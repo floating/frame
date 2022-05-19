@@ -1,4 +1,5 @@
 import log from 'electron-log'
+import { v5 as uuidv5 } from 'uuid'
 
 const panelActions = require('./panel')
 const supportedNetworkTypes = ['ethereum']
@@ -398,11 +399,11 @@ module.exports = {
   setDappStorage: (u, hash, state) => {
     if (state) u(`main.dapp.storage.${hash}`, () => state)
   },
-  initOrigin: (u, originId, chainId, type) => {
-    u('main.origins', () => ({ [originId]: { chainId, type } }))
+  initOrigin: (u, origin, chainId, type) => {
+    u('main.origins', () => ({ [uuidv5(origin, uuidv5.DNS)]: { chainId, type } }))
   },
-  switchOriginChain: (u, originId, chainId, type) => {
-    u('main.origins', originId, () => ({ chainId, type }))
+  switchOriginChain: (u, origin, chainId, type) => {
+    u('main.origins', uuidv5(origin, uuidv5.DNS), () => ({ chainId, type }))
   },
   expandDock: (u, expand) => {
     u('dock.expand', (s) => expand)

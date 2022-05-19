@@ -1,8 +1,7 @@
 const http = require('http')
-const { v5: uuidv5 } = require('uuid')
 const log = require('electron-log')
 
-const { provider } = require('../provider')
+const provider = require('../provider').default
 const accounts = require('../accounts').default
 const store = require('../store').default
 
@@ -46,7 +45,7 @@ const handler = (req, res) => {
         log.warn(`Received payload with no origin: ${JSON.stringify(payload)}`)
       }
       payload._origin = origin
-      store.initOrigin(uuidv5(origin, uuidv5.DNS), 1, 'ethereum')
+      store.initOrigin(origin, 1, 'ethereum')
       if (logTraffic) log.info('req -> | http | ' + req.headers.origin + ' | ' + payload.method + ' | -> | ' + JSON.stringify(payload.params))
       if (protectedMethods.indexOf(payload.method) > -1 && !(await trusted(origin))) {
         let error = { message: 'Permission denied, approve ' + origin + ' in Frame to continue', code: 4001 }

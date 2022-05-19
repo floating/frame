@@ -25,7 +25,7 @@ import { capitalize, arraysMatch } from '../../resources/utils'
 import { ApprovalType } from '../../resources/constants'
 import { checkExistingNonceGas, ecRecover, feeTotalOverMax, gasFees, getActiveChains, getAssets, getChains, getPermissions, getRawTx, getSignedAddress, isCurrentAccount, isScanning, loadAssets, requestPermissions, resError } from './helpers'
 
-type Origins = Record<string, { chainId: number }>
+type Origins = Record<string, { chainId: number, type: string }>
 type Subscriptions = { [key in SubscriptionType]: string[] }
 
 interface RequiredApproval {
@@ -55,15 +55,21 @@ export class Provider extends EventEmitter {
     super()
 
     this.connection.syncDataEmit(this)
-
-    this.connection.on('connect', () => {
+    this.connection.on('connect', (chain, ...args) => {
       this.connected = true
       this.emit('connect')
     })
-    this.connection.on('close', () => { this.connected = false })
-    this.connection.on('data', (chain, ...data) => this.emit('data', ...data))
-    this.connection.on('error', err => log.error(err))
-    this.connection.on('update', event => {
+    this.connection.on('close', (chain, ...args) => { 
+      this.connected = false 
+    })
+    this.connection.on('data', ({ type, id }, ...args) => {
+      this.emit(`data:${type}:${id}`, ...args)
+      // this.emit()
+    })
+    this.connection.on('error', (chain, err, ...args) => {
+      log.error(err)
+    })
+    this.connection.on('update', (chain, event, ...args) => {
       if (event.type === 'fees') {
         return accounts.updatePendingFees(event.chainId)
       }
@@ -847,4 +853,4 @@ store.observer(() => {
   }
 }, 'provider:account')
 
-export { provider }
+export default provider

@@ -1,7 +1,6 @@
 
 
 import EventEmitter from 'events'
-import fetch from 'node-fetch'
 import log from 'electron-log'
 import { shell, Notification } from 'electron'
 import { addHexPrefix, intToHex} from 'ethereumjs-util'
@@ -20,7 +19,7 @@ import {
 } from './types'
 
 // Provider Proxy
-import { provider } from'../provider'
+import provider from '../provider'
 import { Chain } from '../chains'
 import { TypedData, Version } from 'eth-sig-util'
 import { ApprovalType } from '../../resources/constants'
@@ -351,6 +350,11 @@ export class Accounts extends EventEmitter {
           }
 
           provider.on(`data:${targetChain.type}:${targetChain.id}`, handler)
+          // provider.on('data', ({ type, id }, ...args) => {
+          //   if (id === targetChain.id) {
+          //     handler(args)
+          //   }
+          // })
         }
       })
     }

@@ -178,9 +178,7 @@ afterEach(done => {
 
   chains.once('close', ({ id }) => {
     if (id === activeConnection.id) {
-      chains.once('close', ({ id }) => {
-        done(id === activeConnection.id)
-     })   
+      done();
     }
   })
   store.toggleConnection('ethereum', activeConnection.id, 'primary', false)
