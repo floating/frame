@@ -179,6 +179,8 @@ afterEach(done => {
   chains.once('close', ({ id }) => {
     if (id === activeConnection.id) {
       done();
+    } else {
+      done(new Error('connection error'))
     }
   })
   store.toggleConnection('ethereum', activeConnection.id, 'primary', false)
