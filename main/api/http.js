@@ -42,6 +42,9 @@ const handler = (req, res) => {
       const input = Buffer.concat(body).toString()
       const payload = validPayload(input)
       if (!payload) return console.warn('Invalid Payload', input)
+      if (!origin) {
+        log.warn(`Received payload with no origin: ${JSON.stringify(payload)}`)
+      }
       payload._origin = origin
       store.initOrigin(uuidv5(origin, uuidv5.DNS), 1, 'ethereum')
       if (logTraffic) log.info('req -> | http | ' + req.headers.origin + ' | ' + payload.method + ' | -> | ' + JSON.stringify(payload.params))
