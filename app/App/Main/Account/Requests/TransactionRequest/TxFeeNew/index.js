@@ -44,8 +44,9 @@ class TxFee extends React.Component {
       maxFeeUSD = maxFee.shiftedBy(-18).multipliedBy(nativeUSD)
     }
 
-    // accounts for a 12.5% reduction in the block base fee
-    const minFeePerGas = maxFeePerGas.dividedBy(BigNumber(1.14))
+    // accounts for two potential 12.5% block fee increases
+    const reduceFactor = BigNumber(9).dividedBy(8)
+    const minFeePerGas = maxFeePerGas.dividedBy(reduceFactor).dividedBy(reduceFactor)
 
     // accounts for the 50% padding in the gas estimate in the provider
     const minGas = maxGas.dividedBy(BigNumber(1.5))
