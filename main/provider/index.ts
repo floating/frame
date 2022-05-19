@@ -15,7 +15,6 @@ import {
 
 import store from '../store'
 import packageFile from '../../package.json'
-
 import proxyConnection from './proxy'
 import accounts, { AccountRequest, TransactionRequest, SignTypedDataRequest, AddChainRequest, AddTokenRequest } from '../accounts'
 import Chains, { Chain } from '../chains'
@@ -24,7 +23,7 @@ import { populate as populateTransaction, maxFee, TransactionData } from '../tra
 import FrameAccount from '../accounts/Account'
 import { capitalize, arraysMatch } from '../../resources/utils'
 import { ApprovalType } from '../../resources/constants'
-import { ecRecover, feeTotalOverMax, gasFees, getActiveChains, getAssets, getChains, getPermissions, getRawTx, getSignedAddress, isCurrentAccount, isScanning, loadAssets, requestPermissions, resError } from './helpers'
+import { checkExistingNonceGas, ecRecover, feeTotalOverMax, gasFees, getActiveChains, getAssets, getChains, getPermissions, getRawTx, getSignedAddress, isCurrentAccount, isScanning, loadAssets, requestPermissions, resError } from './helpers'
 
 type Origins = Record<string, { chainId: number }>
 type Subscriptions = { [key in SubscriptionType]: string[] }
@@ -52,12 +51,9 @@ export class Provider extends EventEmitter {
     networkChanged: []
   }
 
-  store: (...args: any) => any
-
   constructor () {
     super()
-    this.store = store
-    
+
     this.connection.syncDataEmit(this)
 
     this.connection.on('connect', () => {
@@ -65,7 +61,7 @@ export class Provider extends EventEmitter {
       this.emit('connect')
     })
     this.connection.on('close', () => { this.connected = false })
-    this.connection.on('data', data => this.emit('data', data))
+    this.connection.on('data', (chain, ...data) => this.emit('data', ...data))
     this.connection.on('error', err => log.error(err))
     this.connection.on('update', event => {
       if (event.type === 'fees') {
@@ -377,46 +373,6 @@ export class Provider extends EventEmitter {
     this.connection.send({ id: 1, jsonrpc: '2.0', method: 'eth_getTransactionCount', params: [rawTx.from, 'pending'] }, res, targetChain)
   }
 
-  checkExistingNonceGas (tx: TransactionData) {
-    const { from, nonce } = tx
-
-    const reqs = this.store('main.accounts', from, 'requests')
-    const requests = Object.keys(reqs || {}).map(key => reqs[key])
-    const existing = requests.filter(r => (
-      r.mode === 'monitor' && 
-      r.status !== 'error' && 
-      r.data.nonce === nonce
-    ))
-
-    if (existing.length > 0) {
-      if (tx.maxPriorityFeePerGas && tx.maxFeePerGas) {
-        const existingFee = Math.max(...existing.map(r => r.data.maxPriorityFeePerGas))
-        const existingMax = Math.max(...existing.map(r => r.data.maxFeePerGas))
-        const feeInt = parseInt(tx.maxPriorityFeePerGas)
-        const maxInt = parseInt(tx.maxFeePerGas)
-        if (existingFee * 1.1 >= feeInt || existingMax * 1.1 >= maxInt) {
-          // Bump fees by 10%
-          const bumpedFee = Math.max(Math.ceil(existingFee * 1.1), feeInt)
-          const bumpedBase = Math.max(Math.ceil((existingMax - existingFee) * 1.1), Math.ceil(maxInt - feeInt))
-          tx.maxFeePerGas = '0x' + (bumpedBase + bumpedFee).toString(16)
-          tx.maxPriorityFeePerGas = '0x' + bumpedFee.toString(16)
-          tx.feesUpdated = true
-        }
-      } else if (tx.gasPrice) {
-        const existingPrice = Math.max(...existing.map(r => r.data.gasPrice))
-        const priceInt = parseInt(tx.gasPrice)
-        if (existingPrice >= priceInt) {
-          // Bump price by 10%
-          const bumpedPrice = Math.ceil(existingPrice * 1.1)
-          tx.gasPrice = '0x' + bumpedPrice.toString(16)
-          tx.feesUpdated = true
-        }
-      }
-    }
-
-    return tx
-  }
-
   async fillTransaction (newTx: RPC.SendTransaction.TxParams, cb: Callback<TransactionMetadata>) {
     if (!newTx) return cb(new Error('No transaction data'))
 
@@ -451,7 +407,7 @@ export class Provider extends EventEmitter {
 
           return populatedTransaction
         })
-        .then(tx => this.checkExistingNonceGas(tx))
+        .then(tx => checkExistingNonceGas(tx))
         .then(tx => cb(null, { tx, approvals }))
         .catch(cb)
     } catch (e) {
