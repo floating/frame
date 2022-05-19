@@ -5,25 +5,20 @@ import Wrapper, { ensResolve } from '@aragon/wrapper'
 import store from '../../store'
 import appNames from './appNames'
 import { Provider, TransactionMetadata } from '../../provider'
+import { Chain } from '../../chains'
 
-function getNetworkId () {
-  return parseInt(store('main.currentNetwork.id') || '0')
+const addresses: Record<number, Address> = {
+  1: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
+  3: '0x6afe2cacee211ea9179992f89dc61ff25c61e923',
+  4: '0x98df287b6c145399aaa709692c8d308357bc085d',
+  74: '0xede729eff031bc9f1a36f4361cd0d9585c9dc5f9',
+  100: '0xaafca6b0c89521752e559650206d7c925fd0e530',
+  137: '0x3c70a0190d09f34519e6e218364451add21b7d4b',
+  80001: '0x431f0eed904590b176f9ff8c36a1c4ff0ee9b982'
 }
 
-function registryAddress () {
-  const network = getNetworkId()
-
-  const addresses: Record<number, Address> = {
-    1: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
-    3: '0x6afe2cacee211ea9179992f89dc61ff25c61e923',
-    4: '0x98df287b6c145399aaa709692c8d308357bc085d',
-    74: '0xede729eff031bc9f1a36f4361cd0d9585c9dc5f9',
-    100: '0xaafca6b0c89521752e559650206d7c925fd0e530',
-    137: '0x3c70a0190d09f34519e6e218364451add21b7d4b',
-    80001: '0x431f0eed904590b176f9ff8c36a1c4ff0ee9b982'
-  }
-
-  if (addresses[network]) return addresses[network]
+function registryAddress (chainId: number) {
+  if (addresses[chainId]) return addresses[chainId]
   throw new Error('Unable to locate Aragon ENS registry for current network')
 }
 
@@ -81,13 +76,15 @@ async function resolveName (name: string) {
 export interface AragonOptions {
   dao: Address,
   agent: Address,
-  actor: Address
+  actor: Address,
+  chain: Chain
 }
 
 class Aragon {
   dao: Address
   agent: Address
   actor: Address
+  chain: Chain
 
   provider?: Provider
   wrap?: Wrapper
@@ -98,13 +95,13 @@ class Aragon {
     this.dao = opts.dao
     this.agent = opts.agent
     this.actor = opts.actor // Actor is now just the acting accounts address
+    this.chain = opts.chain
 
     store.observer(() => this.setup())
   }
 
   setup () {
-    const { type, id } = store('main.currentNetwork')
-    const connection = store('main.networks', type, id, 'connection')
+    const connection = store('main.networks', this.chain.type, this.chain.id, 'connection')
     const status = [connection.primary.status, connection.secondary.status]
     if (status.indexOf('connected') > -1 && !this.wrap && !this.inSetup) {
       setTimeout(() => {
