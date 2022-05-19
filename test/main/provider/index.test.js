@@ -41,7 +41,7 @@ beforeEach(async () => {
   store.set('main.accounts', {})
   store.set('main.origins', '8073729a-5e59-53b7-9e69-5d9bcff94087', { chainId: 1, type: 'ethereum' })
   
-  provider = (await import('../../../main/provider')).default
+  provider = (await import('../../../main/provider')).provider
   provider.handlers = {}
 
   const eventTypes = ['accountsChanged', 'chainChanged', 'chainsChanged', 'assetsChanged', 'networkChanged']
@@ -61,44 +61,6 @@ beforeEach(async () => {
   accounts.get = jest.fn(addr => addr === address ? { address, lastSignerType: 'ring' } : undefined)
   accounts.signTransaction = jest.fn()
   accounts.setTxSigned = jest.fn()
-})
-
-describe('#getRawTx', () => {
-  it('leaves a valid value unchanged', () => {
-    const tx = provider.getRawTx({ value: '0x2540be400' })
-
-    expect(tx.value).toBe('0x2540be400')
-  })
-
-  it('removes a leading zero from a valid value', () => {
-    const tx = provider.getRawTx({ value: '0x0a45c6' })
-
-    expect(tx.value).toBe('0xa45c6')
-  })
-
-  it('leaves a valid zero value unchanged', () => {
-    const tx = provider.getRawTx({ value: '0x0' })
-
-    expect(tx.value).toBe('0x0')
-  })
-
-  it('turns a zero value into the correct hex value for zero', () => {
-    const tx = provider.getRawTx({ value: '0x' })
-
-    expect(tx.value).toBe('0x0')
-  })
-
-  it('turns an un-prefixed zero value into the correct hex value for zero', () => {
-    const tx = provider.getRawTx({ value: '0' })
-
-    expect(tx.value).toBe('0x0')
-  })
-
-  it('turns an undefined value into the correct hex value for zero', () => {
-    const tx = provider.getRawTx({ value: undefined })
-
-    expect(tx.value).toBe('0x0')
-  })
 })
 
 describe('#send', () => {
@@ -1258,7 +1220,7 @@ describe('state change events', () => {
         expect(event.params.result).toBe('0x89')
         done()
       })
-      store.set('main.origins', '8073729a-5e59-53b7-9e69-5d9bcff94087', { chainId: 137 })
+      store.set('main.origins', '8073729a-5e59-53b7-9e69-5d9bcff94087', { chainId: 137, type: 'ethereum' })
       provider.subscriptions.chainChanged.push(subscriptionId)
       store.getObserver('provider:chains').fire()
     })

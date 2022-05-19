@@ -95,7 +95,7 @@ require('./rpc')
 const signers = require('./signers').default
 const persist = require('./store/persist')
 const { default: Erc20Contract } = require('./contracts/erc20')
-const { default: provider } = require('./provider')
+const { provider } = require('./provider')
 
 log.info('Chrome: v' + process.versions.chrome)
 log.info('Electron: v' + process.versions.electron)
