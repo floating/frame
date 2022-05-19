@@ -38,6 +38,9 @@ const handler = (socket, req) => {
         origin = 'frame-extension'
       }
     }
+    if (!origin) {
+      log.warn(`Received payload with no origin: ${JSON.stringify(payload)}`)
+    }
     payload._origin = origin
     store.initOrigin(uuidv5(origin, uuidv5.DNS), 1, 'ethereum')
 
