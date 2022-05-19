@@ -466,33 +466,9 @@ describe('migration 19', () => {
           type: 'ethereum'
         },
         clients: {
-          ipfs: {
-            on: false,
-            installed: false,
-            latest: false,
-            version: null,
-            state: 'off'
-          },
-          geth: {
-            on: false,
-            blockNumber: 0,
-            currentBlock: 0,
-            highestBlock: 0,
-            installed: false,
-            latest: false,
-            version: null,
-            state: 'off'
-          },
-          parity: {
-            on: false,
-            blockNumber: 0,
-            currentBlock: 0,
-            highestBlock: 0,
-            installed: false,
-            latest: false,
-            version: null,
-            state: 'off'
-          }
+          ipfs: {},
+          geth: {},
+          parity: {}
         }
       }
     }
