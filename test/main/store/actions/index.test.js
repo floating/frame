@@ -522,14 +522,14 @@ describe('#switchOriginChain', () => {
 
   const updaterFn = (node, origin, update) => {
     const nodePath = [node, origin].join('.')
-    expect(nodePath).toBe('main.origins.frame.eth')
+    expect(nodePath).toBe('main.origins.91f6971d-ba85-52d7-a27e-6af206eb2433')
 
     origins[origin] = update()
   }
 
   beforeEach(() => {
     origins = {
-      'frame.eth': {
+      '91f6971d-ba85-52d7-a27e-6af206eb2433': {
         chainId: 1,
         type: 'ethereum'
       }
@@ -541,8 +541,8 @@ describe('#switchOriginChain', () => {
   it('should switch the chain for an origin', () => {
     switchChain(50, 'cosmos')
 
-    expect(origins['frame.eth'].chainId).toBe(50)
-    expect(origins['frame.eth'].type).toBe('cosmos')
+    expect(origins['91f6971d-ba85-52d7-a27e-6af206eb2433'].chainId).toBe(50)
+    expect(origins['91f6971d-ba85-52d7-a27e-6af206eb2433'].type).toBe('cosmos')
   })
 })
 

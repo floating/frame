@@ -41,7 +41,7 @@ beforeEach(async () => {
   store.set('main.accounts', {})
   store.set('main.origins', '8073729a-5e59-53b7-9e69-5d9bcff94087', { chainId: 1, type: 'ethereum' })
   
-  provider = (await import('../../../main/provider')).provider
+  provider = (await import('../../../main/provider')).default
   provider.handlers = {}
 
   const eventTypes = ['accountsChanged', 'chainChanged', 'chainsChanged', 'assetsChanged', 'networkChanged']

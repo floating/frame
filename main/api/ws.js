@@ -1,8 +1,8 @@
 const WebSocket = require('ws')
-const { v4: uuid, v5: uuidv5 } = require('uuid')
+const { v4: uuid } = require('uuid')
 const log = require('electron-log')
 
-const { provider } = require('../provider')
+const provider = require('../provider')
 const accounts = require('../accounts').default
 const store = require('../store').default
 const windows = require('../windows')
@@ -42,7 +42,7 @@ const handler = (socket, req) => {
       log.warn(`Received payload with no origin: ${JSON.stringify(payload)}`)
     }
     payload._origin = origin
-    store.initOrigin(uuidv5(origin, uuidv5.DNS), 1, 'ethereum')
+    store.initOrigin(origin, 1, 'ethereum')
 
     // Extension custom action for summoning Frame
     if (origin === 'frame-extension' && payload.method === 'frame_summon') return windows.trayClick(true)
