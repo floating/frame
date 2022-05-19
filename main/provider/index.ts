@@ -122,12 +122,9 @@ export class Provider extends EventEmitter {
       this.connected = true
       this.emit('connect')
     })
-
     this.connection.on('close', () => { this.connected = false })
     this.connection.on('data', data => this.emit('data', data))
-
     this.connection.on('error', err => log.error(err))
-
     this.connection.on('update', event => {
       if (event.type === 'fees') {
         return accounts.updatePendingFees(event.chainId)
@@ -192,7 +189,7 @@ export class Provider extends EventEmitter {
   }
 
   getNetVersion (payload: RPCRequestPayload, res: RPCRequestCallback, targetChain: Chain) {
-    const { type, id } = (targetChain || store('main.origins', uuidv5(payload._origin, uuidv5.DNS), 'chainId'))
+    const { type, id } = (targetChain || store('main.origins', uuidv5(payload._origin, uuidv5.DNS)))
 
     const connection = this.connection.connections[type][id]
     const chainConnected = (connection.primary?.connected || connection.secondary?.connected)
@@ -205,7 +202,7 @@ export class Provider extends EventEmitter {
   }
 
   getChainId (payload: RPCRequestPayload, res: RPCSuccessCallback, targetChain: Chain) {
-    const { type, id } = (targetChain || store('main.origins', uuidv5(payload._origin, uuidv5.DNS), 'chainId'))
+    const { type, id } = (targetChain || store('main.origins', uuidv5(payload._origin, uuidv5.DNS)))
 
     const connection = this.connection.connections[type][id]
     const chainConnected = (connection.primary?.connected || connection.secondary?.connected)
@@ -763,20 +760,19 @@ export class Provider extends EventEmitter {
       const params = payload.params
       if (!params || !params[0]) throw new Error('Params not supplied')
       
-      const type = 'ethereum'
 
       const chainId = parseInt(params[0].chainId)
       if (!Number.isInteger(chainId)) throw new Error('Invalid chain id')
 
       // Check if chain exists 
-      const exists = Boolean(store('main.networks', type, chainId))
+      const exists = Boolean(store('main.networks', 'ethereum', chainId))
       if (exists === false) throw new Error('Chain does not exist')
 
       const originId = uuidv5(payload._origin, uuidv5.DNS)
-      const currentChain = store('main.origins', originId, 'chainId')
+      const { chainId: currentChain, type } = store('main.origins', originId)
       
       if (currentChain !== chainId) {
-        store.switchOriginChain(originId, chainId)
+        store.switchOriginChain(originId, chainId, type)
         this.chainChanged(chainId, payload._origin)
       }
 
@@ -930,7 +926,9 @@ export class Provider extends EventEmitter {
         target.id = chainId
       }
     } else {
-      target.id = store('main.origins', uuidv5(payload._origin, uuidv5.DNS), 'chainId')
+      const { chainId, type } = store('main.origins', uuidv5(payload._origin, uuidv5.DNS))
+      target.id = chainId
+      target.type = type
     }
 
     return target

@@ -520,27 +520,29 @@ describe('#setScanning', () => {
 describe('#switchOriginChain', () => {
   let origins = { }
 
-  const updaterFn = (node, origin, chainIdKey, update) => {
-    const nodePath = [node, origin, chainIdKey].join('.')
-    expect(nodePath).toBe('main.origins.frame.eth.chainId')
+  const updaterFn = (node, origin, update) => {
+    const nodePath = [node, origin].join('.')
+    expect(nodePath).toBe('main.origins.frame.eth')
 
-    origins[origin].chainId = update()
+    origins[origin] = update()
   }
 
   beforeEach(() => {
     origins = {
       'frame.eth': {
-        chainId: 1
+        chainId: 1,
+        type: 'ethereum'
       }
     }
   })
 
-  const switchChain = chainId => switchOriginChainAction(updaterFn, 'frame.eth', chainId)
+  const switchChain = (chainId, type) => switchOriginChainAction(updaterFn, 'frame.eth', chainId, type)
 
   it('should switch the chain for an origin', () => {
-    switchChain(4)
+    switchChain(50, 'cosmos')
 
-    expect(origins['frame.eth'].chainId).toBe(4)
+    expect(origins['frame.eth'].chainId).toBe(50)
+    expect(origins['frame.eth'].type).toBe('cosmos')
   })
 })
 
@@ -556,16 +558,20 @@ describe('#removeNetwork', () => {
     main = {
       origins: {
         'frame.eth': {
-          chainId: 1
+          chainId: 1,
+          type: 'ethereum'
         },
         'frame.test': {
-          chainId: 4
+          chainId: 4,        
+          type: 'ethereum',
         },
         'frame.sh': {
-          chainId: 50
+          chainId: 50,
+          type: 'cosmos',
         },
         'frame.test2': {
-          chainId: 4
+          chainId: 4,        
+          type: 'ethereum',
         }
       },
       networks: {
@@ -615,16 +621,20 @@ describe('#removeNetwork', () => {
 
     expect(main.origins).toStrictEqual({
       'frame.eth': {
-        chainId: 1
+        chainId: 1,
+        type: 'ethereum'
       },
       'frame.test': {
-        chainId: 1
+        chainId: 1,
+        type: 'ethereum'
       },
       'frame.sh': {
-        chainId: 50
+        chainId: 50,
+        type: 'cosmos'
       },
       'frame.test2': {
-        chainId: 1
+        chainId: 1,
+        type: 'ethereum'
       }
     })
   })
@@ -642,16 +652,20 @@ describe('#removeNetwork', () => {
   
       expect(main.origins).toStrictEqual({
         'frame.eth': {
-          chainId: 1
+          chainId: 1,
+          type: 'ethereum'
         },
         'frame.test': {
-          chainId: 4
+          chainId: 4,
+          type: 'ethereum'
         },
         'frame.sh': {
-          chainId: 50
+          chainId: 50,
+          type: 'cosmos'
         },
         'frame.test2': {
-          chainId: 4
+          chainId: 4,
+          type: 'ethereum'
         }
       })
     })
@@ -670,16 +684,20 @@ describe('#updateNetwork', () => {
     main = {
       origins: {
         'frame.eth': {
-          chainId: 1
+          chainId: 1,
+          type: 'ethereum'
         },
         'frame.test': {
-          chainId: 4
+          chainId: 4,
+          type: 'ethereum'
         },
         'frame.sh': {
-          chainId: 50
+          chainId: 50,
+          type: 'ethereum'
         },
         'frame.test2': {
-          chainId: 4
+          chainId: 4,
+          type: 'ethereum'
         }
       },
       networks: {
@@ -734,16 +752,20 @@ describe('#updateNetwork', () => {
 
     expect(main.origins).toStrictEqual({
       'frame.eth': {
-        chainId: 1
+        chainId: 1,
+        type: 'ethereum',
       },
       'frame.test': {
-        chainId: 66
+        chainId: 66,
+        type: 'ethereum',
       },
       'frame.sh': {
-        chainId: 50
+        chainId: 50,
+        type: 'ethereum',
       },
       'frame.test2': {
-        chainId: 66
+        chainId: 66,
+        type: 'ethereum',
       }
     })
   })
