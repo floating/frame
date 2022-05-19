@@ -177,7 +177,7 @@ afterEach(done => {
   const activeConnection = Object.values(mockConnections).find(conn => conn.connection.connected)
 
   chains.once('close', ({ id }) => {
-    if(id === activeConnection.id) {
+    if (id === activeConnection.id) {
       chains.once('close', ({ id }) => {
         done(id === activeConnection.id)
      })   

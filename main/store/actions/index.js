@@ -304,7 +304,7 @@ module.exports = {
         main.networks[updatedNetwork.type][updatedNetwork.id] = updatedNetwork
 
         Object.entries(main.origins).forEach(([origin, { chainId }]) => {
-          if(net.id === chainId) {
+          if (net.id === chainId) {
             main.origins[origin].chainId = updatedNetwork.id
             main.origins[origin].type = updatedNetwork.type
           }
@@ -331,7 +331,7 @@ module.exports = {
 
         // If deleting a network that an origin is currently using, switch them to mainnet
         Object.entries(main.origins).forEach(([origin, { chainId }]) => {
-          if(net.id === chainId) {
+          if (net.id === chainId) {
             main.origins[origin].chainId = 1
             main.origins[origin].type = 'ethereum'
           }
