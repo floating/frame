@@ -23,10 +23,6 @@ afterAll(() => {
   log.transports.console.level = 'debug'
 })
 
-beforeEach(() => {
-  jest.spyOn(log, 'error')
-})
-
 const owner = '0xa8be0f701d0f37088600164e71bffc0ad652c251'
 
 const testTokens = {
@@ -599,16 +595,6 @@ describe('#removeNetwork', () => {
 
   const removeNetwork = (networkId, networkType = 'ethereum') => removeNetworkAction(updaterFn, { id: networkId, type: networkType })
 
-  it('should log an error when deleting an invalid network', () => {
-    removeNetwork('not a network')
-    expect(log.error.mock.calls[log.error.mock.calls.length - 1][0]).toStrictEqual(new Error('Invalid chain id'))
-  })
-
-  it('should log an error when deleting mainnet', () => {
-    removeNetwork(1)
-    expect(log.error.mock.calls[log.error.mock.calls.length - 1][0]).toStrictEqual(new Error('Cannot remove mainnet'))
-  })
-
   it('should delete the network and meta', () => {
     removeNetwork(4)
 
@@ -724,16 +710,6 @@ describe('#updateNetwork', () => {
   })
 
   const updateNetwork = (existingNetwork, newNetwork) => updateNetworkAction(updaterFn, existingNetwork, newNetwork)
-
-  it('should log an error when passed an invalid existing network', () => {
-    updateNetwork({ id: 'invalid' })
-    expect(log.error.mock.calls[log.error.mock.calls.length - 1][0]).toStrictEqual(new Error('Invalid network settings: {"id":"invalid"}'))
-  })
-
-  it('should log an error when passed an invalid new network', () => {
-    updateNetwork({ id: '0x1', type: 'ethereum', name: '', explorer: '', symbol: '' }, { id: 'invalid' })
-    expect(log.error.mock.calls[log.error.mock.calls.length - 1][0]).toStrictEqual(new Error('Invalid network settings: {"id":"invalid"}'))
-  })
 
   it('should update the network', () => {
     updateNetwork({ id: '0x4', type: 'ethereum', name: '', explorer: '', symbol: '' }, { id: '0x42', type: 'ethereum', name: 'test', explorer: 'explorer.test', symbol: 'TEST' })
