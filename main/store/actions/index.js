@@ -306,6 +306,7 @@ module.exports = {
         Object.entries(main.origins).forEach(([origin, { chainId }]) => {
           if(net.id === chainId) {
             main.origins[origin].chainId = updatedNetwork.id
+            main.origins[origin].type = updatedNetwork.type
           }
         })
         
@@ -332,6 +333,7 @@ module.exports = {
         Object.entries(main.origins).forEach(([origin, { chainId }]) => {
           if(net.id === chainId) {
             main.origins[origin].chainId = 1
+            main.origins[origin].type = 'ethereum'
           }
         })
 
@@ -396,11 +398,11 @@ module.exports = {
   setDappStorage: (u, hash, state) => {
     if (state) u(`main.dapp.storage.${hash}`, () => state)
   },
-  initOrigin: (u, originId, chainId) => {
-    u('main.origins', () => ({ [originId]: { chainId } }))
+  initOrigin: (u, originId, chainId, type) => {
+    u('main.origins', () => ({ [originId]: { chainId, type } }))
   },
-  switchOriginChain: (u, originId, chainId) => {
-    u('main.origins', originId, 'chainId', () => chainId)
+  switchOriginChain: (u, originId, chainId, type) => {
+    u('main.origins', originId, () => ({ chainId, type }))
   },
   expandDock: (u, expand) => {
     u('dock.expand', (s) => expand)
