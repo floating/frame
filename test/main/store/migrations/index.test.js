@@ -360,7 +360,7 @@ describe('migration 16', () => {
     expect(polygon.id).toBe(137)
   })
 
-  fit('converts current id to number', () => {
+  it('converts current id to number', () => {
     const updatedState = migrations.apply(state, 16)
     const id = updatedState.main.currentNetwork.id
     expect(id).toBe(1)
