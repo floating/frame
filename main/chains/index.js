@@ -404,32 +404,27 @@ class Chains extends EventEmitter {
 
             this.connections[type][chainId].on('connect', (...args) => {
               this.emit(`connect:${type}:${chainId}`, ...args)
-              const current = store('main.currentNetwork')
-              if (current?.type === type && current?.id === parseInt(chainId)) this.emit('connect', ...args)
+              this.emit('connect', ...args)
             })
 
             this.connections[type][chainId].on('close', (...args) => {
               this.emit(`close:${type}:${chainId}`, ...args)
-              const current = store('main.currentNetwork')
-              if (current?.type === type && current?.id === parseInt(chainId)) this.emit('close', ...args)
+              this.emit('close', ...args)
             })
 
             this.connections[type][chainId].on('data', (...args) => {
               this.emit(`data:${type}:${chainId}`, ...args)
-              const current = store('main.currentNetwork')
-              if (current?.type === type && current?.id === parseInt(chainId)) this.emit('data', ...args)
+              this.emit('data', ...args)
             })
 
             this.connections[type][chainId].on('update', (...args) => {
               this.emit(`update:${type}:${chainId}`, ...args)
-              const current = store('main.currentNetwork')
-              if (current?.type === type && current?.id === parseInt(chainId)) this.emit('update', ...args)
+              this.emit('update', ...args)
             })
 
             this.connections[type][chainId].on('error', (...args) => {
               this.emit(`error:${type}:${chainId}`, ...args)
-              const current = store('main.currentNetwork')
-              if (current?.type === type && current?.id === parseInt(chainId)) this.emit('error', ...args)
+              this.emit('error', ...args)
             })
 
           } else if (!chainConfig.on && this.connections[type][chainId]) {
