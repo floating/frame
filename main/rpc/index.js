@@ -165,7 +165,6 @@ const rpc = {
     }
   },
   addAragon (account, cb) {
-    console.log('ARR ARAGON RPC', { account })
     accounts.addAragon(account, cb)
   },
   createFromAddress (address, cb) {

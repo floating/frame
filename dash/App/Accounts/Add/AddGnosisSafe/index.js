@@ -95,7 +95,7 @@ class AddAragon extends React.Component {
             address: actorAddress // External Signer
           },
           dao: dao.apps.kernel.proxyAddress, // DAO Address
-          agent: dao.apps.agent.proxyAddress, // Agent Address
+          agent: dao.apps.agent.proxyAddress // Agent Address
         }
       }
       link.rpc('addAragon', aragonAccount, (err) => {

@@ -33,6 +33,9 @@ async function resolveAragon (domain: string, chainId: number, registryAddress: 
       provider.setChain(chainId)
 
       const address = await ensResolve(domain, { provider, registryAddress })
+
+      provider.close()
+
       if (address.replace('0x', '')) return resolve(address)
       throw new Error('Invalid address')
     } catch (e) {
