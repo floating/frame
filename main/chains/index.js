@@ -403,30 +403,24 @@ class Chains extends EventEmitter {
             this.connections[type][chainId] = new ChainConnection(type, chainId)
 
             this.connections[type][chainId].on('connect', (...args) => {
-              this.emit(`connect:${type}:${chainId}`, ...args)
-              this.emit('connect', ...args)
+              this.emit('connect', { type, id: chainId }, ...args)
             })
 
             this.connections[type][chainId].on('close', (...args) => {
-              this.emit(`close:${type}:${chainId}`, ...args)
-              this.emit('close', ...args)
+              this.emit('close', { type, id: chainId }, ...args)
             })
 
             this.connections[type][chainId].on('data', (...args) => {
-              this.emit(`data:${type}:${chainId}`, ...args)
-              this.emit('data', ...args)
+              this.emit('data', { type, id: chainId }, ...args)
             })
 
             this.connections[type][chainId].on('update', (...args) => {
-              this.emit(`update:${type}:${chainId}`, ...args)
-              this.emit('update', ...args)
+              this.emit('update', { type, id: chainId }, ...args)
             })
 
             this.connections[type][chainId].on('error', (...args) => {
-              this.emit(`error:${type}:${chainId}`, ...args)
-              this.emit('error', ...args)
+              this.emit('error', { type, id: chainId }, ...args)
             })
-
           } else if (!chainConfig.on && this.connections[type][chainId]) {
             this.connections[type][chainId].removeAllListeners()
             this.connections[type][chainId].close()

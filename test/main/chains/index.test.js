@@ -140,10 +140,10 @@ const mockConnections = {
   }
 }
 
-let Chains
+let chains
 beforeAll(async () => {
   // need to import this after mocks are set up
-  Chains = (await import('../../../main/chains')).default
+  chains = (await import('../../../main/chains')).default
 })
 
 beforeEach(() => {
@@ -176,7 +176,11 @@ afterEach(done => {
 
   const activeConnection = Object.values(mockConnections).find(conn => conn.connection.connected)
 
-  Chains.once(`close:ethereum:${activeConnection.id}`, done)
+  chains.once('close', ({ id }) => {
+    if(id === activeConnection.id) {
+      done();
+    }
+  })
   store.toggleConnection('ethereum', activeConnection.id, 'primary', false)
 })
   
