@@ -2,7 +2,7 @@ const WebSocket = require('ws')
 const { v4: uuid, v5: uuidv5 } = require('uuid')
 const log = require('electron-log')
 
-const provider = require('../provider').default
+const { provider } = require('../provider')
 const accounts = require('../accounts').default
 const store = require('../store').default
 const windows = require('../windows')

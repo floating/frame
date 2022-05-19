@@ -20,7 +20,7 @@ import {
 } from './types'
 
 // Provider Proxy
-import provider from'../provider'
+import { provider } from'../provider'
 import { Chain } from '../chains'
 import { TypedData, Version } from 'eth-sig-util'
 import { ApprovalType } from '../../resources/constants'
