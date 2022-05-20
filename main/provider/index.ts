@@ -70,8 +70,8 @@ export class Provider extends EventEmitter {
     this.connection.on('close', () => { 
       this.connected = false
     })
-    this.connection.on('data', (...args) => {
-      this.emit('data', ...args)
+    this.connection.on('data', (chain, ...args) => {
+      this.emit(`data:${chain.type}:${chain.id}`, ...args)
     })
     this.connection.on('error', (chain, err) => {
       log.error(err)
@@ -601,10 +601,9 @@ export class Provider extends EventEmitter {
       if (exists === false) throw new Error('Chain does not exist')
 
       const origin = storeApi.getOrigin(payload._origin)
-      
+
       if (origin.chain.id !== chainId) {
         store.switchOriginChain(payload._origin, chainId, origin.chain.type)
-        this.chainChanged(chainId, origin)
       }
 
       return res({ id: payload.id, jsonrpc: '2.0', result: undefined })
@@ -726,7 +725,7 @@ export class Provider extends EventEmitter {
         return { type: 'ethereum', id: chainId }
       }
     }
-    
+
     return storeApi.getOrigin(payload._origin).chain
   }
 
@@ -806,19 +805,25 @@ export class Provider extends EventEmitter {
 }
 
 const provider = new Provider()
-let origins = storeApi.getOrigins()
+let knownOrigins: Record<string, Origin> = { }
 let availableChains = getActiveChains()
 
 store.observer(() => {
   const currentOrigins = storeApi.getOrigins()
   const currentChains = getActiveChains()
 
-  Object.entries(currentOrigins).forEach(([originId, origin]) => {
-    if(origins[originId].chain.id !== origin.chain.id) {
-      provider.chainChanged(origin.chain.id, origin)
-      provider.networkChanged(origin.chain.id)
+  for (const originId in currentOrigins) {
+    const origin = currentOrigins[originId]
+
+    if (originId in knownOrigins) {
+      if (knownOrigins[originId].chain.id !== origin.chain.id) {
+        provider.chainChanged(origin.chain.id, origin)
+        provider.networkChanged(origin.chain.id)
+      }
+    } else {
+      knownOrigins[originId] = origin
     }
-  })
+  }
 
   if (!arraysMatch(currentChains, availableChains)) {
     availableChains = currentChains

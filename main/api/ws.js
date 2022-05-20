@@ -2,7 +2,7 @@ const WebSocket = require('ws')
 const { v4: uuid, v5: uuidv5 } = require('uuid')
 const log = require('electron-log')
 
-const provider = require('../provider')
+const provider = require('../provider').default
 const accounts = require('../accounts').default
 const store = require('../store').default
 const windows = require('../windows')
@@ -18,7 +18,9 @@ const subs = {}
 
 function updateOrigin (payload, origin) {
   if (!origin) {
-    log.warn(`Received payload with no origin: ${JSON.stringify(payload)}`)
+    log.warn(`Received payload with no origin: ${payload.method}`)
+
+    //log.warn(`Received payload with no origin: ${JSON.stringify(payload)}`)
     return { ...payload, chainId: payload.chainId || '0x1' }
   }
   
@@ -83,7 +85,7 @@ const handler = (socket, req) => {
       provider.send(payload, response => {
         if (response && response.result) {
           if (payload.method === 'eth_subscribe') {
-            subs[response.result] = { socket, origin }
+            subs[response.result] = { socket, originId: payload._origin }
           } else if (payload.method === 'eth_unsubscribe') {
             payload.params.forEach(sub => { if (subs[sub]) delete subs[sub] })
           }
@@ -98,7 +100,7 @@ const handler = (socket, req) => {
   socket.on('close', _ => {
     Object.keys(subs).forEach(sub => {
       if (subs[sub].socket.id === socket.id) {
-        provider.send({ jsonrpc: '2.0', id: 1, method: 'eth_unsubscribe', params: [sub] })
+        provider.send({ jsonrpc: '2.0', id: 1, method: 'eth_unsubscribe', _origin: subs[sub].originId, params: [sub] })
         delete subs[sub]
       }
     })
@@ -111,8 +113,9 @@ module.exports = server => {
   // Send data to the socket that initiated the subscription
   provider.on('data', payload => {
     const subscription = subs[payload.params.subscription]
+
     // if an origin is passed, make sure the subscription is from that origin
-    if (subscription && (!payload.params.origin || payload.params.origin === subscription.origin)) {
+    if (subscription && (!payload.params.origin || payload.params.origin === subscription.originId)) {
       subscription.socket.send(JSON.stringify(payload))
     }
   })
@@ -121,7 +124,10 @@ module.exports = server => {
     const subscription = subs[payload.params.subscription]
     if (subscription) {
       const permissions = store('main.permissions', address) || {}
-      const permission = Object.values(permissions).find(p => p.origin === subscription.origin) || {}
+      const permission = Object.values(permissions).find(({ origin }) => {
+        const originId = uuidv5(origin, uuidv5.DNS)
+        return originId === subscription.originId
+      }) || {}
 
       if (!permission.provider) payload.params.result = []
       subscription.socket.send(JSON.stringify(payload))
