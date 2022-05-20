@@ -23,7 +23,7 @@ function updateOrigin (payload, origin) {
   }
 
   const originId = uuidv5(origin, uuidv5.DNS)
-  let origin = store('main.origins', originId)
+  const existingOrigin = store('main.origins', originId)
 
   if (!existingOrigin && !payload.__extensionConnecting) {
     // the extension will attempt to send messages (eth_chainId and net_version) in order
