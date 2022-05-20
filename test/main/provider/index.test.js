@@ -186,7 +186,6 @@ describe('#send', () => {
         ]
       }, () => {
         expect(store.switchOriginChain).toHaveBeenCalledWith('8073729a-5e59-53b7-9e69-5d9bcff94087', 1, 'ethereum')
-        expect(chainChangedListener).toHaveBeenCalledWith(1, 'frame.test')
         done()
       })
     })
@@ -207,7 +206,6 @@ describe('#send', () => {
         _origin: 'frame.test'
       }, () => {
         expect(store.switchOriginChain).toHaveBeenCalledWith('8073729a-5e59-53b7-9e69-5d9bcff94087', 1, 'ethereum')
-        expect(chainChangedListener).toHaveBeenCalledWith(1, 'frame.test')
         done()
       })
     })
