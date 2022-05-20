@@ -33,6 +33,8 @@ function notify (title: string, body: string, action: (event: Electron.Event) =>
   setTimeout(() => notification.show(), 1000)
 }
 
+const frameOriginId = uuidv5('frame.eth', uuidv5.DNS)
+
 const accountsApi = {
   getAccounts: function () {
     return (store('main.accounts') || {}) as Record<string, Account>
@@ -187,7 +189,7 @@ export class Accounts extends EventEmitter {
   }
 
   private sendRequest (payload: { method: string, params: any[], chainId: string }, cb: RPCRequestCallback) {
-    provider.send({ id: 1, jsonrpc: '2.0', ...payload, _origin: uuidv5('frame.eth', uuidv5.DNS) }, cb)
+    provider.send({ id: 1, jsonrpc: '2.0', ...payload, _origin: frameOriginId }, cb)
   }
 
   private async confirmations (account: FrameAccount, id: string, hash: string, targetChain: Chain) {
