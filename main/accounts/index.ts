@@ -5,6 +5,9 @@ import log from 'electron-log'
 import { shell, Notification } from 'electron'
 import { addHexPrefix, intToHex} from 'ethereumjs-util'
 
+// @ts-ignore
+import { v5 as uuidv5 } from 'uuid'
+
 import store from '../store'
 import ExternalDataScanner, { DataScanner } from '../externalData'
 import { getType as getSignerType } from '../signers/Signer'
@@ -20,7 +23,6 @@ import {
 
 // Provider Proxy
 import provider from '../provider'
-import { Chain } from '../chains'
 import { TypedData, Version } from 'eth-sig-util'
 import { ApprovalType } from '../../resources/constants'
 
@@ -185,7 +187,7 @@ export class Accounts extends EventEmitter {
   }
 
   private sendRequest (payload: { method: string, params: any[], chainId: string }, cb: RPCRequestCallback) {
-    provider.send({ id: 1, jsonrpc: '2.0', ...payload, _origin: 'frame.eth' }, cb)
+    provider.send({ id: 1, jsonrpc: '2.0', ...payload, _origin: uuidv5('frame.eth', uuidv5.DNS) }, cb)
   }
 
   private async confirmations (account: FrameAccount, id: string, hash: string, targetChain: Chain) {

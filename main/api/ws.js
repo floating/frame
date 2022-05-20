@@ -1,5 +1,5 @@
 const WebSocket = require('ws')
-const { v4: uuid } = require('uuid')
+const { v4: uuid, v5: uuidv5 } = require('uuid')
 const log = require('electron-log')
 
 const provider = require('../provider')
@@ -16,6 +16,34 @@ const logTraffic = process.env.LOG_TRAFFIC
 
 const subs = {}
 
+function updateOrigin (payload, origin) {
+  if (!origin) {
+    log.warn(`Received payload with no origin: ${JSON.stringify(payload)}`)
+    return { ...payload, chainId: payload.chainId || '0x1' }
+  }
+
+  const originId = uuidv5(origin, uuidv5.DNS)
+  let origin = store('main.origins', originId)
+
+  if (!existingOrigin && !payload.__extensionConnecting) {
+    // the extension will attempt to send messages (eth_chainId and net_version) in order
+    // to connect. we don't want to store these origins as they'll come from every site
+    // the user visits in their browser
+    store.initOrigin(originId, {
+      name: origin,
+      chain: {
+        id: 1,
+        type: 'ethereum'
+      }
+    })
+  }
+  
+  return {
+    ...payload,
+    _origin: originId
+  }
+}
+
 
 const handler = (socket, req) => {
   socket.id = uuid()
@@ -28,21 +56,18 @@ const handler = (socket, req) => {
   }
   socket.on('message', async data => {
     let origin = socket.origin
-    const payload = validPayload(data)
-    if (!payload) return console.warn('Invalid Payload', data)
+    const rawPayload = validPayload(data)
+    if (!rawPayload) return console.warn('Invalid Payload', data)
     if (socket.isFrameExtension) { // Request from extension, swap origin
-      if (payload.__frameOrigin) {
-        origin = payload.__frameOrigin
-        delete payload.__frameOrigin
+      if (rawPayload.__frameOrigin) {
+        origin = rawPayload.__frameOrigin
+        delete rawPayload.__frameOrigin
       } else {
         origin = 'frame-extension'
       }
     }
-    if (!origin) {
-      log.warn(`Received payload with no origin: ${JSON.stringify(payload)}`)
-    }
-    payload._origin = origin
-    store.initOrigin(origin, 1, 'ethereum')
+
+    const payload = updateOrigin(rawPayload, origin)
 
     // Extension custom action for summoning Frame
     if (origin === 'frame-extension' && payload.method === 'frame_summon') return windows.trayClick(true)

@@ -22,7 +22,7 @@ class AddTokenRequest extends React.Component {
     if (status === 'pending') requestClass += ' signerRequestPending'
     if (status === 'error') requestClass += ' signerRequestError'
 
-    const origin = this.props.req.origin
+    const origin = this.store('main.origins', this.props.req.origin, 'name')
     let originClass = 'requestTokenOrigin'
     if (origin.length > 28) originClass = 'requestTokenOrigin requestTokenOrigin18'
     if (origin.length > 36) originClass = 'requestTokenOrigin requestTokenOrigin12'

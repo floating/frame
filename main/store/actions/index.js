@@ -399,11 +399,11 @@ module.exports = {
   setDappStorage: (u, hash, state) => {
     if (state) u(`main.dapp.storage.${hash}`, () => state)
   },
-  initOrigin: (u, origin, chainId, type) => {
-    u('main.origins', () => ({ [uuidv5(origin, uuidv5.DNS)]: { chainId, type } }))
+  initOrigin: (u, originId, origin) => {
+    u('main.origins', () => ({ [originId]: origin }))
   },
-  switchOriginChain: (u, origin, chainId, type) => {
-    u('main.origins', uuidv5(origin, uuidv5.DNS), () => ({ chainId, type }))
+  switchOriginChain: (u, originId, chainId, type) => {
+    u('main.origins', originId, origin => ({ ...origin, chain: { id: chainId, type } }))
   },
   expandDock: (u, expand) => {
     u('dock.expand', (s) => expand)
