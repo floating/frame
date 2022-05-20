@@ -55,21 +55,20 @@ export class Provider extends EventEmitter {
     super()
 
     this.connection.syncDataEmit(this)
-    this.connection.on('connect', (chain, ...args) => {
+    this.connection.on('connect', (...args) => {
       this.connected = true
-      this.emit('connect')
+      this.emit('connect', ...args)
     })
-    this.connection.on('close', (chain, ...args) => { 
-      this.connected = false 
+    this.connection.on('close', () => { 
+      this.connected = false
     })
-    this.connection.on('data', ({ type, id }, ...args) => {
-      this.emit(`data:${type}:${id}`, ...args)
-      // this.emit()
+    this.connection.on('data', (...args) => {
+      this.emit('data', ...args)
     })
-    this.connection.on('error', (chain, err, ...args) => {
+    this.connection.on('error', (chain, err) => {
       log.error(err)
     })
-    this.connection.on('update', (chain, event, ...args) => {
+    this.connection.on('update', (chain, event) => {
       if (event.type === 'fees') {
         return accounts.updatePendingFees(event.chainId)
       }
