@@ -35,9 +35,6 @@ const handler = (req, res) => {
     res.end()
   } else if (req.method === 'POST') {
     const body = []
-
-    res.writeHead(401, { 'Content-Type': 'application/json' })
-          return res.end(JSON.stringify({ error: 'Invalid Client ID' }))
     req.on('data', chunk => body.push(chunk)).on('end', async () => {
       res.on('error', err => console.error('res err', err))
       const origin = req.headers.origin || 'Unknown'
@@ -106,7 +103,6 @@ const handler = (req, res) => {
 
 // Track subscriptions
 provider.on('data', payload => {
-  return
   if (pollSubs[payload.params.subscription]) {
     const { id, origin } = pollSubs[payload.params.subscription]
     polls[id] = polls[id] || []
