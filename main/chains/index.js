@@ -11,6 +11,12 @@ const { default: BlockMonitor } = require('./blocks')
 const { default: chainConfig } = require('./config')
 const { default: GasCalculator } = require('../transaction/gasCalculator')
 
+const resError = (error, payload, res) => res({ 
+  id: payload.id, 
+  jsonrpc: payload.jsonrpc, 
+  error: typeof error === 'string' ? { message: error, code: -1 } : error
+})
+
 class ChainConnection extends EventEmitter {
   constructor (type, chainId) {
     super()
@@ -355,24 +361,19 @@ class ChainConnection extends EventEmitter {
     }
   }
 
-  resError (error, payload, res) {
-    if (typeof error === 'string') error = { message: error, code: -1 }
-    res({ id: payload.id, jsonrpc: payload.jsonrpc, error })
-  }
-
   send (payload, res) {
     if (this.primary.provider && this.primary.connected) {
       this.primary.provider.sendAsync(payload, (err, result) => {
-        if (err) return this.resError(err, payload, res)
+        if (err) return resError(err, payload, res)
         res(result)
       })
     } else if (this.secondary.provider && this.secondary.connected) {
       this.secondary.provider.sendAsync(payload, (err, result) => {
-        if (err) return this.resError(err, payload, res)
+        if (err) return resError(err, payload, res)
         res(result)
       })
     } else {
-      this.resError('Not connected to Ethereum network', payload, res)
+      resError('Not connected to Ethereum network', payload, res)
     }
   }
 }
@@ -432,21 +433,15 @@ class Chains extends EventEmitter {
   }
 
   send (payload, res, targetChain) {
-    let chainType, chainId
-    if (targetChain) {
-      const { type, id } = targetChain
-      chainType = type
-      chainId = id
+    if (!targetChain) {
+      resError({ message: `Target chain did not exist for send`, code: -32601 }, payload, res)
+    }    
+    const { type, id } = targetChain
+    if (!this.connections[type] || !this.connections[type][id]) {
+      resError({ message: `Connection for ${type} chain with chainId ${id} did not exist for send`, code: -32601 }, payload, res)
     } else {
-      log.error(`Target chain did not exist for send`)
+      this.connections[type][id].send(payload, res)
     }
-    if (this.connections[chainType] && this.connections[chainType][chainId]) {
-      this.connections[chainType][chainId].send(payload, res)
-    } else {
-      log.error(`Connection for ${chainType} chain with chainId ${chainId} did not exist for send`)
-    }
-    // this.connect(store('main.networks', type, id, 'connection'))
-    // store('main.networks', type, chainId, 'connection')
   }
 
   syncDataEmit (emitter) {
