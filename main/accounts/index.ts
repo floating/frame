@@ -324,8 +324,8 @@ export class Accounts extends EventEmitter {
             })
           }
 
-          const handler = async (payload: RPCRequestPayload) => {
-            if (payload.method === 'eth_subscription' && (payload.params as any).subscription === headSub) {
+          const handler = async (chain: Chain, payload: RPCRequestPayload) => {
+            if (chain.id === targetChain.id && payload.method === 'eth_subscription' && (payload.params as any).subscription === headSub) {
               // const newHead = payload.params.result
               let confirmations
               try {
@@ -349,12 +349,7 @@ export class Accounts extends EventEmitter {
             }
           }
 
-          provider.on(`data:${targetChain.type}:${targetChain.id}`, handler)
-          // provider.on('data', ({ type, id }, ...args) => {
-          //   if (id === targetChain.id) {
-          //     handler(args)
-          //   }
-          // })
+          provider.on('data', handler)
         }
       })
     }
