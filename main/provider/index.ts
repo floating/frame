@@ -105,11 +105,11 @@ export class Provider extends EventEmitter {
   }
 
   // fires when the current default chain changes
-  chainChanged (chainId: number, origin: Origin) {
+  chainChanged (chainId: number, originId: string) {
     const chain = intToHex(chainId)
 
     this.subscriptions.chainChanged.forEach(subscription => {
-      this.emit('data', { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, origin: origin.name, result: chain } })
+      this.emit('data', { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, origin: originId, result: chain } })
     })
   }
 
@@ -817,7 +817,7 @@ store.observer(() => {
 
     if (originId in knownOrigins) {
       if (knownOrigins[originId].chain.id !== origin.chain.id) {
-        provider.chainChanged(origin.chain.id, origin)
+        provider.chainChanged(origin.chain.id, originId)
         provider.networkChanged(origin.chain.id)
       }
     } else {
