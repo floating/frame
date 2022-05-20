@@ -17,8 +17,6 @@ const logTraffic = process.env.LOG_TRAFFIC
 const subs = {}
 
 function updateOrigin (payload, origin) {
-  let chain = payload.chainId || '0x1'
-
   if (!origin) {
     log.warn(`Received payload with no origin: ${JSON.stringify(payload)}`)
     return { ...payload, chainId: payload.chainId || '0x1' }
