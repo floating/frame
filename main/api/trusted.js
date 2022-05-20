@@ -10,12 +10,10 @@ const invalidOrigin = o => o !== o.replace(/[^0-9a-z/:.[\]-]/gi, '')
 const addPermissionRequest = (address, origin) => {
   return new Promise((resolve, reject) => {
     const handlerId = uuidv5(origin, uuidv5.DNS)
-    console.log('ADD PERMISSION REQUEST', { origin, handlerId })
     accounts.addRequest({ handlerId, type: 'access', origin: handlerId, address }, () => {
       const permissions = store('main.permissions', address) || {}
       const perms = Object.keys(permissions).map(id => permissions[id])
       const permIndex = perms.map(p => p.origin).indexOf(origin)
-      console.log({ perms, permIndex })
       if (perms[permIndex] && perms[permIndex].provider) {
         resolve(true)
       } else {
