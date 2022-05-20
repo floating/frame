@@ -601,7 +601,6 @@ export class Provider extends EventEmitter {
       
       if (currentChain !== chainId) {
         store.switchOriginChain(originId, chainId, type)
-        this.chainChanged(chainId, payload._origin)
       }
 
       return res({ id: payload.id, jsonrpc: '2.0', result: undefined })
@@ -818,7 +817,7 @@ store.observer(() => {
 
   Object.entries(currentOrigins).forEach(([origin, { chainId }]) => {
     if(origins[origin].chainId !== chainId) {
-      provider.chainChanged(chainId)
+      provider.chainChanged(chainId, origin)
       provider.networkChanged(chainId)
     }
   })
