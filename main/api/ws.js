@@ -46,10 +46,10 @@ const handler = (socket, req) => {
 
     // Extension custom action for summoning Frame
     if (origin === 'frame-extension' && payload.method === 'frame_summon') return windows.trayClick(true)
-    if (logTraffic) log.info('req -> | ' + (socket.isFrameExtension ? 'ext | ' : 'ws | ') + origin + ' | ' + payload.method + ' | -> | ' + payload.params)
+    if (logTraffic) log.info(`req -> | ${(socket.isFrameExtension ? 'ext' : 'ws')} | ${origin} | ${payload.method} | -> | ${payload.params}`)
 
     if (protectedMethods.indexOf(payload.method) > -1 && !(await trusted(origin))) {
-      let error = { message: 'Permission denied, approve ' + origin + ' in Frame to continue', code: 4001 }
+      let error = { message: `Permission denied, approve ${origin} in Frame to continue`, code: 4001 }
       // review
       if (!accounts.getSelectedAddresses()[0]) error = { message: 'No Frame account selected', code: 4001 }
       res({ id: payload.id, jsonrpc: payload.jsonrpc, error })
@@ -62,7 +62,7 @@ const handler = (socket, req) => {
             payload.params.forEach(sub => { if (subs[sub]) delete subs[sub] })
           }
         }
-        if (logTraffic) log.info('<- res | ' + (socket.isFrameExtension ? 'ext | ' : 'ws | ') + origin + ' | ' + payload.method + ' | <- | ' + (JSON.stringify(response.result || response.error)))
+        if (logTraffic) log.info(`<- res | ${(socket.isFrameExtension ? 'ext' : 'ws')} | ${origin} | ${payload.method} | <- | ${JSON.stringify(response.result || response.error)}`)
 
         res(response)
       })
@@ -83,7 +83,7 @@ module.exports = server => {
   const ws = new WebSocket.Server({ server })
   ws.on('connection', handler)
   // Send data to the socket that initiated the subscription
-  provider.on('data', payload => {
+  provider.on('data', (chain, payload) => {
     const subscription = subs[payload.params.subscription]
     // if an origin is passed, make sure the subscription is from that origin
     if (subscription && (!payload.params.origin || payload.params.origin === subscription.origin)) {
