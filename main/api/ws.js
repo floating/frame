@@ -17,11 +17,13 @@ const logTraffic = process.env.LOG_TRAFFIC
 const subs = {}
 
 function updateOrigin (payload, origin) {
+  let chain = payload.chainId || '0x1'
+
   if (!origin) {
     log.warn(`Received payload with no origin: ${JSON.stringify(payload)}`)
     return { ...payload, chainId: payload.chainId || '0x1' }
   }
-
+  
   const originId = uuidv5(origin, uuidv5.DNS)
   const existingOrigin = store('main.origins', originId)
 
@@ -40,6 +42,7 @@ function updateOrigin (payload, origin) {
   
   return {
     ...payload,
+    chainId: payload.chainId || ('0x' + (existingOrigin && existingOrigin.chain.id) || 1).toString(16),
     _origin: originId
   }
 }
