@@ -15,17 +15,17 @@ class AddTokenRequest extends React.Component {
   render () {
     const status = this.props.req.status
     const notice = this.props.req.notice
-    const type = this.props.req.type
+
     let requestClass = 'signerRequest'
     if (status === 'success') requestClass += ' signerRequestSuccess'
     if (status === 'declined') requestClass += ' signerRequestDeclined'
     if (status === 'pending') requestClass += ' signerRequestPending'
     if (status === 'error') requestClass += ' signerRequestError'
 
-    const origin = this.store('main.origins', this.props.req.origin, 'name')
+    const originName = this.store('main.origins', this.props.req.origin, 'name')
     let originClass = 'requestTokenOrigin'
-    if (origin.length > 28) originClass = 'requestTokenOrigin requestTokenOrigin18'
-    if (origin.length > 36) originClass = 'requestTokenOrigin requestTokenOrigin12'
+    if (originName.length > 28) originClass = 'requestTokenOrigin requestTokenOrigin18'
+    if (originName.length > 36) originClass = 'requestTokenOrigin requestTokenOrigin12'
 
     const mode = this.props.req.mode
     const height = mode === 'monitor' ? '80px' : '340px'
