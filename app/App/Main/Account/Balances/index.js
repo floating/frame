@@ -12,6 +12,10 @@ import BigNumber from 'bignumber.js'
 const UNKNOWN = '?'
 const NATIVE_CURRENCY = '0x0000000000000000000000000000000000000000'
 
+function isNativeCurrency (address) {
+  return address === NATIVE_CURRENCY
+}
+
 function formatBalance (balance, totalValue, decimals = 8) {
   const isZero = balance.isZero()
   if (!isZero && balance.toNumber() < 0.001 && totalValue.toNumber() < 1) return '<0.001'
@@ -155,38 +159,25 @@ class Balances extends React.Component {
     if (this.resizeObserver) this.resizeObserver.disconnect()
   }
 
-  getBalances (chainId, rawBalances, rates, chainLayer) {
-    const balances = rawBalances
-      .filter(b => b.address !== NATIVE_CURRENCY) // only tokens
-      .map(rawBalance => {
-        const rate = rates[rawBalance.address || rawBalance.symbol] || {}
+  getBalances (rawBalances, rates) {
+    const networks = this.store('main.networks.ethereum')
+    const networksMeta = this.store('main.networksMeta.ethereum')
 
-        return balance(rawBalance, chainLayer === 'testnet' ? 0 : rate.usd)
+    const balances = rawBalances
+      .map(rawBalance => {
+        const isNative = isNativeCurrency(rawBalance.address)
+
+        const rate = isNative ? networksMeta[rawBalance.chainId].nativeCurrency || {} : rates[rawBalance.address || rawBalance.symbol] || {}
+        const logoURI = isNative ? networksMeta[rawBalance.chainId].nativeCurrency.icon : rawBalance.logoURI
+        const name = isNative ? networksMeta[rawBalance.chainId].nativeCurrency.name : rawBalance.name
+        const decimals = isNative ? 18 : rawBalance.decimals
+        const chainLayer = networks[rawBalance.chainId].layer || 'testnet'
+
+        return balance({ ...rawBalance, logoURI, name, decimals }, chainLayer === 'testnet' ? 0 : rate.usd)
       })
       .sort((a, b) => {
         return b.totalValue.minus(a.totalValue).toNumber()
       })
-
-    const nativeCurrency = this.store('main.networksMeta.ethereum', chainId, 'nativeCurrency')
-
-    if (nativeCurrency) {
-      const storedNativeBalance = rawBalances.find(b => {
-        return b.address === NATIVE_CURRENCY
-      }) || { balance: '0x0' }
-
-      const symbol = this.store('main.networks.ethereum', chainId, 'symbol')
-
-      const rawNativeCurrency = {
-        balance: storedNativeBalance.balance,
-        chainId,
-        decimals: 18,
-        logoURI: nativeCurrency.icon,
-        name: nativeCurrency.name || symbol,
-        symbol
-      }
-      const nativeBalance = balance(rawNativeCurrency, chainLayer === 'testnet' ? { price: 0 } : nativeCurrency.usd)
-      balances.unshift(nativeBalance)
-    }
 
     const totalValue = balances.reduce((a, b) => a.plus(b.totalValue), BigNumber(0))
 
@@ -195,23 +186,11 @@ class Balances extends React.Component {
 
   render () {
     const { address, lastSignerType } = this.store('main.accounts', this.props.id)
-
-    const { type, id: chainId } = this.store('main.currentNetwork')
-    const chainLayer = this.store('main.networks', type, chainId, 'layer') || 'testnet'
     const storedBalances = this.store('main.balances', address) || []
-
     const rates = this.store('main.rates')
 
-    let { balances, totalDisplayValue, totalValue } = this.getBalances(
-      chainId,
-      storedBalances,
-      rates,
-      chainLayer
-    )
-
-    if (!this.props.expanded) {
-      balances = balances.slice(0, 5)
-    }
+    const { balances: allBalances, totalDisplayValue, totalValue } = this.getBalances(storedBalances, rates)
+    const balances = allBalances.slice(0, this.props.expanded ? allBalances.length : 5)
 
     const lastBalanceUpdate = this.store('main.accounts', address, 'balances.lastUpdated')
 

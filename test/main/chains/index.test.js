@@ -177,11 +177,10 @@ afterEach(done => {
   const activeConnection = Object.values(mockConnections).find(conn => conn.connection.connected)
 
   chains.once('close', ({ id }) => {
-    if (id === activeConnection.id) {
-      done();
-    } else {
-      done.fail('connection error')
-    }
+    try {
+      expect(id).toBe(activeConnection.id)
+      done()
+    } catch (e) { done.fail(e) }
   })
   store.toggleConnection('ethereum', activeConnection.id, 'primary', false)
 })
