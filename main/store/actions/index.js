@@ -1,5 +1,4 @@
 import log from 'electron-log'
-import { v5 as uuidv5 } from 'uuid'
 
 const panelActions = require('./panel')
 const supportedNetworkTypes = ['ethereum']
@@ -304,10 +303,9 @@ module.exports = {
         delete main.networks[net.type][net.id]
         main.networks[updatedNetwork.type][updatedNetwork.id] = updatedNetwork
 
-        Object.entries(main.origins).forEach(([origin, { chainId }]) => {
-          if (net.id === chainId) {
-            main.origins[origin].chainId = updatedNetwork.id
-            main.origins[origin].type = updatedNetwork.type
+        Object.entries(main.origins).forEach(([origin, { chain }]) => {
+          if (net.id === chain.id) {
+            main.origins[origin].chain = updatedNetwork
           }
         })
         
@@ -318,7 +316,6 @@ module.exports = {
     }
   },
   removeNetwork: (u, net) => {
-    
     try {
       net.id = parseInt(net.id)
 
@@ -331,10 +328,9 @@ module.exports = {
         }
 
         // If deleting a network that an origin is currently using, switch them to mainnet
-        Object.entries(main.origins).forEach(([origin, { chainId }]) => {
-          if (net.id === chainId) {
-            main.origins[origin].chainId = 1
-            main.origins[origin].type = 'ethereum'
+        Object.entries(main.origins).forEach(([origin, { chain }]) => {
+          if (net.id === chain.id) {
+            main.origins[origin].chain = { id: 1, type: 'ethereum' }
           }
         })
 
@@ -399,11 +395,11 @@ module.exports = {
   setDappStorage: (u, hash, state) => {
     if (state) u(`main.dapp.storage.${hash}`, () => state)
   },
-  initOrigin: (u, origin, chainId, type) => {
-    u('main.origins', () => ({ [uuidv5(origin, uuidv5.DNS)]: { chainId, type } }))
+  initOrigin: (u, originId, origin) => {
+    u('main.origins', origins => ({ ...origins, [originId]: origin }))
   },
-  switchOriginChain: (u, origin, chainId, type) => {
-    u('main.origins', uuidv5(origin, uuidv5.DNS), () => ({ chainId, type }))
+  switchOriginChain: (u, originId, chainId, type) => {
+    u('main.origins', originId, origin => ({ ...origin, chain: { id: chainId, type } }))
   },
   expandDock: (u, expand) => {
     u('dock.expand', (s) => expand)

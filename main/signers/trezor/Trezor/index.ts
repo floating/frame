@@ -3,15 +3,13 @@ import utils from 'web3-utils'
 import { padToEven, stripHexPrefix, addHexPrefix } from 'ethereumjs-util'
 import { TypedData, TypedDataUtils } from 'eth-sig-util'
 import { Device as TrezorDevice } from 'trezor-connect'
+import { v5 as uuid } from 'uuid'
+import { TypedTransaction } from '@ethereumjs/tx'
 
 import Signer from '../../Signer'
 import flex from '../../../flex'
 import { sign, londonToLegacy, signerCompatibility, TransactionData, Signature } from '../../../transaction'
-
-// @ts-ignore
-import { v5 as uuid } from 'uuid'
 import { Derivation, getDerivationPath } from '../../Signer/derive'
-import { TypedTransaction } from '@ethereumjs/tx'
 
 const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
 

@@ -66,6 +66,7 @@ class TransactionRequest extends React.Component {
     const notice = req.notice
     const payload = req.payload
     const typedData = payload.params[1] || {}
+    const originName = this.store('main.origins', req.origin, 'name')
 
     let requestClass = 'signerRequest'
     if (status === 'success') requestClass += ' signerRequestSuccess'
@@ -142,7 +143,7 @@ class TransactionRequest extends React.Component {
               ) : (
                 <>
                   <div className='requestMeta'>
-                    <div className='requestMetaOrigin'>{req.origin}</div>
+                    <div className='requestMetaOrigin'>{originName}</div>
                   </div>
                   <div className='approveRequestHeader approveTransactionHeader'>
                     <div className='approveRequestHeaderIcon'> {svg.octicon('pencil', { height: 20 })}</div>

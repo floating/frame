@@ -526,19 +526,17 @@ describe('#switchOriginChain', () => {
   beforeEach(() => {
     origins = {
       '91f6971d-ba85-52d7-a27e-6af206eb2433': {
-        chainId: 1,
-        type: 'ethereum'
+        chain: { id: 1, type: 'ethereum' }
       }
     }
   })
 
-  const switchChain = (chainId, type) => switchOriginChainAction(updaterFn, 'frame.eth', chainId, type)
+  const switchChain = (chainId, type) => switchOriginChainAction(updaterFn, '91f6971d-ba85-52d7-a27e-6af206eb2433', chainId, type)
 
   it('should switch the chain for an origin', () => {
     switchChain(50, 'cosmos')
 
-    expect(origins['91f6971d-ba85-52d7-a27e-6af206eb2433'].chainId).toBe(50)
-    expect(origins['91f6971d-ba85-52d7-a27e-6af206eb2433'].type).toBe('cosmos')
+    expect(origins['91f6971d-ba85-52d7-a27e-6af206eb2433'].chain).toStrictEqual({ id: 50, type: 'cosmos' })
   })
 })
 
@@ -554,20 +552,16 @@ describe('#removeNetwork', () => {
     main = {
       origins: {
         '91f6971d-ba85-52d7-a27e-6af206eb2433': {
-          chainId: 1,
-          type: 'ethereum'
+          chain: { id: 1, type: 'ethereum' }
         },
         '8073729a-5e59-53b7-9e69-5d9bcff94087': {
-          chainId: 4,        
-          type: 'ethereum',
+          chain: { id: 4, type: 'ethereum' }
         },
         'd7acc008-6411-5486-bb2d-0c0cfcddbb92': {
-          chainId: 50,
-          type: 'cosmos',
+          chain: { id: 50, type: 'cosmos' }
         },
         '695112ec-43e2-52a8-8f69-5c36837d6d13': {
-          chainId: 4,        
-          type: 'ethereum',
+          chain: { id: 4, type: 'ethereum' }
         }
       },
       networks: {
@@ -607,20 +601,16 @@ describe('#removeNetwork', () => {
 
     expect(main.origins).toStrictEqual({
       '91f6971d-ba85-52d7-a27e-6af206eb2433': {
-        chainId: 1,
-        type: 'ethereum'
+        chain: { id: 1, type: 'ethereum' }
       },
       '8073729a-5e59-53b7-9e69-5d9bcff94087': {
-        chainId: 1,
-        type: 'ethereum'
+        chain: { id: 1, type: 'ethereum' }
       },
       'd7acc008-6411-5486-bb2d-0c0cfcddbb92': {
-        chainId: 50,
-        type: 'cosmos'
+        chain: { id: 50, type: 'cosmos' }
       },
       '695112ec-43e2-52a8-8f69-5c36837d6d13': {
-        chainId: 1,
-        type: 'ethereum'
+        chain: { id: 1, type: 'ethereum' }
       }
     })
   })
@@ -638,20 +628,16 @@ describe('#removeNetwork', () => {
   
       expect(main.origins).toStrictEqual({
         '91f6971d-ba85-52d7-a27e-6af206eb2433': {
-          chainId: 1,
-          type: 'ethereum'
+          chain: { id: 1, type: 'ethereum' }
         },
         '8073729a-5e59-53b7-9e69-5d9bcff94087': {
-          chainId: 4,
-          type: 'ethereum'
+          chain: { id: 4, type: 'ethereum' }
         },
         'd7acc008-6411-5486-bb2d-0c0cfcddbb92': {
-          chainId: 50,
-          type: 'cosmos'
+          chain: { id: 50, type: 'cosmos' }
         },
         '695112ec-43e2-52a8-8f69-5c36837d6d13': {
-          chainId: 4,
-          type: 'ethereum'
+          chain: { id: 4, type: 'ethereum' }
         }
       })
     })
@@ -670,20 +656,16 @@ describe('#updateNetwork', () => {
     main = {
       origins: {
         '91f6971d-ba85-52d7-a27e-6af206eb2433': {
-          chainId: 1,
-          type: 'ethereum'
+          chain: { id: 1, type: 'ethereum' }
         },
         '8073729a-5e59-53b7-9e69-5d9bcff94087': {
-          chainId: 4,
-          type: 'ethereum'
+          chain: { id: 4, type: 'ethereum' }
         },
         'd7acc008-6411-5486-bb2d-0c0cfcddbb92': {
-          chainId: 50,
-          type: 'ethereum'
+          chain: { id: 50, type: 'ethereum' }
         },
         '695112ec-43e2-52a8-8f69-5c36837d6d13': {
-          chainId: 4,
-          type: 'ethereum'
+          chain: { id: 4, type: 'ethereum' }
         }
       },
       networks: {
@@ -728,20 +710,16 @@ describe('#updateNetwork', () => {
 
     expect(main.origins).toStrictEqual({
       '91f6971d-ba85-52d7-a27e-6af206eb2433': {
-        chainId: 1,
-        type: 'ethereum',
+        chain: expect.objectContaining({ id: 1, type: 'ethereum' })
       },
       '8073729a-5e59-53b7-9e69-5d9bcff94087': {
-        chainId: 66,
-        type: 'ethereum',
+        chain: expect.objectContaining({ id: 66, type: 'ethereum' })
       },
       'd7acc008-6411-5486-bb2d-0c0cfcddbb92': {
-        chainId: 50,
-        type: 'ethereum',
+        chain: expect.objectContaining({ id: 50, type: 'ethereum' })
       },
       '695112ec-43e2-52a8-8f69-5c36837d6d13': {
-        chainId: 66,
-        type: 'ethereum',
+        chain: expect.objectContaining({ id: 66, type: 'ethereum' })
       }
     })
   })

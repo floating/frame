@@ -1,4 +1,3 @@
-// @ts-ignore
 import { v4 as uuid, v5 as uuidv5 } from 'uuid'
 import EventEmitter from 'events'
 import log from 'electron-log'
@@ -17,7 +16,7 @@ import store from '../store'
 import packageFile from '../../package.json'
 import proxyConnection from './proxy'
 import accounts, { AccountRequest, TransactionRequest, SignTypedDataRequest, AddChainRequest, AddTokenRequest } from '../accounts'
-import Chains, { Chain } from '../chains'
+import Chains from '../chains'
 import { getType as getSignerType, Type as SignerType } from '../signers/Signer'
 import { populate as populateTransaction, maxFee, TransactionData } from '../transaction'
 import FrameAccount from '../accounts/Account'
@@ -25,7 +24,6 @@ import { capitalize, arraysMatch } from '../../resources/utils'
 import { ApprovalType } from '../../resources/constants'
 import { checkExistingNonceGas, ecRecover, feeTotalOverMax, gasFees, getActiveChains, getAssets, getChains, getPermissions, getRawTx, getSignedAddress, isCurrentAccount, isScanning, loadAssets, requestPermissions, resError } from './helpers'
 
-type Origins = Record<string, { chainId: number, type: string }>
 type Subscriptions = { [key in SubscriptionType]: string[] }
 
 interface RequiredApproval {
@@ -37,6 +35,8 @@ export interface TransactionMetadata {
   tx: TransactionData,
   approvals: RequiredApproval[]
 }
+
+const getOrigin = ({ _origin }: RPCRequestPayload) => store('main.origins', uuidv5(_origin, uuidv5.DNS)) as Origin
 
 export class Provider extends EventEmitter {
   connected = false
@@ -62,8 +62,8 @@ export class Provider extends EventEmitter {
     this.connection.on('close', () => { 
       this.connected = false
     })
-    this.connection.on('data', (...args) => {
-      this.emit('data', ...args)
+    this.connection.on('data', (chain, ...args) => {
+      this.emit(`data:${chain.type}:${chain.id}`, ...args)
     })
     this.connection.on('error', (chain, err) => {
       log.error(err)
@@ -97,11 +97,11 @@ export class Provider extends EventEmitter {
   }
 
   // fires when the current default chain changes
-  chainChanged (chainId: number, origin?: string) {
+  chainChanged (chainId: number, originId: string) {
     const chain = intToHex(chainId)
 
     this.subscriptions.chainChanged.forEach(subscription => {
-      this.emit('data', { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, origin, result: chain } })
+      this.emit('data', { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, origin: originId, result: chain } })
     })
   }
 
@@ -121,26 +121,22 @@ export class Provider extends EventEmitter {
   }
 
   getNetVersion (payload: RPCRequestPayload, res: RPCRequestCallback, targetChain: Chain) {
-    const { type, id } = (targetChain || store('main.origins', uuidv5(payload._origin, uuidv5.DNS)))
-
-    const connection = this.connection.connections[type][id]
+    const connection = this.connection.connections[targetChain.type][targetChain.id]
     const chainConnected = (connection.primary?.connected || connection.secondary?.connected)
 
     const response = chainConnected
-      ? { result: id.toString() }
+      ? { result: targetChain.id.toString() }
       : { error: { message: 'not connected', code: 1 } }
 
     res({ id: payload.id, jsonrpc: payload.jsonrpc, ...response })
   }
 
   getChainId (payload: RPCRequestPayload, res: RPCSuccessCallback, targetChain: Chain) {
-    const { type, id } = (targetChain || store('main.origins', uuidv5(payload._origin, uuidv5.DNS)))
-
-    const connection = this.connection.connections[type][id]
+    const connection = this.connection.connections[targetChain.type][targetChain.id]
     const chainConnected = (connection.primary?.connected || connection.secondary?.connected)
 
     const response = chainConnected
-      ? { result: intToHex(id) }
+      ? { result: intToHex(targetChain.id) }
       : { error: { message: 'not connected', code: 1 } }
 
     res({ id: payload.id, jsonrpc: payload.jsonrpc, ...response })
@@ -596,11 +592,10 @@ export class Provider extends EventEmitter {
       const exists = Boolean(store('main.networks', 'ethereum', chainId))
       if (exists === false) throw new Error('Chain does not exist')
 
-      const originId = uuidv5(payload._origin, uuidv5.DNS)
-      const { chainId: currentChain, type } = store('main.origins', originId)
-      
-      if (currentChain !== chainId) {
-        store.switchOriginChain(originId, chainId, type)
+      const origin = getOrigin(payload)
+
+      if (origin.chain.id !== chainId) {
+        store.switchOriginChain(origin, chainId, origin.chain.type)
       }
 
       return res({ id: payload.id, jsonrpc: '2.0', result: undefined })
@@ -713,23 +708,17 @@ export class Provider extends EventEmitter {
     }, targetChain)
   }
 
-  private parseTargetChain (payload: RPCRequestPayload) {
-    const target: Chain = { type: 'ethereum', id: 0 }
-
+  private parseTargetChain (payload: RPCRequestPayload): Chain {
     if ('chainId' in payload) {
       const chainId = parseInt(payload.chainId || '', 16)
       const chainConnection = this.connection.connections['ethereum'][chainId] || {}
 
       if (chainConnection.chainConfig) {
-        target.id = chainId
+        return { type: 'ethereum', id: chainId }
       }
-    } else {
-      const { chainId, type } = store('main.origins', uuidv5(payload._origin, uuidv5.DNS))
-      target.id = chainId
-      target.type = type
     }
 
-    return target
+    return getOrigin(payload).chain
   }
 
   sendAsync (payload: RPCRequestPayload, cb: Callback<RPCResponsePayload>) {
@@ -747,7 +736,7 @@ export class Provider extends EventEmitter {
     const method = payload.method || ''
     const targetChain = this.parseTargetChain(payload)
 
-    if (!targetChain.id) {
+    if (!targetChain) {
       log.warn('received request with unknown chain', JSON.stringify(payload))
       return resError({ message: `unknown chain: ${payload.chainId}`, code: 4901 }, payload, res)
     }
@@ -808,19 +797,23 @@ export class Provider extends EventEmitter {
 }
 
 const provider = new Provider()
-let origins: Origins = store('main.origins')
+let knownOrigins: Record<string, Origin> = {}
 let availableChains = getActiveChains()
 
 store.observer(() => {
-  const currentOrigins: Origins = store('main.origins')
+  const currentOrigins = store('main.origins') as Record<string, Origin>
   const currentChains = getActiveChains()
 
-  Object.entries(currentOrigins).forEach(([origin, { chainId }]) => {
-    if(origins[origin].chainId !== chainId) {
-      provider.chainChanged(chainId, origin)
-      provider.networkChanged(chainId)
+  for (const originId in currentOrigins) {
+    const origin = currentOrigins[originId]
+
+    if (knownOrigins[originId]?.chain.id !== origin.chain.id) {
+      provider.chainChanged(origin.chain.id, originId)
+      provider.networkChanged(origin.chain.id)
+    } else {
+      knownOrigins[originId] = origin
     }
-  })
+  }
 
   if (!arraysMatch(currentChains, availableChains)) {
     availableChains = currentChains

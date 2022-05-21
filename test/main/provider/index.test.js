@@ -39,7 +39,7 @@ afterAll(() => {
 
 beforeEach(async () => {  
   store.set('main.accounts', {})
-  store.set('main.origins', '8073729a-5e59-53b7-9e69-5d9bcff94087', { chainId: 1, type: 'ethereum' })
+  store.set('main.origins', '8073729a-5e59-53b7-9e69-5d9bcff94087', { chain: { id: 1, type: 'ethereum' }})
   
   provider = (await import('../../../main/provider')).default
   provider.handlers = {}
@@ -69,7 +69,7 @@ describe('#send', () => {
   it('passes the given target chain to the connection', () => {
     connection.connections.ethereum[10] = { chainConfig: { hardfork: 'london', chainId: 10 }, primary: { connected: true } }
 
-    store.set('main.origins', '8073729a-5e59-53b7-9e69-5d9bcff94087', { chainId: 10, type: 'ethereum' })
+    store.set('main.origins', '8073729a-5e59-53b7-9e69-5d9bcff94087', { chain: { id: 10, type: 'ethereum' }})
     const request = { method: 'eth_testFrame'  }
 
     send({ ...request, chainId: '0xa' })
@@ -164,9 +164,8 @@ describe('#send', () => {
 
     it('should switch to a chain and notify listeners if it exists in the store', done => {
       store.set('main.networks.ethereum', 1, { id: 1 })
-      store.set('main.origins', '8073729a-5e59-53b7-9e69-5d9bcff94087', { chainId: 137, type: 'ethereum' })
+      store.set('main.origins', '8073729a-5e59-53b7-9e69-5d9bcff94087', { chain: { id: 137, type: 'ethereum' }})
       store.switchOriginChain = jest.fn()
-      const chainChangedListener = jest.spyOn(provider, 'chainChanged')
 
       send({ 
         method: 'wallet_addEthereumChain', 
@@ -185,7 +184,7 @@ describe('#send', () => {
           }
         ]
       }, () => {
-        expect(store.switchOriginChain).toHaveBeenCalledWith('8073729a-5e59-53b7-9e69-5d9bcff94087', 1, 'ethereum')
+        expect(store.switchOriginChain).toHaveBeenCalledWith({ chain: { id: 137, type: 'ethereum' }}, 1, 'ethereum')
         done()
       })
     })
@@ -194,9 +193,8 @@ describe('#send', () => {
   describe('#wallet_switchEthereumChain', () => {
     it('should switch to a chain and notify listeners if it exists in the store', done => {
       store.set('main.networks.ethereum', 1, { id: 1 })
-      store.set('main.origins', { '8073729a-5e59-53b7-9e69-5d9bcff94087': { chainId: 42161, type: 'ethereum' }})
+      store.set('main.origins', { '8073729a-5e59-53b7-9e69-5d9bcff94087': { chain: { id:42161, type: 'ethereum' }}})
       store.switchOriginChain = jest.fn()
-      const chainChangedListener = jest.spyOn(provider, 'chainChanged')
 
       send({ 
         method: 'wallet_switchEthereumChain', 
@@ -205,7 +203,7 @@ describe('#send', () => {
         }],
         _origin: 'frame.test'
       }, () => {
-        expect(store.switchOriginChain).toHaveBeenCalledWith('8073729a-5e59-53b7-9e69-5d9bcff94087', 1, 'ethereum')
+        expect(store.switchOriginChain).toHaveBeenCalledWith({ chain: { id: 42161, type: 'ethereum' }}, 1, 'ethereum')
         done()
       })
     })
@@ -1218,7 +1216,7 @@ describe('state change events', () => {
         expect(event.params.result).toBe('0x89')
         done()
       })
-      store.set('main.origins', '8073729a-5e59-53b7-9e69-5d9bcff94087', { chainId: 137, type: 'ethereum' })
+      store.set('main.origins', '8073729a-5e59-53b7-9e69-5d9bcff94087', { chain: { id: 137, type: 'ethereum' }})
       provider.subscriptions.chainChanged.push(subscriptionId)
       store.getObserver('provider:chains').fire()
     })

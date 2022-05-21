@@ -39,7 +39,7 @@ export default class TokenLoader {
   private tokenList: Token[] = []
   private loader?: NodeJS.Timeout | null
 
-  private readonly eth = ethProvider('frame', { name: 'tokenLoader' })
+  private readonly eth = ethProvider('frame', { origin: 'frame.eth', name: 'tokenLoader' })
   private readonly nebula = nebulaApi(this.eth)
 
   constructor () {

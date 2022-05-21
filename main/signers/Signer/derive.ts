@@ -1,4 +1,3 @@
-// @ts-ignore
 import HDKey from 'hdkey'
 
 import { publicToAddress, toChecksumAddress } from 'ethereumjs-util'
