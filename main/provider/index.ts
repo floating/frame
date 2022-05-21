@@ -17,11 +17,7 @@ import store from '../store'
 import packageFile from '../../package.json'
 import proxyConnection from './proxy'
 import accounts, { AccountRequest, TransactionRequest, SignTypedDataRequest, AddChainRequest, AddTokenRequest } from '../accounts'
-<<<<<<< HEAD
 import Chains, { Chain } from '../chains'
-=======
-import Chains from '../chains'
->>>>>>> 7da40b49e0e31cb55f025fb0339792763ce3bad9
 import { getType as getSignerType, Type as SignerType } from '../signers/Signer'
 import { populate as populateTransaction, maxFee, TransactionData } from '../transaction'
 import FrameAccount from '../accounts/Account'
