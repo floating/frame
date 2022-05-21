@@ -22,7 +22,7 @@ class ChainRequest extends React.Component {
     if (status === 'pending') requestClass += ' signerRequestPending'
     if (status === 'error') requestClass += ' signerRequestError'
 
-    const origin = this.props.req.origin
+    const origin = this.store('main.origins', this.props.req.origin, 'name')
     let originClass = 'requestChainOrigin'
     if (origin.length > 28) originClass = 'requestChainOrigin requestChainOrigin18'
     if (origin.length > 36) originClass = 'requestChainOrigin requestChainOrigin12'

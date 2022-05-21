@@ -553,19 +553,19 @@ describe('#removeNetwork', () => {
   beforeEach(() => {
     main = {
       origins: {
-        '91f6971d-ba85-52d7-a27e-6af206eb2433': {
+        'frame.eth': {
           chainId: 1,
           type: 'ethereum'
         },
-        '8073729a-5e59-53b7-9e69-5d9bcff94087': {
+        'frame.test': {
           chainId: 4,        
           type: 'ethereum',
         },
-        'd7acc008-6411-5486-bb2d-0c0cfcddbb92': {
+        'frame.sh': {
           chainId: 50,
           type: 'cosmos',
         },
-        '695112ec-43e2-52a8-8f69-5c36837d6d13': {
+        'frame.test2': {
           chainId: 4,        
           type: 'ethereum',
         }
@@ -606,19 +606,19 @@ describe('#removeNetwork', () => {
     removeNetwork(4)
 
     expect(main.origins).toStrictEqual({
-      '91f6971d-ba85-52d7-a27e-6af206eb2433': {
+      'frame.eth': {
         chainId: 1,
         type: 'ethereum'
       },
-      '8073729a-5e59-53b7-9e69-5d9bcff94087': {
+      'frame.test': {
         chainId: 1,
         type: 'ethereum'
       },
-      'd7acc008-6411-5486-bb2d-0c0cfcddbb92': {
+      'frame.sh': {
         chainId: 50,
         type: 'cosmos'
       },
-      '695112ec-43e2-52a8-8f69-5c36837d6d13': {
+      'frame.test2': {
         chainId: 1,
         type: 'ethereum'
       }
@@ -637,19 +637,19 @@ describe('#removeNetwork', () => {
       removeNetwork(50, 'cosmos')
   
       expect(main.origins).toStrictEqual({
-        '91f6971d-ba85-52d7-a27e-6af206eb2433': {
+        'frame.eth': {
           chainId: 1,
           type: 'ethereum'
         },
-        '8073729a-5e59-53b7-9e69-5d9bcff94087': {
+        'frame.test': {
           chainId: 4,
           type: 'ethereum'
         },
-        'd7acc008-6411-5486-bb2d-0c0cfcddbb92': {
+        'frame.sh': {
           chainId: 50,
           type: 'cosmos'
         },
-        '695112ec-43e2-52a8-8f69-5c36837d6d13': {
+        'frame.test2': {
           chainId: 4,
           type: 'ethereum'
         }
@@ -669,19 +669,19 @@ describe('#updateNetwork', () => {
   beforeEach(() => {
     main = {
       origins: {
-        '91f6971d-ba85-52d7-a27e-6af206eb2433': {
+        'frame.eth': {
           chainId: 1,
           type: 'ethereum'
         },
-        '8073729a-5e59-53b7-9e69-5d9bcff94087': {
+        'frame.test': {
           chainId: 4,
           type: 'ethereum'
         },
-        'd7acc008-6411-5486-bb2d-0c0cfcddbb92': {
+        'frame.sh': {
           chainId: 50,
           type: 'ethereum'
         },
-        '695112ec-43e2-52a8-8f69-5c36837d6d13': {
+        'frame.test2': {
           chainId: 4,
           type: 'ethereum'
         }
@@ -727,19 +727,19 @@ describe('#updateNetwork', () => {
     updateNetwork({ id: '0x4', type: 'ethereum', name: '', explorer: '', symbol: '' }, { id: '0x42', type: 'ethereum', name: 'test', explorer: 'explorer.test', symbol: 'TEST' })
 
     expect(main.origins).toStrictEqual({
-      '91f6971d-ba85-52d7-a27e-6af206eb2433': {
+      'frame.eth': {
         chainId: 1,
         type: 'ethereum',
       },
-      '8073729a-5e59-53b7-9e69-5d9bcff94087': {
+      'frame.test': {
         chainId: 66,
         type: 'ethereum',
       },
-      'd7acc008-6411-5486-bb2d-0c0cfcddbb92': {
+      'frame.sh': {
         chainId: 50,
         type: 'ethereum',
       },
-      '695112ec-43e2-52a8-8f69-5c36837d6d13': {
+      'frame.test2': {
         chainId: 66,
         type: 'ethereum',
       }

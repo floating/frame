@@ -32,27 +32,19 @@ class TxFee extends React.Component {
 
     let maxFeePerGas, maxFee, maxFeeUSD
 
-    const maxGas = BigNumber(req.data.gasLimit, 16)
-
     if (usesBaseFee(req.data)) {
+      const gasLimit = BigNumber(req.data.gasLimit, 16)
+
       maxFeePerGas = BigNumber(req.data.maxFeePerGas, 16)
-      maxFee = maxFeePerGas.multipliedBy(maxGas)
+      maxFee = maxFeePerGas.multipliedBy(gasLimit)
       maxFeeUSD = maxFee.shiftedBy(-18).multipliedBy(nativeUSD)
     } else {
+      const gasLimit = BigNumber(req.data.gasLimit, 16)
+  
       maxFeePerGas = BigNumber(req.data.gasPrice, 16)
-      maxFee = maxFeePerGas.multipliedBy(maxGas)
+      maxFee = maxFeePerGas.multipliedBy(gasLimit)
       maxFeeUSD = maxFee.shiftedBy(-18).multipliedBy(nativeUSD)
     }
-
-    // accounts for two potential 12.5% block fee increases
-    const reduceFactor = BigNumber(9).dividedBy(8)
-    const minFeePerGas = maxFeePerGas.dividedBy(reduceFactor).dividedBy(reduceFactor)
-
-    // accounts for the 50% padding in the gas estimate in the provider
-    const minGas = maxGas.dividedBy(BigNumber(1.5))
-
-    const minFee = minFeePerGas.multipliedBy(minGas)
-    const minFeeUSD = minFee.shiftedBy(-18).multipliedBy(nativeUSD)
 
     const currentSymbol = this.store('main.networks', this.props.chain.type, this.props.chain.id, 'symbol') || '?'
     
@@ -87,7 +79,7 @@ class TxFee extends React.Component {
                   $
                 </span>
                 <span className='_txFeeUSD'>
-                  {`${this.toDisplayUSD(minFeeUSD)} - ${this.toDisplayUSD(maxFeeUSD)}`}
+                  {this.toDisplayUSD(maxFeeUSD)}
                 </span>
                 <span className='_txFeeUSDDescription'>
                   {`in ${currentSymbol || '?'}`}

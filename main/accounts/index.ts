@@ -5,6 +5,9 @@ import log from 'electron-log'
 import { shell, Notification } from 'electron'
 import { addHexPrefix, intToHex} from 'ethereumjs-util'
 
+// @ts-ignore
+import { v5 as uuidv5 } from 'uuid'
+
 import store from '../store'
 import ExternalDataScanner, { DataScanner } from '../externalData'
 import { getType as getSignerType } from '../signers/Signer'
@@ -20,7 +23,6 @@ import {
 
 // Provider Proxy
 import provider from '../provider'
-import { Chain } from '../chains'
 import { TypedData, Version } from 'eth-sig-util'
 import { ApprovalType } from '../../resources/constants'
 
@@ -30,6 +32,8 @@ function notify (title: string, body: string, action: (event: Electron.Event) =>
 
   setTimeout(() => notification.show(), 1000)
 }
+
+const frameOriginId = uuidv5('frame.eth', uuidv5.DNS)
 
 const accountsApi = {
   getAccounts: function () {
@@ -185,7 +189,7 @@ export class Accounts extends EventEmitter {
   }
 
   private sendRequest (payload: { method: string, params: any[], chainId: string }, cb: RPCRequestCallback) {
-    provider.send({ id: 1, jsonrpc: '2.0', ...payload, _origin: 'frame.eth' }, cb)
+    provider.send({ id: 1, jsonrpc: '2.0', ...payload, _origin: frameOriginId }, cb)
   }
 
   private async confirmations (account: FrameAccount, id: string, hash: string, targetChain: Chain) {
@@ -324,8 +328,8 @@ export class Accounts extends EventEmitter {
             })
           }
 
-          const handler = async (chain: Chain, payload: RPCRequestPayload) => {
-            if (chain.id === targetChain.id && payload.method === 'eth_subscription' && (payload.params as any).subscription === headSub) {
+          const handler = async (payload: RPCRequestPayload) => {
+            if (payload.method === 'eth_subscription' && (payload.params as any).subscription === headSub) {
               // const newHead = payload.params.result
               let confirmations
               try {
@@ -349,7 +353,12 @@ export class Accounts extends EventEmitter {
             }
           }
 
-          provider.on('data', handler)
+          provider.on(`data:${targetChain.type}:${targetChain.id}`, handler)
+          // provider.on('data', ({ type, id }, ...args) => {
+          //   if (id === targetChain.id) {
+          //     handler(args)
+          //   }
+          // })
         }
       })
     }

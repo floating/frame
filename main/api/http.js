@@ -46,9 +46,9 @@ const handler = (req, res) => {
       }
       payload._origin = origin
       store.initOrigin(origin, 1, 'ethereum')
-      if (logTraffic) log.info(`req -> | http | ${req.headers.origin} | ${payload.method} | -> | ${JSON.stringify(payload.params)}`)
+      if (logTraffic) log.info('req -> | http | ' + req.headers.origin + ' | ' + payload.method + ' | -> | ' + JSON.stringify(payload.params))
       if (protectedMethods.indexOf(payload.method) > -1 && !(await trusted(origin))) {
-        let error = { message: `Permission denied, approve ${origin} in Frame to continue`, code: 4001 }
+        let error = { message: 'Permission denied, approve ' + origin + ' in Frame to continue', code: 4001 }
         // Review
         if (!accounts.getSelectedAddresses()[0]) error = { message: 'No Frame account selected', code: 4001 }
         res.writeHead(401, { 'Content-Type': 'application/json' })
@@ -61,7 +61,7 @@ const handler = (req, res) => {
             if (result.length || payload.params[1] === 'immediate' || force) {
               res.writeHead(200, { 'Content-Type': 'application/json' })
               const response = { id: payload.id, jsonrpc: payload.jsonrpc, result }
-              if (logTraffic) log.info(`<- res | http | ${origin} | ${payload.method} | <- | ${JSON.stringify(response)}`)
+              if (logTraffic) log.info('<- res | http | ' + origin + ' | ' + payload.method + ' | <- | ' + JSON.stringify(response))
               res.end(JSON.stringify(response))
               delete polls[id]
               clearTimeout(cleanupTimers[id])
@@ -89,7 +89,7 @@ const handler = (req, res) => {
             }
           }
 
-          if (logTraffic) log.info(`<- res | http | ${req.headers.origin} | ${payload.method} | <- | ${JSON.stringify(response)}`)
+          if (logTraffic) log.info('<- res | http | ' + req.headers.origin + ' | ' + payload.method + ' | <- | ' + JSON.stringify(response))
           res.writeHead(200, { 'Content-Type': 'application/json' })
           res.end(JSON.stringify(response))
         })
@@ -102,7 +102,7 @@ const handler = (req, res) => {
 }
 
 // Track subscriptions
-provider.on('data', (chain, payload) => {
+provider.on('data', payload => {
   if (pollSubs[payload.params.subscription]) {
     const { id, origin } = pollSubs[payload.params.subscription]
     polls[id] = polls[id] || []
