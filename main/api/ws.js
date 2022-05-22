@@ -1,13 +1,13 @@
 const WebSocket = require('ws')
-const { v4: uuid, v5: uuidv5 } = require('uuid')
+const { v4: uuid } = require('uuid')
 const log = require('electron-log')
 
 const provider = require('../provider').default
 const accounts = require('../accounts').default
-const store = require('../store').default
 const windows = require('../windows')
 
 const trusted = require('./trusted')
+const { updateOrigin } = require('./origin')
 const validPayload = require('./validPayload').default
 const isFrameExtension = require('./isFrameExtension')
 const protectedMethods = require('./protectedMethods').default
@@ -15,38 +15,6 @@ const protectedMethods = require('./protectedMethods').default
 const logTraffic = process.env.LOG_TRAFFIC
 
 const subs = {}
-
-function updateOrigin (payload, origin) {
-  if (!origin) {
-    log.warn(`Received payload with no origin: ${payload.method}`)
-
-    //log.warn(`Received payload with no origin: ${JSON.stringify(payload)}`)
-    return { ...payload, chainId: payload.chainId || '0x1' }
-  }
-  
-  const originId = uuidv5(origin, uuidv5.DNS)
-  const existingOrigin = store('main.origins', originId)
-
-  if (!existingOrigin && !payload.__extensionConnecting) {
-    // the extension will attempt to send messages (eth_chainId and net_version) in order
-    // to connect. we don't want to store these origins as they'll come from every site
-    // the user visits in their browser
-    store.initOrigin(originId, {
-      name: origin,
-      chain: {
-        id: 1,
-        type: 'ethereum'
-      }
-    })
-  }
-  
-  return {
-    ...payload,
-    chainId: payload.chainId || `0x${(existingOrigin?.chain.id || 1).toString(16)}`,
-    _origin: originId
-  }
-}
-
 
 const handler = (socket, req) => {
   socket.id = uuid()

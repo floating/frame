@@ -6,6 +6,7 @@ const accounts = require('../accounts').default
 const store = require('../store').default
 
 const trusted = require('./trusted')
+const { updateOrigin } = require('./origin')
 const validPayload = require('./validPayload').default
 const protectedMethods = require('./protectedMethods').default
 
@@ -38,14 +39,17 @@ const handler = (req, res) => {
     req.on('data', chunk => body.push(chunk)).on('end', async () => {
       res.on('error', err => console.error('res err', err))
       const origin = req.headers.origin || 'Unknown'
-      const input = Buffer.concat(body).toString()
-      const payload = validPayload(input)
-      if (!payload) return console.warn('Invalid Payload', input)
+      const data = Buffer.concat(body).toString()
+      
       if (!origin) {
         log.warn(`Received payload with no origin: ${JSON.stringify(payload)}`)
       }
-      payload._origin = origin
-      store.initOrigin(origin, 1, 'ethereum')
+
+      const rawPayload = validPayload(data)
+      if (!rawPayload) return console.warn('Invalid Payload', data)
+
+      const payload = updateOrigin(rawPayload, origin)
+
       if (logTraffic) log.info(`req -> | http | ${req.headers.origin} | ${payload.method} | -> | ${JSON.stringify(payload.params)}`)
       if (protectedMethods.indexOf(payload.method) > -1 && !(await trusted(origin))) {
         let error = { message: `Permission denied, approve ${origin} in Frame to continue`, code: 4001 }
