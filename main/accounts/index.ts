@@ -936,8 +936,4 @@ export class Accounts extends EventEmitter {
   // }
 }
 
-const accounts = new Accounts()
-
-console.log('ZOMG accounts')
-
-export default accounts
+export default new Accounts()
