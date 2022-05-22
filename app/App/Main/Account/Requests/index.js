@@ -88,55 +88,43 @@ class Requests extends React.Component {
   render () {
     const activeAccount =  this.store('main.accounts', this.props.id)
     const requests = Object.values(activeAccount.requests || {})
-    const signingDelay = isHardwareSigner(activeAccount) ? 200 : 1500
 
-    const normal = requests.filter(req => req.mode === 'normal')
-    normal.sort((a, b) => {
+    requests.sort((a, b) => {
       if (a.created > b.created) return -1
       if (a.created < b.created) return 1
       return 0
     })
-    const monitor = requests.filter(req => req.mode === 'monitor')
-    monitor.sort((a, b) => {
-      if (a.created > b.created) return -1
-      if (a.created < b.created) return 1
-      return 0
-    })
-    const monitorHeight = 220
-    let containNormal = normal.length ? (360 + (normal.length * 6)) : 26
-    // if (normal.length && monitor.length > 0) {
-    //   containNormal += 50
-    // } else if (monitor.length > 0) {
-    //   containNormal += 50
-    // }
-    const containMonitor = (monitor.length * monitorHeight) + 20
-    const containHeight = containNormal + containMonitor + 40
 
     return (
-      <div ref={this.moduleRef} className={this.store('selected.view') === 'default' ? 'signerRequests' : 'signerRequests signerRequestsHidden'}>
-        {/* <div className='requestTitle'>
-          <div>Requests</div>
-          <div className='requestCount'>{normal.length}</div>
-        </div> */}
+      <div 
+        ref={this.moduleRef} 
+        className={this.store('selected.view') === 'default' ? 'signerRequests' : 'signerRequests signerRequestsHidden'}
+      >
         <div className='requestContainerWrap'>
-          <div className='requestContainer' style={{ height: containHeight + 'px' }}>
-            <div key='noReq' style={normal.length !== 0 ? { opacity: 0, transform: `translateY(50px)`, transition: 'none' } : { transform: `translateY(${monitor.length === 0 ? 10 : 0}px)` }} className='noRequests'>No Pending Requests</div>
-            <div className='recentRequests' style={{ opacity: monitor.length > 0 ? 1 : 0, transform: `translateY(${containNormal +  40}px)` }}>
+          <div className='requestContainer'>
+            {!requests.length ? (
+              <div key='noReq' className='noRequests'>
+                No Pending Requests
+              </div>
+            ): null}
+            {/* <div className='recentRequests' style={{ opacity: monitor.length > 0 ? 1 : 0, transform: `translateY(${containNormal +  40}px)` }}>
               <span>Recent Transactions</span>
               <span>{monitor.length}</span>
-            </div>
-            {normal.concat(monitor).map((req, i) => {
-              let pos = 0
-              const z = 2000 + i
-              if (req.mode === 'normal') pos = (((normal.length - 1) - i) * 6) + 36
-              if (req.mode === 'monitor') pos = containNormal + 10 + ((i - normal.length) * monitorHeight) + 55
-              if (req.type === 'transaction') return <TransactionRequest key={req.handlerId} req={req} pos={pos} z={z} i={i} onTop={i === normal.length - 1} accountId={this.props.id} signingDelay={signingDelay} />
-              if (req.type === 'access') return <ProviderRequest key={req.handlerId} req={req} pos={pos} z={z} onTop={i === normal.length - 1} />
-              if (req.type === 'sign') return <SignatureRequest key={req.handlerId} req={req} pos={pos} z={z} onTop={i === normal.length - 1} signingDelay={signingDelay} />
-              if (req.type === 'signTypedData') return <SignTypedDataRequest key={req.handlerId} req={req} pos={pos} z={z} onTop={i === normal.length - 1} signingDelay={signingDelay} />
-              if (req.type === 'addChain' || req.type === 'switchChain') return <ChainRequest key={req.handlerId} req={req} pos={pos} z={z} onTop={i === normal.length - 1} />
-              if (req.type === 'addToken') return <AddTokenRequest key={req.handlerId} req={req} pos={pos} z={z} onTop={i === normal.length - 1} />
-              return null
+            </div> */}
+            {requests.map((req, i) => {
+              return (
+                <div 
+                  className='requestItem'
+                  onClick={() => {
+                    this.props.setAccountView('requestView', { req, i })
+                  }}
+                >
+                  <div>{req.type + ' Request'}</div>
+                  <div>{'From' + req.origin}</div>
+                  <div>{req.mode}</div>
+                  {/* <pre>{JSON.stringify(req, null, 2)}</pre> */}
+                </div>
+              )
             })}
           </div>
         </div>

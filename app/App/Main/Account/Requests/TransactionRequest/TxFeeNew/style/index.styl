@@ -1,80 +1,74 @@
 ._txFee
-  position absolute
-  top 233px
-  left 5px
-  right 5px
-  height 30px
+  position relative
+  width 100%
+  margin-bottom 12px
   z-index 100000
   
   ._txFeeInner
-    position absolute 
-    top 0
-    right 0
-    bottom 0
-    left 0
-    background var(--ghostC)
-    border-radius 8px
-    display flex
-    flex-direction row
-    align-items stretch
-    font-weight 500
-    // overflow hidden
+    border-radius 15px
+    margin 0px 6px
 
-    ._txFeeSlice
+    ._txFeeValues
+      border-radius 12px
+      font-size 18px
       display flex
       justify-content center
       align-items center
-      text-transform uppercase
-      // border-right 1px solid var(--ghostA)
-      padding 0px 6px
+      height 42px
+      border-radius 12px
+      display flex
+      justify-content center
+      align-items center
+      -webkit-app-region no-drag
+      transition none
+      pointer-events auto
+      transform translate3d(0, 0, 0)
       font-family FiraCode, monospace
-          
-    ._txFeeLabel
-      font-weight 600
-      font-size 11px
-      text-transform uppercase
-      font-family OpenSans
-      padding 0px 12px 0px 15px
-      // background var(--ghostD)
-
+      background var(--ghostZ)
+      
     ._txFeeGwei
-      padding 0px 4px 0px 8px
-      background var(--ghostE)
-      border-radius 8px
-      width 102px
+      width calc(50% - 3px)
+      height 42px
       transition var(--standardFaster)
       cursor pointer
       transform translateY(0px)
       padding-top 1px
+      display flex
+      justify-content center
+      align-items center
+
 
       *
         pointer-events none
 
       ._txFeeGweiValue
         font-family FiraCode, monospace
-        font-size 15px
-        font-weight 500
+        font-size 20px
+        font-weight 600
         display flex
         align-items center
         justify-content center
         
       ._txFeeGweiLabel
-        font-size 10px
         display flex
         align-items center
         justify-content center
-        font-family FiraCode, monospace
+        font-family 'Exo2'
         padding-left 3px
+        font-weight 600
+        font-size 11px
+        text-transform uppercase
 
     ._txFeeGwei:hover
       // flex 1
       // padding 0px 10px
-      background var(--moon)
-      color var(--moonOver)
-      transform translateY(-5px)
-      box-shadow 0px 20px 30px -5px var(--ghostX)
+      // background var(--moon)
+      // color var(--moonOver)
+      background var(--ghostB)
+      // transform translateY(-5px)
+      // box-shadow 0px 20px 30px -5px var(--ghostX)
       // border-bottom 1px solid var(--goodDark)
-      animation 4s shake ease-in-out infinite alternate
+      // animation 4s shake ease-in-out infinite alternate
 
     ._txFeeGwei:active
       transform translateY(0px)
@@ -82,38 +76,30 @@
       animation-duration 2s
       animation-timing-function: ease-in-out
       animation-iteration-count: infinite
-      box-shadow 0px 5px 8px 0px var(--ghostZ)
+      // box-shadow 0px 5px 8px 0px var(--ghostZ)
 
     ._txFeeValue
       position relative
-      justify-content flex-end
+      display flex
+      align-items center
+      justify-content center
       font-weight 600
       font-size 13px
       flex 1
+      // background var(--ghostZ)
+      // border-radius 12px
+      height 42px
+      margin-left 3px
+      border-left 3px solid var(--ghostZ)
 
       ._txFeeValueDefault
-        position absolute
         padding 1px 15px 0px 15px
         opacity 1
-        top 0
-        left 0
-        bottom 0
-        right 0
         display flex
         align-items center
         justify-content center
 
       ._txFeeValueDefaultWarn
-        position absolute
-        padding 1px 15px 0px 15px
-        opacity 1
-        top 0
-        left 0
-        bottom 0
-        right 0
-        display flex
-        align-items center
-        justify-content center
         color var(--bad)
 
       ._txFeeValueHover
@@ -130,9 +116,7 @@
 
       ._txFeeETH
         padding-right 6px
-        position relative
-        top -1px
-        opacity 0.8
+        opacity 1
         font-family Exo2
 
       ._txFeeETHValue

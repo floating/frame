@@ -41,6 +41,7 @@ const initial = {
   panel: { // Panel view
     show: false,
     view: 'default',
+    viewData: '',
     account: {
       moduleOrder: [
         // 'launcher',
@@ -81,7 +82,7 @@ const initial = {
       }
     }
   },
-  dash: {
+  dash: { // Dash view
     showing: false,
     nav: []
   },

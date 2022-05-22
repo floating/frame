@@ -1,0 +1,82 @@
+.accountView
+  position absolute
+  top 0
+  right 0
+  bottom 5px
+  left 0
+
+  .accountViewMenu
+    position absolute
+    top 70px
+    right 1px
+    left 1px
+    height 48px
+    background var(--ghostA)
+    border-radius 12px
+    box-shadow 0px 4px 8px var(--ghostY)
+    z-index 5
+
+    .accountViewTitle
+      position absolute
+      top 0
+      right 0
+      bottom 0
+      left 19px
+      display flex
+      justify-content center
+      align-items center
+      text-transform uppercase
+      letter-spacing 2px
+      font-weight 500
+      font-size 12px
+      pointer-events none
+
+    .accountViewBack
+      position absolute
+      top 5px
+      left 10px
+      height 32px
+      width 48px
+      border-radius 12px
+      display flex
+      justify-content center
+      align-items center
+      -webkit-app-region no-drag
+      transition none
+      pointer-events auto
+      transform translate3d(0, 0, 0)
+      background var(--ghostB)
+      cursor pointer
+      border 3px solid var(--ghostZ)
+      *
+        pointer-events none
+
+    .accountViewBack:hover
+      background var(--ghostC)
+
+    .accountViewIcon
+      position absolute
+      top 1px
+      right 12px
+      bottom 0px
+      width 34px
+      display flex
+      justify-content center
+      align-items center
+      -webkit-app-region no-drag
+      transition none
+      pointer-events none
+      transform translate3d(0, 0, 0)
+
+  .accountViewMain
+    position absolute
+    top 110px
+    right 1px
+    left 1px
+    bottom 0px
+    overflow-y scroll
+    padding-top 16px
+    padding-bottom 5px
+    animation-delay 0.08s
+    z-index 3
+    

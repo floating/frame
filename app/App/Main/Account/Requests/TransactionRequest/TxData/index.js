@@ -20,10 +20,10 @@ class txData extends React.Component {
     return (
       <div className='_txData'>
         <div className='_txDataInner'>
-          <div className='_txDataSlice _txDataLabel'>
+          <div className='_txLabel'>
             Data
           </div>
-          <div className='_txDataSlice _txDataValue _txButton' onClick={() => {
+          <div className='_txDataValue' onClick={() => {
             this.props.overlayMode('data')
           }}>
            {req.data.data && req.data.data !== '0x' && req.data.data !== '0x0' ? (
