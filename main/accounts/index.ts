@@ -1,9 +1,8 @@
-
-
 import EventEmitter from 'events'
 import log from 'electron-log'
 import { shell, Notification } from 'electron'
 import { addHexPrefix, intToHex} from 'ethereumjs-util'
+import { TypedData, Version } from 'eth-sig-util'
 import { v5 as uuidv5 } from 'uuid'
 
 import store from '../store'
@@ -12,17 +11,14 @@ import { getType as getSignerType } from '../signers/Signer'
 import FrameAccount from './Account'
 import { usesBaseFee, signerCompatibility, maxFee, TransactionData, SignerCompatibility } from '../transaction'
 import { weiIntToEthInt, hexToInt } from '../../resources/utils'
-
+import provider from '../provider'
+import { Chain } from '../chains'
+import { ApprovalType } from '../../resources/constants'
 import {
   AccountRequest, AccessRequest,
   TransactionRequest, TransactionReceipt,
   ReplacementType, RequestStatus, RequestMode
 } from './types'
-
-// Provider Proxy
-import provider from '../provider'
-import { TypedData, Version } from 'eth-sig-util'
-import { ApprovalType } from '../../resources/constants'
 
 function notify (title: string, body: string, action: (event: Electron.Event) => void) {
   const notification = new Notification({ title, body })
@@ -940,4 +936,8 @@ export class Accounts extends EventEmitter {
   // }
 }
 
-export default new Accounts()
+const accounts = new Accounts()
+
+console.log('ZOMG accounts')
+
+export default accounts
