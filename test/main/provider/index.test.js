@@ -184,7 +184,7 @@ describe('#send', () => {
           }
         ]
       }, () => {
-        expect(store.switchOriginChain).toHaveBeenCalledWith(137, 1, 'ethereum')
+        expect(store.switchOriginChain).toHaveBeenCalledWith('8073729a-5e59-53b7-9e69-5d9bcff94087', 1, 'ethereum')
         done()
       })
     })
@@ -203,7 +203,7 @@ describe('#send', () => {
         }],
         _origin: '8073729a-5e59-53b7-9e69-5d9bcff94087'
       }, () => {
-        expect(store.switchOriginChain).toHaveBeenCalledWith(42161, 1, 'ethereum')
+        expect(store.switchOriginChain).toHaveBeenCalledWith('8073729a-5e59-53b7-9e69-5d9bcff94087', 1, 'ethereum')
         done()
       })
     })
