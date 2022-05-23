@@ -47,11 +47,9 @@
     "test:unit": "npm run test:unit:main && npm run test:unit:components",
     "test:unit:main": "npm run test:exec -- --env=node ./test/main",
     "test:unit:components": "npm run test:exec -- --env=jsdom --testTimeout=500 ./test/app",
-    "test:e2e": "npm run test:exec -- --env=node --testPathPattern=e2e",
-    "test:e2e:nodeploy": "npm run test:exec -- --env=node --testPathPattern=e2e --testPathIgnorePatterns=deploy",
+    "test:e2e": "npm run test:exec -- --env=node ./test/e2e",
     "test:usbAdapters": "ELECTRON_RUN_AS_NODE=true ./node_modules/.bin/electron ./node_modules/jest/bin/jest.js ./test/main/signers/ledger/adapter.test.js --testPathIgnorePatterns=''",
     "standard": "standardx --fix --verbose",
-    "test:clients": "mocha test/clients/*.test.js",
     "local:rpc": "ganache-cli --account=\"0x2d6945dbddb8dcf5492004e6f720f8e971196ff61a61c4be99714ebc71e06c00,  5000000000000000000000\" --account=\"0xaef6a68a47c1628081e4e6df195f5f712ae4eb7da332a6d74dca06ae32a3e7ae,5000\""
   },
   "author": {
@@ -136,6 +134,8 @@
     "@types/node": "17.0.23",
     "@types/node-fetch": "2.6.1",
     "@types/node-hid": "1.3.1",
+    "@types/uuid": "^8.3.4",
+    "@types/ws": "^8.5.3",
     "babel-eslint": "10.1.0",
     "electron": "18.1.0",
     "electron-builder": "23.0.3",

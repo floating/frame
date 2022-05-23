@@ -640,20 +640,16 @@ class Settings extends React.Component {
   constructor (props, context) {
     super(props, context)
     this.customMessage = 'Custom Endpoint'
-    this.network = context.store('main.currentNetwork.id')
-    this.networkType = context.store('main.currentNetwork.type')
-    const primaryCustom = context.store('main.networks', this.networkType, this.network, 'connection.primary.custom') || this.customMessage
-    const secondaryCustom = context.store('main.networks', this.networkType, this.network, 'connection.secondary.custom') || this.customMessage
-    context.store.observer(() => {
-      const { type, id } = context.store('main.currentNetwork')
-      if (this.network !== id || this.networkType !== type) {
-        this.networkType = type
-        this.network = id
-        const primaryCustom = context.store('main.networks', type, id, 'connection.primary.custom') || this.customMessage
-        const secondaryCustom = context.store('main.networks', type, id, 'connection.secondary.custom') || this.customMessage
-        this.setState({ primaryCustom, secondaryCustom })
-      }
-    })
+    // context.store.observer(() => {
+    //   const { type, id } = context.store('main.currentNetwork')
+    //   if (this.network !== id || this.networkType !== type) {
+    //     this.networkType = type
+    //     this.network = id
+    //     const primaryCustom = context.store('main.networks', type, id, 'connection.primary.custom') || this.customMessage
+    //     const secondaryCustom = context.store('main.networks', type, id, 'connection.secondary.custom') || this.customMessage
+    //     this.setState({ primaryCustom, secondaryCustom })
+    //   }
+    // })
     this.newNetworkIdDefault = 'ID'
     this.newNetworkNameDefault = 'New Network'
     this.newNetworkExplorerDefault = 'Block Explorer'
@@ -665,9 +661,7 @@ class Settings extends React.Component {
       newNetworkExplorer: this.newNetworkExplorerDefault,
       newNetworkSymbol: this.newNetworkSymbolDefault,
       newNetworkType: this.newNetworkType,
-      localShake: {}, 
-      primaryCustom, 
-      secondaryCustom, 
+      localShake: {},
       resetConfirm: false, 
       expandNetwork: false,
       findFocus: false, 
@@ -740,7 +734,7 @@ class Settings extends React.Component {
   }
 
   render () {
-    const { type, id } = this.store('main.currentNetwork')
+    const { type, id } = { type: 'ethereum', id: 1 }// TODO: this.store('main.currentNetwork')
     const networks = this.store('main.networks')
     const connection = networks[type][id].connection
     const networkPresets = this.store('main.networkPresets', type)

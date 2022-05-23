@@ -25,14 +25,17 @@ class LedgerBLE extends Signer {
       this.deviceStatus()
     }, 4000)
     this.networkObserver = store.observer(() => {
-      if (this.network !== store('main.currentNetwork.id')) {
-        this.network = store('main.currentNetwork.id')
-        this.status = 'loading'
-        this.accounts = []
-        this.update()
-        if (this.network) this.deviceStatus()
-      }
-    })
+      const currentOrigins = store('main.origins')        
+      Object.entries(currentOrigins).forEach(([origin, { chainId }]) => {
+        if(origins[origin].chainId !== chainId) {
+          this.network = chainId
+          this.status = 'loading'
+          this.accounts = []
+          this.update()
+          this.deviceStatus()
+        }
+      })
+    }, 'provider:chains')
     this.hardwareDerivationObserver = store.observer(() => {
       if (this.hardwareDerivation !== store('main.hardwareDerivation')) {
         this.hardwareDerivation = store('main.hardwareDerivation')

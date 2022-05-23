@@ -9,7 +9,10 @@ import {
   addCustomTokens as addCustomTokensAction,
   removeCustomTokens as removeTokensAction,
   addKnownTokens as addKnownTokensAction,
-  setScanning as setScanningAction
+  setScanning as setScanningAction,
+  switchOriginChain as switchOriginChainAction,
+  removeNetwork as removeNetworkAction,
+  updateNetwork as updateNetworkAction
 } from '../../../../main/store/actions'
 
 beforeAll(() => {
@@ -507,5 +510,217 @@ describe('#setScanning', () => {
     jest.advanceTimersByTime(1000)
 
     expect(isScanning).toBe(false)
+  })
+})
+
+describe('#switchOriginChain', () => {
+  let origins = { }
+
+  const updaterFn = (node, origin, update) => {
+    const nodePath = [node, origin].join('.')
+    expect(nodePath).toBe('main.origins.91f6971d-ba85-52d7-a27e-6af206eb2433')
+
+    origins[origin] = update()
+  }
+
+  beforeEach(() => {
+    origins = {
+      '91f6971d-ba85-52d7-a27e-6af206eb2433': {
+        chain: { id: 1, type: 'ethereum' }
+      }
+    }
+  })
+
+  const switchChain = (chainId, type) => switchOriginChainAction(updaterFn, '91f6971d-ba85-52d7-a27e-6af206eb2433', chainId, type)
+
+  it('should switch the chain for an origin', () => {
+    switchChain(50, 'cosmos')
+
+    expect(origins['91f6971d-ba85-52d7-a27e-6af206eb2433'].chain).toStrictEqual({ id: 50, type: 'cosmos' })
+  })
+})
+
+describe('#removeNetwork', () => {
+  let main
+
+  const updaterFn = (node, update) => {
+    expect(node).toBe('main')
+    main = update(main)
+  }
+
+  beforeEach(() => {
+    main = {
+      origins: {
+        '91f6971d-ba85-52d7-a27e-6af206eb2433': {
+          chain: { id: 1, type: 'ethereum' }
+        },
+        '8073729a-5e59-53b7-9e69-5d9bcff94087': {
+          chain: { id: 4, type: 'ethereum' }
+        },
+        'd7acc008-6411-5486-bb2d-0c0cfcddbb92': {
+          chain: { id: 50, type: 'cosmos' }
+        },
+        '695112ec-43e2-52a8-8f69-5c36837d6d13': {
+          chain: { id: 4, type: 'ethereum' }
+        }
+      },
+      networks: {
+        'ethereum': {
+          1: {},
+          4: {},
+          137: {}
+        },
+        'cosmos': {
+          50: {}
+        }
+      },
+      networksMeta: {
+        'ethereum': {
+          1: {},
+          4: {},
+          137: {}
+        },
+        'cosmos': {
+          50: {}
+        }
+      }
+    }
+  })
+
+  const removeNetwork = (networkId, networkType = 'ethereum') => removeNetworkAction(updaterFn, { id: networkId, type: networkType })
+
+  it('should delete the network and meta', () => {
+    removeNetwork(4)
+
+    expect(main.networks.ethereum).toStrictEqual({ 1: {}, 137: {} })
+    expect(main.networksMeta.ethereum).toStrictEqual({ 1: {}, 137: {} })
+  })
+
+  it('should switch the chain for origins using the deleted network to mainnet', () => {
+    removeNetwork(4)
+
+    expect(main.origins).toStrictEqual({
+      '91f6971d-ba85-52d7-a27e-6af206eb2433': {
+        chain: { id: 1, type: 'ethereum' }
+      },
+      '8073729a-5e59-53b7-9e69-5d9bcff94087': {
+        chain: { id: 1, type: 'ethereum' }
+      },
+      'd7acc008-6411-5486-bb2d-0c0cfcddbb92': {
+        chain: { id: 50, type: 'cosmos' }
+      },
+      '695112ec-43e2-52a8-8f69-5c36837d6d13': {
+        chain: { id: 1, type: 'ethereum' }
+      }
+    })
+  })
+
+  describe('when passed the last network of a given type', () => {
+    it('should not delete the last network of a given type', () => {
+      removeNetwork(50, 'cosmos')
+  
+      expect(main.networks.cosmos[50]).toStrictEqual({})
+      expect(main.networksMeta.cosmos[50]).toStrictEqual({})
+    })
+
+    it('should not update its origins', () => {
+      removeNetwork(50, 'cosmos')
+  
+      expect(main.origins).toStrictEqual({
+        '91f6971d-ba85-52d7-a27e-6af206eb2433': {
+          chain: { id: 1, type: 'ethereum' }
+        },
+        '8073729a-5e59-53b7-9e69-5d9bcff94087': {
+          chain: { id: 4, type: 'ethereum' }
+        },
+        'd7acc008-6411-5486-bb2d-0c0cfcddbb92': {
+          chain: { id: 50, type: 'cosmos' }
+        },
+        '695112ec-43e2-52a8-8f69-5c36837d6d13': {
+          chain: { id: 4, type: 'ethereum' }
+        }
+      })
+    })
+  })
+})
+
+describe('#updateNetwork', () => {
+  let main
+
+  const updaterFn = (node, update) => {
+    expect(node).toBe('main')
+    main = update(main)
+  }
+
+  beforeEach(() => {
+    main = {
+      origins: {
+        '91f6971d-ba85-52d7-a27e-6af206eb2433': {
+          chain: { id: 1, type: 'ethereum' }
+        },
+        '8073729a-5e59-53b7-9e69-5d9bcff94087': {
+          chain: { id: 4, type: 'ethereum' }
+        },
+        'd7acc008-6411-5486-bb2d-0c0cfcddbb92': {
+          chain: { id: 50, type: 'ethereum' }
+        },
+        '695112ec-43e2-52a8-8f69-5c36837d6d13': {
+          chain: { id: 4, type: 'ethereum' }
+        }
+      },
+      networks: {
+        'ethereum': {
+          1: {},
+          4: {},
+          137: {}
+        },
+        'cosmos': {
+          50: {}
+        }
+      },
+      networksMeta: {
+        'ethereum': {
+          1: {},
+          4: {},
+          137: {}
+        },
+        'cosmos': {
+          50: {}
+        }
+      }
+    }
+  })
+
+  const updateNetwork = (existingNetwork, newNetwork) => updateNetworkAction(updaterFn, existingNetwork, newNetwork)
+
+  it('should update the network', () => {
+    updateNetwork({ id: '0x4', type: 'ethereum', name: '', explorer: '', symbol: '' }, { id: '0x42', type: 'ethereum', name: 'test', explorer: 'explorer.test', symbol: 'TEST' })
+
+    expect(main.networks.ethereum).toStrictEqual({ 1: {}, 66: { id: 66, type: 'ethereum', name: 'test', explorer: 'explorer.test', symbol: 'TEST' }, 137: {} })
+  })
+
+  it('should trim string properties', () => {
+    updateNetwork({ id: '0x4', type: 'ethereum', name: '', explorer: '', symbol: '' }, { id: '0x42', type: 'ethereum', name: 'test     ', explorer: '   explorer.test    ', symbol: 'TEST  ' })
+
+    expect(main.networks.ethereum).toStrictEqual({ 1: {}, 66: { id: 66, type: 'ethereum', name: 'test', explorer: 'explorer.test', symbol: 'TEST' }, 137: {} })
+  })
+
+  it('should update the chainId for origins using the updated network', () => {
+    updateNetwork({ id: '0x4', type: 'ethereum', name: '', explorer: '', symbol: '' }, { id: '0x42', type: 'ethereum', name: 'test', explorer: 'explorer.test', symbol: 'TEST' })
+
+    expect(main.origins).toStrictEqual({
+      '91f6971d-ba85-52d7-a27e-6af206eb2433': {
+        chain: expect.objectContaining({ id: 1, type: 'ethereum' })
+      },
+      '8073729a-5e59-53b7-9e69-5d9bcff94087': {
+        chain: expect.objectContaining({ id: 66, type: 'ethereum' })
+      },
+      'd7acc008-6411-5486-bb2d-0c0cfcddbb92': {
+        chain: expect.objectContaining({ id: 50, type: 'ethereum' })
+      },
+      '695112ec-43e2-52a8-8f69-5c36837d6d13': {
+        chain: expect.objectContaining({ id: 66, type: 'ethereum' })
+      }
+    })
   })
 })

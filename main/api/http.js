@@ -6,6 +6,7 @@ const accounts = require('../accounts').default
 const store = require('../store').default
 
 const trusted = require('./trusted')
+const { updateOrigin } = require('./origin')
 const validPayload = require('./validPayload').default
 const protectedMethods = require('./protectedMethods').default
 
@@ -38,13 +39,20 @@ const handler = (req, res) => {
     req.on('data', chunk => body.push(chunk)).on('end', async () => {
       res.on('error', err => console.error('res err', err))
       const origin = req.headers.origin || 'Unknown'
-      const input = Buffer.concat(body).toString()
-      const payload = validPayload(input)
-      if (!payload) return console.warn('Invalid Payload', input)
-      payload._origin = origin
-      if (logTraffic) log.info('req -> | http | ' + req.headers.origin + ' | ' + payload.method + ' | -> | ' + JSON.stringify(payload.params))
+      const data = Buffer.concat(body).toString()
+      
+      if (!origin) {
+        log.warn(`Received payload with no origin: ${JSON.stringify(payload)}`)
+      }
+
+      const rawPayload = validPayload(data)
+      if (!rawPayload) return console.warn('Invalid Payload', data)
+
+      const payload = updateOrigin(rawPayload, origin)
+
+      if (logTraffic) log.info(`req -> | http | ${req.headers.origin} | ${payload.method} | -> | ${JSON.stringify(payload.params)}`)
       if (protectedMethods.indexOf(payload.method) > -1 && !(await trusted(origin))) {
-        let error = { message: 'Permission denied, approve ' + origin + ' in Frame to continue', code: 4001 }
+        let error = { message: `Permission denied, approve ${origin} in Frame to continue`, code: 4001 }
         // Review
         if (!accounts.getSelectedAddresses()[0]) error = { message: 'No Frame account selected', code: 4001 }
         res.writeHead(401, { 'Content-Type': 'application/json' })
@@ -57,7 +65,7 @@ const handler = (req, res) => {
             if (result.length || payload.params[1] === 'immediate' || force) {
               res.writeHead(200, { 'Content-Type': 'application/json' })
               const response = { id: payload.id, jsonrpc: payload.jsonrpc, result }
-              if (logTraffic) log.info('<- res | http | ' + origin + ' | ' + payload.method + ' | <- | ' + JSON.stringify(response))
+              if (logTraffic) log.info(`<- res | http | ${origin} | ${payload.method} | <- | ${JSON.stringify(response)}`)
               res.end(JSON.stringify(response))
               delete polls[id]
               clearTimeout(cleanupTimers[id])
@@ -85,7 +93,7 @@ const handler = (req, res) => {
             }
           }
 
-          if (logTraffic) log.info('<- res | http | ' + req.headers.origin + ' | ' + payload.method + ' | <- | ' + JSON.stringify(response))
+          if (logTraffic) log.info(`<- res | http | ${req.headers.origin} | ${payload.method} | <- | ${JSON.stringify(response)}`)
           res.writeHead(200, { 'Content-Type': 'application/json' })
           res.end(JSON.stringify(response))
         })
@@ -98,16 +106,20 @@ const handler = (req, res) => {
 }
 
 // Track subscriptions
-provider.on('data', payload => {
+provider.on('data', (chain, payload) => {
+  return
   if (pollSubs[payload.params.subscription]) {
-    const { id } = pollSubs[payload.params.subscription]
+    const { id, origin } = pollSubs[payload.params.subscription]
     polls[id] = polls[id] || []
     polls[id].push(JSON.stringify(payload))
-    if (pending[id]) pending[id].send()
+    if (pending[id] && (!payload.params.origin || payload.params.origin === origin)) {
+      pending[id].send(JSON.stringify(payload))
+    }
   }
 })
 
 provider.on('data:address', (account, payload) => { // Make sure the subscription has access based on current account
+  return
   if (pollSubs[payload.params.subscription]) {
     const { id, origin } = pollSubs[payload.params.subscription]
     const permissions = store('main.permissions', account) || {}

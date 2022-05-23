@@ -130,7 +130,6 @@ async function sign (rawTx: TransactionData, signingFn: (tx: TypedTransaction) =
       ...rawTx,
       ...signature
       },
-      // @ts-ignore
       { common }
     )
   })

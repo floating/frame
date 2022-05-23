@@ -79,17 +79,11 @@ export interface SignTypedDataRequest extends Omit<AccountRequest, 'type'> {
 }
 
 export interface AccessRequest extends Omit<AccountRequest, 'type'> {
-  type: 'access',
-  address: Address
+  type: 'access'
 }
 
 export interface AddChainRequest extends Omit<AccountRequest, 'type'> {
   type: 'addChain',
-  chain: Chain
-}
-
-export interface SwitchChainRequest extends Omit<AccountRequest, 'type'> {
-  type: 'switchChain',
   chain: Chain
 }
 

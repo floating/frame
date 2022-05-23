@@ -1,46 +1,31 @@
-// @ts-ignore
-import { v4 as uuid } from 'uuid'
+import { v4 as uuid, v5 as uuidv5 } from 'uuid'
 import EventEmitter from 'events'
 import log from 'electron-log'
 import utils from 'web3-utils'
 import { recoverTypedMessage, Version } from 'eth-sig-util'
 import crypto from 'crypto'
-
 import {
-  padToEven,
-  unpadHexString,
   addHexPrefix,
-  stripHexPrefix,
   intToHex,
   isHexString,
   isHexPrefixed,
   fromUtf8,
-  toBuffer,
-  pubToAddress,
-  ecrecover,
-  hashPersonalMessage,
 } from 'ethereumjs-util'
 
 import store from '../store'
-import protectedMethods from '../api/protectedMethods'
 import packageFile from '../../package.json'
-
 import proxyConnection from './proxy'
-import accounts, { AccountRequest, TransactionRequest, SignTypedDataRequest, SwitchChainRequest, AddChainRequest, AddTokenRequest } from '../accounts'
-import Chains, { Chain } from '../chains'
+import accounts, { AccountRequest, TransactionRequest, SignTypedDataRequest, AddChainRequest, AddTokenRequest } from '../accounts'
+import Chains from '../chains'
 import { getType as getSignerType, Type as SignerType } from '../signers/Signer'
-import { TransactionData, usesBaseFee } from '../../resources/domain/transaction'
+import { TransactionData } from '../../resources/domain/transaction'
 import { populate as populateTransaction, maxFee } from '../transaction'
 import FrameAccount from '../accounts/Account'
 import { capitalize, arraysMatch } from '../../resources/utils'
 import { ApprovalType } from '../../resources/constants'
-
-const NATIVE_CURRENCY = '0x0000000000000000000000000000000000000000'
-
-const permission = (date: number, method: string) => ({ parentCapability: method, date })
+import { checkExistingNonceGas, ecRecover, feeTotalOverMax, gasFees, getActiveChains, getAssets, getChains, getPermissions, getRawTx, getSignedAddress, isCurrentAccount, isScanning, loadAssets, requestPermissions, resError } from './helpers'
 
 type Subscriptions = { [key in SubscriptionType]: string[] }
-type Balance = Token & { balance: string, displayBalance: string }
 
 interface RequiredApproval {
   type: ApprovalType,
@@ -52,49 +37,10 @@ export interface TransactionMetadata {
   approvals: RequiredApproval[]
 }
 
-function isScanning (account: Address) {
-  const lastUpdated = store('main.accounts', account, 'balances.lastUpdated') as number
-  return !lastUpdated || (new Date().getTime() - lastUpdated) > (1000 * 60 * 5)
-}
+const getOrigin = ({ _origin }: RPCRequestPayload) => storeApi.getOrigin(_origin)
 
-function getNativeCurrency (chainId: number) {
-  const currency = store('main.networksMeta.ethereum', chainId, 'nativeCurrency')
-
-  return (currency || { usd: { price: 0 } }) as Currency
-}
-
-function getRate (address: Address) {
-  const rate = store('main.rates', address.toLowerCase())
-
-  return (rate || { usd: { price: 0 } }) as Rate
-}
-
-function loadAssets (accountId: string) {
-  const balances: Balance[] = store('main.balances', accountId) || []
-
-  const response = { nativeCurrency: [] as RPC.GetAssets.NativeCurrency[], erc20: [] as RPC.GetAssets.Erc20[] }
-
-  return balances.reduce((assets, balance) => {
-    if (balance.address === NATIVE_CURRENCY) {
-      const currency = getNativeCurrency(balance.chainId)
-
-      assets.nativeCurrency.push({
-        ...balance,
-        currencyInfo: currency
-      })
-    } else {
-      const { usd } = getRate(balance.address)
-
-      assets.erc20.push({
-        ...balance,
-        tokenInfo: {
-          lastKnownPrice: { usd }
-        }
-      })
-    }
-
-    return assets
-  }, response)
+const storeApi = {
+  getOrigin: (id: string) => store('main.origins', id) as Origin
 }
 
 export class Provider extends EventEmitter {
@@ -110,25 +56,24 @@ export class Provider extends EventEmitter {
     networkChanged: []
   }
 
-  store: (...args: any) => any
-
   constructor () {
     super()
-    this.store = store
-    
+
     this.connection.syncDataEmit(this)
-
-    this.connection.on('connect', () => {
+    this.connection.on('connect', (...args) => {
       this.connected = true
-      this.emit('connect')
+      this.emit('connect', ...args)
     })
-
-    this.connection.on('close', () => { this.connected = false })
-    this.connection.on('data', data => this.emit('data', data))
-
-    this.connection.on('error', err => log.error(err))
-
-    this.connection.on('update', event => {
+    this.connection.on('close', () => { 
+      this.connected = false
+    })
+    this.connection.on('data', (chain, ...args) => {
+      this.emit(`data:${chain.type}:${chain.id}`, ...args)
+    })
+    this.connection.on('error', (chain, err) => {
+      log.error(err)
+    })
+    this.connection.on('update', (chain, event) => {
       if (event.type === 'fees') {
         return accounts.updatePendingFees(event.chainId)
       }
@@ -157,11 +102,11 @@ export class Provider extends EventEmitter {
   }
 
   // fires when the current default chain changes
-  chainChanged (chainId: number) {
+  chainChanged (chainId: number, originId: string) {
     const chain = intToHex(chainId)
 
     this.subscriptions.chainChanged.forEach(subscription => {
-      this.emit('data', { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, result: chain } })
+      this.emit('data', { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, origin: originId, result: chain } })
     })
   }
 
@@ -180,45 +125,26 @@ export class Provider extends EventEmitter {
     })
   }
 
-  getCoinbase (payload: RPCRequestPayload, res: RPCRequestCallback) {
-    accounts.getAccounts((err, accounts) => {
-      if (err) return this.resError(`signTransaction Error: ${JSON.stringify(err)}`, payload, res)
-      res({ id: payload.id, jsonrpc: payload.jsonrpc, result: (accounts || [])[0] })
-    })
-  }
-
-  getAccounts (payload: JSONRPCRequestPayload, res: RPCRequestCallback) {
-    res({ id: payload.id, jsonrpc: payload.jsonrpc, result: accounts.getSelectedAddresses().map(a => a.toLowerCase()) })
-  }
-
-  getNetVersion (payload: JSONRPCRequestPayload, res: RPCRequestCallback, targetChain: Chain) {
-    const { type, id } = (targetChain || store('main.currentNetwork'))
-
-    const connection = this.connection.connections[type][id]
+  getNetVersion (payload: RPCRequestPayload, res: RPCRequestCallback, targetChain: Chain) {
+    const connection = this.connection.connections[targetChain.type][targetChain.id]
     const chainConnected = (connection.primary?.connected || connection.secondary?.connected)
 
     const response = chainConnected
-      ? { result: id.toString() }
+      ? { result: targetChain.id.toString() }
       : { error: { message: 'not connected', code: 1 } }
 
     res({ id: payload.id, jsonrpc: payload.jsonrpc, ...response })
   }
 
-  getChainId (payload: JSONRPCRequestPayload, res: RPCSuccessCallback, targetChain: Chain) {
-    const { type, id } = (targetChain || store('main.currentNetwork'))
-
-    const connection = this.connection.connections[type][id]
+  getChainId (payload: RPCRequestPayload, res: RPCSuccessCallback, targetChain: Chain) {
+    const connection = this.connection.connections[targetChain.type][targetChain.id]
     const chainConnected = (connection.primary?.connected || connection.secondary?.connected)
 
     const response = chainConnected
-      ? { result: intToHex(id) }
+      ? { result: intToHex(targetChain.id) }
       : { error: { message: 'not connected', code: 1 } }
 
     res({ id: payload.id, jsonrpc: payload.jsonrpc, ...response })
-  }
-
-  getChains (payload: JSONRPCRequestPayload, res: RPCSuccessCallback) {
-    res({ id: payload.id, jsonrpc: payload.jsonrpc, result: getActiveChains().map(intToHex) })
   }
 
   declineRequest (req: AccountRequest) {
@@ -228,37 +154,7 @@ export class Provider extends EventEmitter {
     }
 
     const payload = req.payload
-    this.resError({ message: 'User declined transaction', code: 4001 }, payload, res)
-  }
-
-  resError (errorData: string | EVMError, request: RPCId, res: RPCErrorCallback) {
-    const error = (typeof errorData === 'string')
-      ? { message: errorData, code: -1 }
-      : { message: errorData.message, code: errorData.code || -1 }
-
-    log.warn(error)
-    res({ id: request.id, jsonrpc: request.jsonrpc, error })
-  }
-
-  getSignedAddress (signed: string, message: string, cb: Callback<String>) {
-    const signature = Buffer.from(signed.replace('0x', ''), 'hex')
-    if (signature.length !== 65) cb(new Error('Frame verifySignature: Signature has incorrect length'))
-    let v = signature[64]
-    v = v === 0 || v === 1 ? v + 27 : v
-    const r = toBuffer(signature.slice(0, 32))
-    const s = toBuffer(signature.slice(32, 64))
-    const hash = hashPersonalMessage(toBuffer(message))
-    const verifiedAddress = '0x' + pubToAddress(ecrecover(hash, v, r, s)).toString('hex')
-    cb(null, verifiedAddress)
-  }
-
-  ecRecover (payload: JSONRPCRequestPayload, res: RPCRequestCallback) {
-    const message = payload.params[0]
-    const signed = payload.params[1]
-    this.getSignedAddress(signed, message, (err, verifiedAddress) => {
-      if (err) return this.resError(err.message, payload, res)
-      res({ id: payload.id, jsonrpc: payload.jsonrpc, result: verifiedAddress })
-    })
+    resError({ message: 'User declined transaction', code: 4001 }, payload, res)
   }
 
   verifySignature (signed: string, message: string, address: string, cb: Callback<boolean>) {
@@ -276,7 +172,7 @@ export class Provider extends EventEmitter {
       }
     }
 
-    this.getSignedAddress(signed, message, (err, verifiedAddress) => {
+    getSignedAddress(signed, message, (err, verifiedAddress) => {
       if (err) return cb(err)
       if ((verifiedAddress || '').toLowerCase() !== address.toLowerCase()) return cb(new Error('Frame verifySignature: Failed ecRecover check'))
       cb(null, true)
@@ -304,13 +200,13 @@ export class Provider extends EventEmitter {
 
     accounts.signMessage(address, message, (err, signed) => {
       if (err) {
-        this.resError(err.message, payload, res)
+        resError(err.message, payload, res)
         cb(err, undefined)
       } else {
         const signature = signed || ''
         this.verifySignature(signature, message, address, err => {
           if (err) {
-            this.resError(err.message, payload, res)
+            resError(err.message, payload, res)
             cb(err)
           } else {
             res({ id: payload.id, jsonrpc: payload.jsonrpc, result: signature })
@@ -334,7 +230,7 @@ export class Provider extends EventEmitter {
 
     accounts.signTypedData(req.version, address, dataToSign, (err, signature) => {
       if (err) {
-        this.resError(err.message, payload, res)
+        resError(err.message, payload, res)
         cb(err)
       } else {
         const sig = signature || ''
@@ -347,19 +243,12 @@ export class Provider extends EventEmitter {
           res({ id: payload.id, jsonrpc: payload.jsonrpc, result: sig })
           cb(null, sig)
         } catch (err: any) {
-          this.resError(err.message, payload, res)
+          resError(err.message, payload, res)
 
           cb(err)
         }
       }
     })
-  }
-
-  feeTotalOverMax (rawTx: TransactionData, maxTotalFee: number) {
-    const maxFeePerGas = usesBaseFee(rawTx) ? parseInt(rawTx.maxFeePerGas || '', 16) : parseInt(rawTx.gasPrice || '', 16)
-    const gasLimit = parseInt(rawTx.gasLimit || '', 16)
-    const totalFee = maxFeePerGas * gasLimit
-    return totalFee > maxTotalFee
   }
 
   signAndSend (req: TransactionRequest, cb: Callback<string>) {
@@ -372,7 +261,7 @@ export class Provider extends EventEmitter {
     const payload = req.payload
     const maxTotalFee = maxFee(rawTx)
 
-    if (this.feeTotalOverMax(rawTx, maxTotalFee)) {
+    if (feeTotalOverMax(rawTx, maxTotalFee)) {
       const chainId = parseInt(rawTx.chainId)
       const symbol = store(`main.networks.ethereum.${chainId}.symbol`)
       const displayAmount = symbol
@@ -381,12 +270,12 @@ export class Provider extends EventEmitter {
 
       const err = `Max fee is over hard limit${displayAmount}`
 
-      this.resError(err, payload, res)
+      resError(err, payload, res)
       cb(new Error(err))
     } else {
       accounts.signTransaction(rawTx, (err, signedTx) => { // Sign Transaction
         if (err) {
-          this.resError(err, payload, res)
+          resError(err, payload, res)
           cb(err)
         } else {
           accounts.setTxSigned(req.handlerId, err => {
@@ -403,7 +292,7 @@ export class Provider extends EventEmitter {
                 if (done) return
                 done = true
                 if (response.error) {
-                  this.resError(response.error, payload, res)
+                  resError(response.error, payload, res)
                   cb(new Error(response.error.message))
                 } else {
                   res(response)
@@ -448,21 +337,6 @@ export class Provider extends EventEmitter {
     })
   }
 
-  private getRawTx (newTx: RPC.SendTransaction.TxParams): TransactionData {
-    const { gas, gasLimit, gasPrice, data, value, type, ...rawTx } = newTx
-    const parsedValue = !value || parseInt(value, 16) === 0 ? '0x0' : addHexPrefix(unpadHexString(value) || '0')
-
-    return {
-      ...rawTx,
-      from: rawTx.from || ((accounts.current() || {}).id),
-      type: '0x0',
-      value: parsedValue,
-      data: addHexPrefix(padToEven(stripHexPrefix(data || '0x'))),
-      gasLimit: gasLimit || gas,
-      chainId: rawTx.chainId || utils.toHex(store('main.currentNetwork.id'))
-    }
-  }
-
   private addRequestHandler (res: RPCRequestCallback) {
     const handlerId: string = uuid()
     this.handlers[handlerId] = res
@@ -496,62 +370,13 @@ export class Provider extends EventEmitter {
     })
   }
 
-  private isCurrentAccount (address: string, account = accounts.current()) {
-    const accountToCheck = account || accounts.current() || { id: '' }
-    return address && (accountToCheck.id.toLowerCase() === address.toLowerCase())
-  }
-
-  private gasFees (rawTx: TransactionData) {
-    return store('main.networksMeta', 'ethereum', parseInt(rawTx.chainId, 16), 'gas')
-  }
-
   getNonce (rawTx: TransactionData, res: RPCRequestCallback) {
     const targetChain: Chain = {
       type: 'ethereum',
-      id: (rawTx && rawTx.chainId) ? parseInt(rawTx.chainId, 16) : store('main.currentNetwork.id')
+      id: parseInt(rawTx.chainId, 16)
     }
 
     this.connection.send({ id: 1, jsonrpc: '2.0', method: 'eth_getTransactionCount', params: [rawTx.from, 'pending'] }, res, targetChain)
-  }
-
-  checkExistingNonceGas (tx: TransactionData) {
-    const { from, nonce } = tx
-
-    const reqs = this.store('main.accounts', from, 'requests')
-    const requests = Object.keys(reqs || {}).map(key => reqs[key])
-    const existing = requests.filter(r => (
-      r.mode === 'monitor' && 
-      r.status !== 'error' && 
-      r.data.nonce === nonce
-    ))
-
-    if (existing.length > 0) {
-      if (tx.maxPriorityFeePerGas && tx.maxFeePerGas) {
-        const existingFee = Math.max(...existing.map(r => r.data.maxPriorityFeePerGas))
-        const existingMax = Math.max(...existing.map(r => r.data.maxFeePerGas))
-        const feeInt = parseInt(tx.maxPriorityFeePerGas)
-        const maxInt = parseInt(tx.maxFeePerGas)
-        if (existingFee * 1.1 >= feeInt || existingMax * 1.1 >= maxInt) {
-          // Bump fees by 10%
-          const bumpedFee = Math.max(Math.ceil(existingFee * 1.1), feeInt)
-          const bumpedBase = Math.max(Math.ceil((existingMax - existingFee) * 1.1), Math.ceil(maxInt - feeInt))
-          tx.maxFeePerGas = '0x' + (bumpedBase + bumpedFee).toString(16)
-          tx.maxPriorityFeePerGas = '0x' + bumpedFee.toString(16)
-          tx.feesUpdated = true
-        }
-      } else if (tx.gasPrice) {
-        const existingPrice = Math.max(...existing.map(r => r.data.gasPrice))
-        const priceInt = parseInt(tx.gasPrice)
-        if (existingPrice >= priceInt) {
-          // Bump price by 10%
-          const bumpedPrice = Math.ceil(existingPrice * 1.1)
-          tx.gasPrice = '0x' + bumpedPrice.toString(16)
-          tx.feesUpdated = true
-        }
-      }
-    }
-
-    return tx
   }
 
   async fillTransaction (newTx: RPC.SendTransaction.TxParams, cb: Callback<TransactionMetadata>) {
@@ -559,8 +384,9 @@ export class Provider extends EventEmitter {
 
     try {
       const approvals: RequiredApproval[] = []
-      const rawTx = this.getRawTx(newTx)
-      const gas = this.gasFees(rawTx)
+      const accountId = (accounts.current() || {}).id
+      const rawTx = getRawTx(newTx, accountId)
+      const gas = gasFees(rawTx)
       const chainConfig = this.connection.connections['ethereum'][parseInt(rawTx.chainId)].chainConfig
 
       const estimateGas = rawTx.gasLimit
@@ -587,7 +413,7 @@ export class Provider extends EventEmitter {
 
           return populatedTransaction
         })
-        .then(tx => this.checkExistingNonceGas(tx))
+        .then(tx => checkExistingNonceGas(tx))
         .then(tx => cb(null, { tx, approvals }))
         .catch(cb)
     } catch (e) {
@@ -602,7 +428,7 @@ export class Provider extends EventEmitter {
     const txChain = txParams.chainId
 
     if (targetChain && txChain && targetChain !== txChain) {
-      return this.resError(`Chain for transaction (${txChain}) does not match request target chain (${targetChain})`, payload, res)
+      return resError(`Chain for transaction (${txChain}) does not match request target chain (${targetChain})`, payload, res)
     }
 
     const newTx = {
@@ -616,12 +442,12 @@ export class Provider extends EventEmitter {
 
     this.fillTransaction(newTx, (err, transactionMetadata) => {
       if (err) {
-        this.resError(err, payload, res)
+        resError(err, payload, res)
       } else {
         const txMetadata = transactionMetadata as TransactionMetadata
         const from = txMetadata.tx.from
 
-        if (from && !this.isCurrentAccount(from, currentAccount)) return this.resError('Transaction is not from currently selected account', payload, res)
+        if (from && !isCurrentAccount(from, currentAccount)) return resError('Transaction is not from currently selected account', payload, res)
 
         const handlerId = this.addRequestHandler(res)
         const { feesUpdated, ...data } = txMetadata.tx
@@ -679,7 +505,7 @@ export class Provider extends EventEmitter {
     const from = orderedParams[0]
     const currentAccount = accounts.current()
 
-    if (!this.isCurrentAccount(from, currentAccount)) return this.resError('sign request is not from currently selected account.', payload, res)
+    if (!isCurrentAccount(from, currentAccount)) return resError('sign request is not from currently selected account.', payload, res)
 
     const handlerId = this.addRequestHandler(res)
 
@@ -709,7 +535,7 @@ export class Provider extends EventEmitter {
     const targetAccount = accounts.get(from.toLowerCase())
 
     if (!targetAccount) {
-      return this.resError(`unknown account: ${from}`, payload, res)
+      return resError(`unknown account: ${from}`, payload, res)
     }
 
     // HACK: Standards clearly say, that second param is an object but it seems like in the wild it can be a JSON-string.
@@ -718,7 +544,7 @@ export class Provider extends EventEmitter {
         typedData = JSON.parse(typedData)
         payload.params = [from, typedData, ...additionalParams]
       } catch (e) {
-        return this.resError('Malformed typedData.', payload, res)
+        return resError('Malformed typedData.', payload, res)
       }
     }
 
@@ -727,7 +553,7 @@ export class Provider extends EventEmitter {
     // check for signers that only support signing a specific version of typed data
     if (version !== 'V4' && signerType && [SignerType.Ledger, SignerType.Lattice, SignerType.Trezor].includes(signerType)) {
       const signerName = capitalize(signerType)
-      return this.resError(`${signerName} only supports eth_signTypedData_v4+`, payload, res)
+      return resError(`${signerName} only supports eth_signTypedData_v4+`, payload, res)
     }
 
     const handlerId = this.addRequestHandler(res)
@@ -763,38 +589,29 @@ export class Provider extends EventEmitter {
       const params = payload.params
       if (!params || !params[0]) throw new Error('Params not supplied')
       
-      const type = 'ethereum'
 
       const chainId = parseInt(params[0].chainId)
       if (!Number.isInteger(chainId)) throw new Error('Invalid chain id')
 
       // Check if chain exists 
-      const exists = Boolean(store('main.networks', type, chainId))
+      const exists = Boolean(store('main.networks', 'ethereum', chainId))
       if (exists === false) throw new Error('Chain does not exist')
 
-      if (store('main.currentNetwork.id') === chainId) return res({ id: payload.id, jsonrpc: '2.0', result: null })
+      const originId = payload._origin
+      const origin = storeApi.getOrigin(originId)
 
-      const handlerId = this.addRequestHandler(res)
-      
-      // Ask user if they want to switch chains
-      accounts.addRequest({
-        handlerId,
-        type: 'switchChain',
-        chain: { 
-          type, 
-          id: params[0].chainId
-        },
-        account: (accounts.getAccounts() || [])[0],
-        origin: payload._origin,
-        payload
-      } as SwitchChainRequest, res)
+      if (origin.chain.id !== chainId) {
+        store.switchOriginChain(originId, chainId, origin.chain.type)
+      }
+
+      return res({ id: payload.id, jsonrpc: '2.0', result: undefined })
     } catch (e) {
-      return this.resError(e as EVMError, payload, res)
+      return resError(e as EVMError, payload, res)
     }
   }
 
   addEthereumChain (payload: RPCRequestPayload, res: RPCRequestCallback) {
-    if (!payload.params[0]) return this.resError('addChain request missing params', payload, res)
+    if (!payload.params[0]) return resError('addChain request missing params', payload, res)
 
     const type = 'ethereum'
     const { 
@@ -806,9 +623,9 @@ export class Provider extends EventEmitter {
       iconUrls = [] 
     } = payload.params[0]
 
-    if (!chainId) return this.resError('addChain request missing chainId', payload, res)
-    if (!chainName) return this.resError('addChain request missing chainName', payload, res)
-    if (!nativeCurrency) return this.resError('addChain request missing nativeCurrency', payload, res)
+    if (!chainId) return resError('addChain request missing chainId', payload, res)
+    if (!chainName) return resError('addChain request missing chainName', payload, res)
+    if (!nativeCurrency) return resError('addChain request missing nativeCurrency', payload, res)
 
     const handlerId = this.addRequestHandler(res)
 
@@ -841,28 +658,11 @@ export class Provider extends EventEmitter {
     }
   }
 
-  getPermissions (payload: JSONRPCRequestPayload, res: RPCRequestCallback) {
-    const now = new Date().getTime()
-    const toPermission = permission.bind(null, now)
-    const allowedOperations = protectedMethods.map(toPermission)
-
-    res({ id: payload.id, jsonrpc: '2.0', result: allowedOperations })
-  }
-
-  requestPermissions (payload: JSONRPCRequestPayload, res: RPCRequestCallback) {
-    // we already require the user to grant permission to call this method so
-    // we just need to return permission objects for the requested operations
-    const now = new Date().getTime()
-    const requestedOperations = (payload.params || []).map(param => permission(now, Object.keys(param)[0]))
-
-    res({ id: payload.id, jsonrpc: '2.0', result: requestedOperations })
-  }
-
   private addCustomToken (payload: RPCRequestPayload, cb: RPCRequestCallback, targetChain: Chain) {
     const { type, options: tokenData } = (payload.params || {}) as any
 
     if ((type || '').toLowerCase() !== 'erc20') {
-      return this.resError('only ERC-20 tokens are supported', payload, cb)
+      return resError('only ERC-20 tokens are supported', payload, cb)
     }
 
     this.getChainId(payload, resp => {
@@ -873,7 +673,7 @@ export class Provider extends EventEmitter {
       const decimals = parseInt(tokenData.decimals || '1')
 
       if (!address) {
-        return this.resError('tokens must define an address', payload, cb)
+        return resError('tokens must define an address', payload, cb)
       }
 
       const res = () => {
@@ -914,33 +714,17 @@ export class Provider extends EventEmitter {
     }, targetChain)
   }
 
-  private getAssets (payload: RPC.GetAssets.Request, cb: RPCCallback<RPC.GetAssets.Response>) {
-    const currentAccount = accounts.current()
-    if (!currentAccount) return this.resError('no account selected', payload, cb)
+  private parseTargetChain (payload: RPCRequestPayload): Chain {
+    if ('chainId' in payload) {
+      const chainId = parseInt(payload.chainId || '', 16)
+      const chainConnection = this.connection.connections['ethereum'][chainId] || {}
 
-    if (isScanning(currentAccount.id)) return this.resError({ message: 'assets not known for account', code: 5901 }, payload, cb)
-
-    const { nativeCurrency, erc20 } = loadAssets(currentAccount.id)
-    const { id, jsonrpc } = payload
-
-    cb({ id, jsonrpc, result: { nativeCurrency, erc20 }})
-  }
-
-  private parseTargetChain (payload: RPCRequestPayload) {
-    const target: Chain = { type: 'ethereum', id: 0 }
-
-    if (!('chainId' in payload)) {
-      return { ...target, id: store('main.currentNetwork.id') }
+      if (chainConnection.chainConfig) {
+        return { type: 'ethereum', id: chainId }
+      }
     }
 
-    const chainId = parseInt(payload.chainId || '', 16)
-    const chainConnection = this.connection.connections['ethereum'][chainId] || {}
-
-    if (chainConnection.chainConfig) {
-      target.id = chainId
-    }
-
-    return target
+    return getOrigin(payload).chain
   }
 
   sendAsync (payload: RPCRequestPayload, cb: Callback<RPCResponsePayload>) {
@@ -958,17 +742,28 @@ export class Provider extends EventEmitter {
     const method = payload.method || ''
     const targetChain = this.parseTargetChain(payload)
 
-    if (!targetChain.id) {
+    if (!targetChain) {
       log.warn('received request with unknown chain', JSON.stringify(payload))
-      return this.resError({ message: `unknown chain: ${payload.chainId}`, code: 4901 }, payload, res)
+      return resError({ message: `unknown chain: ${payload.chainId}`, code: 4901 }, payload, res)
     }
 
-    if (method === 'eth_coinbase') return this.getCoinbase(payload, res)
-    if (method === 'eth_accounts') return this.getAccounts(payload, res)
-    if (method === 'eth_requestAccounts') return this.getAccounts(payload, res)
+    function getAccounts (payload: JSONRPCRequestPayload, res: RPCRequestCallback) {
+      res({ id: payload.id, jsonrpc: payload.jsonrpc, result: accounts.getSelectedAddresses().map(a => a.toLowerCase()) })
+    }
+
+    function getCoinbase (payload: RPCRequestPayload, res: RPCRequestCallback) {
+      accounts.getAccounts((err, accounts) => {
+        if (err) return resError(`signTransaction Error: ${JSON.stringify(err)}`, payload, res)
+        res({ id: payload.id, jsonrpc: payload.jsonrpc, result: (accounts || [])[0] })
+      })
+    }
+
+    if (method === 'eth_coinbase') return getCoinbase(payload, res)
+    if (method === 'eth_accounts') return getAccounts(payload, res)
+    if (method === 'eth_requestAccounts') return getAccounts(payload, res)
     if (method === 'eth_sendTransaction') return this.sendTransaction(payload as RPC.SendTransaction.Request, res)
     if (method === 'eth_getTransactionByHash') return this.getTransactionByHash(payload, res, targetChain)
-    if (method === 'personal_ecRecover') return this.ecRecover(payload, res)
+    if (method === 'personal_ecRecover') return ecRecover(payload, res)
     if (method === 'web3_clientVersion') return this.clientVersion(payload, res)
     if (method === 'eth_subscribe' && payload.params[0] in this.subscriptions) {
       return this.subscribe(payload as RPC.Subscribe.Request, res)
@@ -985,11 +780,11 @@ export class Provider extends EventEmitter {
     
     if (method === 'wallet_addEthereumChain') return this.addEthereumChain(payload, res)
     if (method === 'wallet_switchEthereumChain') return this.switchEthereumChain(payload, res)
-    if (method === 'wallet_getPermissions') return this.getPermissions(payload, res)
-    if (method === 'wallet_requestPermissions') return this.requestPermissions(payload, res)
+    if (method === 'wallet_getPermissions') return getPermissions(payload, res)
+    if (method === 'wallet_requestPermissions') return requestPermissions(payload, res)
     if (method === 'wallet_watchAsset') return this.addCustomToken(payload, res, targetChain)
-    if (method === 'wallet_getChains') return this.getChains(payload, res)
-    if (method === 'wallet_getAssets') return this.getAssets(payload as RPC.GetAssets.Request, res as RPCCallback<RPC.GetAssets.Response>)
+    if (method === 'wallet_getChains') return getChains(payload, res)
+    if (method === 'wallet_getAssets') return getAssets(payload as RPC.GetAssets.Request, accounts.current(), res as RPCCallback<RPC.GetAssets.Response>)
 
     // Connection dependent methods need to pass targetChain
     if (method === 'net_version') return this.getNetVersion(payload, res, targetChain)
@@ -1008,26 +803,21 @@ export class Provider extends EventEmitter {
 }
 
 const provider = new Provider()
-
-function getActiveChains () {
-  const chains: Record<string, Network> = store('main.networks.ethereum') || {}
-
-  return Object.values(chains)
-    .filter(chain => chain.on)
-    .map(chain => chain.id)
-    .sort((a, b) => a - b)
-}
-
-let network = store('main.currentNetwork.id'), availableChains = getActiveChains()
+let knownOrigins: Record<string, Origin> = {}
+let availableChains = getActiveChains()
 
 store.observer(() => {
-  const currentNetworkId = store('main.currentNetwork.id')
+  const currentOrigins = store('main.origins') as Record<string, Origin>
   const currentChains = getActiveChains()
 
-  if (network !== currentNetworkId) {
-    network = currentNetworkId
-    provider.chainChanged(network)
-    provider.networkChanged(network)
+  for (const originId in currentOrigins) {
+    const origin = currentOrigins[originId]
+    if (knownOrigins[originId]?.chain.id !== origin.chain.id) {
+      provider.chainChanged(origin.chain.id, originId)
+      provider.networkChanged(origin.chain.id)
+    } else {
+      knownOrigins[originId] = origin
+    }
   }
 
   if (!arraysMatch(currentChains, availableChains)) {
