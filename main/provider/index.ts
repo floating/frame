@@ -46,11 +46,11 @@ export interface ProviderDataPayload {
   }
 }
 
-const getOrigin = ({ _origin }: RPCRequestPayload) => storeApi.getOrigin(_origin)
-
 const storeApi = {
-  getOrigin: (id: string) => store('main.origins', id) as Origin
+  getOrigin: (id: string) => store('main.origins', uuidv5(id, uuidv5.DNS)) as Origin
 }
+
+const getPayloadOrigin = ({ _origin }: RPCRequestPayload) => storeApi.getOrigin(_origin)
 
 export class Provider extends EventEmitter {
   connected = false
@@ -604,14 +604,12 @@ export class Provider extends EventEmitter {
       if (!Number.isInteger(chainId)) throw new Error('Invalid chain id')
 
       // Check if chain exists 
-      const exists = Boolean(store('main.networks', 'ethereum', chainId))
+      const exists = Boolean(store('main.networks.ethereum', chainId))
       if (exists === false) throw new Error('Chain does not exist')
 
-      const originId = payload._origin
-      const origin = storeApi.getOrigin(originId)
-
+      const origin = getPayloadOrigin(payload)
       if (origin.chain.id !== chainId) {
-        store.switchOriginChain(originId, chainId, origin.chain.type)
+        store.switchOriginChain(origin, chainId, origin.chain.type)
       }
 
       return res({ id: payload.id, jsonrpc: '2.0', result: undefined })
@@ -734,7 +732,7 @@ export class Provider extends EventEmitter {
       }
     }
 
-    return getOrigin(payload).chain
+    return getPayloadOrigin(payload).chain
   }
 
   sendAsync (payload: RPCRequestPayload, cb: Callback<RPCResponsePayload>) {
