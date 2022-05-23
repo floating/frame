@@ -255,22 +255,22 @@ class Settings extends React.Component {
             <div>Inject a connection with our browser extension!</div>
           </div>
           <div className='requestFeature'>
-            <div className='requestFeatureButton requestFeatureButtonMoon' onClick={() => {
+            <div className='requestFeatureButton' onClick={() => {
               link.send('tray:openExternal', 'https://feedback.frame.sh')
             }}>
               Request a Feature 
             </div>
           </div>
           <div className='requestFeature'>
-            <div className='requestFeatureButton requestFeatureButtonGood' onClick={() => {
-              link.send('tray:openExternal', 'https://feedback.frame.sh')
+            <div className='requestFeatureButton' onClick={() => {
+              link.send('tray:openExternal', 'https://discord.gg/UH7NGqY')
             }}>
               Need help? Join our Discord!
             </div>
           </div>
           <div className='requestFeature'>
             <div className='requestFeatureButton' onClick={() => {
-              link.send('tray:openExternal', 'https://feedback.frame.sh')
+              link.send('tray:quit')
             }}>
               Quit
             </div>

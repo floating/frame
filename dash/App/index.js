@@ -2,7 +2,7 @@ import React from 'react'
 import Restore from 'react-restore'
 
 // import Native from '../../resources/Native'
-import link from '../../resources/link'
+// import link from '../../resources/link'
 
 import Command from './Command'
 
