@@ -6,7 +6,7 @@ const accounts = require('../accounts').default
 const store = require('../store').default
 
 const trusted = require('./trusted')
-const { updateOrigin } = require('./origins')
+const { updateOrigin } = require('./origin')
 const validPayload = require('./validPayload').default
 const protectedMethods = require('./protectedMethods').default
 
