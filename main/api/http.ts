@@ -86,17 +86,19 @@ const handler = (req: IncomingMessage, res: ServerResponse) => {
               clearTimeout(cleanupTimers[id])
               cleanupTimers[id] = setTimeout(cleanup.bind(null, id), 20 * 1000)
             } else {
+              const sendResponse = () => {
+                const pendingRequest = pending[id]
+                if (pendingRequest && pendingRequest.timer) {
+                  clearTimeout(pendingRequest.timer)
+                }
+              
+                delete pending[id]
+                send(true)
+              }
+
               pending[id] = { 
-                send: () => {
-                  const pendingRequest = pending[id]
-                  if (pendingRequest && pendingRequest.timer) {
-                    clearTimeout(pendingRequest.timer)
-                  }
-                
-                  delete pending[id]
-                  send(true)
-                },
-                timer: setTimeout(pending[id].send, 15 * 1000)
+                send: sendResponse,
+                timer: setTimeout(sendResponse, 15 * 1000)
               }
             }
           }
