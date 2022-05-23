@@ -1,4 +1,4 @@
-import { v4 as uuid, v5 as uuidv5 } from 'uuid'
+import { v4 as uuid } from 'uuid'
 import EventEmitter from 'events'
 import log from 'electron-log'
 import utils from 'web3-utils'
@@ -47,7 +47,7 @@ export interface ProviderDataPayload {
 }
 
 const storeApi = {
-  getOrigin: (id: string) => store('main.origins', uuidv5(id, uuidv5.DNS)) as Origin
+  getOrigin: (id: string) => store('main.origins', id) as Origin
 }
 
 const getPayloadOrigin = ({ _origin }: RPCRequestPayload) => storeApi.getOrigin(_origin)
