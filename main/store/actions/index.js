@@ -1,6 +1,7 @@
 import log from 'electron-log'
 
 const panelActions = require('./panel')
+const supportedNetworkTypes = ['ethereum']
 
 function validateNetworkSettings (network) {
   const networkId = parseInt(network.id)
@@ -11,9 +12,9 @@ function validateNetworkSettings (network) {
     typeof (network.name) !== 'string' ||
     typeof (network.explorer) !== 'string' ||
     typeof (network.symbol) !== 'string' ||
-    ['ethereum'].indexOf(network.type) === -1
+    !supportedNetworkTypes.includes(network.type)
   ) {
-    throw new Error('Invalid network settings ' + JSON.stringify(network))
+    throw new Error(`Invalid network settings: ${JSON.stringify(network)}`)
   }
 
   return networkId
@@ -29,29 +30,7 @@ function includesToken (tokens, token) {
 module.exports = {
   ...panelActions,
   // setSync: (u, key, payload) => u(key, () => payload),
-  selectNetwork: (u, type, id) => {
-    id = parseInt(id)
-    if (!Number.isInteger(id)) return
-    const reset = { status: 'loading', connected: false, type: '', network: '' }
-    u('main.currentNetwork', selected => {
-      u('main.networks', selected.type, selected.id, connection => {
-        connection.primary = Object.assign({}, connection.primary, reset)
-        connection.secondary = Object.assign({}, connection.secondary, reset)
-        return connection
-      })
-      return { type, id }
-    })
-  },
   activateNetwork: (u, type, chainId, active) => {
-    if (!active) {
-      u('main.currentNetwork', (current) => {
-        if (current.type === type && current.id === chainId) {
-          return { type: 'ethereum', id: 1 }
-        } else {
-          return current
-        }
-      })
-    }
     u('main.networks', type, chainId, 'on', () => active)
   },
   selectPrimary: (u, netType, netId, value) => {
@@ -161,14 +140,6 @@ module.exports = {
       signers[signer.id] = { ...signer, createdAt: new Date().getTime() }
       return signers
     })
-  },
-  // Ethereum and IPFS clients
-  setClientState: (u, client, state) => u(`main.clients.${client}.state`, () => state),
-  updateClient: (u, client, key, value) => u(`main.clients.${client}.${key}`, () => value),
-  toggleClient: (u, client, on) => u(`main.clients.${client}.on`, (value) => on !== undefined ? on : !value),
-  resetClient: (u, client, on) => {
-    const data = { on: false, state: 'off', latest: false, installed: false, version: null }
-    u(`main.clients.${client}`, () => data)
   },
   setLatticeConfig: (u, id, key, value) => {
     u('main.lattice', id, key, () => value)
@@ -332,11 +303,11 @@ module.exports = {
         delete main.networks[net.type][net.id]
         main.networks[updatedNetwork.type][updatedNetwork.id] = updatedNetwork
 
-        const { type, id } = main.currentNetwork
-        if (net.type === type && net.id === id) {
-          main.currentNetwork.type = updatedNetwork.type
-          main.currentNetwork.id = updatedNetwork.id
-        }
+        Object.entries(main.origins).forEach(([origin, { chain }]) => {
+          if (net.id === chain.id) {
+            main.origins[origin].chain = updatedNetwork
+          }
+        })
         
         return main
       })
@@ -352,16 +323,16 @@ module.exports = {
       if (!Number.isInteger(net.id)) throw new Error('Invalid chain id')
       if (net.type === 'ethereum' && net.id === 1) throw new Error('Cannot remove mainnet')
       u('main', main => {
-        // If deleting a network that the user is currently on, move them to mainnet
-        if (net.type === main.currentNetwork.type && net.id === main.currentNetwork.id) {
-          main.currentNetwork.type = 'ethereum'
-          main.currentNetwork.id = 1
+        if (Object.keys(main.networks[net.type]).length <= 1) {
+          return main // Cannot delete last network without adding a new network of this type first
         }
-        let netCount = 0
-        Object.keys(main.networks[net.type]).forEach(id => {
-          netCount++
+
+        // If deleting a network that an origin is currently using, switch them to mainnet
+        Object.entries(main.origins).forEach(([origin, { chain }]) => {
+          if (net.id === chain.id) {
+            main.origins[origin].chain = { id: 1, type: 'ethereum' }
+          }
         })
-        if (netCount <= 1) return main // Cannot delete last network without adding a new network of this type first
 
         if (main.networks[net.type]) {
           delete main.networks[net.type][net.id]
@@ -423,6 +394,12 @@ module.exports = {
   },
   setDappStorage: (u, hash, state) => {
     if (state) u(`main.dapp.storage.${hash}`, () => state)
+  },
+  initOrigin: (u, originId, origin) => {
+    u('main.origins', origins => ({ ...origins, [originId]: origin }))
+  },
+  switchOriginChain: (u, originId, chainId, type) => {
+    u('main.origins', originId, origin => ({ ...origin, chain: { id: chainId, type } }))
   },
   expandDock: (u, expand) => {
     u('dock.expand', (s) => expand)

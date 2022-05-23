@@ -20,7 +20,7 @@ class ProviderRequest extends React.Component {
     if (status === 'declined') requestClass += ' signerRequestDeclined'
     if (status === 'pending') requestClass += ' signerRequestPending'
     if (status === 'error') requestClass += ' signerRequestError'
-    const origin = this.props.req.origin
+    const originName = this.store('main.origins', this.props.req.origin, 'name')
     let originClass = 'requestProviderOrigin'
     if (origin.length > 28) originClass = 'requestProviderOrigin requestProviderOrigin18'
     if (origin.length > 36) originClass = 'requestProviderOrigin requestProviderOrigin12'

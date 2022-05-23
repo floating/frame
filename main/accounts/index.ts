@@ -1,10 +1,9 @@
-
-
 import EventEmitter from 'events'
-import fetch from 'node-fetch'
 import log from 'electron-log'
 import { shell, Notification } from 'electron'
 import { addHexPrefix, intToHex} from 'ethereumjs-util'
+import { TypedData, Version } from 'eth-sig-util'
+import { v5 as uuidv5 } from 'uuid'
 
 import store from '../store'
 import ExternalDataScanner, { DataScanner } from '../externalData'
@@ -12,18 +11,14 @@ import { getType as getSignerType } from '../signers/Signer'
 import FrameAccount from './Account'
 import { usesBaseFee, signerCompatibility, maxFee, TransactionData, SignerCompatibility } from '../transaction'
 import { weiIntToEthInt, hexToInt } from '../../resources/utils'
-
+import provider from '../provider'
+import { Chain } from '../chains'
+import { ApprovalType } from '../../resources/constants'
 import {
   AccountRequest, AccessRequest,
   TransactionRequest, TransactionReceipt,
   ReplacementType, RequestStatus, RequestMode
 } from './types'
-
-// Provider Proxy
-import provider from'../provider'
-import { Chain } from '../chains'
-import { TypedData, Version } from 'eth-sig-util'
-import { ApprovalType } from '../../resources/constants'
 
 function notify (title: string, body: string, action: (event: Electron.Event) => void) {
   const notification = new Notification({ title, body })
@@ -31,6 +26,8 @@ function notify (title: string, body: string, action: (event: Electron.Event) =>
 
   setTimeout(() => notification.show(), 1000)
 }
+
+const frameOriginId = uuidv5('frame.eth', uuidv5.DNS)
 
 const accountsApi = {
   getAccounts: function () {
@@ -41,7 +38,7 @@ const accountsApi = {
   },
 }
 
-export { RequestMode, AccountRequest, AccessRequest, TransactionRequest, SignTypedDataRequest, SwitchChainRequest, AddChainRequest, AddTokenRequest } from './types'
+export { RequestMode, AccountRequest, AccessRequest, TransactionRequest, SignTypedDataRequest, AddChainRequest, AddTokenRequest } from './types'
 
 export class Accounts extends EventEmitter {
   _current: string
@@ -186,7 +183,7 @@ export class Accounts extends EventEmitter {
   }
 
   private sendRequest (payload: { method: string, params: any[], chainId: string }, cb: RPCRequestCallback) {
-    provider.send({ id: 1, jsonrpc: '2.0', ...payload, _origin: 'frame.eth' }, cb)
+    provider.send({ id: 1, jsonrpc: '2.0', ...payload, _origin: frameOriginId }, cb)
   }
 
   private async confirmations (account: FrameAccount, id: string, hash: string, targetChain: Chain) {
@@ -351,6 +348,11 @@ export class Accounts extends EventEmitter {
           }
 
           provider.on(`data:${targetChain.type}:${targetChain.id}`, handler)
+          // provider.on('data', ({ type, id }, ...args) => {
+          //   if (id === targetChain.id) {
+          //     handler(args)
+          //   }
+          // })
         }
       })
     }

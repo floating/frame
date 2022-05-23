@@ -1,6 +1,7 @@
 declare module 'eth-provider' {
   interface ProviderOpts {
-    name: string
+    name?: string,
+    origin?: string
   }
   
   interface RequestPayload {

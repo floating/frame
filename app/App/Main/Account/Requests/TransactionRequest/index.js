@@ -148,6 +148,7 @@ class TransactionRequest extends React.Component {
     const status = req.status
     const mode = req.mode
     const toAddress = req.data && req.data.to ? req.data.to : ''
+    const originName = this.store('main.origins', req.origin, 'name')
     let requestClass = 'signerRequest'
     if (mode === 'monitor') requestClass += ' signerRequestMonitor'
     const success = (req.status === 'confirming' || req.status === 'confirmed')

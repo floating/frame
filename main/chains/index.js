@@ -11,6 +11,12 @@ const { default: BlockMonitor } = require('./blocks')
 const { default: chainConfig } = require('./config')
 const { default: GasCalculator } = require('../transaction/gasCalculator')
 
+const resError = (error, payload, res) => res({ 
+  id: payload.id, 
+  jsonrpc: payload.jsonrpc, 
+  error: typeof error === 'string' ? { message: error, code: -1 } : error
+})
+
 class ChainConnection extends EventEmitter {
   constructor (type, chainId) {
     super()
@@ -355,24 +361,19 @@ class ChainConnection extends EventEmitter {
     }
   }
 
-  resError (error, payload, res) {
-    if (typeof error === 'string') error = { message: error, code: -1 }
-    res({ id: payload.id, jsonrpc: payload.jsonrpc, error })
-  }
-
   send (payload, res) {
-    if (this.primary.provider && this.primary.connected) { // && this.primary.network === store('main.currentNetwork.id')) {
+    if (this.primary.provider && this.primary.connected) {
       this.primary.provider.sendAsync(payload, (err, result) => {
-        if (err) return this.resError(err, payload, res)
+        if (err) return resError(err, payload, res)
         res(result)
       })
-    } else if (this.secondary.provider && this.secondary.connected) { //  && this.secondary.network === store('main.currentNetwork.id')) {
+    } else if (this.secondary.provider && this.secondary.connected) {
       this.secondary.provider.sendAsync(payload, (err, result) => {
-        if (err) return this.resError(err, payload, res)
+        if (err) return resError(err, payload, res)
         res(result)
       })
     } else {
-      this.resError('Not connected to Ethereum network', payload, res)
+      resError('Not connected to Ethereum network', payload, res)
     }
   }
 }
@@ -403,35 +404,24 @@ class Chains extends EventEmitter {
             this.connections[type][chainId] = new ChainConnection(type, chainId)
 
             this.connections[type][chainId].on('connect', (...args) => {
-              this.emit(`connect:${type}:${chainId}`, ...args)
-              const current = store('main.currentNetwork')
-              if (current.type === type && current.id === parseInt(chainId)) this.emit('connect', ...args)
+              this.emit('connect', { type, id: chainId }, ...args)
             })
 
             this.connections[type][chainId].on('close', (...args) => {
-              this.emit(`close:${type}:${chainId}`, ...args)
-              const current = store('main.currentNetwork')
-              if (current.type === type && current.id === parseInt(chainId)) this.emit('close', ...args)
+              this.emit('close', { type, id: chainId }, ...args)
             })
 
             this.connections[type][chainId].on('data', (...args) => {
-              this.emit(`data:${type}:${chainId}`, ...args)
-              const current = store('main.currentNetwork')
-              if (current.type === type && current.id === parseInt(chainId)) this.emit('data', ...args)
+              this.emit('data', { type, id: chainId }, ...args)
             })
 
             this.connections[type][chainId].on('update', (...args) => {
-              this.emit(`update:${type}:${chainId}`, ...args)
-              const current = store('main.currentNetwork')
-              if (current.type === type && current.id === parseInt(chainId)) this.emit('update', ...args)
+              this.emit('update', { type, id: chainId }, ...args)
             })
 
             this.connections[type][chainId].on('error', (...args) => {
-              this.emit(`error:${type}:${chainId}`, ...args)
-              const current = store('main.currentNetwork')
-              if (current.type === type && current.id === parseInt(chainId)) this.emit('error', ...args)
+              this.emit('error', { type, id: chainId }, ...args)
             })
-
           } else if (!chainConfig.on && this.connections[type][chainId]) {
             this.connections[type][chainId].removeAllListeners()
             this.connections[type][chainId].close()
@@ -443,23 +433,15 @@ class Chains extends EventEmitter {
   }
 
   send (payload, res, targetChain) {
-    let chainType, chainId
-    if (targetChain) {
-      const { type, id } = targetChain
-      chainType = type
-      chainId = id
-    } else { // Use currently selected network
-      const { type, id } = store('main.currentNetwork')
-      chainType = type
-      chainId = id
-    }
-    if (this.connections[chainType] && this.connections[chainType][chainId]) {
-      this.connections[chainType][chainId].send(payload, res)
+    if (!targetChain) {
+      resError({ message: `Target chain did not exist for send`, code: -32601 }, payload, res)
+    }    
+    const { type, id } = targetChain
+    if (!this.connections[type] || !this.connections[type][id]) {
+      resError({ message: `Connection for ${type} chain with chainId ${id} did not exist for send`, code: -32601 }, payload, res)
     } else {
-      log.error(`Connection for ${chainType} chain with chainId ${chainId} did not exist for send`)
+      this.connections[type][id].send(payload, res)
     }
-    // this.connect(store('main.networks', type, id, 'connection'))
-    // store('main.networks', type, chainId, 'connection')
   }
 
   syncDataEmit (emitter) {

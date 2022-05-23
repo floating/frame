@@ -1,4 +1,3 @@
-import provider from '../../../main/provider'
 import accounts from '../../../main/accounts'
 import connection from '../../../main/chains'
 import store from '../../../main/store'
@@ -13,6 +12,7 @@ import log from 'electron-log'
 
 const address = '0x22dd63c3619818fdbc262c78baee43cb61e9cccf'
 
+let provider
 let accountRequests = []
 
 jest.mock('../../../main/store')
@@ -37,15 +37,17 @@ afterAll(() => {
   jest.useRealTimers()
 })
 
-beforeEach(() => {
+beforeEach(async () => {  
+  store.set('main.accounts', {})
+  store.set('main.origins', '8073729a-5e59-53b7-9e69-5d9bcff94087', { chain: { id: 1, type: 'ethereum' }})
+  
+  provider = (await import('../../../main/provider')).default
   provider.handlers = {}
 
   const eventTypes = ['accountsChanged', 'chainChanged', 'chainsChanged', 'assetsChanged', 'networkChanged']
   eventTypes.forEach(eventType => provider.subscriptions[eventType] = [])
 
   accountRequests = []
-  store.set('main.accounts', {})
-  store.set('main.currentNetwork.id', 1)
 
   connection.send = jest.fn()
   connection.connections = {
@@ -61,51 +63,14 @@ beforeEach(() => {
   accounts.setTxSigned = jest.fn()
 })
 
-describe('#getRawTx', () => {
-  it('leaves a valid value unchanged', () => {
-    const tx = provider.getRawTx({ value: '0x2540be400' })
-
-    expect(tx.value).toBe('0x2540be400')
-  })
-
-  it('removes a leading zero from a valid value', () => {
-    const tx = provider.getRawTx({ value: '0x0a45c6' })
-
-    expect(tx.value).toBe('0xa45c6')
-  })
-
-  it('leaves a valid zero value unchanged', () => {
-    const tx = provider.getRawTx({ value: '0x0' })
-
-    expect(tx.value).toBe('0x0')
-  })
-
-  it('turns a zero value into the correct hex value for zero', () => {
-    const tx = provider.getRawTx({ value: '0x' })
-
-    expect(tx.value).toBe('0x0')
-  })
-
-  it('turns an un-prefixed zero value into the correct hex value for zero', () => {
-    const tx = provider.getRawTx({ value: '0' })
-
-    expect(tx.value).toBe('0x0')
-  })
-
-  it('turns an undefined value into the correct hex value for zero', () => {
-    const tx = provider.getRawTx({ value: undefined })
-
-    expect(tx.value).toBe('0x0')
-  })
-})
-
 describe('#send', () => {
-  const send = (request, cb = jest.fn()) => provider.send(request, cb)
+  const send = (request, cb = jest.fn()) => provider.send({ ...request, _origin: 'frame.test' }, cb)
 
   it('passes the given target chain to the connection', () => {
     connection.connections.ethereum[10] = { chainConfig: { hardfork: 'london', chainId: 10 }, primary: { connected: true } }
 
-    const request = { method: 'eth_testFrame' }
+    store.set('main.origins', '8073729a-5e59-53b7-9e69-5d9bcff94087', { chain: { id: 10, type: 'ethereum' }})
+    const request = { method: 'eth_testFrame'  }
 
     send({ ...request, chainId: '0xa' })
 
@@ -113,13 +78,11 @@ describe('#send', () => {
   })
 
   it('passes the default target chain to the connection when none is given', () => {
-    store.set('main.currentNetwork.id', 137)
-
     const request = { method: 'eth_testFrame' }
 
     send(request)
 
-    expect(connection.send).toHaveBeenCalledWith(request, expect.any(Function), { type: 'ethereum', id: 137 })
+    expect(connection.send).toHaveBeenCalledWith(request, expect.any(Function), { type: 'ethereum', id: 1 })
   })
 
   it('returns an error when an unknown chain is given', () => {
@@ -145,9 +108,8 @@ describe('#send', () => {
   describe('#eth_chainId', () => {
     it('returns the current chain id from the store', () => {
       store.set('main.networks.ethereum', 1, { id: 1 })
-      store.set('main.currentNetwork', { type: 'ethereum', id: 1 })
 
-      send({ method: 'eth_chainId' }, response => {
+      send({ method: 'eth_chainId', chainId: '0x1' }, response => {
         expect(response.result).toBe('0x1')
       })
     })
@@ -171,7 +133,7 @@ describe('#send', () => {
   })
 
   describe('#wallet_addEthereumChain', () => {
-    it('adds the current chain to the store', done => {
+    it('should create an addChain request', done => {
       send({ 
         method: 'wallet_addEthereumChain', 
         params: [
@@ -187,7 +149,7 @@ describe('#send', () => {
             blockExplorerUrls: ['https://pylon.link'],
             iconUrls: [''] // Currently ignored
           }
-        ] 
+        ]
       }, () => {
         try {
           expect(accountRequests).toHaveLength(1)
@@ -200,9 +162,10 @@ describe('#send', () => {
       })
     })
 
-    it('adds switch chain request if chain exists', done => {
+    it('should switch to a chain and notify listeners if it exists in the store', done => {
       store.set('main.networks.ethereum', 1, { id: 1 })
-      store.set('main.currentNetwork', { type: 'ethereum', id: 137 })
+      store.set('main.origins', '8073729a-5e59-53b7-9e69-5d9bcff94087', { chain: { id: 137, type: 'ethereum' }})
+      store.switchOriginChain = jest.fn()
 
       send({ 
         method: 'wallet_addEthereumChain', 
@@ -219,47 +182,39 @@ describe('#send', () => {
             blockExplorerUrls: ['https://pylon.link'],
             iconUrls: [''] // Currently ignored
           }
-        ] 
+        ]
       }, () => {
-        try {
-          expect(accountRequests).toHaveLength(1)
-          expect(accountRequests[0].handlerId).toBeTruthy()
-          expect(accountRequests[0].type).toBe('switchChain')
-          done()
-        } catch (e) { 
-          done(e) 
-        }
+        expect(store.switchOriginChain).toHaveBeenCalledWith({ chain: { id: 137, type: 'ethereum' }}, 1, 'ethereum')
+        done()
       })
     })
   })
 
   describe('#wallet_switchEthereumChain', () => {
-    it('switches to chain if chain exists in store', done => {
-      store.set('main.currentNetwork', { type: 'ethereum', id: 42161 })
+    it('should switch to a chain and notify listeners if it exists in the store', done => {
+      store.set('main.networks.ethereum', 1, { id: 1 })
+      store.set('main.origins', { '8073729a-5e59-53b7-9e69-5d9bcff94087': { chain: { id:42161, type: 'ethereum' }}})
+      store.switchOriginChain = jest.fn()
 
       send({ 
         method: 'wallet_switchEthereumChain', 
         params: [{
-          chainId: '0x1'
-        }]
+          chainId: '0x1',
+        }],
+        _origin: 'frame.test'
       }, () => {
-        try {
-          expect(accountRequests).toHaveLength(1)
-          expect(accountRequests[0].handlerId).toBeTruthy()
-          expect(accountRequests[0].type).toBe('switchChain')
-          done()
-        } catch (e) { 
-          done(e) 
-        }
+        expect(store.switchOriginChain).toHaveBeenCalledWith({ chain: { id: 42161, type: 'ethereum' }}, 1, 'ethereum')
+        done()
       })
     })
 
-    it('rejects switch if chain doesn\'t exist in the store', done => {
+    it('should reject if the chain does not exist in the store', done => {
       send({
         method: 'wallet_switchEthereumChain', 
         params: [{
           chainId: '0x1234'
-        }]
+        }],
+        _origin: 'frame.test'
       }, () => {
         try {
           expect(accountRequests).toHaveLength(0)
@@ -274,7 +229,8 @@ describe('#send', () => {
   describe('#wallet_getPermissions', () => {
     it('returns all allowed permissions', done => {
       const request = {
-        method: 'wallet_getPermissions'
+        method: 'wallet_getPermissions',
+        _origin: 'frame.test'
       }
 
       send(request, response => {
@@ -316,7 +272,8 @@ describe('#send', () => {
         params: [
           { eth_accounts: {} },
           { eth_signTransaction: {} }
-        ]
+        ],
+        _origin: 'frame.test'
       }
 
       send(request, response => {
@@ -339,7 +296,6 @@ describe('#send', () => {
     let request
     
     beforeEach(() => {
-      store.set('main.currentNetwork', { type: 'ethereum', id: 1 })
       store.set('main.tokens.custom', [])
 
       request = {
@@ -354,7 +310,8 @@ describe('#send', () => {
             decimals: 18,
             image: 'https://badgerdao.io/icon.jpg'
           }
-        }
+        },
+        _origin: 'frame.test'
       }
     })
 
@@ -428,7 +385,7 @@ describe('#send', () => {
         1: { name: 'mainnet', id: 1, on: true }
       })
 
-      send({ method: 'wallet_getChains', id: 14, jsonrpc: '2.0' }, response => {
+        send({ method: 'wallet_getChains', id: 14, jsonrpc: '2.0' }, response => {
         expect(response.error).toBe(undefined)
         expect(response.id).toBe(14)
         expect(response.jsonrpc).toBe('2.0')
@@ -606,7 +563,7 @@ describe('#send', () => {
 
       if (chainId) payload.chainId = chainId
 
-      provider.send(payload, cb)
+      provider.send({ ...payload, _origin: 'frame.test' }, cb)
     }
 
     beforeEach(() => {
@@ -1252,7 +1209,6 @@ describe('state change events', () => {
   describe('#chainChanged', () => {
     it('fires a chainChanged event to subscribers', done => {
       const subscriptionId = '0x9509a964a8d24a17fcfc7b77fc575b71'
-
       provider.once('data', event => {
         expect(event.method).toBe('eth_subscription')
         expect(event.jsonrpc).toBe('2.0')
@@ -1260,10 +1216,8 @@ describe('state change events', () => {
         expect(event.params.result).toBe('0x89')
         done()
       })
-
-      store.set('main.currentNetwork.id', 137)
+      store.set('main.origins', '8073729a-5e59-53b7-9e69-5d9bcff94087', { chain: { id: 137, type: 'ethereum' }})
       provider.subscriptions.chainChanged.push(subscriptionId)
-
       store.getObserver('provider:chains').fire()
     })
   })

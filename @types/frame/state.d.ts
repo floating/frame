@@ -7,6 +7,11 @@ interface Connection {
   custom: string
 }
 
+interface Chain {
+  id: number,
+  type: 'ethereum'
+}
+
 interface Network {
   id: number,
   name: string,
@@ -25,6 +30,11 @@ interface NetworkMetadata {
   nativeCurrency: NativeCurrency,
   symbol: string,
   gas: GasData
+}
+
+interface Origin {
+  chain: Chain,
+  name: string
 }
 
 interface Permission {
