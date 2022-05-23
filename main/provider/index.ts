@@ -36,6 +36,16 @@ export interface TransactionMetadata {
   approvals: RequiredApproval[]
 }
 
+export interface ProviderDataPayload {
+  jsonrpc: '2.0',
+  method: string,
+  params: {
+    subscription: string,
+    origin?: string,
+    result: any
+  }
+}
+
 const getOrigin = ({ _origin }: RPCRequestPayload) => storeApi.getOrigin(_origin)
 
 const storeApi = {
@@ -105,7 +115,8 @@ export class Provider extends EventEmitter {
     const chain = intToHex(chainId)
 
     this.subscriptions.chainChanged.forEach(subscription => {
-      this.emit('data', { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, origin: originId, result: chain } })
+      const event: ProviderDataPayload = { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, origin: originId, result: chain } }
+      this.emit('data', event)
     })
   }
 

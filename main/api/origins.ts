@@ -8,12 +8,6 @@ import store from '../store'
 
 const dev = process.env.NODE_ENV === 'development'
 
-interface ExtensionPayload extends JSONRPCRequestPayload {
-  chainId?: string,
-  __frameOrigin?: string,
-  __extensionConnecting?: boolean
-}
-
 function invalidOrigin (origin: string) {
   return origin !== origin.replace(/[^0-9a-z/:.[\]-]/gi, '')
 }
@@ -36,7 +30,7 @@ function addPermissionRequest (address: Address, origin: string) {
   })
 }
 
-export function updateOrigin (payload: ExtensionPayload, originName?: string): RPCRequestPayload {
+export function updateOrigin (payload: JSONRPCRequestPayload, originName?: string, connectionMessage = false): RPCRequestPayload {
   if (!originName) {
     log.warn(`Received payload with no origin: ${JSON.stringify(payload)}`)
     return { ...payload, chainId: payload.chainId || '0x1', _origin: 'Unknown' }
@@ -45,7 +39,7 @@ export function updateOrigin (payload: ExtensionPayload, originName?: string): R
   const originId = uuidv5(originName, uuidv5.DNS)
   const existingOrigin = store('main.origins', originId)
 
-  if (!existingOrigin && !payload.__extensionConnecting) {
+  if (!existingOrigin && !connectionMessage) {
     // the extension will attempt to send messages (eth_chainId and net_version) in order
     // to connect. we don't want to store these origins as they'll come from every site
     // the user visits in their browser

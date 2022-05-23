@@ -2,7 +2,7 @@ import log from 'electron-log'
 
 const has = (value: any) => value !== null && value !== undefined
 
-export default function (data: string) {
+export default function (data: string): JSONRPCRequestPayload | undefined {
   try {
     const payload = JSON.parse(data) || {}
 
@@ -19,6 +19,4 @@ export default function (data: string) {
   } catch (e) {
     log.info('Error parsing payload: ', data, e)
   }
-
-  return false
 }

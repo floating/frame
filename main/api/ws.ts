@@ -27,6 +27,11 @@ interface FrameWebSocket extends WebSocket {
   isFrameExtension: boolean
 }
 
+interface ExtensionPayload extends JSONRPCRequestPayload {
+  __frameOrigin?: string,
+  __extensionConnecting?: boolean
+}
+
 const storeApi = {
   getPermissions: (address: Address) => {
     return store('main.permissions', address) as Record<string, Permission>
@@ -46,7 +51,7 @@ const handler = (socket: FrameWebSocket, req: IncomingMessage) => {
 
   socket.on('message', async data => {
     let origin = socket.origin
-    const rawPayload = validPayload(data.toString())
+    const rawPayload = validPayload(data.toString()) as ExtensionPayload
     if (!rawPayload) return console.warn('Invalid Payload', data)
     if (socket.isFrameExtension) { // Request from extension, swap origin
       if (rawPayload.__frameOrigin) {
