@@ -59,7 +59,7 @@ class AddTokenRequest extends React.Component {
               }
               <div className='requestToken scaleIn'>
                 <div className='requestTokenInner'>
-                  <div className={originClass}>{this.props.req.origin}</div>
+                  <div className={originClass}>{this.store('main.origins', this.props.req.origin, 'name')}</div>
                   <div className={'requestTokenOriginSub'}>{'wants to add a token'}</div>
                   <div className='requestTokenInfo'>
                     <div className='requestTokenSymbol'>{token.symbol.toUpperCase()}</div>
