@@ -5,6 +5,13 @@ type RPCErrorCallback = RPCCallback<JSONRPCErrorResponsePayload>
 type RPCSuccessCallback = RPCCallback<JSONRPCSuccessResponsePayload>
 type RPCRequestCallback = RPCCallback<RPCResponsePayload>
 
+type OptionalRecord = Record<string, unknown> | undefined
+type UUID<T extends OptionalRecord = undefined> = string & { __uuidBrand: T }
+enum OriginType {
+  Unknown = 'unknown',
+  FrameExtension = 'frame-extension'
+}
+
 type Address = string // 20 hex bytes, 0x-prefixed
 enum SubscriptionType {
   ACCOUNTS = 'accountsChanged',
@@ -20,7 +27,7 @@ interface RPCId {
 }
 
 interface InternalPayload {
-  _origin: string
+  _origin: UUID<Origin> | OriginType.Unknown,
 }
 
 interface JSONRPCRequestPayload extends RPCId {

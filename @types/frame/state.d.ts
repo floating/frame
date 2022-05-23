@@ -32,7 +32,7 @@ interface NetworkMetadata {
   gas: GasData
 }
 
-interface Origin {
+type Origin = {
   chain: Chain,
   name: string
 }
