@@ -58,11 +58,11 @@ const handler = (req: IncomingMessage, res: ServerResponse) => {
     const body: any = []
     req.on('data', chunk => body.push(chunk)).on('end', async () => {
       res.on('error', err => console.error('res err', err))
-      const origin = req.headers.origin
       const data = Buffer.concat(body).toString()
       const rawPayload = validPayload<HTTPPollingPayload>(data)
       if (!rawPayload) return console.warn('Invalid Payload', data)
 
+      const origin = req.headers.origin
       const payload = updateOrigin(rawPayload, origin)
 
       if (logTraffic) log.info(`req -> | http | ${req.headers.origin} | ${payload.method} | -> | ${JSON.stringify(payload.params)}`)
@@ -93,6 +93,7 @@ const handler = (req: IncomingMessage, res: ServerResponse) => {
                 }
               
                 delete pending[id]
+
                 send(true)
               }
 
@@ -133,10 +134,14 @@ provider.on('data', (payload: ProviderDataPayload) => {
   if (pollSubs[payload.params.subscription]) {
     const { id, origin } = pollSubs[payload.params.subscription]
     polls[id] = polls[id] || []
-    polls[id].push(JSON.stringify(payload))
 
-    if (pending[id] && (!payload.params.origin || payload.params.origin === origin)) {
-      pending[id].send()
+    if (!payload.params.origin || payload.params.origin === origin) {
+      const { origin, ...params } = payload.params
+      const responsePayload = { ...payload, params }
+
+      polls[id].push(JSON.stringify(responsePayload))
+
+      pending[id]?.send()
     }
   }
 })
