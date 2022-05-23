@@ -1,33 +1,53 @@
-const http = require('http')
-const log = require('electron-log')
+import http, { IncomingMessage, ServerResponse } from 'http'
+import log from 'electron-log'
 
-const provider = require('../provider').default
-const accounts = require('../accounts').default
-const store = require('../store').default
+import provider, { ProviderDataPayload } from '../provider'
+import accounts from '../accounts'
+import store from '../store'
 
-const trusted = require('./trusted')
-const { updateOrigin } = require('./origin')
-const validPayload = require('./validPayload').default
-const protectedMethods = require('./protectedMethods').default
+import { updateOrigin, isTrusted } from './origins'
+import validPayload from './validPayload'
+import protectedMethods from './protectedMethods'
 
 const logTraffic = process.env.LOG_TRAFFIC
 
-const polls = {}
-const pollSubs = {}
-const pending = {}
-const cleanupTimers = {}
-const cleanup = id => {
+interface PendingRequest {
+  send: () => void,
+  timer: NodeJS.Timeout
+}
+
+interface Subscription {
+  id: string,
+  origin: string
+}
+
+interface HTTPPollingPayload extends JSONRPCRequestPayload {
+  pollId?: string
+}
+
+const polls: Record<string, string[]> = {}
+const pollSubs: Record<string, Subscription> = {}
+const pending: Record<string, PendingRequest> = {}
+const cleanupTimers: Record<string, NodeJS.Timeout> = {}
+
+const storeApi = {
+  getPermissions: (address: Address) => {
+    return store('main.permissions', address) as Record<string, Permission>
+  }
+}
+
+const cleanup = (id: string) => {
   delete polls[id]
   delete pending[id]
   Object.keys(pollSubs).forEach(sub => {
     if (pollSubs[sub].id === id) {
-      provider.send({ jsonrpc: '2.0', id: 1, method: 'eth_unsubscribe', params: [sub] })
+      provider.send({ jsonrpc: '2.0', id: 1, method: 'eth_unsubscribe', params: [sub], _origin: '' })
       delete pollSubs[sub]
     }
   })
 }
 
-const handler = (req, res) => {
+const handler = (req: IncomingMessage, res: ServerResponse) => {
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
   res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept')
@@ -35,23 +55,18 @@ const handler = (req, res) => {
     res.writeHead(200)
     res.end()
   } else if (req.method === 'POST') {
-    const body = []
+    const body: any = []
     req.on('data', chunk => body.push(chunk)).on('end', async () => {
       res.on('error', err => console.error('res err', err))
-      const origin = req.headers.origin || 'Unknown'
       const data = Buffer.concat(body).toString()
-      
-      if (!origin) {
-        log.warn(`Received payload with no origin: ${JSON.stringify(payload)}`)
-      }
-
-      const rawPayload = validPayload(data)
+      const rawPayload = validPayload<HTTPPollingPayload>(data)
       if (!rawPayload) return console.warn('Invalid Payload', data)
 
+      const origin = req.headers.origin
       const payload = updateOrigin(rawPayload, origin)
 
       if (logTraffic) log.info(`req -> | http | ${req.headers.origin} | ${payload.method} | -> | ${JSON.stringify(payload.params)}`)
-      if (protectedMethods.indexOf(payload.method) > -1 && !(await trusted(origin))) {
+      if (protectedMethods.indexOf(payload.method) > -1 && !(await isTrusted(origin))) {
         let error = { message: `Permission denied, approve ${origin} in Frame to continue`, code: 4001 }
         // Review
         if (!accounts.getSelectedAddresses()[0]) error = { message: 'No Frame account selected', code: 4001 }
@@ -60,7 +75,7 @@ const handler = (req, res) => {
       } else {
         if (payload.method === 'eth_pollSubscriptions') {
           const id = payload.params[0]
-          const send = force => {
+          const send = (force: boolean) => {
             const result = polls[id] || []
             if (result.length || payload.params[1] === 'immediate' || force) {
               res.writeHead(200, { 'Content-Type': 'application/json' })
@@ -71,23 +86,32 @@ const handler = (req, res) => {
               clearTimeout(cleanupTimers[id])
               cleanupTimers[id] = setTimeout(cleanup.bind(null, id), 20 * 1000)
             } else {
-              pending[id] = {}
-              pending[id].send = () => {
-                if (pending[id]) clearTimeout(pending[id].timer)
+              const sendResponse = () => {
+                const pendingRequest = pending[id]
+                if (pendingRequest && pendingRequest.timer) {
+                  clearTimeout(pendingRequest.timer)
+                }
+              
                 delete pending[id]
+
                 send(true)
               }
-              pending[id].timer = setTimeout(pending[id].send, 15 * 1000)
+
+              pending[id] = { 
+                send: sendResponse,
+                timer: setTimeout(sendResponse, 15 * 1000)
+              }
             }
           }
-          if (typeof id === 'string') return send()
+          if (typeof id === 'string') return send(false)
           res.writeHead(401, { 'Content-Type': 'application/json' })
           res.end(JSON.stringify({ error: 'Invalid Client ID' }))
         }
+
         provider.send(payload, response => {
           if (response && response.result) {
             if (payload.method === 'eth_subscribe') {
-              pollSubs[response.result] = { id: payload.pollId, origin } // Refactor this so you don't need to send a pollId and use the existing subscription id
+              pollSubs[response.result] = { id: rawPayload.pollId || '', origin: payload._origin } // Refactor this so you don't need to send a pollId and use the existing subscription id
             } else if (payload.method === 'eth_unsubscribe') {
               payload.params.forEach(sub => { if (pollSubs[sub]) delete pollSubs[sub] })
             }
@@ -106,24 +130,27 @@ const handler = (req, res) => {
 }
 
 // Track subscriptions
-provider.on('data', (chain, payload) => {
-  return
+provider.on('data', (payload: ProviderDataPayload) => {
   if (pollSubs[payload.params.subscription]) {
     const { id, origin } = pollSubs[payload.params.subscription]
     polls[id] = polls[id] || []
-    polls[id].push(JSON.stringify(payload))
-    if (pending[id] && (!payload.params.origin || payload.params.origin === origin)) {
-      pending[id].send(JSON.stringify(payload))
+
+    if (!payload.params.origin || payload.params.origin === origin) {
+      const { origin, ...params } = payload.params
+      const responsePayload = { ...payload, params }
+
+      polls[id].push(JSON.stringify(responsePayload))
+
+      pending[id]?.send()
     }
   }
 })
 
 provider.on('data:address', (account, payload) => { // Make sure the subscription has access based on current account
-  return
   if (pollSubs[payload.params.subscription]) {
     const { id, origin } = pollSubs[payload.params.subscription]
-    const permissions = store('main.permissions', account) || {}
-    const permission = Object.values(permissions).find(p => p.origin === origin) || {}
+    const permissions = storeApi.getPermissions(account) || {}
+    const permission = Object.values(permissions).find(p => p.origin === origin) || { provider: false }
 
     if (!permission.provider) payload.params.result = []
     polls[id] = polls[id] || []
@@ -132,4 +159,6 @@ provider.on('data:address', (account, payload) => { // Make sure the subscriptio
   }
 })
 
-module.exports = () => http.createServer(handler)
+export default function () {
+  return http.createServer(handler)
+}
