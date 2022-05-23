@@ -110,7 +110,8 @@ class Requests extends React.Component {
           {/* <div className='requestItemOriginIcon'>
             {svg.nested(10)}
           </div> */}
-          {this.store('main.origins', this.props.req.origin, 'name')}
+          
+          {this.store('main.origins', req.origin, 'name')}
         </div>
         <div className='requestItemMain'>
           <div className='requestItemTitle'>
