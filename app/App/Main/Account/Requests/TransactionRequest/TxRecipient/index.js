@@ -22,13 +22,8 @@ class TxRecipient extends React.Component {
     return (
       <div className='_txRecipient'>
         <div className='_txRecipientInner'>
-          <div className='_txRecipientSlice _txRecipientLabel'>
+        <div className='_txLabel'>
             Recipient
-          </div>
-          <div className='_txRecipientFull' onClick={() => {
-            this.copyAddress(req.data.to)
-          }}>
-            {this.state.copied ? 'Address Copied' : req.data.to}
           </div>
           {req.data.to ? (
             <div className='_txRecipientSlice _txRecipientValue'>
@@ -42,6 +37,11 @@ class TxRecipient extends React.Component {
                   return req.decodedData.contractName
                 })()}</span>
               ) : null}
+              <div className='_txRecipientFull' onClick={() => {
+                this.copyAddress(req.data.to)
+              }}>
+                {this.state.copied ? 'Address Copied' : req.data.to}
+              </div>
             </div>
           ) : (
             <div className='_txRecipientSlice _txRecipientValue'>

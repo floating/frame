@@ -175,8 +175,8 @@ class TransactionRequest extends React.Component {
       maxFeeUSD = maxFee.shiftedBy(-18).multipliedBy(nativeUSD)
     }
 
-    const height = req.status === 'error' ? '215px' : mode === 'monitor' ? '215px' : '340px'
-    const z = mode === 'monitor' ? this.props.z + 2000 - (this.props.i * 2) : this.props.z
+    // const height = req.status === 'error' ? '215px' : mode === 'monitor' ? '215px' : '340px'
+    // const z = mode === 'monitor' ? this.props.z + 2000 - (this.props.i * 2) : this.props.z
     const confirmations = req.tx && req.tx.confirmations ? req.tx.confirmations : 0
     const statusClass = req.status === 'error' ? 'txStatus txStatusError' : 'txStatus'
     // if (!success && !error) statusClass += ' txStatusCompact'
@@ -228,12 +228,6 @@ class TransactionRequest extends React.Component {
 
     const otherChain = (this.chain.id !== this.store('main.currentNetwork.id')) && !this.state.allowOtherChain
 
-    let metaChainClass = 'requestMetaChain'
-    if (this.chain.id !== this.store('main.currentNetwork.id')) metaChainClass += ' requestMetaChainWarn'
-    // if (layer === 'sidechain') metaChainClass += ' requestMetaChainSidechain'
-    // if (layer === 'rollup') metaChainClass += ' requestMetaChainRollup'
-    // if (layer === 'mainnet') metaChainClass += ' requestMetaChainMainnet'
-
     let feeAtTime = '?.??'
 
     if (req && req.tx && req.tx.receipt && nativeUSD) {
@@ -264,34 +258,17 @@ class TransactionRequest extends React.Component {
     )
 
     return (
-      <div key={req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height, zIndex: z }}>
+      <div key={req.handlerId} className={requestClass}>
         <TxOverlay {...this.props} overlay={this.state.overlayMode} overlayMode={this.overlayMode.bind(this)}/>
         {req.type === 'transaction' ? (
           <div className='approveTransaction'>
-            {
-              !!requiredApproval ? (
-                <TxApproval
-                 req={this.props.req}
-                 approval={requiredApproval}
-                 allowOtherChain={this.allowOtherChain.bind(this)} />
-              ) : null
-            }
+            {!!requiredApproval ? (
+              <TxApproval
+                req={this.props.req}
+                approval={requiredApproval}
+                allowOtherChain={this.allowOtherChain.bind(this)} />
+            ) : null}
             <div className='approveTransactionPayload'>
-              <div className={notice ? 'txNonce txNonceSet' : 'txNonce'} style={!this.store('main.nonceAdjust') || error || status || mode === 'monitor' ? { pointerEvents: 'none' } : {}}>
-                <div className='txNonceControl'>
-                  <div className='txNonceButton txNonceButtonLower' onMouseDown={() => link.send('tray:adjustNonce', req.handlerId, -1)}>
-                    {svg.octicon('chevron-down', { height: 14 })}
-                  </div>
-                  <div className='txNonceButton txNonceButtonRaise' onMouseDown={() => link.send('tray:adjustNonce', req.handlerId, 1)}>
-                    {svg.octicon('chevron-up', { height: 14 })}
-                  </div>
-                  <div className='txNonceLabel'>Nonce</div>
-                </div>
-                <div className={nonce === 'TBD' || error ? 'txNonceNumber  txNonceHidden' : 'txNonceNumber'}>
-                  {nonce}
-                </div>
-                {nonce === 'TBD' || error ? <div className='txNonceMarker' /> : null}
-              </div>
               {notice ? (
                 <div className='requestNotice'>
                   <div className='requestNoticeInner'>
@@ -458,35 +435,110 @@ class TransactionRequest extends React.Component {
               ) : (
                 <>
                   <div className='requestMeta'>
-                    <div className={metaChainClass} style={{ textTransform: 'uppercase' }}>{this.store('main.networks', this.chain.type, this.chain.id, 'name')}</div>
-                    <div className='requestMetaOrigin'>{req.origin}</div>
+                    <div className='requestMetaChainIcon'>
+                    </div>
+                    <div className='requestMetaChainInfo'>
+                      <div className='requestMetaChain'>
+                        {this.store('main.networks', this.chain.type, this.chain.id, 'name') + ' Transaction'}
+                      </div>
+                      <div className='requestMetaOrigin'>
+                        <div className='requestMetaOriginIcon'>
+                          {svg.nested(10)}
+                        </div>
+                        {req.origin.replace('https://', '')}
+                      </div>
+                    </div>
+                    <div 
+                      className='requestMetaNonce' 
+                      style={!this.store('main.nonceAdjust') || error || status || mode === 'monitor' ? { pointerEvents: 'none' } : {}}
+                    >
+                      {/* <div className='txNonceControl'>
+                        <div className='txNonceButton txNonceButtonLower' onMouseDown={() => link.send('tray:adjustNonce', req.handlerId, -1)}>
+                          {svg.octicon('chevron-down', { height: 14 })}
+                        </div>
+                        <div className='txNonceButton txNonceButtonRaise' onMouseDown={() => link.send('tray:adjustNonce', req.handlerId, 1)}>
+                          {svg.octicon('chevron-up', { height: 14 })}
+                        </div>
+                        
+                      </div> */}
+                      <div className='txNonceLabel'>Nonce</div>
+                      <div className={nonce === 'TBD' || error ? 'txNonceNumber' : 'txNonceNumber'}>
+                        {nonce}
+                      </div>
+                      {nonce === 'TBD' || error ? <div className='txNonceMarker' /> : null}
+                    </div>
                   </div>
-                  <div className='approveRequestHeader approveTransactionHeader'>
-                    <div className='approveRequestHeaderIcon'>
-                      {svg.octicon('radio-tower', { height: 22 })}
-                    </div>
-                    <div className='approveRequestHeaderTitle'>
-                      <div>Transaction</div>
-                    </div>
-                    {txMeta.replacement ? (
-                      txMeta.possible ? (
-                        <div className='approveRequestHeaderTag'>
-                          valid replacement
-                        </div>
-                      ) : (
-                        <div className='approveRequestHeaderTag approveRequestHeaderTagInvalid'>
-                          {txMeta.notice || 'invalid duplicate'}
-                        </div>
-                      )
+                  {txMeta.replacement ? (
+                    txMeta.possible ? (
+                      <div className='approveRequestHeaderTag'>
+                        valid replacement
+                      </div>
+                    ) : (
+                      <div className='approveRequestHeaderTag approveRequestHeaderTagInvalid'>
+                        {txMeta.notice || 'invalid duplicate'}
+                      </div>
                     )
-                      : null}
-                  </div>
-                  {/* <TxFee {...this.props} /> */}
-                  <TxMain {...this.props} chain={this.chain}/>
+                  ) : null}
                   <TxRecipient {...this.props} />
+                  <TxMain {...this.props} chain={this.chain}/>
                   <TxData {...this.props} overlayMode={this.overlayMode.bind(this)} />
                   <TxFeeNew {...this.props} chain={this.chain} overlayMode={this.overlayMode.bind(this)}/ >
-                  {/* <TxModule top={165} req={req} /> */}
+                  {!notice ? (
+                    <div className='requestApprove'>
+                      {req.automaticFeeUpdateNotice ? (
+                        <div className='requestApproveFeeBlock cardShow'>
+                          <div className='requestApproveFeeButton requestApproveFeeReject' onClick={() => {
+                            const { previousFee } = req.automaticFeeUpdateNotice
+                            if (previousFee.type === '0x2') {
+                              link.rpc('setBaseFee', previousFee.baseFee, req.handlerId, e => { if (e) console.error(e) })
+                              link.rpc('setPriorityFee', previousFee.priorityFee, req.handlerId, e => { if (e) console.error(e) })
+                            } else if (previousFee.type === '0x0')  {
+                              link.rpc('setGasPrice', previousFee.gasPrice, req.handlerId, e => { if (e) console.error(e) })
+                            }
+                          }}>{'reject'}</div>
+                          <div>{'fee updated'}</div>
+                          <div className='requestApproveFeeButton requestApproveFeeAccept' onClick={() => {
+                            link.rpc('removeFeeUpdateNotice', req.handlerId, e => { if (e) console.error(e) })
+                          }}>{'accept'}</div>
+                        </div>
+                      ) : (
+                        <>
+                          <div
+                            className='requestDecline' 
+                            style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none'}}
+                            onClick={() => {
+                              if (this.state.allowInput) this.decline(req)
+                            }}
+                          >
+                            <div className='requestDeclineButton _txButton _txButtonBad'>Decline</div>
+                          </div>
+                          <div
+                            className='requestSign' 
+                            style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none'}}
+                            onClick={() => {
+                              if (this.state.allowInput) {
+                                link.rpc('signerCompatibility', req.handlerId, (e, compatibility) => {
+                                  if (e === 'No signer')  {
+                                    this.store.notify('noSignerWarning', { req })
+                                  } else if (e === 'Signer locked') {
+                                    this.store.notify('signerLockedWarning', { req })
+                                  } else if (!compatibility.compatible && !this.store('main.mute.signerCompatibilityWarning')) {
+                                    this.store.notify('signerCompatibilityWarning', { req, compatibility, chain: this.chain })
+                                  } else if ((maxFeeUSD.toNumber() > FEE_WARNING_THRESHOLD_USD || this.toDisplayUSD(maxFeeUSD) === '0.00') && !this.store('main.mute.gasFeeWarning')) {
+                                    this.store.notify('gasFeeWarning', { req, feeUSD: this.toDisplayUSD(maxFeeUSD), currentSymbol })
+                                  } else {
+                                    this.approve(req.handlerId, req)
+                                  }
+                                })
+                              }}
+                            }
+                          >
+                            <div className='requestSignButton _txButton'> Sign </div>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  ) : null}
                 </>
               )}
             </div>
@@ -494,59 +546,6 @@ class TransactionRequest extends React.Component {
         ) : (
           <div className='unknownType'>{'Unknown: ' + req.type}</div>
         )}
-        {!notice ? (
-          <div className='requestApprove'>
-            {req.automaticFeeUpdateNotice ? (
-              <div className='requestApproveFeeBlock cardShow'>
-                <div className='requestApproveFeeButton requestApproveFeeReject' onClick={() => {
-                  const { previousFee } = req.automaticFeeUpdateNotice
-                  if (previousFee.type === '0x2') {
-                    link.rpc('setBaseFee', previousFee.baseFee, req.handlerId, e => { if (e) console.error(e) })
-                    link.rpc('setPriorityFee', previousFee.priorityFee, req.handlerId, e => { if (e) console.error(e) })
-                  } else if (previousFee.type === '0x0')  {
-                    link.rpc('setGasPrice', previousFee.gasPrice, req.handlerId, e => { if (e) console.error(e) })
-                  }
-                }}>{'reject'}</div>
-                <div>{'fee updated'}</div>
-                <div className='requestApproveFeeButton requestApproveFeeAccept' onClick={() => {
-                  link.rpc('removeFeeUpdateNotice', req.handlerId, e => { if (e) console.error(e) })
-                }}>{'accept'}</div>
-              </div>
-            ) : null}
-            <div
-              className='requestDecline' 
-              style={{ pointerEvents: this.state.allowInput && this.props.onTop ? 'auto' : 'none'}}
-              onClick={() => {
-                if (this.state.allowInput && this.props.onTop) this.decline(req)
-              }}
-            >
-              <div className='requestDeclineButton _txButton _txButtonBad'>Decline</div>
-            </div>
-            <div
-              className='requestSign' 
-              style={{ pointerEvents: this.state.allowInput && this.props.onTop ? 'auto' : 'none'}}
-              onClick={() => {
-                if (this.state.allowInput && this.props.onTop) {
-                  link.rpc('signerCompatibility', req.handlerId, (e, compatibility) => {
-                    if (e === 'No signer')  {
-                      this.store.notify('noSignerWarning', { req })
-                    } else if (e === 'Signer locked') {
-                      this.store.notify('signerLockedWarning', { req })
-                    } else if (!compatibility.compatible && !this.store('main.mute.signerCompatibilityWarning')) {
-                      this.store.notify('signerCompatibilityWarning', { req, compatibility, chain: this.chain })
-                    } else if ((maxFeeUSD.toNumber() > FEE_WARNING_THRESHOLD_USD || this.toDisplayUSD(maxFeeUSD) === '0.00') && !this.store('main.mute.gasFeeWarning')) {
-                      this.store.notify('gasFeeWarning', { req, feeUSD: this.toDisplayUSD(maxFeeUSD), currentSymbol })
-                    } else {
-                      this.approve(req.handlerId, req)
-                    }
-                  })
-                }}
-              }
-            >
-              <div className='requestSignButton _txButton'> Sign </div>
-            </div>
-          </div>
-        ) : null}
       </div>
     )
   }
