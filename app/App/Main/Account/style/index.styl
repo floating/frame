@@ -57,7 +57,6 @@
 
 .signer
   position relative
-  padding 0px // 5px 0px 5px
   z-index 3001
   transition var(--standard), 0s linear height
   will-change transform
@@ -81,19 +80,14 @@
   .signerContainer
     position relative
     z-index 3002
-    // border-radius 6px
-    // overflow hidden
-    // box-shadow 0px 0px 3px -1px rgba(6, 4, 2, 1) // , 0px 1px 1px 0px rgba(6, 54, 122, 0.1), 0 0px 100px -50px rgba(6, 24, 52, .4), cardDrop
-    // background var(--ghostB)
-    padding-bottom 6px
-    // box-shadow 0px 5px 8px -1px var(--thick)
+    padding 0px 0px 5px 0px
 
     .accountMain
       position absolute
-      top 50px
+      top 55px
       left 0
       right 0
-      bottom 50px
+      bottom 0
       transform translate3d(0, 0, 0)
       overflow hidden
 
@@ -1487,8 +1481,8 @@
 .accountModule
   position absolute 
   top 0
-  left 1px
-  right 1px
+  left 2px
+  right 2px
   // border-bottom 1px solid var(--ghostA)
   // background var(--ghostC)
   transform translate3d(0, 0, 0)
@@ -1504,10 +1498,10 @@
   right 0px
   bottom 0px
   // margin 2px
-  border-radius 10px
+  border-radius 12px
   background var(--ghostA)
   // box-shadow 0px 2px 2px var(--ghostX)
-  box-shadow 0px 2px 6px var(--ghostZ)
+  box-shadow 0px 4px 8px var(--ghostY)
   transform translate3d(0, 0, 0)
   // transition 0.05s linear all // var(--standard)
   // margin-bottom 2px
@@ -1756,3 +1750,6 @@
 @import '../Requests/style'
 @import '../Launcher/style'
 @import '../SignerStatus/style'
+
+@import './view'
+  

@@ -73,8 +73,6 @@ class TransactionRequest extends React.Component {
     if (status === 'declined') requestClass += ' signerRequestDeclined'
     if (status === 'pending') requestClass += ' signerRequestPending'
     if (status === 'error') requestClass += ' signerRequestError'
-    const mode = req.mode
-    const height = mode === 'monitor' ? '215px' : '340px'
 
     const messageToSign = typedData.domain
      ? (
@@ -106,7 +104,7 @@ class TransactionRequest extends React.Component {
       </div>
       )
     return (
-      <div key={this.props.req.id || this.props.req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height }}>
+      <div key={this.props.req.id || this.props.req.handlerId} className={requestClass}>
         {type === 'signTypedData' ? (
           <div className='approveRequest'>
             <div className='approveTransactionPayload'>
@@ -145,10 +143,6 @@ class TransactionRequest extends React.Component {
                   <div className='requestMeta'>
                     <div className='requestMetaOrigin'>{originName}</div>
                   </div>
-                  <div className='approveRequestHeader approveTransactionHeader'>
-                    <div className='approveRequestHeaderIcon'> {svg.octicon('pencil', { height: 20 })}</div>
-                    <div className='approveRequestHeaderLabel'> Sign Message</div>
-                  </div>
                   {messageToSign}
                 </>
               )}
@@ -160,15 +154,15 @@ class TransactionRequest extends React.Component {
         <div className='requestApprove'>
           <div 
             className='requestDecline' 
-            style={{ pointerEvents: this.state.allowInput && this.props.onTop ? 'auto' : 'none'}} 
-            onClick={() => { if (this.state.allowInput && this.props.onTop) this.decline(this.props.req.handlerId, this.props.req) 
+            style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none'}} 
+            onClick={() => { if (this.state.allowInput) this.decline(this.props.req.handlerId, this.props.req) 
           }}>
             <div className='requestDeclineButton _txButton _txButtonBad'>Decline</div>
           </div>
           <div 
             className='requestSign' 
-            style={{ pointerEvents: this.state.allowInput && this.props.onTop ? 'auto' : 'none'}}
-            onClick={() => { if (this.state.allowInput && this.props.onTop) this.approve(this.props.req.handlerId, this.props.req) 
+            style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none'}}
+            onClick={() => { if (this.state.allowInput) this.approve(this.props.req.handlerId, this.props.req) 
           }}>
             <div className='requestSignButton _txButton'>Sign</div>
           </div>
