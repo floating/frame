@@ -51,7 +51,7 @@ const handler = (socket: FrameWebSocket, req: IncomingMessage) => {
 
   socket.on('message', async data => {
     let origin = socket.origin
-    const rawPayload = validPayload(data.toString()) as ExtensionPayload
+    const rawPayload = validPayload<ExtensionPayload>(data.toString())
     if (!rawPayload) return console.warn('Invalid Payload', data)
     if (socket.isFrameExtension) { // Request from extension, swap origin
       if (rawPayload.__frameOrigin) {

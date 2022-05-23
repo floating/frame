@@ -2,9 +2,9 @@ import log from 'electron-log'
 
 const has = (value: any) => value !== null && value !== undefined
 
-export default function (data: string): JSONRPCRequestPayload | undefined {
+export default function <T extends JSONRPCRequestPayload> (data: string): T | false {
   try {
-    const payload = JSON.parse(data) || {}
+    const payload = JSON.parse(data) as T || {}
 
     if (has(payload.id) && has(payload.method)) {
       if (!payload.params) payload.params = []
@@ -19,4 +19,6 @@ export default function (data: string): JSONRPCRequestPayload | undefined {
   } catch (e) {
     log.info('Error parsing payload: ', data, e)
   }
+
+  return false
 }

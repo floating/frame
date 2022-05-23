@@ -60,7 +60,7 @@ const handler = (req: IncomingMessage, res: ServerResponse) => {
       res.on('error', err => console.error('res err', err))
       const origin = req.headers.origin
       const data = Buffer.concat(body).toString()
-      const rawPayload = validPayload(data) as HTTPPollingPayload
+      const rawPayload = validPayload<HTTPPollingPayload>(data)
       if (!rawPayload) return console.warn('Invalid Payload', data)
 
       const payload = updateOrigin(rawPayload, origin)
