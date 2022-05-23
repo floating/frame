@@ -1,6 +1,6 @@
 import React, {  createRef } from 'react'
 import Restore from 'react-restore'
-// import link from '../../../resources/link'
+import link from '../../../resources/link'
 // import svg from '../../../resources/svg'
 
 const average = (array) => (array.reduce((a, b) => a + b) / array.length).toFixed(2)
@@ -67,6 +67,7 @@ class _OriginModule extends React.Component {
         <div 
           className='sliceOrigin'
           onClick={() => {
+            console.log('hello')
             link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'updateOriginChain', notifyData: { origin } }})
           }}
         >

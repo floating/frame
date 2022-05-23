@@ -341,14 +341,94 @@
     // tranform translateZ(0)
 
   .requestItem
-    margin 0px 0px 6px 0px
+    margin 0px 0px 7px 0px
     border-radius 12px
     background var(--ghostA)
-    padding 12px
+    padding 8px 0px
     box-shadow 0px 4px 8px var(--ghostY)
     cursor pointer
+    position relative
+    display flex
+    justify-content space-between
     *
       pointer-events none
+
+    .requestItemIcon
+      top 16px
+      left 16px
+      position absolute
+      display flex
+      justify-content center
+      align-items center
+
+      .requestItemIconFram
+        color var(--good)
+        border-radius 8px
+        display flex
+        justify-content center
+        align-items center
+
+    .requestItemOrigin
+      top 16px
+      right 16px
+      position absolute
+      font-weight 600
+      margin-left 2px
+      display flex
+      align-items center
+      font-size 10px
+      margin-top 3px
+
+      .requestItemOriginIcon
+        position relative
+        top -1px
+        display flex
+        justify-content center
+        align-items center
+
+    .requestItemTime
+      bottom 16px  
+      left 16px
+      font-size 10px
+      font-weight 600
+      position absolute
+      display flex
+      justify-content center
+      align-items center
+
+    .requestItemStatus
+      font-size 10px
+      bottom 16px
+      right 16px
+      position absolute
+      font-weight 600
+      margin-left 2px
+
+    .requestItemMain
+      width 100%
+      padding 64px 0px
+      display flex
+      justify-content center
+      align-items center
+      flex-direction column
+      // background blue
+
+      .requestItemTitle
+        position relative
+        font-family 'Exo2'
+        font-weight 500
+
+    .requestItemRight
+      width 64px
+      display flex
+      justify-content center
+      align-items center
+      transform scaleX(-1)
+      position relative
+      left 1px
+
+  .requestItem:hover
+    background var(--ghostB)
 
   .requestItem:last-child
     margin 0px
@@ -425,17 +505,16 @@
     align-items space-between
     width 100%
     box-sizing border-box
-    height 60px
+    height 72px
 
     .requestMetaChainIcon
       position absolute 
       left 12px
-      top 18px
-      background red
-      width 24px
-      height 24px
-      border-radius 16px
-      background red // var(--ghostB)
+      top 12px
+      background var(--ghostZ)
+      width 48px
+      height 48px
+      border-radius 24px
       overflow hidden
       display flex
       justify-content center
@@ -449,7 +528,7 @@
     
     .requestMetaChainInfo
       position absolute 
-      left 48px
+      left 72px
       top 0
       bottom 1px
       right 64px
@@ -1153,7 +1232,7 @@
     top 0px
     right 6px
     bottom 0px
-    left 3px
+    left 6px
     background var(--ghostB)
     z-index 100000
     display flex

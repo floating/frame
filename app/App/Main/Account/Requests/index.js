@@ -2,18 +2,18 @@ import React from 'react'
 import Restore from 'react-restore'
 // import { CSSTransitionGroup } from 'react-transition-group'
 
-import ProviderRequest from './ProviderRequest'
-import TransactionRequest from './TransactionRequest'
-import SignatureRequest from './SignatureRequest'
-import ChainRequest from './ChainRequest'
-import AddTokenRequest from './AddTokenRequest'
+// import ProviderRequest from './ProviderRequest'
+// import TransactionRequest from './TransactionRequest'
+// import SignatureRequest from './SignatureRequest'
+// import ChainRequest from './ChainRequest'
+// import AddTokenRequest from './AddTokenRequest'
+// import SignTypedDataRequest from './SignTypedDataRequest'
+// function isHardwareSigner (account = {}) {
+//   return ['ledger', 'lattice', 'trezor'].includes(account.lastSignerType)
+// }
 
 import link from '../../../../../resources/link'
-import SignTypedDataRequest from './SignTypedDataRequest'
-
-function isHardwareSigner (account = {}) {
-  return ['ledger', 'lattice', 'trezor'].includes(account.lastSignerType)
-}
+import svg from '../../../../../resources/svg'
 
 class Requests extends React.Component {
   constructor (props, context) {
@@ -85,6 +85,43 @@ class Requests extends React.Component {
   //   // link.send('tray:action', 'updateAccountModule', this.props.id, { height: this.moduleRef.current.clientHeight })
   // } 
 
+  renderRequestItem (req, i, title, icon) {
+    return (
+      <div 
+        key={req.handlerId}
+        className='requestItem cardShow'
+        // style={{ animationDelay: (i * 0.08) + 's' }}
+        onClick={() => {
+          this.props.setAccountView('requestView', { req, i })
+        }}
+      >
+        <div className='requestItemIcon'>
+          <div className='requestItemIconFrame'>
+            {icon}
+          </div>
+        </div>
+        <div className='requestItemTime'>
+          {'22m ago'}
+        </div>
+        <div className='requestItemStatus'>
+          {'pending'}
+        </div>
+        <div className='requestItemOrigin'>
+          {/* <div className='requestItemOriginIcon'>
+            {svg.nested(10)}
+          </div> */}
+          {req.origin.replace('https://', '')}
+        </div>
+        <div className='requestItemMain'>
+          <div className='requestItemTitle'>
+            {title}
+          </div>
+        </div>
+        {/* <pre>{JSON.stringify(req, null, 2)}</pre> */}
+      </div>
+    )
+  }
+
   render () {
     const activeAccount =  this.store('main.accounts', this.props.id)
     const requests = Object.values(activeAccount.requests || {})
@@ -112,19 +149,21 @@ class Requests extends React.Component {
               <span>{monitor.length}</span>
             </div> */}
             {requests.map((req, i) => {
-              return (
-                <div 
-                  className='requestItem'
-                  onClick={() => {
-                    this.props.setAccountView('requestView', { req, i })
-                  }}
-                >
-                  <div>{req.type + ' Request'}</div>
-                  <div>{'From' + req.origin}</div>
-                  <div>{req.mode}</div>
-                  {/* <pre>{JSON.stringify(req, null, 2)}</pre> */}
-                </div>
-              )
+              if (req.type === 'access') {
+                return this.renderRequestItem(req, i, 'Account Access', svg.accounts(22))
+              } else if (req.type === 'sign') {
+                return this.renderRequestItem(req, i, 'Sign Message', svg.sign(22))
+              } else if (req.type === 'signTypedData') {
+                return this.renderRequestItem(req, i, 'Sign Data', svg.sign(22))
+              } else if (req.type === 'addChain') { 
+                return this.renderRequestItem(req, i, 'Add Chain', svg.chain(22))
+              } else if (req.type === 'switchChain') {
+                return this.renderRequestItem(req, i, 'Switch Chain', svg.chain(22))
+              } else if (req.type === 'addToken')  {
+                return this.renderRequestItem(req, i, 'Add Tokens', svg.tokens(22))
+              } else if (req.type === 'transaction')  {
+                return this.renderRequestItem(req, i, req.data.chainId + ' Transaction', svg.broadcast(22))
+              }
             })}
           </div>
         </div>

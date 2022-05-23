@@ -13,7 +13,7 @@ import Inventory from './Inventory'
 import Launcher from './Launcher'
 import Permissions from './Permissions'
 import Requests from './Requests'
-import SignerModule from './Signer'
+// import SignerModule from './Signer'
 import SignerStatus from './SignerStatus'
 import Verify from './Verify'
 import Settings from './Settings'
@@ -332,12 +332,14 @@ class _AccountView extends React.Component {
           >
             {svg.chevronLeft(13)}
           </div>
-          <div 
-            className='accountViewTitle casrShow'
-          >
-            {'sign transaction'}
+          <div className='accountViewTitle'>
+            <div className='accountViewIcon'>
+              {this.props.accountViewIcon}
+            </div>
+            <div className='accountViewText'>
+              {this.props.accountViewTitle}
+            </div>
           </div>
-          <div className='accountViewIcon casrShow'>{this.props.accountViewIcon}</div>
         </div>
         <div className='accountViewMain cardShow'>
           {this.props.children}
@@ -385,11 +387,35 @@ class _AccountBody extends React.Component {
     const { view, data } = this.state // this.store('panel')
     if (view === 'requestView') {
       const { req, i } = data
+      let accountViewTitle, accountViewIcon
+      if (req.type === 'access') {
+        accountViewTitle = 'Account Access'
+        accountViewIcon = svg.accounts(17)
+      } else if (req.type === 'sign') {
+        accountViewTitle = 'Sign Message'
+        accountViewIcon = svg.sign(17)
+      } else if (req.type === 'signTypedData') {
+        accountViewTitle = 'Sign Data'
+        accountViewIcon = svg.sign(17)
+      } else if (req.type === 'addChain') { 
+        accountViewTitle = 'Add Chain'
+        accountViewIcon = svg.chsin(17)
+      } else if (req.type === 'switchChain') {
+        accountViewTitle = 'Switch Chain'
+        accountViewIcon = svg.chain(17)
+      } else if (req.type === 'addToken')  {
+        accountViewTitle = 'Add Token'
+        accountViewIcon = svg.tokens(17)
+      } else if (req.type === 'transaction')  {
+        accountViewTitle = 'Sign Transaction'
+        accountViewIcon = svg.broadcast(17)
+      }
       return (
         <AccountView 
           back={() => this.setState({ view: '' })}
           {...this.props}
-          accountViewIcon={svg.broadcast(18)}
+          accountViewTitle={accountViewTitle}
+          accountViewIcon={accountViewIcon}
         >
           {this.renderRequest(req, i)}
         </AccountView>
