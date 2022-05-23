@@ -7,9 +7,8 @@ import provider from '../provider'
 import accounts from '../accounts'
 import windows from '../windows'
 
-import { updateOrigin, isTrusted } from './origin'
+import { updateOrigin, isTrusted, isFrameExtension } from './origin'
 import validPayload from './validPayload'
-import isFrameExtension from './isFrameExtension'
 import protectedMethods from './protectedMethods'
 import { IncomingMessage, Server } from 'http'
 

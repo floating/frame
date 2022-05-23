@@ -1,8 +1,12 @@
 import { v5 as uuidv5 } from 'uuid'
+import { IncomingMessage } from 'http'
+import queryString from 'query-string'
 import log from 'electron-log'
 
 import accounts, { AccessRequest } from '../accounts'
 import store from '../store'
+
+const dev = process.env.NODE_ENV === 'development'
 
 interface ExtensionPayload extends JSONRPCRequestPayload {
   chainId?: string,
@@ -58,6 +62,25 @@ export function updateOrigin (payload: ExtensionPayload, originName?: string): R
     ...payload,
     chainId: payload.chainId || `0x${(existingOrigin?.chain.id || 1).toString(16)}`,
     _origin: originId
+  }
+}
+
+export function isFrameExtension (req: IncomingMessage) {
+  const origin = req.headers.origin
+  if (!origin) return false
+
+  const query = queryString.parse((req.url || '').replace('/', ''))
+  const mozOrigin = origin.startsWith('moz-extension://') 
+  const extOrigin = origin.startsWith('chrome-extension://') || origin.startsWith('moz-extension://') || origin.startsWith('safari-web-extension://')
+
+  if (origin === 'chrome-extension://ldcoohedfbjoobcadoglnnmmfbdlmmhf') { // Match production chrome
+    return true
+  } else if (mozOrigin || (dev && extOrigin)) {
+    // In production, match any Firefox extension origin where query.identity === 'frame-extension'
+    // In dev, match any extension where query.identity === 'frame-extension'
+    return query.identity === 'frame-extension'
+  } else {
+    return false
   }
 }
 
