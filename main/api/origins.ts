@@ -12,6 +12,10 @@ function invalidOrigin (origin: string) {
   return origin !== origin.replace(/[^0-9a-z/:.[\]-]/gi, '')
 }
 
+export function getOriginId(originName: string) {
+  return uuidv5(originName, uuidv5.DNS) as UUID<Origin>
+}
+
 function addPermissionRequest (address: Address, origin: string) {
   return new Promise((resolve, reject) => {
     const handlerId = uuidv5(origin, uuidv5.DNS)
@@ -33,10 +37,10 @@ function addPermissionRequest (address: Address, origin: string) {
 export function updateOrigin (payload: JSONRPCRequestPayload, originName?: string, connectionMessage = false): RPCRequestPayload {
   if (!originName) {
     log.warn(`Received payload with no origin: ${JSON.stringify(payload)}`)
-    return { ...payload, chainId: payload.chainId || '0x1', _origin: 'Unknown' }
+    return { ...payload, chainId: payload.chainId || '0x1', _origin: OriginType.Unknown }
   }
 
-  const originId = uuidv5(originName, uuidv5.DNS)
+  const originId = getOriginId(originName)
   const existingOrigin = store('main.origins', originId)
 
   if (!existingOrigin && !connectionMessage) {

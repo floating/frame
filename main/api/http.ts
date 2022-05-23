@@ -31,9 +31,7 @@ const pending: Record<string, PendingRequest> = {}
 const cleanupTimers: Record<string, NodeJS.Timeout> = {}
 
 const storeApi = {
-  getPermissions: (address: Address) => {
-    return store('main.permissions', address) as Record<string, Permission>
-  }
+  getPermissions: (address: Address) => store('main.permissions', address) as Record<string, Permission>
 }
 
 const cleanup = (id: string) => {
@@ -41,7 +39,7 @@ const cleanup = (id: string) => {
   delete pending[id]
   Object.keys(pollSubs).forEach(sub => {
     if (pollSubs[sub].id === id) {
-      provider.send({ jsonrpc: '2.0', id: 1, method: 'eth_unsubscribe', params: [sub], _origin: '' })
+      provider.send({ jsonrpc: '2.0', id: 1, method: 'eth_unsubscribe', params: [sub], _origin: OriginType.Unknown })  // OriginType.Empty?
       delete pollSubs[sub]
     }
   })
