@@ -47,7 +47,7 @@ export interface ProviderDataPayload {
 }
 
 const storeApi = {
-  getOrigin: (id: string) => store('main.origins', uuidv5(id, uuidv5.DNS)) as Origin
+  getOrigin: (id: string) => store('main.origins', id) as Origin
 }
 
 const getPayloadOrigin = ({ _origin }: RPCRequestPayload) => storeApi.getOrigin(_origin)
