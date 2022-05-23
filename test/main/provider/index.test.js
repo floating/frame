@@ -184,7 +184,7 @@ describe('#send', () => {
           }
         ]
       }, () => {
-        expect(store.switchOriginChain).toHaveBeenCalledWith({ chain: { id: 137, type: 'ethereum' }}, 1, 'ethereum')
+        expect(store.switchOriginChain).toHaveBeenCalledWith(137, 1, 'ethereum')
         done()
       })
     })
@@ -203,7 +203,7 @@ describe('#send', () => {
         }],
         _origin: 'frame.test'
       }, () => {
-        expect(store.switchOriginChain).toHaveBeenCalledWith({ chain: { id: 42161, type: 'ethereum' }}, 1, 'ethereum')
+        expect(store.switchOriginChain).toHaveBeenCalledWith(42161, 1, 'ethereum')
         done()
       })
     })
