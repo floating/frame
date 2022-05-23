@@ -1,4 +1,4 @@
-import { v4 as uuid, v5 as uuidv5 } from 'uuid'
+import { v4 as uuid } from 'uuid'
 import EventEmitter from 'events'
 import log from 'electron-log'
 import utils from 'web3-utils'
@@ -46,11 +46,11 @@ export interface ProviderDataPayload {
   }
 }
 
-const getOrigin = ({ _origin }: RPCRequestPayload) => storeApi.getOrigin(_origin)
-
 const storeApi = {
   getOrigin: (id: string) => store('main.origins', id) as Origin
 }
+
+const getPayloadOrigin = ({ _origin }: RPCRequestPayload) => storeApi.getOrigin(_origin)
 
 export class Provider extends EventEmitter {
   connected = false
@@ -604,12 +604,11 @@ export class Provider extends EventEmitter {
       if (!Number.isInteger(chainId)) throw new Error('Invalid chain id')
 
       // Check if chain exists 
-      const exists = Boolean(store('main.networks', 'ethereum', chainId))
+      const exists = Boolean(store('main.networks.ethereum', chainId))
       if (exists === false) throw new Error('Chain does not exist')
 
       const originId = payload._origin
-      const origin = storeApi.getOrigin(originId)
-
+      const origin = getPayloadOrigin(payload)
       if (origin.chain.id !== chainId) {
         store.switchOriginChain(originId, chainId, origin.chain.type)
       }
@@ -734,7 +733,7 @@ export class Provider extends EventEmitter {
       }
     }
 
-    return getOrigin(payload).chain
+    return getPayloadOrigin(payload).chain
   }
 
   sendAsync (payload: RPCRequestPayload, cb: Callback<RPCResponsePayload>) {
