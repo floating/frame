@@ -1,52 +1,33 @@
 ._txRecipient
-  position absolute
-  top 198px
-  left 5px
-  right 5px
-  height 30px
+  position relative
+  width 100%
+  margin-bottom 12px
   z-index 100001
   
   ._txRecipientInner
-    position absolute 
-    top 0
-    right 0
-    bottom 0
-    left 0
-    background var(--ghostC)
-    border-radius 8px
-    display flex
-    flex-direction row
-    align-items stretch
-    font-weight 500
-    // overflow hidden
-
-    ._txRecipientSlice
-      display flex
-      justify-content center
-      align-items center
-      font-size 14px
-      padding 0px 6px
-      font-family FiraCode, monospace
-
-    ._txRecipientLabel
-      font-weight 600
-      padding 0px 12px 1px 14px
-      font-size 11px
-      text-transform uppercase
-      font-family OpenSans
+    border-radius 15px
+    margin 0px 6px
 
     ._txRecipientValue
-      background var(--ghostE)
-      border-radius 8px
-      flex 1
-      transition var(--standardFaster)
-      cursor pointer
-      transform translateY(0px)
-      padding-top 1px
+      border-radius 12px
+      font-size 17px
+      font-weight 400
       display flex
       justify-content center
       align-items center
-      padding 0px 0px 0px 5px
+      height 40px
+      border-radius 12px
+      display flex
+      justify-content center
+      align-items center
+      -webkit-app-region no-drag
+      transition none
+      pointer-events auto
+      transform translate3d(0, 0, 0)
+      font-family 'Exo2' // FiraCode, monospace
+      background var(--ghostZ)
+      border 3px solid var(--ghostZ)
+      padding-bottom 2px
 
       svg
         position relative
@@ -67,36 +48,30 @@
       left 0
       bottom 0
       right 0
-      min-width 100%
-      // padding 0px 15px
+      padding-top 1px
       display flex
       justify-content center
       align-items center
       font-size 12px 
       z-index 40000
-      background var(--ghostD)
       border-radius 8px
       padding-bottom 0px
       font-family FiraCode, monospace
-      background var(--moon)
-      color var(--moonOver)
+      background var(--ghostA)
       opacity 0
       font-weight 600
+      transition var(--standardFast)
 
     ._txRecipientFull:hover
       opacity 1
       transform translateX(0px) scale(1)
-      background var(--moon)
-      color var(--moonOver)
-      animation 5s shake ease-in-out infinite alternate
       cursor pointer
 
-    ._txRecipientFull:active
-      animation-name shake-little
-      animation-duration 2s
-      animation-timing-function: ease-in-out
-      animation-iteration-count: infinite
-
+    // ._txRecipientFull:active
+    //   animation-name shake-little
+    //   animation-duration 2s
+    //   animation-timing-function: ease-in-out
+    //   animation-iteration-count: infinite
 
 ._txRecipient:hover
   z-index 1000001

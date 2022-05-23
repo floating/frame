@@ -1,60 +1,43 @@
+._txLabel
+  font-weight 600
+  font-size 10px
+  text-transform uppercase
+  font-family 'Exo2'
+  margin-left 3px
+  letter-spacing 3px
+  padding 6px 0px 3px 9px
+
 ._txData
-  position absolute
-  top 163px
-  left 5px
-  right 5px
-  height 30px
+  position relative
+  width 100%
+  margin-bottom 12px
   z-index 100000
   
   ._txDataInner
-    position absolute 
-    top 0
-    right 0
-    bottom 0
-    left 0
-    background var(--ghostC)
-    border-radius 8px
-    // border-bottom-left-radius 8px
-    // border-bottom-right-radius 8px
-    // border-top-left-radius 3px
-    // border-top-right-radius 3px
-    display flex
-    flex-direction row
-    align-items stretch
-    font-weight 500
-    // overflow hidden
-
-    ._txDataSlice
-      display flex
-      justify-content center
-      align-items center
-      font-size 15px
-      // border-right 1px solid var(--ghostA)
-      padding 0px 6px
-      font-family FiraCode, monospace
-
-    ._txDataLabel
-      font-weight 600
-      padding 0px 12px 1px 14px
-      font-size 11px
-      text-transform uppercase
-      font-family OpenSans
+    border-radius 15px
+    margin 0px 6px
 
     ._txDataValue
-      padding 0px 0px 0px 6px
-      background var(--ghostD)
-      border-radius 8px
-      flex 1
-      cursor pointer
-      border-bottom 1px solid var(--ghostC)
-      transform translateY(0px)
-      padding-top 1px
-      font-size 13px
-      font-weight 600
+      border-radius 12px
+      font-size 17px
+      font-weight 400
       display flex
       justify-content center
       align-items center
-      
+      height 40px
+      border-radius 12px
+      display flex
+      justify-content center
+      align-items center
+      -webkit-app-region no-drag
+      transition none
+      pointer-events auto
+      transform translate3d(0, 0, 0)
+      font-family 'Exo2' // FiraCode, monospace
+      background var(--ghostZ)
+      border 3px solid var(--ghostZ)
+      padding-bottom 2px
+
       span
         word-spacing 0px
 
@@ -64,10 +47,8 @@
         padding 0px 0px
 
     ._txDataValue:hover
-      background var(--moon)
-      color var(--moonOver)
-      ._txDataValueMethod
-        color var(--moonOver)
+      background var(--ghostA)
+      cursor pointer
 
     ._txDataValueMethod
       color var(--moon)

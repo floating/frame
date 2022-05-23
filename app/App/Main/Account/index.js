@@ -13,39 +13,19 @@ import Inventory from './Inventory'
 import Launcher from './Launcher'
 import Permissions from './Permissions'
 import Requests from './Requests'
-import SignerModule from './Signer'
+// import SignerModule from './Signer'
 import SignerStatus from './SignerStatus'
 import Verify from './Verify'
 import Settings from './Settings'
 
 
-// import Settings from './Settings'
-
-
-
-// import ledgerLogo from './ledgerLogo.png'
-// import trezorLogo from './trezorLogo.png'
-
-// needs to render and then report height
-
-// {
-//   name: 'verify address on signer' // list of nfts owned by address (postpone?)
-// }
-
-// signer panel will be where you remove signers and accounts
-
-
-
-// const modules = {
-
-// }
-
-
-// class Requests extends React.Component {
-
-// }
-
-
+// move 
+import ProviderRequest from './Requests/ProviderRequest'
+import TransactionRequest from './Requests/TransactionRequest'
+import SignatureRequest from './Requests/SignatureRequest'
+import ChainRequest from './Requests/ChainRequest'
+import AddTokenRequest from './Requests/AddTokenRequest'
+import SignTypedDataRequest from './Requests/SignTypedDataRequest'
 
 
 // class _Verify extends React.Component {
@@ -209,7 +189,7 @@ class _AccountMain extends React.Component {
     }
 
     let moduleClass = ''
-    if (id === 'launcher' || id === 'requests') moduleClass = ' transparentModule'
+    if (id === 'requests') moduleClass = ' transparentModule'
 
     return (
       <div className={'accountModule' + moduleClass} style={style}>
@@ -224,6 +204,7 @@ class _AccountMain extends React.Component {
             id === 'requests' ? <Requests 
               _id={id}
               id={this.props.id}
+              setAccountView={this.props.setAccountView}
               addresses={this.props.addresses} 
               minimized={this.props.minimized} 
               status={this.props.status} 
@@ -294,7 +275,7 @@ class _AccountMain extends React.Component {
     let slideHeight = 0
     const modules = accountModuleOrder.map((id, i) => {
       const module = accountModules[id] || { height: 0 }
-      slideHeight += module.height + 5
+      slideHeight += module.height + 7
       return this.renderModule(
         id, 
         module, 
@@ -337,6 +318,147 @@ class _AccountMain extends React.Component {
 }
 
 const AccountMain = Restore.connect(_AccountMain)
+
+
+// AccountView is a reusable template that provides the option to nav back to main
+class _AccountView extends React.Component {
+  render () {
+    return (
+      <div className='accountView'>
+        <div className='accountViewMenu cardShow'>
+          <div 
+            className='accountViewBack'
+            onClick={() => this.props.back()}
+          >
+            {svg.chevronLeft(13)}
+          </div>
+          <div className='accountViewTitle'>
+            <div className='accountViewIcon'>
+              {this.props.accountViewIcon}
+            </div>
+            <div className='accountViewText'>
+              {this.props.accountViewTitle}
+            </div>
+          </div>
+        </div>
+        <div className='accountViewMain cardShow'>
+          {this.props.children}
+        </div>
+      </div>
+    )
+  }
+}
+
+const AccountView = Restore.connect(_AccountView)
+
+function isHardwareSigner (account = {}) {
+  return ['ledger', 'lattice', 'trezor'].includes(account.lastSignerType)
+}
+
+class _AccountBody extends React.Component {
+  constructor (...args) {
+    super(...args)
+    this.state = {
+      view: 'request'
+    }
+  } 
+  renderRequest (req, i) {
+    const activeAccount =  this.store('main.accounts', this.props.id)
+    const signingDelay = isHardwareSigner(activeAccount) ? 200 : 1500
+
+    if (req.type === 'transaction') {
+      return (
+        <TransactionRequest 
+          key={req.handlerId}
+          req={req}
+          accountId={this.props.id}
+          signingDelay={signingDelay} 
+        />
+      )
+    }
+    if (req.type === 'access') return <ProviderRequest key={req.handlerId} req={req} />
+    if (req.type === 'sign') return <SignatureRequest key={req.handlerId} req={req} signingDelay={signingDelay} />
+    if (req.type === 'signTypedData') return <SignTypedDataRequest key={req.handlerId} req={req} signingDelay={signingDelay} />
+    if (req.type === 'addChain' || req.type === 'switchChain') return <ChainRequest key={req.handlerId} req={req} />
+    if (req.type === 'addToken') return <AddTokenRequest key={req.handlerId} req={req} />
+    return null
+  }
+  render () {
+    const { view, data } = this.state // this.store('panel')
+    if (view === 'requestView') {
+      const { req, i } = data
+      let accountViewTitle, accountViewIcon
+      if (req.type === 'access') {
+        accountViewTitle = 'Account Access'
+        accountViewIcon = svg.accounts(17)
+      } else if (req.type === 'sign') {
+        accountViewTitle = 'Sign Message'
+        accountViewIcon = svg.sign(17)
+      } else if (req.type === 'signTypedData') {
+        accountViewTitle = 'Sign Data'
+        accountViewIcon = svg.sign(17)
+      } else if (req.type === 'addChain') { 
+        accountViewTitle = 'Add Chain'
+        accountViewIcon = svg.chsin(17)
+      } else if (req.type === 'switchChain') {
+        accountViewTitle = 'Switch Chain'
+        accountViewIcon = svg.chain(17)
+      } else if (req.type === 'addToken')  {
+        accountViewTitle = 'Add Token'
+        accountViewIcon = svg.tokens(17)
+      } else if (req.type === 'transaction')  {
+        accountViewTitle = 'Sign Transaction'
+        accountViewIcon = svg.broadcast(17)
+      }
+      return (
+        <AccountView 
+          back={() => this.setState({ view: '' })}
+          {...this.props}
+          accountViewTitle={accountViewTitle}
+          accountViewIcon={accountViewIcon}
+        >
+          {this.renderRequest(req, i)}
+        </AccountView>
+      )
+    } else if (view === 'expandedModule') {
+      return (
+        <AccountView {...props}>
+          <div 
+            className='accountsModuleExpand cardShow' 
+            style={{ pointerEvents: this.state.expandedModule ? 'auto' : 'none' }}
+            onMouseDown={() => this.setState({ expandedModule: false })}
+          >
+            <div className='moduleExpanded' onMouseDown={(e) => {
+              e.stopPropagation()
+            }}>
+              {this.renderModule(
+                this.state.expandedModule, 
+                { height: '100%' }, 
+                0, 
+                0, 
+                this.expandModule.bind(this), 
+                true,
+                this.state.expandedModuleData
+              )}
+            </div>
+          </div>
+        </AccountView>
+      )
+    } else {
+      return (
+        <AccountMain 
+          setAccountView={(view, data) => {
+            this.setState({ view, data })
+          }} 
+          {...this.props} 
+        />
+      )
+    }
+  }
+}
+
+
+const AccountBody = Restore.connect(_AccountBody)
 
 // 
 
@@ -987,7 +1109,7 @@ class Account extends React.Component {
     return (
       <div className='signerWrap' style={current ? { height: initial.height + 'px' } : {}} onMouseDown={() => this.closeAccounts()}>
         <div className={signerClass} style={style} ref={ref => { if (ref) this.signer = ref }}>
-          <div className='signerContainer' style={current ? { height: '100%' } : {}}>
+          <div className='signerContainer' style={current ? { height: 'calc(100% - 62px)' } : {}}>
             {this.store('view.clickGuard') ? <div className='clickGuard' /> : null}
             {!this.state.hideSignerStatus && open ? (
               <SignerStatus open={open} signer={signer} hideSignerStatus={this.hideSignerStatus.bind(this)} />
@@ -1016,36 +1138,20 @@ class Account extends React.Component {
               {/* {this.renderMenu()} */}
               {this.renderStatus()}
             </div>
-            {current ? <AccountMain id={this.props.id} addresses={this.props.addresses} minimized={minimized} status={this.props.status} signer={this.props.signer} /> : null}
-            {/* {current ? this.renderAccountList() : null} */}
-            {/* <div className={open ? 'accountMenu cardShow' : 'accountMenu cardHide'} >
-              <div className='accountMenuLeft'>
-                <div className='accountMenuItem'>{svg.checklist(20)}</div>
-                <div className='accountMenuItem'>{svg.inventory(20)}</div>
-              </div>
-              <div className='accountMenuRight'>
-                <div className='accountMenuItem'>{svg.gear(20)}</div>
-              </div>
-            </div>
-            <div className={current ? 'signerMid cardShow' : 'signerMid cardHide'} style={open ? { } : { pointerEvents: 'none' }}>
-              <Settings id={this.props.id} />
-              <Requests id={this.props.id} addresses={this.props.addresses} minimized={minimized} status={this.props.status} signer={this.props.signer} />
-            </div> */}
-            {/* <div className='signerBot' /> */}
+            {current ? (
+              <AccountBody
+                id={this.props.id} 
+                addresses={this.props.addresses} 
+                minimized={minimized} 
+                status={this.props.status} 
+                signer={this.props.signer} 
+              /> 
+            ) : null}
           </div>
         </div>
       </div>
     )
   }
 }
-
-// <div className='signerBot' style={open && this.props.signer && this.props.signer.status === 'locked' ? { height: '100px' } : {}}>
-//   {current ? (
-//     <div className='signerUnlock' style={open && this.props.signer && this.props.signer.status === 'locked' ? { opacity: 1 } : { pointerEvents: 'none' }}>
-//       <input className='signerUnlockInput' type='password' value={this.state.unlockInput} onChange={this.unlockChange.bind(this)} />
-//       <div className='signerUnlockSubmit' onMouseDown={this.unlockSubmit.bind(this)} >{'Unlock'}</div>
-//     </div>
-//   ) : null}
-// </div>
 
 export default Restore.connect(Account)

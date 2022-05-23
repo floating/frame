@@ -28,16 +28,20 @@ class TxRecipient extends React.Component {
     const currentSymbol = this.store('main.networks', this.props.chain.type, this.props.chain.id, 'symbol') || '?'
     return (
       <div className='_txMain'>
-        <div className='_txMainLabel'>Sending</div>
-        <div className='_txMainValues'>
-          <div className='_txMainValue'>
-            <span className='_txMainValueSymbol'>{currentSymbol}</span>
-            <span className='_txMainValueAmount'>{value}</span>
+        <div className='_txMainInner'>
+          <div className='_txLabel'>
+            Sending
           </div>
-          <div className='_txMainValue'>
-            <span className='_txMainValueEq'>{'≈'}</span>
-            <span className='_txMainValueEqSymbol'>{'$'}</span>
-            <span className='_txMainValueEqAmount'>{(value * etherUSD).toFixed(2)}</span>
+          <div className='_txMainValues'>
+            <div className='_txMainValue'>
+              <span className='_txMainValueSymbol'>{currentSymbol}</span>
+              <span className='_txMainValueAmount'>{value}</span>
+            </div>
+            <div className='_txMainValue'>
+              <span className='_txMainValueEq'>{'≈'}</span>
+              <span className='_txMainValueEqSymbol'>{'$'}</span>
+              <span className='_txMainValueEqAmount'>{(value * etherUSD).toFixed(2)}</span>
+            </div>
           </div>
         </div>
       </div>
