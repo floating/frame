@@ -610,7 +610,7 @@ export class Provider extends EventEmitter {
       const originId = payload._origin
       const origin = getPayloadOrigin(payload)
       if (origin.chain.id !== chainId) {
-        store.switchOriginChain(origin, chainId, origin.chain.type)
+        store.switchOriginChain(origin.chain.id, chainId, origin.chain.type)
       }
 
       return res({ id: payload.id, jsonrpc: '2.0', result: undefined })
