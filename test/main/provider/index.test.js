@@ -64,7 +64,7 @@ beforeEach(async () => {
 })
 
 describe('#send', () => {
-  const send = (request, cb = jest.fn()) => provider.send({ ...request, _origin: 'frame.test' }, cb)
+  const send = (request, cb = jest.fn()) => provider.send({ ...request, _origin: '8073729a-5e59-53b7-9e69-5d9bcff94087' }, cb)
 
   it('passes the given target chain to the connection', () => {
     connection.connections.ethereum[10] = { chainConfig: { hardfork: 'london', chainId: 10 }, primary: { connected: true } }
@@ -201,7 +201,7 @@ describe('#send', () => {
         params: [{
           chainId: '0x1',
         }],
-        _origin: 'frame.test'
+        _origin: '8073729a-5e59-53b7-9e69-5d9bcff94087'
       }, () => {
         expect(store.switchOriginChain).toHaveBeenCalledWith(42161, 1, 'ethereum')
         done()
@@ -214,7 +214,7 @@ describe('#send', () => {
         params: [{
           chainId: '0x1234'
         }],
-        _origin: 'frame.test'
+        _origin: '8073729a-5e59-53b7-9e69-5d9bcff94087'
       }, () => {
         try {
           expect(accountRequests).toHaveLength(0)
@@ -230,7 +230,7 @@ describe('#send', () => {
     it('returns all allowed permissions', done => {
       const request = {
         method: 'wallet_getPermissions',
-        _origin: 'frame.test'
+        _origin: '8073729a-5e59-53b7-9e69-5d9bcff94087'
       }
 
       send(request, response => {
@@ -273,7 +273,7 @@ describe('#send', () => {
           { eth_accounts: {} },
           { eth_signTransaction: {} }
         ],
-        _origin: 'frame.test'
+        _origin: '8073729a-5e59-53b7-9e69-5d9bcff94087'
       }
 
       send(request, response => {
@@ -311,7 +311,7 @@ describe('#send', () => {
             image: 'https://badgerdao.io/icon.jpg'
           }
         },
-        _origin: 'frame.test'
+        _origin: '8073729a-5e59-53b7-9e69-5d9bcff94087'
       }
     })
 
@@ -563,7 +563,7 @@ describe('#send', () => {
 
       if (chainId) payload.chainId = chainId
 
-      provider.send({ ...payload, _origin: 'frame.test' }, cb)
+      provider.send({ ...payload, _origin: '8073729a-5e59-53b7-9e69-5d9bcff94087' }, cb)
     }
 
     beforeEach(() => {
