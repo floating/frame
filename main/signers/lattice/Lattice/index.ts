@@ -1,11 +1,10 @@
-import { Client, Utils } from 'gridplus-sdk'
-import { padToEven, addHexPrefix } from 'ethereumjs-util'
+import { Client, Utils, Constants } from 'gridplus-sdk'
+import rlp from 'rlp'
+import { addHexPrefix } from 'ethereumjs-util'
 import { hexToNumber } from 'web3-utils'
 import log from 'electron-log'
-import crypto from 'crypto'
-
 import Signer from '../../Signer'
-import { sign, signerCompatibility, londonToLegacy, Signature } from '../../../transaction'
+import { sign, signerCompatibility, londonToLegacy } from '../../../transaction'
 import type { TransactionData } from '../../../transaction'
 import { TypedTransaction } from '@ethereumjs/tx'
 import { Derivation, getDerivationPath } from '../../Signer/derive'
@@ -84,7 +83,6 @@ export default class Lattice extends Signer {
       name: devicePermission(this.tag),
       baseUrl,
       privKey: privateKey,
-      skipRetryOnWrongWallet: false,
     })
 
     try {
@@ -179,7 +177,6 @@ export default class Lattice extends Signer {
         const req = {
           startPath: this.getPath(this.addresses.length),
           n: Math.min(addressLimit, this.accountLimit - this.addresses.length),
-          flag: 1,
         }
 
         const loadedAddresses = await connection.getAddresses(req)
@@ -268,13 +265,40 @@ export default class Lattice extends Signer {
       const connection = this.connection as Client
       const compatibility = signerCompatibility(rawTx, this.summary())
       const latticeTx = compatibility.compatible ? { ...rawTx } : londonToLegacy(rawTx)
+      const signerPath = this.getPath(index)
+      const fwVersion = connection.getFwVersion()
 
-      const signedTx: any = await sign(latticeTx, async tx => {
+      const signedTx = await sign(latticeTx, async tx => {
         const unsignedTx = this.createTransaction(index, rawTx.type, latticeTx.chainId, tx)
-        const signOpts = { currency: 'ETH', data: unsignedTx }
+        let signingOptions;
 
-        const result = await connection.sign(signOpts)
-        const sig = result?.sig
+        if (fwVersion && (fwVersion.major > 0 || fwVersion.minor >= 15)) {
+          // @ts-expect-error - Intentionally accessing private method
+          const payload = tx._type ?
+            tx.getMessageToSign(false) :
+            rlp.encode(tx.getMessageToSign(false))
+
+          const to =  tx.to?.toString() ?? undefined
+
+          const callDataDecoder = to 
+            ? await Utils.fetchCalldataDecoder(tx.data, to, unsignedTx.chainId) 
+            : undefined
+
+          const data = {
+            payload,
+            curveType: Constants.SIGNING.CURVES.SECP256K1,
+            hashType: Constants.SIGNING.HASHES.KECCAK256,
+            encodingType: Constants.SIGNING.ENCODINGS.EVM,
+            signerPath,
+            decoder: callDataDecoder?.def
+          };
+          signingOptions = { data, currency: unsignedTx.currency }
+        } else {
+          signingOptions = { currency: 'ETH', data: unsignedTx }
+        }
+
+        const signedTx = await connection.sign(signingOptions)
+        const sig = signedTx?.sig
 
         if (!sig) {
           throw new Error('Signing failed')
