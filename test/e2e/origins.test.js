@@ -15,15 +15,17 @@ afterEach(() => {
 })
 
 it('should be able to change the chain for a given origin', done => {
+  const chain = '0x4'
+
   frame.on('chainChanged', chainId => {
     try {
-      expect(chainId).toBe('0x4')
+      expect(chainId).toBe(chain)
       done()
     } catch (e) { done.fail(e) }
   })
   
   frame.request({
     method: 'wallet_switchEthereumChain',
-    params: [{ chainId: '0x4' }]
+    params: [{ chainId: chain }]
   })
 }, 30 * 1000)

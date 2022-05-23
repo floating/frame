@@ -36,7 +36,11 @@ export interface TransactionMetadata {
   approvals: RequiredApproval[]
 }
 
-const getOrigin = ({ _origin }: RPCRequestPayload) => store('main.origins', uuidv5(_origin, uuidv5.DNS)) as Origin
+const getOrigin = ({ _origin }: RPCRequestPayload) => storeApi.getOrigin(_origin)
+
+const storeApi = {
+  getOrigin: (id: string) => store('main.origins', id) as Origin
+}
 
 export class Provider extends EventEmitter {
   connected = false
@@ -592,10 +596,11 @@ export class Provider extends EventEmitter {
       const exists = Boolean(store('main.networks', 'ethereum', chainId))
       if (exists === false) throw new Error('Chain does not exist')
 
-      const origin = getOrigin(payload)
+      const originId = payload._origin
+      const origin = storeApi.getOrigin(originId)
 
       if (origin.chain.id !== chainId) {
-        store.switchOriginChain(origin, chainId, origin.chain.type)
+        store.switchOriginChain(originId, chainId, origin.chain.type)
       }
 
       return res({ id: payload.id, jsonrpc: '2.0', result: undefined })
@@ -806,7 +811,6 @@ store.observer(() => {
 
   for (const originId in currentOrigins) {
     const origin = currentOrigins[originId]
-
     if (knownOrigins[originId]?.chain.id !== origin.chain.id) {
       provider.chainChanged(origin.chain.id, originId)
       provider.networkChanged(origin.chain.id)

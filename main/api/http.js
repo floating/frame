@@ -107,6 +107,7 @@ const handler = (req, res) => {
 
 // Track subscriptions
 provider.on('data', (chain, payload) => {
+  return
   if (pollSubs[payload.params.subscription]) {
     const { id, origin } = pollSubs[payload.params.subscription]
     polls[id] = polls[id] || []
@@ -118,6 +119,7 @@ provider.on('data', (chain, payload) => {
 })
 
 provider.on('data:address', (account, payload) => { // Make sure the subscription has access based on current account
+  return
   if (pollSubs[payload.params.subscription]) {
     const { id, origin } = pollSubs[payload.params.subscription]
     const permissions = store('main.permissions', account) || {}
