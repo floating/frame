@@ -446,7 +446,7 @@ class TransactionRequest extends React.Component {
                         <div className='requestMetaOriginIcon'>
                           {svg.nested(10)}
                         </div>
-                        {req.origin.replace('https://', '')}
+                        {this.store('main.origins', this.props.req.origin, 'name')}
                       </div>
                     </div>
                     <div 

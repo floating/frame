@@ -64,7 +64,7 @@ class ChainRequest extends React.Component {
               )}
               <div className='requestChain scaleIn'>
                 <div className='requestChainInner'>
-                  <div className={originClass}>{this.props.req.origin}</div>
+                  <div className={originClass}>{this.store('main.origins', this.props.req.origin, 'name')}</div>
                   <div className={'requestChainOriginSub'}>{type === 'switchChain' ? 'wants to switch to chain' : 'wants to add chain'}</div>
                   <div className='requestChainName'>{type === 'switchChain' ? (
                     this.store('main.networks', chain.type, parseInt(chain.id), 'name')
