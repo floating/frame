@@ -182,8 +182,8 @@ class FrameAccount {
   }
 
   setAccess (req: AccessRequest, access: boolean) {
-    const { handlerId, origin, address } = req
-    if (address.toLowerCase() === this.address)  {
+    const { handlerId, origin, account } = req
+    if (account.toLowerCase() === this.address)  {
       // Permissions do no live inside the account summary
       const { name } = store('main.origins', origin)
       store.setPermission(this.address, { handlerId, origin: name, provider: access })
