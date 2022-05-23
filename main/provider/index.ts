@@ -47,7 +47,7 @@ export interface ProviderDataPayload {
 }
 
 const storeApi = {
-  getOrigin: (id: string) => store('main.origins', id) as Origin
+  getOrigin: (id: string) => store('main.origins', uuidv5(id, uuidv5.DNS)) as Origin
 }
 
 const getPayloadOrigin = ({ _origin }: RPCRequestPayload) => storeApi.getOrigin(_origin)
@@ -610,7 +610,7 @@ export class Provider extends EventEmitter {
       const originId = payload._origin
       const origin = getPayloadOrigin(payload)
       if (origin.chain.id !== chainId) {
-        store.switchOriginChain(originId, chainId, origin.chain.type)
+        store.switchOriginChain(origin, chainId, origin.chain.type)
       }
 
       return res({ id: payload.id, jsonrpc: '2.0', result: undefined })
