@@ -66,6 +66,7 @@ class TxFee extends React.Component {
             }}>
               <span className='_txFeeGweiValue'>{this.toDisplayGwei(maxFeePerGas)}</span>
               <span className='_txFeeGweiLabel'>Gwei</span>
+            </div>
             {this.toDisplayUSD(maxFeeUSD) === '0.00' ? (
               <div className='_txFeeValue'>
                 <div className='_txFeeValueDefaultWarn'>
