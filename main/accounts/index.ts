@@ -3,7 +3,6 @@ import log from 'electron-log'
 import { shell, Notification } from 'electron'
 import { addHexPrefix, intToHex} from 'ethereumjs-util'
 import { TypedData, Version } from 'eth-sig-util'
-import { v5 as uuidv5 } from 'uuid'
 
 import store from '../store'
 import ExternalDataScanner, { DataScanner } from '../externalData'
@@ -11,6 +10,7 @@ import { getType as getSignerType } from '../signers/Signer'
 import FrameAccount from './Account'
 import { usesBaseFee, signerCompatibility, maxFee, TransactionData, SignerCompatibility } from '../transaction'
 import { weiIntToEthInt, hexToInt } from '../../resources/utils'
+import { getOriginId } from '../api/origins'
 import provider from '../provider'
 import { Chain } from '../chains'
 import { ApprovalType } from '../../resources/constants'
@@ -27,7 +27,7 @@ function notify (title: string, body: string, action: (event: Electron.Event) =>
   setTimeout(() => notification.show(), 1000)
 }
 
-const frameOriginId = uuidv5('frame.eth', uuidv5.DNS)
+const frameOriginId = getOriginId('frame.eth')
 
 const accountsApi = {
   getAccounts: function () {
