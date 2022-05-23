@@ -12,8 +12,8 @@ import protectedMethods from './protectedMethods'
 const logTraffic = process.env.LOG_TRAFFIC
 
 interface PendingRequest {
-  send?: any,
-  timer?: NodeJS.Timeout
+  send: () => void,
+  timer: NodeJS.Timeout
 }
 
 interface Subscription {
@@ -86,17 +86,18 @@ const handler = (req: IncomingMessage, res: ServerResponse) => {
               clearTimeout(cleanupTimers[id])
               cleanupTimers[id] = setTimeout(cleanup.bind(null, id), 20 * 1000)
             } else {
-              pending[id] = {}
-              pending[id].send = () => {
-                const pendingRequest = pending[id]
-                if (pendingRequest && pendingRequest.timer) {
-                  clearTimeout(pendingRequest.timer)
-                }
-              
-                delete pending[id]
-                send(true)
+              pending[id] = { 
+                send: () => {
+                  const pendingRequest = pending[id]
+                  if (pendingRequest && pendingRequest.timer) {
+                    clearTimeout(pendingRequest.timer)
+                  }
+                
+                  delete pending[id]
+                  send(true)
+                },
+                timer: setTimeout(pending[id].send, 15 * 1000)
               }
-              pending[id].timer = setTimeout(pending[id].send, 15 * 1000)
             }
           }
           if (typeof id === 'string') return send(false)
@@ -133,7 +134,7 @@ provider.on('data', (payload: ProviderDataPayload) => {
     polls[id].push(JSON.stringify(payload))
 
     if (pending[id] && (!payload.params.origin || payload.params.origin === origin)) {
-      pending[id].send(JSON.stringify(payload))
+      pending[id].send()
     }
   }
 })
