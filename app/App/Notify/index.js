@@ -163,10 +163,10 @@ class Notify extends React.Component {
         <div className='notifyBoxSlide'>
           <div className='notifyBox'>
             <div className='notifyFrameIcon'>
-              <img src={frameIcon} />
+              {svg.aragon(72)}
             </div>
             <div className='notifyTitle'>
-              Frame v0.5-beta
+              Notice for Aragon Accounts
             </div>
             <div className='notifyBody'>
               <div className='notifyBodyBlock notifyBodyBlockBig'>
