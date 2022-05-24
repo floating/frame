@@ -48,7 +48,8 @@ class Notify extends React.Component {
     )
   }
 
-  updateOriginChain (origin) {
+  updateOriginChain (data) {
+    const { origin } = data
     return (
       <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
         <div className='notifyBoxSlide'>
@@ -67,6 +68,7 @@ class Notify extends React.Component {
                   return (
                     <div className='originSwapChainListItem' onClick={() => {
                       link.send('tray:action', 'switchOriginChain', origin.id, parseInt(id), 'ethereum')
+                      link.send('tray:action', 'backDash')
                     }}>
                       {this.store('main.networks.ethereum', id, 'name')}
                     </div>
