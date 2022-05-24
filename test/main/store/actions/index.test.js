@@ -534,9 +534,9 @@ describe('#switchOriginChain', () => {
   const switchChain = (chainId, type) => switchOriginChainAction(updaterFn, '91f6971d-ba85-52d7-a27e-6af206eb2433', chainId, type)
 
   it('should switch the chain for an origin', () => {
-    switchChain(50, 'cosmos')
+    switchChain(50, 'ethereum')
 
-    expect(origins['91f6971d-ba85-52d7-a27e-6af206eb2433'].chain).toStrictEqual({ id: 50, type: 'cosmos' })
+    expect(origins['91f6971d-ba85-52d7-a27e-6af206eb2433'].chain).toStrictEqual({ id: 50, type: 'ethereum' })
   })
 })
 
