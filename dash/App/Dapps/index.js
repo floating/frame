@@ -103,11 +103,8 @@ class Dapps extends React.Component {
     const enabledNetworks = Object.values(this.store('main.networks.ethereum')).filter(network => network.on)
     const networkOrigins = enabledNetworks.map((network) => {
       const origins = Object.entries(allOrigins)
-        .map(([id, origin]) => {
-          origin.id = id
-          return origin
-        })
-        .filter(([id, origin]) => origin.chain.id === network.id)
+        .map(([id, origin]) => ({ id, ...origin }))
+        .filter((origin) => origin.chain.id === network.id)
       return { network, origins }
     })
 
