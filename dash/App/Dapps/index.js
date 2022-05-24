@@ -91,12 +91,11 @@ class _OriginModule extends React.Component {
 
 const OriginModule = Restore.connect(_OriginModule)
 
-const NetworkOrigins = ({ network, origins }) => {
-  return <>
+const NetworkOrigins = ({ network, origins }) => 
+  <>
     <div className='originTitle'>{network.name}</div>
     {origins.map((origin) => <OriginModule origin={origin} />)}
   </>
-}
 
 class Dapps extends React.Component {
   render () {
