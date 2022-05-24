@@ -101,16 +101,14 @@ class Dapps extends React.Component {
   render () {
     const allOrigins = this.store('main.origins')
     const enabledNetworks = Object.values(this.store('main.networks.ethereum')).filter(network => network.on)
-    const networkOrigins = {}
-
-    enabledNetworks.forEach((network) => {
+    const networkOrigins = enabledNetworks.map((network) => {
       const origins = Object.values(allOrigins).filter((origin) => origin.chain.id === network.id)
-      networkOrigins[network.id] = { network, origins }
+      return { network, origins }
     })
 
     return (
       <div>
-        {Object.values(networkOrigins).map(({ network, origins }) => origins.length === 0 ? <></> : <NetworkOrigins network={network} origins={origins} />)}
+        {networkOrigins.map(({ network, origins }) => origins.length === 0 ? <></> : <NetworkOrigins network={network} origins={origins} />)}
       </div>
     ) 
   }
