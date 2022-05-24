@@ -5,9 +5,10 @@ import provider, { ProviderDataPayload } from '../provider'
 import accounts from '../accounts'
 import store from '../store'
 
-import { updateOrigin, isTrusted } from './origins'
+import { updateOrigin } from './origins'
 import validPayload from './validPayload'
 import protectedMethods from './protectedMethods'
+import { isTrusted } from './permissions'
 
 const logTraffic = process.env.LOG_TRAFFIC
 
