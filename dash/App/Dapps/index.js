@@ -59,14 +59,14 @@ class _OriginModule extends React.Component {
     }
   }
   render () {
-    const { id, origin } = this.props
+    const { origin } = this.props
     const { active } = this.state
     return (
       <div>      
         <div 
           className='sliceOrigin'
           onClick={() => {
-            link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'updateOriginChain', notifyData: { origin: { id, ...origin } } }})
+            link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'updateOriginChain', notifyData: { origin } }})
           }}
         >
           <div className={active ? 'sliceOriginIndicator sliceOriginIndicatorActive' : 'sliceOriginIndicator' } />
@@ -90,31 +90,30 @@ class _OriginModule extends React.Component {
 
 const OriginModule = Restore.connect(_OriginModule)
 
+const NetworkOrigins = ({ network, origins }) => (
+  <>
+    <div className='originTitle'>{network.name}</div>
+    {origins.map((origin) => <OriginModule origin={origin} />)}
+  </>
+)
+  
 class Dapps extends React.Component {
   render () {
+    const allOrigins = this.store('main.origins')
+    const enabledNetworks = Object.values(this.store('main.networks.ethereum')).filter(network => network.on)
+    const networkOrigins = enabledNetworks.map((network) => {
+      const origins = Object.entries(allOrigins)
+        .map(([id, origin]) => {
+          origin.id = id
+          return origin
+        })
+        .filter(([id, origin]) => origin.chain.id === network.id)
+      return { network, origins }
+    })
+
     return (
       <div>
-        {Object.entries(this.store('main.origins')).map(([id, origin]) => {
-          return (
-            <OriginModule id={id} origin={origin} />
-          )
-        })}
-        <div className='originTitle'>{'Mainnet'}</div>
-        <OriginModule origin={'send.frame.eth'} />
-        <OriginModule origin={'uniswap.io'} />
-        <OriginModule origin={'app.aave.eth'} />
-        <div className='originTitle'>{'Optimism'}</div>
-        <OriginModule origin={'send.frame.eth'} />
-        <OriginModule origin={'uniswap.io'} />
-        <OriginModule origin={'app.aave.eth'} />
-        <div className='originTitle'>{'Polygon'}</div>
-        <OriginModule origin={'send.frame.eth'} />
-        <OriginModule origin={'uniswap.io'} />
-        <OriginModule origin={'app.aave.eth'} />
-        {/* <div className='originTitle'>{'Not Connected'}</div>
-        <OriginModule origin={'send.frame.eth'} />
-        <OriginModule origin={'uniswap.io'} />
-        <OriginModule origin={'app.aave.eth'} /> */}
+        {networkOrigins.map(({ network, origins }) => origins.length === 0 ? <></> : <NetworkOrigins network={network} origins={origins} />)}
       </div>
     ) 
   }
