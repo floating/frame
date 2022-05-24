@@ -72,7 +72,7 @@ class _OriginModule extends React.Component {
         >
           <div className={active ? 'sliceOriginIndicator sliceOriginIndicatorActive' : 'sliceOriginIndicator' } />
           <div className='sliceOriginTile'> 
-            {origin}
+            {origin.name}
           </div>
           <div className='sliceOriginReqs'> 
             <div className='sliceOriginReqsNumber'>{this.state.reqsAverage}</div>
@@ -91,26 +91,27 @@ class _OriginModule extends React.Component {
 
 const OriginModule = Restore.connect(_OriginModule)
 
+const NetworkOrigins = ({ network, origins }) => {
+  return <>
+    <div className='originTitle'>{network.name}</div>
+    {origins.map((origin) => <OriginModule origin={origin} />)}
+  </>
+}
+
 class Dapps extends React.Component {
   render () {
+    const allOrigins = this.store('main.origins')
+    const enabledNetworks = Object.entries(this.store('main.networks.ethereum')).filter(([[networkId]]) => this.store('main.networks.ethereum', networkId, 'on'))
+    const networkOrigins = {}
+
+    enabledNetworks.forEach(([networkId, network]) => {
+      const origins = Object.values(allOrigins).filter((origin) => origin.chain.id === network.id)
+      networkOrigins[networkId] = { network, origins }
+    })
+
     return (
       <div>
-        <div className='originTitle'>{'Mainnet'}</div>
-        <OriginModule origin={'send.frame.eth'} />
-        <OriginModule origin={'uniswap.io'} />
-        <OriginModule origin={'app.aave.eth'} />
-        <div className='originTitle'>{'Optimism'}</div>
-        <OriginModule origin={'send.frame.eth'} />
-        <OriginModule origin={'uniswap.io'} />
-        <OriginModule origin={'app.aave.eth'} />
-        <div className='originTitle'>{'Polygon'}</div>
-        <OriginModule origin={'send.frame.eth'} />
-        <OriginModule origin={'uniswap.io'} />
-        <OriginModule origin={'app.aave.eth'} />
-        {/* <div className='originTitle'>{'Not Connected'}</div>
-        <OriginModule origin={'send.frame.eth'} />
-        <OriginModule origin={'uniswap.io'} />
-        <OriginModule origin={'app.aave.eth'} /> */}
+        {Object.values(networkOrigins).map(({ network, origins }) => origins.length === 0 ? <></> : <NetworkOrigins network={network} origins={origins} />)}
       </div>
     ) 
   }
