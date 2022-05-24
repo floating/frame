@@ -7,6 +7,17 @@ import accounts, { AccessRequest } from '../accounts'
 import store from '../store'
 
 const dev = process.env.NODE_ENV === 'development'
+const originDomainRegex = /^(?:.+(?::\/\/))?(?<origin>.*)/
+
+function parseOrigin (origin: string) {
+  const m = origin.match(originDomainRegex)
+  if (!m) {
+    log.warn(`could not parse origin: ${origin}`)
+    return
+  }
+
+  return (m.groups || {}).origin
+}
 
 function invalidOrigin (origin: string) {
   return origin !== origin.replace(/[^0-9a-z/:.[\]-]/gi, '')
@@ -30,7 +41,9 @@ function addPermissionRequest (address: Address, origin: string) {
   })
 }
 
-export function updateOrigin (payload: JSONRPCRequestPayload, originName?: string, connectionMessage = false): RPCRequestPayload {
+export function updateOrigin (payload: JSONRPCRequestPayload, origin?: string, connectionMessage = false): RPCRequestPayload {
+  const originName = origin ? parseOrigin(origin) : ''
+
   if (!originName) {
     log.warn(`Received payload with no origin: ${JSON.stringify(payload)}`)
     return { ...payload, chainId: payload.chainId || '0x1', _origin: 'Unknown' }
