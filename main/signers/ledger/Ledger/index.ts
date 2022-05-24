@@ -1,10 +1,9 @@
 import log from 'electron-log'
-import { v5 as uuid } from 'uuid'
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-noevents'
 import { TypedData } from 'eth-sig-util'
 
 import { Request, RequestQueue } from './requestQueue'
-import Signer from '../../Signer'
+import Signer, { getSignerId } from '../../Signer'
 import LedgerEthereumApp from './eth'
 import { Derivation, getDerivationPath } from '../../Signer/derive'
 import { signerCompatibility, londonToLegacy, TransactionData } from '../../../transaction'
@@ -68,6 +67,10 @@ function getStatusForError (err: DeviceError) {
   return Status.NEEDS_RECONNECTION
 }
 
+type LedgerDevice = {
+  signer: Ledger
+}
+
 export default class Ledger extends Signer {
   private eth: LedgerEthereumApp | undefined;
 
@@ -87,7 +90,7 @@ export default class Ledger extends Signer {
 
     this.devicePath = devicePath
 
-    this.id = uuid('Ledger' + this.devicePath, ns)
+    this.id = getSignerId<LedgerDevice>('Ledger', this.devicePath, ns)
     this.type = 'ledger'
     this.model = model
     this.status = Status.INITIAL

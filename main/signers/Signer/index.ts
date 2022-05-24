@@ -1,5 +1,6 @@
 import log from 'electron-log'
 import EventEmitter from 'stream'
+import { v5 as uuidv5 } from 'uuid'
 
 import { TransactionData } from '../../transaction'
 import { deriveHDAccounts } from './derive'
@@ -34,6 +35,10 @@ export enum Type {
 
 export function getType (typeValue: string) {
   return Object.values(Type).find(type => type === typeValue)
+}
+
+export function getSignerId<T extends OptionalRecord>(signerName: string, deviceId: string, namespace: string) {
+  return uuidv5(`${signerName}${deviceId}`, namespace) as UUID<T>
 }
 
 export default class Signer extends EventEmitter {

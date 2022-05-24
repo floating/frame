@@ -3,10 +3,9 @@ import utils from 'web3-utils'
 import { padToEven, stripHexPrefix, addHexPrefix } from 'ethereumjs-util'
 import { TypedData, TypedDataUtils } from 'eth-sig-util'
 import { Device as TrezorDevice } from 'trezor-connect'
-import { v5 as uuid } from 'uuid'
 import { TypedTransaction } from '@ethereumjs/tx'
 
-import Signer from '../../Signer'
+import Signer, { getSignerId } from '../../Signer'
 import flex from '../../../flex'
 import { sign, londonToLegacy, signerCompatibility, TransactionData, Signature } from '../../../transaction'
 import { Derivation, getDerivationPath } from '../../Signer/derive'
@@ -80,7 +79,7 @@ export default class Trezor extends Signer {
   }
 
   private getId () {
-    return uuid('Trezor' + this.device.path, ns)
+    return getSignerId<TrezorDevice>('Trezor', this.device.path, ns)
   }
 
   private getPath (index: number) {
