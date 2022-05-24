@@ -100,12 +100,12 @@ const NetworkOrigins = ({ network, origins }) =>
 class Dapps extends React.Component {
   render () {
     const allOrigins = this.store('main.origins')
-    const enabledNetworks = Object.entries(this.store('main.networks.ethereum')).filter(([[networkId]]) => this.store('main.networks.ethereum', networkId, 'on'))
+    const enabledNetworks = Object.values(this.store('main.networks.ethereum')).filter((network) => this.store('main.networks.ethereum', network.id, 'on'))
     const networkOrigins = {}
 
-    enabledNetworks.forEach(([networkId, network]) => {
+    enabledNetworks.forEach((network) => {
       const origins = Object.values(allOrigins).filter((origin) => origin.chain.id === network.id)
-      networkOrigins[networkId] = { network, origins }
+      networkOrigins[network.id] = { network, origins }
     })
 
     return (
