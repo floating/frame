@@ -61,7 +61,6 @@ class _OriginModule extends React.Component {
   render () {
     const { origin } = this.props
     const { active } = this.state
-
     return (
       <div>      
         <div 
@@ -72,7 +71,7 @@ class _OriginModule extends React.Component {
         >
           <div className={active ? 'sliceOriginIndicator sliceOriginIndicatorActive' : 'sliceOriginIndicator' } />
           <div className='sliceOriginTile'> 
-            {origin}
+            {origin.name}
           </div>
           <div className='sliceOriginReqs'> 
             <div className='sliceOriginReqsNumber'>{this.state.reqsAverage}</div>
@@ -91,26 +90,27 @@ class _OriginModule extends React.Component {
 
 const OriginModule = Restore.connect(_OriginModule)
 
+const ChainOrigins = ({ chain, origins }) => (
+  <>
+    <div className='originTitle'>{chain.name}</div>
+    {origins.map((origin) => <OriginModule origin={origin} />)}
+  </>
+)
+  
 class Dapps extends React.Component {
   render () {
+    const allOrigins = this.store('main.origins')
+    const enabledChains = Object.values(this.store('main.networks.ethereum')).filter(chain => chain.on)
+    const chainOrigins = enabledChains.map((chain) => {
+      const origins = Object.entries(allOrigins)
+        .map(([id, origin]) => ({ id, ...origin }))
+        .filter((origin) => origin.chain.id === chain.id)
+      return { chain, origins }
+    })
+
     return (
       <div>
-        <div className='originTitle'>{'Mainnet'}</div>
-        <OriginModule origin={'send.frame.eth'} />
-        <OriginModule origin={'uniswap.io'} />
-        <OriginModule origin={'app.aave.eth'} />
-        <div className='originTitle'>{'Optimism'}</div>
-        <OriginModule origin={'send.frame.eth'} />
-        <OriginModule origin={'uniswap.io'} />
-        <OriginModule origin={'app.aave.eth'} />
-        <div className='originTitle'>{'Polygon'}</div>
-        <OriginModule origin={'send.frame.eth'} />
-        <OriginModule origin={'uniswap.io'} />
-        <OriginModule origin={'app.aave.eth'} />
-        {/* <div className='originTitle'>{'Not Connected'}</div>
-        <OriginModule origin={'send.frame.eth'} />
-        <OriginModule origin={'uniswap.io'} />
-        <OriginModule origin={'app.aave.eth'} /> */}
+        {chainOrigins.map(({ chain, origins }) => origins.length === 0 ? <></> : <ChainOrigins chain={chain} origins={origins} />)}
       </div>
     ) 
   }

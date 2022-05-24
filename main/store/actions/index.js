@@ -399,7 +399,9 @@ module.exports = {
     u('main.origins', origins => ({ ...origins, [originId]: origin }))
   },
   switchOriginChain: (u, originId, chainId, type) => {
-    u('main.origins', originId, origin => ({ ...origin, chain: { id: chainId, type } }))
+    if (originId && typeof chainId === 'number' && type === 'ethereum') {
+      u('main.origins', originId, origin => ({ ...origin, chain: { id: chainId, type } }))
+    }
   },
   expandDock: (u, expand) => {
     u('dock.expand', (s) => expand)
