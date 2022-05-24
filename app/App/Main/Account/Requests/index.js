@@ -123,11 +123,6 @@ class Requests extends React.Component {
           </div>
         </div>
         <div className='requestItemIcon' />
-        {/* <div className='requestItemMain'>
-          <div className='requestItemTitle'>
-            {title}
-          </div>
-        </div> */}
         {/* <pre>{JSON.stringify(req, null, 2)}</pre> */}
       </div>
     )
