@@ -3,7 +3,6 @@ import { IncomingMessage } from 'http'
 import queryString from 'query-string'
 import log from 'electron-log'
 
-import accounts, { AccessRequest } from '../accounts'
 import store from '../store'
 
 const dev = process.env.NODE_ENV === 'development'
