@@ -1,7 +1,8 @@
-const { v4: generateUuid, v5: uuidv5 } = require('uuid')
+const { v4: generateUuid } = require('uuid')
 
 const persist = require('../persist')
 const migrations = require('../migrations')
+const { getOriginId } = require('../../api/origins')
 
 const latestStateVersion = () => {
   const state = persist.get('main')
@@ -545,7 +546,7 @@ const initial = {
 Object.keys(initial.main.accounts).forEach(id => {
   // Remove permissions granted to unknown origins
   const permissions = initial.main.permissions[id]
-  if (permissions) delete permissions[uuidv5('Unknown', uuidv5.DNS)]
+  if (permissions) delete permissions[getOriginId('Unknown')]
 
   // remote lastUpdated timestamp from balances
   initial.main.accounts[id].balances = { lastUpdated: undefined }
