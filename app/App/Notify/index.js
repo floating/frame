@@ -157,6 +157,47 @@ class Notify extends React.Component {
     )
   }
 
+  aragonMigrationWarning () {
+    return (
+      <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
+        <div className='notifyBoxSlide'>
+          <div className='notifyBox'>
+            <div className='notifyFrameIcon'>
+              <img src={frameIcon} />
+            </div>
+            <div className='notifyTitle'>
+              Frame v0.5-beta
+            </div>
+            <div className='notifyBody'>
+              <div className='notifyBodyBlock notifyBodyBlockBig'>
+                Due to a change in the way Frame handles chains in v0.5.0-beta.19, Aragon accounts now need to specify the chain on which they operate.
+              </div>
+              <div className='notifyBodyBlock'>
+                Starting with this version, any previously existing Aragon accounts will be automatically switched to use Ethereum mainnet.
+              </div>
+              <div className='notifyBodyBlock'>
+                If this is not the correct chain for your Aragon account, please remove the account and add it again with the correct chain.
+              </div>
+              <div className='notifyBodyBlock'>
+                You can always verify the chain for your Aragon account under "Account Settings" inside the account.
+              </div>
+            </div>
+            <div className='notifyInput'>
+              <div
+                className='notifyInputOption notifyInputSingleButton' onMouseDown={() => {
+                  link.send('tray:action', 'muteAragonAccountMigrationWarning')
+                  this.store.notify()
+                }}
+              >
+                <div className='notifyInputOptionText notifyBetaGo'>OK!</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   // rinkeby () {
   //   return (
   //     <div className='notifyBoxWrap' style={this.store('view.notify') === 'rinkeby' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
@@ -580,6 +621,12 @@ class Notify extends React.Component {
       return (
         <div className='notify cardShow'>
           {this.betaDisclosure()}
+        </div>
+      )
+    } else if (notify === 'aragonAccountMigrationWarning') {
+      return (
+        <div className='notify cardShow'>
+          {this.aragonMigrationWarning()}
         </div>
       )
     } else if (notify === 'nonceWarning') {

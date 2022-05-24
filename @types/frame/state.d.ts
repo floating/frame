@@ -147,11 +147,22 @@ interface Account {
   address: Address,
   status: AccountStatus,
   signer: string,
-  smart?: any,
+  smart?: SmartAccount,
   requests: Record<string, any>,
   ensName: string,
   created: string,
   balances: {
     lastUpdated?: number
   }
+}
+
+interface SmartAccount {
+  name: string,
+  chain: Chain,
+  type: string,
+  actor: any, // TODO: is this an address or an object?
+  agent: Address,
+  ens: string,
+  apps: any,
+  dao: any
 }

@@ -27,17 +27,6 @@ const storeApi = {
   }
 }
 
-interface SmartAccount {
-  name: string,
-  chain: Chain,
-  type: string,
-  actor: Address,
-  agent: Address,
-  ens: string,
-  apps: any,
-  dao: any,
-}
-
 interface SignerOptions {
   type?: string
 }

@@ -536,6 +536,10 @@ module.exports = {
     u('main.mute.betaDisclosure', () => true)
     u('dash.showing', () => true)
   },
+  muteAragonAccountMigrationWarning: (u) => {
+    u('main.mute.aragonAccountMigrationWarning', () => true)
+    u('dash.showing', () => true)
+  },
   // Dapp Frame
   appDapp: (u, dapp) => {
     u('main.dapps', dapps => {
