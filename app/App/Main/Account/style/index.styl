@@ -200,7 +200,8 @@
       display flex
       justify-content center
       align-items center
-      font-size 13px
+      font-size 12px
+      font-weight 600
       pointer-events none
       z-index 8
 
@@ -1648,11 +1649,11 @@
     bottom 0px
     border-radius 0px
     background transparent
-    overflow-y scroll
-    overflow-x hidden
     box-shadow none
+    // overflow-y scroll
+    // overflow-x hidden
+    // box-shadow none
     transform translate3d(0, 0, 0)
-    // background blue
 
 .signerVerifyText
   font-size 15px
@@ -1704,17 +1705,17 @@
   width 100%
   height 40px
   background var(--ghostB)
-  border-radius 8px
+  border-radius 12px
   color var(--outerspace)
   display flex
   justify-content center
   align-items center
   font-weight 400
-  font-size 13px
+  font-size 12px
   cursor pointer
   box-sizing border-box
   text-transform uppercase
-  box-shadow 0px 2px 2px var(--ghostA)
+  box-shadow 0px 1px 2px var(--ghostZ)
   
   svg
     position relative
@@ -1726,8 +1727,8 @@
     pointer-events none
 
 .moduleButton:hover
-  background var(--ghostD)
-  box-shadow 0px 4px 6px var(--ghostA)
+  background var(--ghostC)
+  box-shadow 0px 2px 4px var(--ghostZ)
 
 .moduleButtonBad
   color var(--bad)
@@ -1746,7 +1747,7 @@
 @import '../Balances/style'
 @import '../Gas/style'
 @import '../Inventory/style'
-// @import '../Settings/style'
+@import '../Permissions/style'
 @import '../Requests/style'
 @import '../Launcher/style'
 @import '../SignerStatus/style'

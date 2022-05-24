@@ -399,7 +399,7 @@ class _AccountBody extends React.Component {
         accountViewIcon = svg.sign(17)
       } else if (req.type === 'addChain') { 
         accountViewTitle = 'Add Chain'
-        accountViewIcon = svg.chsin(17)
+        accountViewIcon = svg.chain(17)
       } else if (req.type === 'switchChain') {
         accountViewTitle = 'Switch Chain'
         accountViewIcon = svg.chain(17)

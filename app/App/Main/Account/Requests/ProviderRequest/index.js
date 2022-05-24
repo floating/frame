@@ -49,7 +49,7 @@ class ProviderRequest extends React.Component {
             <div className='approveTransactionPayload'>
               <div className='requestProvider'>
                 <div className={originClass}>
-                  {origin}
+                  {originName}
                 </div>
                 <div className='requestProviderSub'>
                   wants to connect

@@ -245,18 +245,7 @@ class TransactionRequest extends React.Component {
     }
 
     const showWarning = !status && mode !== 'monitor'
-    const requiredApproval = showWarning && (
-      otherChain 
-        ? { 
-          type: ApprovalType.OtherChainApproval,
-          data: {
-            message: 'transaction is not on currently selected chain',
-            title: 'chain warning'
-          }
-        }
-        : (req.approvals || []).filter(a => !a.approved)[0]
-    )
-
+    const requiredApproval = showWarning && (req.approvals || []).filter(a => !a.approved)[0]
     return (
       <div key={req.handlerId} className={requestClass}>
         <TxOverlay {...this.props} overlay={this.state.overlayMode} overlayMode={this.overlayMode.bind(this)}/>
