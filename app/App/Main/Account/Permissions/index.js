@@ -75,7 +75,7 @@ class Balances extends React.Component {
             })
           )}
           {this.props.expanded ? (
-            <div className='quitFrame'>
+            <div className='clearPermissionsButton'>
               <div onClick={() => {
                 link.send('tray:action', 'clearPermissions', this.props.id)
               }} className='moduleButton'>Clear All Permissions</div>

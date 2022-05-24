@@ -95,29 +95,39 @@ class Requests extends React.Component {
           this.props.setAccountView('requestView', { req, i })
         }}
       >
-        <div className='requestItemIcon'>
-          <div className='requestItemIconFrame'>
+        <div className='requestItemRow requestItemRowHeader'>
+          <div className='requestItemRowIconLarge'>
             {icon}
           </div>
+          <div className='requestItemRowTitleLarge'>
+            {title}
+          </div>
+          <div className='requestItemTime'>
+            {'22m ago'}
+          </div>
         </div>
-        <div className='requestItemTime'>
-          {'22m ago'}
+        <div className='requestItemRow'>
+        <div className='requestItemRowIcon'>
+            {svg.nested(12)}
+          </div>
+          <div className='requestItemRowTitle'>
+            {this.store('main.origins', req.origin, 'name')}
+          </div>
         </div>
-        <div className='requestItemStatus'>
-          {'pending'}
+        <div className='requestItemRow'>
+          <div className='requestItemRowIcon'>
+            {svg.chain(12)}
+          </div>
+          <div className='requestItemRowTitle'>
+            {'pending'}
+          </div>
         </div>
-        <div className='requestItemOrigin'>
-          {/* <div className='requestItemOriginIcon'>
-            {svg.nested(10)}
-          </div> */}
-          
-          {this.store('main.origins', req.origin, 'name')}
-        </div>
-        <div className='requestItemMain'>
+        <div className='requestItemIcon' />
+        {/* <div className='requestItemMain'>
           <div className='requestItemTitle'>
             {title}
           </div>
-        </div>
+        </div> */}
         {/* <pre>{JSON.stringify(req, null, 2)}</pre> */}
       </div>
     )

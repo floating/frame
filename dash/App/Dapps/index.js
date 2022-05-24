@@ -61,7 +61,6 @@ class _OriginModule extends React.Component {
   render () {
     const { origin } = this.props
     const { active } = this.state
-
     return (
       <div>      
         <div 
@@ -91,18 +90,24 @@ class _OriginModule extends React.Component {
 
 const OriginModule = Restore.connect(_OriginModule)
 
-const NetworkOrigins = ({ network, origins }) => 
+const NetworkOrigins = ({ network, origins }) => (
   <>
     <div className='originTitle'>{network.name}</div>
     {origins.map((origin) => <OriginModule origin={origin} />)}
   </>
-
+)
+  
 class Dapps extends React.Component {
   render () {
     const allOrigins = this.store('main.origins')
     const enabledNetworks = Object.values(this.store('main.networks.ethereum')).filter(network => network.on)
     const networkOrigins = enabledNetworks.map((network) => {
-      const origins = Object.values(allOrigins).filter((origin) => origin.chain.id === network.id)
+      const origins = Object.entries(allOrigins)
+        .map(([id, origin]) => {
+          origin.id = id
+          return origin
+        })
+        .filter(([id, origin]) => origin.chain.id === network.id)
       return { network, origins }
     })
 

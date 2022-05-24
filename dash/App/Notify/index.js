@@ -48,7 +48,7 @@ class Notify extends React.Component {
     )
   }
 
-  updateOriginChain ({ origin = 'Unknown' }) {
+  updateOriginChain ({ origin = { name: 'Unknown' } }) {
     return (
       <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
         <div className='notifyBoxSlide'>
@@ -58,7 +58,7 @@ class Notify extends React.Component {
                 Switch chain for:
               </div>
               <div className='originSwapOrigin'>
-                {origin}
+                {origin.name}
               </div>
               <div className='originSwapChainList'>
                 {Object.keys(this.store('main.networks.ethereum')).filter(id => {
@@ -66,7 +66,7 @@ class Notify extends React.Component {
                 }).map(id => {
                   return (
                     <div className='originSwapChainListItem' onClick={() => {
-                      alert('Set the chain for this origin and close notify dialog')
+                      link.send('tray:action', 'switchOriginChain', origin.id, parseInt(id), 'ethereum')
                     }}>
                       {this.store('main.networks.ethereum', id, 'name')}
                     </div>
