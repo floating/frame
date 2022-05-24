@@ -48,7 +48,7 @@ class Notify extends React.Component {
     )
   }
 
-  updateOriginChain ({ origin = { name: 'Unknown' } }) {
+  updateOriginChain (origin) {
     return (
       <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
         <div className='notifyBoxSlide'>
@@ -72,25 +72,8 @@ class Notify extends React.Component {
                     </div>
                   )
                 })}
-                {/* <div 
-                  className='notifyBodyLink' 
-                  style={{marginTop: '20px'}}
-                  onMouseDown={() => { link.send('tray:openExternal', 'https://frame.canny.io') }}
-                >
-                  feedback.frame.sh
-                </div> */}
               </div>
             </div>
-            {/* <div className='notifyInput'>
-              <div
-                className='notifyInputOption notifyInputSingleButton' onMouseDown={() => {
-                  // link.send('tray:action', 'muteBetaDisclosure')
-                  link.send('tray:action', 'backDash')
-                }}
-              >
-                <div className='notifyInputOptionText notifyBetaGo'>Update Chain</div>
-              </div>
-            </div> */}
           </div>
         </div>
       </div>
