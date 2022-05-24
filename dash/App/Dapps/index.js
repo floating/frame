@@ -59,20 +59,19 @@ class _OriginModule extends React.Component {
     }
   }
   render () {
-    const { origin } = this.props
+    const { id, origin } = this.props
     const { active } = this.state
-
     return (
       <div>      
         <div 
           className='sliceOrigin'
           onClick={() => {
-            link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'updateOriginChain', notifyData: { origin } }})
+            link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'updateOriginChain', notifyData: { origin: { id, ...origin } } }})
           }}
         >
           <div className={active ? 'sliceOriginIndicator sliceOriginIndicatorActive' : 'sliceOriginIndicator' } />
           <div className='sliceOriginTile'> 
-            {origin}
+            {origin.name}
           </div>
           <div className='sliceOriginReqs'> 
             <div className='sliceOriginReqsNumber'>{this.state.reqsAverage}</div>
@@ -95,6 +94,11 @@ class Dapps extends React.Component {
   render () {
     return (
       <div>
+        {Object.entries(this.store('main.origins')).map(([id, origin]) => {
+          return (
+            <OriginModule id={id} origin={origin} />
+          )
+        })}
         <div className='originTitle'>{'Mainnet'}</div>
         <OriginModule origin={'send.frame.eth'} />
         <OriginModule origin={'uniswap.io'} />

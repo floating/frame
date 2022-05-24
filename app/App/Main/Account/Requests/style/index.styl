@@ -284,6 +284,7 @@
   transition var(--standardSlow)
   transform translateZ(0)
   overflow hidden
+  padding 32px 0px
 
 // .requestTitle:before
 //   content ''
@@ -340,33 +341,122 @@
     // flex-direction column
     // tranform translateZ(0)
 
+  .requestItem::after
+    position absolute
+    content ''
+    background linear-gradient(90deg, var(--overlayA), var(--overlayB))
+    top 0
+    bottom 0
+    left 0
+    right 0
+    z-index 20
+    border-radius 12px
+    opacity 0.4
+    pointer-events none
+    // border 3px solid linear-gradient(var(--bad), var(--bad))
+
   .requestItem
     margin 0px 0px 7px 0px
     border-radius 12px
     background var(--ghostA)
-    padding 8px 0px
-    box-shadow 0px 4px 8px var(--ghostY)
+    // color var(--goodOver)
+    padding 26px 0px 16px 0px
+    box-shadow 0px 4px 8px var(--ghostY)// , 0px 0px 70px -50px var(--moon)
     cursor pointer
     position relative
-    display flex
-    justify-content space-between
+    z-index 1
+    // display flex
+    // justify-content space-between
     *
       pointer-events none
 
+    .requestItemRow
+      position relative
+      z-index 3
+      width 100%
+      padding 0px 11px
+      display flex
+      align-items center
+      margin-bottom 10px
+      box-sizing border-box
+
+      .requestItemRowIcon
+        width 48px
+        height 16px
+        display flex
+        justify-content center
+        align-items center
+        position relative
+        
+      .requestItemRowIconLarge
+        width 48px
+        height 24px
+        // background blue
+        display flex
+        justify-content center
+
+      .requestItemRowTitle
+        position relative
+        margin-left 16px
+        font-size 11px
+        font-weight 400
+
+      .requestItemRowTitleLarge
+        // height 48px
+        font-weight 500
+        display flex
+        justify-content center
+        align-items center
+        margin-left 16px
+
+    .requestItemRowHeader
+      margin-bottom 20px
+
+    .requestItemTime
+      position absolute
+      top 0px  
+      right 16px
+      bottom 0px
+      font-size 10px
+      font-weight 600
+      
+      display flex
+      // justify-content center
+      align-items center
+
     .requestItemIcon
-      top 16px
-      left 16px
+      top 5px
+      left 8px
+      bottom 5px
+      width 48px
       position absolute
       display flex
       justify-content center
       align-items center
+      //border-left 3px solid var(--ghostZ)
+      //border-right 3px solid var(--ghostZ)
+      border-radius 10px
+      background var(--ghostA)
+      z-index 2
 
-      .requestItemIconFram
-        color var(--good)
-        border-radius 8px
-        display flex
-        justify-content center
-        align-items center
+      border-radius 12px
+      display flex
+      justify-content center
+      align-items center
+      -webkit-app-region no-drag
+      transition none
+      pointer-events auto
+      transform translate3d(0, 0, 0)
+      background var(--ghostB)
+      cursor pointer
+      border 3px solid var(--ghostZ)
+
+      // .requestItemIconFrame
+      //   color var(--good)
+      //   border-radius 8px
+      //   display flex
+      //   justify-content center
+      //   align-items center
 
     .requestItemOrigin
       top 16px
@@ -386,30 +476,20 @@
         justify-content center
         align-items center
 
-    .requestItemTime
-      bottom 16px  
-      left 16px
-      font-size 10px
-      font-weight 600
-      position absolute
-      display flex
-      justify-content center
-      align-items center
-
     .requestItemStatus
       font-size 10px
       bottom 16px
-      right 16px
+      left 64px
       position absolute
       font-weight 600
       margin-left 2px
 
     .requestItemMain
       width 100%
-      padding 64px 0px
+      padding 64px
       display flex
       justify-content center
-      align-items center
+      // align-items center
       flex-direction column
       // background blue
 
@@ -434,7 +514,7 @@
     margin 0px
 
   .noRequests
-    height 42px
+    // height 42px
     // min-height 32px
     font-size 11px
     text-transform uppercase
