@@ -32,9 +32,16 @@ interface NetworkMetadata {
   gas: GasData
 }
 
+interface Session {
+  startedAt: number,
+  endedAt?: number,
+  lastUpdatedAt: number
+}
+
 interface Origin {
   chain: Chain,
-  name: string
+  name: string,
+  session: Session
 }
 
 interface Permission {

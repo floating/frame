@@ -4,6 +4,7 @@ import React from 'react'
 import Restore from 'react-restore'
 import link from '../../../../../resources/link'
 import svg from '../../../../../resources/svg'
+import { isNetworkConnected } from '../../../../../resources/utils/chains'
 
 import chainMeta from '../../../../../resources/chainMeta'
 
@@ -14,13 +15,6 @@ const NATIVE_CURRENCY = '0x0000000000000000000000000000000000000000'
 
 function isNativeCurrency (address) {
   return address === NATIVE_CURRENCY
-}
-
-function isNetworkConnected (network) {
-  return (
-    (network.connection.primary && network.connection.primary.connected) ||
-    (network.connection.secondary && network.connection.secondary.connected)
-  )
 }
 
 function formatBalance (balance, totalValue, decimals = 8) {

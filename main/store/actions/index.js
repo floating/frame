@@ -396,7 +396,51 @@ module.exports = {
     if (state) u(`main.dapp.storage.${hash}`, () => state)
   },
   initOrigin: (u, originId, origin) => {
-    u('main.origins', origins => ({ ...origins, [originId]: origin }))
+    u('main.origins', origins => {
+      const now = new Date().getTime()
+
+      const createdOrigin = {
+        ...origin,
+        session: {
+          startedAt: now,
+          lastUpdatedAt: now
+        }
+      }
+
+      return { ...origins, [originId]: createdOrigin }
+    })
+  },
+  addOriginRequest: (u, originId) => {
+    const now = new Date().getTime()
+
+    u('main.origins', originId, origin => {
+      // start a new session if the previous one had ended
+      const startedAt = origin.session.startedAt < origin.session.endedAt ? now : origin.session.startedAt
+
+      return {
+        ...origin,
+        session: {
+          ...origin.session,
+          startedAt,
+          endedAt: undefined,
+          lastUpdatedAt: now
+        }
+      }
+    })
+  },
+  endOriginSession: (u, originId) => {
+    u('main.origins', originId, origin => {
+      const now = new Date().getTime()
+
+      return {
+        ...origin,
+        session: {
+          ...origin.session,
+          endedAt: now,
+          lastUpdatedAt: now
+        }
+      }
+    })
   },
   switchOriginChain: (u, originId, chainId, type) => {
     if (originId && typeof chainId === 'number' && type === 'ethereum') {
