@@ -24,7 +24,7 @@ class _RequestItem extends React.Component {
     
   }
   getElapsedTime () {
-    const elapsed = Date.now() - (this.props?.req?.created || 0)
+    const elapsed = Date.now() - (this.props.req && this.props.req.created || 0)
     const secs = elapsed / 1000
     const mins = secs / 60
     const hrs = mins / 60
