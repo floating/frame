@@ -41,7 +41,7 @@ class ChainModule extends React.Component {
   //   document.removeEventListener('click', this.clickHandler.bind(this))
   // }
 
-  renderConnection (id, connection) {
+  renderConnection (id, connection, blockHeight) {
     let currentConnectionName = ''
     let currentConnectionStatus = ''
     if (connection.primary.on) {
@@ -67,7 +67,7 @@ class ChainModule extends React.Component {
           <div className='sliceTileBlockIcon'>{svg.chain(14)}</div>
           <div className='sliceTileChainId'>{id}</div>
           <div className='sliceTileBlockIcon'>{svg.cube(14)}</div>
-          <div>{1223434}</div>
+          <div>{blockHeight}</div>
         </div>
       </div>
     )
@@ -110,6 +110,7 @@ class ChainModule extends React.Component {
   render () {
     const { id, type, connection, changed } = this.props
 
+    const networkMeta = this.store('main.networksMeta.ethereum', id)
     const networkPresets = this.store('main.networkPresets', type)
     let presets = networkPresets[id] || {}
     presets = Object.keys(presets).map(i => ({ text: i, value: `${type}:${id}:${i}` }))
@@ -118,7 +119,7 @@ class ChainModule extends React.Component {
 
     return (
       <div className='sliceContainer' ref={this.ref}>
-        {this.renderConnection(id, connection)}
+        {this.renderConnection(id, connection, networkMeta.blockHeight)}
         {this.state.expanded ? (
           <div className='connectionLevels'>
             <div className='signerPermission signerPermissionNetwork cardShow' style={{ zIndex: 2 }}>
