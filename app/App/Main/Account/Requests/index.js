@@ -19,7 +19,7 @@ class _RequestItem extends React.Component {
   constructor (props, context) {
     super(props, context)
     this.state = {
-      ago: this.getElapsedTime()
+      ago: this.getElapsedTime() + ' ago'
     }
     
   }
@@ -37,7 +37,7 @@ class _RequestItem extends React.Component {
   }
   componentDidMount () {
     this.timer = setInterval(() => {
-      this.setState({ ago: this.getElapsedTime() })
+      this.setState({ ago: this.getElapsedTime() + ' ago' })
     }, 1000)
   }
   componentWillUnmount () {
