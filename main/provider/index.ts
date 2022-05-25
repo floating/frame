@@ -22,7 +22,7 @@ import { populate as populateTransaction, maxFee, TransactionData } from '../tra
 import FrameAccount from '../accounts/Account'
 import { capitalize, arraysMatch } from '../../resources/utils'
 import { ApprovalType } from '../../resources/constants'
-import { checkExistingNonceGas, ecRecover, feeTotalOverMax, gasFees, getActiveChains, getAssets, getChains, getPermissions, getRawTx, getSignedAddress, isCurrentAccount, isScanning, loadAssets, requestPermissions, resError } from './helpers'
+import { checkExistingNonceGas, ecRecover, feeTotalOverMax, gasFees, getActiveChains, getAssets, getChains, getChainDetails, getPermissions, getRawTx, getSignedAddress, isCurrentAccount, isScanning, loadAssets, requestPermissions, resError } from './helpers'
 
 type Subscriptions = { [key in SubscriptionType]: string[] }
 
@@ -793,6 +793,7 @@ export class Provider extends EventEmitter {
     if (method === 'wallet_requestPermissions') return requestPermissions(payload, res)
     if (method === 'wallet_watchAsset') return this.addCustomToken(payload, res, targetChain)
     if (method === 'wallet_getChains') return getChains(payload, res)
+    if (method === 'wallet_getChainDetails') return getChainDetails(payload, res)
     if (method === 'wallet_getAssets') return getAssets(payload as RPC.GetAssets.Request, accounts.current(), res as RPCCallback<RPC.GetAssets.Response>)
 
     // Connection dependent methods need to pass targetChain
