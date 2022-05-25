@@ -29,6 +29,17 @@ const polls: Record<string, string[]> = {}
 const pollSubs: Record<string, Subscription> = {}
 const pending: Record<string, PendingRequest> = {}
 const cleanupTimers: Record<string, NodeJS.Timeout> = {}
+const connectionMonitors: Record<string, NodeJS.Timeout> = {}
+
+function extendSession (originId: string) {
+  if (originId) {
+    clearTimeout(connectionMonitors[originId])
+
+    connectionMonitors[originId] = setTimeout(() => {
+      store.endOriginSession(originId)
+    }, 60 * 1000)
+  }
+}
 
 const storeApi = {
   getPermissions: (address: Address) => {
@@ -66,6 +77,9 @@ const handler = (req: IncomingMessage, res: ServerResponse) => {
       const payload = updateOrigin(rawPayload, origin)
 
       if (logTraffic) log.info(`req -> | http | ${req.headers.origin} | ${payload.method} | -> | ${JSON.stringify(payload.params)}`)
+
+      extendSession(payload._origin)
+
       if (protectedMethods.indexOf(payload.method) > -1 && !(await isTrusted(origin))) {
         let error = { message: `Permission denied, approve ${origin} in Frame to continue`, code: 4001 }
         // Review

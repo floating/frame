@@ -411,23 +411,33 @@ module.exports = {
     })
   },
   addOriginRequest: (u, originId) => {
+    const now = new Date().getTime()
+
     u('main.origins', originId, origin => {
+      // start a new session if the previous one had ended
+      const startedAt = origin.session.startedAt < origin.session.endedAt ? now : origin.session.startedAt
+
       return {
         ...origin,
         session: {
           ...origin.session,
-          lastUpdatedAt: new Date().getTime()
+          startedAt,
+          endedAt: undefined,
+          lastUpdatedAt: now
         }
       }
     })
   },
   endOriginSession: (u, originId) => {
     u('main.origins', originId, origin => {
+      const now = new Date().getTime()
+
       return {
         ...origin,
         session: {
           ...origin.session,
-          endedAt: new Date().getTime()
+          endedAt: now,
+          lastUpdatedAt: now
         }
       }
     })

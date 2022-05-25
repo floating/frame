@@ -4,3 +4,7 @@ export function isNetworkConnected (network: Network) {
     (network.connection.secondary && network.connection.secondary.connected)
   )
 }
+
+export function isNetworkEnabled (network: Network) {
+  return network.on
+}

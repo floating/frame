@@ -1,7 +1,7 @@
 import React, {  createRef } from 'react'
 import Restore from 'react-restore'
 import link from '../../../resources/link'
-import { isNetworkConnected } from '../../../resources/utils/chains'
+import { isNetworkConnected, isNetworkEnabled } from '../../../resources/utils/chains'
 // import svg from '../../../resources/svg'
 
 function bySessionStartTime (a, b) {
@@ -10,6 +10,26 @@ function bySessionStartTime (a, b) {
 
 function byLastUpdated (a, b) {
   return a.session.lastUpdatedAt - b.session.lastUpdatedAt
+}
+
+function getOriginsForChain (allOrigins, chain) {
+  const { connectedOrigins, disconnectedOrigins } = Object.values(allOrigins).reduce((acc, origin) => {
+    if (origin.chain.id === chain.id) {
+      const connected = isNetworkConnected(chain) &&
+        (!origin.session.endedAt || origin.session.startedAt > origin.session.endedAt)
+
+      acc[connected ? 'connectedOrigins' : 'disconnectedOrigins'].push(origin)
+    }
+
+    return acc
+  }, { connectedOrigins: [], disconnectedOrigins: [] })
+
+  const origins = {
+    connected: connectedOrigins.sort(bySessionStartTime),
+    disconnected: disconnectedOrigins.sort(byLastUpdated)
+  }
+
+  return origins
 }
 
 class Indicator extends React.Component {
@@ -91,33 +111,25 @@ const ChainOrigins = ({ chain, origins }) => (
 )
   
 class Dapps extends React.Component {
+  getEnabledChains () {
+    return Object.values(this.store('main.networks.ethereum')).filter(isNetworkEnabled)
+  }
+
   render () {
-    const allOrigins = this.store('main.origins')
-    const enabledChains = Object.values(this.store('main.networks.ethereum')).filter(chain => chain.on)
-
-    const chainOrigins = enabledChains.map((chain) => {
-      const { connectedOrigins, disconnectedOrigins } = Object.values(allOrigins).reduce((acc, origin) => {
-        if (origin.chain.id === chain.id) {
-          const connected = isNetworkConnected(chain) && 
-            (!origin.session.endedAt || origin.session.startedAt > origin.session.endedAt)
-
-          acc[connected ? 'connectedOrigins' : 'disconnectedOrigins'].push(origin)
-        }
-
-        return acc
-      }, { connectedOrigins: [], disconnectedOrigins: [] })
-
-      const origins = {
-        connected: connectedOrigins.sort(bySessionStartTime),
-        disconnected: disconnectedOrigins.sort(byLastUpdated)
-      }
-
-      return { chain, origins }
-    })
+    const enabledChains = this.getEnabledChains()
+    const originsForChain = getOriginsForChain.bind(null, this.store('main.origins'))
 
     return (
       <div>
-        {chainOrigins.map(({ chain, origins }) => origins.length === 0 ? <></> : <ChainOrigins chain={chain} origins={origins} />)}
+        {
+          enabledChains.map(chain => {
+            const origins = originsForChain(chain)
+
+            return origins.length === 0
+              ? <></>
+              : <ChainOrigins chain={chain} origins={origins} />
+          })
+        }
       </div>
     ) 
   }
