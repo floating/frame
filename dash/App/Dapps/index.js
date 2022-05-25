@@ -115,15 +115,34 @@ class Dapps extends React.Component {
     return Object.values(this.store('main.networks.ethereum')).filter(isNetworkEnabled)
   }
 
+  getOriginsForChain (chain) {
+    const { connectedOrigins, disconnectedOrigins } = Object.values(this.store('main.origins')).reduce((acc, origin) => {
+      if (origin.chain.id === chain.id) {
+        const connected = isNetworkConnected(chain) &&
+          (!origin.session.endedAt || origin.session.startedAt > origin.session.endedAt)
+
+        acc[connected ? 'connectedOrigins' : 'disconnectedOrigins'].push(origin)
+      }
+
+      return acc
+    }, { connectedOrigins: [], disconnectedOrigins: [] })
+
+    const origins = {
+      connected: connectedOrigins.sort(bySessionStartTime),
+      disconnected: disconnectedOrigins.sort(byLastUpdated)
+    }
+
+    return origins
+  }
+
   render () {
     const enabledChains = this.getEnabledChains()
-    const originsForChain = getOriginsForChain.bind(null, this.store('main.origins'))
 
     return (
       <div>
         {
           enabledChains.map(chain => {
-            const origins = originsForChain(chain)
+            const origins = this.getOriginsForChain(chain)
 
             return origins.length === 0
               ? <></>
