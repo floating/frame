@@ -396,6 +396,17 @@ const migrations = {
     delete initial.main.clients
 
     return initial
+  },
+  20: initial => {
+    // move all Aragon accounts to mainnet and add a warning if we did
+    Object.values(initial.main.accounts).forEach(account => {
+      if (account.smart?.type === 'aragon' && !account.smart.chain) {
+        account.smart.chain = { type: 'ethereum', id: 1 }
+        initial.main.mute.aragonAccountMigrationWarning = false
+      }
+    })
+
+    return initial
   }
 }
 

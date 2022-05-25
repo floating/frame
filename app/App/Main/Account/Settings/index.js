@@ -63,7 +63,11 @@ class Settings extends React.Component {
                     link.send('tray:renameAccount', this.props.id, e.target.value)
                   }}
                 />
-              </div> 
+              </div>
+              {account.smart
+                ? (<div className='moduleRow'>Chain ID: {account.smart.chain && account.smart.chain.id}</div>)
+                : null
+              }
               <div className='moduleRow'>Status: {account.status}</div>
               <div className='moduleRow'>ENS Name: {account.ensName  ? account.ensName : 'none'}</div>
               <div className='moduleRow'>Last Signer Type: {account.lastSignerType}</div>

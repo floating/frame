@@ -484,3 +484,47 @@ describe('migration 19', () => {
     expect(updatedState.main.clients).toBeUndefined()
   })
 })
+
+describe('migration 20', () => {
+  beforeEach(() => {
+    state = {
+      main: {
+        _version: 19,
+        mute: {
+          aragonAccountMigrationWarning: true
+        },
+        accounts: {
+          'test': {
+            smart: {
+              type: 'aragon'
+            }
+          }
+        }
+      }
+    }
+  })
+
+  it('should add the mainnet chain to Aragon accounts', () => {
+    const updatedState = migrations.apply(state, 20)
+    expect(updatedState.main.accounts.test.smart.chain).toEqual({ id: 1, type: 'ethereum' })
+  })
+
+  it('should add a warning if an Aragon account was migrated', () => {
+    const updatedState = migrations.apply(state, 20)
+    expect(updatedState.main.mute.aragonAccountMigrationWarning).toBe(false)
+  })
+
+  it('should not migrate non-Aragon smart accounts', () => {
+    state.main.accounts.test.smart.type = 'gnosis'
+
+    const updatedState = migrations.apply(state, 20)
+    expect(updatedState.main.accounts.test.smart.chain).toBe(undefined)
+  })
+
+  it('should not add a warning if no accounts were migrated', () => {
+    state.main.accounts.test.smart.chain = { id: 137, type: 'ethereum' }
+
+    const updatedState = migrations.apply(state, 20)
+    expect(updatedState.main.mute.aragonAccountMigrationWarning).toBe(true)
+  })
+})

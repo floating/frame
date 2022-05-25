@@ -222,8 +222,8 @@ const rpc = {
   remove (id) {
     signers.remove(id)
   },
-  resolveAragonName (name, cb) {
-    resolveName(name).then(result => cb(null, result)).catch(cb)
+  resolveAragonName (name, chainId, cb) {
+    resolveName(name, chainId).then(result => cb(null, result)).catch(cb)
   },
   verifyAddress (cb) {
     const res = (err, data) => cb(err, data || false)

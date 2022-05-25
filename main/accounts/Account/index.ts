@@ -17,6 +17,7 @@ import { getType as getSignerType, Type as SignerType } from '../../signers/Sign
 import provider from '../../provider'
 import { ApprovalType } from '../../../resources/constants'
 import Erc20Contract from '../../contracts/erc20'
+import { Chain } from '../../chains'
 
 const nebula = nebulaApi()
 
@@ -24,16 +25,6 @@ const storeApi = {
   getPermissions: function (address: Address) {
     return (store('main.permissions', address) || {}) as Record<string, Permission>
   }
-}
-
-interface SmartAccount {
-  name: string,
-  type: string,
-  actor: Address,
-  agent: Address,
-  ens: string,
-  apps: any,
-  dao: any,
 }
 
 interface SignerOptions {
