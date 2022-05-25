@@ -16,6 +16,13 @@ function isNativeCurrency (address) {
   return address === NATIVE_CURRENCY
 }
 
+function isNetworkConnected (network) {
+  return (
+    (network.connection.primary && network.connection.primary.connected) ||
+    (network.connection.secondary && network.connection.secondary.connected)
+  )
+}
+
 function formatBalance (balance, totalValue, decimals = 8) {
   const isZero = balance.isZero()
   if (!isZero && balance.toNumber() < 0.001 && totalValue.toNumber() < 1) return '<0.001'
@@ -164,6 +171,8 @@ class Balances extends React.Component {
     const networksMeta = this.store('main.networksMeta.ethereum')
 
     const balances = rawBalances
+      // only show balances from connected networks
+      .filter(rawBalance => isNetworkConnected(networks[rawBalance.chainId]))
       .map(rawBalance => {
         const isNative = isNativeCurrency(rawBalance.address)
 
