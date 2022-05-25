@@ -52,17 +52,22 @@ export function updateOrigin (payload: JSONRPCRequestPayload, origin?: string, c
   const originId = uuidv5(originName, uuidv5.DNS)
   const existingOrigin = store('main.origins', originId)
 
-  if (!existingOrigin && !connectionMessage) {
+  if (!connectionMessage) {
     // the extension will attempt to send messages (eth_chainId and net_version) in order
     // to connect. we don't want to store these origins as they'll come from every site
     // the user visits in their browser
-    store.initOrigin(originId, {
-      name: originName,
-      chain: {
-        id: 1,
-        type: 'ethereum'
-      }
-    })
+
+    if (existingOrigin) {
+      store.addOriginRequest(originId)
+    } else {
+      store.initOrigin(originId, {
+        name: originName,
+        chain: {
+          id: 1,
+          type: 'ethereum'
+        }
+      })
+    }
   }
 
   return {

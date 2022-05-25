@@ -1,66 +1,63 @@
 import React, {  createRef } from 'react'
 import Restore from 'react-restore'
 import link from '../../../resources/link'
+import { isNetworkConnected } from '../../../resources/utils/chains'
 // import svg from '../../../resources/svg'
 
-const average = (array) => (array.reduce((a, b) => a + b) / array.length).toFixed(2)
+function bySessionStartTime (a, b) {
+  return a.session.startedAt - b.session.startedAt
+}
+
+function byLastUpdated (a, b) {
+  return a.session.lastUpdatedAt - b.session.lastUpdatedAt
+}
+
+class Indicator extends React.Component {
+  constructor (props) {
+    super(props)
+
+    this.state = {
+      active: false,
+      connected: props.connected
+    }
+
+    setTimeout(() => {
+      this.setState({ active: true })
+    }, 20)
+
+    setTimeout(() => {
+      this.setState({ active: false })
+    }, 200)
+  }
+
+  render () {
+    if (this.state.connected) {
+      return <div className={this.state.active ? 'sliceOriginIndicator sliceOriginIndicatorActive' : 'sliceOriginIndicator' } />
+      //return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorGood' /></div>
+    } 
+    // else if (status === 'loading' || status === 'syncing' || status === 'pending' || status === 'standby') {
+    //   return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorPending' /></div>
+    // } 
+    else {
+      return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorBad' /></div>
+    }
+  }
+}
 
 class _OriginModule extends React.Component {
   constructor (...args) {
     super(...args)
+
     this.state = {
-      expanded: false,
-      active: false,
-      activeCount: 0,
-      reqsAverage: 0,
-      reqsTimes: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+      expanded: false
     }
+
     this.ref = createRef()
   }
-  
-  averageReqs () {
-    const reqs = this.state.reqsTimes
-    reqs.push(this.state.activeCount)
-    reqs.shift()
-    this.setState({
-      reqsTimes: reqs, 
-      activeCount: 0, 
-      reqsAverage: (Math.round(average(reqs) * 100) / 100).toFixed(2) 
-    })
-  }
 
-  componentDidMount () {
-    const setActiveRandom = () => {
-      const isActive = Math.round(Math.random() * 1 + 0.3)
-      if (isActive) {
-        clearTimeout(this.clearTimeout)
-        this.setState({ active: false })
-        setTimeout(() => {
-          this.setState({ active: true })
-          this.setState({ activeCount: ++this.state.activeCount })
-          this.clearTimeout = setTimeout(() => {
-            this.setState({ active: false })
-          }, 1000)
-        }, 50)
-      }
-      setTimeout(() => setActiveRandom(), Math.round(Math.random() * 500))
-    }
-    setInterval(() => this.averageReqs(), 1000)
-    setActiveRandom()
-  }
-
-  indicator (status) {
-    if (status === 'connected') {
-      return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorGood' /></div>
-    } else if (status === 'loading' || status === 'syncing' || status === 'pending' || status === 'standby') {
-      return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorPending' /></div>
-    } else {
-      return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorBad' /></div>
-    }
-  }
   render () {
-    const { origin } = this.props
-    const { active } = this.state
+    const { origin, connected } = this.props
+
     return (
       <div>      
         <div 
@@ -69,13 +66,9 @@ class _OriginModule extends React.Component {
             link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'updateOriginChain', notifyData: { origin } }})
           }}
         >
-          <div className={active ? 'sliceOriginIndicator sliceOriginIndicatorActive' : 'sliceOriginIndicator' } />
-          <div className='sliceOriginTile'> 
+          <Indicator key={origin.session.lastUpdatedAt} connected={connected} />
+          <div className='sliceOriginTile'>
             {origin.name}
-          </div>
-          <div className='sliceOriginReqs'> 
-            <div className='sliceOriginReqsNumber'>{this.state.reqsAverage}</div>
-            <div className='sliceOriginReqsLabel'>{'reqs/s'}</div>
           </div>
         </div>
         {this.state.expanded ? (
@@ -93,7 +86,8 @@ const OriginModule = Restore.connect(_OriginModule)
 const ChainOrigins = ({ chain, origins }) => (
   <>
     <div className='originTitle'>{chain.name}</div>
-    {origins.map((origin) => <OriginModule origin={origin} />)}
+    {origins.connected.map((origin) => <OriginModule origin={origin} connected={true} />)}
+    {origins.disconnected.map((origin) => <OriginModule origin={origin} connected={false} />)}
   </>
 )
   
@@ -101,10 +95,24 @@ class Dapps extends React.Component {
   render () {
     const allOrigins = this.store('main.origins')
     const enabledChains = Object.values(this.store('main.networks.ethereum')).filter(chain => chain.on)
+
     const chainOrigins = enabledChains.map((chain) => {
-      const origins = Object.entries(allOrigins)
-        .map(([id, origin]) => ({ id, ...origin }))
-        .filter((origin) => origin.chain.id === chain.id)
+      const { connectedOrigins, disconnectedOrigins } = Object.values(allOrigins).reduce((acc, origin) => {
+        if (origin.chain.id === chain.id) {
+          const connected = isNetworkConnected(chain) && 
+            (!origin.session.endedAt || origin.session.startedAt > origin.session.endedAt)
+
+          acc[connected ? 'connectedOrigins' : 'disconnectedOrigins'].push(origin)
+        }
+
+        return acc
+      }, { connectedOrigins: [], disconnectedOrigins: [] })
+
+      const origins = {
+        connected: connectedOrigins.sort(bySessionStartTime),
+        disconnected: disconnectedOrigins.sort(byLastUpdated)
+      }
+
       return { chain, origins }
     })
 
