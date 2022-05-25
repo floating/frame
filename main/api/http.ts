@@ -36,7 +36,9 @@ function extendSession (originId: string) {
     clearTimeout(connectionMonitors[originId])
 
     connectionMonitors[originId] = setTimeout(() => {
-      store.endOriginSession(originId)
+      if (store('main.origins', originId)) {
+        store.endOriginSession(originId)
+      }
     }, 60 * 1000)
   }
 }
