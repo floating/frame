@@ -12,26 +12,6 @@ function byLastUpdated (a, b) {
   return a.session.lastUpdatedAt - b.session.lastUpdatedAt
 }
 
-function getOriginsForChain (allOrigins, chain) {
-  const { connectedOrigins, disconnectedOrigins } = Object.values(allOrigins).reduce((acc, origin) => {
-    if (origin.chain.id === chain.id) {
-      const connected = isNetworkConnected(chain) &&
-        (!origin.session.endedAt || origin.session.startedAt > origin.session.endedAt)
-
-      acc[connected ? 'connectedOrigins' : 'disconnectedOrigins'].push(origin)
-    }
-
-    return acc
-  }, { connectedOrigins: [], disconnectedOrigins: [] })
-
-  const origins = {
-    connected: connectedOrigins.sort(bySessionStartTime),
-    disconnected: disconnectedOrigins.sort(byLastUpdated)
-  }
-
-  return origins
-}
-
 class Indicator extends React.Component {
   constructor (props) {
     super(props)
