@@ -433,7 +433,7 @@ class TransactionRequest extends React.Component {
                       </div>
                       <div className='requestMetaOrigin'>
                         <div className='requestMetaOriginIcon'>
-                          {svg.nested(10)}
+                          {svg.window(10)}
                         </div>
                         {this.store('main.origins', this.props.req.origin, 'name')}
                       </div>

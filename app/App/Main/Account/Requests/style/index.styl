@@ -359,14 +359,11 @@
     margin 0px 0px 7px 0px
     border-radius 12px
     background var(--ghostA)
-    // color var(--goodOver)
-    padding 26px 0px 16px 0px
+    padding 20px 0px 8px 0px
     box-shadow 0px 4px 8px var(--ghostY)// , 0px 0px 70px -50px var(--moon)
     cursor pointer
     position relative
     z-index 1
-    // display flex
-    // justify-content space-between
     *
       pointer-events none
 
@@ -374,61 +371,100 @@
       position relative
       z-index 3
       width 100%
-      padding 0px 11px
+      padding 0px 13px
       display flex
       align-items center
       margin-bottom 10px
       box-sizing border-box
 
       .requestItemRowIcon
-        width 48px
-        height 16px
+        width 40px
+        height 20px
         display flex
         justify-content center
         align-items center
         position relative
+        // color var(--good)
         
       .requestItemRowIconLarge
-        width 48px
-        height 24px
-        // background blue
+        width 40px
+        height 20px
         display flex
         justify-content center
+        align-items center
+        //color var(--moon)
+
+      .requestItemRowChainIcon
+        position absolute
+        top 0px  
+        right 20px
+        bottom 0px
+        display flex
+        justify-content center
+        align-items center
+        // background var(--moon)
+        width 20px
+        border-radius 10px
 
       .requestItemRowTitle
         position relative
-        margin-left 16px
-        font-size 11px
+        margin-left 9px
+        font-size 12px
         font-weight 400
 
       .requestItemRowTitleLarge
         // height 48px
+        position relative
         font-weight 500
         display flex
         justify-content center
         align-items center
-        margin-left 16px
+        margin-left 8px
+        top -1px
+        //color var(--moon)
 
     .requestItemRowHeader
-      margin-bottom 20px
+      margin-bottom 12px
 
     .requestItemTime
       position absolute
       top 0px  
-      right 16px
+      right 20px
       bottom 0px
-      font-size 10px
-      font-weight 600
-      
+      font-size 12px
+      font-weight 500
       display flex
-      // justify-content center
+      justify-content center
       align-items center
+      // color var(--moon)
+      
+    // .requestItemTimeNew
+    //   color var(--good)
+
+    .requestItemSource
+      position absolute
+      top 0px  
+      right 20px
+      bottom 0px
+      font-size 12px
+      font-weight 400
+      display flex
+      justify-content center
+      align-items center
+      //color var(--moon)
+      margin-top -2px
+
+      div
+        margin-right 5px
+      svg
+        position relative
+        top 1px
 
     .requestItemIcon
       top 5px
-      left 8px
+      left 10px
       bottom 5px
-      width 48px
+      width 39px
       position absolute
       display flex
       justify-content center
@@ -450,6 +486,7 @@
       background var(--ghostB)
       cursor pointer
       border 3px solid var(--ghostZ)
+      display none
 
       // .requestItemIconFrame
       //   color var(--good)
