@@ -4,7 +4,7 @@ import React from 'react'
 import Restore from 'react-restore'
 import link from '../../../../../resources/link'
 import svg from '../../../../../resources/svg'
-import { isNetworkConnected } from '../../../resources/utils/chains'
+import { isNetworkConnected } from '../../../../../resources/utils/chains'
 
 import chainMeta from '../../../../../resources/chainMeta'
 
