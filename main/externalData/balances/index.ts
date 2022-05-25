@@ -149,15 +149,9 @@ export default function (store: Store) {
   function handleChainBalanceUpdate (balances: CurrencyBalance[], address: Address) {
     const currentChainBalances = storeApi.getCurrencyBalances(address)
 
+    // only update balances that have changed
     balances
-      .filter(balance => {
-        return (
-          // only update positive balances
-          parseInt(balance.balance) > 0 &&
-          // only update balances if any have changed
-          (currentChainBalances.find(b => b.chainId === balance.chainId) || {}).balance !== balance.balance
-        )
-      })
+      .filter(balance => (currentChainBalances.find(b => b.chainId === balance.chainId) || {}).balance !== balance.balance)
       .forEach(balance => {
         store.setBalance(address, {
           ...balance,
