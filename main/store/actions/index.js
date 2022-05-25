@@ -448,7 +448,7 @@ module.exports = {
     }
   },
   setBlockHeight: (u, chainId, blockHeight) => {
-    u('main.networkmeta.ethereum', chainId, (chainMeta) => ({ ...chainMeta, blockHeight }))
+    u('main.networksMeta.ethereum', chainId, (chainMeta) => ({ ...chainMeta, blockHeight }))
   },
   expandDock: (u, expand) => {
     u('dock.expand', (s) => expand)
