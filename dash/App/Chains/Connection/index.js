@@ -41,15 +41,15 @@ class ChainModule extends React.Component {
   //   document.removeEventListener('click', this.clickHandler.bind(this))
   // }
 
-  renderConnection (id, connection, blockHeight) {
+  renderConnection (id, { primary, secondary }, blockHeight) {
     let currentConnectionName = ''
     let currentConnectionStatus = ''
-    if (connection.primary.on) {
-      currentConnectionName = connection.primary.connected ? connection.primary.current : connection.primary.status
-      currentConnectionStatus = connection.primary.status 
-    } else if (connection.secondary.on) {
-      currentConnectionName = connection.secondary.connected ? connection.secondary.current : connection.secondary.status
-      currentConnectionStatus = connection.secondary.status 
+    if (primary.on && primary.status !== 'disconnected') {
+      currentConnectionName = primary.connected ? primary.current : primary.status
+      currentConnectionStatus = primary.status 
+    } else if (secondary.on && secondary.status !== 'disconnected') {
+      currentConnectionName = secondary.connected ? secondary.current : secondary.status
+      currentConnectionStatus = secondary.status 
     }
 
     return (
