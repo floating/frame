@@ -17,8 +17,7 @@ class Indicator extends React.Component {
     super(props)
 
     this.state = {
-      active: false,
-      connected: props.connected
+      active: false
     }
 
     setTimeout(() => {
@@ -31,7 +30,7 @@ class Indicator extends React.Component {
   }
 
   render () {
-    if (this.state.connected) {
+    if (this.props.connected) {
       return <div className={this.state.active ? 'sliceOriginIndicator sliceOriginIndicatorActive' : 'sliceOriginIndicator' } />
       //return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorGood' /></div>
     } 
