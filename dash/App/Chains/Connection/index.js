@@ -6,6 +6,18 @@ import Dropdown from '../../../../resources/Components/Dropdown'
 import link from '../../../../resources/link'
 import svg from '../../../../resources/svg'
 
+const Indicator = ({ status }) => {
+  const statusMap = {
+    connected: 'Good',
+    loading: 'Pending',
+    syncing: 'Pending',
+    pending: 'Pending',
+    standby: 'Pending'
+  }
+
+  return <div className={`sliceTileIndicatorLarge sliceTileIndicator${statusMap[status] || 'Bad'}`} />
+}
+
 class ChainModule extends React.Component {
   constructor (...args) {
     super(...args)
@@ -31,12 +43,15 @@ class ChainModule extends React.Component {
 
   renderConnection (id, connection) {
     let currentConnectionName = ''
+    let currentConnectionStatus = ''
     if (connection.primary.on) {
       currentConnectionName = connection.primary.connected ? connection.primary.current : connection.primary.status
+      currentConnectionStatus = connection.primary.status 
     } else if (connection.secondary.on) {
       currentConnectionName = connection.secondary.connected ? connection.secondary.current : connection.secondary.status
+      currentConnectionStatus = connection.secondary.status 
     }
-    
+
     return (
       <div 
         className='sliceTile sliceTileClickable'
@@ -44,7 +59,7 @@ class ChainModule extends React.Component {
           this.setState({ expanded: !this.state.expanded })
         }}
       >
-        <div className={this.props.active ? 'sliceTileIndicatorLarge sliceTileIndicatorActive' : 'sliceTileIndicatorLarge' } />
+        <Indicator className='sliceTileIndicatorLarge' status={currentConnectionStatus} />
         <div className='sliceTileConnectionName'> 
           {currentConnectionName}
         </div>
@@ -97,9 +112,9 @@ class ChainModule extends React.Component {
 
     const networkPresets = this.store('main.networkPresets', type)
     let presets = networkPresets[id] || {}
-    presets = Object.keys(presets).map(i => ({ text: i, value: type + ':' + id + ':' + i }))
-    presets = presets.concat(Object.keys(networkPresets.default).map(i => ({ text: i, value: type + ':' + id + ':' + i })))
-    presets.push({ text: 'Custom', value: type + ':' + id + ':' + 'custom' })
+    presets = Object.keys(presets).map(i => ({ text: i, value: `${type}:${id}:${i}` }))
+    presets = presets.concat(Object.keys(networkPresets.default).map(i => ({ text: i, value: `${type}:${id}:${i}` })))
+    presets.push({ text: 'Custom', value: `${type}:${id}:custom` })
 
     return (
       <div className='sliceContainer' ref={this.ref}>
