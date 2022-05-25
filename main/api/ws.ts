@@ -44,9 +44,7 @@ function extendSession (originId: string) {
     clearTimeout(connectionMonitors[originId])
 
     connectionMonitors[originId] = setTimeout(() => {
-      if (store('main.origins', originId)) {
-        store.endOriginSession(originId)
-      }
+      store.endOriginSession(originId)
     }, 60 * 1000)
   }
 }
@@ -63,28 +61,30 @@ const handler = (socket: FrameWebSocket, req: IncomingMessage) => {
   }
 
   socket.on('message', async data => {
-    let origin = socket.origin
+    let requestOrigin = socket.origin
     const rawPayload = validPayload<ExtensionPayload>(data.toString())
     if (!rawPayload) return console.warn('Invalid Payload', data)
     if (socket.isFrameExtension) { // Request from extension, swap origin
       if (rawPayload.__frameOrigin) {
-        origin = rawPayload.__frameOrigin
+        requestOrigin = rawPayload.__frameOrigin
         delete rawPayload.__frameOrigin
       } else {
-        origin = 'frame-extension'
+        requestOrigin = 'frame-extension'
       }
     }
 
-    const payload = updateOrigin(rawPayload, origin, rawPayload.__extensionConnecting)
-
     // Extension custom action for summoning Frame
-    if (origin === 'frame-extension' && payload.method === 'frame_summon') return windows.trayClick()
-    if (logTraffic) log.info(`req -> | ${(socket.isFrameExtension ? 'ext' : 'ws')} | ${origin} | ${payload.method} | -> | ${payload.params}`)
+    if (requestOrigin === 'frame-extension' && rawPayload.method === 'frame_summon') return windows.trayClick()
+    if (logTraffic) log.info(`req -> | ${(socket.isFrameExtension ? 'ext' : 'ws')} | ${requestOrigin} | ${rawPayload.method} | -> | ${rawPayload.params}`)
 
-    extendSession(payload._origin)
+    const { payload, hasSession } = updateOrigin(rawPayload, requestOrigin, rawPayload.__extensionConnecting)
 
-    if (protectedMethods.indexOf(payload.method) > -1 && !(await isTrusted(origin))) {
-      let error = { message: 'Permission denied, approve ' + origin + ' in Frame to continue', code: 4001 }
+    if (hasSession) {
+      extendSession(payload._origin)
+    }
+
+    if (protectedMethods.indexOf(payload.method) > -1 && !(await isTrusted(requestOrigin))) {
+      let error = { message: 'Permission denied, approve ' + requestOrigin + ' in Frame to continue', code: 4001 }
       // review
       if (!accounts.getSelectedAddresses()[0]) error = { message: 'No Frame account selected', code: 4001 }
       res({ id: payload.id, jsonrpc: payload.jsonrpc, error })
@@ -97,7 +97,7 @@ const handler = (socket: FrameWebSocket, req: IncomingMessage) => {
             payload.params.forEach(sub => { if (subs[sub]) delete subs[sub] })
           }
         }
-        if (logTraffic) log.info(`<- res | ${(socket.isFrameExtension ? 'ext' : 'ws')} | ${origin} | ${payload.method} | <- | ${JSON.stringify(response.result || response.error)}`)
+        if (logTraffic) log.info(`<- res | ${(socket.isFrameExtension ? 'ext' : 'ws')} | ${requestOrigin} | ${payload.method} | <- | ${JSON.stringify(response.result || response.error)}`)
 
         res(response)
       })
