@@ -62,7 +62,7 @@ const handler = (socket: FrameWebSocket, req: IncomingMessage) => {
       }
     }
 
-    const payload = updateOrigin(rawPayload, origin)
+    const payload = updateOrigin(rawPayload, origin, rawPayload.__extensionConnecting)
 
     // Extension custom action for summoning Frame
     if (origin === 'frame-extension' && payload.method === 'frame_summon') return windows.trayClick()
