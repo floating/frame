@@ -407,6 +407,14 @@ const migrations = {
     })
 
     return initial
+  },
+  21: initial => {
+    // add blockHeight to networksMeta
+    Object.entries(initial.main.networksMeta.ethereum).forEach(([chainId, chainMeta]) => {
+      initial.main.networksMeta.ethereum[chainId] = { ...chainMeta, blockHeight: 0 }
+    })
+
+    return initial
   }
 }
 
