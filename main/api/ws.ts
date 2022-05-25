@@ -15,6 +15,7 @@ import { IncomingMessage, Server } from 'http'
 const logTraffic = process.env.LOG_TRAFFIC
 
 const subs: Record<string, Subscription> = {}
+const connectionMonitors: Record<string, NodeJS.Timeout> = {}
 
 interface Subscription {
   originId: string,
@@ -35,6 +36,16 @@ interface ExtensionPayload extends JSONRPCRequestPayload {
 const storeApi = {
   getPermissions: (address: Address) => {
     return store('main.permissions', address) as Record<string, Permission>
+  }
+}
+
+function extendSession (originId: string) {
+  if (originId) {
+    clearTimeout(connectionMonitors[originId])
+
+    connectionMonitors[originId] = setTimeout(() => {
+      store.endOriginSession(originId)
+    }, 60 * 1000)
   }
 }
 
@@ -67,6 +78,8 @@ const handler = (socket: FrameWebSocket, req: IncomingMessage) => {
     // Extension custom action for summoning Frame
     if (origin === 'frame-extension' && payload.method === 'frame_summon') return windows.trayClick()
     if (logTraffic) log.info(`req -> | ${(socket.isFrameExtension ? 'ext' : 'ws')} | ${origin} | ${payload.method} | -> | ${payload.params}`)
+
+    extendSession(payload._origin)
 
     if (protectedMethods.indexOf(payload.method) > -1 && !(await isTrusted(origin))) {
       let error = { message: 'Permission denied, approve ' + origin + ' in Frame to continue', code: 4001 }
