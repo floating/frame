@@ -66,6 +66,12 @@ describe('#updateOrigin', () => {
       expect(store.initOrigin).not.toHaveBeenCalled()
     })
 
+    it('does not assign a session on a connection message', () => {
+      const { hasSession } = updateOrigin({}, 'frame.test', true)
+
+      expect(hasSession).toBe(false)
+    })
+
     it('sets the chainId to mainnet for a new origin', () => {
       const { payload } = updateOrigin({}, 'frame.test')
 

@@ -61,30 +61,30 @@ const handler = (socket: FrameWebSocket, req: IncomingMessage) => {
   }
 
   socket.on('message', async data => {
-    let requestOrigin = socket.origin
+    let origin = socket.origin
     const rawPayload = validPayload<ExtensionPayload>(data.toString())
     if (!rawPayload) return console.warn('Invalid Payload', data)
     if (socket.isFrameExtension) { // Request from extension, swap origin
       if (rawPayload.__frameOrigin) {
-        requestOrigin = rawPayload.__frameOrigin
+        origin = rawPayload.__frameOrigin
         delete rawPayload.__frameOrigin
       } else {
-        requestOrigin = 'frame-extension'
+        origin = 'frame-extension'
       }
     }
 
     // Extension custom action for summoning Frame
-    if (requestOrigin === 'frame-extension' && rawPayload.method === 'frame_summon') return windows.trayClick()
-    if (logTraffic) log.info(`req -> | ${(socket.isFrameExtension ? 'ext' : 'ws')} | ${requestOrigin} | ${rawPayload.method} | -> | ${rawPayload.params}`)
+    if (origin === 'frame-extension' && rawPayload.method === 'frame_summon') return windows.trayClick()
+    if (logTraffic) log.info(`req -> | ${(socket.isFrameExtension ? 'ext' : 'ws')} | ${origin} | ${rawPayload.method} | -> | ${rawPayload.params}`)
 
-    const { payload, hasSession } = updateOrigin(rawPayload, requestOrigin, rawPayload.__extensionConnecting)
+    const { payload, hasSession } = updateOrigin(rawPayload, origin, rawPayload.__extensionConnecting)
 
     if (hasSession) {
       extendSession(payload._origin)
     }
 
-    if (protectedMethods.indexOf(payload.method) > -1 && !(await isTrusted(requestOrigin))) {
-      let error = { message: 'Permission denied, approve ' + requestOrigin + ' in Frame to continue', code: 4001 }
+    if (protectedMethods.indexOf(payload.method) > -1 && !(await isTrusted(origin))) {
+      let error = { message: 'Permission denied, approve ' + origin + ' in Frame to continue', code: 4001 }
       // review
       if (!accounts.getSelectedAddresses()[0]) error = { message: 'No Frame account selected', code: 4001 }
       res({ id: payload.id, jsonrpc: payload.jsonrpc, error })
@@ -97,7 +97,7 @@ const handler = (socket: FrameWebSocket, req: IncomingMessage) => {
             payload.params.forEach(sub => { if (subs[sub]) delete subs[sub] })
           }
         }
-        if (logTraffic) log.info(`<- res | ${(socket.isFrameExtension ? 'ext' : 'ws')} | ${requestOrigin} | ${payload.method} | <- | ${JSON.stringify(response.result || response.error)}`)
+        if (logTraffic) log.info(`<- res | ${(socket.isFrameExtension ? 'ext' : 'ws')} | ${origin} | ${payload.method} | <- | ${JSON.stringify(response.result || response.error)}`)
 
         res(response)
       })
