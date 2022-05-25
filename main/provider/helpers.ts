@@ -195,7 +195,6 @@ export function getActiveChains () {
 }  
 
 export function getActiveChainDetails () {
-  console.log('getActiveChainDetails')
   const chains: Record<string, Network> = store('main.networks.ethereum') || {}
   
   return Object.values(chains)
@@ -208,8 +207,6 @@ export function getActiveChainDetails () {
       })
     })
 }  
-
-setTimeout(() => getActiveChainDetails(), 5000)
 
 export function getChains (payload: JSONRPCRequestPayload, res: RPCSuccessCallback) {
   res({ id: payload.id, jsonrpc: payload.jsonrpc, result: getActiveChains().map(intToHex) })
