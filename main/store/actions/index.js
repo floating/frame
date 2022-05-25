@@ -96,9 +96,6 @@ module.exports = {
       return dontRemind
     })
   },
-  setBlockNumber: (u, network, id, blockNumber) => {
-    u('main.networks', network, id, 'blockNumber', () => blockNumber)
-  },
   setAccount: (u, account) => {
     u('selected.current', _ => account.id)
     u('selected.minimized', _ => false)
