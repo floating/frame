@@ -12,6 +12,24 @@ function byLastUpdated (a, b) {
   return a.session.lastUpdatedAt - b.session.lastUpdatedAt
 }
 
+function getOriginsForChain (chain, origins) {
+  const { connectedOrigins, disconnectedOrigins } = Object.values(origins).reduce((acc, origin) => {
+    if (origin.chain.id === chain.id) {
+      const connected = isNetworkConnected(chain) &&
+        (!origin.session.endedAt || origin.session.startedAt > origin.session.endedAt)
+
+      acc[connected ? 'connectedOrigins' : 'disconnectedOrigins'].push(origin)
+    }
+
+    return acc
+  }, { connectedOrigins: [], disconnectedOrigins: [] })
+
+  return {
+    connected: connectedOrigins.sort(bySessionStartTime),
+    disconnected: disconnectedOrigins.sort(byLastUpdated)
+  }
+}
+
 class Indicator extends React.Component {
   constructor (props) {
     super(props)
@@ -95,40 +113,26 @@ class Dapps extends React.Component {
     return Object.values(this.store('main.networks.ethereum')).filter(isNetworkEnabled)
   }
 
-  getOriginsForChain (chain) {
-    const { connectedOrigins, disconnectedOrigins } = Object.values(this.store('main.origins')).reduce((acc, origin) => {
-      if (origin.chain.id === chain.id) {
-        const connected = isNetworkConnected(chain) &&
-          (!origin.session.endedAt || origin.session.startedAt > origin.session.endedAt)
-
-        acc[connected ? 'connectedOrigins' : 'disconnectedOrigins'].push(origin)
-      }
-
-      return acc
-    }, { connectedOrigins: [], disconnectedOrigins: [] })
-
-    const origins = {
-      connected: connectedOrigins.sort(bySessionStartTime),
-      disconnected: disconnectedOrigins.sort(byLastUpdated)
-    }
-
-    return origins
-  }
-
   render () {
     const enabledChains = this.getEnabledChains()
+    const origins = this.store('main.origins')
+    const originsCount = Object.values(origins).length
+    const clearOriginsClickHandler = () => link.send('tray:action', 'clearOrigins')
 
     return (
       <div>
         {
           enabledChains.map(chain => {
-            const origins = this.getOriginsForChain(chain)
+            const chainOrigins = getOriginsForChain(chain, origins)
 
-            return origins.length === 0
+            return chainOrigins.length === 0
               ? <></>
-              : <ChainOrigins chain={chain} origins={origins} />
+              : <ChainOrigins chain={chain} origins={chainOrigins} />
           })
         }
+        <div className={`clearOriginsButton${originsCount === 0 ? ' clearOriginsButtonDisabled' : ''}`} onClick={clearOriginsClickHandler} >
+          Clear All Origins
+        </div>
       </div>
     ) 
   }
