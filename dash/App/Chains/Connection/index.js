@@ -6,6 +6,30 @@ import Dropdown from '../../../../resources/Components/Dropdown'
 import link from '../../../../resources/link'
 import svg from '../../../../resources/svg'
 
+const ConnectionIndicator = ({ connection }) => {
+  const isConnected = connection.status === 'connected'
+  const isLoading = connection.status === 'loading'
+  const isPending = connection.status === 'pending'
+  const isSyncing = connection.status === 'syncing'
+  let status = 'Bad'
+  if (isConnected) {
+    status = 'Good'
+  } else if (isLoading || isPending || isSyncing) {
+    status = 'Pending'
+  }
+
+  return <div className={`sliceTileIndicatorLarge sliceTileIndicator${status}`} />
+}
+
+const ConnectionStatus = ({ connection }) => 
+  <>
+    <ConnectionIndicator connection={connection} />
+    <div className="sliceTileConnectionName"> 
+      {connection.current}
+    </div>
+  </>
+
+
 class ChainModule extends React.Component {
   constructor (...args) {
     super(...args)
@@ -29,7 +53,14 @@ class ChainModule extends React.Component {
   //   document.removeEventListener('click', this.clickHandler.bind(this))
   // }
 
-  renderConnection (origin, id) {
+  renderConnection (id, { primary, secondary }, blockHeight) {
+    const primaryActive = primary.on && primary.status !== 'disconnected'
+    const secondaryActive = secondary.on && secondary.status !== 'disconnected'
+    let connection = primary
+    if (secondaryActive && !primaryActive) {
+      connection = secondary
+    }
+
     return (
       <div 
         className='sliceTile sliceTileClickable'
@@ -37,15 +68,12 @@ class ChainModule extends React.Component {
           this.setState({ expanded: !this.state.expanded })
         }}
       >
-        <div className={this.props.active ? 'sliceTileIndicatorLarge sliceTileIndicatorActive' : 'sliceTileIndicatorLarge' } />
-        <div className='sliceTileConnectionName'> 
-          {'Pylon'}
-        </div>
+        <ConnectionStatus connection={connection} />
         <div className='sliceTileBlock'>
           <div className='sliceTileBlockIcon'>{svg.chain(14)}</div>
           <div className='sliceTileChainId'>{id}</div>
           <div className='sliceTileBlockIcon'>{svg.cube(14)}</div>
-          <div>{1223434}</div>
+          <div>{blockHeight}</div>
         </div>
       </div>
     )
@@ -88,15 +116,16 @@ class ChainModule extends React.Component {
   render () {
     const { id, type, connection, changed } = this.props
 
+    const networkMeta = this.store('main.networksMeta.ethereum', id)
     const networkPresets = this.store('main.networkPresets', type)
     let presets = networkPresets[id] || {}
-    presets = Object.keys(presets).map(i => ({ text: i, value: type + ':' + id + ':' + i }))
-    presets = presets.concat(Object.keys(networkPresets.default).map(i => ({ text: i, value: type + ':' + id + ':' + i })))
-    presets.push({ text: 'Custom', value: type + ':' + id + ':' + 'custom' })
+    presets = Object.keys(presets).map(i => ({ text: i, value: `${type}:${id}:${i}` }))
+    presets = presets.concat(Object.keys(networkPresets.default).map(i => ({ text: i, value: `${type}:${id}:${i}` })))
+    presets.push({ text: 'Custom', value: `${type}:${id}:custom` })
 
     return (
       <div className='sliceContainer' ref={this.ref}>
-        {this.renderConnection('connection', id)}
+        {this.renderConnection(id, connection, networkMeta.blockHeight)}
         {this.state.expanded ? (
           <div className='connectionLevels'>
             <div className='signerPermission signerPermissionNetwork cardShow' style={{ zIndex: 2 }}>
@@ -113,7 +142,7 @@ class ChainModule extends React.Component {
                       <div className='connectionOptionDetailsInset'>
                         {this.status(type, id, 'primary')}
                         <Dropdown
-                          syncValue={type + ':' + id + ':' + connection.primary.current}
+                          syncValue={`${type}:${id}:${connection.primary.current}`}
                           onChange={preset => {
                             const [type, id, value] = preset.split(':')
                             link.send('tray:action', 'selectPrimary', type, id, value)
@@ -150,7 +179,7 @@ class ChainModule extends React.Component {
                       <div className='connectionOptionDetailsInset'>
                         {this.status(type, id, 'secondary')}
                         <Dropdown
-                          syncValue={type + ':' + id + ':' + connection.secondary.current}
+                          syncValue={`${type}:${id}:${connection.secondary.current}`}
                           onChange={preset => {
                             const [type, id, value] = preset.split(':')
                             link.send('tray:action', 'selectSecondary', type, id, value)
