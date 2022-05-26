@@ -17,8 +17,14 @@ afterEach(() => {
 })
 
 it('should be able to change the chain for a given origin', async () => {
-  const currentChain = await frame.request({ method: 'eth_chainId' })
-  const targetChain = currentChain === '0x1' ? '0x4' : '0x1'
+  const [chains, currentChain] = await Promise.all([
+    frame.request({ method: 'wallet_getChains' }),
+    frame.request({ method: 'eth_chainId' })
+  ])
+
+  const targetChain = chains.find(c => c !== currentChain)
+
+  if (!targetChain) throw new Error('no available chains to switch to!')
 
   return new Promise((resolve, reject) => {
     frame.on('chainChanged', async updatedChainId => {
