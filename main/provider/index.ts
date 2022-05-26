@@ -824,7 +824,7 @@ store.observer(() => {
     const currentOrigin = currentOrigins[originId]
     const knownOrigin = knownOrigins[originId]
 
-    if (knownOrigin?.chain.id !== currentOrigin.chain.id) {
+    if (knownOrigin && knownOrigin.chain.id !== currentOrigin.chain.id) {
       provider.chainChanged(currentOrigin.chain.id, originId)
       provider.networkChanged(currentOrigin.chain.id)
     }
