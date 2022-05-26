@@ -96,9 +96,6 @@ module.exports = {
       return dontRemind
     })
   },
-  setBlockNumber: (u, network, id, blockNumber) => {
-    u('main.networks', network, id, 'blockNumber', () => blockNumber)
-  },
   setAccount: (u, account) => {
     u('selected.current', _ => account.id)
     u('selected.minimized', _ => false)
@@ -265,6 +262,7 @@ module.exports = {
       }
 
       const defaultMeta = {
+        blockHeight: 0,
         gas: {
           price: {
             selected: 'standard',
@@ -449,6 +447,9 @@ module.exports = {
   },
   clearAllOrigins: (u) => {
     u('main.origins', () => ({}))
+  },
+  setBlockHeight: (u, chainId, blockHeight) => {
+    u('main.networksMeta.ethereum', chainId, (chainMeta) => ({ ...chainMeta, blockHeight }))
   },
   expandDock: (u, expand) => {
     u('dock.expand', (s) => expand)

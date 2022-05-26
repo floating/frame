@@ -102,6 +102,7 @@ class ChainConnection extends EventEmitter {
         }
 
         store.setGasFees(this.type, this.chainId, feeMarket)
+        store.setBlockHeight(this.chainId, parseInt(block.number, 16))
 
         this.emit('update', { type: 'fees', chainId: parseInt(this.chainId) })
       } catch (e) {
