@@ -447,6 +447,9 @@ module.exports = {
       u('main.origins', originId, origin => ({ ...origin, chain: { id: chainId, type } }))
     }
   },
+  clearAllOrigins: (u) => {
+    u('main.origins', () => ({}))
+  },
   expandDock: (u, expand) => {
     u('dock.expand', (s) => expand)
   },
