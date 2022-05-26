@@ -47,9 +47,9 @@ class ChainModule extends React.Component {
   renderConnection (id, { primary, secondary }, blockHeight) {
     const primaryActive = primary.on && primary.status !== 'disconnected'
     const secondaryActive = secondary.on && secondary.status !== 'disconnected'
-    let currentConnection = primary
+    let connection = primary
     if (secondaryActive && !primaryActive) {
-      currentConnection = secondary
+      connection = secondary
     }
 
     return (
@@ -59,9 +59,9 @@ class ChainModule extends React.Component {
           this.setState({ expanded: !this.state.expanded })
         }}
       >
-        <Indicator className='sliceTileIndicatorLarge' connection={currentConnection} />
+        <Indicator className='sliceTileIndicatorLarge' connection={connection} />
         <div className='sliceTileConnectionName'> 
-          {currentConnection.current}
+          {connection.current}
         </div>
         <div className='sliceTileBlock'>
           <div className='sliceTileBlockIcon'>{svg.chain(14)}</div>
