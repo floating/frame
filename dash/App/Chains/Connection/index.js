@@ -18,15 +18,13 @@ const ConnectionIndicator = ({ connection }) => {
     status = 'Pending'
   }
 
-  return <>
-    <div className={`sliceTileIndicatorLarge sliceTileIndicator${status}`} />
-  </>
+  return <div className={`sliceTileIndicatorLarge sliceTileIndicator${status}`} />
 }
 
 const ConnectionStatus = ({ connection }) => 
   <>
     <ConnectionIndicator connection={connection} />
-    <div className='sliceTileConnectionName'> 
+    <div className="sliceTileConnectionName"> 
       {connection.current}
     </div>
   </>
