@@ -11,6 +11,7 @@ import {
   addKnownTokens as addKnownTokensAction,
   setScanning as setScanningAction,
   initOrigin as initOriginAction,
+  clearAllOrigins as clearAllOriginsAction,
   addOriginRequest as addOriginRequestAction,
   switchOriginChain as switchOriginChainAction,
   removeNetwork as removeNetworkAction,
@@ -553,6 +554,31 @@ describe('#initOrigin', () => {
         lastUpdatedAt: creationDate.getTime()
       }
     })
+  })
+})
+
+describe('#clearAllOrigins', () => {
+  let origins
+
+  const updaterFn = (node, update) => {
+    expect(node).toBe('main.origins')
+    origins = update()
+  }
+
+  const clearAllOrigins = () => clearAllOriginsAction(updaterFn)
+
+  beforeEach(() => {
+    origins = {
+      '91f6971d-ba85-52d7-a27e-6af206eb2433': {},
+      '8073729a-5e59-53b7-9e69-5d9bcff94087': {},
+      'd7acc008-6411-5486-bb2d-0c0cfcddbb92': {},
+    }
+  })
+
+  it('should clear all existing origins', () => {
+    clearAllOrigins(origins)
+
+    expect(origins).toEqual({})
   })
 })
 
