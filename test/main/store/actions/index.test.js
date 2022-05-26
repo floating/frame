@@ -14,7 +14,8 @@ import {
   addOriginRequest as addOriginRequestAction,
   switchOriginChain as switchOriginChainAction,
   removeNetwork as removeNetworkAction,
-  updateNetwork as updateNetworkAction
+  updateNetwork as updateNetworkAction,
+  setBlockHeight as setBlockHeightAction
 } from '../../../../main/store/actions'
 
 beforeAll(() => {
@@ -175,6 +176,7 @@ describe('#addNetwork', () => {
     addNetwork(polygonNetwork)
 
     expect(networksMeta.ethereum['137']).toEqual({
+      blockHeight: 0,
       gas: {
         price: {
           selected: 'standard',
@@ -822,5 +824,40 @@ describe('#updateNetwork', () => {
         chain: expect.objectContaining({ id: 66, type: 'ethereum' })
       }
     })
+  })
+})
+
+describe('#setBlockHeight', () => {
+  let main
+
+  const updaterFn = (node, chainId, update) => {
+    expect(node).toBe('main.networksMeta.ethereum')
+    main.networksMeta.ethereum[chainId] = update(main.networksMeta.ethereum[chainId])
+  }
+
+  beforeEach(() => {
+    main = {
+      networksMeta: {
+        ethereum: {
+          1: {
+            blockHeight: 0
+          },
+          4: {
+            blockHeight: 0
+          },
+          137: {
+            blockHeight: 0
+          }
+        },
+      },
+    }
+  })
+
+  const setBlockHeight = (chainId, blockHeight) => setBlockHeightAction(updaterFn, chainId, blockHeight)
+
+  it('should update the block height for the expected chain', () => {
+    setBlockHeight(4, 500)
+
+    expect(main.networksMeta.ethereum).toStrictEqual({ 1: { blockHeight: 0 }, 4: { blockHeight: 500 }, 137: { blockHeight: 0 } })
   })
 })

@@ -443,6 +443,7 @@ const initial = {
     networksMeta: main('networksMeta', {
       ethereum: {
         1: {
+          blockHeight: 0,
           gas: {
             fees: {},
             price: {
@@ -452,6 +453,7 @@ const initial = {
           }
         },
         3: {
+          blockHeight: 0,
           gas: {
             fees: {},
             price: {
@@ -461,6 +463,7 @@ const initial = {
           }
         },
         4: {
+          blockHeight: 0,
           gas: {
             fees: {},
             price: {
@@ -470,6 +473,7 @@ const initial = {
           }
         },
         5: {
+          blockHeight: 0,
           gas: {
             fees: {},
             price: {
@@ -479,6 +483,7 @@ const initial = {
           }
         },
         10: {
+          blockHeight: 0,
           gas: {
             fees: {},
             price: {
@@ -488,6 +493,7 @@ const initial = {
           }
         },
         42: {
+          blockHeight: 0,
           gas: {
             fees: {},
             price: {
@@ -497,6 +503,7 @@ const initial = {
           }
         },
         100: {
+          blockHeight: 0,
           gas: {
             fees: {},
             price: {
@@ -506,6 +513,7 @@ const initial = {
           }
         },
         137: {
+          blockHeight: 0,
           gas: {
             fees: {},
             price: {
@@ -515,6 +523,7 @@ const initial = {
           }
         },
         42161: {
+          blockHeight: 0,
           gas: {
             fees: {},
             price: {
