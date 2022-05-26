@@ -194,8 +194,26 @@ export function getActiveChains () {
     .sort((a, b) => a - b)
 }  
 
+export function getActiveChainDetails () {
+  const chains: Record<string, Network> = store('main.networks.ethereum') || {}
+  
+  return Object.values(chains)
+    .filter(chain => chain.on)
+    .sort((a, b) => a.id - b.id)
+    .map(chain => {
+      return ({
+        id: intToHex(chain.id),
+        name: chain.name
+      })
+    })
+}  
+
 export function getChains (payload: JSONRPCRequestPayload, res: RPCSuccessCallback) {
   res({ id: payload.id, jsonrpc: payload.jsonrpc, result: getActiveChains().map(intToHex) })
+}
+
+export function getChainDetails (payload: JSONRPCRequestPayload, res: RPCSuccessCallback) {
+  res({ id: payload.id, jsonrpc: payload.jsonrpc, result: getActiveChainDetails() })
 }
   
 export function ecRecover (payload: JSONRPCRequestPayload, res: RPCRequestCallback) {
