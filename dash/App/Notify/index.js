@@ -50,6 +50,7 @@ class Notify extends React.Component {
 
   updateOriginChain (data) {
     const { origin } = data
+
     return (
       <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
         <div className='notifyBoxSlide'>
