@@ -13,12 +13,12 @@ function byLastUpdated (a, b) {
 }
 
 function getOriginsForChain (chain, origins) {
-  const { connectedOrigins, disconnectedOrigins } = Object.values(origins).reduce((acc, origin) => {
+  const { connectedOrigins, disconnectedOrigins } = Object.entries(origins).reduce((acc, [id, origin]) => {
     if (origin.chain.id === chain.id) {
       const connected = isNetworkConnected(chain) &&
         (!origin.session.endedAt || origin.session.startedAt > origin.session.endedAt)
 
-      acc[connected ? 'connectedOrigins' : 'disconnectedOrigins'].push(origin)
+      acc[connected ? 'connectedOrigins' : 'disconnectedOrigins'].push({ ...origin, id })
     }
 
     return acc

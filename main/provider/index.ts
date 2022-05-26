@@ -820,15 +820,17 @@ let availableChains = getActiveChains()
 store.observer(() => {
   const currentOrigins = store('main.origins') as Record<string, Origin>
   const currentChains = getActiveChains()
-  for (const originId in currentOrigins) {
-    const origin = currentOrigins[originId]
 
-    if (!knownOrigins[originId]) {
-      knownOrigins[originId] = origin
-    } else if (knownOrigins[originId].chain.id !== origin.chain.id) {
-      provider.chainChanged(origin.chain.id, originId)
-      provider.networkChanged(origin.chain.id)
+  for (const originId in currentOrigins) {
+    const currentOrigin = currentOrigins[originId]
+    const knownOrigin = knownOrigins[originId]
+
+    if (knownOrigin && knownOrigin.chain.id !== currentOrigin.chain.id) {
+      provider.chainChanged(currentOrigin.chain.id, originId)
+      provider.networkChanged(currentOrigin.chain.id)
     }
+
+    knownOrigins[originId] = currentOrigin
   }
 
   if (!arraysMatch(currentChains, availableChains)) {
