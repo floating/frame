@@ -7,7 +7,7 @@ import accounts, { AccessRequest } from '../accounts'
 import store from '../store'
 
 const dev = process.env.NODE_ENV === 'development'
-const originDomainRegex = /^(?:ws|http)s?:\/\//
+const protocolRegex = /^(?:ws|http)s?:\/\//
 
 interface OriginUpdateResult {
   payload: RPCRequestPayload,
@@ -17,7 +17,7 @@ interface OriginUpdateResult {
 export function parseOrigin (origin?: string) {
   if (!origin) return 'Unknown'
 
-  return origin.replace(originDomainRegex, '')
+  return origin.replace(protocolRegex, '')
 }
 
 function isRealOrigin (origin: string) {
