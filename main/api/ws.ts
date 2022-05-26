@@ -7,7 +7,7 @@ import provider from '../provider'
 import accounts from '../accounts'
 import windows from '../windows'
 
-import { updateOrigin, isTrusted, isFrameExtension } from './origins'
+import { updateOrigin, isTrusted, isFrameExtension, parseOrigin } from './origins'
 import validPayload from './validPayload'
 import protectedMethods from './protectedMethods'
 import { IncomingMessage, Server } from 'http'
@@ -61,17 +61,20 @@ const handler = (socket: FrameWebSocket, req: IncomingMessage) => {
   }
 
   socket.on('message', async data => {
-    let origin = socket.origin
     const rawPayload = validPayload<ExtensionPayload>(data.toString())
     if (!rawPayload) return console.warn('Invalid Payload', data)
+
+    let requestOrigin = socket.origin
     if (socket.isFrameExtension) { // Request from extension, swap origin
       if (rawPayload.__frameOrigin) {
-        origin = rawPayload.__frameOrigin
+        requestOrigin = rawPayload.__frameOrigin
         delete rawPayload.__frameOrigin
       } else {
-        origin = 'frame-extension'
+        requestOrigin = 'frame-extension'
       }
     }
+
+    const origin = parseOrigin(requestOrigin)
 
     // Extension custom action for summoning Frame
     if (origin === 'frame-extension' && rawPayload.method === 'frame_summon') return windows.trayClick()
