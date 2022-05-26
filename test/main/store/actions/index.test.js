@@ -11,7 +11,7 @@ import {
   addKnownTokens as addKnownTokensAction,
   setScanning as setScanningAction,
   initOrigin as initOriginAction,
-  clearAllOrigins as clearAllOriginsAction,
+  clearOrigins as clearOriginsAction,
   addOriginRequest as addOriginRequestAction,
   switchOriginChain as switchOriginChainAction,
   removeNetwork as removeNetworkAction,
@@ -557,7 +557,7 @@ describe('#initOrigin', () => {
   })
 })
 
-describe('#clearAllOrigins', () => {
+describe('#clearOrigins', () => {
   let origins
 
   const updaterFn = (node, update) => {
@@ -565,7 +565,7 @@ describe('#clearAllOrigins', () => {
     origins = update()
   }
 
-  const clearAllOrigins = () => clearAllOriginsAction(updaterFn)
+  const clearOrigins = () => clearOriginsAction(updaterFn)
 
   beforeEach(() => {
     origins = {
@@ -576,7 +576,7 @@ describe('#clearAllOrigins', () => {
   })
 
   it('should clear all existing origins', () => {
-    clearAllOrigins(origins)
+    clearOrigins(origins)
 
     expect(origins).toEqual({})
   })

@@ -117,7 +117,7 @@ class Dapps extends React.Component {
     const enabledChains = this.getEnabledChains()
     const origins = this.store('main.origins')
     const originsCount = Object.values(origins).length
-    const clearOriginsClickHandler = () => link.send('tray:action', 'clearAllOrigins')
+    const clearOriginsClickHandler = () => link.send('tray:action', 'clearOrigins')
 
     return (
       <div>

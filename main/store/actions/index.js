@@ -445,7 +445,7 @@ module.exports = {
       u('main.origins', originId, origin => ({ ...origin, chain: { id: chainId, type } }))
     }
   },
-  clearAllOrigins: (u) => {
+  clearOrigins: (u) => {
     u('main.origins', () => ({}))
   },
   setBlockHeight: (u, chainId, blockHeight) => {
