@@ -10,6 +10,8 @@ import {
   removeCustomTokens as removeTokensAction,
   addKnownTokens as addKnownTokensAction,
   setScanning as setScanningAction,
+  initOrigin as initOriginAction,
+  addOriginRequest as addOriginRequestAction,
   switchOriginChain as switchOriginChainAction,
   removeNetwork as removeNetworkAction,
   updateNetwork as updateNetworkAction
@@ -510,6 +512,104 @@ describe('#setScanning', () => {
     jest.advanceTimersByTime(1000)
 
     expect(isScanning).toBe(false)
+  })
+})
+
+describe('#initOrigin', () => {
+  let origins
+  const creationDate = new Date('2022-05-24')
+
+  const updaterFn = (node, update) => {
+    expect(node).toBe('main.origins')
+    origins = update()
+  }
+
+  const initOrigin = (id, origin) => initOriginAction(updaterFn, id, origin)
+
+  beforeEach(() => {
+    origins = {}
+    jest.useFakeTimers().setSystemTime(creationDate)
+  })
+
+  afterEach(() => {
+    jest.useRealTimers()
+  })
+
+  it('creates a new origin', () => {
+    const origin = { name: 'frame.test', chain: { id: 137, type: 'ethereum' }}
+
+    initOrigin('91f6971d-ba85-52d7-a27e-6af206eb2433', origin)
+
+    expect(origins['91f6971d-ba85-52d7-a27e-6af206eb2433']).toEqual({
+      name: 'frame.test',
+      chain: {
+        id: 137,
+        type: 'ethereum'
+      },
+      session: {
+        startedAt: creationDate.getTime(),
+        lastUpdatedAt: creationDate.getTime()
+      }
+    })
+  })
+})
+
+describe('#addOriginRequest', () => {
+  let origins
+
+  const creationTime = new Date('2022-05-24').getTime()
+  const updateTime = creationTime + (1000 * 60 * 60 * 24 * 2)
+
+  const updaterFn = (node, id, update) => {
+    expect([node, id].join('.')).toBe('main.origins.test')
+    origins.test = update(origins.test)
+  }
+
+  const addOriginRequest = id => addOriginRequestAction(updaterFn, id)
+
+  beforeEach(() => {
+    jest.useFakeTimers().setSystemTime(updateTime)
+
+    origins = {
+      test: {
+        chain: { id: 10, type: 'ethereum' },
+        session: { }
+      }
+    }
+  })
+
+  afterEach(() => {
+    jest.useRealTimers()
+  })
+
+  it('adds a request to an existing session', () => {
+    origins.test.session.startedAt = creationTime
+    origins.test.session.lastUpdatedAt = creationTime
+
+    addOriginRequest('test')
+
+    expect(origins.test.session).toEqual({
+      startedAt: creationTime,
+      lastUpdatedAt: updateTime,
+      endedAt: undefined
+    })
+  })
+
+  it('handles a request for a previously ended session', () => {
+    const endTime = new Date(creationTime)
+    endTime.setDate(endTime.getDate() + 1)
+
+    origins.test.session.startedAt = creationTime
+    origins.test.session.lastUpdatedAt = endTime.getTime()
+    origins.test.session.endedAt = endTime.getTime()
+
+    addOriginRequest('test')
+
+    expect(origins.test.session).toEqual({
+      startedAt: updateTime,
+      lastUpdatedAt: updateTime,
+      endedAt: undefined
+    })
   })
 })
 

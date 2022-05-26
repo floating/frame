@@ -44,9 +44,7 @@ function extendSession (originId: string) {
     clearTimeout(connectionMonitors[originId])
 
     connectionMonitors[originId] = setTimeout(() => {
-      if (store('main.origins', originId)) {
-        store.endOriginSession(originId)
-      }
+      store.endOriginSession(originId)
     }, 60 * 1000)
   }
 }
@@ -75,13 +73,15 @@ const handler = (socket: FrameWebSocket, req: IncomingMessage) => {
       }
     }
 
-    const payload = updateOrigin(rawPayload, origin, rawPayload.__extensionConnecting)
-
     // Extension custom action for summoning Frame
-    if (origin === 'frame-extension' && payload.method === 'frame_summon') return windows.trayClick()
-    if (logTraffic) log.info(`req -> | ${(socket.isFrameExtension ? 'ext' : 'ws')} | ${origin} | ${payload.method} | -> | ${payload.params}`)
+    if (origin === 'frame-extension' && rawPayload.method === 'frame_summon') return windows.trayClick()
+    if (logTraffic) log.info(`req -> | ${(socket.isFrameExtension ? 'ext' : 'ws')} | ${origin} | ${rawPayload.method} | -> | ${rawPayload.params}`)
 
-    extendSession(payload._origin)
+    const { payload, hasSession } = updateOrigin(rawPayload, origin, rawPayload.__extensionConnecting)
+
+    if (hasSession) {
+      extendSession(payload._origin)
+    }
 
     if (protectedMethods.indexOf(payload.method) > -1 && !(await isTrusted(origin))) {
       let error = { message: 'Permission denied, approve ' + origin + ' in Frame to continue', code: 4001 }
