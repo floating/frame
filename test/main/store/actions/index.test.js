@@ -174,6 +174,7 @@ describe('#addNetwork', () => {
     addNetwork(polygonNetwork)
 
     expect(networksMeta.ethereum['137']).toEqual({
+      blockHeight: 0,
       gas: {
         price: {
           selected: 'standard',
