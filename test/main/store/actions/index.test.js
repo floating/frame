@@ -550,6 +550,7 @@ describe('#initOrigin', () => {
         type: 'ethereum'
       },
       session: {
+        requests: 1,
         startedAt: creationDate.getTime(),
         lastUpdatedAt: creationDate.getTime()
       }
@@ -586,11 +587,12 @@ describe('#addOriginRequest', () => {
   let origins
 
   const creationTime = new Date('2022-05-24').getTime()
-  const updateTime = creationTime + (1000 * 60 * 60 * 24 * 2)
+  const updateTime = creationTime + (1000 * 60 * 60 * 24 * 2) // 2 days
+  const endTime = creationTime + (1000 * 60 * 60 * 24 * 1) // 1 day
 
   const updaterFn = (node, id, update) => {
-    expect([node, id].join('.')).toBe('main.origins.test')
-    origins.test = update(origins.test)
+    expect(node).toBe('main.origins')
+    origins[id] = update(origins[id])
   }
 
   const addOriginRequest = id => addOriginRequestAction(updaterFn, id)
@@ -599,9 +601,22 @@ describe('#addOriginRequest', () => {
     jest.useFakeTimers().setSystemTime(updateTime)
 
     origins = {
-      test: {
+      activeOrigin: {
         chain: { id: 10, type: 'ethereum' },
-        session: { }
+        session: {
+          requests: 3,
+          startedAt: creationTime,
+          lastUpdatedAt: creationTime
+        }
+      },
+      staleOrigin: {
+        chain: { id: 42161, type: 'ethereum' },
+        session: {
+          requests: 14,
+          startedAt: creationTime,
+          endedAt: endTime,
+          lastUpdatedAt: endTime
+        }
       }
     }
   })
@@ -610,34 +625,33 @@ describe('#addOriginRequest', () => {
     jest.useRealTimers()
   })
 
-  it('adds a request to an existing session', () => {
-    origins.test.session.startedAt = creationTime
-    origins.test.session.lastUpdatedAt = creationTime
+  it('updates the timestamp for an existing session', () => {
+    addOriginRequest('activeOrigin')
 
-    addOriginRequest('test')
+    expect(origins.activeOrigin.session.startedAt).toBe(creationTime)
+    expect(origins.activeOrigin.session.lastUpdatedAt).toBe(updateTime)
+  })
 
-    expect(origins.test.session).toEqual({
-      startedAt: creationTime,
-      lastUpdatedAt: updateTime,
-      endedAt: undefined
-    })
+  it('increments the request count for an existing session', () => {
+    origins.activeOrigin.session.requests = 3
+
+    addOriginRequest('activeOrigin')
+
+    expect(origins.activeOrigin.session.requests).toBe(4)
   })
 
   it('handles a request for a previously ended session', () => {
-    const endTime = new Date(creationTime)
-    endTime.setDate(endTime.getDate() + 1)
+    addOriginRequest('staleOrigin')
 
-    origins.test.session.startedAt = creationTime
-    origins.test.session.lastUpdatedAt = endTime.getTime()
-    origins.test.session.endedAt = endTime.getTime()
+    expect(origins.staleOrigin.session.startedAt).toBe(updateTime)
+    expect(origins.staleOrigin.session.endedAt).toBe(undefined)
+    expect(origins.staleOrigin.session.lastUpdatedAt).toBe(updateTime)
+  })
 
-    addOriginRequest('test')
+  it('resets the request count when starting a new session', () => {
+    addOriginRequest('staleOrigin')
 
-    expect(origins.test.session).toEqual({
-      startedAt: updateTime,
-      lastUpdatedAt: updateTime,
-      endedAt: undefined
-    })
+    expect(origins.staleOrigin.session.requests).toBe(1)
   })
 })
 

@@ -400,6 +400,7 @@ module.exports = {
       const createdOrigin = {
         ...origin,
         session: {
+          requests: 1,
           startedAt: now,
           lastUpdatedAt: now
         }
@@ -412,13 +413,15 @@ module.exports = {
     const now = new Date().getTime()
 
     u('main.origins', originId, origin => {
-      // start a new session if the previous one had ended
-      const startedAt = origin.session.startedAt < origin.session.endedAt ? now : origin.session.startedAt
+      // start a new session if the previous one has already ended
+      const isNewSession = origin.session.startedAt < origin.session.endedAt
+      const startedAt = isNewSession ? now : origin.session.startedAt
+      const requests = isNewSession ? 1 : origin.session.requests + 1
 
       return {
         ...origin,
         session: {
-          ...origin.session,
+          requests,
           startedAt,
           endedAt: undefined,
           lastUpdatedAt: now
