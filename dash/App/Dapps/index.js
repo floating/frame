@@ -75,6 +75,11 @@ class _OriginModule extends React.Component {
   render () {
     const { origin, connected } = this.props
 
+    const sessionLengthSeconds = Math.max((origin.session.lastUpdatedAt - origin.session.startedAt), 1000) / 1000
+    const averageRequests = (origin.session.requests / sessionLengthSeconds).toFixed(1)
+
+    console.log({ started: origin.session.startedAt, updated: origin.session.lastUpdatedAt, sessionLengthSeconds, reqs: origin.session.requests, averageRequests })
+
     return (
       <div>      
         <div 
@@ -86,6 +91,10 @@ class _OriginModule extends React.Component {
           <Indicator key={origin.session.lastUpdatedAt} connected={connected} />
           <div className='sliceOriginTile'>
             {origin.name}
+          </div>
+          <div className='sliceOriginReqs'> 
+            <div className='sliceOriginReqsNumber'>{averageRequests}</div>
+            <div className='sliceOriginReqsLabel'>{'reqs/s'}</div>
           </div>
         </div>
         {this.state.expanded ? (
