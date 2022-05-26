@@ -445,6 +445,9 @@ module.exports = {
       u('main.origins', originId, origin => ({ ...origin, chain: { id: chainId, type } }))
     }
   },
+  clearOrigins: (u) => {
+    u('main.origins', () => ({}))
+  },
   setBlockHeight: (u, chainId, blockHeight) => {
     u('main.networksMeta.ethereum', chainId, (chainMeta) => ({ ...chainMeta, blockHeight }))
   },
