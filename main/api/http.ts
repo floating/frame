@@ -36,9 +36,7 @@ function extendSession (originId: string) {
     clearTimeout(connectionMonitors[originId])
 
     connectionMonitors[originId] = setTimeout(() => {
-      if (store('main.origins', originId)) {
-        store.endOriginSession(originId)
-      }
+      store.endOriginSession(originId)
     }, 60 * 1000)
   }
 }
@@ -75,12 +73,14 @@ const handler = (req: IncomingMessage, res: ServerResponse) => {
       const rawPayload = validPayload<HTTPPollingPayload>(data)
       if (!rawPayload) return console.warn('Invalid Payload', data)
 
+      if (logTraffic) log.info(`req -> | http | ${req.headers.origin} | ${rawPayload.method} | -> | ${JSON.stringify(rawPayload.params)}`)
+
       const origin = req.headers.origin
-      const payload = updateOrigin(rawPayload, origin)
+      const { payload, hasSession } = updateOrigin(rawPayload, origin)
 
-      if (logTraffic) log.info(`req -> | http | ${req.headers.origin} | ${payload.method} | -> | ${JSON.stringify(payload.params)}`)
-
-      extendSession(payload._origin)
+      if (hasSession) {
+        extendSession(payload._origin)
+      }
 
       if (protectedMethods.indexOf(payload.method) > -1 && !(await isTrusted(origin))) {
         let error = { message: `Permission denied, approve ${origin} in Frame to continue`, code: 4001 }
