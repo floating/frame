@@ -6,16 +6,19 @@ import Dropdown from '../../../../resources/Components/Dropdown'
 import link from '../../../../resources/link'
 import svg from '../../../../resources/svg'
 
-const Indicator = ({ status }) => {
-  const statusMap = {
-    connected: 'Good',
-    loading: 'Pending',
-    syncing: 'Pending',
-    pending: 'Pending',
-    standby: 'Pending'
+const Indicator = ({ primary, secondary }) => {
+  const isConnected = [primary.status, secondary.status].includes('connected')
+  const isLoading = [primary.status, secondary.status].includes('loading')
+  const isPending = [primary.status, secondary.status].includes('pending')
+  const isSyncing = [primary.status, secondary.status].includes('syncing')
+  let status = 'Bad'
+  if (isConnected) {
+    status = 'Good'
+  } else if (isLoading || isPending || isSyncing) {
+    status = 'Pending'
   }
 
-  return <div className={`sliceTileIndicatorLarge sliceTileIndicator${statusMap[status] || 'Bad'}`} />
+  return <div className={`sliceTileIndicatorLarge sliceTileIndicator${status}`} />
 }
 
 class ChainModule extends React.Component {
@@ -43,13 +46,10 @@ class ChainModule extends React.Component {
 
   renderConnection (id, { primary, secondary }, blockHeight) {
     let currentConnectionName = ''
-    let currentConnectionStatus = ''
-    if (primary.on && primary.status !== 'disconnected') {
+    if (primary.on && primary.status === 'connected') {
       currentConnectionName = primary.current
-      currentConnectionStatus = primary.status 
     } else if (secondary.on && secondary.status !== 'disconnected') {
       currentConnectionName = secondary.current
-      currentConnectionStatus = secondary.status 
     }
 
     return (
@@ -59,7 +59,7 @@ class ChainModule extends React.Component {
           this.setState({ expanded: !this.state.expanded })
         }}
       >
-        <Indicator className='sliceTileIndicatorLarge' status={currentConnectionStatus} />
+        <Indicator className='sliceTileIndicatorLarge' primary={primary} secondary={secondary} />
         <div className='sliceTileConnectionName'> 
           {currentConnectionName}
         </div>
