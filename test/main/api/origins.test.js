@@ -79,13 +79,13 @@ describe('#updateOrigin', () => {
     })
 
     it('sets the chainId to mainnet for an unknown origin', () => {
-      const { payload } = updateOrigin({})
+      const { payload } = updateOrigin({}, 'Unknown')
 
       expect(payload.chainId).toBe('0x1')
     })
 
     it('does not assign a session to an unknown origin', () => {
-      const { hasSession } = updateOrigin({})
+      const { hasSession } = updateOrigin({}, 'Unknown')
 
       expect(hasSession).toBe(false)
     })
@@ -133,12 +133,12 @@ describe('#updateOrigin', () => {
     })
 
     it('does not change an origin using an extension protocol', () => {
-      const origin = parseOrigin('moz-extension://frame.eth')
+      const origin = parseOrigin('chrome-extension://tagxpelsfagzmzljsfgmuipalsfaohgpal')
 
-      expect(origin).toBe('moz-extension://frame.eth')
+      expect(origin).toBe('chrome-extension://tagxpelsfagzmzljsfgmuipalsfaohgpal')
     })
 
-    it('does not change an origin using with no prepended protocol', () => {
+    it('does not change an origin with no prepended protocol', () => {
       const origin = parseOrigin('send.frame.eth')
 
       expect(origin).toBe('send.frame.eth')

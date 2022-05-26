@@ -25,6 +25,10 @@ export function parseOrigin (origin?: string) {
   return (m.groups || {}).origin
 }
 
+function isRealOrigin (origin: string) {
+  return origin !== 'Unknown'
+}
+
 function invalidOrigin (origin: string) {
   return origin !== origin.replace(/[^0-9a-z/:.[\]-]/gi, '')
 }
@@ -47,13 +51,13 @@ function addPermissionRequest (address: Address, origin: string) {
   })
 }
 
-export function updateOrigin (payload: JSONRPCRequestPayload, originName: string, connectionMessage = false): OriginUpdateResult {
+export function updateOrigin (payload: JSONRPCRequestPayload, origin: string, connectionMessage = false): OriginUpdateResult {
   let hasSession = false
 
-  const originId = uuidv5(originName, uuidv5.DNS)
+  const originId = uuidv5(origin, uuidv5.DNS)
   const existingOrigin = store('main.origins', originId)
 
-  if (!connectionMessage) {
+  if (!connectionMessage && isRealOrigin(origin)) {
     hasSession = true
 
     // the extension will attempt to send messages (eth_chainId and net_version) in order
@@ -64,7 +68,7 @@ export function updateOrigin (payload: JSONRPCRequestPayload, originName: string
       store.addOriginRequest(originId)
     } else {
       store.initOrigin(originId, {
-        name: originName,
+        name: origin,
         chain: {
           id: 1,
           type: 'ethereum'
