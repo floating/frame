@@ -7,21 +7,21 @@ import accounts, { AccessRequest } from '../accounts'
 import store from '../store'
 
 const dev = process.env.NODE_ENV === 'development'
-const originDomainRegex = /^(?:.+(?::\/\/))?(?<origin>.*)/
+const protocolRegex = /^(?:ws|http)s?:\/\//
 
 interface OriginUpdateResult {
   payload: RPCRequestPayload,
   hasSession: boolean
 }
 
-function parseOrigin (origin: string) {
-  const m = origin.match(originDomainRegex)
-  if (!m) {
-    log.warn(`could not parse origin: ${origin}`)
-    return
-  }
+export function parseOrigin (origin?: string) {
+  if (!origin) return 'Unknown'
 
-  return (m.groups || {}).origin
+  return origin.replace(protocolRegex, '')
+}
+
+function isRealOrigin (origin: string) {
+  return origin !== 'Unknown'
 }
 
 function invalidOrigin (origin: string) {
@@ -46,45 +46,38 @@ function addPermissionRequest (address: Address, origin: string) {
   })
 }
 
-export function updateOrigin (payload: JSONRPCRequestPayload, origin?: string, connectionMessage = false): OriginUpdateResult {
-  const originName = origin ? parseOrigin(origin) : ''
-  const updatedPayload = { ...payload } as RPCRequestPayload
+export function updateOrigin (payload: JSONRPCRequestPayload, origin: string, connectionMessage = false): OriginUpdateResult {
   let hasSession = false
 
-  if (originName) {
-    const originId = uuidv5(originName, uuidv5.DNS)
-    const existingOrigin = store('main.origins', originId)
+  const originId = uuidv5(origin, uuidv5.DNS)
+  const existingOrigin = store('main.origins', originId)
 
-    if (!connectionMessage) {
-      hasSession = true
+  if (!connectionMessage && isRealOrigin(origin)) {
+    hasSession = true
 
-      // the extension will attempt to send messages (eth_chainId and net_version) in order
-      // to connect. we don't want to store these origins as they'll come from every site
-      // the user visits in their browser
+    // the extension will attempt to send messages (eth_chainId and net_version) in order
+    // to connect. we don't want to store these origins as they'll come from every site
+    // the user visits in their browser
 
-      if (existingOrigin) {
-        store.addOriginRequest(originId)
-        updatedPayload.chainId = updatedPayload.chainId || `0x${existingOrigin.chain.id.toString(16)}`
-      } else {
-        store.initOrigin(originId, {
-          name: originName,
-          chain: {
-            id: 1,
-            type: 'ethereum'
-          }
-        })
-      }
+    if (existingOrigin) {
+      store.addOriginRequest(originId)
+    } else {
+      store.initOrigin(originId, {
+        name: origin,
+        chain: {
+          id: 1,
+          type: 'ethereum'
+        }
+      })
     }
-
-    updatedPayload._origin = originId
   }
 
   return { 
     hasSession,
     payload: { 
-      ...updatedPayload,
-      chainId: updatedPayload.chainId || '0x1',
-      _origin: updatedPayload._origin || 'Unknown'
+      ...payload,
+      chainId: payload.chainId || `0x${(existingOrigin?.chain.id || 1).toString(16)}`,
+      _origin: originId
     }
   }
 }

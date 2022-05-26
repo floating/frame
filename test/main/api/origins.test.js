@@ -1,7 +1,7 @@
 import { v5 as uuidv5 } from 'uuid'
 import log from 'electron-log'
 
-import { updateOrigin } from '../../../main/api/origins'
+import { parseOrigin, updateOrigin } from '../../../main/api/origins'
 import store from '../../../main/store'
 
 jest.mock('../../../main/accounts', () => {})
@@ -79,13 +79,13 @@ describe('#updateOrigin', () => {
     })
 
     it('sets the chainId to mainnet for an unknown origin', () => {
-      const { payload } = updateOrigin({})
+      const { payload } = updateOrigin({}, 'Unknown')
 
       expect(payload.chainId).toBe('0x1')
     })
 
     it('does not assign a session to an unknown origin', () => {
-      const { hasSession } = updateOrigin({})
+      const { hasSession } = updateOrigin({}, 'Unknown')
 
       expect(hasSession).toBe(false)
     })
@@ -109,45 +109,51 @@ describe('#updateOrigin', () => {
 
   describe('parsing', () => {
     it('parses an origin using ws:// protocol', () => {
-      const { payload } = updateOrigin({}, 'ws://frame.eth')
+      const origin = parseOrigin('ws://frame.eth')
 
-      expect(payload._origin).toBe(uuidv5('frame.eth', uuidv5.DNS))
+      expect(origin).toBe('frame.eth')
     })
 
     it('parses an origin using wss:// protocol', () => {
-      const { payload } = updateOrigin({}, 'wss://pylon.frame.eth')
+      const origin = parseOrigin('wss://pylon.frame.eth')
 
-      expect(payload._origin).toBe(uuidv5('pylon.frame.eth', uuidv5.DNS))
+      expect(origin).toBe('pylon.frame.eth')
     })
 
     it('parses an origin using http:// protocol', () => {
-      const { payload } = updateOrigin({}, 'http://test-case.frame.io')
+      const origin = parseOrigin('http://test-case.frame.io')
 
-      expect(payload._origin).toBe(uuidv5('test-case.frame.io', uuidv5.DNS))
+      expect(origin).toBe('test-case.frame.io')
     })
 
     it('parses an origin using https:// protocol', () => {
-      const { payload } = updateOrigin({}, 'https://www.google.com')
+      const origin = parseOrigin('https://www.google.com')
 
-      expect(payload._origin).toBe(uuidv5('www.google.com', uuidv5.DNS))
+      expect(origin).toBe('www.google.com')
     })
 
-    it('parses an origin using an extension protocol', () => {
-      const { payload } = updateOrigin({}, 'moz-extension://frame.eth')
+    it('does not change an origin using an extension protocol', () => {
+      const origin = parseOrigin('chrome-extension://tagxpelsfagzmzljsfgmuipalsfaohgpal')
 
-      expect(payload._origin).toBe(uuidv5('frame.eth', uuidv5.DNS))
+      expect(origin).toBe('chrome-extension://tagxpelsfagzmzljsfgmuipalsfaohgpal')
     })
 
-    it('parses an origin using with no prepended protocol', () => {
-      const { payload } = updateOrigin({}, 'send.frame.eth')
+    it('does not change an origin with no prepended protocol', () => {
+      const origin = parseOrigin('send.frame.eth')
 
-      expect(payload._origin).toBe(uuidv5('send.frame.eth', uuidv5.DNS))
+      expect(origin).toBe('send.frame.eth')
+    })
+
+    it('does not change a plain string origin', () => {
+      const origin = parseOrigin('frame-extension')
+
+      expect(origin).toBe('frame-extension')
     })
 
     it('treats a lack of origin as unknown', () => {
-      const { payload } = updateOrigin({})
+      const origin = parseOrigin(undefined)
 
-      expect(payload._origin).toBe('Unknown')
+      expect(origin).toBe('Unknown')
     })
   })
 })
