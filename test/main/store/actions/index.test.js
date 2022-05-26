@@ -732,13 +732,13 @@ describe('#setBlockHeight', () => {
 
   const updaterFn = (node, chainId, update) => {
     expect(node).toBe('main.networksMeta.ethereum')
-    main = update(main.networksMeta.ethereum)
+    main.networksMeta.ethereum[chainId] = update(main.networksMeta.ethereum[chainId])
   }
 
   beforeEach(() => {
     main = {
       networksMeta: {
-        'ethereum': {
+        ethereum: {
           1: {
             blockHeight: 0
           },
