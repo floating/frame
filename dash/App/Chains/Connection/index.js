@@ -45,10 +45,10 @@ class ChainModule extends React.Component {
     let currentConnectionName = ''
     let currentConnectionStatus = ''
     if (primary.on && primary.status !== 'disconnected') {
-      currentConnectionName = primary.connected ? primary.current : primary.status
+      currentConnectionName = primary.current
       currentConnectionStatus = primary.status 
     } else if (secondary.on && secondary.status !== 'disconnected') {
-      currentConnectionName = secondary.connected ? secondary.current : secondary.status
+      currentConnectionName = secondary.current
       currentConnectionStatus = secondary.status 
     }
 
