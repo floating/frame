@@ -5,7 +5,7 @@ import provider, { ProviderDataPayload } from '../provider'
 import accounts from '../accounts'
 import store from '../store'
 
-import { updateOrigin, isTrusted } from './origins'
+import { updateOrigin, isTrusted, parseOrigin } from './origins'
 import validPayload from './validPayload'
 import protectedMethods from './protectedMethods'
 
@@ -75,7 +75,7 @@ const handler = (req: IncomingMessage, res: ServerResponse) => {
 
       if (logTraffic) log.info(`req -> | http | ${req.headers.origin} | ${rawPayload.method} | -> | ${JSON.stringify(rawPayload.params)}`)
 
-      const origin = req.headers.origin
+      const origin = parseOrigin(req.headers.origin)
       const { payload, hasSession } = updateOrigin(rawPayload, origin)
 
       if (hasSession) {
