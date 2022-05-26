@@ -6,7 +6,7 @@ import Dropdown from '../../../../resources/Components/Dropdown'
 import link from '../../../../resources/link'
 import svg from '../../../../resources/svg'
 
-const Indicator = ({ connection }) => {
+const ConnectionIndicator = ({ connection }) => {
   const isConnected = connection.status === 'connected'
   const isLoading = connection.status === 'loading'
   const isPending = connection.status === 'pending'
@@ -18,8 +18,19 @@ const Indicator = ({ connection }) => {
     status = 'Pending'
   }
 
-  return <div className={`sliceTileIndicatorLarge sliceTileIndicator${status}`} />
+  return <>
+    <div className={`sliceTileIndicatorLarge sliceTileIndicator${status}`} />
+  </>
 }
+
+const ConnectionStatus = ({ connection }) => 
+  <>
+    <ConnectionIndicator connection={connection} />
+    <div className='sliceTileConnectionName'> 
+      {connection.current}
+    </div>
+  </>
+
 
 class ChainModule extends React.Component {
   constructor (...args) {
@@ -59,10 +70,7 @@ class ChainModule extends React.Component {
           this.setState({ expanded: !this.state.expanded })
         }}
       >
-        <Indicator className='sliceTileIndicatorLarge' connection={connection} />
-        <div className='sliceTileConnectionName'> 
-          {connection.current}
-        </div>
+        <ConnectionStatus connection={connection} />
         <div className='sliceTileBlock'>
           <div className='sliceTileBlockIcon'>{svg.chain(14)}</div>
           <div className='sliceTileChainId'>{id}</div>
