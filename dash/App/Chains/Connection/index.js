@@ -6,11 +6,11 @@ import Dropdown from '../../../../resources/Components/Dropdown'
 import link from '../../../../resources/link'
 import svg from '../../../../resources/svg'
 
-const Indicator = ({ primary, secondary }) => {
-  const isConnected = [primary.status, secondary.status].includes('connected')
-  const isLoading = [primary.status, secondary.status].includes('loading')
-  const isPending = [primary.status, secondary.status].includes('pending')
-  const isSyncing = [primary.status, secondary.status].includes('syncing')
+const Indicator = ({ connection }) => {
+  const isConnected = connection.status === 'connected'
+  const isLoading = connection.status === 'loading'
+  const isPending = connection.status === 'pending'
+  const isSyncing = connection.status === 'syncing'
   let status = 'Bad'
   if (isConnected) {
     status = 'Good'
@@ -45,11 +45,11 @@ class ChainModule extends React.Component {
   // }
 
   renderConnection (id, { primary, secondary }, blockHeight) {
-    let currentConnectionName = ''
-    if (primary.on && primary.status === 'connected') {
-      currentConnectionName = primary.current
-    } else if (secondary.on && secondary.status !== 'disconnected') {
-      currentConnectionName = secondary.current
+    const primaryActive = primary.on && primary.status !== 'disconnected'
+    const secondaryActive = secondary.on && secondary.status !== 'disconnected'
+    let currentConnection = primary
+    if (secondaryActive && !primaryActive) {
+      currentConnection = secondary
     }
 
     return (
@@ -59,9 +59,9 @@ class ChainModule extends React.Component {
           this.setState({ expanded: !this.state.expanded })
         }}
       >
-        <Indicator className='sliceTileIndicatorLarge' primary={primary} secondary={secondary} />
+        <Indicator className='sliceTileIndicatorLarge' connection={currentConnection} />
         <div className='sliceTileConnectionName'> 
-          {currentConnectionName}
+          {currentConnection.current}
         </div>
         <div className='sliceTileBlock'>
           <div className='sliceTileBlockIcon'>{svg.chain(14)}</div>
