@@ -262,6 +262,7 @@ module.exports = {
       }
 
       const defaultMeta = {
+        blockHeight: 0,
         gas: {
           price: {
             selected: 'standard',
