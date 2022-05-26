@@ -384,12 +384,30 @@ describe('#send', () => {
         4: { name: 'rinkeby', id: 4, on: false },
         1: { name: 'mainnet', id: 1, on: true }
       })
-
-        send({ method: 'wallet_getChains', id: 14, jsonrpc: '2.0' }, response => {
+      send({ method: 'wallet_getChains', id: 14, jsonrpc: '2.0' }, response => {
         expect(response.error).toBe(undefined)
         expect(response.id).toBe(14)
         expect(response.jsonrpc).toBe('2.0')
         expect(response.result).toEqual(['0x1', '0x89'])
+      })
+    })
+  })
+
+  describe('#wallet_getChainDetails', () => {
+    it('returns a list of active chain details', () => {
+      store.set('main.networks.ethereum', {
+        137: { name: 'polygon', id: 137, on: true },
+        4: { name: 'rinkeby', id: 4, on: false },
+        1: { name: 'mainnet', id: 1, on: true }
+      })
+      send({ method: 'wallet_getChainDetails', id: 14, jsonrpc: '2.0' }, response => {
+        expect(response.error).toBe(undefined)
+        expect(response.id).toBe(14)
+        expect(response.jsonrpc).toBe('2.0')
+        expect(response.result[0].id).toEqual('0x1')
+        expect(response.result[0].name).toEqual('mainnet')
+        expect(response.result[1].id).toEqual('0x89')
+        expect(response.result[1].name).toEqual('polygon')
       })
     })
   })
