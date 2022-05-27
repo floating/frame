@@ -12,6 +12,7 @@ import {
   setScanning as setScanningAction,
   initOrigin as initOriginAction,
   clearOrigins as clearOriginsAction,
+  removeOrigin as removeOriginAction,
   addOriginRequest as addOriginRequestAction,
   switchOriginChain as switchOriginChainAction,
   removeNetwork as removeNetworkAction,
@@ -579,6 +580,34 @@ describe('#clearOrigins', () => {
     clearOrigins(origins)
 
     expect(origins).toEqual({})
+  })
+})
+
+describe('#removeOrigin', () => {
+  let origins
+
+  const updaterFn = (node, update) => {
+    expect(node).toBe('main.origins')
+    origins = update(origins)
+  }
+
+  const removeOrigin = (originId) => removeOriginAction(updaterFn, originId)
+
+  beforeEach(() => {
+    origins = {
+      '91f6971d-ba85-52d7-a27e-6af206eb2433': {},
+      '8073729a-5e59-53b7-9e69-5d9bcff94087': {},
+      'd7acc008-6411-5486-bb2d-0c0cfcddbb92': {},
+    }
+  })
+
+  it('should remove the specified origin', () => {
+    removeOrigin('8073729a-5e59-53b7-9e69-5d9bcff94087')
+
+    expect(origins).toEqual({
+      '91f6971d-ba85-52d7-a27e-6af206eb2433': {},
+      'd7acc008-6411-5486-bb2d-0c0cfcddbb92': {},
+    })
   })
 })
 
