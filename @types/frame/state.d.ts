@@ -33,6 +33,7 @@ interface NetworkMetadata {
 }
 
 interface Session {
+  requests: number,
   startedAt: number,
   endedAt?: number,
   lastUpdatedAt: number
