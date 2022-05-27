@@ -32,9 +32,7 @@ class AddToken extends Component {
   }
 
   async updateTokenData (contractAddress, chainId) {
-    console.log('updateTokenDetails', contractAddress, chainId)
     const { name, symbol, decimals } = await link.invoke('tray:getTokenDetails', contractAddress, chainId)
-    console.log('zomg', name, symbol, decimals)
     this.setState({
       name: name || this.nameDefault,
       symbol: symbol || this.symbolDefault,
