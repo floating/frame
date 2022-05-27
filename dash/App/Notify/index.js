@@ -50,6 +50,10 @@ class Notify extends React.Component {
 
   updateOriginChain (data) {
     const { origin } = data
+    const removeOriginClickHandler = () => {
+      link.send('tray:action', 'removeOrigin', origin.id)
+      link.send('tray:action', 'backDash')
+    }
 
     return (
       <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
@@ -76,6 +80,9 @@ class Notify extends React.Component {
                   )
                 })}
               </div>
+              <div className='removeOriginButton' onClick={removeOriginClickHandler}>
+                Remove Origin
+              </div>  
             </div>
           </div>
         </div>
