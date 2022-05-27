@@ -65,6 +65,7 @@ export default class Erc20Contract {
         symbol: calls[2]
       }
     } catch (e) {
+      console.log(`getTokenData error: ${e}`)
       return {
         decimals: 0,
         name: '',
