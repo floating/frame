@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import Restore from 'react-restore'
+import Dropdown from '../../../../resources/Components/Dropdown'
 import link from '../../../../resources/link'
 
 class AddToken extends Component {
@@ -8,13 +9,14 @@ class AddToken extends Component {
 
     this.nameDefault = 'Token Name'
     this.symbolDefault = 'SYMBOL'
-    this.chainIdDefault = 'ID'
+    this.chainIdDefault = 1
     this.decimalsDefault = '?'
     this.addressDefault = 'Contract Address'
     this.logoURIDefault = 'Logo URI'
 
     this.req = props.req || {}
     this.token = this.req.token || {}
+    this.activeChains = props.activeChains
 
     const chainId = parseInt(this.token.chainId)
     const decimals = parseInt(this.token.decimals)
@@ -22,7 +24,7 @@ class AddToken extends Component {
     this.state = {
       name: this.token.name || this.nameDefault,
       symbol: (this.token.symbol || '').toUpperCase() || this.symbolDefault,
-      chainId: (Number.isInteger(chainId) && chainId) || props.currentNetworkId || this.chainIdDefault,
+      chainId: (Number.isInteger(chainId) && chainId) || this.chainIdDefault,
       address: (this.token.address || '').toLowerCase() || this.addressDefault,
       decimals: (Number.isInteger(decimals) && decimals) || this.decimalsDefault,
       logoURI: this.token.logoURI || this.logoURIDefault
@@ -30,7 +32,9 @@ class AddToken extends Component {
   }
 
   async updateTokenData (contractAddress, chainId) {
+    console.log('updateTokenDetails', contractAddress, chainId)
     const { name, symbol, decimals } = await link.invoke('tray:getTokenDetails', contractAddress, chainId)
+    console.log('zomg', name, symbol, decimals)
     this.setState({
       name: name || this.nameDefault,
       symbol: symbol || this.symbolDefault,
@@ -132,27 +136,14 @@ class AddToken extends Component {
 
               <div className='tokenChainId'>
                 <label className='tokenInputLabel'>
-                  Chain ID
-                  <input
-                    className={`tokenInput tokenInputAddress ${this.isDefault('chainId') ? 'tokenInputDim' : ''}`}
-                    value={this.state.chainId} spellCheck='false'
-                    onChange={(e) => {
-                      if (!e.target.value) return this.setState({ chainId: '' })
-
-                      const chainId = parseInt(e.target.value)
-                      if (!Number.isInteger(chainId)) {
-                        return e.preventDefault()
-                      }
-
+                  Chain
+                  <Dropdown
+                    syncValue={this.state.chainId}
+                    onChange={(chainId) => {
                       this.setState({ chainId })
                       this.updateTokenData(this.state.address, chainId)
                     }}
-                    onFocus={(e) => {
-                      if (e.target.value === this.chainIdDefault) this.setState({ chainId: '' })
-                    }}
-                    onBlur={(e) => {
-                      if (e.target.value === '') this.setState({ chainId: this.chainIdDefault })
-                    }}
+                    options={this.activeChains.map((chain) => ({ text: chain.name, value: chain.id }))}
                   />
                 </label>
               </div>
