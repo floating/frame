@@ -66,10 +66,30 @@ class _OriginModule extends React.Component {
     super(...args)
 
     this.state = {
-      expanded: false
+      expanded: false,
+      averageRequests: '0.0'
     }
 
     this.ref = createRef()
+  }
+
+  componentDidMount () {
+    this.requestUpdates = setInterval(() => {
+      if (this.props.connected) {
+        this.updateRequestRate()
+      }
+    }, 1000)
+  }
+
+  componentWillUnmount () {
+    clearInterval(this.requestUpdates)
+  }
+
+  updateRequestRate () {
+    const { origin } = this.props
+    const now = new Date().getTime()
+    const sessionLengthSeconds = Math.max((now - origin.session.startedAt), 1000) / 1000
+    this.setState({ averageRequests: (origin.session.requests / sessionLengthSeconds).toFixed(1) })
   }
 
   render () {
@@ -87,6 +107,14 @@ class _OriginModule extends React.Component {
           <div className='sliceOriginTile'>
             {origin.name}
           </div>
+          {
+            connected ? (
+              <div className='sliceOriginReqs'>
+                <div className='sliceOriginReqsNumber'>{this.state.averageRequests}</div>
+                <div className='sliceOriginReqsLabel'>{'reqs/s'}</div>
+              </div>
+            ) : null
+          }
         </div>
         {this.state.expanded ? (
           <div>
