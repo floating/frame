@@ -1,6 +1,6 @@
 import { Client, Utils, Constants } from 'gridplus-sdk'
 import rlp from 'rlp'
-import { addHexPrefix } from 'ethereumjs-util'
+import { padToEven, addHexPrefix } from 'ethereumjs-util'
 import { hexToNumber } from 'web3-utils'
 import log from 'electron-log'
 import Signer from '../../Signer'
@@ -265,8 +265,7 @@ export default class Lattice extends Signer {
       const connection = this.connection as Client
       const compatibility = signerCompatibility(rawTx, this.summary())
       const latticeTx = compatibility.compatible ? { ...rawTx } : londonToLegacy(rawTx)
-      const signerPath = this.getPath(index)
-      const fwVersion = connection.getFwVersion()
+          const fwVersion = connection.getFwVersion()
 
       const signedTx = await sign(latticeTx, async tx => {
         const unsignedTx = this.createTransaction(index, rawTx.type, latticeTx.chainId, tx)
@@ -289,7 +288,7 @@ export default class Lattice extends Signer {
             curveType: Constants.SIGNING.CURVES.SECP256K1,
             hashType: Constants.SIGNING.HASHES.KECCAK256,
             encodingType: Constants.SIGNING.ENCODINGS.EVM,
-            signerPath,
+            signerPath: unsignedTx.signerPath,
             decoder: callDataDecoder?.def
           };
           signingOptions = { data, currency: unsignedTx.currency }
@@ -352,6 +351,7 @@ export default class Lattice extends Signer {
     const signature = [
       sig.r,
       sig.s,
+      padToEven(sig.v.toString('hex'))
     ].join('')
 
     return addHexPrefix(signature)
