@@ -32,6 +32,9 @@ class AddToken extends Component {
   }
 
   async updateTokenData (contractAddress, chainId) {
+    if (contractAddress === this.addressDefault || !chainId) {
+      return
+    }
     const { name, symbol, decimals } = await link.invoke('tray:getTokenDetails', contractAddress, chainId)
     this.setState({
       name: name || this.nameDefault,
@@ -77,6 +80,7 @@ class AddToken extends Component {
                       if (e.target.value === this.nameDefault) this.setState({ name: '' })
                     }}
                     onBlur={(e) => {
+                      
                       if (e.target.value === '') this.setState({ name: this.nameDefault })
                     }}
                   />
