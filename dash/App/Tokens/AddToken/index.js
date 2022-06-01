@@ -40,6 +40,11 @@ class AddToken extends Component {
     })
   }
 
+  isConnectedChain () {
+    const chain = this.activeChains.find(({ id }) => id === this.state.chainId)
+    return chain.connection.primary.connected || chain.connection.secondary.connected
+  }
+
   isDefault (statePropName) {
     if (this.state[statePropName] === undefined) {
       return false
@@ -55,6 +60,7 @@ class AddToken extends Component {
       this.state.address && this.state.address !== this.addressDefault &&
       Number.isInteger(this.state.decimals)
     )
+    const showTokenAutofillWarning = !this.isConnectedChain()
 
     return (
       <div className='notifyBoxWrap cardShow' onMouseDown={e => e.stopPropagation()}>
@@ -63,6 +69,7 @@ class AddToken extends Component {
             Add New Token
           </div>
           <div className='addToken'>
+            {showTokenAutofillWarning && <div className='tokenRow'>The currently selected chain is not connected. Token autofill will not work.</div>}
             <div className='tokenRow'>
               <div className='tokenName'>
                 <label className='tokenInputLabel'>
@@ -77,7 +84,6 @@ class AddToken extends Component {
                       if (e.target.value === this.nameDefault) this.setState({ name: '' })
                     }}
                     onBlur={(e) => {
-                      
                       if (e.target.value === '') this.setState({ name: this.nameDefault })
                     }}
                   />
@@ -140,7 +146,7 @@ class AddToken extends Component {
                     syncValue={this.state.chainId}
                     onChange={(chainId) => {
                       this.setState({ chainId })
-                      if (contractAddress !== this.addressDefault) {
+                      if (this.state.address !== this.addressDefault && this.isConnectedChain()) {
                         this.updateTokenData(this.state.address, chainId)
                       }
                     }}
@@ -163,7 +169,9 @@ class AddToken extends Component {
                       }
 
                       this.setState({ address: e.target.value })
-                      this.updateTokenData(e.target.value, this.state.chainId)
+                      if (this.isConnectedChain()) {
+                        this.updateTokenData(e.target.value, this.state.chainId)
+                      }
                     }}
                     onFocus={(e) => {
                       if (e.target.value === this.addressDefault) this.setState({ address: '' })
