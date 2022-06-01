@@ -1,6 +1,6 @@
 {
   "name": "frame",
-  "version": "0.5.0-beta.18",
+  "version": "0.5.0-beta.19",
   "description": "System-wide web3",
   "main": "compiled/main",
   "build": {
