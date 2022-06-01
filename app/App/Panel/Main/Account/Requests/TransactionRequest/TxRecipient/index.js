@@ -37,7 +37,7 @@ class TxRecipient extends React.Component {
             <div className='_txRecipientSlice _txRecipientValue'>
               {ensName
                 ? <span>{ensName}</span>
-                : <span>{address.substring(0, 6)}{svg.octicon('kebab-horizontal', { height: 15 })}{address.substr(address.length - 4)}</span>
+                : <span>{address.substring(0, 6)}{svg.octicon('kebab-horizontal', { height: 15 })}{address.substring(address.length - 4)}</span>
               }
               {req.decodedData && req.decodedData.contractName ? ( 
                 <span className={'_txRecipientContract'}>{(() => {
