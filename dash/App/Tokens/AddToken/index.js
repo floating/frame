@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import Restore from 'react-restore'
+import Dropdown from '../../../../resources/Components/Dropdown'
 import link from '../../../../resources/link'
 
 class AddToken extends Component {
@@ -8,13 +9,14 @@ class AddToken extends Component {
 
     this.nameDefault = 'Token Name'
     this.symbolDefault = 'SYMBOL'
-    this.chainIdDefault = 'ID'
+    this.chainIdDefault = 1
     this.decimalsDefault = '?'
     this.addressDefault = 'Contract Address'
     this.logoURIDefault = 'Logo URI'
 
     this.req = props.req || {}
     this.token = this.req.token || {}
+    this.activeChains = props.activeChains
 
     const chainId = parseInt(this.token.chainId)
     const decimals = parseInt(this.token.decimals)
@@ -22,7 +24,7 @@ class AddToken extends Component {
     this.state = {
       name: this.token.name || this.nameDefault,
       symbol: (this.token.symbol || '').toUpperCase() || this.symbolDefault,
-      chainId: (Number.isInteger(chainId) && chainId) || props.currentNetworkId || this.chainIdDefault,
+      chainId: (Number.isInteger(chainId) && chainId) || this.chainIdDefault,
       address: (this.token.address || '').toLowerCase() || this.addressDefault,
       decimals: (Number.isInteger(decimals) && decimals) || this.decimalsDefault,
       logoURI: this.token.logoURI || this.logoURIDefault
@@ -36,6 +38,11 @@ class AddToken extends Component {
       symbol: symbol || this.symbolDefault,
       decimals: decimals || this.decimalsDefault
     })
+  }
+
+  isConnectedChain () {
+    const chain = this.activeChains.find(({ id }) => id === this.state.chainId)
+    return chain.connection.primary.connected || chain.connection.secondary.connected
   }
 
   isDefault (statePropName) {
@@ -53,6 +60,7 @@ class AddToken extends Component {
       this.state.address && this.state.address !== this.addressDefault &&
       Number.isInteger(this.state.decimals)
     )
+    const showTokenAutofillWarning = !this.isConnectedChain()
 
     return (
       <div className='notifyBoxWrap cardShow' onMouseDown={e => e.stopPropagation()}>
@@ -61,6 +69,7 @@ class AddToken extends Component {
             Add New Token
           </div>
           <div className='addToken'>
+            {showTokenAutofillWarning && <div className='tokenRow'>The currently selected chain is not connected. Token autofill will not work.</div>}
             <div className='tokenRow'>
               <div className='tokenName'>
                 <label className='tokenInputLabel'>
@@ -132,27 +141,16 @@ class AddToken extends Component {
 
               <div className='tokenChainId'>
                 <label className='tokenInputLabel'>
-                  Chain ID
-                  <input
-                    className={`tokenInput tokenInputAddress ${this.isDefault('chainId') ? 'tokenInputDim' : ''}`}
-                    value={this.state.chainId} spellCheck='false'
-                    onChange={(e) => {
-                      if (!e.target.value) return this.setState({ chainId: '' })
-
-                      const chainId = parseInt(e.target.value)
-                      if (!Number.isInteger(chainId)) {
-                        return e.preventDefault()
-                      }
-
+                  Chain
+                  <Dropdown
+                    syncValue={this.state.chainId}
+                    onChange={(chainId) => {
                       this.setState({ chainId })
-                      this.updateTokenData(this.state.address, chainId)
+                      if (this.state.address !== this.addressDefault && this.isConnectedChain()) {
+                        this.updateTokenData(this.state.address, chainId)
+                      }
                     }}
-                    onFocus={(e) => {
-                      if (e.target.value === this.chainIdDefault) this.setState({ chainId: '' })
-                    }}
-                    onBlur={(e) => {
-                      if (e.target.value === '') this.setState({ chainId: this.chainIdDefault })
-                    }}
+                    options={this.activeChains.map((chain) => ({ text: chain.name, value: chain.id }))}
                   />
                 </label>
               </div>
@@ -171,7 +169,9 @@ class AddToken extends Component {
                       }
 
                       this.setState({ address: e.target.value })
-                      this.updateTokenData(e.target.value, this.state.chainId)
+                      if (this.isConnectedChain()) {
+                        this.updateTokenData(e.target.value, this.state.chainId)
+                      }
                     }}
                     onFocus={(e) => {
                       if (e.target.value === this.addressDefault) this.setState({ address: '' })

@@ -9,11 +9,12 @@ import CustomTokens from './CustomTokens'
 class Tokens extends React.Component {
   render () {
     const { notify } = this.props.data
-    console.log('this.props', this.props)
+    const activeChains = Object.values(this.store('main.networks.ethereum')).filter((chain) => chain.on)
+    
     return (
       <div>
         {notify === 'addToken' ? (
-          <AddToken />
+          <AddToken req={this.store('view.notifyData')} activeChains={activeChains}  />
         ) : (
           <CustomTokens />
         )}

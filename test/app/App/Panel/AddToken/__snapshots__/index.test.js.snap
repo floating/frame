@@ -3,7 +3,7 @@
 exports[`should generate the expected HTML 1`] = `
 <DocumentFragment>
   <div
-    class="notifyBoxWrap"
+    class="notifyBoxWrap cardShow"
   >
     <div
       class="notifyBoxSlide"
@@ -71,12 +71,43 @@ exports[`should generate the expected HTML 1`] = `
             <label
               class="tokenInputLabel"
             >
-              Chain ID
-              <input
-                class="tokenInput tokenInputAddress "
-                spellcheck="false"
-                value="42"
-              />
+              Chain
+              <div
+                class="dropdownWrap"
+              >
+                <div
+                  class="dropdown  "
+                >
+                  <div
+                    class="dropdownItems"
+                    role="listbox"
+                    style="margin-top: 0px;"
+                  >
+                    <div
+                      aria-selected="true"
+                      class="dropdownItem"
+                      role="option"
+                      value="1"
+                    >
+                      Mainnet
+                      <div
+                        class="dropdownItemIndicator"
+                      />
+                    </div>
+                    <div
+                      aria-selected="false"
+                      class="dropdownItem"
+                      role="option"
+                      value="137"
+                    >
+                      Polygon
+                      <div
+                        class="dropdownItemIndicator"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
             </label>
           </div>
         </div>
