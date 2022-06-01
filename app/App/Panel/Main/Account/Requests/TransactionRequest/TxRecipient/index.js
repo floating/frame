@@ -1,5 +1,7 @@
 import React from 'react'
 import Restore from 'react-restore'
+import { getAddress } from '@ethersproject/address'
+
 import link from '../../../../../../../../resources/link'
 import svg from '../../../../../../../../resources/svg'
 
@@ -17,6 +19,7 @@ class TxRecipient extends React.Component {
   }
   render () {
     const req = this.props.req
+    const address = req.data.to ? getAddress(req.data.to) : ''
     const ensName = (req.recipient && req.recipient.length < 25) ? req.recipient : ''
 
     return (
@@ -26,15 +29,15 @@ class TxRecipient extends React.Component {
             Recipient
           </div>
           <div className='_txRecipientFull' onClick={() => {
-            this.copyAddress(req.data.to)
+            this.copyAddress(address)
           }}>
-            {this.state.copied ? 'Address Copied' : req.data.to}
+            {this.state.copied ? 'Address Copied' : address}
           </div>
-          {req.data.to ? (
+          {address ? (
             <div className='_txRecipientSlice _txRecipientValue'>
               {ensName
                 ? <span>{ensName}</span>
-                : <span>{req.data.to.substring(0, 6)}{svg.octicon('kebab-horizontal', { height: 15 })}{req.data.to.substr(req.data.to.length - 4)}</span>
+                : <span>{address.substring(0, 6)}{svg.octicon('kebab-horizontal', { height: 15 })}{address.substr(address.length - 4)}</span>
               }
               {req.decodedData && req.decodedData.contractName ? ( 
                 <span className={'_txRecipientContract'}>{(() => {
