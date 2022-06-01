@@ -15,7 +15,7 @@ const user = userEvent.setup()
 
 it('should display the expected chain ID', async () => {
   const { getByRole } = render(
-    <AddToken activeChains={[{ id: 1, name: 'Mainnet' }, { id: 137, name: 'Polygon' }]} />
+    <AddToken activeChains={[{ id: 1, name: 'Mainnet', connection: { primary: { connected: true } } }, { id: 137, name: 'Polygon', connection: { primary: { connected: true } } }]} />
   )
 
   const tokenChainName = getByRole('option', { selected: true }).textContent
@@ -24,7 +24,7 @@ it('should display the expected chain ID', async () => {
 
 it('should generate the expected HTML', async () => {
   const { asFragment } = render(
-    <AddToken activeChains={[{ id: 1, name: 'Mainnet' }, { id: 137, name: 'Polygon' }]} />
+    <AddToken activeChains={[{ id: 1, name: 'Mainnet', connection: { primary: { connected: true } } }, { id: 137, name: 'Polygon', connection: { primary: { connected: true } } }]} />
   )
 
   expect(asFragment()).toMatchSnapshot()
@@ -40,7 +40,7 @@ describe('token metadata lookup', () => {
 
   it('should perform a lookup on a contract address and display the expected token data', async () => {
     const { getByLabelText, getByRole } = render(
-      <AddToken activeChains={[{ id: 1, name: 'Mainnet' }, { id: 137, name: 'Polygon' }]} />
+      <AddToken activeChains={[{ id: 1, name: 'Mainnet', connection: { primary: { connected: true } } }, { id: 137, name: 'Polygon', connection: { primary: { connected: true } } }]} />
     )
 
     const contractAddressInput = getByLabelText('Contract Address')
@@ -63,7 +63,7 @@ describe('token metadata lookup', () => {
   describe('when the chain id is changed', () => {
     it('should perform a lookup and display the expected token data', async () => {
       const { getByLabelText, getByRole } = render(
-        <AddToken activeChains={[{ id: 1, name: 'Mainnet' }, { id: 137, name: 'Polygon' }]} />
+        <AddToken activeChains={[{ id: 1, name: 'Mainnet', connection: { primary: { connected: true } } }, { id: 137, name: 'Polygon', connection: { primary: { connected: true } } }]} />
       )
 
       const tokenContractAddressInput = getByLabelText('Contract Address')
