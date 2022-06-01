@@ -6,6 +6,30 @@ import Dropdown from '../../../../resources/Components/Dropdown'
 import link from '../../../../resources/link'
 import svg from '../../../../resources/svg'
 
+function capitalizeWord (word) {
+  return word[0].toUpperCase() + word.substr(1);
+}
+
+function okProtocol (location) {
+  if (location === 'injected') return true
+  if (location.endsWith('.ipc')) return true
+  if (location.startsWith('wss://') || location.startsWith('ws://')) return true
+  if (location.startsWith('https://') || location.startsWith('http://')) return true
+  return false
+}
+
+function okPort (location) {
+  const match = location.match(/^(?:https?|wss?).*:(?<port>\d{4,})/)
+
+  if (match) {
+    const portStr = (match.groups || { port: 0 }).port
+    const port = parseInt(portStr)
+    return port >= 0 && port <= 65535
+  }
+
+  return true
+}
+
 const ConnectionIndicator = ({ connection }) => {
   const isConnected = connection.status === 'connected'
   const isLoading = connection.status === 'loading'
@@ -31,10 +55,16 @@ const ConnectionStatus = ({ connection }) =>
 
 
 class ChainModule extends React.Component {
-  constructor (...args) {
-    super(...args)
+  constructor (props, context) {
+    super(props, context)
+    const { id, type } = props
+    this.customMessage = 'Custom Endpoint'
+    const primaryCustom = context.store('main.networks', type, id, 'connection.primary.custom') || this.customMessage
+    const secondaryCustom = context.store('main.networks', type, id, 'connection.secondary.custom') || this.customMessage
     this.state = {
-      expanded: false
+      expanded: false,      
+      primaryCustom, 
+      secondaryCustom, 
     }
     this.ref = createRef()
   }
@@ -57,8 +87,12 @@ class ChainModule extends React.Component {
     const primaryActive = primary.on && primary.status !== 'disconnected'
     const secondaryActive = secondary.on && secondary.status !== 'disconnected'
     let connection = primary
+    console.log(primary, secondary)
     if (secondaryActive && !primaryActive) {
       connection = secondary
+      console.log('using secondary connection')
+    } else {
+      console.log('using primary connection')
     }
 
     return (
@@ -78,20 +112,22 @@ class ChainModule extends React.Component {
       </div>
     )
   }
+
   status (type, id, layer) {
     const connection = this.store('main.networks', type, id, 'connection', layer)
     let status = connection.status
     const current = connection.current
 
     if (current === 'custom') {
+      console.log('stat', type, id, layer, connection)
       if (layer === 'primary' && this.state.primaryCustom !== '' && this.state.primaryCustom !== this.customMessage) {
-        if (!this.okProtocol(this.state.primaryCustom)) status = 'invalid target'
-        else if (!this.okPort(this.state.primaryCustom)) status = 'invalid port'
+        if (!okProtocol(this.state.primaryCustom)) status = 'invalid target'
+        else if (!okPort(this.state.primaryCustom)) status = 'invalid port'
       }
 
       if (layer === 'secondary' && this.state.secondaryCustom !== '' && this.state.secondaryCustom !== this.customMessage) {
-        if (!this.okProtocol(this.state.secondaryCustom)) status = 'invalid target'
-        else if (!this.okPort(this.state.secondaryCustom)) status = 'invalid port'
+        if (!okProtocol(this.state.secondaryCustom)) status = 'invalid target'
+        else if (!okPort(this.state.secondaryCustom)) status = 'invalid port'
       }
     }
     if (status === 'connected' && !connection.network) status = 'loading'
@@ -104,6 +140,7 @@ class ChainModule extends React.Component {
       </div>
     )
   }
+
   indicator (status) {
     if (status === 'connected') {
       return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorGood' /></div>
@@ -113,8 +150,9 @@ class ChainModule extends React.Component {
       return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorBad' /></div>
     }
   }
+
   render () {
-    const { id, type, connection, changed } = this.props
+    const { id, type, connection } = this.props
 
     const networkMeta = this.store('main.networksMeta.ethereum', id)
     const networkPresets = this.store('main.networkPresets', type)
@@ -122,6 +160,36 @@ class ChainModule extends React.Component {
     presets = Object.keys(presets).map(i => ({ text: i, value: `${type}:${id}:${i}` }))
     presets = presets.concat(Object.keys(networkPresets.default).map(i => ({ text: i, value: `${type}:${id}:${i}` })))
     presets.push({ text: 'Custom', value: `${type}:${id}:custom` })
+
+    const customFocusHandler = (inputName) => {
+      const stateKey = `${inputName}Custom`
+      const state = this.state[stateKey]
+      if (state === this.customMessage) {
+        this.setState({ [stateKey]: '' })
+      }
+    }
+
+    const customBlurHandler = (inputName) => {
+      const stateKey = `${inputName}Custom`
+      const state = this.state[stateKey]
+      if (state === '') {
+        this.setState({ [stateKey]: this.customMessage })
+      }
+    }
+
+    const customChangeHandler = (e, inputName) => {
+      e.preventDefault()
+      const stateKey = `${inputName}Custom`
+      const actionName = `set${capitalizeWord(stateKey)}`
+      const timeoutName = `${stateKey}InputTimeout`
+      clearTimeout(this[timeoutName])
+      const value = e.target.value.replace(/\s+/g, '')
+      this.setState({ [stateKey]: value })
+      this[timeoutName] = setTimeout(() => {
+        console.log('setTimeout', actionName, type, id, value)
+        link.send('tray:action', actionName, type, id, value === this.customMessage ? '' : value)
+      }, 1000)
+    }
 
     return (
       <div className='sliceContainer' ref={this.ref}>
@@ -156,9 +224,9 @@ class ChainModule extends React.Component {
                         className='customInput'
                         tabIndex='-1'
                         value={this.state.primaryCustom}
-                        onFocus={() => this.customPrimaryFocus()} 
-                        onBlur={() => this.customPrimaryBlur()}
-                        onChange={e => this.inputPrimaryCustom(e)}
+                        onFocus={() => customFocusHandler('primary')} 
+                        onBlur={() => customBlurHandler('primary')}
+                        onChange={e => customChangeHandler(e, 'primary')}
                       />
                     </div>
                   </>
@@ -189,7 +257,13 @@ class ChainModule extends React.Component {
                       </div>
                     </div>
                     <div className={connection.secondary.current === 'custom' && connection.secondary.on ? 'connectionCustomInput connectionCustomInputOn cardShow' : 'connectionCustomInput'}>
-                      <input tabIndex='-1' value={this.state.secondaryCustom} onFocus={() => this.customSecondaryFocus()} onBlur={() => this.customSecondaryBlur()} onChange={e => this.inputSecondaryCustom(e)} />
+                      <input 
+                        tabIndex='-1' 
+                        value={this.state.secondaryCustom} 
+                        onFocus={() => customFocusHandler('secondary')} 
+                        onBlur={() => customBlurHandler('secondary')} 
+                        onChange={e => customChangeHandler(e, 'secondary')} 
+                      />
                     </div>
                   </>
                 ) : null}
