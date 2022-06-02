@@ -182,7 +182,7 @@ export default class Lattice extends Signer {
         const loadedAddresses = await connection.getAddresses(req)
         this.addresses = [...this.addresses, ...loadedAddresses].map((addr) =>
           addr.toString()
-        );
+        )
       }
 
       this.status = 'ok'
