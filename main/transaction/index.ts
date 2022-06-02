@@ -1,9 +1,10 @@
 import { BN, addHexPrefix, stripHexPrefix, bnToHex, intToHex } from 'ethereumjs-util'
-import { JsonTx, TransactionFactory, TypedTransaction } from '@ethereumjs/tx'
+import { TransactionFactory, TypedTransaction } from '@ethereumjs/tx'
 import Common from '@ethereumjs/common'
 
 import chainConfig from '../chains/config'
 import { AppVersion, SignerSummary } from '../signers/Signer'
+import { TransactionData, typeSupportsBaseFee } from '../../resources/domain/transaction'
 
 const londonHardforkSigners: SignerCompatibilityByVersion = {
   seed: () => true,
@@ -36,15 +37,6 @@ export interface Signature {
   s: string
 }
 
-export interface TransactionData extends Omit<JsonTx, 'chainId' | 'type'> {
-  warning?: string,
-  gas?: string,
-  from?: string,
-  feesUpdated?: boolean,
-  chainId: string,
-  type: string
-}
-
 export interface SignerCompatibility  {
   signer: string,
   tx: string,
@@ -74,14 +66,6 @@ function londonToLegacy (txData: TransactionData): TransactionData {
   }
 
   return txData
-}
-
-function typeSupportsBaseFee (type: string | undefined) {
-  return parseInt(type || '0') === 2
-}
-
-function usesBaseFee (rawTx: TransactionData) {
-  return typeSupportsBaseFee(rawTx.type)
 }
 
 function maxFee (rawTx: TransactionData) {
@@ -152,7 +136,6 @@ async function sign (rawTx: TransactionData, signingFn: (tx: TypedTransaction) =
 }
 
 export {
-  usesBaseFee,
   maxFee,
   populate,
   sign,

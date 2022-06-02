@@ -6,7 +6,8 @@ import Transport from '@ledgerhq/hw-transport'
 import Eth from '@ledgerhq/hw-app-eth'
 
 import { Derivation, getDerivationPath, deriveHDAccounts } from '../../Signer/derive'
-import { sign, TransactionData } from '../../../transaction'
+import { TransactionData } from '../../../../resources/domain/transaction'
+import { sign } from '../../../transaction'
 
 export default class LedgerEthereumApp {
   private eth: Eth;

@@ -5,7 +5,7 @@ import Restore from 'react-restore'
 import svg from '../../../../../../../../../resources/svg'
 import link from '../../../../../../../../../resources/link'
 import { gweiToWei, gweiToWeiHex } from '../../../../../../../../../resources/utils'
-import { usesBaseFee } from '../../../../../../../../../main/transaction'
+import { usesBaseFee } from '../../../../../../../../../resources/domain/transaction'
 
 import BigNumber from 'bignumber.js'
 

@@ -2,7 +2,7 @@ import React from 'react'
 import Restore from 'react-restore'
 import BigNumber from 'bignumber.js'
 
-import { usesBaseFee } from '../../../../../../../../main/transaction'
+import { usesBaseFee } from '../../../../../../../../resources/domain/transaction'
 
 const FEE_WARNING_THRESHOLD_USD = 50
 

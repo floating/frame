@@ -6,7 +6,8 @@ import { Device as TrezorDevice } from 'trezor-connect'
 
 import Signer from '../../Signer'
 import flex from '../../../flex'
-import { sign, londonToLegacy, signerCompatibility, TransactionData, Signature } from '../../../transaction'
+import { TransactionData } from '../../../../resources/domain/transaction'
+import { sign, londonToLegacy, signerCompatibility, Signature } from '../../../transaction'
 
 // @ts-ignore
 import { v5 as uuid } from 'uuid'
