@@ -277,7 +277,7 @@ export default class Lattice extends Signer {
             tx.getMessageToSign(false) :
             rlp.encode(tx.getMessageToSign(false))
 
-          const to =  tx.to?.toString() ?? undefined
+          const to = tx.to?.toString() ?? undefined
 
           const callDataDecoder = to 
             ? await Utils.fetchCalldataDecoder(tx.data, to, unsignedTx.chainId) 
