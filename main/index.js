@@ -101,10 +101,6 @@ log.info('Chrome: v' + process.versions.chrome)
 log.info('Electron: v' + process.versions.electron)
 log.info('Node: v' + process.versions.node)
 
-setTimeout(() => {
-  x.break()
-}, 2000)
-
 // prevent showing the exit dialog more than once
 let closing = false
 

@@ -22,31 +22,31 @@ it('displays the error message to the user', () => {
   )
 })
 
-it('gives the user an option to quit or restart', () => {
+it('gives the user an option to accept the error or quit Frame', () => {
   showUnhandledExceptionDialog('something bad happened')
 
   expect(dialog.showMessageBoxSync).toHaveBeenCalledWith(undefined,
     expect.objectContaining({
-      buttons: ['Quit', 'Restart']
+      buttons: ['OK', 'Quit']
     })
   )
 })
 
-it('will not relaunch the app when the user clicks quit', () => {
+it('will relaunch the app when the user clicks OK', () => {
   dialog.showMessageBoxSync.mockImplementation(() => 0)
   
   showUnhandledExceptionDialog('something bad happened')
 
-  expect(app.relaunch).not.toHaveBeenCalled()
+  expect(app.relaunch).toHaveBeenCalled()
   expect(app.quit).toHaveBeenCalled()
 })
 
-it('will relaunch the app when the user clicks restart', () => {
+it('will not relaunch the app when the user clicks quit', () => {
   dialog.showMessageBoxSync.mockImplementation(() => 1)
   
   showUnhandledExceptionDialog('something bad happened')
 
-  expect(app.relaunch).toHaveBeenCalled()
+  expect(app.relaunch).not.toHaveBeenCalled()
   expect(app.quit).toHaveBeenCalled()
 })
 
