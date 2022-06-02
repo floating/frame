@@ -272,8 +272,7 @@ export default class Lattice extends Signer {
         let signingOptions;
 
         if (fwVersion && (fwVersion.major > 0 || fwVersion.minor >= 15)) {
-          // @ts-expect-error - Intentionally accessing private method
-          const payload = tx._type ?
+          const payload = tx.type ?
             tx.getMessageToSign(false) :
             rlp.encode(tx.getMessageToSign(false))
 
