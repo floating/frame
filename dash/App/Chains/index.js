@@ -789,7 +789,7 @@ class Settings extends React.Component {
           </div>
         </div> */}
         <div className='localSettingsWrap'>
-          <div className='newAccount' onClick={() => link.send('tray:action', 'navDash', { view: 'accounts', data: { showAddAccounts: true } })}>
+          <div className='newAccount' onClick={() => link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'addChain' } })}>
             <div className='newAccountIcon'>{svg.plus(16)}</div> 
             Add New Chain
           </div>
