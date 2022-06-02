@@ -89,6 +89,7 @@
   },
   "jest": {
     "testTimeout": 100,
+    "clearMocks": true,
     "roots": [
       "test"
     ],
