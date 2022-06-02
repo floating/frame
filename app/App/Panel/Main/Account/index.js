@@ -1,5 +1,6 @@
 import React from 'react'
 import Restore from 'react-restore'
+import { getAddress } from '@ethersproject/address'
 
 import svg from '../../../../../resources/svg'
 import link from '../../../../../resources/link'
@@ -13,7 +14,6 @@ import Inventory from './Inventory'
 import Launcher from './Launcher'
 import Permissions from './Permissions'
 import Requests from './Requests'
-import SignerModule from './Signer'
 import SignerStatus from './SignerStatus'
 import Verify from './Verify'
 import Settings from './Settings'
@@ -576,11 +576,11 @@ class Account extends React.Component {
   }
   
   onScroll () {
-    this.setState({ addressHover: false}) 
+    this.setState({ addressHover: false }) 
   }
 
   copyAddress () {
-    link.send('tray:clipboardData', this.props.id)
+    link.send('tray:clipboardData', getAddress(this.props.id))
     this.setState({ copied: true })
     setTimeout(_ => this.setState({ copied: false }), 1000)
   }
@@ -848,7 +848,7 @@ class Account extends React.Component {
     // if (this.state.accountHighlight === 'active') currentIndex = this.state.highlightIndex
 
     const { address, ensName, active } = this.store('main.accounts', this.props.id)
-    const formattedAddress = address || '0x'
+    const formattedAddress = getAddress(address)
 
     let requests = this.store('main.accounts', this.props.id, 'requests') || {}
     requests = Object.keys(requests).filter(r => requests[r].mode === 'normal')
