@@ -100,21 +100,40 @@ log.info('Chrome: v' + process.versions.chrome)
 log.info('Electron: v' + process.versions.electron)
 log.info('Node: v' + process.versions.node)
 
+setTimeout(() => {
+  x.break()
+}, 2000)
+
 process.on('uncaughtException', (e) => {
   Sentry.captureException(e)
+
+  log.error('uncaughtException')
+  log.error(e)
 
   if (e.code === 'EPIPE') {
     log.error('uncaught EPIPE error', e)
     return
   }
 
+  let exitAction = 0
+
   if (e.code === 'EADDRINUSE') {
     dialog.showErrorBox('Frame is already running', 'Frame is already running or another application is using port 1248.')
   } else {
-    dialog.showErrorBox('An error occured, Frame will quit', e.message)
+    exitAction = dialog.showMessageBoxSync(undefined, {
+      title: 'Unhandled Exception',
+      message: 'An unexpected error occured',
+      detail: e.message,
+      type: 'error',
+      buttons: ['Quit', 'Restart'],
+      defaultId: 0,
+      cancelId: 0
+    })
   }
-  log.error('uncaughtException')
-  log.error(e)
+
+  if (exitAction === 1) {
+    app.relaunch()
+  }
 
   app.quit()
 })
