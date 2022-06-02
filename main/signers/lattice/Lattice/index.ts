@@ -61,7 +61,7 @@ export default class Lattice extends Signer {
   accountLimit = 5
   tag = ''
 
-  constructor(deviceId: string, name: string, tag: string) {
+  constructor (deviceId: string, name: string, tag: string) {
     super()
 
     this.id = 'lattice-' + deviceId
