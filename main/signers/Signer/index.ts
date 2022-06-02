@@ -1,5 +1,6 @@
 import log from 'electron-log'
 import EventEmitter from 'stream'
+import { addHexPrefix } from 'ethereumjs-util'
 
 import { TransactionData } from '../../transaction'
 import { deriveHDAccounts } from './derive'
@@ -77,7 +78,7 @@ export default class Signer extends EventEmitter {
       name: this.name || this.type + ' signer',
       type: this.type,
       model: this.model,
-      addresses: this.addresses.map(addr => addr.toString()),
+      addresses: this.addresses.map(addr => addHexPrefix(addr.toString())),
       status: this.status,
       appVersion: this.appVersion || { major: 0, minor: 0, patch: 0 }
     }
