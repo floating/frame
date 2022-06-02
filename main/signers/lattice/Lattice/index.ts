@@ -265,7 +265,7 @@ export default class Lattice extends Signer {
       const connection = this.connection as Client
       const compatibility = signerCompatibility(rawTx, this.summary())
       const latticeTx = compatibility.compatible ? { ...rawTx } : londonToLegacy(rawTx)
-          const fwVersion = connection.getFwVersion()
+      const fwVersion = connection.getFwVersion()
 
       const signedTx = await sign(latticeTx, async tx => {
         const unsignedTx = this.createTransaction(index, rawTx.type, latticeTx.chainId, tx)
