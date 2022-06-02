@@ -48,48 +48,6 @@ class Notify extends React.Component {
     )
   }
 
-  updateOriginChain (data) {
-    const { origin } = data
-    const removeOriginClickHandler = () => {
-      link.send('tray:action', 'removeOrigin', origin.id)
-      link.send('tray:action', 'backDash')
-    }
-
-    return (
-      <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
-        <div className='notifyBoxSlide'>
-          <div className='notifyBox'>
-            <div className='notifyBody'>
-              <div className='originSwapTitle'>
-                Switch chain for:
-              </div>
-              <div className='originSwapOrigin'>
-                {origin.name}
-              </div>
-              <div className='originSwapChainList'>
-                {Object.keys(this.store('main.networks.ethereum')).filter(id => {
-                  return this.store('main.networks.ethereum', id, 'on')
-                }).map(id => {
-                  return (
-                    <div className='originSwapChainListItem' onClick={() => {
-                      link.send('tray:action', 'switchOriginChain', origin.id, parseInt(id), 'ethereum')
-                      link.send('tray:action', 'backDash')
-                    }}>
-                      {this.store('main.networks.ethereum', id, 'name')}
-                    </div>
-                  )
-                })}
-              </div>
-              <div className='removeOriginButton' onClick={removeOriginClickHandler}>
-                Remove Origin
-              </div>  
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
   betaDisclosure () {
     return (
       <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
@@ -574,12 +532,6 @@ class Notify extends React.Component {
       return (
         <div className='notify cardShow' onMouseDown={() => link.send('tray:action', 'backDash')}>
           {this.nonceWarning()}
-        </div>
-      )
-    } else if (notify === 'updateOriginChain') {
-      return (
-        <div className='notify cardShow'>
-          {this.updateOriginChain(notifyData)}
         </div>
       )
     } else if (notify === 'gasFeeWarning') {

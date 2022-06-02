@@ -4,12 +4,14 @@ import link from '../../../resources/link'
 import { isNetworkConnected, isNetworkEnabled } from '../../../resources/utils/chains'
 // import svg from '../../../resources/svg'
 
+import DappDetails from './DappDetails'
+
 function bySessionStartTime (a, b) {
-  return a.session.startedAt - b.session.startedAt
+  return b.session.startedAt - a.session.startedAt
 }
 
 function byLastUpdated (a, b) {
-  return a.session.lastUpdatedAt - b.session.lastUpdatedAt
+  return b.session.lastUpdatedAt - a.session.lastUpdatedAt
 }
 
 function getOriginsForChain (chain, origins) {
@@ -26,7 +28,7 @@ function getOriginsForChain (chain, origins) {
 
   return {
     connected: connectedOrigins.sort(bySessionStartTime),
-    disconnected: disconnectedOrigins.sort(byLastUpdated)
+    disconnected: disconnectedOrigins.sort(byLastUpdated).filter(origin => (Date.now() - origin.session.lastUpdatedAt) < 60 * 60 * 1000)
   }
 }
 
@@ -50,13 +52,8 @@ class Indicator extends React.Component {
   render () {
     if (this.props.connected) {
       return <div className={this.state.active ? 'sliceOriginIndicator sliceOriginIndicatorActive' : 'sliceOriginIndicator' } />
-      //return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorGood' /></div>
-    } 
-    // else if (status === 'loading' || status === 'syncing' || status === 'pending' || status === 'standby') {
-    //   return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorPending' /></div>
-    // } 
-    else {
-      return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorBad' /></div>
+    } else {
+      return <div className='sliceOriginIndicator sliceOriginIndicatorOff' />
     }
   }
 }
@@ -100,21 +97,17 @@ class _OriginModule extends React.Component {
         <div 
           className='sliceOrigin'
           onClick={() => {
-            link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'updateOriginChain', notifyData: { origin } }})
+            link.send('tray:action', 'navDash', { view: 'dapps', data: { dappDetails:  origin.id }})
           }}
         >
           <Indicator key={origin.session.lastUpdatedAt} connected={connected} />
           <div className='sliceOriginTile'>
             {origin.name}
+          </div> 
+          <div className='sliceOriginReqs'>
+            <div className='sliceOriginReqsNumber'>{this.state.averageRequests}</div>
+            <div className='sliceOriginReqsLabel'>{'reqs/s'}</div>
           </div>
-          {
-            connected ? (
-              <div className='sliceOriginReqs'>
-                <div className='sliceOriginReqsNumber'>{this.state.averageRequests}</div>
-                <div className='sliceOriginReqsLabel'>{'reqs/s'}</div>
-              </div>
-            ) : null
-          }
         </div>
         {this.state.expanded ? (
           <div>
@@ -147,22 +140,28 @@ class Dapps extends React.Component {
     const originsCount = Object.values(origins).length
     const clearOriginsClickHandler = () => link.send('tray:action', 'clearOrigins')
 
-    return (
-      <div>
-        {
-          enabledChains.map(chain => {
-            const chainOrigins = getOriginsForChain(chain, origins)
+    const { dappDetails } = this.props.data
 
-            return chainOrigins.length === 0
-              ? <></>
-              : <ChainOrigins chain={chain} origins={chainOrigins} />
-          })
-        }
-        <div className={`clearOriginsButton${originsCount === 0 ? ' clearOriginsButtonDisabled' : ''}`} onClick={clearOriginsClickHandler} >
-          Clear All Origins
+    if (dappDetails) {
+      return <DappDetails originId={dappDetails} />
+    } else {
+      return (
+        <div>
+          {
+            enabledChains.map(chain => {
+              const chainOrigins = getOriginsForChain(chain, origins)
+  
+              return chainOrigins.length === 0
+                ? <></>
+                : <ChainOrigins chain={chain} origins={chainOrigins} />
+            })
+          }
+          <div className={`clearOriginsButton${originsCount === 0 ? ' clearOriginsButtonDisabled' : ''}`} onClick={clearOriginsClickHandler} >
+            Clear All Origins
+          </div>
         </div>
-      </div>
-    ) 
+      ) 
+    }
   }
 }
 
