@@ -290,7 +290,7 @@ export default class Lattice extends Signer {
             encodingType: Constants.SIGNING.ENCODINGS.EVM,
             signerPath: unsignedTx.signerPath,
             decoder: callDataDecoder?.def
-          };
+          }
           signingOptions = { data, currency: unsignedTx.currency }
         } else {
           signingOptions = { currency: 'ETH', data: unsignedTx }
