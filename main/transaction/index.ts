@@ -22,7 +22,8 @@ const londonHardforkSigners: SignerCompatibilityByVersion = {
         )
     }
 
-    return version.major >= 3 || (version.major >= 2 && version.minor >= 4 && version.patch >= 2)
+    // 3.x+, 2.5.x+, or 2.4.2+
+    return version.major >= 3 || (version.major === 2 && version.minor >= 5) || (version.major === 2 && version.minor === 4 && version.patch >= 2)
   },
   lattice: version =>  version.major >= 1 || version.minor >= 11
 }

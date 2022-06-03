@@ -132,7 +132,7 @@ describe('#signerCompatibility', () => {
   })
 
   it('is not compatible for eip-1559 transactions on Trezor T signers using firmware prior to 2.4.2', () => {
-    const appVersion = { major: 2, minor: 3, patch: 1 }
+    const appVersion = { major: 2, minor: 4, patch: 0 }
     const tx = {
       type: '0x2'
     }
@@ -158,7 +158,7 @@ describe('#signerCompatibility', () => {
   })
 
   it('is compatible for eip-1559 transactions on Trezor T signers using firmware 2.4.2+', () => {
-    const appVersion = { major: 2, minor: 4, patch: 3 }
+    const appVersion = { major: 2, minor: 5, patch: 1 }
     const tx = {
       type: '0x2'
     }
