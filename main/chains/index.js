@@ -11,6 +11,12 @@ const { default: BlockMonitor } = require('./blocks')
 const { default: chainConfig } = require('./config')
 const { default: GasCalculator } = require('../transaction/gasCalculator')
 
+// these chain IDs are known to not support EIP-1559 and will be forced
+// not to use that mechanism
+// TODO: create a more general chain config that can use the block number
+// and ethereumjs/common to determine the state of various EIPs
+const legacyChains = [250, 4002]
+
 class ChainConnection extends EventEmitter {
   constructor (type, chainId) {
     super()
@@ -55,13 +61,14 @@ class ChainConnection extends EventEmitter {
 
   _createBlockMonitor (provider) {
     const monitor = new BlockMonitor(provider)
+    const allowEip1559 = !legacyChains.includes(parseInt(this.chainId))
 
     monitor.on('data', async block => {
       let feeMarket = null
 
       const gasCalculator = new GasCalculator(provider)
 
-      if ('baseFeePerGas' in block) {
+      if (allowEip1559 && 'baseFeePerGas' in block) {
         try {
           // only consider this an EIP-1559 block if fee market can be loaded
           feeMarket = await gasCalculator.getFeePerGas()
