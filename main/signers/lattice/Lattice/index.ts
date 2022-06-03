@@ -1,12 +1,8 @@
-import { Client } from 'gridplus-sdk'
-import type { Signature } from 'gridplus-sdk'
-import { promisify } from 'util'
-
+import { Client, Utils, Constants } from 'gridplus-sdk'
+import rlp from 'rlp'
 import { padToEven, addHexPrefix } from 'ethereumjs-util'
 import { hexToNumber } from 'web3-utils'
 import log from 'electron-log'
-import crypto from 'crypto'
-
 import Signer from '../../Signer'
 import { sign, signerCompatibility, londonToLegacy } from '../../../transaction'
 import type { TransactionData } from '../../../transaction'
@@ -87,14 +83,12 @@ export default class Lattice extends Signer {
       name: devicePermission(this.tag),
       baseUrl,
       privKey: privateKey,
-      crypto
     })
 
     try {
-      const connect = promisify(this.connection.connect).bind(this.connection, this.deviceId)
-      const paired = !!(await connect())
+      const paired = await this.connection.connect(this.deviceId)
 
-      const [patch, minor, major] = this.connection?.fwVersion || [0, 0, 0]
+      const { fix: patch, minor, major } = this.connection.getFwVersion() || { fix: 0, major: 0, minor: 0 }
 
       log.info(`Connected to Lattice with deviceId=${this.deviceId} paired=${paired}, firmware v${major}.${minor}.${patch}`)
 
@@ -112,7 +106,7 @@ export default class Lattice extends Signer {
       const errorMessage = this.handleError('could not connect to Lattice', e as string)
 
       this.emit('error')
-      
+
       throw new Error(errorMessage)
     }
   }
@@ -124,7 +118,7 @@ export default class Lattice extends Signer {
     }
 
     this.connection = null
-    
+
     this.addresses = []
   }
 
@@ -133,7 +127,7 @@ export default class Lattice extends Signer {
     this.removeAllListeners()
 
     this.disconnect()
-    
+
     super.close()
   }
 
@@ -144,8 +138,8 @@ export default class Lattice extends Signer {
     this.emit('update')
 
     try {
-      const pair = promisify((this.connection as Client).pair).bind(this.connection, pairingCode)
-      const hasActiveWallet = !!(await pair())
+      const connection = this.connection as Client
+      const hasActiveWallet = await connection.pair(pairingCode)
 
       log.info(`successfully paired to Lattice ${this.deviceId}`)
 
@@ -156,7 +150,7 @@ export default class Lattice extends Signer {
       const errorMessage = this.handleError('could not pair to Lattice', e as string)
 
       this.emit('error')
-      
+
       throw new Error(errorMessage)
     }
   }
@@ -175,20 +169,20 @@ export default class Lattice extends Signer {
 
       const connection = this.connection as Client
 
-      log.info(`deriving addresses for Lattice ${connection.name}`)
+      log.info(`deriving addresses for Lattice ${connection.getAppName()}`)
 
-      const getAddresses = promisify(connection.getAddresses).bind(connection)
       const addressLimit = derivation === Derivation.live ? 1 : ADDRESS_LIMIT
 
       while (this.addresses.length < this.accountLimit) {
         const req = {
           startPath: this.getPath(this.addresses.length),
           n: Math.min(addressLimit, this.accountLimit - this.addresses.length),
-          skipCache: true
         }
 
-        const loadedAddresses = await getAddresses(req)
-        this.addresses = [...this.addresses, ...loadedAddresses]
+        const loadedAddresses = await connection.getAddresses(req)
+        this.addresses = [...this.addresses, ...loadedAddresses].map((addr) =>
+           addHexPrefix(addr.toString())
+        )
       }
 
       this.status = 'ok'
@@ -203,7 +197,7 @@ export default class Lattice extends Signer {
           }, 3000)
         })
       }
-      
+
       const errorMessage = this.handleError('could not derive addresses', e as string)
       this.emit('error')
 
@@ -214,11 +208,11 @@ export default class Lattice extends Signer {
   async verifyAddress (index: number, currentAddress: string, display = true, cb: Callback<boolean>) {
     const connection = this.connection as Client
 
-    log.info(`verifying address ${currentAddress} for Lattice ${connection.name}`)
+    log.info(`verifying address ${currentAddress} for Lattice ${connection.getAppName()}`)
 
     try {
       const addresses = await this.deriveAddresses({ retries: 0 })
-      
+
       const address = (addresses[index] || '').toLowerCase()
 
       if (address !== currentAddress) {
@@ -233,7 +227,7 @@ export default class Lattice extends Signer {
 
       this.handleError('could not verify address', err)
       this.emit('error')
-      
+
       cb(new Error(err === 'Address does not match device' ? err : 'Verify Address Error'))
     }
   }
@@ -268,21 +262,50 @@ export default class Lattice extends Signer {
 
   async signTransaction (index: number, rawTx: TransactionData, cb: Callback<string>) {
     try {
+      const connection = this.connection as Client
       const compatibility = signerCompatibility(rawTx, this.summary())
       const latticeTx = compatibility.compatible ? { ...rawTx } : londonToLegacy(rawTx)
+      const fwVersion = connection.getFwVersion()
 
       const signedTx = await sign(latticeTx, async tx => {
         const unsignedTx = this.createTransaction(index, rawTx.type, latticeTx.chainId, tx)
-        const signOpts = { currency: 'ETH', data: unsignedTx }
-        const clientSign = promisify((this.connection as Client).sign).bind(this.connection)
+        let signingOptions;
 
-        const result = await clientSign(signOpts)
-        const sig = result.sig as Signature
+        if (fwVersion && (fwVersion.major > 0 || fwVersion.minor >= 15)) {
+          const payload = tx.type ?
+            tx.getMessageToSign(false) :
+            rlp.encode(tx.getMessageToSign(false))
+
+          const to = tx.to?.toString() ?? undefined
+
+          const callDataDecoder = to 
+            ? await Utils.fetchCalldataDecoder(tx.data, to, unsignedTx.chainId) 
+            : undefined
+
+          const data = {
+            payload,
+            curveType: Constants.SIGNING.CURVES.SECP256K1,
+            hashType: Constants.SIGNING.HASHES.KECCAK256,
+            encodingType: Constants.SIGNING.ENCODINGS.EVM,
+            signerPath: unsignedTx.signerPath,
+            decoder: callDataDecoder?.def
+          }
+          signingOptions = { data, currency: unsignedTx.currency }
+        } else {
+          signingOptions = { currency: 'ETH', data: unsignedTx }
+        }
+
+        const signedTx = await connection.sign(signingOptions)
+        const sig = signedTx?.sig
+
+        if (!sig) {
+          throw new Error('Signing failed')
+        }
 
         return {
           v: sig.v.toString('hex'),
-          r: sig.r,
-          s: sig.s
+          r: sig.r.toString('hex'),
+          s: sig.s.toString('hex')
         }
       })
 
@@ -304,7 +327,7 @@ export default class Lattice extends Signer {
   }
 
   private async sign (index: number, protocol: string, payload: string | TypedData) {
-    const clientSign = promisify((this.connection as Client).sign).bind(this.connection)
+    const connection = this.connection as Client
 
     const data = {
       protocol,
@@ -317,8 +340,12 @@ export default class Lattice extends Signer {
       data: data
     }
 
-    const result = await clientSign(signOpts)
-    const sig = result.sig as Signature
+    const result = await connection.sign(signOpts)
+    const sig = result?.sig
+
+    if (!sig) {
+      throw new Error('Signing failed')
+    }
 
     const signature = [
       sig.r,
