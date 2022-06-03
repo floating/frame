@@ -1,7 +1,7 @@
 import { addHexPrefix, stripHexPrefix } from 'ethereumjs-util'
 import Common from '@ethereumjs/common'
 
-import { usesBaseFee, maxFee, londonToLegacy, signerCompatibility, populate, sign } from '../../../main/transaction'
+import { maxFee, londonToLegacy, signerCompatibility, populate, sign } from '../../../main/transaction'
 
 describe('#signerCompatibility', () => {
   it('is always compatible with legacy transactions', () => {
@@ -228,24 +228,6 @@ describe('#londonToLegacy', () => {
     expect(tx.value).toBe(rawTx.value)
     expect(tx.to).toBe(rawTx.to)
     expect(tx.data).toBe(rawTx.data)
-  })
-})
-
-describe('#usesBaseFee', () => {
-  it('identifies a legacy transaction that uses gas price', () => {
-    const tx = {
-      type: '0x0'
-    }
-
-    expect(usesBaseFee(tx)).toBe(false)
-  })
-
-  it('identifies a transaction that uses EIP-1559 base fees', () => {
-    const tx = {
-      type: '0x2'
-    }
-
-    expect(usesBaseFee(tx)).toBe(true)
   })
 })
 
