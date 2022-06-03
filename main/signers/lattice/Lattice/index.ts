@@ -18,6 +18,12 @@ interface DeriveOptions {
   derivation?: Derivation
 }
 
+interface Signature {
+  r: Buffer,
+  s: Buffer,
+  v: Buffer
+}
+
 export const Status = {
   OK: 'ok',
   CONNECTING: 'connecting',
@@ -265,42 +271,13 @@ export default class Lattice extends Signer {
       const connection = this.connection as Client
       const compatibility = signerCompatibility(rawTx, this.summary())
       const latticeTx = compatibility.compatible ? { ...rawTx } : londonToLegacy(rawTx)
-      const fwVersion = connection.getFwVersion()
 
       const signedTx = await sign(latticeTx, async tx => {
         const unsignedTx = this.createTransaction(index, rawTx.type, latticeTx.chainId, tx)
-        let signingOptions;
-
-        if (fwVersion && (fwVersion.major > 0 || fwVersion.minor >= 15)) {
-          const payload = tx.type ?
-            tx.getMessageToSign(false) :
-            rlp.encode(tx.getMessageToSign(false))
-
-          const to = tx.to?.toString() ?? undefined
-
-          const callDataDecoder = to 
-            ? await Utils.fetchCalldataDecoder(tx.data, to, unsignedTx.chainId) 
-            : undefined
-
-          const data = {
-            payload,
-            curveType: Constants.SIGNING.CURVES.SECP256K1,
-            hashType: Constants.SIGNING.HASHES.KECCAK256,
-            encodingType: Constants.SIGNING.ENCODINGS.EVM,
-            signerPath: unsignedTx.signerPath,
-            decoder: callDataDecoder?.def
-          }
-          signingOptions = { data, currency: unsignedTx.currency }
-        } else {
-          signingOptions = { currency: 'ETH', data: unsignedTx }
-        }
+        const signingOptions = await this.createTransactionSigningOptions(tx, unsignedTx)
 
         const signedTx = await connection.sign(signingOptions)
-        const sig = signedTx?.sig
-
-        if (!sig) {
-          throw new Error('Signing failed')
-        }
+        const sig = signedTx?.sig as Signature
 
         return {
           v: sig.v.toString('hex'),
@@ -341,11 +318,7 @@ export default class Lattice extends Signer {
     }
 
     const result = await connection.sign(signOpts)
-    const sig = result?.sig
-
-    if (!sig) {
-      throw new Error('Signing failed')
-    }
+    const sig = result?.sig as Signature
 
     const signature = [
       sig.r,
@@ -385,6 +358,35 @@ export default class Lattice extends Signer {
     })
 
     return unsignedTx
+  }
+
+  private async createTransactionSigningOptions (tx: TypedTransaction, unsignedTx: any) {
+    const fwVersion = (this.connection as Client).getFwVersion()
+
+    if (fwVersion && (fwVersion.major > 0 || fwVersion.minor >= 15)) {
+      const payload = tx.type ?
+        tx.getMessageToSign(false) :
+        rlp.encode(tx.getMessageToSign(false))
+
+      const to = tx.to?.toString() ?? undefined
+
+      const callDataDecoder = to
+        ? await Utils.fetchCalldataDecoder(tx.data, to, unsignedTx.chainId)
+        : undefined
+
+      const data = {
+        payload,
+        curveType: Constants.SIGNING.CURVES.SECP256K1,
+        hashType: Constants.SIGNING.HASHES.KECCAK256,
+        encodingType: Constants.SIGNING.ENCODINGS.EVM,
+        signerPath: unsignedTx.signerPath,
+        decoder: callDataDecoder?.def
+      }
+
+      return { data, currency: unsignedTx.currency }
+    }
+      
+    return { currency: 'ETH', data: unsignedTx }
   }
 
   private getPath (index: number) {
