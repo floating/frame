@@ -10,7 +10,7 @@ import signers from '../../signers'
 import windows from '../../windows'
 import store from '../../store'
 import { Aragon } from '../aragon'
-import { TransactionData } from '../../transaction'
+import { TransactionData } from '../../../resources/domain/transaction'
 import { capitalize } from '../../../resources/utils'
 import { getType as getSignerType, Type as SignerType } from '../../signers/Signer'
 

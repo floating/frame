@@ -2,9 +2,9 @@ import React from 'react'
 import Restore from 'react-restore'
 import utils from 'web3-utils'
 import BigNumber from 'bignumber.js'
+import { getAddress } from '@ethersproject/address'
 
-import { usesBaseFee } from '../../../../../../../main/transaction'
-
+import { usesBaseFee } from '../../../../../../../resources/domain/transaction'
 import { ApprovalType } from '../../../../../../../resources/constants'
 import svg from '../../../../../../../resources/svg'
 import link from '../../../../../../../resources/link'
@@ -147,7 +147,7 @@ class TransactionRequest extends React.Component {
 
     const status = req.status
     const mode = req.mode
-    const toAddress = req.data && req.data.to ? req.data.to : ''
+    const toAddress = req.data && req.data.to ? getAddress(req.data.to) : ''
     let requestClass = 'signerRequest'
     if (mode === 'monitor') requestClass += ' signerRequestMonitor'
     const success = (req.status === 'confirming' || req.status === 'confirmed')
@@ -435,7 +435,7 @@ class TransactionRequest extends React.Component {
                             <span className='monitorValue0x'>{'0x'}</span>
                             {toAddress.substring(2, 5)}
                             {svg.octicon('kebab-horizontal', { height: 14 })}
-                            {toAddress.substr(toAddress.length - 3)}
+                            {toAddress.substring(toAddress.length - 3)}
                            </span>
                           <span className='monitorSub'>{'ON'} </span>
                           <span className='monitorSub monitorSubHighlight'>

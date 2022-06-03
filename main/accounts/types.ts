@@ -1,7 +1,7 @@
 import type { Version } from 'eth-sig-util'
 import type { DecodedCallData } from '../contracts'
 import type { Chain } from '../chains'
-import type { TransactionData } from '../transaction'
+import type { TransactionData } from '../../resources/domain/transaction'
 
 export enum ReplacementType {
   Speed = 'speed',

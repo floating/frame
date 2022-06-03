@@ -1,4 +1,4 @@
-const { app, ipcMain, protocol, shell, dialog, clipboard, globalShortcut, BrowserWindow } = require('electron')
+const { app, ipcMain, protocol, shell, clipboard, globalShortcut, BrowserWindow } = require('electron')
 
 app.commandLine.appendSwitch('enable-accelerated-2d-canvas', true)
 app.commandLine.appendSwitch('enable-gpu-rasterization', true)
@@ -95,28 +95,30 @@ require('./rpc')
 // const clients = require('./clients')
 const signers = require('./signers').default
 const persist = require('./store/persist')
+const { default: showUnhandledExceptionDialog } = require('./windows/dialog/unhandledException')
 
 log.info('Chrome: v' + process.versions.chrome)
 log.info('Electron: v' + process.versions.electron)
 log.info('Node: v' + process.versions.node)
 
-process.on('uncaughtException', (e) => {
+// prevent showing the exit dialog more than once
+let closing = false
+
+process.on('uncaughtException', e => {
   Sentry.captureException(e)
+
+  log.error('uncaughtException', e)
 
   if (e.code === 'EPIPE') {
     log.error('uncaught EPIPE error', e)
     return
   }
 
-  if (e.code === 'EADDRINUSE') {
-    dialog.showErrorBox('Frame is already running', 'Frame is already running or another application is using port 1248.')
-  } else {
-    dialog.showErrorBox('An error occured, Frame will quit', e.message)
-  }
-  log.error('uncaughtException')
-  log.error(e)
+  if (!closing) {
+    closing = true
 
-  app.quit()
+    showUnhandledExceptionDialog(e.message, e.code)
+  }
 })
 
 const externalWhitelist = [

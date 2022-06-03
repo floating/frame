@@ -70,7 +70,6 @@ export default class LatticeAdapter extends SignerAdapter {
           reloadAddresses = reloadAddresses || (lattice.addresses.length < lattice.accountLimit)
           needsUpdate = true
         }
-
         if (baseUrl !== lattice.connection.baseUrl) {
           // if any connection settings have changed, re-connect
           this.reload(lattice)

@@ -1,7 +1,8 @@
 import log from 'electron-log'
 import EventEmitter from 'stream'
+import { addHexPrefix } from 'ethereumjs-util'
 
-import { TransactionData } from '../../transaction'
+import { TransactionData } from '../../../resources/domain/transaction'
 import { deriveHDAccounts } from './derive'
 import crypt from '../../crypt'
 import { TypedData } from 'eth-sig-util'
@@ -62,7 +63,7 @@ export default class Signer extends EventEmitter {
   }
 
   getCoinbase (cb: Callback<string>) {
-    cb(null, this.addresses[0])
+    cb(null, this.addresses[0].toString())
   }
 
   verifyAddress (index: number, current: string, display: boolean, cb: Callback<boolean>) {
@@ -77,7 +78,7 @@ export default class Signer extends EventEmitter {
       name: this.name || this.type + ' signer',
       type: this.type,
       model: this.model,
-      addresses: this.addresses,
+      addresses: this.addresses.map(addr => addHexPrefix(addr.toString())),
       status: this.status,
       appVersion: this.appVersion || { major: 0, minor: 0, patch: 0 }
     }

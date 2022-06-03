@@ -1,7 +1,6 @@
 
 
 import EventEmitter from 'events'
-import fetch from 'node-fetch'
 import log from 'electron-log'
 import { shell, Notification } from 'electron'
 import { addHexPrefix, intToHex} from 'ethereumjs-util'
@@ -10,7 +9,8 @@ import store from '../store'
 import ExternalDataScanner, { DataScanner } from '../externalData'
 import { getType as getSignerType } from '../signers/Signer'
 import FrameAccount from './Account'
-import { usesBaseFee, signerCompatibility, maxFee, TransactionData, SignerCompatibility } from '../transaction'
+import { usesBaseFee, TransactionData } from '../../resources/domain/transaction'
+import { signerCompatibility, maxFee, SignerCompatibility } from '../transaction'
 import { weiIntToEthInt, hexToInt } from '../../resources/utils'
 
 import {

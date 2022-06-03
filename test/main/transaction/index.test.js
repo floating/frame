@@ -1,7 +1,7 @@
 import { addHexPrefix, stripHexPrefix } from 'ethereumjs-util'
 import Common from '@ethereumjs/common'
 
-import { usesBaseFee, maxFee, londonToLegacy, signerCompatibility, populate, sign } from '../../../main/transaction'
+import { maxFee, londonToLegacy, signerCompatibility, populate, sign } from '../../../main/transaction'
 
 describe('#signerCompatibility', () => {
   it('is always compatible with legacy transactions', () => {
@@ -132,7 +132,7 @@ describe('#signerCompatibility', () => {
   })
 
   it('is not compatible for eip-1559 transactions on Trezor T signers using firmware prior to 2.4.2', () => {
-    const appVersion = { major: 2, minor: 3, patch: 1 }
+    const appVersion = { major: 2, minor: 4, patch: 0 }
     const tx = {
       type: '0x2'
     }
@@ -158,7 +158,7 @@ describe('#signerCompatibility', () => {
   })
 
   it('is compatible for eip-1559 transactions on Trezor T signers using firmware 2.4.2+', () => {
-    const appVersion = { major: 2, minor: 4, patch: 3 }
+    const appVersion = { major: 2, minor: 5, patch: 1 }
     const tx = {
       type: '0x2'
     }
@@ -228,24 +228,6 @@ describe('#londonToLegacy', () => {
     expect(tx.value).toBe(rawTx.value)
     expect(tx.to).toBe(rawTx.to)
     expect(tx.data).toBe(rawTx.data)
-  })
-})
-
-describe('#usesBaseFee', () => {
-  it('identifies a legacy transaction that uses gas price', () => {
-    const tx = {
-      type: '0x0'
-    }
-
-    expect(usesBaseFee(tx)).toBe(false)
-  })
-
-  it('identifies a transaction that uses EIP-1559 base fees', () => {
-    const tx = {
-      type: '0x2'
-    }
-
-    expect(usesBaseFee(tx)).toBe(true)
   })
 })
 
