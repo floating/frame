@@ -3,6 +3,7 @@ import Restore from 'react-restore'
 
 import link from '../../../../../resources/link'
 import svg from '../../../../../resources/svg'
+import RingIcon from '../../../../../resources/Components/RingIcon'
 
 import Signer from '../../Signer'
 
@@ -27,9 +28,9 @@ class AddHardware extends React.Component {
             <div className='addAccountItemTopType'>
               <div className='addAccountItemIcon'>
                 {this.props.type === 'ledger' ? (
-                  <div className='addAccountItemIconType addAccountItemIconLedger'>{svg.ledger(17)}</div>
+                  <RingIcon svgLookup={{ name: 'ledger', size: 15 }} />
                 ) : (
-                  <div className='addAccountItemIconType addAccountItemIconTrezor'>{svg.trezor(17)}</div>
+                  <RingIcon svgLookup={{ name: 'trezor', size: 15 }} />
                 )}
                 <div className='addAccountItemIconHex addAccountItemIconHexHardware' />
               </div>

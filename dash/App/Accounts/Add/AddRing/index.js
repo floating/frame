@@ -3,6 +3,8 @@ import Restore from 'react-restore'
 
 import link from '../../../../../resources/link'
 import svg from '../../../../../resources/svg'
+import RingIcon from '../../../../../resources/Components/RingIcon'
+
 
 class AddRing extends React.Component {
   constructor (...args) {
@@ -102,8 +104,6 @@ class AddRing extends React.Component {
 
   render () {
     let itemClass = 'addAccountItem addAccountItemSmart addAccountItemAdding'
-    const { type, id } = this.store('main.currentNetwork')
-    const network = type + ':' + id
     return (
       <div className={itemClass} style={{ transitionDelay: (0.64 * this.props.index / 4) + 's' }}>
         <div className='addAccountItemBar addAccountItemHot' />
@@ -111,7 +111,9 @@ class AddRing extends React.Component {
           <div className='addAccountItemTop'>
             <div className='addAccountItemTopType'>
               <div className='addAccountItemIcon'>
-                <div className='addAccountItemIconType addAccountItemIconHot' style={{ marginTop: '2px' }}>{svg.octicon('key', { height: 23 })}</div>
+                <div className='addAccountItemIconType addAccountItemIconHot'>
+                  <RingIcon svgLookup={{ name: 'key', size: 16 }} />
+                </div>
                 <div className='addAccountItemIconHex addAccountItemIconHexHot' />
               </div>
               <div className='addAccountItemTopTitle'>Private Key</div>
@@ -123,7 +125,9 @@ class AddRing extends React.Component {
             <div
               className='addAccountItemOptionIntro' onClick={() => {
                 this.adding()
-                if (network === 'ethereum:1') setTimeout(() => link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'hotAccountWarning', notifyData: {} } }), 800)
+                setTimeout(() => {
+                  link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'hotAccountWarning', notifyData: {} } })
+                }, 800)
               }}
             >
               Add Keyring Account

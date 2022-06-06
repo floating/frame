@@ -37,6 +37,7 @@ div
     position absolute
     background var(--ghostZ)
     border-radius 16px
+    padding-bottom 20px
 
     .dashMainOverlay
       position absolute
@@ -51,14 +52,22 @@ div
       pointer-events none
 
     .originTitle
-      margin 30px 10px 5px 10px
+      margin 30px 8px 5px 0px
       font-size 18px
+      display flex
+      align-items center
+
+      .originTitleIcon
+        transform scale(0.5)
+
+      .originTitleText
+        margin-top -2px
 
     .clearOriginsButton
       background var(--ghostA)
-      margin 74px 6px 6px 6px
+      margin 74px 6px 76px 6px
       height 48px
-      border-radius 8px
+      border-radius 12px
       font-weight 500
       box-sizing border-box
       padding 13px
@@ -67,11 +76,13 @@ div
       display flex
       justify-content center
       align-items center
-      font-size 15px
+      font-size 13px
       text-transform uppercase
+      cursor pointer
+      box-shadow 0px 2px 4px var(--ghostY)
 
-    .clearOriginsButtonDisabled
-      opacity 0.5
+    .clearOriginsButton:hover
+      background var(--ghostB)
 
   .panelScrollOverlay
     position absolute
@@ -135,8 +146,7 @@ div
         background var(--ghostC)
 
     .accountTypeSelect
-      height 90px
-      // width 320px
+      height 100px
       font-weight 300
       border-radius 12px
       margin 6px 6px 8px 6px
@@ -145,7 +155,6 @@ div
       align-items center
       cursor pointer
       background var(--ghostA)
-      // border-bottom 2px solid var(--ghostZ)
       box-shadow 0px 4px 8px var(--ghostY)
       font-size 16px
 

@@ -3,6 +3,7 @@ import Restore from 'react-restore'
 
 import link from '../../../../../resources/link'
 import svg from '../../../../../resources/svg'
+import RingIcon from '../../../../../resources/Components/RingIcon'
 
 class AddAragon extends React.Component {
   constructor (...args) {
@@ -161,7 +162,7 @@ class AddAragon extends React.Component {
           <div className='addAccountItemTop'>
             <div className='addAccountItemTopType'>
               <div className='addAccountItemIcon'>
-                <div className='addAccountItemIconType addAccountItemIconSmart' style={{ paddingTop: '6px' }}>{svg.aragon(30)}</div>
+                <RingIcon svgLookup={{ name: 'aragon', size: 24 }} />
               </div>
               <div className='addAccountItemTopTitle'>Aragon DAO</div>
             </div>

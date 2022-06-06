@@ -9,6 +9,9 @@ import { ApprovalType } from '../../../../../../resources/constants'
 import svg from '../../../../../../resources/svg'
 import link from '../../../../../../resources/link'
 
+import RingIcon from '../../../../../../resources/Components/RingIcon'
+import chainMeta from '../../../../../../resources/chainMeta'
+
 import TxBar from './TxBar'
 
 // New Tx
@@ -243,6 +246,8 @@ class TransactionRequest extends React.Component {
       }
     }
 
+    const hexId = '0x' + parseInt(this.chain.id).toString('16')
+
     const showWarning = !status && mode !== 'monitor'
     const requiredApproval = showWarning && (req.approvals || []).filter(a => !a.approved)[0]
     return (
@@ -424,6 +429,10 @@ class TransactionRequest extends React.Component {
                 <>
                   <div className='requestMeta'>
                     <div className='requestMetaChainIcon'>
+                      <RingIcon 
+                        color={chainMeta[hexId] ? chainMeta[hexId].primaryColor : ''} 
+                        img={chainMeta[hexId] ? chainMeta[hexId].icon : ''} 
+                      />
                     </div>
                     <div className='requestMetaChainInfo'>
                       <div className='requestMetaChain'>

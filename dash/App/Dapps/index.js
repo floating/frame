@@ -4,6 +4,9 @@ import link from '../../../resources/link'
 import { isNetworkConnected, isNetworkEnabled } from '../../../resources/utils/chains'
 // import svg from '../../../resources/svg'
 
+import RingIcon from '../../../resources/Components/RingIcon'
+import chainMeta from '../../../resources/chainMeta'
+
 import DappDetails from './DappDetails'
 
 function bySessionStartTime (a, b) {
@@ -122,13 +125,29 @@ class _OriginModule extends React.Component {
 
 const OriginModule = Restore.connect(_OriginModule)
 
-const ChainOrigins = ({ chain, origins }) => (
-  <>
-    <div className='originTitle'>{chain.name}</div>
-    {origins.connected.map((origin) => <OriginModule origin={origin} connected={true} />)}
-    {origins.disconnected.map((origin) => <OriginModule origin={origin} connected={false} />)}
-  </>
-)
+const ChainOrigins = ({ chain, origins }) => {
+  const hexId = '0x' + parseInt(chain.id).toString('16')
+  return (
+    <>
+      <div className='originTitle'>
+        <div className='originTitleIcon'>
+          <RingIcon 
+            color={chainMeta[hexId] ? chainMeta[hexId].primaryColor : ''} 
+            img={chainMeta[hexId] ? chainMeta[hexId].icon : ''} 
+          />
+        </div>
+        <div className='originTitleText'>{chain.name}</div>
+      </div>
+      {origins.connected.map((origin) => <OriginModule origin={origin} connected={true} />)}
+      {origins.disconnected.map((origin) => <OriginModule origin={origin} connected={false} />)}
+      {origins.connected.length === 0 && origins.disconnected.length === 0 ? (
+        <div className='sliceOriginNoDapp'>
+          {'No Dapps Connected'}
+        </div>
+      ) : null}
+    </>
+  )
+}
   
 class Dapps extends React.Component {
   getEnabledChains () {
@@ -147,7 +166,7 @@ class Dapps extends React.Component {
       return <DappDetails originId={dappDetails} />
     } else {
       return (
-        <div>
+        <div className='cardShow'>
           {
             enabledChains.map(chain => {
               const chainOrigins = getOriginsForChain(chain, origins)
@@ -157,8 +176,8 @@ class Dapps extends React.Component {
                 : <ChainOrigins chain={chain} origins={chainOrigins} />
             })
           }
-          <div className={`clearOriginsButton${originsCount === 0 ? ' clearOriginsButtonDisabled' : ''}`} onClick={clearOriginsClickHandler} >
-            Clear All Origins
+          <div className={'clearOriginsButton'} onClick={clearOriginsClickHandler} >
+            Clear All
           </div>
         </div>
       ) 

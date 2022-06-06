@@ -29,7 +29,7 @@ class DappDetails extends React.Component {
   render () {
     const origin = this.store('main.origins', this.props.originId)
     return (
-      <div>
+      <div className='cardShow'>
         <pre>{JSON.stringify(origin, null, 4)}</pre>
         <div className='originSwapTitle'>
           Switch chain for:
