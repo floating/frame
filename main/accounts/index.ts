@@ -546,6 +546,8 @@ export class Accounts extends EventEmitter {
   removeRequest (account: FrameAccount, handlerId: string) {
     log.info(`removeRequest(${account.id}, ${handlerId})`)
 
+    store.backPanelReqView(handlerId)
+
     delete account.requests[handlerId]
     account.update()
   }

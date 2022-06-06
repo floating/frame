@@ -139,9 +139,9 @@ class TransactionRequest extends React.Component {
     this.setState({ allowOtherChain: true })
   }
 
-
   render () {
-    const req = this.props.req
+    const { accountId, handlerId } = this.props
+    const req = this.store('main.accounts', accountId, 'requests', handlerId)
     const originalNotice = (req.notice || '').toLowerCase()
     let notice = req.notice
 
@@ -226,8 +226,6 @@ class TransactionRequest extends React.Component {
 
     let nonce = parseInt(req.data.nonce, 'hex')
     if (isNaN(nonce)) nonce = 'TBD'
-
-    const otherChain = (this.chain.id !== this.store('main.currentNetwork.id')) && !this.state.allowOtherChain
 
     let feeAtTime = '?.??'
 

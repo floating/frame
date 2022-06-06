@@ -271,7 +271,6 @@ class _AccountMain extends React.Component {
   render () {
     const accountModules = this.store('panel.account.modules')
     const accountModuleOrder = this.store('panel.account.moduleOrder')
-    const chainId = this.store('main.currentNetwork.id')
     let slideHeight = 0
     const modules = accountModuleOrder.map((id, i) => {
       const module = accountModules[id] || { height: 0 }
@@ -371,20 +370,64 @@ class _AccountBody extends React.Component {
         <TransactionRequest 
           key={req.handlerId}
           req={req}
+          handlerId={req.handlerId}
           accountId={this.props.id}
           signingDelay={signingDelay} 
         />
       )
+    } else if (req.type === 'access') {
+      return (
+        <ProviderRequest 
+          key={req.handlerId} 
+          handlerId={req.handlerId}
+          accountId={this.props.id}
+          req={req} 
+        />
+      )
+    } else if (req.type === 'sign') {
+      return (
+        <SignatureRequest 
+          key={req.handlerId} 
+          req={req} 
+          handlerId={req.handlerId}
+          accountId={this.props.id}
+          signingDelay={signingDelay} 
+        />
+      )
+    } else if (req.type === 'signTypedData') {
+      return (
+        <SignTypedDataRequest
+          key={req.handlerId}
+          req={req}
+          handlerId={req.handlerId}
+          accountId={this.props.id}
+          signingDelay={signingDelay}
+        />
+      )
+    } else if (req.type === 'addChain' || req.type === 'switchChain') {
+      return (
+        <ChainRequest 
+          key={req.handlerId} 
+          req={req} 
+          handlerId={req.handlerId}
+          accountId={this.props.id}
+        />
+      )
+    } else if (req.type === 'addToken') {
+      return (
+        <AddTokenRequest
+          key={req.handlerId}
+          req={req} 
+          handlerId={req.handlerId}
+          accountId={this.props.id}
+        />
+      )
+    } else {
+      return null
     }
-    if (req.type === 'access') return <ProviderRequest key={req.handlerId} req={req} />
-    if (req.type === 'sign') return <SignatureRequest key={req.handlerId} req={req} signingDelay={signingDelay} />
-    if (req.type === 'signTypedData') return <SignTypedDataRequest key={req.handlerId} req={req} signingDelay={signingDelay} />
-    if (req.type === 'addChain' || req.type === 'switchChain') return <ChainRequest key={req.handlerId} req={req} />
-    if (req.type === 'addToken') return <AddTokenRequest key={req.handlerId} req={req} />
-    return null
   }
   render () {
-    const { view, data } = this.state // this.store('panel')
+    const { view, data } = this.store('panel.nav')[0] || {}
     if (view === 'requestView') {
       const { req, i } = data
       let accountViewTitle, accountViewIcon
@@ -412,7 +455,9 @@ class _AccountBody extends React.Component {
       }
       return (
         <AccountView 
-          back={() => this.setState({ view: '' })}
+          back={() => {
+            link.send('tray:action', 'backPanel', { view, data })
+          }}
           {...this.props}
           accountViewTitle={accountViewTitle}
           accountViewIcon={accountViewIcon}
@@ -448,7 +493,8 @@ class _AccountBody extends React.Component {
       return (
         <AccountMain 
           setAccountView={(view, data) => {
-            this.setState({ view, data })
+            link.send('tray:action', 'navPanel', { view, data })
+            // this.setState({ view, data })
           }} 
           {...this.props} 
         />
@@ -547,7 +593,6 @@ module={this.state.modules[5] || { index: 5, top: 0 }}
 //   }
 
 //   setActive (active) {
-//     const { type, id } = this.store('main.currentNetwork')
 //     if (type !== 'ethereum' || id !== '1') return
 //     this.setState({ openActive: active })
 //     this.openTimer = setTimeout(() => this.setState({ open: active }), 480)
@@ -593,7 +638,6 @@ module={this.state.modules[5] || { index: 5, top: 0 }}
 //     if (this.props.accountHighlight === 'active') currentIndex = this.props.highlightIndex
 //     const address = this.store('main.accounts', this.props.id, 'addresses', currentIndex)
 //     const current = (this.store('selected.current') === this.props.id) && this.props.status === 'ok'
-//     const { type, id } = this.store('main.currentNetwork')
 //     const currentSymbol = this.store('main.networks', type, id, 'symbol') || 'ETH'
 //     if (current) {
 //       const balance = this.store('balances', address)
@@ -902,7 +946,6 @@ class Account extends React.Component {
   //   const index = this.store('main.accounts', this.props.id, 'index')
   //   const startIndex = this.store('selected.accountPage') * 5
   //   const highlight = (this.state.accountHighlight === 'inactive') ? index : this.state.highlightIndex
-  //   const { type, id } = this.store('main.currentNetwork')
   //   const currentSymbol = this.store('main.networks', type, id, 'symbol') || 'ETH'
   //   return (
   //     <div className='accountListWrap'>

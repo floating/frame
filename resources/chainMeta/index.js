@@ -9,26 +9,26 @@ export default {
   '0x1': {
     chainId: 1,
     name: 'mainnet',
-    icon: eth,
-    primaryColor: 'rgb(0, 210, 190)'
+    icon: '',
+    primaryColor: 'var(--good)'
   },
   '0xa': {
     chainId: 10,
     name: 'optimism',
     icon: optimism,
-    primaryColor: 'rgb(220, 84, 65)'
+    primaryColor: 'rgb(246, 36, 35)'
   },
   '0x64': {
     chainId: 100,
     name: 'xdai',
     icon: xdai,
-    primaryColor: 'rgb(99, 167, 165)'
+    primaryColor: 'rgb(90, 181, 178)'
   },
   '0x89': {
     chainId: 137,
     name: 'polygon',
     icon: polygon,
-    primaryColor: 'rgb(142, 94, 241)'
+    primaryColor: 'rgb(140, 97, 232)'
   },
   '0xfa': {
     chainId: 250,
@@ -40,6 +40,6 @@ export default {
     chainId: 42161,
     name: 'arbitrum',
     icon: arbitrum,
-    primaryColor: 'rgb(80, 158, 234)'
+    primaryColor: 'rgb(62, 173, 241)'
   }
 }

@@ -12,6 +12,9 @@ import Restore from 'react-restore'
 //   return ['ledger', 'lattice', 'trezor'].includes(account.lastSignerType)
 // }
 
+import RingIcon from '../../../../../resources/Components/RingIcon'
+import chainMeta from '../../../../../resources/chainMeta'
+
 import link from '../../../../../resources/link'
 import svg from '../../../../../resources/svg'
 
@@ -44,49 +47,64 @@ class _RequestItem extends React.Component {
     clearInterval(this.timer)
   }
   render () {
-    const { req, i, title, icon } = this.props
+    const { account, handlerId, i, title, svgLookup, img, color } = this.props
+    const req = this.store('main.accounts', account, 'requests', handlerId)
     return (
       <div 
         key={req.handlerId}
         className='requestItem cardShow'
         // style={{ animationDelay: (i * 0.08) + 's' }}
         onClick={() => {
-          this.props.setAccountView('requestView', { req, i })
+          this.props.setAccountView('requestView', { account, req, i })
         }}
       >
-        <div className='requestItemRow requestItemRowHeader'>
-          <div className='requestItemRowIconLarge'>
-            {icon}
+        <div className='requestItemTitle'>
+          <div className='requestItemIcon'>
+            <RingIcon 
+              color={color}
+              svgLookup={svgLookup}
+              img={img}
+            />
           </div>
-          <div className='requestItemRowTitleLarge'>
-            {title}
+          <div className='requestItemMain'>
+            <div className='requestItemTitleMain'>
+              {title}
+            </div>
+            <div className='requestItemTitleSub'>
+              <div 
+                className='requestItemTitleSubIcon'
+              >
+                {svg.window(10)}
+              </div>
+              <div className='requestItemTitleSubText'>
+                {this.store('main.origins', req.origin, 'name')}
+              </div>
+            </div>
+            {req.recipient ? (
+              <div className='requestItemTitleSub'>
+                <div 
+                  className='requestItemTitleSubIcon'
+                >
+                  {svg.send(9)}
+                </div>
+                <div className='requestItemTitleSubText'>
+                  {req.recipient}
+                </div>
+              </div>
+            ) : null}
+          </div>
+          <div className='requestItemTitleTime'>
+            <div className='requestItemTitleTimeItem'>
+              {this.state.ago}
+            </div>
           </div>
         </div>
-        <div className='requestItemRow'>
-        <div className='requestItemRowIcon'>
-            {svg.window(12)}
-          </div>
-          <div className='requestItemRowTitle'>
-            {this.store('main.origins', req.origin, 'name')}
-          </div>
-          <div className={'requestItemSource'}>
-            {svg.chrome(11)}
-            {' chrome'}
+        <div className='requestItemDetails'>
+          <div className='requestItemDetailsSlide'>
+            <div className='requestItemDetailsIndicator' />
+            {req.status || 'pending'}
           </div>
         </div>
-        <div className='requestItemRow'>
-          <div className='requestItemRowIcon' style={{ top: 'px' }}>
-            {svg.pin(13)}
-          </div>
-          <div className='requestItemRowTitle'>
-            {'pending'}
-          </div>
-          <div className={this.state.ago.includes('s') ? 'requestItemTime requestItemTimeNew' : 'requestItemTime'}>
-            {this.state.ago}
-          </div>
-        </div>
-        <div className='requestItemIcon' />
-        {/* <pre>{JSON.stringify(req, null, 2)}</pre> */}
       </div>
     )
   }
@@ -196,9 +214,12 @@ class Requests extends React.Component {
                 return (
                   <RequestItem 
                     req={req} 
-                    i={i} 
+                    account={this.props.id}
+                    handlerId={req.handlerId}
+                    i={i}
                     title={'Account Access'} 
-                    icon={svg.accounts(20)} 
+                    color={'var(--outerspace)'}
+                    svgLookup={{ name: 'accounts', size: 16 }}
                     setAccountView={this.props.setAccountView}
                   />
                 )
@@ -206,9 +227,12 @@ class Requests extends React.Component {
                 return (
                   <RequestItem 
                     req={req}
+                    account={this.props.id}
+                    handlerId={req.handlerId}
                     i={i}
                     title={'Sign Message'}
-                    icon={svg.sign(20)}
+                    color={'var(--outerspace)'}
+                    svgLookup={{ name: 'sign', size: 16 }}
                     setAccountView={this.props.setAccountView}
                   />
                 )
@@ -216,9 +240,12 @@ class Requests extends React.Component {
                 return (
                   <RequestItem
                     req={req}
+                    account={this.props.id}
+                    handlerId={req.handlerId}
                     i={i}
                     title={'Sign Data'} 
-                    icon={svg.sign(20)} 
+                    color={'var(--outerspace)'}
+                    svgLookup={{ name: 'sign', size: 16 }}
                     setAccountView={this.props.setAccountView}
                   />
                 )
@@ -226,9 +253,12 @@ class Requests extends React.Component {
                 return (
                   <RequestItem 
                     req={req} 
+                    account={this.props.id}
+                    handlerId={req.handlerId}
                     i={i} 
                     title={'Add Chain'} 
-                    icon={svg.chain(20)} 
+                    color={'var(--outerspace)'}
+                    svgLookup={{ name: 'chain', size: 16 }}
                     setAccountView={this.props.setAccountView}
                   />
                 )
@@ -236,9 +266,12 @@ class Requests extends React.Component {
                 return (
                   <RequestItem
                     req={req}
+                    account={this.props.id}
+                    handlerId={req.handlerId}
                     i={i}
                     title={'Switch Chain'}
-                    icon={svg.chain(20)} 
+                    color={'var(--outerspace)'}
+                    svgLookup={{ name: 'chain', size: 16 }}
                     setAccountView={this.props.setAccountView}
                   />
                 )
@@ -246,20 +279,30 @@ class Requests extends React.Component {
                 return (
                   <RequestItem
                     req={req}
+                    account={this.props.id}
+                    handlerId={req.handlerId}
                     i={i}
                     title={'Add Tokens'}
-                    icon={svg.tokens(20)}
+                    color={'var(--outerspace)'}
+                    svgLookup={{ name: 'tokens', size: 16 }}
                     setAccountView={this.props.setAccountView}
                   />
                 )
               } else if (req.type === 'transaction')  {
                 const chainName = this.store('main.networks.ethereum', parseInt(req.data.chainId, 16), 'name') 
+                const hexId = req.data.chainId
+                chainMeta[hexId] ? chainMeta[hexId].primaryColor : ''
+                chainMeta[hexId] ? chainMeta[hexId].icon : ''
+                
                 return (
                   <RequestItem 
                     req={req}
+                    account={this.props.id}
+                    handlerId={req.handlerId}
                     i={i}
                     title={chainName + ' Transaction'}
-                    icon={svg.broadcast(20)}
+                    color={chainMeta[hexId] ? chainMeta[hexId].primaryColor : ''}
+                    img={chainMeta[hexId] ? chainMeta[hexId].icon : ''}
                     setAccountView={this.props.setAccountView}
                   />
                 )

@@ -6,6 +6,7 @@ import svg from '../../../resources/svg'
 // import Filter from '../Filter'
 
 import Dropdown from '../../../resources/Components/Dropdown'
+import RingIcon from '../../../resources/Components/RingIcon'
 
 import Connection from './Connection'
 import Gas from './Gas'
@@ -564,19 +565,12 @@ class _Network extends React.Component {
     return (
       <div className='network'>
         <div className='networkActive'>
-          {chainMeta[hexId] && chainMeta[hexId].icon ? (
-            <div 
-              className='chainBadge'
-              style={{ background: chainMeta[hexId] ? chainMeta[hexId].primaryColor : '' }}
-            >
-              <img src={chainMeta[hexId].icon} />
-            </div>
-          ) : (
-            <div 
-              className='chainBadge'
-              style={{ background: chainMeta[hexId] ? chainMeta[hexId].primaryColor : '' }}
+          <div className='chainBadge'>
+            <RingIcon 
+              color={chainMeta[hexId] ? chainMeta[hexId].primaryColor : ''} 
+              img={chainMeta[hexId] ? chainMeta[hexId].icon : ''} 
             />
-          )}
+          </div>
           <div className='networkName'>
             {this.state.name}
             {/* <input

@@ -15,8 +15,8 @@
       display flex
       justify-content center
       align-items center
-      height 40px
-      border-radius 12px
+      height 38px
+      border-radius 15px
       display flex
       justify-content center
       align-items center
@@ -26,7 +26,6 @@
       transform translate3d(0, 0, 0)
       font-family 'Exo2' // FiraCode, monospace
       background var(--ghostZ)
-      border 3px solid var(--ghostZ)
       padding-bottom 2px
 
       svg
@@ -54,18 +53,21 @@
       align-items center
       font-size 12px 
       z-index 40000
-      border-radius 8px
+      border-radius 15px
       padding-bottom 0px
       font-family FiraCode, monospace
-      background var(--ghostA)
+      background var(--ghostB)
       opacity 0
       font-weight 600
       transition var(--standardFast)
+      box-shadow 0px 0px 8px var(--ghostY)
 
     ._txRecipientFull:hover
       opacity 1
+      background var(--ghostB)
       transform translateX(0px) scale(1)
-      cursor pointer
+      cursor pointer      
+
 
     // ._txRecipientFull:active
     //   animation-name shake-little

@@ -54,22 +54,7 @@ class Panel extends React.Component {
   
   render () {
     const opacity = this.store('tray.initial') ? 0 : 1 // open ? 'translate3d(0px, 0px, 0px)' : 'translate3d(370px, 0px, 0px)'
-    // const { type, id } = this.store('main.currentNetwork')
 
-    // const nativeCurrency = this.store('main.networksMeta', type, id, 'nativeCurrency')
-
-    // const chainLayer = this.store('main.networks', type, id, 'layer')
-    // const baseRate = chainLayer === 'testnet' ? 'TEST' : 
-    //   nativeCurrency && nativeCurrency.usd ? (
-    //     nativeCurrency.usd.price < 100 ? 
-    //       (Math.round(nativeCurrency.usd.price * 100) / 100).toFixed(2)
-    //     :
-    //       Math.floor(nativeCurrency.usd.price).toLocaleString()
-    // ) : '---'
-
-    // let gasPrice = this.store('main.networksMeta', type, id, 'gas.price.levels.fast')
-    // if (!gasPrice) gasPrice = this.store('main.networksMeta', type, id, 'gas.price.fees.maxFeePerGas')
-    // if (gasPrice) gasPrice = this.hexToDisplayGwei(gasPrice)
     const networks = this.store('main.networks')
     const networkOptions = []
     Object.keys(networks).forEach(type => {

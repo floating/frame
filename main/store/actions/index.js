@@ -578,6 +578,28 @@ module.exports = {
   setDash: (u, update) => {
     u('dash', dash => Object.assign(dash, update))
   },
+  navPanel: (u, navItem) => {
+    u('panel.nav', nav => {
+      if (JSON.stringify(nav[0]) !== JSON.stringify(navItem)) nav.unshift(navItem)      
+      return nav
+    })
+    u('panel.showing', () => true)
+  },
+  backPanel: (u) => {
+    u('panel.nav', nav => {
+      nav.shift()
+      return nav
+    })
+  },
+  backPanelReqView: (u, handlerId) => {
+    u('panel.nav', nav => {
+      const newNav = nav.filter(navItem => {
+        const item = navItem || {}
+        return !item?.data?.req?.handlerId === handlerId
+      })
+      return newNav
+    })
+  },
   navDash: (u, navItem) => {
     u('dash.nav', nav => {
       if (JSON.stringify(nav[0]) !== JSON.stringify(navItem)) nav.unshift(navItem)      

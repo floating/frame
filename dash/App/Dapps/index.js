@@ -85,8 +85,9 @@ class _OriginModule extends React.Component {
   updateRequestRate () {
     const { origin } = this.props
     const now = new Date().getTime()
-    const sessionLengthSeconds = Math.max((now - origin.session.startedAt), 1000) / 1000
-    this.setState({ averageRequests: (origin.session.requests / sessionLengthSeconds).toFixed(1) })
+    const sessionLength = now - origin.session.startedAt
+    const sessionLengthSeconds = sessionLength / Math.min(sessionLength, 1000)
+    this.setState({ averageRequests: (origin.session.requests / sessionLengthSeconds).toFixed(2) })
   }
 
   render () {
@@ -106,7 +107,7 @@ class _OriginModule extends React.Component {
           </div> 
           <div className='sliceOriginReqs'>
             <div className='sliceOriginReqsNumber'>{this.state.averageRequests}</div>
-            <div className='sliceOriginReqsLabel'>{'reqs/s'}</div>
+            <div className='sliceOriginReqsLabel'>{'reqs/min'}</div>
           </div>
         </div>
         {this.state.expanded ? (

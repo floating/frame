@@ -39,6 +39,8 @@ const main = (path, def) => {
 
 const initial = {
   panel: { // Panel view
+    showing: false,
+    nav: [],
     show: false,
     view: 'default',
     viewData: '',
