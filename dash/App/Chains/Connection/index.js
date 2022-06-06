@@ -87,12 +87,8 @@ class ChainModule extends React.Component {
     const primaryActive = primary.on && primary.status !== 'disconnected'
     const secondaryActive = secondary.on && secondary.status !== 'disconnected'
     let connection = primary
-    console.log(primary, secondary)
     if (secondaryActive && !primaryActive) {
       connection = secondary
-      console.log('using secondary connection')
-    } else {
-      console.log('using primary connection')
     }
 
     return (
@@ -119,7 +115,6 @@ class ChainModule extends React.Component {
     const current = connection.current
 
     if (current === 'custom') {
-      console.log('stat', type, id, layer, connection)
       if (layer === 'primary' && this.state.primaryCustom !== '' && this.state.primaryCustom !== this.customMessage) {
         if (!okProtocol(this.state.primaryCustom)) status = 'invalid target'
         else if (!okPort(this.state.primaryCustom)) status = 'invalid port'
@@ -185,10 +180,7 @@ class ChainModule extends React.Component {
       clearTimeout(this[timeoutName])
       const value = e.target.value.replace(/\s+/g, '')
       this.setState({ [stateKey]: value })
-      this[timeoutName] = setTimeout(() => {
-        console.log('setTimeout', actionName, type, id, value)
-        link.send('tray:action', actionName, type, id, value === this.customMessage ? '' : value)
-      }, 1000)
+      this[timeoutName] = setTimeout(() => link.send('tray:action', actionName, type, id, value === this.customMessage ? '' : value), 1000)
     }
 
     return (
