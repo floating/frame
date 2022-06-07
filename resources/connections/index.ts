@@ -9,7 +9,7 @@ export function okProtocol (location: string) {
     const target = location.substring(validProtocol.length)
 
     // dont allow connections back to Frame
-    return target &&
+    return !!target &&
       target !== 'localhost:1248' &&
       target !== '127.0.0.1:1248'
   }
