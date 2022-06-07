@@ -46,6 +46,7 @@ class Settings extends React.Component {
   // }
 
   okProtocol (location) {
+    console.log('SETTINGS')
     if (location === 'injected') return true
     if (location.endsWith('.ipc')) return true
     if (location.startsWith('wss://') || location.startsWith('ws://')) return true
