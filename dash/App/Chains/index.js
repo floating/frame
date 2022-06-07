@@ -3,10 +3,14 @@ import Restore from 'react-restore'
 import link from '../../../resources/link'
 import svg from '../../../resources/svg'
 
+// import Filter from '../Filter'
+
 import Dropdown from '../../../resources/Components/Dropdown'
 
 import Connection from './Connection'
 import Gas from './Gas'
+import Usage from './Usage'
+import Tokens from './Tokens'
 
 import chainMeta from '../../../resources/chainMeta'
 
@@ -150,6 +154,63 @@ class _SettingsModule extends React.Component {
 
 const SettingsModule = Restore.connect(_SettingsModule)
 
+
+// class _FeeModule extends React.Component {
+//   constructor (props, context) {
+//     super(props, context)
+//     this.state = {
+//       expanded: false
+//     }
+//   }
+//   renderCloseBars () {
+//     return (
+//       <div 
+//       className='sliceContainerClose'
+//       onClick={() => {
+//         this.setState({ expanded: false })
+//       }}
+//     >
+//       {svg.chevron(12)}
+//       {svg.chevron(12)}
+//       {svg.chevron(12)}
+//       {svg.chevron(12)}
+//       {svg.chevron(12)}
+//       {svg.chevron(12)}
+//       {svg.chevron(12)}
+//     </div>
+//     )
+//   }
+//   render () {
+//     const { id } = this.props
+//     const gas = Math.round(parseInt(this.store('main.networksMeta.ethereum', id, 'gas.price.levels.fast'), 'hex') / 1e9) || '---'
+//     const price = this.store('main.networksMeta.ethereum', id, 'nativeCurrency.usd.price') || '---'
+//     const change24hr = this.store('main.networksMeta.ethereum', id, 'nativeCurrency.usd.change24hr') || '---'
+//     const symbol = this.store('main.networks.ethereum', id, 'symbol') || '---'
+
+//     return (
+//       <div className='sliceContainer' ref={this.ref}>
+//         <div 
+//           className={this.state.expanded ? 'sliceTile sliceTileHighlight' : 'sliceTile'}
+//           onClick={() => {
+//             this.setState({ expanded: !this.state.expanded })
+//           }}
+//         >
+//           <div>{`${gas} Gwei`}</div>
+//         </div>
+//         {this.state.expanded ? (
+//           <>
+//             {this.renderCloseBars()}
+//             <div className='sliceTile'>{'hello'}</div>
+//           </>
+//         ) : null}
+//       </div>
+//     )
+//   }
+// }
+
+// const FeeModule = Restore.connect(_FeeModule)
+
+
 class _ChainModule extends React.Component {
   constructor (...args) {
     super(...args)
@@ -194,35 +255,24 @@ class _ChainModule extends React.Component {
       </div>
     )
   }
-
-  // returns a (truthy) error message if invalid, otherwise will return false
-  isInvalidCustomTarget (target) {
-    console.log('INVALID CUSTOM TATGET')
-    if (!okProtocol(target)) return 'invalid target'
-    if (!this.okPort(target)) return 'invalid port'
-
-    return false
-  }
-
   status (type, id, layer) {
-    const { status, network, current } = this.store('main.networks', type, id, 'connection', layer)
+    const connection = this.store('main.networks', type, id, 'connection', layer)
+    let status = connection.status
+    const current = connection.current
 
-    if (status === 'connected' && !network) return 'loading'
-    if (!this.store('main.networks', type, id, 'on')) return 'off'
+    if (current === 'custom') {
+      if (layer === 'primary' && this.state.primaryCustom !== '' && this.state.primaryCustom !== this.customMessage) {
+        if (!this.okProtocol(this.state.primaryCustom)) status = 'invalid target'
+        else if (!this.okPort(this.state.primaryCustom)) status = 'invalid port'
+      }
 
-    const customTarget = this.state[`${layer}Custom`]
-    if (current === 'custom' && customTarget !== '' && customTarget !== this.customMessage) {
-      const validationError = this.isInvalidCustomTarget(customTarget)
-      if (validationError) return validationError
+      if (layer === 'secondary' && this.state.secondaryCustom !== '' && this.state.secondaryCustom !== this.customMessage) {
+        if (!this.okProtocol(this.state.secondaryCustom)) status = 'invalid target'
+        else if (!this.okPort(this.state.secondaryCustom)) status = 'invalid port'
+      }
     }
-
-    return status
-  }
-
-  renderConnectionStatus (type, id, layer) {
-
-    console.log('CONNECTION STATUS')
-    const status = this.status(type, id, layer)
+    if (status === 'connected' && !connection.network) status = 'loading'
+    if (!this.store('main.networks', type, id, 'on')) status = 'off'
 
     return (
       <div className='connectionOptionStatus'>
@@ -231,7 +281,6 @@ class _ChainModule extends React.Component {
       </div>
     )
   }
-
   indicator (status) {
     if (status === 'connected') {
       return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorGood' /></div>
@@ -241,11 +290,8 @@ class _ChainModule extends React.Component {
       return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorBad' /></div>
     }
   }
-
   render () {
-    console.log('CHAINS')
-    const { id, type, connection } = this.props
-    const renderStatus = this.renderConnectionStatus.bind(this, type, id)
+    const { id, type, connection, changed } = this.props
 
     const networkPresets = this.store('main.networkPresets', type)
     let presets = networkPresets[id] || {}
@@ -270,7 +316,7 @@ class _ChainModule extends React.Component {
                   <>
                     <div className='connectionOptionDetails cardShow'>
                       <div className='connectionOptionDetailsInset'>
-                        {renderStatus('primary')}
+                        {this.status(type, id, 'primary')}
                         <Dropdown
                           syncValue={type + ':' + id + ':' + connection.primary.current}
                           onChange={preset => {
@@ -307,7 +353,7 @@ class _ChainModule extends React.Component {
                   <>
                     <div className='connectionOptionDetails cardShow'>
                       <div className='connectionOptionDetailsInset'>
-                        {renderStatus('secondary')}
+                        {this.status(type, id, 'secondary')}
                         <Dropdown
                           syncValue={type + ':' + id + ':' + connection.secondary.current}
                           onChange={preset => {
@@ -377,19 +423,8 @@ class _Network extends React.Component {
   okProtocol (location) {
     if (location === 'injected') return true
     if (location.endsWith('.ipc')) return true
-
-    const validProtocol = validProtocols.find(p => location.startsWith(p))
-    if (validProtocol) {
-      const target = location.substring(validProtocol.length)
-
-      console.log({ target })
-
-      // dont allow connections back to Frame
-      return target &&
-        target !== 'localhost:1248' &&
-        target !== '127.0.0.1:1248'
-    }
-
+    if (location.startsWith('wss://') || location.startsWith('ws://')) return true
+    if (location.startsWith('https://') || location.startsWith('http://')) return true
     return false
   }
 

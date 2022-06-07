@@ -2,23 +2,11 @@ import React, { createRef } from 'react'
 import Restore from 'react-restore'
 
 import Dropdown from '../../../../resources/Components/Dropdown'
-import { okProtocol } from '../../../../resources/connections'
+import { isInvalidCustomTarget } from '../../../../resources/connections'
 import { capitalize } from '../../../../resources/utils'
 
 import link from '../../../../resources/link'
 import svg from '../../../../resources/svg'
-
-function okPort (location) {
-  const match = location.match(/^(?:https?|wss?).*:(?<port>\d{4,})/)
-
-  if (match) {
-    const portStr = (match.groups || { port: 0 }).port
-    const port = parseInt(portStr)
-    return port >= 0 && port <= 65535
-  }
-
-  return true
-}
 
 const ConnectionIndicator = ({ connection }) => {
   const isConnected = connection.status === 'connected'
@@ -47,15 +35,19 @@ const ConnectionStatus = ({ connection }) =>
 class ChainModule extends React.Component {
   constructor (props, context) {
     super(props, context)
-    const { id, type } = props
+
     this.customMessage = 'Custom Endpoint'
+
+    const { id, type } = props
     const primaryCustom = context.store('main.networks', type, id, 'connection.primary.custom') || this.customMessage
     const secondaryCustom = context.store('main.networks', type, id, 'connection.secondary.custom') || this.customMessage
+
     this.state = {
       expanded: false,      
       primaryCustom, 
       secondaryCustom, 
     }
+
     this.ref = createRef()
   }
 
@@ -99,14 +91,6 @@ class ChainModule extends React.Component {
     )
   }
 
-  // returns a (truthy) error message if invalid, otherwise will return false
-  isInvalidCustomTarget (target) {
-    if (!okProtocol(target)) return 'invalid target'
-    if (!okPort(target)) return 'invalid port'
-
-    return false
-  }
-
   status (type, id, layer) {
     const { status, network, current } = this.store('main.networks', type, id, 'connection', layer)
 
@@ -116,7 +100,7 @@ class ChainModule extends React.Component {
     if (current === 'custom') {
       const customTarget = this.state[`${layer}Custom`]
       if (customTarget !== '' && customTarget !== this.customMessage) {
-        const validationError = this.isInvalidCustomTarget(customTarget)
+        const validationError = isInvalidCustomTarget(customTarget)
         if (validationError) return validationError
       }
     }
@@ -185,7 +169,7 @@ class ChainModule extends React.Component {
 
       // allow falsy values to pass through to the application state so the connection
       // status can be updated
-      if (!value || !this.isInvalidCustomTarget(value)) {
+      if (!value || !isInvalidCustomTarget(value)) {
         const actionName = `set${capitalize(inputName)}Custom`
         this[timeoutName] = setTimeout(() => link.send('tray:action', actionName, type, id, value === this.customMessage ? '' : value), 1000)
       }
