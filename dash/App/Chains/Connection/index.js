@@ -97,9 +97,10 @@ class ChainModule extends React.Component {
         </div>
       </div>
     )
-  }// returns a (truthy) error message if invalid, otherwise will return false
+  }
+
+  // returns a (truthy) error message if invalid, otherwise will return false
   isInvalidCustomTarget (target) {
-    console.log('INVALID CUSTOM TATGET')
     if (!okProtocol(target)) return 'invalid target'
     if (!okPort(target)) return 'invalid port'
 
@@ -112,18 +113,18 @@ class ChainModule extends React.Component {
     if (status === 'connected' && !network) return 'loading'
     if (!this.store('main.networks', type, id, 'on')) return 'off'
 
-    const customTarget = this.state[`${layer}Custom`]
-    if (current === 'custom' && customTarget !== '' && customTarget !== this.customMessage) {
-      const validationError = this.isInvalidCustomTarget(customTarget)
-      if (validationError) return validationError
+    if (current === 'custom') {
+      const customTarget = this.state[`${layer}Custom`]
+      if (customTarget !== '' && customTarget !== this.customMessage) {
+        const validationError = this.isInvalidCustomTarget(customTarget)
+        if (validationError) return validationError
+      }
     }
 
     return status
   }
 
   renderConnectionStatus (type, id, layer) {
-
-    console.log('CONNECTION STATUS')
     const status = this.status(type, id, layer)
 
     return (
@@ -133,33 +134,6 @@ class ChainModule extends React.Component {
       </div>
     )
   }
-
-  // status (type, id, layer) {
-  //   const connection = this.store('main.networks', type, id, 'connection', layer)
-  //   let status = connection.status
-  //   const current = connection.current
-
-  //   if (current === 'custom') {
-  //     if (layer === 'primary' && this.state.primaryCustom !== '' && this.state.primaryCustom !== this.customMessage) {
-  //       if (!okProtocol(this.state.primaryCustom)) status = 'invalid target'
-  //       else if (!okPort(this.state.primaryCustom)) status = 'invalid port'
-  //     }
-
-  //     if (layer === 'secondary' && this.state.secondaryCustom !== '' && this.state.secondaryCustom !== this.customMessage) {
-  //       if (!okProtocol(this.state.secondaryCustom)) status = 'invalid target'
-  //       else if (!okPort(this.state.secondaryCustom)) status = 'invalid port'
-  //     }
-  //   }
-  //   if (status === 'connected' && !connection.network) status = 'loading'
-  //   if (!this.store('main.networks', type, id, 'on')) status = 'off'
-
-  //   return (
-  //     <div className='connectionOptionStatus'>
-  //       {this.indicator(status)}
-  //       <div className='connectionOptionStatusText'>{status}</div>
-  //     </div>
-  //   )
-  // }
 
   indicator (status) {
     if (status === 'connected') {
@@ -201,13 +175,20 @@ class ChainModule extends React.Component {
 
     const customChangeHandler = (e, inputName) => {
       e.preventDefault()
+
       const stateKey = `${inputName}Custom`
-      const actionName = `set${capitalize(stateKey)}`
       const timeoutName = `${stateKey}InputTimeout`
-      clearTimeout(this[timeoutName])
       const value = e.target.value.replace(/\s+/g, '')
+
+      clearTimeout(this[timeoutName])
       this.setState({ [stateKey]: value })
-      this[timeoutName] = setTimeout(() => link.send('tray:action', actionName, type, id, value === this.customMessage ? '' : value), 1000)
+
+      // allow falsy values to pass through to the application state so the connection
+      // status can be updated
+      if (!value || !this.isInvalidCustomTarget(value)) {
+        const actionName = `set${capitalize(inputName)}Custom`
+        this[timeoutName] = setTimeout(() => link.send('tray:action', actionName, type, id, value === this.customMessage ? '' : value), 1000)
+      }
     }
 
     return (

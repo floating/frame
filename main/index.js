@@ -361,6 +361,7 @@ app.on('ready', () => {
 })
 
 ipcMain.on('tray:action', (e, action, ...args) => {
+  
   if (store[action]) return store[action](...args)
   log.info('Tray sent unrecognized action: ', action)
 })
