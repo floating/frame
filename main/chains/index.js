@@ -176,7 +176,7 @@ class ChainConnection extends EventEmitter {
     const presets = store('main.networkPresets', this.type)
     const currentPresets = Object.assign({}, presets.default, presets[this.chainId])
 
-    const { secondary } = store('main.networks', this.type, this.chainId, 'connection')
+    const { primary, secondary } = store('main.networks', this.type, this.chainId, 'connection')
     const secondaryTarget = secondary.current === 'custom' ? secondary.custom : currentPresets[secondary.current]
 
     if (chain.on && connection.secondary.on && !!secondaryTarget) {
@@ -194,9 +194,6 @@ class ChainConnection extends EventEmitter {
           this.update('secondary')
         }
       } else {
-      console.log('*************** SECONDARY', { secondaryTarget })
-
-
         if (!this.secondary.provider || this.secondary.currentSecondaryTarget !== secondaryTarget) {
           log.info('Creating secondary connection because it didn\'t exist or the target changed', { secondaryTarget })
           this.killProvider(this.secondary.provider)
@@ -269,14 +266,11 @@ class ChainConnection extends EventEmitter {
         this.update('secondary')
       }
     }
-    
-    const { primary } = store('main.networks', this.type, this.chainId, 'connection')
+
     const primaryTarget = primary.current === 'custom' ? primary.custom : currentPresets[primary.current]
 
     if (chain.on && connection.primary.on && !!primaryTarget) {
       log.info('Primary connection: ON')
-
-      console.log('*************** PRIMARY', { primaryTarget })
 
       if (!this.primary.provider || this.primary.currentPrimaryTarget !== primaryTarget) {
         log.info('Creating primary connection because it didn\'t exist or the target changed', { primaryTarget })
