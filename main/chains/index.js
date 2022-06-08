@@ -32,6 +32,7 @@ class ChainConnection extends EventEmitter {
       status: 'off',
       network: '',
       type: '',
+      currentTarget: '',
       connected: false
     }
 
@@ -39,6 +40,7 @@ class ChainConnection extends EventEmitter {
       status: 'off',
       network: '',
       type: '',
+      currentTarget: '',
       connected: false
     }
 
@@ -168,7 +170,7 @@ class ChainConnection extends EventEmitter {
         this.update(priority)
       }
     } else {
-      this[priority][`current${capitalize(priority)}Target`] = target
+      this[priority].currentTarget = target
       this[priority].status = status
     }
   }
@@ -215,7 +217,7 @@ class ChainConnection extends EventEmitter {
       } else if (!secondaryTarget) {
         // if no target is provided automatically set state to disconnected
         this.resetConnection('secondary', 'disconnected')
-      } else if (!this.secondary.provider || this.secondary.currentSecondaryTarget !== secondaryTarget) {
+      } else if (!this.secondary.provider || this.secondary.currentTarget !== secondaryTarget) {
         log.info('Creating secondary connection because it didn\'t exist or the target changed', { secondaryTarget })
 
         this.resetConnection('secondary', 'loading', secondaryTarget)
@@ -283,7 +285,7 @@ class ChainConnection extends EventEmitter {
       if (!primaryTarget) {
         // if no target is provided automatically set state to disconnected
         this.resetConnection('primary', 'disconnected')
-      } else if (!this.primary.provider || this.primary.currentPrimaryTarget !== primaryTarget) {
+      } else if (!this.primary.provider || this.primary.currentTarget !== primaryTarget) {
         log.info('Creating primary connection because it didn\'t exist or the target changed', { primaryTarget })
 
         this.resetConnection('primary', 'loading', primaryTarget)
