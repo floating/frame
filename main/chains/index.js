@@ -10,6 +10,7 @@ const store = require('../store').default
 const { default: BlockMonitor } = require('./blocks')
 const { default: chainConfig } = require('./config')
 const { default: GasCalculator } = require('../transaction/gasCalculator')
+const { capitalize } = require('../../resources/utils')
 
 const resError = (error, payload, res) => res({ 
   id: payload.id, 
@@ -148,6 +149,30 @@ class ChainConnection extends EventEmitter {
     provider.sendAsync({ jsonrpc: '2.0', method: 'web3_clientVersion', params: [], id: 1 }, cb) 
   }
 
+  resetConnection (priority /* 'primary' | 'secondary' */, status, target) {
+    const provider = this[priority].provider
+
+    this.killProvider(provider)
+    this[priority].provider = null
+    this[priority].connected = false
+    this[priority].type = ''
+
+    if (['off', 'disconnected', 'standby'].includes(status)) {
+      if (this[priority].status !== status) {
+        this[priority].status = status
+
+        if (['off', 'disconnected'].includes(status)) {
+          this[priority].network = ''
+        }
+
+        this.update(priority)
+      }
+    } else {
+      this[priority][`current${capitalize(priority)}Target`] = target
+      this[priority].status = status
+    }
+  }
+
   killProvider (provider) {
     if (provider) {
       provider.close()
@@ -179,30 +204,22 @@ class ChainConnection extends EventEmitter {
     const { primary, secondary } = store('main.networks', this.type, this.chainId, 'connection')
     const secondaryTarget = secondary.current === 'custom' ? secondary.custom : currentPresets[secondary.current]
 
-    if (chain.on && connection.secondary.on && !!secondaryTarget) {
+    if (chain.on && connection.secondary.on) {
       log.info('Secondary connection: ON')
 
       if (connection.primary.on && connection.primary.status === 'connected') {
         // Connection is on Standby
         log.info('Secondary connection on STANDBY', connection.secondary.status === 'standby')
-        this.killProvider(this.secondary.provider)
-        this.secondary.provider = null
-        if (connection.secondary.status !== 'standby') {
-          this.secondary.connected = false
-          this.secondary.type = ''
-          this.secondary.status = 'standby'
-          this.update('secondary')
-        }
-      } else {
-        if (!this.secondary.provider || this.secondary.currentSecondaryTarget !== secondaryTarget) {
-          log.info('Creating secondary connection because it didn\'t exist or the target changed', { secondaryTarget })
-          this.killProvider(this.secondary.provider)
-          this.secondary.provider = null
-          this.secondary.currentSecondaryTarget = secondaryTarget
-          this.secondary.status = 'loading'
-          this.secondary.connected = false
-          this.secondary.type = ''
 
+        this.resetConnection('secondary', 'standby')
+      } else {
+        if (!secondaryTarget) {
+          // if no target is provided automatically set state to disconnected
+          this.resetConnection('secondary', 'disconnected')
+        } else if (!this.secondary.provider || this.secondary.currentSecondaryTarget !== secondaryTarget) {
+          log.info('Creating secondary connection because it didn\'t exist or the target changed', { secondaryTarget })
+
+          this.resetConnection('secondary', 'loading', secondaryTarget)
           this._createProvider(secondaryTarget, 'secondary')
 
           this.secondary.provider.on('connect', () => {
@@ -253,34 +270,25 @@ class ChainConnection extends EventEmitter {
           this.secondary.provider.on('error', err => this.emit('error', err))
         }
       }
-    // Secondary connection is set to OFF by the user
     } else {
+      // Secondary connection is set to OFF by the user
       log.info('Secondary connection: OFF')
-      this.killProvider(this.secondary.provider)
-      this.secondary.provider = null
-      if (this.secondary.status !== 'off') {
-        this.secondary.status = 'off'
-        this.secondary.connected = false
-        this.secondary.type = ''
-        this.secondary.network = ''
-        this.update('secondary')
-      }
+
+      this.resetConnection('secondary', 'off')
     }
 
     const primaryTarget = primary.current === 'custom' ? primary.custom : currentPresets[primary.current]
 
-    if (chain.on && connection.primary.on && !!primaryTarget) {
+    if (chain.on && connection.primary.on) {
       log.info('Primary connection: ON')
 
-      if (!this.primary.provider || this.primary.currentPrimaryTarget !== primaryTarget) {
+      if (!primaryTarget) {
+        // if no target is provided automatically set state to disconnected
+        this.resetConnection('primary', 'disconnected')
+      } else if (!this.primary.provider || this.primary.currentPrimaryTarget !== primaryTarget) {
         log.info('Creating primary connection because it didn\'t exist or the target changed', { primaryTarget })
-        this.killProvider(this.primary.provider)
-        this.primary.provider = null
-        this.primary.currentPrimaryTarget = primaryTarget
-        this.primary.status = 'loading'
-        this.primary.connected = false
-        this.primary.type = ''
 
+        this.resetConnection('primary', 'loading', primaryTarget)
         this._createProvider(primaryTarget, 'primary')
 
         this.primary.provider.on('connect', () => {
@@ -333,15 +341,7 @@ class ChainConnection extends EventEmitter {
       }
     } else {
       log.info('Primary connection: OFF')
-      this.killProvider(this.primary.provider)
-      this.primary.provider = null
-      if (this.primary.status !== 'off') {
-        this.primary.status = 'off'
-        this.primary.connected = false
-        this.primary.type = ''
-        this.primary.network = ''
-        this.update('primary')
-      }
+      this.resetConnection('primary', 'off')
     }
   }
 
