@@ -37,6 +37,11 @@ describe('#okProtocol', () => {
     expect(okProtocol('wss://')).toBe(false)
   })
 
+  it('does not allow an unknown preset', () => {
+    expect(okProtocol('frame')).toBe(false)
+  })
+
+
   it('does not allow an unknown protocol', () => {
     expect(okProtocol('tcp://127.0.0.1')).toBe(false)
   })
@@ -63,7 +68,7 @@ describe('#okPort', () => {
     expect(okPort('wss://rpc.com:8000')).toBe(true)
   })
 
-  it('does not allow port greater than 65535', () => {
+  it('does not allow a port greater than 65535', () => {
     expect(okPort('wss://my-rpc.net:65536')).toBe(false)
   })
 })
