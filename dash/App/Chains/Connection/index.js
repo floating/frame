@@ -31,6 +31,15 @@ const ConnectionStatus = ({ connection }) =>
     </div>
   </>
 
+function getActiveConnection (primary, secondary) {
+  const isConnected = ({ status }) => status !== 'disconnected'
+
+  if (secondary.on && (!primary.on || (isConnected(secondary) && !isConnected(primary)))) {
+    return secondary
+  }
+
+  return primary
+}
 
 class ChainModule extends React.Component {
   constructor (props, context) {
@@ -66,11 +75,7 @@ class ChainModule extends React.Component {
   // }
 
   renderConnection (id, { primary, secondary }, blockHeight) {
-    const connectionActive = ({ status, on }) => on && status !== 'disconnected'
-
-    const connection = (!primary.on && secondary.on) || (primary.status === 'disconnected' && connectionActive(secondary))
-      ? secondary
-      : primary
+    const connection = getActiveConnection(primary, secondary)
 
     return (
       <div 
