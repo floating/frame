@@ -568,12 +568,20 @@ Object.values(initial.main.networksMeta).forEach(chains => {
   })
 })
 
-Object.values(initial.main.origins).forEach(origin => {
-  origin.session = {
-    ...origin.session,
-    endedAt: origin.session.lastUpdatedAt
+initial.main.origins = Object.entries(initial.main.origins).reduce((origins, [id, origin]) => {
+  if (id !== uuidv5('Unknown', uuidv5.DNS)) {
+    // don't persist unknown origin
+    origins[id] = {
+      ...origin,
+      session: {
+        ...origin.session,
+        endedAt: origin.session.lastUpdatedAt
+      }
+    }
   }
-})
+
+  return origins
+}, {})
 
 // ---
 

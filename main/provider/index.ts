@@ -750,6 +750,10 @@ export class Provider extends EventEmitter {
 
   send (payload: RPCRequestPayload, res: RPCRequestCallback = () => {}) {
     const method = payload.method || ''
+
+    // method handlers that are not chain-specific can go here, before parsing the target chain
+    if (method === 'eth_unsubscribe' && this.ifSubRemove(payload.params[0])) return res({ id: payload.id, jsonrpc: '2.0', result: true }) // Subscription was ours
+
     const targetChain = this.parseTargetChain(payload)
 
     if (!targetChain) {
@@ -779,7 +783,6 @@ export class Provider extends EventEmitter {
       return this.subscribe(payload as RPC.Subscribe.Request, res)
     }
 
-    if (method === 'eth_unsubscribe' && this.ifSubRemove(payload.params[0])) return res({ id: payload.id, jsonrpc: '2.0', result: true }) // Subscription was ours
     if (method === 'eth_sign' || method === 'personal_sign') return this.sign(payload, res)
 
     if (['eth_signTypedData', 'eth_signTypedData_v1', 'eth_signTypedData_v3', 'eth_signTypedData_v4'].includes(method)) {

@@ -2,40 +2,65 @@ import React, { createRef } from 'react'
 import Restore from 'react-restore'
 
 import Dropdown from '../../../../resources/Components/Dropdown'
+import { isInvalidCustomTarget } from '../../../../resources/connections'
+import { capitalize } from '../../../../resources/utils'
 
 import link from '../../../../resources/link'
 import svg from '../../../../resources/svg'
 
-const ConnectionIndicator = ({ connection }) => {
+const ConnectionIndicator = ({ className, connection }) => {
   const isConnected = connection.status === 'connected'
   const isLoading = connection.status === 'loading'
   const isPending = connection.status === 'pending'
   const isSyncing = connection.status === 'syncing'
+  const isStandBy = connection.status === 'standby'
   let status = 'Bad'
+
   if (isConnected) {
     status = 'Good'
-  } else if (isLoading || isPending || isSyncing) {
+  } else if (isLoading || isPending || isSyncing || isStandBy) {
     status = 'Pending'
   }
 
-  return <div className={`sliceTileIndicatorLarge sliceTileIndicator${status}`} />
+  return <div className={`${className}${status}`} />
 }
 
 const ConnectionStatus = ({ connection }) => 
   <>
-    <ConnectionIndicator connection={connection} />
+    <ConnectionIndicator className="sliceTileIndicatorLarge sliceTileIndicator" connection={connection} />
     <div className="sliceTileConnectionName"> 
       {connection.current}
     </div>
   </>
 
+function isConnected ({ status }) {
+  return status !== 'disconnected'
+}
+
+function getActiveConnection (primary, secondary) {
+  if (secondary.on && (!primary.on || (isConnected(secondary) && !isConnected(primary)))) {
+    return secondary
+  }
+
+  return primary
+}
 
 class ChainModule extends React.Component {
-  constructor (...args) {
-    super(...args)
+  constructor (props, context) {
+    super(props, context)
+
+    this.customMessage = 'Custom Endpoint'
+
+    const { id, type } = props
+    const primaryCustom = context.store('main.networks', type, id, 'connection.primary.custom') || this.customMessage
+    const secondaryCustom = context.store('main.networks', type, id, 'connection.secondary.custom') || this.customMessage
+
     this.state = {
-      expanded: false
+      expanded: false,      
+      primaryCustom, 
+      secondaryCustom, 
     }
+
     this.ref = createRef()
   }
 
@@ -54,12 +79,7 @@ class ChainModule extends React.Component {
   // }
 
   renderConnection (id, { primary, secondary }, blockHeight) {
-    const primaryActive = primary.on && primary.status !== 'disconnected'
-    const secondaryActive = secondary.on && secondary.status !== 'disconnected'
-    let connection = primary
-    if (secondaryActive && !primaryActive) {
-      connection = secondary
-    }
+    const connection = getActiveConnection(primary, secondary)
 
     return (
       <div 
@@ -78,50 +98,82 @@ class ChainModule extends React.Component {
       </div>
     )
   }
+
   status (type, id, layer) {
-    const connection = this.store('main.networks', type, id, 'connection', layer)
-    let status = connection.status
-    const current = connection.current
+    const { status, network, current } = this.store('main.networks', type, id, 'connection', layer)
+
+    if (status === 'connected' && !network) return 'loading'
+    if (!this.store('main.networks', type, id, 'on')) return 'off'
 
     if (current === 'custom') {
-      if (layer === 'primary' && this.state.primaryCustom !== '' && this.state.primaryCustom !== this.customMessage) {
-        if (!this.okProtocol(this.state.primaryCustom)) status = 'invalid target'
-        else if (!this.okPort(this.state.primaryCustom)) status = 'invalid port'
-      }
-
-      if (layer === 'secondary' && this.state.secondaryCustom !== '' && this.state.secondaryCustom !== this.customMessage) {
-        if (!this.okProtocol(this.state.secondaryCustom)) status = 'invalid target'
-        else if (!this.okPort(this.state.secondaryCustom)) status = 'invalid port'
+      const customTarget = this.state[`${layer}Custom`]
+      if (customTarget !== '' && customTarget !== this.customMessage) {
+        const validationError = isInvalidCustomTarget(customTarget)
+        if (validationError) return validationError
       }
     }
-    if (status === 'connected' && !connection.network) status = 'loading'
-    if (!this.store('main.networks', type, id, 'on')) status = 'off'
+
+    return status
+  }
+
+  renderConnectionStatus (type, id, layer) {
+    const status = this.status(type, id, layer)
 
     return (
-      <div className='connectionOptionStatus'>
-        {this.indicator(status)}
-        <div className='connectionOptionStatusText'>{status}</div>
+      <div className="connectionOptionStatus">
+        <div className="connectionOptionStatusIndicator">
+          <ConnectionIndicator className="connectionOptionStatusIndicator" connection={{ status }} />
+        </div>
+        <div className="connectionOptionStatusText">{status}</div>
       </div>
     )
   }
-  indicator (status) {
-    if (status === 'connected') {
-      return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorGood' /></div>
-    } else if (status === 'loading' || status === 'syncing' || status === 'pending' || status === 'standby') {
-      return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorPending' /></div>
-    } else {
-      return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorBad' /></div>
-    }
-  }
+
   render () {
-    const { id, type, connection, changed } = this.props
+    const { id, type, connection } = this.props
 
     const networkMeta = this.store('main.networksMeta.ethereum', id)
     const networkPresets = this.store('main.networkPresets', type)
+    const renderStatus = this.renderConnectionStatus.bind(this, type, id)
+
     let presets = networkPresets[id] || {}
     presets = Object.keys(presets).map(i => ({ text: i, value: `${type}:${id}:${i}` }))
     presets = presets.concat(Object.keys(networkPresets.default).map(i => ({ text: i, value: `${type}:${id}:${i}` })))
     presets.push({ text: 'Custom', value: `${type}:${id}:custom` })
+
+    const customFocusHandler = (inputName) => {
+      const stateKey = `${inputName}Custom`
+      const state = this.state[stateKey]
+      if (state === this.customMessage) {
+        this.setState({ [stateKey]: '' })
+      }
+    }
+
+    const customBlurHandler = (inputName) => {
+      const stateKey = `${inputName}Custom`
+      const state = this.state[stateKey]
+      if (state === '') {
+        this.setState({ [stateKey]: this.customMessage })
+      }
+    }
+
+    const customChangeHandler = (e, inputName) => {
+      e.preventDefault()
+
+      const stateKey = `${inputName}Custom`
+      const timeoutName = `${stateKey}InputTimeout`
+      const value = e.target.value.replace(/\s+/g, '')
+
+      clearTimeout(this[timeoutName])
+      this.setState({ [stateKey]: value })
+
+      // allow falsy values to pass through to the application state so the connection
+      // status can be updated
+      if (!value || !isInvalidCustomTarget(value)) {
+        const actionName = `set${capitalize(inputName)}Custom`
+        this[timeoutName] = setTimeout(() => link.send('tray:action', actionName, type, id, value === this.customMessage ? '' : value), 1000)
+      }
+    }
 
     return (
       <div className='sliceContainer' ref={this.ref}>
@@ -140,7 +192,7 @@ class ChainModule extends React.Component {
                   <>
                     <div className='connectionOptionDetails cardShow'>
                       <div className='connectionOptionDetailsInset'>
-                        {this.status(type, id, 'primary')}
+                        {renderStatus('primary')}
                         <Dropdown
                           syncValue={`${type}:${id}:${connection.primary.current}`}
                           onChange={preset => {
@@ -156,9 +208,9 @@ class ChainModule extends React.Component {
                         className='customInput'
                         tabIndex='-1'
                         value={this.state.primaryCustom}
-                        onFocus={() => this.customPrimaryFocus()} 
-                        onBlur={() => this.customPrimaryBlur()}
-                        onChange={e => this.inputPrimaryCustom(e)}
+                        onFocus={() => customFocusHandler('primary')} 
+                        onBlur={() => customBlurHandler('primary')}
+                        onChange={e => customChangeHandler(e, 'primary')}
                       />
                     </div>
                   </>
@@ -177,7 +229,7 @@ class ChainModule extends React.Component {
                   <>
                     <div className='connectionOptionDetails cardShow'>
                       <div className='connectionOptionDetailsInset'>
-                        {this.status(type, id, 'secondary')}
+                        {renderStatus('secondary')}
                         <Dropdown
                           syncValue={`${type}:${id}:${connection.secondary.current}`}
                           onChange={preset => {
@@ -189,7 +241,13 @@ class ChainModule extends React.Component {
                       </div>
                     </div>
                     <div className={connection.secondary.current === 'custom' && connection.secondary.on ? 'connectionCustomInput connectionCustomInputOn cardShow' : 'connectionCustomInput'}>
-                      <input tabIndex='-1' value={this.state.secondaryCustom} onFocus={() => this.customSecondaryFocus()} onBlur={() => this.customSecondaryBlur()} onChange={e => this.inputSecondaryCustom(e)} />
+                      <input 
+                        tabIndex='-1' 
+                        value={this.state.secondaryCustom} 
+                        onFocus={() => customFocusHandler('secondary')} 
+                        onBlur={() => customBlurHandler('secondary')} 
+                        onChange={e => customChangeHandler(e, 'secondary')} 
+                      />
                     </div>
                   </>
                 ) : null}
