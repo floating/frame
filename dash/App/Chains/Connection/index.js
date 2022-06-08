@@ -8,24 +8,26 @@ import { capitalize } from '../../../../resources/utils'
 import link from '../../../../resources/link'
 import svg from '../../../../resources/svg'
 
-const ConnectionIndicator = ({ connection }) => {
+const ConnectionIndicator = ({ className, connection }) => {
   const isConnected = connection.status === 'connected'
   const isLoading = connection.status === 'loading'
   const isPending = connection.status === 'pending'
   const isSyncing = connection.status === 'syncing'
+  const isStandBy = connection.status === 'standby'
   let status = 'Bad'
+
   if (isConnected) {
     status = 'Good'
-  } else if (isLoading || isPending || isSyncing) {
+  } else if (isLoading || isPending || isSyncing || isStandBy) {
     status = 'Pending'
   }
 
-  return <div className={`sliceTileIndicatorLarge sliceTileIndicator${status}`} />
+  return <div className={`${className}${status}`} />
 }
 
 const ConnectionStatus = ({ connection }) => 
   <>
-    <ConnectionIndicator connection={connection} />
+    <ConnectionIndicator className="sliceTileIndicatorLarge sliceTileIndicator" connection={connection} />
     <div className="sliceTileConnectionName"> 
       {connection.current}
     </div>
@@ -116,21 +118,13 @@ class ChainModule extends React.Component {
     const status = this.status(type, id, layer)
 
     return (
-      <div className='connectionOptionStatus'>
-        {this.indicator(status)}
-        <div className='connectionOptionStatusText'>{status}</div>
+      <div className="connectionOptionStatus">
+        <div className="connectionOptionStatusIndicator">
+          <ConnectionIndicator className="connectionOptionStatusIndicator" connection={{ status }} />
+        </div>
+        <div className="connectionOptionStatusText">{status}</div>
       </div>
     )
-  }
-
-  indicator (status) {
-    if (status === 'connected') {
-      return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorGood' /></div>
-    } else if (status === 'loading' || status === 'syncing' || status === 'pending' || status === 'standby') {
-      return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorPending' /></div>
-    } else {
-      return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorBad' /></div>
-    }
   }
 
   render () {
