@@ -66,10 +66,9 @@ class ChainModule extends React.Component {
   // }
 
   renderConnection (id, { primary, secondary }, blockHeight) {
-    const primaryActive = primary.on && primary.status !== 'disconnected'
-    const secondaryActive = secondary.on && secondary.status !== 'disconnected'
+    const connectionActive = ({ status, on }) => on && status !== 'disconnected'
     let connection = primary
-    if (secondaryActive && !primaryActive) {
+    if (connectionActive(secondary) && !connectionActive(primary)) {
       connection = secondary
     }
 
