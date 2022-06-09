@@ -30,7 +30,6 @@ class DappDetails extends React.Component {
     const origin = this.store('main.origins', this.props.originId)
     return (
       <div className='cardShow'>
-        <pre>{JSON.stringify(origin, null, 4)}</pre>
         <div className='originSwapTitle'>
           Switch chain for:
         </div>

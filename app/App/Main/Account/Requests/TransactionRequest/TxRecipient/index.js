@@ -22,9 +22,6 @@ class TxRecipient extends React.Component {
     return (
       <div className='_txRecipient'>
         <div className='_txRecipientInner'>
-        <div className='_txLabel'>
-            Recipient
-          </div>
           {req.data.to ? (
             <div className='_txRecipientSlice _txRecipientValue'>
               {ensName
@@ -48,6 +45,9 @@ class TxRecipient extends React.Component {
               Deploying Contract
             </div>
           )}
+          <div className='_txLabel'>
+            Recipient
+          </div>
         </div>
       </div>
     )

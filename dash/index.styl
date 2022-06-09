@@ -31,13 +31,20 @@ div
     right 5px
     bottom 40px
     left 5px
-    overflow-y scroll
-    overflow-x hidden
     z-index 1000
-    position absolute
     background var(--ghostZ)
     border-radius 16px
     padding-bottom 20px
+
+    .dashMainScroll
+      position absolute 
+      top 0px
+      right 0px
+      bottom 0px
+      left 0px
+      z-index 2000
+      overflow-y scroll
+      overflow-x hidden
 
     .dashMainOverlay
       position absolute
@@ -45,7 +52,6 @@ div
       right 0px
       bottom 0px
       left 0px
-      // background red
       border-radius 16px
       z-index 40000000
       box-shadow inset 0px 0px 6px var(--ghostY)
@@ -162,16 +168,7 @@ div
         margin-right 12px
 
     .accountTypeSelect:hover
-      //transform translateY(-1px)
       background var(--ghostB)
-      // color var(--good)
-      // animation 5s shake ease-in-out infinite alternate
-
-    // .accountTypeSelect:active
-    //   color var(--good)
-    //   transform translateY(2px)
-    //   animation shake-little 2s ease-in-out infinite
-    //   box-shadow 0px 2px 12px 0px var(--ghostY)
 
   .newAccount
     height 60px
@@ -184,7 +181,6 @@ div
     margin 6px 6px 64px 6px
     cursor pointer
     font-size 16px
-    // border-bottom 2px solid var(--ghostZ)
     box-shadow 0px 4px 8px var(--ghostY)
     padding-top 0px
     padding-left 30px
@@ -211,15 +207,6 @@ div
     
   .newAccount:hover
     background var(--ghostB)
-    // transform translateY(-1px)
-    // color var(--good)
-    // animation 5s shake ease-in-out infinite alternate
-
-  // .newAccount:active
-  //   color var(--good)
-  //   transform translateY(2px)
-  //   animation shake-little 2s ease-in-out infinite
-  //   box-shadow 0px 2px 12px 0px var(--ghostY)
 
   .signers
     width 100%
@@ -250,7 +237,6 @@ div
       align-items center
       position relative
       height 32px
-      // border-radius 8px
       margin 0px 16px 12px 16px
       box-sizing border-box
       font-size 12px
@@ -296,153 +282,3 @@ div
 // @import '../Networks/style'
 // @import '../Filter/style'
 @import './App/card.styl'
-
-  // .bar
-  //   background var(--ghostE)
-  //   position relative
-  //   height 60px
-  //   width calc(100% - 40px)
-  //   margin 20px 20px 0px 20px
-  //   box-size border-box
-  //   border-radius 8px
-  //   // box-shadow 0px 9px 10px rgba(24, 24, 124, 0.1)
-
-  //   input 
-  //     position absolute
-  //     top 0 
-  //     right 0
-  //     bottom 0
-  //     left 0
-  //     width 100%
-  //     height 100%
-  //     outline none
-  //     border none 
-  //     background transparent
-  //     padding 0px 20px
-  //     font-family Raleway, sans-serif
-  //     color var(--outerspace08)
-  //     font-size 28px
-    
-  // .dappWrap
-  //   padding 0px 10px 10px 0px
-  //   display flex
-  //   flex-wrap wrap
-  //   margin 0px 0px 100px 0px
-
-  //   .dapp
-  //     width 80px
-  //     height 110px 
-  //     min-width 80px
-  //     min-height 110px
-  //     margin 20px 0px 0px 20px
-
-  //     .dappIcon
-  //       width 80px
-  //       height 80px 
-  //       min-width 80px
-  //       min-height 80px 
-  //       background var(--ghostD)
-  //       border-radius 12px
-  //       cursor pointer
-
-  //     .dappName
-  //       width 80px
-  //       height 30px 
-  //       min-width 80px
-  //       min-height 30px 
-  //       display flex
-  //       justify-content center
-  //       align-items center
-  //       cursor pointer
-  //       font-size 14px
-
-// #flow
-//   position absolute
-//   top 20px
-//   right 20px
-//   bottom 20px
-//   left 20px
-//   border-radius 16px
-//   background white
-//   box-shadow 0px 9px 10px rgba(24, 24, 124, 0.1)
-
-//   .bar
-//     background rgba(238, 242, 248, 1)
-//     position absolute 
-//     height 60px
-//     width 700px
-//     top 50%
-//     left 50%
-//     margin-top -30px
-//     margin-left -350px
-//     border-radius 8px
-//     box-shadow 0px 9px 10px rgba(24, 24, 124, 0.1)
-
-//     input 
-//       position absolute
-//       top 0 
-//       right 0
-//       bottom 0
-//       left 0
-//       width 100%
-//       height 100%
-//       outline none
-//       border none 
-//       background transparent
-//       padding 0px 20px
-//       font-family Raleway, sans-serif
-//       color var(--outerspace08)
-//       font-size 28px
-    
-
-
-
-
-  // background rgba(228, 232, 248, 1)
-  // margin 0px
-  // border-radius 12px
-  // box-shadow 0px 1px 5px 1px rgba(33, 45, 46, 0.1), 0px 0px 0px 1px rgba(110, 120, 140, 0.2)
-  // overflow hidden
-
-//   #bar
-//     right 360px
-
-//   #bot
-//     left 5px
-//     right 360px
-
-//   #drop
-//     left 5px
-//     bottom 5px
-//     right 360px
-//     border-radius 3px
-
-//   #views
-//     right 360px
-//     bottom 5px
-//     left 5px
-//     border-bottom-right-radius 3px
-//     border-bottom-left-radius 3px
-
-//     .screen
-//       z-index 20000
-
-// .session
-//   position fixed
-//   top 0px
-//   right 15px
-//   height 37px
-//   font-weight 400
-//   border-bottom-left-radius 4px
-//   display flex
-//   justify-content center
-//   align-items center
-//   user-select none
-//   cursor default
-//   font-size 14px
-//   transition var(--standard)
-//   z-index 1000
-
-// .hidden
-//   visibility hidden
-

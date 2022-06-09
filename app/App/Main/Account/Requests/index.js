@@ -12,105 +12,10 @@ import Restore from 'react-restore'
 //   return ['ledger', 'lattice', 'trezor'].includes(account.lastSignerType)
 // }
 
-import RingIcon from '../../../../../resources/Components/RingIcon'
+import RequestItem from '../../../../../resources/Components/RequestItem'
 import chainMeta from '../../../../../resources/chainMeta'
 
 import link from '../../../../../resources/link'
-import svg from '../../../../../resources/svg'
-
-class _RequestItem extends React.Component {
-  constructor (props, context) {
-    super(props, context)
-    this.state = {
-      ago: this.getElapsedTime() + ' ago'
-    }
-    
-  }
-  getElapsedTime () {
-    const elapsed = Date.now() - (this.props.req && this.props.req.created || 0)
-    const secs = elapsed / 1000
-    const mins = secs / 60
-    const hrs = mins / 60
-    const days = hrs / 24
-    if (days >= 1) return Math.round(days) + 'd'
-    if (hrs >= 1) return Math.round(hrs) + 'h'
-    if (mins >= 1) return Math.round(mins) + 'm'
-    if (secs >= 1) return Math.round(secs) + 's'
-    return '0s'
-  }
-  componentDidMount () {
-    this.timer = setInterval(() => {
-      this.setState({ ago: this.getElapsedTime() + ' ago' })
-    }, 1000)
-  }
-  componentWillUnmount () {
-    clearInterval(this.timer)
-  }
-  render () {
-    const { account, handlerId, i, title, svgLookup, img, color } = this.props
-    const req = this.store('main.accounts', account, 'requests', handlerId)
-    return (
-      <div 
-        key={req.handlerId}
-        className='requestItem cardShow'
-        // style={{ animationDelay: (i * 0.08) + 's' }}
-        onClick={() => {
-          this.props.setAccountView('requestView', { account, req, i })
-        }}
-      >
-        <div className='requestItemTitle'>
-          <div className='requestItemIcon'>
-            <RingIcon 
-              color={color}
-              svgLookup={svgLookup}
-              img={img}
-            />
-          </div>
-          <div className='requestItemMain'>
-            <div className='requestItemTitleMain'>
-              {title}
-            </div>
-            <div className='requestItemTitleSub'>
-              <div 
-                className='requestItemTitleSubIcon'
-              >
-                {svg.window(10)}
-              </div>
-              <div className='requestItemTitleSubText'>
-                {this.store('main.origins', req.origin, 'name')}
-              </div>
-            </div>
-            {req.recipient ? (
-              <div className='requestItemTitleSub'>
-                <div 
-                  className='requestItemTitleSubIcon'
-                >
-                  {svg.send(9)}
-                </div>
-                <div className='requestItemTitleSubText'>
-                  {req.recipient}
-                </div>
-              </div>
-            ) : null}
-          </div>
-          <div className='requestItemTitleTime'>
-            <div className='requestItemTitleTimeItem'>
-              {this.state.ago}
-            </div>
-          </div>
-        </div>
-        <div className='requestItemDetails'>
-          <div className='requestItemDetailsSlide'>
-            <div className='requestItemDetailsIndicator' />
-            {req.status || 'pending'}
-          </div>
-        </div>
-      </div>
-    )
-  }
-}
-
-const RequestItem = Restore.connect(_RequestItem)
 
 
 class Requests extends React.Component {
