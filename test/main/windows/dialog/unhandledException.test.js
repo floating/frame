@@ -55,5 +55,6 @@ it('shows a simple error box and quits for an EADDRINUSE error', () => {
   
   expect(dialog.showErrorBox).toHaveBeenCalled()
   expect(dialog.showMessageBoxSync).not.toHaveBeenCalled()
+  expect(app.relaunch).not.toHaveBeenCalled()
   expect(app.quit).toHaveBeenCalled()
 })
