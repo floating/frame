@@ -9,5 +9,6 @@
   "moduleNameMapper": {
     "^uuid$": "<rootDir>/node_modules/uuid/dist/index.js"
   },
-  "testTimeout": 100
+  "testTimeout": 100,
+  "clearMocks": true
 }
