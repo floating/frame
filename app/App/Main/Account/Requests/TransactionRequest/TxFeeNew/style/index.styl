@@ -1,37 +1,36 @@
 ._txFee
   position relative
-  width 100%
-  margin-bottom 12px
-  z-index 100000
-  
+  width calc(100% - 12px)
+  z-index 100001
+  background var(--ghostA)
+  margin 6px
+  border-radius 8px
+  padding 12px 0px 16px 0px
+
   ._txFeeInner
     border-radius 15px
     margin 0px 6px
 
     ._txFeeValues
-      border-radius 12px
       font-size 17px
       font-weight 400
+      border-radius 8px
       display flex
       justify-content center
       align-items center
-      height 32px
-      border-radius 12px
-      display flex
-      justify-content center
-      align-items center
+      // flex-direction column
       -webkit-app-region no-drag
       transition none
       pointer-events auto
       transform translate3d(0, 0, 0)
-      font-family 'Exo2' // FiraCode, monospace
-      background var(--ghostZ)
-      border 3px solid var(--ghostZ)
-      padding-bottom 2px
+      font-family 'Exo2'
+
+      svg
+        position relative
+        top -0px
+        padding 0px 3px 0px 4px
       
     ._txFeeGwei
-      width calc(50% - 3px)
-      height 42px
       transition var(--standardFaster)
       cursor pointer
       transform translateY(0px)
@@ -39,7 +38,8 @@
       display flex
       justify-content center
       align-items center
-
+      border-right 1px solid var(--outerspace)
+      padding-right 8px
 
       *
         pointer-events none
@@ -86,23 +86,17 @@
       display flex
       align-items center
       justify-content center
-      font-weight 600
-      font-size 13px
-      flex 1
-      // background var(--ghostZ)
-      // border-radius 12px
-      height 42px
-      margin-left 3px
-      border-left 3px solid var(--ghostZ)
+      font-weight 500
+      font-size 14px
+      margin-left 10px
 
       ._txFeeValueDefault
-        padding 1px 15px 0px 15px
         opacity 1
         display flex
         align-items center
         justify-content center
 
-      ._txFeeValueDefaultWarn
+      ._txFeeValueDefaultWarnr
         color var(--bad)
 
       ._txFeeValueHover
@@ -115,7 +109,6 @@
         display flex
         align-items center
         justify-content center
-        padding 2px 15px 0px 15px
 
       ._txFeeETH
         padding-right 6px
@@ -135,14 +128,14 @@
 
       ._txFeeUSDDescription
         position relative
-        font-size 10px
+        font-size 11px
         font-family Exo2
-        padding-left 3px
-        top -1px
+        padding-left 2px
 
       ._txFeeEq
         font-size 15px
-        padding 0px 6px 0px 0px
+        padding 0px 8px 0px 0px
+        display none
 
 
     ._txFeeValue:hover

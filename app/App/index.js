@@ -3,6 +3,8 @@ import Restore from 'react-restore'
 import svg from '../../resources/svg'
 import link from '../../resources/link'
 
+import Aux from '../../resources/Components/Aux'
+
 import Main from './Main'
 import Notify from './Notify'
 import Menu from './Menu'
@@ -80,6 +82,7 @@ class Panel extends React.Component {
         <Main />
         <Badge />
         <Menu position='bottom' />
+        <Aux />
       </div>
     )
   }

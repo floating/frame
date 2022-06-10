@@ -1149,10 +1149,15 @@ class Account extends React.Component {
       if (actingSigner) signer = this.store('main.signers', actingSigner)
     }
 
+    const { data } = this.store('panel.nav')[0] || {}
+    if (data && data.aux && data.aux.height) {
+      style.height = style.height - data.aux.height
+    }
+
     return (
       <div className='signerWrap' style={current ? { height: initial.height + 'px' } : {}} onMouseDown={() => this.closeAccounts()}>
         <div className={signerClass} style={style} ref={ref => { if (ref) this.signer = ref }}>
-          <div className='signerContainer' style={current ? { height: 'calc(100% - 62px)' } : {}}>
+          <div className='signerContainer' style={current ? { height: '100%' } : {}}>
             {this.store('view.clickGuard') ? <div className='clickGuard' /> : null}
             {!this.state.hideSignerStatus && open ? (
               <SignerStatus open={open} signer={signer} hideSignerStatus={this.hideSignerStatus.bind(this)} />

@@ -1,14 +1,14 @@
 .requestItem::after
   position absolute
   content ''
-  background linear-gradient(90deg, var(--overlayA), var(--overlayB))
+  // background linear-gradient(90deg, var(--overlayA), var(--overlayB))
   top 0
   bottom 0
   left 0
   right 0
   z-index 20
   border-radius 12px
-  opacity 0.4
+  opacity 1
   pointer-events none
 
 .requestItem
@@ -20,6 +20,10 @@
   position relative
   width 100%
   z-index 1
+  // transition all linear 1s
+  // background linear-gradient(90deg, var(--ghostA), red)
+  // background-position 0% 300%
+  // background-size 400% 400%
   *
     pointer-events none
 
@@ -43,10 +47,12 @@
     bottom 8px
     left 10px
     right 10px
-    background var(--ghostB)
+    background var(--ghostA)
+    background linear-gradient(90deg, var(--ghostB), var(--ghostC))
+    // background linear-gradient(90deg, var(--ghostA), var(--ghostB))
     padding-left 48px
     border-radius 6px
-    box-shadow 0px 2px 4px var(--ghostY)
+    // box-shadow 0px 2px 4px var(--ghostY)
 
   .requestItemDetailsIndicator
     position absolute
@@ -132,7 +138,7 @@
       align-items center
 
       .requestItemTitleTimeItem
-        background var(--ghostB)
+        // background var(--ghostZ)
         height 22px
         padding 0px 16px
         border-radius 12px
@@ -141,7 +147,8 @@
         align-items center
         font-size 12px
         padding-bottom 2px
-        box-shadow 0px 2px 4px var(--ghostY)
+        background linear-gradient(90deg, var(--ghostB), var(--ghostC))
+        // box-shadow 0px 2px 4px var(--ghostY)
 
     .requestItemMain
       margin-left 10px
@@ -257,26 +264,27 @@
     left 1px
 
 .requestItem:hover
-  background var(--ghostB)
+  background-position 0% 0%
+  background linear-gradient(90deg, var(--ghostA), var(--ghostB))
 
   .requestItemDetails
     .requestItemDetailsSlide
-      background var(--ghostC)
+      background linear-gradient(90deg, var(--ghostB), var(--ghostC))
 
 .requestItemHeader
   background none
   box-shadow none
 
-  .requestItemDetails
-    .requestItemDetailsSlide
-      background var(--ghostB)
+  // .requestItemDetails
+  //   .requestItemDetailsSlide
+  //     background var(--ghostB)
 
 .requestItemHeader:hover
   background none
 
-  .requestItemDetails
-    .requestItemDetailsSlide
-      background var(--ghostB)
+  // .requestItemDetails
+  //   .requestItemDetailsSlide
+  //     background var(--ghostB)
 
 .requestItem:last-child
   margin 0px
