@@ -1,11 +1,10 @@
 import React from 'react'
 import Restore from 'react-restore'
-// import utils from 'web3-utils'
 
-import svg from '../../../../../../../../../resources/svg'
-import link from '../../../../../../../../../resources/link'
-import { gweiToWei, gweiToWeiHex } from '../../../../../../../../../resources/utils'
-import { usesBaseFee } from '../../../../../../../../../resources/domain/transaction'
+import svg from '../../../../../../../../resources/svg'
+import link from '../../../../../../../../resources/link'
+import { gweiToWei, gweiToWeiHex } from '../../../../../../../../resources/utils'
+import { usesBaseFee } from '../../../../../../../../resources/domain/transaction'
 
 import BigNumber from 'bignumber.js'
 

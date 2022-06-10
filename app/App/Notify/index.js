@@ -4,7 +4,8 @@ import svg from '../../../resources/svg'
 import link from '../../../resources/link'
 
 import BigNumber from 'bignumber.js'
-import { usesBaseFee } from '../../../../resources/domain/transaction'
+import { usesBaseFee } from '../../../resources/domain/transaction'
+import { capitalize } from '../../../resources/utils'
 
 import frameIcon from './FrameIcon.png'
 
@@ -13,8 +14,6 @@ import AddToken from './AddToken'
 import CustomTokens from './CustomTokens'
 
 const FEE_WARNING_THRESHOLD_USD = 50
-
-const capitalize = s => s[0].toUpperCase() + s.slice(1)
 
 class Notify extends React.Component {
   mainnet () {

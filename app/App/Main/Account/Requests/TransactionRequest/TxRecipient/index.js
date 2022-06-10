@@ -2,8 +2,8 @@ import React from 'react'
 import Restore from 'react-restore'
 import { getAddress } from '@ethersproject/address'
 
-import link from '../../../../../../../../resources/link'
-import svg from '../../../../../../../../resources/svg'
+import link from '../../../../../../../resources/link'
+import svg from '../../../../../../../resources/svg'
 
 class TxRecipient extends React.Component {
   constructor (...args) {

@@ -4,12 +4,10 @@ import utils from 'web3-utils'
 import BigNumber from 'bignumber.js'
 import { getAddress } from '@ethersproject/address'
 
-import { usesBaseFee } from '../../../../../../../resources/domain/transaction'
-import { ApprovalType } from '../../../../../../../resources/constants'
-import svg from '../../../../../../../resources/svg'
-import link from '../../../../../../../resources/link'
+import { usesBaseFee } from '../../../../../../resources/domain/transaction'
+import svg from '../../../../../../resources/svg'
+import link from '../../../../../../resources/link'
 
-import RingIcon from '../../../../../../resources/Components/RingIcon'
 import RequestItem from '../../../../../../resources/Components/RequestItem'
 
 import chainMeta from '../../../../../../resources/chainMeta'
