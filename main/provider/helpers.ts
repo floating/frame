@@ -10,9 +10,10 @@ import {
   hashPersonalMessage,
 } from 'ethereumjs-util'
 import log from 'electron-log'
+
 import store from '../store'
 import protectedMethods from '../api/protectedMethods'
-import { usesBaseFee, TransactionData } from '../transaction'
+import { usesBaseFee, TransactionData } from '../../resources/domain/transaction'
 import FrameAccount from '../accounts/Account'
 
 const NATIVE_CURRENCY = '0x0000000000000000000000000000000000000000'
