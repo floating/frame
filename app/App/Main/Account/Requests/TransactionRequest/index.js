@@ -9,6 +9,11 @@ import { ApprovalType } from '../../../../../../../resources/constants'
 import svg from '../../../../../../../resources/svg'
 import link from '../../../../../../../resources/link'
 
+import RingIcon from '../../../../../../resources/Components/RingIcon'
+import RequestItem from '../../../../../../resources/Components/RequestItem'
+
+import chainMeta from '../../../../../../resources/chainMeta'
+
 import TxBar from './TxBar'
 
 // New Tx
@@ -139,9 +144,9 @@ class TransactionRequest extends React.Component {
     this.setState({ allowOtherChain: true })
   }
 
-
   render () {
-    const req = this.props.req
+    const { accountId, handlerId } = this.props
+    const req = this.store('main.accounts', accountId, 'requests', handlerId)
     const originalNotice = (req.notice || '').toLowerCase()
     let notice = req.notice
 
@@ -226,8 +231,6 @@ class TransactionRequest extends React.Component {
     let nonce = parseInt(req.data.nonce, 'hex')
     if (isNaN(nonce)) nonce = 'TBD'
 
-    const otherChain = (this.chain.id !== this.store('main.currentNetwork.id')) && !this.state.allowOtherChain
-
     let feeAtTime = '?.??'
 
     if (req && req.tx && req.tx.receipt && nativeUSD) {
@@ -243,6 +246,9 @@ class TransactionRequest extends React.Component {
         feeAtTime = (Math.round(feeInUsd * 100) / 100).toFixed(2)
       }
     }
+
+    const hexId = '0x' + parseInt(this.chain.id).toString('16')
+    const chainName = this.store('main.networks.ethereum', this.chain.id, 'name') 
 
     const showWarning = !status && mode !== 'monitor'
     const requiredApproval = showWarning && (req.approvals || []).filter(a => !a.approved)[0]
@@ -423,40 +429,16 @@ class TransactionRequest extends React.Component {
                 </div>
               ) : (
                 <>
-                  <div className='requestMeta'>
-                    <div className='requestMetaChainIcon'>
-                    </div>
-                    <div className='requestMetaChainInfo'>
-                      <div className='requestMetaChain'>
-                        {this.store('main.networks', this.chain.type, this.chain.id, 'name') + ' Transaction'}
-                      </div>
-                      <div className='requestMetaOrigin'>
-                        <div className='requestMetaOriginIcon'>
-                          {svg.window(10)}
-                        </div>
-                        {this.store('main.origins', this.props.req.origin, 'name')}
-                      </div>
-                    </div>
-                    <div 
-                      className='requestMetaNonce' 
-                      style={!this.store('main.nonceAdjust') || error || status || mode === 'monitor' ? { pointerEvents: 'none' } : {}}
-                    >
-                      {/* <div className='txNonceControl'>
-                        <div className='txNonceButton txNonceButtonLower' onMouseDown={() => link.send('tray:adjustNonce', req.handlerId, -1)}>
-                          {svg.octicon('chevron-down', { height: 14 })}
-                        </div>
-                        <div className='txNonceButton txNonceButtonRaise' onMouseDown={() => link.send('tray:adjustNonce', req.handlerId, 1)}>
-                          {svg.octicon('chevron-up', { height: 14 })}
-                        </div>
-                        
-                      </div> */}
-                      <div className='txNonceLabel'>Nonce</div>
-                      <div className={nonce === 'TBD' || error ? 'txNonceNumber' : 'txNonceNumber'}>
-                        {nonce}
-                      </div>
-                      {nonce === 'TBD' || error ? <div className='txNonceMarker' /> : null}
-                    </div>
-                  </div>
+                  <RequestItem 
+                    req={req}
+                    account={accountId}
+                    handlerId={req.handlerId}
+                    title={chainName + ' Transaction'}
+                    color={chainMeta[hexId] ? chainMeta[hexId].primaryColor : ''}
+                    img={chainMeta[hexId] ? chainMeta[hexId].icon : ''}
+                    setAccountView={() => {}}
+                    headerMode={true}
+                  />
                   {txMeta.replacement ? (
                     txMeta.possible ? (
                       <div className='approveRequestHeaderTag'>
@@ -468,10 +450,12 @@ class TransactionRequest extends React.Component {
                       </div>
                     )
                   ) : null}
-                  <TxRecipient {...this.props} />
-                  <TxMain {...this.props} chain={this.chain}/>
-                  <TxData {...this.props} overlayMode={this.overlayMode.bind(this)} />
-                  <TxFeeNew {...this.props} chain={this.chain} overlayMode={this.overlayMode.bind(this)}/ >
+                  <div className='_txBody'>
+                    <TxRecipient {...this.props} />
+                    <TxMain {...this.props} chain={this.chain}/>
+                    <TxData {...this.props} overlayMode={this.overlayMode.bind(this)} />
+                    <TxFeeNew {...this.props} chain={this.chain} overlayMode={this.overlayMode.bind(this)} />
+                  </div>
                   {!notice ? (
                     <div className='requestApprove'>
                       {req.automaticFeeUpdateNotice ? (

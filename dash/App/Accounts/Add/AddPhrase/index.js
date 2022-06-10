@@ -5,6 +5,7 @@ import Signer from '../../Signer'
 
 import link from '../../../../../resources/link'
 import svg from '../../../../../resources/svg'
+import RingIcon from '../../../../../resources/Components/RingIcon'
 
 class AddPhrase extends React.Component {
   constructor (...args) {
@@ -111,7 +112,9 @@ class AddPhrase extends React.Component {
           <div className='addAccountItemTop'>
             <div className='addAccountItemTopType'>
               <div className='addAccountItemIcon'>
-                <div className='addAccountItemIconType addAccountItemIconHot'>{svg.seedling(18)}</div>
+                <div className='addAccountItemIconType addAccountItemIconHot'>
+                  <RingIcon svgLookup={{ name: 'seedling', size: 16 }} />
+                </div>
                 <div className='addAccountItemIconHex addAccountItemIconHexHot' />
               </div>
               <div className='addAccountItemTopTitle'>Seed Phrase</div>

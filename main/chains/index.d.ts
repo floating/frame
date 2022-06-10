@@ -11,7 +11,9 @@ export interface Chain {
 declare class Chains extends EventEmitter {
   connections: {
     ethereum: {
-      [chainId: number]: {
+      [chainId: string]: {
+        type: string,
+        chainId: string,
         chainConfig: Common,
         primary: {
           connected: boolean

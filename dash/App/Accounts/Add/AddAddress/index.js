@@ -3,6 +3,7 @@ import Restore from 'react-restore'
 
 import link from '../../../../../resources/link'
 import svg from '../../../../../resources/svg'
+import RingIcon from '../../../../../resources/Components/RingIcon'
 
 class AddPhrase extends React.Component {
   constructor (...args) {
@@ -102,8 +103,7 @@ class AddPhrase extends React.Component {
           <div className='addAccountItemTop'>
             <div className='addAccountItemTopType'>
               <div className='addAccountItemIcon'>
-                <div className='addAccountItemIconType addAccountItemIconMock' style={{ marginTop: '2px' }}>{svg.mask(24)}</div>
-                <div className='addAccountItemIconHex addAccountItemIconHexSmart' />
+                <RingIcon svgLookup={{ name: 'mask', size: 24 }} />
               </div>
               <div className='addAccountItemTopTitle'>Watch Account</div>
             </div>

@@ -36,7 +36,7 @@
     font-weight 500
 
 .sliceOrigin:hover
-  background var(--ghostA)
+  background var(--ghostB)
 
 .viewAllOrigin
   display flex
@@ -52,44 +52,81 @@
   *
     pointer-events none
 
-.viewAllOrigin:hover
-  color var(--goodLight)
+// .viewAllOrigin:hover
+//   color var(--goodLight)
   
-.sliceOriginIndicator
-  color var(--outerspace)
-  cursor pointer
-  position absolute 
-  top 50%
-  margin-top -2px
-  left 13px
-  bottom 0px
-  width 5px
-  height 5px
-  border-radius 3px
-  display flex
-  justify-content center
-  align-items center
-  border-radius 12px
-  background var(--good)
-  *
-    pointer-events none
+// .sliceOriginIndicator
+//   color var(--outerspace)
+//   cursor pointer
+//   position absolute 
+//   top 50%
+//   margin-top -2.5px
+//   left 13px
+//   bottom 0px
+//   width 6px
+//   height 6px
+//   border-radius 3px
+//   display flex
+//   justify-content center
+//   align-items center
+//   background var(--good)
+//   // box-shadow 0px 0px 4px var(--good)
+//   *
+//     pointer-events none
 
-.sliceOriginIndicatorActive
-  background var(--goodHighlight)
-  box-shadow 0px 0px 4px var(--goodHighlight)
+// .sliceOriginIndicatorOff
+//   // background blue
+//   background var(--ghostX)
+//   box-shadow 0px 0px 0px var(--ghostX)
 
-.sliceOriginReqs
-  margin-right 9px
-  display flex
-  justify-content center
-  align-items center
+// .sliceOriginIndicatorActive
+//   background var(--goodHighlighter)
+//   box-shadow 0px 0px 4px var(--goodHighlighter)
 
-  .sliceOriginReqsNumber
-    font-size 14px
-    margin-right 5px
+// .sliceOriginReqs
+//   margin-right 9px
+//   display flex
+//   justify-content center
+//   align-items center
+
+//   .sliceOriginReqsNumber
+//     font-size 14px
+//     margin-right 5px
     
-  .sliceOriginReqsLabel
-    margin-top 2px
-    font-size 8px
-    text-transform uppercase
-    font-weight bold
+//   .sliceOriginReqsLabel
+//     margin-top 2px
+//     font-size 8px
+//     text-transform uppercase
+//     font-weight bold
+
+// .originSwapTitle
+//   color var(--good)
+
+// .originSwapOrigin
+//   padding 40px
+  
+.originSwapChainList
+  background var(--ghostZ)
+  border-radius 12px
+
+  .originChainItem
+    display flex
+    justify-content center
+    align-items center
+    height 44px
+    margin 6px
+    border-radius 12px
+    cursor pointer
+    background var(--ghostA)
+    box-shadow 0px 4px 8px var(--ghostY)
+    margin-bottom 10px
+
+  .originChainItem:hover
+    background var(--ghostA)
+
+  .originChainItem:last-child
+    border-bottom 0px solid var(--ghostX)
+
+  .originChainItemActive
+    color var(--good)
+

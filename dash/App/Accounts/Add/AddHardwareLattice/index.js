@@ -5,6 +5,8 @@ import Signer from '../../Signer'
 
 import link from '../../../../../resources/link'
 import svg from '../../../../../resources/svg'
+import RingIcon from '../../../../../resources/Components/RingIcon'
+
 
 function parseDeviceName (name) {
   return name.replace(/\s+/g, '-').substring(0, 14)
@@ -112,7 +114,9 @@ class AddHardwareLattice extends React.Component {
           <div className='addAccountItemTop'>
             <div className='addAccountItemTopType'>
               <div className='addAccountItemIcon'>
-                <div className='addAccountItemIconType addAccountItemIconHardware'>{svg.lattice(22)}</div>
+                <div className='addAccountItemIconType addAccountItemIconHardware'>
+                  <RingIcon svgLookup={{ name: 'lattice', size: 20 }} />
+                </div>
               </div>
               <div className='addAccountItemTopTitle'>GridPlus</div>
             </div>

@@ -196,7 +196,7 @@ class FrameAccount {
         
         knownRequest.res({ id, jsonrpc, result })
       }
-
+      store.backPanelReqView(req.handlerId)
       delete this.requests[req.handlerId]
       this.update()
     }

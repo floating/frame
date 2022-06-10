@@ -68,11 +68,16 @@ class Main extends React.Component {
 
     const { filter } = this.state
 
+    const { data } = this.store('panel.nav')[0] || {}
+    const panelScrollStyle = current ? { overflow: 'hidden', pointerEvents: 'none' } : {}
+    if (data && data.aux && data.aux.height) panelScrollStyle.bottom = data.aux.height
+
     return (
       <div className={this.store('panel.view') !== 'default' ? 'card cardHide' : 'card cardShow'}>
-        <div id='panelScroll' style={current ? { overflow: 'hidden', pointerEvents: 'none' } : {}}>
+        <div id='panelScroll' style={panelScrollStyle}>
           <div className='panelScrollOverlay' />
-          <div id='panelSlide' ref={ref => { if (ref) this.scroll = ref }} style={current ? { overflow: 'visible' } : {}}>
+          <div id='panelSlide' 
+            ref={ref => { if (ref) this.scroll = ref }} style={current ? { overflow: 'visible' } : {}}>
             <div id='panelWrap' style={current && scrollTop > 0 ? { marginTop: '-' + scrollTop + 'px' } : {}}>
               {/* {untethered.sort().map((id, i) => <PendingSigner key={'signers' + id} {...this.store('main.signers', id)} index={i} />)} */}
               {sortedAccounts.map((id, i) => {

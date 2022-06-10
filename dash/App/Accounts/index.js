@@ -99,7 +99,7 @@ class AddAccounts extends React.Component {
           <div className='accountTypeSelectIcon'>{'GridPlus Lattice1'}</div>
         </div>
         <div className='accountTypeSelect' onClick={() => this.createNewAccount('ledger')}>
-          <div className='accountTypeSelectIcon'>{svg.ledger(17)}</div>
+          <div className='accountTypeSelectIcon'>{svg.ledger(19)}</div>
           <div className='accountTypeSelectIcon'>{'Ledger Device'}</div>
         </div>
         <div className='accountTypeSelect' onClick={() => this.createNewAccount('trezor')}>
@@ -116,7 +116,7 @@ class AddAccounts extends React.Component {
           <div className='accountTypeSelectIcon'>{'Seed Phrase'}</div>
         </div>
         <div className='accountTypeSelect' onClick={() => this.createNewAccount('keyring')}>
-          <div className='accountTypeSelectIcon'>{svg.octicon('key', { height: 23 })}</div>
+          <div className='accountTypeSelectIcon'>{svg.key(20)}</div>
           <div className='accountTypeSelectIcon'>{'Private Key'}</div>
         </div>
         <div className='accountTypeSelect' onClick={() => this.createNewAccount('keystore')}>

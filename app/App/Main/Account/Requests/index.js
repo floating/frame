@@ -12,87 +12,10 @@ import Restore from 'react-restore'
 //   return ['ledger', 'lattice', 'trezor'].includes(account.lastSignerType)
 // }
 
+import RequestItem from '../../../../../resources/Components/RequestItem'
+import chainMeta from '../../../../../resources/chainMeta'
+
 import link from '../../../../../resources/link'
-import svg from '../../../../../resources/svg'
-
-class _RequestItem extends React.Component {
-  constructor (props, context) {
-    super(props, context)
-    this.state = {
-      ago: this.getElapsedTime() + ' ago'
-    }
-    
-  }
-  getElapsedTime () {
-    const elapsed = Date.now() - (this.props.req && this.props.req.created || 0)
-    const secs = elapsed / 1000
-    const mins = secs / 60
-    const hrs = mins / 60
-    const days = hrs / 24
-    if (days >= 1) return Math.round(days) + 'd'
-    if (hrs >= 1) return Math.round(hrs) + 'h'
-    if (mins >= 1) return Math.round(mins) + 'm'
-    if (secs >= 1) return Math.round(secs) + 's'
-    return '0s'
-  }
-  componentDidMount () {
-    this.timer = setInterval(() => {
-      this.setState({ ago: this.getElapsedTime() + ' ago' })
-    }, 1000)
-  }
-  componentWillUnmount () {
-    clearInterval(this.timer)
-  }
-  render () {
-    const { req, i, title, icon } = this.props
-    return (
-      <div 
-        key={req.handlerId}
-        className='requestItem cardShow'
-        // style={{ animationDelay: (i * 0.08) + 's' }}
-        onClick={() => {
-          this.props.setAccountView('requestView', { req, i })
-        }}
-      >
-        <div className='requestItemRow requestItemRowHeader'>
-          <div className='requestItemRowIconLarge'>
-            {icon}
-          </div>
-          <div className='requestItemRowTitleLarge'>
-            {title}
-          </div>
-        </div>
-        <div className='requestItemRow'>
-        <div className='requestItemRowIcon'>
-            {svg.window(12)}
-          </div>
-          <div className='requestItemRowTitle'>
-            {this.store('main.origins', req.origin, 'name')}
-          </div>
-          <div className={'requestItemSource'}>
-            {svg.chrome(11)}
-            {' chrome'}
-          </div>
-        </div>
-        <div className='requestItemRow'>
-          <div className='requestItemRowIcon' style={{ top: 'px' }}>
-            {svg.pin(13)}
-          </div>
-          <div className='requestItemRowTitle'>
-            {'pending'}
-          </div>
-          <div className={this.state.ago.includes('s') ? 'requestItemTime requestItemTimeNew' : 'requestItemTime'}>
-            {this.state.ago}
-          </div>
-        </div>
-        <div className='requestItemIcon' />
-        {/* <pre>{JSON.stringify(req, null, 2)}</pre> */}
-      </div>
-    )
-  }
-}
-
-const RequestItem = Restore.connect(_RequestItem)
 
 
 class Requests extends React.Component {
@@ -196,9 +119,12 @@ class Requests extends React.Component {
                 return (
                   <RequestItem 
                     req={req} 
-                    i={i} 
+                    account={this.props.id}
+                    handlerId={req.handlerId}
+                    i={i}
                     title={'Account Access'} 
-                    icon={svg.accounts(20)} 
+                    color={'var(--outerspace)'}
+                    svgLookup={{ name: 'accounts', size: 16 }}
                     setAccountView={this.props.setAccountView}
                   />
                 )
@@ -206,9 +132,12 @@ class Requests extends React.Component {
                 return (
                   <RequestItem 
                     req={req}
+                    account={this.props.id}
+                    handlerId={req.handlerId}
                     i={i}
                     title={'Sign Message'}
-                    icon={svg.sign(20)}
+                    color={'var(--outerspace)'}
+                    svgLookup={{ name: 'sign', size: 16 }}
                     setAccountView={this.props.setAccountView}
                   />
                 )
@@ -216,9 +145,12 @@ class Requests extends React.Component {
                 return (
                   <RequestItem
                     req={req}
+                    account={this.props.id}
+                    handlerId={req.handlerId}
                     i={i}
                     title={'Sign Data'} 
-                    icon={svg.sign(20)} 
+                    color={'var(--outerspace)'}
+                    svgLookup={{ name: 'sign', size: 16 }}
                     setAccountView={this.props.setAccountView}
                   />
                 )
@@ -226,9 +158,12 @@ class Requests extends React.Component {
                 return (
                   <RequestItem 
                     req={req} 
+                    account={this.props.id}
+                    handlerId={req.handlerId}
                     i={i} 
                     title={'Add Chain'} 
-                    icon={svg.chain(20)} 
+                    color={'var(--outerspace)'}
+                    svgLookup={{ name: 'chain', size: 16 }}
                     setAccountView={this.props.setAccountView}
                   />
                 )
@@ -236,9 +171,12 @@ class Requests extends React.Component {
                 return (
                   <RequestItem
                     req={req}
+                    account={this.props.id}
+                    handlerId={req.handlerId}
                     i={i}
                     title={'Switch Chain'}
-                    icon={svg.chain(20)} 
+                    color={'var(--outerspace)'}
+                    svgLookup={{ name: 'chain', size: 16 }}
                     setAccountView={this.props.setAccountView}
                   />
                 )
@@ -246,20 +184,30 @@ class Requests extends React.Component {
                 return (
                   <RequestItem
                     req={req}
+                    account={this.props.id}
+                    handlerId={req.handlerId}
                     i={i}
                     title={'Add Tokens'}
-                    icon={svg.tokens(20)}
+                    color={'var(--outerspace)'}
+                    svgLookup={{ name: 'tokens', size: 16 }}
                     setAccountView={this.props.setAccountView}
                   />
                 )
               } else if (req.type === 'transaction')  {
                 const chainName = this.store('main.networks.ethereum', parseInt(req.data.chainId, 16), 'name') 
+                const hexId = req.data.chainId
+                chainMeta[hexId] ? chainMeta[hexId].primaryColor : ''
+                chainMeta[hexId] ? chainMeta[hexId].icon : ''
+                
                 return (
                   <RequestItem 
                     req={req}
+                    account={this.props.id}
+                    handlerId={req.handlerId}
                     i={i}
                     title={chainName + ' Transaction'}
-                    icon={svg.broadcast(20)}
+                    color={chainMeta[hexId] ? chainMeta[hexId].primaryColor : ''}
+                    img={chainMeta[hexId] ? chainMeta[hexId].icon : ''}
                     setAccountView={this.props.setAccountView}
                   />
                 )

@@ -138,10 +138,10 @@ export class Provider extends EventEmitter {
 
   getNetVersion (payload: RPCRequestPayload, res: RPCRequestCallback, targetChain: Chain) {
     const connection = this.connection.connections[targetChain.type][targetChain.id]
-    const chainConnected = (connection.primary?.connected || connection.secondary?.connected)
+    const chainConnected = connection && (connection.primary?.connected || connection.secondary?.connected)
 
     const response = chainConnected
-      ? { result: targetChain.id.toString() }
+      ? { result: connection.chainId }
       : { error: { message: 'not connected', code: 1 } }
 
     res({ id: payload.id, jsonrpc: payload.jsonrpc, ...response })

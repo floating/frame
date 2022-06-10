@@ -20,9 +20,6 @@ class txData extends React.Component {
     return (
       <div className='_txData'>
         <div className='_txDataInner'>
-          <div className='_txLabel'>
-            Data
-          </div>
           <div className='_txDataValue' onClick={() => {
             this.props.overlayMode('data')
           }}>
@@ -39,6 +36,9 @@ class txData extends React.Component {
                 <span>{'Sending Data!'}</span>
               )
             ) : 'No Data'}
+          </div>
+          <div className='_txLabel'>
+            Data
           </div>
         </div>
       </div>

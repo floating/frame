@@ -1,22 +1,20 @@
 ._txMain
   position relative
-  width 100%
-  margin-bottom 12px
-  z-index 100000
+  width calc(100% - 12px)
+  z-index 100001
+  background var(--ghostA)
+  margin 6px
+  border-radius 8px
+  padding 12px 0px 16px 0px
   
   ._txMainInner
-    border-radius 15px
-    margin 0px 6px
-
     ._txMainValues
-      border-radius 12px
       font-size 17px
       font-weight 400
       display flex
       justify-content center
       align-items center
-      height 40px
-      border-radius 12px
+      border-radius 8px
       display flex
       justify-content center
       align-items center
@@ -24,14 +22,15 @@
       transition none
       pointer-events auto
       transform translate3d(0, 0, 0)
-      font-family 'Exo2' // FiraCode, monospace
-      background var(--ghostZ)
-      border 3px solid var(--ghostZ)
-      padding-bottom 2px
+      font-family 'Exo2'
+
+      svg
+        position relative
+        top -0px
+        padding 0px 3px 0px 4px
 
       ._txMainValue
         border-radius 8px
-        // font-family FiraCode, monospace
         font-size 20px
         font-weight 200
         display flex
@@ -41,20 +40,19 @@
         ._txMainValueSymbol
           padding 0px 0px 0px 10px
           font-size 13px
-          // font-family Exo2
           font-weight 600
 
         ._txMainValueAmount
-          padding 2px 5px 0px 5px
+          padding 0px 5px 0px 5px
 
         ._txMainValueEq
-          padding 0px 4px 0px 8px
+          padding 0px 10px 0px 6px
           font-size 15px
 
         ._txMainValueEqSymbol
-          padding 2px 4px 0px 0px
+          padding 2px 2px 0px 0px
           font-size 12px
 
         ._txMainValueEqAmount
-          padding 2px 0px 0px 0px
+          padding 0px 0px 0px 0px
           font-size 14px

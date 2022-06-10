@@ -1,0 +1,290 @@
+.requestItem::after
+  position absolute
+  content ''
+  // background linear-gradient(90deg, var(--overlayA), var(--overlayB))
+  top 0
+  bottom 0
+  left 0
+  right 0
+  z-index 20
+  border-radius 12px
+  opacity 1
+  pointer-events none
+
+.requestItem
+  margin 0px 0px 7px 0px
+  border-radius 12px
+  background var(--ghostA)
+  box-shadow 0px 4px 8px var(--ghostY)
+  cursor pointer
+  position relative
+  width 100%
+  z-index 1
+  // transition all linear 1s
+  // background linear-gradient(90deg, var(--ghostA), red)
+  // background-position 0% 300%
+  // background-size 400% 400%
+  *
+    pointer-events none
+
+  .requestItemDetails
+    position relative
+    display flex
+    align-items center
+    justify-content flex-start
+    text-transform uppercase
+    font-weight 600
+    font-size 9px
+    letter-spacing 3px
+    border-bottom-left-radius 12px
+    border-bottom-right-radius 12px
+    height 20px
+    color var(--moon)
+
+  .requestItemDetailsSlide
+    position absolute
+    top 0
+    bottom 8px
+    left 10px
+    right 10px
+    background var(--ghostA)
+    background linear-gradient(90deg, var(--ghostB), var(--ghostC))
+    // background linear-gradient(90deg, var(--ghostA), var(--ghostB))
+    padding-left 48px
+    border-radius 6px
+    // box-shadow 0px 2px 4px var(--ghostY)
+
+  .requestItemDetailsIndicator
+    position absolute
+    height 4px
+    width 33px
+    border-radius 2px
+    top 4px
+    left 5px
+    background var(--moon)
+    z-index 4
+
+  .requestItemRow
+    position relative
+    z-index 3
+    width 100%
+    display flex
+    align-items center
+    margin-bottom 10px
+    box-sizing border-box
+
+    .requestItemRowIcon
+      width 40px
+      height 20px
+      display flex
+      justify-content center
+      align-items center
+      position relative
+      // color var(--good)
+      
+    .requestItemRowIconLarge
+      width 40px
+      height 20px
+      display flex
+      justify-content center
+      align-items center
+      //color var(--moon)
+
+    .requestItemRowChainIcon
+      position absolute
+      top 0px  
+      right 20px
+      bottom 0px
+      display flex
+      justify-content center
+      align-items center
+      // background var(--moon)
+      width 20px
+      border-radius 10px
+
+    .requestItemRowTitle
+      position relative
+      margin-left 9px
+      font-size 12px
+      font-weight 400
+
+    .requestItemRowTitleLarge
+      position relative
+      font-weight 500
+      display flex
+      justify-content center
+      align-items center
+
+  .requestItemTitle
+    position relative
+    font-family 'Exo2'
+    font-weight 500
+    width 100%
+    display flex
+    justify-content flex-start
+    align-items center
+    height 64px
+    font-size 14px
+    font-weight 600
+
+    .requestItemTitleTime
+      position absolute
+      top 0
+      right 0
+      bottom 0
+      padding 8px
+      display flex
+      justify-content center
+      align-items center
+
+      .requestItemTitleTimeItem
+        // background var(--ghostZ)
+        height 22px
+        padding 0px 16px
+        border-radius 12px
+        display flex
+        justify-content center
+        align-items center
+        font-size 12px
+        padding-bottom 2px
+        background linear-gradient(90deg, var(--ghostB), var(--ghostC))
+        // box-shadow 0px 2px 4px var(--ghostY)
+
+    .requestItemMain
+      margin-left 10px
+      margin-bottom 3px
+
+    .requestItemTitleMain
+      font-size 15px
+      margin-bottom 4px
+      margin-top 5px
+
+    .requestItemTitleSub
+      display flex
+      justify-content flex-start
+      align-items center
+      font-size 11px
+      font-weight 500
+      padding-bottom 4px
+      
+      .requestItemTitleSubIcon
+        margin -1px 5px 0px 1px
+        color var(--outerspace)
+
+      .requestItemTitleSubText
+        margin -3px 0px 0px 0px
+
+  .requestItemTime
+    position absolute
+    top 0px  
+    right 24px
+    bottom 0px
+    font-size 12px
+    font-weight 500
+    display flex
+    justify-content center
+    align-items center
+
+  .requestItemSource
+    position absolute
+    top 0px  
+    right 20px
+    bottom 0px
+    font-size 12px
+    font-weight 400
+    display flex
+    justify-content center
+    align-items center
+    //color var(--moon)
+    margin-top -2px
+
+    div
+      margin-right 5px
+    svg
+      position relative
+      top 1px
+
+  .requestItemIcon
+    width 39px
+    display flex
+    justify-content center
+    align-items center
+    margin-left 10px
+    border-radius 10px
+    background var(--ghostA)
+    z-index 2
+    border-radius 12px
+    -webkit-app-region no-drag
+    transition none
+    pointer-events auto
+    transform translate3d(0, 0, 0)
+    background var(--ghostB)
+    cursor pointer
+
+    // .requestItemIconFrame
+    //   color var(--good)
+    //   border-radius 8px
+    //   display flex
+    //   justify-content center
+    //   align-items center
+
+  .requestItemOrigin
+    top 16px
+    right 16px
+    position absolute
+    font-weight 600
+    margin-left 2px
+    display flex
+    align-items center
+    font-size 10px
+    margin-top 3px
+
+    .requestItemOriginIcon
+      position relative
+      top -1px
+      display flex
+      justify-content center
+      align-items center
+
+  .requestItemStatus
+    font-size 10px
+    bottom 16px
+    left 64px
+    position absolute
+    font-weight 600
+    margin-left 2px
+
+  .requestItemRight
+    width 64px
+    display flex
+    justify-content center
+    align-items center
+    transform scaleX(-1)
+    position relative
+    left 1px
+
+.requestItem:hover
+  background-position 0% 0%
+  background linear-gradient(90deg, var(--ghostA), var(--ghostB))
+
+  .requestItemDetails
+    .requestItemDetailsSlide
+      background linear-gradient(90deg, var(--ghostB), var(--ghostC))
+
+.requestItemHeader
+  background none
+  box-shadow none
+
+  // .requestItemDetails
+  //   .requestItemDetailsSlide
+  //     background var(--ghostB)
+
+.requestItemHeader:hover
+  background none
+
+  // .requestItemDetails
+  //   .requestItemDetailsSlide
+  //     background var(--ghostB)
+
+.requestItem:last-child
+  margin 0px
