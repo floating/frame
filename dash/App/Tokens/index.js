@@ -6,15 +6,19 @@ import svg from '../../../resources/svg'
 import AddToken from './AddToken'
 import CustomTokens from './CustomTokens'
 
+const AddTokenForm = ({ store }) => {
+  const activeChains = Object.values(store('main.networks.ethereum')).filter((chain) => chain.on)
+  return <AddToken req={store('view.notifyData')} activeChains={activeChains}  />
+}
+
 class Tokens extends React.Component {
   render () {
     const { notify } = this.props.data
-    const activeChains = Object.values(this.store('main.networks.ethereum')).filter((chain) => chain.on)
     
     return (
       <div>
         {notify === 'addToken' ? (
-          <AddToken req={this.store('view.notifyData')} activeChains={activeChains}  />
+          <AddTokenForm store={this.store}  />
         ) : (
           <CustomTokens />
         )}
