@@ -30,7 +30,7 @@ jobs:
         title: ${{ steps.package-version.outputs.current-version}}
 
   build_release:
-    needs: [create_draft_release]
+    needs: [create_canary_release]
     strategy:
       fail-fast: false
       matrix:
