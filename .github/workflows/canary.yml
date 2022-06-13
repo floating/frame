@@ -4,14 +4,13 @@ on:
   push:
     branches:
       - 'develop'
-  workflow_dispatch:
 
 env:
  GH_TOKEN: ${{ secrets.GH_RELEASE_DEPLOYMENT_TOKEN }}
 
 jobs:
   create_canary_release:
-    if: github.repository == 'frame-labs/frame-canary' 
+    if: github.repository === 'frame-labs/frame-canary' 
     runs-on: ubuntu-latest
 
     steps:
@@ -31,7 +30,7 @@ jobs:
         title: ${{ steps.package-version.outputs.current-version}}
 
   build_release:
-    needs: [create_canary_release]
+    needs: [create_draft_release]
     strategy:
       fail-fast: false
       matrix:
