@@ -1,6 +1,6 @@
 {
-  "name": "frame",
-  "version": "0.5.0-beta.20",
+  "name": "frame-experimental-release",
+  "version": "0.5.0-canary.1",
   "description": "System-wide web3",
   "main": "compiled/main",
   "scripts": {
@@ -171,7 +171,7 @@
   "browserslist": [
     "last 1 Electron major version"
   ],
-  "repository": "github:floating/frame",
+  "repository": "github:frame-labs/frame-canary",
   "lavamoat": {
     "allowScripts": {
       "@aragon/wrapper>@aragon/os>@aragon/truffle-config-v4>@truffle/hdwallet-provider>@ethereumjs/common>ethereumjs-util>ethereum-cryptography>keccak": true,
