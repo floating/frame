@@ -7,10 +7,10 @@ const latestStateVersion = () => {
   const state = persist.get('main')
   if (!state || !state.__) {
     // log.info('Persisted state: returning base state')
-    return state 
+    return state
   }
 
-  // valid states are less than or equal to the latest migration we know about 
+  // valid states are less than or equal to the latest migration we know about
   const versions = Object.keys(state.__).filter(v => v <= migrations.latest).sort((a, b) => a - b)
 
   if (versions.length === 0) {
@@ -273,12 +273,15 @@ const initial = {
         137: {
           infura: 'https://polygon-mainnet.infura.io/v3/786ade30f36244469480aa5c2bf0743b'
         },
+        534: {
+          candle: 'https://rpc.cndlchain.com'
+        },
         42161: {
           infura: 'https://arbitrum-mainnet.infura.io/v3/786ade30f36244469480aa5c2bf0743b'
         }
       }
     },
-    networks: main('networks', { 
+    networks: main('networks', {
       ethereum: {
         1: {
           id: 1,
@@ -449,6 +452,25 @@ const initial = {
           },
           on: false
         },
+        534: {
+          id: 534,
+          type: 'ethereum',
+          layer: 'sidechain',
+          symbol: 'CNDL',
+          name: 'Candle',
+          explorer: 'https://candleexplorer.com',
+          gas: {
+            price: {
+              selected: 'standard',
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+            }
+          },
+          connection: {
+            primary: { on: true, current: 'candle', status: 'loading', connected: false, type: '', network: '', custom: '' },
+            secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
+          },
+          on: false
+        },
         42161: {
           id: 42161,
           type: 'ethereum',
@@ -536,6 +558,15 @@ const initial = {
           }
         },
         137: {
+          gas: {
+            fees: {},
+            price: {
+              selected: 'standard',
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+            }
+          }
+        },
+        534: {
           gas: {
             fees: {},
             price: {
