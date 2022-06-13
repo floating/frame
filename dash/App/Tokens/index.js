@@ -11,20 +11,16 @@ const AddTokenForm = ({ store }) => {
   return <AddToken req={store('view.notifyData')} activeChains={activeChains}  />
 }
 
-class Tokens extends React.Component {
-  render () {
-    const { notify } = this.props.data
-    
-    return (
-      <div>
-        {notify === 'addToken' ? (
-          <AddTokenForm store={this.store}  />
-        ) : (
-          <CustomTokens />
-        )}
-      </div>
-    ) 
-  }
+function Tokens ({ data: { notify } }) {
+  return (
+    <div>
+      {notify === 'addToken' ? (
+        <AddTokenForm store={this.store}  />
+      ) : (
+        <CustomTokens />
+      )}
+    </div>
+  )
 }
 
 export default Restore.connect(Tokens)
