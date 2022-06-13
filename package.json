@@ -171,7 +171,7 @@
   "browserslist": [
     "last 1 Electron major version"
   ],
-  "repository": "github:floating/frame",
+  "repository": "github:frame-labs/frame-canary",
   "lavamoat": {
     "allowScripts": {
       "@aragon/wrapper>@aragon/os>@aragon/truffle-config-v4>@truffle/hdwallet-provider>@ethereumjs/common>ethereumjs-util>ethereum-cryptography>keccak": true,
