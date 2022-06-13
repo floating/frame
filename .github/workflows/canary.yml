@@ -10,7 +10,7 @@ env:
 
 jobs:
   create_canary_release:
-    if: github.repository === 'frame-labs/frame-canary' 
+    if: github.repository == 'frame-labs/frame-canary' 
     runs-on: ubuntu-latest
 
     steps:
