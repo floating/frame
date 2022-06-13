@@ -7,6 +7,7 @@ import svg from '../../../../../resources/svg'
 import { isNetworkConnected } from '../../../../../resources/utils/chains'
 
 import chainMeta from '../../../../../resources/chainMeta'
+import RingIcon from '../../../../../resources/Components/RingIcon'
 
 import BigNumber from 'bignumber.js'
 
@@ -80,48 +81,54 @@ class Balance extends React.Component {
       }
     }
     let name = balance.name
-    if (name.length > 17) name = name.substr(0, 17) + '..'
+    if (name.length > 19) name = name.substr(0, 17) + '..'
 
     const chainHex = '0x' + chainId.toString(16)
 
     return (
       <div className={i === 0 ? 'signerBalance signerBalanceBase' : 'signerBalance'} key={symbol} onMouseDown={() => this.setState({ selected: i })}>
         <div className='signerBalanceInner' style={{ opacity: !scanning ? 1 : 0 }}>
-          <div 
-            className='signerBalanceChainIcon'
-            style={{ background: chainMeta[chainHex] ? chainMeta[chainHex].primaryColor : '' }}
-          >
-            <img 
-              src={chainMeta[chainHex] ? chainMeta[chainHex].icon : ''}
-              value={chainId}
-              alt={chainId}
+          <div className='signerBalanceIcon'>
+            <RingIcon 
+              img={balance.logoURI && symbol.toUpperCase() !== 'ETH' && `https://proxy.pylon.link?type=icon&target=${encodeURIComponent(balance.logoURI)}`}
+              alt={symbol.toUpperCase()}
+              color={chainMeta[chainHex] ? chainMeta[chainHex].primaryColor : '' }
             />
           </div>
-          <div className='signerBalanceLogo'>
-            <img 
-              src={balance.logoURI && `https://proxy.pylon.link?type=icon&target=${encodeURIComponent(balance.logoURI)}`}
-              value={symbol.toUpperCase()}
-              alt={symbol.toUpperCase()}
-            />
+          <div 
+            className='signerBalanceChain'
+            style={{ color: chainMeta[chainHex] ? chainMeta[chainHex].primaryColor : '' }}
+          >
+            {chainMeta[chainHex] ? chainMeta[chainHex].name : '' }
           </div>
           <div className='signerBalanceCurrency'>
             {name}
           </div>
-          <div className='signerBalancePrice'>
-            <span className='signerBalanceCurrentPrice'>{svg.usd(10)}{balance.price}</span>
-            <span className={priceChangeClass}>
-              <span>{direction === 1 ? '+' : ''}{balance.priceChange ? balance.priceChange + '%' : ''}</span>
-            </span>
-          </div>
           <div className='signerBalanceValue' style={(balance.displayBalance || '0').length >= 12 ? { fontSize: '15px', top: '10px' } : {}}>
-            <span className='signerBalanceSymbol'>{symbol.toUpperCase()}</span>
+            <span 
+              className='signerBalanceSymbol'
+            >
+              {symbol.toUpperCase()}
+            </span>
             <span
               style={(balance.displayBalance || '0').length >= 12 ? { marginTop: '-3px' } : {}}
             >
               {balance.displayBalance}
             </span>
           </div>
-          {<div className='signerBalanceEquivalent'>{svg.usd(10)}{balance.displayValue}</div>}
+          <div className='signerBalancePrice'>
+            <div className='signerBalanceOk'>
+              <span className='signerBalanceCurrentPrice'>
+                {svg.usd(10)}{balance.price}
+              </span>
+              <span className={priceChangeClass}>
+                <span>({direction === 1 ? '+' : ''}{balance.priceChange ? balance.priceChange + '%' : ''})</span>
+              </span>
+            </div>
+            <div className='signerBalanceCurrentValue'>
+              {svg.usd(10)}{balance.displayValue}
+            </div>
+          </div>
         </div>
       </div>
     )
@@ -193,7 +200,7 @@ class Balances extends React.Component {
     const rates = this.store('main.rates')
 
     const { balances: allBalances, totalDisplayValue, totalValue } = this.getBalances(storedBalances, rates)
-    const balances = allBalances.slice(0, this.props.expanded ? allBalances.length : 5)
+    const balances = allBalances.slice(0, this.props.expanded ? allBalances.length : 4)
 
     const lastBalanceUpdate = this.store('main.accounts', address, 'balances.lastUpdated')
 
@@ -223,9 +230,11 @@ class Balances extends React.Component {
             <div className='loader' />
           </div>
         ) : null}
-        {balances.map(({ chainId, symbol, ...balance }, i) => {
-          return <Balance chainId={chainId} symbol={symbol} balance={balance} i={i} scanning={scanning} />
-        })}
+        <div className='signerBalancesWrap'>
+          {balances.map(({ chainId, symbol, ...balance }, i) => {
+            return <Balance chainId={chainId} symbol={symbol} balance={balance} i={i} scanning={scanning} />
+          })}
+        </div>
         <div 
           className='signerBalanceTotal'
           style={{ opacity: !scanning ? 1 : 0 }}
@@ -233,7 +242,7 @@ class Balances extends React.Component {
           {!this.props.expanded ? (
             <div className='signerBalanceButtons'>
               <div className='signerBalanceButton signerBalanceShowAll' onMouseDown={() => this.props.expandModule(this.props.moduleId)}>
-                More
+                {allBalances.length - 4 > 0 ? `+${allBalances.length - 4} More` : 'More'}
               </div>
             </div>
           ) : (

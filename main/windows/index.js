@@ -82,11 +82,13 @@ const detectMouse = () => {
   }, 50)
 }
 
+const trayWidth = 380
+
 const api = {
   create: () => {
     windows.tray = new BrowserWindow({
       id: 'tray',
-      width: 360,
+      width: trayWidth,
       frame: false,
       transparent: process.platform === 'darwin',
       // hasShadow: false,
@@ -257,8 +259,8 @@ const api = {
     windows.tray.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
     windows.tray.setResizable(false) // Keeps height consistant
     const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
-    windows.tray.setMinimumSize(358, dev && !fullheight ? 740 : area.height)
-    windows.tray.setSize(358, dev && !fullheight ? 740 : area.height)
+    windows.tray.setMinimumSize(trayWidth, dev && !fullheight ? 740 : area.height)
+    windows.tray.setSize(trayWidth, dev && !fullheight ? 740 : area.height)
     const pos = topRight(windows.tray) // windows.tray.positioner.calculate('topRight')
     windows.tray.setPosition(pos.x, pos.y)
     if (!glide) windows.tray.focus()
@@ -399,7 +401,7 @@ const api = {
   dash: () => {
     windows.dash = new BrowserWindow({
       id: 'dash',
-      width: 360,
+      width: trayWidth,
       frame: false,
       transparent: process.platform === 'darwin',
       // hasShadow: false,
@@ -451,9 +453,9 @@ const api = {
       windows.dash.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
       windows.dash.setResizable(false) // Keeps height consistant
       const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
-      windows.dash.setSize(360, dev && !fullheight ? 740 : area.height)
+      windows.dash.setSize(trayWidth, dev && !fullheight ? 740 : area.height)
       const {x, y} = topRight(windows.dash) // windows.tray.positioner.calculate('topRight')
-      windows.dash.setPosition(x - 363, y)
+      windows.dash.setPosition(x - trayWidth - 5, y)
       // if (!glide) windows.tray.focus()
       // windows.flow.emit('show')
       windows.dash.show()

@@ -132,6 +132,7 @@ const ChainOrigins = ({ chain, origins }) => {
       <div className='originTitle'>
         <div className='originTitleIcon'>
           <RingIcon 
+            small={true}
             color={chainMeta[hexId] ? chainMeta[hexId].primaryColor : ''} 
             img={chainMeta[hexId] ? chainMeta[hexId].icon : ''} 
           />
@@ -142,7 +143,7 @@ const ChainOrigins = ({ chain, origins }) => {
       {origins.disconnected.map((origin) => <OriginModule origin={origin} connected={false} />)}
       {origins.connected.length === 0 && origins.disconnected.length === 0 ? (
         <div className='sliceOriginNoDapp'>
-          {'No Dapps Connected'}
+          {'No Dapp Recently Connected'}
         </div>
       ) : null}
     </>

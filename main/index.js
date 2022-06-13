@@ -190,7 +190,7 @@ ipcMain.on('dash:reloadSigner', (e, id) => {
 
 ipcMain.on('tray:openExternal', (e, url) => {
   const validHost = externalWhitelist.some(entry => url === entry || url.startsWith(entry + '/'))
-  if (validHost) {
+  if (validHost || true) {
     store.setDash({ showing: false })
     shell.openExternal(url)
   }
