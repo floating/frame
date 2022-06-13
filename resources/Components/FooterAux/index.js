@@ -1,12 +1,6 @@
 import React from 'react'
 import Restore from 'react-restore'
 
-import RingIcon from '../RingIcon'
-// import chainMeta from '../../../../../resources/chainMeta'
-
-// import link from '../../../../../resources/link'
-import svg from '../../svg'
-
 import Gas from '../Gas'
 
 class _Aux extends React.Component {
