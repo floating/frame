@@ -1,9 +1,8 @@
 import React from 'react'
 import Restore from 'react-restore'
-import svg from '../../resources/svg'
 import link from '../../resources/link'
 
-import Aux from '../../resources/Components/Aux'
+import Aux from '../../resources/Components/FooterAux'
 
 import Main from './Main'
 import Notify from './Notify'
