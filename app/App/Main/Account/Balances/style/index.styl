@@ -9,6 +9,14 @@
   padding 10px 0px
   cursor pointer
 
+.signerBalancesWrap
+  margin 0px 6px
+  padding 0px 5px 5px 5px
+  overflow auto
+  background var(--ghostZ)
+  border-radius 12px
+  min-height 70px
+
 .signerBalanceWarningTitle
   position relative
   height 24px
@@ -36,7 +44,7 @@
 
 .signerBalanceTotal
   position relative
-  height 44px
+  height 64px
   width 100%
   z-index 200000
   font-size 14px
@@ -48,8 +56,7 @@
     height 100%
 
   .signerBalanceButton
-    height 30px
-    width 60px
+    height 36px
     margin-left 10px
     background var(--ghostB)
     border-radius 8px
@@ -62,7 +69,7 @@
     font-weight 500
     letter-spacing 1px
     text-transform uppercase
-    padding 0px 3px 0px 4px
+    padding 0px 10px 0px 11px
     color var(--outerspace07)
 
   .signerBalanceAddToken
@@ -71,7 +78,6 @@
     *
       pointer-events none
       margin-left 2px
-
 
   .signerBalanceButton:hover
     background var(--ghostD)
@@ -110,10 +116,10 @@
 
 .signerBalancesLoading
   position absolute
-  top 32px
+  top 38px
   left 5px
   right 5px
-  height 52px
+  height 70px
   z-index 200
   border-radius 11px
   display flex
@@ -138,39 +144,71 @@
 
 .signerBalance
   position relative
-  margin-left 17px
-  width calc(100% - 34px)
   opacity 1
-  height 56px
+  height 70px
   transition 0.1s ease-out all
-  border-bottom 1px solid var(--ghostZ)
+  background var(--ghostA)
+  border-radius 8px
+  margin-top 5px
+  font-family 'Exo2'
 
   .signerBalanceInner
     position relative
     height 100%
     transition var(--standard)
 
+  .signerBalanceIcon
+    position absolute
+    top 16px
+    left 14px
+
   .signerBalanceCurrency
     position absolute
-    left 41px
-    top 8px
+    left 68px
+    top 9px
     right 125px
-    font-size 14px
+    font-size 13px
     display flex
     align-items center
-    font-weight 400
+    font-weight 600
     white-space nowrap
     z-index 2
-    
+
+  .signerBalanceChain
+    position absolute
+    left 69px
+    top 31px
+    font-size 9px
+    display flex
+    align-items center
+    font-weight 600
+    white-space nowrap
+    z-index 2
+    text-transform uppercase
+    letter-spacing 2px
+    height 10px
+   
   .signerBalancePrice
     position absolute
-    left 39px
-    bottom 9px
-    font-size 13px
+    right 10px
+    bottom 10px
+    left 68px
+    font-size 11px
+    font-weight 600
     color var(--outerspace06)
     display flex
     align-items center
+    justify-content space-between
     font-family FiraCode, monospace
+
+  .signerBalanceOk
+    display flex
+    align-items center
+    justify-content center
+
+  .signerBalanceCurrentValue
+    display flex
+    align-items center
 
   .signerBalanceCurrentPrice
     display flex
@@ -178,8 +216,9 @@
     color var(--outerspace)
 
   .signerBalanceCurrentPriceChange
+    display flex
+    align-items center
     margin-left 4px
-    color var(--outerspace06)
 
   .signerBalanceCurrentPriceChangeUp
     color var(--good)
@@ -199,35 +238,6 @@
     z-index 2
     color black
     box-shadow 0px 0px 2px var(--ghostA)
-
-    img:before
-      content attr(alt)
-      top 0
-      bottom 0
-      left 0
-      right 0
-      border-radius 13px
-      position absolute
-      background var(--outerspace)
-      color var(--ghostF)
-      display flex
-      justify-content center
-      align-items center
-      font-size 11px
-      font-weight 600
-      letter-spacing -0.5px
-      margin-left -0.5px
-     
-    img
-      height 12px
-      width 12px
-      border-radius 6px
-      position absolute
-      top 2px
-      left 2px
-      overflow hidden
-
-
 
   .signerBalanceLogo
     position absolute
@@ -269,9 +279,9 @@
 
   .signerBalanceValue
     position absolute
-    right 0px
-    top 7px
-    font-size 18px
+    right 8px
+    top 22px
+    font-size 19px
     text-align center
     display flex
     align-items center
@@ -279,26 +289,26 @@
     // border-right 1px solid var(--doubleThick)
     font-family FiraCode, monospace
     letter-spacing -1px
-    font-weight 200
+    font-weight 100
 
     .signerBalanceSymbol
       font-family 'Exo2', sans-serif
       margin-right 2px
       font-weight 600
-      font-size 12px
-      line-height 11px
+      font-size 13px
+      line-height 13px
       position relative
-      top -2px
-      letter-spacing 0.5px
+      top -1.5px
+      letter-spacing 1px
       color var(--outerspace)
       padding 5px 4px 4px 5px
       border-radius 6px
 
   .signerBalanceEquivalent
     position absolute
-    right 0px
-    bottom 9px
-    font-size 13px
+    right 7px
+    bottom 5px
+    font-size 12px
     color var(--outerspace05)
     display flex
     align-items center
@@ -306,17 +316,6 @@
 
 .signerBalance:last-child
   border-bottom none
-
-.signerBalanceBase
-  // border 1px solid var(--ghostA)
-  // width calc(100% - px)
-  margin 0px 3px 0px 3px
-  // border-radius 8px
-  background var(--ghostZ)
-  padding 0px 14px 0px 14px
-  border-radius 12px
-  border-bottom none // 1px solid var(--ghostA)
-  // box-shadow 0px 4px 5px var(--ghostA)
 
 .signerBalanceSliderDisplay
   position absolute

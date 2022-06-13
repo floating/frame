@@ -17,21 +17,21 @@ class RingIcon extends React.Component {
   //   )
   // }
   render () {
-    const { color, svgLookup, img } = this.props
+    const { color, svgLookup, img, small } = this.props
     return (
       <div 
-        className='ringIcon'
+        className={small ? 'ringIcon ringIconSmall' : 'ringIcon'}
         style={{
           borderColor: color
         }}
       >
-        <div className='ringIconInner' style={{ color: color }}>
+        <div className='ringIconInner' style={{ background: color }}>
           {svgLookup ? (
             svg[svgLookup.name] ? svg[svgLookup.name](svgLookup.size) : null
           ) : img ? (
             <img src={img} />
           ) : (
-            svg.eth(18)
+            svg.eth(small ? 13 : 18)
           )}
         </div>
       </div>

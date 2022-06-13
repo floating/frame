@@ -49,55 +49,6 @@ class Notify extends React.Component {
     )
   }
 
-  updateOriginChain ({ origin = 'Unknown' }) {
-    return (
-      <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
-        <div className='notifyBoxSlide'>
-          <div className='notifyBox'>
-            <div className='notifyBody'>
-              <div className='originSwapTitle'>
-                Switch chain for:
-              </div>
-              <div className='originSwapOrigin'>
-                {origin}
-              </div>
-              <div className='originSwapChainList'>
-                {Object.keys(this.store('main.networks.ethereum')).filter(id => {
-                  return this.store('main.networks.ethereum', id, 'on')
-                }).map(id => {
-                  return (
-                    <div className='originSwapChainListItem' onClick={() => {
-                      alert('Set the chain for this origin and close notify dialog')
-                    }}>
-                      {this.store('main.networks.ethereum', id, 'name')}
-                    </div>
-                  )
-                })}
-                {/* <div 
-                  className='notifyBodyLink' 
-                  style={{marginTop: '20px'}}
-                  onMouseDown={() => { link.send('tray:openExternal', 'https://frame.canny.io') }}
-                >
-                  feedback.frame.sh
-                </div> */}
-              </div>
-            </div>
-            {/* <div className='notifyInput'>
-              <div
-                className='notifyInputOption notifyInputSingleButton' onMouseDown={() => {
-                  // link.send('tray:action', 'muteBetaDisclosure')
-                  this.store.notify()
-                }}
-              >
-                <div className='notifyInputOptionText notifyBetaGo'>Update Chain</div>
-              </div>
-            </div> */}
-          </div>
-        </div>
-      </div>
-    )
-  }
-
   betaDisclosure () {
     return (
       <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
@@ -610,9 +561,9 @@ class Notify extends React.Component {
     if (notify === 'mainnet') {
       return (
         <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
-          <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
+          {/* <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
             {'close'}
-          </div>
+          </div> */}
           {this.mainnet()}
         </div>
       )
@@ -631,126 +582,126 @@ class Notify extends React.Component {
     } else if (notify === 'nonceWarning') {
       return (
         <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
-          <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
+          {/* <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
             {'close'}
-          </div>
+          </div> */}
           {this.nonceWarning()}
         </div>
       )
     } else if (notify === 'updateOriginChain') {
       return (
         <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
-          <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
+          {/* <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
             {'close'}
-          </div>
+          </div> */}
           {this.updateOriginChain(this.store('view.notifyData'))}
         </div>
       )
     } else if (notify === 'gasFeeWarning') {
       return (
         <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
-          <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
+          {/* <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
             {'close'}
-          </div>
+          </div> */}
           {this.gasFeeWarning(this.store('view.notifyData'))}
         </div>
       )
     } else if (notify === 'noSignerWarning') {
       return (
         <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
-          <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
+          {/* <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
             {'close'}
-          </div>
+          </div> */}
           {this.noSignerWarning(this.store('view.notifyData'))}
         </div>
       )
     } else if (notify === 'signerLockedWarning') {
       return (
         <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
-          <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
+          {/* <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
             {'close'}
-          </div>
+          </div> */}
           {this.signerLockedWarning(this.store('view.notifyData'))}
         </div>
       )
     } else if (notify === 'signerCompatibilityWarning') {
       return (
         <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
-          <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
+          {/* <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
             {'close'}
-          </div>
+          </div> */}
           {this.signerCompatibilityWarning(this.store('view.notifyData'))}
         </div>
       )
     } else if (notify === 'contractData') {
       return (
         <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
-          <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
+          {/* <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
             {'close'}
-          </div>
+          </div> */}
           {this.contractData()}
         </div>
       )
     } else if (notify === 'hotAccountWarning') {
       return (
         <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
-          <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
+          {/* <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
             {'close'}
-          </div>
+          </div> */}
           {this.hotAccountWarning()}
         </div>
       )
     } else if (notify === 'hotSignerMismatch') {
       return (
         <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
-          <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
+          {/* <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
             {'close'}
-          </div>
+          </div> */}
           {this.hotSignerMismatch()}
         </div>
       )
     } else if (notify === 'openExternal') {
       return (
         <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
-          <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
+          {/* <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
             {'close'}
-          </div>
+          </div> */}
           {this.openExternal(this.store('view.notifyData'))}
         </div>
       )
     } else if (notify === 'openExplorer') {
       return (
         <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
-          <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
+          {/* <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
             {'close'}
-          </div>
+          </div> */}
           {this.openExplorer(this.store('view.notifyData'))}
         </div>
       )
     } else if (notify === 'addChain') {
       return (
         <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
-          <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
+          {/* <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
             {'close'}
-          </div>
+          </div> */}
           <AddChain req={this.store('view.notifyData')} />
         </div>
       )
     } else if (notify === 'addToken') {
       return (
         <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
-          <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
+          {/* <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
             {'close'}
-          </div>
+          </div> */}
           <AddToken req={this.store('view.notifyData')} currentNetworkId={this.store('main.currentNetwork.id')} />
         </div>
       )
     } else if (notify === 'customTokens') {
       return (
         <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
-          <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
+          {/* <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
             {'close'}
-          </div>
+          </div> */}
           <CustomTokens req={this.store('view.notifyData')} />
         </div>
       )

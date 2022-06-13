@@ -307,7 +307,7 @@ class _AccountMain extends React.Component {
           </div>
         ) : null}
         <div className='accountMainScroll' style={{ pointerEvents: this.state.expandedModule ? 'none' : 'auto' }}>
-          <div className='accountMainSlide' style={{ height: slideHeight + 21 + 'px' }}>
+          <div className='accountMainSlide' style={{ height: slideHeight + 'px' }}>
             {modules}
           </div>
         </div>

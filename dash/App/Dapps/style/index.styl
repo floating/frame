@@ -16,42 +16,6 @@
     justify-content center
     align-items center
 
-.sliceOrigin
-  cursor pointer
-  display flex
-  justify-content space-between
-  align-items center
-  position relative
-  height 32px
-  box-sizing border-box
-  font-size 12px
-  font-weight 300
-  border-radius 8px
-  *
-    pointer-events none
-
-  .sliceOriginTile
-    padding 0px 34px 2px 34px
-    color var(--outerspace)
-    font-weight 500
-
-.sliceOrigin:hover
-  background var(--ghostB)
-
-.viewAllOrigin
-  display flex
-  justify-content center
-  align-items center
-  height 10px
-  padding 5px
-  text-transform uppercase
-  font-size 10px
-  font-weight 600
-  color var(--good)
-  cursor pointer
-  *
-    pointer-events none
-
 // .viewAllOrigin:hover
 //   color var(--goodLight)
   
@@ -99,33 +63,70 @@
 //     text-transform uppercase
 //     font-weight bold
 
-// .originSwapTitle
-//   color var(--good)
 
-// .originSwapOrigin
-//   padding 40px
+.originSwapOrigin
+  height 120px
+  width 100%
+  color var(--moon)
+  font-size 20px
+  font-weight 500
+  display flex
+  align-items center
+  justify-content center
+
+  .originSwapOriginText
+    margin-left 10px
+
+.originSwapTitle
+  width 100%
+  display flex
+  justify-content center
+  text-transform uppercase
+  font-size 11px
+  font-weight 500
+  padding-bottom 6px
   
 .originSwapChainList
   background var(--ghostZ)
   border-radius 12px
 
   .originChainItem
+    position relative
     display flex
     justify-content center
     align-items center
-    height 44px
+    height 64px
     margin 6px
     border-radius 12px
     cursor pointer
     background var(--ghostA)
     box-shadow 0px 4px 8px var(--ghostY)
     margin-bottom 10px
+    font-weight 500
+    font-size 18px
 
   .originChainItem:hover
     background var(--ghostA)
 
   .originChainItem:last-child
     border-bottom 0px solid var(--ghostX)
+
+  .originChainItemIcon
+    position absolute
+    top 11px
+    left 11px
+  
+  .originChainItemCheck
+    position absolute
+    bottom 11px
+    right 11px
+    height 42px
+    width 42px
+    display flex
+    justify-content center
+    align-items center
+    background var(--ghostZ)
+    border-radius 8px
 
   .originChainItemActive
     color var(--good)
