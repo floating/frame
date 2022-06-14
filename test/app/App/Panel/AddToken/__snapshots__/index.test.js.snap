@@ -76,7 +76,7 @@ exports[`should generate the expected HTML 1`] = `
                 class="dropdownWrap"
               >
                 <div
-                  class="dropdown  "
+                  class="dropdown tokenInput"
                 >
                   <div
                     class="dropdownItems"

@@ -98,6 +98,7 @@ const persist = require('./store/persist')
 const { default: showUnhandledExceptionDialog } = require('./windows/dialog/unhandledException')
 const { default: Erc20Contract } = require('./contracts/erc20')
 const { default: provider } = require('./provider')
+const { intToHex } = require('../resources/utils')
 
 log.info('Chrome: v' + process.versions.chrome)
 log.info('Electron: v' + process.versions.electron)
@@ -224,7 +225,7 @@ ipcMain.on('tray:switchChain', (e, type, id, req) => {
 })
 
 ipcMain.handle('tray:getTokenDetails', (e, contractAddress, chainId) => {
-  const contract = new Erc20Contract(contractAddress, chainId, provider)
+  const contract = new Erc20Contract(contractAddress, intToHex(chainId), provider)
   return contract.getTokenData()
 })
 

@@ -60,7 +60,7 @@ const start = async () => {
   try {
     node = await ipfs.create()
     const connectPeers = async () => {
-      // const peers = await ens.resolvePeers('frame.eth')
+      // const peers = await ens.resolvePeers('frame-internal')
       for (const peer of peers) {
         await node.swarm.connect(peer)
       }
@@ -77,7 +77,7 @@ const start = async () => {
   }
 
   // const connectPeers = async () => {
-  //   // const peers = await ens.resolvePeers('frame.eth')
+  //   // const peers = await ens.resolvePeers('frame-internal')
   //   for (const peer of peers) await node.swarm.connect(peer)
   // }
   // await connectPeers()

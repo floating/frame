@@ -143,6 +143,7 @@ class AddToken extends Component {
                 <label className='tokenInputLabel'>
                   Chain
                   <Dropdown
+                    className="tokenInput"
                     syncValue={this.state.chainId}
                     onChange={(chainId) => {
                       this.setState({ chainId })

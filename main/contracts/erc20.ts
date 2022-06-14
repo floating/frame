@@ -12,7 +12,7 @@ function createWeb3ProviderWrapper (chainId: string, provider: Provider) {
       params: request.params || [],
       id: 1,
       jsonrpc: '2.0',
-      _origin: 'frame.eth',
+      _origin: 'frame-internal',
       chainId
     }, cb)
   }
