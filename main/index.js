@@ -215,7 +215,7 @@ ipcMain.on('tray:giveAccess', (e, req, access) => {
 
 ipcMain.on('tray:addChain', (e, chain, req) => {
   if (chain) store.addNetwork(chain)
-  accounts.resolveRequest(req)
+  if (req) accounts.resolveRequest(req)
 })
 
 ipcMain.on('tray:switchChain', (e, type, id, req) => {
