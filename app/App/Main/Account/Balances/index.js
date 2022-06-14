@@ -176,10 +176,11 @@ class Balances extends React.Component {
       .filter(rawBalance => isNetworkConnected(networks[rawBalance.chainId]))
       .map(rawBalance => {
         const isNative = isNativeCurrency(rawBalance.address)
+        const nativeCurrencyInfo = networksMeta[rawBalance.chainId].nativeCurrency || {}
 
-        const rate = isNative ? networksMeta[rawBalance.chainId].nativeCurrency || {} : rates[rawBalance.address || rawBalance.symbol] || {}
-        const logoURI = isNative ? networksMeta[rawBalance.chainId].nativeCurrency.icon : rawBalance.logoURI
-        const name = isNative ? networksMeta[rawBalance.chainId].nativeCurrency.name : rawBalance.name
+        const rate = isNative ? nativeCurrencyInfo : rates[rawBalance.address || rawBalance.symbol] || {}
+        const logoURI = isNative ? nativeCurrencyInfo.icon : rawBalance.logoURI
+        const name = isNative ? nativeCurrencyInfo.name || networks[rawBalance.chainId].name : rawBalance.name
         const decimals = isNative ? 18 : rawBalance.decimals
         const chainLayer = networks[rawBalance.chainId].layer || 'testnet'
 
