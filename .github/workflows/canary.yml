@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - 'develop'
+  workflow_dispatch:
 
 env:
  GH_TOKEN: ${{ secrets.GH_RELEASE_DEPLOYMENT_TOKEN }}
