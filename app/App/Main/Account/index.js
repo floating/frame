@@ -1174,7 +1174,7 @@ class Account extends React.Component {
                   <div className='accountGrabber' style={open || true ? { opacity: 0, pointerEvents: 'none' } : {}}>
                     {svg.grab(35)}
                   </div>
-                  <div className='signerSelect' onMouseDown={this.typeClick.bind(this)}>
+                  <div className='signerSelect' onClick={this.typeClick.bind(this)}>
                     <div className='signerSelectIconWrap'>
                       <div className='signerSelectIcon' style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}>
                         {svg.chevron(26)}

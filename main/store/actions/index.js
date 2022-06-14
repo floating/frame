@@ -585,6 +585,9 @@ module.exports = {
     })
     u('panel.showing', () => true)
   },
+  clearNavPanel: (u) => {
+    u('panel.nav', () => [])
+  },
   backPanel: (u) => {
     u('panel.nav', nav => {
       nav.shift()
