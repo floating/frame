@@ -28,7 +28,7 @@ function notify (title: string, body: string, action: (event: Electron.Event) =>
   setTimeout(() => notification.show(), 1000)
 }
 
-const frameOriginId = uuidv5('frame.eth', uuidv5.DNS)
+const frameOriginId = uuidv5('frame-internal', uuidv5.DNS)
 
 const accountsApi = {
   getAccounts: function () {

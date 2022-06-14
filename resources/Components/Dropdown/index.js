@@ -5,7 +5,7 @@ function findIndex (options, value) {
   return index >= 0 ? index : undefined
 }
 
-const Dropdown = ({ options, syncValue, initialValue, style, className = '', onChange, customClass = '' }) => {
+const Dropdown = ({ options, syncValue, initialValue, style, className = '', onChange }) => {
   const [selectedIndex, setSelectedIndex] = useState(findIndex(options, syncValue || initialValue) || options[0])
   const [expanded, setExpanded] = useState(false)
   const ref = createRef()
@@ -51,7 +51,7 @@ const Dropdown = ({ options, syncValue, initialValue, style, className = '', onC
   return (
     <div className="dropdownWrap" ref={ref}>
       <div
-        className={expanded ? `dropdown dropdownExpanded ${className} ${customClass}` : `dropdown ${className} ${customClass}`}
+        className={expanded ? `dropdown dropdownExpanded ${className}` : `dropdown ${className}`}
         style={expanded ? { ...style, height } : { ...style }}
         onClick={(e) => setExpanded(!expanded)}
       >

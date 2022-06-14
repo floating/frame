@@ -127,7 +127,7 @@ class FrameAccount {
 
     if (this.created.split(':')[0] === 'new') {
       provider.on('connect', () => {
-        provider.send({ jsonrpc: '2.0', id: 1, chainId: '0x1', method: 'eth_blockNumber', _origin: 'frame.eth', params: [] }, (response: any) => {
+        provider.send({ jsonrpc: '2.0', id: 1, chainId: '0x1', method: 'eth_blockNumber', _origin: 'frame-internal', params: [] }, (response: any) => {
           if (response.result) this.created = parseInt(response.result, 16) + ':' + this.created.split(':')[1]
           this.update()
         })
