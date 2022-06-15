@@ -66,8 +66,8 @@ jobs:
         run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_AUTH_TOKEN }}" > ./.npmrc
       - run: npm run setup
       - run: npm run compile
-      - run: npm run test:main -- --testTimeout=500 --verbose
-      - run: npm run test:components
+      - run: npm run test:unit:main -- --testTimeout=500 --verbose
+      - run: npm run test:unit:components
       - run: npm run bundle
       - name: Sleep for 4 seconds
         shell: bash
