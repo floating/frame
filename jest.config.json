@@ -4,7 +4,7 @@
   ],
   "testPathIgnorePatterns": [
     "/node_modules/",
-    "<rootDir>/test/main/signers/ledger/adapter"    
+    "<rootDir>/test/main/signers/ledger/adapter"
   ],
   "moduleNameMapper": {
     "^uuid$": "<rootDir>/node_modules/uuid/dist/index.js"
