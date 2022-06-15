@@ -70,37 +70,40 @@ export default function (eth: EthereumProvider) {
   }
 
   async function getTokenBalance (token: TokenDefinition, owner: string)  {
-    try {
-      const functionData = erc20Interface.encodeFunctionData('balanceOf', [owner])
+    const functionData = erc20Interface.encodeFunctionData('balanceOf', [owner])
 
-      const response = await eth.request({
-        method: 'eth_call',
-        jsonrpc: '2.0',
-        id: id += 1,
-        chainId: addHexPrefix(token.chainId.toString(16)),
-        params: [{ to: token.address, value: '0x0', data: functionData }, 'latest']
-      })
+    const response = await eth.request({
+      method: 'eth_call',
+      jsonrpc: '2.0',
+      id: id += 1,
+      chainId: addHexPrefix(token.chainId.toString(16)),
+      params: [{ to: token.address, value: '0x0', data: functionData }, 'latest']
+    })
 
-      const result = erc20Interface.decodeFunctionResult('balanceOf', response)
+    const result = erc20Interface.decodeFunctionResult('balanceOf', response)
 
-      return result.balance.toHexString()
-    } catch (e) {
-      log.warn(`could not load balance for token with address ${token.address}`, e)
-      return '0x0'
-    }
+    return result.balance.toHexString()
   }
 
   async function getTokenBalancesFromContracts (owner: string, tokens: TokenDefinition[]) {
     const balances = tokens.map(async token => {
-      const rawBalance = await getTokenBalance(token, owner)
+      try {
+        if (token.symbol.toLowerCase() === "dai" && Math.random() < 0.3) {
+          throw new Error('testing DAI!')
+        }
+        const rawBalance = await getTokenBalance(token, owner)
 
-      return {
-        ...token,
-        ...createBalance(rawBalance, token.decimals)
+        return {
+          ...token,
+          ...createBalance(rawBalance, token.decimals)
+        }
+      } catch (e) {
+        log.warn(`could not load balance for token with address ${token.address}`, e)
+        return undefined
       }
     })
 
-    return Promise.all(balances)
+    return Promise.all(balances).then(loaded => loaded.filter(bal => bal !== undefined)) as Promise<Balance[]>
   }
 
   async function getTokenBalancesFromMulticall (owner: string, tokens: TokenDefinition[], chainId: number) {
@@ -108,13 +111,16 @@ export default function (eth: EthereumProvider) {
 
     const results = await multicall(chainId, eth).batchCall(calls)
 
-    return results.map((result, i) => {
-      const balance = result.success ? result.returnValues[0] : createBalance('0x0', tokens[i].decimals)
-      return {
-        ...tokens[i],
-        ...balance
+    return results.reduce((acc, result, i) => {
+      if (result.success) {
+        acc.push({
+          ...tokens[i],
+          ...result.returnValues[0]
+        })
       }
-    })
+
+      return acc
+    }, [] as Balance[])
   }
 
   return {
