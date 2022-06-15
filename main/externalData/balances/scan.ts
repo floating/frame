@@ -99,8 +99,10 @@ export default function (eth: EthereumProvider) {
         return undefined
       }
     })
+    
+    const loadedBalances = await Promise.all(balances)
 
-    return Promise.all(balances).then(loaded => loaded.filter(bal => bal !== undefined)) as Promise<Balance[]>
+    return loadedBalances.filter(bal => bal !== undefined) as Balance[]
   }
 
   async function getTokenBalancesFromMulticall (owner: string, tokens: TokenDefinition[], chainId: number) {
