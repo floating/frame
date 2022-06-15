@@ -93,15 +93,15 @@ class Main extends React.Component {
               })}
               {Object.keys(accounts).length === 0 ? (
                 <div className='noSigners'>
-                  <div className='introLogo'>{svg.logo(70)}</div>
-                  {`No Accounts Found`}
-                  <span className='getStarted'>
+                  {/* <div className='introLogo'>{svg.logo(70)}</div> */}
+                  {`No Accounts Added`}
+                  {/* <span className='getStarted'>
                     Add accounts using <div className='getStartedPlus'><span>+</span></div> above
                   </span>
                   <div className='discordInvite' style={{ margin: '0px' }} onMouseDown={() => this.store.notify('openExternal', { url: 'https://discord.gg/UH7NGqY' })}>
                     <div>Need help getting started?</div>
                     <div className='discordLink'>Join our Discord!</div>
-                  </div>
+                  </div> */}
                 </div>
               ) : null}
             </div>
