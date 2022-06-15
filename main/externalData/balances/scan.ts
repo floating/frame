@@ -88,9 +88,6 @@ export default function (eth: EthereumProvider) {
   async function getTokenBalancesFromContracts (owner: string, tokens: TokenDefinition[]) {
     const balances = tokens.map(async token => {
       try {
-        if (token.symbol.toLowerCase() === "dai" && Math.random() < 0.3) {
-          throw new Error('testing DAI!')
-        }
         const rawBalance = await getTokenBalance(token, owner)
 
         return {
