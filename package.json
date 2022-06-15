@@ -1,6 +1,6 @@
 {
   "name": "frame",
-  "version": "0.5.0-beta.19",
+  "version": "0.5.0-beta.20",
   "description": "System-wide web3",
   "main": "compiled/main",
   "build": {
@@ -76,28 +76,15 @@
     "publish": "electron-builder -c.snap.publish=github",
     "release": "npm run compile && sleep 4 && npm run bundle && sleep 4 && npm run publish",
     "postinstall": "electron-builder install-app-deps",
-    "test": "npm run compile && npm run test:main && npm run test:components && npm run test:e2e",
-    "test:unit": "jest --detectOpenHandles --runInBand",
-    "test:main": "jest --env=node --detectOpenHandles --runInBand ./test/main",
-    "test:components": "jest --env=jsdom --detectOpenHandles --testTimeout=300 ./test/app",
-    "test:e2e": "jest --env=node --detectOpenHandles --runInBand --testPathPattern=e2e",
-    "test:e2e:nodeploy": "jest --env=node --detectOpenHandles --runInBand --testPathPattern=e2e --testPathIgnorePatterns=deploy",
+    "test": "npm run compile && npm run test:unit && npm run test:e2e",
+    "test:exec": "jest --detectOpenHandles --runInBand",
+    "test:unit": "npm run test:unit:main && npm run test:unit:components",
+    "test:unit:main": "npm run test:exec -- --env=node ./test/main",
+    "test:unit:components": "npm run test:exec -- --env=jsdom --testTimeout=500 ./test/app",
+    "test:e2e": "npm run test:exec -- --env=node ./test/e2e",
     "test:usbAdapters": "ELECTRON_RUN_AS_NODE=true ./node_modules/.bin/electron ./node_modules/jest/bin/jest.js ./test/main/signers/ledger/adapter.test.js --testPathIgnorePatterns=''",
     "standard": "standardx --fix --verbose",
-    "test:clients": "mocha test/clients/*.test.js",
     "local:rpc": "ganache-cli --account=\"0x2d6945dbddb8dcf5492004e6f720f8e971196ff61a61c4be99714ebc71e06c00,  5000000000000000000000\" --account=\"0xaef6a68a47c1628081e4e6df195f5f712ae4eb7da332a6d74dca06ae32a3e7ae,5000\""
-  },
-  "jest": {
-    "testTimeout": 100,
-    "clearMocks": true,
-    "roots": [
-      "test"
-    ],
-    "testPathIgnorePatterns": [
-      "/node_modules/",
-      "<rootDir>/test/e2e/",
-      "<rootDir>/test/main/signers/ledger/adapter"
-    ]
   },
   "author": {
     "name": "Frame Labs",
@@ -155,19 +142,19 @@
     "zxcvbn": "4.4.2"
   },
   "devDependencies": {
-    "@babel/core": "7.17.9",
-    "@babel/node": "7.16.8",
-    "@babel/plugin-proposal-decorators": "7.17.9",
-    "@babel/plugin-proposal-do-expressions": "7.16.7",
-    "@babel/plugin-proposal-export-default-from": "7.16.7",
-    "@babel/plugin-proposal-function-bind": "7.16.7",
-    "@babel/plugin-proposal-function-sent": "7.16.7",
-    "@babel/plugin-proposal-pipeline-operator": "7.17.6",
-    "@babel/plugin-proposal-throw-expressions": "7.16.7",
+    "@babel/core": "^7.18.5",
+    "@babel/node": "^7.18.5",
+    "@babel/plugin-proposal-decorators": "^7.18.2",
+    "@babel/plugin-proposal-do-expressions": "^7.16.7",
+    "@babel/plugin-proposal-export-default-from": "^7.17.12",
+    "@babel/plugin-proposal-function-bind": "^7.16.7",
+    "@babel/plugin-proposal-function-sent": "^7.18.2",
+    "@babel/plugin-proposal-pipeline-operator": "^7.18.2",
+    "@babel/plugin-proposal-throw-expressions": "^7.16.7",
     "@babel/plugin-syntax-import-meta": "7.10.4",
-    "@babel/preset-env": "7.16.11",
-    "@babel/preset-react": "7.16.7",
-    "@babel/preset-typescript": "7.16.7",
+    "@babel/preset-env": "^7.18.2",
+    "@babel/preset-react": "^7.17.12",
+    "@babel/preset-typescript": "^7.17.12",
     "@lavamoat/allow-scripts": "^2.0.2",
     "@lavamoat/preinstall-always-fail": "^1.0.0",
     "@ledgerhq/hw-transport-mocker": "6.24.1",
@@ -176,7 +163,7 @@
     "@types/cookie": "0.4.1",
     "@types/get-pixels": "3.3.2",
     "@types/hdkey": "^2.0.1",
-    "@types/jest": "27.4.1",
+    "@types/jest": "^28.1.1",
     "@types/node": "17.0.23",
     "@types/node-fetch": "2.6.1",
     "@types/node-hid": "1.3.1",
@@ -185,7 +172,8 @@
     "electron-builder": "23.0.3",
     "electron-notarize": "1.2.1",
     "hardhat": "2.9.3",
-    "jest": "27.5.1",
+    "jest": "^28.1.1",
+    "jest-environment-jsdom": "^28.1.1",
     "node-abi": "^3.8.0",
     "node-gyp": "8.4.1",
     "node-watch": "0.7.3",
@@ -195,10 +183,9 @@
     "shx": "0.3.4",
     "standardx": "7.0.0",
     "stylus": "0.57.0",
-    "ts-jest": "27.1.4",
-    "typescript": "4.6.3"
+    "typescript": "4.7.3"
   },
-  "standard": {
+  "standardx": {
     "parser": "babel-eslint",
     "env": [
       "jest"
@@ -211,6 +198,9 @@
       "react/no-find-dom-node": 0
     }
   },
+  "browserslist": [
+    "last 1 Electron major version"
+  ],
   "repository": "github:floating/frame",
   "lavamoat": {
     "allowScripts": {
