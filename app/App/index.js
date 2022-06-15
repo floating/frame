@@ -76,11 +76,10 @@ class Panel extends React.Component {
     if (this.store('panel.view') === 'settings') markLeft = 122
     return (
       <div id='panel' style={{ opacity }}>
+        <Badge />
         <Menu />
         <Notify />
         <Main />
-        <Badge />
-        <Menu position='bottom' />
         <Aux />
       </div>
     )
