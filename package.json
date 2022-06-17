@@ -101,7 +101,7 @@
     "react-restore": "0.5.0",
     "react-transition-group": "4.4.2",
     "semver": "7.3.6",
-    "trezor-connect": "8.2.7",
+    "trezor-connect": "8.2.9-extended",
     "uuid": "8.3.2",
     "web3-utils": "1.7.3",
     "ws": "8.5.0",
@@ -208,7 +208,10 @@
       "parcel-bundler>@parcel/watcher>chokidar>fsevents": false,
       "ws>bufferutil": false,
       "ws>utf-8-validate": false,
-      "gridplus-sdk": false
+      "gridplus-sdk": false,
+      "trezor-connect>@trezor/transport>protobufjs": false,
+      "trezor-connect>@trezor/utxo-lib>blake-hash": false,
+      "trezor-connect>@trezor/utxo-lib>tiny-secp256k1": false
     }
   }
 }
