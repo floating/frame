@@ -80,7 +80,6 @@ function initDashWindow () {
   })
 
   const dashUrl = new URL(path.join(process.env.BUNDLE_LOCATION, 'dash.html'), 'file:')
-
   windows.dash.loadURL(dashUrl.toString())
 }
 
@@ -104,9 +103,8 @@ function initTrayWindow () {
   })
 
   const trayUrl = new URL(path.join(process.env.BUNDLE_LOCATION, 'tray.html'), 'file:')
-  // trayUrl.protocol = 'file';
-
   windows.tray.loadURL(trayUrl.toString())
+
   windows.tray.on('closed', () => delete windows.tray)
   windows.tray.webContents.on('will-navigate', e => e.preventDefault()) // Prevent navigation
   windows.tray.webContents.on('will-attach-webview', e => e.preventDefault()) // Prevent attaching <webview>
@@ -115,8 +113,10 @@ function initTrayWindow () {
   windows.tray.setResizable(false)
   windows.tray.setMovable(false)
   windows.tray.setSize(0, 0)
+
   const { width, height, x, y } = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
   windows.tray.setPosition(width + x, height + y)
+  
   if (process.platform === 'linux') {
     const quitMenuItem = { label: 'Quit', click: () => app.quit() }
     const menuShow = Menu.buildFromTemplate([{ label: 'Show', click: () => tray.show() }, quitMenuItem])
@@ -131,9 +131,11 @@ function initTrayWindow () {
       windows.tray.on('focus', () => tray.show())
     }, 2000)
   }
+  
   if (isDev) {
     windows.tray.webContents.openDevTools()
   }
+  
   setTimeout(() => {
     windows.tray.on('blur', () => {
       const frameShowing = frameManager.isFrameShowing()
@@ -143,6 +145,7 @@ function initTrayWindow () {
     })
     windows.tray.focus()
   }, 1260)
+
   if (!openedAtLogin) {
     windows.tray.once('ready-to-show', () => {
       console.log('ready to show', tray.show)
