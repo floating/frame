@@ -1,5 +1,4 @@
 import { app, BrowserWindow, ipcMain, screen, Tray as ElectronTray, Menu, globalShortcut, IpcMainEvent, WebContents } from 'electron'
-import url from 'url'
 import path from 'path'
 import log from 'electron-log'
 import EventEmitter from 'events'
@@ -80,13 +79,9 @@ function initDashWindow () {
     }
   })
 
-  const dashUrl = url.format({
-    pathname: path.join(process.env.BUNDLE_LOCATION, 'dash.html'),
-    protocol: 'file',
-    slashes: true
-  })
+  const dashUrl = new URL(path.join(process.env.BUNDLE_LOCATION, 'dash.html'), 'file:')
 
-  windows.dash.loadURL(dashUrl)
+  windows.dash.loadURL(dashUrl.toString())
 }
 
 function initTrayWindow () {
@@ -108,13 +103,10 @@ function initTrayWindow () {
     }
   })
 
-  const trayUrl = url.format({
-    pathname: path.join(process.env.BUNDLE_LOCATION, 'tray.html'),
-    protocol: 'file',
-    slashes: true
-  })
+  const trayUrl = new URL(path.join(process.env.BUNDLE_LOCATION, 'tray.html'), 'file:')
+  // trayUrl.protocol = 'file';
 
-  windows.tray.loadURL(trayUrl)
+  windows.tray.loadURL(trayUrl.toString())
   windows.tray.on('closed', () => delete windows.tray)
   windows.tray.webContents.on('will-navigate', e => e.preventDefault()) // Prevent navigation
   windows.tray.webContents.on('will-attach-webview', e => e.preventDefault()) // Prevent attaching <webview>
