@@ -177,10 +177,10 @@ export default class FrameManager {
     Object.keys(this.frameInstances).forEach(id => this.sendMessageToFrame(id, channel, ...args))
   }
 
-  reloadFrames (style: any, name: any) {
+  reloadFrames (style?: string) {
     if (style) {
       Object.keys(this.frameInstances).forEach(win => {
-        this.frameInstances[win].webContents.send('main:reload:style', name)
+        this.frameInstances[win].webContents.send('main:reload:style', style)
       })
     } else {
       Object.keys(this.frameInstances).forEach(win => {

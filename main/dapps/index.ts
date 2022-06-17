@@ -1,12 +1,11 @@
 import { hash } from 'eth-ens-namehash'
 import log from 'electron-log'
 import crypto from 'crypto'
-import store from '../store'
 
-// @ts-ignore
-import windows from '../windows'
+import store from '../store'
 import nebulaApi from '../nebula'
 import server from './server'
+import extractColors from '../windows/extractColors'
 
 const nebula = nebulaApi()
 
@@ -21,7 +20,7 @@ async function getDappColors (dappId: string) {
 
   const url = `http://${dapp.ens}.localhost:8421/?session=${session}`
   try {
-    const colors = await windows.extractColors(url, dapp.ens)
+    const colors = await extractColors(url, dapp.ens)
     store.updateDapp(dappId, { colors })
     server.sessions.remove(dapp.ens, session)
   } catch (e) {
