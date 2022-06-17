@@ -111,7 +111,7 @@ class FrameAccount {
           this.signerStatus = updatedSigner.status
 
           if (updatedSigner.status === 'ok' && this.id === this.accounts._current) {
-              this.verifyAddress(false, (err, verified) => {
+              this.verifyAddress(false, (err: Error | null, verified) => {
               if (!err && !verified) this.signer = ''
             })
           }

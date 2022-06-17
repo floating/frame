@@ -1,29 +1,38 @@
-const { app, ipcMain, protocol, shell, clipboard, globalShortcut, BrowserWindow } = require('electron')
+import { app, ipcMain, protocol, shell, clipboard, globalShortcut, BrowserWindow } from 'electron'
+import path from 'path'
+import * as Sentry from '@sentry/electron'
+import log from 'electron-log'
+import url from 'url'
 
-app.commandLine.appendSwitch('enable-accelerated-2d-canvas', true)
-app.commandLine.appendSwitch('enable-gpu-rasterization', true)
-app.commandLine.appendSwitch('force-gpu-rasterization', true)
-app.commandLine.appendSwitch('ignore-gpu-blacklist', true)
-app.commandLine.appendSwitch('enable-native-gpu-memory-buffers', true)
+import windows from './windows'
+import menu from './menu'
+import store from './store'
+import dapps from './dapps'
+import accounts from './accounts'
+import * as launch from './launch'
+import * as updater from './updater'
+import signers from './signers'
+import * as persist from './store/persist'
+import showUnhandledExceptionDialog from './windows/dialog/unhandledException'
+import Erc20Contract from './contracts/erc20'
+import provider from './provider'
+
+require('./rpc')
+
+app.commandLine.appendSwitch('enable-accelerated-2d-canvas', 'true')
+app.commandLine.appendSwitch('enable-gpu-rasterization', 'true')
+app.commandLine.appendSwitch('force-gpu-rasterization', 'true')
+app.commandLine.appendSwitch('ignore-gpu-blacklist', 'true')
+app.commandLine.appendSwitch('enable-native-gpu-memory-buffers', 'true')
 app.commandLine.appendSwitch('force-color-profile', 'srgb')
 
-const path = require('path')
 process.env.BUNDLE_LOCATION = process.env.BUNDLE_LOCATION || path.resolve(__dirname, './../..', 'bundle')
 
 // app.commandLine.appendSwitch('enable-transparent-visuals', true)
 // if (process.platform === 'linux') app.commandLine.appendSwitch('disable-gpu', true)
 
-const Sentry = require('@sentry/electron')
-const log = require('electron-log')
-const url = require('url')
-
 log.transports.console.level = process.env.LOG_LEVEL || 'info'
 log.transports.file.level = ['development', 'test'].includes(process.env.NODE_ENV) ? false : 'verbose'
-
-const windows = require('./windows')
-const menu = require('./menu')
-const store = require('./store').default
-const dapps = require('./dapps').default
 
 function getCrashReportFields () {
   const fields = ['networks', 'networksMeta', 'tokens']
@@ -86,19 +95,6 @@ Sentry.init({
 //   })
 // })
 
-const accounts = require('./accounts').default
-
-const launch = require('./launch')
-const updater = require('./updater')
-require('./rpc')
-// const clients = require('./clients')
-const signers = require('./signers').default
-const persist = require('./store/persist')
-
-const { default: showUnhandledExceptionDialog } = require('./windows/dialog/unhandledException')
-const { default: Erc20Contract } = require('./contracts/erc20')
-const { default: provider } = require('./provider')
-
 log.info('Chrome: v' + process.versions.chrome)
 log.info('Electron: v' + process.versions.electron)
 log.info('Node: v' + process.versions.node)
@@ -110,8 +106,9 @@ process.on('uncaughtException', e => {
   Sentry.captureException(e)
 
   log.error('uncaughtException', e)
+  console.log('uncaughtException', e)
 
-  if (e.code === 'EPIPE') {
+  if (e.name === 'EPIPE') {
     log.error('uncaught EPIPE error', e)
     return
   }
@@ -119,7 +116,7 @@ process.on('uncaughtException', e => {
   if (!closing) {
     closing = true
 
-    showUnhandledExceptionDialog(e.message, e.code)
+    showUnhandledExceptionDialog(e.message, e.name)
   }
 })
 
@@ -261,7 +258,7 @@ ipcMain.on('tray:updateRestart', () => {
 
 ipcMain.on('tray:refreshMain', () => windows.broadcast('main:action', 'syncMain', store('main')))
 
-ipcMain.on('tray:toggleFlow', () => windows.toggleFlow())
+// ipcMain.on('tray:toggleFlow', () => windows.toggleFlow())
 
 ipcMain.on('frame:close', e => {
   windows.close(e)
@@ -299,7 +296,7 @@ dapps.add({
 // })
 
 ipcMain.on('unsetCurrentView', async (e, ens) => {
-  const win = BrowserWindow.fromWebContents(e.sender)
+  const win = BrowserWindow.fromWebContents(e.sender) as FrameWindow
   dapps.unsetCurrentView(win.frameId)
 })
 
@@ -321,7 +318,7 @@ ipcMain.on('*:addFrame', (e, id) => {
 // if (process.platform !== 'darwin' && process.platform !== 'win32') app.disableHardwareAcceleration()
 app.on('ready', () => {
   menu()
-  windows.tray()
+  windows.init()
   // if (process.platform === 'darwin' || process.platform === 'win32') {
   //   windows.tray()
   // } else {
@@ -336,7 +333,7 @@ app.on('ready', () => {
     if (filePath.startsWith(appOrigin)) cb({ path: filePath }) // eslint-disable-line
   })
 
-  store.observer(_ => {
+  store.observer(() => {
     if (store('dash.showing')) {
       windows.showDash()
     } else {
@@ -347,7 +344,7 @@ app.on('ready', () => {
     const altSlash = store('main.shortcuts.altSlash')
     if (altSlash) {
       globalShortcut.unregister('Alt+/')
-      globalShortcut.register('Alt+/', () => windows.trayClick())
+      globalShortcut.register('Alt+/', () => windows.toggleTray())
     } else {
       globalShortcut.unregister('Alt+/')
     }
@@ -368,7 +365,7 @@ ipcMain.on('tray:action', (e, action, ...args) => {
   log.info('Tray sent unrecognized action: ', action)
 })
 
-app.on('activate', () => windows.activate())
+app.on('activate', () => windows.showTray())
 app.on('will-quit', () => app.quit())
 app.on('quit', async () => {
   // await clients.stop()
