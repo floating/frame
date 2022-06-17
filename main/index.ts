@@ -16,7 +16,7 @@ import * as persist from './store/persist'
 import showUnhandledExceptionDialog from './windows/dialog/unhandledException'
 import Erc20Contract from './contracts/erc20'
 import provider from './provider'
-import { instanceOfNodeError } from '../resources/utils'
+import { getErrorCode, instanceOfNodeError } from '../resources/utils'
 
 require('./rpc')
 
@@ -108,10 +108,7 @@ process.on('uncaughtException', e => {
 
   log.error('uncaughtException', e)
 
-  let errorCode = ''
-  if (instanceOfNodeError(e, Error)) {
-    errorCode = e.code as string
-  }
+  const errorCode = getErrorCode(e) ?? ''
 
   if (errorCode === 'EPIPE') {
     log.error('uncaught EPIPE error', e)
