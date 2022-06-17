@@ -231,7 +231,7 @@ class Tray {
     windows.tray.setPosition(0, 0)
     windows.tray.setAlwaysOnTop(true)
     windows.tray.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
-    windows.tray.setResizable(false) // Keeps height consistant
+    windows.tray.setResizable(false) // Keeps height consistent
     const area = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
     windows.tray.setMinimumSize(trayWidth, isDev && !fullheight ? 740 : area.height)
     windows.tray.setSize(trayWidth, isDev && !fullheight ? 740 : area.height)
