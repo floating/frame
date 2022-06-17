@@ -16,6 +16,7 @@ import * as persist from './store/persist'
 import showUnhandledExceptionDialog from './windows/dialog/unhandledException'
 import Erc20Contract from './contracts/erc20'
 import provider from './provider'
+import { instanceOfNodeError } from '../resources/utils'
 
 require('./rpc')
 
@@ -106,9 +107,13 @@ process.on('uncaughtException', e => {
   Sentry.captureException(e)
 
   log.error('uncaughtException', e)
-  console.log('uncaughtException', e)
 
-  if (e.name === 'EPIPE') {
+  let errorCode = ''
+  if (instanceOfNodeError(e, Error)) {
+    errorCode = e.code as string
+  }
+
+  if (errorCode === 'EPIPE') {
     log.error('uncaught EPIPE error', e)
     return
   }
@@ -116,7 +121,7 @@ process.on('uncaughtException', e => {
   if (!closing) {
     closing = true
 
-    showUnhandledExceptionDialog(e.message, e.name)
+    showUnhandledExceptionDialog(e.message, errorCode)
   }
 })
 
