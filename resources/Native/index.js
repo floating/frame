@@ -19,14 +19,6 @@ class Title extends React.Component {
     link.send('frame:unmax')
   }
 
-  handleFull () {
-    link.send('frame:full')
-  }
-
-  handleUnfull () {
-    link.send('frame:unfull')
-  }
-
   render () {
     const platform = this.store('platform')
     const { fullscreen, maximized } = this.store('main.frames', window.frameId)
