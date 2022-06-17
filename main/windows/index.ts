@@ -224,12 +224,10 @@ class Tray {
   }
 
   public show () {
-    console.log('zomg show')
     clearTimeout(mouseTimeout)
     if (!windows.tray) {
       return init()
     }
-    console.log('zomg showing')
     windows.tray.setPosition(0, 0)
     windows.tray.setAlwaysOnTop(true)
     windows.tray.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
