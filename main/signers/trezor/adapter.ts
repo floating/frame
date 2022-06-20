@@ -93,7 +93,7 @@ export default class TrezorSignerAdapter extends SignerAdapter {
 
     TrezorBridge.on('trezor:update', (device: TrezorDevice) => {
       this.withSigner(device, signer => {
-        log.verbose(`Trezor ${signer.id} updated`)
+        log.debug(`Trezor ${signer.id} updated`)
 
         signer.device = device
       })
@@ -112,9 +112,9 @@ export default class TrezorSignerAdapter extends SignerAdapter {
     })
 
     TrezorBridge.on('trezor:needPin', (device: TrezorDevice) => {
-      log.verbose(`Trezor ${device.id} needs pin`)
-
       this.withSigner(device, signer => {
+        log.verbose(`Trezor ${signer.id} needs pin`)
+
         const currentStatus = signer.status
 
         this.addEventHandler(signer, 'trezor:entered:pin', () => {
@@ -128,9 +128,9 @@ export default class TrezorSignerAdapter extends SignerAdapter {
     })
 
     TrezorBridge.on('trezor:needPhrase', (device: TrezorDevice) => {
-      log.verbose(`Trezor ${device.id} needs passphrase`)
-
       this.withSigner(device, signer => {
+        log.verbose(`Trezor ${signer.id} needs passphrase`)
+
         const currentStatus = signer.status
 
         this.addEventHandler(signer, 'trezor:entered:passphrase', () => {
