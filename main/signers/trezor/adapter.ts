@@ -187,8 +187,9 @@ export default class TrezorSignerAdapter extends SignerAdapter {
   reload (trezor: Trezor) {
     log.info(`reloading Trezor ${trezor.id}`)
 
+    // forces a reload of the given device which will fire device connected
+    // events that are handled above
     TrezorBridge.getFeatures(trezor.path)
-    //trezor.deriveAddresses()
   }
 
   private addEventHandler (signer: Trezor, event: string, handler: (device: TrezorDevice) => void) {
