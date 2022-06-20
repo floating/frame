@@ -37,8 +37,8 @@ function createErrorMessage (message: string, cause: string) {
 }
 
 export default class Trezor extends Signer {
-  device?: TrezorDevice;
-  derivation: Derivation | undefined;
+  device?: TrezorDevice
+  derivation: Derivation | undefined
 
   constructor (id: string) {
     super()
