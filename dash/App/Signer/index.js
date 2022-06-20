@@ -261,7 +261,9 @@ class Signer extends React.Component {
 
     const hwSigner = isHardwareSigner(this.props.type)
     const loading = isLoading(status)
-    const disconnected = this.props.type === 'lattice' && !loading && status !== 'ok'
+    const disconnected =
+      (this.props.type === 'lattice' && !loading && status !== 'ok') ||
+      (this.props.type === 'trezor' && !loading && status === 'disconnected')
 
     // UI changes for this status only apply to hot signers
     const isLocked = !hwSigner && status === 'locked'

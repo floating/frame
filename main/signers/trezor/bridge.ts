@@ -53,6 +53,10 @@ class TrezorBridge extends EventEmitter {
   }
 
   // methods to send requests from the application to a Trezor device
+  async getFeatures (devicePath: string) {
+    return this.makeRequest(() => TrezorConnect.getFeatures({ device: { path: devicePath } }))
+  }
+
   async getPublicKey (device: Device, path: string) {
     return this.makeRequest(() => TrezorConnect.getPublicKey({ path, device }))
   }

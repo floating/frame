@@ -4,6 +4,9 @@ import { padToEven, stripHexPrefix, addHexPrefix } from 'ethereumjs-util'
 import { TypedData, TypedDataUtils } from 'eth-sig-util'
 import type { Device as TrezorDevice } from 'trezor-connect'
 
+// @ts-ignore
+import { v5 as uuid } from 'uuid'
+
 import Signer from '../../Signer'
 import { TransactionData } from '../../../../resources/domain/transaction'
 import { sign, londonToLegacy, signerCompatibility } from '../../../transaction'
@@ -11,6 +14,8 @@ import { sign, londonToLegacy, signerCompatibility } from '../../../transaction'
 import { Derivation, getDerivationPath } from '../../Signer/derive'
 import { TypedTransaction } from '@ethereumjs/tx'
 import TrezorBridge from '../bridge'
+
+const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
 
 const defaultTrezorTVersion = { major_version: 2, minor_version: 3, patch_version: 0 }
 const defaultTrezorOneVersion = { major_version: 1, minor_version: 9, patch_version: 2 }
@@ -37,15 +42,22 @@ function createErrorMessage (message: string, cause: string) {
 }
 
 export default class Trezor extends Signer {
+  readonly path: string
+
   device?: TrezorDevice
   derivation: Derivation | undefined
 
-  constructor (id: string) {
+  constructor (path: string) {
     super()
 
-    this.id = id
+    this.path = path
+    this.id = Trezor.generateId(path)
     this.type = 'trezor'
     this.status = Status.INITIAL
+  }
+
+  static generateId (path: string) {
+    return uuid('Trezor' + path, ns)
   }
 
   open (device: TrezorDevice) {
