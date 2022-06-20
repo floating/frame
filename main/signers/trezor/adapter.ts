@@ -33,16 +33,11 @@ export default class TrezorSignerAdapter extends SignerAdapter {
   }
 
   open () {
-    const scanListener = (err: any) => {
-      if (err) return log.error(err)
-    }
-
-    const readyListener = () => {
+    TrezorBridge.on('connect', () => {
       this.observer = store.observer(() => {
         const trezorDerivation = store('main.trezor.derivation')
 
         Object.values(this.knownSigners).forEach(signerInfo => {
-          console.log('**** UPDATING DERIVATION')
           const trezor = signerInfo.signer
           if (trezor.derivation !== trezorDerivation) {
             trezor.derivation = trezorDerivation
@@ -50,9 +45,7 @@ export default class TrezorSignerAdapter extends SignerAdapter {
           }
         })
       })
-    }
-
-    TrezorBridge.on('connect', readyListener)
+    })
 
     TrezorBridge.on('trezor:detected', (path: string) => {
       // create a new signer whenever a Trezor is detected, but it won't be opened
@@ -85,33 +78,23 @@ export default class TrezorSignerAdapter extends SignerAdapter {
       const version = [trezor.appVersion.major, trezor.appVersion.minor, trezor.appVersion.patch].join('.')
       log.info(`Trezor ${id} connected: ${trezor.model}, firmware v${version}`)
 
-      // wait for a session id to be established before attempting to derive addresses
-      this.addEventHandler(trezor, 'trezor:session:created', () => {
-        log.verbose(`Trezor ${id} session created`)
-
-        // arbitrary delay to attempt to prevent message conflicts on first connection
-        setTimeout(() => trezor.deriveAddresses(), 100)
-      })
+      // arbitrary delay to attempt to minimize message conflicts on first connection
+      setTimeout(() => trezor.deriveAddresses(), 200)
     })
 
     TrezorBridge.on('trezor:disconnect', (device: TrezorDevice) => {
-      log.info(`Trezor ${device.id} disconnected`)
-
       this.withSigner(device, signer => {
+        log.info(`Trezor ${signer.id} disconnected`)
+
         this.remove(signer)
       })
     })
 
     TrezorBridge.on('trezor:update', (device: TrezorDevice) => {
       this.withSigner(device, signer => {
-        log.verbose(`Trezor ${signer.id} updated`, { session: device.features?.session_id })
-        const oldDevice = signer.device
+        log.verbose(`Trezor ${signer.id} updated`)
 
         signer.device = device
-
-        if (!oldDevice?.features?.session_id && device.features?.session_id) {
-          this.handleEvent(signer.id, 'trezor:session:created')
-        }
       })
     })
 
@@ -217,7 +200,7 @@ export default class TrezorSignerAdapter extends SignerAdapter {
   }
 
   private withSigner (device: TrezorDevice, fn: (signer: Trezor) => void) {
-    const signer = this.knownSigners[generateId(device.path)].signer
+    const signer = this.knownSigners[generateId(device.path)]?.signer
 
     if (signer) fn(signer)
   }

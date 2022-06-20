@@ -1,6 +1,6 @@
 import log from 'electron-log'
 import { EventEmitter } from 'events'
-import TrezorConnect, { Device, DEVICE, DeviceEvent, DEVICE_EVENT, EthereumSignTransaction, EthereumSignTypedDataMessage, EthereumSignTypedDataTypes, EthereumTransaction, EthereumTransactionEIP1559, Response, UI, UiEvent, UI_EVENT } from 'trezor-connect'
+import TrezorConnect, { Device, DEVICE, DeviceEvent, DEVICE_EVENT, EthereumSignTransaction, EthereumSignTypedDataMessage, EthereumSignTypedDataTypes, EthereumTransaction, EthereumTransactionEIP1559, Response, TRANSPORT_EVENT, UI, UiEvent, UI_EVENT } from 'trezor-connect'
 
 export class ConnectError extends Error {
   private readonly code
@@ -19,7 +19,7 @@ const config = {
   popup: false,
   webusb: false,
   debug: false,
-  lazyLoad: true
+  lazyLoad: false
 }
 
 async function handleResponse <T> (p: Response<T>) {
@@ -41,10 +41,6 @@ class TrezorBridge extends EventEmitter {
       log.info('Trezor Connect initialized')
 
       this.emit('connect')
-
-      // this will force the lazy loading of Trezor devices and
-      // start the flow of events
-      TrezorConnect.getFeatures()
     } catch (e) {
       log.error('could not open TrezorConnect!', e)
     }
@@ -118,24 +114,6 @@ class TrezorBridge extends EventEmitter {
     this.emit('trezor:entered:pin', deviceId)
   }
 
-  async makeRequest <T> (fn: () => Response<T>) {
-    try {
-      const result = await handleResponse(fn())
-      return result
-    } catch (e: any) {
-      if (e.code === 'Device_CallInProgress') {
-        return new Promise<T>(resolve => {
-          setTimeout(() => {
-            log.warn('request conflict, trying again in 200ms', e)
-            resolve(this.makeRequest(fn))
-          }, 200)
-        })
-      } else {
-        throw e
-      }
-    }
-  }
-
   async passphraseEntered (deviceId: string, phrase: string) {
     log.debug('passphrase entered for device', deviceId)
 
@@ -157,6 +135,24 @@ class TrezorBridge extends EventEmitter {
       TrezorConnect.on(UI_EVENT, entered)
       TrezorConnect.uiResponse({ type: UI.RECEIVE_PASSPHRASE, payload: { save: true, value: phrase } })
     })
+  }
+
+  private async makeRequest <T> (fn: () => Response<T>) {
+    try {
+      const result = await handleResponse(fn())
+      return result
+    } catch (e: any) {
+      if (e.code === 'Device_CallInProgress') {
+        return new Promise<T>(resolve => {
+          setTimeout(() => {
+            log.warn('request conflict, trying again in 400ms', e)
+            resolve(this.makeRequest(fn))
+          }, 400)
+        })
+      } else {
+        throw e
+      }
+    }
   }
 
   // listeners for events coming from a Trezor device

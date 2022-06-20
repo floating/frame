@@ -97,7 +97,7 @@ export default class Trezor extends Signer {
       this.device = undefined
       log.error('Trezor address verification timed out')
       cb(new Error('Address verification timed out'))
-    }, 60000)
+    }, 60_000)
 
     try {
       if (!this.device) {
