@@ -29,7 +29,6 @@ async function handleResponse <T> (p: Response<T>) {
   })
 }
 
-// handles connection and state management for Trezor devices
 class TrezorBridge extends EventEmitter {
   async open () {
     TrezorConnect.on(DEVICE_EVENT, this.handleDeviceEvent.bind(this))

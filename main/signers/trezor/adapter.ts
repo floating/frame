@@ -146,6 +146,13 @@ export default class TrezorSignerAdapter extends SignerAdapter {
       log.verbose(`Trezor ${device.id} waiting for passphrase entry on device`)
 
       this.withSigner(device, signer => {
+        const currentStatus = signer.status
+
+        this.addEventHandler(signer, 'trezor:entered:passphrase', () => {
+          signer.status = currentStatus
+          this.emit('update', signer)
+        })
+
         signer.status = Status.ENTERING_PASSPHRASE
         this.emit('update', signer)
       })
