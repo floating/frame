@@ -100,12 +100,12 @@ class TrezorBridge extends EventEmitter {
     this.waitForUiResponse(deviceId, 'trezor:entered:passphrase', { type: UI.RECEIVE_PASSPHRASE, payload: { save: true, value: phrase } })
   }
 
-  private waitForUiResponse (deviceId: string, event: string, response: UiResponse) {
+  private waitForUiResponse (deviceId: string, eventType: string, response: UiResponse) {
     return new Promise<void>((resolve, reject) => {
       const entered = (event: UiEvent) => {
         if (event.type === UI.CLOSE_UI_WINDOW) {
           TrezorConnect.off(UI_EVENT, entered)
-          this.emit('trezor:entered:passphrase', deviceId)
+          this.emit(eventType, deviceId)
           resolve()
         }
       }
