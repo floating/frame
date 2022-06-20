@@ -73,12 +73,12 @@ function getStatusForError (err: DeviceError) {
 }
 
 export default class Ledger extends Signer {
-  private eth: LedgerEthereumApp | undefined;
+  private eth: LedgerEthereumApp | undefined
 
-  devicePath: string;
+  devicePath: string
 
-  derivation: Derivation | undefined;
-  accountLimit = 5;
+  derivation: Derivation | undefined
+  accountLimit = 5
 
   // the Ledger device can only handle one request at a time; the transport will reject
   // all incoming requests while its busy, so we need to make sure requests are only executed

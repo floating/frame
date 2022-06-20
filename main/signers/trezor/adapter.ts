@@ -1,30 +1,64 @@
 import log from 'electron-log'
-import { Device as TrezorDevice } from 'trezor-connect'
 
-import flex from '../../flex'
+// @ts-ignore
+import { v5 as uuid } from 'uuid'
+import type { Device as TrezorDevice } from 'trezor-connect'
+
 import { SignerAdapter } from '../adapters'
-import Trezor from './Trezor'
+import Trezor, { Status } from './Trezor'
 import store from '../../store'
+import TrezorBridge from './bridge'
+
+const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
+
+function generateId (path: string) {
+  return uuid('Trezor' + path, ns)
+}
+
+// handling specific events for a given signer
+interface EventHandlers {
+  [event: string]: (...args: any) => void
+}
+
+interface KnownSigner {
+  signer: Trezor,
+  eventHandlers: EventHandlers
+}
 
 export default class TrezorSignerAdapter extends SignerAdapter {
-  private flexListeners: { [event: string]: (device: TrezorDevice) => void };
-  private knownSigners: { [id: string]: Trezor };
-  private observer: any;
+  private knownSigners: { [id: string]: KnownSigner } = {}
+  private observer?: Observer
 
   constructor () {
     super('trezor')
-
-    this.flexListeners = {}
-    this.knownSigners = {}
   }
 
   open () {
-    const connectListener = (device: TrezorDevice) => {
-      const trezor = new Trezor(device)
-      trezor.derivation = store('main.trezor.derivation')
+    const scanListener = (err: any) => {
+      if (err) return log.error(err)
+    }
 
-      const version = [trezor.appVersion.major, trezor.appVersion.minor, trezor.appVersion.patch].join('.')
-      log.info(`Trezor ${device.id} connected: ${trezor.model}, firmware v${version}`)
+    const readyListener = () => {
+      this.observer = store.observer(() => {
+        const trezorDerivation = store('main.trezor.derivation')
+
+        Object.values(this.knownSigners).forEach(signerInfo => {
+          const trezor = signerInfo.signer
+          if (trezor.derivation !== trezorDerivation) {
+            trezor.derivation = trezorDerivation
+            trezor.deriveAddresses()
+          }
+        })
+      })
+    }
+
+    TrezorBridge.on('connect', readyListener)
+
+    TrezorBridge.on('trezor:detected', (path: string) => {
+      const id = generateId(path)
+      const trezor = new Trezor(id, TrezorBridge)
+
+      log.info(`Trezor ${trezor.id} detected`)
 
       trezor.on('close', () => {
         this.emit('remove', trezor.id)
@@ -34,120 +68,146 @@ export default class TrezorSignerAdapter extends SignerAdapter {
         this.emit('update', trezor)
       })
 
-      this.knownSigners[device.path] = trezor
+      this.knownSigners[id] = { signer: trezor, eventHandlers: {} }
 
       this.emit('add', trezor)
+    })
 
-      trezor.open()
-    }
+    TrezorBridge.on('trezor:connect', (device: TrezorDevice) => {
+      const id = generateId(device.path)
+      const trezor = this.knownSigners[id].signer
 
-    const disconnectListener = (device: TrezorDevice) => {
+      trezor.derivation = store('main.trezor.derivation')
+      trezor.open(device).then(() => {
+        const version = [trezor.appVersion.major, trezor.appVersion.minor, trezor.appVersion.patch].join('.')
+        log.info(`Trezor ${id} connected: ${trezor.model}, firmware v${version}`)
+      })
+
+      this.addEventHandler(trezor, 'trezor:sessionStart', (device: TrezorDevice) => {
+        console.log('HANDLING SESSION START', { device })
+        trezor.device = device
+      })
+    })
+
+    TrezorBridge.on('trezor:disconnect', (device: TrezorDevice) => {
       log.info(`Trezor ${device.id} disconnected`)
 
       this.withSigner(device, signer => {
         this.remove(signer)
       })
-    }
+    })
 
-    const updateListener = (device: TrezorDevice) => {
-      log.debug(`Trezor ${device.id} updated`)
+    TrezorBridge.on('trezor:sessionStart', (device: TrezorDevice) => {
+      this.withSigner(device, signer => {
+        log.info(`Trezor ${signer.id} session started`)
+  
+        this.handleEvent(signer.id, 'trezor:sessionStart', device)
+      })
+    })
 
-      this.withSigner(device, signer => this.emit('update', signer))
-    }
+    TrezorBridge.on('trezor:entered:pin', (deviceId: string) => {
+      log.verbose(`Trezor ${deviceId} pin entered`)
 
-    const needPinListener = (device: TrezorDevice) => {
+      this.handleEvent(deviceId, 'trezor:entered:pin')
+    })
+
+    TrezorBridge.on('trezor:entered:passphrase', (deviceId: string) => {
+      log.verbose(`Trezor ${deviceId} passphrase entered`)
+
+      this.handleEvent(deviceId, 'trezor:entered:passphrase')
+    })
+
+    TrezorBridge.on('trezor:needPin', (device: TrezorDevice) => {
       log.verbose(`Trezor ${device.id} needs pin`)
 
       this.withSigner(device, signer => {
-        signer.status = 'Need Pin',
-        signer.update()
-      })
-    }
+        const currentStatus = signer.status
 
-    const needPhraseListener = (device: TrezorDevice) => {
+        this.addEventHandler(signer, 'trezor:entered:pin', () => {
+          signer.status = currentStatus
+          signer.emit('update')
+        })
+
+        signer.status = Status.NEEDS_PIN
+        signer.emit('update')
+      })
+    })
+
+    TrezorBridge.on('trezor:needPhrase', (device: TrezorDevice) => {
       log.verbose(`Trezor ${device.id} needs passphrase`)
 
       this.withSigner(device, signer => {
-        signer.status = 'Enter Passphrase'
-        signer.update()
-      })
-    }
+        const currentStatus = signer.status
 
-    const enteringPhraseListener = (device: TrezorDevice) => {
+        this.addEventHandler(signer, 'trezor:entered:passphrase', () => {
+          signer.status = currentStatus
+          signer.emit('update')
+        })
+        
+        signer.status = Status.NEEDS_PASSPHRASE
+        signer.emit('update')
+      })
+    })
+
+    TrezorBridge.on('trezor:enteringPhrase', (device: TrezorDevice) => {
       log.verbose(`Trezor ${device.id} waiting for passphrase entry on device`)
 
       this.withSigner(device, signer => {
-        signer.status = 'waiting for input on device'
-        signer.update()
+        signer.status = Status.ENTERING_PASSPHRASE
+        signer.emit('update')
       })
-    }
+    })
 
-    const scanListener = (err: any) => {
-      if (err) return log.error(err)
-    }
-
-    const readyListener = () => {
-      this.observer = store.observer(() => {
-        const trezorDerivation = store('main.trezor.derivation')
-
-        Object.values(this.knownSigners).forEach(trezor => {
-          if (trezor.derivation !== trezorDerivation) {
-            trezor.derivation = trezorDerivation
-            trezor.reset()
-            trezor.deviceStatus()
-          }
-        })
-      })
-
-      this.flexListeners = {
-        'trezor:connect': connectListener,
-        'trezor:disconnect': disconnectListener,
-        'trezor:update': updateListener,
-        'trezor:needPin': needPinListener,
-        'trezor:needPhrase': needPhraseListener,
-        'trezor:enteringPhrase': enteringPhraseListener,
-        'trezor:scan': scanListener
-      }
-
-      Object.entries(this.flexListeners).forEach(([event, listener]) => flex.on(event, listener))
-    }
-
-    flex.on('ready', readyListener)
-
-    this.flexListeners.ready = readyListener
-
+    TrezorBridge.open()
     super.open()
   }
 
   close () {
     if (this.observer) {
       this.observer.remove()
-      this.observer = null
+      this.observer = undefined
     }
 
-    Object.entries(this.flexListeners).forEach(([event, listener]) => flex.off(event, listener))
+    TrezorBridge.close()
 
     super.close()
   }
 
   remove (trezor: Trezor) {
-    if (trezor.device.path in this.knownSigners) {
-      log.info(`removing Trezor ${trezor.device.id}`)
+    if (trezor.id in this.knownSigners) {
+      log.info(`removing Trezor ${trezor.id}`)
 
-      delete this.knownSigners[trezor.device.path]
+      delete this.knownSigners[trezor.id]
 
       trezor.close()
     }
   }
 
   reload (trezor: Trezor) {
-    log.info(`reloading Trezor ${trezor.device.id}`)
+    log.info(`reloading Trezor ${trezor.id}`)
 
-    trezor.open()
+    if (!trezor.device) {
+      log.warn(`tried to reload disconnected Trezor ${trezor.id}`)
+      return
+    }
+
+    trezor.open(trezor.device)
+  }
+
+  private addEventHandler (signer: Trezor, event: string, handler: (device: TrezorDevice) => void) {
+    this.knownSigners[signer.id].eventHandlers[event] = handler
+  }
+
+  private handleEvent (signerId: string, event: string, ...args: any) {
+    const action = this.knownSigners[signerId]?.eventHandlers[event] || (() => {})
+
+    delete this.knownSigners[signerId].eventHandlers[event]
+
+    action(args)
   }
 
   private withSigner (device: TrezorDevice, fn: (signer: Trezor) => void) {
-    const signer = this.knownSigners[device.path]
+    const signer = this.knownSigners[generateId(device.path)].signer
 
     if (signer) fn(signer)
   }

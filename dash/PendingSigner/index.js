@@ -25,7 +25,7 @@ class Pending extends React.Component {
   }
 
   submitPhrase () {
-    link.rpc('trezorPhrase', this.props.id, this.state.tPhrase, () => {})
+    link.rpc('trezorPhrase', this.props.id, this.state.tPhrase || '', () => {})
     this.setState({ tPhrase: '' })
   }
 
@@ -47,6 +47,7 @@ class Pending extends React.Component {
   }
 
   renderTrezorPin (active) {
+    console.log('RENDER TREZOR PIN', { active })
     return (
       <div className='trezorPinWrap' style={active ? {} : { height: '0px', padding: '0px 0px 0px 0px' }}>
         {active ? (

@@ -1,3 +1,5 @@
+import TC from 'trezor-connect'
+
 const {
   default: TrezorConnect,
   UI_EVENT,
@@ -6,9 +8,9 @@ const {
   TRANSPORT_EVENT,
   BLOCKCHAIN_EVENT,
   UI
-} = require('trezor-connect')
+} = TC
 
-const readline = require('readline')
+import readline from 'readline'
 
 async function getInput () {
   return new Promise(resolve => {
@@ -18,7 +20,6 @@ async function getInput () {
     })
 
     reader.on('line', line => {
-      console.log('INPUT', line)
       resolve(line.trim())
     })
   })
@@ -67,7 +68,7 @@ async function connect () {
     try {
       const { type, event, payload } = e
       const { type: payloadType, status, state, mode } = payload
-      console.debug(`[${timeElapsed(startTime, new Date())}] Trezor device event`, { event, type, payloadType, status, state, mode })
+      console.debug(`[${timeElapsed(startTime, new Date())}] Trezor device event`, { payload, event, type, payloadType, status, state, mode })
     } catch (err) {
       console.error('ERROR', err)
     }
@@ -81,14 +82,18 @@ async function connect () {
 
       if (e.type === UI.REQUEST_PIN) {
         console.log('input pin:')
-        const pin = await getInput()
+        try {
+          const pin = await getInput()
 
-        console.log({ pin })
+          console.log({ pin })
 
-        TrezorConnect.uiResponse({
-          type: UI.RECEIVE_PIN,
-          payload: pin
-        })
+          TrezorConnect.uiResponse({
+            type: UI.RECEIVE_PIN,
+            payload: pin
+          })
+        } catch (e) {
+          console.error('error getting input', { e })
+        }
       }
       
       if (e.type === UI.REQUEST_PASSPHRASE) {
@@ -111,22 +116,30 @@ async function connect () {
       console.error('ERROR', err)
     }
   })
-   await TrezorConnect.init(config)
 
-  //const features = await TrezorConnect.getFeatures()
-  //console.log({ features })
+  console.log('CONNECTING ...')
+  await TrezorConnect.init(config)
+
+  setTimeout(async () => {
+    const features = await TrezorConnect.getFeatures()
+    console.log('... CONNECTED!', features)
+
+  }, 5000)
 
 
   const reader = readline.createInterface({
     input: process.stdin,
     output: process.stdout
   })
+  
 
   reader.on('line', line => {
     const command = line.trim() || ''
     if (command.toLowerCase() === 'address') {
       console.log('*** GETTING ADDRESS ***')
-      TrezorConnect.ethereumGetAddress({ path: "m/44'/1'/0'/0/0", showOnTrezor: false }).then(address => console.log({ address }))
+      TrezorConnect.ethereumGetAddress({ path: "m/44'/1'/0'/0/0", showOnTrezor: false })
+        .then(address => console.log({ address }))
+        .catch(err => console.error('error getting address', { err })) 
     }
   })
 

@@ -160,6 +160,8 @@ class Dash extends React.Component {
           return false
         }
       }).filter(s => s)
+
+      console.log({ hardwareSigners, hotSigners })
       
       return (
       <div className='dash'>

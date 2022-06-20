@@ -2,42 +2,52 @@ import log from 'electron-log'
 import utils from 'web3-utils'
 import { padToEven, stripHexPrefix, addHexPrefix } from 'ethereumjs-util'
 import { TypedData, TypedDataUtils } from 'eth-sig-util'
-import { Device as TrezorDevice } from 'trezor-connect'
+import TrezorConnect, { Device as TrezorDevice, UI } from 'trezor-connect'
 
 import Signer from '../../Signer'
-import flex from '../../../flex'
 import { TransactionData } from '../../../../resources/domain/transaction'
 import { sign, londonToLegacy, signerCompatibility, Signature } from '../../../transaction'
 
-// @ts-ignore
-import { v5 as uuid } from 'uuid'
 import { Derivation, getDerivationPath } from '../../Signer/derive'
 import { TypedTransaction } from '@ethereumjs/tx'
-
-const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
+import TrezorBridge, { ConnectError } from '../bridge'
 
 const defaultTrezorTVersion = { major_version: 2, minor_version: 3, patch_version: 0 }
 const defaultTrezorOneVersion = { major_version: 1, minor_version: 9, patch_version: 2 }
 
 type FlexCallback<T> = (err: string | null, result: T | undefined) => void
 
-interface PublicKeyResponse {
-  chainCode: string,
-  publicKey: string,
+export const Status = {
+  INITIAL: 'Connecting',
+  OK: 'ok',
+  LOADING: 'loading',
+  DERIVING: 'addresses',
+  LOCKED: 'locked',
+  WRONG_APP: 'Open your Ledger and select the Ethereum application',
+  DISCONNECTED: 'Disconnected',
+  NEEDS_RECONNECTION: 'Please reconnect this Trezor device',
+  NEEDS_PIN: 'Need Pin',
+  NEEDS_PASSPHRASE: 'Enter Passphrase',
+  ENTERING_PASSPHRASE: 'waiting for input on device'
 }
 
 export default class Trezor extends Signer {
-  private closed = false;
+  private readonly connect: typeof TrezorBridge
   
-  device: TrezorDevice;
+  device?: TrezorDevice;
   derivation: Derivation | undefined;
 
-  constructor (device: TrezorDevice) {
+  constructor (id: string, connect: typeof TrezorBridge) {
     super()
 
-    this.addresses = []
+    this.id = id
+    this.connect = connect
+    this.type = 'trezor'
+    this.status = Status.INITIAL
+  }
+
+  async open (device: TrezorDevice) {
     this.device = device
-    this.id = this.getId()
 
     const defaultVersion = device.features?.model === 'T' ? defaultTrezorTVersion : defaultTrezorOneVersion
     const { major_version: major, minor_version: minor, patch_version: patch } = device.features || defaultVersion
@@ -46,44 +56,20 @@ export default class Trezor extends Signer {
     const model = (device.features?.model || '').toString() === '1' ? 'One' : device.features?.model
     this.model = ['Trezor', model].join(' ').trim()
 
-    this.type = 'trezor'
-    this.status = 'loading'
-  }
+    this.deriveAddresses()
 
-  async open () {
-    this.closed = false
-
-    this.reset()
-    this.deviceStatus()
-    
-    setTimeout(() => {
-      this.deviceStatus()
-    }, 2000)
+    // TODO: do we need this?
+    // this will prompt for a passphrase and pin
+    // return TrezorConnect.getDeviceState({ device: this.device })
   }
 
   close () {
-    this.closed = true
+    this.device = undefined
 
     this.emit('close')
     this.removeAllListeners()
 
     super.close()
-  }
-
-  update () {
-    if (this.closed) return
-
-    this.emit('update')
-  }
-
-  reset () {
-    this.status = 'loading'
-    this.addresses = []
-    this.update()
-  }
-
-  private getId () {
-    return uuid('Trezor' + this.device.path, ns)
   }
 
   private getPath (index: number) {
@@ -98,32 +84,41 @@ export default class Trezor extends Signer {
     return `m/${getDerivationPath(this.derivation)}`.replace(/\/+$/,'')
   }
 
-  deviceStatus () {
-    this.lookupAddresses((err, addresses) => {
-      if (err) {
-        if (err === 'Device call in progress') return
+  private handleError (err: ConnectError) {
+    log.error('trezor error', err)
 
-        if (err.toLowerCase() !== 'verify address error') this.status = 'loading'
-        if (err === 'ui-device_firmware_old') this.status = `Update Firmware (v${this.device.firmwareRelease.release.version.join('.')})`
-        if (err === 'ui-device_bootloader_mode') this.status = 'Device in Bootloader Mode'
-        this.addresses = []
-        this.update()
-      } else if (addresses && addresses.length) {
-        if (addresses[0] !== this.coinbase || this.status !== 'ok') {
-          this.coinbase = addresses[0]
-          this.addresses = addresses
-          this.deviceStatus()
-        }
-        if (addresses.length > this.addresses.length) this.addresses = addresses
-        this.status = 'ok'
-        this.update()
-      } else {
-        this.status = 'Unable to find addresses'
-        this.addresses = []
-        this.update()
-      }
-    })
+    this.status = err.error
+    this.emit('update')
   }
+
+  // deviceStatus () {
+  //   this.lookupAddresses((err, addresses) => {
+  //     if (err) {
+  //       if (err === 'Device call in progress') return
+
+  //       if (err.toLowerCase() !== 'verify address error') this.status = 'loading'
+  //       if (err === 'ui-device_firmware_old') {
+  //         this.status = `Update Firmware (v${[this.appVersion.major, this.appVersion.minor, this.appVersion.patch].join('.')})`
+  //       }
+  //       if (err === 'ui-device_bootloader_mode') this.status = 'Device in Bootloader Mode'
+  //       this.addresses = []
+  //       this.emit('update')
+  //     } else if (addresses && addresses.length) {
+  //       if (addresses[0] !== this.coinbase || this.status !== 'ok') {
+  //         this.coinbase = addresses[0]
+  //         this.addresses = addresses
+  //         this.deviceStatus()
+  //       }
+  //       if (addresses.length > this.addresses.length) this.addresses = addresses
+  //       this.status = 'ok'
+  //       this.emit('update')
+  //     } else {
+  //       this.status = 'Unable to find addresses'
+  //       this.addresses = []
+  //       this.emit('update')
+  //     }
+  //   })
+  // }
 
   verifyAddress (index: number, currentAddress: string, display = false, cb: Callback<boolean>, attempt = 0) {
     log.info('Verify Address, attempt: ' + attempt)
@@ -137,7 +132,8 @@ export default class Trezor extends Signer {
       cb(new Error('Address verification timed out'), undefined)
     }, 60 * 1000)
 
-    const rpcCallback: FlexCallback<{ address: string }> = (err, result) => {
+    TrezorConnect.ethereumGetAddress({ device: this.device, path: this.getPath(index), showOnTrezor: display }).then(res => {
+      const err = res.success ? undefined : res.payload.error
       clearTimeout(timer)
       if (timeout) return
       if (err) {
@@ -153,7 +149,7 @@ export default class Trezor extends Signer {
           cb(new Error('Verify Address Error'), undefined)
         }
       } else {
-        const verified = result as { address: string }
+        const verified = res.payload as { address: string }
 
         const address = verified.address ? verified.address.toLowerCase() : ''
         const current = (currentAddress || '').toLowerCase()
@@ -172,53 +168,66 @@ export default class Trezor extends Signer {
           cb(null, true)
         }
       }
-    }
-
-    flex.rpc('trezor.ethereumGetAddress', this.device.path, this.getPath(index), display, rpcCallback)
+    })
   }
 
-  lookupAddresses (cb: FlexCallback<Array<string>>) {
-    const rpcCallback: FlexCallback<PublicKeyResponse> = (err, result) => {
-      if (err) return cb(err, undefined)
+  async getFeatures () {
+    TrezorConnect.getFeatures({ device: this.device })
+  }
 
-      const key = result as PublicKeyResponse
-      this.deriveHDAccounts(key.publicKey, key.chainCode, (err, accs) => {
-        if (err) return cb(err.message, undefined)
+  async deriveAddresses () {
+    this.status = Status.DERIVING
+    this.emit('update')
+
+    console.trace('======> GET PUBLIC KEY')
+
+    try {
+      const publicKey = await this.connect.getPublicKey(this.basePath(), this.device)
+
+      console.log({ publicKey })
+
+      this.deriveHDAccounts(publicKey.publicKey, publicKey.chainCode, (err, accs) => {
+        if (err) {
+          this.status = Status.NEEDS_RECONNECTION
+          this.emit('update')
+          return
+        }
 
         const accounts = (accs || []) as string[]
         const firstAccount = accounts[0] || ''
-        this.verifyAddress(0, firstAccount, false, err => {
-          if (err) return cb(err.message, undefined)
-          cb(null, accounts)
-        })
-      })
-    }
+        if (accounts.length > this.addresses.length) {
+          this.addresses = accounts
+        }
+        this.status = Status.OK
+        this.emit('update')
 
-    flex.rpc('trezor.getPublicKey', this.device.path, this.basePath(), rpcCallback)
+        // this.verifyAddress(0, firstAccount, false, err => {
+        //   if (err) {
+        //     this.status = 'could not verify address, please re-connect this Trezor device'
+        //   } else {
+        //     this.status = Status.OK
+        //     if (accounts.length > this.addresses.length) {
+        //       this.addresses = accounts
+        //     }
+        //   }
+ 
+        //   this.emit('update')
+        // })
+      })
+    } catch (e: any) {
+      log.error('could not get public key from Trezor', e)
+      this.handleError(e)
+    }
   }
 
   setPhrase (phrase: string) {
-    const rpcCallback: FlexCallback<void> = err => {
-      if (err) log.error(err)
-      setTimeout(() => this.deviceStatus(), 1000)
-    }
-
-    this.status = 'loading'
-    this.update()
-
-    flex.rpc('trezor.inputPhrase', this.device.path, phrase, rpcCallback)
+    TrezorConnect.uiResponse({ type: UI.RECEIVE_PASSPHRASE, payload: { save: true, value: phrase } })
+    this.emit('entered:phrase')
   }
 
   setPin (pin: string) {
-    const rpcCallback: FlexCallback<void> = err => {
-      if (err) log.error(err)
-      setTimeout(() => this.deviceStatus(), 250)
-    }
-
-    this.status = 'loading'
-    this.update()
-
-    flex.rpc('trezor.inputPin', this.device.path, pin, rpcCallback)
+    //this.connect.pinEntered(pin)
+    //this.emit('entered:pin')
   }
 
   // Standard Methods
@@ -235,7 +244,7 @@ export default class Trezor extends Signer {
       }
     }
 
-    flex.rpc('trezor.ethereumSignMessage', this.device.path, this.getPath(index), this.normalize(message), rpcCallback)
+    //flex.rpc('trezor.ethereumSignMessage', this.device.path, this.getPath(index), this.normalize(message), rpcCallback)
   }
 
   // Standard Methods
@@ -264,9 +273,9 @@ export default class Trezor extends Signer {
       const domainSeparatorHash = TypedDataUtils.hashStruct('EIP712Domain', domain, types, true).toString('hex')
       const messageHash = TypedDataUtils.hashStruct(primaryType as any, message, types, true).toString('hex')
 
-      flex.rpc('trezor.ethereumSignTypedHash', this.device.path, this.getPath(index), typedData, domainSeparatorHash, messageHash, rpcCallback)
+      //flex.rpc('trezor.ethereumSignTypedHash', this.device.path, this.getPath(index), typedData, domainSeparatorHash, messageHash, rpcCallback)
     } else {
-      flex.rpc('trezor.ethereumSignTypedData', this.device.path, this.getPath(index), typedData, rpcCallback)
+      //flex.rpc('trezor.ethereumSignTypedData', this.device.path, this.getPath(index), typedData, rpcCallback)
     }
   }
 
@@ -292,7 +301,7 @@ export default class Trezor extends Signer {
           resolve({ v, r, s })
         }
 
-        flex.rpc('trezor.ethereumSignTransaction', this.device.path, path, trezorTx, rpcCallback)
+        //flex.rpc('trezor.ethereumSignTransaction', this.device.path, path, trezorTx, rpcCallback)
       })
     })
     .then(signedTx => cb(null, addHexPrefix(signedTx.serialize().toString('hex'))))

@@ -364,6 +364,7 @@ app.on('will-quit', () => app.quit())
 app.on('quit', async () => {
   // await clients.stop()
   accounts.close()
+  signers.close()
 })
 app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit() })
 

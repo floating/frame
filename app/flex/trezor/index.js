@@ -1,11 +1,11 @@
 const EventEmitter = require('events')
-const {
-  default: TrezorConnect,
-  DEVICE_EVENT,
-  DEVICE,
-  UI_EVENT,
-  UI
-} = require('trezor-connect')
+// const {
+//   default: TrezorConnect,
+//   DEVICE_EVENT,
+//   DEVICE,
+//   UI_EVENT,
+//   UI
+// } = require('trezor-connect')
 
 const events = new EventEmitter()
 events.setMaxListeners(128)
@@ -116,6 +116,7 @@ class Device {
 
 class Trezor {
   constructor (emit) {
+    if (true) return
     this.emit = emit
     this.devices = {}
 

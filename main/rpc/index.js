@@ -18,6 +18,7 @@ function randomLetters (num) {
 
 const { resolveName } = require('../accounts/aragon')
 const { arraysEqual } = require('../../resources/utils')
+const { default: TrezorBridge } = require('../../main/signers/trezor/bridge')
 
 const rpc = {
   getState: cb => {
@@ -70,22 +71,12 @@ const rpc = {
   // setSignerIndex: signers.setSignerIndex,
   // unsetSigner: signers.unsetSigner,
   trezorPin: (id, pin, cb) => {
-    const signer = signers.get(id)
-    if (signer && signer.setPin) {
-      signer.setPin(pin)
-      cb(null, { status: 'ok' })
-    } else {
-      cb(new Error('Set pin not available'))
-    }
+    cb()
+    TrezorBridge.pinEntered(id, pin)
   },
   trezorPhrase: (id, phrase, cb) => {
-    const signer = signers.get(id)
-    if (signer && signer.setPhrase) {
-      signer.setPhrase(phrase || '')
-      cb(null, { status: 'ok' })
-    } else {
-      cb(new Error('Set phrase not available'))
-    }
+    cb()
+    TrezorBridge.passphraseEntered(id, phrase)
   },
   createLattice: (deviceId, deviceName, cb) => {
     if (!deviceId) {

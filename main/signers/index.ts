@@ -52,6 +52,10 @@ class Signers extends EventEmitter {
     registeredAdapters.forEach(this.addAdapter.bind(this))
   }
 
+  close () {
+    registeredAdapters.forEach(a => a.close())
+  }
+
   addAdapter (adapter: SignerAdapter) {
     const addFn = this.add.bind(this)
     const removeFn = this.remove.bind(this)

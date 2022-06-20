@@ -40,7 +40,7 @@ class Signer extends React.Component {
   }
 
   submitPhrase () {
-    link.rpc('trezorPhrase', this.props.id, this.state.tPhrase, () => {})
+    link.rpc('trezorPhrase', this.props.id, this.state.tPhrase || '', () => {})
     this.setState({ tPhrase: '' })
   }
 

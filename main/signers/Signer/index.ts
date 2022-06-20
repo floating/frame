@@ -84,7 +84,7 @@ export default class Signer extends EventEmitter {
     }
   }
 
-  open () {
+  open (device?: any) {
     // windows.broadcast('main:action', 'addSigner', this.summary())
   }
 
