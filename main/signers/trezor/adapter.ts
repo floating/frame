@@ -15,18 +15,17 @@ function generateId (path: string) {
   return uuid('Trezor' + path, ns)
 }
 
-// handling specific events for a given signer
-interface EventHandlers {
-  [event: string]: (...args: any) => void
-}
-
-interface KnownSigner {
-  signer: Trezor,
-  eventHandlers: EventHandlers
+interface KnownSigners {
+  [id: string]: {
+    signer: Trezor,
+    eventHandlers: {
+      [event: string]: (...args: any) => void
+    }
+  }
 }
 
 export default class TrezorSignerAdapter extends SignerAdapter {
-  private knownSigners: { [id: string]: KnownSigner } = {}
+  private knownSigners: KnownSigners = {}
   private observer?: Observer
 
   constructor () {
@@ -43,6 +42,7 @@ export default class TrezorSignerAdapter extends SignerAdapter {
         const trezorDerivation = store('main.trezor.derivation')
 
         Object.values(this.knownSigners).forEach(signerInfo => {
+          console.log('**** UPDATING DERIVATION')
           const trezor = signerInfo.signer
           if (trezor.derivation !== trezorDerivation) {
             trezor.derivation = trezorDerivation
@@ -55,8 +55,10 @@ export default class TrezorSignerAdapter extends SignerAdapter {
     TrezorBridge.on('connect', readyListener)
 
     TrezorBridge.on('trezor:detected', (path: string) => {
+      // create a new signer whenever a Trezor is detected, but it won't be opened
+      // until a connect event with an active device is received
       const id = generateId(path)
-      const trezor = new Trezor(id, TrezorBridge)
+      const trezor = new Trezor(id)
 
       log.info(`Trezor ${trezor.id} detected`)
 
@@ -78,14 +80,17 @@ export default class TrezorSignerAdapter extends SignerAdapter {
       const trezor = this.knownSigners[id].signer
 
       trezor.derivation = store('main.trezor.derivation')
-      trezor.open(device).then(() => {
-        const version = [trezor.appVersion.major, trezor.appVersion.minor, trezor.appVersion.patch].join('.')
-        log.info(`Trezor ${id} connected: ${trezor.model}, firmware v${version}`)
-      })
+      trezor.open(device)
 
-      this.addEventHandler(trezor, 'trezor:sessionStart', (device: TrezorDevice) => {
-        // update device with new session info, preventing future need to enter passphrase
-        trezor.device = device
+      const version = [trezor.appVersion.major, trezor.appVersion.minor, trezor.appVersion.patch].join('.')
+      log.info(`Trezor ${id} connected: ${trezor.model}, firmware v${version}`)
+
+      // wait for a session id to be established before attempting to derive addresses
+      this.addEventHandler(trezor, 'trezor:session:created', () => {
+        log.verbose(`Trezor ${id} session created`)
+
+        // arbitrary delay to attempt to prevent message conflicts on first connection
+        setTimeout(() => trezor.deriveAddresses(), 100)
       })
     })
 
@@ -97,11 +102,16 @@ export default class TrezorSignerAdapter extends SignerAdapter {
       })
     })
 
-    TrezorBridge.on('trezor:sessionStart', (device: TrezorDevice) => {
+    TrezorBridge.on('trezor:update', (device: TrezorDevice) => {
       this.withSigner(device, signer => {
-        log.info(`Trezor ${signer.id} session started`)
-  
-        this.handleEvent(signer.id, 'trezor:sessionStart', device)
+        log.verbose(`Trezor ${signer.id} updated`, { session: device.features?.session_id })
+        const oldDevice = signer.device
+
+        signer.device = device
+
+        if (!oldDevice?.features?.session_id && device.features?.session_id) {
+          this.handleEvent(signer.id, 'trezor:session:created')
+        }
       })
     })
 
@@ -125,11 +135,11 @@ export default class TrezorSignerAdapter extends SignerAdapter {
 
         this.addEventHandler(signer, 'trezor:entered:pin', () => {
           signer.status = currentStatus
-          signer.emit('update')
+          this.emit('update', signer)
         })
 
         signer.status = Status.NEEDS_PIN
-        signer.emit('update')
+        this.emit('update', signer)
       })
     })
 
@@ -141,11 +151,11 @@ export default class TrezorSignerAdapter extends SignerAdapter {
 
         this.addEventHandler(signer, 'trezor:entered:passphrase', () => {
           signer.status = currentStatus
-          signer.emit('update')
+          this.emit('update', signer)
         })
         
         signer.status = Status.NEEDS_PASSPHRASE
-        signer.emit('update')
+        this.emit('update', signer)
       })
     })
 
@@ -154,7 +164,7 @@ export default class TrezorSignerAdapter extends SignerAdapter {
 
       this.withSigner(device, signer => {
         signer.status = Status.ENTERING_PASSPHRASE
-        signer.emit('update')
+        this.emit('update', signer)
       })
     })
 
@@ -191,7 +201,7 @@ export default class TrezorSignerAdapter extends SignerAdapter {
       return
     }
 
-    trezor.open(trezor.device)
+    trezor.deriveAddresses()
   }
 
   private addEventHandler (signer: Trezor, event: string, handler: (device: TrezorDevice) => void) {
