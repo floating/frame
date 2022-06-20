@@ -84,7 +84,7 @@ export default class TrezorSignerAdapter extends SignerAdapter {
       })
 
       this.addEventHandler(trezor, 'trezor:sessionStart', (device: TrezorDevice) => {
-        console.log('HANDLING SESSION START', { device })
+        // update device with new session info, preventing future need to enter passphrase
         trezor.device = device
       })
     })
