@@ -118,23 +118,6 @@ describe('ui events', () => {
 
     TrezorConnect.emit(UI_EVENT, { type: UI.REQUEST_PASSPHRASE, payload })
   })
-
-  it('emits an enteringPhrase event when a passphrase is requested and will be entered on the device', done => {
-    const device = {
-      type: 'acquired',
-      id: 'someid1234',
-      features: { capabilities: ['Capability_PassphraseEntry'] }
-    }
-
-    TrezorBridge.once('trezor:enteringPhrase', device => {
-      try {
-        expect(device).toEqual(device)
-        done()
-      } catch (e) { done(e) }
-    })
-
-    TrezorConnect.emit(UI_EVENT, { type: UI.REQUEST_PASSPHRASE, payload: { device } })
-  })
 })
 
 describe('requests', () => {
@@ -146,7 +129,7 @@ describe('requests', () => {
       return { id: 1, success: true, payload: features }
     })
 
-    const loadedFeatures = await TrezorBridge.getFeatures('41')
+    const loadedFeatures = await TrezorBridge.getFeatures({ device: { path: '41' } })
 
     expect(loadedFeatures).toEqual(features)
   })

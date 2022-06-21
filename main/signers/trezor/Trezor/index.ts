@@ -167,7 +167,11 @@ export default class Trezor extends Signer {
     this.emit('update')
 
     try {
-      const publicKey = await TrezorBridge.getPublicKey(this.path, this.basePath())
+      if (!this.device) {
+        throw new Error('Trezor not connected')
+      }
+
+      const publicKey = await TrezorBridge.getPublicKey(this.device, this.basePath())
 
       this.deriveHDAccounts(publicKey.publicKey, publicKey.chainCode, (err, accs) => {
         if (err) {

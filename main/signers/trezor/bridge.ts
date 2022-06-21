@@ -71,8 +71,8 @@ class TrezorBridge extends EventEmitter {
     return this.makeRequest(() => TrezorConnect.getAccountInfo({ device, path, coin: 'eth' }))
   }
 
-  async getPublicKey (devicePath: string, path: string) {
-    return this.makeRequest(() => TrezorConnect.getPublicKey({ path, device: { path: devicePath } }))
+  async getPublicKey (device: Device, path: string) {
+    return this.makeRequest(() => TrezorConnect.getPublicKey({ device, path }))
   }
 
   async getAddress (device: Device, path: string, display = false) {
