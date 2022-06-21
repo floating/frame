@@ -78,6 +78,10 @@ const rpc = {
     cb()
     TrezorBridge.passphraseEntered(id, phrase)
   },
+  trezorEnterPhrase: (id, cb) => {
+    cb()
+    TrezorBridge.enterPassphraseOnDevice(id)
+  },
   createLattice: (deviceId, deviceName, cb) => {
     if (!deviceId) {
       return cb(new Error('No Device ID'))

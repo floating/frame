@@ -139,6 +139,17 @@ class TrezorBridge extends EventEmitter {
     this.emit('trezor:entered:passphrase', deviceId)
   }
 
+  async enterPassphraseOnDevice (deviceId: string) {
+    log.debug('requested to enter passphrase on device', deviceId)
+
+    TrezorConnect.uiResponse({
+      type: UI.RECEIVE_PASSPHRASE,
+      payload: { value: '', passphraseOnDevice: true, save: true }
+    })
+
+    this.emit('trezor:enteringPhrase', deviceId)
+  }
+
   private async makeRequest <T> (fn: () => Response<T>, retries = 20) {
     try {
       const result = await handleResponse(fn())
@@ -186,19 +197,7 @@ class TrezorBridge extends EventEmitter {
     if (e.type === UI.REQUEST_PIN) {
       this.emit('trezor:needPin', e.payload.device)
     } else if (e.type === UI.REQUEST_PASSPHRASE) {
-      const device = e.payload.device
-      const capabilities = (device.features || {}).capabilities || []
-
-      if (capabilities.includes('Capability_PassphraseEntry')) {
-        this.emit('trezor:enteringPhrase', e.payload.device)
-
-        TrezorConnect.uiResponse({
-          type: UI.RECEIVE_PASSPHRASE,
-          payload: { value: '', passphraseOnDevice: true, save: true }
-        })
-      } else {
-        this.emit('trezor:needPhrase', device)
-      }
+      this.emit('trezor:needPhrase', e.payload.device)
     }
   }
 }

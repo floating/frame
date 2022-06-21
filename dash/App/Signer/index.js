@@ -107,6 +107,8 @@ class Signer extends React.Component {
   }
 
   renderTrezorPhrase (active) {
+    const allowsDeviceEntry = (this.props.capabilities || []).includes('Capability_PassphraseEntry')
+
     return (
       <div className='trezorPinWrap' style={active ? {} : { height: '0px', padding: '0px 0px 0px 0px' }}>
         {active ? (
@@ -114,8 +116,19 @@ class Signer extends React.Component {
             <div className='trezorPhraseInput'>
               <input type='password' onChange={(e) => this.setState({ tPhrase: e.target.value })} onKeyPress={e => this.phraseKeyPress(e)} autoFocus />
             </div>
-            <div className='signerPinMessage signerPinSubmit' onMouseDown={() => this.submitPhrase()}>
+            <div className='signerPinMessage signerPinSubmit' onMouseDown={evt => {
+              if (evt.button === 0) { // left click only
+                this.submitPhrase()
+              }
+            }}>
               Submit Passphrase
+            </div>
+            <div className='signerPinMessage signerPinSubmit' onMouseDown={evt => {
+              if (evt.button === 0) { // left click only
+                link.rpc('trezorEnterPhrase', this.props.id, () => {})
+              }
+            }}>
+              Enter passphrase on device
             </div>
           </>
         ) : null}
@@ -219,7 +232,7 @@ class Signer extends React.Component {
     const loading = isLoading(status)
     const disconnected =
       (this.props.type === 'lattice' && !loading && status !== 'ok') ||
-      (this.props.type === 'trezor' && !loading && status === 'disconnected')
+      (this.props.type === 'trezor' && !loading && (status === 'disconnected' || status.includes('reconnect')))
 
     // TODO: create well-defined signer states that drive these UI features
     const canReconnect =

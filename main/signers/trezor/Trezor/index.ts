@@ -92,6 +92,15 @@ export default class Trezor extends Signer {
     super.close()
   }
 
+  summary () {
+    const summary = super.summary()
+
+    return {
+      ...summary,
+      capabilities: this.device?.features?.capabilities || []
+    }
+  }
+
   private getPath (index: number) {
     return this.basePath() + '/' + index.toString()
   }
@@ -134,7 +143,7 @@ export default class Trezor extends Signer {
       const current = (currentAddress || '').toLowerCase()
 
       if (reportedAddress !== current) {
-        log.error(`address from Frame (${current}) does not match address from Trezor device (${reportedAddress}`)
+        log.error(`address from Frame (${current}) does not match address from Trezor device (${reportedAddress})`)
         
         this.handleError('address does not match device, reconnect your Trezor')
 
