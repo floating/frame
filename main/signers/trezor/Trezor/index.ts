@@ -26,7 +26,6 @@ export const Status = {
   LOADING: 'loading',
   DERIVING: 'addresses',
   LOCKED: 'locked',
-  WRONG_APP: 'Open your Ledger and select the Ethereum application',
   DISCONNECTED: 'Disconnected',
   NEEDS_RECONNECTION: 'Please reconnect this Trezor device',
   NEEDS_PIN: 'Need Pin',
@@ -60,15 +59,28 @@ export default class Trezor extends Signer {
     return uuid('Trezor' + path, ns)
   }
 
-  open (device: TrezorDevice) {
+  async open (device: TrezorDevice) {
     this.device = device
+    this.status = Status.INITIAL
+    this.emit('update')
 
-    const defaultVersion = device.features?.model === 'T' ? defaultTrezorTVersion : defaultTrezorOneVersion
-    const { major_version: major, minor_version: minor, patch_version: patch } = device.features || defaultVersion
-    this.appVersion = { major, minor, patch }
+    try {
+      const features = await TrezorBridge.getFeatures({ device })
 
-    const model = (device.features?.model || '').toString() === '1' ? 'One' : device.features?.model
-    this.model = ['Trezor', model].join(' ').trim()
+      const defaultVersion = features?.model === 'T' ? defaultTrezorTVersion : defaultTrezorOneVersion
+      const { major_version: major, minor_version: minor, patch_version: patch } = features || defaultVersion
+      this.appVersion = { major, minor, patch }
+
+      const model = (features?.model || '').toString() === '1' ? 'One' : features?.model
+      this.model = ['Trezor', model].join(' ').trim()
+
+      // this prompts a login of pin and/or passphrase
+      await TrezorBridge.getAccountInfo(device, this.getPath(0))
+    } catch (e) {
+      this.handleUnrecoverableError()
+
+      throw e
+    }
   }
 
   close () {
@@ -92,7 +104,7 @@ export default class Trezor extends Signer {
     return `m/${getDerivationPath(this.derivation)}`.replace(/\/+$/,'')
   }
 
-  private handleUnrecoverableError (message = Status.NEEDS_RECONNECTION) {
+  private handleUnrecoverableError () {
     this.handleError(Status.NEEDS_RECONNECTION)
   }
 
@@ -106,7 +118,6 @@ export default class Trezor extends Signer {
 
   async verifyAddress (index: number, currentAddress: string, display = false, cb: Callback<boolean>) {
     const waitForInput = setTimeout(() => {
-      this.device = undefined
       log.error('Trezor address verification timed out')
       cb(new Error('Address verification timed out'))
     }, 60_000)
@@ -147,15 +158,11 @@ export default class Trezor extends Signer {
     this.emit('update')
 
     try {
-      if (!this.device) {
-        throw new Error('Trezor not connected')
-      }
-
-      const publicKey = await TrezorBridge.getPublicKey(this.device, this.basePath())
+      const publicKey = await TrezorBridge.getPublicKey(this.path, this.basePath())
 
       this.deriveHDAccounts(publicKey.publicKey, publicKey.chainCode, (err, accs) => {
         if (err) {
-          this.handleUnrecoverableError('could not derive addresses, reconnect your Trezor')
+          this.handleError('could not derive addresses, reconnect your Trezor')
           return
         }
 
@@ -176,7 +183,7 @@ export default class Trezor extends Signer {
       })
     } catch (e: any) {
       log.error('could not get public key from Trezor', e)
-      this.handleUnrecoverableError('could not derive addresses, reconnect your Trezor')
+      this.handleError('could not derive addresses, reconnect your Trezor')
     }
   }
 

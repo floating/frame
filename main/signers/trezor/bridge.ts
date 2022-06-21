@@ -1,6 +1,16 @@
 import log from 'electron-log'
 import { EventEmitter } from 'events'
-import TrezorConnect, { Device, DEVICE, DeviceEvent, DEVICE_EVENT, EthereumSignTransaction, EthereumSignTypedDataMessage, EthereumSignTypedDataTypes, EthereumTransaction, EthereumTransactionEIP1559, Response, TRANSPORT_EVENT, UI, UiEvent, UI_EVENT } from 'trezor-connect'
+import TrezorConnect, {
+  CommonParams,
+  Device,
+  DeviceEvent,
+  UiEvent,
+  Response,
+  DEVICE,
+  DEVICE_EVENT,
+  UI,
+  UI_EVENT
+} from 'trezor-connect'
 
 export class ConnectError extends Error {
   private readonly code
@@ -53,12 +63,16 @@ class TrezorBridge extends EventEmitter {
   }
 
   // methods to send requests from the application to a Trezor device
-  async getFeatures (devicePath: string) {
-    return this.makeRequest(() => TrezorConnect.getFeatures({ device: { path: devicePath } }))
+  async getFeatures (params: CommonParams) {
+    return this.makeRequest(() => TrezorConnect.getFeatures(params))
   }
 
-  async getPublicKey (device: Device, path: string) {
-    return this.makeRequest(() => TrezorConnect.getPublicKey({ path, device }))
+  async getAccountInfo (device: Device, path: string) {
+    return this.makeRequest(() => TrezorConnect.getAccountInfo({ device, path, coin: 'eth' }))
+  }
+
+  async getPublicKey (devicePath: string, path: string) {
+    return this.makeRequest(() => TrezorConnect.getPublicKey({ path, device: { path: devicePath } }))
   }
 
   async getAddress (device: Device, path: string, display = false) {
@@ -120,36 +134,25 @@ class TrezorBridge extends EventEmitter {
   async passphraseEntered (deviceId: string, phrase: string) {
     log.debug('passphrase entered for device', deviceId)
 
-    return new Promise<void>((resolve, reject) => {
-      const entered = (event: UiEvent) => {
-        // a close window event will always be received after the passphrase is entered
-        if (event.type === UI.CLOSE_UI_WINDOW) {
-          TrezorConnect.off(UI_EVENT, entered)
-          this.emit('trezor:entered:passphrase', deviceId)
-          resolve()
-        }
-      }
-  
-      setTimeout(() => {
-        TrezorConnect.off(UI_EVENT, entered)
-        reject('request timed out')
-      }, 60 * 1000)
-  
-      TrezorConnect.on(UI_EVENT, entered)
-      TrezorConnect.uiResponse({ type: UI.RECEIVE_PASSPHRASE, payload: { save: true, value: phrase } })
-    })
+    TrezorConnect.uiResponse({ type: UI.RECEIVE_PASSPHRASE, payload: { save: true, value: phrase } })
+
+    this.emit('trezor:entered:passphrase', deviceId)
   }
 
-  private async makeRequest <T> (fn: () => Response<T>) {
+  private async makeRequest <T> (fn: () => Response<T>, retries = 20) {
     try {
       const result = await handleResponse(fn())
       return result
     } catch (e: any) {
+      if (retries === 0) {
+        throw new Error('Trezor unreachable, please try again')
+      }
+
       if (e.code === 'Device_CallInProgress') {
         return new Promise<T>(resolve => {
           setTimeout(() => {
             log.warn('request conflict, trying again in 400ms', e)
-            resolve(this.makeRequest(fn))
+            resolve(this.makeRequest(fn, retries - 1))
           }, 400)
         })
       } else {
