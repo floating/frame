@@ -98,12 +98,12 @@ export default class TrezorSignerAdapter extends SignerAdapter {
       log.verbose(`Trezor ${deviceId} waiting for passphrase entry on device`)
       const signer = this.knownSigners[deviceId].signer
 
-      const currentStatus = signer.status
+      // const currentStatus = signer.status
 
-      this.addEventHandler(signer, 'trezor:entered:passphrase', () => {
-        signer.status = currentStatus
-        this.emit('update', signer)
-      })
+      // this.addEventHandler(signer, 'trezor:entered:passphrase', () => {
+      //   signer.status = currentStatus
+      //   this.emit('update', signer)
+      // })
 
       signer.status = Status.ENTERING_PASSPHRASE
       this.emit('update', signer)
@@ -197,6 +197,9 @@ export default class TrezorSignerAdapter extends SignerAdapter {
   reload (trezor: Trezor) {
     log.info(`reloading Trezor ${trezor.id}`)
 
+    trezor.status = Status.INITIAL
+    this.emit('update', trezor)
+
     if (trezor.device) {
       // this Trezor is already open, just reset and derive addresses again
       trezor.open(trezor.device).then(() => trezor.deriveAddresses())
@@ -204,9 +207,6 @@ export default class TrezorSignerAdapter extends SignerAdapter {
       // this Trezor is not open because it was never connected,
       // attempt to force a reload by calling this method
       TrezorBridge.getFeatures({ device: { path: trezor.path } })
-
-      trezor.status = Status.INITIAL
-      this.emit('update', trezor)
     }
   }
 

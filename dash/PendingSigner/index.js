@@ -7,11 +7,7 @@ import link from '../../../../../resources/link'
 class Pending extends React.Component {
   constructor (...args) {
     super(...args)
-    this.state = {
-      tPin: '',
-      tPhrase: '',
-      passphraseSubmitted: false
-    }
+    this.state = { tPin: '' }
   }
 
   backspacePin (e) {
@@ -29,8 +25,8 @@ class Pending extends React.Component {
   }
 
   submitPhrase () {
-    this.setState({ tPhrase: '', passphraseSubmitted: true })
-    link.rpc('trezorPhrase', this.props.id, this.state.tPhrase || '', () => {})
+    link.rpc('trezorPhrase', this.props.id, this.state.tPhrase, () => {})
+    this.setState({ tPhrase: '' })
   }
 
   renderLoadingLive () {
@@ -95,12 +91,6 @@ class Pending extends React.Component {
   }
 
   renderTrezorPhrase (active) {
-    const phraseClasses = ['signerPinMessage', 'signerPinSubmit']
-
-    if (this.state.passphraseSubmitted) {
-      phraseClasses.push('passphraseSubmitted')
-    }
-
     return (
       <div className='trezorPinWrap' style={active ? {} : { height: '0px', padding: '0px 0px 0px 0px' }}>
         {active ? (
@@ -108,11 +98,8 @@ class Pending extends React.Component {
             <div className='trezorPhraseInput'>
               <input type='password' onChange={(e) => this.setState({ tPhrase: e.target.value })} onKeyPress={e => this.phraseKeyPress(e)} autoFocus />
             </div>
-            <div className={phraseClasses.join(' ')} onMouseDown={() => {
-              if (this.state.passphraseSubmitted) return
-              this.submitPhrase()
-            }}>
-              {this.state.passphraseSubmitted ? '... verifying ...' : 'Submit Passphrase'}
+            <div className='signerPinMessage signerPinSubmit' onMouseDown={() => this.submitPhrase()}>
+              Submit Passphrase
             </div>
           </>
         ) : null}
