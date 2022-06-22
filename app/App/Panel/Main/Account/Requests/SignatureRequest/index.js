@@ -11,7 +11,8 @@ function decodeMessage (rawMessage) {
     return buff.length === 32 ? rawMessage : buff.toString('utf8')
   }
 
-  return rawMessage
+  // replace all multiple line returns with just one to prevent excess space in message
+  return rawMessage.replaceAll(/[\n\r]+/g, '\n')
 }
 
 class TransactionRequest extends React.Component {
