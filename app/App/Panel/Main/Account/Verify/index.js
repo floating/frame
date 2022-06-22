@@ -73,8 +73,8 @@ class Verify extends React.Component {
               {this.state.verifyAddressResponse ? (
                 <div className={this.state.verifyAddressSuccess ? 'signerVerifyResponse signerVerifyResponseSuccess cardShow' : 'signerVerifyResponse'}>{this.state.verifyAddressResponse}</div>
               ) : null}
-              <div className={buttonClasses.join(' ')} onMouseDown={() => {
-                if (!this.state.verifyInProgress) {
+              <div className={buttonClasses.join(' ')} onMouseDown={evt => {
+                if (evt.button === 0 && !this.state.verifyInProgress) {
                   this.verifyAddress()
                 }
               }}>
