@@ -11,23 +11,28 @@ class Verify extends React.Component {
         link.send('tray:action', 'updateAccountModule', this.props.moduleId, { height: this.moduleRef.current.clientHeight })
       }
     })
+
     this.state = {
       expand: false,
       verifyAddressSuccess: false,
-      verifyAddressResponse: ''
+      verifyAddressResponse: '',
+      verifyInProgress: false
     }
   }
 
   verifyAddress () {
+    this.setState({ verifyInProgress: true })
+
     link.rpc('verifyAddress', err => {
       if (err) {
-        this.setState({ verifyAddressSuccess: false, verifyAddressResponse: err })
+        this.setState({ verifyInProgress: false, verifyAddressSuccess: false, verifyAddressResponse: err })
       } else {
-        this.setState({ verifyAddressSuccess: true, verifyAddressResponse: 'Address matched!' })
+        this.setState({ verifyInProgress: false, verifyAddressSuccess: true, verifyAddressResponse: 'Address matched!' })
       }
+
       setTimeout(() => {
         this.setState({ verifyAddressSuccess: false, verifyAddressResponse: '' })
-      }, 5000)
+      }, 5 * 1000)
     })
   }
 
@@ -48,15 +53,12 @@ class Verify extends React.Component {
   render () {
     const signerType = this.store('main.accounts', this.props.id, 'lastSignerType')
     const account = this.store('main.accounts', this.props.id)
-<<<<<<< HEAD
     const buttonClasses = ['moduleButton']
 
     if (this.state.verifyInProgress) {
       buttonClasses.push('signerVerifyInProgress')
     }
 
-=======
->>>>>>> revert verify button changes
     return (
       <div ref={this.moduleRef} className='balancesBlock'>
         {account.smart ? (
@@ -79,17 +81,12 @@ class Verify extends React.Component {
               {this.state.verifyAddressResponse ? (
                 <div className={this.state.verifyAddressSuccess ? 'signerVerifyResponse signerVerifyResponseSuccess cardShow' : 'signerVerifyResponse'}>{this.state.verifyAddressResponse}</div>
               ) : null}
-<<<<<<< HEAD
               <div className={buttonClasses.join(' ')} onMouseDown={evt => {
                 if (evt.button === 0 && !this.state.verifyInProgress) {
                   this.verifyAddress()
                 }
               }}>
                 {this.getText(signerType)}
-=======
-              <div className='moduleButton' onMouseDown={() => this.verifyAddress()}>
-                {signerKind === 'hot' ? 'Verify Address' : 'Verify Address on Device'}
->>>>>>> revert verify button changes
               </div>
             </div>
           </>
