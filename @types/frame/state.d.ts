@@ -174,5 +174,3 @@ interface SmartAccount {
   apps: any,
   dao: any
 }
-
-type FrameWindow = BrowserWindow & { frameId: string }
