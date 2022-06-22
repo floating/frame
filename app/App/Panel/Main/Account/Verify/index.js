@@ -36,6 +36,14 @@ class Verify extends React.Component {
     })
   }
 
+  getText (isHwSigner) {
+    if (this.state.verifyInProgress) {
+      return isHwSigner ? 'verifying' : 'check your device'
+    }
+
+    return isHwSigner ? 'verify address' : 'verify address on device'
+  }
+
   componentDidMount () {
     this.resizeObserver.observe(this.moduleRef.current)
   } 
@@ -78,11 +86,7 @@ class Verify extends React.Component {
                   this.verifyAddress()
                 }
               }}>
-                {
-                  this.state.verifyInProgress
-                    ? isHwSigner ? 'Verifying' : 'check your device'
-                    : isHwSigner ? 'Verify Address' : 'Verify Address on Device'
-                }
+                {this.getText(isHwSigner)}
               </div>
             </div>
           </>
