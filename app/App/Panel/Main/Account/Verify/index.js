@@ -36,7 +36,9 @@ class Verify extends React.Component {
     })
   }
 
-  getText (isHwSigner) {
+  getText (signerType) {
+    const isHwSigner = (signerType === 'seed' || signerType === 'ring')
+
     if (this.state.verifyInProgress) {
       return isHwSigner ? 'verifying' : 'check your device'
     }
@@ -50,9 +52,7 @@ class Verify extends React.Component {
 
   render () {
     const signerType = this.store('main.accounts', this.props.id, 'lastSignerType')
-    const isHwSigner = (signerType === 'seed' || signerType === 'ring')
     const account = this.store('main.accounts', this.props.id)
-
     const buttonClasses = ['moduleButton']
 
     if (this.state.verifyInProgress) {
@@ -86,7 +86,7 @@ class Verify extends React.Component {
                   this.verifyAddress()
                 }
               }}>
-                {this.getText(isHwSigner)}
+                {this.getText(signerType)}
               </div>
             </div>
           </>
