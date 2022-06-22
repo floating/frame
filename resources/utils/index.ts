@@ -41,17 +41,18 @@ function debounce (func: (...args: any) => any, timeout = 300) {
   }
 }
 
-function instanceOfNodeError<T extends ErrorConstructor>(
+function instanceOfNodeError<T extends ErrorConstructor> (
   value: Error,
   errorType: T
 ): value is InstanceType<T> & NodeJS.ErrnoException {
   return value instanceof errorType;
 }
 
-function getErrorCode(e: Error) {
-  if(!instanceOfNodeError(e, Error)) {
+function getErrorCode (e: Error) {
+  if (!instanceOfNodeError(e, Error)) {
     return undefined
   }
+
   return e.code
 }
 
