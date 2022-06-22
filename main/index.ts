@@ -18,6 +18,7 @@ import showUnhandledExceptionDialog from './windows/dialog/unhandledException'
 import Erc20Contract from './contracts/erc20'
 import provider from './provider'
 import { getErrorCode } from '../resources/utils'
+import { FrameInstance } from './windows/frames/frameInstances'
 
 require('./rpc')
 
@@ -235,8 +236,8 @@ dapps.add({
 })
 
 ipcMain.on('unsetCurrentView', async (e, ens) => {
-  const win = BrowserWindow.fromWebContents(e.sender) as FrameWindow
-  dapps.unsetCurrentView(win.frameId)
+  const win = BrowserWindow.fromWebContents(e.sender) as FrameInstance
+  dapps.unsetCurrentView(win.frameId as string)
 })
 
 ipcMain.on('*:addFrame', (e, id) => {
@@ -297,6 +298,7 @@ app.on('quit', async () => {
 app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit() })
 
 let launchStatus = store('main.launch')
+
 store.observer(() => {
   if (launchStatus !== store('main.launch')) {
     launchStatus = store('main.launch')
