@@ -62,7 +62,7 @@ class TransactionRequest extends React.Component {
     }
     return (
       <div ref={this.signRefs[0]} className='signValue'>
-        <div ref={this.signRefs[1]} className='signValueInner'>{message + message + message + message + message + message + message + message + message + message + message + message + message + message + message + message + message + message + message + message}</div>
+        <div ref={this.signRefs[1]} className='signValueInner'>{message}</div>
         {showMore ? <div className='signValueMore'>scroll to see more</div> : null}
       </div>
     )
