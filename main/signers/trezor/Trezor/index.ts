@@ -33,9 +33,9 @@ export const Status = {
   ENTERING_PASSPHRASE: 'waiting for input on device'
 }
 
-function createErrorMessage (message: string, cause: string) {
+function createErrorMessage (message: string, cause: string = '') {
   // the cause may need to be transformed into a more informative message
-  return (cause || '').toLowerCase().match(/forbidden key path/)
+  return cause.toLowerCase().match(/forbidden key path/)
     ? 'derivation path failed strict safety checks on trezor device'
     : message
 }
@@ -125,7 +125,7 @@ export default class Trezor extends Signer {
     this.emit('update')
   }
 
-  async verifyAddress (index: number, currentAddress: string, display = false, cb: Callback<boolean>) {
+  async verifyAddress (index: number, currentAddress: string = '', display = false, cb: Callback<boolean>) {
     const waitForInput = setTimeout(() => {
       log.error('Trezor address verification timed out')
       cb(new Error('Address verification timed out'))
@@ -140,7 +140,7 @@ export default class Trezor extends Signer {
 
       clearTimeout(waitForInput)
 
-      const current = (currentAddress || '').toLowerCase()
+      const current = currentAddress.toLowerCase()
 
       if (reportedAddress !== current) {
         log.error(`address from Frame (${current}) does not match address from Trezor device (${reportedAddress})`)
@@ -173,13 +173,12 @@ export default class Trezor extends Signer {
 
       const publicKey = await TrezorBridge.getPublicKey(this.device, this.basePath())
 
-      this.deriveHDAccounts(publicKey.publicKey, publicKey.chainCode, (err, accs) => {
+      this.deriveHDAccounts(publicKey.publicKey, publicKey.chainCode, (err, accounts = []) => {
         if (err) {
           this.handleError('could not derive addresses, reconnect your Trezor')
           return
         }
 
-        const accounts = (accs || []) as string[]
         const firstAccount = accounts[0] || ''
 
         this.verifyAddress(0, firstAccount, false, err => {

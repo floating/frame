@@ -13,6 +13,18 @@ function isLoading (status = '') {
   return ['loading', 'connecting', 'addresses', 'input', 'pairing'].some(s => statusToCheck.includes(s))
 }
 
+function isDisconnected (type, status, isLoading) {
+  if (type === 'lattice') {
+    return status !== 'ok' && !isLoading
+  }
+
+  if (type === 'trezor') {
+    return (status === 'disconnected' || status.includes('reconnect')) && !isLoading
+  }
+  
+  return false
+}
+
 class Signer extends React.Component {
   constructor (...args) {
     super(...args)
@@ -230,9 +242,7 @@ class Signer extends React.Component {
 
     const hwSigner = isHardwareSigner(this.props.type)
     const loading = isLoading(status)
-    const disconnected =
-      (this.props.type === 'lattice' && !loading && status !== 'ok') ||
-      (this.props.type === 'trezor' && !loading && (status === 'disconnected' || status.includes('reconnect')))
+    const disconnected = isDisconnected(this.props.type, status, loading)
 
     // TODO: create well-defined signer states that drive these UI features
     const canReconnect =

@@ -26,7 +26,9 @@ beforeEach(done => {
   TrezorBridge.open()
 })
 
-afterEach(async () => TrezorBridge.close())
+afterEach(() => {
+  TrezorBridge.close()
+})
 
 describe('connect events', () => {
   it('emits a detected event on device changed event with type unacquired', done => {

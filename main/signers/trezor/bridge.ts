@@ -33,10 +33,10 @@ const config = {
 }
 
 async function handleResponse <T> (p: Response<T>) {
-  return p.then(response => {
-    if (response.success) return response.payload
-    throw { message: response.payload.error, code: response.payload.code }
-  })
+  const response = await p
+  
+  if (response.success) return response.payload
+  throw { message: response.payload.error, code: response.payload.code }
 }
 
 class TrezorBridge extends EventEmitter {
@@ -76,54 +76,62 @@ class TrezorBridge extends EventEmitter {
   }
 
   async getAddress (device: Device, path: string, display = false) {
-    return this.makeRequest(() => TrezorConnect.ethereumGetAddress({
+    const result = await this.makeRequest(() => TrezorConnect.ethereumGetAddress({
       device,
       path,
       showOnTrezor: display
-    })).then(result => (result.address || '').toLowerCase())
+    }))
+    
+    return (result.address || '').toLowerCase()
   }
 
   async signMessage (device: Device, path: string, message: string) {
-    return this.makeRequest(() => TrezorConnect.ethereumSignMessage({
+    const result = await this.makeRequest(() => TrezorConnect.ethereumSignMessage({
       device,
       path,
       message,
       hex: true
-    })).then(result => result.signature)
+    }))
+    
+    return result.signature
   }
 
   async signTypedData (device: Device, path: string, data: any) {
-    return this.makeRequest(() => TrezorConnect.ethereumSignTypedData({
+    const result = await this.makeRequest(() => TrezorConnect.ethereumSignTypedData({
       device,
       path,
       data,
       metamask_v4_compat: true,
-    })).then(result => result.signature)
+    }))
+    
+    return result.signature
   }
 
   async signTypedHash (device: Device, path: string, data: any, domainSeparatorHash: string, messageHash: string) {
-    return this.makeRequest(() => TrezorConnect.ethereumSignTypedData({
+    const result = await this.makeRequest(() => TrezorConnect.ethereumSignTypedData({
       device,
       path,
       data,
       domain_separator_hash: domainSeparatorHash,
       message_hash: messageHash,
       metamask_v4_compat: true
-    })).then(result => result.signature)
+    }))
+    
+    return result.signature
   }
 
   async signTransaction (device: Device, path: string, tx: any) {
-    return this.makeRequest(() => TrezorConnect.ethereumSignTransaction({
+    const result = await this.makeRequest(() => TrezorConnect.ethereumSignTransaction({
       device,
       path,
       transaction: tx
-    })).then(result => {
-      const { v, r, s } = result
-      return { v, r, s }
-    })
+    }))
+    
+    const { v, r, s } = result
+    return { v, r, s }
   }
 
-  async pinEntered (deviceId: string, pin: string) {
+  pinEntered (deviceId: string, pin: string) {
     log.debug('pin entered for device', deviceId)
 
     TrezorConnect.uiResponse({ type: UI.RECEIVE_PIN, payload: pin })
@@ -131,7 +139,7 @@ class TrezorBridge extends EventEmitter {
     this.emit('trezor:entered:pin', deviceId)
   }
 
-  async passphraseEntered (deviceId: string, phrase: string) {
+  passphraseEntered (deviceId: string, phrase: string) {
     log.debug('passphrase entered for device', deviceId)
 
     TrezorConnect.uiResponse({ type: UI.RECEIVE_PASSPHRASE, payload: { save: true, value: phrase } })
@@ -139,7 +147,7 @@ class TrezorBridge extends EventEmitter {
     this.emit('trezor:entered:passphrase', deviceId)
   }
 
-  async enterPassphraseOnDevice (deviceId: string) {
+  enterPassphraseOnDevice (deviceId: string) {
     log.debug('requested to enter passphrase on device', deviceId)
 
     TrezorConnect.uiResponse({
