@@ -22,6 +22,8 @@ class TransactionRequest extends React.Component {
 
     const props = args[0] || {}
 
+    this.signRefs = [React.createRef(), React.createRef()]
+
     setTimeout(() => {
       this.setState({ allowInput: true })
     }, props.signingDelay || 1500)
@@ -49,6 +51,21 @@ class TransactionRequest extends React.Component {
 
   hexToDisplayValue (hex) {
     return (Math.round(parseFloat(fromWei(hex, 'ether')) * 1000000) / 1000000).toFixed(6)
+  }
+
+  renderMessage (message) {
+    let showMore = false
+    if (this.signRefs[0].current && this.signRefs[1].current) {
+      const inner = this.signRefs[1].current.clientHeight
+      const wrap = this.signRefs[0].current.clientHeight + this.signRefs[0].current.scrollTop
+      if (inner > wrap) showMore = true
+    }
+    return (
+      <div ref={this.signRefs[0]} className='signValue'>
+        <div ref={this.signRefs[1]} className='signValueInner'>{message + message + message + message + message + message + message + message + message + message + message + message + message + message + message + message + message + message + message + message}</div>
+        {showMore ? <div className='signValueMore'>scroll to see more</div> : null}
+      </div>
+    )
   }
 
   render () {
@@ -108,9 +125,7 @@ class TransactionRequest extends React.Component {
                     <div className='approveRequestHeaderIcon'> {svg.octicon('pencil', { height: 20 })}</div>
                     <div className='approveRequestHeaderLabel'> Sign Message</div>
                   </div>
-                  <div className='signValue'>
-                    <div className='signValueInner'>{message}</div>
-                  </div>
+                  {this.renderMessage(message)}
                 </>
               )}
             </div>
