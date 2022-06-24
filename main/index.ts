@@ -1,50 +1,44 @@
-const { app, ipcMain, protocol, shell, clipboard, globalShortcut, BrowserWindow } = require('electron')
+import { app, ipcMain, protocol, shell, clipboard, globalShortcut, BrowserWindow } from 'electron'
+import path from 'path'
+import * as Sentry from '@sentry/electron'
+import log from 'electron-log'
+import { numberToHex } from 'web3-utils'
+import url from 'url'
 
-app.commandLine.appendSwitch('enable-accelerated-2d-canvas', true)
-app.commandLine.appendSwitch('enable-gpu-rasterization', true)
-app.commandLine.appendSwitch('force-gpu-rasterization', true)
-app.commandLine.appendSwitch('ignore-gpu-blacklist', true)
-app.commandLine.appendSwitch('enable-native-gpu-memory-buffers', true)
+import windows from './windows'
+import menu from './menu'
+import store from './store'
+import dapps from './dapps'
+import accounts from './accounts'
+import * as launch from './launch'
+import * as updater from './updater'
+import signers from './signers'
+import * as persist from './store/persist'
+import showUnhandledExceptionDialog from './windows/dialog/unhandledException'
+import Erc20Contract from './contracts/erc20'
+import provider from './provider'
+import { getErrorCode } from '../resources/utils'
+import { FrameInstance } from './windows/frames/frameInstances'
+
+require('./rpc')
+
+app.commandLine.appendSwitch('enable-accelerated-2d-canvas', 'true')
+app.commandLine.appendSwitch('enable-gpu-rasterization', 'true')
+app.commandLine.appendSwitch('force-gpu-rasterization', 'true')
+app.commandLine.appendSwitch('ignore-gpu-blacklist', 'true')
+app.commandLine.appendSwitch('enable-native-gpu-memory-buffers', 'true')
 app.commandLine.appendSwitch('force-color-profile', 'srgb')
 
-const path = require('path')
 process.env.BUNDLE_LOCATION = process.env.BUNDLE_LOCATION || path.resolve(__dirname, './../..', 'bundle')
-
-// app.commandLine.appendSwitch('enable-transparent-visuals', true)
-// if (process.platform === 'linux') app.commandLine.appendSwitch('disable-gpu', true)
-
-const Sentry = require('@sentry/electron')
-const log = require('electron-log')
-const url = require('url')
 
 log.transports.console.level = process.env.LOG_LEVEL || 'info'
 log.transports.file.level = ['development', 'test'].includes(process.env.NODE_ENV) ? false : 'verbose'
-
-const windows = require('./windows')
-const menu = require('./menu')
-const store = require('./store').default
-const dapps = require('./dapps').default
 
 function getCrashReportFields () {
   const fields = ['networks', 'networksMeta', 'tokens']
 
   return fields.reduce((extra, field) => {
     return { ...extra, [field]: JSON.stringify(store('main', field) || {}) }
-    // if (field === 'accounts') {
-    //   // scrub account information
-    //   const accountData = Object.fromEntries(Object.entries(store('main.accounts') || {}).map(([id, account]) => {
-    //     return [
-    //       truncateAddress(id),
-    //       {
-    //         ...account,
-    //         id: truncateAddress(account.id),
-    //         address: truncateAddress(account.address)
-    //       }
-    //     ]
-    //   }))
-
-    //   return { ...extra, accounts: JSON.stringify(accountData) }
-    // }
   }, {})
 }
 
@@ -62,47 +56,9 @@ Sentry.init({
   }
 })
 
-// if (process.defaultApp) {
-//   if (process.argv.length >= 2) {
-//     app.setAsDefaultProtocolClient('dapp', process.execPath, [path.resolve(process.argv[1])])
-//   }
-// } else {
-//   app.setAsDefaultProtocolClient('dapp')
-// }
-
-// app.on('open-url', (event, url) => {
-//   dialog.showErrorBox('Welcome Back', `You arrived from: ${url}`)
-// })
-
-// log.transports.file.level = 'info'
-
-// Action Monitor
-// store.api.feed((state, actions, obscount) => {
-//   actions.forEach(a => {
-//     console.log(a.name)
-//     a.updates.forEach(u => {
-//       console.log(u.path)
-//     })
-//   })
-// })
-
-const accounts = require('./accounts').default
-
-const launch = require('./launch')
-const updater = require('./updater')
-require('./rpc')
-// const clients = require('./clients')
-const signers = require('./signers').default
-const persist = require('./store/persist')
-
-const { default: showUnhandledExceptionDialog } = require('./windows/dialog/unhandledException')
-const { default: Erc20Contract } = require('./contracts/erc20')
-const { default: provider } = require('./provider')
-const { intToHex } = require('../resources/utils')
-
-log.info('Chrome: v' + process.versions.chrome)
-log.info('Electron: v' + process.versions.electron)
-log.info('Node: v' + process.versions.node)
+log.info(`Chrome: v${process.versions.chrome}`)
+log.info(`Electron: v${process.versions.electron}`)
+log.info(`Node: v${process.versions.node}`)
 
 // prevent showing the exit dialog more than once
 let closing = false
@@ -112,7 +68,9 @@ process.on('uncaughtException', e => {
 
   log.error('uncaughtException', e)
 
-  if (e.code === 'EPIPE') {
+  const errorCode = getErrorCode(e) ?? ''
+
+  if (errorCode === 'EPIPE') {
     log.error('uncaught EPIPE error', e)
     return
   }
@@ -120,7 +78,7 @@ process.on('uncaughtException', e => {
   if (!closing) {
     closing = true
 
-    showUnhandledExceptionDialog(e.message, e.code)
+    showUnhandledExceptionDialog(e.message, errorCode)
   }
 })
 
@@ -151,11 +109,6 @@ ipcMain.on('tray:resetAllSettings', () => {
   app.relaunch()
   app.exit(0)
 })
-
-// ipcMain.on('tray:removeAllAccountsAndSigners', () => {
-//   signers.removeAllSigners()
-//   accounts.removeAllAccounts()
-// })
 
 ipcMain.on('tray:replaceTx', async (e, id, type) => {
   try {
@@ -204,9 +157,6 @@ ipcMain.on('tray:openExplorer', (e, hash, chain) => {
 })
 
 ipcMain.on('tray:copyTxHash', (e, hash, chain) => {
-  // remove trailing slashes from the base url
-  // const explorer = (store('main.networks', chain.type, chain.id, 'explorer') || '').replace(/\/+$/, '')
-  // clipboard.writeText(explorer + '/tx/' + hash)
   if (hash) clipboard.writeText(hash)
 })
 
@@ -225,7 +175,7 @@ ipcMain.on('tray:switchChain', (e, type, id, req) => {
 })
 
 ipcMain.handle('tray:getTokenDetails', (e, contractAddress, chainId) => {
-  const contract = new Erc20Contract(contractAddress, intToHex(chainId), provider)
+  const contract = new Erc20Contract(contractAddress, numberToHex(chainId), provider)
   return contract.getTokenData()
 })
 
@@ -262,8 +212,6 @@ ipcMain.on('tray:updateRestart', () => {
 
 ipcMain.on('tray:refreshMain', () => windows.broadcast('main:action', 'syncMain', store('main')))
 
-ipcMain.on('tray:toggleFlow', () => windows.toggleFlow())
-
 ipcMain.on('frame:close', e => {
   windows.close(e)
 })
@@ -280,13 +228,6 @@ ipcMain.on('frame:unmax', e => {
   windows.unmax(e)
 })
 
-// ipcMain.on('tray:launchDapp', async (e, domain) => {
-//   await dapps.add(domain, {}, err => { if (err) console.error('error adding...', err) })
-//   await dapps.launch(domain, console.error)
-// })
-
-// ipcMain.on('addDapp', (dapp) => dapps.add(dapp))
-
 dapps.add({
   ens: 'send.frame.eth',
   config: {
@@ -294,14 +235,9 @@ dapps.add({
   }
 })
 
-// ipcMain.on('runDapp', async (e, ens) => {
-//   const win = BrowserWindow.fromWebContents(e.sender)
-//   dapps.open(win.frameId, ens)
-// })
-
 ipcMain.on('unsetCurrentView', async (e, ens) => {
-  const win = BrowserWindow.fromWebContents(e.sender)
-  dapps.unsetCurrentView(win.frameId)
+  const win = BrowserWindow.fromWebContents(e.sender) as FrameInstance
+  dapps.unsetCurrentView(win.frameId as string)
 })
 
 ipcMain.on('*:addFrame', (e, id) => {
@@ -319,15 +255,9 @@ ipcMain.on('*:addFrame', (e, id) => {
   }
 })
 
-// if (process.platform !== 'darwin' && process.platform !== 'win32') app.disableHardwareAcceleration()
 app.on('ready', () => {
   menu()
-  windows.tray()
-  // if (process.platform === 'darwin' || process.platform === 'win32') {
-  //   windows.tray()
-  // } else {
-  //   setTimeout(windows.tray, 800)
-  // }
+  windows.init()
   if (app.dock) app.dock.hide()
 
   protocol.interceptFileProtocol('file', (req, cb) => {
@@ -337,7 +267,7 @@ app.on('ready', () => {
     if (filePath.startsWith(appOrigin)) cb({ path: filePath }) // eslint-disable-line
   })
 
-  store.observer(_ => {
+  store.observer(() => {
     if (store('dash.showing')) {
       windows.showDash()
     } else {
@@ -348,20 +278,11 @@ app.on('ready', () => {
     const altSlash = store('main.shortcuts.altSlash')
     if (altSlash) {
       globalShortcut.unregister('Alt+/')
-      globalShortcut.register('Alt+/', () => windows.trayClick())
+      globalShortcut.register('Alt+/', () => windows.toggleTray())
     } else {
       globalShortcut.unregister('Alt+/')
     }
   })
-  // store.observer(() => {
-  //   const altSlash = store('main.shortcuts.altSlash')
-  //   if (altSlash) {
-  //     globalShortcut.unregister('Alt+Space')
-  //     globalShortcut.register('Alt+Space', () => windows.openDapp())
-  //   } else {
-  //     globalShortcut.unregister('Alt+Space')
-  //   }
-  // })
 })
 
 ipcMain.on('tray:action', (e, action, ...args) => {
@@ -369,15 +290,15 @@ ipcMain.on('tray:action', (e, action, ...args) => {
   log.info('Tray sent unrecognized action: ', action)
 })
 
-app.on('activate', () => windows.activate())
+app.on('activate', () => windows.showTray())
 app.on('will-quit', () => app.quit())
 app.on('quit', async () => {
-  // await clients.stop()
   accounts.close()
 })
 app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit() })
 
 let launchStatus = store('main.launch')
+
 store.observer(() => {
   if (launchStatus !== store('main.launch')) {
     launchStatus = store('main.launch')

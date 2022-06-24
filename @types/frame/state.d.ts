@@ -126,12 +126,12 @@ interface Frame {
 }
 
 interface Dapp {
-  id: string,
+  id?: string,
   ens: string,
-  status: string,
-  config: string,
-  manifest: any,
-  current: any
+  status?: string,
+  config: Record<string, string>,
+  manifest?: any,
+  current?: any
 }
 
 type SignerType = 'ring' | 'seed' | 'aragon' | 'trezor' | 'ledger' | 'lattice'

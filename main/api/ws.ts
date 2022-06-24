@@ -77,7 +77,7 @@ const handler = (socket: FrameWebSocket, req: IncomingMessage) => {
     const origin = parseOrigin(requestOrigin)
 
     // Extension custom action for summoning Frame
-    if (origin === 'frame-extension' && rawPayload.method === 'frame_summon') return windows.trayClick()
+    if (origin === 'frame-extension' && rawPayload.method === 'frame_summon') return windows.toggleTray()
     if (logTraffic) log.info(`req -> | ${(socket.isFrameExtension ? 'ext' : 'ws')} | ${origin} | ${rawPayload.method} | -> | ${rawPayload.params}`)
 
     const { payload, hasSession } = updateOrigin(rawPayload, origin, rawPayload.__extensionConnecting)
