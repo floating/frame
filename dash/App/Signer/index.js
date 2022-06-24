@@ -13,6 +13,18 @@ function isLoading (status = '') {
   return ['loading', 'connecting', 'addresses', 'input', 'pairing'].some(s => statusToCheck.includes(s))
 }
 
+function isDisconnected (type, status, isLoading) {
+  if (type === 'lattice') {
+    return status !== 'ok' && !isLoading
+  }
+
+  if (type === 'trezor') {
+    return (status === 'disconnected' || status.includes('reconnect')) && !isLoading
+  }
+  
+  return false
+}
+
 class Signer extends React.Component {
   constructor (...args) {
     super(...args)
@@ -21,7 +33,8 @@ class Signer extends React.Component {
       page: 0,
       addressLimit: 5,
       latticePairCode: '',
-      tPin: ''
+      tPin: '',
+      tPhrase: ''
     }
   }
 
@@ -40,8 +53,8 @@ class Signer extends React.Component {
   }
 
   submitPhrase () {
-    link.rpc('trezorPhrase', this.props.id, this.state.tPhrase, () => {})
     this.setState({ tPhrase: '' })
+    link.rpc('trezorPhrase', this.props.id, this.state.tPhrase || '', () => {})
   }
 
   renderLoadingLive () {
@@ -106,6 +119,8 @@ class Signer extends React.Component {
   }
 
   renderTrezorPhrase (active) {
+    const allowsDeviceEntry = (this.props.capabilities || []).includes('Capability_PassphraseEntry')
+
     return (
       <div className='trezorPinWrap' style={active ? {} : { height: '0px', padding: '0px 0px 0px 0px' }}>
         {active ? (
@@ -113,60 +128,26 @@ class Signer extends React.Component {
             <div className='trezorPhraseInput'>
               <input type='password' onChange={(e) => this.setState({ tPhrase: e.target.value })} onKeyPress={e => this.phraseKeyPress(e)} autoFocus />
             </div>
-            <div className='signerPinMessage signerPinSubmit' onMouseDown={() => this.submitPhrase()}>
+            <div className='signerPinMessage signerPinSubmit' onMouseDown={evt => {
+              if (evt.button === 0) { // left click only
+                this.submitPhrase()
+              }
+            }}>
               Submit Passphrase
+            </div>
+            <div className='signerPinMessageOr'>{'or'}</div>
+            <div className='signerPinMessage signerPinSubmit' onMouseDown={evt => {
+              if (evt.button === 0) { // left click only
+                link.rpc('trezorEnterPhrase', this.props.id, () => {})
+              }
+            }}>
+              Enter passphrase on device
             </div>
           </>
         ) : null}
       </div>
     )
   }
-
-  // render () {
-  //   const open = this.store('selected.open')
-  //   const style = {}
-  //   if (open) {
-  //     style.opacity = 0
-  //     style.pointerEvents = 'none'
-  //     style.transform = 'translate(0px, -100px)'
-  //   }
-  //   if (this.props.type === 'trezor' && this.props.status === 'Need Pin') style.height = '300px'
-  //   if (this.props.type === 'trezor' && this.props.status === 'Enter Passphrase') style.height = '180px'
-
-  //   style.transition = '0.48s cubic-bezier(.82,0,.12,1) all'
-
-  //   const status = this.props.status ? this.props.status.charAt(0).toUpperCase() + this.props.status.substring(1) : ''
-
-  //   return (
-  //     <div className='pendingSignerWrap' style={style}>
-  //       <div className='pendingSignerInset'>
-  //         <div className='pendingSignerTop'>
-  //           {this.renderLoadingLive()}
-  //           <div className='pendingSignerLogo'>
-  //             {this.props.type === 'ledger' && (
-  //               <div style={{ marginTop: '4px' }}>
-  //                 {svg.ledger(25)}
-  //               </div>
-  //             )}
-  //             {this.props.type === 'trezor' && (
-  //               svg.trezor(25)
-  //             )}
-  //             {this.props.type === 'lattice' && (
-  //               svg.lattice(25)
-  //             )}
-  //           </div>
-  //           <div className='pendingSignerText'>
-  //             <div className='pendingSignerType'>{this.props.type + ' Found'}</div>
-  //             <div className='pendingSignerStatus'>{status}</div>
-  //           </div>
-  //         </div>
-  //         <div className='signerInterface'>
-  //           {this.renderTrezorPin(this.props.type === 'trezor' && this.props.status === 'Need Pin')}
-  //           {this.renderTrezorPhrase(this.props.type === 'trezor' && this.props.status === 'Enter Passphrase')}
-  //         </div>
-  //       </div>
-  //     </div>
-  //   )
 
   getStatus () {
     return (this.props.status || '').toLowerCase()
@@ -241,6 +222,18 @@ class Signer extends React.Component {
     this.setState({ latticePairCode: '' })
   }
 
+  reconnectButton (hwSigner) {
+    return (
+      <div className='signerControlOption'
+        onMouseDown={() => {
+          link.send('dash:reloadSigner', this.props.id)
+        }}
+      >
+        {hwSigner ? 'Reconnect' : 'Reload Signer'}
+      </div>
+    )
+  }
+
   render () {
     const signer = this.store('main.signers', this.props.id)
     const { page, addressLimit } = this.state
@@ -250,7 +243,11 @@ class Signer extends React.Component {
 
     const hwSigner = isHardwareSigner(this.props.type)
     const loading = isLoading(status)
-    const disconnected = this.props.type === 'lattice' && !loading && status !== 'ok'
+    const disconnected = isDisconnected(this.props.type, status, loading)
+
+    // TODO: create well-defined signer states that drive these UI features
+    const canReconnect =
+      (this.props.type !== 'trezor' || status === 'disconnected' || status.includes('reconnect'))
 
     // UI changes for this status only apply to hot signers
     const isLocked = !hwSigner && status === 'locked'
@@ -366,14 +363,7 @@ class Signer extends React.Component {
                 </div>
               </div>
             ) : null}
-            {/* <div className='signerControlOption'>Hide empty accounts</div>
-            <div className='signerControlOption'>Deactivte empty Accounts</div>
-            <div className='signerControlOption'>Deactivte all Accounts</div>
-            <div className='signerControlOption'>Reload Signer</div>
-            <div className='signerControlOption signerControlOptionEffect'>Lock Signer</div> */}
-            <div className='signerControlOption' onMouseDown={() => {
-              link.send('dash:reloadSigner', this.props.id)
-            }}>{hwSigner ? 'Reconnect' : 'Reload Signer'}</div>
+            {canReconnect ? this.reconnectButton(hwSigner) : null}
             <div className='signerControlOption signerControlOptionImportant' onMouseDown={() => {
               link.send('dash:removeSigner', this.props.id)
             }}>Remove Signer</div>

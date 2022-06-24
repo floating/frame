@@ -125,7 +125,7 @@ class Aragon {
         wrap.init().then(() => {
           this.wrap = wrap
           this.inSetup = false
-        }).catch((err: any) => {
+        }).catch((err: unknown) => {
           log.error(err)
           this.inSetup = false
         })

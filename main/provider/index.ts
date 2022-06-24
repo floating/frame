@@ -324,7 +324,8 @@ export class Provider extends EventEmitter {
 
           res({ id: payload.id, jsonrpc: payload.jsonrpc, result: sig })
           cb(null, sig)
-        } catch (err: any) {
+        } catch (e: unknown) {
+          const err = e as Error
           this.resError(err.message, payload, res)
 
           cb(err)
