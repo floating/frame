@@ -13,7 +13,7 @@ import TrezorConnect, {
 } from 'trezor-connect'
 
 export class ConnectError extends Error {
-  private readonly code
+  readonly code
 
   constructor (msg: string, code?: string) {
     super(msg)
@@ -162,20 +162,22 @@ class TrezorBridge extends EventEmitter {
     try {
       const result = await handleResponse(fn())
       return result
-    } catch (e: any) {
+    } catch (e: unknown) {
       if (retries === 0) {
         throw new Error('Trezor unreachable, please try again')
       }
 
-      if (e.code === 'Device_CallInProgress') {
+      const err = e as ConnectError
+
+      if (err.code === 'Device_CallInProgress') {
         return new Promise<T>(resolve => {
           setTimeout(() => {
-            log.warn('request conflict, trying again in 400ms', e)
+            log.warn('request conflict, trying again in 400ms', err)
             resolve(this.makeRequest(fn, retries - 1))
           }, 400)
         })
       } else {
-        throw e
+        throw err
       }
     }
   }

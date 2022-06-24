@@ -221,7 +221,7 @@ export default class Ledger extends Signer {
       try {
         await this.eth?.getAddress("44'/60'/0'/0", false, false)
         resolve(undefined)
-      } catch (e: any) {
+      } catch (e: unknown) {
         const err = e as DeviceError
         resolve({ message: err.message, statusCode: err.statusCode || -1 })
       }

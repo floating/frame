@@ -54,7 +54,7 @@ export default class Signer extends EventEmitter {
     this.addresses = []
   }
 
-  deriveHDAccounts (publicKey: string, chainCode: string, cb: (err: any, accounts: string[] | undefined) => void) {
+  deriveHDAccounts (publicKey: string, chainCode: string, cb: Callback<string[]>) {
     deriveHDAccounts(publicKey, chainCode, cb)
   }
 

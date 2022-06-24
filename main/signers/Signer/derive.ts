@@ -7,7 +7,7 @@ export enum Derivation {
   live = 'live', legacy = 'legacy', standard = 'standard', testnet = 'testnet'
 }
 
-export function deriveHDAccounts (publicKey: string, chainCode: string, cb: (err: any, accounts: string[] | undefined) => void) {
+export function deriveHDAccounts (publicKey: string, chainCode: string, cb: Callback<string[]>) {
   try {
     const hdk = new HDKey()
     hdk.publicKey = Buffer.from(publicKey, 'hex')
@@ -22,7 +22,7 @@ export function deriveHDAccounts (publicKey: string, chainCode: string, cb: (err
 
     cb(null, accounts)
   } catch (e) {
-    cb(e, undefined)
+    cb(e as Error, undefined)
   }
 }
 
