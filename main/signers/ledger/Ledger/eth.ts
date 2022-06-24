@@ -25,7 +25,7 @@ export default class LedgerEthereumApp {
 
     const path = getDerivationPath(derivation)
 
-    const executor = async (resolve: (addresses: string[]) => void, reject: (err: any) => void) => {
+    const executor = async (resolve: (addresses: string[]) => void, reject: (err?: Error) => void) => {
       try {
         const result = await this.getAddress(path, false, true)
         deriveHDAccounts(result.publicKey, result.chainCode || '', (err, addresses) => {
@@ -33,7 +33,7 @@ export default class LedgerEthereumApp {
           resolve(addresses as string[])
         })
       } catch (err) {
-        reject(err)
+        reject(err as Error)
       }
     }
 

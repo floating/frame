@@ -19,5 +19,4 @@ jobs:
     - run: sudo apt install -y libudev-dev
     - run: npm run setup
     - run: npm run compile
-    - run: npm run test:main
-    - run: npm run test:components
+    - run: npm run test:unit

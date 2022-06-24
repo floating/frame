@@ -3,7 +3,7 @@ const { app, dialog } = require('electron')
 enum ExitAction { OK, Quit }
 
 export default function (message: string, code?: string) {
-  let exitAction = ExitAction.OK
+  let exitAction = ExitAction.Quit
 
   if (code === 'EADDRINUSE') {
     dialog.showErrorBox('Frame is already running', 'Frame is already running or another application is using port 1248.')

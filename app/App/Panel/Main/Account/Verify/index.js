@@ -11,24 +11,39 @@ class Verify extends React.Component {
         link.send('tray:action', 'updateAccountModule', this.props.moduleId, { height: this.moduleRef.current.clientHeight })
       }
     })
+
     this.state = {
       expand: false,
       verifyAddressSuccess: false,
-      verifyAddressResponse: ''
+      verifyAddressResponse: '',
+      verifyInProgress: false
     }
   }
 
   verifyAddress () {
+    this.setState({ verifyInProgress: true })
+
     link.rpc('verifyAddress', err => {
       if (err) {
-        this.setState({ verifyAddressSuccess: false, verifyAddressResponse: err })
+        this.setState({ verifyInProgress: false, verifyAddressSuccess: false, verifyAddressResponse: err })
       } else {
-        this.setState({ verifyAddressSuccess: true, verifyAddressResponse: 'Address matched!' })
+        this.setState({ verifyInProgress: false, verifyAddressSuccess: true, verifyAddressResponse: 'Address matched!' })
       }
+
       setTimeout(() => {
         this.setState({ verifyAddressSuccess: false, verifyAddressResponse: '' })
-      }, 5000)
+      }, 5 * 1000)
     })
+  }
+
+  getText (signerType) {
+    const isHwSigner = (signerType === 'seed' || signerType === 'ring')
+
+    if (this.state.verifyInProgress) {
+      return isHwSigner ? 'verifying' : 'check your device'
+    }
+
+    return isHwSigner ? 'verify address' : 'verify address on device'
   }
 
   componentDidMount () {
@@ -37,8 +52,13 @@ class Verify extends React.Component {
 
   render () {
     const signerType = this.store('main.accounts', this.props.id, 'lastSignerType')
-    const signerKind = (signerType === 'seed' || signerType === 'ring') ? 'hot' : 'device'
     const account = this.store('main.accounts', this.props.id)
+    const buttonClasses = ['moduleButton']
+
+    if (this.state.verifyInProgress) {
+      buttonClasses.push('signerVerifyInProgress')
+    }
+
     return (
       <div ref={this.moduleRef} className='balancesBlock'>
         {account.smart ? (
@@ -61,8 +81,12 @@ class Verify extends React.Component {
               {this.state.verifyAddressResponse ? (
                 <div className={this.state.verifyAddressSuccess ? 'signerVerifyResponse signerVerifyResponseSuccess cardShow' : 'signerVerifyResponse'}>{this.state.verifyAddressResponse}</div>
               ) : null}
-              <div className='moduleButton' onMouseDown={() => this.verifyAddress()}>
-                {signerKind === 'hot' ? 'Verify Address' : 'Verify Address on Device'}
+              <div className={buttonClasses.join(' ')} onMouseDown={evt => {
+                if (evt.button === 0 && !this.state.verifyInProgress) {
+                  this.verifyAddress()
+                }
+              }}>
+                {this.getText(signerType)}
               </div>
             </div>
           </>
