@@ -29,7 +29,7 @@ import proxyConnection from './proxy'
 import accounts, { AccountRequest, TransactionRequest, SignTypedDataRequest, SwitchChainRequest, AddChainRequest, AddTokenRequest } from '../accounts'
 import Chains, { Chain } from '../chains'
 import { getType as getSignerType, Type as SignerType } from '../signers/Signer'
-import { TransactionData, usesBaseFee } from '../../resources/domain/transaction'
+import { getAddress, TransactionData, usesBaseFee } from '../../resources/domain/transaction'
 import { populate as populateTransaction, maxFee } from '../transaction'
 import FrameAccount from '../accounts/Account'
 import { capitalize, arraysMatch } from '../../resources/utils'
@@ -450,12 +450,13 @@ export class Provider extends EventEmitter {
   }
 
   private getRawTx (newTx: RPC.SendTransaction.TxParams): TransactionData {
-    const { gas, gasLimit, gasPrice, data, value, type, ...rawTx } = newTx
+    const { gas, gasLimit, gasPrice, data, value, type, to, ...rawTx } = newTx
     const parsedValue = !value || parseInt(value, 16) === 0 ? '0x0' : addHexPrefix(unpadHexString(value) || '0')
 
     return {
       ...rawTx,
       from: rawTx.from || ((accounts.current() || {}).id),
+      to: to ? getAddress(to) : to,
       type: '0x0',
       value: parsedValue,
       data: addHexPrefix(padToEven(stripHexPrefix(data || '0x'))),

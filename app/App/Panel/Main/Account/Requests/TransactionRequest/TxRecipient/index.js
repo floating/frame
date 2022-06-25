@@ -1,6 +1,5 @@
 import React from 'react'
 import Restore from 'react-restore'
-import { getAddress } from '@ethersproject/address'
 
 import link from '../../../../../../../../resources/link'
 import svg from '../../../../../../../../resources/svg'
@@ -12,14 +11,16 @@ class TxRecipient extends React.Component {
       copied: false
     }
   }
+
   copyAddress (data) {
     link.send('tray:clipboardData', data)
     this.setState({ copied: true })
     setTimeout(_ => this.setState({ copied: false }), 1000)
   }
+
   render () {
     const req = this.props.req
-    const address = req.data.to ? getAddress(req.data.to) : ''
+    const address = (req.data && req.data.to) || ''
     const ensName = (req.recipient && req.recipient.length < 25) ? req.recipient : ''
 
     return (
