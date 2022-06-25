@@ -1,6 +1,5 @@
 import React from 'react'
 import Restore from 'react-restore'
-import { getAddress } from '@ethersproject/address'
 
 import svg from '../../../../../resources/svg'
 import link from '../../../../../resources/link'
@@ -17,6 +16,7 @@ import Requests from './Requests'
 import SignerStatus from './SignerStatus'
 import Verify from './Verify'
 import Settings from './Settings'
+import { getAddress } from '../../../../../resources/domain/transaction'
 
 
 // import Settings from './Settings'
