@@ -7,11 +7,13 @@ const latestStateVersion = () => {
   const state = persist.get('main')
   if (!state || !state.__) {
     // log.info('Persisted state: returning base state')
-    return state 
+    return state
   }
 
-  // valid states are less than or equal to the latest migration we know about 
-  const versions = Object.keys(state.__).filter(v => v <= migrations.latest).sort((a, b) => a - b)
+  // valid states are less than or equal to the latest migration we know about
+  const versions = Object.keys(state.__)
+    .filter((v) => v <= migrations.latest)
+    .sort((a, b) => a - b)
 
   if (versions.length === 0) {
     // log.info('Persisted state: returning base state')
@@ -25,7 +27,11 @@ const latestStateVersion = () => {
 
 const get = (path, obj = latestStateVersion()) => {
   path.split('.').some((key, i) => {
-    if (typeof obj !== 'object') { obj = undefined } else { obj = obj[key] }
+    if (typeof obj !== 'object') {
+      obj = undefined
+    } else {
+      obj = obj[key]
+    }
     return obj === undefined // Stop navigating the path if we get to undefined value
   })
   return obj
@@ -38,7 +44,8 @@ const main = (path, def) => {
 }
 
 const initial = {
-  panel: { // Panel view
+  panel: {
+    // Panel view
     showing: false,
     nav: [],
     show: false,
@@ -54,39 +61,40 @@ const initial = {
         'inventory',
         'permissions',
         'verify',
-        'settings'
+        'settings',
       ],
       modules: {
         requests: {
-          height: 0
+          height: 0,
         },
         activity: {
-          height: 0
+          height: 0,
         },
         balances: {
-          height: 0
+          height: 0,
         },
         inventory: {
-          height: 0
+          height: 0,
         },
         permissions: {
-          height: 0
+          height: 0,
         },
         verify: {
-          height: 0
+          height: 0,
         },
         launcher: {
-          height: 0
+          height: 0,
         },
         gas: {
-          height: 100
-        }
-      }
-    }
+          height: 100,
+        },
+      },
+    },
   },
-  dash: { // Dash view
+  dash: {
+    // Dash view
     showing: false,
-    nav: []
+    nav: [],
   },
   flow: {},
   dapps: {},
@@ -99,12 +107,12 @@ const initial = {
     badge: '',
     addAccount: '', // Add view (needs to be merged into Phase)
     addNetwork: false, // Phase view (needs to be merged with Add)
-    clickGuard: false
+    clickGuard: false,
   },
   signers: {},
   tray: {
     open: false,
-    initial: true
+    initial: true,
   },
   balances: {},
   selected: {
@@ -115,7 +123,7 @@ const initial = {
     settings: {
       viewIndex: 0,
       views: ['permissions', 'verify', 'control'],
-      subIndex: 0
+      subIndex: 0,
     },
     addresses: [],
     showAccounts: false,
@@ -128,21 +136,21 @@ const initial = {
         right: 5,
         bottom: 5,
         height: 5,
-        index: 0
-      }
-    }
+        index: 0,
+      },
+    },
   },
   frame: {
-    type: 'tray'
+    type: 'tray',
   },
   node: {
-    provider: false
+    provider: false,
   },
   provider: {
-    events: []
+    events: [],
   },
   external: {
-    rates: {}
+    rates: {},
   },
   platform: process.platform,
   main: {
@@ -152,12 +160,12 @@ const initial = {
     colorwayPrimary: {
       dark: {
         background: '#1c1c1b',
-        text: '#ecf1ff'
+        text: '#ecf1ff',
       },
       light: {
         background: '#cdcde5',
-        text: '#1e3250'
-      }
+        text: '#1e3250',
+      },
     },
     mute: {
       alphaWarning: main('mute.alphaWarning', false),
@@ -168,10 +176,10 @@ const initial = {
       gasFeeWarning: main('mute.gasFeeWarning', false),
       betaDisclosure: main('mute.betaDisclosure', false),
       signerCompatibilityWarning: main('mute.signerCompatibilityWarning', false),
-      aragonAccountMigrationWarning: main('mute.aragonAccountMigrationWarning', true)
+      aragonAccountMigrationWarning: main('mute.aragonAccountMigrationWarning', true),
     },
     shortcuts: {
-      altSlash: main('shortcuts.altSlash', true)
+      altSlash: main('shortcuts.altSlash', true),
     },
     // showUSDValue: main('showUSDValue', true),
     launch: main('launch', false),
@@ -186,14 +194,14 @@ const initial = {
       accountLimit: main('latticeSettings.accountLimit', 5),
       derivation: main('latticeSettings.derivation', 'standard'),
       endpointMode: main('latticeSettings.endpointMode', 'default'),
-      endpointCustom: main('latticeSettings.endpointCustom', '')
+      endpointCustom: main('latticeSettings.endpointCustom', ''),
     },
     ledger: {
       derivation: main('ledger.derivation', 'live'),
-      liveAccountLimit: main('ledger.liveAccountLimit', 5)
+      liveAccountLimit: main('ledger.liveAccountLimit', 5),
     },
     trezor: {
-      derivation: main('trezor.derivation', 'standard')
+      derivation: main('trezor.derivation', 'standard'),
     },
     origins: main('origins', {}),
     accounts: main('accounts', {}),
@@ -206,51 +214,57 @@ const initial = {
     signers: {},
     savedSigners: {},
     updater: {
-      dontRemind: main('updater.dontRemind', [])
+      dontRemind: main('updater.dontRemind', []),
     },
     networkPresets: {
       ethereum: {
         default: {
-          local: 'direct'
+          local: 'direct',
         },
         1: {
-          alchemy: ['wss://eth-mainnet.ws.alchemyapi.io/v2/NBms1eV9i16RFHpFqQxod56OLdlucIq0', 'https://eth-mainnet.alchemyapi.io/v2/NBms1eV9i16RFHpFqQxod56OLdlucIq0'],
-          infura: 'infura'
+          alchemy: [
+            'wss://eth-mainnet.ws.alchemyapi.io/v2/NBms1eV9i16RFHpFqQxod56OLdlucIq0',
+            'https://eth-mainnet.alchemyapi.io/v2/NBms1eV9i16RFHpFqQxod56OLdlucIq0',
+          ],
+          infura: 'infura',
         },
         3: {
-          infura: 'infuraRopsten'
+          infura: 'infuraRopsten',
         },
         4: {
-          infura: 'infuraRinkeby'
+          infura: 'infuraRinkeby',
         },
         5: {
-          infura: ['wss://goerli.infura.io/ws/v3/786ade30f36244469480aa5c2bf0743b', 'https://goerli.infura.io/ws/v3/786ade30f36244469480aa5c2bf0743b'],
+          infura: [
+            'wss://goerli.infura.io/ws/v3/786ade30f36244469480aa5c2bf0743b',
+            'https://goerli.infura.io/ws/v3/786ade30f36244469480aa5c2bf0743b',
+          ],
           mudit: 'https://rpc.goerli.mudit.blog',
           slockit: 'https://rpc.slock.it/goerli',
-          prylabs: 'https://goerli.prylabs.net'
+          prylabs: 'https://goerli.prylabs.net',
         },
         10: {
           optimism: 'https://mainnet.optimism.io',
-          infura: 'https://optimism-mainnet.infura.io/v3/786ade30f36244469480aa5c2bf0743b'
+          infura: 'https://optimism-mainnet.infura.io/v3/786ade30f36244469480aa5c2bf0743b',
         },
         42: {
-          infura: 'infuraKovan'
+          infura: 'infuraKovan',
         },
         74: {
-          idchain: 'wss://idchain.one/ws/'
+          idchain: 'wss://idchain.one/ws/',
         },
         100: {
-          poa: 'https://dai.poa.network'
+          poa: 'https://dai.poa.network',
         },
         137: {
-          infura: 'https://polygon-mainnet.infura.io/v3/786ade30f36244469480aa5c2bf0743b'
+          infura: 'https://polygon-mainnet.infura.io/v3/786ade30f36244469480aa5c2bf0743b',
         },
         42161: {
-          infura: 'https://arbitrum-mainnet.infura.io/v3/786ade30f36244469480aa5c2bf0743b'
-        }
-      }
+          infura: 'https://arbitrum-mainnet.infura.io/v3/786ade30f36244469480aa5c2bf0743b',
+        },
+      },
     },
-    networks: main('networks', { 
+    networks: main('networks', {
       ethereum: {
         1: {
           id: 1,
@@ -262,14 +276,30 @@ const initial = {
           gas: {
             price: {
               selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-            }
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' },
+            },
           },
           connection: {
-            primary: { on: true, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
-            secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
+            primary: {
+              on: true,
+              current: 'infura',
+              status: 'loading',
+              connected: false,
+              type: '',
+              network: '',
+              custom: '',
+            },
+            secondary: {
+              on: false,
+              current: 'custom',
+              status: 'loading',
+              connected: false,
+              type: '',
+              network: '',
+              custom: '',
+            },
           },
-          on: true
+          on: true,
         },
         3: {
           id: 3,
@@ -281,14 +311,30 @@ const initial = {
           gas: {
             price: {
               selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-            }
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' },
+            },
           },
           connection: {
-            primary: { on: true, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
-            secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
+            primary: {
+              on: true,
+              current: 'infura',
+              status: 'loading',
+              connected: false,
+              type: '',
+              network: '',
+              custom: '',
+            },
+            secondary: {
+              on: false,
+              current: 'custom',
+              status: 'loading',
+              connected: false,
+              type: '',
+              network: '',
+              custom: '',
+            },
           },
-          on: false
+          on: false,
         },
         4: {
           id: 4,
@@ -300,14 +346,30 @@ const initial = {
           gas: {
             price: {
               selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-            }
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' },
+            },
           },
           connection: {
-            primary: { on: true, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
-            secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
+            primary: {
+              on: true,
+              current: 'infura',
+              status: 'loading',
+              connected: false,
+              type: '',
+              network: '',
+              custom: '',
+            },
+            secondary: {
+              on: false,
+              current: 'custom',
+              status: 'loading',
+              connected: false,
+              type: '',
+              network: '',
+              custom: '',
+            },
           },
-          on: false
+          on: false,
         },
         5: {
           id: 5,
@@ -319,14 +381,30 @@ const initial = {
           gas: {
             price: {
               selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-            }
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' },
+            },
           },
           connection: {
-            primary: { on: true, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
-            secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
+            primary: {
+              on: true,
+              current: 'infura',
+              status: 'loading',
+              connected: false,
+              type: '',
+              network: '',
+              custom: '',
+            },
+            secondary: {
+              on: false,
+              current: 'custom',
+              status: 'loading',
+              connected: false,
+              type: '',
+              network: '',
+              custom: '',
+            },
           },
-          on: false
+          on: false,
         },
         10: {
           id: 10,
@@ -338,14 +416,30 @@ const initial = {
           gas: {
             price: {
               selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-            }
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' },
+            },
           },
           connection: {
-            primary: { on: true, current: 'optimism', status: 'loading', connected: false, type: '', network: '', custom: '' },
-            secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
+            primary: {
+              on: true,
+              current: 'optimism',
+              status: 'loading',
+              connected: false,
+              type: '',
+              network: '',
+              custom: '',
+            },
+            secondary: {
+              on: false,
+              current: 'custom',
+              status: 'loading',
+              connected: false,
+              type: '',
+              network: '',
+              custom: '',
+            },
           },
-          on: false
+          on: false,
         },
         42: {
           id: 42,
@@ -357,14 +451,30 @@ const initial = {
           gas: {
             price: {
               selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-            }
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' },
+            },
           },
           connection: {
-            primary: { on: true, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
-            secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
+            primary: {
+              on: true,
+              current: 'infura',
+              status: 'loading',
+              connected: false,
+              type: '',
+              network: '',
+              custom: '',
+            },
+            secondary: {
+              on: false,
+              current: 'custom',
+              status: 'loading',
+              connected: false,
+              type: '',
+              network: '',
+              custom: '',
+            },
           },
-          on: false
+          on: false,
         },
         // 74: {
         //   id: 74,
@@ -393,14 +503,30 @@ const initial = {
           gas: {
             price: {
               selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-            }
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' },
+            },
           },
           connection: {
-            primary: { on: true, current: 'poa', status: 'loading', connected: false, type: '', network: '', custom: '' },
-            secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
+            primary: {
+              on: true,
+              current: 'poa',
+              status: 'loading',
+              connected: false,
+              type: '',
+              network: '',
+              custom: '',
+            },
+            secondary: {
+              on: false,
+              current: 'custom',
+              status: 'loading',
+              connected: false,
+              type: '',
+              network: '',
+              custom: '',
+            },
           },
-          on: false
+          on: false,
         },
         137: {
           id: 137,
@@ -412,14 +538,30 @@ const initial = {
           gas: {
             price: {
               selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-            }
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' },
+            },
           },
           connection: {
-            primary: { on: true, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
-            secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
+            primary: {
+              on: true,
+              current: 'infura',
+              status: 'loading',
+              connected: false,
+              type: '',
+              network: '',
+              custom: '',
+            },
+            secondary: {
+              on: false,
+              current: 'custom',
+              status: 'loading',
+              connected: false,
+              type: '',
+              network: '',
+              custom: '',
+            },
           },
-          on: false
+          on: false,
         },
         42161: {
           id: 42161,
@@ -431,16 +573,32 @@ const initial = {
           gas: {
             price: {
               selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-            }
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' },
+            },
           },
           connection: {
-            primary: { on: true, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
-            secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
+            primary: {
+              on: true,
+              current: 'infura',
+              status: 'loading',
+              connected: false,
+              type: '',
+              network: '',
+              custom: '',
+            },
+            secondary: {
+              on: false,
+              current: 'custom',
+              status: 'loading',
+              connected: false,
+              type: '',
+              network: '',
+              custom: '',
+            },
           },
-          on: false
-        }
-      }
+          on: false,
+        },
+      },
     }),
     networksMeta: main('networksMeta', {
       ethereum: {
@@ -450,9 +608,9 @@ const initial = {
             fees: {},
             price: {
               selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-            }
-          }
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' },
+            },
+          },
         },
         3: {
           blockHeight: 0,
@@ -460,9 +618,9 @@ const initial = {
             fees: {},
             price: {
               selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-            }
-          }
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' },
+            },
+          },
         },
         4: {
           blockHeight: 0,
@@ -470,9 +628,9 @@ const initial = {
             fees: {},
             price: {
               selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-            }
-          }
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' },
+            },
+          },
         },
         5: {
           blockHeight: 0,
@@ -480,9 +638,9 @@ const initial = {
             fees: {},
             price: {
               selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-            }
-          }
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' },
+            },
+          },
         },
         10: {
           blockHeight: 0,
@@ -490,9 +648,9 @@ const initial = {
             fees: {},
             price: {
               selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-            }
-          }
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' },
+            },
+          },
         },
         42: {
           blockHeight: 0,
@@ -500,9 +658,9 @@ const initial = {
             fees: {},
             price: {
               selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-            }
-          }
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' },
+            },
+          },
         },
         100: {
           blockHeight: 0,
@@ -510,9 +668,9 @@ const initial = {
             fees: {},
             price: {
               selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-            }
-          }
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' },
+            },
+          },
         },
         137: {
           blockHeight: 0,
@@ -520,9 +678,9 @@ const initial = {
             fees: {},
             price: {
               selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-            }
-          }
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' },
+            },
+          },
         },
         42161: {
           blockHeight: 0,
@@ -530,11 +688,11 @@ const initial = {
             fees: {},
             price: {
               selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-            }
-          }
-        }
-      }
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' },
+            },
+          },
+        },
+      },
     }),
     ipfs: {},
     dapps: {},
@@ -544,17 +702,17 @@ const initial = {
       details: {},
       map: {
         added: [],
-        docked: []
+        docked: [],
       },
       storage: {},
-      removed: []
-    }
-  }
+      removed: [],
+    },
+  },
 }
 
 // --- remove state that should not persist from session to session
 
-Object.keys(initial.main.accounts).forEach(id => {
+Object.keys(initial.main.accounts).forEach((id) => {
   // Remove permissions granted to unknown origins
   const permissions = initial.main.permissions[id]
   if (permissions) delete permissions[uuidv5('Unknown', uuidv5.DNS)]
@@ -563,8 +721,8 @@ Object.keys(initial.main.accounts).forEach(id => {
   initial.main.accounts[id].balances = { lastUpdated: undefined }
 })
 
-Object.values(initial.main.networksMeta).forEach(chains => {
-  Object.values(chains).forEach(chainMeta => {
+Object.values(initial.main.networksMeta).forEach((chains) => {
+  Object.values(chains).forEach((chainMeta) => {
     // remove stale price data
     chainMeta.nativeCurrency = { ...chainMeta.nativeCurrency, usd: { price: 0, change24hr: 0 } }
   })
@@ -577,8 +735,8 @@ initial.main.origins = Object.entries(initial.main.origins).reduce((origins, [id
       ...origin,
       session: {
         ...origin.session,
-        endedAt: origin.session.lastUpdatedAt
-      }
+        endedAt: origin.session.lastUpdatedAt,
+      },
     }
   }
 

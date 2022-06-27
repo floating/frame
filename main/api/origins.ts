@@ -10,33 +10,39 @@ const dev = process.env.NODE_ENV === 'development'
 const protocolRegex = /^(?:ws|http)s?:\/\//
 
 interface OriginUpdateResult {
-  payload: RPCRequestPayload,
+  payload: RPCRequestPayload
   hasSession: boolean
 }
 
-export function parseOrigin (origin?: string) {
+export function parseOrigin(origin?: string) {
   if (!origin) return 'Unknown'
 
   return origin.replace(protocolRegex, '')
 }
 
-function isRealOrigin (origin: string) {
+function isRealOrigin(origin: string) {
   return origin !== 'Unknown'
 }
 
-function invalidOrigin (origin: string) {
+function invalidOrigin(origin: string) {
   return origin !== origin.replace(/[^0-9a-z/:.[\]-]/gi, '')
 }
 
-function addPermissionRequest (address: Address, origin: string) {
+function addPermissionRequest(address: Address, origin: string) {
   return new Promise((resolve, reject) => {
     const handlerId = uuidv5(origin, uuidv5.DNS)
-    const request: AccessRequest = { payload: undefined as any, handlerId, type: 'access', origin: handlerId, account: address }
+    const request: AccessRequest = {
+      payload: undefined as any,
+      handlerId,
+      type: 'access',
+      origin: handlerId,
+      account: address,
+    }
 
     accounts.addRequest(request, () => {
       const permissions = store('main.permissions', address) || {}
-      const perms = Object.keys(permissions).map(id => permissions[id])
-      const permIndex = perms.map(p => p.origin).indexOf(origin)
+      const perms = Object.keys(permissions).map((id) => permissions[id])
+      const permIndex = perms.map((p) => p.origin).indexOf(origin)
       if (perms[permIndex] && perms[permIndex].provider) {
         resolve(true)
       } else {
@@ -46,7 +52,11 @@ function addPermissionRequest (address: Address, origin: string) {
   })
 }
 
-export function updateOrigin (payload: JSONRPCRequestPayload, origin: string, connectionMessage = false): OriginUpdateResult {
+export function updateOrigin(
+  payload: JSONRPCRequestPayload,
+  origin: string,
+  connectionMessage = false
+): OriginUpdateResult {
   let hasSession = false
 
   const originId = uuidv5(origin, uuidv5.DNS)
@@ -66,31 +76,35 @@ export function updateOrigin (payload: JSONRPCRequestPayload, origin: string, co
         name: origin,
         chain: {
           id: 1,
-          type: 'ethereum'
-        }
+          type: 'ethereum',
+        },
       })
     }
   }
 
-  return { 
+  return {
     hasSession,
-    payload: { 
+    payload: {
       ...payload,
       chainId: payload.chainId || `0x${(existingOrigin?.chain.id || 1).toString(16)}`,
-      _origin: originId
-    }
+      _origin: originId,
+    },
   }
 }
 
-export function isFrameExtension (req: IncomingMessage) {
+export function isFrameExtension(req: IncomingMessage) {
   const origin = req.headers.origin
   if (!origin) return false
 
   const query = queryString.parse((req.url || '').replace('/', ''))
-  const mozOrigin = origin.startsWith('moz-extension://') 
-  const extOrigin = origin.startsWith('chrome-extension://') || origin.startsWith('moz-extension://') || origin.startsWith('safari-web-extension://')
+  const mozOrigin = origin.startsWith('moz-extension://')
+  const extOrigin =
+    origin.startsWith('chrome-extension://') ||
+    origin.startsWith('moz-extension://') ||
+    origin.startsWith('safari-web-extension://')
 
-  if (origin === 'chrome-extension://ldcoohedfbjoobcadoglnnmmfbdlmmhf') { // Match production chrome
+  if (origin === 'chrome-extension://ldcoohedfbjoobcadoglnnmmfbdlmmhf') {
+    // Match production chrome
     return true
   } else if (mozOrigin || (dev && extOrigin)) {
     // In production, match any Firefox extension origin where query.identity === 'frame-extension'
@@ -101,7 +115,7 @@ export function isFrameExtension (req: IncomingMessage) {
   }
 }
 
-export async function isTrusted (origin?: string) {
+export async function isTrusted(origin?: string) {
   if (!origin || origin === 'null') origin = 'Unknown' // Permission granted to unknown origins only persist until the Frame is closed, they are not permanent
   if (invalidOrigin(origin)) return false
   if (origin === 'frame-extension') return true
@@ -110,8 +124,8 @@ export async function isTrusted (origin?: string) {
   const address = account.address
   if (!address) return
   const permissions = store('main.permissions', address) || {}
-  const perms = Object.keys(permissions).map(id => permissions[id])
-  const permIndex = perms.map(p => p.origin).indexOf(origin)
+  const perms = Object.keys(permissions).map((id) => permissions[id])
+  const permIndex = perms.map((p) => p.origin).indexOf(origin)
   if (permIndex === -1) {
     try {
       return await addPermissionRequest(address, origin)

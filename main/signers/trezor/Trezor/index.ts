@@ -22,17 +22,17 @@ const defaultTrezorOneVersion = { major_version: 1, minor_version: 9, patch_vers
 type FlexCallback<T> = (err: string | null, result: T | undefined) => void
 
 interface PublicKeyResponse {
-  chainCode: string,
-  publicKey: string,
+  chainCode: string
+  publicKey: string
 }
 
 export default class Trezor extends Signer {
-  private closed = false;
-  
-  device: TrezorDevice;
-  derivation: Derivation | undefined;
+  private closed = false
 
-  constructor (device: TrezorDevice) {
+  device: TrezorDevice
+  derivation: Derivation | undefined
+
+  constructor(device: TrezorDevice) {
     super()
 
     this.addresses = []
@@ -50,18 +50,18 @@ export default class Trezor extends Signer {
     this.status = 'loading'
   }
 
-  async open () {
+  async open() {
     this.closed = false
 
     this.reset()
     this.deviceStatus()
-    
+
     setTimeout(() => {
       this.deviceStatus()
     }, 2000)
   }
 
-  close () {
+  close() {
     this.closed = true
 
     this.emit('close')
@@ -70,41 +70,42 @@ export default class Trezor extends Signer {
     super.close()
   }
 
-  update () {
+  update() {
     if (this.closed) return
 
     this.emit('update')
   }
 
-  reset () {
+  reset() {
     this.status = 'loading'
     this.addresses = []
     this.update()
   }
 
-  private getId () {
+  private getId() {
     return uuid('Trezor' + this.device.path, ns)
   }
 
-  private getPath (index: number) {
+  private getPath(index: number) {
     return this.basePath() + '/' + index.toString()
   }
 
-  private basePath () {
+  private basePath() {
     if (!this.derivation) {
       throw new Error('attempted to get base path with unknown derivation!')
     }
 
-    return `m/${getDerivationPath(this.derivation)}`.replace(/\/+$/,'')
+    return `m/${getDerivationPath(this.derivation)}`.replace(/\/+$/, '')
   }
 
-  deviceStatus () {
+  deviceStatus() {
     this.lookupAddresses((err, addresses) => {
       if (err) {
         if (err === 'Device call in progress') return
 
         if (err.toLowerCase() !== 'verify address error') this.status = 'loading'
-        if (err === 'ui-device_firmware_old') this.status = `Update Firmware (v${this.device.firmwareRelease.release.version.join('.')})`
+        if (err === 'ui-device_firmware_old')
+          this.status = `Update Firmware (v${this.device.firmwareRelease.release.version.join('.')})`
         if (err === 'ui-device_bootloader_mode') this.status = 'Device in Bootloader Mode'
         this.addresses = []
         this.update()
@@ -125,7 +126,7 @@ export default class Trezor extends Signer {
     })
   }
 
-  verifyAddress (index: number, currentAddress: string, display = false, cb: Callback<boolean>, attempt = 0) {
+  verifyAddress(index: number, currentAddress: string, display = false, cb: Callback<boolean>, attempt = 0) {
     log.info('Verify Address, attempt: ' + attempt)
     let timeout = false
     const timer = setTimeout(() => {
@@ -145,7 +146,7 @@ export default class Trezor extends Signer {
           setTimeout(() => this.verifyAddress(index, currentAddress, display, cb, ++attempt), 1000 * (attempt + 1))
         } else {
           log.error('Verify address error:', err)
-          
+
           this.status = (err || '').toLowerCase().match(/forbidden key path/)
             ? 'derivation path failed strict safety checks on trezor device'
             : err
@@ -163,7 +164,7 @@ export default class Trezor extends Signer {
         if (address !== current) {
           // TODO: Error Notification
           log.error(new Error('Address does not match device'))
-          
+
           this.close()
 
           cb(new Error('Address does not match device'), undefined)
@@ -177,7 +178,7 @@ export default class Trezor extends Signer {
     flex.rpc('trezor.ethereumGetAddress', this.device.path, this.getPath(index), display, rpcCallback)
   }
 
-  lookupAddresses (cb: FlexCallback<Array<string>>) {
+  lookupAddresses(cb: FlexCallback<Array<string>>) {
     const rpcCallback: FlexCallback<PublicKeyResponse> = (err, result) => {
       if (err) return cb(err, undefined)
 
@@ -187,7 +188,7 @@ export default class Trezor extends Signer {
 
         const accounts = (accs || []) as string[]
         const firstAccount = accounts[0] || ''
-        this.verifyAddress(0, firstAccount, false, err => {
+        this.verifyAddress(0, firstAccount, false, (err) => {
           if (err) return cb(err.message, undefined)
           cb(null, accounts)
         })
@@ -197,8 +198,8 @@ export default class Trezor extends Signer {
     flex.rpc('trezor.getPublicKey', this.device.path, this.basePath(), rpcCallback)
   }
 
-  setPhrase (phrase: string) {
-    const rpcCallback: FlexCallback<void> = err => {
+  setPhrase(phrase: string) {
+    const rpcCallback: FlexCallback<void> = (err) => {
       if (err) log.error(err)
       setTimeout(() => this.deviceStatus(), 1000)
     }
@@ -209,8 +210,8 @@ export default class Trezor extends Signer {
     flex.rpc('trezor.inputPhrase', this.device.path, phrase, rpcCallback)
   }
 
-  setPin (pin: string) {
-    const rpcCallback: FlexCallback<void> = err => {
+  setPin(pin: string) {
+    const rpcCallback: FlexCallback<void> = (err) => {
       if (err) log.error(err)
       setTimeout(() => this.deviceStatus(), 250)
     }
@@ -222,7 +223,7 @@ export default class Trezor extends Signer {
   }
 
   // Standard Methods
-  signMessage (index: number, message: string, cb: Callback<string>) {
+  signMessage(index: number, message: string, cb: Callback<string>) {
     const rpcCallback: FlexCallback<any> = (err, result) => {
       if (err) {
         log.error('signMessage Error')
@@ -239,7 +240,7 @@ export default class Trezor extends Signer {
   }
 
   // Standard Methods
-  signTypedData (index: number, version: string, typedData: TypedData, cb: Callback<string>) {
+  signTypedData(index: number, version: string, typedData: TypedData, cb: Callback<string>) {
     const versionNum = (version.match(/[Vv](\d+)/) || [])[1]
 
     if ((parseInt(versionNum) || 0) < 4) {
@@ -264,17 +265,25 @@ export default class Trezor extends Signer {
       const domainSeparatorHash = TypedDataUtils.hashStruct('EIP712Domain', domain, types, true).toString('hex')
       const messageHash = TypedDataUtils.hashStruct(primaryType as any, message, types, true).toString('hex')
 
-      flex.rpc('trezor.ethereumSignTypedHash', this.device.path, this.getPath(index), typedData, domainSeparatorHash, messageHash, rpcCallback)
+      flex.rpc(
+        'trezor.ethereumSignTypedHash',
+        this.device.path,
+        this.getPath(index),
+        typedData,
+        domainSeparatorHash,
+        messageHash,
+        rpcCallback
+      )
     } else {
       flex.rpc('trezor.ethereumSignTypedData', this.device.path, this.getPath(index), typedData, rpcCallback)
     }
   }
 
-  signTransaction (index: number, rawTx: TransactionData, cb: Callback<string>) {
+  signTransaction(index: number, rawTx: TransactionData, cb: Callback<string>) {
     const compatibility = signerCompatibility(rawTx, this.summary())
     const compatibleTx = compatibility.compatible ? { ...rawTx } : londonToLegacy(rawTx)
 
-    sign(compatibleTx, tx => {
+    sign(compatibleTx, (tx) => {
       return new Promise((resolve, reject) => {
         const trezorTx = this.normalizeTransaction(rawTx.chainId, tx)
         const path = this.getPath(index)
@@ -295,19 +304,19 @@ export default class Trezor extends Signer {
         flex.rpc('trezor.ethereumSignTransaction', this.device.path, path, trezorTx, rpcCallback)
       })
     })
-    .then(signedTx => cb(null, addHexPrefix(signedTx.serialize().toString('hex'))))
-    .catch(err => cb(err.message, undefined))
+      .then((signedTx) => cb(null, addHexPrefix(signedTx.serialize().toString('hex'))))
+      .catch((err) => cb(err.message, undefined))
   }
 
-  private isTrezorOne () {
+  private isTrezorOne() {
     return this.model.toLowerCase().includes('one')
   }
 
-  private normalize (hex: string) {
+  private normalize(hex: string) {
     return (hex && padToEven(stripHexPrefix(hex))) || ''
   }
 
-  private normalizeTransaction (chainId: string, tx: TypedTransaction) {
+  private normalizeTransaction(chainId: string, tx: TypedTransaction) {
     const txJson = tx.toJSON()
 
     const unsignedTx = {
@@ -316,12 +325,12 @@ export default class Trezor extends Signer {
       to: this.normalize(txJson.to || ''),
       value: this.normalize(txJson.value || ''),
       data: this.normalize(txJson.data || ''),
-      chainId: utils.hexToNumber(chainId)
+      chainId: utils.hexToNumber(chainId),
     }
 
     const optionalFields = ['gasPrice', 'maxFeePerGas', 'maxPriorityFeePerGas']
 
-    optionalFields.forEach(field => {
+    optionalFields.forEach((field) => {
       // @ts-ignore
       const val: string = txJson[field]
       if (val) {

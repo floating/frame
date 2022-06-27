@@ -41,7 +41,6 @@ describe('#okProtocol', () => {
     expect(okProtocol('frame')).toBe(false)
   })
 
-
   it('does not allow an unknown protocol', () => {
     expect(okProtocol('tcp://127.0.0.1')).toBe(false)
   })

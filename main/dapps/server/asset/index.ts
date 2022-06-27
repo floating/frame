@@ -7,17 +7,18 @@ import { ServerResponse } from 'http'
 
 const nebula = nebulaApi()
 
-function error (res: ServerResponse, code: number, message: string) {
+function error(res: ServerResponse, code: number, message: string) {
   res.writeHead(code || 404)
   res.end(message)
 }
 
-function getCid (namehash: string): string {
+function getCid(namehash: string): string {
   return store(`main.dapps`, namehash, `content`)
 }
 
 export default {
-  stream: async (res: ServerResponse, namehash: string, path: string) => { // Stream assets from IPFS back to the client
+  stream: async (res: ServerResponse, namehash: string, path: string) => {
+    // Stream assets from IPFS back to the client
     let found = false
 
     const cid = getCid(namehash)
@@ -55,7 +56,8 @@ export default {
     // })
     // stream.on('error', err => error(res, err.statusCode, `For security reasons, please launch this app from Frame\n\n(${err.message})`))
   },
-  dapp: async (res: ServerResponse, namehash: string) => { // Resolve dapp via IPFS, inject functionality and send it back to the client
+  dapp: async (res: ServerResponse, namehash: string) => {
+    // Resolve dapp via IPFS, inject functionality and send it back to the client
     // if (!ipfs return error(res, 404, 'IPFS client not running')
     const cid = store('main.dapps', namehash, 'content')
     const index = await nebula.ipfs.getFile(`${cid}/index.html`)
@@ -71,7 +73,7 @@ export default {
     //   </script>
     // `)
     res.end($.html())
-  }
+  },
 }
 
 //   ipfs.get(`${cid}/index.html`, (err, files) => {

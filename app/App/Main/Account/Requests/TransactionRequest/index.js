@@ -25,17 +25,17 @@ import TxApproval from './TxApproval'
 const FEE_WARNING_THRESHOLD_USD = 50
 
 class Time extends React.Component {
-  constructor (...args) {
+  constructor(...args) {
     super(...args)
     this.state = {
-      time: Date.now()
+      time: Date.now(),
     }
     setInterval(() => {
       this.setState({ time: Date.now() })
     }, 1000)
   }
 
-  msToTime (duration) {
+  msToTime(duration) {
     const seconds = Math.floor((duration / 1000) % 60)
     const minutes = Math.floor((duration / (1000 * 60)) % 60)
     const hours = Math.floor((duration / (1000 * 60 * 60)) % 24)
@@ -53,27 +53,23 @@ class Time extends React.Component {
     return { time, label }
   }
 
-  render () {
+  render() {
     const { time, label } = this.msToTime(this.state.time - this.props.time)
     return (
-      <div className='txProgressSuccessItem txProgressSuccessItemRight'>
-        <div className='txProgressSuccessItemValue'>
-          {time}
-        </div>
-        <div className='txProgressSuccessItemLabel'>
-          {label}
-        </div>
+      <div className="txProgressSuccessItem txProgressSuccessItemRight">
+        <div className="txProgressSuccessItemValue">{time}</div>
+        <div className="txProgressSuccessItemLabel">{label}</div>
       </div>
     )
   }
 }
 
 class TransactionRequest extends React.Component {
-  constructor (props, context) {
+  constructor(props, context) {
     super(props, context)
-    this.chain = { 
-      type: 'ethereum', 
-      id: parseInt(props.req.data.chainId, 'hex')
+    this.chain = {
+      type: 'ethereum',
+      id: parseInt(props.req.data.chainId, 'hex'),
     }
     this.state = { allowInput: false, dataView: false }
 
@@ -82,29 +78,29 @@ class TransactionRequest extends React.Component {
     }, props.signingDelay || 1500)
   }
 
-  copyAddress (data) {
+  copyAddress(data) {
     link.send('tray:clipboardData', data)
     this.setState({ copied: true })
-    setTimeout(_ => this.setState({ copied: false }), 1000)
+    setTimeout((_) => this.setState({ copied: false }), 1000)
   }
 
-  approve (reqId, req) {
+  approve(reqId, req) {
     link.rpc('approveRequest', req, () => {}) // Move to link.send
   }
 
-  decline (req) {
+  decline(req) {
     link.rpc('declineRequest', req, () => {}) // Move to link.send
   }
 
-  toggleDataView (id) {
+  toggleDataView(id) {
     this.setState({ dataView: !this.state.dataView })
   }
 
-  hexToDisplayValue (hex) {
+  hexToDisplayValue(hex) {
     return (Math.round(parseFloat(utils.fromWei(hex, 'ether')) * 1000000) / 1000000).toFixed(6)
   }
 
-  txSectionStyle (index, height) {
+  txSectionStyle(index, height) {
     if (this.state.selectedIndex === index) {
       return {
         transform: `translateY(${0}px)`,
@@ -114,35 +110,35 @@ class TransactionRequest extends React.Component {
         background: 'rgba(237, 242, 253, 1)',
         left: '10px',
         right: '10px',
-        padding: '0px 30px'
+        padding: '0px 30px',
       }
     } else {
       return {
-        transform: `translateY(${(index * -40) - 60}px)`,
-        zIndex: 1
+        transform: `translateY(${index * -40 - 60}px)`,
+        zIndex: 1,
       }
     }
   }
 
-  copyData (data) {
+  copyData(data) {
     link.send('tray:clipboardData', data)
     this.setState({ copiedData: true })
-    setTimeout(_ => this.setState({ copiedData: false }), 1000)
+    setTimeout((_) => this.setState({ copiedData: false }), 1000)
   }
 
-  overlayMode (mode) {
+  overlayMode(mode) {
     this.setState({ overlayMode: mode })
   }
 
-  toDisplayUSD (bn) {
+  toDisplayUSD(bn) {
     return bn.toFixed(2, BigNumber.ROUND_UP).toString()
   }
 
-  allowOtherChain () {
+  allowOtherChain() {
     this.setState({ allowOtherChain: true })
   }
 
-  render () {
+  render() {
     const { accountId, handlerId } = this.props
     const req = this.store('main.accounts', accountId, 'requests', handlerId)
     const originalNotice = (req.notice || '').toLowerCase()
@@ -153,7 +149,7 @@ class TransactionRequest extends React.Component {
     const toAddress = req.data && req.data.to ? getAddress(req.data.to) : ''
     let requestClass = 'signerRequest'
     if (mode === 'monitor') requestClass += ' signerRequestMonitor'
-    const success = (req.status === 'confirming' || req.status === 'confirmed')
+    const success = req.status === 'confirming' || req.status === 'confirmed'
     const error = req.status === 'error' || req.status === 'declined'
     if (success) requestClass += ' signerRequestSuccess'
     if (req.status === 'confirmed') requestClass += ' signerRequestConfirmed'
@@ -197,10 +193,10 @@ class TransactionRequest extends React.Component {
     // }
     if (mode !== 'monitor' && req.data.nonce) {
       const r = this.store('main.accounts', this.props.accountId, 'requests')
-      const requests = Object.keys(r || {}).map(key => r[key])
-      const monitor = requests.filter(req => req.mode === 'monitor')
-      const monitorFilter = monitor.filter(r => r.status !== 'error')
-      const existingNonces = monitorFilter.map(m => m.data.nonce)
+      const requests = Object.keys(r || {}).map((key) => r[key])
+      const monitor = requests.filter((req) => req.mode === 'monitor')
+      const monitorFilter = monitor.filter((r) => r.status !== 'error')
+      const existingNonces = monitorFilter.map((m) => m.data.nonce)
       existingNonces.forEach((nonce, i) => {
         if (req.data.nonce === nonce) {
           txMeta.replacement = true
@@ -214,11 +210,13 @@ class TransactionRequest extends React.Component {
             txMeta.possible = false
             txMeta.notice = 'gas price too low'
           } else if (
-              req.data.maxPriorityFeePerGas &&
-              req.data.maxFeePerGas &&
-              Math.ceil(parseInt(monitorFilter[i].data.maxPriorityFeePerGas, 'hex') * 1.1) > parseInt(req.data.maxPriorityFeePerGas, 'hex') &&
-              Math.ceil(parseInt(monitorFilter[i].data.maxFeePerGas, 'hex') * 1.1) > parseInt(req.data.maxFeePerGas, 'hex')
-            ) {
+            req.data.maxPriorityFeePerGas &&
+            req.data.maxFeePerGas &&
+            Math.ceil(parseInt(monitorFilter[i].data.maxPriorityFeePerGas, 'hex') * 1.1) >
+              parseInt(req.data.maxPriorityFeePerGas, 'hex') &&
+            Math.ceil(parseInt(monitorFilter[i].data.maxFeePerGas, 'hex') * 1.1) >
+              parseInt(req.data.maxFeePerGas, 'hex')
+          ) {
             txMeta.possible = false
             txMeta.notice = 'gas fees too low'
           }
@@ -246,31 +244,30 @@ class TransactionRequest extends React.Component {
     }
 
     const hexId = '0x' + parseInt(this.chain.id).toString('16')
-    const chainName = this.store('main.networks.ethereum', this.chain.id, 'name') 
+    const chainName = this.store('main.networks.ethereum', this.chain.id, 'name')
 
     const showWarning = !status && mode !== 'monitor'
-    const requiredApproval = showWarning && (req.approvals || []).filter(a => !a.approved)[0]
+    const requiredApproval = showWarning && (req.approvals || []).filter((a) => !a.approved)[0]
     return (
       <div key={req.handlerId} className={requestClass}>
-        <TxOverlay {...this.props} overlay={this.state.overlayMode} overlayMode={this.overlayMode.bind(this)}/>
+        <TxOverlay {...this.props} overlay={this.state.overlayMode} overlayMode={this.overlayMode.bind(this)} />
         {req.type === 'transaction' ? (
-          <div className='approveTransaction'>
+          <div className="approveTransaction">
             {!!requiredApproval ? (
               <TxApproval
                 req={this.props.req}
                 approval={requiredApproval}
-                allowOtherChain={this.allowOtherChain.bind(this)} />
+                allowOtherChain={this.allowOtherChain.bind(this)}
+              />
             ) : null}
-            <div className='approveTransactionPayload'>
+            <div className="approveTransactionPayload">
               {notice ? (
-                <div className='requestNotice'>
-                  <div className='requestNoticeInner'>
+                <div className="requestNotice">
+                  <div className="requestNoticeInner">
                     {!error ? (
                       <div className={success || !req.tx ? 'txAugment txAugmentHidden' : 'txAugment'}>
                         {this.state.txHashCopied ? (
-                          <div className={'txDetailsOptions txDetailsOptionsTxHash'}>
-                            Transaction Hash Copied
-                          </div>
+                          <div className={'txDetailsOptions txDetailsOptionsTxHash'}>Transaction Hash Copied</div>
                         ) : this.state.viewDetailsHover ? (
                           <div
                             className={'txDetailsOptions'}
@@ -316,7 +313,9 @@ class TransactionRequest extends React.Component {
                         ) : (
                           <>
                             <div
-                              className={req && req.tx && req.tx.hash ? 'txDetails txDetailsShow' : 'txDetails txDetailsHide'}
+                              className={
+                                req && req.tx && req.tx.hash ? 'txDetails txDetailsShow' : 'txDetails txDetailsHide'
+                              }
                               onMouseOver={() => {
                                 clearTimeout(this.viewDetailsHoverTimer)
                                 this.setState({ viewDetailsHover: true })
@@ -329,10 +328,16 @@ class TransactionRequest extends React.Component {
                             >
                               View Details
                             </div>
-                            <div className='txAugmentCancel' onMouseDown={() => link.send('tray:replaceTx', req.handlerId, 'cancel')}>
+                            <div
+                              className="txAugmentCancel"
+                              onMouseDown={() => link.send('tray:replaceTx', req.handlerId, 'cancel')}
+                            >
                               Cancel
                             </div>
-                            <div className='txAugmentSpeedUp' onMouseDown={() => link.send('tray:replaceTx', req.handlerId, 'speed')}>
+                            <div
+                              className="txAugmentSpeedUp"
+                              onMouseDown={() => link.send('tray:replaceTx', req.handlerId, 'speed')}
+                            >
                               Speed Up
                             </div>
                           </>
@@ -347,20 +352,16 @@ class TransactionRequest extends React.Component {
                     <div className={success ? 'txProgressSuccess' : 'txProgressSuccess txProgressHidden'}>
                       {req && req.tx && req.tx.receipt ? (
                         <>
-                          <div className='txProgressSuccessItem txProgressSuccessItemLeft'>
-                            <div className='txProgressSuccessItemLabel'>
-                              In Block
-                            </div>
-                            <div className='txProgressSuccessItemValue'>
+                          <div className="txProgressSuccessItem txProgressSuccessItemLeft">
+                            <div className="txProgressSuccessItemLabel">In Block</div>
+                            <div className="txProgressSuccessItemValue">
                               {parseInt(req.tx.receipt.blockNumber, 'hex')}
                             </div>
                           </div>
                           <Time time={req.completed} />
-                          <div className='txProgressSuccessItem txProgressSuccessItemCenter'>
-                            <div className='txProgressSuccessItemLabel'>
-                              Fee
-                            </div>
-                            <div className='txProgressSuccessItemValue'>
+                          <div className="txProgressSuccessItem txProgressSuccessItemCenter">
+                            <div className="txProgressSuccessItemLabel">Fee</div>
+                            <div className="txProgressSuccessItemValue">
                               <div style={{ margin: '0px 1px 0px 0px', fontSize: '10px' }}>$</div>
                               {feeAtTime || '?.??'}
                             </div>
@@ -368,66 +369,110 @@ class TransactionRequest extends React.Component {
                         </>
                       ) : null}
                     </div>
-                    <div className={statusClass} style={!req.tx && !error && mode === 'monitor' ? { bottom: '60px' } : {}}>
+                    <div
+                      className={statusClass}
+                      style={!req.tx && !error && mode === 'monitor' ? { bottom: '60px' } : {}}
+                    >
                       {success ? <div>Successful</div> : null}
-                      <div className='txProgressNotice'>
-                        <div className={success || (mode === 'monitor' && status !== 'verifying') ? 'txProgressNoticeBars txProgressNoticeHidden' : 'txProgressNoticeBars'}>
-                          {[...Array(10).keys()].map(i => {
+                      <div className="txProgressNotice">
+                        <div
+                          className={
+                            success || (mode === 'monitor' && status !== 'verifying')
+                              ? 'txProgressNoticeBars txProgressNoticeHidden'
+                              : 'txProgressNoticeBars'
+                          }
+                        >
+                          {[...Array(10).keys()].map((i) => {
                             return <div key={'f' + i} className={`txProgressNoticeBar txProgressNoticeBar-${i}`} />
                           })}
-                          <div className='txProgressNoticeBarDeadzone' />
-                          {[...Array(10).keys()].reverse().map(i => {
+                          <div className="txProgressNoticeBarDeadzone" />
+                          {[...Array(10).keys()].reverse().map((i) => {
                             return <div key={'r' + i} className={`txProgressNoticeBar txProgressNoticeBar-${i}`} />
                           })}
                         </div>
-                        <div className={success || (mode === 'monitor' && status !== 'verifying') ? 'txProgressNoticeIcon txProgressNoticeHidden' : 'txProgressNoticeIcon'}>
+                        <div
+                          className={
+                            success || (mode === 'monitor' && status !== 'verifying')
+                              ? 'txProgressNoticeIcon txProgressNoticeHidden'
+                              : 'txProgressNoticeIcon'
+                          }
+                        >
                           {status === 'pending' ? svg.sign(23) : null}
                           {status === 'sending' ? svg.send(19) : null}
                           {status === 'verifying' ? svg.octicon('check', { height: 26 }) : null}
                           {status === 'error' ? svg.octicon('circle-slash', { height: 22 }) : null}
                         </div>
-                        <div className={success ? 'txProgressNoticeText txProgressNoticeHidden' : mode === 'monitor' ? 'txProgressNoticeText txProgressNoticeSuccess' : 'txProgressNoticeText'}>
-                          <div className='txProgressDetailError' onMouseDown={() => { if (req && notice && notice.toLowerCase() === 'please enable contract data on the ethereum app settings') this.store.notify('contractData') }}>
+                        <div
+                          className={
+                            success
+                              ? 'txProgressNoticeText txProgressNoticeHidden'
+                              : mode === 'monitor'
+                              ? 'txProgressNoticeText txProgressNoticeSuccess'
+                              : 'txProgressNoticeText'
+                          }
+                        >
+                          <div
+                            className="txProgressDetailError"
+                            onMouseDown={() => {
+                              if (
+                                req &&
+                                notice &&
+                                notice.toLowerCase() === 'please enable contract data on the ethereum app settings'
+                              )
+                                this.store.notify('contractData')
+                            }}
+                          >
                             {status === 'verifying' || status === 'confirming' || status === 'confirmed' ? '' : notice}
                           </div>
                         </div>
-                        {status === 'pending' ? <div className='txProgressCancel' onMouseDown={() => this.decline(this.props.req)}>Cancel</div> : null}
+                        {status === 'pending' ? (
+                          <div className="txProgressCancel" onMouseDown={() => this.decline(this.props.req)}>
+                            Cancel
+                          </div>
+                        ) : null}
                       </div>
                     </div>
                     <TxBar req={req} />
-                    <div className='monitorIcon'>{svg.octicon('radio-tower', { height: 17 })}</div>
-                    <div className='monitorIconIndicator' />
-                    <div className='monitorTop'>
+                    <div className="monitorIcon">{svg.octicon('radio-tower', { height: 17 })}</div>
+                    <div className="monitorIconIndicator" />
+                    <div className="monitorTop">
                       {toAddress ? (
-                        <div className='monitorTo'>
-                          <span className='monitorSub'>{'TO'} </span>
-                          <span className='monitorValue'>
-                            <span className='monitorValue0x'>{'0x'}</span>
+                        <div className="monitorTo">
+                          <span className="monitorSub">{'TO'} </span>
+                          <span className="monitorValue">
+                            <span className="monitorValue0x">{'0x'}</span>
                             {toAddress.substring(2, 5)}
                             {svg.octicon('kebab-horizontal', { height: 14 })}
                             {toAddress.substring(toAddress.length - 3)}
-                           </span>
-                          <span className='monitorSub'>{'ON'} </span>
-                          <span className='monitorSub monitorSubHighlight'>
+                          </span>
+                          <span className="monitorSub">{'ON'} </span>
+                          <span className="monitorSub monitorSubHighlight">
                             {}
                             {this.store('main.networks', this.chain.type, this.chain.id, 'name')}
                           </span>
                         </div>
                       ) : (
-                        <div className='monitorDeploy'>deploy</div>
+                        <div className="monitorDeploy">deploy</div>
                       )}
                     </div>
-                    <div className='monitorConfirms'>
-                      {[...Array(12).keys()].map(i => {
-                        const monitorConfirmsItem = confirmations > i ? 'txProgressConfirmsItem txProgressConfirmsItemGood' : 'txProgressConfirmsItem'
-                        return <div key={i} className={monitorConfirmsItem}>{svg.octicon('chevron-right', { height: 14 })}</div>
+                    <div className="monitorConfirms">
+                      {[...Array(12).keys()].map((i) => {
+                        const monitorConfirmsItem =
+                          confirmations > i
+                            ? 'txProgressConfirmsItem txProgressConfirmsItemGood'
+                            : 'txProgressConfirmsItem'
+                        return (
+                          <div key={i} className={monitorConfirmsItem}>
+                            {svg.octicon('chevron-right', { height: 14 })}
+                          </div>
+                        )
                       })}
                     </div>
                   </div>
                 </div>
               ) : (
                 <>
-                  <RequestItem 
+                  <RequestItem
                     req={req}
                     account={accountId}
                     handlerId={req.handlerId}
@@ -439,72 +484,103 @@ class TransactionRequest extends React.Component {
                   />
                   {txMeta.replacement ? (
                     txMeta.possible ? (
-                      <div className='approveRequestHeaderTag'>
-                        valid replacement
-                      </div>
+                      <div className="approveRequestHeaderTag">valid replacement</div>
                     ) : (
-                      <div className='approveRequestHeaderTag approveRequestHeaderTagInvalid'>
+                      <div className="approveRequestHeaderTag approveRequestHeaderTagInvalid">
                         {txMeta.notice || 'invalid duplicate'}
                       </div>
                     )
                   ) : null}
-                  <div className='_txBody'>
+                  <div className="_txBody">
                     <TxRecipient {...this.props} />
-                    <TxMain {...this.props} chain={this.chain}/>
+                    <TxMain {...this.props} chain={this.chain} />
                     <TxData {...this.props} overlayMode={this.overlayMode.bind(this)} />
                     <TxFeeNew {...this.props} chain={this.chain} overlayMode={this.overlayMode.bind(this)} />
                   </div>
                   {!notice ? (
-                    <div className='requestApprove'>
+                    <div className="requestApprove">
                       {req.automaticFeeUpdateNotice ? (
-                        <div className='requestApproveFeeBlock cardShow'>
-                          <div className='requestApproveFeeButton requestApproveFeeReject' onClick={() => {
-                            const { previousFee } = req.automaticFeeUpdateNotice
-                            if (previousFee.type === '0x2') {
-                              link.rpc('setBaseFee', previousFee.baseFee, req.handlerId, e => { if (e) console.error(e) })
-                              link.rpc('setPriorityFee', previousFee.priorityFee, req.handlerId, e => { if (e) console.error(e) })
-                            } else if (previousFee.type === '0x0')  {
-                              link.rpc('setGasPrice', previousFee.gasPrice, req.handlerId, e => { if (e) console.error(e) })
-                            }
-                          }}>{'reject'}</div>
+                        <div className="requestApproveFeeBlock cardShow">
+                          <div
+                            className="requestApproveFeeButton requestApproveFeeReject"
+                            onClick={() => {
+                              const { previousFee } = req.automaticFeeUpdateNotice
+                              if (previousFee.type === '0x2') {
+                                link.rpc('setBaseFee', previousFee.baseFee, req.handlerId, (e) => {
+                                  if (e) console.error(e)
+                                })
+                                link.rpc('setPriorityFee', previousFee.priorityFee, req.handlerId, (e) => {
+                                  if (e) console.error(e)
+                                })
+                              } else if (previousFee.type === '0x0') {
+                                link.rpc('setGasPrice', previousFee.gasPrice, req.handlerId, (e) => {
+                                  if (e) console.error(e)
+                                })
+                              }
+                            }}
+                          >
+                            {'reject'}
+                          </div>
                           <div>{'fee updated'}</div>
-                          <div className='requestApproveFeeButton requestApproveFeeAccept' onClick={() => {
-                            link.rpc('removeFeeUpdateNotice', req.handlerId, e => { if (e) console.error(e) })
-                          }}>{'accept'}</div>
+                          <div
+                            className="requestApproveFeeButton requestApproveFeeAccept"
+                            onClick={() => {
+                              link.rpc('removeFeeUpdateNotice', req.handlerId, (e) => {
+                                if (e) console.error(e)
+                              })
+                            }}
+                          >
+                            {'accept'}
+                          </div>
                         </div>
                       ) : (
                         <>
                           <div
-                            className='requestDecline' 
-                            style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none'}}
+                            className="requestDecline"
+                            style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none' }}
                             onClick={() => {
                               if (this.state.allowInput) this.decline(req)
                             }}
                           >
-                            <div className='requestDeclineButton _txButton _txButtonBad'>Decline</div>
+                            <div className="requestDeclineButton _txButton _txButtonBad">Decline</div>
                           </div>
                           <div
-                            className='requestSign' 
-                            style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none'}}
+                            className="requestSign"
+                            style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none' }}
                             onClick={() => {
                               if (this.state.allowInput) {
                                 link.rpc('signerCompatibility', req.handlerId, (e, compatibility) => {
-                                  if (e === 'No signer')  {
+                                  if (e === 'No signer') {
                                     this.store.notify('noSignerWarning', { req })
                                   } else if (e === 'Signer locked') {
                                     this.store.notify('signerLockedWarning', { req })
-                                  } else if (!compatibility.compatible && !this.store('main.mute.signerCompatibilityWarning')) {
-                                    this.store.notify('signerCompatibilityWarning', { req, compatibility, chain: this.chain })
-                                  } else if ((maxFeeUSD.toNumber() > FEE_WARNING_THRESHOLD_USD || this.toDisplayUSD(maxFeeUSD) === '0.00') && !this.store('main.mute.gasFeeWarning')) {
-                                    this.store.notify('gasFeeWarning', { req, feeUSD: this.toDisplayUSD(maxFeeUSD), currentSymbol })
+                                  } else if (
+                                    !compatibility.compatible &&
+                                    !this.store('main.mute.signerCompatibilityWarning')
+                                  ) {
+                                    this.store.notify('signerCompatibilityWarning', {
+                                      req,
+                                      compatibility,
+                                      chain: this.chain,
+                                    })
+                                  } else if (
+                                    (maxFeeUSD.toNumber() > FEE_WARNING_THRESHOLD_USD ||
+                                      this.toDisplayUSD(maxFeeUSD) === '0.00') &&
+                                    !this.store('main.mute.gasFeeWarning')
+                                  ) {
+                                    this.store.notify('gasFeeWarning', {
+                                      req,
+                                      feeUSD: this.toDisplayUSD(maxFeeUSD),
+                                      currentSymbol,
+                                    })
                                   } else {
                                     this.approve(req.handlerId, req)
                                   }
                                 })
-                              }}
-                            }
+                              }
+                            }}
                           >
-                            <div className='requestSignButton _txButton'> Sign </div>
+                            <div className="requestSignButton _txButton"> Sign </div>
                           </div>
                         </>
                       )}
@@ -515,7 +591,7 @@ class TransactionRequest extends React.Component {
             </div>
           </div>
         ) : (
-          <div className='unknownType'>{'Unknown: ' + req.type}</div>
+          <div className="unknownType">{'Unknown: ' + req.type}</div>
         )}
       </div>
     )

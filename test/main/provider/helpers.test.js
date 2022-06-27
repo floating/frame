@@ -6,7 +6,7 @@ jest.mock('../../../main/store')
 beforeAll(async () => {
   log.transports.console.level = false
 })
-  
+
 afterAll(() => {
   log.transports.console.level = 'debug'
 })

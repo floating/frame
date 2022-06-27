@@ -23,7 +23,7 @@ describe('migration 13', () => {
               type: 'ethereum',
               layer: 'mainnet',
               symbol: 'ETH',
-              name: 'Mainnet'
+              name: 'Mainnet',
             },
             137: {
               id: 1,
@@ -34,20 +34,20 @@ describe('migration 13', () => {
               connection: {
                 primary: {
                   on: true,
-                  current: 'matic'
+                  current: 'matic',
                 },
                 secondary: {
                   on: false,
-                  current: 'local'
-                }
-              }
-            }
-          }
+                  current: 'local',
+                },
+              },
+            },
+          },
         },
         networksMeta: {
-          ethereum: { }
-        }
-      }
+          ethereum: {},
+        },
+      },
     }
   })
 
@@ -60,7 +60,7 @@ describe('migration 13', () => {
 
   it('adds default gas price info', () => {
     state.main.networksMeta.ethereum = {
-      1: { }
+      1: {},
     }
 
     const updatedState = migrations.apply(state, 13)
@@ -74,10 +74,10 @@ describe('migration 13', () => {
       1: {
         gas: {
           price: {
-            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-          }
-        }
-      }
+            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' },
+          },
+        },
+      },
     }
 
     const updatedState = migrations.apply(state, 13)
@@ -90,15 +90,15 @@ describe('migration 13', () => {
       1: {
         gas: {
           price: {
-            selected: 'standard'
-          }
-        }
-      }
+            selected: 'standard',
+          },
+        },
+      },
     }
 
-    const updatedState = migrations.apply(state, 13);
+    const updatedState = migrations.apply(state, 13)
 
-    ['slow', 'standard', 'fast', 'asap', 'custom'].forEach(level => {
+    ;['slow', 'standard', 'fast', 'asap', 'custom'].forEach((level) => {
       expect(updatedState.main.networksMeta.ethereum[1].gas.price).toHaveProperty(`levels.${level}`)
     })
   })
@@ -110,11 +110,11 @@ describe('migration 13', () => {
           price: {
             selected: 'asap',
             levels: {
-              slow: '0x0a93'
-            }
-          }
-        }
-      }
+              slow: '0x0a93',
+            },
+          },
+        },
+      },
     }
 
     const updatedState = migrations.apply(state, 13)
@@ -140,48 +140,50 @@ describe('migration 14', () => {
               connection: {
                 primary: {
                   on: true,
-                  current: 'matic'
+                  current: 'matic',
                 },
                 secondary: {
                   on: false,
-                  current: 'local'
-                }
-              }
-            }
-          }
+                  current: 'local',
+                },
+              },
+            },
+          },
         },
         networksMeta: {
-          ethereum: { }
-        }
-      }
+          ethereum: {},
+        },
+      },
     }
   })
 
   const connectionPriorities = ['primary', 'secondary']
 
-  connectionPriorities.forEach(priority => {
+  connectionPriorities.forEach((priority) => {
     it(`updates the ${priority} polygon connection from matic to infura`, () => {
       state.main.networks.ethereum[137].connection[priority].current = 'matic'
-  
+
       const updatedState = migrations.apply(state, 14)
-  
+
       expect(updatedState.main.networks.ethereum[137].connection[priority].current).toBe('infura')
 
       // ensure other settings weren't changed
-      expect(updatedState.main.networks.ethereum[137].connection[priority].on)
-        .toBe(state.main.networks.ethereum[137].connection[priority].on)
+      expect(updatedState.main.networks.ethereum[137].connection[priority].on).toBe(
+        state.main.networks.ethereum[137].connection[priority].on
+      )
     })
-  
+
     it(`does not update the ${priority} polygon connection if not matic`, () => {
       state.main.networks.ethereum[137].connection[priority].current = 'local'
-  
+
       const updatedState = migrations.apply(state, 14)
-  
+
       expect(updatedState.main.networks.ethereum[137].connection[priority].current).toBe('local')
 
       // ensure other settings weren't changed
-      expect(updatedState.main.networks.ethereum[137].connection[priority].on)
-        .toBe(state.main.networks.ethereum[137].connection[priority].on)
+      expect(updatedState.main.networks.ethereum[137].connection[priority].on).toBe(
+        state.main.networks.ethereum[137].connection[priority].on
+      )
     })
   })
 
@@ -199,7 +201,7 @@ describe('migration 14', () => {
       symbol: 'ETH',
       name: 'Arbitrum',
       explorer: 'https://explorer.arbitrum.io',
-      gas: { price: { selected: 'standard', levels: {} } }
+      gas: { price: { selected: 'standard', levels: {} } },
     })
 
     expect(arbitrum.connection.primary.on).toBe(true)
@@ -213,8 +215,8 @@ describe('migration 14', () => {
     state.main.networks.ethereum[42161] = {
       explorer: 'https://custom-explorer.arbitrum.io',
       connection: {
-        primary: { on: true, current: 'local' }
-      }
+        primary: { on: true, current: 'local' },
+      },
     }
 
     const updatedState = migrations.apply(state, 14)
@@ -235,7 +237,7 @@ describe('migration 14', () => {
 
     expect(arbitrum.gas.fees.maxFeePerGas).toBe(undefined)
     expect(arbitrum).toMatchObject({
-      gas: { fees: {} , price: { selected: 'standard', levels: {} } }
+      gas: { fees: {}, price: { selected: 'standard', levels: {} } },
     })
   })
 
@@ -243,9 +245,9 @@ describe('migration 14', () => {
     state.main.networksMeta.ethereum[42161] = {
       gas: {
         fees: {
-          maxFeePerGas: '0xf'
-        }
-      }
+          maxFeePerGas: '0xf',
+        },
+      },
     }
 
     const updatedState = migrations.apply(state, 14)
@@ -273,20 +275,20 @@ describe('migration 15', () => {
               connection: {
                 primary: {
                   on: true,
-                  current: 'matic'
+                  current: 'matic',
                 },
                 secondary: {
                   on: false,
-                  current: 'local'
-                }
-              }
-            }
-          }
+                  current: 'local',
+                },
+              },
+            },
+          },
         },
         networksMeta: {
-          ethereum: { }
-        }
-      }
+          ethereum: {},
+        },
+      },
     }
   })
 
@@ -299,7 +301,7 @@ describe('migration 15', () => {
 
   it('adds the Polygon explorer if one does not exist', () => {
     delete state.main.networks.ethereum['137'].explorer
-    
+
     const updatedState = migrations.apply(state, 15)
     const polygon = updatedState.main.networks.ethereum['137']
 
@@ -322,8 +324,8 @@ describe('migration 16', () => {
       main: {
         _version: 15,
         currentNetwork: {
-          type: 'ethereum', 
-          id: '1'
+          type: 'ethereum',
+          id: '1',
         },
         networks: {
           ethereum: {
@@ -337,20 +339,20 @@ describe('migration 16', () => {
               connection: {
                 primary: {
                   on: true,
-                  current: 'matic'
+                  current: 'matic',
                 },
                 secondary: {
                   on: false,
-                  current: 'local'
-                }
-              }
-            }
-          }
+                  current: 'local',
+                },
+              },
+            },
+          },
         },
         networksMeta: {
-          ethereum: {}
-        }
-      }
+          ethereum: {},
+        },
+      },
     }
   })
 
@@ -374,13 +376,13 @@ describe('migration 17', () => {
         _version: 16,
         lattice: {
           McBbS7: {
-            deviceId: 'McBbS7'
-          }
+            deviceId: 'McBbS7',
+          },
         },
         latticeSettings: {
-          suffix: 'my-laptop'
-        }
-      }
+          suffix: 'my-laptop',
+        },
+      },
     }
   })
 
@@ -427,8 +429,8 @@ describe('migration 18', () => {
     state = {
       main: {
         _version: 17,
-        tokens: ['AVAX', 'OHM']
-      }
+        tokens: ['AVAX', 'OHM'],
+      },
     }
   })
 
@@ -444,7 +446,7 @@ describe('migration 18', () => {
 
     const updatedState = migrations.apply(state, 18)
 
-    expect(updatedState.main.tokens).toEqual({ custom: []})
+    expect(updatedState.main.tokens).toEqual({ custom: [] })
   })
 
   it('migrates missing custom tokens to an empty array', () => {
@@ -452,7 +454,7 @@ describe('migration 18', () => {
 
     const updatedState = migrations.apply(state, 18)
 
-    expect(updatedState.main.tokens).toEqual({ custom: []})
+    expect(updatedState.main.tokens).toEqual({ custom: [] })
   })
 })
 
@@ -463,14 +465,14 @@ describe('migration 19', () => {
         _version: 18,
         currentNetwork: {
           id: 1,
-          type: 'ethereum'
+          type: 'ethereum',
         },
         clients: {
           ipfs: {},
           geth: {},
-          parity: {}
-        }
-      }
+          parity: {},
+        },
+      },
     }
   })
 
@@ -491,16 +493,16 @@ describe('migration 20', () => {
       main: {
         _version: 19,
         mute: {
-          aragonAccountMigrationWarning: true
+          aragonAccountMigrationWarning: true,
         },
         accounts: {
-          'test': {
+          test: {
             smart: {
-              type: 'aragon'
-            }
-          }
-        }
-      }
+              type: 'aragon',
+            },
+          },
+        },
+      },
     }
   })
 

@@ -5,10 +5,10 @@ import link from '../../../../resources/link'
 import svg from '../../../../resources/svg'
 
 class ChainModule extends React.Component {
-  constructor (...args) {
+  constructor(...args) {
     super(...args)
     this.state = {
-      expanded: false
+      expanded: false,
     }
     this.ref = createRef()
   }
@@ -27,22 +27,21 @@ class ChainModule extends React.Component {
   //   document.removeEventListener('click', this.clickHandler.bind(this))
   // }
 
-  renderConnection (origin, id) {
+  renderConnection(origin, id) {
     return (
-      <div 
-        className='sliceTile sliceTileClickable'
+      <div
+        className="sliceTile sliceTileClickable"
         onClick={() => {
-          link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'customTokens', notifyData: {} }})
+          link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'customTokens', notifyData: {} } })
         }}
       >
-        <div className='sliceTileTokens'>
+        <div className="sliceTileTokens">
           <div>{'Manage Tokens'}</div>
         </div>
-        
       </div>
     )
   }
-  status (type, id, layer) {
+  status(type, id, layer) {
     const connection = this.store('main.networks', type, id, 'connection', layer)
     let status = connection.status
     const current = connection.current
@@ -53,7 +52,11 @@ class ChainModule extends React.Component {
         else if (!this.okPort(this.state.primaryCustom)) status = 'invalid port'
       }
 
-      if (layer === 'secondary' && this.state.secondaryCustom !== '' && this.state.secondaryCustom !== this.customMessage) {
+      if (
+        layer === 'secondary' &&
+        this.state.secondaryCustom !== '' &&
+        this.state.secondaryCustom !== this.customMessage
+      ) {
         if (!this.okProtocol(this.state.secondaryCustom)) status = 'invalid target'
         else if (!this.okPort(this.state.secondaryCustom)) status = 'invalid port'
       }
@@ -62,36 +65,48 @@ class ChainModule extends React.Component {
     if (!this.store('main.networks', type, id, 'on')) status = 'off'
 
     return (
-      <div className='connectionOptionStatus'>
+      <div className="connectionOptionStatus">
         {this.indicator(status)}
-        <div className='connectionOptionStatusText'>{status}</div>
+        <div className="connectionOptionStatusText">{status}</div>
       </div>
     )
   }
-  indicator (status) {
+  indicator(status) {
     if (status === 'connected') {
-      return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorGood' /></div>
+      return (
+        <div className="connectionOptionStatusIndicator">
+          <div className="connectionOptionStatusIndicatorGood" />
+        </div>
+      )
     } else if (status === 'loading' || status === 'syncing' || status === 'pending' || status === 'standby') {
-      return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorPending' /></div>
+      return (
+        <div className="connectionOptionStatusIndicator">
+          <div className="connectionOptionStatusIndicatorPending" />
+        </div>
+      )
     } else {
-      return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorBad' /></div>
+      return (
+        <div className="connectionOptionStatusIndicator">
+          <div className="connectionOptionStatusIndicatorBad" />
+        </div>
+      )
     }
   }
-  render () {
+  render() {
     const { id, type, connection, changed } = this.props
 
     const networkPresets = this.store('main.networkPresets', type)
     let presets = networkPresets[id] || {}
-    presets = Object.keys(presets).map(i => ({ text: i, value: type + ':' + id + ':' + i }))
-    presets = presets.concat(Object.keys(networkPresets.default).map(i => ({ text: i, value: type + ':' + id + ':' + i })))
+    presets = Object.keys(presets).map((i) => ({ text: i, value: type + ':' + id + ':' + i }))
+    presets = presets.concat(
+      Object.keys(networkPresets.default).map((i) => ({ text: i, value: type + ':' + id + ':' + i }))
+    )
     presets.push({ text: 'Custom', value: type + ':' + id + ':' + 'custom' })
 
     return (
-      <div className='sliceContainer' ref={this.ref}>
+      <div className="sliceContainer" ref={this.ref}>
         {this.renderConnection('connection', id)}
-        {this.state.expanded ? (
-          <div>{'HELLO'}</div>
-        ) : null}
+        {this.state.expanded ? <div>{'HELLO'}</div> : null}
       </div>
     )
   }

@@ -5,7 +5,7 @@ import link from '../../../resources/link'
 import svg from '../../../resources/svg'
 
 class Settings extends React.Component {
-  constructor (props, context) {
+  constructor(props, context) {
     super(props, context)
     this.customMessage = 'Custom Endpoint'
     // this.network = context.store('main.currentNetwork.id')
@@ -27,17 +27,26 @@ class Settings extends React.Component {
     // })
   }
 
-  appInfo () {
+  appInfo() {
     return (
-      <div className='appInfo'>
-        <div className='appInfoLine appInfoLineVersion'>{'v' + require('../../../package.json').version}</div>
-        <div className='appInfoLine appInfoLineReset'>
+      <div className="appInfo">
+        <div className="appInfoLine appInfoLineVersion">{'v' + require('../../../package.json').version}</div>
+        <div className="appInfoLine appInfoLineReset">
           {this.state.resetConfirm ? (
-            <span className='appInfoLineResetConfirm'>
-              Are you sure you want to reset everything? <span className='pointer' onClick={() => link.send('tray:resetAllSettings')}>Yes</span> <span>/</span> <span className='pointer' onClick={() => this.setState({ resetConfirm: false })}>No</span>
+            <span className="appInfoLineResetConfirm">
+              Are you sure you want to reset everything?{' '}
+              <span className="pointer" onClick={() => link.send('tray:resetAllSettings')}>
+                Yes
+              </span>{' '}
+              <span>/</span>{' '}
+              <span className="pointer" onClick={() => this.setState({ resetConfirm: false })}>
+                No
+              </span>
             </span>
           ) : (
-            <span className='pointer' onClick={() => this.setState({ resetConfirm: true })}>Reset All Settings & Data</span>
+            <span className="pointer" onClick={() => this.setState({ resetConfirm: true })}>
+              Reset All Settings & Data
+            </span>
           )}
         </div>
       </div>
@@ -61,42 +70,51 @@ class Settings extends React.Component {
   //   if (this.state.secondaryCustom === '') this.setState({ secondaryCustom: this.customMessage })
   // }
 
-  customPrimaryFocus () {
+  customPrimaryFocus() {
     if (this.state.primaryCustom === this.customMessage) this.setState({ primaryCustom: '' })
   }
 
-  customPrimaryBlur () {
+  customPrimaryBlur() {
     if (this.state.primaryCustom === '') this.setState({ primaryCustom: this.customMessage })
   }
 
-  inputPrimaryCustom (e) {
+  inputPrimaryCustom(e) {
     e.preventDefault()
     clearTimeout(this.customPrimaryInputTimeout)
     const value = e.target.value.replace(/\s+/g, '')
     this.setState({ primaryCustom: value })
     const { type, id } = this.store('main.currentNetwork')
-    this.customPrimaryInputTimeout = setTimeout(() => link.send('tray:action', 'setPrimaryCustom', type, id, this.state.primaryCustom), 1000)
+    this.customPrimaryInputTimeout = setTimeout(
+      () => link.send('tray:action', 'setPrimaryCustom', type, id, this.state.primaryCustom),
+      1000
+    )
   }
 
-  inputSecondaryCustom (e) {
+  inputSecondaryCustom(e) {
     e.preventDefault()
     clearTimeout(this.customSecondaryInputTimeout)
     const value = e.target.value.replace(/\s+/g, '')
     this.setState({ secondaryCustom: value })
     const { type, id } = this.store('main.currentNetwork')
-    this.customSecondaryInputTimeout = setTimeout(() => link.send('tray:action', 'setSecondaryCustom', type, id, this.state.secondaryCustom), 1000)
+    this.customSecondaryInputTimeout = setTimeout(
+      () => link.send('tray:action', 'setSecondaryCustom', type, id, this.state.secondaryCustom),
+      1000
+    )
   }
 
-  inputLatticeEndpoint (e) {
+  inputLatticeEndpoint(e) {
     e.preventDefault()
     clearTimeout(this.inputLatticeTimeout)
     const value = e.target.value.replace(/\s+/g, '')
     this.setState({ latticeEndpoint: value })
     // TODO: Update to target specific Lattice device rather than global
-    this.inputLatticeTimeout = setTimeout(() => link.send('tray:action', 'setLatticeEndpointCustom', this.state.latticeEndpoint), 1000)
+    this.inputLatticeTimeout = setTimeout(
+      () => link.send('tray:action', 'setLatticeEndpointCustom', this.state.latticeEndpoint),
+      1000
+    )
   }
 
-  localShake (key) {
+  localShake(key) {
     const localShake = Object.assign({}, this.state.localShake)
     localShake[key] = true
     this.setState({ localShake })
@@ -107,7 +125,7 @@ class Settings extends React.Component {
     }, 1010)
   }
 
-  status (layer) {
+  status(layer) {
     const { type, id } = this.store('main.currentNetwork')
     const connection = this.store('main.networks', type, id, 'connection', layer)
     let status = connection.status
@@ -119,147 +137,214 @@ class Settings extends React.Component {
         else if (!okPort(this.state.primaryCustom)) status = 'invalid port'
       }
 
-      if (layer === 'secondary' && this.state.secondaryCustom !== '' && this.state.secondaryCustom !== this.customMessage) {
+      if (
+        layer === 'secondary' &&
+        this.state.secondaryCustom !== '' &&
+        this.state.secondaryCustom !== this.customMessage
+      ) {
         if (!okProtocol(this.state.secondaryCustom)) status = 'invalid target'
         else if (!okPort(this.state.secondaryCustom)) status = 'invalid port'
       }
     }
     if (status === 'connected' && !connection.network) status = 'loading'
     return (
-      <div className='connectionOptionStatus'>
+      <div className="connectionOptionStatus">
         {this.indicator(status)}
-        <div className='connectionOptionStatusText'>{status}</div>
+        <div className="connectionOptionStatusText">{status}</div>
       </div>
     )
   }
 
-  discord () {
+  discord() {
     return (
-      <div className='discordInvite' onClick={() => link.send('tray:openExternal', 'https://discord.gg/UH7NGqY') }>
+      <div className="discordInvite" onClick={() => link.send('tray:openExternal', 'https://discord.gg/UH7NGqY')}>
         <div>Need help?</div>
-        <div className='discordLink'>Join our Discord!</div>
+        <div className="discordLink">Join our Discord!</div>
       </div>
     )
   }
 
-  quit () {
+  quit() {
     return (
-      <div className='addCustomTokenButtonWrap quitFrame' style={{ zIndex: 215 }}>
-        <div className='addCustomTokenButton' onClick={() => link.send('tray:quit')}>
+      <div className="addCustomTokenButtonWrap quitFrame" style={{ zIndex: 215 }}>
+        <div className="addCustomTokenButton" onClick={() => link.send('tray:quit')}>
           Quit
         </div>
       </div>
     )
   }
 
-  indicator (status) {
+  indicator(status) {
     if (status === 'connected') {
-      return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorGood' /></div>
+      return (
+        <div className="connectionOptionStatusIndicator">
+          <div className="connectionOptionStatusIndicatorGood" />
+        </div>
+      )
     } else if (status === 'loading' || status === 'syncing' || status === 'pending' || status === 'standby') {
-      return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorPending' /></div>
+      return (
+        <div className="connectionOptionStatusIndicator">
+          <div className="connectionOptionStatusIndicatorPending" />
+        </div>
+      )
     } else {
-      return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorBad' /></div>
+      return (
+        <div className="connectionOptionStatusIndicator">
+          <div className="connectionOptionStatusIndicatorBad" />
+        </div>
+      )
     }
   }
 
-  selectNetwork (network) {
+  selectNetwork(network) {
     const [type, id] = network.split(':')
     if (network.type !== type || network.id !== id) link.send('tray:action', 'selectNetwork', type, id)
   }
 
-  expandNetwork (e, expand) {
+  expandNetwork(e, expand) {
     e.stopPropagation()
     this.setState({ expandNetwork: expand !== undefined ? expand : !this.state.expandNetwork })
   }
 
-  render () {
+  render() {
     const { type, id } = { type: 'ethereum', id: 1 } // TODO
     const networks = this.store('main.networks')
     // const connection = networks[type][id].connection
     const networkPresets = this.store('main.networkPresets', type)
     let presets = networkPresets[id] || {}
-    presets = Object.keys(presets).map(i => ({ text: i, value: type + ':' + id + ':' + i }))
-    presets = presets.concat(Object.keys(networkPresets.default).map(i => ({ text: i, value: type + ':' + id + ':' + i })))
+    presets = Object.keys(presets).map((i) => ({ text: i, value: type + ':' + id + ':' + i }))
+    presets = presets.concat(
+      Object.keys(networkPresets.default).map((i) => ({ text: i, value: type + ':' + id + ':' + i }))
+    )
     presets.push({ text: 'Custom', value: type + ':' + id + ':' + 'custom' })
 
     const networkOptions = []
-    Object.keys(networks).forEach(type => {
-      Object.keys(networks[type]).forEach(id => {
+    Object.keys(networks).forEach((type) => {
+      Object.keys(networks[type]).forEach((id) => {
         networkOptions.push({ text: networks[type][id].name, value: type + ':' + id })
       })
     })
     return (
       <div className={'localSettings cardShow'}>
-        <div className='localSettingsWrap'>
-          <div className='dashModule' onClick={() => link.send('tray:action', 'navDash', { view: 'accounts', data: {} })}>
-            <div className='dashModuleIcon'>{svg.accounts(24)}</div>
-            <div className='dashModuleTitle'>{'Accounts'}</div>
+        <div className="localSettingsWrap">
+          <div
+            className="dashModule"
+            onClick={() => link.send('tray:action', 'navDash', { view: 'accounts', data: {} })}
+          >
+            <div className="dashModuleIcon">{svg.accounts(24)}</div>
+            <div className="dashModuleTitle">{'Accounts'}</div>
           </div>
-          <div className='dashModule' onClick={() => link.send('tray:action', 'navDash', { view: 'chains', data: {} })}>
-            <div className='dashModuleIcon'>{svg.chain(24)}</div>
-            <div className='dashModuleTitle'>{'Chains'}</div>
+          <div className="dashModule" onClick={() => link.send('tray:action', 'navDash', { view: 'chains', data: {} })}>
+            <div className="dashModuleIcon">{svg.chain(24)}</div>
+            <div className="dashModuleTitle">{'Chains'}</div>
           </div>
-          <div className='dashModule' onClick={() => link.send('tray:action', 'navDash', { view: 'dapps', data: {} })}>
-            <div className='dashModuleIcon'>{svg.window(24)}</div>
-            <div className='dashModuleTitle'>{'Dapps'}</div>
+          <div className="dashModule" onClick={() => link.send('tray:action', 'navDash', { view: 'dapps', data: {} })}>
+            <div className="dashModuleIcon">{svg.window(24)}</div>
+            <div className="dashModuleTitle">{'Dapps'}</div>
           </div>
-          <div className='dashModule' onClick={() => link.send('tray:action', 'navDash', { view: 'tokens', data: {} })}>
-            <div className='dashModuleIcon'>{svg.tokens(24)}</div>
-            <div className='dashModuleTitle'>{'Tokens'}</div>
+          <div className="dashModule" onClick={() => link.send('tray:action', 'navDash', { view: 'tokens', data: {} })}>
+            <div className="dashModuleIcon">{svg.tokens(24)}</div>
+            <div className="dashModuleTitle">{'Tokens'}</div>
           </div>
-          <div className='dashModule' onClick={() => link.send('tray:action', 'navDash', { view: 'settings', data: {} })}>
-            <div className='dashModuleIcon'>{svg.settings(24)}</div>
-            <div className='dashModuleTitle'>{'Settings'}</div>
+          <div
+            className="dashModule"
+            onClick={() => link.send('tray:action', 'navDash', { view: 'settings', data: {} })}
+          >
+            <div className="dashModuleIcon">{svg.settings(24)}</div>
+            <div className="dashModuleTitle">{'Settings'}</div>
           </div>
-          <div className='snipIt'>
+          <div className="snipIt">
             <div>Using a dapp that doesn't support Frame natively?</div>
-            <div className='snipItBrowserExtensionIcons'>
-              <div 
-                className='snipItBrowserExtensionIcon snipItBrowserExtensionIconChrome'
-                onClick={() => link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'openExternal', notifyData: { url: 'https://chrome.google.com/webstore/detail/frame-alpha/ldcoohedfbjoobcadoglnnmmfbdlmmhf' } }})}
+            <div className="snipItBrowserExtensionIcons">
+              <div
+                className="snipItBrowserExtensionIcon snipItBrowserExtensionIconChrome"
+                onClick={() =>
+                  link.send('tray:action', 'navDash', {
+                    view: 'notify',
+                    data: {
+                      notify: 'openExternal',
+                      notifyData: {
+                        url: 'https://chrome.google.com/webstore/detail/frame-alpha/ldcoohedfbjoobcadoglnnmmfbdlmmhf',
+                      },
+                    },
+                  })
+                }
               >
                 {svg.chrome(28)}
               </div>
-              <div 
-                className='snipItBrowserExtensionIcon snipItBrowserExtensionIconFirefox'
-                onClick={() => link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'openExternal', notifyData: { url: 'https://addons.mozilla.org/en-US/firefox/addon/frame-extension' } }})}
+              <div
+                className="snipItBrowserExtensionIcon snipItBrowserExtensionIconFirefox"
+                onClick={() =>
+                  link.send('tray:action', 'navDash', {
+                    view: 'notify',
+                    data: {
+                      notify: 'openExternal',
+                      notifyData: { url: 'https://addons.mozilla.org/en-US/firefox/addon/frame-extension' },
+                    },
+                  })
+                }
               >
                 {svg.firefox(28)}
               </div>
-              <div 
-                className='snipItBrowserExtensionIcon snipItBrowserExtensionIconSafari'
-                onClick={() => link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'openExternal', notifyData: { url: 'https://addons.mozilla.org/en-US/firefox/addon/frame-extension' } }})}
+              <div
+                className="snipItBrowserExtensionIcon snipItBrowserExtensionIconSafari"
+                onClick={() =>
+                  link.send('tray:action', 'navDash', {
+                    view: 'notify',
+                    data: {
+                      notify: 'openExternal',
+                      notifyData: { url: 'https://addons.mozilla.org/en-US/firefox/addon/frame-extension' },
+                    },
+                  })
+                }
               >
                 {svg.safari(28)}
               </div>
             </div>
             <div>Inject a connection with our browser extension!</div>
           </div>
-          <div className='requestFeature'>
-            <div className='requestFeatureButton' onClick={() => {
-              link.send('tray:openExternal', 'https://feedback.frame.sh')
-            }}>
-              Request a Feature 
+          <div className="requestFeature">
+            <div
+              className="requestFeatureButton"
+              onClick={() => {
+                link.send('tray:openExternal', 'https://feedback.frame.sh')
+              }}
+            >
+              Request a Feature
             </div>
           </div>
-          <div className='requestFeature'>
-            <div className='requestFeatureButton' onClick={() => {
-              link.send('tray:openExternal', 'https://discord.gg/UH7NGqY')
-            }}>
+          <div className="requestFeature">
+            <div
+              className="requestFeatureButton"
+              onClick={() => {
+                link.send('tray:openExternal', 'https://discord.gg/UH7NGqY')
+              }}
+            >
               Need help? Join our Discord!
             </div>
           </div>
-          <div className='requestFeature'>
-            <div className='requestFeatureButton' onClick={() => {
-              link.send('tray:quit')
-            }}>
+          <div className="requestFeature">
+            <div
+              className="requestFeatureButton"
+              onClick={() => {
+                link.send('tray:quit')
+              }}
+            >
               Quit
             </div>
           </div>
-          <div 
-            className='viewLicense' 
-            onClick={() => link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'openExternal', notifyData: { url: 'https://github.com/floating/frame/blob/master/LICENSE' } }})}
-           >
+          <div
+            className="viewLicense"
+            onClick={() =>
+              link.send('tray:action', 'navDash', {
+                view: 'notify',
+                data: {
+                  notify: 'openExternal',
+                  notifyData: { url: 'https://github.com/floating/frame/blob/master/LICENSE' },
+                },
+              })
+            }
+          >
             View License
           </div>
           {this.appInfo()}

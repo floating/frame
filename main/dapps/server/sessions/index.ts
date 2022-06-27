@@ -16,5 +16,5 @@ export default {
     app = app.replaceAll('.', '-')
     sessions[app].splice(sessions[app].indexOf(session), 1)
     if (sessions[app].length === 0) delete sessions[app]
-  }
+  },
 }

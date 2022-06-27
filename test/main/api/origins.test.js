@@ -26,16 +26,13 @@ describe('#updateOrigin', () => {
     it('adds a new origin to the store', () => {
       updateOrigin({}, 'frame.test')
 
-      expect(store.initOrigin).toHaveBeenCalledWith(
-        uuidv5('frame.test', uuidv5.DNS),
-        {
-          name: 'frame.test',
-          chain: {
-            type: 'ethereum',
-            id: 1
-          }
-        }
-      )
+      expect(store.initOrigin).toHaveBeenCalledWith(uuidv5('frame.test', uuidv5.DNS), {
+        name: 'frame.test',
+        chain: {
+          type: 'ethereum',
+          id: 1,
+        },
+      })
     })
 
     it('assigns a session to a new origin', () => {

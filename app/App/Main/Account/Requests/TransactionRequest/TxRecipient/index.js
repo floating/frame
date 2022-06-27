@@ -6,59 +6,68 @@ import link from '../../../../../../../resources/link'
 import svg from '../../../../../../../resources/svg'
 
 class TxRecipient extends React.Component {
-  constructor (...args) {
+  constructor(...args) {
     super(...args)
     this.state = {
-      copied: false
+      copied: false,
     }
   }
-  copyAddress (data) {
+  copyAddress(data) {
     link.send('tray:clipboardData', data)
     this.setState({ copied: true })
-    setTimeout(_ => this.setState({ copied: false }), 1000)
+    setTimeout((_) => this.setState({ copied: false }), 1000)
   }
-  render () {
+  render() {
     const req = this.props.req
     const address = req.data.to ? getAddress(req.data.to) : ''
-    const ensName = (req.recipient && req.recipient.length < 25) ? req.recipient : ''
+    const ensName = req.recipient && req.recipient.length < 25 ? req.recipient : ''
 
     return (
-      <div className='_txRecipient'>
-        <div className='_txRecipientInner'>
+      <div className="_txRecipient">
+        <div className="_txRecipientInner">
           {address ? (
-            <div className='_txRecipientSlice _txRecipientValue'>
-              {ensName
-                ? <span>{ensName}</span>
-                : <span>{address.substring(0, 6)}{svg.octicon('kebab-horizontal', { height: 15 })}{address.substring(address.length - 4)}</span>
-              }
-              {req.decodedData && req.decodedData.contractName ? ( 
-                <span className={'_txRecipientContract'}>{(() => {
-                  if (req.decodedData.contractName.length > 11) return `${req.decodedData.contractName.substr(0, 9)}..`
-                  return req.decodedData.contractName
-                })()}</span>
+            <div className="_txRecipientSlice _txRecipientValue">
+              {ensName ? (
+                <span>{ensName}</span>
+              ) : (
+                <span>
+                  {address.substring(0, 6)}
+                  {svg.octicon('kebab-horizontal', { height: 15 })}
+                  {address.substring(address.length - 4)}
+                </span>
+              )}
+              {req.decodedData && req.decodedData.contractName ? (
+                <span className={'_txRecipientContract'}>
+                  {(() => {
+                    if (req.decodedData.contractName.length > 11)
+                      return `${req.decodedData.contractName.substr(0, 9)}..`
+                    return req.decodedData.contractName
+                  })()}
+                </span>
               ) : null}
-              <div className='_txRecipientFull' onClick={() => {
-                this.copyAddress(address)
-              }}>
+              <div
+                className="_txRecipientFull"
+                onClick={() => {
+                  this.copyAddress(address)
+                }}
+              >
                 {this.state.copied ? 'Address Copied' : address}
               </div>
             </div>
           ) : (
-            <div className='_txRecipientSlice _txRecipientValue'>
-              Deploying Contract
-            </div>
+            <div className="_txRecipientSlice _txRecipientValue">Deploying Contract</div>
           )}
-          <div className='_txLabel'>
-            Recipient
-          </div>
+          <div className="_txLabel">Recipient</div>
         </div>
       </div>
     )
   }
 }
 
-{/* <div className='transactionToAddressFull' onMouseDown={this.copyAddress.bind(this, req.data.to)}>
+{
+  /* <div className='transactionToAddressFull' onMouseDown={this.copyAddress.bind(this, req.data.to)}>
 {this.state.copied ? <span>{'Copied'}{svg.octicon('clippy', { height: 14 })}</span> : req.data.to}
-</div> */}
+</div> */
+}
 
 export default Restore.connect(TxRecipient)

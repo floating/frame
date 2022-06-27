@@ -12,11 +12,11 @@ interface TokenSpec extends Token {
   }
 }
 
-function mergeTokens (existingTokens: Token[], updatedTokens: TokenSpec[]) {
+function mergeTokens(existingTokens: Token[], updatedTokens: TokenSpec[]) {
   const omitList: string[] = []
 
   const mergedList = [existingTokens, updatedTokens].reduce((tokens, list) => {
-    list.forEach(token => {
+    list.forEach((token) => {
       const address = token.address.toLowerCase()
       const key = `${token.chainId}:${address}`
       const omitToken = ((token as any).extensions || {}).omit
@@ -42,22 +42,19 @@ export default class TokenLoader {
   private readonly eth = ethProvider('frame', { origin: 'frame-internal', name: 'tokenLoader' })
   private readonly nebula = nebulaApi(this.eth)
 
-  constructor () {
-    this.tokenList = mergeTokens(
-      sushiswapTokenList.tokens as Token[],
-      defaultTokenList.tokens as TokenSpec[]
-    )
+  constructor() {
+    this.tokenList = mergeTokens(sushiswapTokenList.tokens as Token[], defaultTokenList.tokens as TokenSpec[])
   }
 
-  private async loadTokenList () {
+  private async loadTokenList() {
     const updatedTokens = await this.frameTokenList()
-  
+
     this.tokenList = mergeTokens(this.tokenList, updatedTokens)
-  
+
     log.info(`updated token list to contain ${this.tokenList.length} tokens`)
   }
 
-  async frameTokenList () {
+  async frameTokenList() {
     log.debug('loading tokens from tokens.frame.eth')
 
     try {
@@ -76,7 +73,7 @@ export default class TokenLoader {
     return []
   }
 
-  async start () {
+  async start() {
     log.verbose('starting token loader')
 
     return new Promise((resolve, reject) => {
@@ -93,15 +90,15 @@ export default class TokenLoader {
       this.eth.once('connect', startLoading.bind(this))
     })
   }
-  
-  stop () {
+
+  stop() {
     if (this.loader) {
       clearInterval(this.loader)
       this.loader = null
     }
   }
 
-  getTokens (chainId: number) {
-    return this.tokenList.filter(token => token.chainId === chainId)
+  getTokens(chainId: number) {
+    return this.tokenList.filter((token) => token.chainId === chainId)
   }
 }

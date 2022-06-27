@@ -1,33 +1,34 @@
 import type { EthereumProvider } from 'eth-provider'
 
 export enum MulticallVersion {
-  V1 = 1, V2 = 2
+  V1 = 1,
+  V2 = 2,
 }
 
-export type CallResult<T> = { success: boolean, returnValues: T[] }
+export type CallResult<T> = { success: boolean; returnValues: T[] }
 export type PostProcessor<R, T> = (val: R) => T
 
 export interface MulticallConfig {
-  address: Address,
-  chainId: number,
-  provider: EthereumProvider,
+  address: Address
+  chainId: number
+  provider: EthereumProvider
   version: MulticallVersion
 }
 
 export interface Call<R, T> {
-  target: Address,
-  call: string[],
+  target: Address
+  call: string[]
   returns: [PostProcessor<R, T>]
 }
 
 export const abi = [
   'function aggregate(tuple(address target, bytes callData)[] calls) returns (uint256 blockNumber, bytes[] returndata)',
-  'function tryAggregate(bool requireSuccess, tuple(address target, bytes callData)[] calls) returns (tuple(bool success, bytes returndata)[] result)'
+  'function tryAggregate(bool requireSuccess, tuple(address target, bytes callData)[] calls) returns (tuple(bool success, bytes returndata)[] result)',
 ]
 
 export const functionSignatureMatcher = /function\s+(?<signature>\w+)/
 
-export const multicallAddresses: Record<number, { version: MulticallVersion, address: Address }> = {
+export const multicallAddresses: Record<number, { version: MulticallVersion; address: Address }> = {
   1: {
     version: MulticallVersion.V2,
     address: '0x5ba1e12693dc8f9c48aad8770482f4739beed696', // mainnet
@@ -46,7 +47,7 @@ export const multicallAddresses: Record<number, { version: MulticallVersion, add
   },
   30: {
     version: MulticallVersion.V1,
-    address: '0x6c62bf5440de2cb157205b15c424bceb5c3368f5' // RSK mainnet
+    address: '0x6c62bf5440de2cb157205b15c424bceb5c3368f5', // RSK mainnet
   },
   31: {
     version: MulticallVersion.V1,
@@ -75,5 +76,5 @@ export const multicallAddresses: Record<number, { version: MulticallVersion, add
   80001: {
     version: MulticallVersion.V1,
     address: '0x08411add0b5aa8ee47563b146743c13b3556c9cc', // mumbai
-  }
+  },
 }

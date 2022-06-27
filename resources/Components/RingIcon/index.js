@@ -4,7 +4,7 @@ import link from '../../../resources/link'
 import svg from '../../../resources/svg'
 
 class RingIcon extends React.Component {
-  constructor (...args) {
+  constructor(...args) {
     super(...args)
     this.state = {}
   }
@@ -16,18 +16,20 @@ class RingIcon extends React.Component {
   //     </div>
   //   )
   // }
-  render () {
+  render() {
     const { color, svgLookup, img, small } = this.props
     return (
-      <div 
+      <div
         className={small ? 'ringIcon ringIconSmall' : 'ringIcon'}
         style={{
-          borderColor: color
+          borderColor: color,
         }}
       >
-        <div className='ringIconInner' style={{ background: color }}>
+        <div className="ringIconInner" style={{ background: color }}>
           {svgLookup ? (
-            svg[svgLookup.name] ? svg[svgLookup.name](svgLookup.size) : null
+            svg[svgLookup.name] ? (
+              svg[svgLookup.name](svgLookup.size)
+            ) : null
           ) : img ? (
             <img src={img} />
           ) : (

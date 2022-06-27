@@ -16,10 +16,9 @@ const storeApi = {
   getCustomTokens: () => (store('main.tokens.custom') || []) as Token[],
   getKnownTokens: (address?: Address) => ((address && store('main.tokens.known', address)) || []) as Token[],
   getConnectedNetworks: () => {
-    const networks = (Object.values(store('main.networks.ethereum') || {})) as Network[]
-    return networks
-      .filter(n => (n.connection.primary || {}).connected || (n.connection.secondary || {}).connected)
-  }
+    const networks = Object.values(store('main.networks.ethereum') || {}) as Network[]
+    return networks.filter((n) => (n.connection.primary || {}).connected || (n.connection.secondary || {}).connected)
+  },
 }
 
 export default function () {
@@ -29,7 +28,8 @@ export default function () {
   const rates = Rates(pylon, store)
   const balances = Balances(store)
 
-  let connectedChains: number[] = [], activeAccount: Address = ''
+  let connectedChains: number[] = [],
+    activeAccount: Address = ''
 
   inventory.start()
   rates.start()
@@ -64,10 +64,13 @@ export default function () {
   })
 
   const allNetworksObserver = store.observer(() => {
-    const connectedNetworkIds = storeApi.getConnectedNetworks().map(n => n.id).sort()
+    const connectedNetworkIds = storeApi
+      .getConnectedNetworks()
+      .map((n) => n.id)
+      .sort()
 
     if (!arraysMatch(connectedChains, connectedNetworkIds)) {
-      const newlyConnectedNetworks = connectedNetworkIds.filter(c => !connectedChains.includes(c))
+      const newlyConnectedNetworks = connectedNetworkIds.filter((c) => !connectedChains.includes(c))
       connectedChains = connectedNetworkIds
 
       handleNetworkUpdate(newlyConnectedNetworks)
@@ -100,6 +103,6 @@ export default function () {
       inventory.stop()
       rates.stop()
       balances.stop()
-    }
+    },
   } as DataScanner
 }

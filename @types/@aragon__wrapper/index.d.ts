@@ -1,19 +1,19 @@
 declare module '@aragon/wrapper' {
   interface WrapperOptions {
-    provider: any,
+    provider: any
     apm?: {
       ipfs?: {
-        gateway: string,
-      },
+        gateway: string
+      }
       ensRegistryAddress?: string
     }
   }
 
   interface App {
-    appId: string,
-    proxyAddress: string,
-    name: string,
-    kernel: string,
+    appId: string
+    proxyAddress: string
+    name: string
+    kernel: string
     agent: string
   }
 
@@ -26,15 +26,20 @@ declare module '@aragon/wrapper' {
   }
 
   export default class Wrapper {
-    constructor (address: string, opts: WrapperOptions)
+    constructor(address: string, opts: WrapperOptions)
     apps: Apps
 
     init(): Promise<void>
-    calculateTransactionPath(from: string, destination: string, action: string, txData: Array<string | undefined>): Promise<Array<TransactionData>>
+    calculateTransactionPath(
+      from: string,
+      destination: string,
+      action: string,
+      txData: Array<string | undefined>
+    ): Promise<Array<TransactionData>>
   }
 
   interface ResolveOptions {
-    provider: any,
+    provider: any
     registryAddress?: string
   }
 

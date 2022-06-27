@@ -9,5 +9,5 @@ export default {
   navigateOnDragDrop: false,
   enableRemoteModule: false,
   disableBlinkFeatures: 'Auxclick',
-  paintWhenInitiallyHidden: true
+  paintWhenInitiallyHidden: true,
 }

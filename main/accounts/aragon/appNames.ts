@@ -13,9 +13,9 @@ const knownApps = [
   'evmreg',
   'apm-registry',
   'apm-repo',
-  'apm-enssub'
+  'apm-enssub',
 ]
 
-const hashes = Object.fromEntries(knownApps.map(app => [namehash.hash(`${app}.aragonpm.eth`), app]))
+const hashes = Object.fromEntries(knownApps.map((app) => [namehash.hash(`${app}.aragonpm.eth`), app]))
 
 export default hashes

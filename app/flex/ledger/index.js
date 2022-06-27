@@ -6,7 +6,7 @@ import AppEth from '@ledgerhq/hw-app-eth'
 import EthereumTx from 'ethereumjs-tx'
 
 class Device {
-  constructor (device, emit) {
+  constructor(device, emit) {
     this.device = device
     this.id = this.device.id
     this.eth = new AppEth(device)
@@ -14,30 +14,30 @@ class Device {
     this.setup()
   }
 
-  setup () {
+  setup() {
     this.connect()
   }
 
-  summary () {
+  summary() {
     return {
-      id: this.id
+      id: this.id,
     }
   }
 
-  connect () {
+  connect() {
     this.emit('ledger:connect', this.summary())
   }
 
-  disconnect () {
+  disconnect() {
     this.emit('ledger:disconnect', this.summary())
   }
 
-  update (device = this.device) {
+  update(device = this.device) {
     this.device = device
     this.emit('ledger:update', this.summary())
   }
 
-  async ethereumGetAddress (path, display, cb) {
+  async ethereumGetAddress(path, display, cb) {
     try {
       cb(null, await this.eth.getAddress(path, display, true))
     } catch (err) {
@@ -45,40 +45,44 @@ class Device {
     }
   }
 
-  ethereumSignTransaction (path, rawTx, cb) {
+  ethereumSignTransaction(path, rawTx, cb) {
     const tx = new EthereumTx(rawTx)
     tx.raw[6] = Buffer.from([rawTx.chainId]) // v
     tx.raw[7] = Buffer.from([]) // r
     tx.raw[8] = Buffer.from([]) // s
     const rawTxHex = tx.serialize().toString('hex')
-    this.eth.signTransaction(this.getPath(), rawTxHex).then(result => {
-      cb(null, result)
-    }).catch(err => {
-      cb(err.message)
-    })
+    this.eth
+      .signTransaction(this.getPath(), rawTxHex)
+      .then((result) => {
+        cb(null, result)
+      })
+      .catch((err) => {
+        cb(err.message)
+      })
   }
 
-  ethereumSignMessage (path, message, cb) {
+  ethereumSignMessage(path, message, cb) {
     console.log('ethereumSignMessage')
   }
 
-  ethereumVerifyMessage (path, message, cb) {
+  ethereumVerifyMessage(path, message, cb) {
     console.log('ethereumVerifyMessage')
   }
 }
 
 class Ledger {
-  constructor (emit) {
+  constructor(emit) {
     this.emit = emit
     this.devices = {}
-    document.addEventListener('mousedown', e => { // Synthetic input event created by main process for web-ble scan
+    document.addEventListener('mousedown', (e) => {
+      // Synthetic input event created by main process for web-ble scan
       if (e.clientX === -124816 && e.clientX === -124816) this.scan()
     })
     this.emit('ledger:scan') // Request synthetic input
     this.scanner = setInterval(() => this.emit('ledger:scan'), 20000)
   }
 
-  async scan () {
+  async scan() {
     try {
       const device = await TransportWebBLE.create()
       if (!this.devices[device.id]) {
@@ -95,26 +99,26 @@ class Ledger {
     }
   }
 
-  deviceNotFound (id, cb) {
+  deviceNotFound(id, cb) {
     cb(new Error(`Device with id: ${id} not found`))
   }
 
-  ethereumGetAddress (id, path, display, cb) {
+  ethereumGetAddress(id, path, display, cb) {
     if (!this.devices[id]) return this.deviceNotFound(id, cb)
     this.devices[id].ethereumGetAddress(path, display, cb)
   }
 
-  ethereumSignTransaction (id, path, tx, cb) {
+  ethereumSignTransaction(id, path, tx, cb) {
     if (!this.devices[id]) return this.deviceNotFound(id, cb)
     this.devices[id].ethereumSignTransaction(path, tx, cb)
   }
 
-  ethereumSignMessage (id, path, message, cb) {
+  ethereumSignMessage(id, path, message, cb) {
     if (!this.devices[id]) return this.deviceNotFound(id, cb)
     this.devices[id].ethereumSignMessage(path, message, cb)
   }
 
-  ethereumVerifyMessage (id, path, message, cb) {
+  ethereumVerifyMessage(id, path, message, cb) {
     if (!this.devices[id]) return this.deviceNotFound(id, cb)
     this.devices[id].ethereumVerifyMessage(path, message, cb)
   }

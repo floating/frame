@@ -25,19 +25,18 @@ const ConnectionIndicator = ({ className, connection }) => {
   return <div className={`${className}${status}`} />
 }
 
-const ConnectionStatus = ({ connection }) => 
+const ConnectionStatus = ({ connection }) => (
   <>
     <ConnectionIndicator className="sliceTileIndicatorLarge sliceTileIndicator" connection={connection} />
-    <div className="sliceTileConnectionName"> 
-      {connection.current}
-    </div>
+    <div className="sliceTileConnectionName">{connection.current}</div>
   </>
+)
 
-function isConnected ({ status }) {
+function isConnected({ status }) {
   return status !== 'disconnected'
 }
 
-function getActiveConnection (primary, secondary) {
+function getActiveConnection(primary, secondary) {
   if (secondary.on && (!primary.on || (isConnected(secondary) && !isConnected(primary)))) {
     return secondary
   }
@@ -46,19 +45,20 @@ function getActiveConnection (primary, secondary) {
 }
 
 class ChainModule extends React.Component {
-  constructor (props, context) {
+  constructor(props, context) {
     super(props, context)
 
     this.customMessage = 'Custom Endpoint'
 
     const { id, type } = props
     const primaryCustom = context.store('main.networks', type, id, 'connection.primary.custom') || this.customMessage
-    const secondaryCustom = context.store('main.networks', type, id, 'connection.secondary.custom') || this.customMessage
+    const secondaryCustom =
+      context.store('main.networks', type, id, 'connection.secondary.custom') || this.customMessage
 
     this.state = {
-      expanded: false,      
-      primaryCustom, 
-      secondaryCustom, 
+      expanded: false,
+      primaryCustom,
+      secondaryCustom,
     }
 
     this.ref = createRef()
@@ -78,28 +78,28 @@ class ChainModule extends React.Component {
   //   document.removeEventListener('click', this.clickHandler.bind(this))
   // }
 
-  renderConnection (id, { primary, secondary }, blockHeight) {
+  renderConnection(id, { primary, secondary }, blockHeight) {
     const connection = getActiveConnection(primary, secondary)
 
     return (
-      <div 
-        className='sliceTile sliceTileClickable'
+      <div
+        className="sliceTile sliceTileClickable"
         onClick={() => {
           this.setState({ expanded: !this.state.expanded })
         }}
       >
         <ConnectionStatus connection={connection} />
-        <div className='sliceTileBlock'>
-          <div className='sliceTileBlockIcon'>{svg.chain(14)}</div>
-          <div className='sliceTileChainId'>{id}</div>
-          <div className='sliceTileBlockIcon'>{svg.cube(14)}</div>
+        <div className="sliceTileBlock">
+          <div className="sliceTileBlockIcon">{svg.chain(14)}</div>
+          <div className="sliceTileChainId">{id}</div>
+          <div className="sliceTileBlockIcon">{svg.cube(14)}</div>
           <div>{blockHeight}</div>
         </div>
       </div>
     )
   }
 
-  status (type, id, layer) {
+  status(type, id, layer) {
     const { status, network, current } = this.store('main.networks', type, id, 'connection', layer)
 
     if (status === 'connected' && !network) return 'loading'
@@ -116,7 +116,7 @@ class ChainModule extends React.Component {
     return status
   }
 
-  renderConnectionStatus (type, id, layer) {
+  renderConnectionStatus(type, id, layer) {
     const status = this.status(type, id, layer)
 
     return (
@@ -129,7 +129,7 @@ class ChainModule extends React.Component {
     )
   }
 
-  render () {
+  render() {
     const { id, type, connection } = this.props
 
     const networkMeta = this.store('main.networksMeta.ethereum', id)
@@ -137,8 +137,8 @@ class ChainModule extends React.Component {
     const renderStatus = this.renderConnectionStatus.bind(this, type, id)
 
     let presets = networkPresets[id] || {}
-    presets = Object.keys(presets).map(i => ({ text: i, value: `${type}:${id}:${i}` }))
-    presets = presets.concat(Object.keys(networkPresets.default).map(i => ({ text: i, value: `${type}:${id}:${i}` })))
+    presets = Object.keys(presets).map((i) => ({ text: i, value: `${type}:${id}:${i}` }))
+    presets = presets.concat(Object.keys(networkPresets.default).map((i) => ({ text: i, value: `${type}:${id}:${i}` })))
     presets.push({ text: 'Custom', value: `${type}:${id}:custom` })
 
     const customFocusHandler = (inputName) => {
@@ -171,31 +171,41 @@ class ChainModule extends React.Component {
       // status can be updated
       if (!value || !isInvalidCustomTarget(value)) {
         const actionName = `set${capitalize(inputName)}Custom`
-        this[timeoutName] = setTimeout(() => link.send('tray:action', actionName, type, id, value === this.customMessage ? '' : value), 1000)
+        this[timeoutName] = setTimeout(
+          () => link.send('tray:action', actionName, type, id, value === this.customMessage ? '' : value),
+          1000
+        )
       }
     }
 
     return (
-      <div className='sliceContainer' ref={this.ref}>
+      <div className="sliceContainer" ref={this.ref}>
         {this.renderConnection(id, connection, networkMeta.blockHeight)}
         {this.state.expanded ? (
-          <div className='connectionLevels'>
-            <div className='signerPermission signerPermissionNetwork cardShow' style={{ zIndex: 2 }}>
+          <div className="connectionLevels">
+            <div className="signerPermission signerPermissionNetwork cardShow" style={{ zIndex: 2 }}>
               <div className={connection.primary.on ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
-                <div className='connectionOptionToggle'>
-                  <div className='signerPermissionSetting'>Primary</div>
-                  <div className={connection.primary.on ? 'signerPermissionToggleSmall signerPermissionToggleSmallOn' : 'signerPermissionToggleSmall'} onMouseDown={_ => link.send('tray:action', 'toggleConnection', type, id, 'primary')}>
-                    <div className='signerPermissionToggleSwitch' />
+                <div className="connectionOptionToggle">
+                  <div className="signerPermissionSetting">Primary</div>
+                  <div
+                    className={
+                      connection.primary.on
+                        ? 'signerPermissionToggleSmall signerPermissionToggleSmallOn'
+                        : 'signerPermissionToggleSmall'
+                    }
+                    onMouseDown={(_) => link.send('tray:action', 'toggleConnection', type, id, 'primary')}
+                  >
+                    <div className="signerPermissionToggleSwitch" />
                   </div>
                 </div>
                 {connection.primary.on ? (
                   <>
-                    <div className='connectionOptionDetails cardShow'>
-                      <div className='connectionOptionDetailsInset'>
+                    <div className="connectionOptionDetails cardShow">
+                      <div className="connectionOptionDetailsInset">
                         {renderStatus('primary')}
                         <Dropdown
                           syncValue={`${type}:${id}:${connection.primary.current}`}
-                          onChange={preset => {
+                          onChange={(preset) => {
                             const [type, id, value] = preset.split(':')
                             link.send('tray:action', 'selectPrimary', type, id, value)
                           }}
@@ -203,36 +213,49 @@ class ChainModule extends React.Component {
                         />
                       </div>
                     </div>
-                    <div className={connection.primary.current === 'custom' && connection.primary.on ? 'connectionCustomInput connectionCustomInputOn cardShow' : 'connectionCustomInput'}>
-                      <input 
-                        className='customInput'
-                        tabIndex='-1'
+                    <div
+                      className={
+                        connection.primary.current === 'custom' && connection.primary.on
+                          ? 'connectionCustomInput connectionCustomInputOn cardShow'
+                          : 'connectionCustomInput'
+                      }
+                    >
+                      <input
+                        className="customInput"
+                        tabIndex="-1"
                         value={this.state.primaryCustom}
-                        onFocus={() => customFocusHandler('primary')} 
+                        onFocus={() => customFocusHandler('primary')}
                         onBlur={() => customBlurHandler('primary')}
-                        onChange={e => customChangeHandler(e, 'primary')}
+                        onChange={(e) => customChangeHandler(e, 'primary')}
                       />
                     </div>
                   </>
                 ) : null}
               </div>
             </div>
-            <div className='signerPermission signerPermissionNetwork cardShow' style={{ zIndex: 1 }}>
+            <div className="signerPermission signerPermissionNetwork cardShow" style={{ zIndex: 1 }}>
               <div className={connection.secondary.on ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
-                <div className='connectionOptionToggle'>
-                  <div className='signerPermissionSetting'>Secondary</div>
-                  <div className={connection.secondary.on ? 'signerPermissionToggleSmall signerPermissionToggleSmallOn' : 'signerPermissionToggleSmall'} onMouseDown={_ => link.send('tray:action', 'toggleConnection', type, id, 'secondary')}>
-                    <div className='signerPermissionToggleSwitch' />
+                <div className="connectionOptionToggle">
+                  <div className="signerPermissionSetting">Secondary</div>
+                  <div
+                    className={
+                      connection.secondary.on
+                        ? 'signerPermissionToggleSmall signerPermissionToggleSmallOn'
+                        : 'signerPermissionToggleSmall'
+                    }
+                    onMouseDown={(_) => link.send('tray:action', 'toggleConnection', type, id, 'secondary')}
+                  >
+                    <div className="signerPermissionToggleSwitch" />
                   </div>
                 </div>
                 {connection.secondary.on ? (
                   <>
-                    <div className='connectionOptionDetails cardShow'>
-                      <div className='connectionOptionDetailsInset'>
+                    <div className="connectionOptionDetails cardShow">
+                      <div className="connectionOptionDetailsInset">
                         {renderStatus('secondary')}
                         <Dropdown
                           syncValue={`${type}:${id}:${connection.secondary.current}`}
-                          onChange={preset => {
+                          onChange={(preset) => {
                             const [type, id, value] = preset.split(':')
                             link.send('tray:action', 'selectSecondary', type, id, value)
                           }}
@@ -240,20 +263,26 @@ class ChainModule extends React.Component {
                         />
                       </div>
                     </div>
-                    <div className={connection.secondary.current === 'custom' && connection.secondary.on ? 'connectionCustomInput connectionCustomInputOn cardShow' : 'connectionCustomInput'}>
-                      <input 
-                        tabIndex='-1' 
-                        value={this.state.secondaryCustom} 
-                        onFocus={() => customFocusHandler('secondary')} 
-                        onBlur={() => customBlurHandler('secondary')} 
-                        onChange={e => customChangeHandler(e, 'secondary')} 
+                    <div
+                      className={
+                        connection.secondary.current === 'custom' && connection.secondary.on
+                          ? 'connectionCustomInput connectionCustomInputOn cardShow'
+                          : 'connectionCustomInput'
+                      }
+                    >
+                      <input
+                        tabIndex="-1"
+                        value={this.state.secondaryCustom}
+                        onFocus={() => customFocusHandler('secondary')}
+                        onBlur={() => customBlurHandler('secondary')}
+                        onChange={(e) => customChangeHandler(e, 'secondary')}
                       />
                     </div>
                   </>
                 ) : null}
               </div>
             </div>
-          </div>   
+          </div>
         ) : null}
       </div>
     )

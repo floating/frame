@@ -2,7 +2,7 @@ import React from 'react'
 import Restore from 'react-restore'
 
 class Block extends React.Component {
-  constructor (props, context) {
+  constructor(props, context) {
     super(props, context)
     this.moduleRef = React.createRef()
     this.resizeObserver = new ResizeObserver(() => {
@@ -11,18 +11,18 @@ class Block extends React.Component {
       }
     })
   }
-  componentDidMount () {
+  componentDidMount() {
     this.resizeObserver.observe(this.moduleRef.current)
-  } 
-  componentWillUnmount () {
+  }
+  componentWillUnmount() {
     this.resizeObserver.disconnect()
   }
-  render () {
+  render() {
     return (
       <div ref={this.moduleRef}>
-        <div className='moduleHeader'>{this.props.moduleId}</div>
-        <div className='moduleMain'>
-          <div className='cardShow'>{`Module Not Found`}</div>
+        <div className="moduleHeader">{this.props.moduleId}</div>
+        <div className="moduleMain">
+          <div className="cardShow">{`Module Not Found`}</div>
         </div>
       </div>
     )

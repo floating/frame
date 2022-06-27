@@ -6,37 +6,37 @@ import erc20 from '../externalData/balances/erc-20-abi'
 const erc20Abi = JSON.stringify(erc20)
 
 interface EtherscanSourceCodeResponse {
-  status: string,
-  message: string,
+  status: string
+  message: string
   result: ContractSourceCodeResult[]
 }
 
 interface ContractSourceCodeResult {
-  SourceCode: string,
-  ABI: string,
-  ContractName: string,
+  SourceCode: string
+  ABI: string
+  ContractName: string
   Implementation: string
 }
 
 interface ContractSource {
-  abi: string,
-  name: string,
+  abi: string
+  name: string
   source: string
 }
 
 export interface DecodedCallData {
-  contractAddress: string,
-  contractName: string,
-  source: string,
-  method: string,
+  contractAddress: string
+  contractName: string
+  source: string
+  method: string
   args: Array<{
-    name: string,
-    type: string,
+    name: string
+    type: string
     value: string
   }>
 }
 
-function parseAbi (abiData: string): Interface | undefined {
+function parseAbi(abiData: string): Interface | undefined {
   try {
     return new Interface(abiData)
   } catch (e) {
@@ -44,8 +44,10 @@ function parseAbi (abiData: string): Interface | undefined {
   }
 }
 
-async function fetchSourceCode (contractAddress: Address) {
-  const res = await fetch(`https://api.etherscan.io/api?module=contract&action=getsourcecode&address=${contractAddress}&apikey=3SYU5MW5QK8RPCJV1XVICHWKT774993S24`)
+async function fetchSourceCode(contractAddress: Address) {
+  const res = await fetch(
+    `https://api.etherscan.io/api?module=contract&action=getsourcecode&address=${contractAddress}&apikey=3SYU5MW5QK8RPCJV1XVICHWKT774993S24`
+  )
 
   if (res.status === 200 && (res.headers.get('content-type') || '').toLowerCase().includes('json')) {
     const parsedResponse = await (res.json() as Promise<EtherscanSourceCodeResponse>)
@@ -56,8 +58,7 @@ async function fetchSourceCode (contractAddress: Address) {
   return []
 }
 
-
-async function fetchAbi (contractAddress: Address): Promise<ContractSourceCodeResult | undefined> {
+async function fetchAbi(contractAddress: Address): Promise<ContractSourceCodeResult | undefined> {
   try {
     const sources = await fetchSourceCode(contractAddress)
 
@@ -77,7 +78,7 @@ async function fetchAbi (contractAddress: Address): Promise<ContractSourceCodeRe
   }
 }
 
-export function decodeCallData (calldata: string, abi: string) {
+export function decodeCallData(calldata: string, abi: string) {
   const contractInterface = parseAbi(abi)
 
   if (contractInterface) {
@@ -89,7 +90,11 @@ export function decodeCallData (calldata: string, abi: string) {
 
       return {
         method: abiMethod.name,
-        args: abiMethod.inputs.map((input, i) => ({ name: input.name, type: input.type, value: decoded[i].toString() }))
+        args: abiMethod.inputs.map((input, i) => ({
+          name: input.name,
+          type: input.type,
+          value: decoded[i].toString(),
+        })),
       }
     } catch (e) {
       log.warn('unknown ABI method for signature', sighash)
@@ -97,7 +102,10 @@ export function decodeCallData (calldata: string, abi: string) {
   }
 }
 
-export async function decodeContractCall (contractAddress: Address, calldata: string): Promise<DecodedCallData | undefined> {
+export async function decodeContractCall(
+  contractAddress: Address,
+  calldata: string
+): Promise<DecodedCallData | undefined> {
   const contractSources: ContractSource[] = [{ name: 'ERC-20', source: 'erc-20 contract', abi: erc20Abi }]
   const contractSource = await fetchAbi(contractAddress)
 
@@ -113,7 +121,7 @@ export async function decodeContractCall (contractAddress: Address, calldata: st
         contractAddress: contractAddress.toLowerCase(),
         contractName: source.name,
         source: source.source,
-        ...decodedCall
+        ...decodedCall,
       }
     }
   }

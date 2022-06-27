@@ -12,7 +12,7 @@ const dapps = require('../dapps')
 // const ens = require('../ens')
 // const ipfs = require('../ipfs')
 
-function randomLetters (num) {
+function randomLetters(num) {
   return [...Array(num)].map(() => String.fromCharCode(65 + Math.floor(Math.random() * 26))).join('')
 }
 
@@ -20,10 +20,10 @@ const { resolveName } = require('../accounts/aragon')
 const { arraysEqual } = require('../../resources/utils')
 
 const rpc = {
-  getState: cb => {
+  getState: (cb) => {
     cb(null, store())
   },
-  getFrameId (window, cb) {
+  getFrameId(window, cb) {
     if (window.frameId) {
       cb(null, window.frameId)
     } else {
@@ -93,18 +93,18 @@ const rpc = {
     }
 
     store.updateLattice(deviceId, {
-      deviceId, 
+      deviceId,
       baseUrl: 'https://signing.gridpl.us',
       endpointMode: 'default',
       paired: true,
       deviceName: (deviceName || 'GridPlus').substring(0, 14),
       tag: randomLetters(6),
-      privKey: crypto.randomBytes(32).toString('hex')  
+      privKey: crypto.randomBytes(32).toString('hex'),
     })
 
     cb(null, { id: 'lattice-' + deviceId })
   },
-  async latticePair (id, pin, cb) {
+  async latticePair(id, pin, cb) {
     const signer = signers.get(id)
 
     if (signer && signer.pair) {
@@ -124,20 +124,20 @@ const rpc = {
         status: provider.connection.primary.status,
         network: provider.connection.primary.network,
         type: provider.connection.primary.type,
-        connected: provider.connection.primary.connected
+        connected: provider.connection.primary.connected,
       },
       secondary: {
         status: provider.connection.secondary.status,
         network: provider.connection.secondary.network,
         type: provider.connection.secondary.type,
-        connected: provider.connection.secondary.connected
-      }
+        connected: provider.connection.secondary.connected,
+      },
     })
   },
-  confirmRequestApproval (req, approvalType, approvalData, cb) {
+  confirmRequestApproval(req, approvalType, approvalData, cb) {
     accounts.confirmRequestApproval(req.handlerId, approvalType, approvalData)
   },
-  approveRequest (req, cb) {
+  approveRequest(req, cb) {
     accounts.setRequestPending(req)
     if (req.type === 'transaction') {
       provider.approveTransactionRequest(req, (err, res) => {
@@ -156,104 +156,109 @@ const rpc = {
       })
     }
   },
-  declineRequest (req, cb) {
-    if (
-      req.type === 'transaction' ||
-      req.type === 'sign' ||
-      req.type === 'signTypedData'
-    ) {
+  declineRequest(req, cb) {
+    if (req.type === 'transaction' || req.type === 'sign' || req.type === 'signTypedData') {
       accounts.declineRequest(req.handlerId)
       provider.declineRequest(req)
     }
   },
-  addAragon (account, cb) {
+  addAragon(account, cb) {
     accounts.addAragon(account, cb)
   },
-  createFromAddress (address, cb) {
+  createFromAddress(address, cb) {
     if (!utils.isAddress(address)) return cb(new Error('Invalid Address'))
     accounts.add(address, { type: 'Address' })
     cb()
   },
-  createAccount (address, options, cb) {
+  createAccount(address, options, cb) {
     if (!utils.isAddress(address)) return cb(new Error('Invalid Address'))
     accounts.add(address, options)
     cb()
   },
-  removeAccount (address, options, cb) {
+  removeAccount(address, options, cb) {
     // if (!utils.isAddress(address)) return cb(new Error('Invalid Address'))
     accounts.remove(address)
     cb()
   },
-  createFromPhrase (phrase, password, cb) {
+  createFromPhrase(phrase, password, cb) {
     signers.createFromPhrase(phrase, password, cb)
   },
-  locateKeystore (cb) {
-    dialog.showOpenDialog({ properties: ['openFile'] }).then(file => {
-      const keystore = file || { filePaths: [] }
-      if ((keystore.filePaths || []).length > 0) {
-        fs.readFile(keystore.filePaths[0], 'utf8', (err, data) => {
-          if (err) return cb(err)
-          try { cb(null, JSON.parse(data)) } catch (err) { cb(err) }
-        })
-      } else {
-        cb(new Error('No Keystore Found'))
-      }
-    }).catch(cb)
+  locateKeystore(cb) {
+    dialog
+      .showOpenDialog({ properties: ['openFile'] })
+      .then((file) => {
+        const keystore = file || { filePaths: [] }
+        if ((keystore.filePaths || []).length > 0) {
+          fs.readFile(keystore.filePaths[0], 'utf8', (err, data) => {
+            if (err) return cb(err)
+            try {
+              cb(null, JSON.parse(data))
+            } catch (err) {
+              cb(err)
+            }
+          })
+        } else {
+          cb(new Error('No Keystore Found'))
+        }
+      })
+      .catch(cb)
   },
-  createFromKeystore (keystore, keystorePassword, password, cb) {
+  createFromKeystore(keystore, keystorePassword, password, cb) {
     signers.createFromKeystore(keystore, keystorePassword, password, cb)
   },
-  createFromPrivateKey (privateKey, password, cb) {
+  createFromPrivateKey(privateKey, password, cb) {
     signers.createFromPrivateKey(privateKey, password, cb)
   },
-  addPrivateKey (id, privateKey, password, cb) {
+  addPrivateKey(id, privateKey, password, cb) {
     signers.addPrivateKey(id, privateKey, password, cb)
   },
-  removePrivateKey (id, index, password, cb) {
+  removePrivateKey(id, index, password, cb) {
     signers.removePrivateKey(id, index, password, cb)
   },
-  addKeystore (id, keystore, keystorePassword, password, cb) {
+  addKeystore(id, keystore, keystorePassword, password, cb) {
     signers.addKeystore(id, keystore, keystorePassword, password, cb)
   },
-  unlockSigner (id, password, cb) {
+  unlockSigner(id, password, cb) {
     signers.unlock(id, password, cb)
   },
-  lockSigner (id, cb) {
+  lockSigner(id, cb) {
     signers.lock(id, cb)
   },
-  remove (id) {
+  remove(id) {
     signers.remove(id)
   },
-  resolveAragonName (name, chainId, cb) {
-    resolveName(name, chainId).then(result => cb(null, result)).catch(cb)
+  resolveAragonName(name, chainId, cb) {
+    resolveName(name, chainId)
+      .then((result) => cb(null, result))
+      .catch(cb)
   },
-  verifyAddress (cb) {
+  verifyAddress(cb) {
     const res = (err, data) => cb(err, data || false)
     accounts.verifyAddress(true, res)
   },
-  setBaseFee (fee, handlerId, cb) {
+  setBaseFee(fee, handlerId, cb) {
     accounts.setBaseFee(fee, handlerId, true, cb)
     // store.setGasDefault(netType, netId, level, price)
   },
-  setPriorityFee (fee, handlerId, cb) {
+  setPriorityFee(fee, handlerId, cb) {
     accounts.setPriorityFee(fee, handlerId, true, cb)
     // store.setGasDefault(netType, netId, level, price)
   },
-  setGasPrice (price,handlerId, cb) {
+  setGasPrice(price, handlerId, cb) {
     accounts.setGasPrice(price, handlerId, true, cb)
     // store.setGasDefault(netType, netId, level, price)
   },
-  setGasLimit (limit, handlerId, cb) {
+  setGasLimit(limit, handlerId, cb) {
     accounts.setGasLimit(limit, handlerId, true, cb)
   },
-  removeFeeUpdateNotice (handlerId, cb) {
+  removeFeeUpdateNotice(handlerId, cb) {
     accounts.removeFeeUpdateNotice(handlerId, cb)
   },
-  signerCompatibility (handlerId, cb) {
+  signerCompatibility(handlerId, cb) {
     accounts.signerCompatibility(handlerId, cb)
   },
   // flow
-  async flowCommand (command, cb) {
+  async flowCommand(command, cb) {
     // console.log('flowCommand', command, cb)
     await dapps.add(command.input, {}, (err, res) => {
       if (err || res) console.log(err, res)
@@ -262,49 +267,49 @@ const rpc = {
       if (err || res) console.log(err, res)
     })
   },
-  addDapp (domain, options, cb) {
+  addDapp(domain, options, cb) {
     if (!(domain.endsWith('.eth') || domain.endsWith('.xyz'))) domain += '.eth'
     // console.log('addDapp', domain, options, cb)
     dapps.add(domain, options, cb)
   },
-  removeDapp (domain, cb) {
+  removeDapp(domain, cb) {
     dapps.remove(domain, cb)
   },
-  moveDapp (fromArea, fromIndex, toArea, toIndex, cb) {
+  moveDapp(fromArea, fromIndex, toArea, toIndex, cb) {
     dapps.move(fromArea, fromIndex, toArea, toIndex, cb)
   },
-  launchDapp (domain, cb) {
+  launchDapp(domain, cb) {
     dapps.launch(domain, cb)
   },
-  openDapp (domain, options, cb) {
+  openDapp(domain, options, cb) {
     if (domain.endsWith('.eth')) {
       // console.log(' RPC openDapp ', domain, options, cb)
       dapps.add(domain, options, cb)
     } else {
       console.log('input needs to be ens name')
     }
-  }
+  },
 }
 
-const unwrap = v => v !== undefined || v !== null ? JSON.parse(v) : v
-const wrap = v => v !== undefined || v !== null ? JSON.stringify(v) : v
+const unwrap = (v) => (v !== undefined || v !== null ? JSON.parse(v) : v)
+const wrap = (v) => (v !== undefined || v !== null ? JSON.stringify(v) : v)
 
 ipcMain.on('main:rpc', (event, id, method, ...args) => {
   id = unwrap(id)
   method = unwrap(method)
-  args = args.map(arg => unwrap(arg))
+  args = args.map((arg) => unwrap(arg))
   if (rpc[method]) {
     if (method === 'getFrameId') {
       rpc[method](event.sender.getOwnerBrowserWindow(), ...args, (...args) => {
-        event.sender.send('main:rpc', id, ...args.map(arg => arg instanceof Error ? wrap(arg.message) : wrap(arg)))
+        event.sender.send('main:rpc', id, ...args.map((arg) => (arg instanceof Error ? wrap(arg.message) : wrap(arg))))
       })
     } else {
       rpc[method](...args, (...args) => {
-        event.sender.send('main:rpc', id, ...args.map(arg => arg instanceof Error ? wrap(arg.message) : wrap(arg)))
+        event.sender.send('main:rpc', id, ...args.map((arg) => (arg instanceof Error ? wrap(arg.message) : wrap(arg))))
       })
     }
   } else {
     const args = [new Error('Unknown RPC method: ' + method)]
-    event.sender.send('main:rpc', id, ...args.map(arg => arg instanceof Error ? wrap(arg.message) : wrap(arg)))
+    event.sender.send('main:rpc', id, ...args.map((arg) => (arg instanceof Error ? wrap(arg.message) : wrap(arg))))
   }
 })

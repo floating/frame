@@ -1,6 +1,6 @@
 import React, { useState, useEffect, createRef } from 'react'
 
-function findIndex (options, value) {
+function findIndex(options, value) {
   const index = options.findIndex((option) => option.value === value)
   return index >= 0 ? index : undefined
 }
@@ -59,11 +59,18 @@ const Dropdown = ({ options, syncValue, initialValue, style, className = '', onC
           {options.map((option, index) => {
             const words = option.text.split(' ').slice(0, 3)
             const length = words.length === 3 ? 1 : words.length === 2 ? 3 : 10
-            const text = words.map(w => w.substr(0, length)).join(' ')
+            const text = words.map((w) => w.substr(0, length)).join(' ')
             const ariaSelected = index === selectedIndex ? 'true' : 'false'
-            
+
             return (
-              <div key={option.text + index} className="dropdownItem" role="option" aria-selected={ariaSelected} value={option.value} onMouseDown={() => handleSelect(option, index)}>
+              <div
+                key={option.text + index}
+                className="dropdownItem"
+                role="option"
+                aria-selected={ariaSelected}
+                value={option.value}
+                onMouseDown={() => handleSelect(option, index)}
+              >
                 {text}
                 {indicator(option)}
               </div>

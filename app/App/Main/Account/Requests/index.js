@@ -17,9 +17,8 @@ import chainMeta from '../../../../../resources/chainMeta'
 
 import link from '../../../../../resources/link'
 
-
 class Requests extends React.Component {
-  constructor (props, context) {
+  constructor(props, context) {
     super(props, context)
     this.state = {
       minimized: false,
@@ -44,7 +43,7 @@ class Requests extends React.Component {
   //   }
   // }
 
-  minimize () {
+  minimize() {
     this.setState({ minimized: true })
   }
 
@@ -68,13 +67,13 @@ class Requests extends React.Component {
   //   }
   // }
 
-  componentDidMount () {
+  componentDidMount() {
     this.resizeObserver.observe(this.moduleRef.current)
     if (this.moduleRef && this.moduleRef.current) {
       link.send('tray:action', 'updateAccountModule', this.props._id, { height: this.moduleRef.current.clientHeight })
     }
     setTimeout(() => {
-      const current = (this.store('selected.current') === this.props.id) && this.props.status === 'ok'
+      const current = this.store('selected.current') === this.props.id && this.props.status === 'ok'
       const open = current && this.store('selected.open')
       if (open && this.props.signer && this.unlockInput) {
         const signer = this.store('main.signers', this.props.signer)
@@ -84,12 +83,12 @@ class Requests extends React.Component {
   }
 
   // componentDidMount () {
-    
-  //   // link.send('tray:action', 'updateAccountModule', this.props.id, { height: this.moduleRef.current.clientHeight })
-  // } 
 
-  render () {
-    const activeAccount =  this.store('main.accounts', this.props.id)
+  //   // link.send('tray:action', 'updateAccountModule', this.props.id, { height: this.moduleRef.current.clientHeight })
+  // }
+
+  render() {
+    const activeAccount = this.store('main.accounts', this.props.id)
     const requests = Object.values(activeAccount.requests || {})
 
     requests.sort((a, b) => {
@@ -99,17 +98,17 @@ class Requests extends React.Component {
     })
 
     return (
-      <div 
-        ref={this.moduleRef} 
+      <div
+        ref={this.moduleRef}
         className={this.store('selected.view') === 'default' ? 'signerRequests' : 'signerRequests signerRequestsHidden'}
       >
-        <div className='requestContainerWrap'>
-          <div className='requestContainer'>
+        <div className="requestContainerWrap">
+          <div className="requestContainer">
             {!requests.length ? (
-              <div key='noReq' className='noRequests'>
+              <div key="noReq" className="noRequests">
                 No Pending Requests
               </div>
-            ): null}
+            ) : null}
             {/* <div className='recentRequests' style={{ opacity: monitor.length > 0 ? 1 : 0, transform: `translateY(${containNormal +  40}px)` }}>
               <span>Recent Transactions</span>
               <span>{monitor.length}</span>
@@ -117,12 +116,12 @@ class Requests extends React.Component {
             {requests.map((req, i) => {
               if (req.type === 'access') {
                 return (
-                  <RequestItem 
-                    req={req} 
+                  <RequestItem
+                    req={req}
                     account={this.props.id}
                     handlerId={req.handlerId}
                     i={i}
-                    title={'Account Access'} 
+                    title={'Account Access'}
                     color={'var(--outerspace)'}
                     svgLookup={{ name: 'accounts', size: 16 }}
                     setAccountView={this.props.setAccountView}
@@ -130,7 +129,7 @@ class Requests extends React.Component {
                 )
               } else if (req.type === 'sign') {
                 return (
-                  <RequestItem 
+                  <RequestItem
                     req={req}
                     account={this.props.id}
                     handlerId={req.handlerId}
@@ -148,20 +147,20 @@ class Requests extends React.Component {
                     account={this.props.id}
                     handlerId={req.handlerId}
                     i={i}
-                    title={'Sign Data'} 
+                    title={'Sign Data'}
                     color={'var(--outerspace)'}
                     svgLookup={{ name: 'sign', size: 16 }}
                     setAccountView={this.props.setAccountView}
                   />
                 )
-              } else if (req.type === 'addChain') { 
+              } else if (req.type === 'addChain') {
                 return (
-                  <RequestItem 
-                    req={req} 
+                  <RequestItem
+                    req={req}
                     account={this.props.id}
                     handlerId={req.handlerId}
-                    i={i} 
-                    title={'Add Chain'} 
+                    i={i}
+                    title={'Add Chain'}
                     color={'var(--outerspace)'}
                     svgLookup={{ name: 'chain', size: 16 }}
                     setAccountView={this.props.setAccountView}
@@ -180,7 +179,7 @@ class Requests extends React.Component {
                     setAccountView={this.props.setAccountView}
                   />
                 )
-              } else if (req.type === 'addToken')  {
+              } else if (req.type === 'addToken') {
                 return (
                   <RequestItem
                     req={req}
@@ -193,14 +192,14 @@ class Requests extends React.Component {
                     setAccountView={this.props.setAccountView}
                   />
                 )
-              } else if (req.type === 'transaction')  {
-                const chainName = this.store('main.networks.ethereum', parseInt(req.data.chainId, 16), 'name') 
+              } else if (req.type === 'transaction') {
+                const chainName = this.store('main.networks.ethereum', parseInt(req.data.chainId, 16), 'name')
                 const hexId = req.data.chainId
                 chainMeta[hexId] ? chainMeta[hexId].primaryColor : ''
                 chainMeta[hexId] ? chainMeta[hexId].icon : ''
-                
+
                 return (
-                  <RequestItem 
+                  <RequestItem
                     req={req}
                     account={this.props.id}
                     handlerId={req.handlerId}

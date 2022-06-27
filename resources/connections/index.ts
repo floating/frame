@@ -1,23 +1,21 @@
 const validProtocols = ['ws://', 'wss://', 'http://', 'https://']
 
-export function okProtocol (location: string) {
+export function okProtocol(location: string) {
   if (location === 'injected') return true
   if (location.endsWith('.ipc')) return true
 
-  const validProtocol = validProtocols.find(p => location.startsWith(p))
+  const validProtocol = validProtocols.find((p) => location.startsWith(p))
   if (validProtocol) {
     const target = location.substring(validProtocol.length)
 
     // dont allow connections back to Frame
-    return !!target &&
-      target !== 'localhost:1248' &&
-      target !== '127.0.0.1:1248'
+    return !!target && target !== 'localhost:1248' && target !== '127.0.0.1:1248'
   }
 
   return false
 }
 
-export function okPort (location: string) {
+export function okPort(location: string) {
   const match = location.match(/^(?:https?|wss?).*:(?<port>\d{4,})/)
 
   if (match) {
@@ -30,7 +28,7 @@ export function okPort (location: string) {
 }
 
 // returns a (truthy) error message if invalid, otherwise will return false
-export function isInvalidCustomTarget (target: string) {
+export function isInvalidCustomTarget(target: string) {
   if (!okProtocol(target)) return 'invalid target'
   if (!okPort(target)) return 'invalid port'
 

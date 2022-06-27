@@ -3,23 +3,25 @@ import Restore from 'react-restore'
 import link from '../../../resources/link'
 
 class Bridge extends React.Component {
-  render () {
+  render() {
     if (this.store('view.badge') === 'updateReady') {
       return (
-        <div className='badgeWrap'>
-          <div className='badge cardShow' style={{ transform: 'translateY(0px)', height: '196px' }}>
-            <div className='badgeInner'>
-              <div className='badgeMessage'>
-                Your update is ready, relaunch Frame to switch
-              </div>
-              <div className='badgeInput'>
-                <div className='badgeInputButton'>
-                  <div className='badgeInputInner' onMouseDown={() => this.store.updateBadge()}>Ok</div>
+        <div className="badgeWrap">
+          <div className="badge cardShow" style={{ transform: 'translateY(0px)', height: '196px' }}>
+            <div className="badgeInner">
+              <div className="badgeMessage">Your update is ready, relaunch Frame to switch</div>
+              <div className="badgeInput">
+                <div className="badgeInputButton">
+                  <div className="badgeInputInner" onMouseDown={() => this.store.updateBadge()}>
+                    Ok
+                  </div>
                 </div>
               </div>
-              <div className='badgeInput'>
-                <div className='badgeInputButton'>
-                  <div className='badgeInputInner' onMouseDown={() => link.send('tray:updateRestart')}>Relaunch Now</div>
+              <div className="badgeInput">
+                <div className="badgeInputButton">
+                  <div className="badgeInputInner" onMouseDown={() => link.send('tray:updateRestart')}>
+                    Relaunch Now
+                  </div>
                 </div>
               </div>
             </div>
@@ -28,41 +30,45 @@ class Bridge extends React.Component {
       )
     } else if (this.store('view.badge') === 'updateAvailable') {
       return (
-        <div className='badgeWrap'>
-          <div className='badge cardShow' style={{ transform: 'translateY(0px)', height: '224px' }}>
-            <div className='badgeInner'>
-              <div className='badgeMessage'>
-                A new update is available, would you like to install it?
-              </div>
-              <div className='badgeInput'>
-                <div className='badgeInputButton'>
+        <div className="badgeWrap">
+          <div className="badge cardShow" style={{ transform: 'translateY(0px)', height: '224px' }}>
+            <div className="badgeInner">
+              <div className="badgeMessage">A new update is available, would you like to install it?</div>
+              <div className="badgeInput">
+                <div className="badgeInputButton">
                   <div
-                    className='badgeInputInner' onMouseDown={() => {
+                    className="badgeInputInner"
+                    onMouseDown={() => {
                       link.send('tray:installAvailableUpdate', true, false)
                     }}
                     style={{ color: 'var(--good)' }}
-                  >Install Update
+                  >
+                    Install Update
                   </div>
                 </div>
               </div>
-              <div className='badgeInput'>
-                <div className='badgeInputButton'>
+              <div className="badgeInput">
+                <div className="badgeInputButton">
                   <div
-                    className='badgeInputInner' onMouseDown={() => {
+                    className="badgeInputInner"
+                    onMouseDown={() => {
                       link.send('tray:installAvailableUpdate', false, false)
                     }}
                     style={{ color: 'var(--moon)' }}
-                  >Remind Me Later
+                  >
+                    Remind Me Later
                   </div>
                 </div>
               </div>
-              <div className='badgeInput'>
-                <div className='badgeInputButton'>
+              <div className="badgeInput">
+                <div className="badgeInputButton">
                   <div
-                    className='badgeInputInner badgeInputSmall' onMouseDown={() => {
+                    className="badgeInputInner badgeInputSmall"
+                    onMouseDown={() => {
                       link.send('tray:installAvailableUpdate', false, true)
                     }}
-                  >Skip This Version
+                  >
+                    Skip This Version
                   </div>
                 </div>
               </div>

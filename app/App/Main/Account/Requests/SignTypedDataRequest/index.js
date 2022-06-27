@@ -6,16 +6,12 @@ import link from '../../../../../../resources/link'
 
 const SimpleJSON = ({ json }) => {
   return (
-    <div className='simpleJson'>
+    <div className="simpleJson">
       {Object.keys(json).map((key, o) => (
-        <div key={key + o} className='simpleJsonChild'>
-          <div className='simpleJsonKey'>{key}:</div>
-          <div className='simpleJsonValue'>
-            {typeof json[key] === 'object' ? (
-              <SimpleJSON json={json[key]} key={key} />
-            ) : (
-              json[key]
-            )}
+        <div key={key + o} className="simpleJsonChild">
+          <div className="simpleJsonKey">{key}:</div>
+          <div className="simpleJsonValue">
+            {typeof json[key] === 'object' ? <SimpleJSON json={json[key]} key={key} /> : json[key]}
           </div>
         </div>
       ))}
@@ -24,7 +20,7 @@ const SimpleJSON = ({ json }) => {
 }
 
 class TransactionRequest extends React.Component {
-  constructor (...args) {
+  constructor(...args) {
     super(...args)
     this.state = { allowInput: false, dataView: false }
 
@@ -35,31 +31,31 @@ class TransactionRequest extends React.Component {
     }, props.signingDelay || 1500)
   }
 
-  copyAddress (e) {
+  copyAddress(e) {
     e.preventDefault()
     e.target.select()
     document.execCommand('Copy')
     this.setState({ copied: true })
-    setTimeout(_ => this.setState({ copied: false }), 1000)
+    setTimeout((_) => this.setState({ copied: false }), 1000)
   }
 
-  approve (reqId, req) {
+  approve(reqId, req) {
     link.rpc('approveRequest', req, () => {}) // Move to link.send
   }
 
-  decline (reqId, req) {
+  decline(reqId, req) {
     link.rpc('declineRequest', req, () => {}) // Move to link.send
   }
 
-  toggleDataView (id) {
+  toggleDataView(id) {
     this.setState({ dataView: !this.state.dataView })
   }
 
-  hexToDisplayValue (hex) {
+  hexToDisplayValue(hex) {
     return (Math.round(parseFloat(utils.fromWei(hex, 'ether')) * 1000000) / 1000000).toFixed(6)
   }
 
-  render () {
+  render() {
     const { req } = this.props
     const type = req.type
     const status = req.status
@@ -74,74 +70,83 @@ class TransactionRequest extends React.Component {
     if (status === 'pending') requestClass += ' signerRequestPending'
     if (status === 'error') requestClass += ' signerRequestError'
 
-    const messageToSign = typedData.domain
-     ? (
-        <div className='signTypedData'>
-          <div className='signTypedDataInner'>
-            <div className='signTypedDataSection'>
-              <div className='signTypedDataTitle'>Domain</div>
-              <SimpleJSON json={typedData.domain} />
-            </div>
-            <div className='signTypedDataSection'>
-              <div className='signTypedDataTitle'>Message</div>
-              <SimpleJSON json={typedData.message} />
-            </div>
+    const messageToSign = typedData.domain ? (
+      <div className="signTypedData">
+        <div className="signTypedDataInner">
+          <div className="signTypedDataSection">
+            <div className="signTypedDataTitle">Domain</div>
+            <SimpleJSON json={typedData.domain} />
           </div>
-        </div>
-        )
-      : (
-        <div className='signTypedData'>
-          <div className='signTypedDataInner'>
-            <div className='signTypedDataSection'>
-            <SimpleJSON json={
-              typedData.reduce((data, elem) => {
-                data[elem.name] = elem.value
-                return data
-              }, {})
-            } />
+          <div className="signTypedDataSection">
+            <div className="signTypedDataTitle">Message</div>
+            <SimpleJSON json={typedData.message} />
           </div>
         </div>
       </div>
-      )
+    ) : (
+      <div className="signTypedData">
+        <div className="signTypedDataInner">
+          <div className="signTypedDataSection">
+            <SimpleJSON
+              json={typedData.reduce((data, elem) => {
+                data[elem.name] = elem.value
+                return data
+              }, {})}
+            />
+          </div>
+        </div>
+      </div>
+    )
     return (
       <div key={this.props.req.id || this.props.req.handlerId} className={requestClass}>
         {type === 'signTypedData' ? (
-          <div className='approveRequest'>
-            <div className='approveTransactionPayload'>
+          <div className="approveRequest">
+            <div className="approveTransactionPayload">
               {notice ? (
-                <div className='requestNotice'>
-                  {(_ => {
+                <div className="requestNotice">
+                  {((_) => {
                     if (status === 'pending') {
                       return (
-                        <div key={status} className='requestNoticeInner cardShow'>
-                          <div style={{ paddingBottom: 20 }}><div className='loader' /></div>
-                          <div className='requestNoticeInnerText'>See Signer</div>
-                          <div className='cancelRequest' onMouseDown={() => this.decline(this.props.req.handlerId, this.props.req)}>Cancel</div>
+                        <div key={status} className="requestNoticeInner cardShow">
+                          <div style={{ paddingBottom: 20 }}>
+                            <div className="loader" />
+                          </div>
+                          <div className="requestNoticeInnerText">See Signer</div>
+                          <div
+                            className="cancelRequest"
+                            onMouseDown={() => this.decline(this.props.req.handlerId, this.props.req)}
+                          >
+                            Cancel
+                          </div>
                         </div>
                       )
                     } else if (status === 'success') {
                       return (
-                        <div key={status} className='requestNoticeInner cardShow requestNoticeSuccess'>
+                        <div key={status} className="requestNoticeInner cardShow requestNoticeSuccess">
                           <div>{svg.octicon('check', { height: 80 })}</div>
-                          <div className='requestNoticeInnerText'>{notice}</div>
+                          <div className="requestNoticeInnerText">{notice}</div>
                         </div>
                       )
                     } else if (status === 'error' || status === 'declined') {
                       return (
-                        <div key={status} className='requestNoticeInner cardShow requestNoticeError'>
+                        <div key={status} className="requestNoticeInner cardShow requestNoticeError">
                           <div>{svg.octicon('circle-slash', { height: 80 })}</div>
-                          <div className='requestNoticeInnerText'>{notice}</div>
+                          <div className="requestNoticeInnerText">{notice}</div>
                         </div>
                       )
                     } else {
-                      return <div key={notice} className='requestNoticeInner cardShow'>{notice}</div>
+                      return (
+                        <div key={notice} className="requestNoticeInner cardShow">
+                          {notice}
+                        </div>
+                      )
                     }
                   })()}
                 </div>
               ) : (
                 <>
-                  <div className='requestMeta'>
-                    <div className='requestMetaOrigin'>{originName}</div>
+                  <div className="requestMeta">
+                    <div className="requestMetaOrigin">{originName}</div>
                   </div>
                   {messageToSign}
                 </>
@@ -149,22 +154,26 @@ class TransactionRequest extends React.Component {
             </div>
           </div>
         ) : (
-          <div className='unknownType'>{'Unknown: ' + this.props.req.type}</div>
+          <div className="unknownType">{'Unknown: ' + this.props.req.type}</div>
         )}
-        <div className='requestApprove'>
-          <div 
-            className='requestDecline' 
-            style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none'}} 
-            onClick={() => { if (this.state.allowInput) this.decline(this.props.req.handlerId, this.props.req) 
-          }}>
-            <div className='requestDeclineButton _txButton _txButtonBad'>Decline</div>
+        <div className="requestApprove">
+          <div
+            className="requestDecline"
+            style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none' }}
+            onClick={() => {
+              if (this.state.allowInput) this.decline(this.props.req.handlerId, this.props.req)
+            }}
+          >
+            <div className="requestDeclineButton _txButton _txButtonBad">Decline</div>
           </div>
-          <div 
-            className='requestSign' 
-            style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none'}}
-            onClick={() => { if (this.state.allowInput) this.approve(this.props.req.handlerId, this.props.req) 
-          }}>
-            <div className='requestSignButton _txButton'>Sign</div>
+          <div
+            className="requestSign"
+            style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none' }}
+            onClick={() => {
+              if (this.state.allowInput) this.approve(this.props.req.handlerId, this.props.req)
+            }}
+          >
+            <div className="requestSignButton _txButton">Sign</div>
           </div>
         </div>
       </div>

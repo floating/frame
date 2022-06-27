@@ -34,7 +34,7 @@ process.env.BUNDLE_LOCATION = process.env.BUNDLE_LOCATION || path.resolve(__dirn
 log.transports.console.level = process.env.LOG_LEVEL || 'info'
 log.transports.file.level = ['development', 'test'].includes(process.env.NODE_ENV) ? false : 'verbose'
 
-function getCrashReportFields () {
+function getCrashReportFields() {
   const fields = ['networks', 'networksMeta', 'tokens']
 
   return fields.reduce((extra, field) => {
@@ -51,9 +51,9 @@ Sentry.init({
       ...evt,
       user: { ...evt.user, ip_address: undefined }, // remove IP address
       tags: { ...evt.tags, 'frame.instance_id': store('main.instanceId') },
-      extra: getCrashReportFields()
+      extra: getCrashReportFields(),
     }
-  }
+  },
 })
 
 log.info(`Chrome: v${process.versions.chrome}`)
@@ -63,7 +63,7 @@ log.info(`Node: v${process.versions.node}`)
 // prevent showing the exit dialog more than once
 let closing = false
 
-process.on('uncaughtException', e => {
+process.on('uncaughtException', (e) => {
   Sentry.captureException(e)
 
   log.error('uncaughtException', e)
@@ -98,10 +98,12 @@ const externalWhitelist = [
   'https://frame.canny.io',
   'https://feedback.frame.sh',
   'https://wiki.trezor.io/Trezor_Bridge',
-  'https://opensea.io'
+  'https://opensea.io',
 ]
 
-global.eval = () => { throw new Error(`This app does not support global.eval()`) } // eslint-disable-line
+global.eval = () => {
+  throw new Error(`This app does not support global.eval()`)
+} // eslint-disable-line
 
 ipcMain.on('tray:resetAllSettings', () => {
   persist.clear()
@@ -143,7 +145,7 @@ ipcMain.on('dash:reloadSigner', (e, id) => {
 })
 
 ipcMain.on('tray:openExternal', (e, url) => {
-  const validHost = externalWhitelist.some(entry => url === entry || url.startsWith(entry + '/'))
+  const validHost = externalWhitelist.some((entry) => url === entry || url.startsWith(entry + '/'))
   if (validHost || true) {
     store.setDash({ showing: false })
     shell.openExternal(url)
@@ -212,27 +214,27 @@ ipcMain.on('tray:updateRestart', () => {
 
 ipcMain.on('tray:refreshMain', () => windows.broadcast('main:action', 'syncMain', store('main')))
 
-ipcMain.on('frame:close', e => {
+ipcMain.on('frame:close', (e) => {
   windows.close(e)
 })
 
-ipcMain.on('frame:min', e => {
+ipcMain.on('frame:min', (e) => {
   windows.min(e)
 })
 
-ipcMain.on('frame:max', e => {
+ipcMain.on('frame:max', (e) => {
   windows.max(e)
 })
 
-ipcMain.on('frame:unmax', e => {
+ipcMain.on('frame:unmax', (e) => {
   windows.unmax(e)
 })
 
 dapps.add({
   ens: 'send.frame.eth',
   config: {
-    key: 'value'
-  }
+    key: 'value',
+  },
 })
 
 ipcMain.on('unsetCurrentView', async (e, ens) => {
@@ -249,7 +251,7 @@ ipcMain.on('*:addFrame', (e, id) => {
     store.addFrame({
       id,
       currentView: '',
-      views: {}
+      views: {},
     })
     dapps.open(id, 'send.frame.eth')
   }
@@ -295,7 +297,9 @@ app.on('will-quit', () => app.quit())
 app.on('quit', async () => {
   accounts.close()
 })
-app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit() })
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') app.quit()
+})
 
 let launchStatus = store('main.launch')
 

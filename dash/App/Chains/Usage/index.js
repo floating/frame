@@ -7,25 +7,25 @@ import svg from '../../../../resources/svg'
 const average = (array) => (array.reduce((a, b) => a + b) / array.length).toFixed(2)
 
 class _OriginModule extends React.Component {
-  constructor (...args) {
+  constructor(...args) {
     super(...args)
     this.state = {
       expanded: false,
       active: false,
       activeCount: 0,
       reqsAverage: 0,
-      reqsTimes: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+      reqsTimes: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     }
     this.ref = createRef()
   }
-  averageReqs () {
+  averageReqs() {
     const reqs = this.state.reqsTimes
     reqs.push(this.state.activeCount)
     reqs.shift()
     this.setState({ reqsTimes: reqs, activeCount: 0, reqsAverage: (Math.round(average(reqs) * 100) / 100).toFixed(2) })
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const setActiveRandom = () => {
       const isActive = Math.round(Math.random() * 1 + 0.3)
       if (isActive) {
@@ -59,49 +59,59 @@ class _OriginModule extends React.Component {
   //   document.removeEventListener('click', this.clickHandler.bind(this))
   // }
 
-  indicator (status) {
+  indicator(status) {
     if (status === 'connected') {
-      return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorGood' /></div>
+      return (
+        <div className="connectionOptionStatusIndicator">
+          <div className="connectionOptionStatusIndicatorGood" />
+        </div>
+      )
     } else if (status === 'loading' || status === 'syncing' || status === 'pending' || status === 'standby') {
-      return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorPending' /></div>
+      return (
+        <div className="connectionOptionStatusIndicator">
+          <div className="connectionOptionStatusIndicatorPending" />
+        </div>
+      )
     } else {
-      return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorBad' /></div>
+      return (
+        <div className="connectionOptionStatusIndicator">
+          <div className="connectionOptionStatusIndicatorBad" />
+        </div>
+      )
     }
   }
-  render () {
+  render() {
     const { id, type, connection, changed, origin } = this.props
     const { active } = this.state
 
     const networkPresets = this.store('main.networkPresets', type)
     let presets = networkPresets[id] || {}
-    presets = Object.keys(presets).map(i => ({ text: i, value: type + ':' + id + ':' + i }))
-    presets = presets.concat(Object.keys(networkPresets.default).map(i => ({ text: i, value: type + ':' + id + ':' + i })))
+    presets = Object.keys(presets).map((i) => ({ text: i, value: type + ':' + id + ':' + i }))
+    presets = presets.concat(
+      Object.keys(networkPresets.default).map((i) => ({ text: i, value: type + ':' + id + ':' + i }))
+    )
     presets.push({ text: 'Custom', value: type + ':' + id + ':' + 'custom' })
 
     return (
-      <>      
-        <div 
-          className='sliceOrigin'
+      <>
+        <div
+          className="sliceOrigin"
           onClick={() => {
-            link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'updateOriginChain', notifyData: { origin } }})
+            link.send('tray:action', 'navDash', {
+              view: 'notify',
+              data: { notify: 'updateOriginChain', notifyData: { origin } },
+            })
           }}
         >
-          <div className={active ? 'sliceOriginIndicator sliceOriginIndicatorActive' : 'sliceOriginIndicator' } />
-          <div className='sliceOriginTile'> 
-            {origin}
-          </div>
-          <div className='sliceOriginReqs'> 
-            <div className='sliceOriginReqsNumber'>{this.state.reqsAverage }</div>
-            <div className='sliceOriginReqsLabel'>{'reqs/s'}</div>
+          <div className={active ? 'sliceOriginIndicator sliceOriginIndicatorActive' : 'sliceOriginIndicator'} />
+          <div className="sliceOriginTile">{origin}</div>
+          <div className="sliceOriginReqs">
+            <div className="sliceOriginReqsNumber">{this.state.reqsAverage}</div>
+            <div className="sliceOriginReqsLabel">{'reqs/s'}</div>
           </div>
         </div>
-        {this.state.expanded ? (
-          <div>
-            {'origin quick menu'}
-          </div>
-        ) : null}
+        {this.state.expanded ? <div>{'origin quick menu'}</div> : null}
       </>
-
     )
   }
 }
@@ -109,10 +119,10 @@ class _OriginModule extends React.Component {
 const OriginModule = Restore.connect(_OriginModule)
 
 class ChainModule extends React.Component {
-  constructor (...args) {
+  constructor(...args) {
     super(...args)
     this.state = {
-      expanded: true
+      expanded: true,
     }
     this.ref = createRef()
   }
@@ -131,50 +141,62 @@ class ChainModule extends React.Component {
   //   document.removeEventListener('click', this.clickHandler.bind(this))
   // }
 
-  renderHeader (origin, id) {
+  renderHeader(origin, id) {
     return (
-      <div 
-        className='sliceTile sliceTileClickable'
+      <div
+        className="sliceTile sliceTileClickable"
         onClick={() => {
           this.setState({ expanded: !this.state.expanded })
         }}
       >
-        <div className='sliceTileUsage'>
-          <div className='sliceTileUsageCount'>{'4'}</div>
-          <div className='sliceTileUsageDescription'>{'connected dapps'}</div>
+        <div className="sliceTileUsage">
+          <div className="sliceTileUsageCount">{'4'}</div>
+          <div className="sliceTileUsageDescription">{'connected dapps'}</div>
         </div>
       </div>
     )
   }
-  indicator (status) {
+  indicator(status) {
     if (status === 'connected') {
-      return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorGood' /></div>
+      return (
+        <div className="connectionOptionStatusIndicator">
+          <div className="connectionOptionStatusIndicatorGood" />
+        </div>
+      )
     } else if (status === 'loading' || status === 'syncing' || status === 'pending' || status === 'standby') {
-      return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorPending' /></div>
+      return (
+        <div className="connectionOptionStatusIndicator">
+          <div className="connectionOptionStatusIndicatorPending" />
+        </div>
+      )
     } else {
-      return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorBad' /></div>
+      return (
+        <div className="connectionOptionStatusIndicator">
+          <div className="connectionOptionStatusIndicatorBad" />
+        </div>
+      )
     }
   }
-  render () {
+  render() {
     const { id, type, connection, changed } = this.props
 
     const networkPresets = this.store('main.networkPresets', type)
     let presets = networkPresets[id] || {}
-    presets = Object.keys(presets).map(i => ({ text: i, value: type + ':' + id + ':' + i }))
-    presets = presets.concat(Object.keys(networkPresets.default).map(i => ({ text: i, value: type + ':' + id + ':' + i })))
+    presets = Object.keys(presets).map((i) => ({ text: i, value: type + ':' + id + ':' + i }))
+    presets = presets.concat(
+      Object.keys(networkPresets.default).map((i) => ({ text: i, value: type + ':' + id + ':' + i }))
+    )
     presets.push({ text: 'Custom', value: type + ':' + id + ':' + 'custom' })
 
     return (
-      <div className='sliceContainer' ref={this.ref}>
+      <div className="sliceContainer" ref={this.ref}>
         {this.renderHeader('connection', id)}
         {!this.state.expanded ? (
-          <div className='sliceContainer'>
+          <div className="sliceContainer">
             <OriginModule origin={'send.frame.eth'} {...this.props} />
             <OriginModule origin={'uniswap.io'} {...this.props} />
             <OriginModule origin={'app.aave.eth'} {...this.props} />
-            <div className='viewAllOrigin'>
-              {'view all'}
-            </div>
+            <div className="viewAllOrigin">{'view all'}</div>
           </div>
         ) : null}
       </div>

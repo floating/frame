@@ -13,19 +13,19 @@ import Badge from './Badge'
 // <DevTools />
 
 class Panel extends React.Component {
-  indicator (connection) {
+  indicator(connection) {
     const status = [connection.primary.status, connection.secondary.status]
     if (status.indexOf('connected') > -1) {
       if (this.store('selected.current')) {
-        return <div className='panelDetailIndicatorInner panelDetailIndicatorGood' />
+        return <div className="panelDetailIndicatorInner panelDetailIndicatorGood" />
       } else {
-        return <div className='panelDetailIndicatorInner panelDetailIndicatorWaiting' />
+        return <div className="panelDetailIndicatorInner panelDetailIndicatorWaiting" />
       }
     } else {
-      return <div className='panelDetailIndicatorInner panelDetailIndicatorBad' />
+      return <div className="panelDetailIndicatorInner panelDetailIndicatorBad" />
     }
   }
-  
+
   // componentDidMount () {
   //   console.log('did mount')
   //   document.addEventListener('keydown', (event) => {
@@ -44,29 +44,29 @@ class Panel extends React.Component {
   //   })
   // }
 
-  selectNetwork (network) {
+  selectNetwork(network) {
     const [type, id] = network.split(':')
     if (network.type !== type || network.id !== id) link.send('tray:action', 'selectNetwork', type, id)
   }
-  
-  hexToDisplayGwei (weiHex) {
+
+  hexToDisplayGwei(weiHex) {
     return parseInt(weiHex, 'hex') / 1e9 < 1 ? '‹1' : Math.round(parseInt(weiHex, 'hex') / 1e9)
   }
-  
-  render () {
+
+  render() {
     const opacity = this.store('tray.initial') ? 0 : 1 // open ? 'translate3d(0px, 0px, 0px)' : 'translate3d(370px, 0px, 0px)'
 
     const networks = this.store('main.networks')
     const networkOptions = []
-    Object.keys(networks).forEach(type => {
-      Object.keys(networks[type]).forEach(id => {
+    Object.keys(networks).forEach((type) => {
+      Object.keys(networks[type]).forEach((id) => {
         const net = networks[type][id]
         const status = [net.connection.primary.status, net.connection.secondary.status]
         if (net.on) {
-          networkOptions.push({ 
-            text: net.name, 
+          networkOptions.push({
+            text: net.name,
             value: type + ':' + id,
-            indicator: net.on && status.indexOf('connected') > -1 ? 'good' : 'bad'
+            indicator: net.on && status.indexOf('connected') > -1 ? 'good' : 'bad',
           })
         }
       })
@@ -75,7 +75,7 @@ class Panel extends React.Component {
     if (this.store('panel.view') === 'networks') markLeft = 68
     if (this.store('panel.view') === 'settings') markLeft = 122
     return (
-      <div id='panel' style={{ opacity }}>
+      <div id="panel" style={{ opacity }}>
         <Badge />
         <Menu />
         <Notify />

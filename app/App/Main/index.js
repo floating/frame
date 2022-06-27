@@ -12,18 +12,18 @@ import link from '../../../resources/link'
 let firstScroll = true
 
 class Main extends React.Component {
-  constructor (...args) {
+  constructor(...args) {
     super(...args)
     this.state = {
-      filter: ''
+      filter: '',
     }
   }
 
-  reportScroll () {
+  reportScroll() {
     this.store.initialScrollPos(ReactDOM.findDOMNode(this.scroll).scrollTop)
   }
 
-  resetScroll () {
+  resetScroll() {
     setTimeout(() => {
       if (firstScroll) {
         firstScroll = false
@@ -33,21 +33,21 @@ class Main extends React.Component {
     }, 3000)
   }
 
-  accountSort (accounts, a, b) {
+  accountSort(accounts, a, b) {
     try {
       let [aBlock, aLocal] = accounts[a].created.split(':')
       let [bBlock, bLocal] = accounts[b].created.split(':')
-  
+
       aLocal = parseInt(aLocal)
       bLocal = parseInt(bLocal)
-  
+
       if (aBlock === 'new' && bBlock !== 'new') return -1
       if (bBlock !== 'new' && aBlock === 'new') return 1
       if (aBlock === 'new' && bBlock === 'new') return aLocal >= bLocal ? 1 : 0
-  
+
       aBlock = parseInt(aBlock)
       bBlock = parseInt(bBlock)
-  
+
       if (aBlock > bBlock) return -1
       if (aBlock < bBlock) return -1
       if (aBlock === bBlock) return aLocal >= bLocal ? 1 : 0
@@ -59,7 +59,7 @@ class Main extends React.Component {
     }
   }
 
-  render () {
+  render() {
     const accounts = this.store('main.accounts')
     const current = this.store('selected.current')
     const scrollTop = this.store('selected.position.scrollTop')
@@ -74,11 +74,16 @@ class Main extends React.Component {
 
     return (
       <div className={this.store('panel.view') !== 'default' ? 'card cardHide' : 'card cardShow'}>
-        <div id='panelScroll' style={panelScrollStyle}>
-          <div className='panelScrollOverlay' />
-          <div id='panelSlide' 
-            ref={ref => { if (ref) this.scroll = ref }} style={current ? { overflow: 'visible' } : {}}>
-            <div id='panelWrap' style={current && scrollTop > 0 ? { marginTop: '-' + scrollTop + 'px' } : {}}>
+        <div id="panelScroll" style={panelScrollStyle}>
+          <div className="panelScrollOverlay" />
+          <div
+            id="panelSlide"
+            ref={(ref) => {
+              if (ref) this.scroll = ref
+            }}
+            style={current ? { overflow: 'visible' } : {}}
+          >
+            <div id="panelWrap" style={current && scrollTop > 0 ? { marginTop: '-' + scrollTop + 'px' } : {}}>
               {/* {untethered.sort().map((id, i) => <PendingSigner key={'signers' + id} {...this.store('main.signers', id)} index={i} />)} */}
               {sortedAccounts.map((id, i) => {
                 const account = accounts[id]
@@ -88,11 +93,20 @@ class Main extends React.Component {
                   !account.name.includes(filter) &&
                   !account.ensName.includes(filter) &&
                   !account.lastSignerType.includes(filter)
-                ) return null
-                return <Account key={id} {...account} index={i} reportScroll={() => this.reportScroll()} resetScroll={() => this.resetScroll()} />
+                )
+                  return null
+                return (
+                  <Account
+                    key={id}
+                    {...account}
+                    index={i}
+                    reportScroll={() => this.reportScroll()}
+                    resetScroll={() => this.resetScroll()}
+                  />
+                )
               })}
               {Object.keys(accounts).length === 0 ? (
-                <div className='noSigners'>
+                <div className="noSigners">
                   {/* <div className='introLogo'>{svg.logo(70)}</div> */}
                   {`No Accounts Added`}
                   {/* <span className='getStarted'>

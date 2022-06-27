@@ -14,9 +14,11 @@ Sentry.init({ dsn: 'https://7b09a85b26924609bef5882387e2c4dc@o1204372.ingest.sen
 
 // window.removeAllAccountsAndSigners = () => link.send('tray:removeAllAccountsAndSigners')
 
-document.addEventListener('dragover', e => e.preventDefault())
-document.addEventListener('drop', e => e.preventDefault())
-window.eval = global.eval = () => { throw new Error(`This app does not support window.eval()`) } // eslint-disable-line
+document.addEventListener('dragover', (e) => e.preventDefault())
+document.addEventListener('drop', (e) => e.preventDefault())
+window.eval = global.eval = () => {
+  throw new Error(`This app does not support window.eval()`)
+} // eslint-disable-line
 
 link.rpc('getState', (err, state) => {
   if (err) return console.error('Could not get initial state from main.')
@@ -33,5 +35,7 @@ link.rpc('getState', (err, state) => {
   ReactDOM.render(<Frame />, document.getElementById('frame'))
 })
 // document.addEventListener('mouseover', e => link.send('tray:focus'))
-document.addEventListener('mouseout', e => { if (e.clientX < 0) link.send('tray:mouseout') })
-document.addEventListener('contextmenu', e => link.send('*:contextmenu', e.clientX, e.clientY))
+document.addEventListener('mouseout', (e) => {
+  if (e.clientX < 0) link.send('tray:mouseout')
+})
+document.addEventListener('contextmenu', (e) => link.send('*:contextmenu', e.clientX, e.clientY))

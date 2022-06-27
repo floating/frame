@@ -4,13 +4,13 @@ import link from '../../../resources/link'
 import svg from '../../../resources/svg'
 
 class Command extends React.Component {
-  render () {
+  render() {
     const { view, data } = this.store('dash.nav')[0] || { view: '', data: {} }
     return (
-      <div className='command'>
+      <div className="command">
         {this.store('dash.nav').length ? (
-          <div 
-            className='commandItem commandItemBack cardShow'
+          <div
+            className="commandItem commandItemBack cardShow"
             onClick={() => {
               link.send('tray:action', 'backDash')
             }}
@@ -18,18 +18,18 @@ class Command extends React.Component {
             {svg.chevronLeft(16)}
           </div>
         ) : null}
-        <div key={view} className='commandTitle cardShow'>
+        <div key={view} className="commandTitle cardShow">
           {view}
         </div>
-        
+
         {/* <div 
           className='commandInput'
         >
           <input />
         </div> */}
 
-        <div 
-          className='commandItem commandItemClose'
+        <div
+          className="commandItem commandItemClose"
           onClick={() => {
             link.send('tray:action', 'closeDash')
           }}
@@ -37,7 +37,7 @@ class Command extends React.Component {
           {svg.x(16)}
         </div>
       </div>
-    ) 
+    )
   }
 }
 

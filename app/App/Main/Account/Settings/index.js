@@ -4,23 +4,25 @@ import link from '../../../../../resources/link'
 import svg from '../../../../../resources/svg'
 
 class Settings extends React.Component {
-  constructor (...args) {
+  constructor(...args) {
     super(...args)
     this.moduleRef = React.createRef()
     if (!this.props.expanded) {
       this.resizeObserver = new ResizeObserver(() => {
         if (this.moduleRef && this.moduleRef.current) {
-          link.send('tray:action', 'updateAccountModule', this.props.moduleId, { height: this.moduleRef.current.clientHeight })
+          link.send('tray:action', 'updateAccountModule', this.props.moduleId, {
+            height: this.moduleRef.current.clientHeight,
+          })
         }
       })
     }
     this.state = {
       expand: false,
-      name: ''
+      name: '',
     }
   }
 
-  componentDidMount () {
+  componentDidMount() {
     if (this.resizeObserver) this.resizeObserver.observe(this.moduleRef.current)
     this.nameObs = this.store.observer(() => {
       const name = this.store('main.accounts', this.props.id, 'name')
@@ -28,56 +30,60 @@ class Settings extends React.Component {
     })
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     if (this.resizeObserver) this.resizeObserver.disconnect()
     this.nameObs.remove()
   }
 
-  render () {
+  render() {
     const account = this.store('main.accounts', this.props.id)
     return (
       <div ref={this.moduleRef}>
         {this.props.expanded ? (
-          <div className='moduleHeader'>
+          <div className="moduleHeader">
             {'Settings'}
-            <div className='moduleHeaderClose' onMouseDown={() => this.props.expandModule(false)}>
+            <div className="moduleHeaderClose" onMouseDown={() => this.props.expandModule(false)}>
               {svg.close(12)}
             </div>
-          </div>  
+          </div>
         ) : null}
-        <div className='moduleMain moduleMainSettings'>
+        <div className="moduleMain moduleMainSettings">
           {!this.props.expanded ? (
-            <div className='moduleButton' onMouseDown={() => this.props.expandModule(this.props.moduleId)}>
+            <div className="moduleButton" onMouseDown={() => this.props.expandModule(this.props.moduleId)}>
               Account Settings
             </div>
           ) : (
             <>
-              <div className='moduleRow'>
-                Account Tag: 
+              <div className="moduleRow">
+                Account Tag:
                 <input
-                  type='text'
-                  tabIndex='-1'
-                  value={this.state.name} 
+                  type="text"
+                  tabIndex="-1"
+                  value={this.state.name}
                   onChange={(e) => {
                     this.setState({ name: e.target.value })
                     link.send('tray:renameAccount', this.props.id, e.target.value)
                   }}
                 />
               </div>
-              {account.smart
-                ? (<div className='moduleRow'>Chain ID: {account.smart.chain && account.smart.chain.id}</div>)
-                : null
-              }
-              <div className='moduleRow'>Status: {account.status}</div>
-              <div className='moduleRow'>ENS Name: {account.ensName  ? account.ensName : 'none'}</div>
-              <div className='moduleRow'>Last Signer Type: {account.lastSignerType}</div>
-              <div className='moduleRow'>Signer Connected: {account.signer ? 'yes' : 'no'}</div>
+              {account.smart ? (
+                <div className="moduleRow">Chain ID: {account.smart.chain && account.smart.chain.id}</div>
+              ) : null}
+              <div className="moduleRow">Status: {account.status}</div>
+              <div className="moduleRow">ENS Name: {account.ensName ? account.ensName : 'none'}</div>
+              <div className="moduleRow">Last Signer Type: {account.lastSignerType}</div>
+              <div className="moduleRow">Signer Connected: {account.signer ? 'yes' : 'no'}</div>
               {/* <div className='moduleRow'>Account Added: {account.created}</div> */}
-              <div className='moduleButton moduleButtonBad' onMouseDown={() => {
-                link.rpc('removeAccount', this.props.id, {}, () => {
-                  // console.log('Removed account ', address)
-                })
-              }}>Remove This Account</div>
+              <div
+                className="moduleButton moduleButtonBad"
+                onMouseDown={() => {
+                  link.rpc('removeAccount', this.props.id, {}, () => {
+                    // console.log('Removed account ', address)
+                  })
+                }}
+              >
+                Remove This Account
+              </div>
             </>
           )}
         </div>

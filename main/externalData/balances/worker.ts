@@ -11,7 +11,7 @@ import balancesLoader, { BalanceLoader } from './scan'
 import TokenLoader from '../inventory/tokens'
 
 interface ExternalDataWorkerMessage {
-  command: string,
+  command: string
   args: any[]
 }
 
@@ -29,17 +29,17 @@ eth.on('connect', async () => {
   sendToMainProcess({ type: 'ready' })
 })
 
-async function getChains () {
+async function getChains() {
   try {
     const chains: string[] = await eth.request({ method: 'wallet_getChains' })
-    return chains.map(chain => parseInt(chain))
+    return chains.map((chain) => parseInt(chain))
   } catch (e) {
     log.error('could not load chains', e)
     return []
   }
 }
 
-function sendToMainProcess (data: any) {
+function sendToMainProcess(data: any) {
   if (process.send) {
     return process.send(data)
   } else {
@@ -47,20 +47,23 @@ function sendToMainProcess (data: any) {
   }
 }
 
-async function tokenBalanceScan (address: Address, tokensToOmit: Token[] = [], chains?: number[]) {
+async function tokenBalanceScan(address: Address, tokensToOmit: Token[] = [], chains?: number[]) {
   try {
     // for chains that support multicall, we can attempt to load every token that we know about,
     // for all other chains we need to call each contract individually so don't scan every contract
-    const eligibleChains = (chains || await getChains()).filter(chainSupportsScan)
-    const tokenLists = eligibleChains.map(chainId => tokenLoader.getTokens(chainId))
+    const eligibleChains = (chains || (await getChains())).filter(chainSupportsScan)
+    const tokenLists = eligibleChains.map((chainId) => tokenLoader.getTokens(chainId))
     const tokens = tokenLists.reduce((all, tokenList) => {
       return all.concat(
-        tokenList.filter(token => tokensToOmit.every(t => t.chainId !== token.chainId || t.address !== token.address))
+        tokenList.filter((token) =>
+          tokensToOmit.every((t) => t.chainId !== token.chainId || t.address !== token.address)
+        )
       )
     }, [] as Token[])
 
-    const tokenBalances = (await balances.getTokenBalances(address, tokens))
-      .filter(balance => parseInt(balance.balance) > 0)
+    const tokenBalances = (await balances.getTokenBalances(address, tokens)).filter(
+      (balance) => parseInt(balance.balance) > 0
+    )
 
     sendToMainProcess({ type: 'tokenBalances', address, balances: tokenBalances })
   } catch (e) {
@@ -68,7 +71,7 @@ async function tokenBalanceScan (address: Address, tokensToOmit: Token[] = [], c
   }
 }
 
-async function fetchTokenBalances (address: Address, tokens: Token[]) {
+async function fetchTokenBalances(address: Address, tokens: Token[]) {
   try {
     const tokenBalances = await balances.getTokenBalances(address, tokens)
 
@@ -78,7 +81,7 @@ async function fetchTokenBalances (address: Address, tokens: Token[]) {
   }
 }
 
-async function chainBalanceScan (address: string, chains?: number[]) {
+async function chainBalanceScan(address: string, chains?: number[]) {
   try {
     const availableChains = chains || (await getChains())
     const chainBalances = await balances.getCurrencyBalances(address, availableChains)
@@ -89,7 +92,7 @@ async function chainBalanceScan (address: string, chains?: number[]) {
   }
 }
 
-function resetHeartbeat () {
+function resetHeartbeat() {
   clearTimeout(heartbeat)
 
   heartbeat = setTimeout(() => {
@@ -103,7 +106,7 @@ const messageHandler: { [command: string]: (...params: any) => void } = {
   updateChainBalance: chainBalanceScan,
   fetchTokenBalances: fetchTokenBalances,
   tokenBalanceScan: tokenBalanceScan,
-  heartbeat: resetHeartbeat
+  heartbeat: resetHeartbeat,
 }
 
 process.on('message', (message: ExternalDataWorkerMessage) => {

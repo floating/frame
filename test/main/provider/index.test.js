@@ -40,39 +40,43 @@ afterAll(() => {
 beforeEach(() => {
   store.set('main.accounts', {})
   store.set('main.origins', {})
-  
+
   provider.handlers = {}
 
   const eventTypes = ['accountsChanged', 'chainChanged', 'chainsChanged', 'assetsChanged', 'networkChanged']
-  eventTypes.forEach(eventType => provider.subscriptions[eventType] = [])
+  eventTypes.forEach((eventType) => (provider.subscriptions[eventType] = []))
 
   accountRequests = []
 
   connection.send = jest.fn()
   connection.connections = {
     ethereum: {
-      1: { chainConfig: chainConfig(1, 'london'), primary: { connected: true }},
-      4: { chainConfig: chainConfig(4, 'london'), primary: { connected: true }}
-    }
+      1: { chainConfig: chainConfig(1, 'london'), primary: { connected: true } },
+      4: { chainConfig: chainConfig(4, 'london'), primary: { connected: true } },
+    },
   }
 
   accounts.current = jest.fn(() => ({ id: address, getAccounts: () => [address] }))
-  accounts.get = jest.fn(addr => addr === address ? { address, lastSignerType: 'ring' } : undefined)
+  accounts.get = jest.fn((addr) => (addr === address ? { address, lastSignerType: 'ring' } : undefined))
   accounts.signTransaction = jest.fn()
   accounts.setTxSigned = jest.fn()
 })
 
 describe('#send', () => {
   beforeEach(() => {
-    store.set('main.origins', '8073729a-5e59-53b7-9e69-5d9bcff94087', { chain: { id: 1, type: 'ethereum' }})
+    store.set('main.origins', '8073729a-5e59-53b7-9e69-5d9bcff94087', { chain: { id: 1, type: 'ethereum' } })
   })
 
-  const send = (request, cb = jest.fn()) => provider.send({ ...request, _origin: '8073729a-5e59-53b7-9e69-5d9bcff94087' }, cb)
+  const send = (request, cb = jest.fn()) =>
+    provider.send({ ...request, _origin: '8073729a-5e59-53b7-9e69-5d9bcff94087' }, cb)
 
   it('passes the given target chain to the connection', () => {
-    connection.connections.ethereum[10] = { chainConfig: { hardfork: 'london', chainId: 10 }, primary: { connected: true } }
+    connection.connections.ethereum[10] = {
+      chainConfig: { hardfork: 'london', chainId: 10 },
+      primary: { connected: true },
+    }
 
-    const request = { method: 'eth_testFrame'  }
+    const request = { method: 'eth_testFrame' }
 
     send({ ...request, chainId: '0xa' })
 
@@ -90,7 +94,7 @@ describe('#send', () => {
   it('returns an error when an unknown chain is given', () => {
     const request = { method: 'eth_testFrame', chainId: '0x63' }
 
-    send(request, response => {
+    send(request, (response) => {
       expect(connection.send).not.toHaveBeenCalled()
       expect(response.error.message).toMatch(/unknown chain/)
       expect(response.result).toBe(undefined)
@@ -100,7 +104,7 @@ describe('#send', () => {
   it('returns an error when an invalid chain is given', () => {
     const request = { method: 'eth_testFrame', chainId: 'test' }
 
-    send(request, response => {
+    send(request, (response) => {
       expect(connection.send).not.toHaveBeenCalled()
       expect(response.error.message).toMatch(/unknown chain/)
       expect(response.result).toBe(undefined)
@@ -111,7 +115,7 @@ describe('#send', () => {
     it('returns the current chain id from the store', () => {
       store.set('main.networks.ethereum', 1, { id: 1 })
 
-      send({ method: 'eth_chainId', chainId: '0x1' }, response => {
+      send({ method: 'eth_chainId', chainId: '0x1' }, (response) => {
         expect(response.result).toBe('0x1')
       })
     })
@@ -119,7 +123,7 @@ describe('#send', () => {
     it('returns a chain id from the target chain', () => {
       store.set('main.networks.ethereum', 4, { id: 4 })
 
-      send({ method: 'eth_chainId', chainId: '0x4' }, response => {
+      send({ method: 'eth_chainId', chainId: '0x4' }, (response) => {
         expect(response.result).toBe('0x4')
       })
     })
@@ -127,7 +131,7 @@ describe('#send', () => {
     it('returns an error for a disconnected chain', () => {
       connection.connections.ethereum[11] = { chainConfig: chainConfig(11, 'london'), primary: { connected: false } }
 
-      send({ method: 'eth_chainId', chainId: '0xb' }, response => {
+      send({ method: 'eth_chainId', chainId: '0xb' }, (response) => {
         expect(response.error.message).toBe('not connected')
         expect(response.result).toBeUndefined()
       })
@@ -135,114 +139,130 @@ describe('#send', () => {
   })
 
   describe('#wallet_addEthereumChain', () => {
-    it('should create an addChain request', done => {
-      send({ 
-        method: 'wallet_addEthereumChain', 
-        params: [
-          {
-            chainId: '0x1234', // A 0x-prefixed hexadecimal string
-            chainName: 'New Chain',
-            nativeCurrency: {
-              name: 'New',
-              symbol: 'NEW', // 2-6 characters long
-              decimals: 18
+    it('should create an addChain request', (done) => {
+      send(
+        {
+          method: 'wallet_addEthereumChain',
+          params: [
+            {
+              chainId: '0x1234', // A 0x-prefixed hexadecimal string
+              chainName: 'New Chain',
+              nativeCurrency: {
+                name: 'New',
+                symbol: 'NEW', // 2-6 characters long
+                decimals: 18,
+              },
+              rpcUrls: ['https://pylon.link'],
+              blockExplorerUrls: ['https://pylon.link'],
+              iconUrls: [''], // Currently ignored
             },
-            rpcUrls: ['https://pylon.link'],
-            blockExplorerUrls: ['https://pylon.link'],
-            iconUrls: [''] // Currently ignored
+          ],
+        },
+        () => {
+          try {
+            expect(accountRequests).toHaveLength(1)
+            expect(accountRequests[0].handlerId).toBeTruthy()
+            expect(accountRequests[0].type).toBe('addChain')
+            done()
+          } catch (e) {
+            done(e)
           }
-        ]
-      }, () => {
-        try {
-          expect(accountRequests).toHaveLength(1)
-          expect(accountRequests[0].handlerId).toBeTruthy()
-          expect(accountRequests[0].type).toBe('addChain')
-          done()
-        } catch (e) { 
-          done(e) 
         }
-      })
+      )
     })
 
-    it('should switch to a chain and notify listeners if it exists in the store', done => {
+    it('should switch to a chain and notify listeners if it exists in the store', (done) => {
       store.set('main.networks.ethereum', 1, { id: 1 })
-      store.set('main.origins', '8073729a-5e59-53b7-9e69-5d9bcff94087', { chain: { id: 137, type: 'ethereum' }})
+      store.set('main.origins', '8073729a-5e59-53b7-9e69-5d9bcff94087', { chain: { id: 137, type: 'ethereum' } })
       store.switchOriginChain = jest.fn()
 
-      send({ 
-        method: 'wallet_addEthereumChain', 
-        params: [
-          {
-            chainId: '0x1', // A 0x-prefixed hexadecimal string
-            chainName: 'Mainnet',
-            nativeCurrency: {
-              name: 'Ether',
-              symbol: 'ETH', // 2-6 characters long
-              decimals: 18
+      send(
+        {
+          method: 'wallet_addEthereumChain',
+          params: [
+            {
+              chainId: '0x1', // A 0x-prefixed hexadecimal string
+              chainName: 'Mainnet',
+              nativeCurrency: {
+                name: 'Ether',
+                symbol: 'ETH', // 2-6 characters long
+                decimals: 18,
+              },
+              rpcUrls: ['https://pylon.link'],
+              blockExplorerUrls: ['https://pylon.link'],
+              iconUrls: [''], // Currently ignored
             },
-            rpcUrls: ['https://pylon.link'],
-            blockExplorerUrls: ['https://pylon.link'],
-            iconUrls: [''] // Currently ignored
-          }
-        ]
-      }, () => {
-        expect(store.switchOriginChain).toHaveBeenCalledWith('8073729a-5e59-53b7-9e69-5d9bcff94087', 1, 'ethereum')
-        done()
-      })
+          ],
+        },
+        () => {
+          expect(store.switchOriginChain).toHaveBeenCalledWith('8073729a-5e59-53b7-9e69-5d9bcff94087', 1, 'ethereum')
+          done()
+        }
+      )
     })
   })
 
   describe('#wallet_switchEthereumChain', () => {
-    it('should switch to a chain and notify listeners if it exists in the store', done => {
+    it('should switch to a chain and notify listeners if it exists in the store', (done) => {
       store.set('main.networks.ethereum', 1, { id: 1 })
-      store.set('main.origins', { '8073729a-5e59-53b7-9e69-5d9bcff94087': { chain: { id:42161, type: 'ethereum' }}})
+      store.set('main.origins', { '8073729a-5e59-53b7-9e69-5d9bcff94087': { chain: { id: 42161, type: 'ethereum' } } })
       store.switchOriginChain = jest.fn()
 
-      send({ 
-        method: 'wallet_switchEthereumChain', 
-        params: [{
-          chainId: '0x1',
-        }],
-        _origin: '8073729a-5e59-53b7-9e69-5d9bcff94087'
-      }, () => {
-        expect(store.switchOriginChain).toHaveBeenCalledWith('8073729a-5e59-53b7-9e69-5d9bcff94087', 1, 'ethereum')
-        done()
-      })
+      send(
+        {
+          method: 'wallet_switchEthereumChain',
+          params: [
+            {
+              chainId: '0x1',
+            },
+          ],
+          _origin: '8073729a-5e59-53b7-9e69-5d9bcff94087',
+        },
+        () => {
+          expect(store.switchOriginChain).toHaveBeenCalledWith('8073729a-5e59-53b7-9e69-5d9bcff94087', 1, 'ethereum')
+          done()
+        }
+      )
     })
 
-    it('should reject if the chain does not exist in the store', done => {
-      send({
-        method: 'wallet_switchEthereumChain', 
-        params: [{
-          chainId: '0x1234'
-        }],
-        _origin: '8073729a-5e59-53b7-9e69-5d9bcff94087'
-      }, () => {
-        try {
-          expect(accountRequests).toHaveLength(0)
-          done()
-        } catch (e) { 
-          done(e) 
+    it('should reject if the chain does not exist in the store', (done) => {
+      send(
+        {
+          method: 'wallet_switchEthereumChain',
+          params: [
+            {
+              chainId: '0x1234',
+            },
+          ],
+          _origin: '8073729a-5e59-53b7-9e69-5d9bcff94087',
+        },
+        () => {
+          try {
+            expect(accountRequests).toHaveLength(0)
+            done()
+          } catch (e) {
+            done(e)
+          }
         }
-      })
+      )
     })
   })
-  
+
   describe('#wallet_getPermissions', () => {
-    it('returns all allowed permissions', done => {
+    it('returns all allowed permissions', (done) => {
       const request = {
         method: 'wallet_getPermissions',
-        _origin: '8073729a-5e59-53b7-9e69-5d9bcff94087'
+        _origin: '8073729a-5e59-53b7-9e69-5d9bcff94087',
       }
 
-      send(request, response => {
+      send(request, (response) => {
         try {
           expect(response.error).toBe(undefined)
 
           const permissions = response.result
           expect(permissions).toHaveLength(14)
-          expect(permissions.map(p => p.parentCapability)).toEqual(expect.arrayContaining(
-            [
+          expect(permissions.map((p) => p.parentCapability)).toEqual(
+            expect.arrayContaining([
               'eth_coinbase',
               'eth_accounts',
               'eth_requestAccounts',
@@ -256,28 +276,27 @@ describe('#send', () => {
               'eth_signTypedData_v3',
               'eth_signTypedData_v4',
               'wallet_addEthereumChain',
-              'wallet_getAssets'
-            ]
-          ))
+              'wallet_getAssets',
+            ])
+          )
 
           done()
-        } catch (e) { done(e) }
+        } catch (e) {
+          done(e)
+        }
       })
     })
   })
 
   describe('#wallet_requestPermissions', () => {
-    it('returns the requested permissions', done => {
+    it('returns the requested permissions', (done) => {
       const request = {
         method: 'wallet_requestPermissions',
-        params: [
-          { eth_accounts: {} },
-          { eth_signTransaction: {} }
-        ],
-        _origin: '8073729a-5e59-53b7-9e69-5d9bcff94087'
+        params: [{ eth_accounts: {} }, { eth_signTransaction: {} }],
+        _origin: '8073729a-5e59-53b7-9e69-5d9bcff94087',
       }
 
-      send(request, response => {
+      send(request, (response) => {
         try {
           expect(response.error).toBe(undefined)
 
@@ -288,14 +307,16 @@ describe('#send', () => {
           expect(permissions[1].parentCapability).toBe('eth_signTransaction')
           expect(Number.isInteger(permissions[1].date)).toBe(true)
           done()
-        } catch (e) { done(e) }
+        } catch (e) {
+          done(e)
+        }
       })
     })
   })
 
   describe('#wallet_watchAsset', () => {
     let request
-    
+
     beforeEach(() => {
       store.set('main.tokens.custom', [])
 
@@ -309,10 +330,10 @@ describe('#send', () => {
             symbol: 'BADGER',
             name: 'BadgerDAO Token',
             decimals: 18,
-            image: 'https://badgerdao.io/icon.jpg'
-          }
+            image: 'https://badgerdao.io/icon.jpg',
+          },
         },
-        _origin: '8073729a-5e59-53b7-9e69-5d9bcff94087'
+        _origin: '8073729a-5e59-53b7-9e69-5d9bcff94087',
       }
     })
 
@@ -330,9 +351,9 @@ describe('#send', () => {
               symbol: 'BADGER',
               name: 'BadgerDAO Token',
               decimals: 18,
-              logoURI: 'https://badgerdao.io/icon.jpg'
+              logoURI: 'https://badgerdao.io/icon.jpg',
             },
-            payload: request
+            payload: request,
           })
         )
       })
@@ -383,9 +404,9 @@ describe('#send', () => {
       store.set('main.networks.ethereum', {
         137: { name: 'polygon', id: 137, on: true },
         4: { name: 'rinkeby', id: 4, on: false },
-        1: { name: 'mainnet', id: 1, on: true }
+        1: { name: 'mainnet', id: 1, on: true },
       })
-      send({ method: 'wallet_getChains', id: 14, jsonrpc: '2.0' }, response => {
+      send({ method: 'wallet_getChains', id: 14, jsonrpc: '2.0' }, (response) => {
         expect(response.error).toBe(undefined)
         expect(response.id).toBe(14)
         expect(response.jsonrpc).toBe('2.0')
@@ -399,9 +420,9 @@ describe('#send', () => {
       store.set('main.networks.ethereum', {
         137: { name: 'polygon', id: 137, on: true },
         4: { name: 'rinkeby', id: 4, on: false },
-        1: { name: 'mainnet', id: 1, on: true }
+        1: { name: 'mainnet', id: 1, on: true },
       })
-      send({ method: 'wallet_getChainDetails', id: 14, jsonrpc: '2.0' }, response => {
+      send({ method: 'wallet_getChainDetails', id: 14, jsonrpc: '2.0' }, (response) => {
         expect(response.error).toBe(undefined)
         expect(response.id).toBe(14)
         expect(response.jsonrpc).toBe('2.0')
@@ -422,7 +443,7 @@ describe('#send', () => {
         symbol: 'BADGER',
         balance: '0x1605d9ee98627100000',
         decimals: 18,
-        displayBalance: '6500'
+        displayBalance: '6500',
       },
       {
         address: '0x383518188c0c6d7730d91b2c03a03c837814a899',
@@ -431,7 +452,7 @@ describe('#send', () => {
         symbol: 'OHM',
         balance: '0xd14d13208',
         decimals: 9,
-        displayBalance: '56.183829'
+        displayBalance: '56.183829',
       },
       {
         address: '0x0000000000000000000000000000000000000000',
@@ -440,8 +461,8 @@ describe('#send', () => {
         symbol: 'AETH',
         balance: '0xd8f8753a603f70000',
         decimals: 18,
-        displayBalance: '250.15'
-      }
+        displayBalance: '250.15',
+      },
     ]
 
     beforeEach(() => {
@@ -449,10 +470,10 @@ describe('#send', () => {
       store.set('main.balances', address, balances)
     })
 
-    it('returns an error if no account is selected', done => {
+    it('returns an error if no account is selected', (done) => {
       accounts.current.mockReturnValueOnce(undefined)
 
-      send({ method: 'wallet_getAssets', id: 21, jsonrpc: '2.0' }, response => {
+      send({ method: 'wallet_getAssets', id: 21, jsonrpc: '2.0' }, (response) => {
         expect(response.id).toBe(21)
         expect(response.jsonrpc).toBe('2.0')
         expect(response.result).toBe(undefined)
@@ -461,8 +482,8 @@ describe('#send', () => {
       })
     })
 
-    it('returns native currencies from all chains', done => {
-      send({ method: 'wallet_getAssets' }, response => {
+    it('returns native currencies from all chains', (done) => {
+      send({ method: 'wallet_getAssets' }, (response) => {
         expect(response.error).toBe(undefined)
         expect(response.result.nativeCurrency).toHaveLength(1)
 
@@ -472,8 +493,8 @@ describe('#send', () => {
       })
     })
 
-    it('returns erc20 tokens from all chains', done => {
-      send({ method: 'wallet_getAssets' }, response => {
+    it('returns erc20 tokens from all chains', (done) => {
+      send({ method: 'wallet_getAssets' }, (response) => {
         expect(response.error).toBe(undefined)
         expect(response.result.erc20).toHaveLength(2)
 
@@ -484,13 +505,13 @@ describe('#send', () => {
       })
     })
 
-    it('returns an error while scanning', done => {
+    it('returns an error while scanning', (done) => {
       const yesterday = new Date()
       yesterday.setDate(yesterday.getDate() - 1)
 
       store.set('main.accounts', address, 'balances.lastUpdated', yesterday)
 
-      send({ method: 'wallet_getAssets', id: 51, jsonrpc: '2.0' }, response => {
+      send({ method: 'wallet_getAssets', id: 51, jsonrpc: '2.0' }, (response) => {
         expect(response.id).toBe(51)
         expect(response.jsonrpc).toBe('2.0')
         expect(response.result).toBe(undefined)
@@ -516,53 +537,53 @@ describe('#send', () => {
       })
     })
 
-    it('returns the response from the connection', done => {
+    it('returns the response from the connection', (done) => {
       blockResult = {
         blockHash: '0xc1b0227f0721a05357b2b417e3872c5f6f01da209422013fe66ee291527fb123',
-        blockNumber: '0xc80d08'
+        blockNumber: '0xc80d08',
       }
 
-      send(request, response => {
+      send(request, (response) => {
         expect(response.result.blockHash).toBe('0xc1b0227f0721a05357b2b417e3872c5f6f01da209422013fe66ee291527fb123')
         expect(response.result.blockNumber).toBe('0xc80d08')
         done()
       })
     })
 
-    it('uses maxFeePerGas as the gasPrice if one is not defined', done => {
+    it('uses maxFeePerGas as the gasPrice if one is not defined', (done) => {
       const fee = `0x${(10e9).toString(16)}`
 
       blockResult = {
-        maxFeePerGas: fee
+        maxFeePerGas: fee,
       }
 
-      send(request, response => {
+      send(request, (response) => {
         expect(response.result.gasPrice).toBe(fee)
         expect(response.result.maxFeePerGas).toBe(fee)
         done()
       })
     })
 
-    it('maintains the gasPrice if maxFeePerGas exists', done => {
+    it('maintains the gasPrice if maxFeePerGas exists', (done) => {
       const gasPrice = `0x${(8e9).toString(16)}`
       const maxFeePerGas = `0x${(10e9).toString(16)}`
 
       blockResult = {
         gasPrice,
-        maxFeePerGas
+        maxFeePerGas,
       }
 
-      send(request, response => {
+      send(request, (response) => {
         expect(response.result.gasPrice).toBe(gasPrice)
         expect(response.result.maxFeePerGas).toBe(maxFeePerGas)
         done()
       })
     })
 
-    it('returns a response with no result attribute', done => {
+    it('returns a response with no result attribute', (done) => {
       mockConnectionError('no transaction!')
 
-      send(request, response => {
+      send(request, (response) => {
         expect(response.error.message).toBe('no transaction!')
         done()
       })
@@ -577,7 +598,7 @@ describe('#send', () => {
         jsonrpc: '2.0',
         id: 7,
         method: 'eth_sendTransaction',
-        params: [tx]
+        params: [tx],
       }
 
       if (chainId) payload.chainId = chainId
@@ -592,40 +613,42 @@ describe('#send', () => {
         chainId: '0x1',
         gasLimit: weiToHex(21000),
         type: '0x1',
-        nonce: '0xa'
+        nonce: '0xa',
       }
 
       const chainIds = [1, 137]
 
-      chainIds.forEach(chainId => {
+      chainIds.forEach((chainId) => {
         store.set('main.networksMeta.ethereum', chainId, 'gas', {
           price: {
             selected: 'standard',
             levels: { slow: '', standard: '', fast: gweiToHex(30), asap: '', custom: '' },
             fees: {
               maxPriorityFeePerGas: gweiToHex(1),
-              maxBaseFeePerGas: gweiToHex(8)
-            }
-          }
+              maxBaseFeePerGas: gweiToHex(8),
+            },
+          },
         })
 
         connection.connections.ethereum[chainId] = {
-          chainConfig: chainConfig(chainId, chainId === 1 ? 'london' : 'istanbul')
+          chainConfig: chainConfig(chainId, chainId === 1 ? 'london' : 'istanbul'),
         }
       })
     })
 
-    it('rejects a transaction with a mismatched chain id', done => {
-      sendTransaction(response => {
+    it('rejects a transaction with a mismatched chain id', (done) => {
+      sendTransaction((response) => {
         try {
           expect(response.result).toBe(undefined)
           expect(response.error.message.toLowerCase()).toMatch(/does not match/)
           done()
-        } catch (e) { done(e) }
+        } catch (e) {
+          done(e)
+        }
       }, '0x4')
     })
 
-    it('populates the transaction with the request chain id if not provided in the transaction', done => {
+    it('populates the transaction with the request chain id if not provided in the transaction', (done) => {
       delete tx.chainId
 
       sendTransaction(() => {
@@ -633,11 +656,13 @@ describe('#send', () => {
           const initialRequest = accountRequests[0]
           expect(initialRequest.data.chainId).toBe('0x89')
           done()
-        } catch (e) { done(e) }
+        } catch (e) {
+          done(e)
+        }
       }, '0x89')
     })
 
-    it('maintains transaction chain id if no target chain provided with the request', done => {
+    it('maintains transaction chain id if no target chain provided with the request', (done) => {
       tx.chainId = '0x89'
 
       sendTransaction(() => {
@@ -645,11 +670,13 @@ describe('#send', () => {
           const initialRequest = accountRequests[0]
           expect(initialRequest.data.chainId).toBe('0x89')
           done()
-        } catch (e) { done(e) }
+        } catch (e) {
+          done(e)
+        }
       })
     })
 
-    it('pads the gas estimate from the network by 50 percent', done => {
+    it('pads the gas estimate from the network by 50 percent', (done) => {
       connection.send.mockImplementationOnce((payload, cb) => {
         expect(payload.method).toBe('eth_estimateGas')
         cb({ result: addHexPrefix((150000).toString(16)) })
@@ -662,7 +689,9 @@ describe('#send', () => {
           const initialRequest = accountRequests[0]
           expect(initialRequest.data.gasLimit).toBe(addHexPrefix((225000).toString(16)))
           done()
-        } catch (e) { done(e) }
+        } catch (e) {
+          done(e)
+        }
       })
     })
 
@@ -670,25 +699,25 @@ describe('#send', () => {
       beforeEach(() => {
         const chainIds = [1, 137]
 
-        chainIds.forEach(chainId => {
+        chainIds.forEach((chainId) => {
           store.set('main.networksMeta.ethereum', chainId, 'gas', {
             price: {
               selected: 'standard',
               levels: { slow: '', standard: '', fast: gweiToHex(30), asap: '', custom: '' },
               fees: {
                 maxPriorityFeePerGas: gweiToHex(1),
-                maxBaseFeePerGas: gweiToHex(8)
-              }
-            }
+                maxBaseFeePerGas: gweiToHex(8),
+              },
+            },
           })
 
           connection.connections.ethereum[chainId] = {
-            chainConfig: chainConfig(chainId, chainId === 1 ? 'london' : 'istanbul')
+            chainConfig: chainConfig(chainId, chainId === 1 ? 'london' : 'istanbul'),
           }
         })
       })
-      
-      it('adds a 10% gas buffer when replacing a legacy transaction', done => {
+
+      it('adds a 10% gas buffer when replacing a legacy transaction', (done) => {
         tx.type = '0x0'
         tx.chainId = addHexPrefix((137).toString(16))
 
@@ -696,12 +725,12 @@ describe('#send', () => {
           sendTransaction(() => {
             const initialRequest = accountRequests[0]
             const initialPrice = initialRequest.data.gasPrice
-    
+
             expect(initialPrice).toBe(gweiToHex(30))
             expect(initialRequest.feesUpdatedByUser).toBeFalsy()
-    
+
             initialRequest.mode = 'monitor'
-    
+
             sendTransaction(() => {
               const replacementRequest = accountRequests[1]
               const bumpedPrice = Math.ceil(initialPrice * 1.1)
@@ -711,11 +740,11 @@ describe('#send', () => {
             })
           })
         } catch (e) {
-         done(e) 
+          done(e)
         }
       })
-      
-      it('does not add a buffer to replacement legacy transactions if the current gas price is already higher', done => {
+
+      it('does not add a buffer to replacement legacy transactions if the current gas price is already higher', (done) => {
         tx.type = '0x0'
         tx.chainId = addHexPrefix((137).toString(16))
 
@@ -723,23 +752,23 @@ describe('#send', () => {
           sendTransaction(() => {
             const initialRequest = accountRequests[0]
             const initialPrice = initialRequest.data.gasPrice
-    
+
             expect(initialPrice).toBe(gweiToHex(30))
             expect(initialRequest.feesUpdatedByUser).toBeFalsy()
-    
+
             initialRequest.mode = 'monitor'
-    
+
             store.set('main.networksMeta.ethereum', 137, 'gas', {
               price: {
                 selected: 'standard',
                 levels: { slow: '', standard: '', fast: gweiToHex(40), asap: '', custom: '' },
                 fees: {
                   maxPriorityFeePerGas: gweiToHex(1),
-                  maxBaseFeePerGas: gweiToHex(8)
-                }
-              }
+                  maxBaseFeePerGas: gweiToHex(8),
+                },
+              },
             })
-            
+
             sendTransaction(() => {
               const replacementRequest = accountRequests[1]
               expect(replacementRequest.data.gasPrice).toBe(gweiToHex(40))
@@ -748,11 +777,11 @@ describe('#send', () => {
             })
           })
         } catch (e) {
-         done(e)
+          done(e)
         }
       })
-  
-      it('adds a 10% gas buffer when replacing an EIP-1559 transaction', done => {
+
+      it('adds a 10% gas buffer when replacing an EIP-1559 transaction', (done) => {
         tx.type = '0x2'
         tx.chainId = addHexPrefix((1).toString(16))
 
@@ -761,7 +790,7 @@ describe('#send', () => {
             const initialRequest = accountRequests[0]
             const initialTip = initialRequest.data.maxPriorityFeePerGas
             const initialMax = initialRequest.data.maxFeePerGas
-    
+
             expect(initialTip).toBe(gweiToHex(1))
             expect(initialMax).toBe(gweiToHex(9))
             expect(initialRequest.feesUpdatedByUser).toBeFalsy()
@@ -773,7 +802,7 @@ describe('#send', () => {
               const bumpedFee = Math.ceil(initialTip * 1.1)
               const bumpedBase = Math.ceil((initialMax - initialTip) * 1.1)
               const bumpedMax = bumpedFee + bumpedBase
-    
+
               expect(replacementRequest.data.maxPriorityFeePerGas).toBe(weiToHex(bumpedFee))
               expect(replacementRequest.data.maxFeePerGas).toBe(weiToHex(bumpedMax))
               expect(replacementRequest.feesUpdatedByUser).toBe(true)
@@ -781,11 +810,11 @@ describe('#send', () => {
             })
           })
         } catch (e) {
-         done(e) 
+          done(e)
         }
       })
-      
-      it('buffers only the priority fee for replacement EIP-1559 transactions if the current base price is high enough for replacement', done => {
+
+      it('buffers only the priority fee for replacement EIP-1559 transactions if the current base price is high enough for replacement', (done) => {
         tx.type = '0x2'
         tx.chainId = addHexPrefix((1).toString(16))
 
@@ -794,11 +823,11 @@ describe('#send', () => {
             const initialRequest = accountRequests[0]
             const initialTip = initialRequest.data.maxPriorityFeePerGas
             const initialMax = initialRequest.data.maxFeePerGas
-    
+
             expect(initialTip).toBe(gweiToHex(1))
             expect(initialMax).toBe(gweiToHex(9))
             expect(initialRequest.feesUpdatedByUser).toBeFalsy()
-    
+
             initialRequest.mode = 'monitor'
 
             store.set('main.networksMeta.ethereum', 1, 'gas', {
@@ -807,26 +836,26 @@ describe('#send', () => {
                 levels: { slow: '', standard: '', fast: gweiToHex(40), asap: '', custom: '' },
                 fees: {
                   maxPriorityFeePerGas: gweiToHex(1),
-                  maxBaseFeePerGas: gweiToHex(20)
-                }
-              }
+                  maxBaseFeePerGas: gweiToHex(20),
+                },
+              },
             })
-    
+
             sendTransaction(() => {
               const replacementRequest = accountRequests[1]
               const bumpedFee = Math.ceil(initialTip * 1.1)
               expect(replacementRequest.data.maxPriorityFeePerGas).toBe(weiToHex(bumpedFee))
-              expect(replacementRequest.data.maxFeePerGas).toBe(weiToHex((20 * 1e9) + bumpedFee))
+              expect(replacementRequest.data.maxFeePerGas).toBe(weiToHex(20 * 1e9 + bumpedFee))
               expect(replacementRequest.feesUpdatedByUser).toBe(true)
               done()
             })
           })
         } catch (e) {
-         done(e)
+          done(e)
         }
       })
-      
-      it('does not add a buffer to replacement EIP-1559 transactions if the current gas price is already higher', done => {
+
+      it('does not add a buffer to replacement EIP-1559 transactions if the current gas price is already higher', (done) => {
         tx.type = '0x2'
         tx.chainId = addHexPrefix((1).toString(16))
 
@@ -835,11 +864,11 @@ describe('#send', () => {
             const initialRequest = accountRequests[0]
             const initialTip = initialRequest.data.maxPriorityFeePerGas
             const initialMax = initialRequest.data.maxFeePerGas
-    
+
             expect(initialTip).toBe(gweiToHex(1))
             expect(initialMax).toBe(gweiToHex(9))
             expect(initialRequest.feesUpdatedByUser).toBeFalsy()
-    
+
             initialRequest.mode = 'monitor'
             store.set('main.networksMeta.ethereum', 1, 'gas', {
               price: {
@@ -847,14 +876,14 @@ describe('#send', () => {
                 levels: { slow: '', standard: '', fast: gweiToHex(40), asap: '', custom: '' },
                 fees: {
                   maxPriorityFeePerGas: gweiToHex(2),
-                  maxBaseFeePerGas: gweiToHex(14)
-                }
-              }
+                  maxBaseFeePerGas: gweiToHex(14),
+                },
+              },
             })
-    
+
             sendTransaction(() => {
               const replacementRequest = accountRequests[1]
-    
+
               expect(replacementRequest.data.maxPriorityFeePerGas).toBe(gweiToHex(2))
               expect(replacementRequest.data.maxFeePerGas).toBe(gweiToHex(16))
               expect(replacementRequest.feesUpdatedByUser).toBeFalsy()
@@ -862,7 +891,7 @@ describe('#send', () => {
             })
           })
         } catch (e) {
-         done(e)
+          done(e)
         }
       })
     })
@@ -880,10 +909,10 @@ describe('#send', () => {
       expect(accountRequests[0].payload.params[1]).toEqual(message)
     })
 
-    it('does not submit a request from an account other than the current one', done => {
+    it('does not submit a request from an account other than the current one', (done) => {
       const params = ['0xa4581bfe76201f3aa147cce8e360140582260441', message]
 
-      send({ method: 'eth_sign', params }, err => {
+      send({ method: 'eth_sign', params }, (err) => {
         expect(err.error).toBeTruthy()
         done()
       })
@@ -911,10 +940,10 @@ describe('#send', () => {
       expect(accountRequests[0].payload.params[1]).toEqual(message)
     })
 
-    it('does not submit a request from an account other than the current one', done => {
+    it('does not submit a request from an account other than the current one', (done) => {
       const params = [message, '0xa4581bfe76201f3aa147cce8e360140582260441']
 
-      send({ method: 'personal_sign', params }, err => {
+      send({ method: 'personal_sign', params }, (err) => {
         expect(err.error).toBeTruthy()
         done()
       })
@@ -924,13 +953,13 @@ describe('#send', () => {
   describe('#eth_signTypedData', () => {
     const typedData = {
       types: {
-          EIP712Domain: 'domain',
-          Bid: 'bid',
-          Identity: 'identity',
+        EIP712Domain: 'domain',
+        Bid: 'bid',
+        Identity: 'identity',
       },
       domain: 'domainData',
       primaryType: 'Bid',
-      message: 'message'
+      message: 'message',
     }
 
     const validRequests = [
@@ -938,21 +967,21 @@ describe('#send', () => {
       { method: 'eth_signTypedData', params: [typedData, address], version: 'V1' },
       { method: 'eth_signTypedData_v1', params: [typedData, address], version: 'V1' },
       { method: 'eth_signTypedData_v3', params: [address, typedData], version: 'V3' },
-      { method: 'eth_signTypedData_v4', params: [address, typedData], version: 'V4' }
+      { method: 'eth_signTypedData_v4', params: [address, typedData], version: 'V4' },
     ]
 
-    function verifyRequest (version) {
+    function verifyRequest(version) {
       expect(accountRequests).toHaveLength(1)
       expect(accountRequests[0].handlerId).toBeTruthy()
       expect(accountRequests[0].payload.params[0]).toBe(address)
       expect(accountRequests[0].payload.params[1]).toEqual(typedData)
       expect(accountRequests[0].version).toBe(version)
     }
-    
+
     validRequests.forEach(({ method, params, version }) => {
       it(`submits a ${method} request to sign typed data`, () => {
         send({ method, params })
-  
+
         verifyRequest(version)
       })
     })
@@ -965,20 +994,20 @@ describe('#send', () => {
       verifyRequest('V1')
     })
 
-    it('does not submit a request from an unknown account', done => {
+    it('does not submit a request from an unknown account', (done) => {
       const params = ['0xa4581bfe76201f3aa147cce8e360140582260441', typedData]
 
-      send({ method: 'eth_signTypedData_v3', params }, err => {
+      send({ method: 'eth_signTypedData_v3', params }, (err) => {
         expect(err.error.message).toBeTruthy()
         expect(err.error.code).toBe(-1)
         done()
       })
     })
 
-    it('does not submit a request with malformed type data', done => {
+    it('does not submit a request with malformed type data', (done) => {
       const params = [address, 'test']
 
-      send({ method: 'eth_signTypedData_v3', params }, err => {
+      send({ method: 'eth_signTypedData_v3', params }, (err) => {
         expect(err.error.message).toBeTruthy()
         expect(err.error.code).toBe(-1)
         done()
@@ -988,15 +1017,15 @@ describe('#send', () => {
     // these signers only support V4+
     const hardwareSigners = [SignerType.Ledger, SignerType.Lattice, SignerType.Trezor]
 
-    hardwareSigners.forEach(signerType => {
-      it(`does not submit a V3 request to a ${signerType}`, done => {
-        accounts.get.mockImplementationOnce(addr => {
+    hardwareSigners.forEach((signerType) => {
+      it(`does not submit a V3 request to a ${signerType}`, (done) => {
+        accounts.get.mockImplementationOnce((addr) => {
           return addr === address ? { address, lastSignerType: signerType } : {}
         })
 
         const params = [address, typedData]
 
-        send({ method: 'eth_signTypedData_v3', params }, err => {
+        send({ method: 'eth_signTypedData_v3', params }, (err) => {
           expect(err.error.message).toMatch(new RegExp(signerType, 'i'))
           expect(err.error.code).toBe(-1)
           done()
@@ -1006,13 +1035,13 @@ describe('#send', () => {
 
     const unknownVersions = ['_v5', '_v1.1', 'v3']
 
-    unknownVersions.forEach(versionExtension => {
-      it(`passes a request with unhandled method eth_signTypedData${versionExtension} through to the connection`, done => {
+    unknownVersions.forEach((versionExtension) => {
+      it(`passes a request with unhandled method eth_signTypedData${versionExtension} through to the connection`, (done) => {
         mockConnectionError('received unhandled request')
-  
+
         const params = [address, 'test']
-  
-        send({ method: `eth_signTypedData${versionExtension}`, params }, err => {
+
+        send({ method: `eth_signTypedData${versionExtension}`, params }, (err) => {
           expect(err.error.message).toBe('received unhandled request')
           done()
         })
@@ -1024,11 +1053,12 @@ describe('#send', () => {
     const eventTypes = ['accountsChanged', 'chainChanged', 'chainsChanged', 'networkChanged']
 
     describe('#eth_subscribe', () => {
-      const subscribe = (eventType, cb) => send({ id: 9, jsonrpc: '2.0', method: 'eth_subscribe', params: [eventType] }, cb)
+      const subscribe = (eventType, cb) =>
+        send({ id: 9, jsonrpc: '2.0', method: 'eth_subscribe', params: [eventType] }, cb)
 
-      eventTypes.forEach(eventType => {
+      eventTypes.forEach((eventType) => {
         it(`subscribes to ${eventType} events`, () => {
-          subscribe(eventType, response => {
+          subscribe(eventType, (response) => {
             expect(response.id).toBe(9)
             expect(response.jsonrpc).toBe('2.0')
             expect(response.error).toBe(undefined)
@@ -1041,8 +1071,8 @@ describe('#send', () => {
 
       it('returns an error from the node if attempting to unsubscribe to an unknown event', () => {
         mockConnectionError('unknown event!')
-  
-        subscribe('everythingChanged', response => {
+
+        subscribe('everythingChanged', (response) => {
           expect(response.id).toBe(9)
           expect(response.jsonrpc).toBe('2.0')
           expect(response.error.message).toBe('unknown event!')
@@ -1053,13 +1083,13 @@ describe('#send', () => {
 
     describe('#eth_unsubscribe', () => {
       const unsubscribe = (id, cb) => send({ id: 8, jsonrpc: '2.0', method: 'eth_unsubscribe', params: [id] }, cb)
-  
-      eventTypes.forEach(eventType => {
+
+      eventTypes.forEach((eventType) => {
         it(`unsubscribes from ${eventType} events`, () => {
           const subId = '0x1acc2933618a0ff548f03b1c99420366'
           provider.subscriptions[eventType] = [subId]
-  
-          unsubscribe(subId, response => {
+
+          unsubscribe(subId, (response) => {
             expect(response.id).toBe(8)
             expect(response.jsonrpc).toBe('2.0')
             expect(response.error).toBe(undefined)
@@ -1068,22 +1098,22 @@ describe('#send', () => {
           })
         })
       })
-  
+
       it('returns an error from the node if attempting to unsubscribe from an unknown subscription', () => {
         mockConnectionError('unknown subscription!')
-  
+
         provider.subscriptions.accountsChanged = ['0xtest1']
         provider.subscriptions.chainChanged = ['0xtest2']
         provider.subscriptions.chainsChanged = ['0xtest2']
         provider.subscriptions.networkChanged = ['0xtest3']
-  
-        unsubscribe('0xanothersub', response => {
+
+        unsubscribe('0xanothersub', (response) => {
           expect(response.id).toBe(8)
           expect(response.jsonrpc).toBe('2.0')
           expect(response.error.message).toBe('unknown subscription!')
           expect(response.result).toBe(undefined)
 
-          eventTypes.forEach(eventType => {
+          eventTypes.forEach((eventType) => {
             expect(provider.subscriptions[eventType]).toHaveLength(1)
           })
         })
@@ -1093,7 +1123,8 @@ describe('#send', () => {
 })
 
 describe('#signAndSend', () => {
-  let tx = {}, request = {}
+  let tx = {},
+    request = {}
 
   const signAndSend = (cb = jest.fn()) => provider.signAndSend(request, cb)
 
@@ -1103,11 +1134,11 @@ describe('#signAndSend', () => {
     request = {
       handlerId: 99,
       payload: { jsonrpc: '2.0', id: 2, method: 'eth_sendTransaction' },
-      data: tx
+      data: tx,
     }
   })
 
-  it('allows a Fantom transaction with fees over the mainnet hard limit', done => {
+  it('allows a Fantom transaction with fees over the mainnet hard limit', (done) => {
     // 200 gwei * 10M gas = 2 FTM
     tx.chainId = '0xfa'
     tx.type = '0x0'
@@ -1118,34 +1149,38 @@ describe('#signAndSend', () => {
 
     signAndSend(done)
   })
-  
-  it('does not allow a pre-EIP-1559 transaction with fees that exceeds the hard limit', done => {
+
+  it('does not allow a pre-EIP-1559 transaction with fees that exceeds the hard limit', (done) => {
     // 200 gwei * 10M gas = 2 ETH
     tx.chainId = '0x1'
     tx.type = '0x0'
     tx.gasPrice = utils.parseUnits('210', 'gwei').toHexString()
     tx.gasLimit = addHexPrefix((1e7).toString(16))
 
-    signAndSend(err => {
+    signAndSend((err) => {
       try {
         expect(err.message).toMatch(/over hard limit/)
         done()
-      } catch (e) { done(e) }
+      } catch (e) {
+        done(e)
+      }
     })
   })
-  
-  it('does not allow a post-EIP-1559 transaction with fees that exceed the hard limit', done => {
+
+  it('does not allow a post-EIP-1559 transaction with fees that exceed the hard limit', (done) => {
     // 200 gwei * 10M gas = 2 ETH
     tx.chainId = '0x1'
     tx.type = '0x2'
     tx.maxFeePerGas = utils.parseUnits('210', 'gwei').toHexString()
     tx.gasLimit = addHexPrefix((1e7).toString(16))
 
-    signAndSend(err => {
+    signAndSend((err) => {
       try {
         expect(err.message).toMatch(/over hard limit/)
         done()
-      } catch (e) { done(e) }
+      } catch (e) {
+        done(e)
+      }
     })
   })
 
@@ -1164,32 +1199,38 @@ describe('#signAndSend', () => {
     describe('success', () => {
       beforeEach(() => {
         connection.send.mockImplementation((payload, cb) => {
-          expect(payload).toEqual(expect.objectContaining({
-            id: request.payload.id,
-            method: 'eth_sendRawTransaction',
-            params: [signedTx]
-          }))
-          
+          expect(payload).toEqual(
+            expect.objectContaining({
+              id: request.payload.id,
+              method: 'eth_sendRawTransaction',
+              params: [signedTx],
+            })
+          )
+
           cb({ result: txHash })
         })
       })
 
-      it('sends a successfully signed transaction', done => {
+      it('sends a successfully signed transaction', (done) => {
         signAndSend((err, result) => {
           try {
             expect(err).toBe(null)
             expect(result).toBe(txHash)
             done()
-          } catch (e) { done(e) }
+          } catch (e) {
+            done(e)
+          }
         })
       })
 
-      it('responds to a successful transaction request with the transaction hash result', done => {
-        provider.handlers[request.handlerId] = response => {
+      it('responds to a successful transaction request with the transaction hash result', (done) => {
+        provider.handlers[request.handlerId] = (response) => {
           try {
             expect(response.result).toBe(txHash)
             done()
-          } catch (e) { done(e) }
+          } catch (e) {
+            done(e)
+          }
         }
 
         signAndSend()
@@ -1203,15 +1244,15 @@ describe('#signAndSend', () => {
         mockConnectionError(errorMessage)
       })
 
-      it('handles a transaction send failure', done => {
-        signAndSend(err => {
+      it('handles a transaction send failure', (done) => {
+        signAndSend((err) => {
           expect(err.message).toBe(errorMessage)
           done()
         })
       })
 
-      it('responds to a failed transaction request with the payload', done => {
-        provider.handlers[request.handlerId] = err => {
+      it('responds to a failed transaction request with the payload', (done) => {
+        provider.handlers[request.handlerId] = (err) => {
           expect(err.id).toBe(request.payload.id)
           expect(err.jsonrpc).toBe(request.payload.jsonrpc)
           expect(err.error.message).toBe(errorMessage)
@@ -1226,7 +1267,7 @@ describe('#signAndSend', () => {
 
 describe('state change events', () => {
   beforeEach(() => {
-    store.set('main.origins', '8073729a-5e59-53b7-9e69-5d9bcff94087', { chain: { id: 1, type: 'ethereum' }})
+    store.set('main.origins', '8073729a-5e59-53b7-9e69-5d9bcff94087', { chain: { id: 1, type: 'ethereum' } })
     store.getObserver('provider:chains').fire()
   })
 
@@ -1235,9 +1276,9 @@ describe('state change events', () => {
       provider.subscriptions.chainChanged = []
     })
 
-    it('fires a chainChanged event to subscribers', done => {
+    it('fires a chainChanged event to subscribers', (done) => {
       const subscriptionId = '0x9509a964a8d24a17fcfc7b77fc575b71'
-      provider.once('data', event => {
+      provider.once('data', (event) => {
         expect(event.method).toBe('eth_subscription')
         expect(event.jsonrpc).toBe('2.0')
         expect(event.params.subscription).toBe(subscriptionId)
@@ -1247,7 +1288,7 @@ describe('state change events', () => {
 
       provider.subscriptions.chainChanged.push(subscriptionId)
 
-      store.set('main.origins', '8073729a-5e59-53b7-9e69-5d9bcff94087', { chain: { id: 137, type: 'ethereum' }})
+      store.set('main.origins', '8073729a-5e59-53b7-9e69-5d9bcff94087', { chain: { id: 137, type: 'ethereum' } })
       store.getObserver('provider:chains').fire()
     })
   })
@@ -1257,18 +1298,18 @@ describe('state change events', () => {
       1: {
         name: 'test',
         id: 1,
-        on: true
+        on: true,
       },
       4: {
         name: 'rinkeby',
         id: 4,
-        on: true
+        on: true,
       },
       10: {
         name: 'optimism',
         id: 10,
-        on: false
-      }
+        on: false,
+      },
     }
 
     beforeEach(() => {
@@ -1278,10 +1319,10 @@ describe('state change events', () => {
       store.getObserver('provider:chains').fire()
     })
 
-    it('fires a chainsChanged event when a chain is added', done => {
+    it('fires a chainsChanged event when a chain is added', (done) => {
       const subscriptionId = '0x9509a964a8d24a17fcfc7b77fc575b71'
 
-      provider.once('data', event => {
+      provider.once('data', (event) => {
         expect(event.method).toBe('eth_subscription')
         expect(event.jsonrpc).toBe('2.0')
         expect(event.params.subscription).toBe(subscriptionId)
@@ -1292,7 +1333,7 @@ describe('state change events', () => {
       const polygon = {
         name: 'polygon',
         id: 137,
-        on: true
+        on: true,
       }
 
       provider.subscriptions.chainsChanged.push(subscriptionId)
@@ -1301,10 +1342,10 @@ describe('state change events', () => {
       store.getObserver('provider:chains').fire()
     })
 
-    it('fires a chainsChanged event when a chain is removed', done => {
+    it('fires a chainsChanged event when a chain is removed', (done) => {
       const subscriptionId = '0x9509a964a8d24a17fcfc7b77fc575b71'
 
-      provider.once('data', event => {
+      provider.once('data', (event) => {
         expect(event.method).toBe('eth_subscription')
         expect(event.jsonrpc).toBe('2.0')
         expect(event.params.subscription).toBe(subscriptionId)
@@ -1318,10 +1359,10 @@ describe('state change events', () => {
       store.getObserver('provider:chains').fire()
     })
 
-    it('fires a chainsChanged event when a chain connection is turned off', done => {
+    it('fires a chainsChanged event when a chain connection is turned off', (done) => {
       const subscriptionId = '0x9509a964a8d24a17fcfc7b77fc575b71'
 
-      provider.once('data', event => {
+      provider.once('data', (event) => {
         expect(event.method).toBe('eth_subscription')
         expect(event.jsonrpc).toBe('2.0')
         expect(event.params.subscription).toBe(subscriptionId)
@@ -1336,10 +1377,10 @@ describe('state change events', () => {
       store.getObserver('provider:chains').fire()
     })
 
-    it('fires a chainsChanged event when a chain connection is turned off', done => {
+    it('fires a chainsChanged event when a chain connection is turned off', (done) => {
       const subscriptionId = '0x9509a964a8d24a17fcfc7b77fc575b71'
 
-      provider.once('data', event => {
+      provider.once('data', (event) => {
         expect(event.method).toBe('eth_subscription')
         expect(event.jsonrpc).toBe('2.0')
         expect(event.params.subscription).toBe(subscriptionId)
@@ -1367,12 +1408,12 @@ describe('state change events', () => {
       provider.removeAllListeners('data:address')
     })
 
-    it('fires an assetsChanged event when native currency assets are present', done => {
+    it('fires an assetsChanged event when native currency assets are present', (done) => {
       const balance = {
         symbol: 'ETH',
         balance: '0xe7',
         address: '0x0000000000000000000000000000000000000000',
-        chainId: 1
+        chainId: 1,
       }
 
       store.set('main.balances', account, [balance])
@@ -1380,7 +1421,7 @@ describe('state change events', () => {
       const priceData = { usd: { price: 3815.91 } }
       store.set('main.networksMeta.ethereum.1.nativeCurrency', priceData)
 
-      provider.once('data:address', ((accountId, event) => {
+      provider.once('data:address', (accountId, event) => {
         expect(accountId).toBe(account)
         expect(event.method).toBe('eth_subscription')
         expect(event.jsonrpc).toBe('2.0')
@@ -1388,22 +1429,22 @@ describe('state change events', () => {
         expect(event.params.result).toEqual({
           account,
           nativeCurrency: [{ ...balance, currencyInfo: priceData }],
-          erc20: []
+          erc20: [],
         })
 
         done()
-      }))
+      })
 
       store.set('selected.current', account)
       store.getObserver('provider:account').fire()
       jest.advanceTimersByTime(800)
     })
 
-    it('fires an assetsChanged event when erc20 assets are present', done => {
+    it('fires an assetsChanged event when erc20 assets are present', (done) => {
       const balance = {
         symbol: 'OHM',
         balance: '0x606401fc9',
-        address: '0x383518188c0c6d7730d91b2c03a03c837814a899'
+        address: '0x383518188c0c6d7730d91b2c03a03c837814a899',
       }
 
       store.set('main.balances', account, [balance])
@@ -1411,7 +1452,7 @@ describe('state change events', () => {
       const priceData = { usd: { price: 225.35 } }
       store.set('main.rates', balance.address, priceData)
 
-      provider.once('data:address', ((accountId, event) => {
+      provider.once('data:address', (accountId, event) => {
         expect(accountId).toBe(account)
         expect(event.method).toBe('eth_subscription')
         expect(event.jsonrpc).toBe('2.0')
@@ -1419,11 +1460,11 @@ describe('state change events', () => {
         expect(event.params.result).toEqual({
           account,
           nativeCurrency: [],
-          erc20: [{ ...balance, tokenInfo: { lastKnownPrice: { ...priceData } } }]
+          erc20: [{ ...balance, tokenInfo: { lastKnownPrice: { ...priceData } } }],
         })
 
         done()
-      }))
+      })
 
       store.set('selected.current', account)
       store.getObserver('provider:account').fire()
@@ -1431,7 +1472,9 @@ describe('state change events', () => {
     })
 
     it('does not fire an assetsChanged event when no account is selected', () => {
-      provider.once('data:address', () => { throw new Error('event fired when no account selected!') })
+      provider.once('data:address', () => {
+        throw new Error('event fired when no account selected!')
+      })
 
       store.set('main.balances', account, [{ address: '0xany' }])
       store.set('selected.current', undefined)
@@ -1440,7 +1483,9 @@ describe('state change events', () => {
     })
 
     it('does not fire an assetsChanged event when no assets are present', () => {
-      provider.once('data:address', () => { throw new Error('event fired when account has no assets!') })
+      provider.once('data:address', () => {
+        throw new Error('event fired when account has no assets!')
+      })
 
       store.set('main.balances', account, [])
       store.set('selected.current', account)
@@ -1470,6 +1515,6 @@ describe('state change events', () => {
 
 // utility functions //
 
-function mockConnectionError (message) {
+function mockConnectionError(message) {
   connection.send.mockImplementation((p, cb) => cb({ id: p.id, jsonrpc: p.jsonrpc, error: { message, code: -1 } }))
 }

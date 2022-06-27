@@ -3,15 +3,15 @@ import log from 'electron-log'
 const panelActions = require('./panel')
 const supportedNetworkTypes = ['ethereum']
 
-function validateNetworkSettings (network) {
+function validateNetworkSettings(network) {
   const networkId = parseInt(network.id)
 
   if (
-    (!Number.isInteger(networkId)) ||
-    typeof (network.type) !== 'string' ||
-    typeof (network.name) !== 'string' ||
-    typeof (network.explorer) !== 'string' ||
-    typeof (network.symbol) !== 'string' ||
+    !Number.isInteger(networkId) ||
+    typeof network.type !== 'string' ||
+    typeof network.name !== 'string' ||
+    typeof network.explorer !== 'string' ||
+    typeof network.symbol !== 'string' ||
     !supportedNetworkTypes.includes(network.type)
   ) {
     throw new Error(`Invalid network settings: ${JSON.stringify(network)}`)
@@ -20,11 +20,9 @@ function validateNetworkSettings (network) {
   return networkId
 }
 
-function includesToken (tokens, token) {
+function includesToken(tokens, token) {
   const existingAddress = token.address.toLowerCase()
-  return tokens.some(t => 
-    t.address.toLowerCase() === existingAddress && t.chainId === token.chainId
-  )
+  return tokens.some((t) => t.address.toLowerCase() === existingAddress && t.chainId === token.chainId)
 }
 
 module.exports = {
@@ -53,19 +51,19 @@ module.exports = {
     })
   },
   setPrimary: (u, netType, netId, status) => {
-    u('main.networks', netType, netId, 'connection.primary', primary => {
+    u('main.networks', netType, netId, 'connection.primary', (primary) => {
       return Object.assign({}, primary, status)
     })
   },
   setSecondary: (u, netType, netId, status) => {
-    u('main.networks', netType, netId, 'connection.secondary', secondary => {
+    u('main.networks', netType, netId, 'connection.secondary', (secondary) => {
       return Object.assign({}, secondary, status)
     })
   },
-  setLaunch: (u, launch) => u('main.launch', _ => launch),
-  toggleLaunch: u => u('main.launch', launch => !launch),
-  toggleReveal: u => u('main.reveal', reveal => !reveal),
-  toggleNonceAdjust: u => u('main.nonceAdjust', nonceAdjust => !nonceAdjust),
+  setLaunch: (u, launch) => u('main.launch', (_) => launch),
+  toggleLaunch: (u) => u('main.launch', (launch) => !launch),
+  toggleReveal: (u) => u('main.reveal', (reveal) => !reveal),
+  toggleNonceAdjust: (u) => u('main.nonceAdjust', (nonceAdjust) => !nonceAdjust),
   setPermission: (u, address, permission) => {
     u('main.permissions', address, (permissions = {}) => {
       permissions[permission.handlerId] = permission
@@ -78,7 +76,7 @@ module.exports = {
     })
   },
   toggleAccess: (u, address, handlerId) => {
-    u('main.permissions', address, permissions => {
+    u('main.permissions', address, (permissions) => {
       permissions[handlerId].provider = !permissions[handlerId].provider
       return permissions
     })
@@ -91,18 +89,18 @@ module.exports = {
     u(path, () => value)
   },
   dontRemind: (u, version) => {
-    u('main.updater.dontRemind', dontRemind => {
+    u('main.updater.dontRemind', (dontRemind) => {
       if (dontRemind.indexOf(version) === -1) dontRemind.push(version)
       return dontRemind
     })
   },
   setAccount: (u, account) => {
-    u('selected.current', _ => account.id)
-    u('selected.minimized', _ => false)
-    u('selected.open', _ => true)
+    u('selected.current', (_) => account.id)
+    u('selected.minimized', (_) => false)
+    u('selected.open', (_) => true)
   },
   accountTokensUpdated: (u, address) => {
-    u('main.accounts', address, account => {
+    u('main.accounts', address, (account) => {
       const balances = { ...account.balances, lastUpdated: new Date().getTime() }
       const updated = { ...account, balances }
 
@@ -110,30 +108,30 @@ module.exports = {
     })
   },
   updateAccount: (u, updatedAccount) => {
-    u('main.accounts', updatedAccount.id, account => {
+    u('main.accounts', updatedAccount.id, (account) => {
       // if (account) return updatedAccount // Account exists
       // if (add) return updatedAccount // Account is new and should be added
       return { ...updatedAccount, balances: (account || {}).balances }
     })
   },
   removeAccount: (u, id) => {
-    u('main.accounts', accounts => {
+    u('main.accounts', (accounts) => {
       delete accounts[id]
       return accounts
     })
   },
   removeSigner: (u, id) => {
-    u('main.signers', signers => {
+    u('main.signers', (signers) => {
       delete signers[id]
       return signers
     })
   },
   updateSigner: (u, signer) => {
     if (!signer.id) return
-    u('main.signers', signer.id, prev => ({ ...prev, ...signer }))
+    u('main.signers', signer.id, (prev) => ({ ...prev, ...signer }))
   },
   newSigner: (u, signer) => {
-    u('main.signers', signers => {
+    u('main.signers', (signers) => {
       signers[signer.id] = { ...signer, createdAt: new Date().getTime() }
       return signers
     })
@@ -186,13 +184,13 @@ module.exports = {
     u('main.mute.welcomeWarning', () => true)
   },
   toggleExplorerWarning: (u) => {
-    u('main.mute.explorerWarning', v => !v)
+    u('main.mute.explorerWarning', (v) => !v)
   },
   toggleGasFeeWarning: (u) => {
-    u('main.mute.gasFeeWarning', v => !v)
+    u('main.mute.gasFeeWarning', (v) => !v)
   },
   toggleSignerCompatibilityWarning: (u) => {
-    u('main.mute.signerCompatibilityWarning', v => !v)
+    u('main.mute.signerCompatibilityWarning', (v) => !v)
   },
   setAltSpace: (u, v) => {
     u('main.shortcuts.altSlash', () => v)
@@ -215,7 +213,7 @@ module.exports = {
     }
   },
   setNativeCurrencyData: (u, netType, netId, currency) => {
-    u('main.networksMeta', netType, netId, 'nativeCurrency', existing => ({ ...existing, ...currency }))
+    u('main.networksMeta', netType, netId, 'nativeCurrency', (existing) => ({ ...existing, ...currency }))
   },
   addNetwork: (u, net) => {
     try {
@@ -234,31 +232,31 @@ module.exports = {
         gas: {
           price: {
             selected: 'standard',
-            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-          }
+            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' },
+          },
         },
         connection: {
           presets: { local: 'direct' },
-          primary: { 
-            on: true, 
-            current: 'custom', 
-            status: 'loading', 
-            connected: false, 
-            type: '', 
-            network: '', 
-            custom: primaryRpc
+          primary: {
+            on: true,
+            current: 'custom',
+            status: 'loading',
+            connected: false,
+            type: '',
+            network: '',
+            custom: primaryRpc,
           },
-          secondary: { 
-            on: false, 
-            current: 'custom', 
-            status: 'loading', 
-            connected: false, 
-            type: '', 
-            network: '', 
-            custom: secondaryRpc
-          }
+          secondary: {
+            on: false,
+            current: 'custom',
+            status: 'loading',
+            connected: false,
+            type: '',
+            network: '',
+            custom: secondaryRpc,
+          },
         },
-        on: true
+        on: true,
       }
 
       const defaultMeta = {
@@ -266,12 +264,12 @@ module.exports = {
         gas: {
           price: {
             selected: 'standard',
-            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-          }
-        }
+            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' },
+          },
+        },
       }
 
-      u('main', main => {
+      u('main', (main) => {
         if (!main.networks[net.type]) main.networks[net.type] = {}
         if (main.networks[net.type][net.id]) return main // Network already exists, don't overwrite, notify user
 
@@ -288,16 +286,16 @@ module.exports = {
     try {
       net.id = validateNetworkSettings(net)
       newNet.id = validateNetworkSettings(newNet)
-      
-      u('main', main => {
+
+      u('main', (main) => {
         const updatedNetwork = Object.assign({}, main.networks[net.type][net.id], newNet)
 
-        Object.keys(updatedNetwork).forEach(k => {
+        Object.keys(updatedNetwork).forEach((k) => {
           if (typeof updatedNetwork[k] === 'string') {
             updatedNetwork[k] = updatedNetwork[k].trim()
           }
         })
-        
+
         delete main.networks[net.type][net.id]
         main.networks[updatedNetwork.type][updatedNetwork.id] = updatedNetwork
 
@@ -306,7 +304,7 @@ module.exports = {
             main.origins[origin].chain = updatedNetwork
           }
         })
-        
+
         return main
       })
     } catch (e) {
@@ -320,7 +318,7 @@ module.exports = {
       // Cannot delete mainnet
       if (!Number.isInteger(net.id)) throw new Error('Invalid chain id')
       if (net.type === 'ethereum' && net.id === 1) throw new Error('Cannot remove mainnet')
-      u('main', main => {
+      u('main', (main) => {
         if (Object.keys(main.networks[net.type]).length <= 1) {
           return main // Cannot delete last network without adding a new network of this type first
         }
@@ -346,7 +344,7 @@ module.exports = {
   // Flow
   addDapp: (u, namehash, data, options = { docked: false, added: false }) => {
     u(`main.dapp.details.${namehash}`, () => data)
-    u('main.dapp.map', map => {
+    u('main.dapp.map', (map) => {
       if (options.docked && map.docked.length <= 10) {
         map.docked.push(namehash)
       } else {
@@ -360,7 +358,7 @@ module.exports = {
       if (open) {
         if (dapps.indexOf(ens) === -1) dapps.push(ens)
       } else {
-        dapps = dapps.filter(e => e !== ens)
+        dapps = dapps.filter((e) => e !== ens)
       }
       return dapps
     })
@@ -371,7 +369,7 @@ module.exports = {
       delete dapps[namehash]
       return dapps
     })
-    u('main.dapp.map', map => {
+    u('main.dapp.map', (map) => {
       let index = map.added.indexOf(namehash)
       if (index !== -1) {
         map.added.splice(index, 1)
@@ -383,7 +381,7 @@ module.exports = {
     })
   },
   moveDapp: (u, fromArea, fromIndex, toArea, toIndex) => {
-    u('main.dapp.map', map => {
+    u('main.dapp.map', (map) => {
       const hash = map[fromArea][fromIndex]
       map[fromArea].splice(fromIndex, 1)
       map[toArea].splice(toIndex, 0, hash)
@@ -394,7 +392,7 @@ module.exports = {
     if (state) u(`main.dapp.storage.${hash}`, () => state)
   },
   initOrigin: (u, originId, origin) => {
-    u('main.origins', origins => {
+    u('main.origins', (origins) => {
       const now = new Date().getTime()
 
       const createdOrigin = {
@@ -402,8 +400,8 @@ module.exports = {
         session: {
           requests: 1,
           startedAt: now,
-          lastUpdatedAt: now
-        }
+          lastUpdatedAt: now,
+        },
       }
 
       return { ...origins, [originId]: createdOrigin }
@@ -412,7 +410,7 @@ module.exports = {
   addOriginRequest: (u, originId) => {
     const now = new Date().getTime()
 
-    u('main.origins', originId, origin => {
+    u('main.origins', originId, (origin) => {
       // start a new session if the previous one has already ended
       const isNewSession = origin.session.startedAt < origin.session.endedAt
       const startedAt = isNewSession ? now : origin.session.startedAt
@@ -424,13 +422,13 @@ module.exports = {
           requests,
           startedAt,
           endedAt: undefined,
-          lastUpdatedAt: now
-        }
+          lastUpdatedAt: now,
+        },
       }
     })
   },
   endOriginSession: (u, originId) => {
-    u('main.origins', originId, origin => {
+    u('main.origins', originId, (origin) => {
       const now = new Date().getTime()
 
       return {
@@ -438,21 +436,21 @@ module.exports = {
         session: {
           ...origin.session,
           endedAt: now,
-          lastUpdatedAt: now
-        }
+          lastUpdatedAt: now,
+        },
       }
     })
   },
   switchOriginChain: (u, originId, chainId, type) => {
     if (originId && typeof chainId === 'number' && type === 'ethereum') {
-      u('main.origins', originId, origin => ({ ...origin, chain: { id: chainId, type } }))
+      u('main.origins', originId, (origin) => ({ ...origin, chain: { id: chainId, type } }))
     }
   },
   clearOrigins: (u) => {
     u('main.origins', () => ({}))
   },
   removeOrigin: (u, originId) => {
-    u('main.origins', origins => {
+    u('main.origins', (origins) => {
       delete origins[originId]
       return origins
     })
@@ -464,7 +462,7 @@ module.exports = {
     u('dock.expand', (s) => expand)
   },
   pin: (u) => {
-    u('main.pin', pin => !pin)
+    u('main.pin', (pin) => !pin)
   },
   saveAccount: (u, id) => {
     u('main.save.account', () => id)
@@ -481,7 +479,7 @@ module.exports = {
   },
   setBalance: (u, address, balance) => {
     u('main.balances', address, (balances = []) => {
-      const existingBalances = balances.filter(b => b.address !== balance.address || b.chainId !== balance.chainId)
+      const existingBalances = balances.filter((b) => b.address !== balance.address || b.chainId !== balance.chainId)
 
       return [...existingBalances, balance]
     })
@@ -489,13 +487,13 @@ module.exports = {
   // Tokens
   setBalances: (u, address, newBalances) => {
     u('main.balances', address, (balances = []) => {
-      const existingBalances = balances.filter(b => {
-        return newBalances.every(bal => bal.chainId !== b.chainId || bal.address !== b.address)
+      const existingBalances = balances.filter((b) => {
+        return newBalances.every((bal) => bal.chainId !== b.chainId || bal.address !== b.address)
       })
 
       // TODO: possibly add an option to filter out zero balances
       //const withoutZeroBalances = Object.entries(updatedBalances)
-        //.filter(([address, balanceObj]) => !(new BigNumber(balanceObj.balance)).isZero())
+      //.filter(([address, balanceObj]) => !(new BigNumber(balanceObj.balance)).isZero())
       return [...existingBalances, ...newBalances]
     })
   },
@@ -504,8 +502,9 @@ module.exports = {
       const key = address.toLowerCase()
 
       for (const accountAddress in balances) {
-        const balanceIndex = balances[accountAddress]
-          .findIndex(balance => balance.chainId === chainId && balance.address.toLowerCase() === key)
+        const balanceIndex = balances[accountAddress].findIndex(
+          (balance) => balance.chainId === chainId && balance.address.toLowerCase() === key
+        )
 
         if (balanceIndex > -1) {
           balances[accountAddress].splice(balanceIndex, 1)
@@ -525,38 +524,38 @@ module.exports = {
     }
   },
   omitToken: (u, address, omitToken) => {
-    u('main.accounts', address, 'tokens.omit', omit => {
+    u('main.accounts', address, 'tokens.omit', (omit) => {
       omit = omit || []
       if (omit.indexOf(omitToken) === -1) omit.push(omitToken)
       return omit
     })
   },
   addCustomTokens: (u, tokens) => {
-    u('main.tokens.custom', existing => {
+    u('main.tokens.custom', (existing) => {
       // remove any tokens that have been overwritten by one with
       // the same address and chain ID
-      const existingTokens = existing.filter(token => !includesToken(tokens, token))
-      const tokensToAdd = tokens.map(t => ({ ...t, address: t.address.toLowerCase() }))
+      const existingTokens = existing.filter((token) => !includesToken(tokens, token))
+      const tokensToAdd = tokens.map((t) => ({ ...t, address: t.address.toLowerCase() }))
 
       return [...existingTokens, ...tokensToAdd]
     })
   },
   removeCustomTokens: (u, tokens) => {
-    u('main.tokens.custom', existing => {
-      return existing.filter(token => !includesToken(tokens, token))
+    u('main.tokens.custom', (existing) => {
+      return existing.filter((token) => !includesToken(tokens, token))
     })
   },
   addKnownTokens: (u, address, tokens) => {
     u('main.tokens.known', address, (existing = []) => {
-      const existingTokens = existing.filter(token => !includesToken(tokens, token))
-      const tokensToAdd = tokens.map(t => ({ ...t, address: t.address.toLowerCase() }))
+      const existingTokens = existing.filter((token) => !includesToken(tokens, token))
+      const tokensToAdd = tokens.map((t) => ({ ...t, address: t.address.toLowerCase() }))
 
       return [...existingTokens, ...tokensToAdd]
     })
   },
   removeKnownTokens: (u, address, tokens) => {
     u('main.tokens.known', address, (existing = []) => {
-      return existing.filter(token => !includesToken(tokens, token))
+      return existing.filter((token) => !includesToken(tokens, token))
     })
   },
   setColorway: (u, colorway) => {
@@ -570,17 +569,17 @@ module.exports = {
   //   u('dash.type', () => type)
   // },
   toggleDash: (u, force) => {
-    u('dash.showing', s => force === 'hide' ? false : force === 'show' ? true : !s)
+    u('dash.showing', (s) => (force === 'hide' ? false : force === 'show' ? true : !s))
   },
   closeDash: (u) => {
     u('dash.showing', () => false)
   },
   setDash: (u, update) => {
-    u('dash', dash => Object.assign(dash, update))
+    u('dash', (dash) => Object.assign(dash, update))
   },
   navPanel: (u, navItem) => {
-    u('panel.nav', nav => {
-      if (JSON.stringify(nav[0]) !== JSON.stringify(navItem)) nav.unshift(navItem)      
+    u('panel.nav', (nav) => {
+      if (JSON.stringify(nav[0]) !== JSON.stringify(navItem)) nav.unshift(navItem)
       return nav
     })
     u('panel.showing', () => true)
@@ -589,14 +588,14 @@ module.exports = {
     u('panel.nav', () => [])
   },
   backPanel: (u) => {
-    u('panel.nav', nav => {
+    u('panel.nav', (nav) => {
       nav.shift()
       return nav
     })
   },
   backPanelReqView: (u, handlerId) => {
-    u('panel.nav', nav => {
-      const newNav = nav.filter(navItem => {
+    u('panel.nav', (nav) => {
+      const newNav = nav.filter((navItem) => {
         const item = navItem || {}
         return !item?.data?.req?.handlerId === handlerId
       })
@@ -604,14 +603,14 @@ module.exports = {
     })
   },
   navDash: (u, navItem) => {
-    u('dash.nav', nav => {
-      if (JSON.stringify(nav[0]) !== JSON.stringify(navItem)) nav.unshift(navItem)      
+    u('dash.nav', (nav) => {
+      if (JSON.stringify(nav[0]) !== JSON.stringify(navItem)) nav.unshift(navItem)
       return nav
     })
     u('dash.showing', () => true)
   },
   backDash: (u) => {
-    u('dash.nav', nav => {
+    u('dash.nav', (nav) => {
       nav.shift()
       return nav
     })
@@ -626,7 +625,7 @@ module.exports = {
   },
   // Dapp Frame
   appDapp: (u, dapp) => {
-    u('main.dapps', dapps => {
+    u('main.dapps', (dapps) => {
       if (dapps && !dapps[dapp.id]) {
         dapps[dapp.id] = dapp
       }
@@ -634,7 +633,7 @@ module.exports = {
     })
   },
   updateDapp: (u, dappId, update) => {
-    u('main.dapps', dapps => {
+    u('main.dapps', (dapps) => {
       if (dapps && dapps[dappId]) {
         dapps[dappId] = Object.assign({}, dapps[dappId], update)
       }
@@ -645,10 +644,10 @@ module.exports = {
     u('main.frames', frame.id, () => frame)
   },
   updateFrame: (u, frameId, update) => {
-    u('main.frames', frameId, frame => Object.assign({}, frame, update))
+    u('main.frames', frameId, (frame) => Object.assign({}, frame, update))
   },
   removeFrame: (u, frameId) => {
-    u('main.frames', frames => {
+    u('main.frames', (frames) => {
       delete frames[frameId]
       return frames
     })
@@ -658,9 +657,9 @@ module.exports = {
   },
   addFrameView: (u, frameId, view) => {
     if (frameId && view) {
-      u('main.frames', frameId, frame => {
+      u('main.frames', frameId, (frame) => {
         let existing
-        Object.keys(frame.views).some(viewId => {
+        Object.keys(frame.views).some((viewId) => {
           if (frame.views[viewId].dappId === view.dappId) {
             existing = viewId
             return true
@@ -681,16 +680,16 @@ module.exports = {
   },
   setCurrentFrameView: (u, frameId, viewId) => {
     if (frameId) {
-      u('main.frames', frameId, frame => {
+      u('main.frames', frameId, (frame) => {
         frame.currentView = viewId
         return frame
       })
     }
   },
   updateFrameView: (u, frameId, viewId, update) => {
-    u('main.frames', frameId, 'views', views => {
+    u('main.frames', frameId, 'views', (views) => {
       if ((update.show && views[viewId].ready) || (update.ready && views[viewId].show)) {
-        Object.keys(views).forEach(id => {
+        Object.keys(views).forEach((id) => {
           if (id !== viewId) views[id].show = false
         })
       }
@@ -699,18 +698,18 @@ module.exports = {
     })
   },
   removeFrameView: (u, frameId, viewId) => {
-    u('main.frames', frameId, 'views', views => {
+    u('main.frames', frameId, 'views', (views) => {
       delete views[viewId]
       return views
     })
   },
-  unsetAccount: u => {
-    u('selected.minimized', _ => true)
-    u('selected.open', _ => false)
-    u('selected.view', _ => 'default')
-    u('selected.showAccounts', _ => false)
-    setTimeout(_ => {
-      u('selected', signer => {
+  unsetAccount: (u) => {
+    u('selected.minimized', (_) => true)
+    u('selected.open', (_) => false)
+    u('selected.view', (_) => 'default')
+    u('selected.showAccounts', (_) => false)
+    setTimeout((_) => {
+      u('selected', (signer) => {
         signer.last = signer.current
         signer.current = ''
         signer.requests = {}
@@ -718,7 +717,7 @@ module.exports = {
         return signer
       })
     }, 320)
-  }
+  },
   // toggleUSDValue: (u) => {
   //   u('main.showUSDValue', show => !show)
   // }

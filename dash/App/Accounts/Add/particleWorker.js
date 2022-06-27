@@ -5,14 +5,14 @@ const particles = []
 const particleCount = 56
 
 class Particle {
-  constructor () {
+  constructor() {
     this.x = canvas.width * Math.random()
     this.y = canvas.height * Math.random()
     this.vx = Math.random() - 1
     this.vy = Math.random() - 1
   }
 
-  update () {
+  update() {
     this.x += this.vx
     this.y += this.vy
     if (this.x < 0 || this.x > canvas.width) this.vx = -this.vx
@@ -30,7 +30,7 @@ const loop = () => {
   }, 1000 / 20)
 }
 
-self.onmessage = e => {
+self.onmessage = (e) => {
   if (e.data.type === 'init') {
     canvas = e.data.canvas
     ctx = canvas.getContext('2d')

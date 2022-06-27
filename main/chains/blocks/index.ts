@@ -4,38 +4,38 @@ import log from 'electron-log'
 import type { BigNumber } from 'bignumber.js'
 
 interface Connection {
-  send (payload: JSONRPCRequestPayload): Promise<any>,
-  on: (event: string, handler: any) => void,
-  off: (event: string, handler: any) => void,
+  send(payload: JSONRPCRequestPayload): Promise<any>
+  on: (event: string, handler: any) => void
+  off: (event: string, handler: any) => void
   chainId: string
 }
 
 interface SubscriptionMessage {
-  type: 'eth_subscription',
+  type: 'eth_subscription'
   data: {
-    subscription: string,
+    subscription: string
     result: Block
   }
 }
 
 interface Block {
-  number: string,
-  hash: string | null,
-  parentHash: string,
-  nonce: string | null,
-  sha3Uncles: string,
-  logsBloom: string | null,
-  transactionsRoot: string,
-  stateRoot: string,
-  miner: string,
-  difficulty: BigNumber,
-  totalDifficulty: BigNumber,
-  extraData: string,
-  size: number,
-  gasLimit: number,
-  gasUsed: number,
-  timestamp: number,
-  uncles: string[],
+  number: string
+  hash: string | null
+  parentHash: string
+  nonce: string | null
+  sha3Uncles: string
+  logsBloom: string | null
+  transactionsRoot: string
+  stateRoot: string
+  miner: string
+  difficulty: BigNumber
+  totalDifficulty: BigNumber
+  extraData: string
+  size: number
+  gasLimit: number
+  gasUsed: number
+  timestamp: number
+  uncles: string[]
 }
 
 class BlockMonitor extends EventEmitter {
@@ -45,7 +45,7 @@ class BlockMonitor extends EventEmitter {
 
   latestBlock: string
 
-  constructor (connection: Connection) {
+  constructor(connection: Connection) {
     super()
 
     this.start = this.start.bind(this)
@@ -63,23 +63,24 @@ class BlockMonitor extends EventEmitter {
     this.connection.on('close', this.stop)
   }
 
-  start () {
+  start() {
     this.connection.on('message', this.handleMessage)
 
     // load the latest block first on connect, then start checking for new blocks
     this.getLatestBlock()
 
-    this.connection.send({ id: 1, jsonrpc: '2.0', method: 'eth_subscribe', params: ['newHeads'] })
-      .then(subId => this.subscriptionId = subId)
-      .catch(err => {
+    this.connection
+      .send({ id: 1, jsonrpc: '2.0', method: 'eth_subscribe', params: ['newHeads'] })
+      .then((subId) => (this.subscriptionId = subId))
+      .catch((err) => {
         // subscriptions are not supported, poll for block changes instead
         this._clearSubscription()
-        
+
         this.poller = setInterval(this.getLatestBlock, 15 * 1000)
       })
   }
 
-  stop () {
+  stop() {
     if (this.subscriptionId) {
       this._clearSubscription()
     }
@@ -89,32 +90,32 @@ class BlockMonitor extends EventEmitter {
     }
   }
 
-  _clearSubscription () {
+  _clearSubscription() {
     this.connection.off('message', this.handleMessage)
     this.subscriptionId = ''
   }
 
-  _stopPoller () {
+  _stopPoller() {
     clearInterval(<NodeJS.Timeout>this.poller)
     this.poller = undefined
   }
 
-  getLatestBlock () {
+  getLatestBlock() {
     this.connection
       .send({ id: 1, jsonrpc: '2.0', method: 'eth_getBlockByNumber', params: ['latest', false] })
       .then(this.handleBlock)
-      .catch(err => {
+      .catch((err) => {
         log.error(`Could not load block for chain ${this.connection.chainId}`, err)
       })
   }
 
-  handleMessage (message: SubscriptionMessage) {
+  handleMessage(message: SubscriptionMessage) {
     if (message.type === 'eth_subscription' && message.data.subscription === this.subscriptionId) {
       this.handleBlock(message.data.result)
     }
   }
 
-  handleBlock (block: Block) {
+  handleBlock(block: Block) {
     if (!block) return log.error('handleBlock received undefined block')
     if (block.number !== this.latestBlock) {
       this.latestBlock = block.number

@@ -3,14 +3,16 @@ import log from 'electron-log'
 
 jest.mock('eth-provider', () => () => ({ connected: true }))
 
-jest.mock('../../../../main/nebula', () => jest.fn(() => ({
-  resolve: async () => ({ record: {} }),
-  ipfs: {
-    getJson: async () => ({
-      tokens: [{ name: 'another-token', chainId: 299, address: '0x9999' }]
-    })
-  }
-})))
+jest.mock('../../../../main/nebula', () =>
+  jest.fn(() => ({
+    resolve: async () => ({ record: {} }),
+    ipfs: {
+      getJson: async () => ({
+        tokens: [{ name: 'another-token', chainId: 299, address: '0x9999' }],
+      }),
+    },
+  }))
+)
 
 beforeAll(() => {
   log.transports.console.level = false

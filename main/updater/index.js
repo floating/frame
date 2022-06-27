@@ -23,13 +23,14 @@ const prereleaseTrack = true
 autoUpdater.allowPrerelease = prereleaseTrack
 autoUpdater.autoDownload = false
 
-autoUpdater.on('error', err => {
+autoUpdater.on('error', (err) => {
   // TODO: Error Notification
   log.error(' > Auto Update Error: ' + err.message)
   updater.checkManualUpdate()
 })
 
-autoUpdater.on('update-available', (r) => { //  Ask if they want to download it
+autoUpdater.on('update-available', (r) => {
+  //  Ask if they want to download it
   log.info(' > autoUpdated found that an update is available...')
   updater.updateAvailable(r.version, 'auto')
 })
@@ -39,7 +40,7 @@ autoUpdater.on('update-not-available', () => {
   updater.checkManualUpdate()
 })
 
-autoUpdater.on('update-downloaded', res => {
+autoUpdater.on('update-downloaded', (res) => {
   if (!updater.updatePending) updater.updateReady()
   updater.updatePending = true
 })
@@ -48,14 +49,16 @@ const updater = {
   updatePending: false,
   availableUpdate: '',
   availableVersion: '',
-  updateAvailable: (version, location) => { // An update is available
+  updateAvailable: (version, location) => {
+    // An update is available
     this.availableVersion = version
     this.availableUpdate = location
     const remindOk = store('main.updater.dontRemind').indexOf(version) === -1
     if (!updater.notified[version] && remindOk) windows.broadcast('main:action', 'updateBadge', 'updateAvailable')
     updater.notified[version] = true
   },
-  updateReady: () => { // An update is ready
+  updateReady: () => {
+    // An update is ready
     windows.broadcast('main:action', 'updateBadge', 'updateReady')
   },
   installAvailableUpdate: (install, dontRemind) => {
@@ -75,25 +78,32 @@ const updater = {
   },
   notified: {},
   checkManualUpdate: () => {
-    https.get(options, res => {
-      let rawData = ''
-      res.on('data', chunk => { rawData += chunk })
-      res.on('end', () => {
-        try {
-          const releases = JSON.parse(rawData).filter(r => (!r.prerelease || prereleaseTrack))
-          if (releases && releases[0] && releases[0].tag_name && !updater.notified[releases[0].tag_name]) {
-            const newVersion = releases[0].tag_name.charAt(0) === 'v' ? releases[0].tag_name.substr(1) : releases[0].tag_name
-            if (compareVersions(newVersion, version) === 1) {
-              log.info('Updater: Current version is behind latest')
-              log.info('Updater: User has not been notified of this version yet')
-              log.info('Updater: Notify user')
-              updater.updateAvailable(releases[0].tag_name, releases[0].html_url)
+    https
+      .get(options, (res) => {
+        let rawData = ''
+        res.on('data', (chunk) => {
+          rawData += chunk
+        })
+        res.on('end', () => {
+          try {
+            const releases = JSON.parse(rawData).filter((r) => !r.prerelease || prereleaseTrack)
+            if (releases && releases[0] && releases[0].tag_name && !updater.notified[releases[0].tag_name]) {
+              const newVersion =
+                releases[0].tag_name.charAt(0) === 'v' ? releases[0].tag_name.substr(1) : releases[0].tag_name
+              if (compareVersions(newVersion, version) === 1) {
+                log.info('Updater: Current version is behind latest')
+                log.info('Updater: User has not been notified of this version yet')
+                log.info('Updater: Notify user')
+                updater.updateAvailable(releases[0].tag_name, releases[0].html_url)
+              }
             }
+          } catch (err) {
+            checkErr(err)
           }
-        } catch (err) { checkErr(err) }
+        })
       })
-    }).on('error', checkErr)
-  }
+      .on('error', checkErr)
+  },
 }
 
 if (!dev) {

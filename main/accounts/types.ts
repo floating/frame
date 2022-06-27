@@ -5,12 +5,12 @@ import type { TransactionData } from '../../resources/domain/transaction'
 
 export enum ReplacementType {
   Speed = 'speed',
-  Cancel = 'cancel'
+  Cancel = 'cancel',
 }
 
 export enum RequestMode {
   Normal = 'normal',
-  Monitor = 'monitor'
+  Monitor = 'monitor',
 }
 
 export enum RequestStatus {
@@ -21,60 +21,60 @@ export enum RequestStatus {
   Confirmed = 'confirmed',
   Declined = 'declined',
   Error = 'error',
-  Success = 'success'
+  Success = 'success',
 }
 
 type RequestType = 'sign' | 'signTypedData' | 'transaction' | 'access' | 'addChain' | 'switchChain' | 'addToken'
 
 export interface AccountRequest {
-  type: RequestType,
-  origin: string,
-  payload: JSONRPCRequestPayload,
-  handlerId: string,
-  account: string,
-  status?: RequestStatus,
-  mode?: RequestMode,
-  notice?: string,
-  created?: number,
+  type: RequestType
+  origin: string
+  payload: JSONRPCRequestPayload
+  handlerId: string
+  account: string
+  status?: RequestStatus
+  mode?: RequestMode
+  notice?: string
+  created?: number
   res?: (response?: RPCResponsePayload) => void
 }
 
 export interface TransactionReceipt {
-  gasUsed: string,
+  gasUsed: string
   blockNumber: string
 }
 
 export interface Approval {
-  type: string,
-  data: any,
-  approved: boolean,
+  type: string
+  data: any
+  approved: boolean
   approve: (data: any) => void
 }
 
 export interface TransactionRequest extends Omit<AccountRequest, 'type'> {
-  type: 'transaction',
-  payload: RPC.SendTransaction.Request,
-  data: TransactionData,
-  decodedData?: DecodedCallData,
+  type: 'transaction'
+  payload: RPC.SendTransaction.Request
+  data: TransactionData
+  decodedData?: DecodedCallData
   tx?: {
-    receipt?: TransactionReceipt,
-    hash?: string,
+    receipt?: TransactionReceipt
+    hash?: string
     confirmations: number
-  },
-  approvals: Approval[],
-  locked?: boolean,
+  }
+  approvals: Approval[]
+  locked?: boolean
   automaticFeeUpdateNotice?: {
-    previousFee: any,
-  },
-  recipient?: string, // ens name
-  updatedFees?: boolean,
-  feeAtTime?: string,
-  completed?: number,
+    previousFee: any
+  }
+  recipient?: string // ens name
+  updatedFees?: boolean
+  feeAtTime?: string
+  completed?: number
   feesUpdatedByUser: boolean
 }
 
 export interface SignTypedDataRequest extends Omit<AccountRequest, 'type'> {
-  type: 'signTypedData',
+  type: 'signTypedData'
   version: Version
 }
 
@@ -83,11 +83,11 @@ export interface AccessRequest extends Omit<AccountRequest, 'type'> {
 }
 
 export interface AddChainRequest extends Omit<AccountRequest, 'type'> {
-  type: 'addChain',
+  type: 'addChain'
   chain: Chain
 }
 
 export interface AddTokenRequest extends Omit<AccountRequest, 'type'> {
-  type: 'addToken',
+  type: 'addToken'
   token: Token
 }

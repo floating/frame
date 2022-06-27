@@ -8,14 +8,13 @@ import TxDataOverlay from './TxDataOverlay'
 import TxFeeOverlay from './TxFeeOverlay'
 
 class TxModule extends React.Component {
-  constructor (props, context) {
+  constructor(props, context) {
     super(props, context)
     this.moduleRef = React.createRef()
     this.state = {
-      active: false
+      active: false,
     }
   }
-
 
   // setActive (active) {
   //   if (!this.props.req || !this.props.req.data || !this.props.req.data.data) return
@@ -32,8 +31,7 @@ class TxModule extends React.Component {
   //   }
   // }
 
-
-  render () {
+  render() {
     const { overlay } = this.props
     if (overlay === 'fee') {
       return <TxFeeOverlay {...this.props} />

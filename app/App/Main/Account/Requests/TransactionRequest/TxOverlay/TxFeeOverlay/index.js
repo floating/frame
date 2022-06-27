@@ -8,7 +8,7 @@ import { usesBaseFee } from '../../../../../../../../resources/domain/transactio
 
 import BigNumber from 'bignumber.js'
 
-function maxFee (tx = { chainId: '' }) {
+function maxFee(tx = { chainId: '' }) {
   const chainId = parseInt(tx.chainId)
 
   // for ETH-based chains, the max fee should be 2 ETH
@@ -27,22 +27,22 @@ function maxFee (tx = { chainId: '' }) {
 
 //  <div className='txModuleTop'>
 // <div className={'txModuleTopData txModuleTopDataExpanded'}>
-  // <div className='transactionDataNotice'>{svg.octicon('issue-opened', { height: 26 })}</div>
-  // <div className='transactionDataLabel'>View Data</div>
-  // <div className='transactionDataIndicator' onMouseDown={() => this.copyData(req.data.data)}>
-    // {svg.octicon('clippy', { height: 20 })}
-  // </div>
-// </div> 
+// <div className='transactionDataNotice'>{svg.octicon('issue-opened', { height: 26 })}</div>
+// <div className='transactionDataLabel'>View Data</div>
+// <div className='transactionDataIndicator' onMouseDown={() => this.copyData(req.data.data)}>
+// {svg.octicon('clippy', { height: 20 })}
+// </div>
+// </div>
 // <div className='txModuleBody'>
 
 class TxFeeOverlay extends React.Component {
-  constructor (props, context) {
+  constructor(props, context) {
     super(props, context)
 
     this.moduleRef = React.createRef()
 
     this.state = {
-      copiedData: false
+      copiedData: false,
     }
 
     if (usesBaseFee(props.req.data)) {
@@ -61,45 +61,45 @@ class TxFeeOverlay extends React.Component {
     this.state.gasLimit = BigNumber(props.req.data.gasLimit, 16).toString()
   }
 
-  mouseDetect (e) {
+  mouseDetect(e) {
     if (this.moduleRef && this.moduleRef.current && !this.moduleRef.current.contains(e.target)) {
       this.props.overlayMode()
     }
   }
 
-  componentDidMount () {
+  componentDidMount() {
     document.addEventListener('mousedown', this.mouseDetect.bind(this))
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     document.removeEventListener('mousedown', this.mouseDetect.bind(this))
   }
 
-  copyData (data) {
+  copyData(data) {
     if (data) {
       link.send('tray:clipboardData', data)
       this.setState({ copiedData: true })
-      setTimeout(_ => this.setState({ copiedData: false }), 1000)
+      setTimeout((_) => this.setState({ copiedData: false }), 1000)
     }
   }
 
-  toDisplayEther (bn) {
+  toDisplayEther(bn) {
     return parseFloat(bn.shiftedBy(-18).toFixed(6).toString())
   }
 
-  toDisplayFromWei (bn) {
-    return bn.shiftedBy(-9).toFixed(9).toString().replace(/0+$/,'').replace(/\.+$/,'')
+  toDisplayFromWei(bn) {
+    return bn.shiftedBy(-9).toFixed(9).toString().replace(/0+$/, '').replace(/\.+$/, '')
   }
 
-  toDisplayFromGwei (bn) {
-    return bn.toFixed(9).toString().replace(/0+$/,'').replace(/\.+$/,'')
+  toDisplayFromGwei(bn) {
+    return bn.toFixed(9).toString().replace(/0+$/, '').replace(/\.+$/, '')
   }
 
-  trimGwei (gwei) {
+  trimGwei(gwei) {
     return parseFloat(parseFloat(gwei).toFixed(3)).toString()
   }
 
-  setBaseFee (baseFee) {
+  setBaseFee(baseFee) {
     this.setState({ baseFee })
     clearTimeout(this.baseFeeSubmitTimeout)
     this.baseFeeSubmitTimeout = setTimeout(() => {
@@ -109,18 +109,18 @@ class TxFeeOverlay extends React.Component {
       const priorityFee = parseFloat(this.state.priorityFee)
       const gasLimit = parseInt(this.state.gasLimit)
       const maxTotalFee = maxFee(this.props.req.data)
-      
+
       if (gweiToWei(baseFee + priorityFee) * gasLimit > maxTotalFee) {
         baseFee = Math.floor(maxTotalFee / gasLimit / 1e9) - priorityFee
       }
-      link.rpc('setBaseFee', gweiToWeiHex(baseFee), this.props.req.handlerId, e => {
+      link.rpc('setBaseFee', gweiToWeiHex(baseFee), this.props.req.handlerId, (e) => {
         if (e) console.error(e)
       })
       this.setState({ baseFee: this.toDisplayFromGwei(BigNumber(baseFee)) })
     }, 500)
   }
 
-  setPriorityFee (priorityFee) {
+  setPriorityFee(priorityFee) {
     this.setState({ priorityFee })
     clearTimeout(this.priorityFeeSubmitTimeout)
     this.priorityFeeSubmitTimeout = setTimeout(() => {
@@ -134,16 +134,18 @@ class TxFeeOverlay extends React.Component {
       if (gweiToWei(baseFee + priorityFee) * gasLimit > maxTotalFee) {
         priorityFee = Math.floor(maxTotalFee / gasLimit / 1e9) - baseFee
       }
-      link.rpc('setPriorityFee', gweiToWeiHex(priorityFee), this.props.req.handlerId, e => {
+      link.rpc('setPriorityFee', gweiToWeiHex(priorityFee), this.props.req.handlerId, (e) => {
         if (e) console.error(e)
       })
-      if (this.toDisplayFromGwei(BigNumber(priorityFee)) !== this.toDisplayFromGwei(BigNumber(this.state.priorityFee))) {
+      if (
+        this.toDisplayFromGwei(BigNumber(priorityFee)) !== this.toDisplayFromGwei(BigNumber(this.state.priorityFee))
+      ) {
         this.setState({ priorityFee: this.toDisplayFromGwei(BigNumber(priorityFee)) })
       }
     }, 500)
   }
 
-  setGasPrice (gasPrice) {
+  setGasPrice(gasPrice) {
     this.setState({ gasPrice })
     clearTimeout(this.gasPriceSubmitTimeout)
     this.gasPriceSubmitTimeout = setTimeout(() => {
@@ -156,14 +158,14 @@ class TxFeeOverlay extends React.Component {
       if (gweiToWei(gasPrice) * gasLimit > maxTotalFee) {
         gasPrice = Math.floor(maxTotalFee / gasLimit / 1e9)
       }
-      link.rpc('setGasPrice', gweiToWeiHex(gasPrice), this.props.req.handlerId, e => {
+      link.rpc('setGasPrice', gweiToWeiHex(gasPrice), this.props.req.handlerId, (e) => {
         if (e) console.error(e)
       })
       this.setState({ gasPrice: this.toDisplayFromGwei(BigNumber(gasPrice)) })
     }, 500)
   }
 
-  setGasLimit (gasLimit) {
+  setGasLimit(gasLimit) {
     this.setState({ gasLimit })
     clearTimeout(this.gasLimitSubmitTimeout)
     this.gasLimitSubmitTimeout = setTimeout(() => {
@@ -186,28 +188,28 @@ class TxFeeOverlay extends React.Component {
           gasLimit = Math.floor(maxTotalFee / gweiToWei(gasPrice))
         }
       }
-      link.rpc('setGasLimit', '0x' + gasLimit.toString(16), this.props.req.handlerId, e => {
+      link.rpc('setGasLimit', '0x' + gasLimit.toString(16), this.props.req.handlerId, (e) => {
         if (e) console.error(e)
       })
       this.setState({ gasLimit: gasLimit.toString() })
     }, 500)
   }
 
-  limitRange (num, min, max) {
+  limitRange(num, min, max) {
     if (num > max) return max
     if (num < min) return min
     return num
   }
 
-  renderBaseFeeInput () {
+  renderBaseFeeInput() {
     return (
-      <div className='txFeeOverlayBaseFee'>
-        <div className='txFeeOverlayInput'>
+      <div className="txFeeOverlayBaseFee">
+        <div className="txFeeOverlayInput">
           <input
             tabIndex={0}
             value={this.state.baseFee}
             onChange={(e) => {
-              this.setBaseFee(e.target.value.match('[0-9\.\-]*').toString())
+              this.setBaseFee(e.target.value.match('[0-9.-]*').toString())
             }}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
@@ -231,20 +233,20 @@ class TxFeeOverlay extends React.Component {
             }}
           />
         </div>
-        <div className='txFeeOverlayLabel'>Base Fee (GWEI)</div>
+        <div className="txFeeOverlayLabel">Base Fee (GWEI)</div>
       </div>
     )
   }
 
-  renderPriorityFeeInput () {
+  renderPriorityFeeInput() {
     return (
-      <div className='txFeeOverlayPriorityFee'>
-        <div className='txFeeOverlayInput'>
-        <input
+      <div className="txFeeOverlayPriorityFee">
+        <div className="txFeeOverlayInput">
+          <input
             tabIndex={1}
             value={this.state.priorityFee}
             onChange={(e) => {
-              this.setPriorityFee(e.target.value.match('[0-9\.\-]*'))
+              this.setPriorityFee(e.target.value.match('[0-9.-]*'))
             }}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
@@ -268,20 +270,20 @@ class TxFeeOverlay extends React.Component {
             }}
           />
         </div>
-        <div className='txFeeOverlayLabel'>Max Priority Fee (GWEI) </div>
+        <div className="txFeeOverlayLabel">Max Priority Fee (GWEI) </div>
       </div>
     )
   }
 
-  renderGasPriceInput () {
+  renderGasPriceInput() {
     return (
-      <div className='txFeeOverlayBaseFee'>
-        <div className='txFeeOverlayInput'>
+      <div className="txFeeOverlayBaseFee">
+        <div className="txFeeOverlayInput">
           <input
             tabIndex={0}
             value={this.state.gasPrice}
             onChange={(e) => {
-              this.setGasPrice(e.target.value.match('[0-9\.\-]*').toString())
+              this.setGasPrice(e.target.value.match('[0-9.-]*').toString())
             }}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
@@ -305,19 +307,19 @@ class TxFeeOverlay extends React.Component {
             }}
           />
         </div>
-        <div className='txFeeOverlayLabel'>Gas Price (GWEI)</div>
+        <div className="txFeeOverlayLabel">Gas Price (GWEI)</div>
       </div>
     )
   }
 
-  renderGasLimitInput () {
+  renderGasLimitInput() {
     return (
-      <div className='txFeeOverlayLimit'>
-        <div className='txFeeOverlayInput'>
-          <input 
-            tabIndex={3} 
+      <div className="txFeeOverlayLimit">
+        <div className="txFeeOverlayInput">
+          <input
+            tabIndex={3}
             value={this.state.gasLimit}
-            className='txFeeOverlayInput' 
+            className="txFeeOverlayInput"
             onChange={(e) => {
               this.setGasLimit(e.target.value.match('[0-9]*'))
             }}
@@ -339,12 +341,12 @@ class TxFeeOverlay extends React.Component {
             }}
           />
         </div>
-        <div className='txFeeOverlayLabel'>Gas Limit (UNITS)</div>
+        <div className="txFeeOverlayLabel">Gas Limit (UNITS)</div>
       </div>
     )
   }
 
-  render () {
+  render() {
     const { req, overlayMode } = this.props
     if (usesBaseFee(req.data)) {
       // const baseFee = BigNumber(this.state.maxFeePerGas, 16)
@@ -354,12 +356,14 @@ class TxFeeOverlay extends React.Component {
       // maxFee = maxFeePerGas.multipliedBy(gasLimit)
       // maxFeeUSD = maxFee.multipliedBy(nativeUSD)
       return (
-        <div className='txOverlay cardShow' ref={this.moduleRef}>
-          <div className='txOverlayTitle'>Adjust Fee</div>
-          <div className='txOverlayClose' onMouseDown={() => overlayMode()}>{svg.octicon('x', { height: 16 })}</div>
-          <div className='txFeeOverlay'>
-            <div className='txFeeOverlayInset'>
-              <div className='txFeeOverlayEstimate'></div>
+        <div className="txOverlay cardShow" ref={this.moduleRef}>
+          <div className="txOverlayTitle">Adjust Fee</div>
+          <div className="txOverlayClose" onMouseDown={() => overlayMode()}>
+            {svg.octicon('x', { height: 16 })}
+          </div>
+          <div className="txFeeOverlay">
+            <div className="txFeeOverlayInset">
+              <div className="txFeeOverlayEstimate"></div>
               {this.renderBaseFeeInput()}
               {this.renderPriorityFeeInput()}
               {this.renderGasLimitInput()}
@@ -373,12 +377,14 @@ class TxFeeOverlay extends React.Component {
       // maxFee = maxFeePerGas.multipliedBy(gasLimit)
       // maxFeeUSD = maxFee.shiftedBy(-18).multipliedBy(nativeUSD)
       return (
-        <div className='txOverlay cardShow' ref={this.moduleRef}>
-          <div className='txOverlayTitle'>Adjust Fee</div>
-          <div className='txOverlayClose' onMouseDown={() => overlayMode()}>{svg.octicon('x', { height: 16 })}</div>
-          <div className='txFeeOverlay'>
-            <div className='txFeeOverlayInset'>
-              <div className='txFeeOverlayEstimate'></div>
+        <div className="txOverlay cardShow" ref={this.moduleRef}>
+          <div className="txOverlayTitle">Adjust Fee</div>
+          <div className="txOverlayClose" onMouseDown={() => overlayMode()}>
+            {svg.octicon('x', { height: 16 })}
+          </div>
+          <div className="txFeeOverlay">
+            <div className="txFeeOverlayInset">
+              <div className="txFeeOverlayEstimate"></div>
               {this.renderGasPriceInput()}
               {this.renderGasLimitInput()}
             </div>

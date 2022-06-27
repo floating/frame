@@ -15,7 +15,12 @@ const user = userEvent.setup()
 
 it('should display the expected chain ID', async () => {
   const { getByRole } = render(
-    <AddToken activeChains={[{ id: 1, name: 'Mainnet', connection: { primary: { connected: true } } }, { id: 137, name: 'Polygon', connection: { primary: { connected: true } } }]} />
+    <AddToken
+      activeChains={[
+        { id: 1, name: 'Mainnet', connection: { primary: { connected: true } } },
+        { id: 137, name: 'Polygon', connection: { primary: { connected: true } } },
+      ]}
+    />
   )
 
   const tokenChainName = getByRole('option', { selected: true }).textContent
@@ -24,7 +29,12 @@ it('should display the expected chain ID', async () => {
 
 it('should generate the expected HTML', async () => {
   const { asFragment } = render(
-    <AddToken activeChains={[{ id: 1, name: 'Mainnet', connection: { primary: { connected: true } } }, { id: 137, name: 'Polygon', connection: { primary: { connected: true } } }]} />
+    <AddToken
+      activeChains={[
+        { id: 1, name: 'Mainnet', connection: { primary: { connected: true } } },
+        { id: 137, name: 'Polygon', connection: { primary: { connected: true } } },
+      ]}
+    />
   )
 
   expect(asFragment()).toMatchSnapshot()
@@ -33,14 +43,22 @@ it('should generate the expected HTML', async () => {
 describe('token metadata lookup', () => {
   beforeEach(() => {
     link.invoke.mockImplementation((channel, contractAddress, chainId) => {
-      const tokenData = chainId === 1 ? { name: 'Frame Test', symbol: 'FRT', decimals: '18' } : { name: 'Frame Test on Polygon', symbol: 'mFRT', decimals: '18' }
+      const tokenData =
+        chainId === 1
+          ? { name: 'Frame Test', symbol: 'FRT', decimals: '18' }
+          : { name: 'Frame Test on Polygon', symbol: 'mFRT', decimals: '18' }
       return Promise.resolve(tokenData)
     })
   })
 
   it('should perform a lookup on a contract address and display the expected token data', async () => {
     const { getByLabelText, getByRole } = render(
-      <AddToken activeChains={[{ id: 1, name: 'Mainnet', connection: { primary: { connected: true } } }, { id: 137, name: 'Polygon', connection: { primary: { connected: true } } }]} />
+      <AddToken
+        activeChains={[
+          { id: 1, name: 'Mainnet', connection: { primary: { connected: true } } },
+          { id: 137, name: 'Polygon', connection: { primary: { connected: true } } },
+        ]}
+      />
     )
 
     const contractAddressInput = getByLabelText('Contract Address')
@@ -63,7 +81,12 @@ describe('token metadata lookup', () => {
   describe('when the chain id is changed', () => {
     it('should perform a lookup and display the expected token data', async () => {
       const { getByLabelText, getByRole } = render(
-        <AddToken activeChains={[{ id: 1, name: 'Mainnet', connection: { primary: { connected: true } } }, { id: 137, name: 'Polygon', connection: { primary: { connected: true } } }]} />
+        <AddToken
+          activeChains={[
+            { id: 1, name: 'Mainnet', connection: { primary: { connected: true } } },
+            { id: 137, name: 'Polygon', connection: { primary: { connected: true } } },
+          ]}
+        />
       )
 
       const tokenContractAddressInput = getByLabelText('Contract Address')
@@ -76,10 +99,7 @@ describe('token metadata lookup', () => {
 
       expect(tokenChainSelect.textContent).toEqual('Mainnet')
 
-      await userEvent.selectOptions(
-        getByRole('listbox'),
-        getByRole('option', { name: 'Polygon' }),
-      )
+      await userEvent.selectOptions(getByRole('listbox'), getByRole('option', { name: 'Polygon' }))
       tokenChainSelect = getByRole('option', { selected: true })
 
       await waitFor(() => {

@@ -6,7 +6,7 @@ import svg from '../../../../../resources/svg'
 import RingIcon from '../../../../../resources/Components/RingIcon'
 
 class AddPhrase extends React.Component {
-  constructor (...args) {
+  constructor(...args) {
     super(...args)
     this.state = {
       index: 0,
@@ -14,15 +14,15 @@ class AddPhrase extends React.Component {
       address: '',
       password: '',
       status: '',
-      error: false
+      error: false,
     }
     this.forms = [React.createRef(), React.createRef()]
   }
 
-  onChange (key, e) {
+  onChange(key, e) {
     e.preventDefault()
     const update = {}
-    const value = (e.target.value || '')
+    const value = e.target.value || ''
     // value = value === ' ' ? '' : value
     // value = value.replace(/[ \t]+/g, '_')
     // value = value.replace(/\W/g, '')
@@ -32,14 +32,14 @@ class AddPhrase extends React.Component {
     this.setState(update)
   }
 
-  onBlur (key, e) {
+  onBlur(key, e) {
     e.preventDefault()
     const update = {}
     update[key] = this.state[key] || ''
     this.setState(update)
   }
 
-  onFocus (key, e) {
+  onFocus(key, e) {
     e.preventDefault()
     if (this.state[key] === '') {
       const update = {}
@@ -48,12 +48,12 @@ class AddPhrase extends React.Component {
     }
   }
 
-  next () {
+  next() {
     this.setState({ index: ++this.state.index })
     this.focusActive()
   }
 
-  create () {
+  create() {
     this.setState({ index: ++this.state.index })
     link.rpc('createFromAddress', this.state.address, (err, signer) => {
       if (err) {
@@ -64,7 +64,7 @@ class AddPhrase extends React.Component {
     })
   }
 
-  restart () {
+  restart() {
     this.setState({ index: 0, adding: false, address: '', password: '', success: false })
     setTimeout(() => {
       this.setState({ status: '', error: false })
@@ -72,7 +72,7 @@ class AddPhrase extends React.Component {
     this.focusActive()
   }
 
-  keyPress (e) {
+  keyPress(e) {
     if (e.key === 'Enter') {
       e.preventDefault()
       const formInput = this.forms[this.state.index]
@@ -82,59 +82,74 @@ class AddPhrase extends React.Component {
     }
   }
 
-  adding () {
+  adding() {
     this.setState({ adding: true })
     this.focusActive()
   }
 
-  focusActive () {
+  focusActive() {
     setTimeout(() => {
       const formInput = this.forms[this.state.index]
       if (formInput) formInput.current.focus()
     }, 500)
   }
 
-  render () {
+  render() {
     let itemClass = 'addAccountItem addAccountItemSmart addAccountItemAdding'
     return (
-      <div className={itemClass} style={{ transitionDelay: (0.64 * this.props.index / 4) + 's' }}>
-        <div className='addAccountItemBar addAccountItemMock' />
-        <div className='addAccountItemWrap'>
-          <div className='addAccountItemTop'>
-            <div className='addAccountItemTopType'>
-              <div className='addAccountItemIcon'>
+      <div className={itemClass} style={{ transitionDelay: (0.64 * this.props.index) / 4 + 's' }}>
+        <div className="addAccountItemBar addAccountItemMock" />
+        <div className="addAccountItemWrap">
+          <div className="addAccountItemTop">
+            <div className="addAccountItemTopType">
+              <div className="addAccountItemIcon">
                 <RingIcon svgLookup={{ name: 'mask', size: 24 }} />
               </div>
-              <div className='addAccountItemTopTitle'>Watch Account</div>
+              <div className="addAccountItemTopTitle">Watch Account</div>
             </div>
             {/* <div className='addAccountItemClose' onClick={() => this.props.close()}>{'Done'}</div> */}
-            <div className='addAccountItemSummary'>Watch accounts work like normal accounts but cannot sign</div>
+            <div className="addAccountItemSummary">Watch accounts work like normal accounts but cannot sign</div>
           </div>
-          <div className='addAccountItemOption'>
+          <div className="addAccountItemOption">
             <div
-              className='addAccountItemOptionIntro' onClick={() => {
+              className="addAccountItemOptionIntro"
+              onClick={() => {
                 this.adding()
               }}
             >
               Add Address Account
             </div>
-            <div className='addAccountItemOptionSetup' style={{ transform: `translateX(-${100 * this.state.index}%)` }}>
-              <div className='addAccountItemOptionSetupFrames'>
-                <div className='addAccountItemOptionSetupFrame'>
-                  <div className='addAccountItemOptionTitle'>input address</div>
-                  <div className='addAccountItemOptionInputPhrase'>
-                    <textarea tabIndex='-1' value={this.state.address} ref={this.forms[0]} onChange={e => this.onChange('address', e)} onFocus={e => this.onFocus('address', e)} onBlur={e => this.onBlur('address', e)} onKeyPress={e => this.keyPress(e)} />
+            <div className="addAccountItemOptionSetup" style={{ transform: `translateX(-${100 * this.state.index}%)` }}>
+              <div className="addAccountItemOptionSetupFrames">
+                <div className="addAccountItemOptionSetupFrame">
+                  <div className="addAccountItemOptionTitle">input address</div>
+                  <div className="addAccountItemOptionInputPhrase">
+                    <textarea
+                      tabIndex="-1"
+                      value={this.state.address}
+                      ref={this.forms[0]}
+                      onChange={(e) => this.onChange('address', e)}
+                      onFocus={(e) => this.onFocus('address', e)}
+                      onBlur={(e) => this.onBlur('address', e)}
+                      onKeyPress={(e) => this.keyPress(e)}
+                    />
                   </div>
-                  <div className='addAccountItemOptionSubmit' onClick={() => this.create()}>Create</div>
+                  <div className="addAccountItemOptionSubmit" onClick={() => this.create()}>
+                    Create
+                  </div>
                 </div>
-                <div className='addAccountItemOptionSetupFrame'>
-                  <div className='addAccountItemOptionTitle'>{this.state.status}</div>
-                  {this.state.error ? <div className='addAccountItemOptionSubmit' onClick={() => this.restart()}>try again</div> : null}
+                <div className="addAccountItemOptionSetupFrame">
+                  <div className="addAccountItemOptionTitle">{this.state.status}</div>
+                  {this.state.error ? (
+                    <div className="addAccountItemOptionSubmit" onClick={() => this.restart()}>
+                      try again
+                    </div>
+                  ) : null}
                 </div>
               </div>
             </div>
           </div>
-          <div className='addAccountItemFooter' />
+          <div className="addAccountItemFooter" />
         </div>
       </div>
     )

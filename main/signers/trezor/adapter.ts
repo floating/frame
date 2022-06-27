@@ -7,18 +7,18 @@ import Trezor from './Trezor'
 import store from '../../store'
 
 export default class TrezorSignerAdapter extends SignerAdapter {
-  private flexListeners: { [event: string]: (device: TrezorDevice) => void };
-  private knownSigners: { [id: string]: Trezor };
-  private observer: any;
+  private flexListeners: { [event: string]: (device: TrezorDevice) => void }
+  private knownSigners: { [id: string]: Trezor }
+  private observer: any
 
-  constructor () {
+  constructor() {
     super('trezor')
 
     this.flexListeners = {}
     this.knownSigners = {}
   }
 
-  open () {
+  open() {
     const connectListener = (device: TrezorDevice) => {
       const trezor = new Trezor(device)
       trezor.derivation = store('main.trezor.derivation')
@@ -44,7 +44,7 @@ export default class TrezorSignerAdapter extends SignerAdapter {
     const disconnectListener = (device: TrezorDevice) => {
       log.info(`Trezor ${device.id} disconnected`)
 
-      this.withSigner(device, signer => {
+      this.withSigner(device, (signer) => {
         this.remove(signer)
       })
     }
@@ -52,22 +52,21 @@ export default class TrezorSignerAdapter extends SignerAdapter {
     const updateListener = (device: TrezorDevice) => {
       log.debug(`Trezor ${device.id} updated`)
 
-      this.withSigner(device, signer => this.emit('update', signer))
+      this.withSigner(device, (signer) => this.emit('update', signer))
     }
 
     const needPinListener = (device: TrezorDevice) => {
       log.verbose(`Trezor ${device.id} needs pin`)
 
-      this.withSigner(device, signer => {
-        signer.status = 'Need Pin',
-        signer.update()
+      this.withSigner(device, (signer) => {
+        ;(signer.status = 'Need Pin'), signer.update()
       })
     }
 
     const needPhraseListener = (device: TrezorDevice) => {
       log.verbose(`Trezor ${device.id} needs passphrase`)
 
-      this.withSigner(device, signer => {
+      this.withSigner(device, (signer) => {
         signer.status = 'Enter Passphrase'
         signer.update()
       })
@@ -76,7 +75,7 @@ export default class TrezorSignerAdapter extends SignerAdapter {
     const enteringPhraseListener = (device: TrezorDevice) => {
       log.verbose(`Trezor ${device.id} waiting for passphrase entry on device`)
 
-      this.withSigner(device, signer => {
+      this.withSigner(device, (signer) => {
         signer.status = 'waiting for input on device'
         signer.update()
       })
@@ -90,7 +89,7 @@ export default class TrezorSignerAdapter extends SignerAdapter {
       this.observer = store.observer(() => {
         const trezorDerivation = store('main.trezor.derivation')
 
-        Object.values(this.knownSigners).forEach(trezor => {
+        Object.values(this.knownSigners).forEach((trezor) => {
           if (trezor.derivation !== trezorDerivation) {
             trezor.derivation = trezorDerivation
             trezor.reset()
@@ -106,7 +105,7 @@ export default class TrezorSignerAdapter extends SignerAdapter {
         'trezor:needPin': needPinListener,
         'trezor:needPhrase': needPhraseListener,
         'trezor:enteringPhrase': enteringPhraseListener,
-        'trezor:scan': scanListener
+        'trezor:scan': scanListener,
       }
 
       Object.entries(this.flexListeners).forEach(([event, listener]) => flex.on(event, listener))
@@ -119,7 +118,7 @@ export default class TrezorSignerAdapter extends SignerAdapter {
     super.open()
   }
 
-  close () {
+  close() {
     if (this.observer) {
       this.observer.remove()
       this.observer = null
@@ -130,7 +129,7 @@ export default class TrezorSignerAdapter extends SignerAdapter {
     super.close()
   }
 
-  remove (trezor: Trezor) {
+  remove(trezor: Trezor) {
     if (trezor.device.path in this.knownSigners) {
       log.info(`removing Trezor ${trezor.device.id}`)
 
@@ -140,13 +139,13 @@ export default class TrezorSignerAdapter extends SignerAdapter {
     }
   }
 
-  reload (trezor: Trezor) {
+  reload(trezor: Trezor) {
     log.info(`reloading Trezor ${trezor.device.id}`)
 
     trezor.open()
   }
 
-  private withSigner (device: TrezorDevice, fn: (signer: Trezor) => void) {
+  private withSigner(device: TrezorDevice, fn: (signer: Trezor) => void) {
     const signer = this.knownSigners[device.path]
 
     if (signer) fn(signer)

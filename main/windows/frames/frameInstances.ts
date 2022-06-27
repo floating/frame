@@ -1,4 +1,4 @@
-import electron, { BrowserView, BrowserWindow }  from 'electron'
+import electron, { BrowserView, BrowserWindow } from 'electron'
 import path from 'path'
 
 import store from '../../store'
@@ -7,8 +7,8 @@ import webPrefrences from '../webPreferences'
 import topRight from './topRight'
 
 export interface FrameInstance extends BrowserWindow {
-  frameId?: string,
-  views?: Record<string, BrowserView>,
+  frameId?: string
+  views?: Record<string, BrowserView>
   showingView?: string
 }
 
@@ -20,7 +20,7 @@ const place = (frameInstance: FrameInstance) => {
   const width = targetWidth > maxWidth ? maxWidth : targetWidth
   frameInstance.setMinimumSize(400, 300)
   frameInstance.setSize(width, height)
-  const pos = topRight(frameInstance) 
+  const pos = topRight(frameInstance)
   frameInstance.setPosition(pos.x - 400, pos.y + 80)
 }
 
@@ -28,9 +28,9 @@ export default {
   reposition: (frameInstance: FrameInstance) => {
     place(frameInstance)
   },
-  create: (frame: Frame) => {  
+  create: (frame: Frame) => {
     const preload = path.resolve(__dirname, process.env.BUNDLE_LOCATION, 'bridge.js')
-  
+
     const frameInstance: FrameInstance = new BrowserWindow({
       x: 0,
       y: 0,
@@ -44,15 +44,15 @@ export default {
       trafficLightPosition: { x: 10, y: 9 },
       backgroundColor: store('main.colorwayPrimary', store('main.colorway'), 'background'),
       icon: path.join(__dirname, './AppIcon.png'),
-      webPreferences: { ...webPrefrences, preload }
+      webPreferences: { ...webPrefrences, preload },
     })
 
     frameInstance.loadURL(`file://${process.env.BUNDLE_LOCATION}/dapp.html`)
-  
+
     frameInstance.on('ready-to-show', () => {
       frameInstance.show()
     })
-    
+
     frameInstance.showingView = ''
     frameInstance.frameId = frame.id
     frameInstance.views = {}
@@ -75,5 +75,5 @@ export default {
     // frameInstance.webContents.openDevTools({ mode: 'detach' })
 
     return frameInstance
-  }
+  },
 }

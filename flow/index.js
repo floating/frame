@@ -7,9 +7,11 @@ import link from '../resources/link'
 
 import App from './App'
 
-document.addEventListener('dragover', e => e.preventDefault())
-document.addEventListener('drop', e => e.preventDefault())
-window.eval = global.eval = () => { throw new Error(`This app does not support window.eval()`) } // eslint-disable-line
+document.addEventListener('dragover', (e) => e.preventDefault())
+document.addEventListener('drop', (e) => e.preventDefault())
+window.eval = global.eval = () => {
+  throw new Error(`This app does not support window.eval()`)
+} // eslint-disable-line
 link.rpc('getState', (err, state) => {
   if (err) return console.error('Could not get initial state from main')
   console.log('initial state', state)
