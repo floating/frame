@@ -4,6 +4,7 @@
   "description": "System-wide web3",
   "main": "compiled/main",
   "scripts": {
+    "prepare": "husky install",
     "clean": "npx rimraf dist bundle compiled .cache node_modules",
     "setup:full": "npm run clean && npm cache clean --force && npm install --cache /tmp/empty-cache --ignore-scripts && allow-scripts && npm audit fix",
     "setup:clean": "npm run clean && npm run setup",
@@ -33,6 +34,8 @@
     "launch:dev:worker": "cross-env NODE_ENV=development LOG_WORKER=true electron ./compiled/main",
     "launch:dev:rinkeby": "cross-env NODE_ENV=development RINKEBY=true electron ./compiled/main",
     "launch:inspect": "cross-env NODE_ENV=production LOG_LEVEL=verbose electron --inspect ./compiled/main",
+    "format": "prettier --write \"**/*.{j,t}s\"",
+    "format:check": "prettier --check \"**/*.{j,t}s\"",
     "prod": "npm run compile && npm run bundle && npm run launch",
     "hot": "npm run compile && npm run bundle && npm run launch:hot",
     "watch:compile": "shx mkdir -p ./compiled/main/windows && npm run copy-assets && tsc -w",
@@ -49,7 +52,6 @@
     "test:unit:components": "npm run test:exec -- --env=jsdom --testTimeout=500 ./test/app",
     "test:e2e": "npm run test:exec -- --env=node ./test/e2e",
     "test:usbAdapters": "ELECTRON_RUN_AS_NODE=true ./node_modules/.bin/electron ./node_modules/jest/bin/jest.js ./test/main/signers/ledger/adapter.test.js --testPathIgnorePatterns=''",
-    "standard": "standardx --fix --verbose",
     "local:rpc": "ganache-cli --account=\"0x2d6945dbddb8dcf5492004e6f720f8e971196ff61a61c4be99714ebc71e06c00,  5000000000000000000000\" --account=\"0xaef6a68a47c1628081e4e6df195f5f712ae4eb7da332a6d74dca06ae32a3e7ae,5000\""
   },
   "author": {
@@ -141,6 +143,7 @@
     "electron-builder": "23.0.3",
     "electron-notarize": "1.2.1",
     "hardhat": "2.9.9",
+    "husky": "^8.0.1",
     "jest": "28.1.1",
     "jest-environment-jsdom": "28.1.1",
     "node-abi": "3.22.0",
@@ -148,25 +151,17 @@
     "node-watch": "0.7.3",
     "parcel-bundler": "1.12.3",
     "prebuild-install": "7.1.1",
+    "prettier": "^2.7.1",
     "rimraf": "3.0.2",
     "shx": "0.3.4",
-    "standardx": "7.0.0",
     "stylus": "0.58.1",
     "ts-jest": "28.0.5",
     "typescript": "4.7.3"
   },
-  "standardx": {
-    "parser": "babel-eslint",
-    "env": [
-      "jest"
+  "lint-staged": {
+    "**/*.{yml,json,md,ts,js}": [
+      "prettier --write"
     ]
-  },
-  "eslintConfig": {
-    "rules": {
-      "multiline-ternary": 0,
-      "react/no-direct-mutation-state": 0,
-      "react/no-find-dom-node": 0
-    }
   },
   "browserslist": [
     "last 1 Electron major version"
