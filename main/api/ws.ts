@@ -85,7 +85,7 @@ const handler = (socket: FrameWebSocket, req: IncomingMessage) => {
       log.info(
         `req -> | ${socket.isFrameExtension ? 'ext' : 'ws'} | ${origin} | ${rawPayload.method} | -> | ${
           rawPayload.params
-        }`
+        }`,
       )
 
     const { payload, hasSession } = updateOrigin(rawPayload, origin, rawPayload.__extensionConnecting)
@@ -113,8 +113,8 @@ const handler = (socket: FrameWebSocket, req: IncomingMessage) => {
         if (logTraffic)
           log.info(
             `<- res | ${socket.isFrameExtension ? 'ext' : 'ws'} | ${origin} | ${payload.method} | <- | ${JSON.stringify(
-              response.result || response.error
-            )}`
+              response.result || response.error,
+            )}`,
           )
 
         res(response)

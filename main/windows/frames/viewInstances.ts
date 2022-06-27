@@ -31,7 +31,7 @@ export default {
           preload: path.resolve('./main/windows/viewPreload.js'),
           partition: 'persist:' + view.ens,
         },
-        webPreferences
+        webPreferences,
       ),
     })
 
@@ -100,7 +100,7 @@ export default {
         () => {
           viewInstance.webContents.loadURL(view.url)
         },
-        (error) => log.error(error)
+        (error) => log.error(error),
       )
 
     viewInstance.webContents.on('did-finish-load', () => {

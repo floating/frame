@@ -120,7 +120,7 @@ class ChainConnection extends EventEmitter {
         log.error(
           `could not update gas prices for chain ${this.chainId}`,
           { feeMarket, chainConfig: this.chainConfig },
-          e
+          e,
         )
       }
     })
@@ -454,7 +454,7 @@ class Chains extends EventEmitter {
       resError(
         { message: `Connection for ${type} chain with chainId ${id} did not exist for send`, code: -32601 },
         payload,
-        res
+        res,
       )
     } else {
       this.connections[type][id].send(payload, res)

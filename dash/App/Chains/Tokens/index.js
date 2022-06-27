@@ -99,7 +99,7 @@ class ChainModule extends React.Component {
     let presets = networkPresets[id] || {}
     presets = Object.keys(presets).map((i) => ({ text: i, value: type + ':' + id + ':' + i }))
     presets = presets.concat(
-      Object.keys(networkPresets.default).map((i) => ({ text: i, value: type + ':' + id + ':' + i }))
+      Object.keys(networkPresets.default).map((i) => ({ text: i, value: type + ':' + id + ':' + i })),
     )
     presets.push({ text: 'Custom', value: type + ':' + id + ':' + 'custom' })
 

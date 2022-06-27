@@ -137,9 +137,9 @@ export default function (chainId: number, eth: EthereumProvider) {
         } catch (e) {
           log.error(
             `multicall error (batch ${batchStart}-${batchEnd}), chainId: ${chainId}, first call: ${JSON.stringify(
-              calls[batchStart]
+              calls[batchStart],
             )}`,
-            e
+            e,
           )
           return [...Array(batchCalls.length).keys()].map((n) => ({ success: false, returnValues: [] }))
         }

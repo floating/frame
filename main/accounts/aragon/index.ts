@@ -160,8 +160,8 @@ class Aragon {
         if (!newTx)
           return cb(
             new Error(
-              'Could not calculate a transaction path for Aragon smart account, make sure your acting account has the necessary permissions'
-            )
+              'Could not calculate a transaction path for Aragon smart account, make sure your acting account has the necessary permissions',
+            ),
           )
         delete newTx.nonce
         newTx.chainId = tx.chainId

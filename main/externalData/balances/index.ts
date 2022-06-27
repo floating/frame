@@ -18,12 +18,12 @@ export default function (store: Store) {
     getKnownTokens: (address?: Address) => ((address && store('main.tokens.known', address)) || []) as Token[],
     getCurrencyBalances: (address: Address) => {
       return ((store('main.balances', address) || []) as Balance[]).filter(
-        (balance) => balance.address === NATIVE_CURRENCY
+        (balance) => balance.address === NATIVE_CURRENCY,
       )
     },
     getTokenBalances: (address: Address) => {
       return ((store('main.balances', address) || []) as Balance[]).filter(
-        (balance) => balance.address !== NATIVE_CURRENCY
+        (balance) => balance.address !== NATIVE_CURRENCY,
       )
     },
   }
@@ -153,7 +153,8 @@ export default function (store: Store) {
     // only update balances that have changed
     balances
       .filter(
-        (balance) => (currentChainBalances.find((b) => b.chainId === balance.chainId) || {}).balance !== balance.balance
+        (balance) =>
+          (currentChainBalances.find((b) => b.chainId === balance.chainId) || {}).balance !== balance.balance,
       )
       .forEach((balance) => {
         store.setBalance(address, {
@@ -169,7 +170,7 @@ export default function (store: Store) {
     const currentTokenBalances = storeApi.getTokenBalances(address)
     const changedBalances = balances.filter((newBalance) => {
       const currentBalance = currentTokenBalances.find(
-        (b) => b.address === newBalance.address && b.chainId === newBalance.chainId
+        (b) => b.address === newBalance.address && b.chainId === newBalance.chainId,
       )
       return !currentBalance || currentBalance.balance !== newBalance.balance
     })
@@ -181,7 +182,7 @@ export default function (store: Store) {
 
       // add any non-zero balances to the list of known tokens
       const unknownBalances = changedBalances.filter(
-        (b) => parseInt(b.balance) > 0 && !knownTokens.some((t) => t.address === b.address && t.chainId === b.chainId)
+        (b) => parseInt(b.balance) > 0 && !knownTokens.some((t) => t.address === b.address && t.chainId === b.chainId),
       )
 
       if (unknownBalances.length > 0) {
@@ -190,7 +191,7 @@ export default function (store: Store) {
 
       // remove zero balances from the list of known tokens
       const zeroBalances = changedBalances.filter(
-        (b) => parseInt(b.balance) === 0 && knownTokens.some((t) => t.address === b.address && t.chainId === b.chainId)
+        (b) => parseInt(b.balance) === 0 && knownTokens.some((t) => t.address === b.address && t.chainId === b.chainId),
       )
 
       if (zeroBalances.length > 0) {

@@ -29,7 +29,7 @@ function getOriginsForChain(chain, origins) {
 
       return acc
     },
-    { connectedOrigins: [], disconnectedOrigins: [] }
+    { connectedOrigins: [], disconnectedOrigins: [] },
   )
 
   return {

@@ -103,7 +103,7 @@ async function extractColors(url: string, ens: string) {
         partition: 'persist:' + ens,
         offscreen: true,
       },
-      webPreferences
+      webPreferences,
     ),
   })
 

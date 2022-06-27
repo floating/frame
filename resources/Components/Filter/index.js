@@ -73,7 +73,7 @@ class Filter extends React.Component {
               <div className="filterButtonInner">
                 {'+'}
                 {svg.chain(14)}
-              </div>
+              </div>,
             )}
           </div>
         ) : null}

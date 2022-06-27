@@ -12,7 +12,7 @@ jest.mock('eth-provider', () =>
   jest.fn(() => ({
     request: jest.fn(),
     setChain: jest.fn(),
-  }))
+  })),
 )
 
 const callResponse = '0x0000000000000000000000000000000000000000000000000000000000000000'
@@ -82,7 +82,7 @@ describe('#getTokenBalances', () => {
               expect(tc.call[1]).toBe(ownerAddress)
 
               const token = knownTokens.find(
-                (token) => token.address === tc.target && token.chainId === parseInt(chainId)
+                (token) => token.address === tc.target && token.chainId === parseInt(chainId),
               )
 
               if (token) {
@@ -211,7 +211,7 @@ function respondToTokenCall(payload) {
   expect(payload.params[1]).toBe('latest')
 
   const token = knownTokens.find(
-    (token) => token.address === payload.params[0].to && token.chainId === parseInt(payload.chainId)
+    (token) => token.address === payload.params[0].to && token.chainId === parseInt(payload.chainId),
   )
 
   const balance = onChainBalances[token.address]

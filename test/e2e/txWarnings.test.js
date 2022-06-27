@@ -27,7 +27,7 @@ test(
       return Boolean(e)
     }
   },
-  30 * 1000
+  30 * 1000,
 )
 
 // test('Failing Transaction (Goerli)', async done => {

@@ -77,7 +77,7 @@ const handler = (req: IncomingMessage, res: ServerResponse) => {
 
         if (logTraffic)
           log.info(
-            `req -> | http | ${req.headers.origin} | ${rawPayload.method} | -> | ${JSON.stringify(rawPayload.params)}`
+            `req -> | http | ${req.headers.origin} | ${rawPayload.method} | -> | ${JSON.stringify(rawPayload.params)}`,
           )
 
         const origin = parseOrigin(req.headers.origin)

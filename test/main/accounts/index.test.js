@@ -131,7 +131,7 @@ describe('#setBaseFee', () => {
         expect(err.message).toBeTruthy()
         done()
       },
-      2
+      2,
     )
   })
 
@@ -165,7 +165,7 @@ describe('#setBaseFee', () => {
         done()
       },
       1,
-      false
+      false,
     )
   })
 
@@ -202,7 +202,7 @@ describe('#setBaseFee', () => {
         }
       },
       1,
-      true
+      true,
     )
   })
 
@@ -272,7 +272,7 @@ describe('#setBaseFee', () => {
         }
       },
       1,
-      true
+      true,
     )
   })
 })
@@ -322,7 +322,7 @@ describe('#setPriorityFee', () => {
         expect(err.message).toBeTruthy()
         done()
       },
-      2
+      2,
     )
   })
 
@@ -356,7 +356,7 @@ describe('#setPriorityFee', () => {
         done()
       },
       1,
-      false
+      false,
     )
   })
 
@@ -449,7 +449,7 @@ describe('#setPriorityFee', () => {
         }
       },
       1,
-      true
+      true,
     )
   })
 })
@@ -500,7 +500,7 @@ describe('#setGasPrice', () => {
         expect(err.message).toBeTruthy()
         done()
       },
-      2
+      2,
     )
   })
 
@@ -534,7 +534,7 @@ describe('#setGasPrice', () => {
         done()
       },
       1,
-      false
+      false,
     )
   })
 
@@ -613,7 +613,7 @@ describe('#setGasPrice', () => {
         }
       },
       1,
-      true
+      true,
     )
   })
 })
@@ -663,7 +663,7 @@ describe('#setGasLimit', () => {
         expect(err.message).toBeTruthy()
         done()
       },
-      2
+      2,
     )
   })
 
@@ -697,7 +697,7 @@ describe('#setGasLimit', () => {
         done()
       },
       1,
-      false
+      false,
     )
   })
 
@@ -781,7 +781,7 @@ describe('#setGasLimit', () => {
         }
       },
       1,
-      true
+      true,
     )
   })
 })
@@ -797,7 +797,7 @@ describe('#adjustNonce', () => {
           jsonrpc: '2.0',
           method: 'eth_getTransactionCount',
           params: ['0x22dd63c3619818fdbc262c78baee43cb61e9cccf', 'pending'],
-        })
+        }),
       )
 
       cb({ result: onChainNonce })

@@ -56,13 +56,13 @@ async function tokenBalanceScan(address: Address, tokensToOmit: Token[] = [], ch
     const tokens = tokenLists.reduce((all, tokenList) => {
       return all.concat(
         tokenList.filter((token) =>
-          tokensToOmit.every((t) => t.chainId !== token.chainId || t.address !== token.address)
-        )
+          tokensToOmit.every((t) => t.chainId !== token.chainId || t.address !== token.address),
+        ),
       )
     }, [] as Token[])
 
     const tokenBalances = (await balances.getTokenBalances(address, tokens)).filter(
-      (balance) => parseInt(balance.balance) > 0
+      (balance) => parseInt(balance.balance) > 0,
     )
 
     sendToMainProcess({ type: 'tokenBalances', address, balances: tokenBalances })

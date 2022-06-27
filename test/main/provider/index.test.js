@@ -167,7 +167,7 @@ describe('#send', () => {
           } catch (e) {
             done(e)
           }
-        }
+        },
       )
     })
 
@@ -197,7 +197,7 @@ describe('#send', () => {
         () => {
           expect(store.switchOriginChain).toHaveBeenCalledWith('8073729a-5e59-53b7-9e69-5d9bcff94087', 1, 'ethereum')
           done()
-        }
+        },
       )
     })
   })
@@ -221,7 +221,7 @@ describe('#send', () => {
         () => {
           expect(store.switchOriginChain).toHaveBeenCalledWith('8073729a-5e59-53b7-9e69-5d9bcff94087', 1, 'ethereum')
           done()
-        }
+        },
       )
     })
 
@@ -243,7 +243,7 @@ describe('#send', () => {
           } catch (e) {
             done(e)
           }
-        }
+        },
       )
     })
   })
@@ -277,7 +277,7 @@ describe('#send', () => {
               'eth_signTypedData_v4',
               'wallet_addEthereumChain',
               'wallet_getAssets',
-            ])
+            ]),
           )
 
           done()
@@ -354,7 +354,7 @@ describe('#send', () => {
               logoURI: 'https://badgerdao.io/icon.jpg',
             },
             payload: request,
-          })
+          }),
         )
       })
     })
@@ -1204,7 +1204,7 @@ describe('#signAndSend', () => {
               id: request.payload.id,
               method: 'eth_sendRawTransaction',
               params: [signedTx],
-            })
+            }),
           )
 
           cb({ result: txHash })

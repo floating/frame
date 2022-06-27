@@ -19,7 +19,7 @@ it('displays the error message to the user', () => {
     undefined,
     expect.objectContaining({
       detail: 'something bad happened',
-    })
+    }),
   )
 })
 
@@ -30,7 +30,7 @@ it('gives the user an option to accept the error or quit Frame', () => {
     undefined,
     expect.objectContaining({
       buttons: ['OK', 'Quit'],
-    })
+    }),
   )
 })
 

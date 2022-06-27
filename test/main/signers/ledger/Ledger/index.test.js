@@ -242,7 +242,7 @@ describe('#verifyAddress', () => {
                 ? '0xe9d6f5779cf6936de03c0bec631f3bb3e336d98d'
                 : '0xCd37a15BdfEc87D0e383E628da2399053D5948ca',
           })
-        })
+        }),
     )
   })
 
@@ -326,9 +326,9 @@ signingMethods.forEach((signingMethod) => {
             resolve(
               path === "44'/60'/0'/3"
                 ? '0x724e7dfa6ee0fd0dd84c5d8a84eb57be29ff20ed253b3249de2e3d6b119d7b1e6a211ce0c48f93c5e399ac8cd7c6fe56e36fa960b6da92de2c435814928f2f8c1b'
-                : '0xf257b7f96ad7cbf11b80c2085dc76d10ede662fb2c77dc7fbd9f574d78d9da6d08cb1a99c7d97ac87b9d7f5a4e3ae052ba3a11888fdfeefe6a169a0547c1b2e01b'
+                : '0xf257b7f96ad7cbf11b80c2085dc76d10ede662fb2c77dc7fbd9f574d78d9da6d08cb1a99c7d97ac87b9d7f5a4e3ae052ba3a11888fdfeefe6a169a0547c1b2e01b',
             )
-          })
+          }),
       )
 
       ledger.once('update', () => done('Ledger unexpectedly updated!'))
@@ -338,7 +338,7 @@ signingMethods.forEach((signingMethod) => {
           expect(ledger.status).toBe(Status.OK)
           expect(err).toBeFalsy()
           expect(signature).toBe(
-            '0x724e7dfa6ee0fd0dd84c5d8a84eb57be29ff20ed253b3249de2e3d6b119d7b1e6a211ce0c48f93c5e399ac8cd7c6fe56e36fa960b6da92de2c435814928f2f8c1b'
+            '0x724e7dfa6ee0fd0dd84c5d8a84eb57be29ff20ed253b3249de2e3d6b119d7b1e6a211ce0c48f93c5e399ac8cd7c6fe56e36fa960b6da92de2c435814928f2f8c1b',
           )
         })
       })
@@ -417,9 +417,9 @@ describe('#signTypedData', () => {
           resolve(
             path === "44'/60'/0'/5"
               ? '0x724e7dfa6ee0fd0dd84c5d8a84eb57be29ff20ed253b3249de2e3d6b119d7b1e6a211ce0c48f93c5e399ac8cd7c6fe56e36fa960b6da92de2c435814928f2f8c1b'
-              : '0xf257b7f96ad7cbf11b80c2085dc76d10ede662fb2c77dc7fbd9f574d78d9da6d08cb1a99c7d97ac87b9d7f5a4e3ae052ba3a11888fdfeefe6a169a0547c1b2e01b'
+              : '0xf257b7f96ad7cbf11b80c2085dc76d10ede662fb2c77dc7fbd9f574d78d9da6d08cb1a99c7d97ac87b9d7f5a4e3ae052ba3a11888fdfeefe6a169a0547c1b2e01b',
           )
-        })
+        }),
     )
 
     ledger.once('update', () => done('Ledger unexpectedly updated!'))
@@ -429,7 +429,7 @@ describe('#signTypedData', () => {
         expect(ledger.status).toBe(Status.OK)
         expect(err).toBeFalsy()
         expect(signature).toBe(
-          '0x724e7dfa6ee0fd0dd84c5d8a84eb57be29ff20ed253b3249de2e3d6b119d7b1e6a211ce0c48f93c5e399ac8cd7c6fe56e36fa960b6da92de2c435814928f2f8c1b'
+          '0x724e7dfa6ee0fd0dd84c5d8a84eb57be29ff20ed253b3249de2e3d6b119d7b1e6a211ce0c48f93c5e399ac8cd7c6fe56e36fa960b6da92de2c435814928f2f8c1b',
         )
       })
     })

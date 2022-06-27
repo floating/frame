@@ -69,7 +69,7 @@ window.addEventListener(
       }
     }
   },
-  false
+  false,
 )
 
 export default link

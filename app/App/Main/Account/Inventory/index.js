@@ -94,7 +94,7 @@ class Inventory extends React.Component {
                               {this.state.hoverAsset.img ? (
                                 <img
                                   src={`https://proxy.pylon.link?type=nft&target=${encodeURIComponent(
-                                    this.state.hoverAsset.img
+                                    this.state.hoverAsset.img,
                                   )}`}
                                 />
                               ) : null}
@@ -106,7 +106,7 @@ class Inventory extends React.Component {
                                 inventory[k].meta.image
                                   ? {
                                       backgroundImage: `url(https://proxy.pylon.link?type=nft&target=${encodeURIComponent(
-                                        inventory[k].meta.image
+                                        inventory[k].meta.image,
                                       )})`,
                                     }
                                   : {}

@@ -11,7 +11,7 @@ export default function (message: string, code?: string) {
   if (code === 'EADDRINUSE') {
     dialog.showErrorBox(
       'Frame is already running',
-      'Frame is already running or another application is using port 1248.'
+      'Frame is already running or another application is using port 1248.',
     )
   } else {
     exitAction = dialog.showMessageBoxSync(undefined as any, {

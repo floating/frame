@@ -20,7 +20,7 @@ it('should display the expected chain ID', async () => {
         { id: 1, name: 'Mainnet', connection: { primary: { connected: true } } },
         { id: 137, name: 'Polygon', connection: { primary: { connected: true } } },
       ]}
-    />
+    />,
   )
 
   const tokenChainName = getByRole('option', { selected: true }).textContent
@@ -34,7 +34,7 @@ it('should generate the expected HTML', async () => {
         { id: 1, name: 'Mainnet', connection: { primary: { connected: true } } },
         { id: 137, name: 'Polygon', connection: { primary: { connected: true } } },
       ]}
-    />
+    />,
   )
 
   expect(asFragment()).toMatchSnapshot()
@@ -58,7 +58,7 @@ describe('token metadata lookup', () => {
           { id: 1, name: 'Mainnet', connection: { primary: { connected: true } } },
           { id: 137, name: 'Polygon', connection: { primary: { connected: true } } },
         ]}
-      />
+      />,
     )
 
     const contractAddressInput = getByLabelText('Contract Address')
@@ -86,7 +86,7 @@ describe('token metadata lookup', () => {
             { id: 1, name: 'Mainnet', connection: { primary: { connected: true } } },
             { id: 137, name: 'Polygon', connection: { primary: { connected: true } } },
           ]}
-        />
+        />,
       )
 
       const tokenContractAddressInput = getByLabelText('Contract Address')

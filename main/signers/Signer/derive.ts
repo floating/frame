@@ -12,7 +12,7 @@ export enum Derivation {
 export function deriveHDAccounts(
   publicKey: string,
   chainCode: string,
-  cb: (err: any, accounts: string[] | undefined) => void
+  cb: (err: any, accounts: string[] | undefined) => void,
 ) {
   try {
     const hdk = new HDKey()

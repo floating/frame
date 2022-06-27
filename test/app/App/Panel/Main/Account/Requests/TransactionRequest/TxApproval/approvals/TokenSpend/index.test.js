@@ -20,7 +20,7 @@ describe('changing approval amounts', () => {
         onApprove={onApprove}
         onDecline={done}
         approval={{ data: { decimals: 6, amount: addHexPrefix((100e6).toString(16)) } }}
-      />
+      />,
     )
 
     const reject = queryByRole('button', { name: 'Reject' })
@@ -44,7 +44,7 @@ describe('changing approval amounts', () => {
       <TokenSpend
         onApprove={onApprove}
         approval={{ data: { decimals: 6, amount: addHexPrefix((100e6).toString(16)) } }}
-      />
+      />,
     )
 
     const proceed = queryByRole('button', { name: 'Proceed' })
@@ -76,7 +76,7 @@ describe('changing approval amounts', () => {
               amount: addHexPrefix((100e6).toString(16)),
             },
           }}
-        />
+        />,
       )
 
       const edit = queryByRole('button', { name: 'Edit' })
@@ -118,7 +118,7 @@ describe('changing approval amounts', () => {
               amount: addHexPrefix((100e6).toString(16)),
             },
           }}
-        />
+        />,
       )
 
       const edit = queryByRole('button', { name: 'Edit' })
@@ -147,7 +147,7 @@ describe('changing approval amounts', () => {
     }
 
     const { queryByRole } = render(
-      <TokenSpend onApprove={onApprove} approval={{ data: { amount: addHexPrefix((100e6).toString(16)) } }} />
+      <TokenSpend onApprove={onApprove} approval={{ data: { amount: addHexPrefix((100e6).toString(16)) } }} />,
     )
 
     const edit = queryByRole('button', { name: 'Edit' })
@@ -174,7 +174,7 @@ describe('changing approval amounts', () => {
     }
 
     const { queryByRole } = render(
-      <TokenSpend onApprove={onApprove} approval={{ data: { amount: addHexPrefix((50e6).toString(16)) } }} />
+      <TokenSpend onApprove={onApprove} approval={{ data: { amount: addHexPrefix((50e6).toString(16)) } }} />,
     )
 
     const edit = queryByRole('button', { name: 'Edit' })
@@ -214,7 +214,7 @@ describe('changing approval amounts', () => {
             amount: addHexPrefix((100e6).toString(16)),
           },
         }}
-      />
+      />,
     )
 
     const edit = queryByRole('button', { name: 'Edit' })
@@ -291,7 +291,7 @@ describe('formatting amounts', () => {
               amount: addHexPrefix((spec.amount * 1e6).toString(16)),
             },
           }}
-        />
+        />,
       )
 
       const edit = queryByRole('button', { name: 'Edit' })

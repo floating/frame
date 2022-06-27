@@ -18,7 +18,7 @@ window.addEventListener(
     if (e.origin === 'file://' && data.source !== source) {
       if (data.method === 'rpc')
         return rpc(...data.args, (...args) =>
-          e.source.postMessage(wrap({ method: 'rpc', id: data.id, args, source }), e.origin)
+          e.source.postMessage(wrap({ method: 'rpc', id: data.id, args, source }), e.origin),
         )
       if (data.method === 'event') return ipcRenderer.send(...data.args)
       if (data.method === 'invoke') {
@@ -29,7 +29,7 @@ window.addEventListener(
       }
     }
   },
-  false
+  false,
 )
 
 ipcRenderer.on('main:action', (...args) => {

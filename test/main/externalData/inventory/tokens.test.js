@@ -11,7 +11,7 @@ jest.mock('../../../../main/nebula', () =>
         tokens: [{ name: 'another-token', chainId: 299, address: '0x9999' }],
       }),
     },
-  }))
+  })),
 )
 
 beforeAll(() => {

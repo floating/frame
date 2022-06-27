@@ -133,7 +133,7 @@ async function sign(rawTx: TransactionData, signingFn: (tx: TypedTransaction) =>
         ...rawTx,
         ...signature,
       },
-      { common }
+      { common },
     )
   })
 }

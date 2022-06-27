@@ -176,7 +176,7 @@ export function requestPermissions(payload: JSONRPCRequestPayload, res: RPCReque
 export function getAssets(
   payload: RPC.GetAssets.Request,
   currentAccount: FrameAccount | null,
-  cb: RPCCallback<RPC.GetAssets.Response>
+  cb: RPCCallback<RPC.GetAssets.Response>,
 ) {
   if (!currentAccount) return resError('no account selected', payload, cb)
   if (isScanning(currentAccount.id))

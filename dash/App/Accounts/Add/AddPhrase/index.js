@@ -135,7 +135,7 @@ class AddPhrase extends React.Component {
                       view: 'notify',
                       data: { notify: 'hotAccountWarning', notifyData: {} },
                     }),
-                  800
+                  800,
                 )
               }}
             >

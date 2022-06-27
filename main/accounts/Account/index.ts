@@ -90,7 +90,7 @@ class FrameAccount {
 
     const existingPermissions = storeApi.getPermissions(this.address)
     const currentSendDappPermission = Object.values(existingPermissions).find((p) =>
-      (p.origin || '').toLowerCase().includes('send.frame.eth')
+      (p.origin || '').toLowerCase().includes('send.frame.eth'),
     )
 
     if (!currentSendDappPermission) {
@@ -133,7 +133,7 @@ class FrameAccount {
           (response: any) => {
             if (response.result) this.created = parseInt(response.result, 16) + ':' + this.created.split(':')[1]
             this.update()
-          }
+          },
         )
       })
     }
@@ -210,7 +210,7 @@ class FrameAccount {
     req: TransactionRequest,
     type: ApprovalType,
     data: any = {},
-    onApprove: (data: any) => void = () => {}
+    onApprove: (data: any) => void = () => {},
   ) {
     // TODO: turn TransactionRequest into its own class
     const approve = (data: any) => {
@@ -276,7 +276,7 @@ class FrameAccount {
           if (req.decodedData) {
             req.decodedData.args[1].value = approvedAmount
           }
-        }
+        },
       )
 
       this.update()
@@ -433,7 +433,7 @@ class FrameAccount {
         requests: this.requests,
         ensName: this.ensName,
         created: this.created,
-      })
+      }),
     ) as Account
 
     if (update.smart && update.smart.actor && update.smart.actor.account) {
@@ -511,8 +511,8 @@ class FrameAccount {
       if (index === -1)
         cb(
           new Error(
-            `Acting signer cannot sign for this address, could not find acting address in signer: ${actingAccount.address}`
-          )
+            `Acting signer cannot sign for this address, could not find acting address in signer: ${actingAccount.address}`,
+          ),
         )
       actingSigner.signTypedData(index, version, typedData, cb)
     } else {
@@ -541,8 +541,8 @@ class FrameAccount {
         if (index === -1)
           cb(
             new Error(
-              `Acting signer cannot sign for this address, could not find acting address in signer: ${actingAccount.address}`
-            )
+              `Acting signer cannot sign for this address, could not find acting address in signer: ${actingAccount.address}`,
+            ),
           )
         actingSigner.signTransaction(index, rawTx, cb)
       } else {

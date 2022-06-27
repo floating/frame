@@ -173,7 +173,7 @@ class ChainModule extends React.Component {
         const actionName = `set${capitalize(inputName)}Custom`
         this[timeoutName] = setTimeout(
           () => link.send('tray:action', actionName, type, id, value === this.customMessage ? '' : value),
-          1000
+          1000,
         )
       }
     }
