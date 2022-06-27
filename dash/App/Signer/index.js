@@ -135,14 +135,20 @@ class Signer extends React.Component {
             }}>
               Submit Passphrase
             </div>
-            <div className='signerPinMessageOr'>{'or'}</div>
-            <div className='signerPinMessage signerPinSubmit' onMouseDown={evt => {
-              if (evt.button === 0) { // left click only
-                link.rpc('trezorEnterPhrase', this.props.id, () => {})
-              }
-            }}>
-              Enter passphrase on device
-            </div>
+            {
+              allowsDeviceEntry
+                ? <>
+                    <div className='signerPinMessageOr'>{'or'}</div>
+                    <div className='signerPinMessage signerPinSubmit' onMouseDown={evt => {
+                      if (evt.button === 0) { // left click only
+                        link.rpc('trezorEnterPhrase', this.props.id, () => {})
+                      }
+                    }}>
+                      Enter passphrase on device
+                    </div>
+                  </>
+                : <></>
+            }
           </>
         ) : null}
       </div>
