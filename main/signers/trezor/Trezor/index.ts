@@ -73,11 +73,18 @@ export default class Trezor extends Signer {
 
       const model = (features?.model || '').toString() === '1' ? 'One' : features?.model
       this.model = ['Trezor', model].join(' ').trim()
+    } catch (e) {
+      this.handleUnrecoverableError()
 
+      throw e
+    }
+
+    try {
       // this prompts a login of pin and/or passphrase
       await TrezorBridge.getAccountInfo(device, this.getPath(0))
     } catch (e) {
-      this.handleUnrecoverableError()
+      const err = e as ConnectError
+      this.handleError(createErrorMessage(Status.NEEDS_RECONNECTION, err.message))
 
       throw e
     }
@@ -186,10 +193,7 @@ export default class Trezor extends Signer {
         this.verifyAddress(0, firstAccount, false, err => {
           if (!err) {
             this.status = Status.OK
-
-            if (accounts.length > this.addresses.length) {
-              this.addresses = accounts
-            }
+            this.addresses = accounts
           }
  
           this.emit('update')
