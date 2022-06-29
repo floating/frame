@@ -48,7 +48,7 @@ class AddChain extends React.Component {
 
     const newNetworkReady = (
       this.state.newNetworkId !== this.newNetworkIdDefault && this.state.newNetworkId !== '' &&
-      this.state.newNetworkName !== this.newNetworkNameDefault && this.state.newNetworkName !== '' &&
+      this.state.newNetworkName !== this.newNetworkNameDefault && this.state.newNetworkName !== ''
     )
 
     return (
