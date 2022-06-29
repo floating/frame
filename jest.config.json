@@ -4,15 +4,7 @@
   ],
   "testPathIgnorePatterns": [
     "/node_modules/",
-<<<<<<< HEAD
-<<<<<<< HEAD
     "<rootDir>/test/main/signers/ledger/adapter"
-=======
-    "<rootDir>/test/main/signers/ledger/adapter"    
->>>>>>> update test deps, scripts and config
-=======
-    "<rootDir>/test/main/signers/ledger/adapter"
->>>>>>> remove space
   ],
   "moduleNameMapper": {
     "^uuid$": "<rootDir>/node_modules/uuid/dist/index.js"
