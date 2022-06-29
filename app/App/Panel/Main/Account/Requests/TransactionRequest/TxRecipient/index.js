@@ -1,10 +1,9 @@
 import React from 'react'
 import Restore from 'react-restore'
+import { ADDRESS_DISPLAY_CHARS } from '../../../../../../../../resources/constants'
 
 import link from '../../../../../../../../resources/link'
 import svg from '../../../../../../../../resources/svg'
-
-const DISPLAY_ADDRESS_HALF_DIGITS = 8; // TODO: consolidate to a global config
 
 class TxRecipient extends React.Component {
   constructor (...args) {
@@ -40,7 +39,7 @@ class TxRecipient extends React.Component {
             <div className='_txRecipientSlice _txRecipientValue'>
               {ensName
                 ? <span>{ensName}</span>
-                : <span>{address.substring(0, 2 + DISPLAY_ADDRESS_HALF_DIGITS)}{svg.octicon('kebab-horizontal', { height: 15 })}{address.substring(address.length - DISPLAY_ADDRESS_HALF_DIGITS)}</span>
+                : <span>{address.substring(0, 2 + ADDRESS_DISPLAY_CHARS)}{svg.octicon('kebab-horizontal', { height: 15 })}{address.substring(address.length - ADDRESS_DISPLAY_CHARS)}</span>
               }
               {req.decodedData && req.decodedData.contractName ? (
                 <span className={'_txRecipientContract'}>{(() => {

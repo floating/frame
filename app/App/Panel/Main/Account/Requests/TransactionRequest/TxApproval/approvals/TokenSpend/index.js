@@ -5,11 +5,10 @@ import BigNumber from 'bignumber.js'
 import svg from '../../../../../../../../../../resources/svg'
 import link from '../../../../../../../../../../resources/link'
 
-import { ApprovalType } from '../../../../../../../../../../resources/constants'
+import { ADDRESS_DISPLAY_CHARS, ApprovalType } from '../../../../../../../../../../resources/constants'
 
 const numberRegex = /\.0+$|(\.[0-9]*[1-9])0+$/
 const MAX_HEX = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
-const DISPLAY_ADDRESS_HALF_DIGITS = 8; // TODO: consolidate to a global config
 
 const digitsLookup = [
   { value: 1, symbol: '' },
@@ -246,9 +245,12 @@ class TokenSpend extends React.Component {
                 {data.spender ? (
                   <div className='approveTokenSpendSpenderAddress'>
                     <div className='approveTokenSpendSpenderAddressLarge'>
-                      {data.spender.substring(0, 2 + DISPLAY_ADDRESS_HALF_DIGITS)}
+                      {
+                        // 0x prefix plus leading characters of address
+                        data.spender.substring(0, 2 + ADDRESS_DISPLAY_CHARS)
+                      }
                       {svg.octicon('kebab-horizontal', { height: 15 })}
-                      {data.spender.substr(data.contract.length - DISPLAY_ADDRESS_HALF_DIGITS)}
+                      {data.spender.substr(data.contract.length - ADDRESS_DISPLAY_CHARS)}
                     </div>
                     <div
                       className='approveTokenSpendSpenderAddressFull'
