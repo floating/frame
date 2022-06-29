@@ -1,6 +1,5 @@
 import React from 'react'
 import Restore from 'react-restore'
-import { ADDRESS_DISPLAY_CHARS } from '../../../../../../../../resources/constants'
 
 import link from '../../../../../../../../resources/link'
 import svg from '../../../../../../../../resources/svg'
@@ -39,7 +38,7 @@ class TxRecipient extends React.Component {
             <div className='_txRecipientSlice _txRecipientValue'>
               {ensName
                 ? <span>{ensName}</span>
-                : <span>{address.substring(0, 2 + ADDRESS_DISPLAY_CHARS)}{svg.octicon('kebab-horizontal', { height: 15 })}{address.substring(address.length - ADDRESS_DISPLAY_CHARS)}</span>
+                : <span>{address.substring(0, 8)}{svg.octicon('kebab-horizontal', { height: 15 })}{address.substring(address.length - 6)}</span>
               }
               {req.decodedData && req.decodedData.contractName ? (
                 <span className={'_txRecipientContract'}>{(() => {
