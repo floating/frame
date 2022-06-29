@@ -245,9 +245,9 @@ class TokenSpend extends React.Component {
                 {data.spender ? (
                   <div className='approveTokenSpendSpenderAddress'>
                     <div className='approveTokenSpendSpenderAddressLarge'>
-                      {data.spender.substring(0, 6)}
+                      {data.spender.substring(0, 8)}
                       {svg.octicon('kebab-horizontal', { height: 15 })}
-                      {data.spender.substr(data.contract.length - 4)}
+                      {data.spender.substr(data.contract.length - 6)}
                     </div>
                     <div 
                       className='approveTokenSpendSpenderAddressFull' 

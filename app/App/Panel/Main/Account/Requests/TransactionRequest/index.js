@@ -432,7 +432,7 @@ class TransactionRequest extends React.Component {
                           <span className='monitorSub'>{'TO'} </span>
                           <span className='monitorValue'>
                             <span className='monitorValue0x'>{'0x'}</span>
-                            {toAddress.substring(2, 7)}
+                            {toAddress.substring(2, 5)}
                             {svg.octicon('kebab-horizontal', { height: 14 })}
                             {toAddress.substring(toAddress.length - 3)}
                            </span>
