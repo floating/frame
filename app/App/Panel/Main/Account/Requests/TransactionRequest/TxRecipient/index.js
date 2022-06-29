@@ -1,5 +1,6 @@
 import React from 'react'
 import Restore from 'react-restore'
+import { ADDRESS_DISPLAY_CHARS } from '../../../../../../../../resources/constants'
 
 import link from '../../../../../../../../resources/link'
 import svg from '../../../../../../../../resources/svg'
