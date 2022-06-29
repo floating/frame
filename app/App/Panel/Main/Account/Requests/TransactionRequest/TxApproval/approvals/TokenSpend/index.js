@@ -9,6 +9,7 @@ import { ApprovalType } from '../../../../../../../../../../resources/constants'
 
 const numberRegex = /\.0+$|(\.[0-9]*[1-9])0+$/
 const MAX_HEX = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
+const DISPLAY_ADDRESS_HALF_DIGITS = 8; // TODO: consolidate to a global config
 
 const digitsLookup = [
   { value: 1, symbol: '' },
@@ -64,7 +65,7 @@ class TokenSpend extends React.Component {
       } else {
         amount = '0x' + custom.integerValue().toString(16)
       }
-      
+
       this.setState({ mode: 'custom', amount, customInput: value })
     }
   }
@@ -139,7 +140,7 @@ class TokenSpend extends React.Component {
             } : {}}
             onClick={() => {
               this.props.onApprove(
-                this.props.req, 
+                this.props.req,
                 ApprovalType.TokenSpendApproval,
                 { amount: this.state.amount }
               )
@@ -174,7 +175,7 @@ class TokenSpend extends React.Component {
                       {symbol}
                     </div>
                     {this.state.mode === 'custom' ? (
-                      <input 
+                      <input
                         autoFocus
                         type='text'
                         aria-label='Custom Amount'
@@ -190,7 +191,7 @@ class TokenSpend extends React.Component {
                       />
                     ) : (
                       <div>
-                        <div 
+                        <div
                           className='approveTokenSpendAmountNoInput'
                           role='textbox'
                           style={inputLock ? { cursor: 'default' } : null}
@@ -199,7 +200,7 @@ class TokenSpend extends React.Component {
                           }}
                         >
                           <div className='approveTokenSpendAmountNoInputNumber'>{displayAmount.number}</div>
-                          <div className='approveTokenSpendAmountNoInputSymbol'>{displayAmount.symbol}</div> 
+                          <div className='approveTokenSpendAmountNoInputSymbol'>{displayAmount.symbol}</div>
                         </div>
                       </div>
                     )}
@@ -214,7 +215,7 @@ class TokenSpend extends React.Component {
                     >
                       Requested
                     </div>
-                    <div 
+                    <div
                       className={this.state.mode === 'unlimited' ? 'approveTokenSpendPresetButton approveTokenSpendPresetButtonSelected' : 'approveTokenSpendPresetButton'}
                       role='button'
                       onClick={() => {
@@ -225,7 +226,7 @@ class TokenSpend extends React.Component {
                       <span className='approveTokenSpendPresetButtonInfinity'>{'Unlimited'}</span>
                     </div>
                     {!inputLock ? (
-                      <div 
+                      <div
                         className={this.state.mode === 'custom' ? 'approveTokenSpendPresetButton approveTokenSpendPresetButtonSelected' : 'approveTokenSpendPresetButton'}
                         role='button'
                         onClick={() => {
@@ -245,18 +246,18 @@ class TokenSpend extends React.Component {
                 {data.spender ? (
                   <div className='approveTokenSpendSpenderAddress'>
                     <div className='approveTokenSpendSpenderAddressLarge'>
-                      {data.spender.substring(0, 8)}
+                      {data.spender.substring(0, 2 + DISPLAY_ADDRESS_HALF_DIGITS)}
                       {svg.octicon('kebab-horizontal', { height: 15 })}
-                      {data.spender.substr(data.contract.length - 6)}
+                      {data.spender.substr(data.contract.length - DISPLAY_ADDRESS_HALF_DIGITS)}
                     </div>
-                    <div 
-                      className='approveTokenSpendSpenderAddressFull' 
+                    <div
+                      className='approveTokenSpendSpenderAddressFull'
                       onClick={() => {
                         link.send('tray:clipboardData', data.spender)
                         this.setState({ copyTokenRequester: true })
                         setTimeout(() => {
                           this.setState({ copyTokenRequester: false })
-                        }, 1000) 
+                        }, 1000)
                       }}
                     >
                       {this.state.copyTokenRequester ? 'ADDRESS COPIED' : data.spender}
@@ -270,14 +271,14 @@ class TokenSpend extends React.Component {
                   <div className='approveTokenSpendTokenSymbol'>
                     {symbol}
                   </div>
-                  <div 
+                  <div
                     className='approveTokenSpendTokenContract'
                     onClick={() => {
                       link.send('tray:clipboardData', data.contract)
                       this.setState({ copyTokenContract: true })
                       setTimeout(() => {
                         this.setState({ copyTokenContract: false })
-                      }, 1000) 
+                      }, 1000)
                     }}
                   >
                     {this.state.copyTokenContract ? 'ADDRESS COPIED' : data.contract}

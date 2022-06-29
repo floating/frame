@@ -4,6 +4,8 @@ import Restore from 'react-restore'
 import link from '../../../../../../../../resources/link'
 import svg from '../../../../../../../../resources/svg'
 
+const DISPLAY_ADDRESS_HALF_DIGITS = 8; // TODO: consolidate to a global config
+
 class TxRecipient extends React.Component {
   constructor (...args) {
     super(...args)
@@ -38,9 +40,9 @@ class TxRecipient extends React.Component {
             <div className='_txRecipientSlice _txRecipientValue'>
               {ensName
                 ? <span>{ensName}</span>
-                : <span>{address.substring(0, 8)}{svg.octicon('kebab-horizontal', { height: 15 })}{address.substring(address.length - 6)}</span>
+                : <span>{address.substring(0, 2 + DISPLAY_ADDRESS_HALF_DIGITS)}{svg.octicon('kebab-horizontal', { height: 15 })}{address.substring(address.length - DISPLAY_ADDRESS_HALF_DIGITS)}</span>
               }
-              {req.decodedData && req.decodedData.contractName ? ( 
+              {req.decodedData && req.decodedData.contractName ? (
                 <span className={'_txRecipientContract'}>{(() => {
                   if (req.decodedData.contractName.length > 11) return `${req.decodedData.contractName.substr(0, 9)}..`
                   return req.decodedData.contractName
