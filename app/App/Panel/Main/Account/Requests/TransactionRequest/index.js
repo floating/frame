@@ -331,7 +331,7 @@ class TransactionRequest extends React.Component {
                               className={'txDetailsOptionsCopy'}
                               onMouseDown={() => {
                                 if (req && req.tx && req.tx.hash) {
-                                  link.send('tray:copyTxHash', req.tx.hash, this.chain)
+                                  link.send('tray:copyTxHash', req.tx.hash)
                                   this.setState({ txHashCopied: true, viewDetailsHover: false })
                                   setTimeout(() => {
                                     this.setState({ txHashCopied: false })

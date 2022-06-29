@@ -194,13 +194,13 @@ ipcMain.on('tray:openExternal', (e, url) => {
 ipcMain.on('tray:openExplorer', (e, hash, chain) => {
   // remove trailing slashes from the base url
   const explorer = (store('main.networks', chain.type, chain.id, 'explorer') || '').replace(/\/+$/, '')
-  shell.openExternal(`${explorer}/tx/${hash}`)
+
+  if (explorer) {
+    shell.openExternal(`${explorer}/tx/${hash}`)
+  }
 })
 
-ipcMain.on('tray:copyTxHash', (e, hash, chain) => {
-  // remove trailing slashes from the base url
-  // const explorer = (store('main.networks', chain.type, chain.id, 'explorer') || '').replace(/\/+$/, '')
-  // clipboard.writeText(explorer + '/tx/' + hash)
+ipcMain.on('tray:copyTxHash', (e, hash) => {
   if (hash) clipboard.writeText(hash)
 })
 
