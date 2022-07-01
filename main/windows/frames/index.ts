@@ -170,7 +170,7 @@ export default class FrameManager {
       webContents.send(channel, ...args)
     } else {
       log.error(
-        new Error(`Tried to send a message to frame with id ${frameId} but it does not exist or has been destroyed`),
+        new Error(`Tried to send a message to frame with id ${frameId} but it does not exist or has been destroyed`)
       )
     }
   }

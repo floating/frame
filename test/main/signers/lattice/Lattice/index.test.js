@@ -280,7 +280,7 @@ describe('#deriveAddresses', () => {
     expect(lattice.connection.getAddresses).toHaveBeenCalledWith(
       expect.objectContaining({
         startPath: [0x80000000 + 44, 0x80000000 + 60, 0x80000000, 0, 0],
-      }),
+      })
     )
   })
 
@@ -295,7 +295,7 @@ describe('#deriveAddresses', () => {
     expect(lattice.connection.getAddresses).toHaveBeenCalledWith(
       expect.objectContaining({
         startPath: [0x80000000 + 44, 0x80000000 + 60, 0x80000000, 5],
-      }),
+      })
     )
   })
 
@@ -314,7 +314,7 @@ describe('#deriveAddresses', () => {
         n + 1,
         expect.objectContaining({
           startPath: [0x80000000 + 44, 0x80000000 + 60, 0x80000000 + n, 0, 0],
-        }),
+        })
       )
     })
   })

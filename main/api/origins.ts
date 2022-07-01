@@ -55,7 +55,7 @@ function addPermissionRequest(address: Address, origin: string) {
 export function updateOrigin(
   payload: JSONRPCRequestPayload,
   origin: string,
-  connectionMessage = false,
+  connectionMessage = false
 ): OriginUpdateResult {
   let hasSession = false
 

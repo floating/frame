@@ -503,7 +503,7 @@ module.exports = {
 
       for (const accountAddress in balances) {
         const balanceIndex = balances[accountAddress].findIndex(
-          (balance) => balance.chainId === chainId && balance.address.toLowerCase() === key,
+          (balance) => balance.chainId === chainId && balance.address.toLowerCase() === key
         )
 
         if (balanceIndex > -1) {

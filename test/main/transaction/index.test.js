@@ -398,7 +398,7 @@ describe('#sign', () => {
         v: stripHexPrefix(signature.v),
         r: stripHexPrefix(signature.r),
         s: stripHexPrefix(signature.s),
-      }),
+      })
     )
 
     expect(signedTx.toJSON()).toMatchObject({

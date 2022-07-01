@@ -105,7 +105,7 @@ function hashTypedData(typedData) {
       Buffer.from('1901', 'hex'),
       structHash('EIP712Domain', typedData.types, typedData.domain),
       structHash(typedData.primaryType, typedData.types, typedData.message),
-    ]),
+    ])
   )
 }
 

@@ -34,7 +34,7 @@ declare module '@aragon/wrapper' {
       from: string,
       destination: string,
       action: string,
-      txData: Array<string | undefined>,
+      txData: Array<string | undefined>
     ): Promise<Array<TransactionData>>
   }
 

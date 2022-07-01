@@ -264,7 +264,7 @@ class _AccountMain extends React.Component {
                 0,
                 this.expandModule.bind(this),
                 true,
-                this.state.expandedModuleData,
+                this.state.expandedModuleData
               )}
             </div>
           </div>
@@ -418,7 +418,7 @@ class _AccountBody extends React.Component {
                 0,
                 this.expandModule.bind(this),
                 true,
-                this.state.expandedModuleData,
+                this.state.expandedModuleData
               )}
             </div>
           </div>

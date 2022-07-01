@@ -169,7 +169,7 @@ describe('migration 14', () => {
 
       // ensure other settings weren't changed
       expect(updatedState.main.networks.ethereum[137].connection[priority].on).toBe(
-        state.main.networks.ethereum[137].connection[priority].on,
+        state.main.networks.ethereum[137].connection[priority].on
       )
     })
 
@@ -182,7 +182,7 @@ describe('migration 14', () => {
 
       // ensure other settings weren't changed
       expect(updatedState.main.networks.ethereum[137].connection[priority].on).toBe(
-        state.main.networks.ethereum[137].connection[priority].on,
+        state.main.networks.ethereum[137].connection[priority].on
       )
     })
   })

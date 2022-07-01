@@ -328,7 +328,7 @@ class _ChainModule extends React.Component {
     let presets = networkPresets[id] || {}
     presets = Object.keys(presets).map((i) => ({ text: i, value: type + ':' + id + ':' + i }))
     presets = presets.concat(
-      Object.keys(networkPresets.default).map((i) => ({ text: i, value: type + ':' + id + ':' + i })),
+      Object.keys(networkPresets.default).map((i) => ({ text: i, value: type + ':' + id + ':' + i }))
     )
     presets.push({ text: 'Custom', value: type + ':' + id + ':' + 'custom' })
 
@@ -511,7 +511,7 @@ class _Network extends React.Component {
     this.setState({ primaryCustom: value })
     this.customPrimaryInputTimeout = setTimeout(
       () => link.send('tray:action', 'setPrimaryCustom', this.props.type, this.props.id, this.state.primaryCustom),
-      1000,
+      1000
     )
   }
 
@@ -522,7 +522,7 @@ class _Network extends React.Component {
     this.setState({ secondaryCustom: value })
     this.customSecondaryInputTimeout = setTimeout(
       () => link.send('tray:action', 'setSecondaryCustom', this.props.type, this.props.id, this.state.secondaryCustom),
-      1000,
+      1000
     )
   }
 
@@ -610,13 +610,13 @@ class _Network extends React.Component {
     let presets = networkPresets[id] || {}
     presets = Object.keys(presets).map((i) => ({ text: i, value: type + ':' + id + ':' + i }))
     presets = presets.concat(
-      Object.keys(networkPresets.default).map((i) => ({ text: i, value: type + ':' + id + ':' + i })),
+      Object.keys(networkPresets.default).map((i) => ({ text: i, value: type + ':' + id + ':' + i }))
     )
     presets.push({ text: 'Custom', value: type + ':' + id + ':' + 'custom' })
 
     const gas =
       Math.round(
-        parseInt(this.store('main.networksMeta.ethereum', this.state.id, 'gas.price.levels.fast'), 'hex') / 1e9,
+        parseInt(this.store('main.networksMeta.ethereum', this.state.id, 'gas.price.levels.fast'), 'hex') / 1e9
       ) || '---'
     const price = this.store('main.networksMeta.ethereum', this.state.id, 'nativeCurrency.usd.price') || '?'
     const change24hr = this.store('main.networksMeta.ethereum', this.state.id, 'nativeCurrency.usd.change24hr') || '?'
@@ -812,7 +812,7 @@ class Settings extends React.Component {
                 />
               )
             })}
-        </div>,
+        </div>
       )
     })
     return nets
@@ -826,7 +826,7 @@ class Settings extends React.Component {
     let presets = networkPresets[id] || {}
     presets = Object.keys(presets).map((i) => ({ text: i, value: type + ':' + id + ':' + i }))
     presets = presets.concat(
-      Object.keys(networkPresets.default).map((i) => ({ text: i, value: type + ':' + id + ':' + i })),
+      Object.keys(networkPresets.default).map((i) => ({ text: i, value: type + ':' + id + ':' + i }))
     )
     presets.push({ text: 'Custom', value: type + ':' + id + ':' + 'custom' })
     const networkOptions = []

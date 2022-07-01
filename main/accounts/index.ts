@@ -240,8 +240,8 @@ export class Accounts extends EventEmitter {
                     txRequest.feeAtTime = (
                       Math.round(
                         weiIntToEthInt(
-                          hexToInt(gasUsed) * hexToInt(txRequest.data.gasPrice || '0x0') * res.result.ethusd,
-                        ) * 100,
+                          hexToInt(gasUsed) * hexToInt(txRequest.data.gasPrice || '0x0') * res.result.ethusd
+                        ) * 100
                       ) / 100
                     ).toFixed(2)
                     account.update()
@@ -284,7 +284,7 @@ export class Accounts extends EventEmitter {
               const receiptBlock = parseInt((txRequest.tx.receipt as TransactionReceipt).blockNumber, 16)
               resolve(blockHeight - receiptBlock)
             }
-          },
+          }
         )
       })
     })
@@ -355,7 +355,7 @@ export class Accounts extends EventEmitter {
                   if (res.error) {
                     log.error('error sending message eth_unsubscribe', res)
                   }
-                },
+                }
               )
             }
 
@@ -391,7 +391,7 @@ export class Accounts extends EventEmitter {
             //   }
             // })
           }
-        },
+        }
       )
     }
   }
@@ -445,7 +445,7 @@ export class Accounts extends EventEmitter {
         .map(([_, req]) => [_, req] as [string, TransactionRequest])
         .filter(
           ([_, req]) =>
-            !req.locked && !req.feesUpdatedByUser && (!chainId || parseInt(req.data.chainId, 16) === chainId),
+            !req.locked && !req.feesUpdatedByUser && (!chainId || parseInt(req.data.chainId, 16) === chainId)
         )
 
       transactions.forEach(([id, req]) => {
@@ -807,7 +807,7 @@ export class Accounts extends EventEmitter {
     handlerId: string,
     userUpdate: boolean,
     previousFee: any,
-    cb: Callback<void>,
+    cb: Callback<void>
   ) {
     const txRequest = this.getTransactionRequest(currentAccount, handlerId)
 
@@ -830,7 +830,7 @@ export class Accounts extends EventEmitter {
       const { currentAccount, maxPriorityFeePerGas, gasLimit, currentBaseFee, txType } = this.txFeeUpdate(
         baseFee,
         handlerId,
-        userUpdate,
+        userUpdate
       )
 
       // New value
@@ -871,7 +871,7 @@ export class Accounts extends EventEmitter {
       const { currentAccount, maxPriorityFeePerGas, gasLimit, currentBaseFee, txType } = this.txFeeUpdate(
         priorityFee,
         handlerId,
-        userUpdate,
+        userUpdate
       )
 
       // New values
@@ -1008,7 +1008,7 @@ export class Accounts extends EventEmitter {
               txRequest.data.nonce = adjustedNonce
               currentAccount.update()
             }
-          },
+          }
         )
       }
     }

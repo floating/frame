@@ -66,7 +66,7 @@ class AddRing extends React.Component {
         } else {
           this.setState({ status: 'Successful', error: false })
         }
-      },
+      }
     )
   }
 

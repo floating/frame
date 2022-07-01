@@ -97,7 +97,7 @@ export default class Lattice extends Signer {
       const { fix: patch, minor, major } = this.connection.getFwVersion() || { fix: 0, major: 0, minor: 0 }
 
       log.info(
-        `Connected to Lattice with deviceId=${this.deviceId} paired=${paired}, firmware v${major}.${minor}.${patch}`,
+        `Connected to Lattice with deviceId=${this.deviceId} paired=${paired}, firmware v${major}.${minor}.${patch}`
       )
 
       this.appVersion = { major, minor, patch }

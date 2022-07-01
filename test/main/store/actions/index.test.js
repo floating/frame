@@ -358,7 +358,7 @@ describe('#removeBalance', () => {
     expect(balances[owner]).not.toContainEqual(expect.objectContaining({ address: testTokens.zrx.address }))
     expect(balances[owner]).toHaveLength(1)
     expect(balances['0xd0e3872f5fa8ecb49f1911f605c0da90689a484e']).not.toContainEqual(
-      expect.objectContaining({ address: testTokens.zrx.address }),
+      expect.objectContaining({ address: testTokens.zrx.address })
     )
     expect(balances['0xd0e3872f5fa8ecb49f1911f605c0da90689a484e']).toHaveLength(1)
   })
@@ -886,7 +886,7 @@ describe('#updateNetwork', () => {
   it('should update the network', () => {
     updateNetwork(
       { id: '0x4', type: 'ethereum', name: '', explorer: '', symbol: '' },
-      { id: '0x42', type: 'ethereum', name: 'test', explorer: 'explorer.test', symbol: 'TEST' },
+      { id: '0x42', type: 'ethereum', name: 'test', explorer: 'explorer.test', symbol: 'TEST' }
     )
 
     expect(main.networks.ethereum).toStrictEqual({
@@ -899,7 +899,7 @@ describe('#updateNetwork', () => {
   it('should trim string properties', () => {
     updateNetwork(
       { id: '0x4', type: 'ethereum', name: '', explorer: '', symbol: '' },
-      { id: '0x42', type: 'ethereum', name: 'test     ', explorer: '   explorer.test    ', symbol: 'TEST  ' },
+      { id: '0x42', type: 'ethereum', name: 'test     ', explorer: '   explorer.test    ', symbol: 'TEST  ' }
     )
 
     expect(main.networks.ethereum).toStrictEqual({
@@ -912,7 +912,7 @@ describe('#updateNetwork', () => {
   it('should update the chainId for origins using the updated network', () => {
     updateNetwork(
       { id: '0x4', type: 'ethereum', name: '', explorer: '', symbol: '' },
-      { id: '0x42', type: 'ethereum', name: 'test', explorer: 'explorer.test', symbol: 'TEST' },
+      { id: '0x42', type: 'ethereum', name: 'test', explorer: 'explorer.test', symbol: 'TEST' }
     )
 
     expect(main.origins).toStrictEqual({

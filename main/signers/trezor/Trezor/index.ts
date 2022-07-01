@@ -272,7 +272,7 @@ export default class Trezor extends Signer {
         typedData,
         domainSeparatorHash,
         messageHash,
-        rpcCallback,
+        rpcCallback
       )
     } else {
       flex.rpc('trezor.ethereumSignTypedData', this.device.path, this.getPath(index), typedData, rpcCallback)

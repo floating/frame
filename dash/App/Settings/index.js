@@ -78,7 +78,7 @@ class Settings extends React.Component {
     const { type, id } = this.store('main.currentNetwork')
     this.customPrimaryInputTimeout = setTimeout(
       () => link.send('tray:action', 'setPrimaryCustom', type, id, this.state.primaryCustom),
-      1000,
+      1000
     )
   }
 
@@ -90,7 +90,7 @@ class Settings extends React.Component {
     const { type, id } = this.store('main.currentNetwork')
     this.customSecondaryInputTimeout = setTimeout(
       () => link.send('tray:action', 'setSecondaryCustom', type, id, this.state.secondaryCustom),
-      1000,
+      1000
     )
   }
 
@@ -102,7 +102,7 @@ class Settings extends React.Component {
     // TODO: Update to target specific Lattice device rather than global
     this.inputLatticeTimeout = setTimeout(
       () => link.send('tray:action', 'setLatticeEndpointCustom', this.state.latticeEndpoint),
-      1000,
+      1000
     )
   }
 

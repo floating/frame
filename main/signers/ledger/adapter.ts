@@ -194,7 +194,7 @@ export default class LedgerSignerAdapter extends SignerAdapter {
     const { pendingDisconnections, reconnections } = this.getReconnectedLedgers(ledgerDevices)
     const detachedLedgers = this.getDetachedLedgers(ledgerDevices)
     const attachedDevices = this.getAttachedDevices(ledgerDevices).filter(
-      (device) => !reconnections.some((r) => r.device.devicePath === device.path),
+      (device) => !reconnections.some((r) => r.device.devicePath === device.path)
     )
 
     return {
@@ -215,7 +215,7 @@ export default class LedgerSignerAdapter extends SignerAdapter {
     // detached Ledgers are previously known signers that are
     // no longer one of the connected Ledger devices
     return Object.values(this.knownSigners).filter(
-      (signer) => !connectedDevices.some((device) => device.path === signer.devicePath),
+      (signer) => !connectedDevices.some((device) => device.path === signer.devicePath)
     )
   }
 
@@ -233,7 +233,7 @@ export default class LedgerSignerAdapter extends SignerAdapter {
 
         return resolved
       },
-      { pendingDisconnections: [] as Array<Disconnection>, reconnections: [] as Array<Disconnection> },
+      { pendingDisconnections: [] as Array<Disconnection>, reconnections: [] as Array<Disconnection> }
     )
 
     // if we are still waiting on reconnections, check if any more devices have been added. if so, assume
@@ -242,7 +242,7 @@ export default class LedgerSignerAdapter extends SignerAdapter {
     // device path from the one from which they were disconnected
     while (pendingDisconnections.length > 0) {
       const reconnectedDevice = connectedDevices.find(
-        (device) => !reconnections.some((r) => r.device.devicePath === device.path) && !this.knownSigners[device.path],
+        (device) => !reconnections.some((r) => r.device.devicePath === device.path) && !this.knownSigners[device.path]
       )
 
       if (reconnectedDevice) {

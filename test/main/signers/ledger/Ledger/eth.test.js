@@ -101,7 +101,7 @@ describe('#signMessage', () => {
     const signature = await ethApp.signMessage("44'/60'/0'/0/2", '0x68656c6c6f2c204672616d6521')
 
     expect(signature).toBe(
-      '0x5dfbee187e688cddacd854f3ed514c5a0a84ae972fe9ddeafb06436c92d7b1421ad9b725c7270d2c5b32ef824e0700ae354471a644d9cd06cb9f3422feba213100',
+      '0x5dfbee187e688cddacd854f3ed514c5a0a84ae972fe9ddeafb06436c92d7b1421ad9b725c7270d2c5b32ef824e0700ae354471a644d9cd06cb9f3422feba213100'
     )
   }, 100)
 
@@ -115,7 +115,7 @@ describe('#signMessage', () => {
     const signature = await ethApp.signMessage("44'/1'/0'/0/6", '68656c6c6f2c204672616d6521')
 
     expect(signature).toBe(
-      '0xe5d40722e7df2660b8f7b68367ea885ddc68d4da701bb04565f60252909127e72cfe480f7227a2a3f6e8753d4ac9f4e3526f65d78fa3fbcc1ec3b3148bd85e3201',
+      '0xe5d40722e7df2660b8f7b68367ea885ddc68d4da701bb04565f60252909127e72cfe480f7227a2a3f6e8753d4ac9f4e3526f65d78fa3fbcc1ec3b3148bd85e3201'
     )
   }, 100)
 
@@ -211,7 +211,7 @@ describe('#signTypedData', () => {
     const signature = await ethApp.signTypedData("44'/60'/0'/0", typedData)
 
     expect(signature).toBe(
-      '0xee800a5a7e4e1668a8ebab2a5bce4c96424e0f80b7ba08fc48e063393196e0851c0f9dab8909655368974e8aec6dba5c15772d575189e31b894fb7f8286c63b900',
+      '0xee800a5a7e4e1668a8ebab2a5bce4c96424e0f80b7ba08fc48e063393196e0851c0f9dab8909655368974e8aec6dba5c15772d575189e31b894fb7f8286c63b900'
     )
   }, 100)
 
@@ -283,7 +283,7 @@ describe('#signTransaction', () => {
     const signature = await ethApp.signTransaction("44'/60'/0'/0", legacyTx)
 
     expect(signature).toBe(
-      '0xf86a058501dcd65000825208942f318c334780961fb129d2a6c30d0763d9a5c970865af3107a4000802ba087cdd3a45082a1d86c4dab5a1944360a69543dba2acacea01f19133a7ddef115a078365690e4bdcf1bb58242bb673d53f94d525bee4217b0f191048eaca8cade73',
+      '0xf86a058501dcd65000825208942f318c334780961fb129d2a6c30d0763d9a5c970865af3107a4000802ba087cdd3a45082a1d86c4dab5a1944360a69543dba2acacea01f19133a7ddef115a078365690e4bdcf1bb58242bb673d53f94d525bee4217b0f191048eaca8cade73'
     )
   }, 100)
 
@@ -297,7 +297,7 @@ describe('#signTransaction', () => {
     const signature = await ethApp.signTransaction("44'/60'/0'/0", eip1559Tx)
 
     expect(signature).toBe(
-      '0x02f8700406843b9aca00843b9aca0b825208942f318c334780961fb129d2a6c30d0763d9a5c970865af3107a400080c001a0ebefc9f798b04e3952310d6b82c48fda245df9edef77507d06025cdc5af4efa1a0570784cbcf84a0f03cac7771fbfeee4f4759034baf42ca735065554afa600ee3',
+      '0x02f8700406843b9aca00843b9aca0b825208942f318c334780961fb129d2a6c30d0763d9a5c970865af3107a400080c001a0ebefc9f798b04e3952310d6b82c48fda245df9edef77507d06025cdc5af4efa1a0570784cbcf84a0f03cac7771fbfeee4f4759034baf42ca735065554afa600ee3'
     )
   }, 100)
 

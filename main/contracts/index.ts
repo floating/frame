@@ -46,7 +46,7 @@ function parseAbi(abiData: string): Interface | undefined {
 
 async function fetchSourceCode(contractAddress: Address) {
   const res = await fetch(
-    `https://api.etherscan.io/api?module=contract&action=getsourcecode&address=${contractAddress}&apikey=3SYU5MW5QK8RPCJV1XVICHWKT774993S24`,
+    `https://api.etherscan.io/api?module=contract&action=getsourcecode&address=${contractAddress}&apikey=3SYU5MW5QK8RPCJV1XVICHWKT774993S24`
   )
 
   if (res.status === 200 && (res.headers.get('content-type') || '').toLowerCase().includes('json')) {
@@ -104,7 +104,7 @@ export function decodeCallData(calldata: string, abi: string) {
 
 export async function decodeContractCall(
   contractAddress: Address,
-  calldata: string,
+  calldata: string
 ): Promise<DecodedCallData | undefined> {
   const contractSources: ContractSource[] = [{ name: 'ERC-20', source: 'erc-20 contract', abi: erc20Abi }]
   const contractSource = await fetchAbi(contractAddress)

@@ -180,7 +180,7 @@ class Tray {
 
   constructor() {
     this.electronTray = new ElectronTray(
-      path.join(__dirname, process.platform === 'darwin' ? './IconTemplate.png' : './Icon.png'),
+      path.join(__dirname, process.platform === 'darwin' ? './IconTemplate.png' : './Icon.png')
     )
     this.ready = false
     this.gasObserver = store.observer(() => {

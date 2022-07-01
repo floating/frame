@@ -16,7 +16,7 @@ function createWeb3ProviderWrapper(chainId: string, provider: Provider) {
         _origin: 'frame-internal',
         chainId,
       },
-      cb,
+      cb
     )
   }
 

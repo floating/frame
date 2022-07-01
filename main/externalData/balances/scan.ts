@@ -133,7 +133,7 @@ export default function (eth: EthereumProvider) {
           return multicallSupportsChain(chainId)
             ? getTokenBalancesFromMulticall(owner, tokens, chainId)
             : getTokenBalancesFromContracts(owner, tokens)
-        }),
+        })
       )
 
       return ([] as TokenBalance[]).concat(...tokenBalances)

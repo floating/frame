@@ -332,7 +332,7 @@ describe('signer device changes', () => {
       latticeSigner.emit('update')
 
       expect(updateHandler).toHaveBeenCalledWith(
-        expect.objectContaining({ deviceId: 'NBaJ8e', deviceName: 'Frame-testlattice' }),
+        expect.objectContaining({ deviceId: 'NBaJ8e', deviceName: 'Frame-testlattice' })
       )
     })
 
@@ -392,7 +392,7 @@ describe('signer device changes', () => {
       latticeSigner.emit('error')
 
       expect(updateHandler).toHaveBeenCalledWith(
-        expect.objectContaining({ deviceId: 'NBaJ8e', deviceName: 'Frame-testlattice' }),
+        expect.objectContaining({ deviceId: 'NBaJ8e', deviceName: 'Frame-testlattice' })
       )
     })
 

@@ -10,5 +10,5 @@ document.addEventListener(
       document.body.style.opacity = '1'
     })
   },
-  false,
+  false
 )

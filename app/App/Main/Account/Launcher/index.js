@@ -90,7 +90,7 @@ class Launcher extends React.Component {
               <div className="launchButtonInner">
                 <div className="dashboradIcon">{svg.send(13)}</div>
                 <div>{'Send'}</div>
-              </div>,
+              </div>
             )}
           </div>
         </div>

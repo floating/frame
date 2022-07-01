@@ -343,7 +343,7 @@ export class Provider extends EventEmitter {
                 {
                   type: 'ethereum',
                   id: parseInt(req.data.chainId, 16),
-                },
+                }
               )
             }
             const broadcastTimer = setInterval(() => cast(), 1000)
@@ -412,7 +412,7 @@ export class Provider extends EventEmitter {
           log.verbose(`gas estimate for tx to ${txParams.to}: ${estimatedLimit}, using ${paddedLimit} as gas limit`)
           return resolve(addHexPrefix(paddedLimit.toString(16)))
         },
-        targetChain,
+        targetChain
       )
     })
   }
@@ -426,7 +426,7 @@ export class Provider extends EventEmitter {
     this.connection.send(
       { id: 1, jsonrpc: '2.0', method: 'eth_getTransactionCount', params: [rawTx.from, 'pending'] },
       res,
-      targetChain,
+      targetChain
     )
   }
 
@@ -482,7 +482,7 @@ export class Provider extends EventEmitter {
       return resError(
         `Chain for transaction (${txChain}) does not match request target chain (${targetChain})`,
         payload,
-        res,
+        res
       )
     }
 
@@ -730,7 +730,7 @@ export class Provider extends EventEmitter {
           origin: payload._origin,
           payload,
         } as AddChainRequest,
-        res,
+        res
       )
     }
   }
@@ -761,7 +761,7 @@ export class Provider extends EventEmitter {
 
         // don't attempt to add the token if it's already been added
         const tokenExists = store('main.tokens.custom').some(
-          (token: Token) => token.chainId === chainId && token.address === address,
+          (token: Token) => token.chainId === chainId && token.address === address
         )
         if (tokenExists) {
           return res()
@@ -793,10 +793,10 @@ export class Provider extends EventEmitter {
             origin: payload._origin,
             payload,
           } as AddTokenRequest,
-          res,
+          res
         )
       },
-      targetChain,
+      targetChain
     )
   }
 

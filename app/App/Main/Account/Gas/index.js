@@ -62,7 +62,7 @@ class Gas extends React.Component {
   }
   toDisplayUSD(bn) {
     return parseFloat(
-      bn.toNumber() >= 1 ? bn.toFixed(0, BigNumber.ROUND_UP).toString() : bn.toFixed(2, BigNumber.ROUND_UP).toString(),
+      bn.toNumber() >= 1 ? bn.toFixed(0, BigNumber.ROUND_UP).toString() : bn.toFixed(2, BigNumber.ROUND_UP).toString()
     )
   }
   roundGwei(gwei) {
@@ -74,7 +74,7 @@ class Gas extends React.Component {
         ? Math.round(gwei * 10) / 10
         : gwei >= 1
         ? Math.round(gwei * 100) / 100
-        : Math.round(gwei * 1000) / 1000,
+        : Math.round(gwei * 1000) / 1000
     )
   }
   levelDisplay(level) {
@@ -86,7 +86,7 @@ class Gas extends React.Component {
     return this.toDisplayUSD(
       BigNumber(value * gasLimit)
         .shiftedBy(-9)
-        .multipliedBy(nativeUSD),
+        .multipliedBy(nativeUSD)
     )
   }
 
@@ -109,7 +109,7 @@ class Gas extends React.Component {
     const layer = this.store('main.networks', type, id, 'layer')
     const nativeCurrency = this.store('main.networksMeta', type, id, 'nativeCurrency')
     const nativeUSD = BigNumber(
-      nativeCurrency && nativeCurrency.usd && layer !== 'testnet' ? nativeCurrency.usd.price : 0,
+      nativeCurrency && nativeCurrency.usd && layer !== 'testnet' ? nativeCurrency.usd.price : 0
     )
 
     if (id === 10) {
