@@ -12,6 +12,30 @@ export default {
     icon: '',
     primaryColor: 'var(--good)'
   },
+  '0x3': {
+    chainId: 3,
+    name: 'ropsten',
+    icon: '',
+    primaryColor: 'rgb(255, 153, 51)'
+  },
+  '0x4': {
+    chainId: 4,
+    name: 'rinkeby',
+    icon: '',
+    primaryColor: 'rgb(255, 153, 51)'
+  },
+  '0x5': {
+    chainId: 5,
+    name: 'görli',
+    icon: '',
+    primaryColor: 'rgb(255, 153, 51)'
+  },
+  '0x2a': {
+    chainId: 42,
+    name: 'kovan',
+    icon: '',
+    primaryColor: 'rgb(255, 153, 51)'
+  },
   '0xa': {
     chainId: 10,
     name: 'optimism',
