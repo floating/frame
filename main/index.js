@@ -49,6 +49,26 @@ function getCrashReportFields () {
   }, {})
 }
 
+function getSentryException(event) {
+  const exceptions = event?.exception?.values || []
+  const safeExceptions = exceptions.map((exception) => {
+    const frames = exception?.stacktrace?.frames || []
+    const safeExceptionModule = ({ module = '' }) => {
+      const matches = /\((.+)[\\|\/]frame[\\|\/]resources[\\|\/]app.asar[\\|\/](.+)\)/.exec(module)
+      if (matches && matches[2]) {
+        return `{asar}/${matches[2].replaceAll('\\', '/')}`
+      }
+      return module
+    }
+    const safeFrames = frames.map((frame) => ({ ...frame, module: safeExceptionModule(frame) }))
+    return { stacktrace: { frames: safeFrames } }
+  })
+
+  return {
+    exception: { values: safeExceptions },
+  }
+}
+
 Sentry.init({
   // only use IPC from renderer process, not HTTP
   ipcMode: Sentry.IPCMode.Classic,
@@ -56,6 +76,7 @@ Sentry.init({
   beforeSend: (evt) => {
     return {
       ...evt,
+      exception: getSentryException(evt),
       user: { ...evt.user, ip_address: undefined }, // remove IP address
       tags: { ...evt.tags, 'frame.instance_id': store('main.instanceId') },
       extra: getCrashReportFields()
