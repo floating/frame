@@ -98,34 +98,34 @@ class AddPhrase extends React.Component {
     let itemClass = 'addAccountItem addAccountItemSmart addAccountItemAdding'
     return (
       <div className={itemClass} style={{ transitionDelay: (0.64 * this.props.index) / 4 + 's' }}>
-        <div className="addAccountItemBar addAccountItemMock" />
-        <div className="addAccountItemWrap">
-          <div className="addAccountItemTop">
-            <div className="addAccountItemTopType">
-              <div className="addAccountItemIcon">
+        <div className='addAccountItemBar addAccountItemMock' />
+        <div className='addAccountItemWrap'>
+          <div className='addAccountItemTop'>
+            <div className='addAccountItemTopType'>
+              <div className='addAccountItemIcon'>
                 <RingIcon svgLookup={{ name: 'mask', size: 24 }} />
               </div>
-              <div className="addAccountItemTopTitle">Watch Account</div>
+              <div className='addAccountItemTopTitle'>Watch Account</div>
             </div>
             {/* <div className='addAccountItemClose' onClick={() => this.props.close()}>{'Done'}</div> */}
-            <div className="addAccountItemSummary">Watch accounts work like normal accounts but cannot sign</div>
+            <div className='addAccountItemSummary'>Watch accounts work like normal accounts but cannot sign</div>
           </div>
-          <div className="addAccountItemOption">
+          <div className='addAccountItemOption'>
             <div
-              className="addAccountItemOptionIntro"
+              className='addAccountItemOptionIntro'
               onClick={() => {
                 this.adding()
               }}
             >
               Add Address Account
             </div>
-            <div className="addAccountItemOptionSetup" style={{ transform: `translateX(-${100 * this.state.index}%)` }}>
-              <div className="addAccountItemOptionSetupFrames">
-                <div className="addAccountItemOptionSetupFrame">
-                  <div className="addAccountItemOptionTitle">input address</div>
-                  <div className="addAccountItemOptionInputPhrase">
+            <div className='addAccountItemOptionSetup' style={{ transform: `translateX(-${100 * this.state.index}%)` }}>
+              <div className='addAccountItemOptionSetupFrames'>
+                <div className='addAccountItemOptionSetupFrame'>
+                  <div className='addAccountItemOptionTitle'>input address</div>
+                  <div className='addAccountItemOptionInputPhrase'>
                     <textarea
-                      tabIndex="-1"
+                      tabIndex='-1'
                       value={this.state.address}
                       ref={this.forms[0]}
                       onChange={(e) => this.onChange('address', e)}
@@ -134,14 +134,14 @@ class AddPhrase extends React.Component {
                       onKeyPress={(e) => this.keyPress(e)}
                     />
                   </div>
-                  <div className="addAccountItemOptionSubmit" onClick={() => this.create()}>
+                  <div className='addAccountItemOptionSubmit' onClick={() => this.create()}>
                     Create
                   </div>
                 </div>
-                <div className="addAccountItemOptionSetupFrame">
-                  <div className="addAccountItemOptionTitle">{this.state.status}</div>
+                <div className='addAccountItemOptionSetupFrame'>
+                  <div className='addAccountItemOptionTitle'>{this.state.status}</div>
                   {this.state.error ? (
-                    <div className="addAccountItemOptionSubmit" onClick={() => this.restart()}>
+                    <div className='addAccountItemOptionSubmit' onClick={() => this.restart()}>
                       try again
                     </div>
                   ) : null}
@@ -149,7 +149,7 @@ class AddPhrase extends React.Component {
               </div>
             </div>
           </div>
-          <div className="addAccountItemFooter" />
+          <div className='addAccountItemFooter' />
         </div>
       </div>
     )

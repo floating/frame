@@ -62,20 +62,20 @@ class _OriginModule extends React.Component {
   indicator(status) {
     if (status === 'connected') {
       return (
-        <div className="connectionOptionStatusIndicator">
-          <div className="connectionOptionStatusIndicatorGood" />
+        <div className='connectionOptionStatusIndicator'>
+          <div className='connectionOptionStatusIndicatorGood' />
         </div>
       )
     } else if (status === 'loading' || status === 'syncing' || status === 'pending' || status === 'standby') {
       return (
-        <div className="connectionOptionStatusIndicator">
-          <div className="connectionOptionStatusIndicatorPending" />
+        <div className='connectionOptionStatusIndicator'>
+          <div className='connectionOptionStatusIndicatorPending' />
         </div>
       )
     } else {
       return (
-        <div className="connectionOptionStatusIndicator">
-          <div className="connectionOptionStatusIndicatorBad" />
+        <div className='connectionOptionStatusIndicator'>
+          <div className='connectionOptionStatusIndicatorBad' />
         </div>
       )
     }
@@ -95,7 +95,7 @@ class _OriginModule extends React.Component {
     return (
       <>
         <div
-          className="sliceOrigin"
+          className='sliceOrigin'
           onClick={() => {
             link.send('tray:action', 'navDash', {
               view: 'notify',
@@ -104,10 +104,10 @@ class _OriginModule extends React.Component {
           }}
         >
           <div className={active ? 'sliceOriginIndicator sliceOriginIndicatorActive' : 'sliceOriginIndicator'} />
-          <div className="sliceOriginTile">{origin}</div>
-          <div className="sliceOriginReqs">
-            <div className="sliceOriginReqsNumber">{this.state.reqsAverage}</div>
-            <div className="sliceOriginReqsLabel">{'reqs/s'}</div>
+          <div className='sliceOriginTile'>{origin}</div>
+          <div className='sliceOriginReqs'>
+            <div className='sliceOriginReqsNumber'>{this.state.reqsAverage}</div>
+            <div className='sliceOriginReqsLabel'>{'reqs/s'}</div>
           </div>
         </div>
         {this.state.expanded ? <div>{'origin quick menu'}</div> : null}
@@ -144,14 +144,14 @@ class ChainModule extends React.Component {
   renderHeader(origin, id) {
     return (
       <div
-        className="sliceTile sliceTileClickable"
+        className='sliceTile sliceTileClickable'
         onClick={() => {
           this.setState({ expanded: !this.state.expanded })
         }}
       >
-        <div className="sliceTileUsage">
-          <div className="sliceTileUsageCount">{'4'}</div>
-          <div className="sliceTileUsageDescription">{'connected dapps'}</div>
+        <div className='sliceTileUsage'>
+          <div className='sliceTileUsageCount'>{'4'}</div>
+          <div className='sliceTileUsageDescription'>{'connected dapps'}</div>
         </div>
       </div>
     )
@@ -159,20 +159,20 @@ class ChainModule extends React.Component {
   indicator(status) {
     if (status === 'connected') {
       return (
-        <div className="connectionOptionStatusIndicator">
-          <div className="connectionOptionStatusIndicatorGood" />
+        <div className='connectionOptionStatusIndicator'>
+          <div className='connectionOptionStatusIndicatorGood' />
         </div>
       )
     } else if (status === 'loading' || status === 'syncing' || status === 'pending' || status === 'standby') {
       return (
-        <div className="connectionOptionStatusIndicator">
-          <div className="connectionOptionStatusIndicatorPending" />
+        <div className='connectionOptionStatusIndicator'>
+          <div className='connectionOptionStatusIndicatorPending' />
         </div>
       )
     } else {
       return (
-        <div className="connectionOptionStatusIndicator">
-          <div className="connectionOptionStatusIndicatorBad" />
+        <div className='connectionOptionStatusIndicator'>
+          <div className='connectionOptionStatusIndicatorBad' />
         </div>
       )
     }
@@ -189,14 +189,14 @@ class ChainModule extends React.Component {
     presets.push({ text: 'Custom', value: type + ':' + id + ':' + 'custom' })
 
     return (
-      <div className="sliceContainer" ref={this.ref}>
+      <div className='sliceContainer' ref={this.ref}>
         {this.renderHeader('connection', id)}
         {!this.state.expanded ? (
-          <div className="sliceContainer">
+          <div className='sliceContainer'>
             <OriginModule origin={'send.frame.eth'} {...this.props} />
             <OriginModule origin={'uniswap.io'} {...this.props} />
             <OriginModule origin={'app.aave.eth'} {...this.props} />
-            <div className="viewAllOrigin">{'view all'}</div>
+            <div className='viewAllOrigin'>{'view all'}</div>
           </div>
         ) : null}
       </div>

@@ -40,25 +40,25 @@ class Settings extends React.Component {
     return (
       <div ref={this.moduleRef}>
         {this.props.expanded ? (
-          <div className="moduleHeader">
+          <div className='moduleHeader'>
             {'Settings'}
-            <div className="moduleHeaderClose" onMouseDown={() => this.props.expandModule(false)}>
+            <div className='moduleHeaderClose' onMouseDown={() => this.props.expandModule(false)}>
               {svg.close(12)}
             </div>
           </div>
         ) : null}
-        <div className="moduleMain moduleMainSettings">
+        <div className='moduleMain moduleMainSettings'>
           {!this.props.expanded ? (
-            <div className="moduleButton" onMouseDown={() => this.props.expandModule(this.props.moduleId)}>
+            <div className='moduleButton' onMouseDown={() => this.props.expandModule(this.props.moduleId)}>
               Account Settings
             </div>
           ) : (
             <>
-              <div className="moduleRow">
+              <div className='moduleRow'>
                 Account Tag:
                 <input
-                  type="text"
-                  tabIndex="-1"
+                  type='text'
+                  tabIndex='-1'
                   value={this.state.name}
                   onChange={(e) => {
                     this.setState({ name: e.target.value })
@@ -67,15 +67,15 @@ class Settings extends React.Component {
                 />
               </div>
               {account.smart ? (
-                <div className="moduleRow">Chain ID: {account.smart.chain && account.smart.chain.id}</div>
+                <div className='moduleRow'>Chain ID: {account.smart.chain && account.smart.chain.id}</div>
               ) : null}
-              <div className="moduleRow">Status: {account.status}</div>
-              <div className="moduleRow">ENS Name: {account.ensName ? account.ensName : 'none'}</div>
-              <div className="moduleRow">Last Signer Type: {account.lastSignerType}</div>
-              <div className="moduleRow">Signer Connected: {account.signer ? 'yes' : 'no'}</div>
+              <div className='moduleRow'>Status: {account.status}</div>
+              <div className='moduleRow'>ENS Name: {account.ensName ? account.ensName : 'none'}</div>
+              <div className='moduleRow'>Last Signer Type: {account.lastSignerType}</div>
+              <div className='moduleRow'>Signer Connected: {account.signer ? 'yes' : 'no'}</div>
               {/* <div className='moduleRow'>Account Added: {account.created}</div> */}
               <div
-                className="moduleButton moduleButtonBad"
+                className='moduleButton moduleButtonBad'
                 onMouseDown={() => {
                   link.rpc('removeAccount', this.props.id, {}, () => {
                     // console.log('Removed account ', address)

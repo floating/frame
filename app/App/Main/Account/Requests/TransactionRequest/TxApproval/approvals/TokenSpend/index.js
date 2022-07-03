@@ -114,11 +114,11 @@ class TokenSpend extends React.Component {
     const inputLock = !data.symbol || !data.name || !this.decimals
 
     return (
-      <div className="approveTransactionWarning">
-        <div className="approveTransactionWarningOptions">
+      <div className='approveTransactionWarning'>
+        <div className='approveTransactionWarningOptions'>
           <div
-            className="approveTransactionWarningReject"
-            role="button"
+            className='approveTransactionWarningReject'
+            role='button'
             style={
               this.state.inEditApproval
                 ? {
@@ -137,7 +137,7 @@ class TokenSpend extends React.Component {
                 ? 'approveTokenSpendEditButton approveTokenSpendDoneButton'
                 : 'approveTokenSpendEditButton'
             }
-            role="button"
+            role='button'
             onClick={() => {
               if (this.state.inEditApproval) {
                 this.doneEditing()
@@ -149,8 +149,8 @@ class TokenSpend extends React.Component {
             {this.state.inEditApproval ? 'Done' : 'Edit'}
           </div>
           <div
-            className="approveTransactionWarningProceed"
-            role="button"
+            className='approveTransactionWarningProceed'
+            role='button'
             style={
               this.state.inEditApproval
                 ? {
@@ -166,32 +166,32 @@ class TokenSpend extends React.Component {
             Proceed
           </div>
         </div>
-        <div className="approveTransactionWarningFill">
-          <div className="approveTransactionWarningIcon approveTransactionWarningIconLeft">{svg.alert(32)}</div>
-          <div className="approveTransactionWarningIcon approveTransactionWarningIconRight">{svg.alert(32)}</div>
-          <div className="approveTransactionWarningTitle">{'token approval'}</div>
+        <div className='approveTransactionWarningFill'>
+          <div className='approveTransactionWarningIcon approveTransactionWarningIconLeft'>{svg.alert(32)}</div>
+          <div className='approveTransactionWarningIcon approveTransactionWarningIconRight'>{svg.alert(32)}</div>
+          <div className='approveTransactionWarningTitle'>{'token approval'}</div>
           {this.state.inEditApproval ? (
             <div className={'approveTokenSpend'}>
               {this.state.exiting ? (
-                <div className="approveTokenSpendConfirm">
+                <div className='approveTokenSpendConfirm'>
                   {displayAmount.number ? (
-                    <div className="approveTokenSpendConfirmNumber">{displayAmount.number}</div>
+                    <div className='approveTokenSpendConfirmNumber'>{displayAmount.number}</div>
                   ) : null}
                   {displayAmount.symbol ? (
-                    <div className="approveTokenSpendConfirmNumberText">{displayAmount.symbol}</div>
+                    <div className='approveTokenSpendConfirmNumberText'>{displayAmount.symbol}</div>
                   ) : null}
-                  <div className="approveTokenSpendConfirmSymbol">{data.symbol}</div>
+                  <div className='approveTokenSpendConfirmSymbol'>{data.symbol}</div>
                 </div>
               ) : (
-                <div className="approveTokenSpendEdit">
-                  <div className="approveTokenSpendEditTitle">{'Token Spend Limit'}</div>
-                  <div className="approveTokenSpendAmount">
-                    <div className="approveTokenSpendSymbol">{symbol}</div>
+                <div className='approveTokenSpendEdit'>
+                  <div className='approveTokenSpendEditTitle'>{'Token Spend Limit'}</div>
+                  <div className='approveTokenSpendAmount'>
+                    <div className='approveTokenSpendSymbol'>{symbol}</div>
                     {this.state.mode === 'custom' ? (
                       <input
                         autoFocus
-                        type="text"
-                        aria-label="Custom Amount"
+                        type='text'
+                        aria-label='Custom Amount'
                         value={this.state.customInput}
                         onChange={(e) => {
                           e.preventDefault()
@@ -205,8 +205,8 @@ class TokenSpend extends React.Component {
                     ) : (
                       <div>
                         <div
-                          className="approveTokenSpendAmountNoInput"
-                          role="textbox"
+                          className='approveTokenSpendAmountNoInput'
+                          role='textbox'
                           style={inputLock ? { cursor: 'default' } : null}
                           onClick={
                             inputLock
@@ -216,20 +216,20 @@ class TokenSpend extends React.Component {
                                 }
                           }
                         >
-                          <div className="approveTokenSpendAmountNoInputNumber">{displayAmount.number}</div>
-                          <div className="approveTokenSpendAmountNoInputSymbol">{displayAmount.symbol}</div>
+                          <div className='approveTokenSpendAmountNoInputNumber'>{displayAmount.number}</div>
+                          <div className='approveTokenSpendAmountNoInputSymbol'>{displayAmount.symbol}</div>
                         </div>
                       </div>
                     )}
                   </div>
-                  <div className="approveTokenSpendPresets">
+                  <div className='approveTokenSpendPresets'>
                     <div
                       className={
                         this.state.mode === 'requested'
                           ? 'approveTokenSpendPresetButton approveTokenSpendPresetButtonSelected'
                           : 'approveTokenSpendPresetButton'
                       }
-                      role="button"
+                      role='button'
                       onClick={() => {
                         this.setState({ mode: 'requested', amount: this.requestedAmount })
                       }}
@@ -242,13 +242,13 @@ class TokenSpend extends React.Component {
                           ? 'approveTokenSpendPresetButton approveTokenSpendPresetButtonSelected'
                           : 'approveTokenSpendPresetButton'
                       }
-                      role="button"
+                      role='button'
                       onClick={() => {
                         const amount = MAX_HEX
                         this.setState({ mode: 'unlimited', amount })
                       }}
                     >
-                      <span className="approveTokenSpendPresetButtonInfinity">{'Unlimited'}</span>
+                      <span className='approveTokenSpendPresetButtonInfinity'>{'Unlimited'}</span>
                     </div>
                     {!inputLock ? (
                       <div
@@ -257,7 +257,7 @@ class TokenSpend extends React.Component {
                             ? 'approveTokenSpendPresetButton approveTokenSpendPresetButtonSelected'
                             : 'approveTokenSpendPresetButton'
                         }
-                        role="button"
+                        role='button'
                         onClick={() => {
                           this.setCustomAmount(this.state.customInput)
                         }}
@@ -270,17 +270,17 @@ class TokenSpend extends React.Component {
               )}
             </div>
           ) : (
-            <div className="approveTokenSpend">
-              <div className="approveTokenSpendDescription">
+            <div className='approveTokenSpend'>
+              <div className='approveTokenSpendDescription'>
                 {data.spender ? (
-                  <div className="approveTokenSpendSpenderAddress">
-                    <div className="approveTokenSpendSpenderAddressLarge">
+                  <div className='approveTokenSpendSpenderAddress'>
+                    <div className='approveTokenSpendSpenderAddressLarge'>
                       {data.spender.substring(0, 6)}
                       {svg.octicon('kebab-horizontal', { height: 15 })}
                       {data.spender.substr(data.contract.length - 4)}
                     </div>
                     <div
-                      className="approveTokenSpendSpenderAddressFull"
+                      className='approveTokenSpendSpenderAddressFull'
                       onClick={() => {
                         link.send('tray:clipboardData', data.spender)
                         this.setState({ copyTokenRequester: true })
@@ -293,11 +293,11 @@ class TokenSpend extends React.Component {
                     </div>
                   </div>
                 ) : null}
-                <div className="approveTokenSpendSub">{'wants approval to spend'}</div>
-                <div className="approveTokenSpendToken">
-                  <div className="approveTokenSpendTokenSymbol">{symbol}</div>
+                <div className='approveTokenSpendSub'>{'wants approval to spend'}</div>
+                <div className='approveTokenSpendToken'>
+                  <div className='approveTokenSpendTokenSymbol'>{symbol}</div>
                   <div
-                    className="approveTokenSpendTokenContract"
+                    className='approveTokenSpendTokenContract'
                     onClick={() => {
                       link.send('tray:clipboardData', data.contract)
                       this.setState({ copyTokenContract: true })
@@ -309,7 +309,7 @@ class TokenSpend extends React.Component {
                     {this.state.copyTokenContract ? 'ADDRESS COPIED' : data.contract}
                   </div>
                 </div>
-                <div className="approveTokenSpendTokenName">{name}</div>
+                <div className='approveTokenSpendTokenName'>{name}</div>
               </div>
             </div>
           )}

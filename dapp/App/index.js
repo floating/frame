@@ -45,21 +45,21 @@ class App extends React.Component {
         : {}
 
     return (
-      <div className="splash">
+      <div className='splash'>
         <Native />
-        <div className="overlay" />
-        <div className="mainLeft">
+        <div className='overlay' />
+        <div className='mainLeft'>
           <div
-            className="accountTile"
+            className='accountTile'
             onClick={() => {
               link.send('unsetCurrentView')
             }}
           >
-            <div className="accountIcon"></div>
+            <div className='accountIcon'></div>
           </div>
-          <div className="dappIcons">
-            <div className="dappIconsScroll">
-              <div className="dappIconsWrap">
+          <div className='dappIcons'>
+            <div className='dappIconsScroll'>
+              <div className='dappIconsWrap'>
                 {Object.keys(store('main.dapps')).map((id) => {
                   return <DappTile ens={store('main.dapps', id, 'ens')} />
                 })}
@@ -67,32 +67,32 @@ class App extends React.Component {
             </div>
           </div>
         </div>
-        <div className="main">
-          <div className="mainTop" />
+        <div className='main'>
+          <div className='mainTop' />
           {currentDapp ? (
             <>
               <div
-                className="mainDappBackground"
+                className='mainDappBackground'
                 style={{
                   background: currentDapp.colors ? currentDapp.colors.background : 'none',
                 }}
               >
-                <div className="mainDappBackgroundTop" />
+                <div className='mainDappBackgroundTop' />
                 {!currentView.ready ? (
-                  <div className="mainDappLoading">
-                    <div className="loader" style={loaderStyle} />
+                  <div className='mainDappLoading'>
+                    <div className='loader' style={loaderStyle} />
                   </div>
                 ) : null}
               </div>
             </>
           ) : !currentView.ready ? (
             sendDapp.status === 'failed' ? (
-              <div className="mainDappLoading">
-                <div className="mainDappLoadingText">{'Send dapp failed to load'}</div>
+              <div className='mainDappLoading'>
+                <div className='mainDappLoadingText'>{'Send dapp failed to load'}</div>
               </div>
             ) : (
-              <div className="mainDappLoading">
-                <div className="loader" />
+              <div className='mainDappLoading'>
+                <div className='loader' />
               </div>
             )
           ) : null}

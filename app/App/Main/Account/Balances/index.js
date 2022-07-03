@@ -90,8 +90,8 @@ class Balance extends React.Component {
         key={symbol}
         onMouseDown={() => this.setState({ selected: i })}
       >
-        <div className="signerBalanceInner" style={{ opacity: !scanning ? 1 : 0 }}>
-          <div className="signerBalanceIcon">
+        <div className='signerBalanceInner' style={{ opacity: !scanning ? 1 : 0 }}>
+          <div className='signerBalanceIcon'>
             <RingIcon
               img={
                 balance.logoURI &&
@@ -103,24 +103,24 @@ class Balance extends React.Component {
             />
           </div>
           <div
-            className="signerBalanceChain"
+            className='signerBalanceChain'
             style={{ color: chainMeta[chainHex] ? chainMeta[chainHex].primaryColor : '' }}
           >
             {chainMeta[chainHex] ? chainMeta[chainHex].name : ''}
           </div>
-          <div className="signerBalanceCurrency">{name}</div>
+          <div className='signerBalanceCurrency'>{name}</div>
           <div
-            className="signerBalanceValue"
+            className='signerBalanceValue'
             style={(balance.displayBalance || '0').length >= 12 ? { fontSize: '15px', top: '10px' } : {}}
           >
-            <span className="signerBalanceSymbol">{symbol.toUpperCase()}</span>
+            <span className='signerBalanceSymbol'>{symbol.toUpperCase()}</span>
             <span style={(balance.displayBalance || '0').length >= 12 ? { marginTop: '-3px' } : {}}>
               {balance.displayBalance}
             </span>
           </div>
-          <div className="signerBalancePrice">
-            <div className="signerBalanceOk">
-              <span className="signerBalanceCurrentPrice">
+          <div className='signerBalancePrice'>
+            <div className='signerBalanceOk'>
+              <span className='signerBalanceCurrentPrice'>
                 {svg.usd(10)}
                 {balance.price}
               </span>
@@ -131,7 +131,7 @@ class Balance extends React.Component {
                 </span>
               </span>
             </div>
-            <div className="signerBalanceCurrentValue">
+            <div className='signerBalanceCurrentValue'>
               {svg.usd(10)}
               {balance.displayValue}
             </div>
@@ -221,7 +221,7 @@ class Balances extends React.Component {
     return (
       <div
         ref={this.moduleRef}
-        className="balancesBlock"
+        className='balancesBlock'
         style={
           this.props.expanded
             ? {
@@ -234,35 +234,35 @@ class Balances extends React.Component {
         <div className={'moduleHeader moduleHeaderBorderless'}>
           <span>balances</span>
           {this.props.expanded ? (
-            <div className="moduleHeaderClose" onMouseDown={() => this.props.expandModule(false)}>
+            <div className='moduleHeaderClose' onMouseDown={() => this.props.expandModule(false)}>
               {svg.close(12)}
             </div>
           ) : null}
         </div>
         {scanning ? (
-          <div className="signerBalancesLoading">
-            <div className="loader" />
+          <div className='signerBalancesLoading'>
+            <div className='loader' />
           </div>
         ) : null}
-        <div className="signerBalancesWrap">
+        <div className='signerBalancesWrap'>
           {balances.map(({ chainId, symbol, ...balance }, i) => {
             return <Balance chainId={chainId} symbol={symbol} balance={balance} i={i} scanning={scanning} />
           })}
         </div>
-        <div className="signerBalanceTotal" style={{ opacity: !scanning ? 1 : 0 }}>
+        <div className='signerBalanceTotal' style={{ opacity: !scanning ? 1 : 0 }}>
           {!this.props.expanded ? (
-            <div className="signerBalanceButtons">
+            <div className='signerBalanceButtons'>
               <div
-                className="signerBalanceButton signerBalanceShowAll"
+                className='signerBalanceButton signerBalanceShowAll'
                 onMouseDown={() => this.props.expandModule(this.props.moduleId)}
               >
                 {allBalances.length - 4 > 0 ? `+${allBalances.length - 4} More` : 'More'}
               </div>
             </div>
           ) : (
-            <div className="signerBalanceButtons">
+            <div className='signerBalanceButtons'>
               <div
-                className="signerBalanceButton signerBalanceAddToken"
+                className='signerBalanceButton signerBalanceAddToken'
                 onMouseDown={() => {
                   link.send('tray:action', 'navDash', { view: 'tokens', data: { notify: 'addToken' } })
                 }}
@@ -271,9 +271,9 @@ class Balances extends React.Component {
               </div>
             </div>
           )}
-          <div className="signerBalanceTotalText">
-            <div className="signerBalanceTotalLabel">{'Total: '}</div>
-            <div className="signerBalanceTotalValue">
+          <div className='signerBalanceTotalText'>
+            <div className='signerBalanceTotalLabel'>{'Total: '}</div>
+            <div className='signerBalanceTotalValue'>
               {svg.usd(11)}
               {balances.length > 0 ? totalDisplayValue : '---.--'}
             </div>
@@ -281,13 +281,13 @@ class Balances extends React.Component {
         </div>
         {totalValue.toNumber() > 10000 && hotSigner ? (
           <div
-            className="signerBalanceWarning"
+            className='signerBalanceWarning'
             onClick={() => this.setState({ showHighHotMessage: !this.state.showHighHotMessage })}
             style={scanning ? { opacity: 0 } : { opacity: 1 }}
           >
-            <div className="signerBalanceWarningTitle">{'high value account is using hot signer'}</div>
+            <div className='signerBalanceWarningTitle'>{'high value account is using hot signer'}</div>
             {this.state.showHighHotMessage ? (
-              <div className="signerBalanceWarningMessage">
+              <div className='signerBalanceWarningMessage'>
                 {'We recommend using one of our supported hardware signers to increase the security of your account'}
               </div>
             ) : null}

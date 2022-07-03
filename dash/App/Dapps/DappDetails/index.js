@@ -10,7 +10,7 @@ class DappDetails extends React.Component {
   updateOriginChain() {
     const origin = this.store('main.origins', this.props.originId)
     return (
-      <div className="originSwapChainList">
+      <div className='originSwapChainList'>
         {Object.keys(this.store('main.networks.ethereum'))
           .filter((id) => {
             return this.store('main.networks.ethereum', id, 'on')
@@ -33,7 +33,7 @@ class DappDetails extends React.Component {
                   link.send('tray:action', 'switchOriginChain', this.props.originId, parseInt(id), 'ethereum')
                 }}
               >
-                <div className="originChainItemIcon">
+                <div className='originChainItemIcon'>
                   <RingIcon
                     color={chainMeta[hexId] ? chainMeta[hexId].primaryColor : 'var(--moon)'}
                     img={chainMeta[hexId] ? chainMeta[hexId].icon : ''}
@@ -43,7 +43,7 @@ class DappDetails extends React.Component {
                 {this.store('main.networks.ethereum', id, 'name')}
 
                 <div
-                  className="originChainItemCheck"
+                  className='originChainItemCheck'
                   style={
                     selected
                       ? {
@@ -64,15 +64,15 @@ class DappDetails extends React.Component {
   render() {
     const origin = this.store('main.origins', this.props.originId)
     return (
-      <div className="cardShow">
-        <div className="originSwapOrigin">
+      <div className='cardShow'>
+        <div className='originSwapOrigin'>
           {svg.window(20)}
-          <div className="originSwapOriginText">{origin.name}</div>
+          <div className='originSwapOriginText'>{origin.name}</div>
         </div>
-        <div className="originSwapTitle">default chain</div>
+        <div className='originSwapTitle'>default chain</div>
         <div>{this.updateOriginChain()}</div>
         <div
-          className="clearOriginsButton"
+          className='clearOriginsButton'
           style={{ color: 'var(--good)' }}
           onClick={() => {
             link.send('tray:openExternal', `https://${origin.name}/`)
@@ -81,7 +81,7 @@ class DappDetails extends React.Component {
           {'launch dapp'}
         </div>
         <div
-          className="clearOriginsButton"
+          className='clearOriginsButton'
           style={{ color: 'var(--bad)', marginTop: '10px' }}
           onClick={() => {
             link.send('tray:action', 'removeOrigin', this.props.originId)

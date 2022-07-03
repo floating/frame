@@ -36,7 +36,7 @@ class Pending extends React.Component {
       const marginTop = liveAccountLimit === 40 ? -8 : 0
       return (
         <div
-          className="loadingLiveAddresses"
+          className='loadingLiveAddresses'
           style={{ top: `${marginTop}px`, padding: '20px', width: `${styleWidth}px` }}
         >
           {[...Array(liveAccountLimit).keys()]
@@ -45,7 +45,7 @@ class Pending extends React.Component {
               return (
                 <div
                   key={'loadingLiveAddress' + i}
-                  className="loadingLiveAddress"
+                  className='loadingLiveAddress'
                   style={{ opacity: i <= this.props.liveAddressesFound ? '1' : '0.3' }}
                 />
               )
@@ -59,33 +59,33 @@ class Pending extends React.Component {
 
   renderTrezorPin(active) {
     return (
-      <div className="trezorPinWrap" style={active ? {} : { height: '0px', padding: '0px 0px 0px 0px' }}>
+      <div className='trezorPinWrap' style={active ? {} : { height: '0px', padding: '0px 0px 0px 0px' }}>
         {active ? (
           <>
-            <div className="trezorPhraseInput">
+            <div className='trezorPhraseInput'>
               {this.state.tPin.split('').map((n, i) => {
                 return (
-                  <div key={i} className="trezorPinInputButton" onMouseDown={this.trezorPin.bind(this, i)}>
+                  <div key={i} className='trezorPinInputButton' onMouseDown={this.trezorPin.bind(this, i)}>
                     {svg.octicon('primitive-dot', { height: 14 })}
                   </div>
                 )
               })}
             </div>
             <div
-              className="signerPinMessage signerPinSubmit"
+              className='signerPinMessage signerPinSubmit'
               onMouseDown={this.state.tPin ? () => this.submitPin() : null}
             >
               Submit Pin
               {this.state.tPin ? (
-                <div className="signerPinDelete" onMouseDown={this.backspacePin.bind(this)}>
+                <div className='signerPinDelete' onMouseDown={this.backspacePin.bind(this)}>
                   {svg.octicon('chevron-left', { height: 18 })}
                 </div>
               ) : null}
             </div>
-            <div className="trezorPinInputWrap">
-              <div className="trezorPinInput">
+            <div className='trezorPinInputWrap'>
+              <div className='trezorPinInput'>
                 {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => (
-                  <div key={i} className="trezorPinInputButton" onMouseDown={this.trezorPin.bind(this, i)}>
+                  <div key={i} className='trezorPinInputButton' onMouseDown={this.trezorPin.bind(this, i)}>
                     {svg.octicon('primitive-dot', { height: 20 })}
                   </div>
                 ))}
@@ -106,18 +106,18 @@ class Pending extends React.Component {
 
   renderTrezorPhrase(active) {
     return (
-      <div className="trezorPinWrap" style={active ? {} : { height: '0px', padding: '0px 0px 0px 0px' }}>
+      <div className='trezorPinWrap' style={active ? {} : { height: '0px', padding: '0px 0px 0px 0px' }}>
         {active ? (
           <>
-            <div className="trezorPhraseInput">
+            <div className='trezorPhraseInput'>
               <input
-                type="password"
+                type='password'
                 onChange={(e) => this.setState({ tPhrase: e.target.value })}
                 onKeyPress={(e) => this.phraseKeyPress(e)}
                 autoFocus
               />
             </div>
-            <div className="signerPinMessage signerPinSubmit" onMouseDown={() => this.submitPhrase()}>
+            <div className='signerPinMessage signerPinSubmit' onMouseDown={() => this.submitPhrase()}>
               Submit Passphrase
             </div>
           </>
@@ -142,21 +142,21 @@ class Pending extends React.Component {
     const status = this.props.status ? this.props.status.charAt(0).toUpperCase() + this.props.status.substring(1) : ''
 
     return (
-      <div className="pendingSignerWrap" style={style}>
-        <div className="pendingSignerInset">
-          <div className="pendingSignerTop">
+      <div className='pendingSignerWrap' style={style}>
+        <div className='pendingSignerInset'>
+          <div className='pendingSignerTop'>
             {this.renderLoadingLive()}
-            <div className="pendingSignerLogo">
+            <div className='pendingSignerLogo'>
               {this.props.type === 'ledger' && <div style={{ marginTop: '4px' }}>{svg.ledger(25)}</div>}
               {this.props.type === 'trezor' && svg.trezor(25)}
               {this.props.type === 'lattice' && svg.lattice(25)}
             </div>
-            <div className="pendingSignerText">
-              <div className="pendingSignerType">{this.props.type + ' Found'}</div>
-              <div className="pendingSignerStatus">{status}</div>
+            <div className='pendingSignerText'>
+              <div className='pendingSignerType'>{this.props.type + ' Found'}</div>
+              <div className='pendingSignerStatus'>{status}</div>
             </div>
           </div>
-          <div className="signerInterface">
+          <div className='signerInterface'>
             {this.renderTrezorPin(this.props.type === 'trezor' && this.props.status === 'Need Pin')}
             {this.renderTrezorPhrase(this.props.type === 'trezor' && this.props.status === 'Enter Passphrase')}
           </div>

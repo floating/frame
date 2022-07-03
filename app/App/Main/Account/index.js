@@ -189,7 +189,7 @@ class _AccountMain extends React.Component {
 
     return (
       <div className={'accountModule' + moduleClass} style={style}>
-        <div className="accountModuleInner cardShow" style={{ animationDelay: index * 0.1 + 's' }}>
+        <div className='accountModuleInner cardShow' style={{ animationDelay: index * 0.1 + 's' }}>
           {id === 'gas' ? (
             <Gas moduleId={id} id={this.props.id} expandModule={expandModule} expanded={expanded} />
           ) : id === 'requests' ? (
@@ -244,15 +244,15 @@ class _AccountMain extends React.Component {
       return this.renderModule(id, module, slideHeight - module.height - 5, i, this.expandModule.bind(this))
     })
     return (
-      <div className="accountMain">
+      <div className='accountMain'>
         {this.state.expandedModule ? (
           <div
-            className="accountsModuleExpand cardShow"
+            className='accountsModuleExpand cardShow'
             style={{ pointerEvents: this.state.expandedModule ? 'auto' : 'none' }}
             onMouseDown={() => this.setState({ expandedModule: false })}
           >
             <div
-              className="moduleExpanded"
+              className='moduleExpanded'
               onMouseDown={(e) => {
                 e.stopPropagation()
               }}
@@ -269,8 +269,8 @@ class _AccountMain extends React.Component {
             </div>
           </div>
         ) : null}
-        <div className="accountMainScroll" style={{ pointerEvents: this.state.expandedModule ? 'none' : 'auto' }}>
-          <div className="accountMainSlide" style={{ height: slideHeight + 'px' }}>
+        <div className='accountMainScroll' style={{ pointerEvents: this.state.expandedModule ? 'none' : 'auto' }}>
+          <div className='accountMainSlide' style={{ height: slideHeight + 'px' }}>
             {modules}
           </div>
         </div>
@@ -285,17 +285,17 @@ const AccountMain = Restore.connect(_AccountMain)
 class _AccountView extends React.Component {
   render() {
     return (
-      <div className="accountView">
-        <div className="accountViewMenu cardShow">
-          <div className="accountViewBack" onClick={() => this.props.back()}>
+      <div className='accountView'>
+        <div className='accountViewMenu cardShow'>
+          <div className='accountViewBack' onClick={() => this.props.back()}>
             {svg.chevronLeft(13)}
           </div>
-          <div className="accountViewTitle">
-            <div className="accountViewIcon">{this.props.accountViewIcon}</div>
-            <div className="accountViewText">{this.props.accountViewTitle}</div>
+          <div className='accountViewTitle'>
+            <div className='accountViewIcon'>{this.props.accountViewIcon}</div>
+            <div className='accountViewText'>{this.props.accountViewTitle}</div>
           </div>
         </div>
-        <div className="accountViewMain cardShow">{this.props.children}</div>
+        <div className='accountViewMain cardShow'>{this.props.children}</div>
       </div>
     )
   }
@@ -401,12 +401,12 @@ class _AccountBody extends React.Component {
       return (
         <AccountView {...props}>
           <div
-            className="accountsModuleExpand cardShow"
+            className='accountsModuleExpand cardShow'
             style={{ pointerEvents: this.state.expandedModule ? 'auto' : 'none' }}
             onMouseDown={() => this.setState({ expandedModule: false })}
           >
             <div
-              className="moduleExpanded"
+              className='moduleExpanded'
               onMouseDown={(e) => {
                 e.stopPropagation()
               }}
@@ -733,10 +733,10 @@ class Account extends React.Component {
 
   renderTrezorPin(active) {
     return (
-      <div className="trezorPinWrap" style={active ? {} : { height: '0px', padding: '0px 0px 0px 0px' }}>
-        <div className="trezorPinInput">
+      <div className='trezorPinWrap' style={active ? {} : { height: '0px', padding: '0px 0px 0px 0px' }}>
+        <div className='trezorPinInput'>
           {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => (
-            <div key={i} className="trezorPinInputButton" onMouseDown={this.trezorPin.bind(this, i)}>
+            <div key={i} className='trezorPinInputButton' onMouseDown={this.trezorPin.bind(this, i)}>
               {svg.octicon('primitive-dot', { height: 20 })}
             </div>
           ))}
@@ -789,7 +789,7 @@ class Account extends React.Component {
     // const inSettings = this.store('selected.view') === 'settings'
     return (
       <div
-        className="signerType"
+        className='signerType'
         onMouseDown={() => {
           this.hideSignerStatus(!this.state.hideSignerStatus)
         }}
@@ -801,13 +801,13 @@ class Account extends React.Component {
         ) : null} */}
         {((_) => {
           const type = this.props.lastSignerType
-          if (type === 'ledger') return <div className="signerSelectIconWrap signerIconLedger">{svg.ledger(20)}</div>
-          if (type === 'trezor') return <div className="signerSelectIconWrap signerIconTrezor">{svg.trezor(20)}</div>
+          if (type === 'ledger') return <div className='signerSelectIconWrap signerIconLedger'>{svg.ledger(20)}</div>
+          if (type === 'trezor') return <div className='signerSelectIconWrap signerIconTrezor'>{svg.trezor(20)}</div>
           if (type === 'seed' || type === 'ring')
-            return <div className="signerSelectIconWrap signerIconHot">{svg.flame(24)}</div>
-          if (type === 'aragon') return <div className="signerSelectIconWrap signerIconSmart">{svg.aragon(28)}</div>
-          if (type === 'lattice') return <div className="signerSelectIconWrap signerIconSmart">{svg.lattice(22)}</div>
-          return <div className="signerSelectIconWrap">{svg.logo(20)}</div>
+            return <div className='signerSelectIconWrap signerIconHot'>{svg.flame(24)}</div>
+          if (type === 'aragon') return <div className='signerSelectIconWrap signerIconSmart'>{svg.aragon(28)}</div>
+          if (type === 'lattice') return <div className='signerSelectIconWrap signerIconSmart'>{svg.lattice(22)}</div>
+          return <div className='signerSelectIconWrap'>{svg.logo(20)}</div>
         })()}
         {/* this.props.signer ? (
           this.store('main.signers', this.props.signer, 'status') === 'locked' ? (
@@ -826,16 +826,16 @@ class Account extends React.Component {
     if ((this.store('selected.current') === this.props.id) & this.store('selected.open')) menuClass += ' signerMenuOpen'
     return (
       <div className={menuClass}>
-        <div className="signerMenuItem signerMenuItemLeft" onMouseDown={() => this.store.setSignerView('default')}>
-          <div className="signerMenuItemIcon">
+        <div className='signerMenuItem signerMenuItemLeft' onMouseDown={() => this.store.setSignerView('default')}>
+          <div className='signerMenuItemIcon'>
             {svg.octicon('pulse', { height: 23 })}
-            <div className="iconUnderline" />
+            <div className='iconUnderline' />
           </div>
         </div>
-        <div className="signerMenuItem signerMenuItemRight" onMouseDown={() => this.store.setSignerView('settings')}>
-          <div className="signerMenuItemIcon">
+        <div className='signerMenuItem signerMenuItemRight' onMouseDown={() => this.store.setSignerView('settings')}>
+          <div className='signerMenuItemIcon'>
             {svg.octicon('settings', { height: 23 })}
-            <div className="iconUnderline" />
+            <div className='iconUnderline' />
           </div>
         </div>
       </div>
@@ -873,13 +873,13 @@ class Account extends React.Component {
     const markLeft = itemWidth * viewIndex + 'px'
     const markRight = (views.length - viewIndex - 1) * itemWidth + 'px'
     return (
-      <div className="settingsMenu">
-        <div className="settingsMenuItems">
+      <div className='settingsMenu'>
+        <div className='settingsMenuItems'>
           <div
             className={viewIndex === 0 ? 'settingsMenuItem settingsMenuItemSelected' : 'settingsMenuItem'}
             onMouseDown={() => this.store.setSettingsView(0)}
           >
-            <div className="settingsMenuItemIcon" style={{ left: '2px', top: '2px' }}>
+            <div className='settingsMenuItemIcon' style={{ left: '2px', top: '2px' }}>
               {svg.octicon('key', { height: 18 })}
             </div>
           </div>
@@ -887,20 +887,20 @@ class Account extends React.Component {
             className={viewIndex === 1 ? 'settingsMenuItem settingsMenuItemSelected' : 'settingsMenuItem'}
             onMouseDown={() => this.store.setSettingsView(1)}
           >
-            <div className="settingsMenuItemIcon">{svg.octicon('checklist', { height: 22 })}</div>
+            <div className='settingsMenuItemIcon'>{svg.octicon('checklist', { height: 22 })}</div>
           </div>
           <div
             className={viewIndex === 2 ? 'settingsMenuItem settingsMenuItemSelected' : 'settingsMenuItem'}
             onMouseDown={() => this.store.setSettingsView(2)}
           >
-            <div className="settingsMenuItemIcon" style={{ left: '-1px', top: '0px' }}>
+            <div className='settingsMenuItemIcon' style={{ left: '-1px', top: '0px' }}>
               {svg.octicon('gear', { height: 20 })}
             </div>
           </div>
         </div>
-        <div className="settingsMenuSelect">
-          <div className="settingsMenuMark" style={{ left: markLeft, right: markRight }}>
-            <div className="settingsMenuMarkLine" />
+        <div className='settingsMenuSelect'>
+          <div className='settingsMenuMark' style={{ left: markLeft, right: markRight }}>
+            <div className='settingsMenuMarkLine' />
           </div>
         </div>
       </div>
@@ -983,11 +983,11 @@ class Account extends React.Component {
     requests = Object.keys(requests).filter((r) => requests[r].mode === 'normal')
 
     return this.props.status !== 'ok' ? (
-      <div className="signerStatusNotOk">{status}</div>
+      <div className='signerStatusNotOk'>{status}</div>
     ) : (
       <>
         {!this.state.addressHover ? (
-          <div className="signerName">
+          <div className='signerName'>
             <div className={!ensName || !this.props.name ? 'signerNameText' : 'signerNameText signerNameTextENS'}>
               {this.props.name}
             </div>
@@ -995,7 +995,7 @@ class Account extends React.Component {
         ) : null}
         <div className={'signerAddress'}>
           <div
-            className="transactionToAddress"
+            className='transactionToAddress'
             onMouseEnter={() => {
               this.setState({ addressHover: true })
             }}
@@ -1004,12 +1004,12 @@ class Account extends React.Component {
             }}
             onMouseDown={this.copyAddress.bind(this)}
           >
-            <div className="transactionToAddressLargeWrap">
+            <div className='transactionToAddressLargeWrap'>
               {this.state.addressHover ? (
-                <div className="transactionToAddressLarge transactionToAddressCopy">copy address</div>
+                <div className='transactionToAddressLarge transactionToAddressCopy'>copy address</div>
               ) : ensName ? (
                 <div
-                  className="transactionToAddressLarge transactionToAddressENS"
+                  className='transactionToAddressLarge transactionToAddressENS'
                   style={{ fontSize: this.getAddressSize() + 'px' }}
                 >
                   {ensName}
@@ -1033,7 +1033,7 @@ class Account extends React.Component {
               }
             >
               {this.state.copied ? (
-                <span className="transactionToAddressFullCopied">
+                <span className='transactionToAddressFullCopied'>
                   {'Address Copied'}
                   {svg.octicon('clippy', { height: 14 })}
                 </span>
@@ -1145,7 +1145,7 @@ class Account extends React.Component {
 
     return (
       <div
-        className="signerWrap"
+        className='signerWrap'
         style={current ? { height: initial.height + 'px' } : {}}
         onMouseDown={() => this.closeAccounts()}
       >
@@ -1156,8 +1156,8 @@ class Account extends React.Component {
             if (ref) this.signer = ref
           }}
         >
-          <div className="signerContainer" style={current ? { height: '100%' } : {}}>
-            {this.store('view.clickGuard') ? <div className="clickGuard" /> : null}
+          <div className='signerContainer' style={current ? { height: '100%' } : {}}>
+            {this.store('view.clickGuard') ? <div className='clickGuard' /> : null}
             {!this.state.hideSignerStatus && open ? (
               <SignerStatus open={open} signer={signer} hideSignerStatus={this.hideSignerStatus.bind(this)} />
             ) : null}
@@ -1170,12 +1170,12 @@ class Account extends React.Component {
               {!this.state.addressHover ? this.renderSignerIndicator() : null}
               {!this.state.addressHover ? (
                 <>
-                  <div className="accountGrabber" style={open || true ? { opacity: 0, pointerEvents: 'none' } : {}}>
+                  <div className='accountGrabber' style={open || true ? { opacity: 0, pointerEvents: 'none' } : {}}>
                     {svg.grab(35)}
                   </div>
-                  <div className="signerSelect" onClick={this.typeClick.bind(this)}>
-                    <div className="signerSelectIconWrap">
-                      <div className="signerSelectIcon" style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+                  <div className='signerSelect' onClick={this.typeClick.bind(this)}>
+                    <div className='signerSelectIconWrap'>
+                      <div className='signerSelectIcon' style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}>
                         {svg.chevron(26)}
                       </div>
                     </div>

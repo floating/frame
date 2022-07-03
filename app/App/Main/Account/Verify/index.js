@@ -42,11 +42,11 @@ class Verify extends React.Component {
     const signerKind = signerType === 'seed' || signerType === 'ring' ? 'hot' : 'device'
     const account = this.store('main.accounts', this.props.id)
     return (
-      <div ref={this.moduleRef} className="balancesBlock">
+      <div ref={this.moduleRef} className='balancesBlock'>
         {account.smart ? (
           <>
-            <div className="moduleHeader">{'Smart Account'}</div>
-            <div className="moduleMain moduleMainSettings">
+            <div className='moduleHeader'>{'Smart Account'}</div>
+            <div className='moduleMain moduleMainSettings'>
               <div>{account.smart.type} Account</div>
               <div>DAO exists on this chain: ?</div>
               <div>Agent Address: {account.address}</div>
@@ -57,9 +57,9 @@ class Verify extends React.Component {
           </>
         ) : (
           <>
-            <div className="moduleHeader">{'Verify Address'}</div>
-            <div className="moduleMain">
-              <div className="signerVerifyText">Verify that the address displayed in Frame is correct</div>
+            <div className='moduleHeader'>{'Verify Address'}</div>
+            <div className='moduleMain'>
+              <div className='signerVerifyText'>Verify that the address displayed in Frame is correct</div>
               {this.state.verifyAddressResponse ? (
                 <div
                   className={
@@ -71,7 +71,7 @@ class Verify extends React.Component {
                   {this.state.verifyAddressResponse}
                 </div>
               ) : null}
-              <div className="moduleButton" onMouseDown={() => this.verifyAddress()}>
+              <div className='moduleButton' onMouseDown={() => this.verifyAddress()}>
                 {signerKind === 'hot' ? 'Verify Address' : 'Verify Address on Device'}
               </div>
             </div>

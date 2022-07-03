@@ -27,8 +27,8 @@ const ConnectionIndicator = ({ className, connection }) => {
 
 const ConnectionStatus = ({ connection }) => (
   <>
-    <ConnectionIndicator className="sliceTileIndicatorLarge sliceTileIndicator" connection={connection} />
-    <div className="sliceTileConnectionName">{connection.current}</div>
+    <ConnectionIndicator className='sliceTileIndicatorLarge sliceTileIndicator' connection={connection} />
+    <div className='sliceTileConnectionName'>{connection.current}</div>
   </>
 )
 
@@ -83,16 +83,16 @@ class ChainModule extends React.Component {
 
     return (
       <div
-        className="sliceTile sliceTileClickable"
+        className='sliceTile sliceTileClickable'
         onClick={() => {
           this.setState({ expanded: !this.state.expanded })
         }}
       >
         <ConnectionStatus connection={connection} />
-        <div className="sliceTileBlock">
-          <div className="sliceTileBlockIcon">{svg.chain(14)}</div>
-          <div className="sliceTileChainId">{id}</div>
-          <div className="sliceTileBlockIcon">{svg.cube(14)}</div>
+        <div className='sliceTileBlock'>
+          <div className='sliceTileBlockIcon'>{svg.chain(14)}</div>
+          <div className='sliceTileChainId'>{id}</div>
+          <div className='sliceTileBlockIcon'>{svg.cube(14)}</div>
           <div>{blockHeight}</div>
         </div>
       </div>
@@ -120,11 +120,11 @@ class ChainModule extends React.Component {
     const status = this.status(type, id, layer)
 
     return (
-      <div className="connectionOptionStatus">
-        <div className="connectionOptionStatusIndicator">
-          <ConnectionIndicator className="connectionOptionStatusIndicator" connection={{ status }} />
+      <div className='connectionOptionStatus'>
+        <div className='connectionOptionStatusIndicator'>
+          <ConnectionIndicator className='connectionOptionStatusIndicator' connection={{ status }} />
         </div>
-        <div className="connectionOptionStatusText">{status}</div>
+        <div className='connectionOptionStatusText'>{status}</div>
       </div>
     )
   }
@@ -179,14 +179,14 @@ class ChainModule extends React.Component {
     }
 
     return (
-      <div className="sliceContainer" ref={this.ref}>
+      <div className='sliceContainer' ref={this.ref}>
         {this.renderConnection(id, connection, networkMeta.blockHeight)}
         {this.state.expanded ? (
-          <div className="connectionLevels">
-            <div className="signerPermission signerPermissionNetwork cardShow" style={{ zIndex: 2 }}>
+          <div className='connectionLevels'>
+            <div className='signerPermission signerPermissionNetwork cardShow' style={{ zIndex: 2 }}>
               <div className={connection.primary.on ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
-                <div className="connectionOptionToggle">
-                  <div className="signerPermissionSetting">Primary</div>
+                <div className='connectionOptionToggle'>
+                  <div className='signerPermissionSetting'>Primary</div>
                   <div
                     className={
                       connection.primary.on
@@ -195,13 +195,13 @@ class ChainModule extends React.Component {
                     }
                     onMouseDown={(_) => link.send('tray:action', 'toggleConnection', type, id, 'primary')}
                   >
-                    <div className="signerPermissionToggleSwitch" />
+                    <div className='signerPermissionToggleSwitch' />
                   </div>
                 </div>
                 {connection.primary.on ? (
                   <>
-                    <div className="connectionOptionDetails cardShow">
-                      <div className="connectionOptionDetailsInset">
+                    <div className='connectionOptionDetails cardShow'>
+                      <div className='connectionOptionDetailsInset'>
                         {renderStatus('primary')}
                         <Dropdown
                           syncValue={`${type}:${id}:${connection.primary.current}`}
@@ -221,8 +221,8 @@ class ChainModule extends React.Component {
                       }
                     >
                       <input
-                        className="customInput"
-                        tabIndex="-1"
+                        className='customInput'
+                        tabIndex='-1'
                         value={this.state.primaryCustom}
                         onFocus={() => customFocusHandler('primary')}
                         onBlur={() => customBlurHandler('primary')}
@@ -233,10 +233,10 @@ class ChainModule extends React.Component {
                 ) : null}
               </div>
             </div>
-            <div className="signerPermission signerPermissionNetwork cardShow" style={{ zIndex: 1 }}>
+            <div className='signerPermission signerPermissionNetwork cardShow' style={{ zIndex: 1 }}>
               <div className={connection.secondary.on ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
-                <div className="connectionOptionToggle">
-                  <div className="signerPermissionSetting">Secondary</div>
+                <div className='connectionOptionToggle'>
+                  <div className='signerPermissionSetting'>Secondary</div>
                   <div
                     className={
                       connection.secondary.on
@@ -245,13 +245,13 @@ class ChainModule extends React.Component {
                     }
                     onMouseDown={(_) => link.send('tray:action', 'toggleConnection', type, id, 'secondary')}
                   >
-                    <div className="signerPermissionToggleSwitch" />
+                    <div className='signerPermissionToggleSwitch' />
                   </div>
                 </div>
                 {connection.secondary.on ? (
                   <>
-                    <div className="connectionOptionDetails cardShow">
-                      <div className="connectionOptionDetailsInset">
+                    <div className='connectionOptionDetails cardShow'>
+                      <div className='connectionOptionDetailsInset'>
                         {renderStatus('secondary')}
                         <Dropdown
                           syncValue={`${type}:${id}:${connection.secondary.current}`}
@@ -271,7 +271,7 @@ class ChainModule extends React.Component {
                       }
                     >
                       <input
-                        tabIndex="-1"
+                        tabIndex='-1'
                         value={this.state.secondaryCustom}
                         onFocus={() => customFocusHandler('secondary')}
                         onBlur={() => customBlurHandler('secondary')}

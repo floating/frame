@@ -102,10 +102,10 @@ class Requests extends React.Component {
         ref={this.moduleRef}
         className={this.store('selected.view') === 'default' ? 'signerRequests' : 'signerRequests signerRequestsHidden'}
       >
-        <div className="requestContainerWrap">
-          <div className="requestContainer">
+        <div className='requestContainerWrap'>
+          <div className='requestContainer'>
             {!requests.length ? (
-              <div key="noReq" className="noRequests">
+              <div key='noReq' className='noRequests'>
                 No Pending Requests
               </div>
             ) : null}

@@ -26,48 +26,48 @@ class ProviderRequest extends React.Component {
     if (origin.length > 36) originClass = 'requestProviderOrigin requestProviderOrigin12'
     return (
       <div key={this.props.req.id || this.props.req.handlerId} className={requestClass}>
-        <div className="approveRequest">
+        <div className='approveRequest'>
           {notice ? (
-            <div className="requestNotice">
+            <div className='requestNotice'>
               {status === 'pending' ? (
-                <div className="requestNoticeInner">
+                <div className='requestNoticeInner'>
                   <div>
-                    <div className="loader" />
+                    <div className='loader' />
                   </div>
                 </div>
               ) : status === 'success' ? (
-                <div className="requestNoticeInner">{svg.octicon('check', { height: 80 })}</div>
+                <div className='requestNoticeInner'>{svg.octicon('check', { height: 80 })}</div>
               ) : status === 'error' || status === 'declined' ? (
-                <div className="requestNoticeInner">{svg.octicon('circle-slash', { height: 80 })}</div>
+                <div className='requestNoticeInner'>{svg.octicon('circle-slash', { height: 80 })}</div>
               ) : null}
             </div>
           ) : (
-            <div className="approveTransactionPayload">
-              <div className="requestProvider">
+            <div className='approveTransactionPayload'>
+              <div className='requestProvider'>
                 <div className={originClass}>{originName}</div>
-                <div className="requestProviderSub">wants to connect</div>
+                <div className='requestProviderSub'>wants to connect</div>
               </div>
             </div>
           )}
         </div>
-        <div className="requestApprove">
+        <div className='requestApprove'>
           <div
-            className="requestDecline"
+            className='requestDecline'
             style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none' }}
             onClick={() => {
               if (this.state.allowInput) link.send('tray:giveAccess', this.props.req, false)
             }}
           >
-            <div className="requestDeclineButton _txButton _txButtonBad">Decline</div>
+            <div className='requestDeclineButton _txButton _txButtonBad'>Decline</div>
           </div>
           <div
-            className="requestSign"
+            className='requestSign'
             style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none' }}
             onClick={() => {
               if (this.state.allowInput) link.send('tray:giveAccess', this.props.req, true)
             }}
           >
-            <div className="requestSignButton _txButton">Approve</div>
+            <div className='requestSignButton _txButton'>Approve</div>
           </div>
         </div>
       </div>

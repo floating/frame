@@ -26,30 +26,30 @@ class _SettingsModule extends React.Component {
     const { id, name, type, explorer, symbol, layer, changed } = this.props
     const price = this.store('main.networksMeta.ethereum', id, 'nativeCurrency.usd.price') || '?'
     return (
-      <div className="sliceContainer" ref={this.ref}>
+      <div className='sliceContainer' ref={this.ref}>
         <div
-          className="sliceTile sliceTileClickable"
+          className='sliceTile sliceTileClickable'
           onClick={() => {
             this.setState({ expanded: !this.state.expanded })
           }}
         >
-          <div className="sliceChainId">
-            <div className="sliceChainIdIcon">{svg.chain(12)}</div>
-            <div className="sliceChainIdNumber">{id}</div>
+          <div className='sliceChainId'>
+            <div className='sliceChainIdIcon'>{svg.chain(12)}</div>
+            <div className='sliceChainIdNumber'>{id}</div>
           </div>
-          <div className="sliceChainId">
-            <div className="sliceChainIdIcon">{symbol}</div>
-            <div className="sliceChainIdNumber">{price.toLocaleString()}</div>
+          <div className='sliceChainId'>
+            <div className='sliceChainIdIcon'>{symbol}</div>
+            <div className='sliceChainIdNumber'>{price.toLocaleString()}</div>
           </div>
         </div>
         {this.state.expanded ? (
           <>
-            <div className="chainConfig cardShow">
-              <div className="chainConfigRow">
+            <div className='chainConfig cardShow'>
+              <div className='chainConfigRow'>
                 <input
-                  className="chainIdInput"
+                  className='chainIdInput'
                   value={this.state.id}
-                  spellCheck="false"
+                  spellCheck='false'
                   onChange={(e) => {
                     if (type === 'ethereum' && id === 1) return
                     this.setState({ id: e.target.value })
@@ -59,9 +59,9 @@ class _SettingsModule extends React.Component {
                   }}
                 />
                 <input
-                  className="chainSymbolInput"
+                  className='chainSymbolInput'
                   value={this.state.symbol}
-                  spellCheck="false"
+                  spellCheck='false'
                   onChange={(e) => {
                     if (type === 'ethereum' && id === 1) return
                     if (e.target.value.length > 8) return e.preventDefault()
@@ -86,10 +86,10 @@ class _SettingsModule extends React.Component {
                   }
                 />
               </div>
-              <div className="chainConfigRow">
+              <div className='chainConfigRow'>
                 <input
                   value={this.state.explorer}
-                  spellCheck="false"
+                  spellCheck='false'
                   onChange={(e) => {
                     this.setState({ explorer: e.target.value })
                   }}
@@ -101,13 +101,13 @@ class _SettingsModule extends React.Component {
             </div>
 
             {type === 'ethereum' && id === 1 ? (
-              <div className="chainMore cardShow">
-                <div className="moduleButton moduleButtonLocked">{svg.lock(11)}</div>
+              <div className='chainMore cardShow'>
+                <div className='moduleButton moduleButtonLocked'>{svg.lock(11)}</div>
               </div>
             ) : (
-              <div className="chainMore cardShow">
+              <div className='chainMore cardShow'>
                 <div
-                  className="moduleButton moduleButtonBad"
+                  className='moduleButton moduleButtonBad'
                   onMouseDown={() => {
                     const { id, name, type, explorer } = this.props
                     link.send('tray:action', 'removeNetwork', { id, name, explorer, type })
@@ -120,9 +120,9 @@ class _SettingsModule extends React.Component {
             )}
 
             {changed ? (
-              <div className="chainConfigSave cardShow">
+              <div className='chainConfigSave cardShow'>
                 <div
-                  className="moduleButton moduleButtonGood"
+                  className='moduleButton moduleButtonGood'
                   onMouseDown={() => {
                     const net = {
                       id: this.props.id,
@@ -158,8 +158,8 @@ class _SettingsModule extends React.Component {
                 </div>
               </div>
             ) : this.state.submitted ? (
-              <div className="chainConfigSave">
-                <div className="moduleButton">{svg.octicon('check', { height: 22 })}</div>
+              <div className='chainConfigSave'>
+                <div className='moduleButton'>{svg.octicon('check', { height: 22 })}</div>
               </div>
             ) : null}
           </>
@@ -252,7 +252,7 @@ class _ChainModule extends React.Component {
   renderConnection(origin, id) {
     return (
       <div
-        className="sliceTile sliceTileClickable"
+        className='sliceTile sliceTileClickable'
         onClick={() => {
           this.setState({ expanded: !this.state.expanded })
         }}
@@ -260,11 +260,11 @@ class _ChainModule extends React.Component {
         <div
           className={this.props.active ? 'sliceTileIndicatorLarge sliceTileIndicatorActive' : 'sliceTileIndicatorLarge'}
         />
-        <div className="sliceTileConnectionName">{'Pylon'}</div>
-        <div className="sliceTileBlock">
-          <div className="sliceTileBlockIcon">{svg.chain(16)}</div>
-          <div className="sliceTileChainId">{id}</div>
-          <div className="sliceTileBlockIcon">{svg.cube(16)}</div>
+        <div className='sliceTileConnectionName'>{'Pylon'}</div>
+        <div className='sliceTileBlock'>
+          <div className='sliceTileBlockIcon'>{svg.chain(16)}</div>
+          <div className='sliceTileChainId'>{id}</div>
+          <div className='sliceTileBlockIcon'>{svg.cube(16)}</div>
           <div>{1223434}</div>
         </div>
       </div>
@@ -294,29 +294,29 @@ class _ChainModule extends React.Component {
     if (!this.store('main.networks', type, id, 'on')) status = 'off'
 
     return (
-      <div className="connectionOptionStatus">
+      <div className='connectionOptionStatus'>
         {this.indicator(status)}
-        <div className="connectionOptionStatusText">{status}</div>
+        <div className='connectionOptionStatusText'>{status}</div>
       </div>
     )
   }
   indicator(status) {
     if (status === 'connected') {
       return (
-        <div className="connectionOptionStatusIndicator">
-          <div className="connectionOptionStatusIndicatorGood" />
+        <div className='connectionOptionStatusIndicator'>
+          <div className='connectionOptionStatusIndicatorGood' />
         </div>
       )
     } else if (status === 'loading' || status === 'syncing' || status === 'pending' || status === 'standby') {
       return (
-        <div className="connectionOptionStatusIndicator">
-          <div className="connectionOptionStatusIndicatorPending" />
+        <div className='connectionOptionStatusIndicator'>
+          <div className='connectionOptionStatusIndicatorPending' />
         </div>
       )
     } else {
       return (
-        <div className="connectionOptionStatusIndicator">
-          <div className="connectionOptionStatusIndicatorBad" />
+        <div className='connectionOptionStatusIndicator'>
+          <div className='connectionOptionStatusIndicatorBad' />
         </div>
       )
     }
@@ -333,14 +333,14 @@ class _ChainModule extends React.Component {
     presets.push({ text: 'Custom', value: type + ':' + id + ':' + 'custom' })
 
     return (
-      <div className="sliceContainer" ref={this.ref}>
+      <div className='sliceContainer' ref={this.ref}>
         {this.renderConnection('connection', id)}
         {this.state.expanded ? (
-          <div className="connectionLevels">
-            <div className="signerPermission signerPermissionNetwork cardShow" style={{ zIndex: 2 }}>
+          <div className='connectionLevels'>
+            <div className='signerPermission signerPermissionNetwork cardShow' style={{ zIndex: 2 }}>
               <div className={connection.primary.on ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
-                <div className="connectionOptionToggle">
-                  <div className="signerPermissionSetting">Primary</div>
+                <div className='connectionOptionToggle'>
+                  <div className='signerPermissionSetting'>Primary</div>
                   <div
                     className={
                       connection.primary.on
@@ -349,13 +349,13 @@ class _ChainModule extends React.Component {
                     }
                     onMouseDown={(_) => link.send('tray:action', 'toggleConnection', type, id, 'primary')}
                   >
-                    <div className="signerPermissionToggleSwitch" />
+                    <div className='signerPermissionToggleSwitch' />
                   </div>
                 </div>
                 {connection.primary.on ? (
                   <>
-                    <div className="connectionOptionDetails cardShow">
-                      <div className="connectionOptionDetailsInset">
+                    <div className='connectionOptionDetails cardShow'>
+                      <div className='connectionOptionDetailsInset'>
                         {this.status(type, id, 'primary')}
                         <Dropdown
                           syncValue={type + ':' + id + ':' + connection.primary.current}
@@ -375,8 +375,8 @@ class _ChainModule extends React.Component {
                       }
                     >
                       <input
-                        className="customInput"
-                        tabIndex="-1"
+                        className='customInput'
+                        tabIndex='-1'
                         value={this.state.primaryCustom}
                         onFocus={() => this.customPrimaryFocus()}
                         onBlur={() => this.customPrimaryBlur()}
@@ -387,10 +387,10 @@ class _ChainModule extends React.Component {
                 ) : null}
               </div>
             </div>
-            <div className="signerPermission signerPermissionNetwork cardShow" style={{ zIndex: 1 }}>
+            <div className='signerPermission signerPermissionNetwork cardShow' style={{ zIndex: 1 }}>
               <div className={connection.secondary.on ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
-                <div className="connectionOptionToggle">
-                  <div className="signerPermissionSetting">Secondary</div>
+                <div className='connectionOptionToggle'>
+                  <div className='signerPermissionSetting'>Secondary</div>
                   <div
                     className={
                       connection.secondary.on
@@ -399,13 +399,13 @@ class _ChainModule extends React.Component {
                     }
                     onMouseDown={(_) => link.send('tray:action', 'toggleConnection', type, id, 'secondary')}
                   >
-                    <div className="signerPermissionToggleSwitch" />
+                    <div className='signerPermissionToggleSwitch' />
                   </div>
                 </div>
                 {connection.secondary.on ? (
                   <>
-                    <div className="connectionOptionDetails cardShow">
-                      <div className="connectionOptionDetailsInset">
+                    <div className='connectionOptionDetails cardShow'>
+                      <div className='connectionOptionDetailsInset'>
                         {this.status(type, id, 'secondary')}
                         <Dropdown
                           syncValue={type + ':' + id + ':' + connection.secondary.current}
@@ -425,7 +425,7 @@ class _ChainModule extends React.Component {
                       }
                     >
                       <input
-                        tabIndex="-1"
+                        tabIndex='-1'
                         value={this.state.secondaryCustom}
                         onFocus={() => this.customSecondaryFocus()}
                         onBlur={() => this.customSecondaryBlur()}
@@ -636,15 +636,15 @@ class _Network extends React.Component {
       return null
 
     return (
-      <div className="network">
-        <div className="networkActive">
-          <div className="chainBadge">
+      <div className='network'>
+        <div className='networkActive'>
+          <div className='chainBadge'>
             <RingIcon
               color={chainMeta[hexId] ? chainMeta[hexId].primaryColor : ''}
               img={chainMeta[hexId] ? chainMeta[hexId].icon : ''}
             />
           </div>
-          <div className="networkName">
+          <div className='networkName'>
             {this.state.name}
             {/* <input
               value={this.state.name} spellCheck='false'
@@ -660,7 +660,7 @@ class _Network extends React.Component {
           {/* <div className='chainIdBadgeBackground' /> */}
 
           <div
-            className="chainSettings"
+            className='chainSettings'
             onClick={() => {
               alert('show chain settings')
             }}
@@ -678,26 +678,26 @@ class _Network extends React.Component {
             }
           >
             {this.props.id === 1 ? (
-              <div className="signerPermissionToggleSwitchLocked">
+              <div className='signerPermissionToggleSwitchLocked'>
                 {svg.lock(10)}
-                <div className="signerPermissionToggleSwitch" />
+                <div className='signerPermissionToggleSwitch' />
               </div>
             ) : (
-              <div className="signerPermissionToggleSwitch" />
+              <div className='signerPermissionToggleSwitch' />
             )}
           </div>
         </div>
         {this.props.on ? (
-          <div className="chainModules">
+          <div className='chainModules'>
             <Connection changed={changed} {...this.props} />
             <Gas id={this.props.id} />
             {/* <Usage changed={changed} {...this.props} />
             <Tokens changed={changed} {...this.props} /> */}
-            <div className="chainFooter">
-              <div className="chainCurrencyItem">
-                <div className="chainCurrencyItemSymbol">{symbol}</div>
-                <div className="chainCurrencyItemAt">{'@'}</div>
-                <div className="sliceChainIdNumber">{'$' + price.toLocaleString() + ''}</div>
+            <div className='chainFooter'>
+              <div className='chainCurrencyItem'>
+                <div className='chainCurrencyItemSymbol'>{symbol}</div>
+                <div className='chainCurrencyItemAt'>{'@'}</div>
+                <div className='sliceChainIdNumber'>{'$' + price.toLocaleString() + ''}</div>
               </div>
             </div>
           </div>
@@ -746,7 +746,7 @@ class Settings extends React.Component {
   discord() {
     return (
       <div
-        className="discordInvite"
+        className='discordInvite'
         onMouseDown={() =>
           link.send('tray:action', 'navDash', {
             view: 'openExternal',
@@ -755,15 +755,15 @@ class Settings extends React.Component {
         }
       >
         <div>Need help?</div>
-        <div className="discordLink">Join our Discord!</div>
+        <div className='discordLink'>Join our Discord!</div>
       </div>
     )
   }
 
   quit() {
     return (
-      <div className="quitFrame">
-        <div onMouseDown={() => link.send('tray:quit')} className="quitFrameButton">
+      <div className='quitFrame'>
+        <div onMouseDown={() => link.send('tray:quit')} className='quitFrameButton'>
           Quit
         </div>
       </div>
@@ -875,29 +875,29 @@ class Settings extends React.Component {
             />
           </div>
         </div> */}
-        <div className="localSettingsWrap">
+        <div className='localSettingsWrap'>
           <div
-            className="newAccount"
+            className='newAccount'
             onClick={() => link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'addChain' } })}
           >
-            <div className="newAccountIcon">{svg.plus(16)}</div>
+            <div className='newAccountIcon'>{svg.plus(16)}</div>
             Add New Chain
           </div>
           {this.renderConnections('mainnet')}
-          <div className="networkBreak">
-            <div className="networkBreakLayer">Rollups</div>
+          <div className='networkBreak'>
+            <div className='networkBreakLayer'>Rollups</div>
           </div>
           {this.renderConnections('rollup')}
-          <div className="networkBreak">
-            <div className="networkBreakLayer">Sidechains</div>
+          <div className='networkBreak'>
+            <div className='networkBreakLayer'>Sidechains</div>
           </div>
           {this.renderConnections('sidechain')}
-          <div className="networkBreak">
-            <div className="networkBreakLayer">Testnets</div>
+          <div className='networkBreak'>
+            <div className='networkBreakLayer'>Testnets</div>
           </div>
           {this.renderConnections('testnet')}
-          <div className="networkBreak">
-            <div className="networkBreakLayer">Other</div>
+          <div className='networkBreak'>
+            <div className='networkBreakLayer'>Other</div>
           </div>
           {this.renderConnections('other')}
           {this.discord()}

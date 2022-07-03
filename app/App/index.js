@@ -17,12 +17,12 @@ class Panel extends React.Component {
     const status = [connection.primary.status, connection.secondary.status]
     if (status.indexOf('connected') > -1) {
       if (this.store('selected.current')) {
-        return <div className="panelDetailIndicatorInner panelDetailIndicatorGood" />
+        return <div className='panelDetailIndicatorInner panelDetailIndicatorGood' />
       } else {
-        return <div className="panelDetailIndicatorInner panelDetailIndicatorWaiting" />
+        return <div className='panelDetailIndicatorInner panelDetailIndicatorWaiting' />
       }
     } else {
-      return <div className="panelDetailIndicatorInner panelDetailIndicatorBad" />
+      return <div className='panelDetailIndicatorInner panelDetailIndicatorBad' />
     }
   }
 
@@ -75,7 +75,7 @@ class Panel extends React.Component {
     if (this.store('panel.view') === 'networks') markLeft = 68
     if (this.store('panel.view') === 'settings') markLeft = 122
     return (
-      <div id="panel" style={{ opacity }}>
+      <div id='panel' style={{ opacity }}>
         <Badge />
         <Menu />
         <Notify />

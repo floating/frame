@@ -57,53 +57,53 @@ class _RequestItem extends React.Component {
           }
         }}
       >
-        <div className="requestItemTitle">
-          <div className="requestItemIcon">
+        <div className='requestItemTitle'>
+          <div className='requestItemIcon'>
             <RingIcon color={color} svgLookup={svgLookup} img={img} />
           </div>
-          <div className="requestItemMain">
-            <div className="requestItemTitleMain">{title}</div>
-            <div className="requestItemTitleSub">
-              <div className="requestItemTitleSubIcon">{svg.window(10)}</div>
-              <div className="requestItemTitleSubText">{this.store('main.origins', req.origin, 'name')}</div>
+          <div className='requestItemMain'>
+            <div className='requestItemTitleMain'>{title}</div>
+            <div className='requestItemTitleSub'>
+              <div className='requestItemTitleSubIcon'>{svg.window(10)}</div>
+              <div className='requestItemTitleSubText'>{this.store('main.origins', req.origin, 'name')}</div>
             </div>
           </div>
           {txNonce ? (
             <div
-              className="requestMetaNonce"
+              className='requestMetaNonce'
               style={
                 !this.store('main.nonceAdjust') || error || status || mode === 'monitor'
                   ? { pointerEvents: 'none' }
                   : {}
               }
             >
-              <div className="txNonceControl">
+              <div className='txNonceControl'>
                 <div
-                  className="txNonceButton txNonceButtonLower"
+                  className='txNonceButton txNonceButtonLower'
                   onMouseDown={() => link.send('tray:adjustNonce', req.handlerId, -1)}
                 >
                   {svg.octicon('chevron-down', { height: 14 })}
                 </div>
                 <div
-                  className="txNonceButton txNonceButtonRaise"
+                  className='txNonceButton txNonceButtonRaise'
                   onMouseDown={() => link.send('tray:adjustNonce', req.handlerId, 1)}
                 >
                   {svg.octicon('chevron-up', { height: 14 })}
                 </div>
               </div>
-              <div className="txNonceLabel">Nonce</div>
+              <div className='txNonceLabel'>Nonce</div>
               <div className={nonce === 'TBD' || error ? 'txNonceNumber' : 'txNonceNumber'}>{nonce}</div>
-              {nonce === 'TBD' || error ? <div className="txNonceMarker" /> : null}
+              {nonce === 'TBD' || error ? <div className='txNonceMarker' /> : null}
             </div>
           ) : (
-            <div className="requestItemTitleTime">
-              <div className="requestItemTitleTimeItem">{this.state.ago}</div>
+            <div className='requestItemTitleTime'>
+              <div className='requestItemTitleTimeItem'>{this.state.ago}</div>
             </div>
           )}
         </div>
-        <div className="requestItemDetails">
-          <div className="requestItemDetailsSlide">
-            <div className="requestItemDetailsIndicator" />
+        <div className='requestItemDetails'>
+          <div className='requestItemDetailsSlide'>
+            <div className='requestItemDetailsIndicator' />
             {req.status || 'pending'}
           </div>
         </div>

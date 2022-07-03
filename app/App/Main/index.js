@@ -74,16 +74,16 @@ class Main extends React.Component {
 
     return (
       <div className={this.store('panel.view') !== 'default' ? 'card cardHide' : 'card cardShow'}>
-        <div id="panelScroll" style={panelScrollStyle}>
-          <div className="panelScrollOverlay" />
+        <div id='panelScroll' style={panelScrollStyle}>
+          <div className='panelScrollOverlay' />
           <div
-            id="panelSlide"
+            id='panelSlide'
             ref={(ref) => {
               if (ref) this.scroll = ref
             }}
             style={current ? { overflow: 'visible' } : {}}
           >
-            <div id="panelWrap" style={current && scrollTop > 0 ? { marginTop: '-' + scrollTop + 'px' } : {}}>
+            <div id='panelWrap' style={current && scrollTop > 0 ? { marginTop: '-' + scrollTop + 'px' } : {}}>
               {/* {untethered.sort().map((id, i) => <PendingSigner key={'signers' + id} {...this.store('main.signers', id)} index={i} />)} */}
               {sortedAccounts.map((id, i) => {
                 const account = accounts[id]
@@ -106,7 +106,7 @@ class Main extends React.Component {
                 )
               })}
               {Object.keys(accounts).length === 0 ? (
-                <div className="noSigners">
+                <div className='noSigners'>
                   {/* <div className='introLogo'>{svg.logo(70)}</div> */}
                   {`No Accounts Added`}
                   {/* <span className='getStarted'>

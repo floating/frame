@@ -107,26 +107,26 @@ class AddPhrase extends React.Component {
 
     return (
       <div className={itemClass} style={{ transitionDelay: (0.64 * this.props.index) / 4 + 's' }}>
-        <div className="addAccountItemBar addAccountItemHot" />
-        <div className="addAccountItemWrap">
-          <div className="addAccountItemTop">
-            <div className="addAccountItemTopType">
-              <div className="addAccountItemIcon">
-                <div className="addAccountItemIconType addAccountItemIconHot">
+        <div className='addAccountItemBar addAccountItemHot' />
+        <div className='addAccountItemWrap'>
+          <div className='addAccountItemTop'>
+            <div className='addAccountItemTopType'>
+              <div className='addAccountItemIcon'>
+                <div className='addAccountItemIconType addAccountItemIconHot'>
                   <RingIcon svgLookup={{ name: 'seedling', size: 16 }} />
                 </div>
-                <div className="addAccountItemIconHex addAccountItemIconHexHot" />
+                <div className='addAccountItemIconHex addAccountItemIconHexHot' />
               </div>
-              <div className="addAccountItemTopTitle">Seed Phrase</div>
+              <div className='addAccountItemTopTitle'>Seed Phrase</div>
             </div>
             {/* <div className='addAccountItemClose' onMouseDown={() => this.props.close()}>{'DONE'}</div> */}
-            <div className="addAccountItemSummary">
+            <div className='addAccountItemSummary'>
               A phrase account uses a list of words to backup and restore your account
             </div>
           </div>
-          <div className="addAccountItemOption">
+          <div className='addAccountItemOption'>
             <div
-              className="addAccountItemOptionIntro"
+              className='addAccountItemOptionIntro'
               onMouseDown={() => {
                 this.adding()
                 setTimeout(
@@ -141,13 +141,13 @@ class AddPhrase extends React.Component {
             >
               Add Phrase Account
             </div>
-            <div className="addAccountItemOptionSetup" style={{ transform: `translateX(-${100 * this.state.index}%)` }}>
-              <div className="addAccountItemOptionSetupFrames">
-                <div className="addAccountItemOptionSetupFrame">
-                  <div className="addAccountItemOptionTitle">seed phrase</div>
-                  <div className="addAccountItemOptionInputPhrase">
+            <div className='addAccountItemOptionSetup' style={{ transform: `translateX(-${100 * this.state.index}%)` }}>
+              <div className='addAccountItemOptionSetupFrames'>
+                <div className='addAccountItemOptionSetupFrame'>
+                  <div className='addAccountItemOptionTitle'>seed phrase</div>
+                  <div className='addAccountItemOptionInputPhrase'>
                     <textarea
-                      tabIndex="-1"
+                      tabIndex='-1'
                       value={this.state.phrase}
                       ref={this.forms[0]}
                       onChange={(e) => this.onChange('phrase', e)}
@@ -156,17 +156,17 @@ class AddPhrase extends React.Component {
                       onKeyPress={(e) => this.keyPress(e)}
                     />
                   </div>
-                  <div className="addAccountItemOptionSubmit" onMouseDown={() => this.next()}>
+                  <div className='addAccountItemOptionSubmit' onMouseDown={() => this.next()}>
                     Next
                   </div>
                 </div>
-                <div className="addAccountItemOptionSetupFrame">
-                  <div className="addAccountItemOptionTitle">create password</div>
-                  <div className="addAccountItemOptionInputPhrase addAccountItemOptionInputPassword">
-                    <div className="addAccountItemOptionSubtitle">password must be 12 characters or longer</div>
+                <div className='addAccountItemOptionSetupFrame'>
+                  <div className='addAccountItemOptionTitle'>create password</div>
+                  <div className='addAccountItemOptionInputPhrase addAccountItemOptionInputPassword'>
+                    <div className='addAccountItemOptionSubtitle'>password must be 12 characters or longer</div>
                     <input
-                      type="password"
-                      tabIndex="-1"
+                      type='password'
+                      tabIndex='-1'
                       value={this.state.password}
                       ref={this.forms[1]}
                       onChange={(e) => this.onChange('password', e)}
@@ -175,18 +175,18 @@ class AddPhrase extends React.Component {
                       onKeyPress={(e) => this.keyPress(e)}
                     />
                   </div>
-                  <div className="addAccountItemOptionSubmit" onMouseDown={() => this.create()}>
+                  <div className='addAccountItemOptionSubmit' onMouseDown={() => this.create()}>
                     Create
                   </div>
                 </div>
-                <div className="addAccountItemOptionSetupFrame">
+                <div className='addAccountItemOptionSetupFrame'>
                   {signer ? (
                     <Signer key={signer.id} {...signer} inSetup={true} />
                   ) : (
                     <>
-                      <div className="addAccountItemOptionTitle">{this.state.status}</div>
+                      <div className='addAccountItemOptionTitle'>{this.state.status}</div>
                       {this.state.error ? (
-                        <div className="addAccountItemOptionSubmit" onMouseDown={() => this.restart()}>
+                        <div className='addAccountItemOptionSubmit' onMouseDown={() => this.restart()}>
                           try again
                         </div>
                       ) : null}
@@ -196,7 +196,7 @@ class AddPhrase extends React.Component {
               </div>
             </div>
           </div>
-          <div className="addAccountItemFooter" />
+          <div className='addAccountItemFooter' />
         </div>
       </div>
     )

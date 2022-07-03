@@ -65,7 +65,7 @@ class Indicator extends React.Component {
         />
       )
     } else {
-      return <div className="sliceOriginIndicator sliceOriginIndicatorOff" />
+      return <div className='sliceOriginIndicator sliceOriginIndicatorOff' />
     }
   }
 }
@@ -108,16 +108,16 @@ class _OriginModule extends React.Component {
     return (
       <div>
         <div
-          className="sliceOrigin"
+          className='sliceOrigin'
           onClick={() => {
             link.send('tray:action', 'navDash', { view: 'dapps', data: { dappDetails: origin.id } })
           }}
         >
           <Indicator key={origin.session.lastUpdatedAt} connected={connected} />
-          <div className="sliceOriginTile">{origin.name}</div>
-          <div className="sliceOriginReqs">
-            <div className="sliceOriginReqsNumber">{this.state.averageRequests}</div>
-            <div className="sliceOriginReqsLabel">{'reqs/min'}</div>
+          <div className='sliceOriginTile'>{origin.name}</div>
+          <div className='sliceOriginReqs'>
+            <div className='sliceOriginReqsNumber'>{this.state.averageRequests}</div>
+            <div className='sliceOriginReqsLabel'>{'reqs/min'}</div>
           </div>
         </div>
         {this.state.expanded ? <div>{'origin quick menu'}</div> : null}
@@ -132,15 +132,15 @@ const ChainOrigins = ({ chain, origins }) => {
   const hexId = '0x' + parseInt(chain.id).toString('16')
   return (
     <>
-      <div className="originTitle">
-        <div className="originTitleIcon">
+      <div className='originTitle'>
+        <div className='originTitleIcon'>
           <RingIcon
             small={true}
             color={chainMeta[hexId] ? chainMeta[hexId].primaryColor : ''}
             img={chainMeta[hexId] ? chainMeta[hexId].icon : ''}
           />
         </div>
-        <div className="originTitleText">{chain.name}</div>
+        <div className='originTitleText'>{chain.name}</div>
       </div>
       {origins.connected.map((origin) => (
         <OriginModule origin={origin} connected={true} />
@@ -149,7 +149,7 @@ const ChainOrigins = ({ chain, origins }) => {
         <OriginModule origin={origin} connected={false} />
       ))}
       {origins.connected.length === 0 && origins.disconnected.length === 0 ? (
-        <div className="sliceOriginNoDapp">{'No Dapp Recently Connected'}</div>
+        <div className='sliceOriginNoDapp'>{'No Dapp Recently Connected'}</div>
       ) : null}
     </>
   )
@@ -172,7 +172,7 @@ class Dapps extends React.Component {
       return <DappDetails originId={dappDetails} />
     } else {
       return (
-        <div className="cardShow">
+        <div className='cardShow'>
           {enabledChains.map((chain) => {
             const chainOrigins = getOriginsForChain(chain, origins)
 

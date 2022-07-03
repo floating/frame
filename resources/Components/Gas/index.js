@@ -22,30 +22,30 @@ class Gas extends React.Component {
     if (!time)
       return (
         <>
-          ?<span className="timeUnit">?</span>
+          ?<span className='timeUnit'>?</span>
         </>
       )
     if (time < 60)
       return (
         <>
-          <span className="timeUnit">~</span>
+          <span className='timeUnit'>~</span>
           {time}
-          <span className="timeUnit">s</span>
+          <span className='timeUnit'>s</span>
         </>
       )
     if (time < 3600)
       return (
         <>
-          <span className="timeUnit">~</span>
+          <span className='timeUnit'>~</span>
           {Math.round(time / 60)}
-          <span className="timeUnit">m</span>
+          <span className='timeUnit'>m</span>
         </>
       )
     return (
       <>
-        <span className="timeUnit">~</span>
+        <span className='timeUnit'>~</span>
         {Math.round(time / 3600)}
-        <span className="timeUnit">h</span>
+        <span className='timeUnit'>h</span>
       </>
     )
   }
@@ -151,23 +151,23 @@ class Gas extends React.Component {
 
     return (
       <div
-        className="sliceTile sliceTileClickable"
+        className='sliceTile sliceTileClickable'
         onClick={() => {
           this.setState({ expanded: !this.state.expanded })
         }}
       >
-        <div className="sliceTileGasPrice">
-          <div className="sliceTileGasPriceIcon">{svg.gas(9)}</div>
-          <div className="sliceTileGasPriceNumber">{gasPrice}</div>
-          <div className="sliceTileGasPriceUnit">{'gwei'}</div>
+        <div className='sliceTileGasPrice'>
+          <div className='sliceTileGasPriceIcon'>{svg.gas(9)}</div>
+          <div className='sliceTileGasPriceNumber'>{gasPrice}</div>
+          <div className='sliceTileGasPriceUnit'>{'gwei'}</div>
         </div>
-        <div className="sliceGasEstimateBlock">
+        <div className='sliceGasEstimateBlock'>
           {feeEstimatesUSD.map((estimate) => {
             return (
-              <div className="gasEstimate">
-                <div className="gasEstimateRange">
-                  <span className="gasEstimateSymbol">{!estimate.low || estimate.low >= 0.01 ? `$` : '<$'}</span>
-                  <span className="gasEstimateRangeLow">{`${
+              <div className='gasEstimate'>
+                <div className='gasEstimateRange'>
+                  <span className='gasEstimateSymbol'>{!estimate.low || estimate.low >= 0.01 ? `$` : '<$'}</span>
+                  <span className='gasEstimateRangeLow'>{`${
                     !estimate.low
                       ? 0
                       : estimate.low < 0.01
@@ -177,7 +177,7 @@ class Gas extends React.Component {
                       : estimate.low
                   }`}</span>
                 </div>
-                <div className="gasEstimateLabel">{estimate.label}</div>
+                <div className='gasEstimateLabel'>{estimate.label}</div>
               </div>
             )
           })}
@@ -203,55 +203,55 @@ class Gas extends React.Component {
     }
 
     return (
-      <div className="sliceContainer" ref={this.ref}>
+      <div className='sliceContainer' ref={this.ref}>
         {/* <div className='moduleHeader'>{'Fee Monitor'}</div>   */}
 
         {this.renderSummary()}
         {this.state.expanded ? (
-          <div className="sliceGasBlock">
+          <div className='sliceGasBlock'>
             {this.state.baseHover ? (
-              <div className="feeToolTip feeToolTipBase cardShow">
+              <div className='feeToolTip feeToolTipBase cardShow'>
                 The current base fee is added with a buffer to cover the next 3 blocks, any amount greater than your
                 block's base fee is refunded
               </div>
             ) : null}
             {this.state.prioHover ? (
-              <div className="feeToolTip feeToolTipPriority cardShow">
+              <div className='feeToolTip feeToolTipPriority cardShow'>
                 A priority tip paid to validators is added to incentivize quick inclusion of your transaction into a
                 block
               </div>
             ) : null}
-            <div className="gasItem gasItemSmall" style={!fees ? { pointerEvents: 'none', opacity: 0 } : {}}>
-              <div className="gasGweiNum">{calculatedFees.actualBaseFee}</div>
-              <span className="gasGweiLabel">{'GWEI'}</span>
-              <span className="gasLevelLabel">{'Current Base'}</span>
+            <div className='gasItem gasItemSmall' style={!fees ? { pointerEvents: 'none', opacity: 0 } : {}}>
+              <div className='gasGweiNum'>{calculatedFees.actualBaseFee}</div>
+              <span className='gasGweiLabel'>{'GWEI'}</span>
+              <span className='gasLevelLabel'>{'Current Base'}</span>
             </div>
-            <div className="gasItem gasItemLarge">
+            <div className='gasItem gasItemLarge'>
               <div
-                className="gasArrow"
+                className='gasArrow'
                 onClick={() => this.setState({ baseHover: true })}
                 style={!fees ? { pointerEvents: 'none', opacity: 0 } : {}}
                 onMouseLeave={() => this.setState({ baseHover: false })}
               >
-                <div className="gasArrowNotify">+</div>
-                <div className="gasArrowInner">{svg.chevron(27)}</div>
+                <div className='gasArrowNotify'>+</div>
+                <div className='gasArrowInner'>{svg.chevron(27)}</div>
               </div>
-              <div className="gasGweiNum">{gasPrice}</div>
-              <span className="gasGweiLabel">{'GWEI'}</span>
-              <span className="gasLevelLabel">{'Recommended'}</span>
+              <div className='gasGweiNum'>{gasPrice}</div>
+              <span className='gasGweiLabel'>{'GWEI'}</span>
+              <span className='gasLevelLabel'>{'Recommended'}</span>
               <div
-                className="gasArrow gasArrowRight"
+                className='gasArrow gasArrowRight'
                 style={!fees ? { pointerEvents: 'none', opacity: 0 } : {}}
                 onClick={() => this.setState({ prioHover: true })}
                 onMouseLeave={() => this.setState({ prioHover: false })}
               >
-                <div className="gasArrowInner">{svg.chevron(27)}</div>
+                <div className='gasArrowInner'>{svg.chevron(27)}</div>
               </div>
             </div>
-            <div className="gasItem gasItemSmall" style={!fees ? { pointerEvents: 'none', opacity: 0 } : {}}>
-              <div className="gasGweiNum">{calculatedFees.priorityFee}</div>
-              <span className="gasGweiLabel">{'GWEI'}</span>
-              <span className="gasLevelLabel">{'Priority Tip'}</span>
+            <div className='gasItem gasItemSmall' style={!fees ? { pointerEvents: 'none', opacity: 0 } : {}}>
+              <div className='gasGweiNum'>{calculatedFees.priorityFee}</div>
+              <span className='gasGweiLabel'>{'GWEI'}</span>
+              <span className='gasLevelLabel'>{'Priority Tip'}</span>
             </div>
           </div>
         ) : null}

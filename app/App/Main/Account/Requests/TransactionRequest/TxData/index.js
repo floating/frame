@@ -18,10 +18,10 @@ class txData extends React.Component {
   render() {
     const req = this.props.req
     return (
-      <div className="_txData">
-        <div className="_txDataInner">
+      <div className='_txData'>
+        <div className='_txDataInner'>
           <div
-            className="_txDataValue"
+            className='_txDataValue'
             onClick={() => {
               this.props.overlayMode('data')
             }}
@@ -44,7 +44,7 @@ class txData extends React.Component {
               'No Data'
             )}
           </div>
-          <div className="_txLabel">Data</div>
+          <div className='_txLabel'>Data</div>
         </div>
       </div>
     )

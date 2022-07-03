@@ -54,38 +54,38 @@ class Add extends React.Component {
                 <>
                   <div className={state === 'entered' ? 'addAccountShade addAccountShadeActive' : 'addAccountShade'} />
                   <div className={state === 'entered' ? 'addAccountMain addAccountMainActive' : 'addAccountMain'}>
-                    <div className="addAccountMainInner">
-                      <div className="addAccountTitle">Add Account</div>
-                      <div className="addAccountBreak" />
-                      <div className="addAccountSubtitle">
+                    <div className='addAccountMainInner'>
+                      <div className='addAccountTitle'>Add Account</div>
+                      <div className='addAccountBreak' />
+                      <div className='addAccountSubtitle'>
                         Add or create a decentralized account to use with any dapp
                       </div>
-                      <div className="addAccountBreak" />
-                      <div className="addAccountHeader">
+                      <div className='addAccountBreak' />
+                      <div className='addAccountHeader'>
                         <div style={{ marginRight: '10px' }}>{svg.octicon('server', { height: 17 })}</div>
                         <div>Hardware Accounts</div>
                       </div>
-                      <AddHardware index={1} type="ledger" />
-                      <AddHardware index={2} type="trezor" />
-                      <AddHardwareLattice index={3} type="lattice" />
-                      <div className="addAccountHeader">
+                      <AddHardware index={1} type='ledger' />
+                      <AddHardware index={2} type='trezor' />
+                      <AddHardwareLattice index={3} type='lattice' />
+                      <div className='addAccountHeader'>
                         <div style={{ marginRight: '10px' }}>{svg.lightbulb(12)}</div>
                         <div>Smart Accounts</div>
                       </div>
                       <AddAragon index={3} />
-                      <div className="addAccountHeader">
+                      <div className='addAccountHeader'>
                         <div style={{ margin: '-1px 10px 0px 0px' }}>{svg.flame(18)}</div>
                         <div>Hot Accounts</div>
                       </div>
                       <AddPhrase index={4} />
                       <AddRing index={5} />
-                      <div className="addAccountHeader">
+                      <div className='addAccountHeader'>
                         <div style={{ margin: '-3px 10px 0px 0px' }}>{svg.handshake(23)}</div>
                         <div>Nonsigning Accounts</div>
                       </div>
                       <AddAddress index={6} />
-                      <div className="addAccountBreak" style={{ margin: '40px 0px 0px 0px' }} />
-                      <div className="addAccountFooter">{svg.logo(32)}</div>
+                      <div className='addAccountBreak' style={{ margin: '40px 0px 0px 0px' }} />
+                      <div className='addAccountFooter'>{svg.logo(32)}</div>
                     </div>
                   </div>
                 </>
@@ -97,12 +97,12 @@ class Add extends React.Component {
                     : 'addAccountInterface'
                 }
               >
-                <div className="panelBottomMenu">
+                <div className='panelBottomMenu'>
                   <div
                     className={state === 'entered' ? 'addAccountTrigger addAccountTriggerActive' : 'addAccountTrigger'}
                     onMouseDown={() => this.toggleAddAccount(state)}
                   >
-                    <div className="addAccountTriggerIcon">+</div>
+                    <div className='addAccountTriggerIcon'>+</div>
                   </div>
                 </div>
               </div>
@@ -112,7 +112,7 @@ class Add extends React.Component {
                   state === 'entered' ? 'addAccountShadeForward addAccountShadeForwardActive' : 'addAccountShadeForward'
                 }
               >
-                <canvas id="canvas" />
+                <canvas id='canvas' />
               </div>
             </>
           )

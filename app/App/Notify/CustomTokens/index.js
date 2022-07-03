@@ -13,16 +13,16 @@ class CustomTokens extends React.Component {
     const tokens = this.store('main.tokens.custom')
 
     return (
-      <div className="notifyBoxWrap" onMouseDown={(e) => e.stopPropagation()}>
-        <div className="notifyBoxSlide">
-          <div className="customTokens">
-            <div className="customTokensTitle">
-              <div className="customTokensTitleText">Custom Tokens</div>
-              <div className="customTokensAddToken" onClick={() => this.store.notify('addToken', this.props.req)}>
+      <div className='notifyBoxWrap' onMouseDown={(e) => e.stopPropagation()}>
+        <div className='notifyBoxSlide'>
+          <div className='customTokens'>
+            <div className='customTokensTitle'>
+              <div className='customTokensTitleText'>Custom Tokens</div>
+              <div className='customTokensAddToken' onClick={() => this.store.notify('addToken', this.props.req)}>
                 Add Token
               </div>
             </div>
-            <div className="customTokensList">
+            <div className='customTokensList'>
               {tokens.length > 0 ? (
                 []
                   .concat(tokens)
@@ -38,8 +38,8 @@ class CustomTokens extends React.Component {
                             : 'customTokensListItem'
                         }
                       >
-                        <div className="customTokensListItemTitle">
-                          <div className="customTokensListItemName">
+                        <div className='customTokensListItemTitle'>
+                          <div className='customTokensListItemName'>
                             <img
                               src={
                                 token.logoURI &&
@@ -48,13 +48,13 @@ class CustomTokens extends React.Component {
                               value={token.symbol.toUpperCase()}
                               alt={token.symbol.toUpperCase()}
                             />
-                            <div className="customTokensListItemText">
-                              <div className="customTokensListItemSymbol">{token.symbol}</div>
-                              <div className="customTokensListItemSub">{token.name}</div>
+                            <div className='customTokensListItemText'>
+                              <div className='customTokensListItemSymbol'>{token.symbol}</div>
+                              <div className='customTokensListItemSub'>{token.name}</div>
                             </div>
                           </div>
-                          <div className="customTokensListItemChain">
-                            <div className="customTokensListItemChainLabel">{'Chain ID:'}</div>
+                          <div className='customTokensListItemChain'>
+                            <div className='customTokensListItemChainLabel'>{'Chain ID:'}</div>
                             <div>{token.chainId}</div>
                             <div
                               className={
@@ -69,7 +69,7 @@ class CustomTokens extends React.Component {
                           </div>
                         </div>
                         <div
-                          className="customTokensListItemAddress"
+                          className='customTokensListItemAddress'
                           onClick={() => {
                             link.send('tray:clipboardData', token.address)
                             this.setState({ copied: true })
@@ -78,13 +78,13 @@ class CustomTokens extends React.Component {
                         >
                           {this.state.copied ? 'Address Copied' : token.address}
                         </div>
-                        <div className="customTokensListItemBottom">
-                          <div className="customTokensListItemChainDecimal">
-                            <div className="customTokensListItemChainLabel">{'Decimals:'}</div>
+                        <div className='customTokensListItemBottom'>
+                          <div className='customTokensListItemChainDecimal'>
+                            <div className='customTokensListItemChainLabel'>{'Decimals:'}</div>
                             <div>{token.decimals}</div>
                           </div>
                           <div
-                            className="customTokensListItemRemoveButton"
+                            className='customTokensListItemRemoveButton'
                             onClick={() => {
                               this.setState({ tokenExpanded: false })
                               setTimeout(() => {
@@ -99,7 +99,7 @@ class CustomTokens extends React.Component {
                     )
                   })
               ) : (
-                <div className="customTokensListNoTokens">{'No Custom Tokens'}</div>
+                <div className='customTokensListNoTokens'>{'No Custom Tokens'}</div>
               )}
             </div>
           </div>

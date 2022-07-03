@@ -37,22 +37,22 @@ class Filter extends React.Component {
     return (
       <div className={this.state.glitchOn ? 'glitch glitchOn' : 'glitch'}>
         {[...Array(10).keys()].map((i) => (
-          <div key={i + 'hg'} className="line">
+          <div key={i + 'hg'} className='line'>
             {el}
           </div>
         ))}
-        {!this.state.glitchOn ? <div className="line lastLine">{el}</div> : null}
+        {!this.state.glitchOn ? <div className='line lastLine'>{el}</div> : null}
       </div>
     )
   }
   render() {
     const { buttonActionName, buttonAction } = this.props
     return (
-      <div className="filter">
-        <div className="filterWrap">
-          <div className="filterIcon">{svg.search(18)}</div>
+      <div className='filter'>
+        <div className='filterWrap'>
+          <div className='filterIcon'>{svg.search(18)}</div>
           <input
-            className="filterInput"
+            className='filterInput'
             spellCheck={false}
             tabIndex={-1}
             onChange={(e) => this.props.onInput(e.target.value)}
@@ -60,7 +60,7 @@ class Filter extends React.Component {
         </div>
         {buttonActionName ? (
           <div
-            className="filterButton"
+            className='filterButton'
             onClick={() => {
               this.setState({ glitchOn: false })
               if (buttonAction) buttonAction()
@@ -70,7 +70,7 @@ class Filter extends React.Component {
             onMouseLeave={() => this.setState({ glitchOn: false })}
           >
             {this.glitch(
-              <div className="filterButtonInner">
+              <div className='filterButtonInner'>
                 {'+'}
                 {svg.chain(14)}
               </div>

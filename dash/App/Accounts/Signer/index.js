@@ -51,7 +51,7 @@ class Signer extends React.Component {
       const marginTop = liveAccountLimit === 40 ? -8 : 0
       return (
         <div
-          className="loadingLiveAddresses"
+          className='loadingLiveAddresses'
           style={{ top: `${marginTop}px`, padding: '20px', width: `${styleWidth}px` }}
         >
           {[...Array(liveAccountLimit).keys()]
@@ -60,7 +60,7 @@ class Signer extends React.Component {
               return (
                 <div
                   key={'loadingLiveAddress' + i}
-                  className="loadingLiveAddress"
+                  className='loadingLiveAddress'
                   style={{ opacity: i <= this.props.liveAddressesFound ? '1' : '0.3' }}
                 />
               )
@@ -74,33 +74,33 @@ class Signer extends React.Component {
 
   renderTrezorPin(active) {
     return (
-      <div className="trezorPinWrap" style={active ? {} : { height: '0px', padding: '0px 0px 0px 0px' }}>
+      <div className='trezorPinWrap' style={active ? {} : { height: '0px', padding: '0px 0px 0px 0px' }}>
         {active ? (
           <>
-            <div className="trezorPhraseInput">
+            <div className='trezorPhraseInput'>
               {this.state.tPin.split('').map((n, i) => {
                 return (
-                  <div key={i} className="trezorPinInputButton" onMouseDown={this.trezorPin.bind(this, i)}>
+                  <div key={i} className='trezorPinInputButton' onMouseDown={this.trezorPin.bind(this, i)}>
                     {svg.octicon('primitive-dot', { height: 14 })}
                   </div>
                 )
               })}
             </div>
             <div
-              className="signerPinMessage signerPinSubmit"
+              className='signerPinMessage signerPinSubmit'
               onMouseDown={this.state.tPin ? () => this.submitPin() : null}
             >
               Submit Pin
               {this.state.tPin ? (
-                <div className="signerPinDelete" onMouseDown={this.backspacePin.bind(this)}>
+                <div className='signerPinDelete' onMouseDown={this.backspacePin.bind(this)}>
                   {svg.octicon('chevron-left', { height: 18 })}
                 </div>
               ) : null}
             </div>
-            <div className="trezorPinInputWrap">
-              <div className="trezorPinInput">
+            <div className='trezorPinInputWrap'>
+              <div className='trezorPinInput'>
                 {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => (
-                  <div key={i} className="trezorPinInputButton" onMouseDown={this.trezorPin.bind(this, i)}>
+                  <div key={i} className='trezorPinInputButton' onMouseDown={this.trezorPin.bind(this, i)}>
                     {svg.octicon('primitive-dot', { height: 20 })}
                   </div>
                 ))}
@@ -121,18 +121,18 @@ class Signer extends React.Component {
 
   renderTrezorPhrase(active) {
     return (
-      <div className="trezorPinWrap" style={active ? {} : { height: '0px', padding: '0px 0px 0px 0px' }}>
+      <div className='trezorPinWrap' style={active ? {} : { height: '0px', padding: '0px 0px 0px 0px' }}>
         {active ? (
           <>
-            <div className="trezorPhraseInput">
+            <div className='trezorPhraseInput'>
               <input
-                type="password"
+                type='password'
                 onChange={(e) => this.setState({ tPhrase: e.target.value })}
                 onKeyPress={(e) => this.phraseKeyPress(e)}
                 autoFocus
               />
             </div>
-            <div className="signerPinMessage signerPinSubmit" onMouseDown={() => this.submitPhrase()}>
+            <div className='signerPinMessage signerPinSubmit' onMouseDown={() => this.submitPhrase()}>
               Submit Passphrase
             </div>
           </>
@@ -196,20 +196,20 @@ class Signer extends React.Component {
 
     if (status === 'ok') {
       return (
-        <div className="signerStatus">
-          <div className="signerStatusIndicator signerStatusIndicatorReady"></div>
+        <div className='signerStatus'>
+          <div className='signerStatusIndicator signerStatusIndicatorReady'></div>
         </div>
       )
     } else if (status === 'locked') {
       return (
-        <div className="signerStatus">
-          <div className="signerStatusIndicator signerStatusIndicatorLocked"></div>
+        <div className='signerStatus'>
+          <div className='signerStatusIndicator signerStatusIndicatorLocked'></div>
         </div>
       )
     } else {
       return (
-        <div className="signerStatus">
-          <div className="signerStatusIndicator"></div>
+        <div className='signerStatus'>
+          <div className='signerStatusIndicator'></div>
         </div>
       )
     }
@@ -219,7 +219,7 @@ class Signer extends React.Component {
     const status = this.getStatus()
 
     if (status === 'ok') {
-      return <div className="signerStatusText signerStatusReady">{'ready to sign'}</div>
+      return <div className='signerStatusText signerStatusReady'>{'ready to sign'}</div>
     } else if (status === 'locked') {
       const hwSigner = isHardwareSigner(this.props.type)
       const lockText = hwSigner ? 'Please unlock your ' + this.props.type : 'locked'
@@ -227,9 +227,9 @@ class Signer extends React.Component {
       const classes = hwSigner ? 'signerStatusText' : 'signerStatusText signerStatusIssue'
       return <div className={classes}>{lockText}</div>
     } else if (status === 'addresses') {
-      return <div className="signerStatusText">{'deriving addresses'}</div>
+      return <div className='signerStatusText'>{'deriving addresses'}</div>
     } else {
-      return <div className="signerStatusText">{this.props.status}</div>
+      return <div className='signerStatusText'>{this.props.status}</div>
     }
   }
 
@@ -270,36 +270,36 @@ class Signer extends React.Component {
 
     return (
       <div className={signerClass} style={{ zIndex: 1000 - this.props.index }}>
-        <div className="signerTop">
-          <div className="signerIcon">
+        <div className='signerTop'>
+          <div className='signerIcon'>
             {((_) => {
               const type = this.props.type
-              if (type === 'ledger') return <div className="signerIconWrap signerIconHardware">{svg.ledger(20)}</div>
-              if (type === 'trezor') return <div className="signerIconWrap signerIconHardware">{svg.trezor(20)}</div>
+              if (type === 'ledger') return <div className='signerIconWrap signerIconHardware'>{svg.ledger(20)}</div>
+              if (type === 'trezor') return <div className='signerIconWrap signerIconHardware'>{svg.trezor(20)}</div>
               if (type === 'seed' || type === 'ring')
-                return <div className="signerIconWrap signerIconHot">{svg.flame(23)}</div>
-              if (type === 'aragon') return <div className="signerIconWrap signerIconSmart">{svg.aragon(28)}</div>
-              if (type === 'lattice') return <div className="signerIconWrap signerIconSmart">{svg.lattice(22)}</div>
-              return <div className="signerIconWrap">{svg.logo(20)}</div>
+                return <div className='signerIconWrap signerIconHot'>{svg.flame(23)}</div>
+              if (type === 'aragon') return <div className='signerIconWrap signerIconSmart'>{svg.aragon(28)}</div>
+              if (type === 'lattice') return <div className='signerIconWrap signerIconSmart'>{svg.lattice(22)}</div>
+              return <div className='signerIconWrap'>{svg.logo(20)}</div>
             })()}
           </div>
-          <div className="signerType" style={this.props.inSetup ? { top: '21px' } : { top: '24px' }}>
+          <div className='signerType' style={this.props.inSetup ? { top: '21px' } : { top: '24px' }}>
             {this.props.model}
           </div>
-          <div className="signerName">
+          <div className='signerName'>
             {this.props.name}
-            <div className="signerNameUpdate">{svg.save(14)}</div>
+            <div className='signerNameUpdate'>{svg.save(14)}</div>
           </div>
           {this.status()}
         </div>
         {this.statusText()}
         {this.props.type === 'lattice' && status === 'pair' ? (
-          <div className="signerLatticePair">
-            <div className="signerLatticePairTitle">Please input your Lattice's pairing code</div>
-            <div className="signerLatticePairInput">
+          <div className='signerLatticePair'>
+            <div className='signerLatticePairTitle'>Please input your Lattice's pairing code</div>
+            <div className='signerLatticePairInput'>
               <input
                 autoFocus
-                tabIndex="1"
+                tabIndex='1'
                 value={this.state.latticePairCode}
                 onChange={(e) => this.setState({ latticePairCode: (e.target.value || '').toUpperCase() })}
                 onKeyPress={(e) => {
@@ -307,7 +307,7 @@ class Signer extends React.Component {
                 }}
               />
             </div>
-            <div onMouseDown={() => this.pairToLattice()} className="signerLatticePairSubmit">
+            <div onMouseDown={() => this.pairToLattice()} className='signerLatticePairSubmit'>
               Pair
             </div>
           </div>
@@ -319,7 +319,7 @@ class Signer extends React.Component {
                 <span className='signerAccountsTitleActiveCount'>{activeAccounts.length}</span> 
               </span>
             </div> */}
-            <div className="signerAccounts">
+            <div className='signerAccounts'>
               {signer.addresses.slice(startIndex, startIndex + addressLimit).map((address, index) => {
                 const added = this.store('main.accounts', address.toLowerCase())
                 return (
@@ -336,54 +336,54 @@ class Signer extends React.Component {
                       }
                     }}
                   >
-                    <div className="signerAccountIndex">{index + 1 + startIndex}</div>
-                    <div className="signerAccountAddress">
+                    <div className='signerAccountIndex'>{index + 1 + startIndex}</div>
+                    <div className='signerAccountAddress'>
                       {address.substr(0, 11)} {svg.octicon('kebab-horizontal', { height: 20 })}{' '}
                       {address.substr(address.length - 10)}
                     </div>
-                    <div className="signerAccountCheck" />
+                    <div className='signerAccountCheck' />
                   </div>
                 )
               })}
             </div>
-            <div className="signerBottom">
-              <div className="signerBottomPageBack" onMouseDown={() => this.nextPage(true)}>
+            <div className='signerBottom'>
+              <div className='signerBottomPageBack' onMouseDown={() => this.nextPage(true)}>
                 {svg.triangleLeft(20)}
               </div>
-              <div className="signerBottomPages">
+              <div className='signerBottomPages'>
                 {page + 1 + ' / ' + Math.ceil(signer.addresses.length / addressLimit)}
               </div>
-              <div className="signerBottomPageNext" onMouseDown={() => this.nextPage()}>
+              <div className='signerBottomPageNext' onMouseDown={() => this.nextPage()}>
                 {svg.triangleLeft(20)}
               </div>
             </div>
           </>
         ) : this.props.type === 'trezor' && (status === 'need pin' || status === 'enter passphrase') ? (
-          <div className="signerInterface">
+          <div className='signerInterface'>
             {this.renderTrezorPin(this.props.type === 'trezor' && status === 'need pin')}
             {this.renderTrezorPhrase(this.props.type === 'trezor' && status === 'enter passphrase')}
           </div>
         ) : loading ? (
-          <div className="signerLoading">
-            <div className="signerLoadingLoader" />
+          <div className='signerLoading'>
+            <div className='signerLoadingLoader' />
           </div>
         ) : (
           <></>
         )}
         {disconnected || this.props.inSetup ? null : (
-          <div className="signerDrawer">
-            <div className="showControls" onMouseDown={() => this.setState({ showControls: !this.state.showControls })}>
+          <div className='signerDrawer'>
+            <div className='showControls' onMouseDown={() => this.setState({ showControls: !this.state.showControls })}>
               {this.state.showControls ? 'hide' : 'more'}
             </div>
-            <div className="showControlsLine" />
+            <div className='showControlsLine' />
           </div>
         )}
         {this.state.showControls || disconnected ? (
-          <div className="signerControls cardShow">
+          <div className='signerControls cardShow'>
             {!!permissionId ? (
-              <div className="signerControlDetail">
-                <div className="signerControlDetailKey">{'PERMISSION ID:'}</div>
-                <div className="signerControlDetailValue">{permissionId}</div>
+              <div className='signerControlDetail'>
+                <div className='signerControlDetailKey'>{'PERMISSION ID:'}</div>
+                <div className='signerControlDetailValue'>{permissionId}</div>
               </div>
             ) : null}
             {/* <div className='signerControlOption'>Hide empty accounts</div>
@@ -392,7 +392,7 @@ class Signer extends React.Component {
             <div className='signerControlOption'>Reload Signer</div>
             <div className='signerControlOption signerControlOptionEffect'>Lock Signer</div> */}
             <div
-              className="signerControlOption"
+              className='signerControlOption'
               onMouseDown={() => {
                 link.send('dash:reloadSigner', this.props.id)
               }}
@@ -400,7 +400,7 @@ class Signer extends React.Component {
               {hwSigner ? 'Reconnect' : 'Reload Signer'}
             </div>
             <div
-              className="signerControlOption signerControlOptionImportant"
+              className='signerControlOption signerControlOptionImportant'
               onMouseDown={() => {
                 link.send('dash:removeSigner', this.props.id)
               }}

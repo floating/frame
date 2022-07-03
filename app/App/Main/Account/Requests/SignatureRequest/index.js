@@ -69,20 +69,20 @@ class TransactionRequest extends React.Component {
     return (
       <div key={this.props.req.id || this.props.req.handlerId} className={requestClass}>
         {type === 'sign' ? (
-          <div className="approveRequest">
-            <div className="approveTransactionPayload">
+          <div className='approveRequest'>
+            <div className='approveTransactionPayload'>
               {notice ? (
-                <div className="requestCover">
+                <div className='requestCover'>
                   {((_) => {
                     if (status === 'pending') {
                       return (
-                        <div key={status} className="requestNoticeInner cardShow">
+                        <div key={status} className='requestNoticeInner cardShow'>
                           <div style={{ paddingBottom: 20 }}>
-                            <div className="loader" />
+                            <div className='loader' />
                           </div>
-                          <div className="requestNoticeInnerText">See Signer</div>
+                          <div className='requestNoticeInnerText'>See Signer</div>
                           <div
-                            className="cancelRequest"
+                            className='cancelRequest'
                             onMouseDown={() => this.decline(this.props.req.handlerId, this.props.req)}
                           >
                             Cancel
@@ -91,21 +91,21 @@ class TransactionRequest extends React.Component {
                       )
                     } else if (status === 'success') {
                       return (
-                        <div key={status} className="requestNoticeInner cardShow requestNoticeSuccess">
+                        <div key={status} className='requestNoticeInner cardShow requestNoticeSuccess'>
                           <div>{svg.octicon('check', { height: 80 })}</div>
-                          <div className="requestNoticeInnerText">{notice}</div>
+                          <div className='requestNoticeInnerText'>{notice}</div>
                         </div>
                       )
                     } else if (status === 'error' || status === 'declined') {
                       return (
-                        <div key={status} className="requestNoticeInner cardShow requestNoticeError">
+                        <div key={status} className='requestNoticeInner cardShow requestNoticeError'>
                           <div>{svg.octicon('circle-slash', { height: 80 })}</div>
-                          <div className="requestNoticeInnerText">{notice}</div>
+                          <div className='requestNoticeInnerText'>{notice}</div>
                         </div>
                       )
                     } else {
                       return (
-                        <div key={notice} className="requestNoticeInner cardShow">
+                        <div key={notice} className='requestNoticeInner cardShow'>
                           {notice}
                         </div>
                       )
@@ -114,34 +114,34 @@ class TransactionRequest extends React.Component {
                 </div>
               ) : (
                 <>
-                  <div className="signValue">
-                    <div className="signValueInner">{message}</div>
+                  <div className='signValue'>
+                    <div className='signValueInner'>{message}</div>
                   </div>
                 </>
               )}
             </div>
           </div>
         ) : (
-          <div className="unknownType">{'Unknown: ' + this.props.req.type}</div>
+          <div className='unknownType'>{'Unknown: ' + this.props.req.type}</div>
         )}
-        <div className="requestApprove">
+        <div className='requestApprove'>
           <div
-            className="requestDecline"
+            className='requestDecline'
             style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none' }}
             onClick={() => {
               if (this.state.allowInput) this.decline(this.props.req.handlerId, this.props.req)
             }}
           >
-            <div className="requestDeclineButton _txButton _txButtonBad">Decline</div>
+            <div className='requestDeclineButton _txButton _txButtonBad'>Decline</div>
           </div>
           <div
-            className="requestSign"
+            className='requestSign'
             style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none' }}
             onClick={() => {
               if (this.state.allowInput) this.approve(this.props.req.handlerId, this.props.req)
             }}
           >
-            <div className="requestSignButton _txButton">Sign</div>
+            <div className='requestSignButton _txButton'>Sign</div>
           </div>
         </div>
       </div>

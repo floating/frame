@@ -157,31 +157,31 @@ class AddAragon extends React.Component {
     let itemClass = 'addAccountItem addAccountItemSmart addAccountItemAdding'
     return (
       <div className={itemClass}>
-        <div className="addAccountItemBar addAccountItemSmart" />
-        <div className="addAccountItemWrap">
-          <div className="addAccountItemTop">
-            <div className="addAccountItemTopType">
-              <div className="addAccountItemIcon">
+        <div className='addAccountItemBar addAccountItemSmart' />
+        <div className='addAccountItemWrap'>
+          <div className='addAccountItemTop'>
+            <div className='addAccountItemTopType'>
+              <div className='addAccountItemIcon'>
                 <RingIcon svgLookup={{ name: 'aragon', size: 24 }} />
               </div>
-              <div className="addAccountItemTopTitle">Aragon DAO</div>
+              <div className='addAccountItemTopTitle'>Aragon DAO</div>
             </div>
             {/* <div className='addAccountItemClose' onMouseDown={() => this.props.close()}>{'Done'}</div> */}
-            <div className="addAccountItemSummary">
+            <div className='addAccountItemSummary'>
               An Aragon smart account allows you to use your Aragon DAO with any dapp
             </div>
           </div>
-          <div className="addAccountItemOption">
-            <div className="addAccountItemOptionIntro" onMouseDown={() => this.adding()}>
-              <div className="addAccountItemDeviceTitle">Add Aragon Account</div>
+          <div className='addAccountItemOption'>
+            <div className='addAccountItemOptionIntro' onMouseDown={() => this.adding()}>
+              <div className='addAccountItemDeviceTitle'>Add Aragon Account</div>
             </div>
-            <div className="addAccountItemOptionSetup" style={{ transform: `translateX(-${100 * this.state.index}%)` }}>
-              <div className="addAccountItemOptionSetupFrames">
-                <div className="addAccountItemOptionSetupFrame">
-                  <div className="addAccountItemOptionTitle">enter chain id</div>
-                  <div className="addAccountItemOptionInputPhrase">
+            <div className='addAccountItemOptionSetup' style={{ transform: `translateX(-${100 * this.state.index}%)` }}>
+              <div className='addAccountItemOptionSetupFrames'>
+                <div className='addAccountItemOptionSetupFrame'>
+                  <div className='addAccountItemOptionTitle'>enter chain id</div>
+                  <div className='addAccountItemOptionInputPhrase'>
                     <input
-                      tabIndex="-1"
+                      tabIndex='-1'
                       ref={this.forms[0]}
                       value={this.state.chainId}
                       onChange={(e) => this.onChange('chainId', e)}
@@ -192,15 +192,15 @@ class AddAragon extends React.Component {
                       }}
                     />
                   </div>
-                  <div className="addAccountItemOptionSubmit" onMouseDown={() => this.next()}>
+                  <div className='addAccountItemOptionSubmit' onMouseDown={() => this.next()}>
                     Next
                   </div>
                 </div>
-                <div className="addAccountItemOptionSetupFrame">
-                  <div className="addAccountItemOptionTitle">enter dao name</div>
-                  <div className="addAccountItemOptionInputPhrase">
+                <div className='addAccountItemOptionSetupFrame'>
+                  <div className='addAccountItemOptionTitle'>enter dao name</div>
+                  <div className='addAccountItemOptionInputPhrase'>
                     <input
-                      tabIndex="-1"
+                      tabIndex='-1'
                       ref={this.forms[1]}
                       value={this.state.name}
                       onChange={(e) => this.onChange('name', e)}
@@ -211,13 +211,13 @@ class AddAragon extends React.Component {
                       }}
                     />
                   </div>
-                  <div className="addAccountItemOptionSubmit" onMouseDown={() => this.next()}>
+                  <div className='addAccountItemOptionSubmit' onMouseDown={() => this.next()}>
                     Next
                   </div>
                 </div>
-                <div className="addAccountItemOptionSetupFrame">
-                  <div className="addAccountItemOptionTitle">Choose acting account</div>
-                  <div className="addAccountItemOptionList">
+                <div className='addAccountItemOptionSetupFrame'>
+                  <div className='addAccountItemOptionTitle'>Choose acting account</div>
+                  <div className='addAccountItemOptionList'>
                     {Object.keys(this.store('main.accounts'))
                       .filter((id) => this.accountFilter(id))
                       .sort((a, b) => this.accountSort(a, b))
@@ -226,15 +226,15 @@ class AddAragon extends React.Component {
                         return (
                           <div
                             key={id}
-                            className="addAccountItemOptionListItem"
+                            className='addAccountItemOptionListItem'
                             onMouseDown={(e) => this.actorAccount(id)}
                           >
-                            <div className="actingAccountAddress">
+                            <div className='actingAccountAddress'>
                               {id ? id.substring(0, 8) : ''}
                               {svg.octicon('kebab-horizontal', { height: 16 })}
                               {id ? id.substr(id.length - 6) : ''}
                             </div>
-                            <div className="actingAccountTag">{account.name}</div>
+                            <div className='actingAccountTag'>{account.name}</div>
                           </div>
                         )
                       })}
@@ -252,10 +252,10 @@ class AddAragon extends React.Component {
                     })}
                   </div>
                 </div> */}
-                <div className="addAccountItemOptionSetupFrame">
-                  <div className="addAccountItemOptionTitle">{this.state.status}</div>
+                <div className='addAccountItemOptionSetupFrame'>
+                  <div className='addAccountItemOptionTitle'>{this.state.status}</div>
                   {this.state.error ? (
-                    <div className="addAccountItemOptionSubmit" onMouseDown={() => this.restart()}>
+                    <div className='addAccountItemOptionSubmit' onMouseDown={() => this.restart()}>
                       try again
                     </div>
                   ) : null}
@@ -264,7 +264,7 @@ class AddAragon extends React.Component {
             </div>
           </div>
           <div
-            className="addAccountItemFooter"
+            className='addAccountItemFooter'
             onMouseDown={() => {
               const net = this.store('main.currentNetwork.id')
               const open = (url) =>

@@ -203,8 +203,8 @@ class TxFeeOverlay extends React.Component {
 
   renderBaseFeeInput() {
     return (
-      <div className="txFeeOverlayBaseFee">
-        <div className="txFeeOverlayInput">
+      <div className='txFeeOverlayBaseFee'>
+        <div className='txFeeOverlayInput'>
           <input
             tabIndex={0}
             value={this.state.baseFee}
@@ -233,15 +233,15 @@ class TxFeeOverlay extends React.Component {
             }}
           />
         </div>
-        <div className="txFeeOverlayLabel">Base Fee (GWEI)</div>
+        <div className='txFeeOverlayLabel'>Base Fee (GWEI)</div>
       </div>
     )
   }
 
   renderPriorityFeeInput() {
     return (
-      <div className="txFeeOverlayPriorityFee">
-        <div className="txFeeOverlayInput">
+      <div className='txFeeOverlayPriorityFee'>
+        <div className='txFeeOverlayInput'>
           <input
             tabIndex={1}
             value={this.state.priorityFee}
@@ -270,15 +270,15 @@ class TxFeeOverlay extends React.Component {
             }}
           />
         </div>
-        <div className="txFeeOverlayLabel">Max Priority Fee (GWEI) </div>
+        <div className='txFeeOverlayLabel'>Max Priority Fee (GWEI) </div>
       </div>
     )
   }
 
   renderGasPriceInput() {
     return (
-      <div className="txFeeOverlayBaseFee">
-        <div className="txFeeOverlayInput">
+      <div className='txFeeOverlayBaseFee'>
+        <div className='txFeeOverlayInput'>
           <input
             tabIndex={0}
             value={this.state.gasPrice}
@@ -307,19 +307,19 @@ class TxFeeOverlay extends React.Component {
             }}
           />
         </div>
-        <div className="txFeeOverlayLabel">Gas Price (GWEI)</div>
+        <div className='txFeeOverlayLabel'>Gas Price (GWEI)</div>
       </div>
     )
   }
 
   renderGasLimitInput() {
     return (
-      <div className="txFeeOverlayLimit">
-        <div className="txFeeOverlayInput">
+      <div className='txFeeOverlayLimit'>
+        <div className='txFeeOverlayInput'>
           <input
             tabIndex={3}
             value={this.state.gasLimit}
-            className="txFeeOverlayInput"
+            className='txFeeOverlayInput'
             onChange={(e) => {
               this.setGasLimit(e.target.value.match('[0-9]*'))
             }}
@@ -341,7 +341,7 @@ class TxFeeOverlay extends React.Component {
             }}
           />
         </div>
-        <div className="txFeeOverlayLabel">Gas Limit (UNITS)</div>
+        <div className='txFeeOverlayLabel'>Gas Limit (UNITS)</div>
       </div>
     )
   }
@@ -356,14 +356,14 @@ class TxFeeOverlay extends React.Component {
       // maxFee = maxFeePerGas.multipliedBy(gasLimit)
       // maxFeeUSD = maxFee.multipliedBy(nativeUSD)
       return (
-        <div className="txOverlay cardShow" ref={this.moduleRef}>
-          <div className="txOverlayTitle">Adjust Fee</div>
-          <div className="txOverlayClose" onMouseDown={() => overlayMode()}>
+        <div className='txOverlay cardShow' ref={this.moduleRef}>
+          <div className='txOverlayTitle'>Adjust Fee</div>
+          <div className='txOverlayClose' onMouseDown={() => overlayMode()}>
             {svg.octicon('x', { height: 16 })}
           </div>
-          <div className="txFeeOverlay">
-            <div className="txFeeOverlayInset">
-              <div className="txFeeOverlayEstimate"></div>
+          <div className='txFeeOverlay'>
+            <div className='txFeeOverlayInset'>
+              <div className='txFeeOverlayEstimate'></div>
               {this.renderBaseFeeInput()}
               {this.renderPriorityFeeInput()}
               {this.renderGasLimitInput()}
@@ -377,14 +377,14 @@ class TxFeeOverlay extends React.Component {
       // maxFee = maxFeePerGas.multipliedBy(gasLimit)
       // maxFeeUSD = maxFee.shiftedBy(-18).multipliedBy(nativeUSD)
       return (
-        <div className="txOverlay cardShow" ref={this.moduleRef}>
-          <div className="txOverlayTitle">Adjust Fee</div>
-          <div className="txOverlayClose" onMouseDown={() => overlayMode()}>
+        <div className='txOverlay cardShow' ref={this.moduleRef}>
+          <div className='txOverlayTitle'>Adjust Fee</div>
+          <div className='txOverlayClose' onMouseDown={() => overlayMode()}>
             {svg.octicon('x', { height: 16 })}
           </div>
-          <div className="txFeeOverlay">
-            <div className="txFeeOverlayInset">
-              <div className="txFeeOverlayEstimate"></div>
+          <div className='txFeeOverlay'>
+            <div className='txFeeOverlayInset'>
+              <div className='txFeeOverlayEstimate'></div>
               {this.renderGasPriceInput()}
               {this.renderGasLimitInput()}
             </div>

@@ -34,12 +34,12 @@ class Inventory extends React.Component {
     const inventory = this.store('main.inventory', this.props.id)
     const collections = Object.keys(inventory || {})
     return (
-      <div ref={this.moduleRef} className="balancesBlock">
-        <div className="moduleHeader">
+      <div ref={this.moduleRef} className='balancesBlock'>
+        <div className='moduleHeader'>
           {'Inventory'}
           {this.props.expanded ? (
             <div
-              className="moduleHeaderClose"
+              className='moduleHeaderClose'
               onMouseDown={() => {
                 this.props.expandModule(false)
               }}
@@ -70,7 +70,7 @@ class Inventory extends React.Component {
               .map((k) => {
                 return (
                   <div
-                    className="inventoryCollection"
+                    className='inventoryCollection'
                     onClick={() => {
                       this.props.expandModule(this.props.moduleId, { currentCollection: k })
                     }}
@@ -88,9 +88,9 @@ class Inventory extends React.Component {
                   >
                     {this.props.expanded ? (
                       <>
-                        <div className="inventoryPreview">
+                        <div className='inventoryPreview'>
                           {this.state.hoverAsset ? (
-                            <div className="inventoryPreviewMedia">
+                            <div className='inventoryPreviewMedia'>
                               {this.state.hoverAsset.img ? (
                                 <img
                                   src={`https://proxy.pylon.link?type=nft&target=${encodeURIComponent(
@@ -101,7 +101,7 @@ class Inventory extends React.Component {
                             </div>
                           ) : (
                             <div
-                              className="inventoryPreviewCollection"
+                              className='inventoryPreviewCollection'
                               style={
                                 inventory[k].meta.image
                                   ? {
@@ -114,10 +114,10 @@ class Inventory extends React.Component {
                             />
                           )}
                         </div>
-                        <div className="inventoryPreviewTitle">
+                        <div className='inventoryPreviewTitle'>
                           {this.state.hoverAsset ? this.state.hoverAsset.name : inventory[k].meta.name}
                         </div>
-                        <div className="inventoryCollectionItems">
+                        <div className='inventoryCollectionItems'>
                           {Object.keys(inventory[k].items || {})
                             .sort((a, b) => {
                               a = inventory[k].items[a].tokenId
@@ -128,7 +128,7 @@ class Inventory extends React.Component {
                               const { tokenId, name, img, openSeaLink } = inventory[k].items[id]
                               return (
                                 <div
-                                  className="inventoryCollectionItem"
+                                  className='inventoryCollectionItem'
                                   onClick={() => {
                                     this.store.notify('openExternal', { url: openSeaLink })
                                   }}
@@ -153,23 +153,23 @@ class Inventory extends React.Component {
                                 </div>
                               )
                             })}
-                          <div className="inventoryCollectionLine" />
+                          <div className='inventoryCollectionLine' />
                         </div>
                       </>
                     ) : (
-                      <div className="inventoryCollectionTop">
-                        <div className="inventoryCollectionName">{inventory[k].meta.name}</div>
-                        <div className="inventoryCollectionCount">{Object.keys(inventory[k].items).length}</div>
-                        <div className="inventoryCollectionLine" />
+                      <div className='inventoryCollectionTop'>
+                        <div className='inventoryCollectionName'>{inventory[k].meta.name}</div>
+                        <div className='inventoryCollectionCount'>{Object.keys(inventory[k].items).length}</div>
+                        <div className='inventoryCollectionLine' />
                       </div>
                     )}
                   </div>
                 )
               })
           ) : inventory ? (
-            <div className="inventoryNotFound">No Items Found</div>
+            <div className='inventoryNotFound'>No Items Found</div>
           ) : (
-            <div className="inventoryNotFound">Loading Items..</div>
+            <div className='inventoryNotFound'>Loading Items..</div>
           )}
         </div>
       </div>

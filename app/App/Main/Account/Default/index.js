@@ -20,9 +20,9 @@ class Block extends React.Component {
   render() {
     return (
       <div ref={this.moduleRef}>
-        <div className="moduleHeader">{this.props.moduleId}</div>
-        <div className="moduleMain">
-          <div className="cardShow">{`Module Not Found`}</div>
+        <div className='moduleHeader'>{this.props.moduleId}</div>
+        <div className='moduleMain'>
+          <div className='cardShow'>{`Module Not Found`}</div>
         </div>
       </div>
     )

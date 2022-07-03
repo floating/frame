@@ -61,17 +61,17 @@ class Launcher extends React.Component {
     return (
       <div className={this.state.glitchOn ? 'glitch glitchOn' : 'glitch'}>
         {[...Array(10).keys()].map((i) => (
-          <div key={i + 'hg'} className="line">
+          <div key={i + 'hg'} className='line'>
             {el}
           </div>
         ))}
-        {!this.state.glitchOn ? <div className="line lastLine">{el}</div> : null}
+        {!this.state.glitchOn ? <div className='line lastLine'>{el}</div> : null}
       </div>
     )
   }
   render() {
     return (
-      <div ref={this.moduleRef} className="panelMenu">
+      <div ref={this.moduleRef} className='panelMenu'>
         <div
           className={'panelMenuItem panelMenuItemOpen'}
           onClick={() =>

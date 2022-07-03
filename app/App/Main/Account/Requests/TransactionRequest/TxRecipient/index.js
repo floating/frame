@@ -23,10 +23,10 @@ class TxRecipient extends React.Component {
     const ensName = req.recipient && req.recipient.length < 25 ? req.recipient : ''
 
     return (
-      <div className="_txRecipient">
-        <div className="_txRecipientInner">
+      <div className='_txRecipient'>
+        <div className='_txRecipientInner'>
           {address ? (
-            <div className="_txRecipientSlice _txRecipientValue">
+            <div className='_txRecipientSlice _txRecipientValue'>
               {ensName ? (
                 <span>{ensName}</span>
               ) : (
@@ -46,7 +46,7 @@ class TxRecipient extends React.Component {
                 </span>
               ) : null}
               <div
-                className="_txRecipientFull"
+                className='_txRecipientFull'
                 onClick={() => {
                   this.copyAddress(address)
                 }}
@@ -55,9 +55,9 @@ class TxRecipient extends React.Component {
               </div>
             </div>
           ) : (
-            <div className="_txRecipientSlice _txRecipientValue">Deploying Contract</div>
+            <div className='_txRecipientSlice _txRecipientValue'>Deploying Contract</div>
           )}
-          <div className="_txLabel">Recipient</div>
+          <div className='_txLabel'>Recipient</div>
         </div>
       </div>
     )

@@ -9,7 +9,7 @@ class _Aux extends React.Component {
     const aux = (data && data.aux) || {}
     if (aux.type === 'gas') {
       return (
-        <div className="auxWrap cardShow">
+        <div className='auxWrap cardShow'>
           <Gas id={1} />
         </div>
       )

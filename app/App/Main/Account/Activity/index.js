@@ -22,9 +22,9 @@ class Balances extends React.Component {
   }
   render() {
     return (
-      <div ref={this.moduleRef} className="balancesBlock">
-        <div className="moduleHeader">{'activity monitor'}</div>
-        <div className="moduleComingSoon">{'Coming Soon'}</div>
+      <div ref={this.moduleRef} className='balancesBlock'>
+        <div className='moduleHeader'>{'activity monitor'}</div>
+        <div className='moduleComingSoon'>{'Coming Soon'}</div>
       </div>
     )
   }

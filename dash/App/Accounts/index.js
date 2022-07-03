@@ -23,59 +23,59 @@ class AddAccounts extends React.Component {
   }
   renderAddNonsigning() {
     return (
-      <div className="addAccounts cardShow">
+      <div className='addAccounts cardShow'>
         <AddAddress close={this.props.close} />
       </div>
     )
   }
   renderAddKeyring() {
     return (
-      <div className="addAccounts cardShow">
+      <div className='addAccounts cardShow'>
         <AddRing close={this.props.close} />
       </div>
     )
   }
   renderAddKeystore() {
     return (
-      <div className="addAccounts cardShow">
+      <div className='addAccounts cardShow'>
         <AddKeystore close={this.props.close} />
       </div>
     )
   }
   renderAddSeed() {
     return (
-      <div className="addAccounts cardShow">
+      <div className='addAccounts cardShow'>
         <AddPhrase close={this.props.close} />
       </div>
     )
   }
   renderAddTrezor() {
     return (
-      <div className="addAccounts cardShow">
+      <div className='addAccounts cardShow'>
         <AddHardware type={'trezor'} close={this.props.close} />
       </div>
     )
   }
   renderAddLedger() {
     return (
-      <div className="addAccounts cardShow">
+      <div className='addAccounts cardShow'>
         <AddHardware type={'ledger'} close={this.props.close} />
       </div>
     )
   }
   renderAddLattice() {
     return (
-      <div className="addAccounts cardShow">
+      <div className='addAccounts cardShow'>
         <AddHardwareLattice type={'lattice'} close={this.props.close} />
       </div>
     )
   }
   renderAddGnosis() {
-    return <div className="addAccounts cardShow">{'Add Gnosis'}</div>
+    return <div className='addAccounts cardShow'>{'Add Gnosis'}</div>
   }
   renderAddAragon() {
     return (
-      <div className="addAccounts cardShow">
+      <div className='addAccounts cardShow'>
         <AddAragon close={this.props.close} />
       </div>
     )
@@ -85,43 +85,43 @@ class AddAccounts extends React.Component {
   }
   renderDefault() {
     return (
-      <div className="addAccounts cardShow">
-        <div className="addAccountsHeader">
-          <div className="addAccountsHeaderTitle">What type of account would you like to add?</div>
+      <div className='addAccounts cardShow'>
+        <div className='addAccountsHeader'>
+          <div className='addAccountsHeaderTitle'>What type of account would you like to add?</div>
           {/* <div className='addAccountsHeaderClose' onClick={() => this.props.close()}>{'done'}</div> */}
         </div>
-        <div className="accountTypeSelect" onClick={() => this.createNewAccount('lattice')}>
-          <div className="accountTypeSelectIcon">{svg.lattice(22)}</div>
-          <div className="accountTypeSelectIcon">{'GridPlus Lattice1'}</div>
+        <div className='accountTypeSelect' onClick={() => this.createNewAccount('lattice')}>
+          <div className='accountTypeSelectIcon'>{svg.lattice(22)}</div>
+          <div className='accountTypeSelectIcon'>{'GridPlus Lattice1'}</div>
         </div>
-        <div className="accountTypeSelect" onClick={() => this.createNewAccount('ledger')}>
-          <div className="accountTypeSelectIcon">{svg.ledger(19)}</div>
-          <div className="accountTypeSelectIcon">{'Ledger Device'}</div>
+        <div className='accountTypeSelect' onClick={() => this.createNewAccount('ledger')}>
+          <div className='accountTypeSelectIcon'>{svg.ledger(19)}</div>
+          <div className='accountTypeSelectIcon'>{'Ledger Device'}</div>
         </div>
-        <div className="accountTypeSelect" onClick={() => this.createNewAccount('trezor')}>
-          <div className="accountTypeSelectIcon">{svg.trezor(17)}</div>
-          <div className="accountTypeSelectIcon">{'Trezor Device'}</div>
+        <div className='accountTypeSelect' onClick={() => this.createNewAccount('trezor')}>
+          <div className='accountTypeSelectIcon'>{svg.trezor(17)}</div>
+          <div className='accountTypeSelectIcon'>{'Trezor Device'}</div>
         </div>
-        <div className="accountTypeSelect" onClick={() => this.createNewAccount('aragon')}>
-          <div className="accountTypeSelectIcon">{svg.aragon(30)}</div>
-          <div className="accountTypeSelectIcon">{'Aragon DAO'}</div>
+        <div className='accountTypeSelect' onClick={() => this.createNewAccount('aragon')}>
+          <div className='accountTypeSelectIcon'>{svg.aragon(30)}</div>
+          <div className='accountTypeSelectIcon'>{'Aragon DAO'}</div>
         </div>
         {/* <div className='accountTypeSelect' onClick={() => this.setState({ view: 'gnosis' })}>Gnosis Safe</div> */}
-        <div className="accountTypeSelect" onClick={() => this.createNewAccount('seed')}>
-          <div className="accountTypeSelectIcon">{svg.seedling(23)}</div>
-          <div className="accountTypeSelectIcon">{'Seed Phrase'}</div>
+        <div className='accountTypeSelect' onClick={() => this.createNewAccount('seed')}>
+          <div className='accountTypeSelectIcon'>{svg.seedling(23)}</div>
+          <div className='accountTypeSelectIcon'>{'Seed Phrase'}</div>
         </div>
-        <div className="accountTypeSelect" onClick={() => this.createNewAccount('keyring')}>
-          <div className="accountTypeSelectIcon">{svg.key(20)}</div>
-          <div className="accountTypeSelectIcon">{'Private Key'}</div>
+        <div className='accountTypeSelect' onClick={() => this.createNewAccount('keyring')}>
+          <div className='accountTypeSelectIcon'>{svg.key(20)}</div>
+          <div className='accountTypeSelectIcon'>{'Private Key'}</div>
         </div>
-        <div className="accountTypeSelect" onClick={() => this.createNewAccount('keystore')}>
-          <div className="accountTypeSelectIcon">{svg.file(20)}</div>
-          <div className="accountTypeSelectIcon">{'Keystore File (json)'}</div>
+        <div className='accountTypeSelect' onClick={() => this.createNewAccount('keystore')}>
+          <div className='accountTypeSelectIcon'>{svg.file(20)}</div>
+          <div className='accountTypeSelectIcon'>{'Keystore File (json)'}</div>
         </div>
-        <div className="accountTypeSelect" onClick={() => this.createNewAccount('nonsigning')}>
-          <div className="accountTypeSelectIcon">{svg.mask(24)}</div>
-          <div className="accountTypeSelectIcon">{'Watch-only Account'}</div>
+        <div className='accountTypeSelect' onClick={() => this.createNewAccount('nonsigning')}>
+          <div className='accountTypeSelectIcon'>{svg.mask(24)}</div>
+          <div className='accountTypeSelectIcon'>{'Watch-only Account'}</div>
         </div>
       </div>
     )
@@ -189,32 +189,32 @@ class Dash extends React.Component {
         {...this.props}
       />
     ) : (
-      <div className="cardShow">
+      <div className='cardShow'>
         <div
-          className="newAccount"
+          className='newAccount'
           onClick={() => link.send('tray:action', 'navDash', { view: 'accounts', data: { showAddAccounts: true } })}
         >
-          <div className="newAccountIcon">{svg.plus(16)}</div>
+          <div className='newAccountIcon'>{svg.plus(16)}</div>
           Add New Account
         </div>
-        <div className="signers">
-          <div className="signersMid">
-            <div className="signersHeader">Your Hardware Signers</div>
-            <div className="signersList">
+        <div className='signers'>
+          <div className='signersMid'>
+            <div className='signersHeader'>Your Hardware Signers</div>
+            <div className='signersList'>
               {hardwareSigners.length ? (
                 hardwareSigners
                   .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
                   .map((signer, index) => <Signer index={index} key={signer.id} {...signer} />)
               ) : (
-                <div className="noSigners">{'No hardware signers detected'}</div>
+                <div className='noSigners'>{'No hardware signers detected'}</div>
               )}
             </div>
-            <div className="signersHeader">Your Hot Signers</div>
-            <div className="signersList">
+            <div className='signersHeader'>Your Hot Signers</div>
+            <div className='signersList'>
               {hotSigners.length ? (
                 hotSigners.map((signer, index) => <Signer index={index} key={signer.id} {...signer} />)
               ) : (
-                <div className="noSigners">{'No hot signers detected'}</div>
+                <div className='noSigners'>{'No hot signers detected'}</div>
               )}
             </div>
           </div>

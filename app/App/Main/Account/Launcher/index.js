@@ -64,20 +64,20 @@ class Launcher extends React.Component {
     return (
       <div className={this.state.glitchOn ? 'glitch glitchOn' : 'glitch'}>
         {[...Array(10).keys()].map((i) => (
-          <div key={i + 'hg'} className="line">
+          <div key={i + 'hg'} className='line'>
             {el}
           </div>
         ))}
-        {!this.state.glitchOn ? <div className="line lastLine">{el}</div> : null}
+        {!this.state.glitchOn ? <div className='line lastLine'>{el}</div> : null}
       </div>
     )
   }
   render() {
     return (
-      <div ref={this.moduleRef} className="launcher">
-        <div className="launcherTiles">
+      <div ref={this.moduleRef} className='launcher'>
+        <div className='launcherTiles'>
           <div
-            className="dappTile launchButton"
+            className='dappTile launchButton'
             onClick={() => {
               this.setState({ glitchOn: false })
               link.send('*:addFrame', 'dappLauncher')
@@ -87,8 +87,8 @@ class Launcher extends React.Component {
             onMouseLeave={() => this.setState({ glitchOn: false })}
           >
             {this.glitch(
-              <div className="launchButtonInner">
-                <div className="dashboradIcon">{svg.send(13)}</div>
+              <div className='launchButtonInner'>
+                <div className='dashboradIcon'>{svg.send(13)}</div>
                 <div>{'Send'}</div>
               </div>
             )}

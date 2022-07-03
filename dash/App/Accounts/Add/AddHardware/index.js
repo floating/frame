@@ -21,36 +21,36 @@ class AddHardware extends React.Component {
 
     const tethered = Object.keys(signers).filter(isType.bind(this)).map(toDevice.bind(this))
     return (
-      <div className="addAccountItem addAccountItemAdding">
-        <div className="addAccountItemBar addAccountItemHardware" />
-        <div className="addAccountItemWrap">
-          <div className="addAccountItemTop">
-            <div className="addAccountItemTopType">
-              <div className="addAccountItemIcon">
+      <div className='addAccountItem addAccountItemAdding'>
+        <div className='addAccountItemBar addAccountItemHardware' />
+        <div className='addAccountItemWrap'>
+          <div className='addAccountItemTop'>
+            <div className='addAccountItemTopType'>
+              <div className='addAccountItemIcon'>
                 {this.props.type === 'ledger' ? (
                   <RingIcon svgLookup={{ name: 'ledger', size: 15 }} />
                 ) : (
                   <RingIcon svgLookup={{ name: 'trezor', size: 15 }} />
                 )}
-                <div className="addAccountItemIconHex addAccountItemIconHexHardware" />
+                <div className='addAccountItemIconHex addAccountItemIconHexHardware' />
               </div>
-              <div className="addAccountItemTopTitle">{this.deviceName}</div>
+              <div className='addAccountItemTopTitle'>{this.deviceName}</div>
             </div>
             {/* <div className='addAccountItemClose' onMouseDown={() => this.props.close()}>{'DONE'}</div> */}
-            <div className="addAccountItemSummary">{`Unlock your ${this.deviceName} to get started`}</div>
+            <div className='addAccountItemSummary'>{`Unlock your ${this.deviceName} to get started`}</div>
           </div>
-          <div className="addAccountItemDevices">
+          <div className='addAccountItemDevices'>
             {tethered.length ? (
               tethered.map((signer, i) => {
                 return (
-                  <div className="addAccountItemOptionSetupFrame">
+                  <div className='addAccountItemOptionSetupFrame'>
                     {signer ? (
                       <Signer key={signer.id} {...signer} inSetup={true} />
                     ) : (
                       <>
-                        <div className="addAccountItemOptionTitle">{this.state.status}</div>
+                        <div className='addAccountItemOptionTitle'>{this.state.status}</div>
                         {this.state.error ? (
-                          <div className="addAccountItemOptionSubmit" onMouseDown={() => this.restart()}>
+                          <div className='addAccountItemOptionSubmit' onMouseDown={() => this.restart()}>
                             try again
                           </div>
                         ) : null}
@@ -61,16 +61,16 @@ class AddHardware extends React.Component {
               })
             ) : (
               <>
-                <div className="addAccountItemDevice">
-                  <div className="addAccountItemDeviceTitle">No Devices Found</div>
+                <div className='addAccountItemDevice'>
+                  <div className='addAccountItemDeviceTitle'>No Devices Found</div>
                 </div>
                 {this.deviceName === 'trezor' ? (
-                  <div className="addAccountItemTrezorBridgeWarning">
+                  <div className='addAccountItemTrezorBridgeWarning'>
                     <div>Don't see your Trezor?</div>
                     <div>
                       <span>Make sure you've installed </span>
                       <span
-                        className="openBridgeUrl"
+                        className='openBridgeUrl'
                         onClick={() => link.send('tray:openExternal', 'https://wiki.trezor.io/Trezor_Bridge')}
                       >
                         Trezor bridge
@@ -82,7 +82,7 @@ class AddHardware extends React.Component {
             )}
           </div>
           <div
-            className="addAccountItemFooter"
+            className='addAccountItemFooter'
             onMouseDown={() => {
               const open = (url) =>
                 link.send('tray:action', 'navDash', {

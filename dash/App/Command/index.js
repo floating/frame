@@ -7,10 +7,10 @@ class Command extends React.Component {
   render() {
     const { view, data } = this.store('dash.nav')[0] || { view: '', data: {} }
     return (
-      <div className="command">
+      <div className='command'>
         {this.store('dash.nav').length ? (
           <div
-            className="commandItem commandItemBack cardShow"
+            className='commandItem commandItemBack cardShow'
             onClick={() => {
               link.send('tray:action', 'backDash')
             }}
@@ -18,7 +18,7 @@ class Command extends React.Component {
             {svg.chevronLeft(16)}
           </div>
         ) : null}
-        <div key={view} className="commandTitle cardShow">
+        <div key={view} className='commandTitle cardShow'>
           {view}
         </div>
 
@@ -29,7 +29,7 @@ class Command extends React.Component {
         </div> */}
 
         <div
-          className="commandItem commandItemClose"
+          className='commandItem commandItemClose'
           onClick={() => {
             link.send('tray:action', 'closeDash')
           }}

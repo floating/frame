@@ -10,9 +10,9 @@ class App extends React.Component {
 
   render() {
     return (
-      <div className="dappTile">
+      <div className='dappTile'>
         <div
-          className="dappIcon"
+          className='dappIcon'
           onClick={() => {
             link.send('runDapp', this.props.ens)
           }}

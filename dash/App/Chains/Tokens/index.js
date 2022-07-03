@@ -30,12 +30,12 @@ class ChainModule extends React.Component {
   renderConnection(origin, id) {
     return (
       <div
-        className="sliceTile sliceTileClickable"
+        className='sliceTile sliceTileClickable'
         onClick={() => {
           link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'customTokens', notifyData: {} } })
         }}
       >
-        <div className="sliceTileTokens">
+        <div className='sliceTileTokens'>
           <div>{'Manage Tokens'}</div>
         </div>
       </div>
@@ -65,29 +65,29 @@ class ChainModule extends React.Component {
     if (!this.store('main.networks', type, id, 'on')) status = 'off'
 
     return (
-      <div className="connectionOptionStatus">
+      <div className='connectionOptionStatus'>
         {this.indicator(status)}
-        <div className="connectionOptionStatusText">{status}</div>
+        <div className='connectionOptionStatusText'>{status}</div>
       </div>
     )
   }
   indicator(status) {
     if (status === 'connected') {
       return (
-        <div className="connectionOptionStatusIndicator">
-          <div className="connectionOptionStatusIndicatorGood" />
+        <div className='connectionOptionStatusIndicator'>
+          <div className='connectionOptionStatusIndicatorGood' />
         </div>
       )
     } else if (status === 'loading' || status === 'syncing' || status === 'pending' || status === 'standby') {
       return (
-        <div className="connectionOptionStatusIndicator">
-          <div className="connectionOptionStatusIndicatorPending" />
+        <div className='connectionOptionStatusIndicator'>
+          <div className='connectionOptionStatusIndicatorPending' />
         </div>
       )
     } else {
       return (
-        <div className="connectionOptionStatusIndicator">
-          <div className="connectionOptionStatusIndicatorBad" />
+        <div className='connectionOptionStatusIndicator'>
+          <div className='connectionOptionStatusIndicatorBad' />
         </div>
       )
     }
@@ -104,7 +104,7 @@ class ChainModule extends React.Component {
     presets.push({ text: 'Custom', value: type + ':' + id + ':' + 'custom' })
 
     return (
-      <div className="sliceContainer" ref={this.ref}>
+      <div className='sliceContainer' ref={this.ref}>
         {this.renderConnection('connection', id)}
         {this.state.expanded ? <div>{'HELLO'}</div> : null}
       </div>

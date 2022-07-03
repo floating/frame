@@ -49,13 +49,13 @@ const Dropdown = ({ options, syncValue, initialValue, style, className = '', onC
   const marginTop = `${-28 * selectedIndex}px`
 
   return (
-    <div className="dropdownWrap" ref={ref}>
+    <div className='dropdownWrap' ref={ref}>
       <div
         className={expanded ? `dropdown dropdownExpanded ${className}` : `dropdown ${className}`}
         style={expanded ? { ...style, height } : { ...style }}
         onClick={(e) => setExpanded(!expanded)}
       >
-        <div className="dropdownItems" role="listbox" style={expanded ? {} : { marginTop }}>
+        <div className='dropdownItems' role='listbox' style={expanded ? {} : { marginTop }}>
           {options.map((option, index) => {
             const words = option.text.split(' ').slice(0, 3)
             const length = words.length === 3 ? 1 : words.length === 2 ? 3 : 10
@@ -65,8 +65,8 @@ const Dropdown = ({ options, syncValue, initialValue, style, className = '', onC
             return (
               <div
                 key={option.text + index}
-                className="dropdownItem"
-                role="option"
+                className='dropdownItem'
+                role='option'
                 aria-selected={ariaSelected}
                 value={option.value}
                 onMouseDown={() => handleSelect(option, index)}

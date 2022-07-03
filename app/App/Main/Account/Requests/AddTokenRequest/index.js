@@ -36,41 +36,41 @@ class AddTokenRequest extends React.Component {
         className={requestClass}
         style={{ transform: `translateY(${this.props.pos}px)`, height }}
       >
-        <div className="approveRequest">
+        <div className='approveRequest'>
           {notice ? (
-            <div className="requestNotice">
+            <div className='requestNotice'>
               {((_) => {
                 if (status === 'pending') {
                   return (
-                    <div className="requestNoticeInner scaleIn">
+                    <div className='requestNoticeInner scaleIn'>
                       <div>
-                        <div className="loader" />
+                        <div className='loader' />
                       </div>
                     </div>
                   )
                 } else if (status === 'success') {
-                  return <div className="requestNoticeInner scaleIn">{svg.octicon('check', { height: 80 })}</div>
+                  return <div className='requestNoticeInner scaleIn'>{svg.octicon('check', { height: 80 })}</div>
                 } else if (status === 'error' || status === 'declined') {
-                  return <div className="requestNoticeInner scaleIn">{svg.octicon('circle-slash', { height: 80 })}</div>
+                  return <div className='requestNoticeInner scaleIn'>{svg.octicon('circle-slash', { height: 80 })}</div>
                 }
               })()}
             </div>
           ) : (
-            <div className="approveTransactionPayload">
+            <div className='approveTransactionPayload'>
               {
-                <div className="approveRequestHeader approveTransactionHeader">
-                  <div className="approveRequestHeaderIcon"> {svg.octicon('shield', { height: 20 })}</div>
-                  <div className="approveRequestHeaderLabel"> Add Token</div>
+                <div className='approveRequestHeader approveTransactionHeader'>
+                  <div className='approveRequestHeaderIcon'> {svg.octicon('shield', { height: 20 })}</div>
+                  <div className='approveRequestHeaderLabel'> Add Token</div>
                 </div>
               }
-              <div className="requestToken scaleIn">
-                <div className="requestTokenInner">
+              <div className='requestToken scaleIn'>
+                <div className='requestTokenInner'>
                   <div className={originClass}>{this.store('main.origins', this.props.req.origin, 'name')}</div>
                   <div className={'requestTokenOriginSub'}>{'wants to add a token'}</div>
-                  <div className="requestTokenInfo">
-                    <div className="requestTokenSymbol">{token.symbol.toUpperCase()}</div>
-                    <div className="requestTokenName">{token.name}</div>
-                    <div className="requestTokenAddress">{token.address}</div>
+                  <div className='requestTokenInfo'>
+                    <div className='requestTokenSymbol'>{token.symbol.toUpperCase()}</div>
+                    <div className='requestTokenName'>{token.name}</div>
+                    <div className='requestTokenAddress'>{token.address}</div>
                   </div>
                 </div>
               </div>
@@ -78,24 +78,24 @@ class AddTokenRequest extends React.Component {
           )}
         </div>
         {
-          <div className="requestApprove">
+          <div className='requestApprove'>
             <div
-              className="requestDecline"
+              className='requestDecline'
               style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none' }}
               onClick={() => {
                 if (this.state.allowInput) link.send('tray:addToken', false, this.props.req)
               }}
             >
-              <div className="requestDeclineButton _txButton _txButtonBad">Decline</div>
+              <div className='requestDeclineButton _txButton _txButtonBad'>Decline</div>
             </div>
             <div
-              className="requestSign"
+              className='requestSign'
               style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none' }}
               onClick={() => {
                 if (this.state.allowInput) this.store.notify('addToken', this.props.req)
               }}
             >
-              <div className="requestSignButton _txButton">Review</div>
+              <div className='requestSignButton _txButton'>Review</div>
             </div>
           </div>
         }

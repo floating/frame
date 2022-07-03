@@ -33,30 +33,30 @@ class Gas extends React.Component {
     if (!time)
       return (
         <>
-          ?<span className="timeUnit">?</span>
+          ?<span className='timeUnit'>?</span>
         </>
       )
     if (time < 60)
       return (
         <>
-          <span className="timeUnit">~</span>
+          <span className='timeUnit'>~</span>
           {time}
-          <span className="timeUnit">s</span>
+          <span className='timeUnit'>s</span>
         </>
       )
     if (time < 3600)
       return (
         <>
-          <span className="timeUnit">~</span>
+          <span className='timeUnit'>~</span>
           {Math.round(time / 60)}
-          <span className="timeUnit">m</span>
+          <span className='timeUnit'>m</span>
         </>
       )
     return (
       <>
-        <span className="timeUnit">~</span>
+        <span className='timeUnit'>~</span>
         {Math.round(time / 3600)}
-        <span className="timeUnit">h</span>
+        <span className='timeUnit'>h</span>
       </>
     )
   }
@@ -161,65 +161,65 @@ class Gas extends React.Component {
 
     return (
       <div ref={this.moduleRef}>
-        <div className="moduleHeader">{'Fee Monitor'}</div>
-        <div className="gasBlock">
+        <div className='moduleHeader'>{'Fee Monitor'}</div>
+        <div className='gasBlock'>
           {this.state.baseHover ? (
-            <div className="feeToolTip feeToolTipBase cardShow">
+            <div className='feeToolTip feeToolTipBase cardShow'>
               The current base fee is added with a buffer to cover the next 3 blocks, any amount greater than your
               block's base fee is refunded
             </div>
           ) : null}
           {this.state.prioHover ? (
-            <div className="feeToolTip feeToolTipPriority cardShow">
+            <div className='feeToolTip feeToolTipPriority cardShow'>
               A priority tip paid to validators is added to incentivize quick inclusion of your transaction into a block
             </div>
           ) : null}
-          <div className="gasItem gasItemSmall" style={!fees ? { pointerEvents: 'none', opacity: 0 } : {}}>
-            <span className="gasGweiNum">{calculatedFees.actualBaseFee}</span>
-            <span className="gasGweiLabel">{'GWEI'}</span>
-            <span className="gasLevelLabel">{'Current Base'}</span>
+          <div className='gasItem gasItemSmall' style={!fees ? { pointerEvents: 'none', opacity: 0 } : {}}>
+            <span className='gasGweiNum'>{calculatedFees.actualBaseFee}</span>
+            <span className='gasGweiLabel'>{'GWEI'}</span>
+            <span className='gasLevelLabel'>{'Current Base'}</span>
           </div>
-          <div className="gasItem gasItemLarge">
+          <div className='gasItem gasItemLarge'>
             <div
-              className="gasArrow"
+              className='gasArrow'
               onClick={() => this.setState({ baseHover: true })}
               style={!fees ? { pointerEvents: 'none', opacity: 0 } : {}}
               onMouseLeave={() => this.setState({ baseHover: false })}
             >
-              <div className="gasArrowNotify">+</div>
-              <div className="gasArrowInner">{svg.chevron(27)}</div>
+              <div className='gasArrowNotify'>+</div>
+              <div className='gasArrowInner'>{svg.chevron(27)}</div>
             </div>
-            <span className="gasGweiNum">{gasPrice}</span>
-            <span className="gasGweiLabel">{'GWEI'}</span>
-            <span className="gasLevelLabel">{'Recommended'}</span>
+            <span className='gasGweiNum'>{gasPrice}</span>
+            <span className='gasGweiLabel'>{'GWEI'}</span>
+            <span className='gasLevelLabel'>{'Recommended'}</span>
             <div
-              className="gasArrow gasArrowRight"
+              className='gasArrow gasArrowRight'
               style={!fees ? { pointerEvents: 'none', opacity: 0 } : {}}
               onClick={() => this.setState({ prioHover: true })}
               onMouseLeave={() => this.setState({ prioHover: false })}
             >
-              <div className="gasArrowInner">{svg.chevron(27)}</div>
+              <div className='gasArrowInner'>{svg.chevron(27)}</div>
             </div>
           </div>
-          <div className="gasItem gasItemSmall" style={!fees ? { pointerEvents: 'none', opacity: 0 } : {}}>
-            <span className="gasGweiNum">{calculatedFees.priorityFee}</span>
-            <span className="gasGweiLabel">{'GWEI'}</span>
-            <span className="gasLevelLabel">{'Priority Tip'}</span>
+          <div className='gasItem gasItemSmall' style={!fees ? { pointerEvents: 'none', opacity: 0 } : {}}>
+            <span className='gasGweiNum'>{calculatedFees.priorityFee}</span>
+            <span className='gasGweiLabel'>{'GWEI'}</span>
+            <span className='gasLevelLabel'>{'Priority Tip'}</span>
           </div>
         </div>
-        <div className="gasEstimateBlock">
+        <div className='gasEstimateBlock'>
           {feeEstimatesUSD.map((estimate) => {
             return (
-              <div className="gasEstimate">
-                <div className="gasEstimateRange">
+              <div className='gasEstimate'>
+                <div className='gasEstimateRange'>
                   <span style={{ fontSize: '11px', marginRight: '-2px', marginTop: '-1px' }}>
                     {!estimate.low || estimate.low >= 1 ? `$` : '<$'}
                   </span>
-                  <span className="gasEstimateRangeLow">{`${
+                  <span className='gasEstimateRangeLow'>{`${
                     !estimate.low ? 0 : estimate.low < 1 ? 1 : estimate.low
                   }`}</span>
                 </div>
-                <div className="gasEstimateLabel">{estimate.label}</div>
+                <div className='gasEstimateLabel'>{estimate.label}</div>
               </div>
             )
           })}

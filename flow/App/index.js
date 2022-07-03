@@ -30,8 +30,8 @@ class Flow extends React.Component {
   // }
   render() {
     return (
-      <div className="dapps">
-        <div ref={this.input} className="bar">
+      <div className='dapps'>
+        <div ref={this.input} className='bar'>
           <input
             onChange={(e) => {
               this.setState({ input: e.target.value })
@@ -45,68 +45,68 @@ class Flow extends React.Component {
             }}
           />
         </div>
-        <div className="dappWrap">
+        <div className='dappWrap'>
           <div
-            className="dapp"
+            className='dapp'
             onMouseDown={() =>
               link.rpc('openDapp', 'matt.eth', {}, (err) => {
                 console.log('err', err)
               })
             }
           >
-            <div className="dappIcon"></div>
-            <div className="dappName">matt.eth</div>
+            <div className='dappIcon'></div>
+            <div className='dappName'>matt.eth</div>
           </div>
           <div
-            className="dapp"
+            className='dapp'
             onMouseDown={() =>
               link.rpc('openDapp', 'frame.eth', {}, (err) => {
                 console.log('err', err)
               })
             }
           >
-            <div className="dappIcon"></div>
-            <div className="dappName">frame.eth</div>
+            <div className='dappIcon'></div>
+            <div className='dappName'>frame.eth</div>
           </div>
-          <div className="dapp">
-            <div className="dappIcon"></div>
-            <div className="dappName">Aragon</div>
+          <div className='dapp'>
+            <div className='dappIcon'></div>
+            <div className='dappName'>Aragon</div>
           </div>
-          <div className="dapp">
-            <div className="dappIcon"></div>
-            <div className="dappName">Compound</div>
+          <div className='dapp'>
+            <div className='dappIcon'></div>
+            <div className='dappName'>Compound</div>
           </div>
-          <div className="dapp">
-            <div className="dappIcon"></div>
-            <div className="dappName">Dapp 1</div>
+          <div className='dapp'>
+            <div className='dappIcon'></div>
+            <div className='dappName'>Dapp 1</div>
           </div>
-          <div className="dapp">
-            <div className="dappIcon"></div>
-            <div className="dappName">Dapp 2</div>
+          <div className='dapp'>
+            <div className='dappIcon'></div>
+            <div className='dappName'>Dapp 2</div>
           </div>
-          <div className="dapp">
-            <div className="dappIcon"></div>
-            <div className="dappName">Wallet</div>
+          <div className='dapp'>
+            <div className='dappIcon'></div>
+            <div className='dappName'>Wallet</div>
           </div>
-          <div className="dapp">
-            <div className="dappIcon"></div>
-            <div className="dappName">Wallet</div>
+          <div className='dapp'>
+            <div className='dappIcon'></div>
+            <div className='dappName'>Wallet</div>
           </div>
-          <div className="dapp">
-            <div className="dappIcon"></div>
-            <div className="dappName">Wallet</div>
+          <div className='dapp'>
+            <div className='dappIcon'></div>
+            <div className='dappName'>Wallet</div>
           </div>
-          <div className="dapp">
-            <div className="dappIcon"></div>
-            <div className="dappName">Wallet</div>
+          <div className='dapp'>
+            <div className='dappIcon'></div>
+            <div className='dappName'>Wallet</div>
           </div>
-          <div className="dapp">
-            <div className="dappIcon"></div>
-            <div className="dappName">Wallet</div>
+          <div className='dapp'>
+            <div className='dappIcon'></div>
+            <div className='dappName'>Wallet</div>
           </div>
-          <div className="dapp">
-            <div className="dappIcon"></div>
-            <div className="dappName">Wallet</div>
+          <div className='dapp'>
+            <div className='dappIcon'></div>
+            <div className='dappName'>Wallet</div>
           </div>
         </div>
       </div>

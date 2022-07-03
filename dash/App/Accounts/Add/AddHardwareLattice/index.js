@@ -106,28 +106,28 @@ class AddHardwareLattice extends React.Component {
 
     return (
       <div className={itemClass} style={{ transitionDelay: (0.64 * this.props.index) / 4 + 's' }}>
-        <div className="addAccountItemBar" />
-        <div className="addAccountItemWrap">
-          <div className="addAccountItemTop">
-            <div className="addAccountItemTopType">
-              <div className="addAccountItemIcon">
-                <div className="addAccountItemIconType addAccountItemIconHardware">
+        <div className='addAccountItemBar' />
+        <div className='addAccountItemWrap'>
+          <div className='addAccountItemTop'>
+            <div className='addAccountItemTopType'>
+              <div className='addAccountItemIcon'>
+                <div className='addAccountItemIconType addAccountItemIconHardware'>
                   <RingIcon svgLookup={{ name: 'lattice', size: 20 }} />
                 </div>
               </div>
-              <div className="addAccountItemTopTitle">GridPlus</div>
+              <div className='addAccountItemTopTitle'>GridPlus</div>
             </div>
             {/* <div className='addAccountItemClose' onMouseDown={() => this.props.close()}>{'Done'}</div> */}
-            <div className="addAccountItemSummary">GridPlus Lattice1</div>
+            <div className='addAccountItemSummary'>GridPlus Lattice1</div>
           </div>
-          <div className="addAccountItemOption">
-            <div className="addAccountItemOptionSetup" style={{ transform: `translateX(-${100 * this.state.index}%)` }}>
-              <div className="addAccountItemOptionSetupFrames">
-                <div className="addAccountItemOptionSetupFrame">
-                  <div className="addAccountItemOptionTitle">Device Name</div>
-                  <div className="addAccountItemOptionInputPhrase">
+          <div className='addAccountItemOption'>
+            <div className='addAccountItemOptionSetup' style={{ transform: `translateX(-${100 * this.state.index}%)` }}>
+              <div className='addAccountItemOptionSetupFrames'>
+                <div className='addAccountItemOptionSetupFrame'>
+                  <div className='addAccountItemOptionTitle'>Device Name</div>
+                  <div className='addAccountItemOptionInputPhrase'>
                     <input
-                      tabIndex="-1"
+                      tabIndex='-1'
                       ref={this.forms[0]}
                       value={this.state.deviceName}
                       onChange={(e) => this.onChange('deviceName', e)}
@@ -141,7 +141,7 @@ class AddHardwareLattice extends React.Component {
                     />
                   </div>
                   <div
-                    className="addAccountItemOptionSubmit"
+                    className='addAccountItemOptionSubmit'
                     onMouseDown={() => {
                       this.next()
                     }}
@@ -149,11 +149,11 @@ class AddHardwareLattice extends React.Component {
                     Next
                   </div>
                 </div>
-                <div className="addAccountItemOptionSetupFrame">
-                  <div className="addAccountItemOptionTitle">Enter device id</div>
-                  <div className="addAccountItemOptionInputPhrase">
+                <div className='addAccountItemOptionSetupFrame'>
+                  <div className='addAccountItemOptionTitle'>Enter device id</div>
+                  <div className='addAccountItemOptionInputPhrase'>
                     <input
-                      tabIndex="-1"
+                      tabIndex='-1'
                       ref={this.forms[1]}
                       value={this.state.deviceId}
                       onChange={(e) => this.onChange('deviceId', e)}
@@ -168,7 +168,7 @@ class AddHardwareLattice extends React.Component {
                     />
                   </div>
                   <div
-                    className="addAccountItemOptionSubmit"
+                    className='addAccountItemOptionSubmit'
                     onMouseDown={() => {
                       this.createLattice()
                       this.next()
@@ -177,14 +177,14 @@ class AddHardwareLattice extends React.Component {
                     Create
                   </div>
                 </div>
-                <div className="addAccountItemOptionSetupFrame">
+                <div className='addAccountItemOptionSetupFrame'>
                   {signer && this.state.status === 'Successful' ? (
                     <Signer key={signer.id} {...signer} inSetup={true} />
                   ) : (
                     <>
-                      <div className="addAccountItemOptionTitle">{this.state.status}</div>
+                      <div className='addAccountItemOptionTitle'>{this.state.status}</div>
                       {this.state.error ? (
-                        <div className="addAccountItemOptionSubmit" onMouseDown={() => this.restart()}>
+                        <div className='addAccountItemOptionSubmit' onMouseDown={() => this.restart()}>
                           try again
                         </div>
                       ) : null}
@@ -194,7 +194,7 @@ class AddHardwareLattice extends React.Component {
               </div>
             </div>
           </div>
-          <div className="addAccountItemFooter" />
+          <div className='addAccountItemFooter' />
         </div>
       </div>
     )

@@ -26,46 +26,46 @@ class TxBar extends React.Component {
 
     return (
       <div className={txBarClass}>
-        <div className="txProgress">
-          <div className="txProgressBack">
-            <div className="txProgressLine" />
-            <div className="txProgressSteps">
-              <div className="txProgressStep">
+        <div className='txProgress'>
+          <div className='txProgressBack'>
+            <div className='txProgressLine' />
+            <div className='txProgressSteps'>
+              <div className='txProgressStep'>
                 <div className={progressIconClass} style={{ padding: '10px 11px' }}>
                   {svg.sign(22)}
                 </div>
-                <div className="txProgressStepMarker" />
+                <div className='txProgressStepMarker' />
                 <div
                   className={position > 1 ? 'txProgressStepCenter txProgressStepCenterOn' : 'txProgressStepCenter'}
                 />
               </div>
-              <div className="txProgressStep">
+              <div className='txProgressStep'>
                 <div className={progressIconClass} style={{ padding: '11px 12px' }}>
                   {svg.send(15)}
                 </div>
-                <div className="txProgressStepMarker" />
+                <div className='txProgressStepMarker' />
                 <div
                   className={position > 2 ? 'txProgressStepCenter txProgressStepCenterOn' : 'txProgressStepCenter'}
                 />
               </div>
-              <div className="txProgressStep">
+              <div className='txProgressStep'>
                 <div className={progressIconClass} style={{ padding: '7px 12px' }}>
                   {svg.octicon('check', { height: 24 })}
                 </div>
-                <div className="txProgressStepMarker" />
+                <div className='txProgressStepMarker' />
                 <div
                   className={position > 3 ? 'txProgressStepCenter txProgressStepCenterOn' : 'txProgressStepCenter'}
                 />
               </div>
             </div>
           </div>
-          <div className="txProgressFront">
-            <div className="txProgressSlide" style={{ right: slide }}>
-              <div className="txProgressTail" />
-              <div className="txProgressLoading">
-                <div className="txProgressLoadingDot" />
-                <div className="txProgressLoadingCenter" />
-                <div className="txProgressLoadingBox" />
+          <div className='txProgressFront'>
+            <div className='txProgressSlide' style={{ right: slide }}>
+              <div className='txProgressTail' />
+              <div className='txProgressLoading'>
+                <div className='txProgressLoadingDot' />
+                <div className='txProgressLoadingCenter' />
+                <div className='txProgressLoadingBox' />
               </div>
             </div>
           </div>

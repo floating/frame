@@ -54,19 +54,19 @@ class AddChain extends React.Component {
       this.state.newNetworkExplorer !== ''
 
     return (
-      <div className="notifyBoxWrap" onMouseDown={(e) => e.stopPropagation()}>
-        <div className="notifyBoxSlide">
-          <div className="addChainTitle">Add New Chain</div>
-          <div className="addChain">
-            <div className="chainRow">
-              <div className="chainName">
-                <div className="chainInputLabel">Chain Name</div>
+      <div className='notifyBoxWrap' onMouseDown={(e) => e.stopPropagation()}>
+        <div className='notifyBoxSlide'>
+          <div className='addChainTitle'>Add New Chain</div>
+          <div className='addChain'>
+            <div className='chainRow'>
+              <div className='chainName'>
+                <div className='chainInputLabel'>Chain Name</div>
                 <input
                   className={
                     this.state.newNetworkName === this.newNetworkNameDefault ? 'chainInput chainInputDim' : 'chainInput'
                   }
                   value={this.state.newNetworkName}
-                  spellCheck="false"
+                  spellCheck='false'
                   onChange={(e) => {
                     this.setState({ newNetworkName: e.target.value })
                   }}
@@ -80,15 +80,15 @@ class AddChain extends React.Component {
               </div>
             </div>
 
-            <div className="chainRow">
-              <div className="chainId">
-                <div className="chainInputLabel">Chain ID</div>
+            <div className='chainRow'>
+              <div className='chainId'>
+                <div className='chainInputLabel'>Chain ID</div>
                 <input
                   className={
                     this.state.newNetworkId === this.newNetworkIdDefault ? 'chainInput chainInputDim' : 'chainInput'
                   }
                   value={this.state.newNetworkId}
-                  spellCheck="false"
+                  spellCheck='false'
                   onChange={(e) => {
                     if (Number(parseInt(e.target.value)) || e.target.value === '') {
                       this.setState({ newNetworkId: e.target.value })
@@ -103,8 +103,8 @@ class AddChain extends React.Component {
                 />
               </div>
 
-              <div className="chainSymbol">
-                <div className="chainInputLabel">Native Symbol</div>
+              <div className='chainSymbol'>
+                <div className='chainInputLabel'>Native Symbol</div>
                 <input
                   className={
                     this.state.newNetworkSymbol === this.newNetworkSymbolDefault
@@ -112,7 +112,7 @@ class AddChain extends React.Component {
                       : 'chainInput'
                   }
                   value={this.state.newNetworkSymbol}
-                  spellCheck="false"
+                  spellCheck='false'
                   onChange={(e) => {
                     if (e.target.value.length > 8) return e.preventDefault()
                     this.setState({ newNetworkSymbol: e.target.value })
@@ -127,9 +127,9 @@ class AddChain extends React.Component {
               </div>
             </div>
 
-            <div className="chainRow">
-              <div className="chainExplorer">
-                <div className="chainInputLabel">Block Explorer</div>
+            <div className='chainRow'>
+              <div className='chainExplorer'>
+                <div className='chainInputLabel'>Block Explorer</div>
                 <input
                   className={
                     this.state.newNetworkExplorer === this.newNetworkExplorerDefault
@@ -137,7 +137,7 @@ class AddChain extends React.Component {
                       : 'chainInput'
                   }
                   value={this.state.newNetworkExplorer}
-                  spellCheck="false"
+                  spellCheck='false'
                   onChange={(e) => {
                     this.setState({ newNetworkExplorer: e.target.value })
                   }}
@@ -151,9 +151,9 @@ class AddChain extends React.Component {
               </div>
             </div>
 
-            <div className="chainRow">
-              <div className="chainExplorer">
-                <div className="chainInputLabel">Primary RPC</div>
+            <div className='chainRow'>
+              <div className='chainExplorer'>
+                <div className='chainInputLabel'>Primary RPC</div>
                 <input
                   className={
                     this.state.newNetworkRPCPrimary === this.newNetworkRPCPrimary
@@ -161,7 +161,7 @@ class AddChain extends React.Component {
                       : 'chainInput'
                   }
                   value={this.state.newNetworkRPCPrimary}
-                  spellCheck="false"
+                  spellCheck='false'
                   onChange={(e) => {
                     this.setState({ newNetworkRPCPrimary: e.target.value })
                   }}
@@ -175,9 +175,9 @@ class AddChain extends React.Component {
               </div>
             </div>
 
-            <div className="chainRow">
-              <div className="chainExplorer">
-                <div className="chainInputLabel">Secondary RPC</div>
+            <div className='chainRow'>
+              <div className='chainExplorer'>
+                <div className='chainInputLabel'>Secondary RPC</div>
                 <input
                   className={
                     this.state.newNetworkRPCSecondary === this.newNetworkRPCSecondary
@@ -185,7 +185,7 @@ class AddChain extends React.Component {
                       : 'chainInput'
                   }
                   value={this.state.newNetworkRPCSecondary}
-                  spellCheck="false"
+                  spellCheck='false'
                   onChange={(e) => {
                     this.setState({ newNetworkRPCSecondary: e.target.value })
                   }}
@@ -239,10 +239,10 @@ class AddChain extends React.Component {
               </div>
             </div> */}
 
-            <div className="chainRow">
-              <div className="chainLayers">
-                <div className="chainInputLabel">Chain Type</div>
-                <div className="chainLayerOptions">
+            <div className='chainRow'>
+              <div className='chainLayers'>
+                <div className='chainInputLabel'>Chain Type</div>
+                <div className='chainLayerOptions'>
                   <div
                     className={
                       this.state.newNetworkLayer === 'rollup'
@@ -287,10 +287,10 @@ class AddChain extends React.Component {
               </div>
             </div>
 
-            <div className="chainRow">
+            <div className='chainRow'>
               {changedNewNetwork && newNetworkReady ? (
                 <div
-                  className="addTokenSubmit addTokenSubmitEnabled"
+                  className='addTokenSubmit addTokenSubmitEnabled'
                   onMouseDown={() => {
                     const net = {
                       id: this.state.newNetworkId,
@@ -311,7 +311,7 @@ class AddChain extends React.Component {
                   Add Chain
                 </div>
               ) : (
-                <div className="addTokenSubmit">Fill in Chain</div>
+                <div className='addTokenSubmit'>Fill in Chain</div>
               )}
             </div>
           </div>

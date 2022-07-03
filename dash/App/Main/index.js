@@ -29,22 +29,22 @@ class Settings extends React.Component {
 
   appInfo() {
     return (
-      <div className="appInfo">
-        <div className="appInfoLine appInfoLineVersion">{'v' + require('../../../package.json').version}</div>
-        <div className="appInfoLine appInfoLineReset">
+      <div className='appInfo'>
+        <div className='appInfoLine appInfoLineVersion'>{'v' + require('../../../package.json').version}</div>
+        <div className='appInfoLine appInfoLineReset'>
           {this.state.resetConfirm ? (
-            <span className="appInfoLineResetConfirm">
+            <span className='appInfoLineResetConfirm'>
               Are you sure you want to reset everything?{' '}
-              <span className="pointer" onClick={() => link.send('tray:resetAllSettings')}>
+              <span className='pointer' onClick={() => link.send('tray:resetAllSettings')}>
                 Yes
               </span>{' '}
               <span>/</span>{' '}
-              <span className="pointer" onClick={() => this.setState({ resetConfirm: false })}>
+              <span className='pointer' onClick={() => this.setState({ resetConfirm: false })}>
                 No
               </span>
             </span>
           ) : (
-            <span className="pointer" onClick={() => this.setState({ resetConfirm: true })}>
+            <span className='pointer' onClick={() => this.setState({ resetConfirm: true })}>
               Reset All Settings & Data
             </span>
           )}
@@ -148,26 +148,26 @@ class Settings extends React.Component {
     }
     if (status === 'connected' && !connection.network) status = 'loading'
     return (
-      <div className="connectionOptionStatus">
+      <div className='connectionOptionStatus'>
         {this.indicator(status)}
-        <div className="connectionOptionStatusText">{status}</div>
+        <div className='connectionOptionStatusText'>{status}</div>
       </div>
     )
   }
 
   discord() {
     return (
-      <div className="discordInvite" onClick={() => link.send('tray:openExternal', 'https://discord.gg/UH7NGqY')}>
+      <div className='discordInvite' onClick={() => link.send('tray:openExternal', 'https://discord.gg/UH7NGqY')}>
         <div>Need help?</div>
-        <div className="discordLink">Join our Discord!</div>
+        <div className='discordLink'>Join our Discord!</div>
       </div>
     )
   }
 
   quit() {
     return (
-      <div className="addCustomTokenButtonWrap quitFrame" style={{ zIndex: 215 }}>
-        <div className="addCustomTokenButton" onClick={() => link.send('tray:quit')}>
+      <div className='addCustomTokenButtonWrap quitFrame' style={{ zIndex: 215 }}>
+        <div className='addCustomTokenButton' onClick={() => link.send('tray:quit')}>
           Quit
         </div>
       </div>
@@ -177,20 +177,20 @@ class Settings extends React.Component {
   indicator(status) {
     if (status === 'connected') {
       return (
-        <div className="connectionOptionStatusIndicator">
-          <div className="connectionOptionStatusIndicatorGood" />
+        <div className='connectionOptionStatusIndicator'>
+          <div className='connectionOptionStatusIndicatorGood' />
         </div>
       )
     } else if (status === 'loading' || status === 'syncing' || status === 'pending' || status === 'standby') {
       return (
-        <div className="connectionOptionStatusIndicator">
-          <div className="connectionOptionStatusIndicatorPending" />
+        <div className='connectionOptionStatusIndicator'>
+          <div className='connectionOptionStatusIndicatorPending' />
         </div>
       )
     } else {
       return (
-        <div className="connectionOptionStatusIndicator">
-          <div className="connectionOptionStatusIndicatorBad" />
+        <div className='connectionOptionStatusIndicator'>
+          <div className='connectionOptionStatusIndicatorBad' />
         </div>
       )
     }
@@ -226,38 +226,38 @@ class Settings extends React.Component {
     })
     return (
       <div className={'localSettings cardShow'}>
-        <div className="localSettingsWrap">
+        <div className='localSettingsWrap'>
           <div
-            className="dashModule"
+            className='dashModule'
             onClick={() => link.send('tray:action', 'navDash', { view: 'accounts', data: {} })}
           >
-            <div className="dashModuleIcon">{svg.accounts(24)}</div>
-            <div className="dashModuleTitle">{'Accounts'}</div>
+            <div className='dashModuleIcon'>{svg.accounts(24)}</div>
+            <div className='dashModuleTitle'>{'Accounts'}</div>
           </div>
-          <div className="dashModule" onClick={() => link.send('tray:action', 'navDash', { view: 'chains', data: {} })}>
-            <div className="dashModuleIcon">{svg.chain(24)}</div>
-            <div className="dashModuleTitle">{'Chains'}</div>
+          <div className='dashModule' onClick={() => link.send('tray:action', 'navDash', { view: 'chains', data: {} })}>
+            <div className='dashModuleIcon'>{svg.chain(24)}</div>
+            <div className='dashModuleTitle'>{'Chains'}</div>
           </div>
-          <div className="dashModule" onClick={() => link.send('tray:action', 'navDash', { view: 'dapps', data: {} })}>
-            <div className="dashModuleIcon">{svg.window(24)}</div>
-            <div className="dashModuleTitle">{'Dapps'}</div>
+          <div className='dashModule' onClick={() => link.send('tray:action', 'navDash', { view: 'dapps', data: {} })}>
+            <div className='dashModuleIcon'>{svg.window(24)}</div>
+            <div className='dashModuleTitle'>{'Dapps'}</div>
           </div>
-          <div className="dashModule" onClick={() => link.send('tray:action', 'navDash', { view: 'tokens', data: {} })}>
-            <div className="dashModuleIcon">{svg.tokens(24)}</div>
-            <div className="dashModuleTitle">{'Tokens'}</div>
+          <div className='dashModule' onClick={() => link.send('tray:action', 'navDash', { view: 'tokens', data: {} })}>
+            <div className='dashModuleIcon'>{svg.tokens(24)}</div>
+            <div className='dashModuleTitle'>{'Tokens'}</div>
           </div>
           <div
-            className="dashModule"
+            className='dashModule'
             onClick={() => link.send('tray:action', 'navDash', { view: 'settings', data: {} })}
           >
-            <div className="dashModuleIcon">{svg.settings(24)}</div>
-            <div className="dashModuleTitle">{'Settings'}</div>
+            <div className='dashModuleIcon'>{svg.settings(24)}</div>
+            <div className='dashModuleTitle'>{'Settings'}</div>
           </div>
-          <div className="snipIt">
+          <div className='snipIt'>
             <div>Using a dapp that doesn't support Frame natively?</div>
-            <div className="snipItBrowserExtensionIcons">
+            <div className='snipItBrowserExtensionIcons'>
               <div
-                className="snipItBrowserExtensionIcon snipItBrowserExtensionIconChrome"
+                className='snipItBrowserExtensionIcon snipItBrowserExtensionIconChrome'
                 onClick={() =>
                   link.send('tray:action', 'navDash', {
                     view: 'notify',
@@ -273,7 +273,7 @@ class Settings extends React.Component {
                 {svg.chrome(28)}
               </div>
               <div
-                className="snipItBrowserExtensionIcon snipItBrowserExtensionIconFirefox"
+                className='snipItBrowserExtensionIcon snipItBrowserExtensionIconFirefox'
                 onClick={() =>
                   link.send('tray:action', 'navDash', {
                     view: 'notify',
@@ -287,7 +287,7 @@ class Settings extends React.Component {
                 {svg.firefox(28)}
               </div>
               <div
-                className="snipItBrowserExtensionIcon snipItBrowserExtensionIconSafari"
+                className='snipItBrowserExtensionIcon snipItBrowserExtensionIconSafari'
                 onClick={() =>
                   link.send('tray:action', 'navDash', {
                     view: 'notify',
@@ -303,9 +303,9 @@ class Settings extends React.Component {
             </div>
             <div>Inject a connection with our browser extension!</div>
           </div>
-          <div className="requestFeature">
+          <div className='requestFeature'>
             <div
-              className="requestFeatureButton"
+              className='requestFeatureButton'
               onClick={() => {
                 link.send('tray:openExternal', 'https://feedback.frame.sh')
               }}
@@ -313,9 +313,9 @@ class Settings extends React.Component {
               Request a Feature
             </div>
           </div>
-          <div className="requestFeature">
+          <div className='requestFeature'>
             <div
-              className="requestFeatureButton"
+              className='requestFeatureButton'
               onClick={() => {
                 link.send('tray:openExternal', 'https://discord.gg/UH7NGqY')
               }}
@@ -323,9 +323,9 @@ class Settings extends React.Component {
               Need help? Join our Discord!
             </div>
           </div>
-          <div className="requestFeature">
+          <div className='requestFeature'>
             <div
-              className="requestFeatureButton"
+              className='requestFeatureButton'
               onClick={() => {
                 link.send('tray:quit')
               }}
@@ -334,7 +334,7 @@ class Settings extends React.Component {
             </div>
           </div>
           <div
-            className="viewLicense"
+            className='viewLicense'
             onClick={() =>
               link.send('tray:action', 'navDash', {
                 view: 'notify',

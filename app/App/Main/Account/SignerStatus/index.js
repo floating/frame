@@ -57,10 +57,10 @@ class SignerStatus extends React.Component {
 
   renderTrezorPin(active) {
     return (
-      <div className="trezorPinWrap" style={active ? {} : { height: '0px', padding: '0px 0px 0px 0px' }}>
-        <div className="trezorPinInput">
+      <div className='trezorPinWrap' style={active ? {} : { height: '0px', padding: '0px 0px 0px 0px' }}>
+        <div className='trezorPinInput'>
           {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => (
-            <div key={i} className="trezorPinInputButton" onMouseDown={this.trezorPin.bind(this, i)}>
+            <div key={i} className='trezorPinInputButton' onMouseDown={this.trezorPin.bind(this, i)}>
               {svg.octicon('primitive-dot', { height: 20 })}
             </div>
           ))}
@@ -90,17 +90,17 @@ class SignerStatus extends React.Component {
 
     return !isHardware && signer.id && signer.status === 'locked' ? (
       <div className={shake ? 'signerStatus headShake' : 'signerStatus'} ref={this.statusRef}>
-        <div className="signerStatusWrap">
-          <div className="signerStatusTop">
-            <div className="signerStatusTopArrow" />
+        <div className='signerStatusWrap'>
+          <div className='signerStatusTop'>
+            <div className='signerStatusTopArrow' />
           </div>
-          <div className="signerStatusMain">
-            <div className="signerUnlockWrap">
-              <div className="signerUnlockHeader">The signer for this account is locked</div>
+          <div className='signerStatusMain'>
+            <div className='signerUnlockWrap'>
+              <div className='signerUnlockHeader'>The signer for this account is locked</div>
               <input
                 ref={this.inputRef}
-                className="signerUnlockInput"
-                type="password"
+                className='signerUnlockInput'
+                type='password'
                 value={this.state.unlockInput}
                 onChange={this.unlockChange.bind(this)}
                 onKeyDown={(e) => {
@@ -110,7 +110,7 @@ class SignerStatus extends React.Component {
                   }
                 }}
               />
-              <div className="signerUnlockSubmit" onClick={this.unlockSubmit.bind(this)}>
+              <div className='signerUnlockSubmit' onClick={this.unlockSubmit.bind(this)}>
                 {'Unlock'}
               </div>
             </div>

@@ -25,7 +25,7 @@ class RingIcon extends React.Component {
           borderColor: color,
         }}
       >
-        <div className="ringIconInner" style={{ background: color }}>
+        <div className='ringIconInner' style={{ background: color }}>
           {svgLookup ? (
             svg[svgLookup.name] ? (
               svg[svgLookup.name](svgLookup.size)
