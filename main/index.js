@@ -1,15 +1,23 @@
 const { app, ipcMain, protocol, shell, clipboard, globalShortcut, BrowserWindow } = require('electron')
+const log = require('electron-log')
 
-const additionalData = { myKey: 'myValue' }
-const hasInstanceLock = app.requestSingleInstanceLock(additionalData)
+log.transports.console.level = process.env.LOG_LEVEL || 'info'
+log.transports.file.level = ['development', 'test'].includes(process.env.NODE_ENV) ? false : 'verbose'
+
+const hasInstanceLock = app.requestSingleInstanceLock()
 
 if (!hasInstanceLock) {
   app.quit()
 } else {
-  app.on('second-instance', (event, commandLine, workingDirectory, additionalData) => {
+  app.on('second-instance', () => {
     const tray = windows.getTray()
+    log.info('second instance requested')
     if (tray) {
-      if (tray.isMinimized()) tray.restore()
+      if (tray.isMinimized()) {
+        log.info('restoring Frame window...')
+        tray.restore()
+      }
+      
       tray.focus()
     }
   })
@@ -28,11 +36,10 @@ if (!hasInstanceLock) {
   // if (process.platform === 'linux') app.commandLine.appendSwitch('disable-gpu', true)
 
   const Sentry = require('@sentry/electron')
-  const log = require('electron-log')
+  
   const url = require('url')
 
-  log.transports.console.level = process.env.LOG_LEVEL || 'info'
-  log.transports.file.level = ['development', 'test'].includes(process.env.NODE_ENV) ? false : 'verbose'
+
 
   const data = require('./data')
   const windows = require('./windows')
