@@ -63,7 +63,9 @@ class AddChain extends React.Component {
                 <div className='chainInputLabel'>Chain Name</div>
                 <input
                   className={
-                    this.state.newNetworkName === this.newNetworkNameDefault ? 'chainInput chainInputDim' : 'chainInput'
+                    this.state.newNetworkName === this.newNetworkNameDefault
+                      ? 'chainInput chainInputDim'
+                      : 'chainInput'
                   }
                   value={this.state.newNetworkName}
                   spellCheck='false'
@@ -71,10 +73,12 @@ class AddChain extends React.Component {
                     this.setState({ newNetworkName: e.target.value })
                   }}
                   onFocus={(e) => {
-                    if (e.target.value === this.newNetworkNameDefault) this.setState({ newNetworkName: '' })
+                    if (e.target.value === this.newNetworkNameDefault)
+                      this.setState({ newNetworkName: '' })
                   }}
                   onBlur={(e) => {
-                    if (e.target.value === '') this.setState({ newNetworkName: this.newNetworkNameDefault })
+                    if (e.target.value === '')
+                      this.setState({ newNetworkName: this.newNetworkNameDefault })
                   }}
                 />
               </div>
@@ -85,7 +89,9 @@ class AddChain extends React.Component {
                 <div className='chainInputLabel'>Chain ID</div>
                 <input
                   className={
-                    this.state.newNetworkId === this.newNetworkIdDefault ? 'chainInput chainInputDim' : 'chainInput'
+                    this.state.newNetworkId === this.newNetworkIdDefault
+                      ? 'chainInput chainInputDim'
+                      : 'chainInput'
                   }
                   value={this.state.newNetworkId}
                   spellCheck='false'
@@ -95,10 +101,12 @@ class AddChain extends React.Component {
                     }
                   }}
                   onFocus={(e) => {
-                    if (e.target.value === this.newNetworkIdDefault) this.setState({ newNetworkId: '' })
+                    if (e.target.value === this.newNetworkIdDefault)
+                      this.setState({ newNetworkId: '' })
                   }}
                   onBlur={(e) => {
-                    if (e.target.value === '') this.setState({ newNetworkId: this.newNetworkIdDefault })
+                    if (e.target.value === '')
+                      this.setState({ newNetworkId: this.newNetworkIdDefault })
                   }}
                 />
               </div>
@@ -118,10 +126,12 @@ class AddChain extends React.Component {
                     this.setState({ newNetworkSymbol: e.target.value })
                   }}
                   onFocus={(e) => {
-                    if (e.target.value === this.newNetworkSymbolDefault) this.setState({ newNetworkSymbol: '' })
+                    if (e.target.value === this.newNetworkSymbolDefault)
+                      this.setState({ newNetworkSymbol: '' })
                   }}
                   onBlur={(e) => {
-                    if (e.target.value === '') this.setState({ newNetworkSymbol: this.newNetworkSymbolDefault })
+                    if (e.target.value === '')
+                      this.setState({ newNetworkSymbol: this.newNetworkSymbolDefault })
                   }}
                 />
               </div>
@@ -142,10 +152,12 @@ class AddChain extends React.Component {
                     this.setState({ newNetworkExplorer: e.target.value })
                   }}
                   onFocus={(e) => {
-                    if (e.target.value === this.newNetworkExplorerDefault) this.setState({ newNetworkExplorer: '' })
+                    if (e.target.value === this.newNetworkExplorerDefault)
+                      this.setState({ newNetworkExplorer: '' })
                   }}
                   onBlur={(e) => {
-                    if (e.target.value === '') this.setState({ newNetworkExplorer: this.newNetworkExplorerDefault })
+                    if (e.target.value === '')
+                      this.setState({ newNetworkExplorer: this.newNetworkExplorerDefault })
                   }}
                 />
               </div>
@@ -166,10 +178,12 @@ class AddChain extends React.Component {
                     this.setState({ newNetworkRPCPrimary: e.target.value })
                   }}
                   onFocus={(e) => {
-                    if (e.target.value === this.newNetworkRPCPrimary) this.setState({ newNetworkRPCPrimary: '' })
+                    if (e.target.value === this.newNetworkRPCPrimary)
+                      this.setState({ newNetworkRPCPrimary: '' })
                   }}
                   onBlur={(e) => {
-                    if (e.target.value === '') this.setState({ newNetworkRPCPrimary: this.newNetworkRPCPrimary })
+                    if (e.target.value === '')
+                      this.setState({ newNetworkRPCPrimary: this.newNetworkRPCPrimary })
                   }}
                 />
               </div>
@@ -190,10 +204,12 @@ class AddChain extends React.Component {
                     this.setState({ newNetworkRPCSecondary: e.target.value })
                   }}
                   onFocus={(e) => {
-                    if (e.target.value === this.newNetworkRPCSecondary) this.setState({ newNetworkRPCSecondary: '' })
+                    if (e.target.value === this.newNetworkRPCSecondary)
+                      this.setState({ newNetworkRPCSecondary: '' })
                   }}
                   onBlur={(e) => {
-                    if (e.target.value === '') this.setState({ newNetworkRPCSecondary: this.newNetworkRPCSecondary })
+                    if (e.target.value === '')
+                      this.setState({ newNetworkRPCSecondary: this.newNetworkRPCSecondary })
                   }}
                 />
               </div>

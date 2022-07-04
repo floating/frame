@@ -94,7 +94,11 @@ class FrameAccount {
     )
 
     if (!currentSendDappPermission) {
-      store.setPermission(this.address, { handlerId: 'send-dapp-native', origin: 'send.frame.eth', provider: true })
+      store.setPermission(this.address, {
+        handlerId: 'send-dapp-native',
+        origin: 'send.frame.eth',
+        provider: true,
+      })
     }
 
     this.update()
@@ -129,9 +133,17 @@ class FrameAccount {
     if (this.created.split(':')[0] === 'new') {
       provider.on('connect', () => {
         provider.send(
-          { jsonrpc: '2.0', id: 1, chainId: '0x1', method: 'eth_blockNumber', _origin: 'frame-internal', params: [] },
+          {
+            jsonrpc: '2.0',
+            id: 1,
+            chainId: '0x1',
+            method: 'eth_blockNumber',
+            _origin: 'frame-internal',
+            params: [],
+          },
           (response: any) => {
-            if (response.result) this.created = parseInt(response.result, 16) + ':' + this.created.split(':')[1]
+            if (response.result)
+              this.created = parseInt(response.result, 16) + ':' + this.created.split(':')[1]
             this.update()
           }
         )
@@ -343,7 +355,8 @@ class FrameAccount {
       if (this.smart.type === 'aragon') {
         if (req.type === 'transaction') {
           const txRequest = req as TransactionRequest
-          if (!this.aragon) return this.resError('Could not resolve Aragon account', txRequest.payload, res)
+          if (!this.aragon)
+            return this.resError('Could not resolve Aragon account', txRequest.payload, res)
           const rawTx = txRequest.data
           rawTx.data = rawTx.data || '0x'
           this.aragon.pathTransaction(rawTx, (err, pathTx) => {
@@ -353,7 +366,8 @@ class FrameAccount {
             Object.keys(tx).forEach((key) => {
               // Number to hex conversion
               const k = key as keyof RPC.SendTransaction.TxParams
-              if (tx[k] && typeof tx[k] === 'number') tx[k] = addHexPrefix((tx[k] || 0).toString(16))
+              if (tx[k] && typeof tx[k] === 'number')
+                tx[k] = addHexPrefix((tx[k] || 0).toString(16))
             })
             txRequest.data = tx
             add(req)
@@ -386,7 +400,9 @@ class FrameAccount {
       const actingSigner = signers.get(actingAccount.signer)
       if (!actingSigner || !actingSigner.verifyAddress)
         return cb(new Error(`Could not find acting account signer: ${actingAccount.signer}`))
-      const index = actingSigner.addresses.map((a) => a.toLowerCase()).indexOf(actingAccount.address)
+      const index = actingSigner.addresses
+        .map((a) => a.toLowerCase())
+        .indexOf(actingAccount.address)
       if (index > -1) {
         actingSigner.verifyAddress(index, actingAccount.address, display, cb)
       } else {
@@ -477,12 +493,20 @@ class FrameAccount {
     } else if (this.smart) {
       if (this.smart && this.smart.actor) {
         const actingAccount = this.accounts.get(this.smart.actor)
-        if (!actingAccount) return cb(new Error(`Could not find acting account: ${this.smart.actor}`))
+        if (!actingAccount)
+          return cb(new Error(`Could not find acting account: ${this.smart.actor}`))
         const actingSigner = signers.get(actingAccount.signer)
         if (!actingSigner || !actingSigner.verifyAddress)
           return cb(new Error(`Could not find acting account signer: ${actingAccount.signer}`))
-        const index = actingSigner.addresses.map((a) => a.toLowerCase()).indexOf(actingAccount.address)
-        if (index === -1) cb(new Error('Acting signer cannot sign for this address, could not find address in signer'))
+        const index = actingSigner.addresses
+          .map((a) => a.toLowerCase())
+          .indexOf(actingAccount.address)
+        if (index === -1)
+          cb(
+            new Error(
+              'Acting signer cannot sign for this address, could not find address in signer'
+            )
+          )
         actingSigner.signMessage(index, message, cb)
       } else {
         cb(new Error(`Agent's (${this.smart.agent}) signer is not ready`))
@@ -507,7 +531,9 @@ class FrameAccount {
       const actingSigner = signers.get(actingAccount.signer)
       if (!actingSigner || !actingSigner.verifyAddress)
         return cb(new Error(`Could not find acting account signer: ${actingAccount.signer}`))
-      const index = actingSigner.addresses.map((a) => a.toLowerCase()).indexOf(actingAccount.address)
+      const index = actingSigner.addresses
+        .map((a) => a.toLowerCase())
+        .indexOf(actingAccount.address)
       if (index === -1)
         cb(
           new Error(
@@ -533,11 +559,14 @@ class FrameAccount {
         s.signTransaction(index, rawTx, cb)
       } else if (this.smart && this.smart.actor) {
         const actingAccount = this.accounts.get(this.smart.actor)
-        if (!actingAccount) return cb(new Error(`Could not find acting account: ${this.smart.actor}`))
+        if (!actingAccount)
+          return cb(new Error(`Could not find acting account: ${this.smart.actor}`))
         const actingSigner = signers.get(actingAccount.signer)
         if (!actingSigner || !actingSigner.verifyAddress)
           return cb(new Error(`Could not find acting account signer: ${actingAccount.signer}`))
-        const index = actingSigner.addresses.map((a) => a.toLowerCase()).indexOf(actingAccount.address)
+        const index = actingSigner.addresses
+          .map((a) => a.toLowerCase())
+          .indexOf(actingAccount.address)
         if (index === -1)
           cb(
             new Error(

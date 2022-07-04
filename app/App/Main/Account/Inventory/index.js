@@ -115,7 +115,9 @@ class Inventory extends React.Component {
                           )}
                         </div>
                         <div className='inventoryPreviewTitle'>
-                          {this.state.hoverAsset ? this.state.hoverAsset.name : inventory[k].meta.name}
+                          {this.state.hoverAsset
+                            ? this.state.hoverAsset.name
+                            : inventory[k].meta.name}
                         </div>
                         <div className='inventoryCollectionItems'>
                           {Object.keys(inventory[k].items || {})
@@ -148,7 +150,11 @@ class Inventory extends React.Component {
                                   }}
                                 >
                                   {img ? (
-                                    <img src={`https://proxy.pylon.link?type=nft&target=${encodeURIComponent(img)}`} />
+                                    <img
+                                      src={`https://proxy.pylon.link?type=nft&target=${encodeURIComponent(
+                                        img
+                                      )}`}
+                                    />
                                   ) : null}
                                 </div>
                               )
@@ -159,7 +165,9 @@ class Inventory extends React.Component {
                     ) : (
                       <div className='inventoryCollectionTop'>
                         <div className='inventoryCollectionName'>{inventory[k].meta.name}</div>
-                        <div className='inventoryCollectionCount'>{Object.keys(inventory[k].items).length}</div>
+                        <div className='inventoryCollectionCount'>
+                          {Object.keys(inventory[k].items).length}
+                        </div>
                         <div className='inventoryCollectionLine' />
                       </div>
                     )}

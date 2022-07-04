@@ -81,7 +81,10 @@ class AddAccounts extends React.Component {
     )
   }
   createNewAccount(type) {
-    link.send('tray:action', 'navDash', { view: 'accounts', data: { showAddAccounts: true, newAccountType: type } })
+    link.send('tray:action', 'navDash', {
+      view: 'accounts',
+      data: { showAddAccounts: true, newAccountType: type },
+    })
   }
   renderDefault() {
     return (
@@ -185,14 +188,24 @@ class Dash extends React.Component {
     const { showAddAccounts } = this.props.data
     return showAddAccounts ? (
       <AddAccounts
-        close={() => link.send('tray:action', 'navDash', { view: 'accounts', data: { showAddAccounts: false } })}
+        close={() =>
+          link.send('tray:action', 'navDash', {
+            view: 'accounts',
+            data: { showAddAccounts: false },
+          })
+        }
         {...this.props}
       />
     ) : (
       <div className='cardShow'>
         <div
           className='newAccount'
-          onClick={() => link.send('tray:action', 'navDash', { view: 'accounts', data: { showAddAccounts: true } })}
+          onClick={() =>
+            link.send('tray:action', 'navDash', {
+              view: 'accounts',
+              data: { showAddAccounts: true },
+            })
+          }
         >
           <div className='newAccountIcon'>{svg.plus(16)}</div>
           Add New Account
@@ -212,7 +225,9 @@ class Dash extends React.Component {
             <div className='signersHeader'>Your Hot Signers</div>
             <div className='signersList'>
               {hotSigners.length ? (
-                hotSigners.map((signer, index) => <Signer index={index} key={signer.id} {...signer} />)
+                hotSigners.map((signer, index) => (
+                  <Signer index={index} key={signer.id} {...signer} />
+                ))
               ) : (
                 <div className='noSigners'>{'No hot signers detected'}</div>
               )}

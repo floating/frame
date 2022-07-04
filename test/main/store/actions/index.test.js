@@ -126,7 +126,9 @@ describe('#addNetwork', () => {
     addNetwork(polygonNetwork)
 
     expect(networks.ethereum['137'].secondaryRpc).toBeUndefined()
-    expect(networks.ethereum['137'].connection.secondary.custom).toBe('https://rpc-mainnet.matic.network')
+    expect(networks.ethereum['137'].connection.secondary.custom).toBe(
+      'https://rpc-mainnet.matic.network'
+    )
   })
 
   it('adds a network with the correct default connection presets', () => {
@@ -355,7 +357,9 @@ describe('#removeBalance', () => {
   it('removes a balance from all accounts', () => {
     removeBalance(testTokens.zrx.address)
 
-    expect(balances[owner]).not.toContainEqual(expect.objectContaining({ address: testTokens.zrx.address }))
+    expect(balances[owner]).not.toContainEqual(
+      expect.objectContaining({ address: testTokens.zrx.address })
+    )
     expect(balances[owner]).toHaveLength(1)
     expect(balances['0xd0e3872f5fa8ecb49f1911f605c0da90689a484e']).not.toContainEqual(
       expect.objectContaining({ address: testTokens.zrx.address })
@@ -725,7 +729,10 @@ describe('#switchOriginChain', () => {
   it('should switch the chain for an origin', () => {
     switchChain(50, 'ethereum')
 
-    expect(origins['91f6971d-ba85-52d7-a27e-6af206eb2433'].chain).toStrictEqual({ id: 50, type: 'ethereum' })
+    expect(origins['91f6971d-ba85-52d7-a27e-6af206eb2433'].chain).toStrictEqual({
+      id: 50,
+      type: 'ethereum',
+    })
   })
 })
 
@@ -881,7 +888,8 @@ describe('#updateNetwork', () => {
     }
   })
 
-  const updateNetwork = (existingNetwork, newNetwork) => updateNetworkAction(updaterFn, existingNetwork, newNetwork)
+  const updateNetwork = (existingNetwork, newNetwork) =>
+    updateNetworkAction(updaterFn, existingNetwork, newNetwork)
 
   it('should update the network', () => {
     updateNetwork(
@@ -899,7 +907,13 @@ describe('#updateNetwork', () => {
   it('should trim string properties', () => {
     updateNetwork(
       { id: '0x4', type: 'ethereum', name: '', explorer: '', symbol: '' },
-      { id: '0x42', type: 'ethereum', name: 'test     ', explorer: '   explorer.test    ', symbol: 'TEST  ' }
+      {
+        id: '0x42',
+        type: 'ethereum',
+        name: 'test     ',
+        explorer: '   explorer.test    ',
+        symbol: 'TEST  ',
+      }
     )
 
     expect(main.networks.ethereum).toStrictEqual({
@@ -958,7 +972,8 @@ describe('#setBlockHeight', () => {
     }
   })
 
-  const setBlockHeight = (chainId, blockHeight) => setBlockHeightAction(updaterFn, chainId, blockHeight)
+  const setBlockHeight = (chainId, blockHeight) =>
+    setBlockHeightAction(updaterFn, chainId, blockHeight)
 
   it('should update the block height for the expected chain', () => {
     setBlockHeight(4, 500)

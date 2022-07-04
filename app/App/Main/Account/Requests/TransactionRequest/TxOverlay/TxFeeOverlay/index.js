@@ -138,7 +138,8 @@ class TxFeeOverlay extends React.Component {
         if (e) console.error(e)
       })
       if (
-        this.toDisplayFromGwei(BigNumber(priorityFee)) !== this.toDisplayFromGwei(BigNumber(this.state.priorityFee))
+        this.toDisplayFromGwei(BigNumber(priorityFee)) !==
+        this.toDisplayFromGwei(BigNumber(this.state.priorityFee))
       ) {
         this.setState({ priorityFee: this.toDisplayFromGwei(BigNumber(priorityFee)) })
       }

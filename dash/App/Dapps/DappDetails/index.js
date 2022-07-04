@@ -25,12 +25,20 @@ class DappDetails extends React.Component {
                   selected
                     ? {
                         color: 'var(--ghostB)',
-                        background: chainMeta[hexId] ? chainMeta[hexId].primaryColor : 'var(--moon)',
+                        background: chainMeta[hexId]
+                          ? chainMeta[hexId].primaryColor
+                          : 'var(--moon)',
                       }
                     : {}
                 }
                 onClick={() => {
-                  link.send('tray:action', 'switchOriginChain', this.props.originId, parseInt(id), 'ethereum')
+                  link.send(
+                    'tray:action',
+                    'switchOriginChain',
+                    this.props.originId,
+                    parseInt(id),
+                    'ethereum'
+                  )
                 }}
               >
                 <div className='originChainItemIcon'>
@@ -47,7 +55,9 @@ class DappDetails extends React.Component {
                   style={
                     selected
                       ? {
-                          background: chainMeta[hexId] ? chainMeta[hexId].primaryColor : 'var(--moon)',
+                          background: chainMeta[hexId]
+                            ? chainMeta[hexId].primaryColor
+                            : 'var(--moon)',
                         }
                       : {}
                   }

@@ -60,7 +60,10 @@ class ChainConnection extends EventEmitter {
   _createProvider(target, priority) {
     this.update(priority)
 
-    this[priority].provider = provider(target, { name: priority, infuraId: '786ade30f36244469480aa5c2bf0743b' })
+    this[priority].provider = provider(target, {
+      name: priority,
+      infuraId: '786ade30f36244469480aa5c2bf0743b',
+    })
     this[priority].blockMonitor = this._createBlockMonitor(this[priority].provider, priority)
   }
 
@@ -98,13 +101,19 @@ class ChainConnection extends EventEmitter {
 
       try {
         if (feeMarket) {
-          const gasPrice = parseInt(feeMarket.maxBaseFeePerGas) + parseInt(feeMarket.maxPriorityFeePerGas)
+          const gasPrice =
+            parseInt(feeMarket.maxBaseFeePerGas) + parseInt(feeMarket.maxPriorityFeePerGas)
 
           store.setGasPrices(this.type, this.chainId, { fast: addHexPrefix(gasPrice.toString(16)) })
           store.setGasDefault(this.type, this.chainId, 'fast')
         } else {
           const gas = await gasCalculator.getGasPrices()
-          const customLevel = store('main.networksMeta', this.type, this.chainId, 'gas.price.levels.custom')
+          const customLevel = store(
+            'main.networksMeta',
+            this.type,
+            this.chainId,
+            'gas.price.levels.custom'
+          )
 
           store.setGasPrices(this.type, this.chainId, {
             ...gas,
@@ -149,14 +158,18 @@ class ChainConnection extends EventEmitter {
   }
 
   getNetwork(provider, cb) {
-    provider.sendAsync({ jsonrpc: '2.0', method: 'eth_chainId', params: [], id: 1 }, (err, response) => {
-      try {
-        response.result = !err && response && !response.error ? parseInt(response.result, 'hex').toString() : ''
-        cb(err, response)
-      } catch (e) {
-        cb(e)
+    provider.sendAsync(
+      { jsonrpc: '2.0', method: 'eth_chainId', params: [], id: 1 },
+      (err, response) => {
+        try {
+          response.result =
+            !err && response && !response.error ? parseInt(response.result, 'hex').toString() : ''
+          cb(err, response)
+        } catch (e) {
+          cb(e)
+        }
       }
-    })
+    )
   }
 
   getNodeType(provider, cb) {
@@ -216,7 +229,8 @@ class ChainConnection extends EventEmitter {
     const currentPresets = Object.assign({}, presets.default, presets[this.chainId])
 
     const { primary, secondary } = store('main.networks', this.type, this.chainId, 'connection')
-    const secondaryTarget = secondary.current === 'custom' ? secondary.custom : currentPresets[secondary.current]
+    const secondaryTarget =
+      secondary.current === 'custom' ? secondary.custom : currentPresets[secondary.current]
 
     if (chain.on && connection.secondary.on) {
       log.info('Secondary connection: ON')
@@ -230,7 +244,9 @@ class ChainConnection extends EventEmitter {
         // if no target is provided automatically set state to disconnected
         this.resetConnection('secondary', 'disconnected')
       } else if (!this.secondary.provider || this.secondary.currentTarget !== secondaryTarget) {
-        log.info("Creating secondary connection because it didn't exist or the target changed", { secondaryTarget })
+        log.info("Creating secondary connection because it didn't exist or the target changed", {
+          secondaryTarget,
+        })
 
         this.resetConnection('secondary', 'loading', secondaryTarget)
         this._createProvider(secondaryTarget, 'secondary')
@@ -269,7 +285,11 @@ class ChainConnection extends EventEmitter {
           this.emit('close')
         })
         this.secondary.provider.on('status', (status) => {
-          if (status === 'connected' && this.secondary.network && this.secondary.network !== this.chainId) {
+          if (
+            status === 'connected' &&
+            this.secondary.network &&
+            this.secondary.network !== this.chainId
+          ) {
             this.secondary.connected = false
             this.secondary.type = ''
             this.secondary.status = 'chain mismatch'
@@ -289,7 +309,8 @@ class ChainConnection extends EventEmitter {
       this.resetConnection('secondary', 'off')
     }
 
-    const primaryTarget = primary.current === 'custom' ? primary.custom : currentPresets[primary.current]
+    const primaryTarget =
+      primary.current === 'custom' ? primary.custom : currentPresets[primary.current]
 
     if (chain.on && connection.primary.on) {
       log.info('Primary connection: ON')
@@ -298,7 +319,9 @@ class ChainConnection extends EventEmitter {
         // if no target is provided automatically set state to disconnected
         this.resetConnection('primary', 'disconnected')
       } else if (!this.primary.provider || this.primary.currentTarget !== primaryTarget) {
-        log.info("Creating primary connection because it didn't exist or the target changed", { primaryTarget })
+        log.info("Creating primary connection because it didn't exist or the target changed", {
+          primaryTarget,
+        })
 
         this.resetConnection('primary', 'loading', primaryTarget)
         this._createProvider(primaryTarget, 'primary')
@@ -338,7 +361,11 @@ class ChainConnection extends EventEmitter {
           this.emit('close')
         })
         this.primary.provider.on('status', (status) => {
-          if (status === 'connected' && this.primary.network && this.primary.network !== this.chainId) {
+          if (
+            status === 'connected' &&
+            this.primary.network &&
+            this.primary.network !== this.chainId
+          ) {
             this.primary.connected = false
             this.primary.type = ''
             this.primary.status = 'chain mismatch'
@@ -452,7 +479,10 @@ class Chains extends EventEmitter {
     const { type, id } = targetChain
     if (!this.connections[type] || !this.connections[type][id]) {
       resError(
-        { message: `Connection for ${type} chain with chainId ${id} did not exist for send`, code: -32601 },
+        {
+          message: `Connection for ${type} chain with chainId ${id} did not exist for send`,
+          code: -32601,
+        },
         payload,
         res
       )

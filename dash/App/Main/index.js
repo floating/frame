@@ -14,7 +14,13 @@ class Settings extends React.Component {
     // const secondaryCustom = context.store('main.networks', this.networkType, this.network, 'connection.secondary.custom') || this.customMessage
     const latticeEndpoint = context.store('main.latticeSettings.endpointCustom')
     const latticeEndpointMode = context.store('main.latticeSettings.endpointMode')
-    this.state = { localShake: {}, latticeEndpoint, latticeEndpointMode, resetConfirm: false, expandNetwork: false }
+    this.state = {
+      localShake: {},
+      latticeEndpoint,
+      latticeEndpointMode,
+      resetConfirm: false,
+      expandNetwork: false,
+    }
     // context.store.observer(() => {
     //   const { type, id } = context.store('main.currentNetwork')
     //   if (this.network !== id || this.networkType !== type) {
@@ -30,7 +36,9 @@ class Settings extends React.Component {
   appInfo() {
     return (
       <div className='appInfo'>
-        <div className='appInfoLine appInfoLineVersion'>{'v' + require('../../../package.json').version}</div>
+        <div className='appInfoLine appInfoLineVersion'>
+          {'v' + require('../../../package.json').version}
+        </div>
         <div className='appInfoLine appInfoLineReset'>
           {this.state.resetConfirm ? (
             <span className='appInfoLineResetConfirm'>
@@ -132,7 +140,11 @@ class Settings extends React.Component {
     const current = connection.current
 
     if (current === 'custom') {
-      if (layer === 'primary' && this.state.primaryCustom !== '' && this.state.primaryCustom !== this.customMessage) {
+      if (
+        layer === 'primary' &&
+        this.state.primaryCustom !== '' &&
+        this.state.primaryCustom !== this.customMessage
+      ) {
         if (!okProtocol(this.state.primaryCustom)) status = 'invalid target'
         else if (!okPort(this.state.primaryCustom)) status = 'invalid port'
       }
@@ -157,7 +169,10 @@ class Settings extends React.Component {
 
   discord() {
     return (
-      <div className='discordInvite' onClick={() => link.send('tray:openExternal', 'https://discord.gg/UH7NGqY')}>
+      <div
+        className='discordInvite'
+        onClick={() => link.send('tray:openExternal', 'https://discord.gg/UH7NGqY')}
+      >
         <div>Need help?</div>
         <div className='discordLink'>Join our Discord!</div>
       </div>
@@ -181,7 +196,12 @@ class Settings extends React.Component {
           <div className='connectionOptionStatusIndicatorGood' />
         </div>
       )
-    } else if (status === 'loading' || status === 'syncing' || status === 'pending' || status === 'standby') {
+    } else if (
+      status === 'loading' ||
+      status === 'syncing' ||
+      status === 'pending' ||
+      status === 'standby'
+    ) {
       return (
         <div className='connectionOptionStatusIndicator'>
           <div className='connectionOptionStatusIndicatorPending' />
@@ -198,7 +218,8 @@ class Settings extends React.Component {
 
   selectNetwork(network) {
     const [type, id] = network.split(':')
-    if (network.type !== type || network.id !== id) link.send('tray:action', 'selectNetwork', type, id)
+    if (network.type !== type || network.id !== id)
+      link.send('tray:action', 'selectNetwork', type, id)
   }
 
   expandNetwork(e, expand) {
@@ -214,7 +235,10 @@ class Settings extends React.Component {
     let presets = networkPresets[id] || {}
     presets = Object.keys(presets).map((i) => ({ text: i, value: type + ':' + id + ':' + i }))
     presets = presets.concat(
-      Object.keys(networkPresets.default).map((i) => ({ text: i, value: type + ':' + id + ':' + i }))
+      Object.keys(networkPresets.default).map((i) => ({
+        text: i,
+        value: type + ':' + id + ':' + i,
+      }))
     )
     presets.push({ text: 'Custom', value: type + ':' + id + ':' + 'custom' })
 
@@ -234,15 +258,24 @@ class Settings extends React.Component {
             <div className='dashModuleIcon'>{svg.accounts(24)}</div>
             <div className='dashModuleTitle'>{'Accounts'}</div>
           </div>
-          <div className='dashModule' onClick={() => link.send('tray:action', 'navDash', { view: 'chains', data: {} })}>
+          <div
+            className='dashModule'
+            onClick={() => link.send('tray:action', 'navDash', { view: 'chains', data: {} })}
+          >
             <div className='dashModuleIcon'>{svg.chain(24)}</div>
             <div className='dashModuleTitle'>{'Chains'}</div>
           </div>
-          <div className='dashModule' onClick={() => link.send('tray:action', 'navDash', { view: 'dapps', data: {} })}>
+          <div
+            className='dashModule'
+            onClick={() => link.send('tray:action', 'navDash', { view: 'dapps', data: {} })}
+          >
             <div className='dashModuleIcon'>{svg.window(24)}</div>
             <div className='dashModuleTitle'>{'Dapps'}</div>
           </div>
-          <div className='dashModule' onClick={() => link.send('tray:action', 'navDash', { view: 'tokens', data: {} })}>
+          <div
+            className='dashModule'
+            onClick={() => link.send('tray:action', 'navDash', { view: 'tokens', data: {} })}
+          >
             <div className='dashModuleIcon'>{svg.tokens(24)}</div>
             <div className='dashModuleTitle'>{'Tokens'}</div>
           </div>
@@ -279,7 +312,9 @@ class Settings extends React.Component {
                     view: 'notify',
                     data: {
                       notify: 'openExternal',
-                      notifyData: { url: 'https://addons.mozilla.org/en-US/firefox/addon/frame-extension' },
+                      notifyData: {
+                        url: 'https://addons.mozilla.org/en-US/firefox/addon/frame-extension',
+                      },
                     },
                   })
                 }
@@ -293,7 +328,9 @@ class Settings extends React.Component {
                     view: 'notify',
                     data: {
                       notify: 'openExternal',
-                      notifyData: { url: 'https://addons.mozilla.org/en-US/firefox/addon/frame-extension' },
+                      notifyData: {
+                        url: 'https://addons.mozilla.org/en-US/firefox/addon/frame-extension',
+                      },
                     },
                   })
                 }

@@ -305,7 +305,8 @@ export default class Ledger extends Signer {
         type: 'deriveAddresses',
         execute: async () => {
           try {
-            if (!this.eth) throw new Error('attempted to derive Live addresses but Eth app is not connected!')
+            if (!this.eth)
+              throw new Error('attempted to derive Live addresses but Eth app is not connected!')
 
             const path = this.getPath(i)
             const { address } = await this.eth.getAddress(path, false, false)
@@ -339,8 +340,10 @@ export default class Ledger extends Signer {
       type: 'deriveAddresses',
       execute: async () => {
         try {
-          if (!this.eth) throw new Error('attempted to derive hardware addresses but Eth app is not connected!')
-          if (!this.derivation) throw new Error('attempted to derive hardware addresses for unknown derivation!')
+          if (!this.eth)
+            throw new Error('attempted to derive hardware addresses but Eth app is not connected!')
+          if (!this.derivation)
+            throw new Error('attempted to derive hardware addresses for unknown derivation!')
 
           const addresses = await this.eth.deriveAddresses(this.derivation)
 
@@ -366,8 +369,10 @@ export default class Ledger extends Signer {
       type: 'verifyAddress',
       execute: async () => {
         try {
-          if (!this.eth) throw new Error('attempted to verify address but Eth app is not connected!')
-          if (!this.derivation) throw new Error('attempted to verify address with unknown derivation!')
+          if (!this.eth)
+            throw new Error('attempted to verify address but Eth app is not connected!')
+          if (!this.derivation)
+            throw new Error('attempted to verify address with unknown derivation!')
 
           const path = this.getPath(index)
           const result = await this.getAddress(path, display, true)
@@ -387,7 +392,9 @@ export default class Ledger extends Signer {
           cb(null, true)
         } catch (e) {
           const err = e as DeviceError
-          const message = wasRequestRejected(err) ? 'Verify request rejected by user' : 'Verify address error'
+          const message = wasRequestRejected(err)
+            ? 'Verify request rejected by user'
+            : 'Verify address error'
 
           // if the address couldn't be verified for any reason the signer can no longer
           // be used, so force it to be closed by setting the status code to unhandled error
@@ -406,7 +413,8 @@ export default class Ledger extends Signer {
       execute: async () => {
         try {
           if (!this.eth) throw new Error('attempted to sign message but Eth app is not connected!')
-          if (!this.derivation) throw new Error('attempted to sign message with unknown derivation!')
+          if (!this.derivation)
+            throw new Error('attempted to sign message with unknown derivation!')
 
           const path = this.getPath(index)
           const signedMessage = await this.eth.signMessage(path, message)
@@ -416,7 +424,9 @@ export default class Ledger extends Signer {
           cb(null, signedMessage)
         } catch (e) {
           const err = e as DeviceError
-          const message = wasRequestRejected(err) ? 'Sign request rejected by user' : 'Sign message error'
+          const message = wasRequestRejected(err)
+            ? 'Sign request rejected by user'
+            : 'Sign message error'
 
           this.handleError(err)
           log.error('error signing message on Ledger', err.toString())
@@ -431,15 +441,22 @@ export default class Ledger extends Signer {
     const versionNum = (version.match(/[Vv](\d+)/) || [])[1]
 
     if ((parseInt(versionNum) || 0) < 4) {
-      return cb(new Error(`Invalid version (${version}), Ledger only supports eth_signTypedData version 4+`), undefined)
+      return cb(
+        new Error(
+          `Invalid version (${version}), Ledger only supports eth_signTypedData version 4+`
+        ),
+        undefined
+      )
     }
 
     this.enqueueRequests({
       type: 'signTypedData',
       execute: async () => {
         try {
-          if (!this.eth) throw new Error('attempted to sign typed data but Eth app is not connected!')
-          if (!this.derivation) throw new Error('attempted to sign typed data with unknown derivation!')
+          if (!this.eth)
+            throw new Error('attempted to sign typed data but Eth app is not connected!')
+          if (!this.derivation)
+            throw new Error('attempted to sign typed data with unknown derivation!')
 
           const path = this.getPath(index)
           const signedData = await this.eth.signTypedData(path, typedData)
@@ -470,8 +487,10 @@ export default class Ledger extends Signer {
       type: 'signTransaction',
       execute: async () => {
         try {
-          if (!this.eth) throw new Error('attempted to sign transaction but Eth app is not connected!')
-          if (!this.derivation) throw new Error('attempted to sign transaction with unknown derivation!')
+          if (!this.eth)
+            throw new Error('attempted to sign transaction but Eth app is not connected!')
+          if (!this.derivation)
+            throw new Error('attempted to sign transaction with unknown derivation!')
 
           const path = this.getPath(index)
           const signedTx = await this.eth.signTransaction(path, ledgerTx)
@@ -481,7 +500,9 @@ export default class Ledger extends Signer {
           cb(null, signedTx)
         } catch (e) {
           const err = e as DeviceError
-          const message = wasRequestRejected(err) ? 'Sign request rejected by user' : 'Sign transaction error'
+          const message = wasRequestRejected(err)
+            ? 'Sign request rejected by user'
+            : 'Sign transaction error'
 
           this.handleError(err)
           log.error('error signing transaction on Ledger', err.toString())
@@ -504,7 +525,10 @@ export default class Ledger extends Signer {
 
       if (!display) {
         // if display is true, the Ledger waits for user input so never time out
-        fallback = setTimeout(() => reject({ message: 'getAddress timed out', statusCode: -1 }), 3000)
+        fallback = setTimeout(
+          () => reject({ message: 'getAddress timed out', statusCode: -1 }),
+          3000
+        )
       }
 
       this.eth

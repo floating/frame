@@ -57,10 +57,17 @@ class SignerStatus extends React.Component {
 
   renderTrezorPin(active) {
     return (
-      <div className='trezorPinWrap' style={active ? {} : { height: '0px', padding: '0px 0px 0px 0px' }}>
+      <div
+        className='trezorPinWrap'
+        style={active ? {} : { height: '0px', padding: '0px 0px 0px 0px' }}
+      >
         <div className='trezorPinInput'>
           {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => (
-            <div key={i} className='trezorPinInputButton' onMouseDown={this.trezorPin.bind(this, i)}>
+            <div
+              key={i}
+              className='trezorPinInputButton'
+              onMouseDown={this.trezorPin.bind(this, i)}
+            >
               {svg.octicon('primitive-dot', { height: 20 })}
             </div>
           ))}
@@ -72,7 +79,12 @@ class SignerStatus extends React.Component {
   componentDidMount() {
     setTimeout(() => {
       document.addEventListener('mousedown', (e) => {
-        if (this.props.open && this.statusRef && this.statusRef.current && !this.statusRef.current.contains(e.target)) {
+        if (
+          this.props.open &&
+          this.statusRef &&
+          this.statusRef.current &&
+          !this.statusRef.current.contains(e.target)
+        ) {
           this.props.hideSignerStatus(true)
         }
       })

@@ -10,7 +10,9 @@ jest.mock('../../../main/externalData')
 
 jest.mock('../../../main/store/persist')
 
-jest.mock('../../../main/nebula', () => jest.fn(() => ({ ready: () => true, ens: { lookupAddress: jest.fn() } })))
+jest.mock('../../../main/nebula', () =>
+  jest.fn(() => ({ ready: () => true, ens: { lookupAddress: jest.fn() } }))
+)
 
 const weiToHex = (wei) => addHexPrefix(wei.toString(16))
 const gweiToHex = (gwei) => weiToHex(gwei * 1e9)
@@ -178,7 +180,9 @@ describe('#setBaseFee', () => {
     setBaseFee(gweiToHex(updatedBaseFee), (err) => {
       try {
         expect(err).toBeFalsy()
-        expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(weiToHex(2e9 + updatedBaseFee * 1e9))
+        expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(
+          weiToHex(2e9 + updatedBaseFee * 1e9)
+        )
         done()
       } catch (e) {
         done(e)
@@ -402,7 +406,9 @@ describe('#setPriorityFee', () => {
     setPriorityFee(highPriorityFee, (err) => {
       try {
         expect(err).toBeFalsy()
-        expect(Accounts.current().requests[1].data.maxPriorityFeePerGas).toBe(weiToHex(maxPriorityFee))
+        expect(Accounts.current().requests[1].data.maxPriorityFeePerGas).toBe(
+          weiToHex(maxPriorityFee)
+        )
         expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(expectedMaxFee)
         done()
       } catch (e) {
@@ -427,7 +433,9 @@ describe('#setPriorityFee', () => {
     setPriorityFee(highPriorityFee, (err) => {
       try {
         expect(err).toBeFalsy()
-        expect(Accounts.current().requests[1].data.maxPriorityFeePerGas).toBe(weiToHex(expectedPriorityFee))
+        expect(Accounts.current().requests[1].data.maxPriorityFeePerGas).toBe(
+          weiToHex(expectedPriorityFee)
+        )
         expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(weiToHex(maxFee))
         done()
       } catch (e) {

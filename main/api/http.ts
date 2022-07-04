@@ -52,7 +52,13 @@ const cleanup = (id: string) => {
   delete pending[id]
   Object.keys(pollSubs).forEach((sub) => {
     if (pollSubs[sub].id === id) {
-      provider.send({ jsonrpc: '2.0', id: 1, method: 'eth_unsubscribe', params: [sub], _origin: '' })
+      provider.send({
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'eth_unsubscribe',
+        params: [sub],
+        _origin: '',
+      })
       delete pollSubs[sub]
     }
   })
@@ -61,7 +67,10 @@ const cleanup = (id: string) => {
 const handler = (req: IncomingMessage, res: ServerResponse) => {
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
-  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept')
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept'
+  )
   if (req.method === 'OPTIONS') {
     res.writeHead(200)
     res.end()
@@ -77,7 +86,9 @@ const handler = (req: IncomingMessage, res: ServerResponse) => {
 
         if (logTraffic)
           log.info(
-            `req -> | http | ${req.headers.origin} | ${rawPayload.method} | -> | ${JSON.stringify(rawPayload.params)}`
+            `req -> | http | ${req.headers.origin} | ${rawPayload.method} | -> | ${JSON.stringify(
+              rawPayload.params
+            )}`
           )
 
         const origin = parseOrigin(req.headers.origin)
@@ -88,9 +99,13 @@ const handler = (req: IncomingMessage, res: ServerResponse) => {
         }
 
         if (protectedMethods.indexOf(payload.method) > -1 && !(await isTrusted(origin))) {
-          let error = { message: `Permission denied, approve ${origin} in Frame to continue`, code: 4001 }
+          let error = {
+            message: `Permission denied, approve ${origin} in Frame to continue`,
+            code: 4001,
+          }
           // Review
-          if (!accounts.getSelectedAddresses()[0]) error = { message: 'No Frame account selected', code: 4001 }
+          if (!accounts.getSelectedAddresses()[0])
+            error = { message: 'No Frame account selected', code: 4001 }
           res.writeHead(401, { 'Content-Type': 'application/json' })
           res.end(JSON.stringify({ id: payload.id, jsonrpc: payload.jsonrpc, error }))
         } else {
@@ -102,7 +117,11 @@ const handler = (req: IncomingMessage, res: ServerResponse) => {
                 res.writeHead(200, { 'Content-Type': 'application/json' })
                 const response = { id: payload.id, jsonrpc: payload.jsonrpc, result }
                 if (logTraffic)
-                  log.info(`<- res | http | ${origin} | ${payload.method} | <- | ${JSON.stringify(response)}`)
+                  log.info(
+                    `<- res | http | ${origin} | ${payload.method} | <- | ${JSON.stringify(
+                      response
+                    )}`
+                  )
                 res.end(JSON.stringify(response))
                 delete polls[id]
                 clearTimeout(cleanupTimers[id])
@@ -142,7 +161,11 @@ const handler = (req: IncomingMessage, res: ServerResponse) => {
             }
 
             if (logTraffic)
-              log.info(`<- res | http | ${req.headers.origin} | ${payload.method} | <- | ${JSON.stringify(response)}`)
+              log.info(
+                `<- res | http | ${req.headers.origin} | ${payload.method} | <- | ${JSON.stringify(
+                  response
+                )}`
+              )
             res.writeHead(200, { 'Content-Type': 'application/json' })
             res.end(JSON.stringify(response))
           })
@@ -177,7 +200,9 @@ provider.on('data:address', (account, payload) => {
   if (pollSubs[payload.params.subscription]) {
     const { id, origin } = pollSubs[payload.params.subscription]
     const permissions = storeApi.getPermissions(account) || {}
-    const permission = Object.values(permissions).find((p) => p.origin === origin) || { provider: false }
+    const permission = Object.values(permissions).find((p) => p.origin === origin) || {
+      provider: false,
+    }
 
     if (!permission.provider) payload.params.result = []
     polls[id] = polls[id] || []

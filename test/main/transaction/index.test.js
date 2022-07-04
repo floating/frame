@@ -1,7 +1,13 @@
 import { addHexPrefix, stripHexPrefix } from 'ethereumjs-util'
 import Common from '@ethereumjs/common'
 
-import { maxFee, londonToLegacy, signerCompatibility, populate, sign } from '../../../main/transaction'
+import {
+  maxFee,
+  londonToLegacy,
+  signerCompatibility,
+  populate,
+  sign,
+} from '../../../main/transaction'
 
 describe('#signerCompatibility', () => {
   it('is always compatible with legacy transactions', () => {
@@ -124,7 +130,11 @@ describe('#signerCompatibility', () => {
       type: '0x2',
     }
 
-    const compatibility = signerCompatibility(tx, { type: 'trezor', appVersion, model: 'Trezor One' })
+    const compatibility = signerCompatibility(tx, {
+      type: 'trezor',
+      appVersion,
+      model: 'Trezor One',
+    })
 
     expect(compatibility.signer).toBe('trezor')
     expect(compatibility.tx).toBe('london')
@@ -150,7 +160,11 @@ describe('#signerCompatibility', () => {
       type: '0x2',
     }
 
-    const compatibility = signerCompatibility(tx, { type: 'trezor', appVersion, model: 'Trezor One' })
+    const compatibility = signerCompatibility(tx, {
+      type: 'trezor',
+      appVersion,
+      model: 'Trezor One',
+    })
 
     expect(compatibility.signer).toBe('trezor')
     expect(compatibility.tx).toBe('london')

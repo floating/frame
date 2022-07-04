@@ -155,8 +155,10 @@ export class Accounts extends EventEmitter {
     const currentAccount = this.current()
 
     return new Promise<void>((resolve, reject) => {
-      if (!currentAccount || !currentAccount.requests[id]) return reject(new Error('Could not find request'))
-      if (currentAccount.requests[id].type !== 'transaction') return reject(new Error('Request is not transaction'))
+      if (!currentAccount || !currentAccount.requests[id])
+        return reject(new Error('Could not find request'))
+      if (currentAccount.requests[id].type !== 'transaction')
+        return reject(new Error('Request is not transaction'))
 
       const txRequest = this.getTransactionRequest(currentAccount, id)
 
@@ -197,7 +199,10 @@ export class Accounts extends EventEmitter {
     })
   }
 
-  private sendRequest(payload: { method: string; params: any[]; chainId: string }, cb: RPCRequestCallback) {
+  private sendRequest(
+    payload: { method: string; params: any[]; chainId: string },
+    cb: RPCRequestCallback
+  ) {
     provider.send({ id: 1, jsonrpc: '2.0', ...payload, _origin: frameOriginId }, cb)
   }
 
@@ -209,84 +214,103 @@ export class Accounts extends EventEmitter {
         return reject(new Error('Unable to determine target chain'))
       const targetChainId = addHexPrefix(targetChain.id.toString(16))
 
-      this.sendRequest({ method: 'eth_blockNumber', params: [], chainId: targetChainId }, (res: RPCResponsePayload) => {
-        if (res.error) return reject(new Error(JSON.stringify(res.error)))
+      this.sendRequest(
+        { method: 'eth_blockNumber', params: [], chainId: targetChainId },
+        (res: RPCResponsePayload) => {
+          if (res.error) return reject(new Error(JSON.stringify(res.error)))
 
-        this.sendRequest(
-          { method: 'eth_getTransactionReceipt', params: [hash], chainId: targetChainId },
-          (receiptRes: RPCResponsePayload) => {
-            if (receiptRes.error) return reject(receiptRes.error)
-            if (!this.accounts[account.address]) return reject(new Error('account closed'))
+          this.sendRequest(
+            { method: 'eth_getTransactionReceipt', params: [hash], chainId: targetChainId },
+            (receiptRes: RPCResponsePayload) => {
+              if (receiptRes.error) return reject(receiptRes.error)
+              if (!this.accounts[account.address]) return reject(new Error('account closed'))
 
-            if (receiptRes.result && account.requests[id]) {
-              const txRequest = this.getTransactionRequest(account, id)
+              if (receiptRes.result && account.requests[id]) {
+                const txRequest = this.getTransactionRequest(account, id)
 
-              txRequest.tx = {
-                ...txRequest.tx,
-                receipt: receiptRes.result,
-                confirmations: txRequest.tx?.confirmations || 0,
-              }
+                txRequest.tx = {
+                  ...txRequest.tx,
+                  receipt: receiptRes.result,
+                  confirmations: txRequest.tx?.confirmations || 0,
+                }
 
-              account.update()
+                account.update()
 
-              if (!txRequest.feeAtTime) {
-                const network = targetChain
-                if (network.type === 'ethereum' && network.id === 1) {
-                  const ethPrice = store('main.networksMeta.ethereum.1.nativeCurrency.usd.price')
+                if (!txRequest.feeAtTime) {
+                  const network = targetChain
+                  if (network.type === 'ethereum' && network.id === 1) {
+                    const ethPrice = store('main.networksMeta.ethereum.1.nativeCurrency.usd.price')
 
-                  if (ethPrice && txRequest.tx && txRequest.tx.receipt && this.accounts[account.address]) {
-                    const { gasUsed } = txRequest.tx.receipt
+                    if (
+                      ethPrice &&
+                      txRequest.tx &&
+                      txRequest.tx.receipt &&
+                      this.accounts[account.address]
+                    ) {
+                      const { gasUsed } = txRequest.tx.receipt
 
-                    txRequest.feeAtTime = (
-                      Math.round(
-                        weiIntToEthInt(
-                          hexToInt(gasUsed) * hexToInt(txRequest.data.gasPrice || '0x0') * res.result.ethusd
-                        ) * 100
-                      ) / 100
-                    ).toFixed(2)
+                      txRequest.feeAtTime = (
+                        Math.round(
+                          weiIntToEthInt(
+                            hexToInt(gasUsed) *
+                              hexToInt(txRequest.data.gasPrice || '0x0') *
+                              res.result.ethusd
+                          ) * 100
+                        ) / 100
+                      ).toFixed(2)
+                      account.update()
+                    }
+                  } else {
+                    txRequest.feeAtTime = '?'
                     account.update()
                   }
-                } else {
-                  txRequest.feeAtTime = '?'
-                  account.update()
                 }
+
+                if (
+                  receiptRes.result.status === '0x1' &&
+                  txRequest.status === RequestStatus.Verifying
+                ) {
+                  txRequest.status = RequestStatus.Confirming
+                  txRequest.notice = 'Confirming'
+                  txRequest.completed = Date.now()
+                  const hash = txRequest.tx.hash || ''
+                  const h = hash.substring(0, 6) + '...' + hash.substring(hash.length - 4)
+                  const body = `Transaction ${h} successful! \n Click for details`
+
+                  // Drop any other pending txs with same nonce
+                  Object.keys(account.requests).forEach((k) => {
+                    const txReq = this.getTransactionRequest(account, k)
+                    if (
+                      txReq.status === RequestStatus.Verifying &&
+                      txReq.data.nonce === (account.requests[id] as TransactionRequest).data.nonce
+                    ) {
+                      txReq.status = RequestStatus.Error
+                      txReq.notice = 'Dropped'
+                      setTimeout(
+                        () => this.accounts[account.address] && this.removeRequest(account, k),
+                        8000
+                      )
+                    }
+                  })
+
+                  // If Frame is hidden, trigger native notification
+                  notify('Transaction Successful', body, () => {
+                    const { type, id } = targetChain
+                    const explorer = store('main.networks', type, id, 'explorer')
+                    shell.openExternal(explorer + '/tx/' + hash)
+                  })
+                }
+                const blockHeight = parseInt(res.result, 16)
+                const receiptBlock = parseInt(
+                  (txRequest.tx.receipt as TransactionReceipt).blockNumber,
+                  16
+                )
+                resolve(blockHeight - receiptBlock)
               }
-
-              if (receiptRes.result.status === '0x1' && txRequest.status === RequestStatus.Verifying) {
-                txRequest.status = RequestStatus.Confirming
-                txRequest.notice = 'Confirming'
-                txRequest.completed = Date.now()
-                const hash = txRequest.tx.hash || ''
-                const h = hash.substring(0, 6) + '...' + hash.substring(hash.length - 4)
-                const body = `Transaction ${h} successful! \n Click for details`
-
-                // Drop any other pending txs with same nonce
-                Object.keys(account.requests).forEach((k) => {
-                  const txReq = this.getTransactionRequest(account, k)
-                  if (
-                    txReq.status === RequestStatus.Verifying &&
-                    txReq.data.nonce === (account.requests[id] as TransactionRequest).data.nonce
-                  ) {
-                    txReq.status = RequestStatus.Error
-                    txReq.notice = 'Dropped'
-                    setTimeout(() => this.accounts[account.address] && this.removeRequest(account, k), 8000)
-                  }
-                })
-
-                // If Frame is hidden, trigger native notification
-                notify('Transaction Successful', body, () => {
-                  const { type, id } = targetChain
-                  const explorer = store('main.networks', type, id, 'explorer')
-                  shell.openExternal(explorer + '/tx/' + hash)
-                })
-              }
-              const blockHeight = parseInt(res.result, 16)
-              const receiptBlock = parseInt((txRequest.tx.receipt as TransactionReceipt).blockNumber, 16)
-              resolve(blockHeight - receiptBlock)
             }
-          }
-        )
-      })
+          )
+        }
+      )
     })
   }
 
@@ -331,13 +355,19 @@ export class Accounts extends EventEmitter {
                   txRequest.status = RequestStatus.Confirmed
                   txRequest.notice = 'Confirmed'
                   account.update()
-                  setTimeout(() => this.accounts[account.address] && this.removeRequest(account, id), 8000)
+                  setTimeout(
+                    () => this.accounts[account.address] && this.removeRequest(account, id),
+                    8000
+                  )
                   clearTimeout(monitorTimer)
                 }
               } catch (e) {
                 log.error('error awaiting confirmations', e)
                 clearTimeout(monitorTimer)
-                setTimeout(() => this.accounts[account.address] && this.removeRequest(account, id), 60 * 1000)
+                setTimeout(
+                  () => this.accounts[account.address] && this.removeRequest(account, id),
+                  60 * 1000
+                )
                 return
               }
             }
@@ -347,7 +377,10 @@ export class Accounts extends EventEmitter {
             const headSub = newHeadRes.result
 
             const removeSubscription = async (requestRemoveTimeout: number) => {
-              setTimeout(() => this.accounts[account.address] && this.removeRequest(account, id), requestRemoveTimeout)
+              setTimeout(
+                () => this.accounts[account.address] && this.removeRequest(account, id),
+                requestRemoveTimeout
+              )
               provider.off(`data:${targetChain.type}:${targetChain.id}`, handler)
               this.sendRequest(
                 { method: 'eth_unsubscribe', chainId: targetChainId, params: [headSub] },
@@ -360,7 +393,10 @@ export class Accounts extends EventEmitter {
             }
 
             const handler = async (payload: RPCRequestPayload) => {
-              if (payload.method === 'eth_subscription' && (payload.params as any).subscription === headSub) {
+              if (
+                payload.method === 'eth_subscription' &&
+                (payload.params as any).subscription === headSub
+              ) {
                 // const newHead = payload.params.result
                 let confirmations
                 try {
@@ -445,7 +481,9 @@ export class Accounts extends EventEmitter {
         .map(([_, req]) => [_, req] as [string, TransactionRequest])
         .filter(
           ([_, req]) =>
-            !req.locked && !req.feesUpdatedByUser && (!chainId || parseInt(req.data.chainId, 16) === chainId)
+            !req.locked &&
+            !req.feesUpdatedByUser &&
+            (!chainId || parseInt(req.data.chainId, 16) === chainId)
         )
 
       transactions.forEach(([id, req]) => {
@@ -538,9 +576,11 @@ export class Accounts extends EventEmitter {
 
     if (!currentAccount) return cb(new Error('No Account Selected'))
 
-    const matchSelected = (rawTx.from || '').toLowerCase() === currentAccount.getSelectedAddress().toLowerCase()
+    const matchSelected =
+      (rawTx.from || '').toLowerCase() === currentAccount.getSelectedAddress().toLowerCase()
     const matchActor =
-      (rawTx.from || '').toLowerCase() === (currentAccount.smart ? currentAccount.smart.actor.toLowerCase() : false)
+      (rawTx.from || '').toLowerCase() ===
+      (currentAccount.smart ? currentAccount.smart.actor.toLowerCase() : false)
 
     if (matchSelected || matchActor) {
       currentAccount.signTransaction(rawTx, cb)
@@ -553,7 +593,9 @@ export class Accounts extends EventEmitter {
     const currentAccount = this.current()
     if (!currentAccount) return cb(new Error('Could not locate account'))
 
-    const request = currentAccount.requests[handlerId] && currentAccount.requests[handlerId].type === 'transaction'
+    const request =
+      currentAccount.requests[handlerId] &&
+      currentAccount.requests[handlerId].type === 'transaction'
     if (!request) return cb(new Error(`Could not locate request ${handlerId}`))
 
     const signer = currentAccount.getSigner()
@@ -612,7 +654,11 @@ export class Accounts extends EventEmitter {
       txRequest.notice = 'Signature Declined'
       txRequest.mode = RequestMode.Monitor
 
-      setTimeout(() => this.accounts[currentAccount.address] && this.removeRequest(currentAccount, handlerId), 8000)
+      setTimeout(
+        () =>
+          this.accounts[currentAccount.address] && this.removeRequest(currentAccount, handlerId),
+        8000
+      )
       currentAccount.update()
     }
   }
@@ -640,7 +686,10 @@ export class Accounts extends EventEmitter {
 
       if (err.message === 'Ledger device: Invalid data received (0x6a80)') {
         currentAccount.requests[handlerId].notice = 'Ledger Contract Data = No'
-      } else if (err.message === 'Ledger device: Condition of use not satisfied (denied by the user?) (0x6985)') {
+      } else if (
+        err.message ===
+        'Ledger device: Condition of use not satisfied (denied by the user?) (0x6985)'
+      ) {
         currentAccount.requests[handlerId].notice = 'Ledger Signature Declined'
       } else {
         const notice =
@@ -658,11 +707,20 @@ export class Accounts extends EventEmitter {
             activeAccount.requests[handlerId].mode = RequestMode.Monitor
             activeAccount.update()
 
-            setTimeout(() => this.accounts[activeAccount.address] && this.removeRequest(activeAccount, handlerId), 8000)
+            setTimeout(
+              () =>
+                this.accounts[activeAccount.address] &&
+                this.removeRequest(activeAccount, handlerId),
+              8000
+            )
           }
         }, 1500)
       } else {
-        setTimeout(() => this.accounts[currentAccount.address] && this.removeRequest(currentAccount, handlerId), 3300)
+        setTimeout(
+          () =>
+            this.accounts[currentAccount.address] && this.removeRequest(currentAccount, handlerId),
+          3300
+        )
       }
 
       currentAccount.update()
@@ -716,7 +774,11 @@ export class Accounts extends EventEmitter {
       if (currentAccount.requests[handlerId].type === 'transaction') {
         currentAccount.requests[handlerId].mode = RequestMode.Monitor
       } else {
-        setTimeout(() => this.accounts[currentAccount.address] && this.removeRequest(currentAccount, handlerId), 3300)
+        setTimeout(
+          () =>
+            this.accounts[currentAccount.address] && this.removeRequest(currentAccount, handlerId),
+          3300
+        )
       }
 
       currentAccount.update()
@@ -730,7 +792,8 @@ export class Accounts extends EventEmitter {
     if (currentAccount && currentAccount.address === address) {
       store.unsetAccount()
 
-      const defaultAccount = (Object.values(this.accounts).filter((a) => a.address !== address) || [])[0]
+      const defaultAccount = (Object.values(this.accounts).filter((a) => a.address !== address) ||
+        [])[0]
       if (defaultAccount) {
         this._current = defaultAccount.id
         defaultAccount.active = true
@@ -827,11 +890,8 @@ export class Accounts extends EventEmitter {
 
   setBaseFee(baseFee: string, handlerId: string, userUpdate: boolean, cb: Callback<void>) {
     try {
-      const { currentAccount, maxPriorityFeePerGas, gasLimit, currentBaseFee, txType } = this.txFeeUpdate(
-        baseFee,
-        handlerId,
-        userUpdate
-      )
+      const { currentAccount, maxPriorityFeePerGas, gasLimit, currentBaseFee, txType } =
+        this.txFeeUpdate(baseFee, handlerId, userUpdate)
 
       // New value
       const newBaseFee = parseInt(this.limitedHexValue(baseFee, 0, 9999 * 1e9), 16)
@@ -868,11 +928,8 @@ export class Accounts extends EventEmitter {
 
   setPriorityFee(priorityFee: string, handlerId: string, userUpdate: boolean, cb: Callback<void>) {
     try {
-      const { currentAccount, maxPriorityFeePerGas, gasLimit, currentBaseFee, txType } = this.txFeeUpdate(
-        priorityFee,
-        handlerId,
-        userUpdate
-      )
+      const { currentAccount, maxPriorityFeePerGas, gasLimit, currentBaseFee, txType } =
+        this.txFeeUpdate(priorityFee, handlerId, userUpdate)
 
       // New values
       const newMaxPriorityFeePerGas = parseInt(this.limitedHexValue(priorityFee, 0, 9999 * 1e9), 16)
@@ -912,7 +969,11 @@ export class Accounts extends EventEmitter {
 
   setGasPrice(price: string, handlerId: string, userUpdate: boolean, cb: Callback<void>) {
     try {
-      const { currentAccount, gasLimit, gasPrice, txType } = this.txFeeUpdate(price, handlerId, userUpdate)
+      const { currentAccount, gasLimit, gasPrice, txType } = this.txFeeUpdate(
+        price,
+        handlerId,
+        userUpdate
+      )
 
       // New values
       const newGasPrice = parseInt(this.limitedHexValue(price, 0, 9999 * 1e9), 16)
@@ -945,7 +1006,11 @@ export class Accounts extends EventEmitter {
 
   setGasLimit(limit: string, handlerId: string, userUpdate: boolean, cb: Callback<void>) {
     try {
-      const { currentAccount, maxFeePerGas, gasPrice, txType } = this.txFeeUpdate(limit, handlerId, userUpdate)
+      const { currentAccount, maxFeePerGas, gasPrice, txType } = this.txFeeUpdate(
+        limit,
+        handlerId,
+        userUpdate
+      )
 
       // New values
       const newGasLimit = parseInt(this.limitedHexValue(limit, 0, 12.5e6), 16)
@@ -984,8 +1049,10 @@ export class Accounts extends EventEmitter {
   adjustNonce(handlerId: string, nonceAdjust: number) {
     const currentAccount = this.current()
 
-    if (nonceAdjust !== 1 && nonceAdjust !== -1) return log.error('Invalid nonce adjustment', nonceAdjust)
-    if (!currentAccount) return log.error('No account selected during nonce adjustement', nonceAdjust)
+    if (nonceAdjust !== 1 && nonceAdjust !== -1)
+      return log.error('Invalid nonce adjustment', nonceAdjust)
+    if (!currentAccount)
+      return log.error('No account selected during nonce adjustement', nonceAdjust)
 
     const txRequest = this.getTransactionRequest(currentAccount, handlerId)
     if (txRequest && txRequest.type === 'transaction') {

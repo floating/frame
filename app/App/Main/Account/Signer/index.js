@@ -24,7 +24,9 @@ class Balances extends React.Component {
     return (
       <div ref={this.moduleRef} className='balancesBlock'>
         <div className='moduleHeader'>{'Signer Status'}</div>
-        <div style={{ padding: '30px', display: 'flex', justifyContent: 'center' }}>{'Signer Status'}</div>
+        <div style={{ padding: '30px', display: 'flex', justifyContent: 'center' }}>
+          {'Signer Status'}
+        </div>
       </div>
     )
   }

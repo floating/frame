@@ -50,7 +50,10 @@ class AddHardware extends React.Component {
                       <>
                         <div className='addAccountItemOptionTitle'>{this.state.status}</div>
                         {this.state.error ? (
-                          <div className='addAccountItemOptionSubmit' onMouseDown={() => this.restart()}>
+                          <div
+                            className='addAccountItemOptionSubmit'
+                            onMouseDown={() => this.restart()}
+                          >
                             try again
                           </div>
                         ) : null}
@@ -71,7 +74,9 @@ class AddHardware extends React.Component {
                       <span>Make sure you've installed </span>
                       <span
                         className='openBridgeUrl'
-                        onClick={() => link.send('tray:openExternal', 'https://wiki.trezor.io/Trezor_Bridge')}
+                        onClick={() =>
+                          link.send('tray:openExternal', 'https://wiki.trezor.io/Trezor_Bridge')
+                        }
                       >
                         Trezor bridge
                       </span>
@@ -91,7 +96,8 @@ class AddHardware extends React.Component {
                 })
               if (this.deviceName === 'ledger')
                 return open('https://shop.ledger.com/pages/ledger-nano-x?r=1fb484cde64f')
-              if (this.deviceName === 'trezor') return open('https://shop.trezor.io/?offer_id=10&aff_id=3270')
+              if (this.deviceName === 'trezor')
+                return open('https://shop.trezor.io/?offer_id=10&aff_id=3270')
             }}
           >
             {``}

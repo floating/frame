@@ -32,7 +32,10 @@ class ChainModule extends React.Component {
       <div
         className='sliceTile sliceTileClickable'
         onClick={() => {
-          link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'customTokens', notifyData: {} } })
+          link.send('tray:action', 'navDash', {
+            view: 'notify',
+            data: { notify: 'customTokens', notifyData: {} },
+          })
         }}
       >
         <div className='sliceTileTokens'>
@@ -47,7 +50,11 @@ class ChainModule extends React.Component {
     const current = connection.current
 
     if (current === 'custom') {
-      if (layer === 'primary' && this.state.primaryCustom !== '' && this.state.primaryCustom !== this.customMessage) {
+      if (
+        layer === 'primary' &&
+        this.state.primaryCustom !== '' &&
+        this.state.primaryCustom !== this.customMessage
+      ) {
         if (!this.okProtocol(this.state.primaryCustom)) status = 'invalid target'
         else if (!this.okPort(this.state.primaryCustom)) status = 'invalid port'
       }
@@ -78,7 +85,12 @@ class ChainModule extends React.Component {
           <div className='connectionOptionStatusIndicatorGood' />
         </div>
       )
-    } else if (status === 'loading' || status === 'syncing' || status === 'pending' || status === 'standby') {
+    } else if (
+      status === 'loading' ||
+      status === 'syncing' ||
+      status === 'pending' ||
+      status === 'standby'
+    ) {
       return (
         <div className='connectionOptionStatusIndicator'>
           <div className='connectionOptionStatusIndicatorPending' />
@@ -99,7 +111,10 @@ class ChainModule extends React.Component {
     let presets = networkPresets[id] || {}
     presets = Object.keys(presets).map((i) => ({ text: i, value: type + ':' + id + ':' + i }))
     presets = presets.concat(
-      Object.keys(networkPresets.default).map((i) => ({ text: i, value: type + ':' + id + ':' + i }))
+      Object.keys(networkPresets.default).map((i) => ({
+        text: i,
+        value: type + ':' + id + ':' + i,
+      }))
     )
     presets.push({ text: 'Custom', value: type + ':' + id + ':' + 'custom' })
 

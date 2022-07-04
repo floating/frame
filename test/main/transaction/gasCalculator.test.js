@@ -54,7 +54,19 @@ describe('#getGasPrices', () => {
 })
 
 describe('#getFeePerGas', () => {
-  let baseFeeHistory = ['0x8', '0x8', '0x8', '0x8', '0x8', '0x8', '0x8', '0x8', '0x8', '0x8', '0xb6']
+  let baseFeeHistory = [
+    '0x8',
+    '0x8',
+    '0x8',
+    '0x8',
+    '0x8',
+    '0x8',
+    '0x8',
+    '0x8',
+    '0x8',
+    '0x8',
+    '0xb6',
+  ]
   let gasUsedRatios = [0.12024061496050893]
   let blockRewards = [['0x3b9aca00']]
 
@@ -83,7 +95,9 @@ describe('#getFeePerGas', () => {
 
   it('calculates the priority fee for the next block based on normal blocks', async () => {
     // all blocks with gas ratios between 0.1 and 0.9 will be considered for calculating the median priority fee
-    gasUsedRatios = [0.12024061496050893, 0.17942918604838942, 0.23114498292513627, 0.1801134637893198]
+    gasUsedRatios = [
+      0.12024061496050893, 0.17942918604838942, 0.23114498292513627, 0.1801134637893198,
+    ]
     blockRewards = [['0xee6b2800'], ['0x3b9aca00'], ['0x77359400'], ['0x3b9aca00']]
 
     const gas = new GasCalculator(testConnection)
@@ -95,7 +109,9 @@ describe('#getFeePerGas', () => {
 
   it('excludes full blocks from the priority fee calculation', async () => {
     // all full blocks (gas ratios above 0.9) will be excluded from calculating the median priority fee
-    gasUsedRatios = [0.91024061496050893, 0.17942918604838942, 0.23114498292513627, 1, 0.1801134637893198]
+    gasUsedRatios = [
+      0.91024061496050893, 0.17942918604838942, 0.23114498292513627, 1, 0.1801134637893198,
+    ]
     blockRewards = [['0xee6b2800'], ['0x3b9aca00'], ['0x77359400'], ['0x77359400'], ['0x3b9aca00']]
 
     const gas = new GasCalculator(testConnection)
@@ -108,7 +124,8 @@ describe('#getFeePerGas', () => {
   it('excludes "empty" blocks from the priority fee calculation', async () => {
     // all empty blocks (gas ratios below 0.9) will be excluded from calculating the median priority fee
     gasUsedRatios = [
-      0.01024061496050893, 0.17942918604838942, 0.23114498292513627, 0.0801134637893198, 0.1801134637893198,
+      0.01024061496050893, 0.17942918604838942, 0.23114498292513627, 0.0801134637893198,
+      0.1801134637893198,
     ]
     blockRewards = [['0xee6b2800'], ['0x3b9aca00'], ['0x77359400'], ['0x77359400'], ['0x3b9aca00']]
 
@@ -121,7 +138,8 @@ describe('#getFeePerGas', () => {
 
   it('uses a default priority fee of one gwei when no eligible blocks are available', async () => {
     gasUsedRatios = [
-      0.01024061496050893, 0.07942918604838942, 1.23114498292513627, 0.0801134637893198, 1.1801134637893198,
+      0.01024061496050893, 0.07942918604838942, 1.23114498292513627, 0.0801134637893198,
+      1.1801134637893198,
     ]
     blockRewards = [['0xee6b2800'], ['0x3b9aca00'], ['0x77359400'], ['0x77359400'], ['0x3b9aca00']]
 

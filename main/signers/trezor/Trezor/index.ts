@@ -39,8 +39,13 @@ export default class Trezor extends Signer {
     this.device = device
     this.id = this.getId()
 
-    const defaultVersion = device.features?.model === 'T' ? defaultTrezorTVersion : defaultTrezorOneVersion
-    const { major_version: major, minor_version: minor, patch_version: patch } = device.features || defaultVersion
+    const defaultVersion =
+      device.features?.model === 'T' ? defaultTrezorTVersion : defaultTrezorOneVersion
+    const {
+      major_version: major,
+      minor_version: minor,
+      patch_version: patch,
+    } = device.features || defaultVersion
     this.appVersion = { major, minor, patch }
 
     const model = (device.features?.model || '').toString() === '1' ? 'One' : device.features?.model
@@ -105,7 +110,9 @@ export default class Trezor extends Signer {
 
         if (err.toLowerCase() !== 'verify address error') this.status = 'loading'
         if (err === 'ui-device_firmware_old')
-          this.status = `Update Firmware (v${this.device.firmwareRelease.release.version.join('.')})`
+          this.status = `Update Firmware (v${this.device.firmwareRelease.release.version.join(
+            '.'
+          )})`
         if (err === 'ui-device_bootloader_mode') this.status = 'Device in Bootloader Mode'
         this.addresses = []
         this.update()
@@ -126,7 +133,13 @@ export default class Trezor extends Signer {
     })
   }
 
-  verifyAddress(index: number, currentAddress: string, display = false, cb: Callback<boolean>, attempt = 0) {
+  verifyAddress(
+    index: number,
+    currentAddress: string,
+    display = false,
+    cb: Callback<boolean>,
+    attempt = 0
+  ) {
     log.info('Verify Address, attempt: ' + attempt)
     let timeout = false
     const timer = setTimeout(() => {
@@ -143,7 +156,10 @@ export default class Trezor extends Signer {
       if (timeout) return
       if (err) {
         if (err === 'Device call in progress' && attempt < 5) {
-          setTimeout(() => this.verifyAddress(index, currentAddress, display, cb, ++attempt), 1000 * (attempt + 1))
+          setTimeout(
+            () => this.verifyAddress(index, currentAddress, display, cb, ++attempt),
+            1000 * (attempt + 1)
+          )
         } else {
           log.error('Verify address error:', err)
 
@@ -175,7 +191,13 @@ export default class Trezor extends Signer {
       }
     }
 
-    flex.rpc('trezor.ethereumGetAddress', this.device.path, this.getPath(index), display, rpcCallback)
+    flex.rpc(
+      'trezor.ethereumGetAddress',
+      this.device.path,
+      this.getPath(index),
+      display,
+      rpcCallback
+    )
   }
 
   lookupAddresses(cb: FlexCallback<Array<string>>) {
@@ -236,7 +258,13 @@ export default class Trezor extends Signer {
       }
     }
 
-    flex.rpc('trezor.ethereumSignMessage', this.device.path, this.getPath(index), this.normalize(message), rpcCallback)
+    flex.rpc(
+      'trezor.ethereumSignMessage',
+      this.device.path,
+      this.getPath(index),
+      this.normalize(message),
+      rpcCallback
+    )
   }
 
   // Standard Methods
@@ -244,7 +272,12 @@ export default class Trezor extends Signer {
     const versionNum = (version.match(/[Vv](\d+)/) || [])[1]
 
     if ((parseInt(versionNum) || 0) < 4) {
-      return cb(new Error(`Invalid version (${version}), Trezor only supports eth_signTypedData version 4+`), undefined)
+      return cb(
+        new Error(
+          `Invalid version (${version}), Trezor only supports eth_signTypedData version 4+`
+        ),
+        undefined
+      )
     }
 
     const rpcCallback: FlexCallback<any> = (err, result) => {
@@ -262,8 +295,18 @@ export default class Trezor extends Signer {
     if (this.isTrezorOne()) {
       // Trezor One requires hashed input
       const { types, primaryType, domain, message } = TypedDataUtils.sanitizeData(typedData)
-      const domainSeparatorHash = TypedDataUtils.hashStruct('EIP712Domain', domain, types, true).toString('hex')
-      const messageHash = TypedDataUtils.hashStruct(primaryType as any, message, types, true).toString('hex')
+      const domainSeparatorHash = TypedDataUtils.hashStruct(
+        'EIP712Domain',
+        domain,
+        types,
+        true
+      ).toString('hex')
+      const messageHash = TypedDataUtils.hashStruct(
+        primaryType as any,
+        message,
+        types,
+        true
+      ).toString('hex')
 
       flex.rpc(
         'trezor.ethereumSignTypedHash',
@@ -275,7 +318,13 @@ export default class Trezor extends Signer {
         rpcCallback
       )
     } else {
-      flex.rpc('trezor.ethereumSignTypedData', this.device.path, this.getPath(index), typedData, rpcCallback)
+      flex.rpc(
+        'trezor.ethereumSignTypedData',
+        this.device.path,
+        this.getPath(index),
+        typedData,
+        rpcCallback
+      )
     }
   }
 

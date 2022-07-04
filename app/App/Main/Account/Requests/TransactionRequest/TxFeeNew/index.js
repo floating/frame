@@ -27,8 +27,14 @@ class TxFee extends React.Component {
     const req = this.props.req
 
     const layer = this.store('main.networks', this.chain.type, this.chain.id, 'layer')
-    const nativeCurrency = this.store('main.networksMeta', this.chain.type, this.chain.id, 'nativeCurrency')
-    const nativeUSD = nativeCurrency && nativeCurrency.usd && layer !== 'testnet' ? nativeCurrency.usd.price : 0
+    const nativeCurrency = this.store(
+      'main.networksMeta',
+      this.chain.type,
+      this.chain.id,
+      'nativeCurrency'
+    )
+    const nativeUSD =
+      nativeCurrency && nativeCurrency.usd && layer !== 'testnet' ? nativeCurrency.usd.price : 0
 
     let maxFeePerGas, maxFee, maxFeeUSD
 
@@ -54,7 +60,8 @@ class TxFee extends React.Component {
     const minFee = minFeePerGas.multipliedBy(minGas)
     const minFeeUSD = minFee.shiftedBy(-18).multipliedBy(nativeUSD)
 
-    const currentSymbol = this.store('main.networks', this.props.chain.type, this.props.chain.id, 'symbol') || '?'
+    const currentSymbol =
+      this.store('main.networks', this.props.chain.type, this.props.chain.id, 'symbol') || '?'
 
     return (
       <div className='_txFee'>
@@ -80,7 +87,8 @@ class TxFee extends React.Component {
               <div className='_txFeeValue'>
                 <div
                   className={
-                    maxFeeUSD.toNumber() > FEE_WARNING_THRESHOLD_USD || this.toDisplayUSD(maxFeeUSD) === '0.00'
+                    maxFeeUSD.toNumber() > FEE_WARNING_THRESHOLD_USD ||
+                    this.toDisplayUSD(maxFeeUSD) === '0.00'
                       ? '_txFeeValueDefault _txFeeValueDefaultWarn'
                       : '_txFeeValueDefault'
                   }

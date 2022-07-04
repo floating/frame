@@ -23,7 +23,8 @@ const events = new EventEmitter()
 const frameManager = new FrameManager()
 const isDev = process.env.NODE_ENV === 'development'
 const fullheight = !!process.env.FULL_HEIGHT
-const openedAtLogin = app && app.getLoginItemSettings() && app.getLoginItemSettings().wasOpenedAtLogin
+const openedAtLogin =
+  app && app.getLoginItemSettings() && app.getLoginItemSettings().wasOpenedAtLogin
 const windows: Windows = {}
 const showOnReady = true
 const trayWidth = 380
@@ -119,18 +120,28 @@ function initTrayWindow() {
   windows.tray.webContents.on('will-navigate', (e) => e.preventDefault()) // Prevent navigation
   windows.tray.webContents.on('will-attach-webview', (e) => e.preventDefault()) // Prevent attaching <webview>
   windows.tray.webContents.on('new-window', (e) => e.preventDefault()) // Prevent new windows
-  windows.tray.webContents.session.setPermissionRequestHandler((webContents, permission, res) => res(false))
+  windows.tray.webContents.session.setPermissionRequestHandler((webContents, permission, res) =>
+    res(false)
+  )
   windows.tray.setResizable(false)
   windows.tray.setMovable(false)
   windows.tray.setSize(0, 0)
 
-  const { width, height, x, y } = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
+  const { width, height, x, y } = screen.getDisplayNearestPoint(
+    screen.getCursorScreenPoint()
+  ).workArea
   windows.tray.setPosition(width + x, height + y)
 
   if (process.platform === 'linux') {
     const quitMenuItem = { label: 'Quit', click: () => app.quit() }
-    const menuShow = Menu.buildFromTemplate([{ label: 'Show', click: () => tray.show() }, quitMenuItem])
-    const menuHide = Menu.buildFromTemplate([{ label: 'Hide', click: () => tray.hide() }, quitMenuItem])
+    const menuShow = Menu.buildFromTemplate([
+      { label: 'Show', click: () => tray.show() },
+      quitMenuItem,
+    ])
+    const menuHide = Menu.buildFromTemplate([
+      { label: 'Hide', click: () => tray.hide() },
+      quitMenuItem,
+    ])
     windows.tray.on('show', () => {
       tray.setContextMenu(menuHide)
     })
@@ -340,14 +351,18 @@ if (isDev) {
   })
   if (process.env.BUNDLE_LOCATION) {
     const watch = require('node-watch')
-    watch(path.resolve(process.env.BUNDLE_LOCATION), { recursive: true }, (_evt: Event, name: string) => {
-      if (name.indexOf('css') > -1) {
-        Object.keys(windows).forEach((win) => {
-          windows[win].webContents.send('main:reload:style', name)
-        })
-        frameManager.reloadFrames(name)
+    watch(
+      path.resolve(process.env.BUNDLE_LOCATION),
+      { recursive: true },
+      (_evt: Event, name: string) => {
+        if (name.indexOf('css') > -1) {
+          Object.keys(windows).forEach((win) => {
+            windows[win].webContents.send('main:reload:style', name)
+          })
+          frameManager.reloadFrames(name)
+        }
       }
-    })
+    )
   }
 }
 
@@ -357,7 +372,8 @@ ipcMain.on('*:contextmenu', (e, x, y) => {
   }
 })
 
-const windowFromWebContents = (webContents: WebContents) => BrowserWindow.fromWebContents(webContents) as BrowserWindow
+const windowFromWebContents = (webContents: WebContents) =>
+  BrowserWindow.fromWebContents(webContents) as BrowserWindow
 
 const init = () => {
   if (tray) {

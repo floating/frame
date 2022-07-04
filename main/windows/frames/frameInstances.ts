@@ -13,7 +13,9 @@ export interface FrameInstance extends BrowserWindow {
 }
 
 const place = (frameInstance: FrameInstance) => {
-  const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
+  const area = electron.screen.getDisplayNearestPoint(
+    electron.screen.getCursorScreenPoint()
+  ).workArea
   const height = area.height - 160
   const maxWidth = Math.floor(height * 1.24)
   const targetWidth = area.width - 460

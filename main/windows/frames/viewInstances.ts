@@ -80,7 +80,12 @@ export default {
 
     frameInstance.addBrowserView(viewInstance)
 
-    viewInstance.setBounds({ x: 0, y: fullscreen ? 0 : 32, width: width, height: fullscreen ? height : height - 32 })
+    viewInstance.setBounds({
+      x: 0,
+      y: fullscreen ? 0 : 32,
+      width: width,
+      height: fullscreen ? height : height - 32,
+    })
 
     viewInstance.setAutoResize({ width: true, height: true })
 
@@ -119,7 +124,8 @@ export default {
     const { ens, session } = extract(url)
     server.sessions.remove(ens, session)
 
-    if (frameInstance && !frameInstance.isDestroyed()) frameInstance.removeBrowserView(views[viewId])
+    if (frameInstance && !frameInstance.isDestroyed())
+      frameInstance.removeBrowserView(views[viewId])
 
     const webcontents = views[viewId].webContents as any
     webcontents.destroy()
@@ -132,7 +138,12 @@ export default {
     const viewInstance = (frameInstance.views || {})[viewId]
     if (viewInstance) {
       const { width, height } = frameInstance.getBounds()
-      viewInstance.setBounds({ x: 0, y: fullscreen ? 0 : 32, width: width, height: fullscreen ? height : height - 32 })
+      viewInstance.setBounds({
+        x: 0,
+        y: fullscreen ? 0 : 32,
+        width: width,
+        height: fullscreen ? height : height - 32,
+      })
       // viewInstance.setBounds({ x: 73, y: 16, width: width - 73, height: height - 16 })
       viewInstance.setAutoResize({ width: true, height: true })
     }

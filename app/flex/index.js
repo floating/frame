@@ -10,7 +10,11 @@ import Trezor from './trezor'
 // Emitter Transport
 const emit = (eventName, ...args) => {
   // console.log('emit', eventName, ...args)
-  link.send('tray:flex:event', eventName, ...args.map((arg) => (arg instanceof Error ? wrap(arg.message) : wrap(arg))))
+  link.send(
+    'tray:flex:event',
+    eventName,
+    ...args.map((arg) => (arg instanceof Error ? wrap(arg.message) : wrap(arg)))
+  )
 }
 
 const flex = {
@@ -29,10 +33,18 @@ link.on('flex', (id, target, ...args) => {
   args = args.map((arg) => unwrap(arg))
   if (flex[lib] && flex[lib][method]) {
     flex[lib][method](...args, (...args) => {
-      link.send('tray:flex:res', id, ...args.map((arg) => (arg instanceof Error ? wrap(arg.message) : wrap(arg))))
+      link.send(
+        'tray:flex:res',
+        id,
+        ...args.map((arg) => (arg instanceof Error ? wrap(arg.message) : wrap(arg)))
+      )
     })
   } else {
     const args = [new Error('Unknown flex lib:method: ' + target)]
-    link.send('tray:flex:res', id, ...args.map((arg) => (arg instanceof Error ? wrap(arg.message) : wrap(arg))))
+    link.send(
+      'tray:flex:res',
+      id,
+      ...args.map((arg) => (arg instanceof Error ? wrap(arg.message) : wrap(arg)))
+    )
   }
 })

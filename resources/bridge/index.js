@@ -24,7 +24,10 @@ window.addEventListener(
       if (data.method === 'invoke') {
         ;(async () => {
           const args = await ipcRenderer.invoke(...data.args)
-          window.postMessage(wrap({ method: 'invoke', channel: 'action', id: data.id, args, source }), '*')
+          window.postMessage(
+            wrap({ method: 'invoke', channel: 'action', id: data.id, args, source }),
+            '*'
+          )
         })()
       }
     }

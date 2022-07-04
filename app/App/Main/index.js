@@ -83,7 +83,10 @@ class Main extends React.Component {
             }}
             style={current ? { overflow: 'visible' } : {}}
           >
-            <div id='panelWrap' style={current && scrollTop > 0 ? { marginTop: '-' + scrollTop + 'px' } : {}}>
+            <div
+              id='panelWrap'
+              style={current && scrollTop > 0 ? { marginTop: '-' + scrollTop + 'px' } : {}}
+            >
               {/* {untethered.sort().map((id, i) => <PendingSigner key={'signers' + id} {...this.store('main.signers', id)} index={i} />)} */}
               {sortedAccounts.map((id, i) => {
                 const account = accounts[id]

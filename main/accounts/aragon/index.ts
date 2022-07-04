@@ -73,9 +73,16 @@ async function resolveName(name: string, chainId: number) {
           if (name) appsSummary[name] = { proxyAddress }
         })
         if (!appsSummary.kernel) return reject(new Error('Unable to locate DAO kernel'))
-        if (!appsSummary.agent) return reject(new Error('Unable to locate DAO agent, make sure it is installed'))
+        if (!appsSummary.agent)
+          return reject(new Error('Unable to locate DAO agent, make sure it is installed'))
 
-        resolve({ name: domain.split('.')[0], domain, apps: appsSummary, ens: address, network: chainId })
+        resolve({
+          name: domain.split('.')[0],
+          domain,
+          apps: appsSummary,
+          ens: address,
+          network: chainId,
+        })
       })
     } catch (e) {
       reject(e)

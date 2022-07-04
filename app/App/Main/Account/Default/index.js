@@ -7,7 +7,9 @@ class Block extends React.Component {
     this.moduleRef = React.createRef()
     this.resizeObserver = new ResizeObserver(() => {
       if (this.moduleRef && this.moduleRef.current) {
-        link.send('tray:action', 'updateAccountModule', props.id, { height: this.moduleRef.current.clientHeight })
+        link.send('tray:action', 'updateAccountModule', props.id, {
+          height: this.moduleRef.current.clientHeight,
+        })
       }
     })
   }

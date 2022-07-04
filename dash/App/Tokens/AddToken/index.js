@@ -32,7 +32,11 @@ class AddToken extends Component {
   }
 
   async updateTokenData(contractAddress, chainId) {
-    const { name, symbol, decimals } = await link.invoke('tray:getTokenDetails', contractAddress, chainId)
+    const { name, symbol, decimals } = await link.invoke(
+      'tray:getTokenDetails',
+      contractAddress,
+      chainId
+    )
     this.setState({
       name: name || this.nameDefault,
       symbol: symbol || this.symbolDefault,
@@ -79,7 +83,9 @@ class AddToken extends Component {
                 <label className='tokenInputLabel'>
                   Token Name
                   <input
-                    className={`tokenInput tokenInputAddress ${this.isDefault('name') ? 'tokenInputDim' : ''}`}
+                    className={`tokenInput tokenInputAddress ${
+                      this.isDefault('name') ? 'tokenInputDim' : ''
+                    }`}
                     value={this.state.name}
                     spellCheck='false'
                     onChange={(e) => {
@@ -101,7 +107,9 @@ class AddToken extends Component {
                 <label className='tokenInputLabel'>
                   Symbol
                   <input
-                    className={`tokenInput tokenInputAddress ${this.isDefault('symbol') ? 'tokenInputDim' : ''}`}
+                    className={`tokenInput tokenInputAddress ${
+                      this.isDefault('symbol') ? 'tokenInputDim' : ''
+                    }`}
                     value={this.state.symbol}
                     spellCheck='false'
                     onChange={(e) => {
@@ -122,7 +130,9 @@ class AddToken extends Component {
                 <label className='tokenInputLabel'>
                   Decimals
                   <input
-                    className={`tokenInput tokenInputAddress ${this.isDefault('decimals') ? 'tokenInputDim' : ''}`}
+                    className={`tokenInput tokenInputAddress ${
+                      this.isDefault('decimals') ? 'tokenInputDim' : ''
+                    }`}
                     value={this.state.decimals}
                     spellCheck='false'
                     onChange={(e) => {
@@ -156,7 +166,10 @@ class AddToken extends Component {
                         this.updateTokenData(this.state.address, chainId)
                       }
                     }}
-                    options={this.activeChains.map((chain) => ({ text: chain.name, value: chain.id }))}
+                    options={this.activeChains.map((chain) => ({
+                      text: chain.name,
+                      value: chain.id,
+                    }))}
                   />
                 </label>
               </div>
@@ -167,7 +180,9 @@ class AddToken extends Component {
                 <label className='tokenInputLabel'>
                   Contract Address
                   <input
-                    className={`tokenInput tokenInputAddress ${this.isDefault('address') ? 'tokenInputDim' : ''}`}
+                    className={`tokenInput tokenInputAddress ${
+                      this.isDefault('address') ? 'tokenInputDim' : ''
+                    }`}
                     value={this.state.address}
                     spellCheck='false'
                     onChange={(e) => {
@@ -196,7 +211,9 @@ class AddToken extends Component {
                 <label className='tokenInputLabel'>
                   Logo URI
                   <input
-                    className={`tokenInput tokenInputAddress ${this.isDefault('logoURI') ? 'tokenInputDim' : ''}`}
+                    className={`tokenInput tokenInputAddress ${
+                      this.isDefault('logoURI') ? 'tokenInputDim' : ''
+                    }`}
                     value={this.state.logoURI}
                     spellCheck='false'
                     onChange={(e) => {

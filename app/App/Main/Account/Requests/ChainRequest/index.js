@@ -49,9 +49,17 @@ class ChainRequest extends React.Component {
                     </div>
                   )
                 } else if (status === 'success') {
-                  return <div className='requestNoticeInner scaleIn'>{svg.octicon('check', { height: 80 })}</div>
+                  return (
+                    <div className='requestNoticeInner scaleIn'>
+                      {svg.octicon('check', { height: 80 })}
+                    </div>
+                  )
                 } else if (status === 'error' || status === 'declined') {
-                  return <div className='requestNoticeInner scaleIn'>{svg.octicon('circle-slash', { height: 80 })}</div>
+                  return (
+                    <div className='requestNoticeInner scaleIn'>
+                      {svg.octicon('circle-slash', { height: 80 })}
+                    </div>
+                  )
                 }
               })()}
             </div>
@@ -59,18 +67,26 @@ class ChainRequest extends React.Component {
             <div className='approveTransactionPayload'>
               {type === 'switchChain' ? (
                 <div className='approveRequestHeader approveTransactionHeader'>
-                  <div className='approveRequestHeaderIcon'> {svg.octicon('shield', { height: 20 })}</div>
+                  <div className='approveRequestHeaderIcon'>
+                    {' '}
+                    {svg.octicon('shield', { height: 20 })}
+                  </div>
                   <div className='approveRequestHeaderLabel'> Switch Chain</div>
                 </div>
               ) : (
                 <div className='approveRequestHeader approveTransactionHeader'>
-                  <div className='approveRequestHeaderIcon'> {svg.octicon('shield', { height: 20 })}</div>
+                  <div className='approveRequestHeaderIcon'>
+                    {' '}
+                    {svg.octicon('shield', { height: 20 })}
+                  </div>
                   <div className='approveRequestHeaderLabel'> Add Chain</div>
                 </div>
               )}
               <div className='requestChain scaleIn'>
                 <div className='requestChainInner'>
-                  <div className={originClass}>{this.store('main.origins', this.props.req.origin, 'name')}</div>
+                  <div className={originClass}>
+                    {this.store('main.origins', this.props.req.origin, 'name')}
+                  </div>
                   <div className={'requestChainOriginSub'}>
                     {type === 'switchChain' ? 'wants to switch to chain' : 'wants to add chain'}
                   </div>
@@ -90,7 +106,8 @@ class ChainRequest extends React.Component {
               className='requestDecline'
               style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none' }}
               onClick={() => {
-                if (this.state.allowInput) link.send('tray:switchChain', false, false, this.props.req)
+                if (this.state.allowInput)
+                  link.send('tray:switchChain', false, false, this.props.req)
               }}
             >
               <div className='requestDeclineButton _txButton _txButtonBad'>Decline</div>
@@ -99,7 +116,8 @@ class ChainRequest extends React.Component {
               className='requestSign'
               style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none' }}
               onClick={() => {
-                if (this.state.allowInput) link.send('tray:switchChain', chain.type, parseInt(chain.id), this.props.req)
+                if (this.state.allowInput)
+                  link.send('tray:switchChain', chain.type, parseInt(chain.id), this.props.req)
               }}
             >
               <div className='requestSignButton _txButton'>Switch</div>
@@ -111,7 +129,8 @@ class ChainRequest extends React.Component {
               className='requestDecline'
               style={{ pointerEvents: this.state.allowInput && this.props.onTop ? 'auto' : 'none' }}
               onClick={() => {
-                if (this.state.allowInput && this.props.onTop) link.send('tray:addChain', false, this.props.req)
+                if (this.state.allowInput && this.props.onTop)
+                  link.send('tray:addChain', false, this.props.req)
               }}
             >
               <div className='requestDeclineButton _txButton _txButtonBad'>Decline</div>
@@ -120,7 +139,8 @@ class ChainRequest extends React.Component {
               className='requestSign'
               style={{ pointerEvents: this.state.allowInput && this.props.onTop ? 'auto' : 'none' }}
               onClick={() => {
-                if (this.state.allowInput && this.props.onTop) this.store.notify('addChain', this.props.req)
+                if (this.state.allowInput && this.props.onTop)
+                  this.store.notify('addChain', this.props.req)
               }}
             >
               <div className='requestSignButton _txButton'>Review</div>

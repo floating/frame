@@ -28,7 +28,9 @@ class Requests extends React.Component {
     this.moduleRef = React.createRef()
     this.resizeObserver = new ResizeObserver(() => {
       if (this.moduleRef && this.moduleRef.current) {
-        link.send('tray:action', 'updateAccountModule', props._id, { height: this.moduleRef.current.clientHeight })
+        link.send('tray:action', 'updateAccountModule', props._id, {
+          height: this.moduleRef.current.clientHeight,
+        })
       }
     })
   }
@@ -70,7 +72,9 @@ class Requests extends React.Component {
   componentDidMount() {
     this.resizeObserver.observe(this.moduleRef.current)
     if (this.moduleRef && this.moduleRef.current) {
-      link.send('tray:action', 'updateAccountModule', this.props._id, { height: this.moduleRef.current.clientHeight })
+      link.send('tray:action', 'updateAccountModule', this.props._id, {
+        height: this.moduleRef.current.clientHeight,
+      })
     }
     setTimeout(() => {
       const current = this.store('selected.current') === this.props.id && this.props.status === 'ok'
@@ -100,7 +104,11 @@ class Requests extends React.Component {
     return (
       <div
         ref={this.moduleRef}
-        className={this.store('selected.view') === 'default' ? 'signerRequests' : 'signerRequests signerRequestsHidden'}
+        className={
+          this.store('selected.view') === 'default'
+            ? 'signerRequests'
+            : 'signerRequests signerRequestsHidden'
+        }
       >
         <div className='requestContainerWrap'>
           <div className='requestContainer'>
@@ -193,7 +201,11 @@ class Requests extends React.Component {
                   />
                 )
               } else if (req.type === 'transaction') {
-                const chainName = this.store('main.networks.ethereum', parseInt(req.data.chainId, 16), 'name')
+                const chainName = this.store(
+                  'main.networks.ethereum',
+                  parseInt(req.data.chainId, 16),
+                  'name'
+                )
                 const hexId = req.data.chainId
                 chainMeta[hexId] ? chainMeta[hexId].primaryColor : ''
                 chainMeta[hexId] ? chainMeta[hexId].icon : ''

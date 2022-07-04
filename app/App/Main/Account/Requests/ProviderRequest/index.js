@@ -38,7 +38,9 @@ class ProviderRequest extends React.Component {
               ) : status === 'success' ? (
                 <div className='requestNoticeInner'>{svg.octicon('check', { height: 80 })}</div>
               ) : status === 'error' || status === 'declined' ? (
-                <div className='requestNoticeInner'>{svg.octicon('circle-slash', { height: 80 })}</div>
+                <div className='requestNoticeInner'>
+                  {svg.octicon('circle-slash', { height: 80 })}
+                </div>
               ) : null}
             </div>
           ) : (

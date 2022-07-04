@@ -29,12 +29,16 @@ class Notify extends React.Component {
               Please read{' '}
               <span
                 onMouseDown={() => {
-                  link.send('tray:openExternal', 'https://github.com/floating/frame/blob/master/LICENSE')
+                  link.send(
+                    'tray:openExternal',
+                    'https://github.com/floating/frame/blob/master/LICENSE'
+                  )
                 }}
               >
                 our license
               </span>
-              , use at your own risk and verify transactions and account details on a signing device whenever possible.
+              , use at your own risk and verify transactions and account details on a signing device
+              whenever possible.
             </div>
           </div>
           <div className='notifyInput'>
@@ -67,18 +71,22 @@ class Notify extends React.Component {
                 We are excited to welcome you to the next iteration of Frame!
               </div>
               <div className='notifyBodyBlock'>
-                Be advised, this version of Frame is currently in "beta" and will update on a beta track
+                Be advised, this version of Frame is currently in "beta" and will update on a beta
+                track
               </div>
               <div className='notifyBodyBlock'>
-                Use hardware signers for high value accounts and verify all transaction and account details on your
-                signing device
+                Use hardware signers for high value accounts and verify all transaction and account
+                details on your signing device
               </div>
               <div className='notifyBodyBlock'>
                 <span>Read</span>
                 <span
                   className='notifyBodyLink'
                   onMouseDown={() => {
-                    link.send('tray:openExternal', 'https://github.com/floating/frame/blob/0.5/LICENSE')
+                    link.send(
+                      'tray:openExternal',
+                      'https://github.com/floating/frame/blob/0.5/LICENSE'
+                    )
                   }}
                 >
                   our license
@@ -182,8 +190,8 @@ class Notify extends React.Component {
             <div className='notifyBody'>
               <div className='notifyBodyBlock notifyBodyBlockBig'>
                 <div>
-                  Adjusting the nonce of a replacement transaction will cause it to become a new transaction rather than
-                  a replacement, use with caution
+                  Adjusting the nonce of a replacement transaction will cause it to become a new
+                  transaction rather than a replacement, use with caution
                 </div>
               </div>
             </div>
@@ -213,7 +221,9 @@ class Notify extends React.Component {
                 <div className='notifyBodyLine notifyBodyPrice'>{`≈ $${feeUSD} in ${currentSymbol}`}</div>
               </>
             ) : (
-              <div className='notifyBodyLine'>We were unable to determine this transaction's fee in USD.</div>
+              <div className='notifyBodyLine'>
+                We were unable to determine this transaction's fee in USD.
+              </div>
             )}
             <div className='notifyBodyQuestion'>Are you sure you want to proceed?</div>
           </div>
@@ -236,7 +246,10 @@ class Notify extends React.Component {
               <div className='notifyInputOptionText'>Proceed</div>
             </div>
           </div>
-          <div className='notifyCheck' onMouseDown={() => link.send('tray:action', 'toggleGasFeeWarning')}>
+          <div
+            className='notifyCheck'
+            onMouseDown={() => link.send('tray:action', 'toggleGasFeeWarning')}
+          >
             <div className='notifyCheckBox'>
               {this.store('main.mute.gasFeeWarning') ? svg.octicon('check', { height: 26 }) : null}
             </div>
@@ -277,7 +290,9 @@ class Notify extends React.Component {
           <div className='notifyTitle'>No Signer Attached!</div>
           <div className='notifyBody'>
             <div className='notifyBodyLine'>No signer attached for this account</div>
-            <div className='notifyBodyQuestion'>Please attach a signer that can sign for this account</div>
+            <div className='notifyBodyQuestion'>
+              Please attach a signer that can sign for this account
+            </div>
           </div>
           <div className='notifyInput'>
             <div
@@ -311,7 +326,9 @@ class Notify extends React.Component {
               }transactions. Your transaction will be converted to a legacy transaction before signing.`}
             </div>
             {['lattice', 'ledger'].includes(signer) ? (
-              <div className='notifyBodyUpdate'>{`Update your ${capitalize(signer)} to enable compatibility`}</div>
+              <div className='notifyBodyUpdate'>{`Update your ${capitalize(
+                signer
+              )} to enable compatibility`}</div>
             ) : null}
             <div className='notifyBodyQuestion'>Do you want to proceed?</div>
           </div>
@@ -329,10 +346,18 @@ class Notify extends React.Component {
               onMouseDown={() => {
                 // TODO: Transacionns need a better flow to respond to mutiple notifications after hitting sign
                 const layer = this.store('main.networks', chain.type, chain.id, 'layer')
-                const nativeCurrency = this.store('main.networksMeta', chain.type, chain.id, 'nativeCurrency')
+                const nativeCurrency = this.store(
+                  'main.networksMeta',
+                  chain.type,
+                  chain.id,
+                  'nativeCurrency'
+                )
                 const nativeUSD =
-                  nativeCurrency && nativeCurrency.usd && layer !== 'testnet' ? nativeCurrency.usd.price : 0
-                const currentSymbol = this.store('main.networks', chain.type, chain.id, 'symbol') || '?'
+                  nativeCurrency && nativeCurrency.usd && layer !== 'testnet'
+                    ? nativeCurrency.usd.price
+                    : 0
+                const currentSymbol =
+                  this.store('main.networks', chain.type, chain.id, 'symbol') || '?'
 
                 let maxFeePerGas, maxFee, maxFeeUSD
 
@@ -349,7 +374,8 @@ class Notify extends React.Component {
                 }
 
                 if (
-                  (maxFeeUSD.toNumber() > FEE_WARNING_THRESHOLD_USD || this.toDisplayUSD(maxFeeUSD) === '0.00') &&
+                  (maxFeeUSD.toNumber() > FEE_WARNING_THRESHOLD_USD ||
+                    this.toDisplayUSD(maxFeeUSD) === '0.00') &&
                   !this.store('main.mute.gasFeeWarning')
                 ) {
                   link.send('tray:action', 'navDash', {
@@ -368,9 +394,14 @@ class Notify extends React.Component {
               <div className='notifyInputOptionText'>Proceed</div>
             </div>
           </div>
-          <div className='notifyCheck' onMouseDown={() => link.send('tray:action', 'toggleSignerCompatibilityWarning')}>
+          <div
+            className='notifyCheck'
+            onMouseDown={() => link.send('tray:action', 'toggleSignerCompatibilityWarning')}
+          >
             <div className='notifyCheckBox'>
-              {this.store('main.mute.signerCompatibilityWarning') ? svg.octicon('check', { height: 26 }) : null}
+              {this.store('main.mute.signerCompatibilityWarning')
+                ? svg.octicon('check', { height: 26 })
+                : null}
             </div>
             <div className='notifyCheckText'>{"Don't show this warning again"}</div>
           </div>
@@ -384,7 +415,11 @@ class Notify extends React.Component {
       <div
         className='notifyBoxWrap'
         onMouseDown={(e) => e.stopPropagation()}
-        style={this.store('view.notify') === 'contractData' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}
+        style={
+          this.store('view.notify') === 'contractData'
+            ? { transform: 'translateX(calc(-100% - 100px))' }
+            : {}
+        }
       >
         <div className='notifyBox'>
           <div className='notifyTitle'>
@@ -392,7 +427,9 @@ class Notify extends React.Component {
             <div>Not Allowed</div>
           </div>
           <div className='notifyBody'>
-            <div className='notifyBodyLine'>Your Ledger currently doesn't allow signing of contract data.</div>
+            <div className='notifyBodyLine'>
+              Your Ledger currently doesn't allow signing of contract data.
+            </div>
             <div className='notifyBodyLine'>
               <span>To change this settings go to</span>
               <br />
@@ -424,7 +461,9 @@ class Notify extends React.Component {
         className='notifyBoxWrap'
         onMouseDown={(e) => e.stopPropagation()}
         style={
-          this.store('view.notify') === 'hotAccountWarning' ? { transform: 'translateX(calc(-100% - 100px))' } : {}
+          this.store('view.notify') === 'hotAccountWarning'
+            ? { transform: 'translateX(calc(-100% - 100px))' }
+            : {}
         }
       >
         <div className='notifyBox'>
@@ -433,8 +472,8 @@ class Notify extends React.Component {
           </div>
           <div className='notifyBody'>
             <div className='notifyBodyLine'>
-              Frame hot signers are in alpha! Do not use them with high value accounts and verify your backups are
-              valid. Only proceed if you understand and accept these risks.
+              Frame hot signers are in alpha! Do not use them with high value accounts and verify
+              your backups are valid. Only proceed if you understand and accept these risks.
             </div>
           </div>
           <div className='notifyInput'>
@@ -458,7 +497,9 @@ class Notify extends React.Component {
         className='notifyBoxWrap'
         onMouseDown={(e) => e.stopPropagation()}
         style={
-          this.store('view.notify') === 'hotSignerMismatch' ? { transform: 'translateX(calc(-100% - 100px))' } : {}
+          this.store('view.notify') === 'hotSignerMismatch'
+            ? { transform: 'translateX(calc(-100% - 100px))' }
+            : {}
         }
       >
         <div className='notifyBox'>
@@ -467,7 +508,8 @@ class Notify extends React.Component {
           </div>
           <div className='notifyBody'>
             <div className='notifyBodyLine'>
-              The unlocked hot signer did not match the address shown in Frame and has been relocked.
+              The unlocked hot signer did not match the address shown in Frame and has been
+              relocked.
             </div>
           </div>
           <div className='notifyInput'>
@@ -524,7 +566,9 @@ class Notify extends React.Component {
         <div className='notifyBox'>
           <div className='notifyTitle'>Open Block Explorer</div>
           <div className='notifyBody'>
-            <div className='notifyBodyLine'>Frame will open a block explorer in your browser for transaction:</div>
+            <div className='notifyBodyLine'>
+              Frame will open a block explorer in your browser for transaction:
+            </div>
             <div className='notifyBodyHash'>{hash}</div>
           </div>
           <div className='notifyInput'>
@@ -553,7 +597,9 @@ class Notify extends React.Component {
             }}
           >
             <div className='notifyCheckBox'>
-              {this.store('main.mute.explorerWarning') ? svg.octicon('check', { height: 26 }) : null}
+              {this.store('main.mute.explorerWarning')
+                ? svg.octicon('check', { height: 26 })
+                : null}
             </div>
             <div className='notifyCheckText'>{"Don't show this warning again"}</div>
           </div>

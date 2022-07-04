@@ -10,7 +10,9 @@ const weiIntToEthInt = (wei: number) => wei / 1e18
 const gweiToWeiHex = (gwei: number) => intToHex(gweiToWei(gwei))
 
 function randomLetters(num: number) {
-  return [...Array(num)].map(() => String.fromCharCode(65 + Math.floor(Math.random() * 26))).join('')
+  return [...Array(num)]
+    .map(() => String.fromCharCode(65 + Math.floor(Math.random() * 26)))
+    .join('')
 }
 
 function capitalize(s: string) {

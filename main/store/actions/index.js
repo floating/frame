@@ -22,7 +22,9 @@ function validateNetworkSettings(network) {
 
 function includesToken(tokens, token) {
   const existingAddress = token.address.toLowerCase()
-  return tokens.some((t) => t.address.toLowerCase() === existingAddress && t.chainId === token.chainId)
+  return tokens.some(
+    (t) => t.address.toLowerCase() === existingAddress && t.chainId === token.chainId
+  )
 }
 
 module.exports = {
@@ -140,7 +142,8 @@ module.exports = {
     u('main.lattice', id, key, () => value)
   },
   updateLattice: (u, deviceId, update) => {
-    if (deviceId && update) u('main.lattice', deviceId, (current = {}) => Object.assign(current, update))
+    if (deviceId && update)
+      u('main.lattice', deviceId, (current = {}) => Object.assign(current, update))
   },
   removeLattice: (u, deviceId) => {
     if (deviceId) {
@@ -213,7 +216,10 @@ module.exports = {
     }
   },
   setNativeCurrencyData: (u, netType, netId, currency) => {
-    u('main.networksMeta', netType, netId, 'nativeCurrency', (existing) => ({ ...existing, ...currency }))
+    u('main.networksMeta', netType, netId, 'nativeCurrency', (existing) => ({
+      ...existing,
+      ...currency,
+    }))
   },
   addNetwork: (u, net) => {
     try {
@@ -479,7 +485,9 @@ module.exports = {
   },
   setBalance: (u, address, balance) => {
     u('main.balances', address, (balances = []) => {
-      const existingBalances = balances.filter((b) => b.address !== balance.address || b.chainId !== balance.chainId)
+      const existingBalances = balances.filter(
+        (b) => b.address !== balance.address || b.chainId !== balance.chainId
+      )
 
       return [...existingBalances, balance]
     })

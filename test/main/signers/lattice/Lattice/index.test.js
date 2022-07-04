@@ -598,7 +598,10 @@ describe('#signTransaction', () => {
 
   beforeEach(() => {
     lattice.appVersion = { major: 1, minor: 1, patch: 0 }
-    lattice.connection = { sign: jest.fn(), getFwVersion: async () => ({ major: 1, minor: 3, fix: 5 }) }
+    lattice.connection = {
+      sign: jest.fn(),
+      getFwVersion: async () => ({ major: 1, minor: 3, fix: 5 }),
+    }
   })
 
   it('signs a legacy transaction', (done) => {

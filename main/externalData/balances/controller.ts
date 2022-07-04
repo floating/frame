@@ -58,7 +58,9 @@ export default class BalancesWorkerController extends EventEmitter {
 
     this.worker.on('close', (code, signal) => {
       // emitted after exit or error and when all stdio streams are closed
-      log.warn(`balances worker exited with code ${code}, signal: ${signal}, pid: ${this.worker.pid}`)
+      log.warn(
+        `balances worker exited with code ${code}, signal: ${signal}, pid: ${this.worker.pid}`
+      )
       this.worker.removeAllListeners()
 
       this.emit('close')

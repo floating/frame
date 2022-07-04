@@ -51,7 +51,8 @@ function toBN(hexStr: string) {
 function signerCompatibility(txData: TransactionData, signer: SignerSummary): SignerCompatibility {
   if (typeSupportsBaseFee(txData.type)) {
     const compatible =
-      signer.type in londonHardforkSigners && londonHardforkSigners[signer.type](signer.appVersion, signer.model)
+      signer.type in londonHardforkSigners &&
+      londonHardforkSigners[signer.type](signer.appVersion, signer.model)
     return { signer: signer.type, tx: 'london', compatible }
   }
 
@@ -120,8 +121,14 @@ function hexifySignature({ v, r, s }: Signature) {
   }
 }
 
-async function sign(rawTx: TransactionData, signingFn: (tx: TypedTransaction) => Promise<Signature>) {
-  const common = chainConfig(parseInt(rawTx.chainId), parseInt(rawTx.type) === 2 ? 'london' : 'berlin')
+async function sign(
+  rawTx: TransactionData,
+  signingFn: (tx: TypedTransaction) => Promise<Signature>
+) {
+  const common = chainConfig(
+    parseInt(rawTx.chainId),
+    parseInt(rawTx.type) === 2 ? 'london' : 'berlin'
+  )
 
   const tx = TransactionFactory.fromTxData(rawTx, { common })
 

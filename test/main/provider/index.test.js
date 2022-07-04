@@ -16,7 +16,11 @@ const address = '0x22dd63c3619818fdbc262c78baee43cb61e9cccf'
 let accountRequests = []
 
 jest.mock('../../../main/store')
-jest.mock('../../../main/chains', () => ({ send: jest.fn(), syncDataEmit: jest.fn(), on: jest.fn() }))
+jest.mock('../../../main/chains', () => ({
+  send: jest.fn(),
+  syncDataEmit: jest.fn(),
+  on: jest.fn(),
+}))
 jest.mock('../../../main/accounts', () => ({}))
 
 beforeAll(async () => {
@@ -43,7 +47,13 @@ beforeEach(() => {
 
   provider.handlers = {}
 
-  const eventTypes = ['accountsChanged', 'chainChanged', 'chainsChanged', 'assetsChanged', 'networkChanged']
+  const eventTypes = [
+    'accountsChanged',
+    'chainChanged',
+    'chainsChanged',
+    'assetsChanged',
+    'networkChanged',
+  ]
   eventTypes.forEach((eventType) => (provider.subscriptions[eventType] = []))
 
   accountRequests = []
@@ -57,14 +67,18 @@ beforeEach(() => {
   }
 
   accounts.current = jest.fn(() => ({ id: address, getAccounts: () => [address] }))
-  accounts.get = jest.fn((addr) => (addr === address ? { address, lastSignerType: 'ring' } : undefined))
+  accounts.get = jest.fn((addr) =>
+    addr === address ? { address, lastSignerType: 'ring' } : undefined
+  )
   accounts.signTransaction = jest.fn()
   accounts.setTxSigned = jest.fn()
 })
 
 describe('#send', () => {
   beforeEach(() => {
-    store.set('main.origins', '8073729a-5e59-53b7-9e69-5d9bcff94087', { chain: { id: 1, type: 'ethereum' } })
+    store.set('main.origins', '8073729a-5e59-53b7-9e69-5d9bcff94087', {
+      chain: { id: 1, type: 'ethereum' },
+    })
   })
 
   const send = (request, cb = jest.fn()) =>
@@ -80,7 +94,10 @@ describe('#send', () => {
 
     send({ ...request, chainId: '0xa' })
 
-    expect(connection.send).toHaveBeenCalledWith(request, expect.any(Function), { type: 'ethereum', id: 10 })
+    expect(connection.send).toHaveBeenCalledWith(request, expect.any(Function), {
+      type: 'ethereum',
+      id: 10,
+    })
   })
 
   it('passes the default target chain to the connection when none is given', () => {
@@ -88,7 +105,10 @@ describe('#send', () => {
 
     send(request)
 
-    expect(connection.send).toHaveBeenCalledWith(request, expect.any(Function), { type: 'ethereum', id: 1 })
+    expect(connection.send).toHaveBeenCalledWith(request, expect.any(Function), {
+      type: 'ethereum',
+      id: 1,
+    })
   })
 
   it('returns an error when an unknown chain is given', () => {
@@ -129,7 +149,10 @@ describe('#send', () => {
     })
 
     it('returns an error for a disconnected chain', () => {
-      connection.connections.ethereum[11] = { chainConfig: chainConfig(11, 'london'), primary: { connected: false } }
+      connection.connections.ethereum[11] = {
+        chainConfig: chainConfig(11, 'london'),
+        primary: { connected: false },
+      }
 
       send({ method: 'eth_chainId', chainId: '0xb' }, (response) => {
         expect(response.error.message).toBe('not connected')
@@ -173,7 +196,9 @@ describe('#send', () => {
 
     it('should switch to a chain and notify listeners if it exists in the store', (done) => {
       store.set('main.networks.ethereum', 1, { id: 1 })
-      store.set('main.origins', '8073729a-5e59-53b7-9e69-5d9bcff94087', { chain: { id: 137, type: 'ethereum' } })
+      store.set('main.origins', '8073729a-5e59-53b7-9e69-5d9bcff94087', {
+        chain: { id: 137, type: 'ethereum' },
+      })
       store.switchOriginChain = jest.fn()
 
       send(
@@ -195,7 +220,11 @@ describe('#send', () => {
           ],
         },
         () => {
-          expect(store.switchOriginChain).toHaveBeenCalledWith('8073729a-5e59-53b7-9e69-5d9bcff94087', 1, 'ethereum')
+          expect(store.switchOriginChain).toHaveBeenCalledWith(
+            '8073729a-5e59-53b7-9e69-5d9bcff94087',
+            1,
+            'ethereum'
+          )
           done()
         }
       )
@@ -205,7 +234,9 @@ describe('#send', () => {
   describe('#wallet_switchEthereumChain', () => {
     it('should switch to a chain and notify listeners if it exists in the store', (done) => {
       store.set('main.networks.ethereum', 1, { id: 1 })
-      store.set('main.origins', { '8073729a-5e59-53b7-9e69-5d9bcff94087': { chain: { id: 42161, type: 'ethereum' } } })
+      store.set('main.origins', {
+        '8073729a-5e59-53b7-9e69-5d9bcff94087': { chain: { id: 42161, type: 'ethereum' } },
+      })
       store.switchOriginChain = jest.fn()
 
       send(
@@ -219,7 +250,11 @@ describe('#send', () => {
           _origin: '8073729a-5e59-53b7-9e69-5d9bcff94087',
         },
         () => {
-          expect(store.switchOriginChain).toHaveBeenCalledWith('8073729a-5e59-53b7-9e69-5d9bcff94087', 1, 'ethereum')
+          expect(store.switchOriginChain).toHaveBeenCalledWith(
+            '8073729a-5e59-53b7-9e69-5d9bcff94087',
+            1,
+            'ethereum'
+          )
           done()
         }
       )
@@ -360,7 +395,9 @@ describe('#send', () => {
     })
 
     it('does not add a request for a token that is already added', () => {
-      store.set('main.tokens.custom', [{ address: '0xbfa641051ba0a0ad1b0acf549a89536a0d76472e', chainId: 1 }])
+      store.set('main.tokens.custom', [
+        { address: '0xbfa641051ba0a0ad1b0acf549a89536a0d76472e', chainId: 1 },
+      ])
 
       send(request, ({ result }) => {
         expect(result).toBe(true)
@@ -524,7 +561,11 @@ describe('#send', () => {
   describe('#eth_getTransactionByHash', () => {
     const chain = 4
     const txHash = '0x06c1c968d4bd20c0ebfed34f6f34d8a5d189d9d2ce801f2ee8dd45dac32628d5'
-    const request = { method: 'eth_getTransactionByHash', params: [txHash], chainId: '0x' + chain.toString(16) }
+    const request = {
+      method: 'eth_getTransactionByHash',
+      params: [txHash],
+      chainId: '0x' + chain.toString(16),
+    }
 
     let blockResult
 
@@ -544,7 +585,9 @@ describe('#send', () => {
       }
 
       send(request, (response) => {
-        expect(response.result.blockHash).toBe('0xc1b0227f0721a05357b2b417e3872c5f6f01da209422013fe66ee291527fb123')
+        expect(response.result.blockHash).toBe(
+          '0xc1b0227f0721a05357b2b417e3872c5f6f01da209422013fe66ee291527fb123'
+        )
         expect(response.result.blockNumber).toBe('0xc80d08')
         done()
       })
@@ -1082,7 +1125,8 @@ describe('#send', () => {
     })
 
     describe('#eth_unsubscribe', () => {
-      const unsubscribe = (id, cb) => send({ id: 8, jsonrpc: '2.0', method: 'eth_unsubscribe', params: [id] }, cb)
+      const unsubscribe = (id, cb) =>
+        send({ id: 8, jsonrpc: '2.0', method: 'eth_unsubscribe', params: [id] }, cb)
 
       eventTypes.forEach((eventType) => {
         it(`unsubscribes from ${eventType} events`, () => {
@@ -1267,7 +1311,9 @@ describe('#signAndSend', () => {
 
 describe('state change events', () => {
   beforeEach(() => {
-    store.set('main.origins', '8073729a-5e59-53b7-9e69-5d9bcff94087', { chain: { id: 1, type: 'ethereum' } })
+    store.set('main.origins', '8073729a-5e59-53b7-9e69-5d9bcff94087', {
+      chain: { id: 1, type: 'ethereum' },
+    })
     store.getObserver('provider:chains').fire()
   })
 
@@ -1288,7 +1334,9 @@ describe('state change events', () => {
 
       provider.subscriptions.chainChanged.push(subscriptionId)
 
-      store.set('main.origins', '8073729a-5e59-53b7-9e69-5d9bcff94087', { chain: { id: 137, type: 'ethereum' } })
+      store.set('main.origins', '8073729a-5e59-53b7-9e69-5d9bcff94087', {
+        chain: { id: 137, type: 'ethereum' },
+      })
       store.getObserver('provider:chains').fire()
     })
   })
@@ -1516,5 +1564,7 @@ describe('state change events', () => {
 // utility functions //
 
 function mockConnectionError(message) {
-  connection.send.mockImplementation((p, cb) => cb({ id: p.id, jsonrpc: p.jsonrpc, error: { message, code: -1 } }))
+  connection.send.mockImplementation((p, cb) =>
+    cb({ id: p.id, jsonrpc: p.jsonrpc, error: { message, code: -1 } })
+  )
 }

@@ -205,11 +205,26 @@ class _AccountMain extends React.Component {
               expanded={expanded}
             />
           ) : id === 'verify' ? (
-            <Verify moduleId={id} id={this.props.id} expandModule={expandModule} expanded={expanded} />
+            <Verify
+              moduleId={id}
+              id={this.props.id}
+              expandModule={expandModule}
+              expanded={expanded}
+            />
           ) : id === 'activity' ? (
-            <Activity moduleId={id} id={this.props.id} expandModule={expandModule} expanded={expanded} />
+            <Activity
+              moduleId={id}
+              id={this.props.id}
+              expandModule={expandModule}
+              expanded={expanded}
+            />
           ) : id === 'launcher' ? (
-            <Launcher moduleId={id} id={this.props.id} expandModule={expandModule} expanded={expanded} />
+            <Launcher
+              moduleId={id}
+              id={this.props.id}
+              expandModule={expandModule}
+              expanded={expanded}
+            />
           ) : id === 'inventory' ? (
             <Inventory
               moduleId={id}
@@ -219,11 +234,26 @@ class _AccountMain extends React.Component {
               expandedData={expandedData}
             />
           ) : id === 'permissions' ? (
-            <Permissions moduleId={id} id={this.props.id} expandModule={expandModule} expanded={expanded} />
+            <Permissions
+              moduleId={id}
+              id={this.props.id}
+              expandModule={expandModule}
+              expanded={expanded}
+            />
           ) : id === 'balances' ? (
-            <Balances moduleId={id} {...this.props} expandModule={expandModule} expanded={expanded} />
+            <Balances
+              moduleId={id}
+              {...this.props}
+              expandModule={expandModule}
+              expanded={expanded}
+            />
           ) : id === 'settings' ? (
-            <Settings moduleId={id} id={this.props.id} expandModule={expandModule} expanded={expanded} />
+            <Settings
+              moduleId={id}
+              id={this.props.id}
+              expandModule={expandModule}
+              expanded={expanded}
+            />
           ) : (
             <Default moduleId={id} expandModule={expandModule} expanded={expanded} />
           )}
@@ -241,7 +271,13 @@ class _AccountMain extends React.Component {
     const modules = accountModuleOrder.map((id, i) => {
       const module = accountModules[id] || { height: 0 }
       slideHeight += module.height + 7
-      return this.renderModule(id, module, slideHeight - module.height - 5, i, this.expandModule.bind(this))
+      return this.renderModule(
+        id,
+        module,
+        slideHeight - module.height - 5,
+        i,
+        this.expandModule.bind(this)
+      )
     })
     return (
       <div className='accountMain'>
@@ -269,7 +305,10 @@ class _AccountMain extends React.Component {
             </div>
           </div>
         ) : null}
-        <div className='accountMainScroll' style={{ pointerEvents: this.state.expandedModule ? 'none' : 'auto' }}>
+        <div
+          className='accountMainScroll'
+          style={{ pointerEvents: this.state.expandedModule ? 'none' : 'auto' }}
+        >
           <div className='accountMainSlide' style={{ height: slideHeight + 'px' }}>
             {modules}
           </div>
@@ -329,7 +368,14 @@ class _AccountBody extends React.Component {
         />
       )
     } else if (req.type === 'access') {
-      return <ProviderRequest key={req.handlerId} handlerId={req.handlerId} accountId={this.props.id} req={req} />
+      return (
+        <ProviderRequest
+          key={req.handlerId}
+          handlerId={req.handlerId}
+          accountId={this.props.id}
+          req={req}
+        />
+      )
     } else if (req.type === 'sign') {
       return (
         <SignatureRequest
@@ -351,9 +397,23 @@ class _AccountBody extends React.Component {
         />
       )
     } else if (req.type === 'addChain' || req.type === 'switchChain') {
-      return <ChainRequest key={req.handlerId} req={req} handlerId={req.handlerId} accountId={this.props.id} />
+      return (
+        <ChainRequest
+          key={req.handlerId}
+          req={req}
+          handlerId={req.handlerId}
+          accountId={this.props.id}
+        />
+      )
     } else if (req.type === 'addToken') {
-      return <AddTokenRequest key={req.handlerId} req={req} handlerId={req.handlerId} accountId={this.props.id} />
+      return (
+        <AddTokenRequest
+          key={req.handlerId}
+          req={req}
+          handlerId={req.handlerId}
+          accountId={this.props.id}
+        />
+      )
     } else {
       return null
     }
@@ -733,10 +793,17 @@ class Account extends React.Component {
 
   renderTrezorPin(active) {
     return (
-      <div className='trezorPinWrap' style={active ? {} : { height: '0px', padding: '0px 0px 0px 0px' }}>
+      <div
+        className='trezorPinWrap'
+        style={active ? {} : { height: '0px', padding: '0px 0px 0px 0px' }}
+      >
         <div className='trezorPinInput'>
           {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => (
-            <div key={i} className='trezorPinInputButton' onMouseDown={this.trezorPin.bind(this, i)}>
+            <div
+              key={i}
+              className='trezorPinInputButton'
+              onMouseDown={this.trezorPin.bind(this, i)}
+            >
               {svg.octicon('primitive-dot', { height: 20 })}
             </div>
           ))}
@@ -801,12 +868,16 @@ class Account extends React.Component {
         ) : null} */}
         {((_) => {
           const type = this.props.lastSignerType
-          if (type === 'ledger') return <div className='signerSelectIconWrap signerIconLedger'>{svg.ledger(20)}</div>
-          if (type === 'trezor') return <div className='signerSelectIconWrap signerIconTrezor'>{svg.trezor(20)}</div>
+          if (type === 'ledger')
+            return <div className='signerSelectIconWrap signerIconLedger'>{svg.ledger(20)}</div>
+          if (type === 'trezor')
+            return <div className='signerSelectIconWrap signerIconTrezor'>{svg.trezor(20)}</div>
           if (type === 'seed' || type === 'ring')
             return <div className='signerSelectIconWrap signerIconHot'>{svg.flame(24)}</div>
-          if (type === 'aragon') return <div className='signerSelectIconWrap signerIconSmart'>{svg.aragon(28)}</div>
-          if (type === 'lattice') return <div className='signerSelectIconWrap signerIconSmart'>{svg.lattice(22)}</div>
+          if (type === 'aragon')
+            return <div className='signerSelectIconWrap signerIconSmart'>{svg.aragon(28)}</div>
+          if (type === 'lattice')
+            return <div className='signerSelectIconWrap signerIconSmart'>{svg.lattice(22)}</div>
           return <div className='signerSelectIconWrap'>{svg.logo(20)}</div>
         })()}
         {/* this.props.signer ? (
@@ -822,17 +893,25 @@ class Account extends React.Component {
 
   renderMenu() {
     let menuClass = 'signerMenu'
-    menuClass += this.store('selected.view') === 'settings' ? ' signerMenuSettings' : ' signerMenuDefault'
-    if ((this.store('selected.current') === this.props.id) & this.store('selected.open')) menuClass += ' signerMenuOpen'
+    menuClass +=
+      this.store('selected.view') === 'settings' ? ' signerMenuSettings' : ' signerMenuDefault'
+    if ((this.store('selected.current') === this.props.id) & this.store('selected.open'))
+      menuClass += ' signerMenuOpen'
     return (
       <div className={menuClass}>
-        <div className='signerMenuItem signerMenuItemLeft' onMouseDown={() => this.store.setSignerView('default')}>
+        <div
+          className='signerMenuItem signerMenuItemLeft'
+          onMouseDown={() => this.store.setSignerView('default')}
+        >
           <div className='signerMenuItemIcon'>
             {svg.octicon('pulse', { height: 23 })}
             <div className='iconUnderline' />
           </div>
         </div>
-        <div className='signerMenuItem signerMenuItemRight' onMouseDown={() => this.store.setSignerView('settings')}>
+        <div
+          className='signerMenuItem signerMenuItemRight'
+          onMouseDown={() => this.store.setSignerView('settings')}
+        >
           <div className='signerMenuItemIcon'>
             {svg.octicon('settings', { height: 23 })}
             <div className='iconUnderline' />
@@ -876,7 +955,9 @@ class Account extends React.Component {
       <div className='settingsMenu'>
         <div className='settingsMenuItems'>
           <div
-            className={viewIndex === 0 ? 'settingsMenuItem settingsMenuItemSelected' : 'settingsMenuItem'}
+            className={
+              viewIndex === 0 ? 'settingsMenuItem settingsMenuItemSelected' : 'settingsMenuItem'
+            }
             onMouseDown={() => this.store.setSettingsView(0)}
           >
             <div className='settingsMenuItemIcon' style={{ left: '2px', top: '2px' }}>
@@ -884,13 +965,17 @@ class Account extends React.Component {
             </div>
           </div>
           <div
-            className={viewIndex === 1 ? 'settingsMenuItem settingsMenuItemSelected' : 'settingsMenuItem'}
+            className={
+              viewIndex === 1 ? 'settingsMenuItem settingsMenuItemSelected' : 'settingsMenuItem'
+            }
             onMouseDown={() => this.store.setSettingsView(1)}
           >
             <div className='settingsMenuItemIcon'>{svg.octicon('checklist', { height: 22 })}</div>
           </div>
           <div
-            className={viewIndex === 2 ? 'settingsMenuItem settingsMenuItemSelected' : 'settingsMenuItem'}
+            className={
+              viewIndex === 2 ? 'settingsMenuItem settingsMenuItemSelected' : 'settingsMenuItem'
+            }
             onMouseDown={() => this.store.setSettingsView(2)}
           >
             <div className='settingsMenuItemIcon' style={{ left: '-1px', top: '0px' }}>
@@ -988,7 +1073,11 @@ class Account extends React.Component {
       <>
         {!this.state.addressHover ? (
           <div className='signerName'>
-            <div className={!ensName || !this.props.name ? 'signerNameText' : 'signerNameText signerNameTextENS'}>
+            <div
+              className={
+                !ensName || !this.props.name ? 'signerNameText' : 'signerNameText signerNameTextENS'
+              }
+            >
               {this.props.name}
             </div>
           </div>
@@ -1006,7 +1095,9 @@ class Account extends React.Component {
           >
             <div className='transactionToAddressLargeWrap'>
               {this.state.addressHover ? (
-                <div className='transactionToAddressLarge transactionToAddressCopy'>copy address</div>
+                <div className='transactionToAddressLarge transactionToAddressCopy'>
+                  copy address
+                </div>
               ) : ensName ? (
                 <div
                   className='transactionToAddressLarge transactionToAddressENS'
@@ -1017,10 +1108,13 @@ class Account extends React.Component {
               ) : (
                 <div
                   className={
-                    this.props.name ? 'transactionToAddressLarge' : 'transactionToAddressLarge transactionToAddressENS'
+                    this.props.name
+                      ? 'transactionToAddressLarge'
+                      : 'transactionToAddressLarge transactionToAddressENS'
                   }
                 >
-                  {formattedAddress.substring(0, 6)} {svg.octicon('kebab-horizontal', { height: 16 })}{' '}
+                  {formattedAddress.substring(0, 6)}{' '}
+                  {svg.octicon('kebab-horizontal', { height: 16 })}{' '}
                   {formattedAddress.substr(formattedAddress.length - 5)}
                 </div>
               )}
@@ -1159,7 +1253,11 @@ class Account extends React.Component {
           <div className='signerContainer' style={current ? { height: '100%' } : {}}>
             {this.store('view.clickGuard') ? <div className='clickGuard' /> : null}
             {!this.state.hideSignerStatus && open ? (
-              <SignerStatus open={open} signer={signer} hideSignerStatus={this.hideSignerStatus.bind(this)} />
+              <SignerStatus
+                open={open}
+                signer={signer}
+                hideSignerStatus={this.hideSignerStatus.bind(this)}
+              />
             ) : null}
             <div
               className={this.props.active ? 'signerTop signerTopActive' : 'signerTop'}
@@ -1170,12 +1268,18 @@ class Account extends React.Component {
               {!this.state.addressHover ? this.renderSignerIndicator() : null}
               {!this.state.addressHover ? (
                 <>
-                  <div className='accountGrabber' style={open || true ? { opacity: 0, pointerEvents: 'none' } : {}}>
+                  <div
+                    className='accountGrabber'
+                    style={open || true ? { opacity: 0, pointerEvents: 'none' } : {}}
+                  >
                     {svg.grab(35)}
                   </div>
                   <div className='signerSelect' onClick={this.typeClick.bind(this)}>
                     <div className='signerSelectIconWrap'>
-                      <div className='signerSelectIcon' style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+                      <div
+                        className='signerSelectIcon'
+                        style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                      >
                         {svg.chevron(26)}
                       </div>
                     </div>

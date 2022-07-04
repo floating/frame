@@ -17,7 +17,10 @@ class BasicApproval extends React.Component {
     return (
       <div className='approveTransactionWarning'>
         <div className='approveTransactionWarningOptions'>
-          <div className='approveTransactionWarningReject' onClick={() => this.props.onDecline(this.props.req)}>
+          <div
+            className='approveTransactionWarningReject'
+            onClick={() => this.props.onDecline(this.props.req)}
+          >
             Reject
           </div>
           <div
@@ -41,10 +44,19 @@ class BasicApproval extends React.Component {
             Proceed
           </div>
         </div>
-        <div className='approveTransactionWarningFill' style={this.state.inPreview ? { opacity: 0 } : { opacity: 1 }}>
-          <div className='approveTransactionWarningIcon approveTransactionWarningIconLeft'>{svg.alert(32)}</div>
-          <div className='approveTransactionWarningIcon approveTransactionWarningIconRight'>{svg.alert(32)}</div>
-          <div className='approveTransactionWarningTitle'>{approval && approval.data && approval.data.title}</div>
+        <div
+          className='approveTransactionWarningFill'
+          style={this.state.inPreview ? { opacity: 0 } : { opacity: 1 }}
+        >
+          <div className='approveTransactionWarningIcon approveTransactionWarningIconLeft'>
+            {svg.alert(32)}
+          </div>
+          <div className='approveTransactionWarningIcon approveTransactionWarningIconRight'>
+            {svg.alert(32)}
+          </div>
+          <div className='approveTransactionWarningTitle'>
+            {approval && approval.data && approval.data.title}
+          </div>
           <div className='approveTransactionWarningMessage'>
             <div className='approveTransactionWarningMessageInner'>
               {approval && approval.data && approval.data.message}

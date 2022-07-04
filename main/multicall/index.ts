@@ -80,7 +80,10 @@ function getInterface(functionSignature: string) {
   return memoizedInterfaces[functionSignature]
 }
 
-async function aggregate<R, T>(calls: Call<R, T>[], config: MulticallConfig): Promise<CallResult<T>[]> {
+async function aggregate<R, T>(
+  calls: Call<R, T>[],
+  config: MulticallConfig
+): Promise<CallResult<T>[]> {
   const aggData = buildCallData(calls)
   const response = await makeCall('aggregate', [aggData], config)
 
@@ -117,7 +120,9 @@ export default function (chainId: number, eth: EthereumProvider) {
   const config = chainConfig(chainId, eth)
 
   async function call<R, T>(calls: Call<R, T>[]): Promise<CallResult<T>[]> {
-    return config.version === MulticallVersion.V2 ? tryAggregate(calls, config) : aggregate(calls, config)
+    return config.version === MulticallVersion.V2
+      ? tryAggregate(calls, config)
+      : aggregate(calls, config)
   }
 
   return {
@@ -141,7 +146,10 @@ export default function (chainId: number, eth: EthereumProvider) {
             )}`,
             e
           )
-          return [...Array(batchCalls.length).keys()].map((n) => ({ success: false, returnValues: [] }))
+          return [...Array(batchCalls.length).keys()].map((n) => ({
+            success: false,
+            returnValues: [],
+          }))
         }
       })
 

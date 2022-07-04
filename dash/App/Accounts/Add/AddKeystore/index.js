@@ -167,7 +167,10 @@ class AddRing extends React.Component {
             >
               Add Keyring Account
             </div>
-            <div className='addAccountItemOptionSetup' style={{ transform: `translateX(-${100 * this.state.index}%)` }}>
+            <div
+              className='addAccountItemOptionSetup'
+              style={{ transform: `translateX(-${100 * this.state.index}%)` }}
+            >
               <div className='addAccountItemOptionSetupFrames'>
                 <div className='addAccountItemOptionSetupFrame'>
                   <div className='addAccountItemOptionTitle'>Add Keystore File</div>
@@ -203,7 +206,9 @@ class AddRing extends React.Component {
                 <div className='addAccountItemOptionSetupFrame'>
                   <div className='addAccountItemOptionTitle'>Create Account Password</div>
                   <div className='addAccountItemOptionInputPhrase addAccountItemOptionInputPassword'>
-                    <div className='addAccountItemOptionSubtitle'>password must be 12 characters or longer</div>
+                    <div className='addAccountItemOptionSubtitle'>
+                      password must be 12 characters or longer
+                    </div>
                     <input
                       type='password'
                       tabIndex='-1'
@@ -215,7 +220,10 @@ class AddRing extends React.Component {
                       onKeyPress={(e) => this.keyPress(e, () => this.createKeystore())}
                     />
                   </div>
-                  <div className='addAccountItemOptionSubmit' onMouseDown={() => this.createKeystore()}>
+                  <div
+                    className='addAccountItemOptionSubmit'
+                    onMouseDown={() => this.createKeystore()}
+                  >
                     Create
                   </div>
                 </div>

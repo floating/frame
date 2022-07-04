@@ -141,7 +141,10 @@ class AddPhrase extends React.Component {
             >
               Add Phrase Account
             </div>
-            <div className='addAccountItemOptionSetup' style={{ transform: `translateX(-${100 * this.state.index}%)` }}>
+            <div
+              className='addAccountItemOptionSetup'
+              style={{ transform: `translateX(-${100 * this.state.index}%)` }}
+            >
               <div className='addAccountItemOptionSetupFrames'>
                 <div className='addAccountItemOptionSetupFrame'>
                   <div className='addAccountItemOptionTitle'>seed phrase</div>
@@ -163,7 +166,9 @@ class AddPhrase extends React.Component {
                 <div className='addAccountItemOptionSetupFrame'>
                   <div className='addAccountItemOptionTitle'>create password</div>
                   <div className='addAccountItemOptionInputPhrase addAccountItemOptionInputPassword'>
-                    <div className='addAccountItemOptionSubtitle'>password must be 12 characters or longer</div>
+                    <div className='addAccountItemOptionSubtitle'>
+                      password must be 12 characters or longer
+                    </div>
                     <input
                       type='password'
                       tabIndex='-1'
@@ -186,7 +191,10 @@ class AddPhrase extends React.Component {
                     <>
                       <div className='addAccountItemOptionTitle'>{this.state.status}</div>
                       {this.state.error ? (
-                        <div className='addAccountItemOptionSubmit' onMouseDown={() => this.restart()}>
+                        <div
+                          className='addAccountItemOptionSubmit'
+                          onMouseDown={() => this.restart()}
+                        >
                           try again
                         </div>
                       ) : null}

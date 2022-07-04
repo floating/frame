@@ -6,7 +6,9 @@ function findIndex(options, value) {
 }
 
 const Dropdown = ({ options, syncValue, initialValue, style, className = '', onChange }) => {
-  const [selectedIndex, setSelectedIndex] = useState(findIndex(options, syncValue || initialValue) || options[0])
+  const [selectedIndex, setSelectedIndex] = useState(
+    findIndex(options, syncValue || initialValue) || options[0]
+  )
   const [expanded, setExpanded] = useState(false)
   const ref = createRef()
 

@@ -10,9 +10,13 @@ const migrations = {
         // Prerelease versions of 0.3.2 used 'normal' instead of 'standard'
         if (gasPrice[network].default === 'normal') gasPrice[network].default = 'standard'
         // For each network with gasPrices, copy over default and custom level
-        if (initial.main.networks.ethereum[network] && initial.main.networks.ethereum[network].gas) {
+        if (
+          initial.main.networks.ethereum[network] &&
+          initial.main.networks.ethereum[network].gas
+        ) {
           initial.main.networks.ethereum[network].gas.price.selected = gasPrice[network].default
-          initial.main.networks.ethereum[network].gas.price.levels.custom = gasPrice[network].levels.custom
+          initial.main.networks.ethereum[network].gas.price.levels.custom =
+            gasPrice[network].levels.custom
         }
       })
     }
@@ -77,7 +81,8 @@ const migrations = {
           initial.main.networks.ethereum[id].symbol = 'ETH'
         }
       }
-      if (initial.main.networks.ethereum[id].symbol === 'Ξ') initial.main.networks.ethereum[id].symbol = 'ETH'
+      if (initial.main.networks.ethereum[id].symbol === 'Ξ')
+        initial.main.networks.ethereum[id].symbol = 'ETH'
       // Update safelow -> slow and trader -> asap
       if (initial.main.networks.ethereum[id].gas.price.selected === 'safelow')
         initial.main.networks.ethereum[id].gas.price.selected = 'slow'
@@ -89,7 +94,8 @@ const migrations = {
     })
 
     // If migrating from before this was a setting make it 'true' to grandfather behavior
-    if (initial.main.mute && initial.main.accountCloseLock === undefined) initial.main.accountCloseLock = true
+    if (initial.main.mute && initial.main.accountCloseLock === undefined)
+      initial.main.accountCloseLock = true
 
     return initial
   },
@@ -108,7 +114,15 @@ const migrations = {
         },
       },
       connection: {
-        primary: { on: true, current: 'matic', status: 'loading', connected: false, type: '', network: '', custom: '' },
+        primary: {
+          on: true,
+          current: 'matic',
+          status: 'loading',
+          connected: false,
+          type: '',
+          network: '',
+          custom: '',
+        },
         secondary: {
           on: false,
           current: 'custom',
@@ -163,13 +177,18 @@ const migrations = {
       address = address.toLowerCase()
 
       const hasPermissions =
-        addresses[address] && addresses[address].permissions && Object.keys(addresses[address].permissions).length > 0
+        addresses[address] &&
+        addresses[address].permissions &&
+        Object.keys(addresses[address].permissions).length > 0
       // const hasTokens = addresses[address] && addresses[address].tokens && Object.keys(addresses[address].tokens).length > 0
-      if (!hasPermissions) return log.info(`Address ${address} did not have any permissions or tokens`)
+      if (!hasPermissions)
+        return log.info(`Address ${address} did not have any permissions or tokens`)
 
       // Copy Account permissions
       initial.main.permissions[address] =
-        addresses[address] && addresses[address].permissions ? Object.assign({}, addresses[address].permissions) : {}
+        addresses[address] && addresses[address].permissions
+          ? Object.assign({}, addresses[address].permissions)
+          : {}
 
       const matchingAccounts = []
       Object.keys(accounts)
@@ -203,7 +222,8 @@ const migrations = {
         delete newAccounts[address].signer
         delete newAccounts[address].index
         delete newAccounts[address].addresses
-        newAccounts[address].tokens = addresses[address] && addresses[address].tokens ? addresses[address].tokens : {}
+        newAccounts[address].tokens =
+          addresses[address] && addresses[address].tokens ? addresses[address].tokens : {}
         newAccounts[address] = Object.assign({}, newAccounts[address])
       }
     })
@@ -290,7 +310,10 @@ const migrations = {
     // Convert all accounts to new creation type system
     Object.keys(initial.main.accounts).forEach((account) => {
       try {
-        if (!initial.main.accounts[account].created || initial.main.accounts[account].created === -1) {
+        if (
+          !initial.main.accounts[account].created ||
+          initial.main.accounts[account].created === -1
+        ) {
           initial.main.accounts[account].created = 'new:' + Date.now()
         } else {
           initial.main.accounts[account].created = initial.main.accounts[account].created + ''
@@ -431,7 +454,9 @@ const migrations = {
     }
     Object.keys(initial.main.networks.ethereum).forEach((chain) => {
       try {
-        initial.main.networks.ethereum[chain].id = parseInt(initial.main.networks.ethereum[chain].id)
+        initial.main.networks.ethereum[chain].id = parseInt(
+          initial.main.networks.ethereum[chain].id
+        )
       } catch (e) {
         log.error(e)
       }

@@ -139,7 +139,9 @@ describe('changing approval amounts', () => {
     const onApprove = function (req, approvalType, data) {
       try {
         expect(approvalType).toBe(ApprovalType.TokenSpendApproval)
-        expect(data.amount).toBe('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff')
+        expect(data.amount).toBe(
+          '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
+        )
         done()
       } catch (e) {
         done(e)
@@ -147,7 +149,10 @@ describe('changing approval amounts', () => {
     }
 
     const { queryByRole } = render(
-      <TokenSpend onApprove={onApprove} approval={{ data: { amount: addHexPrefix((100e6).toString(16)) } }} />
+      <TokenSpend
+        onApprove={onApprove}
+        approval={{ data: { amount: addHexPrefix((100e6).toString(16)) } }}
+      />
     )
 
     const edit = queryByRole('button', { name: 'Edit' })
@@ -174,7 +179,10 @@ describe('changing approval amounts', () => {
     }
 
     const { queryByRole } = render(
-      <TokenSpend onApprove={onApprove} approval={{ data: { amount: addHexPrefix((50e6).toString(16)) } }} />
+      <TokenSpend
+        onApprove={onApprove}
+        approval={{ data: { amount: addHexPrefix((50e6).toString(16)) } }}
+      />
     )
 
     const edit = queryByRole('button', { name: 'Edit' })

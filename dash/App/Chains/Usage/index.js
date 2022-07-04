@@ -22,7 +22,11 @@ class _OriginModule extends React.Component {
     const reqs = this.state.reqsTimes
     reqs.push(this.state.activeCount)
     reqs.shift()
-    this.setState({ reqsTimes: reqs, activeCount: 0, reqsAverage: (Math.round(average(reqs) * 100) / 100).toFixed(2) })
+    this.setState({
+      reqsTimes: reqs,
+      activeCount: 0,
+      reqsAverage: (Math.round(average(reqs) * 100) / 100).toFixed(2),
+    })
   }
 
   componentDidMount() {
@@ -66,7 +70,12 @@ class _OriginModule extends React.Component {
           <div className='connectionOptionStatusIndicatorGood' />
         </div>
       )
-    } else if (status === 'loading' || status === 'syncing' || status === 'pending' || status === 'standby') {
+    } else if (
+      status === 'loading' ||
+      status === 'syncing' ||
+      status === 'pending' ||
+      status === 'standby'
+    ) {
       return (
         <div className='connectionOptionStatusIndicator'>
           <div className='connectionOptionStatusIndicatorPending' />
@@ -88,7 +97,10 @@ class _OriginModule extends React.Component {
     let presets = networkPresets[id] || {}
     presets = Object.keys(presets).map((i) => ({ text: i, value: type + ':' + id + ':' + i }))
     presets = presets.concat(
-      Object.keys(networkPresets.default).map((i) => ({ text: i, value: type + ':' + id + ':' + i }))
+      Object.keys(networkPresets.default).map((i) => ({
+        text: i,
+        value: type + ':' + id + ':' + i,
+      }))
     )
     presets.push({ text: 'Custom', value: type + ':' + id + ':' + 'custom' })
 
@@ -103,7 +115,11 @@ class _OriginModule extends React.Component {
             })
           }}
         >
-          <div className={active ? 'sliceOriginIndicator sliceOriginIndicatorActive' : 'sliceOriginIndicator'} />
+          <div
+            className={
+              active ? 'sliceOriginIndicator sliceOriginIndicatorActive' : 'sliceOriginIndicator'
+            }
+          />
           <div className='sliceOriginTile'>{origin}</div>
           <div className='sliceOriginReqs'>
             <div className='sliceOriginReqsNumber'>{this.state.reqsAverage}</div>
@@ -163,7 +179,12 @@ class ChainModule extends React.Component {
           <div className='connectionOptionStatusIndicatorGood' />
         </div>
       )
-    } else if (status === 'loading' || status === 'syncing' || status === 'pending' || status === 'standby') {
+    } else if (
+      status === 'loading' ||
+      status === 'syncing' ||
+      status === 'pending' ||
+      status === 'standby'
+    ) {
       return (
         <div className='connectionOptionStatusIndicator'>
           <div className='connectionOptionStatusIndicatorPending' />
@@ -184,7 +205,10 @@ class ChainModule extends React.Component {
     let presets = networkPresets[id] || {}
     presets = Object.keys(presets).map((i) => ({ text: i, value: type + ':' + id + ':' + i }))
     presets = presets.concat(
-      Object.keys(networkPresets.default).map((i) => ({ text: i, value: type + ':' + id + ':' + i }))
+      Object.keys(networkPresets.default).map((i) => ({
+        text: i,
+        value: type + ':' + id + ':' + i,
+      }))
     )
     presets.push({ text: 'Custom', value: type + ':' + id + ':' + 'custom' })
 

@@ -54,12 +54,17 @@ export default class Signer extends EventEmitter {
     this.addresses = []
   }
 
-  deriveHDAccounts(publicKey: string, chainCode: string, cb: (err: any, accounts: string[] | undefined) => void) {
+  deriveHDAccounts(
+    publicKey: string,
+    chainCode: string,
+    cb: (err: any, accounts: string[] | undefined) => void
+  ) {
     deriveHDAccounts(publicKey, chainCode, cb)
   }
 
   fingerprint() {
-    if (this.addresses && this.addresses.length) return crypt.stringToKey(this.addresses.join()).toString('hex')
+    if (this.addresses && this.addresses.length)
+      return crypt.stringToKey(this.addresses.join()).toString('hex')
   }
 
   getCoinbase(cb: Callback<string>) {

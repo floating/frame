@@ -46,7 +46,11 @@ export default class GasCalculator {
     this.connection = connection
   }
 
-  async _getFeeHistory(numBlocks: number, rewardPercentiles: number[], newestBlock = 'latest'): Promise<Block[]> {
+  async _getFeeHistory(
+    numBlocks: number,
+    rewardPercentiles: number[],
+    newestBlock = 'latest'
+  ): Promise<Block[]> {
     const blockCount = intToHex(numBlocks)
     const payload = rpcPayload('eth_feeHistory', [blockCount, newestBlock, rewardPercentiles])
 
@@ -88,7 +92,8 @@ export default class GasCalculator {
     const eligibleRewardsBlocks = blocks
       .filter((block) => block.gasUsedRatio >= 0.1 && block.gasUsedRatio <= 0.9)
       .map((block) => block.rewards[0])
-    const medianReward = eligibleRewardsBlocks.sort()[Math.floor(eligibleRewardsBlocks.length / 2)] || oneGwei
+    const medianReward =
+      eligibleRewardsBlocks.sort()[Math.floor(eligibleRewardsBlocks.length / 2)] || oneGwei
 
     return {
       nextBaseFee: intToHex(nextBlockFee),

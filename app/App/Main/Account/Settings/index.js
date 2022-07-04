@@ -49,7 +49,10 @@ class Settings extends React.Component {
         ) : null}
         <div className='moduleMain moduleMainSettings'>
           {!this.props.expanded ? (
-            <div className='moduleButton' onMouseDown={() => this.props.expandModule(this.props.moduleId)}>
+            <div
+              className='moduleButton'
+              onMouseDown={() => this.props.expandModule(this.props.moduleId)}
+            >
               Account Settings
             </div>
           ) : (
@@ -67,10 +70,14 @@ class Settings extends React.Component {
                 />
               </div>
               {account.smart ? (
-                <div className='moduleRow'>Chain ID: {account.smart.chain && account.smart.chain.id}</div>
+                <div className='moduleRow'>
+                  Chain ID: {account.smart.chain && account.smart.chain.id}
+                </div>
               ) : null}
               <div className='moduleRow'>Status: {account.status}</div>
-              <div className='moduleRow'>ENS Name: {account.ensName ? account.ensName : 'none'}</div>
+              <div className='moduleRow'>
+                ENS Name: {account.ensName ? account.ensName : 'none'}
+              </div>
               <div className='moduleRow'>Last Signer Type: {account.lastSignerType}</div>
               <div className='moduleRow'>Signer Connected: {account.signer ? 'yes' : 'no'}</div>
               {/* <div className='moduleRow'>Account Added: {account.created}</div> */}

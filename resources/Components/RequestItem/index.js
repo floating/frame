@@ -65,7 +65,9 @@ class _RequestItem extends React.Component {
             <div className='requestItemTitleMain'>{title}</div>
             <div className='requestItemTitleSub'>
               <div className='requestItemTitleSubIcon'>{svg.window(10)}</div>
-              <div className='requestItemTitleSubText'>{this.store('main.origins', req.origin, 'name')}</div>
+              <div className='requestItemTitleSubText'>
+                {this.store('main.origins', req.origin, 'name')}
+              </div>
             </div>
           </div>
           {txNonce ? (
@@ -92,7 +94,9 @@ class _RequestItem extends React.Component {
                 </div>
               </div>
               <div className='txNonceLabel'>Nonce</div>
-              <div className={nonce === 'TBD' || error ? 'txNonceNumber' : 'txNonceNumber'}>{nonce}</div>
+              <div className={nonce === 'TBD' || error ? 'txNonceNumber' : 'txNonceNumber'}>
+                {nonce}
+              </div>
               {nonce === 'TBD' || error ? <div className='txNonceMarker' /> : null}
             </div>
           ) : (

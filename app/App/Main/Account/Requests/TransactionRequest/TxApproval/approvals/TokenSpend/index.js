@@ -42,7 +42,8 @@ class TokenSpend extends React.Component {
     super(...args)
 
     this.decimals = this.props.approval.data.decimals || 0
-    this.requestedAmount = '0x' + new BigNumber(this.props.approval.data.amount).integerValue().toString(16)
+    this.requestedAmount =
+      '0x' + new BigNumber(this.props.approval.data.amount).integerValue().toString(16)
     this.state = {
       inPreview: false,
       inEditApproval: false,
@@ -160,15 +161,21 @@ class TokenSpend extends React.Component {
                 : {}
             }
             onClick={() => {
-              this.props.onApprove(this.props.req, ApprovalType.TokenSpendApproval, { amount: this.state.amount })
+              this.props.onApprove(this.props.req, ApprovalType.TokenSpendApproval, {
+                amount: this.state.amount,
+              })
             }}
           >
             Proceed
           </div>
         </div>
         <div className='approveTransactionWarningFill'>
-          <div className='approveTransactionWarningIcon approveTransactionWarningIconLeft'>{svg.alert(32)}</div>
-          <div className='approveTransactionWarningIcon approveTransactionWarningIconRight'>{svg.alert(32)}</div>
+          <div className='approveTransactionWarningIcon approveTransactionWarningIconLeft'>
+            {svg.alert(32)}
+          </div>
+          <div className='approveTransactionWarningIcon approveTransactionWarningIconRight'>
+            {svg.alert(32)}
+          </div>
           <div className='approveTransactionWarningTitle'>{'token approval'}</div>
           {this.state.inEditApproval ? (
             <div className={'approveTokenSpend'}>
@@ -216,8 +223,12 @@ class TokenSpend extends React.Component {
                                 }
                           }
                         >
-                          <div className='approveTokenSpendAmountNoInputNumber'>{displayAmount.number}</div>
-                          <div className='approveTokenSpendAmountNoInputSymbol'>{displayAmount.symbol}</div>
+                          <div className='approveTokenSpendAmountNoInputNumber'>
+                            {displayAmount.number}
+                          </div>
+                          <div className='approveTokenSpendAmountNoInputSymbol'>
+                            {displayAmount.symbol}
+                          </div>
                         </div>
                       </div>
                     )}

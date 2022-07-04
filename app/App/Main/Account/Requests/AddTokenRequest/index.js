@@ -49,9 +49,17 @@ class AddTokenRequest extends React.Component {
                     </div>
                   )
                 } else if (status === 'success') {
-                  return <div className='requestNoticeInner scaleIn'>{svg.octicon('check', { height: 80 })}</div>
+                  return (
+                    <div className='requestNoticeInner scaleIn'>
+                      {svg.octicon('check', { height: 80 })}
+                    </div>
+                  )
                 } else if (status === 'error' || status === 'declined') {
-                  return <div className='requestNoticeInner scaleIn'>{svg.octicon('circle-slash', { height: 80 })}</div>
+                  return (
+                    <div className='requestNoticeInner scaleIn'>
+                      {svg.octicon('circle-slash', { height: 80 })}
+                    </div>
+                  )
                 }
               })()}
             </div>
@@ -59,13 +67,18 @@ class AddTokenRequest extends React.Component {
             <div className='approveTransactionPayload'>
               {
                 <div className='approveRequestHeader approveTransactionHeader'>
-                  <div className='approveRequestHeaderIcon'> {svg.octicon('shield', { height: 20 })}</div>
+                  <div className='approveRequestHeaderIcon'>
+                    {' '}
+                    {svg.octicon('shield', { height: 20 })}
+                  </div>
                   <div className='approveRequestHeaderLabel'> Add Token</div>
                 </div>
               }
               <div className='requestToken scaleIn'>
                 <div className='requestTokenInner'>
-                  <div className={originClass}>{this.store('main.origins', this.props.req.origin, 'name')}</div>
+                  <div className={originClass}>
+                    {this.store('main.origins', this.props.req.origin, 'name')}
+                  </div>
                   <div className={'requestTokenOriginSub'}>{'wants to add a token'}</div>
                   <div className='requestTokenInfo'>
                     <div className='requestTokenSymbol'>{token.symbol.toUpperCase()}</div>

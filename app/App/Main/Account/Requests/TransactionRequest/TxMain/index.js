@@ -22,10 +22,17 @@ class TxRecipient extends React.Component {
   render() {
     const req = this.props.req
     const layer = this.store('main.networks', this.props.chain.type, this.props.chain.id, 'layer')
-    const nativeCurrency = this.store('main.networksMeta', this.props.chain.type, this.props.chain.id, 'nativeCurrency')
-    const etherUSD = nativeCurrency && nativeCurrency.usd && layer !== 'testnet' ? nativeCurrency.usd.price : 0
+    const nativeCurrency = this.store(
+      'main.networksMeta',
+      this.props.chain.type,
+      this.props.chain.id,
+      'nativeCurrency'
+    )
+    const etherUSD =
+      nativeCurrency && nativeCurrency.usd && layer !== 'testnet' ? nativeCurrency.usd.price : 0
     const value = this.hexToDisplayValue(req.data.value || '0x')
-    const currentSymbol = this.store('main.networks', this.props.chain.type, this.props.chain.id, 'symbol') || '?'
+    const currentSymbol =
+      this.store('main.networks', this.props.chain.type, this.props.chain.id, 'symbol') || '?'
     return (
       <div className='_txMain'>
         <div className='_txMainInner'>

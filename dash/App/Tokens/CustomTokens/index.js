@@ -48,7 +48,9 @@ class CustomTokens extends React.Component {
                           <img
                             src={
                               token.logoURI &&
-                              `https://proxy.pylon.link?type=icon&target=${encodeURIComponent(token.logoURI)}`
+                              `https://proxy.pylon.link?type=icon&target=${encodeURIComponent(
+                                token.logoURI
+                              )}`
                             }
                             value={token.symbol.toUpperCase()}
                             alt={token.symbol.toUpperCase()}
@@ -67,7 +69,11 @@ class CustomTokens extends React.Component {
                                 ? 'customTokensListItemExpand'
                                 : 'customTokensListItemExpand customTokensListItemExpandActive'
                             }
-                            onClick={() => this.setState({ tokenExpanded: this.state.tokenExpanded === i ? -1 : i })}
+                            onClick={() =>
+                              this.setState({
+                                tokenExpanded: this.state.tokenExpanded === i ? -1 : i,
+                              })
+                            }
                           >
                             {svg.octicon('chevron-down', { height: 16 })}
                           </div>

@@ -32,7 +32,10 @@ class App extends React.Component {
 
     // Hard code send dapp status for now
     const sendDapp =
-      this.store('main.dapps', '0xe8d705c28f65bc3fe10df8b22f9daa265b99d0e1893b2df49fd38120f0410bca') || {}
+      this.store(
+        'main.dapps',
+        '0xe8d705c28f65bc3fe10df8b22f9daa265b99d0e1893b2df49fd38120f0410bca'
+      ) || {}
 
     const loaderStyle =
       currentDapp && currentDapp.colors

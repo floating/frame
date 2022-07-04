@@ -80,24 +80,33 @@ const handler = (socket: FrameWebSocket, req: IncomingMessage) => {
     const origin = parseOrigin(requestOrigin)
 
     // Extension custom action for summoning Frame
-    if (origin === 'frame-extension' && rawPayload.method === 'frame_summon') return windows.toggleTray()
+    if (origin === 'frame-extension' && rawPayload.method === 'frame_summon')
+      return windows.toggleTray()
     if (logTraffic)
       log.info(
-        `req -> | ${socket.isFrameExtension ? 'ext' : 'ws'} | ${origin} | ${rawPayload.method} | -> | ${
-          rawPayload.params
-        }`
+        `req -> | ${socket.isFrameExtension ? 'ext' : 'ws'} | ${origin} | ${
+          rawPayload.method
+        } | -> | ${rawPayload.params}`
       )
 
-    const { payload, hasSession } = updateOrigin(rawPayload, origin, rawPayload.__extensionConnecting)
+    const { payload, hasSession } = updateOrigin(
+      rawPayload,
+      origin,
+      rawPayload.__extensionConnecting
+    )
 
     if (hasSession) {
       extendSession(payload._origin)
     }
 
     if (protectedMethods.indexOf(payload.method) > -1 && !(await isTrusted(origin))) {
-      let error = { message: 'Permission denied, approve ' + origin + ' in Frame to continue', code: 4001 }
+      let error = {
+        message: 'Permission denied, approve ' + origin + ' in Frame to continue',
+        code: 4001,
+      }
       // review
-      if (!accounts.getSelectedAddresses()[0]) error = { message: 'No Frame account selected', code: 4001 }
+      if (!accounts.getSelectedAddresses()[0])
+        error = { message: 'No Frame account selected', code: 4001 }
       res({ id: payload.id, jsonrpc: payload.jsonrpc, error })
     } else {
       provider.send(payload, (response) => {
@@ -112,9 +121,9 @@ const handler = (socket: FrameWebSocket, req: IncomingMessage) => {
         }
         if (logTraffic)
           log.info(
-            `<- res | ${socket.isFrameExtension ? 'ext' : 'ws'} | ${origin} | ${payload.method} | <- | ${JSON.stringify(
-              response.result || response.error
-            )}`
+            `<- res | ${socket.isFrameExtension ? 'ext' : 'ws'} | ${origin} | ${
+              payload.method
+            } | <- | ${JSON.stringify(response.result || response.error)}`
           )
 
         res(response)
@@ -125,7 +134,13 @@ const handler = (socket: FrameWebSocket, req: IncomingMessage) => {
   socket.on('close', (_) => {
     Object.keys(subs).forEach((sub) => {
       if (subs[sub].socket.id === socket.id) {
-        provider.send({ jsonrpc: '2.0', id: 1, method: 'eth_unsubscribe', _origin: subs[sub].originId, params: [sub] })
+        provider.send({
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'eth_unsubscribe',
+          _origin: subs[sub].originId,
+          params: [sub],
+        })
         delete subs[sub]
       }
     })
@@ -140,7 +155,10 @@ export default function (server: Server) {
     const subscription = subs[payload.params.subscription]
 
     // if an origin is passed, make sure the subscription is from that origin
-    if (subscription && (!payload.params.origin || payload.params.origin === subscription.originId)) {
+    if (
+      subscription &&
+      (!payload.params.origin || payload.params.origin === subscription.originId)
+    ) {
       subscription.socket.send(JSON.stringify(payload))
     }
   })

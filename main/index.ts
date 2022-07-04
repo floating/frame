@@ -29,10 +29,13 @@ app.commandLine.appendSwitch('ignore-gpu-blacklist', 'true')
 app.commandLine.appendSwitch('enable-native-gpu-memory-buffers', 'true')
 app.commandLine.appendSwitch('force-color-profile', 'srgb')
 
-process.env.BUNDLE_LOCATION = process.env.BUNDLE_LOCATION || path.resolve(__dirname, './../..', 'bundle')
+process.env.BUNDLE_LOCATION =
+  process.env.BUNDLE_LOCATION || path.resolve(__dirname, './../..', 'bundle')
 
 log.transports.console.level = process.env.LOG_LEVEL || 'info'
-log.transports.file.level = ['development', 'test'].includes(process.env.NODE_ENV) ? false : 'verbose'
+log.transports.file.level = ['development', 'test'].includes(process.env.NODE_ENV)
+  ? false
+  : 'verbose'
 
 function getCrashReportFields() {
   const fields = ['networks', 'networksMeta', 'tokens']
@@ -154,7 +157,10 @@ ipcMain.on('tray:openExternal', (e, url) => {
 
 ipcMain.on('tray:openExplorer', (e, hash, chain) => {
   // remove trailing slashes from the base url
-  const explorer = (store('main.networks', chain.type, chain.id, 'explorer') || '').replace(/\/+$/, '')
+  const explorer = (store('main.networks', chain.type, chain.id, 'explorer') || '').replace(
+    /\/+$/,
+    ''
+  )
   shell.openExternal(`${explorer}/tx/${hash}`)
 })
 

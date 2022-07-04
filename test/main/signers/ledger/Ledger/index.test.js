@@ -46,7 +46,10 @@ function verifyPromise(resolve, reject, expectations) {
   }
 }
 
-const addresses = ['0xf10326c1c6884b094e03d616cc8c7b920e3f73e0', '0xa16002db5438b5862270a9e404346e3c3b059eeb']
+const addresses = [
+  '0xf10326c1c6884b094e03d616cc8c7b920e3f73e0',
+  '0xa16002db5438b5862270a9e404346e3c3b059eeb',
+]
 
 let ledger
 
@@ -249,12 +252,17 @@ describe('#verifyAddress', () => {
   it('verifies an address', (done) => {
     ledger.once('update', () => done('status updated unexpectedly!'))
 
-    ledger.verifyAddress(9, '0xe9d6f5779cf6936de03c0bec631f3bb3e336d98d', false, (err, verified) => {
-      verifyDone(done, () => {
-        expect(verified).toBe(true)
-        expect(err).toBeFalsy()
-      })
-    })
+    ledger.verifyAddress(
+      9,
+      '0xe9d6f5779cf6936de03c0bec631f3bb3e336d98d',
+      false,
+      (err, verified) => {
+        verifyDone(done, () => {
+          expect(verified).toBe(true)
+          expect(err).toBeFalsy()
+        })
+      }
+    )
 
     runNextRequest()
   })
@@ -287,19 +295,26 @@ describe('#verifyAddress', () => {
     it(`fails if ${testCase}`, async () => {
       const statusUpdate = new Promise((resolve, reject) => {
         ledger.on('update', () => {
-          verifyPromise(resolve, reject, () => expect(ledger.status).toBe(Status.NEEDS_RECONNECTION))
+          verifyPromise(resolve, reject, () =>
+            expect(ledger.status).toBe(Status.NEEDS_RECONNECTION)
+          )
         })
       })
 
       const callback = new Promise((resolve, reject) => {
         setup()
 
-        ledger.verifyAddress(1, '0xe9d6f5779cf6936de03c0bec631f3bb3e336d98d', false, (err, verified) => {
-          verifyPromise(resolve, reject, () => {
-            expect(verified).toBeUndefined()
-            expect(err.message).toBe(expectedError)
-          })
-        })
+        ledger.verifyAddress(
+          1,
+          '0xe9d6f5779cf6936de03c0bec631f3bb3e336d98d',
+          false,
+          (err, verified) => {
+            verifyPromise(resolve, reject, () => {
+              expect(verified).toBeUndefined()
+              expect(err.message).toBe(expectedError)
+            })
+          }
+        )
       })
 
       runNextRequest()
@@ -382,7 +397,9 @@ signingMethods.forEach((signingMethod) => {
       it(`fails if ${testCase}`, async () => {
         const statusUpdate = new Promise((resolve, reject) => {
           ledger.on('update', () => {
-            verifyPromise(resolve, reject, () => expect(ledger.status).toBe(Status.NEEDS_RECONNECTION))
+            verifyPromise(resolve, reject, () =>
+              expect(ledger.status).toBe(Status.NEEDS_RECONNECTION)
+            )
           })
         })
 
@@ -467,7 +484,10 @@ describe('#signTypedData', () => {
   })
 
   it('fails if the signing request is invalid', (done) => {
-    Eth.mock.instances[0].signTypedData.mockRejectedValue({ statusCode: 99901, message: 'Invalid typed data' })
+    Eth.mock.instances[0].signTypedData.mockRejectedValue({
+      statusCode: 99901,
+      message: 'Invalid typed data',
+    })
 
     ledger.once('update', () => done('Ledger unexpectedly updated!'))
     ledger.once('close', () => done('Ledger unexpectedly closed!'))
@@ -502,7 +522,9 @@ describe('#signTypedData', () => {
     it(`fails if ${testCase}`, async () => {
       const statusUpdate = new Promise((resolve, reject) => {
         ledger.on('update', () => {
-          verifyPromise(resolve, reject, () => expect(ledger.status).toBe(Status.NEEDS_RECONNECTION))
+          verifyPromise(resolve, reject, () =>
+            expect(ledger.status).toBe(Status.NEEDS_RECONNECTION)
+          )
         })
       })
 

@@ -141,7 +141,12 @@ class AddAragon extends React.Component {
   }
 
   restart() {
-    this.setState({ adding: false, agent: '0x0000000000000000000000000000000000000000', index: 0, name: '' })
+    this.setState({
+      adding: false,
+      agent: '0x0000000000000000000000000000000000000000',
+      index: 0,
+      name: '',
+    })
     setTimeout(() => {
       this.setState({ status: '', error: false })
     }, 500)
@@ -175,7 +180,10 @@ class AddAragon extends React.Component {
             <div className='addAccountItemOptionIntro' onMouseDown={() => this.adding()}>
               <div className='addAccountItemDeviceTitle'>Add Aragon Account</div>
             </div>
-            <div className='addAccountItemOptionSetup' style={{ transform: `translateX(-${100 * this.state.index}%)` }}>
+            <div
+              className='addAccountItemOptionSetup'
+              style={{ transform: `translateX(-${100 * this.state.index}%)` }}
+            >
               <div className='addAccountItemOptionSetupFrames'>
                 <div className='addAccountItemOptionSetupFrame'>
                   <div className='addAccountItemOptionTitle'>enter chain id</div>

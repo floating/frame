@@ -155,10 +155,17 @@ class TransactionRequest extends React.Component {
     if (req.status === 'confirmed') requestClass += ' signerRequestConfirmed'
     else if (error) requestClass += ' signerRequestError'
     const layer = this.store('main.networks', this.chain.type, this.chain.id, 'layer')
-    const nativeCurrency = this.store('main.networksMeta', this.chain.type, this.chain.id, 'nativeCurrency')
-    const nativeUSD = nativeCurrency && nativeCurrency.usd && layer !== 'testnet' ? nativeCurrency.usd.price : 0
+    const nativeCurrency = this.store(
+      'main.networksMeta',
+      this.chain.type,
+      this.chain.id,
+      'nativeCurrency'
+    )
+    const nativeUSD =
+      nativeCurrency && nativeCurrency.usd && layer !== 'testnet' ? nativeCurrency.usd.price : 0
     const value = this.hexToDisplayValue(req.data.value || '0x')
-    const currentSymbol = this.store('main.networks', this.chain.type, this.chain.id, 'symbol') || '?'
+    const currentSymbol =
+      this.store('main.networks', this.chain.type, this.chain.id, 'symbol') || '?'
 
     let maxFeePerGas, maxFee, maxFeeUSD
 
@@ -182,7 +189,9 @@ class TransactionRequest extends React.Component {
 
     const insufficientFundsMatch = originalNotice.includes('insufficient funds')
     if (insufficientFundsMatch) {
-      notice = originalNotice.includes('for gas') ? 'insufficient funds for gas' : 'insufficient funds'
+      notice = originalNotice.includes('for gas')
+        ? 'insufficient funds for gas'
+        : 'insufficient funds'
     }
 
     const txMeta = { replacement: false, possible: true, notice: '' }
@@ -250,7 +259,11 @@ class TransactionRequest extends React.Component {
     const requiredApproval = showWarning && (req.approvals || []).filter((a) => !a.approved)[0]
     return (
       <div key={req.handlerId} className={requestClass}>
-        <TxOverlay {...this.props} overlay={this.state.overlayMode} overlayMode={this.overlayMode.bind(this)} />
+        <TxOverlay
+          {...this.props}
+          overlay={this.state.overlayMode}
+          overlayMode={this.overlayMode.bind(this)}
+        />
         {req.type === 'transaction' ? (
           <div className='approveTransaction'>
             {!!requiredApproval ? (
@@ -265,9 +278,13 @@ class TransactionRequest extends React.Component {
                 <div className='requestNotice'>
                   <div className='requestNoticeInner'>
                     {!error ? (
-                      <div className={success || !req.tx ? 'txAugment txAugmentHidden' : 'txAugment'}>
+                      <div
+                        className={success || !req.tx ? 'txAugment txAugmentHidden' : 'txAugment'}
+                      >
                         {this.state.txHashCopied ? (
-                          <div className={'txDetailsOptions txDetailsOptionsTxHash'}>Transaction Hash Copied</div>
+                          <div className={'txDetailsOptions txDetailsOptionsTxHash'}>
+                            Transaction Hash Copied
+                          </div>
                         ) : this.state.viewDetailsHover ? (
                           <div
                             className={'txDetailsOptions'}
@@ -288,7 +305,10 @@ class TransactionRequest extends React.Component {
                                   if (this.store('main.mute.explorerWarning')) {
                                     link.send('tray:openExplorer', req.tx.hash, this.chain)
                                   } else {
-                                    this.store.notify('openExplorer', { hash: req.tx.hash, chain: this.chain })
+                                    this.store.notify('openExplorer', {
+                                      hash: req.tx.hash,
+                                      chain: this.chain,
+                                    })
                                   }
                                 }
                               }}
@@ -314,7 +334,9 @@ class TransactionRequest extends React.Component {
                           <>
                             <div
                               className={
-                                req && req.tx && req.tx.hash ? 'txDetails txDetailsShow' : 'txDetails txDetailsHide'
+                                req && req.tx && req.tx.hash
+                                  ? 'txDetails txDetailsShow'
+                                  : 'txDetails txDetailsHide'
                               }
                               onMouseOver={() => {
                                 clearTimeout(this.viewDetailsHoverTimer)
@@ -330,13 +352,17 @@ class TransactionRequest extends React.Component {
                             </div>
                             <div
                               className='txAugmentCancel'
-                              onMouseDown={() => link.send('tray:replaceTx', req.handlerId, 'cancel')}
+                              onMouseDown={() =>
+                                link.send('tray:replaceTx', req.handlerId, 'cancel')
+                              }
                             >
                               Cancel
                             </div>
                             <div
                               className='txAugmentSpeedUp'
-                              onMouseDown={() => link.send('tray:replaceTx', req.handlerId, 'speed')}
+                              onMouseDown={() =>
+                                link.send('tray:replaceTx', req.handlerId, 'speed')
+                              }
                             >
                               Speed Up
                             </div>
@@ -347,9 +373,15 @@ class TransactionRequest extends React.Component {
                     <div className={success ? 'txSuccessHash ' : 'txSuccessHash'}>
                       {req && req.tx && req.tx.hash ? req.tx.hash.substring(0, 9) : ''}
                       {svg.octicon('kebab-horizontal', { height: 16 })}
-                      {req && req.tx && req.tx.hash ? req.tx.hash.substr(req.tx.hash.length - 7) : ''}
+                      {req && req.tx && req.tx.hash
+                        ? req.tx.hash.substr(req.tx.hash.length - 7)
+                        : ''}
                     </div>
-                    <div className={success ? 'txProgressSuccess' : 'txProgressSuccess txProgressHidden'}>
+                    <div
+                      className={
+                        success ? 'txProgressSuccess' : 'txProgressSuccess txProgressHidden'
+                      }
+                    >
                       {req && req.tx && req.tx.receipt ? (
                         <>
                           <div className='txProgressSuccessItem txProgressSuccessItemLeft'>
@@ -383,11 +415,21 @@ class TransactionRequest extends React.Component {
                           }
                         >
                           {[...Array(10).keys()].map((i) => {
-                            return <div key={'f' + i} className={`txProgressNoticeBar txProgressNoticeBar-${i}`} />
+                            return (
+                              <div
+                                key={'f' + i}
+                                className={`txProgressNoticeBar txProgressNoticeBar-${i}`}
+                              />
+                            )
                           })}
                           <div className='txProgressNoticeBarDeadzone' />
                           {[...Array(10).keys()].reverse().map((i) => {
-                            return <div key={'r' + i} className={`txProgressNoticeBar txProgressNoticeBar-${i}`} />
+                            return (
+                              <div
+                                key={'r' + i}
+                                className={`txProgressNoticeBar txProgressNoticeBar-${i}`}
+                              />
+                            )
                           })}
                         </div>
                         <div
@@ -417,16 +459,24 @@ class TransactionRequest extends React.Component {
                               if (
                                 req &&
                                 notice &&
-                                notice.toLowerCase() === 'please enable contract data on the ethereum app settings'
+                                notice.toLowerCase() ===
+                                  'please enable contract data on the ethereum app settings'
                               )
                                 this.store.notify('contractData')
                             }}
                           >
-                            {status === 'verifying' || status === 'confirming' || status === 'confirmed' ? '' : notice}
+                            {status === 'verifying' ||
+                            status === 'confirming' ||
+                            status === 'confirmed'
+                              ? ''
+                              : notice}
                           </div>
                         </div>
                         {status === 'pending' ? (
-                          <div className='txProgressCancel' onMouseDown={() => this.decline(this.props.req)}>
+                          <div
+                            className='txProgressCancel'
+                            onMouseDown={() => this.decline(this.props.req)}
+                          >
                             Cancel
                           </div>
                         ) : null}
@@ -495,7 +545,11 @@ class TransactionRequest extends React.Component {
                     <TxRecipient {...this.props} />
                     <TxMain {...this.props} chain={this.chain} />
                     <TxData {...this.props} overlayMode={this.overlayMode.bind(this)} />
-                    <TxFeeNew {...this.props} chain={this.chain} overlayMode={this.overlayMode.bind(this)} />
+                    <TxFeeNew
+                      {...this.props}
+                      chain={this.chain}
+                      overlayMode={this.overlayMode.bind(this)}
+                    />
                   </div>
                   {!notice ? (
                     <div className='requestApprove'>
@@ -509,13 +563,23 @@ class TransactionRequest extends React.Component {
                                 link.rpc('setBaseFee', previousFee.baseFee, req.handlerId, (e) => {
                                   if (e) console.error(e)
                                 })
-                                link.rpc('setPriorityFee', previousFee.priorityFee, req.handlerId, (e) => {
-                                  if (e) console.error(e)
-                                })
+                                link.rpc(
+                                  'setPriorityFee',
+                                  previousFee.priorityFee,
+                                  req.handlerId,
+                                  (e) => {
+                                    if (e) console.error(e)
+                                  }
+                                )
                               } else if (previousFee.type === '0x0') {
-                                link.rpc('setGasPrice', previousFee.gasPrice, req.handlerId, (e) => {
-                                  if (e) console.error(e)
-                                })
+                                link.rpc(
+                                  'setGasPrice',
+                                  previousFee.gasPrice,
+                                  req.handlerId,
+                                  (e) => {
+                                    if (e) console.error(e)
+                                  }
+                                )
                               }
                             }}
                           >
@@ -542,41 +606,47 @@ class TransactionRequest extends React.Component {
                               if (this.state.allowInput) this.decline(req)
                             }}
                           >
-                            <div className='requestDeclineButton _txButton _txButtonBad'>Decline</div>
+                            <div className='requestDeclineButton _txButton _txButtonBad'>
+                              Decline
+                            </div>
                           </div>
                           <div
                             className='requestSign'
                             style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none' }}
                             onClick={() => {
                               if (this.state.allowInput) {
-                                link.rpc('signerCompatibility', req.handlerId, (e, compatibility) => {
-                                  if (e === 'No signer') {
-                                    this.store.notify('noSignerWarning', { req })
-                                  } else if (e === 'Signer locked') {
-                                    this.store.notify('signerLockedWarning', { req })
-                                  } else if (
-                                    !compatibility.compatible &&
-                                    !this.store('main.mute.signerCompatibilityWarning')
-                                  ) {
-                                    this.store.notify('signerCompatibilityWarning', {
-                                      req,
-                                      compatibility,
-                                      chain: this.chain,
-                                    })
-                                  } else if (
-                                    (maxFeeUSD.toNumber() > FEE_WARNING_THRESHOLD_USD ||
-                                      this.toDisplayUSD(maxFeeUSD) === '0.00') &&
-                                    !this.store('main.mute.gasFeeWarning')
-                                  ) {
-                                    this.store.notify('gasFeeWarning', {
-                                      req,
-                                      feeUSD: this.toDisplayUSD(maxFeeUSD),
-                                      currentSymbol,
-                                    })
-                                  } else {
-                                    this.approve(req.handlerId, req)
+                                link.rpc(
+                                  'signerCompatibility',
+                                  req.handlerId,
+                                  (e, compatibility) => {
+                                    if (e === 'No signer') {
+                                      this.store.notify('noSignerWarning', { req })
+                                    } else if (e === 'Signer locked') {
+                                      this.store.notify('signerLockedWarning', { req })
+                                    } else if (
+                                      !compatibility.compatible &&
+                                      !this.store('main.mute.signerCompatibilityWarning')
+                                    ) {
+                                      this.store.notify('signerCompatibilityWarning', {
+                                        req,
+                                        compatibility,
+                                        chain: this.chain,
+                                      })
+                                    } else if (
+                                      (maxFeeUSD.toNumber() > FEE_WARNING_THRESHOLD_USD ||
+                                        this.toDisplayUSD(maxFeeUSD) === '0.00') &&
+                                      !this.store('main.mute.gasFeeWarning')
+                                    ) {
+                                      this.store.notify('gasFeeWarning', {
+                                        req,
+                                        feeUSD: this.toDisplayUSD(maxFeeUSD),
+                                        currentSymbol,
+                                      })
+                                    } else {
+                                      this.approve(req.handlerId, req)
+                                    }
                                   }
-                                })
+                                )
                               }
                             }}
                           >

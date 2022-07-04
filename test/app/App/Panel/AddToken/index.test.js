@@ -103,7 +103,9 @@ describe('token metadata lookup', () => {
       tokenChainSelect = getByRole('option', { selected: true })
 
       await waitFor(() => {
-        expect(tokenContractAddressInput.value).toEqual('0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0')
+        expect(tokenContractAddressInput.value).toEqual(
+          '0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0'
+        )
         expect(tokenNameInput.value).toEqual('Frame Test on Polygon')
         expect(tokenSymbolInput.value).toEqual('mFRT')
         expect(tokenDecimalsInput.value).toEqual('18')

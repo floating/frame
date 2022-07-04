@@ -54,7 +54,11 @@ class Device {
   }
 
   inputPhrase(phrase, cb) {
-    TrezorConnect.uiResponse({ device: this.device, type: UI.RECEIVE_PASSPHRASE, payload: { value: phrase } })
+    TrezorConnect.uiResponse({
+      device: this.device,
+      type: UI.RECEIVE_PASSPHRASE,
+      payload: { value: phrase },
+    })
     cb()
   }
 
@@ -95,7 +99,12 @@ class Device {
   }
 
   ethereumSignTypedData(path, data, cb) {
-    TrezorConnect.ethereumSignTypedData({ device: this.device, path, data, metamask_v4_compat: true })
+    TrezorConnect.ethereumSignTypedData({
+      device: this.device,
+      path,
+      data,
+      metamask_v4_compat: true,
+    })
       .then((res) => {
         if (!res.success) return cb(new Error(res.payload.error))
         cb(null, res.payload)

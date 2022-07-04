@@ -108,7 +108,9 @@ class AddPhrase extends React.Component {
               <div className='addAccountItemTopTitle'>Watch Account</div>
             </div>
             {/* <div className='addAccountItemClose' onClick={() => this.props.close()}>{'Done'}</div> */}
-            <div className='addAccountItemSummary'>Watch accounts work like normal accounts but cannot sign</div>
+            <div className='addAccountItemSummary'>
+              Watch accounts work like normal accounts but cannot sign
+            </div>
           </div>
           <div className='addAccountItemOption'>
             <div
@@ -119,7 +121,10 @@ class AddPhrase extends React.Component {
             >
               Add Address Account
             </div>
-            <div className='addAccountItemOptionSetup' style={{ transform: `translateX(-${100 * this.state.index}%)` }}>
+            <div
+              className='addAccountItemOptionSetup'
+              style={{ transform: `translateX(-${100 * this.state.index}%)` }}
+            >
               <div className='addAccountItemOptionSetupFrames'>
                 <div className='addAccountItemOptionSetupFrame'>
                   <div className='addAccountItemOptionTitle'>input address</div>

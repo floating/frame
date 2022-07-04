@@ -6,7 +6,10 @@ import erc20Abi from '../externalData/balances/erc-20-abi'
 import type { Provider } from '../provider'
 
 function createWeb3ProviderWrapper(chainId: string, provider: Provider) {
-  const wrappedSend = (request: { method: string; params?: any[] }, cb: (error: any, response: any) => void) => {
+  const wrappedSend = (
+    request: { method: string; params?: any[] },
+    cb: (error: any, response: any) => void
+  ) => {
     provider.sendAsync(
       {
         method: request.method,
@@ -59,7 +62,11 @@ export default class Erc20Contract {
 
   async getTokenData() {
     try {
-      const calls = await Promise.all([this.contract.decimals(), this.contract.name(), this.contract.symbol()])
+      const calls = await Promise.all([
+        this.contract.decimals(),
+        this.contract.name(),
+        this.contract.symbol(),
+      ])
 
       return {
         decimals: calls[0],

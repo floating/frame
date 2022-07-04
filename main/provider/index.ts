@@ -155,21 +155,32 @@ export class Provider extends EventEmitter {
     const chains = availableChains.map(intToHex)
 
     this.subscriptions.chainsChanged.forEach((subscription) => {
-      this.emit('data', { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, result: chains } })
+      this.emit('data', {
+        method: 'eth_subscription',
+        jsonrpc: '2.0',
+        params: { subscription, result: chains },
+      })
     })
   }
 
   networkChanged(netId: number | string) {
     this.subscriptions.networkChanged.forEach((subscription) => {
-      this.emit('data', { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, result: netId } })
+      this.emit('data', {
+        method: 'eth_subscription',
+        jsonrpc: '2.0',
+        params: { subscription, result: netId },
+      })
     })
   }
 
   getNetVersion(payload: RPCRequestPayload, res: RPCRequestCallback, targetChain: Chain) {
     const connection = this.connection.connections[targetChain.type][targetChain.id]
-    const chainConnected = connection && (connection.primary?.connected || connection.secondary?.connected)
+    const chainConnected =
+      connection && (connection.primary?.connected || connection.secondary?.connected)
 
-    const response = chainConnected ? { result: connection.chainId } : { error: { message: 'not connected', code: 1 } }
+    const response = chainConnected
+      ? { result: connection.chainId }
+      : { error: { message: 'not connected', code: 1 } }
 
     res({ id: payload.id, jsonrpc: payload.jsonrpc, ...response })
   }
@@ -391,7 +402,12 @@ export class Provider extends EventEmitter {
     const { from, to, value, data, nonce } = rawTx
     const txParams = { from, to, value, data, nonce }
 
-    const payload: JSONRPCRequestPayload = { method: 'eth_estimateGas', params: [txParams], jsonrpc: '2.0', id: 1 }
+    const payload: JSONRPCRequestPayload = {
+      method: 'eth_estimateGas',
+      params: [txParams],
+      jsonrpc: '2.0',
+      id: 1,
+    }
     const targetChain: Chain = {
       type: 'ethereum',
       id: parseInt(rawTx.chainId, 16),
@@ -409,7 +425,9 @@ export class Provider extends EventEmitter {
           const estimatedLimit = parseInt(response.result, 16)
           const paddedLimit = Math.ceil(estimatedLimit * 1.5)
 
-          log.verbose(`gas estimate for tx to ${txParams.to}: ${estimatedLimit}, using ${paddedLimit} as gas limit`)
+          log.verbose(
+            `gas estimate for tx to ${txParams.to}: ${estimatedLimit}, using ${paddedLimit} as gas limit`
+          )
           return resolve(addHexPrefix(paddedLimit.toString(16)))
         },
         targetChain
@@ -438,7 +456,8 @@ export class Provider extends EventEmitter {
       const accountId = (accounts.current() || {}).id
       const rawTx = getRawTx(newTx, accountId)
       const gas = gasFees(rawTx)
-      const chainConfig = this.connection.connections['ethereum'][parseInt(rawTx.chainId)].chainConfig
+      const chainConfig =
+        this.connection.connections['ethereum'][parseInt(rawTx.chainId)].chainConfig
 
       const estimateGas = rawTx.gasLimit
         ? Promise.resolve(rawTx)
@@ -531,7 +550,10 @@ export class Provider extends EventEmitter {
   getTransactionByHash(payload: RPCRequestPayload, cb: RPCRequestCallback, targetChain: Chain) {
     const res = (response: any) => {
       if (response.result && !response.result.gasPrice && response.result.maxFeePerGas) {
-        return cb({ ...response, result: { ...response.result, gasPrice: response.result.maxFeePerGas } })
+        return cb({
+          ...response,
+          result: { ...response.result, gasPrice: response.result.maxFeePerGas },
+        })
       }
 
       cb(response)
@@ -856,8 +878,10 @@ export class Provider extends EventEmitter {
     if (method === 'eth_coinbase') return getCoinbase(payload, res)
     if (method === 'eth_accounts') return getAccounts(payload, res)
     if (method === 'eth_requestAccounts') return getAccounts(payload, res)
-    if (method === 'eth_sendTransaction') return this.sendTransaction(payload as RPC.SendTransaction.Request, res)
-    if (method === 'eth_getTransactionByHash') return this.getTransactionByHash(payload, res, targetChain)
+    if (method === 'eth_sendTransaction')
+      return this.sendTransaction(payload as RPC.SendTransaction.Request, res)
+    if (method === 'eth_getTransactionByHash')
+      return this.getTransactionByHash(payload, res, targetChain)
     if (method === 'personal_ecRecover') return ecRecover(payload, res)
     if (method === 'web3_clientVersion') return this.clientVersion(payload, res)
     if (method === 'eth_subscribe' && payload.params[0] in this.subscriptions) {
@@ -867,10 +891,17 @@ export class Provider extends EventEmitter {
     if (method === 'eth_sign' || method === 'personal_sign') return this.sign(payload, res)
 
     if (
-      ['eth_signTypedData', 'eth_signTypedData_v1', 'eth_signTypedData_v3', 'eth_signTypedData_v4'].includes(method)
+      [
+        'eth_signTypedData',
+        'eth_signTypedData_v1',
+        'eth_signTypedData_v3',
+        'eth_signTypedData_v4',
+      ].includes(method)
     ) {
       const underscoreIndex = method.lastIndexOf('_')
-      const version = (underscoreIndex > 3 ? method.substring(underscoreIndex + 1) : 'v1').toUpperCase() as Version
+      const version = (
+        underscoreIndex > 3 ? method.substring(underscoreIndex + 1) : 'v1'
+      ).toUpperCase() as Version
       return this.signTypedData(payload, version, res)
     }
 
@@ -882,7 +913,11 @@ export class Provider extends EventEmitter {
     if (method === 'wallet_getChains') return getChains(payload, res)
     if (method === 'wallet_getChainDetails') return getChainDetails(payload, res)
     if (method === 'wallet_getAssets')
-      return getAssets(payload as RPC.GetAssets.Request, accounts.current(), res as RPCCallback<RPC.GetAssets.Response>)
+      return getAssets(
+        payload as RPC.GetAssets.Request,
+        accounts.current(),
+        res as RPCCallback<RPC.GetAssets.Response>
+      )
 
     // Connection dependent methods need to pass targetChain
     if (method === 'net_version') return this.getNetVersion(payload, res, targetChain)
@@ -934,7 +969,10 @@ store.observer(() => {
   if (currentAccountId) {
     const assets = loadAssets(currentAccountId)
 
-    if (!isScanning(currentAccountId) && (assets.erc20.length > 0 || assets.nativeCurrency.length > 0)) {
+    if (
+      !isScanning(currentAccountId) &&
+      (assets.erc20.length > 0 || assets.nativeCurrency.length > 0)
+    ) {
       if (!debouncedAssets) {
         setTimeout(() => {
           if (debouncedAssets) {

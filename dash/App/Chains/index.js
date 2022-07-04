@@ -258,7 +258,11 @@ class _ChainModule extends React.Component {
         }}
       >
         <div
-          className={this.props.active ? 'sliceTileIndicatorLarge sliceTileIndicatorActive' : 'sliceTileIndicatorLarge'}
+          className={
+            this.props.active
+              ? 'sliceTileIndicatorLarge sliceTileIndicatorActive'
+              : 'sliceTileIndicatorLarge'
+          }
         />
         <div className='sliceTileConnectionName'>{'Pylon'}</div>
         <div className='sliceTileBlock'>
@@ -276,7 +280,11 @@ class _ChainModule extends React.Component {
     const current = connection.current
 
     if (current === 'custom') {
-      if (layer === 'primary' && this.state.primaryCustom !== '' && this.state.primaryCustom !== this.customMessage) {
+      if (
+        layer === 'primary' &&
+        this.state.primaryCustom !== '' &&
+        this.state.primaryCustom !== this.customMessage
+      ) {
         if (!this.okProtocol(this.state.primaryCustom)) status = 'invalid target'
         else if (!this.okPort(this.state.primaryCustom)) status = 'invalid port'
       }
@@ -307,7 +315,12 @@ class _ChainModule extends React.Component {
           <div className='connectionOptionStatusIndicatorGood' />
         </div>
       )
-    } else if (status === 'loading' || status === 'syncing' || status === 'pending' || status === 'standby') {
+    } else if (
+      status === 'loading' ||
+      status === 'syncing' ||
+      status === 'pending' ||
+      status === 'standby'
+    ) {
       return (
         <div className='connectionOptionStatusIndicator'>
           <div className='connectionOptionStatusIndicatorPending' />
@@ -328,7 +341,10 @@ class _ChainModule extends React.Component {
     let presets = networkPresets[id] || {}
     presets = Object.keys(presets).map((i) => ({ text: i, value: type + ':' + id + ':' + i }))
     presets = presets.concat(
-      Object.keys(networkPresets.default).map((i) => ({ text: i, value: type + ':' + id + ':' + i }))
+      Object.keys(networkPresets.default).map((i) => ({
+        text: i,
+        value: type + ':' + id + ':' + i,
+      }))
     )
     presets.push({ text: 'Custom', value: type + ':' + id + ':' + 'custom' })
 
@@ -337,8 +353,15 @@ class _ChainModule extends React.Component {
         {this.renderConnection('connection', id)}
         {this.state.expanded ? (
           <div className='connectionLevels'>
-            <div className='signerPermission signerPermissionNetwork cardShow' style={{ zIndex: 2 }}>
-              <div className={connection.primary.on ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
+            <div
+              className='signerPermission signerPermissionNetwork cardShow'
+              style={{ zIndex: 2 }}
+            >
+              <div
+                className={
+                  connection.primary.on ? 'connectionOption connectionOptionOn' : 'connectionOption'
+                }
+              >
                 <div className='connectionOptionToggle'>
                   <div className='signerPermissionSetting'>Primary</div>
                   <div
@@ -347,7 +370,9 @@ class _ChainModule extends React.Component {
                         ? 'signerPermissionToggleSmall signerPermissionToggleSmallOn'
                         : 'signerPermissionToggleSmall'
                     }
-                    onMouseDown={(_) => link.send('tray:action', 'toggleConnection', type, id, 'primary')}
+                    onMouseDown={(_) =>
+                      link.send('tray:action', 'toggleConnection', type, id, 'primary')
+                    }
                   >
                     <div className='signerPermissionToggleSwitch' />
                   </div>
@@ -387,8 +412,17 @@ class _ChainModule extends React.Component {
                 ) : null}
               </div>
             </div>
-            <div className='signerPermission signerPermissionNetwork cardShow' style={{ zIndex: 1 }}>
-              <div className={connection.secondary.on ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
+            <div
+              className='signerPermission signerPermissionNetwork cardShow'
+              style={{ zIndex: 1 }}
+            >
+              <div
+                className={
+                  connection.secondary.on
+                    ? 'connectionOption connectionOptionOn'
+                    : 'connectionOption'
+                }
+              >
                 <div className='connectionOptionToggle'>
                   <div className='signerPermissionSetting'>Secondary</div>
                   <div
@@ -397,7 +431,9 @@ class _ChainModule extends React.Component {
                         ? 'signerPermissionToggleSmall signerPermissionToggleSmallOn'
                         : 'signerPermissionToggleSmall'
                     }
-                    onMouseDown={(_) => link.send('tray:action', 'toggleConnection', type, id, 'secondary')}
+                    onMouseDown={(_) =>
+                      link.send('tray:action', 'toggleConnection', type, id, 'secondary')
+                    }
                   >
                     <div className='signerPermissionToggleSwitch' />
                   </div>
@@ -453,10 +489,15 @@ class _Network extends React.Component {
     this.network = id
     this.networkType = type
     const primaryCustom =
-      context.store('main.networks', this.networkType, this.network, 'connection.primary.custom') || this.customMessage
-    const secondaryCustom =
-      context.store('main.networks', this.networkType, this.network, 'connection.secondary.custom') ||
+      context.store('main.networks', this.networkType, this.network, 'connection.primary.custom') ||
       this.customMessage
+    const secondaryCustom =
+      context.store(
+        'main.networks',
+        this.networkType,
+        this.network,
+        'connection.secondary.custom'
+      ) || this.customMessage
     this.newNetworkIdDefault = 'ID'
     this.newNetworkNameDefault = 'New Network'
     this.newNetworkExplorerDefault = 'Block Explorer'
@@ -510,7 +551,14 @@ class _Network extends React.Component {
     const value = e.target.value.replace(/\s+/g, '')
     this.setState({ primaryCustom: value })
     this.customPrimaryInputTimeout = setTimeout(
-      () => link.send('tray:action', 'setPrimaryCustom', this.props.type, this.props.id, this.state.primaryCustom),
+      () =>
+        link.send(
+          'tray:action',
+          'setPrimaryCustom',
+          this.props.type,
+          this.props.id,
+          this.state.primaryCustom
+        ),
       1000
     )
   }
@@ -521,7 +569,14 @@ class _Network extends React.Component {
     const value = e.target.value.replace(/\s+/g, '')
     this.setState({ secondaryCustom: value })
     this.customSecondaryInputTimeout = setTimeout(
-      () => link.send('tray:action', 'setSecondaryCustom', this.props.type, this.props.id, this.state.secondaryCustom),
+      () =>
+        link.send(
+          'tray:action',
+          'setSecondaryCustom',
+          this.props.type,
+          this.props.id,
+          this.state.secondaryCustom
+        ),
       1000
     )
   }
@@ -610,16 +665,25 @@ class _Network extends React.Component {
     let presets = networkPresets[id] || {}
     presets = Object.keys(presets).map((i) => ({ text: i, value: type + ':' + id + ':' + i }))
     presets = presets.concat(
-      Object.keys(networkPresets.default).map((i) => ({ text: i, value: type + ':' + id + ':' + i }))
+      Object.keys(networkPresets.default).map((i) => ({
+        text: i,
+        value: type + ':' + id + ':' + i,
+      }))
     )
     presets.push({ text: 'Custom', value: type + ':' + id + ':' + 'custom' })
 
     const gas =
       Math.round(
-        parseInt(this.store('main.networksMeta.ethereum', this.state.id, 'gas.price.levels.fast'), 'hex') / 1e9
+        parseInt(
+          this.store('main.networksMeta.ethereum', this.state.id, 'gas.price.levels.fast'),
+          'hex'
+        ) / 1e9
       ) || '---'
-    const price = this.store('main.networksMeta.ethereum', this.state.id, 'nativeCurrency.usd.price') || '?'
-    const change24hr = this.store('main.networksMeta.ethereum', this.state.id, 'nativeCurrency.usd.change24hr') || '?'
+    const price =
+      this.store('main.networksMeta.ethereum', this.state.id, 'nativeCurrency.usd.price') || '?'
+    const change24hr =
+      this.store('main.networksMeta.ethereum', this.state.id, 'nativeCurrency.usd.change24hr') ||
+      '?'
     const symbol = this.store('main.networks.ethereum', this.state.id, 'symbol') || '?'
 
     const hexId = '0x' + parseInt(id).toString('16')
@@ -668,7 +732,11 @@ class _Network extends React.Component {
             {svg.gear(11)}
           </div>
           <div
-            className={this.props.on ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'}
+            className={
+              this.props.on
+                ? 'signerPermissionToggle signerPermissionToggleOn'
+                : 'signerPermissionToggle'
+            }
             onClick={
               this.props.id !== 1
                 ? () => {
@@ -750,7 +818,10 @@ class Settings extends React.Component {
         onMouseDown={() =>
           link.send('tray:action', 'navDash', {
             view: 'openExternal',
-            data: { notify: 'hotAccountWarning', notifyData: { url: 'https://discord.gg/UH7NGqY' } },
+            data: {
+              notify: 'hotAccountWarning',
+              notifyData: { url: 'https://discord.gg/UH7NGqY' },
+            },
           })
         }
       >
@@ -772,7 +843,8 @@ class Settings extends React.Component {
 
   selectNetwork(network) {
     const [type, id] = network.split(':')
-    if (network.type !== type || network.id !== id) link.send('tray:action', 'selectNetwork', type, id)
+    if (network.type !== type || network.id !== id)
+      link.send('tray:action', 'selectNetwork', type, id)
   }
 
   // expandNetwork (e, expand) {
@@ -826,7 +898,10 @@ class Settings extends React.Component {
     let presets = networkPresets[id] || {}
     presets = Object.keys(presets).map((i) => ({ text: i, value: type + ':' + id + ':' + i }))
     presets = presets.concat(
-      Object.keys(networkPresets.default).map((i) => ({ text: i, value: type + ':' + id + ':' + i }))
+      Object.keys(networkPresets.default).map((i) => ({
+        text: i,
+        value: type + ':' + id + ':' + i,
+      }))
     )
     presets.push({ text: 'Custom', value: type + ':' + id + ':' + 'custom' })
     const networkOptions = []
@@ -878,7 +953,9 @@ class Settings extends React.Component {
         <div className='localSettingsWrap'>
           <div
             className='newAccount'
-            onClick={() => link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'addChain' } })}
+            onClick={() =>
+              link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'addChain' } })
+            }
           >
             <div className='newAccountIcon'>{svg.plus(16)}</div>
             Add New Chain
