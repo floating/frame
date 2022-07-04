@@ -83,7 +83,6 @@ const detectMouse = () => {
 }
 
 const api = {
-  getTray: () => windows.tray,
   create: () => {
     windows.tray = new BrowserWindow({
       id: 'tray',
