@@ -1,20 +1,12 @@
 const { app, ipcMain, protocol, shell, clipboard, globalShortcut, BrowserWindow } = require('electron')
 
 const additionalData = { myKey: 'myValue' }
-const gotTheLock = app.requestSingleInstanceLock(additionalData)
+const hasInstanceLock = app.requestSingleInstanceLock(additionalData)
 
-console.log('lock: ', gotTheLock)
-
-if (!gotTheLock) {
-  console.log('not got lock, quitting')
+if (!hasInstanceLock) {
   app.quit()
 } else {
-  console.log('running')
   app.on('second-instance', (event, commandLine, workingDirectory, additionalData) => {
-    // Print out data received from the second instance.
-    console.log('second instance', additionalData)
-
-    // Someone tried to run a second instance, we should focus our window.
     const tray = windows.getTray()
     if (tray) {
       if (tray.isMinimized()) tray.restore()
