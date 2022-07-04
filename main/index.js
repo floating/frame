@@ -10,7 +10,7 @@ if (!hasInstanceLock) {
   app.quit()
 } else {
   app.on('second-instance', (event, argv, workingDirectory) => {
-    log.info('second instance requested...', workingDirectory, argv)
+    log.info(`second instance requested from directory: ${workingDirectory}`)
     windows.showTray()
   })
 
