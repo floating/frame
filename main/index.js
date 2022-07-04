@@ -9,17 +9,10 @@ const hasInstanceLock = app.requestSingleInstanceLock()
 if (!hasInstanceLock) {
   app.quit()
 } else {
-  app.on('second-instance', (event, argv) => {
-    const tray = windows.getTray()
-    log.info('second instance requested...', argv)
-    if (tray) {
-      if (tray.isMinimized()) {
-        log.info('restoring Frame window...')
-        tray.restore()
-      }
-      
-      windows.showTray()
-    }
+  app.on('second-instance', (event, argv, workingDirectory) => {
+    log.info('second instance requested...', workingDirectory, argv)
+    windows.showTray()
+    windows.showDash()
   })
 
   app.commandLine.appendSwitch('enable-accelerated-2d-canvas', true)
