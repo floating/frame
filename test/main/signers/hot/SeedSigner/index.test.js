@@ -73,7 +73,7 @@ describe('Seed signer', () => {
     } catch (e) {
       done(e)
     }
-  }, 2000)
+  }, 2500)
 
   test('Scan for signers', (done) => {
     jest.useFakeTimers()
@@ -92,7 +92,7 @@ describe('Seed signer', () => {
     hot.scan(signers)
 
     jest.runAllTimers()
-  }, 800)
+  }, 1000)
 
   test('Unlock with wrong password', (done) => {
     try {
@@ -115,7 +115,7 @@ describe('Seed signer', () => {
     } catch (e) {
       done(e)
     }
-  }, 400)
+  }, 500)
 
   test('Sign message', (done) => {
     try {

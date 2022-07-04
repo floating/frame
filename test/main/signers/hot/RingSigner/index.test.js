@@ -113,7 +113,7 @@ describe('Ring signer', () => {
     hot.scan(signers)
 
     jest.runAllTimers()
-  }, 800)
+  }, 1000)
 
   test('Close signer', (done) => {
     try {
@@ -204,7 +204,7 @@ describe('Ring signer', () => {
     } catch (e) {
       done(e)
     }
-  }, 500)
+  }, 1000)
 
   test('Unlock', (done) => {
     try {
@@ -215,7 +215,7 @@ describe('Ring signer', () => {
     } catch (e) {
       done(e)
     }
-  }, 500)
+  }, 2000)
 
   test('Sign message', (done) => {
     try {

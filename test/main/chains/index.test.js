@@ -261,5 +261,5 @@ Object.values(mockConnections).forEach((chain) => {
     })
 
     store.toggleConnection('ethereum', chain.id, 'primary', true)
-  })
+  }, 500)
 })
