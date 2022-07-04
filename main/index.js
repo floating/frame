@@ -9,16 +9,16 @@ const hasInstanceLock = app.requestSingleInstanceLock()
 if (!hasInstanceLock) {
   app.quit()
 } else {
-  app.on('second-instance', () => {
+  app.on('second-instance', (event, argv) => {
     const tray = windows.getTray()
-    log.info('second instance requested')
+    log.info('second instance requested...', argv)
     if (tray) {
       if (tray.isMinimized()) {
         log.info('restoring Frame window...')
         tray.restore()
       }
       
-      tray.focus()
+      windows.showTray()
     }
   })
 
