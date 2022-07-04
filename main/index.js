@@ -12,7 +12,6 @@ if (!hasInstanceLock) {
   app.on('second-instance', (event, argv, workingDirectory) => {
     log.info('second instance requested...', workingDirectory, argv)
     windows.showTray()
-    windows.showDash()
   })
 
   app.commandLine.appendSwitch('enable-accelerated-2d-canvas', true)
