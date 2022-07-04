@@ -94,11 +94,7 @@ export default class Lattice extends Signer {
     try {
       const paired = await this.connection.connect(this.deviceId)
 
-      const {
-        fix: patch,
-        minor,
-        major,
-      } = this.connection.getFwVersion() || { fix: 0, major: 0, minor: 0 }
+      const { fix: patch, minor, major } = this.connection.getFwVersion() || { fix: 0, major: 0, minor: 0 }
 
       log.info(
         `Connected to Lattice with deviceId=${this.deviceId} paired=${paired}, firmware v${major}.${minor}.${patch}`
@@ -192,9 +188,7 @@ export default class Lattice extends Signer {
         }
 
         const loadedAddresses = await connection.getAddresses(req)
-        this.addresses = [...this.addresses, ...loadedAddresses].map((addr) =>
-          addHexPrefix(addr.toString())
-        )
+        this.addresses = [...this.addresses, ...loadedAddresses].map((addr) => addHexPrefix(addr.toString()))
       }
 
       this.status = 'ok'
@@ -217,12 +211,7 @@ export default class Lattice extends Signer {
     }
   }
 
-  async verifyAddress(
-    index: number,
-    currentAddress: string,
-    display = true,
-    cb: Callback<boolean>
-  ) {
+  async verifyAddress(index: number, currentAddress: string, display = true, cb: Callback<boolean>) {
     const connection = this.connection as Client
 
     log.info(`verifying address ${currentAddress} for Lattice ${connection.getAppName()}`)
@@ -264,11 +253,7 @@ export default class Lattice extends Signer {
     const versionNum = (version.match(/[Vv](\d+)/) || [])[1]
 
     if ((parseInt(versionNum) || 0) < 4) {
-      return cb(
-        new Error(
-          `Invalid version (${version}), Lattice only supports eth_signTypedData version 4+`
-        )
-      )
+      return cb(new Error(`Invalid version (${version}), Lattice only supports eth_signTypedData version 4+`))
     }
 
     try {
@@ -379,9 +364,7 @@ export default class Lattice extends Signer {
 
       const to = tx.to?.toString() ?? undefined
 
-      const callDataDecoder = to
-        ? await Utils.fetchCalldataDecoder(tx.data, to, unsignedTx.chainId)
-        : undefined
+      const callDataDecoder = to ? await Utils.fetchCalldataDecoder(tx.data, to, unsignedTx.chainId) : undefined
 
       const data = {
         payload,

@@ -50,11 +50,7 @@ class ChainModule extends React.Component {
     const current = connection.current
 
     if (current === 'custom') {
-      if (
-        layer === 'primary' &&
-        this.state.primaryCustom !== '' &&
-        this.state.primaryCustom !== this.customMessage
-      ) {
+      if (layer === 'primary' && this.state.primaryCustom !== '' && this.state.primaryCustom !== this.customMessage) {
         if (!this.okProtocol(this.state.primaryCustom)) status = 'invalid target'
         else if (!this.okPort(this.state.primaryCustom)) status = 'invalid port'
       }
@@ -85,12 +81,7 @@ class ChainModule extends React.Component {
           <div className='connectionOptionStatusIndicatorGood' />
         </div>
       )
-    } else if (
-      status === 'loading' ||
-      status === 'syncing' ||
-      status === 'pending' ||
-      status === 'standby'
-    ) {
+    } else if (status === 'loading' || status === 'syncing' || status === 'pending' || status === 'standby') {
       return (
         <div className='connectionOptionStatusIndicator'>
           <div className='connectionOptionStatusIndicatorPending' />

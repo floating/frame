@@ -3,15 +3,7 @@ const ethSigUtil = require('eth-sig-util')
 const { TransactionFactory } = require('@ethereumjs/tx')
 const Common = require('@ethereumjs/common').default
 
-const {
-  BN,
-  hashPersonalMessage,
-  toBuffer,
-  ecsign,
-  addHexPrefix,
-  pubToAddress,
-  ecrecover,
-} = require('ethereumjs-util')
+const { BN, hashPersonalMessage, toBuffer, ecsign, addHexPrefix, pubToAddress, ecrecover } = require('ethereumjs-util')
 
 function chainConfig(chain, hardfork) {
   const chainId = new BN(chain)
@@ -36,8 +28,7 @@ class HotSignerWorker {
       process.send(response)
     }
     // Verify token
-    if (!crypto.timingSafeEqual(Buffer.from(token), Buffer.from(this.token)))
-      return pseudoCallback('Invalid token')
+    if (!crypto.timingSafeEqual(Buffer.from(token), Buffer.from(this.token))) return pseudoCallback('Invalid token')
     // If method exists -> execute
     if (this[method]) return this[method](params, pseudoCallback)
     // Else return error
@@ -52,11 +43,7 @@ class HotSignerWorker {
     const signed = ecsign(hash, key)
 
     // Return serialized signed message
-    const hex = Buffer.concat([
-      Buffer.from(signed.r),
-      Buffer.from(signed.s),
-      Buffer.from([signed.v]),
-    ]).toString('hex')
+    const hex = Buffer.concat([Buffer.from(signed.r), Buffer.from(signed.s), Buffer.from([signed.v])]).toString('hex')
 
     pseudoCallback(null, addHexPrefix(hex))
   }

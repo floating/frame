@@ -43,10 +43,7 @@ export default class TokenLoader {
   private readonly nebula = nebulaApi(this.eth)
 
   constructor() {
-    this.tokenList = mergeTokens(
-      sushiswapTokenList.tokens as Token[],
-      defaultTokenList.tokens as TokenSpec[]
-    )
+    this.tokenList = mergeTokens(sushiswapTokenList.tokens as Token[], defaultTokenList.tokens as TokenSpec[])
   }
 
   private async loadTokenList() {
@@ -62,9 +59,7 @@ export default class TokenLoader {
 
     try {
       const tokenListRecord = await this.nebula.resolve('tokens.frame.eth')
-      const tokenManifest: { tokens: TokenSpec[] } = await this.nebula.ipfs.getJson(
-        tokenListRecord.record.content
-      )
+      const tokenManifest: { tokens: TokenSpec[] } = await this.nebula.ipfs.getJson(tokenListRecord.record.content)
 
       const tokens = tokenManifest.tokens
 

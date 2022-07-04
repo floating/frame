@@ -10,13 +10,8 @@ import { SignerAdapter } from '../adapters'
 import Ledger from './Ledger'
 import store from '../../store'
 
-function updateDerivation(
-  ledger: Ledger,
-  derivation = store('main.ledger.derivation'),
-  accountLimit = 0
-) {
-  const liveAccountLimit =
-    accountLimit || (derivation === Derivation.live ? store('main.ledger.liveAccountLimit') : 0)
+function updateDerivation(ledger: Ledger, derivation = store('main.ledger.derivation'), accountLimit = 0) {
+  const liveAccountLimit = accountLimit || (derivation === Derivation.live ? store('main.ledger.liveAccountLimit') : 0)
 
   ledger.derivation = derivation
   ledger.accountLimit = liveAccountLimit
@@ -119,8 +114,7 @@ export default class LedgerSignerAdapter extends SignerAdapter {
   }
 
   private handleDeviceChanges() {
-    const { attachedDevices, detachedLedgers, reconnections, pendingDisconnections } =
-      this.detectDeviceChanges()
+    const { attachedDevices, detachedLedgers, reconnections, pendingDisconnections } = this.detectDeviceChanges()
 
     this.disconnections = pendingDisconnections
 
@@ -163,9 +157,7 @@ export default class LedgerSignerAdapter extends SignerAdapter {
   }
 
   private async handleReconnectedDevice(disconnection: Disconnection) {
-    log.info(
-      `Ledger ${disconnection.device.model} re-connected at ${disconnection.device.devicePath}`
-    )
+    log.info(`Ledger ${disconnection.device.model} re-connected at ${disconnection.device.devicePath}`)
 
     clearTimeout(disconnection.timeout)
 
@@ -183,9 +175,7 @@ export default class LedgerSignerAdapter extends SignerAdapter {
     this.disconnections.push({
       device: ledger,
       timeout: setTimeout(() => {
-        const index = this.disconnections.findIndex(
-          (d) => d.device.devicePath === ledger.devicePath
-        )
+        const index = this.disconnections.findIndex((d) => d.device.devicePath === ledger.devicePath)
         this.disconnections.splice(index, 1)
 
         log.info(`Ledger ${ledger.model} detached from ${ledger.devicePath}`)
@@ -255,9 +245,7 @@ export default class LedgerSignerAdapter extends SignerAdapter {
     // device path from the one from which they were disconnected
     while (pendingDisconnections.length > 0) {
       const reconnectedDevice = connectedDevices.find(
-        (device) =>
-          !reconnections.some((r) => r.device.devicePath === device.path) &&
-          !this.knownSigners[device.path]
+        (device) => !reconnections.some((r) => r.device.devicePath === device.path) && !this.knownSigners[device.path]
       )
 
       if (reconnectedDevice) {

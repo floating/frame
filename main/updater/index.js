@@ -58,8 +58,7 @@ const updater = {
     this.availableVersion = version
     this.availableUpdate = location
     const remindOk = store('main.updater.dontRemind').indexOf(version) === -1
-    if (!updater.notified[version] && remindOk)
-      windows.broadcast('main:action', 'updateBadge', 'updateAvailable')
+    if (!updater.notified[version] && remindOk) windows.broadcast('main:action', 'updateBadge', 'updateAvailable')
     updater.notified[version] = true
   },
   updateReady: () => {
@@ -92,16 +91,9 @@ const updater = {
         res.on('end', () => {
           try {
             const releases = JSON.parse(rawData).filter((r) => !r.prerelease || prereleaseTrack)
-            if (
-              releases &&
-              releases[0] &&
-              releases[0].tag_name &&
-              !updater.notified[releases[0].tag_name]
-            ) {
+            if (releases && releases[0] && releases[0].tag_name && !updater.notified[releases[0].tag_name]) {
               const newVersion =
-                releases[0].tag_name.charAt(0) === 'v'
-                  ? releases[0].tag_name.substr(1)
-                  : releases[0].tag_name
+                releases[0].tag_name.charAt(0) === 'v' ? releases[0].tag_name.substr(1) : releases[0].tag_name
               if (compareVersions(newVersion, version) === 1) {
                 log.info('Updater: Current version is behind latest')
                 log.info('Updater: User has not been notified of this version yet')

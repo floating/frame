@@ -121,10 +121,7 @@ class AddHardwareLattice extends React.Component {
             <div className='addAccountItemSummary'>GridPlus Lattice1</div>
           </div>
           <div className='addAccountItemOption'>
-            <div
-              className='addAccountItemOptionSetup'
-              style={{ transform: `translateX(-${100 * this.state.index}%)` }}
-            >
+            <div className='addAccountItemOptionSetup' style={{ transform: `translateX(-${100 * this.state.index}%)` }}>
               <div className='addAccountItemOptionSetupFrames'>
                 <div className='addAccountItemOptionSetupFrame'>
                   <div className='addAccountItemOptionTitle'>Device Name</div>
@@ -187,10 +184,7 @@ class AddHardwareLattice extends React.Component {
                     <>
                       <div className='addAccountItemOptionTitle'>{this.state.status}</div>
                       {this.state.error ? (
-                        <div
-                          className='addAccountItemOptionSubmit'
-                          onMouseDown={() => this.restart()}
-                        >
+                        <div className='addAccountItemOptionSubmit' onMouseDown={() => this.restart()}>
                           try again
                         </div>
                       ) : null}

@@ -130,11 +130,7 @@ class Settings extends React.Component {
     const current = connection.current
 
     if (current === 'custom') {
-      if (
-        layer === 'primary' &&
-        this.state.primaryCustom !== '' &&
-        this.state.primaryCustom !== this.customMessage
-      ) {
+      if (layer === 'primary' && this.state.primaryCustom !== '' && this.state.primaryCustom !== this.customMessage) {
         if (!okProtocol(this.state.primaryCustom)) status = 'invalid target'
         else if (!okPort(this.state.primaryCustom)) status = 'invalid port'
       }
@@ -159,10 +155,7 @@ class Settings extends React.Component {
 
   discord() {
     return (
-      <div
-        className='discordInvite'
-        onClick={() => link.send('tray:openExternal', 'https://discord.gg/UH7NGqY')}
-      >
+      <div className='discordInvite' onClick={() => link.send('tray:openExternal', 'https://discord.gg/UH7NGqY')}>
         <div>Need help?</div>
         <div className='discordLink'>Join our Discord!</div>
       </div>
@@ -186,12 +179,7 @@ class Settings extends React.Component {
           <div className='connectionOptionStatusIndicatorGood' />
         </div>
       )
-    } else if (
-      status === 'loading' ||
-      status === 'syncing' ||
-      status === 'pending' ||
-      status === 'standby'
-    ) {
+    } else if (status === 'loading' || status === 'syncing' || status === 'pending' || status === 'standby') {
       return (
         <div className='connectionOptionStatusIndicator'>
           <div className='connectionOptionStatusIndicatorPending' />
@@ -208,8 +196,7 @@ class Settings extends React.Component {
 
   selectNetwork(network) {
     const [type, id] = network.split(':')
-    if (network.type !== type || network.id !== id)
-      link.send('tray:action', 'selectNetwork', type, id)
+    if (network.type !== type || network.id !== id) link.send('tray:action', 'selectNetwork', type, id)
   }
 
   expandNetwork(e, expand) {
@@ -236,9 +223,7 @@ class Settings extends React.Component {
                     ? 'signerPermissionToggle signerPermissionToggleOn'
                     : 'signerPermissionToggle'
                 }
-                onClick={(_) =>
-                  link.send('tray:action', 'setAltSpace', !this.store('main.shortcuts.altSlash'))
-                }
+                onClick={(_) => link.send('tray:action', 'setAltSpace', !this.store('main.shortcuts.altSlash'))}
               >
                 <div className='signerPermissionToggleSwitch' />
               </div>
@@ -262,9 +247,7 @@ class Settings extends React.Component {
                     ? 'signerPermissionToggle signerPermissionToggleOn'
                     : 'signerPermissionToggle'
                 }
-                onClick={(_) =>
-                  link.send('tray:action', 'setAutohide', !this.store('main.autohide'))
-                }
+                onClick={(_) => link.send('tray:action', 'setAutohide', !this.store('main.autohide'))}
               >
                 <div className='signerPermissionToggleSwitch' />
               </div>
@@ -303,9 +286,7 @@ class Settings extends React.Component {
                 <div className='signerPermissionToggleSwitch' />
               </div>
             </div>
-            <div className='signerPermissionDetails'>
-              {"Mouse to display's right edge to summon Frame"}
-            </div>
+            <div className='signerPermissionDetails'>{"Mouse to display's right edge to summon Frame"}</div>
           </div>
           <div className='signerPermission localSetting' style={{ zIndex: 210 }}>
             <div className='signerPermissionControls'>
@@ -329,9 +310,7 @@ class Settings extends React.Component {
                 <div className='signerPermissionToggleSwitch' />
               </div>
             </div>
-            <div className='signerPermissionDetails'>
-              {"Adds the ability to edit a transaction's nonce"}
-            </div>
+            <div className='signerPermissionDetails'>{"Adds the ability to edit a transaction's nonce"}</div>
           </div>
           {/* <div className='signerPermission localSetting' style={{ zIndex: 6 }}>
             <div className='signerPermissionControls'>
@@ -354,20 +333,12 @@ class Settings extends React.Component {
                       ? 'signerPermissionToggle signerPermissionToggleOn'
                       : 'signerPermissionToggle'
                   }
-                  onClick={(_) =>
-                    link.send(
-                      'tray:action',
-                      'setMenubarGasPrice',
-                      !this.store('main.menubarGasPrice')
-                    )
-                  }
+                  onClick={(_) => link.send('tray:action', 'setMenubarGasPrice', !this.store('main.menubarGasPrice'))}
                 >
                   <div className='signerPermissionToggleSwitch' />
                 </div>
               </div>
-              <div className='signerPermissionDetails'>
-                Show current gas price (Gwei) in menubar
-              </div>
+              <div className='signerPermissionDetails'>Show current gas price (Gwei) in menubar</div>
             </div>
           ) : null}
           <div className='signerPermission localSetting' style={{ zIndex: 208 }}>
@@ -399,9 +370,7 @@ class Settings extends React.Component {
                 ]}
               />
             </div>
-            <div className='signerPermissionDetails'>
-              {'Derivation path for connected Trezor devices'}
-            </div>
+            <div className='signerPermissionDetails'>{'Derivation path for connected Trezor devices'}</div>
           </div>
           <div className='signerPermission localSetting' style={{ zIndex: 206 }}>
             <div className='signerPermissionControls'>
@@ -417,9 +386,7 @@ class Settings extends React.Component {
                 ]}
               />
             </div>
-            <div className='signerPermissionDetails'>
-              {'Derivation path for connected Ledger devices'}
-            </div>
+            <div className='signerPermissionDetails'>{'Derivation path for connected Ledger devices'}</div>
           </div>
           {this.store('main.ledger.derivation') === 'live' ? (
             <div className='signerPermission localSetting' style={{ zIndex: 205 }}>
@@ -452,9 +419,7 @@ class Settings extends React.Component {
                 ]}
               />
             </div>
-            <div className='signerPermissionDetails'>
-              {'Derivation path for connected Lattice devices'}
-            </div>
+            <div className='signerPermissionDetails'>{'Derivation path for connected Lattice devices'}</div>
           </div>
           <div className='signerPermission localSetting' style={{ zIndex: 203 }}>
             <div className='signerPermissionControls'>
@@ -515,9 +480,7 @@ class Settings extends React.Component {
                 ]}
               />
             </div>
-            <div className='signerPermissionDetails'>
-              When should Frame relock your hot signers?
-            </div>
+            <div className='signerPermissionDetails'>When should Frame relock your hot signers?</div>
           </div>
         </div>
       </div>

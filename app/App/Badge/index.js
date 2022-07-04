@@ -19,10 +19,7 @@ class Bridge extends React.Component {
               </div>
               <div className='badgeInput'>
                 <div className='badgeInputButton'>
-                  <div
-                    className='badgeInputInner'
-                    onMouseDown={() => link.send('tray:updateRestart')}
-                  >
+                  <div className='badgeInputInner' onMouseDown={() => link.send('tray:updateRestart')}>
                     Relaunch Now
                   </div>
                 </div>
@@ -36,9 +33,7 @@ class Bridge extends React.Component {
         <div className='badgeWrap'>
           <div className='badge cardShow' style={{ transform: 'translateY(0px)', height: '224px' }}>
             <div className='badgeInner'>
-              <div className='badgeMessage'>
-                A new update is available, would you like to install it?
-              </div>
+              <div className='badgeMessage'>A new update is available, would you like to install it?</div>
               <div className='badgeInput'>
                 <div className='badgeInputButton'>
                   <div

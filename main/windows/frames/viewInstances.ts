@@ -124,8 +124,7 @@ export default {
     const { ens, session } = extract(url)
     server.sessions.remove(ens, session)
 
-    if (frameInstance && !frameInstance.isDestroyed())
-      frameInstance.removeBrowserView(views[viewId])
+    if (frameInstance && !frameInstance.isDestroyed()) frameInstance.removeBrowserView(views[viewId])
 
     const webcontents = views[viewId].webContents as any
     webcontents.destroy()

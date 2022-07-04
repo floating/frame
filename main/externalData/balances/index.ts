@@ -12,13 +12,10 @@ export default function (store: Store) {
     getNetwork: (id: number) => (store('main.networks.ethereum', id) || {}) as Network,
     getConnectedNetworks: () => {
       const networks = Object.values(store('main.networks.ethereum') || {}) as Network[]
-      return networks.filter(
-        (n) => (n.connection.primary || {}).connected || (n.connection.secondary || {}).connected
-      )
+      return networks.filter((n) => (n.connection.primary || {}).connected || (n.connection.secondary || {}).connected)
     },
     getCustomTokens: () => (store('main.tokens.custom') || []) as Token[],
-    getKnownTokens: (address?: Address) =>
-      ((address && store('main.tokens.known', address)) || []) as Token[],
+    getKnownTokens: (address?: Address) => ((address && store('main.tokens.known', address)) || []) as Token[],
     getCurrencyBalances: (address: Address) => {
       return ((store('main.balances', address) || []) as Balance[]).filter(
         (balance) => balance.address === NATIVE_CURRENCY
@@ -130,14 +127,9 @@ export default function (store: Store) {
     const customTokens = storeApi.getCustomTokens()
     const knownTokens = storeApi
       .getKnownTokens(address)
-      .filter(
-        (token) =>
-          !customTokens.some((t) => t.address === token.address && t.chainId === token.chainId)
-      )
+      .filter((token) => !customTokens.some((t) => t.address === token.address && t.chainId === token.chainId))
 
-    const trackedTokens = [...customTokens, ...knownTokens].filter((t) =>
-      chains.includes(t.chainId)
-    )
+    const trackedTokens = [...customTokens, ...knownTokens].filter((t) => chains.includes(t.chainId))
 
     if (trackedTokens.length > 0) {
       workerController?.updateKnownTokenBalances(address, trackedTokens)
@@ -161,9 +153,7 @@ export default function (store: Store) {
     // only update balances that have changed
     balances
       .filter(
-        (balance) =>
-          (currentChainBalances.find((b) => b.chainId === balance.chainId) || {}).balance !==
-          balance.balance
+        (balance) => (currentChainBalances.find((b) => b.chainId === balance.chainId) || {}).balance !== balance.balance
       )
       .forEach((balance) => {
         store.setBalance(address, {
@@ -191,9 +181,7 @@ export default function (store: Store) {
 
       // add any non-zero balances to the list of known tokens
       const unknownBalances = changedBalances.filter(
-        (b) =>
-          parseInt(b.balance) > 0 &&
-          !knownTokens.some((t) => t.address === b.address && t.chainId === b.chainId)
+        (b) => parseInt(b.balance) > 0 && !knownTokens.some((t) => t.address === b.address && t.chainId === b.chainId)
       )
 
       if (unknownBalances.length > 0) {
@@ -202,9 +190,7 @@ export default function (store: Store) {
 
       // remove zero balances from the list of known tokens
       const zeroBalances = changedBalances.filter(
-        (b) =>
-          parseInt(b.balance) === 0 &&
-          knownTokens.some((t) => t.address === b.address && t.chainId === b.chainId)
+        (b) => parseInt(b.balance) === 0 && knownTokens.some((t) => t.address === b.address && t.chainId === b.chainId)
       )
 
       if (zeroBalances.length > 0) {

@@ -62,9 +62,7 @@ class Gas extends React.Component {
   }
   toDisplayUSD(bn) {
     return parseFloat(
-      bn.toNumber() >= 1
-        ? bn.toFixed(0, BigNumber.ROUND_UP).toString()
-        : bn.toFixed(2, BigNumber.ROUND_UP).toString()
+      bn.toNumber() >= 1 ? bn.toFixed(0, BigNumber.ROUND_UP).toString() : bn.toFixed(2, BigNumber.ROUND_UP).toString()
     )
   }
   roundGwei(gwei) {
@@ -135,9 +133,7 @@ class Gas extends React.Component {
         label,
       }))
     } else {
-      const low = calculatedFees
-        ? this.roundGwei(calculatedFees.actualBaseFee + calculatedFees.priorityFee)
-        : gasPrice
+      const low = calculatedFees ? this.roundGwei(calculatedFees.actualBaseFee + calculatedFees.priorityFee) : gasPrice
 
       return estimates.map(({ label, estimatedGas }) => ({
         low: this.txEstimate(low, estimatedGas, nativeUSD),
@@ -161,13 +157,7 @@ class Gas extends React.Component {
       priorityFee: this.levelDisplay(maxPriorityFeePerGas),
     }
 
-    const feeEstimatesUSD = this.txEstimates(
-      type,
-      id,
-      gasPrice,
-      fees ? calculatedFees : null,
-      currentSymbol
-    )
+    const feeEstimatesUSD = this.txEstimates(type, id, gasPrice, fees ? calculatedFees : null, currentSymbol)
 
     return (
       <div ref={this.moduleRef}>
@@ -175,20 +165,16 @@ class Gas extends React.Component {
         <div className='gasBlock'>
           {this.state.baseHover ? (
             <div className='feeToolTip feeToolTipBase cardShow'>
-              The current base fee is added with a buffer to cover the next 3 blocks, any amount
-              greater than your block's base fee is refunded
+              The current base fee is added with a buffer to cover the next 3 blocks, any amount greater than your
+              block's base fee is refunded
             </div>
           ) : null}
           {this.state.prioHover ? (
             <div className='feeToolTip feeToolTipPriority cardShow'>
-              A priority tip paid to validators is added to incentivize quick inclusion of your
-              transaction into a block
+              A priority tip paid to validators is added to incentivize quick inclusion of your transaction into a block
             </div>
           ) : null}
-          <div
-            className='gasItem gasItemSmall'
-            style={!fees ? { pointerEvents: 'none', opacity: 0 } : {}}
-          >
+          <div className='gasItem gasItemSmall' style={!fees ? { pointerEvents: 'none', opacity: 0 } : {}}>
             <span className='gasGweiNum'>{calculatedFees.actualBaseFee}</span>
             <span className='gasGweiLabel'>{'GWEI'}</span>
             <span className='gasLevelLabel'>{'Current Base'}</span>
@@ -215,10 +201,7 @@ class Gas extends React.Component {
               <div className='gasArrowInner'>{svg.chevron(27)}</div>
             </div>
           </div>
-          <div
-            className='gasItem gasItemSmall'
-            style={!fees ? { pointerEvents: 'none', opacity: 0 } : {}}
-          >
+          <div className='gasItem gasItemSmall' style={!fees ? { pointerEvents: 'none', opacity: 0 } : {}}>
             <span className='gasGweiNum'>{calculatedFees.priorityFee}</span>
             <span className='gasGweiLabel'>{'GWEI'}</span>
             <span className='gasLevelLabel'>{'Priority Tip'}</span>

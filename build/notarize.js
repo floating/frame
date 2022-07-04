@@ -20,11 +20,7 @@ module.exports = async function (params) {
     })
 
     // verify signed and notarized application
-    execFileSync(
-      'spctl',
-      ['--assess', '--type', 'execute', '--verbose', '--ignore-cache', '--no-cache', appPath],
-      {}
-    )
+    execFileSync('spctl', ['--assess', '--type', 'execute', '--verbose', '--ignore-cache', '--no-cache', appPath], {})
 
     console.log(`Successfully notarized ${appId}`)
   } catch (error) {

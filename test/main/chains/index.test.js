@@ -46,8 +46,7 @@ class MockConnection extends EventEmitter {
     }
 
     this.sendAsync = (payload, cb) => {
-      if (payload.method === 'eth_chainId')
-        return cb(null, { result: addHexPrefix(chainId.toString(16)) })
+      if (payload.method === 'eth_chainId') return cb(null, { result: addHexPrefix(chainId.toString(16)) })
       return cb('unknown method!')
     }
   }

@@ -162,12 +162,7 @@ class Signers extends EventEmitter {
     hot.createFromPrivateKey(this, privateKey, password, cb)
   }
 
-  createFromKeystore(
-    keystore: Keystore,
-    keystorePassword: string,
-    password: string,
-    cb: Callback<Signer>
-  ) {
+  createFromKeystore(keystore: Keystore, keystorePassword: string, password: string, cb: Callback<Signer>) {
     hot.createFromKeystore(this, keystore, keystorePassword, password, cb)
   }
 
@@ -195,13 +190,7 @@ class Signers extends EventEmitter {
     ;(signer as RingSigner).removePrivateKey(index, password, cb)
   }
 
-  addKeystore(
-    id: string,
-    keystore: Keystore,
-    keystorePassword: string,
-    password: string,
-    cb: Callback<Signer>
-  ) {
+  addKeystore(id: string, keystore: Keystore, keystorePassword: string, password: string, cb: Callback<Signer>) {
     // Get signer
     const signer = this.get(id)
 

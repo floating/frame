@@ -47,9 +47,7 @@ async function pixelColor(image: Electron.NativeImage) {
       const color = {
         background: `rgb(${colorArray.join(', ')})`,
         backgroundShade: `rgb(${colorArray.map((v) => Math.max(parseInt(v) - 5, 0)).join(', ')})`,
-        backgroundLight: `rgb(${colorArray
-          .map((v) => Math.min(parseInt(v) + 50, 255))
-          .join(', ')})`,
+        backgroundLight: `rgb(${colorArray.map((v) => Math.min(parseInt(v) + 50, 255)).join(', ')})`,
         text: textColor(...(colorArray.map((a) => parseInt(a)) as [number, number, number])),
       }
 

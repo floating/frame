@@ -67,10 +67,7 @@ const cleanup = (id: string) => {
 const handler = (req: IncomingMessage, res: ServerResponse) => {
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
-  res.setHeader(
-    'Access-Control-Allow-Headers',
-    'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept'
-  )
+  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept')
   if (req.method === 'OPTIONS') {
     res.writeHead(200)
     res.end()
@@ -86,9 +83,7 @@ const handler = (req: IncomingMessage, res: ServerResponse) => {
 
         if (logTraffic)
           log.info(
-            `req -> | http | ${req.headers.origin} | ${rawPayload.method} | -> | ${JSON.stringify(
-              rawPayload.params
-            )}`
+            `req -> | http | ${req.headers.origin} | ${rawPayload.method} | -> | ${JSON.stringify(rawPayload.params)}`
           )
 
         const origin = parseOrigin(req.headers.origin)
@@ -104,8 +99,7 @@ const handler = (req: IncomingMessage, res: ServerResponse) => {
             code: 4001,
           }
           // Review
-          if (!accounts.getSelectedAddresses()[0])
-            error = { message: 'No Frame account selected', code: 4001 }
+          if (!accounts.getSelectedAddresses()[0]) error = { message: 'No Frame account selected', code: 4001 }
           res.writeHead(401, { 'Content-Type': 'application/json' })
           res.end(JSON.stringify({ id: payload.id, jsonrpc: payload.jsonrpc, error }))
         } else {
@@ -117,11 +111,7 @@ const handler = (req: IncomingMessage, res: ServerResponse) => {
                 res.writeHead(200, { 'Content-Type': 'application/json' })
                 const response = { id: payload.id, jsonrpc: payload.jsonrpc, result }
                 if (logTraffic)
-                  log.info(
-                    `<- res | http | ${origin} | ${payload.method} | <- | ${JSON.stringify(
-                      response
-                    )}`
-                  )
+                  log.info(`<- res | http | ${origin} | ${payload.method} | <- | ${JSON.stringify(response)}`)
                 res.end(JSON.stringify(response))
                 delete polls[id]
                 clearTimeout(cleanupTimers[id])
@@ -161,11 +151,7 @@ const handler = (req: IncomingMessage, res: ServerResponse) => {
             }
 
             if (logTraffic)
-              log.info(
-                `<- res | http | ${req.headers.origin} | ${payload.method} | <- | ${JSON.stringify(
-                  response
-                )}`
-              )
+              log.info(`<- res | http | ${req.headers.origin} | ${payload.method} | <- | ${JSON.stringify(response)}`)
             res.writeHead(200, { 'Content-Type': 'application/json' })
             res.end(JSON.stringify(response))
           })

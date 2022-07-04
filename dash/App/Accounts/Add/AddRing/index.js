@@ -137,10 +137,7 @@ class AddRing extends React.Component {
             >
               Add Keyring Account
             </div>
-            <div
-              className='addAccountItemOptionSetup'
-              style={{ transform: `translateX(-${100 * this.state.index}%)` }}
-            >
+            <div className='addAccountItemOptionSetup' style={{ transform: `translateX(-${100 * this.state.index}%)` }}>
               <div className='addAccountItemOptionSetupFrames'>
                 <div className='addAccountItemOptionSetupFrame'>
                   <div className='addAccountItemOptionTitle'>Enter Private Key</div>
@@ -163,9 +160,7 @@ class AddRing extends React.Component {
                 <div className='addAccountItemOptionSetupFrame'>
                   <div className='addAccountItemOptionTitle'>Create Password</div>
                   <div className='addAccountItemOptionInputPhrase addAccountItemOptionInputPassword'>
-                    <div className='addAccountItemOptionSubtitle'>
-                      password must be 12 characters or longer
-                    </div>
+                    <div className='addAccountItemOptionSubtitle'>password must be 12 characters or longer</div>
                     <input
                       type='password'
                       tabIndex='-1'

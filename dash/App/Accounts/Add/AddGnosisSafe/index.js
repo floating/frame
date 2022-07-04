@@ -158,10 +158,7 @@ class AddAragon extends React.Component {
         <div className='addAccountItemWrap'>
           <div className='addAccountItemTop'>
             <div className='addAccountItemIcon'>
-              <div
-                className='addAccountItemIconType addAccountItemIconSmart'
-                style={{ paddingTop: '6px' }}
-              >
+              <div className='addAccountItemIconType addAccountItemIconSmart' style={{ paddingTop: '6px' }}>
                 {svg.aragon(30)}
               </div>
               <div className='addAccountItemIconHex addAccountItemIconHexSmart' />
@@ -176,10 +173,7 @@ class AddAragon extends React.Component {
             <div className='addAccountItemOptionIntro' onMouseDown={() => this.adding()}>
               <div className='addAccountItemDeviceTitle'>Add Aragon Account</div>
             </div>
-            <div
-              className='addAccountItemOptionSetup'
-              style={{ transform: `translateX(-${100 * this.state.index}%)` }}
-            >
+            <div className='addAccountItemOptionSetup' style={{ transform: `translateX(-${100 * this.state.index}%)` }}>
               <div className='addAccountItemOptionSetupFrames'>
                 <div className='addAccountItemOptionSetupFrame'>
                   <div className='addAccountItemOptionTitle'>enter chain id</div>
@@ -242,21 +236,19 @@ class AddAragon extends React.Component {
                 <div className='addAccountItemOptionSetupFrame'>
                   <div className='addAccountItemOptionTitle'>Choose acting address</div>
                   <div className='addAccountItemOptionList'>
-                    {(this.store('main.accounts', this.state.actorId, 'addresses') || []).map(
-                      (a, i) => {
-                        return (
-                          <div
-                            key={a + i}
-                            className='addAccountItemOptionListItem fira'
-                            onMouseDown={(e) => this.actorAddress(a, i)}
-                          >
-                            {a ? a.substring(0, 10) : ''}
-                            {svg.octicon('kebab-horizontal', { height: 16 })}
-                            {a ? a.substr(a.length - 10) : ''}
-                          </div>
-                        )
-                      }
-                    )}
+                    {(this.store('main.accounts', this.state.actorId, 'addresses') || []).map((a, i) => {
+                      return (
+                        <div
+                          key={a + i}
+                          className='addAccountItemOptionListItem fira'
+                          onMouseDown={(e) => this.actorAddress(a, i)}
+                        >
+                          {a ? a.substring(0, 10) : ''}
+                          {svg.octicon('kebab-horizontal', { height: 16 })}
+                          {a ? a.substr(a.length - 10) : ''}
+                        </div>
+                      )
+                    })}
                   </div>
                 </div>
                 <div className='addAccountItemOptionSetupFrame'>

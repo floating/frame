@@ -88,9 +88,7 @@ describe('#getTokenBalances', () => {
               if (token) {
                 return {
                   success: true,
-                  returnValues: [
-                    tc.returns[0](ethers.BigNumber.from(onChainBalances[token.address].toString())),
-                  ],
+                  returnValues: [tc.returns[0](ethers.BigNumber.from(onChainBalances[token.address].toString()))],
                 }
               }
 
@@ -209,9 +207,7 @@ function verifyBasePayload(payload) {
 
 function respondToTokenCall(payload) {
   expect(payload.params[0].value).toBe('0x0')
-  expect(payload.params[0].data).toBe(
-    '0x70a08231000000000000000000000000bfa641051ba0a0ad1b0acf549a89536a0d76472e'
-  )
+  expect(payload.params[0].data).toBe('0x70a08231000000000000000000000000bfa641051ba0a0ad1b0acf549a89536a0d76472e')
   expect(payload.params[1]).toBe('latest')
 
   const token = knownTokens.find(

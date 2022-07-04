@@ -104,11 +104,7 @@ class Requests extends React.Component {
     return (
       <div
         ref={this.moduleRef}
-        className={
-          this.store('selected.view') === 'default'
-            ? 'signerRequests'
-            : 'signerRequests signerRequestsHidden'
-        }
+        className={this.store('selected.view') === 'default' ? 'signerRequests' : 'signerRequests signerRequestsHidden'}
       >
         <div className='requestContainerWrap'>
           <div className='requestContainer'>
@@ -201,11 +197,7 @@ class Requests extends React.Component {
                   />
                 )
               } else if (req.type === 'transaction') {
-                const chainName = this.store(
-                  'main.networks.ethereum',
-                  parseInt(req.data.chainId, 16),
-                  'name'
-                )
+                const chainName = this.store('main.networks.ethereum', parseInt(req.data.chainId, 16), 'name')
                 const hexId = req.data.chainId
                 chainMeta[hexId] ? chainMeta[hexId].primaryColor : ''
                 chainMeta[hexId] ? chainMeta[hexId].icon : ''

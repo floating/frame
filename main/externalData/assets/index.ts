@@ -24,12 +24,10 @@ interface ChainUpdate {
 
 export default function rates(pylon: Pylon, store: Store) {
   const storeApi = {
-    getKnownTokens: (address?: Address) =>
-      ((address && store('main.tokens.known', address)) || []) as Token[],
+    getKnownTokens: (address?: Address) => ((address && store('main.tokens.known', address)) || []) as Token[],
     setNativeCurrencyData: (chainId: number, currencyData: Currency) =>
       store.setNativeCurrencyData('ethereum', chainId, currencyData),
-    setNativeCurrencyRate: (chainId: number, rate: Rate) =>
-      store.setNativeCurrencyData('ethereum', chainId, rate),
+    setNativeCurrencyRate: (chainId: number, rate: Rate) => store.setNativeCurrencyData('ethereum', chainId, rate),
     setTokenRates: (rates: Record<Address, Rate>) => store.setRates(rates),
   }
 
@@ -39,9 +37,7 @@ export default function rates(pylon: Pylon, store: Store) {
     const nativeCurrencyUpdates = updates.filter((u) => u.id.type === AssetType.NativeCurrency)
 
     if (nativeCurrencyUpdates.length > 0) {
-      log.debug(
-        `got currency rate updates for chains: ${nativeCurrencyUpdates.map((u) => u.id.chainId)}`
-      )
+      log.debug(`got currency rate updates for chains: ${nativeCurrencyUpdates.map((u) => u.id.chainId)}`)
 
       nativeCurrencyUpdates.forEach((u) => {
         storeApi.setNativeCurrencyRate(u.id.chainId, {
@@ -94,9 +90,7 @@ export default function rates(pylon: Pylon, store: Store) {
       type: AssetType.NativeCurrency,
       chainId,
     }))
-    const knownTokens = storeApi
-      .getKnownTokens(address)
-      .filter((token) => chains.includes(token.chainId))
+    const knownTokens = storeApi.getKnownTokens(address).filter((token) => chains.includes(token.chainId))
     const subscribedTokens = knownTokens.map((token) => ({
       type: AssetType.Token,
       chainId: token.chainId,

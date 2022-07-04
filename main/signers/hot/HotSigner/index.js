@@ -11,9 +11,7 @@ const store = require('../../../store').default
 // Mock windows module during tests
 const windows = app ? require('../../../windows') : { broadcast: () => {} }
 // Mock user data dir during tests
-const USER_DATA = app
-  ? app.getPath('userData')
-  : path.resolve(path.dirname(require.main.filename), '../.userData')
+const USER_DATA = app ? app.getPath('userData') : path.resolve(path.dirname(require.main.filename), '../.userData')
 const SIGNERS_PATH = path.resolve(USER_DATA, 'signers')
 
 class HotSigner extends Signer {
@@ -47,13 +45,9 @@ class HotSigner extends Signer {
     const signerPath = path.resolve(SIGNERS_PATH, `${this.id}.json`)
 
     // Overwrite file
-    fs.writeFileSync(
-      signerPath,
-      '00000000000000000000000000000000000000000000000000000000000000000000',
-      {
-        mode: 0o600,
-      }
-    )
+    fs.writeFileSync(signerPath, '00000000000000000000000000000000000000000000000000000000000000000000', {
+      mode: 0o600,
+    })
 
     // Remove file
     removeSync(signerPath)

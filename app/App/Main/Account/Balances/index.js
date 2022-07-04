@@ -111,9 +111,7 @@ class Balance extends React.Component {
           <div className='signerBalanceCurrency'>{name}</div>
           <div
             className='signerBalanceValue'
-            style={
-              (balance.displayBalance || '0').length >= 12 ? { fontSize: '15px', top: '10px' } : {}
-            }
+            style={(balance.displayBalance || '0').length >= 12 ? { fontSize: '15px', top: '10px' } : {}}
           >
             <span className='signerBalanceSymbol'>{symbol.toUpperCase()}</span>
             <span style={(balance.displayBalance || '0').length >= 12 ? { marginTop: '-3px' } : {}}>
@@ -189,20 +187,13 @@ class Balances extends React.Component {
         const isNative = isNativeCurrency(rawBalance.address)
         const nativeCurrencyInfo = networksMeta[rawBalance.chainId].nativeCurrency || {}
 
-        const rate = isNative
-          ? nativeCurrencyInfo
-          : rates[rawBalance.address || rawBalance.symbol] || {}
+        const rate = isNative ? nativeCurrencyInfo : rates[rawBalance.address || rawBalance.symbol] || {}
         const logoURI = isNative ? nativeCurrencyInfo.icon : rawBalance.logoURI
-        const name = isNative
-          ? nativeCurrencyInfo.name || networks[rawBalance.chainId].name
-          : rawBalance.name
+        const name = isNative ? nativeCurrencyInfo.name || networks[rawBalance.chainId].name : rawBalance.name
         const decimals = isNative ? 18 : rawBalance.decimals
         const chainLayer = networks[rawBalance.chainId].layer || 'testnet'
 
-        return balance(
-          { ...rawBalance, logoURI, name, decimals },
-          chainLayer === 'testnet' ? 0 : rate.usd
-        )
+        return balance({ ...rawBalance, logoURI, name, decimals }, chainLayer === 'testnet' ? 0 : rate.usd)
       })
       .sort((a, b) => {
         return b.totalValue.minus(a.totalValue).toNumber()
@@ -218,11 +209,7 @@ class Balances extends React.Component {
     const storedBalances = this.store('main.balances', address) || []
     const rates = this.store('main.rates')
 
-    const {
-      balances: allBalances,
-      totalDisplayValue,
-      totalValue,
-    } = this.getBalances(storedBalances, rates)
+    const { balances: allBalances, totalDisplayValue, totalValue } = this.getBalances(storedBalances, rates)
     const balances = allBalances.slice(0, this.props.expanded ? allBalances.length : 4)
 
     const lastBalanceUpdate = this.store('main.accounts', address, 'balances.lastUpdated')
@@ -259,15 +246,7 @@ class Balances extends React.Component {
         ) : null}
         <div className='signerBalancesWrap'>
           {balances.map(({ chainId, symbol, ...balance }, i) => {
-            return (
-              <Balance
-                chainId={chainId}
-                symbol={symbol}
-                balance={balance}
-                i={i}
-                scanning={scanning}
-              />
-            )
+            return <Balance chainId={chainId} symbol={symbol} balance={balance} i={i} scanning={scanning} />
           })}
         </div>
         <div className='signerBalanceTotal' style={{ opacity: !scanning ? 1 : 0 }}>
@@ -309,14 +288,10 @@ class Balances extends React.Component {
             onClick={() => this.setState({ showHighHotMessage: !this.state.showHighHotMessage })}
             style={scanning ? { opacity: 0 } : { opacity: 1 }}
           >
-            <div className='signerBalanceWarningTitle'>
-              {'high value account is using hot signer'}
-            </div>
+            <div className='signerBalanceWarningTitle'>{'high value account is using hot signer'}</div>
             {this.state.showHighHotMessage ? (
               <div className='signerBalanceWarningMessage'>
-                {
-                  'We recommend using one of our supported hardware signers to increase the security of your account'
-                }
+                {'We recommend using one of our supported hardware signers to increase the security of your account'}
               </div>
             ) : null}
           </div>

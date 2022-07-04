@@ -38,8 +38,7 @@ window.addEventListener(
         if (data.type === 'css') {
           document.querySelectorAll('link').forEach((sheet) => {
             if (sheet.visited !== true && sheet.href.indexOf(data.target) > -1) {
-              if (sheet.isLoaded === false || !sheet.href || !(sheet.href.indexOf('.css') > -1))
-                return
+              if (sheet.isLoaded === false || !sheet.href || !(sheet.href.indexOf('.css') > -1)) return
               sheet.visited = true
               const clone = sheet.cloneNode()
               clone.isLoaded = false

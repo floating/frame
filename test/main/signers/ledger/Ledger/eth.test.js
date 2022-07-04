@@ -164,10 +164,7 @@ describe('#signTypedData', () => {
       contents: 'Hello, Bob!',
       from: {
         name: 'Cow',
-        wallets: [
-          '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
-          '0xDeaDbeefdEAdbeefdEadbEEFdeadbeEFdEaDbeeF',
-        ],
+        wallets: ['0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826', '0xDeaDbeefdEAdbeefdEadbEEFdeadbeEFdEaDbeeF'],
       },
       to: [
         {

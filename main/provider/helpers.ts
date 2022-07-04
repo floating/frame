@@ -39,9 +39,7 @@ export function checkExistingNonceGas(tx: TransactionData) {
 
   const reqs = store('main.accounts', from, 'requests')
   const requests = Object.keys(reqs || {}).map((key) => reqs[key])
-  const existing = requests.filter(
-    (r) => r.mode === 'monitor' && r.status !== 'error' && r.data.nonce === nonce
-  )
+  const existing = requests.filter((r) => r.mode === 'monitor' && r.status !== 'error' && r.data.nonce === nonce)
 
   if (existing.length > 0) {
     if (tx.maxPriorityFeePerGas && tx.maxFeePerGas) {
@@ -52,10 +50,7 @@ export function checkExistingNonceGas(tx: TransactionData) {
       if (existingFee * 1.1 >= feeInt || existingMax * 1.1 >= maxInt) {
         // Bump fees by 10%
         const bumpedFee = Math.max(Math.ceil(existingFee * 1.1), feeInt)
-        const bumpedBase = Math.max(
-          Math.ceil((existingMax - existingFee) * 1.1),
-          Math.ceil(maxInt - feeInt)
-        )
+        const bumpedBase = Math.max(Math.ceil((existingMax - existingFee) * 1.1), Math.ceil(maxInt - feeInt))
         tx.maxFeePerGas = '0x' + (bumpedBase + bumpedFee).toString(16)
         tx.maxPriorityFeePerGas = '0x' + bumpedFee.toString(16)
         tx.feesUpdated = true
@@ -112,21 +107,15 @@ export function isScanning(account: Address) {
 }
 
 export function feeTotalOverMax(rawTx: TransactionData, maxTotalFee: number) {
-  const maxFeePerGas = usesBaseFee(rawTx)
-    ? parseInt(rawTx.maxFeePerGas || '', 16)
-    : parseInt(rawTx.gasPrice || '', 16)
+  const maxFeePerGas = usesBaseFee(rawTx) ? parseInt(rawTx.maxFeePerGas || '', 16) : parseInt(rawTx.gasPrice || '', 16)
   const gasLimit = parseInt(rawTx.gasLimit || '', 16)
   const totalFee = maxFeePerGas * gasLimit
   return totalFee > maxTotalFee
 }
 
-export function getRawTx(
-  newTx: RPC.SendTransaction.TxParams,
-  accountId: string | undefined
-): TransactionData {
+export function getRawTx(newTx: RPC.SendTransaction.TxParams, accountId: string | undefined): TransactionData {
   const { gas, gasLimit, gasPrice, data, value, type, ...rawTx } = newTx
-  const parsedValue =
-    !value || parseInt(value, 16) === 0 ? '0x0' : addHexPrefix(unpadHexString(value) || '0')
+  const parsedValue = !value || parseInt(value, 16) === 0 ? '0x0' : addHexPrefix(unpadHexString(value) || '0')
 
   return {
     ...rawTx,
@@ -160,8 +149,7 @@ export function resError(errorData: string | EVMError, request: RPCId, res: RPCE
 
 export function getSignedAddress(signed: string, message: string, cb: Callback<String>) {
   const signature = Buffer.from(signed.replace('0x', ''), 'hex')
-  if (signature.length !== 65)
-    cb(new Error('Frame verifySignature: Signature has incorrect length'))
+  if (signature.length !== 65) cb(new Error('Frame verifySignature: Signature has incorrect length'))
   let v = signature[64]
   v = v === 0 || v === 1 ? v + 27 : v
   const r = toBuffer(signature.slice(0, 32))
@@ -183,9 +171,7 @@ export function requestPermissions(payload: JSONRPCRequestPayload, res: RPCReque
   // we already require the user to grant permission to call this method so
   // we just need to return permission objects for the requested operations
   const now = new Date().getTime()
-  const requestedOperations = (payload.params || []).map((param) =>
-    permission(now, Object.keys(param)[0])
-  )
+  const requestedOperations = (payload.params || []).map((param) => permission(now, Object.keys(param)[0]))
 
   res({ id: payload.id, jsonrpc: '2.0', result: requestedOperations })
 }

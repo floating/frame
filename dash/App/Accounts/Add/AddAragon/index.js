@@ -180,10 +180,7 @@ class AddAragon extends React.Component {
             <div className='addAccountItemOptionIntro' onMouseDown={() => this.adding()}>
               <div className='addAccountItemDeviceTitle'>Add Aragon Account</div>
             </div>
-            <div
-              className='addAccountItemOptionSetup'
-              style={{ transform: `translateX(-${100 * this.state.index}%)` }}
-            >
+            <div className='addAccountItemOptionSetup' style={{ transform: `translateX(-${100 * this.state.index}%)` }}>
               <div className='addAccountItemOptionSetupFrames'>
                 <div className='addAccountItemOptionSetupFrame'>
                   <div className='addAccountItemOptionTitle'>enter chain id</div>

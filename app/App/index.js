@@ -46,8 +46,7 @@ class Panel extends React.Component {
 
   selectNetwork(network) {
     const [type, id] = network.split(':')
-    if (network.type !== type || network.id !== id)
-      link.send('tray:action', 'selectNetwork', type, id)
+    if (network.type !== type || network.id !== id) link.send('tray:action', 'selectNetwork', type, id)
   }
 
   hexToDisplayGwei(weiHex) {

@@ -70,12 +70,7 @@ class _OriginModule extends React.Component {
           <div className='connectionOptionStatusIndicatorGood' />
         </div>
       )
-    } else if (
-      status === 'loading' ||
-      status === 'syncing' ||
-      status === 'pending' ||
-      status === 'standby'
-    ) {
+    } else if (status === 'loading' || status === 'syncing' || status === 'pending' || status === 'standby') {
       return (
         <div className='connectionOptionStatusIndicator'>
           <div className='connectionOptionStatusIndicatorPending' />
@@ -115,11 +110,7 @@ class _OriginModule extends React.Component {
             })
           }}
         >
-          <div
-            className={
-              active ? 'sliceOriginIndicator sliceOriginIndicatorActive' : 'sliceOriginIndicator'
-            }
-          />
+          <div className={active ? 'sliceOriginIndicator sliceOriginIndicatorActive' : 'sliceOriginIndicator'} />
           <div className='sliceOriginTile'>{origin}</div>
           <div className='sliceOriginReqs'>
             <div className='sliceOriginReqsNumber'>{this.state.reqsAverage}</div>
@@ -179,12 +170,7 @@ class ChainModule extends React.Component {
           <div className='connectionOptionStatusIndicatorGood' />
         </div>
       )
-    } else if (
-      status === 'loading' ||
-      status === 'syncing' ||
-      status === 'pending' ||
-      status === 'standby'
-    ) {
+    } else if (status === 'loading' || status === 'syncing' || status === 'pending' || status === 'standby') {
       return (
         <div className='connectionOptionStatusIndicator'>
           <div className='connectionOptionStatusIndicatorPending' />

@@ -13,9 +13,7 @@ const dapps = require('../dapps')
 // const ipfs = require('../ipfs')
 
 function randomLetters(num) {
-  return [...Array(num)]
-    .map(() => String.fromCharCode(65 + Math.floor(Math.random() * 26)))
-    .join('')
+  return [...Array(num)].map(() => String.fromCharCode(65 + Math.floor(Math.random() * 26))).join('')
 }
 
 const { resolveName } = require('../accounts/aragon')
@@ -303,27 +301,15 @@ ipcMain.on('main:rpc', (event, id, method, ...args) => {
   if (rpc[method]) {
     if (method === 'getFrameId') {
       rpc[method](event.sender.getOwnerBrowserWindow(), ...args, (...args) => {
-        event.sender.send(
-          'main:rpc',
-          id,
-          ...args.map((arg) => (arg instanceof Error ? wrap(arg.message) : wrap(arg)))
-        )
+        event.sender.send('main:rpc', id, ...args.map((arg) => (arg instanceof Error ? wrap(arg.message) : wrap(arg))))
       })
     } else {
       rpc[method](...args, (...args) => {
-        event.sender.send(
-          'main:rpc',
-          id,
-          ...args.map((arg) => (arg instanceof Error ? wrap(arg.message) : wrap(arg)))
-        )
+        event.sender.send('main:rpc', id, ...args.map((arg) => (arg instanceof Error ? wrap(arg.message) : wrap(arg))))
       })
     }
   } else {
     const args = [new Error('Unknown RPC method: ' + method)]
-    event.sender.send(
-      'main:rpc',
-      id,
-      ...args.map((arg) => (arg instanceof Error ? wrap(arg.message) : wrap(arg)))
-    )
+    event.sender.send('main:rpc', id, ...args.map((arg) => (arg instanceof Error ? wrap(arg.message) : wrap(arg))))
   }
 })

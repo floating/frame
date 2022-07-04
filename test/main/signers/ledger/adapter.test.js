@@ -186,8 +186,7 @@ const platforms = ['Linux', 'Windows']
 platforms.forEach((platform) => {
   // on Linux and Mac, the Ledger will re-connect using the same path as the one
   // that was disconnected. on Windows, it will have a different path
-  const expectedReconnectionPath =
-    platform === 'Linux' ? 'nano-x-eth-app-path' : 'nano-x2-eth-app-path'
+  const expectedReconnectionPath = platform === 'Linux' ? 'nano-x-eth-app-path' : 'nano-x2-eth-app-path'
 
   it(`updates an existing Ledger when the eth app is exited on ${platform}`, (done) => {
     let receivedDisconnect = false

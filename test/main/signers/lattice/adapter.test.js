@@ -123,10 +123,7 @@ describe('#reload', () => {
   it('connects the Lattice signer with the correct settings', () => {
     adapter.reload(latticeSigner)
 
-    expect(latticeSigner.connect).toHaveBeenCalledWith(
-      'https://signing.gridpl.us',
-      'supersecretkey'
-    )
+    expect(latticeSigner.connect).toHaveBeenCalledWith('https://signing.gridpl.us', 'supersecretkey')
   })
 })
 
@@ -205,10 +202,7 @@ describe('settings changes', () => {
     settingsObserver.fire()
 
     expect(latticeSigner.disconnect).toHaveBeenCalled()
-    expect(latticeSigner.connect).toHaveBeenCalledWith(
-      'https://signing.gridpl.us',
-      'supersecretkey'
-    )
+    expect(latticeSigner.connect).toHaveBeenCalledWith('https://signing.gridpl.us', 'supersecretkey')
   })
 
   it('derives addresses if the account limit has increased above the number of addresses', () => {
@@ -363,10 +357,7 @@ describe('signer device changes', () => {
     it('updates the Lattice to paired if signer is paired after connecting', () => {
       latticeSigner.emit('connect', true)
 
-      expect(store.updateLattice).toHaveBeenCalledWith(
-        'NBaJ8e',
-        expect.objectContaining({ paired: true })
-      )
+      expect(store.updateLattice).toHaveBeenCalledWith('NBaJ8e', expect.objectContaining({ paired: true }))
     })
 
     it('updates the Lattice to unpaired if signer is not paired after connecting', () => {
@@ -376,10 +367,7 @@ describe('signer device changes', () => {
 
       latticeSigner.emit('connect', false)
 
-      expect(store.updateLattice).toHaveBeenCalledWith(
-        'NBaJ8e',
-        expect.objectContaining({ paired: false })
-      )
+      expect(store.updateLattice).toHaveBeenCalledWith('NBaJ8e', expect.objectContaining({ paired: false }))
     })
 
     it('derives addresses if the signer has an active wallet after pairing', () => {
@@ -392,10 +380,7 @@ describe('signer device changes', () => {
       latticeSigner.emit('paired', false)
 
       // paired is always true even if there is no active wallet
-      expect(store.updateLattice).toHaveBeenCalledWith(
-        'NBaJ8e',
-        expect.objectContaining({ paired: true })
-      )
+      expect(store.updateLattice).toHaveBeenCalledWith('NBaJ8e', expect.objectContaining({ paired: true }))
     })
 
     it('updates the Lattice to unpaired after an error connecting', () => {
@@ -403,10 +388,7 @@ describe('signer device changes', () => {
 
       latticeSigner.emit('error')
 
-      expect(store.updateLattice).toHaveBeenCalledWith(
-        'NBaJ8e',
-        expect.objectContaining({ paired: false })
-      )
+      expect(store.updateLattice).toHaveBeenCalledWith('NBaJ8e', expect.objectContaining({ paired: false }))
     })
 
     it('disconnects after an error', () => {

@@ -36,11 +36,7 @@ class TxBar extends React.Component {
                 </div>
                 <div className='txProgressStepMarker' />
                 <div
-                  className={
-                    position > 1
-                      ? 'txProgressStepCenter txProgressStepCenterOn'
-                      : 'txProgressStepCenter'
-                  }
+                  className={position > 1 ? 'txProgressStepCenter txProgressStepCenterOn' : 'txProgressStepCenter'}
                 />
               </div>
               <div className='txProgressStep'>
@@ -49,11 +45,7 @@ class TxBar extends React.Component {
                 </div>
                 <div className='txProgressStepMarker' />
                 <div
-                  className={
-                    position > 2
-                      ? 'txProgressStepCenter txProgressStepCenterOn'
-                      : 'txProgressStepCenter'
-                  }
+                  className={position > 2 ? 'txProgressStepCenter txProgressStepCenterOn' : 'txProgressStepCenter'}
                 />
               </div>
               <div className='txProgressStep'>
@@ -62,11 +54,7 @@ class TxBar extends React.Component {
                 </div>
                 <div className='txProgressStepMarker' />
                 <div
-                  className={
-                    position > 3
-                      ? 'txProgressStepCenter txProgressStepCenterOn'
-                      : 'txProgressStepCenter'
-                  }
+                  className={position > 3 ? 'txProgressStepCenter txProgressStepCenterOn' : 'txProgressStepCenter'}
                 />
               </div>
             </div>

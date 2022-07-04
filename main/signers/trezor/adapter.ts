@@ -23,11 +23,7 @@ export default class TrezorSignerAdapter extends SignerAdapter {
       const trezor = new Trezor(device)
       trezor.derivation = store('main.trezor.derivation')
 
-      const version = [
-        trezor.appVersion.major,
-        trezor.appVersion.minor,
-        trezor.appVersion.patch,
-      ].join('.')
+      const version = [trezor.appVersion.major, trezor.appVersion.minor, trezor.appVersion.patch].join('.')
       log.info(`Trezor ${device.id} connected: ${trezor.model}, firmware v${version}`)
 
       trezor.on('close', () => {

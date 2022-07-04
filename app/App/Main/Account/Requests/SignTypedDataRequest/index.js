@@ -114,9 +114,7 @@ class TransactionRequest extends React.Component {
                           <div className='requestNoticeInnerText'>See Signer</div>
                           <div
                             className='cancelRequest'
-                            onMouseDown={() =>
-                              this.decline(this.props.req.handlerId, this.props.req)
-                            }
+                            onMouseDown={() => this.decline(this.props.req.handlerId, this.props.req)}
                           >
                             Cancel
                           </div>
@@ -124,20 +122,14 @@ class TransactionRequest extends React.Component {
                       )
                     } else if (status === 'success') {
                       return (
-                        <div
-                          key={status}
-                          className='requestNoticeInner cardShow requestNoticeSuccess'
-                        >
+                        <div key={status} className='requestNoticeInner cardShow requestNoticeSuccess'>
                           <div>{svg.octicon('check', { height: 80 })}</div>
                           <div className='requestNoticeInnerText'>{notice}</div>
                         </div>
                       )
                     } else if (status === 'error' || status === 'declined') {
                       return (
-                        <div
-                          key={status}
-                          className='requestNoticeInner cardShow requestNoticeError'
-                        >
+                        <div key={status} className='requestNoticeInner cardShow requestNoticeError'>
                           <div>{svg.octicon('circle-slash', { height: 80 })}</div>
                           <div className='requestNoticeInnerText'>{notice}</div>
                         </div>

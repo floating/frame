@@ -27,10 +27,7 @@ const ConnectionIndicator = ({ className, connection }) => {
 
 const ConnectionStatus = ({ connection }) => (
   <>
-    <ConnectionIndicator
-      className='sliceTileIndicatorLarge sliceTileIndicator'
-      connection={connection}
-    />
+    <ConnectionIndicator className='sliceTileIndicatorLarge sliceTileIndicator' connection={connection} />
     <div className='sliceTileConnectionName'>{connection.current}</div>
   </>
 )
@@ -54,8 +51,7 @@ class ChainModule extends React.Component {
     this.customMessage = 'Custom Endpoint'
 
     const { id, type } = props
-    const primaryCustom =
-      context.store('main.networks', type, id, 'connection.primary.custom') || this.customMessage
+    const primaryCustom = context.store('main.networks', type, id, 'connection.primary.custom') || this.customMessage
     const secondaryCustom =
       context.store('main.networks', type, id, 'connection.secondary.custom') || this.customMessage
 
@@ -126,10 +122,7 @@ class ChainModule extends React.Component {
     return (
       <div className='connectionOptionStatus'>
         <div className='connectionOptionStatusIndicator'>
-          <ConnectionIndicator
-            className='connectionOptionStatusIndicator'
-            connection={{ status }}
-          />
+          <ConnectionIndicator className='connectionOptionStatusIndicator' connection={{ status }} />
         </div>
         <div className='connectionOptionStatusText'>{status}</div>
       </div>
@@ -145,9 +138,7 @@ class ChainModule extends React.Component {
 
     let presets = networkPresets[id] || {}
     presets = Object.keys(presets).map((i) => ({ text: i, value: `${type}:${id}:${i}` }))
-    presets = presets.concat(
-      Object.keys(networkPresets.default).map((i) => ({ text: i, value: `${type}:${id}:${i}` }))
-    )
+    presets = presets.concat(Object.keys(networkPresets.default).map((i) => ({ text: i, value: `${type}:${id}:${i}` })))
     presets.push({ text: 'Custom', value: `${type}:${id}:custom` })
 
     const customFocusHandler = (inputName) => {
@@ -181,14 +172,7 @@ class ChainModule extends React.Component {
       if (!value || !isInvalidCustomTarget(value)) {
         const actionName = `set${capitalize(inputName)}Custom`
         this[timeoutName] = setTimeout(
-          () =>
-            link.send(
-              'tray:action',
-              actionName,
-              type,
-              id,
-              value === this.customMessage ? '' : value
-            ),
+          () => link.send('tray:action', actionName, type, id, value === this.customMessage ? '' : value),
           1000
         )
       }
@@ -199,15 +183,8 @@ class ChainModule extends React.Component {
         {this.renderConnection(id, connection, networkMeta.blockHeight)}
         {this.state.expanded ? (
           <div className='connectionLevels'>
-            <div
-              className='signerPermission signerPermissionNetwork cardShow'
-              style={{ zIndex: 2 }}
-            >
-              <div
-                className={
-                  connection.primary.on ? 'connectionOption connectionOptionOn' : 'connectionOption'
-                }
-              >
+            <div className='signerPermission signerPermissionNetwork cardShow' style={{ zIndex: 2 }}>
+              <div className={connection.primary.on ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
                 <div className='connectionOptionToggle'>
                   <div className='signerPermissionSetting'>Primary</div>
                   <div
@@ -216,9 +193,7 @@ class ChainModule extends React.Component {
                         ? 'signerPermissionToggleSmall signerPermissionToggleSmallOn'
                         : 'signerPermissionToggleSmall'
                     }
-                    onMouseDown={(_) =>
-                      link.send('tray:action', 'toggleConnection', type, id, 'primary')
-                    }
+                    onMouseDown={(_) => link.send('tray:action', 'toggleConnection', type, id, 'primary')}
                   >
                     <div className='signerPermissionToggleSwitch' />
                   </div>
@@ -258,17 +233,8 @@ class ChainModule extends React.Component {
                 ) : null}
               </div>
             </div>
-            <div
-              className='signerPermission signerPermissionNetwork cardShow'
-              style={{ zIndex: 1 }}
-            >
-              <div
-                className={
-                  connection.secondary.on
-                    ? 'connectionOption connectionOptionOn'
-                    : 'connectionOption'
-                }
-              >
+            <div className='signerPermission signerPermissionNetwork cardShow' style={{ zIndex: 1 }}>
+              <div className={connection.secondary.on ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
                 <div className='connectionOptionToggle'>
                   <div className='signerPermissionSetting'>Secondary</div>
                   <div
@@ -277,9 +243,7 @@ class ChainModule extends React.Component {
                         ? 'signerPermissionToggleSmall signerPermissionToggleSmallOn'
                         : 'signerPermissionToggleSmall'
                     }
-                    onMouseDown={(_) =>
-                      link.send('tray:action', 'toggleConnection', type, id, 'secondary')
-                    }
+                    onMouseDown={(_) => link.send('tray:action', 'toggleConnection', type, id, 'secondary')}
                   >
                     <div className='signerPermissionToggleSwitch' />
                   </div>

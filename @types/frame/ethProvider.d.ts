@@ -21,8 +21,5 @@ declare module 'eth-provider' {
     setChain(chainId: string)
   }
 
-  export default function provider(
-    targets?: string | string[],
-    opts?: ProviderOpts
-  ): EthereumProvider
+  export default function provider(targets?: string | string[], opts?: ProviderOpts): EthereumProvider
 }

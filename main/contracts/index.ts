@@ -49,10 +49,7 @@ async function fetchSourceCode(contractAddress: Address) {
     `https://api.etherscan.io/api?module=contract&action=getsourcecode&address=${contractAddress}&apikey=3SYU5MW5QK8RPCJV1XVICHWKT774993S24`
   )
 
-  if (
-    res.status === 200 &&
-    (res.headers.get('content-type') || '').toLowerCase().includes('json')
-  ) {
+  if (res.status === 200 && (res.headers.get('content-type') || '').toLowerCase().includes('json')) {
     const parsedResponse = await (res.json() as Promise<EtherscanSourceCodeResponse>)
 
     if (parsedResponse.message === 'OK') return parsedResponse.result
@@ -109,9 +106,7 @@ export async function decodeContractCall(
   contractAddress: Address,
   calldata: string
 ): Promise<DecodedCallData | undefined> {
-  const contractSources: ContractSource[] = [
-    { name: 'ERC-20', source: 'erc-20 contract', abi: erc20Abi },
-  ]
+  const contractSources: ContractSource[] = [{ name: 'ERC-20', source: 'erc-20 contract', abi: erc20Abi }]
   const contractSource = await fetchAbi(contractAddress)
 
   if (contractSource) {

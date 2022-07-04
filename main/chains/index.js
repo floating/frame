@@ -101,19 +101,13 @@ class ChainConnection extends EventEmitter {
 
       try {
         if (feeMarket) {
-          const gasPrice =
-            parseInt(feeMarket.maxBaseFeePerGas) + parseInt(feeMarket.maxPriorityFeePerGas)
+          const gasPrice = parseInt(feeMarket.maxBaseFeePerGas) + parseInt(feeMarket.maxPriorityFeePerGas)
 
           store.setGasPrices(this.type, this.chainId, { fast: addHexPrefix(gasPrice.toString(16)) })
           store.setGasDefault(this.type, this.chainId, 'fast')
         } else {
           const gas = await gasCalculator.getGasPrices()
-          const customLevel = store(
-            'main.networksMeta',
-            this.type,
-            this.chainId,
-            'gas.price.levels.custom'
-          )
+          const customLevel = store('main.networksMeta', this.type, this.chainId, 'gas.price.levels.custom')
 
           store.setGasPrices(this.type, this.chainId, {
             ...gas,
@@ -158,18 +152,14 @@ class ChainConnection extends EventEmitter {
   }
 
   getNetwork(provider, cb) {
-    provider.sendAsync(
-      { jsonrpc: '2.0', method: 'eth_chainId', params: [], id: 1 },
-      (err, response) => {
-        try {
-          response.result =
-            !err && response && !response.error ? parseInt(response.result, 'hex').toString() : ''
-          cb(err, response)
-        } catch (e) {
-          cb(e)
-        }
+    provider.sendAsync({ jsonrpc: '2.0', method: 'eth_chainId', params: [], id: 1 }, (err, response) => {
+      try {
+        response.result = !err && response && !response.error ? parseInt(response.result, 'hex').toString() : ''
+        cb(err, response)
+      } catch (e) {
+        cb(e)
       }
-    )
+    })
   }
 
   getNodeType(provider, cb) {
@@ -229,8 +219,7 @@ class ChainConnection extends EventEmitter {
     const currentPresets = Object.assign({}, presets.default, presets[this.chainId])
 
     const { primary, secondary } = store('main.networks', this.type, this.chainId, 'connection')
-    const secondaryTarget =
-      secondary.current === 'custom' ? secondary.custom : currentPresets[secondary.current]
+    const secondaryTarget = secondary.current === 'custom' ? secondary.custom : currentPresets[secondary.current]
 
     if (chain.on && connection.secondary.on) {
       log.info('Secondary connection: ON')
@@ -285,11 +274,7 @@ class ChainConnection extends EventEmitter {
           this.emit('close')
         })
         this.secondary.provider.on('status', (status) => {
-          if (
-            status === 'connected' &&
-            this.secondary.network &&
-            this.secondary.network !== this.chainId
-          ) {
+          if (status === 'connected' && this.secondary.network && this.secondary.network !== this.chainId) {
             this.secondary.connected = false
             this.secondary.type = ''
             this.secondary.status = 'chain mismatch'
@@ -309,8 +294,7 @@ class ChainConnection extends EventEmitter {
       this.resetConnection('secondary', 'off')
     }
 
-    const primaryTarget =
-      primary.current === 'custom' ? primary.custom : currentPresets[primary.current]
+    const primaryTarget = primary.current === 'custom' ? primary.custom : currentPresets[primary.current]
 
     if (chain.on && connection.primary.on) {
       log.info('Primary connection: ON')
@@ -361,11 +345,7 @@ class ChainConnection extends EventEmitter {
           this.emit('close')
         })
         this.primary.provider.on('status', (status) => {
-          if (
-            status === 'connected' &&
-            this.primary.network &&
-            this.primary.network !== this.chainId
-          ) {
+          if (status === 'connected' && this.primary.network && this.primary.network !== this.chainId) {
             this.primary.connected = false
             this.primary.type = ''
             this.primary.status = 'chain mismatch'

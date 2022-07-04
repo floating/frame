@@ -14,13 +14,10 @@ export interface DataScanner {
 const storeApi = {
   getActiveAddress: () => (store('selected.current') || '') as Address,
   getCustomTokens: () => (store('main.tokens.custom') || []) as Token[],
-  getKnownTokens: (address?: Address) =>
-    ((address && store('main.tokens.known', address)) || []) as Token[],
+  getKnownTokens: (address?: Address) => ((address && store('main.tokens.known', address)) || []) as Token[],
   getConnectedNetworks: () => {
     const networks = Object.values(store('main.networks.ethereum') || {}) as Network[]
-    return networks.filter(
-      (n) => (n.connection.primary || {}).connected || (n.connection.secondary || {}).connected
-    )
+    return networks.filter((n) => (n.connection.primary || {}).connected || (n.connection.secondary || {}).connected)
   },
 }
 

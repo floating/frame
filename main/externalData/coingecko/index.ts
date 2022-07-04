@@ -87,11 +87,7 @@ async function coinPrices(ids: string[], currencies = ['usd']): Promise<Rates> {
   return call(`${baseUrl}/simple/price`, queryParams)
 }
 
-async function tokenPrices(
-  addresses: string[],
-  asset_platform: string,
-  currencies = ['usd']
-): Promise<Rates> {
+async function tokenPrices(addresses: string[], asset_platform: string, currencies = ['usd']): Promise<Rates> {
   const queryParams = {
     contract_addresses: addresses.join(','),
     vs_currencies: currencies.join(','),

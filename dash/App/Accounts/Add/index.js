@@ -52,18 +52,8 @@ class Add extends React.Component {
             <>
               {state !== 'exited' ? (
                 <>
-                  <div
-                    className={
-                      state === 'entered'
-                        ? 'addAccountShade addAccountShadeActive'
-                        : 'addAccountShade'
-                    }
-                  />
-                  <div
-                    className={
-                      state === 'entered' ? 'addAccountMain addAccountMainActive' : 'addAccountMain'
-                    }
-                  >
+                  <div className={state === 'entered' ? 'addAccountShade addAccountShadeActive' : 'addAccountShade'} />
+                  <div className={state === 'entered' ? 'addAccountMain addAccountMainActive' : 'addAccountMain'}>
                     <div className='addAccountMainInner'>
                       <div className='addAccountTitle'>Add Account</div>
                       <div className='addAccountBreak' />
@@ -72,9 +62,7 @@ class Add extends React.Component {
                       </div>
                       <div className='addAccountBreak' />
                       <div className='addAccountHeader'>
-                        <div style={{ marginRight: '10px' }}>
-                          {svg.octicon('server', { height: 17 })}
-                        </div>
+                        <div style={{ marginRight: '10px' }}>{svg.octicon('server', { height: 17 })}</div>
                         <div>Hardware Accounts</div>
                       </div>
                       <AddHardware index={1} type='ledger' />
@@ -111,11 +99,7 @@ class Add extends React.Component {
               >
                 <div className='panelBottomMenu'>
                   <div
-                    className={
-                      state === 'entered'
-                        ? 'addAccountTrigger addAccountTriggerActive'
-                        : 'addAccountTrigger'
-                    }
+                    className={state === 'entered' ? 'addAccountTrigger addAccountTriggerActive' : 'addAccountTrigger'}
                     onMouseDown={() => this.toggleAddAccount(state)}
                   >
                     <div className='addAccountTriggerIcon'>+</div>
@@ -125,9 +109,7 @@ class Add extends React.Component {
               <div
                 style={state === 'exited' ? { display: 'none' } : {}}
                 className={
-                  state === 'entered'
-                    ? 'addAccountShadeForward addAccountShadeForwardActive'
-                    : 'addAccountShadeForward'
+                  state === 'entered' ? 'addAccountShadeForward addAccountShadeForwardActive' : 'addAccountShadeForward'
                 }
               >
                 <canvas id='canvas' />

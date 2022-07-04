@@ -29,38 +29,17 @@ class TxApproval extends React.Component {
     }
 
     if (approval.type === ApprovalType.GasLimitApproval) {
-      return (
-        <BasicApproval
-          req={req}
-          approval={approval}
-          onApprove={this.approve}
-          onDecline={this.decline}
-        />
-      )
+      return <BasicApproval req={req} approval={approval} onApprove={this.approve} onDecline={this.decline} />
     }
 
     if (approval.type === ApprovalType.OtherChainApproval) {
       if (!allowOtherChain || typeof allowOtherChain !== 'function')
         throw new Error('OtherChainApproval needs allowOtherChain')
-      return (
-        <BasicApproval
-          req={req}
-          approval={approval}
-          onApprove={allowOtherChain}
-          onDecline={this.decline}
-        />
-      )
+      return <BasicApproval req={req} approval={approval} onApprove={allowOtherChain} onDecline={this.decline} />
     }
 
     if (approval.type === ApprovalType.TokenSpendApproval) {
-      return (
-        <TokenSpend
-          req={req}
-          approval={approval}
-          onApprove={this.approve}
-          onDecline={this.decline}
-        />
-      )
+      return <TokenSpend req={req} approval={approval} onApprove={this.approve} onDecline={this.decline} />
     }
   }
 }

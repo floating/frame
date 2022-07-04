@@ -57,26 +57,19 @@ class _Balances extends React.Component {
       <div className='signerBalance' key={k} onMouseDown={() => this.setState({ selected: i })}>
         <div className='signerBalanceLogo'>
           <img
-            src={
-              token.logoURI &&
-              `https://proxy.pylon.link?type=icon&target=${encodeURIComponent(token.logoURI)}`
-            }
+            src={token.logoURI && `https://proxy.pylon.link?type=icon&target=${encodeURIComponent(token.logoURI)}`}
           />
         </div>
         <div className='signerBalanceCurrency'>{token.symbol}</div>
         <div
           className='signerBalanceValue'
-          style={
-            (token.displayBalance || '$0').length >= 12 ? { fontSize: '15px', top: '14px' } : {}
-          }
+          style={(token.displayBalance || '$0').length >= 12 ? { fontSize: '15px', top: '14px' } : {}}
         >
           {balance === undefined ? '-.------' : token.displayBalance}
         </div>
         <div
           className='signerBalanceEquivalent'
-          style={
-            (token.usdDisplayValue || '$0').length >= 11 ? { fontSize: '10px', top: '15px' } : {}
-          }
+          style={(token.usdDisplayValue || '$0').length >= 11 ? { fontSize: '10px', top: '15px' } : {}}
         >
           {token.usdDisplayValue}
         </div>
@@ -106,10 +99,7 @@ class _Balances extends React.Component {
           logoURI: 'https://assets.coingecko.com/coins/images/279/thumb/ethereum.png?1595348880',
           symbol: currentSymbol,
           balance,
-          displayBalance:
-            balance === undefined
-              ? '-.------'
-              : '' + parseFloat(balance).toFixed(6).toLocaleString(),
+          displayBalance: balance === undefined ? '-.------' : '' + parseFloat(balance).toFixed(6).toLocaleString(),
           floatBalance: parseFloat(balance || 0).toFixed(6),
           usdRate: etherUSD,
           usdValue: Math.floor(parseFloat(balance) * etherUSD),
@@ -119,11 +109,7 @@ class _Balances extends React.Component {
       const knownList = Object.keys(known).sort((a, b) => {
         if (a === 'default') return -1
         if (b === 'default') return 1
-        return known[a].usdValue > known[b].usdValue
-          ? -1
-          : known[a].usdValue < known[b].usdValue
-          ? 1
-          : 0
+        return known[a].usdValue > known[b].usdValue ? -1 : known[a].usdValue < known[b].usdValue ? 1 : 0
       })
       const offsetTop = selected * 47 + 10
       return (
@@ -178,9 +164,7 @@ class _Balances extends React.Component {
               </div>
             </div>
           </div>
-          {knownList.length <= 1 ? (
-            <div className='signerBalanceNoTokens'>No other token balances found</div>
-          ) : null}
+          {knownList.length <= 1 ? <div className='signerBalanceNoTokens'>No other token balances found</div> : null}
         </div>
       )
     } else {
@@ -263,17 +247,10 @@ class Signer extends React.Component {
 
   renderTrezorPin(active) {
     return (
-      <div
-        className='trezorPinWrap'
-        style={active ? {} : { height: '0px', padding: '0px 0px 0px 0px' }}
-      >
+      <div className='trezorPinWrap' style={active ? {} : { height: '0px', padding: '0px 0px 0px 0px' }}>
         <div className='trezorPinInput'>
           {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => (
-            <div
-              key={i}
-              className='trezorPinInputButton'
-              onMouseDown={this.trezorPin.bind(this, i)}
-            >
+            <div key={i} className='trezorPinInputButton' onMouseDown={this.trezorPin.bind(this, i)}>
               {svg.octicon('primitive-dot', { height: 20 })}
             </div>
           ))}
@@ -361,8 +338,7 @@ class Signer extends React.Component {
                 if (this.props.signer) {
                   if (this.props.signer.type === 'ledger') return svg.ledger(24)
                   if (this.props.signer.type === 'trezor') return svg.trezor(20)
-                  if (this.props.signer.type === 'seed' || this.props.signer.type === 'ring')
-                    return svg.flame(21)
+                  if (this.props.signer.type === 'seed' || this.props.signer.type === 'ring') return svg.flame(21)
                   if (this.props.signer.type === 'aragon') return svg.aragon(32)
                   if (this.props.signer.type === 'lattice') return svg.lattice(32)
                   return svg.octicon('plus', { height: 31 })
@@ -386,25 +362,17 @@ class Signer extends React.Component {
 
   renderMenu() {
     let menuClass = 'signerMenu'
-    menuClass +=
-      this.store('selected.view') === 'settings' ? ' signerMenuSettings' : ' signerMenuDefault'
-    if ((this.store('selected.current') === this.props.id) & this.store('selected.open'))
-      menuClass += ' signerMenuOpen'
+    menuClass += this.store('selected.view') === 'settings' ? ' signerMenuSettings' : ' signerMenuDefault'
+    if ((this.store('selected.current') === this.props.id) & this.store('selected.open')) menuClass += ' signerMenuOpen'
     return (
       <div className={menuClass}>
-        <div
-          className='signerMenuItem signerMenuItemLeft'
-          onMouseDown={() => this.store.setSignerView('default')}
-        >
+        <div className='signerMenuItem signerMenuItemLeft' onMouseDown={() => this.store.setSignerView('default')}>
           <div className='signerMenuItemIcon'>
             {svg.octicon('pulse', { height: 23 })}
             <div className='iconUnderline' />
           </div>
         </div>
-        <div
-          className='signerMenuItem signerMenuItemRight'
-          onMouseDown={() => this.store.setSignerView('settings')}
-        >
+        <div className='signerMenuItem signerMenuItemRight' onMouseDown={() => this.store.setSignerView('settings')}>
           <div className='signerMenuItemIcon'>
             {svg.octicon('settings', { height: 23 })}
             <div className='iconUnderline' />
@@ -448,9 +416,7 @@ class Signer extends React.Component {
       <div className='settingsMenu'>
         <div className='settingsMenuItems'>
           <div
-            className={
-              viewIndex === 0 ? 'settingsMenuItem settingsMenuItemSelected' : 'settingsMenuItem'
-            }
+            className={viewIndex === 0 ? 'settingsMenuItem settingsMenuItemSelected' : 'settingsMenuItem'}
             onMouseDown={() => this.store.setSettingsView(0)}
           >
             <div className='settingsMenuItemIcon' style={{ left: '2px', top: '2px' }}>
@@ -458,17 +424,13 @@ class Signer extends React.Component {
             </div>
           </div>
           <div
-            className={
-              viewIndex === 1 ? 'settingsMenuItem settingsMenuItemSelected' : 'settingsMenuItem'
-            }
+            className={viewIndex === 1 ? 'settingsMenuItem settingsMenuItemSelected' : 'settingsMenuItem'}
             onMouseDown={() => this.store.setSettingsView(1)}
           >
             <div className='settingsMenuItemIcon'>{svg.octicon('checklist', { height: 22 })}</div>
           </div>
           <div
-            className={
-              viewIndex === 2 ? 'settingsMenuItem settingsMenuItemSelected' : 'settingsMenuItem'
-            }
+            className={viewIndex === 2 ? 'settingsMenuItem settingsMenuItemSelected' : 'settingsMenuItem'}
             onMouseDown={() => this.store.setSettingsView(2)}
           >
             <div className='settingsMenuItemIcon' style={{ left: '-1px', top: '0px' }}>
@@ -503,44 +465,30 @@ class Signer extends React.Component {
                 return (
                   <div
                     key={i}
-                    className={
-                      i === highlight
-                        ? 'accountListItem accountListItemSelected'
-                        : 'accountListItem'
-                    }
+                    className={i === highlight ? 'accountListItem accountListItemSelected' : 'accountListItem'}
                     onMouseDown={() => this.setSignerIndex(i)}
                     onMouseEnter={() => this.setHighlight('active', i)}
                     onMouseLeave={() => this.setHighlight('inactive', i)}
                   >
-                    <div className='accountListItemCheck'>
-                      {svg.octicon('check', { height: 27 })}
-                    </div>
+                    <div className='accountListItemCheck'>{svg.octicon('check', { height: 27 })}</div>
                     <div className='accountListItemAddress'>
                       {a ? a.substring(0, 6) : ''}
                       {svg.octicon('kebab-horizontal', { height: 16 })}
                       {a ? a.substr(a.length - 4) : ''}
                     </div>
                     <div className='accountListItemBalance'>
-                      {currentSymbol +
-                        ' ' +
-                        (balance === undefined ? '-.------' : parseFloat(balance).toFixed(6))}
+                      {currentSymbol + ' ' + (balance === undefined ? '-.------' : parseFloat(balance).toFixed(6))}
                     </div>
                   </div>
                 )
               })}
           </div>
           <div className='accountPageToggle'>
-            <div
-              className='accountPageButton accountPageButtonLeft'
-              onMouseDown={() => this.updateAccountPage('<')}
-            >
+            <div className='accountPageButton accountPageButtonLeft' onMouseDown={() => this.updateAccountPage('<')}>
               {svg.octicon('chevron-left', { height: 18 })}
             </div>
             <div className='accountPageCurrent'>{this.store('selected.accountPage') + 1}</div>
-            <div
-              className='accountPageButton accountPageButtonRight'
-              onMouseDown={() => this.updateAccountPage('>')}
-            >
+            <div className='accountPageButton accountPageButtonRight' onMouseDown={() => this.updateAccountPage('>')}>
               {svg.octicon('chevron-right', { height: 18 })}
             </div>
           </div>
@@ -573,11 +521,7 @@ class Signer extends React.Component {
           <div className='signerStatusNotOk'>{status}</div>
         ) : (
           <div className='signerAccounts' style={{ width: '100%' }}>
-            <div
-              key={address + currentIndex}
-              className='signerAccount'
-              style={{ minWidth: 'calc(100%)' }}
-            >
+            <div key={address + currentIndex} className='signerAccount' style={{ minWidth: 'calc(100%)' }}>
               <div className='signerName'>
                 <div className='signerNameText'>
                   {this.props.name}
@@ -599,12 +543,7 @@ class Signer extends React.Component {
                     ) : (
                       address
                     )}
-                    <input
-                      tabIndex='-1'
-                      onMouseDown={(e) => this.copyAddress(e)}
-                      value={address}
-                      readOnly
-                    />
+                    <input tabIndex='-1' onMouseDown={(e) => this.copyAddress(e)} value={address} readOnly />
                   </div>
                 </div>
               </div>
@@ -697,10 +636,7 @@ class Signer extends React.Component {
             </div>
             {current ? this.renderAccountList() : null}
             {current ? (
-              <div
-                className='signerMid'
-                style={open ? { top: '170px' } : { pointerEvents: 'none' }}
-              >
+              <div className='signerMid' style={open ? { top: '170px' } : { pointerEvents: 'none' }}>
                 <Settings id={this.props.id} />
                 <Requests
                   id={this.props.id}

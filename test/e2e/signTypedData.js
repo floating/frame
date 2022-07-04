@@ -51,10 +51,7 @@ const main = async () => {
     ])
     console.log({ signedTypedDataStringified })
 
-    const signedTypedDataAsObject = await ethereum.send('eth_signTypedData', [
-      accounts[0],
-      TYPED_DATA,
-    ])
+    const signedTypedDataAsObject = await ethereum.send('eth_signTypedData', [accounts[0], TYPED_DATA])
     console.log({ signedTypedDataAsObject })
   } catch (e) {
     if (e.message === 'Unexpected end of JSON input') {

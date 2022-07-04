@@ -22,8 +22,7 @@ function getOriginsForChain(chain, origins) {
     (acc, [id, origin]) => {
       if (origin.chain.id === chain.id) {
         const connected =
-          isNetworkConnected(chain) &&
-          (!origin.session.endedAt || origin.session.startedAt > origin.session.endedAt)
+          isNetworkConnected(chain) && (!origin.session.endedAt || origin.session.startedAt > origin.session.endedAt)
 
         acc[connected ? 'connectedOrigins' : 'disconnectedOrigins'].push({ ...origin, id })
       }
@@ -62,11 +61,7 @@ class Indicator extends React.Component {
     if (this.props.connected) {
       return (
         <div
-          className={
-            this.state.active
-              ? 'sliceOriginIndicator sliceOriginIndicatorActive'
-              : 'sliceOriginIndicator'
-          }
+          className={this.state.active ? 'sliceOriginIndicator sliceOriginIndicatorActive' : 'sliceOriginIndicator'}
         />
       )
     } else {
@@ -181,11 +176,7 @@ class Dapps extends React.Component {
           {enabledChains.map((chain) => {
             const chainOrigins = getOriginsForChain(chain, origins)
 
-            return chainOrigins.length === 0 ? (
-              <></>
-            ) : (
-              <ChainOrigins chain={chain} origins={chainOrigins} />
-            )
+            return chainOrigins.length === 0 ? <></> : <ChainOrigins chain={chain} origins={chainOrigins} />
           })}
           <div className={'clearOriginsButton'} onClick={clearOriginsClickHandler}>
             Clear All

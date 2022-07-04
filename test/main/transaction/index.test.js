@@ -1,13 +1,7 @@
 import { addHexPrefix, stripHexPrefix } from 'ethereumjs-util'
 import Common from '@ethereumjs/common'
 
-import {
-  maxFee,
-  londonToLegacy,
-  signerCompatibility,
-  populate,
-  sign,
-} from '../../../main/transaction'
+import { maxFee, londonToLegacy, signerCompatibility, populate, sign } from '../../../main/transaction'
 
 describe('#signerCompatibility', () => {
   it('is always compatible with legacy transactions', () => {

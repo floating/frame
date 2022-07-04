@@ -10,9 +10,7 @@ function isHardwareSigner(type = '') {
 
 function isLoading(status = '') {
   const statusToCheck = status.toLowerCase()
-  return ['loading', 'connecting', 'addresses', 'input', 'pairing'].some((s) =>
-    statusToCheck.includes(s)
-  )
+  return ['loading', 'connecting', 'addresses', 'input', 'pairing'].some((s) => statusToCheck.includes(s))
 }
 
 class Signer extends React.Component {
@@ -76,20 +74,13 @@ class Signer extends React.Component {
 
   renderTrezorPin(active) {
     return (
-      <div
-        className='trezorPinWrap'
-        style={active ? {} : { height: '0px', padding: '0px 0px 0px 0px' }}
-      >
+      <div className='trezorPinWrap' style={active ? {} : { height: '0px', padding: '0px 0px 0px 0px' }}>
         {active ? (
           <>
             <div className='trezorPhraseInput'>
               {this.state.tPin.split('').map((n, i) => {
                 return (
-                  <div
-                    key={i}
-                    className='trezorPinInputButton'
-                    onMouseDown={this.trezorPin.bind(this, i)}
-                  >
+                  <div key={i} className='trezorPinInputButton' onMouseDown={this.trezorPin.bind(this, i)}>
                     {svg.octicon('primitive-dot', { height: 14 })}
                   </div>
                 )
@@ -109,11 +100,7 @@ class Signer extends React.Component {
             <div className='trezorPinInputWrap'>
               <div className='trezorPinInput'>
                 {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => (
-                  <div
-                    key={i}
-                    className='trezorPinInputButton'
-                    onMouseDown={this.trezorPin.bind(this, i)}
-                  >
+                  <div key={i} className='trezorPinInputButton' onMouseDown={this.trezorPin.bind(this, i)}>
                     {svg.octicon('primitive-dot', { height: 20 })}
                   </div>
                 ))}
@@ -134,10 +121,7 @@ class Signer extends React.Component {
 
   renderTrezorPhrase(active) {
     return (
-      <div
-        className='trezorPinWrap'
-        style={active ? {} : { height: '0px', padding: '0px 0px 0px 0px' }}
-      >
+      <div className='trezorPinWrap' style={active ? {} : { height: '0px', padding: '0px 0px 0px 0px' }}>
         {active ? (
           <>
             <div className='trezorPhraseInput'>
@@ -148,10 +132,7 @@ class Signer extends React.Component {
                 autoFocus
               />
             </div>
-            <div
-              className='signerPinMessage signerPinSubmit'
-              onMouseDown={() => this.submitPhrase()}
-            >
+            <div className='signerPinMessage signerPinSubmit' onMouseDown={() => this.submitPhrase()}>
               Submit Passphrase
             </div>
           </>
@@ -281,9 +262,7 @@ class Signer extends React.Component {
     // UI changes for this status only apply to hot signers
     const isLocked = !hwSigner && status === 'locked'
     const permissionId =
-      this.props.tag || this.props.tag === ''
-        ? 'Frame' + (this.props.tag ? `-${this.props.tag}` : '')
-        : undefined
+      this.props.tag || this.props.tag === '' ? 'Frame' + (this.props.tag ? `-${this.props.tag}` : '') : undefined
 
     let signerClass = 'signer'
     if (status === 'ok') signerClass += ' signerOk'
@@ -295,23 +274,16 @@ class Signer extends React.Component {
           <div className='signerIcon'>
             {((_) => {
               const type = this.props.type
-              if (type === 'ledger')
-                return <div className='signerIconWrap signerIconHardware'>{svg.ledger(20)}</div>
-              if (type === 'trezor')
-                return <div className='signerIconWrap signerIconHardware'>{svg.trezor(20)}</div>
+              if (type === 'ledger') return <div className='signerIconWrap signerIconHardware'>{svg.ledger(20)}</div>
+              if (type === 'trezor') return <div className='signerIconWrap signerIconHardware'>{svg.trezor(20)}</div>
               if (type === 'seed' || type === 'ring')
                 return <div className='signerIconWrap signerIconHot'>{svg.flame(23)}</div>
-              if (type === 'aragon')
-                return <div className='signerIconWrap signerIconSmart'>{svg.aragon(28)}</div>
-              if (type === 'lattice')
-                return <div className='signerIconWrap signerIconSmart'>{svg.lattice(22)}</div>
+              if (type === 'aragon') return <div className='signerIconWrap signerIconSmart'>{svg.aragon(28)}</div>
+              if (type === 'lattice') return <div className='signerIconWrap signerIconSmart'>{svg.lattice(22)}</div>
               return <div className='signerIconWrap'>{svg.logo(20)}</div>
             })()}
           </div>
-          <div
-            className='signerType'
-            style={this.props.inSetup ? { top: '21px' } : { top: '24px' }}
-          >
+          <div className='signerType' style={this.props.inSetup ? { top: '21px' } : { top: '24px' }}>
             {this.props.model}
           </div>
           <div className='signerName'>
@@ -329,9 +301,7 @@ class Signer extends React.Component {
                 autoFocus
                 tabIndex='1'
                 value={this.state.latticePairCode}
-                onChange={(e) =>
-                  this.setState({ latticePairCode: (e.target.value || '').toUpperCase() })
-                }
+                onChange={(e) => this.setState({ latticePairCode: (e.target.value || '').toUpperCase() })}
                 onKeyPress={(e) => {
                   if (e.key === 'Enter') this.pairToLattice()
                 }}
@@ -350,33 +320,31 @@ class Signer extends React.Component {
               </span>
             </div> */}
             <div className='signerAccounts'>
-              {signer.addresses
-                .slice(startIndex, startIndex + addressLimit)
-                .map((address, index) => {
-                  const added = this.store('main.accounts', address.toLowerCase())
-                  return (
-                    <div
-                      key={address}
-                      className={!added ? 'signerAccount' : 'signerAccount signerAccountAdded'}
-                      onClick={() => {
-                        if (this.store('main.accounts', address.toLowerCase())) {
-                          link.rpc('removeAccount', address, {}, () => {})
-                        } else {
-                          link.rpc('createAccount', address, { type: signer.type }, (e) => {
-                            if (e) console.error(e)
-                          })
-                        }
-                      }}
-                    >
-                      <div className='signerAccountIndex'>{index + 1 + startIndex}</div>
-                      <div className='signerAccountAddress'>
-                        {address.substr(0, 11)} {svg.octicon('kebab-horizontal', { height: 20 })}{' '}
-                        {address.substr(address.length - 10)}
-                      </div>
-                      <div className='signerAccountCheck' />
+              {signer.addresses.slice(startIndex, startIndex + addressLimit).map((address, index) => {
+                const added = this.store('main.accounts', address.toLowerCase())
+                return (
+                  <div
+                    key={address}
+                    className={!added ? 'signerAccount' : 'signerAccount signerAccountAdded'}
+                    onClick={() => {
+                      if (this.store('main.accounts', address.toLowerCase())) {
+                        link.rpc('removeAccount', address, {}, () => {})
+                      } else {
+                        link.rpc('createAccount', address, { type: signer.type }, (e) => {
+                          if (e) console.error(e)
+                        })
+                      }
+                    }}
+                  >
+                    <div className='signerAccountIndex'>{index + 1 + startIndex}</div>
+                    <div className='signerAccountAddress'>
+                      {address.substr(0, 11)} {svg.octicon('kebab-horizontal', { height: 20 })}{' '}
+                      {address.substr(address.length - 10)}
                     </div>
-                  )
-                })}
+                    <div className='signerAccountCheck' />
+                  </div>
+                )
+              })}
             </div>
             <div className='signerBottom'>
               <div className='signerBottomPageBack' onMouseDown={() => this.nextPage(true)}>
@@ -390,8 +358,7 @@ class Signer extends React.Component {
               </div>
             </div>
           </>
-        ) : this.props.type === 'trezor' &&
-          (status === 'need pin' || status === 'enter passphrase') ? (
+        ) : this.props.type === 'trezor' && (status === 'need pin' || status === 'enter passphrase') ? (
           <div className='signerInterface'>
             {this.renderTrezorPin(this.props.type === 'trezor' && status === 'need pin')}
             {this.renderTrezorPhrase(this.props.type === 'trezor' && status === 'enter passphrase')}
@@ -405,10 +372,7 @@ class Signer extends React.Component {
         )}
         {disconnected || this.props.inSetup ? null : (
           <div className='signerDrawer'>
-            <div
-              className='showControls'
-              onMouseDown={() => this.setState({ showControls: !this.state.showControls })}
-            >
+            <div className='showControls' onMouseDown={() => this.setState({ showControls: !this.state.showControls })}>
               {this.state.showControls ? 'hide' : 'more'}
             </div>
             <div className='showControlsLine' />

@@ -29,10 +29,7 @@ function getGlobalLatticeSettings(): GlobalLatticeSettings {
   const accountLimit = store('main.latticeSettings.accountLimit')
   const derivation = store('main.latticeSettings.derivation')
   const endpointMode = store('main.latticeSettings.endpointMode')
-  const baseUrl =
-    endpointMode === 'custom'
-      ? store('main.latticeSettings.endpointCustom')
-      : 'https://signing.gridpl.us'
+  const baseUrl = endpointMode === 'custom' ? store('main.latticeSettings.endpointCustom') : 'https://signing.gridpl.us'
 
   return { baseUrl, derivation, accountLimit }
 }

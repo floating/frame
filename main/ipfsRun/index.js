@@ -50,10 +50,8 @@ const api = {
   },
   getFile: async (path) => {
     const files = await api.get(path)
-    if (files.length > 1)
-      throw new Error(`Path ${path} is a directory, use .get() to return all files`)
-    if (files[0].path !== path || files.length !== 1)
-      throw new Error(`Path ${path} could not be found`)
+    if (files.length > 1) throw new Error(`Path ${path} is a directory, use .get() to return all files`)
+    if (files[0].path !== path || files.length !== 1) throw new Error(`Path ${path} could not be found`)
     return files[0]
   },
 }

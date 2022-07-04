@@ -18,10 +18,7 @@ class CustomTokens extends React.Component {
           <div className='customTokens'>
             <div className='customTokensTitle'>
               <div className='customTokensTitleText'>Custom Tokens</div>
-              <div
-                className='customTokensAddToken'
-                onClick={() => this.store.notify('addToken', this.props.req)}
-              >
+              <div className='customTokensAddToken' onClick={() => this.store.notify('addToken', this.props.req)}>
                 Add Token
               </div>
             </div>
@@ -46,9 +43,7 @@ class CustomTokens extends React.Component {
                             <img
                               src={
                                 token.logoURI &&
-                                `https://proxy.pylon.link?type=icon&target=${encodeURIComponent(
-                                  token.logoURI
-                                )}`
+                                `https://proxy.pylon.link?type=icon&target=${encodeURIComponent(token.logoURI)}`
                               }
                               value={token.symbol.toUpperCase()}
                               alt={token.symbol.toUpperCase()}

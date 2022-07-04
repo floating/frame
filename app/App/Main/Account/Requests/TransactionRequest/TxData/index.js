@@ -32,8 +32,7 @@ class txData extends React.Component {
                   <span>{'Sending Data: '}</span>
                   <span className={'_txDataValueMethod'}>
                     {(() => {
-                      if (req.decodedData.method.length > 17)
-                        return `${req.decodedData.method.substr(0, 15)}..`
+                      if (req.decodedData.method.length > 17) return `${req.decodedData.method.substr(0, 15)}..`
                       return req.decodedData.method
                     })()}
                   </span>

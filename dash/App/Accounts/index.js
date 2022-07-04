@@ -225,9 +225,7 @@ class Dash extends React.Component {
             <div className='signersHeader'>Your Hot Signers</div>
             <div className='signersList'>
               {hotSigners.length ? (
-                hotSigners.map((signer, index) => (
-                  <Signer index={index} key={signer.id} {...signer} />
-                ))
+                hotSigners.map((signer, index) => <Signer index={index} key={signer.id} {...signer} />)
               ) : (
                 <div className='noSigners'>{'No hot signers detected'}</div>
               )}

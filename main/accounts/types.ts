@@ -24,14 +24,7 @@ export enum RequestStatus {
   Success = 'success',
 }
 
-type RequestType =
-  | 'sign'
-  | 'signTypedData'
-  | 'transaction'
-  | 'access'
-  | 'addChain'
-  | 'switchChain'
-  | 'addToken'
+type RequestType = 'sign' | 'signTypedData' | 'transaction' | 'access' | 'addChain' | 'switchChain' | 'addToken'
 
 export interface AccountRequest {
   type: RequestType

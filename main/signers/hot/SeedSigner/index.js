@@ -18,29 +18,26 @@ class SeedSigner extends HotSigner {
   addSeed(seed, password, cb) {
     if (this.encryptedSeed) return cb(new Error('This signer already has a seed'))
 
-    this._callWorker(
-      { method: 'encryptSeed', params: { seed, password } },
-      (err, encryptedSeed) => {
-        if (err) return cb(err)
+    this._callWorker({ method: 'encryptSeed', params: { seed, password } }, (err, encryptedSeed) => {
+      if (err) return cb(err)
 
-        // Derive addresses
-        const wallet = hdKey.fromMasterSeed(Buffer.from(seed, 'hex'))
+      // Derive addresses
+      const wallet = hdKey.fromMasterSeed(Buffer.from(seed, 'hex'))
 
-        const addresses = []
-        for (let i = 0; i < 100; i++) {
-          const publicKey = wallet.derive("m/44'/60'/0'/0/" + i).publicKey
-          const address = publicKeyToAddress(publicKey)
-          addresses.push(address)
-        }
-
-        // Update signer
-        this.encryptedSeed = encryptedSeed
-        this.addresses = addresses
-        this.update()
-
-        cb(null)
+      const addresses = []
+      for (let i = 0; i < 100; i++) {
+        const publicKey = wallet.derive("m/44'/60'/0'/0/" + i).publicKey
+        const address = publicKeyToAddress(publicKey)
+        addresses.push(address)
       }
-    )
+
+      // Update signer
+      this.encryptedSeed = encryptedSeed
+      this.addresses = addresses
+      this.update()
+
+      cb(null)
+    })
   }
 
   async addPhrase(phrase, password, cb) {
