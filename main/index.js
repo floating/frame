@@ -15,9 +15,10 @@ if (!gotTheLock) {
     console.log('second instance', additionalData)
 
     // Someone tried to run a second instance, we should focus our window.
-    if (myWindow) {
-      if (myWindow.isMinimized()) myWindow.restore()
-      myWindow.focus()
+    const tray = windows.getTray()
+    if (tray) {
+      if (tray.isMinimized()) tray.restore()
+      tray.focus()
     }
   })
 
