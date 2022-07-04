@@ -84,6 +84,12 @@ class Balance extends React.Component {
     if (name.length > 19) name = name.substr(0, 17) + '..'
 
     const chainHex = '0x' + chainId.toString(16)
+    const priceChange = () => {
+      if (!balance.priceChange) {
+        return ''
+      }
+      return `(${direction === 1 ? '+' : ''}${balance.priceChange}%)`
+    }
 
     return (
       <div className={i === 0 ? 'signerBalance signerBalanceBase' : 'signerBalance'} key={symbol} onMouseDown={() => this.setState({ selected: i })}>
@@ -122,7 +128,7 @@ class Balance extends React.Component {
                 {svg.usd(10)}{balance.price}
               </span>
               <span className={priceChangeClass}>
-                <span>({direction === 1 ? '+' : ''}{balance.priceChange ? balance.priceChange + '%' : ''})</span>
+                <span>{priceChange()}</span>
               </span>
             </div>
             <div className='signerBalanceCurrentValue'>
