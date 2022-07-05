@@ -7,7 +7,7 @@ log.transports.file.level = ['development', 'test'].includes(process.env.NODE_EN
 const hasInstanceLock = app.requestSingleInstanceLock()
 
 if (!hasInstanceLock) {
-  log.info('Another instance of Frame is running - exiting...')
+  log.info('another instance of Frame is running - exiting...')
   return app.quit()
 }
 
