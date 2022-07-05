@@ -5,6 +5,8 @@ import log from 'electron-log'
 import { numberToHex } from 'web3-utils'
 import url from 'url'
 
+process.env.BUNDLE_LOCATION = process.env.BUNDLE_LOCATION || path.resolve(__dirname, './../..', 'bundle')
+
 import windows from './windows'
 import menu from './menu'
 import store from './store'
@@ -28,8 +30,6 @@ app.commandLine.appendSwitch('force-gpu-rasterization', 'true')
 app.commandLine.appendSwitch('ignore-gpu-blacklist', 'true')
 app.commandLine.appendSwitch('enable-native-gpu-memory-buffers', 'true')
 app.commandLine.appendSwitch('force-color-profile', 'srgb')
-
-process.env.BUNDLE_LOCATION = process.env.BUNDLE_LOCATION || path.resolve(__dirname, './../..', 'bundle')
 
 log.transports.console.level = process.env.LOG_LEVEL || 'info'
 log.transports.file.level = ['development', 'test'].includes(process.env.NODE_ENV) ? false : 'verbose'
