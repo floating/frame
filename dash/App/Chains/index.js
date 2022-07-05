@@ -592,12 +592,17 @@ class _Network extends React.Component {
                 blockExplorerUrls: [explorer],
                 rpcUrls: [],
                 nativeCurrency: this.store('main.networksMeta', type, id, 'nativeCurrency') || {}, 
+                nativeCurrency: {
+                  symbol: symbol
+                },
                 id: id,
                 name: name,
                 type: type,
-                layer: layer
+                layer: layer,
+                iconUrls: []
               }
             }
+            console.log('CHAIN REQUEST')
             link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'addChain', notifyData: { editMode: true, req }} })
           }}>
             {svg.gear(11)}
