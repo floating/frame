@@ -1,5 +1,8 @@
 import * as Sentry from '@sentry/electron'
+import showUnhandledExceptionDialog from '../windows/dialog/unhandledException'
 import type { Event } from '@sentry/types'
+import log from 'electron-log'
+
 import store from '../store'
 
 function getCrashReportFields () {
@@ -27,7 +30,7 @@ function getSentryExceptions (event: Event) {
   return safeExceptions
 }
 
-export function init () {
+export function initSentry () {
   Sentry.init({
     // only use IPC from renderer process, not HTTP
     ipcMode: Sentry.IPCMode.Classic,
@@ -40,4 +43,24 @@ export function init () {
       extra: getCrashReportFields()
     })
   })
+}
+
+// prevent showing the exit dialog more than once
+let closing = false
+
+export function uncaughtExceptionHandler (e: NodeJS.ErrnoException) {
+  log.error('uncaughtException', e)
+
+  Sentry.captureException(e)
+
+  if (e.code === 'EPIPE') {
+    log.error('uncaught EPIPE error', e)
+    return
+  }
+
+  if (!closing) {
+    closing = true
+
+    showUnhandledExceptionDialog(e.message, e.code)
+  }
 }
