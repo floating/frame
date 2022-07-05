@@ -6,7 +6,10 @@ log.transports.file.level = ['development', 'test'].includes(process.env.NODE_EN
 
 const hasInstanceLock = app.requestSingleInstanceLock()
 
-if (!hasInstanceLock) return app.quit()
+if (!hasInstanceLock) {
+  log.info('Another instance of Frame is running - exiting...')
+  return app.quit()
+}
 
 app.commandLine.appendSwitch('enable-accelerated-2d-canvas', true)
 app.commandLine.appendSwitch('enable-gpu-rasterization', true)
