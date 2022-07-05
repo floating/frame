@@ -5,13 +5,10 @@ jest.mock('@sentry/electron', () => ({ init: jest.fn(), IPCMode: { Classic: 'tes
 jest.mock('../../../main/store')
 
 describe('sentry', () => {
-  beforeEach(async () => {
-    initSentry();
-  })
-
   const mockEvent = (event) => Sentry.init.mock.calls[0][0].beforeSend(event)
 
-  it('should call sentry with the expected object', () => {
+  it('should initialize sentry with the expected object', () => {
+    initSentry();
     expect(Sentry.init).toHaveBeenCalledWith({
       beforeSend: expect.any(Function),
       dsn: 'https://7b09a85b26924609bef5882387e2c4dc@o1204372.ingest.sentry.io/6331069',
@@ -20,6 +17,7 @@ describe('sentry', () => {
   })
 
   it('should strip asar paths from stackframe modules', () => {
+    initSentry();
     const sentryEvent = mockEvent({
       exception: {
         values: [{
