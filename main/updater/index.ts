@@ -124,8 +124,8 @@ if (!dev) {
   } else {
     setTimeout(() => {
       checkForManualUpdate()
-      setInterval(() => checkForManualUpdate(), 10 * 1000)
-    }, 1 * 1000)
+      setInterval(() => checkForManualUpdate(), 60 * 60 * 1000)
+    }, 10 * 1000)
   }
 }
 
