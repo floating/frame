@@ -8,18 +8,19 @@ function getCrashReportFields () {
   return fields.reduce((extra, field) => ({ ...extra, [field]: JSON.stringify(store('main', field) || {}) }), {})
 }
 
+function sanitizeStackFrame ({ module = '' }) {
+  const matches = /(.+)[\\|\/]frame[\\|\/]resources[\\|\/]app.asar[\\|\/](.+)/.exec(module)
+  if (matches && matches[2]) {
+    return `{asar}/${matches[2].replaceAll('\\', '/')}`
+  }
+  return module
+}
+
 function getSentryExceptions (event: Event) {
   const exceptions = event?.exception?.values || []
   const safeExceptions = exceptions.map((exception) => {
     const frames = exception?.stacktrace?.frames || []
-    const safeExceptionModule = ({ module = '' }) => {
-      const matches = /(.+)[\\|\/]frame[\\|\/]resources[\\|\/]app.asar[\\|\/](.+)/.exec(module)
-      if (matches && matches[2]) {
-        return `{asar}/${matches[2].replaceAll('\\', '/')}`
-      }
-      return module
-    }
-    const safeFrames = frames.map((frame) => ({ ...frame, module: safeExceptionModule(frame) }))
+    const safeFrames = frames.map((frame) => ({ ...frame, module: sanitizeStackFrame(frame) }))
     return { stacktrace: { frames: safeFrames } }
   })
   

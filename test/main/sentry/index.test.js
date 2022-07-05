@@ -1,6 +1,5 @@
 import * as Sentry from '@sentry/electron'
 import { init as initSentry } from '../../../main/sentry'
-import mockAsarPathEvent from '../../mocks/sentry.asar-path.json'
 
 jest.mock('@sentry/electron', () => ({ init: jest.fn(), IPCMode: { Classic: 'test-ipcmode' } }))
 jest.mock('../../../main/store')
@@ -21,11 +20,28 @@ describe('sentry', () => {
   })
 
   it('should strip asar paths from stackframe modules', () => {
-    const sentryEvent = mockEvent(mockAsarPathEvent)
+    const sentryEvent = mockEvent({
+      exception: {
+        values: [{
+          "type": "Error",
+          "value": "Cannot find latest.yml in the latest release artifacts (https://github.com/floating/frame/releases/download/v0.5.0-beta.20/latest.yml): HttpError: 404 \n\"method: GET url: https://github.com/floating/frame/releases/download/v0.5.0-beta.20/latest.yml\\n\\...",
+          "stacktrace": {
+              "frames": [{
+                "module": "C:\\Users\\Test\\AppData\\Local\\Programs\\frame\\resources\\app.asar\\node_modules\\electron-updater\\out\\AppUpdater",
+              }, {
+                "module": "node:domain",
+              }, {
+                "module": "C:\\Users\\Test\\AppData\\Local\\Programs\\frame\\resources\\app.asar\\compiled\\main\\signers\\lattice\\Lattice\\index",
+              }]
+            },
+          }]
+      }
+    })
     const stackFrameModules = sentryEvent.exception.values[0].stacktrace.frames.map((frame) => frame.module)
-    stackFrameModules.filter((module) => module.includes('app.asar'))
-      .forEach((module) => {
-        expect(module).toMatch(/{asar}[\/(.+)]+/)
-      })
+    expect(stackFrameModules).toStrictEqual([
+      "{asar}/node_modules/electron-updater/out/AppUpdater",
+      "node:domain",
+      "{asar}/compiled/main/signers/lattice/Lattice/index"
+    ])
   })
 })
