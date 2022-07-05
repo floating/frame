@@ -591,7 +591,7 @@ class Notify extends React.Component {
     } else if (notify === 'addChain') {
       return (
         <div className='notify cardShow'>
-          <AddChain req={notifyData} />
+          <AddChain {...notifyData} />
         </div>
       )
     } else {

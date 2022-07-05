@@ -16,6 +16,8 @@ class ChainRequest extends React.Component {
     const status = this.props.req.status
     const notice = this.props.req.notice
     const type = this.props.req.type
+    const chain = this.props.req.chain
+    
     let requestClass = 'signerRequest'
     if (status === 'success') requestClass += ' signerRequestSuccess'
     if (status === 'declined') requestClass += ' signerRequestDeclined'
@@ -23,15 +25,11 @@ class ChainRequest extends React.Component {
     if (status === 'error') requestClass += ' signerRequestError'
 
     const originName = this.store('main.origins', this.props.req.origin, 'name')
-    let originClass = 'requestChainOrigin'
-    if (originName.length > 28) originClass = 'requestChainOrigin requestChainOrigin18'
-    if (originName.length > 36) originClass = 'requestChainOrigin requestChainOrigin12'
-
-    const mode = this.props.req.mode
-    const height = mode === 'monitor' ? '80px' : '340px'
-    const chain = this.props.req.chain
+    let originClass = 'requestProviderOrigin'
+    if (origin.length > 28) originClass = 'requestProviderOrigin requestProviderOrigin18'
+    if (origin.length > 36) originClass = 'requestProviderOrigin requestProviderOrigin12'
     return (
-      <div key={this.props.req.id || this.props.req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height }}>
+      <div key={this.props.req.id || this.props.req.handlerId} className={requestClass}>
         <div className='approveRequest'>
           {notice ? (
             <div className='requestNotice'>

@@ -56,7 +56,7 @@ class AddChain extends React.Component {
       <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
         <div className='notifyBoxSlide'>
           <div className='addChainTitle'>
-            Add New Chain
+            {this.props.editMode ? 'Chain Config' : 'Add New Chain'}
           </div>
           <div className='addChain'>
             <div className='chainRow'>
@@ -259,7 +259,7 @@ class AddChain extends React.Component {
                     }, 400)
                   }}
                 >
-                  Add Chain
+                 {this.props.editMode ? 'Update Chain' : 'Add Chain'}
                 </div>
               ) : (
                 <div 

@@ -537,8 +537,8 @@ class _Network extends React.Component {
         this.props.layer !== this.state.layer
       )
     )
-    const { id, type, connection, filter } = this.props
-
+    const { id, name, type, explorer, symbol, layer, connection, filter } = this.props
+   
     const networkPresets = this.store('main.networkPresets', type)
     let presets = networkPresets[id] || {}
     presets = Object.keys(presets).map(i => ({ text: i, value: type + ':' + id + ':' + i }))
@@ -548,7 +548,7 @@ class _Network extends React.Component {
     const gas = Math.round(parseInt(this.store('main.networksMeta.ethereum', this.state.id, 'gas.price.levels.fast'), 'hex') / 1e9) || '---'
     const price = this.store('main.networksMeta.ethereum', this.state.id, 'nativeCurrency.usd.price') || '?'
     const change24hr = this.store('main.networksMeta.ethereum', this.state.id, 'nativeCurrency.usd.change24hr') || '?'
-    const symbol = this.store('main.networks.ethereum', this.state.id, 'symbol') || '?'
+    // const symbol = this.store('main.networks.ethereum', this.state.id, 'symbol') || '?'
 
     const hexId = '0x' + parseInt(id).toString('16')
 
@@ -587,7 +587,18 @@ class _Network extends React.Component {
           {/* <div className='chainIdBadgeBackground' /> */}
 
           <div className='chainSettings' onClick={() => {
-            alert('show chain settings')
+            const req = {
+              chain: {
+                blockExplorerUrls: [explorer],
+                rpcUrls: [],
+                nativeCurrency: this.store('main.networksMeta', type, id, 'nativeCurrency') || {}, 
+                id: id,
+                name: name,
+                type: type,
+                layer: layer
+              }
+            }
+            link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'addChain', notifyData: { editMode: true, req }} })
           }}>
             {svg.gear(11)}
           </div>
