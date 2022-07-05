@@ -5,6 +5,7 @@ log.transports.console.level = process.env.LOG_LEVEL || 'info'
 log.transports.file.level = ['development', 'test'].includes(process.env.NODE_ENV) ? false : 'verbose'
 
 const hasInstanceLock = app.requestSingleInstanceLock()
+console.log('instance lock', app.requestSingleInstanceLock, hasInstanceLock)
 
 if (!hasInstanceLock) {
   app.quit()
