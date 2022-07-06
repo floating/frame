@@ -36,7 +36,6 @@ class Bridge extends React.Component {
                 <div
                   className='badgeInputInner' onMouseDown={() => {
                     link.send('tray:installAvailableUpdate')
-                    link.send('tray:dismissUpdate', true)
                   }}
                 >Install Update
                 </div>

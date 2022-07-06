@@ -167,13 +167,18 @@ class Updater {
         return
       }
 
+      this.dismissUpdate(false, false)
       this.autoUpdater.send('download')
     } else if (this.availableUpdate.startsWith('https')) {
       shell.openExternal(this.availableUpdate)
     }
   }
 
-  dismissUpdate (remind = false) {
+  dismissUpdate (remind = false, updateComplete = true) {
+    if (updateComplete && this.autoUpdater) {
+      this.autoUpdater.kill()
+    }
+
     if (!remind) {
       store.dontRemind(this.availableVersion)
     }

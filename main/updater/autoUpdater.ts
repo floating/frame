@@ -26,7 +26,8 @@ autoUpdater.on('update-not-available', res => {
   sendMessage('update', {})
 })
 
-autoUpdater.on('update-downloaded', () => {
+autoUpdater.on('update-downloaded', res => {
+  log.debug('Update downloaded', { res })
   sendMessage('update-ready')
 })
 
