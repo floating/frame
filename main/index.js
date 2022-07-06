@@ -93,6 +93,22 @@ process.on('uncaughtException', (e) => {
   }
 })
 
+function startUpdater () {
+  powerMonitor.on('resume', () => {
+    log.debug('System resuming, starting updater')
+
+    updater.start()
+  })
+
+  powerMonitor.on('suspend', () => {
+    log.debug('System suspending, stopping updater')
+
+    updater.stop()
+  })
+
+  updater.start()
+}
+
 const externalWhitelist = [
   'https://frame.sh',
   'https://chrome.google.com/webstore/detail/frame-alpha/ldcoohedfbjoobcadoglnnmmfbdlmmhf',
@@ -116,7 +132,10 @@ global.eval = () => { throw new Error(`This app does not support global.eval()`)
 
 ipcMain.on('tray:resetAllSettings', () => {
   persist.clear()
-  if (updater.updatePending) return updater.quitAndInstall()
+
+  if (updater.updateReady) {
+    return updater.quitAndInstall()
+  }
 
   app.relaunch()
   app.exit(0)
@@ -140,13 +159,21 @@ ipcMain.on('tray:clipboardData', (e, data) => {
 })
 
 ipcMain.on('tray:installAvailableUpdate', (e) => {
-  updater.installUpdate()
+  store.dontRemind(this.availableVersion)
+  windows.broadcast('main:action', 'updateBadge', '')
+
+  updater.fetchUpdate()
 })
 
 ipcMain.on('tray:dismissUpdate', (e, remind) => {
-  updater.dismissUpdate(remind)
-})
+  if (!remind) {
+    store.dontRemind(this.availableVersion)
+  }
 
+  windows.broadcast('main:action', 'updateBadge', '')
+
+  updater.dismissUpdate()
+})
 
 ipcMain.on('tray:removeAccount', (e, id) => {
   accounts.remove(id)
@@ -288,6 +315,10 @@ ipcMain.on('*:addFrame', (e, id) => {
 
 // if (process.platform !== 'darwin' && process.platform !== 'win32') app.disableHardwareAcceleration()
 app.on('ready', () => {
+  if (!dev) {
+    startUpdater()
+  }
+
   data()
   menu()
   windows.tray()

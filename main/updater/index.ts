@@ -1,5 +1,4 @@
-
-import { shell, powerMonitor } from 'electron'
+import { shell } from 'electron'
 import log from 'electron-log'
 import path from 'path'
 
@@ -14,25 +13,19 @@ export interface VersionUpdate {
   }
 }
 
-function isMac () {
-  return process.platform === 'darwin'
-}
+const isMac = process.platform === 'darwin'
+const isWindows = process.platform === 'win32'
 
-function isWindows () {
-  return process.platform === 'win32'
-}
-
-const UPDATE_INTERVAL = parseInt(process.env.UPDATE_INTERVAL || '') || 60 * 60 * 1000
-const useAutoUpdater = true || isMac() || isWindows()
+const UPDATE_INTERVAL = parseInt(process.env.UPDATE_INTERVAL || '') || 60 * 60_000
+const useAutoUpdater = isMac || isWindows
 
 class Updater {
-  updatePending = false
-
   private autoUpdater?: WorkerProcess
 
   // this will only be set if an upgrade-eligible version is found
   private availableUpdate = ''
   private availableVersion = ''
+  private installerReady = false
 
   private pendingCheck?: NodeJS.Timeout
   private notified: Record<string, boolean> = {}
@@ -55,7 +48,7 @@ class Updater {
     setTimeout(() => {
       check()
       this.pendingCheck = setInterval(check, UPDATE_INTERVAL)
-    }, 10 * 1000)
+    }, 10_000)
   }
 
   stop () {
@@ -71,7 +64,68 @@ class Updater {
     }
   }
 
-  checkForAutoUpdate () {
+  get updateReady () {
+    return this.installerReady
+  }
+
+  fetchUpdate () {
+    if (this.availableUpdate === 'auto') {
+      if (!this.autoUpdater) {
+        log.warn(`update ${this.availableVersion} is asking to be downloaded but autoUpdater is not running!`)
+        return
+      }
+
+      this.autoUpdater.send('download')
+    } else if (this.availableUpdate.startsWith('https')) {
+      shell.openExternal(this.availableUpdate)
+    }
+  }
+
+  quitAndInstall () {
+    if (this.installerReady) {
+      if (!this.autoUpdater) {
+        log.warn(`update ${this.availableVersion} is asking to be installed but autoUpdater is not running!`)
+        return
+      }
+
+      this.autoUpdater.send('install')
+    }
+  }
+
+  dismissUpdate () {
+    if (this.autoUpdater) {
+      this.autoUpdater.kill()
+    }
+
+    this.availableUpdate = ''
+    this.availableVersion = ''
+  }
+
+  private updateAvailable (version: string, location: string) {
+    if (!this.notified[version]) {
+      // a newer version is available
+
+      this.availableVersion = version
+      this.availableUpdate = location
+
+      const remindOk = !store('main.updater.dontRemind').includes(version)
+
+      if (remindOk) {
+        windows.broadcast('main:action', 'updateBadge', 'updateAvailable')
+      }
+
+      this.notified[version] = true
+    }
+  }
+
+  // an update has been downloaded and is ready to be installed
+  private readyForInstall () {
+    this.installerReady = true
+
+    windows.broadcast('main:action', 'updateBadge', 'updateReady')
+  }
+
+  private checkForAutoUpdate () {
     log.debug('Doing automatic check for app update')
   
     this.autoUpdater = new WorkerProcess({
@@ -86,7 +140,7 @@ class Updater {
   
         log.info('Auto check found available update', { version, location })
   
-        updater.updateAvailable(version, location)
+        this.updateAvailable(version, location)
       } else {
         log.info('No available updates found by auto check, checking manually')
         this.checkForManualUpdate()
@@ -96,29 +150,30 @@ class Updater {
     this.autoUpdater.on('update-ready', () => {
       log.info('Auto check update ready for install')
   
-      if (!updater.updatePending) updater.updateReady()
+      if (!this.installerReady) this.readyForInstall()
     })
   
     this.autoUpdater.on('error', (err: string) => {
-      updater.updatePending = false
+      this.installerReady = false
   
       log.warn('Error auto checking for update, checking manually', err)
       this.checkForManualUpdate()
     })
 
     this.autoUpdater.on('exit', () => {
+      this.installerReady = false
       this.autoUpdater = undefined
     })
   }
   
-  checkForManualUpdate () {
+  private checkForManualUpdate () {
     log.debug('Checking for app update manually')
   
     const worker = new WorkerProcess({
       name: 'manual-update-checker',
       modulePath: path.resolve(__dirname, 'manualCheck.js'),
       args: ['--prerelease'],
-      timeout: 60 * 1000
+      timeout: 60_000
     })
   
     worker.on('update', (update: VersionUpdate) => {
@@ -127,7 +182,7 @@ class Updater {
   
         log.info('Manual check found available update', { version, location })
   
-        updater.updateAvailable(version, location)
+        this.updateAvailable(version, location)
       }
     })
   
@@ -135,88 +190,6 @@ class Updater {
       log.warn('Error manually checking for update', err)
     })
   }
-
-  updateAvailable (version: string, location: string) {
-    if (!this.notified[version]) {
-      // a newer version is available
-  
-      this.availableVersion = version
-      this.availableUpdate = location
-  
-      const remindOk = store('main.updater.dontRemind').indexOf(version) === -1
-
-      if (remindOk) {
-        windows.broadcast('main:action', 'updateBadge', 'updateAvailable')
-      }
-
-      this.notified[version] = true
-    }
-  }
-
-  updateReady () {
-    // an update is ready to be installed
-    windows.broadcast('main:action', 'updateBadge', 'updateReady')
-
-    this.updatePending = true
-  }
-
-  installUpdate () {
-    if (this.availableUpdate === 'auto') {
-      if (!this.autoUpdater) {
-        log.warn(`update ${this.availableVersion} is asking to be downloaded but autoUpdater is not running!`)
-        return
-      }
-
-      this.dismissUpdate(false, false)
-      this.autoUpdater.send('download')
-    } else if (this.availableUpdate.startsWith('https')) {
-      shell.openExternal(this.availableUpdate)
-    }
-  }
-
-  dismissUpdate (remind = false, updateComplete = true) {
-    if (updateComplete && this.autoUpdater) {
-      this.autoUpdater.kill()
-    }
-
-    if (!remind) {
-      store.dontRemind(this.availableVersion)
-    }
-
-    // close the update panel
-    windows.broadcast('main:action', 'updateBadge', '')
-
-    this.availableUpdate = ''
-  }
-
-  quitAndInstall () {
-    if (this.updatePending) {
-      if (!this.autoUpdater) {
-        log.warn(`update ${this.availableVersion} is asking to be installed but autoUpdater is not running!`)
-        return
-      }
-
-      this.autoUpdater.send('install')
-    }
-  }
 }
 
-const updater = new Updater()
-
-if (process.env.NODE_ENV !== 'development') {
-  powerMonitor.on('resume', () => {
-    log.debug('System resuming, starting updater')
-
-    updater.start()
-  })
-
-  powerMonitor.on('suspend', () => {
-    log.debug('System suspending, stopping updater')
-
-    updater.stop()
-  })
-
-  updater.start()
-}
-
-export default updater
+export default new Updater()
