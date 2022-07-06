@@ -158,16 +158,16 @@ ipcMain.on('tray:clipboardData', (e, data) => {
   if (data) clipboard.writeText(data)
 })
 
-ipcMain.on('tray:installAvailableUpdate', (e) => {
-  store.dontRemind(this.availableVersion)
+ipcMain.on('tray:installAvailableUpdate', (e, version) => {
+  store.dontRemind(version)
   windows.broadcast('main:action', 'updateBadge', '')
 
   updater.fetchUpdate()
 })
 
-ipcMain.on('tray:dismissUpdate', (e, remind) => {
+ipcMain.on('tray:dismissUpdate', (e, version, remind) => {
   if (!remind) {
-    store.dontRemind(this.availableVersion)
+    store.dontRemind(version)
   }
 
   windows.broadcast('main:action', 'updateBadge', '')

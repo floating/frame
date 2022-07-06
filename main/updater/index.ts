@@ -75,8 +75,11 @@ class Updater {
         return
       }
 
+      log.info(`Downloading update for version ${this.availableVersion}`)
+
       this.autoUpdater.send('download')
     } else if (this.availableUpdate.startsWith('https')) {
+      log.verbose(`Opening release page for version ${this.availableVersion}`)
       shell.openExternal(this.availableUpdate)
     }
   }
@@ -88,11 +91,15 @@ class Updater {
         return
       }
 
+      log.info(`Quitting, will install ${this.availableVersion} on restart`)
+
       this.autoUpdater.send('install')
     }
   }
 
   dismissUpdate () {
+    log.verbose('Dismissed update', { version: this.availableVersion })
+
     if (this.autoUpdater) {
       this.autoUpdater.kill()
     }
@@ -102,6 +109,8 @@ class Updater {
   }
 
   private updateAvailable (version: string, location: string) {
+    log.verbose('Found available update', { version, location, alreadyNotified: this.notified[version] || false })
+
     if (!this.notified[version]) {
       // a newer version is available
 
@@ -111,7 +120,9 @@ class Updater {
       const remindOk = !store('main.updater.dontRemind').includes(version)
 
       if (remindOk) {
-        windows.broadcast('main:action', 'updateBadge', 'updateAvailable')
+        windows.broadcast('main:action', 'updateBadge', 'updateAvailable', this.availableVersion)
+      } else {
+        log.verbose(`Update to version ${version} is available but user chose to skip`)
       }
 
       this.notified[version] = true
@@ -138,7 +149,7 @@ class Updater {
       if (update.availableUpdate) {
         const { version, location } = update.availableUpdate
   
-        log.info('Auto check found available update', { version, location })
+        log.debug('Auto check found available update', { version, location })
   
         this.updateAvailable(version, location)
       } else {
@@ -180,7 +191,7 @@ class Updater {
       if (update.availableUpdate) {
         const { version, location } = update.availableUpdate
   
-        log.info('Manual check found available update', { version, location })
+        log.debug('Manual check found available update', { version, location })
   
         this.updateAvailable(version, location)
       }
