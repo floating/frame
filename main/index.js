@@ -13,7 +13,6 @@ process.env['BUNDLE_LOCATION'] = process.env.BUNDLE_LOCATION || path.resolve(__d
 // app.commandLine.appendSwitch('enable-transparent-visuals', true)
 // if (process.platform === 'linux') app.commandLine.appendSwitch('disable-gpu', true)
 
-const Sentry = require('@sentry/electron')
 const log = require('electron-log')
 const url = require('url')
 
@@ -26,42 +25,6 @@ const menu = require('./menu')
 const store = require('./store').default
 const dapps = require('./dapps').default
 
-function getCrashReportFields () {
-  const fields = ['networks', 'networksMeta', 'tokens']
-
-  return fields.reduce((extra, field) => {
-    return { ...extra, [field]: JSON.stringify(store('main', field) || {}) }
-    // if (field === 'accounts') {
-    //   // scrub account information
-    //   const accountData = Object.fromEntries(Object.entries(store('main.accounts') || {}).map(([id, account]) => {
-    //     return [
-    //       truncateAddress(id),
-    //       {
-    //         ...account,
-    //         id: truncateAddress(account.id),
-    //         address: truncateAddress(account.address)
-    //       }
-    //     ]
-    //   }))
-
-    //   return { ...extra, accounts: JSON.stringify(accountData) }
-    // }
-  }, {})
-}
-
-Sentry.init({
-  // only use IPC from renderer process, not HTTP
-  ipcMode: Sentry.IPCMode.Classic,
-  dsn: 'https://7b09a85b26924609bef5882387e2c4dc@o1204372.ingest.sentry.io/6331069',
-  beforeSend: (evt) => {
-    return {
-      ...evt,
-      user: { ...evt.user, ip_address: undefined }, // remove IP address
-      tags: { ...evt.tags, 'frame.instance_id': store('main.instanceId') },
-      extra: getCrashReportFields()
-    }
-  }
-})
 
 // if (process.defaultApp) {
 //   if (process.argv.length >= 2) {
@@ -91,7 +54,11 @@ const accounts = require('./accounts').default
 
 const launch = require('./launch')
 const updater = require('./updater')
+const sentry = require('./sentry')
+
 require('./rpc')
+sentry.init()
+
 // const clients = require('./clients')
 const signers = require('./signers').default
 const persist = require('./store/persist')
