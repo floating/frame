@@ -116,7 +116,8 @@ global.eval = () => { throw new Error(`This app does not support global.eval()`)
 
 ipcMain.on('tray:resetAllSettings', () => {
   persist.clear()
-  if (updater.updatePending) return updater.quitAndInstall(true, true)
+  if (updater.updatePending) return updater.quitAndInstall()
+
   app.relaunch()
   app.exit(0)
 })
@@ -138,9 +139,14 @@ ipcMain.on('tray:clipboardData', (e, data) => {
   if (data) clipboard.writeText(data)
 })
 
-ipcMain.on('tray:installAvailableUpdate', (e, install, dontRemind) => {
-  updater.installAvailableUpdate(install, dontRemind)
+ipcMain.on('tray:installAvailableUpdate', (e) => {
+  updater.installUpdate()
 })
+
+ipcMain.on('tray:dismissUpdate', (e, remind) => {
+  updater.dismissUpdate(remind)
+})
+
 
 ipcMain.on('tray:removeAccount', (e, id) => {
   accounts.remove(id)
@@ -218,7 +224,7 @@ ipcMain.on('tray:syncPath', (e, path, value) => {
 ipcMain.on('tray:ready', () => require('./api'))
 
 ipcMain.on('tray:updateRestart', () => {
-  updater.quitAndInstall(true, true)
+  updater.quitAndInstall()
 })
 
 ipcMain.on('tray:refreshMain', () => windows.broadcast('main:action', 'syncMain', store('main')))

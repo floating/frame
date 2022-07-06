@@ -35,7 +35,8 @@ class Bridge extends React.Component {
               <div className='badgeInputButton'>
                 <div
                   className='badgeInputInner' onMouseDown={() => {
-                    link.send('tray:installAvailableUpdate', true, false)
+                    link.send('tray:installAvailableUpdate')
+                    link.send('tray:dismissUpdate', true)
                   }}
                 >Install Update
                 </div>
@@ -45,7 +46,7 @@ class Bridge extends React.Component {
               <div className='badgeInputButton'>
                 <div
                   className='badgeInputInner' onMouseDown={() => {
-                    link.send('tray:installAvailableUpdate', false, false)
+                    link.send('tray:dismissUpdate', true)
                   }}
                 >Remind Me Later
                 </div>
@@ -55,7 +56,7 @@ class Bridge extends React.Component {
               <div className='badgeInputButton'>
                 <div
                   className='badgeInputInner badgeInputSmall' onMouseDown={() => {
-                    link.send('tray:installAvailableUpdate', false, true)
+                    link.send('tray:dismissUpdate', false)
                   }}
                 >Skip This Version
                 </div>

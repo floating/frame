@@ -3,7 +3,7 @@ import https from 'https'
 import semver from 'semver'
 
 import packageInfo from '../../package.json'
-import { WorkerProcessMessage } from '../worker'
+import { sendError, sendMessage } from '../worker'
 
 const httpOptions = {
   host: 'api.github.com',
@@ -20,11 +20,6 @@ interface GithubRelease {
   html_url: string
 }
 
-export interface AvailableUpdate {
-  tagName: string
-  htmlUrl: string
-}
-
 function parseResponse (rawData: string) {
   return JSON.parse(rawData) as GithubRelease[]
 }
@@ -35,16 +30,7 @@ function compareVersions (a: string, b: string) {
   return 0
 }
 
-function sendMessage (msg: WorkerProcessMessage<AvailableUpdate>) {
-  if (process.send) {
-    process.send(msg)
-  }
-}
-
-process.on('uncaughtException', e => {
-  console.log('ERRROROROR')
-  sendMessage({ error: e })
-})
+process.on('uncaughtException', sendError)
 
 log.verbose('Performing manual check for updates', { isPrereleaseTrack })
 
@@ -63,7 +49,7 @@ https.get(httpOptions, res => {
       log.verbose('Manual check found release', { currentVersion: version, latestVersion, isNewerVersion })
 
       if (isNewerVersion) {
-        sendMessage({ result: { tagName: releases[0].tag_name, htmlUrl: releases[0].html_url } })
+        sendMessage('update-available', { version: releases[0].tag_name, location: releases[0].html_url })
       }
     } else {
       log.verbose('Manual check did not find any releases')
