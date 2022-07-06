@@ -209,7 +209,7 @@ class Tray {
     store.toggleDash('hide');
     if (autohide) {
         this.recentAutohide = true;
-        clearTimeout(this.recentAutoHideTimeout);
+        clearTimeout(this.recentAutoHideTimeout as NodeJS.Timeout);
         this.recentAutoHideTimeout = setTimeout(() => {
             this.recentAutohide = false;
         }, 50);
