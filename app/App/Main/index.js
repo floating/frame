@@ -97,6 +97,7 @@ class Main extends React.Component {
               </div>
               <div className='panelFilterInput'>
                 <input 
+                  tabindex='-1'
                   onChange={(e) => {
                     const value = e.target.value
                     this.setState({ accountFilter: value  })
