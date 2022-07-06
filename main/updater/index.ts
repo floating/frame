@@ -7,8 +7,6 @@ import store from '../store'
 import windows from '../windows'
 import WorkerProcess from '../worker/process'
 
-process.on('uncaughtException', e => console.log('UNCUAGHT IN MAIN!', e))
-
 export interface VersionUpdate {
   availableUpdate?: {
     version: string
@@ -56,7 +54,7 @@ class Updater {
 
     setTimeout(() => {
       check()
-      this.pendingCheck = setInterval(() => check(), UPDATE_INTERVAL)
+      this.pendingCheck = setInterval(check, UPDATE_INTERVAL)
     }, 4 * 1000)
   }
 
@@ -200,7 +198,7 @@ class Updater {
 
 const updater = new Updater()
 
-if (process.env.NODE_ENV === 'development') {
+if (process.env.NODE_ENV !== 'development') {
   powerMonitor.on('resume', () => {
     log.debug('System resuming, starting updater')
 
