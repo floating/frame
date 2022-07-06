@@ -1,6 +1,8 @@
-import * as Sentry from '@sentry/electron'
+import { init as initSentry, IPCMode } from '@sentry/electron'
 import type { Event } from '@sentry/types'
 import store from '../store'
+
+const SESSION_EVENT_LIMIT = 50
 
 function getCrashReportFields () {
   const fields = ['networks', 'networksMeta', 'tokens']
@@ -28,16 +30,25 @@ function getSentryExceptions (event: Event) {
 }
 
 export function init () {
-  Sentry.init({
+  let sessionEventCount = 0
+  
+  initSentry({
     // only use IPC from renderer process, not HTTP
-    ipcMode: Sentry.IPCMode.Classic,
+    ipcMode: IPCMode.Classic,
     dsn: 'https://7b09a85b26924609bef5882387e2c4dc@o1204372.ingest.sentry.io/6331069',
-    beforeSend: (evt: Event) => ({
-      ...evt,
-      exception: { values: getSentryExceptions(evt) },
-      user: { ...evt.user, ip_address: undefined }, // remove IP address
-      tags: { ...evt.tags, 'frame.instance_id': store('main.instanceId') },
-      extra: getCrashReportFields()
-    })
+    beforeSend: (event: Event) => {
+      if (sessionEventCount >= SESSION_EVENT_LIMIT) {
+        return null
+      }
+      sessionEventCount += 1
+
+      return {
+        ...event,
+        exception: { values: getSentryExceptions(event) },
+        user: { ...event.user, ip_address: undefined }, // remove IP address
+        tags: { ...event.tags, 'frame.instance_id': store('main.instanceId') },
+        extra: getCrashReportFields()
+      }
+    }
   })
 }
