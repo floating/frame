@@ -715,6 +715,9 @@ module.exports = {
         return signer
       })
     }, 320)
+  },
+  setAccountFilter: (u, value) => {
+    u('panel.accountFilter', () => value)
   }
   // toggleUSDValue: (u) => {
   //   u('main.showUSDValue', show => !show)
