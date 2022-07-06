@@ -16,11 +16,13 @@ autoUpdater.on('checking-for-update', () => {
   log.verbose('Performing automatic check for updates', { isPrereleaseTrack })
 })
 
-autoUpdater.on('update-available', r => { //  Ask if they want to download it
-  sendMessage('update', { availableUpdate: { version: r.version, location: 'auto' } })
+autoUpdater.on('update-available', res => { //  Ask if they want to download it
+  log.debug('Update available', { res })
+  sendMessage('update', { availableUpdate: { version: res.version, location: 'auto' } })
 })
 
-autoUpdater.on('update-not-available', () => {
+autoUpdater.on('update-not-available', res => {
+  log.debug('Update not available', { res })
   sendMessage('update', {})
 })
 
