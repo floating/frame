@@ -42,4 +42,30 @@ describe('sentry', () => {
       "{asar}/compiled/main/signers/lattice/Lattice/index"
     ])
   })
+
+  it('should drop events once the session limit has been reached', () => {
+    initSentry();
+    const events = Array(53).fill({})
+    const sentEvents = events.map((event) => mockEvent(event))
+
+    expect(sentEvents.slice(0, 50)).toStrictEqual(
+      Array(50).fill({
+        exception: {
+          values: [],
+        },
+        extra: {
+          networks: '{}',
+          networksMeta: '{}',
+          tokens: '{}',
+        },
+        tags: {
+          "frame.instance_id": undefined,
+        },
+        user: {
+          ip_address: undefined,
+        }
+      })
+    )
+    expect(sentEvents.slice(50, 53)).toStrictEqual([null, null, null])
+  })
 })
