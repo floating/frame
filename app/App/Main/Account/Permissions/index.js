@@ -29,28 +29,20 @@ class Balances extends React.Component {
     // const transform = viewIndex === i ? 'translateX(0)' : viewIndex > i ? 'translateX(-100%)' : 'translateX(100%)'
     // const id = this.store('selected.current')
     // const address = this.store('main.accounts', this.props.id, 'address')
-    const permissions = this.store('main.permissions', this.props.id) || {}
+    const permissions = this.store('main.permissions', this.props.account) || {}
     let permissionList = Object.keys(permissions).sort((a, b) => a.origin < b.origin ? -1 : 1)
     if (!this.props.expanded) permissionList = permissionList.slice(0, 3)
     
     return (
       <div 
         ref={this.moduleRef}
-        style={this.props.expanded ? {
-          height: '100%',
-          overflowY: 'scroll'
-        }: {}}
       >
-        <div className='moduleHeader'>
-          {'Permissions'}
-          {this.props.expanded ? (
-            <div className='moduleHeaderClose' onClick={() => this.props.expandModule(false)}>
-              {svg.close(12)}
-            </div>
-          ) : null}
-        </div>  
-
-        <div className='moduleMain moduleMainPermissions'>
+        {!this.props.expanded ? (
+          <div className='moduleHeader'>
+            {'Permissions'}
+          </div>
+        ) : null}
+        <div className='moduleMainPermissions'>
           {permissionList.length === 0 ? (
             <div className='signerPermission'>
               <div className='signerPermissionControls'>
@@ -65,7 +57,7 @@ class Balances extends React.Component {
                     <div className='signerPermissionOrigin'>{permissions[o].origin}</div>
                     <div 
                       className={permissions[o].provider ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'}
-                      onClick={_ => link.send('tray:action', 'toggleAccess', this.props.id, o)}
+                      onClick={_ => link.send('tray:action', 'toggleAccess', this.props.account, o)}
                     >
                       <div className='signerPermissionToggleSwitch' />
                     </div>
@@ -77,7 +69,7 @@ class Balances extends React.Component {
           {this.props.expanded ? (
             <div className='clearPermissionsButton'>
               <div onClick={() => {
-                link.send('tray:action', 'clearPermissions', this.props.id)
+                link.send('tray:action', 'clearPermissions', this.props.account)
               }} className='moduleButton'>Clear All Permissions</div>
             </div>
           ) : null}
@@ -85,7 +77,7 @@ class Balances extends React.Component {
         {!this.props.expanded ? (
           <div className='signerBalanceTotal'>
             <div className='signerBalanceButtons'>
-              <div className='signerBalanceButton signerBalanceShowAll' onClick={() => this.props.expandModule(this.props.moduleId)}>
+              <div className='signerBalanceButton signerBalanceShowAll' onClick={() => this.props.expandModule({ id: this.props.moduleId, account: this.props.account})}>
                 More
               </div>
             </div>

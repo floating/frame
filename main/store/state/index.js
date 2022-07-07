@@ -53,7 +53,7 @@ const initial = {
         'balances',
         'inventory',
         'permissions',
-        'verify',
+        // 'verify',
         'settings'
       ],
       modules: {

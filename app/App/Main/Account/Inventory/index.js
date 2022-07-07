@@ -29,21 +29,16 @@ class Inventory extends React.Component {
   }
 
   render () {
-    const inventory = this.store('main.inventory', this.props.id)
+    const inventory = this.store('main.inventory', this.props.account)
     const collections = Object.keys(inventory || {})
     return (
       <div ref={this.moduleRef} className='balancesBlock'>
-        <div className='moduleHeader'>
-          {'Inventory'}
-          {this.props.expanded ? (
-            <div className='moduleHeaderClose' onMouseDown={() => {
-              this.props.expandModule(false)
-            }}>
-              {svg.close(12)}
-            </div>
-          ) : null}
-        </div>  
-        <div>
+        {!this.props.expanded ? (
+          <div className='moduleHeader'>
+            {'Inventory'}
+          </div>  
+        ) : null}
+        <div className='inventoryWrapper'>
           {collections.length ? collections.filter(k => {
             if (this.props.expanded) {
               const expandedData = this.props.expandedData || {}
@@ -63,15 +58,8 @@ class Inventory extends React.Component {
               <div 
                 className='inventoryCollection'
                 onClick={() => {
-                  this.props.expandModule(this.props.moduleId, { currentCollection: k })
+                  this.props.expandModule({ id: this.props.moduleId, account: this.props.account, currentCollection: k })
                 }}
-                style={this.props.expanded ? {
-                  position: 'absolute',
-                  top: '30px',
-                  right: '0',
-                  bottom: '0',
-                  left: '0'
-                } : {}}
               >
                 {this.props.expanded ? (
                   <>

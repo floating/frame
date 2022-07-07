@@ -91,47 +91,37 @@
       transform translate3d(0, 0, 0)
       overflow hidden
 
-      .accountsModuleExpand
-        background var(--ghostZ)
-        position absolute
-        top 0px
-        left 0
-        right 0
-        bottom 0
-        z-index 2001
+  .accountsModuleExpand
+    background var(--ghostZ)
+    z-index 2001
 
-        .moduleExpanded
-          position absolute
-          top 19px
-          left 0px
-          right 0px
-          bottom 16px
-          z-index 20000
-          border-radius 12px
-          box-shadow 0px 4px 8px var(--ghostY)
-          
-          // .accountModuleInner
-          //   overflow-y scroll
+    .moduleExpanded
+      z-index 20000
+      border-radius 12px
+      box-shadow 0px 4px 8px var(--ghostY)
+      
+      .accountModuleInner
+        position relative
 
-      .accountMainScroll
-        position absolute
-        top 0
-        left 0
-        right 0
-        bottom 0
-        overflow-y scroll
-        overflow-x hidden
-        transform translate3d(0, 0, 0)
-        padding-top 13px
-        z-index 2000
+  .accountMainScroll
+    position absolute
+    top 0
+    left 0
+    right 0
+    bottom 0
+    overflow-y scroll
+    overflow-x hidden
+    transform translate3d(0, 0, 0)
+    padding-top 13px
+    z-index 2000
 
-      .accountMainSlide
-        position relative 
-        width 100%
-        transform translate3d(0, 0, 0)
-        transition var(--standardSlow)
-        transition-delay 0.32s
-        padding-bottom 20px
+  .accountMainSlide
+    position relative 
+    width 100%
+    transform translate3d(0, 0, 0)
+    transition var(--standardSlow)
+    transition-delay 0.32s
+    padding-bottom 20px
 
   .signerAddress
     font-size 10px
@@ -1599,10 +1589,6 @@
 
   .moduleFooter
     padding 16px
-
-  .moduleMainPermissions
-    padding 0px 16px 0px 16px
-    box-sizing border-box
 
   .moduleMainSettings
     font-size 11px

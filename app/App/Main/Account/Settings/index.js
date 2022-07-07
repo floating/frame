@@ -3,6 +3,8 @@ import Restore from 'react-restore'
 import link from '../../../../../resources/link'
 import svg from '../../../../../resources/svg'
 
+import Verify from './Verify'
+
 class Settings extends React.Component {
   constructor (...args) {
     super(...args)
@@ -52,6 +54,9 @@ class Settings extends React.Component {
             </div>
           ) : (
             <>
+              <Verify 
+                id={this.props.id}
+              />
               <div className='moduleRow'>
                 Account Tag: 
                 <input

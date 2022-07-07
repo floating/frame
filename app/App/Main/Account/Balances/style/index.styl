@@ -1,6 +1,7 @@
 .balancesBlock
   margin-bottom 60px
   box-sizing border-box
+  overflow auto
 
 .signerBalanceWarning
   position relative
@@ -10,8 +11,9 @@
   cursor pointer
 
 .signerBalancesWrap
-  margin 0px 6px
+  margin 6px 6px
   padding 0px 5px 5px 5px
+  box-sizing border-box
   overflow auto
   background var(--ghostZ)
   border-radius 12px
@@ -166,13 +168,14 @@
     position absolute
     left 62px
     top 23px
-    right 125px
+    right 135px
     font-size 14px
     display flex
     align-items center
     font-weight 600
     white-space nowrap
     z-index 2
+    overflow hidden
 
   .signerBalanceChain
     position absolute
@@ -284,7 +287,7 @@
   .signerBalanceValue
     position absolute
     right 8px
-    top 22px
+    top 21px
     font-size 19px
     text-align center
     display flex

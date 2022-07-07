@@ -1,7 +1,16 @@
+.inventoryWrapper
+  background var(--ghostZ)
+  margin 0px 6px 24px 6px
+  padding 0px 0px
+  border-radius 12px
+  overflow auto
+
 .inventoryCollection
   position relative
   border-radius 8px
   z-index 300
+  margin 5px
+  background var(--ghostA)
 
   .inventoryCollectionTop
     position relative
@@ -10,9 +19,8 @@
     align-items center
     padding 3px 9px 3px 12px
     font-size 14px
-    margin 0px 3px 0px 3px
     cursor pointer
-    border-radius 7px
+    border-radius 8px
     height 42px
     font-weight 300
 
@@ -20,7 +28,7 @@
       pointer-events none
 
   .inventoryCollectionTop:hover
-    background var(--ghostC)
+    background var(--ghostB)
 
   .inventoryCollectionImage
     height 42px
@@ -177,3 +185,8 @@
       width 100%
       height 100%
       object-fit contain
+
+.moduleExpanded
+  .inventoryCollectionItems
+    position relative
+    

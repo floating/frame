@@ -202,7 +202,7 @@ class Balances extends React.Component {
   }
 
   render () {
-    const { address, lastSignerType } = this.store('main.accounts', this.props.id)
+    const { address, lastSignerType } = this.store('main.accounts', this.props.account)
     const storedBalances = this.store('main.balances', address) || []
     const rates = this.store('main.rates')
 
@@ -219,19 +219,12 @@ class Balances extends React.Component {
       <div 
         ref={this.moduleRef}
         className='balancesBlock'
-        style={this.props.expanded ? {
-          height: '100%',
-          overflowY: 'scroll'
-        }: {}}
       >
-        <div className={'moduleHeader moduleHeaderBorderless'}>
-          <span>balances</span>
-          {this.props.expanded ? (
-            <div className='moduleHeaderClose' onMouseDown={() => this.props.expandModule(false)}>
-              {svg.close(12)}
-            </div>
-          ) : null}
-        </div>
+        {!this.props.expanded ? (
+          <div className={'moduleHeader moduleHeaderBorderless'}>
+            <span>balances</span>
+          </div>
+        ) : null}
         {scanning ? (
           <div className='signerBalancesLoading'>
             <div className='loader' />
@@ -248,7 +241,7 @@ class Balances extends React.Component {
         >
           {!this.props.expanded ? (
             <div className='signerBalanceButtons'>
-              <div className='signerBalanceButton signerBalanceShowAll' onMouseDown={() => this.props.expandModule(this.props.moduleId)}>
+              <div className='signerBalanceButton signerBalanceShowAll' onMouseDown={() => this.props.expandModule({ id: this.props.moduleId, account: this.props.account })}>
                 {allBalances.length - 4 > 0 ? `+${allBalances.length - 4} More` : 'More'}
               </div>
             </div>
