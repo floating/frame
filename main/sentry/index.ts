@@ -2,7 +2,7 @@ import { init as initSentry, IPCMode } from '@sentry/electron'
 import type { Event } from '@sentry/types'
 import store from '../store'
 
-const SESSION_EVENT_LIMIT = 50
+const EVENT_RATE_LIMIT = 5
 
 function getCrashReportFields () {
   const fields = ['networks', 'networksMeta', 'tokens']
@@ -30,17 +30,22 @@ function getSentryExceptions (event: Event) {
 }
 
 export function init () {
-  let sessionEventCount = 0
+  let eventLimit = EVENT_RATE_LIMIT
+
+  setInterval(() => {
+    if (eventLimit < EVENT_RATE_LIMIT) eventLimit++
+  }, 60_000)
   
   initSentry({
     // only use IPC from renderer process, not HTTP
     ipcMode: IPCMode.Classic,
     dsn: 'https://7b09a85b26924609bef5882387e2c4dc@o1204372.ingest.sentry.io/6331069',
     beforeSend: (event: Event) => {
-      if (sessionEventCount >= SESSION_EVENT_LIMIT) {
+      if (eventLimit === 0) {
         return null
       }
-      sessionEventCount += 1
+
+      eventLimit--
 
       return {
         ...event,

@@ -4,8 +4,33 @@ import { init as initSentry } from '../../../main/sentry'
 jest.mock('@sentry/electron', () => ({ init: jest.fn(), IPCMode: { Classic: 'test-ipcmode' } }))
 jest.mock('../../../main/store')
 
+beforeAll(() => {
+  jest.useFakeTimers()
+})
+
+afterAll(() => {
+  jest.useRealTimers()
+})
+
 describe('sentry', () => {
   const mockEvent = (event) => Sentry.init.mock.calls[0][0].beforeSend(event)
+  const mockEvents = (events) => events.map(mockEvent)
+  const validEvent = {
+    exception: {
+      values: [],
+    },
+    extra: {
+      networks: '{}',
+      networksMeta: '{}',
+      tokens: '{}',
+    },
+    tags: {
+      "frame.instance_id": undefined,
+    },
+    user: {
+      ip_address: undefined,
+    }
+  }
 
   it('should initialize sentry with the expected object', () => {
     initSentry()
@@ -17,7 +42,7 @@ describe('sentry', () => {
   })
 
   it('should strip asar paths from stackframe modules', () => {
-    initSentry();
+    initSentry()
     const sentryEvent = mockEvent({
       exception: {
         values: [{
@@ -43,29 +68,39 @@ describe('sentry', () => {
     ])
   })
 
-  it('should drop events once the session limit has been reached', () => {
-    initSentry();
-    const events = Array(53).fill({})
-    const sentEvents = events.map((event) => mockEvent(event))
+  it('should drop events once the rate limit has been reached', () => {
+    initSentry()
+    const sentEvents = mockEvents(Array(10).fill({}))
 
-    expect(sentEvents.slice(0, 50)).toStrictEqual(
-      Array(50).fill({
-        exception: {
-          values: [],
-        },
-        extra: {
-          networks: '{}',
-          networksMeta: '{}',
-          tokens: '{}',
-        },
-        tags: {
-          "frame.instance_id": undefined,
-        },
-        user: {
-          ip_address: undefined,
-        }
-      })
+    expect(sentEvents.slice(0, 5)).toStrictEqual(
+      Array(5).fill(validEvent)
     )
-    expect(sentEvents.slice(50, 53)).toStrictEqual([null, null, null])
+    expect(sentEvents.slice(5)).toStrictEqual([null, null, null, null, null])
+  })
+
+  it('should send events after the rate limit recovery period has elapsed', () => {
+    const events = Array(5).fill({})
+    initSentry()
+    mockEvents(events)
+    jest.advanceTimersByTime(60_000)
+    expect(mockEvents(events)).toStrictEqual(
+      [validEvent, null, null, null, null]
+    )
+    jest.advanceTimersByTime(2 * 60_000)
+    expect(mockEvents(events)).toStrictEqual(
+      [validEvent, validEvent, null, null, null]
+    )
+    jest.advanceTimersByTime(3 * 60_000)
+    expect(mockEvents(events)).toStrictEqual(
+      [validEvent, validEvent, validEvent, null, null]
+    )
+    jest.advanceTimersByTime(4 * 60_000)
+    expect(mockEvents(events)).toStrictEqual(
+      [validEvent, validEvent, validEvent, validEvent, null]
+    )
+    jest.advanceTimersByTime(100 * 60_000)
+    expect(mockEvents(events)).toStrictEqual(
+      [validEvent, validEvent, validEvent, validEvent, validEvent]
+    )
   })
 })
