@@ -1,5 +1,8 @@
-import { init as initSentry, IPCMode } from '@sentry/electron'
+import { init as initSentry, captureException, IPCMode } from '@sentry/electron'
+import log from 'electron-log'
 import type { Event } from '@sentry/types'
+
+import showUnhandledExceptionDialog from '../windows/dialog/unhandledException'
 import store from '../store'
 
 const EVENT_RATE_LIMIT = 5
@@ -27,6 +30,26 @@ function getSentryExceptions (event: Event) {
   })
   
   return safeExceptions
+}
+
+// prevent showing the exit dialog more than once
+let closing = false
+
+export function uncaughtExceptionHandler (e) {
+  log.error('uncaughtException', e)
+
+  captureException(e)
+
+  if (e.code === 'EPIPE') {
+    log.error('uncaught EPIPE error', e)
+    return
+  }
+
+  if (!closing) {
+    closing = true
+
+    showUnhandledExceptionDialog(e.message, e.code)
+  }
 }
 
 export function init () {

@@ -54,39 +54,20 @@ const accounts = require('./accounts').default
 
 const launch = require('./launch')
 const updater = require('./updater')
-const sentry = require('./sentry')
+const errors = require('./errors')
 
 require('./rpc')
-sentry.init()
+errors.init()
 
 // const clients = require('./clients')
 const signers = require('./signers').default
 const persist = require('./store/persist')
-const { default: showUnhandledExceptionDialog } = require('./windows/dialog/unhandledException')
 
 log.info('Chrome: v' + process.versions.chrome)
 log.info('Electron: v' + process.versions.electron)
 log.info('Node: v' + process.versions.node)
 
-// prevent showing the exit dialog more than once
-let closing = false
-
-process.on('uncaughtException', e => {
-  log.error('uncaughtException', e)
-
-  Sentry.captureException(e)
-
-  if (e.code === 'EPIPE') {
-    log.error('uncaught EPIPE error', e)
-    return
-  }
-
-  if (!closing) {
-    closing = true
-
-    showUnhandledExceptionDialog(e.message, e.code)
-  }
-})
+process.on('uncaughtException', errors.uncaughtExceptionHandler)
 
 const externalWhitelist = [
   'https://frame.sh',
