@@ -16,7 +16,8 @@ export interface WorkerProcessCommand {
 export interface WorkerOptions {
   modulePath: string
   name: string
-  args: string[]
+  args?: string[]
+  env?: Record<string, string>
   timeout?: number
 }
 
@@ -30,14 +31,15 @@ export default class WorkerProcess extends EventEmitter {
     this.abortController = new AbortController()
     const { signal } = this.abortController
 
-    // use spawn instead of fork since Electron hardcodes ELECTRON_RUN_AS_NODE=true
-    // when using fork
-    this.worker = spawn(
-      process.execPath,
-      [opts.modulePath, ...opts.args],
+    log.verbose('creating worker with path:', opts.modulePath + ' ' + (opts.args || []).join(' '))
+
+    this.worker = fork(
+      opts.modulePath,
+      opts.args,
       {
         signal,
-        stdio: ['pipe', 'pipe', 'pipe', 'ipc']
+        // @ts-ignore
+        env: opts.env
       }
     )
 

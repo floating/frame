@@ -1,9 +1,9 @@
-import { shell } from 'electron'
+import { app, shell } from 'electron'
 import log from 'electron-log'
 import path from 'path'
 
-import store from '../store'
-import windows from '../windows'
+// import store from '../store'
+// import windows from '../windows'
 import WorkerProcess from '../worker/process'
 
 export interface VersionUpdate {
@@ -13,11 +13,13 @@ export interface VersionUpdate {
   }
 }
 
+log.transports.console.level = 'debug'
+
 const isMac = process.platform === 'darwin'
 const isWindows = process.platform === 'win32'
 
 const UPDATE_INTERVAL = parseInt(process.env.UPDATE_INTERVAL || '') || 60 * 60_000
-const useAutoUpdater = isMac || isWindows
+const useAutoUpdater = true || isMac || isWindows
 
 class Updater {
   private autoUpdater?: WorkerProcess
@@ -48,7 +50,7 @@ class Updater {
     setTimeout(() => {
       check()
       this.pendingCheck = setInterval(check, UPDATE_INTERVAL)
-    }, 10_000)
+    }, 1000)
   }
 
   stop () {
@@ -117,23 +119,24 @@ class Updater {
       this.availableVersion = version
       this.availableUpdate = location
 
-      const remindOk = !store('main.updater.dontRemind').includes(version)
+      const remindOk = false // !store('main.updater.dontRemind').includes(version)
 
       if (remindOk) {
-        windows.broadcast('main:action', 'updateBadge', 'updateAvailable', this.availableVersion)
+        // windows.broadcast('main:action', 'updateBadge', 'updateAvailable', this.availableVersion)
       } else {
         log.verbose(`Update to version ${version} is available but user chose to skip`)
       }
 
       this.notified[version] = true
     }
+
   }
 
   // an update has been downloaded and is ready to be installed
   private readyForInstall () {
     this.installerReady = true
 
-    windows.broadcast('main:action', 'updateBadge', 'updateReady')
+    // windows.broadcast('main:action', 'updateBadge', 'updateReady')
   }
 
   private checkForAutoUpdate () {
@@ -141,8 +144,22 @@ class Updater {
   
     this.autoUpdater = new WorkerProcess({
       name: 'auto-updater',
-      modulePath: path.resolve(__dirname, 'autoUpdater.js'),
-      args: ['--prerelease']
+      modulePath: path.resolve(__dirname, 'autoUpdater.js')
+    })
+
+    this.autoUpdater.once('ready', () => {
+      const config = {
+        app: {
+          // TODO: get these from Electron
+          version: '0.5.0-beta.19', //app.getVersion(),
+          appUpdateConfigPath: '/home/matt/projects/frame/compiled/main/dev-app-update.yml', // path.join(process.resourcesPath, 'app-update.yml'),
+          userDataPath: '/home/matt/.config/Electron' //app.getPath('userData'),
+        },
+        owner: process.env.GH_OWNER || 'floating',
+        repo: process.env.GH_REPO || 'frame'
+      }
+      
+      this.autoUpdater?.send('check', config)
     })
   
     this.autoUpdater.on('update', (update: VersionUpdate) => {
@@ -183,7 +200,6 @@ class Updater {
     const worker = new WorkerProcess({
       name: 'manual-update-checker',
       modulePath: path.resolve(__dirname, 'manualCheck.js'),
-      args: ['--prerelease'],
       timeout: 60_000
     })
   
@@ -203,4 +219,6 @@ class Updater {
   }
 }
 
-export default new Updater()
+const updater = new Updater()
+
+updater.start()
