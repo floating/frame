@@ -30,10 +30,12 @@ function getSentryExceptions (event: Event) {
 }
 
 export function init () {
-  let eventLimit = EVENT_RATE_LIMIT
+  let allowedEvents = EVENT_RATE_LIMIT
 
   setInterval(() => {
-    if (eventLimit < EVENT_RATE_LIMIT) eventLimit++
+    if (allowedEvents < EVENT_RATE_LIMIT) {
+      allowedEvents++
+    }
   }, 60_000)
   
   initSentry({
@@ -41,11 +43,11 @@ export function init () {
     ipcMode: IPCMode.Classic,
     dsn: 'https://7b09a85b26924609bef5882387e2c4dc@o1204372.ingest.sentry.io/6331069',
     beforeSend: (event: Event) => {
-      if (eventLimit === 0) {
+      if (allowedEvents === 0) {
         return null
       }
 
-      eventLimit--
+      allowedEvents--
 
       return {
         ...event,
