@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import Restore from 'react-restore'
-import Dropdown from '../../../../resources/Components/Dropdown'
 import RingIcon from '../../../../resources/Components/RingIcon'
 import chainMeta from '../../../../resources/chainMeta'
 import link from '../../../../resources/link'
@@ -115,16 +114,6 @@ class AddToken extends Component {
       this.state.address && this.state.address !== this.addressDefault &&
       Number.isInteger(this.state.decimals)
     )
-    // const showTokenAutofillWarning = !this.isConnectedChain()
-
-    // if no this.state.chainId render chain selector
-    // if no contract address render address input
-    // if chain and address are filled show fully populated form
-    // dont allow chainging chain or contract address after the fact
-    // allow changing 
-    // symbol, decilams, name, logoURI
-
-    // once symbold decimals, name are filled then sumbit
 
     if (!this.state.chainId) {
       return (
@@ -180,12 +169,6 @@ class AddToken extends Component {
                     this.setState({ inputAddress: e.target.value })
                   }
                 }}
-                // onFocus={(e) => {
-                //   if (e.target.value === this.addressDefault) this.setState({ address: '' })
-                // }}
-                // onBlur={(e) => {
-                //   if (e.target.value === '') this.setState({ address: this.addressDefault })
-                // }}
               />
 
             </div>
@@ -299,7 +282,7 @@ class AddToken extends Component {
                     />
                     Decimals
                   </label>
-  
+
                 </div>
               </div>
   
