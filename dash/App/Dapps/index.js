@@ -17,9 +17,11 @@ function byLastUpdated (a, b) {
   return b.session.lastUpdatedAt - a.session.lastUpdatedAt
 }
 
+const originFilter = ['frame-internal', 'frame-extension']
+
 function getOriginsForChain (chain, origins) {
   const { connectedOrigins, disconnectedOrigins } = Object.entries(origins).reduce((acc, [id, origin]) => {
-    if (origin.chain.id === chain.id) {
+    if (origin.chain.id === chain.id && !originFilter.includes(origin.name)) {
       const connected = isNetworkConnected(chain) &&
         (!origin.session.endedAt || origin.session.startedAt > origin.session.endedAt)
 

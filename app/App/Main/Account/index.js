@@ -125,51 +125,20 @@ import SignTypedDataRequest from './Requests/SignTypedDataRequest'
 // import Restore from 'react-restore'
 // import link from '../../../../../../../resources/link'
 
-// account module is position absolute and with a translateX 
-class _AccountMain extends React.Component {
-  constructor (...args) {
-    super(...args)
-    this.state = {
-      expandedModule: ''
-    }
-  }
-  // constructor (props, context) {
-  //   // console.log(context)
-  //   super(props, context)
-  //   // this.resizeObserver = new ResizeObserver(() => )
-  //   this.state = { 
-  //     slideHeight: 0
-  //   }
-  //   // this.moduleRefs = []
-  //   context.store.observer(() => { 
-  //     const modules = context.store('views.tray.account.defaultModules') // modules per account in future
-  //     // Make refs
-  //     if (this.moduleRefs.length < modules.length) {
-  //       this.resizeObserver.disconnect()
-  //       this.moduleRefs = modules.map(() => React.createRef())
-  //     }
-  //   })
-    
-  // }
-  // componentDidMount () {
 
-  // }
-  // reportModule () {
 
-  // }
-  // computePositions () {
-  //   this.resizeObserver.disconnect()
-  //   const modulePositions = []
-  //   let slideHeight = 0
-  //   this.moduleRefs.forEach((ref, i) => {
-  //     modulePositions[i] = {}
-  //     modulePositions[i].top = slideHeight
-  //     modulePositions[i].height = ref && ref.current ? ref.current.clientHeight + 1 : 0
-  //     slideHeight += modulePositions[i].height
-  //   })
-  // }
-  renderModule (id, module, top, index, expandModule, expanded, expandedData) {
-    // console.log(id, module, top, index)
+class _AccountModule extends React.Component {
+  render () {
+    const { 
+      id, 
+      module, 
+      top, 
+      index, 
+      expandModule, 
+      expanded, 
+      expandedData,
+      account
+    } = this.props
     let hidden = false
     let style = { 
       transform: `translateY(${top}px)`, 
@@ -192,19 +161,19 @@ class _AccountMain extends React.Component {
     if (id === 'requests') moduleClass = ' transparentModule'
 
     return (
-      <div className={'accountModule' + moduleClass} style={style}>
+      <div className={'accountModule ' + moduleClass} style={style}>
         <div className='accountModuleInner cardShow' style={{ animationDelay: (index * 0.1) + 's'}}>
           {
             id === 'gas' ? <Gas 
               moduleId={id} 
-              id={this.props.id}
+              id={account}
               expandModule={expandModule}
               expanded={expanded}
             /> :
             id === 'requests' ? <Requests 
               _id={id}
-              id={this.props.id}
-              setAccountView={this.props.setAccountView}
+              id={account}
+              setAccountView={(view, data) => link.send('tray:action', 'navPanel', { view, data })}
               addresses={this.props.addresses} 
               minimized={this.props.minimized} 
               status={this.props.status} 
@@ -214,44 +183,44 @@ class _AccountMain extends React.Component {
             /> :
             id === 'verify' ? <Verify 
               moduleId={id}
-              id={this.props.id}
+              id={account}
               expandModule={expandModule}
               expanded={expanded}
             /> :
             id === 'activity' ? <Activity 
               moduleId={id} 
-              id={this.props.id}
+              id={account}
               expandModule={expandModule}
               expanded={expanded}
             /> :
             id === 'launcher' ? <Launcher 
               moduleId={id}
-              id={this.props.id} 
+              id={account} 
               expandModule={expandModule}
               expanded={expanded}
             /> :
             id === 'inventory' ? <Inventory 
               moduleId={id} 
-              id={this.props.id}
+              account={account}
               expandModule={expandModule}
               expanded={expanded}
               expandedData={expandedData}
             /> :
             id === 'permissions' ? <Permissions
               moduleId={id}
-              id={this.props.id}
+              account={account}
               expandModule={expandModule}
               expanded={expanded}
             /> :
             id === 'balances' ? <Balances
-              moduleId={id} 
-              {...this.props}
+              moduleId={id}
+              account={account}
               expandModule={expandModule}
               expanded={expanded}
             /> :
             id === 'settings' ? <Settings
               moduleId={id}
-              id={this.props.id}
+              account={account}
               expandModule={expandModule}
               expanded={expanded}
             /> :
@@ -265,8 +234,32 @@ class _AccountMain extends React.Component {
       </div>
     )
   }
-  expandModule (id, data) {
-    this.setState({ expandedModule: id, expandedModuleData: data || {} }) 
+}
+
+const AccountModule = Restore.connect(_AccountModule)
+
+// account module is position absolute and with a translateX 
+class _AccountMain extends React.Component {
+  constructor (...args) {
+    super(...args)
+    this.state = {
+      expandedModule: ''
+    }
+  }
+  // computePositions () {
+  //   this.resizeObserver.disconnect()
+  //   const modulePositions = []
+  //   let slideHeight = 0
+  //   this.moduleRefs.forEach((ref, i) => {
+  //     modulePositions[i] = {}
+  //     modulePositions[i].top = slideHeight
+  //     modulePositions[i].height = ref && ref.current ? ref.current.clientHeight + 1 : 0
+  //     slideHeight += modulePositions[i].height
+  //   })
+  // }
+  
+  expandModule (data) {
+    link.send('tray:action', 'navPanel', { view: 'expandedModule', data })
   }
   render () {
     const accountModules = this.store('panel.account.modules')
@@ -275,42 +268,53 @@ class _AccountMain extends React.Component {
     const modules = accountModuleOrder.map((id, i) => {
       const module = accountModules[id] || { height: 0 }
       slideHeight += module.height + 7
-      return this.renderModule(
-        id, 
-        module, 
-        slideHeight - module.height - 5, 
-        i, 
-        this.expandModule.bind(this)
-      )
+      return <AccountModule
+        id={id} 
+        account={this.props.id}
+        module={module} 
+        top={slideHeight - module.height - 5}
+        index={i} 
+        expandModule={this.expandModule.bind(this)}
+      />
     })
     return (
       <div className='accountMain'>
-        {this.state.expandedModule ? (
-          <div 
-            className='accountsModuleExpand cardShow' 
-            style={{ pointerEvents: this.state.expandedModule ? 'auto' : 'none' }}
-            onMouseDown={() => this.setState({ expandedModule: false })}
-          >
-            <div className='moduleExpanded' onMouseDown={(e) => {
-              e.stopPropagation()
-            }}>
-              {this.renderModule(
-                this.state.expandedModule, 
-                { height: '100%' }, 
-                0, 
-                0, 
-                this.expandModule.bind(this), 
-                true,
-                this.state.expandedModuleData
-              )}
-            </div>
-          </div>
-        ) : null}
         <div className='accountMainScroll' style={{ pointerEvents: this.state.expandedModule ? 'none' : 'auto' }}>
           <div className='accountMainSlide' style={{ height: slideHeight + 'px' }}>
             {modules}
           </div>
         </div>
+        {/* {this.state.expandedModule ? (
+          <AccountView 
+            back={() => {
+              link.send('tray:action', 'backPanel', { view, data })
+            }}
+            {...this.props}
+            accountViewTitle={'accountViewTitle'}
+          >
+            <div 
+              className='accountsModuleExpand cardShow' 
+              style={{ pointerEvents: this.state.expandedModule ? 'auto' : 'none' }}
+              onMouseDown={() => this.setState({ expandedModule: false })}
+            >
+              <div className='moduleExpanded' onMouseDown={(e) => {
+                e.stopPropagation()
+              }}>
+                {this.renderModule(
+                  this.state.expandedModule, 
+                  { height: '100%' }, 
+                  0, 
+                  0, 
+                  this.expandModule.bind(this), 
+                  true,
+                  this.state.expandedModuleData
+                )}
+              </div>
+            </div>
+          </AccountView>
+        ) : (
+         
+        )} */}
       </div>
     )
   }
@@ -427,7 +431,7 @@ class _AccountBody extends React.Component {
     }
   }
   render () {
-    const { view, data } = this.store('panel.nav')[0] || {}
+    const { view = '', data = {} } = this.store('panel.nav')[0] || {}
     if (view === 'requestView') {
       const { req, i } = data
       let accountViewTitle, accountViewIcon
@@ -467,37 +471,39 @@ class _AccountBody extends React.Component {
       )
     } else if (view === 'expandedModule') {
       return (
-        <AccountView {...props}>
+        <AccountView 
+          back={() => {
+            link.send('tray:action', 'backPanel')
+          }}
+          {...this.props}
+          accountViewTitle={data.id}
+        >
           <div 
             className='accountsModuleExpand cardShow' 
-            style={{ pointerEvents: this.state.expandedModule ? 'auto' : 'none' }}
             onMouseDown={() => this.setState({ expandedModule: false })}
           >
             <div className='moduleExpanded' onMouseDown={(e) => {
               e.stopPropagation()
             }}>
-              {this.renderModule(
-                this.state.expandedModule, 
-                { height: '100%' }, 
-                0, 
-                0, 
-                this.expandModule.bind(this), 
-                true,
-                this.state.expandedModuleData
-              )}
+              <AccountModule 
+                id={data.id}
+                account={data.account}
+                module={{ height: '100%' }}
+                top={0}
+                index={0}
+                expandModule={(view, data) => {
+                  link.send('tray:action', 'navPanel', { view: 'expandedModule', data }) 
+                }} 
+                expanded={true} 
+                expandedData={data}
+              />
             </div>
           </div>
         </AccountView>
       )
     } else {
       return (
-        <AccountMain 
-          setAccountView={(view, data) => {
-            link.send('tray:action', 'navPanel', { view, data })
-            // this.setState({ view, data })
-          }} 
-          {...this.props} 
-        />
+        <AccountMain {...this.props} />
       )
     }
   }

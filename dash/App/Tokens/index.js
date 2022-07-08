@@ -13,13 +13,13 @@ const AddTokenForm = ({ store }) => {
 
 function Tokens ({ data: { notify } }) {
   return (
-    <div>
+    <>
       {notify === 'addToken' ? (
         <AddTokenForm store={this.store}  />
       ) : (
         <CustomTokens />
       )}
-    </div>
+    </>
   )
 }
 

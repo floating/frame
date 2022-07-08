@@ -9,10 +9,6 @@ import { capitalize } from '../../../resources/utils'
 
 import frameIcon from './FrameIcon.png'
 
-import AddChain from './AddChain'
-import AddToken from './AddToken'
-import CustomTokens from './CustomTokens'
-
 const FEE_WARNING_THRESHOLD_USD = 50
 
 class Notify extends React.Component {
@@ -676,33 +672,6 @@ class Notify extends React.Component {
             {'close'}
           </div> */}
           {this.openExplorer(this.store('view.notifyData'))}
-        </div>
-      )
-    } else if (notify === 'addChain') {
-      return (
-        <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
-          {/* <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
-            {'close'}
-          </div> */}
-          <AddChain req={this.store('view.notifyData')} />
-        </div>
-      )
-    } else if (notify === 'addToken') {
-      return (
-        <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
-          {/* <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
-            {'close'}
-          </div> */}
-          <AddToken req={this.store('view.notifyData')} currentNetworkId={this.store('main.currentNetwork.id')} />
-        </div>
-      )
-    } else if (notify === 'customTokens') {
-      return (
-        <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
-          {/* <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
-            {'close'}
-          </div> */}
-          <CustomTokens req={this.store('view.notifyData')} />
         </div>
       )
     } else {

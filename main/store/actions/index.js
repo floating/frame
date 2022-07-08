@@ -430,17 +430,14 @@ module.exports = {
     })
   },
   endOriginSession: (u, originId) => {
-    u('main.origins', originId, origin => {
-      const now = new Date().getTime()
-
-      return {
-        ...origin,
-        session: {
-          ...origin.session,
-          endedAt: now,
-          lastUpdatedAt: now
-        }
+    u('main.origins', origins => {
+      const origin = origins[originId]
+      if (origin) {
+        const now = new Date().getTime()
+        const session = Object.assign({}, origin.session, { endedAt: now, lastUpdatedAt: now })
+        origins[originId] = Object.assign({}, origin, { session })
       }
+      return origins
     })
   },
   switchOriginChain: (u, originId, chainId, type) => {
@@ -718,6 +715,9 @@ module.exports = {
         return signer
       })
     }, 320)
+  },
+  setAccountFilter: (u, value) => {
+    u('panel.accountFilter', () => value)
   }
   // toggleUSDValue: (u) => {
   //   u('main.showUSDValue', show => !show)

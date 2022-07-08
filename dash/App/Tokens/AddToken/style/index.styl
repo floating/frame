@@ -1,5 +1,11 @@
+.addTokenTop
+  display flex
+  justify-content center
+  align-items center
+  flex-direction column
+
 .addTokenTitle
-  padding 40px 0px 60px 10px
+  padding 40px 0px 60px 0px
   font-size 24px
   font-weight 100
 
@@ -12,11 +18,48 @@
   box-sizing border-box
   padding-bottom 32px
 
+.newTokenView
+  min-height 100%
+  width 100%
+  display flex
+  justify-content center
+  align-items center
+  flex-direction column
+
+.newTokenChainSelectTitle
+  padding-bottom 40px
+  display flex
+  justify-content center
+  align-items center
+  flex-direction column
+
+.newTokenChainAddress
+  font-family 'Fira Code', monospace
+  font-weight 400
+  font-size 18px
+  svg
+    margin 4px 5px
+
+.newTokenChainSelectChain
+  width 100%
+
+.newTokenChainSelectSubtitle
+  margin-top 3px
+  font-size 10px
+  font-weight bold
+  text-transform uppercase
+
+.newTokenChainSelectFooter
+  margin-top 40px
+  font-size 10px
+  font-weight bold
+  text-transform uppercase
+
 .tokenRow
   width 100%
   display flex
   justify-content space-between
-  padding 0px 5px 20px 5px
+  padding 0px 5px 40px 5px
   box-sizing border-box
 
 .tokenRow:last-child
@@ -24,21 +67,26 @@
 
 .tokenName
   width 100%
+  text-align center
 
 .tokenAddress
   width 100%
+  text-align center
 
 .tokenLogoUri
   width 100%
+  text-align center
 
 .tokenChainId
   width calc(35% - 5px)
 
 .tokenDecimals
-  width calc(26% - 5px)
+  width calc(50% - 5px)
+  text-align center
 
 .tokenSymbol
-  width calc(39% - 5px)
+  width calc(50% - 5px)
+  text-align center
 
 .tokenExplorer
   width 100%
@@ -54,40 +102,48 @@
   font-size 16px
   padding 0px
   width 100%
-  background var(--ghostZ)
-  border-radius 8px
-  font-family OpenSans, sans-serif
-  padding 10px 3px
-  margin-top: 10px
-  margin-left: -10px
-  font-weight 300
+  font-family 'Exo2'
+  background var(--ghostY)
+  border-radius 12px
+  padding 23px 3px 20px 3px
+  font-weight 500
   color var(--outerspace)
+  
   &.dropdown
     margin-top: 17px
     padding: 0px
 
+.tokenInputLabel
+  font-size 12px
+  text-transform uppercase
+  font-weight 300
+  input
+    margin-bottom 5px
+
 .tokenInputDim
   font-size 16px !important
-  font-family OpenSans, sans-serif !important
+  // rfont-family OpenSans, sans-serif !important
   font-weight 300 !important
   color var(--outerspace03)
 
 .tokenInputAddress
   font-family 'Fira Code', monospace
   font-weight 500
-  font-size 12.5px
-  line-height 20px
-  padding-top 11px
+  font-size 13px
+  background var(--ghostY)
 
-.tokenInputLabel
-  font-size 11px
+.tokenSetAddress
+  font-size 13px
   text-transform uppercase
   font-weight 500
-  padding 0px 0px 10px 10px
-  text-align left
-  width 100%
-  letter-spacing 0.5px
-  display inline-block
+  padding 10px 50px
+  background var(--ghostA)
+  border-radius 12px
+  cursor pointer
+  margin-top 10px
+
+.tokenSetAddress:hover
+  background var(--ghostB)
 
 .tokenLayers
   width 100%
@@ -127,7 +183,7 @@
   color var(--good)
 
 .addTokenSubmit
-  background var(--ghostC)
+  background var(--ghostA)
   width 100%
   margin 25px
   height 48px
@@ -152,7 +208,7 @@
 //   color var(--good)
 
 .addTokenSubmitEnabled
-  background var(--ghostC)
+  background var(--ghostB)
   color var(--good)
   opacity 1
   cursor pointer

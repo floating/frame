@@ -305,7 +305,7 @@ class FrameAccount {
     }
   }
 
-  addRequest (req: AccountRequest, res: RPCCallback<any> = () => {}) {
+  addRequest (req: any, res: RPCCallback<any> = () => {}) {
     const add = async (r: AccountRequest) => {
       this.requests[r.handlerId] = req
       this.requests[r.handlerId].mode = RequestMode.Normal
@@ -329,6 +329,36 @@ class FrameAccount {
       windows.showTray()
       windows.broadcast('main:action', 'setSignerView', 'default')
       windows.broadcast('main:action', 'setPanelView', 'default')
+
+      // Display request
+      const { account } = req
+
+      // Check if this account is open
+      const accountOpen = store('selected.current') === account
+
+      // Does the current panel nav include a 'requestView'
+      const panelNav = store('panel.nav') || []
+      const inRequestView = panelNav.map((crumb: any) => crumb.view).includes('requestView')
+
+      if (accountOpen && !inRequestView) {
+        const reqData = Object.assign({}, req)
+        delete reqData.res
+
+        // TODO: Encapsulate this logic somewhere else
+        if (reqData.type === 'transaction') {
+          const aux = {
+            type: 'gas',
+            height: 100,
+            data: {
+              chain: req.data.chainId
+            }
+          }
+
+          store.navPanel({ view: 'requestView', data: { account, req: reqData, aux } })
+        } else {
+          store.navPanel({ view: 'requestView', data: { account, req: reqData } })
+        }
+      }
     }
     // Add a filter to make sure we're adding the request to an account that controls the outcome
     if (this.smart) {

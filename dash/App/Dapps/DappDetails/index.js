@@ -6,7 +6,6 @@ import RingIcon from '../../../../resources/Components/RingIcon'
 import chainMeta from '../../../../resources/chainMeta'
 import svg from '../../../../resources/svg'
 
-
 class DappDetails extends React.Component {
   updateOriginChain () {
     const origin = this.store('main.origins', this.props.originId)

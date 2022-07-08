@@ -1,7 +1,9 @@
 import React, { Component } from 'react'
 import Restore from 'react-restore'
-import Dropdown from '../../../../resources/Components/Dropdown'
+import RingIcon from '../../../../resources/Components/RingIcon'
+import chainMeta from '../../../../resources/chainMeta'
 import link from '../../../../resources/link'
+import svg from '../../../../resources/svg'
 
 class AddToken extends Component {
   constructor (props, context) {
@@ -9,7 +11,7 @@ class AddToken extends Component {
 
     this.nameDefault = 'Token Name'
     this.symbolDefault = 'SYMBOL'
-    this.chainIdDefault = 1
+    // this.chainIdDefault = 1
     this.decimalsDefault = '?'
     this.addressDefault = 'Contract Address'
     this.logoURIDefault = 'Logo URI'
@@ -23,10 +25,12 @@ class AddToken extends Component {
 
     this.state = {
       name: this.token.name || this.nameDefault,
-      symbol: (this.token.symbol || '').toUpperCase() || this.symbolDefault,
-      chainId: (Number.isInteger(chainId) && chainId) || this.chainIdDefault,
-      address: (this.token.address || '').toLowerCase() || this.addressDefault,
-      decimals: (Number.isInteger(decimals) && decimals) || this.decimalsDefault,
+      symbol: (this.token.symbol || '').toUpperCase(),
+      _chainId: Number.isInteger(chainId) && chainId,
+      chainId: Number.isInteger(chainId) && chainId,
+      inputAddress: (this.token.address || '').toLowerCase(),
+      address: (this.token.address || '').toLowerCase(),
+      decimals: (Number.isInteger(decimals) && decimals),
       logoURI: this.token.logoURI || this.logoURIDefault
     }
   }
@@ -52,7 +56,57 @@ class AddToken extends Component {
     return this.state[statePropName] === this[`${statePropName}Default`]
   }
 
+  updateOriginChain () {
+    // const origin = this.store('main.origins', this.props.originId)
+    return (
+      <div className='originSwapChainList'>
+        {Object.keys(this.store('main.networks.ethereum')).filter(id => {
+          return this.store('main.networks.ethereum', id, 'on')
+        }).map(id => {
+          const hexId = '0x' + parseInt(id).toString('16')
+          const selected = this.state._chainId === parseInt(id)
+          return (
+            <div 
+              className={'originChainItem'} 
+              key={id}
+              style={selected ? {
+                color: 'var(--ghostB)',
+                background: chainMeta[hexId] ? chainMeta[hexId].primaryColor : 'var(--moon)'
+              } : {}}
+              onClick={() => {
+                this.setState({ _chainId: parseInt(id) })
+                setTimeout(() => {
+                  this.setState({ chainId: parseInt(id) })
+                }, 200)
+              }}
+            >
+              <div className='originChainItemIcon'>
+                <RingIcon 
+                  color={chainMeta[hexId] ? chainMeta[hexId].primaryColor : 'var(--moon)'} 
+                  img={chainMeta[hexId] ? chainMeta[hexId].icon : ''} 
+                />
+              </div>
+              
+              {this.store('main.networks.ethereum', id, 'name')}
+
+              <div 
+                className='originChainItemCheck'
+                style={selected ? {
+                  background: chainMeta[hexId] ? chainMeta[hexId].primaryColor : 'var(--moon)'
+                } : {}}
+              >
+                {selected ? svg.check(28) : null}
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    )
+  }
+
   render () {
+    const currentChain = this.state.chainId ? this.store('main.networks.ethereum', this.state.chainId, 'name') : undefined
+
     const newTokenReady = (
       this.state.name && this.state.name !== this.nameDefault &&
       this.state.symbol && this.state.symbol !== this.symbolDefault &&
@@ -60,179 +114,227 @@ class AddToken extends Component {
       this.state.address && this.state.address !== this.addressDefault &&
       Number.isInteger(this.state.decimals)
     )
-    const showTokenAutofillWarning = !this.isConnectedChain()
 
-    return (
-      <div className='notifyBoxWrap cardShow' onMouseDown={e => e.stopPropagation()}>
-        <div className='notifyBoxSlide'>
-          <div className='addTokenTitle'>
-            Add New Token
+    if (!this.state.chainId) {
+      return (
+        <div className='newTokenView cardShow'>
+          <div className='newTokenChainSelectTitle'>
+            {'What chain is this token on?'}
           </div>
-          <div className='addToken'>
-            {showTokenAutofillWarning && <div className='tokenRow'>The currently selected chain is not connected. Token autofill will not work.</div>}
-            <div className='tokenRow'>
-              <div className='tokenName'>
-                <label className='tokenInputLabel'>
-                  Token Name
-                  <input
-                    className={`tokenInput tokenInputAddress ${this.isDefault('name') ? 'tokenInputDim' : ''}`}
-                    value={this.state.name} spellCheck='false'
-                    onChange={(e) => {
-                      this.setState({ name: e.target.value })
-                    }}
-                    onFocus={(e) => {
-                      if (e.target.value === this.nameDefault) this.setState({ name: '' })
-                    }}
-                    onBlur={(e) => {
-                      if (e.target.value === '') this.setState({ name: this.nameDefault })
-                    }}
-                  />
-                </label>
+          <div className='newTokenChainSelectChain'>
+            {this.updateOriginChain()}
+          </div>
+          <div className='newTokenChainSelectFooter'>
+            {'Chain not listed? Enable it in Chains'}
+          </div>
+        </div>
+      )
+    } else if (!this.state.address) {
+      const hexId = '0x' + parseInt(this.state.chainId).toString('16')
+      return (
+        <div className='newTokenView cardShow'>
+          <div className='newTokenChainSelectTitle'>
+            <div>{`What is the token\'s contract address?`}</div>
+            {currentChain ? (
+              <div 
+                className='newTokenChainSelectSubtitle'
+                style={{
+                  color: chainMeta[hexId] ? chainMeta[hexId].primaryColor : 'var(--moon)'
+                }}
+              >
+                {`on ${currentChain}`}
               </div>
+            ) : null}
+          </div>
+
+          <div className='tokenRow'>
+            <div className='tokenAddress'>
+              <input
+                className={`tokenInput tokenInputAddress ${this.isDefault('address') ? 'tokenInputDim' : ''}`}
+                value={this.state.inputAddress} 
+                spellCheck='false'
+                autoFocus='true'
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    this.setState({ address: this.state.inputAddress })
+                    if (this.isConnectedChain()) {
+                      this.updateTokenData(this.state.inputAddress, this.state.chainId)
+                    }
+                  } 
+                }}
+                onChange={(e) => {
+                  if (e.target.value.length > 42) {
+                    e.preventDefault()
+                  } else {
+                    this.setState({ inputAddress: e.target.value })
+                  }
+                }}
+              />
+
             </div>
-
-            <div className='tokenRow'>
-              <div className='tokenSymbol'>
-                <label className='tokenInputLabel'>
-                  Symbol
-                  <input
-                    className={`tokenInput tokenInputAddress ${this.isDefault('symbol') ? 'tokenInputDim' : ''}`}
-                    value={this.state.symbol} spellCheck='false'
-                    onChange={(e) => {
-                      if (e.target.value.length > 10) return e.preventDefault()
-                      this.setState({ symbol: e.target.value })
-                    }}
-                    onFocus={(e) => {
-                      if (e.target.value === this.symbolDefault) this.setState({ symbol: '' })
-                    }}
-                    onBlur={(e) => {
-                      if (e.target.value === '') this.setState({ symbol: this.symbolDefault })
-                    }}
-                  />
-                </label>
-
+          </div>
+          <div 
+            className='tokenSetAddress'
+            onClick={() => {
+              this.setState({ address: this.state.inputAddress })
+              if (this.isConnectedChain()) {
+                this.updateTokenData(this.state.inputAddress, this.state.chainId)
+              }
+            }}
+          >
+            {'Set Address'}
+          </div>
+        </div>
+      )
+    } else {
+      const address = this.state.address || ''
+      const hexId = '0x' + parseInt(this.state.chainId).toString('16')
+      return (
+        <div className='notifyBoxWrap cardShow' onMouseDown={e => e.stopPropagation()}>
+          <div className='notifyBoxSlide'>
+            <div className='addTokenTop'>
+              <div className='addTokenTitle'>
+                Add New Token
               </div>
-
-              <div className='tokenDecimals'>
-                <label className='tokenInputLabel'>
-                  Decimals
-                  <input
-                    className={`tokenInput tokenInputAddress ${this.isDefault('decimals') ? 'tokenInputDim' : ''}`}
-                    value={this.state.decimals} spellCheck='false'
-                    onChange={(e) => {
-                      if (!e.target.value) return this.setState({ decimals: '' })
-                      if (e.target.value.length > 2) return e.preventDefault()
-
-                      const decimals = parseInt(e.target.value)
-                      if (!Number.isInteger(decimals)) return e.preventDefault()
-
-                      this.setState({ decimals })
-                    }}
-                    onFocus={(e) => {
-                      if (e.target.value === this.decimalsDefault) this.setState({ decimals: '' })
-                    }}
-                    onBlur={(e) => {
-                      if (e.target.value === '') this.setState({ decimals: this.decimalsDefault })
-                    }}
-                  />
-                </label>
-
-              </div>
-
-              <div className='tokenChainId'>
-                <label className='tokenInputLabel'>
-                  Chain
-                  <Dropdown
-                    className="tokenInput"
-                    syncValue={this.state.chainId}
-                    onChange={(chainId) => {
-                      this.setState({ chainId })
-                      if (this.state.address !== this.addressDefault && this.isConnectedChain()) {
-                        this.updateTokenData(this.state.address, chainId)
-                      }
-                    }}
-                    options={this.activeChains.map((chain) => ({ text: chain.name, value: chain.id }))}
-                  />
-                </label>
-              </div>
-            </div>
-
-            <div className='tokenRow'>
-              <div className='tokenAddress'>
-                <label className='tokenInputLabel'>
-                  Contract Address
-                  <input
-                    className={`tokenInput tokenInputAddress ${this.isDefault('address') ? 'tokenInputDim' : ''}`}
-                    value={this.state.address} spellCheck='false'
-                    onChange={(e) => {
-                      if (e.target.value.length > 42) {
-                        return e.preventDefault()
-                      }
-
-                      this.setState({ address: e.target.value })
-                      if (this.isConnectedChain()) {
-                        this.updateTokenData(e.target.value, this.state.chainId)
-                      }
-                    }}
-                    onFocus={(e) => {
-                      if (e.target.value === this.addressDefault) this.setState({ address: '' })
-                    }}
-                    onBlur={(e) => {
-                      if (e.target.value === '') this.setState({ address: this.addressDefault })
-                    }}
-                  />
-                </label>
-              </div>
-            </div>
-
-            <div className='tokenRow'>
-              <div className='tokenLogoUri'>
-                <label className='tokenInputLabel'>
-                  Logo URI
-                  <input
-                    className={`tokenInput tokenInputAddress ${this.isDefault('logoURI') ? 'tokenInputDim' : ''}`}
-                    value={this.state.logoURI} spellCheck='false'
-                    onChange={(e) => {
-                      this.setState({ logoURI: e.target.value })
-                    }}
-                    onFocus={(e) => {
-                      if (e.target.value === this.logoURIDefault) this.setState({ logoURI: '' })
-                    }}
-                    onBlur={(e) => {
-                      if (e.target.value === '') this.setState({ logoURI: this.logoURIDefault })
-                    }}
-                  />
-                </label>
-              </div>
-            </div>
-
-            <div className='tokenRow'>
-              {newTokenReady ? (
-                <div
-                  className='addTokenSubmit addTokenSubmitEnabled'
-                  onMouseDown={() => {
-                    const { name, symbol, chainId, address, decimals, logoURI } = this.state
-                    const token = { name, symbol, chainId, address, decimals, logoURI }
-                    link.send('tray:addToken', token, this.props.req)
-                    setTimeout(() => {
-                      link.send('tray:action', 'backDash')
-                    }, 400)
-                  }}
-                >
-                  Add Token
+              <div className='newTokenChainSelectTitle'>
+                <div className='newTokenChainAddress'>
+                  {address.substring(0, 10)}
+                  {svg.octicon('kebab-horizontal', { height: 14 })}
+                  {address.substring(address.length - 8)}
                 </div>
-              ) : (
-                <div
-                  className='addTokenSubmit'
-                >
-                  Fill in Token Details
+                {currentChain ? (
+                  <div 
+                    className='newTokenChainSelectSubtitle'
+                    style={{
+                      color: chainMeta[hexId] ? chainMeta[hexId].primaryColor : 'var(--moon)'
+                    }}
+                  >
+                    {`on ${currentChain}`}
+                  </div>
+                ) : null}
+              </div>
+            </div>
+            <div className='addToken'>
+              <div className='tokenRow'>
+                <div className='tokenName'>
+                  <label className='tokenInputLabel'>
+                    <input
+                      className={`tokenInput ${this.isDefault('name') ? 'tokenInputDim' : ''}`}
+                      value={this.state.name} 
+                      spellCheck='false'
+                      onChange={(e) => {
+                        this.setState({ name: e.target.value })
+                      }}
+                      onFocus={(e) => {
+                        if (e.target.value === this.nameDefault) this.setState({ name: '' })
+                      }}
+                      onBlur={(e) => {
+                        if (e.target.value === '') this.setState({ name: this.nameDefault })
+                      }}
+                    />
+                    Token Name
+                  </label>
                 </div>
-              )}
+              </div>
+  
+              <div className='tokenRow'>
+                <div className='tokenSymbol'>
+                  <label className='tokenInputLabel'>
+                    <input
+                      className={`tokenInput ${this.isDefault('symbol') ? 'tokenInputDim' : ''}`}
+                      value={this.state.symbol} spellCheck='false'
+                      onChange={(e) => {
+                        if (e.target.value.length > 10) return e.preventDefault()
+                        this.setState({ symbol: e.target.value })
+                      }}
+                      onFocus={(e) => {
+                        if (e.target.value === this.symbolDefault) this.setState({ symbol: '' })
+                      }}
+                      onBlur={(e) => {
+                        if (e.target.value === '') this.setState({ symbol: this.symbolDefault })
+                      }}
+                    />
+                    Symbol
+                  </label>
+  
+                </div>
+  
+                <div className='tokenDecimals'>
+                  <label className='tokenInputLabel'>
+                    <input
+                      className={`tokenInput ${this.isDefault('decimals') ? 'tokenInputDim' : ''}`}
+                      value={this.state.decimals} spellCheck='false'
+                      onChange={(e) => {
+                        if (!e.target.value) return this.setState({ decimals: '' })
+                        if (e.target.value.length > 2) return e.preventDefault()
+  
+                        const decimals = parseInt(e.target.value)
+                        if (!Number.isInteger(decimals)) return e.preventDefault()
+  
+                        this.setState({ decimals })
+                      }}
+                      onFocus={(e) => {
+                        if (e.target.value === this.decimalsDefault) this.setState({ decimals: '' })
+                      }}
+                      onBlur={(e) => {
+                        if (e.target.value === '') this.setState({ decimals: this.decimalsDefault })
+                      }}
+                    />
+                    Decimals
+                  </label>
+
+                </div>
+              </div>
+  
+              <div className='tokenRow'>
+                <div className='tokenLogoUri'>
+                  <label className='tokenInputLabel'>
+                    <input
+                      className={`tokenInput ${this.isDefault('logoURI') ? 'tokenInputDim' : ''}`}
+                      value={this.state.logoURI} spellCheck='false'
+                      onChange={(e) => {
+                        this.setState({ logoURI: e.target.value })
+                      }}
+                      onFocus={(e) => {
+                        if (e.target.value === this.logoURIDefault) this.setState({ logoURI: '' })
+                      }}
+                      onBlur={(e) => {
+                        if (e.target.value === '') this.setState({ logoURI: this.logoURIDefault })
+                      }}
+                    />
+                     Logo URI
+                  </label>
+                </div>
+              </div>
+  
+              <div className='tokenRow'>
+                {newTokenReady ? (
+                  <div
+                    className='addTokenSubmit addTokenSubmitEnabled'
+                    onMouseDown={() => {
+                      const { name, symbol, chainId, address, decimals, logoURI } = this.state
+                      const token = { name, symbol, chainId, address, decimals, logoURI }
+                      link.send('tray:addToken', token, this.props.req)
+                      setTimeout(() => {
+                        link.send('tray:action', 'backDash')
+                      }, 400)
+                    }}
+                  >
+                    Add Token
+                  </div>
+                ) : (
+                  <div
+                    className='addTokenSubmit'
+                  >
+                    Fill in Token Details
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    )
+      )
+    }
   }
 }
 

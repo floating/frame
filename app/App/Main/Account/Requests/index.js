@@ -109,11 +109,7 @@ class Requests extends React.Component {
               <div key='noReq' className='noRequests'>
                 No Pending Requests
               </div>
-            ): null}
-            {/* <div className='recentRequests' style={{ opacity: monitor.length > 0 ? 1 : 0, transform: `translateY(${containNormal +  40}px)` }}>
-              <span>Recent Transactions</span>
-              <span>{monitor.length}</span>
-            </div> */}
+            ) : null}
             {requests.map((req, i) => {
               if (req.type === 'access') {
                 return (

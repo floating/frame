@@ -56,7 +56,7 @@ class AddChain extends React.Component {
       <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
         <div className='notifyBoxSlide'>
           <div className='addChainTitle'>
-            Add New Chain
+            {this.props.editMode ? 'Chain Config' : 'Add New Chain'}
           </div>
           <div className='addChain'>
             <div className='chainRow'>
@@ -253,13 +253,27 @@ class AddChain extends React.Component {
                       primaryRpc: this.state.newNetworkRPCPrimary,
                       secondaryRpc: this.state.newNetworkRPCSecondary,
                     }
-                    link.send('tray:addChain', net, this.props.req)
+                    if (this.props.editMode) {
+                      const currentNet = {
+                        id: this.chain.id,
+                        name: this.chain.name,
+                        type: this.chain.type,
+                        explorer: this.chain.blockExplorerUrls[0],
+                        symbol: this.chain.nativeCurrency.symbol,
+                        layer: this.chain.layer,
+                        primaryRpc: this.state.newNetworkRPCPrimary,
+                        secondaryRpc: this.state.newNetworkRPCSecondary,
+                      }
+                      link.send('tray:action', 'updateNetwork', currentNet, net)
+                    } else {
+                      link.send('tray:addChain', net, this.props.req)
+                    }
                     setTimeout(() => {
                       link.send('tray:action', 'backDash')
                     }, 400)
                   }}
                 >
-                  Add Chain
+                 {this.props.editMode ? 'Update Chain' : 'Add Chain'}
                 </div>
               ) : (
                 <div 

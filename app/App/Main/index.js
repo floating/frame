@@ -15,7 +15,7 @@ class Main extends React.Component {
   constructor (...args) {
     super(...args)
     this.state = {
-      filter: ''
+      accountFilter: ''
     }
   }
 
@@ -65,45 +65,74 @@ class Main extends React.Component {
     const scrollTop = this.store('selected.position.scrollTop')
     const open = current && this.store('selected.open')
     const sortedAccounts = Object.keys(accounts).sort((a, b) => this.accountSort(accounts, a, b))
-
-    const { filter } = this.state
+    const filter = this.store('panel.accountFilter')
 
     const { data } = this.store('panel.nav')[0] || {}
     const panelScrollStyle = current ? { overflow: 'hidden', pointerEvents: 'none' } : {}
     if (data && data.aux && data.aux.height) panelScrollStyle.bottom = data.aux.height
 
+    const displayAccounts = sortedAccounts.filter((id, i) => {
+      const account = accounts[id]
+      return !(
+        filter &&
+        !account.address.includes(filter) &&
+        !account.name.includes(filter) &&
+        !account.ensName.includes(filter) &&
+        !account.lastSignerType.includes(filter)
+      )
+    })
+
     return (
       <div className={this.store('panel.view') !== 'default' ? 'card cardHide' : 'card cardShow'}>
         <div id='panelScroll' style={panelScrollStyle}>
           <div className='panelScrollOverlay' />
-          <div id='panelSlide' 
-            ref={ref => { if (ref) this.scroll = ref }} style={current ? { overflow: 'visible' } : {}}>
-            <div id='panelWrap' style={current && scrollTop > 0 ? { marginTop: '-' + scrollTop + 'px' } : {}}>
-              {/* {untethered.sort().map((id, i) => <PendingSigner key={'signers' + id} {...this.store('main.signers', id)} index={i} />)} */}
-              {sortedAccounts.map((id, i) => {
-                const account = accounts[id]
-                if (
-                  filter &&
-                  !account.address.includes(filter) &&
-                  !account.name.includes(filter) &&
-                  !account.ensName.includes(filter) &&
-                  !account.lastSignerType.includes(filter)
-                ) return null
-                return <Account key={id} {...account} index={i} reportScroll={() => this.reportScroll()} resetScroll={() => this.resetScroll()} />
-              })}
-              {Object.keys(accounts).length === 0 ? (
-                <div className='noSigners'>
-                  {/* <div className='introLogo'>{svg.logo(70)}</div> */}
-                  {`No Accounts Added`}
-                  {/* <span className='getStarted'>
-                    Add accounts using <div className='getStartedPlus'><span>+</span></div> above
-                  </span>
-                  <div className='discordInvite' style={{ margin: '0px' }} onMouseDown={() => this.store.notify('openExternal', { url: 'https://discord.gg/UH7NGqY' })}>
-                    <div>Need help getting started?</div>
-                    <div className='discordLink'>Join our Discord!</div>
-                  </div> */}
+          <div 
+            id='panelSlide' 
+            ref={ref => { if (ref) this.scroll = ref }} 
+            style={current ? { overflow: 'visible' } : {}}
+          >
+            <div className='panelFilter'>
+              <div className='panelFilterIcon'>
+                {svg.search(12)}
+              </div>
+              <div className='panelFilterInput'>
+                <input 
+                  tabIndex='-1'
+                  onChange={(e) => {
+                    const value = e.target.value
+                    this.setState({ accountFilter: value  })
+                    link.send('tray:action', 'setAccountFilter', value)
+                  }}
+                  value={this.state.accountFilter}
+                />
+              </div>
+              {this.state.accountFilter ? (
+                <div 
+                  className='panelFilterClear'
+                  onClick={() => {
+                    this.setState({ accountFilter: '' })
+                    link.send('tray:action', 'setAccountFilter', '')
+                  }}
+                >
+                  {svg.close(12)}
                 </div>
               ) : null}
+            </div>
+            <div id='panelWrap' style={current && scrollTop > 0 ? { marginTop: '-' + scrollTop + 'px' } : {}}>
+              {displayAccounts.length ? (
+                displayAccounts.map((id, i) => {
+                  const account = accounts[id]
+                  return <Account key={id} {...account} index={i} reportScroll={() => this.reportScroll()} resetScroll={() => this.resetScroll()} />
+                })
+              ) : Object.keys(accounts).length === 0 ? (
+                <div className='noSigners'>
+                  {'No Accounts Added'}
+                </div>
+              ) : (
+                <div className='noSigners'>
+                  {'No Matching Accounts'}
+                </div>
+              )}
             </div>
           </div>
         </div>
