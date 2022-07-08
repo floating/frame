@@ -591,7 +591,6 @@ class _Network extends React.Component {
               chain: {
                 blockExplorerUrls: [explorer],
                 rpcUrls: [],
-                nativeCurrency: this.store('main.networksMeta', type, id, 'nativeCurrency') || {}, 
                 nativeCurrency: {
                   symbol: symbol
                 },
