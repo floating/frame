@@ -25,7 +25,7 @@ class Settings extends React.Component {
   componentDidMount () {
     if (this.resizeObserver) this.resizeObserver.observe(this.moduleRef.current)
     this.nameObs = this.store.observer(() => {
-      const name = this.store('main.accounts', this.props.id, 'name')
+      const name = this.store('main.accounts', this.props.account, 'name')
       if (name !== this.state.name) this.setState({ name })
     })
   }
@@ -36,7 +36,7 @@ class Settings extends React.Component {
   }
 
   render () {
-    const account = this.store('main.accounts', this.props.id)
+    const account = this.store('main.accounts', this.props.account)
     return (
       <div ref={this.moduleRef}>
         {this.props.expanded ? (
@@ -49,13 +49,13 @@ class Settings extends React.Component {
         ) : null}
         <div className='moduleMain moduleMainSettings'>
           {!this.props.expanded ? (
-            <div className='moduleButton' onMouseDown={() => this.props.expandModule(this.props.moduleId)}>
+            <div className='moduleButton' onMouseDown={() => this.props.expandModule({ id: this.props.moduleId, account: this.props.account })}>
               Account Settings
             </div>
           ) : (
             <>
               <Verify 
-                id={this.props.id}
+                id={this.props.account}
               />
               <div className='moduleRow'>
                 Account Tag: 
@@ -65,7 +65,7 @@ class Settings extends React.Component {
                   value={this.state.name} 
                   onChange={(e) => {
                     this.setState({ name: e.target.value })
-                    link.send('tray:renameAccount', this.props.id, e.target.value)
+                    link.send('tray:renameAccount', this.props.account, e.target.value)
                   }}
                 />
               </div>
@@ -79,7 +79,7 @@ class Settings extends React.Component {
               <div className='moduleRow'>Signer Connected: {account.signer ? 'yes' : 'no'}</div>
               {/* <div className='moduleRow'>Account Added: {account.created}</div> */}
               <div className='moduleButton moduleButtonBad' onMouseDown={() => {
-                link.rpc('removeAccount', this.props.id, {}, () => {
+                link.rpc('removeAccount', this.props.account, {}, () => {
                   // console.log('Removed account ', address)
                 })
               }}>Remove This Account</div>

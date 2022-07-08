@@ -602,7 +602,6 @@ class _Network extends React.Component {
                 iconUrls: []
               }
             }
-            console.log('CHAIN REQUEST')
             link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'addChain', notifyData: { editMode: true, req }} })
           }}>
             {svg.gear(11)}

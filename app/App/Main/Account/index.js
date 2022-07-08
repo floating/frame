@@ -220,7 +220,7 @@ class _AccountModule extends React.Component {
             /> :
             id === 'settings' ? <Settings
               moduleId={id}
-              id={account}
+              account={account}
               expandModule={expandModule}
               expanded={expanded}
             /> :
