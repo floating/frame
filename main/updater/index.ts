@@ -2,9 +2,10 @@ import { app, shell } from 'electron'
 import log from 'electron-log'
 import path from 'path'
 
-// import store from '../store'
-// import windows from '../windows'
+import store from '../store'
+import windows from '../windows'
 import WorkerProcess from '../worker/process'
+import { UpdaterOptions } from './autoUpdater'
 
 export interface VersionUpdate {
   availableUpdate?: {
@@ -119,10 +120,10 @@ class Updater {
       this.availableVersion = version
       this.availableUpdate = location
 
-      const remindOk = false // !store('main.updater.dontRemind').includes(version)
+      const remindOk = !store('main.updater.dontRemind').includes(version)
 
       if (remindOk) {
-        // windows.broadcast('main:action', 'updateBadge', 'updateAvailable', this.availableVersion)
+        windows.broadcast('main:action', 'updateBadge', 'updateAvailable', this.availableVersion)
       } else {
         log.verbose(`Update to version ${version} is available but user chose to skip`)
       }
@@ -136,7 +137,7 @@ class Updater {
   private readyForInstall () {
     this.installerReady = true
 
-    // windows.broadcast('main:action', 'updateBadge', 'updateReady')
+    windows.broadcast('main:action', 'updateBadge', 'updateReady')
   }
 
   private checkForAutoUpdate () {
@@ -148,12 +149,15 @@ class Updater {
     })
 
     this.autoUpdater.once('ready', () => {
-      const config = {
+      const config: UpdaterOptions = {
         app: {
-          // TODO: get these from Electron
-          version: '0.5.0-beta.19', //app.getVersion(),
-          appUpdateConfigPath: '/home/matt/projects/frame/compiled/main/dev-app-update.yml', // path.join(process.resourcesPath, 'app-update.yml'),
-          userDataPath: '/home/matt/.config/Electron' //app.getPath('userData'),
+          version: app.getVersion(),
+          name: app.getName(),
+          isPackaged: app.isPackaged,
+          appUpdateConfigPath: app.isPackaged
+            ? path.join(process.resourcesPath, 'app-update.yml')
+            : path.join(app.getAppPath(), 'dev-app-update.yml'),
+          userDataPath: app.getPath('userData')
         },
         owner: process.env.GH_OWNER || 'floating',
         repo: process.env.GH_REPO || 'frame'
@@ -161,6 +165,11 @@ class Updater {
 
       this.autoUpdater?.send('check', config)
     })
+
+    const switchToManualUpdate = () => {
+      this.autoUpdater?.kill()
+      this.checkForManualUpdate()
+    }
 
     this.autoUpdater.on('update', (update: VersionUpdate) => {
       if (update.availableUpdate) {
@@ -171,7 +180,7 @@ class Updater {
         this.updateAvailable(version, location)
       } else {
         log.info('No available updates found by auto check, checking manually')
-        this.checkForManualUpdate()
+        switchToManualUpdate()
       }
     })
 
@@ -185,7 +194,7 @@ class Updater {
       this.installerReady = false
 
       log.warn('Error auto checking for update, checking manually', err)
-      this.checkForManualUpdate()
+      switchToManualUpdate()
     })
 
     this.autoUpdater.on('exit', () => {
@@ -219,6 +228,4 @@ class Updater {
   }
 }
 
-const updater = new Updater()
-
-updater.start()
+export default new Updater()

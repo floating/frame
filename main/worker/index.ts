@@ -2,6 +2,8 @@ import log from 'electron-log'
 import { WorkerProcessCommand } from './process'
 
 export function sendMessage (event: string, payload?: any) {
+  log.debug(`child process with pid ${process.pid} sending "${event}" event with payload: ${JSON.stringify(payload)}`)
+
   if (process.send) {
     process.send({ event, payload })
   } else {
@@ -16,7 +18,7 @@ export function sendError (err: Error) {
 const messageHandlers: { [command: string]: (...params: any) => void } = { }
 
 function handleMessageFromParent (message: WorkerProcessCommand) {
-  log.debug(`child process with pid ${process.pid} received message: ${message.command} [${message.args}]`)
+  log.debug(`child process with pid ${process.pid} received message: ${message.command} ${JSON.stringify(message.args)}`)
 
   const args = message.args || []
 

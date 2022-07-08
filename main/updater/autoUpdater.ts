@@ -4,6 +4,7 @@ import log from 'electron-log'
 
 import { AppImageUpdater, AppUpdater, MacUpdater, NsisUpdater } from 'electron-updater'
 import { GitHubProvider } from 'electron-updater/out/providers/GitHubProvider'
+import { getAppCacheDir } from 'electron-updater/out/AppAdapter'
 import { ProviderRuntimeOptions } from 'electron-updater/out/providers/Provider'
 import { AllPublishOptions } from 'builder-util-runtime'
 
@@ -12,6 +13,26 @@ import { addCommand, sendError, sendMessage } from '../worker'
 process.on('uncaughtException', sendError)
 
 const isPrereleaseTrack = process.argv.includes('--prerelease')
+
+interface AppOptions {
+  version: string
+  name: string
+  isPackaged: boolean
+  userDataPath: string
+  appUpdateConfigPath: string
+}
+
+export interface UpdaterOptions {
+  app: AppOptions,
+  owner: string,
+  repo: string
+}
+
+interface SyntheticApp extends AppOptions {
+  baseCachePath: string
+  whenReady: () => Promise<void>
+  quit: () => void
+}
 
 class CustomProvider extends GitHubProvider {
   constructor (options: any, updater: AppUpdater, runtimeOptions: ProviderRuntimeOptions) {
@@ -60,16 +81,19 @@ function createAppUpdater (options: AllPublishOptions, app: any) {
   return new AppImageUpdater(options, app)
 }
 
-addCommand('check', options => {
-  const syntheticApp = {
+addCommand('check', async (options: UpdaterOptions) => {
+  const syntheticApp: SyntheticApp = {
     ...options.app,
-    whenReady: () => Promise.resolve()
+    baseCachePath: getAppCacheDir(),
+    whenReady: () => Promise.resolve(),
+    quit: () => {
+      sendMessage('quit')
+    }
   }
 
   autoUpdater = createAppUpdater({
     provider: 'custom',
     updateProvider: CustomProvider,
-
     owner: options.owner,
     repo: options.repo
   }, syntheticApp)
@@ -99,7 +123,11 @@ addCommand('check', options => {
     sendMessage('update-ready')
   })
 
-  autoUpdater.checkForUpdates()
+  const result = await autoUpdater.checkForUpdates()
+
+  if (!result) {
+    autoUpdater.emit('update-not-available', 'updater is not active')
+  }
 })
 
 addCommand('download', () => {

@@ -49,7 +49,7 @@ https.get(httpOptions, res => {
       log.verbose('Manual check found release', { currentVersion: version, latestVersion, isNewerVersion })
 
       if (isNewerVersion) {
-        sendMessage('update-available', { version: releases[0].tag_name, location: releases[0].html_url })
+        sendMessage('update', { availableUpdate: { version: releases[0].tag_name, location: releases[0].html_url } })
       }
     } else {
       log.verbose('Manual check did not find any releases')
