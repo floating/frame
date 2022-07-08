@@ -37,7 +37,7 @@ class Updater {
 
     this.stop()
 
-    const check = useAutoUpdater 
+    const check = useAutoUpdater
       ? () => {
           if (!this.autoUpdater) {
             // previous auto update cycle has completed so the worker process exited, start a new one,
@@ -141,7 +141,7 @@ class Updater {
 
   private checkForAutoUpdate () {
     log.debug('Doing automatic check for app update')
-  
+
     this.autoUpdater = new WorkerProcess({
       name: 'auto-updater',
       modulePath: path.resolve(__dirname, 'autoUpdater.js')
@@ -158,32 +158,32 @@ class Updater {
         owner: process.env.GH_OWNER || 'floating',
         repo: process.env.GH_REPO || 'frame'
       }
-      
+
       this.autoUpdater?.send('check', config)
     })
-  
+
     this.autoUpdater.on('update', (update: VersionUpdate) => {
       if (update.availableUpdate) {
         const { version, location } = update.availableUpdate
-  
+
         log.debug('Auto check found available update', { version, location })
-  
+
         this.updateAvailable(version, location)
       } else {
         log.info('No available updates found by auto check, checking manually')
         this.checkForManualUpdate()
       }
     })
-  
+
     this.autoUpdater.on('update-ready', () => {
       log.info('Auto check update ready for install')
-  
+
       if (!this.installerReady) this.readyForInstall()
     })
-  
+
     this.autoUpdater.on('error', (err: string) => {
       this.installerReady = false
-  
+
       log.warn('Error auto checking for update, checking manually', err)
       this.checkForManualUpdate()
     })
@@ -193,26 +193,26 @@ class Updater {
       this.autoUpdater = undefined
     })
   }
-  
+
   private checkForManualUpdate () {
     log.debug('Checking for app update manually')
-  
+
     const worker = new WorkerProcess({
       name: 'manual-update-checker',
       modulePath: path.resolve(__dirname, 'manualCheck.js'),
       timeout: 60_000
     })
-  
+
     worker.on('update', (update: VersionUpdate) => {
       if (update.availableUpdate) {
         const { version, location } = update.availableUpdate
-  
+
         log.debug('Manual check found available update', { version, location })
-  
+
         this.updateAvailable(version, location)
       }
     })
-  
+
     worker.on('error', (err: string) => {
       log.warn('Error manually checking for update', err)
     })

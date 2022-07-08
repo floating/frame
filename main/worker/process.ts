@@ -1,3 +1,4 @@
+import { ChildProcess, fork } from 'child_process'
 import { EventEmitter } from 'events'
 import log from 'electron-log'
 
@@ -24,10 +25,12 @@ export interface WorkerOptions {
 export default class WorkerProcess extends EventEmitter {
   private readonly abortController
   private readonly worker: ChildProcess
+  private readonly name: string
 
   constructor (opts: WorkerOptions) {
     super()
 
+    this.name = opts.name
     this.abortController = new AbortController()
     const { signal } = this.abortController
 
@@ -42,11 +45,11 @@ export default class WorkerProcess extends EventEmitter {
       }
     )
 
-    log.info(`created ${opts.name} worker, pid: ${this.worker.pid}`)
+    log.info(`created ${this.name} worker, pid: ${this.worker.pid}`)
 
     if (opts.timeout) {
       setTimeout(() => {
-        log.warn(`worker process ${opts.name} timed out`)
+        log.warn(`worker process ${this.name} timed out`)
         this.abortController.abort()
       }, opts.timeout)
     }
@@ -54,12 +57,12 @@ export default class WorkerProcess extends EventEmitter {
     this.worker.on('message', (message: WorkerProcessMessage) => this.emit(message.event, message.payload))
 
     this.worker.once('error', err => {
-      log.warn(`worker process ${opts.name} raised error: ${err}`)
+      log.warn(`worker process ${this.name} raised error: ${err}`)
       this.kill()
     })
 
     this.worker.once('exit', code => {
-      log.verbose(`worker process ${opts.name} exited with code: ${code}`)
+      log.verbose(`worker process ${this.name} exited with code: ${code}`)
       this.kill()
     })
   }

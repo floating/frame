@@ -41,7 +41,7 @@ https.get(httpOptions, res => {
   res.on('end', () => {
     const releases = parseResponse(rawData).filter(r => (!r.prerelease || isPrereleaseTrack)) || []
     const latestRelease = releases[0] || { tag_name: '' }
-    
+
     if (latestRelease.tag_name) {
       const latestVersion = releases[0].tag_name.charAt(0) === 'v' ? releases[0].tag_name.substring(1) : releases[0].tag_name
       const isNewerVersion = compareVersions(latestVersion, version) === 1

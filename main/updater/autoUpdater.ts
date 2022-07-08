@@ -52,7 +52,7 @@ function createAppUpdater (options: AllPublishOptions, app: any) {
   if (process.platform === "win32") {
     return new NsisUpdater(options, app)
   }
-  
+
   if (process.platform === "darwin") {
      return new MacUpdater(options, app)
   }
@@ -65,35 +65,35 @@ addCommand('check', options => {
     ...options.app,
     whenReady: () => Promise.resolve()
   }
-  
+
   autoUpdater = createAppUpdater({
     provider: 'custom',
     updateProvider: CustomProvider,
-    
+
     owner: options.owner,
     repo: options.repo
   }, syntheticApp)
-  
+
   autoUpdater.logger = log
   autoUpdater.allowPrerelease = isPrereleaseTrack
   autoUpdater.autoDownload = false
-  
+
   autoUpdater.on('error', sendError)
-  
+
   autoUpdater.on('checking-for-update', () => {
     log.verbose('Performing automatic check for updates', { isPrereleaseTrack })
   })
-  
+
   autoUpdater.on('update-available', res => { //  Ask if they want to download it
     log.debug('Update available', { res })
     sendMessage('update', { availableUpdate: { version: res.version, location: 'auto' } })
   })
-  
+
   autoUpdater.on('update-not-available', res => {
     log.debug('Update not available', { res })
     sendMessage('update', {})
   })
-  
+
   autoUpdater.on('update-downloaded', res => {
     log.debug('Update downloaded', { res })
     sendMessage('update-ready')

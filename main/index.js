@@ -315,10 +315,9 @@ ipcMain.on('*:addFrame', (e, id) => {
 
 // if (process.platform !== 'darwin' && process.platform !== 'win32') app.disableHardwareAcceleration()
 app.on('ready', () => {
-  if (dev) {
+  if (!dev) {
     startUpdater()
   }
-  
 
   data()
   menu()
