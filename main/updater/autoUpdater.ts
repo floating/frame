@@ -1,13 +1,13 @@
-import { URL } from 'url'
+import { URL, urlToHttpOptions } from 'url'
 import https, { RequestOptions } from 'https'
-import { AppImageUpdater, AppUpdater } from 'electron-updater'
 import log from 'electron-log'
-import { GitHubProvider } from 'electron-updater/out/providers/GitHubProvider';
+
+import { AppImageUpdater, AppUpdater, MacUpdater, NsisUpdater } from 'electron-updater'
+import { GitHubProvider } from 'electron-updater/out/providers/GitHubProvider'
 import { ProviderRuntimeOptions } from 'electron-updater/out/providers/Provider'
+import { AllPublishOptions } from 'builder-util-runtime'
 
 import { addCommand, sendError, sendMessage } from '../worker'
-import { IncomingMessage } from 'http';
-import { urlToHttpOptions } from 'node:url'
 
 process.on('uncaughtException', sendError)
 
@@ -48,15 +48,28 @@ class CustomProvider extends GitHubProvider {
 
 let autoUpdater: AppUpdater | undefined
 
+function createAppUpdater (options: AllPublishOptions, app: any) {
+  if (process.platform === "win32") {
+    return new NsisUpdater(options, app)
+  }
+  
+  if (process.platform === "darwin") {
+     return new MacUpdater(options, app)
+  }
+
+  return new AppImageUpdater(options, app)
+}
+
 addCommand('check', options => {
   const syntheticApp = {
     ...options.app,
     whenReady: () => Promise.resolve()
   }
   
-  autoUpdater = new AppImageUpdater({
+  autoUpdater = createAppUpdater({
     provider: 'custom',
     updateProvider: CustomProvider,
+    
     owner: options.owner,
     repo: options.repo
   }, syntheticApp)

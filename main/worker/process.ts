@@ -38,7 +38,6 @@ export default class WorkerProcess extends EventEmitter {
       opts.args,
       {
         signal,
-        // @ts-ignore
         env: opts.env
       }
     )
