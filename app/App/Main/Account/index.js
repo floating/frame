@@ -161,7 +161,7 @@ class _AccountModule extends React.Component {
     if (id === 'requests') moduleClass = ' transparentModule'
 
     return (
-      <div className={'accountModule' + moduleClass} style={style}>
+      <div className={'accountModule ' + moduleClass} style={style}>
         <div className='accountModuleInner cardShow' style={{ animationDelay: (index * 0.1) + 's'}}>
           {
             id === 'gas' ? <Gas 
@@ -173,7 +173,7 @@ class _AccountModule extends React.Component {
             id === 'requests' ? <Requests 
               _id={id}
               id={account}
-              setAccountView={this.props.setAccountView}
+              setAccountView={(view, data) => link.send('tray:action', 'navPanel', { view, data })}
               addresses={this.props.addresses} 
               minimized={this.props.minimized} 
               status={this.props.status} 
@@ -431,7 +431,7 @@ class _AccountBody extends React.Component {
     }
   }
   render () {
-    const { view, data } = this.store('panel.nav')[0] || {}
+    const { view = '', data = {} } = this.store('panel.nav')[0] || {}
     if (view === 'requestView') {
       const { req, i } = data
       let accountViewTitle, accountViewIcon
@@ -477,11 +477,9 @@ class _AccountBody extends React.Component {
           }}
           {...this.props}
           accountViewTitle={data.id}
-          accountViewIcon={svg.broadcast(17)}
         >
           <div 
             className='accountsModuleExpand cardShow' 
-            style={{ pointerEvents: this.state.expandedModule ? 'auto' : 'none' }}
             onMouseDown={() => this.setState({ expandedModule: false })}
           >
             <div className='moduleExpanded' onMouseDown={(e) => {
@@ -505,13 +503,7 @@ class _AccountBody extends React.Component {
       )
     } else {
       return (
-        <AccountMain 
-          setAccountView={(view, data) => {
-            link.send('tray:action', 'navPanel', { view, data })
-            // this.setState({ view, data })
-          }} 
-          {...this.props} 
-        />
+        <AccountMain {...this.props} />
       )
     }
   }

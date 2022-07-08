@@ -58,7 +58,7 @@ class Inventory extends React.Component {
               <div 
                 className='inventoryCollection'
                 onClick={() => {
-                  this.props.expandModule({ id: this.props.moduleId, account: this.props.account, currentCollection: k })
+                  if (!this.props.expanded) this.props.expandModule({ id: this.props.moduleId, account: this.props.account, currentCollection: k })
                 }}
               >
                 {this.props.expanded ? (
