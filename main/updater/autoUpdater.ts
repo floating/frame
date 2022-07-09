@@ -1,141 +1,91 @@
-import { URL, urlToHttpOptions } from 'url'
-import https, { RequestOptions } from 'https'
 import log from 'electron-log'
+import EventEmitter from 'events'
 
 import { AppImageUpdater, AppUpdater, MacUpdater, NsisUpdater } from 'electron-updater'
-import { GitHubProvider } from 'electron-updater/out/providers/GitHubProvider'
-import { getAppCacheDir } from 'electron-updater/out/AppAdapter'
-import { ProviderRuntimeOptions } from 'electron-updater/out/providers/Provider'
-import { AllPublishOptions } from 'builder-util-runtime'
+import { Domain, create as createDomain } from 'domain'
 
-import { addCommand, sendError, sendMessage } from '../worker'
-
-process.on('uncaughtException', sendError)
-
-const isPrereleaseTrack = process.argv.includes('--prerelease')
-
-interface AppOptions {
+interface VersionInfo {
   version: string
-  name: string
-  isPackaged: boolean
-  userDataPath: string
-  appUpdateConfigPath: string
 }
 
-export interface UpdaterOptions {
-  app: AppOptions,
-  owner: string,
-  repo: string
-}
-
-interface SyntheticApp extends AppOptions {
-  baseCachePath: string
-  whenReady: () => Promise<void>
-  quit: () => void
-}
-
-class CustomProvider extends GitHubProvider {
-  constructor (options: any, updater: AppUpdater, runtimeOptions: ProviderRuntimeOptions) {
-    super(options, updater, runtimeOptions)
-
-    // @ts-ignore
-    this.executor = {
-      request: (options) => {
-        return this.get(options)
-      }
-    }
-  }
-
-  private get (options: RequestOptions) {
-    return new Promise((resolve, reject) => {
-      https.get(options, res => {
-        if (res.statusCode === 301 || res.statusCode === 302) {
-          if (res.headers.location) {
-            const newUrl = new URL(res.headers.location)
-            return resolve(this.get({ ...options, ...urlToHttpOptions(newUrl) }))
-          } else {
-            return reject(new Error(`redirect with no URL provided, status: ${res.statusCode}, path: ${options.path}`))
-          }
-        }
-
-        let data = ''
-        res.on('data', chunk => data += chunk)
-        res.on('end', () => resolve(data))
-        res.on('error', err => reject(err))
-      }).on('error', reject)
-    })
-  }
-}
-
-let autoUpdater: AppUpdater | undefined
-
-function createAppUpdater (options: AllPublishOptions, app: any) {
+function createAppUpdater () {
   if (process.platform === "win32") {
-    return new NsisUpdater(options, app)
+    return new NsisUpdater()
   }
 
   if (process.platform === "darwin") {
-     return new MacUpdater(options, app)
+     return new MacUpdater()
   }
 
-  return new AppImageUpdater(options, app)
+  return new AppImageUpdater()
 }
 
-addCommand('check', async (options: UpdaterOptions) => {
-  const syntheticApp: SyntheticApp = {
-    ...options.app,
-    baseCachePath: getAppCacheDir(),
-    whenReady: () => Promise.resolve(),
-    quit: () => {
-      sendMessage('quit')
-    }
+export default class AutoUpdater extends EventEmitter {
+  private readonly electronAutoUpdater: AppUpdater
+  private readonly domain: Domain
+
+  constructor () {
+    super()
+
+    this.domain = createDomain()
+
+    this.domain.on('error', err => {
+      log.error('Unhandled auto updater error', err)
+      this.close()
+      this.domain.exit()
+    })
+
+    this.electronAutoUpdater = createAppUpdater()
+  
+    this.electronAutoUpdater.logger = log
+    this.electronAutoUpdater.allowPrerelease = false
+    this.electronAutoUpdater.autoDownload = false
+  
+    this.electronAutoUpdater.on('error', err => {
+      this.emit('error', err)
+    })
+  
+    this.electronAutoUpdater.on('checking-for-update', () => {
+      log.verbose('Performing automatic check for updates', { allowPrerelease: this.electronAutoUpdater.allowPrerelease })
+    })
+  
+    this.electronAutoUpdater.on('update-available', (res: VersionInfo) => {
+      log.debug('Auto updater detected update available', { res })
+      this.emit('update-available', { version: res.version, location: 'auto' })
+    })
+  
+    this.electronAutoUpdater.on('update-not-available', res => {
+      log.debug('Auto updater detected update not available', { res })
+      this.emit('update-not-available', res)
+    })
+  
+    this.electronAutoUpdater.on('update-downloaded', res => {
+      log.debug('Update downloaded', { res })
+      this.emit('update-downloaded')
+    })
   }
 
-  autoUpdater = createAppUpdater({
-    provider: 'custom',
-    updateProvider: CustomProvider,
-    owner: options.owner,
-    repo: options.repo
-  }, syntheticApp)
-
-  autoUpdater.logger = log
-  autoUpdater.allowPrerelease = isPrereleaseTrack
-  autoUpdater.autoDownload = false
-
-  autoUpdater.on('error', sendError)
-
-  autoUpdater.on('checking-for-update', () => {
-    log.verbose('Performing automatic check for updates', { isPrereleaseTrack })
-  })
-
-  autoUpdater.on('update-available', res => { //  Ask if they want to download it
-    log.debug('Update available', { res })
-    sendMessage('update', { availableUpdate: { version: res.version, location: 'auto' } })
-  })
-
-  autoUpdater.on('update-not-available', res => {
-    log.debug('Update not available', { res })
-    sendMessage('update', {})
-  })
-
-  autoUpdater.on('update-downloaded', res => {
-    log.debug('Update downloaded', { res })
-    sendMessage('update-ready')
-  })
-
-  const result = await autoUpdater.checkForUpdates()
-
-  if (!result) {
-    autoUpdater.emit('update-not-available', 'updater is not active')
+  close () {
+    // TODO: use cancellation token to cancel download
+    this.emit('exit')
+    this.electronAutoUpdater.removeAllListeners()
   }
-})
 
-addCommand('download', () => {
-  autoUpdater?.downloadUpdate()
-})
+  async checkForUpdates () {
+    this.domain.run(async () => {
+      const result = await this.electronAutoUpdater.checkForUpdates()
 
-addCommand('install', () => {
-  autoUpdater?.quitAndInstall(true, true)
-})
+      if (!result) {
+        this.electronAutoUpdater.emit('update-not-available', 'updater is not active')
+      }
+    })
+  }
 
-sendMessage('ready')
+  async downloadUpdate () {
+    this.electronAutoUpdater.downloadUpdate()
+  }
+
+  async quitAndInstall () {
+    this.electronAutoUpdater.quitAndInstall()
+  }
+}

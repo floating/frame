@@ -1,9 +1,9 @@
 import log from 'electron-log'
 import https from 'https'
 import semver from 'semver'
+import { VersionUpdate } from '.'
 
 import packageInfo from '../../package.json'
-import { sendError, sendMessage } from '../worker'
 
 const httpOptions = {
   host: 'api.github.com',
@@ -12,12 +12,15 @@ const httpOptions = {
 }
 
 const version = packageInfo.version
-const isPrereleaseTrack = process.argv.includes('--prerelease')
 
 interface GithubRelease {
   prerelease: boolean,
   tag_name: string,
   html_url: string
+}
+
+interface CheckOptions {
+  prereleaseTrack?: boolean
 }
 
 function parseResponse (rawData: string) {
@@ -30,29 +33,33 @@ function compareVersions (a: string, b: string) {
   return 0
 }
 
-process.on('uncaughtException', sendError)
+export default function (opts?: CheckOptions) {
+  log.verbose('Performing manual check for updates', { prereleaseTrack: opts?.prereleaseTrack })
 
-log.verbose('Performing manual check for updates', { isPrereleaseTrack })
-
-https.get(httpOptions, res => {
-  let rawData = ''
-
-  res.on('data', chunk => { rawData += chunk })
-  res.on('end', () => {
-    const releases = parseResponse(rawData).filter(r => (!r.prerelease || isPrereleaseTrack)) || []
-    const latestRelease = releases[0] || { tag_name: '' }
-
-    if (latestRelease.tag_name) {
-      const latestVersion = releases[0].tag_name.charAt(0) === 'v' ? releases[0].tag_name.substring(1) : releases[0].tag_name
-      const isNewerVersion = compareVersions(latestVersion, version) === 1
-
-      log.verbose('Manual check found release', { currentVersion: version, latestVersion, isNewerVersion })
-
-      if (isNewerVersion) {
-        sendMessage('update', { availableUpdate: { version: releases[0].tag_name, location: releases[0].html_url } })
-      }
-    } else {
-      log.verbose('Manual check did not find any releases')
-    }
+  return new Promise<VersionUpdate>((resolve, reject) => {
+    https.get(httpOptions, res => {
+      let rawData = ''
+    
+      res.on('error', reject)
+      res.on('data', chunk => { rawData += chunk })
+      res.on('end', () => {
+        const releases = parseResponse(rawData).filter(r => (!r.prerelease || opts?.prereleaseTrack)) || []
+        const latestRelease = releases[0] || { tag_name: '' }
+    
+        if (latestRelease.tag_name) {
+          const latestVersion = releases[0].tag_name.charAt(0) === 'v' ? releases[0].tag_name.substring(1) : releases[0].tag_name
+          const isNewerVersion = compareVersions(latestVersion, version) === 1
+    
+          log.verbose('Manual check found release', { currentVersion: version, latestVersion, isNewerVersion })
+    
+          if (isNewerVersion) {
+            resolve({ version: releases[0].tag_name, location: releases[0].html_url })
+          }
+        } else {
+          log.verbose('Manual check did not find any releases')
+          reject('no releases found')
+        }
+      })
+    }).on('error', reject)
   })
-})
+}
