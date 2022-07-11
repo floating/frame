@@ -83,12 +83,12 @@ let closing = false
 process.on('uncaughtException', (e) => {
   log.error('uncaughtException', e)
 
+  errors.captureException(e)
+  
   if (e.code === 'EPIPE') {
     log.error('uncaught EPIPE error', e)
     return
   }
-  
-  errors.captureException(e)
 
   if (!closing) {
     closing = true
