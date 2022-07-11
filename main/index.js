@@ -71,6 +71,7 @@ errors.init()
 // const clients = require('./clients')
 const signers = require('./signers').default
 const persist = require('./store/persist')
+const { default: showUnhandledExceptionDialog } = require('./windows/dialog/unhandledException')
 
 log.info('Chrome: v' + process.versions.chrome)
 log.info('Electron: v' + process.versions.electron)
