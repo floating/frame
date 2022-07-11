@@ -54,10 +54,10 @@ const accounts = require('./accounts').default
 
 const launch = require('./launch')
 const updater = require('./updater')
-const sentry = require('./sentry')
+const errors = require('./errors')
 
 require('./rpc')
-sentry.init()
+errors.init()
 
 // const clients = require('./clients')
 const signers = require('./signers').default
@@ -71,11 +71,11 @@ log.info('Node: v' + process.versions.node)
 // prevent showing the exit dialog more than once
 let closing = false
 
-process.on('uncaughtException', e => {
+process.on('uncaughtException', (e) => {
   log.error('uncaughtException', e)
 
-  Sentry.captureException(e)
-
+  errors.captureException(e)
+  
   if (e.code === 'EPIPE') {
     log.error('uncaught EPIPE error', e)
     return
@@ -86,6 +86,7 @@ process.on('uncaughtException', e => {
 
     showUnhandledExceptionDialog(e.message, e.code)
   }
+  
 })
 
 const externalWhitelist = [
@@ -326,6 +327,10 @@ ipcMain.on('tray:action', (e, action, ...args) => {
   log.info('Tray sent unrecognized action: ', action)
 })
 
+app.on('second-instance', (event, argv, workingDirectory) => {
+  log.info(`second instance requested from directory: ${workingDirectory}`)
+  windows.showTray()
+})
 app.on('activate', () => windows.activate())
 app.on('will-quit', () => app.quit())
 app.on('quit', async () => {
