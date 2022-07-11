@@ -72,9 +72,6 @@ describe('sentry', () => {
     initSentry()
     const sentEvents = mockEvents(Array(10).fill({}))
 
-    expect(sentEvents.slice(0, 5)).toStrictEqual(
-      Array(5).fill(validEvent)
-    )
     // after the limit is reached, this function will return a falsy value rather than the actual event
     const reportedEvents = sentEvents.filter(evt => !!evt)
     expect(reportedEvents).toStrictEqual(Array(5).fill(validEvent))
