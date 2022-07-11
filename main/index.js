@@ -66,7 +66,7 @@ const updater = require('./updater')
 const errors = require('./errors')
 
 require('./rpc')
-errors.initSentry()
+errors.init()
 
 // const clients = require('./clients')
 const signers = require('./signers').default
