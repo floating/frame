@@ -76,7 +76,26 @@ log.info('Chrome: v' + process.versions.chrome)
 log.info('Electron: v' + process.versions.electron)
 log.info('Node: v' + process.versions.node)
 
-process.on('uncaughtException', errors.uncaughtExceptionHandler)
+// prevent showing the exit dialog more than once
+let closing = false
+
+process.on('uncaughtException', (e) => {
+  log.error('uncaughtException', e)
+
+  if (e.code === 'EPIPE') {
+    log.error('uncaught EPIPE error', e)
+    return
+  }
+  
+  errors.captureException(e)
+
+  if (!closing) {
+    closing = true
+
+    showUnhandledExceptionDialog(e.message, e.code)
+  }
+  
+})
 
 const externalWhitelist = [
   'https://frame.sh',

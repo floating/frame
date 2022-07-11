@@ -1,7 +1,5 @@
 import * as Sentry from '@sentry/electron'
-import showUnhandledExceptionDialog from '../windows/dialog/unhandledException'
 import type { Event } from '@sentry/types'
-import log from 'electron-log'
 
 import store from '../store'
 
@@ -45,22 +43,6 @@ export function initSentry () {
   })
 }
 
-// prevent showing the exit dialog more than once
-let closing = false
-
-export function uncaughtExceptionHandler (e: NodeJS.ErrnoException) {
-  log.error('uncaughtException', e)
-
+export function captureException (e: NodeJS.ErrnoException) {
   Sentry.captureException(e)
-
-  if (e.code === 'EPIPE') {
-    log.error('uncaught EPIPE error', e)
-    return
-  }
-
-  if (!closing) {
-    closing = true
-
-    showUnhandledExceptionDialog(e.message, e.code)
-  }
 }
