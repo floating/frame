@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/electron'
-import { initSentry } from '../../../main/errors'
+import { init } from '../../../main/errors'
 
 jest.mock('@sentry/electron', () => ({ init: jest.fn(), IPCMode: { Classic: 'test-ipcmode' } }))
 jest.mock('../../../main/store')
@@ -33,7 +33,7 @@ describe('sentry', () => {
   }
 
   it('should initialize sentry with the expected object', () => {
-    initSentry()
+    init()
     expect(Sentry.init).toHaveBeenCalledWith({
       beforeSend: expect.any(Function),
       dsn: 'https://7b09a85b26924609bef5882387e2c4dc@o1204372.ingest.sentry.io/6331069',
@@ -42,7 +42,7 @@ describe('sentry', () => {
   })
 
   it('should strip asar paths from stackframe modules', () => {
-    initSentry()
+    init()
     const sentryEvent = mockEvent({
       exception: {
         values: [{
@@ -69,7 +69,7 @@ describe('sentry', () => {
   })
 
   it('should drop events once the rate limit has been reached', () => {
-    initSentry()
+    init()
     const sentEvents = mockEvents(Array(10).fill({}))
 
     // after the limit is reached, this function will return a falsy value rather than the actual event
@@ -79,7 +79,7 @@ describe('sentry', () => {
 
   it('should send events after the rate limit recovery period has elapsed', () => {
     const events = Array(5).fill({})
-    initSentry()
+    init()
     mockEvents(events)
     jest.advanceTimersByTime(60_000)
     expect(mockEvents(events)).toStrictEqual(
