@@ -1,7 +1,5 @@
 const { app, ipcMain, protocol, shell, clipboard, globalShortcut, BrowserWindow } = require('electron')
 
-
-
 app.commandLine.appendSwitch('enable-accelerated-2d-canvas', true)
 app.commandLine.appendSwitch('enable-gpu-rasterization', true)
 app.commandLine.appendSwitch('force-gpu-rasterization', true)
