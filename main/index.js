@@ -8,7 +8,7 @@ const hasInstanceLock = app.requestSingleInstanceLock()
 
 if (!hasInstanceLock) {
   log.info('another instance of Frame is running - exiting...')
-  return app.exit(1)
+  app.exit(1)
 }
 
 app.commandLine.appendSwitch('enable-accelerated-2d-canvas', true)
