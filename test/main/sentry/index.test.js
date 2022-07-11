@@ -75,7 +75,9 @@ describe('sentry', () => {
     expect(sentEvents.slice(0, 5)).toStrictEqual(
       Array(5).fill(validEvent)
     )
-    expect(sentEvents.slice(5)).toStrictEqual([null, null, null, null, null])
+    // after the limit is reached, this function will return a falsy value rather than the actual event
+    const reportedEvents = sentEvents.filter(evt => !!evt)
+    expect(reportedEvents).toStrictEqual(Array(5).fill(validEvent))
   })
 
   it('should send events after the rate limit recovery period has elapsed', () => {
