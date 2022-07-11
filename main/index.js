@@ -13,6 +13,7 @@ process.env['BUNDLE_LOCATION'] = process.env.BUNDLE_LOCATION || path.resolve(__d
 // app.commandLine.appendSwitch('enable-transparent-visuals', true)
 // if (process.platform === 'linux') app.commandLine.appendSwitch('disable-gpu', true)
 
+const log = require('electron-log')
 const url = require('url')
 
 log.transports.console.level = process.env.LOG_LEVEL || 'info'
