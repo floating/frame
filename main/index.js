@@ -1,15 +1,6 @@
 const { app, ipcMain, protocol, shell, clipboard, globalShortcut, BrowserWindow } = require('electron')
-const log = require('electron-log')
 
-log.transports.console.level = process.env.LOG_LEVEL || 'info'
-log.transports.file.level = ['development', 'test'].includes(process.env.NODE_ENV) ? false : 'verbose'
 
-const hasInstanceLock = app.requestSingleInstanceLock()
-
-if (!hasInstanceLock) {
-  log.info('another instance of Frame is running - exiting...')
-  return app.quit()
-}
 
 app.commandLine.appendSwitch('enable-accelerated-2d-canvas', true)
 app.commandLine.appendSwitch('enable-gpu-rasterization', true)
@@ -26,7 +17,8 @@ process.env['BUNDLE_LOCATION'] = process.env.BUNDLE_LOCATION || path.resolve(__d
 
 const url = require('url')
 
-
+log.transports.console.level = process.env.LOG_LEVEL || 'info'
+log.transports.file.level = ['development', 'test'].includes(process.env.NODE_ENV) ? false : 'verbose'
 
 const data = require('./data')
 const windows = require('./windows')
