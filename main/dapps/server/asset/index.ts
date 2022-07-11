@@ -1,4 +1,5 @@
 import cheerio from 'cheerio'
+import log from 'electron-log'
 
 import nebulaApi from '../../../nebula'
 import store from '../../../store'
@@ -37,9 +38,9 @@ export default {
       }
 
       res.end()
-    } catch (e: any) {
+    } catch (e) {
       // console.error('   ---   ' + e.message)
-      error(res, 404, e.message)
+      error(res, 404, (e as NodeJS.ErrnoException).message)
     }
 
     // file.content.on('data', data => res.write(data))
@@ -58,19 +59,17 @@ export default {
   dapp: async (res: ServerResponse, namehash: string) => { // Resolve dapp via IPFS, inject functionality and send it back to the client
     // if (!ipfs return error(res, 404, 'IPFS client not running')
     const cid = store('main.dapps', namehash, 'content')
-    const index = await nebula.ipfs.getFile(`${cid}/index.html`)
-    // res.setHeader('Set-Cookie', [`__app=${app}`, `__session=${session}`])
-    res.setHeader('Access-Control-Allow-Origin', '*')
-    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
-    res.writeHead(200)
-    const $ = cheerio.load(index)
-    // $('html').prepend(`
-    //   <script>
-    //     // const initial = ${JSON.stringify(storage.get(cid) || {})}
-    //     ${inject}
-    //   </script>
-    // `)
-    res.end($.html())
+
+    try { 
+      const index = await nebula.ipfs.getFile(`${cid}/index.html`)    
+      res.setHeader('Access-Control-Allow-Origin', '*')
+      res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
+      res.writeHead(200)
+      const $ = cheerio.load(index)
+      res.end($.html())
+    } catch (e) {
+      log.error('could not resolve dapp', (e as NodeJS.ErrnoException).message)
+    }
   }
 }
 
