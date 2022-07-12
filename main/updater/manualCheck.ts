@@ -54,7 +54,7 @@ export default function (opts?: CheckOptions) {
           log.verbose('Manual check found release', { currentVersion: version, latestVersion, isNewerVersion })
     
           if (isNewerVersion) {
-            resolve({ version: releases[0].tag_name, location: latestRelease.html_url })
+            resolve({ version: latestRelease.tag_name, location: latestRelease.html_url })
           }
         } else {
           log.verbose('Manual check did not find any releases')
