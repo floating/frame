@@ -157,7 +157,7 @@ class Updater {
         if (!this.installerReady) this.readyForInstall()
       })
   
-      this.autoUpdater.on('error', (err: string) => {
+      this.autoUpdater.on('error', (err: Error) => {
         this.installerReady = false
   
         log.warn('Error auto checking for update, checking manually', err)

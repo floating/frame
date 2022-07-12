@@ -252,7 +252,6 @@ ipcMain.on('tray:syncPath', (e, path, value) => {
 ipcMain.on('tray:ready', () => {
   require('./api')
 
-  console.log('DEV! STARTING UPDATER')
   if (!dev) {
     startUpdater()
   }
