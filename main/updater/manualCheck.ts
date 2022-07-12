@@ -1,7 +1,8 @@
 import log from 'electron-log'
 import https from 'https'
 import semver from 'semver'
-import { VersionUpdate } from '.'
+
+import type { VersionUpdate } from '.'
 
 import packageInfo from '../../package.json'
 
@@ -47,13 +48,13 @@ export default function (opts?: CheckOptions) {
         const latestRelease = releases[0] || { tag_name: '' }
     
         if (latestRelease.tag_name) {
-          const latestVersion = releases[0].tag_name.charAt(0) === 'v' ? releases[0].tag_name.substring(1) : releases[0].tag_name
+          const latestVersion = latestRelease.tag_name.charAt(0) === 'v' ? latestRelease.tag_name.substring(1) : latestRelease.tag_name
           const isNewerVersion = compareVersions(latestVersion, version) === 1
     
           log.verbose('Manual check found release', { currentVersion: version, latestVersion, isNewerVersion })
     
           if (isNewerVersion) {
-            resolve({ version: releases[0].tag_name, location: releases[0].html_url })
+            resolve({ version: releases[0].tag_name, location: latestRelease.html_url })
           }
         } else {
           log.verbose('Manual check did not find any releases')
