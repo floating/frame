@@ -7,6 +7,8 @@ import getType from './getType'
 import { ServerResponse } from 'http'
 
 const nebula = nebulaApi()
+const MAX_DAPP_RESOLUTION_ATTEMPTS = 4
+let dappResolutionAttempts: number
 
 function error (res: ServerResponse, code: number, message: string) {
   res.writeHead(code || 404)
@@ -15,6 +17,28 @@ function error (res: ServerResponse, code: number, message: string) {
 
 function getCid (namehash: string): string {
   return store(`main.dapps`, namehash, `content`)
+}
+
+async function resolveDapp (url: string, res: ServerResponse) {
+  // exit and close the dapp window after a certain number of tries so that we don't keep spinning forever
+  if (dappResolutionAttempts > MAX_DAPP_RESOLUTION_ATTEMPTS) {
+    store.removeFrame('dappLauncher')
+    return
+  }
+
+  dappResolutionAttempts++
+
+  try {
+    const index = await nebula.ipfs.getFile(url)    
+    res.setHeader('Access-Control-Allow-Origin', '*')
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
+    res.writeHead(200)
+    const $ = cheerio.load(index)
+    res.end($.html())
+  } catch (e) {
+    log.error('could not resolve dapp', (e as NodeJS.ErrnoException).message)
+    setTimeout(() => resolveDapp(url, res), 5_000)
+  }
 }
 
 export default {
@@ -59,17 +83,10 @@ export default {
   dapp: async (res: ServerResponse, namehash: string) => { // Resolve dapp via IPFS, inject functionality and send it back to the client
     // if (!ipfs return error(res, 404, 'IPFS client not running')
     const cid = store('main.dapps', namehash, 'content')
+    const dappUrl = `${cid}/index.html`
+    dappResolutionAttempts = 0
 
-    try { 
-      const index = await nebula.ipfs.getFile(`${cid}/index.html`)    
-      res.setHeader('Access-Control-Allow-Origin', '*')
-      res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
-      res.writeHead(200)
-      const $ = cheerio.load(index)
-      res.end($.html())
-    } catch (e) {
-      log.error('could not resolve dapp', (e as NodeJS.ErrnoException).message)
-    }
+    resolveDapp(dappUrl, res)
   }
 }
 
