@@ -1173,6 +1173,40 @@ describe('#signAndSend', () => {
     })
   })
 
+  describe('#fillTransaction', () => {
+    beforeEach(() => {
+      connection.send.mockImplementationOnce((payload, cb) => {
+        expect(payload.method).toBe('eth_estimateGas')
+        cb({ result: addHexPrefix((150000).toString(16)) })
+      })
+
+      store.set('main.networksMeta.ethereum.1.gas', {
+        price: {
+          selected: 'standard',
+          levels: { slow: '', standard: '', fast: gweiToHex(30), asap: '', custom: '' },
+          fees: {
+            maxPriorityFeePerGas: gweiToHex(1),
+            maxBaseFeePerGas: gweiToHex(8)
+          }
+        }
+      })
+    })
+
+    it('should not include an undefined "to" field', done => {
+      const txJson = {
+        chainId: '0x1'
+      }
+
+      provider.fillTransaction(txJson, (err, { tx }) => {
+        try {
+          expect(err).toBeFalsy()
+          expect('to' in tx).toBe(false)
+          done()
+        } catch (e) { done(e) }
+      })
+    })
+  })
+
   describe('broadcasting transactions', () => {
     const signedTx = '0x2eca5b929f8a671f0a3c0a7996f83141b2260fdfac62a1da8a8098b326001b99'
     const txHash = '0x6e8b1de115105ceab599b4d99604797b961cfd1f46b85e10f23a81974baae3d5'

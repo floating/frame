@@ -195,7 +195,7 @@ export class Provider extends EventEmitter {
     const { type, id } = (targetChain || store('main.currentNetwork'))
 
     const connection = this.connection.connections[type][id]
-    const chainConnected = (connection.primary?.connected || connection.secondary?.connected)
+    const chainConnected = (connection?.primary?.connected || connection?.secondary?.connected)
 
     const response = chainConnected
       ? { result: id.toString() }
@@ -208,7 +208,7 @@ export class Provider extends EventEmitter {
     const { type, id } = (targetChain || store('main.currentNetwork'))
 
     const connection = this.connection.connections[type][id]
-    const chainConnected = (connection.primary?.connected || connection.secondary?.connected)
+    const chainConnected = (connection?.primary?.connected || connection?.secondary?.connected)
 
     const response = chainConnected
       ? { result: intToHex(id) }
@@ -453,16 +453,21 @@ export class Provider extends EventEmitter {
     const { gas, gasLimit, gasPrice, data, value, type, to, ...rawTx } = newTx
     const parsedValue = !value || parseInt(value, 16) === 0 ? '0x0' : addHexPrefix(unpadHexString(value) || '0')
 
-    return {
+    const tx: TransactionData = {
       ...rawTx,
       from: rawTx.from || ((accounts.current() || {}).id),
-      to: to ? getAddress(to) : to,
       type: '0x0',
       value: parsedValue,
       data: addHexPrefix(padToEven(stripHexPrefix(data || '0x'))),
       gasLimit: gasLimit || gas,
       chainId: rawTx.chainId || utils.toHex(store('main.currentNetwork.id'))
     }
+
+    if (to) {
+      tx.to = getAddress(to)
+    }
+
+    return tx
   }
 
   private addRequestHandler (res: RPCRequestCallback) {
