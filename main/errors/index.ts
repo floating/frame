@@ -30,10 +30,6 @@ function getSentryExceptions (event: Event) {
   return safeExceptions
 }
 
-export function captureException (e: NodeJS.ErrnoException) {
-  captureException(e)
-}
-
 export function init () {
   let allowedEvents = EVENT_RATE_LIMIT
 
