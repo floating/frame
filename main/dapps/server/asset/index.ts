@@ -1,5 +1,6 @@
 import cheerio from 'cheerio'
 import log from 'electron-log'
+import { ipcMain } from 'electron'
 
 import nebulaApi from '../../../nebula'
 import store from '../../../store'
@@ -22,13 +23,15 @@ function getCid (namehash: string): string {
 async function resolveDapp (url: string, res: ServerResponse) {
   // exit and close the dapp window after a certain number of tries so that we don't keep spinning forever
   if (dappResolutionAttempts > MAX_DAPP_RESOLUTION_ATTEMPTS) {
-    store.removeFrame('dappLauncher')
+    ipcMain.emit('*:removeFrame', undefined, 'dappLauncher')
+    // windows.closeFrame('dappLauncher')
     return
   }
 
   dappResolutionAttempts++
 
   try {
+    throw new Error('zomg')
     const index = await nebula.ipfs.getFile(url)    
     res.setHeader('Access-Control-Allow-Origin', '*')
     res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type')

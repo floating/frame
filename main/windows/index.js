@@ -468,6 +468,9 @@ const api = {
   refocusFrame: (frameId) => {
     frameManager.refocus(frameId)
   },
+  closeFrame: (frameId) => {
+    frameManager.close(frameId)
+  },
   events,
   extractColors
 }

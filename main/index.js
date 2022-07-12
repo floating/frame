@@ -280,6 +280,16 @@ ipcMain.on('*:addFrame', (e, id) => {
   }
 })
 
+ipcMain.on('*:removeFrame', (e, id) => {
+  const existingFrame = store('main.frames', id)
+
+  if (existingFrame) {
+    windows.closeFrame(id)
+  } else {
+    windows.refocusFrame(id)
+  }
+})
+
 // if (process.platform !== 'darwin' && process.platform !== 'win32') app.disableHardwareAcceleration()
 app.on('ready', () => {
   data()

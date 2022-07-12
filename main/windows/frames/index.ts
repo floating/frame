@@ -27,6 +27,12 @@ export default class FrameManager {
     })
   }
 
+  close (frameId: string) {
+    console.log('frameManager close', frameId, this.frameInstances)
+    this.removeFrameInstance(frameId)
+    store.removeFrame(frameId)
+  }
+
   manageFrames (frames: Record<string, Frame>, inFocus: string) {
     const frameIds = Object.keys(frames)
     const instanceIds = Object.keys(this.frameInstances)
@@ -39,10 +45,7 @@ export default class FrameManager {
 
         this.frameInstances[frameId] = frameInstance
 
-        frameInstance.on('closed', () => {
-          this.removeFrameInstance(frameId)
-          store.removeFrame(frameId)
-        })
+        frameInstance.on('closed', () => this.close(frameId))
 
         frameInstance.on('maximize', () => {
           store.updateFrame(frameId, { maximized: true })
@@ -80,7 +83,7 @@ export default class FrameManager {
           const { currentView } = frames[frameId]
           if (currentView && frameInstance) {
             frameInstance.views = frameInstance.views || {}
-            frameInstance.views[currentView].webContents.focus()
+            frameInstance.views[currentView]?.webContents?.focus()
           } 
         })
       })
@@ -149,6 +152,7 @@ export default class FrameManager {
   removeFrameInstance (frameId: string) {
     const frameInstance = this.frameInstances[frameId]
 
+    console.log('removeFrameInstance', frameInstance, frameId)
     Object.keys(frameInstance.views || {}).forEach(viewId => {
       viewInstances.destroy(frameInstance, viewId)
     })
