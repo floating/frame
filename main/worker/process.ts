@@ -4,7 +4,7 @@ import log from 'electron-log'
 
 // message from a worker process to the parent
 export interface WorkerProcessMessage {
-  event: string,
+  event: string
   payload: any
 }
 
