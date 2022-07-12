@@ -113,7 +113,10 @@ module.exports = {
   },
   dontRemind: (u, version) => {
     u('main.updater.dontRemind', dontRemind => {
-      if (dontRemind.indexOf(version) === -1) dontRemind.push(version)
+      if (!dontRemind.includes(version)) {
+        return [...dontRemind, version]
+      }
+
       return dontRemind
     })
   },

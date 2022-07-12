@@ -1,9 +1,10 @@
-const { app, ipcMain, protocol, shell, clipboard, globalShortcut, BrowserWindow } = require('electron')
+const { app, ipcMain, protocol, shell, clipboard, globalShortcut, powerMonitor, BrowserWindow } = require('electron')
 const log = require('electron-log')
 
 log.transports.console.level = process.env.LOG_LEVEL || 'info'
 log.transports.file.level = ['development', 'test'].includes(process.env.NODE_ENV) ? false : 'verbose'
 
+const dev = process.env.NODE_ENV === 'development'
 const hasInstanceLock = app.requestSingleInstanceLock()
 
 if (!hasInstanceLock) {
@@ -60,7 +61,7 @@ const dapps = require('./dapps').default
 const accounts = require('./accounts').default
 
 const launch = require('./launch')
-const updater = require('./updater')
+const updater = require('./updater').default
 const errors = require('./errors')
 
 require('./rpc')
@@ -93,6 +94,22 @@ process.on('uncaughtException', (e) => {
   }
 })
 
+function startUpdater () {
+  powerMonitor.on('resume', () => {
+    log.debug('System resuming, starting updater')
+
+    updater.start()
+  })
+
+  powerMonitor.on('suspend', () => {
+    log.debug('System suspending, stopping updater')
+
+    updater.stop()
+  })
+
+  updater.start()
+}
+
 const externalWhitelist = [
   'https://frame.sh',
   'https://chrome.google.com/webstore/detail/frame-alpha/ldcoohedfbjoobcadoglnnmmfbdlmmhf',
@@ -116,7 +133,11 @@ global.eval = () => { throw new Error(`This app does not support global.eval()`)
 
 ipcMain.on('tray:resetAllSettings', () => {
   persist.clear()
-  if (updater.updatePending) return updater.quitAndInstall(true, true)
+
+  if (updater.updateReady) {
+    return updater.quitAndInstall()
+  }
+
   app.relaunch()
   app.exit(0)
 })
@@ -138,8 +159,21 @@ ipcMain.on('tray:clipboardData', (e, data) => {
   if (data) clipboard.writeText(data)
 })
 
-ipcMain.on('tray:installAvailableUpdate', (e, install, dontRemind) => {
-  updater.installAvailableUpdate(install, dontRemind)
+ipcMain.on('tray:installAvailableUpdate', (e, version) => {
+  store.dontRemind(version)
+  windows.broadcast('main:action', 'updateBadge', '')
+
+  updater.fetchUpdate()
+})
+
+ipcMain.on('tray:dismissUpdate', (e, version, remind) => {
+  if (!remind) {
+    store.dontRemind(version)
+  }
+
+  windows.broadcast('main:action', 'updateBadge', '')
+
+  updater.dismissUpdate()
 })
 
 ipcMain.on('tray:removeAccount', (e, id) => {
@@ -215,10 +249,16 @@ ipcMain.on('tray:syncPath', (e, path, value) => {
   store.syncPath(path, value)
 })
 
-ipcMain.on('tray:ready', () => require('./api'))
+ipcMain.on('tray:ready', () => {
+  require('./api')
+
+  if (!dev) {
+    startUpdater()
+  }
+})
 
 ipcMain.on('tray:updateRestart', () => {
-  updater.quitAndInstall(true, true)
+  updater.quitAndInstall()
 })
 
 ipcMain.on('tray:refreshMain', () => windows.broadcast('main:action', 'syncMain', store('main')))
@@ -315,15 +355,6 @@ app.on('ready', () => {
       globalShortcut.unregister('Alt+/')
     }
   })
-  // store.observer(() => {
-  //   const altSlash = store('main.shortcuts.altSlash')
-  //   if (altSlash) {
-  //     globalShortcut.unregister('Alt+Space')
-  //     globalShortcut.register('Alt+Space', () => windows.openDapp())
-  //   } else {
-  //     globalShortcut.unregister('Alt+Space')
-  //   }
-  // })
 })
 
 ipcMain.on('tray:action', (e, action, ...args) => {
