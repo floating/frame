@@ -44,7 +44,7 @@ export default class AutoUpdater extends EventEmitter {
     this.electronAutoUpdater.allowPrerelease = false
     this.electronAutoUpdater.autoDownload = false
   
-    this.electronAutoUpdater.on('error', err => {
+    this.electronAutoUpdater.on('error', (err: string) => {
       this.emit('error', new Error(err))
     })
   
