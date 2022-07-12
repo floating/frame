@@ -24,11 +24,7 @@ process.env['BUNDLE_LOCATION'] = process.env.BUNDLE_LOCATION || path.resolve(__d
 // app.commandLine.appendSwitch('enable-transparent-visuals', true)
 // if (process.platform === 'linux') app.commandLine.appendSwitch('disable-gpu', true)
 
-const Sentry = require('@sentry/electron')
-
 const url = require('url')
-
-
 
 const data = require('./data')
 const windows = require('./windows')
@@ -84,8 +80,6 @@ let closing = false
 
 process.on('uncaughtException', (e) => {
   log.error('uncaughtException', e)
-
-  errors.captureException(e)
   
   if (e.code === 'EPIPE') {
     log.error('uncaught EPIPE error', e)
@@ -97,7 +91,6 @@ process.on('uncaughtException', (e) => {
 
     showUnhandledExceptionDialog(e.message, e.code)
   }
-  
 })
 
 const externalWhitelist = [
