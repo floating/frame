@@ -42,7 +42,7 @@ class Updater {
     setTimeout(() => {
       check()
       this.pendingCheck = setInterval(check, UPDATE_INTERVAL)
-    }, 1000)
+    }, 10_000)
   }
 
   stop () {
