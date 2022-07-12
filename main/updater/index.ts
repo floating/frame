@@ -1,4 +1,3 @@
-import Domain from 'domain'
 import { shell } from 'electron'
 import log from 'electron-log'
 
@@ -119,7 +118,6 @@ class Updater {
 
       this.notified[version] = true
     }
-
   }
 
   // an update has been downloaded and is ready to be installed
@@ -131,6 +129,11 @@ class Updater {
 
   private checkForAutoUpdate () {
     log.debug('Doing automatic check for app update')
+
+    const switchToManualUpdate = () => {
+      this.dismissUpdate()
+      this.checkForManualUpdate()
+    }
 
     if (!this.autoUpdater) {
       this.autoUpdater = new AutoUpdater()
@@ -145,7 +148,7 @@ class Updater {
   
       this.autoUpdater.on('update-not-available', () => {
         log.info('No available updates found by auto check, checking manually')
-        this.checkForManualUpdate()
+        switchToManualUpdate()
       })
   
       this.autoUpdater.on('update-downloaded', () => {
@@ -158,7 +161,7 @@ class Updater {
         this.installerReady = false
   
         log.warn('Error auto checking for update, checking manually', err)
-        this.checkForManualUpdate()
+        switchToManualUpdate()
       })
   
       this.autoUpdater.on('exit', () => {
@@ -166,7 +169,7 @@ class Updater {
         this.autoUpdater = undefined
       })
     }
-  
+
     this.autoUpdater.checkForUpdates()
   }
 

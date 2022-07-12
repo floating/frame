@@ -1,9 +1,10 @@
-const { app, ipcMain, protocol, shell, clipboard, globalShortcut, BrowserWindow } = require('electron')
+const { app, ipcMain, protocol, shell, clipboard, globalShortcut, powerMonitor, BrowserWindow } = require('electron')
 const log = require('electron-log')
 
 log.transports.console.level = process.env.LOG_LEVEL || 'info'
 log.transports.file.level = ['development', 'test'].includes(process.env.NODE_ENV) ? false : 'verbose'
 
+const dev = process.env.NODE_ENV === 'development'
 const hasInstanceLock = app.requestSingleInstanceLock()
 
 if (!hasInstanceLock) {
@@ -60,7 +61,7 @@ const dapps = require('./dapps').default
 const accounts = require('./accounts').default
 
 const launch = require('./launch')
-const updater = require('./updater')
+const updater = require('./updater').default
 const errors = require('./errors')
 
 require('./rpc')
@@ -251,6 +252,7 @@ ipcMain.on('tray:syncPath', (e, path, value) => {
 ipcMain.on('tray:ready', () => {
   require('./api')
 
+  console.log('DEV! STARTING UPDATER')
   if (dev) {
     startUpdater()
   }

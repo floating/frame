@@ -44,6 +44,7 @@ export function init () {
     ipcMode: Sentry.IPCMode.Classic,
     dsn: 'https://7b09a85b26924609bef5882387e2c4dc@o1204372.ingest.sentry.io/6331069',
     beforeSend: (event: Event) => {
+      console.log(' -------> BEFORE SEND!')
       if (allowedEvents === 0) {
         return null
       }

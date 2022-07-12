@@ -27,12 +27,15 @@ export default class AutoUpdater extends EventEmitter {
   constructor () {
     super()
 
+    // due to some bugs in the library, electron-updater can sometimes throw uncaught exceptions, so wrap these calls in a domain
+    // in order to not interrupt the application execution and have Frame crash
     this.domain = createDomain()
 
     this.domain.on('error', err => {
       log.error('Unhandled auto updater error', err)
+
+      this.emit('error', err)
       this.close()
-      this.domain.exit()
     })
 
     this.electronAutoUpdater = createAppUpdater()
@@ -66,6 +69,8 @@ export default class AutoUpdater extends EventEmitter {
   }
 
   close () {
+    this.domain.exit()
+
     // TODO: use cancellation token to cancel download
     this.emit('exit')
     this.electronAutoUpdater.removeAllListeners()
@@ -73,16 +78,30 @@ export default class AutoUpdater extends EventEmitter {
 
   async checkForUpdates () {
     this.domain.run(async () => {
-      const result = await this.electronAutoUpdater.checkForUpdates()
+      try {
+        const result = await this.electronAutoUpdater.checkForUpdates()
 
-      if (!result) {
-        this.electronAutoUpdater.emit('update-not-available', 'updater is not active')
+        if (!result) {
+          this.electronAutoUpdater.emit('update-not-available', 'updater is not active')
+        }
+      } catch (e) {
+        // in case of failure an error is emitted, but for some reason an exception is also thrown
+        // so handle that promise rejection here
+        log.warn('Auto updater failed to check for updates', e)
       }
     })
   }
 
   async downloadUpdate () {
-    this.electronAutoUpdater.downloadUpdate()
+    this.domain.run(async () => {
+      try {
+        await this.electronAutoUpdater.downloadUpdate()
+      }  catch (e) {
+        // in case of failure an error is emitted, but for some reason an exception is also thrown
+        // so handle that promise rejection here
+        log.warn('Auto updater failed to download update', e)
+      }
+    })
   }
 
   async quitAndInstall () {
