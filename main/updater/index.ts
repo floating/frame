@@ -17,7 +17,7 @@ const isMac = process.platform === 'darwin'
 const isWindows = process.platform === 'win32'
 
 const UPDATE_INTERVAL = parseInt(process.env.UPDATE_INTERVAL || '') || 60 * 60_000
-const useAutoUpdater = true || isMac || isWindows
+const useAutoUpdater = isMac || isWindows
 
 class Updater {
   private autoUpdater?: AutoUpdater

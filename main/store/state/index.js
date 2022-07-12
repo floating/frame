@@ -201,7 +201,7 @@ const initial = {
     signers: {},
     savedSigners: {},
     updater: {
-      dontRemind: []
+      dontRemind: main('updater.dontRemind', [])
     },
     clients: {
       ipfs: {

@@ -253,7 +253,7 @@ ipcMain.on('tray:ready', () => {
   require('./api')
 
   console.log('DEV! STARTING UPDATER')
-  if (dev) {
+  if (!dev) {
     startUpdater()
   }
 })
