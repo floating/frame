@@ -11,8 +11,6 @@ export interface VersionUpdate {
   location: string
 }
 
-log.transports.console.level = 'debug'
-
 const isMac = process.platform === 'darwin'
 const isWindows = process.platform === 'win32'
 
