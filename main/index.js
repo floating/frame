@@ -367,6 +367,13 @@ app.on('second-instance', (event, argv, workingDirectory) => {
   windows.showTray()
 })
 app.on('activate', () => windows.activate())
+
+app.on('before-quit', (evt) => {
+  if (!updater.updateReady) {
+    updater.stop()
+  }
+})
+
 app.on('will-quit', () => app.quit())
 app.on('quit', async () => {
   // await clients.stop()

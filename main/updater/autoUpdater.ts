@@ -1,7 +1,7 @@
 import log from 'electron-log'
 import EventEmitter from 'events'
 
-import { AppImageUpdater, AppUpdater, MacUpdater, NsisUpdater } from 'electron-updater'
+import { AppImageUpdater, AppUpdater, CancellationToken, MacUpdater, NsisUpdater } from 'electron-updater'
 import { Domain, create as createDomain } from 'domain'
 
 interface VersionInfo {
@@ -23,6 +23,8 @@ function createAppUpdater () {
 export default class AutoUpdater extends EventEmitter {
   private readonly electronAutoUpdater: AppUpdater
   private readonly domain: Domain
+
+  private downloadCancellationToken?: CancellationToken
 
   constructor () {
     super()
@@ -63,17 +65,23 @@ export default class AutoUpdater extends EventEmitter {
     })
   
     this.electronAutoUpdater.on('update-downloaded', res => {
+      this.downloadCancellationToken?.dispose()
+      this.downloadCancellationToken = undefined
+
       log.debug('Update downloaded', { res })
       this.emit('update-downloaded')
     })
   }
 
   close () {
+    this.electronAutoUpdater.logger = null
+    this.electronAutoUpdater.removeAllListeners()
+    this.cancelDownload()
+
     this.domain.exit()
 
-    // TODO: use cancellation token to cancel download
     this.emit('exit')
-    this.electronAutoUpdater.removeAllListeners()
+    this.removeAllListeners()
   }
 
   async checkForUpdates () {
@@ -95,16 +103,29 @@ export default class AutoUpdater extends EventEmitter {
   async downloadUpdate () {
     this.domain.run(async () => {
       try {
-        await this.electronAutoUpdater.downloadUpdate()
-      }  catch (e) {
-        // in case of failure an error is emitted, but for some reason an exception is also thrown
-        // so handle that promise rejection here
+        this.downloadCancellationToken = new CancellationToken()
+        await this.electronAutoUpdater.downloadUpdate(this.downloadCancellationToken)
+      } catch (e) {
         log.warn('Auto updater failed to download update', e)
+
+        this.cancelDownload()
       }
     })
   }
 
   async quitAndInstall () {
     this.electronAutoUpdater.quitAndInstall()
+  }
+
+  private cancelDownload () {
+    log.debug('Auto update download cancel')
+
+    if (this.downloadCancellationToken) {
+      log.verbose('Canceling auto update download')
+
+      this.downloadCancellationToken.cancel()
+      this.downloadCancellationToken.dispose()
+      this.downloadCancellationToken = undefined
+    }
   }
 }
