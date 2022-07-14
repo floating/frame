@@ -1,10 +1,13 @@
 import * as Sentry from '@sentry/electron'
 import { init } from '../../../main/errors'
+import store from '../../../main/store'
 
 jest.mock('@sentry/electron', () => ({ init: jest.fn(), IPCMode: { Classic: 'test-ipcmode' } }))
+
 jest.mock('../../../main/store')
 
 beforeAll(() => {
+  store.set('main.exceptionReporting', true);
   jest.useFakeTimers()
 })
 
@@ -139,5 +142,25 @@ describe('sentry', () => {
     const sentEvents = mockEvents(5)
     const reportedEvents = sentEvents.filter(evt => !!evt)
     expect(reportedEvents.length).toBe(5)
+  })
+
+    
+  it('should send events when exception reporting is enabled', () => {
+    init()
+    expect(store('main.exceptionReporting')).toBe(true);
+
+    // send 5 events which should all pass as log reporting is enabled
+    const sentEvents = mockEvents(5)
+    const reportedEvents = sentEvents.filter(evt => !!evt)
+    expect(reportedEvents.length).toBe(5)
+  })
+
+  it('should not send events when exception reporting is disabled', () => {
+    init()
+    store.set('main.exceptionReporting', false);
+    // send 5 events which should all fail to send if log reporting is disabled
+    const sentEvents = mockEvents(5)
+    const reportedEvents = sentEvents.filter(evt => !!evt)
+    expect(reportedEvents.length).toBe(0)
   })
 })
