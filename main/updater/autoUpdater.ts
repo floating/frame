@@ -105,10 +105,9 @@ export default class AutoUpdater extends EventEmitter {
       try {
         this.downloadCancellationToken = new CancellationToken()
         await this.electronAutoUpdater.downloadUpdate(this.downloadCancellationToken)
-      }  catch (e) {
+      } catch (e) {
         this.cancelDownload()
-        // in case of failure an error is emitted, but for some reason an exception is also thrown
-        // so handle that promise rejection here
+
         log.warn('Auto updater failed to download update', e)
       }
     })
@@ -119,6 +118,8 @@ export default class AutoUpdater extends EventEmitter {
   }
 
   private cancelDownload () {
+    log.debug('Canceling auto update download')
+
     this.downloadCancellationToken?.cancel()
     this.downloadCancellationToken?.dispose()
     this.downloadCancellationToken = undefined
