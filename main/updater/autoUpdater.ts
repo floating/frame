@@ -65,15 +65,18 @@ export default class AutoUpdater extends EventEmitter {
     })
   
     this.electronAutoUpdater.on('update-downloaded', res => {
+      this.downloadCancellationToken?.dispose()
+      this.downloadCancellationToken = undefined
+
       log.debug('Update downloaded', { res })
       this.emit('update-downloaded')
     })
   }
 
   close () {
-    this.cancelDownload()
     this.electronAutoUpdater.logger = null
     this.electronAutoUpdater.removeAllListeners()
+    this.cancelDownload()
 
     this.domain.exit()
 
@@ -116,10 +119,8 @@ export default class AutoUpdater extends EventEmitter {
   }
 
   private cancelDownload () {
-    if (this.downloadCancellationToken) {
-      this.downloadCancellationToken.cancel()
-      this.downloadCancellationToken.dispose()
-      this.downloadCancellationToken = undefined
-    }
+    this.downloadCancellationToken?.cancel()
+    this.downloadCancellationToken?.dispose()
+    this.downloadCancellationToken = undefined
   }
 }
