@@ -106,9 +106,9 @@ export default class AutoUpdater extends EventEmitter {
         this.downloadCancellationToken = new CancellationToken()
         await this.electronAutoUpdater.downloadUpdate(this.downloadCancellationToken)
       } catch (e) {
-        this.cancelDownload()
-
         log.warn('Auto updater failed to download update', e)
+
+        this.cancelDownload()
       }
     })
   }
@@ -118,10 +118,14 @@ export default class AutoUpdater extends EventEmitter {
   }
 
   private cancelDownload () {
-    log.debug('Canceling auto update download')
+    log.debug('Auto update download cancel')
 
-    this.downloadCancellationToken?.cancel()
-    this.downloadCancellationToken?.dispose()
-    this.downloadCancellationToken = undefined
+    if (this.downloadCancellationToken) {
+      log.verbose('Canceling auto update download')
+
+      this.downloadCancellationToken.cancel()
+      this.downloadCancellationToken.dispose()
+      this.downloadCancellationToken = undefined
+    }
   }
 }
