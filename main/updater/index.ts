@@ -25,19 +25,20 @@ class Updater {
   private availableVersion = ''
   private installerReady = false
 
+  private setupCheck?: NodeJS.Timeout
   private pendingCheck?: NodeJS.Timeout
   private notified: Record<string, boolean> = {}
 
   start () {
     log.verbose('Starting updater', { useAutoUpdater })
 
-    this.stop()
+    this.stopUpdates()
 
     const check = useAutoUpdater
       ? () => this.checkForAutoUpdate()
       : () => this.checkForManualUpdate()
 
-    setTimeout(() => {
+    this.setupCheck = setTimeout(() => {
       check()
       this.pendingCheck = setInterval(check, UPDATE_INTERVAL)
     }, 10_000)
@@ -45,16 +46,8 @@ class Updater {
 
   stop () {
     log.verbose('Stopping updater')
-
-    if (this.pendingCheck) {
-      this.pendingCheck = undefined
-      clearTimeout(this.pendingCheck)
-    }
-
-    if (this.autoUpdater) {
-      this.autoUpdater.close()
-      this.autoUpdater = undefined
-    }
+    
+    this.stopUpdates()
   }
 
   get updateReady () {
@@ -95,6 +88,23 @@ class Updater {
 
     this.availableUpdate = ''
     this.availableVersion = ''
+  }
+
+  private stopUpdates () {
+    if (this.setupCheck) {
+      clearTimeout(this.setupCheck)
+      this.setupCheck = undefined
+    }
+
+    if (this.pendingCheck) {
+      clearInterval(this.pendingCheck)
+      this.pendingCheck = undefined
+    }
+
+    if (this.autoUpdater) {
+      this.autoUpdater.close()
+      this.autoUpdater = undefined
+    }
   }
 
   private updateAvailable (version: string, location: string) {
