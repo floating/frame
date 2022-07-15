@@ -12,19 +12,19 @@ afterAll(() => {
   jest.useRealTimers()
 })
 
-describe('sentry', () => {
-  describe('#init', () => {
-    it('should initialize sentry with the expected object', () => {
-      init()
-  
-      expect(Sentry.init).toHaveBeenCalledWith({
-        beforeSend: expect.any(Function),
-        dsn: 'https://7b09a85b26924609bef5882387e2c4dc@o1204372.ingest.sentry.io/6331069',
-        ipcMode: 'test-ipcmode'
-      })
+describe('#init', () => {
+  it('should initialize sentry with the expected object', () => {
+    init()
+
+    expect(Sentry.init).toHaveBeenCalledWith({
+      beforeSend: expect.any(Function),
+      dsn: 'https://7b09a85b26924609bef5882387e2c4dc@o1204372.ingest.sentry.io/6331069',
+      ipcMode: 'test-ipcmode'
     })
   })
+})
 
+describe('sentry', () => {
   describe('#beforeSend', () => {
     const sendErrorEvent = (event) => SentryInstance.beforeSend(event)
     const sendErrorEvents = (numEvents) => [...Array(numEvents).fill(validEvent)].map(sendErrorEvent)
