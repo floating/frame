@@ -43,6 +43,30 @@ describe('sentry', () => {
     })
   })
 
+  it('should send exception type and value params after parsing stackframe modules', () => {
+    init()
+    const sentryEvent = mockEvent({
+      exception: {
+        values: [{
+          "type": "Error",
+          "value": "Cannot find latest.yml in the latest release artifacts (https://github.com/floating/frame/releases/download/v0.5.0-beta.20/latest.yml): HttpError: 404 \n\"method: GET url: https://github.com/floating/frame/releases/download/v0.5.0-beta.20/latest.yml\\n\\...",
+          "stacktrace": {
+              "frames": [{
+                "module": "C:\\Users\\Test\\AppData\\Local\\Programs\\frame\\resources\\app.asar\\node_modules\\electron-updater\\out\\AppUpdater",
+              }, {
+                "module": "node:domain",
+              }, {
+                "module": "C:\\Users\\Test\\AppData\\Local\\Programs\\frame\\resources\\app.asar\\compiled\\main\\signers\\lattice\\Lattice\\index",
+              }]
+            },
+          }]
+      }
+    })
+    const sentException = sentryEvent.exception.values[0]
+    expect(sentException.type).toBe('Error')
+    expect(sentException.value).toBe('Cannot find latest.yml in the latest release artifacts (https://github.com/floating/frame/releases/download/v0.5.0-beta.20/latest.yml): HttpError: 404 \n\"method: GET url: https://github.com/floating/frame/releases/download/v0.5.0-beta.20/latest.yml\\n\\...')
+  })
+
   it('should strip asar paths from stackframe modules on Windows', () => {
     init()
 
