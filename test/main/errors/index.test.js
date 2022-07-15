@@ -75,7 +75,17 @@ describe('sentry', () => {
     })
 
     it('should strip asar paths from stackframe modules on Windows', () => {
-      const sentryEvent = simulateException(sampleException)
+      const windowsException = {
+        ...sampleException,
+        stacktrace: {
+          frames: [
+            { module: 'C:\\Users\\Test\\AppData\\Local\\Programs\\frame\\resources\\app.asar\\node_modules\\electron-updater\\out\\AppUpdater' },
+            { module: 'node:domain' },
+            { module: 'C:\\Users\\Test\\AppData\\Local\\Programs\\frame\\resources\\app.asar\\compiled\\main\\signers\\lattice\\Lattice\\index' }
+          ]
+        }
+      }
+      const sentryEvent = simulateException(windowsException)
 
       const stackFrameModules = sentryEvent.exception.values[0].stacktrace.frames.map((frame) => frame.module)
   
