@@ -1,5 +1,6 @@
-import * as Sentry from '@sentry/electron'
-import type { Event } from '@sentry/types'
+import { ElectronOptions } from '@sentry/electron'
+import * as Sentry from '@sentry/electron/main'
+import type { Event, Transport, TransportClass } from '@sentry/types'
 
 import store from '../store'
 
@@ -30,7 +31,7 @@ function getSentryExceptions (event: Event) {
   return safeExceptions
 }
 
-export function init () {
+export function init (dsn = 'https://7b09a85b26924609bef5882387e2c4dc@o1204372.ingest.sentry.io/6331069', transport?: TransportClass<Transport>) {
   let allowedEvents = EVENT_RATE_LIMIT
 
   setInterval(() => {
@@ -38,11 +39,11 @@ export function init () {
       allowedEvents++
     }
   }, 60_000)
-  
-  Sentry.init({
+
+  const sentryOpts: ElectronOptions = {
     // only use IPC from renderer process, not HTTP
     ipcMode: Sentry.IPCMode.Classic,
-    dsn: 'https://7b09a85b26924609bef5882387e2c4dc@o1204372.ingest.sentry.io/6331069',
+    dsn,
     beforeSend: (event: Event) => {
       if (allowedEvents === 0) {
         return null
@@ -58,5 +59,11 @@ export function init () {
         extra: getCrashReportFields()
       }
     }
-  })
+  }
+
+  if (transport) {
+    sentryOpts.transport = transport
+  }
+  
+  Sentry.init(sentryOpts)
 }
