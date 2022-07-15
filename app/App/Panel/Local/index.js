@@ -450,7 +450,7 @@ class Settings extends React.Component {
           <div className='signerPermission localSetting' style={{ zIndex: 198 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Log exceptions</div>
-              <div className={this.store('main.exceptionReporting') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onClick={_ => link.send('tray:action', 'setLogExceptions', !this.store('main.exceptionReporting'))}>
+              <div className={this.store('main.exceptionReporting') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onClick={_ => link.send('tray:action', 'setExceptionReporting', !this.store('main.exceptionReporting'))}>
                 <div className='signerPermissionToggleSwitch' />
               </div>
             </div>
