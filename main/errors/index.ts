@@ -24,7 +24,7 @@ function getSentryExceptions (event: Event) {
   const safeExceptions = exceptions.map((exception) => {
     const frames = exception?.stacktrace?.frames || []
     const safeFrames = frames.map((frame) => ({ ...frame, module: sanitizeStackFrame(frame) }))
-    return { stacktrace: { frames: safeFrames } }
+    return { ...exception, stacktrace: { frames: safeFrames } }
   })
   
   return safeExceptions
