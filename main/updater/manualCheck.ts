@@ -54,6 +54,8 @@ export default function (opts?: CheckOptions) {
       res.on('data', chunk => { rawData += chunk })
       res.on('end', () => {
         const contentType = res.headers['content-type'] || ''
+
+        log.debug('Manual check response', { status: res.statusCode, contentType })
         if (res.statusCode != 200 || !contentType.includes('json')) {
           log.warn('Manual check for update returned invalid response', { status: res.statusCode, contentType, data: rawData })
           return reject(new Error(`invalid response, status: ${res.statusCode} contentType: ${contentType}`))
@@ -70,10 +72,12 @@ export default function (opts?: CheckOptions) {
     
           if (isNewerVersion) {
             resolve({ version: latestRelease.tag_name, location: latestRelease.html_url })
+          } else {
+            reject(new Error('newer version is not available'))
           }
         } else {
           log.verbose('Manual check did not find any releases')
-          reject('no releases found')
+          reject(new Error('no releases found'))
         }
       })
     }).on('error', reject)

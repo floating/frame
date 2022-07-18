@@ -13,6 +13,7 @@ beforeAll(() => {
 afterAll(() => {
   nock.cleanAll()
   nock.enableNetConnect()
+  log.transports.console.level = 'debug'
 })
 
 it('identifies that a newer version is available', async () => {
@@ -31,6 +32,21 @@ it('identifies that a newer version is available', async () => {
 
   expect(res.version).toBe(nextVersion)
   expect(res.location).toBe('https://frame.sh/the-next-great-release')
+})
+
+it('identifies that a newer version is not available', async () => {
+  const version = packageInfo.version
+  const nextVersion = version
+
+  const releases = [{
+    html_url: 'https://frame.sh/the-next-great-release',
+    prerelease: false,
+    tag_name: nextVersion
+  }]
+
+  mockApiResponse(200, releases)
+
+  return expect(checkForUpdates({ prereleaseTrack: false })).rejects.toBeDefined()
 })
 
 it('ignores a release on the prerelease track', () => {
