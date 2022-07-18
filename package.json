@@ -93,6 +93,7 @@
     "gridplus-sdk": "2.2.0",
     "hdkey": "2.0.1",
     "nebula": "0.1.2",
+    "nock": "^13.2.8",
     "node-fetch": "2.6.7",
     "node-hid": "2.1.1",
     "query-string": "7.1.1",

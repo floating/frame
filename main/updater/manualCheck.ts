@@ -25,7 +25,12 @@ interface CheckOptions {
 }
 
 function parseResponse (rawData: string) {
-  return JSON.parse(rawData) as GithubRelease[]
+  try {
+    return JSON.parse(rawData) as GithubRelease[]
+  } catch (e) {
+    log.warn('Manual check for update returned invalid JSON response', e)
+    return []
+  }
 }
 
 function compareVersions (a: string, b: string) {
@@ -41,9 +46,19 @@ export default function (opts?: CheckOptions) {
     https.get(httpOptions, res => {
       let rawData = ''
     
-      res.on('error', reject)
+      res.on('error', e => {
+        log.warn('Manual check for update encountered HTTP error', e)
+        reject(e)
+      })
+
       res.on('data', chunk => { rawData += chunk })
       res.on('end', () => {
+        const contentType = res.headers['content-type'] || ''
+        if (res.statusCode != 200 || !contentType.includes('json')) {
+          log.warn('Manual check for update returned invalid response', { status: res.statusCode, contentType, data: rawData })
+          return reject(new Error(`invalid response, status: ${res.statusCode} contentType: ${contentType}`))
+        }
+
         const releases = parseResponse(rawData).filter(r => (!r.prerelease || opts?.prereleaseTrack)) || []
         const latestRelease = releases[0] || { tag_name: '' }
     
