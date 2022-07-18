@@ -35,7 +35,7 @@ it('identifies that a newer version is available', async () => {
   const response = [
     {
       html_url: 'https://frame.sh/cutting-edge-frame-release',
-      prerelease: false,
+      prerelease: true,
       tag_name: `v${nextVersion}`
     },
     ...githubReleasesResponse
@@ -43,7 +43,7 @@ it('identifies that a newer version is available', async () => {
 
   mockApiResponse(200, response)
 
-  const res = await checkForUpdates()
+  const res = await checkForUpdates({ prereleaseTrack: true })
 
   expect(res.version).toBe(`v${nextVersion}`)
   expect(res.location).toBe('https://frame.sh/cutting-edge-frame-release')
@@ -61,7 +61,7 @@ it('ignores a release on the prerelease track', () => {
 
   mockApiResponse(200, response)
 
-  return expect(checkForUpdates()).resolves.toBeFalsy()
+  return expect(checkForUpdates({ prereleaseTrack: false })).resolves.toBeFalsy()
 })
 
 it('handles an HTTP status error', async () => {
