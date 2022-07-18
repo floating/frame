@@ -42,7 +42,7 @@ function compareVersions (a: string, b: string) {
 export default function (opts?: CheckOptions) {
   log.verbose('Performing manual check for updates', { prereleaseTrack: opts?.prereleaseTrack })
 
-  return new Promise<VersionUpdate>((resolve, reject) => {
+  return new Promise<VersionUpdate | undefined>((resolve, reject) => {
     https.get(httpOptions, res => {
       let rawData = ''
     
@@ -70,11 +70,10 @@ export default function (opts?: CheckOptions) {
     
           log.verbose('Manual check found release', { currentVersion: version, latestVersion, isNewerVersion })
     
-          if (isNewerVersion) {
-            resolve({ version: latestRelease.tag_name, location: latestRelease.html_url })
-          } else {
-            reject(new Error('newer version is not available'))
-          }
+          resolve(isNewerVersion
+            ? { version: latestRelease.tag_name, location: latestRelease.html_url }
+            : undefined
+          )
         } else {
           log.verbose('Manual check did not find any releases')
           reject(new Error('no releases found'))

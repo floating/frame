@@ -187,12 +187,16 @@ class Updater {
     try {
       const update = await manualCheck({ prereleaseTrack: false })
 
-      const { version, location } = update
-      log.debug('Manual check found available update', { version, location })
-
-      this.updateAvailable(version, location)
+      if (!update) {
+        log.info('Manual check found no updates')
+      } else {
+        const { version, location } = update
+        log.debug('Manual check found available update', { version, location })
+  
+        this.updateAvailable(version, location)
+      }
     } catch (e) {
-      log.info('Manual check found no updates', e)
+      log.error('Error performing manual check for updates', e)
     }
   }
 }
