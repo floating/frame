@@ -65,7 +65,7 @@ it('ignores a release on the prerelease track', () => {
 })
 
 it('handles an HTTP status error', async () => {
-  mockApiResponse(404, '{"message":"API rate limit exceeded"}')
+  mockApiResponse(403, '{"message":"API rate limit exceeded"}')
 
   return expect(checkForUpdates()).rejects.toBeDefined()
 })
