@@ -144,7 +144,7 @@ class TokenSpend extends React.Component {
             onClick={() => {
               this.props.onApprove(
                 this.props.req,
-                ApprovalType.TokenSpendApproval,
+                this.state.revoke ? ApprovalType.TokenSpendRevocation : ApprovalType.TokenSpendApproval,
                 { amount: this.state.amount }
               )
             }}
