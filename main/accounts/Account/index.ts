@@ -17,6 +17,7 @@ import { getType as getSignerType, Type as SignerType } from '../../signers/Sign
 import provider from '../../provider'
 import { ApprovalType } from '../../../resources/constants'
 import Erc20Contract from '../../contracts/erc20'
+import { hexToNumber } from 'web3-utils'
 
 const nebula = nebulaApi()
 
@@ -257,7 +258,7 @@ class FrameAccount {
 
       this.addRequiredApproval(
         req,
-        amount === '0x00' ? ApprovalType.TokenSpendRevocation : ApprovalType.TokenSpendApproval,
+        hexToNumber(amount) === 0 ? ApprovalType.TokenSpendRevocation : ApprovalType.TokenSpendApproval,
         {
           decimals,
           name,
