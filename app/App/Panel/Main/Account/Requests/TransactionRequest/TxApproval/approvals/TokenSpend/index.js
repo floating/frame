@@ -40,7 +40,7 @@ class TokenSpend extends React.Component {
     this.decimals = data.decimals || 0
     this.requestedAmount = '0x' + new BigNumber(data.amount).integerValue().toString(16)
     this.state = {
-      revoke,
+      revoke: !!revoke,
       inPreview: false,
       inEditApproval: false,
       mode: 'requested',
