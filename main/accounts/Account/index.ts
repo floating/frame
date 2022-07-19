@@ -257,7 +257,7 @@ class FrameAccount {
 
       this.addRequiredApproval(
         req,
-        ApprovalType.TokenSpendApproval,
+        amount === '0x00' ? ApprovalType.TokenSpendRevocation : ApprovalType.TokenSpendApproval,
         {
           decimals,
           name,
