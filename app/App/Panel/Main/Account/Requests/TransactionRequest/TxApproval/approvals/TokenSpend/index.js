@@ -39,8 +39,8 @@ class TokenSpend extends React.Component {
 
     this.decimals = data.decimals || 0
     this.requestedAmount = '0x' + new BigNumber(data.amount).integerValue().toString(16)
+    this.revoke = !!revoke
     this.state = {
-      revoke: !!revoke,
       inPreview: false,
       inEditApproval: false,
       mode: 'requested',
@@ -87,7 +87,7 @@ class TokenSpend extends React.Component {
   }
 
   render () {
-    const { req, approval } = this.props
+    const { req, approval, onApprove, onDecline } = this.props
     const { data } = approval
 
     const displayInt = new BigNumber(this.state.amount).shiftedBy(-this.decimals).integerValue()
@@ -97,7 +97,7 @@ class TokenSpend extends React.Component {
       symbol: 'unlimited'
     } : displayInt > 9e12 ? {
       number: '',
-      symbol: this.props.approval.data.decimals ? '~unlimited' : 'unknown'
+      symbol: approval.data.decimals ? '~unlimited' : 'unknown'
     } : nFormat(displayInt)
 
     const symbol = data.symbol || '???'
@@ -115,11 +115,11 @@ class TokenSpend extends React.Component {
               opacity: 0,
               pointerEvents: 'none'
             } : {}}
-            onClick={() => this.props.onDecline(req)}
+            onClick={() => onDecline(req)}
           >
             Reject
           </div>
-          {!this.state.revoke && 
+          {!this.revoke && 
             <div
               className={this.state.inEditApproval ? 'approveTokenSpendEditButton approveTokenSpendDoneButton' : 'approveTokenSpendEditButton'}
               role='button'
@@ -142,9 +142,9 @@ class TokenSpend extends React.Component {
               pointerEvents: 'none'
             } : {}}
             onClick={() => {
-              this.props.onApprove(
-                this.props.req,
-                this.state.revoke ? ApprovalType.TokenSpendRevocation : ApprovalType.TokenSpendApproval,
+              onApprove(
+                req,
+                this.revoke ? ApprovalType.TokenSpendRevocation : ApprovalType.TokenSpendApproval,
                 { amount: this.state.amount }
               )
             }}
@@ -159,7 +159,7 @@ class TokenSpend extends React.Component {
           <div className='approveTransactionWarningIcon approveTransactionWarningIconRight'>
             {svg.alert(32)}
           </div>
-          <div className='approveTransactionWarningTitle'>{this.state.revoke ? 'revoke token approval' : 'token approval'}</div>
+          <div className='approveTransactionWarningTitle'>{this.revoke ? 'revoke token approval' : 'token approval'}</div>
           {this.state.inEditApproval ? (
             <div className={'approveTokenSpend'}>
               {this.state.exiting ? (
@@ -271,7 +271,7 @@ class TokenSpend extends React.Component {
                   </div>
                 ) : null}
                 <div className='approveTokenSpendSub'>
-                  {this.state.revoke ? 'wants to revoke approval to spend' : 'wants approval to spend'}
+                  {this.revoke ? 'wants to revoke approval to spend' : 'wants approval to spend'}
                 </div>
                 <div className='approveTokenSpendToken'>
                   <div className='approveTokenSpendTokenSymbol'>
