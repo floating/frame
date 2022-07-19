@@ -11,6 +11,47 @@ jest.mock('../../../../../../../../../../../main/store/persist')
 
 const TokenSpend = Restore.connect(ApproveTokenSpendComponent, store)
 
+describe('revoking an approval', () => {
+  it('allows the user to reject a revocation approval', done => {
+    const onApprove = () => done('should not have approved!')
+
+    const { queryByRole } = render(
+      <TokenSpend
+        onApprove={onApprove}
+        onDecline={done}
+        approval={{ data: { decimals: 6, amount: '0x00' } }} 
+        revoke
+      />
+    )
+
+    const reject = queryByRole('button', { name: 'Reject' })
+    fireEvent.click(reject)
+  })
+
+  it('allows the user to proceed', done => {
+    const onApprove = function (req, approvalType, data) {
+      try {
+        expect(approvalType).toBe(ApprovalType.TokenSpendRevocation)
+
+        // 100 * 1e6 to account for decimals
+        expect(data.amount).toBe('0x0')
+        done()
+      } catch (e) { done(e) }
+    }
+
+    const { queryByRole } = render(
+      <TokenSpend
+        onApprove={onApprove}
+        approval={{ data: { decimals: 6, amount: '0x00' } }} 
+        revoke
+      />
+    )
+
+    const proceed = queryByRole('button', { name: 'Proceed' })
+    fireEvent.click(proceed)
+  })
+})
+
 describe('changing approval amounts', () => {
   it('allows the user to reject an approval', done => {
     const onApprove = () => done('should not have approved!')
