@@ -174,7 +174,6 @@ const initial = {
     reveal: main('reveal', false),
     nonceAdjust: main('nonceAdjust', false),
     autohide: main('autohide', true),
-    exceptionReporting: main('exceptionReporting', true),
     accountCloseLock: main('accountCloseLock', false),
     hardwareDerivation: main('hardwareDerivation', 'mainnet'),
     menubarGasPrice: main('menubarGasPrice', false),
@@ -191,6 +190,9 @@ const initial = {
     },
     trezor: {
       derivation: main('trezor.derivation', 'standard')
+    },
+    privacy: {
+      errorReporting: main('privacy.errorReporting', true)
     },
     accounts: main('accounts', {}),
     addresses: main('addresses', {}), // Should be removed after 0.5 release
