@@ -174,6 +174,7 @@ const initial = {
     reveal: main('reveal', false),
     nonceAdjust: main('nonceAdjust', false),
     autohide: main('autohide', true),
+    exceptionReporting: main('exceptionReporting', true),
     accountCloseLock: main('accountCloseLock', false),
     hardwareDerivation: main('hardwareDerivation', 'mainnet'),
     menubarGasPrice: main('menubarGasPrice', false),
