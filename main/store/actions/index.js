@@ -235,8 +235,8 @@ module.exports = {
   setAutohide: (u, v) => {
     u('main.autohide', () => v)
   },
-  setExceptionReporting: (u, v) => {
-    u('main.exceptionReporting', () => v)
+  setErrorReporting: (u, enable) => {
+    u('main.privacy.errorReporting', () => enable)
   },
   setGasFees: (u, netType, netId, fees) => {
     u('main.networksMeta', netType, netId, 'gas.price.fees', () => fees)

@@ -7,7 +7,8 @@ jest.mock('@sentry/electron', () => ({ init: jest.fn(), IPCMode: { Classic: 'tes
 jest.mock('../../../main/store')
 
 beforeAll(() => {
-  store.set('main.exceptionReporting', true);
+  store.set('main.privacy.errorReporting', true)
+
   jest.useFakeTimers()
 })
 
@@ -153,25 +154,11 @@ describe('sentry', () => {
       const reportedEvents = sentEvents.filter(evt => !!evt)
       expect(reportedEvents.length).toBe(5)
     })
-  })
 
-    
-  it('should send events when exception reporting is enabled', () => {
-    init()
-    expect(store('main.exceptionReporting')).toBe(true);
+    it('should not send an event when exception reporting is disabled', () => {
+      store.set('main.privacy.errorReporting', false)
 
-    // send 5 events which should all pass as log reporting is enabled
-    const sentEvents = mockEvents(5)
-    const reportedEvents = sentEvents.filter(evt => !!evt)
-    expect(reportedEvents.length).toBe(5)
-  })
-
-  it('should not send events when exception reporting is disabled', () => {
-    init()
-    store.set('main.exceptionReporting', false);
-    // send 5 events which should all fail to send if log reporting is disabled
-    const sentEvents = mockEvents(5)
-    const reportedEvents = sentEvents.filter(evt => !!evt)
-    expect(reportedEvents.length).toBe(0)
+      expect(sendErrorEvent(validEvent)).toBeNull()
+    })
   })
 })

@@ -33,20 +33,22 @@ function getSentryExceptions (event: Event) {
 export function init () {
   let allowedEvents = EVENT_RATE_LIMIT
 
-  setInterval(() => {
-    if (allowedEvents < EVENT_RATE_LIMIT) {
-      allowedEvents++
-    }
-  }, 60_000)
+  const backOffRateLimitBy = (numEventsToAllow: number) => {
+    allowedEvents = Math.min(EVENT_RATE_LIMIT, allowedEvents + numEventsToAllow)
+  }
+
+  const filterEvent = () => {
+    return allowedEvents <= 0 || !store('main.privacy.errorReporting')
+  }
+
+  setInterval(() => backOffRateLimitBy(1), 60_000)
   
   Sentry.init({
     // only use IPC from renderer process, not HTTP
     ipcMode: Sentry.IPCMode.Classic,
     dsn: 'https://7b09a85b26924609bef5882387e2c4dc@o1204372.ingest.sentry.io/6331069',
     beforeSend: (event: Event) => {
-      if (allowedEvents === 0 || !store('main.exceptionReporting')) {
-        return null
-      }
+      if (filterEvent()) return null
 
       allowedEvents--
 
