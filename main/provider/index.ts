@@ -134,12 +134,29 @@ export class Provider extends EventEmitter {
       }
     })
 
+    console.log('provider init')
+
+    const netVersionPayloadEmissionLimit = 5
+    let netVersionPayloadEmissions = 0
+
     proxyConnection.on('provider:send', (payload: RPCRequestPayload) => {
       const { id, method } = payload
+      console.log('provider:send', payload)
       this.send(payload, ({ error, result }) => {
-        proxyConnection.emit('payload', { id, method, error, result })
+        console.log('emitting proxyConnection payload', { id, method, error, result })
+
+        // limit payload emissions - stop net_version payload emission spam when disconnected
+        if (method !== 'net_version' || netVersionPayloadEmissions < netVersionPayloadEmissionLimit) {
+          netVersionPayloadEmissions++
+          proxyConnection.emit('payload', { id, method, error, result })
+        }
       })
     })
+
+    // reset the net_version emissions
+    setInterval(() => {
+      netVersionPayloadEmissions = 0
+    }, 10_000)
 
     this.getNonce = this.getNonce.bind(this)
   }
