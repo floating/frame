@@ -35,9 +35,10 @@ function nFormat (n, digits = 2)  {
 class TokenSpend extends React.Component {
   constructor (...args) {
     super(...args)
+    const { approval: { data } } = this.props
 
-    this.decimals = this.props.approval.data.decimals || 0
-    this.requestedAmount = '0x' + new BigNumber(this.props.approval.data.amount).integerValue().toString(16)
+    this.decimals = data.decimals || 0
+    this.requestedAmount = '0x' + new BigNumber(data.amount).integerValue().toString(16)
     this.state = {
       inPreview: false,
       inEditApproval: false,
@@ -85,7 +86,7 @@ class TokenSpend extends React.Component {
   }
 
   render () {
-    const { req, approval } = this.props
+    const { req, revoke, approval, onApprove, onDecline } = this.props
     const { data } = approval
 
     const displayInt = new BigNumber(this.state.amount).shiftedBy(-this.decimals).integerValue()
@@ -95,7 +96,7 @@ class TokenSpend extends React.Component {
       symbol: 'unlimited'
     } : displayInt > 9e12 ? {
       number: '',
-      symbol: this.props.approval.data.decimals ? '~unlimited' : 'unknown'
+      symbol: approval.data.decimals ? '~unlimited' : 'unknown'
     } : nFormat(displayInt)
 
     const symbol = data.symbol || '???'
@@ -113,23 +114,25 @@ class TokenSpend extends React.Component {
               opacity: 0,
               pointerEvents: 'none'
             } : {}}
-            onClick={() => this.props.onDecline(req)}
+            onClick={() => onDecline(req)}
           >
             Reject
           </div>
-          <div
-            className={this.state.inEditApproval ? 'approveTokenSpendEditButton approveTokenSpendDoneButton' : 'approveTokenSpendEditButton'}
-            role='button'
-            onClick={() => {
-              if (this.state.inEditApproval) {
-                this.doneEditing()
-              } else {
-                this.startEditing()
-              }
-            }}
-          >
-            {this.state.inEditApproval ? 'Done' : 'Edit' }
-          </div>
+          {!revoke && 
+            <div
+              className={this.state.inEditApproval ? 'approveTokenSpendEditButton approveTokenSpendDoneButton' : 'approveTokenSpendEditButton'}
+              role='button'
+              onClick={() => {
+                if (this.state.inEditApproval) {
+                  this.doneEditing()
+                } else {
+                  this.startEditing()
+                }
+              }}
+            >
+              {this.state.inEditApproval ? 'Done' : 'Edit' }
+            </div>
+          }
           <div
             className='approveTransactionWarningProceed'
             role='button'
@@ -138,9 +141,9 @@ class TokenSpend extends React.Component {
               pointerEvents: 'none'
             } : {}}
             onClick={() => {
-              this.props.onApprove(
-                this.props.req,
-                ApprovalType.TokenSpendApproval,
+              onApprove(
+                req,
+                revoke ? ApprovalType.TokenSpendRevocation : ApprovalType.TokenSpendApproval,
                 { amount: this.state.amount }
               )
             }}
@@ -155,7 +158,7 @@ class TokenSpend extends React.Component {
           <div className='approveTransactionWarningIcon approveTransactionWarningIconRight'>
             {svg.alert(32)}
           </div>
-          <div className='approveTransactionWarningTitle'>{'token approval'}</div>
+          <div className='approveTransactionWarningTitle'>{revoke ? 'revoke token approval' : 'token approval'}</div>
           {this.state.inEditApproval ? (
             <div className={'approveTokenSpend'}>
               {this.state.exiting ? (
@@ -267,7 +270,7 @@ class TokenSpend extends React.Component {
                   </div>
                 ) : null}
                 <div className='approveTokenSpendSub'>
-                  {'wants approval to spend'}
+                  {revoke ? 'wants to revoke approval to spend' : 'wants approval to spend'}
                 </div>
                 <div className='approveTokenSpendToken'>
                   <div className='approveTokenSpendTokenSymbol'>

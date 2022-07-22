@@ -7,7 +7,7 @@ import { ApprovalType } from '../../../../../../../../resources/constants'
 import { BasicApproval, TokenSpend } from './approvals'
 
 const supportedApprovals = [
-  ApprovalType.GasLimitApproval, ApprovalType.OtherChainApproval, ApprovalType.TokenSpendApproval
+  ApprovalType.GasLimitApproval, ApprovalType.OtherChainApproval, ApprovalType.TokenSpendApproval, ApprovalType.TokenSpendRevocation
 ]
 
 class TxApproval extends React.Component {
@@ -56,6 +56,18 @@ class TxApproval extends React.Component {
           approval={approval}
           onApprove={this.approve}
           onDecline={this.decline}
+        />
+      )
+    }
+
+    if (approval.type === ApprovalType.TokenSpendRevocation) {
+      return (
+        <TokenSpend 
+          req={req}
+          approval={approval}
+          onApprove={this.approve}
+          onDecline={this.decline}
+          revoke
         />
       )
     }

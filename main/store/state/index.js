@@ -191,6 +191,9 @@ const initial = {
     trezor: {
       derivation: main('trezor.derivation', 'standard')
     },
+    privacy: {
+      errorReporting: main('privacy.errorReporting', true)
+    },
     accounts: main('accounts', {}),
     addresses: main('addresses', {}), // Should be removed after 0.5 release
     permissions: main('permissions', {}),

@@ -376,6 +376,8 @@ app.on('before-quit', (evt) => {
 
 app.on('will-quit', () => app.quit())
 app.on('quit', async () => {
+  log.info('Application closing')
+
   // await clients.stop()
   accounts.close()
   signers.close()
