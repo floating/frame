@@ -58,7 +58,7 @@ export default class TokenLoader {
   }
 
   async frameTokenList () {
-    log.debug('loading tokens from tokens.frame.eth')
+    log.verbose('loading tokens from tokens.frame.eth')
 
     try {
       const tokenListRecord = await this.nebula.resolve('tokens.frame.eth')
@@ -79,18 +79,27 @@ export default class TokenLoader {
   async start () {
     log.verbose('starting token loader')
 
-    return new Promise((resolve, reject) => {
-      const connectTimeout = setTimeout(() => reject('could not connect to provider'), 30 * 1000)
-
-      const startLoading = () => {
+    return new Promise<void>(resolve => {
+      const startLoading = async () => {
         clearTimeout(connectTimeout)
-        this.loader = setInterval(() => this.loadTokenList(), 1000 * 60 * 10)
-        resolve(this.loadTokenList())
+
+        await this.loadTokenList()
+
+        finishLoading()
       }
+
+      const finishLoading = () => {
+        this.eth.off('connect', onConnect)
+        this.loader = setInterval(() => this.loadTokenList(), 1000 * 60 * 10)
+        resolve()
+      }
+
+      const connectTimeout = setTimeout(() => finishLoading(), 10 * 1000)
+      const onConnect = startLoading.bind(this)
 
       if (this.eth.connected) return startLoading()
 
-      this.eth.once('connect', startLoading.bind(this))
+      this.eth.once('connect', onConnect)
     })
   }
   

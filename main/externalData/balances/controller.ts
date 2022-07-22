@@ -5,6 +5,8 @@ import { EventEmitter } from 'stream'
 
 import { CurrencyBalance, TokenBalance } from './scan'
 
+const BOOTSTRAP_TIMEOUT_SECONDS = 30
+
 interface WorkerMessage {
   type: string
 }
@@ -34,10 +36,18 @@ export default class BalancesWorkerController extends EventEmitter {
 
     log.info('created balances worker, pid:', this.worker.pid)
 
+    // restart the worker if no ready event is received within a reasonable time frame
+    const bootstrapTimeout = setTimeout(() => {
+      log.warn(`Balances worker with pid ${this.worker.pid} did not report as ready after ${BOOTSTRAP_TIMEOUT_SECONDS} seconds, killing worker`)
+      this.stopWorker()
+    }, BOOTSTRAP_TIMEOUT_SECONDS * 1000)
+
     this.worker.on('message', (message: WorkerMessage) => {
       log.debug(`balances controller received message: ${JSON.stringify(message)}`)
 
       if (message.type === 'ready') {
+        clearTimeout(bootstrapTimeout)
+
         log.info(`balances worker ready, pid: ${this.worker.pid}`)
 
         this.heartbeat = setInterval(() => this.sendHeartbeat(), 1000 * 20)
