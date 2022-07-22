@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/electron'
-import type { Event } from '@sentry/types'
+import type { Event } from '@sentry/electron'
 
 import store from '../store'
 
