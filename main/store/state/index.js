@@ -240,7 +240,7 @@ const initial = {
           idchain: 'wss://idchain.one/ws/'
         },
         100: {
-          poa: 'https://dai.poa.network'
+          poa: 'https://rpc.gnosischain.com/'
         },
         137: {
           infura: 'https://polygon-mainnet.infura.io/v3/786ade30f36244469480aa5c2bf0743b'
@@ -388,8 +388,8 @@ const initial = {
           type: 'ethereum',
           layer: 'sidechain',
           symbol: 'xDAI',
-          name: 'xDai',
-          explorer: 'https://blockscout.com/poa/xdai',
+          name: 'Gnosis',
+          explorer: 'https://blockscout.com/xdai/mainnet',
           gas: {
             price: {
               selected: 'standard',
