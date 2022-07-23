@@ -258,7 +258,7 @@ class FrameAccount {
 
       this.addRequiredApproval(
         req,
-        hexToNumber(amount) === 0 ? ApprovalType.TokenSpendRevocation : ApprovalType.TokenSpendApproval,
+        new BigNumber(amount).isZero() ? ApprovalType.TokenSpendRevocation : ApprovalType.TokenSpendApproval,
         {
           decimals,
           name,
