@@ -94,7 +94,11 @@ export default class TokenLoader {
         resolve()
       }
 
-      const connectTimeout = setTimeout(() => finishLoading(), 10 * 1000)
+      const connectTimeout = setTimeout(() => {
+        log.warn('Token loader could not connect to provider, using default list')
+        finishLoading()
+      }, 10 * 1000)
+
       const onConnect = startLoading.bind(this)
 
       if (this.eth.connected) return startLoading()
