@@ -42,19 +42,20 @@ class _RequestItem extends React.Component {
         key={req.handlerId}
         className={headerMode ? 'requestItem requestItemHeader' : 'requestItem cardShow' }
         onClick={() => {
-          console.log('req', req)
-          if (req.type === 'transaction') {
-            const aux = {
-              type: 'gas',
-              height: 100,
-              data: {
-                chain: req.data.chainId
-              }
-            }
-            this.props.setAccountView('requestView', { account, req, i, aux })
-          } else {
-            this.props.setAccountView('requestView', { account, req, i })
-          }
+          this.props.setAccountView('requestView', { account, req, i })
+          // console.log('req', req)
+          // if (req.type === 'transaction') {
+          //   const aux = {
+          //     type: 'gas',
+          //     height: 100,
+          //     data: {
+          //       chain: req.data.chainId
+          //     }
+          //   }
+          //   this.props.setAccountView('requestView', { account, req, i, aux })
+          // } else {
+            
+          // }
         }}
       >
         <div className='requestItemTitle'>

@@ -59,6 +59,7 @@ class TxFee extends React.Component {
     return (
       <div className='_txFee'>
         <div className='_txFeeInner'>
+          <div className='_txLabel'>Fee</div>
           <div className='_txFeeValues'>
             <div className='_txFeeGwei' onClick={() => {
               this.props.overlayMode('fee')
@@ -104,7 +105,6 @@ class TxFee extends React.Component {
               </div>
             )}
           </div>
-          <div className='_txLabel'>Fee</div>
         </div>
       </div>
     )

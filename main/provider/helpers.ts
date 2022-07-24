@@ -193,6 +193,79 @@ export function getActiveChains () {
     .filter(chain => chain.on)
     .map(chain => chain.id)
     .sort((a, b) => a - b)
+}
+
+export function getActiveChainsFull () {
+  const chains: Record<string, Network> = store('main.networks.ethereum') || {}
+  
+  return Object.values(chains)
+    .filter(chain => chain.on)
+    .sort((a, b) => a.id - b.id)
+    .map(chain => {
+      return ({
+        chainId: intToHex(chain.id),
+        name: chain.name,
+        network: '',
+        nativeCurrency: {
+          name: "Ether",
+          symbol: "ETH",
+          decimals: 18
+        },
+        shortName: '',
+        icon: ''
+      })
+    })
+
+    // return 
+    // {
+    //   "name": "Ethereum Mainnet",
+    //   "chain": "ETH",
+    //   "network": "mainnet",
+    //   "nativeCurrency": {
+    //     "name": "Ether",
+    //     "symbol": "ETH",
+    //     "decimals": 18
+    //   },
+    //   "shortName": "eth",
+    //   "chainId": 1,
+    //   "networkId": 1,
+    //   "icon": “{url}”
+    // }
+    
+
+    // {
+    //   id: 42161,
+    //   type: 'ethereum',
+    //   layer: 'rollup',
+    //   symbol: 'aETH',
+    //   name: 'Arbitrum',
+    //   explorer: 'https://explorer.arbitrum.io',
+    //   gas: { price: { selected: 'standard', levels: [Object] } },
+    //   connection: {
+    //     primary: {
+    //       on: true,
+    //       current: 'infura',
+    //       status: 'connected',
+    //       connected: true,
+    //       type: '',
+    //       network: '42161',
+    //       custom: ''
+    //     },
+    //     secondary: {
+    //       on: false,
+    //       current: 'custom',
+    //       status: 'loading',
+    //       connected: false,
+    //       type: '',
+    //       network: '',
+    //       custom: ''
+    //     }
+    //   },
+    //   on: true,
+    //   primaryRpc: 'Primary Endpoint',
+    //   secondaryRpc: 'Secondary Endpoint'
+    // }
+
 }  
 
 export function getActiveChainDetails () {

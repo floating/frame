@@ -344,20 +344,22 @@ class FrameAccount {
         const reqData = Object.assign({}, req)
         delete reqData.res
 
-        // TODO: Encapsulate this logic somewhere else
-        if (reqData.type === 'transaction') {
-          const aux = {
-            type: 'gas',
-            height: 100,
-            data: {
-              chain: req.data.chainId
-            }
-          }
+        store.navPanel({ view: 'requestView', data: { account, req: reqData } })
 
-          store.navPanel({ view: 'requestView', data: { account, req: reqData, aux } })
-        } else {
-          store.navPanel({ view: 'requestView', data: { account, req: reqData } })
-        }
+        // TODO: Encapsulate this logic somewhere else
+        // if (reqData.type === 'transaction') {
+        //   const aux = {
+        //     type: 'gas',
+        //     height: 100,
+        //     data: {
+        //       chain: req.data.chainId
+        //     }
+        //   }
+
+        //   store.navPanel({ view: 'requestView', data: { account, req: reqData, aux } })
+        // } else {
+        //   store.navPanel({ view: 'requestView', data: { account, req: reqData } })
+        // }
       }
     }
     // Add a filter to make sure we're adding the request to an account that controls the outcome

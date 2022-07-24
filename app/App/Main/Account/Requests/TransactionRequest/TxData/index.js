@@ -20,25 +20,28 @@ class txData extends React.Component {
     return (
       <div className='_txData'>
         <div className='_txDataInner'>
+          <div className='_txLabel'>
+            Action
+          </div>
           <div className='_txDataValue' onClick={() => {
             this.props.overlayMode('data')
           }}>
            {req.data.data && req.data.data !== '0x' && req.data.data !== '0x0' ? (
               req.decodedData && req.decodedData.method ? (
                 <>
-                  <span>{'Sending Data: '}</span>
                   <span className={'_txDataValueMethod'}>{(() => {
                     if (req.decodedData.method.length > 17) return `${req.decodedData.method.substr(0, 15)}..`
                     return req.decodedData.method
+                  })()}</span>
+                  <span className={'_txTag'}>{(() => {
+                    if (req.decodedData.contractName.length > 11) return `${req.decodedData.contractName.substr(0, 9)}..`
+                    return req.decodedData.contractName
                   })()}</span>
                 </>
                ) : (
                 <span>{'Sending Data!'}</span>
               )
             ) : 'No Data'}
-          </div>
-          <div className='_txLabel'>
-            Data
           </div>
         </div>
       </div>

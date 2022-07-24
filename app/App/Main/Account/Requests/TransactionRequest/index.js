@@ -142,6 +142,22 @@ class TransactionRequest extends React.Component {
     this.setState({ allowOtherChain: true })
   }
 
+  renderStep () {
+    const { accountId, handlerId, step } = this.props
+    const req = this.store('main.accounts', accountId, 'requests', handlerId)
+    if (step === 'confirmChain') {
+      return 'confirmChain'
+    } else if (step === 'approvals') {
+      return 'approvals'
+    } else if (step === 'confirmTx') {
+      return 'confirmTx'
+    } else if (step === 'sign') {
+      return 'sign'
+    } else {
+      return 'monitor'
+    }
+  }
+
   render () {
     const { accountId, handlerId } = this.props
     const req = this.store('main.accounts', accountId, 'requests', handlerId)
@@ -253,6 +269,7 @@ class TransactionRequest extends React.Component {
     return (
       <div key={req.handlerId} className={requestClass}>
         <TxOverlay {...this.props} overlay={this.state.overlayMode} overlayMode={this.overlayMode.bind(this)}/>
+        {this.renderStep()}
         {req.type === 'transaction' ? (
           <div className='approveTransaction'>
             {!!requiredApproval ? (
