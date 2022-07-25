@@ -39,7 +39,7 @@ function mergeTokens (existingTokens: Token[], updatedTokens: TokenSpec[]) {
 
 export default class TokenLoader {
   private tokenList: Token[] = []
-  private loader?: NodeJS.Timeout | null
+  private nextLoad?: NodeJS.Timeout | null
 
   private readonly eth = ethProvider('frame', { name: 'tokenLoader' })
   private readonly nebula = nebulaApi(this.eth)
@@ -54,58 +54,60 @@ export default class TokenLoader {
     )
   }
 
-  private async loadTokenList () {
-    const updatedTokens = await this.frameTokenList()
+  private async loadTokenList (timeout = 60_000) {
+    try {
+      const updatedTokens = await this.fetchTokenList(timeout)
 
-    this.tokenList = mergeTokens(this.tokenList, updatedTokens)
-  
-    log.info(`updated token list to contain ${this.tokenList.length} tokens`)
+      log.info(`Fetched ${updatedTokens.length} tokens`)
+
+      this.tokenList = mergeTokens(this.tokenList, updatedTokens)
+
+      log.info(`Updated token list to contain ${this.tokenList.length} tokens`)
+
+      this.nextLoad = setTimeout(() => this.loadTokenList(), 10 * 60_000)
+    } catch (e) {
+      log.warn('Could not fetch token list', e)
+      this.nextLoad = setTimeout(() => this.loadTokenList(), 30_000)
+    }
   }
 
-  private async frameTokenList () {
-    log.verbose('loading tokens from tokens.frame.eth')
+  private async fetchTokenList (timeout: number) {
+    log.verbose(`Fetching tokens from ${TOKENS_ENS_DOMAIN}`)
 
-    return new Promise<TokenSpec[]>(async resolve => {
+    return new Promise<TokenSpec[]>(async (resolve, reject) => {
       const requestTimeout = setTimeout(() => {
-        log.warn(`Timeout loading token list from ${TOKENS_ENS_DOMAIN}`)
-        resolve([])
-      }, 8 * 1000)
+        reject(`Timeout fetching token list from ${TOKENS_ENS_DOMAIN}`)
+      }, timeout)
 
       try {
         const tokenListRecord = await this.nebula.resolve(TOKENS_ENS_DOMAIN)
         const tokenManifest: { tokens: TokenSpec[] } = await this.nebula.ipfs.getJson(tokenListRecord.record.content)
-
-        clearTimeout(requestTimeout)
-
         const tokens = tokenManifest.tokens
-
-        log.info(`loaded ${tokens.length} tokens from ${TOKENS_ENS_DOMAIN}`)
 
         resolve(tokens)
       } catch (e) {
-        log.warn(`Could not load token list from ${TOKENS_ENS_DOMAIN}`, e)
-
+        reject(e)
+      } finally {
         clearTimeout(requestTimeout)
-        resolve([])
       }
     })
   }
 
   async start () {
-    log.verbose('starting token loader')
+    log.verbose('Starting token loader')
 
     return new Promise<void>(resolve => {
       const startLoading = async () => {
         clearTimeout(connectTimeout)
 
-        await this.loadTokenList()
+        // use a lower timeout for the first load
+        await this.loadTokenList(8000)
 
         finishLoading()
       }
 
       const finishLoading = () => {
         this.eth.off('connect', onConnect)
-        this.loader = setInterval(() => this.loadTokenList(), 1000 * 60 * 10)
         resolve()
       }
 
@@ -123,9 +125,9 @@ export default class TokenLoader {
   }
   
   stop () {
-    if (this.loader) {
-      clearInterval(this.loader)
-      this.loader = null
+    if (this.nextLoad) {
+      clearInterval(this.nextLoad)
+      this.nextLoad = null
     }
   }
 
