@@ -23,34 +23,45 @@ class TxRecipient extends React.Component {
     const ensName = (req.recipient && req.recipient.length < 25) ? req.recipient : ''
 
     return (
-      <div className='_txRecipient'>
-        <div className='_txRecipientInner'>
+      <div className='_txMain' style={{ animationDelay: (0.1 * this.props.i) + 's' }}>
+        <div className='_txMainInner'>
           <div className='_txLabel'>
             Recipient
           </div>
-          {address ? (
-            <div className='_txRecipientSlice _txRecipientValue'>
-              {ensName
-                ? <span>{ensName}</span>
-                : <span>{address.substring(0, 6)}{svg.octicon('kebab-horizontal', { height: 15 })}{address.substring(address.length - 4)}</span>
-              }
-              {req.decodedData && req.decodedData.contractName ? ( 
-                <span className={'_txRecipientContract'}>{(() => {
-                  if (req.decodedData.contractName.length > 11) return `${req.decodedData.contractName.substr(0, 9)}..`
-                  return req.decodedData.contractName
-                })()}</span>
-              ) : null}
-              <div className='_txRecipientFull' onClick={() => {
-                this.copyAddress(address)
-              }}>
-                {this.state.copied ? 'Address Copied' : address}
+          <div className='_txMainValues'>
+            {address ? (
+              <div className='_txMainSlice _txMainValue'>
+                {ensName
+                  ? <span>{ensName}</span>
+                  : <span>{address.substring(0, 6)}{svg.octicon('kebab-horizontal', { height: 15 })}{address.substring(address.length - 4)}</span>
+                }
+                {req.decodedData && req.decodedData.contractName ? ( 
+                  <span className={'_txRecipientContract'}>{(() => {
+                    if (req.decodedData.contractName.length > 11) return `${req.decodedData.contractName.substr(0, 9)}..`
+                    return req.decodedData.contractName
+                  })()}</span>
+                ) : null}
+                <div className='_txRecipientFull' onClick={() => {
+                  this.copyAddress(address)
+                }}>
+                  {this.state.copied ? (
+                    <span>{'Address Copied'}</span>
+                  ) : (
+                    <span className='_txRecipientFira'>{address}</span>
+                  )}
+                </div>
               </div>
-            </div>
-          ) : (
-            <div className='_txRecipientSlice _txRecipientValue'>
-              Deploying Contract
-            </div>
-          )}
+            ) : (
+              <div className='_txRecipientSlice _txRecipientValue'>
+                Deploying Contract
+              </div>
+            )}
+            {address ? (
+              <div className='_txMainTag'>
+                {'External account on mainnet'}
+              </div>
+            ) : null}
+          </div>
         </div>
       </div>
     )

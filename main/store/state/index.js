@@ -38,6 +38,17 @@ const main = (path, def) => {
 }
 
 const initial = {
+  windows: {
+    panel: {
+      show: false,
+      nav: []
+    },
+    dash: {
+      show: false,
+      nav: []
+    },
+    frames: []
+  },
   panel: { // Panel view
     showing: false,
     nav: [],

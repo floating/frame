@@ -600,6 +600,42 @@ module.exports = {
       return newNav
     })
   },
+  navForward: (u, windowId, crumb) => {
+    if (!windowId || !crumb) return log.warn('Invalid nav forward', window, crumb)
+    u('windows', windowId, 'nav', nav => {
+      if (JSON.stringify(nav[0]) !== JSON.stringify(crumb)) nav.unshift(crumb)      
+      return nav
+    })
+    u('windows', window, 'showing', () => true)
+  },
+  navBack: (u, windowId) => {
+    if (!window || !op) return log.warn('Invalid nav back', window)
+    u('windows', windowId, 'nav', nav => {
+      nav.shift()
+      return nav
+    })
+  },
+  navBackReq: (u, windowId, reqId) => {
+
+  },
+  nav: (u, window, op, crumb) => {
+    if (!window || !op) return log.warn('Invalid nav', window, op)
+    const win = store('windows', window)
+    if (win) {
+      if (op === 'forward') {
+        u('windows', window, 'nav', nav => {
+          if (JSON.stringify(nav[0]) !== JSON.stringify(crumb)) nav.unshift(crumb)      
+          return nav
+        })
+        u('windows', window, 'showing', () => true)
+      } else if (op === 'back') {
+        u('windows', window, 'nav', nav => {
+          nav.shift()
+          return nav
+        })
+      }
+    }
+  },
   navDash: (u, navItem) => {
     u('dash.nav', nav => {
       if (JSON.stringify(nav[0]) !== JSON.stringify(navItem)) nav.unshift(navItem)      

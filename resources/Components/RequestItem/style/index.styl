@@ -12,7 +12,6 @@
   pointer-events none
 
 .requestItem
-  margin 0px 0px 7px 0px
   border-radius 12px
   background var(--ghostA)
   box-shadow 0px 4px 8px var(--ghostY)
@@ -38,28 +37,24 @@
     letter-spacing 3px
     border-bottom-left-radius 12px
     border-bottom-right-radius 12px
-    height 20px
+    display none
+    padding 8px 0px 0px 0px
     color var(--moon)
 
   .requestItemDetailsSlide
-    position absolute
-    top 0
-    bottom 8px
-    left 10px
-    right 10px
+    width 100%
     background var(--ghostA)
-    background linear-gradient(90deg, var(--ghostB), var(--ghostC))
     // background linear-gradient(90deg, var(--ghostA), var(--ghostB))
-    padding-left 48px
+    padding-left 73px
     border-radius 6px
     // box-shadow 0px 2px 4px var(--ghostY)
 
   .requestItemDetailsIndicator
     position absolute
     height 4px
-    width 33px
+    width 60px
     border-radius 2px
-    top 4px
+    top 12px
     left 5px
     background var(--moon)
     z-index 4
@@ -123,7 +118,7 @@
     display flex
     justify-content flex-start
     align-items center
-    height 64px
+    padding 8px 0px
     font-size 14px
     font-weight 600
 

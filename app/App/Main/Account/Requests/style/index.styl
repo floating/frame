@@ -394,8 +394,6 @@
   tranform translateZ(0)
   display flex
   flex-direction column
-  box-shadow 0px 4px 8px var(--ghostX)
-  // background var(--ghostA)
   padding-bottom 64px
 
   .requestMeta
@@ -1107,12 +1105,9 @@
   padding 20px
 
 .requestApprove
-  position relative
   width 100%
-  padding 0px 6px
   box-sizing border-box
-  height 53px
-  margin-top 24px
+  height 58px
   font-size 14px
   text-transform uppercase
   -webkit-app-region no-drag
@@ -1122,7 +1117,9 @@
   justify-content space-around
   align-items center
   font-weight 400
-  margin-bottom 24px
+  z-index 30000000
+  margin-top 16px
+  margin-bottom 20px
 
   .requestApproveFeeBlock
     position absolute
@@ -1181,7 +1178,7 @@
     padding-left 2px
     padding-bottom 10px
     cursor pointer
-    // box-shadow 0px 4px 8px var(--ghostY)
+    box-shadow 0px 4px 4px var(--ghostY)
 
     *
       pointer-events none
@@ -1194,7 +1191,7 @@
     border-radius 2px
     width 30px
     background var(--bad)
-    bottom 11px
+    bottom 16px
 
   .requestDeclineButton:hover:before
     background var(--badOver)
@@ -1203,6 +1200,7 @@
     position relative
     width 50%
     height 100%
+
     // overflow hidden
 
   .requestSignButton
@@ -1219,6 +1217,7 @@
     letter-spacing 2px
     padding-left 2px
     padding-bottom 10px
+    box-shadow 0px 4px 4px var(--ghostY)
     // box-shadow 0px 4px 8px var(--ghostY)
 
   // .requestSignButton:hover
@@ -1232,7 +1231,7 @@
     border-radius 2px
     width 30px
     background var(--good)
-    bottom 11px
+    bottom 16px
     // transition var(--standardFaster)
 
   .requestSignButton:hover:before

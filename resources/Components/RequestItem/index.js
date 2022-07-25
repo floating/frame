@@ -4,7 +4,7 @@ import Restore from 'react-restore'
 import RingIcon from '../../../resources/Components/RingIcon'
 // import chainMeta from '../../../../../resources/chainMeta'
 
-// import link from '../../../../../resources/link'
+import link from '../../../resources/link'
 import svg from '../../../resources/svg'
 
 class _RequestItem extends React.Component {
@@ -42,7 +42,18 @@ class _RequestItem extends React.Component {
         key={req.handlerId}
         className={headerMode ? 'requestItem requestItemHeader' : 'requestItem cardShow' }
         onClick={() => {
-          this.props.setAccountView('requestView', { account, req, i })
+          const crumb = { 
+            view: 'requestView', 
+            data: { 
+              step: 'confirmChain', 
+              account, 
+              req, 
+              i 
+            } 
+          }
+          link.send('tray:action', 'navPanel', crumb)
+          // this.props.setAccountView('requestView', { account, req, i })
+          
           // console.log('req', req)
           // if (req.type === 'transaction') {
           //   const aux = {
@@ -58,6 +69,12 @@ class _RequestItem extends React.Component {
           // }
         }}
       >
+        <div className='requestItemDetails'>
+          <div className='requestItemDetailsSlide'>
+            <div className='requestItemDetailsIndicator' />
+            {req.status || 'pending'}
+          </div>
+        </div>
         <div className='requestItemTitle'>
           <div className='requestItemIcon'>
             <RingIcon 
@@ -108,12 +125,6 @@ class _RequestItem extends React.Component {
               </div>
             </div>
           )}
-        </div>
-        <div className='requestItemDetails'>
-          <div className='requestItemDetailsSlide'>
-            <div className='requestItemDetailsIndicator' />
-            {req.status || 'pending'}
-          </div>
         </div>
       </div>
     )

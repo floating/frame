@@ -269,7 +269,7 @@ class TransactionRequest extends React.Component {
     return (
       <div key={req.handlerId} className={requestClass}>
         <TxOverlay {...this.props} overlay={this.state.overlayMode} overlayMode={this.overlayMode.bind(this)}/>
-        {this.renderStep()}
+        {/* {this.renderStep()} */}
         {req.type === 'transaction' ? (
           <div className='approveTransaction'>
             {!!requiredApproval ? (
@@ -451,7 +451,6 @@ class TransactionRequest extends React.Component {
                     title={chainName + ' Transaction'}
                     color={chainMeta[hexId] ? chainMeta[hexId].primaryColor : ''}
                     img={chainMeta[hexId] ? chainMeta[hexId].icon : ''}
-                    setAccountView={() => {}}
                     headerMode={true}
                   />
                   {txMeta.replacement ? (
@@ -465,11 +464,14 @@ class TransactionRequest extends React.Component {
                       </div>
                     )
                   ) : null}
+                  <div className='_txDescription'>
+                    {'Sending ETH'}
+                  </div>
                   <div className='_txBody'>
-                    <TxRecipient {...this.props} />
-                    <TxMain {...this.props} chain={this.chain}/>
-                    <TxData {...this.props} overlayMode={this.overlayMode.bind(this)} />
-                    <TxFeeNew {...this.props} chain={this.chain} overlayMode={this.overlayMode.bind(this)} />
+                    <TxRecipient i={1} {...this.props} />
+                    <TxMain i={2} {...this.props} chain={this.chain}/>
+                    <TxData i={3} {...this.props} overlayMode={this.overlayMode.bind(this)} />
+                    <TxFeeNew i={4} {...this.props} chain={this.chain} overlayMode={this.overlayMode.bind(this)} />
                   </div>
                   {!notice ? (
                     <div className='requestApprove'>

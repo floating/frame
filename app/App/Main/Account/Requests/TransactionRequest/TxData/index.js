@@ -18,17 +18,17 @@ class txData extends React.Component {
   render () {
     const req = this.props.req
     return (
-      <div className='_txData'>
-        <div className='_txDataInner'>
+      <div className='_txMain' style={{ animationDelay: (0.1 * this.props.i) + 's' }}>
+        <div className='_txMainInner'>
           <div className='_txLabel'>
-            Action
+            Data
           </div>
-          <div className='_txDataValue' onClick={() => {
+          <div className='_txMainValues' onClick={() => {
             this.props.overlayMode('data')
           }}>
            {req.data.data && req.data.data !== '0x' && req.data.data !== '0x0' ? (
               req.decodedData && req.decodedData.method ? (
-                <>
+                <div className='_txMainValue'>
                   <span className={'_txDataValueMethod'}>{(() => {
                     if (req.decodedData.method.length > 17) return `${req.decodedData.method.substr(0, 15)}..`
                     return req.decodedData.method
@@ -37,11 +37,17 @@ class txData extends React.Component {
                     if (req.decodedData.contractName.length > 11) return `${req.decodedData.contractName.substr(0, 9)}..`
                     return req.decodedData.contractName
                   })()}</span>
-                </>
+                </div>
                ) : (
-                <span>{'Sending Data!'}</span>
+                <div className='_txMainValue'>
+                  {'Sending Data!'}
+                </div>
               )
-            ) : 'No Data'}
+            ) : (
+              <div className='_txMainTag'>
+                {'No Data Included'}
+              </div>
+            )}
           </div>
         </div>
       </div>

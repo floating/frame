@@ -173,7 +173,6 @@ class _AccountModule extends React.Component {
             id === 'requests' ? <Requests 
               _id={id}
               id={account}
-              setAccountView={(view, data) => link.send('tray:action', 'navPanel', { view, data })}
               addresses={this.props.addresses} 
               minimized={this.props.minimized} 
               status={this.props.status} 
@@ -358,6 +357,34 @@ function isHardwareSigner (account = {}) {
   return ['ledger', 'lattice', 'trezor'].includes(account.lastSignerType)
 }
 
+class _ConfirmChain extends React.Component {
+  constructor (...args) {
+    super(...args)
+    this.state = {
+    }
+  } 
+  render () {
+    const { data } = this.props
+    return (
+      <div onClick={() => {
+        const crumb = { 
+          view: 'requestView', 
+          data: { 
+            ...data,
+            step: ''
+          } 
+        }
+        console.log('tray:action', 'navPanel', crumb)
+        link.send('tray:action', 'navPanel', crumb)
+      }}>
+        {'CONFIRM CHAIN'}
+      </div>
+    )
+  }
+}
+
+const ConfirmChain = Restore.connect(_ConfirmChain)
+
 class _AccountBody extends React.Component {
   constructor (...args) {
     super(...args)
@@ -365,18 +392,32 @@ class _AccountBody extends React.Component {
       view: 'request'
     }
   } 
-  renderRequest (req, i) {
+  renderRequest (req, data) {
     const activeAccount =  this.store('main.accounts', this.props.id)
     const signingDelay = isHardwareSigner(activeAccount) ? 200 : 1500
 
     if (req.type === 'transaction') {
+      if (data.step === 'confirmChain') {
+        return (
+          <ConfirmChain 
+            account={this.props.id}
+            req={req}
+            data={data}
+          />
+        )
+      }
+
+      if (data.step === 'approvals') {
+        return 'Approvals'
+      } 
+
       return (
         <TransactionRequest 
           key={req.handlerId}
           req={req}
           handlerId={req.handlerId}
           accountId={this.props.id}
-          signingDelay={signingDelay} 
+          signingDelay={signingDelay}
         />
       )
     } else if (req.type === 'access') {
@@ -437,25 +478,25 @@ class _AccountBody extends React.Component {
       let accountViewTitle, accountViewIcon
       if (req.type === 'access') {
         accountViewTitle = 'Account Access'
-        accountViewIcon = svg.accounts(17)
+        // accountViewIcon = svg.accounts(17)
       } else if (req.type === 'sign') {
         accountViewTitle = 'Sign Message'
-        accountViewIcon = svg.sign(17)
+        // accountViewIcon = svg.sign(17)
       } else if (req.type === 'signTypedData') {
         accountViewTitle = 'Sign Data'
-        accountViewIcon = svg.sign(17)
+        // accountViewIcon = svg.sign(17)
       } else if (req.type === 'addChain') { 
         accountViewTitle = 'Add Chain'
-        accountViewIcon = svg.chain(17)
+        // accountViewIcon = svg.chain(17)
       } else if (req.type === 'switchChain') {
         accountViewTitle = 'Switch Chain'
-        accountViewIcon = svg.chain(17)
+        // accountViewIcon = svg.chain(17)
       } else if (req.type === 'addToken')  {
         accountViewTitle = 'Add Token'
-        accountViewIcon = svg.tokens(17)
+        // accountViewIcon = svg.tokens(17)
       } else if (req.type === 'transaction')  {
         accountViewTitle = 'Sign Transaction'
-        accountViewIcon = svg.broadcast(17)
+        // accountViewIcon = svg.broadcast(17)
       }
       return (
         <AccountView 
@@ -466,7 +507,7 @@ class _AccountBody extends React.Component {
           accountViewTitle={accountViewTitle}
           accountViewIcon={accountViewIcon}
         >
-          {this.renderRequest(req, i)}
+          {this.renderRequest(req, data)}
         </AccountView>
       )
     } else if (view === 'expandedModule') {

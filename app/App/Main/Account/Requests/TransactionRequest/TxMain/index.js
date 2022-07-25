@@ -27,20 +27,24 @@ class TxRecipient extends React.Component {
     const value = this.hexToDisplayValue(req.data.value || '0x')
     const currentSymbol = this.store('main.networks', this.props.chain.type, this.props.chain.id, 'symbol') || '?'
     return (
-      <div className='_txMain'>
+      <div className='_txMain' style={{ animationDelay: (0.1 * this.props.i) + 's' }}>
         <div className='_txMainInner'>
           <div className='_txLabel'>
-            Sending
+            Transferring
           </div>
           <div className='_txMainValues'>
-            <div className='_txMainValue'>
-              <span className='_txMainValueSymbol'>{currentSymbol}</span>
-              <span className='_txMainValueAmount'>{value}</span>
-            </div>
-            <div className='_txMainValue'>
-              <span className='_txMainValueEq'>{'≈'}</span>
-              <span className='_txMainValueEqSymbol'>{'$'}</span>
-              <span className='_txMainValueEqAmount'>{(value * etherUSD).toFixed(2)}</span>
+            <div className='_txMainTransferring'>
+              <div className='_txMainTransferringPart _txMainTransferringPartHighlight'>
+                <span className='_txMainTransferringSymbol'>{currentSymbol}</span>
+              </div>
+              <div className='_txMainTransferringPart'>
+                <span className='_txMainTransferringAmount'>{value}</span>
+              </div>
+              <div className='_txMainTransferringPart _txMainTransferringPartHighlight'>
+                <span className='_txMainTransferringEq'>{'≈'}</span>
+                <span className='_txMainTransferringEqSymbol'>{'$'}</span>
+                <span className='_txMainTransferringEqAmount'>{(value * etherUSD).toFixed(2)}</span>
+              </div>
             </div>
           </div>
         </div>
