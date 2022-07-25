@@ -5,7 +5,7 @@ import { EventEmitter } from 'stream'
 
 import { CurrencyBalance, TokenBalance } from './scan'
 
-const BOOTSTRAP_TIMEOUT_SECONDS = 30
+const BOOTSTRAP_TIMEOUT_SECONDS = 20
 
 interface WorkerMessage {
   type: string

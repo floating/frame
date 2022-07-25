@@ -89,13 +89,17 @@ async function chainBalanceScan (address: string, chains?: number[]) {
   }
 }
 
+function disconnect () {
+  process.disconnect()
+  process.kill(process.pid, 'SIGHUP')
+}
+
 function resetHeartbeat () {
   clearTimeout(heartbeat)
 
   heartbeat = setTimeout(() => {
     log.warn('no heartbeat received in 60 seconds, worker exiting')
-    process.disconnect()
-    process.kill(process.pid, 'SIGHUP')
+    disconnect()
   }, 60 * 1000)
 }
 

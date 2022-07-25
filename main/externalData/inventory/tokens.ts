@@ -43,6 +43,9 @@ export default class TokenLoader {
   private readonly nebula = nebulaApi(this.eth)
 
   constructor () {
+    // token resolution uses mainnet ENS
+    this.eth.setChain('0x1')
+
     this.tokenList = mergeTokens(
       sushiswapTokenList.tokens as Token[],
       defaultTokenList.tokens as TokenSpec[]
@@ -51,29 +54,39 @@ export default class TokenLoader {
 
   private async loadTokenList () {
     const updatedTokens = await this.frameTokenList()
-  
+
     this.tokenList = mergeTokens(this.tokenList, updatedTokens)
   
     log.info(`updated token list to contain ${this.tokenList.length} tokens`)
   }
 
-  async frameTokenList () {
+  private async frameTokenList () {
     log.verbose('loading tokens from tokens.frame.eth')
 
-    try {
-      const tokenListRecord = await this.nebula.resolve('tokens.frame.eth')
-      const tokenManifest: { tokens: TokenSpec[] } = await this.nebula.ipfs.getJson(tokenListRecord.record.content)
+    return new Promise<TokenSpec[]>(async resolve => {
+      const requestTimeout = setTimeout(() => {
+        log.warn('Timeout loading token list from tokens.frame.eth')
+        resolve([])
+      }, 8 * 1000)
 
-      const tokens = tokenManifest.tokens
+      try {
+        const tokenListRecord = await this.nebula.resolve('tokens.frame.eth')
+        const tokenManifest: { tokens: TokenSpec[] } = await this.nebula.ipfs.getJson(tokenListRecord.record.content)
 
-      log.info(`loaded ${tokens.length} tokens from tokens.frame.eth`)
+        clearTimeout(requestTimeout)
 
-      return tokens
-    } catch (e) {
-      log.warn('Could not load token list from tokens.frame.eth, using default list', e)
-    }
+        const tokens = tokenManifest.tokens
 
-    return []
+        log.info(`loaded ${tokens.length} tokens from tokens.frame.eth`)
+
+        resolve(tokens)
+      } catch (e) {
+        log.warn('Could not load token list from tokens.frame.eth', e)
+
+        clearTimeout(requestTimeout)
+        resolve([])
+      }
+    })
   }
 
   async start () {
@@ -97,7 +110,7 @@ export default class TokenLoader {
       const connectTimeout = setTimeout(() => {
         log.warn('Token loader could not connect to provider, using default list')
         finishLoading()
-      }, 10 * 1000)
+      }, 5 * 1000)
 
       const onConnect = startLoading.bind(this)
 
