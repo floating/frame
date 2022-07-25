@@ -25,7 +25,7 @@ afterAll(() => {
 let tokenLoader, mockEthProvider
 
 beforeEach(() => {
-  mockEthProvider = { connected: true, once: jest.fn(), off: jest.fn() }
+  mockEthProvider = { connected: true, setChain: jest.fn(), once: jest.fn(), off: jest.fn() }
   tokenLoader = new TokenLoader()
 })
 

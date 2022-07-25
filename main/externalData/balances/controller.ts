@@ -5,7 +5,7 @@ import { EventEmitter } from 'stream'
 
 import { CurrencyBalance, TokenBalance } from './scan'
 
-const BOOTSTRAP_TIMEOUT_SECONDS = 30
+const BOOTSTRAP_TIMEOUT_SECONDS = 20
 
 interface WorkerMessage {
   type: string
@@ -26,6 +26,7 @@ interface ChainBalanceMessage extends Omit<WorkerMessage, 'type'> {
 export default class BalancesWorkerController extends EventEmitter {
   private readonly worker: ChildProcess
 
+  private bootstrapTimeout?: NodeJS.Timeout
   private heartbeat?: NodeJS.Timeout
 
   constructor () {
@@ -37,7 +38,7 @@ export default class BalancesWorkerController extends EventEmitter {
     log.info('created balances worker, pid:', this.worker.pid)
 
     // restart the worker if no ready event is received within a reasonable time frame
-    const bootstrapTimeout = setTimeout(() => {
+    this.bootstrapTimeout = setTimeout(() => {
       log.warn(`Balances worker with pid ${this.worker.pid} did not report as ready after ${BOOTSTRAP_TIMEOUT_SECONDS} seconds, killing worker`)
       this.stopWorker()
     }, BOOTSTRAP_TIMEOUT_SECONDS * 1000)
@@ -46,7 +47,7 @@ export default class BalancesWorkerController extends EventEmitter {
       log.debug(`balances controller received message: ${JSON.stringify(message)}`)
 
       if (message.type === 'ready') {
-        clearTimeout(bootstrapTimeout)
+        this.clearBootstrapTimeout()
 
         log.info(`balances worker ready, pid: ${this.worker.pid}`)
 
@@ -115,6 +116,8 @@ export default class BalancesWorkerController extends EventEmitter {
       this.heartbeat = undefined
     }
 
+    this.clearBootstrapTimeout()
+
     this.worker.kill('SIGTERM')
   }
 
@@ -140,5 +143,12 @@ export default class BalancesWorkerController extends EventEmitter {
 
   private sendHeartbeat () {
     this.sendCommandToWorker('heartbeat')
+  }
+
+  private clearBootstrapTimeout () {
+    if (this.bootstrapTimeout) {
+      clearTimeout(this.bootstrapTimeout)
+      this.bootstrapTimeout = undefined
+    }
   }
 }

@@ -21,6 +21,11 @@ let balances: BalanceLoader
 const eth = ethProvider('frame', { name: 'scanWorker' })
 const tokenLoader = new TokenLoader()
 
+eth.on('error', e => {
+  log.error('Error in balances worker', e)
+  disconnect()
+})
+
 eth.on('connect', async () => {
   await tokenLoader.start()
 
@@ -89,13 +94,17 @@ async function chainBalanceScan (address: string, chains?: number[]) {
   }
 }
 
+function disconnect () {
+  process.disconnect()
+  process.kill(process.pid, 'SIGHUP')
+}
+
 function resetHeartbeat () {
   clearTimeout(heartbeat)
 
   heartbeat = setTimeout(() => {
     log.warn('no heartbeat received in 60 seconds, worker exiting')
-    process.disconnect()
-    process.kill(process.pid, 'SIGHUP')
+    disconnect()
   }, 60 * 1000)
 }
 
