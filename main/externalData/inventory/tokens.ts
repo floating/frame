@@ -6,6 +6,8 @@ import nebulaApi from '../../nebula'
 import defaultTokenList from './default-tokens.json'
 import sushiswapTokenList from '@sushiswap/default-token-list'
 
+const TOKENS_ENS_DOMAIN = 'tokens.frame.eth'
+
 interface TokenSpec extends Token {
   extensions: {
     omit: boolean
@@ -65,23 +67,23 @@ export default class TokenLoader {
 
     return new Promise<TokenSpec[]>(async resolve => {
       const requestTimeout = setTimeout(() => {
-        log.warn('Timeout loading token list from tokens.frame.eth')
+        log.warn(`Timeout loading token list from ${TOKENS_ENS_DOMAIN}`)
         resolve([])
       }, 8 * 1000)
 
       try {
-        const tokenListRecord = await this.nebula.resolve('tokens.frame.eth')
+        const tokenListRecord = await this.nebula.resolve(TOKENS_ENS_DOMAIN)
         const tokenManifest: { tokens: TokenSpec[] } = await this.nebula.ipfs.getJson(tokenListRecord.record.content)
 
         clearTimeout(requestTimeout)
 
         const tokens = tokenManifest.tokens
 
-        log.info(`loaded ${tokens.length} tokens from tokens.frame.eth`)
+        log.info(`loaded ${tokens.length} tokens from ${TOKENS_ENS_DOMAIN}`)
 
         resolve(tokens)
       } catch (e) {
-        log.warn('Could not load token list from tokens.frame.eth', e)
+        log.warn(`Could not load token list from ${TOKENS_ENS_DOMAIN}`, e)
 
         clearTimeout(requestTimeout)
         resolve([])
