@@ -21,6 +21,11 @@ let balances: BalanceLoader
 const eth = ethProvider('frame', { name: 'scanWorker' })
 const tokenLoader = new TokenLoader()
 
+eth.on('error', e => {
+  log.error('Error in balances worker', e)
+  disconnect()
+})
+
 eth.on('connect', async () => {
   await tokenLoader.start()
 
