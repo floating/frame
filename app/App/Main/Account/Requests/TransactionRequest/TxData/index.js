@@ -26,21 +26,23 @@ class txData extends React.Component {
           <div className='_txMainValues' onClick={() => {
             this.props.overlayMode('data')
           }}>
-           {req.data.data && req.data.data !== '0x' && req.data.data !== '0x0' ? (
+            {req.data.data && req.data.data !== '0x' && req.data.data !== '0x0' ? (
               req.decodedData && req.decodedData.method ? (
                 <div className='_txMainValue'>
                   <span className={'_txDataValueMethod'}>{(() => {
                     if (req.decodedData.method.length > 17) return `${req.decodedData.method.substr(0, 15)}..`
                     return req.decodedData.method
                   })()}</span>
-                  <span className={'_txTag'}>{(() => {
+                  <span>{'via'}</span>
+                  <span className={'_txDataValueMethod'}>{(() => {
                     if (req.decodedData.contractName.length > 11) return `${req.decodedData.contractName.substr(0, 9)}..`
                     return req.decodedData.contractName
                   })()}</span>
+                  <span>{'contract'}</span>
                 </div>
                ) : (
                 <div className='_txMainValue'>
-                  {'Sending Data!'}
+                  {'Unknown data present'}
                 </div>
               )
             ) : (
@@ -48,6 +50,11 @@ class txData extends React.Component {
                 {'No Data Included'}
               </div>
             )}
+            {req.data.data && req.data.data !== '0x' && req.data.data !== '0x0' ? (
+              <div className='_txMainTag _txMainTagWarning'>
+                {'Sending Data!'}
+              </div>
+            ) : null}
           </div>
         </div>
       </div>

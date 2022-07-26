@@ -478,15 +478,16 @@ class TransactionRequest extends React.Component {
                         {req.data.data && req.data.data !== '0x' && req.data.data !== '0x0' ? (
                           req.decodedData && req.decodedData.method ? (
                             <div className='_txMainValue'>
-                              <span className={'_txDataValueMethod'}>{(() => {
+                              <span className={''}>{(() => {
                                 if (req.decodedData.method.length > 17) return `${req.decodedData.method.substr(0, 15)}..`
                                 return req.decodedData.method
                               })()}</span>
                               <span>{'via'}</span>
-                              <span className={'_txTag'}>{(() => {
+                              <span className={''}>{(() => {
                                 if (req.decodedData.contractName.length > 11) return `${req.decodedData.contractName.substr(0, 9)}..`
                                 return req.decodedData.contractName
                               })()}</span>
+                              <span>{'contract'}</span>
                             </div>
                           ) : (
                             <div>{'taking unknown action via unknown contract'}</div>
@@ -498,10 +499,10 @@ class TransactionRequest extends React.Component {
                   </div>
 
                   <div className='_txBody'>
-                    <TxRecipient i={1} {...this.props} />
-                    <TxMain i={2} {...this.props} chain={this.chain}/>
-                    <TxData i={3} {...this.props} overlayMode={this.overlayMode.bind(this)} />
-                    <TxFeeNew i={4} {...this.props} chain={this.chain} overlayMode={this.overlayMode.bind(this)} />
+                    <TxRecipient i={1} {...this.props} req={req} />
+                    <TxMain i={2} {...this.props} req={req} chain={this.chain}/>
+                    <TxData i={3} {...this.props} req={req} />
+                    <TxFeeNew i={4} {...this.props} req={req} chain={this.chain} />
                   </div>
                   {!notice ? (
                     <div className='requestApprove'>
