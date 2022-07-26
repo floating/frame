@@ -580,8 +580,6 @@ class TransactionRequest extends React.Component {
     } else {
       return step
     }
-
-    
   }
 }
 

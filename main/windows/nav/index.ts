@@ -1,4 +1,4 @@
-// Listeners and helpers to manage navigation states for each window
+// Manage navigation states for each window
 
 import { ipcMain } from 'electron'
 
@@ -10,16 +10,17 @@ interface Crumb {
 
 const nav = {
   forward: (windowId: string, crumb: Crumb) => {
-    if (windowId === 'panel') {
-      store.navForward('panel', crumb)
-    } else if (windowId === 'dash') {
-      store.navDash(crumb)
-    }
+    // Adds new crumb to nav array
+    store.navForward(windowId, crumb)
   },
   back: (windowId: string) => {
+    // Removes last crumb from nav array
     store.navBack(windowId)
   },
   update: (windowId: string, crumb: Crumb, navigate: boolean = true) => {
+    // Updated last crumb in nav array with new data
+    // Replaces last crumb when navigate is false
+    // Adds new crumb to nav array when navigate is true
     store.navUpdate(windowId, crumb, navigate)
   }
 }
