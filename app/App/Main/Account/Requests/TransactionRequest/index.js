@@ -458,7 +458,7 @@ class TransactionRequest extends React.Component {
                     )
                   ) : null}
                   <div className='_txDescription'>
-                    {false ? ( // Recipient is account
+                    {false ? ( // TODO: Add account type discovery to tx request flow
                       <>
                         {req.data.value && req.data.value !== '0x' && req.data.value !== '0x0' ? (
                           <div>{'Sending ETH'}</div>
@@ -573,7 +573,6 @@ class TransactionRequest extends React.Component {
   render () {
     const { accountId, handlerId, step } = this.props
     const req = this.store('main.accounts', accountId, 'requests', handlerId)
-    console.log('')
     if (step === 'adjustFee') {
       return this.renderAdjustFee()
     } else if (step === 'confirm') {
