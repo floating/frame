@@ -30,17 +30,17 @@ class TxRecipient extends React.Component {
           </div>
           <div className='_txMainValues'>
             {address ? (
-              <div className='_txMainSlice _txMainValue'>
+              <div className='_txMainValue'>
                 {ensName
-                  ? <span>{ensName}</span>
-                  : <span>{address.substring(0, 6)}{svg.octicon('kebab-horizontal', { height: 15 })}{address.substring(address.length - 4)}</span>
+                  ? <span className='_txRecipient'>{ensName}</span>
+                  : <span className='_txRecipient'>{address.substring(0, 6)}{svg.octicon('kebab-horizontal', { height: 15 })}{address.substring(address.length - 4)}</span>
                 }
-                {req.decodedData && req.decodedData.contractName ? ( 
+                {/* {req.decodedData && req.decodedData.contractName ? ( 
                   <span className={'_txDataValueMethod'}>{(() => {
                     if (req.decodedData.contractName.length > 11) return `${req.decodedData.contractName.substr(0, 9)}..`
                     return req.decodedData.contractName
                   })()}</span>
-                ) : null}
+                ) : null} */}
                 <div className='_txRecipientFull' onClick={() => {
                   this.copyAddress(address)
                 }}>
@@ -56,11 +56,15 @@ class TxRecipient extends React.Component {
                 Deploying Contract
               </div>
             )}
-            {address ? (
+            {req.decodedData && req.decodedData.contractName ? (
               <div className='_txMainTag'>
-                {'External account on mainnet'}
+                {`${req.decodedData.contractName} contract on mainnet`}
               </div>
-            ) : null}
+            ) : (
+              <div className='_txMainTag'>
+                {'external account on mainnet'}
+              </div>
+            )}
           </div>
         </div>
       </div>
