@@ -258,7 +258,7 @@ class _AccountMain extends React.Component {
   // }
   
   expandModule (data) {
-    link.send('tray:action', 'navPanel', { view: 'expandedModule', data })
+    link.send('nav:forward', 'panel', { view: 'expandedModule', ...data })
   }
   render () {
     const accountModules = this.store('panel.account.modules')

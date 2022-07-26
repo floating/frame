@@ -347,21 +347,6 @@ class FrameAccount {
 
         const crumb = { view: 'requestView', step: 'confirm', account, req: reqData }
         nav.forward('panel', crumb)
-
-        // TODO: Encapsulate this logic somewhere else
-        // if (reqData.type === 'transaction') {
-        //   const aux = {
-        //     type: 'gas',
-        //     height: 100,
-        //     data: {
-        //       chain: req.data.chainId
-        //     }
-        //   }
-
-        //   store.navPanel({ view: 'requestView', data: { account, req: reqData, aux } })
-        // } else {
-        //   store.navPanel({ view: 'requestView', data: { account, req: reqData } })
-        // }
       }
     }
     // Add a filter to make sure we're adding the request to an account that controls the outcome
