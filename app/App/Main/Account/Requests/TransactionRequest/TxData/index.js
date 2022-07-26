@@ -18,27 +18,43 @@ class txData extends React.Component {
   render () {
     const req = this.props.req
     return (
-      <div className='_txData'>
-        <div className='_txDataInner'>
-          <div className='_txDataValue' onClick={() => {
+      <div className='_txMain' style={{ animationDelay: (0.1 * this.props.i) + 's' }}>
+        <div className='_txMainInner'>
+          <div className='_txLabel'>
+            Data
+          </div>
+          <div className='_txMainValues' onClick={() => {
             this.props.overlayMode('data')
           }}>
-           {req.data.data && req.data.data !== '0x' && req.data.data !== '0x0' ? (
+            {req.data.data && req.data.data !== '0x' && req.data.data !== '0x0' ? (
               req.decodedData && req.decodedData.method ? (
-                <>
-                  <span>{'Sending Data: '}</span>
+                <div className='_txMainValue'>
                   <span className={'_txDataValueMethod'}>{(() => {
                     if (req.decodedData.method.length > 17) return `${req.decodedData.method.substr(0, 15)}..`
                     return req.decodedData.method
                   })()}</span>
-                </>
+                  <span>{'via'}</span>
+                  <span className={'_txDataValueMethod'}>{(() => {
+                    if (req.decodedData.contractName.length > 11) return `${req.decodedData.contractName.substr(0, 9)}..`
+                    return req.decodedData.contractName
+                  })()}</span>
+                  <span>{'contract'}</span>
+                </div>
                ) : (
-                <span>{'Sending Data!'}</span>
+                <div className='_txMainValue'>
+                  {'Unknown data present'}
+                </div>
               )
-            ) : 'No Data'}
-          </div>
-          <div className='_txLabel'>
-            Data
+            ) : (
+              <div className='_txMainTag'>
+                {'No Data Included'}
+              </div>
+            )}
+            {req.data.data && req.data.data !== '0x' && req.data.data !== '0x0' ? (
+              <div className='_txMainTag _txMainTagWarning'>
+                {'Sending Data!'}
+              </div>
+            ) : null}
           </div>
         </div>
       </div>

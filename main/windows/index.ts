@@ -17,6 +17,7 @@ const openedAtLogin = app && app.getLoginItemSettings() && app.getLoginItemSetti
 const windows: Windows = {}
 const showOnReady = true
 const trayWidth = 380
+const devHeight = 800
 
 let tray: Tray
 let dash: Dash
@@ -236,8 +237,8 @@ class Tray {
     windows.tray.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
     windows.tray.setResizable(false) // Keeps height consistent
     const area = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
-    windows.tray.setMinimumSize(trayWidth, isDev && !fullheight ? 740 : area.height)
-    windows.tray.setSize(trayWidth, isDev && !fullheight ? 740 : area.height)
+    windows.tray.setMinimumSize(trayWidth, isDev && !fullheight ? devHeight : area.height)
+    windows.tray.setSize(trayWidth, isDev && !fullheight ? devHeight : area.height)
     const pos = topRight(windows.tray)
     windows.tray.setPosition(pos.x, pos.y)
     if (!glide) {
@@ -285,7 +286,7 @@ class Dash {
       windows.dash.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
       windows.dash.setResizable(false) // Keeps height consistent
       const area = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
-      windows.dash.setSize(trayWidth, isDev && !fullheight ? 740 : area.height)
+      windows.dash.setSize(trayWidth, isDev && !fullheight ? devHeight : area.height)
       const {x, y} = topRight(windows.dash)
       windows.dash.setPosition(x - trayWidth - 5, y)
       windows.dash.show()

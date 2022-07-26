@@ -1,58 +1,132 @@
 ._txMain
   position relative
-  width calc(100% - 12px)
+  width calc(100%)
   z-index 100001
   background var(--ghostA)
-  margin 6px
-  border-radius 8px
-  padding 12px 0px 16px 0px
-  
+  margin 16px 0px 16px 0px
+  border-radius 14px
+  padding 5px 0px 5px 0px
+  animation-name puffIn
+  animation-duration 0.2s
+  animation-fill-mode both
+  overflow hidden
+  box-shadow 0px 4px 5px var(--ghostY)
+
   ._txMainInner
+    margin 0px 5px
+    
     ._txMainValues
       font-size 17px
       font-weight 400
-      display flex
-      justify-content center
-      align-items center
-      border-radius 8px
-      display flex
-      justify-content center
-      align-items center
+      border-radius 10px
       -webkit-app-region no-drag
       transition none
       pointer-events auto
       transform translate3d(0, 0, 0)
       font-family 'Exo2'
+      overflow hidden
+      padding 0px 5px 5px 5px
+      background var(--ghostZ)
 
       svg
         position relative
         top -0px
         padding 0px 3px 0px 4px
 
-      ._txMainValue
-        border-radius 8px
+      ._txMainTransferring
+        margin-top 5px
+        display flex
+        justify-content center
+        align-items stretch
+        border-radius 6px
+        overflow hidden
+        font-weight 400
+
+        ._txMainTransferringPart
+          flex-grow 1
+          display flex
+          justify-content center
+          align-items center
+          border-radius 6px
+          padding 7px 0px
+          background var(--ghostA)
+          margin-right 5px
+
+        ._txMainTransferringPart:last-child
+          margin-right 0px
+
+        ._txMainTransferringPartLarge
+          flex-grow 2
+          
+      ._txMainTransferringSymbol
+        font-size 14px
+        font-weight 600
+        margin-right 5px
+
+      ._txMainTransferringAmount
         font-size 20px
-        font-weight 200
+        position relative
+        top -1px
+
+      ._txMainTransferringEq
+        font-size 15px
+        margin-left 4px
+
+      ._txMainTransferringEqSymbol
+        font-size 12px
+
+      ._txMainTransferringEqAmount
+        font-size 14px
+
+      ._txMainValue
+        font-size 14px
+        font-weight 500
         display flex
         justify-content center
         align-items center
+        border-radius 8px
+        -webkit-app-region no-drag
+        transition none
+        pointer-events auto
+        transform translate3d(0, 0, 0)
+        font-family 'Exo2'
+        padding 8px
+        background var(--ghostA)
+        margin-top 5px
 
-        ._txMainValueSymbol
-          padding 0px 0px 0px 10px
-          font-size 13px
-          font-weight 600
+        svg
+          position relative
+          top -0px
+          padding 0px 3px 0px 4px
 
-        ._txMainValueAmount
-          padding 0px 5px 0px 5px
+  ._txMainTag
+    position relative
+    z-index 100001
+    animation-name puffIn
+    animation-duration 0.2s
+    animation-fill-mode both
+    overflow hidden
+    font-size 10px
+    font-weight 600
+    text-transform uppercase
+    letter-spacing 1px
+    text-align center
+    padding 5px 0px 0px 0px
 
-        ._txMainValueEq
-          padding 0px 10px 0px 6px
-          font-size 15px
+._txContinueButton
+  margin-top 64px
+  background var(--ghostA)
+  border-radius 14px
+  height 60px
+  cursor pointer
+  display flex
+  justify-content center
+  align-items center
+  text-transform uppercase
+  font-family 'Exo2'
+  letter-spacing 2px
+  font-weight 600
+  font-size 14px
 
-        ._txMainValueEqSymbol
-          padding 2px 2px 0px 0px
-          font-size 12px
-
-        ._txMainValueEqAmount
-          padding 0px 0px 0px 0px
-          font-size 14px
+._txContinueButton:hover
+  background var(--ghostB)

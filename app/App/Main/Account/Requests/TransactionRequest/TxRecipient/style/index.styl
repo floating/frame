@@ -1,74 +1,49 @@
-._txRecipient
+._txRecipientContract
+  margin-left 16px
+  color var(--red)
+  font-size 13px
   position relative
-  width calc(100% - 12px)
-  z-index 100001
-  background var(--ghostA)
-  margin 6px
+  top 0px
+  font-weight 600
+
+._txRecipient
+  font-size 18px
+  margin-right 6px
+
+._txRecipientFull
+  position absolute 
+  top 0
+  left 0
+  bottom 0
+  right 0
+  display flex
+  justify-content center
+  align-items center
+  z-index 40000
   border-radius 8px
-  padding 12px 0px 16px 0px
-  
-  ._txRecipientInner
-
-    ._txRecipientValue
-      font-size 17px
-      font-weight 400
-      display flex
-      justify-content center
-      align-items center
-      border-radius 8px
-      display flex
-      justify-content center
-      align-items center
-      -webkit-app-region no-drag
-      transition none
-      pointer-events auto
-      transform translate3d(0, 0, 0)
-      font-family 'Exo2'
-
-      svg
-        position relative
-        top -0px
-        padding 0px 3px 0px 4px
-
-    ._txRecipientContract
-      margin-left 6px
-      color var(--moon)
-      font-size 13px
-      position relative
-      top 0px
-      font-weight 600
-
-    ._txRecipientFull
-      position absolute 
-      top 0
-      left 0
-      bottom 0
-      right 0
-      padding-top 3px
-      display flex
-      justify-content center
-      align-items center
-      font-size 11.5px 
-      z-index 40000
-      border-radius 8px
-      font-family FiraCode, monospace
-      background var(--ghostB)
-      opacity 0
-      font-weight 600
-      transition var(--standard)
-
-    ._txRecipientFull:hover
-      opacity 1
-      transform translateX(0px) scale(1)
-      cursor pointer      
-
-
-    // ._txRecipientFull:active
-    //   animation-name shake-little
-    //   animation-duration 2s
-    //   animation-timing-function: ease-in-out
-    //   animation-iteration-count: infinite
-
-._txRecipient:hover
-  z-index 1000001
   background var(--ghostB)
+  opacity 0
+  box-shadow 0px 4px 4px var(--ghostZ)
+
+  ._txRecipientFira
+    position relative
+    top 1.5px
+    left 1px
+    font-size 12px 
+    font-weight 600
+    font-family FiraCode, monospace
+
+._txRecipientFull:hover
+  opacity 1
+  transform translateX(0px) scale(1)
+  cursor pointer      
+
+  // ._txRecipientFull:active
+  //   animation-name shake-little
+  //   animation-duration 2s
+  //   animation-timing-function: ease-in-out
+  //   animation-iteration-count: infinite
+
+// ._txRecipient:hover
+//   z-index 1000001
+//   background var(--ghostB)

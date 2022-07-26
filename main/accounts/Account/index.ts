@@ -8,6 +8,7 @@ import { decodeContractCall } from '../../contracts'
 import nebulaApi from '../../nebula'
 import signers from '../../signers'
 import windows from '../../windows'
+import nav from '../../windows/nav'
 import store from '../../store'
 import { Aragon } from '../aragon'
 import { TransactionData } from '../../../resources/domain/transaction'
@@ -337,27 +338,15 @@ class FrameAccount {
       const accountOpen = store('selected.current') === account
 
       // Does the current panel nav include a 'requestView'
-      const panelNav = store('panel.nav') || []
+      const panelNav = store('windows.panel.nav') || []
       const inRequestView = panelNav.map((crumb: any) => crumb.view).includes('requestView')
 
       if (accountOpen && !inRequestView) {
         const reqData = Object.assign({}, req)
         delete reqData.res
 
-        // TODO: Encapsulate this logic somewhere else
-        if (reqData.type === 'transaction') {
-          const aux = {
-            type: 'gas',
-            height: 100,
-            data: {
-              chain: req.data.chainId
-            }
-          }
-
-          store.navPanel({ view: 'requestView', data: { account, req: reqData, aux } })
-        } else {
-          store.navPanel({ view: 'requestView', data: { account, req: reqData } })
-        }
+        const crumb = { view: 'requestView', step: 'confirm', account, req: reqData }
+        nav.forward('panel', crumb)
       }
     }
     // Add a filter to make sure we're adding the request to an account that controls the outcome

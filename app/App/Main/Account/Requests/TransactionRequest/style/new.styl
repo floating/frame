@@ -1,9 +1,9 @@
 ._txButton
   background var(--ghostB)
-  border-radius 9px
+  border-radius 14px
   transform translateY(0px)
   cursor pointer
-  box-shadow 0px 4px 8px var(--ghostZ)
+  box-shadow 0px 4px 4px var(--ghostZ)
 
   *
     pointer-events none
@@ -13,7 +13,7 @@
   // padding 0px 10px
   background var(--good)
   color var(--goodOver)
-  box-shadow 0px 10px 40px -5px var(--ghostZ)
+  box-shadow 0px 10px 20px -5px var(--ghostZ)
   animation 5s shake ease-in-out infinite alternate
 
 ._txButtonBad:hover
@@ -178,6 +178,25 @@
 
 ._txBody
   background var(--ghostZ)
-  width calc(100% - 12px)
+  width calc(100%)
   margin 0px 6px
   border-radius 12px
+
+._txDescription
+  width 100%
+  background var(--ghostY)
+  padding 30px 0px
+  margin-top 8px
+  border-radius 12px
+  text-align center
+  animation-name puffIn
+  animation-duration 0.2s
+  font-family 'Exo2'
+  font-size 16px
+  font-weight 600
+  display flex
+  justify-content center
+  align-items center
+  flex-direction column
+
+@import '../AdjustFee/style'

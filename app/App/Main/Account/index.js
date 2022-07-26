@@ -173,7 +173,6 @@ class _AccountModule extends React.Component {
             id === 'requests' ? <Requests 
               _id={id}
               id={account}
-              setAccountView={(view, data) => link.send('tray:action', 'navPanel', { view, data })}
               addresses={this.props.addresses} 
               minimized={this.props.minimized} 
               status={this.props.status} 
@@ -259,7 +258,7 @@ class _AccountMain extends React.Component {
   // }
   
   expandModule (data) {
-    link.send('tray:action', 'navPanel', { view: 'expandedModule', data })
+    link.send('nav:forward', 'panel', { view: 'expandedModule', ...data })
   }
   render () {
     const accountModules = this.store('panel.account.modules')
@@ -358,6 +357,7 @@ function isHardwareSigner (account = {}) {
   return ['ledger', 'lattice', 'trezor'].includes(account.lastSignerType)
 }
 
+
 class _AccountBody extends React.Component {
   constructor (...args) {
     super(...args)
@@ -365,7 +365,7 @@ class _AccountBody extends React.Component {
       view: 'request'
     }
   } 
-  renderRequest (req, i) {
+  renderRequest (req, data) {
     const activeAccount =  this.store('main.accounts', this.props.id)
     const signingDelay = isHardwareSigner(activeAccount) ? 200 : 1500
 
@@ -374,9 +374,10 @@ class _AccountBody extends React.Component {
         <TransactionRequest 
           key={req.handlerId}
           req={req}
+          step={data.step}
           handlerId={req.handlerId}
           accountId={this.props.id}
-          signingDelay={signingDelay} 
+          signingDelay={signingDelay}
         />
       )
     } else if (req.type === 'access') {
@@ -431,49 +432,49 @@ class _AccountBody extends React.Component {
     }
   }
   render () {
-    const { view = '', data = {} } = this.store('panel.nav')[0] || {}
-    if (view === 'requestView') {
-      const { req, i } = data
+    const crumb = this.store('windows.panel.nav')[0] || {}
+    if (crumb.view === 'requestView') {
+      const { req, i } = crumb
       let accountViewTitle, accountViewIcon
       if (req.type === 'access') {
         accountViewTitle = 'Account Access'
-        accountViewIcon = svg.accounts(17)
+        // accountViewIcon = svg.accounts(17)
       } else if (req.type === 'sign') {
         accountViewTitle = 'Sign Message'
-        accountViewIcon = svg.sign(17)
+        // accountViewIcon = svg.sign(17)
       } else if (req.type === 'signTypedData') {
         accountViewTitle = 'Sign Data'
-        accountViewIcon = svg.sign(17)
+        // accountViewIcon = svg.sign(17)
       } else if (req.type === 'addChain') { 
         accountViewTitle = 'Add Chain'
-        accountViewIcon = svg.chain(17)
+        // accountViewIcon = svg.chain(17)
       } else if (req.type === 'switchChain') {
         accountViewTitle = 'Switch Chain'
-        accountViewIcon = svg.chain(17)
+        // accountViewIcon = svg.chain(17)
       } else if (req.type === 'addToken')  {
         accountViewTitle = 'Add Token'
-        accountViewIcon = svg.tokens(17)
+        // accountViewIcon = svg.tokens(17)
       } else if (req.type === 'transaction')  {
         accountViewTitle = 'Sign Transaction'
-        accountViewIcon = svg.broadcast(17)
+        // accountViewIcon = svg.broadcast(17)
       }
       return (
         <AccountView 
           back={() => {
-            link.send('tray:action', 'backPanel', { view, data })
+            link.send('nav:back', 'panel')
           }}
           {...this.props}
           accountViewTitle={accountViewTitle}
           accountViewIcon={accountViewIcon}
         >
-          {this.renderRequest(req, i)}
+          {this.renderRequest(req, crumb)}
         </AccountView>
       )
-    } else if (view === 'expandedModule') {
+    } else if (crumb.view === 'expandedModule') {
       return (
         <AccountView 
           back={() => {
-            link.send('tray:action', 'backPanel')
+            link.send('nav:back', 'panel')
           }}
           {...this.props}
           accountViewTitle={data.id}

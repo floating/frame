@@ -600,6 +600,36 @@ module.exports = {
       return newNav
     })
   },
+  navForward: (u, windowId, crumb) => {
+    if (!windowId || !crumb) return log.warn('Invalid nav forward', windowId, crumb)
+    u('windows', windowId, 'nav', nav => {
+      if (JSON.stringify(nav[0]) !== JSON.stringify(crumb)) nav.unshift(crumb)      
+      return nav
+    })
+    u('windows', windowId, 'showing', () => true)
+  },
+  navUpdate: (u, windowId, crumb, navigate) => {
+    if (!windowId || !crumb) return log.warn('Invalid nav forward', windowId, crumb)
+    u('windows', windowId, 'nav', nav => {
+      const updatedNav = Object.assign({}, nav[0], crumb)
+      if (JSON.stringify(nav[0]) !== JSON.stringify(updatedNav)) {
+        if (navigate) {
+          nav.unshift(updatedNav)
+        } else {
+          nav[0] = updatedNav
+        }
+      }    
+      return nav
+    })
+    if (navigate) u('windows', windowId, 'showing', () => true)
+  },
+  navBack: (u, windowId) => {
+    if (!windowId) return log.warn('Invalid nav back', windowId)
+    u('windows', windowId, 'nav', nav => {
+      nav.shift()
+      return nav
+    })
+  },
   navDash: (u, navItem) => {
     u('dash.nav', nav => {
       if (JSON.stringify(nav[0]) !== JSON.stringify(navItem)) nav.unshift(navItem)      

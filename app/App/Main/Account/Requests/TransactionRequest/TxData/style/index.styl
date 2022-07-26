@@ -3,61 +3,57 @@
   font-size 10px
   text-transform uppercase
   font-family 'Exo2'
-  padding 4px 0px 0px 0px
-  letter-spacing 2px
+  padding 2px 0px 6px 12px
+  letter-spacing 1px
+
+._txDataValue
+  font-size 17px
+  font-weight 400
   display flex
   justify-content center
   align-items center
+  border-radius 6px
+  display flex
+  justify-content center
+  align-items center
+  -webkit-app-region no-drag
+  transition none
+  pointer-events auto
+  transform translate3d(0, 0, 0)
+  font-family 'Exo2'
+  padding 8px
+  background var(--ghostZ)
+
+  svg
+    position relative
+    top -0px
+    padding 0px 3px 0px 4px
+
+  span
+    word-spacing 0px
+
+  svg
+    position relative
+    top -2px
+    padding 0px 0px
+
+._txDataValue:hover
+  background var(--ghostA)
+  cursor pointer
+
+._txDataValueMethod
+  text-transform uppercase
+  font-size 15px
+  letter-spacing 1px
+  font-weight 600
   color var(--good)
 
-._txData
-  position relative
-  width calc(100% - 12px)
-  z-index 100001
-  background var(--ghostA)
-  margin 6px
-  border-radius 8px
-  padding 12px 0px 16px 0px
-  
-  ._txDataInner
-    border-radius 15px
-    margin 0px 6px
-
-    ._txDataValue
-      font-size 17px
-      font-weight 400
-      display flex
-      justify-content center
-      align-items center
-      border-radius 8px
-      display flex
-      justify-content center
-      align-items center
-      -webkit-app-region no-drag
-      transition none
-      pointer-events auto
-      transform translate3d(0, 0, 0)
-      font-family 'Exo2'
-
-      svg
-        position relative
-        top -0px
-        padding 0px 3px 0px 4px
-
-      span
-        word-spacing 0px
-
-      svg
-        position relative
-        top -2px
-        padding 0px 0px
-
-    ._txDataValue:hover
-      background var(--ghostA)
-      cursor pointer
-
-    ._txDataValueMethod
-      color var(--moon)
+._txDataValueContract
+  text-transform uppercase
+  font-size 15px
+  letter-spacing 1px
+  font-weight 500
+  color var(--moon)
 
 ._txData:hover
   z-index 1000001

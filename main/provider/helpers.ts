@@ -193,6 +193,30 @@ export function getActiveChains () {
     .filter(chain => chain.on)
     .map(chain => chain.id)
     .sort((a, b) => a - b)
+}
+
+export function getActiveChainsFull () {
+  const chains: Record<string, Network> = store('main.networks.ethereum') || {}
+
+  // TODO: Finalize this spec
+  
+  return Object.values(chains)
+    .filter(chain => chain.on)
+    .sort((a, b) => a.id - b.id)
+    .map(chain => {
+      return ({
+        chainId: intToHex(chain.id),
+        name: chain.name,
+        network: '',
+        nativeCurrency: {
+          name: "Ether",
+          symbol: "ETH",
+          decimals: 18
+        },
+        shortName: '',
+        icon: ''
+      })
+    })
 }  
 
 export function getActiveChainDetails () {

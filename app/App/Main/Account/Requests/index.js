@@ -121,7 +121,6 @@ class Requests extends React.Component {
                     title={'Account Access'} 
                     color={'var(--outerspace)'}
                     svgLookup={{ name: 'accounts', size: 16 }}
-                    setAccountView={this.props.setAccountView}
                   />
                 )
               } else if (req.type === 'sign') {
@@ -134,7 +133,6 @@ class Requests extends React.Component {
                     title={'Sign Message'}
                     color={'var(--outerspace)'}
                     svgLookup={{ name: 'sign', size: 16 }}
-                    setAccountView={this.props.setAccountView}
                   />
                 )
               } else if (req.type === 'signTypedData') {
@@ -147,7 +145,6 @@ class Requests extends React.Component {
                     title={'Sign Data'} 
                     color={'var(--outerspace)'}
                     svgLookup={{ name: 'sign', size: 16 }}
-                    setAccountView={this.props.setAccountView}
                   />
                 )
               } else if (req.type === 'addChain') { 
@@ -160,7 +157,6 @@ class Requests extends React.Component {
                     title={'Add Chain'} 
                     color={'var(--outerspace)'}
                     svgLookup={{ name: 'chain', size: 16 }}
-                    setAccountView={this.props.setAccountView}
                   />
                 )
               } else if (req.type === 'switchChain') {
@@ -173,7 +169,6 @@ class Requests extends React.Component {
                     title={'Switch Chain'}
                     color={'var(--outerspace)'}
                     svgLookup={{ name: 'chain', size: 16 }}
-                    setAccountView={this.props.setAccountView}
                   />
                 )
               } else if (req.type === 'addToken')  {
@@ -186,7 +181,6 @@ class Requests extends React.Component {
                     title={'Add Tokens'}
                     color={'var(--outerspace)'}
                     svgLookup={{ name: 'tokens', size: 16 }}
-                    setAccountView={this.props.setAccountView}
                   />
                 )
               } else if (req.type === 'transaction')  {
@@ -204,7 +198,6 @@ class Requests extends React.Component {
                     title={chainName + ' Transaction'}
                     color={chainMeta[hexId] ? chainMeta[hexId].primaryColor : ''}
                     img={chainMeta[hexId] ? chainMeta[hexId].icon : ''}
-                    setAccountView={this.props.setAccountView}
                   />
                 )
               }

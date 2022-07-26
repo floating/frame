@@ -1,156 +1,149 @@
-._txFee
-  position relative
-  width calc(100% - 12px)
-  z-index 100001
-  background var(--ghostA)
-  margin 6px
+._txFeeBar
+  font-size 17px
+  font-weight 400
+  display flex
+  justify-content center
+  align-items center
   border-radius 8px
-  padding 12px 0px 16px 0px
+  display flex
+  justify-content center
+  align-items center
+  -webkit-app-region no-drag
+  transition none
+  pointer-events auto
+  transform translate3d(0, 0, 0)
+  font-family 'Exo2'
+  padding 0px
+  background var(--ghostA)
+  margin-top 5px
+  cursor pointer
 
-  ._txFeeInner
-    border-radius 15px
-    margin 0px 6px
+  *
+    pointer-events none
 
-    ._txFeeValues
-      font-size 17px
-      font-weight 400
-      border-radius 8px
-      display flex
-      justify-content center
-      align-items center
-      // flex-direction column
-      -webkit-app-region no-drag
-      transition none
-      pointer-events auto
-      transform translate3d(0, 0, 0)
-      font-family 'Exo2'
-
-      svg
-        position relative
-        top -0px
-        padding 0px 3px 0px 4px
-      
-    ._txFeeGwei
-      transition var(--standardFaster)
-      cursor pointer
-      transform translateY(0px)
-      padding-top 1px
-      display flex
-      justify-content center
-      align-items center
-      border-right 1px solid var(--outerspace)
-      padding-right 8px
-
-      *
-        pointer-events none
-
-      ._txFeeGweiValue
-        font-family FiraCode, monospace
-        font-size 20px
-        font-weight 600
-        display flex
-        align-items center
-        justify-content center
-        
-      ._txFeeGweiLabel
-        display flex
-        align-items center
-        justify-content center
-        font-family 'Exo2'
-        padding-left 3px
-        font-weight 600
-        font-size 11px
-        text-transform uppercase
-
-    ._txFeeGwei:hover
-      // flex 1
-      // padding 0px 10px
-      // background var(--moon)
-      // color var(--moonOver)
-      background var(--ghostB)
-      // transform translateY(-5px)
-      // box-shadow 0px 20px 30px -5px var(--ghostX)
-      // border-bottom 1px solid var(--goodDark)
-      // animation 4s shake ease-in-out infinite alternate
-
-    ._txFeeGwei:active
-      transform translateY(0px)
-      animation-name shake-little
-      animation-duration 2s
-      animation-timing-function: ease-in-out
-      animation-iteration-count: infinite
-      // box-shadow 0px 5px 8px 0px var(--ghostZ)
-
-    ._txFeeValue
-      position relative
-      display flex
-      align-items center
-      justify-content center
-      font-weight 500
-      font-size 14px
-      margin-left 10px
-
-      ._txFeeValueDefault
-        opacity 1
-        display flex
-        align-items center
-        justify-content center
-
-      ._txFeeValueDefaultWarnr
-        color var(--bad)
-
-      ._txFeeValueHover
-        position absolute
-        opacity 0
-        top 0
-        left 0
-        bottom 0
-        right 0
-        display flex
-        align-items center
-        justify-content center
-
-      ._txFeeETH
-        padding-right 6px
-        opacity 1
-        font-family Exo2
-
-      ._txFeeETHValue
-        padding-right 0px
-
-      ._txFeeUSD
-        font-weight 500
-        position relative
-        font-size 13px
-
-      ._txFeeUSDSymbol
-        font-size 11px
-
-      ._txFeeUSDDescription
-        position relative
-        font-size 11px
-        font-family Exo2
-        padding-left 2px
-
-      ._txFeeEq
-        font-size 15px
-        padding 0px 8px 0px 0px
-        display none
+  svg
+    position relative
+    top -0px
+    padding 0px 3px 0px 4px
 
 
-    ._txFeeValue:hover
-      ._txFeeValueDefault
-        opacity 0
+._txFeeGwei
+  cursor pointer
+  transform translateY(0px)
+  padding-top 1px
+  display flex
+  justify-content center
+  align-items center
+  padding 6px 16px 4px 20px
 
-      ._txFeeValueHover
-        opacity 1
+  *
+    pointer-events none
 
-._txFee:hover
-  z-index 1000001
+  ._txFeeGweiValue
+    font-family FiraCode, monospace
+    font-size 20px
+    font-weight 600
+    display flex
+    align-items center
+    justify-content center
+    
+  ._txFeeGweiLabel
+    display flex
+    align-items center
+    justify-content center
+    font-family 'Exo2'
+    padding-left 4px
+    position relative
+    top -1px
+    font-weight 600
+    font-size 11px
+    text-transform uppercase
 
-      
-      
-      
+._txFeeGwei:hover
+  // flex 1
+  // padding 0px 10px
+  // background var(--moon)
+  // color var(--moonOver)
+  background var(--ghostB)
+  // transform translateY(-5px)
+  // box-shadow 0px 20px 30px -5px var(--ghostX)
+  // border-bottom 1px solid var(--goodDark)
+  // animation 4s shake ease-in-out infinite alternate
+
+._txFeeGwei:active
+  transform translateY(0px)
+  animation-name shake-little
+  animation-duration 2s
+  animation-timing-function: ease-in-out
+  animation-iteration-count: infinite
+  // box-shadow 0px 5px 8px 0px var(--ghostZ)
+
+._txFeeValue
+  position relative
+  display flex
+  align-items center
+  justify-content center
+  font-weight 500
+  font-size 14px
+  margin-left 10px
+
+  ._txFeeValueDefault
+    opacity 1
+    display flex
+    align-items center
+    justify-content center
+
+  ._txFeeValueDefaultWarnr
+    color var(--bad)
+
+  ._txFeeValueHover
+    position absolute
+    opacity 0
+    top 0
+    left 0
+    bottom 0
+    right 0
+    display flex
+    align-items center
+    justify-content center
+
+  ._txFeeETH
+    padding-right 6px
+    opacity 1
+    font-family Exo2
+
+  ._txFeeETHValue
+    padding-right 0px
+
+  ._txFeeUSD
+    font-weight 500
+    position relative
+    font-size 13px
+
+  ._txFeeUSDSymbol
+    font-size 11px
+
+  ._txFeeUSDDescription
+    position relative
+    font-size 11px
+    font-family Exo2
+    padding-left 2px
+
+  ._txFeeEq
+    font-size 15px
+    padding 0px 8px 0px 0px
+    display none
+
+
+._txFeeValue:hover
+  ._txFeeValueDefault
+    opacity 0
+
+  ._txFeeValueHover
+    opacity 1
+
+._txFeeBar:hover
+  background var(--ghostB)      
 
 @keyframes wavey
   0%
