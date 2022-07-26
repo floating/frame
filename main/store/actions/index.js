@@ -624,14 +624,11 @@ module.exports = {
     if (navigate) u('windows', windowId, 'showing', () => true)
   },
   navBack: (u, windowId) => {
-    if (!windowId) return log.warn('Invalid nav back', window)
+    if (!windowId) return log.warn('Invalid nav back', windowId)
     u('windows', windowId, 'nav', nav => {
       nav.shift()
       return nav
     })
-  },
-  navBackReq: (u, windowId, reqId) => {
-
   },
   navDash: (u, navItem) => {
     u('dash.nav', nav => {
