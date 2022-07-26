@@ -357,33 +357,6 @@ function isHardwareSigner (account = {}) {
   return ['ledger', 'lattice', 'trezor'].includes(account.lastSignerType)
 }
 
-class _ConfirmChain extends React.Component {
-  constructor (...args) {
-    super(...args)
-    this.state = {
-    }
-  } 
-  render () {
-    const { data } = this.props
-    return (
-      <div onClick={() => {
-        const crumb = { 
-          view: 'requestView', 
-          data: { 
-            ...data,
-            step: ''
-          } 
-        }
-        console.log('tray:action', 'navPanel', crumb)
-        link.send('tray:action', 'navPanel', crumb)
-      }}>
-        {'CONFIRM CHAIN'}
-      </div>
-    )
-  }
-}
-
-const ConfirmChain = Restore.connect(_ConfirmChain)
 
 class _AccountBody extends React.Component {
   constructor (...args) {
@@ -397,24 +370,11 @@ class _AccountBody extends React.Component {
     const signingDelay = isHardwareSigner(activeAccount) ? 200 : 1500
 
     if (req.type === 'transaction') {
-      if (data.step === 'confirmChain') {
-        return (
-          <ConfirmChain 
-            account={this.props.id}
-            req={req}
-            data={data}
-          />
-        )
-      }
-
-      if (data.step === 'approvals') {
-        return 'Approvals'
-      } 
-
       return (
         <TransactionRequest 
           key={req.handlerId}
           req={req}
+          step={data.step}
           handlerId={req.handlerId}
           accountId={this.props.id}
           signingDelay={signingDelay}
@@ -472,9 +432,9 @@ class _AccountBody extends React.Component {
     }
   }
   render () {
-    const { view = '', data = {} } = this.store('panel.nav')[0] || {}
-    if (view === 'requestView') {
-      const { req, i } = data
+    const crumb = this.store('windows.panel.nav')[0] || {}
+    if (crumb.view === 'requestView') {
+      const { req, i } = crumb
       let accountViewTitle, accountViewIcon
       if (req.type === 'access') {
         accountViewTitle = 'Account Access'
@@ -501,20 +461,20 @@ class _AccountBody extends React.Component {
       return (
         <AccountView 
           back={() => {
-            link.send('tray:action', 'backPanel', { view, data })
+            link.send('nav:back', 'panel')
           }}
           {...this.props}
           accountViewTitle={accountViewTitle}
           accountViewIcon={accountViewIcon}
         >
-          {this.renderRequest(req, data)}
+          {this.renderRequest(req, crumb)}
         </AccountView>
       )
-    } else if (view === 'expandedModule') {
+    } else if (crumb.view === 'expandedModule') {
       return (
         <AccountView 
           back={() => {
-            link.send('tray:action', 'backPanel')
+            link.send('nav:back', 'panel')
           }}
           {...this.props}
           accountViewTitle={data.id}

@@ -5,7 +5,6 @@ import svg from '../../../../../../../resources/svg'
 import link from '../../../../../../../resources/link'
 
 import TxDataOverlay from './TxDataOverlay'
-import TxFeeOverlay from './TxFeeOverlay'
 
 class TxModule extends React.Component {
   constructor (props, context) {

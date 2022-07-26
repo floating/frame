@@ -3,6 +3,7 @@ import Restore from 'react-restore'
 import BigNumber from 'bignumber.js'
 
 import { usesBaseFee } from '../../../../../../../resources/domain/transaction'
+import link from '../../../../../../../resources/link'
 
 const FEE_WARNING_THRESHOLD_USD = 50
 
@@ -62,7 +63,7 @@ class TxFee extends React.Component {
           <div className='_txLabel'>Fee</div>
           <div className='_txMainValues'>
             <div className='_txFeeBar'  onClick={() => {
-                this.props.overlayMode('fee')
+                link.send('nav:update', 'panel', { step: 'adjustFee' })
               }}>
               <div className='_txFeeGwei'>
                 <span className='_txFeeGweiValue'>{this.toDisplayGwei(maxFeePerGas)}</span>

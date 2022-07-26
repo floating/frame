@@ -345,7 +345,7 @@ class FrameAccount {
         const reqData = Object.assign({}, req)
         delete reqData.res
 
-        const crumb = { view: 'requestView', data: { account, req: reqData } }
+        const crumb = { view: 'requestView', step: 'confirm', account, req: reqData }
         nav.forward('panel', crumb)
 
         // TODO: Encapsulate this logic somewhere else

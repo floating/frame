@@ -1,10 +1,10 @@
 import React from 'react'
 import Restore from 'react-restore'
 
-import svg from '../../../../../../../../resources/svg'
-import link from '../../../../../../../../resources/link'
-import { gweiToWei, gweiToWeiHex } from '../../../../../../../../resources/utils'
-import { usesBaseFee } from '../../../../../../../../resources/domain/transaction'
+import svg from '../../../../../../../resources/svg'
+import link from '../../../../../../../resources/link'
+import { gweiToWei, gweiToWeiHex } from '../../../../../../../resources/utils'
+import { usesBaseFee } from '../../../../../../../resources/domain/transaction'
 
 import BigNumber from 'bignumber.js'
 
@@ -354,17 +354,10 @@ class TxFeeOverlay extends React.Component {
       // maxFee = maxFeePerGas.multipliedBy(gasLimit)
       // maxFeeUSD = maxFee.multipliedBy(nativeUSD)
       return (
-        <div className='txOverlay cardShow' ref={this.moduleRef}>
-          <div className='txOverlayTitle'>Adjust Fee</div>
-          <div className='txOverlayClose' onMouseDown={() => overlayMode()}>{svg.octicon('x', { height: 16 })}</div>
-          <div className='txFeeOverlay'>
-            <div className='txFeeOverlayInset'>
-              <div className='txFeeOverlayEstimate'></div>
-              {this.renderBaseFeeInput()}
-              {this.renderPriorityFeeInput()}
-              {this.renderGasLimitInput()}
-            </div>
-          </div>
+        <div className='txAdjustFee cardShow' ref={this.moduleRef}>
+          {this.renderBaseFeeInput()}
+          {this.renderPriorityFeeInput()}
+          {this.renderGasLimitInput()}
         </div>
       )
     } else {
@@ -373,16 +366,9 @@ class TxFeeOverlay extends React.Component {
       // maxFee = maxFeePerGas.multipliedBy(gasLimit)
       // maxFeeUSD = maxFee.shiftedBy(-18).multipliedBy(nativeUSD)
       return (
-        <div className='txOverlay cardShow' ref={this.moduleRef}>
-          <div className='txOverlayTitle'>Adjust Fee</div>
-          <div className='txOverlayClose' onMouseDown={() => overlayMode()}>{svg.octicon('x', { height: 16 })}</div>
-          <div className='txFeeOverlay'>
-            <div className='txFeeOverlayInset'>
-              <div className='txFeeOverlayEstimate'></div>
-              {this.renderGasPriceInput()}
-              {this.renderGasLimitInput()}
-            </div>
-          </div>
+        <div className='txAdjustFee cardShow' ref={this.moduleRef}>
+          {this.renderGasPriceInput()}
+          {this.renderGasLimitInput()}
         </div>
       )
     }

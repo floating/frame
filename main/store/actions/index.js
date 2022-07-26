@@ -606,10 +606,19 @@ module.exports = {
       if (JSON.stringify(nav[0]) !== JSON.stringify(crumb)) nav.unshift(crumb)      
       return nav
     })
-    u('windows', window, 'showing', () => true)
+    u('windows', windowId, 'showing', () => true)
+  },
+  navUpdate: (u, windowId, crumb, navigate) => {
+    if (!windowId || !crumb) return log.warn('Invalid nav forward', window, crumb)
+    u('windows', windowId, 'nav', nav => {
+      const updatedNav = Object.assign({}, nav[0], crumb)
+      if (JSON.stringify(nav[0]) !== JSON.stringify(updatedNav) && navigate) nav.unshift(updatedNav)      
+      return nav
+    })
+    if (navigate) u('windows', windowId, 'showing', () => true)
   },
   navBack: (u, windowId) => {
-    if (!window || !op) return log.warn('Invalid nav back', window)
+    if (!windowId) return log.warn('Invalid nav back', window)
     u('windows', windowId, 'nav', nav => {
       nav.shift()
       return nav

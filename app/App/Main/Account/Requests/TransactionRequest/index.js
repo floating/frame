@@ -20,6 +20,7 @@ import TxFeeNew from './TxFeeNew'
 import TxData from './TxData'
 import TxRecipient from './TxRecipient'
 import TxOverlay from './TxOverlay'
+import AdjustFee from './AdjustFee'
 import TxApproval from './TxApproval'
 
 const FEE_WARNING_THRESHOLD_USD = 50
@@ -142,23 +143,15 @@ class TransactionRequest extends React.Component {
     this.setState({ allowOtherChain: true })
   }
 
-  renderStep () {
+  renderAdjustFee () {
     const { accountId, handlerId, step } = this.props
     const req = this.store('main.accounts', accountId, 'requests', handlerId)
-    if (step === 'confirmChain') {
-      return 'confirmChain'
-    } else if (step === 'approvals') {
-      return 'approvals'
-    } else if (step === 'confirmTx') {
-      return 'confirmTx'
-    } else if (step === 'sign') {
-      return 'sign'
-    } else {
-      return 'monitor'
-    }
+    return (
+      <AdjustFee {...this.props} req={req} />
+    )
   }
 
-  render () {
+  renderTx () {
     const { accountId, handlerId } = this.props
     const req = this.store('main.accounts', accountId, 'requests', handlerId)
     const originalNotice = (req.notice || '').toLowerCase()
@@ -268,7 +261,7 @@ class TransactionRequest extends React.Component {
     const requiredApproval = showWarning && (req.approvals || []).filter(a => !a.approved)[0]
     return (
       <div key={req.handlerId} className={requestClass}>
-        <TxOverlay {...this.props} overlay={this.state.overlayMode} overlayMode={this.overlayMode.bind(this)}/>
+        {/* <TxOverlay {...this.props} overlay={this.state.overlayMode} overlayMode={this.overlayMode.bind(this)}/> */}
         {/* {this.renderStep()} */}
         {req.type === 'transaction' ? (
           <div className='approveTransaction'>
@@ -465,8 +458,45 @@ class TransactionRequest extends React.Component {
                     )
                   ) : null}
                   <div className='_txDescription'>
-                    {'Sending ETH'}
+                    {false ? ( // Recipient is account
+                      <>
+                        {req.data.value && req.data.value !== '0x' && req.data.value !== '0x0' ? (
+                          <div>{'Sending ETH'}</div>
+                        ) : null}
+                        {req.data.data && req.data.data !== '0x' && req.data.data !== '0x0' ? (
+
+                          <div>{'including data in a tx'}</div>
+                        ) : null}
+                        <div>{'to an account'}</div>
+                        <div>{'on Mainnet'}</div>
+                      </>
+                    ) : ( // Recipient is contract
+                      <>
+                        {req.data.value && req.data.value !== '0x' && req.data.value !== '0x0' ? (
+                          <div>{'Sending ETH'}</div>
+                        ) : null}
+                        {req.data.data && req.data.data !== '0x' && req.data.data !== '0x0' ? (
+                          req.decodedData && req.decodedData.method ? (
+                            <div className='_txMainValue'>
+                              <span className={'_txDataValueMethod'}>{(() => {
+                                if (req.decodedData.method.length > 17) return `${req.decodedData.method.substr(0, 15)}..`
+                                return req.decodedData.method
+                              })()}</span>
+                              <span>{'via'}</span>
+                              <span className={'_txTag'}>{(() => {
+                                if (req.decodedData.contractName.length > 11) return `${req.decodedData.contractName.substr(0, 9)}..`
+                                return req.decodedData.contractName
+                              })()}</span>
+                            </div>
+                          ) : (
+                            <div>{'taking unknown action via unknown contract'}</div>
+                          )
+                        ) : null}
+                        <div>{'on Mainnet'}</div>
+                      </>
+                    )}
                   </div>
+
                   <div className='_txBody'>
                     <TxRecipient i={1} {...this.props} />
                     <TxMain i={2} {...this.props} chain={this.chain}/>
@@ -538,6 +568,20 @@ class TransactionRequest extends React.Component {
         )}
       </div>
     )
+  }
+  render () {
+    const { accountId, handlerId, step } = this.props
+    const req = this.store('main.accounts', accountId, 'requests', handlerId)
+    console.log('')
+    if (step === 'adjustFee') {
+      return this.renderAdjustFee()
+    } else if (step === 'confirm') {
+      return this.renderTx()
+    } else {
+      return step
+    }
+
+    
   }
 }
 

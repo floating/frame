@@ -43,15 +43,13 @@ class _RequestItem extends React.Component {
         className={headerMode ? 'requestItem requestItemHeader' : 'requestItem cardShow' }
         onClick={() => {
           const crumb = { 
-            view: 'requestView', 
-            data: { 
-              step: 'confirmChain', 
-              account, 
-              req, 
-              i 
-            } 
+            view: 'requestView',
+            step: 'confirm', 
+            account, 
+            req, 
+            i 
           }
-          link.send('tray:action', 'navPanel', crumb)
+          link.send('nav:forward', 'panel', crumb)
           // this.props.setAccountView('requestView', { account, req, i })
           
           // console.log('req', req)

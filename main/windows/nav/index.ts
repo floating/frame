@@ -5,13 +5,11 @@ import { ipcMain } from 'electron'
 import store from '../../store'
 
 interface Crumb {
-  view: string,
-  data: Object
+  view: string
 }
 
 const nav = {
   forward: (windowId: string, crumb: Crumb) => {
-    console.log('nav forward', windowId, crumb)
     if (windowId === 'panel') {
       store.navForward('panel', crumb)
     } else if (windowId === 'dash') {
@@ -19,8 +17,10 @@ const nav = {
     }
   },
   back: (windowId: string) => {
-    console.log('nav back', windowId)
     store.navBack(windowId)
+  },
+  update: (windowId: string, crumb: Crumb, navigate: boolean = true) => {
+    store.navUpdate(windowId, crumb, navigate)
   }
 }
 
@@ -30,6 +30,10 @@ ipcMain.on('nav:forward', (e, windowId: string, crumb: Crumb) => {
 
 ipcMain.on('nav:back', (e, windowId: string) => {
   nav.back(windowId)
+})
+
+ipcMain.on('nav:update', (e, windowId: string, crumb: Crumb, navigate: boolean) => {
+  nav.update(windowId, crumb, navigate)
 })
 
 export default nav

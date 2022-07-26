@@ -30,17 +30,15 @@ class TxRecipient extends React.Component {
       <div className='_txMain' style={{ animationDelay: (0.1 * this.props.i) + 's' }}>
         <div className='_txMainInner'>
           <div className='_txLabel'>
-            Transferring
+            Sending
           </div>
           <div className='_txMainValues'>
             <div className='_txMainTransferring'>
-              <div className='_txMainTransferringPart _txMainTransferringPartHighlight'>
+              <div className='_txMainTransferringPart _txMainTransferringPartLarge'>
                 <span className='_txMainTransferringSymbol'>{currentSymbol}</span>
-              </div>
-              <div className='_txMainTransferringPart'>
                 <span className='_txMainTransferringAmount'>{value}</span>
               </div>
-              <div className='_txMainTransferringPart _txMainTransferringPartHighlight'>
+              <div className='_txMainTransferringPart'>
                 <span className='_txMainTransferringEq'>{'≈'}</span>
                 <span className='_txMainTransferringEqSymbol'>{'$'}</span>
                 <span className='_txMainTransferringEqAmount'>{(value * etherUSD).toFixed(2)}</span>
