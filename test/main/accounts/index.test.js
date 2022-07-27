@@ -6,6 +6,7 @@ import provider from '../../../main/provider'
 jest.mock('../../../main/provider', () => ({ send: jest.fn(), emit: jest.fn() }))
 jest.mock('../../../main/signers', () => ({ get: jest.fn() }))
 jest.mock('../../../main/windows', () => ({ broadcast: jest.fn(), showTray: jest.fn() }))
+jest.mock('../../../main/windows/nav', () => ({ on: jest.fn(), forward: jest.fn() }))
 jest.mock('../../../main/externalData')
 
 jest.mock('../../../main/store/persist')
