@@ -67,13 +67,13 @@ class TxFeeOverlay extends React.Component {
   //   }
   // }
 
-  componentDidMount () {
-    document.addEventListener('mousedown', this.mouseDetect.bind(this))
-  }
+  // componentDidMount () {
+  //   document.addEventListener('mousedown', this.mouseDetect.bind(this))
+  // }
 
-  componentWillUnmount () {
-    document.removeEventListener('mousedown', this.mouseDetect.bind(this))
-  }
+  // componentWillUnmount () {
+  //   document.removeEventListener('mousedown', this.mouseDetect.bind(this))
+  // }
 
   copyData (data) {
     if (data) {
