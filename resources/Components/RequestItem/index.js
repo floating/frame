@@ -83,8 +83,7 @@ class _RequestItem extends React.Component {
           </div>
           {txNonce ? (
             <div 
-              className='requestMetaNonce' 
-              style={!this.store('main.nonceAdjust') || error || status || mode === 'monitor' ? { pointerEvents: 'none' } : {}}
+              className='requestMetaNonce'
             >
               <div className='txNonceControl'>
                 <div className='txNonceButton txNonceButtonLower' onMouseDown={() => link.send('tray:adjustNonce', req.handlerId, -1)}>
@@ -96,10 +95,9 @@ class _RequestItem extends React.Component {
                 
               </div>
               <div className='txNonceLabel'>Nonce</div>
-              <div className={nonce === 'TBD' || error ? 'txNonceNumber' : 'txNonceNumber'}>
+              <div className={'txNonceNumber'}>
                 {nonce}
               </div>
-              {nonce === 'TBD' || error ? <div className='txNonceMarker' /> : null}
             </div>
           ) : (
             <div className='requestItemTitleTime'>

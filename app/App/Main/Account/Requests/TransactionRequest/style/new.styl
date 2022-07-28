@@ -184,20 +184,36 @@
 
 ._txDescription
   width 100%
-  background var(--ghostY)
-  padding 30px 0px
-  margin-top 8px
-  border-radius 12px
-  text-align center
   animation-name cardShow
   animation-duration 0.2s
   font-family 'Exo2'
   font-size 16px
-  font-weight 600
-  display flex
-  justify-content center
-  align-items center
-  flex-direction column
+  font-weight 500
+  cursor pointer
+
+  *
+    pointer-events none
+
+  ._txDescriptionSummary
+    padding 30px 0px
+    display flex
+    justify-content center
+    align-items center
+    flex-direction column
+
+    ._txDescriptionSummaryLine
+      padding-bottom 10px
+      display flex
+      justify-content center
+      align-items center
+      font-size 12px
+
+  ._txDescriptionTag
+    font-size 10px
+    width 100%
+    border-top 1px solid var(--ghostX)
+    padding 10px 20px
+    text-transform uppercase
 
 @import '../AdjustFee/style'
 @import '../ViewData/style'

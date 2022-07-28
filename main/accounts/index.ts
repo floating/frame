@@ -894,6 +894,10 @@ export class Accounts extends EventEmitter {
     if (!currentAccount) return log.error('No account selected during nonce adjustement', nonceAdjust)
 
     const txRequest = this.getTransactionRequest(currentAccount, handlerId)
+
+    // TODO: Figure out root casue for data object being frozen here
+    txRequest.data = Object.assign({}, txRequest.data)
+
     if (txRequest && txRequest.type === 'transaction') {
       const nonce = txRequest.data && txRequest.data.nonce
       if (nonce) {
@@ -903,7 +907,6 @@ export class Accounts extends EventEmitter {
         currentAccount.update()
       } else {
         const { from, chainId } = txRequest.data
-
         this.sendRequest({ method: 'eth_getTransactionCount', chainId, params: [from, 'pending'] }, (res: RPCResponsePayload) => {
           if (res.result) {
             const newNonce = parseInt(res.result, 16)

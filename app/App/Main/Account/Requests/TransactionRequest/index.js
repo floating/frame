@@ -16,6 +16,7 @@ import TxBar from './TxBar'
 
 // New Tx
 import TxMain from './TxMain'
+import TxMainNew from './TxMainNew'
 import TxFeeNew from './TxFeeNew'
 import TxData from './TxData'
 import TxRecipient from './TxRecipient'
@@ -152,10 +153,8 @@ class TransactionRequest extends React.Component {
   }
 
   renderViewData () {
-    const { accountId, handlerId, step } = this.props
-    const req = this.store('main.accounts', accountId, 'requests', handlerId)
     return (
-      <ViewData {...this.props} req={req} />
+      <ViewData {...this.props} />
     )
   }
 
@@ -465,51 +464,12 @@ class TransactionRequest extends React.Component {
                       </div>
                     )
                   ) : null}
-                  <div className='_txDescription'>
-                    {false ? ( // TODO: Add account type discovery to tx request flow
-                      <>
-                        {req.data.value && req.data.value !== '0x' && req.data.value !== '0x0' ? (
-                          <div>{'Sending ETH'}</div>
-                        ) : null}
-                        {req.data.data && req.data.data !== '0x' && req.data.data !== '0x0' ? (
-
-                          <div>{'including data in a tx'}</div>
-                        ) : null}
-                        <div>{'to an account'}</div>
-                        <div>{'on Mainnet'}</div>
-                      </>
-                    ) : ( // Recipient is contract
-                      <>
-                        {req.data.value && req.data.value !== '0x' && req.data.value !== '0x0' ? (
-                          <div>{'Sending ETH'}</div>
-                        ) : null}
-                        {req.data.data && req.data.data !== '0x' && req.data.data !== '0x0' ? (
-                          req.decodedData && req.decodedData.method ? (
-                            <div className='_txMainValue'>
-                              <span className={''}>{(() => {
-                                if (req.decodedData.method.length > 17) return `${req.decodedData.method.substr(0, 15)}..`
-                                return req.decodedData.method
-                              })()}</span>
-                              <span>{'via'}</span>
-                              <span className={''}>{(() => {
-                                if (req.decodedData.contractName.length > 11) return `${req.decodedData.contractName.substr(0, 9)}..`
-                                return req.decodedData.contractName
-                              })()}</span>
-                            </div>
-                          ) : (
-                            <div>{'taking unknown action via unknown contract'}</div>
-                          )
-                        ) : null}
-                        <div>{'on Mainnet'}</div>
-                      </>
-                    )}
-                  </div>
 
                   <div className='_txBody'>
-                    <TxRecipient i={1} {...this.props} req={req} />
-                    <TxMain i={2} {...this.props} req={req} chain={this.chain}/>
-                    <TxData i={3} {...this.props} req={req} />
-                    <TxFeeNew i={4} {...this.props} req={req} chain={this.chain} />
+                    <TxMainNew i={0} {...this.props} req={req} chain={this.chain}/>
+                    <TxMain i={1} {...this.props} req={req} chain={this.chain}/>
+                    <TxFeeNew i={2} {...this.props} req={req} chain={this.chain} />
+                    <TxRecipient i={3} {...this.props} req={req} />
                   </div>
                   {!notice ? (
                     <div className='requestApprove'>

@@ -61,11 +61,11 @@ class TxFeeOverlay extends React.Component {
     this.state.gasLimit = BigNumber(props.req.data.gasLimit, 16).toString()
   }
 
-  mouseDetect (e) {
-    if (this.moduleRef && this.moduleRef.current && !this.moduleRef.current.contains(e.target)) {
-      this.props.overlayMode()
-    }
-  }
+  // mouseDetect (e) {
+  //   if (this.moduleRef && this.moduleRef.current && !this.moduleRef.current.contains(e.target)) {
+  //     this.props.overlayMode()
+  //   }
+  // }
 
   componentDidMount () {
     document.addEventListener('mousedown', this.mouseDetect.bind(this))

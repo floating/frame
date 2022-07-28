@@ -6,9 +6,9 @@
   margin 16px 0px 16px 0px
   border-radius 14px
   padding 5px 0px 5px 0px
-  animation-name cardShow
-  animation-duration 0.2s
-  animation-fill-mode both
+  // animation-name cardShow
+  // animation-duration 0.2s
+  // animation-fill-mode both
   overflow hidden
   box-shadow 0px 4px 5px var(--ghostY)
 
@@ -93,25 +93,29 @@
         padding 8px
         background var(--ghostA)
         margin-top 5px
-
+        cursor pointer
+        
         svg
           position relative
           top -0px
           padding 0px 3px 0px 4px
-
+      
   ._txMainTag
     position relative
     z-index 100001
-    animation-name puffIn
+    animation-name cardShow
     animation-duration 0.2s
     animation-fill-mode both
     overflow hidden
-    font-size 10px
+    font-size 11px
     font-weight 600
     text-transform uppercase
     letter-spacing 1px
     text-align center
-    padding 5px 0px 0px 0px
+    padding 5px 0px 5px 0px
+    margin-top 5px
+    border-radius 8px
+    background var(--ghostA)
 
 ._txContinueButton
   margin-top 64px
@@ -130,3 +134,15 @@
 
 ._txContinueButton:hover
   background var(--ghostB)
+
+._txMain:hover
+  // background var(--ghostB)
+  animation 5s shake ease-in-out infinite alternate
+  box-shadow 0px 6px 15px 0px var(--ghostX)
+
+._txMain:active
+  // background var(--ghostB)
+  animation shake-little
+  animation-duration 8s
+  box-shadow 0px 2px 6px var(--ghostX)
+  animation shake-little 2s ease-in-out infinite

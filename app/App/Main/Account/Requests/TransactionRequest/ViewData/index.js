@@ -31,11 +31,38 @@ class ViewData extends React.Component {
   }
 
   render () {
-    const { req } = this.props
+    const { accountId, handlerId, step } = this.props
+    const req = this.store('main.accounts', accountId, 'requests', handlerId)
+    let nonce = parseInt(req.data.nonce, 'hex')
+    if (isNaN(nonce)) nonce = 'TBD'
+
     return (
       <div className='cardShow'>
         {utils.toAscii(req.data.data || '0x') ? (
           <div className='transactionDataBodyInner'>
+            <div>
+              <div 
+                className='requestMetaNonce' 
+              >
+                <div className='txNonceControl'>
+                  <div 
+                    className='txNonceButton txNonceButtonLower' 
+                    onMouseDown={() => {
+                      link.send('tray:adjustNonce', req.handlerId, -1)
+                    }}>
+                    {svg.octicon('chevron-down', { height: 14 })}
+                  </div>
+                  <div className='txNonceButton txNonceButtonRaise' onMouseDown={() => link.send('tray:adjustNonce', req.handlerId, 1)}>
+                    {svg.octicon('chevron-up', { height: 14 })}
+                  </div>
+                  
+                </div>
+                <div className='txNonceLabel'>Nonce</div>
+                <div className={'txNonceNumber'}>
+                  {nonce}
+                </div>
+              </div>
+            </div>
             {req.decodedData ? (
               <div className='decodedDataContract'>
                 <div className='decodedDataContractArgHeader'>Contract Method</div>

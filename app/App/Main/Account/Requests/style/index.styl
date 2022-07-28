@@ -466,16 +466,11 @@
           margin-right 4px
           color var(--good)
 
-    .requestMetaNonce
-      position absolute 
-      right 12px
-      top 18px
-      bottom 0
-      width 64px
-      height 24px
-      border-radius 6px
-      background var(--ghostB)
-      display flex
+.requestMetaNonce
+  height 24px
+  border-radius 6px
+  background var(--ghostB)
+  display flex
       
 .requestOverlay
   display none
@@ -1362,95 +1357,64 @@
 span
   padding 0px 3px 0px 0px
 
-.txNonce
-  // position absolute
-  // top 19px
-  // right 17px
-  position relative
-  // background var(--ghostC)
-  height 22px
-  // width 100%
-  // border-radius 12px
-  // box-shadow 0px 2px 1px var(--ghostC)
+
+.txNonceMarker
+  background var(--ghostD)
+  width 29px
+  border-radius 6px
+
+.txNonceNumber
+  width 48px
+  text-align center
+  opacity 1
+  font-weight 400
+  font-size 13px
   display flex
-  justify-content center
+  justify-content center 
   align-items center
-  font-size 12px
-  font-weight 600
-  color var(--outerspace05)
-  transition var(--standard)
-  z-index 9999
-  overflow hidden
 
-  .txNonceMarker
-    // position absolute
-    background var(--ghostD)
-    // top 10px
-    // right 9px
-    // bottom 9px
-    width 29px
-    border-radius 6px
+.txNonceHidden
+  color var(--outerspace06)
+  opacity 0
 
-  .txNonceNumber
-    // position absolute 
-    // top -1px
-    // right 0
-    // bottom 0px
-    width 48px
-    text-align center
-    opacity 1
-    font-weight 400
-    font-size 13px
-    display flex
-    justify-content center 
-    align-items center
+.txNonceControl
+  width 130px
+  display flex
+  justify-conent space-between
 
-  .txNonceHidden
-    color var(--outerspace06)
-    opacity 0
+.txNonceButton
+  height 21px
+  width 25px
+  display flex
+  justify-content center 
+  align-items center
+  font-size 10px
+  text-transform uppercase
+  border-right 1px solid var(--ghostC)
+  cursor pointer
 
-  .txNonceControl
-    // position absolute 
-    // top 0px
-    // right 48px
-    // bottom 0px
-    width 130px
-    display flex
-    justify-conent space-between
+  *
+    pointer-events none
 
-  .txNonceButton
-    height 21px
-    width 25px
-    display flex
-    justify-content center 
-    align-items center
-    font-size 10px
-    text-transform uppercase
-    border-right 1px solid var(--ghostC)
-    cursor pointer
+// .txNonceButton:hover
+//   background var(--ghostF)
 
-    *
-      pointer-events none
+.txNonceButtonLower 
+  padding 1px 0px 0px 4px
 
-  // .txNonceButton:hover
-  //   background var(--ghostF)
+.txNonceButtonRaise
+  padding 0px 0px 1px 0px
 
-  .txNonceButtonLower 
-    padding 1px 0px 0px 4px
-
-  .txNonceButtonRaise
-    padding 0px 0px 1px 0px
-
-  .txNonceLabel
-    height 100%
-    width 70px
-    text-align center
-    font-size 10px
-    text-transform uppercase
-    border-right 1px solid var(--ghostC)
-    display flex
-    justify-content center 
-    align-items center
+.txNonceLabel
+  height 100%
+  width 70px
+  text-align center
+  font-size 10px
+  text-transform uppercase
+  border-right 1px solid var(--ghostC)
+  display flex
+  justify-content center 
+  align-items center
 
 // .txNonce:hover
 //   // color var(--outerspace08)
