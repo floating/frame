@@ -24,7 +24,7 @@ class txData extends React.Component {
             Data
           </div>
           <div className='_txMainValues' onClick={() => {
-            this.props.overlayMode('data')
+            link.send('nav:update', 'panel', { step: 'viewData' })
           }}>
             {req.data.data && req.data.data !== '0x' && req.data.data !== '0x0' ? (
               req.decodedData && req.decodedData.method ? (
@@ -38,7 +38,6 @@ class txData extends React.Component {
                     if (req.decodedData.contractName.length > 11) return `${req.decodedData.contractName.substr(0, 9)}..`
                     return req.decodedData.contractName
                   })()}</span>
-                  <span>{'contract'}</span>
                 </div>
                ) : (
                 <div className='_txMainValue'>

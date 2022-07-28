@@ -1,24 +1,8 @@
-.txDataOverlay
-  box-sizing border-box
-  position absolute
-  top 40px
-  left 0
-  right 0
-  bottom 0
-  font-size 16px
-  text-transform none
-  transition var(--standardSlow)
-  overflow-wrap break-word
-  word-wrap break-word
-  font-family FiraCode, monospace
-  overflow-x hidden
-  overflow-y scroll
-
 .decodedDataContract
   padding 32px 11px 11px 11px
   position relative
   border-radius 8px
-  background var(--ghostC)
+  background var(--ghostA)
 
 .dataUnverified
   position absolute
@@ -98,7 +82,7 @@
   align-items center
   justify-content center
   // border-top 1px solid var(--thick)
-  background var(--ghostD)
+  background var(--ghostB)
   border-radius 8px
 
 .decodedDataContractArg
@@ -150,23 +134,23 @@
   font-size 14px
   position relative
   cursor pointer
+  max-width 100%
   *
     pointer-events none
 
-  .txModuleDataBodyCopied
-    position absolute
-    top -5px
-    left -5px
-    right -5px
-    bottom -5px
-    display flex
-    justify-content center
-    align-items center
-    font-size 16px
-    letter-spacing 0px
-    border-radius 12px
-    background var(--ghostD)
+.txModuleDataBodyCopied
+  position absolute
+  top -5px
+  left -5px
+  right -5px
+  bottom -5px
+  display flex
+  justify-content center
+  align-items center
+  font-size 16px
+  letter-spacing 0px
+  border-radius 12px
+  background var(--ghostB)
 
-    svg
-      margin -3px 0px 0px 10px
-  
+  svg
+    margin -3px 0px 0px 10px

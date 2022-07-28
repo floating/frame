@@ -19,8 +19,8 @@ import TxMain from './TxMain'
 import TxFeeNew from './TxFeeNew'
 import TxData from './TxData'
 import TxRecipient from './TxRecipient'
-import TxOverlay from './TxOverlay'
 import AdjustFee from './AdjustFee'
+import ViewData from './ViewData'
 import TxApproval from './TxApproval'
 
 const FEE_WARNING_THRESHOLD_USD = 50
@@ -148,6 +148,14 @@ class TransactionRequest extends React.Component {
     const req = this.store('main.accounts', accountId, 'requests', handlerId)
     return (
       <AdjustFee {...this.props} req={req} />
+    )
+  }
+
+  renderViewData () {
+    const { accountId, handlerId, step } = this.props
+    const req = this.store('main.accounts', accountId, 'requests', handlerId)
+    return (
+      <ViewData {...this.props} req={req} />
     )
   }
 
@@ -487,7 +495,6 @@ class TransactionRequest extends React.Component {
                                 if (req.decodedData.contractName.length > 11) return `${req.decodedData.contractName.substr(0, 9)}..`
                                 return req.decodedData.contractName
                               })()}</span>
-                              <span>{'contract'}</span>
                             </div>
                           ) : (
                             <div>{'taking unknown action via unknown contract'}</div>
@@ -575,6 +582,8 @@ class TransactionRequest extends React.Component {
     const req = this.store('main.accounts', accountId, 'requests', handlerId)
     if (step === 'adjustFee') {
       return this.renderAdjustFee()
+    } else if (step === 'viewData') {
+      return this.renderViewData()
     } else if (step === 'confirm') {
       return this.renderTx()
     } else {

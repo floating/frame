@@ -477,7 +477,7 @@ class _AccountBody extends React.Component {
             link.send('nav:back', 'panel')
           }}
           {...this.props}
-          accountViewTitle={data.id}
+          accountViewTitle={crumb.id}
         >
           <div 
             className='accountsModuleExpand cardShow' 
@@ -487,8 +487,8 @@ class _AccountBody extends React.Component {
               e.stopPropagation()
             }}>
               <AccountModule 
-                id={data.id}
-                account={data.account}
+                id={crumb.id}
+                account={crumb.account}
                 module={{ height: '100%' }}
                 top={0}
                 index={0}
@@ -496,7 +496,7 @@ class _AccountBody extends React.Component {
                   link.send('tray:action', 'navPanel', { view: 'expandedModule', data }) 
                 }} 
                 expanded={true} 
-                expandedData={data}
+                expandedData={crumb}
               />
             </div>
           </div>

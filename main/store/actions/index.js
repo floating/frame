@@ -591,15 +591,6 @@ module.exports = {
       return nav
     })
   },
-  backPanelReqView: (u, handlerId) => {
-    u('panel.nav', nav => {
-      const newNav = nav.filter(navItem => {
-        const item = navItem || {}
-        return !item?.data?.req?.handlerId === handlerId
-      })
-      return newNav
-    })
-  },
   navForward: (u, windowId, crumb) => {
     if (!windowId || !crumb) return log.warn('Invalid nav forward', windowId, crumb)
     u('windows', windowId, 'nav', nav => {
@@ -622,6 +613,15 @@ module.exports = {
       return nav
     })
     if (navigate) u('windows', windowId, 'showing', () => true)
+  },
+  navClearReq: (u, handlerId) => {
+    u('windows.panel.nav', nav => {
+      const newNav = nav.filter(navItem => {
+        const item = navItem || {}
+        return !item?.req?.handlerId === handlerId
+      })
+      return newNav
+    })
   },
   navBack: (u, windowId) => {
     if (!windowId) return log.warn('Invalid nav back', windowId)

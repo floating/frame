@@ -39,14 +39,6 @@ class Settings extends React.Component {
     const account = this.store('main.accounts', this.props.account)
     return (
       <div ref={this.moduleRef}>
-        {this.props.expanded ? (
-          <div className='moduleHeader'>
-            {'Settings'}
-            <div className='moduleHeaderClose' onMouseDown={() => this.props.expandModule(false)}>
-              {svg.close(12)}
-            </div>
-          </div>  
-        ) : null}
         <div className='moduleMain moduleMainSettings'>
           {!this.props.expanded ? (
             <div className='moduleButton' onMouseDown={() => this.props.expandModule({ id: this.props.moduleId, account: this.props.account })}>
