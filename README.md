@@ -11,7 +11,8 @@
 <br>
 <h5 align="center">
   <a href="#features">Features</a> ⁃
-  <a href="#downloads">Downloads</a> ⁃
+  <a href="#installation">Installation</a> ⁃
+  <a href="#usage">Usage</a> ⁃
   <a href="#related">Related</a>
 </h5>
 <br>
@@ -37,10 +38,16 @@ Frame is a native web3 interface that lets you sign data, securely manage accoun
 ### Talks
   - [Frame at Aracon](https://www.youtube.com/watch?v=wlZWLiy2GD0)
 
-### Downloads
+### Installation
+
+#### Downloads
   - [All Releases](https://github.com/floating/frame/releases)
 
-### Run Source
+#### Arch Linux
+
+If you use an arch-based distro, you can use an AUR Helper like [yay](https://github.com/Jguer/yay) to install Frame by running `yay -S frame-eth` or for the development version: `yay -S frame-eth-dev`.
+
+#### Run Source
 ```bash
 # Clone
 › git clone https://github.com/floating/frame
@@ -56,19 +63,20 @@ Frame is a native web3 interface that lets you sign data, securely manage accoun
 
 **On Ubuntu:** Run `sudo apt-get install build-essential libudev-dev` **before** running the demo.
 
-### Build Apps
+#### Build Apps
   ```bash
   › npm run bundle # Create app bundle
   › npm run build # Build apps for current platform
   ```
-  
-### Connect to Frame natively
+### Usage
+
+#### Connect to Frame natively
 
 Frame exposes system-wide JSON-RPC endpoints `ws://127.0.0.1:1248` and `http://127.0.0.1:1248` that you can connect to from any app. We recommend using [eth-provider](https://github.com/floating/eth-provider) to create a connection `const provider = ethProvider('frame')` as `eth-provider` will handle any connection edge cases across browsers and environments
 
-### Frame's injected provider
+#### Connect when Frame is not natively supported
 
-Frame also has a browser extension for injecting a Frame-connected [EIP-1193](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1193.md) provider into web apps as `window.ethereum`. This can be used to inject a connection when an app does not provide the option to connect to Frame natively.
+Frame also has a [browser extensions]("https://github.com/floating/frame-extension) that can be used to inject a connection when an app does not provide the option to connect to Frame natively i.e. only to MetaMask. It injects a Frame-connected [EIP-1193](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1193.md) provider into web apps as `window.ethereum`.
 
 ### Related
   - [Frame Chat](https://discord.gg/UH7NGqY) - Feel free to drop in and ask questions!
