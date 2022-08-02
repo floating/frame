@@ -35,21 +35,23 @@ jest.mock('../../../../../resources/link')
 const AddToken = Restore.connect(AddTokenComponent, store)
 const user = userEvent.setup()
 
-it('should display the expected chain IDs', async () => {
-  const { getAllByRole } = render(
-    <AddToken activeChains={[{ id: 1, name: 'Mainnet', connection: { primary: { connected: true } } }, { id: 137, name: 'Polygon', connection: { primary: { connected: true } } }]} />
-  )
+describe('token chain', () => {
+  it('should display the expected chain IDs', async () => {
+    const { getAllByRole } = render(
+      <AddToken activeChains={[{ id: 1, name: 'Mainnet', connection: { primary: { connected: true } } }, { id: 137, name: 'Polygon', connection: { primary: { connected: true } } }]} />
+    )
 
-  const tokenChainNames = getAllByRole('button').map((el) => el.textContent)
-  expect(tokenChainNames).toEqual(['Mainnet', 'Polygon'])
-})
+    const tokenChainNames = getAllByRole('button').map((el) => el.textContent)
+    expect(tokenChainNames).toEqual(['Mainnet', 'Polygon'])
+  })
 
-it('should generate the expected HTML', async () => {
-  const { asFragment } = render(
-    <AddToken activeChains={[{ id: 1, name: 'Mainnet', connection: { primary: { connected: true } } }, { id: 137, name: 'Polygon', connection: { primary: { connected: true } } }]} />
-  )
+  it('should generate the expected HTML', async () => {
+    const { asFragment } = render(
+      <AddToken activeChains={[{ id: 1, name: 'Mainnet', connection: { primary: { connected: true } } }, { id: 137, name: 'Polygon', connection: { primary: { connected: true } } }]} />
+    )
 
-  expect(asFragment()).toMatchSnapshot()
+    expect(asFragment()).toMatchSnapshot()
+  })
 })
 
 describe('token contract address', () => {
