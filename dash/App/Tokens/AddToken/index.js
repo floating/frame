@@ -69,6 +69,7 @@ class AddToken extends Component {
             <div 
               className={'originChainItem'} 
               key={id}
+              role='button'
               style={selected ? {
                 color: 'var(--ghostB)',
                 background: chainMeta[hexId] ? chainMeta[hexId].primaryColor : 'var(--moon)'
