@@ -12,12 +12,11 @@ declare class Chains extends EventEmitter {
   connections: {
     ethereum: {
       [chainId: string]: {
-        type: string,
-        chainId: string,
-        chainConfig: Common,
+        chainId: string
+        chainConfig: Common
         primary: {
           connected: boolean
-        },
+        }
         secondary: {
           connected: boolean
         }

@@ -1,5 +1,5 @@
 import { Client, Utils, Constants } from 'gridplus-sdk'
-import rlp from 'rlp'
+import { encode } from 'rlp'
 import { padToEven, addHexPrefix } from 'ethereumjs-util'
 import { hexToNumber } from 'web3-utils'
 import log from 'electron-log'
@@ -366,7 +366,7 @@ export default class Lattice extends Signer {
     if (fwVersion && (fwVersion.major > 0 || fwVersion.minor >= 15)) {
       const payload = tx.type ?
         tx.getMessageToSign(false) :
-        rlp.encode(tx.getMessageToSign(false))
+        encode(tx.getMessageToSign(false))
 
       const to = tx.to?.toString() ?? undefined
 

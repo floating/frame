@@ -6,6 +6,8 @@ import nebulaApi from '../../nebula'
 import defaultTokenList from './default-tokens.json'
 import sushiswapTokenList from '@sushiswap/default-token-list'
 
+const TOKENS_ENS_DOMAIN = 'tokens.frame.eth'
+
 interface TokenSpec extends Token {
   extensions: {
     omit: boolean
@@ -37,67 +39,95 @@ function mergeTokens (existingTokens: Token[], updatedTokens: TokenSpec[]) {
 
 export default class TokenLoader {
   private tokenList: Token[] = []
-  private loader?: NodeJS.Timeout | null
+  private nextLoad?: NodeJS.Timeout | null
 
   private readonly eth = ethProvider('frame', { origin: 'frame-internal', name: 'tokenLoader' })
   private readonly nebula = nebulaApi(this.eth)
 
   constructor () {
+    // token resolution uses mainnet ENS
+    this.eth.setChain('0x1')
+
     this.tokenList = mergeTokens(
       sushiswapTokenList.tokens as Token[],
       defaultTokenList.tokens as TokenSpec[]
     )
   }
 
-  private async loadTokenList () {
-    const updatedTokens = await this.frameTokenList()
-  
-    this.tokenList = mergeTokens(this.tokenList, updatedTokens)
-  
-    log.info(`updated token list to contain ${this.tokenList.length} tokens`)
+  private async loadTokenList (timeout = 60_000) {
+    try {
+      const updatedTokens = await this.fetchTokenList(timeout)
+
+      log.info(`Fetched ${updatedTokens.length} tokens`)
+
+      this.tokenList = mergeTokens(this.tokenList, updatedTokens)
+
+      log.info(`Updated token list to contain ${this.tokenList.length} tokens`)
+
+      this.nextLoad = setTimeout(() => this.loadTokenList(), 10 * 60_000)
+    } catch (e) {
+      log.warn('Could not fetch token list', e)
+      this.nextLoad = setTimeout(() => this.loadTokenList(), 30_000)
+    }
   }
 
-  async frameTokenList () {
-    log.debug('loading tokens from tokens.frame.eth')
+  private async fetchTokenList (timeout: number) {
+    log.verbose(`Fetching tokens from ${TOKENS_ENS_DOMAIN}`)
 
-    try {
-      const tokenListRecord = await this.nebula.resolve('tokens.frame.eth')
-      const tokenManifest: { tokens: TokenSpec[] } = await this.nebula.ipfs.getJson(tokenListRecord.record.content)
+    return new Promise<TokenSpec[]>(async (resolve, reject) => {
+      const requestTimeout = setTimeout(() => {
+        reject(`Timeout fetching token list from ${TOKENS_ENS_DOMAIN}`)
+      }, timeout)
 
-      const tokens = tokenManifest.tokens
+      try {
+        const tokenListRecord = await this.nebula.resolve(TOKENS_ENS_DOMAIN)
+        const tokenManifest: { tokens: TokenSpec[] } = await this.nebula.ipfs.getJson(tokenListRecord.record.content)
+        const tokens = tokenManifest.tokens
 
-      log.info(`loaded ${tokens.length} tokens from tokens.frame.eth`)
-
-      return tokens
-    } catch (e) {
-      log.warn('Could not load token list from tokens.frame.eth, using default list', e)
-    }
-
-    return []
+        resolve(tokens)
+      } catch (e) {
+        reject(e)
+      } finally {
+        clearTimeout(requestTimeout)
+      }
+    })
   }
 
   async start () {
-    log.verbose('starting token loader')
+    log.verbose('Starting token loader')
 
-    return new Promise((resolve, reject) => {
-      const connectTimeout = setTimeout(() => reject('could not connect to provider'), 30 * 1000)
-
-      const startLoading = () => {
+    return new Promise<void>(resolve => {
+      const startLoading = async () => {
         clearTimeout(connectTimeout)
-        this.loader = setInterval(() => this.loadTokenList(), 1000 * 60 * 10)
-        resolve(this.loadTokenList())
+
+        // use a lower timeout for the first load
+        await this.loadTokenList(8000)
+
+        finishLoading()
       }
+
+      const finishLoading = () => {
+        this.eth.off('connect', onConnect)
+        resolve()
+      }
+
+      const connectTimeout = setTimeout(() => {
+        log.warn('Token loader could not connect to provider, using default list')
+        finishLoading()
+      }, 5 * 1000)
+
+      const onConnect = startLoading.bind(this)
 
       if (this.eth.connected) return startLoading()
 
-      this.eth.once('connect', startLoading.bind(this))
+      this.eth.once('connect', onConnect)
     })
   }
   
   stop () {
-    if (this.loader) {
-      clearInterval(this.loader)
-      this.loader = null
+    if (this.nextLoad) {
+      clearInterval(this.nextLoad)
+      this.nextLoad = null
     }
   }
 

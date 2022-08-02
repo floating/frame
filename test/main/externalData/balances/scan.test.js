@@ -184,11 +184,6 @@ describe('#getTokenBalances', () => {
           displayBalance: '6245.1'
         },
         {
-          ...zrxToken,
-          balance: '0x0',
-          displayBalance: '0'
-        },
-        {
           ...badgerDaoToken,
           balance: addHexPrefix(padToEven(new BigNumber('17893000000000000000').toString(16))),
           displayBalance: '17.893'

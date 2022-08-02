@@ -4,7 +4,7 @@ import ethProvider from 'eth-provider'
 
 log.transports.console.format = '[scanWorker] {h}:{i}:{s}.{ms} {text}'
 log.transports.console.level = process.env.LOG_WORKER ? 'debug' : 'info'
-log.transports.file.level = ['development', 'test'].includes(process.env.NODE_ENV) ? false : 'verbose'
+log.transports.file.level = ['development', 'test'].includes(process.env.NODE_ENV || 'development') ? false : 'verbose'
 
 import { supportsChain as chainSupportsScan } from '../../multicall'
 import balancesLoader, { BalanceLoader } from './scan'
@@ -20,6 +20,11 @@ let balances: BalanceLoader
 
 const eth = ethProvider('frame', { origin: 'frame-internal', name: 'scanWorker' })
 const tokenLoader = new TokenLoader()
+
+eth.on('error', e => {
+  log.error('Error in balances worker', e)
+  disconnect()
+})
 
 eth.on('connect', async () => {
   await tokenLoader.start()
@@ -89,13 +94,17 @@ async function chainBalanceScan (address: string, chains?: number[]) {
   }
 }
 
+function disconnect () {
+  process.disconnect()
+  process.kill(process.pid, 'SIGHUP')
+}
+
 function resetHeartbeat () {
   clearTimeout(heartbeat)
 
   heartbeat = setTimeout(() => {
     log.warn('no heartbeat received in 60 seconds, worker exiting')
-    process.disconnect()
-    process.kill(process.pid, 'SIGHUP')
+    disconnect()
   }, 60 * 1000)
 }
 

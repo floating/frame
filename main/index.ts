@@ -1,19 +1,17 @@
-import { app, ipcMain, protocol, shell, clipboard, globalShortcut, BrowserWindow } from 'electron'
+import { app, ipcMain, protocol, shell, clipboard, globalShortcut, powerMonitor, BrowserWindow } from 'electron'
 import path from 'path'
-import * as Sentry from '@sentry/electron'
 import log from 'electron-log'
 import { numberToHex } from 'web3-utils'
 import url from 'url'
 
-process.env.BUNDLE_LOCATION = process.env.BUNDLE_LOCATION || path.resolve(__dirname, './../..', 'bundle')
-
+import * as errors from './errors'
 import windows from './windows'
 import menu from './menu'
 import store from './store'
 import dapps from './dapps'
 import accounts from './accounts'
 import * as launch from './launch'
-import * as updater from './updater'
+import updater from './updater'
 import signers from './signers'
 import * as persist from './store/persist'
 import showUnhandledExceptionDialog from './windows/dialog/unhandledException'
@@ -22,7 +20,7 @@ import provider from './provider'
 import { getErrorCode } from '../resources/utils'
 import { FrameInstance } from './windows/frames/frameInstances'
 
-require('./rpc')
+process.env.BUNDLE_LOCATION = process.env.BUNDLE_LOCATION || path.resolve(__dirname, './../..', 'bundle')
 
 app.commandLine.appendSwitch('enable-accelerated-2d-canvas', 'true')
 app.commandLine.appendSwitch('enable-gpu-rasterization', 'true')
@@ -34,27 +32,16 @@ app.commandLine.appendSwitch('force-color-profile', 'srgb')
 log.transports.console.level = process.env.LOG_LEVEL || 'info'
 log.transports.file.level = ['development', 'test'].includes(process.env.NODE_ENV) ? false : 'verbose'
 
-function getCrashReportFields () {
-  const fields = ['networks', 'networksMeta', 'tokens']
+const dev = process.env.NODE_ENV === 'development'
+const hasInstanceLock = app.requestSingleInstanceLock()
 
-  return fields.reduce((extra, field) => {
-    return { ...extra, [field]: JSON.stringify(store('main', field) || {}) }
-  }, {})
+if (!hasInstanceLock) {
+  log.info('another instance of Frame is running - exiting...')
+  app.exit(1)
 }
 
-Sentry.init({
-  // only use IPC from renderer process, not HTTP
-  ipcMode: Sentry.IPCMode.Classic,
-  dsn: 'https://7b09a85b26924609bef5882387e2c4dc@o1204372.ingest.sentry.io/6331069',
-  beforeSend: (evt) => {
-    return {
-      ...evt,
-      user: { ...evt.user, ip_address: undefined }, // remove IP address
-      tags: { ...evt.tags, 'frame.instance_id': store('main.instanceId') },
-      extra: getCrashReportFields()
-    }
-  }
-})
+require('./rpc')
+errors.init()
 
 log.info(`Chrome: v${process.versions.chrome}`)
 log.info(`Electron: v${process.versions.electron}`)
@@ -63,9 +50,7 @@ log.info(`Node: v${process.versions.node}`)
 // prevent showing the exit dialog more than once
 let closing = false
 
-process.on('uncaughtException', e => {
-  Sentry.captureException(e)
-
+process.on('uncaughtException', (e) => {
   log.error('uncaughtException', e)
 
   const errorCode = getErrorCode(e) ?? ''
@@ -81,6 +66,22 @@ process.on('uncaughtException', e => {
     showUnhandledExceptionDialog(e.message, errorCode)
   }
 })
+
+function startUpdater () {
+  powerMonitor.on('resume', () => {
+    log.debug('System resuming, starting updater')
+
+    updater.start()
+  })
+
+  powerMonitor.on('suspend', () => {
+    log.debug('System suspending, stopping updater')
+
+    updater.stop()
+  })
+
+  updater.start()
+}
 
 const externalWhitelist = [
   'https://frame.sh',
@@ -105,7 +106,11 @@ global.eval = () => { throw new Error(`This app does not support global.eval()`)
 
 ipcMain.on('tray:resetAllSettings', () => {
   persist.clear()
-  if (updater.updatePending) return updater.quitAndInstall(true, true)
+
+  if (updater.updateReady) {
+    return updater.quitAndInstall()
+  }
+
   app.relaunch()
   app.exit(0)
 })
@@ -122,8 +127,21 @@ ipcMain.on('tray:clipboardData', (e, data) => {
   if (data) clipboard.writeText(data)
 })
 
-ipcMain.on('tray:installAvailableUpdate', (e, install, dontRemind) => {
-  updater.installAvailableUpdate(install, dontRemind)
+ipcMain.on('tray:installAvailableUpdate', (e, version) => {
+  store.dontRemind(version)
+  windows.broadcast('main:action', 'updateBadge', '')
+
+  updater.fetchUpdate()
+})
+
+ipcMain.on('tray:dismissUpdate', (e, version, remind) => {
+  if (!remind) {
+    store.dontRemind(version)
+  }
+
+  windows.broadcast('main:action', 'updateBadge', '')
+
+  updater.dismissUpdate()
 })
 
 ipcMain.on('tray:removeAccount', (e, id) => {
@@ -153,10 +171,13 @@ ipcMain.on('tray:openExternal', (e, url) => {
 ipcMain.on('tray:openExplorer', (e, hash, chain) => {
   // remove trailing slashes from the base url
   const explorer = (store('main.networks', chain.type, chain.id, 'explorer') || '').replace(/\/+$/, '')
-  shell.openExternal(`${explorer}/tx/${hash}`)
+
+  if (explorer) {
+    shell.openExternal(`${explorer}/tx/${hash}`)
+  }
 })
 
-ipcMain.on('tray:copyTxHash', (e, hash, chain) => {
+ipcMain.on('tray:copyTxHash', (e, hash) => {
   if (hash) clipboard.writeText(hash)
 })
 
@@ -204,10 +225,16 @@ ipcMain.on('tray:syncPath', (e, path, value) => {
   store.syncPath(path, value)
 })
 
-ipcMain.on('tray:ready', () => require('./api'))
+ipcMain.on('tray:ready', () => {
+  require('./api')
+
+  if (!dev) {
+    startUpdater()
+  }
+})
 
 ipcMain.on('tray:updateRestart', () => {
-  updater.quitAndInstall(true, true)
+  updater.quitAndInstall()
 })
 
 ipcMain.on('tray:refreshMain', () => windows.broadcast('main:action', 'syncMain', store('main')))
@@ -290,11 +317,27 @@ ipcMain.on('tray:action', (e, action, ...args) => {
   log.info('Tray sent unrecognized action: ', action)
 })
 
-app.on('activate', () => windows.showTray())
-app.on('will-quit', () => app.quit())
-app.on('quit', async () => {
-  accounts.close()
+app.on('second-instance', (event, argv, workingDirectory) => {
+  log.info(`second instance requested from directory: ${workingDirectory}`)
+  windows.showTray()
 })
+app.on('activate', () => windows.showTray())
+
+app.on('before-quit', (evt) => {
+  if (!updater.updateReady) {
+    updater.stop()
+  }
+})
+
+app.on('will-quit', () => app.quit())
+app.on('quit', () => {
+  log.info('Application closing')
+
+  // await clients.stop()
+  accounts.close()
+  signers.close()
+})
+
 app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit() })
 
 let launchStatus = store('main.launch')

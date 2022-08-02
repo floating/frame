@@ -12,11 +12,13 @@ class TxRecipient extends React.Component {
       copied: false
     }
   }
+
   copyAddress (data) {
     link.send('tray:clipboardData', data)
     this.setState({ copied: true })
     setTimeout(_ => this.setState({ copied: false }), 1000)
   }
+
   render () {
     const req = this.props.req
     const address = req.data.to ? getAddress(req.data.to) : ''
@@ -33,7 +35,7 @@ class TxRecipient extends React.Component {
               <div className='_txMainValue'>
                 {ensName
                   ? <span className='_txRecipient'>{ensName}</span>
-                  : <span className='_txRecipient'>{address.substring(0, 6)}{svg.octicon('kebab-horizontal', { height: 15 })}{address.substring(address.length - 4)}</span>
+                  : <span className='_txRecipient'>{address.substring(0, 8)}{svg.octicon('kebab-horizontal', { height: 15 })}{address.substring(address.length - 6)}</span>
                 }
                 {/* {req.decodedData && req.decodedData.contractName ? ( 
                   <span className={'_txDataValueMethod'}>{(() => {

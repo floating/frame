@@ -13,7 +13,7 @@ import log from 'electron-log'
 
 import store from '../store'
 import protectedMethods from '../api/protectedMethods'
-import { usesBaseFee, TransactionData } from '../../resources/domain/transaction'
+import { getAddress, usesBaseFee, TransactionData } from '../../resources/domain/transaction'
 import FrameAccount from '../accounts/Account'
 
 const NATIVE_CURRENCY = '0x0000000000000000000000000000000000000000'
@@ -115,10 +115,10 @@ export function feeTotalOverMax (rawTx: TransactionData, maxTotalFee: number) {
 }
 
 export function getRawTx (newTx: RPC.SendTransaction.TxParams, accountId: string | undefined): TransactionData {
-  const { gas, gasLimit, gasPrice, data, value, type, ...rawTx } = newTx
+  const { gas, gasLimit, gasPrice, data, value, type, to, ...rawTx } = newTx
   const parsedValue = !value || parseInt(value, 16) === 0 ? '0x0' : addHexPrefix(unpadHexString(value) || '0')
 
-  return {
+  const tx: TransactionData = {
     ...rawTx,
     from: rawTx.from || accountId,
     type: '0x0',
@@ -127,6 +127,12 @@ export function getRawTx (newTx: RPC.SendTransaction.TxParams, accountId: string
     gasLimit: gasLimit || gas,
     chainId: rawTx.chainId
   }
+
+  if (to) {
+    tx.to = getAddress(to)
+  }
+
+  return tx
 }
   
 export function gasFees (rawTx: TransactionData) {

@@ -247,7 +247,10 @@ export class Accounts extends EventEmitter {
               notify('Transaction Successful', body, () => {
                 const { type, id } = targetChain
                 const explorer = store('main.networks', type, id, 'explorer')
-                shell.openExternal(explorer + '/tx/' + hash)
+
+                if (explorer) {
+                  shell.openExternal(explorer + '/tx/' + hash)
+                }
               })
             }
             const blockHeight = parseInt(res.result, 16)

@@ -92,7 +92,10 @@ module.exports = {
   },
   dontRemind: (u, version) => {
     u('main.updater.dontRemind', dontRemind => {
-      if (dontRemind.indexOf(version) === -1) dontRemind.push(version)
+      if (!dontRemind.includes(version)) {
+        return [...dontRemind, version]
+      }
+
       return dontRemind
     })
   },
@@ -199,6 +202,9 @@ module.exports = {
   },
   setAutohide: (u, v) => {
     u('main.autohide', () => v)
+  },
+  setErrorReporting: (u, enable) => {
+    u('main.privacy.errorReporting', () => enable)
   },
   setGasFees: (u, netType, netId, fees) => {
     u('main.networksMeta', netType, netId, 'gas.price.fees', () => fees)

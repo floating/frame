@@ -2,7 +2,6 @@ import React from 'react'
 import Restore from 'react-restore'
 import utils from 'web3-utils'
 import BigNumber from 'bignumber.js'
-import { getAddress } from '@ethersproject/address'
 
 import { usesBaseFee } from '../../../../../../resources/domain/transaction'
 import svg from '../../../../../../resources/svg'
@@ -166,7 +165,7 @@ class TransactionRequest extends React.Component {
 
     const status = req.status
     const mode = req.mode
-    const toAddress = req.data && req.data.to ? getAddress(req.data.to) : ''
+    const toAddress = (req.data && req.data.to) || ''
     let requestClass = 'signerRequest'
     if (mode === 'monitor') requestClass += ' signerRequestMonitor'
     const success = (req.status === 'confirming' || req.status === 'confirmed')
@@ -319,7 +318,7 @@ class TransactionRequest extends React.Component {
                               className={'txDetailsOptionsCopy'}
                               onMouseDown={() => {
                                 if (req && req.tx && req.tx.hash) {
-                                  link.send('tray:copyTxHash', req.tx.hash, this.chain)
+                                  link.send('tray:copyTxHash', req.tx.hash)
                                   this.setState({ txHashCopied: true, viewDetailsHover: false })
                                   setTimeout(() => {
                                     this.setState({ txHashCopied: false })

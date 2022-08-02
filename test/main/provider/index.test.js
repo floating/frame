@@ -892,23 +892,38 @@ describe('#send', () => {
 
   describe('#personal_sign', () => {
     const message = 'hello, Ethereum!'
+    const password = 'supersecret'
 
     it('submits a request to sign a personal message with the address first', () => {
-      send({ method: 'personal_sign', params: [message, address] })
+      send({ method: 'personal_sign', params: [address, message, password] })
 
       expect(accountRequests).toHaveLength(1)
       expect(accountRequests[0].handlerId).toBeTruthy()
       expect(accountRequests[0].payload.params[0]).toBe(address)
       expect(accountRequests[0].payload.params[1]).toEqual(message)
+      expect(accountRequests[0].payload.params[2]).toEqual(password)
     })
 
     it('submits a request to sign a personal message with the message first', () => {
-      send({ method: 'personal_sign', params: [address, message] })
+      send({ method: 'personal_sign', params: [message, address, password] })
 
       expect(accountRequests).toHaveLength(1)
       expect(accountRequests[0].handlerId).toBeTruthy()
       expect(accountRequests[0].payload.params[0]).toBe(address)
       expect(accountRequests[0].payload.params[1]).toEqual(message)
+      expect(accountRequests[0].payload.params[2]).toEqual(password)
+    })
+
+    it('submits a request to sign a personal message with a 20-byte message first', () => {
+      const hexMessage = '0x6672616d652e7368206973206772656174212121'
+
+      send({ method: 'personal_sign', params: [hexMessage, address, password] })
+
+      expect(accountRequests).toHaveLength(1)
+      expect(accountRequests[0].handlerId).toBeTruthy()
+      expect(accountRequests[0].payload.params[0]).toBe(address)
+      expect(accountRequests[0].payload.params[1]).toEqual(hexMessage)
+      expect(accountRequests[0].payload.params[2]).toEqual(password)
     })
 
     it('does not submit a request from an account other than the current one', done => {
@@ -1146,6 +1161,40 @@ describe('#signAndSend', () => {
         expect(err.message).toMatch(/over hard limit/)
         done()
       } catch (e) { done(e) }
+    })
+  })
+
+  describe('#fillTransaction', () => {
+    beforeEach(() => {
+      connection.send.mockImplementationOnce((payload, cb) => {
+        expect(payload.method).toBe('eth_estimateGas')
+        cb({ result: addHexPrefix((150000).toString(16)) })
+      })
+
+      store.set('main.networksMeta.ethereum.1.gas', {
+        price: {
+          selected: 'standard',
+          levels: { slow: '', standard: '', fast: gweiToHex(30), asap: '', custom: '' },
+          fees: {
+            maxPriorityFeePerGas: gweiToHex(1),
+            maxBaseFeePerGas: gweiToHex(8)
+          }
+        }
+      })
+    })
+
+    it('should not include an undefined "to" field', done => {
+      const txJson = {
+        chainId: '0x1'
+      }
+
+      provider.fillTransaction(txJson, (err, { tx }) => {
+        try {
+          expect(err).toBeFalsy()
+          expect('to' in tx).toBe(false)
+          done()
+        } catch (e) { done(e) }
+      })
     })
   })
 

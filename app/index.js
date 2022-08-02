@@ -8,8 +8,6 @@ import App from './App'
 import link from '../resources/link'
 import _store from './store'
 
-import './flex'
-
 Sentry.init({ dsn: 'https://7b09a85b26924609bef5882387e2c4dc@o1204372.ingest.sentry.io/6331069' })
 
 // window.removeAllAccountsAndSigners = () => link.send('tray:removeAllAccountsAndSigners')

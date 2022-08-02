@@ -1,7 +1,7 @@
 import TokenLoader from '../../../../main/externalData/inventory/tokens'
 import log from 'electron-log'
 
-jest.mock('eth-provider', () => () => ({ connected: true }))
+jest.mock('eth-provider', () => () => mockEthProvider)
 
 jest.mock('../../../../main/nebula', () => jest.fn(() => ({
   resolve: async () => ({ record: {} }),
@@ -22,9 +22,10 @@ afterAll(() => {
   jest.useRealTimers()
 })
 
-let tokenLoader
+let tokenLoader, mockEthProvider
 
 beforeEach(() => {
+  mockEthProvider = { connected: true, setChain: jest.fn(), once: jest.fn(), off: jest.fn() }
   tokenLoader = new TokenLoader()
 })
 
@@ -46,6 +47,19 @@ it('loads a token list from nebula', async () => {
 
   expect(tokens.length).toBe(1)
   expect(tokens[0].name).toBe('another-token')
+})
+
+it('starts the loader with the default list when the provider is unavailable', async () => {
+  mockEthProvider.connected = false
+
+  const test = tokenLoader.start().then(() => {
+    expect(tokenLoader.getTokens(1).length).toBeGreaterThan(0)
+  })
+
+  // wait for attempts to connect
+  jest.advanceTimersByTime(60 * 1000)
+
+  return test
 })
 
 it('loads the default token list for mainnet', () => {

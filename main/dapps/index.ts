@@ -1,7 +1,6 @@
 import { hash } from 'eth-ens-namehash'
 import log from 'electron-log'
 import crypto from 'crypto'
-
 import store from '../store'
 import nebulaApi from '../nebula'
 import server from './server'

@@ -11,8 +11,51 @@ jest.mock('../../../../../../../../../../../main/store/persist')
 
 const TokenSpend = Restore.connect(ApproveTokenSpendComponent, store)
 
-describe('changing approval amounts', () => {
-  it('allows the user to reject an approval', done => {
+it('allows the user to reject an approval', done => {
+  const onApprove = () => done('should not have approved!')
+
+  const { queryByRole } = render(
+    <TokenSpend
+      onApprove={onApprove}
+      onDecline={done}
+      approval={{ data: { decimals: 6, amount: addHexPrefix(100e6.toString(16)) } }} 
+    />
+  )
+
+  const reject = queryByRole('button', { name: 'Reject' })
+  fireEvent.click(reject)
+})
+
+it('allows the user to proceed', done => {
+  const onApprove = function (req, approvalType, data) {
+    try {
+      expect(approvalType).toBe(ApprovalType.TokenSpendApproval)
+
+      // 100 * 1e6 to account for decimals
+      expect(data.amount).toBe('0x5f5e100')
+      done()
+    } catch (e) { done(e) }
+  }
+
+  const { queryByRole } = render(<TokenSpend onApprove={onApprove} approval={{ data: { decimals: 6, amount: addHexPrefix(100e6.toString(16)) } }} />)
+
+  const proceed = queryByRole('button', { name: 'Proceed' })
+  fireEvent.click(proceed)
+})
+
+it('should render the expected HTML', () => {
+  const tokenSpend = render(
+    <TokenSpend
+      onApprove={() => {}}
+      onDecline={() => {}}
+      approval={{ data: { decimals: 6, amount: addHexPrefix(100e6.toString(16)) } }} 
+    />
+  )
+  expect(tokenSpend.container).toMatchSnapshot()
+})
+
+describe('revoking an approval', () => {
+  it('allows the user to reject a revocation approval', done => {
     const onApprove = () => done('should not have approved!')
 
     const { queryByRole } = render(
@@ -20,6 +63,7 @@ describe('changing approval amounts', () => {
         onApprove={onApprove}
         onDecline={done}
         approval={{ data: { decimals: 6, amount: addHexPrefix(100e6.toString(16)) } }}
+        revoke
       />
     )
 
@@ -27,23 +71,43 @@ describe('changing approval amounts', () => {
     fireEvent.click(reject)
   })
 
-  it('allows the user to proceed without editing', done => {
+  it('allows the user to proceed', done => {
     const onApprove = function (req, approvalType, data) {
       try {
-        expect(approvalType).toBe(ApprovalType.TokenSpendApproval)
+        expect(approvalType).toBe(ApprovalType.TokenSpendRevocation)
 
         // 100 * 1e6 to account for decimals
-        expect(data.amount).toBe('0x5f5e100')
+        expect(data.amount).toBe('0x0')
         done()
       } catch (e) { done(e) }
     }
 
-    const { queryByRole } = render(<TokenSpend onApprove={onApprove} approval={{ data: { decimals: 6, amount: addHexPrefix(100e6.toString(16)) } }} />)
+    const { queryByRole } = render(
+      <TokenSpend
+        onApprove={onApprove}
+        approval={{ data: { decimals: 6, amount: '0x00' } }} 
+        revoke
+      />
+    )
 
     const proceed = queryByRole('button', { name: 'Proceed' })
     fireEvent.click(proceed)
   })
 
+  it('should render the expected HTML', () => {
+    const tokenSpend = render(
+      <TokenSpend
+        onApprove={() => {}}
+        onDecline={() => {}}
+        approval={{ data: { decimals: 6, amount: '0x00' } }} 
+        revoke
+      />
+    )
+    expect(tokenSpend.container).toMatchSnapshot()
+  })
+})
+
+describe('changing approval amounts', () => {
   it('allows the user to set the token approval to a custom amount', async () => {
     return new Promise(async (resolve, reject) => {
       const onApprove = function (req, approvalType, data) {
@@ -66,7 +130,7 @@ describe('changing approval amounts', () => {
               decimals: 6,
               amount: addHexPrefix(100e6.toString(16))
             }
-          }} 
+          }}
         />
       )
 
@@ -106,7 +170,7 @@ describe('changing approval amounts', () => {
               decimals: 6,
               amount: addHexPrefix(100e6.toString(16))
             }
-          }} 
+          }}
         />
       )
 
@@ -192,7 +256,7 @@ describe('changing approval amounts', () => {
             decimals: 6,
             amount: addHexPrefix(100e6.toString(16))
           }
-        }}
+        }} 
       />
     )
 
@@ -266,7 +330,7 @@ describe('formatting amounts', () => {
               decimals: 6,
               amount: addHexPrefix((spec.amount * 1e6).toString(16))
             }
-          }}
+          }} 
         />
       )
 

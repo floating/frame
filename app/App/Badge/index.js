@@ -4,7 +4,9 @@ import link from '../../../resources/link'
 
 class Bridge extends React.Component {
   render () {
-    if (this.store('view.badge') === 'updateReady') {
+    const badge = this.store('view.badge') || {}
+
+    if (badge.type === 'updateReady') {
       return (
         <div className='badgeWrap'>
           <div className='badge cardShow' style={{ transform: 'translateY(0px)', height: '196px' }}>
@@ -26,19 +28,19 @@ class Bridge extends React.Component {
           </div>
         </div>
       )
-    } else if (this.store('view.badge') === 'updateAvailable') {
+    } else if (badge.type === 'updateAvailable') {
       return (
         <div className='badgeWrap'>
           <div className='badge cardShow' style={{ transform: 'translateY(0px)', height: '224px' }}>
             <div className='badgeInner'>
               <div className='badgeMessage'>
-                A new update is available, would you like to install it?
+                Version {badge.version} is available, would you like to install it?
               </div>
               <div className='badgeInput'>
                 <div className='badgeInputButton'>
                   <div
                     className='badgeInputInner' onMouseDown={() => {
-                      link.send('tray:installAvailableUpdate', true, false)
+                      link.send('tray:installAvailableUpdate', badge.version)
                     }}
                     style={{ color: 'var(--good)' }}
                   >Install Update
@@ -49,7 +51,7 @@ class Bridge extends React.Component {
                 <div className='badgeInputButton'>
                   <div
                     className='badgeInputInner' onMouseDown={() => {
-                      link.send('tray:installAvailableUpdate', false, false)
+                      link.send('tray:dismissUpdate', badge.version, true)
                     }}
                     style={{ color: 'var(--moon)' }}
                   >Remind Me Later
@@ -60,7 +62,7 @@ class Bridge extends React.Component {
                 <div className='badgeInputButton'>
                   <div
                     className='badgeInputInner badgeInputSmall' onMouseDown={() => {
-                      link.send('tray:installAvailableUpdate', false, true)
+                      link.send('tray:dismissUpdate', badge.version, false)
                     }}
                   >Skip This Version
                   </div>

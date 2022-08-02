@@ -1700,8 +1700,7 @@
   justify-content center
   align-items center
   font-weight 400
-  font-size 12px
-  cursor pointer
+  font-size 13px
   box-sizing border-box
   text-transform uppercase
   box-shadow 0px 1px 2px var(--ghostZ)
@@ -1715,9 +1714,14 @@
   *
     pointer-events none
 
-.moduleButton:hover
+.moduleButton.signerVerifyInProgress
   background var(--ghostC)
-  box-shadow 0px 2px 4px var(--ghostZ)
+  color var(--outerspace04)
+
+.moduleButton:hover:not(.signerVerifyInProgress)
+  cursor pointer
+  background var(--ghostD)
+  box-shadow 0px 4px 6px var(--ghostA)
 
 .moduleButtonBad
   color var(--bad)
