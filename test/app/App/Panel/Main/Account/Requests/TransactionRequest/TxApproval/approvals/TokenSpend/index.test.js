@@ -43,17 +43,6 @@ it('allows the user to proceed', done => {
   fireEvent.click(proceed)
 })
 
-it('should render the expected HTML', () => {
-  const tokenSpend = render(
-    <TokenSpend
-      onApprove={() => {}}
-      onDecline={() => {}}
-      approval={{ data: { decimals: 6, amount: addHexPrefix(100e6.toString(16)) } }} 
-    />
-  )
-  expect(tokenSpend.container).toMatchSnapshot()
-})
-
 describe('revoking an approval', () => {
   it('allows the user to reject a revocation approval', done => {
     const onApprove = () => done('should not have approved!')
@@ -92,18 +81,6 @@ describe('revoking an approval', () => {
 
     const proceed = queryByRole('button', { name: 'Proceed' })
     fireEvent.click(proceed)
-  })
-
-  it('should render the expected HTML', () => {
-    const tokenSpend = render(
-      <TokenSpend
-        onApprove={() => {}}
-        onDecline={() => {}}
-        approval={{ data: { decimals: 6, amount: '0x00' } }} 
-        revoke
-      />
-    )
-    expect(tokenSpend.container).toMatchSnapshot()
   })
 })
 
