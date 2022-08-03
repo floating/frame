@@ -25,12 +25,12 @@ class AddToken extends Component {
 
     this.state = {
       name: this.token.name || this.nameDefault,
-      symbol: (this.token.symbol || '').toUpperCase(),
+      symbol: (this.token.symbol || '').toUpperCase() || this.symbolDefault,
       _chainId: Number.isInteger(chainId) && chainId,
       chainId: Number.isInteger(chainId) && chainId,
       inputAddress: (this.token.address || '').toLowerCase(),
       address: (this.token.address || '').toLowerCase(),
-      decimals: (Number.isInteger(decimals) && decimals),
+      decimals: (Number.isInteger(decimals) && decimals) || this.decimalsDefault,
       logoURI: this.token.logoURI || this.logoURIDefault
     }
   }
