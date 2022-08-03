@@ -82,12 +82,12 @@ class AddToken extends Component {
                 }}
               >
                 <div className='originChainItemIcon'>
-                  <RingIcon 
-                    color={chainMeta[hexId] ? chainMeta[hexId].primaryColor : 'var(--moon)'} 
-                    img={chainMeta[hexId] ? chainMeta[hexId].icon : ''} 
+                  <RingIcon
+                    color={chainMeta[hexId] ? chainMeta[hexId].primaryColor : 'var(--moon)'}
+                    img={chainMeta[hexId] ? chainMeta[hexId].icon : ''}
                   />
                 </div>
-                
+
                 {this.store('main.networks.ethereum', id, 'name')}
 
                 <div 
@@ -146,48 +146,48 @@ class AddToken extends Component {
                 {`on ${currentChain}`}
               </div>
             ) : null}
+          </div>
 
-            <div className='tokenRow'>
-              <div className='tokenAddress'>
-                <input
-                  aria-labelledby='newTokenAddressLabel'
-                  className={`tokenInput tokenInputAddress ${this.isDefault('address') ? 'tokenInputDim' : ''}`}
-                  value={this.state.inputAddress} 
-                  spellCheck={false}
-                  autoFocus={true}
-                  onKeyPress={(e) => {
-                    if (e.key === 'Enter') {
-                      this.setState({ address: this.state.inputAddress })
-                      if (this.isConnectedChain()) {
-                        this.updateTokenData(this.state.inputAddress, this.state.chainId)
-                      }
-                    } 
-                  }}
-                  onChange={(e) => {
-                    if (e.target.value.length > 42) {
-                      e.preventDefault()
-                    } else {
-                      this.setState({ inputAddress: e.target.value })
+          <div className='tokenRow'>
+            <div className='tokenAddress'>
+              <input
+                aria-labelledby='newTokenAddressLabel'
+                className={`tokenInput tokenInputAddress ${this.isDefault('address') ? 'tokenInputDim' : ''}`}
+                value={this.state.inputAddress} 
+                spellCheck={false}
+                autoFocus={true}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    this.setState({ address: this.state.inputAddress })
+                    if (this.isConnectedChain()) {
+                      this.updateTokenData(this.state.inputAddress, this.state.chainId)
                     }
-                  }}
-                />
+                  } 
+                }}
+                onChange={(e) => {
+                  if (e.target.value.length > 42) {
+                    e.preventDefault()
+                  } else {
+                    this.setState({ inputAddress: e.target.value })
+                  }
+                }}
+              />
 
-              </div>
             </div>
-          </div>
-          <div 
-            className='tokenSetAddress'
-            role='button'
-            onClick={() => {
-              this.setState({ address: this.state.inputAddress })
-              if (this.isConnectedChain()) {
-                this.updateTokenData(this.state.inputAddress, this.state.chainId)
-              }
-            }}
-          >
-            {'Set Address'}
-          </div>
         </div>
+        <div
+          className='tokenSetAddress'
+          role='button'
+          onClick={() => {
+            this.setState({ address: this.state.inputAddress })
+            if (this.isConnectedChain()) {
+              this.updateTokenData(this.state.inputAddress, this.state.chainId)
+            }
+          }}
+        >
+          {'Set Address'}
+        </div>
+      </div>
       )
     } else {
       const address = this.state.address || ''
@@ -245,7 +245,7 @@ class AddToken extends Component {
                   <label className='tokenInputLabel'>
                     <input
                       className={`tokenInput ${this.isDefault('symbol') ? 'tokenInputDim' : ''}`}
-                      value={this.state.symbol} 
+                      value={this.state.symbol}
                       spellCheck={false}
                       onChange={(e) => {
                         if (e.target.value.length > 10) return e.preventDefault()
@@ -267,7 +267,7 @@ class AddToken extends Component {
                   <label className='tokenInputLabel'>
                     <input
                       className={`tokenInput ${this.isDefault('decimals') ? 'tokenInputDim' : ''}`}
-                      value={this.state.decimals} 
+                      value={this.state.decimals}
                       spellCheck={false}
                       onChange={(e) => {
                         if (!e.target.value) return this.setState({ decimals: '' })
@@ -296,7 +296,7 @@ class AddToken extends Component {
                   <label className='tokenInputLabel'>
                     <input
                       className={`tokenInput ${this.isDefault('logoURI') ? 'tokenInputDim' : ''}`}
-                      value={this.state.logoURI} 
+                      value={this.state.logoURI}
                       spellCheck={false}
                       onChange={(e) => {
                         this.setState({ logoURI: e.target.value })
