@@ -67,7 +67,7 @@ class AddToken extends Component {
             const selected = this.state._chainId === parseInt(id)
             return (
               <div 
-                className={'originChainItem'} 
+                className='originChainItem'
                 key={id}
                 role='button'
                 style={selected ? {
