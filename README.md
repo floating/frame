@@ -74,9 +74,9 @@ If you use an arch-based distro, you can use an AUR Helper like [yay](https://gi
 
 Frame exposes system-wide JSON-RPC endpoints `ws://127.0.0.1:1248` and `http://127.0.0.1:1248` that you can connect to from any app. We recommend using [eth-provider](https://github.com/floating/eth-provider) to create a connection `const provider = ethProvider('frame')` as `eth-provider` will handle any connection edge cases across browsers and environments
 
-#### Connect when Frame is not natively supported
+### Frame's injected provider
 
-Frame also has a [browser extensions]("https://github.com/floating/frame-extension) that can be used to inject a connection when an app does not provide the option to connect to Frame natively i.e. only to MetaMask. It injects a Frame-connected [EIP-1193](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1193.md) provider into web apps as `window.ethereum`.
+Frame also has a browser extension for injecting a Frame-connected [EIP-1193](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1193.md) provider into web apps as `window.ethereum`. This can be used to inject a connection when an app does not provide the option to connect to Frame natively.
 
 ### Related
   - [Frame Chat](https://discord.gg/UH7NGqY) - Feel free to drop in and ask questions!
