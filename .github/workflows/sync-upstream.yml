@@ -14,6 +14,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+      with:
+        token: ${{ secrets.GH_RELEASE_DEPLOYMENT_TOKEN }}
     - run: git remote add upstream https://github.com/floating/frame.git
     - run: git fetch upstream
     - run: git checkout develop
