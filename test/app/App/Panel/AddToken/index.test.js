@@ -81,7 +81,7 @@ describe('entering token contract address', () => {
     await user.click(tokenChains[1])
 
     await waitFor(() => expect(asFragment()).toMatchSnapshot())
-  })
+  }, 1000)
 })
 
 describe('retrieving token metadata - successful lookup', () => {
