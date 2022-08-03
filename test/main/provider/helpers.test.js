@@ -1,5 +1,5 @@
 import log from 'electron-log'
-import { getRawTx } from '../../../main/provider/helpers'
+import { getRawTx, getSignedAddress } from '../../../main/provider/helpers'
 
 jest.mock('../../../main/store')
 
@@ -46,5 +46,13 @@ describe('#getRawTx', () => {
     const tx = getRawTx({ value: undefined })
 
     expect(tx.value).toBe('0x0')
+  })
+})
+
+describe('#getSignedAddress', () => {
+  it('returns an error if no signed address is provided', () => {
+    getSignedAddress(null, 'some message', err => {
+      expect(err).toBeTruthy()
+    })
   })
 })
