@@ -441,7 +441,7 @@ const initial = {
           layer: 'rollup',
           symbol: 'ETH',
           name: 'Arbitrum',
-          explorer: 'https://explorer.arbitrum.io',
+          explorer: 'https://arbiscan.io',
           gas: {
             price: {
               selected: 'standard',
