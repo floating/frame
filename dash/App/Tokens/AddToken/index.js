@@ -25,12 +25,12 @@ class AddToken extends Component {
 
     this.state = {
       name: this.token.name || this.nameDefault,
-      symbol: (this.token.symbol || '').toUpperCase(),
+      symbol: (this.token.symbol || '').toUpperCase() || this.symbolDefault,
       _chainId: Number.isInteger(chainId) && chainId,
       chainId: Number.isInteger(chainId) && chainId,
       inputAddress: (this.token.address || '').toLowerCase(),
       address: (this.token.address || '').toLowerCase(),
-      decimals: (Number.isInteger(decimals) && decimals),
+      decimals: (Number.isInteger(decimals) && decimals) || this.decimalsDefault,
       logoURI: this.token.logoURI || this.logoURIDefault
     }
   }
@@ -60,46 +60,47 @@ class AddToken extends Component {
     // const origin = this.store('main.origins', this.props.originId)
     return (
       <div className='originSwapChainList'>
-        {Object.keys(this.store('main.networks.ethereum')).filter(id => {
-          return this.store('main.networks.ethereum', id, 'on')
-        }).map(id => {
-          const hexId = '0x' + parseInt(id).toString('16')
-          const selected = this.state._chainId === parseInt(id)
-          return (
-            <div 
-              className={'originChainItem'} 
-              key={id}
-              style={selected ? {
-                color: 'var(--ghostB)',
-                background: chainMeta[hexId] ? chainMeta[hexId].primaryColor : 'var(--moon)'
-              } : {}}
-              onClick={() => {
-                this.setState({ _chainId: parseInt(id) })
-                setTimeout(() => {
-                  this.setState({ chainId: parseInt(id) })
-                }, 200)
-              }}
-            >
-              <div className='originChainItemIcon'>
-                <RingIcon 
-                  color={chainMeta[hexId] ? chainMeta[hexId].primaryColor : 'var(--moon)'} 
-                  img={chainMeta[hexId] ? chainMeta[hexId].icon : ''} 
-                />
-              </div>
-              
-              {this.store('main.networks.ethereum', id, 'name')}
-
+        {Object.keys(this.store('main.networks.ethereum'))
+          .filter(id => this.store('main.networks.ethereum', id, 'on'))
+          .map(id => {
+            const hexId = '0x' + parseInt(id).toString('16')
+            const selected = this.state._chainId === parseInt(id)
+            return (
               <div 
-                className='originChainItemCheck'
+                className='originChainItem'
+                key={id}
+                role='button'
                 style={selected ? {
+                  color: 'var(--ghostB)',
                   background: chainMeta[hexId] ? chainMeta[hexId].primaryColor : 'var(--moon)'
                 } : {}}
+                onClick={() => {
+                  this.setState({ _chainId: parseInt(id) })
+                  setTimeout(() => {
+                    this.setState({ chainId: parseInt(id) })
+                  }, 200)
+                }}
               >
-                {selected ? svg.check(28) : null}
+                <div className='originChainItemIcon'>
+                  <RingIcon
+                    color={chainMeta[hexId] ? chainMeta[hexId].primaryColor : 'var(--moon)'}
+                    img={chainMeta[hexId] ? chainMeta[hexId].icon : ''}
+                  />
+                </div>
+
+                {this.store('main.networks.ethereum', id, 'name')}
+
+                <div 
+                  className='originChainItemCheck'
+                  style={selected ? {
+                    background: chainMeta[hexId] ? chainMeta[hexId].primaryColor : 'var(--moon)'
+                  } : {}}
+                >
+                  {selected ? svg.check(28) : null}
+                </div>
               </div>
-            </div>
-          )
-        })}
+            )
+          })}
       </div>
     )
   }
@@ -134,7 +135,7 @@ class AddToken extends Component {
       return (
         <div className='newTokenView cardShow'>
           <div className='newTokenChainSelectTitle'>
-            <div>{`What is the token\'s contract address?`}</div>
+            <label id='newTokenAddressLabel'>{`What is the token's contract address?`}</label>
             {currentChain ? (
               <div 
                 className='newTokenChainSelectSubtitle'
@@ -150,10 +151,11 @@ class AddToken extends Component {
           <div className='tokenRow'>
             <div className='tokenAddress'>
               <input
+                aria-labelledby='newTokenAddressLabel'
                 className={`tokenInput tokenInputAddress ${this.isDefault('address') ? 'tokenInputDim' : ''}`}
                 value={this.state.inputAddress} 
-                spellCheck='false'
-                autoFocus='true'
+                spellCheck={false}
+                autoFocus={true}
                 onKeyPress={(e) => {
                   if (e.key === 'Enter') {
                     this.setState({ address: this.state.inputAddress })
@@ -172,19 +174,20 @@ class AddToken extends Component {
               />
 
             </div>
-          </div>
-          <div 
-            className='tokenSetAddress'
-            onClick={() => {
-              this.setState({ address: this.state.inputAddress })
-              if (this.isConnectedChain()) {
-                this.updateTokenData(this.state.inputAddress, this.state.chainId)
-              }
-            }}
-          >
-            {'Set Address'}
-          </div>
         </div>
+        <div
+          className='tokenSetAddress'
+          role='button'
+          onClick={() => {
+            this.setState({ address: this.state.inputAddress })
+            if (this.isConnectedChain()) {
+              this.updateTokenData(this.state.inputAddress, this.state.chainId)
+            }
+          }}
+        >
+          {'Set Address'}
+        </div>
+      </div>
       )
     } else {
       const address = this.state.address || ''
@@ -221,7 +224,7 @@ class AddToken extends Component {
                     <input
                       className={`tokenInput ${this.isDefault('name') ? 'tokenInputDim' : ''}`}
                       value={this.state.name} 
-                      spellCheck='false'
+                      spellCheck={false}
                       onChange={(e) => {
                         this.setState({ name: e.target.value })
                       }}
@@ -242,7 +245,8 @@ class AddToken extends Component {
                   <label className='tokenInputLabel'>
                     <input
                       className={`tokenInput ${this.isDefault('symbol') ? 'tokenInputDim' : ''}`}
-                      value={this.state.symbol} spellCheck='false'
+                      value={this.state.symbol}
+                      spellCheck={false}
                       onChange={(e) => {
                         if (e.target.value.length > 10) return e.preventDefault()
                         this.setState({ symbol: e.target.value })
@@ -263,7 +267,8 @@ class AddToken extends Component {
                   <label className='tokenInputLabel'>
                     <input
                       className={`tokenInput ${this.isDefault('decimals') ? 'tokenInputDim' : ''}`}
-                      value={this.state.decimals} spellCheck='false'
+                      value={this.state.decimals}
+                      spellCheck={false}
                       onChange={(e) => {
                         if (!e.target.value) return this.setState({ decimals: '' })
                         if (e.target.value.length > 2) return e.preventDefault()
@@ -291,7 +296,8 @@ class AddToken extends Component {
                   <label className='tokenInputLabel'>
                     <input
                       className={`tokenInput ${this.isDefault('logoURI') ? 'tokenInputDim' : ''}`}
-                      value={this.state.logoURI} spellCheck='false'
+                      value={this.state.logoURI}
+                      spellCheck={false}
                       onChange={(e) => {
                         this.setState({ logoURI: e.target.value })
                       }}
