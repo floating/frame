@@ -63,22 +63,20 @@ describe('selecting token chain', () => {
 
 describe('entering token contract address', () => {
   it('should prompt for the token contract address', async () => {
-    const { getAllByRole, findByLabelText, findByText } = render(
+    const { getByText, findByLabelText, findByText } = render(
       <AddToken activeChains={[{ id: 1, name: 'Mainnet', connection: { primary: { connected: true } } }, { id: 137, name: 'Polygon', connection: { primary: { connected: true } } }]} />
     )
-    const tokenChains = getAllByRole('button')
-    await user.click(tokenChains[1])
+    await user.click(getByText('Polygon'))
     
     await findByLabelText(`What is the token's contract address?`, { selector: 'input' })
     await findByText('on Polygon')
   }, 1000)
 
   it('should generate the expected HTML', async () => {
-    const { asFragment, getAllByRole } = render(
+    const { asFragment, getByText } = render(
       <AddToken activeChains={[{ id: 1, name: 'Mainnet', connection: { primary: { connected: true } } }, { id: 137, name: 'Polygon', connection: { primary: { connected: true } } }]} />
     )
-    const tokenChains = getAllByRole('button')
-    await user.click(tokenChains[1])
+    await user.click(getByText('Polygon'))
 
     await waitFor(() => expect(asFragment()).toMatchSnapshot())
   }, 1000)
@@ -86,12 +84,10 @@ describe('entering token contract address', () => {
 
 describe('retrieving token metadata - successful lookup', () => {
   it('should perform a lookup on a contract address and display the expected token metadata', async () => {
-    const { findByLabelText, getAllByRole, findByRole } = render(
+    const { findByLabelText, getByText, findByRole } = render(
       <AddToken activeChains={[{ id: 1, name: 'Mainnet', connection: { primary: { connected: true } } }, { id: 137, name: 'Polygon', connection: { primary: { connected: true } } }]} />
     )
-
-    const tokenChains = getAllByRole('button')
-    await user.click(tokenChains[1])
+    await user.click(getByText('Polygon'))
 
     const contractAddressInput = await findByLabelText(`What is the token's contract address?`)
     await user.type(contractAddressInput, '0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0')
@@ -109,11 +105,10 @@ describe('retrieving token metadata - successful lookup', () => {
   }, 1000)
 
   it('should generate the expected HTML', async () => {
-    const { asFragment, findByLabelText, getAllByRole, findByRole } = render(
+    const { asFragment, findByLabelText, getByText, findByRole } = render(
       <AddToken activeChains={[{ id: 1, name: 'Mainnet', connection: { primary: { connected: true } } }, { id: 137, name: 'Polygon', connection: { primary: { connected: true } } }]} />
     )
-    const tokenChains = getAllByRole('button')
-    await user.click(tokenChains[1])
+    await user.click(getByText('Polygon'))
 
     const contractAddressInput = await findByLabelText(`What is the token's contract address?`)
     await user.type(contractAddressInput, '0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0')
@@ -126,12 +121,10 @@ describe('retrieving token metadata - successful lookup', () => {
 
 describe('retrieving token metadata - unsuccessful lookup', () => {
   it('should perform a lookup on a contract address and not display any metadata', async () => {
-    const { findByLabelText, getAllByRole, findByRole } = render(
+    const { findByLabelText, getByText, findByRole } = render(
       <AddToken activeChains={[{ id: 1, name: 'Mainnet', connection: { primary: { connected: true } } }, { id: 137, name: 'Polygon', connection: { primary: { connected: true } } }]} />
     )
-
-    const tokenChains = getAllByRole('button')
-    await user.click(tokenChains[1])
+    await user.click(getByText('Polygon'))
 
     const contractAddressInput = await findByLabelText(`What is the token's contract address?`)
     await user.type(contractAddressInput, '0x3432b6a60d23ca0dfca7761b7ab56459dinvalid')
@@ -149,11 +142,10 @@ describe('retrieving token metadata - unsuccessful lookup', () => {
   }, 1000)
 
   it('should generate the expected HTML', async () => {
-    const { asFragment, findByLabelText, getAllByRole, findByRole } = render(
+    const { asFragment, findByLabelText, getByText, findByRole } = render(
       <AddToken activeChains={[{ id: 1, name: 'Mainnet', connection: { primary: { connected: true } } }, { id: 137, name: 'Polygon', connection: { primary: { connected: true } } }]} />
     )
-    const tokenChains = getAllByRole('button')
-    await user.click(tokenChains[1])
+    await user.click(getByText('Polygon'))
 
     const contractAddressInput = await findByLabelText(`What is the token's contract address?`)
     await user.type(contractAddressInput, '0x3432b6a60d23ca0dfca7761b7ab56459dinvalid')
