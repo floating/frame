@@ -51,7 +51,7 @@ log.info(`Node: v${process.versions.node}`)
 let closing = false
 
 process.on('uncaughtException', (e) => {
-  log.error('uncaughtException', e)
+  log.error('Uncaught Exception!', e)
 
   const errorCode = getErrorCode(e) ?? ''
 
@@ -65,6 +65,10 @@ process.on('uncaughtException', (e) => {
 
     showUnhandledExceptionDialog(e.message, errorCode)
   }
+})
+
+process.on('unhandledRejection', (e) => {
+  log.error('Unhandled Rejection!', e)
 })
 
 function startUpdater () {

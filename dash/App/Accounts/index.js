@@ -131,7 +131,6 @@ class AddAccounts extends React.Component {
     )
   }
   render () {
-    console.log('this.props', this.props)
     const { newAccountType } = this.props.data
     
     if (newAccountType === 'aragon')  {
