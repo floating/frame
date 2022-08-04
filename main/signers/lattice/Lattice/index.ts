@@ -187,7 +187,7 @@ export default class Lattice extends Signer {
       while (this.addresses.length < this.accountLimit) {
         const req = {
           startPath: this.getPath(this.addresses.length),
-          n: 11//Math.min(addressLimit, this.accountLimit - this.addresses.length),
+          n: Math.min(addressLimit, this.accountLimit - this.addresses.length),
         }
 
         const loadedAddresses = await connection.getAddresses(req)
