@@ -142,7 +142,6 @@ export default class LatticeAdapter extends SignerAdapter {
           // don't attempt to automatically connect if the Lattice isn't
           // paired as this could happen without the user noticing
           lattice.connect(baseUrl, privKey).catch(() => {
-            console.log('caught error!')
             store.updateLattice(deviceId, { paired: false })
           })
         }
