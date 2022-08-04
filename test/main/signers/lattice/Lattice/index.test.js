@@ -60,7 +60,7 @@ describe('#connect', () => {
         return pairingStatus
       }
 
-      throw 'connection error!'
+      throw new Error('connection error!')
     })
   })
 
@@ -131,7 +131,7 @@ describe('#connect', () => {
     
     try {
       await lattice.connect(baseUrl, privateKey)
-      throw 'should have failed to connect!'
+      throw new Error('should have failed to connect!')
     } catch (e) {
       expect(e.message.toLowerCase()).toMatch(/device locked/)
     }
@@ -155,7 +155,7 @@ describe('#connect', () => {
       
     try {
       await lattice.connect(baseUrl, privateKey)
-      throw 'should have failed to connect!'
+      throw new Error('should have failed to connect!')
     } catch (e) {
       expect(e.message.toLowerCase()).toMatch(/invalid request/)
     }
@@ -216,7 +216,7 @@ describe('#pair', () => {
     expect(hasActiveWallet).toBe(false)
   })
   
-  it('emits an error event on afailure', async () => {
+  it('emits an error event on failure', async () => {
     const handler = new Promise((resolve, reject) => {
       lattice.once('paired', () => reject('should not be paired!'))
 
@@ -446,7 +446,7 @@ describe('#signMessage', () => {
           }
         }
 
-        throw 'invalid message!'
+        throw new Error('invalid message!')
       })
     }
   })
@@ -491,7 +491,7 @@ describe('#signTypedData', () => {
           }
         }
 
-        throw 'invalid message!'
+        throw new Error('invalid message!')
       })
     }
   })
