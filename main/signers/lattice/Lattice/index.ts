@@ -14,7 +14,7 @@ const ADDRESS_LIMIT = 10
 const HARDENED_OFFSET = 0x80000000
 
 interface DeriveOptions {
-  retries?: number,
+  retries: number,
   derivation?: Derivation
 }
 
@@ -41,12 +41,12 @@ function devicePermission (tag: string) {
   return tag ? `Frame-${tag}` : 'Frame'
 }
 
-function parseError (err: string) {
-  return err.replace(/Error from device: /, '')
+function parseError (err: Error) {
+  return (err.message || '').replace(/Error from device: /, '')
 }
 
-function getStatusForError (err: string) {
-  const errText = err.toLowerCase()
+function getStatusForError (err: Error) {
+  const errText = (err.message || '').toLowerCase()
 
   if (errText.includes('device locked')) {
     return Status.LOCKED
@@ -109,7 +109,7 @@ export default class Lattice extends Signer {
 
       return paired
     } catch (e) {
-      const errorMessage = this.handleError('could not connect to Lattice', e as string)
+      const errorMessage = this.handleError('could not connect to Lattice', e as Error)
 
       this.emit('error')
 
@@ -153,7 +153,7 @@ export default class Lattice extends Signer {
 
       return hasActiveWallet
     } catch (e) {
-      const errorMessage = this.handleError('could not pair to Lattice', e as string)
+      const errorMessage = this.handleError('could not pair to Lattice', e as Error)
 
       this.emit('error')
 
@@ -161,28 +161,33 @@ export default class Lattice extends Signer {
     }
   }
 
-  async deriveAddresses (opts?: DeriveOptions) {
-    const { derivation, retriesRemaining } = {
-      derivation: opts?.derivation || this.derivation,
-      retriesRemaining: ((opts && ('retries' in opts)) ? opts.retries : 2) as number
-    }
+  async deriveAddresses (derivation?: Derivation, retries = 2) {
+    this.status = Status.DERIVING
+    this.emit('update')
+
+    log.info(`deriving addresses for Lattice ${(this.connection as Client).getAppName()}`)
 
     try {
-      this.status = Status.DERIVING
-      this.emit('update')
+      await this.derive({ derivation, retries })
+    } catch (e) {
+      this.emit('error', e)
+    }
+  }
 
-      this.derivation = derivation
+  private async derive (opts: DeriveOptions) {
+    const { derivation, retries } = opts
+
+    try {
+      this.derivation = derivation || this.derivation
 
       const connection = this.connection as Client
 
-      log.info(`deriving addresses for Lattice ${connection.getAppName()}`)
-
-      const addressLimit = derivation === Derivation.live ? 1 : ADDRESS_LIMIT
+      const addressLimit = this.derivation === Derivation.live ? 1 : ADDRESS_LIMIT
 
       while (this.addresses.length < this.accountLimit) {
         const req = {
           startPath: this.getPath(this.addresses.length),
-          n: Math.min(addressLimit, this.accountLimit - this.addresses.length),
+          n: 11//Math.min(addressLimit, this.accountLimit - this.addresses.length),
         }
 
         const loadedAddresses = await connection.getAddresses(req)
@@ -196,16 +201,19 @@ export default class Lattice extends Signer {
 
       return this.addresses
     } catch (e) {
-      if (retriesRemaining > 0) {
+      const err = e as Error
+
+      if (retries > 0) {
+        log.verbose(`Deriving ${this.derivation} Lattice addresses failed, trying ${retries} more times, error:`, err.message)
+
         return new Promise<string[]>(resolve => {
           setTimeout(() => {
-            resolve(this.deriveAddresses({ retries: retriesRemaining - 1 }))
+            resolve(this.derive({ ...opts, retries: retries - 1 }))
           }, 3000)
         })
       }
 
-      const errorMessage = this.handleError('could not derive addresses', e as string)
-      this.emit('error')
+      const errorMessage = this.handleError('could not derive addresses', err)
 
       throw new Error(errorMessage)
     }
@@ -217,7 +225,7 @@ export default class Lattice extends Signer {
     log.info(`verifying address ${currentAddress} for Lattice ${connection.getAppName()}`)
 
     try {
-      const addresses = await this.deriveAddresses({ retries: 0 })
+      const addresses = await this.derive({ retries: 0 })
 
       const address = (addresses[index] || '').toLowerCase()
 
@@ -229,12 +237,12 @@ export default class Lattice extends Signer {
 
       cb(null, true)
     } catch (e) {
-      const err = (e as Error).message
+      const err = e as Error
 
       this.handleError('could not verify address', err)
       this.emit('error')
 
-      cb(new Error(err === 'Address does not match device' ? err : 'Verify Address Error'))
+      cb(err.message === 'Address does not match device' ? err : new Error('Verify Address Error'))
     }
   }
 
@@ -405,7 +413,7 @@ export default class Lattice extends Signer {
     })
   }
 
-  private handleError (message: string, err: string) {
+  private handleError (message: string, err: Error) {
     const status = getStatusForError(err)
     const parsedErrorMessage = parseError(err)
     const fullMessage = message + ': ' + parsedErrorMessage

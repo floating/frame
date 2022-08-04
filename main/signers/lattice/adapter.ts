@@ -106,7 +106,7 @@ export default class LatticeAdapter extends SignerAdapter {
             // client is already paired between sessions
             const { derivation } = getLatticeSettings(deviceId)
 
-            lattice.deriveAddresses({ derivation })
+            lattice.deriveAddresses(derivation)
           }
         })
 
@@ -115,7 +115,7 @@ export default class LatticeAdapter extends SignerAdapter {
 
           if (hasActiveWallet) {
             const { derivation } = getLatticeSettings(deviceId)
-            lattice.deriveAddresses({ derivation })
+            lattice.deriveAddresses(derivation)
           }
         })
 

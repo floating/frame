@@ -60,7 +60,7 @@ describe('#connect', () => {
         return pairingStatus
       }
 
-      throw 'connection error!'
+      throw new Error('connection error!')
     })
   })
 
@@ -116,10 +116,10 @@ describe('#connect', () => {
   })
   
   it('emits an error event when device is locked', async () => {
-    connectFn.mockRejectedValue('Error from device: Device Locked')
+    connectFn.mockRejectedValue(new Error('Error from device: Device Locked'))
 
     const handler = new Promise((resolve, reject) => {
-      lattice.once('connect', () => reject('should not be connected!'))
+      lattice.once('connect', () => reject(new Error('should not be connected!')))
 
       lattice.once('error', () => {
         try {
@@ -131,7 +131,7 @@ describe('#connect', () => {
     
     try {
       await lattice.connect(baseUrl, privateKey)
-      throw 'should have failed to connect!'
+      throw new Error('should have failed to connect!')
     } catch (e) {
       expect(e.message.toLowerCase()).toMatch(/device locked/)
     }
@@ -140,7 +140,7 @@ describe('#connect', () => {
   })
   
   it('emits an error event when device returns invalid request', async () => {
-    connectFn.mockRejectedValue('Error from device: Invalid Request')
+    connectFn.mockRejectedValue(new Error('Error from device: Invalid Request'))
 
     const handler = new Promise((resolve, reject) => {
       lattice.once('connect', () => reject('should not be connected!'))
@@ -155,7 +155,7 @@ describe('#connect', () => {
       
     try {
       await lattice.connect(baseUrl, privateKey)
-      throw 'should have failed to connect!'
+      throw new Error('should have failed to connect!')
     } catch (e) {
       expect(e.message.toLowerCase()).toMatch(/invalid request/)
     }
@@ -181,7 +181,7 @@ describe('#pair', () => {
     lattice.connection = {
       pair: jest.fn(async code => {
         if (code === pairingCode) return true
-        throw 'Error from device: Pairing failed'
+        throw new Error('Error from device: Pairing failed')
       })
     }
   })
@@ -230,7 +230,7 @@ describe('#pair', () => {
       
     try {
       await lattice.pair('SDFJOSJD')
-      throw 'should have failed to connect!'
+      throw new Error('should have failed to connect!')
     } catch (e) {
       expect(e.message.toLowerCase()).toMatch(/pairing failed/)
     }
@@ -346,7 +346,7 @@ describe('#deriveAddresses', () => {
 
     lattice.connection.getAddresses.mockImplementation(async opts => {
       if ((requestNum += 1) === 1) {
-        throw 'Error from device: Getting addresses failed'
+        throw new Error('Error from device: Getting addresses failed')
       }
       return ['addr1', 'addr2', 'addr3', 'addr4', 'addr5']
     })
@@ -367,9 +367,9 @@ describe('#deriveAddresses', () => {
   })
   
   it('emits an error event on failure', done => {
-    lattice.connection.getAddresses.mockImplementation(async opts => {
-      throw 'Error from device: Getting addresses failed'
-  })
+    lattice.connection.getAddresses.mockImplementation(async () => {
+      throw new Error('Error from device: Getting addresses failed')
+    })
 
     lattice.on('update', () => {
       if (lattice.status === 'ok') done('should not have derived!')
@@ -383,7 +383,7 @@ describe('#deriveAddresses', () => {
       } catch (e) { done(e) }
     })
       
-    lattice.deriveAddresses({ retries: 0 }).catch(err => expect(err).toBeTruthy())
+    lattice.deriveAddresses(Derivation.standard, 0)
   })
 })
 
@@ -416,7 +416,7 @@ describe('#verifyAddress', () => {
 
   it('fails if deriving addresses fails', done => {
     lattice.addresses = []
-    lattice.connection.getAddresses = async () => { throw 'error!' }
+    lattice.connection.getAddresses = async () => { throw new Error('error!') }
 
     lattice.verifyAddress(2, 'addr3', false, (err, result) => {
       try {
@@ -446,7 +446,7 @@ describe('#signMessage', () => {
           }
         }
 
-        throw 'invalid message!'
+        throw new Error('invalid message!')
       })
     }
   })
@@ -491,7 +491,7 @@ describe('#signTypedData', () => {
           }
         }
 
-        throw 'invalid message!'
+        throw new Error('invalid message!')
       })
     }
   })
