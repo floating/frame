@@ -154,8 +154,8 @@ export function resError (errorData: string | EVMError, request: RPCId, res: RPC
 }
   
 export function getSignedAddress (signed: string, message: string, cb: Callback<String>) {
-  const signature = Buffer.from(signed.replace('0x', ''), 'hex')
-  if (signature.length !== 65) cb(new Error('Frame verifySignature: Signature has incorrect length'))
+  const signature = Buffer.from((signed || '').replace('0x', ''), 'hex')
+  if (signature.length !== 65) return cb(new Error('Frame verifySignature: Signature has incorrect length'))
   let v = signature[64]
   v = v === 0 || v === 1 ? v + 27 : v
   const r = toBuffer(signature.slice(0, 32))
@@ -248,8 +248,8 @@ export function getChainDetails (payload: JSONRPCRequestPayload, res: RPCSuccess
 }
   
 export function ecRecover (payload: JSONRPCRequestPayload, res: RPCRequestCallback) {
-  const message = payload.params[0]
-  const signed = payload.params[1]
+  const [message, signed] = payload.params
+
   getSignedAddress(signed, message, (err, verifiedAddress) => {
     if (err) return resError(err.message, payload, res)
     res({ id: payload.id, jsonrpc: payload.jsonrpc, result: verifiedAddress })
