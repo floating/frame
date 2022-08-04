@@ -186,8 +186,4 @@ export default class LatticeAdapter extends SignerAdapter {
       log.error('could not reload Lattice', e)
     }
   }
-
-  private handleError () {
-
-  }
 }
