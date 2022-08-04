@@ -180,6 +180,8 @@ export default class Lattice extends Signer {
     try {
       this.derivation = derivation || this.derivation
 
+      log.verbose(`Deriving ${this.derivation} Lattice addresses, retries remaining: ${retries}`)
+
       const connection = this.connection as Client
 
       const addressLimit = this.derivation === Derivation.live ? 1 : ADDRESS_LIMIT
