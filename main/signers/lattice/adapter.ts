@@ -106,7 +106,7 @@ export default class LatticeAdapter extends SignerAdapter {
             // client is already paired between sessions
             const { derivation } = getLatticeSettings(deviceId)
 
-            lattice.deriveAddresses({ derivation })
+            lattice.deriveAddresses(derivation)
           }
         })
 
@@ -115,7 +115,7 @@ export default class LatticeAdapter extends SignerAdapter {
 
           if (hasActiveWallet) {
             const { derivation } = getLatticeSettings(deviceId)
-            lattice.deriveAddresses({ derivation })
+            lattice.deriveAddresses(derivation)
           }
         })
 
@@ -142,6 +142,7 @@ export default class LatticeAdapter extends SignerAdapter {
           // don't attempt to automatically connect if the Lattice isn't
           // paired as this could happen without the user noticing
           lattice.connect(baseUrl, privKey).catch(() => {
+            console.log('caught error!')
             store.updateLattice(deviceId, { paired: false })
           })
         }
@@ -185,5 +186,9 @@ export default class LatticeAdapter extends SignerAdapter {
     } catch (e) {
       log.error('could not reload Lattice', e)
     }
+  }
+
+  private handleError () {
+
   }
 }
