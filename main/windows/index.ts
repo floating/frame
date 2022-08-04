@@ -149,7 +149,6 @@ function initTrayWindow () {
 
   if (!openedAtLogin) {
     windows.tray.once('ready-to-show', () => {
-      console.log('ready to show', tray.show)
       tray.show()
     })
   }
@@ -352,7 +351,6 @@ const init = () => {
   if (tray) {
     tray.destroy()
   }
-  console.log('init tray')
   tray = new Tray()
   dash = new Dash()
 }
