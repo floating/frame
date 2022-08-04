@@ -180,8 +180,6 @@ export default class Lattice extends Signer {
     try {
       this.derivation = derivation || this.derivation
 
-      log.verbose(`Deriving ${this.derivation} Lattice addresses, retries remaining: ${retries}`)
-
       const connection = this.connection as Client
 
       const addressLimit = this.derivation === Derivation.live ? 1 : ADDRESS_LIMIT
@@ -189,7 +187,7 @@ export default class Lattice extends Signer {
       while (this.addresses.length < this.accountLimit) {
         const req = {
           startPath: this.getPath(this.addresses.length),
-          n: Math.min(addressLimit, this.accountLimit - this.addresses.length),
+          n: 11//Math.min(addressLimit, this.accountLimit - this.addresses.length),
         }
 
         const loadedAddresses = await connection.getAddresses(req)
@@ -203,7 +201,11 @@ export default class Lattice extends Signer {
 
       return this.addresses
     } catch (e) {
+      const err = e as Error
+
       if (retries > 0) {
+        log.verbose(`Deriving ${this.derivation} Lattice addresses failed, trying ${retries} more times, error:`, err.message)
+
         return new Promise<string[]>(resolve => {
           setTimeout(() => {
             resolve(this.derive({ ...opts, retries: retries - 1 }))
@@ -211,7 +213,7 @@ export default class Lattice extends Signer {
         })
       }
 
-      const errorMessage = this.handleError('could not derive addresses', e as Error)
+      const errorMessage = this.handleError('could not derive addresses', err)
 
       throw new Error(errorMessage)
     }
