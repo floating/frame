@@ -651,6 +651,11 @@ module.exports = {
   },
   muteBetaDisclosure: (u) => {
     u('main.mute.betaDisclosure', () => true)
+    const navItem = { view: 'accounts', data: {} }
+    u('dash.nav', nav => {
+      if (JSON.stringify(nav[0]) !== JSON.stringify(navItem)) nav.unshift(navItem)      
+      return nav
+    })
     u('dash.showing', () => true)
   },
   muteAragonAccountMigrationWarning: (u) => {

@@ -7,6 +7,8 @@ import { hexToNumber } from 'web3-utils'
 import store from '../store'
 import FrameManager from './frames'
 
+process.env.BUNDLE_LOCATION = process.env.BUNDLE_LOCATION || path.resolve(__dirname, './../../..', 'bundle')
+
 type Windows = { [key: string]: BrowserWindow }
 
 const events = new EventEmitter()
