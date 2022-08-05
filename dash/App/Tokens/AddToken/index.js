@@ -8,10 +8,12 @@ import svg from '../../../../resources/svg'
 class AddTokenChainScreen extends Component {
   constructor (props, context) {
     super(props, context)
+    this.state = {}
   }
   
   render () {
-    const { chainId, store } = this.props
+    const { store } = this.props
+    const { chainId } = this.state
     return <div className='newTokenView cardShow'>
       <div className='newTokenChainSelectTitle'>
         {'What chain is this token on?'}
@@ -35,7 +37,10 @@ class AddTokenChainScreen extends Component {
                   background: chainMeta[hexId] ? chainMeta[hexId].primaryColor : 'var(--moon)'
                 } : {}}
                 onClick={() => {
-                  link.send('tray:action', 'navDash', { view: 'tokens', data: { notify: 'addToken', notifyData: { chainId: parseInt(id) }} })
+                  this.setState({ chainId: intId })
+                  setTimeout(() => {
+                    link.send('tray:action', 'navDash', { view: 'tokens', data: { notify: 'addToken', notifyData: { chainId: intId }} })
+                  }, 200)
                 }}
               >
                 <div className='originChainItemIcon'>
@@ -259,7 +264,6 @@ class AddTokenFormScreen extends Component {
                   />
                   Symbol
                 </label>
-
               </div>
 
               <div className='tokenDecimals'>
