@@ -4,6 +4,8 @@ import log from 'electron-log'
 import { numberToHex } from 'web3-utils'
 import url from 'url'
 
+process.env.BUNDLE_LOCATION = process.env.BUNDLE_LOCATION || path.resolve(__dirname, './../..', 'bundle')
+
 import * as errors from './errors'
 import windows from './windows'
 import menu from './menu'
@@ -19,8 +21,6 @@ import Erc20Contract from './contracts/erc20'
 import provider from './provider'
 import { getErrorCode } from '../resources/utils'
 import { FrameInstance } from './windows/frames/frameInstances'
-
-process.env.BUNDLE_LOCATION = process.env.BUNDLE_LOCATION || path.resolve(__dirname, './../..', 'bundle')
 
 app.commandLine.appendSwitch('enable-accelerated-2d-canvas', 'true')
 app.commandLine.appendSwitch('enable-gpu-rasterization', 'true')
