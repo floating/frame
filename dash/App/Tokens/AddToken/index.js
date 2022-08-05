@@ -316,10 +316,12 @@ class AddTokenFormScreen extends Component {
                 <div
                   className='addTokenSubmit addTokenSubmitEnabled'
                   onMouseDown={() => {
-                    const { name, symbol, chainId, address, decimals, logoURI } = this.state
+                    const { name, symbol, address, decimals, logoURI } = this.state
                     const token = { name, symbol, chainId, address, decimals, logoURI }
                     link.send('tray:addToken', token, req)
                     setTimeout(() => {
+                      link.send('tray:action', 'backDash')
+                      link.send('tray:action', 'backDash')
                       link.send('tray:action', 'backDash')
                     }, 400)
                   }}
@@ -327,9 +329,7 @@ class AddTokenFormScreen extends Component {
                   Add Token
                 </div>
               ) : (
-                <div
-                  className='addTokenSubmit'
-                >
+                <div className='addTokenSubmit'>
                   Fill in Token Details
                 </div>
               )}
