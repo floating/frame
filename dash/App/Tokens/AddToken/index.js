@@ -8,7 +8,6 @@ import svg from '../../../../resources/svg'
 class AddTokenChainScreen extends Component {
   constructor (props, context) {
     super(props, context)
-    // this.store = props.store
   }
   
   render () {
@@ -180,7 +179,7 @@ class AddTokenFormScreen extends Component {
   }
 
   render () {
-    const { chainId, chainName, tokenData: { address } } = this.props
+    const { chainId, chainName, req, tokenData: { address } } = this.props
     const newTokenReady = (
       this.state.name && this.state.name !== this.nameDefault &&
       this.state.symbol && this.state.symbol !== this.symbolDefault &&
@@ -319,7 +318,7 @@ class AddTokenFormScreen extends Component {
                   onMouseDown={() => {
                     const { name, symbol, chainId, address, decimals, logoURI } = this.state
                     const token = { name, symbol, chainId, address, decimals, logoURI }
-                    link.send('tray:addToken', token, this.req)
+                    link.send('tray:addToken', token, req)
                     setTimeout(() => {
                       link.send('tray:action', 'backDash')
                     }, 400)
