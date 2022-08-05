@@ -193,8 +193,6 @@ class AddTokenFormScreen extends Component {
       Number.isInteger(this.state.decimals)
     )
     const hexId = '0x' + parseInt(chainId).toString('16')
-    console.log('chainId', chainId)
-    console.log('address', address)
     
     return (
       <div className='notifyBoxWrap cardShow' onMouseDown={e => e.stopPropagation()}>
@@ -358,9 +356,7 @@ class AddToken extends Component {
   }
 
   async updateTokenData (contractAddress, chainId) {
-    console.log('updateTokenData', contractAddress, chainId)
     const { name, symbol, decimals } = await link.invoke('tray:getTokenDetails', contractAddress, chainId)
-    console.log('retrieved', name, symbol, decimals)
     this.setState({ tokenData: { name, symbol, decimals }})
   }
 
@@ -369,10 +365,6 @@ class AddToken extends Component {
     const address = data && data.notifyData && data.notifyData.address
     const chainId = data && data.notifyData && data.notifyData.chainId
     const chainName = chainId ? this.store('main.networks.ethereum', chainId, 'name') : undefined
-
-    console.log('data', data.notifyData)
-    console.log('chainId', chainId)
-    console.log('address', address)
 
     if (!chainId) {
       return <AddTokenChainScreen store={this.store} />
