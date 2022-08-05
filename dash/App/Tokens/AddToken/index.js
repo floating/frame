@@ -319,7 +319,7 @@ class AddTokenFormScreen extends Component {
                   className='addTokenSubmit addTokenSubmitEnabled'
                   onMouseDown={() => {
                     const { name, symbol, address, decimals, logoURI } = this.state
-                    const token = { name, symbol, chainId, address, decimals, logoURI }
+                    const token = { name, symbol, chainId, address, decimals, logoURI: this.isDefault('logoURI') ? '' : logoURI }
                     link.send('tray:addToken', token, req)
                     setTimeout(() => {
                       link.send('tray:action', 'backDash')
