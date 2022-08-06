@@ -87,13 +87,14 @@ describe('#send', () => {
     expect(connection.send).toHaveBeenCalledWith(request, expect.any(Function), { type: 'ethereum', id: 1 })
   })
 
-  it('returns an error when an unknown chain is given', () => {
+  it('returns an error when an unknown chain is given', done => {
     const request = { method: 'eth_testFrame', chainId: '0x63' }
 
     send(request, response => {
       expect(connection.send).not.toHaveBeenCalled()
       expect(response.error.message).toMatch(/unknown chain/)
       expect(response.result).toBe(undefined)
+      done()
     })
   })
 
