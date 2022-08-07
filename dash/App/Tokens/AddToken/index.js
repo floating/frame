@@ -4,16 +4,20 @@ import RingIcon from '../../../../resources/Components/RingIcon'
 import chainMeta from '../../../../resources/chainMeta'
 import link from '../../../../resources/link'
 import svg from '../../../../resources/svg'
+import { intToHex } from '../../../../resources/utils'
 
 class AddTokenChainScreen extends Component {
   constructor (props, context) {
     super(props, context)
-    this.state = {}
+    this.state = {
+      chainId: 1
+    }
   }
   
   render () {
     const { store } = this.props
-    const { chainId } = this.state
+    const { chainId: stateChainId } = this.state
+
     return <div className='newTokenView cardShow'>
       <div className='newTokenChainSelectTitle'>
         {'What chain is this token on?'}
@@ -23,10 +27,11 @@ class AddTokenChainScreen extends Component {
         {Object.keys(store('main.networks.ethereum'))
           .filter(id => store('main.networks.ethereum', id, 'on'))
           .map(id => {
-            const intId = parseInt(id)
-            const hexId = '0x' + intId.toString('16')
-            const selected = chainId === intId
+            const chainId = parseInt(id)
+            const hexChainId = intToHex(chainId)
+            const selected = stateChainId === chainId
             const chainName = store('main.networks.ethereum', id, 'name')
+
             return (
               <div 
                 className='originChainItem'
@@ -34,19 +39,19 @@ class AddTokenChainScreen extends Component {
                 role='button'
                 style={selected ? {
                   color: 'var(--ghostB)',
-                  background: chainMeta[hexId] ? chainMeta[hexId].primaryColor : 'var(--moon)'
+                  background: chainMeta[hexChainId] ? chainMeta[hexChainId].primaryColor : 'var(--moon)'
                 } : {}}
                 onClick={() => {
-                  this.setState({ chainId: intId })
+                  this.setState({ chainId })
                   setTimeout(() => {
-                    link.send('tray:action', 'navDash', { view: 'tokens', data: { notify: 'addToken', notifyData: { chainId: intId }} })
+                    link.send('tray:action', 'navDash', { view: 'tokens', data: { notify: 'addToken', notifyData: { chainId }} })
                   }, 200)
                 }}
               >
                 <div className='originChainItemIcon'>
                   <RingIcon
-                    color={chainMeta[hexId] ? chainMeta[hexId].primaryColor : 'var(--moon)'}
-                    img={chainMeta[hexId] ? chainMeta[hexId].icon : ''}
+                    color={chainMeta[hexChainId] ? chainMeta[hexChainId].primaryColor : 'var(--moon)'}
+                    img={chainMeta[hexChainId] ? chainMeta[hexChainId].icon : ''}
                   />
                 </div>
 
@@ -55,7 +60,7 @@ class AddTokenChainScreen extends Component {
                 <div 
                   className='originChainItemCheck'
                   style={selected ? {
-                    background: chainMeta[hexId] ? chainMeta[hexId].primaryColor : 'var(--moon)'
+                    background: chainMeta[hexChainId] ? chainMeta[hexChainId].primaryColor : 'var(--moon)'
                   } : {}}
                 >
                   {selected ? svg.check(28) : null}
@@ -84,12 +89,14 @@ class AddTokenAddressScreen extends Component {
   isConnectedChain () {
     const { chainId, activeChains } = this.props
     const chain = activeChains.find(({ id }) => id === chainId)
+
     return chain.connection.primary.connected || chain.connection.secondary.connected
   }
 
   render () {
     const { chainId, chainName } = this.props
-    const hexId = '0x' + parseInt(chainId).toString('16')
+    const hexId = intToHex(parseInt(chainId))
+
     return (
       <div className='newTokenView cardShow'>
         <div className='newTokenChainSelectTitle'>
@@ -192,7 +199,7 @@ class AddTokenFormScreen extends Component {
       address &&
       Number.isInteger(this.state.decimals)
     )
-    const hexId = '0x' + parseInt(chainId).toString('16')
+    const hexId = intToHex(parseInt(chainId))
     
     return (
       <div className='notifyBoxWrap cardShow' onMouseDown={e => e.stopPropagation()}>
