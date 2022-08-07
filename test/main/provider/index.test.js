@@ -98,13 +98,14 @@ describe('#send', () => {
     })
   })
 
-  it('returns an error when an invalid chain is given', () => {
+  it('returns an error when an invalid chain is given', done => {
     const request = { method: 'eth_testFrame', chainId: 'test' }
 
     send(request, response => {
       expect(connection.send).not.toHaveBeenCalled()
       expect(response.error.message).toMatch(/unknown chain/)
       expect(response.result).toBe(undefined)
+      done()
     })
   })
 
