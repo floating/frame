@@ -46,11 +46,7 @@ class Settings extends React.Component {
             </div>
           ) : (
             <>
-              <Verify 
-                id={this.props.account}
-              />
-              <div className='moduleRow'>
-                Account Tag: 
+              <div className='settingsRow'>
                 <input
                   type='text'
                   tabIndex='-1'
@@ -60,21 +56,37 @@ class Settings extends React.Component {
                     link.send('tray:renameAccount', this.props.account, e.target.value)
                   }}
                 />
+                <div className='settingsRowTag'>
+                  {'Account Tag'}
+                </div>
               </div>
-              {account.smart
-                ? (<div className='moduleRow'>Chain ID: {account.smart.chain && account.smart.chain.id}</div>)
-                : null
-              }
-              <div className='moduleRow'>Status: {account.status}</div>
-              <div className='moduleRow'>ENS Name: {account.ensName  ? account.ensName : 'none'}</div>
-              <div className='moduleRow'>Last Signer Type: {account.lastSignerType}</div>
-              <div className='moduleRow'>Signer Connected: {account.signer ? 'yes' : 'no'}</div>
-              {/* <div className='moduleRow'>Account Added: {account.created}</div> */}
+              
+              <div className='settingsRow'>
+                <Verify 
+                  id={this.props.account}
+                />
+              </div>
+
+              {account.smart ? (
+                <div className='settingsRow'>Chain ID: {account.smart.chain && account.smart.chain.id}</div>
+              ) : null}
+
+              <div className='settingsRow'>
+                <div>{`Account using ${account.lastSignerType} signer`}</div>
+                {account.signer ? (
+                  <div className='settingsRowInset settingsRowInsetConnected'>{'signer connected'}</div>
+                ) : (
+                  <div className='settingsRowInset'>{'signer not connected'}</div>
+                )}
+              </div>
+
               <div className='moduleButton moduleButtonBad' onMouseDown={() => {
-                link.rpc('removeAccount', this.props.account, {}, () => {
-                  // console.log('Removed account ', address)
-                })
-              }}>Remove This Account</div>
+                link.rpc('removeAccount', this.props.account, {}, () => {})
+              }}>
+                {'Remove This Account'}
+              </div>
+              {/* <div className='moduleRow'>ENS Name: {account.ensName  ? account.ensName : 'none'}</div> */}
+              {/* <div className='moduleRow'>Account Added: {account.created}</div> */}
             </>
           )}
         </div>

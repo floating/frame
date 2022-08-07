@@ -54,36 +54,31 @@ class Notify extends React.Component {
               <img src={frameIcon} />
             </div>
             <div className='notifyTitle'>
-              Frame v0.5-beta
+              Frame v0.5
             </div>
             <div className='notifyBody'>
-              <div className='notifyBodyBlock notifyBodyBlockBig'>
-                We are excited to welcome you to the next iteration of Frame!
-              </div>
               <div className='notifyBodyBlock'>
-                Be advised, this version of Frame is currently in "beta" and will update on a beta track
-              </div>
-              <div className='notifyBodyBlock'>
-                Use hardware signers for high value accounts and verify all transaction and account details on your signing device
-              </div>
-              <div className='notifyBodyBlock'>
-                <span>Read</span>
-                <span 
-                  className='notifyBodyLink'
-                  onMouseDown={() => { link.send('tray:openExternal', 'https://github.com/floating/frame/blob/0.5/LICENSE') }}
-                >
-                  our license
-                </span>
-                <span>and use Frame at your own risk</span>
-              </div>
-              <div className='notifyBodyBlock notifyBodyBlockBig'>
-                <div>Please give us your feedback!</div>
-                <div 
-                  className='notifyBodyLink' 
-                  style={{marginTop: '20px'}}
-                  onMouseDown={() => { link.send('tray:openExternal', 'https://frame.canny.io') }}
-                >
-                  feedback.frame.sh
+                <div className='notifySection'>
+                  Use hardware signers for high value accounts
+                </div>
+                <div className='notifySection'>
+                  <span>Read</span>
+                  <span
+                    className='notifyBodyLink'
+                    onMouseDown={() => { link.send('tray:openExternal', 'https://github.com/floating/frame/blob/0.5/LICENSE') }}
+                  >
+                    our license
+                  </span>
+                  <span>and use Frame at your own risk</span>
+                </div>
+                <div className='notifySection'>
+                  <span>Please give us your feedback! </span>
+                  <span
+                    className='notifyBodyLink' 
+                    onMouseDown={() => { link.send('tray:openExternal', 'https://frame.canny.io') }}
+                  >
+                    feedback.frame.sh
+                  </span>
                 </div>
               </div>
             </div>

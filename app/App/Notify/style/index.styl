@@ -53,12 +53,13 @@
     border-radius 12px
     box-sizing border-box
     position absolute
-    top 80px
-    bottom 50px
-    left 6px
-    right 6px
+    top 0px
+    bottom 0px
+    left 0px
+    right 0px
+    padding 8px
     transition var(--standard)
-    background var(--ghostA)
+    background var(--ghostZ)
     display flex
     justify-content center
     align-items center
@@ -86,11 +87,11 @@
       align-items center
 
     .notifyBox
-      border-top 1px solid var(--ghostA)
-      border-bottom 1px solid var(--ghostA)
       width 100%
       overflow hidden
-      padding 64px 0px
+
+      .notifySection
+        margin 10px
       
       .notifyTitle
         font-size 19px
@@ -121,26 +122,25 @@
           // box-shadow 0px 30px 24px -10px var(--doubleThick)
 
       .notifyBody
-        font-size 17px
+        font-size 14px
         position relative
         z-index 3
-        padding 4px
         word-break break-word
         width 100%
         box-sizing border-box
-        padding 20px
+        padding 8px
 
         .notifyBodyLine
           padding 0px 0px 
           text-transform uppercase
-          font-size 16px
+          font-size 14px
           font-weight 500
           font-family 'Exo2'
 
         .notifyBodyLineUrl
           padding-bottom 56px
           font-family FiraCode, monospace
-          font-size 16px
+          font-size 14px
           font-weight 100
           word-break break-all
  
@@ -153,17 +153,6 @@
           margin-top 50px
           font-size 13px
           font-weight 500
-
-        .notifyBodyBlock
-          padding 8px
-          margin-bottom 8px
-          background var(--ghostB)
-          border-radius 8px
-
-        .notifyBodyBlockBig
-          padding 16px
-          font-size 17px
-          background var(--ghostC)
 
         .notifyBodyLink
           text-decoration underline

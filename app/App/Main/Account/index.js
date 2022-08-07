@@ -179,12 +179,6 @@ class _AccountModule extends React.Component {
               expandModule={expandModule}
               expanded={expanded}
             /> :
-            id === 'verify' ? <Verify 
-              moduleId={id}
-              id={account}
-              expandModule={expandModule}
-              expanded={expanded}
-            /> :
             id === 'activity' ? <Activity 
               moduleId={id} 
               id={account}
@@ -488,7 +482,7 @@ class _AccountBody extends React.Component {
               <AccountModule 
                 id={crumb.id}
                 account={crumb.account}
-                module={{ height: '100%' }}
+                module={{ height: 'auto' }}
                 top={0}
                 index={0}
                 expandModule={(view, data) => {
