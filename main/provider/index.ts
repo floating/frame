@@ -728,9 +728,7 @@ export class Provider extends EventEmitter {
       const chainId = parseInt(payload.chainId || '', 16)
       const chainConnection = this.connection.connections['ethereum'][chainId] || {}
 
-      if (chainConnection.chainConfig) {
-        return { type: 'ethereum', id: chainId }
-      }
+      return chainConnection.chainConfig && { type: 'ethereum', id: chainId }
     }
 
     return getPayloadOrigin(payload).chain
