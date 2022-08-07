@@ -342,7 +342,7 @@ class FrameAccount {
       const inRequestView = panelNav.map((crumb: any) => crumb.view).includes('requestView')
 
       if (accountOpen && !inRequestView) {
-        const reqData = Object.assign({}, req)
+        const reqData = { ...req, data: { ...req.data } }
         delete reqData.res
 
         const crumb = { view: 'requestView', step: 'confirm', account, req: reqData }
