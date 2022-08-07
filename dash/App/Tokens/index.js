@@ -6,16 +6,16 @@ import svg from '../../../resources/svg'
 import AddToken from './AddToken'
 import CustomTokens from './CustomTokens'
 
-const AddTokenForm = ({ store }) => {
+const AddTokenForm = ({ store, data }) => {
   const activeChains = Object.values(store('main.networks.ethereum')).filter((chain) => chain.on)
-  return <AddToken req={store('view.notifyData')} activeChains={activeChains}  />
+  return <AddToken req={store('view.notifyData')} activeChains={activeChains} data={data} />
 }
 
-function Tokens ({ data: { notify } }) {
+function Tokens ({ data }) {
   return (
     <>
-      {notify === 'addToken' ? (
-        <AddTokenForm store={this.store}  />
+      {data.notify === 'addToken' ? (
+        <AddTokenForm store={this.store} data={data}  />
       ) : (
         <CustomTokens />
       )}
