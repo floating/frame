@@ -209,11 +209,11 @@ class AddTokenFormScreen extends Component {
               Add New Token
             </div>
             <div className='newTokenChainSelectTitle'>
-              <div className='newTokenChainAddress'>
+              <h2 className='newTokenChainAddress'>
                 {address.substring(0, 10)}
                 {svg.octicon('kebab-horizontal', { height: 14 })}
                 {address.substring(address.length - 8)}
-              </div>
+              </h2>
               {chainName ? (
                 <div 
                   className='newTokenChainSelectSubtitle'
