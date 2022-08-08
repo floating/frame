@@ -106,7 +106,7 @@ describe('selecting token chain', () => {
     const polygonButton = getByRole('button', { name: 'Polygon' })
     await user.click(polygonButton)
 
-    const contractAddressInput = getByLabelText(`What is the token's contract address?`)
+    const contractAddressInput = getByLabelText(`Enter token's address`)
     expect(contractAddressInput.textContent).toBe('')
   })
 })
@@ -123,7 +123,7 @@ describe('retrieving token metadata', () => {
 
     rerenderComponent = rerender
     
-    const contractAddressLabel = getByLabelText(`What is the token's contract address?`)
+    const contractAddressLabel = getByLabelText(`Enter token's address`)
     await user.type(contractAddressLabel, '0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0')
     const setAddressButton = getByRole('button', { name: 'Set Address' })
     await user.click(setAddressButton)
@@ -150,7 +150,7 @@ describe('retrieving token metadata', () => {
 
     rerenderComponent = rerender
 
-    const contractAddressLabel = getByLabelText(`What is the token's contract address?`)
+    const contractAddressLabel = getByLabelText(`Enter token's address`)
     await user.type(contractAddressLabel, '0x3432b6a60d23ca0dfca7761b7ab56459dinvalid')      
     const setAddressButton = getByRole('button', { name: 'Set Address' })
     await user.click(setAddressButton)
