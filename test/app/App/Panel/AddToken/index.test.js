@@ -93,7 +93,7 @@ describe('selecting token chain', () => {
     expect(tokenChainNames).toEqual(['Mainnet', 'Polygon'])
   })
 
-  it('accepts a chain selection', async () => {
+  it('should prompt for a contract address after chain selection', async () => {
     const { user, getByRole, getByLabelText, rerender } = setup(
       <AddToken activeChains={[
         { id: 1, name: 'Mainnet', connection: { primary: { connected: true } } },
