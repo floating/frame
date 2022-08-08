@@ -34,8 +34,21 @@ jest.mock('../../../../../main/store/persist')
 jest.mock('../../../../../resources/link')
 
 const AddToken = Restore.connect(AddTokenComponent, store)
-const user = userEvent.setup()
+
+const user = userEvent.setup({ advanceTimers: () => {
+  jest.advanceTimersByTime(200)
+  return Promise.resolve()
+}})
+
 let rerenderComponent
+
+beforeAll(() => {
+  jest.useFakeTimers()
+})
+
+afterAll(() => {
+  jest.useRealTimers()
+})
 
 beforeEach(() => {
   link.invoke.mockImplementation((channel, contractAddress, chainId) => {
@@ -51,20 +64,22 @@ beforeEach(() => {
     expect(msg).toBe('navDash')
     expect(view).toBe('tokens')
     expect(notify).toBe('addToken')
+
+    // simulate nav updating notify data which will pass new props to this component
     rerenderComponent(
       <AddToken 
         activeChains={[
           { id: 1, name: 'Mainnet', connection: { primary: { connected: true } } },
           { id: 137, name: 'Polygon', connection: { primary: { connected: true } } }
         ]} 
-        data={{ notifyData }} 
+        data={{ notifyData }}
       />
     )
   })
 })
 
 describe('selecting token chain', () => {
-  it('should display the expected chain IDs', async () => {
+  it('should display the expected chain IDs', () => {
     const { getAllByRole } = render(
       <AddToken activeChains={[
         { id: 1, name: 'Mainnet', connection: { primary: { connected: true } } },
@@ -75,27 +90,41 @@ describe('selecting token chain', () => {
     const tokenChainNames = getAllByRole('button').map((el) => el.textContent)
     expect(tokenChainNames).toEqual(['Mainnet', 'Polygon'])
   })
-})
 
-describe('retrieving token metadata', () => {
-  it('should display successfully loaded data', async () => {
-    const { getByText, getByLabelText, getByRole, rerender } = render(
+  it('accepts a chain selection', async () => {
+    const { getByRole, getByLabelText, rerender } = render(
       <AddToken activeChains={[
         { id: 1, name: 'Mainnet', connection: { primary: { connected: true } } },
         { id: 137, name: 'Polygon', connection: { primary: { connected: true } } }
       ]} />
     )
+
     rerenderComponent = rerender
 
-    const selectPolygonButton = getByText('Polygon')
-    await user.click(selectPolygonButton)
+    const polygonButton = getByRole('button', { name: 'Polygon' })
+    await user.click(polygonButton)
+
+    const contractAddressInput = getByLabelText(`What is the token's contract address?`)
+    expect(contractAddressInput.textContent).toBe('')
+  })
+})
+
+describe('retrieving token metadata', () => {
+  it('should display successfully loaded data', async () => {
+    const { getByLabelText, getByRole, rerender } = render(
+      <AddToken activeChains={[
+        { id: 1, name: 'Mainnet', connection: { primary: { connected: true } } },
+        { id: 137, name: 'Polygon', connection: { primary: { connected: true } } }
+      ]}
+      data={{ notifyData: { chainId: 137 }}} />
+    )
+
+    rerenderComponent = rerender
     
-    await waitFor(async () => {
-      const contractAddressInput = getByLabelText(`What is the token's contract address?`)
-      await user.type(contractAddressInput, '0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0')      
-      const setAddressButton = getByRole('button')
-      await user.click(setAddressButton)
-    }, 200)
+    const contractAddressLabel = getByLabelText(`What is the token's contract address?`)
+    await user.type(contractAddressLabel, '0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0')
+    const setAddressButton = getByRole('button', { name: 'Set Address' })
+    await user.click(setAddressButton)
 
     const contractAddressInput = getByRole('heading')
     const tokenNameInput = getByLabelText('Token Name')
@@ -103,29 +132,26 @@ describe('retrieving token metadata', () => {
     const tokenDecimalsInput = getByLabelText('Decimals')
 
     expect(contractAddressInput.textContent).toEqual('0x3432b6a6d9c964d0')
-    expect(tokenNameInput.value).toEqual('Frame Test on Polygon')
+    await waitFor(() => expect(tokenNameInput.value).toEqual('Frame Test on Polygon'))
     expect(tokenSymbolInput.value).toEqual('mFRT')
     expect(tokenDecimalsInput.value).toEqual('18')
-  }, 800)
+  })
 
   it('should show a form with defaults when data is not found', async () => {
-    const { getByText, getByLabelText, getByRole, rerender } = render(
+    const { getByLabelText, getByRole, rerender } = render(
       <AddToken activeChains={[
         { id: 1, name: 'Mainnet', connection: { primary: { connected: true } } },
         { id: 137, name: 'Polygon', connection: { primary: { connected: true } } }
-      ]} />
+      ]}
+      data={{ notifyData: { chainId: 137 }}} />
     )
+
     rerenderComponent = rerender
 
-    const selectPolygonButton = getByText('Polygon')
-    await user.click(selectPolygonButton)
-
-    await waitFor(async () => {
-      const contractAddressInput = getByLabelText(`What is the token's contract address?`)
-      await user.type(contractAddressInput, '0x3432b6a60d23ca0dfca7761b7ab56459dinvalid')      
-      const setAddressButton = getByRole('button')
-      await user.click(setAddressButton)
-    }, 200)
+    const contractAddressLabel = getByLabelText(`What is the token's contract address?`)
+    await user.type(contractAddressLabel, '0x3432b6a60d23ca0dfca7761b7ab56459dinvalid')      
+    const setAddressButton = getByRole('button', { name: 'Set Address' })
+    await user.click(setAddressButton)
 
     const contractAddressInput = getByRole('heading')
     const tokenNameInput = getByLabelText('Token Name')
@@ -133,8 +159,8 @@ describe('retrieving token metadata', () => {
     const tokenDecimalsInput = getByLabelText('Decimals')
 
     expect(contractAddressInput.textContent).toEqual('0x3432b6a6dinvalid')
-    expect(tokenNameInput.value).toEqual('Token Name')
+    await waitFor(() => expect(tokenNameInput.value).toEqual('Token Name'))
     expect(tokenSymbolInput.value).toEqual('SYMBOL')
     expect(tokenDecimalsInput.value).toEqual('?')
-  }, 800)
+  })
 })
