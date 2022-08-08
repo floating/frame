@@ -5,6 +5,7 @@ on:
     branches:
       - 'beta.*'
       - 'develop'
+  pull_request:
 
 jobs:
   build:
