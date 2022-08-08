@@ -20,7 +20,7 @@ class AddTokenChainScreen extends Component {
 
     return <div className='newTokenView cardShow'>
       <div className='newTokenChainSelectTitle'>
-        {'Select token\'s chain'}
+        {`Select token's chain`}
       </div>
       <div className='newTokenChainSelectChain'>
       <div className='originSwapChainList'>
