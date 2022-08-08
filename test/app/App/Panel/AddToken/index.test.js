@@ -159,7 +159,7 @@ describe('retrieving token metadata', () => {
     const tokenDecimalsInput = getByLabelText('Decimals')
 
     expect(contractAddressInput.textContent).toEqual('0x3432b6a6dinvalid')
-    await waitFor(() => expect(tokenNameInput.value).toEqual('Token Name'))
+    expect(tokenNameInput.value).toEqual('Token Name')
     expect(tokenSymbolInput.value).toEqual('SYMBOL')
     expect(tokenDecimalsInput.value).toEqual('?')
   })
