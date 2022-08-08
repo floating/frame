@@ -35,12 +35,7 @@ jest.mock('../../../../../resources/link')
 
 const AddToken = Restore.connect(AddTokenComponent, store)
 
-function setup (jsx, options = {}) {
-  return {
-    user: userEvent.setup(options),
-    ...render(jsx)
-  }
-}
+const setup = (jsx, options = {}) => ({ user: userEvent.setup(options), ...render(jsx) })
 
 const advanceTimers = (ms = 0) => {
   jest.advanceTimersByTime(ms)
