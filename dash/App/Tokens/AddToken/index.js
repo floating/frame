@@ -159,18 +159,23 @@ class AddTokenFormScreen extends Component {
     this.decimalsDefault = '?'
     this.logoURIDefault = 'Logo URI'
     this.activeChains = props.activeChains
-    this.state = {
-      name: props.tokenData.name || this.nameDefault,
-      symbol: props.tokenData.symbol || this.symbolDefault,
-      decimals: props.tokenData.decimals || this.decimalsDefault,
-      logoURI: this.logoURIDefault
+    this.state = this.stateFromTokenData(props.tokenData)
+  }
+
+  stateFromTokenData (tokenData) {
+    return { 
+      address: tokenData.address || '', 
+      name: tokenData.name || this.nameDefault, 
+      symbol: tokenData.symbol || this.symbolDefault, 
+      decimals: tokenData.decimals || this.decimalsDefault, 
+      logoURI: tokenData.logoURI || this.logoURIDefault 
     }
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate (prevProps) {
     const { tokenData } = this.props
     if (tokenData !== prevProps.tokenData) {
-      this.setState({ ...tokenData })
+      this.setState(this.stateFromTokenData(tokenData))
     }
   }
 
@@ -200,7 +205,7 @@ class AddTokenFormScreen extends Component {
               Add New Token
             </div>
             <div className='newTokenChainSelectTitle'>
-              <div className='newTokenChainAddress'>
+              <div className='newTokenChainAddress' role='heading' aria-level='2'>
                 {address.substring(0, 10)}
                 {svg.octicon('kebab-horizontal', { height: 14 })}
                 {address.substring(address.length - 8)}
