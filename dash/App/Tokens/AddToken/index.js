@@ -10,7 +10,7 @@ class AddTokenChainScreen extends Component {
   constructor (props, context) {
     super(props, context)
     this.state = {
-      chainId: 1
+      chainId: 0
     }
   }
   
@@ -20,7 +20,7 @@ class AddTokenChainScreen extends Component {
 
     return <div className='newTokenView cardShow'>
       <div className='newTokenChainSelectTitle'>
-        {'What chain is this token on?'}
+        {'Select token\'s chain'}
       </div>
       <div className='newTokenChainSelectChain'>
       <div className='originSwapChainList'>
@@ -52,19 +52,10 @@ class AddTokenChainScreen extends Component {
                   <RingIcon
                     color={chainMeta[hexChainId] ? chainMeta[hexChainId].primaryColor : 'var(--moon)'}
                     img={chainMeta[hexChainId] ? chainMeta[hexChainId].icon : ''}
+                    small={true}
                   />
                 </div>
-
                 {chainName}
-
-                <div 
-                  className='originChainItemCheck'
-                  style={selected ? {
-                    background: chainMeta[hexChainId] ? chainMeta[hexChainId].primaryColor : 'var(--moon)'
-                  } : {}}
-                >
-                  {selected ? svg.check(28) : null}
-                </div>
               </div>
             )
           })}
@@ -100,7 +91,7 @@ class AddTokenAddressScreen extends Component {
     return (
       <div className='newTokenView cardShow'>
         <div className='newTokenChainSelectTitle'>
-          <label id='newTokenAddressLabel'>{`What is the token's contract address?`}</label>
+          <label id='newTokenAddressLabel'>{`Enter token's address`}</label>
           {chainName ? (
             <div 
               className='newTokenChainSelectSubtitle'
