@@ -35,10 +35,17 @@ jest.mock('../../../../../resources/link')
 
 const AddToken = Restore.connect(AddTokenComponent, store)
 
-const user = userEvent.setup({ advanceTimers: () => {
-  jest.advanceTimersByTime(200)
+function setup (jsx, options = {}) {
+  return {
+    user: userEvent.setup(options),
+    ...render(jsx)
+  }
+}
+
+const advanceTimers = (ms = 0) => {
+  jest.advanceTimersByTime(ms)
   return Promise.resolve()
-}})
+}
 
 let rerenderComponent
 
@@ -80,7 +87,7 @@ beforeEach(() => {
 
 describe('selecting token chain', () => {
   it('should display the expected chain IDs', () => {
-    const { getAllByRole } = render(
+    const { getAllByRole } = setup(
       <AddToken activeChains={[
         { id: 1, name: 'Mainnet', connection: { primary: { connected: true } } },
         { id: 137, name: 'Polygon', connection: { primary: { connected: true } } }
@@ -92,11 +99,11 @@ describe('selecting token chain', () => {
   })
 
   it('accepts a chain selection', async () => {
-    const { getByRole, getByLabelText, rerender } = render(
+    const { user, getByRole, getByLabelText, rerender } = setup(
       <AddToken activeChains={[
         { id: 1, name: 'Mainnet', connection: { primary: { connected: true } } },
         { id: 137, name: 'Polygon', connection: { primary: { connected: true } } }
-      ]} />
+      ]} />, { advanceTimers: () => advanceTimers(200) }
     )
 
     rerenderComponent = rerender
@@ -111,12 +118,12 @@ describe('selecting token chain', () => {
 
 describe('retrieving token metadata', () => {
   it('should display successfully loaded data', async () => {
-    const { getByLabelText, getByRole, rerender } = render(
+    const { user, getByLabelText, getByRole, rerender } = setup(
       <AddToken activeChains={[
         { id: 1, name: 'Mainnet', connection: { primary: { connected: true } } },
         { id: 137, name: 'Polygon', connection: { primary: { connected: true } } }
       ]}
-      data={{ notifyData: { chainId: 137 }}} />
+      data={{ notifyData: { chainId: 137 }}} />, { advanceTimers }
     )
 
     rerenderComponent = rerender
@@ -138,12 +145,12 @@ describe('retrieving token metadata', () => {
   })
 
   it('should show a form with defaults when data is not found', async () => {
-    const { getByLabelText, getByRole, rerender } = render(
+    const { user, getByLabelText, getByRole, rerender } = setup(
       <AddToken activeChains={[
         { id: 1, name: 'Mainnet', connection: { primary: { connected: true } } },
         { id: 137, name: 'Polygon', connection: { primary: { connected: true } } }
       ]}
-      data={{ notifyData: { chainId: 137 }}} />
+      data={{ notifyData: { chainId: 137 }}} />, { advanceTimers }
     )
 
     rerenderComponent = rerender
