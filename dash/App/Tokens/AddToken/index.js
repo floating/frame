@@ -6,17 +6,19 @@ import link from '../../../../resources/link'
 import svg from '../../../../resources/svg'
 import { intToHex } from '../../../../resources/utils'
 
-class AddTokenChainScreen extends Component {
-  constructor (props, context) {
-    super(props, context)
+class AddTokenChainScreenComponent extends Component {
+  constructor (...args) {
+    super(...args)
+
     this.state = {
       chainId: 0
     }
   }
   
   render () {
-    const { store } = this.props
-    const { chainId: stateChainId } = this.state
+    const { chainId: selectedChainId } = this.state
+
+    const activeChains = Object.values(this.store('main.networks.ethereum')).filter((chain) => chain.on)
 
     return <div className='newTokenView cardShow'>
       <div className='newTokenChainSelectTitle'>
@@ -24,40 +26,38 @@ class AddTokenChainScreen extends Component {
       </div>
       <div className='newTokenChainSelectChain'>
       <div className='originSwapChainList'>
-        {Object.keys(store('main.networks.ethereum'))
-          .filter(id => store('main.networks.ethereum', id, 'on'))
-          .map(id => {
-            const chainId = parseInt(id)
-            const hexChainId = intToHex(chainId)
-            const selected = stateChainId === chainId
-            const chainName = store('main.networks.ethereum', id, 'name')
+        {activeChains.map(chain => {
+          const selected = selectedChainId === chain.id
+          const hexChainId = intToHex(chain.id)
+          const chainName = chain.name
 
-            return (
-              <div 
-                className='originChainItem'
-                key={id}
-                role='button'
-                style={selected ? {
-                  color: 'var(--ghostB)',
-                  background: chainMeta[hexChainId] ? chainMeta[hexChainId].primaryColor : 'var(--moon)'
-                } : {}}
-                onClick={() => {
-                  this.setState({ chainId })
-                  setTimeout(() => {
-                    link.send('tray:action', 'navDash', { view: 'tokens', data: { notify: 'addToken', notifyData: { chainId }} })
-                  }, 200)
-                }}
-              >
-                <div className='originChainItemIcon'>
-                  <RingIcon
-                    color={chainMeta[hexChainId] ? chainMeta[hexChainId].primaryColor : 'var(--moon)'}
-                    img={chainMeta[hexChainId] ? chainMeta[hexChainId].icon : ''}
-                    small={true}
-                  />
-                </div>
-                {chainName}
+          return (
+            <div
+              className='originChainItem'
+              key={chain.id}
+              role='button'
+              style={selected ? {
+                color: 'var(--ghostB)',
+                background: chainMeta[hexChainId] ? chainMeta[hexChainId].primaryColor : 'var(--moon)'
+              } : {}}
+              onClick={() => {
+                this.setState({ chainId: chain.id })
+
+                setTimeout(() => {
+                  link.send('tray:action', 'navDash', { view: 'tokens', data: { notify: 'addToken', notifyData: { chainId: chain.id }} })
+                }, 200)
+              }}
+            >
+              <div className='originChainItemIcon'>
+                <RingIcon
+                  color={chainMeta[hexChainId] ? chainMeta[hexChainId].primaryColor : 'var(--moon)'}
+                  img={chainMeta[hexChainId] ? chainMeta[hexChainId].icon : ''}
+                  small={true}
+                />
               </div>
-            )
+              {chainName}
+            </div>
+          )
           })}
       </div>
       </div>
@@ -68,20 +68,42 @@ class AddTokenChainScreen extends Component {
   }
 }
 
-class AddTokenAddressScreen extends Component {
+const AddTokenChainScreen = Restore.connect(AddTokenChainScreenComponent)
+
+class AddTokenAddressScreenComponent extends Component {
   constructor (props, context) {
     super(props, context)
+
     this.state = {
       inputAddress: '',
     }
-    this.updateTokenData = props.updateTokenData
   }
 
   isConnectedChain () {
-    const { chainId, activeChains } = this.props
-    const chain = activeChains.find(({ id }) => id === chainId)
+    const activeChains = Object.values(this.store('main.networks.ethereum')).filter((chain) => chain.on)
+    const chain = activeChains.find(({ id }) => id === this.props.chainId)
 
     return chain.connection.primary.connected || chain.connection.secondary.connected
+  }
+
+  submit (address) {
+    const { chainId } = this.props
+
+    if (this.isConnectedChain()) {
+      this.props.updateTokenData(address, chainId)
+    }
+
+    link.send('tray:action', 'navDash',
+      {
+        view: 'tokens',
+        data: {
+          notify: 'addToken',
+          notifyData: {
+            address, chainId
+          }
+        }
+      }
+    )
   }
 
   render () {
@@ -114,11 +136,7 @@ class AddTokenAddressScreen extends Component {
               autoFocus={true}
               onKeyPress={(e) => {
                 if (e.key === 'Enter') {
-                  this.setState({ address: this.state.inputAddress })
-                  if (this.isConnectedChain()) {
-                    this.updateTokenData(this.state.inputAddress, chainId)
-                  }
-                  link.send('tray:action', 'navDash', { view: 'tokens', data: { notify: 'addToken', notifyData: { address: this.state.inputAddress, chainId }} })
+                  this.submit(this.state.inputAddress)
                 } 
               }}
               onChange={(e) => {
@@ -135,11 +153,7 @@ class AddTokenAddressScreen extends Component {
         className='tokenSetAddress'
         role='button'
         onClick={() => {
-          this.setState({ address: this.state.inputAddress })
-          if (this.isConnectedChain()) {
-            this.updateTokenData(this.state.inputAddress, chainId)
-          }
-          link.send('tray:action', 'navDash', { view: 'tokens', data: { notify: 'addToken', notifyData: { address: this.state.inputAddress, chainId }} })
+          this.submit(this.state.inputAddress)
         }}
       >
         {'Set Address'}
@@ -149,6 +163,7 @@ class AddTokenAddressScreen extends Component {
   }
 }
 
+const AddTokenAddressScreen = Restore.connect(AddTokenAddressScreenComponent)
 
 class AddTokenFormScreen extends Component {
   constructor (props, context) {
@@ -158,7 +173,7 @@ class AddTokenFormScreen extends Component {
     this.symbolDefault = 'SYMBOL'
     this.decimalsDefault = '?'
     this.logoURIDefault = 'Logo URI'
-    this.activeChains = props.activeChains
+
     this.state = this.stateFromTokenData(props.tokenData)
   }
 
@@ -364,20 +379,20 @@ class AddToken extends Component {
   }
 
   render () {
-    const { activeChains, data, req } = this.props
+    const { data, req } = this.props
     const address = data && data.notifyData && data.notifyData.address
     const chainId = data && data.notifyData && data.notifyData.chainId
     const chainName = chainId ? this.store('main.networks.ethereum', chainId, 'name') : undefined
 
     if (!chainId) {
-      return <AddTokenChainScreen store={this.store} />
+      return <AddTokenChainScreen />
     } else if (!address) {
-      return <AddTokenAddressScreen chainId={chainId} chainName={chainName} activeChains={activeChains} updateTokenData={this.updateTokenData.bind(this)} />
+      return <AddTokenAddressScreen chainId={chainId} chainName={chainName} updateTokenData={this.updateTokenData.bind(this)} />
     }
     
     const tokenData = { address, ...this.state.tokenData }
 
-    return <AddTokenFormScreen chainId={chainId} chainName={chainName} req={req} activeChains={activeChains} tokenData={tokenData} />
+    return <AddTokenFormScreen chainId={chainId} chainName={chainName} req={req} tokenData={tokenData} />
   }
 }
 
