@@ -117,7 +117,7 @@ class Gas extends React.Component {
       priorityFee: this.levelDisplay(maxPriorityFeePerGas)
     }
     const emptyFees = !Object.keys(fees).length
-    const feeEstimatesUSD = this.txEstimates(type, id, gasPrice, !emptyFees ? calculatedFees : null, currentSymbol)
+    const feeEstimatesUSD = this.txEstimates(type, id, gasPrice, emptyFees ? null : calculatedFees, currentSymbol)
 
     return (
       <div 
