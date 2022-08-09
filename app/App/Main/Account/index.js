@@ -8,7 +8,7 @@ import Default from './Default'
 
 import Activity from './Activity'
 import Balances from './Balances'
-import Gas from './Gas'
+import Gas from '../../../../resources/Components/Gas'
 import Inventory from './Inventory'
 import Launcher from './Launcher'
 import Permissions from './Permissions'

@@ -7,9 +7,9 @@ import svg from '../../../resources/svg'
 
 import Dropdown from '../../../resources/Components/Dropdown'
 import RingIcon from '../../../resources/Components/RingIcon'
+import Gas from '../../../resources/Components/Gas'
 
 import Connection from './Connection'
-import Gas from './Gas'
 import Usage from './Usage'
 import Tokens from './Tokens'
 
