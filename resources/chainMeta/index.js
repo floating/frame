@@ -1,5 +1,4 @@
 import arbitrum from './icons/arbitrum.svg'
-import eth from './icons/eth.svg'
 import fantom from './icons/fantom.svg'
 import optimism from './icons/optimism.svg'
 import polygon from './icons/polygon.svg'
