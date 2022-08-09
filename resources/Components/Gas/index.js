@@ -111,15 +111,13 @@ class Gas extends React.Component {
     const fees = this.store('main.networksMeta', type, id, 'gas.price.fees')
     const currentSymbol = this.store('main.networks', type, id, 'symbol') || 'ETH'
     const gasPrice = this.levelDisplay(levels.fast)
-
-    const { nextBaseFee, maxPriorityFeePerGas } = (fees || {})
-
+    const { nextBaseFee, maxPriorityFeePerGas } = fees
     const calculatedFees = {
       actualBaseFee: this.roundGwei((weiToGwei(hexToInt(nextBaseFee)))),
       priorityFee: this.levelDisplay(maxPriorityFeePerGas)
     }
-
-    const feeEstimatesUSD = this.txEstimates(type, id, gasPrice, fees ? calculatedFees : null, currentSymbol)
+    const emptyFees = !Object.keys(fees).length
+    const feeEstimatesUSD = this.txEstimates(type, id, gasPrice, !emptyFees ? calculatedFees : null, currentSymbol)
 
     return (
       <div 
@@ -158,14 +156,12 @@ class Gas extends React.Component {
     const fees = this.store('main.networksMeta', type, id, 'gas.price.fees')
     const currentSymbol = this.store('main.networks', type, id, 'symbol') || 'ETH'
     const gasPrice = this.levelDisplay(levels.fast)
-
-    const { nextBaseFee, maxPriorityFeePerGas } = (fees || {})
-
+    const { nextBaseFee, maxPriorityFeePerGas } = fees
+    const emptyFees = !Object.keys(fees).length
     const calculatedFees = {
       actualBaseFee: this.roundGwei((weiToGwei(hexToInt(nextBaseFee)))),
       priorityFee: this.levelDisplay(maxPriorityFeePerGas)
     }
-
 
     return (
       <div className='sliceContainer' ref={this.ref}>
@@ -176,7 +172,7 @@ class Gas extends React.Component {
           <div className='sliceGasBlock'>
             {this.state.baseHover ? <div className='feeToolTip feeToolTipBase cardShow'>The current base fee is added with a buffer to cover the next 3 blocks, any amount greater than your block's base fee is refunded</div> : null}
             {this.state.prioHover ? <div className='feeToolTip feeToolTipPriority cardShow'>A priority tip paid to validators is added to incentivize quick inclusion of your transaction into a block</div> : null }
-            <div className='gasItem gasItemSmall' style={ !fees ? { pointerEvents: 'none', opacity: 0 } : {}}>
+            <div className='gasItem gasItemSmall' style={ emptyFees ? { pointerEvents: 'none', opacity: 0 } : {}}>
               <div className='gasGweiNum'>
                 {calculatedFees.actualBaseFee}
               </div >
@@ -187,7 +183,7 @@ class Gas extends React.Component {
               <div 
                 className='gasArrow' 
                 onClick={() => this.setState({ baseHover: true })}
-                style={ !fees ? { pointerEvents: 'none', opacity: 0 } : {}}
+                style={ emptyFees ? { pointerEvents: 'none', opacity: 0 } : {}}
                 onMouseLeave={() => this.setState({ baseHover: false })}
               >
                 <div className='gasArrowNotify'>+</div>
@@ -200,14 +196,14 @@ class Gas extends React.Component {
               <span className='gasLevelLabel'>{'Recommended'}</span>
               <div 
                 className='gasArrow gasArrowRight'
-                style={ !fees ? { pointerEvents: 'none', opacity: 0 } : {}}
+                style={ emptyFees ? { pointerEvents: 'none', opacity: 0 } : {}}
                 onClick={() => this.setState({ prioHover: true })}
                 onMouseLeave={() => this.setState({ prioHover: false })}
               >
                 <div className='gasArrowInner'>{svg.chevron(27)}</div>
               </div>
             </div>
-            <div className='gasItem gasItemSmall' style={ !fees ? { pointerEvents: 'none', opacity: 0 } : {}}>
+            <div className='gasItem gasItemSmall' style={ emptyFees ? { pointerEvents: 'none', opacity: 0 } : {}}>
               <div  className='gasGweiNum'>
                 {calculatedFees.priorityFee}
               </div >
