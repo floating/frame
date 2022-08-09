@@ -136,7 +136,12 @@ export function getRawTx (newTx: RPC.SendTransaction.TxParams, accountId: string
 }
   
 export function gasFees (rawTx: TransactionData) {
-  return store('main.networksMeta', 'ethereum', parseInt(rawTx.chainId, 16), 'gas')
+  const gas = store('main.networksMeta', 'ethereum', parseInt(rawTx.chainId, 16), 'gas')
+  const { price } = gas
+  const { fees } = price
+
+  // ensure fees is either a populated object (EIP-1559 compatible) or falsy
+  return { ...gas, price: { ...price, fees: Object.keys(fees).length ? fees : undefined } }
 }
   
 export function isCurrentAccount (address: string, account: FrameAccount | null) {
