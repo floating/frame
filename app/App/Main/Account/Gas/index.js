@@ -133,7 +133,7 @@ class Gas extends React.Component {
         <div className='gasBlock'>
           {this.state.baseHover ? <div className='feeToolTip feeToolTipBase cardShow'>The current base fee is added with a buffer to cover the next 3 blocks, any amount greater than your block's base fee is refunded</div> : null}
           {this.state.prioHover ? <div className='feeToolTip feeToolTipPriority cardShow'>A priority tip paid to validators is added to incentivize quick inclusion of your transaction into a block</div> : null }
-          <div className='gasItem gasItemSmall' style={ !emptyFees ? { pointerEvents: 'none', opacity: 0 } : {}}>
+          <div className='gasItem gasItemSmall' style={ emptyFees ? { pointerEvents: 'none', opacity: 0 } : {}}>
             <span className='gasGweiNum'>{calculatedFees.actualBaseFee}</span>
             <span className='gasGweiLabel'>{'GWEI'}</span>
             <span className='gasLevelLabel'>{'Current Base'}</span>
