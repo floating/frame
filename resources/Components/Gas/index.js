@@ -36,6 +36,7 @@ function toDisplayUSD (bn) {
 function txEstimate (value, gasLimit, nativeUSD) {
   return toDisplayUSD(BigNumber(value * gasLimit).shiftedBy(-9).multipliedBy(nativeUSD))
 }
+
 class Gas extends React.Component {
   constructor (...args) {
     super(...args)
@@ -98,8 +99,8 @@ class Gas extends React.Component {
 
       return estimates.map(({ label, estimatedGas }) => (
         {
-          low: this.txEstimate(low, estimatedGas, nativeUSD),
-          high: this.txEstimate(gasPrice, estimatedGas, nativeUSD),
+          low: txEstimate(low, estimatedGas, nativeUSD),
+          high: txEstimate(gasPrice, estimatedGas, nativeUSD),
           label
         }
       ))
