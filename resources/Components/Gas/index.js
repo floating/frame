@@ -11,6 +11,31 @@ const gasToSendEth = 21 * 1000
 const gasToSendToken = 65 * 1000
 const gasForDexSwap = 200 * 1000
 
+function roundGwei(gwei) {
+  if (gwei && gwei < 0.001) return '‹0.001'
+  return parseFloat(
+    gwei >= 10 ? Math.round(gwei) :
+    gwei >= 5 ? Math.round(gwei * 10) / 10 :
+    gwei >= 1 ? Math.round(gwei * 100) / 100 :
+    Math.round(gwei * 1000) / 1000
+  )
+}
+
+function levelDisplay (level) {
+  const gwei = weiToGwei(hexToInt(level)) 
+  return roundGwei(gwei) || 0
+}
+
+function toDisplayUSD (bn) {
+  return parseFloat(
+    bn.toNumber() >= 1 ? bn.toFixed(0, BigNumber.ROUND_UP).toString() :
+    bn.toFixed(2, BigNumber.ROUND_UP).toString()     
+  )
+}
+
+function txEstimate (value, gasLimit, nativeUSD) {
+  return toDisplayUSD(BigNumber(value * gasLimit).shiftedBy(-9).multipliedBy(nativeUSD))
+}
 class Gas extends React.Component {
   constructor (...args) {
     super(...args)
@@ -23,29 +48,6 @@ class Gas extends React.Component {
     if (time < 60) return <><span className='timeUnit'>~</span>{time}<span className='timeUnit'>s</span></>
     if (time < 3600) return <><span className='timeUnit'>~</span>{Math.round(time / 60)}<span className='timeUnit'>m</span></>
     return <><span className='timeUnit'>~</span>{Math.round(time / 3600)}<span className='timeUnit'>h</span></>
-  }
-  toDisplayUSD (bn) {
-    return parseFloat(
-      bn.toNumber() >= 1 ? bn.toFixed(0, BigNumber.ROUND_UP).toString() :
-      bn.toFixed(2, BigNumber.ROUND_UP).toString()     
-    )
-  }
-  roundGwei (gwei) {
-    if (gwei && gwei < 0.001) return '‹0.001'
-    return parseFloat(
-      gwei >= 10 ? Math.round(gwei) :
-      gwei >= 5 ? Math.round(gwei * 10) / 10 :
-      gwei >= 1 ? Math.round(gwei * 100) / 100 :
-      Math.round(gwei * 1000) / 1000
-    )
-  }
-  levelDisplay (level) {
-    const gwei = weiToGwei(hexToInt(level)) 
-    return this.roundGwei(gwei) || 0
-  }
-
-  txEstimate (value, gasLimit, nativeUSD) {
-    return this.toDisplayUSD(BigNumber(value * gasLimit).shiftedBy(-9).multipliedBy(nativeUSD))
   }
 
   txEstimates (type, id, gasPrice, calculatedFees, currentSymbol) {
@@ -75,7 +77,7 @@ class Gas extends React.Component {
 
       const l1GasEstimates = [4300, 5100, 6900]
       const ethPriceLevels = this.store('main.networksMeta.ethereum', 1, 'gas.price.levels')
-      const l1Price = this.levelDisplay(ethPriceLevels.fast)
+      const l1Price = levelDisplay(ethPriceLevels.fast)
 
       const optimismEstimate = (l1Limit, l2Limit) => {
         const l1Estimate = BigNumber(l1Price * l1Limit * 1.5)
@@ -92,7 +94,7 @@ class Gas extends React.Component {
         }
       ))
     } else {
-      const low = calculatedFees ? this.roundGwei(calculatedFees.actualBaseFee + calculatedFees.priorityFee) : gasPrice
+      const low = calculatedFees ? roundGwei(calculatedFees.actualBaseFee + calculatedFees.priorityFee) : gasPrice
 
       return estimates.map(({ label, estimatedGas }) => (
         {
@@ -110,14 +112,14 @@ class Gas extends React.Component {
     const levels = this.store('main.networksMeta', type, id, 'gas.price.levels')
     const fees = this.store('main.networksMeta', type, id, 'gas.price.fees')
     const currentSymbol = this.store('main.networks', type, id, 'symbol') || 'ETH'
-    const gasPrice = this.levelDisplay(levels.fast)
+    const gasPrice = levelDisplay(levels.fast)
     const { nextBaseFee, maxPriorityFeePerGas } = fees
     const calculatedFees = {
-      actualBaseFee: this.roundGwei((weiToGwei(hexToInt(nextBaseFee)))),
-      priorityFee: this.levelDisplay(maxPriorityFeePerGas)
+      actualBaseFee: roundGwei((weiToGwei(hexToInt(nextBaseFee)))),
+      priorityFee: levelDisplay(maxPriorityFeePerGas)
     }
     const emptyFees = !Object.keys(fees).length
-    const feeEstimatesUSD = this.txEstimates(type, id, gasPrice, emptyFees ? null : calculatedFees, currentSymbol)
+    const feeEstimatesUSD = txEstimates(type, id, gasPrice, emptyFees ? null : calculatedFees, currentSymbol)
 
     return (
       <div 
@@ -154,13 +156,12 @@ class Gas extends React.Component {
     const { id } = this.props
     const levels = this.store('main.networksMeta', type, id, 'gas.price.levels')
     const fees = this.store('main.networksMeta', type, id, 'gas.price.fees')
-    const currentSymbol = this.store('main.networks', type, id, 'symbol') || 'ETH'
-    const gasPrice = this.levelDisplay(levels.fast)
+    const gasPrice = levelDisplay(levels.fast)
     const { nextBaseFee, maxPriorityFeePerGas } = fees
-    const emptyFees = !Object.keys(fees).length
+    const displayFeeMarket = !!Object.keys(fees).length
     const calculatedFees = {
-      actualBaseFee: this.roundGwei((weiToGwei(hexToInt(nextBaseFee)))),
-      priorityFee: this.levelDisplay(maxPriorityFeePerGas)
+      actualBaseFee: roundGwei((weiToGwei(hexToInt(nextBaseFee)))),
+      priorityFee: levelDisplay(maxPriorityFeePerGas)
     }
 
     return (
@@ -172,7 +173,7 @@ class Gas extends React.Component {
           <div className='sliceGasBlock'>
             {this.state.baseHover ? <div className='feeToolTip feeToolTipBase cardShow'>The current base fee is added with a buffer to cover the next 3 blocks, any amount greater than your block's base fee is refunded</div> : null}
             {this.state.prioHover ? <div className='feeToolTip feeToolTipPriority cardShow'>A priority tip paid to validators is added to incentivize quick inclusion of your transaction into a block</div> : null }
-            <div className='gasItem gasItemSmall' style={ emptyFees ? { pointerEvents: 'none', opacity: 0 } : {}}>
+            <div className='gasItem gasItemSmall' style={displayFeeMarket ? {} : { pointerEvents: 'none', opacity: 0 }}>
               <div className='gasGweiNum'>
                 {calculatedFees.actualBaseFee}
               </div >
@@ -183,28 +184,28 @@ class Gas extends React.Component {
               <div 
                 className='gasArrow' 
                 onClick={() => this.setState({ baseHover: true })}
-                style={ emptyFees ? { pointerEvents: 'none', opacity: 0 } : {}}
+                style={displayFeeMarket ? {} : { pointerEvents: 'none', opacity: 0 }}
                 onMouseLeave={() => this.setState({ baseHover: false })}
               >
                 <div className='gasArrowNotify'>+</div>
                 <div className='gasArrowInner'>{svg.chevron(27)}</div>
               </div>
-              <div  className='gasGweiNum'>
+              <div className='gasGweiNum'>
                 {gasPrice}
               </div >
               <span className='gasGweiLabel'>{'GWEI'}</span>
               <span className='gasLevelLabel'>{'Recommended'}</span>
               <div 
                 className='gasArrow gasArrowRight'
-                style={ emptyFees ? { pointerEvents: 'none', opacity: 0 } : {}}
+                style={displayFeeMarket ? {} : { pointerEvents: 'none', opacity: 0 }}
                 onClick={() => this.setState({ prioHover: true })}
                 onMouseLeave={() => this.setState({ prioHover: false })}
               >
                 <div className='gasArrowInner'>{svg.chevron(27)}</div>
               </div>
             </div>
-            <div className='gasItem gasItemSmall' style={ emptyFees ? { pointerEvents: 'none', opacity: 0 } : {}}>
-              <div  className='gasGweiNum'>
+            <div className='gasItem gasItemSmall' style={displayFeeMarket ? {} : { pointerEvents: 'none', opacity: 0 }}>
+              <div className='gasGweiNum'>
                 {calculatedFees.priorityFee}
               </div >
               <span className='gasGweiLabel'>{'GWEI'}</span>
