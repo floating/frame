@@ -831,16 +831,18 @@
     font-weight 400
     letter-spacing 1px
     color var(--outerspace05)
-    cursor pointer
     line-height 30px
-    
-    .pointer
-      cursor pointer
    
     .appInfoLineResetConfirm
       color var(--outerspace)
       span
-        margin-left 5px
+        margin-left 15px
+    
+    .appInfoLineResetButton, .appInfoLineResetConfirmButton
+      cursor pointer
+    
+    .appInfoLineResetConfirmButton:hover
+      color var(--outerspace)
 
   .appInfoLineVersion
     height 40px
