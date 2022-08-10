@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, useState } from 'react'
 import Restore from 'react-restore'
 import BigNumber from 'bignumber.js'
 
@@ -36,87 +36,67 @@ function txEstimate (value, gasLimit, nativeUSD) {
   return toDisplayUSD(BigNumber(value * gasLimit).shiftedBy(-9).multipliedBy(nativeUSD))
 }
 
-class GasFees extends Component {
-  constructor (...args) {
-    super(...args)
+const GasFees = ({ gasPrice }) => 
+  <div className='gasItem gasItemLarge'>
+    <div className='gasGweiNum'>
+      {gasPrice}
+    </div >
+    <span className='gasGweiLabel'>{'GWEI'}</span>
+    <span className='gasLevelLabel'>{'Recommended'}</span>
+  </div>
+
+const GasFeesMarket = ({ gasPrice, fees: { nextBaseFee, maxPriorityFeePerGas } }) => {
+  const [displayBaseHint, setDisplayBaseHint] = useState(false)
+  const [displayPriorityHint, setDisplayPriorityHint] = useState(false)
+  const calculatedFees = {
+    actualBaseFee: roundGwei((weiToGwei(hexToInt(nextBaseFee)))),
+    priorityFee: levelDisplay(maxPriorityFeePerGas)
   }
 
-  render () {
-    const { gasPrice } = this.props
-
-    return <>
-      <div className='gasItem gasItemLarge'>
-        <div className='gasGweiNum'>
-          {gasPrice}
-        </div >
-        <span className='gasGweiLabel'>{'GWEI'}</span>
-        <span className='gasLevelLabel'>{'Recommended'}</span>
+  return <>
+    {displayBaseHint && <div className='feeToolTip feeToolTipBase cardShow'>
+      The current base fee is added with a buffer to cover the next 3 blocks, any amount greater than your block's base fee is refunded
+    </div>}
+    {displayPriorityHint && <div className='feeToolTip feeToolTipPriority cardShow'>
+      A priority tip paid to validators is added to incentivize quick inclusion of your transaction into a block
+    </div>}
+    <div className='gasItem gasItemSmall'>
+      <div className='gasGweiNum'>
+        {calculatedFees.actualBaseFee}
+      </div >
+      <span className='gasGweiLabel'>{'GWEI'}</span>
+      <span className='gasLevelLabel'>{'Current Base'}</span>
+    </div>
+    <div className='gasItem gasItemLarge'>
+      <div 
+        className='gasArrow' 
+        onClick={() => setDisplayBaseHint(true)}
+        onMouseLeave={() => setDisplayBaseHint(false)}
+      >
+        <div className='gasArrowNotify'>+</div>
+        <div className='gasArrowInner'>{svg.chevron(27)}</div>
       </div>
-    </>
-  }
-}
-
-class GasFeesMarket extends Component {
-  constructor (...args) {
-    super(...args)
-    this.state = {
-      baseHover: false,
-      prioHover: false
-    }
-  }
-
-  render () {
-    const { gasPrice, fees: { nextBaseFee, maxPriorityFeePerGas } } = this.props 
-    const calculatedFees = {
-      actualBaseFee: roundGwei((weiToGwei(hexToInt(nextBaseFee)))),
-      priorityFee: levelDisplay(maxPriorityFeePerGas)
-    }
-
-    return <>
-      {this.state.baseHover && <div className='feeToolTip feeToolTipBase cardShow'>
-        The current base fee is added with a buffer to cover the next 3 blocks, any amount greater than your block's base fee is refunded
-      </div>}
-      {this.state.prioHover && <div className='feeToolTip feeToolTipPriority cardShow'>
-        A priority tip paid to validators is added to incentivize quick inclusion of your transaction into a block
-      </div>}
-      <div className='gasItem gasItemSmall'>
-        <div className='gasGweiNum'>
-          {calculatedFees.actualBaseFee}
-        </div >
-        <span className='gasGweiLabel'>{'GWEI'}</span>
-        <span className='gasLevelLabel'>{'Current Base'}</span>
+      <div className='gasGweiNum'>
+        {gasPrice}
+      </div >
+      <span className='gasGweiLabel'>{'GWEI'}</span>
+      <span className='gasLevelLabel'>{'Recommended'}</span>
+      <div 
+        className='gasArrow gasArrowRight'
+        onClick={() => setDisplayPriorityHint(true)}
+        onMouseLeave={() => setDisplayPriorityHint(false)}
+      >
+        <div className='gasArrowInner'>{svg.chevron(27)}</div>
       </div>
-      <div className='gasItem gasItemLarge'>
-        <div 
-          className='gasArrow' 
-          onClick={() => this.setState({ baseHover: true })}
-          onMouseLeave={() => this.setState({ baseHover: false })}
-        >
-          <div className='gasArrowNotify'>+</div>
-          <div className='gasArrowInner'>{svg.chevron(27)}</div>
-        </div>
-        <div className='gasGweiNum'>
-          {gasPrice}
-        </div >
-        <span className='gasGweiLabel'>{'GWEI'}</span>
-        <span className='gasLevelLabel'>{'Recommended'}</span>
-        <div 
-          className='gasArrow gasArrowRight'
-          onClick={() => this.setState({ prioHover: true })}
-          onMouseLeave={() => this.setState({ prioHover: false })}
-        >
-          <div className='gasArrowInner'>{svg.chevron(27)}</div>
-        </div>
-      </div>
-      <div className='gasItem gasItemSmall'>
-        <div className='gasGweiNum'>
-          {calculatedFees.priorityFee}
-        </div >
-        <span className='gasGweiLabel'>{'GWEI'}</span>
-        <span className='gasLevelLabel'>{'Priority Tip'}</span>
-      </div>
-    </>
-  }
+    </div>
+    <div className='gasItem gasItemSmall'>
+      <div className='gasGweiNum'>
+        {calculatedFees.priorityFee}
+      </div >
+      <span className='gasGweiLabel'>{'GWEI'}</span>
+      <span className='gasLevelLabel'>{'Priority Tip'}</span>
+    </div>
+  </>
 }
 
 class GasSummaryComponent extends Component {
@@ -127,7 +107,7 @@ class GasSummaryComponent extends Component {
   txEstimates (type, id, gasPrice, calculatedFees, currentSymbol) {
     const estimates = [
       {
-        label: 'Send ' + currentSymbol,
+        label: `Send ${currentSymbol}`,
         estimatedGas: gasToSendEth
       },
       {
@@ -245,10 +225,11 @@ class Gas extends Component {
 
     return (
       <div className='sliceContainer' ref={this.ref}>
-        <div className='sliceTile sliceTileClickable' 
-             onClick={() => {
-               this.setState({ expanded: !this.state.expanded })
-             }} 
+        <div 
+          className='sliceTile sliceTileClickable' 
+          onClick={() => {
+            this.setState({ expanded: !this.state.expanded })
+          }} 
         >
           <GasSummary chainId={chainId} displayFeeMarket={displayFeeMarket} gasPrice={gasPrice} />  
         </div>
