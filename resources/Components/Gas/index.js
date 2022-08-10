@@ -148,7 +148,7 @@ class GasSummary extends Component {
         const l1Estimate = BigNumber(l1Price * l1Limit * 1.5)
         const l2Estimate = BigNumber(gasPrice * l2Limit)
 
-        return this.toDisplayUSD(l1Estimate.plus(l2Estimate).shiftedBy(-9).multipliedBy(nativeUSD))
+        return toDisplayUSD(l1Estimate.plus(l2Estimate).shiftedBy(-9).multipliedBy(nativeUSD))
       }
 
       return estimates.map(({ label, estimatedGas }, i) => (
