@@ -6,9 +6,9 @@ import svg from '../../svg'
 import { weiToGwei, hexToInt } from '../../utils'
 
 // estimated gas to perform various common tasks
-const gasToSendEth = 21_000
-const gasToSendToken = 65_000
-const gasForDexSwap = 200_000
+const gasToSendEth = 21 * 1000
+const gasToSendToken = 65 * 1000
+const gasForDexSwap = 200 * 1000
 
 function roundGwei(gwei) {
   if (gwei && gwei < 0.001) return '‹0.001'
