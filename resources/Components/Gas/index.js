@@ -221,7 +221,9 @@ class Gas extends Component {
     const fees = this.store('main.networksMeta', type, chainId, 'gas.price.fees')
     const levels = this.store('main.networksMeta', type, chainId, 'gas.price.levels')
     const gasPrice = levelDisplay(levels.fast)
-    const displayFeeMarket = !!Object.keys(fees).length
+
+    // fees is either a populated object (EIP-1559 compatible) or falsy
+    const displayFeeMarket = !!fees
 
     return (
       <div className='sliceContainer' ref={this.ref}>
