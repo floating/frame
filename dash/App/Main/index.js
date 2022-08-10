@@ -33,11 +33,18 @@ class Settings extends React.Component {
         <div className='appInfoLine appInfoLineVersion'>{'v' + require('../../../package.json').version}</div>
         <div className='appInfoLine appInfoLineReset'>
           {this.state.resetConfirm ? (
-            <span className='appInfoLineResetConfirm'>
-              Are you sure you want to reset everything? <span className='pointer' onClick={() => link.send('tray:resetAllSettings')}>Yes</span> <span>/</span> <span className='pointer' onClick={() => this.setState({ resetConfirm: false })}>No</span>
-            </span>
+            <>            
+              <span className='appInfoLineResetConfirm'>
+                Are you sure you want to reset everything?
+              </span>              
+              <span className='appInfoLineResetConfirmButtons'>
+                <span className='appInfoLineResetConfirmButton' onClick={() => link.send('tray:resetAllSettings')}>Yes</span>
+                <span> / </span>
+                <span className='appInfoLineResetConfirmButton' onClick={() => this.setState({ resetConfirm: false })}>No</span>
+              </span>
+            </>
           ) : (
-            <span className='pointer' onClick={() => this.setState({ resetConfirm: true })}>Reset All Settings & Data</span>
+            <span className='appInfoLineResetButton' onClick={() => this.setState({ resetConfirm: true })}>Reset All Settings & Data</span>
           )}
         </div>
       </div>
