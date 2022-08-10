@@ -64,6 +64,12 @@ class GasFeesMarket extends Component {
   }
 
   render () {
+    const { gasPrice, fees: { nextBaseFee, maxPriorityFeePerGas } } = this.props 
+    const calculatedFees = {
+      actualBaseFee: roundGwei((weiToGwei(hexToInt(nextBaseFee)))),
+      priorityFee: levelDisplay(maxPriorityFeePerGas)
+    }
+
     return <>
       {this.state.baseHover && <div className='feeToolTip feeToolTipBase cardShow'>
         The current base fee is added with a buffer to cover the next 3 blocks, any amount greater than your block's base fee is refunded
@@ -111,7 +117,7 @@ class GasFeesMarket extends Component {
   }
 }
 
-class GasSummary extends Component {
+class GasSummaryComponent extends Component {
   constructor (...args) {
     super(...args)
   }
@@ -217,6 +223,8 @@ class GasSummary extends Component {
   }
 }
 
+const GasSummary = Restore.connect(GasSummaryComponent)
+
 class Gas extends Component {
   constructor (...args) {
     super(...args)
@@ -244,7 +252,7 @@ class Gas extends Component {
         </div>
         {this.state.expanded ? (
           <div className='sliceGasBlock'>
-            {displayFeeMarket ? <GasFeesMarket gasPrice={gasPrice} /> : <GasFees gasPrice={gasPrice} />}
+            {displayFeeMarket ? <GasFeesMarket gasPrice={gasPrice} fees={fees} /> : <GasFees gasPrice={gasPrice} />}
           </div>
         ) : null }
       </div>
