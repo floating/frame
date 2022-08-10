@@ -624,7 +624,7 @@ class _Network extends React.Component {
         {this.props.on ? (
           <div className='chainModules'>
             <Connection changed={changed} {...this.props} />
-            <Gas id={this.props.id} /> 
+            <Gas chainId={this.props.id} /> 
             {/* <Usage changed={changed} {...this.props} />
             <Tokens changed={changed} {...this.props} /> */}
             <div className='chainFooter'>

@@ -42,6 +42,8 @@ class GasFees extends Component {
   }
 
   render () {
+    const { gasPrice } = this.props
+
     return <>
       <div className='gasItem gasItemLarge'>
         <div className='gasGweiNum'>
@@ -178,21 +180,21 @@ class GasSummaryComponent extends Component {
   }
 
   feeEstimatesUSD () {
-    const { id, displayFeeMarket } = this.props
+    const { chainId, displayFeeMarket, gasPrice } = this.props
     const type = 'ethereum'
-    const currentSymbol = this.store('main.networks', type, id, 'symbol') || 'ETH'
+    const currentSymbol = this.store('main.networks', type, chainId, 'symbol') || 'ETH'
     
     if (!displayFeeMarket) {
-      return this.txEstimates(type, id, gasPrice, null, currentSymbol)
+      return this.txEstimates(type, chainId, gasPrice, null, currentSymbol)
     }
 
-    const { nextBaseFee, maxPriorityFeePerGas } = this.store('main.networksMeta', type, id, 'gas.price.fees')  
+    const { nextBaseFee, maxPriorityFeePerGas } = this.store('main.networksMeta', type, chainId, 'gas.price.fees')  
     const calculatedFees = {
       actualBaseFee: roundGwei((weiToGwei(hexToInt(nextBaseFee)))),
       priorityFee: levelDisplay(maxPriorityFeePerGas)
     }
 
-    return this.txEstimates(type, id, gasPrice, calculatedFees, currentSymbol)
+    return this.txEstimates(type, chainId, gasPrice, calculatedFees, currentSymbol)
   }
 
   render () {
@@ -234,10 +236,10 @@ class Gas extends Component {
   }
 
   render () {
-    const { id } = this.props
+    const { chainId } = this.props
     const type = 'ethereum'
-    const fees = this.store('main.networksMeta', type, id, 'gas.price.fees')
-    const levels = this.store('main.networksMeta', type, id, 'gas.price.levels')
+    const fees = this.store('main.networksMeta', type, chainId, 'gas.price.fees')
+    const levels = this.store('main.networksMeta', type, chainId, 'gas.price.levels')
     const gasPrice = levelDisplay(levels.fast)
     const displayFeeMarket = !!Object.keys(fees).length
 
@@ -248,7 +250,7 @@ class Gas extends Component {
                this.setState({ expanded: !this.state.expanded })
              }} 
         >
-          <GasSummary displayFeeMarket={displayFeeMarket} gasPrice={gasPrice} />  
+          <GasSummary chainId={chainId} displayFeeMarket={displayFeeMarket} gasPrice={gasPrice} />  
         </div>
         {this.state.expanded ? (
           <div className='sliceGasBlock'>
