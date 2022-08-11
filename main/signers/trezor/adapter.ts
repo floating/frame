@@ -32,7 +32,10 @@ export default class TrezorSignerAdapter extends SignerAdapter {
         const trezor = signerInfo.signer
         if (trezor.derivation !== trezorDerivation) {
           trezor.derivation = trezorDerivation
-          trezor.deriveAddresses()
+
+          if (trezor.status === Status.OK) {
+            trezor.deriveAddresses()
+          }
         }
       })
     })
@@ -127,7 +130,7 @@ export default class TrezorSignerAdapter extends SignerAdapter {
 
     TrezorBridge.on('trezor:needPhrase', (device: TrezorDevice) => {
       this.withSigner(device, signer => {
-        log.verbose(`Trezor ${signer.id} needs passphrase`)
+        log.verbose(`Trezor ${signer.id} needs passphrase`, { status: signer.status })
 
         const currentStatus = signer.status
 
