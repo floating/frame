@@ -54,7 +54,7 @@ class Panel extends React.Component {
   }
   
   render () {
-    const opacity = this.store('tray.initial') ? 0 : 1 // open ? 'translate3d(0px, 0px, 0px)' : 'translate3d(370px, 0px, 0px)'
+    const opacity = this.store('tray.initial') ? 0 : 1
 
     const networks = this.store('main.networks')
     const networkOptions = []
@@ -71,9 +71,6 @@ class Panel extends React.Component {
         }
       })
     })
-    let markLeft = 11
-    if (this.store('panel.view') === 'networks') markLeft = 68
-    if (this.store('panel.view') === 'settings') markLeft = 122
     return (
       <div id='panel' style={{ opacity }}>
         <Badge />

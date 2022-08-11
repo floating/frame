@@ -328,8 +328,8 @@ class FrameAccount {
 
       this.update()
       windows.showTray()
-      windows.broadcast('main:action', 'setSignerView', 'default')
-      windows.broadcast('main:action', 'setPanelView', 'default')
+      store.setSignerView('default')
+      store.setPanelView('default')
 
       // Display request
       const { account } = req

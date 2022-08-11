@@ -134,7 +134,7 @@ ipcMain.on('tray:clipboardData', (e, data) => {
 
 ipcMain.on('tray:installAvailableUpdate', (e, version) => {
   store.dontRemind(version)
-  windows.broadcast('main:action', 'updateBadge', '')
+  store.updateBadge('')
 
   updater.fetchUpdate()
 })
@@ -144,7 +144,7 @@ ipcMain.on('tray:dismissUpdate', (e, version, remind) => {
     store.dontRemind(version)
   }
 
-  windows.broadcast('main:action', 'updateBadge', '')
+  store.updateBadge('')
 
   updater.dismissUpdate()
 })
@@ -241,8 +241,6 @@ ipcMain.on('tray:ready', () => {
 ipcMain.on('tray:updateRestart', () => {
   updater.quitAndInstall()
 })
-
-ipcMain.on('tray:refreshMain', () => windows.broadcast('main:action', 'syncMain', store('main')))
 
 ipcMain.on('frame:close', e => {
   windows.close(e)

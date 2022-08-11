@@ -16,7 +16,7 @@ class Bridge extends React.Component {
               </div>
               <div className='badgeInput'>
                 <div className='badgeInputButton'>
-                  <div className='badgeInputInner' onMouseDown={() => this.store.updateBadge()}>Ok</div>
+                  <div className='badgeInputInner' onMouseDown={() => link.send('tray:action', 'updateBadge', '')}>Ok</div>
                 </div>
               </div>
               <div className='badgeInput'>

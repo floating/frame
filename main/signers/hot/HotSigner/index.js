@@ -124,7 +124,7 @@ class HotSigner extends Signer {
     this._callWorker(payload, (err, verified) => {
       if (err || !verified) {
         if (!err) {
-          windows.broadcast('main:action', 'notify', 'hotSignerMismatch')
+          store.notify('hotSignerMismatch')
           err = new Error('Unable to verify address')
         }
         this.lock(() => {

@@ -934,7 +934,6 @@ export class Accounts extends EventEmitter {
   }
 
   // removeAllAccounts () {
-  //   windows.broadcast('main:action', 'unsetSigner')
   //   setTimeout(() => {
   //     Object.keys(this.accounts).forEach(id => {
   //       if (this.accounts[id]) this.accounts[id].close()

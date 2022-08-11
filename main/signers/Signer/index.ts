@@ -85,11 +85,11 @@ export default class Signer extends EventEmitter {
   }
 
   open (device?: any) {
-    // windows.broadcast('main:action', 'addSigner', this.summary())
+    console.warn('Signer:' + this.type + ' did not implement a open method')
   }
 
   close () {
-    // windows.broadcast('main:action', 'removeSigner', this.summary())
+    console.warn('Signer:' + this.type + ' did not implement a close method')
   }
 
   delete () {
@@ -97,8 +97,7 @@ export default class Signer extends EventEmitter {
   }
 
   update (options = {}) {
-    // if (options.setView) windows.broadcast('main:action', 'setView', options.setView)
-    // windows.broadcast('main:action', 'updateSigner', this.summary())
+    console.warn('Signer:' + this.type + ' did not implement a update method')
   }
 
   signMessage (index: number, message: string, cb: Callback<string>) {
