@@ -1,11 +1,8 @@
 import React from 'react'
-import { render, waitFor } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
-
 import Restore from 'react-restore'
+import { render } from '@testing-library/react'
+
 import store from '../../../../../main/store'
-import link from '../../../../../resources/link'
-import { setupComponent, advanceTimers } from '../../../../componentSetup'
 import AddChainComponent from '../../../../../dash/App/Notify/AddChain'
 
 jest.mock('../../../../../main/store/persist')
@@ -115,12 +112,8 @@ describe('adding a new chain', () => {
   })
 
   it('does not allow a chain with an existing ID to be created', async () => {
-    const props = requestProps({ id: '0x89', name: 'Mainnet' })
-    const { user, getByLabelText, getByRole } = setupComponent(<AddChain {...props} />)
-
-    const chainIdInput = getByLabelText('Chain ID')
-    await user.clear(chainIdInput)
-    await user.type(chainIdInput, '1')
+    const props = requestProps({ id: '0x1', name: 'Bizarro Mainnet' })
+    const { getByRole } = render(<AddChain {...props} />)
 
     const submitButton = getByRole('button')
     expect(submitButton.textContent.toLowerCase()).toBe('invalid chain id')
