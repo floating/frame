@@ -80,6 +80,7 @@ class AddChain extends React.Component {
             <div className='chainRow'>
               <div className='chainId'>
                 <div className='chainInputLabel'>Chain ID</div>
+                {this.props.editMode && <div className='chainFieldDisplay'>{this.state.newNetworkId}</div>}
                 <input
                   className={this.state.newNetworkId === this.newNetworkIdDefault ? 'chainInput chainInputDim' : 'chainInput'}
                   value={this.state.newNetworkId} spellCheck='false'
@@ -94,6 +95,7 @@ class AddChain extends React.Component {
                   onBlur={(e) => {
                     if (e.target.value === '') this.setState({ newNetworkId: this.newNetworkIdDefault })
                   }}
+                  style={this.props.editMode ? { display: 'none' } : {}}
                 />
               </div>
 
