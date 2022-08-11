@@ -254,7 +254,8 @@ class Tray {
   }
 
   toggle () {
-    if (this.recentAutohide) return
+    if (!this.isReady() || this.recentAutohide) return
+
     const showing = (windows.tray as BrowserWindow).isVisible()
     showing ? this.hide() : this.show()
   }
