@@ -1,8 +1,8 @@
 import React from 'react'
-import { render, waitFor } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
-
 import Restore from 'react-restore'
+import { render, waitFor } from '@testing-library/react'
+
+import { setupComponent, advanceTimers } from '../../../../componentSetup'
 import store from '../../../../../main/store'
 import link from '../../../../../resources/link'
 import AddTokenComponent from '../../../../../dash/App/Tokens/AddToken'
@@ -14,19 +14,6 @@ jest.mock('../../../../../resources/link', () => ({
 }))
 
 const AddToken = Restore.connect(AddTokenComponent, store)
-
-const setup = (jsx, options = {}) => ({
-  user: userEvent.setup({
-    ...options,
-    advanceTimers: options.advanceTimers || advanceTimers
-  }),
-  ...render(jsx)
-})
-
-const advanceTimers = (ms = 0) => {
-  jest.advanceTimersByTime(ms)
-  return Promise.resolve()
-}
 
 beforeAll(() => {
   jest.useFakeTimers()
@@ -76,7 +63,7 @@ describe('selecting token chain', () => {
   
   it('should update add token navigation when a chain is selected', async () => {
     // 200 ms UI delay after clicking the button to select a chain
-    const { user, getByRole } = setup(<AddToken />, { advanceTimers: () => advanceTimers(200) })
+    const { user, getByRole } = setupComponent(<AddToken />, { advanceTimers: () => advanceTimers(200) })
   
     const polygonButton = getByRole('button', { name: 'Polygon' })
     await user.click(polygonButton)
@@ -102,7 +89,7 @@ describe('setting token address', () => {
   })
   
   it('should update add token navigation when an address is entered', async () => {
-    const { user, getByLabelText, getByRole } = setup(<AddToken data={{ notifyData: { chainId: 137 }}} />)
+    const { user, getByLabelText, getByRole } = setupComponent(<AddToken data={{ notifyData: { chainId: 137 }}} />)
 
     const contractAddressLabel = getByLabelText(`Enter token's address`)
     await user.type(contractAddressLabel, '0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0')
@@ -124,7 +111,7 @@ describe('setting token address', () => {
   it('should retrieve token metadata from a connected chain when an address is entered', async () => {
     store.setPrimary('ethereum', 137, { connected: true })
 
-    const { user, getByLabelText, getByRole } = setup(<AddToken data={{ notifyData: { chainId: 137 }}} />)
+    const { user, getByLabelText, getByRole } = setupComponent(<AddToken data={{ notifyData: { chainId: 137 }}} />)
 
     const contractAddressLabel = getByLabelText(`Enter token's address`)
     await user.type(contractAddressLabel, '0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0')
@@ -155,7 +142,7 @@ describe('setting token details', () => {
   it('should update with loaded token metadata', async () => {
     store.setPrimary('ethereum', 137, { connected: true })
   
-    const { user, getByLabelText, getByRole, rerender } = setup(<AddToken data={{ notifyData: { chainId: 137 }}} />)
+    const { user, getByLabelText, getByRole, rerender } = setupComponent(<AddToken data={{ notifyData: { chainId: 137 }}} />)
   
     link.invoke.mockResolvedValue({
       name: 'Frame Test on Polygon',
