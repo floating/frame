@@ -7,9 +7,9 @@ import svg from '../../../resources/svg'
 
 import Dropdown from '../../../resources/Components/Dropdown'
 import RingIcon from '../../../resources/Components/RingIcon'
+import Gas from '../../../resources/Components/Gas'
 
 import Connection from './Connection'
-import Gas from './Gas'
 import Usage from './Usage'
 import Tokens from './Tokens'
 
@@ -624,7 +624,7 @@ class _Network extends React.Component {
         {this.props.on ? (
           <div className='chainModules'>
             <Connection changed={changed} {...this.props} />
-            <Gas id={this.props.id} /> 
+            <Gas chainId={this.props.id} /> 
             {/* <Usage changed={changed} {...this.props} />
             <Tokens changed={changed} {...this.props} /> */}
             <div className='chainFooter'>
