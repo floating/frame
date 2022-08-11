@@ -38,7 +38,7 @@ module.exports = {
   clickGuard: (u, on) => u('view.clickGuard', () => on),
   toggleAddAccount: (u) => u('view.addAccount', show => !show),
   toggleAddNetwork: (u) => u('view.addNetwork', show => !show),
-  updateBadge: (u, type) => u('view.badge', _ => type),
+  updateBadge: (u, type, version) => u('view.badge', () => ({ type, version })),
   toggleSettings: u => {
     u('panel.view', view => view === 'settings' ? 'default' : 'settings')
   },

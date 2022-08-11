@@ -183,7 +183,7 @@ class Tray {
     })
     this.readyHandler = () => {
       if (showOnReady) {
-        windows.tray.webContents.send('main:action', 'trayOpen', true)
+        store.trayOpen(true)
       }
       this.ready = true
       if (store('dash.showing')) {

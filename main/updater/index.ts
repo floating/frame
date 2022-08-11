@@ -119,7 +119,7 @@ class Updater {
       const remindOk = !store('main.updater.dontRemind').includes(version)
 
       if (remindOk) {
-        windows.broadcast('main:action', 'updateBadge', 'updateAvailable', this.availableVersion)
+        store.updateBadge('updateAvailable', this.availableVersion)
       } else {
         log.verbose(`Update to version ${version} is available but user chose to skip`)
       }
@@ -132,7 +132,7 @@ class Updater {
   private readyForInstall () {
     this.installerReady = true
 
-    windows.broadcast('main:action', 'updateBadge', 'updateReady')
+    store.updateBadge('updateReady')
   }
 
   private checkForAutoUpdate () {
