@@ -39,7 +39,7 @@ afterAll(() => {
 
 describe('adding a new chain', () => {
   it('renders with defaults', () => {
-    const { getByLabelText, getByText, getByRole } = render(<AddChain {...requestProps()} />)
+    const { getByLabelText, getByRole } = render(<AddChain {...requestProps()} />)
 
     const chainNameInput = getByLabelText('Chain Name')
     expect(chainNameInput.value).toEqual('Chain Name')
@@ -56,7 +56,7 @@ describe('adding a new chain', () => {
     const secondaryRpcInput = getByLabelText('Secondary RPC')
     expect(secondaryRpcInput.value).toEqual('Secondary Endpoint')
 
-    const otherLayerButton = getByText('Other', { selector: 'div' })
+    const otherLayerButton = getByRole('radio', { name: 'Other' })
     expect(otherLayerButton.getAttribute('aria-checked')).toBe('true')
 
     const submitButton = getByRole('button')
@@ -116,6 +116,6 @@ describe('adding a new chain', () => {
     const { getByRole } = render(<AddChain {...props} />)
 
     const submitButton = getByRole('button')
-    expect(submitButton.textContent.toLowerCase()).toBe('invalid chain id')
+    expect(submitButton.textContent.toLowerCase()).toBe('chain id already exists')
   })
 })

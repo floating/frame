@@ -41,8 +41,8 @@ class AddChain extends React.Component {
     return !existingChains.includes(parseInt(chainId))
   }
 
-  render () {
-    const changedNewNetwork = (
+  networkChanged () {
+    return (
       this.state.newNetworkId !== this.newNetworkIdDefault ||
       this.state.newNetworkName !== this.newNetworkNameDefault ||
       this.state.newNetworkExplorer !== this.newNetworkExplorerDefault ||
@@ -50,12 +50,71 @@ class AddChain extends React.Component {
       this.state.newNetworkRPCPrimary !== this.newNetworkRPCPrimary ||
       this.state.newNetworkRPCSecondary !== this.newNetworkRPCSecondary
     )
+  }
 
-    const newNetworkReady = (
+  networkReady () {
+    return (
       this.state.newNetworkId !== this.newNetworkIdDefault && this.state.newNetworkId !== '' &&
       this.state.newNetworkName !== this.newNetworkNameDefault && this.state.newNetworkName !== ''
     )
+  }
 
+  disabledSubmitButton (text) {
+    return (
+      <div role='button' className='addTokenSubmit'>{text}</div>
+    )
+  }
+
+  submitButton () {
+    if (!this.networkChanged() || !this.networkReady()) {
+      return this.disabledSubmitButton('Fill in Chain')
+    }
+
+    if (!this.props.editMode && !this.isValidChain(parseInt(this.state.newNetworkId))) {
+      return this.disabledSubmitButton('Chain ID already exists')
+    }
+    
+    return (
+          <div
+            role='button'
+            className='addTokenSubmit addTokenSubmitEnabled' 
+            onMouseDown={() => {
+              const net = {
+                id: this.state.newNetworkId,
+                name: this.state.newNetworkName,
+                type: this.state.newNetworkType,
+                explorer: this.state.newNetworkExplorer,
+                symbol: this.state.newNetworkSymbol,
+                layer: this.state.newNetworkLayer,
+                primaryRpc: this.state.newNetworkRPCPrimary,
+                secondaryRpc: this.state.newNetworkRPCSecondary,
+              }
+              if (this.props.editMode) {
+                const currentNet = {
+                  id: this.chain.id,
+                  name: this.chain.name,
+                  type: this.chain.type,
+                  explorer: this.chain.blockExplorerUrls[0],
+                  symbol: this.chain.nativeCurrency.symbol,
+                  layer: this.chain.layer,
+                  primaryRpc: this.state.newNetworkRPCPrimary,
+                  secondaryRpc: this.state.newNetworkRPCSecondary,
+                }
+                link.send('tray:action', 'updateNetwork', currentNet, net)
+              } else {
+                link.send('tray:addChain', net, this.props.req)
+              }
+              setTimeout(() => {
+                link.send('tray:action', 'backDash')
+              }, 400)
+            }}
+          >
+          {this.props.editMode ? 'Update Chain' : 'Add Chain'}
+          </div>
+        )
+  }
+
+  render () {
     return (
       <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
         <div className='notifyBoxSlide'>
@@ -189,27 +248,27 @@ class AddChain extends React.Component {
             <div className='chainRow'>
               <div className='chainLayers chainInputField'>
                 <div role='label' className='chainInputLabel'>Chain Type</div>
-                <div className='chainLayerOptions'>
+                <div role='radiogroup' className='chainLayerOptions'>
                   <div
-                    role='checkbox'
+                    role='radio'
                     aria-checked={this.state.newNetworkLayer === 'rollup'}
                     className={this.state.newNetworkLayer === 'rollup' ?  'chainLayerOption chainLayerOptionOn' : 'chainLayerOption'}
                     onMouseDown={() => this.setState({ newNetworkLayer: 'rollup' })}
                   >Rollup</div>
                   <div
-                    role='checkbox'
+                    role='radio'
                     aria-checked={this.state.newNetworkLayer === 'sidechain'}
                     className={this.state.newNetworkLayer === 'sidechain' ?  'chainLayerOption chainLayerOptionOn' : 'chainLayerOption'}
                     onMouseDown={() => this.setState({ newNetworkLayer: 'sidechain' })}
                   >Sidechain</div>
                   <div
-                    role='checkbox'
+                    role='radio'
                     aria-checked={this.state.newNetworkLayer === 'testnet'}
                     className={this.state.newNetworkLayer === 'testnet' ?  'chainLayerOption chainLayerOptionOn' : 'chainLayerOption'}
                     onMouseDown={() => this.setState({ newNetworkLayer: 'testnet' })}
                   >Testnet</div>
                   <div
-                    role='checkbox'
+                    role='radio'
                     aria-checked={this.state.newNetworkLayer === 'other'}
                     className={this.state.newNetworkLayer === 'other' ?  'chainLayerOption chainLayerOptionOn' : 'chainLayerOption'}
                     onMouseDown={() => this.setState({ newNetworkLayer: 'other' })}
@@ -219,56 +278,7 @@ class AddChain extends React.Component {
             </div>
 
             <div className='chainRow'>
-              {changedNewNetwork && newNetworkReady 
-                ? this.isValidChain(parseInt(this.state.newNetworkId))
-                  ? (
-                    <div
-                      role='button'
-                      className='addTokenSubmit addTokenSubmitEnabled' 
-                      onMouseDown={() => {
-                        const net = {
-                          id: this.state.newNetworkId,
-                          name: this.state.newNetworkName,
-                          type: this.state.newNetworkType,
-                          explorer: this.state.newNetworkExplorer,
-                          symbol: this.state.newNetworkSymbol,
-                          layer: this.state.newNetworkLayer,
-                          primaryRpc: this.state.newNetworkRPCPrimary,
-                          secondaryRpc: this.state.newNetworkRPCSecondary,
-                        }
-                        if (this.props.editMode) {
-                          const currentNet = {
-                            id: this.chain.id,
-                            name: this.chain.name,
-                            type: this.chain.type,
-                            explorer: this.chain.blockExplorerUrls[0],
-                            symbol: this.chain.nativeCurrency.symbol,
-                            layer: this.chain.layer,
-                            primaryRpc: this.state.newNetworkRPCPrimary,
-                            secondaryRpc: this.state.newNetworkRPCSecondary,
-                          }
-                          link.send('tray:action', 'updateNetwork', currentNet, net)
-                        } else {
-                          link.send('tray:addChain', net, this.props.req)
-                        }
-                        setTimeout(() => {
-                          link.send('tray:action', 'backDash')
-                        }, 400)
-                      }}
-                    >
-                    {this.props.editMode ? 'Update Chain' : 'Add Chain'}
-                    </div>
-                  ) 
-                  : (
-                    <div role='button' className='addTokenSubmit'>Invalid Chain ID</div>
-                  ): (
-                <div
-                  role='button'
-                  className='addTokenSubmit' 
-                >
-                  Fill in Chain
-                </div>
-              )}
+              {this.submitButton()}
             </div>
           </div>
         </div>
