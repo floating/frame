@@ -6,7 +6,7 @@
   border-radius 16px
   background var(--ghostA)
   padding 6px
-  box-shadow 0px 4px 4px var(--ghostY)
+  box-shadow 0px 2px 8px var(--ghostY)
 
   input
     z-index 200
@@ -18,8 +18,7 @@
     // margin-left 8px
     width 100%
     color var(--outerspace)
-    border-radius 8px
-    margin-top 5px
+    border-radius 7px
     text-align center
     font-size 16px
     font-weight 500
@@ -28,30 +27,36 @@
     transition var(--standardFast)
 
   input:hover
-    background var(--ghostZ)
+    background var(--ghostB)
+    transition var(--standardFast)
+    box-shadow 0px 6px 42px 0px var(--ghostZ)
 
   input:focus
-    background var(--ghostZ)
+    background var(--ghostC)
+    transition var(--standardFast)
+    box-shadow 0px 6px 42px 0px var(--ghostZ)
 
-  .panelBlockTitle
+.panelBlockTitle
     font-weight 600
     font-size 11px
     text-transform uppercase
     font-family 'Exo2'
     padding 2px 0px 10px 10px
     letter-spacing 1px
+
+  .panelBlockItem:not(:first-child)
+    margin-top 4px
   
   .panelBlockValues
     font-size 17px
     font-weight 400
-    border-radius 13px
+    border-radius 10px
     -webkit-app-region no-drag
     transition none
     pointer-events auto
     transform translate3d(0, 0, 0)
     font-family 'Exo2'
-    overflow hidden
-    padding 0px 4px 4px 4px
+    padding 4px 4px 4px 4px
     background var(--ghostZ)
 
     .panelBlockValue
@@ -60,14 +65,13 @@
       display flex
       justify-content center
       align-items center
-      border-radius 8px
+      border-radius 7px
       -webkit-app-region no-drag
       transition none
       pointer-events auto
       transform translate3d(0, 0, 0)
       font-family 'Exo2'
       padding 8px
-      margin-top 5px
       text-transform uppercase
       
       svg
@@ -81,7 +85,7 @@
       display flex
       justify-content center
       align-items center
-      border-radius 8px
+      border-radius 7px
       -webkit-app-region no-drag
       transition none
       pointer-events auto
@@ -89,17 +93,15 @@
       font-family 'Exo2'
       padding 16px
       background var(--ghostA)
-      margin-top 5px
       cursor pointer
       transition var(--standardFast)
       box-shadow 0px 0px 0px 0px var(--ghostZ)
       text-transform uppercase
 
     .panelBlockButton:hover
-      transform translateY(-0.5px)
       background var(--ghostB)
       transition var(--standardFast)
-      box-shadow 0px 6px 42px 0px var(--ghostZ)
+      box-shadow 0px 6px 22px 0px var(--ghostZ)
 
     .panelBlockButton:active
       transform translateY(1px)

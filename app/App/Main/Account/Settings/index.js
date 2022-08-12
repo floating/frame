@@ -42,7 +42,7 @@ class Settings extends React.Component {
         {!this.props.expanded ? (
           <div className='panelBlock'>
             <div className='panelBlockValues'>
-              <div className='panelBlockButton' onMouseDown={() => this.props.expandModule({ id: this.props.moduleId, account: this.props.account })}>
+              <div className='panelBlockButton panelBlockItem' onMouseDown={() => this.props.expandModule({ id: this.props.moduleId, account: this.props.account })}>
                 Account Settings
               </div>
             </div>
@@ -53,7 +53,7 @@ class Settings extends React.Component {
               <div className='panelBlockTitle'>
                 Name
               </div>
-              <div className='panelBlockValues'>
+              <div className='panelBlockValues panelBlockItem'>
                 <input
                   type='text'
                   tabIndex='-1'
@@ -69,7 +69,7 @@ class Settings extends React.Component {
             {account.smart ? (
               <div className='panelBlock'>
                 <div className='panelBlockValues'>
-                  <div className='panelBlockValue'>
+                  <div className='panelBlockValue panelBlockItem'>
                     Chain ID: {account.smart.chain && account.smart.chain.id}
                   </div>
                 </div>
@@ -82,11 +82,11 @@ class Settings extends React.Component {
               </div>
               <div className='panelBlockValues'>
                 {account.signer ? (
-                  <div className='panelBlockValue'>
+                  <div className='panelBlockValue panelBlockItem'>
                     {`${account.lastSignerType} signer connected`}
                   </div>
                 ) : (
-                  <div className='panelBlockValue'>
+                  <div className='panelBlockValue panelBlockItem'>
                     {'signer disconnected'}
                   </div>
                 )}
@@ -97,7 +97,7 @@ class Settings extends React.Component {
             </div>
             <div className='panelBlock'>
               <div className='panelBlockValues'>
-                <div className='panelBlockButton' onMouseDown={() => {
+                <div className='panelBlockButton panelBlockItem' onMouseDown={() => {
                   console.log('ok')
                   // link.rpc('removeAccount', this.props.account, {}, () => {})
                 }}
