@@ -1,12 +1,14 @@
 import React from 'react'
 import Restore from 'react-restore'
-import { render, waitFor } from '@testing-library/react'
+import { render } from '@testing-library/react'
 
 import store from '../../../../../main/store'
+import link from '../../../../../resources/link'
 import { setupComponent } from '../../../../componentSetup'
 import AddChainComponent from '../../../../../dash/App/Notify/AddChain'
 
 jest.mock('../../../../../main/store/persist')
+jest.mock('../../../../../resources/link', () => ({ send: jest.fn() }))
 
 const AddChain = Restore.connect(AddChainComponent, store)
 
@@ -127,9 +129,38 @@ describe('adding a new chain', () => {
     const { user, getByRole } = setupComponent(<AddChain {...props} />)
 
     await user.click(getByRole('button'))
-    
+
     const submitButton = getByRole('button')
     expect(submitButton.textContent).toMatch(/creating/i)
+  })
+
+  it('adds a new chain when the user clicks submit', async () => {
+    const props = requestProps({
+      id: '0xa4b2',
+      type: 'ethereum',
+      name: 'Arbitrum Rinkeby',
+      nativeCurrency: {
+        symbol: 'ETH'
+      },
+      blockExplorerUrls: ['https://rinkeby.arbiscan.io'],
+      rpcUrls: ['https://arbitrum-rinkeby.infura.com', 'https://myrpc.arbrink.net'],
+      layer: 'sidechain'
+    })
+
+    const { user, getByRole } = setupComponent(<AddChain {...props} />)
+
+    await user.click(getByRole('button'))
+
+    expect(link.send).toHaveBeenCalledWith('tray:addChain', {
+      id: 42162,
+      name: 'Arbitrum Rinkeby',
+      symbol: 'ETH',
+      explorer: 'https://rinkeby.arbiscan.io',
+      type: 'ethereum',
+      layer: 'sidechain',
+      primaryRpc: 'https://arbitrum-rinkeby.infura.com',
+      secondaryRpc: 'https://myrpc.arbrink.net'
+    }, props.req)
   })
 })
 
@@ -165,8 +196,46 @@ describe('editing a chain', () => {
     const { user, getByRole } = setupComponent(<AddChain {...props} />)
 
     await user.click(getByRole('button'))
-    
+
     const submitButton = getByRole('button')
     expect(submitButton.textContent).toMatch(/updating/i)
+  })
+
+  it('edits the existing chain when the user clicks submit', async () => {
+    const props = requestProps({
+      id: '0x1',
+      type: 'ethereum',
+      name: 'Mainnet',
+      nativeCurrency: {
+        symbol: 'ETH'
+      },
+      blockExplorerUrls: ['https://etherscan.io'],
+      rpcUrls: ['http://localhost:8080', 'https://mainnet.infura.com'],
+      layer: 'other'
+    })
+
+    const { user, getByRole, getByLabelText } = setupComponent(<AddChain {...props} />)
+
+    const primaryRpcInput = getByLabelText('Primary RPC')
+    await user.clear(primaryRpcInput)
+    await user.type(primaryRpcInput, 'https://my-custom-rpc.net')
+    await user.click(getByRole('button'))
+
+    expect(link.send).toHaveBeenCalledWith('tray:action', 'updateNetwork',
+      expect.objectContaining({
+        id: '0x1',
+        name: 'Mainnet',
+        symbol: 'ETH'
+      }), {
+        id: 1,
+        name: 'Mainnet',
+        symbol: 'ETH',
+        explorer: 'https://etherscan.io',
+        primaryRpc: 'https://my-custom-rpc.net',
+        secondaryRpc: 'https://mainnet.infura.com',
+        type: 'ethereum',
+        layer: 'other'
+      }
+    )
   })
 })
