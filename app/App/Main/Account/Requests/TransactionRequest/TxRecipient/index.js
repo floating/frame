@@ -54,8 +54,8 @@ class TxRecipient extends React.Component {
                 </div>
               </div>
             ) : (
-              <div className='_txRecipientSlice _txRecipientValue'>
-                Deploying Contract
+              <div className='_txMainValue'>
+                <span className='_txRecipient'>{'Deploying Contract'}</span>
               </div>
             )}
             {req.decodedData && req.decodedData.contractName ? (

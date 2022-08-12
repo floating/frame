@@ -39,14 +39,21 @@ class Settings extends React.Component {
     const account = this.store('main.accounts', this.props.account)
     return (
       <div ref={this.moduleRef}>
-        <div className='moduleMain moduleMainSettings'>
-          {!this.props.expanded ? (
-            <div className='moduleButton' onMouseDown={() => this.props.expandModule({ id: this.props.moduleId, account: this.props.account })}>
-              Account Settings
+        {!this.props.expanded ? (
+          <div className='panelBlock'>
+            <div className='panelBlockValues'>
+              <div className='panelBlockButton' onMouseDown={() => this.props.expandModule({ id: this.props.moduleId, account: this.props.account })}>
+                Account Settings
+              </div>
             </div>
-          ) : (
-            <>
-              <div className='settingsRow'>
+          </div>
+        ) : (
+          <div className='expandedModule'>
+            <div className='panelBlock'>
+              <div className='panelBlockTitle'>
+                Name
+              </div>
+              <div className='panelBlockValues'>
                 <input
                   type='text'
                   tabIndex='-1'
@@ -56,40 +63,54 @@ class Settings extends React.Component {
                     link.send('tray:renameAccount', this.props.account, e.target.value)
                   }}
                 />
-                <div className='settingsRowTag'>
-                  {'Account Tag'}
+              </div>
+            </div>
+
+            {account.smart ? (
+              <div className='panelBlock'>
+                <div className='panelBlockValues'>
+                  <div className='panelBlockValue'>
+                    Chain ID: {account.smart.chain && account.smart.chain.id}
+                  </div>
                 </div>
               </div>
-              
-              <div className='settingsRow'>
+            ) : null}
+
+            <div className='panelBlock'>
+              <div className='panelBlockTitle'>
+                Signer
+              </div>
+              <div className='panelBlockValues'>
+                {account.signer ? (
+                  <div className='panelBlockValue'>
+                    {`${account.lastSignerType} signer connected`}
+                  </div>
+                ) : (
+                  <div className='panelBlockValue'>
+                    {'signer disconnected'}
+                  </div>
+                )}
                 <Verify 
                   id={this.props.account}
                 />
               </div>
-
-              {account.smart ? (
-                <div className='settingsRow'>Chain ID: {account.smart.chain && account.smart.chain.id}</div>
-              ) : null}
-
-              <div className='settingsRow'>
-                <div>{`Account using ${account.lastSignerType} signer`}</div>
-                {account.signer ? (
-                  <div className='settingsRowInset settingsRowInsetConnected'>{'signer connected'}</div>
-                ) : (
-                  <div className='settingsRowInset'>{'signer not connected'}</div>
-                )}
+            </div>
+            <div className='panelBlock'>
+              <div className='panelBlockValues'>
+                <div className='panelBlockButton' onMouseDown={() => {
+                  console.log('ok')
+                  // link.rpc('removeAccount', this.props.account, {}, () => {})
+                }}
+                  style={{ color: 'var(--bad)' }}
+                >
+                  {'Remove This Account'}
+                </div>
               </div>
-
-              <div className='moduleButton moduleButtonBad' onMouseDown={() => {
-                link.rpc('removeAccount', this.props.account, {}, () => {})
-              }}>
-                {'Remove This Account'}
-              </div>
-              {/* <div className='moduleRow'>ENS Name: {account.ensName  ? account.ensName : 'none'}</div> */}
-              {/* <div className='moduleRow'>Account Added: {account.created}</div> */}
-            </>
-          )}
-        </div>
+            </div>
+            {/* <div className='moduleRow'>ENS Name: {account.ensName  ? account.ensName : 'none'}</div> */}
+            {/* <div className='moduleRow'>Account Added: {account.created}</div> */}
+          </div>
+        )}
       </div>
     )
   }

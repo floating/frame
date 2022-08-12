@@ -98,8 +98,7 @@
 
     .moduleExpanded
       z-index 20000
-      border-radius 12px
-      box-shadow 0px 4px 8px var(--ghostY)
+
       
       .accountModuleInner
         position relative
@@ -1484,6 +1483,11 @@
   // box-shadow 0px 10px 10px var(--ghostA)
   // padding 0px 0px 0px 0px
   // overflow hidden
+.moduleExpanded
+  .accountModuleInner
+    background none
+    box-shadow none
+    border-radius none
 
 .accountModuleInner
   position absolute
@@ -1519,13 +1523,12 @@
     
   .moduleHeader
     position relative
-    font-size 11px
+    font-size 12px
     text-transform uppercase
-    font-weight bold
+    font-weight 600
     letter-spacing 2px
-    padding 14px 12px 12px 12px
-    height 38px
-    text-align center
+    padding 21px 0px 19px 21px
+    font-family 'Ubuntu'
     box-sizing border-box
 
     .moduleHeaderClose
