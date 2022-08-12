@@ -3,18 +3,21 @@ import Restore from 'react-restore'
 import link from '../../../../resources/link'
 import { SubmitButton, DisabledSubmitButton } from '../Button'
 
+const networkDefaults = {
+  id: 'Chain ID',
+  type: 'ethereum',
+  name: 'Chain Name',
+  explorer: 'Block Explorer',
+  primaryRpc: 'Primary Endpoint',
+  secondaryRpc: 'Secondary Endpoint',
+  symbol: 'Native Symbol',
+  layer: 'other'
+}
+
 class AddChain extends React.Component {
   constructor (props, context) {
     super(props, context)
 
-    this.newNetworkIdDefault = 'Chain ID'
-    this.newNetworkNameDefault = 'Chain Name'
-    this.newNetworkExplorerDefault = 'Block Explorer'
-    this.newNetworkRPCPrimary = 'Primary Endpoint'
-    this.newNetworkRPCSecondary = 'Secondary Endpoint'
-    this.newNetworkSymbolDefault = 'Native Symbol'
-    this.newNetworkType = 'ethereum'
-    this.newNetworkLayer = ''
     this.req = props.req
     this.chain = (this.req && this.req.chain) || {}
 
@@ -23,14 +26,14 @@ class AddChain extends React.Component {
     const nativeChainCurrency = this.chain.nativeCurrency || {}
 
     this.state = {
-      newNetworkId: parseInt(this.chain.id) || this.newNetworkIdDefault,
-      newNetworkName: this.chain.name || this.newNetworkNameDefault,
-      newNetworkExplorer: blockExplorerUrls[0] || this.newNetworkExplorerDefault,
-      newNetworkRPCPrimary: rpcUrls[0] || this.newNetworkRPCPrimary,
-      newNetworkRPCSecondary: rpcUrls[1] || this.newNetworkRPCSecondary,
-      newNetworkSymbol: nativeChainCurrency.symbol || this.newNetworkSymbolDefault,
-      newNetworkType: this.chain.type || this.newNetworkType,
-      newNetworkLayer: this.chain.layer || 'other',
+      newNetworkId: parseInt(this.chain.id) || networkDefaults.id,
+      newNetworkName: this.chain.name || networkDefaults.name,
+      newNetworkExplorer: blockExplorerUrls[0] || networkDefaults.explorer,
+      newNetworkRPCPrimary: rpcUrls[0] || networkDefaults.primaryRpc,
+      newNetworkRPCSecondary: rpcUrls[1] || networkDefaults.secondaryRpc,
+      newNetworkSymbol: nativeChainCurrency.symbol || networkDefaults.symbol,
+      newNetworkType: this.chain.type || networkDefaults.type,
+      newNetworkLayer: this.chain.layer || networkDefaults.layer,
       localShake: {}, 
       resetConfirm: false, 
       expandNetwork: false,
@@ -45,19 +48,19 @@ class AddChain extends React.Component {
 
   networkChanged () {
     return (
-      this.state.newNetworkId !== this.newNetworkIdDefault ||
-      this.state.newNetworkName !== this.newNetworkNameDefault ||
-      this.state.newNetworkExplorer !== this.newNetworkExplorerDefault ||
-      this.state.newNetworkSymbol !== this.newNetworkSymbolDefault ||
-      this.state.newNetworkRPCPrimary !== this.newNetworkRPCPrimary ||
-      this.state.newNetworkRPCSecondary !== this.newNetworkRPCSecondary
+      this.state.newNetworkId !== networkDefaults.id ||
+      this.state.newNetworkName !== networkDefaults.name ||
+      this.state.newNetworkExplorer !== networkDefaults.explorer ||
+      this.state.newNetworkSymbol !== networkDefaults.symbol ||
+      this.state.newNetworkRPCPrimary !== networkDefaults.primaryRpc ||
+      this.state.newNetworkRPCSecondary !== networkDefaults.secondaryRpc
     )
   }
 
   networkReady () {
     return (
-      this.state.newNetworkId !== this.newNetworkIdDefault && this.state.newNetworkId !== '' &&
-      this.state.newNetworkName !== this.newNetworkNameDefault && this.state.newNetworkName !== ''
+      this.state.newNetworkId !== networkDefaults.id && this.state.newNetworkId !== '' &&
+      this.state.newNetworkName !== networkDefaults.name && this.state.newNetworkName !== ''
     )
   }
 
@@ -74,7 +77,7 @@ class AddChain extends React.Component {
 
     return (<input
       id='chainId'
-      className={this.state.newNetworkId === this.newNetworkIdDefault ? 'chainInput chainInputDim' : 'chainInput'}
+      className={this.state.newNetworkId === networkDefaults.id ? 'chainInput chainInputDim' : 'chainInput'}
       value={this.state.newNetworkId} spellCheck='false'
       onChange={(e) => {
         if (Number(parseInt(e.target.value)) || e.target.value === '') {
@@ -82,10 +85,10 @@ class AddChain extends React.Component {
         }
       }}
       onFocus={(e) => {
-        if (e.target.value === this.newNetworkIdDefault) this.setState({ newNetworkId: '' })
+        if (e.target.value === networkDefaults.id) this.setState({ newNetworkId: '' })
       }}
       onBlur={(e) => {
-        if (e.target.value === '') this.setState({ newNetworkId: this.newNetworkIdDefault })
+        if (e.target.value === '') this.setState({ newNetworkId: networkDefaults.id })
       }}
     />)
   }
@@ -153,16 +156,16 @@ class AddChain extends React.Component {
                 <label htmlFor='chainName' className='chainInputLabel'>Chain Name</label>
                 <input
                   id='chainName'
-                  className={this.state.newNetworkName === this.newNetworkNameDefault ? 'chainInput chainInputDim' : 'chainInput'}
+                  className={this.state.newNetworkName === networkDefaults.name ? 'chainInput chainInputDim' : 'chainInput'}
                   value={this.state.newNetworkName} spellCheck='false'
                   onChange={(e) => {
                     this.setState({ newNetworkName: e.target.value })
                   }}
                   onFocus={(e) => {
-                    if (e.target.value === this.newNetworkNameDefault) this.setState({ newNetworkName: '' })
+                    if (e.target.value === networkDefaults.name) this.setState({ newNetworkName: '' })
                   }}
                   onBlur={(e) => {
-                    if (e.target.value === '') this.setState({ newNetworkName: this.newNetworkNameDefault })
+                    if (e.target.value === '') this.setState({ newNetworkName: networkDefaults.name })
                   }}
                 />
               </div>
@@ -178,17 +181,17 @@ class AddChain extends React.Component {
                 <label htmlFor='chainSymbol' className='chainInputLabel'>Native Symbol</label>
                 <input
                   id='chainSymbol'
-                  className={this.state.newNetworkSymbol === this.newNetworkSymbolDefault ? 'chainInput chainInputDim' : 'chainInput'}
+                  className={this.state.newNetworkSymbol === networkDefaults.symbol ? 'chainInput chainInputDim' : 'chainInput'}
                   value={this.state.newNetworkSymbol} spellCheck='false'
                   onChange={(e) => {
                     if (e.target.value.length > 8) return e.preventDefault()
                     this.setState({ newNetworkSymbol: e.target.value })
                   }}
                   onFocus={(e) => {
-                    if (e.target.value === this.newNetworkSymbolDefault) this.setState({ newNetworkSymbol: '' })
+                    if (e.target.value === networkDefaults.symbol) this.setState({ newNetworkSymbol: '' })
                   }}
                   onBlur={(e) => {
-                    if (e.target.value === '') this.setState({ newNetworkSymbol: this.newNetworkSymbolDefault })
+                    if (e.target.value === '') this.setState({ newNetworkSymbol: networkDefaults.symbol })
                   }}
                 />
               </div>
@@ -199,16 +202,16 @@ class AddChain extends React.Component {
                 <label htmlFor='chainExplorer' className='chainInputLabel'>Block Explorer</label>
                 <input
                   id='chainExplorer'
-                  className={this.state.newNetworkExplorer === this.newNetworkExplorerDefault ? 'chainInput chainInputDim' : 'chainInput'}
+                  className={this.state.newNetworkExplorer === networkDefaults.explorer ? 'chainInput chainInputDim' : 'chainInput'}
                   value={this.state.newNetworkExplorer} spellCheck='false'
                   onChange={(e) => {
                     this.setState({ newNetworkExplorer: e.target.value })
                   }}
                   onFocus={(e) => {
-                    if (e.target.value === this.newNetworkExplorerDefault) this.setState({ newNetworkExplorer: '' })
+                    if (e.target.value === networkDefaults.explorer) this.setState({ newNetworkExplorer: '' })
                   }}
                   onBlur={(e) => {
-                    if (e.target.value === '') this.setState({ newNetworkExplorer: this.newNetworkExplorerDefault })
+                    if (e.target.value === '') this.setState({ newNetworkExplorer: networkDefaults.explorer })
                   }}
                 />
               </div>
@@ -219,16 +222,16 @@ class AddChain extends React.Component {
                 <label htmlFor='primaryRpc' className='chainInputLabel'>Primary RPC</label>
                 <input
                   id='primaryRpc'
-                  className={this.state.newNetworkRPCPrimary === this.newNetworkRPCPrimary ? 'chainInput chainInputDim' : 'chainInput'}
+                  className={this.state.newNetworkRPCPrimary === networkDefaults.primaryRpc ? 'chainInput chainInputDim' : 'chainInput'}
                   value={this.state.newNetworkRPCPrimary} spellCheck='false'
                   onChange={(e) => {
                     this.setState({ newNetworkRPCPrimary: e.target.value })
                   }}
                   onFocus={(e) => {
-                    if (e.target.value === this.newNetworkRPCPrimary) this.setState({ newNetworkRPCPrimary: '' })
+                    if (e.target.value === networkDefaults.primaryRpc) this.setState({ newNetworkRPCPrimary: '' })
                   }}
                   onBlur={(e) => {
-                    if (e.target.value === '') this.setState({ newNetworkRPCPrimary: this.newNetworkRPCPrimary })
+                    if (e.target.value === '') this.setState({ newNetworkRPCPrimary: networkDefaults.primaryRpc })
                   }}
                 />
               </div>
@@ -239,16 +242,16 @@ class AddChain extends React.Component {
                 <label htmlFor='secondaryRpc' className='chainInputLabel'>Secondary RPC</label>
                 <input
                   id='secondaryRpc'
-                  className={this.state.newNetworkRPCSecondary === this.newNetworkRPCSecondary ? 'chainInput chainInputDim' : 'chainInput'}
+                  className={this.state.newNetworkRPCSecondary === networkDefaults.secondaryRpc ? 'chainInput chainInputDim' : 'chainInput'}
                   value={this.state.newNetworkRPCSecondary} spellCheck='false'
                   onChange={(e) => {
                     this.setState({ newNetworkRPCSecondary: e.target.value })
                   }}
                   onFocus={(e) => {
-                    if (e.target.value === this.newNetworkRPCSecondary) this.setState({ newNetworkRPCSecondary: '' })
+                    if (e.target.value === networkDefaults.secondaryRpc) this.setState({ newNetworkRPCSecondary: '' })
                   }}
                   onBlur={(e) => {
-                    if (e.target.value === '') this.setState({ newNetworkRPCSecondary: this.newNetworkRPCSecondary})
+                    if (e.target.value === '') this.setState({ newNetworkRPCSecondary: networkDefaults.secondaryRpc })
                   }}
                 />
               </div>
