@@ -1,6 +1,7 @@
 import React from 'react'
 import Restore from 'react-restore'
 import link from '../../../../resources/link'
+import { SubmitButton, DisabledSubmitButton } from '../Button'
 
 class AddChain extends React.Component {
   constructor (props, context) {
@@ -90,51 +91,46 @@ class AddChain extends React.Component {
 
   submitButton () {
     if (!this.networkChanged() || !this.networkReady()) {
-      return this.disabledSubmitButton('Fill in Chain')
+      return <DisabledSubmitButton text={'Fill in Chain'} />
     }
 
     if (!this.props.editMode && !this.isValidChain(parseInt(this.state.newNetworkId))) {
-      return this.disabledSubmitButton('Chain ID already exists')
+      return <DisabledSubmitButton text={'Chain ID already exists'} />
+    }
+
+    const onClick = () => {
+      const net = {
+        id: this.state.newNetworkId,
+        name: this.state.newNetworkName,
+        type: this.state.newNetworkType,
+        explorer: this.state.newNetworkExplorer,
+        symbol: this.state.newNetworkSymbol,
+        layer: this.state.newNetworkLayer,
+        primaryRpc: this.state.newNetworkRPCPrimary,
+        secondaryRpc: this.state.newNetworkRPCSecondary,
+      }
+
+      if (!this.props.editMode) {
+        link.send('tray:addChain', net, this.props.req)
+      } else {
+        const currentNet = {
+          id: this.chain.id,
+          name: this.chain.name,
+          type: this.chain.type,
+          explorer: this.chain.blockExplorerUrls[0],
+          symbol: this.chain.nativeCurrency.symbol,
+          layer: this.chain.layer,
+          primaryRpc: this.state.newNetworkRPCPrimary,
+          secondaryRpc: this.state.newNetworkRPCSecondary,
+        }
+
+        link.send('tray:action', 'updateNetwork', currentNet, net)
+      }
     }
     
     return (
-          <div
-            role='button'
-            className='addTokenSubmit addTokenSubmitEnabled' 
-            onMouseDown={() => {
-              const net = {
-                id: this.state.newNetworkId,
-                name: this.state.newNetworkName,
-                type: this.state.newNetworkType,
-                explorer: this.state.newNetworkExplorer,
-                symbol: this.state.newNetworkSymbol,
-                layer: this.state.newNetworkLayer,
-                primaryRpc: this.state.newNetworkRPCPrimary,
-                secondaryRpc: this.state.newNetworkRPCSecondary,
-              }
-              if (this.props.editMode) {
-                const currentNet = {
-                  id: this.chain.id,
-                  name: this.chain.name,
-                  type: this.chain.type,
-                  explorer: this.chain.blockExplorerUrls[0],
-                  symbol: this.chain.nativeCurrency.symbol,
-                  layer: this.chain.layer,
-                  primaryRpc: this.state.newNetworkRPCPrimary,
-                  secondaryRpc: this.state.newNetworkRPCSecondary,
-                }
-                link.send('tray:action', 'updateNetwork', currentNet, net)
-              } else {
-                link.send('tray:addChain', net, this.props.req)
-              }
-              setTimeout(() => {
-                link.send('tray:action', 'backDash')
-              }, 400)
-            }}
-          >
-          {this.props.editMode ? 'Update Chain' : 'Add Chain'}
-          </div>
-        )
+      <SubmitButton handleClick={onClick} text={this.props.editMode ? 'Update Chain' : 'Add Chain'} />
+    )
   }
 
   render () {
