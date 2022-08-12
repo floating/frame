@@ -33,7 +33,8 @@ class AddChain extends React.Component {
       newNetworkLayer: this.chain.layer || 'other',
       localShake: {}, 
       resetConfirm: false, 
-      expandNetwork: false 
+      expandNetwork: false,
+      submitted: false
     }
   }
 
@@ -90,6 +91,10 @@ class AddChain extends React.Component {
   }
 
   submitButton () {
+    if (this.state.submitted) {
+      return <DisabledSubmitButton text={this.props.editMode ? 'Updating' : 'Creating'} />
+    }
+
     if (!this.networkChanged() || !this.networkReady()) {
       return <DisabledSubmitButton text={'Fill in Chain'} />
     }
@@ -99,6 +104,8 @@ class AddChain extends React.Component {
     }
 
     const onClick = () => {
+      this.setState({ submitted: true })
+
       const net = {
         id: this.state.newNetworkId,
         name: this.state.newNetworkName,
@@ -117,7 +124,7 @@ class AddChain extends React.Component {
           id: this.chain.id,
           name: this.chain.name,
           type: this.chain.type,
-          explorer: this.chain.blockExplorerUrls[0],
+          explorer: (this.chain.blockExplorerUrls || [])[0],
           symbol: this.chain.nativeCurrency.symbol,
           layer: this.chain.layer,
           primaryRpc: this.state.newNetworkRPCPrimary,

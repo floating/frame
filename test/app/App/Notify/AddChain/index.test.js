@@ -1,8 +1,9 @@
 import React from 'react'
 import Restore from 'react-restore'
-import { render } from '@testing-library/react'
+import { render, waitFor } from '@testing-library/react'
 
 import store from '../../../../../main/store'
+import { setupComponent } from '../../../../componentSetup'
 import AddChainComponent from '../../../../../dash/App/Notify/AddChain'
 
 jest.mock('../../../../../main/store/persist')
@@ -113,12 +114,22 @@ describe('adding a new chain', () => {
     expect(submitButton.textContent).toBe('Add Chain')
   })
 
-  it('does not allow a chain with an existing ID to be created', async () => {
+  it('does not allow a chain with an existing ID to be created', () => {
     const props = requestProps({ id: '0x1', name: 'Bizarro Mainnet' })
     const { getByRole } = render(<AddChain {...props} />)
 
     const submitButton = getByRole('button')
     expect(submitButton.textContent).toMatch(/chain id already exists/i)
+  })
+
+  it('shows that the chain is being created', async () => {
+    const props = requestProps({ id: '0xa4b2', name: 'Arbitrum Rinkeby' })
+    const { user, getByRole } = setupComponent(<AddChain {...props} />)
+
+    await user.click(getByRole('button'))
+    
+    const submitButton = getByRole('button')
+    expect(submitButton.textContent).toMatch(/creating/i)
   })
 })
 
@@ -133,7 +144,7 @@ describe('editing a chain', () => {
     expect(submitButton.textContent).toMatch(/update chain/i)
   })
 
-  it('does not allow the chain id to be edited', async () => {
+  it('does not allow the chain id to be edited', () => {
     const props = requestProps({ id: '0x1' })
     const { queryByLabelText } = render(<AddChain {...props} />)
 
@@ -147,5 +158,15 @@ describe('editing a chain', () => {
 
     const submitButton = getByRole('button')
     expect(submitButton.textContent).toMatch(/fill in chain/i)
+  })
+
+  it('shows that the chain is being updated', async () => {
+    const props = requestProps({ id: '0x89', name: 'Matic Network', nativeCurrency: { symbol: 'MATIC' } })
+    const { user, getByRole } = setupComponent(<AddChain {...props} />)
+
+    await user.click(getByRole('button'))
+    
+    const submitButton = getByRole('button')
+    expect(submitButton.textContent).toMatch(/updating/i)
   })
 })
