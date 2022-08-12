@@ -22,7 +22,7 @@ class AddChain extends React.Component {
     const nativeChainCurrency = this.chain.nativeCurrency || {}
 
     this.state = {
-      newNetworkId: parseInt(this.chain.id, 16) || this.newNetworkIdDefault,
+      newNetworkId: parseInt(this.chain.id) || this.newNetworkIdDefault,
       newNetworkName: this.chain.name || this.newNetworkNameDefault,
       newNetworkExplorer: blockExplorerUrls[0] || this.newNetworkExplorerDefault,
       newNetworkRPCPrimary: rpcUrls[0] || this.newNetworkRPCPrimary,
@@ -63,6 +63,29 @@ class AddChain extends React.Component {
     return (
       <div role='button' className='addTokenSubmit'>{text}</div>
     )
+  }
+
+  chainIdInput () {
+    if (this.props.editMode) {
+      return (<div className='chainFieldDisplay'>{this.state.newNetworkId}</div>)
+    }
+
+    return (<input
+      id='chainId'
+      className={this.state.newNetworkId === this.newNetworkIdDefault ? 'chainInput chainInputDim' : 'chainInput'}
+      value={this.state.newNetworkId} spellCheck='false'
+      onChange={(e) => {
+        if (Number(parseInt(e.target.value)) || e.target.value === '') {
+          this.setState({ newNetworkId: e.target.value })
+        }
+      }}
+      onFocus={(e) => {
+        if (e.target.value === this.newNetworkIdDefault) this.setState({ newNetworkId: '' })
+      }}
+      onBlur={(e) => {
+        if (e.target.value === '') this.setState({ newNetworkId: this.newNetworkIdDefault })
+      }}
+    />)
   }
 
   submitButton () {
@@ -145,24 +168,7 @@ class AddChain extends React.Component {
             <div className='chainRow'>
               <div className='chainId chainInputField'>
                 <label htmlFor='chainId' className='chainInputLabel'>Chain ID</label>
-                {this.props.editMode && <div className='chainFieldDisplay'>{this.state.newNetworkId}</div>}
-                <input
-                  id='chainId'
-                  className={this.state.newNetworkId === this.newNetworkIdDefault ? 'chainInput chainInputDim' : 'chainInput'}
-                  value={this.state.newNetworkId} spellCheck='false'
-                  onChange={(e) => {
-                    if (Number(parseInt(e.target.value)) || e.target.value === '') {
-                      this.setState({ newNetworkId: e.target.value })
-                    }
-                  }}
-                  onFocus={(e) => {
-                    if (e.target.value === this.newNetworkIdDefault) this.setState({ newNetworkId: '' })
-                  }}
-                  onBlur={(e) => {
-                    if (e.target.value === '') this.setState({ newNetworkId: this.newNetworkIdDefault })
-                  }}
-                  style={this.props.editMode ? { display: 'none' } : {}}
-                />
+                {this.chainIdInput()}
               </div>
 
               <div className='chainSymbol chainInputField'>

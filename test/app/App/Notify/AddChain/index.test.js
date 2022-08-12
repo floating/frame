@@ -9,9 +9,9 @@ jest.mock('../../../../../main/store/persist')
 
 const AddChain = Restore.connect(AddChainComponent, store)
 
-const requestProps = (chain = {}) => {
+const createProps = (editMode, chain = {}) => {
   return {
-    editMode: false,
+    editMode,
     req: { chain }
   }
 }
@@ -38,6 +38,8 @@ afterAll(() => {
 })
 
 describe('adding a new chain', () => {
+  const requestProps = (chain) => createProps(false, chain)
+
   it('renders with defaults', () => {
     const { getByLabelText, getByRole } = render(<AddChain {...requestProps()} />)
 
@@ -56,8 +58,8 @@ describe('adding a new chain', () => {
     const secondaryRpcInput = getByLabelText('Secondary RPC')
     expect(secondaryRpcInput.value).toEqual('Secondary Endpoint')
 
-    const otherLayerButton = getByRole('radio', { name: 'Other' })
-    expect(otherLayerButton.getAttribute('aria-checked')).toBe('true')
+    const otherLayerButton = getByRole('radio', { checked: true })
+    expect(otherLayerButton.textContent).toBe('Other')
 
     const submitButton = getByRole('button')
     expect(submitButton.textContent).toBe('Fill in Chain')
@@ -116,6 +118,34 @@ describe('adding a new chain', () => {
     const { getByRole } = render(<AddChain {...props} />)
 
     const submitButton = getByRole('button')
-    expect(submitButton.textContent.toLowerCase()).toBe('chain id already exists')
+    expect(submitButton.textContent).toMatch(/chain id already exists/i)
+  })
+})
+
+describe('editing a chain', () => {
+  const requestProps = (chain) => createProps(true, chain)
+
+  it('allows a chain with an existing chain id to be edited', () => {
+    const props = requestProps({ id: '0x1', name: 'Bizarro Mainnet' })
+    const { getByRole } = render(<AddChain {...props} />)
+
+    const submitButton = getByRole('button')
+    expect(submitButton.textContent).toMatch(/update chain/i)
+  })
+
+  it('does not allow the chain id to be edited', async () => {
+    const props = requestProps({ id: '0x1' })
+    const { queryByLabelText } = render(<AddChain {...props} />)
+
+    const chainIdInput = queryByLabelText('Chain ID', { selector: 'input' })
+    expect(chainIdInput).toBeNull()
+  })
+
+  it('does not allow a chain to be edited to have no name', () => {
+    const props = requestProps({ id: '0x1', blockExplorerUrls: ['https://etherscan.io'] })
+    const { getByRole } = render(<AddChain {...props} />)
+
+    const submitButton = getByRole('button')
+    expect(submitButton.textContent).toMatch(/fill in chain/i)
   })
 })
