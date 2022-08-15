@@ -12,14 +12,14 @@ const networkDefaults = {
   layer: 'other'
 }
 
-export function isNetworkReady (network) {
+function isNetworkReady (network) {
   return (
     network.id && network.id !== networkDefaults.id &&
     network.name && network.name !== networkDefaults.name
   )
 }
 
-export function ChainEditForm ({ title, chain, getSubmitStatus, onSubmit, existingChain }) {
+export default function ChainEditForm ({ title, chain, getSubmitStatus, onSubmit, existingChain }) {
   const blockExplorerUrls = chain.blockExplorerUrls || []
   const rpcUrls = chain.rpcUrls || []
   const nativeChainCurrency = chain.nativeCurrency || {}
@@ -36,6 +36,14 @@ export function ChainEditForm ({ title, chain, getSubmitStatus, onSubmit, existi
   const submitButton = () => {
     const network = {
       id: chainId, name, explorer, symbol, layer, primaryRpc, secondaryRpc, type: chain.type
+    }
+
+    if (submitted) {
+      return <DisabledSubmitButton text={'Updating'} />
+    }
+
+    if (!isNetworkReady(network)) {
+      return <DisabledSubmitButton text={'Fill in Chain'} />
     }
 
     const { ready, text } = getSubmitStatus(network, submitted)
@@ -87,7 +95,10 @@ export function ChainEditForm ({ title, chain, getSubmitStatus, onSubmit, existi
           <div className='chainId chainInputField'>
             {
               existingChain
-                ? <div className='chainFieldDisplay'>{chainId}</div>
+                ? <>
+                    <div className='chainInputLabel'>Chain ID</div>
+                    <div className='chainFieldDisplay'>{chainId}</div>
+                  </>
                 : <>
                     <label htmlFor='chainId' className='chainInputLabel'>Chain ID</label>
                     <input

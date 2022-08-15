@@ -590,14 +590,12 @@ class Notify extends React.Component {
         </div>
       )
     } else if (notify === 'addChain') {
-      console.log({ notify })
       return (
         <div className='notify cardShow'>
           <AddChain {...notifyData} />
         </div>
       )
     } else if (notify === 'updateChain') {
-      console.log({ notify })
       return (
         <div className='notify cardShow'>
           <UpdateChain {...notifyData} />

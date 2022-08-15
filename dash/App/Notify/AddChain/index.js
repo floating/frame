@@ -1,8 +1,7 @@
 import React from 'react'
 import Restore from 'react-restore'
 import link from '../../../../resources/link'
-import { ChainEditForm, isNetworkReady } from '../ChainEditForm'
-
+import ChainEditForm from '../ChainEditForm'
 
 class AddChain extends React.Component {
   constructor (...args) {
@@ -14,19 +13,9 @@ class AddChain extends React.Component {
     return !existingChains.includes(parseInt(chainId))
   }
 
-  submitStatus (network, submitted) {
-    const status = { ready: false }
-
-    if (submitted) {
-      return { ...status, text: 'Creating' }
-    }
-
-    if (!isNetworkReady(network)) {
-      return { ...status, text: 'Fill in Chain' }
-    }
-
+  submitStatus (network) {
     if (this.chainIdExists(network.id)) {
-      return { ...status, text: 'Chain ID already exists' }
+      return { ready: false, text: 'Chain ID already exists' }
     }
 
     return { ready: true, text: 'Add Chain' }
