@@ -7,11 +7,9 @@ import { ChainEditForm, isNetworkReady } from '../ChainEditForm'
 class AddChain extends React.Component {
   constructor (...args) {
     super(...args)
-
-    this.chain = this.req ? this.req.chain : {}
   }
 
-  isValidChain (chainId) {
+  chainIdExists (chainId) {
     const existingChains = Object.keys(this.store('main.networks.ethereum')).map(id => parseInt(id))
     return !existingChains.includes(parseInt(chainId))
   }
@@ -27,7 +25,7 @@ class AddChain extends React.Component {
       return { ...status, text: 'Fill in Chain' }
     }
 
-    if (!this.isValidChain(network.id)) {
+    if (this.chainIdExists(network.id)) {
       return { ...status, text: 'Chain ID already exists' }
     }
 
@@ -37,12 +35,15 @@ class AddChain extends React.Component {
   render () {
     return (
       <ChainEditForm
-        chain={this.chain}
+        chain={this.props.chain}
         title='Add New Chain'
         getSubmitStatus={this.submitStatus.bind(this)}
         onSubmit={(network) => {
           link.send('tray:addChain', network)
-          link.send('tray:resolveRequest', this.props.req)
+
+          if (this.props.req) {
+            link.send('tray:resolveRequest', this.props.req)
+          }
         }}
       />
     )

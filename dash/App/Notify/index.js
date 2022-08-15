@@ -9,6 +9,7 @@ import { usesBaseFee } from '../../../main/transaction'
 import frameIcon from './FrameIcon.png'
 
 import AddChain from './AddChain'
+import UpdateChain from './UpdateChain'
 
 const FEE_WARNING_THRESHOLD_USD = 50
 
@@ -589,9 +590,17 @@ class Notify extends React.Component {
         </div>
       )
     } else if (notify === 'addChain') {
+      console.log({ notify })
       return (
         <div className='notify cardShow'>
           <AddChain {...notifyData} />
+        </div>
+      )
+    } else if (notify === 'updateChain') {
+      console.log({ notify })
+      return (
+        <div className='notify cardShow'>
+          <UpdateChain {...notifyData} />
         </div>
       )
     } else {

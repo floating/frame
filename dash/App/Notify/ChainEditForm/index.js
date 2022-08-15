@@ -87,7 +87,8 @@ export function ChainEditForm ({ title, chain, getSubmitStatus, onSubmit, existi
           <div className='chainId chainInputField'>
             {
               existingChain
-                ? <>
+                ? <div className='chainFieldDisplay'>{chainId}</div>
+                : <>
                     <label htmlFor='chainId' className='chainInputLabel'>Chain ID</label>
                     <input
                       id='chainId'
@@ -107,7 +108,6 @@ export function ChainEditForm ({ title, chain, getSubmitStatus, onSubmit, existi
                       }}
                     />
                   </>
-                : <div className='chainFieldDisplay'>{chainId}</div>
             }
             
           </div>
