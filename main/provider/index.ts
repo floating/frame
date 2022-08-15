@@ -530,8 +530,8 @@ export class Provider extends EventEmitter {
   }
 
   signTypedData (rawPayload: RPCRequestPayload, version: Version, res: RPCRequestCallback) {
-    // v1 has the param order as: [data, address, ...], all other versions have [address, data, ...]
-    const orderedParams = version === 'V1'
+    // ensure param order is [address, data, ...] regardless of version
+    const orderedParams = utils.isAddress(rawPayload.params[1]) && !utils.isAddress(rawPayload.params[0])
       ? [rawPayload.params[1], rawPayload.params[0], ...rawPayload.params.slice(2)]
       : [...rawPayload.params]
 
