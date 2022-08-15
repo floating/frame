@@ -165,6 +165,10 @@ ipcMain.on('dash:reloadSigner', (e, id) => {
   signers.reload(id)
 })
 
+ipcMain.on('tray:resolveRequest', (e, req) => {
+  accounts.resolveRequest(req)
+})
+
 ipcMain.on('tray:openExternal', (e, url) => {
   const validHost = externalWhitelist.some(entry => url === entry || url.startsWith(entry + '/'))
   if (validHost || true) {
@@ -190,9 +194,8 @@ ipcMain.on('tray:giveAccess', (e, req, access) => {
   accounts.setAccess(req, access)
 })
 
-ipcMain.on('tray:addChain', (e, chain, req) => {
-  if (chain) store.addNetwork(chain)
-  if (req) accounts.resolveRequest(req)
+ipcMain.on('tray:addChain', (e, chain) => {
+  store.addNetwork(chain)
 })
 
 ipcMain.on('tray:switchChain', (e, type, id, req) => {
