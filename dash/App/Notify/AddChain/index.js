@@ -3,6 +3,12 @@ import Restore from 'react-restore'
 import link from '../../../../resources/link'
 import ChainEditForm from '../ChainEditForm'
 
+const labels = {
+  title: 'Add New Chain',
+  submit: 'Add Chain',
+  submitted: 'Creating'
+}
+
 class AddChain extends React.Component {
   constructor (...args) {
     super(...args)
@@ -10,23 +16,17 @@ class AddChain extends React.Component {
 
   chainIdExists (chainId) {
     const existingChains = Object.keys(this.store('main.networks.ethereum')).map(id => parseInt(id))
-    return !existingChains.includes(parseInt(chainId))
-  }
-
-  submitStatus (network) {
-    if (this.chainIdExists(network.id)) {
-      return { ready: false, text: 'Chain ID already exists' }
-    }
-
-    return { ready: true, text: 'Add Chain' }
+    return existingChains.includes(parseInt(chainId))
   }
 
   render () {
     return (
       <ChainEditForm
         chain={this.props.chain}
-        title='Add New Chain'
-        getSubmitStatus={this.submitStatus.bind(this)}
+        labels={labels}
+        invalidateSubmit={(chain) => {
+          return this.chainIdExists(chain.id) ? 'Chain ID already exists' : false
+        }}
         onSubmit={(network) => {
           link.send('tray:addChain', network)
 
