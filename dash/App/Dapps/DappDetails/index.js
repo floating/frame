@@ -74,7 +74,7 @@ class DappDetails extends React.Component {
           className='clearOriginsButton' 
           style={{ color: 'var(--bad)', marginTop: '10px' }}
           onClick={() => {
-            link.send('tray:action', 'removeOrigin', this.props.originId)
+            link.send('tray:removeOrigin', this.props.originId)
             link.send('tray:action', 'backDash')
           }}
         >
