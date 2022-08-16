@@ -50,9 +50,9 @@ class TxFeeOverlay extends React.Component {
       const maxFee = BigNumber(props.req.data.maxFeePerGas, 16)
       const baseFee = maxFee.minus(prioFee)
 
-      this.state.priorityFee = this.toDisplayFromWei(prioFee)
+      this.state.priorityFee = this.trimGwei(this.toDisplayFromWei(prioFee))
       this.state.maxFee = this.toDisplayFromWei(maxFee)
-      this.state.baseFee = this.toDisplayFromWei(baseFee)
+      this.state.baseFee = this.trimGwei(this.toDisplayFromWei(baseFee))
     } else {
       const gasPrice = BigNumber(props.req.data.gasPrice, 16)
       this.state.gasPrice = this.toDisplayFromWei(gasPrice)
@@ -105,7 +105,7 @@ class TxFeeOverlay extends React.Component {
     this.baseFeeSubmitTimeout = setTimeout(() => {
       baseFee = parseFloat(baseFee)
       if (isNaN(baseFee)) return
-      baseFee = this.limitRange(baseFee, 0, 9999)
+      baseFee = this.trimGwei(this.limitRange(baseFee, 0, 9999))
       const priorityFee = parseFloat(this.state.priorityFee)
       const gasLimit = parseInt(this.state.gasLimit)
       const maxTotalFee = maxFee(this.props.req.data)
@@ -126,7 +126,7 @@ class TxFeeOverlay extends React.Component {
     this.priorityFeeSubmitTimeout = setTimeout(() => {
       priorityFee = parseFloat(priorityFee)
       if (isNaN(priorityFee)) return
-      priorityFee = this.limitRange(priorityFee, 0, 9999)
+      priorityFee = this.trimGwei(this.limitRange(priorityFee, 0, 9999))
       const baseFee = parseFloat(this.state.baseFee)
       const gasLimit = parseInt(this.state.gasLimit)
       const maxTotalFee = maxFee(this.props.req.data)
