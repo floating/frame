@@ -19,7 +19,7 @@ function isNetworkReady (network) {
   )
 }
 
-export default function ChainEditForm ({ chain, labels, invalidateSubmit, onSubmit, existingChain }) {
+export default function ChainEditForm ({ chain, labels, onSubmit, invalidateSubmit = () => {}, existingChain = false }) {
   const blockExplorerUrls = chain.blockExplorerUrls || []
   const rpcUrls = chain.rpcUrls || []
   const nativeChainCurrency = chain.nativeCurrency || {}
@@ -47,14 +47,14 @@ export default function ChainEditForm ({ chain, labels, invalidateSubmit, onSubm
     }
 
     // returns text if submit is not valid and should not be enabled
-    const warningText = invalidateSubmit && invalidateSubmit(network)
+    const warningText = invalidateSubmit(network)
     if (warningText) {
       return <DisabledSubmitButton text={warningText} />
     }
 
     return (
       <SubmitButton
-        onSubmit={() => {
+        handleClick={() => {
           setSubmitted(true)
           onSubmit(network)
         }}
@@ -66,7 +66,7 @@ export default function ChainEditForm ({ chain, labels, invalidateSubmit, onSubm
   return (
     <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
       <div className='notifyBoxSlide'>
-        <div className='addChainTitle'>{labels.title}</div>
+        <div role='title' className='addChainTitle'>{labels.title}</div>
 
         <div className='addChain'>
           <div className='chainRow'>
@@ -90,6 +90,7 @@ export default function ChainEditForm ({ chain, labels, invalidateSubmit, onSubm
             </div>
           </div>
         </div>
+
 
         <div className='chainRow'>
           <div className='chainId chainInputField'>
@@ -120,7 +121,6 @@ export default function ChainEditForm ({ chain, labels, invalidateSubmit, onSubm
                     />
                   </>
             }
-            
           </div>
 
           <div className='chainSymbol chainInputField'>
