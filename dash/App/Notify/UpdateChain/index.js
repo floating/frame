@@ -9,7 +9,7 @@ const labels = {
   submit: 'Update Chain',
   submitted: 'Updating'
 }
-``
+
 function UpdateChain ({ chain }) {
   return (
     <ChainEditForm
