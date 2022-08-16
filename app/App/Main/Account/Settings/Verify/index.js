@@ -31,7 +31,7 @@ class Verify extends React.Component {
     const account = this.store('main.accounts', this.props.id)
     // if (signerType === 'Address') return null
     return (
-      <div>
+      <>
         {account.smart ? (
           <>
             <div>{account.smart.type} Account</div>
@@ -43,18 +43,22 @@ class Verify extends React.Component {
           </>
         ) : (
           <>
-            <div>Verify the address displayed in Frame is correct</div>
-            <div className='settingsButton' onMouseDown={() => this.verifyAddress()}>
+            <div className='panelBlockButton panelBlockItem' onMouseDown={() => this.verifyAddress()}>
               {signerKind === 'hot' ? 'Verify Address' : 'Verify Address on Device'}
             </div>
             {this.state.verifyAddressResponse ? (
-              <div className={this.state.verifyAddressSuccess ? 'signerVerifyResponse signerVerifyResponseSuccess cardShow' : 'signerVerifyResponse cardShow'}>
+              <div 
+                className={'panelBlockValue panelBlockItem cardShow'}
+                style={{
+                  color: this.state.verifyAddressSuccess ? 'var(--good)' : 'var(--bad)'
+                }}
+              >
                 {this.state.verifyAddressResponse}
               </div>
             ) : null}
           </>
         )}
-      </div>
+      </>
     )
   }
 }

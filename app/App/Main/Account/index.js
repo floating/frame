@@ -26,55 +26,6 @@ import ChainRequest from './Requests/ChainRequest'
 import AddTokenRequest from './Requests/AddTokenRequest'
 import SignTypedDataRequest from './Requests/SignTypedDataRequest'
 
-
-// class _Verify extends React.Component {
-//   constructor (props, context) {
-//     super(props, context)
-//     this.moduleRef = React.createRef()
-//     this.resizeObserver = new ResizeObserver(() => {
-//       if (this.moduleRef && this.moduleRef.current) {
-//         link.send('tray:action', 'updateAccountModule', props.id, { height: this.moduleRef.current.clientHeight })
-//       }
-//     })
-//     this.state = {
-//       verifyAddressSuccess: false,
-//       verifyAddressResponse: ''
-//     }
-//   }
-//   componentDidMount () {
-//     this.resizeObserver.observe(this.moduleRef.current)
-//     link.send('tray:action', 'updateAccountModule', this.props.id, { height: this.moduleRef.current.clientHeight })
-//   } 
-//   render () {
-//     // console.log(this.props)
-//     // const { module, index } = this.props
-//     // const { top, height } = module
-//     // const style = { transform: `translateY(${top}px)`, zIndex: 10000 - index, height }
-//     // const i = 1
-//     // const transform = viewIndex === i ? 'translateX(0)' : viewIndex > i ? 'translateX(-100%)' : 'translateX(100%)'
-//     const signerType = this.store('main.accounts', this.props.id, 'signer.type')
-//     const signerKind = (signerType === 'seed' || signerType === 'ring') ? 'hot' : 'device'
-//     return (
-//       <div ref={this.moduleRef} style={{ padding: '20px' }}>
-//         <div className='signerSettingsTitle'>Verify Address</div>
-//         <div className='signerPermission'>
-//           <div className='signerVerifyText'>Verify that the address displayed in Frame is correct</div>
-//           {this.state.verifyAddressResponse ? (
-//             <div className={this.state.verifyAddressSuccess ? 'signerVerifyResponse signerVerifyResponseSuccess' : 'signerVerifyResponse'}>{this.state.verifyAddressResponse}</div>
-//           ) : null}
-//         </div>
-//         <div className='quitFrame'>
-//           <div onMouseDown={() => this.verifyAddress()} className='quitFrameButton'>{signerKind === 'hot' ? 'Verify Address' : 'Verify Address on Device'}</div>
-//         </div>
-//       </div>
-//     )
-
-//   }
-// }
-
-// const Verify = Restore.connect(_Verify)
-
-
 // class Module extends React.Component {
 //   constructor (props, context) {
 //     super(props, context)

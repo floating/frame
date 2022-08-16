@@ -1,26 +1,127 @@
-.settingsRow
+.expandedModule
+  padding-top 16px
+
+.panelBlock
   margin-bottom 20px
-  text-align center
-  border-radius 8px
-  background var(--ghostB)
-  padding 8px
+  border-radius 16px
+  background var(--ghostA)
+  padding 6px
+  box-shadow 0px 2px 8px var(--ghostY)
 
   input
     z-index 200
     user-select auto
     background transparent
-    background var(--ghostC)
+    background var(--ghostA)
     outline none
     border none
-    margin-left 8px
-    height 40px
+    // margin-left 8px
     width 100%
     color var(--outerspace)
-    margin 0
-    border-radius 8px
+    border-radius 7px
     text-align center
     font-size 16px
-    margin-bottom 8px
+    font-weight 500
+    padding 14px
+    font-family 'Exo2'
+    transition var(--standardFast)
+
+  input:hover
+    background var(--ghostB)
+    transition var(--standardFast)
+    box-shadow 0px 6px 42px 0px var(--ghostZ)
+
+  input:focus
+    background var(--ghostC)
+    transition var(--standardFast)
+    box-shadow 0px 6px 42px 0px var(--ghostZ)
+
+.panelBlockTitle
+    font-weight 600
+    font-size 11px
+    text-transform uppercase
+    font-family 'Exo2'
+    padding 2px 0px 10px 10px
+    letter-spacing 1px
+
+  .panelBlockItem:not(:first-child)
+    margin-top 4px
+  
+  .panelBlockValues
+    font-size 17px
+    font-weight 400
+    border-radius 10px
+    -webkit-app-region no-drag
+    transition none
+    pointer-events auto
+    transform translate3d(0, 0, 0)
+    font-family 'Exo2'
+    padding 4px 4px 4px 4px
+    background var(--ghostZ)
+
+    .panelBlockValue
+      font-size 12px
+      font-weight 500
+      display flex
+      justify-content center
+      align-items center
+      border-radius 7px
+      -webkit-app-region no-drag
+      transition none
+      pointer-events auto
+      transform translate3d(0, 0, 0)
+      font-family 'Exo2'
+      padding 8px
+      text-transform uppercase
+      
+      svg
+        position relative
+        top -0px
+        padding 0px 3px 0px 4px
+
+    .panelBlockButton
+      font-size 14px
+      font-weight 500
+      display flex
+      justify-content center
+      align-items center
+      border-radius 7px
+      -webkit-app-region no-drag
+      transition none
+      pointer-events auto
+      transform translate3d(0, 0, 0)
+      font-family 'Exo2'
+      padding 16px
+      background var(--ghostA)
+      cursor pointer
+      transition var(--standardFast)
+      box-shadow 0px 0px 0px 0px var(--ghostZ)
+      text-transform uppercase
+
+    .panelBlockButton:hover
+      background var(--ghostB)
+      transition var(--standardFast)
+      box-shadow 0px 6px 22px 0px var(--ghostZ)
+
+    .panelBlockButton:active
+      transform translateY(1px)
+      background var(--ghostB)
+      transition var(--standardFast)
+      box-shadow 0px 2px 4px 0px var(--ghostZ)
+    
+    .panelBlockTag
+      position relative
+      z-index 100001
+      overflow hidden
+      font-size 11px
+      font-weight 600
+      text-transform uppercase
+      letter-spacing 1px
+      text-align center
+      padding 5px 0px 5px 0px
+      margin-top 5px
+      border-radius 8px
+      background var(--ghostA)
 
 .settingsRowInset
   padding 8px
@@ -45,7 +146,6 @@
   box-sizing border-box
   text-transform uppercase
   box-shadow 0px 1px 2px var(--ghostZ)
-  margin-top 8px
   cursor pointer
 
 .settingsButton:hover
@@ -63,7 +163,7 @@
   text-align center
   position relative
   box-sizing border-box
-  margin-top 8px
+  margin-top 4px
 
 .signerVerifyResponseSuccess
   background var(--good)
