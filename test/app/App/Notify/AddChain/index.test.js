@@ -1,6 +1,5 @@
 import React from 'react'
 import Restore from 'react-restore'
-import { render } from '@testing-library/react'
 
 import store from '../../../../../main/store'
 import link from '../../../../../resources/link'
@@ -11,13 +10,6 @@ jest.mock('../../../../../main/store/persist')
 jest.mock('../../../../../resources/link', () => ({ send: jest.fn() }))
 
 const AddChain = Restore.connect(AddChainComponent, store)
-
-const createProps = (editMode, chain = {}) => {
-  return {
-    editMode,
-    req: { chain }
-  }
-}
 
 beforeAll(() => {
   jest.useFakeTimers()
@@ -40,103 +32,48 @@ afterAll(() => {
   jest.useRealTimers()
 })
 
-describe('adding a new chain', () => {
-  const requestProps = (chain) => createProps(false, chain)
+it('renders the title', () => {
+  const { getByRole } = renderForm()
 
-  it('renders with defaults', () => {
-    const { getByLabelText, getByRole } = render(<AddChain {...requestProps()} />)
+  const titleSection = getByRole('title')
+  expect(titleSection.textContent).toBe('Add New Chain')
+})
 
-    const chainNameInput = getByLabelText('Chain Name')
-    expect(chainNameInput.value).toEqual('Chain Name')
+it('renders the submit button text', () => {
+  const { getByRole } = renderForm({ chain: { id: 137, name: 'Polygon' }})
 
-    const chainIdInput = getByLabelText('Chain ID')
-    expect(chainIdInput.value).toEqual('Chain ID')
+  const submitButton = getByRole('button')
+  expect(submitButton.textContent).toBe('Add Chain')
+})
 
-    const blockExplorerInput = getByLabelText('Block Explorer')
-    expect(blockExplorerInput.value).toEqual('Block Explorer')
+it('renders the correct text after the form is submitted', async () => {
+  const { user, getByRole } = renderForm({ chain: { id: 137, name: 'Polygon' }})
 
-    const primaryRpcInput = getByLabelText('Primary RPC')
-    expect(primaryRpcInput.value).toEqual('Primary Endpoint')
+  await user.click(getByRole('button'))
 
-    const secondaryRpcInput = getByLabelText('Secondary RPC')
-    expect(secondaryRpcInput.value).toEqual('Secondary Endpoint')
+  const submitButton = getByRole('button')
+  expect(submitButton.textContent).toBe('Creating')
+})
 
-    const otherLayerButton = getByRole('radio', { checked: true })
-    expect(otherLayerButton.textContent).toBe('Other')
+it('renders a warning if the entered chain id already exists', () => {
+  const { user, getByRole } = renderForm({ chain: { id: 1, name: 'Mainnet' }})
 
-    const submitButton = getByRole('button')
-    expect(submitButton.textContent).toBe('Fill in Chain')
-  })
+  const submitButton = getByRole('button')
+  expect(submitButton.textContent).toMatch(/chain id already exists/i)
+})
 
-  it('renders with the chain name from an add chain request', () => {
-    const props = requestProps({ name: 'Polygon' })
-    const { getByLabelText } = render(<AddChain {...props} />)
+it('does not allow submit if the chain id already exists', async () => {
+  const { user, getByRole } = renderForm({ chain: { id: 1, name: 'Mainnet' }})
 
-    const chainNameInput = getByLabelText('Chain Name')
-    expect(chainNameInput.value).toEqual('Polygon')
-  })
+  await user.click(getByRole('button'))
 
-  it('renders with the chain ID from an add chain request', () => {
-    const props = requestProps({ id: '0x89' })
-    const { getByLabelText } = render(<AddChain {...props} />)
+  expect(link.send).not.toHaveBeenCalled()
+})
 
-    const chainIdInput = getByLabelText('Chain ID')
-    expect(chainIdInput.value).toEqual('137')
-  })
-
-  it('renders with the first block explorer from an add chain request', () => {
-    const props = requestProps({ blockExplorerUrls: ['https://polygonscan.com'] })
-    const { getByLabelText } = render(<AddChain {...props} />)
-
-    const blockExplorerInput = getByLabelText('Block Explorer')
-    expect(blockExplorerInput.value).toEqual('https://polygonscan.com')
-  })
-
-  it('renders with the first RPC url from an add chain request', () => {
-    const props = requestProps({ rpcUrls: ['https://myrpc.polygon.net'] })
-    const { getByLabelText } = render(<AddChain {...props} />)
-
-    const primaryRpcInput = getByLabelText('Primary RPC')
-    expect(primaryRpcInput.value).toEqual('https://myrpc.polygon.net')
-  })
-
-  it('renders with the second RPC url from an add chain request', () => {
-    const props = requestProps({ rpcUrls: ['https://disconnected.com', 'https://myrpc.polygon.net'] })
-    const { getByLabelText } = render(<AddChain {...props} />)
-
-    const secondaryRpcInput = getByLabelText('Secondary RPC')
-    expect(secondaryRpcInput.value).toEqual('https://myrpc.polygon.net')
-  })
-
-  it('allows a chain with valid settings to be created', () => {
-    const props = requestProps({ id: '0x89', name: 'Polygon' })
-    const { getByRole } = render(<AddChain {...props} />)
-
-    const submitButton = getByRole('button')
-    expect(submitButton.textContent).toBe('Add Chain')
-  })
-
-  it('does not allow a chain with an existing ID to be created', () => {
-    const props = requestProps({ id: '0x1', name: 'Bizarro Mainnet' })
-    const { getByRole } = render(<AddChain {...props} />)
-
-    const submitButton = getByRole('button')
-    expect(submitButton.textContent).toMatch(/chain id already exists/i)
-  })
-
-  it('shows that the chain is being created', async () => {
-    const props = requestProps({ id: '0xa4b2', name: 'Arbitrum Rinkeby' })
-    const { user, getByRole } = setupComponent(<AddChain {...props} />)
-
-    await user.click(getByRole('button'))
-
-    const submitButton = getByRole('button')
-    expect(submitButton.textContent).toMatch(/creating/i)
-  })
-
-  it('adds a new chain when the user clicks submit', async () => {
-    const props = requestProps({
-      id: '0xa4b2',
+it('adds a valid chain', async () => {
+  const { user, getByRole } = renderForm({
+    chain: {
+      id: 42162,
       type: 'ethereum',
       name: 'Arbitrum Rinkeby',
       nativeCurrency: {
@@ -145,13 +82,14 @@ describe('adding a new chain', () => {
       blockExplorerUrls: ['https://rinkeby.arbiscan.io'],
       rpcUrls: ['https://arbitrum-rinkeby.infura.com', 'https://myrpc.arbrink.net'],
       layer: 'sidechain'
-    })
+    }
+  })
 
-    const { user, getByRole } = setupComponent(<AddChain {...props} />)
+  await user.click(getByRole('button'))
 
-    await user.click(getByRole('button'))
-
-    expect(link.send).toHaveBeenCalledWith('tray:addChain', {
+  expect(link.send).toHaveBeenNthCalledWith(1,
+    'tray:addChain',
+    {
       id: 42162,
       name: 'Arbitrum Rinkeby',
       symbol: 'ETH',
@@ -160,82 +98,116 @@ describe('adding a new chain', () => {
       layer: 'sidechain',
       primaryRpc: 'https://arbitrum-rinkeby.infura.com',
       secondaryRpc: 'https://myrpc.arbrink.net'
-    }, props.req)
-  })
+    }
+  )
 })
 
-describe('editing a chain', () => {
-  const requestProps = (chain) => createProps(true, chain)
-
-  it('allows a chain with an existing chain id to be edited', () => {
-    const props = requestProps({ id: '0x1', name: 'Bizarro Mainnet' })
-    const { getByRole } = render(<AddChain {...props} />)
-
-    const submitButton = getByRole('button')
-    expect(submitButton.textContent).toMatch(/update chain/i)
+it('resolves an add chain request after submission', async () => {
+  const req = { handlerId: '1234' }
+  const { user, getByRole } = renderForm({
+    req,
+    chain: {
+      id: 137,
+      name: 'Polygon'
+    }
   })
 
-  it('does not allow the chain id to be edited', () => {
-    const props = requestProps({ id: '0x1' })
-    const { queryByLabelText } = render(<AddChain {...props} />)
+  await user.click(getByRole('button'))
 
-    const chainIdInput = queryByLabelText('Chain ID', { selector: 'input' })
-    expect(chainIdInput).toBeNull()
-  })
-
-  it('does not allow a chain to be edited to have no name', () => {
-    const props = requestProps({ id: '0x1', blockExplorerUrls: ['https://etherscan.io'] })
-    const { getByRole } = render(<AddChain {...props} />)
-
-    const submitButton = getByRole('button')
-    expect(submitButton.textContent).toMatch(/fill in chain/i)
-  })
-
-  it('shows that the chain is being updated', async () => {
-    const props = requestProps({ id: '0x89', name: 'Matic Network', nativeCurrency: { symbol: 'MATIC' } })
-    const { user, getByRole } = setupComponent(<AddChain {...props} />)
-
-    await user.click(getByRole('button'))
-
-    const submitButton = getByRole('button')
-    expect(submitButton.textContent).toMatch(/updating/i)
-  })
-
-  it('edits the existing chain when the user clicks submit', async () => {
-    const props = requestProps({
-      id: '0x1',
-      type: 'ethereum',
-      name: 'Mainnet',
-      nativeCurrency: {
-        symbol: 'ETH'
-      },
-      blockExplorerUrls: ['https://etherscan.io'],
-      rpcUrls: ['http://localhost:8080', 'https://mainnet.infura.com'],
-      layer: 'other'
-    })
-
-    const { user, getByRole, getByLabelText } = setupComponent(<AddChain {...props} />)
-
-    const primaryRpcInput = getByLabelText('Primary RPC')
-    await user.clear(primaryRpcInput)
-    await user.type(primaryRpcInput, 'https://my-custom-rpc.net')
-    await user.click(getByRole('button'))
-
-    expect(link.send).toHaveBeenCalledWith('tray:action', 'updateNetwork',
-      expect.objectContaining({
-        id: '0x1',
-        name: 'Mainnet',
-        symbol: 'ETH'
-      }), {
-        id: 1,
-        name: 'Mainnet',
-        symbol: 'ETH',
-        explorer: 'https://etherscan.io',
-        primaryRpc: 'https://my-custom-rpc.net',
-        secondaryRpc: 'https://mainnet.infura.com',
-        type: 'ethereum',
-        layer: 'other'
-      }
-    )
-  })
+  expect(link.send).toHaveBeenNthCalledWith(2, 'tray:resolveRequest', req)
 })
+
+it('does not attempt to resolve an undefined request', async () => {
+  const { user, getByRole } = renderForm({
+    chain: {
+      id: 137,
+      name: 'Polygon'
+    }
+  })
+
+  await user.click(getByRole('button'))
+
+  expect(link.send).toHaveBeenCalledTimes(1)
+  expect(link.send.mock.calls[0][0]).not.toBe('tray:resolveRequest')
+})
+
+// describe('editing a chain', () => {
+//   const requestProps = (chain) => createProps(true, chain)
+
+//   it('allows a chain with an existing chain id to be edited', () => {
+//     const props = requestProps({ id: '0x1', name: 'Bizarro Mainnet' })
+//     const { getByRole } = render(<AddChain {...props} />)
+
+//     const submitButton = getByRole('button')
+//     expect(submitButton.textContent).toMatch(/update chain/i)
+//   })
+
+//   it('does not allow the chain id to be edited', () => {
+//     const props = requestProps({ id: '0x1' })
+//     const { queryByLabelText } = render(<AddChain {...props} />)
+
+//     const chainIdInput = queryByLabelText('Chain ID', { selector: 'input' })
+//     expect(chainIdInput).toBeNull()
+//   })
+
+//   it('does not allow a chain to be edited to have no name', () => {
+//     const props = requestProps({ id: '0x1', blockExplorerUrls: ['https://etherscan.io'] })
+//     const { getByRole } = render(<AddChain {...props} />)
+
+//     const submitButton = getByRole('button')
+//     expect(submitButton.textContent).toMatch(/fill in chain/i)
+//   })
+
+//   it('shows that the chain is being updated', async () => {
+//     const props = requestProps({ id: '0x89', name: 'Matic Network', nativeCurrency: { symbol: 'MATIC' } })
+//     const { user, getByRole } = setupComponent(<AddChain {...props} />)
+
+//     await user.click(getByRole('button'))
+
+//     const submitButton = getByRole('button')
+//     expect(submitButton.textContent).toMatch(/updating/i)
+//   })
+
+//   it('edits the existing chain when the user clicks submit', async () => {
+//     const props = requestProps({
+//       id: '0x1',
+//       type: 'ethereum',
+//       name: 'Mainnet',
+//       nativeCurrency: {
+//         symbol: 'ETH'
+//       },
+//       blockExplorerUrls: ['https://etherscan.io'],
+//       rpcUrls: ['http://localhost:8080', 'https://mainnet.infura.com'],
+//       layer: 'other'
+//     })
+
+//     const { user, getByRole, getByLabelText } = setupComponent(<AddChain {...props} />)
+
+//     const primaryRpcInput = getByLabelText('Primary RPC')
+//     await user.clear(primaryRpcInput)
+//     await user.type(primaryRpcInput, 'https://my-custom-rpc.net')
+//     await user.click(getByRole('button'))
+
+//     expect(link.send).toHaveBeenCalledWith('tray:action', 'updateNetwork',
+//       expect.objectContaining({
+//         id: '0x1',
+//         name: 'Mainnet',
+//         symbol: 'ETH'
+//       }), {
+//         id: 1,
+//         name: 'Mainnet',
+//         symbol: 'ETH',
+//         explorer: 'https://etherscan.io',
+//         primaryRpc: 'https://my-custom-rpc.net',
+//         secondaryRpc: 'https://mainnet.infura.com',
+//         type: 'ethereum',
+//         layer: 'other'
+//       }
+//     )
+//   })
+// })
+
+// helper functions
+function renderForm ({ req, chain = {} } = {}) {
+  return setupComponent(<AddChain {...{req, chain} }/>)
+}

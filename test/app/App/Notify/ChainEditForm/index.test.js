@@ -55,13 +55,6 @@ describe('rendering', () => {
     const chainIdInput = getByLabelText('Chain ID')
     expect(chainIdInput.value).toEqual('Chain ID')
   })
-  
-  it('does not allow an existing chain id to be edited', () => {
-    const { queryByLabelText } = renderForm({ existingChain: true })
-
-    const chainIdInput = queryByLabelText('Chain ID', { selector: 'input' })
-    expect(chainIdInput).toBeNull()
-  })
 
   it('renders the provided block explorer', () => {
     const { getByLabelText } = renderForm({ chain: { blockExplorerUrls: ['https://etherscan.io'] } })
@@ -126,8 +119,21 @@ describe('rendering', () => {
     expect(titleSection.textContent).toBe('Add New Chain')
   })
 
-  it('renders a warning to fill in data if the chain is not ready to be submitted', () => {
-    const { getByRole } = renderForm({ labels: { submit: 'Create Chain' }})
+  it('renders a warning to fill in data if no chain name has been entered', () => {
+    const { getByRole } = renderForm({
+      chain: { id: 1 },
+      labels: { submit: 'Create Chain' }
+    })
+
+    const submitButton = getByRole('button')
+    expect(submitButton.textContent).toBe('Fill in Chain')
+  })
+
+  it('renders a warning to fill in data if no chain id has been entered', () => {
+    const { getByRole } = renderForm({
+      chain: { name: 'Bizarro Mainnet' },
+      labels: { submit: 'Create Chain' }
+    })
 
     const submitButton = getByRole('button')
     expect(submitButton.textContent).toBe('Fill in Chain')
@@ -139,16 +145,33 @@ describe('rendering', () => {
     const submitButton = getByRole('button')
     expect(submitButton.textContent).toBe('Create Chain')
   })
+
+  it('renders the submit button with a warning if the submit is invalidated', () => {
+    const { getByRole } = renderValidForm({ invalidateSubmit: () => 'no submitting in a test!' })
+
+    const submitButton = getByRole('button')
+    expect(submitButton.textContent).toBe('no submitting in a test!')
+  })
+})
+
+describe('editing', () => {
+  it('does not allow an existing chain id to be edited', () => {
+    const { queryByLabelText } = renderForm({ existingChain: true })
+
+    const chainIdInput = queryByLabelText('Chain ID', { selector: 'input' })
+    expect(chainIdInput).toBeNull()
+  })
 })
 
 describe('submitting', () => {
-  it('does not allow a submission if the form is missing chain data', async () => {
+  it('submits the form when the submit button is clicked', async () => {
     const onSubmit = jest.fn()
-    const { user, getByRole } = renderForm({ onSubmit })
+    const chain = { id: 10, name: 'Optimism' }
+    const { user, getByRole } = renderValidForm({ onSubmit, chain })
 
     await user.click(getByRole('button'))
 
-    expect(onSubmit).not.toHaveBeenCalled()
+    expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining(chain))
   })
 
   it('displays the submitted label after the user clicks submit', async () => {
@@ -158,6 +181,24 @@ describe('submitting', () => {
 
     const submitButton = getByRole('button')
     expect(submitButton.textContent).toEqual('Updating')
+  })
+
+  it('does not allow a submission if the form is missing chain data', async () => {
+    const onSubmit = jest.fn()
+    const { user, getByRole } = renderForm({ onSubmit })
+
+    await user.click(getByRole('button'))
+
+    expect(onSubmit).not.toHaveBeenCalled()
+  })
+
+  it('does not allow a submission if the submit button is invalidated', async () => {
+    const onSubmit = jest.fn()
+    const { user, getByRole } = renderValidForm({ invalidateSubmit: () => 'test', onSubmit })
+
+    await user.click(getByRole('button'))
+
+    expect(onSubmit).not.toHaveBeenCalled()
   })
 
   it('does not allow another submission after the user clicks submit', async () => {
