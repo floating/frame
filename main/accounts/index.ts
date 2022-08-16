@@ -548,10 +548,10 @@ export class Accounts extends EventEmitter {
   }
 
   removeRequests (handlerId: string) {
-    log.info(`removeRequests(${handlerId})`)
-
     Object.values(this.accounts).forEach((account) => {
-      this.removeRequest(account, handlerId)
+      if (account.requests[handlerId]) {
+        this.removeRequest(account, handlerId)
+      }
     })
   }
 
