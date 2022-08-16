@@ -70,7 +70,8 @@ export interface TransactionRequest extends Omit<AccountRequest, 'type'> {
   updatedFees?: boolean,
   feeAtTime?: string,
   completed?: number,
-  feesUpdatedByUser: boolean
+  feesUpdatedByUser: boolean,
+  recipientType: string
 }
 
 export interface SignTypedDataRequest extends Omit<AccountRequest, 'type'> {

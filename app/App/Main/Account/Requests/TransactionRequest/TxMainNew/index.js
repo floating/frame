@@ -21,11 +21,10 @@ class TxRecipient extends React.Component {
   }
   render () {
     const req = this.props.req
-    const layer = this.store('main.networks', this.props.chain.type, this.props.chain.id, 'layer')
-    const nativeCurrency = this.store('main.networksMeta', this.props.chain.type, this.props.chain.id, 'nativeCurrency')
-    const etherUSD = nativeCurrency && nativeCurrency.usd && layer !== 'testnet' ? nativeCurrency.usd.price : 0
-    const value = this.hexToDisplayValue(req.data.value || '0x')
-    const currentSymbol = this.store('main.networks', this.props.chain.type, this.props.chain.id, 'symbol') || '?'
+    const chainId = parseInt(req.data.chainId, 16)
+
+    const chainName = this.store('main.networks.ethereum', chainId, 'name')
+    const currentSymbol = this.store('main.networks.ethereum', chainId, 'symbol') || '?'
 
     const txMeta = { replacement: false, possible: true, notice: '' }
     // TODO
@@ -105,7 +104,7 @@ class TxRecipient extends React.Component {
                       <div>{'including data in a tx'}</div>
                     ) : null}
                     <div>{'to an account'}</div>
-                    <div>{'on Mainnet'}</div>
+                    <div>{`on ${chainName}`}</div>
                   </>
                 ) : ( // Recipient is contract
                   <div className='_txDescriptionSummary'>
@@ -129,7 +128,7 @@ class TxRecipient extends React.Component {
                         <div>{'taking unknown action via unknown contract'}</div>
                       )
                     ) : null}
-                    <div>{'on Mainnet'}</div>
+                    <div>{`on ${chainName}`}</div>
                   </div>
                 )}
               </div>

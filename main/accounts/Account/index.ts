@@ -19,6 +19,8 @@ import provider from '../../provider'
 import { ApprovalType } from '../../../resources/constants'
 import Erc20Contract from '../../contracts/erc20'
 
+import recipient from './recipient'
+
 const nebula = nebulaApi()
 
 const storeApi = {
@@ -151,6 +153,20 @@ class FrameAccount {
       log.error('lookupAddress Error:', e)
       this.ensName = ''
       this.update()
+    }
+  }
+
+  async lookupRecipientType (req: TransactionRequest) {
+    try {
+      const { to, chainId } = req.data
+      const type = await recipient.getType(to, chainId)
+      const knownTxRequest = this.requests[req.handlerId] as TransactionRequest
+      if (type && knownTxRequest) {
+        knownTxRequest.recipientType = type
+        this.update()
+      }
+    } catch (e) {
+      log.warn(e)
     }
   }
 
@@ -324,6 +340,7 @@ class FrameAccount {
         }
 
         this.populateRequestEnsName(txRequest)
+        this.lookupRecipientType(req)
       }
 
       this.update()

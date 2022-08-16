@@ -156,6 +156,73 @@ class TransactionRequest extends React.Component {
       <ViewData {...this.props} />
     )
   }
+  renderApprovalButtons (req) {
+    if (req.notice) {
+      return null
+    } else {
+      return (
+        <div className='requestApprove' style={{
+          transform: req.automaticFeeUpdateNotice ? 'translateY(60px)' : 'translateY(0px)'
+        }}>
+          <div 
+            className={req.automaticFeeUpdateNotice ? 'requestApproveFeeBlock requestApproveFeeBlockActive' : 'requestApproveFeeBlock'}
+          >
+            <div className='requestApproveFeeButton requestApproveFeeReject' onClick={() => {
+              const { previousFee } = req.automaticFeeUpdateNotice
+              if (previousFee.type === '0x2') {
+                link.rpc('setBaseFee', previousFee.baseFee, req.handlerId, e => { if (e) console.error(e) })
+                link.rpc('setPriorityFee', previousFee.priorityFee, req.handlerId, e => { if (e) console.error(e) })
+              } else if (previousFee.type === '0x0')  {
+                link.rpc('setGasPrice', previousFee.gasPrice, req.handlerId, e => { if (e) console.error(e) })
+              }
+            }}>{'reject'}</div>
+            <div className='requestApproveFeeText'>{'fee updated'}</div>
+            <div className='requestApproveFeeButton requestApproveFeeAccept' onClick={() => {
+              link.rpc('removeFeeUpdateNotice', req.handlerId, e => { if (e) console.error(e) })
+            }}>{'accept'}</div>
+          </div>
+          <div
+            className='requestDecline' 
+            style={{ 
+              pointerEvents: this.state.allowInput && !req.automaticFeeUpdateNotice ? 'auto' : 'none',
+              opacity: req.automaticFeeUpdateNotice ? 0.2 : 1
+            }}
+            onClick={() => {
+              if (this.state.allowInput && !req.automaticFeeUpdateNotice) this.decline(req)
+            }}
+          >
+            <div className='requestDeclineButton _txButton _txButtonBad'>Decline</div>
+          </div>
+          <div
+            className='requestSign' 
+            style={{ 
+              pointerEvents: this.state.allowInput && !req.automaticFeeUpdateNotice ? 'auto' : 'none',
+              opacity: req.automaticFeeUpdateNotice ? 0.2 : 1
+            }}
+            onClick={() => {
+              if (this.state.allowInput && !req.automaticFeeUpdateNotice) {
+                link.rpc('signerCompatibility', req.handlerId, (e, compatibility) => {
+                  if (e === 'No signer')  {
+                    this.store.notify('noSignerWarning', { req })
+                  } else if (e === 'Signer locked') {
+                    this.store.notify('signerLockedWarning', { req })
+                  } else if (!compatibility.compatible && !this.store('main.mute.signerCompatibilityWarning')) {
+                    this.store.notify('signerCompatibilityWarning', { req, compatibility, chain: this.chain })
+                  } else if ((maxFeeUSD.toNumber() > FEE_WARNING_THRESHOLD_USD || this.toDisplayUSD(maxFeeUSD) === '0.00') && !this.store('main.mute.gasFeeWarning')) {
+                    this.store.notify('gasFeeWarning', { req, feeUSD: this.toDisplayUSD(maxFeeUSD), currentSymbol })
+                  } else {
+                    this.approve(req.handlerId, req)
+                  }
+                })
+              }}
+            }
+          >
+            <div className='requestSignButton _txButton'> Sign </div>
+          </div>
+        </div>
+      )
+    }
+  }
 
   renderTx () {
     const { accountId, handlerId } = this.props
@@ -422,7 +489,7 @@ class TransactionRequest extends React.Component {
                             {toAddress.substring(2, 5)}
                             {svg.octicon('kebab-horizontal', { height: 14 })}
                             {toAddress.substring(toAddress.length - 3)}
-                           </span>
+                          </span>
                           <span className='monitorSub'>{'ON'} </span>
                           <span className='monitorSub monitorSubHighlight'>
                             {}
@@ -466,66 +533,10 @@ class TransactionRequest extends React.Component {
 
                   <div className='_txBody'>
                     <TxMainNew i={0} {...this.props} req={req} chain={this.chain}/>
-                    <TxMain i={1} {...this.props} req={req} chain={this.chain}/>
-                    <TxFeeNew i={2} {...this.props} req={req} chain={this.chain} />
-                    <TxRecipient i={3} {...this.props} req={req} />
+                    <TxRecipient i={1} {...this.props} req={req} />
+                    <TxMain i={2} {...this.props} req={req} chain={this.chain}/>
+                    <TxFeeNew i={3} {...this.props} req={req} chain={this.chain} />
                   </div>
-                  {!notice ? (
-                    <div className='requestApprove'>
-                      {req.automaticFeeUpdateNotice ? (
-                        <div className='requestApproveFeeBlock cardShow'>
-                          <div className='requestApproveFeeButton requestApproveFeeReject' onClick={() => {
-                            const { previousFee } = req.automaticFeeUpdateNotice
-                            if (previousFee.type === '0x2') {
-                              link.rpc('setBaseFee', previousFee.baseFee, req.handlerId, e => { if (e) console.error(e) })
-                              link.rpc('setPriorityFee', previousFee.priorityFee, req.handlerId, e => { if (e) console.error(e) })
-                            } else if (previousFee.type === '0x0')  {
-                              link.rpc('setGasPrice', previousFee.gasPrice, req.handlerId, e => { if (e) console.error(e) })
-                            }
-                          }}>{'reject'}</div>
-                          <div>{'fee updated'}</div>
-                          <div className='requestApproveFeeButton requestApproveFeeAccept' onClick={() => {
-                            link.rpc('removeFeeUpdateNotice', req.handlerId, e => { if (e) console.error(e) })
-                          }}>{'accept'}</div>
-                        </div>
-                      ) : (
-                        <>
-                          <div
-                            className='requestDecline' 
-                            style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none'}}
-                            onClick={() => {
-                              if (this.state.allowInput) this.decline(req)
-                            }}
-                          >
-                            <div className='requestDeclineButton _txButton _txButtonBad'>Decline</div>
-                          </div>
-                          <div
-                            className='requestSign' 
-                            style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none'}}
-                            onClick={() => {
-                              if (this.state.allowInput) {
-                                link.rpc('signerCompatibility', req.handlerId, (e, compatibility) => {
-                                  if (e === 'No signer')  {
-                                    this.store.notify('noSignerWarning', { req })
-                                  } else if (e === 'Signer locked') {
-                                    this.store.notify('signerLockedWarning', { req })
-                                  } else if (!compatibility.compatible && !this.store('main.mute.signerCompatibilityWarning')) {
-                                    this.store.notify('signerCompatibilityWarning', { req, compatibility, chain: this.chain })
-                                  } else if ((maxFeeUSD.toNumber() > FEE_WARNING_THRESHOLD_USD || this.toDisplayUSD(maxFeeUSD) === '0.00') && !this.store('main.mute.gasFeeWarning')) {
-                                    this.store.notify('gasFeeWarning', { req, feeUSD: this.toDisplayUSD(maxFeeUSD), currentSymbol })
-                                  } else {
-                                    this.approve(req.handlerId, req)
-                                  }
-                                })
-                              }}
-                            }
-                          >
-                            <div className='requestSignButton _txButton'> Sign </div>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  ) : null}
                 </>
               )}
             </div>
@@ -533,6 +544,7 @@ class TransactionRequest extends React.Component {
         ) : (
           <div className='unknownType'>{'Unknown: ' + req.type}</div>
         )}
+        {this.renderApprovalButtons(req)}
       </div>
     )
   }

@@ -23,6 +23,7 @@ class TxRecipient extends React.Component {
     const req = this.props.req
     const address = req.data.to ? getAddress(req.data.to) : ''
     const ensName = (req.recipient && req.recipient.length < 25) ? req.recipient : ''
+    const chainName = this.store('main.networks.ethereum', parseInt(req.data.chainId, 16), 'name') 
 
     return (
       <div className='_txMain' style={{ animationDelay: (0.1 * this.props.i) + 's' }}>
@@ -60,11 +61,20 @@ class TxRecipient extends React.Component {
             )}
             {req.decodedData && req.decodedData.contractName ? (
               <div className='_txMainTag'>
-                {`${req.decodedData.contractName} contract on mainnet`}
+                {`${req.decodedData.contractName} contract on ${chainName}`}
+              </div>
+            ) : null}
+            {req.recipientType === 'contract' ? (
+              <div className='_txMainTag'>
+                {`recipient is contract on ${chainName}`}
+              </div>
+            ) : req.recipientType === 'external' ? (
+              <div className='_txMainTag'>
+                {`recipient is external account on ${chainName}`}
               </div>
             ) : (
               <div className='_txMainTag'>
-                {'external account on mainnet'}
+                {`recipient type unknown on ${chainName}`}
               </div>
             )}
           </div>
