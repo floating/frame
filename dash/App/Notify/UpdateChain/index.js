@@ -1,5 +1,6 @@
 import React from 'react'
 import Restore from 'react-restore'
+
 import link from '../../../../resources/link'
 import ChainEditForm from '../ChainEditForm'
 
@@ -8,24 +9,18 @@ const labels = {
   submit: 'Update Chain',
   submitted: 'Updating'
 }
-
-class UpdateChain extends React.Component {
-  constructor (...args) {
-    super(...args)
-  }
-
-  render () {
-    return (
-      <ChainEditForm
-        chain={this.props.chain}
+``
+function UpdateChain ({ chain }) {
+  return (
+    <ChainEditForm
+        chain={chain}
         existingChain={true}
         labels={labels}
-        onSubmit={(network) => {
-          link.send('tray:action', 'updateNetwork', this.props.chain, network)
+        onSubmit={(updatedChain) => {
+          link.send('tray:action', 'updateNetwork', chain, updatedChain)
         }}
-      />
-    )
-  }
+    />
+  )
 }
 
 export default Restore.connect(UpdateChain)

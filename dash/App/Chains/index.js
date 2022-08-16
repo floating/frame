@@ -587,18 +587,7 @@ class _Network extends React.Component {
           {/* <div className='chainIdBadgeBackground' /> */}
 
           <div className='chainSettings' onClick={() => {
-            const chain = {
-              blockExplorerUrls: [explorer],
-              rpcUrls: [],
-              nativeCurrency: {
-                symbol: symbol
-              },
-              id: id,
-              name: name,
-              type: type,
-              layer: layer,
-              iconUrls: []
-            }
+            const chain = { id, type, name, symbol, explorer, layer }
 
             link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'updateChain', notifyData: { chain }} })
           }}>
@@ -796,7 +785,15 @@ class Settings extends React.Component {
           </div>
         </div> */}
         <div className='localSettingsWrap'>
-          <div className='newAccount' onClick={() => link.send('tray:action', 'navDash', { view: 'notify', data: { notifyData: { chain: {} }, notify: 'addChain' } })}>
+          <div className='newAccount' onClick={() => link.send('tray:action', 'navDash', {
+            view: 'notify',
+            data: {
+              notify: 'addChain',
+              notifyData: {
+                chain: {}
+              }
+            }})
+          }>
             <div className='newAccountIcon'>{svg.plus(16)}</div> 
             Add New Chain
           </div>

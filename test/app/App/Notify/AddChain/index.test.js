@@ -56,7 +56,7 @@ it('renders the correct text after the form is submitted', async () => {
 })
 
 it('renders a warning if the entered chain id already exists', () => {
-  const { user, getByRole } = renderForm({ chain: { id: 1, name: 'Mainnet' }})
+  const { getByRole } = renderForm({ chain: { id: 1, name: 'Mainnet' }})
 
   const submitButton = getByRole('button')
   expect(submitButton.textContent).toMatch(/chain id already exists/i)
@@ -76,10 +76,8 @@ it('adds a valid chain', async () => {
       id: 42162,
       type: 'ethereum',
       name: 'Arbitrum Rinkeby',
-      nativeCurrency: {
-        symbol: 'ETH'
-      },
-      blockExplorerUrls: ['https://rinkeby.arbiscan.io'],
+      symbol: 'ETH',
+      explorer: 'https://rinkeby.arbiscan.io',
       rpcUrls: ['https://arbitrum-rinkeby.infura.com', 'https://myrpc.arbrink.net'],
       layer: 'sidechain'
     }

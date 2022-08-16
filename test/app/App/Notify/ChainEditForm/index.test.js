@@ -29,7 +29,7 @@ describe('rendering', () => {
   })
 
   it('renders the provided chain symbol', () => {
-    const { getByLabelText } = renderForm({ chain: { nativeCurrency: { symbol: 'AVAX' } } })
+    const { getByLabelText } = renderForm({ chain: { symbol: 'AVAX' } })
 
     const symbolInput = getByLabelText('Native Symbol')
     expect(symbolInput.value).toEqual('AVAX')
@@ -57,7 +57,7 @@ describe('rendering', () => {
   })
 
   it('renders the provided block explorer', () => {
-    const { getByLabelText } = renderForm({ chain: { blockExplorerUrls: ['https://etherscan.io'] } })
+    const { getByLabelText } = renderForm({ chain: { explorer: 'https://etherscan.io' } })
 
     const blockExplorerInput = getByLabelText('Block Explorer')
     expect(blockExplorerInput.value).toEqual('https://etherscan.io')

@@ -655,9 +655,10 @@ export class Provider extends EventEmitter {
           type,
           id: chainId,
           name: chainName,
-          nativeCurrency,
-          rpcUrls,
-          blockExplorerUrls, 
+          symbol: nativeCurrency.symbol,
+          primaryRpc: rpcUrls[0],
+          secondaryRpc: rpcUrls[1],
+          explorer: blockExplorerUrls[0], 
           iconUrls
         },
         account: (accounts.getAccounts() || [])[0],

@@ -10,28 +10,26 @@ const labels = {
 }
 
 class AddChain extends React.Component {
-  constructor (...args) {
-    super(...args)
-  }
-
   chainIdExists (chainId) {
     const existingChains = Object.keys(this.store('main.networks.ethereum')).map(id => parseInt(id))
     return existingChains.includes(parseInt(chainId))
   }
 
   render () {
+    const { chain, req } = this.props
+
     return (
       <ChainEditForm
-        chain={this.props.chain}
+        chain={chain}
         labels={labels}
-        invalidateSubmit={(chain) => {
-          return this.chainIdExists(chain.id) ? 'Chain ID already exists' : false
+        invalidateSubmit={(enteredChain) => {
+          return this.chainIdExists(enteredChain.id) ? 'Chain ID already exists' : false
         }}
-        onSubmit={(network) => {
-          link.send('tray:addChain', network)
+        onSubmit={(addedChain) => {
+          link.send('tray:addChain', addedChain)
 
-          if (this.props.req) {
-            link.send('tray:resolveRequest', this.props.req)
+          if (req) {
+            link.send('tray:resolveRequest', req)
           }
         }}
       />

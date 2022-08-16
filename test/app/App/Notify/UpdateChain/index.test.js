@@ -57,10 +57,8 @@ it('edits the existing chain when the user clicks submit', async () => {
     id: 1,
     type: 'ethereum',
     name: 'Mainnet',
-    nativeCurrency: {
-      symbol: 'ETH'
-    },
-    blockExplorerUrls: ['https://etherscan.io'],
+    symbol: 'ETH',
+    explorer: 'https://etherscan.io',
     rpcUrls: ['http://localhost:8080', 'https://mainnet.infura.com'],
     layer: 'other'
   }

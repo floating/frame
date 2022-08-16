@@ -20,16 +20,14 @@ function isNetworkReady (network) {
 }
 
 export default function ChainEditForm ({ chain, labels, onSubmit, invalidateSubmit = () => {}, existingChain = false }) {
-  const blockExplorerUrls = chain.blockExplorerUrls || []
   const rpcUrls = chain.rpcUrls || []
-  const nativeChainCurrency = chain.nativeCurrency || {}
     
   const [name, setChainName] = useState(chain.name || networkDefaults.name)
   const [chainId, setChainId] = useState(parseInt(chain.id) || networkDefaults.id)
-  const [explorer, setExplorer] = useState(blockExplorerUrls[0] || networkDefaults.explorer)
+  const [explorer, setExplorer] = useState(chain.explorer || networkDefaults.explorer)
   const [primaryRpc, setPrimaryRpc] = useState(rpcUrls[0] || networkDefaults.primaryRpc)
   const [secondaryRpc, setSecondaryRpc] = useState(rpcUrls[1] || networkDefaults.secondaryRpc)
-  const [symbol, setSymbol] = useState(nativeChainCurrency.symbol || networkDefaults.symbol)
+  const [symbol, setSymbol] = useState(chain.symbol || networkDefaults.symbol)
   const [layer, setLayer] = useState(chain.layer || networkDefaults.layer)
   const [submitted, setSubmitted] = useState(false)
 
