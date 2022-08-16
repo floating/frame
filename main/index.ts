@@ -226,6 +226,18 @@ ipcMain.on('tray:adjustNonce', (e, handlerId, nonceAdjust) => {
   accounts.adjustNonce(handlerId, nonceAdjust)
 })
 
+ipcMain.on('tray:removeOrigin', (e, handlerId) => {
+  accounts.removeRequests(handlerId)
+  store.removeOrigin(handlerId)
+})
+
+ipcMain.on('tray:clearOrigins', (e) => {
+  Object.keys(store('main.origins')).forEach((handlerId) => {
+    accounts.removeRequests(handlerId)
+  })
+  store.clearOrigins()
+})
+
 ipcMain.on('tray:syncPath', (e, path, value) => {
   store.syncPath(path, value)
 })
