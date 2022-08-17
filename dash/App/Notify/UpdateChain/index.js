@@ -11,16 +11,16 @@ const labels = {
 }
 
 function UpdateChain ({ chain }) {
-  const formProps = {
-    chain,
-    labels,
-    existingChain: true,
-    onSubmit: (updatedChain) => {
-      link.send('tray:action', 'updateNetwork', chain, updatedChain)
-    }
-  }
-
-  return <ChainEditForm {...formProps} />
+  return (
+    <ChainEditForm
+      chain={chain}
+      labels={labels}
+      existingChain={true}
+      onSubmit={(updatedChain) => {
+        link.send('tray:action', 'updateNetwork', chain, updatedChain)
+      }}
+    />
+  )
 }
 
 export default Restore.connect(UpdateChain)

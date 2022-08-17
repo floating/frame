@@ -75,15 +75,13 @@ class AddChain extends React.Component {
   }
 
   render () {
-    const formProps = {
-      chain: this.props.chain,
-      labels,
-      onSubmit: this.onSubmit.bind(this),
-      invalidateSubmit: this.invalidateSubmit.bind(this)
-    }
-  
     return (
-      <ChainEditForm {...formProps}>
+      <ChainEditForm
+        chain={this.props.chain}
+        labels={labels}
+        onSubmit={this.onSubmit.bind(this)}
+        invalidateSubmit={this.invalidateSubmit.bind(this)}
+      >
         <RPCInput
           text={this.state.primaryRpc}
           defaultText={defaults.primaryRpc}
