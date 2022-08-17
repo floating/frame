@@ -91,7 +91,7 @@ describe('rendering', () => {
     expect(titleSection.textContent).toBe('Add New Chain')
   })
 
-  it('renders a warning to fill in data if no chain name has been entered', () => {
+  it('renders instructions to fill in data if no chain name has been entered', () => {
     const { getByRole } = renderForm({
       chain: { id: 1 },
       labels: { submit: 'Create Chain' }
@@ -101,7 +101,7 @@ describe('rendering', () => {
     expect(submitButton.textContent).toBe('Fill in Chain')
   })
 
-  it('renders a warning to fill in data if no chain id has been entered', () => {
+  it('renders instructions to fill in data if no chain id has been entered', () => {
     const { getByRole } = renderForm({
       chain: { name: 'Bizarro Mainnet' },
       labels: { submit: 'Create Chain' }
