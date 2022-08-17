@@ -1134,7 +1134,6 @@
   box-sizing border-box
   height 88px
   font-size 14px
-  text-transform uppercase
   -webkit-app-region no-drag
   pointer-events auto
   opacity 1
@@ -1145,17 +1144,17 @@
   z-index 30000000
   transition var(--standard)
   position absolute
-  bottom 8px
-  left 0px
-  right 0px
+  bottom 6px
+  left -1px
+  right -1px
   background var(--ghostA)
   border-radius 14px
-  box-shadow 0px -16px 32px var(--ghostY)
+  box-shadow 0px -16px 16px var(--ghostZ)
 
   .requestApproveFeeBlock::before
     content ''
     position absolute
-    top 45px
+    top 30px
     right 5px
     bottom 5px
     left 5px
@@ -1165,38 +1164,36 @@
     
   .requestApproveFeeBlock
     position absolute
-    top -110px
+    top -93px
     right 0px
     left 0px
-    height 105px
     background var(--ghostA)
     z-index 30
-    display flex
-    justify-content space-between
-    align-items center
+    height 88px
     border-radius 13px
-    font-size 11px
     box-shadow 0px 2.5px 2.5px var(--ghostY)
     filter blur(20px)
     opacity 0
     transition var(--standard)
     padding 0px 5px
+    pointer-events none
+    box-shadow 0px -16px 16px var(--ghostZ)
 
     .requestApproveFeeText
       z-index 4
-      background var(--ghostB)
-      height calc(100% - 20px)
-      width 120px
-      border-radius 8px
+      position absolute 
+      top 1px
+      left 0
+      right 0
+      height 30px
       display flex
       justify-content center
       align-items center
+      font-size 13px
+      text-transform uppercase
 
     .requestApproveFeeButton 
-      height calc(100% - 20px)
-      margin 0px 5px
       padding 0px 24px
-      width 110px
       border-radius 8px
       box-sizing border-box
       background var(--ghostB)
@@ -1207,18 +1204,33 @@
       align-items center
       cursor pointer
       z-index 4
+      text-transform uppercase
       *
         pointer-events none
 
     .requestApproveFeeButton:hover
       background var(--ghostC)
 
+    .requestApproveFeeReject
+      color var(--moon)
+      position absolute 
+      left 10px
+      bottom 11px
+      top 35px
+      right calc(50% + 2.5px)
+
     .requestApproveFeeAccept
       color var(--good)
+      position absolute 
+      right 10px
+      bottom 11px
+      top 35px
+      left calc(50% + 2.5px)
 
   .requestApproveFeeBlockActive
     filter blur(0px)
     opacity 1
+    pointer-events auto
 
   .requestDecline
     position absolute
@@ -1227,6 +1239,7 @@
     right 50%
     bottom 10px
     z-index 40
+    text-transform uppercase
 
   .requestDeclineButton
     position absolute
@@ -1258,7 +1271,7 @@
     border-radius 2px
     width 30px
     background var(--bad)
-    bottom 20px
+    bottom 16px
 
   .requestDeclineButton:hover:before
     background var(--badOver)
@@ -1270,6 +1283,7 @@
     left 50%
     bottom 10px
     z-index 40
+    text-transform uppercase
 
     // overflow hidden
   .requestSignButton
@@ -1299,7 +1313,7 @@
     border-radius 2px
     width 30px
     background var(--good)
-    bottom 20px
+    bottom 16px
 
   .requestSignButton:hover:before
     background var(--goodOver)

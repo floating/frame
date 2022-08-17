@@ -16,7 +16,7 @@ const fullheight = !!process.env.FULL_HEIGHT
 const openedAtLogin = app && app.getLoginItemSettings() && app.getLoginItemSettings().wasOpenedAtLogin
 const windows: Windows = {}
 const showOnReady = true
-const trayWidth = 380
+const trayWidth = 400
 const devHeight = 800
 
 let tray: Tray

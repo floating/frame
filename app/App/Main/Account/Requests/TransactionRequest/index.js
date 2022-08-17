@@ -162,7 +162,7 @@ class TransactionRequest extends React.Component {
     } else {
       return (
         <div className='requestApprove' style={{
-          transform: req.automaticFeeUpdateNotice ? 'translateY(60px)' : 'translateY(0px)'
+          transform: req.automaticFeeUpdateNotice ? 'translateY(92px)' : 'translateY(0px)'
         }}>
           <div 
             className={req.automaticFeeUpdateNotice ? 'requestApproveFeeBlock requestApproveFeeBlockActive' : 'requestApproveFeeBlock'}
@@ -175,11 +175,11 @@ class TransactionRequest extends React.Component {
               } else if (previousFee.type === '0x0')  {
                 link.rpc('setGasPrice', previousFee.gasPrice, req.handlerId, e => { if (e) console.error(e) })
               }
-            }}>{'reject'}</div>
-            <div className='requestApproveFeeText'>{'fee updated'}</div>
+            }}>{'reject fee'}</div>
+            <div className='requestApproveFeeText'>{'Fee Updated'}</div>
             <div className='requestApproveFeeButton requestApproveFeeAccept' onClick={() => {
               link.rpc('removeFeeUpdateNotice', req.handlerId, e => { if (e) console.error(e) })
-            }}>{'accept'}</div>
+            }}>{'accept fee'}</div>
           </div>
           <div
             className='requestDecline' 

@@ -4,6 +4,8 @@ import link from '../../../../../../../resources/link'
 import svg from '../../../../../../../resources/svg'
 import utils from 'web3-utils'
 
+import BigNumber from 'bignumber.js'
+
 class TxRecipient extends React.Component {
   constructor (...args) {
     super(...args)
@@ -19,6 +21,27 @@ class TxRecipient extends React.Component {
   hexToDisplayValue (hex) {
     return (Math.round(parseFloat(utils.fromWei(hex, 'ether')) * 1000000) / 1000000).toFixed(6)
   }
+
+  renderRecog (req) {
+    if (req && req.recog && req.recog.type === 'erc20:transfer') {
+      const { data } = req.recog
+      const amount = new BigNumber(data.amount) 
+      const decimals = new BigNumber('1e' + data.decimals)
+      const displayAmount = amount.dividedBy(decimals)
+
+      return (
+        <>
+          <div className='_txDescriptionSummaryLine'>
+            {`Sending ${displayAmount.toFixed(9)} ${data.symbol}`}
+          </div>
+          <div className='_txDescriptionSummaryLine'>
+            {`To: ${data.recipient}`}
+          </div>
+        </>
+      )
+    }
+  }
+
   render () {
     const req = this.props.req
     const chainId = parseInt(req.data.chainId, 16)
@@ -94,16 +117,12 @@ class TxRecipient extends React.Component {
               <div className='_txDescription' onClick={() => {
                 link.send('nav:update', 'panel', { step: 'viewData' })
               }}>
-                {false ? ( // TODO: Add account type discovery to tx request flow
+                {req.recipientType === 'external' ? (
                   <>
                     {req.data.value && req.data.value !== '0x' && req.data.value !== '0x0' ? (
                       <div>{`Sending ${currentSymbol}`}</div>
                     ) : null}
-                    {req.data.data && req.data.data !== '0x' && req.data.data !== '0x0' ? (
-
-                      <div>{'including data in a tx'}</div>
-                    ) : null}
-                    <div>{'to an account'}</div>
+                    <div>{'to an external account'}</div>
                     <div>{`on ${chainName}`}</div>
                   </>
                 ) : ( // Recipient is contract
@@ -112,7 +131,9 @@ class TxRecipient extends React.Component {
                       <div>{`Sending ${currentSymbol}`}</div>
                     ) : null}
                     {req.data.data && req.data.data !== '0x' && req.data.data !== '0x0' ? (
-                      req.decodedData && req.decodedData.method ? (
+                      req.recog ? (
+                        this.renderRecog(req)
+                      ) : req.decodedData && req.decodedData.method ? (
                         <div className='_txDescriptionSummaryLine'>
                           <span className={'_txDataValueMethod'}>{(() => {
                             if (req.decodedData.method.length > 17) return `${req.decodedData.method.substr(0, 15)}..`
@@ -125,7 +146,7 @@ class TxRecipient extends React.Component {
                           })()}</span>
                         </div>
                       ) : (
-                        <div>{'taking unknown action via unknown contract'}</div>
+                        <div>{'unknown action via unknown contract'}</div>
                       )
                     ) : null}
                     <div>{`on ${chainName}`}</div>
@@ -136,6 +157,11 @@ class TxRecipient extends React.Component {
             {req.data.data && req.data.data !== '0x' && req.data.data !== '0x0' ? (
               <div className='_txMainTag _txMainTagWarning'>
                 {'Transaction includes data'}
+              </div>
+            ) : null}
+            {req.decodedData && req.decodedData.source ? (
+              <div className='_txMainTag _txMainTagWarning'>
+                {'abi source: ' + req.decodedData.source}
               </div>
             ) : null}
           </div>
