@@ -96,7 +96,7 @@ class TxFeeOverlay extends React.Component {
   }
 
   trimGwei (gwei) {
-    return parseFloat(parseFloat(gwei).toFixed(3)).toString()
+    return parseFloat(parseFloat(gwei).toFixed(9)).toString()
   }
 
   setBaseFee (baseFee) {
@@ -217,14 +217,14 @@ class TxFeeOverlay extends React.Component {
                 e.preventDefault()
                 let baseFee = parseFloat(this.state.baseFee)
                 if (isNaN(baseFee)) return
-                baseFee = this.trimGwei(this.limitRange(baseFee + 1, 0, 9999))
+                baseFee = this.limitRange(Math.floor(baseFee) + 1, 0, 9999)
                 baseFee = this.toDisplayFromGwei(BigNumber(baseFee))
                 this.setBaseFee(baseFee)
               } else if (e.key === 'ArrowDown') {
                 e.preventDefault()
                 let baseFee = parseFloat(this.state.baseFee)
                 if (isNaN(baseFee)) return
-                baseFee = this.trimGwei(this.limitRange(baseFee - 1, 0, 9999))
+                baseFee = this.limitRange(Math.ceil(baseFee) - 1, 0, 9999)
                 baseFee = this.toDisplayFromGwei(BigNumber(baseFee))
                 this.setBaseFee(baseFee)
               }
@@ -254,14 +254,14 @@ class TxFeeOverlay extends React.Component {
                 e.preventDefault()
                 let priorityFee = parseFloat(this.state.priorityFee)
                 if (isNaN(priorityFee)) return
-                priorityFee = this.trimGwei(this.limitRange(priorityFee + 1, 0, 9999))
+                priorityFee = this.limitRange(Math.floor(priorityFee) + 1, 0, 9999)
                 priorityFee = this.toDisplayFromGwei(BigNumber(priorityFee))
                 this.setPriorityFee(priorityFee)
               } else if (e.key === 'ArrowDown') {
                 e.preventDefault()
                 let priorityFee = parseFloat(this.state.priorityFee)
                 if (isNaN(priorityFee)) return
-                priorityFee = this.trimGwei(this.limitRange(priorityFee - 1, 0, 9999))
+                priorityFee = this.limitRange(Math.ceil(priorityFee) - 1, 0, 9999)
                 priorityFee = this.toDisplayFromGwei(BigNumber(priorityFee))
                 this.setPriorityFee(priorityFee)
               }
