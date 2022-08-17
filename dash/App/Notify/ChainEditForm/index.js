@@ -3,7 +3,6 @@ import { DisabledSubmitButton, SubmitButton } from '../Button'
 
 const networkDefaults = {
   id: 'Chain ID',
-  type: 'ethereum',
   name: 'Chain Name',
   explorer: 'Block Explorer',
   symbol: 'Native Symbol',
@@ -17,7 +16,14 @@ function isNetworkReady (network) {
   )
 }
 
-export default function ChainEditForm ({ children = [], chain, labels, onSubmit, invalidateSubmit = () => {}, existingChain = false }) {
+export default function ChainEditForm ({
+  chain,
+  labels,
+  onSubmit,
+  existingChain = false,
+  invalidateSubmit = () => {},
+  children: additionalFields = [] })
+{
   const [name, setChainName] = useState(chain.name || networkDefaults.name)
   const [chainId, setChainId] = useState(parseInt(chain.id) || networkDefaults.id)
   const [explorer, setExplorer] = useState(chain.explorer || networkDefaults.explorer)
@@ -82,7 +88,6 @@ export default function ChainEditForm ({ children = [], chain, labels, onSubmit,
             </div>
           </div>
         </div>
-
 
         <div className='chainRow'>
           <div className='chainId chainInputField'>
@@ -156,9 +161,9 @@ export default function ChainEditForm ({ children = [], chain, labels, onSubmit,
         </div>
 
         {
-          children.map((childElement, i) => {
+          additionalFields.map((field, i) => {
             return (
-              <div key={i} className='chainRow'>{childElement}</div>
+              <div key={i} className='chainRow'>{field}</div>
             )
           })
         }

@@ -70,12 +70,16 @@ class AddChain extends React.Component {
     }
   }
 
+  invalidateSubmit (enteredChain) {
+    return this.chainIdExists(enteredChain.id) ? 'Chain ID already exists' : false
+  }
+
   render () {
     const formProps = {
       chain: this.props.chain,
       labels,
       onSubmit: this.onSubmit.bind(this),
-      invalidateSubmit: (enteredChain) => this.chainIdExists(enteredChain.id) ? 'Chain ID already exists' : false
+      invalidateSubmit: this.invalidateSubmit.bind(this)
     }
   
     return (

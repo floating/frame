@@ -790,7 +790,7 @@ class Settings extends React.Component {
             data: {
               notify: 'addChain',
               notifyData: {
-                chain: {}
+                chain: { type: 'ethereum' }
               }
             }})
           }>
