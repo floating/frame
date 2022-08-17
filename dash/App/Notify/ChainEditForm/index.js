@@ -16,12 +16,40 @@ function isNetworkReady (network) {
   )
 }
 
+const EditFormSubmitButton = ({ network, labels, onSubmit, validateSubmit }) => {
+  const [submitted, setSubmitted] = useState(false)
+
+  if (submitted) {
+    return <DisabledSubmitButton text={labels.submitted} />
+  }
+
+  if (!isNetworkReady(network)) {
+    return <DisabledSubmitButton text='Fill in Chain' />
+  }
+
+  // returns text if submit is not valid and should not be enabled
+  const { message, valid } = validateSubmit(network)
+  if (!valid) {
+    return <DisabledSubmitButton text={message} />
+  }
+
+  return (
+    <SubmitButton
+      handleClick={() => {
+        setSubmitted(true)
+        onSubmit(network)
+      }}
+      text={labels.submit}
+    />
+  )
+}
+
 export default function ChainEditForm ({
   chain,
   labels,
   onSubmit,
   existingChain = false,
-  invalidateSubmit = () => {},
+  validateSubmit = () => ({ valid: true }),
   children: additionalFields = [] })
 {
   const [name, setChainName] = useState(chain.name || networkDefaults.name)
@@ -29,38 +57,7 @@ export default function ChainEditForm ({
   const [explorer, setExplorer] = useState(chain.explorer || networkDefaults.explorer)
   const [symbol, setSymbol] = useState(chain.symbol || networkDefaults.symbol)
   const [layer, setLayer] = useState(chain.layer || networkDefaults.layer)
-  const [submitted, setSubmitted] = useState(false)
-
-  const submitButton = () => {
-    const network = {
-      id: chainId, name, explorer, symbol, layer, type: chain.type
-    }
-
-    if (submitted) {
-      return <DisabledSubmitButton text={labels.submitted} />
-    }
-
-    if (!isNetworkReady(network)) {
-      return <DisabledSubmitButton text={'Fill in Chain'} />
-    }
-
-    // returns text if submit is not valid and should not be enabled
-    const warningText = invalidateSubmit(network)
-    if (warningText) {
-      return <DisabledSubmitButton text={warningText} />
-    }
-
-    return (
-      <SubmitButton
-        handleClick={() => {
-          setSubmitted(true)
-          onSubmit(network)
-        }}
-        text={labels.submit}
-      />
-    )
-  }
-
+  
   return (
     <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
       <div className='notifyBoxSlide'>
@@ -200,7 +197,16 @@ export default function ChainEditForm ({
           </div>
         </div>
 
-        <div className='chainRow'>{submitButton()}</div>
+        <div className='chainRow'>
+          <EditFormSubmitButton 
+            labels={labels} 
+            network={{
+              id: chainId, name, explorer, symbol, layer, type: chain.type
+            }}
+            onSubmit={onSubmit}
+            validateSubmit={validateSubmit}
+          />
+        </div>
       </div>
     </div>
   )

@@ -119,7 +119,7 @@ describe('rendering', () => {
   })
 
   it('renders the submit button with a warning if the submit is invalidated', () => {
-    const { getByRole } = renderValidForm({ invalidateSubmit: () => 'no submitting in a test!' })
+    const { getByRole } = renderValidForm({ validateSubmit: () => ({ valid: false, message: 'no submitting in a test!' })})
 
     const submitButton = getByRole('button')
     expect(submitButton.textContent).toBe('no submitting in a test!')
@@ -166,7 +166,7 @@ describe('submitting', () => {
 
   it('does not allow a submission if the submit button is invalidated', async () => {
     const onSubmit = jest.fn()
-    const { user, getByRole } = renderValidForm({ invalidateSubmit: () => 'test', onSubmit })
+    const { user, getByRole } = renderValidForm({ validateSubmit: () => ({ valid: false, message: 'test' }), onSubmit })
 
     await user.click(getByRole('button'))
 
@@ -189,8 +189,8 @@ function renderValidForm (props) {
   return renderForm({ chain: { id: 137, name: 'Polygon' }, ...props})
 }
 
-function renderForm ({ chain = { }, labels = {}, existingChain, onSubmit = () => {}, invalidateSubmit = () => {} } = {}) {
-  const props = { chain, labels, existingChain, onSubmit, invalidateSubmit }
+function renderForm ({ chain = { }, labels = {}, existingChain, onSubmit = () => {}, validateSubmit = () => ({ valid: true }) } = {}) {
+  const props = { chain, labels, existingChain, onSubmit, validateSubmit }
   
   return setupComponent(<ChainEditForm {...props} />)
 }

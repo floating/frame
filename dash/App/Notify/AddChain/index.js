@@ -70,8 +70,17 @@ class AddChain extends React.Component {
     }
   }
 
-  invalidateSubmit (enteredChain) {
-    return this.chainIdExists(enteredChain.id) ? 'Chain ID already exists' : false
+  validateSubmit (enteredChain) {
+    if (this.chainIdExists(enteredChain.id)) {
+      return {
+        message: 'Chain ID already exists',
+        valid: false
+      }
+    }
+
+    return {
+      valid: true
+    }
   }
 
   render () {
@@ -80,7 +89,7 @@ class AddChain extends React.Component {
         chain={this.props.chain}
         labels={labels}
         onSubmit={this.onSubmit.bind(this)}
-        invalidateSubmit={this.invalidateSubmit.bind(this)}
+        validateSubmit={this.validateSubmit.bind(this)}
       >
         <RPCInput
           text={this.state.primaryRpc}
