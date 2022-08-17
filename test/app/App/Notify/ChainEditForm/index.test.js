@@ -70,34 +70,6 @@ describe('rendering', () => {
     expect(blockExplorerInput.value).toEqual('Block Explorer')
   })
 
-  it('renders the first provided RPC as the primary RPC', () => {
-    const { getByLabelText } = renderForm({ chain: { rpcUrls: ['https://myrpc.polygon.net'] } })
-
-    const primaryRpcInput = getByLabelText('Primary RPC')
-    expect(primaryRpcInput.value).toEqual('https://myrpc.polygon.net')
-  })
-
-  it('renders the default primary RPC text', () => {
-    const { getByLabelText } = renderForm()
-
-    const primaryRpcInput = getByLabelText('Primary RPC')
-    expect(primaryRpcInput.value).toEqual('Primary Endpoint')
-  })
-
-  it('renders the second provided RPC as the secondary RPC', () => {
-    const { getByLabelText } = renderForm({ chain: { rpcUrls: ['https://disconnected.com', 'https://myrpc.polygon.net'] } })
-
-    const secondaryRpcInput = getByLabelText('Secondary RPC')
-    expect(secondaryRpcInput.value).toEqual('https://myrpc.polygon.net')
-  })
-
-  it('renders the default secondary RPC text', () => {
-    const { getByLabelText } = renderForm()
-
-    const secondaryRpcInput = getByLabelText('Secondary RPC')
-    expect(secondaryRpcInput.value).toEqual('Secondary Endpoint')
-  })
-
   it('renders the correct button for the provided layer', () => {
     const { getByRole } = renderForm({ chain: { layer: 'testnet' }})
 

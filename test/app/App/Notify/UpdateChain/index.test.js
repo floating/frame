@@ -59,26 +59,22 @@ it('edits the existing chain when the user clicks submit', async () => {
     name: 'Mainnet',
     symbol: 'ETH',
     explorer: 'https://etherscan.io',
-    rpcUrls: ['http://localhost:8080', 'https://mainnet.infura.com'],
     layer: 'other'
   }
 
   const { user, getByRole, getByLabelText } = setupComponent(<UpdateChain chain={chain} />)
 
-  const primaryRpcInput = getByLabelText('Primary RPC')
-  await user.clear(primaryRpcInput)
-  await user.type(primaryRpcInput, 'https://my-custom-rpc.net')
+  const explorerInput = getByLabelText('Block Explorer')
+  await user.clear(explorerInput)
+  await user.type(explorerInput, 'https://my-custom-explorer.net')
   await user.click(getByRole('button'))
 
   expect(link.send).toHaveBeenCalledWith('tray:action', 'updateNetwork', chain, {
-      id: 1,
-      name: 'Mainnet',
-      symbol: 'ETH',
-      explorer: 'https://etherscan.io',
-      primaryRpc: 'https://my-custom-rpc.net',
-      secondaryRpc: 'https://mainnet.infura.com',
-      type: 'ethereum',
-      layer: 'other'
-    }
-  )
+    id: 1,
+    name: 'Mainnet',
+    symbol: 'ETH',
+    explorer: 'https://my-custom-explorer.net',
+    type: 'ethereum',
+    layer: 'other'
+  })
 })

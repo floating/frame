@@ -6,8 +6,6 @@ const networkDefaults = {
   type: 'ethereum',
   name: 'Chain Name',
   explorer: 'Block Explorer',
-  primaryRpc: 'Primary Endpoint',
-  secondaryRpc: 'Secondary Endpoint',
   symbol: 'Native Symbol',
   layer: 'other'
 }
@@ -19,21 +17,17 @@ function isNetworkReady (network) {
   )
 }
 
-export default function ChainEditForm ({ chain, labels, onSubmit, invalidateSubmit = () => {}, existingChain = false }) {
-  const rpcUrls = chain.rpcUrls || []
-    
+export default function ChainEditForm ({ children = [], chain, labels, onSubmit, invalidateSubmit = () => {}, existingChain = false }) {
   const [name, setChainName] = useState(chain.name || networkDefaults.name)
   const [chainId, setChainId] = useState(parseInt(chain.id) || networkDefaults.id)
   const [explorer, setExplorer] = useState(chain.explorer || networkDefaults.explorer)
-  const [primaryRpc, setPrimaryRpc] = useState(rpcUrls[0] || networkDefaults.primaryRpc)
-  const [secondaryRpc, setSecondaryRpc] = useState(rpcUrls[1] || networkDefaults.secondaryRpc)
   const [symbol, setSymbol] = useState(chain.symbol || networkDefaults.symbol)
   const [layer, setLayer] = useState(chain.layer || networkDefaults.layer)
   const [submitted, setSubmitted] = useState(false)
 
   const submitButton = () => {
     const network = {
-      id: chainId, name, explorer, symbol, layer, primaryRpc, secondaryRpc, type: chain.type
+      id: chainId, name, explorer, symbol, layer, type: chain.type
     }
 
     if (submitted) {
@@ -161,47 +155,13 @@ export default function ChainEditForm ({ chain, labels, onSubmit, invalidateSubm
           </div>
         </div>
 
-        <div className='chainRow'>
-          <div className='chainExplorer chainInputField'>
-            <label htmlFor='primaryRpc' className='chainInputLabel'>Primary RPC</label>
-            <input
-              id='primaryRpc'
-              className={primaryRpc === networkDefaults.primaryRpc ? 'chainInput chainInputDim' : 'chainInput'}
-              value={primaryRpc}
-              spellCheck='false'
-              onChange={(e) => {
-                setPrimaryRpc(e.target.value)
-              }}
-              onFocus={(e) => {
-                if (e.target.value === networkDefaults.primaryRpc) setPrimaryRpc('')
-              }}
-              onBlur={(e) => {
-                if (e.target.value === '') setPrimaryRpc(networkDefaults.primaryRpc)
-              }}
-            />
-          </div>
-        </div>
-
-        <div className='chainRow'>
-          <div className='chainExplorer chainInputField'>
-            <label htmlFor='secondaryRpc' className='chainInputLabel'>Secondary RPC</label>
-            <input
-              id='secondaryRpc'
-              className={secondaryRpc === networkDefaults.secondaryRpc ? 'chainInput chainInputDim' : 'chainInput'}
-              value={secondaryRpc}
-              spellCheck='false'
-              onChange={(e) => {
-                setSecondaryRpc(e.target.value)
-              }}
-              onFocus={(e) => {
-                if (e.target.value === networkDefaults.secondaryRpc) setSecondaryRpc('')
-              }}
-              onBlur={(e) => {
-                if (e.target.value === '') setSecondaryRpc(networkDefaults.secondaryRpc)
-              }}
-            />
-          </div>
-        </div>
+        {
+          children.map((childElement, i) => {
+            return (
+              <div key={i} className='chainRow'>{childElement}</div>
+            )
+          })
+        }
 
         <div className='chainRow'>
           <div className='chainLayers chainInputField'>
