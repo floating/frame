@@ -141,10 +141,10 @@ export function gasFees (rawTx: TransactionData) {
 
   if (gas.price.fees) {
     // default to dapp-supplied values for maxFeePerGas & maxPriorityFeePerGas
-    if (rawTx.maxFeePerGas && parseInt(rawTx.maxFeePerGas, 16) !== NaN) {
+    if (rawTx.maxFeePerGas && !isNaN(parseInt(rawTx.maxFeePerGas, 16))) {
       gas.price.fees.maxFeePerGas = rawTx.maxFeePerGas
     }
-    if (rawTx.maxPriorityFeePerGas && parseInt(rawTx.maxPriorityFeePerGas, 16) !== NaN) {
+    if (rawTx.maxPriorityFeePerGas && !isNaN(parseInt(rawTx.maxPriorityFeePerGas, 16))) {
       gas.price.fees.maxPriorityFeePerGas = rawTx.maxPriorityFeePerGas
     }
   }
