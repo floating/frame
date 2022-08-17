@@ -136,7 +136,20 @@ export function getRawTx (newTx: RPC.SendTransaction.TxParams, accountId: string
 }
   
 export function gasFees (rawTx: TransactionData) {
-  return store('main.networksMeta', 'ethereum', parseInt(rawTx.chainId, 16), 'gas')
+
+  const gas = store('main.networksMeta', 'ethereum', parseInt(rawTx.chainId, 16), 'gas')
+
+  if (gas.price.fees) {
+    // default to dapp-supplied values for maxFeePerGas & maxPriorityFeePerGas
+    if (rawTx.maxFeePerGas && parseInt(rawTx.maxFeePerGas, 16) !== NaN) {
+      gas.price.fees.maxFeePerGas = rawTx.maxFeePerGas
+    }
+    if (rawTx.maxPriorityFeePerGas && parseInt(rawTx.maxPriorityFeePerGas, 16) !== NaN) {
+      gas.price.fees.maxPriorityFeePerGas = rawTx.maxPriorityFeePerGas
+    }
+  }
+
+  return gas
 }
   
 export function isCurrentAccount (address: string, account: FrameAccount | null) {
