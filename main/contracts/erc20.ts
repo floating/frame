@@ -41,14 +41,12 @@ export default class Erc20Contract {
   }
 
   static isTransfer (data: TransactionDescription) {
-    const transferConfirmed = (
+    return (
       data.name === 'transfer' &&
       data.functionFragment.inputs.length === 2 &&
       (data.functionFragment.inputs[0].name || '').toLowerCase().endsWith('to') && data.functionFragment.inputs[0].type === 'address' &&
       (data.functionFragment.inputs[1].name || '').toLowerCase().endsWith('value') && data.functionFragment.inputs[1].type === 'uint256'
     )
-    console.log('transferConfirmed', transferConfirmed)
-    return transferConfirmed
   }
 
   decodeCallData (calldata: string) {
