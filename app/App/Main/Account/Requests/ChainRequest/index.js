@@ -83,7 +83,7 @@ class ChainRequest extends React.Component {
             <div 
               className='requestDecline' 
               style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none'}}
-              onClick={() => { if (this.state.allowInput) link.send('tray:addChain', false, this.props.req) 
+              onClick={() => { if (this.state.allowInput) link.send('tray:resolveRequest', this.props.req)
             }}>
               <div className='requestDeclineButton _txButton _txButtonBad'>Decline</div>
             </div>
