@@ -19,7 +19,7 @@ import provider from '../../provider'
 import { ApprovalType } from '../../../resources/constants'
 import Erc20Contract from '../../contracts/erc20'
 
-import recipient from './recipient'
+import reveal from '../../reveal'
 
 const nebula = nebulaApi()
 
@@ -156,19 +156,19 @@ class FrameAccount {
     }
   }
 
-  async lookupRecipientType (req: TransactionRequest) {
-    try {
-      const { to, chainId } = req.data
-      const type = await recipient.getType(to, chainId)
-      const knownTxRequest = this.requests[req.handlerId] as TransactionRequest
-      if (type && knownTxRequest) {
-        knownTxRequest.recipientType = type
-        this.update()
-      }
-    } catch (e) {
-      log.warn(e)
-    }
-  }
+  // async lookupRecipientType (req: TransactionRequest) {
+  //   try {
+  //     const { to, chainId } = req.data
+  //     const type = await recipient.getType(to, chainId)
+  //     const knownTxRequest = this.requests[req.handlerId] as TransactionRequest
+  //     if (type && knownTxRequest) {
+  //       knownTxRequest.recipientType = type
+  //       this.update()
+  //     }
+  //   } catch (e) {
+  //     log.warn(e)
+  //   }
+  // }
 
   findSigner (address: Address) {
     const signers = store('main.signers') as Record<string, Signer>
@@ -252,9 +252,12 @@ class FrameAccount {
     res({ id: payload.id, jsonrpc: payload.jsonrpc, error })
   }
 
-  private async checkForErc20Approve (req: TransactionRequest, calldata: string) {
+  private async checkForErc20Approve (req: TransactionRequest) {
     const contractAddress = req.data.to
     if (!contractAddress) return
+
+    const calldata = req.data.data
+    if (!calldata) return
 
     const contract = new Erc20Contract(contractAddress, req.data.chainId, provider)
     const decodedData = contract.decodeCallData(calldata)
@@ -289,54 +292,59 @@ class FrameAccount {
           }
         )
         this.update()
-      } else if (Erc20Contract.isTransfer(decodedData)) {
-        const recipient = decodedData.args[0].toLowerCase()
-        const amount = decodedData.args[1].toHexString()
-        const { decimals, name, symbol } = await contract.getTokenData()
-        if (req) {
-          req.recog = {
-            type: 'erc20:transfer',
-            data: {
-              recipient,
-              amount,
-              decimals,
-              name,
-              symbol
-            }
-          }
+      }
+    }
+  }
+
+  private async revealDetails (req: TransactionRequest) {
+    const tx = req.data
+    const calldata = tx.data
+    const chainId = tx.chainId
+
+    if (tx.to) { // Get recipient idenity
+      try {
+        const recipient = await reveal.identity(tx.to, tx.chainId)
+        const knownTxRequest = this.requests[req.handlerId] as TransactionRequest
+  
+        if (recipient && knownTxRequest) {
+          knownTxRequest.recipient = recipient.ens
+          knownTxRequest.recipientType = recipient.type
           this.update()
         }
+      } catch (e) {
+        log.warn(e)
       }
     }
-  }
 
-  private async populateRequestCallData (req: TransactionRequest, calldata: string) {
-    try {
-      const decodedData = await decodeContractCall(req.data.to || '', calldata)
-      const knownTxRequest = this.requests[req.handlerId] as TransactionRequest
-
-      if (knownTxRequest && decodedData) {
-        knownTxRequest.decodedData = decodedData
-        this.update()
-      } 
-    } catch (e) {
-      log.warn(e)
-    }
-  }
-
-  private async populateRequestEnsName (req: TransactionRequest) {
-    const { to } = req.data
-
-    try {
-      const ensName: string = ((await nebula.ens.reverseLookup([to])) || [])[0]
-      const knownTxRequest = this.requests[req.handlerId] as TransactionRequest
-
-      if (ensName && knownTxRequest) {
-        knownTxRequest.recipient = ensName
-        this.update()
+    if (calldata && calldata !== '0x' && parseInt(calldata, 16) !== 0) { 
+      
+      try { // Decode action 
+        const decodedData = await reveal.decode(tx.to || '', chainId, calldata)
+        const knownTxRequest = this.requests[req.handlerId] as TransactionRequest
+  
+        if (knownTxRequest && decodedData) {
+          knownTxRequest.decodedData = decodedData
+          this.update()
+        } 
+      } catch (e) {
+        log.warn(e)
       }
-    } catch (e) {
-      log.warn(e)
+
+      try { // Recog action 
+        const recog = await reveal.recog(tx.to || '', chainId, calldata)
+        const knownTxRequest = this.requests[req.handlerId] as TransactionRequest
+  
+        if (knownTxRequest && recog) {
+          knownTxRequest.recog = recog
+          this.update()
+        } 
+      } catch (e) {
+        log.warn(e)
+      }
+
+      try { // Simulate action 
+      } catch (e) {
+      }
     }
   }
 
@@ -348,17 +356,8 @@ class FrameAccount {
       this.requests[r.handlerId].res = res
 
       if ((req || {}).type === 'transaction') {
-        const txRequest = req as TransactionRequest
-        const calldata = txRequest.data.data
-
-        if (calldata && calldata !== '0x' && parseInt(calldata, 16) !== 0) {
-          await this.checkForErc20Approve(txRequest, calldata)
-
-          this.populateRequestCallData(txRequest, calldata)
-        }
-
-        this.populateRequestEnsName(txRequest)
-        this.lookupRecipientType(req)
+        await this.revealDetails(req)
+        await this.checkForErc20Approve(req)
       }
 
       this.update()

@@ -22,6 +22,7 @@ class TxRecipient extends React.Component {
   render () {
     const req = this.props.req
     const address = req.data.to ? getAddress(req.data.to) : ''
+    console.log(req.recipient)
     const ensName = (req.recipient && req.recipient.length < 25) ? req.recipient : ''
     const chainName = this.store('main.networks.ethereum', parseInt(req.data.chainId, 16), 'name') 
 

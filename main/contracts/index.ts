@@ -44,7 +44,19 @@ function parseAbi (abiData: string): Interface | undefined {
   }
 }
 
-async function fetchSourceCode (contractAddress: Address) {
+// function scanEndpoint (contractAddress: Address, chainId: string) {
+//   if (chainId === '0x1') {
+//     return `https://api.etherscan.io/api?module=contract&action=getsourcecode&address=${contractAddress}&apikey=3SYU5MW5QK8RPCJV1XVICHWKT774993S24`
+//   } else if (chainId === '0x89') {
+//     return `https://api.polygonscan.com/api?module=contract&action=getsourcecode&address=0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270&apikey=YourApiKeyToken`
+//   } else if ('optimisim') {
+//     return `https://api-optimistic.etherscan.io/api?module=contract&action=getsourcecode&address=0x80AA7cb0006d5DDD91cce684229Ac6e398864606&apikey=YourApiKeyToken`
+//   } else if ('arbitrum') {
+//     return `https://api.arbiscan.io/api?module=contract&action=getsourcecode&address=0x0000000000000000000000000000000000001004&apikey=YourApiKeyToken`
+//   }
+// }
+
+async function fetchSourceCode (contractAddress: Address, chainId: string) {
   const res = await fetch(`https://api.etherscan.io/api?module=contract&action=getsourcecode&address=${contractAddress}&apikey=3SYU5MW5QK8RPCJV1XVICHWKT774993S24`)
 
   if (res.status === 200 && (res.headers.get('content-type') || '').toLowerCase().includes('json')) {
@@ -57,9 +69,9 @@ async function fetchSourceCode (contractAddress: Address) {
 }
 
 
-async function fetchAbi (contractAddress: Address): Promise<ContractSourceCodeResult | undefined> {
+async function fetchAbi (contractAddress: Address, chainId: string): Promise<ContractSourceCodeResult | undefined> {
   try {
-    const sources = await fetchSourceCode(contractAddress)
+    const sources = await fetchSourceCode(contractAddress, chainId)
 
     if (sources.length > 0) {
       const source = sources[0]
@@ -67,7 +79,7 @@ async function fetchAbi (contractAddress: Address): Promise<ContractSourceCodeRe
 
       if (implementation) {
         // this is a proxy contract, return the ABI for the source
-        return fetchAbi(implementation)
+        return fetchAbi(implementation, chainId)
       }
 
       return source
@@ -97,9 +109,9 @@ export function decodeCallData (calldata: string, abi: string) {
   }
 }
 
-export async function decodeContractCall (contractAddress: Address, calldata: string): Promise<DecodedCallData | undefined> {
+export async function decodeContractCall (contractAddress: Address, chainId: string, calldata: string): Promise<DecodedCallData | undefined> {
   const contractSources: ContractSource[] = [{ name: 'ERC-20', source: 'erc-20 contract', abi: erc20Abi }]
-  const contractSource = await fetchAbi(contractAddress)
+  const contractSource = await fetchAbi(contractAddress, chainId)
 
   if (contractSource) {
     contractSources.push({ name: contractSource.ContractName, source: 'etherscan', abi: contractSource.ABI })
