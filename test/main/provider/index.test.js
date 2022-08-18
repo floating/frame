@@ -982,7 +982,7 @@ describe('#send', () => {
 
       send({ method: 'eth_signTypedData', params })
 
-      verifyRequest('V1')
+      verifyRequest('V4')
     })
 
     it('does not submit a request from an unknown account', done => {
