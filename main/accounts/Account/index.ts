@@ -4,7 +4,6 @@ import BigNumber from 'bignumber.js'
 import { Version } from 'eth-sig-util'
 
 import { AccessRequest, AccountRequest, Accounts, RequestMode, TransactionRequest } from '..'
-import { decodeContractCall } from '../../contracts'
 import nebulaApi from '../../nebula'
 import signers from '../../signers'
 import windows from '../../windows'
@@ -155,20 +154,6 @@ class FrameAccount {
       this.update()
     }
   }
-
-  // async lookupRecipientType (req: TransactionRequest) {
-  //   try {
-  //     const { to, chainId } = req.data
-  //     const type = await recipient.getType(to, chainId)
-  //     const knownTxRequest = this.requests[req.handlerId] as TransactionRequest
-  //     if (type && knownTxRequest) {
-  //       knownTxRequest.recipientType = type
-  //       this.update()
-  //     }
-  //   } catch (e) {
-  //     log.warn(e)
-  //   }
-  // }
 
   findSigner (address: Address) {
     const signers = store('main.signers') as Record<string, Signer>

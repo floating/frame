@@ -212,6 +212,7 @@ class _AccountMain extends React.Component {
       const module = accountModules[id] || { height: 0 }
       slideHeight += module.height + 7
       return <AccountModule
+        key={id}
         id={id} 
         account={this.props.id}
         module={module} 

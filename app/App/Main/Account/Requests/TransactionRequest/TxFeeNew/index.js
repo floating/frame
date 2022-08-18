@@ -62,43 +62,51 @@ class TxFee extends React.Component {
         <div className='_txMainInner'>
           <div className='_txLabel'>Fee</div>
           <div className='_txMainValues'>
-            <div className='_txFeeBar'  onClick={() => {
-              link.send('nav:update', 'panel', { step: 'adjustFee' })
-            }}>
-              <div className='_txFeeGwei'>
-                <span className='_txFeeGweiValue'>{this.toDisplayGwei(maxFeePerGas)}</span>
-                <span className='_txFeeGweiLabel'>Gwei</span>
-              </div>
-              <div>
-                <span className='_txFeeETH'>
-                  {currentSymbol || '?'}
-                </span>
-                <span className='_txFeeETHValue'>
-                  {this.toDisplayEther(maxFee)}
-                </span>
-              </div>
-            </div>
-            {this.toDisplayUSD(maxFeeUSD) !== '0.00' ? (
-              <div className='_txMainTag'>
-                <div className={maxFeeUSD.toNumber() > FEE_WARNING_THRESHOLD_USD || this.toDisplayUSD(maxFeeUSD) === '0.00' ? '_txFeeValueDefault _txFeeValueDefaultWarn' : '_txFeeValueDefault'}>
-                  <span className=''>
-                    ≈
-                  </span>
-                  <span className=''>
-                    {`$${this.toDisplayUSD(minFeeUSD)}`}
-                  </span>
-                  <span className=''>
-                    {'-'}
-                  </span>
-                  <span className=''>
-                    {`$${this.toDisplayUSD(maxFeeUSD)}`}
-                  </span>
-                  <span className=''>
-                    {`in ${currentSymbol || '?'}`}
-                  </span>
+            <div className='_txMainValuesRow'>
+              <div className='_txMainValuesColumn' style={{ flex: '1' }}>
+                <div className='_txFeeBar' onClick={() => {
+                  link.send('nav:update', 'panel', { step: 'adjustFee' })
+                }}>
+                  <div className='_txFeeGwei'>
+                    <span className='_txFeeGweiValue'>{this.toDisplayGwei(maxFeePerGas)}</span>
+                    <span className='_txFeeGweiLabel'>Gwei</span>
+                  </div>
                 </div>
               </div>
-            ) : null}
+              <div className='_txMainValuesColumn' style={{ flex: '1' }}>
+                <div className='_txFeeTotal'>
+                  <div>
+                    <span className='_txFeeETH'>
+                      {currentSymbol || '?'}
+                    </span>
+                    <span className='_txFeeETHValue'>
+                      {this.toDisplayEther(maxFee)}
+                    </span>
+                  </div>
+                </div>
+                {this.toDisplayUSD(maxFeeUSD) !== '0.00' ? (
+                  <div className='_txMainTag'>
+                    <div className={maxFeeUSD.toNumber() > FEE_WARNING_THRESHOLD_USD || this.toDisplayUSD(maxFeeUSD) === '0.00' ? '_txFeeValueDefault _txFeeValueDefaultWarn' : '_txFeeValueDefault'}>
+                      <span className=''>
+                        ≈
+                      </span>
+                      <span className=''>
+                        {`$${this.toDisplayUSD(minFeeUSD)}`}
+                      </span>
+                      <span className=''>
+                        {'-'}
+                      </span>
+                      <span className=''>
+                        {`$${this.toDisplayUSD(maxFeeUSD)}`}
+                      </span>
+                      <span className=''>
+                        {`in ${currentSymbol || '?'}`}
+                      </span>
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+            </div>
           </div>
         </div>
       </div>

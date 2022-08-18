@@ -150,7 +150,11 @@ class TxRecipient extends React.Component {
                     {req.data.value && req.data.value !== '0x' && req.data.value !== '0x0' ? (
                       <div>{`Sending ${currentSymbol}`}</div>
                     ) : null}
-                    {req.recognizedActions ? this.renderRecognizedActions(req) : null}
+                    {req.recognizedActions.length ? (
+                      this.renderRecognizedActions(req)
+                    ) : req.decodedData && req.decodedData.method ? (
+                      <div>{`Calling Contract Method ${req.decodedData.method}`}</div>
+                    ) : null}
                     <div>{`on ${chainName}`}</div>
                   </div>
                 )}

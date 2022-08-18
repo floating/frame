@@ -232,7 +232,7 @@ class Balances extends React.Component {
         ) : null}
         <div className='signerBalancesWrap'>
           {balances.map(({ chainId, symbol, ...balance }, i) => {
-            return <Balance chainId={chainId} symbol={symbol} balance={balance} i={i} scanning={scanning} />
+            return <Balance key={chainId + symbol} chainId={chainId} symbol={symbol} balance={balance} i={i} scanning={scanning} />
           })}
         </div>
         <div 

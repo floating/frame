@@ -23,6 +23,7 @@ class TxSending extends React.Component {
   }
   render () {
     const req = this.props.req
+    const contract = req.data.to.toLowerCase()
     const chainId = parseInt(req.data.chainId, 16)
     const chainName = this.store('main.networks.ethereum', chainId, 'name')
 
@@ -30,15 +31,13 @@ class TxSending extends React.Component {
     const { amount, decimals, name, recipient, symbol, recipientType, recipientEns } = action.data || {}
     const value = new BigNumber(amount) 
     const displayValue = value.dividedBy('1e' + decimals).toFixed(6)
-
     const address = recipient
-    const ensName = (req.recipient && req.recipient.length < 25) ? req.recipient : ''
+    // const ensName = (recipientEns && recipientEns.length < 25) ? recipientEns : ''
     const layer = this.store('main.networks', this.props.chain.type, this.props.chain.id, 'layer')
-    const nativeCurrency = this.store('main.networksMeta', this.props.chain.type, this.props.chain.id, 'nativeCurrency')
 
-    // TODO: Convert this to token price
-    const etherUSD = nativeCurrency && nativeCurrency.usd && layer !== 'testnet' ? nativeCurrency.usd.price : 0
     if (action.type === 'erc20:transfer') {
+      const rate = this.store('main.rates', contract)
+      const rateUSD = rate && rate.usd && layer !== 'testnet' ? rate.usd.price : 0
       return (
         <div className='_txMain' style={{ animationDelay: (0.1 * this.props.i) + 's' }}>
           <div className='_txMainInner'>
@@ -54,7 +53,7 @@ class TxSending extends React.Component {
                 <div className='_txMainTransferringPart'>
                   <span className='_txMainTransferringEq'>{'≈'}</span>
                   <span className='_txMainTransferringEqSymbol'>{'$'}</span>
-                  <span className='_txMainTransferringEqAmount'>{(displayValue * etherUSD).toFixed(2)}</span>
+                  <span className='_txMainTransferringEqAmount'>{(displayValue * rateUSD).toFixed(2)}</span>
                 </div>
               </div>
               {address && recipientType === 'contract' ? (

@@ -113,7 +113,8 @@ class Requests extends React.Component {
             {requests.map((req, i) => {
               if (req.type === 'access') {
                 return (
-                  <RequestItem 
+                  <RequestItem
+                    key={req.type + i}
                     req={req} 
                     account={this.props.id}
                     handlerId={req.handlerId}
@@ -126,6 +127,7 @@ class Requests extends React.Component {
               } else if (req.type === 'sign') {
                 return (
                   <RequestItem 
+                    key={req.type + i}
                     req={req}
                     account={this.props.id}
                     handlerId={req.handlerId}
@@ -138,6 +140,7 @@ class Requests extends React.Component {
               } else if (req.type === 'signTypedData') {
                 return (
                   <RequestItem
+                    key={req.type + i}
                     req={req}
                     account={this.props.id}
                     handlerId={req.handlerId}
@@ -150,6 +153,7 @@ class Requests extends React.Component {
               } else if (req.type === 'addChain') { 
                 return (
                   <RequestItem 
+                    key={req.type + i}
                     req={req} 
                     account={this.props.id}
                     handlerId={req.handlerId}
@@ -162,6 +166,7 @@ class Requests extends React.Component {
               } else if (req.type === 'switchChain') {
                 return (
                   <RequestItem
+                    key={req.type + i}
                     req={req}
                     account={this.props.id}
                     handlerId={req.handlerId}
@@ -174,6 +179,7 @@ class Requests extends React.Component {
               } else if (req.type === 'addToken')  {
                 return (
                   <RequestItem
+                    key={req.type + i}
                     req={req}
                     account={this.props.id}
                     handlerId={req.handlerId}
@@ -191,6 +197,7 @@ class Requests extends React.Component {
                 
                 return (
                   <RequestItem 
+                    key={req.type + i}
                     req={req}
                     account={this.props.id}
                     handlerId={req.handlerId}

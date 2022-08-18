@@ -509,7 +509,7 @@ class TransactionRequest extends React.Component {
                   <TxMainNew i={0} {...this.props} req={req} chain={this.chain} />
                   <TxMain i={1} {...this.props} req={req} chain={this.chain} />
                   {recognizedActions.map((action, i) => {
-                    return <TxAction i={2 + i} {...this.props} req={req} chain={this.chain} action={action} />
+                    return <TxAction key={'action' + action.type + i} i={2 + i} {...this.props} req={req} chain={this.chain} action={action} />
                   })}
                   <TxRecipient i={3 + recognizedActions.length} {...this.props} req={req} />
                   <TxFeeNew i={4 + recognizedActions.length} {...this.props} req={req} chain={this.chain} />

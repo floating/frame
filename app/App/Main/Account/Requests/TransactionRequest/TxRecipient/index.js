@@ -59,12 +59,6 @@ class TxRecipient extends React.Component {
                   ? <span className='_txRecipient'>{ensName}</span>
                   : <span className='_txRecipient'>{address.substring(0, 8)}{svg.octicon('kebab-horizontal', { height: 15 })}{address.substring(address.length - 6)}</span>
                 }
-                {/* {req.decodedData && req.decodedData.contractName ? ( 
-                  <span className={'_txDataValueMethod'}>{(() => {
-                    if (req.decodedData.contractName.length > 11) return `${req.decodedData.contractName.substr(0, 9)}..`
-                    return req.decodedData.contractName
-                  })()}</span>
-                ) : null} */}
                 <div className='_txRecipientFull' onClick={() => {
                   this.copyAddress(address)
                 }}>
@@ -80,19 +74,6 @@ class TxRecipient extends React.Component {
                 <span className='_txRecipient'>{'Deploying Contract'}</span>
               </div>
             )}
-            {/* {req.recipientType === 'contract' ? (
-              <div className='_txMainTag'>
-                {`recipient is contract on ${chainName}`}
-              </div>
-            ) : req.recipientType === 'external' ? (
-              <div className='_txMainTag'>
-                {`recipient is external account on ${chainName}`}
-              </div>
-            ) : (
-              <div className='_txMainTag'>
-                {`recipient type unknown on ${chainName}`}
-              </div>
-            )} */}
           </div>
         </div>
       </div>

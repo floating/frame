@@ -55,6 +55,7 @@ class Inventory extends React.Component {
       displayCollections.map(k => {
         return (
           <div 
+            key={k}
             className='inventoryCollection'
             onClick={() => {
               if (!this.props.expanded) this.props.expandModule({ id: this.props.moduleId, account: this.props.account, currentCollection: k })
@@ -86,6 +87,7 @@ class Inventory extends React.Component {
                     const { tokenId, name, img, openSeaLink } = inventory[k].items[id]
                     return (
                       <div 
+                        key={id}
                         className='inventoryCollectionItem'
                         onClick={() => {
                           this.store.notify('openExternal', { url: openSeaLink })
