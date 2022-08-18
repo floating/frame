@@ -785,7 +785,7 @@ export class Provider extends EventEmitter {
 
     if (['eth_signTypedData', 'eth_signTypedData_v1', 'eth_signTypedData_v3', 'eth_signTypedData_v4'].includes(method)) {
       const underscoreIndex = method.lastIndexOf('_')
-      const version = (underscoreIndex > 3 ? method.substring(underscoreIndex + 1) : 'v1').toUpperCase() as Version
+      const version = (underscoreIndex > 3 ? method.substring(underscoreIndex + 1) : 'v4').toUpperCase() as Version
       return this.signTypedData(payload, version, res)
     }
     
