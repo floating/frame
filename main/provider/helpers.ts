@@ -136,7 +136,6 @@ export function getRawTx (newTx: RPC.SendTransaction.TxParams, accountId: string
   return tx
 }
 
-  
 export function processTxForGasFees (rawTx: TransactionData) {
 
   const gas = store('main.networksMeta', 'ethereum', parseInt(rawTx.chainId, 16), 'gas')
