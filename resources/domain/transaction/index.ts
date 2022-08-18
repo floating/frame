@@ -1,7 +1,7 @@
 import { JsonTx } from '@ethereumjs/tx'
 import { getAddress as getChecksumAddress } from '@ethersproject/address'
 
-export enum GasFeeSource {
+export enum GasFeesSource {
   Dapp = 'Dapp',
   Frame = 'Frame'
 }
@@ -13,8 +13,7 @@ export interface TransactionData extends Omit<JsonTx, 'chainId' | 'type'> {
   feesUpdated?: boolean,
   chainId: string,
   type: string,
-  maxFeePerGasSource: GasFeeSource,
-  maxPriorityFeePerGasSource: GasFeeSource
+  gasFeesSource: GasFeesSource,
 }
 
 export function typeSupportsBaseFee (type: string) {

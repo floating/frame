@@ -13,7 +13,7 @@ import log from 'electron-log'
 
 import store from '../store'
 import protectedMethods from '../api/protectedMethods'
-import { getAddress, usesBaseFee, TransactionData } from '../../resources/domain/transaction'
+import { getAddress, usesBaseFee, TransactionData, GasFeesSource } from '../../resources/domain/transaction'
 import FrameAccount from '../accounts/Account'
 
 const NATIVE_CURRENCY = '0x0000000000000000000000000000000000000000'
@@ -126,8 +126,7 @@ export function getRawTx (newTx: RPC.SendTransaction.TxParams, accountId: string
     data: addHexPrefix(padToEven(stripHexPrefix(data || '0x'))),
     gasLimit: gasLimit || gas,
     chainId: rawTx.chainId,
-    maxFeePerGasSource: GasFeeSource.Frame,
-    maxPriorityFeePerGasSource: GasFeeSource.Frame
+    gasFeesSource: GasFeesSource.Frame,
   }
 
   if (to) {
@@ -137,10 +136,6 @@ export function getRawTx (newTx: RPC.SendTransaction.TxParams, accountId: string
   return tx
 }
 
-export enum GasFeeSource {
-  Dapp = 'Dapp',
-  Frame = 'Frame'
-}
   
 export function processTxForGasFees (rawTx: TransactionData) {
 
@@ -151,13 +146,13 @@ export function processTxForGasFees (rawTx: TransactionData) {
     const useDappMaxFeePerGas = rawTx.maxFeePerGas && !isNaN(parseInt(rawTx.maxFeePerGas, 16))
     if (useDappMaxFeePerGas) {
       gas.price.fees.maxFeePerGas = rawTx.maxFeePerGas
-      rawTx.maxFeePerGasSource = GasFeeSource.Dapp
+      rawTx.gasFeesSource = GasFeesSource.Dapp
     }
     
     const useDappMaxPriorityFeePerGas = rawTx.maxPriorityFeePerGas && !isNaN(parseInt(rawTx.maxPriorityFeePerGas, 16))
     if (useDappMaxPriorityFeePerGas) {
       gas.price.fees.maxPriorityFeePerGas = rawTx.maxPriorityFeePerGas
-      rawTx.maxPriorityFeePerGasSource = GasFeeSource.Dapp
+      rawTx.gasFeesSource = GasFeesSource.Dapp
     }
   }
 
