@@ -125,7 +125,9 @@ export function getRawTx (newTx: RPC.SendTransaction.TxParams, accountId: string
     value: parsedValue,
     data: addHexPrefix(padToEven(stripHexPrefix(data || '0x'))),
     gasLimit: gasLimit || gas,
-    chainId: rawTx.chainId
+    chainId: rawTx.chainId,
+    maxFeePerGasSource: GasFeeSource.Frame,
+    maxPriorityFeePerGasSource: GasFeeSource.Frame
   }
 
   if (to) {
@@ -134,22 +136,32 @@ export function getRawTx (newTx: RPC.SendTransaction.TxParams, accountId: string
 
   return tx
 }
+
+export enum GasFeeSource {
+  Dapp = 'Dapp',
+  Frame = 'Frame'
+}
   
-export function gasFees (rawTx: TransactionData) {
+export function processTxForGasFees (rawTx: TransactionData) {
 
   const gas = store('main.networksMeta', 'ethereum', parseInt(rawTx.chainId, 16), 'gas')
 
   if (gas.price.fees) {
     // default to dapp-supplied values for maxFeePerGas & maxPriorityFeePerGas
-    if (rawTx.maxFeePerGas && !isNaN(parseInt(rawTx.maxFeePerGas, 16))) {
+    const useDappMaxFeePerGas = rawTx.maxFeePerGas && !isNaN(parseInt(rawTx.maxFeePerGas, 16))
+    if (useDappMaxFeePerGas) {
       gas.price.fees.maxFeePerGas = rawTx.maxFeePerGas
+      rawTx.maxFeePerGasSource = GasFeeSource.Dapp
     }
-    if (rawTx.maxPriorityFeePerGas && !isNaN(parseInt(rawTx.maxPriorityFeePerGas, 16))) {
+    
+    const useDappMaxPriorityFeePerGas = rawTx.maxPriorityFeePerGas && !isNaN(parseInt(rawTx.maxPriorityFeePerGas, 16))
+    if (useDappMaxPriorityFeePerGas) {
       gas.price.fees.maxPriorityFeePerGas = rawTx.maxPriorityFeePerGas
+      rawTx.maxPriorityFeePerGasSource = GasFeeSource.Dapp
     }
   }
 
-  return gas
+  return [gas, rawTx]
 }
   
 export function isCurrentAccount (address: string, account: FrameAccount | null) {

@@ -24,7 +24,7 @@ import { populate as populateTransaction, maxFee } from '../transaction'
 import FrameAccount from '../accounts/Account'
 import { capitalize, arraysMatch } from '../../resources/utils'
 import { ApprovalType } from '../../resources/constants'
-import { checkExistingNonceGas, ecRecover, feeTotalOverMax, gasFees, getActiveChains, getAssets, getChains, getChainDetails, getPermissions, getRawTx, getSignedAddress, isCurrentAccount, isScanning, loadAssets, requestPermissions, resError } from './helpers'
+import { checkExistingNonceGas, ecRecover, feeTotalOverMax, processTxForGasFees, getActiveChains, getAssets, getChains, getChainDetails, getPermissions, getRawTx, getSignedAddress, isCurrentAccount, isScanning, loadAssets, requestPermissions, resError } from './helpers'
 
 type Subscriptions = { [key in SubscriptionType]: string[] }
 
@@ -399,13 +399,13 @@ export class Provider extends EventEmitter {
       const approvals: RequiredApproval[] = []
       const accountId = (accounts.current() || {}).id
       const rawTx = getRawTx(newTx, accountId)
-      const gas = gasFees(rawTx)
-      const chainConfig = this.connection.connections['ethereum'][parseInt(rawTx.chainId)].chainConfig
+      const [gas, txWithGas] = processTxForGasFees(rawTx)
+      const chainConfig = this.connection.connections['ethereum'][parseInt(txWithGas.chainId)].chainConfig
 
-      const estimateGas = rawTx.gasLimit
-        ? Promise.resolve(rawTx)
-        : this.getGasEstimate(rawTx)
-          .then(gasLimit => ({ ...rawTx, gasLimit }))
+      const estimateGas = txWithGas.gasLimit
+        ? Promise.resolve(txWithGas)
+        : this.getGasEstimate(txWithGas)
+          .then(gasLimit => ({ ...txWithGas, gasLimit }))
           .catch(err => {
             approvals.push({
               type: ApprovalType.GasLimitApproval,
@@ -415,7 +415,7 @@ export class Provider extends EventEmitter {
               }
             })
 
-            return { ...rawTx, gasLimit: '0x00' }
+            return { ...txWithGas, gasLimit: '0x00' }
          })
 
       estimateGas
