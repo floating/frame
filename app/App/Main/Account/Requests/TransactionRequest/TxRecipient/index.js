@@ -22,17 +22,37 @@ class TxRecipient extends React.Component {
   render () {
     const req = this.props.req
     const address = req.data.to ? getAddress(req.data.to) : ''
-    console.log(req.recipient)
     const ensName = (req.recipient && req.recipient.length < 25) ? req.recipient : ''
     const chainName = this.store('main.networks.ethereum', parseInt(req.data.chainId, 16), 'name') 
-
+    const value = req.data.value || '0x'
+    if (req.recipientType !== 'contract' && (value !== '0x' || parseInt(value, 16)) !== 0) return null
     return (
       <div className='_txMain' style={{ animationDelay: (0.1 * this.props.i) + 's' }}>
         <div className='_txMainInner'>
           <div className='_txLabel'>
-            Recipient
+            <div>{req.recipientType === 'contract' ? 'Calling Contract' : 'Recipient Account'}</div>
           </div>
           <div className='_txMainValues'>
+            {req.decodedData && req.decodedData.method ? (
+              <div className='_txMainValue'>
+                <span className={'_txDataValueMethod'}>{(() => {
+                  if (req.decodedData.method.length > 17) return `${req.decodedData.method.substr(0, 15)}..`
+                  return req.decodedData.method
+                })()}</span>
+                <span>{'via'}</span>
+                <span className={'_txDataValueMethod'}>{(() => {
+                  if (req.decodedData.contractName.length > 11) return `${req.decodedData.contractName.substr(0, 9)}..`
+                  return req.decodedData.contractName
+                })()}</span>
+              </div>
+            ) : req.recipientType === 'contract' ? (
+              <div className='_txMainTag'>{'unknown action via unknown contract'}</div>
+            ) : null}
+            {req.decodedData && req.decodedData.source ? (
+              <div className='_txMainTag'>
+                {'abi source: ' + req.decodedData.source}
+              </div>
+            ) : null}
             {address ? (
               <div className='_txMainValue'>
                 {ensName
@@ -60,12 +80,7 @@ class TxRecipient extends React.Component {
                 <span className='_txRecipient'>{'Deploying Contract'}</span>
               </div>
             )}
-            {req.decodedData && req.decodedData.contractName ? (
-              <div className='_txMainTag'>
-                {`${req.decodedData.contractName} contract on ${chainName}`}
-              </div>
-            ) : null}
-            {req.recipientType === 'contract' ? (
+            {/* {req.recipientType === 'contract' ? (
               <div className='_txMainTag'>
                 {`recipient is contract on ${chainName}`}
               </div>
@@ -77,7 +92,7 @@ class TxRecipient extends React.Component {
               <div className='_txMainTag'>
                 {`recipient type unknown on ${chainName}`}
               </div>
-            )}
+            )} */}
           </div>
         </div>
       </div>

@@ -27,8 +27,8 @@ async function resolveEntityType (address: string, chainId: string): Promise<Ent
       id: 1,
       chainId // TODO: Verify this overrides setChain
     }      
-    const code = (await provider.request(payload) || [])[0]
-    const type = code === '0x' ? 'external' : 'contract'
+    const code = (await provider.request(payload) || [])
+    const type = (code === '0x' || code === '0x0') ? 'external' : 'contract'
     return type
   } catch (e) {
     log.error(e)
@@ -46,70 +46,44 @@ async function resolveEnsName (address: string): Promise<string> {
   }
 }
 
-type Recog = {
+type Actions = Array<{
   type: string
   data: {}
-}
+}>
 
-const unknownRecog = {
-  type: 'unknown',
-  data: {}
-}
-
-async function recogErc20 (contractAddress: string, chainId: string, calldata: string): Promise<Recog> {
-  if (!contractAddress) return unknownRecog
+async function recogErc20 (actions: Actions, contractAddress: string, chainId: string, calldata: string) {
+  if (!contractAddress) return
   try {
     const contract = new Erc20Contract(contractAddress, chainId, provider)
     const decoded = contract.decodeCallData(calldata)
     if (decoded) {
       const { decimals, name, symbol } = await contract.getTokenData()
-
       if (Erc20Contract.isApproval(decoded)) {
         const spender = decoded.args[0].toLowerCase()
         const amount = decoded.args[1].toHexString()
-
-        const recog = {
+        const { ens, type } = await surface.identity(spender, chainId)
+        actions.push({
           type: 'erc20:approval',
-          data: {
-            spender,
-            amount,
-            decimals,
-            name,
-            symbol
-          }
-        }
-
-        return recog
-
+          data: { spender, amount, decimals, name, symbol, spenderEns: ens, spenderType: type }
+        })
       } else if (Erc20Contract.isTransfer(decoded)) {
         const recipient = decoded.args[0].toLowerCase()
         const amount = decoded.args[1].toHexString()
-
-        const recog = {
+        const { ens, type } = await surface.identity(recipient, chainId)
+        actions.push({ 
           type: 'erc20:transfer',
-          data: {
-            recipient,
-            amount,
-            decimals,
-            name,
-            symbol
-          }
-        }
-        return recog
-      } else {
-        return unknownRecog
+          data: { recipient, amount, decimals, name, symbol, recipientEns: ens, recipientType: type }
+        })
       }
-    } else {
-      return unknownRecog
     }
   } catch (e) {
     log.warn(e)
-    return unknownRecog
   }
 }
 
 const surface = {
   identity: async (address: string, chainId: string) => {
+    // Resolve ens, type and other data about address entities 
     const results = await Promise.all([
       resolveEntityType(address, chainId),
       resolveEnsName(address)
@@ -125,11 +99,15 @@ const surface = {
     return identityResults
   },
   decode: async (contractAddress: string, chainId: string, calldata: string) => {
+    // Decode calldata
     const decodedCalldata = await decodeContractCall(contractAddress || '', chainId, calldata)
     return decodedCalldata
   },
   recog: async (contractAddress: string, chainId: string, calldata: string) => {
-    return await recogErc20(contractAddress, chainId, calldata)
+    // Recognize actions from standard tx types
+    const actions: Actions = []
+    await recogErc20(actions, contractAddress, chainId, calldata)
+    return actions
   },
   simulate: async () => {}
 }

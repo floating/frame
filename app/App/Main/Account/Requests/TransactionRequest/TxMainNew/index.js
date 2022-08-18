@@ -22,24 +22,24 @@ class TxRecipient extends React.Component {
     return (Math.round(parseFloat(utils.fromWei(hex, 'ether')) * 1000000) / 1000000).toFixed(6)
   }
 
-  renderRecog (req) {
-    if (req && req.recog && req.recog.type === 'erc20:transfer') {
-      const { data } = req.recog
-      const amount = new BigNumber(data.amount) 
-      const decimals = new BigNumber('1e' + data.decimals)
-      const displayAmount = amount.dividedBy(decimals)
-
-      return (
-        <>
-          <div className='_txDescriptionSummaryLine'>
-            {`Sending ${displayAmount.toFixed(9)} ${data.symbol}`}
-          </div>
-          <div className='_txDescriptionSummaryLine'>
-            {`To: ${data.recipient}`}
-          </div>
-        </>
-      )
+  renderRecognizedActions (req) {
+    if (req && req.recognizedActions) {
+      return req.recognizedActions.map(action => {
+        const { type, data } = action
+        if (type === 'erc20:transfer') {
+          const amount = new BigNumber(data.amount) 
+          const decimals = new BigNumber('1e' + data.decimals)
+          const displayAmount = amount.dividedBy(decimals)
+          return (
+            <div className='_txDescriptionSummary'>
+              {`Sending ${displayAmount.toString()} ${data.symbol}`}
+            </div>
+          )
+        }
+        return null
+      })
     }
+    return null
   }
 
   render () {
@@ -118,37 +118,22 @@ class TxRecipient extends React.Component {
                 link.send('nav:update', 'panel', { step: 'viewData' })
               }}>
                 {req.recipientType === 'external' ? (
-                  <>
+                  <div className='_txDescriptionSummary'>
                     {req.data.value && req.data.value !== '0x' && req.data.value !== '0x0' ? (
                       <div>{`Sending ${currentSymbol}`}</div>
-                    ) : null}
-                    <div>{'to an external account'}</div>
+                    ) : req.data.data && req.data.data !== '0x' && req.data.data !== '0x0'  ? (
+                      <div>{`Sending Data`}</div>
+                    ) : (
+                      <div>{`Empty Transaction`}</div>
+                    )}
                     <div>{`on ${chainName}`}</div>
-                  </>
+                  </div>
                 ) : ( // Recipient is contract
                   <div className='_txDescriptionSummary'>
                     {req.data.value && req.data.value !== '0x' && req.data.value !== '0x0' ? (
                       <div>{`Sending ${currentSymbol}`}</div>
                     ) : null}
-                    {req.data.data && req.data.data !== '0x' && req.data.data !== '0x0' ? (
-                      req.recog ? (
-                        this.renderRecog(req)
-                      ) : req.decodedData && req.decodedData.method ? (
-                        <div className='_txDescriptionSummaryLine'>
-                          <span className={'_txDataValueMethod'}>{(() => {
-                            if (req.decodedData.method.length > 17) return `${req.decodedData.method.substr(0, 15)}..`
-                            return req.decodedData.method
-                          })()}</span>
-                          <span>{'via'}</span>
-                          <span className={'_txDataValueMethod'}>{(() => {
-                            if (req.decodedData.contractName.length > 11) return `${req.decodedData.contractName.substr(0, 9)}..`
-                            return req.decodedData.contractName
-                          })()}</span>
-                        </div>
-                      ) : (
-                        <div>{'unknown action via unknown contract'}</div>
-                      )
-                    ) : null}
+                    {req.recognizedActions ? this.renderRecognizedActions(req) : null}
                     <div>{`on ${chainName}`}</div>
                   </div>
                 )}
@@ -157,11 +142,6 @@ class TxRecipient extends React.Component {
             {req.data.data && req.data.data !== '0x' && req.data.data !== '0x0' ? (
               <div className='_txMainTag _txMainTagWarning'>
                 {'Transaction includes data'}
-              </div>
-            ) : null}
-            {req.decodedData && req.decodedData.source ? (
-              <div className='_txMainTag _txMainTagWarning'>
-                {'abi source: ' + req.decodedData.source}
               </div>
             ) : null}
           </div>

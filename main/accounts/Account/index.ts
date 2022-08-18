@@ -318,7 +318,7 @@ class FrameAccount {
 
     if (calldata && calldata !== '0x' && parseInt(calldata, 16) !== 0) { 
       
-      try { // Decode action 
+      try { // Decode calldata
         const decodedData = await reveal.decode(tx.to || '', chainId, calldata)
         const knownTxRequest = this.requests[req.handlerId] as TransactionRequest
   
@@ -330,21 +330,21 @@ class FrameAccount {
         log.warn(e)
       }
 
-      try { // Recog action 
-        const recog = await reveal.recog(tx.to || '', chainId, calldata)
+      try { // Recognize actions
+        const actions = await reveal.recog(tx.to || '', chainId, calldata)
         const knownTxRequest = this.requests[req.handlerId] as TransactionRequest
   
-        if (knownTxRequest && recog) {
-          knownTxRequest.recog = recog
+        if (knownTxRequest && actions ) {
+          knownTxRequest.recognizedActions = actions
           this.update()
         } 
       } catch (e) {
         log.warn(e)
       }
 
-      try { // Simulate action 
-      } catch (e) {
-      }
+      // try { // Simulate actions 
+      // } catch (e) {
+      // }
     }
   }
 

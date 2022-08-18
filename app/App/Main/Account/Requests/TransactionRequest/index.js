@@ -17,6 +17,7 @@ import TxBar from './TxBar'
 import TxMain from './TxMain'
 import TxMainNew from './TxMainNew'
 import TxFeeNew from './TxFeeNew'
+import TxAction from './TxAction'
 import TxData from './TxData'
 import TxRecipient from './TxRecipient'
 import AdjustFee from './AdjustFee'
@@ -332,6 +333,8 @@ class TransactionRequest extends React.Component {
 
     const showWarning = !status && mode !== 'monitor'
     const requiredApproval = showWarning && (req.approvals || []).filter(a => !a.approved)[0]
+
+    const recognizedActions = req.recognizedActions || []
     return (
       <div key={req.handlerId} className={requestClass}>
         {/* <TxOverlay {...this.props} overlay={this.state.overlayMode} overlayMode={this.overlayMode.bind(this)}/> */}
@@ -532,10 +535,13 @@ class TransactionRequest extends React.Component {
                   ) : null}
 
                   <div className='_txBody'>
-                    <TxMainNew i={0} {...this.props} req={req} chain={this.chain}/>
-                    <TxRecipient i={1} {...this.props} req={req} />
-                    <TxMain i={2} {...this.props} req={req} chain={this.chain}/>
-                    <TxFeeNew i={3} {...this.props} req={req} chain={this.chain} />
+                    <TxMainNew i={0} {...this.props} req={req} chain={this.chain} />
+                    <TxMain i={1} {...this.props} req={req} chain={this.chain} />
+                    {recognizedActions.map((action, i) => {
+                      return <TxAction i={2 + i} {...this.props} req={req} chain={this.chain} action={action} />
+                    })}
+                    <TxRecipient i={3 + recognizedActions.length} {...this.props} req={req} />
+                    <TxFeeNew i={4 + recognizedActions.length} {...this.props} req={req} chain={this.chain} />
                   </div>
                 </>
               )}
