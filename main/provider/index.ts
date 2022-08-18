@@ -399,13 +399,13 @@ export class Provider extends EventEmitter {
       const approvals: RequiredApproval[] = []
       const accountId = (accounts.current() || {}).id
       const rawTx = getRawTx(newTx, accountId)
-      const [gas, txWithGas] = processTxForGasFees(rawTx)
-      const chainConfig = this.connection.connections['ethereum'][parseInt(txWithGas.chainId)].chainConfig
+      const [gas, updatedTx] = processTxForGasFees(rawTx)
+      const chainConfig = this.connection.connections['ethereum'][parseInt(updatedTx.chainId)].chainConfig
 
-      const estimateGas = txWithGas.gasLimit
-        ? Promise.resolve(txWithGas)
-        : this.getGasEstimate(txWithGas)
-          .then(gasLimit => ({ ...txWithGas, gasLimit }))
+      const estimateGas = updatedTx.gasLimit
+        ? Promise.resolve(updatedTx)
+        : this.getGasEstimate(updatedTx)
+          .then(gasLimit => ({ ...updatedTx, gasLimit }))
           .catch(err => {
             approvals.push({
               type: ApprovalType.GasLimitApproval,
@@ -415,7 +415,7 @@ export class Provider extends EventEmitter {
               }
             })
 
-            return { ...txWithGas, gasLimit: '0x00' }
+            return { ...updatedTx, gasLimit: '0x00' }
          })
 
       estimateGas
