@@ -54,7 +54,7 @@ type Actions = Array<{
 async function recogErc20 (actions: Actions, contractAddress: string, chainId: string, calldata: string) {
   if (!contractAddress) return
   try {
-    const contract = new Erc20Contract(contractAddress, chainId, provider)
+    const contract = new Erc20Contract(contractAddress, chainId)
     const decoded = contract.decodeCallData(calldata)
     if (decoded) {
       const { decimals, name, symbol } = await contract.getTokenData()

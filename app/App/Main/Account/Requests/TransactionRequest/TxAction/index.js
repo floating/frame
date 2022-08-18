@@ -4,6 +4,7 @@ import link from '../../../../../../../resources/link'
 import svg from '../../../../../../../resources/svg'
 import utils from 'web3-utils'
 import { getAddress } from '@ethersproject/address'
+import BigNumber from 'bignumber.js'
 
 class TxSending extends React.Component {
   constructor (...args) {
@@ -22,27 +23,27 @@ class TxSending extends React.Component {
   }
   render () {
     const req = this.props.req
+    const chainId = parseInt(req.data.chainId, 16)
+    const chainName = this.store('main.networks.ethereum', chainId, 'name')
+
     const { action } = this.props
     const { amount, decimals, name, recipient, symbol, recipientType, recipientEns } = action.data || {}
+    const value = new BigNumber(amount) 
+    const displayValue = value.dividedBy('1e' + decimals).toFixed(6)
 
     const address = recipient
     const ensName = (req.recipient && req.recipient.length < 25) ? req.recipient : ''
     const layer = this.store('main.networks', this.props.chain.type, this.props.chain.id, 'layer')
     const nativeCurrency = this.store('main.networksMeta', this.props.chain.type, this.props.chain.id, 'nativeCurrency')
-    const etherUSD = nativeCurrency && nativeCurrency.usd && layer !== 'testnet' ? nativeCurrency.usd.price : 0
-    const value = req.data.value || '0x'
-    const displayValue = this.hexToDisplayValue(value)
-    const currentSymbol = this.store('main.networks', this.props.chain.type, this.props.chain.id, 'symbol') || '?'
-    const chainId = parseInt(this.props.chain.id, 16)
-    const chainName = this.store('main.networks.ethereum', chainId, 'name')
 
+    // TODO: Convert this to token price
+    const etherUSD = nativeCurrency && nativeCurrency.usd && layer !== 'testnet' ? nativeCurrency.usd.price : 0
     if (action.type === 'erc20:transfer') {
-      const value = amount
       return (
         <div className='_txMain' style={{ animationDelay: (0.1 * this.props.i) + 's' }}>
           <div className='_txMainInner'>
             <div className='_txLabel'>
-              <div>{`Sending ${symbol}`}</div>
+              <div>{`Sending ${name}`}</div>
             </div>
             <div className='_txMainValues'>
               <div className='_txMainTransferring'>

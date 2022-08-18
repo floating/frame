@@ -7,10 +7,6 @@ import { usesBaseFee } from '../../../../../../resources/domain/transaction'
 import svg from '../../../../../../resources/svg'
 import link from '../../../../../../resources/link'
 
-import RequestItem from '../../../../../../resources/Components/RequestItem'
-
-import chainMeta from '../../../../../../resources/chainMeta'
-
 import TxBar from './TxBar'
 
 // New Tx
@@ -328,9 +324,6 @@ class TransactionRequest extends React.Component {
       }
     }
 
-    const hexId = '0x' + parseInt(this.chain.id).toString('16')
-    const chainName = this.store('main.networks.ethereum', this.chain.id, 'name') 
-
     const showWarning = !status && mode !== 'monitor'
     const requiredApproval = showWarning && (req.approvals || []).filter(a => !a.approved)[0]
 
@@ -512,38 +505,15 @@ class TransactionRequest extends React.Component {
                   </div>
                 </div>
               ) : (
-                <>
-                  <RequestItem 
-                    req={req}
-                    account={accountId}
-                    handlerId={req.handlerId}
-                    title={chainName + ' Transaction'}
-                    color={chainMeta[hexId] ? chainMeta[hexId].primaryColor : ''}
-                    img={chainMeta[hexId] ? chainMeta[hexId].icon : ''}
-                    headerMode={true}
-                  />
-                  {txMeta.replacement ? (
-                    txMeta.possible ? (
-                      <div className='approveRequestHeaderTag'>
-                        valid replacement
-                      </div>
-                    ) : (
-                      <div className='approveRequestHeaderTag approveRequestHeaderTagInvalid'>
-                        {txMeta.notice || 'invalid duplicate'}
-                      </div>
-                    )
-                  ) : null}
-
-                  <div className='_txBody'>
-                    <TxMainNew i={0} {...this.props} req={req} chain={this.chain} />
-                    <TxMain i={1} {...this.props} req={req} chain={this.chain} />
-                    {recognizedActions.map((action, i) => {
-                      return <TxAction i={2 + i} {...this.props} req={req} chain={this.chain} action={action} />
-                    })}
-                    <TxRecipient i={3 + recognizedActions.length} {...this.props} req={req} />
-                    <TxFeeNew i={4 + recognizedActions.length} {...this.props} req={req} chain={this.chain} />
-                  </div>
-                </>
+                <div className='_txBody'>
+                  <TxMainNew i={0} {...this.props} req={req} chain={this.chain} />
+                  <TxMain i={1} {...this.props} req={req} chain={this.chain} />
+                  {recognizedActions.map((action, i) => {
+                    return <TxAction i={2 + i} {...this.props} req={req} chain={this.chain} action={action} />
+                  })}
+                  <TxRecipient i={3 + recognizedActions.length} {...this.props} req={req} />
+                  <TxFeeNew i={4 + recognizedActions.length} {...this.props} req={req} chain={this.chain} />
+                </div>
               )}
             </div>
           </div>

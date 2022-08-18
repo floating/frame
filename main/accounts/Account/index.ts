@@ -259,7 +259,7 @@ class FrameAccount {
     const calldata = req.data.data
     if (!calldata) return
 
-    const contract = new Erc20Contract(contractAddress, req.data.chainId, provider)
+    const contract = new Erc20Contract(contractAddress, req.data.chainId)
     const decodedData = contract.decodeCallData(calldata)
 
     if (decodedData) {
@@ -356,7 +356,7 @@ class FrameAccount {
       this.requests[r.handlerId].res = res
 
       if ((req || {}).type === 'transaction') {
-        await this.revealDetails(req)
+        this.revealDetails(req)
         await this.checkForErc20Approve(req)
       }
 

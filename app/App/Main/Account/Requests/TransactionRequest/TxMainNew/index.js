@@ -6,6 +6,10 @@ import utils from 'web3-utils'
 
 import BigNumber from 'bignumber.js'
 
+import chainMeta from '../../../../../../../resources/chainMeta'
+import RequestItem from '../../../../../../../resources/Components/RequestItem'
+
+
 class TxRecipient extends React.Component {
   constructor (...args) {
     super(...args)
@@ -50,6 +54,10 @@ class TxRecipient extends React.Component {
     const currentSymbol = this.store('main.networks.ethereum', chainId, 'symbol') || '?'
 
     const txMeta = { replacement: false, possible: true, notice: '' }
+
+    const { accountId } = this.props
+    const hexId = '0x' + parseInt(req.data.chainId).toString('16')
+
     // TODO
     // if (signer locked) {
     //   txMeta.possible = false
@@ -89,6 +97,15 @@ class TxRecipient extends React.Component {
     return (
       <div className='_txMain' style={{ animationDelay: (0.1 * this.props.i) + 's' }}>
         <div className='_txMainInner'>
+          <RequestItem 
+            req={req}
+            account={accountId}
+            handlerId={req.handlerId}
+            title={chainName + ' Transaction'}
+            color={chainMeta[hexId] ? chainMeta[hexId].primaryColor : ''}
+            img={chainMeta[hexId] ? chainMeta[hexId].icon : ''}
+            headerMode={true}
+          />
           <div className='_txMainValues'>
             {txMeta.replacement ? (
               txMeta.possible ? (
