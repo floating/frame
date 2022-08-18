@@ -138,24 +138,28 @@ export function getRawTx (newTx: RPC.SendTransaction.TxParams, accountId: string
 
 export function processTxForGasFees (rawTx: TransactionData) {
   const gas = store('main.networksMeta', 'ethereum', parseInt(rawTx.chainId, 16), 'gas')
-  const updatedTx = { ...rawTx }
 
-  if (gas.price.fees) {
-    // default to dapp-supplied values for maxFeePerGas & maxPriorityFeePerGas
-    const useDappMaxFeePerGas = rawTx.maxFeePerGas && !isNaN(parseInt(rawTx.maxFeePerGas, 16))
-    if (useDappMaxFeePerGas) {
-      gas.price.fees.maxFeePerGas = rawTx.maxFeePerGas
-      updatedTx.gasFeesSource = GasFeesSource.Dapp
-    }
-    
-    const useDappMaxPriorityFeePerGas = rawTx.maxPriorityFeePerGas && !isNaN(parseInt(rawTx.maxPriorityFeePerGas, 16))
-    if (useDappMaxPriorityFeePerGas) {
-      gas.price.fees.maxPriorityFeePerGas = rawTx.maxPriorityFeePerGas
-      updatedTx.gasFeesSource = GasFeesSource.Dapp
-    }
+  if (!gas.price.fees) {
+    return [gas, rawTx]
   }
 
-  return [gas, updatedTx]
+  const updatedTx = { ...rawTx }
+  const updatedGas = { ...gas }
+
+  // default to dapp-supplied values for maxFeePerGas & maxPriorityFeePerGas
+  const useDappMaxFeePerGas = rawTx.maxFeePerGas && !isNaN(parseInt(rawTx.maxFeePerGas, 16))
+  if (useDappMaxFeePerGas) {
+    updatedGas.price.fees.maxFeePerGas = rawTx.maxFeePerGas
+    updatedTx.gasFeesSource = GasFeesSource.Dapp
+  }
+  
+  const useDappMaxPriorityFeePerGas = rawTx.maxPriorityFeePerGas && !isNaN(parseInt(rawTx.maxPriorityFeePerGas, 16))
+  if (useDappMaxPriorityFeePerGas) {
+    updatedGas.price.fees.maxPriorityFeePerGas = rawTx.maxPriorityFeePerGas
+    updatedTx.gasFeesSource = GasFeesSource.Dapp
+  }
+
+  return [updatedGas, updatedTx]
 }
   
 export function isCurrentAccount (address: string, account: FrameAccount | null) {
