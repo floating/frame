@@ -64,10 +64,6 @@ class AddChain extends React.Component {
     }
 
     link.send('tray:addChain', chainToAdd)
-
-    if (this.props.req) {
-      link.send('tray:resolveRequest', this.props.req)
-    }
   }
 
   validateSubmit (enteredChain) {
