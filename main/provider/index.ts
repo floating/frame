@@ -613,7 +613,7 @@ export class Provider extends EventEmitter {
         store.switchOriginChain(originId, chainId, origin.chain.type)
       }
 
-      return res({ id: payload.id, jsonrpc: '2.0', result: undefined })
+      return res({ id: payload.id, jsonrpc: '2.0', result: null })
     } catch (e) {
       return resError(e as EVMError, payload, res)
     }
@@ -628,8 +628,7 @@ export class Provider extends EventEmitter {
       chainName, 
       nativeCurrency, 
       rpcUrls = [], 
-      blockExplorerUrls = [],
-      iconUrls = [] 
+      blockExplorerUrls = []
     } = payload.params[0]
 
     if (!chainId) return resError('addChain request missing chainId', payload, res)
@@ -658,8 +657,7 @@ export class Provider extends EventEmitter {
           symbol: nativeCurrency.symbol,
           primaryRpc: rpcUrls[0],
           secondaryRpc: rpcUrls[1],
-          explorer: blockExplorerUrls[0], 
-          iconUrls
+          explorer: blockExplorerUrls[0]
         },
         account: (accounts.getAccounts() || [])[0],
         origin: payload._origin,

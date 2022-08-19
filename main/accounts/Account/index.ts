@@ -193,13 +193,30 @@ class FrameAccount {
     if (knownRequest) {
       if (knownRequest.res) {
         const { id, jsonrpc } = req.payload || {}
-        
         knownRequest.res({ id, jsonrpc, result })
       }
-      store.navClearReq(req.handlerId)
-      delete this.requests[req.handlerId]
-      this.update()
+
+      this.clearRequest(knownRequest)
     }
+  }
+
+  rejectRequest (req: AccountRequest, error: EVMError) {
+    const knownRequest = this.requests[req.handlerId]
+
+    if (knownRequest) {
+      if (knownRequest.res) {
+        const { id, jsonrpc } = req.payload || {}
+        knownRequest.res({ id, jsonrpc, error })
+      }
+
+      this.clearRequest(knownRequest)
+    }
+  }
+
+  private clearRequest (req: AccountRequest) {
+    store.navClearReq(req.handlerId)
+    delete this.requests[req.handlerId]
+    this.update()
   }
 
   addRequiredApproval (req: TransactionRequest, type: ApprovalType, data: any = {}, onApprove: (data: any) => void = () => {}) {

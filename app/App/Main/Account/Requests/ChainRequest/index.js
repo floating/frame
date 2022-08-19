@@ -13,10 +13,7 @@ class ChainRequest extends React.Component {
   }
 
   render () {
-    const status = this.props.req.status
-    const notice = this.props.req.notice
-    const type = this.props.req.type
-    const chain = this.props.req.chain
+    const { status, notice, type, chain } = this.props.req
     
     let requestClass = 'signerRequest'
     if (status === 'success') requestClass += ' signerRequestSuccess'
@@ -83,14 +80,20 @@ class ChainRequest extends React.Component {
             <div 
               className='requestDecline' 
               style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none'}}
-              onClick={() => { if (this.state.allowInput) link.send('tray:resolveRequest', this.props.req)
+              onClick={() => { if (this.state.allowInput) {
+                const err = { code: 4001, message: 'User rejected the request' }
+                link.send('tray:rejectRequest', this.props.req, err)
+              }
             }}>
               <div className='requestDeclineButton _txButton _txButtonBad'>Decline</div>
             </div>
             <div 
               className='requestSign' 
               style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none'}}
-              onClick={() => { if (this.state.allowInput) this.store.notify('addChain', this.props.req) 
+              onClick={() => { if (this.state.allowInput) {
+                link.send('tray:resolveRequest', this.props.req, null)
+                link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'addChain', notifyData: { chain } } })
+              }
             }}>
               <div className='requestSignButton _txButton'>Review</div>
             </div>
