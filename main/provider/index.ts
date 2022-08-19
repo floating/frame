@@ -619,7 +619,7 @@ export class Provider extends EventEmitter {
     }
   }
 
-  addEthereumChain (payload: RPCRequestPayload, res: RPCRequestCallback) {
+  private addEthereumChain (payload: RPCRequestPayload, res: RPCRequestCallback) {
     if (!payload.params[0]) return resError('addChain request missing params', payload, res)
 
     const type = 'ethereum'
