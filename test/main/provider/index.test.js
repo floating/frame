@@ -951,11 +951,11 @@ describe('#send', () => {
     }
 
     const validRequests = [
-      { method: 'eth_signTypedData', params: [address, typedData], version: 'V4' },
+      { method: 'eth_signTypedData', params: [address, typedData], version: 'V1' },
       { method: 'eth_signTypedData_v1', params: [address, typedData], version: 'V1' },
       { method: 'eth_signTypedData_v3', params: [address, typedData], version: 'V3' },
       { method: 'eth_signTypedData_v4', params: [address, typedData], version: 'V4' },
-      { method: 'eth_signTypedData', params: [typedData, address], version: 'V4', dataFirst: true },
+      { method: 'eth_signTypedData', params: [typedData, address], version: 'V1', dataFirst: true },
       { method: 'eth_signTypedData_v1', params: [typedData, address], version: 'V1', dataFirst: true },
       { method: 'eth_signTypedData_v3', params: [typedData, address], version: 'V3', dataFirst: true },
       { method: 'eth_signTypedData_v4', params: [typedData, address], version: 'V4', dataFirst: true }
@@ -982,7 +982,7 @@ describe('#send', () => {
 
       send({ method: 'eth_signTypedData', params })
 
-      verifyRequest('V4')
+      verifyRequest('V1')
     })
 
     it('does not submit a request from an unknown account', done => {
