@@ -638,8 +638,8 @@ export class Provider extends EventEmitter {
     const handlerId = this.addRequestHandler(res)
 
     // Check if chain exists
-    const id = parseInt(chainId)
-    if (!Number.isInteger(id)) throw new Error('Invalid chain id')
+    const id = parseInt(chainId, 16)
+    if (!Number.isInteger(id)) return resError('Invalid chain id', payload, res)
 
     const exists = Boolean(store('main.networks', type, id))
     if (exists) {
@@ -652,7 +652,7 @@ export class Provider extends EventEmitter {
         type: 'addChain',
         chain: {
           type,
-          id: chainId,
+          id,
           name: chainName,
           symbol: nativeCurrency.symbol,
           primaryRpc: rpcUrls[0],
