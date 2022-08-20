@@ -242,7 +242,6 @@ class TxFeeOverlay extends Component {
           </> :  
           <GasPriceInput initialValue={this.state.gasPrice} maxTotalFee={maxTotalFee} gasLimit={this.state.gasLimit} handlerId={handlerId} tabIndex={0} />
         }
-        
         <GasLimitInput initialValue={this.state.gasLimit} maxTotalFee={maxTotalFee} baseFee={this.state.baseFee} priorityFee={this.state.priorityFee} gasPrice={this.state.gasPrice} handlerId={handlerId} limiter={(val) => limitRange(val, 0, 12.5e6)} tabIndex={2} />
       </div>
     )
