@@ -798,24 +798,22 @@ describe('#removeRequest', () => {
   beforeEach(() => {
     store.navClearReq = jest.fn()
     account.update = jest.fn()
+    Accounts.addRequest(request)
   })
 
   it('should remove a request for the provided handlerId from the account object', () => {
-    Accounts.addRequest(request)
     Accounts.removeRequest(account, request.handlerId)
 
     expect(Object.keys(account.requests)).toHaveLength(0)
   })
 
   it('should clear a request for the provided handlerId from the nav', () => {
-    Accounts.addRequest(request)
     Accounts.removeRequest(account, request.handlerId)
 
     expect(store.navClearReq).toHaveBeenCalledWith(request.handlerId)
   })
 
   it('should update the account', () => {
-    Accounts.addRequest(request)
     Accounts.removeRequest(account, request.handlerId)
 
     expect(account.update).toHaveBeenCalled()
