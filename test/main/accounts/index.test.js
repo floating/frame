@@ -90,7 +90,9 @@ beforeEach(() => {
 
 afterEach(() => {
   Object.values(Accounts.accounts).forEach(account => {
-    account.requests = {}
+    Object.keys(account.requests).forEach(id => {
+      Accounts.removeRequest(account, id)
+    })
   })
 })
 
