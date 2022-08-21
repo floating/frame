@@ -107,11 +107,8 @@ class _AccountModule extends React.Component {
       }
     }
 
-    let moduleClass = ''
-    if (id === 'requests') moduleClass = ' transparentModule'
-
     return (
-      <div className={'accountModule ' + moduleClass} style={style}>
+      <div className={'accountModule'} style={style}>
         <div className='accountModuleInner cardShow' style={{ animationDelay: (index * 0.1) + 's'}}>
           {
             id === 'gas' ? <Gas 

@@ -148,7 +148,7 @@ class Inventory extends React.Component {
             <div className='inventoryNotFound'>Loading Items..</div>
           )}
         </div>
-        {!this.props.expanded ? (
+        {!this.props.expanded && collections.length ? (
           <div className='signerBalanceTotal'>
             <div className='signerBalanceButtons'>
               <div className='signerBalanceButton signerBalanceShowAll' onMouseDown={() => this.props.expandModule({ id: this.props.moduleId, account: this.props.account })}>

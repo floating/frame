@@ -100,9 +100,14 @@ class Requests extends React.Component {
 
     return (
       <div 
-        ref={this.moduleRef} 
-        className={this.store('selected.view') === 'default' ? 'signerRequests' : 'signerRequests signerRequestsHidden'}
+        ref={this.moduleRef}
+        className='balancesBlock'
       >
+        {!this.props.expanded ? (
+          <div className={'moduleHeader'}>
+            <span>Requests</span>
+          </div>
+        ) : null}
         <div className='requestContainerWrap'>
           <div className='requestContainer'>
             {!requests.length ? (

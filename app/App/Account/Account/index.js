@@ -108,7 +108,7 @@ class _AccountModule extends React.Component {
     }
 
     let moduleClass = ''
-    if (id === 'requests') moduleClass = ' transparentModule'
+    // if (id === 'requests') moduleClass = ' transparentModule'
 
     return (
       <div className={'accountModule ' + moduleClass} style={style}>
@@ -216,7 +216,7 @@ class _AccountMain extends React.Component {
         id={id} 
         account={this.props.id}
         module={module} 
-        top={slideHeight - module.height - 5}
+        top={slideHeight - module.height + 40}
         index={i} 
         expandModule={this.expandModule.bind(this)}
       />

@@ -9,12 +9,25 @@ import Restore from 'react-restore'
 
 
 class Backdrop extends React.Component {
+  getStyle () {
+
+    const accountOpen = this.store('selected.open')
+    const crumb = this.store('windows.panel.nav')[0] || {}
+    if (accountOpen && crumb.view === 'requestView') {
+      return ({
+        top: '160px',
+        bottom: '140px'
+      })
+    } else if (accountOpen) {
+      return ({
+        top: '160px',
+        bottom: '40px'
+      })
+    }
+  }
   render () {
     const accountOpen = this.store('selected.open')
-    const style = accountOpen ? {
-      top: '160px',
-      bottom: '40px'
-    } : {}
+    const style = this.getStyle()
     return (
       <>
         <div className='overlay' style={style} />

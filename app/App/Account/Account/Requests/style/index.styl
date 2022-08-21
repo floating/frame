@@ -332,32 +332,32 @@
     color var(--outerspace08)
 
 .requestContainerWrap
-  position relative
-  tranform translateZ(0)
+  margin 0px 6px 6px 6px
+  padding 0px 5px 5px 5px
+  box-sizing border-box
+  overflow auto
+  background var(--ghostZ)
+  border-radius 10px
 
   .requestContainer
     width 100%
     position relative
 
   .noRequests
-    // height 42px
-    // min-height 32px
-    font-size 11px
+    font-size 10px
     text-transform uppercase
-    font-weight 400
-    letter-spacing 2px
-    padding-left 2px
+    font-weight 600
+    letter-spacing 1px
+    padding-left 1px
     display flex
     justify-content center
     align-items center
     transition var(--standard)
-    // tranform translateZ(0)
-    // border-radius 12px
-    // margin 5px
-    // background var(--good)
-    // color var(--goodOver)
-  // .noRequests:hover
-  //   background var(--goodHighlight)
+    background var(--ghostA)
+    color var(--outerspace05)
+    margin-top 5px
+    height 48px
+    border-radius 8px
 
   .recentRequests
     position absolute
@@ -641,9 +641,10 @@
   position absolute
   top 0
   right 0
-  bottom 20px
+  bottom 0px
   left 0
-  padding-bottom 128px
+  padding-bottom 64px
+  border-radius 20px
   overflow-y scroll
 
   .approveTransactionIcon
@@ -1183,8 +1184,8 @@
   transition var(--standard)
   position absolute
   bottom 40px
-  left 6px
-  right 6px
+  left 8px
+  right 8px
   // background var(--ghostZ)
   border-radius 16px
   background var(--ghostZ)
@@ -1203,69 +1204,59 @@
   //   background var(--ghostZ)
     
   .requestApproveFeeBlock
-    position absolute
-    top -67px
-    right 6px
-    left 6px
+    top -99px
     // background linear-gradient(rgba(0, 0, 0, 0.0), var(--ghostX))
     z-index 9
     // height 50px
-    font-size 14px
+    font-size 13px
     opacity 0
     transition var(--standard)
     font-family 'OpenSans'
-    background var(--ghostB)
     // padding 0px 5px
     // background blue
     // border-radius 12px
     pointer-events none
-    box-shadow 0px -16px 16px var(--ghostZ), 0px 4px 4px var(--ghostY)
     transform translateY(0px) 
     display flex
     justify-content center
     align-items center
     text-transform uppercase
     font-weight 500
-    letter-spacing 1px
     transform scale(0.8)
     filter blur(20px)
+    background linear-gradient(to top, var(--ghostZ) 25%, var(--ghostZ0) 100%)
     // box-shadow 0px 4px 4px var(--ghostY)
 
     position absolute
     // top 70px
-    right 4px
-    left 4px
-    height 48px
-    background var(--ghostA)
-    border-radius 15px
-    box-shadow 0px 4px 4px var(--ghostY)
+    right 0px
+    left 0px
+    height 88px
+    border-bottom-left-radius 20px
+    border-bottom-right-radius 20px
     z-index 5
 
     .requestApproveFeeText
-      margin-right 64px
-      margin-left 32px
+      margin-top 24px
+      background var(--ghostB)
+      padding 8px 24px
+      border-top-left-radius 12px
+      border-bottom-left-radius 12px
+      border-top-right-radius 4px
+      border-bottom-right-radius 4px
 
     .requestApproveFeeButton 
-      position absolute
-      // right 12px
-      // width 108px
-      // box-sizing border-box
+      margin-top 24px
+      margin-left 2px
       background var(--ghostB)
-      // color var(--moon)
-      display flex
-      justify-content center
-      align-items center
+      padding 8px 16px
+      border-top-left-radius 4px
+      border-bottom-left-radius 4px
+      border-top-right-radius 12px
+      border-bottom-right-radius 12px
+      pointer-events auto
+      color var(--moon)
       cursor pointer
-      // z-index 4
-      // text-transform uppercase
-      // height 40px
-      font-size 12px
-      top 5px
-      right 8px
-      height 32px
-      width 48px
-      border-radius 12px
-      border 3px solid var(--ghostZ)
 
       *
         pointer-events none
@@ -1292,8 +1283,8 @@
   .requestApproveFeeBlockActive
     filter blur(0px)
     opacity 1
-    pointer-events auto
     transform scale(1)
+    pointer-events none
 
   .requestDecline
     position absolute
