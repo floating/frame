@@ -69,17 +69,13 @@
   .networkActive
     position relative
     display flex
-    align-items space-between
     width 100%
     box-sizing border-box
     height 74px
 
     .chainBadge
-      position absolute
-      left 12px
-      top 15px
+      width 19%
       border-radius 16px
-      background var(--ghostB)
       box-sizing border-box
       display flex
       justify-content center
@@ -92,11 +88,7 @@
         color var(--outerspace)
 
     .networkName
-      position absolute
-      left 68px
-      right 100px
-      top 1px
-      bottom 4px
+      flex-grow 1
       font-size 18px
       text-align left
       font-weight 400
@@ -106,7 +98,6 @@
       align-items center
 
     .signerPermissionToggle
-      position absolute
       right 16px
       top 50%
       margin-top -9px
@@ -115,7 +106,6 @@
       border-radius 12px
 
       .signerPermissionToggleSwitch
-        position absolute
         top 2px
         left 2px
         bottom 2px
@@ -158,6 +148,12 @@
       .signerPermissionToggleSwitch
         position absolute
         transform translateX(20px)
+
+    .chainModify
+      padding 0px 12px
+      display flex
+      flex-direction column
+      justify-content space-evenly
 
   .phaseNetworkLine
     position relative
@@ -948,10 +944,6 @@
     margin-right 6px
 
 .chainSettings
-  position absolute
-  right 60px
-  top 50%
-  margin-top -10px
   height 20px
   width 40px
   border-radius 12px

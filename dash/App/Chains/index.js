@@ -586,13 +586,25 @@ class _Network extends React.Component {
 
           {/* <div className='chainIdBadgeBackground' /> */}
 
-          <div className='chainSettings' onClick={() => {
-            const chain = { id, type, name, symbol, explorer, layer }
-
-            link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'updateChain', notifyData: { chain }} })
-          }}>
-            {svg.gear(11)}
-          </div>
+          {/* {type === 'ethereum' && id === 1 ? (
+              <div className='chainMore cardShow'>
+                <div className='moduleButton moduleButtonLocked'>
+                  {svg.lock(11)}
+                </div>
+              </div>
+            ) : (
+              <div className='chainMore cardShow'>
+                <div
+                  className='moduleButton moduleButtonBad' onMouseDown={() => {
+                    const { id, name, type, explorer } = this.props
+                    link.send('tray:action', 'removeNetwork', { id, name, explorer, type })
+                  }}
+                >
+                  {svg.trash(13)} 
+                  <span>remove chain</span>
+                </div>
+              </div>
+            )} */}
           <div 
             className={this.props.on ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} 
             onClick={this.props.id !== 1 ? () => {
@@ -608,7 +620,23 @@ class _Network extends React.Component {
               <div className='signerPermissionToggleSwitch' />
             )}
           </div>
+
+          <div className='chainModify'>
+            <div role='button' className='chainSettings' onClick={() => {
+              const chain = { id, type, name, symbol, explorer, layer }
+              
+              link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'updateChain', notifyData: { chain }} })
+            }}>
+              {svg.gear(11)}
+            </div>
+            <div role='button' className='chainSettings' onClick={() => {
+              link.send('tray:action', 'removeNetwork', { id, name, explorer, type })
+            }}>
+              {svg.trash(11)}
+            </div>
+          </div>
         </div>
+
         {this.props.on ? (
           <div className='chainModules'>
             <Connection changed={changed} {...this.props} />
