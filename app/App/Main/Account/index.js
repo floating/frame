@@ -14,7 +14,6 @@ import Launcher from './Launcher'
 import Permissions from './Permissions'
 import Requests from './Requests'
 import SignerStatus from './SignerStatus'
-import Verify from './Verify'
 import Settings from './Settings'
 import { getAddress } from '../../../../resources/domain/transaction'
 

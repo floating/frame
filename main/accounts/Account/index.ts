@@ -11,7 +11,7 @@ import windows from '../../windows'
 import nav from '../../windows/nav'
 import store from '../../store'
 import { Aragon } from '../aragon'
-import { TransactionData } from '../../../resources/domain/transaction'
+import { TransactionData, getAddress } from '../../../resources/domain/transaction'
 import { capitalize } from '../../../resources/utils'
 import { getType as getSignerType, Type as SignerType } from '../../signers/Signer'
 
@@ -244,7 +244,7 @@ class FrameAccount {
     const decodedData = contract.decodeCallData(calldata)
 
     if (decodedData && Erc20Contract.isApproval(decodedData)) {
-      const spender = decodedData.args[0].toLowerCase()
+      const spender = getAddress(decodedData.args[0])
       const amount = decodedData.args[1].toHexString()
       const { decimals, name, symbol } = await contract.getTokenData()
 
