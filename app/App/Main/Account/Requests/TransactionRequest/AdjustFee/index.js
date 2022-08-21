@@ -55,12 +55,12 @@ const FeeOverlayInput = ({ initialValue, labelText, tabIndex, decimals, onReceiv
     onReceiveValue(limitedValue)
     setValue(formatForInput(limitedValue, decimals))
   }
-  const set = (newValue) => {
-    setValue(formatForInput(newValue, decimals))
+  const set = (newValueStr, newValueNum) => {
+    setValue(newValueStr)
     clearTimeout(submitTimeout)
 
     setSubmitTimeout(
-      setTimeout(() => processValue(newValue), 500)
+      setTimeout(() => processValue(newValueNum), 500)
     )
   }
 
@@ -87,7 +87,7 @@ const FeeOverlayInput = ({ initialValue, labelText, tabIndex, decimals, onReceiv
                 return
               }
 
-              set(parsedValue)
+              set(value[0], parsedValue)
             }
           }}
           onKeyDown={(e) => {
