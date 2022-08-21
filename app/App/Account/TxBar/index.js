@@ -1,6 +1,6 @@
 import React from 'react'
 import Restore from 'react-restore'
-import svg from '../../../../../../../resources/svg'
+import svg from '../../../../resources/svg'
 
 class TxBar extends React.Component {
   render () {

@@ -2,12 +2,15 @@ import React from 'react'
 import Restore from 'react-restore'
 import link from '../../resources/link'
 
-import Aux from '../../resources/Components/FooterAux'
+// import Aux from '../../resources/Components/FooterAux'
 
-import Main from './Main'
+import Account from './Account'
 import Notify from './Notify'
 import Menu from './Menu'
 import Badge from './Badge'
+
+import Backdrop from './Backdrop'
+import AccountSelector from './AccountSelector'
 
 // import DevTools from 'restore-devtools'
 // <DevTools />
@@ -73,11 +76,20 @@ class Panel extends React.Component {
     })
     return (
       <div id='panel' style={{ opacity }}>
+        {/* <Overlay /> */}
         <Badge />
-        <Menu />
         <Notify />
-        <Main />
-        <Aux />
+
+        <Menu />
+
+        <AccountSelector />
+        <Account />
+        <Backdrop />
+        
+        {/* <AccountSelector />
+        <OpenAccount /> */}
+        {/* <Main />
+        <Aux /> */}
       </div>
     )
   }

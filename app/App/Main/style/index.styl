@@ -10,6 +10,13 @@
   opacity 1
   transition 5s linear all
 
+.footerModule
+  position absolute
+  bottom 0px
+  left 0px 
+  right 0px
+  height 10px
+
 #panelScroll
   position absolute
   top 80px
@@ -23,67 +30,6 @@
   border-radius 18px
   transition var(--standard)
   overflow hidden
-
-  .panelFilter
-    background var(--ghostZ)
-    position absolute
-    top 0px
-    left 0px
-    right 0px
-    height 48px
-    z-index 2
-    overflow hidden
-    background var(--ghostZ)
-    transition var(--standardFast)
-
-    .panelFilterIcon
-      position absolute
-      top 0
-      left 0
-      bottom 0
-      width 48px
-      display flex
-      justify-content center
-      align-items center
-      background var(--ghostZ)
-
-    .panelFilterInput
-      position absolute
-      top 0
-      left 0
-      bottom 0
-      right 0
-
-      input 
-        width 100%
-        height 100%
-        border none
-        outline none
-        text-align center
-        background transparent
-        color var(--outerspace)
-        font-size 18px
-        font-family 'Exo2'
-        padding-bottom 4px
-
-    .panelFilterClear
-      position absolute
-      top 0
-      right 0
-      bottom 0
-      width 48px
-      display flex
-      justify-content center
-      align-items center
-      color var(--outerspace)
-      cursor pointer
-      border-bottom-left-radius 9px
-
-      *
-        pointer-events none
-
-    .panelFilterClear:hover
-      background linear-gradient(45deg, var(--ghostA), var(--ghostZ))
 
   .panelScrollOverlay
     position absolute
@@ -105,79 +51,6 @@
 
   #panelSlide::-webkit-scrollbar
     display none
-
-  #panelWrap
-    padding 48px 4px 32px 4px
-    will-change scroll-position
-
-    .noSigners
-      width 100%
-      display flex
-      justify-content center
-      align-items center
-      flex-direction column
-      font-weight 300
-      font-size 19px
-      position relative
-      z-index 100
-
-      .introLogo
-        padding-bottom 38px
-
-        svg
-          fill var(--outerspace)
-
-      .getStarted
-        margin-top 30px
-        box-sizing border-box
-        border-radius 12px
-        padding 20px
-        font-size 14px
-        margin 20px
-        text-align center
-        font-weight 500
-        background var(--outerspace)
-        color var(--spacewhite)
-        line-height 24px
-
-        .getStartedPlus
-          display inline-block
-          position relative
-          top 4px
-          border 2px solid var(--spacewhite)
-          width 43px
-          height 22px
-          border-radius 11px
-          text-align center
-          margin 0px 5px 0px 5px
-          box-sizing border-box
-
-          span 
-            position relative
-            top -3px
-            left 2px
-            font-size 17px
-
-      .featureBox
-        display flex
-        justify-content center
-        align-items center
-        flex-direction column
-        margin-top 30px
-
-        .featureBoxText
-          font-size 13px
-          font-weight 400
-          letter-spacing 4px
-
-        .featureBoxSubtext
-          margin-top 8px
-          font-size 10px
-          font-weight 500
-          font-family FiraCode, monospace
-          justify-content center
-          letter-spacing 1px
-          opacity 0.7
 
 .signersSlide
   position absolute

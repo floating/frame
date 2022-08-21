@@ -1,0 +1,27 @@
+.backdrop
+  position absolute
+  top 80px
+  right 8px
+  left 8px
+  bottom 40px
+  z-index 1
+  pointer-events none
+  transition var(--standard)
+  background var(--ghostZ)
+  border-radius 20px
+
+.overlay
+  position absolute
+  display none
+  top 80px
+  right 8px
+  left 8px
+  bottom 40px
+  z-index 1000 // top
+  pointer-events none
+  transition var(--standard)
+  // background green
+  opacity 1
+  border-radius 20px
+  box-shadow inset 0px 2px 6px var(--ghostY)
+  

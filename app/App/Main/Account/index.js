@@ -1058,12 +1058,12 @@ class Account extends React.Component {
       style.position = 'absolute'
       style.top = initial.top // open ? 40 : initial.top
       style.bottom = initial.bottom // open ? 3 : initial.bottom
-      style.left = '4px'
-      style.right = '4px'
+      style.left = '0px'
+      style.right = '0px'
       style.zIndex = '100000000'
       const panelHeight = document.body.offsetHeight
       style.height = open ? panelHeight - 62 - 3 : initial.height - 3
-      let top = (initial.top - 6) * -1
+      let top = (initial.top + 60) * -1
       style.transform = open ? `translateY(${top}px)` : 'translateY(0px)'
     } else if (this.store('selected.current') !== '') {
       // Not currently selected, but another signer is
