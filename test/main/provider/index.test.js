@@ -951,11 +951,14 @@ describe('#send', () => {
     }
 
     const validRequests = [
-      // the first 2 parameters are reversed for V1
-      { method: 'eth_signTypedData', params: [typedData, address], version: 'V1' },
-      { method: 'eth_signTypedData_v1', params: [typedData, address], version: 'V1' },
+      { method: 'eth_signTypedData', params: [address, typedData], version: 'V1' },
+      { method: 'eth_signTypedData_v1', params: [address, typedData], version: 'V1' },
       { method: 'eth_signTypedData_v3', params: [address, typedData], version: 'V3' },
-      { method: 'eth_signTypedData_v4', params: [address, typedData], version: 'V4' }
+      { method: 'eth_signTypedData_v4', params: [address, typedData], version: 'V4' },
+      { method: 'eth_signTypedData', params: [typedData, address], version: 'V1', dataFirst: true },
+      { method: 'eth_signTypedData_v1', params: [typedData, address], version: 'V1', dataFirst: true },
+      { method: 'eth_signTypedData_v3', params: [typedData, address], version: 'V3', dataFirst: true },
+      { method: 'eth_signTypedData_v4', params: [typedData, address], version: 'V4', dataFirst: true }
     ]
 
     function verifyRequest (version) {
@@ -966,8 +969,8 @@ describe('#send', () => {
       expect(accountRequests[0].version).toBe(version)
     }
     
-    validRequests.forEach(({ method, params, version }) => {
-      it(`submits a ${method} request to sign typed data`, () => {
+    validRequests.forEach(({ method, params, version, dataFirst }) => {
+      it(`submits a ${method} request to sign typed data${dataFirst ? ' with data sent as the first param' : ''}`, () => {
         send({ method, params })
   
         verifyRequest(version)
