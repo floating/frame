@@ -578,12 +578,29 @@ class Notify extends React.Component {
           {this.hotSignerMismatch()}
         </div>
       )
-    } else if (notify === 'confirm') {
+    } else if (notify === 'confirmRemoveChain') {
+      const { chain } = notifyData
+
+      const onAccept = () => {
+        link.send('tray:action', 'removeNetwork', chain)
+
+        // if accepted, go back twice to get back to the main chains panel
+        link.send('tray:action', 'backDash', 2)
+      }
+
+      const onDecline = () => {
+        link.send('tray:action', 'backDash')
+      }
+
       return (
         <div className='notify cardShow'>
           <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
             <div className='notifyBoxSlide'>
-              <Confirm {...notifyData} />
+              <Confirm
+                prompt='Are you sure you want to remove this chain?'
+                onAccept={onAccept}
+                onDecline={onDecline}
+              />
             </div>
           </div>
         </div>

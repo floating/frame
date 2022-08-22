@@ -15,23 +15,15 @@ function UpdateChain ({ chain }) {
   const RemoveChainButton = () => {
     return (
       <DangerousSubmitButton
-        handleClick={async () => {
-          const { accepted } = await link.invoke('dash:confirm', { prompt: 'Are you sure you want to remove this chain?' })
-
-          if (accepted) {
-            link.send('tray:action', 'removeNetwork', chain)
-
-            // if accepted, go back twice to get back to the main chains panel
-            link.send('tray:action', 'backDash')
-          }
-
-          // if declined, go back once to get to the chain update panel
-          link.send('tray:action', 'backDash')
-        }}
         text='Remove Chain'
+        handleClick={() => {
+          const confirmAction = { view: 'notify', data: { notify: 'confirmRemoveChain', notifyData: { chain } } }
+          link.send('tray:action', 'navDash', confirmAction)
+        }}
       />
     )
   }
+
   return (
     <>
       <ChainEditForm

@@ -1,20 +1,20 @@
 import React, { useState } from 'react'
 
-import link from '../../../resources/link'
-
-export default function ConfirmDialog ({ id, prompt, acceptText = 'OK', declineText = 'Decline' }) {
+export default function ConfirmDialog ({ id, prompt, acceptText = 'OK', declineText = 'Decline', onAccept, onDecline }) {
   const [submitted, setSubmitted] = useState(false)
 
-  const clickHandler = (evt, response) => {
+  console.log('confirm', { prompt, onAccept, onDecline })
+
+  const clickHandler = (evt, onClick) => {
     if (evt.button === 0 && !submitted) {
       setSubmitted(true)
-      link.send('dash:resolveConfirm', id, response)
+      onClick()
     }
   }
 
-  const ResponseButton = ({ text, response }) => {
+  const ResponseButton = ({ text, onClick }) => {
     return (
-      <div role='button' className='confirmButton' onClick={(evt) => clickHandler(evt, response)}>
+      <div role='button' className='confirmButton' onClick={(evt) => clickHandler(evt, onClick)}>
         {text}
       </div>
     )
@@ -25,8 +25,8 @@ export default function ConfirmDialog ({ id, prompt, acceptText = 'OK', declineT
       <div className='confirmText'>{prompt}</div>
 
       <div className='confirmButtonOptions'>
-        <ResponseButton text={declineText} response={false} />
-        <ResponseButton text={acceptText} response={true} />
+        <ResponseButton text={declineText} onClick={onDecline} />
+        <ResponseButton text={acceptText} onClick={onAccept} />
       </div>
     </div>
   )

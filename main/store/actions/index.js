@@ -643,9 +643,14 @@ module.exports = {
     })
     u('dash.showing', () => true)
   },
-  backDash: (u) => {
+  backDash: (u, numSteps = 1) => {
+    console.log({ backDash: numSteps })
     u('dash.nav', nav => {
-      nav.shift()
+      while (numSteps > 0) {
+        nav.shift()
+        numSteps--
+      }
+
       return nav
     })
   },

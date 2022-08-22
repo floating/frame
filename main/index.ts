@@ -166,27 +166,6 @@ ipcMain.on('dash:reloadSigner', (e, id) => {
   signers.reload(id)
 })
 
-type Confirm = {
-  resolve: (...params: any) => void
-}
-
-const confirms: Record<string, Confirm> = {}
-
-ipcMain.on('dash:resolveConfirm', (e, confirmId, result) => {
-  confirms[confirmId].resolve({ accepted: !!result })
-  delete confirms[confirmId]
-})
-
-ipcMain.handle('dash:confirm', (e, data) => {
-  const confirmId = 'confirm-' + randomUUID()
-  const notifyData = { ...data, id: confirmId }
-
-  return new Promise((resolve) => {
-    confirms[confirmId] = { resolve }
-    store.navDash({ view: 'notify', data: { notify: 'confirm', notifyData } })
-  })
-})
-
 ipcMain.on('tray:resolveRequest', (e, req) => {
   accounts.resolveRequest(req)
 })
