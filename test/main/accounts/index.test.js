@@ -822,6 +822,7 @@ describe('#removeRequest', () => {
 
 describe('#removeRequests', () => {
   beforeEach(() => {
+    store.setGasFees('ethereum', '1', { maxBaseFeePerGas: '', maxPriorityFeePerGas: '' })
     Accounts.removeRequest = jest.fn()
     Accounts.addRequest(request)
     Accounts.setSigner(account2.address, () => {
