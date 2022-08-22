@@ -547,6 +547,14 @@ export class Accounts extends EventEmitter {
     }
   }
 
+  removeRequests (handlerId: string) {
+    Object.values(this.accounts).forEach((account) => {
+      if (account.requests[handlerId]) {
+        this.removeRequest(account, handlerId)
+      }
+    })
+  }
+
   removeRequest (account: FrameAccount, handlerId: string) {
     log.info(`removeRequest(${account.id}, ${handlerId})`)
 
