@@ -6,7 +6,6 @@ export default function ConfirmDialog ({ id, prompt, acceptText = 'OK', declineT
   const [submitted, setSubmitted] = useState(false)
 
   const clickHandler = (evt, response) => {
-    console.log('CLICK!', { evt, response })
     if (evt.button === 0 && !submitted) {
       setSubmitted(true)
       link.send('dash:resolveConfirm', id, response)
