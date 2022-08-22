@@ -281,14 +281,12 @@ class FrameAccount {
     }
   }
 
-  private async revealDetails (req: TransactionRequest) {
-    const tx = req.data
-    const calldata = tx.data
-    const chainId = tx.chainId
+  private async recipientIdentity (req: TransactionRequest) {
+    const { to, chainId } = req.data
 
-    if (tx.to) { // Get recipient idenity
+    if (to) { // Get recipient identity
       try {
-        const recipient = await reveal.identity(tx.to, tx.chainId)
+        const recipient = await reveal.identity(to, chainId)
         const knownTxRequest = this.requests[req.handlerId] as TransactionRequest
   
         if (recipient && knownTxRequest) {
@@ -300,11 +298,14 @@ class FrameAccount {
         log.warn(e)
       }
     }
+  }
 
-    if (calldata && calldata !== '0x' && parseInt(calldata, 16) !== 0) { 
-      
+  private async decodeCalldata (req: TransactionRequest) {
+    const { to, chainId, data: calldata } = req.data
+
+    if (to && calldata && calldata !== '0x' && parseInt(calldata, 16) !== 0) { 
       try { // Decode calldata
-        const decodedData = await reveal.decode(tx.to || '', chainId, calldata)
+        const decodedData = await reveal.decode(to, chainId, calldata)
         const knownTxRequest = this.requests[req.handlerId] as TransactionRequest
   
         if (knownTxRequest && decodedData) {
@@ -314,11 +315,17 @@ class FrameAccount {
       } catch (e) {
         log.warn(e)
       }
+    }
+  }
 
+  private async recognizeActions (req: TransactionRequest) {
+    const { to, chainId, data: calldata } = req.data
+
+    if (to && calldata && calldata !== '0x' && parseInt(calldata, 16) !== 0) { 
       try { // Recognize actions
-        const actions = await reveal.recog(tx.to || '', chainId, calldata)
+        const actions = await reveal.recog(to, chainId, calldata)
         const knownTxRequest = this.requests[req.handlerId] as TransactionRequest
-  
+
         if (knownTxRequest && actions ) {
           knownTxRequest.recognizedActions = actions
           this.update()
@@ -326,11 +333,13 @@ class FrameAccount {
       } catch (e) {
         log.warn(e)
       }
-
-      // try { // Simulate actions 
-      // } catch (e) {
-      // }
     }
+  }
+
+  private async revealDetails (req: TransactionRequest) {
+    this.recipientIdentity(req)
+    this.decodeCalldata(req)
+    this.recognizeActions(req)
   }
 
   addRequest (req: any, res: RPCCallback<any> = () => {}) {

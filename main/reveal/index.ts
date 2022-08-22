@@ -82,28 +82,23 @@ async function recogErc20 (actions: Actions, contractAddress: string, chainId: s
 }
 
 const surface = {
-  identity: async (address: string, chainId: string) => {
+  identity: async (address: string = '', chainId: string) => {
     // Resolve ens, type and other data about address entities 
-    const results = await Promise.all([
+    const [type, ens] = await Promise.all([
       resolveEntityType(address, chainId),
       resolveEnsName(address)
     ])
     // TODO: Check the address against various scam dbs
     // TODO: Check the address against user's contact list
     // TODO: Check the address against previously verified contracts
-    const identityResults = {
-      type: results[0],
-      ens: results[1]
-    }
-    console.log('identityResults', identityResults)
-    return identityResults
+    return { type, ens }
   },
-  decode: async (contractAddress: string, chainId: string, calldata: string) => {
+  decode: async (contractAddress: string = '', chainId: string, calldata: string) => {
     // Decode calldata
-    const decodedCalldata = await decodeContractCall(contractAddress || '', chainId, calldata)
+    const decodedCalldata = await decodeContractCall(contractAddress, chainId, calldata)
     return decodedCalldata
   },
-  recog: async (contractAddress: string, chainId: string, calldata: string) => {
+  recog: async (contractAddress: string = '', chainId: string, calldata: string) => {
     // Recognize actions from standard tx types
     const actions: Actions = []
     await recogErc20(actions, contractAddress, chainId, calldata)
