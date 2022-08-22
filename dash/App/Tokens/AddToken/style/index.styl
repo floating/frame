@@ -185,7 +185,7 @@
 .addTokenSubmit
   background var(--ghostA)
   width 100%
-  margin 25px
+  margin 0px 25px
   height 48px
   border-radius 16px
   font-weight 500
@@ -209,8 +209,13 @@
 
 .addTokenSubmitEnabled
   background var(--ghostB)
-  color var(--good)
   opacity 1
   cursor pointer
   * 
     pointer-events none
+
+.addTokenSubmitGood
+  color var(--good)
+
+.addTokenSubmitBad
+  color var(--bad)

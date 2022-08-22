@@ -8,6 +8,7 @@ import { usesBaseFee } from '../../../main/transaction'
 
 import frameIcon from './FrameIcon.png'
 
+import Confirm from '../../../resources/Components/Confirm'
 import AddChain from './AddChain'
 import UpdateChain from './UpdateChain'
 
@@ -577,6 +578,17 @@ class Notify extends React.Component {
           {this.hotSignerMismatch()}
         </div>
       )
+    } else if (notify === 'confirm') {
+      console.log({ notifyData })
+      return (
+        <div className='notify cardShow'>
+          <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
+            <div className='notifyBoxSlide'>
+              <Confirm {...notifyData} />
+            </div>
+          </div>
+        </div>
+      )
     } else if (notify === 'openExternal') {
       return (
         <div className='notify cardShow'>
@@ -592,13 +604,21 @@ class Notify extends React.Component {
     } else if (notify === 'addChain') {
       return (
         <div className='notify cardShow'>
-          <AddChain {...notifyData} />
+          <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
+            <div className='notifyBoxSlide'>
+              <AddChain {...notifyData} />
+            </div>
+          </div>
         </div>
       )
     } else if (notify === 'updateChain') {
       return (
         <div className='notify cardShow'>
-          <UpdateChain {...notifyData} />
+          <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
+            <div className='notifyBoxSlide'>
+              <UpdateChain {...notifyData} />
+            </div>
+          </div>
         </div>
       )
     } else {
