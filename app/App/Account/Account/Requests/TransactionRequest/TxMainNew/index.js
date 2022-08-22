@@ -118,22 +118,21 @@ class TxRecipient extends React.Component {
                 </div>
               )
             ) : null}
-            <div className='_txMainValue' >
-              {txMeta.replacement ? (
-                txMeta.possible ? (
-                  <div className='approveRequestHeaderTag'>
-                    valid replacement
-                  </div>
-                ) : (
-                  <div className='approveRequestHeaderTag approveRequestHeaderTagInvalid'>
-                    {txMeta.notice || 'invalid duplicate'}
-                  </div>
-                )
-              ) : null}
-                  
-              <div className='_txDescription' onClick={() => {
-                link.send('nav:update', 'panel', { step: 'viewData' })
-              }}>
+            {txMeta.replacement ? (
+              txMeta.possible ? (
+                <div className='approveRequestHeaderTag'>
+                  valid replacement
+                </div>
+              ) : (
+                <div className='approveRequestHeaderTag approveRequestHeaderTagInvalid'>
+                  {txMeta.notice || 'invalid duplicate'}
+                </div>
+              )
+            ) : null}
+            <div className='_txMainValue _txMainValueClickable' onClick={() => {
+              link.send('nav:update', 'panel', { step: 'viewData' })
+            }}>
+              <div className='_txDescription'>
                 {req.recipientType === 'external' ? (
                   <div className='_txDescriptionSummary'>
                     {req.data.value && req.data.value !== '0x' && req.data.value !== '0x0' ? (

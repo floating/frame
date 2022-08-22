@@ -1,9 +1,7 @@
 import React from 'react'
 import Restore from 'react-restore'
 import utils from 'web3-utils'
-import BigNumber from 'bignumber.js'
 
-import { usesBaseFee } from '../../../../../../resources/domain/transaction'
 import svg from '../../../../../../resources/svg'
 import link from '../../../../../../resources/link'
 
@@ -18,51 +16,6 @@ import AdjustFee from './AdjustFee'
 import ViewData from './ViewData'
 import TxApproval from './TxApproval'
 
-const FEE_WARNING_THRESHOLD_USD = 50
-
-class Time extends React.Component {
-  constructor (...args) {
-    super(...args)
-    this.state = {
-      time: Date.now()
-    }
-    setInterval(() => {
-      this.setState({ time: Date.now() })
-    }, 1000)
-  }
-
-  msToTime (duration) {
-    const seconds = Math.floor((duration / 1000) % 60)
-    const minutes = Math.floor((duration / (1000 * 60)) % 60)
-    const hours = Math.floor((duration / (1000 * 60 * 60)) % 24)
-    let label, time
-    if (hours) {
-      label = hours === 1 ? 'hour ago' : 'hours ago'
-      time = hours
-    } else if (minutes) {
-      label = minutes === 1 ? 'minute ago' : 'minutes ago'
-      time = minutes
-    } else {
-      label = 'seconds ago'
-      time = seconds
-    }
-    return { time, label }
-  }
-
-  render () {
-    const { time, label } = this.msToTime(this.state.time - this.props.time)
-    return (
-      <div className='txProgressSuccessItem txProgressSuccessItemRight'>
-        <div className='txProgressSuccessItemValue'>
-          {time}
-        </div>
-        <div className='txProgressSuccessItemLabel'>
-          {label}
-        </div>
-      </div>
-    )
-  }
-}
 
 class TransactionRequest extends React.Component {
   constructor (props, context) {
@@ -130,10 +83,6 @@ class TransactionRequest extends React.Component {
     this.setState({ overlayMode: mode })
   }
 
-  toDisplayUSD (bn) {
-    return bn.toFixed(2, BigNumber.ROUND_UP).toString()
-  }
-
   allowOtherChain () {
     this.setState({ allowOtherChain: true })
   }
@@ -151,73 +100,6 @@ class TransactionRequest extends React.Component {
       <ViewData {...this.props} />
     )
   }
-  // renderApprovalButtons (req) {
-  //   if (req.notice) {
-  //     return null
-  //   } else {
-  //     return (
-  //       <div className='requestApprove' style={{
-  //         transform: req.automaticFeeUpdateNotice ? 'translateY(92px)' : 'translateY(0px)'
-  //       }}>
-  //         <div 
-  //           className={req.automaticFeeUpdateNotice ? 'requestApproveFeeBlock requestApproveFeeBlockActive' : 'requestApproveFeeBlock'}
-  //         >
-  //           <div className='requestApproveFeeButton requestApproveFeeReject' onClick={() => {
-  //             const { previousFee } = req.automaticFeeUpdateNotice
-  //             if (previousFee.type === '0x2') {
-  //               link.rpc('setBaseFee', previousFee.baseFee, req.handlerId, e => { if (e) console.error(e) })
-  //               link.rpc('setPriorityFee', previousFee.priorityFee, req.handlerId, e => { if (e) console.error(e) })
-  //             } else if (previousFee.type === '0x0')  {
-  //               link.rpc('setGasPrice', previousFee.gasPrice, req.handlerId, e => { if (e) console.error(e) })
-  //             }
-  //           }}>{'reject fee'}</div>
-  //           <div className='requestApproveFeeText'>{'Fee Updated'}</div>
-  //           <div className='requestApproveFeeButton requestApproveFeeAccept' onClick={() => {
-  //             link.rpc('removeFeeUpdateNotice', req.handlerId, e => { if (e) console.error(e) })
-  //           }}>{'accept fee'}</div>
-  //         </div>
-  //         <div
-  //           className='requestDecline' 
-  //           style={{ 
-  //             pointerEvents: this.state.allowInput && !req.automaticFeeUpdateNotice ? 'auto' : 'none',
-  //             opacity: req.automaticFeeUpdateNotice ? 0.2 : 1
-  //           }}
-  //           onClick={() => {
-  //             if (this.state.allowInput && !req.automaticFeeUpdateNotice) this.decline(req)
-  //           }}
-  //         >
-  //           <div className='requestDeclineButton _txButton _txButtonBad'>Decline</div>
-  //         </div>
-  //         <div
-  //           className='requestSign' 
-  //           style={{ 
-  //             pointerEvents: this.state.allowInput && !req.automaticFeeUpdateNotice ? 'auto' : 'none',
-  //             opacity: req.automaticFeeUpdateNotice ? 0.2 : 1
-  //           }}
-  //           onClick={() => {
-  //             if (this.state.allowInput && !req.automaticFeeUpdateNotice) {
-  //               link.rpc('signerCompatibility', req.handlerId, (e, compatibility) => {
-  //                 if (e === 'No signer')  {
-  //                   this.store.notify('noSignerWarning', { req })
-  //                 } else if (e === 'Signer locked') {
-  //                   this.store.notify('signerLockedWarning', { req })
-  //                 } else if (!compatibility.compatible && !this.store('main.mute.signerCompatibilityWarning')) {
-  //                   this.store.notify('signerCompatibilityWarning', { req, compatibility, chain: this.chain })
-  //                 } else if ((maxFeeUSD.toNumber() > FEE_WARNING_THRESHOLD_USD || this.toDisplayUSD(maxFeeUSD) === '0.00') && !this.store('main.mute.gasFeeWarning')) {
-  //                   this.store.notify('gasFeeWarning', { req, feeUSD: this.toDisplayUSD(maxFeeUSD), currentSymbol })
-  //                 } else {
-  //                   this.approve(req.handlerId, req)
-  //                 }
-  //               })
-  //             }}
-  //           }
-  //         >
-  //           <div className='requestSignButton _txButton'> Sign </div>
-  //         </div>
-  //       </div>
-  //     )
-  //   }
-  // }
 
   renderTx () {
     const { accountId, handlerId } = this.props
@@ -243,25 +125,6 @@ class TransactionRequest extends React.Component {
     const value = this.hexToDisplayValue(req.data.value || '0x')
     const currentSymbol = this.store('main.networks', this.chain.type, this.chain.id, 'symbol') || '?'
 
-    let maxFeePerGas, maxFee, maxFeeUSD
-
-    if (usesBaseFee(req.data)) {
-      const gasLimit = BigNumber(req.data.gasLimit, 16)
-      maxFeePerGas = BigNumber(req.data.maxFeePerGas, 16)
-      maxFee = maxFeePerGas.multipliedBy(gasLimit)
-      maxFeeUSD = maxFee.shiftedBy(-18).multipliedBy(nativeUSD)
-    } else {
-      const gasLimit = BigNumber(req.data.gasLimit, 16)
-      maxFeePerGas = BigNumber(req.data.gasPrice, 16)
-      maxFee = maxFeePerGas.multipliedBy(gasLimit)
-      maxFeeUSD = maxFee.shiftedBy(-18).multipliedBy(nativeUSD)
-    }
-
-    // const height = req.status === 'error' ? '215px' : mode === 'monitor' ? '215px' : '340px'
-    // const z = mode === 'monitor' ? this.props.z + 2000 - (this.props.i * 2) : this.props.z
-    const confirmations = req.tx && req.tx.confirmations ? req.tx.confirmations : 0
-    const statusClass = req.status === 'error' ? 'txStatus txStatusError' : 'txStatus'
-    // if (!success && !error) statusClass += ' txStatusCompact'
 
     const insufficientFundsMatch = originalNotice.includes('insufficient funds')
     if (insufficientFundsMatch) {
@@ -308,22 +171,6 @@ class TransactionRequest extends React.Component {
     let nonce = parseInt(req.data.nonce, 'hex')
     if (isNaN(nonce)) nonce = 'TBD'
 
-    let feeAtTime = '?.??'
-
-    if (req && req.tx && req.tx.receipt && nativeUSD) {
-      const { gasUsed, effectiveGasPrice } = req.tx.receipt
-      const { type, gasPrice } = req.data
-
-      const paidGas = effectiveGasPrice || (parseInt(type) < 2 ? gasPrice : null)
-
-      if (paidGas) {
-        const feeInWei = parseInt(gasUsed, 'hex') * parseInt(paidGas, 'hex')
-        const feeInEth = feeInWei / 1e18
-        const feeInUsd = feeInEth * nativeUSD
-        feeAtTime = (Math.round(feeInUsd * 100) / 100).toFixed(2)
-      }
-    }
-
     const showWarning = !status && mode !== 'monitor'
     const requiredApproval = showWarning && (req.approvals || []).filter(a => !a.approved)[0]
 
@@ -351,6 +198,23 @@ class TransactionRequest extends React.Component {
                   <TxRecipient i={3 + recognizedActions.length} {...this.props} req={req} />
                   <TxFeeNew i={4 + recognizedActions.length} {...this.props} req={req} chain={this.chain} />
                 </div>
+            </div>
+            <div className={req.automaticFeeUpdateNotice ? 'requestFooter requestFooterActive' : 'requestFooter'}>
+              <div className='requestApproveFee'>
+                <div className='requestApproveFeeText'>{'Fee Updated'}</div>
+                <div className='requestApproveFeeButton' onClick={() => {
+                  link.rpc('removeFeeUpdateNotice', req.handlerId, e => { if (e) console.error(e) })
+                }}>{'Ok'}</div>
+              </div>
+              {/* <div className='' onClick={() => {
+                const { previousFee } = req.automaticFeeUpdateNotice
+                if (previousFee.type === '0x2') {
+                  link.rpc('setBaseFee', previousFee.baseFee, req.handlerId, e => { if (e) console.error(e) })
+                  link.rpc('setPriorityFee', previousFee.priorityFee, req.handlerId, e => { if (e) console.error(e) })
+                } else if (previousFee.type === '0x0')  {
+                  link.rpc('setGasPrice', previousFee.gasPrice, req.handlerId, e => { if (e) console.error(e) })
+                }
+              }}>{'Revert'}</div> */}
             </div>
           </div>
         ) : (

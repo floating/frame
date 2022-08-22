@@ -155,26 +155,10 @@ class AccountSelector extends React.Component {
   }
 
   render () {
-    const accounts = this.store('main.accounts')
     const current = this.store('selected.current')
-    const scrollTop = this.store('selected.position.scrollTop')
-    const open = current && this.store('selected.open')
 
-    const sortedAccounts = Object.keys(accounts).sort((a, b) => this.accountSort(accounts, a, b))
-
-    const filter = this.store('panel.accountFilter')
-
-    const { data } = this.store('panel.nav')[0] || {}
-
-    const panelScrollStyle = current ? { pointerEvents: 'none' } : {}
-
-    // if (open) panelScrollStyle.top = '146px'
-
-    const crumb = this.store('windows.panel.nav')[0] || {}
-   // if (crumb.view === 'requestView') panelScrollStyle.bottom = '142px'
-    
     return (
-      <div className='accountSelector' style={panelScrollStyle}>
+      <div className={current ? 'accountSelector accountSelectorDisabled' : 'accountSelector'}>
         {this.renderAccountFilter()}
         {this.renderAccountList()}
       </div>

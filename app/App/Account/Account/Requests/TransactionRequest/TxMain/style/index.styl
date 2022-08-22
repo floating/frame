@@ -5,12 +5,8 @@
   margin 16px 6px
   border-radius 14px
   padding 5px 0px 5px 0px
-  // animation-name cardShow
-  // animation-duration 0.2s
-  // animation-fill-mode both
   overflow hidden
   box-shadow 0px 4px 8px var(--ghostY)
-  cursor pointer
 
   ._txMainInner
     margin 0px 5px
@@ -21,7 +17,6 @@
       border-radius 10px
       -webkit-app-region no-drag
       transition none
-      pointer-events auto
       transform translate3d(0, 0, 0)
       font-family 'Exo2'
       overflow hidden
@@ -100,18 +95,26 @@
         border-radius 8px
         -webkit-app-region no-drag
         transition none
-        pointer-events auto
         transform translate3d(0, 0, 0)
         font-family 'Exo2'
         padding 8px
         background var(--ghostA)
         margin-top 5px
-        cursor pointer
         
         svg
           position relative
           top -0px
           padding 0px 3px 0px 4px
+
+      ._txMainValueClickable
+        cursor pointer
+        background var(--ghostA)
+        
+        *
+          pointer-events none
+
+      ._txMainValueClickable:hover
+        background var(--ghostB)
       
   ._txMainTag
     position relative

@@ -71,23 +71,14 @@
     padding 0px 0px 5px 0px
 
   .signerAddress
-    font-size 10px
     font-family FiraCode, monospace
-    letter-spacing 0px
-    position absolute
-    top 0px
-    left 0px
-    bottom 0px
-    right 0px
-    padding-top 0px
-    transform translateZ(0)
 
     .transactionToAddressLargeWrap
       position absolute
-      top 14px
-      left 61px
+      top 17px
+      left 81px
       height 40px
-      width 140px
+      width 164px
       cursor pointer
       z-index 5
 
@@ -98,7 +89,7 @@
       right 0px
       bottom 0px
       display flex
-      font-size 17px
+      font-size 20px
       opacity 1
       pointer-events none
 
@@ -173,33 +164,33 @@
 
     .accountNotificationBadge
       position absolute
-      top 15px
+      top 20px
       right 60px
-      height 33px
-      width 33px
+      height 42px
+      width 42px
       z-index 400000
-      border-radius 18px
+      border-radius 21px
       display flex
       justify-content center
       align-items center
-      font-size 17px
+      font-size 18px
       font-weight 400
       font-family FiraCode, monospace
       color var(--ghostZ)
       transition var(--standard)
-      border 1px solid var(--ghostZ)
+      background var(--ghostB)
+      padding-top 2px
+      box-sizing border-box
       pointer-events none
 
     .accountNotificationBadgeReady
       color var(--outerspace)
       background var(--ghostC)
       transition var(--standardFast)
-      border 1px solid var(--ghostX)
 
     .accountNotificationBadgeActive
       background var(--good)
       color var(--goodOver)
-      border 1px solid transparent
       opacity 1
 
     .transactionToAddress
@@ -219,30 +210,20 @@
 
     .signerSelect
       position absolute 
-      // position relative
       top 0px
       right 0px
-      // 
-      // display flex
-      // justify-content center
-      // align-items center
+      bottom 0px
       width 90px
-      // margin 0px 30px
-      height 63px
-      // 
       box-sizing border-box
-      // 
       z-index 300000
-      // background blu
       border-radius 16px
-      // border-bottom-right-radius 8px
       
       .signerSelectIconWrap
         width 100%
         height 100%
         transform rotate(0deg)
         box-sizing border-box
-        padding 18px 15px 0px 49px
+        padding 28px 16px 0px 48px
         cursor pointer
         transform translateX(-2px)
         // border-left 1px solid var(--ghostA)
@@ -285,12 +266,13 @@
 
     .accountIndicator
       position absolute 
-      background var(--ghostY)
-      top 16px
-      left 6px
-      bottom 15px
+      top 12px
+      left 12px
+      bottom 12px
+      box-sizing border-box
+      border-radius 8px
       width 3px
-      border-radius 2px
+      background var(--ghostZ)
     
     .accountIndicatorGood
       background var(--good)
@@ -301,22 +283,13 @@
     .signerType
       position absolute 
       top 0px
-      left 0px
-      width 80px
-      height 63px
-      // margin 0px 30px
-      
-      // background red
-      // margin-left -55px
-      z-index 3400      /// background linear-gradient(var(--ghostB), var(--ghostB))
-      // background linear-gradient(var(--ghostB), var(--ghostD))
-      // box-shadow 0px 2px 3px var(--thin), 0px 19px 9px -14px var(--thin) !important
-      // border-radius 14px
-      // border-bottom-right-radius 16px
+      left 16px
+      bottom 0px
+      width 64px
+      z-index 3400
       transition var(--standard)
       -webkit-app-region no-drag
       box-sizing border-box
-      // padding 12px
       z-index 300000
 
       .signerTypeStatusBadge
@@ -342,32 +315,16 @@
         left 11px
 
       .signerSelectIconWrap
-        // position relative
-        // background var(--ghostD)
-        
-        // width 40px
-        // height 39px
-        // border-radius 14px
-        // transform rotate(0deg)
         position absolute
-        top 0
-        left 12px
-        right 23px
-        bottom 0px
-
-        
-        // box-sizing border-box
-        // padding 10px
+        top 6px
+        left 16px
+        width 32px
+        bottom 6px
         cursor pointer
-        // margin-left 6px
-        // background red
-        // box-shadow 0px 4px 6px -1px var(--thin)
-        // display flex
-        // padding 19px 9px
-        // color var(--good)
         display flex
         justify-content center
         align-items center
+        border-radius 8px
 
         div, svg
           pointer-events none
@@ -699,8 +656,8 @@
 
     .signerName
       position absolute
-      bottom 12px
-      left 62px
+      bottom 18px
+      left 81px
       overflow hidden
       display flex
       justify-content center
@@ -715,7 +672,7 @@
         // padding-bottom 0px
         position relative
         transition var(--standard)
-        font-size 12px
+        font-size 13px
         display flex
         justify-content center
         align-items center
@@ -809,8 +766,12 @@
           svg
             transition var(--standardSlow)
 
-  // .signerTopActive
-  //   background var(--ghostC)
+  .signerTopActive
+    pointer-events auto !important
+    .signerSelect
+      pointer-events auto !important
+    .transactionToAddressLargeWrap
+      pointer-events auto !important
 
   .accountListWrap
     position absolute

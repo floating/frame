@@ -2,15 +2,63 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import Restore from 'react-restore'
 import utils from 'web3-utils'
+import BigNumber from 'bignumber.js'
 
 import Account from './Account'
-
-// import Filter from '../../Components/Filter'
-
 import TxBar from './TxBar'
 
 import svg from '../../../resources/svg'
 import link from '../../../resources/link'
+
+import { usesBaseFee } from '../../../resources/domain/transaction'
+
+const FEE_WARNING_THRESHOLD_USD = 50
+
+class Time extends React.Component {
+  constructor (...args) {
+    super(...args)
+    this.state = {
+      time: Date.now()
+    }
+    setInterval(() => {
+      this.setState({ time: Date.now() })
+    }, 1000)
+  }
+
+  msToTime (duration) {
+    const seconds = Math.floor((duration / 1000) % 60)
+    const minutes = Math.floor((duration / (1000 * 60)) % 60)
+    const hours = Math.floor((duration / (1000 * 60 * 60)) % 24)
+    let label, time
+    if (hours) {
+      label = hours === 1 ? 'hour ago' : 'hours ago'
+      time = hours
+    } else if (minutes) {
+      label = minutes === 1 ? 'minute ago' : 'minutes ago'
+      time = minutes
+    } else {
+      label = 'seconds ago'
+      time = seconds
+    }
+    return { time, label }
+  }
+
+  render () {
+    const { time, label } = this.msToTime(this.state.time - this.props.time)
+    return (
+      <div className='txProgressSuccessItem txProgressSuccessItemRight'>
+        <div className='txProgressSuccessItemValue'>
+          {time}
+        </div>
+        <div className='txProgressSuccessItemLabel'>
+          {label}
+        </div>
+      </div>
+    )
+  }
+}
+
+// import Filter from '../../Components/Filter'
 
 let firstScroll = true
 
@@ -45,6 +93,10 @@ class _RequestApprove extends React.Component {
     return (Math.round(parseFloat(utils.fromWei(hex, 'ether')) * 1000000) / 1000000).toFixed(6)
   }
 
+  toDisplayUSD (bn) {
+    return bn.toFixed(2, BigNumber.ROUND_UP).toString()
+  }
+
   render () {
     const { req } = this.props
     const { notice, status, mode } = req
@@ -67,9 +119,36 @@ class _RequestApprove extends React.Component {
 
     let maxFeePerGas, maxFee, maxFeeUSD
 
+    if (usesBaseFee(req.data)) {
+      const gasLimit = BigNumber(req.data.gasLimit, 16)
+      maxFeePerGas = BigNumber(req.data.maxFeePerGas, 16)
+      maxFee = maxFeePerGas.multipliedBy(gasLimit)
+      maxFeeUSD = maxFee.shiftedBy(-18).multipliedBy(nativeUSD)
+    } else {
+      const gasLimit = BigNumber(req.data.gasLimit, 16)
+      maxFeePerGas = BigNumber(req.data.gasPrice, 16)
+      maxFee = maxFeePerGas.multipliedBy(gasLimit)
+      maxFeeUSD = maxFee.shiftedBy(-18).multipliedBy(nativeUSD)
+    }
+
     const confirmations = req.tx && req.tx.confirmations ? req.tx.confirmations : 0
     const statusClass = req.status === 'error' ? 'txStatus txStatusError' : 'txStatus'
 
+    let feeAtTime = '?.??'
+
+    if (req && req.tx && req.tx.receipt && nativeUSD) {
+      const { gasUsed, effectiveGasPrice } = req.tx.receipt
+      const { type, gasPrice } = req.data
+
+      const paidGas = effectiveGasPrice || (parseInt(type) < 2 ? gasPrice : null)
+
+      if (paidGas) {
+        const feeInWei = parseInt(gasUsed, 'hex') * parseInt(paidGas, 'hex')
+        const feeInEth = feeInWei / 1e18
+        const feeInUsd = feeInEth * nativeUSD
+        feeAtTime = (Math.round(feeInUsd * 100) / 100).toFixed(2)
+      }
+    }
 
 
     if (notice) {
@@ -241,23 +320,6 @@ class _RequestApprove extends React.Component {
     } else {
       return (
         <div className='requestApprove'>
-          <div 
-            className={req.automaticFeeUpdateNotice ? 'requestApproveFeeBlock requestApproveFeeBlockActive' : 'requestApproveFeeBlock'}
-          >
-            <div className='requestApproveFeeText'>{'Fee Updated'}</div>
-            <div className='requestApproveFeeButton' onClick={() => {
-              link.rpc('removeFeeUpdateNotice', req.handlerId, e => { if (e) console.error(e) })
-            }}>{'Ok'}</div>
-            {/* <div className='' onClick={() => {
-              const { previousFee } = req.automaticFeeUpdateNotice
-              if (previousFee.type === '0x2') {
-                link.rpc('setBaseFee', previousFee.baseFee, req.handlerId, e => { if (e) console.error(e) })
-                link.rpc('setPriorityFee', previousFee.priorityFee, req.handlerId, e => { if (e) console.error(e) })
-              } else if (previousFee.type === '0x0')  {
-                link.rpc('setGasPrice', previousFee.gasPrice, req.handlerId, e => { if (e) console.error(e) })
-              }
-            }}>{'Revert'}</div> */}
-          </div>
           <div
             className='requestDecline' 
             onClick={() => {
@@ -385,8 +447,6 @@ class Main extends React.Component {
     const currentAccount = accounts[current]
 
     // const { data } = this.store('panel.nav')[0] || {}
-  
-    console.log('currentAccount', currentAccount)
     if (currentAccount) {
       return (
         <>

@@ -135,27 +135,15 @@ class Account extends React.Component {
       <div className='signerType' onMouseDown={() => {
         this.hideSignerStatus(!this.state.hideSignerStatus)
       }}>
-        {/* {!this.props.signer || (this.props.signer && this.props.signer.status === 'initial') ? (
-          <div className='signerTypeDisconnected' onMouseDown={this.typeClick.bind(this)} style={inSettings ? { transform: 'translateY(-30px)' } : {}} onMouseEnter={() => this.setState({ openHover: true })} onMouseLeave={() => this.setState({ openHover: false })}>
-            <div className='signerTypeDisconnectedImageFront'>{svg.logo(24)}</div>
-          </div>
-        ) : null} */}
         {(_ => {
           const type = this.props.lastSignerType 
-          if (type === 'ledger') return <div className='signerSelectIconWrap signerIconLedger'>{svg.ledger(20)}</div>
-          if (type === 'trezor') return <div className='signerSelectIconWrap signerIconTrezor'>{svg.trezor(20)}</div>
+          if (type === 'ledger') return <div className='signerSelectIconWrap signerIconLedger'>{svg.ledger(24)}</div>
+          if (type === 'trezor') return <div className='signerSelectIconWrap signerIconTrezor'>{svg.trezor(24)}</div>
           if (type === 'seed' || type === 'ring') return <div className='signerSelectIconWrap signerIconHot'>{svg.flame(24)}</div>
-          if (type === 'aragon') return <div className='signerSelectIconWrap signerIconSmart'>{svg.aragon(28)}</div>
-          if (type === 'lattice') return <div className='signerSelectIconWrap signerIconSmart'>{svg.lattice(22)}</div>
+          if (type === 'aragon') return <div className='signerSelectIconWrap signerIconSmart'>{svg.aragon(32)}</div>
+          if (type === 'lattice') return <div className='signerSelectIconWrap signerIconSmart'>{svg.lattice(26)}</div>
           return <div className='signerSelectIconWrap'>{svg.logo(20)}</div>
         })()}
-        {/* this.props.signer ? (
-          this.store('main.signers', this.props.signer, 'status') === 'locked' ? (
-            <div className='signerTypeStatusBadge signerTypeStatusBadgeLocked'>{svg.lock(8)}</div>
-          ) : null
-        ) : (
-          <div className='signerTypeStatusBadge signerTypeStatusBadgeDisconnected'>{svg.plug(10)}</div>
-        )*/}
       </div>
     )
   }

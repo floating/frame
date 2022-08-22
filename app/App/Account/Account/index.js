@@ -13,9 +13,8 @@ import Inventory from './Inventory'
 import Launcher from './Launcher'
 import Permissions from './Permissions'
 import Requests from './Requests'
-import SignerStatus from './SignerStatus'
-import Verify from './Verify'
 import Settings from './Settings'
+import SignerStatus from './SignerStatus'
 import { getAddress } from '../../../../resources/domain/transaction'
 
 // move 
@@ -186,8 +185,12 @@ class _AccountMain extends React.Component {
   constructor (...args) {
     super(...args)
     this.state = {
-      expandedModule: ''
+      expandedModule: '',
+      hideSignerStatus: false
     }
+  }
+  hideSignerStatus (value) {
+    this.setState({ hideSignerStatus: value })
   }
   // computePositions () {
   //   this.resizeObserver.disconnect()
@@ -203,6 +206,23 @@ class _AccountMain extends React.Component {
   
   expandModule (data) {
     link.send('nav:forward', 'panel', { view: 'expandedModule', ...data })
+  }
+  renderSignerStatus () {
+    const current = (this.store('selected.current') === this.props.id) && this.props.status === 'ok'
+    const open = current && this.store('selected.open')
+
+    const account = this.store('main.accounts', this.props.id)
+    let signer
+
+    if (account.signer) {
+      signer = this.store('main.signers', account.signer)
+    } else if (account.smart)  {
+      const actingSigner = this.store('main.accounts', account.smart.actor, 'signer')
+      if (actingSigner) signer = this.store('main.signers', actingSigner)
+    }
+    return !this.state.hideSignerStatus && open ? (
+      <SignerStatus open={open} signer={signer} hideSignerStatus={this.hideSignerStatus.bind(this)} />
+    ) : null
   }
   render () {
     const accountModules = this.store('panel.account.modules')
@@ -223,6 +243,7 @@ class _AccountMain extends React.Component {
     })
     return (
       <div className='accountMain'>
+        {this.renderSignerStatus()}
         <div className='accountMainScroll' style={{ pointerEvents: this.state.expandedModule ? 'none' : 'auto' }}>
           <div className='accountMainSlide' style={{ height: slideHeight + 'px' }}>
             {modules}
@@ -763,86 +784,8 @@ class Account extends React.Component {
     }
   }
 
-  renderSignerIndicator () {
-    let accountIndicatorClass = 'accountIndicator'
-    if (this.props.signer) {
-      const signer = this.store('main.signers', this.props.signer) || {}
-      if (signer.status === 'locked') {
-        accountIndicatorClass += ' accountIndicatorLocked'
-      } else if (signer.status === 'ok') {
-        accountIndicatorClass += ' accountIndicatorGood'
-      }
-    } else if (this.props.smart) {
-      const actingAccount = this.store('main.accounts', this.props.smart.actor)
-      if (!actingAccount) return
-      const actingSigner = this.store('main.signers', actingAccount.signer)
-      if (!actingSigner) return
-      if (actingSigner.status === 'locked') {
-        accountIndicatorClass += ' accountIndicatorLocked'
-      } else if (actingSigner.status === 'ok') {
-        accountIndicatorClass += ' accountIndicatorGood'
-      }
-    }
-    return <div className={accountIndicatorClass} />  
-  }
 
-  renderType () {
-    // let innerClass = 'signerInner'
-    // if (this.state.typeActive) innerClass += ' signerInnerActive'
-    if (this.state.typeShake) innerClass += ' headShake'
-    if (this.store('selected.view') === 'settings') innerClass += ' signerTypeSettings'
-    // if (!this.props.signer || (this.props.signer && this.props.signer.status === 'initial')) innerClass += ' signerInnerDisconnected'
-    // const inSettings = this.store('selected.view') === 'settings'
-    return (
-      <div className='signerType' onMouseDown={() => {
-        this.hideSignerStatus(!this.state.hideSignerStatus)
-      }}>
-        {/* {!this.props.signer || (this.props.signer && this.props.signer.status === 'initial') ? (
-          <div className='signerTypeDisconnected' onMouseDown={this.typeClick.bind(this)} style={inSettings ? { transform: 'translateY(-30px)' } : {}} onMouseEnter={() => this.setState({ openHover: true })} onMouseLeave={() => this.setState({ openHover: false })}>
-            <div className='signerTypeDisconnectedImageFront'>{svg.logo(24)}</div>
-          </div>
-        ) : null} */}
-        {(_ => {
-          const type = this.props.lastSignerType 
-          if (type === 'ledger') return <div className='signerSelectIconWrap signerIconLedger'>{svg.ledger(20)}</div>
-          if (type === 'trezor') return <div className='signerSelectIconWrap signerIconTrezor'>{svg.trezor(20)}</div>
-          if (type === 'seed' || type === 'ring') return <div className='signerSelectIconWrap signerIconHot'>{svg.flame(24)}</div>
-          if (type === 'aragon') return <div className='signerSelectIconWrap signerIconSmart'>{svg.aragon(28)}</div>
-          if (type === 'lattice') return <div className='signerSelectIconWrap signerIconSmart'>{svg.lattice(22)}</div>
-          return <div className='signerSelectIconWrap'>{svg.logo(20)}</div>
-        })()}
-        {/* this.props.signer ? (
-          this.store('main.signers', this.props.signer, 'status') === 'locked' ? (
-            <div className='signerTypeStatusBadge signerTypeStatusBadgeLocked'>{svg.lock(8)}</div>
-          ) : null
-        ) : (
-          <div className='signerTypeStatusBadge signerTypeStatusBadgeDisconnected'>{svg.plug(10)}</div>
-        )*/}
-      </div>
-    )
-  }
 
-  renderMenu () {
-    let menuClass = 'signerMenu'
-    menuClass += this.store('selected.view') === 'settings' ? ' signerMenuSettings' : ' signerMenuDefault'
-    if (this.store('selected.current') === this.props.id & this.store('selected.open')) menuClass += ' signerMenuOpen'
-    return (
-      <div className={menuClass}>
-        <div className='signerMenuItem signerMenuItemLeft' onMouseDown={() => this.store.setSignerView('default')}>
-          <div className='signerMenuItemIcon'>
-            {svg.octicon('pulse', { height: 23 })}
-            <div className='iconUnderline' />
-          </div>
-        </div>
-        <div className='signerMenuItem signerMenuItemRight' onMouseDown={() => this.store.setSignerView('settings')}>
-          <div className='signerMenuItemIcon'>
-            {svg.octicon('settings', { height: 23 })}
-            <div className='iconUnderline' />
-          </div>
-        </div>
-      </div>
-    )
-  }
 
   setHighlight (mode, index) {
     if (!this.locked) this.setState({ accountHighlight: mode, highlightIndex: index || 0 })
@@ -1033,10 +976,6 @@ class Account extends React.Component {
         </div> */}
       </>
     )
-  }
-
-  hideSignerStatus (value) {
-    this.setState({ hideSignerStatus: value })
   }
 
   render () {

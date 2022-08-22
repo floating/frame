@@ -186,10 +186,7 @@
 .txProgressNotice
   position relative
   width 100%
-  // background blue
-  // top 50%
-  // height 1000px
-  // margin-top -500px
+  height 100%
 
   .txProgressNoticeBars
     position absolute
@@ -257,8 +254,8 @@
     align-items center
     z-index 1001
     font-weight 500
-    background var(--ghostY)
     border-radius 12px
+    padding-bottom 6px
 
   .txProgressNoticeLoader
     height 100px
@@ -538,12 +535,8 @@
   fill car(--good)
 
 .requestNotice, .requestCover
-  // height 100%
-  // transform translateZ(0px)
-  // overflow hidden
-  // background blue
   box-sizing border-box
-  height 118px
+  height 112px
   font-size 14px
   -webkit-app-region no-drag
   pointer-events auto
@@ -570,6 +563,7 @@
     align-items center
     flex-direction column
     height 100%
+    width 100%
 
     .requestNoticeInnerText
       padding-top 30px
@@ -636,6 +630,89 @@
     margin-top 6px
     transform translateZ(0px)
     letter-spacing 1px
+
+.requestFooter
+  bottom 0
+  font-size 13px
+  opacity 0
+  transition var(--standard)
+  font-family 'OpenSans'
+  pointer-events none
+  transform translateY(0px) 
+  display flex
+  justify-content center
+  align-items center
+  text-transform uppercase
+  font-weight 500
+  transform scale(0.8)
+  filter blur(20px)
+  background linear-gradient(to top, var(--ghostZ) 25%, var(--ghostZ0) 100%)
+  position fixed
+  right 0px
+  left 0px
+  height 88px
+  border-bottom-left-radius 20px
+  border-bottom-right-radius 20px
+  z-index 9999999
+
+  .requestApproveFee
+    position absolute 
+    bottom 12px
+    right 12px
+    left 12px
+    display flex
+    justify-content center
+    align-items center
+
+    .requestApproveFeeText
+      margin-top 24px
+      background var(--ghostB)
+      padding 8px 32px
+      border-top-left-radius 12px
+      border-bottom-left-radius 12px
+      border-top-right-radius 4px
+      border-bottom-right-radius 4px
+
+    .requestApproveFeeButton 
+      margin-top 24px
+      margin-left 2px
+      background var(--ghostB)
+      padding 8px 32px
+      border-top-left-radius 4px
+      border-bottom-left-radius 4px
+      border-top-right-radius 12px
+      border-bottom-right-radius 12px
+      pointer-events auto
+      color var(--moon)
+      cursor pointer
+
+      *
+        pointer-events none
+
+    .requestApproveFeeButton:hover
+      background var(--ghostC)
+
+    .requestApproveFeeReject
+      color var(--moon)
+      position absolute 
+      left 10px
+      bottom 11px
+      top 35px
+      right calc(50% + 2.5px)
+
+    .requestApproveFeeAccept
+      color var(--good)
+      position absolute 
+      right 10px
+      bottom 11px
+      top 35px
+      left calc(50% + 2.5px)
+
+.requestFooterActive
+  filter blur(0px)
+  opacity 1
+  transform scale(1)
+  pointer-events none
 
 .approveTransaction, .approveRequest
   position absolute
@@ -1115,6 +1192,7 @@
       transition var(--standard)
       font-weight bold
       cursor pointer
+      
       *
         pointer-events none
 
@@ -1166,10 +1244,6 @@
     transform translateY(0px)
 
 .requestApprove
-  // height 100%
-  // transform translateZ(0px)
-  // overflow hidden
-  // background blue
   box-sizing border-box
   height 88px
   font-size 14px
@@ -1180,7 +1254,7 @@
   justify-content space-around
   align-items center
   font-weight 400
-  z-index 999999999999999
+  z-index 999999999
   transition var(--standard)
   position absolute
   bottom 40px
@@ -1193,7 +1267,7 @@
   animation 0.32s fadeUp var(--cubic)
   // box-shadow 0px -16px 16px var(--ghostZ)
 
-  // .requestApproveFeeBlock::before
+  // .requestFooter::before
   //   content ''
   //   position absolute
   //   top 30px
@@ -1202,90 +1276,6 @@
   //   left 5px
   //   border-radius 11px
   //   background var(--ghostZ)
-    
-  .requestApproveFeeBlock
-    top -99px
-    // background linear-gradient(rgba(0, 0, 0, 0.0), var(--ghostX))
-    z-index 9
-    // height 50px
-    font-size 13px
-    opacity 0
-    transition var(--standard)
-    font-family 'OpenSans'
-    // padding 0px 5px
-    // background blue
-    // border-radius 12px
-    pointer-events none
-    transform translateY(0px) 
-    display flex
-    justify-content center
-    align-items center
-    text-transform uppercase
-    font-weight 500
-    transform scale(0.8)
-    filter blur(20px)
-    background linear-gradient(to top, var(--ghostZ) 25%, var(--ghostZ0) 100%)
-    // box-shadow 0px 4px 4px var(--ghostY)
-
-    position absolute
-    // top 70px
-    right 0px
-    left 0px
-    height 88px
-    border-bottom-left-radius 20px
-    border-bottom-right-radius 20px
-    z-index 5
-
-    .requestApproveFeeText
-      margin-top 24px
-      background var(--ghostB)
-      padding 8px 24px
-      border-top-left-radius 12px
-      border-bottom-left-radius 12px
-      border-top-right-radius 4px
-      border-bottom-right-radius 4px
-
-    .requestApproveFeeButton 
-      margin-top 24px
-      margin-left 2px
-      background var(--ghostB)
-      padding 8px 16px
-      border-top-left-radius 4px
-      border-bottom-left-radius 4px
-      border-top-right-radius 12px
-      border-bottom-right-radius 12px
-      pointer-events auto
-      color var(--moon)
-      cursor pointer
-
-      *
-        pointer-events none
-
-    .requestApproveFeeButton:hover
-      background var(--ghostC)
-
-    .requestApproveFeeReject
-      color var(--moon)
-      position absolute 
-      left 10px
-      bottom 11px
-      top 35px
-      right calc(50% + 2.5px)
-
-    .requestApproveFeeAccept
-      color var(--good)
-      position absolute 
-      right 10px
-      bottom 11px
-      top 35px
-      left calc(50% + 2.5px)
-
-  .requestApproveFeeBlockActive
-    filter blur(0px)
-    opacity 1
-    transform scale(1)
-    pointer-events none
-
   .requestDecline
     position absolute
     top 6px
@@ -1806,6 +1796,7 @@ span:last-child
   // left 5px
   // right 5px
   // bottom 100px
+
   border-radius 12px
   text-align center
   box-sizing border-box
@@ -1815,11 +1806,12 @@ span:last-child
   text-transform uppercase
   letter-spacing 0.5px
   margin-left 0.5px
-  overflow hidden
   transition var(--standard)
   display flex
   justify-content center
   align-items center
+  width 100%
+  height 100%
 
   .txProgressNoticeHidden
     transition var(--standard)
@@ -1827,19 +1819,19 @@ span:last-child
     opacity 0
     pointer-events none
 
-  .txProgressNoticeSuccess
-    position absolute
-    // top 50%
-    // height 50px
-    left 0
-    right 0
-    z-index 1000005
-    // margin-top -px
-    display flex
-    justify-content center
-    align-items center
-    flex-direction column
-    transition var(--standard)
+  // .txProgressNoticeSuccess
+  //   position absolute
+  //   // top 50%
+  //   // height 50px
+  //   left 0
+  //   right 0
+  //   z-index 1000005
+  //   // margin-top -px
+  //   display flex
+  //   justify-content center
+  //   align-items center
+  //   flex-direction column
+  //   transition var(--standard)
 
 .txStatusError
   top 30px

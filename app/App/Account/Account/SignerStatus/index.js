@@ -69,18 +69,18 @@ class SignerStatus extends React.Component {
     )
   }
 
-  componentDidMount () {
-    setTimeout(() => {
-      document.addEventListener('mousedown', (e) => {
-        if (this.props.open && this.statusRef && this.statusRef.current && !this.statusRef.current.contains(e.target)) {
-          this.props.hideSignerStatus(true)
-        }
-      })
-      if (this.inputRef.current) {
-        this.inputRef.current.focus()
-      }
-    }, 100)
-  }
+  // componentDidMount () {
+  //   setTimeout(() => {
+  //     document.addEventListener('mousedown', (e) => {
+  //       if (this.props.open && this.statusRef && this.statusRef.current && !this.statusRef.current.contains(e.target)) {
+  //         this.props.hideSignerStatus(true)
+  //       }
+  //     })
+  //     if (this.inputRef.current) {
+  //       this.inputRef.current.focus()
+  //     }
+  //   }, 100)
+  // }
 
   render () {
     const { shake } = this.state
