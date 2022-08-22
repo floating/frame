@@ -3,8 +3,6 @@ import React, { useState } from 'react'
 export default function ConfirmDialog ({ id, prompt, acceptText = 'OK', declineText = 'Decline', onAccept, onDecline }) {
   const [submitted, setSubmitted] = useState(false)
 
-  console.log('confirm', { prompt, onAccept, onDecline })
-
   const clickHandler = (evt, onClick) => {
     if (evt.button === 0 && !submitted) {
       setSubmitted(true)

@@ -646,9 +646,9 @@ module.exports = {
   backDash: (u, numSteps = 1) => {
     console.log({ backDash: numSteps })
     u('dash.nav', nav => {
-      while (numSteps > 0) {
+      while (numSteps > 0 && nav.length > 0) {
         nav.shift()
-        numSteps--
+        numSteps -= 1
       }
 
       return nav

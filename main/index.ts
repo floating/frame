@@ -22,7 +22,6 @@ import Erc20Contract from './contracts/erc20'
 import provider from './provider'
 import { getErrorCode } from '../resources/utils'
 import { FrameInstance } from './windows/frames/frameInstances'
-import { randomUUID } from 'crypto'
 
 app.commandLine.appendSwitch('enable-accelerated-2d-canvas', 'true')
 app.commandLine.appendSwitch('enable-gpu-rasterization', 'true')
