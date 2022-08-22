@@ -6,7 +6,7 @@ export function DisabledSubmitButton ({ text }) {
   )
 }
 
-function SubmitButton ({ text, handleClick, extraClasses = [] }) {
+function BasicSubmitButton ({ text, handleClick, extraClasses = [] }) {
   const classes = ['addTokenSubmit', 'addTokenSubmitEnabled'].concat(extraClasses).join(' ')
 
   return (
@@ -25,12 +25,12 @@ function SubmitButton ({ text, handleClick, extraClasses = [] }) {
   )
 }
 
-export function GoodSubmitButton (props) {
+export function SubmitButton (props) {
   const buttonProps = { ...props, extraClasses: ['addTokenSubmitGood'] }
-  return <SubmitButton {...buttonProps} />
+  return <BasicSubmitButton {...buttonProps} />
 }
 
-export function BadSubmitButton (props) {
+export function DangerousSubmitButton (props) {
   const buttonProps = { ...props, extraClasses: ['addTokenSubmitBad'] }
-  return <SubmitButton {...buttonProps} />
+  return <BasicSubmitButton {...buttonProps} />
 }

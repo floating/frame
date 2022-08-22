@@ -579,7 +579,6 @@ class Notify extends React.Component {
         </div>
       )
     } else if (notify === 'confirm') {
-      console.log({ notifyData })
       return (
         <div className='notify cardShow'>
           <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>

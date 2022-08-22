@@ -1,41 +1,33 @@
-import React from 'react'
+import React, { useState } from 'react'
 
-export default function ConfirmDialog ({ prompt, acceptText = 'OK', rejectText = 'Decline', onAccept, onDecline }) {
+import link from '../../../resources/link'
+
+export default function ConfirmDialog ({ id, prompt, acceptText = 'OK', declineText = 'Decline' }) {
+  const [submitted, setSubmitted] = useState(false)
+
+  const clickHandler = (evt, response) => {
+    console.log('CLICK!', { evt, response })
+    if (evt.button === 0 && !submitted) {
+      setSubmitted(true)
+      link.send('dash:resolveConfirm', id, response)
+    }
+  }
+
+  const ResponseButton = ({ text, response }) => {
+    return (
+      <div role='button' className='confirmButton' onClick={(evt) => clickHandler(evt, response)}>
+        {text}
+      </div>
+    )
+  }
+
   return (
-    <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
-      <div className='notifyBoxSlide'></div>
-
+    <div id={id} className='confirmDialog'>
       <div className='confirmText'>{prompt}</div>
-      <div
-            className='approveTransactionWarningProceed'
-            onClick={() => this.props.onApprove(this.props.req, this.props.approval.type)}
-          >
-            Proceed
-          </div>
-
-          <div className='requestApprove'>
-            <div 
-              className='requestDecline' 
-              onClick={() => { if (this.state.allowInput) link.send('tray:resolveRequest', this.props.req)
-            }}>
-              <div className='requestDeclineButton _txButton _txButtonBad'>Decline</div>
-            </div>
-            <div 
-              className='requestSign' 
-              onClick={() => { if (this.state.allowInput) this.store.notify('addChain', this.props.req) 
-            }}>
-              <div className='requestSignButton _txButton'>Review</div>
-            </div>
-          </div>
 
       <div className='confirmButtonOptions'>
-        <div role='button' className='confirmRejectButton'>
-          {rejectText}
-        </div>
-
-        <div role='button' className='confirmRejectButton'>
-          {acceptText}
-        </div>
+        <ResponseButton text={declineText} response={false} />
+        <ResponseButton text={acceptText} response={true} />
       </div>
     </div>
   )

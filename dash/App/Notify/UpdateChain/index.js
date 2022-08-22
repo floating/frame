@@ -3,7 +3,7 @@ import Restore from 'react-restore'
 
 import link from '../../../../resources/link'
 import ChainEditForm from '../ChainEditForm'
-import { BadSubmitButton } from '../Button'
+import { DangerousSubmitButton } from '../Button'
 
 const labels = {
   title: 'Update Chain',
@@ -24,13 +24,19 @@ function UpdateChain ({ chain }) {
       />
 
       <div className='chainRow'>
-        <BadSubmitButton
-          handleClick={() => {
-            const data = {
-              prompt: 'Are you sure you want to remove this chain?'
+        <DangerousSubmitButton
+          handleClick={async () => {
+            const { accepted } = await link.invoke('dash:confirm', { prompt: 'Are you sure you want to remove this chain?' })
+
+            if (accepted) {
+              link.send('tray:action', 'removeNetwork', chain)
+
+              // if accepted, go back twice to get back to the main chains panel
+              link.send('tray:action', 'backDash')
             }
-  
-            link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'confirm', notifyData: { ...data }} })
+
+            // if declined, go back once to get to the chain update panel
+            link.send('tray:action', 'backDash')
           }}
           text='Remove Chain'
         />

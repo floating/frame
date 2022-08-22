@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 
 import link from '../../../../resources/link'
-import { DisabledSubmitButton, GoodSubmitButton } from '../Button'
+import { DisabledSubmitButton, SubmitButton } from '../Button'
 
 const networkDefaults = {
   id: 'Chain ID',
@@ -36,7 +36,7 @@ const EditFormSubmitButton = ({ network, labels, onSubmit, validateSubmit }) => 
   }
 
   return (
-    <GoodSubmitButton
+    <SubmitButton
       handleClick={() => {
         setTimeout(() => {
           link.send('tray:action', 'backDash')
