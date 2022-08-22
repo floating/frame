@@ -12,6 +12,26 @@ const labels = {
 }
 
 function UpdateChain ({ chain }) {
+  const RemoveChainButton = () => {
+    return (
+      <DangerousSubmitButton
+        handleClick={async () => {
+          const { accepted } = await link.invoke('dash:confirm', { prompt: 'Are you sure you want to remove this chain?' })
+
+          if (accepted) {
+            link.send('tray:action', 'removeNetwork', chain)
+
+            // if accepted, go back twice to get back to the main chains panel
+            link.send('tray:action', 'backDash')
+          }
+
+          // if declined, go back once to get to the chain update panel
+          link.send('tray:action', 'backDash')
+        }}
+        text='Remove Chain'
+      />
+    )
+  }
   return (
     <>
       <ChainEditForm
@@ -24,22 +44,7 @@ function UpdateChain ({ chain }) {
       />
 
       <div className='chainRow'>
-        <DangerousSubmitButton
-          handleClick={async () => {
-            const { accepted } = await link.invoke('dash:confirm', { prompt: 'Are you sure you want to remove this chain?' })
-
-            if (accepted) {
-              link.send('tray:action', 'removeNetwork', chain)
-
-              // if accepted, go back twice to get back to the main chains panel
-              link.send('tray:action', 'backDash')
-            }
-
-            // if declined, go back once to get to the chain update panel
-            link.send('tray:action', 'backDash')
-          }}
-          text='Remove Chain'
-        />
+        <RemoveChainButton />
       </div>
     </>
   )
