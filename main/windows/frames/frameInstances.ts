@@ -21,7 +21,7 @@ const place = (frameInstance: FrameInstance) => {
   frameInstance.setMinimumSize(400, 300)
   frameInstance.setSize(width, height)
   const pos = topRight(frameInstance) 
-  frameInstance.setPosition(pos.x - 400, pos.y + 80)
+  frameInstance.setPosition(pos.x - 440, pos.y + 80)
 }
 
 export default {

@@ -1,0 +1,161 @@
+._txMain
+  position relative
+  z-index 100001
+  background var(--ghostA)
+  margin 16px 6px
+  border-radius 14px
+  padding 5px 0px 5px 0px
+  overflow hidden
+  box-shadow 0px 4px 8px var(--ghostY)
+
+  ._txMainInner
+    margin 0px 5px
+    
+    ._txMainValues
+      font-size 17px
+      font-weight 400
+      border-radius 10px
+      -webkit-app-region no-drag
+      transition none
+      transform translate3d(0, 0, 0)
+      font-family 'Exo2'
+      overflow hidden
+      padding 0px 5px 5px 5px
+      background var(--ghostZ)
+
+      svg
+        position relative
+        top -0px
+        padding 0px 3px 0px 4px
+
+      ._txMainValuesRow
+        display flex
+        height 70px
+
+      ._txMainValuesColumn
+        display flex
+        flex-direction column
+        height 100%
+        margin-right 5px
+      
+      ._txMainValuesColumn:last-child
+        margin-right 0px
+
+      ._txMainTransferring
+        margin-top 5px
+        display flex
+        justify-content center
+        align-items stretch
+        border-radius 6px
+        overflow hidden
+        font-weight 400
+
+        ._txMainTransferringPart
+          flex-grow 1
+          display flex
+          justify-content center
+          align-items center
+          border-radius 6px
+          padding 7px 0px
+          background var(--ghostA)
+          margin-right 5px
+
+        ._txMainTransferringPart:last-child
+          margin-right 0px
+
+        ._txMainTransferringPartLarge
+          flex-grow 2
+          
+      ._txMainTransferringSymbol
+        font-size 14px
+        font-weight 600
+        margin-right 5px
+
+      ._txMainTransferringAmount
+        font-size 20px
+        position relative
+        top -1px
+
+      ._txMainTransferringEq
+        font-size 15px
+        margin-left 4px
+
+      ._txMainTransferringEqSymbol
+        font-size 12px
+
+      ._txMainTransferringEqAmount
+        font-size 14px
+
+      ._txMainValue
+        font-size 14px
+        font-weight 500
+        display flex
+        justify-content center
+        align-items center
+        border-radius 8px
+        -webkit-app-region no-drag
+        transition none
+        transform translate3d(0, 0, 0)
+        font-family 'Exo2'
+        padding 8px
+        background var(--ghostA)
+        margin-top 5px
+        
+        svg
+          position relative
+          top -0px
+          padding 0px 3px 0px 4px
+
+      ._txMainValueClickable
+        cursor pointer
+        background var(--ghostA)
+        
+        *
+          pointer-events none
+
+      ._txMainValueClickable:hover
+        background var(--ghostB)
+      
+  ._txMainTag
+    position relative
+    z-index 100001
+    // animation-name cardShow
+    // animation-duration 0.2s
+    // animation-fill-mode both
+    overflow hidden
+    font-size 11px
+    font-weight 600
+    text-transform uppercase
+    letter-spacing 1px
+    text-align center
+    padding 5px 0px 5px 0px
+    margin-top 5px
+    border-radius 8px
+    background var(--ghostA)
+
+  ._txMainTagWarning
+    color var(--moon)
+
+._txContinueButton
+  margin-top 64px
+  background var(--ghostA)
+  border-radius 14px
+  height 60px
+  cursor pointer
+  display flex
+  justify-content center
+  align-items center
+  text-transform uppercase
+  font-family 'Exo2'
+  letter-spacing 2px
+  font-weight 600
+  font-size 14px
+
+._txContinueButton:hover
+  background var(--ghostB)
+
+// ._txMain:hover
+//   animation shake 8s ease-in-out infinite alternate
+
+._txMain:active
+  animation shake-little 2s ease-in-out infinite

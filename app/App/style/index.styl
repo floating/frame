@@ -117,68 +117,68 @@
   opacity 1
   transform translate3d(0, 0, 0)
   
-  .panelFilter
-    background var(--ghostZ)
-    position absolute
-    top 12px
-    left 68px
-    right 68px
-    height 32px
-    border-radius 12px
-    border 3px solid var(--ghostZ)
-    z-index 2000000000
-    overflow hidden
-    transition var(--standardFast)
+  // .panelFilter
+  //   background var(--ghostZ)
+  //   position absolute
+  //   top 12px
+  //   left 68px
+  //   right 68px
+  //   height 32px
+  //   border-radius 12px
+  //   border 3px solid var(--ghostZ)
+  //   z-index 2000000000
+  //   overflow hidden
+  //   transition var(--standardFast)
 
-    .panelFilterIcon
-      position absolute
-      top 0
-      left 0
-      bottom 0
-      width 32px
-      display flex
-      justify-content center
-      align-items center
-      background var(--ghostZ)
+  //   .panelFilterIcon
+  //     position absolute
+  //     top 0
+  //     left 0
+  //     bottom 0
+  //     width 32px
+  //     display flex
+  //     justify-content center
+  //     align-items center
+  //     background var(--ghostZ)
 
-    .panelFilterInput
-      position absolute
-      top 0
-      left 32px
-      bottom 0
-      right 0
+  //   .panelFilterInput
+  //     position absolute
+  //     top 0
+  //     left 32px
+  //     bottom 0
+  //     right 0
 
-      input 
-        width 100%
-        height 100%
-        border none
-        outline none
-        text-align center
-        background transparent
-        color var(--outerspace)
-        font-size 18px
-        font-family 'Exo2'
-        padding-right 32px
-        padding-bottom 4px
+  //     input 
+  //       width 100%
+  //       height 100%
+  //       border none
+  //       outline none
+  //       text-align center
+  //       background transparent
+  //       color var(--outerspace)
+  //       font-size 18px
+  //       font-family 'Exo2'
+  //       padding-right 32px
+  //       padding-bottom 4px
 
-    .panelFilterClear
-      position absolute
-      top 0
-      right 0
-      bottom 0
-      width 32px
-      display flex
-      justify-content center
-      align-items center
-      color var(--outerspace)
-      cursor pointer
-      border-radius 9px
+  //   .panelFilterClear
+  //     position absolute
+  //     top 0
+  //     right 0
+  //     bottom 0
+  //     width 32px
+  //     display flex
+  //     justify-content center
+  //     align-items center
+  //     color var(--outerspace)
+  //     cursor pointer
+  //     border-radius 9px
 
-      *
-        pointer-events none
+  //     *
+  //       pointer-events none
 
-    .panelFilterClear:hover
-      background var(--ghostB)
+  //   .panelFilterClear:hover
+  //     background var(--ghostB)
 
   .panelMenuItem
     height 32px
@@ -510,7 +510,12 @@
       *
         pointer-events none
 
-@import '../Main/style'
+// @import '../Main/style'
 @import '../Notify/style'
 @import '../Badge/style'
 @import './card.styl'
+
+
+@import '../Backdrop/style'
+@import '../Account/style'
+@import '../AccountSelector/style'
