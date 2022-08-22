@@ -10,10 +10,6 @@ const FEE_WARNING_THRESHOLD_USD = 50
 class TxFee extends React.Component {
   constructor (props, context) {
     super(props, context)
-    this.chain = { 
-      type: 'ethereum', 
-      id: parseInt(props.req.data.chainId, 'hex')
-    }
   }
   toDisplayUSD (bn) {
     return bn.toFixed(2, BigNumber.ROUND_UP).toString()
@@ -27,8 +23,13 @@ class TxFee extends React.Component {
   render () {
     const req = this.props.req
 
-    const layer = this.store('main.networks', this.chain.type, this.chain.id, 'layer')
-    const nativeCurrency = this.store('main.networksMeta', this.chain.type, this.chain.id, 'nativeCurrency')
+    const chain = { 
+      type: 'ethereum', 
+      id: parseInt(req.data.chainId, 'hex')
+    }
+
+    const layer = this.store('main.networks', chain.type, chain.id, 'layer')
+    const nativeCurrency = this.store('main.networksMeta', chain.type, chain.id, 'nativeCurrency')
     const nativeUSD = nativeCurrency && nativeCurrency.usd && layer !== 'testnet' ? nativeCurrency.usd.price : 0
 
     let maxFeePerGas, maxFee, maxFeeUSD

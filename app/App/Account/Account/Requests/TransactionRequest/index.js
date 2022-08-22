@@ -20,10 +20,6 @@ import TxApproval from './TxApproval'
 class TransactionRequest extends React.Component {
   constructor (props, context) {
     super(props, context)
-    this.chain = { 
-      type: 'ethereum', 
-      id: parseInt(props.req.data.chainId, 'hex')
-    }
     this.state = { allowInput: false, dataView: false }
 
     setTimeout(() => {
@@ -119,12 +115,11 @@ class TransactionRequest extends React.Component {
     if (success) requestClass += ' signerRequestSuccess'
     if (req.status === 'confirmed') requestClass += ' signerRequestConfirmed'
     else if (error) requestClass += ' signerRequestError'
-    const layer = this.store('main.networks', this.chain.type, this.chain.id, 'layer')
-    const nativeCurrency = this.store('main.networksMeta', this.chain.type, this.chain.id, 'nativeCurrency')
-    const nativeUSD = nativeCurrency && nativeCurrency.usd && layer !== 'testnet' ? nativeCurrency.usd.price : 0
-    const value = this.hexToDisplayValue(req.data.value || '0x')
-    const currentSymbol = this.store('main.networks', this.chain.type, this.chain.id, 'symbol') || '?'
 
+    const chain = {
+      type: 'ethereum', 
+      id: parseInt(req.data.chainId, 'hex')
+    }
 
     const insufficientFundsMatch = originalNotice.includes('insufficient funds')
     if (insufficientFundsMatch) {
@@ -190,13 +185,13 @@ class TransactionRequest extends React.Component {
             <div className='approveTransactionPayload'>
               
                 <div className='_txBody'>
-                  <TxMainNew i={0} {...this.props} req={req} chain={this.chain} />
-                  <TxMain i={1} {...this.props} req={req} chain={this.chain} />
+                  <TxMainNew i={0} {...this.props} req={req} chain={chain} />
+                  <TxMain i={1} {...this.props} req={req} chain={chain} />
                   {recognizedActions.map((action, i) => {
-                    return <TxAction key={'action' + action.type + i} i={2 + i} {...this.props} req={req} chain={this.chain} action={action} />
+                    return <TxAction key={'action' + action.type + i} i={2 + i} {...this.props} req={req} chain={chain} action={action} />
                   })}
                   <TxRecipient i={3 + recognizedActions.length} {...this.props} req={req} />
-                  <TxFeeNew i={4 + recognizedActions.length} {...this.props} req={req} chain={this.chain} />
+                  <TxFeeNew i={4 + recognizedActions.length} {...this.props} req={req} chain={chain} />
                 </div>
             </div>
             <div className={req.automaticFeeUpdateNotice ? 'requestFooter requestFooterActive' : 'requestFooter'}>

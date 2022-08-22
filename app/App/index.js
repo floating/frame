@@ -2,8 +2,6 @@ import React from 'react'
 import Restore from 'react-restore'
 import link from '../../resources/link'
 
-// import Aux from '../../resources/Components/FooterAux'
-
 import Account from './Account'
 import Notify from './Notify'
 import Menu from './Menu'

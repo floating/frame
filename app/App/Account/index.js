@@ -65,10 +65,6 @@ let firstScroll = true
 class _RequestApprove extends React.Component {
   constructor (props, context) {
     super(props, context)
-    this.chain = { 
-      type: 'ethereum', 
-      id: parseInt(props.req.data.chainId, 'hex')
-    }
     this.state = { allowInput: false, dataView: false }
 
     setTimeout(() => {
@@ -111,11 +107,17 @@ class _RequestApprove extends React.Component {
     if (success) requestClass += ' signerRequestSuccess'
     if (req.status === 'confirmed') requestClass += ' signerRequestConfirmed'
     else if (error) requestClass += ' signerRequestError'
-    const layer = this.store('main.networks', this.chain.type, this.chain.id, 'layer')
-    const nativeCurrency = this.store('main.networksMeta', this.chain.type, this.chain.id, 'nativeCurrency')
+
+    const chain = { 
+      type: 'ethereum', 
+      id: parseInt(req.data.chainId, 'hex')
+    }
+
+    const layer = this.store('main.networks', chain.type, chain.id, 'layer')
+    const nativeCurrency = this.store('main.networksMeta', chain.type, chain.id, 'nativeCurrency')
     const nativeUSD = nativeCurrency && nativeCurrency.usd && layer !== 'testnet' ? nativeCurrency.usd.price : 0
-    const value = this.hexToDisplayValue(req.data.value || '0x')
-    const currentSymbol = this.store('main.networks', this.chain.type, this.chain.id, 'symbol') || '?'
+    // const value = this.hexToDisplayValue(req.data.value || '0x')
+    const currentSymbol = this.store('main.networks', chain.type, chain.id, 'symbol') || '?'
 
     let maxFeePerGas, maxFee, maxFeeUSD
 
@@ -179,9 +181,9 @@ class _RequestApprove extends React.Component {
                       onMouseDown={() => {
                         if (req && req.tx && req.tx.hash) {
                           if (this.store('main.mute.explorerWarning')) {
-                            link.send('tray:openExplorer', req.tx.hash, this.chain)
+                            link.send('tray:openExplorer', req.tx.hash, chain)
                           } else {
-                            this.store.notify('openExplorer', { hash: req.tx.hash, chain: this.chain })
+                            this.store.notify('openExplorer', { hash: req.tx.hash, chain: chain })
                           }
                         }
                       }}
@@ -338,7 +340,7 @@ class _RequestApprove extends React.Component {
                   } else if (e === 'Signer locked') {
                     this.store.notify('signerLockedWarning', { req })
                   } else if (!compatibility.compatible && !this.store('main.mute.signerCompatibilityWarning')) {
-                    this.store.notify('signerCompatibilityWarning', { req, compatibility, chain: this.chain })
+                    this.store.notify('signerCompatibilityWarning', { req, compatibility, chain: chain })
                   } else if ((maxFeeUSD.toNumber() > FEE_WARNING_THRESHOLD_USD || this.toDisplayUSD(maxFeeUSD) === '0.00') && !this.store('main.mute.gasFeeWarning')) {
                     this.store.notify('gasFeeWarning', { req, feeUSD: this.toDisplayUSD(maxFeeUSD), currentSymbol })
                   } else {
@@ -372,11 +374,45 @@ class _Footer extends React.Component {
       const reqViewData = crumb.req // TODO: Only pass req id in nav
       const req = this.store('main.accounts', accountId, 'requests', reqViewData.handlerId)
       if (req) {
-        return (
-          <div className='footerModule'>
-            <RequestApprove req={req} />
-          </div>
-        )
+        if (req.type === 'transaction') {
+          return (
+            <div className='footerModule'>
+              <RequestApprove req={req} />
+            </div>
+          )
+        } else if (req.type === 'access') {
+          return (
+            <div className='footerModule'>
+              {'Access request'}
+            </div>
+          )
+        } else if (req.type === 'sign') {
+          return (
+            <div className='footerModule'>
+              {'Sign request'}
+            </div>
+          )
+        } else if (req.type === 'signTypedData') {
+          return (
+            <div className='footerModule'>
+              {'Sign typed data request'}
+            </div>
+          )
+        } else if (req.type === 'addChain' || req.type === 'switchChain') {
+          return (
+            <div className='footerModule'>
+              {'Add chain or switch chain request'}
+            </div>
+          )
+        } else if (req.type === 'addToken') {
+          return (
+            <div className='footerModule'>
+              {'Add token request'}
+            </div>
+          )
+        } else {
+          return null
+        }
       }
     }
   }
