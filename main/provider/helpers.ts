@@ -245,9 +245,7 @@ export function getChains (payload: JSONRPCRequestPayload, res: RPCSuccessCallba
 }
 
 export function getChainDetails (payload: JSONRPCRequestPayload, res: RPCSuccessCallback) {
-  const result = getActiveChainDetails()
-  console.log('getChainDetails', result)
-  res({ id: payload.id, jsonrpc: payload.jsonrpc, result })
+  res({ id: payload.id, jsonrpc: payload.jsonrpc, result: getActiveChainDetails() })
 }
   
 export function ecRecover (payload: JSONRPCRequestPayload, res: RPCRequestCallback) {
