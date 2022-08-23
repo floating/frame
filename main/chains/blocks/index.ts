@@ -3,10 +3,8 @@ import log from 'electron-log'
 
 import type { BigNumber } from 'bignumber.js'
 
-interface Connection {
+interface Connection extends EventEmitter {
   send (payload: JSONRPCRequestPayload): Promise<any>,
-  on: (event: string, handler: any) => void,
-  off: (event: string, handler: any) => void,
   chainId: string
 }
 
@@ -59,8 +57,8 @@ class BlockMonitor extends EventEmitter {
 
     this.latestBlock = '0x0'
 
-    this.connection.on('connect', this.start)
-    this.connection.on('close', this.stop)
+    this.connection.once('connect', this.start)
+    this.connection.once('close', this.stop)
   }
 
   start () {
@@ -80,6 +78,10 @@ class BlockMonitor extends EventEmitter {
   }
 
   stop () {
+    this.removeAllListeners()
+    this.connection.off('connect', this.start)
+    this.connection.off('close', this.stop)
+
     if (this.subscriptionId) {
       this._clearSubscription()
     }
