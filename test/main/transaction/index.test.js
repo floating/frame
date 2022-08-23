@@ -275,7 +275,7 @@ describe('#populate', () => {
       value: '0x6f05b59d3b20000',
       to: '0x6635f83421bf059cd8111f180f0727128685bae4',
       data: '0x0000000000000000000006635f83421bf059cd8111f180f0726635f83421bf059cd8111f180f072',
-      gasFeesSource: GasFeesSource.Frame
+      gasFeesSource: GasFeesSource.Dapp
     }
   })
 
