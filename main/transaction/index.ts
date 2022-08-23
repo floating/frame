@@ -4,7 +4,7 @@ import Common from '@ethereumjs/common'
 
 import chainConfig from '../chains/config'
 import { AppVersion, SignerSummary } from '../signers/Signer'
-import { TransactionData, typeSupportsBaseFee } from '../../resources/domain/transaction'
+import { GasFeesSource, TransactionData, typeSupportsBaseFee } from '../../resources/domain/transaction'
 
 const londonHardforkSigners: SignerCompatibilityByVersion = {
   seed: () => true,
@@ -94,16 +94,31 @@ function populate (rawTx: TransactionData, chainConfig: Common, gas: any): Trans
 
     const maxPriorityFee = toBN(gas.price.fees.maxPriorityFeePerGas)
     const maxBaseFee = toBN(gas.price.fees.maxBaseFeePerGas)
-    const maxFee = maxPriorityFee.add(maxBaseFee)
 
-    txData.maxPriorityFeePerGas = bnToHex(maxPriorityFee)
-    txData.maxFeePerGas = bnToHex(maxFee)
+    const useDappMaxFeePerGas = rawTx.maxFeePerGas && !isNaN(parseInt(rawTx.maxFeePerGas, 16))
+    if (useDappMaxFeePerGas) {
+      txData.gasFeesSource = GasFeesSource.Dapp
+    } else {
+      const maxFee = maxPriorityFee.add(maxBaseFee)
+      txData.maxFeePerGas = bnToHex(maxFee)
+    }
+    
+    const useDappMaxPriorityFeePerGas = rawTx.maxPriorityFeePerGas && !isNaN(parseInt(rawTx.maxPriorityFeePerGas, 16))
+    if (useDappMaxPriorityFeePerGas) {
+      txData.gasFeesSource = GasFeesSource.Dapp
+    } else {
+      txData.maxPriorityFeePerGas = bnToHex(maxPriorityFee)
+    }
   } else {
     txData.type = intToHex(chainConfig.isActivatedEIP(2930) ? 1 : 0)
 
-    const gasPrice = toBN(gas.price.levels.fast)
-
-    txData.gasPrice = bnToHex(gasPrice)
+    const useDappGasPrice = rawTx.gasPrice && !isNaN(parseInt(rawTx.gasPrice, 16))
+    if (useDappGasPrice) {
+      txData.gasFeesSource = GasFeesSource.Dapp
+    } else {
+      const gasPrice = toBN(gas.price.levels.fast)
+      txData.gasPrice = bnToHex(gasPrice)
+    }
   }
 
   return txData
