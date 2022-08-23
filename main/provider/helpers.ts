@@ -126,7 +126,7 @@ export function getRawTx (newTx: RPC.SendTransaction.TxParams, accountId: string
     data: addHexPrefix(padToEven(stripHexPrefix(data || '0x'))),
     gasLimit: gasLimit || gas,
     chainId: rawTx.chainId,
-    gasFeesSource: GasFeesSource.Frame,
+    gasFeesSource: GasFeesSource.Dapp,
   }
 
   if (to) {
@@ -245,7 +245,9 @@ export function getChains (payload: JSONRPCRequestPayload, res: RPCSuccessCallba
 }
 
 export function getChainDetails (payload: JSONRPCRequestPayload, res: RPCSuccessCallback) {
-  res({ id: payload.id, jsonrpc: payload.jsonrpc, result: getActiveChainDetails() })
+  const result = getActiveChainDetails()
+  console.log('getChainDetails', result)
+  res({ id: payload.id, jsonrpc: payload.jsonrpc, result })
 }
   
 export function ecRecover (payload: JSONRPCRequestPayload, res: RPCRequestCallback) {
