@@ -187,12 +187,11 @@ class FrameAccount {
     return this.requests[id] as T
   }
 
-  resolveRequest <T> (req: AccountRequest, result?: T) {
-    const knownRequest = this.requests[req.handlerId]
+  resolveRequest <T> ({ handlerId, payload: { id, jsonrpc } }: AccountRequest, result?: T) {
+    const knownRequest = this.requests[handlerId]
 
     if (knownRequest) {
       if (knownRequest.res) {
-        const { id, jsonrpc } = req.payload || {}
         knownRequest.res({ id, jsonrpc, result })
       }
 
@@ -200,12 +199,11 @@ class FrameAccount {
     }
   }
 
-  rejectRequest (req: AccountRequest, error: EVMError) {
-    const knownRequest = this.requests[req.handlerId]
+  rejectRequest ({ handlerId, payload: { id, jsonrpc } }: AccountRequest, error: EVMError) {
+    const knownRequest = this.requests[handlerId]
 
     if (knownRequest) {
       if (knownRequest.res) {
-        const { id, jsonrpc } = req.payload || {}
         knownRequest.res({ id, jsonrpc, error })
       }
 
@@ -213,9 +211,9 @@ class FrameAccount {
     }
   }
 
-  private clearRequest (req: AccountRequest) {
-    store.navClearReq(req.handlerId)
-    delete this.requests[req.handlerId]
+  private clearRequest ({ handlerId }: AccountRequest) {
+    store.navClearReq(handlerId)
+    delete this.requests[handlerId]
     this.update()
   }
 
