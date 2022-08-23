@@ -531,10 +531,17 @@ export class Accounts extends EventEmitter {
     }
   }
 
-  resolveRequest (req: AccountRequest) {
+  resolveRequest <T> (req: AccountRequest, result?: T) {
     const currentAccount = this.current()
     if (currentAccount && currentAccount.resolveRequest) {
-      currentAccount.resolveRequest(req)
+      currentAccount.resolveRequest(req, result)
+    }
+  }
+
+  rejectRequest (req: AccountRequest, error: EVMError) {
+    const currentAccount = this.current()
+    if (currentAccount) {
+      currentAccount.rejectRequest(req, error)
     }
   }
 

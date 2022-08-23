@@ -165,8 +165,13 @@ ipcMain.on('dash:reloadSigner', (e, id) => {
   signers.reload(id)
 })
 
-ipcMain.on('tray:resolveRequest', (e, req) => {
-  accounts.resolveRequest(req)
+ipcMain.on('tray:resolveRequest', (e, req, result) => {
+  accounts.resolveRequest(req, result)
+})
+
+ipcMain.on('tray:rejectRequest', (e, req) => {
+  const err = { code: 4001, message: 'User rejected the request' }
+  accounts.rejectRequest(req, err)
 })
 
 ipcMain.on('tray:openExternal', (e, url) => {

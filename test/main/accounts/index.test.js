@@ -770,7 +770,7 @@ describe('#resolveRequest', () => {
       throw new Error('unexpected callback!')
     })
 
-    Accounts.resolveRequest({ handlerId: '-1' })
+    Accounts.resolveRequest({ payload: {}, handlerId: '-1' })
 
     expect(Object.keys(Accounts.current().requests)).toHaveLength(1)
   })
