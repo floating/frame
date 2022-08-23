@@ -155,10 +155,10 @@ class AccountSelector extends React.Component {
   }
 
   render () {
-    const current = this.store('selected.current')
+    const open = this.store('selected.open')
 
     return (
-      <div className={current ? 'accountSelector accountSelectorDisabled' : 'accountSelector'}>
+      <div className={open ? 'accountSelector accountSelectorDisabled' : 'accountSelector'}>
         {this.renderAccountFilter()}
         {this.renderAccountList()}
       </div>

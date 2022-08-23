@@ -372,8 +372,9 @@ class FrameAccount {
       if (accountOpen && !inRequestView) {
         const reqData = { ...req, data: { ...req.data } }
         delete reqData.res
-
-        const crumb = { view: 'requestView', step: 'confirm', account, req: reqData }
+        // TODO: only pass req id in nav instead of entire req
+        const reqClone = JSON.parse(JSON.stringify(reqData))
+        const crumb = { view: 'requestView', step: 'confirm', account, req: reqClone }
         nav.forward('panel', crumb)
       }
     }

@@ -852,53 +852,54 @@
     svg
       transform rotate(-45deg)
 
-.light
-  .approveTransactionWarning:before
-    content ''
-    position absolute 
-    top 0
-    left 0
-    right 0
-    bottom 0
-    background-image url('./App/Account/Account/Requests/style/wave.svg')
-    opacity 0.2
-    border-radius 8px
+// .light
+//   .approveTransactionWarning:before
+//     content ''
+//     position absolute 
+//     top 0
+//     left 0
+//     right 0
+//     bottom 0
+//     background-image url('./App/Account/Account/Requests/style/wave.svg')
+//     opacity 0.2
+//     border-radius 8px
 
-.dark
-  .approveTransactionWarning:before
-    content ''
-    position absolute 
-    top 0
-    left 0
-    right 0
-    bottom 0
-    background-image url('./App/Account/Account/Requests/style/waveDark.svg')
-    opacity 0.2
-    border-radius 8px
+// .dark
+//   .approveTransactionWarning:before
+//     content ''
+//     position absolute 
+//     top 0
+//     left 0
+//     right 0
+//     bottom 0
+//     background-image url('./App/Account/Account/Requests/style/waveDark.svg')
+//     opacity 0.2
+//     border-radius 12px
 
 .approveTransactionWarning
-  position absolute 
-  top 83px
-  right 0px
-  bottom 0px
-  left 0px
-  z-index 200000
-  border-radius 8px
+  position fixed
+  top 20px
+  right 6px
+  bottom 6px
+  left 6px
+  z-index 999900000
+  border-radius 16px
   background var(--ghostX02)
   background-position 0px 0px
+  overflow hidden
 
   .approveTransactionWarningOptions
     position absolute 
     bottom 78px
-    right 0px
-    left 0px
+    right 6px
+    left 6px
     height 30px
     border-radius 8px
     z-index 20000
     font-size 12px
     text-transform uppercase
     font-weight 600
-    background var(--ghostD)
+    background var(--ghostB)
     letter-spacing 1px
 
     .approveTransactionWarningReject
@@ -925,7 +926,7 @@
       text-align center
       box-sizing border-box
       border-radius 8px
-      background var(--ghostE)
+      background var(--ghostC)
       cursor help
       *
         pointer-event none
@@ -940,7 +941,7 @@
       text-align center
       box-sizing border-box
       border-radius 8px
-      background var(--ghostE)
+      background var(--ghostC)
       cursor pointer    
       *
         pointer-event none
@@ -973,13 +974,13 @@
     right 0px
     left 0px
     bottom 0px
-    background var(--ghostC)
+    background var(--ghostA)
     transition var(--standard)
     border-radius 8px
 
     .approveTransactionWarningIcon
       position absolute 
-      bottom 0px
+      top 0px
       height 80px
       width 75px
       display flex
@@ -1001,7 +1002,7 @@
       font-weight 600
       font-family Open Sans, sans-serif
       position absolute
-      bottom 21px
+      top 21px
       left 9px
       right 9px
       height 36px

@@ -75,8 +75,8 @@
 
     .transactionToAddressLargeWrap
       position absolute
-      top 17px
-      left 81px
+      top 21px
+      left 65px
       height 40px
       width 164px
       cursor pointer
@@ -154,7 +154,7 @@
     border-radius 12px
     transition var(--standard), background 0s linear
     z-index 9999000
-    height 80px
+    height 76px
     background var(--ghostA)
     margin 0px 0px 6px 0px
     box-shadow 0px 4px 8px var(--ghostY)
@@ -163,25 +163,27 @@
       z-index 3004
 
     .accountNotificationBadge
-      position absolute
-      top 20px
-      right 60px
+      position absolute 
+      top 18px
+      right 74px
+      width 60px
+      z-index 300000
+      border-radius 16px
       height 42px
-      width 42px
-      z-index 400000
-      border-radius 21px
+      width 48px
+      border-radius 12px
       display flex
       justify-content center
       align-items center
-      font-size 18px
-      font-weight 400
-      font-family FiraCode, monospace
-      color var(--ghostZ)
-      transition var(--standard)
+      -webkit-app-region no-drag
+      transition none
+      pointer-events auto
+      transform translate3d(0, 0, 0)
       background var(--ghostB)
-      padding-top 2px
-      box-sizing border-box
-      pointer-events none
+      position absolute
+      cursor pointer
+      color var(--outerspace01)
+      font-size 18px
 
     .accountNotificationBadgeReady
       color var(--outerspace)
@@ -210,24 +212,31 @@
 
     .signerSelect
       position absolute 
-      top 0px
-      right 0px
-      bottom 0px
-      width 90px
-      box-sizing border-box
+      top 18px
+      right 13px
+      width 60px
       z-index 300000
       border-radius 16px
+      height 42px
+      width 48px
+      border-radius 12px
+      display flex
+      justify-content center
+      align-items center
+      -webkit-app-region no-drag
+      transition none
+      pointer-events auto
+      transform translate3d(0, 0, 0)
+      background var(--ghostB)
+      position absolute
+      cursor pointer
+      // border 3px solid var(--ghostZ)
+      cursor pointer
+      
       
       .signerSelectIconWrap
-        width 100%
-        height 100%
-        transform rotate(0deg)
-        box-sizing border-box
-        padding 28px 16px 0px 48px
-        cursor pointer
-        transform translateX(-2px)
-        // border-left 1px solid var(--ghostA)
-
+        padding 1px 0px 0px 2px
+        pointer-events none
         div, svg
           pointer-events none
         
@@ -239,7 +248,8 @@
         pointer-events none
 
     .signerSelect:hover
-      background linear-gradient(90deg, var(--ghostB0), var(--ghostB))
+      cursor pointer
+      background var(--ghostC)
 
     .accountGrabber
       position absolute
@@ -266,9 +276,9 @@
 
     .accountIndicator
       position absolute 
-      top 12px
-      left 12px
-      bottom 12px
+      top 16px
+      left 6px
+      bottom 16px
       box-sizing border-box
       border-radius 8px
       width 3px
@@ -283,7 +293,7 @@
     .signerType
       position absolute 
       top 0px
-      left 16px
+      left 0px
       bottom 0px
       width 64px
       z-index 3400
@@ -316,15 +326,14 @@
 
       .signerSelectIconWrap
         position absolute
-        top 6px
+        top 1px
         left 16px
-        width 32px
-        bottom 6px
+        width 41px
+        bottom 0px
         cursor pointer
         display flex
         justify-content center
         align-items center
-        border-radius 8px
 
         div, svg
           pointer-events none
@@ -410,121 +419,8 @@
         opacity 1
         transition var(--standardSlow)
         margin-left 2px
-        // background yellow
         display none
 
-    // .signerTypeDisconnected:hover
-    //   margin-left -58px
-    //   width 116px
-
-    // .signerTypeDisconnected
-    //   position absolute
-    //   top 50%
-    //   left 50%
-    //   margin-top -40px
-    //   margin-left -55px
-    //   width 80px
-    //   height 74px
-    //   border-radius 12px
-    //   display none
-      
-    //   // border-bottom-right-radius 6px
-    //   // border-top-left-radius 0px
-    //   // border-top-right-radius 0px
-    //   // display flex
-    //   justify-content center
-    //   align-items center
-    //   overflow hidden
-    //   transition .32s cubic-bezier(0.175, 0.885, 0.32, 1.275) all, 0.1s linear top, 0.1s linear bottom, 0.1s linear box-shadow
-    //   -webkit-app-region no-drag
-    //   // background var(--ghostD)
-    //   z-index 15
-    //   color var(--outerspace)
-    //   transform translateZ(0)
-    //   // box-shadow 0px -5px 5px 5px var(--thick), 0px 2px 2px 1px var(--ghostD)
-
-    //   display flex
-    //   justify-content center
-    //   align-items center
-    //   overflow hidden
-    //   transition .42s cubic-bezier(0.175, 0.885, 0.32, 1.275) all, 0.1s linear top, 0.1s linear bottom, 0.1s linear box-shadow, 0.1s linear opacity
-    //   -webkit-app-region no-drag
-    //   box-shadow 0px 2px 2px var(--thick)
-
-    //   .signerDisconnectedTextOpen, .signerDisconnectedTextClose
-    //     position absolute
-    //     top 50%
-    //     left 0
-    //     right 0
-    //     height 30px
-    //     margin-top -15px
-    //     // margin-top 40px
-    //     display flex
-    //     flex-direction column
-    //     justify-content center
-    //     align-items center
-    //     text-transform uppercase
-    //     font-size 11px
-    //     line-height 10px
-    //     font-weight 600
-    //     letter-spacing 2px
-    //     color var(--outerspaceLight)
-    //     transition var(--standardFast)
-    //     opacity 0 !important
-    //   //
-    //   // .signerTypeDisconnectedImageBack
-    //   //   color var(--outerspace05) //var(--lowerlight)
-    //   //   text-transform uppercase
-    //   //   font-size 11px
-    //   //   line-height 10px
-    //   //   font-weight 300
-    //   //   letter-spacing 1px
-    //   //   filter drop-shadow(0px 4px 1px var(--doubleThick))
-    //   //   position absolute
-    //   //   transition var(--standardFast)
-    //   //   opacity 0
-
-    //   .signerTypeDisconnectedImageFront
-    //     color var(--outerspace08)
-    //     text-transform uppercase
-    //     font-size 11px
-    //     line-height 10px
-    //     font-weight 300
-    //     letter-spacing 1px
-    //     position absolute
-    //     margin-top 0px
-    //     transition var(--standardFast)
-    //     opacity 1
-    //     filter drop-shadow(0px 1px 1px var(--thick))
-
-    //   .signerTypeDisconnectedText
-    //     text-transform uppercase
-    //     position absolute
-    //     bottom -40px
-    //     font-size 11px
-    //     font-weight 600
-    //     letter-spacing 1px
-    //     margin-left 1px
-    //     transform translateY(0px)
-    //     color var(--ghostE)
-    //     transition var(--standardFast)
-    //     text-shadow 0px 1px 1px var(--tripleThick)
-
-    // .signerTypeDisconnected:hover
-    //   .signerTypeDisconnectedImageFront
-    //     color var(--ghostD)
-    // .signerDisconnectedTextOpen
-    //   //margin-top -7px
-    //   opacity 1 !important
-    //   .signerDisconnectedTextClose
-    //     //-top -7px
-    //     opacity 1 !important
-    //   .signerTypeDisconnectedImageBack
-    //     ////margin-top -52px
-    //     opacity 0
-    //   .signerTypeDisconnectedImageFront
-    //     //margin-top -52px
-    //     opacity 0
 
     .signerInner
       position absolute
@@ -532,15 +428,12 @@
       left 0px
       right 0px
       bottom 2px
-      // background var(--outerspaceDark)
-      // border-radius 12px
       display flex
       justify-content center
       align-items center
       overflow hidden
       transition .42s cubic-bezier(0.175, 0.885, 0.32, 1.275) all, 0.1s linear top, 0.1s linear bottom, 0.1s linear box-shadow, 0.1s linear opacity
       -webkit-app-region no-drag
-      // box-shadow 0px 2px 2px rgba(5, 5, 45, 0.4)
       z-index 25
       transform translateZ(0)
 
@@ -656,8 +549,8 @@
 
     .signerName
       position absolute
-      bottom 18px
-      left 81px
+      bottom 16px
+      left 65px
       overflow hidden
       display flex
       justify-content center
@@ -672,14 +565,12 @@
         // padding-bottom 0px
         position relative
         transition var(--standard)
-        font-size 13px
+        font-size 12px
         display flex
         justify-content center
         align-items center
         z-index 10
         font-weight 500
-        color var(--outerspace08)
-        // background red
 
       .signerNameTextENS
         opacity 0

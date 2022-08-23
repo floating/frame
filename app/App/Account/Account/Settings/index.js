@@ -98,8 +98,7 @@ class Settings extends React.Component {
             <div className='panelBlock'>
               <div className='panelBlockValues'>
                 <div className='panelBlockButton panelBlockItem' onMouseDown={() => {
-                  console.log('ok')
-                  // link.rpc('removeAccount', this.props.account, {}, () => {})
+                  link.rpc('removeAccount', this.props.account, {}, () => {})
                 }}
                   style={{ color: 'var(--bad)' }}
                 >

@@ -100,7 +100,6 @@ class TransactionRequest extends React.Component {
   renderTx () {
     const { accountId, handlerId } = this.props
     const req = this.store('main.accounts', accountId, 'requests', handlerId)
-    console.log({ accountId, handlerId, req })
     if (!req) return null
     const originalNotice = (req.notice || '').toLowerCase()
     let notice = req.notice

@@ -37,7 +37,7 @@ class ViewData extends React.Component {
     if (isNaN(nonce)) nonce = 'TBD'
 
     return (
-      <div className='cardShow'>
+      <div className='txViewData cardShow'>
         {utils.toAscii(req.data.data || '0x') ? (
           <div className='transactionDataBodyInner'>
             <div>

@@ -682,7 +682,7 @@
       border-bottom-left-radius 4px
       border-top-right-radius 12px
       border-bottom-right-radius 12px
-      pointer-events auto
+      pointer-events none
       color var(--moon)
       cursor pointer
 
@@ -713,6 +713,9 @@
   opacity 1
   transform scale(1)
   pointer-events none
+  .requestApproveFee
+    .requestApproveFeeButton 
+      pointer-events auto
 
 .approveTransaction, .approveRequest
   position absolute

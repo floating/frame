@@ -566,7 +566,7 @@ export class Accounts extends EventEmitter {
       txRequest.notice = 'Signature Declined'
       txRequest.mode = RequestMode.Monitor
 
-      // setTimeout(() => this.accounts[currentAccount.address] && this.removeRequest(currentAccount, handlerId), 8000)
+      setTimeout(() => this.accounts[currentAccount.address] && this.removeRequest(currentAccount, handlerId), 2000)
       currentAccount.update()
     }
   }

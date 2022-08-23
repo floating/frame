@@ -17,6 +17,8 @@
   display flex
   justify-content center
   align-items center
+  transform translateY(0px)
+  transition var(--standardFast)
 
   .accountSelectorScroll
     width 100%
@@ -164,6 +166,8 @@
 
 .accountSelectorDisabled
   pointer-events none
+  transform translateY(-20px)
+  transition var(--standard)
   *
     pointer-events none
 
