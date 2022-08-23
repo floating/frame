@@ -96,7 +96,7 @@ function populate (rawTx: TransactionData, chainConfig: Common, gas: any): Trans
     const useDappMaxPriorityFeePerGas = rawTx.maxPriorityFeePerGas && !isNaN(parseInt(rawTx.maxPriorityFeePerGas, 16))
     
     if (useDappMaxFeePerGas || useDappMaxPriorityFeePerGas) {
-      // dapp has supplied a valid value for maxFeePerGas or MaxPriorityFeePerGas so we change the source flag
+      // dapp supplied a valid value for maxFeePerGas or maxPriorityFeePerGas so we change the source flag
       txData.gasFeesSource = GasFeesSource.Dapp
     }
 
@@ -109,7 +109,7 @@ function populate (rawTx: TransactionData, chainConfig: Common, gas: any): Trans
     }
     
     if (!useDappMaxPriorityFeePerGas) {
-      // no valid dapp-supplied value so we set maxPriorityFeePerGas to that supplied by Frame
+      // no valid dapp-supplied value for maxPriorityFeePerGas so we use the Frame-supplied value
       const maxPriorityFee = toBN(gas.price.fees.maxPriorityFeePerGas)
       txData.maxPriorityFeePerGas = bnToHex(maxPriorityFee)
     }
@@ -118,10 +118,10 @@ function populate (rawTx: TransactionData, chainConfig: Common, gas: any): Trans
 
     const useDappGasPrice = rawTx.gasPrice && !isNaN(parseInt(rawTx.gasPrice, 16))
     if (useDappGasPrice) {
-      // dapp has supplied a valid value for gasPrice so we change the source flag
+      // dapp supplied a valid value for gasPrice so we change the source flag
       txData.gasFeesSource = GasFeesSource.Dapp
     } else {
-      // no valid dapp-supplied value so we set gasPrice to that supplied by Frame
+      // no valid dapp-supplied value for gasPrice so we use the Frame-supplied value
       const gasPrice = toBN(gas.price.levels.fast)
       txData.gasPrice = bnToHex(gasPrice)
     }
