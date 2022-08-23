@@ -133,7 +133,7 @@ const GasLimitInput = ({ initialValue, maxTotalFee, baseFee, priorityFee, gasPri
 
   return (
     <div className='txFeeOverlayLimit'>
-      <FeeOverlayInput initialValue={initialValue} onReceiveValue={receiveValueHandler} labelText='Gas Limit (UNITS)' tabIndex={2} decimals={false} />
+      <FeeOverlayInput initialValue={initialValue} onReceiveValue={receiveValueHandler} labelText='Gas Limit (UNITS)' tabIndex={tabIndex} decimals={false} />
     </div>
   )
 }
@@ -151,7 +151,7 @@ const GasPriceInput = ({ initialValue, maxTotalFee, gasLimit, handlerId }) => {
   }
   return (
     <div className='txFeeOverlayGasPrice'>
-      <FeeOverlayInput initialValue={initialValue} onReceiveValue={receiveValueHandler} labelText='Gas Price (GWEI)' tabIndex={0} decimals={true} />
+      <FeeOverlayInput initialValue={initialValue} onReceiveValue={receiveValueHandler} labelText='Gas Price (GWEI)' tabIndex={tabIndex} decimals={true} />
     </div>
   )
 }
@@ -170,12 +170,12 @@ const BaseFeeInput = ({ initialValue, maxTotalFee, priorityFee, gasLimit, handle
   }
   return (
     <div className='txFeeOverlayBaseFee'>
-      <FeeOverlayInput initialValue={initialValue} onReceiveValue={receiveValueHandler} labelText='Base Fee (GWEI)' tabIndex={0} decimals={true} />
+      <FeeOverlayInput initialValue={initialValue} onReceiveValue={receiveValueHandler} labelText='Base Fee (GWEI)' tabIndex={tabIndex} decimals={true} />
     </div>
   )
 }
 
-const PriorityFeeInput = ({ initialValue, maxTotalFee, baseFee, gasLimit, handlerId }) => {
+const PriorityFeeInput = ({ initialValue, maxTotalFee, baseFee, gasLimit, handlerId, tabIndex }) => {
   const receiveValueHandler = (newValue) => {
     let priorityFee = trimGwei(newValue)
 
@@ -189,7 +189,7 @@ const PriorityFeeInput = ({ initialValue, maxTotalFee, baseFee, gasLimit, handle
   }
   return (
     <div className='txFeeOverlayPriorityFee'>
-      <FeeOverlayInput initialValue={initialValue} onReceiveValue={receiveValueHandler} labelText='Max Priority Fee (GWEI)' tabIndex={1} decimals={true} />
+      <FeeOverlayInput initialValue={initialValue} onReceiveValue={receiveValueHandler} labelText='Max Priority Fee (GWEI)' tabIndex={tabIndex} decimals={true} />
     </div>
   )
 }
@@ -237,13 +237,13 @@ class TxFeeOverlay extends Component {
         {
           usesBaseFee(data) ? 
           <>
-            <BaseFeeInput initialValue={this.state.baseFee} maxTotalFee={maxTotalFee} priorityFee={this.state.priorityFee} gasLimit={this.state.gasLimit} handlerId={handlerId} />
-            <PriorityFeeInput initialValue={this.state.priorityFee} maxTotalFee={maxTotalFee} baseFee={this.state.baseFee} gasLimit={this.state.gasLimit} handlerId={handlerId} />
+            <BaseFeeInput initialValue={this.state.baseFee} maxTotalFee={maxTotalFee} priorityFee={this.state.priorityFee} gasLimit={this.state.gasLimit} handlerId={handlerId} tabIndex={0} />
+            <PriorityFeeInput initialValue={this.state.priorityFee} maxTotalFee={maxTotalFee} baseFee={this.state.baseFee} gasLimit={this.state.gasLimit} handlerId={handlerId} tabIndex={1} />
           </> :  
-          <GasPriceInput initialValue={this.state.gasPrice} maxTotalFee={maxTotalFee} gasLimit={this.state.gasLimit} handlerId={handlerId} />
+          <GasPriceInput initialValue={this.state.gasPrice} maxTotalFee={maxTotalFee} gasLimit={this.state.gasLimit} handlerId={handlerId} tabIndex={0} />
         }
         
-        <GasLimitInput initialValue={this.state.gasLimit} maxTotalFee={maxTotalFee} baseFee={this.state.baseFee} priorityFee={this.state.priorityFee} gasPrice={this.state.gasPrice} handlerId={handlerId} limiter={(val) => limitRange(val, 0, 12.5e6)} />
+        <GasLimitInput initialValue={this.state.gasLimit} maxTotalFee={maxTotalFee} baseFee={this.state.baseFee} priorityFee={this.state.priorityFee} gasPrice={this.state.gasPrice} handlerId={handlerId} limiter={(val) => limitRange(val, 0, 12.5e6)} tabIndex={2} />
       </div>
     )
   }
