@@ -187,7 +187,7 @@ class FrameAccount {
     return this.requests[id] as T
   }
 
-  resolveRequest <T> ({ handlerId, payload: { id, jsonrpc } }: AccountRequest, result?: T) {
+  resolveRequest ({ handlerId, payload: { id, jsonrpc } }: AccountRequest, result?: any) {
     const knownRequest = this.requests[handlerId]
 
     if (knownRequest) {
