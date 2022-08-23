@@ -113,15 +113,15 @@ function populate (rawTx: TransactionData, chainConfig: Common, gas: GasData): T
     
   const useFrameMaxFeePerGas = !rawTx.maxFeePerGas || isNaN(parseInt(rawTx.maxFeePerGas, 16))
   const useFrameMaxPriorityFeePerGas = !rawTx.maxPriorityFeePerGas || isNaN(parseInt(rawTx.maxPriorityFeePerGas, 16))
-    
-  if (useFrameMaxFeePerGas && useFrameMaxPriorityFeePerGas) {
-    // dapp did not supply a valid value for maxFeePerGas or maxPriorityFeePerGas so we change the source flag
-    txData.gasFeesSource = GasFeesSource.Frame
-  }
-
+  
   if (!useFrameMaxFeePerGas && !useFrameMaxPriorityFeePerGas) {
     // return tx unaltered when we are using no Frame-supplied values
     return txData
+  }
+
+  if (useFrameMaxFeePerGas && useFrameMaxPriorityFeePerGas) {
+    // dapp did not supply a valid value for maxFeePerGas or maxPriorityFeePerGas so we change the source flag
+    txData.gasFeesSource = GasFeesSource.Frame
   }
 
   const maxPriorityFee = toBN(useFrameMaxPriorityFeePerGas ? gas.price.fees.maxPriorityFeePerGas : rawTx.maxPriorityFeePerGas as string)
