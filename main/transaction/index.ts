@@ -101,7 +101,8 @@ function populate (rawTx: TransactionData, chainConfig: Common, gas: any): Trans
     }
 
     if (!useDappMaxFeePerGas) {
-      // no valid dapp-supplied value for maxFeePerGas so we calculate it from Frame or dapp-supplied values 
+      // no valid dapp-supplied value for maxFeePerGas so we calculate it
+      // calculation uses Frame-supplied values and dapp-supplied maxPriorityFeePerGas (if available and valid)
       const maxBaseFee = toBN(gas.price.fees.maxBaseFeePerGas)
       const maxPriorityFee = toBN(useDappMaxPriorityFeePerGas ? rawTx.maxPriorityFeePerGas : gas.price.fees.maxPriorityFeePerGas)
       const maxFee = maxPriorityFee.add(maxBaseFee)
