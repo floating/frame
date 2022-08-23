@@ -305,7 +305,7 @@ describe('#populate', () => {
       expect(tx.gasFeesSource).toBe(GasFeesSource.Frame)
     })
 
-    it('uses Dapp-supplied gasPrice when the dapp specified a valid value', () => {
+    it('uses dapp-supplied gasPrice when the dapp specified a valid value', () => {
       gas.price.levels.fast = addHexPrefix(7e9.toString(16))
       rawTx.gasPrice = 6e9.toString(16)
       const tx = populate(rawTx, chainConfig, gas)
@@ -364,7 +364,7 @@ describe('#populate', () => {
       expect(tx.gasFeesSource).toBe(GasFeesSource.Dapp)
     })
 
-    it('uses Dapp-supplied maxFeePerGas when the dapp specified a valid value', () => {
+    it('uses dapp-supplied maxFeePerGas when the dapp specified a valid value', () => {
       gas.price.fees.maxBaseFeePerGas = addHexPrefix(7e9.toString(16))
       gas.price.fees.maxPriorityFeePerGas = addHexPrefix(3e9.toString(16))
       rawTx.maxFeePerGas = 6e9.toString(16)
@@ -391,7 +391,7 @@ describe('#populate', () => {
       expect(tx.gasFeesSource).toBe(GasFeesSource.Frame)
     })
 
-    it('uses Dapp-supplied maxPriorityFeePerGas when the dapp specified a valid value', () => {
+    it('uses dapp-supplied maxPriorityFeePerGas when the dapp specified a valid value', () => {
       gas.price.fees.maxBaseFeePerGas = addHexPrefix(7e9.toString(16))
       gas.price.fees.maxPriorityFeePerGas = addHexPrefix(3e9.toString(16))
       rawTx.maxPriorityFeePerGas = 6e9.toString(16)
