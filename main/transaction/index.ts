@@ -91,7 +91,6 @@ function populate (rawTx: TransactionData, chainConfig: Common, gas: any): Trans
 
   if (chainConfig.isActivatedEIP(1559) && gas.price.fees) {
     txData.type = intToHex(2)
-
     
     const useDappMaxFeePerGas = rawTx.maxFeePerGas && !isNaN(parseInt(rawTx.maxFeePerGas, 16))
     const useDappMaxPriorityFeePerGas = rawTx.maxPriorityFeePerGas && !isNaN(parseInt(rawTx.maxPriorityFeePerGas, 16))
