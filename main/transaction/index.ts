@@ -94,17 +94,16 @@ function populate (rawTx: TransactionData, chainConfig: Common, gas: any): Trans
 
     
     const useDappMaxFeePerGas = rawTx.maxFeePerGas && !isNaN(parseInt(rawTx.maxFeePerGas, 16))
-    const useDappMaxBaseFeePerGas = rawTx.maxBaseFeePerGas && !isNaN(parseInt(rawTx.maxBaseFeePerGas, 16))
     const useDappMaxPriorityFeePerGas = rawTx.maxPriorityFeePerGas && !isNaN(parseInt(rawTx.maxPriorityFeePerGas, 16))
     
-    if (useDappMaxFeePerGas || useDappMaxBaseFeePerGas || useDappMaxPriorityFeePerGas) {
+    if (useDappMaxFeePerGas || useDappMaxPriorityFeePerGas) {
       // dapp has supplied a valid value for maxFeePerGas or MaxPriorityFeePerGas so we change the source flag
       txData.gasFeesSource = GasFeesSource.Dapp
     }
 
     if (!useDappMaxFeePerGas) {
       // no valid dapp-supplied value for maxFeePerGas so we calculate it from Frame or dapp-supplied values 
-      const maxBaseFee = toBN(useDappMaxBaseFeePerGas ? rawTx.maxBaseFeePerGas : gas.price.fees.maxBaseFeePerGas)
+      const maxBaseFee = toBN(gas.price.fees.maxBaseFeePerGas)
       const maxPriorityFee = toBN(useDappMaxPriorityFeePerGas ? rawTx.maxPriorityFeePerGas : gas.price.fees.maxPriorityFeePerGas)
       const maxFee = maxPriorityFee.add(maxBaseFee)
       txData.maxFeePerGas = bnToHex(maxFee)
