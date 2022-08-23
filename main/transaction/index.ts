@@ -86,48 +86,58 @@ function maxFee (rawTx: TransactionData) {
   return 50 * 1e18
 }
 
-function populate (rawTx: TransactionData, chainConfig: Common, gas: any): TransactionData {
+function calculateMaxFeePerGas(maxBaseFee: BN, maxPriorityFee: BN) {
+  return bnToHex(maxPriorityFee.add(maxBaseFee))
+}
+
+function populate (rawTx: TransactionData, chainConfig: Common, gas: GasData): TransactionData {
   const txData: TransactionData = { ...rawTx }
 
-  if (chainConfig.isActivatedEIP(1559) && gas.price.fees) {
-    txData.type = intToHex(2)
-    
-    const useDappMaxFeePerGas = rawTx.maxFeePerGas && !isNaN(parseInt(rawTx.maxFeePerGas, 16))
-    const useDappMaxPriorityFeePerGas = rawTx.maxPriorityFeePerGas && !isNaN(parseInt(rawTx.maxPriorityFeePerGas, 16))
-    
-    if (useDappMaxFeePerGas || useDappMaxPriorityFeePerGas) {
-      // dapp supplied a valid value for maxFeePerGas or maxPriorityFeePerGas so we change the source flag
-      txData.gasFeesSource = GasFeesSource.Dapp
-    }
-
-    if (!useDappMaxFeePerGas) {
-      // no valid dapp-supplied value for maxFeePerGas so we calculate it
-      // calculation uses Frame-supplied values and dapp-supplied maxPriorityFeePerGas (if available and valid)
-      const maxBaseFee = toBN(gas.price.fees.maxBaseFeePerGas)
-      const maxPriorityFee = toBN(useDappMaxPriorityFeePerGas ? rawTx.maxPriorityFeePerGas : gas.price.fees.maxPriorityFeePerGas)
-      const maxFee = maxPriorityFee.add(maxBaseFee)
-      txData.maxFeePerGas = bnToHex(maxFee)
-    }
-    
-    if (!useDappMaxPriorityFeePerGas) {
-      // no valid dapp-supplied value for maxPriorityFeePerGas so we use the Frame-supplied value
-      const maxPriorityFee = toBN(gas.price.fees.maxPriorityFeePerGas)
-      txData.maxPriorityFeePerGas = bnToHex(maxPriorityFee)
-    }
-  } else {
+  // non-EIP-1559 case
+  if (!chainConfig.isActivatedEIP(1559) || !gas.price.fees) {
     txData.type = intToHex(chainConfig.isActivatedEIP(2930) ? 1 : 0)
 
-    const useDappGasPrice = rawTx.gasPrice && !isNaN(parseInt(rawTx.gasPrice, 16))
-    if (useDappGasPrice) {
-      // dapp supplied a valid value for gasPrice so we change the source flag
-      txData.gasFeesSource = GasFeesSource.Dapp
-    } else {
+    const useFrameGasPrice = !rawTx.gasPrice || isNaN(parseInt(rawTx.gasPrice, 16))
+    if (useFrameGasPrice) {
       // no valid dapp-supplied value for gasPrice so we use the Frame-supplied value
-      const gasPrice = toBN(gas.price.levels.fast)
+      const gasPrice = toBN(gas.price.levels.fast as string)
       txData.gasPrice = bnToHex(gasPrice)
-    }
+      txData.gasFeesSource = GasFeesSource.Frame
+    } 
+
+    return txData
   }
 
+  // EIP-1559 case
+  txData.type = intToHex(2)
+    
+  const useFrameMaxFeePerGas = !rawTx.maxFeePerGas || isNaN(parseInt(rawTx.maxFeePerGas, 16))
+  const useFrameMaxPriorityFeePerGas = !rawTx.maxPriorityFeePerGas || isNaN(parseInt(rawTx.maxPriorityFeePerGas, 16))
+    
+  if (useFrameMaxFeePerGas && useFrameMaxPriorityFeePerGas) {
+    // dapp did not supply a valid value for maxFeePerGas or maxPriorityFeePerGas so we change the source flag
+    txData.gasFeesSource = GasFeesSource.Frame
+  }
+
+  if (!useFrameMaxFeePerGas && !useFrameMaxPriorityFeePerGas) {
+    // return tx unaltered when we are using no Frame-supplied values
+    return txData
+  }
+
+  const maxPriorityFee = toBN(useFrameMaxPriorityFeePerGas ? gas.price.fees.maxPriorityFeePerGas : rawTx.maxPriorityFeePerGas as string)
+
+  if (useFrameMaxFeePerGas) {
+    // no valid dapp-supplied value for maxFeePerGas so we calculate it
+    // calculation uses Frame-supplied values and dapp-supplied maxPriorityFeePerGas (if available and valid)
+    const maxBaseFee = toBN(gas.price.fees.maxBaseFeePerGas)
+    txData.maxFeePerGas = calculateMaxFeePerGas(maxBaseFee, maxPriorityFee)
+  }
+
+  if (useFrameMaxPriorityFeePerGas) {
+    // no valid dapp-supplied value for maxPriorityFeePerGas so we use the Frame-supplied value
+    txData.maxPriorityFeePerGas = bnToHex(maxPriorityFee)
+  }
+  
   return txData
 }
 
