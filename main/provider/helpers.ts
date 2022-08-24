@@ -13,7 +13,7 @@ import log from 'electron-log'
 
 import store from '../store'
 import protectedMethods from '../api/protectedMethods'
-import { getAddress, usesBaseFee, TransactionData } from '../../resources/domain/transaction'
+import { getAddress, usesBaseFee, TransactionData, GasFeesSource } from '../../resources/domain/transaction'
 import FrameAccount from '../accounts/Account'
 
 const NATIVE_CURRENCY = '0x0000000000000000000000000000000000000000'
@@ -125,7 +125,8 @@ export function getRawTx (newTx: RPC.SendTransaction.TxParams, accountId: string
     value: parsedValue,
     data: addHexPrefix(padToEven(stripHexPrefix(data || '0x'))),
     gasLimit: gasLimit || gas,
-    chainId: rawTx.chainId
+    chainId: rawTx.chainId,
+    gasFeesSource: GasFeesSource.Dapp,
   }
 
   if (to) {

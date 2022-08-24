@@ -532,8 +532,8 @@ export class Provider extends EventEmitter {
   }
 
   signTypedData (rawPayload: RPCRequestPayload, version: Version, res: RPCRequestCallback) {
-    // v1 has the param order as: [data, address, ...], all other versions have [address, data, ...]
-    const orderedParams = version === 'V1'
+    // ensure param order is [address, data, ...] regardless of version
+    const orderedParams = utils.isAddress(rawPayload.params[1]) && !utils.isAddress(rawPayload.params[0])
       ? [rawPayload.params[1], rawPayload.params[0], ...rawPayload.params.slice(2)]
       : [...rawPayload.params]
 
@@ -615,13 +615,13 @@ export class Provider extends EventEmitter {
         store.switchOriginChain(originId, chainId, origin.chain.type)
       }
 
-      return res({ id: payload.id, jsonrpc: '2.0', result: undefined })
+      return res({ id: payload.id, jsonrpc: '2.0', result: null })
     } catch (e) {
       return resError(e as EVMError, payload, res)
     }
   }
 
-  addEthereumChain (payload: RPCRequestPayload, res: RPCRequestCallback) {
+  private addEthereumChain (payload: RPCRequestPayload, res: RPCRequestCallback) {
     if (!payload.params[0]) return resError('addChain request missing params', payload, res)
 
     const type = 'ethereum'
@@ -630,8 +630,7 @@ export class Provider extends EventEmitter {
       chainName, 
       nativeCurrency, 
       rpcUrls = [], 
-      blockExplorerUrls = [],
-      iconUrls = [] 
+      blockExplorerUrls = []
     } = payload.params[0]
 
     if (!chainId) return resError('addChain request missing chainId', payload, res)
@@ -641,8 +640,8 @@ export class Provider extends EventEmitter {
     const handlerId = this.addRequestHandler(res)
 
     // Check if chain exists
-    const id = parseInt(chainId)
-    if (!Number.isInteger(id)) throw new Error('Invalid chain id')
+    const id = parseInt(chainId, 16)
+    if (!Number.isInteger(id)) return resError('Invalid chain id', payload, res)
 
     const exists = Boolean(store('main.networks', type, id))
     if (exists) {
@@ -655,12 +654,12 @@ export class Provider extends EventEmitter {
         type: 'addChain',
         chain: {
           type,
-          id: chainId,
+          id,
           name: chainName,
-          nativeCurrency,
-          rpcUrls,
-          blockExplorerUrls, 
-          iconUrls
+          symbol: nativeCurrency.symbol,
+          primaryRpc: rpcUrls[0],
+          secondaryRpc: rpcUrls[1],
+          explorer: blockExplorerUrls[0]
         },
         account: (accounts.getAccounts() || [])[0],
         origin: payload._origin,

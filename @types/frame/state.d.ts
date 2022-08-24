@@ -59,7 +59,8 @@ interface GasData {
   fees: GasFees,
   price: {
     selected: string,
-    levels: GasLevels
+    levels: GasLevels,
+    fees: GasFees | null
   }
 }
 

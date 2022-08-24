@@ -165,6 +165,15 @@ ipcMain.on('dash:reloadSigner', (e, id) => {
   signers.reload(id)
 })
 
+ipcMain.on('tray:resolveRequest', (e, req, result) => {
+  accounts.resolveRequest(req, result)
+})
+
+ipcMain.on('tray:rejectRequest', (e, req) => {
+  const err = { code: 4001, message: 'User rejected the request' }
+  accounts.rejectRequest(req, err)
+})
+
 ipcMain.on('tray:openExternal', (e, url) => {
   const validHost = externalWhitelist.some(entry => url === entry || url.startsWith(entry + '/'))
   if (validHost || true) {
@@ -190,9 +199,8 @@ ipcMain.on('tray:giveAccess', (e, req, access) => {
   accounts.setAccess(req, access)
 })
 
-ipcMain.on('tray:addChain', (e, chain, req) => {
-  if (chain) store.addNetwork(chain)
-  if (req) accounts.resolveRequest(req)
+ipcMain.on('tray:addChain', (e, chain) => {
+  store.addNetwork(chain)
 })
 
 ipcMain.on('tray:switchChain', (e, type, id, req) => {
@@ -224,6 +232,18 @@ ipcMain.on('tray:removeToken', (e, token) => {
 
 ipcMain.on('tray:adjustNonce', (e, handlerId, nonceAdjust) => {
   accounts.adjustNonce(handlerId, nonceAdjust)
+})
+
+ipcMain.on('tray:removeOrigin', (e, handlerId) => {
+  accounts.removeRequests(handlerId)
+  store.removeOrigin(handlerId)
+})
+
+ipcMain.on('tray:clearOrigins', (e) => {
+  Object.keys(store('main.origins')).forEach((handlerId) => {
+    accounts.removeRequests(handlerId)
+  })
+  store.clearOrigins()
 })
 
 ipcMain.on('tray:syncPath', (e, path, value) => {

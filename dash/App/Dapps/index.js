@@ -160,8 +160,7 @@ class Dapps extends React.Component {
   render () {
     const enabledChains = this.getEnabledChains()
     const origins = this.store('main.origins')
-    const originsCount = Object.values(origins).length
-    const clearOriginsClickHandler = () => link.send('tray:action', 'clearOrigins')
+    const clearOriginsClickHandler = () => link.send('tray:clearOrigins')
 
     const { dappDetails } = this.props.data
 
