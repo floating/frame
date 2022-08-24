@@ -5,14 +5,17 @@ import { AccountRequest } from '../../accounts'
 
 import store from '../../store'
 
-export interface CrumbSpec {
-  view: string
-  step: string
+type View = 'requestView'
+type Step = 'confirm'
+
+interface Crumb {
+  view: View
+  step: Step
   account: string
   req: AccountRequest
 }
 
-export function Crumb ({ view, step, account, req }: CrumbSpec) {
+function copyCrumb ({ view, step, account, req }: Crumb) {
   const reqData = JSON.parse(JSON.stringify(req))
 
   return {
@@ -26,7 +29,7 @@ export function Crumb ({ view, step, account, req }: CrumbSpec) {
 const nav = {
   forward: (windowId: string, crumb: Crumb) => {
     // Adds new crumb to nav array
-    store.navForward(windowId, crumb)
+    store.navForward(windowId, copyCrumb(crumb))
   },
   back: (windowId: string) => {
     // Removes last crumb from nav array
@@ -36,7 +39,7 @@ const nav = {
     // Updated last crumb in nav array with new data
     // Replaces last crumb when navigate is false
     // Adds new crumb to nav array when navigate is true
-    store.navUpdate(windowId, crumb, navigate)
+    store.navUpdate(windowId, copyCrumb(crumb), navigate)
   }
 }
 
