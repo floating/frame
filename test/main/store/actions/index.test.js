@@ -929,7 +929,7 @@ describe('#activateNetwork', () => {
 
   const activateNetwork = (type, chainId, active) => activateNetworkAction(updaterFn, type, chainId, active)
 
-  it('sets the given chain to be on', () => {
+  it('activates the given chain', () => {
     main.networks.ethereum[137].on = false
 
     activateNetwork('ethereum', 137, true)
