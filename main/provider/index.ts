@@ -473,7 +473,9 @@ export class Provider extends EventEmitter {
           account: (currentAccount as FrameAccount).id, 
           origin: payload._origin, 
           approvals: [],
-          feesUpdatedByUser: feesUpdated || false
+          feesUpdatedByUser: feesUpdated || false,
+          recipientType: '',
+          recognizedActions: []
         } as TransactionRequest
 
         accounts.addRequest(req, res)

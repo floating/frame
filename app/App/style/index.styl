@@ -103,8 +103,8 @@
 
 .panelMenu
   position absolute
-  left 18px
-  right 18px
+  left 24px
+  right 24px
   // width 100px
   top 10px
   height 63px
@@ -116,75 +116,12 @@
   z-index 1000000000
   opacity 1
   transform translate3d(0, 0, 0)
-  
-  .panelFilter
-    background var(--ghostZ)
-    position absolute
-    top 12px
-    left 68px
-    right 68px
-    height 32px
-    border-radius 12px
-    border 3px solid var(--ghostZ)
-    z-index 2000000000
-    overflow hidden
-    transition var(--standardFast)
-
-    .panelFilterIcon
-      position absolute
-      top 0
-      left 0
-      bottom 0
-      width 32px
-      display flex
-      justify-content center
-      align-items center
-      background var(--ghostZ)
-
-    .panelFilterInput
-      position absolute
-      top 0
-      left 32px
-      bottom 0
-      right 0
-
-      input 
-        width 100%
-        height 100%
-        border none
-        outline none
-        text-align center
-        background transparent
-        color var(--outerspace)
-        font-size 18px
-        font-family 'Exo2'
-        padding-right 32px
-        padding-bottom 4px
-
-    .panelFilterClear
-      position absolute
-      top 0
-      right 0
-      bottom 0
-      width 32px
-      display flex
-      justify-content center
-      align-items center
-      color var(--outerspace)
-      cursor pointer
-      border-radius 9px
-
-      *
-        pointer-events none
-
-    .panelFilterClear:hover
-      background var(--ghostB)
 
   .panelMenuItem
-    height 32px
+    height 38px
     width 48px
-    top 12px
-    border-radius 12px
+    top 9px
+    border-radius 16px
     display flex
     justify-content center
     align-items center
@@ -268,82 +205,6 @@
   .panelMenuMarkGood
     background var(--good)
     
-    // .panelMenuMark::after
-    //   content ''
-    //   position absolute
-    //   top 0
-    //   left 0
-    //   right 0
-    //   bottom 0
-    //   width 38px
-    //   height 3px
-    //   background var(--outerspace)
-    //   // transform translateX(14px)
-    //   border-radius 2px
-    //   transition var(--standard)
-    //   z-index 20002
-
-    // .panelMenuMark::after
-    //   content ''
-    //   position absolute
-    //   top 5px
-    //   left -5px
-    //   right -5px
-    //   // height 40px
-    //   // background red
-    //   // transform perspective(300px) skew(20deg)
-    //   border-bottom: 20px solid var(--good)
-    //   border-left: 10px solid transparent
-    //   border-right: 10px solid transparent
-    //   filter blur(9px)
-    //   opacity 0.1
-
-    //   // perspective 20px
-
-    // .panelMenuMark::before
-    //   content ''
-    //   position absolute
-    //   top 16px
-    //   left -5px
-    //   right -4px
-    //   height 28px
-    //   // background red
-    //   border 1px solid var(--good)
-    //   border-radius 7px
-    //   // transform perspective(300px) skew(20deg)
-    //   // border-bottom: 20px solid var(--outerspace)
-    //   // border-left: 10px solid transparent
-    //   // border-right: 10px solid transparent
-    //   // filter blur(9px)
-    //   // opacity 0.1
-    //   // perspective 20px
-    //   box-shadow 0px 0px 10px var(--good02)
-
-
-  
-  
-  // .panelMenuItemOpen
-  //   color var(--good)
-  //   cursor pointer
-
-  // .panelMenuItemAccounts
-  //   right 120px
-  //   svg
-  //     stroke ver(--outerspace)
-  //     stroke-width 2
-
-  // .panelMenuItemNetwork
-  //   position absolute
-  //   left 45px
-    
-  // .panelMenuItemConnections
-  //   right 64px
-
-  // .panelMenuItemSettings
-  //   right 9px
-    // svg
-    //   transform rotate(90deg)
-       
   .panelDetail
     display flex
     align-items center
@@ -360,7 +221,6 @@
     display flex
     justify-content center
     align-items center
-    // margin-top -1px
     font-weight 400
     padding-right 8px
     margin-right 8px
@@ -417,46 +277,17 @@
       border-radius 2px
 
     .panelDetailIndicatorGood
-      // transition var(--standardSlow)
       background var(--good)
 
     .panelDetailIndicatorWaiting
-      // transition var(--standardSlow)
       background var(--moon)
 
     .panelDetailIndicatorBad
-      // transition var(--standardSlow)
       background var(--bad)
 
     .panelDetailIndicatorPending
       transition var(--standardSlow)
       background var(--pending)
-
-// .panelMenuAddMode
-//   transition var(--standard)
-//   z-index 10000
-//   .panelDetail
-//     transition var(--standardSlowest)
-//     margin-left calc(50% - 50px)
-//   .panelMenuItem
-//     transition var(--standard)
-//     opacity 0
-//     pointer-events none
-//     svg
-//       color var(--spacewhite)
-//   .panelDetailText
-//     transition var(--standard)
-//     color var(--spacewhite)
-//   .panelDetailIndicator
-//     .panelDetailIndicatorGood
-//       transition var(--standardSlow)
-//       background var(--smart)
-//     .panelDetailIndicatorBad
-//       transition var(--standardSlow)
-//       background var(--hot)
-//     .panelDetailIndicatorPending
-//       transition var(--standardSlow)
-//       background var(--hardware)
 
 .appMenu
   position absolute
@@ -464,7 +295,6 @@
   right 0px
   bottom 0px
   height 48px
-  // padding 0px 9px 0px 9px
   display flex
   justify-content space-between
   align-items center
@@ -472,13 +302,8 @@
   z-index 100000000000
   opacity 1
   transform translate3d(0, 0, 0)
-  // background linear-gradient(rgba(240, 240, 255, 0.5), rgba(240, 240, 255, 0))
   transition var(--standardFast)
   background var(--ghostB)
-  // border-top 1px solid var(--thin)
-  // box-shadow 0px -4px 10px var(--thick)
-  // border-top-left-radius 12px
-  // border-top-right-radius 12px
   display none
 
   .appMenuItem
@@ -502,7 +327,7 @@
       transform translate3d(0, 0, 0)
       background var(--ghostE)
       position absolute
-      box-shadow 0px 4px 6px -1px var(--thin) // , 0px 8px 8px -2px var(--thin), 0px 0px 10px -2px var(--thin)
+      box-shadow 0px 4px 6px -1px var(--thin)
       cursor pointer
       padding-top 1px
       margin 10px
@@ -510,7 +335,9 @@
       *
         pointer-events none
 
-@import '../Main/style'
+@import './card.styl'
 @import '../Notify/style'
 @import '../Badge/style'
-@import './card.styl'
+@import '../Backdrop/style'
+@import '../Account/style'
+@import '../AccountSelector/style'

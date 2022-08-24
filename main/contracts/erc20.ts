@@ -3,18 +3,19 @@ import { Contract } from '@ethersproject/contracts'
 import { Web3Provider } from '@ethersproject/providers'
 import log from 'electron-log'
 import erc20Abi from '../externalData/balances/erc-20-abi'
-import type { Provider } from '../provider'
+import provider from '../provider'
 
-function createWeb3ProviderWrapper (chainId: string, provider: Provider) {
+function createWeb3ProviderWrapper (chainId: string) {
   const wrappedSend = (request: { method: string, params?: any[] }, cb: (error: any, response: any) => void) => {
-    provider.sendAsync({
+    const wrappedPayload = {
       method: request.method,
       params: request.params || [],
       id: 1,
       jsonrpc: '2.0',
       _origin: 'frame-internal',
       chainId
-    }, cb)
+    }
+    provider.sendAsync(wrappedPayload, cb)
   }
 
   return {
@@ -26,8 +27,8 @@ function createWeb3ProviderWrapper (chainId: string, provider: Provider) {
 export default class Erc20Contract {
   private contract: Contract
 
-  constructor (address: Address, chainId: string, provider: Provider) {
-    const web3Provider = new Web3Provider(createWeb3ProviderWrapper(chainId, provider))
+  constructor (address: Address, chainId: string) {
+    const web3Provider = new Web3Provider(createWeb3ProviderWrapper(chainId))
     this.contract = new Contract(address, erc20Abi, web3Provider)
   }
 
@@ -36,6 +37,15 @@ export default class Erc20Contract {
       data.name === 'approve' &&
       data.functionFragment.inputs.length === 2 &&
       (data.functionFragment.inputs[0].name || '').toLowerCase().endsWith('spender') && data.functionFragment.inputs[0].type === 'address' &&
+      (data.functionFragment.inputs[1].name || '').toLowerCase().endsWith('value') && data.functionFragment.inputs[1].type === 'uint256'
+    )
+  }
+
+  static isTransfer (data: TransactionDescription) {
+    return (
+      data.name === 'transfer' &&
+      data.functionFragment.inputs.length === 2 &&
+      (data.functionFragment.inputs[0].name || '').toLowerCase().endsWith('to') && data.functionFragment.inputs[0].type === 'address' &&
       (data.functionFragment.inputs[1].name || '').toLowerCase().endsWith('value') && data.functionFragment.inputs[1].type === 'uint256'
     )
   }

@@ -121,6 +121,9 @@ module.exports = {
     u('selected.minimized', _ => false)
     u('selected.open', _ => true)
   },
+  setAccountSignerStatusOpen: (u, value) => {
+    u('selected.signerStatusOpen', _ => Boolean(value))
+  },
   accountTokensUpdated: (u, address) => {
     u('main.accounts', address, account => {
       const balances = { ...account.balances, lastUpdated: new Date().getTime() }
@@ -581,17 +584,17 @@ module.exports = {
     })
   },
   // Dashboard
-  // setDashType: (u, type) => {
-  //   // console.log('set dash type', type)
-  //   u('dash.type', () => type)
-  // },
   toggleDash: (u, force) => {
     u('dash.showing', s => force === 'hide' ? false : force === 'show' ? true : !s)
   },
   closeDash: (u) => {
     u('dash.showing', () => false)
+    u('dash.nav', () => ([])) // Reset nav
   },
   setDash: (u, update) => {
+    if (!update.showing) {
+      u('dash.nav', () => ([])) // Reset nav
+    }
     u('dash', dash => Object.assign(dash, update))
   },
   navPanel: (u, navItem) => {

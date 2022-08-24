@@ -4,7 +4,6 @@ import BigNumber from 'bignumber.js'
 import { Version } from 'eth-sig-util'
 
 import { AccessRequest, AccountRequest, Accounts, RequestMode, TransactionRequest } from '..'
-import { decodeContractCall } from '../../contracts'
 import nebulaApi from '../../nebula'
 import signers from '../../signers'
 import windows from '../../windows'
@@ -18,6 +17,8 @@ import { getType as getSignerType, Type as SignerType } from '../../signers/Sign
 import provider from '../../provider'
 import { ApprovalType } from '../../../resources/constants'
 import Erc20Contract from '../../contracts/erc20'
+
+import reveal from '../../reveal'
 
 const nebula = nebulaApi()
 
@@ -73,7 +74,7 @@ class FrameAccount {
     this.lastSignerType = lastSignerType || (options.type as SignerType)
 
     this.active = active
-    this.name = name || capitalize(options.type || '') + ' Account'
+    this.name = name || capitalize(lastSignerType || '') + ' Account'
     this.ensName = ensName
 
     this.created = created || `new:${Date.now()}`
@@ -251,74 +252,109 @@ class FrameAccount {
     res({ id: payload.id, jsonrpc: payload.jsonrpc, error })
   }
 
-  private async checkForErc20Approve (req: TransactionRequest, calldata: string) {
+  private async checkForErc20Approve (req: TransactionRequest) {
     const contractAddress = req.data.to
     if (!contractAddress) return
 
-    const contract = new Erc20Contract(contractAddress, req.data.chainId, provider)
+    const calldata = req.data.data
+    if (!calldata) return
+
+    const contract = new Erc20Contract(contractAddress, req.data.chainId)
     const decodedData = contract.decodeCallData(calldata)
 
-    if (decodedData && Erc20Contract.isApproval(decodedData)) {
-      const spender = getAddress(decodedData.args[0])
-      const amount = decodedData.args[1].toHexString()
-      const { decimals, name, symbol } = await contract.getTokenData()
-
-      this.addRequiredApproval(
-        req,
-        new BigNumber(amount).isZero() ? ApprovalType.TokenSpendRevocation : ApprovalType.TokenSpendApproval,
-        {
-          decimals,
-          name,
-          symbol,
-          amount,
-          contract: contractAddress,
-          spender
-        },
-        (data: { amount: string }) => {
-          // amount is a hex string
-          const approvedAmount = new BigNumber(data.amount).toString()
-          log.info(`changing approved amount for request ${req.handlerId} to ${approvedAmount}`)
-
-          req.data.data = contract.encodeCallData('approve', [spender, data.amount])
-
-          if (req.decodedData) {
-            req.decodedData.args[1].value = approvedAmount
+    if (decodedData) {
+      if (Erc20Contract.isApproval(decodedData)) {
+        const spender = decodedData.args[0].toLowerCase()
+        const amount = decodedData.args[1].toHexString()
+        const { decimals, name, symbol } = await contract.getTokenData()
+  
+        this.addRequiredApproval(
+          req,
+          new BigNumber(amount).isZero() ? ApprovalType.TokenSpendRevocation : ApprovalType.TokenSpendApproval,
+          {
+            decimals,
+            name,
+            symbol,
+            amount,
+            contract: contractAddress,
+            spender
+          },
+          (data: { amount: string }) => {
+            // amount is a hex string
+            const approvedAmount = new BigNumber(data.amount).toString()
+            log.info(`changing approved amount for request ${req.handlerId} to ${approvedAmount}`)
+  
+            req.data.data = contract.encodeCallData('approve', [spender, data.amount])
+  
+            if (req.decodedData) {
+              req.decodedData.args[1].value = approvedAmount
+            }
           }
-        }
-      )
-
-      this.update()
-    }
-  }
-
-  private async populateRequestCallData (req: TransactionRequest, calldata: string) {
-    try {
-      const decodedData = await decodeContractCall(req.data.to || '', calldata)
-      const knownTxRequest = this.requests[req.handlerId] as TransactionRequest
-
-      if (knownTxRequest && decodedData) {
-        knownTxRequest.decodedData = decodedData
-        this.update()
-      } 
-    } catch (e) {
-      log.warn(e)
-    }
-  }
-
-  private async populateRequestEnsName (req: TransactionRequest) {
-    const { to } = req.data
-
-    try {
-      const ensName: string = ((await nebula.ens.reverseLookup([to])) || [])[0]
-      const knownTxRequest = this.requests[req.handlerId] as TransactionRequest
-
-      if (ensName && knownTxRequest) {
-        knownTxRequest.recipient = ensName
+        )
         this.update()
       }
-    } catch (e) {
-      log.warn(e)
     }
+  }
+
+  private async recipientIdentity (req: TransactionRequest) {
+    const { to, chainId } = req.data
+
+    if (to) { // Get recipient identity
+      try {
+        const recipient = await reveal.identity(to, chainId)
+        const knownTxRequest = this.requests[req.handlerId] as TransactionRequest
+  
+        if (recipient && knownTxRequest) {
+          knownTxRequest.recipient = recipient.ens
+          knownTxRequest.recipientType = recipient.type
+          this.update()
+        }
+      } catch (e) {
+        log.warn(e)
+      }
+    }
+  }
+
+  private async decodeCalldata (req: TransactionRequest) {
+    const { to, chainId, data: calldata } = req.data
+
+    if (to && calldata && calldata !== '0x' && parseInt(calldata, 16) !== 0) { 
+      try { // Decode calldata
+        const decodedData = await reveal.decode(to, chainId, calldata)
+        const knownTxRequest = this.requests[req.handlerId] as TransactionRequest
+  
+        if (knownTxRequest && decodedData) {
+          knownTxRequest.decodedData = decodedData
+          this.update()
+        } 
+      } catch (e) {
+        log.warn(e)
+      }
+    }
+  }
+
+  private async recognizeActions (req: TransactionRequest) {
+    const { to, chainId, data: calldata } = req.data
+
+    if (to && calldata && calldata !== '0x' && parseInt(calldata, 16) !== 0) { 
+      try { // Recognize actions
+        const actions = await reveal.recog(to, chainId, calldata)
+        const knownTxRequest = this.requests[req.handlerId] as TransactionRequest
+
+        if (knownTxRequest && actions ) {
+          knownTxRequest.recognizedActions = actions
+          this.update()
+        } 
+      } catch (e) {
+        log.warn(e)
+      }
+    }
+  }
+
+  private async revealDetails (req: TransactionRequest) {
+    this.recipientIdentity(req)
+    this.decodeCalldata(req)
+    this.recognizeActions(req)
   }
 
   addRequest (req: any, res: RPCCallback<any> = () => {}) {
@@ -329,16 +365,8 @@ class FrameAccount {
       this.requests[r.handlerId].res = res
 
       if ((req || {}).type === 'transaction') {
-        const txRequest = req as TransactionRequest
-        const calldata = txRequest.data.data
-
-        if (calldata && calldata !== '0x' && parseInt(calldata, 16) !== 0) {
-          await this.checkForErc20Approve(txRequest, calldata)
-
-          this.populateRequestCallData(txRequest, calldata)
-        }
-
-        this.populateRequestEnsName(txRequest)
+        this.revealDetails(req)
+        await this.checkForErc20Approve(req)
       }
 
       this.update()
@@ -359,8 +387,9 @@ class FrameAccount {
       if (accountOpen && !inRequestView) {
         const reqData = { ...req, data: { ...req.data } }
         delete reqData.res
-
-        const crumb = { view: 'requestView', step: 'confirm', account, req: reqData }
+        // TODO: only pass req id in nav instead of entire req
+        const reqClone = JSON.parse(JSON.stringify(reqData))
+        const crumb = { view: 'requestView', step: 'confirm', account, req: reqClone }
         nav.forward('panel', crumb)
       }
     }

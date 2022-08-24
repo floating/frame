@@ -209,7 +209,7 @@ ipcMain.on('tray:switchChain', (e, type, id, req) => {
 })
 
 ipcMain.handle('tray:getTokenDetails', (e, contractAddress, chainId) => {
-  const contract = new Erc20Contract(contractAddress, numberToHex(chainId), provider)
+  const contract = new Erc20Contract(contractAddress, numberToHex(chainId))
   return contract.getTokenData()
 })
 

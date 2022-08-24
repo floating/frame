@@ -2,12 +2,13 @@ import React from 'react'
 import Restore from 'react-restore'
 import link from '../../resources/link'
 
-import Aux from '../../resources/Components/FooterAux'
-
-import Main from './Main'
+import Account from './Account'
 import Notify from './Notify'
 import Menu from './Menu'
 import Badge from './Badge'
+
+import Backdrop from './Backdrop'
+import AccountSelector from './AccountSelector'
 
 // import DevTools from 'restore-devtools'
 // <DevTools />
@@ -27,7 +28,6 @@ class Panel extends React.Component {
   }
   
   // componentDidMount () {
-  //   console.log('did mount')
   //   document.addEventListener('keydown', (event) => {
   //     console.log('event ky', event.key, this.store('panel.view'))
   //     const view = this.store('panel.view')
@@ -74,10 +74,11 @@ class Panel extends React.Component {
     return (
       <div id='panel' style={{ opacity }}>
         <Badge />
-        <Menu />
         <Notify />
-        <Main />
-        <Aux />
+        <Menu />
+        <AccountSelector />
+        <Account />
+        <Backdrop />
       </div>
     )
   }
