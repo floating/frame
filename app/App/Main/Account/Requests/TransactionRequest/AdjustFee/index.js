@@ -28,7 +28,7 @@ function formatForInput (num, decimals) {
   return decimals ? toDisplayFromGwei(BigNumber(num)) : num.toString()
 }
 
-function maxFee (tx = { chainId: '' }) {
+function getMaxTotalFee (tx = { chainId: '' }) {
   const chainId = parseInt(tx.chainId)
 
   // for ETH-based chains, the max fee should be 2 ETH
@@ -63,6 +63,7 @@ const FeeOverlayInput = ({ initialValue, labelText, tabIndex, decimals, onReceiv
       setTimeout(() => processValue(newValueNum), 500)
     )
   }
+  const labelId = `txFeeOverlayLabel_${tabIndex}`
 
   return (
     <>
@@ -71,6 +72,7 @@ const FeeOverlayInput = ({ initialValue, labelText, tabIndex, decimals, onReceiv
           tabIndex={tabIndex} 
           value={value}
           className='txFeeOverlayInput' 
+          aria-labelledby={labelId}
           onChange={(e) => {
             const value = (decimals ? /[0-9\.]*/ : /[0-9]*/).exec(e.target.value)
             if (value) {
@@ -111,138 +113,118 @@ const FeeOverlayInput = ({ initialValue, labelText, tabIndex, decimals, onReceiv
             }
           }}
         />
-        </div>
-        <div className='txFeeOverlayLabel'>{labelText}</div>
-      </>
-    )
+      </div>
+      <div id={labelId} className='txFeeOverlayLabel'>{labelText}</div>
+    </>
+  )
 }
 
-const GasLimitInput = ({ initialValue, maxTotalFee, baseFee, priorityFee, gasPrice, handlerId }) => {
-  const receiveValueHandler = (newValue) => {
-    let gasLimit = newValue
-    if (gasPrice && gweiToWei(gasPrice) * gasLimit > maxTotalFee) {
-      gasLimit = Math.floor(maxTotalFee / gweiToWei(gasPrice))
-    } else if (gweiToWei(baseFee + priorityFee) * newValue > maxTotalFee) {
-      gasLimit = Math.floor(maxTotalFee / gweiToWei(baseFee + priorityFee))
-    }
+const GasLimitInput = ({ initialValue, onReceiveValue, tabIndex }) => 
+  <div className='txFeeOverlayLimit'>
+    <FeeOverlayInput initialValue={initialValue} onReceiveValue={onReceiveValue} labelText='Gas Limit (UNITS)' tabIndex={tabIndex} decimals={false} limiter={(val) => limitRange(val, 0, 12.5e6)} />
+  </div>
 
-    link.rpc('setGasLimit', intToHex(gasLimit), handlerId, (e) => {
+const GasPriceInput = ({ initialValue, onReceiveValue, tabIndex }) => 
+  <div className='txFeeOverlayGasPrice'>
+    <FeeOverlayInput initialValue={initialValue} onReceiveValue={onReceiveValue} labelText='Gas Price (GWEI)' tabIndex={tabIndex} decimals={true} />
+  </div>
+
+const BaseFeeInput = ({ initialValue, onReceiveValue, tabIndex }) => 
+  <div className='txFeeOverlayBaseFee'>
+    <FeeOverlayInput initialValue={initialValue} onReceiveValue={onReceiveValue} labelText='Base Fee (GWEI)' tabIndex={tabIndex} decimals={true} />
+  </div>
+
+const PriorityFeeInput = ({ initialValue, onReceiveValue, tabIndex }) => 
+  <div className='txFeeOverlayPriorityFee'>
+    <FeeOverlayInput initialValue={initialValue} onReceiveValue={onReceiveValue} labelText='Max Priority Fee (GWEI)' tabIndex={tabIndex} decimals={true} />
+  </div>
+
+const PriceInput = ({ gasPrice, maxTotalFee, gasLimit, handlerId }) => {
+  const displayGasPrice = toDisplayFromWei(gasPrice)
+
+  const gasPriceReceiveValueHandler = (newValue) => {
+    let newGasPrice = limitRange(newValue)
+
+    if (gweiToWei(newGasPrice) * gasLimit > maxTotalFee) {
+      newGasPrice = Math.floor(maxTotalFee / gasLimit / 1e9)
+    }
+    link.rpc('setGasPrice', gweiToWeiHex(newGasPrice), handlerId, (e) => {
       if (e) console.error(e)
     })
   }
 
-  return (
-    <div className='txFeeOverlayLimit'>
-      <FeeOverlayInput initialValue={initialValue} onReceiveValue={receiveValueHandler} labelText='Gas Limit (UNITS)' tabIndex={tabIndex} decimals={false} />
-    </div>
-  )
+  return <GasPriceInput initialValue={displayGasPrice} onReceiveValue={gasPriceReceiveValueHandler} tabIndex={0} />
 }
 
-const GasPriceInput = ({ initialValue, maxTotalFee, gasLimit, handlerId }) => {
-  const receiveValueHandler = (newValue) => {
-    let gasPrice = limitRange(newValue)
+const FeeInputs = ({ baseFee, priorityFee, maxTotalFee, gasLimit, handlerId, tabIndex }) => {
+  const displayPriorityFee = trimGwei(toDisplayFromWei(priorityFee)).toString()
+  const displayBaseFee = trimGwei(toDisplayFromWei(baseFee)).toString()
 
-    if (gweiToWei(gasPrice) * gasLimit > maxTotalFee) {
-      gasPrice = Math.floor(maxTotalFee / gasLimit / 1e9)
+  const priorityFeeReceiveValueHandler = (newValue) => {
+    let newPriorityFee = trimGwei(newValue)
+
+    if (gweiToWei(baseFee + newPriorityFee) * gasLimit > maxTotalFee) {
+      newPriorityFee = Math.floor(maxTotalFee / gasLimit / 1e9) - baseFee
     }
-    link.rpc('setGasPrice', gweiToWeiHex(gasPrice), handlerId, (e) => {
+    link.rpc('setPriorityFee', gweiToWeiHex(newPriorityFee), handlerId, (e) => {
       if (e) console.error(e)
     })
   }
-  return (
-    <div className='txFeeOverlayGasPrice'>
-      <FeeOverlayInput initialValue={initialValue} onReceiveValue={receiveValueHandler} labelText='Gas Price (GWEI)' tabIndex={tabIndex} decimals={true} />
-    </div>
-  )
-}
-
-const BaseFeeInput = ({ initialValue, maxTotalFee, priorityFee, gasLimit, handlerId }) => {
-  const receiveValueHandler = (newValue) => {
-    let baseFee = trimGwei(newValue)
+  const baseFeeReceiveValueHandler = (newValue) => {
+    let newBaseFee = trimGwei(newValue)
     
-    if (gweiToWei(baseFee + priorityFee) * gasLimit > maxTotalFee) {
-      baseFee = Math.floor(maxTotalFee / gasLimit / 1e9) - priorityFee
-      console.log('recalculating baseFee')
+    if (gweiToWei(newBaseFee + priorityFee) * gasLimit > maxTotalFee) {
+      newBaseFee = Math.floor(maxTotalFee / gasLimit / 1e9) - priorityFee
     }
-    link.rpc('setBaseFee', gweiToWeiHex(baseFee), handlerId, (e) => {
+    link.rpc('setBaseFee', gweiToWeiHex(newBaseFee), handlerId, (e) => {
       if (e) console.error(e)
     })
   }
-  return (
-    <div className='txFeeOverlayBaseFee'>
-      <FeeOverlayInput initialValue={initialValue} onReceiveValue={receiveValueHandler} labelText='Base Fee (GWEI)' tabIndex={tabIndex} decimals={true} />
-    </div>
-  )
+
+  return <>
+    <BaseFeeInput initialValue={displayBaseFee} onReceiveValue={baseFeeReceiveValueHandler} tabIndex={tabIndex} />
+    <PriorityFeeInput initialValue={displayPriorityFee} onReceiveValue={priorityFeeReceiveValueHandler} tabIndex={tabIndex + 1} />
+  </>
 }
 
-const PriorityFeeInput = ({ initialValue, maxTotalFee, baseFee, gasLimit, handlerId, tabIndex }) => {
-  const receiveValueHandler = (newValue) => {
-    let priorityFee = trimGwei(newValue)
-
-    if (gweiToWei(baseFee + priorityFee) * gasLimit > maxTotalFee) {
-      console.log('recalculating priority fee')
-      priorityFee = Math.floor(maxTotalFee / gasLimit / 1e9) - baseFee
+const LimitInput = ({ gasPrice, baseFee, priorityFee, gasLimit, maxTotalFee, handlerId, tabIndex }) => {
+  const gasLimitReceiveValueHandler = (newValue) => {
+    let newGasLimit = newValue
+    if (gasPrice && gweiToWei(gasPrice) * newGasLimit > maxTotalFee) {
+      newGasLimit = Math.floor(maxTotalFee / gweiToWei(gasPrice))
+    } else if (gweiToWei(baseFee + priorityFee) * newValue > maxTotalFee) {
+      newGasLimit = Math.floor(maxTotalFee / gweiToWei(baseFee + priorityFee))
     }
-    link.rpc('setPriorityFee', gweiToWeiHex(priorityFee), handlerId, (e) => {
+
+    link.rpc('setGasLimit', intToHex(newGasLimit), handlerId, (e) => {
       if (e) console.error(e)
     })
   }
-  return (
-    <div className='txFeeOverlayPriorityFee'>
-      <FeeOverlayInput initialValue={initialValue} onReceiveValue={receiveValueHandler} labelText='Max Priority Fee (GWEI)' tabIndex={tabIndex} decimals={true} />
-    </div>
-  )
+
+  return <GasLimitInput initialValue={gasLimit} onReceiveValue={gasLimitReceiveValueHandler} tabIndex={tabIndex} />
 }
 
 class TxFeeOverlay extends Component {
   constructor (props, context) {
     super(props, context)
-
     this.moduleRef = React.createRef()
-
-    this.state = {
-      copiedData: false
-    }
-
-    if (usesBaseFee(props.req.data)) {
-      const prioFee = BigNumber(props.req.data.maxPriorityFeePerGas, 16)
-      const maxFee = BigNumber(props.req.data.maxFeePerGas, 16)
-      const baseFee = maxFee.minus(prioFee)
-
-      this.state.priorityFee = trimGwei(toDisplayFromWei(prioFee)).toString()
-      this.state.maxFee = toDisplayFromWei(maxFee)
-      this.state.baseFee = trimGwei(toDisplayFromWei(baseFee)).toString()
-    } else {
-      const gasPrice = BigNumber(props.req.data.gasPrice, 16)
-      this.state.gasPrice = toDisplayFromWei(gasPrice)
-    }
-
-    this.state.gasLimit = BigNumber(props.req.data.gasLimit, 16).toString()
-  }
-
-  copyData (data) {
-    if (data) {
-      link.send('tray:clipboardData', data)
-      this.setState({ copiedData: true })
-      setTimeout(() => this.setState({ copiedData: false }), 1000)
-    }
   }
 
   render () {
     const { req: { data, handlerId } } = this.props
-    const maxTotalFee = maxFee(data)
+    const gasLimit = BigNumber(data.gasLimit, 16)
+    const priorityFee = BigNumber(data.maxPriorityFeePerGas, 16)
+    const maxFee = BigNumber(data.maxFeePerGas, 16)
+    const gasPrice = BigNumber(data.gasPrice, 16)
+    const baseFee = maxFee.minus(priorityFee)
+    const maxTotalFee = getMaxTotalFee(data)
 
     return (
       <div className='txAdjustFee cardShow' ref={this.moduleRef}>
-        {
-          usesBaseFee(data) ? 
-          <>
-            <BaseFeeInput initialValue={this.state.baseFee} maxTotalFee={maxTotalFee} priorityFee={this.state.priorityFee} gasLimit={this.state.gasLimit} handlerId={handlerId} tabIndex={0} />
-            <PriorityFeeInput initialValue={this.state.priorityFee} maxTotalFee={maxTotalFee} baseFee={this.state.baseFee} gasLimit={this.state.gasLimit} handlerId={handlerId} tabIndex={1} />
-          </> :  
-          <GasPriceInput initialValue={this.state.gasPrice} maxTotalFee={maxTotalFee} gasLimit={this.state.gasLimit} handlerId={handlerId} tabIndex={0} />
-        }
-        <GasLimitInput initialValue={this.state.gasLimit} maxTotalFee={maxTotalFee} baseFee={this.state.baseFee} priorityFee={this.state.priorityFee} gasPrice={this.state.gasPrice} handlerId={handlerId} limiter={(val) => limitRange(val, 0, 12.5e6)} tabIndex={2} />
+        {usesBaseFee(data)
+          ? <FeeInputs priorityFee={priorityFee} baseFee={baseFee} gasLimit={gasLimit} maxTotalFee={maxTotalFee} handlerId={handlerId} tabIndex={0} /> 
+          : <PriceInput gasPrice={gasPrice} gasLimit={gasLimit} maxTotalFee={maxTotalFee} handlerId={handlerId} tabIndex={0} />}
+        <LimitInput gasPrice={gasPrice} gasLimit={gasLimit} priorityFee={priorityFee} baseFee={baseFee} maxTotalFee={maxTotalFee} handlerId={handlerId} tabIndex={2} />
       </div>
     )
   }
