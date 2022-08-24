@@ -613,13 +613,13 @@ export class Provider extends EventEmitter {
         store.switchOriginChain(originId, chainId, origin.chain.type)
       }
 
-      return res({ id: payload.id, jsonrpc: '2.0', result: null })
+      return res({ id: payload.id, jsonrpc: '2.0', result: undefined })
     } catch (e) {
       return resError(e as EVMError, payload, res)
     }
   }
 
-  private addEthereumChain (payload: RPCRequestPayload, res: RPCRequestCallback) {
+  addEthereumChain (payload: RPCRequestPayload, res: RPCRequestCallback) {
     if (!payload.params[0]) return resError('addChain request missing params', payload, res)
 
     const type = 'ethereum'
@@ -628,7 +628,8 @@ export class Provider extends EventEmitter {
       chainName, 
       nativeCurrency, 
       rpcUrls = [], 
-      blockExplorerUrls = []
+      blockExplorerUrls = [],
+      iconUrls = [] 
     } = payload.params[0]
 
     if (!chainId) return resError('addChain request missing chainId', payload, res)
@@ -638,8 +639,8 @@ export class Provider extends EventEmitter {
     const handlerId = this.addRequestHandler(res)
 
     // Check if chain exists
-    const id = parseInt(chainId, 16)
-    if (!Number.isInteger(id)) return resError('Invalid chain id', payload, res)
+    const id = parseInt(chainId)
+    if (!Number.isInteger(id)) throw new Error('Invalid chain id')
 
     const exists = Boolean(store('main.networks', type, id))
     if (exists) {
@@ -652,12 +653,13 @@ export class Provider extends EventEmitter {
         type: 'addChain',
         chain: {
           type,
-          id,
+          id: chainId,
           name: chainName,
           symbol: nativeCurrency.symbol,
           primaryRpc: rpcUrls[0],
           secondaryRpc: rpcUrls[1],
-          explorer: blockExplorerUrls[0]
+          explorer: blockExplorerUrls[0], 
+          iconUrls
         },
         account: (accounts.getAccounts() || [])[0],
         origin: payload._origin,

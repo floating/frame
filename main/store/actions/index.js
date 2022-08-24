@@ -3,6 +3,14 @@ import log from 'electron-log'
 const panelActions = require('./panel')
 const supportedNetworkTypes = ['ethereum']
 
+function switchChainForOrigins (origins, oldChainId, newChainId) {
+  Object.entries(origins).forEach(([origin, { chain }]) => {
+    if (oldChainId === chain.id) {
+      origins[origin].chain = { id: newChainId, type: 'ethereum' }
+    }
+  })
+}
+
 function validateNetworkSettings (network) {
   const networkId = parseInt(network.id)
 
@@ -32,6 +40,15 @@ module.exports = {
   // setSync: (u, key, payload) => u(key, () => payload),
   activateNetwork: (u, type, chainId, active) => {
     u('main.networks', type, chainId, 'on', () => active)
+
+    if (!active) {
+      u('main', main => {
+        // If de-activating a network that an origin is currently using, switch them to mainnet
+        switchChainForOrigins(main.origins, chainId, 1)
+
+        return main
+      })
+    }
   },
   selectPrimary: (u, netType, netId, value) => {
     u('main.networks', netType, netId, 'connection.primary.current', () => value)
@@ -332,11 +349,7 @@ module.exports = {
         }
 
         // If deleting a network that an origin is currently using, switch them to mainnet
-        Object.entries(main.origins).forEach(([origin, { chain }]) => {
-          if (net.id === chain.id) {
-            main.origins[origin].chain = { id: 1, type: 'ethereum' }
-          }
-        })
+        switchChainForOrigins(main.origins, net.id, 1)
 
         if (main.networks[net.type]) {
           delete main.networks[net.type][net.id]

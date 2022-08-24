@@ -17,6 +17,7 @@ import {
   switchOriginChain as switchOriginChainAction,
   removeNetwork as removeNetworkAction,
   updateNetwork as updateNetworkAction,
+  activateNetwork as activateNetworkAction,
   setBlockHeight as setBlockHeightAction
 } from '../../../../main/store/actions'
 
@@ -893,6 +894,55 @@ describe('#updateNetwork', () => {
         chain: expect.objectContaining({ id: 66, type: 'ethereum' })
       }
     })
+  })
+})
+
+describe('#activateNetwork', () => {
+  let main = {
+    networks: {
+      ethereum: {
+        137: {
+          on: false
+        }
+      }
+    },
+    origins: {
+      'frame.test': {
+        chain: {
+          id: 137
+        }
+      }
+    }
+  }
+
+  const updaterFn = (node, ...args) => {
+    if (node === 'main') {
+      const update = args[0]
+      update(main)
+    }
+
+    if (node === 'main.networks') {
+      const [type, chainId, on, update] = args
+      main.networks[type][chainId][on] = update()
+    }
+  }
+
+  const activateNetwork = (type, chainId, active) => activateNetworkAction(updaterFn, type, chainId, active)
+
+  it('sets the given chain to be on', () => {
+    main.networks.ethereum[137].on = false
+
+    activateNetwork('ethereum', 137, true)
+
+    expect(main.networks.ethereum[137].on).toBe(true)
+  })
+
+  it('switches the chain for origins from the deactivated chain to mainnet', () => {
+    main.origins['frame.test'].chain.id = 137
+
+    activateNetwork('ethereum', 137, false)
+
+    expect(main.origins['frame.test'].chain.id).toBe(1)
   })
 })
 
