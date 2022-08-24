@@ -167,13 +167,18 @@
 
     .accountNotificationBadge
       position absolute 
-      top 16px
-      right 73px
+      top 19px
+      right 64px
       width 60px
       z-index 300000
       height 38px
-      width 48px
-      border-radius 16px
+      width 38px
+      padding-left 2px
+      box-sizing border-box
+      border-top-left-radius 13px
+      border-bottom-left-radius 13px
+      border-top-right-radius 6px
+      border-bottom-right-radius 6px
       display flex
       justify-content center
       align-items center
@@ -181,23 +186,38 @@
       transition none
       pointer-events auto
       transform translate3d(0, 0, 0)
-      background var(--ghostB)
+      background var(--ghostA)
       position absolute
       cursor pointer
       color var(--outerspace01)
       font-size 16px
       font-weight 500
-      border 3px solid var(--ghostA)
+      transition var(--standardFast)
+      box-shadow 0px 2px 2px var(--ghostY)
+      
+      span
+        position relative
+        z-index 4000
 
     .accountNotificationBadgeReady
       color var(--outerspace)
       background var(--ghostB)
-      transition var(--standardFast)
 
     .accountNotificationBadgeActive
+      span
+        color var(--goodOver)
+
+    .accountNotificationBadgeActive::before
+      content ''
+      position absolute
+      z-index 3
+      inset 3px
       background var(--good)
-      color var(--goodOver)
-      opacity 1
+      border-top-left-radius 10px
+      border-bottom-left-radius 10px
+      border-top-right-radius 4px
+      border-bottom-right-radius 4px
+      // box-shadow 0px 2px 2px var(--ghostX)
 
     .transactionToAddress
       .transactionToAddressLarge
@@ -220,24 +240,47 @@
       right 10px
       z-index 300000
       border-radius 16px
-      height 38px
-      width 48px
-      display flex
-      justify-content center
-      align-items center
+      height 44px
+      width 95px
       -webkit-app-region no-drag
       transition none
       pointer-events auto
       transform translate3d(0, 0, 0)
-      background var(--ghostB)
+      background var(--ghostZ)
       position absolute
       cursor pointer
-      border 3px solid var(--ghostZ)
-      cursor pointer
+
+      .signerSelectButton
+        position absolute 
+        top 3px
+        right 3px
+        bottom 3px
+        z-index 300000
+        border-radius 13px
+        width 48px
+        background var(--ghostB)
+        display flex
+        justify-content center
+        align-items center
+        border-top-right-radius 13px
+        border-bottom-right-radius 13px
+        border-top-left-radius 6px
+        border-bottom-left-radius 6px
+        padding-right 4px
+        box-sizing border-box
+        box-shadow 0px 2px 2px var(--ghostY)
+
+        *
+          pointer-events none
+      
+      .signerSelectButton:hover
+        cursor pointer
+        background var(--ghostC)
       
       .signerSelectIconWrap
         padding 1px 0px 0px 2px
         pointer-events none
+
         div, svg
           pointer-events none
         
@@ -247,10 +290,6 @@
       .signerSelectIcon
         transition var(--standard)
         pointer-events none
-
-    .signerSelect:hover
-      cursor pointer
-      background var(--ghostC)
 
     .accountGrabber
       position absolute

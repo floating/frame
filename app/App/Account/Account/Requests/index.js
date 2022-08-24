@@ -16,7 +16,7 @@ import RequestItem from '../../../../../resources/Components/RequestItem'
 import chainMeta from '../../../../../resources/chainMeta'
 
 import link from '../../../../../resources/link'
-
+import svg from '../../../../../resources/svg'
 
 class Requests extends React.Component {
   constructor (props, context) {
@@ -105,7 +105,8 @@ class Requests extends React.Component {
       >
         {!this.props.expanded ? (
           <div className={'moduleHeader'}>
-            <span>Requests</span>
+           <span>{svg.inbox(13)}</span>
+           <span>{'Requests'}</span>
           </div>
         ) : null}
         <div className='requestContainerWrap'>

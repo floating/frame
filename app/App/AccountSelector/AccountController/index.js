@@ -248,7 +248,7 @@ class Account extends React.Component {
               }
             </div>
             <div className={this.state.addressHover ? 'transactionToAddressFull' : 'transactionToAddressFull transactionToAddressFullHidden'}>
-              {this.state.copied ? <span className='transactionToAddressFullCopied'>{svg.octicon('clippy', { height: 18 })}{'Address Copied'}</span> : formattedAddress}
+              {this.state.copied ? <span className='transactionToAddressFullCopied'>{'Address Copied'}</span> : formattedAddress}
             </div>
           </div>
         </div>
@@ -259,7 +259,7 @@ class Account extends React.Component {
           if (requests.length > 0) requestBadgeClass += ' accountNotificationBadgeActive'
           return (
             <div className={requestBadgeClass}>
-              {requests.length}
+              <span>{requests.length}</span>
             </div>
           )
         })()}
@@ -364,9 +364,11 @@ class Account extends React.Component {
                     {svg.grab(35)}
                   </div> */}
                   <div className='signerSelect' onClick={this.typeClick.bind(this)}>
-                    <div className='signerSelectIconWrap'>
-                      <div className='signerSelectIcon' style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}>
-                        {svg.chevron(26)}
+                    <div className='signerSelectButton'>
+                      <div className='signerSelectIconWrap'>
+                        <div className='signerSelectIcon' style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+                          {svg.chevron(26)}
+                        </div>
                       </div>
                     </div>
                   </div>

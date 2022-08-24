@@ -221,8 +221,9 @@ class Balances extends React.Component {
         className='balancesBlock'
       >
         {!this.props.expanded ? (
-          <div className={'moduleHeader moduleHeaderBorderless'}>
-            <span>balances</span>
+          <div className={'moduleHeader'}>
+            <span>{svg.tokens(13)}</span>
+            <span>{'Balances'}</span>
           </div>
         ) : null}
         {scanning ? (

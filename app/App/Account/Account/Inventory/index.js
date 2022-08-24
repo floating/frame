@@ -136,7 +136,8 @@ class Inventory extends React.Component {
       <div ref={this.moduleRef} className='balancesBlock'>
         {!this.props.expanded ? (
           <div className='moduleHeader'>
-            {'Inventory'}
+            <span>{svg.inventory(12)}</span>
+            <span>{'Inventory'}</span>
           </div>  
         ) : null}
         <div className='inventoryWrapper'>

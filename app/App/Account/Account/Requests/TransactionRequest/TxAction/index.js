@@ -42,7 +42,18 @@ class TxSending extends React.Component {
         <div className='_txMain' style={{ animationDelay: (0.1 * this.props.i) + 's' }}>
           <div className='_txMainInner'>
             <div className='_txLabel'>
-              <div>{`Sending ${name}`}</div>
+              <div>
+                <span>{`Sending ${symbol}`}</span>
+                <span style={{ 
+                  opacity: 0.8, 
+                  fontSize: '9px',
+                  position: 'relative',
+                  top: '-1px',
+                  left: '4px'
+                }}>
+                  {`(${name})`}
+                </span>
+              </div>
             </div>
             <div className='_txMainValues'>
               <div className='_txMainTransferring'>

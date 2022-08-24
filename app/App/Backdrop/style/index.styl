@@ -8,7 +8,7 @@
   pointer-events none
   transition var(--standard)
   background var(--ghostZ)
-  border-radius 20px
+  border-radius 26px
 
 .overlay
   position absolute
@@ -18,9 +18,36 @@
   bottom 40px
   z-index 1000 // top
   pointer-events none
-  transition var(--standard)
-  // background green
+  transition var(--standard), box-shadow 0s
   border-radius 26px
   opacity 1
   box-shadow inset 0px 0px 8px var(--ghostX)
+
+.overlayMonitor
+  opacity 1
+
+.light
+  .overlayMonitor::before
+    content ''
+    position absolute
+    top 0px
+    right 0px
+    left 0px
+    bottom 0px
+    border-radius 26px
+    opacity 0.1
+    background-image url('./App/Account/Account/Requests/style/wave.svg')
+
+.dark
+  .overlayMonitor::before
+    content ''
+    position absolute
+    top 0px
+    right 0px
+    left 0px
+    bottom 0px
+    border-radius 26px
+    opacity 0.1
+    background-image url('./App/Account/Account/Requests/style/waveDark.svg')
+    
   

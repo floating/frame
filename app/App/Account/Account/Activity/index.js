@@ -21,7 +21,10 @@ class Balances extends React.Component {
   render () {
     return (
       <div ref={this.moduleRef} className='balancesBlock'>
-        <div className='moduleHeader'>{'activity monitor'}</div>  
+        <div className='moduleHeader'>
+          <span>{svg.inbox(13)}</span>
+          <span>{'Activity'}</span>
+        </div>  
         <div className='moduleComingSoon'>
           {'Coming Soon'}
         </div>  
