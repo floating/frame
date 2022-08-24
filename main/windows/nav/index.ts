@@ -1,7 +1,6 @@
 // Manage navigation states for each window
 
 import { ipcMain } from 'electron'
-import { AccountRequest } from '../../accounts'
 
 import store from '../../store'
 
@@ -11,25 +10,14 @@ type Step = 'confirm'
 interface Crumb {
   view: View
   step: Step
-  account: string
-  req: AccountRequest
-}
-
-function copyCrumb ({ view, step, account, req }: Crumb) {
-  const reqData = JSON.parse(JSON.stringify(req))
-
-  return {
-    view,
-    step,
-    account,
-    req: reqData
-  }
+  accountId: string
+  requestId: string
 }
 
 const nav = {
   forward: (windowId: string, crumb: Crumb) => {
     // Adds new crumb to nav array
-    store.navForward(windowId, copyCrumb(crumb))
+    store.navForward(windowId, crumb)
   },
   back: (windowId: string) => {
     // Removes last crumb from nav array
@@ -39,7 +27,7 @@ const nav = {
     // Updated last crumb in nav array with new data
     // Replaces last crumb when navigate is false
     // Adds new crumb to nav array when navigate is true
-    store.navUpdate(windowId, copyCrumb(crumb), navigate)
+    store.navUpdate(windowId, crumb, navigate)
   }
 }
 
