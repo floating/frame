@@ -1,11 +1,26 @@
 // Manage navigation states for each window
 
 import { ipcMain } from 'electron'
+import { AccountRequest } from '../../accounts'
 
 import store from '../../store'
 
-interface Crumb {
+export interface CrumbSpec {
   view: string
+  step: string
+  account: string
+  req: AccountRequest
+}
+
+export function Crumb ({ view, step, account, req }: CrumbSpec) {
+  const reqData = JSON.parse(JSON.stringify(req))
+
+  return {
+    view,
+    step,
+    account,
+    req: reqData
+  }
 }
 
 const nav = {

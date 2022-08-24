@@ -7,7 +7,7 @@ import { AccessRequest, AccountRequest, Accounts, RequestMode, TransactionReques
 import nebulaApi from '../../nebula'
 import signers from '../../signers'
 import windows from '../../windows'
-import nav from '../../windows/nav'
+import nav, { Crumb } from '../../windows/nav'
 import store from '../../store'
 import { Aragon } from '../aragon'
 import { TransactionData, getAddress } from '../../../resources/domain/transaction'
@@ -385,11 +385,9 @@ class FrameAccount {
       const inRequestView = panelNav.map((crumb: any) => crumb.view).includes('requestView')
 
       if (accountOpen && !inRequestView) {
-        const reqData = { ...req, data: { ...req.data } }
-        delete reqData.res
-        // TODO: only pass req id in nav instead of entire req
-        const reqClone = JSON.parse(JSON.stringify(reqData))
-        const crumb = { view: 'requestView', step: 'confirm', account, req: reqClone }
+        const { res, ...reqData } = req
+
+        const crumb = Crumb({ view: 'requestView', step: 'confirm', account, req: reqData })
         nav.forward('panel', crumb)
       }
     }
