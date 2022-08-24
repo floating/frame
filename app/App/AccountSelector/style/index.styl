@@ -103,12 +103,14 @@
             letter-spacing 1px
             opacity 0.7
 
-@keyframes slideDown
+@keyframes appear
   0%
-    transform translateY(-10px)
+    filter blur(10px)
+    opacity 0
 
   100%
-    transform translateY(0px)
+    filter blur(0px)
+    opacity 1
 
 .panelFilter
   position absolute
@@ -118,7 +120,7 @@
   height 48px
   z-index 2
   overflow hidden
-  animation slideDown 0.16s cubic-bezier(.82,0,.12,1)
+  animation appear 1s cubic-bezier(.82,0,.12,1)
 
   .panelFilterIcon
     position absolute

@@ -104,6 +104,9 @@ module.exports = {
     u('selected.minimized', _ => false)
     u('selected.open', _ => true)
   },
+  setAccountSignerStatusOpen: (u, value) => {
+    u('selected.signerStatusOpen', _ => Boolean(value))
+  },
   accountTokensUpdated: (u, address) => {
     u('main.accounts', address, account => {
       const balances = { ...account.balances, lastUpdated: new Date().getTime() }

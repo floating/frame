@@ -17,8 +17,7 @@ class Account extends React.Component {
       highlightIndex: 0,
       unlockInput: '',
       openHover: false,
-      addressHover: false,
-      hideSignerStatus: true
+      addressHover: false
     }
   }
 
@@ -38,7 +37,7 @@ class Account extends React.Component {
   copyAddress () {
     link.send('tray:clipboardData', getAddress(this.props.id))
     this.setState({ copied: true })
-    setTimeout(_ => this.setState({ copied: false }), 1000)
+    setTimeout(_ => this.setState({ copied: false }), 1800)
   }
 
   unlockChange (e) {
@@ -89,14 +88,19 @@ class Account extends React.Component {
     )
   }
 
+  setSignerStatusOpen (value) {
+    link.send('tray:action', 'setAccountSignerStatusOpen', value)
+  }
+
   typeClick () {
     if (this.props.status === 'ok') {
       this.select()
       this.setState({ typeActive: true })
       setTimeout(() => this.setState({ typeActive: false }), 110)
-      setTimeout(() => this.setState({ hideSignerStatus: false }), 800)
+      setTimeout(() => this.setSignerStatusOpen(true), 800)
     } else {
-      this.setState({ typeShake: true, hideSignerStatus: true })
+      this.setSignerStatusOpen(false)
+      this.setState({ typeShake: true })
       setTimeout(() => this.setState({ typeShake: false }), 1010)
     }
   }
@@ -124,16 +128,27 @@ class Account extends React.Component {
     return <div className={accountIndicatorClass} />  
   }
 
+  isHotSigner (lastSignerType) {
+    return ['seed', 'ring'].includes(lastSignerType)
+  }
+
   renderType () {
     // let innerClass = 'signerInner'
     // if (this.state.typeActive) innerClass += ' signerInnerActive'
+    const current = (this.store('selected.current') === this.props.id) && this.props.status === 'ok'
+    const open = current && this.store('selected.open')
+    const signerStatusOpen = current && this.store('selected.signerStatusOpen')
+
     if (this.state.typeShake) innerClass += ' headShake'
     if (this.store('selected.view') === 'settings') innerClass += ' signerTypeSettings'
     // if (!this.props.signer || (this.props.signer && this.props.signer.status === 'initial')) innerClass += ' signerInnerDisconnected'
     // const inSettings = this.store('selected.view') === 'settings'
+
+    const isHotSigner = this.isHotSigner(this.props.lastSignerType)
+    
     return (
-      <div className='signerType' onMouseDown={() => {
-        this.hideSignerStatus(!this.state.hideSignerStatus)
+      <div className={!isHotSigner ? 'signerType' : 'signerType signerTypeHot'} onMouseDown={() => {
+        if (open) this.setSignerStatusOpen(!signerStatusOpen)
       }}>
         {(_ => {
           const type = this.props.lastSignerType 
@@ -192,24 +207,18 @@ class Account extends React.Component {
     const ensName = this.store('main.accounts', this.props.id, 'ensName')
     if (ensName) {
       if (ensName.length <= 13) {
-        return 18
+        return 19
       } else {
-        let size = 18 - (ensName.length - 13)
+        let size = 19 - (ensName.length - 13)
         if (size < 8) size = 8
         return size
       }
     } else {
-      return 20
+      return 21
     }
   }
 
   renderStatus () {
-    // let open = current && this.store('selected.open')
-    // TODO: Set Signer Name
-    // let currentIndex = this.store('main.accounts', this.props.id, 'index')
-    // const status = this.props.status.charAt(0).toUpperCase() + this.props.status.substr(1)
-    // if (this.state.accountHighlight === 'active') currentIndex = this.state.highlightIndex
-
     const { address, ensName, active } = this.store('main.accounts', this.props.id)
     const formattedAddress = getAddress(address)
 
@@ -229,25 +238,43 @@ class Account extends React.Component {
         ) : null}
         <div className={'signerAddress'}>
           <div className='transactionToAddress'
-            onMouseEnter={() => {
-              this.setState({ addressHover: true })
+            onClick={() => {
+              if (this.state.addressHover) {
+                this.copyAddress()
+              }
             }}
-            onMouseLeave={() => {
-              this.setState({ addressHover: false })
-            }}
-            onMouseDown={this.copyAddress.bind(this)}
           >
             <div className='transactionToAddressLargeWrap'>
-              {this.state.addressHover ? (
-                <div className='transactionToAddressLarge transactionToAddressCopy'>copy address</div>
-              ) : ensName ? (
-                <div className='transactionToAddressLarge transactionToAddressENS' style={{ fontSize: this.getAddressSize() + 'px' }}>{ensName}</div>
+              {!this.state.addressHover ? ensName ? (
+                <div 
+                  className='transactionToAddressLarge transactionToAddressENS' 
+                  style={{ fontSize: this.getAddressSize() + 'px' }}
+                  onClick={() => {
+                    if (!this.state.addressHover) {
+                      this.setState({ addressHover: true })
+                    }
+                  }}
+                  >
+                    {ensName}
+                  </div>
               ) : (
-                <div className={this.props.name ? 'transactionToAddressLarge' : 'transactionToAddressLarge transactionToAddressENS'}>{formattedAddress.substring(0, 6)} {svg.octicon('kebab-horizontal', { height: 16 })} {formattedAddress.substr(formattedAddress.length - 5)}</div>
-              )
-              }
+                <div 
+                  className={this.props.name ? 'transactionToAddressLarge' : 'transactionToAddressLarge transactionToAddressENS'}
+                  onClick={() => {
+                    if (!this.state.addressHover) {
+                      this.setState({ addressHover: true })
+                    }
+                  }}
+                >
+                  <div>{formattedAddress.substring(0, 5)}</div>
+                  <div className='transactionToAddressLargeEllipsis'>{svg.ellipsis(16)}</div>
+                  <div>{formattedAddress.substr(formattedAddress.length - 3)}</div>
+                </div>
+              ) : null}
             </div>
-            <div className={this.state.addressHover ? 'transactionToAddressFull' : 'transactionToAddressFull transactionToAddressFullHidden'}>
+            <div 
+              className={this.state.addressHover ? 'transactionToAddressFull' : 'transactionToAddressFull transactionToAddressFullHidden'}
+            >
               {this.state.copied ? <span className='transactionToAddressFullCopied'>{'Address Copied'}</span> : formattedAddress}
             </div>
           </div>
@@ -265,10 +292,6 @@ class Account extends React.Component {
         })()}
       </>
     )
-  }
-
-  hideSignerStatus (value) {
-    this.setState({ hideSignerStatus: value })
   }
 
   render () {
@@ -342,6 +365,9 @@ class Account extends React.Component {
         className='signerWrap' 
         style={current ? { height: initial.height + 'px' } : {}} 
         onMouseDown={() => this.closeAccounts()}
+        onMouseLeave={() => {
+          this.setState({ addressHover: false })
+        }}
       >
         <div 
           className={signerClass}

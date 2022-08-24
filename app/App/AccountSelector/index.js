@@ -59,6 +59,8 @@ class AccountSelector extends React.Component {
   }
 
   renderAccountFilter () {
+    const open = this.store('selected.open')
+    if (open) return null
     return (
       <div className='panelFilter'>
         <div className='panelFilterIcon'>

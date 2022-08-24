@@ -276,14 +276,14 @@ class Settings extends React.Component {
 
           <div className='signerPermission localSetting' style={{ zIndex: 198 }}>
             <div className='signerPermissionControls'>
-              <div className='signerPermissionSetting'>Report errors</div>
+              <div className='signerPermissionSetting'>Error Reporting</div>
               <div className={this.store('main.privacy.errorReporting') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onClick={_ => link.send('tray:action', 'setErrorReporting', !this.store('main.privacy.errorReporting'))}>
                 <div className='signerPermissionToggleSwitch' />
               </div>
             </div>
             <div className='signerPermissionDetails'>
               <span>
-                Help improve Frame by sending anonymous exception data when errors happen
+                Help improve Frame by anonymously reporting errors
               </span>
             </div>
           </div>

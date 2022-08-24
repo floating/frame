@@ -75,30 +75,28 @@
 
     .transactionToAddressLargeWrap
       position absolute
-      top 18px
-      left 65px
+      bottom 14px
+      left 66px
       height 40px
       width 164px
-      cursor pointer
       z-index 5
 
     .transactionToAddressLarge
       position absolute
-      top 0px
-      left 0px
-      right 0px
       bottom 0px
+      left 0px
+      max-width 100%
+      font-weight 600
       display flex
-      font-size 20px
+      font-size 16px
       opacity 1
-      pointer-events none
+      cursor pointer
+      *
+        pointer-events none
 
-      svg
-        color var(--outerspace08)
-        padding-top 3px
-        padding-left 4px
-        padding-right 4px
-
+      .transactionToAddressLargeEllipsis
+        padding 2px 1px
+        
     .transactionToAddressCopy
       display flex
       justify-content center
@@ -119,7 +117,7 @@
 
     .transactionToAddressFull
       position absolute
-      top 2px
+      top 3px
       right 0
       bottom 0
       left 0
@@ -127,9 +125,13 @@
       justify-content center
       align-items center
       font-size 13.5px
-      font-weight 600
-      pointer-events none
+      font-weight 600    
       z-index 8
+      cursor pointer
+      * 
+        pointer-events none
+        
+      
 
       .transactionToAddressFullCopied
         position absolute
@@ -145,9 +147,12 @@
           margin-left 11px
 
     .transactionToAddressENS
-      transform translateY(9px)
+      transform translateY(-12px)
+      font-weight 600
+
     .transactionToAddressFullHidden
       opacity 0
+      pointer-events none
 
 
   .signerTop
@@ -183,12 +188,9 @@
       justify-content center
       align-items center
       -webkit-app-region no-drag
-      transition none
-      pointer-events auto
       transform translate3d(0, 0, 0)
       background var(--ghostA)
       position absolute
-      cursor pointer
       color var(--outerspace01)
       font-size 16px
       font-weight 500
@@ -244,7 +246,6 @@
       width 95px
       -webkit-app-region no-drag
       transition none
-      pointer-events auto
       transform translate3d(0, 0, 0)
       background var(--ghostZ)
       position absolute
@@ -370,7 +371,6 @@
         left 17px
         width 41px
         bottom 0px
-        cursor pointer
         display flex
         justify-content center
         align-items center
@@ -460,7 +460,6 @@
         transition var(--standardSlow)
         margin-left 2px
         display none
-
 
     .signerInner
       position absolute
@@ -589,7 +588,7 @@
 
     .signerName
       position absolute
-      bottom 16px
+      top 16px
       left 66px
       overflow hidden
       display flex
@@ -605,12 +604,13 @@
         // padding-bottom 0px
         position relative
         transition var(--standard)
-        font-size 12px
+        font-size 16px
+        font-family 'Ubuntu'
         display flex
         justify-content center
         align-items center
         z-index 10
-        font-weight 500
+        font-weight 400
 
       .signerNameTextENS
         opacity 0
@@ -703,6 +703,11 @@
       pointer-events auto !important
     .transactionToAddressLargeWrap
       pointer-events auto !important
+    .signerType
+      cursor pointer
+      pointer-events auto
+    .signerTypeHot:hover
+      color var(--moon)
 
   .accountListWrap
     position absolute

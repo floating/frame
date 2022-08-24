@@ -73,7 +73,7 @@ class SignerStatus extends React.Component {
     setTimeout(() => {
       document.addEventListener('mousedown', (e) => {
         if (this.props.open && this.statusRef && this.statusRef.current && !this.statusRef.current.contains(e.target)) {
-          this.props.hideSignerStatus(true)
+          this.props.setSignerStatusOpen(false)
         }
       })
       if (this.inputRef.current) {

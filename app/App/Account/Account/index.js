@@ -130,12 +130,8 @@ class _AccountMain extends React.Component {
   constructor (...args) {
     super(...args)
     this.state = {
-      expandedModule: '',
-      hideSignerStatus: false
+      expandedModule: ''
     }
-  }
-  hideSignerStatus (value) {
-    this.setState({ hideSignerStatus: value })
   }
   // computePositions () {
   //   this.resizeObserver.disconnect()
@@ -152,9 +148,16 @@ class _AccountMain extends React.Component {
   expandModule (data) {
     link.send('nav:forward', 'panel', { view: 'expandedModule', ...data })
   }
+
+  setSignerStatusOpen (value) {
+    link.send('tray:action', 'setAccountSignerStatusOpen', value)
+  }
+  
   renderSignerStatus () {
     const current = (this.store('selected.current') === this.props.id) && this.props.status === 'ok'
     const open = current && this.store('selected.open')
+
+    const signerStatusOpen = current && this.store('selected.signerStatusOpen')
 
     const account = this.store('main.accounts', this.props.id)
     let signer
@@ -165,15 +168,15 @@ class _AccountMain extends React.Component {
       const actingSigner = this.store('main.accounts', account.smart.actor, 'signer')
       if (actingSigner) signer = this.store('main.signers', actingSigner)
     }
-    return !this.state.hideSignerStatus && open ? (
-      <SignerStatus open={open} signer={signer} hideSignerStatus={this.hideSignerStatus.bind(this)} />
+    return signerStatusOpen && open ? (
+      <SignerStatus open={open} signer={signer} setSignerStatusOpen={this.setSignerStatusOpen} />
     ) : null
   }
 
   renderAccountFilter () {
     const accountOpen = this.store('selected.open')
     return (
-      <div className='panelFilter' style={{ opacity: accountOpen ? 1 : 0}}>
+      <div className='panelFilter'>
         <div className='panelFilterIcon'>
           {svg.search(12)}
         </div>
