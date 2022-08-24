@@ -248,7 +248,7 @@ class Account extends React.Component {
               }
             </div>
             <div className={this.state.addressHover ? 'transactionToAddressFull' : 'transactionToAddressFull transactionToAddressFullHidden'}>
-              {this.state.copied ? <span className='transactionToAddressFullCopied'>{'Address Copied'}{svg.octicon('clippy', { height: 14 })}</span> : formattedAddress}
+              {this.state.copied ? <span className='transactionToAddressFullCopied'>{svg.octicon('clippy', { height: 18 })}{'Address Copied'}</span> : formattedAddress}
             </div>
           </div>
         </div>

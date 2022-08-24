@@ -75,7 +75,7 @@
 
     .transactionToAddressLargeWrap
       position absolute
-      top 21px
+      top 18px
       left 65px
       height 40px
       width 164px
@@ -134,15 +134,18 @@
       .transactionToAddressFullCopied
         position absolute
         right 18px
-        top 22px
+        top 25px
+        left 18px
+        font-family 'Exo2'
+        text-align center
 
         svg
           position relative
-          top -1px
-          margin-left 22px
+          top 0px
+          margin-left 11px
 
     .transactionToAddressENS
-      transform translateY(7px)
+      transform translateY(9px)
     .transactionToAddressFullHidden
       opacity 0
 
@@ -151,10 +154,10 @@
     position relative
     opacity 1
     z-index 3030000
-    border-radius 12px
+    border-radius 20px
     transition var(--standard), background 0s linear
     z-index 9999000
-    height 76px
+    height 74px
     background var(--ghostA)
     margin 0px 0px 6px 0px
     box-shadow 0px 4px 8px var(--ghostY)
@@ -164,14 +167,13 @@
 
     .accountNotificationBadge
       position absolute 
-      top 18px
-      right 74px
+      top 16px
+      right 73px
       width 60px
       z-index 300000
-      border-radius 16px
-      height 42px
+      height 38px
       width 48px
-      border-radius 12px
+      border-radius 16px
       display flex
       justify-content center
       align-items center
@@ -183,11 +185,13 @@
       position absolute
       cursor pointer
       color var(--outerspace01)
-      font-size 18px
+      font-size 16px
+      font-weight 500
+      border 3px solid var(--ghostA)
 
     .accountNotificationBadgeReady
       color var(--outerspace)
-      background var(--ghostC)
+      background var(--ghostB)
       transition var(--standardFast)
 
     .accountNotificationBadgeActive
@@ -212,14 +216,12 @@
 
     .signerSelect
       position absolute 
-      top 18px
-      right 13px
-      width 60px
+      top 16px
+      right 10px
       z-index 300000
       border-radius 16px
-      height 42px
+      height 38px
       width 48px
-      border-radius 12px
       display flex
       justify-content center
       align-items center
@@ -230,9 +232,8 @@
       background var(--ghostB)
       position absolute
       cursor pointer
-      // border 3px solid var(--ghostZ)
+      border 3px solid var(--ghostZ)
       cursor pointer
-      
       
       .signerSelectIconWrap
         padding 1px 0px 0px 2px
@@ -276,12 +277,12 @@
 
     .accountIndicator
       position absolute 
-      top 16px
-      left 6px
-      bottom 16px
+      top 20px
+      left 7px
+      bottom 20px
       box-sizing border-box
-      border-radius 8px
-      width 3px
+      border-radius 2px
+      width 4px
       background var(--ghostZ)
     
     .accountIndicatorGood
@@ -326,8 +327,8 @@
 
       .signerSelectIconWrap
         position absolute
-        top 1px
-        left 16px
+        top 3px
+        left 17px
         width 41px
         bottom 0px
         cursor pointer
@@ -550,7 +551,7 @@
     .signerName
       position absolute
       bottom 16px
-      left 65px
+      left 66px
       overflow hidden
       display flex
       justify-content center
