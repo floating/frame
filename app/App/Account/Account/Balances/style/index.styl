@@ -46,10 +46,11 @@
 
 .signerBalanceTotal
   position relative
-  height 64px
+  height 48px
   width 100%
   z-index 200000
   font-size 14px
+  margin-bottom 6px
 
   .signerBalanceButtons
     display flex
@@ -59,9 +60,10 @@
 
   .signerBalanceButton
     height 36px
-    margin-left 10px
-    background var(--ghostB)
-    border-radius 8px
+    margin-left 8px
+    background var(--ghostA)
+    border 3px solid var(--ghostZ)
+    border-radius 14px
     cursor pointer
     z-index 4000
     display flex
@@ -71,8 +73,7 @@
     font-weight 500
     letter-spacing 1px
     text-transform uppercase
-    padding 0px 10px 0px 11px
-    color var(--outerspace07)
+    padding 0px 15px 0px 16px
 
   .signerBalanceAddToken
     width 84px
@@ -82,15 +83,14 @@
       margin-left 2px
 
   .signerBalanceButton:hover
-    background var(--ghostD)
+    background var(--ghostB)
     color var(--outerspace)
     // color var(--good)
 
   .signerBalanceTotalText
     position absolute
-    // background var(--ghostD)
     left 16px
-    right 16px
+    right 18px
     bottom 0px
     top 0px
     display flex
@@ -101,14 +101,12 @@
       margin-right 10px
       margin-top 1px
       text-transform uppercase
-      font-size 11px
+      font-size 8px
       letter-spacing 1px
-      font-weight 400
-      color var(--outerspace06)
+      font-weight 600
 
     .signerBalanceTotalValue
       font-size 17px
-      color var(--outerspace06)
       font-family FiraCode, monospace
       letter-spacing -1px
       font-size 15px

@@ -59,9 +59,8 @@ class AccountSelector extends React.Component {
   }
 
   renderAccountFilter () {
-    const accountOpen = this.store('selected.open')
     return (
-      <div className='panelFilter' style={{ opacity: accountOpen ? 0 : 1}}>
+      <div className='panelFilter'>
         <div className='panelFilterIcon'>
           {svg.search(12)}
         </div>

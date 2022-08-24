@@ -35,11 +35,12 @@ class Balances extends React.Component {
     
     return (
       <div 
+        className='balancesBlock'
         ref={this.moduleRef}
       >
         {!this.props.expanded ? (
           <div className='moduleHeader'>
-            <span>{svg.window(13)}</span>
+            <span>{svg.key(14)}</span>
             <span>{'Permissions'}</span>
           </div>
         ) : null}

@@ -169,6 +169,40 @@ class _AccountMain extends React.Component {
       <SignerStatus open={open} signer={signer} hideSignerStatus={this.hideSignerStatus.bind(this)} />
     ) : null
   }
+
+  renderAccountFilter () {
+    const accountOpen = this.store('selected.open')
+    return (
+      <div className='panelFilter' style={{ opacity: accountOpen ? 1 : 0}}>
+        <div className='panelFilterIcon'>
+          {svg.search(12)}
+        </div>
+        <div className='panelFilterInput'>
+          <input 
+            tabIndex='-1'
+            onChange={(e) => {
+              const value = e.target.value
+              this.setState({ accountFilter: value  })
+              link.send('tray:action', 'setAccountFilter', value)
+            }}
+            value={this.state.accountFilter}
+          />
+        </div>
+        {this.state.accountFilter ? (
+          <div 
+            className='panelFilterClear'
+            onClick={() => {
+              this.setState({ accountFilter: '' })
+              link.send('tray:action', 'setAccountFilter', '')
+            }}
+          >
+            {svg.close(12)}
+          </div>
+        ) : null}
+      </div>
+    )
+  }
+
   render () {
     const accountModules = this.store('panel.account.modules')
     const accountModuleOrder = this.store('panel.account.moduleOrder')
@@ -188,6 +222,7 @@ class _AccountMain extends React.Component {
     })
     return (
       <div className='accountMain'>
+        {this.renderAccountFilter()}
         {this.renderSignerStatus()}
         <div className='accountMainScroll' style={{ pointerEvents: this.state.expandedModule ? 'none' : 'auto' }}>
           <div className='accountMainSlide' style={{ height: slideHeight + 'px' }}>

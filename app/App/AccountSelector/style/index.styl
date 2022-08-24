@@ -103,66 +103,71 @@
             letter-spacing 1px
             opacity 0.7
 
-  .panelFilter
-    // background var(--ghostZ)
+@keyframes slideDown
+  0%
+    transform translateY(-10px)
+
+  100%
+    transform translateY(0px)
+
+.panelFilter
+  position absolute
+  top 0px
+  left 0px
+  right 0px
+  height 48px
+  z-index 2
+  overflow hidden
+  animation slideDown 0.16s cubic-bezier(.82,0,.12,1)
+
+  .panelFilterIcon
     position absolute
-    top 0px
-    left 0px
-    right 0px
-    height 48px
-    z-index 2
-    overflow hidden
+    top 0
+    left 0
+    bottom 0
+    width 48px
+    display flex
+    justify-content center
+    align-items center
     // background var(--ghostZ)
-    transition var(--standard)
 
-    .panelFilterIcon
-      position absolute
-      top 0
-      left 0
-      bottom 0
-      width 48px
-      display flex
-      justify-content center
-      align-items center
-      // background var(--ghostZ)
+  .panelFilterInput
+    position absolute
+    top 0
+    left 0
+    bottom 0
+    right 0
 
-    .panelFilterInput
-      position absolute
-      top 0
-      left 0
-      bottom 0
-      right 0
-
-      input 
-        width 100%
-        height 100%
-        border none
-        outline none
-        text-align center
-        background transparent
-        color var(--outerspace)
-        font-size 18px
-        font-family 'Exo2'
-        padding-bottom 4px
-
-    .panelFilterClear
-      position absolute
-      top 0
-      right 0
-      bottom 0
-      width 48px
-      display flex
-      justify-content center
-      align-items center
+    input 
+      width 100%
+      height 100%
+      border none
+      outline none
+      text-align center
+      background transparent
       color var(--outerspace)
-      cursor pointer
-      border-bottom-left-radius 9px
+      font-size 18px
+      font-family 'Exo2'
+      padding-bottom 4px
 
-      *
-        pointer-events none
+  .panelFilterClear
+    position absolute
+    top 0
+    right 0
+    bottom 0
+    width 48px
+    display flex
+    justify-content center
+    align-items center
+    color var(--outerspace)
+    cursor pointer
+    border-bottom-left-radius 9px
 
-    .panelFilterClear:hover
-      background linear-gradient(45deg, var(--ghostA), var(--ghostZ))
+    *
+      pointer-events none
+
+  .panelFilterClear:hover
+    background linear-gradient(45deg, var(--ghostA), var(--ghostZ))
 
 .accountSelectorDisabled
   pointer-events none
