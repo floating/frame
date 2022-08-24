@@ -7,7 +7,7 @@ import { gweiToWei, gweiToWeiHex, intToHex } from '../../../../../../../resource
 import { usesBaseFee } from '../../../../../../../resources/domain/transaction'
 
 function toDisplayFromWei (bn) {
-  return bn.shiftedBy(-9).toFixed(9).toString().replace(/0+$/, '').replace(/\.+$/, '')
+  return bn.shiftedBy(-9).decimalPlaces(9).toString()
 }
 
 function toDisplayFromGwei (bn) {
@@ -55,7 +55,7 @@ const FeeOverlayInput = ({ initialValue, labelText, tabIndex, decimals, onReceiv
     onReceiveValue(limitedValue)
     setValue(formatForInput(limitedValue, decimals))
   }
-  const set = (newValueStr, newValueNum) => {
+  const submitValue = (newValueStr, newValueNum) => {
     setValue(newValueStr)
     clearTimeout(submitTimeout)
 
@@ -89,7 +89,7 @@ const FeeOverlayInput = ({ initialValue, labelText, tabIndex, decimals, onReceiv
                 return
               }
 
-              set(value[0], parsedValue)
+              submitValue(value[0], parsedValue)
             }
           }}
           onKeyDown={(e) => {
@@ -105,10 +105,10 @@ const FeeOverlayInput = ({ initialValue, labelText, tabIndex, decimals, onReceiv
 
               if (e.key === 'ArrowUp') {
                 const incrementedValue = decimals ? limitRange(Math.floor(parsedValue) + 1) : (parsedValue + 1000)
-                set(incrementedValue)
+                submitValue(incrementedValue)
               } else {
                 const decrementedValue = decimals ? limitRange(Math.floor(parsedValue) - 1) : (parsedValue - 1000)
-                set(decrementedValue)
+                submitValue(decrementedValue)
               }
             }
           }}
@@ -141,7 +141,6 @@ const PriorityFeeInput = ({ initialValue, onReceiveValue, tabIndex }) =>
 
 const PriceInput = ({ gasPrice, maxTotalFee, gasLimit, handlerId }) => {
   const displayGasPrice = toDisplayFromWei(gasPrice)
-
   const gasPriceReceiveValueHandler = (newValue) => {
     let newGasPrice = limitRange(newValue)
 
@@ -218,6 +217,8 @@ class TxFeeOverlay extends Component {
     const gasPrice = BigNumber(data.gasPrice, 16)
     const baseFee = maxFee.minus(priorityFee)
     const maxTotalFee = getMaxTotalFee(data)
+
+    console.log(data)
 
     return (
       <div className='txAdjustFee cardShow' ref={this.moduleRef}>
