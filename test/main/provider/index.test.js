@@ -137,60 +137,104 @@ describe('#send', () => {
   })
 
   describe('#wallet_addEthereumChain', () => {
-    it('should create an addChain request', done => {
-      send({ 
-        method: 'wallet_addEthereumChain', 
-        params: [
-          {
-            chainId: '0x1234', // A 0x-prefixed hexadecimal string
-            chainName: 'New Chain',
-            nativeCurrency: {
-              name: 'New',
-              symbol: 'NEW', // 2-6 characters long
-              decimals: 18
-            },
-            rpcUrls: ['https://pylon.link'],
-            blockExplorerUrls: ['https://pylon.link'],
-            iconUrls: [''] // Currently ignored
-          }
-        ]
-      }, () => {
-        try {
-          expect(accountRequests).toHaveLength(1)
-          expect(accountRequests[0].handlerId).toBeTruthy()
-          expect(accountRequests[0].type).toBe('addChain')
-          done()
-        } catch (e) { 
-          done(e) 
-        }
-      })
+    const sendRequest = (chain, cb) => send({ method: 'wallet_addEthereumChain', params: [chain] }, cb)
+
+    it('rejects a request with no chain id', done => {
+      const cb = (response) => {
+        expect(response.error.message).toMatch(/missing chainid/i)
+        expect(response.result).toBeUndefined()
+        done()
+      }
+
+      sendRequest({ chainName: 'Rinkeby', nativeCurrency: { symbol: 'rETH' }}, cb)
     })
 
-    it('should switch to a chain and notify listeners if it exists in the store', done => {
+    it('rejects a request with an invalid chain id', done => {
+      const cb = (response) => {
+        expect(response.error.message).toMatch(/invalid chain id/i)
+        expect(response.result).toBeUndefined()
+        done()
+      }
+
+      sendRequest({ chainId: 'test', chainName: 'Rinkeby', nativeCurrency: { symbol: 'rETH' }}, cb)
+    })
+
+    it('rejects a request with no chain name', done => {
+      const cb = (response) => {
+        expect(response.error.message).toMatch(/missing chainname/i)
+        expect(response.result).toBeUndefined()
+        done()
+      }
+
+      sendRequest({ chainId: '0x4', nativeCurrency: { symbol: 'rETH' }}, cb)
+    })
+
+    it('rejects a request with no native currency', done => {
+      const cb = (response) => {
+        expect(response.error.message).toMatch(/missing nativecurrency/i)
+        expect(response.result).toBeUndefined()
+        done()
+      }
+
+      sendRequest({ chainId: '0x4', chainName: 'Rinkeby' }, cb)
+    })
+
+    it('should create a request to add the chain', done => {
+      const cb = () => {
+        expect(accountRequests).toHaveLength(1)
+        expect(accountRequests[0]).toEqual(expect.objectContaining(
+          {
+            handlerId: expect.any(String),
+            type: 'addChain',
+            chain: {
+              type: 'ethereum',
+              id: 4660,
+              name: 'Bizarro Polygon',
+              symbol: 'NEW',
+              primaryRpc: 'https://pylon.link',
+              secondaryRpc: undefined,
+              explorer: 'https://explorer.pylon.link'
+            }
+          }
+        ))
+
+        done()
+      }
+
+      sendRequest({
+        chainId: '0x1234', // A 0x-prefixed hexadecimal string
+        chainName: 'Bizarro Polygon',
+        nativeCurrency: {
+          name: 'New',
+          symbol: 'NEW', // 2-6 characters long
+          decimals: 18
+        },
+        rpcUrls: ['https://pylon.link'],
+        blockExplorerUrls: ['https://explorer.pylon.link']
+      }, cb)
+    })
+
+    it('should switch the chain for the requesting origin if the chain already exists', done => {
       store.set('main.networks.ethereum', 1, { id: 1 })
       store.set('main.origins', '8073729a-5e59-53b7-9e69-5d9bcff94087', { chain: { id: 137, type: 'ethereum' }})
       store.switchOriginChain = jest.fn()
 
-      send({ 
-        method: 'wallet_addEthereumChain', 
-        params: [
-          {
-            chainId: '0x1', // A 0x-prefixed hexadecimal string
-            chainName: 'Mainnet',
-            nativeCurrency: {
-              name: 'Ether',
-              symbol: 'ETH', // 2-6 characters long
-              decimals: 18
-            },
-            rpcUrls: ['https://pylon.link'],
-            blockExplorerUrls: ['https://pylon.link'],
-            iconUrls: [''] // Currently ignored
-          }
-        ]
-      }, () => {
+      const cb = (response) => {
+        expect(response.error).toBeFalsy()
+        expect(response.result).toBeNull()
+
+        expect(accountRequests).toHaveLength(0)
         expect(store.switchOriginChain).toHaveBeenCalledWith('8073729a-5e59-53b7-9e69-5d9bcff94087', 1, 'ethereum')
         done()
-      })
+      }
+
+      sendRequest({
+        chainId: '0x1', // A 0x-prefixed hexadecimal string
+        chainName: 'Mainnet',
+        nativeCurrency: {
+          symbol: 'ETH'
+        }
+      }, cb)
     })
   })
 
@@ -951,11 +995,14 @@ describe('#send', () => {
     }
 
     const validRequests = [
-      // the first 2 parameters are reversed for V1
-      { method: 'eth_signTypedData', params: [typedData, address], version: 'V1' },
-      { method: 'eth_signTypedData_v1', params: [typedData, address], version: 'V1' },
+      { method: 'eth_signTypedData', params: [address, typedData], version: 'V1' },
+      { method: 'eth_signTypedData_v1', params: [address, typedData], version: 'V1' },
       { method: 'eth_signTypedData_v3', params: [address, typedData], version: 'V3' },
-      { method: 'eth_signTypedData_v4', params: [address, typedData], version: 'V4' }
+      { method: 'eth_signTypedData_v4', params: [address, typedData], version: 'V4' },
+      { method: 'eth_signTypedData', params: [typedData, address], version: 'V1', dataFirst: true },
+      { method: 'eth_signTypedData_v1', params: [typedData, address], version: 'V1', dataFirst: true },
+      { method: 'eth_signTypedData_v3', params: [typedData, address], version: 'V3', dataFirst: true },
+      { method: 'eth_signTypedData_v4', params: [typedData, address], version: 'V4', dataFirst: true }
     ]
 
     function verifyRequest (version) {
@@ -966,8 +1013,8 @@ describe('#send', () => {
       expect(accountRequests[0].version).toBe(version)
     }
     
-    validRequests.forEach(({ method, params, version }) => {
-      it(`submits a ${method} request to sign typed data`, () => {
+    validRequests.forEach(({ method, params, version, dataFirst }) => {
+      it(`submits a ${method} request to sign typed data${dataFirst ? ' with data sent as the first param' : ''}`, () => {
         send({ method, params })
   
         verifyRequest(version)

@@ -10,7 +10,7 @@ import windows from '../../windows'
 import nav from '../../windows/nav'
 import store from '../../store'
 import { Aragon } from '../aragon'
-import { TransactionData } from '../../../resources/domain/transaction'
+import { TransactionData, getAddress } from '../../../resources/domain/transaction'
 import { capitalize } from '../../../resources/utils'
 import { getType as getSignerType, Type as SignerType } from '../../signers/Signer'
 
@@ -188,19 +188,34 @@ class FrameAccount {
     return this.requests[id] as T
   }
 
-  resolveRequest <T> (req: AccountRequest, result?: T) {
-    const knownRequest = this.requests[req.handlerId]
+  resolveRequest ({ handlerId, payload: { id, jsonrpc } }: AccountRequest, result?: any) {
+    const knownRequest = this.requests[handlerId]
 
     if (knownRequest) {
       if (knownRequest.res) {
-        const { id, jsonrpc } = req.payload || {}
-        
         knownRequest.res({ id, jsonrpc, result })
       }
-      store.navClearReq(req.handlerId)
-      delete this.requests[req.handlerId]
-      this.update()
+
+      this.clearRequest(knownRequest)
     }
+  }
+
+  rejectRequest ({ handlerId, payload: { id, jsonrpc } }: AccountRequest, error: EVMError) {
+    const knownRequest = this.requests[handlerId]
+
+    if (knownRequest) {
+      if (knownRequest.res) {
+        knownRequest.res({ id, jsonrpc, error })
+      }
+
+      this.clearRequest(knownRequest)
+    }
+  }
+
+  private clearRequest ({ handlerId }: AccountRequest) {
+    store.navClearReq(handlerId)
+    delete this.requests[handlerId]
+    this.update()
   }
 
   addRequiredApproval (req: TransactionRequest, type: ApprovalType, data: any = {}, onApprove: (data: any) => void = () => {}) {

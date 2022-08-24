@@ -10,7 +10,6 @@ const store = require('../store').default
 const { default: BlockMonitor } = require('./blocks')
 const { default: chainConfig } = require('./config')
 const { default: GasCalculator } = require('../transaction/gasCalculator')
-const { capitalize } = require('../../resources/utils')
 
 // these chain IDs are known to not support EIP-1559 and will be forced
 // not to use that mechanism
@@ -119,6 +118,8 @@ class ChainConnection extends EventEmitter {
         log.error(`could not update gas prices for chain ${this.chainId}`, { feeMarket, chainConfig: this.chainConfig }, e)
       }
     })
+
+    return monitor
   }
 
   update (priority) {
@@ -159,12 +160,16 @@ class ChainConnection extends EventEmitter {
   }
 
   resetConnection (priority /* 'primary' | 'secondary' */, status, target) {
+    log.debug('resetConnection', { priority, status, target })
+
     const provider = this[priority].provider
 
     this.killProvider(provider)
     this[priority].provider = null
     this[priority].connected = false
     this[priority].type = ''
+
+    this.stopBlockMonitor(priority)
 
     if (['off', 'disconnected', 'standby'].includes(status)) {
       if (this[priority].status !== status) {
@@ -183,9 +188,19 @@ class ChainConnection extends EventEmitter {
   }
 
   killProvider (provider) {
+    log.debug('killProvider', { provider })
+
     if (provider) {
       provider.close()
       provider.removeAllListeners()
+    }
+  }
+  
+  stopBlockMonitor (priority) {
+    log.debug('stopBlockMonitor', { chainId: this.chainId, priority })
+
+    if (this[priority].blockMonitor) {
+      this[priority].blockMonitor.stop()
     }
   }
 
@@ -353,12 +368,16 @@ class ChainConnection extends EventEmitter {
   }
 
   close (update = true) {
+    log.verbose(`closing chain ${this.chainId}`, { update })
+
     if (this.observer) this.observer.remove()
 
     this.killProvider(this.primary.provider)
+    this.stopBlockMonitor('primary')
     this.primary.provider = null
 
     this.killProvider(this.secondary.provider)
+    this.stopBlockMonitor('secondary')
     this.secondary.provider = null
 
     if (update) {

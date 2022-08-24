@@ -587,21 +587,9 @@ class _Network extends React.Component {
           {/* <div className='chainIdBadgeBackground' /> */}
 
           <div className='chainSettings' onClick={() => {
-            const req = {
-              chain: {
-                blockExplorerUrls: [explorer],
-                rpcUrls: [],
-                nativeCurrency: {
-                  symbol: symbol
-                },
-                id: id,
-                name: name,
-                type: type,
-                layer: layer,
-                iconUrls: []
-              }
-            }
-            link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'addChain', notifyData: { editMode: true, req }} })
+            const chain = { id, type, name, symbol, explorer, layer }
+
+            link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'updateChain', notifyData: { chain }} })
           }}>
             {svg.gear(11)}
           </div>
@@ -797,7 +785,15 @@ class Settings extends React.Component {
           </div>
         </div> */}
         <div className='localSettingsWrap'>
-          <div className='newAccount' onClick={() => link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'addChain' } })}>
+          <div className='newAccount' onClick={() => link.send('tray:action', 'navDash', {
+            view: 'notify',
+            data: {
+              notify: 'addChain',
+              notifyData: {
+                chain: { type: 'ethereum' }
+              }
+            }})
+          }>
             <div className='newAccountIcon'>{svg.plus(16)}</div> 
             Add New Chain
           </div>

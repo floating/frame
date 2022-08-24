@@ -28,6 +28,18 @@ const account = {
   tokens: {},
   created: '12819530:1626189153547'
 }
+const account2 = {
+  id: '0xef8f1bbe054ad30c6af774ed7a7c70a74ef77ac5',
+  name: 'Ledger Account',
+  lastSignerType: 'ledger',
+  address: '0xef8f1bbe054ad30c6af774ed7a7c70a74ef77ac5',
+  status: 'ok',
+  active: false,
+  signer: '',
+  requests: {},
+  ensName: '',
+  created: '15315799:1660153882707',
+} 
 
 let Accounts, request
 
@@ -37,6 +49,7 @@ beforeAll(async () => {
   jest.useFakeTimers()
 
   store.updateAccount(account)
+  store.updateAccount(account2)
 
   // need to import this after mocks are set up
   Accounts = (await import('../../../main/accounts')).default
@@ -757,7 +770,7 @@ describe('#resolveRequest', () => {
       throw new Error('unexpected callback!')
     })
 
-    Accounts.resolveRequest({ handlerId: '-1' })
+    Accounts.resolveRequest({ payload: {}, handlerId: '-1' })
 
     expect(Object.keys(Accounts.current().requests)).toHaveLength(1)
   })
@@ -778,5 +791,55 @@ describe('#resolveRequest', () => {
     Accounts.resolveRequest(request)
 
     expect(Object.keys(Accounts.current().requests)).toHaveLength(0)
+  })
+})
+
+describe('#removeRequest', () => {
+  beforeEach(() => {
+    store.navClearReq = jest.fn()
+    account.update = jest.fn()
+    Accounts.addRequest(request)
+  })
+
+  it('should remove a request for the provided handlerId from the account object', () => {
+    Accounts.removeRequest(account, request.handlerId)
+
+    expect(Object.keys(account.requests)).toHaveLength(0)
+  })
+
+  it('should clear a request for the provided handlerId from the nav', () => {
+    Accounts.removeRequest(account, request.handlerId)
+
+    expect(store.navClearReq).toHaveBeenCalledWith(request.handlerId)
+  })
+
+  it('should update the account', () => {
+    Accounts.removeRequest(account, request.handlerId)
+
+    expect(account.update).toHaveBeenCalled()
+  })
+})
+
+describe('#removeRequests', () => {
+  beforeEach(() => {
+    store.setGasFees('ethereum', '1', { maxBaseFeePerGas: '', maxPriorityFeePerGas: '' })
+    Accounts.removeRequest = jest.fn()
+    Accounts.addRequest(request)
+    Accounts.setSigner(account2.address, () => {
+      Accounts.addRequest({ ...request, data: { ...request.data, type: '0x1' } })
+    })
+  })
+
+  it('should remove the requests for a given handlerId across accounts', () => {
+    Accounts.removeRequests(request.handlerId)
+
+    expect(Object.keys(account.requests)).toHaveLength(0)
+    expect(Object.keys(account2.requests)).toHaveLength(0)
+  })
+
+  it('should not remove requests when there are none matching the given handlerId', () => {
+    Accounts.removeRequests('4')
+
+    expect(Accounts.removeRequest).not.toHaveBeenCalled()
   })
 })
