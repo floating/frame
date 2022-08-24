@@ -28,12 +28,12 @@ div
   .dashMain
     position absolute 
     top 80px
-    right 5px
+    right 8px
     bottom 40px
-    left 5px
+    left 8px
     z-index 1000
     background var(--ghostZ)
-    border-radius 16px
+    border-radius 24px
     padding-bottom 20px
 
     .dashMainScroll
@@ -43,6 +43,7 @@ div
       bottom 0px
       left 0px
       z-index 2000
+      border-radius 24px
       overflow-y scroll
       overflow-x hidden
 
@@ -52,7 +53,7 @@ div
       right 0px
       bottom 0px
       left 0px
-      border-radius 16px
+      border-radius 24px
       z-index 40000000
       box-shadow inset 0px 0px 6px var(--ghostY)
       pointer-events none
@@ -96,7 +97,6 @@ div
     right 0px
     bottom 0px
     left 0px
-    // background red
     border-radius 16px
     z-index 40000000
     box-shadow inset 0px 0px 6px var(--ghostX)
@@ -277,8 +277,4 @@ div
 
 @import './App/Notify/style'
 @import './App/Tokens/style'
-// @import '../Local/style'
-// @import '../Badge/style'
-// @import '../Networks/style'
-// @import '../Filter/style'
 @import './App/card.styl'

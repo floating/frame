@@ -64,19 +64,6 @@
   pointer-events auto
   box-sizing border-box
   z-index 10000000
-  // background blue
-
-  // .signerContainer:before
-  //   content ''
-  //   position absolute
-  //   top 0
-  //   right 0
-  //   left 0
-  //   bottom 2px
-  //   // background var(--ghostC)
-  //   z-index 40
-  //   border-radius 12px
-  //   z-index 3003
 
   .signerContainer
     position relative
@@ -122,7 +109,6 @@
     overflow-y scroll
     overflow-x hidden
     transform translate3d(0, 0, 0)
-    // padding-top 13px
     z-index 2000
 
   .accountMainSlide
@@ -214,32 +200,8 @@
     .transactionToAddressENS
       transform translateY(7px)
 
-      // input
-      //   position absolute
-      //   top -3px
-      //   left -3px
-      //   display block
-      //   width calc(100% + 6px)
-      //   height calc(100% + 6px)
-      //   border none
-      //   outline none
-      //   overflow hidden
-      //   opacity 0
-      //   cursor default
-
-      // svg
-      //   padding-left 5px
-      //   padding-bottom 1px
     .transactionToAddressFullHidden
       opacity 0
-      // background green
-
-
-    // .signerAddressActive
-    //   .transactionToAddressLarge
-    //     opacity 0
-    //   .transactionToAddressFull
-    //     opacity  1
 
   .clickGuard
     position absolute
@@ -255,10 +217,8 @@
     top 100px
     left 0
     right 0
-    // height 0px
     height 0px
     background var(--ghostB)
-    // height 40px
     z-index 3015
     transition var(--standardFast)
     border-bottom-left-radius 16px
@@ -344,7 +304,6 @@
         position relative
         z-index 3
         transition var(--standardSlow)
-        // opacity 0
         transform translateY(-200px)
         pointer-events none
 
@@ -434,20 +393,16 @@
     top 64px
     right 0px
     left 0px
-    // padding-top 20px
     border-radius 6px
     z-index 3005
     overflow-x hidden
     overflow-y hidden
-    // opacity 1
     transition var(--standard), 0.1s linear background
     will-change transform
     background var(--ghostC)
     z-index 9999003
     height 40px
     background var(--ghostC)
-    //animation-timing-function: cubic-bezier(0.1, -0.6, 0.2, 0)
-    // background red // var(--ghostB)
     box-shadow 0px 4px 6px -1px var(--thick)
     animation-delay 0.2s
     .accountMenuLeft
@@ -491,7 +446,6 @@
     right 0px
     bottom 7px
     left 0px
-    // padding-top 20px
     border-radius 6px
     z-index 3005
     overflow-x hidden
@@ -501,8 +455,6 @@
     will-change transform
     background var(--ghostC)
     z-index 9999003
-    //animation-timing-function: cubic-bezier(0.1, -0.6, 0.2, 0)
-    // background red // var(--ghostB)
     box-shadow 0px 4px 6px -1px var(--thick)
     animation-delay 0.4s
 
@@ -554,92 +506,11 @@
       height 40px
       border-top 1px solid var(--ghostB)
 
-  .signerBot
-    position absolute
-    bottom 3px
-    left 3px
-    right 3px
-    opacity 1
-    z-index 3020
-    height 64px
-    // border-bottom-left-radius 16px
-    // border-bottom-right-radius 16px
-    pointer-events none
-    transition var(--standard)
-    transform translateZ(0)
-    // background linear-gradient(rgba(255, 255, 255, 0), var(--ghostD), var(--ghostD))
-    background var(--ghostC)
-    overflow hidden
-
   .signerEvents
     height 200px
     overflow scroll
     background rgba(0, 0, 50, 0.1)
     width 100%
-
-  .signerSelectArrowWrap
-    position absolute
-    display flex
-    justify-content center
-    align-items center
-    font-size 14px
-    font-weight 200
-    text-align center
-    top 0
-    bottom 0px
-    width 16px
-    z-index 1
-    color var(--spacewhite)
-    flex-direction column
-    opacity 1
-    transition var(--standard)
-    transition-delay 0.64s
-    
-    .signerSelectArrows
-      height 50px
-      width 16px
-      // border-radius 25px
-      position relative
-      
-      .signerSelectArrow
-        position absolute
-        top 0
-        left 0
-        right 0
-        animation-duration 2.4s
-        animation-name arrowSlide
-        animation-iteration-count infinite
-        animation-fill-mode none
-        animation-play-state running
-        transform translateZ(0)
-        will-change transform, opacity
-        opacity 0
-
-        svg
-          color var(--outerspace)
-          opacity 1
-          transform translateZ(0)
-          will-change transform, opacity
-
-      .signerSelectArrow:first-child
-        animation-delay 0s
-        margin-top 12px
-
-      .signerSelectArrow:nth-child(2)
-        animation-delay 0.09s
-        margin-top 19px
-
-      .signerSelectArrow:nth-child(3)
-        animation-delay 0.18s
-        margin-top 26px
-
-      .signerSelectArrow:nth-child(4)
-        animation-delay 0.27s
-        margin-top 33px
-
-      .signerSelectArrow:nth-child(5)
-        animation-delay 0.36s
-        margin-top 40px
 
   .signerSelectDown
     transform rotate(180deg)
@@ -666,170 +537,13 @@
     font-size 12px
     width 100%
 
-// .trezorPhraseInput
-//   height 200px
-//   width 100%
-//   background var(--outerspace05)
-//   position relative
-//   display flex
-//   justify-content center
-//   transition var(--standard)
-//   padding 20px 0px 20px 0px
-//   height 120px
-//   overflow hidden
-
-// .trezorPinWrap:before
-//   content ''
-//   position absolute
-//   top 0
-//   right 0
-//   bottom 3px
-//   left 0
-//   background #212d2e
-//   border-radius 3px
-
-// .trezorPinWrap
-//   width 100%
-//   background var(--outerspace)
-//   position relative
-//   display flex
-//   justify-content center
-//   transition var(--standard)
-//   padding 20px 0px 20px 0px
-//   height 120px
-//   overflow hidden
-//   background blue
-
-//   .trezorPinInput
-//     display flex
-//     width 120px
-//     height 120px
-//     flex-wrap wrap-reverse
-//     z-index 1000
-
-//     .trezorPinInputButton
-//       min-width 40px
-//       min-height 40px
-//       display flex
-//       justify-content center
-//       align-items center
-
-//       svg
-//         color var(--spacewhite)
-
-//     .trezorPinInputButton:hover
-//       svg
-//         transform scale(1.7)
-
-//     .trezorPinInputButton:active
-//       svg
-//         transform scale(2.1)
-//         transition none
-
-// .okSigner
-//   .signerTop
-//     .signerNav
-    // .signerTypeDisconnected
-    //   .signerDisconnectedTextOpen
-    //     opacity 1 !important
-    //   .signerDisconnectedTextClose
-    //     opacity 0 !important
-      // .signerType
-      //   width 160px
-      //   // margin-left -80px
-      //   .signerSelect
-      //     opacity 1
-      //   .signerInner
-      //     left 25px
-      //     right 25px
-      //   .signerTypeSettings
-      //     transform translateY(-30px)
-
-.openSigner
-  // TODO fix transition
-  // padding 3px 5px 4px 4px
-  .signerMid
-    > div
-      opacity 1
-  .signerTop
-    .signerStatus
-      .signerInfo
-        opacity 1
-        height 20px
-    // .signerNav
-    //   .signerTypeDisconnected
-    //     width 160px
-    //     // margin-left -80px
-    //     // .signerDisconnectedTextOpen
-    //     //   opacity 0
-    //     // .signerDisconnectedTextClose
-    //     //   opacity 1
-    //   .signerType
-    //     .signerSelect
-    //       opacity 0
-    //     .signerInner
-    //       left 0px
-    //       right 0px
-    //       .low
-    //         margin-left -20px
-
-  .signerSelectDown.signerSelectRight
-    right 0
-
-  .signerSelectDown.signerSelectLeft
-    left 0
-
-  .accountListWrap
-    height 60px
-
-.signerInSettings
-  .signerTop
-    .addressSelect
-      transform translateY(0px)
-      pointer-events auto
-  .accountListWrap
-    height 130px
-    transform translateY(0px)
-    will-change height
-
-.signerAccountExpand
-  .addressSelectArrow:first-child
-    transition var(--standardSlow)
-    svg
-      transform rotate(-180deg)
-  .addressSelectArrow:last-child
-    transition var(--standardSlow)
-    svg
-      transform rotate(180deg)
-  .accountListWrap
-    transition var(--standardSlow)
-    height 425px
-    .accountList
-      .accountListItems
-        pointer-events auto
-        transform translateY(0px)
-        // opacity 1
-      .accountPageToggle
-        opacity 1
-        pointer-events auto
-        transform translateY(0px)
-      .settingsMenu
-        opacity 0
-        pointer-events none
-        transform translateY(50px)
-
 .accountModule
   position absolute 
   top 0
   left 2px
   right 2px
-  // border-bottom 1px solid var(--ghostA)
-  // background var(--ghostC)
   transform translate3d(0, 0, 0)
-  transition var(--standardFast) // , 0s linear height // 0.05s linear allheight // // , height 1s linear
-  // box-shadow 0px 10px 10px var(--ghostA)
-  // padding 0px 0px 0px 0px
-  // overflow hidden
+  transition var(--standardFast)
 .moduleExpanded
   .accountModuleInner
     background none
@@ -842,7 +556,7 @@
   left 0px
   right 0px
   bottom 0px
-  border-radius 18px
+  border-radius 20px
   background var(--ghostA)
   box-shadow 0px 4px 8px var(--ghostY)
   transform translate3d(0, 0, 0)

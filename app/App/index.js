@@ -28,7 +28,6 @@ class Panel extends React.Component {
   }
   
   // componentDidMount () {
-  //   console.log('did mount')
   //   document.addEventListener('keydown', (event) => {
   //     console.log('event ky', event.key, this.store('panel.view'))
   //     const view = this.store('panel.view')
@@ -74,20 +73,12 @@ class Panel extends React.Component {
     })
     return (
       <div id='panel' style={{ opacity }}>
-        {/* <Overlay /> */}
         <Badge />
         <Notify />
-
         <Menu />
-
         <AccountSelector />
         <Account />
         <Backdrop />
-        
-        {/* <AccountSelector />
-        <OpenAccount /> */}
-        {/* <Main />
-        <Aux /> */}
       </div>
     )
   }

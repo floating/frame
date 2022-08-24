@@ -168,9 +168,14 @@ class _AccountMain extends React.Component {
       const actingSigner = this.store('main.accounts', account.smart.actor, 'signer')
       if (actingSigner) signer = this.store('main.signers', actingSigner)
     }
-    return signerStatusOpen && open ? (
-      <SignerStatus open={open} signer={signer} setSignerStatusOpen={this.setSignerStatusOpen} />
-    ) : null
+    if (!signerStatusOpe || !open) return null
+    return (
+      <SignerStatus 
+        open={open}
+        signer={signer}
+        setSignerStatusOpen={this.setSignerStatusOpen}
+      />
+    )
   }
 
   renderAccountFilter () {

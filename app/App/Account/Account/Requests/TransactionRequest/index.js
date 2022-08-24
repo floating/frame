@@ -10,12 +10,10 @@ import TxMain from './TxMain'
 import TxMainNew from './TxMainNew'
 import TxFeeNew from './TxFeeNew'
 import TxAction from './TxAction'
-import TxData from './TxData'
 import TxRecipient from './TxRecipient'
 import AdjustFee from './AdjustFee'
 import ViewData from './ViewData'
 import TxApproval from './TxApproval'
-
 
 class TransactionRequest extends React.Component {
   constructor (props, context) {

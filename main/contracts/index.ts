@@ -68,7 +68,6 @@ async function fetchSourceCode (contractAddress: Address, chainId: string) {
   return []
 }
 
-
 async function fetchAbi (contractAddress: Address, chainId: string): Promise<ContractSourceCodeResult | undefined> {
   try {
     const sources = await fetchSourceCode(contractAddress, chainId)
@@ -110,7 +109,7 @@ export function decodeCallData (calldata: string, abi: string) {
 }
 
 export async function decodeContractCall (contractAddress: Address, chainId: string, calldata: string): Promise<DecodedCallData | undefined> {
-  const contractSources: ContractSource[] = [{ name: 'ERC-20', source: 'unverified erc-20', abi: erc20Abi }]
+  const contractSources: ContractSource[] = [{ name: 'ERC-20', source: 'Generic ERC-20', abi: erc20Abi }]
   const contractSource = await fetchAbi(contractAddress, chainId)
 
   if (contractSource) {

@@ -29,7 +29,8 @@ class Time extends React.Component {
     const seconds = Math.floor((duration / 1000) % 60)
     const minutes = Math.floor((duration / (1000 * 60)) % 60)
     const hours = Math.floor((duration / (1000 * 60 * 60)) % 24)
-    let label, time
+    let label = ''
+    let time = ''
     if (hours) {
       label = hours === 1 ? 'hour ago' : 'hours ago'
       time = hours
@@ -119,19 +120,10 @@ class _RequestApprove extends React.Component {
     // const value = this.hexToDisplayValue(req.data.value || '0x')
     const currentSymbol = this.store('main.networks', chain.type, chain.id, 'symbol') || '?'
 
-    let maxFeePerGas, maxFee, maxFeeUSD
-
-    if (usesBaseFee(req.data)) {
-      const gasLimit = BigNumber(req.data.gasLimit, 16)
-      maxFeePerGas = BigNumber(req.data.maxFeePerGas, 16)
-      maxFee = maxFeePerGas.multipliedBy(gasLimit)
-      maxFeeUSD = maxFee.shiftedBy(-18).multipliedBy(nativeUSD)
-    } else {
-      const gasLimit = BigNumber(req.data.gasLimit, 16)
-      maxFeePerGas = BigNumber(req.data.gasPrice, 16)
-      maxFee = maxFeePerGas.multipliedBy(gasLimit)
-      maxFeeUSD = maxFee.shiftedBy(-18).multipliedBy(nativeUSD)
-    }
+    const gasLimit = BigNumber(req.data.gasLimit, 16)
+    const maxFeePerGas = BigNumber(usesBaseFee(req.data) ? req.data.maxFeePerGas : req.data.gasPrice, 16) 
+    const maxFee = maxFeePerGas.multipliedBy(gasLimit)
+    const maxFeeUSD = maxFee.shiftedBy(-18).multipliedBy(nativeUSD)
 
     const confirmations = req.tx && req.tx.confirmations ? req.tx.confirmations : 0
     const statusClass = req.status === 'error' ? 'txStatus txStatusError' : 'txStatus'
@@ -151,7 +143,6 @@ class _RequestApprove extends React.Component {
         feeAtTime = (Math.round(feeInUsd * 100) / 100).toFixed(2)
       }
     }
-
 
     if (notice) {
       return (
@@ -420,12 +411,6 @@ class _Footer extends React.Component {
 
 const Footer = Restore.connect(_Footer)
 
-
-
-
-
-
-
 class Main extends React.Component {
   constructor (...args) {
     super(...args)
@@ -481,25 +466,20 @@ class Main extends React.Component {
     if (!open) return
 
     const currentAccount = accounts[current]
+    if (!currentAccount) return null
 
-    // const { data } = this.store('panel.nav')[0] || {}
-    if (currentAccount) {
-      return (
-        <>
-          <Account 
-            key={current.id} 
-            {...currentAccount} 
-            index={1} 
-            reportScroll={() => this.reportScroll()} 
-            resetScroll={() => this.resetScroll()} 
-          />
-          <Footer />
-        </>
-      )
-    } else {
-      return null
-    }
-
+    return (
+      <>
+        <Account 
+          key={current.id} 
+          {...currentAccount} 
+          index={1} 
+          reportScroll={() => this.reportScroll()} 
+          resetScroll={() => this.resetScroll()} 
+        />
+        <Footer />
+      </>
+    )
   }
 }
 

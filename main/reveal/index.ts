@@ -27,7 +27,7 @@ async function resolveEntityType (address: string, chainId: string): Promise<Ent
       id: 1,
       chainId // TODO: Verify this overrides setChain
     }      
-    const code = (await provider.request(payload) || [])
+    const code = await provider.request(payload)
     const type = (code === '0x' || code === '0x0') ? 'external' : 'contract'
     return type
   } catch (e) {
@@ -38,7 +38,7 @@ async function resolveEntityType (address: string, chainId: string): Promise<Ent
 
 async function resolveEnsName (address: string): Promise<string> {
   try {
-    const ensName: string = (await nebula.ens.reverseLookup([address]) || [])[0]
+    const ensName: string = (await nebula.ens.reverseLookup([address]))[0]
     return ensName
   } catch (e) {
     log.warn(e)
