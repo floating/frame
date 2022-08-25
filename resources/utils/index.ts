@@ -14,6 +14,7 @@ function randomLetters (num: number) {
 }
 
 function capitalize (s: string) {
+  if (!s) return s
   return s[0].toUpperCase() + s.substring(1).toLowerCase()
 }
 
