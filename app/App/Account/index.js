@@ -360,10 +360,9 @@ class _Footer extends React.Component {
   // }
   render () {
     const crumb = this.store('windows.panel.nav')[0] || {}
-    const accountId = this.store('selected.current')
     if (crumb.view === 'requestView') {
-      const reqViewData = crumb.req // TODO: Only pass req id in nav
-      const req = this.store('main.accounts', accountId, 'requests', reqViewData.handlerId)
+      const { accountId, requestId } = crumb.data
+      const req = this.store('main.accounts', accountId, 'requests', requestId)
       if (req) {
         if (req.type === 'transaction') {
           return (

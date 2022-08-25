@@ -385,11 +385,7 @@ class FrameAccount {
       const inRequestView = panelNav.map((crumb: any) => crumb.view).includes('requestView')
 
       if (accountOpen && !inRequestView) {
-        const reqData = { ...req, data: { ...req.data } }
-        delete reqData.res
-        // TODO: only pass req id in nav instead of entire req
-        const reqClone = JSON.parse(JSON.stringify(reqData))
-        const crumb = { view: 'requestView', step: 'confirm', account, req: reqClone }
+        const crumb = { view: 'requestView', data: { step: 'confirm', accountId: account, requestId: req.handlerId } } as const
         nav.forward('panel', crumb)
       }
     }

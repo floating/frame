@@ -44,10 +44,11 @@ class _RequestItem extends React.Component {
         onClick={() => {
           const crumb = { 
             view: 'requestView',
-            step: 'confirm', 
-            account, 
-            req, 
-            i 
+            data: {
+              step: 'confirm', 
+              accountId: account, 
+              requestId: req.handlerId
+            }
           }
           link.send('nav:forward', 'panel', crumb)
         }}

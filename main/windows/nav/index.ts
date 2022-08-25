@@ -3,13 +3,10 @@
 import { ipcMain } from 'electron'
 
 import store from '../../store'
-
-interface Crumb {
-  view: string
-}
+import type { Breadcrumb } from './breadcrumb'
 
 const nav = {
-  forward: (windowId: string, crumb: Crumb) => {
+  forward: (windowId: string, crumb: Breadcrumb) => {
     // Adds new crumb to nav array
     store.navForward(windowId, crumb)
   },
@@ -17,7 +14,7 @@ const nav = {
     // Removes last crumb from nav array
     store.navBack(windowId)
   },
-  update: (windowId: string, crumb: Crumb, navigate: boolean = true) => {
+  update: (windowId: string, crumb: Breadcrumb, navigate: boolean = true) => {
     // Updated last crumb in nav array with new data
     // Replaces last crumb when navigate is false
     // Adds new crumb to nav array when navigate is true
@@ -25,7 +22,7 @@ const nav = {
   }
 }
 
-ipcMain.on('nav:forward', (e, windowId: string, crumb: Crumb) => {
+ipcMain.on('nav:forward', (e, windowId: string, crumb: Breadcrumb) => {
   nav.forward(windowId, crumb)
 })
 
@@ -33,7 +30,7 @@ ipcMain.on('nav:back', (e, windowId: string) => {
   nav.back(windowId)
 })
 
-ipcMain.on('nav:update', (e, windowId: string, crumb: Crumb, navigate: boolean) => {
+ipcMain.on('nav:update', (e, windowId: string, crumb: Breadcrumb, navigate: boolean) => {
   nav.update(windowId, crumb, navigate)
 })
 
