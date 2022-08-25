@@ -26,20 +26,13 @@ it('renders the title', () => {
   expect(titleSection.textContent).toBe('Update Chain')
 })
 
-it('renders the submit button text', () => {
-  const { getByRole } = setupComponent(<UpdateChain chain={{ id: 137, name: 'Polygon' }} />)
-
-  const submitButton = getByRole('button')
-  expect(submitButton.textContent).toBe('Update Chain')
-})
-
 it('renders the correct text after the form is submitted', async () => {
   const { user, getByRole } = setupComponent(<UpdateChain chain={{ id: 137, name: 'Polygon' }} />)
 
-  await user.click(getByRole('button'))
+  await user.click(getByRole('button', { name: 'Update Chain' }))
 
-  const submitButton = getByRole('button')
-  expect(submitButton.textContent).toBe('Updating')
+  const submitButton = getByRole('button', { name: 'Updating' })
+  expect(submitButton).toBeDefined()
 })
 
 it('does not allow a chain to be edited to have no name', async () => {
@@ -48,8 +41,8 @@ it('does not allow a chain to be edited to have no name', async () => {
   const chainNameInput = getByLabelText('Chain Name') 
   await user.clear(chainNameInput)
 
-  const submitButton = getByRole('button')
-  expect(submitButton.textContent).toMatch(/fill in chain/i)
+  const submitButton = getByRole('button', { name: /fill in chain/i })
+  expect(submitButton).toBeDefined()
 })
 
 it('edits the existing chain when the user clicks submit', async () => {
@@ -67,7 +60,7 @@ it('edits the existing chain when the user clicks submit', async () => {
   const explorerInput = getByLabelText('Block Explorer')
   await user.clear(explorerInput)
   await user.type(explorerInput, 'https://my-custom-explorer.net')
-  await user.click(getByRole('button'))
+  await user.click(getByRole('button', { name: 'Update Chain' }))
 
   expect(link.send).toHaveBeenCalledWith('tray:action', 'updateNetwork', chain, {
     id: 1,
@@ -77,4 +70,31 @@ it('edits the existing chain when the user clicks submit', async () => {
     type: 'ethereum',
     layer: 'other'
   })
+})
+
+it('opens a confirmation when removing a chain', async () => {
+  const chain = {
+    id: 1,
+    type: 'ethereum',
+    name: 'Mainnet',
+    symbol: 'ETH',
+    explorer: 'https://etherscan.io',
+    layer: 'other'
+  }
+
+  const { user, getByRole } = setupComponent(<UpdateChain chain={chain} />)
+
+  await user.click(getByRole('button', { name: 'Remove Chain' }))
+
+  expect(link.send).toHaveBeenCalledWith(
+    'tray:action',
+    'navDash',
+    {
+      view: 'notify',
+      data: {
+        notify: 'confirmRemoveChain',
+        notifyData: { chain }
+      }
+    }
+  )
 })
