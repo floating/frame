@@ -3,11 +3,11 @@ import Restore from 'react-restore'
 
 class Backdrop extends React.Component {
   getStyle () {
-    const accountId = this.store('selected.current')
     const accountOpen = this.store('selected.open')
     const crumb = this.store('windows.panel.nav')[0] || {}
     if (accountOpen && crumb.view === 'requestView') {
-      const req = this.store('main.accounts', crumb.accountId, 'requests', crumb.requestId)
+      const { accountId, requestId } = crumb.data
+      const req = this.store('main.accounts', accountId, 'requests', requestId)
       if (req && req.type === 'transaction' && req.mode === 'monitor') {
         return ({
           overlay: {
