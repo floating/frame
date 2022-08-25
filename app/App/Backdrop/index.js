@@ -7,8 +7,7 @@ class Backdrop extends React.Component {
     const accountOpen = this.store('selected.open')
     const crumb = this.store('windows.panel.nav')[0] || {}
     if (accountOpen && crumb.view === 'requestView') {
-      const reqViewData = crumb.req // TODO: Only pass req id in nav
-      const req = this.store('main.accounts', accountId, 'requests', reqViewData.handlerId)
+      const req = this.store('main.accounts', crumb.accountId, 'requests', crumb.requestId)
       if (req && req.type === 'transaction' && req.mode === 'monitor') {
         return ({
           overlay: {

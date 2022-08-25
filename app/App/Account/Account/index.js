@@ -357,7 +357,8 @@ class _AccountBody extends React.Component {
   render () {
     const crumb = this.store('windows.panel.nav')[0] || {}
     if (crumb.view === 'requestView') {
-      const { req, i } = crumb
+      const req = this.store('main.accounts', crumb.accountId, 'requests', crumb.requestId)
+
       let accountViewTitle, accountViewIcon
       if (req.type === 'access') {
         accountViewTitle = 'Account Access'
