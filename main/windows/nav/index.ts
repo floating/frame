@@ -1,9 +1,9 @@
 // Manage navigation states for each window
 
-import { Breadcrumb } from '@sentry/electron'
 import { ipcMain } from 'electron'
 
 import store from '../../store'
+import type { Breadcrumb } from './breadcrumb'
 
 const nav = {
   forward: (windowId: string, crumb: Breadcrumb) => {
