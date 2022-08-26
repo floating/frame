@@ -2,6 +2,7 @@ import log from 'electron-log'
 import fetch from 'node-fetch'
 import { Interface } from '@ethersproject/abi'
 import erc20 from '../externalData/balances/erc-20-abi'
+import { hexToNumberString } from 'web3-utils'
 
 const erc20Abi = JSON.stringify(erc20)
 
@@ -9,6 +10,17 @@ interface EtherscanSourceCodeResponse {
   status: string,
   message: string,
   result: ContractSourceCodeResult[]
+}
+
+interface SourcifySourceCodeResponse {
+  status: string,
+  files: SourcifySourceCodeFile[]
+}
+
+interface SourcifySourceCodeFile {
+  name: string
+  path: string
+  content: string
 }
 
 interface ContractSourceCodeResult {
@@ -44,25 +56,33 @@ function parseAbi (abiData: string): Interface | undefined {
   }
 }
 
-// function scanEndpoint (contractAddress: Address, chainId: string) {
-//   if (chainId === '0x1') {
-//     return `https://api.etherscan.io/api?module=contract&action=getsourcecode&address=${contractAddress}&apikey=3SYU5MW5QK8RPCJV1XVICHWKT774993S24`
-//   } else if (chainId === '0x89') {
-//     return `https://api.polygonscan.com/api?module=contract&action=getsourcecode&address=0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270&apikey=YourApiKeyToken`
-//   } else if ('optimism') {
-//     return `https://api-optimistic.etherscan.io/api?module=contract&action=getsourcecode&address=0x80AA7cb0006d5DDD91cce684229Ac6e398864606&apikey=YourApiKeyToken`
-//   } else if ('arbitrum') {
-//     return `https://api.arbiscan.io/api?module=contract&action=getsourcecode&address=0x0000000000000000000000000000000000001004&apikey=YourApiKeyToken`
-//   }
-// }
+function scanEndpoint (contractAddress: Address, chainId: string) {
+  if (chainId === '0x1') {
+    return `https://api.etherscan.io/api?module=contract&action=getsourcecode&address=${contractAddress}&apikey=3SYU5MW5QK8RPCJV1XVICHWKT774993S24`
+  } else if (chainId === '0x89') {
+    return `https://api.polygonscan.com/api?module=contract&action=getsourcecode&address=${contractAddress}&apikey=2P3U9T63MT26T1X64AAE368UNTS9RKEEBB`
+  } else if (chainId === '0xa') {
+    return `https://api-optimistic.etherscan.io/api?module=contract&action=getsourcecode&address=${contractAddress}&apikey=3SYU5MW5QK8RPCJV1XVICHWKT774993S24`
+  } else if (chainId === '0xa4b1') {
+    return `https://api.arbiscan.io/api?module=contract&action=getsourcecode&address=${contractAddress}&apikey=VP126CP67QVH9ZEKAZT1UZ751VZ6ZTIZAD`
+  }
+
+  return `https://sourcify.dev/server/files/any/${hexToNumberString(chainId)}/${contractAddress}`
+}
 
 async function fetchSourceCode (contractAddress: Address, chainId: string) {
-  const res = await fetch(`https://api.etherscan.io/api?module=contract&action=getsourcecode&address=${contractAddress}&apikey=3SYU5MW5QK8RPCJV1XVICHWKT774993S24`)
+  const endpointUrl = scanEndpoint(contractAddress, chainId)
+  const res = await fetch(endpointUrl)
 
   if (res.status === 200 && (res.headers.get('content-type') || '').toLowerCase().includes('json')) {
-    const parsedResponse = await (res.json() as Promise<EtherscanSourceCodeResponse>)
+    const parsedResponse = await res.json()
 
-    if (parsedResponse.message === 'OK') return parsedResponse.result
+    if (parsedResponse?.message === 'OK') {
+      return (parsedResponse as EtherscanSourceCodeResponse).result
+    }
+    if (['partial', 'full'].includes(parsedResponse?.status)) {
+      return JSON.parse((parsedResponse as SourcifySourceCodeResponse).files[0].content)
+    }
   }
 
   return []
@@ -72,7 +92,11 @@ async function fetchAbi (contractAddress: Address, chainId: string): Promise<Con
   try {
     const sources = await fetchSourceCode(contractAddress, chainId)
 
-    if (sources.length > 0) {
+    if (sources.output) {
+      // sourcify
+      return sources.output.abi
+    } else if (sources.length > 0) {
+      // etherscan compatible
       const source = sources[0]
       const implementation = source.Implementation
 
