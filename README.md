@@ -52,6 +52,10 @@ If you use an arch-based distro, you can use an AUR Helper like [yay](https://gi
 # Clone
 › git clone https://github.com/floating/frame
 
+# Use node v16
+› nvm install 16
+› nvm use 16
+
 # Install
 › npm run setup
 
