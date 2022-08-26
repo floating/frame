@@ -63,7 +63,7 @@ class TxRecipient extends React.Component {
     //   txMeta.possible = false
     //   txMeta.notice = 'signer is locked'
     // }
-    if (req.data.nonce) {
+    if (req.mode !== 'monitor' && req.data.nonce) {
       const r = this.store('main.accounts', this.props.accountId, 'requests')
       const requests = Object.keys(r || {}).map(key => r[key])
       const monitor = requests.filter(req => req.mode === 'monitor')
