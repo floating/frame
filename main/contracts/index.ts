@@ -1,5 +1,5 @@
 import log from 'electron-log'
-import fetch from 'node-fetch'
+import fetch, { Response } from 'node-fetch'
 import { Interface } from '@ethersproject/abi'
 import erc20 from '../externalData/balances/erc-20-abi'
 import { hexToNumberString } from 'web3-utils'
@@ -56,48 +56,68 @@ function parseAbi (abiData: string): Interface | undefined {
   }
 }
 
-function scanEndpoint (contractAddress: Address, chainId: string) {
-  if (chainId === '0x1') {
-    return `https://api.etherscan.io/api?module=contract&action=getsourcecode&address=${contractAddress}&apikey=3SYU5MW5QK8RPCJV1XVICHWKT774993S24`
-  } else if (chainId === '0x89') {
-    return `https://api.polygonscan.com/api?module=contract&action=getsourcecode&address=${contractAddress}&apikey=2P3U9T63MT26T1X64AAE368UNTS9RKEEBB`
-  } else if (chainId === '0xa') {
-    return `https://api-optimistic.etherscan.io/api?module=contract&action=getsourcecode&address=${contractAddress}&apikey=3SYU5MW5QK8RPCJV1XVICHWKT774993S24`
-  } else if (chainId === '0xa4b1') {
-    return `https://api.arbiscan.io/api?module=contract&action=getsourcecode&address=${contractAddress}&apikey=VP126CP67QVH9ZEKAZT1UZ751VZ6ZTIZAD`
-  }
+const scanEndpoint = {
+  '0x1': (contractAddress: Address) => `https://api.etherscan.io/api?module=contract&action=getsourcecode&address=${contractAddress}&apikey=3SYU5MW5QK8RPCJV1XVICHWKT774993S24`,
+  '0x89': (contractAddress: Address) => `https://api.polygonscan.com/api?module=contract&action=getsourcecode&address=${contractAddress}&apikey=2P3U9T63MT26T1X64AAE368UNTS9RKEEBB`,
+  '0xa': (contractAddress: Address) => `https://api-optimistic.etherscan.io/api?module=contract&action=getsourcecode&address=${contractAddress}&apikey=3SYU5MW5QK8RPCJV1XVICHWKT774993S24`,
+  '0xa4b1': (contractAddress: Address) => `https://api.arbiscan.io/api?module=contract&action=getsourcecode&address=${contractAddress}&apikey=VP126CP67QVH9ZEKAZT1UZ751VZ6ZTIZAD`
+}
 
+function sourcifyEndpoint (contractAddress: Address, chainId: string) {
   return `https://sourcify.dev/server/files/any/${hexToNumberString(chainId)}/${contractAddress}`
 }
 
-async function fetchSourceCode (contractAddress: Address, chainId: string) {
-  const endpointUrl = scanEndpoint(contractAddress, chainId)
-  const res = await fetch(endpointUrl)
-
-  if (res.status === 200 && (res.headers.get('content-type') || '').toLowerCase().includes('json')) {
-    const parsedResponse = await res.json()
-
-    if (parsedResponse?.message === 'OK') {
-      return (parsedResponse as EtherscanSourceCodeResponse).result
-    }
-    if (['partial', 'full'].includes(parsedResponse?.status)) {
-      return JSON.parse((parsedResponse as SourcifySourceCodeResponse).files[0].content)
-    }
+async function parseResponse <T>(response: Response): Promise<T> {
+  if (response?.status !== 200 || !(response?.headers.get('content-type') || '').toLowerCase().includes('json')) {
+    return Promise.reject()
   }
+  return await response.json()
+}
 
-  return []
+async function fetchSourceCode (contractAddress: Address, chainId: string) {
+  const scanEndpointUrl = scanEndpoint[chainId as keyof typeof scanEndpoint](contractAddress)
+  const sourcifyEndpointUrl = sourcifyEndpoint(contractAddress, chainId)
+  const sourceCodeRequests = [fetch(sourcifyEndpointUrl)]
+
+  if (scanEndpointUrl) {
+    sourceCodeRequests.push(fetch(sourcifyEndpointUrl))
+  }
+  const sourceCodeResponses = await Promise.all(sourceCodeRequests)
+  const [sourcifyRes, scanRes] = sourceCodeResponses
+
+  try {
+    const parsedScanResponse = await parseResponse<EtherscanSourceCodeResponse>(scanRes)
+    const parsedSourcifyResponse = await parseResponse<SourcifySourceCodeResponse>(sourcifyRes)
+    const sourceCodeResults = []
+    if (parsedScanResponse?.message === 'OK') {
+      sourceCodeResults.push(parsedScanResponse.result)
+    }
+    if (['partial', 'full'].includes(parsedSourcifyResponse?.status)) {
+      sourceCodeResults.push(JSON.parse(parsedSourcifyResponse.files[0].content))
+    }
+    return sourceCodeResults
+  } catch (e) {
+    return []
+  }
 }
 
 async function fetchAbi (contractAddress: Address, chainId: string): Promise<ContractSourceCodeResult | undefined> {
   try {
-    const sources = await fetchSourceCode(contractAddress, chainId)
+    const [scanResult, sourcifyResult] = await fetchSourceCode(contractAddress, chainId)
+    
+    // sourcify
+    if (sourcifyResult?.output) {
+      // if no scan result and scan supports the chain, return undefined
+      if (!scanResult.length && Object.keys(scanEndpoint).includes(chainId)) {
+        return undefined
+      }
 
-    if (sources.output) {
-      // sourcify
-      return sources.output.abi
-    } else if (sources.length > 0) {
-      // etherscan compatible
-      const source = sources[0]
+      return sourcifyResult.output.abi
+    }
+
+    // etherscan compatible
+    if (scanResult.length > 0) {
+      const source = scanResult[0]
       const implementation = source.Implementation
 
       if (implementation) {
