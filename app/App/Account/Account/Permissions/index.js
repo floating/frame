@@ -79,7 +79,16 @@ class Balances extends React.Component {
         {!this.props.expanded ? (
           <div className='signerBalanceTotal'>
             <div className='signerBalanceButtons'>
-              <div className='signerBalanceButton signerBalanceShowAll' onClick={() => this.props.expandModule({ id: this.props.moduleId, account: this.props.account})}>
+              <div className='signerBalanceButton signerBalanceShowAll' onClick={() => {
+                const crumb = {
+                  view: 'expandedModule', 
+                  data: {
+                    id: this.props.moduleId,
+                    account: this.props.account
+                  }
+                }
+                link.send('nav:forward', 'panel', crumb)
+              }}>
                 More
               </div>
             </div>

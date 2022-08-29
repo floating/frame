@@ -1,10 +1,4 @@
 .notify
-  // position fixed
-  // top 0px
-  // right 0px
-  // left 0px
-  // bottom 0px
-  // z-index 9999999999999999
   width 100%
   height 100%
   pointer-events auto
@@ -18,7 +12,7 @@
   background var(--ghostZ)
   
   ::selection
-    background var(--moon) //  #ffb7b7
+    background var(--moon)
 
   .notifyCloseButton
     position absolute
@@ -41,19 +35,8 @@
     *
       pointer-events none
 
-  // .notifyBox:before
-  //   content ''
-  //   top 0
-  //   right 0
-  //   bottom 3px
-  //   left 0
-  //   position absolute
-  //   border-radius 12px
-  //   background var(--ghostB)
-  //   z-index 2
-
   .notifyBoxWrap
-    border-radius 10px
+    border-radius 20px
     box-sizing border-box
     position absolute
     top 5px
@@ -121,7 +104,6 @@
           width 96px
           height 96px
           border-radius 24px
-          // box-shadow 0px 30px 24px -10px var(--doubleThick)
 
       .notifyBody
         font-size 17px
@@ -308,19 +290,6 @@
         .notifyInputProceed
           border-top-right-radius 20px
           border-bottom-right-radius 20px
-
-        // .notifyInputSingleButton:before
-        //   content ''
-        //   position absolute
-        //   display none
-        //   top 0
-        //   left 0
-        //   right 0
-        //   bottom 2px
-        //   background var(--ghostB)
-        //   border 3px solid var(--ghostZ)
-        //   z-index 2
-        //   border-radius 12px
 
         .notifyInputSingleButton
           left 50%

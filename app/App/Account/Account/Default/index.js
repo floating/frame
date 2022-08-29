@@ -1,5 +1,6 @@
 import React from 'react'
 import Restore from 'react-restore'
+import link from '../../../../../resources/link'
 
 class Block extends React.Component {
   constructor (props, context) {

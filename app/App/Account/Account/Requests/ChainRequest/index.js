@@ -58,50 +58,6 @@ class ChainRequest extends React.Component {
             </div>
           )}
         </div>
-        {type === 'switchChain' ? (
-          <div className='requestApprove'>
-            <div 
-              className='requestDecline' 
-              style={{ pointerEvents: this.state.allowInput? 'auto' : 'none'}}
-              onClick={() => { if (this.state.allowInput) link.send('tray:switchChain', false, false, this.props.req) 
-            }}>
-              <div className='requestDeclineButton _txButton _txButtonBad'>Decline</div>
-            </div>
-            <div 
-              className='requestSign' 
-              style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none'}}
-              onClick={() => { if (this.state.allowInput) link.send('tray:switchChain', chain.type, parseInt(chain.id), this.props.req)
-            }}>
-              <div className='requestSignButton _txButton'>Switch</div>
-            </div>
-          </div>
-        ) : (
-          <div className='requestApprove'>
-            <div 
-              className='requestDecline' 
-              style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none'}}
-              onClick={() => { 
-                if (this.state.allowInput) {
-                  link.send('tray:rejectRequest', this.props.req)
-                }
-              }
-            }>
-              <div className='requestDeclineButton _txButton _txButtonBad'>Decline</div>
-            </div>
-            <div 
-              className='requestSign' 
-              style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none'}}
-              onClick={() => {
-                if (this.state.allowInput) {
-                  link.send('tray:resolveRequest', this.props.req, null)
-                  link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'addChain', notifyData: { chain } } })
-                }
-              }
-            }>
-              <div className='requestSignButton _txButton'>Review</div>
-            </div>
-          </div>
-        )}
       </div>
     )
   }

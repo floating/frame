@@ -56,8 +56,6 @@ const rpc = {
   //   }, 320)
   // },
   unsetSigner: (id, cb) => {
-    store.clearNavPanel()
-
     const previousAddresses = accounts.getSelectedAddresses()
 
     accounts.unsetSigner(cb)
