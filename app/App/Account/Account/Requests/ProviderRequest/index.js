@@ -58,22 +58,6 @@ class ProviderRequest extends React.Component {
             </div>
           )}
         </div>
-        <div className='requestApprove'>
-          <div 
-            className='requestDecline' 
-            style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none'}}
-            onClick={() => { if (this.state.allowInput) link.send('tray:giveAccess', this.props.req, false) 
-          }}>
-            <div className='requestDeclineButton _txButton _txButtonBad'>Decline</div>
-          </div>
-          <div 
-            className='requestSign' 
-            style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none'}}
-            onClick={() => { if (this.state.allowInput) link.send('tray:giveAccess', this.props.req, true) 
-          }}>
-            <div className='requestSignButton _txButton'>Approve</div>
-          </div>
-        </div>
       </div>
     )
   }

@@ -4,7 +4,6 @@ import Restore from 'react-restore'
 import svg from '../../../../resources/svg'
 import link from '../../../../resources/link'
 
-import SignerStatus from './SignerStatus'
 import { getAddress } from '../../../../resources/domain/transaction'
 
 class Account extends React.Component {

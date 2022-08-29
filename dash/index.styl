@@ -16,7 +16,6 @@ div
   width 0px
   background transparent
 
-
 .dash
   width 100%
   height 100%
@@ -174,7 +173,7 @@ div
     height 60px
     position relative
     background var(--ghostA)
-    border-radius 12px
+    border-radius 20px
     display flex
     justify-content center
     align-items center
@@ -188,7 +187,7 @@ div
     box-sizing border-box
     letter-spacing 1px
     color var(--outerspace)
-    font-family 'Exo2', OpenSans, sans-serif
+    font-family 'Ubuntu'
     font-weight 400
     transform rotate(0.0001deg)
     z-index 5
@@ -211,25 +210,6 @@ div
   .signers
     width 100%
 
-    // .signersTop
-    //   position absolute
-    //   top 0
-    //   right 0
-    //   left 0
-    //   background var(--ghostA)
-    //   height 40px
-    //   display none
-
-    // .signersMid
-      // position absolute
-      // top 0px
-      // right 0
-      // left 0
-      // bottom 0px
-      // overflow-x hidden
-      // overflow-y scroll
-      // padding 4px
-      
     .signersHeader
       width calc(100% - 32px)
       display flex
@@ -243,7 +223,6 @@ div
       text-transform uppercase
       letter-spacing 1px
       font-weight 400
-
 
     .noSigners
       position relative
@@ -274,7 +253,6 @@ div
 @import './App/Main/style'
 @import './App/Accounts/Add/style'
 @import './App/Accounts/Signer/style'
-
 @import './App/Notify/style'
 @import './App/Tokens/style'
 @import './App/card.styl'

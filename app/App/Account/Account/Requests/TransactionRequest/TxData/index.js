@@ -24,7 +24,7 @@ class txData extends React.Component {
             Data
           </div>
           <div className='_txMainValues' onClick={() => {
-            link.send('nav:update', 'panel', { step: 'viewData' })
+            link.send('nav:update', 'panel', { data: { step: 'viewData' } })
           }}>
             {req.data.data && req.data.data !== '0x' && req.data.data !== '0x0' ? (
               req.decodedData && req.decodedData.method ? (

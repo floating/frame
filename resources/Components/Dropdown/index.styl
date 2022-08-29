@@ -23,12 +23,10 @@
   z-index 99999999999999999
   pointer-events auto
   cursor pointer
+  box-shadow 0px 2px 3px var(--ghostZ)
 
 .dropdown:hover
   background var(--ghostC)
-
-// .dropdown:hover
-//   background var(--ghostD)
 
 .darkerDrop
   background var(--ghostC)
@@ -38,12 +36,11 @@
 
 .dropdownExpanded
   padding 18px 0px 18px 0px
-  box-shadow 0px 8px 32px 8px var(--ghostZ) // 0px 4px 10px var(--thick), 0px 5px 14px -2px var(--thick)
+  box-shadow 0px 8px 32px 8px var(--ghostY)
 
 .dropdownItems
   transition var(--standardFast)
   transform translateZ(0)
-  // cursor pointer
 
 .dropdownItem
   display flex

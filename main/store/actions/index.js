@@ -122,7 +122,7 @@ module.exports = {
     u('selected.open', _ => true)
   },
   setAccountSignerStatusOpen: (u, value) => {
-    u('selected.signerStatusOpen', _ => Boolean(value))
+    u('selected.signerStatusOpen', () => Boolean(value))
   },
   accountTokensUpdated: (u, address) => {
     u('main.accounts', address, account => {
@@ -597,22 +597,6 @@ module.exports = {
     }
     u('dash', dash => Object.assign(dash, update))
   },
-  navPanel: (u, navItem) => {
-    u('panel.nav', nav => {
-      if (JSON.stringify(nav[0]) !== JSON.stringify(navItem)) nav.unshift(navItem)      
-      return nav
-    })
-    u('panel.showing', () => true)
-  },
-  clearNavPanel: (u) => {
-    u('panel.nav', () => [])
-  },
-  backPanel: (u) => {
-    u('panel.nav', nav => {
-      nav.shift()
-      return nav
-    })
-  },
   navForward: (u, windowId, crumb) => {
     if (!windowId || !crumb) return log.warn('Invalid nav forward', windowId, crumb)
     u('windows', windowId, 'nav', nav => {
@@ -624,14 +608,17 @@ module.exports = {
   navUpdate: (u, windowId, crumb, navigate) => {
     if (!windowId || !crumb) return log.warn('Invalid nav forward', windowId, crumb)
     u('windows', windowId, 'nav', nav => {
-      const updatedNav = Object.assign({}, nav[0], crumb)
+      const updatedNav = {
+        view: nav[0].view || crumb.view,
+        data: Object.assign({}, nav[0].data, crumb.data)
+      }
       if (JSON.stringify(nav[0]) !== JSON.stringify(updatedNav)) {
         if (navigate) {
           nav.unshift(updatedNav)
         } else {
           nav[0] = updatedNav
         }
-      }    
+      }
       return nav
     })
     if (navigate) u('windows', windowId, 'showing', () => true)
@@ -767,6 +754,7 @@ module.exports = {
     u('selected.open', _ => false)
     u('selected.view', _ => 'default')
     u('selected.showAccounts', _ => false)
+    u('windows.panel.nav', () => [])
     setTimeout(_ => {
       u('selected', signer => {
         signer.last = signer.current

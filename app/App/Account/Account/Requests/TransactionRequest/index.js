@@ -180,7 +180,6 @@ class TransactionRequest extends React.Component {
                 allowOtherChain={this.allowOtherChain.bind(this)} />
             ) : null}
             <div className='approveTransactionPayload'>
-              
                 <div className='_txBody'>
                   <TxMainNew i={0} {...this.props} req={req} chain={chain} />
                   <TxMain i={1} {...this.props} req={req} chain={chain} />

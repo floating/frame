@@ -75,7 +75,7 @@
 
     .transactionToAddressLargeWrap
       position absolute
-      bottom 14px
+      bottom 15px
       left 66px
       height 40px
       width 164px
@@ -88,7 +88,7 @@
       max-width 100%
       font-weight 600
       display flex
-      font-size 16px
+      font-size 15px
       opacity 1
       cursor pointer
       *
@@ -96,6 +96,11 @@
 
       .transactionToAddressLargeEllipsis
         padding 2px 1px
+    
+
+    .transactionToAddressLarge:hover
+      background var(--ghostC)
+
         
     .transactionToAddressCopy
       display flex
@@ -126,13 +131,12 @@
       align-items center
       font-size 13.5px
       font-weight 600    
-      z-index 8
+      z-index 80
       cursor pointer
       * 
         pointer-events none
         
       
-
       .transactionToAddressFullCopied
         position absolute
         right 18px
@@ -147,7 +151,7 @@
           margin-left 11px
 
     .transactionToAddressENS
-      transform translateY(-12px)
+      transform translateY(-11px)
       font-weight 600
 
     .transactionToAddressFullHidden
@@ -259,12 +263,11 @@
         padding-right 4px
         box-sizing border-box
         box-shadow 0px 2px 2px var(--ghostY)
-
+        cursor pointer
         *
           pointer-events none
       
       .signerSelectButton:hover
-        cursor pointer
         background var(--ghostC)
       
       .signerSelectIconWrap
@@ -544,16 +547,14 @@
 
       .signerNameText
         position relative
-        font-weight 300
-        position relative
         transition var(--standard)
-        font-size 16px
+        font-size 18px
         font-family 'Ubuntu'
         display flex
         justify-content center
         align-items center
         z-index 10
-        font-weight 400
+        font-weight 300
 
       .signerNameTextENS
         opacity 0
@@ -641,15 +642,24 @@
             transition var(--standardSlow)
 
   .signerTopActive
-    pointer-events auto !important
     .signerSelect
       pointer-events auto !important
     .transactionToAddressLargeWrap
       pointer-events auto !important
+
+    .transactionToAddressLarge, .transactionToAddressFull
+      cursor pointer !important
+
+    .transactionToAddressFullHidden
+      pointer-events none !important
+
     .signerType
       cursor pointer
       pointer-events auto
+    .signerSelectIconWrap
+      cursor pointer
     .signerTypeHot:hover
+      cursor pointer
       color var(--moon)
 
   .accountListWrap
@@ -893,7 +903,6 @@
     right 0px
     bottom 7px
     left 0px
-    // padding-top 20px
     border-radius 6px
     z-index 3005
     overflow-x hidden
@@ -903,8 +912,6 @@
     will-change transform
     background var(--ghostC)
     z-index 9999003
-    //animation-timing-function: cubic-bezier(0.1, -0.6, 0.2, 0)
-    // background red // var(--ghostB)
     box-shadow 0px 4px 6px -1px var(--thick)
     animation-delay 0.4s
 

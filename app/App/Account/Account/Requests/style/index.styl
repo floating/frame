@@ -344,7 +344,7 @@
     color var(--outerspace05)
     margin-top 5px
     height 48px
-    border-radius 8px
+    border-radius 11px
 
   .recentRequests
     position absolute
@@ -374,9 +374,7 @@
   bottom 0
   left 0
   width 100%
-  // height calc(100% - 10px)
   justify-content space-between
-  // box-shadow 0px 2px 0px var(--thick), 0px 8px 8px -2px var(--thick), 0px 0px 10px -2px var(--thick)
   transition var(--standardFast)
   z-index 2000
   color var(--outerspace)
@@ -509,9 +507,7 @@
   align-items center
   background var(--ghostA)
   svg
-    color var(--outerspace09)
-  .approveTransactionPayload
-    color var(--outerspace09)
+    color var(--outerspace)
   .requestApprove
     opacity 0
     pointer-events none
@@ -584,11 +580,18 @@
   align-items center
   flex-direction column
   transform translateZ(0px)
-  padding 120px 0px 80px 0px
+  padding 120px 0px 120px 0px
+  margin 16px 4px
+  border-radius 20px
+  width calc(100% - 16px)
+  box-sizing border-box
+  background var(--ghostA)
+  box-shadow 0px 6px 6px var(--ghostY)
+  font-family 'Ubuntu'
 
   .requestProviderOrigin
     font-size 22px
-    font-weight 200
+    font-weight 300
     width 300px
     text-align center
     transform translateZ(0px)
@@ -707,10 +710,10 @@
   position absolute
   top 0
   right 0
-  bottom 0px
+  bottom 100px
   left 0
-  padding-bottom 64px
-  border-radius 20px
+  padding 64px 0px
+  border-radius 24px
   overflow-y scroll
 
   .approveTransactionIcon
@@ -1175,6 +1178,7 @@
       transition var(--standard)
       font-weight bold
       cursor pointer
+      z-index 200
       
       *
         pointer-events none
@@ -1226,7 +1230,7 @@
   bottom 40px
   left 8px
   right 8px
-  border-radius 16px
+  border-radius 24px
   background var(--ghostZ)
   box-shadow inset  0px 0px 6px var(--ghostX)
   animation 0.32s fadeUp var(--cubic)
@@ -1246,8 +1250,6 @@
     right 0px
     bottom 0px
     left 0px
-    // animation scalein 3000ms var(--cubic)
-    // transition var(--standardFaster)
     transform translateZ(0px)
     display flex
     justify-content center
@@ -1257,7 +1259,6 @@
     padding-left 2px
     padding-bottom 10px
     cursor pointer
-    box-shadow 0px 4px 4px var(--ghostY)
 
     *
       pointer-events none
@@ -1284,7 +1285,6 @@
     z-index 40
     text-transform uppercase
 
-    // overflow hidden
   .requestSignButton
     position absolute
     top 0px
@@ -1299,7 +1299,6 @@
     letter-spacing 2px
     padding-left 2px
     padding-bottom 10px
-    box-shadow 0px 4px 8px var(--ghostY)
 
   .requestSignButton:before
     content ''
