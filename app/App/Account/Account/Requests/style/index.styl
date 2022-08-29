@@ -1237,10 +1237,10 @@
 
   .requestDecline
     position absolute
-    top 6px
-    left 6px
-    right 50%
-    bottom 6px
+    top 4px
+    left 4px
+    right calc(50% - 1px)
+    bottom 4px
     z-index 40
     text-transform uppercase
 
@@ -1259,9 +1259,14 @@
     padding-left 2px
     padding-bottom 10px
     cursor pointer
-
+    border-top-right-radius 9px
+    border-bottom-right-radius 9px
     *
       pointer-events none
+
+    span
+      position relative
+      z-index 99
 
   .requestDeclineButton:before
     content ''
@@ -1272,16 +1277,17 @@
     width 30px
     background var(--bad)
     bottom 22px
+    z-index 80
 
   .requestDeclineButton:hover:before
     background var(--badOver)
 
   .requestSign
     position absolute
-    top 6px
-    right 6px
-    left 50%
-    bottom 6px
+    top 4px
+    right 4px
+    left calc(50% - 1px)
+    bottom 4px
     z-index 40
     text-transform uppercase
 
@@ -1299,6 +1305,16 @@
     letter-spacing 2px
     padding-left 2px
     padding-bottom 10px
+    border-top-left-radius 9px
+    border-bottom-left-radius 9px
+
+    *
+      pointer-events none
+
+    span
+      position relative
+      z-index 99
+
 
   .requestSignButton:before
     content ''
@@ -1309,6 +1325,7 @@
     width 30px
     background var(--good)
     bottom 22px
+    z-index 98
 
   .requestSignButton:hover:before
     background var(--goodOver)

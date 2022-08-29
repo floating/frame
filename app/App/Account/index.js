@@ -319,7 +319,9 @@ class _RequestApprove extends React.Component {
               if (this.state.allowInput) this.decline(req)
             }}
           >
-            <div className='requestDeclineButton _txButton _txButtonBad'>Decline</div>
+            <div className='requestDeclineButton _txButton _txButtonBad'>
+              <span>Decline</span>
+            </div>
           </div>
           <div
             className='requestSign' 
@@ -341,7 +343,9 @@ class _RequestApprove extends React.Component {
               }}
             }
           >
-            <div className='requestSignButton _txButton'> Sign </div>
+            <div className='requestSignButton _txButton'>
+              <span>Sign</span>
+            </div>
           </div>
         </div>
       )
@@ -370,7 +374,7 @@ class _Footer extends React.Component {
       const { accountId, requestId } = crumb.data
       const req = this.store('main.accounts', accountId, 'requests', requestId)
       if (req) {
-        if (req.type === 'transaction') {
+        if (req.type === 'transaction' && crumb.data.step === 'confirm') {
           return (
             <div className='footerModule'>
               <RequestApprove req={req} />
@@ -385,14 +389,18 @@ class _Footer extends React.Component {
                   style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none'}}
                   onClick={() => { if (this.state.allowInput) link.send('tray:giveAccess', req, false) 
                 }}>
-                  <div className='requestDeclineButton _txButton _txButtonBad'>Decline</div>
+                  <div className='requestDeclineButton _txButton _txButtonBad'>
+                    <span>Decline</span>
+                  </div>
                 </div>
                 <div 
                   className='requestSign' 
                   style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none'}}
                   onClick={() => { if (this.state.allowInput) link.send('tray:giveAccess', req, true) 
                 }}>
-                  <div className='requestSignButton _txButton'>Approve</div>
+                  <div className='requestSignButton _txButton'>
+                    <span>Approve</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -406,14 +414,18 @@ class _Footer extends React.Component {
                   style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none'}}
                   onClick={() => { if (this.state.allowInput) this.decline(req.handlerId, req) 
                 }}>
-                  <div className='requestDeclineButton _txButton _txButtonBad'>Decline</div>
+                  <div className='requestDeclineButton _txButton _txButtonBad'>
+                    <span>Decline</span>
+                  </div>
                 </div>
                 <div 
                   className='requestSign' 
                   style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none'}}
                   onClick={() => { if (this.state.allowInput) this.approve(req.handlerId, req) 
                 }}>
-                  <div className='requestSignButton _txButton'>Sign</div>
+                  <div className='requestSignButton _txButton'>
+                    <span>Sign</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -427,14 +439,18 @@ class _Footer extends React.Component {
                   style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none'}} 
                   onClick={() => { if (this.state.allowInput) this.decline(req.handlerId, req) 
                 }}>
-                  <div className='requestDeclineButton _txButton _txButtonBad'>Decline</div>
+                  <div className='requestDeclineButton _txButton _txButtonBad'>
+                    <span>Decline</span>
+                  </div>
                 </div>
                 <div 
                   className='requestSign' 
                   style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none'}}
                   onClick={() => { if (this.state.allowInput) this.approve(req.handlerId, req) 
                 }}>
-                  <div className='requestSignButton _txButton'>Sign</div>
+                  <div className='requestSignButton _txButton'>
+                    <span>Sign</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -448,14 +464,18 @@ class _Footer extends React.Component {
                   style={{ pointerEvents: this.state.allowInput? 'auto' : 'none'}}
                   onClick={() => { if (this.state.allowInput) link.send('tray:switchChain', false, false, req) 
                 }}>
-                  <div className='requestDeclineButton _txButton _txButtonBad'>Decline</div>
+                  <div className='requestDeclineButton _txButton _txButtonBad'>
+                    <span>Decline</span>
+                  </div>
                 </div>
                 <div 
                   className='requestSign' 
                   style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none'}}
                   onClick={() => { if (this.state.allowInput) link.send('tray:switchChain', chain.type, parseInt(chain.id), req)
                 }}>
-                  <div className='requestSignButton _txButton'>Switch</div>
+                  <div className='requestSignButton _txButton'>
+                    <span>Switch</span>
+                  </div>
                 </div>
               </div>
             ) : (
@@ -469,7 +489,9 @@ class _Footer extends React.Component {
                     }
                   }
                 }>
-                  <div className='requestDeclineButton _txButton _txButtonBad'>Decline</div>
+                  <div className='requestDeclineButton _txButton _txButtonBad'>
+                    <span>Decline</span>
+                  </div>
                 </div>
                 <div 
                   className='requestSign' 
@@ -481,7 +503,9 @@ class _Footer extends React.Component {
                     }
                   }
                 }>
-                  <div className='requestSignButton _txButton'>Review</div>
+                  <div className='requestSignButton _txButton'>
+                    <span>Review</span>
+                  </div>
                 </div>
               </div>
             )
@@ -495,14 +519,18 @@ class _Footer extends React.Component {
                   style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none'}}
                   onClick={() => { if (this.state.allowInput) link.send('tray:addToken', false, this.props.req)
                 }}>
-                  <div className='requestDeclineButton _txButton _txButtonBad'>Decline</div>
+                  <div className='requestDeclineButton _txButton _txButtonBad'>
+                    <span>Decline</span>
+                  </div>
                 </div>
                 <div
                   className='requestSign'
                   style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none'}}
                   onClick={() => { if (this.state.allowInput) this.store.notify('addToken', this.props.req)
                 }}>
-                  <div className='requestSignButton _txButton'>Review</div>
+                  <div className='requestSignButton _txButton'>
+                    <span>Review</span>
+                  </div>
                 </div>
               </div>
             </div>
