@@ -1,5 +1,6 @@
 import React from 'react'
 import Restore from 'react-restore'
+import link from '../../../../../../resources/link'
 
 class Inventory extends React.Component {
   constructor (...args) {
@@ -33,7 +34,15 @@ class Inventory extends React.Component {
             key={k}
             className='inventoryCollection'
             onClick={() => {
-              this.props.expandModule({ id: this.props.moduleId, account: this.props.account, currentCollection: k })
+              const crumb = {
+                view: 'expandedModule', 
+                data: {
+                  id: this.props.moduleId,
+                  account: this.props.account,
+                  currentCollection: k
+                }
+              }
+              link.send('nav:forward', 'panel', crumb)
             }}
           >
             <div className='inventoryCollectionTop'>

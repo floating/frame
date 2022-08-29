@@ -42,7 +42,16 @@ class Settings extends React.Component {
         {!this.props.expanded ? (
           <div className='panelBlock'>
             <div className='panelBlockValues'>
-              <div className='panelBlockButton panelBlockItem' onMouseDown={() => this.props.expandModule({ id: this.props.moduleId, account: this.props.account })}>
+              <div className='panelBlockButton panelBlockItem' onMouseDown={() => {
+                const crumb = {
+                  view: 'expandedModule', 
+                  data: {
+                    id: this.props.moduleId,
+                    account: this.props.account
+                  }
+                }
+                link.send('nav:forward', 'panel', crumb)
+              }}>
                 Account Settings
               </div>
             </div>

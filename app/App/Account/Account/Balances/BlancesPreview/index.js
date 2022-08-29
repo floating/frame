@@ -114,7 +114,16 @@ class BalancesPreview extends React.Component {
         >
           {!this.props.expanded ? (
             <div className='signerBalanceButtons'>
-              <div className='signerBalanceButton signerBalanceShowAll' onMouseDown={() => this.props.expandModule({ id: this.props.moduleId, account: this.props.account })}>
+              <div className='signerBalanceButton signerBalanceShowAll' onClick={() => {
+                const crumb = {
+                  view: 'expandedModule', 
+                  data: {
+                    id: this.props.moduleId,
+                    account: this.props.account
+                  }
+                }
+                link.send('nav:forward', 'panel', crumb)
+              }}>
                 {allBalances.length - 4 > 0 ? `+${allBalances.length - 4} More` : 'More'}
               </div>
             </div>

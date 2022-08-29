@@ -7,17 +7,11 @@ class Inventory extends React.Component {
   constructor (...args) {
     super(...args)
     this.moduleRef = React.createRef()
-    if (!this.props.expanded) {
-      this.resizeObserver = new ResizeObserver(() => {
-        if (this.moduleRef && this.moduleRef.current) {
-          link.send('tray:action', 'updateAccountModule', this.props.moduleId, { height: this.moduleRef.current.clientHeight })
-        }
-      })
-    }
-    this.state = {
-      expand: false,
-      hoverAsset: false
-    }
+    this.resizeObserver = new ResizeObserver(() => {
+      if (this.moduleRef && this.moduleRef.current) {
+        link.send('tray:action', 'updateAccountModule', this.props.moduleId, { height: this.moduleRef.current.clientHeight })
+      }
+    })
   }
 
   componentDidMount () {
@@ -31,21 +25,13 @@ class Inventory extends React.Component {
   displayCollections () {
     const inventory = this.store('main.inventory', this.props.account)
     const collections = Object.keys(inventory || {})
-    return collections.filter(k => {
-      if (this.props.expanded) {
-        const expandedData = this.props.expandedData || {}
-        const current = expandedData.currentCollection
-        return current === k
-      } else {
-        return true
-      }
-    }).sort((a, b) => {
+    return collections.sort((a, b) => {
       const assetsLengthA = Object.keys(inventory[a].items).length
       const assetsLengthB = Object.keys(inventory[b].items).length
       if (assetsLengthA > assetsLengthB) return -1
       if (assetsLengthA < assetsLengthB) return 1
       return 0
-    }).slice(0, this.props.expanded ? this.length : 6)
+    }).slice(0, 6)
   }
 
   renderInventoryList () {
@@ -58,69 +44,22 @@ class Inventory extends React.Component {
             key={k}
             className='inventoryCollection'
             onClick={() => {
-              if (!this.props.expanded) this.props.expandModule({ id: this.props.moduleId, account: this.props.account, currentCollection: k })
+              const crumb = {
+                view: 'expandedModule', 
+                data: {
+                  id: this.props.moduleId,
+                  account: this.props.account,
+                  currentCollection: k
+                }
+              }
+              link.send('nav:forward', 'panel', crumb)
             }}
           >
-            {this.props.expanded ? (
-              <div className='expandedModule'>
-                <div className='inventoryPreview'>
-                  {this.state.hoverAsset ? (
-                    <div className='inventoryPreviewMedia'>
-                      {this.state.hoverAsset.img ? <img src={`https://proxy.pylon.link?type=nft&target=${encodeURIComponent(this.state.hoverAsset.img)}`} /> : null}
-                    </div>
-                  ) : (
-                    <div 
-                      className='inventoryPreviewCollection'
-                      style={inventory[k].meta.image ? {
-                        backgroundImage: `url(https://proxy.pylon.link?type=nft&target=${encodeURIComponent(inventory[k].meta.image)})`
-                      } : {}}
-                    />
-                  )}
-                </div>
-                <div className='inventoryPreviewTitle'>{this.state.hoverAsset ? this.state.hoverAsset.name : inventory[k].meta.name}</div>
-                <div className='inventoryCollectionItems'>
-                  {Object.keys(inventory[k].items || {}).sort((a, b) => {
-                    a = inventory[k].items[a].tokenId
-                    b = inventory[k].items[b].tokenId
-                    return a < b ? -1 : b > a ? 1 : 0
-                  }).map(id => {
-                    const { tokenId, name, img, openSeaLink } = inventory[k].items[id]
-                    return (
-                      <div 
-                        key={id}
-                        className='inventoryCollectionItem'
-                        onClick={() => {
-                          this.store.notify('openExternal', { url: openSeaLink })
-                        }}
-                        onMouseEnter={() => {
-                          this.setState({
-                            hoverAsset: {
-                              name,
-                              tokenId,
-                              img
-                            }
-                          })
-                        }}
-                        onMouseLeave={() => {
-                          this.setState({
-                            hoverAsset: false
-                          })
-                        }}
-                      >
-                        {img ? <img src={`https://proxy.pylon.link?type=nft&target=${encodeURIComponent(img)}`} /> : null}
-                      </div>
-                    )
-                  })}
-                  <div className='inventoryCollectionLine' />
-                </div>
-              </div>
-            ) : inventory[k] ? (
-              <div className='inventoryCollectionTop'>
-                <div className='inventoryCollectionName'>{inventory[k].meta.name}</div>
-                <div className='inventoryCollectionCount'>{Object.keys(inventory[k].items).length}</div>
-                <div className='inventoryCollectionLine' />
-              </div>
-            ) : 'NO COLLECTION'}
+            <div className='inventoryCollectionTop'>
+              <div className='inventoryCollectionName'>{inventory[k].meta.name}</div>
+              <div className='inventoryCollectionCount'>{Object.keys(inventory[k].items).length}</div>
+              <div className='inventoryCollectionLine' />
+            </div>
           </div>
         )
       })
@@ -134,12 +73,10 @@ class Inventory extends React.Component {
     const moreCollections = collections.length - displayCollections.length
     return (
       <div ref={this.moduleRef} className='balancesBlock'>
-        {!this.props.expanded ? (
-          <div className='moduleHeader'>
-            <span>{svg.inventory(12)}</span>
-            <span>{'Inventory'}</span>
-          </div>  
-        ) : null}
+        <div className='moduleHeader'>
+          <span>{svg.inventory(12)}</span>
+          <span>{'Inventory'}</span>
+        </div>  
         <div className='inventoryWrapper'>
           {collections.length ? (
             this.renderInventoryList()
@@ -149,10 +86,19 @@ class Inventory extends React.Component {
             <div className='inventoryNotFound'>Loading Items..</div>
           )}
         </div>
-        {!this.props.expanded && collections.length ? (
+        {collections.length ? (
           <div className='signerBalanceTotal'>
             <div className='signerBalanceButtons'>
-              <div className='signerBalanceButton signerBalanceShowAll' onMouseDown={() => this.props.expandModule({ id: this.props.moduleId, account: this.props.account })}>
+              <div className='signerBalanceButton signerBalanceShowAll' onClick={() => {
+                const crumb = {
+                  view: 'expandedModule', 
+                  data: {
+                    id: this.props.moduleId,
+                    account: this.props.account
+                  }
+                }
+                link.send('nav:forward', 'panel', crumb)
+              }}>
                 {moreCollections > 0 ? `+${moreCollections} More` : 'More'}
               </div>
             </div>
