@@ -57,10 +57,22 @@ function parseAbi (abiData: string): Interface | undefined {
 }
 
 const scanEndpoint = {
-  '0x1': (contractAddress: Address) => `https://api.etherscan.io/api?module=contract&action=getsourcecode&address=${contractAddress}&apikey=3SYU5MW5QK8RPCJV1XVICHWKT774993S24`,
-  '0x89': (contractAddress: Address) => `https://api.polygonscan.com/api?module=contract&action=getsourcecode&address=${contractAddress}&apikey=2P3U9T63MT26T1X64AAE368UNTS9RKEEBB`,
-  '0xa': (contractAddress: Address) => `https://api-optimistic.etherscan.io/api?module=contract&action=getsourcecode&address=${contractAddress}&apikey=3SYU5MW5QK8RPCJV1XVICHWKT774993S24`,
-  '0xa4b1': (contractAddress: Address) => `https://api.arbiscan.io/api?module=contract&action=getsourcecode&address=${contractAddress}&apikey=VP126CP67QVH9ZEKAZT1UZ751VZ6ZTIZAD`
+  '0x1': {
+    name: 'etherscan',
+    url: (contractAddress: Address) => `https://api.etherscan.io/api?module=contract&action=getsourcecode&address=${contractAddress}&apikey=3SYU5MW5QK8RPCJV1XVICHWKT774993S24`,
+  },
+  '0x89': {
+    name: 'polygonscan',
+    url: (contractAddress: Address) => `https://api.polygonscan.com/api?module=contract&action=getsourcecode&address=${contractAddress}&apikey=2P3U9T63MT26T1X64AAE368UNTS9RKEEBB`,
+  },
+  '0xa': {
+    name: 'optimistic.etherscan',
+    url: (contractAddress: Address) => `https://api-optimistic.etherscan.io/api?module=contract&action=getsourcecode&address=${contractAddress}&apikey=3SYU5MW5QK8RPCJV1XVICHWKT774993S24`,
+  },
+  '0xa4b1': {
+    name: 'arbiscan',
+    url: (contractAddress: Address) => `https://api.arbiscan.io/api?module=contract&action=getsourcecode&address=${contractAddress}&apikey=VP126CP67QVH9ZEKAZT1UZ751VZ6ZTIZAD`
+  }
 }
 
 function sourcifyEndpoint (contractAddress: Address, chainId: string) {
@@ -75,7 +87,7 @@ async function parseResponse <T>(response: Response): Promise<T> {
 }
 
 async function fetchSourceCode (contractAddress: Address, chainId: string) {
-  const scanEndpointUrl = scanEndpoint[chainId as keyof typeof scanEndpoint](contractAddress)
+  const scanEndpointUrl = scanEndpoint[chainId as keyof typeof scanEndpoint].url(contractAddress)
   const sourcifyEndpointUrl = sourcifyEndpoint(contractAddress, chainId)
   const sourceCodeRequests = [fetch(sourcifyEndpointUrl)]
 
@@ -101,7 +113,7 @@ async function fetchSourceCode (contractAddress: Address, chainId: string) {
   }
 }
 
-async function fetchAbi (contractAddress: Address, chainId: string): Promise<ContractSourceCodeResult | undefined> {
+async function fetchAbi (contractAddress: Address, chainId: string): Promise<ContractSource | undefined> {
   try {
     const [scanResult, sourcifyResult] = await fetchSourceCode(contractAddress, chainId)
     
@@ -112,7 +124,8 @@ async function fetchAbi (contractAddress: Address, chainId: string): Promise<Con
         return undefined
       }
 
-      return sourcifyResult.output.abi
+      const { abi, devdoc: { title } } = sourcifyResult.output
+      return { abi, name: title, source: 'sourcify' }
     }
 
     // etherscan compatible
@@ -125,7 +138,7 @@ async function fetchAbi (contractAddress: Address, chainId: string): Promise<Con
         return fetchAbi(implementation, chainId)
       }
 
-      return source
+      return { abi: source.ABI, name: source.ContractName, source: scanEndpoint[chainId as keyof typeof scanEndpoint].name }
     }
   } catch (e) {
     log.warn(`could not fetch source code for contract ${contractAddress}`, e)
@@ -157,17 +170,17 @@ export async function decodeContractCall (contractAddress: Address, chainId: str
   const contractSource = await fetchAbi(contractAddress, chainId)
 
   if (contractSource) {
-    contractSources.push({ name: contractSource.ContractName, source: 'etherscan', abi: contractSource.ABI })
+    contractSources.push(contractSource)
   }
 
-  for (const source of contractSources.reverse()) {
-    const decodedCall = decodeCallData(calldata, source.abi)
+  for (const { name, source, abi} of contractSources.reverse()) {
+    const decodedCall = decodeCallData(calldata, abi)
 
     if (decodedCall) {
       return {
         contractAddress: contractAddress.toLowerCase(),
-        contractName: source.name,
-        source: source.source,
+        contractName: name,
+        source,
         ...decodedCall
       }
     }
