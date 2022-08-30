@@ -1,6 +1,6 @@
 import log from 'electron-log'
 import fetch, { Response } from 'node-fetch'
-import { Interface } from '@ethersproject/abi'
+import { Interface, JsonFragment } from '@ethersproject/abi'
 import erc20 from '../externalData/balances/erc-20-abi'
 import { hexToNumberString } from 'web3-utils'
 
@@ -21,6 +21,33 @@ interface SourcifySourceCodeFile {
   name: string
   path: string
   content: string
+}
+
+interface SourcifyMetadataFileContent {
+  compiler: { version: string },
+  language: string,
+  output: {
+    abi: JsonFragment[],
+    devdoc: Partial<{
+      details: string
+      title: string
+    }>
+  },
+  settings: Partial<{
+    compilationTarget: {
+      [K: string]: string
+    },
+    evmVersion: string
+    metadata: { 
+      [K: string]: string
+    }
+  }>,
+  sources: {
+    [K: string]: {
+      [J: string]: string | string[]
+    }
+  },
+  version: number
 }
 
 interface ContractSourceCodeResult {
@@ -46,6 +73,11 @@ export interface DecodedCallData {
     type: string,
     value: string
   }>
+}
+
+type SourceCodeResults = {
+  scanResult?: EtherscanSourceCodeResponse['result']
+  sourcifyResult?: SourcifyMetadataFileContent
 }
 
 function parseAbi (abiData: string): Interface | undefined {
@@ -92,7 +124,7 @@ async function fetchSourceCode (contractAddress: Address, chainId: string) {
   const sourceCodeRequests = [fetch(sourcifyEndpointUrl)]
 
   if (scanEndpointUrl) {
-    sourceCodeRequests.push(fetch(sourcifyEndpointUrl))
+    sourceCodeRequests.push(fetch(scanEndpointUrl))
   }
   const sourceCodeResponses = await Promise.all(sourceCodeRequests)
   const [sourcifyRes, scanRes] = sourceCodeResponses
@@ -100,36 +132,37 @@ async function fetchSourceCode (contractAddress: Address, chainId: string) {
   try {
     const parsedScanResponse = await parseResponse<EtherscanSourceCodeResponse>(scanRes)
     const parsedSourcifyResponse = await parseResponse<SourcifySourceCodeResponse>(sourcifyRes)
-    const sourceCodeResults = []
+    const sourceCodeResults: SourceCodeResults = {}
     if (parsedScanResponse?.message === 'OK') {
-      sourceCodeResults.push(parsedScanResponse.result)
+      sourceCodeResults.scanResult = parsedScanResponse.result
     }
     if (['partial', 'full'].includes(parsedSourcifyResponse?.status)) {
-      sourceCodeResults.push(JSON.parse(parsedSourcifyResponse.files[0].content))
+      sourceCodeResults.sourcifyResult = (JSON.parse(parsedSourcifyResponse.files[0].content))
     }
     return sourceCodeResults
   } catch (e) {
-    return []
+    console.log('source code response parsing error', e)
+    return {}
   }
 }
 
 async function fetchAbi (contractAddress: Address, chainId: string): Promise<ContractSource | undefined> {
   try {
-    const [scanResult, sourcifyResult] = await fetchSourceCode(contractAddress, chainId)
+    const { scanResult, sourcifyResult } = await fetchSourceCode(contractAddress, chainId)
     
     // sourcify
     if (sourcifyResult?.output) {
       // if no scan result and scan supports the chain, return undefined
-      if (!scanResult.length && Object.keys(scanEndpoint).includes(chainId)) {
+      if (!scanResult?.length && Object.keys(scanEndpoint).includes(chainId)) {
         return undefined
       }
 
       const { abi, devdoc: { title } } = sourcifyResult.output
-      return { abi, name: title, source: 'sourcify' }
+      return { abi: JSON.stringify(abi), name: title as string, source: 'sourcify' }
     }
 
     // etherscan compatible
-    if (scanResult.length > 0) {
+    if (scanResult?.length) {
       const source = scanResult[0]
       const implementation = source.Implementation
 
@@ -173,7 +206,7 @@ export async function decodeContractCall (contractAddress: Address, chainId: str
     contractSources.push(contractSource)
   }
 
-  for (const { name, source, abi} of contractSources.reverse()) {
+  for (const { name, source, abi } of contractSources.reverse()) {
     const decodedCall = decodeCallData(calldata, abi)
 
     if (decodedCall) {
