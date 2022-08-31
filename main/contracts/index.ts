@@ -1,10 +1,7 @@
 import log from 'electron-log'
 import fetch, { Response } from 'node-fetch'
 import { Interface, JsonFragment } from '@ethersproject/abi'
-import erc20 from '../externalData/balances/erc-20-abi'
 import { hexToNumberString } from 'web3-utils'
-
-const erc20Abi = JSON.stringify(erc20)
 
 interface EtherscanSourceCodeResponse {
   status: string,
@@ -57,7 +54,7 @@ interface ContractSourceCodeResult {
   Implementation: string
 }
 
-interface ContractSource {
+export interface ContractSource {
   abi: string,
   name: string,
   source: string
@@ -146,7 +143,7 @@ async function fetchSourceCode (contractAddress: Address, chainId: string) {
   }
 }
 
-async function fetchAbi (contractAddress: Address, chainId: string): Promise<ContractSource | undefined> {
+export async function fetchAbi (contractAddress: Address, chainId: string): Promise<ContractSource | undefined> {
   try {
     const { scanResult, sourcifyResult } = await fetchSourceCode(contractAddress, chainId)
     
@@ -198,26 +195,3 @@ export function decodeCallData (calldata: string, abi: string) {
   }
 }
 
-export async function decodeContractCall (contractAddress: Address, chainId: string, calldata: string): Promise<DecodedCallData | undefined> {
-  const contractSources: ContractSource[] = [{ name: 'ERC-20', source: 'Generic ERC-20', abi: erc20Abi }]
-  const contractSource = await fetchAbi(contractAddress, chainId)
-
-  if (contractSource) {
-    contractSources.push(contractSource)
-  }
-
-  for (const { name, source, abi } of contractSources.reverse()) {
-    const decodedCall = decodeCallData(calldata, abi)
-
-    if (decodedCall) {
-      return {
-        contractAddress: contractAddress.toLowerCase(),
-        contractName: name,
-        source,
-        ...decodedCall
-      }
-    }
-  }
-
-  log.warn(`Unable to decode data for contract ${contractAddress}`)
-}
