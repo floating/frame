@@ -85,7 +85,7 @@ function parseAbi (abiData: string): Interface | undefined {
   }
 }
 
-const scanEndpoint = {
+const scanEndpointMap = {
   '0x1': {
     name: 'etherscan',
     url: (contractAddress: Address) => `https://api.etherscan.io/api?module=contract&action=getsourcecode&address=${contractAddress}&apikey=3SYU5MW5QK8RPCJV1XVICHWKT774993S24`,
@@ -108,34 +108,33 @@ function sourcifyEndpoint (contractAddress: Address, chainId: string) {
   return `https://sourcify.dev/server/files/any/${hexToNumberString(chainId)}/${contractAddress}`
 }
 
-async function parseResponse <T>(response: Response): Promise<T> {
+async function parseResponse <T>(response: Response): Promise<T | undefined> {
   if (response?.status !== 200 || !(response?.headers.get('content-type') || '').toLowerCase().includes('json')) {
-    return Promise.reject()
+    return Promise.resolve(undefined)
   }
   return await response.json()
 }
 
 async function fetchSourceCode (contractAddress: Address, chainId: string) {
-  const scanEndpointUrl = scanEndpoint[chainId as keyof typeof scanEndpoint].url(contractAddress)
+  const scanEndpoint = scanEndpointMap[chainId as keyof typeof scanEndpointMap]
+  const scanEndpointUrl = scanEndpoint?.url(contractAddress)
   const sourcifyEndpointUrl = sourcifyEndpoint(contractAddress, chainId)
   const sourceCodeRequests = [fetch(sourcifyEndpointUrl)]
-
+  
   if (scanEndpointUrl) {
     sourceCodeRequests.push(fetch(scanEndpointUrl))
   }
   const sourceCodeResponses = await Promise.all(sourceCodeRequests)
   const [sourcifyRes, scanRes] = sourceCodeResponses
-
+  
   try {
     const parsedScanResponse = await parseResponse<EtherscanSourceCodeResponse>(scanRes)
     const parsedSourcifyResponse = await parseResponse<SourcifySourceCodeResponse>(sourcifyRes)
-    const sourceCodeResults: SourceCodeResults = {}
-    if (parsedScanResponse?.message === 'OK') {
-      sourceCodeResults.scanResult = parsedScanResponse.result
+    const sourceCodeResults: SourceCodeResults = {
+      scanResult: parsedScanResponse?.message === 'OK' ? parsedScanResponse.result : undefined,
+      sourcifyResult: parsedSourcifyResponse && ['partial', 'full'].includes(parsedSourcifyResponse.status) ? JSON.parse(parsedSourcifyResponse.files[0].content) : undefined
     }
-    if (['partial', 'full'].includes(parsedSourcifyResponse?.status)) {
-      sourceCodeResults.sourcifyResult = (JSON.parse(parsedSourcifyResponse.files[0].content))
-    }
+
     return sourceCodeResults
   } catch (e) {
     console.log('source code response parsing error', e)
@@ -150,7 +149,7 @@ export async function fetchAbi (contractAddress: Address, chainId: string): Prom
     // sourcify
     if (sourcifyResult?.output) {
       // if no scan result and scan supports the chain, return undefined
-      if (!scanResult?.length && Object.keys(scanEndpoint).includes(chainId)) {
+      if (scanResult && scanResult[0].ABI === 'Contract source code not verified' && Object.keys(scanEndpointMap).includes(chainId)) {
         return undefined
       }
 
@@ -168,7 +167,7 @@ export async function fetchAbi (contractAddress: Address, chainId: string): Prom
         return fetchAbi(implementation, chainId)
       }
 
-      return { abi: source.ABI, name: source.ContractName, source: scanEndpoint[chainId as keyof typeof scanEndpoint].name }
+      return { abi: source.ABI, name: source.ContractName, source: scanEndpointMap[chainId as keyof typeof scanEndpointMap].name }
     }
   } catch (e) {
     log.warn(`could not fetch source code for contract ${contractAddress}`, e)
