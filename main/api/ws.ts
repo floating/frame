@@ -3,7 +3,7 @@ import { v4 as uuid, v5 as uuidv5 } from 'uuid'
 import  log from 'electron-log'
 
 import store from '../store'
-import provider from '../provider'
+import provider, { ProviderDataPayload } from '../provider'
 import accounts from '../accounts'
 import windows from '../windows'
 
@@ -86,12 +86,20 @@ const handler = (socket: FrameWebSocket, req: IncomingMessage) => {
       extendSession(payload._origin)
     }
 
+    if (payload.method === 'eth_subscribe') {
+      console.log('REQUEST', { payload })
+    }
+
     if (protectedMethods.indexOf(payload.method) > -1 && !(await isTrusted(origin))) {
       let error = { message: 'Permission denied, approve ' + origin + ' in Frame to continue', code: 4001 }
       // review
       if (!accounts.getSelectedAddresses()[0]) error = { message: 'No Frame account selected', code: 4001 }
       res({ id: payload.id, jsonrpc: payload.jsonrpc, error })
     } else {
+
+    if (payload.method === 'eth_subscribe') {
+      console.log('SENDING')
+    }
       provider.send(payload, response => {
         if (response && response.result) {
           if (payload.method === 'eth_subscribe') {
@@ -121,11 +129,11 @@ export default function (server: Server) {
   const ws = new WebSocket.Server({ server })
   ws.on('connection', handler)
   // Send data to the socket that initiated the subscription
-  provider.on('data', payload => {
+  provider.on('data', ({ origin, ...payload }: ProviderDataPayload) => {
     const subscription = subs[payload.params.subscription]
 
     // if an origin is passed, make sure the subscription is from that origin
-    if (subscription && (!payload.params.origin || payload.params.origin === subscription.originId)) {
+    if (subscription && (!origin || origin === subscription.originId)) {
       subscription.socket.send(JSON.stringify(payload))
     }
   })

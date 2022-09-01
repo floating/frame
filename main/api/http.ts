@@ -146,16 +146,13 @@ const handler = (req: IncomingMessage, res: ServerResponse) => {
 }
 
 // Track subscriptions
-provider.on('data', (payload: ProviderDataPayload) => {
+provider.on('data', ({ origin, ...payload }: ProviderDataPayload) => {
   if (pollSubs[payload.params.subscription]) {
     const { id, origin } = pollSubs[payload.params.subscription]
     polls[id] = polls[id] || []
 
-    if (!payload.params.origin || payload.params.origin === origin) {
-      const { origin, ...params } = payload.params
-      const responsePayload = { ...payload, params }
-
-      polls[id].push(JSON.stringify(responsePayload))
+    if (!origin || origin === origin) {
+      polls[id].push(JSON.stringify(payload))
 
       pending[id]?.send()
     }

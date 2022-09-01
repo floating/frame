@@ -39,11 +39,11 @@ export interface TransactionMetadata {
 }
 
 export interface ProviderDataPayload {
-  jsonrpc: '2.0',
-  method: string,
+  jsonrpc: '2.0'
+  method: string
+  origin?: string
   params: {
-    subscription: string,
-    origin?: string,
+    subscription: string
     result: any
   }
 }
@@ -79,6 +79,7 @@ export class Provider extends EventEmitter {
       this.connected = false
     })
     this.connection.on('data', (chain, ...args) => {
+      this.emit('data', ...args)
       this.emit(`data:${chain.type}:${chain.id}`, ...args)
     })
     this.connection.on('error', (chain, err) => {
@@ -117,7 +118,7 @@ export class Provider extends EventEmitter {
     const chain = intToHex(chainId)
 
     this.subscriptions.chainChanged.forEach(subscription => {
-      const event: ProviderDataPayload = { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, origin: originId, result: chain } }
+      const event: ProviderDataPayload = { method: 'eth_subscription', jsonrpc: '2.0', origin: originId, params: { subscription, result: chain } }
       this.emit('data', event)
     })
   }
@@ -574,11 +575,15 @@ export class Provider extends EventEmitter {
   }
 
   subscribe (payload: RPC.Subscribe.Request, res: RPCSuccessCallback) {
+    log.debug('provider subscribe', { payload })
+
     const subId = addHexPrefix(crypto.randomBytes(16).toString('hex'))
     const subscriptionType = payload.params[0]
     
     this.subscriptions[subscriptionType] = this.subscriptions[subscriptionType] || []
     this.subscriptions[subscriptionType].push(subId)
+
+    console.log({ id: payload.id, subId })
 
     res({ id: payload.id, jsonrpc: '2.0', result: subId })
   }
@@ -749,11 +754,16 @@ export class Provider extends EventEmitter {
   send (payload: RPCRequestPayload, res: RPCRequestCallback = () => {}) {
     const method = payload.method || ''
 
+    if (method.includes('subscribe'))
+    console.log('SEND')
     // method handlers that are not chain-specific can go here, before parsing the target chain
     if (method === 'eth_unsubscribe' && this.ifSubRemove(payload.params[0])) return res({ id: payload.id, jsonrpc: '2.0', result: true }) // Subscription was ours
 
     const targetChain = this.parseTargetChain(payload)
+    
 
+    if (method.includes('subscribe'))
+    console.log({ targetChain })
     if (!targetChain) {
       log.warn('received request with unknown chain', JSON.stringify(payload))
       return resError({ message: `unknown chain: ${payload.chainId}`, code: 4901 }, payload, res)
@@ -806,6 +816,8 @@ export class Provider extends EventEmitter {
     // remove custom data
     const { _origin, chainId, ...rpcPayload } = payload
 
+
+    if (method.includes('subscribe')) console.log('SENDING TO CONNECTION')
     // Pass everything else to our connection
     this.connection.send(rpcPayload, res, targetChain)
   }
