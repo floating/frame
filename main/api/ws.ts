@@ -86,20 +86,12 @@ const handler = (socket: FrameWebSocket, req: IncomingMessage) => {
       extendSession(payload._origin)
     }
 
-    if (payload.method === 'eth_subscribe') {
-      console.log('REQUEST', { payload })
-    }
-
     if (protectedMethods.indexOf(payload.method) > -1 && !(await isTrusted(origin))) {
       let error = { message: 'Permission denied, approve ' + origin + ' in Frame to continue', code: 4001 }
       // review
       if (!accounts.getSelectedAddresses()[0]) error = { message: 'No Frame account selected', code: 4001 }
       res({ id: payload.id, jsonrpc: payload.jsonrpc, error })
     } else {
-
-    if (payload.method === 'eth_subscribe') {
-      console.log('SENDING')
-    }
       provider.send(payload, response => {
         if (response && response.result) {
           if (payload.method === 'eth_subscribe') {
