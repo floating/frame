@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid'
 import EventEmitter from 'events'
 import log from 'electron-log'
-import utils from 'web3-utils'
+import { isAddress, hexToNumber } from 'web3-utils'
 import { recoverTypedMessage, Version } from 'eth-sig-util'
 import crypto from 'crypto'
 import {
@@ -24,7 +24,8 @@ import { populate as populateTransaction, maxFee } from '../transaction'
 import FrameAccount from '../accounts/Account'
 import { capitalize, arraysMatch } from '../../resources/utils'
 import { ApprovalType } from '../../resources/constants'
-import { checkExistingNonceGas, ecRecover, feeTotalOverMax, gasFees, getActiveChains, getAssets, getChains, getChainDetails, getPermissions, getRawTx, getSignedAddress, isCurrentAccount, isScanning, loadAssets, requestPermissions, resError } from './helpers'
+import { checkExistingNonceGas, ecRecover, feeTotalOverMax, gasFees, getActiveChains, getAssets, getChains, getChainDetails, getPermissions, getRawTx, getSignedAddress, isCurrentAccount, isScanning, loadAssets, requestPermissions, resError, getActiveChainsFull } from './helpers'
+import chainConfig from '../chains/config'
 
 type Subscriptions = { [key in SubscriptionType]: string[] }
 
@@ -502,7 +503,7 @@ export class Provider extends EventEmitter {
   _personalSign (payload: RPCRequestPayload, res: RPCRequestCallback) {
     const params = payload.params || []
 
-    if (utils.isAddress(params[0]) && !utils.isAddress(params[1])) {
+    if (isAddress(params[0]) && !isAddress(params[1])) {
       // personal_sign requests expect the first parameter to be the message and the second
       // parameter to be an address. however some clients send these in the opposite order
       // so try to detect that
@@ -533,7 +534,7 @@ export class Provider extends EventEmitter {
 
   signTypedData (rawPayload: RPCRequestPayload, version: Version, res: RPCRequestCallback) {
     // ensure param order is [address, data, ...] regardless of version
-    const orderedParams = utils.isAddress(rawPayload.params[1]) && !utils.isAddress(rawPayload.params[0])
+    const orderedParams = isAddress(rawPayload.params[1]) && !isAddress(rawPayload.params[0])
       ? [rawPayload.params[1], rawPayload.params[0], ...rawPayload.params.slice(2)]
       : [...rawPayload.params]
 
@@ -817,11 +818,11 @@ export class Provider extends EventEmitter {
 
 const provider = new Provider()
 let knownOrigins: Record<string, Origin> = {}
-let availableChains = getActiveChains()
+let availableChains = getActiveChainsFull()
 
 store.observer(() => {
   const currentOrigins = store('main.origins') as Record<string, Origin>
-  const currentChains = getActiveChains()
+  const currentChains = getActiveChainsFull()
 
   for (const originId in currentOrigins) {
     const currentOrigin = currentOrigins[originId]
@@ -835,9 +836,12 @@ store.observer(() => {
     knownOrigins[originId] = currentOrigin
   }
 
-  if (!arraysMatch(currentChains, availableChains)) {
+  const availableChainIds = availableChains.map(({ chainId }) => hexToNumber(chainId))
+  const currentChainIds = currentChains.map(({ chainId }) => hexToNumber(chainId))
+
+  if (!arraysMatch(currentChainIds, availableChainIds) || currentChains.some(({ name }, index) => name !== availableChains[index].name)) {
     availableChains = currentChains
-    provider.chainsChanged(availableChains)
+    provider.chainsChanged(currentChainIds)
   }
 }, 'provider:chains')
 
