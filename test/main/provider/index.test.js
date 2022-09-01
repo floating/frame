@@ -1416,7 +1416,7 @@ describe('state change events', () => {
       store.getObserver('provider:chains').fire()
     })
 
-    it('fires a chainsChanged event when a chain connection is turned off', done => {
+    it('fires a chainsChanged event when a chain connection is turned on', done => {
       const subscriptionId = '0x9509a964a8d24a17fcfc7b77fc575b71'
 
       provider.once('data', event => {
@@ -1446,6 +1446,24 @@ describe('state change events', () => {
       })
 
       const chains = { ...networks, 4: { ...networks[4], on: false } }
+      store.set('main.networks.ethereum', chains)
+      provider.subscriptions.chainsChanged.push(subscriptionId)
+
+      store.getObserver('provider:chains').fire()
+    })
+
+    it('fires a chainsChanged event when a chain name is changed', done => {
+      const subscriptionId = '0x9509a964a8d24a17fcfc7b77fc575b71'
+
+      provider.once('data', event => {
+        expect(event.method).toBe('eth_subscription')
+        expect(event.jsonrpc).toBe('2.0')
+        expect(event.params.subscription).toBe(subscriptionId)
+        expect(event.params.result).toEqual(['0x1', '0x4'])
+        done()
+      })
+
+      const chains = { ...networks, 4: { ...networks[4], name: 'rinkeby2' } }
       store.set('main.networks.ethereum', chains)
       provider.subscriptions.chainsChanged.push(subscriptionId)
 
