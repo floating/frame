@@ -756,7 +756,7 @@ export class Provider extends EventEmitter {
     if (method === 'eth_unsubscribe' && this.ifSubRemove(payload.params[0])) return res({ id: payload.id, jsonrpc: '2.0', result: true }) // Subscription was ours
 
     const targetChain = this.parseTargetChain(payload)
-    
+
     if (!targetChain) {
       log.warn('received request with unknown chain', JSON.stringify(payload))
       return resError({ message: `unknown chain: ${payload.chainId}`, code: 4901 }, payload, res)
