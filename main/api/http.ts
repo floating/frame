@@ -146,31 +146,31 @@ const handler = (req: IncomingMessage, res: ServerResponse) => {
 }
 
 // Track subscriptions
-provider.on('data', ({ origin, ...payload }: ProviderDataPayload) => {
-  if (pollSubs[payload.params.subscription]) {
-    const { id, origin } = pollSubs[payload.params.subscription]
-    polls[id] = polls[id] || []
+// provider.on('data', ({ origin, ...payload }: ProviderDataPayload) => {
+//   if (pollSubs[payload.params.subscription]) {
+//     const { id, origin } = pollSubs[payload.params.subscription]
+//     polls[id] = polls[id] || []
 
-    if (!origin || origin === origin) {
-      polls[id].push(JSON.stringify(payload))
+//     if (!origin || origin === origin) {
+//       polls[id].push(JSON.stringify(payload))
 
-      pending[id]?.send()
-    }
-  }
-})
+//       pending[id]?.send()
+//     }
+//   }
+// })
 
-provider.on('data:address', (account, payload) => { // Make sure the subscription has access based on current account
-  if (pollSubs[payload.params.subscription]) {
-    const { id, origin } = pollSubs[payload.params.subscription]
-    const permissions = storeApi.getPermissions(account) || {}
-    const permission = Object.values(permissions).find(p => p.origin === origin) || { provider: false }
+// provider.on('data:address', (account, payload) => { // Make sure the subscription has access based on current account
+//   if (pollSubs[payload.params.subscription]) {
+//     const { id, origin } = pollSubs[payload.params.subscription]
+//     const permissions = storeApi.getPermissions(account) || {}
+//     const permission = Object.values(permissions).find(p => p.origin === origin) || { provider: false }
 
-    if (!permission.provider) payload.params.result = []
-    polls[id] = polls[id] || []
-    polls[id].push(JSON.stringify(payload))
-    if (pending[id]) pending[id].send()
-  }
-})
+//     if (!permission.provider) payload.params.result = []
+//     polls[id] = polls[id] || []
+//     polls[id].push(JSON.stringify(payload))
+//     if (pending[id]) pending[id].send()
+//   }
+// })
 
 export default function () {
   return http.createServer(handler)

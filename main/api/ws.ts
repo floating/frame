@@ -120,26 +120,11 @@ const handler = (socket: FrameWebSocket, req: IncomingMessage) => {
 export default function (server: Server) {
   const ws = new WebSocket.Server({ server })
   ws.on('connection', handler)
-  // Send data to the socket that initiated the subscription
-  provider.on('data', ({ origin, ...payload }: ProviderDataPayload) => {
+
+  provider.on('data:subscription', (payload) => {
     const subscription = subs[payload.params.subscription]
 
-    // if an origin is passed, make sure the subscription is from that origin
-    if (subscription && (!origin || origin === subscription.originId)) {
-      subscription.socket.send(JSON.stringify(payload))
-    }
-  })
-
-  provider.on('data:address', (address, payload) => { // Make sure the subscription has access based on current account
-    const subscription = subs[payload.params.subscription]
     if (subscription) {
-      const permissions = storeApi.getPermissions(address) || {}
-      const permission = Object.values(permissions).find(({ origin }) => {
-        const originId = uuidv5(origin, uuidv5.DNS)
-        return originId === subscription.originId
-      }) || { provider: false }
-
-      if (!permission.provider) payload.params.result = []
       subscription.socket.send(JSON.stringify(payload))
     }
   })

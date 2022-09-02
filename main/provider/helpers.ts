@@ -10,6 +10,7 @@ import {
   hashPersonalMessage,
 } from 'ethereumjs-util'
 import log from 'electron-log'
+import { v5 as uuidv5 } from 'uuid'
 
 import store from '../store'
 import protectedMethods from '../api/protectedMethods'
@@ -181,6 +182,16 @@ export function requestPermissions (payload: JSONRPCRequestPayload, res: RPCRequ
   const requestedOperations = (payload.params || []).map(param => permission(now, Object.keys(param)[0]))
   
   res({ id: payload.id, jsonrpc: '2.0', result: requestedOperations })
+}
+
+export function hasPermission (address: string, originId: string) {
+  const permissions = store('main.permissions', address) as Record<string, Permission>
+
+  const permission = Object.values(permissions).find(({ origin }) => {
+    return uuidv5(origin, uuidv5.DNS) === originId
+  })
+
+  return permission?.provider
 }
   
 export function getAssets (payload: RPC.GetAssets.Request, currentAccount: FrameAccount | null, cb: RPCCallback<RPC.GetAssets.Response>) {

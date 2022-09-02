@@ -24,9 +24,14 @@ import { populate as populateTransaction, maxFee } from '../transaction'
 import FrameAccount from '../accounts/Account'
 import { capitalize, arraysMatch } from '../../resources/utils'
 import { ApprovalType } from '../../resources/constants'
-import { checkExistingNonceGas, ecRecover, feeTotalOverMax, gasFees, getActiveChains, getAssets, getChains, getChainDetails, getPermissions, getRawTx, getSignedAddress, isCurrentAccount, isScanning, loadAssets, requestPermissions, resError } from './helpers'
+import { checkExistingNonceGas, ecRecover, feeTotalOverMax, gasFees, getActiveChains, getAssets, getChains, getChainDetails, getPermissions, getRawTx, getSignedAddress, isCurrentAccount, isScanning, loadAssets, requestPermissions, resError, hasPermission } from './helpers'
 
-type Subscriptions = { [key in SubscriptionType]: string[] }
+type Subscription = {
+  id: string
+  originId: string
+}
+
+type Subscriptions = { [key in SubscriptionType]: Subscription[] }
 
 interface RequiredApproval {
   type: ApprovalType,
@@ -41,7 +46,6 @@ export interface TransactionMetadata {
 export interface ProviderDataPayload {
   jsonrpc: '2.0'
   method: string
-  origin?: string
   params: {
     subscription: string
     result: any
@@ -79,7 +83,10 @@ export class Provider extends EventEmitter {
       this.connected = false
     })
     this.connection.on('data', (chain, ...args) => {
-      this.emit('data', ...args)
+      if ((args[0] || {}).method === 'eth_subscription') {
+        this.emit('data:subscription', ...args)
+      }
+
       this.emit(`data:${chain.type}:${chain.id}`, ...args)
     })
     this.connection.on('error', (chain, err) => {
@@ -102,24 +109,38 @@ export class Provider extends EventEmitter {
   }
 
   accountsChanged (accounts: string[]) {
-    this.subscriptions.accountsChanged.forEach(subscription => {
-      this.emit('data:address', accounts[0], { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, result: accounts } })
-    })
+    const address = accounts[0]
+
+    this.subscriptions.accountsChanged
+      .filter((subscription) => hasPermission(address, subscription.originId))
+      .forEach(subscription => {
+        const event: ProviderDataPayload = { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription: subscription.id, result: accounts } }
+        this.emit('data:subscription', event)
+      })
   }
 
-  assetsChanged (account: string, assets: RPC.GetAssets.Assets) {
-    this.subscriptions.assetsChanged.forEach(subscription => {
-      this.emit('data:address', account, { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, result: { ...assets, account } } })
-    })
+  assetsChanged (address: string, assets: RPC.GetAssets.Assets) {
+    this.subscriptions.assetsChanged
+      .filter((subscription) => hasPermission(address, subscription.originId))
+      .forEach(subscription => {
+        const event: ProviderDataPayload = { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription: subscription.id, result: { ...assets, account: address } } }
+        this.emit('data:subscription', event)
+      })
   }
 
-  // fires when the current default chain changes
   chainChanged (chainId: number, originId: string) {
     const chain = intToHex(chainId)
 
-    this.subscriptions.chainChanged.forEach(subscription => {
-      const event: ProviderDataPayload = { method: 'eth_subscription', jsonrpc: '2.0', origin: originId, params: { subscription, result: chain } }
-      this.emit('data', event)
+    this.subscriptions.chainChanged
+      .filter((subscription) => subscription.originId === originId)
+      .forEach((subscription) => {
+        const event: ProviderDataPayload = {
+          method: 'eth_subscription',
+          jsonrpc: '2.0',
+          params: { subscription: subscription.id, result: chain }
+        }
+
+        this.emit('data:subscription', event)
     })
   }
 
@@ -128,13 +149,22 @@ export class Provider extends EventEmitter {
     const chains = availableChains.map(intToHex)
 
     this.subscriptions.chainsChanged.forEach(subscription => {
-      this.emit('data', { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, result: chains } })
+      this.emit('data:subscription', { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, result: chains } })
     })
   }
 
-  networkChanged (netId: number | string) {
-    this.subscriptions.networkChanged.forEach(subscription => {
-      this.emit('data', { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, result: netId } })
+  networkChanged (netId: number | string, originId: string) {
+
+    this.subscriptions.networkChanged
+      .filter((subscription) => subscription.originId === originId)
+      .forEach((subscription) => {
+        const event: ProviderDataPayload = {
+          method: 'eth_subscription',
+          jsonrpc: '2.0',
+          params: { subscription: subscription.id, result: netId }
+        }
+
+        this.emit('data:subscription', event)
     })
   }
 
@@ -581,7 +611,7 @@ export class Provider extends EventEmitter {
     const subscriptionType = payload.params[0]
     
     this.subscriptions[subscriptionType] = this.subscriptions[subscriptionType] || []
-    this.subscriptions[subscriptionType].push(subId)
+    this.subscriptions[subscriptionType].push({ id: subId, originId: payload._origin })
 
     res({ id: payload.id, jsonrpc: '2.0', result: subId })
   }
@@ -589,7 +619,7 @@ export class Provider extends EventEmitter {
   ifSubRemove (id: string) {
     return Object.keys(this.subscriptions).some(type => {
       const subscriptionType = type as SubscriptionType
-      const index = this.subscriptions[subscriptionType].indexOf(id)
+      const index = this.subscriptions[subscriptionType].findIndex((sub) => sub.id === id)
 
       return (index > -1) && this.subscriptions[subscriptionType].splice(index, 1)
     })
@@ -832,7 +862,7 @@ store.observer(() => {
 
     if (knownOrigin && knownOrigin.chain.id !== currentOrigin.chain.id) {
       provider.chainChanged(currentOrigin.chain.id, originId)
-      provider.networkChanged(currentOrigin.chain.id)
+      provider.networkChanged(currentOrigin.chain.id, originId)
     }
 
     knownOrigins[originId] = currentOrigin
