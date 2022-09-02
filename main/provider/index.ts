@@ -125,7 +125,7 @@ export class Provider extends EventEmitter {
   chainsChanged (availableChains: number[]) {
     const chains = availableChains.map(intToHex)
 
-    this.subscriptions.chainsChanged.forEach(subscription => this.sendSubscriptionData(subscription.id, chains))
+    this.subscriptions.chainsChanged.forEach((subscription) => this.sendSubscriptionData(subscription.id, chains))
   }
 
   networkChanged (netId: number | string, originId: string) {

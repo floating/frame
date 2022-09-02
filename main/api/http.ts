@@ -145,7 +145,6 @@ const handler = (req: IncomingMessage, res: ServerResponse) => {
   }
 }
 
-// Track subscriptions
 provider.on('data:subscription', (payload: RPC.Susbcription.Response) => {
   const subscription = pollSubs[payload.params.subscription]
   if (subscription) {
