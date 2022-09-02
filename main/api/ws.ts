@@ -121,7 +121,7 @@ export default function (server: Server) {
   const ws = new WebSocket.Server({ server })
   ws.on('connection', handler)
 
-  provider.on('data:subscription', (payload) => {
+  provider.on('data:subscription', (payload: RPC.Susbcription.Response) => {
     const subscription = subs[payload.params.subscription]
 
     if (subscription) {

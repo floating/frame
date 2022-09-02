@@ -43,15 +43,6 @@ export interface TransactionMetadata {
   approvals: RequiredApproval[]
 }
 
-export interface ProviderDataPayload {
-  jsonrpc: '2.0'
-  method: string
-  params: {
-    subscription: string
-    result: any
-  }
-}
-
 const storeApi = {
   getOrigin: (id: string) => store('main.origins', id) as Origin
 }
@@ -144,7 +135,7 @@ export class Provider extends EventEmitter {
   }
 
   private sendSubscriptionData (subscription: string, result: any) {
-    const payload: ProviderDataPayload = {
+    const payload: RPC.Susbcription.Response = {
       jsonrpc: '2.0',
       method: 'eth_subscription',
       params: { subscription, result }

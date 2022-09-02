@@ -1,7 +1,7 @@
 import http, { IncomingMessage, ServerResponse } from 'http'
 import log from 'electron-log'
 
-import provider, { ProviderDataPayload } from '../provider'
+import provider from '../provider'
 import accounts from '../accounts'
 import store from '../store'
 
@@ -146,31 +146,17 @@ const handler = (req: IncomingMessage, res: ServerResponse) => {
 }
 
 // Track subscriptions
-// provider.on('data', ({ origin, ...payload }: ProviderDataPayload) => {
-//   if (pollSubs[payload.params.subscription]) {
-//     const { id, origin } = pollSubs[payload.params.subscription]
-//     polls[id] = polls[id] || []
+provider.on('data:subscription', (payload: RPC.Susbcription.Response) => {
+  const subscription = pollSubs[payload.params.subscription]
+  if (subscription) {
+    const { id } = subscription
 
-//     if (!origin || origin === origin) {
-//       polls[id].push(JSON.stringify(payload))
+    polls[id] = polls[id] || []
 
-//       pending[id]?.send()
-//     }
-//   }
-// })
-
-// provider.on('data:address', (account, payload) => { // Make sure the subscription has access based on current account
-//   if (pollSubs[payload.params.subscription]) {
-//     const { id, origin } = pollSubs[payload.params.subscription]
-//     const permissions = storeApi.getPermissions(account) || {}
-//     const permission = Object.values(permissions).find(p => p.origin === origin) || { provider: false }
-
-//     if (!permission.provider) payload.params.result = []
-//     polls[id] = polls[id] || []
-//     polls[id].push(JSON.stringify(payload))
-//     if (pending[id]) pending[id].send()
-//   }
-// })
+    polls[id].push(JSON.stringify(payload))
+    pending[id]?.send()
+  }
+})
 
 export default function () {
   return http.createServer(handler)

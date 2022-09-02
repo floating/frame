@@ -108,4 +108,12 @@ declare namespace RPC {
       params: SubscriptionType[]
     }
   }
+
+  namespace Susbcription {
+    interface Response {
+      jsonrpc: '2.0'
+      method: 'eth_subscription'
+      params: any
+    }
+  }
 }
