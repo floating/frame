@@ -113,19 +113,13 @@ export class Provider extends EventEmitter {
 
     this.subscriptions.accountsChanged
       .filter((subscription) => hasPermission(address, subscription.originId))
-      .forEach(subscription => {
-        const event: ProviderDataPayload = { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription: subscription.id, result: accounts } }
-        this.emit('data:subscription', event)
-      })
+      .forEach((subscription) => this.sendSubscriptionData(subscription.id, accounts))
   }
 
   assetsChanged (address: string, assets: RPC.GetAssets.Assets) {
     this.subscriptions.assetsChanged
       .filter((subscription) => hasPermission(address, subscription.originId))
-      .forEach(subscription => {
-        const event: ProviderDataPayload = { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription: subscription.id, result: { ...assets, account: address } } }
-        this.emit('data:subscription', event)
-      })
+      .forEach((subscription) => this.sendSubscriptionData(subscription.id, { ...assets, account: address }))
   }
 
   chainChanged (chainId: number, originId: string) {
@@ -133,39 +127,30 @@ export class Provider extends EventEmitter {
 
     this.subscriptions.chainChanged
       .filter((subscription) => subscription.originId === originId)
-      .forEach((subscription) => {
-        const event: ProviderDataPayload = {
-          method: 'eth_subscription',
-          jsonrpc: '2.0',
-          params: { subscription: subscription.id, result: chain }
-        }
-
-        this.emit('data:subscription', event)
-    })
+      .forEach((subscription) => this.sendSubscriptionData(subscription.id, chain))
   }
 
   // fires when the list of available chains changes
   chainsChanged (availableChains: number[]) {
     const chains = availableChains.map(intToHex)
 
-    this.subscriptions.chainsChanged.forEach(subscription => {
-      this.emit('data:subscription', { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, result: chains } })
-    })
+    this.subscriptions.chainsChanged.forEach(subscription => this.sendSubscriptionData(subscription.id, chains))
   }
 
   networkChanged (netId: number | string, originId: string) {
-
     this.subscriptions.networkChanged
       .filter((subscription) => subscription.originId === originId)
-      .forEach((subscription) => {
-        const event: ProviderDataPayload = {
-          method: 'eth_subscription',
-          jsonrpc: '2.0',
-          params: { subscription: subscription.id, result: netId }
-        }
+      .forEach((subscription) => this.sendSubscriptionData(subscription.id, netId))
+  }
 
-        this.emit('data:subscription', event)
-    })
+  private sendSubscriptionData (subscription: string, result: any) {
+    const payload: ProviderDataPayload = {
+      jsonrpc: '2.0',
+      method: 'eth_subscription',
+      params: { subscription, result }
+    }
+
+    this.emit('data:subscription', payload)
   }
 
   getNetVersion (payload: RPCRequestPayload, res: RPCRequestCallback, targetChain: Chain) {
