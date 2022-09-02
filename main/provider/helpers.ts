@@ -186,8 +186,8 @@ export function requestPermissions (payload: JSONRPCRequestPayload, res: RPCRequ
 
 export function hasPermission (address: string, originId: string) {
   const permissions = store('main.permissions', address) as Record<string, Permission>
-
   const permission = Object.values(permissions).find(({ origin }) => {
+    console.log(uuidv5('test.frame', uuidv5.DNS))
     return uuidv5(origin, uuidv5.DNS) === originId
   })
 

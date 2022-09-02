@@ -65,7 +65,6 @@ export class Provider extends EventEmitter {
   constructor () {
     super()
 
-    this.connection.syncDataEmit(this)
     this.connection.on('connect', (...args) => {
       this.connected = true
       this.emit('connect', ...args)

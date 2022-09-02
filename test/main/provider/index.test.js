@@ -1,6 +1,7 @@
 import provider from '../../../main/provider'
 import accounts from '../../../main/accounts'
 import connection from '../../../main/chains'
+import { hasPermission, getActiveChains } from '../../../main/provider/helpers'
 import store from '../../../main/store'
 import chainConfig from '../../../main/chains/config'
 import { weiToHex, gweiToHex } from '../../../resources/utils'
@@ -18,6 +19,16 @@ let accountRequests = []
 jest.mock('../../../main/store')
 jest.mock('../../../main/chains', () => ({ send: jest.fn(), syncDataEmit: jest.fn(), on: jest.fn() }))
 jest.mock('../../../main/accounts', () => ({}))
+jest.mock('../../../main/provider/helpers', () => {
+  const helpers = jest.requireActual('../../../main/provider/helpers')
+
+  return {
+    ...helpers,
+    hasPermission: jest.fn(),
+    getActiveChains: jest.fn()
+  }
+  
+})
 
 beforeAll(async () => {
   log.transports.console.level = false
@@ -1324,6 +1335,8 @@ describe('#signAndSend', () => {
 
 describe('state change events', () => {
   beforeEach(() => {
+    provider.removeAllListeners('data:subscription')
+
     store.set('main.origins', '8073729a-5e59-53b7-9e69-5d9bcff94087', { chain: { id: 1, type: 'ethereum' }})
     store.getObserver('provider:chains').fire()
   })
@@ -1334,16 +1347,17 @@ describe('state change events', () => {
     })
 
     it('fires a chainChanged event to subscribers', done => {
-      const subscriptionId = '0x9509a964a8d24a17fcfc7b77fc575b71'
-      provider.once('data', event => {
+      const subscription = { id: '0x9509a964a8d24a17fcfc7b77fc575b71', originId: '8073729a-5e59-53b7-9e69-5d9bcff94087' }
+
+      provider.once('data:subscription', event => {
         expect(event.method).toBe('eth_subscription')
         expect(event.jsonrpc).toBe('2.0')
-        expect(event.params.subscription).toBe(subscriptionId)
+        expect(event.params.subscription).toBe(subscription.id)
         expect(event.params.result).toBe('0x89')
         done()
       })
 
-      provider.subscriptions.chainChanged.push(subscriptionId)
+      provider.subscriptions.chainChanged.push(subscription)
 
       store.set('main.origins', '8073729a-5e59-53b7-9e69-5d9bcff94087', { chain: { id: 137, type: 'ethereum' }})
       store.getObserver('provider:chains').fire()
@@ -1351,216 +1365,193 @@ describe('state change events', () => {
   })
 
   describe('#chainsChanged', () => {
-    const networks = {
-      1: {
-        name: 'test',
-        id: 1,
-        on: true
-      },
-      4: {
-        name: 'rinkeby',
-        id: 4,
-        on: true
-      },
-      10: {
-        name: 'optimism',
-        id: 10,
-        on: false
-      }
-    }
+    const subscription = { id: '0x9509a964a8d24a17fcfc7b77fc575b71' }
 
     beforeEach(() => {
-      provider.subscriptions.chainsChanged = []
+      provider.subscriptions.chainsChanged = [subscription]
 
-      store.set('main.networks.ethereum', networks)
+      getActiveChains.mockReturnValue([1, 4])
+
       store.getObserver('provider:chains').fire()
     })
 
     it('fires a chainsChanged event when a chain is added', done => {
-      const subscriptionId = '0x9509a964a8d24a17fcfc7b77fc575b71'
-
-      provider.once('data', event => {
+      provider.once('data:subscription', event => {
         expect(event.method).toBe('eth_subscription')
         expect(event.jsonrpc).toBe('2.0')
-        expect(event.params.subscription).toBe(subscriptionId)
+        expect(event.params.subscription).toBe(subscription.id)
         expect(event.params.result).toEqual(['0x1', '0x4', '0x89'])
         done()
       })
 
-      const polygon = {
-        name: 'polygon',
-        id: 137,
-        on: true
-      }
+      getActiveChains.mockReturnValue([1, 4, 137])
 
-      provider.subscriptions.chainsChanged.push(subscriptionId)
-
-      store.set('main.networks.ethereum', { ...networks, 137: polygon })
       store.getObserver('provider:chains').fire()
     })
 
     it('fires a chainsChanged event when a chain is removed', done => {
-      const subscriptionId = '0x9509a964a8d24a17fcfc7b77fc575b71'
-
-      provider.once('data', event => {
+      provider.once('data:subscription', event => {
         expect(event.method).toBe('eth_subscription')
         expect(event.jsonrpc).toBe('2.0')
-        expect(event.params.subscription).toBe(subscriptionId)
+        expect(event.params.subscription).toBe(subscription.id)
         expect(event.params.result).toEqual(['0x1'])
         done()
       })
 
-      store.set('main.networks.ethereum', { 1: networks[1] })
-      provider.subscriptions.chainsChanged.push(subscriptionId)
-
-      store.getObserver('provider:chains').fire()
-    })
-
-    it('fires a chainsChanged event when a chain connection is turned off', done => {
-      const subscriptionId = '0x9509a964a8d24a17fcfc7b77fc575b71'
-
-      provider.once('data', event => {
-        expect(event.method).toBe('eth_subscription')
-        expect(event.jsonrpc).toBe('2.0')
-        expect(event.params.subscription).toBe(subscriptionId)
-        expect(event.params.result).toEqual(['0x1', '0x4', '0xa'])
-        done()
-      })
-
-      const chains = { ...networks, 10: { ...networks[10], on: true } }
-      store.set('main.networks.ethereum', chains)
-      provider.subscriptions.chainsChanged.push(subscriptionId)
-
-      store.getObserver('provider:chains').fire()
-    })
-
-    it('fires a chainsChanged event when a chain connection is turned off', done => {
-      const subscriptionId = '0x9509a964a8d24a17fcfc7b77fc575b71'
-
-      provider.once('data', event => {
-        expect(event.method).toBe('eth_subscription')
-        expect(event.jsonrpc).toBe('2.0')
-        expect(event.params.subscription).toBe(subscriptionId)
-        expect(event.params.result).toEqual(['0x1'])
-        done()
-      })
-
-      const chains = { ...networks, 4: { ...networks[4], on: false } }
-      store.set('main.networks.ethereum', chains)
-      provider.subscriptions.chainsChanged.push(subscriptionId)
+      getActiveChains.mockReturnValue([1])
 
       store.getObserver('provider:chains').fire()
     })
   })
 
   describe('#assetsChanged', () => {
-    const subscriptionId = '0x9509a964a8d24a17fcfc7b77fc575b71'
+    const subscription = { id: '0x9509a964a8d24a17fcfc7b77fc575b71', originId: '028e387d-2b5b-551e-a7df-2b2efa30307d' }
     const account = '0xce070f8134f69a4d55cc4bef4a7c8d0bb56ff1d9'
 
     beforeEach(() => {
-      accounts.current = () => ({ id: account })
-      store.set('main.accounts', account, 'balances.lastUpdated', new Date())
-
-      provider.subscriptions.assetsChanged.push(subscriptionId)
-      provider.removeAllListeners('data:address')
+      provider.subscriptions.assetsChanged.push(subscription)
+      provider.removeAllListeners('data:subscription')
     })
 
-    it('fires an assetsChanged event when native currency assets are present', done => {
-      const balance = {
-        symbol: 'ETH',
-        balance: '0xe7',
-        address: '0x0000000000000000000000000000000000000000',
-        chainId: 1
-      }
+    it('fires an assetsChanged event when an account has permission', done => {
+      hasPermission.mockReturnValueOnce(true)
 
-      store.set('main.balances', account, [balance])
+      const assets = { account, nativeCurrency: [], erc20: ['tokens'] }
 
-      const priceData = { usd: { price: 3815.91 } }
-      store.set('main.networksMeta.ethereum.1.nativeCurrency', priceData)
+      provider.once('data:subscription', (payload) => {
+        expect(payload.method).toBe('eth_subscription')
+        expect(payload.jsonrpc).toBe('2.0')
+        expect(payload.params.subscription).toBe(subscription.id)
+        expect(payload.params.result).toEqual(assets)
 
-      provider.once('data:address', ((accountId, event) => {
-        expect(accountId).toBe(account)
-        expect(event.method).toBe('eth_subscription')
-        expect(event.jsonrpc).toBe('2.0')
-        expect(event.params.subscription).toBe(subscriptionId)
-        expect(event.params.result).toEqual({
-          account,
-          nativeCurrency: [{ ...balance, currencyInfo: priceData }],
-          erc20: []
-        })
+        expect(hasPermission).toHaveBeenCalledWith(account, subscription.originId)
 
         done()
-      }))
+      })
 
-      store.set('selected.current', account)
-      store.getObserver('provider:account').fire()
-      jest.advanceTimersByTime(800)
+      provider.assetsChanged(account, assets)
     })
 
-    it('fires an assetsChanged event when erc20 assets are present', done => {
-      const balance = {
-        symbol: 'OHM',
-        balance: '0x606401fc9',
-        address: '0x383518188c0c6d7730d91b2c03a03c837814a899'
-      }
+    it('does not fire an assetsChanged event when an account does not have permission', () => {
+      hasPermission.mockReturnValueOnce(false)
 
-      store.set('main.balances', account, [balance])
+      const assets = { account, nativeCurrency: [], erc20: ['tokens'] }
 
-      const priceData = { usd: { price: 225.35 } }
-      store.set('main.rates', balance.address, priceData)
+      provider.once('data:subscription', () => { throw new Error('event fired to account without permission!') })
 
-      provider.once('data:address', ((accountId, event) => {
-        expect(accountId).toBe(account)
-        expect(event.method).toBe('eth_subscription')
-        expect(event.jsonrpc).toBe('2.0')
-        expect(event.params.subscription).toBe(subscriptionId)
-        expect(event.params.result).toEqual({
-          account,
-          nativeCurrency: [],
-          erc20: [{ ...balance, tokenInfo: { lastKnownPrice: { ...priceData } } }]
-        })
-
-        done()
-      }))
-
-      store.set('selected.current', account)
-      store.getObserver('provider:account').fire()
-      jest.advanceTimersByTime(800)
+      provider.assetsChanged(account, assets)
     })
 
-    it('does not fire an assetsChanged event when no account is selected', () => {
-      provider.once('data:address', () => { throw new Error('event fired when no account selected!') })
-
-      store.set('main.balances', account, [{ address: '0xany' }])
-      store.set('selected.current', undefined)
-
-      store.getObserver('provider:account').fire()
-    })
-
-    it('does not fire an assetsChanged event when no assets are present', () => {
-      provider.once('data:address', () => { throw new Error('event fired when account has no assets!') })
-
-      store.set('main.balances', account, [])
-      store.set('selected.current', account)
-
-      store.getObserver('provider:account').fire()
-    })
-
-    it('does not fire an assetsChanged event while scanning', async () => {
-      const yesterday = new Date()
-      yesterday.setDate(yesterday.getDate() - 1)
-
-      store.set('main.accounts', account, 'balances.lastUpdated', yesterday)
-      store.set('main.balances', account, [{ address: '0xany' }])
-      store.set('selected.current', account)
-
-      return new Promise((resolve, reject) => {
-        provider.once('data:address', () => reject('event fired while still scanning!'))
-
+    describe('events', () => {
+      const fireEvent = () => {
         store.getObserver('provider:account').fire()
+  
+        // event debounce time
         jest.advanceTimersByTime(800)
+      }
 
-        resolve()
+      beforeEach(() => {
+        hasPermission.mockReturnValueOnce(true)
+
+        accounts.current = () => ({ id: account })
+        store.set('main.accounts', account, 'balances.lastUpdated', new Date())
+        store.set('main.permissions', account, { 'test.frame': { origin: 'test.frame', provider: true } })
+      })
+
+      it('fires an assetsChanged event when native currency assets are present', done => {
+        const balance = {
+          symbol: 'ETH',
+          balance: '0xe7',
+          address: '0x0000000000000000000000000000000000000000',
+          chainId: 1
+        }
+  
+        store.set('main.balances', account, [balance])
+  
+        const priceData = { usd: { price: 3815.91 } }
+        store.set('main.networksMeta.ethereum.1.nativeCurrency', priceData)
+  
+        provider.once('data:subscription', (event) => {
+          expect(event.method).toBe('eth_subscription')
+          expect(event.jsonrpc).toBe('2.0')
+          expect(event.params.subscription).toBe(subscription.id)
+          expect(event.params.result).toEqual({
+            account,
+            nativeCurrency: [{ ...balance, currencyInfo: priceData }],
+            erc20: []
+          })
+  
+          done()
+        })
+  
+        store.set('selected.current', account)
+  
+        fireEvent()
+      })
+  
+      it('fires an assetsChanged event when erc20 assets are present', done => {
+        const balance = {
+          symbol: 'OHM',
+          balance: '0x606401fc9',
+          address: '0x383518188c0c6d7730d91b2c03a03c837814a899'
+        }
+  
+        store.set('main.balances', account, [balance])
+  
+        const priceData = { usd: { price: 225.35 } }
+        store.set('main.rates', balance.address, priceData)
+  
+        provider.once('data:subscription', (event) => {
+          expect(event.method).toBe('eth_subscription')
+          expect(event.jsonrpc).toBe('2.0')
+          expect(event.params.subscription).toBe(subscription.id)
+          expect(event.params.result).toEqual({
+            account,
+            nativeCurrency: [],
+            erc20: [{ ...balance, tokenInfo: { lastKnownPrice: { ...priceData } } }]
+          })
+  
+          done()
+        })
+  
+        store.set('selected.current', account)
+  
+        fireEvent()
+      })
+  
+      it('does not fire an assetsChanged event when no account is selected', () => {
+        provider.once('data:subscription', () => { throw new Error('event fired when no account selected!') })
+  
+        store.set('main.balances', account, [{ address: '0xany' }])
+        store.set('selected.current', undefined)
+  
+        fireEvent()
+      })
+  
+      it('does not fire an assetsChanged event when no assets are present', () => {
+        provider.once('data:subscription', () => { throw new Error('event fired when account has no assets!') })
+  
+        store.set('main.balances', account, [])
+        store.set('selected.current', account)
+  
+        fireEvent()
+      })
+  
+      it('does not fire an assetsChanged event while scanning', async () => {
+        const yesterday = new Date()
+        yesterday.setDate(yesterday.getDate() - 1)
+  
+        store.set('main.accounts', account, 'balances.lastUpdated', yesterday)
+        store.set('main.balances', account, [{ address: '0xany' }])
+        store.set('selected.current', account)
+  
+        return new Promise((resolve, reject) => {
+          provider.once('data:subscription', () => reject('event fired while still scanning!'))
+  
+          fireEvent()
+  
+          resolve()
+        })
       })
     })
   })
