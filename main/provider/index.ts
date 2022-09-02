@@ -24,9 +24,14 @@ import { populate as populateTransaction, maxFee } from '../transaction'
 import FrameAccount from '../accounts/Account'
 import { capitalize, arraysMatch } from '../../resources/utils'
 import { ApprovalType } from '../../resources/constants'
-import { checkExistingNonceGas, ecRecover, feeTotalOverMax, gasFees, getActiveChains, getAssets, getChains, getChainDetails, getPermissions, getRawTx, getSignedAddress, isCurrentAccount, isScanning, loadAssets, requestPermissions, resError } from './helpers'
+import { checkExistingNonceGas, ecRecover, feeTotalOverMax, gasFees, getActiveChains, getAssets, getChains, getChainDetails, getPermissions, getRawTx, getSignedAddress, isCurrentAccount, isScanning, loadAssets, requestPermissions, resError, hasPermission } from './helpers'
 
-type Subscriptions = { [key in SubscriptionType]: string[] }
+type Subscription = {
+  id: string
+  originId: string
+}
+
+type Subscriptions = { [key in SubscriptionType]: Subscription[] }
 
 interface RequiredApproval {
   type: ApprovalType,
@@ -36,16 +41,6 @@ interface RequiredApproval {
 export interface TransactionMetadata {
   tx: TransactionData,
   approvals: RequiredApproval[]
-}
-
-export interface ProviderDataPayload {
-  jsonrpc: '2.0',
-  method: string,
-  params: {
-    subscription: string,
-    origin?: string,
-    result: any
-  }
 }
 
 const storeApi = {
@@ -70,7 +65,6 @@ export class Provider extends EventEmitter {
   constructor () {
     super()
 
-    this.connection.syncDataEmit(this)
     this.connection.on('connect', (...args) => {
       this.connected = true
       this.emit('connect', ...args)
@@ -79,6 +73,10 @@ export class Provider extends EventEmitter {
       this.connected = false
     })
     this.connection.on('data', (chain, ...args) => {
+      if ((args[0] || {}).method === 'eth_subscription') {
+        this.emit('data:subscription', ...args)
+      }
+
       this.emit(`data:${chain.type}:${chain.id}`, ...args)
     })
     this.connection.on('error', (chain, err) => {
@@ -101,40 +99,48 @@ export class Provider extends EventEmitter {
   }
 
   accountsChanged (accounts: string[]) {
-    this.subscriptions.accountsChanged.forEach(subscription => {
-      this.emit('data:address', accounts[0], { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, result: accounts } })
-    })
+    const address = accounts[0]
+
+    this.subscriptions.accountsChanged
+      .filter((subscription) => hasPermission(address, subscription.originId))
+      .forEach((subscription) => this.sendSubscriptionData(subscription.id, accounts))
   }
 
-  assetsChanged (account: string, assets: RPC.GetAssets.Assets) {
-    this.subscriptions.assetsChanged.forEach(subscription => {
-      this.emit('data:address', account, { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, result: { ...assets, account } } })
-    })
+  assetsChanged (address: string, assets: RPC.GetAssets.Assets) {
+    this.subscriptions.assetsChanged
+      .filter((subscription) => hasPermission(address, subscription.originId))
+      .forEach((subscription) => this.sendSubscriptionData(subscription.id, { ...assets, account: address }))
   }
 
-  // fires when the current default chain changes
   chainChanged (chainId: number, originId: string) {
     const chain = intToHex(chainId)
 
-    this.subscriptions.chainChanged.forEach(subscription => {
-      const event: ProviderDataPayload = { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, origin: originId, result: chain } }
-      this.emit('data', event)
-    })
+    this.subscriptions.chainChanged
+      .filter((subscription) => subscription.originId === originId)
+      .forEach((subscription) => this.sendSubscriptionData(subscription.id, chain))
   }
 
   // fires when the list of available chains changes
   chainsChanged (availableChains: number[]) {
     const chains = availableChains.map(intToHex)
 
-    this.subscriptions.chainsChanged.forEach(subscription => {
-      this.emit('data', { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, result: chains } })
-    })
+    this.subscriptions.chainsChanged.forEach((subscription) => this.sendSubscriptionData(subscription.id, chains))
   }
 
-  networkChanged (netId: number | string) {
-    this.subscriptions.networkChanged.forEach(subscription => {
-      this.emit('data', { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, result: netId } })
-    })
+  networkChanged (netId: number | string, originId: string) {
+    this.subscriptions.networkChanged
+      .filter((subscription) => subscription.originId === originId)
+      .forEach((subscription) => this.sendSubscriptionData(subscription.id, netId))
+  }
+
+  private sendSubscriptionData (subscription: string, result: any) {
+    const payload: RPC.Susbcription.Response = {
+      jsonrpc: '2.0',
+      method: 'eth_subscription',
+      params: { subscription, result }
+    }
+
+    this.emit('data:subscription', payload)
   }
 
   getNetVersion (payload: RPCRequestPayload, res: RPCRequestCallback, targetChain: Chain) {
@@ -574,11 +580,13 @@ export class Provider extends EventEmitter {
   }
 
   subscribe (payload: RPC.Subscribe.Request, res: RPCSuccessCallback) {
+    log.debug('provider subscribe', { payload })
+
     const subId = addHexPrefix(crypto.randomBytes(16).toString('hex'))
     const subscriptionType = payload.params[0]
     
     this.subscriptions[subscriptionType] = this.subscriptions[subscriptionType] || []
-    this.subscriptions[subscriptionType].push(subId)
+    this.subscriptions[subscriptionType].push({ id: subId, originId: payload._origin })
 
     res({ id: payload.id, jsonrpc: '2.0', result: subId })
   }
@@ -586,7 +594,7 @@ export class Provider extends EventEmitter {
   ifSubRemove (id: string) {
     return Object.keys(this.subscriptions).some(type => {
       const subscriptionType = type as SubscriptionType
-      const index = this.subscriptions[subscriptionType].indexOf(id)
+      const index = this.subscriptions[subscriptionType].findIndex((sub) => sub.id === id)
 
       return (index > -1) && this.subscriptions[subscriptionType].splice(index, 1)
     })
@@ -829,7 +837,7 @@ store.observer(() => {
 
     if (knownOrigin && knownOrigin.chain.id !== currentOrigin.chain.id) {
       provider.chainChanged(currentOrigin.chain.id, originId)
-      provider.networkChanged(currentOrigin.chain.id)
+      provider.networkChanged(currentOrigin.chain.id, originId)
     }
 
     knownOrigins[originId] = currentOrigin

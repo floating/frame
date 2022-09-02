@@ -470,15 +470,6 @@ class Chains extends EventEmitter {
       this.connections[type][id].send(payload, res)
     }
   }
-
-  syncDataEmit (emitter) {
-    this.syncDataEmitter = emitter
-  }
-
-  emit(type, ...args) {
-    if (this.syncDataEmitter && type.startsWith('data:')) this.syncDataEmitter.emit(type, ...args)
-    super.emit(type, ...args)
-  }
 }
 
 module.exports = new Chains()
