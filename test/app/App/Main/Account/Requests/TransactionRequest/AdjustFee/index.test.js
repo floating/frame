@@ -1,10 +1,10 @@
 import React from 'react'
 import Restore from 'react-restore'
-import { addHexPrefix, stripHexPrefix } from 'ethereumjs-util'
+import { addHexPrefix } from 'ethereumjs-util'
 
 import store from '../../../../../../../../main/store'
 import link from '../../../../../../../../resources/link'
-import { setupComponent } from '../../../../../../../componentSetup'
+import { advanceTimers, setupComponent } from '../../../../../../../componentSetup'
 import AdjustFeeComponent from '../../../../../../../../app/App/Main/Account/Requests/TransactionRequest/AdjustFee'
 
 jest.mock('../../../../../../../../main/store/persist')
@@ -56,6 +56,7 @@ it('renders the gas limit input', () => {
 })
 
 describe('base fee input submitting values', () => {
+
   const submittedAmounts = [
     { amount: 100e9.toString(), submitted: '9999' },
     { amount: 1e9.toString(), submitted: '9999' },
@@ -70,10 +71,10 @@ describe('base fee input submitting values', () => {
       const { user, getByLabelText } = setupComponent(<AdjustFee req={req} />)
       const baseFeeInput = getByLabelText('Base Fee (GWEI)')
 
-      await user.type(baseFeeInput, spec.amount)
-      
-      jest.advanceTimersByTime(500)
+      await user.type(baseFeeInput, `{backspace}${spec.amount}`)
 
+      advanceTimers(500)
+      
       expect(baseFeeInput.value).toBe(spec.submitted)
       expect(link.rpc).toHaveBeenCalledWith(spec.submitted)
     })
@@ -83,9 +84,9 @@ describe('base fee input submitting values', () => {
     const { user, getByLabelText } = setupComponent(<AdjustFee req={req} />)
     const baseFeeInput = getByLabelText('Base Fee (GWEI)')
 
-    await user.type(baseFeeInput, '20.')
+    await user.type(baseFeeInput, '{backspace}20.')
     
-    jest.advanceTimersByTime(500)
+    advanceTimers(500)
 
     expect(baseFeeInput.value).toBe('20.')
     expect(link.rpc).not.toHaveBeenCalled()
