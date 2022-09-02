@@ -1,9 +1,9 @@
 import WebSocket from 'ws'
-import { v4 as uuid, v5 as uuidv5 } from 'uuid'
+import { v4 as uuid } from 'uuid'
 import  log from 'electron-log'
 
 import store from '../store'
-import provider, { ProviderDataPayload } from '../provider'
+import provider from '../provider'
 import accounts from '../accounts'
 import windows from '../windows'
 
