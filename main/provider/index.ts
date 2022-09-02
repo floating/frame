@@ -24,7 +24,8 @@ import { populate as populateTransaction, maxFee } from '../transaction'
 import FrameAccount from '../accounts/Account'
 import { capitalize, arraysMatch } from '../../resources/utils'
 import { ApprovalType } from '../../resources/constants'
-import { checkExistingNonceGas, ecRecover, feeTotalOverMax, gasFees, getActiveChains, getAssets, getChains, getChainDetails, getPermissions, getRawTx, getSignedAddress, isCurrentAccount, isScanning, loadAssets, requestPermissions, resError, hasPermission } from './helpers'
+import { checkExistingNonceGas, ecRecover, feeTotalOverMax, gasFees, getActiveChains, getAssets, getChains, getChainDetails, getPermissions, getRawTx, getSignedAddress, isCurrentAccount, isScanning, loadAssets, requestPermissions, resError } from './helpers'
+import { AssetsChangedObserver, ChainsChangeObserver, OriginChainChangeObserver } from '../observers/chains'
 
 type Subscription = {
   id: string
@@ -824,52 +825,9 @@ export class Provider extends EventEmitter {
 }
 
 const provider = new Provider()
-let knownOrigins: Record<string, Origin> = {}
-let availableChains = getActiveChains()
 
-store.observer(() => {
-  const currentOrigins = store('main.origins') as Record<string, Origin>
-  const currentChains = getActiveChains()
-
-  for (const originId in currentOrigins) {
-    const currentOrigin = currentOrigins[originId]
-    const knownOrigin = knownOrigins[originId]
-
-    if (knownOrigin && knownOrigin.chain.id !== currentOrigin.chain.id) {
-      provider.chainChanged(currentOrigin.chain.id, originId)
-      provider.networkChanged(currentOrigin.chain.id, originId)
-    }
-
-    knownOrigins[originId] = currentOrigin
-  }
-
-  if (!arraysMatch(currentChains, availableChains)) {
-    availableChains = currentChains
-    provider.chainsChanged(availableChains)
-  }
-}, 'provider:chains')
-
-let debouncedAssets: RPC.GetAssets.Assets | null = null
-
-store.observer(() => {
-  const currentAccountId = store('selected.current')
-
-  if (currentAccountId) {
-    const assets = loadAssets(currentAccountId)
-
-    if (!isScanning(currentAccountId) && (assets.erc20.length > 0 || assets.nativeCurrency.length > 0)) {
-      if (!debouncedAssets) {
-        setTimeout(() => {
-          if (debouncedAssets) {
-            provider.assetsChanged(currentAccountId, debouncedAssets)
-            debouncedAssets = null
-          }
-        }, 800)
-      }
-
-      debouncedAssets = assets
-    }
-  }
-}, 'provider:account')
+store.observer(ChainsChangeObserver(provider), 'provider:chains')
+store.observer(OriginChainChangeObserver(provider, store), 'provider:origins')
+store.observer(AssetsChangedObserver(provider, store), 'provider:account')
 
 export default provider
