@@ -158,7 +158,7 @@ const PriorityFeeInput = ({ initialValue, onReceiveValue, tabIndex }) =>
 const PriceInput = ({ gasPrice, maxTotalFee, gasLimit, handlerId }) => {
   const displayGasPrice = toDisplayFromWei(gasPrice)
   const gasPriceReceiveValueHandler = (newGasPrice) => {
-    // TODO: explain the below calculation
+    // TODO: test & explain the below calculation
     if (gweiToWei(newGasPrice).times(gasLimit).gt(maxTotalFee)) {
       console.log('gas price clobbered')
       newGasPrice = maxTotalFee.div(gasLimit).div(1e9).decimalPlaces(0, BigNumber.ROUND_FLOOR)
@@ -178,10 +178,10 @@ const FeeInputs = ({ baseFee, priorityFee, maxTotalFee, gasLimit, handlerId, tab
   const displayBaseFee = toDisplayFromWei(baseFee)
 
   const priorityFeeReceiveValueHandler = (newPriorityFee) => {
-    // TODO: explain the below calculation
-    if (gweiToWei(baseFee.plus(newPriorityFee)).times(gasLimit).gt(maxTotalFee)) {
+    // TODO: test & explain the below calculation
+    if (baseFee.plus(gweiToWei(newPriorityFee)).times(gasLimit).gt(maxTotalFee)) {
       console.log('priority fee clobbered')
-      newPriorityFee = maxTotalFee.div(gasLimit).div(1e9).decimalPlaces(0, BigNumber.ROUND_FLOOR).minus(baseFee)
+      newPriorityFee = maxTotalFee.div(gasLimit).decimalPlaces(0, BigNumber.ROUND_FLOOR).minus(baseFee)
     }
 
     console.log('sending priority fee', newPriorityFee.toString())
@@ -190,10 +190,10 @@ const FeeInputs = ({ baseFee, priorityFee, maxTotalFee, gasLimit, handlerId, tab
     })
   }
   const baseFeeReceiveValueHandler = (newBaseFee) => {
-    // TODO: explain the below calculation
-    if (gweiToWei(newBaseFee.plus(priorityFee)).times(gasLimit).gt(maxTotalFee)) {
+    // TODO: test & explain the below calculation
+    if (gweiToWei(newBaseFee).plus(priorityFee).times(gasLimit).gt(maxTotalFee)) {
       console.log('base fee clobbered')
-      newBaseFee = maxTotalFee.div(gasLimit).div(1e9).decimalPlaces(0, BigNumber.ROUND_FLOOR).minus(priorityFee)
+      newBaseFee = maxTotalFee.div(gasLimit).decimalPlaces(0, BigNumber.ROUND_FLOOR).minus(priorityFee)
     }
 
     console.log('sending base fee', newBaseFee.toString())
@@ -201,6 +201,8 @@ const FeeInputs = ({ baseFee, priorityFee, maxTotalFee, gasLimit, handlerId, tab
       if (e) console.error(e)
     })
   }
+
+  console.log('displayBaseFee', displayBaseFee)
 
   return <>
     <BaseFeeInput initialValue={displayBaseFee} onReceiveValue={baseFeeReceiveValueHandler} tabIndex={tabIndex} />
@@ -210,13 +212,13 @@ const FeeInputs = ({ baseFee, priorityFee, maxTotalFee, gasLimit, handlerId, tab
 
 const LimitInput = ({ gasPrice, baseFee, priorityFee, gasLimit, maxTotalFee, handlerId, tabIndex }) => {
   const gasLimitReceiveValueHandler = (newGasLimit) => {
-    // TODO: explain the below calculations
-    if (gasPrice && gweiToWei(gasPrice).times(newGasLimit).gt(maxTotalFee)) {
+    // TODO: test & explain the below calculations
+    if (gasPrice && gasPrice.times(newGasLimit).gt(maxTotalFee)) {
       console.log('gas limit clobbered 1')
-      newGasLimit = maxTotalFee.div(gweiToWei(gasPrice)).decimalPlaces(0, BigNumber.ROUND_FLOOR)
-    } else if (gweiToWei(baseFee.plus(priorityFee)).times(newGasLimit).gt(maxTotalFee)) {
-      console.log('gas limit clobbered 2', baseFee.plus(priorityFee))
-      newGasLimit = maxTotalFee.div(gweiToWei(baseFee.plus(priorityFee))).decimalPlaces(0, BigNumber.ROUND_FLOOR)
+      newGasLimit = maxTotalFee.div(gasPrice).decimalPlaces(0, BigNumber.ROUND_FLOOR)
+    } else if (baseFee.plus(priorityFee).times(newGasLimit).gt(maxTotalFee)) {
+      console.log('gas limit clobbered 2', baseFee.toString(), priorityFee.toString())
+      newGasLimit = maxTotalFee.div(baseFee.plus(priorityFee)).decimalPlaces(0, BigNumber.ROUND_FLOOR)
     }
 
     console.log('sending gas limit', newGasLimit.toString())
