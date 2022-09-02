@@ -105,6 +105,13 @@ describe('base fee input', () => {
     expect(baseFeeInput.value).toBe('')
     expect(link.rpc).not.toHaveBeenCalled()
   })
+
+  // arrow up increments
+  // arrow down decrements
+  // arrow up hitting limit does not increment
+  // arrow down hitting limit does not decrement
+  // enter key calls blur
+  // base fee clobbered
 })
 
 describe('priority fee input', () => {
@@ -156,6 +163,13 @@ describe('priority fee input', () => {
     expect(priorityFeeInput.value).toBe('')
     expect(link.rpc).not.toHaveBeenCalled()
   })
+
+  // arrow up increments
+  // arrow down decrements
+  // arrow up hitting limit does not increment
+  // arrow down hitting limit does not decrement
+  // enter key calls blur
+  // priority fee clobbered
 })
 
 describe('gas limit input', () => {
@@ -192,6 +206,13 @@ describe('gas limit input', () => {
     expect(gasLimitInput.value).toBe('')
     expect(link.rpc).not.toHaveBeenCalled()
   })
+
+  // arrow up increments
+  // arrow down decrements
+  // arrow up hitting limit does not increment
+  // arrow down hitting limit does not decrement
+  // enter key calls blur
+  // gas limit clobbered
 })
 
 describe('legacy transactions', () => {
@@ -269,6 +290,14 @@ describe('legacy transactions', () => {
       expect(gasPriceInput.value).toBe('')
       expect(link.rpc).not.toHaveBeenCalled()
     })
+
+    // arrow up increments
+    // arrow down decrements
+    // arrow up hitting limit does not increment
+    // arrow down hitting limit does not decrement
+    // enter key calls blur
+    // gas price clobbered
+    // gas limit clobbered
   })
 })
 
