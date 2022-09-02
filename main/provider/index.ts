@@ -22,10 +22,10 @@ import { getType as getSignerType, Type as SignerType } from '../signers/Signer'
 import { TransactionData } from '../../resources/domain/transaction'
 import { populate as populateTransaction, maxFee } from '../transaction'
 import FrameAccount from '../accounts/Account'
-import { capitalize, arraysMatch } from '../../resources/utils'
+import { capitalize } from '../../resources/utils'
 import { ApprovalType } from '../../resources/constants'
-import { checkExistingNonceGas, ecRecover, feeTotalOverMax, gasFees, getActiveChains, getAssets, getChains, getChainDetails, getPermissions, getRawTx, getSignedAddress, isCurrentAccount, isScanning, loadAssets, requestPermissions, resError } from './helpers'
-import { AssetsChangedObserver, ChainsChangeObserver, OriginChainChangeObserver } from '../observers/chains'
+import { checkExistingNonceGas, ecRecover, feeTotalOverMax, gasFees, getAssets, getChains, getChainDetails, getPermissions, getRawTx, getSignedAddress, isCurrentAccount, requestPermissions, resError } from './helpers'
+import { AssetsChangedObserver, ChainsChangeObserver, OriginChainChangeObserver } from '../observers'
 
 type Subscription = {
   id: string
