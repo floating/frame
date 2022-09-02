@@ -1,5 +1,5 @@
-import { arraysMatch } from "../../resources/utils"
-import { getActiveChains, isScanning, loadAssets } from "../provider/helpers"
+import { arraysMatch } from '../../resources/utils'
+import { getActiveChains, isScanning, loadAssets } from '../provider/helpers'
 
 interface ChainsChangedHandler {
   chainsChanged: (chainIds: number[]) => void
