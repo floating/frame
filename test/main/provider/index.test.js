@@ -27,7 +27,6 @@ jest.mock('../../../main/provider/helpers', () => {
     hasPermission: jest.fn(),
     getActiveChains: jest.fn()
   }
-  
 })
 
 beforeAll(async () => {
