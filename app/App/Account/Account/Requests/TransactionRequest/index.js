@@ -82,10 +82,10 @@ class TransactionRequest extends React.Component {
   }
 
   renderAdjustFee () {
-    const { accountId, handlerId, step } = this.props
+    const { accountId, handlerId } = this.props
     const req = this.store('main.accounts', accountId, 'requests', handlerId)
     return (
-      <AdjustFee {...this.props} req={req} />
+      <AdjustFee req={req} />
     )
   }
 
