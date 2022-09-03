@@ -60,11 +60,11 @@ describe('#createObserver', () => {
   const handler = { assetsChanged: jest.fn() }
   const observer = createObserver(handler)
 
-  const fireObserver = () => {
+  const fireObserver = (waitTime = 800) => {
     observer()
 
-    // event debounce time
-    jest.advanceTimersByTime(800)
+    // event debounce time is 800 ms
+    jest.advanceTimersByTime(waitTime)
   }
 
   beforeEach(() => {
@@ -138,5 +138,12 @@ describe('#createObserver', () => {
     fireObserver()
 
     expect(handler.assetsChanged).not.toHaveBeenCalled()
+  })
+
+  it('only invokes the handler once in any 800 ms span', () => {
+    fireObserver(500)
+    fireObserver(500)
+
+    expect(handler.assetsChanged).toHaveBeenCalledTimes(1)
   })
 })
