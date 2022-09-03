@@ -37,9 +37,7 @@ beforeEach(() => {
 })
 
 it('renders the base fee input', () => {
-  const { getByLabelText, debug } = setupComponent(<AdjustFee req={req} />)
-
-  debug()   
+  const { getByLabelText } = setupComponent(<AdjustFee req={req} />)
   const baseFeeInput = getByLabelText('Base Fee (GWEI)')
   expect(baseFeeInput.value).toBe('4')
 })
