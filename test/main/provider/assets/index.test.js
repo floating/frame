@@ -69,7 +69,9 @@ describe('#createObserver', () => {
 
   beforeEach(() => {
     handler.assetsChanged = jest.fn()
+
     store.set('selected.current', account)
+    store.set('main.balances', account, [{ address: '0xany' }])
   })
 
   it('invokes the handler when the account is holding native currency assets', () => {
@@ -112,7 +114,6 @@ describe('#createObserver', () => {
   })
 
   it('does not invoke the handler when no account is selected', () => {
-    store.set('main.balances', account, [{ address: '0xany' }])
     store.set('selected.current', undefined)
 
     fireObserver()
@@ -133,7 +134,6 @@ describe('#createObserver', () => {
     yesterday.setDate(yesterday.getDate() - 1)
 
     store.set('main.accounts', account, 'balances.lastUpdated', yesterday)
-    store.set('main.balances', account, [{ address: '0xany' }])
 
     fireObserver()
 
