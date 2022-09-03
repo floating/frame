@@ -24,8 +24,22 @@ import { populate as populateTransaction, maxFee } from '../transaction'
 import FrameAccount from '../accounts/Account'
 import { capitalize } from '../../resources/utils'
 import { ApprovalType } from '../../resources/constants'
-import { checkExistingNonceGas, ecRecover, feeTotalOverMax, gasFees, getChainDetails, getPermissions, getRawTx, getSignedAddress, isCurrentAccount, requestPermissions, resError, hasPermission } from './helpers'
 import { createObserver as AssetsObserver, loadAssets } from './assets'
+
+import {
+  checkExistingNonceGas,
+  ecRecover,
+  feeTotalOverMax,
+  gasFees,
+  getChainDetails,
+  getPermissions,
+  getRawTx,
+  getSignedAddress,
+  isCurrentAccount,
+  requestPermissions,
+  resError,
+  hasPermission
+} from './helpers'
 
 import {
   createChainsObserver as ChainsObserver,
