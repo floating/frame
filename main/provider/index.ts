@@ -26,7 +26,7 @@ import { capitalize } from '../../resources/utils'
 import { ApprovalType } from '../../resources/constants'
 import { checkExistingNonceGas, ecRecover, feeTotalOverMax, gasFees, getChains, getChainDetails, getPermissions, getRawTx, getSignedAddress, isCurrentAccount, requestPermissions, resError, hasPermission } from './helpers'
 import { ChainsChangeObserver, OriginChainChangeObserver } from '../observers'
-import { createObserver as createAssetsObserver, loadAssets } from './assets'
+import { createObserver as AssetsObserver, loadAssets } from './assets'
 
 type Subscription = {
   id: string
@@ -842,6 +842,6 @@ const provider = new Provider()
 
 store.observer(ChainsChangeObserver(provider), 'provider:chains')
 store.observer(OriginChainChangeObserver(provider, store), 'provider:origins')
-store.observer(createAssetsObserver(provider), 'provider:assets')
+store.observer(AssetsObserver(provider), 'provider:assets')
 
 export default provider
