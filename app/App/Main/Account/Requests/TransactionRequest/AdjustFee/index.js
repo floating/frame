@@ -180,46 +180,30 @@ class TxFeeOverlay extends Component {
 
     console.log(data)
 
-    const gasLimitLimiter = (rawGasLimit) => {
-      const { baseFee, priorityFee, gasPrice } = this.state
-      // TODO: test the below calculations
-      // if total fee > maximum allowed fee we recalculate the gas limit based on the maximum allowed
-      if (gasPrice && totalFee({ gasPrice, gasLimit: rawGasLimit }).gt(maxTotalFee)) {
-        console.log('gas limit clobbered 1')
-        return limitGasUnits(maxTotalFee.div(gasPrice).decimalPlaces(0, BigNumber.ROUND_FLOOR))
-      } else if (totalFee({ baseFee, priorityFee, gasLimit: rawGasLimit }).gt(maxTotalFee)) {
-        console.log('gas limit clobbered 2', baseFee.toString(), priorityFee.toString())
-        return limitGasUnits(maxTotalFee.div(baseFee.plus(priorityFee)).decimalPlaces(0, BigNumber.ROUND_FLOOR))
-      }
-  
-      return limitGasUnits(rawGasLimit)
-    }
-
-    const displayPriorityFee = toDisplayFromWei(priorityFee)
     const displayBaseFee = toDisplayFromWei(baseFee)
-  
-    const priorityFeeLimiter = (rawPriorityFee) => {
-      const { baseFee, gasLimit } = this.state
-      // TODO: test the below calculation
-      // if total fee > maximum allowed fee we recalculate the priority fee based on the maximum allowed
-      if (totalFee({ baseFee, priorityFee: rawPriorityFee, gasLimit }).gt(maxTotalFee)) {
-        console.log('priority fee clobbered')
-        return limitGwei(maxTotalFee.div(gasLimit).decimalPlaces(0, BigNumber.ROUND_FLOOR).minus(baseFee))
-      }
-  
-      return limitGwei(rawPriorityFee)
-    }
-
     const baseFeeLimiter = (rawBaseFee) => {
       const { priorityFee, gasLimit } = this.state
       // if total fee > maximum allowed fee we recalculate the base fee based on the maximum allowed
       console.log('testing clobber', rawBaseFee.toString(), priorityFee.toString(), gasLimit.toString(), totalFee({ baseFee: rawBaseFee, priorityFee, gasLimit }).div(1e18).toString(), maxTotalFee.div(1e18).toString())
       if (totalFee({ baseFee: rawBaseFee, priorityFee, gasLimit }).gt(maxTotalFee)) {
         console.log('base fee clobbered')
-        return limitGwei(maxTotalFee.div(gasLimit).decimalPlaces(0, BigNumber.ROUND_FLOOR).minus(priorityFee))
+        rawBaseFee = maxTotalFee.div(gasLimit).decimalPlaces(0, BigNumber.ROUND_FLOOR).minus(priorityFee)
       }
 
       return limitGwei(rawBaseFee)
+    }
+
+    const displayPriorityFee = toDisplayFromWei(priorityFee)
+    const priorityFeeLimiter = (rawPriorityFee) => {
+      const { baseFee, gasLimit } = this.state
+      // TODO: test the below calculation
+      // if total fee > maximum allowed fee we recalculate the priority fee based on the maximum allowed
+      if (totalFee({ baseFee, priorityFee: rawPriorityFee, gasLimit }).gt(maxTotalFee)) {
+        console.log('priority fee clobbered')
+        rawPriorityFee = maxTotalFee.div(gasLimit).decimalPlaces(0, BigNumber.ROUND_FLOOR).minus(baseFee)
+      }
+  
+      return limitGwei(rawPriorityFee)
     }
 
     const displayGasPrice = toDisplayFromWei(gasPrice)
@@ -229,13 +213,27 @@ class TxFeeOverlay extends Component {
       // if total fee > maximum allowed fee we recalculate the gas price based on the maximum allowed
       if (totalFee({ gasPrice: rawGasPrice, gasLimit }).gt(maxTotalFee)) {
         console.log('gas price clobbered')
-        return maxTotalFee.div(gasLimit).div(1e9).decimalPlaces(0, BigNumber.ROUND_FLOOR)
+        rawGasPrice = maxTotalFee.div(gasLimit).div(1e9).decimalPlaces(0, BigNumber.ROUND_FLOOR)
       }
 
       return limitGwei(rawGasPrice)
     }
 
     const displayGasLimit = gasLimit.toString()
+    const gasLimitLimiter = (rawGasLimit) => {
+      const { baseFee, priorityFee, gasPrice } = this.state
+      // TODO: test the below calculations
+      // if total fee > maximum allowed fee we recalculate the gas limit based on the maximum allowed
+      if (gasPrice && totalFee({ gasPrice, gasLimit: rawGasLimit }).gt(maxTotalFee)) {
+        console.log('gas limit clobbered 1')
+        rawGasLimit = maxTotalFee.div(gasPrice).decimalPlaces(0, BigNumber.ROUND_FLOOR)
+      } else if (totalFee({ baseFee, priorityFee, gasLimit: rawGasLimit }).gt(maxTotalFee)) {
+        console.log('gas limit clobbered 2', baseFee.toString(), priorityFee.toString())
+        rawGasLimit = maxTotalFee.div(baseFee.plus(priorityFee)).decimalPlaces(0, BigNumber.ROUND_FLOOR)
+      }
+  
+      return limitGasUnits(rawGasLimit)
+    }
 
     const receiveValueHandler = (value, name, setAsHex = true) => {
       console.log(`sending ${name}`, value.toString())
