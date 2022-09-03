@@ -194,6 +194,29 @@ describe('base fee input', () => {
     expect(document.activeElement).not.toEqual(baseFeeInput);
   })
 
+  fit('recalculates the base fee when the total fee exceeds the maximum allowed (ETH-based chains)', async () => {
+    req.data.chainId = '1'
+    const { user, getByLabelText } = setupComponent(<AdjustFee req={req} />)
+    const baseFeeInput = getByLabelText('Base Fee (GWEI)')
+    const priorityFeeInput = getByLabelText('Max Priority Fee (GWEI)')
+    const gasLimitInput = getByLabelText('Gas Limit (UNITS)')
+
+    await user.clear(priorityFeeInput)
+    await user.type(priorityFeeInput, '4576547845678568586758')
+
+    await user.clear(gasLimitInput)
+    await user.type(gasLimitInput, '876897897897897897897')
+
+    advanceTimers(500)
+    
+    await user.clear(baseFeeInput)
+    await user.type(baseFeeInput, '5686548658568568568568')
+
+    advanceTimers(500)
+
+    // expect(baseFeeInput.value).toBe('0')
+    expect(link.rpc).toHaveBeenCalledWith('setBaseFee', hexStr(0), '1', expect.any(Function))
+  })
   // base fee clobbered
 })
 
