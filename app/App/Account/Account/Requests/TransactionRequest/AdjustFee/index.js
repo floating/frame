@@ -25,14 +25,17 @@ function bnToHex (bn) {
   return `0x${bn.toString(16)}`
 }
 
-function limitRange (bn, min = 0, max = 9999) {
+function limitRange (bn, min = 0, max = 9999e9) {
   if (bn.gt(max)) return BigNumber(max)
   if (bn.lt(min)) return BigNumber(min)
   return bn
 }
 
-function formatForInput (num, decimals) {
-  return decimals ? toDisplayFromGwei(BigNumber(num)) : num.toString()
+function formatForInput (num, decimals, useWei = false) {
+  if (!decimals) {
+    return num.toString()
+  }
+  return useWei ? toDisplayFromWei(BigNumber(num)) : toDisplayFromGwei(BigNumber(num))
 }
 
 function getMaxTotalFee (tx = { chainId: '' }) {
@@ -54,7 +57,7 @@ function getMaxTotalFee (tx = { chainId: '' }) {
 
 const totalFee = ({ gasPrice, baseFee, priorityFee, gasLimit }) => gasPrice ? gasPrice.times(gasLimit) : baseFee.plus(priorityFee).times(gasLimit)
 
-const limitGwei = (bn) => trimGwei(limitRange(bn))
+// const limitGwei = (bn) => trimGwei(limitRange(bn))
 const limitGasUnits = (bn) => limitRange(bn, 0, 12.5e6)
 
 const FeeOverlayInput = ({ initialValue, labelText, tabIndex, decimals, onReceiveValue, limiter }) => {
@@ -66,9 +69,9 @@ const FeeOverlayInput = ({ initialValue, labelText, tabIndex, decimals, onReceiv
 
     setSubmitTimeout(
       setTimeout(() => {
-        const limitedValue = limiter(newValue)
-        onReceiveValue(decimals ? gweiToWei(limitedValue) : limitedValue)
-        setValue(formatForInput(limitedValue, decimals))
+        const limitedValue = limiter(decimals ? gweiToWei(trimGwei(newValue)) : newValue)  // needs wei
+        onReceiveValue(limitedValue)  // needs wei
+        setValue(formatForInput(limitedValue, decimals, true))  // needs gwei
       }, 500)
     )
   }
@@ -190,7 +193,7 @@ class TxFeeOverlay extends Component {
         rawBaseFee = maxTotalFee.div(gasLimit).decimalPlaces(0, BigNumber.ROUND_FLOOR).minus(priorityFee)
       }
 
-      return limitGwei(rawBaseFee)
+      return limitRange(rawBaseFee)
     }
 
     const displayPriorityFee = toDisplayFromWei(priorityFee)
@@ -203,7 +206,7 @@ class TxFeeOverlay extends Component {
         rawPriorityFee = maxTotalFee.div(gasLimit).decimalPlaces(0, BigNumber.ROUND_FLOOR).minus(baseFee)
       }
   
-      return limitGwei(rawPriorityFee)
+      return limitRange(rawPriorityFee)
     }
 
     const displayGasPrice = toDisplayFromWei(gasPrice)
@@ -211,12 +214,13 @@ class TxFeeOverlay extends Component {
       const { gasLimit } = this.state
       // TODO: test & explain the below calculation
       // if total fee > maximum allowed fee we recalculate the gas price based on the maximum allowed
+      console.log('testing clobber', rawGasPrice.toString(), gasLimit.toString(), totalFee({ gasPrice: rawGasPrice, gasLimit }).toString(), maxTotalFee.toString())
       if (totalFee({ gasPrice: rawGasPrice, gasLimit }).gt(maxTotalFee)) {
         console.log('gas price clobbered')
-        rawGasPrice = maxTotalFee.div(gasLimit).div(1e9).decimalPlaces(0, BigNumber.ROUND_FLOOR)
+        rawGasPrice = maxTotalFee.div(gasLimit).decimalPlaces(0, BigNumber.ROUND_FLOOR)
       }
 
-      return limitGwei(rawGasPrice)
+      return limitRange(rawGasPrice)
     }
 
     const displayGasLimit = gasLimit.toString()
