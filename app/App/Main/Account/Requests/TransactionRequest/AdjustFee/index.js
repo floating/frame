@@ -21,8 +21,8 @@ function gweiToWei (bn) {
   return bn.times(1e9)
 }
 
-function gweiToWeiHex (bn) {
-  return `0x${gweiToWei(bn).toString(16)}`
+function bnToHex (bn) {
+  return `0x${bn.toString(16)}`
 }
 
 function limitRange (bn, min = 0, max = 9999) {
@@ -52,6 +52,8 @@ function getMaxTotalFee (tx = { chainId: '' }) {
   return 50 * 1e18
 }
 
+const totalFee = ({ gasPrice, baseFee, priorityFee, gasLimit }) => gasPrice ? gasPrice.times(gasLimit) : baseFee.plus(priorityFee).times(gasLimit)
+
 const defaultLimiter = (bn) => trimGwei(limitRange(bn))
 
 const FeeOverlayInput = ({ initialValue, labelText, tabIndex, decimals, onReceiveValue, limiter = defaultLimiter }) => {
@@ -64,7 +66,7 @@ const FeeOverlayInput = ({ initialValue, labelText, tabIndex, decimals, onReceiv
     setSubmitTimeout(
       setTimeout(() => {
         const limitedValue = limiter(newValue)
-        onReceiveValue(limitedValue)
+        onReceiveValue(decimals ? gweiToWei(limitedValue) : limitedValue)
         setValue(formatForInput(limitedValue, decimals))
       }, 500)
     )
@@ -177,11 +179,12 @@ class TxFeeOverlay extends Component {
     console.log(data)
 
     const gasLimitReceiveValueHandler = (newGasLimit) => {
-      // TODO: test & explain the below calculations
-      if (gasPrice && gasPrice.times(newGasLimit).gt(maxTotalFee)) {
+      // TODO: test the below calculations
+      // if total fee > maximum allowed fee we recalculate the gas limit based on the maximum allowed
+      if (gasPrice && totalFee({ gasPrice, gasLimit: newGasLimit }).gt(maxTotalFee)) {
         console.log('gas limit clobbered 1')
         newGasLimit = maxTotalFee.div(gasPrice).decimalPlaces(0, BigNumber.ROUND_FLOOR)
-      } else if (baseFee.plus(priorityFee).times(newGasLimit).gt(maxTotalFee)) {
+      } else if (totalFee({ baseFee, priorityFee, gasLimit: newGasLimit }).gt(maxTotalFee)) {
         console.log('gas limit clobbered 2', baseFee.toString(), priorityFee.toString())
         newGasLimit = maxTotalFee.div(baseFee.plus(priorityFee)).decimalPlaces(0, BigNumber.ROUND_FLOOR)
       }
@@ -197,27 +200,29 @@ class TxFeeOverlay extends Component {
     const displayBaseFee = toDisplayFromWei(baseFee)
   
     const priorityFeeReceiveValueHandler = (newPriorityFee) => {
-      // TODO: test & explain the below calculation
-      if (baseFee.plus(gweiToWei(newPriorityFee)).times(gasLimit).gt(maxTotalFee)) {
+      // TODO: test the below calculation
+      // if total fee > maximum allowed fee we recalculate the priority fee based on the maximum allowed
+      if (totalFee({ baseFee, priorityFee: newPriorityFee, gasLimit }).gt(maxTotalFee)) {
         console.log('priority fee clobbered')
         newPriorityFee = maxTotalFee.div(gasLimit).decimalPlaces(0, BigNumber.ROUND_FLOOR).minus(baseFee)
       }
   
       console.log('sending priority fee', newPriorityFee.toString())
-      this.state.priorityFee = gweiToWeiHex(newPriorityFee)
+      this.state.priorityFee = bnToHex(newPriorityFee)
       link.rpc('setPriorityFee', this.state.priorityFee, handlerId, (e) => {
         if (e) console.error(e)
       })
     }
     const baseFeeReceiveValueHandler = (newBaseFee) => {
-      // TODO: test & explain the below calculation
-      if (gweiToWei(newBaseFee).plus(priorityFee).times(gasLimit).gt(maxTotalFee)) {
+      // TODO: test the below calculation
+      // if total fee > maximum allowed fee we recalculate the base fee based on the maximum allowed
+      if (totalFee({ baseFee: newBaseFee, priorityFee, gasLimit }).gt(maxTotalFee)) {
         console.log('base fee clobbered')
         newBaseFee = maxTotalFee.div(gasLimit).decimalPlaces(0, BigNumber.ROUND_FLOOR).minus(priorityFee)
       }
   
       console.log('sending base fee', newBaseFee.toString())
-      this.state.baseFee = gweiToWeiHex(newBaseFee)
+      this.state.baseFee = bnToHex(newBaseFee)
       link.rpc('setBaseFee', this.state.baseFee, handlerId, (e) => {
         if (e) console.error(e)
       })
@@ -226,17 +231,20 @@ class TxFeeOverlay extends Component {
     const displayGasPrice = toDisplayFromWei(gasPrice)
     const gasPriceReceiveValueHandler = (newGasPrice) => {
       // TODO: test & explain the below calculation
-      if (gweiToWei(newGasPrice).times(gasLimit).gt(maxTotalFee)) {
+      // if total fee > maximum allowed fee we recalculate the gas price based on the maximum allowed
+      if (totalFee({ gasPrice: newGasPrice, gasLimit }).gt(maxTotalFee)) {
         console.log('gas price clobbered')
         newGasPrice = maxTotalFee.div(gasLimit).div(1e9).decimalPlaces(0, BigNumber.ROUND_FLOOR)
       }
   
       console.log('sending gas price', newGasPrice.toString())
-      this.state.gasPrice = gweiToWeiHex(newGasPrice)
+      this.state.gasPrice = bnToHex(newGasPrice)
       link.rpc('setGasPrice', this.state.gasPrice, handlerId, (e) => {
         if (e) console.error(e)
       })
     }
+
+    const displayGasLimit = gasLimit.toString()
 
     return (
       <div className='txAdjustFee cardShow' ref={this.moduleRef}>
@@ -246,7 +254,7 @@ class TxFeeOverlay extends Component {
               <PriorityFeeInput initialValue={displayPriorityFee} onReceiveValue={priorityFeeReceiveValueHandler} tabIndex={1} />
             </> 
           : <GasPriceInput initialValue={displayGasPrice} onReceiveValue={gasPriceReceiveValueHandler} tabIndex={0} />}
-        <GasLimitInput initialValue={gasLimit.toString()} onReceiveValue={gasLimitReceiveValueHandler} tabIndex={2} />
+        <GasLimitInput initialValue={displayGasLimit} onReceiveValue={gasLimitReceiveValueHandler} tabIndex={2} />
       </div>
     )
   }
