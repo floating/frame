@@ -1345,7 +1345,8 @@ describe('state change events', () => {
       provider.subscriptions.chainChanged = []
     })
 
-    it('fires a chainChanged event to subscribers', done => {
+    // TODO: moving this to its own module shortly
+    it.skip('fires a chainChanged event to subscribers', done => {
       const subscription = { id: '0x9509a964a8d24a17fcfc7b77fc575b71', originId: '8073729a-5e59-53b7-9e69-5d9bcff94087' }
 
       provider.once('data:subscription', event => {
@@ -1443,7 +1444,7 @@ describe('state change events', () => {
 
     describe('events', () => {
       const fireEvent = () => {
-        store.getObserver('provider:account').fire()
+        store.getObserver('provider:assets').fire()
   
         // event debounce time
         jest.advanceTimersByTime(800)

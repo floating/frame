@@ -11,5 +11,8 @@
     "\\.svg$": "<rootDir>/test/jest.svg.js"
   },
   "testTimeout": 100,
+  "fakeTimers": {
+    "enableGlobally": true
+  },
   "clearMocks": true
 }

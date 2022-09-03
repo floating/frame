@@ -24,8 +24,9 @@ import { populate as populateTransaction, maxFee } from '../transaction'
 import FrameAccount from '../accounts/Account'
 import { capitalize } from '../../resources/utils'
 import { ApprovalType } from '../../resources/constants'
-import { checkExistingNonceGas, ecRecover, feeTotalOverMax, gasFees, getAssets, getChains, getChainDetails, getPermissions, getRawTx, getSignedAddress, isCurrentAccount, requestPermissions, resError } from './helpers'
-import { AssetsChangedObserver, ChainsChangeObserver, OriginChainChangeObserver } from '../observers'
+import { checkExistingNonceGas, ecRecover, feeTotalOverMax, gasFees, getChains, getChainDetails, getPermissions, getRawTx, getSignedAddress, isCurrentAccount, requestPermissions, resError, hasPermission } from './helpers'
+import { ChainsChangeObserver, OriginChainChangeObserver } from '../observers'
+import { createObserver as createAssetsObserver, loadAssets } from './assets'
 
 type Subscription = {
   id: string
@@ -744,6 +745,19 @@ export class Provider extends EventEmitter {
     return getPayloadOrigin(payload).chain
   }
 
+  private getAssets (payload: RPC.GetAssets.Request, currentAccount: FrameAccount | null, cb: RPCCallback<RPC.GetAssets.Response>) {
+    if (!currentAccount) return resError('no account selected', payload, cb)
+
+    try {
+      const { nativeCurrency, erc20 } = loadAssets(currentAccount.id)
+      const { id, jsonrpc } = payload
+      
+      return cb({ id, jsonrpc, result: { nativeCurrency, erc20 }})
+    } catch (e) {
+      return resError({ message: (e as Error).message, code: 5901 }, payload, cb)
+    }
+  }
+
   sendAsync (payload: RPCRequestPayload, cb: Callback<RPCResponsePayload>) {
     this.send(payload, res => {
       if (res.error) {
@@ -806,7 +820,7 @@ export class Provider extends EventEmitter {
     if (method === 'wallet_watchAsset') return this.addCustomToken(payload, res, targetChain)
     if (method === 'wallet_getChains') return getChains(payload, res)
     if (method === 'wallet_getChainDetails') return getChainDetails(payload, res)
-    if (method === 'wallet_getAssets') return getAssets(payload as RPC.GetAssets.Request, accounts.current(), res as RPCCallback<RPC.GetAssets.Response>)
+    if (method === 'wallet_getAssets') return this.getAssets(payload as RPC.GetAssets.Request, accounts.current(), res as RPCCallback<RPC.GetAssets.Response>)
 
     // Connection dependent methods need to pass targetChain
     if (method === 'net_version') return this.getNetVersion(payload, res, targetChain)
@@ -828,6 +842,6 @@ const provider = new Provider()
 
 store.observer(ChainsChangeObserver(provider), 'provider:chains')
 store.observer(OriginChainChangeObserver(provider, store), 'provider:origins')
-store.observer(AssetsChangedObserver(provider, store), 'provider:account')
+store.observer(createAssetsObserver(provider), 'provider:assets')
 
 export default provider

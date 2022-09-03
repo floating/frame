@@ -1,5 +1,5 @@
 import { arraysMatch } from '../../resources/utils'
-import { getActiveChains, isScanning, loadAssets } from '../provider/helpers'
+import { getActiveChains } from '../provider/helpers'
 
 interface ChainsChangedHandler {
   chainsChanged: (chainIds: number[]) => void
@@ -11,10 +11,6 @@ interface ChainChangedHandler {
 
 interface NetworkChangedHandler {
   networkChanged: (networkId: number, originId: string) => void
-}
-
-interface AssetsChangedHandler {
-  assetsChanged: (address: Address, assets: RPC.GetAssets.Assets) => void
 }
 
 export function ChainsChangeObserver (handler: ChainsChangedHandler) {
@@ -46,31 +42,6 @@ export function OriginChainChangeObserver (handler: ChainChangedHandler & Networ
       }
 
       knownOrigins[originId] = currentOrigin
-    }
-  }
-}
-
-export function AssetsChangedObserver (handler: AssetsChangedHandler, store: Store) {
-  let debouncedAssets: RPC.GetAssets.Assets | null = null
-
-  return function () {
-    const currentAccountId = store('selected.current')
-
-    if (currentAccountId) {
-      const assets = loadAssets(currentAccountId)
-
-      if (!isScanning(currentAccountId) && (assets.erc20.length > 0 || assets.nativeCurrency.length > 0)) {
-        if (!debouncedAssets) {
-          setTimeout(() => {
-            if (debouncedAssets) {
-              handler.assetsChanged(currentAccountId, debouncedAssets)
-              debouncedAssets = null
-            }
-          }, 800)
-        }
-
-        debouncedAssets = assets
-      }
     }
   }
 }

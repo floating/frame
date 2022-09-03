@@ -17,23 +17,7 @@ import protectedMethods from '../api/protectedMethods'
 import { getAddress, usesBaseFee, TransactionData, GasFeesSource } from '../../resources/domain/transaction'
 import FrameAccount from '../accounts/Account'
 
-const NATIVE_CURRENCY = '0x0000000000000000000000000000000000000000'
-
 const permission = (date: number, method: string) => ({ parentCapability: method, date })
-
-type Balance = Token & { balance: string, displayBalance: string }
-
-function getNativeCurrency (chainId: number) {
-  const currency = store('main.networksMeta.ethereum', chainId, 'nativeCurrency')
-  
-  return (currency || { usd: { price: 0 } }) as Currency
-}
-  
-function getRate (address: Address) {
-  const rate = store('main.rates', address.toLowerCase())
- 
-  return (rate || { usd: { price: 0 } }) as Rate
-}
 
 export function checkExistingNonceGas (tx: TransactionData) {
   const { from, nonce } = tx
@@ -73,39 +57,6 @@ export function checkExistingNonceGas (tx: TransactionData) {
   }
 
   return tx
-}
-  
-export function loadAssets (accountId: string) {
-  const balances: Balance[] = store('main.balances', accountId) || []
-
-  const response = { nativeCurrency: [] as RPC.GetAssets.NativeCurrency[], erc20: [] as RPC.GetAssets.Erc20[] }
-
-  return balances.reduce((assets, balance) => {
-    if (balance.address === NATIVE_CURRENCY) {
-      const currency = getNativeCurrency(balance.chainId)
-
-      assets.nativeCurrency.push({
-        ...balance,
-        currencyInfo: currency
-      })
-    } else {
-      const { usd } = getRate(balance.address)
-
-      assets.erc20.push({
-        ...balance,
-        tokenInfo: {
-          lastKnownPrice: { usd }
-        }
-      })
-    }
-
-    return assets
-  }, response)
-}
-
-export function isScanning (account: Address) {
-  const lastUpdated = store('main.accounts', account, 'balances.lastUpdated') as number
-  return !lastUpdated || (new Date().getTime() - lastUpdated) > (1000 * 60 * 5)
 }
 
 export function feeTotalOverMax (rawTx: TransactionData, maxTotalFee: number) {
@@ -192,16 +143,6 @@ export function hasPermission (address: string, originId: string) {
   })
 
   return permission?.provider
-}
-  
-export function getAssets (payload: RPC.GetAssets.Request, currentAccount: FrameAccount | null, cb: RPCCallback<RPC.GetAssets.Response>) {
-  if (!currentAccount) return resError('no account selected', payload, cb)
-  if (isScanning(currentAccount.id)) return resError({ message: 'assets not known for account', code: 5901 }, payload, cb)
-  
-  const { nativeCurrency, erc20 } = loadAssets(currentAccount.id)
-  const { id, jsonrpc } = payload
-  
-  cb({ id, jsonrpc, result: { nativeCurrency, erc20 }})
 }
   
 export function getActiveChains () {
