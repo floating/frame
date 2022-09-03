@@ -162,23 +162,25 @@ class TxFeeOverlay extends Component {
     super(props, context)
     const { req: { data: { gasLimit, maxPriorityFeePerGas, maxFeePerGas, gasPrice } } } = props
     this.moduleRef = React.createRef()
+    const maxFee = BigNumber(maxFeePerGas, 16)
+    const priorityFee = BigNumber(maxPriorityFeePerGas, 16)
     this.state = {
       gasLimit: BigNumber(gasLimit, 16),
-      priorityFee: BigNumber(maxPriorityFeePerGas, 16),
-      maxFee: BigNumber(maxFeePerGas, 16),
-      gasPrice: BigNumber(gasPrice, 16)
+      gasPrice: BigNumber(gasPrice, 16),
+      baseFee: maxFee.minus(priorityFee),
+      priorityFee
     }
   }
 
   render () {
     const { req: { data, handlerId } } = this.props
-    const { gasLimit, priorityFee, maxFee, gasPrice } = this.state
-    const baseFee = maxFee.minus(priorityFee)
+    const { baseFee, gasLimit, priorityFee, gasPrice } = this.state
     const maxTotalFee = BigNumber(getMaxTotalFee(data))
 
     console.log(data)
 
     const gasLimitReceiveValueHandler = (newGasLimit) => {
+      const { baseFee, priorityFee, gasPrice } = this.state
       // TODO: test the below calculations
       // if total fee > maximum allowed fee we recalculate the gas limit based on the maximum allowed
       if (gasPrice && totalFee({ gasPrice, gasLimit: newGasLimit }).gt(maxTotalFee)) {
@@ -200,6 +202,7 @@ class TxFeeOverlay extends Component {
     const displayBaseFee = toDisplayFromWei(baseFee)
   
     const priorityFeeReceiveValueHandler = (newPriorityFee) => {
+      const { baseFee, gasLimit } = this.state
       // TODO: test the below calculation
       // if total fee > maximum allowed fee we recalculate the priority fee based on the maximum allowed
       if (totalFee({ baseFee, priorityFee: newPriorityFee, gasLimit }).gt(maxTotalFee)) {
@@ -214,8 +217,10 @@ class TxFeeOverlay extends Component {
       })
     }
     const baseFeeReceiveValueHandler = (newBaseFee) => {
+      const { priorityFee, gasLimit } = this.state
       // TODO: test the below calculation
       // if total fee > maximum allowed fee we recalculate the base fee based on the maximum allowed
+      console.log('testing clobber', newBaseFee.toString(), priorityFee.toString(), gasLimit.toString(), totalFee({ baseFee: newBaseFee, priorityFee, gasLimit }).div(1e18).toString(), maxTotalFee.div(1e18).toString())
       if (totalFee({ baseFee: newBaseFee, priorityFee, gasLimit }).gt(maxTotalFee)) {
         console.log('base fee clobbered')
         newBaseFee = maxTotalFee.div(gasLimit).decimalPlaces(0, BigNumber.ROUND_FLOOR).minus(priorityFee)
@@ -230,6 +235,7 @@ class TxFeeOverlay extends Component {
 
     const displayGasPrice = toDisplayFromWei(gasPrice)
     const gasPriceReceiveValueHandler = (newGasPrice) => {
+      const { gasLimit } = this.state
       // TODO: test & explain the below calculation
       // if total fee > maximum allowed fee we recalculate the gas price based on the maximum allowed
       if (totalFee({ gasPrice: newGasPrice, gasLimit }).gt(maxTotalFee)) {
@@ -250,7 +256,7 @@ class TxFeeOverlay extends Component {
       <div className='txAdjustFee cardShow' ref={this.moduleRef}>
         {usesBaseFee(data)
           ? <>
-              <BaseFeeInput initialValue={displayBaseFee} onReceiveValue={baseFeeReceiveValueHandler} tabIndex={0} />
+              <BaseFeeInput initialValue={(displayBaseFee)} onReceiveValue={baseFeeReceiveValueHandler} tabIndex={0} />
               <PriorityFeeInput initialValue={displayPriorityFee} onReceiveValue={priorityFeeReceiveValueHandler} tabIndex={1} />
             </> 
           : <GasPriceInput initialValue={displayGasPrice} onReceiveValue={gasPriceReceiveValueHandler} tabIndex={0} />}
