@@ -12,6 +12,7 @@ beforeEach(() => {
 
 describe('#loadAssets', () => {
   it('loads native currency assets', () => {
+    const priceData = { usd: { price: 3815.91 } }
     const balance = {
       symbol: 'ETH',
       balance: '0xe7',
@@ -19,10 +20,8 @@ describe('#loadAssets', () => {
       chainId: 1
     }
 
-    store.set('main.balances', account, [balance])
-
-    const priceData = { usd: { price: 3815.91 } }
     store.set('main.networksMeta.ethereum.1.nativeCurrency', priceData)
+    store.set('main.balances', account, [balance])
 
     expect(loadAssets(account)).toEqual({
       nativeCurrency: [{ ...balance, currencyInfo: priceData }],
@@ -31,16 +30,15 @@ describe('#loadAssets', () => {
   })
 
   it('loads token assets', () => {
+    const priceData = { usd: { price: 225.35 } }
     const balance = {
       symbol: 'OHM',
       balance: '0x606401fc9',
       address: '0x383518188c0c6d7730d91b2c03a03c837814a899'
     }
   
-    store.set('main.balances', account, [balance])
-
-    const priceData = { usd: { price: 225.35 } }
     store.set('main.rates', balance.address, priceData)
+    store.set('main.balances', account, [balance])
 
     expect(loadAssets(account)).toEqual({
       nativeCurrency: [],
