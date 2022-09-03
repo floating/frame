@@ -24,8 +24,7 @@ jest.mock('../../../main/provider/helpers', () => {
 
   return {
     ...helpers,
-    hasPermission: jest.fn(),
-    getActiveChains: jest.fn()
+    hasPermission: jest.fn()
   }
 })
 
@@ -1365,12 +1364,30 @@ describe('state change events', () => {
   })
 
   describe('#chainsChanged', () => {
+    const networks = {
+      1: {
+        name: 'test',
+        id: 1,
+        on: true
+      },
+      4: {
+        name: 'rinkeby',
+        id: 4,
+        on: true
+      },
+      10: {
+        name: 'optimism',
+        id: 10,
+        on: false
+      }
+    }
+
     const subscription = { id: '0x9509a964a8d24a17fcfc7b77fc575b71' }
 
     beforeEach(() => {
       provider.subscriptions.chainsChanged = [subscription]
 
-      getActiveChains.mockReturnValue([1, 4])
+      store.set('main.networks.ethereum', networks)
 
       store.getObserver('provider:chains').fire()
     })
@@ -1384,7 +1401,13 @@ describe('state change events', () => {
         done()
       })
 
-      getActiveChains.mockReturnValue([1, 4, 137])
+      const polygon = {
+        name: 'polygon',
+        id: 137,
+        on: true
+      }
+
+      store.set('main.networks.ethereum', { ...networks, 137: polygon })
 
       store.getObserver('provider:chains').fire()
     })
@@ -1398,7 +1421,7 @@ describe('state change events', () => {
         done()
       })
 
-      getActiveChains.mockReturnValue([1])
+      store.set('main.networks.ethereum', { 1: networks[1] })
 
       store.getObserver('provider:chains').fire()
     })
