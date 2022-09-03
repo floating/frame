@@ -11,6 +11,8 @@ import AdjustFeeComponent from '../../../../../../../../app/App/Main/Account/Req
 jest.mock('../../../../../../../../main/store/persist')
 jest.mock('../../../../../../../../resources/link', () => ({ rpc: jest.fn() }))
 
+const hexStr = (val) => `0x${BigNumber(val).times(1e9).toString(16)}`
+
 const AdjustFee = Restore.connect(AdjustFeeComponent, store)
 let req
 
@@ -77,7 +79,7 @@ describe('base fee input', () => {
       advanceTimers(500)
       
       expect(baseFeeInput.value).toBe(spec.submitted)
-      expect(link.rpc).toHaveBeenCalledWith('setBaseFee', `0x${BigNumber(spec.submitted).times(1e9).toString(16)}`, '1', expect.any(Function))
+      expect(link.rpc).toHaveBeenCalledWith('setBaseFee', hexStr(spec.submitted), '1', expect.any(Function))
     })
   })
 
@@ -106,11 +108,92 @@ describe('base fee input', () => {
     expect(link.rpc).not.toHaveBeenCalled()
   })
 
-  // arrow up increments
-  // arrow down decrements
-  // arrow up hitting limit does not increment
-  // arrow down hitting limit does not decrement
-  // enter key calls blur
+  it('increments integer values when the up arrow key is pressed', async () => {
+    const { user, getByLabelText } = setupComponent(<AdjustFee req={req} />)
+    const baseFeeInput = getByLabelText('Base Fee (GWEI)')
+
+    await user.type(baseFeeInput, '{ArrowUp}')
+    
+    advanceTimers(500)
+
+    expect(baseFeeInput.value).toBe('5')
+    expect(link.rpc).toHaveBeenCalledWith('setBaseFee', hexStr(5), '1', expect.any(Function))
+  })
+
+  it('increments float values when the up arrow key is pressed', async () => {
+    const { user, getByLabelText } = setupComponent(<AdjustFee req={req} />)
+    const baseFeeInput = getByLabelText('Base Fee (GWEI)')
+
+    await user.clear(baseFeeInput)
+    await user.type(baseFeeInput, '1.5{ArrowUp}')
+    
+    advanceTimers(500)
+
+    expect(baseFeeInput.value).toBe('2.5')
+    expect(link.rpc).toHaveBeenCalledWith('setBaseFee', hexStr(2.5), '1', expect.any(Function))
+  })
+
+  it('does not increment values above the upper limit', async () => {
+    const { user, getByLabelText } = setupComponent(<AdjustFee req={req} />)
+    const baseFeeInput = getByLabelText('Base Fee (GWEI)')
+
+    await user.clear(baseFeeInput)
+    await user.type(baseFeeInput, '9998{ArrowUp}{ArrowUp}{ArrowUp}')
+    
+    advanceTimers(500)
+
+    expect(baseFeeInput.value).toBe('9999')
+    expect(link.rpc).toHaveBeenCalledWith('setBaseFee', hexStr(9999), '1', expect.any(Function))
+  })
+
+  it('decrements integer values when the down arrow key is pressed', async () => {
+    const { user, getByLabelText } = setupComponent(<AdjustFee req={req} />)
+    const baseFeeInput = getByLabelText('Base Fee (GWEI)')
+
+    await user.type(baseFeeInput, '{ArrowDown}')
+    
+    advanceTimers(500)
+
+    expect(baseFeeInput.value).toBe('3')
+    expect(link.rpc).toHaveBeenCalledWith('setBaseFee', hexStr(3), '1', expect.any(Function))
+  })
+
+  it('decrements float values when the down arrow key is pressed', async () => {
+    const { user, getByLabelText } = setupComponent(<AdjustFee req={req} />)
+    const baseFeeInput = getByLabelText('Base Fee (GWEI)')
+
+    await user.clear(baseFeeInput)
+    await user.type(baseFeeInput, '2.5{ArrowDown}')
+    
+    advanceTimers(500)
+
+    expect(baseFeeInput.value).toBe('1.5')
+    expect(link.rpc).toHaveBeenCalledWith('setBaseFee', hexStr(1.5), '1', expect.any(Function))
+  })
+
+  it('does not decrement values below the lower limit', async () => {
+    const { user, getByLabelText } = setupComponent(<AdjustFee req={req} />)
+    const baseFeeInput = getByLabelText('Base Fee (GWEI)')
+
+    await user.clear(baseFeeInput)
+    await user.type(baseFeeInput, '1{ArrowDown}{ArrowDown}{ArrowDown}')
+    
+    advanceTimers(500)
+
+    expect(baseFeeInput.value).toBe('0')
+    expect(link.rpc).toHaveBeenCalledWith('setBaseFee', hexStr(0), '1', expect.any(Function))
+  })
+
+  it('blurs the input when the enter key is pressed', async () => {
+    const { user, getByLabelText } = setupComponent(<AdjustFee req={req} />)
+    const baseFeeInput = getByLabelText('Base Fee (GWEI)')
+
+    await user.clear(baseFeeInput)
+    await user.type(baseFeeInput, '5{Enter}')
+
+    expect(document.activeElement).not.toEqual(baseFeeInput);
+  })
+
   // base fee clobbered
 })
 
@@ -135,7 +218,7 @@ describe('priority fee input', () => {
       advanceTimers(500)
       
       expect(priorityFeeInput.value).toBe(spec.submitted)
-      expect(link.rpc).toHaveBeenCalledWith('setPriorityFee', `0x${BigNumber(spec.submitted).times(1e9).toString(16)}`, '1', expect.any(Function))
+      expect(link.rpc).toHaveBeenCalledWith('setPriorityFee', hexStr(spec.submitted), '1', expect.any(Function))
     })
   })
 
@@ -164,11 +247,92 @@ describe('priority fee input', () => {
     expect(link.rpc).not.toHaveBeenCalled()
   })
 
-  // arrow up increments
-  // arrow down decrements
-  // arrow up hitting limit does not increment
-  // arrow down hitting limit does not decrement
-  // enter key calls blur
+  it('increments integer values when the up arrow key is pressed', async () => {
+    const { user, getByLabelText } = setupComponent(<AdjustFee req={req} />)
+    const priorityFeeInput = getByLabelText('Max Priority Fee (GWEI)')
+
+    await user.type(priorityFeeInput, '{ArrowUp}')
+    
+    advanceTimers(500)
+
+    expect(priorityFeeInput.value).toBe('4')
+    expect(link.rpc).toHaveBeenCalledWith('setPriorityFee', hexStr(4), '1', expect.any(Function))
+  })
+
+  it('increments float values when the up arrow key is pressed', async () => {
+    const { user, getByLabelText } = setupComponent(<AdjustFee req={req} />)
+    const priorityFeeInput = getByLabelText('Max Priority Fee (GWEI)')
+
+    await user.clear(priorityFeeInput)
+    await user.type(priorityFeeInput, '1.5{ArrowUp}')
+    
+    advanceTimers(500)
+
+    expect(priorityFeeInput.value).toBe('2.5')
+    expect(link.rpc).toHaveBeenCalledWith('setPriorityFee', hexStr(2.5), '1', expect.any(Function))
+  })
+
+  it('does not increment values above the upper limit', async () => {
+    const { user, getByLabelText } = setupComponent(<AdjustFee req={req} />)
+    const priorityFeeInput = getByLabelText('Max Priority Fee (GWEI)')
+
+    await user.clear(priorityFeeInput)
+    await user.type(priorityFeeInput, '9998{ArrowUp}{ArrowUp}{ArrowUp}')
+    
+    advanceTimers(500)
+
+    expect(priorityFeeInput.value).toBe('9999')
+    expect(link.rpc).toHaveBeenCalledWith('setPriorityFee', hexStr(9999), '1', expect.any(Function))
+  })
+
+  it('decrements integer values when the down arrow key is pressed', async () => {
+    const { user, getByLabelText } = setupComponent(<AdjustFee req={req} />)
+    const priorityFeeInput = getByLabelText('Max Priority Fee (GWEI)')
+
+    await user.type(priorityFeeInput, '{ArrowDown}')
+    
+    advanceTimers(500)
+
+    expect(priorityFeeInput.value).toBe('2')
+    expect(link.rpc).toHaveBeenCalledWith('setPriorityFee', hexStr(2), '1', expect.any(Function))
+  })
+
+  it('decrements float values when the down arrow key is pressed', async () => {
+    const { user, getByLabelText } = setupComponent(<AdjustFee req={req} />)
+    const priorityFeeInput = getByLabelText('Max Priority Fee (GWEI)')
+
+    await user.clear(priorityFeeInput)
+    await user.type(priorityFeeInput, '2.5{ArrowDown}')
+    
+    advanceTimers(500)
+
+    expect(priorityFeeInput.value).toBe('1.5')
+    expect(link.rpc).toHaveBeenCalledWith('setPriorityFee', hexStr(1.5), '1', expect.any(Function))
+  })
+
+  it('does not decrement values below the lower limit', async () => {
+    const { user, getByLabelText } = setupComponent(<AdjustFee req={req} />)
+    const priorityFeeInput = getByLabelText('Max Priority Fee (GWEI)')
+
+    await user.clear(priorityFeeInput)
+    await user.type(priorityFeeInput, '1{ArrowDown}{ArrowDown}{ArrowDown}')
+    
+    advanceTimers(500)
+
+    expect(priorityFeeInput.value).toBe('0')
+    expect(link.rpc).toHaveBeenCalledWith('setPriorityFee', hexStr(0), '1', expect.any(Function))
+  })
+
+  it('blurs the input when the enter key is pressed', async () => {
+    const { user, getByLabelText } = setupComponent(<AdjustFee req={req} />)
+    const priorityFeeInput = getByLabelText('Max Priority Fee (GWEI)')
+
+    await user.clear(priorityFeeInput)
+    await user.type(priorityFeeInput, '5{Enter}')
+
+    expect(document.activeElement).not.toEqual(priorityFeeInput);
+  })
+
   // priority fee clobbered
 })
 
@@ -207,11 +371,66 @@ describe('gas limit input', () => {
     expect(link.rpc).not.toHaveBeenCalled()
   })
 
-  // arrow up increments
-  // arrow down decrements
-  // arrow up hitting limit does not increment
-  // arrow down hitting limit does not decrement
-  // enter key calls blur
+  it('increments values when the up arrow key is pressed', async () => {
+    const { user, getByLabelText } = setupComponent(<AdjustFee req={req} />)
+    const gasLimitInput = getByLabelText('Gas Limit (UNITS)')
+
+    await user.type(gasLimitInput, '{ArrowUp}')
+    
+    advanceTimers(500)
+
+    expect(gasLimitInput.value).toBe('26000')
+    expect(link.rpc).toHaveBeenCalledWith('setGasLimit', '26000', '1', expect.any(Function))
+  })
+
+  it('does not increment values above the upper limit', async () => {
+    const { user, getByLabelText } = setupComponent(<AdjustFee req={req} />)
+    const gasLimitInput = getByLabelText('Gas Limit (UNITS)')
+
+    await user.clear(gasLimitInput)
+    await user.type(gasLimitInput, '12499000{ArrowUp}{ArrowUp}{ArrowUp}')
+    
+    advanceTimers(500)
+
+    expect(gasLimitInput.value).toBe('12500000')
+    expect(link.rpc).toHaveBeenCalledWith('setGasLimit', '12500000', '1', expect.any(Function))
+  })
+
+  it('decrements values when the down arrow key is pressed', async () => {
+    const { user, getByLabelText } = setupComponent(<AdjustFee req={req} />)
+    const gasLimitInput = getByLabelText('Gas Limit (UNITS)')
+
+    await user.type(gasLimitInput, '{ArrowDown}')
+    
+    advanceTimers(500)
+
+    expect(gasLimitInput.value).toBe('24000')
+    expect(link.rpc).toHaveBeenCalledWith('setGasLimit', '24000', '1', expect.any(Function))
+  })
+
+  it('does not decrement values below the lower limit', async () => {
+    const { user, getByLabelText } = setupComponent(<AdjustFee req={req} />)
+    const gasLimitInput = getByLabelText('Gas Limit (UNITS)')
+
+    await user.clear(gasLimitInput)
+    await user.type(gasLimitInput, '1000{ArrowDown}{ArrowDown}{ArrowDown}')
+    
+    advanceTimers(500)
+
+    expect(gasLimitInput.value).toBe('0')
+    expect(link.rpc).toHaveBeenCalledWith('setGasLimit', '0', '1', expect.any(Function))
+  })
+
+  it('blurs the input when the enter key is pressed', async () => {
+    const { user, getByLabelText } = setupComponent(<AdjustFee req={req} />)
+    const gasLimitInput = getByLabelText('Gas Limit (UNITS)')
+
+    await user.clear(gasLimitInput)
+    await user.type(gasLimitInput, '45000{Enter}')
+
+    expect(document.activeElement).not.toEqual(gasLimitInput);
+  })
+
   // gas limit clobbered
 })
 
@@ -262,7 +481,7 @@ describe('legacy transactions', () => {
         advanceTimers(500)
         
         expect(gasPriceInput.value).toBe(spec.submitted)
-        expect(link.rpc).toHaveBeenCalledWith('setGasPrice', `0x${BigNumber(spec.submitted).times(1e9).toString(16)}`, '1', expect.any(Function))
+        expect(link.rpc).toHaveBeenCalledWith('setGasPrice', hexStr(spec.submitted), '1', expect.any(Function))
       })
     })
   
@@ -291,11 +510,92 @@ describe('legacy transactions', () => {
       expect(link.rpc).not.toHaveBeenCalled()
     })
 
-    // arrow up increments
-    // arrow down decrements
-    // arrow up hitting limit does not increment
-    // arrow down hitting limit does not decrement
-    // enter key calls blur
+    it('increments integer values when the up arrow key is pressed', async () => {
+      const { user, getByLabelText } = setupComponent(<AdjustFee req={req} />)
+      const gasPriceInput = getByLabelText('Gas Price (GWEI)')
+  
+      await user.type(gasPriceInput, '{ArrowUp}')
+      
+      advanceTimers(500)
+  
+      expect(gasPriceInput.value).toBe('8')
+      expect(link.rpc).toHaveBeenCalledWith('setGasPrice', hexStr(8), '1', expect.any(Function))
+    })
+  
+    it('increments float values when the up arrow key is pressed', async () => {
+      const { user, getByLabelText } = setupComponent(<AdjustFee req={req} />)
+      const gasPriceInput = getByLabelText('Gas Price (GWEI)')
+  
+      await user.clear(gasPriceInput)
+      await user.type(gasPriceInput, '1.5{ArrowUp}')
+      
+      advanceTimers(500)
+  
+      expect(gasPriceInput.value).toBe('2.5')
+      expect(link.rpc).toHaveBeenCalledWith('setGasPrice', hexStr(2.5), '1', expect.any(Function))
+    })
+  
+    it('does not increment values above the upper limit', async () => {
+      const { user, getByLabelText } = setupComponent(<AdjustFee req={req} />)
+      const gasPriceInput = getByLabelText('Gas Price (GWEI)')
+  
+      await user.clear(gasPriceInput)
+      await user.type(gasPriceInput, '9998{ArrowUp}{ArrowUp}{ArrowUp}')
+      
+      advanceTimers(500)
+  
+      expect(gasPriceInput.value).toBe('9999')
+      expect(link.rpc).toHaveBeenCalledWith('setGasPrice', hexStr(9999), '1', expect.any(Function))
+    })
+  
+    it('decrements integer values when the down arrow key is pressed', async () => {
+      const { user, getByLabelText } = setupComponent(<AdjustFee req={req} />)
+      const gasPriceInput = getByLabelText('Gas Price (GWEI)')
+  
+      await user.type(gasPriceInput, '{ArrowDown}')
+      
+      advanceTimers(500)
+  
+      expect(gasPriceInput.value).toBe('6')
+      expect(link.rpc).toHaveBeenCalledWith('setGasPrice', hexStr(6), '1', expect.any(Function))
+    })
+  
+    it('decrements float values when the down arrow key is pressed', async () => {
+      const { user, getByLabelText } = setupComponent(<AdjustFee req={req} />)
+      const gasPriceInput = getByLabelText('Gas Price (GWEI)')
+  
+      await user.clear(gasPriceInput)
+      await user.type(gasPriceInput, '2.5{ArrowDown}')
+      
+      advanceTimers(500)
+  
+      expect(gasPriceInput.value).toBe('1.5')
+      expect(link.rpc).toHaveBeenCalledWith('setGasPrice', hexStr(1.5), '1', expect.any(Function))
+    })
+  
+    it('does not decrement values below the lower limit', async () => {
+      const { user, getByLabelText } = setupComponent(<AdjustFee req={req} />)
+      const gasPriceInput = getByLabelText('Gas Price (GWEI)')
+  
+      await user.clear(gasPriceInput)
+      await user.type(gasPriceInput, '1{ArrowDown}{ArrowDown}{ArrowDown}')
+      
+      advanceTimers(500)
+  
+      expect(gasPriceInput.value).toBe('0')
+      expect(link.rpc).toHaveBeenCalledWith('setGasPrice', hexStr(0), '1', expect.any(Function))
+    })
+  
+    it('blurs the input when the enter key is pressed', async () => {
+      const { user, getByLabelText } = setupComponent(<AdjustFee req={req} />)
+      const gasPriceInput = getByLabelText('Gas Price (GWEI)')
+  
+      await user.clear(gasPriceInput)
+      await user.type(gasPriceInput, '5{Enter}')
+  
+      expect(document.activeElement).not.toEqual(gasPriceInput);
+    })
+    
     // gas price clobbered
     // gas limit clobbered
   })
