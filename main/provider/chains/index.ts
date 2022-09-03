@@ -1,5 +1,15 @@
-import { arraysMatch } from '../../resources/utils'
-import { getActiveChains } from '../provider/helpers'
+import { arraysMatch } from '../../../resources/utils'
+import store from '../../store'
+
+// typed access to state
+const storeApi = {
+  getCurrentOrigins: (): Record<string, Origin> => {
+    return store('main.origins')
+  },
+  getChains: (): Record<string, Network> => {
+    return store('main.networks.ethereum') || {}
+  }
+}
 
 interface ChainsChangedHandler {
   chainsChanged: (chainIds: number[]) => void
@@ -13,7 +23,7 @@ interface NetworkChangedHandler {
   networkChanged: (networkId: number, originId: string) => void
 }
 
-export function ChainsChangeObserver (handler: ChainsChangedHandler) {
+function createChainsObserver (handler: ChainsChangedHandler) {
   let availableChains = getActiveChains()
 
   return function () {
@@ -26,11 +36,11 @@ export function ChainsChangeObserver (handler: ChainsChangedHandler) {
   }
 }
 
-export function OriginChainChangeObserver (handler: ChainChangedHandler & NetworkChangedHandler, store: Store) {
+function createOriginChainObserver (handler: ChainChangedHandler & NetworkChangedHandler) {
   let knownOrigins: Record<string, Origin> = {}
 
   return function () {
-    const currentOrigins = store('main.origins') as Record<string, Origin>
+    const currentOrigins = storeApi.getCurrentOrigins()
 
     for (const originId in currentOrigins) {
       const currentOrigin = currentOrigins[originId]
@@ -45,3 +55,14 @@ export function OriginChainChangeObserver (handler: ChainChangedHandler & Networ
     }
   }
 }
+
+function getActiveChains () {
+  const chains = storeApi.getChains()
+  
+  return Object.values(chains)
+    .filter(chain => chain.on)
+    .map(chain => chain.id)
+    .sort((a, b) => a - b)
+}
+
+export { getActiveChains, createChainsObserver, createOriginChainObserver }

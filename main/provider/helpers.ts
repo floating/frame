@@ -144,15 +144,6 @@ export function hasPermission (address: string, originId: string) {
 
   return permission?.provider
 }
-  
-export function getActiveChains () {
-  const chains: Record<string, Network> = store('main.networks.ethereum') || {}
-  
-  return Object.values(chains)
-    .filter(chain => chain.on)
-    .map(chain => chain.id)
-    .sort((a, b) => a - b)
-}
 
 export function getActiveChainsFull () {
   const chains: Record<string, Network> = store('main.networks.ethereum') || {}
@@ -190,10 +181,6 @@ export function getActiveChainDetails () {
         name: chain.name
       })
     })
-}  
-
-export function getChains (payload: JSONRPCRequestPayload, res: RPCSuccessCallback) {
-  res({ id: payload.id, jsonrpc: payload.jsonrpc, result: getActiveChains().map(intToHex) })
 }
 
 export function getChainDetails (payload: JSONRPCRequestPayload, res: RPCSuccessCallback) {

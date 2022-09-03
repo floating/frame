@@ -24,9 +24,15 @@ import { populate as populateTransaction, maxFee } from '../transaction'
 import FrameAccount from '../accounts/Account'
 import { capitalize } from '../../resources/utils'
 import { ApprovalType } from '../../resources/constants'
-import { checkExistingNonceGas, ecRecover, feeTotalOverMax, gasFees, getChains, getChainDetails, getPermissions, getRawTx, getSignedAddress, isCurrentAccount, requestPermissions, resError, hasPermission } from './helpers'
-import { ChainsChangeObserver, OriginChainChangeObserver } from '../observers'
+import { checkExistingNonceGas, ecRecover, feeTotalOverMax, gasFees, getChainDetails, getPermissions, getRawTx, getSignedAddress, isCurrentAccount, requestPermissions, resError, hasPermission } from './helpers'
 import { createObserver as AssetsObserver, loadAssets } from './assets'
+
+import {
+  createChainsObserver as ChainsObserver,
+  createOriginChainObserver as OriginChainObserver,
+  getActiveChains
+} from './chains'
+
 
 type Subscription = {
   id: string
@@ -745,6 +751,10 @@ export class Provider extends EventEmitter {
     return getPayloadOrigin(payload).chain
   }
 
+  private getChains (payload: JSONRPCRequestPayload, res: RPCSuccessCallback) {
+    res({ id: payload.id, jsonrpc: payload.jsonrpc, result: getActiveChains().map(intToHex) })
+  }
+
   private getAssets (payload: RPC.GetAssets.Request, currentAccount: FrameAccount | null, cb: RPCCallback<RPC.GetAssets.Response>) {
     if (!currentAccount) return resError('no account selected', payload, cb)
 
@@ -818,7 +828,7 @@ export class Provider extends EventEmitter {
     if (method === 'wallet_getPermissions') return getPermissions(payload, res)
     if (method === 'wallet_requestPermissions') return requestPermissions(payload, res)
     if (method === 'wallet_watchAsset') return this.addCustomToken(payload, res, targetChain)
-    if (method === 'wallet_getChains') return getChains(payload, res)
+    if (method === 'wallet_getChains') return this.getChains(payload, res)
     if (method === 'wallet_getChainDetails') return getChainDetails(payload, res)
     if (method === 'wallet_getAssets') return this.getAssets(payload as RPC.GetAssets.Request, accounts.current(), res as RPCCallback<RPC.GetAssets.Response>)
 
@@ -840,8 +850,8 @@ export class Provider extends EventEmitter {
 
 const provider = new Provider()
 
-store.observer(ChainsChangeObserver(provider), 'provider:chains')
-store.observer(OriginChainChangeObserver(provider, store), 'provider:origins')
+store.observer(ChainsObserver(provider), 'provider:chains')
+store.observer(OriginChainObserver(provider), 'provider:origins')
 store.observer(AssetsObserver(provider), 'provider:assets')
 
 export default provider
