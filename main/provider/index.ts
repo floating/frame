@@ -22,9 +22,31 @@ import { getType as getSignerType, Type as SignerType } from '../signers/Signer'
 import { TransactionData } from '../../resources/domain/transaction'
 import { populate as populateTransaction, maxFee } from '../transaction'
 import FrameAccount from '../accounts/Account'
-import { capitalize, arraysMatch } from '../../resources/utils'
+import { capitalize } from '../../resources/utils'
 import { ApprovalType } from '../../resources/constants'
-import { checkExistingNonceGas, ecRecover, feeTotalOverMax, gasFees, getActiveChains, getAssets, getChains, getChainDetails, getPermissions, getRawTx, getSignedAddress, isCurrentAccount, isScanning, loadAssets, requestPermissions, resError, hasPermission } from './helpers'
+import { createObserver as AssetsObserver, loadAssets } from './assets'
+
+import {
+  checkExistingNonceGas,
+  ecRecover,
+  feeTotalOverMax,
+  gasFees,
+  getChainDetails,
+  getPermissions,
+  getRawTx,
+  getSignedAddress,
+  isCurrentAccount,
+  requestPermissions,
+  resError,
+  hasPermission
+} from './helpers'
+
+import {
+  createChainsObserver as ChainsObserver,
+  createOriginChainObserver as OriginChainObserver,
+  getActiveChains
+} from './chains'
+
 
 type Subscription = {
   id: string
@@ -743,6 +765,23 @@ export class Provider extends EventEmitter {
     return getPayloadOrigin(payload).chain
   }
 
+  private getChains (payload: JSONRPCRequestPayload, res: RPCSuccessCallback) {
+    res({ id: payload.id, jsonrpc: payload.jsonrpc, result: getActiveChains().map(intToHex) })
+  }
+
+  private getAssets (payload: RPC.GetAssets.Request, currentAccount: FrameAccount | null, cb: RPCCallback<RPC.GetAssets.Response>) {
+    if (!currentAccount) return resError('no account selected', payload, cb)
+
+    try {
+      const { nativeCurrency, erc20 } = loadAssets(currentAccount.id)
+      const { id, jsonrpc } = payload
+      
+      return cb({ id, jsonrpc, result: { nativeCurrency, erc20 }})
+    } catch (e) {
+      return resError({ message: (e as Error).message, code: 5901 }, payload, cb)
+    }
+  }
+
   sendAsync (payload: RPCRequestPayload, cb: Callback<RPCResponsePayload>) {
     this.send(payload, res => {
       if (res.error) {
@@ -803,9 +842,9 @@ export class Provider extends EventEmitter {
     if (method === 'wallet_getPermissions') return getPermissions(payload, res)
     if (method === 'wallet_requestPermissions') return requestPermissions(payload, res)
     if (method === 'wallet_watchAsset') return this.addCustomToken(payload, res, targetChain)
-    if (method === 'wallet_getChains') return getChains(payload, res)
+    if (method === 'wallet_getChains') return this.getChains(payload, res)
     if (method === 'wallet_getChainDetails') return getChainDetails(payload, res)
-    if (method === 'wallet_getAssets') return getAssets(payload as RPC.GetAssets.Request, accounts.current(), res as RPCCallback<RPC.GetAssets.Response>)
+    if (method === 'wallet_getAssets') return this.getAssets(payload as RPC.GetAssets.Request, accounts.current(), res as RPCCallback<RPC.GetAssets.Response>)
 
     // Connection dependent methods need to pass targetChain
     if (method === 'net_version') return this.getNetVersion(payload, res, targetChain)
@@ -824,52 +863,9 @@ export class Provider extends EventEmitter {
 }
 
 const provider = new Provider()
-let knownOrigins: Record<string, Origin> = {}
-let availableChains = getActiveChains()
 
-store.observer(() => {
-  const currentOrigins = store('main.origins') as Record<string, Origin>
-  const currentChains = getActiveChains()
-
-  for (const originId in currentOrigins) {
-    const currentOrigin = currentOrigins[originId]
-    const knownOrigin = knownOrigins[originId]
-
-    if (knownOrigin && knownOrigin.chain.id !== currentOrigin.chain.id) {
-      provider.chainChanged(currentOrigin.chain.id, originId)
-      provider.networkChanged(currentOrigin.chain.id, originId)
-    }
-
-    knownOrigins[originId] = currentOrigin
-  }
-
-  if (!arraysMatch(currentChains, availableChains)) {
-    availableChains = currentChains
-    provider.chainsChanged(availableChains)
-  }
-}, 'provider:chains')
-
-let debouncedAssets: RPC.GetAssets.Assets | null = null
-
-store.observer(() => {
-  const currentAccountId = store('selected.current')
-
-  if (currentAccountId) {
-    const assets = loadAssets(currentAccountId)
-
-    if (!isScanning(currentAccountId) && (assets.erc20.length > 0 || assets.nativeCurrency.length > 0)) {
-      if (!debouncedAssets) {
-        setTimeout(() => {
-          if (debouncedAssets) {
-            provider.assetsChanged(currentAccountId, debouncedAssets)
-            debouncedAssets = null
-          }
-        }, 800)
-      }
-
-      debouncedAssets = assets
-    }
-  }
-}, 'provider:account')
+store.observer(ChainsObserver(provider), 'provider:chains')
+store.observer(OriginChainObserver(provider), 'provider:origins')
+store.observer(AssetsObserver(provider), 'provider:assets')
 
 export default provider

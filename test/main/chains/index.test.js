@@ -141,7 +141,10 @@ const mockConnections = {
 }
 
 let chains
+
 beforeAll(async () => {
+  jest.useRealTimers()
+
   // need to import this after mocks are set up
   chains = (await import('../../../main/chains')).default
 })
