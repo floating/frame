@@ -128,7 +128,7 @@ describe('#createObserver', () => {
     expect(handler.assetsChanged).not.toHaveBeenCalled()
   })
 
-  it('does not invoke the handler while scanning', async () => {
+  it('does not invoke the handler while scanning', () => {
     const yesterday = new Date()
     yesterday.setDate(yesterday.getDate() - 1)
 
