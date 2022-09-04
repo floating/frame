@@ -435,37 +435,62 @@ describe('#send', () => {
     })
   })
 
-  describe('#wallet_getChains', () => {
+  describe('#wallet_getEthereumChains', () => {
     it('returns a list of active chains', () => {
       store.set('main.networks.ethereum', {
-        137: { name: 'polygon', id: 137, on: true },
-        4: { name: 'rinkeby', id: 4, on: false },
-        1: { name: 'mainnet', id: 1, on: true }
+        137: { name: 'polygon', id: 137, explorer: 'https://polygonscan.com', on: true },
+        1: { name: 'mainnet', id: 1, explorer: 'https://etherscan.io', on: true }
       })
-      send({ method: 'wallet_getChains', id: 14, jsonrpc: '2.0' }, response => {
-        expect(response.error).toBe(undefined)
-        expect(response.id).toBe(14)
-        expect(response.jsonrpc).toBe('2.0')
-        expect(response.result).toEqual(['0x1', '0x89'])
-      })
-    })
-  })
 
-  describe('#wallet_getChainDetails', () => {
-    it('returns a list of active chain details', () => {
-      store.set('main.networks.ethereum', {
-        137: { name: 'polygon', id: 137, on: true },
-        4: { name: 'rinkeby', id: 4, on: false },
-        1: { name: 'mainnet', id: 1, on: true }
+      store.set('main.networksMeta.ethereum', {
+        1: {
+          nativeCurrency: {
+            name: 'Ether',
+            symbol: 'ETH',
+            decimals: 18,
+            icon: 'ethereum'
+          }
+        },
+        137: {
+          nativeCurrency: {
+            name: 'Matic',
+            symbol: 'MATIC',
+            decimals: 18,
+            icon: 'matic'
+          }
+        }
       })
-      send({ method: 'wallet_getChainDetails', id: 14, jsonrpc: '2.0' }, response => {
+
+      send({ method: 'wallet_getEthereumChains', id: 14, jsonrpc: '2.0' }, response => {
         expect(response.error).toBe(undefined)
         expect(response.id).toBe(14)
         expect(response.jsonrpc).toBe('2.0')
-        expect(response.result[0].id).toEqual('0x1')
-        expect(response.result[0].name).toEqual('mainnet')
-        expect(response.result[1].id).toEqual('0x89')
-        expect(response.result[1].name).toEqual('polygon')
+        expect(response.result).toStrictEqual([
+          {
+            name: 'mainnet',
+            chainId: 1,
+            networkId: 1,
+            icon: 'ethereum',
+            explorers: [{ url: 'https://etherscan.io' }],
+            nativeCurrency: {
+              name: 'Ether',
+              symbol: 'ETH',
+              decimals: 18
+            }
+          },
+          {
+            name: 'polygon',
+            chainId: 137,
+            networkId: 137,
+            icon: 'matic',
+            explorers: [{ url: 'https://polygonscan.com' }],
+            nativeCurrency: {
+              name: 'Matic',
+              symbol: 'MATIC',
+              decimals: 18
+            }
+          }
+        ])
       })
     })
   })
@@ -1402,22 +1427,25 @@ describe('state change events', () => {
       1: {
         name: 'test',
         id: 1,
+        explorer: 'https://etherscan.io',
         on: true
-      },
-      4: {
-        name: 'rinkeby',
-        id: 4,
-        on: true
-      },
-      10: {
-        name: 'optimism',
-        id: 10,
-        on: false
+      }
+    }
+
+    const networksMeta = {
+      1: {
+        nativeCurrency: {
+          name: 'Ether',
+          symbol: 'ETH',
+          decimals: 18,
+          icon: 'ethereum'
+        }
       }
     }
 
     // set the known state to compare the test event to
     store.set('main.networks.ethereum', networks)
+    store.set('main.networksMeta.ethereum', networksMeta)
     store.getObserver('provider:chains').fire()
 
     provider.subscriptions.chainsChanged = [subscription]
@@ -1425,17 +1453,45 @@ describe('state change events', () => {
       expect(event.method).toBe('eth_subscription')
       expect(event.jsonrpc).toBe('2.0')
       expect(event.params.subscription).toBe(subscription.id)
-      expect(event.params.result).toEqual(['0x1', '0x4', '0x89'])
+      expect(event.params.result).toStrictEqual([
+        {
+          name: 'test',
+          chainId: 1,
+          networkId: 1,
+          icon: 'ethereum',
+          explorers: [{ url: 'https://etherscan.io' }],
+          nativeCurrency: {
+            name: 'Ether',
+            symbol: 'ETH',
+            decimals: 18
+          }
+        },
+        {
+          name: 'Polygon',
+          chainId: 137,
+          networkId: 137,
+          icon: undefined,
+          explorers: [{ url: 'https://polygonscan.com' }],
+          nativeCurrency: {
+            name: 'Matic',
+            symbol: 'MATIC',
+            decimals: 18
+          }
+        }
+      ])
+
       done()
     })
 
     const polygon = {
-      name: 'polygon',
+      name: 'Polygon',
       id: 137,
+      explorer: 'https://polygonscan.com',
       on: true
     }
 
     store.set('main.networks.ethereum', { ...networks, 137: polygon })
+    store.set('main.networksMeta.ethereum', { ...networksMeta, 137: { nativeCurrency: { symbol: 'MATIC', name: 'Matic', decimals: 18 }} })
 
     store.getObserver('provider:chains').fire()
   })

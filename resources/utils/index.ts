@@ -31,6 +31,10 @@ function arraysMatch <T> (a: T[] = [], b: T[] = []) {
   )
 }
 
+function objectsEqual (o1: object, o2: object) {
+  return JSON.stringify(o1) === JSON.stringify(o2)
+}
+
 function debounce (func: (...args: any) => any, timeout = 300) {
   let timer: NodeJS.Timeout
 
@@ -61,6 +65,7 @@ export {
   getErrorCode,
   randomLetters,
   capitalize,
+  objectsEqual,
   arraysEqual,
   arraysMatch,
   debounce,

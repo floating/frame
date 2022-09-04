@@ -3,6 +3,13 @@ import store from '../../../../main/store'
 
 jest.mock('../../../../main/store', () => jest.fn())
 
+const ether = {
+  name: 'Ether',
+  symbol: 'ETH',
+  icon: 'https://assets.coingecko.com/coins/images/ethereum.png',
+  decimals: 18
+}
+
 const chains = {
   '1': {
     name: 'Ethereum Mainnet',
@@ -11,8 +18,9 @@ const chains = {
     on: true
   },
   '4': {
-    name: 'Rinkeby',
+    name: 'Ethereum Testnet Rinkeby',
     id: 4,
+    explorer: 'https://rinkeby.etherscan.io',
     on: true
   },
   '137': {
@@ -24,14 +32,13 @@ const chains = {
 
 const chainMeta = {
   '1': {
+    nativeCurrency: ether
+  },
+  '4': {
     nativeCurrency: {
-      name: 'Ether',
-      symbol: 'ETH',
-      icon: 'https://assets.coingecko.com/coins/images/ethereum.png',
-      decimals: 18
+      ...ether, name: 'Rinkeby Ether'
     }
   },
-  '4': { nativeCurrency: {} },
   '137': { nativeCurrency: {} }
 }
 
@@ -74,12 +81,65 @@ describe('#createChainsObserver', () => {
     handler.chainsChanged = jest.fn()
   })
 
-  it('invokes the handler when a chain is added', () => {
-    setChains({ ...chains, '10': { name: 'Optimism', id: 10, on: true }})
+  it('invokes the handler with EVM chain objects', () => {
+    const optimism = { name: 'Optimism', id: 10, explorer: 'https://optimistic.etherscan.io', on: true }
+
+    setChains({ ...chains, '10': optimism}, { ...chainMeta, '10': { nativeCurrency: ether }})
 
     observer()
 
-    expect(handler.chainsChanged).toHaveBeenCalledWith([1, 4, 10])
+    expect(handler.chainsChanged).toHaveBeenCalledWith([
+      {
+        chainId: 1,
+        networkId: 1,
+        name: 'Ethereum Mainnet',
+        icon: 'https://assets.coingecko.com/coins/images/ethereum.png',
+        nativeCurrency: {
+          name: 'Ether',
+          symbol: 'ETH',
+          decimals: 18
+        },
+        explorers: [{
+          url: 'https://etherscan.io'
+        }]
+      }, {
+        chainId: 4,
+        networkId: 4,
+        name: 'Ethereum Testnet Rinkeby',
+        icon: 'https://assets.coingecko.com/coins/images/ethereum.png',
+        nativeCurrency: {
+          name: 'Rinkeby Ether',
+          symbol: 'ETH',
+          decimals: 18
+        },
+        explorers: [{
+          url: 'https://rinkeby.etherscan.io'
+        }]
+      }, {
+        chainId: 10,
+        networkId: 10,
+        name: 'Optimism',
+        icon: 'https://assets.coingecko.com/coins/images/ethereum.png',
+        nativeCurrency: {
+          name: 'Ether',
+          symbol: 'ETH',
+          decimals: 18
+        },
+        explorers: [{
+          url: 'https://optimistic.etherscan.io'
+        }]
+      }])
+  })
+
+  it('invokes the handler when a chain is added', () => {
+    const optimism = { name: 'Optimism', id: 10, explorer: 'https://optimistic.etherscan.io', on: true }
+
+    setChains({ ...chains, '10': optimism}, { ...chainMeta, '10': { nativeCurrency: ether }})
+
+    observer()
+
+    const changedChains = handler.chainsChanged.mock.calls[0][0]
+    expect(changedChains.map(c => c.chainId)).toEqual([1, 4, 10])
   })
   
   it('invokes the handler when a chain is removed', () => {
@@ -88,7 +148,8 @@ describe('#createChainsObserver', () => {
 
     observer()
 
-    expect(handler.chainsChanged).toHaveBeenCalledWith([1])
+    const changedChains = handler.chainsChanged.mock.calls[0][0]
+    expect(changedChains.map(c => c.chainId)).toEqual([1])
   })
   
   it('invokes the handler when a chain is activated', () => {
@@ -99,7 +160,8 @@ describe('#createChainsObserver', () => {
 
     observer()
 
-    expect(handler.chainsChanged).toHaveBeenCalledWith([1, 4, 137])
+    const changedChains = handler.chainsChanged.mock.calls[0][0]
+    expect(changedChains.map(c => c.chainId)).toEqual([1, 4, 137])
   })
   
   it('invokes the handler when a chain is deactivated', () => {
@@ -110,7 +172,8 @@ describe('#createChainsObserver', () => {
 
     observer()
 
-    expect(handler.chainsChanged).toHaveBeenCalledWith([1])
+    const changedChains = handler.chainsChanged.mock.calls[0][0]
+    expect(changedChains.map(c => c.chainId)).toEqual([1])
   })
 
   it('does not invoke the handler when no chains have changed', () => {
@@ -165,7 +228,7 @@ describe('#createOriginChainObserver', () => {
 
 // helper functions
 
-function setChains (chainState, chainMetaState) {
+function setChains (chainState, chainMetaState = chainMeta) {
   store.mockImplementation(node => {
     if (node === 'main.networks.ethereum') {
       return chainState

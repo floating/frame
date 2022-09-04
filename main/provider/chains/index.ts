@@ -1,4 +1,4 @@
-import { arraysMatch } from '../../../resources/utils'
+import { arraysMatch, objectsEqual } from '../../../resources/utils'
 import store from '../../store'
 
 // typed access to state
@@ -32,7 +32,7 @@ function createChainsObserver (handler: ChainsChangedHandler) {
   return function () {
     const currentChains = getActiveChains()
 
-    if (!arraysMatch(currentChains, availableChains)) {
+    if (!objectsEqual(currentChains, availableChains)) {
       availableChains = currentChains
       handler.chainsChanged(availableChains)
     }
