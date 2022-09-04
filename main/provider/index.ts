@@ -565,6 +565,10 @@ export class Provider extends EventEmitter {
         return resError('Malformed typedData.', payload, res)
       }
     }
+    
+    if (!Array.isArray(typedData) && !typedData.message) {
+      return resError('TypedData missing message', payload, res)
+    }
 
     const signerType = getSignerType(targetAccount.lastSignerType)
 
