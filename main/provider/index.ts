@@ -143,9 +143,7 @@ export class Provider extends EventEmitter {
   }
 
   // fires when the list of available chains changes
-  chainsChanged (availableChains: number[]) {
-    const chains = availableChains.map(intToHex)
-
+  chainsChanged (chains: RPC.GetChains.Chain[]) {
     this.subscriptions.chainsChanged.forEach((subscription) => this.sendSubscriptionData(subscription.id, chains))
   }
 
@@ -766,7 +764,7 @@ export class Provider extends EventEmitter {
   }
 
   private getChains (payload: JSONRPCRequestPayload, res: RPCSuccessCallback) {
-    res({ id: payload.id, jsonrpc: payload.jsonrpc, result: getActiveChains().map(intToHex) })
+    res({ id: payload.id, jsonrpc: payload.jsonrpc, result: getActiveChains() })
   }
 
   private getAssets (payload: RPC.GetAssets.Request, currentAccount: FrameAccount | null, cb: RPCCallback<RPC.GetAssets.Response>) {

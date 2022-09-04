@@ -8,11 +8,14 @@ const storeApi = {
   },
   getChains: (): Record<string, Network> => {
     return store('main.networks.ethereum') || {}
+  },
+  getChainsMeta: (): Record<string, NetworkMetadata> => {
+    return store('main.networksMeta.ethereum') || {}
   }
 }
 
 interface ChainsChangedHandler {
-  chainsChanged: (chainIds: number[]) => void
+  chainsChanged: (chains: RPC.GetChains.Chain[]) => void
 }
 
 interface ChainChangedHandler {
@@ -56,13 +59,31 @@ function createOriginChainObserver (handler: ChainChangedHandler & NetworkChange
   }
 }
 
-function getActiveChains () {
+function getActiveChains (): RPC.GetChains.Chain[] {
   const chains = storeApi.getChains()
+  const meta = storeApi.getChainsMeta()
   
   return Object.values(chains)
     .filter(chain => chain.on)
-    .map(chain => chain.id)
-    .sort((a, b) => a - b)
+    .sort((a, b) => a.id - b.id)
+    .map(chain => {
+      const { id, explorer, name } = chain
+      const metadata = meta[id]
+
+      const { nativeCurrency } = metadata
+      const { icon, name: currencyName, symbol, decimals } = nativeCurrency
+
+      return ({
+        chainId: id,
+        networkId: id,
+        name,
+        nativeCurrency: {
+          name: currencyName, symbol, decimals
+        },
+        icon,
+        explorers: [{ url: explorer }]
+      })
+    })
 }
 
 export { getActiveChains, createChainsObserver, createOriginChainObserver }

@@ -80,6 +80,38 @@ declare namespace RPC {
     }
   }
 
+  namespace GetChains {
+    interface NativeCurrency {
+      name: string
+      symbol: string
+      decimals: number
+    }
+
+    interface Explorer {
+      name?: string
+      icon?: string
+      url: string
+      standard?: string
+    }
+
+    interface Chain {
+      chainId: number
+      networkId: number
+      name: string
+      icon: string
+      nativeCurrency: NativeCurrency
+      explorers: Explorer[]
+    }
+
+    interface Request extends Omit<RPCRequestPayload, 'method'> {
+      method: 'wallet_getEthereumChains'
+    }
+
+    interface Response extends Omit<RPCResponsePayload, 'result'> {
+      result?: Chain[]
+    }
+  }
+
   namespace SendTransaction {
     interface TxParams {
       nonce?: string;

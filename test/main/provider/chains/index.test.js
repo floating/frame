@@ -4,18 +4,63 @@ import store from '../../../../main/store'
 jest.mock('../../../../main/store', () => jest.fn())
 
 const chains = {
-  '1': { name: 'Mainnet', id: 1, on: true },
-  '4': { name: 'Rinkeby', id: 4, on: true },
-  '137': { name: 'Polygon', id: 137, on: false }
+  '1': {
+    name: 'Ethereum Mainnet',
+    id: 1,
+    explorer: 'https://etherscan.io',
+    on: true
+  },
+  '4': {
+    name: 'Rinkeby',
+    id: 4,
+    on: true
+  },
+  '137': {
+    name: 'Polygon',
+    id: 137,
+    on: false
+  }
+}
+
+const chainMeta = {
+  '1': {
+    nativeCurrency: {
+      name: 'Ether',
+      symbol: 'ETH',
+      icon: 'https://assets.coingecko.com/coins/images/ethereum.png',
+      decimals: 18
+    }
+  },
+  '4': { nativeCurrency: {} },
+  '137': { nativeCurrency: {} }
 }
 
 beforeEach(() => {
-  setChains(chains)
+  setChains(chains, chainMeta)
 })
 
 describe('#getActiveChains', () => {
   it('returns all chains that are active', () => {
-    expect(getActiveChains()).toEqual([1, 4])
+    expect(getActiveChains().map(chain => chain.chainId)).toEqual([1, 4])
+  })
+
+  it('returns an EVM chain object', () => {
+    const mainnet = getActiveChains().find(chain => chain.chainId === 1)
+
+    expect(mainnet).toStrictEqual({
+      chainId: 1,
+      networkId: 1,
+      name: 'Ethereum Mainnet',
+      icon: 'https://assets.coingecko.com/coins/images/ethereum.png',
+      nativeCurrency: {
+        name: 'Ether',
+        symbol: 'ETH',
+        decimals: 18
+      },
+      explorers: [{
+        url: 'https://etherscan.io'
+      }]
+    })
   })
 })
 
@@ -120,10 +165,17 @@ describe('#createOriginChainObserver', () => {
 
 // helper functions
 
-function setChains (chainState) {
+function setChains (chainState, chainMetaState) {
   store.mockImplementation(node => {
-    expect(node).toBe('main.networks.ethereum')
-    return chainState
+    if (node === 'main.networks.ethereum') {
+      return chainState
+    }
+
+    if (node === 'main.networksMeta.ethereum') {
+      return chainMetaState
+    }
+
+    throw new Error('unexpected store access!')
   })
 }
 
