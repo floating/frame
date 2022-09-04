@@ -553,7 +553,7 @@ export class Provider extends EventEmitter {
     const targetAccount = accounts.get(from.toLowerCase())
 
     if (!targetAccount) {
-      return resError(`unknown account: ${from}`, payload, res)
+      return resError(`Unknown account: ${from}`, payload, res)
     }
 
     // HACK: Standards clearly say, that second param is an object but it seems like in the wild it can be a JSON-string.
@@ -562,12 +562,12 @@ export class Provider extends EventEmitter {
         typedData = JSON.parse(typedData)
         payload.params = [from, typedData, ...additionalParams]
       } catch (e) {
-        return resError('Malformed typedData.', payload, res)
+        return resError('Malformed typed data', payload, res)
       }
     }
     
     if (!Array.isArray(typedData) && !typedData.message) {
-      return resError('TypedData missing message', payload, res)
+      return resError('Typed data missing message', payload, res)
     }
 
     const signerType = getSignerType(targetAccount.lastSignerType)
