@@ -36,7 +36,9 @@ async function handleResponse <T> (p: Response<T>) {
   const response = await p
   
   if (response.success) return response.payload
-  throw { message: response.payload.error, code: response.payload.code }
+  const responseError = new Error(response.payload.error) as NodeJS.ErrnoException
+  responseError.code = response.payload.code
+  throw responseError
 }
 
 class TrezorBridge extends EventEmitter {
