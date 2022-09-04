@@ -1039,11 +1039,21 @@ describe('#send', () => {
       verifyRequest('V1')
     })
 
+    it('does not submit a request without a message', done => {
+      const params = [address, { ...typedData, message: undefined }]
+
+      send({ method: 'eth_signTypedData_v3', params }, err => {
+        expect(err.error.message).toBe('Typed data missing message')
+        expect(err.error.code).toBe(-1)
+        done()
+      })
+    })
+
     it('does not submit a request from an unknown account', done => {
       const params = ['0xa4581bfe76201f3aa147cce8e360140582260441', typedData]
 
       send({ method: 'eth_signTypedData_v3', params }, err => {
-        expect(err.error.message).toBeTruthy()
+        expect(err.error.message).toBe('Unknown account: 0xa4581bfe76201f3aa147cce8e360140582260441')
         expect(err.error.code).toBe(-1)
         done()
       })
@@ -1053,7 +1063,7 @@ describe('#send', () => {
       const params = [address, 'test']
 
       send({ method: 'eth_signTypedData_v3', params }, err => {
-        expect(err.error.message).toBeTruthy()
+        expect(err.error.message).toBe('Malformed typed data')
         expect(err.error.code).toBe(-1)
         done()
       })
