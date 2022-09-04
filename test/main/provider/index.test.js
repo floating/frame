@@ -995,21 +995,91 @@ describe('#send', () => {
   describe('#eth_signTypedData', () => {
     const typedData = {
       types: {
-          EIP712Domain: 'domain',
-          Bid: 'bid',
-          Identity: 'identity',
+        EIP712Domain: [
+          { name: 'name', type: 'string' },
+          { name: 'version', type: 'string' },
+          { name: 'chainId', type: 'uint256' },
+          { name: 'verifyingContract', type: 'address' }
+        ],
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address' }
+        ],
+        Mail: [
+          { name: 'from', type: 'Person' },
+          { name: 'to', type: 'Person' },
+          { name: 'contents', type: 'string' }
+        ]
       },
       domain: 'domainData',
-      primaryType: 'Bid',
+      primaryType: 'Mail',
       message: 'message'
+    }
+    const typedDataLegacy = [
+      {
+        type: 'string',
+        name: 'fullName',
+        value: 'Satoshi Nakamoto'
+      },
+      {
+        type: 'uint32',
+        name: 'userId',
+        value: '1212'
+      }
+    ]
+    const typedDataRecursive = { 
+      ...typedData,
+      types: {
+        EIP712Domain: [
+            { name: 'name', type: 'string' },
+            { name: 'version', type: 'string' },
+            { name: 'chainId', type: 'uint256' },
+            { name: 'verifyingContract', type: 'address' }
+        ],
+        Person: [
+            { name: 'name', type: 'string' },
+            { name: 'mother', type: 'Person' },
+            { name: 'father', type: 'Person' }
+        ]
+      }
+    }
+    const typedDataArrays = { 
+      ...typedData, 
+      types: {
+        EIP712Domain: [
+          { name: 'name', type: 'string' },
+          { name: 'version', type: 'string' },
+          { name: 'chainId', type: 'uint256' },
+          { name: 'verifyingContract', type: 'address' }
+        ],
+        Person: [
+            { name: 'name', type: 'string' },
+            { name: 'wallets', type: 'address[]' }
+        ],
+        Mail: [
+            { name: 'from', type: 'Person' },
+            { name: 'to', type: 'Person[]' },
+            { name: 'contents', type: 'string' }
+        ],
+        Group: [
+            { name: 'name', type: 'string' },
+            { name: 'members', type: 'Person[]' }
+        ]
+      }
     }
 
     const validRequests = [
-      { method: 'eth_signTypedData', params: [address, typedData], version: 'V1' },
+      { method: 'eth_signTypedData', params: [address, typedDataLegacy], version: 'V1' },
+      { method: 'eth_signTypedData', params: [address, typedData], version: 'V3' },
+      { method: 'eth_signTypedData', params: [address, typedDataRecursive], version: 'V4' },
+      { method: 'eth_signTypedData', params: [address, typedDataArrays], version: 'V4' },
       { method: 'eth_signTypedData_v1', params: [address, typedData], version: 'V1' },
       { method: 'eth_signTypedData_v3', params: [address, typedData], version: 'V3' },
       { method: 'eth_signTypedData_v4', params: [address, typedData], version: 'V4' },
-      { method: 'eth_signTypedData', params: [typedData, address], version: 'V1', dataFirst: true },
+      { method: 'eth_signTypedData', params: [typedDataLegacy, address], version: 'V1', dataFirst: true },
+      { method: 'eth_signTypedData', params: [typedData, address], version: 'V3', dataFirst: true },
+      { method: 'eth_signTypedData', params: [typedDataRecursive, address], version: 'V4', dataFirst: true },
+      { method: 'eth_signTypedData', params: [typedDataArrays, address], version: 'V4', dataFirst: true },
       { method: 'eth_signTypedData_v1', params: [typedData, address], version: 'V1', dataFirst: true },
       { method: 'eth_signTypedData_v3', params: [typedData, address], version: 'V3', dataFirst: true },
       { method: 'eth_signTypedData_v4', params: [typedData, address], version: 'V4', dataFirst: true }
