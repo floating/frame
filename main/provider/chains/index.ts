@@ -1,4 +1,4 @@
-import { arraysMatch, objectsEqual } from '../../../resources/utils'
+import { objectsEqual } from '../../../resources/utils'
 import store from '../../store'
 
 // typed access to state
