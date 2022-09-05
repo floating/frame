@@ -80,7 +80,7 @@ function getActiveChains (): RPC.GetEthereumChains.Chain[] {
         nativeCurrency: {
           name: currencyName, symbol, decimals
         },
-        icon,
+        icon: [{ url: icon }],
         explorers: [{ url: explorer }]
       })
     })

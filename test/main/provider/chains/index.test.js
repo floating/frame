@@ -58,7 +58,7 @@ describe('#getActiveChains', () => {
       chainId: 1,
       networkId: 1,
       name: 'Ethereum Mainnet',
-      icon: 'https://assets.coingecko.com/coins/images/ethereum.png',
+      icon: [{ url: 'https://assets.coingecko.com/coins/images/ethereum.png' }],
       nativeCurrency: {
         name: 'Ether',
         symbol: 'ETH',
@@ -93,7 +93,7 @@ describe('#createChainsObserver', () => {
         chainId: 1,
         networkId: 1,
         name: 'Ethereum Mainnet',
-        icon: 'https://assets.coingecko.com/coins/images/ethereum.png',
+        icon: [{ url: 'https://assets.coingecko.com/coins/images/ethereum.png' }],
         nativeCurrency: {
           name: 'Ether',
           symbol: 'ETH',
@@ -106,7 +106,7 @@ describe('#createChainsObserver', () => {
         chainId: 4,
         networkId: 4,
         name: 'Ethereum Testnet Rinkeby',
-        icon: 'https://assets.coingecko.com/coins/images/ethereum.png',
+        icon: [{ url: 'https://assets.coingecko.com/coins/images/ethereum.png' }],
         nativeCurrency: {
           name: 'Rinkeby Ether',
           symbol: 'ETH',
@@ -119,7 +119,7 @@ describe('#createChainsObserver', () => {
         chainId: 10,
         networkId: 10,
         name: 'Optimism',
-        icon: 'https://assets.coingecko.com/coins/images/ethereum.png',
+        icon: [{ url: 'https://assets.coingecko.com/coins/images/ethereum.png' }],
         nativeCurrency: {
           name: 'Ether',
           symbol: 'ETH',

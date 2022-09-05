@@ -81,6 +81,13 @@ declare namespace RPC {
   }
 
   namespace GetEthereumChains {
+    interface Icon {
+      url: string
+      width?: number
+      height?: number
+      format?: 'png' | 'jpg' | 'svg'
+    }
+
     interface NativeCurrency {
       name: string
       symbol: string
@@ -89,7 +96,7 @@ declare namespace RPC {
 
     interface Explorer {
       name?: string
-      icon?: string
+      icon?: Icon[]
       url: string
       standard?: string
     }
@@ -98,7 +105,7 @@ declare namespace RPC {
       chainId: number
       networkId: number
       name: string
-      icon: string
+      icon: Icon[]
       nativeCurrency: NativeCurrency
       explorers: Explorer[]
     }
