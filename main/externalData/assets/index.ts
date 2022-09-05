@@ -19,6 +19,7 @@ interface ChainUpdate {
       symbol: string
       iconURI: string
       name: string
+      decimals?: number
     }
   }
 }
@@ -79,13 +80,13 @@ export default function rates (pylon: Pylon, store: Store) {
 
     updates.forEach(update => {
       const { chainId, nativeCurrency } = update.data
-      const { iconURI, name, symbol } = nativeCurrency
+      const { iconURI, name, symbol, decimals } = nativeCurrency
 
       storeApi.setNativeCurrencyData(chainId, {
         icon: iconURI,
         name,
         symbol,
-        decimals: 18
+        decimals: decimals || 18
       })
     })
   }

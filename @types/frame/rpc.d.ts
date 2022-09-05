@@ -80,7 +80,7 @@ declare namespace RPC {
     }
   }
 
-  namespace GetChains {
+  namespace GetEthereumChains {
     interface NativeCurrency {
       name: string
       symbol: string

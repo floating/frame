@@ -15,7 +15,7 @@ const storeApi = {
 }
 
 interface ChainsChangedHandler {
-  chainsChanged: (chains: RPC.GetChains.Chain[]) => void
+  chainsChanged: (chains: RPC.GetEthereumChains.Chain[]) => void
 }
 
 interface ChainChangedHandler {
@@ -59,7 +59,7 @@ function createOriginChainObserver (handler: ChainChangedHandler & NetworkChange
   }
 }
 
-function getActiveChains (): RPC.GetChains.Chain[] {
+function getActiveChains (): RPC.GetEthereumChains.Chain[] {
   const chains = storeApi.getChains()
   const meta = storeApi.getChainsMeta()
   
