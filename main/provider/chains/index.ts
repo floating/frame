@@ -68,9 +68,7 @@ function getActiveChains (): RPC.GetEthereumChains.Chain[] {
     .sort((a, b) => a.id - b.id)
     .map(chain => {
       const { id, explorer, name } = chain
-      const metadata = meta[id]
-
-      const { nativeCurrency } = metadata
+      const { nativeCurrency } = meta[id]
       const { icon, name: currencyName, symbol, decimals } = nativeCurrency
 
       return ({
