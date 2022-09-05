@@ -15,6 +15,8 @@ const currentVersion = packageInfo.version
 const nextVersion = currentVersion.slice(0, currentVersion.length - 1) + (parseInt(currentVersion[currentVersion.length -1]) + 1)
 
 beforeAll(() => {
+  jest.useRealTimers()
+
   nock.disableNetConnect()
   log.transports.console.level = false
 })

@@ -5,11 +5,10 @@ import BigNumber from 'bignumber.js'
 import link from '../../../../../../resources/link'
 import svg from '../../../../../../resources/svg'
 import { isNetworkConnected } from '../../../../../../resources/utils/chains'
+import { NATIVE_CURRENCY } from '../../../../../../resources/utils/constants'
 
 import { formatUsdRate, balance } from '../helpers'
 import Balance from '../Balance'
-
-const NATIVE_CURRENCY = '0x0000000000000000000000000000000000000000'
 
 function isNativeCurrency (address) {
   return address === NATIVE_CURRENCY
