@@ -1,4 +1,6 @@
-import { objectsEqual } from '../../../resources/utils'
+// @ts-ignore
+import deepEqual from 'deep-equal'
+
 import store from '../../store'
 
 // typed access to state
@@ -32,7 +34,7 @@ function createChainsObserver (handler: ChainsChangedHandler) {
   return function () {
     const currentChains = getActiveChains()
 
-    if (!objectsEqual(currentChains, availableChains)) {
+    if (!deepEqual(currentChains, availableChains)) {
       availableChains = currentChains
       handler.chainsChanged(availableChains)
     }
