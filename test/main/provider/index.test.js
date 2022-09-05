@@ -992,7 +992,7 @@ describe('#send', () => {
     }, 100)
   })
 
-  fdescribe('#eth_signTypedData', () => {
+  describe('#eth_signTypedData', () => {
     const typedData = {
       types: {
         EIP712Domain: [
@@ -1051,6 +1051,16 @@ describe('#send', () => {
           { name: 'mother', type: 'Person' },
           { name: 'father', type: 'Person' }
         ]
+      },
+      primaryType: 'Person',
+      message: {
+        name: 'Satoshi Nakamoto',
+        mother: {
+          name: 'unknown'
+        },
+        father: {
+          name: 'unknown'
+        }
       }
     }
     const typedDataArrays = { 
@@ -1104,39 +1114,40 @@ describe('#send', () => {
     }
 
     const validRequests = [
-      { method: 'eth_signTypedData', params: [address, typedDataLegacy], version: 'V1' },
-      { method: 'eth_signTypedData', params: [address, typedData], version: 'V3' },
-      { method: 'eth_signTypedData', params: [address, typedDataRecursive], version: 'V4' },
-      { method: 'eth_signTypedData', params: [address, typedDataArrays], version: 'V4' },
-      { method: 'eth_signTypedData', params: [address, typedDataNullCustomType], version: 'V4' },
-      { method: 'eth_signTypedData', params: [address, typedDataUndefinedProperty], version: 'V3' },
-      { method: 'eth_signTypedData_v1', params: [address, typedData], version: 'V1' },
-      { method: 'eth_signTypedData_v3', params: [address, typedData], version: 'V3' },
-      { method: 'eth_signTypedData_v4', params: [address, typedData], version: 'V4' },
-      { method: 'eth_signTypedData', params: [typedDataLegacy, address], version: 'V1', dataFirst: true },
-      { method: 'eth_signTypedData', params: [typedData, address], version: 'V3', dataFirst: true },
-      { method: 'eth_signTypedData', params: [typedDataRecursive, address], version: 'V4', dataFirst: true },
-      { method: 'eth_signTypedData', params: [typedDataArrays, address], version: 'V4', dataFirst: true },
-      { method: 'eth_signTypedData', params: [typedDataNullCustomType, address], version: 'V4', dataFirst: true },
-      { method: 'eth_signTypedData', params: [typedDataUndefinedProperty, address], version: 'V3', dataFirst: true },
-      { method: 'eth_signTypedData_v1', params: [typedData, address], version: 'V1', dataFirst: true },
-      { method: 'eth_signTypedData_v3', params: [typedData, address], version: 'V3', dataFirst: true },
-      { method: 'eth_signTypedData_v4', params: [typedData, address], version: 'V4', dataFirst: true }
+      { method: 'eth_signTypedData', params: [address, typedDataLegacy], version: 'V1', dataDescription: 'legacy' },
+      { method: 'eth_signTypedData', params: [address, typedData], version: 'V3', dataDescription: 'eip-712' },
+      { method: 'eth_signTypedData', params: [address, typedDataRecursive], version: 'V4', dataDescription: 'eip-712 with recursion' },
+      { method: 'eth_signTypedData', params: [address, typedDataArrays], version: 'V4', dataDescription: 'eip-712 with arrays' },
+      { method: 'eth_signTypedData', params: [address, typedDataNullCustomType], version: 'V4', dataDescription: 'eip-712 with null custom type' },
+      { method: 'eth_signTypedData', params: [address, typedDataUndefinedProperty], version: 'V3', dataDescription: 'eip-712 with undefined property' },
+      { method: 'eth_signTypedData_v1', params: [address, typedDataLegacy], version: 'V1', dataDescription: 'legacy' },
+      { method: 'eth_signTypedData_v3', params: [address, typedData], version: 'V3', dataDescription: 'eip-712' },
+      { method: 'eth_signTypedData_v4', params: [address, typedData], version: 'V4', dataDescription: 'eip-712' },
+      { method: 'eth_signTypedData', params: [typedDataLegacy, address], version: 'V1', dataFirst: true, dataDescription: 'legacy' },
+      { method: 'eth_signTypedData', params: [typedData, address], version: 'V3', dataFirst: true, dataDescription: 'eip-712' },
+      { method: 'eth_signTypedData', params: [typedDataRecursive, address], version: 'V4', dataFirst: true, dataDescription: 'eip-712 with recursion' },
+      { method: 'eth_signTypedData', params: [typedDataArrays, address], version: 'V4', dataFirst: true, dataDescription: 'eip-712 with arrays' },
+      { method: 'eth_signTypedData', params: [typedDataNullCustomType, address], version: 'V4', dataFirst: true, dataDescription: 'eip-712 with null custom type' },
+      { method: 'eth_signTypedData', params: [typedDataUndefinedProperty, address], version: 'V3', dataFirst: true, dataDescription: 'eip-712 with undefined property' },
+      { method: 'eth_signTypedData_v1', params: [typedDataLegacy, address], version: 'V1', dataFirst: true, dataDescription: 'legacy' },
+      { method: 'eth_signTypedData_v3', params: [typedData, address], version: 'V3', dataFirst: true, dataDescription: 'eip-712' },
+      { method: 'eth_signTypedData_v4', params: [typedData, address], version: 'V4', dataFirst: true, dataDescription: 'eip-712' }
     ]
 
-    function verifyRequest (version) {
+    function verifyRequest (version, expectedPayload) {
       expect(accountRequests).toHaveLength(1)
       expect(accountRequests[0].handlerId).toBeTruthy()
       expect(accountRequests[0].payload.params[0]).toBe(address)
-      expect(accountRequests[0].payload.params[1]).toEqual(typedData)
+      expect(accountRequests[0].payload.params[1]).toEqual(expectedPayload)
       expect(accountRequests[0].version).toBe(version)
     }
     
-    validRequests.forEach(({ method, params, version, dataFirst }) => {
-      it(`submits a ${method} request to sign typed data${dataFirst ? ' with data sent as the first param' : ''}`, () => {
+    validRequests.forEach(({ method, params, version, dataFirst, dataDescription }) => {
+      it(`submits an ${method} request supplying ${dataDescription} data${dataFirst ? ' (inverted params)' : ''}`, () => {
         send({ method, params })
   
-        verifyRequest(version)
+        const expectedPayload = params[dataFirst ? 0 : 1]
+        verifyRequest(version, expectedPayload)
       })
     })
 
@@ -1145,7 +1156,7 @@ describe('#send', () => {
 
       send({ method: 'eth_signTypedData', params })
 
-      verifyRequest('V1')
+      verifyRequest('V3', typedData)
     })
 
     it('does not submit a request from an unknown account', done => {
