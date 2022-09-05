@@ -71,7 +71,9 @@ function getActiveChains (): RPC.GetEthereumChains.Chain[] {
     .map(chain => {
       const { id, explorer, name } = chain
       const { nativeCurrency } = meta[id]
-      const { icon, name: currencyName, symbol, decimals } = nativeCurrency
+      const { icon: currencyIcon, name: currencyName, symbol, decimals } = nativeCurrency
+
+      const icons = currencyIcon ? [{ url: currencyIcon }] : []
 
       return ({
         chainId: id,
@@ -80,7 +82,7 @@ function getActiveChains (): RPC.GetEthereumChains.Chain[] {
         nativeCurrency: {
           name: currencyName, symbol, decimals
         },
-        icon: [{ url: icon }],
+        icon: icons,
         explorers: [{ url: explorer }]
       })
     })

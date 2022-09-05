@@ -470,7 +470,7 @@ describe('#send', () => {
             name: 'mainnet',
             chainId: 1,
             networkId: 1,
-            icon: 'ethereum',
+            icon: [{ url: 'ethereum' }],
             explorers: [{ url: 'https://etherscan.io' }],
             nativeCurrency: {
               name: 'Ether',
@@ -482,7 +482,7 @@ describe('#send', () => {
             name: 'polygon',
             chainId: 137,
             networkId: 137,
-            icon: 'matic',
+            icon: [{ url: 'matic' }],
             explorers: [{ url: 'https://polygonscan.com' }],
             nativeCurrency: {
               name: 'Matic',
@@ -1458,7 +1458,7 @@ describe('state change events', () => {
           name: 'test',
           chainId: 1,
           networkId: 1,
-          icon: 'ethereum',
+          icon: [{ url: 'ethereum' }],
           explorers: [{ url: 'https://etherscan.io' }],
           nativeCurrency: {
             name: 'Ether',
@@ -1470,7 +1470,7 @@ describe('state change events', () => {
           name: 'Polygon',
           chainId: 137,
           networkId: 137,
-          icon: undefined,
+          icon: [],
           explorers: [{ url: 'https://polygonscan.com' }],
           nativeCurrency: {
             name: 'Matic',
