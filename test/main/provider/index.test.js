@@ -1112,6 +1112,10 @@ describe('#send', () => {
         contents: undefined,
       }
     }
+    const typedDataInvalid = {
+      ...typedData,
+      primaryType: 'b0rk'
+    }
 
     const validRequests = [
       { method: 'eth_signTypedData', params: [address, typedDataLegacy], version: 'V1', dataDescription: 'legacy' },
@@ -1157,6 +1161,14 @@ describe('#send', () => {
       send({ method: 'eth_signTypedData', params })
 
       verifyRequest('V3', typedData)
+    })
+
+    it('handles invalid EIP-712 data by defaulting to v3', () => {
+      const params = [typedDataInvalid, address]
+
+      send({ method: 'eth_signTypedData', params })
+
+      verifyRequest('V3', typedDataInvalid)
     })
 
     it('does not submit a request from an unknown account', done => {

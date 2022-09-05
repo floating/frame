@@ -286,17 +286,22 @@ export function getVersionFromTypedData (typedData: TypedDataV1 | TypedMessage<M
       return type === typeToCheck ? true : hasRecursiveType(type)
     })
 
-  // arrays only supported by v4
-  if (containsArrays()) {
-    return 'V4'
-  }
+  try {
+    // arrays only supported by v4
+    if (containsArrays()) {
+      return 'V4'
+    }
 
-  // v3 and v4 both support recursion but with different strategies
-  if (hasRecursiveType()) {
-    // default to v4 when encountering recursion unless data contains undefined types (invalid in v4)
-    return hasUndefinedType() ? 'V3' : 'V4'
+    // v3 and v4 both support recursion but with different strategies
+    if (hasRecursiveType()) {
+      // default to v4 when encountering recursion unless data contains undefined types (invalid in v4)
+      return hasUndefinedType() ? 'V3' : 'V4'
+    }
+    
+    // no v4-specific features so default to v3 unless data contains null custom types (invalid in v3)
+    return hasNullCustomType() ? 'V4' : 'V3'
+  } catch (e) {
+    // parsing error - default to v3
+    return 'V3'
   }
-  
-  // no v4-specific features so default to v3 unless data contains null custom types (invalid in v3)
-  return hasNullCustomType() ? 'V4' : 'V3'
 }
