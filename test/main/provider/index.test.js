@@ -992,7 +992,7 @@ describe('#send', () => {
     }, 100)
   })
 
-  describe('#eth_signTypedData', () => {
+  fdescribe('#eth_signTypedData', () => {
     const typedData = {
       types: {
         EIP712Domain: [
@@ -1013,7 +1013,17 @@ describe('#send', () => {
       },
       domain: 'domainData',
       primaryType: 'Mail',
-      message: 'message'
+      message: {
+        from: {
+          name: 'Cow',
+          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        },
+        to: {
+          name: 'Bob',
+          wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+        },
+        contents: 'Hello!',
+      }
     }
     const typedDataLegacy = [
       {
@@ -1031,15 +1041,15 @@ describe('#send', () => {
       ...typedData,
       types: {
         EIP712Domain: [
-            { name: 'name', type: 'string' },
-            { name: 'version', type: 'string' },
-            { name: 'chainId', type: 'uint256' },
-            { name: 'verifyingContract', type: 'address' }
+          { name: 'name', type: 'string' },
+          { name: 'version', type: 'string' },
+          { name: 'chainId', type: 'uint256' },
+          { name: 'verifyingContract', type: 'address' }
         ],
         Person: [
-            { name: 'name', type: 'string' },
-            { name: 'mother', type: 'Person' },
-            { name: 'father', type: 'Person' }
+          { name: 'name', type: 'string' },
+          { name: 'mother', type: 'Person' },
+          { name: 'father', type: 'Person' }
         ]
       }
     }
@@ -1053,18 +1063,43 @@ describe('#send', () => {
           { name: 'verifyingContract', type: 'address' }
         ],
         Person: [
-            { name: 'name', type: 'string' },
-            { name: 'wallets', type: 'address[]' }
+          { name: 'name', type: 'string' },
+          { name: 'wallets', type: 'address[]' }
         ],
         Mail: [
-            { name: 'from', type: 'Person' },
-            { name: 'to', type: 'Person[]' },
-            { name: 'contents', type: 'string' }
+          { name: 'from', type: 'Person' },
+          { name: 'to', type: 'Person[]' },
+          { name: 'contents', type: 'string' }
         ],
         Group: [
-            { name: 'name', type: 'string' },
-            { name: 'members', type: 'Person[]' }
+          { name: 'name', type: 'string' },
+          { name: 'members', type: 'Person[]' }
         ]
+      }
+    }
+    const typedDataNullCustomType = {
+      ...typedData,
+      message: {
+        to: null,
+        from: {
+          name: 'Cow',
+          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        },
+        contents: 'Hello, Bob!',
+      }
+    }
+    const typedDataUndefinedProperty = {
+      ...typedData,
+      message: {
+        from: {
+          name: 'Cow',
+          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        },
+        to: {
+          name: 'Bob',
+          wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+        },
+        contents: undefined,
       }
     }
 
@@ -1073,6 +1108,8 @@ describe('#send', () => {
       { method: 'eth_signTypedData', params: [address, typedData], version: 'V3' },
       { method: 'eth_signTypedData', params: [address, typedDataRecursive], version: 'V4' },
       { method: 'eth_signTypedData', params: [address, typedDataArrays], version: 'V4' },
+      { method: 'eth_signTypedData', params: [address, typedDataNullCustomType], version: 'V4' },
+      { method: 'eth_signTypedData', params: [address, typedDataUndefinedProperty], version: 'V3' },
       { method: 'eth_signTypedData_v1', params: [address, typedData], version: 'V1' },
       { method: 'eth_signTypedData_v3', params: [address, typedData], version: 'V3' },
       { method: 'eth_signTypedData_v4', params: [address, typedData], version: 'V4' },
@@ -1080,6 +1117,8 @@ describe('#send', () => {
       { method: 'eth_signTypedData', params: [typedData, address], version: 'V3', dataFirst: true },
       { method: 'eth_signTypedData', params: [typedDataRecursive, address], version: 'V4', dataFirst: true },
       { method: 'eth_signTypedData', params: [typedDataArrays, address], version: 'V4', dataFirst: true },
+      { method: 'eth_signTypedData', params: [typedDataNullCustomType, address], version: 'V4', dataFirst: true },
+      { method: 'eth_signTypedData', params: [typedDataUndefinedProperty, address], version: 'V3', dataFirst: true },
       { method: 'eth_signTypedData_v1', params: [typedData, address], version: 'V1', dataFirst: true },
       { method: 'eth_signTypedData_v3', params: [typedData, address], version: 'V3', dataFirst: true },
       { method: 'eth_signTypedData_v4', params: [typedData, address], version: 'V4', dataFirst: true }

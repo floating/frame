@@ -24,7 +24,7 @@ import { populate as populateTransaction, maxFee } from '../transaction'
 import FrameAccount from '../accounts/Account'
 import { capitalize, arraysMatch } from '../../resources/utils'
 import { ApprovalType } from '../../resources/constants'
-import { checkExistingNonceGas, ecRecover, feeTotalOverMax, gasFees, getActiveChains, getAssets, getChains, getChainDetails, getPermissions, getRawTx, getSignedAddress, isCurrentAccount, isScanning, loadAssets, requestPermissions, resError, hasPermission } from './helpers'
+import { checkExistingNonceGas, ecRecover, feeTotalOverMax, gasFees, getActiveChains, getAssets, getChains, getChainDetails, getPermissions, getRawTx, getSignedAddress, isCurrentAccount, isScanning, loadAssets, requestPermissions, resError, hasPermission, getVersionFromTypedData } from './helpers'
 
 type Subscription = {
   id: string
@@ -566,6 +566,11 @@ export class Provider extends EventEmitter {
       }
     }
 
+    // no explicit version called so we choose one which best fits the data
+    if (!version) {
+      version = getVersionFromTypedData(typedData)
+    }
+
     const signerType = getSignerType(targetAccount.lastSignerType)
 
     // check for signers that only support signing a specific version of typed data
@@ -794,7 +799,7 @@ export class Provider extends EventEmitter {
 
     if (['eth_signTypedData', 'eth_signTypedData_v1', 'eth_signTypedData_v3', 'eth_signTypedData_v4'].includes(method)) {
       const underscoreIndex = method.lastIndexOf('_')
-      const version = (underscoreIndex > 3 ? method.substring(underscoreIndex + 1) : 'v1').toUpperCase() as Version
+      const version = (underscoreIndex > 3 ? method.substring(underscoreIndex + 1).toUpperCase() : undefined) as Version
       return this.signTypedData(payload, version, res)
     }
     
