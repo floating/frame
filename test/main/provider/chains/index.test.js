@@ -175,6 +175,18 @@ describe('#createChainsObserver', () => {
     const changedChains = handler.chainsChanged.mock.calls[0][0]
     expect(changedChains.map(c => c.chainId)).toEqual([1])
   })
+  
+  it('invokes the handler when a chain name changes', () => {
+    const { '4': { ...rinkeby } } = chains
+    rinkeby.name = 'Rink-a-Bee'
+
+    setChains({ ...chains, '4': rinkeby })
+
+    observer()
+
+    const changedChains = handler.chainsChanged.mock.calls[0][0]
+    expect(changedChains.map(c => c.chainId)).toEqual([1, 4])
+  })
 
   it('does not invoke the handler when no chains have changed', () => {
     observer()
