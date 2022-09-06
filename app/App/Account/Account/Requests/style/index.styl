@@ -430,7 +430,7 @@
         text-align left
         font-weight 400
         padding-left 0px
-        font-family 'Exo2', sans-serif
+        font-family 'MainFont'
         display flex
         align-items center
 
@@ -439,7 +439,7 @@
         text-align left
         font-weight 400
         padding-left 0px
-        font-family 'Exo2', sans-serif
+        font-family 'MainFont'
         display flex
         align-items center
         position relative
@@ -522,7 +522,7 @@
 
 .requestNotice, .requestCover
   box-sizing border-box
-  height 112px
+  height 128px
   font-size 14px
   -webkit-app-region no-drag
   pointer-events auto
@@ -534,9 +534,9 @@
   z-index 999999999999999
   transition var(--standard)
   position absolute
-  bottom 12px
-  left 6px
-  right 6px
+  bottom 0px
+  left 0px
+  right 0px
   animation 0.32s fadeUp var(--cubic)
 
   .requestNoticeInner
@@ -548,7 +548,7 @@
     width 100%
 
     .requestNoticeInnerText
-      padding-top 30px
+      padding-bottom 12px
       font-size 12px
       font-weight 400
       text-transform uppercase
@@ -587,7 +587,7 @@
   box-sizing border-box
   background var(--ghostA)
   box-shadow 0px 6px 6px var(--ghostY)
-  font-family 'Ubuntu'
+  font-family 'MainFont'
 
   .requestProviderOrigin
     font-size 22px
@@ -625,7 +625,7 @@
   font-size 13px
   opacity 0
   transition var(--standard)
-  font-family 'OpenSans'
+  font-family 'MainFont'
   pointer-events none
   transform translateY(0px) 
   display flex
@@ -643,6 +643,26 @@
   border-bottom-left-radius 20px
   border-bottom-right-radius 20px
   z-index 9999999
+
+  .txActionButtons
+    position absolute 
+    bottom 0px
+    right 0px
+    left 0px
+    display flex
+    flex-wrap wrap
+    overflow hidden
+    border-radius 12px
+
+    .txActionButton
+      width calc(50% - 4px)
+      background var(--ghostB)
+      box-sizing border-box
+      padding 8px
+      margin 2px
+      pointer-events none
+      color var(--moon)
+      cursor pointer
 
   .requestApproveFee
     position absolute 
@@ -849,7 +869,7 @@
     word-break break-word
     white-space break-spaces
     user-select all
-    font-family FiraCode, monospace
+    font-family 'FiraCode'
     font-weight 400
 
 .signTypedData
@@ -884,7 +904,7 @@
       font-size 20px
       margin-bottom 18px
       font-weight 400
-      font-family 'Exo2'
+      font-family 'MainFont'
 
 .transactionValue
   position absolute
@@ -912,7 +932,7 @@
   align-items center
   font-size 16px
   font-weight bold
-  font-family FiraCode, sans-serif
+  font-family 'FiraCode'
   margin 2px 8px 0px 0px 
   padding 0px 16px
   background var(--ghostD)
@@ -935,8 +955,7 @@
 .networkFeeSymbol
   position relative
   font-size 12px
-  font-weight 600
-  font-family FiraCode, sans-serif
+  font-family 'FiraCode'
   left -2px
   top 1px
 
@@ -945,8 +964,7 @@
   justify-content center
   align-items center
   font-size 16px
-  font-weight bold
-  font-family FiraCode, sans-serif
+  font-family 'FiraCode'
   margin 2px 0px 0px 8px 
   padding 0px 16px
   background var(--ghostD)
@@ -1103,7 +1121,7 @@
     transition var(--standardSlow)
     overflow-wrap break-word
     word-wrap break-word
-    font-family FiraCode, monospace
+    font-family 'FiraCode'
     overflow-x hidden
     overlflow-y scroll
     border-radius 6px
@@ -1145,7 +1163,7 @@
 
   .transactionToAddress
     font-size 12px
-    font-family FiraCode, monospace
+    font-family 'FiraCode'
     position relative
     height 25px
     width 100%
@@ -1354,9 +1372,9 @@
 .monitorConfirms
   position absolute
   top 0px
-  left 24px
+  left 13px
   right 0
-  padding 3px 26px 3px 0px
+  padding 3px 16px 3px 0px
   display flex
   justify-content space-between
   z-index 1002
@@ -1400,7 +1418,7 @@
   width 24px
 
 .monitorTo
-  font-family Exo2
+  font-family 'MainFont'
   display flex
   justify-content flex-start
   align-items center
@@ -1580,7 +1598,6 @@ span:last-child
   border-radius 16px
   background var(--ghostD)
   z-index 20000000009999
-  display none
   
   .txAugmentCancel
     position absolute
@@ -1705,7 +1722,7 @@ span:last-child
   transition var(--standardSlow)
   opacity 0
   transform translateY(25px)
-  font-family FiraCode, monospace
+  font-family 'FiraCode'
   overflow hidden
   font-size 16px
   padding-top 2px
@@ -1750,7 +1767,7 @@ span:last-child
   position absolute
   top 0px
   right 16px
-  bottom 8px
+  bottom 0px
   left 16px
   z-index 1000005
   display flex
@@ -1778,8 +1795,7 @@ span:last-child
       justify-content center
       align-items center
       font-size 14px
-      font-weight 600
-      font-family FiraCode, monospace
+      font-family 'FiraCode'
       letter-spacing -0.5px
 
     .txProgressSuccessItemLabel
@@ -1806,6 +1822,10 @@ span:last-child
     width 110px
     border-left 2px solid var(--ghostA)
 
+.txProgressHidden
+  opacity 0
+  pointer-events none
+
 .txSummary
   display flex
   justify-content center
@@ -1827,8 +1847,8 @@ span:last-child
   position absolute
   z-index 1001
   height 58px
-  bottom 0px
-  width 331px
+  bottom 6px
+  width 361px
   border-bottom-left-radius 16px
   border-bottom-right-radius 16px
   overflow hidden
@@ -2146,10 +2166,9 @@ span:last-child
 
   .simpleJsonKey
     font-size 14px
-    font-weight 100
     width 100%
     color var(--moon)
-    font-family 'FiraCode', monospace
+    font-family 'FiraCode'
 
   .simpleJsonValue
     margin 10px 10px 10px 3px
@@ -2158,9 +2177,8 @@ span:last-child
     font-size 16px
     width calc(100% - 3px)
     box-sizing border-box
-    font-weight 600
     word-wrap break-word
-    font-family 'FiraCode', monospace
+    font-family 'FiraCode'
     user-select all !important
 
 

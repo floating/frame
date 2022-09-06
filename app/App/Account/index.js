@@ -6,6 +6,7 @@ import BigNumber from 'bignumber.js'
 
 import Account from './Account'
 import TxBar from './TxBar'
+import TxConfirmations from './TxConfirmations'
 
 import svg from '../../../resources/svg'
 import link from '../../../resources/link'
@@ -70,12 +71,7 @@ class _RequestApprove extends React.Component {
 
     setTimeout(() => {
       this.setState({ allowInput: true })
-    }, 1500)
-    
-
-    // setTimeout(() => {
-    //   this.setState({ allowInput: true })
-    // }, props.signingDelay || 1500)
+    }, props.signingDelay || 1500)
   }
 
   approve (reqId, req) {
@@ -148,85 +144,16 @@ class _RequestApprove extends React.Component {
       return (
         <div className='requestNotice'>
           <div className='requestNoticeInner'>
-            {!error ? (
-              <div className={success || !req.tx ? 'txAugment txAugmentHidden' : 'txAugment'}>
-                {this.state.txHashCopied ? (
-                  <div className={'txDetailsOptions txDetailsOptionsTxHash'}>
-                    Transaction Hash Copied
-                  </div>
-                ) : this.state.viewDetailsHover ? (
-                  <div
-                    className={'txDetailsOptions'}
-                    onMouseOver={() => {
-                      clearTimeout(this.viewDetailsHoverTimer)
-                      this.setState({ viewDetailsHover: true })
-                    }}
-                    onMouseLeave={() => {
-                      this.viewDetailsHoverTimer = setTimeout(() => {
-                        this.setState({ viewDetailsHover: false })
-                      }, 0)
-                    }}
-                  >
-                    <div
-                      className={'txDetailsOptionsOpen'}
-                      onMouseDown={() => {
-                        if (req && req.tx && req.tx.hash) {
-                          if (this.store('main.mute.explorerWarning')) {
-                            link.send('tray:openExplorer', req.tx.hash, chain)
-                          } else {
-                            this.store.notify('openExplorer', { hash: req.tx.hash, chain: chain })
-                          }
-                        }
-                      }}
-                    >
-                      Open Explorer
-                    </div>
-                    <div
-                      className={'txDetailsOptionsCopy'}
-                      onMouseDown={() => {
-                        if (req && req.tx && req.tx.hash) {
-                          link.send('tray:copyTxHash', req.tx.hash)
-                          this.setState({ txHashCopied: true, viewDetailsHover: false })
-                          setTimeout(() => {
-                            this.setState({ txHashCopied: false })
-                          }, 3000)
-                        }
-                      }}
-                    >
-                      Copy Hash
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    <div
-                      className={req && req.tx && req.tx.hash ? 'txDetails txDetailsShow' : 'txDetails txDetailsHide'}
-                      onMouseOver={() => {
-                        clearTimeout(this.viewDetailsHoverTimer)
-                        this.setState({ viewDetailsHover: true })
-                      }}
-                      onMouseLeave={() => {
-                        this.viewDetailsHoverTimer = setTimeout(() => {
-                          this.setState({ viewDetailsHover: false })
-                        }, 0)
-                      }}
-                    >
-                      View Details
-                    </div>
-                    <div className='txAugmentCancel' onMouseDown={() => link.send('tray:replaceTx', req.handlerId, 'cancel')}>
-                      Cancel
-                    </div>
-                    <div className='txAugmentSpeedUp' onMouseDown={() => link.send('tray:replaceTx', req.handlerId, 'speed')}>
-                      Speed Up
-                    </div>
-                  </>
-                )}
+            {error ? (
+              <div className={'requestNoticeInnerText'}>
+                {notice}
               </div>
             ) : null}
-            <div className={success ? 'txSuccessHash ' : 'txSuccessHash'}>
+            {/* <div className={success ? 'txSuccessHash ' : 'txSuccessHash'}>
               {req && req.tx && req.tx.hash ? req.tx.hash.substring(0, 9) : ''}
               {svg.octicon('kebab-horizontal', { height: 16 })}
               {req && req.tx && req.tx.hash ? req.tx.hash.substr(req.tx.hash.length - 7) : ''}
-            </div>
+            </div> */}
             <div className={success ? 'txProgressSuccess' : 'txProgressSuccess txProgressHidden'}>
               {req && req.tx && req.tx.receipt ? (
                 <>
@@ -252,8 +179,8 @@ class _RequestApprove extends React.Component {
               ) : null}
             </div>
             {/* <div className={statusClass} style={!req.tx && !error && mode === 'monitor' ? { bottom: '60px' } : {}}> */}
-            <div className={statusClass}>
-              {success ? <div>Successful</div> : null}
+            {/* <div className={statusClass}>
+              {success ? <div>Successful</div> : error}
               <div className='txProgressNotice'>
                 <div className={success || (mode === 'monitor' && status !== 'verifying') ? 'txProgressNoticeBars txProgressNoticeHidden' : 'txProgressNoticeBars'}>
                   {[...Array(10).keys()].map(i => {
@@ -277,7 +204,8 @@ class _RequestApprove extends React.Component {
                 </div>
                 {status === 'pending' ? <div className='txProgressCancel' onMouseDown={() => this.decline(this.props.req)}>Cancel</div> : null}
               </div>
-            </div>
+            </div> */}
+            <TxConfirmations req={req} />
             <TxBar req={req} />
             {/* <div className='monitorIcon'>{svg.octicon('radio-tower', { height: 17 })}</div> */}
             {/* <div className='monitorIconIndicator' /> */}
@@ -301,12 +229,6 @@ class _RequestApprove extends React.Component {
                 <div className='monitorDeploy'>deploy</div>
               )}
             </div> */}
-            <div className='monitorConfirms'>
-              {[...Array(12).keys()].map(i => {
-                const monitorConfirmsItem = confirmations > i ? 'txProgressConfirmsItem txProgressConfirmsItemGood' : 'txProgressConfirmsItem'
-                return <div key={i} className={monitorConfirmsItem}>{svg.octicon('chevron-right', { height: 14 })}</div>
-              })}
-            </div>
           </div>
         </div>
       )
@@ -421,8 +343,10 @@ class _Footer extends React.Component {
                 <div 
                   className='requestSign' 
                   style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none'}}
-                  onClick={() => { if (this.state.allowInput) this.approve(req.handlerId, req) 
-                }}>
+                  onClick={() => {
+                    if (this.state.allowInput) this.approve(req.handlerId, req) 
+                  }}
+                >
                   <div className='requestSignButton _txButton'>
                     <span>Sign</span>
                   </div>

@@ -122,11 +122,16 @@ class TxRecipient extends React.Component {
               link.send('nav:update', 'panel', { data: { step: 'viewData' } })
             }}>
               <div className='_txDescription'>
-                {req.recipientType === 'external' ? (
+                {!req.to && req.data.data && req.data.data !== '0x' && req.data.data !== '0x0' ? (
+                  <div className='_txDescriptionSummary'>
+                    <div>{`Deploying Contract`}</div>
+                    <div>{`on ${chainName}`}</div>
+                  </div>
+                ) : req.recipientType === 'external' ? (
                   <div className='_txDescriptionSummary'>
                     {req.data.value && req.data.value !== '0x' && req.data.value !== '0x0' ? (
                       <div>{`Sending ${currentSymbol}`}</div>
-                    ) : req.data.data && req.data.data !== '0x' && req.data.data !== '0x0'  ? (
+                    ) : req.data.data && req.data.data !== '0x' && req.data.data !== '0x0' ? (
                       <div>{`Sending Data`}</div>
                     ) : (
                       <div>{`Empty Transaction`}</div>

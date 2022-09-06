@@ -40,8 +40,8 @@ class Balances extends React.Component {
       >
         {!this.props.expanded ? (
           <div className='moduleHeader'>
-            <span>{svg.key(14)}</span>
-            <span>{'Permissions'}</span>
+            <span>{svg.window(14)}</span>
+            <span>{'Dapps'}</span>
           </div>
         ) : null}
         <div className='moduleMainPermissions'>

@@ -97,10 +97,8 @@
           .featureBoxSubtext
             margin-top 8px
             font-size 10px
-            font-weight 500
-            font-family FiraCode, monospace
+            font-family 'FiraCode'
             justify-content center
-            letter-spacing 1px
             opacity 0.7
 
 @keyframes appear
@@ -148,7 +146,7 @@
       background transparent
       color var(--outerspace)
       font-size 18px
-      font-family 'Exo2'
+      font-family 'MainFont'
       padding-bottom 4px
 
   .panelFilterClear
@@ -175,3 +173,6 @@
   transform translateY(-14px)
   transition var(--standard)
   z-index 999999999
+
+  *
+    pointer-events none

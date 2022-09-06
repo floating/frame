@@ -180,32 +180,80 @@ class TransactionRequest extends React.Component {
                 allowOtherChain={this.allowOtherChain.bind(this)} />
             ) : null}
             <div className='approveTransactionPayload'>
-                <div className='_txBody'>
-                  <TxMainNew i={0} {...this.props} req={req} chain={chain} />
-                  <TxMain i={1} {...this.props} req={req} chain={chain} />
-                  {recognizedActions.map((action, i) => {
-                    return <TxAction key={'action' + action.type + i} i={2 + i} {...this.props} req={req} chain={chain} action={action} />
-                  })}
-                  <TxRecipient i={3 + recognizedActions.length} {...this.props} req={req} />
-                  <TxFeeNew i={4 + recognizedActions.length} {...this.props} req={req} chain={chain} />
-                </div>
-            </div>
-            <div className={req.automaticFeeUpdateNotice ? 'requestFooter requestFooterActive' : 'requestFooter'}>
-              <div className='requestApproveFee'>
-                <div className='requestApproveFeeText'>{'Fee Updated'}</div>
-                <div className='requestApproveFeeButton' onClick={() => {
-                  link.rpc('removeFeeUpdateNotice', req.handlerId, e => { if (e) console.error(e) })
-                }}>{'Ok'}</div>
+              <div className='_txBody'>
+                <TxMainNew i={0} {...this.props} req={req} chain={chain} />
+                <TxMain i={1} {...this.props} req={req} chain={chain} />
+                {recognizedActions.map((action, i) => {
+                  return <TxAction key={'action' + action.type + i} i={2 + i} {...this.props} req={req} chain={chain} action={action} />
+                })}
+                <TxRecipient i={3 + recognizedActions.length} {...this.props} req={req} />
+                <TxFeeNew i={4 + recognizedActions.length} {...this.props} req={req} chain={chain} />
               </div>
-              {/* <div className='' onClick={() => {
-                const { previousFee } = req.automaticFeeUpdateNotice
-                if (previousFee.type === '0x2') {
-                  link.rpc('setBaseFee', previousFee.baseFee, req.handlerId, e => { if (e) console.error(e) })
-                  link.rpc('setPriorityFee', previousFee.priorityFee, req.handlerId, e => { if (e) console.error(e) })
-                } else if (previousFee.type === '0x0')  {
-                  link.rpc('setGasPrice', previousFee.gasPrice, req.handlerId, e => { if (e) console.error(e) })
-                }
-              }}>{'Revert'}</div> */}
+            </div>
+            <div className={(req.automaticFeeUpdateNotice || true) ? 'requestFooter requestFooterActive' : 'requestFooter'}>
+              <div className='txActionButtons'>
+                
+                {req.automaticFeeUpdatenotice ? (
+                  <div className='txActionButtonsRow'>
+                    <div className='txActionText'>{'Fee Updated'}</div>
+                    <div className='txActionButton' onClick={() => {
+                      link.rpc('removeFeeUpdateNotice', req.handlerId, e => { if (e) console.error(e) })
+                    }}>{'Ok'}</div>
+                  </div>
+                ) : null }
+
+                {req && req.tx && req.tx.hash ? (
+                  <div className='txActionButtonsRow'>
+                    <div
+                      className={'txActionButton'}
+                      onClick={() => {
+                        if (req && req.tx && req.tx.hash) {
+                          if (this.store('main.mute.explorerWarning')) {
+                            link.send('tray:openExplorer', req.tx.hash, chain)
+                          } else {
+                            this.store.notify('openExplorer', { hash: req.tx.hash, chain: chain })
+                          }
+                        }
+                      }}
+                    >
+                      Open Explorer
+                    </div>
+                    <div
+                      className={'txActionButton'}
+                      onClick={() => {
+                        if (req && req.tx && req.tx.hash) {
+                          link.send('tray:copyTxHash', req.tx.hash)
+                          this.setState({ txHashCopied: true, viewDetailsHover: false })
+                          setTimeout(() => {
+                            this.setState({ txHashCopied: false })
+                          }, 3000)
+                        }
+                      }}
+                    >
+                      Copy Hash
+                    </div>
+                  </div>
+                ) : null}
+
+                {mode === 'monitor' ? (
+                  <div className='txActionButtonsRow'>
+                    <div 
+                      className='txActionButton'
+                      onClick={() => link.send('tray:replaceTx', req.handlerId, 'cancel')}
+                    >
+                      Cancel
+                    </div>
+                    <div 
+                      className='txActionButton' 
+                      onClick={() => link.send('tray:replaceTx', req.handlerId, 'speed')}
+                    >
+                      Speed Up
+                    </div>
+                  </div>
+                ) : null }
+
+                
+              </div>
             </div>
           </div>
         ) : (

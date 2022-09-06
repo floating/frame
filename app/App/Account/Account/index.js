@@ -235,7 +235,12 @@ const AccountMain = Restore.connect(_AccountMain)
 class _AccountView extends React.Component {
   render () {
     return (
-      <div className='accountView'>
+      <div className='accountView'
+        // TODO: sync via nav
+        style={{
+          bottom: '140px'
+        }}
+      >
         <div className='accountViewMenu cardShow'>
           <div 
             className='accountViewBack'

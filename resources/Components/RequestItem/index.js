@@ -53,12 +53,6 @@ class _RequestItem extends React.Component {
           link.send('nav:forward', 'panel', crumb)
         }}
       >
-        <div className='requestItemDetails'>
-          <div className='requestItemDetailsSlide'>
-            <div className='requestItemDetailsIndicator' />
-            {req.status || 'pending'}
-          </div>
-        </div>
         <div className='requestItemTitle'>
           <div className='requestItemIcon'>
             <RingIcon 
@@ -107,6 +101,12 @@ class _RequestItem extends React.Component {
               </div>
             </div>
           )}
+        </div>
+        <div className='requestItemDetails'>
+          <div className='requestItemDetailsSlide'>
+            <div className='requestItemDetailsIndicator' />
+            {req.status || 'pending'}
+          </div>
         </div>
       </div>
     )

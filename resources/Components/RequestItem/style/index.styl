@@ -19,7 +19,7 @@
   width 100%
   z-index 1
   margin-top 5px
-  height 70px
+  // height 70px
   // transition all linear 1s
   // background linear-gradient(90deg, var(--ghostA), red)
   // background-position 0% 300%
@@ -38,25 +38,20 @@
     letter-spacing 3px
     border-bottom-left-radius 12px
     border-bottom-right-radius 12px
-    display none
-    padding 8px 0px 0px 0px
+    height 20px
     color var(--moon)
+    background var(--ghostB)
 
   .requestItemDetailsSlide
     width 100%
-    background var(--ghostA)
-    // background linear-gradient(90deg, var(--ghostA), var(--ghostB))
-    padding-left 73px
-    border-radius 6px
-    // box-shadow 0px 2px 4px var(--ghostY)
+    display flex
+    align-items center
 
   .requestItemDetailsIndicator
-    position absolute
     height 4px
-    width 60px
+    width 37px
     border-radius 2px
-    top 12px
-    left 5px
+    margin 4px 14px
     background var(--moon)
     z-index 4
 
@@ -113,7 +108,7 @@
 
   .requestItemTitle
     position relative
-    font-family 'Exo2'
+    font-family 'MainFont'
     font-weight 500
     width 100%
     display flex
@@ -205,11 +200,11 @@
     display flex
     justify-content center
     align-items center
-    margin-left 10px
+    margin-left 12px
     border-radius 10px
     background var(--ghostA)
     z-index 2
-    border-radius 12px
+    border-radius 20px
     -webkit-app-region no-drag
     transition none
     pointer-events auto
