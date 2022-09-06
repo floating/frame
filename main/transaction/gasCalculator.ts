@@ -75,6 +75,21 @@ export default class GasCalculator {
       asap: gasPrice
     }
   }
+
+  async _getMedianReward (blocks: Block[], lowerPercentile: number): Promise<number> {
+    // only consider priority fees from blocks that aren't almost empty or almost full
+    const eligibleRewardsBlocks = blocks.filter(block => block.gasUsedRatio >= 0.1 && block.gasUsedRatio <= 0.9).map(block => block.rewards[0])
+    const medianReward = eligibleRewardsBlocks.sort()[Math.floor(eligibleRewardsBlocks.length / 2)] 
+
+    // increase percentile by 5% until a value is reached - return 1 gwei when we hit 100%
+    if (!medianReward) {
+      const nextPercentile = lowerPercentile + 5
+      const nextBlocks = await this._getFeeHistory(10, [nextPercentile])
+      return lowerPercentile === 100 ? oneGwei : await this._getMedianReward(nextBlocks, nextPercentile)
+    }
+    
+    return medianReward
+  } 
   
   async getFeePerGas (): Promise<GasFees> {
     // fetch the last 10 blocks and the bottom 10% of priority fees paid for each block
@@ -83,10 +98,7 @@ export default class GasCalculator {
     // plan for max fee of 2 full blocks, each one increasing the fee by 12.5%
     const nextBlockFee = blocks[blocks.length - 1].baseFee // base fee for next block
     const calculatedFee = Math.ceil(nextBlockFee * 1.125 * 1.125)
-
-    // only consider priority fees from blocks that aren't almost empty or almost full
-    const eligibleRewardsBlocks = blocks.filter(block => block.gasUsedRatio >= 0.1 && block.gasUsedRatio <= 0.9).map(block => block.rewards[0])
-    const medianReward = eligibleRewardsBlocks.sort()[Math.floor(eligibleRewardsBlocks.length / 2)] || oneGwei
+    const medianReward = await this._getMedianReward(blocks, 10)
 
     return {
       nextBaseFee: intToHex(nextBlockFee),
