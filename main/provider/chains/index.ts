@@ -1,4 +1,6 @@
-import { arraysMatch } from '../../../resources/utils'
+// @ts-ignore
+import deepEqual from 'deep-equal'
+
 import store from '../../store'
 
 // typed access to state
@@ -8,11 +10,14 @@ const storeApi = {
   },
   getChains: (): Record<string, Network> => {
     return store('main.networks.ethereum') || {}
+  },
+  getChainsMeta: (): Record<string, NetworkMetadata> => {
+    return store('main.networksMeta.ethereum') || {}
   }
 }
 
 interface ChainsChangedHandler {
-  chainsChanged: (chainIds: number[]) => void
+  chainsChanged: (chains: RPC.GetEthereumChains.Chain[]) => void
 }
 
 interface ChainChangedHandler {
@@ -29,7 +34,7 @@ function createChainsObserver (handler: ChainsChangedHandler) {
   return function () {
     const currentChains = getActiveChains()
 
-    if (!arraysMatch(currentChains, availableChains)) {
+    if (!deepEqual(currentChains, availableChains)) {
       availableChains = currentChains
       handler.chainsChanged(availableChains)
     }
@@ -56,13 +61,31 @@ function createOriginChainObserver (handler: ChainChangedHandler & NetworkChange
   }
 }
 
-function getActiveChains () {
+function getActiveChains (): RPC.GetEthereumChains.Chain[] {
   const chains = storeApi.getChains()
+  const meta = storeApi.getChainsMeta()
   
   return Object.values(chains)
     .filter(chain => chain.on)
-    .map(chain => chain.id)
-    .sort((a, b) => a - b)
+    .sort((a, b) => a.id - b.id)
+    .map(chain => {
+      const { id, explorer, name } = chain
+      const { nativeCurrency } = meta[id]
+      const { icon: currencyIcon, name: currencyName, symbol, decimals } = nativeCurrency
+
+      const icons = currencyIcon ? [{ url: currencyIcon }] : []
+
+      return ({
+        chainId: id,
+        networkId: id,
+        name,
+        nativeCurrency: {
+          name: currencyName, symbol, decimals
+        },
+        icon: icons,
+        explorers: [{ url: explorer }]
+      })
+    })
 }
 
 export { getActiveChains, createChainsObserver, createOriginChainObserver }

@@ -4,20 +4,22 @@ import Pylon, { AssetType } from '@framelabs/pylon-client'
 import { AssetId } from '@framelabs/pylon-client/dist/assetId'
 
 interface RateUpdate {
-  id: AssetId,
+  id: AssetId
   data: {
-    usd: number,
+    usd: number
     usd_24h_change: number
   }
 }
 
 interface ChainUpdate {
-  id: number,
+  id: number
   data: {
-    chainId: number,
+    chainId: number
     nativeCurrency: {
-      iconURI: string,
+      symbol: string
+      iconURI: string
       name: string
+      decimals?: number
     }
   }
 }
@@ -25,7 +27,7 @@ interface ChainUpdate {
 export default function rates (pylon: Pylon, store: Store) {
   const storeApi = {
     getKnownTokens: (address?: Address) => ((address && store('main.tokens.known', address)) || []) as Token[],
-    setNativeCurrencyData: (chainId: number, currencyData: Currency) => store.setNativeCurrencyData('ethereum', chainId, currencyData),
+    setNativeCurrencyData: (chainId: number, currencyData: NativeCurrency) => store.setNativeCurrencyData('ethereum', chainId, currencyData),
     setNativeCurrencyRate: (chainId: number, rate: Rate) => store.setNativeCurrencyData('ethereum', chainId, rate),
     setTokenRates: (rates: Record<Address, Rate>) => store.setRates(rates)
   }
@@ -77,9 +79,14 @@ export default function rates (pylon: Pylon, store: Store) {
     log.debug(`got chain updates for ${updates.map(u => u.id)}`)
 
     updates.forEach(update => {
-      storeApi.setNativeCurrencyData(update.data.chainId, {
-        icon: update.data.nativeCurrency.iconURI,
-        name: update.data.nativeCurrency.name
+      const { chainId, nativeCurrency } = update.data
+      const { iconURI, name, symbol, decimals } = nativeCurrency
+
+      storeApi.setNativeCurrencyData(chainId, {
+        icon: iconURI,
+        name,
+        symbol,
+        decimals: decimals || 18
       })
     })
   }

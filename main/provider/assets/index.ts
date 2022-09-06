@@ -11,7 +11,7 @@ const storeApi = {
   getBalances: (account: Address): Balance[] => {
     return store('main.balances', account) || []
   },
-  getNativeCurrency: (chainId: number): Currency => {
+  getNativeCurrency: (chainId: number): NativeCurrency => {
     const currency = store('main.networksMeta.ethereum', chainId, 'nativeCurrency')
     
     return (currency || { usd: { price: 0 } })

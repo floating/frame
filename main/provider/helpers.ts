@@ -181,10 +181,6 @@ export function getActiveChainDetails () {
       })
     })
 }
-
-export function getChainDetails (payload: JSONRPCRequestPayload, res: RPCSuccessCallback) {
-  res({ id: payload.id, jsonrpc: payload.jsonrpc, result: getActiveChainDetails() })
-}
   
 export function ecRecover (payload: JSONRPCRequestPayload, res: RPCRequestCallback) {
   const [message, signed] = payload.params

@@ -81,6 +81,7 @@
     "content-hash": "2.5.2",
     "cookie": "0.5.0",
     "cross-env": "7.0.3",
+    "deep-equal": "2.0.5",
     "electron-log": "4.4.7",
     "electron-updater": "5.0.1",
     "eth-ens-namehash": "2.0.8",
