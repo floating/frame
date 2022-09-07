@@ -11,7 +11,6 @@ import {
 } from 'ethereumjs-util'
 import log from 'electron-log'
 import { v5 as uuidv5 } from 'uuid'
-import { MessageTypes, TypedDataV1, TypedMessage } from '@metamask/eth-sig-util'
 
 import store from '../store'
 import protectedMethods from '../api/protectedMethods'
@@ -194,41 +193,4 @@ export function ecRecover (payload: JSONRPCRequestPayload, res: RPCRequestCallba
     if (err) return resError(err.message, payload, res)
     res({ id: payload.id, jsonrpc: payload.jsonrpc, result: verifiedAddress })
   })
-}
-
-export function getVersionFromTypedData (typedData: TypedDataV1 | TypedMessage<MessageTypes>) {
-  if (Array.isArray(typedData)) {
-    return 'V1'
-  }
-
-  const isCustomType = (type: string) => !!typedData.types[type] 
-  const hasNullCustomType = () => typedData.types[typedData.primaryType].some(({ name, type }) => isCustomType(type) && typedData.message[name] === null)
-  const hasUndefinedType = () => typedData.types[typedData.primaryType].some(({ name }) => typedData.message[name] === undefined)
-  const containsArrays = () => Object.values(typedData.types).flat().some(({ type }) => type.endsWith('[]'))
-  const hasRecursiveType = (typeToCheck = typedData.primaryType): boolean => 
-    typedData.types[typeToCheck].some(({ type }) => {
-      if (!isCustomType(type)) {
-        return false
-      }
-      return type === typeToCheck ? true : hasRecursiveType(type)
-    })
-
-  try {
-    // arrays only supported by v4
-    if (containsArrays()) {
-      return 'V4'
-    }
-
-    // v3 and v4 both support recursion but with different strategies
-    if (hasRecursiveType()) {
-      // default to v4 when encountering recursion unless data contains undefined types (invalid in v4)
-      return hasUndefinedType() ? 'V3' : 'V4'
-    }
-    
-    // no v4-specific features so default to v3 unless data contains null custom types (invalid in v3)
-    return hasNullCustomType() ? 'V4' : 'V3'
-  } catch (e) {
-    // parsing error - default to v3
-    return 'V3'
-  }
 }

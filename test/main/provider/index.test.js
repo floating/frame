@@ -1038,81 +1038,6 @@ describe('#send', () => {
         value: '1212'
       }
     ]
-    const typedDataRecursive = { 
-      ...typedData,
-      types: {
-        EIP712Domain: [
-          { name: 'name', type: 'string' },
-          { name: 'version', type: 'string' },
-          { name: 'chainId', type: 'uint256' },
-          { name: 'verifyingContract', type: 'address' }
-        ],
-        Person: [
-          { name: 'name', type: 'string' },
-          { name: 'mother', type: 'Person' },
-          { name: 'father', type: 'Person' }
-        ]
-      },
-      primaryType: 'Person',
-      message: {
-        name: 'Satoshi Nakamoto',
-        mother: {
-          name: 'unknown'
-        },
-        father: {
-          name: 'unknown'
-        }
-      }
-    }
-    const typedDataArrays = { 
-      ...typedData, 
-      types: {
-        EIP712Domain: [
-          { name: 'name', type: 'string' },
-          { name: 'version', type: 'string' },
-          { name: 'chainId', type: 'uint256' },
-          { name: 'verifyingContract', type: 'address' }
-        ],
-        Person: [
-          { name: 'name', type: 'string' },
-          { name: 'wallets', type: 'address[]' }
-        ],
-        Mail: [
-          { name: 'from', type: 'Person' },
-          { name: 'to', type: 'Person[]' },
-          { name: 'contents', type: 'string' }
-        ],
-        Group: [
-          { name: 'name', type: 'string' },
-          { name: 'members', type: 'Person[]' }
-        ]
-      }
-    }
-    const typedDataNullCustomType = {
-      ...typedData,
-      message: {
-        to: null,
-        from: {
-          name: 'Cow',
-          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
-        },
-        contents: 'Hello, Bob!',
-      }
-    }
-    const typedDataUndefinedProperty = {
-      ...typedData,
-      message: {
-        from: {
-          name: 'Cow',
-          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
-        },
-        to: {
-          name: 'Bob',
-          wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
-        },
-        contents: undefined,
-      }
-    }
     const typedDataInvalid = {
       ...typedData,
       primaryType: 'b0rk'
@@ -1120,20 +1045,12 @@ describe('#send', () => {
 
     const validRequests = [
       { method: 'eth_signTypedData', params: [address, typedDataLegacy], version: 'V1', dataDescription: 'legacy' },
-      { method: 'eth_signTypedData', params: [address, typedData], version: 'V3', dataDescription: 'eip-712' },
-      { method: 'eth_signTypedData', params: [address, typedDataRecursive], version: 'V4', dataDescription: 'eip-712 with recursion' },
-      { method: 'eth_signTypedData', params: [address, typedDataArrays], version: 'V4', dataDescription: 'eip-712 with arrays' },
-      { method: 'eth_signTypedData', params: [address, typedDataNullCustomType], version: 'V4', dataDescription: 'eip-712 with null custom type' },
-      { method: 'eth_signTypedData', params: [address, typedDataUndefinedProperty], version: 'V3', dataDescription: 'eip-712 with undefined property' },
+      { method: 'eth_signTypedData', params: [address, typedData], version: 'V4', dataDescription: 'eip-712' },
       { method: 'eth_signTypedData_v1', params: [address, typedDataLegacy], version: 'V1', dataDescription: 'legacy' },
       { method: 'eth_signTypedData_v3', params: [address, typedData], version: 'V3', dataDescription: 'eip-712' },
       { method: 'eth_signTypedData_v4', params: [address, typedData], version: 'V4', dataDescription: 'eip-712' },
       { method: 'eth_signTypedData', params: [typedDataLegacy, address], version: 'V1', dataFirst: true, dataDescription: 'legacy' },
-      { method: 'eth_signTypedData', params: [typedData, address], version: 'V3', dataFirst: true, dataDescription: 'eip-712' },
-      { method: 'eth_signTypedData', params: [typedDataRecursive, address], version: 'V4', dataFirst: true, dataDescription: 'eip-712 with recursion' },
-      { method: 'eth_signTypedData', params: [typedDataArrays, address], version: 'V4', dataFirst: true, dataDescription: 'eip-712 with arrays' },
-      { method: 'eth_signTypedData', params: [typedDataNullCustomType, address], version: 'V4', dataFirst: true, dataDescription: 'eip-712 with null custom type' },
-      { method: 'eth_signTypedData', params: [typedDataUndefinedProperty, address], version: 'V3', dataFirst: true, dataDescription: 'eip-712 with undefined property' },
+      { method: 'eth_signTypedData', params: [typedData, address], version: 'V4', dataFirst: true, dataDescription: 'eip-712' },
       { method: 'eth_signTypedData_v1', params: [typedDataLegacy, address], version: 'V1', dataFirst: true, dataDescription: 'legacy' },
       { method: 'eth_signTypedData_v3', params: [typedData, address], version: 'V3', dataFirst: true, dataDescription: 'eip-712' },
       { method: 'eth_signTypedData_v4', params: [typedData, address], version: 'V4', dataFirst: true, dataDescription: 'eip-712' }
@@ -1161,15 +1078,15 @@ describe('#send', () => {
 
       send({ method: 'eth_signTypedData', params })
 
-      verifyRequest('V3', typedData)
+      verifyRequest('V4', typedData)
     })
 
-    it('handles invalid EIP-712 data by defaulting to v3', () => {
+    it('handles invalid EIP-712 data by defaulting to v4', () => {
       const params = [typedDataInvalid, address]
 
       send({ method: 'eth_signTypedData', params })
 
-      verifyRequest('V3', typedDataInvalid)
+      verifyRequest('V4', typedDataInvalid)
     })
 
     it('does not submit a request from an unknown account', done => {

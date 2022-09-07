@@ -25,6 +25,7 @@ import FrameAccount from '../accounts/Account'
 import { capitalize } from '../../resources/utils'
 import { ApprovalType } from '../../resources/constants'
 import { createObserver as AssetsObserver, loadAssets } from './assets'
+import { getVersionFromTypedData } from './typedData'
 
 import {
   checkExistingNonceGas,
@@ -39,7 +40,6 @@ import {
   requestPermissions,
   resError,
   hasPermission,
-  getVersionFromTypedData
 } from './helpers'
 
 import {
