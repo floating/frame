@@ -22,8 +22,8 @@ class ProviderRequest extends React.Component {
     const origin = this.store('main.origins', originId)
     const originName = origin ? origin.name : 'Unknown Origin'
     let originClass = 'requestProviderOrigin'
-    if (originId.length > 28) originClass = 'requestProviderOrigin requestProviderOrigin18'
-    if (originId.length > 36) originClass = 'requestProviderOrigin requestProviderOrigin12'
+    if (originName.length > 28) originClass = 'requestProviderOrigin requestProviderOrigin18'
+    if (originName.length > 36) originClass = 'requestProviderOrigin requestProviderOrigin12'
     return (
       <div key={this.props.req.id || this.props.req.handlerId} className={requestClass}>
         <div className='approveRequest'>
