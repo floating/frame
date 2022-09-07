@@ -176,11 +176,10 @@ class FrameAccount {
   setAccess (req: AccessRequest, access: boolean) {
     const { handlerId, origin, account } = req
     if (account.toLowerCase() === this.address)  {
-      // Permissions do no live inside the account summary
-      const { name } = store('main.origins', origin)
-      store.setPermission(this.address, { handlerId, origin: name, provider: access })
+      // Permissions do not live inside the account summary
+      const originName = store('main.origins', origin, 'name') || 'Unknown'
+      store.setPermission(this.address, { handlerId, origin: originName, provider: access })
     }
-
     this.resolveRequest(req)
   }
 
@@ -188,12 +187,12 @@ class FrameAccount {
     return this.requests[id] as T
   }
 
-  resolveRequest ({ handlerId, payload: { id, jsonrpc } }: AccountRequest, result?: any) {
+  resolveRequest ({ handlerId, payload }: AccountRequest, result?: any) {
     const knownRequest = this.requests[handlerId]
 
     if (knownRequest) {
       if (knownRequest.res) {
-        knownRequest.res({ id, jsonrpc, result })
+        knownRequest.res(payload ? { id: payload.id, jsonrpc: payload.jsonrpc, result } : undefined)
       }
 
       this.clearRequest(knownRequest)

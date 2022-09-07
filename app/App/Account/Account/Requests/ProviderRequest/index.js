@@ -13,17 +13,17 @@ class ProviderRequest extends React.Component {
   }
 
   render () {
-    const status = this.props.req.status
-    const notice = this.props.req.notice
+    const { status, notice, origin: originId } = this.props.req
     let requestClass = 'signerRequest'
     if (status === 'success') requestClass += ' signerRequestSuccess'
     if (status === 'declined') requestClass += ' signerRequestDeclined'
     if (status === 'pending') requestClass += ' signerRequestPending'
     if (status === 'error') requestClass += ' signerRequestError'
-    const originName = this.store('main.origins', this.props.req.origin, 'name')
+    const origin = this.store('main.origins', originId)
+    const originName = origin ? origin.name : 'Unknown Origin'
     let originClass = 'requestProviderOrigin'
-    if (origin.length > 28) originClass = 'requestProviderOrigin requestProviderOrigin18'
-    if (origin.length > 36) originClass = 'requestProviderOrigin requestProviderOrigin12'
+    if (originId.length > 28) originClass = 'requestProviderOrigin requestProviderOrigin18'
+    if (originId.length > 36) originClass = 'requestProviderOrigin requestProviderOrigin12'
     return (
       <div key={this.props.req.id || this.props.req.handlerId} className={requestClass}>
         <div className='approveRequest'>
