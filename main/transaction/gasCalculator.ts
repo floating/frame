@@ -83,9 +83,12 @@ export default class GasCalculator {
 
     // increase percentile by 5% until a value is reached - return 1 gwei when we hit 100%
     if (!medianReward) {
+      if (lowerPercentile === 100) {
+        return oneGwei
+      }
       const nextPercentile = lowerPercentile + 5
       const nextBlocks = await this._getFeeHistory(10, [nextPercentile])
-      return lowerPercentile === 100 ? oneGwei : await this._getMedianReward(nextBlocks, nextPercentile)
+      return await this._getMedianReward(nextBlocks, nextPercentile)
     }
     
     return medianReward
