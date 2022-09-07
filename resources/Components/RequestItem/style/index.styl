@@ -11,6 +11,9 @@
   opacity 1
   pointer-events none
 
+.requestItem:hover
+  background var(--ghostB)
+
 .requestItem
   border-radius 10px
   background var(--ghostA)
@@ -19,11 +22,14 @@
   width 100%
   z-index 1
   margin-top 5px
+  overflow hidden
+  font-family 'MainFont'
+  font-weight 600
   // height 70px
   // transition all linear 1s
-  // background linear-gradient(90deg, var(--ghostA), red)
-  // background-position 0% 300%
   // background-size 400% 400%
+  // background-position 0% 300%
+  // background linear-gradient(90deg, var(--ghostC), var(--ghostA))
   *
     pointer-events none
 
@@ -34,26 +40,35 @@
     justify-content flex-start
     text-transform uppercase
     font-weight 600
-    font-size 9px
-    letter-spacing 3px
-    border-bottom-left-radius 12px
-    border-bottom-right-radius 12px
-    height 20px
+    letter-spacing 4px
+    padding 0px 0px 8px 12px
+    font-size 10px
+    border-radius 12px
     color var(--moon)
-    background var(--ghostB)
 
-  .requestItemDetailsSlide
-    width 100%
-    display flex
-    align-items center
+    .requestItemDetailsSlide
+      width 100%
+      display flex
+      align-items center
+      justify-content center
 
-  .requestItemDetailsIndicator
-    height 4px
-    width 37px
-    border-radius 2px
-    margin 4px 14px
-    background var(--moon)
-    z-index 4
+    .requestItemDetailsIndicator
+      height 2px
+      flex 1
+      border-radius 1px
+      margin 0px 10px 0px 2px
+      background var(--moon)
+      z-index 4
+
+  .requestItemDetailsGood
+    color var(--good)
+    .requestItemDetailsIndicator
+      background var(--good)
+
+  .requestItemDetailsBad
+    color var(--bad)
+    .requestItemDetailsIndicator
+      background var(--bad)
 
   .requestItemRow
     position relative
@@ -139,6 +154,7 @@
         font-size 12px
         padding-bottom 2px
         background linear-gradient(90deg, var(--ghostB), var(--ghostC))
+        box-shadow 0px 1px 2px var(--ghostZ)
         // box-shadow 0px 2px 4px var(--ghostY)
 
     .requestItemMain
@@ -146,24 +162,25 @@
       margin-bottom 3px
 
     .requestItemTitleMain
-      font-size 15px
-      margin-bottom 4px
+      font-size 16px
+      font-weight 300
+      margin-bottom 5px
       margin-top 5px
 
-    .requestItemTitleSub
-      display flex
-      justify-content flex-start
-      align-items center
-      font-size 11px
-      font-weight 500
-      padding-bottom 4px
-      
-      .requestItemTitleSubIcon
-        margin -1px 5px 0px 1px
-        color var(--outerspace)
+  .requestItemTitleSub
+    display flex
+    justify-content flex-start
+    align-items center
+    font-size 11px
+    font-weight 500
+    padding-bottom 4px
+    
+    .requestItemTitleSubIcon
+      margin -1px 5px 0px 1px
+      color var(--outerspace)
 
-      .requestItemTitleSubText
-        margin -3px 0px 0px 0px
+    .requestItemTitleSubText
+      margin -3px 0px 0px 0px
 
   .requestItemTime
     position absolute
@@ -254,13 +271,14 @@
     position relative
     left 1px
 
-.requestItem:hover
-  background-position 0% 0%
-  background linear-gradient(90deg, var(--ghostA), var(--ghostB))
+// .requestItem:hover
+//   background-position 0% 0%
+//   background linear-gradient(90deg, var(--ghostA), var(--ghostB))
+  
 
-  .requestItemDetails
-    .requestItemDetailsSlide
-      background linear-gradient(90deg, var(--ghostB), var(--ghostC))
+  // .requestItemDetails
+  //   .requestItemDetailsSlide
+  //     background linear-gradient(90deg, var(--ghostB), var(--ghostC))
 
 .requestItemHeader
   background none

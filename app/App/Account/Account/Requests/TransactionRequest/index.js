@@ -192,17 +192,18 @@ class TransactionRequest extends React.Component {
             </div>
             <div className={(req.automaticFeeUpdateNotice || true) ? 'requestFooter requestFooterActive' : 'requestFooter'}>
               <div className='txActionButtons'>
-                
                 {req.automaticFeeUpdatenotice ? (
                   <div className='txActionButtonsRow'>
                     <div className='txActionText'>{'Fee Updated'}</div>
                     <div className='txActionButton' onClick={() => {
-                      link.rpc('removeFeeUpdateNotice', req.handlerId, e => { if (e) console.error(e) })
+                      link.rpc('removeFeeUpdateNotice', req.handlerId, e => { 
+                        if (e) console.error(e) 
+                      })
                     }}>{'Ok'}</div>
                   </div>
                 ) : null }
 
-                {req && req.tx && req.tx.hash ? (
+                {(req && req.tx && req.tx.hash)  ? (
                   <div className='txActionButtonsRow'>
                     <div
                       className={'txActionButton'}
@@ -251,8 +252,6 @@ class TransactionRequest extends React.Component {
                     </div>
                   </div>
                 ) : null }
-
-                
               </div>
             </div>
           </div>

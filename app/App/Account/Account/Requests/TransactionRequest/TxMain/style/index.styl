@@ -3,8 +3,8 @@
   z-index 100001
   background var(--ghostA)
   margin 16px 6px
-  border-radius 14px
-  padding 5px 0px 5px 0px
+  border-radius 20px
+  padding 0px 0px 5px 0px
   overflow hidden
   box-shadow 0px 4px 8px var(--ghostY)
 
@@ -14,7 +14,7 @@
     ._txMainValues
       font-size 17px
       font-weight 400
-      border-radius 10px
+      border-radius 16px
       -webkit-app-region no-drag
       transition none
       transform translate3d(0, 0, 0)
@@ -46,16 +46,16 @@
         display flex
         justify-content center
         align-items stretch
-        border-radius 6px
+        border-radius 12px
         overflow hidden
-        font-weight 400
+        font-weight 200
 
         ._txMainTransferringPart
           flex-grow 1
           display flex
           justify-content center
           align-items center
-          border-radius 6px
+          border-radius 12px
           padding 7px 0px
           background var(--ghostA)
           margin-right 5px
@@ -70,6 +70,8 @@
         font-size 14px
         font-weight 600
         margin-right 5px
+        position relative
+        top -1px
 
       ._txMainTransferringAmount
         font-size 20px
@@ -88,16 +90,16 @@
 
       ._txMainValue
         font-size 14px
-        font-weight 500
+        line-height 22px
         display flex
         justify-content center
         align-items center
-        border-radius 8px
+        border-radius 12px
         -webkit-app-region no-drag
         transition none
         transform translate3d(0, 0, 0)
         font-family 'MainFont'
-        padding 8px
+        padding 12px
         background var(--ghostA)
         margin-top 5px
         
@@ -130,7 +132,7 @@
     text-align center
     padding 5px 0px 5px 0px
     margin-top 5px
-    border-radius 8px
+    border-radius 12px
     background var(--ghostA)
 
   ._txMainTagWarning

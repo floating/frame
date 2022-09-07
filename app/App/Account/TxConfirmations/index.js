@@ -11,7 +11,7 @@ class TxConfirmations extends React.Component {
       <div className='monitorConfirms'>
         {[...Array(12).keys()].map(i => {
           const monitorConfirmsItem = confirmations > i ? 'txProgressConfirmsItem txProgressConfirmsItemGood' : 'txProgressConfirmsItem'
-          return <div key={i} className={monitorConfirmsItem}>{svg.octicon('chevron-right', { height: 14 })}</div>
+          return <div key={i} className={monitorConfirmsItem}>{svg.arrowRight(12)}</div>
         })}
         </div>
     )

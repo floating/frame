@@ -140,15 +140,18 @@ class _RequestApprove extends React.Component {
       }
     }
 
+    let displayStatus = req.status
+    if (displayStatus === 'verifying') displayStatus = 'waiting for block'
+
     if (notice) {
       return (
         <div className='requestNotice'>
           <div className='requestNoticeInner'>
-            {error ? (
+            {/* {error ? (
               <div className={'requestNoticeInnerText'}>
                 {notice}
               </div>
-            ) : null}
+            ) : null} */}
             {/* <div className={success ? 'txSuccessHash ' : 'txSuccessHash'}>
               {req && req.tx && req.tx.hash ? req.tx.hash.substring(0, 9) : ''}
               {svg.octicon('kebab-horizontal', { height: 16 })}
@@ -206,6 +209,9 @@ class _RequestApprove extends React.Component {
               </div>
             </div> */}
             <TxConfirmations req={req} />
+            <div className={'requestNoticeInnerText'} style={{ position: 'relative', top: '-10px'}}>
+              {displayStatus}
+            </div>
             <TxBar req={req} />
             {/* <div className='monitorIcon'>{svg.octicon('radio-tower', { height: 17 })}</div> */}
             {/* <div className='monitorIconIndicator' /> */}
@@ -248,7 +254,7 @@ class _RequestApprove extends React.Component {
           <div
             className='requestSign' 
             onClick={() => {
-              if (this.state.allowInput && !req.automaticFeeUpdateNotice) {
+              if (this.state.allowInput) {
                 link.rpc('signerCompatibility', req.handlerId, (e, compatibility) => {
                   if (e === 'No signer')  {
                     this.store.notify('noSignerWarning', { req })

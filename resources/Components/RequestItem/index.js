@@ -37,6 +37,16 @@ class _RequestItem extends React.Component {
   render () {
     const { account, handlerId, i, title, svgLookup, img, color, headerMode, txNonce } = this.props
     const req = this.store('main.accounts', account, 'requests', handlerId)
+
+    const status = req.status || 'pending'
+
+    let requestItemDetailsClass = 'requestItemDetails'
+    if (status === 'confirming') {
+      requestItemDetailsClass += ' requestItemDetailsGood'
+    } else if (status === 'error') {
+      requestItemDetailsClass += ' requestItemDetailsBad'
+    }
+
     return (
       <div 
         key={req.handlerId}
@@ -102,10 +112,10 @@ class _RequestItem extends React.Component {
             </div>
           )}
         </div>
-        <div className='requestItemDetails'>
+        <div className={requestItemDetailsClass}>
           <div className='requestItemDetailsSlide'>
+            {status}
             <div className='requestItemDetailsIndicator' />
-            {req.status || 'pending'}
           </div>
         </div>
       </div>
