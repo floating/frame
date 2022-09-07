@@ -66,7 +66,7 @@ class TxFee extends React.Component {
             <div className='_txMainValuesRow'>
               <div className='_txMainValuesColumn' style={{ flex: '1' }}>
                 <div className='_txFeeBar' onClick={() => {
-                  link.send('nav:update', 'panel', { step: 'adjustFee' })
+                  link.send('nav:update', 'panel', { data: { step: 'adjustFee' } })
                 }}>
                   <div className='_txFeeGwei'>
                     <span className='_txFeeGweiValue'>{this.toDisplayGwei(maxFeePerGas)}</span>

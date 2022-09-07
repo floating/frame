@@ -1,23 +1,53 @@
 ._txButton
   background var(--ghostB)
-  border-radius 12px
+  border-radius 19px
   transform translateY(0px)
   cursor pointer
+  box-shadow 0px 4px 4px var(--ghostX)
+  position relative
 
   *
     pointer-events none
 
 ._txButton:hover
-  // flex 1
-  // padding 0px 10px
-  background var(--good)
+  // background var(--good)
   color var(--goodOver)
-  box-shadow 0px 10px 20px -5px var(--ghostZ)
+  box-shadow 0px 6px 6px var(--ghostX)
   animation 5s shake ease-in-out infinite alternate
 
+._txButton:hover::after
+  content ''
+  position absolute
+  top 4px
+  left 4px
+  right 4px
+  bottom 4px
+  background white
+  border-top-right-radius 15px
+  border-bottom-right-radius 15px
+  border-top-left-radius 6px
+  border-bottom-left-radius 6px
+  background var(--good)
+  z-index 3
+
 ._txButtonBad:hover
-  background var(--bad)
   color var(--badOver)
+
+._txButtonBad:hover::after
+  content ''
+  position absolute
+  top 4px
+  left 4px
+  right 4px
+  bottom 4px
+  background white
+  border-top-left-radius 15px
+  border-bottom-left-radius 15px
+  border-top-right-radius 6px
+  border-bottom-right-radius 6px
+  color var(--badOver)
+  background var(--bad)
+  z-index 3
 
 ._txButton:active
   transform translateY(0px)
@@ -25,7 +55,7 @@
   animation-duration 2s
   animation-timing-function: ease-in-out
   animation-iteration-count: infinite
-  box-shadow 0px 4px 6px 0px var(--ghostA)
+  box-shadow 0px 2px 2px var(--ghostX)
 
 @keyframes shake 
   0% 
@@ -186,11 +216,9 @@
 
 ._txDescription
   width 100%
-  // animation-name cardShow
-  // animation-duration 0.2s
-  font-family 'Exo2'
+  font-family 'Ubuntu'
   font-size 16px
-  font-weight 500
+  font-weight 400
   cursor pointer
   padding 10px 0px
 

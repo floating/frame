@@ -63,7 +63,7 @@ class TxRecipient extends React.Component {
     //   txMeta.possible = false
     //   txMeta.notice = 'signer is locked'
     // }
-    if (req.data.nonce) {
+    if (req.mode !== 'monitor' && req.data.nonce) {
       const r = this.store('main.accounts', this.props.accountId, 'requests')
       const requests = Object.keys(r || {}).map(key => r[key])
       const monitor = requests.filter(req => req.mode === 'monitor')
@@ -118,19 +118,8 @@ class TxRecipient extends React.Component {
                 </div>
               )
             ) : null}
-            {txMeta.replacement ? (
-              txMeta.possible ? (
-                <div className='approveRequestHeaderTag'>
-                  valid replacement
-                </div>
-              ) : (
-                <div className='approveRequestHeaderTag approveRequestHeaderTagInvalid'>
-                  {txMeta.notice || 'invalid duplicate'}
-                </div>
-              )
-            ) : null}
             <div className='_txMainValue _txMainValueClickable' onClick={() => {
-              link.send('nav:update', 'panel', { step: 'viewData' })
+              link.send('nav:update', 'panel', { data: { step: 'viewData' } })
             }}>
               <div className='_txDescription'>
                 {req.recipientType === 'external' ? (
