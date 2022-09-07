@@ -209,7 +209,7 @@ class _RequestApprove extends React.Component {
               </div>
             </div> */}
             <TxConfirmations req={req} />
-            <div className={'requestNoticeInnerText'} style={{ position: 'relative', top: '-10px'}}>
+            <div className={'requestNoticeInnerText'}>
               {displayStatus}
             </div>
             <TxBar req={req} />

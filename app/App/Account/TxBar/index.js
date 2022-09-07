@@ -41,7 +41,7 @@ class TxBar extends React.Component {
                 <div className={position > 2 ? 'txProgressStepCenter txProgressStepCenterOn' : 'txProgressStepCenter'} />
               </div>
               <div className='txProgressStep'>
-                <div className={progressIconClass} style={{ padding: '9px 12px' }}>{svg.cube(16)}</div>
+                <div className={progressIconClass} style={{ padding: '11px 12px' }}>{svg.cube(16)}</div>
                 <div className='txProgressStepMarker' />
                 <div className={position > 3 ? 'txProgressStepCenter txProgressStepCenterOn' : 'txProgressStepCenter'} />
               </div>
