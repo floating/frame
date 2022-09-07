@@ -16,8 +16,6 @@ jest.mock('../../../../../resources/link', () => ({
 const AddToken = Restore.connect(AddTokenComponent, store)
 
 beforeAll(() => {
-  jest.useFakeTimers()
-
   store.addNetwork({
     id: 1,
     type: 'ethereum',
@@ -47,10 +45,6 @@ beforeAll(() => {
 
   store.setPrimary('ethereum', 137, { connected: false })
   store.activateNetwork('ethereum', 137, true)
-})
-
-afterAll(() => {
-  jest.useRealTimers()
 })
 
 describe('selecting token chain', () => {

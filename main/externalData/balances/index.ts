@@ -1,9 +1,9 @@
 import log from 'electron-log'
 
+import { NATIVE_CURRENCY } from '../../../resources/utils/constants'
 import BalancesWorkerController from './controller'
 import { CurrencyBalance, TokenBalance } from './scan'
 
-const NATIVE_CURRENCY = '0x0000000000000000000000000000000000000000'
 const RESTART_WAIT = 5 // seconds
 
 export default function (store: Store) {

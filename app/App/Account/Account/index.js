@@ -30,8 +30,7 @@ class _AccountModule extends React.Component {
       id, 
       module, 
       top, 
-      index, 
-      expandModule, 
+      index,
       expanded, 
       expandedData,
       account
@@ -61,7 +60,6 @@ class _AccountModule extends React.Component {
             id === 'gas' ? <Gas 
               moduleId={id} 
               id={account}
-              expandModule={expandModule}
               expanded={expanded}
             /> :
             id === 'requests' ? <Requests 
@@ -70,50 +68,42 @@ class _AccountModule extends React.Component {
               addresses={this.props.addresses} 
               minimized={this.props.minimized} 
               status={this.props.status} 
-              signer={this.props.signer} 
-              expandModule={expandModule}
+              signer={this.props.signer}
               expanded={expanded}
             /> :
             id === 'activity' ? <Activity 
               moduleId={id} 
               id={account}
-              expandModule={expandModule}
               expanded={expanded}
             /> :
             id === 'launcher' ? <Launcher 
               moduleId={id}
               id={account} 
-              expandModule={expandModule}
               expanded={expanded}
             /> :
             id === 'inventory' ? <Inventory 
               moduleId={id} 
               account={account}
-              expandModule={expandModule}
               expanded={expanded}
               expandedData={expandedData}
             /> :
             id === 'permissions' ? <Permissions
               moduleId={id}
               account={account}
-              expandModule={expandModule}
               expanded={expanded}
             /> :
             id === 'balances' ? <Balances
               moduleId={id}
               account={account}
-              expandModule={expandModule}
               expanded={expanded}
             /> :
             id === 'settings' ? <Settings
               moduleId={id}
               account={account}
-              expandModule={expandModule}
               expanded={expanded}
             /> :
             <Default 
               moduleId={id}
-              expandModule={expandModule}
               expanded={expanded}
             />
           }
@@ -145,9 +135,6 @@ class _AccountMain extends React.Component {
   //   })
   // }
   
-  expandModule (data) {
-    link.send('nav:forward', 'panel', { view: 'expandedModule', ...data })
-  }
 
   setSignerStatusOpen (value) {
     link.send('tray:action', 'setAccountSignerStatusOpen', value)
@@ -224,8 +211,7 @@ class _AccountMain extends React.Component {
         account={this.props.id}
         module={module} 
         top={slideHeight - module.height + 40}
-        index={i} 
-        expandModule={this.expandModule.bind(this)}
+        index={i}
       />
     })
     return (
@@ -356,10 +342,10 @@ class _AccountBody extends React.Component {
   }
   render () {
     const crumb = this.store('windows.panel.nav')[0] || {}
+
     if (crumb.view === 'requestView') {
       const { accountId, requestId } = crumb.data
       const req = this.store('main.accounts', accountId, 'requests', requestId)
-
       let accountViewTitle, accountViewIcon
       if (req.type === 'access') {
         accountViewTitle = 'Account Access'
@@ -402,7 +388,7 @@ class _AccountBody extends React.Component {
             link.send('nav:back', 'panel')
           }}
           {...this.props}
-          accountViewTitle={crumb.id}
+          accountViewTitle={crumb.data.id}
         >
           <div 
             className='accountsModuleExpand cardShow' 
@@ -412,16 +398,13 @@ class _AccountBody extends React.Component {
               e.stopPropagation()
             }}>
               <AccountModule 
-                id={crumb.id}
-                account={crumb.account}
+                id={crumb.data.id}
+                account={crumb.data.account}
                 module={{ height: 'auto' }}
                 top={0}
                 index={0}
-                expandModule={(view, data) => {
-                  link.send('tray:action', 'navPanel', { view: 'expandedModule', data }) 
-                }} 
                 expanded={true} 
-                expandedData={crumb}
+                expandedData={crumb.data}
               />
             </div>
           </div>

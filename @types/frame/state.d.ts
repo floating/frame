@@ -13,22 +13,23 @@ interface Chain {
 }
 
 interface Network {
-  id: number,
-  name: string,
-  symbol: string,
-  layer: string,
-  on: boolean,
+  id: number
+  name: string
+  symbol: string
+  layer: string
+  explorer: string
+  on: boolean
   connection: {
-    primary: Connection,
+    primary: Connection
     secondary: Connection
   }
 }
 
 interface NetworkMetadata {
-  id: number,
-  name: string,
-  nativeCurrency: NativeCurrency,
-  symbol: string,
+  id: number
+  name: string
+  nativeCurrency: NativeCurrency
+  symbol: string
   gas: GasData
 }
 
@@ -53,6 +54,9 @@ interface Permission {
 
 interface NativeCurrency {
   symbol: string
+  icon: string
+  name: string
+  decimals: number
 }
 
 interface GasData {
@@ -96,11 +100,6 @@ interface Rate {
     price: BigNumber,
     change24hr: BigNumber
   }
-}
-
-interface Currency {
-  icon: string,
-  name: string
 }
 
 interface Token {

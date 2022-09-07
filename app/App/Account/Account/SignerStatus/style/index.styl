@@ -24,8 +24,8 @@
   position absolute
   z-index 99999
   top 0px
-  left 5px
-  right 5px
+  left 3px
+  right 3px
   pointer-events auto
 
   .signerStatusWrap
@@ -35,10 +35,11 @@
     animation-name fadeInDown
     animation-duration 400ms
     animation-timing-function cubic-bezier(.82,0,.12,1)
+    z-index 40000
 
   .signerStatusTop
     position relative
-    height 10px
+    height 7px
 
     .signerStatusTopArrow
       background var(--ghostB)
@@ -47,15 +48,14 @@
       border-top-left-radius 3px
       transform rotate(45deg)
       position absolute
-      top 7px
-      left 25px
-      box-shadow -4px -4px 6px -2px var(--ghostA) // , 0px 10px 20px var(--ghostZ)
+      top 6px
+      left 26px
 
   .signerStatusMain
     background var(--ghostB)
-    border-radius 16px
+    border-radius 20px
     box-shadow 0px 0px 10px var(--ghostZ), 0px 10px 20px var(--ghostZ)
-    padding 20px
+    padding 42px
 
 .signerStatusHidden
   transform translateY(-40px)
@@ -70,37 +70,38 @@
   width 100%
 
   .signerUnlockHeader
-    padding-bottom 20px
+    padding-bottom 32px
     text-transform uppercase
-    font-size 12px
+    font-size 13px
     font-weight 400
+    text-shadow 0px 1px 2px var(--ghostX)
 
   .signerUnlockInput
-    height 40px
+    height 48px
     width 100%
     padding-bottom 0px
     border 0
     outline 0
     background var(--ghostC)
-    font-size 24px
+    font-size 26px
     letter-spacing 6px
     display flex
     justify-content center
     align-items center
     text-align center
-    border-radius 22px
-    color var(--outerspace08)
-    box-shadow 0px 1px 1px var(--ghostA), inset 0px 1px 1px var(--ghostA)
-    text-shadow 0px 2px 2px var(--ghostA)
-    border 2px solid var(--moon)
+    border-radius 24px
+    color var(--outerspace)
+    box-sizing border-box
+    border 3px solid var(--ghostZ)
     color var(--moon)
 
   .signerUnlockSubmit
-    height 30px
+    height 32px
     background var(--ghostC)
     color var(--outerspace)
     font-size 12px
-    margin 12px 0px 0px 0px
+    box-sizing border-box
+    margin 32px 0px 0px 0px
     width 140px
     border-radius 15px
     display flex
@@ -109,21 +110,23 @@
     font-weight 600
     cursor pointer
     text-transform uppercase
-    box-shadow 0px 1px 1px var(--ghostA)
+    // box-shadow 0px 2px 8px -2px var(--ghostX)
+    cursor pointer 
+    border 3px solid var(--ghostZ)
 
     *
       pointer-events none
 
   .signerUnlockSubmit:hover
-    background var(--moon)
-    color var(--moonOver)
-    animation 5s shake ease-in-out infinite alternate
-    box-shadow 0px 5px 15px 0px var(--ghostB)
+    background var(--ghostD)
+    color var(--good)
+    // animation 5s shake ease-in-out infinite alternate
+    // box-shadow 0px 2px 8px var(--ghostZ)
 
   .signerUnlockSubmit:active
     transform translateY(0px)
-    animation shake-little 2s ease-in-out infinite
-    box-shadow 0px 4px 6px 0px var(--ghostB)
+    // animation shake-little 2s ease-in-out infinite
+    // box-shadow 0px 2px 8px var(--ghostZ)
 
 .headShake
   animation-duration 1s

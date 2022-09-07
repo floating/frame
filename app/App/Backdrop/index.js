@@ -8,20 +8,21 @@ class Backdrop extends React.Component {
     if (accountOpen && crumb.view === 'requestView') {
       const { accountId, requestId } = crumb.data
       const req = this.store('main.accounts', accountId, 'requests', requestId)
-      if (req && req.type === 'transaction' && req.mode === 'monitor') {
+      // TODO: Move this to nav data
+      if (req && req.type === 'transaction' && crumb.data.step !== 'confirm') {
         return ({
           overlay: {
-            class: 'overlay overlayMonitor',
+            class: 'overlay',
             style: {
               top: '140px',
-              bottom: '140px'
+              bottom: '40px'
             }
           },
           backdrop: {
             class: 'backdrop',
             style: {
               top: '140px',
-              bottom: '140px'
+              bottom: '40px'
             }
           }
         })

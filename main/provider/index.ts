@@ -22,11 +22,37 @@ import { getType as getSignerType, Type as SignerType } from '../signers/Signer'
 import { TransactionData } from '../../resources/domain/transaction'
 import { populate as populateTransaction, maxFee } from '../transaction'
 import FrameAccount from '../accounts/Account'
-import { capitalize, arraysMatch } from '../../resources/utils'
+import { capitalize } from '../../resources/utils'
 import { ApprovalType } from '../../resources/constants'
-import { checkExistingNonceGas, ecRecover, feeTotalOverMax, gasFees, getActiveChains, getAssets, getChains, getChainDetails, getPermissions, getRawTx, getSignedAddress, isCurrentAccount, isScanning, loadAssets, requestPermissions, resError } from './helpers'
+import { createObserver as AssetsObserver, loadAssets } from './assets'
 
-type Subscriptions = { [key in SubscriptionType]: string[] }
+import {
+  checkExistingNonceGas,
+  ecRecover,
+  feeTotalOverMax,
+  gasFees,
+  getPermissions,
+  getRawTx,
+  getSignedAddress,
+  isCurrentAccount,
+  requestPermissions,
+  resError,
+  hasPermission
+} from './helpers'
+
+import {
+  createChainsObserver as ChainsObserver,
+  createOriginChainObserver as OriginChainObserver,
+  getActiveChains
+} from './chains'
+
+
+type Subscription = {
+  id: string
+  originId: string
+}
+
+type Subscriptions = { [key in SubscriptionType]: Subscription[] }
 
 interface RequiredApproval {
   type: ApprovalType,
@@ -36,16 +62,6 @@ interface RequiredApproval {
 export interface TransactionMetadata {
   tx: TransactionData,
   approvals: RequiredApproval[]
-}
-
-export interface ProviderDataPayload {
-  jsonrpc: '2.0',
-  method: string,
-  params: {
-    subscription: string,
-    origin?: string,
-    result: any
-  }
 }
 
 const storeApi = {
@@ -70,7 +86,6 @@ export class Provider extends EventEmitter {
   constructor () {
     super()
 
-    this.connection.syncDataEmit(this)
     this.connection.on('connect', (...args) => {
       this.connected = true
       this.emit('connect', ...args)
@@ -79,6 +94,10 @@ export class Provider extends EventEmitter {
       this.connected = false
     })
     this.connection.on('data', (chain, ...args) => {
+      if ((args[0] || {}).method === 'eth_subscription') {
+        this.emit('data:subscription', ...args)
+      }
+
       this.emit(`data:${chain.type}:${chain.id}`, ...args)
     })
     this.connection.on('error', (chain, err) => {
@@ -101,40 +120,46 @@ export class Provider extends EventEmitter {
   }
 
   accountsChanged (accounts: string[]) {
-    this.subscriptions.accountsChanged.forEach(subscription => {
-      this.emit('data:address', accounts[0], { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, result: accounts } })
-    })
+    const address = accounts[0]
+
+    this.subscriptions.accountsChanged
+      .filter((subscription) => hasPermission(address, subscription.originId))
+      .forEach((subscription) => this.sendSubscriptionData(subscription.id, accounts))
   }
 
-  assetsChanged (account: string, assets: RPC.GetAssets.Assets) {
-    this.subscriptions.assetsChanged.forEach(subscription => {
-      this.emit('data:address', account, { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, result: { ...assets, account } } })
-    })
+  assetsChanged (address: string, assets: RPC.GetAssets.Assets) {
+    this.subscriptions.assetsChanged
+      .filter((subscription) => hasPermission(address, subscription.originId))
+      .forEach((subscription) => this.sendSubscriptionData(subscription.id, { ...assets, account: address }))
   }
 
-  // fires when the current default chain changes
   chainChanged (chainId: number, originId: string) {
     const chain = intToHex(chainId)
 
-    this.subscriptions.chainChanged.forEach(subscription => {
-      const event: ProviderDataPayload = { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, origin: originId, result: chain } }
-      this.emit('data', event)
-    })
+    this.subscriptions.chainChanged
+      .filter((subscription) => subscription.originId === originId)
+      .forEach((subscription) => this.sendSubscriptionData(subscription.id, chain))
   }
 
   // fires when the list of available chains changes
-  chainsChanged (availableChains: number[]) {
-    const chains = availableChains.map(intToHex)
-
-    this.subscriptions.chainsChanged.forEach(subscription => {
-      this.emit('data', { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, result: chains } })
-    })
+  chainsChanged (chains: RPC.GetEthereumChains.Chain[]) {
+    this.subscriptions.chainsChanged.forEach((subscription) => this.sendSubscriptionData(subscription.id, chains))
   }
 
-  networkChanged (netId: number | string) {
-    this.subscriptions.networkChanged.forEach(subscription => {
-      this.emit('data', { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, result: netId } })
-    })
+  networkChanged (netId: number | string, originId: string) {
+    this.subscriptions.networkChanged
+      .filter((subscription) => subscription.originId === originId)
+      .forEach((subscription) => this.sendSubscriptionData(subscription.id, netId))
+  }
+
+  private sendSubscriptionData (subscription: string, result: any) {
+    const payload: RPC.Susbcription.Response = {
+      jsonrpc: '2.0',
+      method: 'eth_subscription',
+      params: { subscription, result }
+    }
+
+    this.emit('data:subscription', payload)
   }
 
   getNetVersion (payload: RPCRequestPayload, res: RPCRequestCallback, targetChain: Chain) {
@@ -574,11 +599,13 @@ export class Provider extends EventEmitter {
   }
 
   subscribe (payload: RPC.Subscribe.Request, res: RPCSuccessCallback) {
+    log.debug('provider subscribe', { payload })
+
     const subId = addHexPrefix(crypto.randomBytes(16).toString('hex'))
     const subscriptionType = payload.params[0]
     
     this.subscriptions[subscriptionType] = this.subscriptions[subscriptionType] || []
-    this.subscriptions[subscriptionType].push(subId)
+    this.subscriptions[subscriptionType].push({ id: subId, originId: payload._origin })
 
     res({ id: payload.id, jsonrpc: '2.0', result: subId })
   }
@@ -586,7 +613,7 @@ export class Provider extends EventEmitter {
   ifSubRemove (id: string) {
     return Object.keys(this.subscriptions).some(type => {
       const subscriptionType = type as SubscriptionType
-      const index = this.subscriptions[subscriptionType].indexOf(id)
+      const index = this.subscriptions[subscriptionType].findIndex((sub) => sub.id === id)
 
       return (index > -1) && this.subscriptions[subscriptionType].splice(index, 1)
     })
@@ -735,6 +762,23 @@ export class Provider extends EventEmitter {
     return getPayloadOrigin(payload).chain
   }
 
+  private getChains (payload: JSONRPCRequestPayload, res: RPCSuccessCallback) {
+    res({ id: payload.id, jsonrpc: payload.jsonrpc, result: getActiveChains() })
+  }
+
+  private getAssets (payload: RPC.GetAssets.Request, currentAccount: FrameAccount | null, cb: RPCCallback<RPC.GetAssets.Response>) {
+    if (!currentAccount) return resError('no account selected', payload, cb)
+
+    try {
+      const { nativeCurrency, erc20 } = loadAssets(currentAccount.id)
+      const { id, jsonrpc } = payload
+      
+      return cb({ id, jsonrpc, result: { nativeCurrency, erc20 }})
+    } catch (e) {
+      return resError({ message: (e as Error).message, code: 5901 }, payload, cb)
+    }
+  }
+
   sendAsync (payload: RPCRequestPayload, cb: Callback<RPCResponsePayload>) {
     this.send(payload, res => {
       if (res.error) {
@@ -795,9 +839,8 @@ export class Provider extends EventEmitter {
     if (method === 'wallet_getPermissions') return getPermissions(payload, res)
     if (method === 'wallet_requestPermissions') return requestPermissions(payload, res)
     if (method === 'wallet_watchAsset') return this.addCustomToken(payload, res, targetChain)
-    if (method === 'wallet_getChains') return getChains(payload, res)
-    if (method === 'wallet_getChainDetails') return getChainDetails(payload, res)
-    if (method === 'wallet_getAssets') return getAssets(payload as RPC.GetAssets.Request, accounts.current(), res as RPCCallback<RPC.GetAssets.Response>)
+    if (method === 'wallet_getEthereumChains') return this.getChains(payload, res)
+    if (method === 'wallet_getAssets') return this.getAssets(payload as RPC.GetAssets.Request, accounts.current(), res as RPCCallback<RPC.GetAssets.Response>)
 
     // Connection dependent methods need to pass targetChain
     if (method === 'net_version') return this.getNetVersion(payload, res, targetChain)
@@ -816,52 +859,9 @@ export class Provider extends EventEmitter {
 }
 
 const provider = new Provider()
-let knownOrigins: Record<string, Origin> = {}
-let availableChains = getActiveChains()
 
-store.observer(() => {
-  const currentOrigins = store('main.origins') as Record<string, Origin>
-  const currentChains = getActiveChains()
-
-  for (const originId in currentOrigins) {
-    const currentOrigin = currentOrigins[originId]
-    const knownOrigin = knownOrigins[originId]
-
-    if (knownOrigin && knownOrigin.chain.id !== currentOrigin.chain.id) {
-      provider.chainChanged(currentOrigin.chain.id, originId)
-      provider.networkChanged(currentOrigin.chain.id)
-    }
-
-    knownOrigins[originId] = currentOrigin
-  }
-
-  if (!arraysMatch(currentChains, availableChains)) {
-    availableChains = currentChains
-    provider.chainsChanged(availableChains)
-  }
-}, 'provider:chains')
-
-let debouncedAssets: RPC.GetAssets.Assets | null = null
-
-store.observer(() => {
-  const currentAccountId = store('selected.current')
-
-  if (currentAccountId) {
-    const assets = loadAssets(currentAccountId)
-
-    if (!isScanning(currentAccountId) && (assets.erc20.length > 0 || assets.nativeCurrency.length > 0)) {
-      if (!debouncedAssets) {
-        setTimeout(() => {
-          if (debouncedAssets) {
-            provider.assetsChanged(currentAccountId, debouncedAssets)
-            debouncedAssets = null
-          }
-        }, 800)
-      }
-
-      debouncedAssets = assets
-    }
-  }
-}, 'provider:account')
+store.observer(ChainsObserver(provider), 'provider:chains')
+store.observer(OriginChainObserver(provider), 'provider:origins')
+store.observer(AssetsObserver(provider), 'provider:assets')
 
 export default provider

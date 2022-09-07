@@ -199,11 +199,12 @@ class FrameAccount {
     }
   }
 
-  rejectRequest ({ handlerId, payload: { id, jsonrpc } }: AccountRequest, error: EVMError) {
+  rejectRequest ({ handlerId, payload }: AccountRequest, error: EVMError) {
     const knownRequest = this.requests[handlerId]
 
     if (knownRequest) {
-      if (knownRequest.res) {
+      if (knownRequest.res && payload) {
+        const { id, jsonrpc } = payload
         knownRequest.res({ id, jsonrpc, error })
       }
 

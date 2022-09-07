@@ -80,6 +80,45 @@ declare namespace RPC {
     }
   }
 
+  namespace GetEthereumChains {
+    interface Icon {
+      url: string
+      width?: number
+      height?: number
+      format?: 'png' | 'jpg' | 'svg'
+    }
+
+    interface NativeCurrency {
+      name: string
+      symbol: string
+      decimals: number
+    }
+
+    interface Explorer {
+      name?: string
+      icon?: Icon[]
+      url: string
+      standard?: string
+    }
+
+    interface Chain {
+      chainId: number
+      networkId: number
+      name: string
+      icon: Icon[]
+      nativeCurrency: NativeCurrency
+      explorers: Explorer[]
+    }
+
+    interface Request extends Omit<RPCRequestPayload, 'method'> {
+      method: 'wallet_getEthereumChains'
+    }
+
+    interface Response extends Omit<RPCResponsePayload, 'result'> {
+      result?: Chain[]
+    }
+  }
+
   namespace SendTransaction {
     interface TxParams {
       nonce?: string;
@@ -106,6 +145,14 @@ declare namespace RPC {
     interface Request extends Omit<RPCRequestPayload, 'method'> {
       method: 'eth_subscribe',
       params: SubscriptionType[]
+    }
+  }
+
+  namespace Susbcription {
+    interface Response {
+      jsonrpc: '2.0'
+      method: 'eth_subscription'
+      params: any
     }
   }
 }
