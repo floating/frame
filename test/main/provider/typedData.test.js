@@ -146,3 +146,4 @@ describe('#getVersionFromTypedData', () => {
       })
     })
   })
+  
