@@ -11,7 +11,6 @@ const gasToSendToken = 65 * 1000
 const gasForDexSwap = 200 * 1000
 
 function roundGwei(gwei) {
-  if (gwei && gwei < 0.001) return '‹0.001'
   return parseFloat(
     gwei >= 10 ? Math.round(gwei) :
     gwei >= 5 ? Math.round(gwei * 10) / 10 :
@@ -62,7 +61,7 @@ const GasFeesMarket = ({ gasPrice, fees: { nextBaseFee, maxPriorityFeePerGas } }
     </div>}
     <div className='gasItem gasItemSmall'>
       <div className='gasGweiNum'>
-        {calculatedFees.actualBaseFee}
+        {calculatedFees.actualBaseFee || '‹0.001'}
       </div >
       <span className='gasGweiLabel'>{'GWEI'}</span>
       <span className='gasLevelLabel'>{'Current Base'}</span>
@@ -91,7 +90,7 @@ const GasFeesMarket = ({ gasPrice, fees: { nextBaseFee, maxPriorityFeePerGas } }
     </div>
     <div className='gasItem gasItemSmall'>
       <div className='gasGweiNum'>
-        {calculatedFees.priorityFee}
+        {calculatedFees.priorityFee || '‹0.001'}
       </div >
       <span className='gasGweiLabel'>{'GWEI'}</span>
       <span className='gasLevelLabel'>{'Priority Tip'}</span>
