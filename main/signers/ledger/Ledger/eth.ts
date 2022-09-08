@@ -58,7 +58,7 @@ export default class LedgerEthereumApp {
       domainSeparatorHex = TypedDataUtils.hashStruct('EIP712Domain', domain, types).toString('hex')
       hashStructMessageHex = TypedDataUtils.hashStruct(primaryType as string, message, types).toString('hex')
     } catch (e) {
-      const err = new Error('Invalid typed data') as unknown as DeviceError
+      const err = new Error('Invalid typed data') as DeviceError
       err.statusCode = 99901
       throw err
     }
