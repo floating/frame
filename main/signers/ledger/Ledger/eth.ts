@@ -8,7 +8,7 @@ import Eth from '@ledgerhq/hw-app-eth'
 import { Derivation, getDerivationPath, deriveHDAccounts } from '../../Signer/derive'
 import { TransactionData } from '../../../../resources/domain/transaction'
 import { sign } from '../../../transaction'
-import type { DeviceError } from '.'
+import { DeviceError } from '.'
 
 export default class LedgerEthereumApp {
   private eth: Eth;
@@ -58,9 +58,7 @@ export default class LedgerEthereumApp {
       domainSeparatorHex = TypedDataUtils.hashStruct('EIP712Domain', domain, types).toString('hex')
       hashStructMessageHex = TypedDataUtils.hashStruct(primaryType as string, message, types).toString('hex')
     } catch (e) {
-      const err = new Error('Invalid typed data') as DeviceError
-      err.statusCode = 99901
-      throw err
+      throw new DeviceError('Invalid typed data', 99901)
     }
 
     const signature = await this.eth.signEIP712HashedMessage(path, domainSeparatorHex, hashStructMessageHex)
