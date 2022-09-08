@@ -21,7 +21,7 @@ class TxBar extends React.Component {
       progressIconClass += ' txProgressStepIconHidden'
       txBarClass += ' txBarError'
     }
-    const slideMap = ['375px', '283px', '182px', '80px', '-35px']
+    const slideMap = ['375px', '268.5px', '181px', '93.5px', '-35px']
     const slide = slideMap[position]
 
     return (

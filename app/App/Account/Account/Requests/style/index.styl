@@ -530,7 +530,7 @@
   display flex
   justify-content space-around
   align-items center
-  font-weight 400
+  font-weight 300
   z-index 999999999999999
   transition var(--standard)
   position absolute
@@ -546,7 +546,7 @@
 
     .requestNoticeInnerText
       position absolute
-      top 0px
+      top 50px
       left 0px
       right 0px
       height 54px
@@ -645,7 +645,7 @@
   transform scale(0.8)
   background linear-gradient(to top, var(--ghostZ) 25%, var(--ghostZ0) 100%)
   position absolute
-  top 56px
+  bottom 50px
   left 16px
   right 16px
   border-radius 26px
@@ -1279,7 +1279,7 @@
 
 .requestApprove
   box-sizing border-box
-  height 95px
+  height 88px
   font-size 16px
   -webkit-app-region no-drag
   pointer-events auto
@@ -1937,26 +1937,26 @@ span:last-child
   position absolute
   z-index 1001
   height 58px
-  bottom 35px
+  top 4px
   left 20px
   right 20px
-  overflow hidden
+  // overflow hidden
   transition var(--standard)
 
   .txProgress
     .txProgressBack
       position absolute
       top 0
-      right -20px
+      right 0px
       bottom 0
-      left -20px
+      left 0px
       z-index 1001
 
       .txProgressLine
         position absolute
-        top 40px
-        left 0
-        right 0
+        top 37px
+        left 0px
+        right 0px
         height 2px
         margin-top -1px
         background var(--ghostY)
@@ -1992,12 +1992,11 @@ span:last-child
             transition-delay 500
             transition var(--standardFast)
 
-
           .txProgressStepMarker
             position absolute
             z-index 996
             left 50%
-            top 40px
+            top 37px
             height 12px
             width 12px
             margin-top -6px
@@ -2009,7 +2008,7 @@ span:last-child
             position absolute
             z-index 997
             left 50%
-            top 40px
+            top 37px
             height 6px
             width 6px
             margin-top -3px
@@ -2041,7 +2040,7 @@ span:last-child
 
         .txProgressTail
           position absolute
-          top 40px
+          top 37px
           left 0
           right 0
           height 2px
@@ -2059,7 +2058,7 @@ span:last-child
           animation spin 0.7s infinite linear
           position absolute
           z-index 1012
-          top 40px
+          top 37px
           right -8px
           margin-top -8px
 

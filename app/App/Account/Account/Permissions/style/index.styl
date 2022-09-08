@@ -18,6 +18,17 @@
   font-weight 200
   margin-top 4px
 
+.signerPermission:first-child
+  border-top-left-radius 17px
+  border-top-right-radius 17px
+
+.signerPermission:last-child
+  border-bottom-left-radius 17px
+  border-bottom-right-radius 17px
+
+.signerPermission:first-child:last-child
+  border-radius 17px
+
 .signerPermission
   position relative
   justify-content space-between
@@ -28,7 +39,7 @@
   z-index 2000
   background var(--ghostA)
   margin 3px
-  border-radius 16px
+  border-radius 8px
 
   .signerPermissionControls
     display flex
