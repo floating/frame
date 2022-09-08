@@ -23,7 +23,7 @@ export const Status = {
   NEEDS_RECONNECTION: 'Please reconnect this Ledger device'
 }
 
-export interface DeviceError {
+export interface DeviceError extends Error {
   statusCode: number,
   message: string
 }
