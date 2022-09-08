@@ -76,7 +76,7 @@ const GasFeesMarket = ({ gasPrice, fees: { nextBaseFee, maxPriorityFeePerGas } }
         <div className='gasArrowInner'>{svg.chevron(27)}</div>
       </div>
       <div className='gasGweiNum'>
-        {gasPrice}
+        {gasPrice || '‹0.001'}
       </div >
       <span className='gasGweiLabel'>{'GWEI'}</span>
       <span className='gasLevelLabel'>{'Recommended'}</span>
@@ -183,7 +183,7 @@ class GasSummaryComponent extends Component {
       <>
         <div className='sliceTileGasPrice'> 
           <div className='sliceTileGasPriceIcon'>{svg.gas(9)}</div>
-          <div className='sliceTileGasPriceNumber'>{gasPrice}</div>
+          <div className='sliceTileGasPriceNumber'>{gasPrice || '‹0.001'}</div>
           <div className='sliceTileGasPriceUnit'>{'gwei'}</div>
         </div>
         <div className='sliceGasEstimateBlock'>
