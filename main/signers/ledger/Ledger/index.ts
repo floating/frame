@@ -67,7 +67,7 @@ function getStatusForError (err: DeviceError) {
 export class DeviceError extends Error {
   readonly statusCode
 
-  constructor (msg: string, code: number = -1) {
+  constructor (msg: string, code = -1) {
     super(msg)
     this.statusCode = code    
   }
@@ -225,8 +225,7 @@ export default class Ledger extends Signer {
         await this.eth?.getAddress("44'/60'/0'/0", false, false)
         resolve(undefined)
       } catch (e) {
-        const { message, statusCode } = e as DeviceError
-        resolve(new DeviceError(message, statusCode))
+        resolve(e as DeviceError)
       }
     })
 
