@@ -147,6 +147,84 @@ class _RequestApprove extends React.Component {
       return (
         <div className='requestNotice'>
           <div className='requestNoticeInner'>
+            <div className={(req && req.tx && req.tx.hash) ? 'requestFooter requestFooterActive' : 'requestFooter'}>
+              <div className='txActionButtons'
+                onMouseLeave={() => {
+                  this.setState({ showHashDetails: false })
+                }}
+              >
+                {(req && req.tx && req.tx.hash) ? 
+                  this.state.txHashCopied ? (
+                    <div className='txActionButtonsRow'>
+                      <div
+                        className={'txActionText'}
+                      >
+                        Transaction Hash Copied
+                      </div>
+                    </div>
+                  ) : (
+                  this.state.showHashDetails || status === 'confirming' ? (
+                    <div className='txActionButtonsRow'>
+                      <div
+                        className={'txActionButton'}
+                        onClick={() => {
+                          if (req && req.tx && req.tx.hash) {
+                            if (this.store('main.mute.explorerWarning')) {
+                              link.send('tray:openExplorer', req.tx.hash, chain)
+                            } else {
+                              this.store.notify('openExplorer', { hash: req.tx.hash, chain: chain })
+                            }
+                          }
+                        }}
+                      >
+                        Open Explorer
+                      </div>
+                      <div
+                        className={'txActionButton'}
+                        onClick={() => {
+                          if (req && req.tx && req.tx.hash) {
+                            link.send('tray:copyTxHash', req.tx.hash)
+                            this.setState({ txHashCopied: true, showHashDetails: false })
+                            setTimeout(() => {
+                              this.setState({ txHashCopied: false })
+                            }, 3000)
+                          }
+                        }}
+                      >
+                        Copy Hash
+                      </div>
+                    </div>
+                  ) : (
+                    <div className='txActionButtonsRow'>
+                      <div 
+                        className='txActionButton txActionButtonBad'
+                        onClick={() => {
+                          link.send('tray:replaceTx', req.handlerId, 'cancel')
+                        }}
+                      >
+                        Cancel
+                      </div>
+                      <div
+                        className={'txActionButton'}
+                        onClick={() => {
+                          this.setState({ showHashDetails: true })
+                        }}
+                      >
+                        View Details
+                      </div>
+                      <div 
+                        className='txActionButton txActionButtonGood' 
+                        onClick={() => {
+                          link.send('tray:replaceTx', req.handlerId, 'speed')
+                        }}
+                      >
+                        Speed Up
+                      </div>
+                    </div>
+                  ) 
+                ) : null}
+              </div>
+            </div>
             {/* {error ? (
               <div className={'requestNoticeInnerText'}>
                 {notice}
@@ -240,42 +318,56 @@ class _RequestApprove extends React.Component {
       )
     } else {
       return (
-        <div className='requestApprove'>
-          <div
-            className='requestDecline' 
-            onClick={() => {
-              if (this.state.allowInput) this.decline(req)
-            }}
-          >
-            <div className='requestDeclineButton _txButton _txButtonBad'>
-              <span>Decline</span>
+        <>
+          <div className={req.automaticFeeUpdateNotice ? 'automaticFeeUpdate automaticFeeUpdateActive' : 'automaticFeeUpdate'}>
+            <div className='txActionButtons'>
+              <div className='txActionButtonsRow' style={{ padding: '0px 60px'}}>
+                <div className='txActionText'>{'Fee Updated'}</div>
+                <div className='txActionButton txActionButtonGood' onClick={() => {
+                  link.rpc('removeFeeUpdateNotice', req.handlerId, e => { 
+                    if (e) console.error(e) 
+                  })
+                }}>{'Ok'}</div>
+              </div>
             </div>
           </div>
-          <div
-            className='requestSign' 
-            onClick={() => {
-              if (this.state.allowInput) {
-                link.rpc('signerCompatibility', req.handlerId, (e, compatibility) => {
-                  if (e === 'No signer')  {
-                    this.store.notify('noSignerWarning', { req })
-                  } else if (e === 'Signer locked') {
-                    this.store.notify('signerLockedWarning', { req })
-                  } else if (!compatibility.compatible && !this.store('main.mute.signerCompatibilityWarning')) {
-                    this.store.notify('signerCompatibilityWarning', { req, compatibility, chain: chain })
-                  } else if ((maxFeeUSD.toNumber() > FEE_WARNING_THRESHOLD_USD || this.toDisplayUSD(maxFeeUSD) === '0.00') && !this.store('main.mute.gasFeeWarning')) {
-                    this.store.notify('gasFeeWarning', { req, feeUSD: this.toDisplayUSD(maxFeeUSD), currentSymbol })
-                  } else {
-                    this.approve(req.handlerId, req)
-                  }
-                })
+          <div className='requestApprove'>
+            <div
+              className='requestDecline' 
+              onClick={() => {
+                if (this.state.allowInput) this.decline(req)
               }}
-            }
-          >
-            <div className='requestSignButton _txButton'>
-              <span>Sign</span>
+            >
+              <div className='requestDeclineButton _txButton _txButtonBad'>
+                <span>Decline</span>
+              </div>
+            </div>
+            <div
+              className='requestSign' 
+              onClick={() => {
+                if (this.state.allowInput) {
+                  link.rpc('signerCompatibility', req.handlerId, (e, compatibility) => {
+                    if (e === 'No signer')  {
+                      this.store.notify('noSignerWarning', { req })
+                    } else if (e === 'Signer locked') {
+                      this.store.notify('signerLockedWarning', { req })
+                    } else if (!compatibility.compatible && !this.store('main.mute.signerCompatibilityWarning')) {
+                      this.store.notify('signerCompatibilityWarning', { req, compatibility, chain: chain })
+                    } else if ((maxFeeUSD.toNumber() > FEE_WARNING_THRESHOLD_USD || this.toDisplayUSD(maxFeeUSD) === '0.00') && !this.store('main.mute.gasFeeWarning')) {
+                      this.store.notify('gasFeeWarning', { req, feeUSD: this.toDisplayUSD(maxFeeUSD), currentSymbol })
+                    } else {
+                      this.approve(req.handlerId, req)
+                    }
+                  })
+                }}
+              }
+            >
+              <div className='requestSignButton _txButton'>
+                <span>Sign</span>
+              </div>
             </div>
           </div>
-        </div>
+        </>
       )
     }
   }
@@ -456,8 +548,13 @@ class _Footer extends React.Component {
                 <div
                   className='requestSign'
                   style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none'}}
-                  onClick={() => { if (this.state.allowInput) this.store.notify('addToken', this.props.req)
-                }}>
+                  onClick={() => {
+                    if (this.state.allowInput) {
+                      link.send('tray:resolveRequest', req, null)
+                      link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'addToken', notifyData: { token: req.token } } })
+                    }
+                  }
+                }>
                   <div className='requestSignButton _txButton'>
                     <span>Review</span>
                   </div>

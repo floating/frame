@@ -18,7 +18,7 @@ import TxApproval from './TxApproval'
 class TransactionRequest extends React.Component {
   constructor (props, context) {
     super(props, context)
-    this.state = { allowInput: false, dataView: false }
+    this.state = { allowInput: false, dataView: false, showHashDetails: false }
 
     setTimeout(() => {
       this.setState({ allowInput: true })
@@ -188,70 +188,6 @@ class TransactionRequest extends React.Component {
                 })}
                 <TxRecipient i={3 + recognizedActions.length} {...this.props} req={req} />
                 <TxFeeNew i={4 + recognizedActions.length} {...this.props} req={req} chain={chain} />
-              </div>
-            </div>
-            <div className={(req.automaticFeeUpdateNotice || true) ? 'requestFooter requestFooterActive' : 'requestFooter'}>
-              <div className='txActionButtons'>
-                {req.automaticFeeUpdatenotice ? (
-                  <div className='txActionButtonsRow'>
-                    <div className='txActionText'>{'Fee Updated'}</div>
-                    <div className='txActionButton' onClick={() => {
-                      link.rpc('removeFeeUpdateNotice', req.handlerId, e => { 
-                        if (e) console.error(e) 
-                      })
-                    }}>{'Ok'}</div>
-                  </div>
-                ) : null }
-
-                {(req && req.tx && req.tx.hash)  ? (
-                  <div className='txActionButtonsRow'>
-                    <div
-                      className={'txActionButton'}
-                      onClick={() => {
-                        if (req && req.tx && req.tx.hash) {
-                          if (this.store('main.mute.explorerWarning')) {
-                            link.send('tray:openExplorer', req.tx.hash, chain)
-                          } else {
-                            this.store.notify('openExplorer', { hash: req.tx.hash, chain: chain })
-                          }
-                        }
-                      }}
-                    >
-                      Open Explorer
-                    </div>
-                    <div
-                      className={'txActionButton'}
-                      onClick={() => {
-                        if (req && req.tx && req.tx.hash) {
-                          link.send('tray:copyTxHash', req.tx.hash)
-                          this.setState({ txHashCopied: true, viewDetailsHover: false })
-                          setTimeout(() => {
-                            this.setState({ txHashCopied: false })
-                          }, 3000)
-                        }
-                      }}
-                    >
-                      Copy Hash
-                    </div>
-                  </div>
-                ) : null}
-
-                {mode === 'monitor' ? (
-                  <div className='txActionButtonsRow'>
-                    <div 
-                      className='txActionButton'
-                      onClick={() => link.send('tray:replaceTx', req.handlerId, 'cancel')}
-                    >
-                      Cancel
-                    </div>
-                    <div 
-                      className='txActionButton' 
-                      onClick={() => link.send('tray:replaceTx', req.handlerId, 'speed')}
-                    >
-                      Speed Up
-                    </div>
-                  </div>
-                ) : null }
               </div>
             </div>
           </div>

@@ -238,7 +238,7 @@ class _AccountView extends React.Component {
       <div className='accountView'
         // TODO: sync via nav
         style={{
-          bottom: '140px'
+          bottom: '200px'
         }}
       >
         <div className='accountViewMenu cardShow'>

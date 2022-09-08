@@ -114,7 +114,8 @@ class _RequestItem extends React.Component {
         </div>
         <div className={requestItemDetailsClass}>
           <div className='requestItemDetailsSlide'>
-            {status}
+            <div className='requestItemDetailsIndicator' />
+            <span>{status}</span>
             <div className='requestItemDetailsIndicator' />
           </div>
         </div>

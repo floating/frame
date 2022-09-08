@@ -12,12 +12,20 @@
 
 .signerBalancesWrap
   margin 0px 6px 6px 6px
-  padding 0px 5px 5px 5px
+  padding 0px 3px 3px 3px
   box-sizing border-box
   overflow auto
   background var(--ghostZ)
-  border-radius 12px
+  border-radius 20px
   min-height 70px
+
+  *:first-child
+    border-top-right-radius 17px
+    border-top-left-radius 17px
+
+  *:last-child
+    border-bottom-right-radius 17px
+    border-bottom-left-radius 17px
 
 .signerBalanceWarningTitle
   position relative
@@ -63,7 +71,7 @@
     margin-left 8px
     background var(--ghostA)
     border 3px solid var(--ghostZ)
-    border-radius 14px
+    border-radius 20px
     cursor pointer
     z-index 4000
     display flex
@@ -149,7 +157,7 @@
   transition 0.1s ease-out all
   background var(--ghostA)
   border-radius 8px
-  margin-top 5px
+  margin-top 3px
   font-family 'MainFont'
 
   .signerBalanceInner
@@ -159,8 +167,8 @@
 
   .signerBalanceIcon
     position absolute
-    top 16px
-    left 10px
+    top 18px
+    left 12px
 
   .signerBalanceCurrency
     position absolute

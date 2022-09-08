@@ -32,14 +32,14 @@ class Backdrop extends React.Component {
           class: 'overlay',
           style: {
             top: '140px',
-            bottom: '140px'
+            bottom: '200px'
           }
         },
         backdrop: {
           class: 'backdrop',
           style: {
             top: '140px',
-            bottom: '140px'
+            bottom: '200px'
           }
         }
       })

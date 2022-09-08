@@ -121,11 +121,14 @@ ipcMain.on('tray:resetAllSettings', () => {
 })
 
 ipcMain.on('tray:replaceTx', async (e, id, type) => {
-  try {
-    await accounts.replaceTx(id, type)
-  } catch (e) {
-    log.error('tray:replaceTx Error', e)
-  }
+  store.navBack('panel')
+  setTimeout(async () => {
+    try {
+      await accounts.replaceTx(id, type)
+    } catch (e) {
+      log.error('tray:replaceTx Error', e)
+    }
+  }, 1000)
 })
 
 ipcMain.on('tray:clipboardData', (e, data) => {
@@ -176,7 +179,7 @@ ipcMain.on('tray:rejectRequest', (e, req) => {
 
 ipcMain.on('tray:openExternal', (e, url) => {
   const validHost = externalWhitelist.some(entry => url === entry || url.startsWith(entry + '/'))
-  if (validHost || true) {
+  if (validHost) {
     store.setDash({ showing: false })
     shell.openExternal(url)
   }
