@@ -102,9 +102,9 @@ export function isFrameExtension (req: IncomingMessage) {
   }
 }
 
-export async function isTrusted (fullPayload: RPCRequestPayload) {
+export async function isTrusted (payload: RPCRequestPayload) {
   // Permission granted to unknown origins only persist until the Frame is closed, they are not permanent
-  const { name: originName } = store('main.origins', fullPayload._origin)
+  const { name: originName } = store('main.origins', payload._origin)
 
   if (invalidOrigin(originName)) return false
   if (originName === 'frame-extension') return true
@@ -117,7 +117,7 @@ export async function isTrusted (fullPayload: RPCRequestPayload) {
   const permIndex = perms.map(p => p.origin).indexOf(originName)
   if (permIndex === -1) {
     try {
-      return await addPermissionRequest(address, fullPayload)
+      return await addPermissionRequest(address, payload)
     } catch (e) {
       log.error(e)
       return false
