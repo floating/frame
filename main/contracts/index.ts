@@ -1,7 +1,7 @@
 import log from 'electron-log'
 import { Interface } from '@ethersproject/abi'
-import { fetchSourcifyContract } from './sourcifyAbi'
-import { chainSupported, fetchScanContract } from './scanAbi'
+import { fetchSourcifyContract } from './sourcifyContract'
+import { chainSupported, fetchScanContract } from './scanContract'
 
 export interface ContractSource {
   abi: string,
