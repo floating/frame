@@ -35,7 +35,7 @@ export async function fetchContract (contractAddress: Address, chainId: string):
     const contracts = await Promise.all(fetches.map((getContract) => getContract(contractAddress, chainId)))
 
     // if no etherscan result and etherscan supports the chain, return undefined
-    if (contracts[1] && contracts[1].abi === 'Contract source code not verified' && chainSupported(chainId)) {
+    if (!contracts[1] && chainSupported(chainId)) {
       return undefined
     }
     
