@@ -114,7 +114,7 @@ describe('#fetchContract', () => {
           name: 'mock sourcify abi', 
           source: 'sourcify'
         })
-      })
+      }, 500)
 
       it(`retrieves a contract from ${scanName} when the sourcify request fails`, () => {
         mockApiResponse('sourcify.dev', sourcifyEndpoint, 400, '')
@@ -125,7 +125,7 @@ describe('#fetchContract', () => {
           name: 'mock scan abi', 
           source: scanName
         })
-      })
+      }, 500)
 
       it(`retrieves a contract from sourcify when the ${scanName} request fails`, () => {
         mockApiResponse('sourcify.dev', sourcifyEndpoint, 200, sourcifyResponse)
@@ -136,14 +136,14 @@ describe('#fetchContract', () => {
           name: 'mock sourcify abi', 
           source: 'sourcify'
         })
-      })
+      }, 500)
     
       it(`does not retrieve an ABI when it is not found via ${scanName}`, () => {
         mockApiResponse('sourcify.dev', sourcifyEndpoint, 200, sourcifyResponse)
         mockApiResponse(scanDomain, scanEndpoint, 200, scanNotFoundResponse)
     
         return expect(fetchContract('0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0', chainId)).resolves.toBeUndefined()
-      })
+      }, 500)
     })
   })
 
@@ -155,5 +155,5 @@ describe('#fetchContract', () => {
       name: 'mock sourcify abi', 
       source: 'sourcify'
     })
-  })
+  }, 500)
 })
