@@ -79,7 +79,7 @@ const mockSourcify = (address) => [
 ]
 
 describe('#fetchSourcifyContract', () => {
-  mockScan('0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0').forEach(({ chainName, chainId, sourcifyEndpoint }) => {
+  mockSourcify('0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0').forEach(({ chainName, chainId, sourcifyEndpoint }) => {
     describe(`querying ${chainName}`, () => {
       it('retrieves a contract from sourcify', () => {
         mockApiResponse('sourcify.dev', sourcifyEndpoint, 200, sourcifyResponse)
