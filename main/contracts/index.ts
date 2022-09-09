@@ -1,7 +1,7 @@
 import log from 'electron-log'
 import { Interface } from '@ethersproject/abi'
 import { fetchSourcifyContract } from './sourcifyContract'
-import { chainSupported, fetchScanContract } from './scanContract'
+import { chainSupported, fetchEtherscanContract } from './etherscanContract'
 
 export interface ContractSource {
   abi: string,
@@ -31,7 +31,7 @@ function parseAbi (abiData: string): Interface | undefined {
 
 export async function fetchContract (contractAddress: Address, chainId: string): Promise<ContractSource | undefined> {
   try {
-    const [sourcifyContract, scanContract] = await Promise.all([fetchSourcifyContract(contractAddress, chainId), fetchScanContract(contractAddress, chainId)])
+    const [sourcifyContract, scanContract] = await Promise.all([fetchSourcifyContract(contractAddress, chainId), fetchEtherscanContract(contractAddress, chainId)])
     
     // if no scan result and scan supports the chain, return undefined
     if (scanContract && scanContract.abi === 'Contract source code not verified' && chainSupported(chainId)) {

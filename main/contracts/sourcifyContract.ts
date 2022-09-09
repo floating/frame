@@ -2,6 +2,7 @@ import log from 'electron-log'
 import fetch, { Response } from 'node-fetch'
 import { JsonFragment } from '@ethersproject/abi'
 import { hexToNumberString } from 'web3-utils'
+import type { ContractSource } from '.'
 
 interface SourcifySourceCodeResponse {
   status: string,
@@ -39,24 +40,6 @@ interface SourcifyMetadataFileContent {
     }
   },
   version: number
-}
-
-export interface ContractSource {
-  abi: string,
-  name: string,
-  source: string
-}
-
-export interface DecodedCallData {
-  contractAddress: string,
-  contractName: string,
-  source: string,
-  method: string,
-  args: Array<{
-    name: string,
-    type: string,
-    value: string
-  }>
 }
 
 function sourcifyEndpoint (contractAddress: Address, chainId: string) {

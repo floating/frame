@@ -1,5 +1,6 @@
 import log from 'electron-log'
 import fetch, { Response } from 'node-fetch'
+import type { ContractSource } from '.'
 
 interface EtherscanSourceCodeResponse {
   status: string,
@@ -14,25 +15,7 @@ interface ContractSourceCodeResult {
   Implementation: string
 }
 
-export interface ContractSource {
-  abi: string,
-  name: string,
-  source: string
-}
-
-export interface DecodedCallData {
-  contractAddress: string,
-  contractName: string,
-  source: string,
-  method: string,
-  args: Array<{
-    name: string,
-    type: string,
-    value: string
-  }>
-}
-
-const scanEndpointMap = {
+const endpointMap = {
   '0x1': {
     name: 'etherscan',
     url: (contractAddress: Address) => `https://api.etherscan.io/api?module=contract&action=getsourcecode&address=${contractAddress}&apikey=3SYU5MW5QK8RPCJV1XVICHWKT774993S24`,
@@ -59,15 +42,15 @@ async function parseResponse <T>(response: Response): Promise<T | undefined> {
 }
 
 async function fetchSourceCode (contractAddress: Address, chainId: string): Promise<ContractSourceCodeResult[] | undefined> {
-  const scanEndpoint = scanEndpointMap[chainId as keyof typeof scanEndpointMap]
-  const scanEndpointUrl = scanEndpoint?.url(contractAddress)
+  const endpoint = endpointMap[chainId as keyof typeof endpointMap]
+  const endpointUrl = endpoint?.url(contractAddress)
   
-  if (scanEndpointUrl) {
-    const scanRes = await fetch(scanEndpointUrl)  
+  if (endpointUrl) {
+    const res = await fetch(endpointUrl)  
     try {
-      const parsedScanResponse = await parseResponse<EtherscanSourceCodeResponse>(scanRes)
+      const parsedResponse = await parseResponse<EtherscanSourceCodeResponse>(res)
 
-      return parsedScanResponse?.message === 'OK' ? parsedScanResponse.result : undefined
+      return parsedResponse?.message === 'OK' ? parsedResponse.result : undefined
     } catch (e) {
       console.log('source code response parsing error', e)
       return undefined
@@ -76,24 +59,24 @@ async function fetchSourceCode (contractAddress: Address, chainId: string): Prom
 }
 
 export function chainSupported (chainId: string) {
-  return Object.keys(scanEndpointMap).includes(chainId)
+  return Object.keys(endpointMap).includes(chainId)
 }
 
-export async function fetchScanContract (contractAddress: Address, chainId: string): Promise<ContractSource | undefined> {
+export async function fetchEtherscanContract (contractAddress: Address, chainId: string): Promise<ContractSource | undefined> {
   try {
-    const scanResult = await fetchSourceCode(contractAddress, chainId)
+    const result = await fetchSourceCode(contractAddress, chainId)
 
     // etherscan compatible
-    if (scanResult?.length) {
-      const source = scanResult[0]
+    if (result?.length) {
+      const source = result[0]
       const implementation = source.Implementation
 
       if (implementation) {
         // this is a proxy contract, return the ABI for the source
-        return fetchScanContract(implementation, chainId)
+        return fetchEtherscanContract(implementation, chainId)
       }
 
-      return { abi: source.ABI, name: source.ContractName, source: scanEndpointMap[chainId as keyof typeof scanEndpointMap].name }
+      return { abi: source.ABI, name: source.ContractName, source: endpointMap[chainId as keyof typeof endpointMap].name }
     }
   } catch (e) {
     log.warn(`could not fetch source code for contract ${contractAddress}`, e)
