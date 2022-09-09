@@ -20,10 +20,6 @@ export function parseOrigin (origin?: string) {
   return origin.replace(protocolRegex, '')
 }
 
-function isRealOrigin (origin: string) {
-  return origin !== 'Unknown'
-}
-
 function invalidOrigin (origin: string) {
   return origin !== origin.replace(/[^0-9a-z/:.[\]-]/gi, '')
 }
@@ -53,7 +49,7 @@ export function updateOrigin (payload: JSONRPCRequestPayload, origin: string, co
 
   const originId = uuidv5(origin, uuidv5.DNS)
   const existingOrigin = store('main.origins', originId)
-  if (!connectionMessage && isRealOrigin(origin)) {
+  if (!connectionMessage) {
     hasSession = true
 
     // the extension will attempt to send messages (eth_chainId and net_version) in order
