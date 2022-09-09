@@ -216,7 +216,7 @@ Object.values(mockConnections).forEach(chain => {
     }
 
     const expectedBaseFee = 7e9 * 1.125 * 1.125
-    const expectedPriorityFee = 1e9
+    const expectedPriorityFee = 0
 
     observer = store.observer(() => {
       const gas = store(`main.networksMeta.ethereum.${chain.id}.gas.price`)
