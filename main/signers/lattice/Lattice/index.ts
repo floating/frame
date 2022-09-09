@@ -109,7 +109,7 @@ export default class Lattice extends Signer {
 
       return paired
     } catch (e) {
-      const errorMessage = this.handleError('could not connect to Lattice', e as string)
+      const errorMessage = this.handleError('could not connect to Lattice', (e as Error).message)
 
       this.emit('error')
 
@@ -153,7 +153,7 @@ export default class Lattice extends Signer {
 
       return hasActiveWallet
     } catch (e) {
-      const errorMessage = this.handleError('could not pair to Lattice', e as string)
+      const errorMessage = this.handleError('could not pair to Lattice', (e as Error).message)
 
       this.emit('error')
 
@@ -204,7 +204,7 @@ export default class Lattice extends Signer {
         })
       }
 
-      const errorMessage = this.handleError('could not derive addresses', e as string)
+      const errorMessage = this.handleError('could not derive addresses', (e as Error).message)
       this.emit('error')
 
       throw new Error(errorMessage)
