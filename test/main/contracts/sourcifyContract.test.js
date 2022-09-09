@@ -55,7 +55,7 @@ afterAll(() => {
   log.transports.console.level = 'debug'
 })
 
-const mockScan = (address) => [
+const mockSourcify = (address) => [
   {
     chainName: 'mainnet',
     chainId: '0x1',
