@@ -91,13 +91,13 @@ describe('#fetchSourcifyContract', () => {
         })
       })
     
-      it(`does not retrieve a contract when the request fails`, () => {
+      it('does not retrieve a contract when the request fails', () => {
         mockApiResponse('sourcify.dev', sourcifyEndpoint, 400)
     
         return expect(fetchSourcifyContract('0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0', chainId)).resolves.toBeUndefined()
       })
 
-      it(`does not retrieve a contract when the contract is not found`, () => {
+      it('does not retrieve a contract when the contract is not found', () => {
         mockApiResponse('sourcify.dev', sourcifyEndpoint, 200, sourcifyNotFoundResponse)
     
         return expect(fetchSourcifyContract('0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0', chainId)).resolves.toBeUndefined()
