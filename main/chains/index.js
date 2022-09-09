@@ -79,7 +79,7 @@ class ChainConnection extends EventEmitter {
       if (allowEip1559 && 'baseFeePerGas' in block) {
         try {
           // only consider this an EIP-1559 block if fee market can be loaded
-          feeMarket = await gasCalculator.getFeePerGas()
+          feeMarket = await gasCalculator.getFeePerGas(this.chainId)
 
           this.chainConfig.setHardforkByBlockNumber(block.number)
 
@@ -90,7 +90,7 @@ class ChainConnection extends EventEmitter {
           }
         } catch (e) {
           feeMarket = null
-          // log.error(`could not load EIP-1559 fee market for chain ${this.chainId}`, e)
+          log.error(`could not load EIP-1559 fee market for chain ${this.chainId}`, e)
         }
       }
 

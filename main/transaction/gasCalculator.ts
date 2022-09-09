@@ -1,4 +1,5 @@
 import { intToHex } from 'ethereumjs-util'
+import log from 'electron-log'
 
 const oneGwei = 1e9
 
@@ -46,11 +47,12 @@ export default class GasCalculator {
     this.connection = connection
   }
 
-  async _getFeeHistory(numBlocks: number, rewardPercentiles: number[], newestBlock = 'latest'): Promise<Block[]> {
+  async _getFeeHistory(numBlocks: number, rewardPercentiles: number[], chainId: string, newestBlock = 'latest', ): Promise<Block[]> {
     const blockCount = intToHex(numBlocks)
     const payload = rpcPayload('eth_feeHistory', [blockCount, newestBlock, rewardPercentiles])
 
     const feeHistory: FeeHistoryResponse = await this.connection.send(payload)
+    console.log(`feeHistory for chain ${chainId}`, feeHistory)
 
     const feeHistoryBlocks = feeHistory.baseFeePerGas.map((baseFee, i) => {
       return {
@@ -76,7 +78,7 @@ export default class GasCalculator {
     }
   }
 
-  async _getMedianReward (blocks: Block[], lowerPercentile: number): Promise<number> {
+  async _getMedianReward (blocks: Block[], lowerPercentile: number, chainId: string): Promise<number> {
     // only consider priority fees from blocks that aren't almost empty or almost full
     const eligibleRewardsBlocks = blocks.filter(block => block.gasUsedRatio >= 0.1 && block.gasUsedRatio <= 0.9).map(block => block.rewards[0])
     const medianReward = eligibleRewardsBlocks.sort()[Math.floor(eligibleRewardsBlocks.length / 2)] 
@@ -87,21 +89,51 @@ export default class GasCalculator {
         return oneGwei
       }
       const nextPercentile = lowerPercentile + 5
-      const nextBlocks = await this._getFeeHistory(10, [nextPercentile])
-      return await this._getMedianReward(nextBlocks, nextPercentile)
+      log.info('increasing percentile to ', nextPercentile)
+      const nextBlocks = await this._getFeeHistory(10, [nextPercentile], chainId)
+      return await this._getMedianReward(nextBlocks, nextPercentile, chainId)
     }
     
     return medianReward
-  } 
-  
-  async getFeePerGas (): Promise<GasFees> {
+  }
+
+  async getFeePerGas (chainId: string): Promise<GasFees> {
     // fetch the last 10 blocks and the bottom 10% of priority fees paid for each block
-    const blocks = await this._getFeeHistory(10, [10])
+    const blocks = await this._getFeeHistory(10, [10], chainId)
     
     // plan for max fee of 2 full blocks, each one increasing the fee by 12.5%
     const nextBlockFee = blocks[blocks.length - 1].baseFee // base fee for next block
     const calculatedFee = Math.ceil(nextBlockFee * 1.125 * 1.125)
-    const medianReward = await this._getMedianReward(blocks, 10)
+
+    // only consider priority fees from blocks that aren't almost empty or almost full
+    const eligibleRewardsBlocks = blocks.filter(block => block.gasUsedRatio >= 0.1 && block.gasUsedRatio <= 0.9).map(block => block.rewards[0])
+    let medianReward = eligibleRewardsBlocks.sort()[Math.floor(eligibleRewardsBlocks.length / 2)]
+
+    if (!medianReward && chainId === '137') {
+      // increase number of blocks
+      const moreBlocks = await this._getFeeHistory(20, [10], chainId)
+      const moreEligibleRewardsBlocks = moreBlocks.filter(block => block.gasUsedRatio >= 0.1 && block.gasUsedRatio <= 0.9).map(block => block.rewards[0])
+      const medianRewardMoreBlocks = moreEligibleRewardsBlocks.sort()[Math.floor(moreEligibleRewardsBlocks.length / 2)]
+
+      // percentile increase
+      const medianRewardPercentile = await this._getMedianReward(blocks, 10, chainId)
+
+      // remove block filtering
+      const unfilteredEligibleRewardsBlocks = blocks.map(block => block.rewards[0])
+      const medianRewardGasUsedRatio = unfilteredEligibleRewardsBlocks.sort()[Math.floor(unfilteredEligibleRewardsBlocks.length / 2)]
+      
+      // log out proposed fixes
+      log.info(`Gas calculator hit one gwei for chain: ${chainId}`)
+      // log.info('median reward percentile approach: ', medianRewardPercentile)
+      log.info('gas used ratio approach: ', medianRewardGasUsedRatio)
+      log.info('doubled number of blocks approach', medianRewardMoreBlocks)
+
+      medianReward = medianRewardPercentile
+    } else if(!medianReward) {
+      medianReward = 0
+    }
+
+    log.info(`Gas calculator maxPriorityFee calculation for chain ${chainId}: ${medianReward}`)
 
     return {
       nextBaseFee: intToHex(nextBlockFee),
