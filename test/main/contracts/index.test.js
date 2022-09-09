@@ -1,7 +1,7 @@
 import log from 'electron-log'
 import nock from 'nock'
 
-import { fetchAbi } from '../../../main/contracts'
+import { fetchContract } from '../../../main/contracts'
 
 function mockApiResponse (domain, path, status, body, headers = { 'content-type': 'application/json' }) {
   nock(`https://${domain}`)
@@ -102,36 +102,36 @@ const mockScan = (address) => [
   }
 ]
 
-describe('#fetchAbi', () => {
+describe('#fetchContract', () => {
   mockScan('0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0').forEach(({ chainName, chainId, scanName, scanDomain, scanEndpoint, sourcifyEndpoint }) => {
     describe(`querying ${chainName}`, () => {
-      it('retrieves an ABI from sourcify by default', () => {
+      it('retrieves a contract from sourcify by default', () => {
         mockApiResponse('sourcify.dev', sourcifyEndpoint, 200, sourcifyResponse)
         mockApiResponse(scanDomain, scanEndpoint, 200, scanResponse)
     
-        return expect(fetchAbi('0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0', chainId)).resolves.toStrictEqual({
+        return expect(fetchContract('0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0', chainId)).resolves.toStrictEqual({
           abi: JSON.stringify(mockAbi), 
           name: 'mock sourcify abi', 
           source: 'sourcify'
         })
       })
 
-      it(`retrieves an ABI from ${scanName} when the sourcify request fails`, () => {
+      it(`retrieves a contract from ${scanName} when the sourcify request fails`, () => {
         mockApiResponse('sourcify.dev', sourcifyEndpoint, 400, '')
         mockApiResponse(scanDomain, scanEndpoint, 200, scanResponse)
     
-        return expect(fetchAbi('0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0', chainId)).resolves.toStrictEqual({
+        return expect(fetchContract('0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0', chainId)).resolves.toStrictEqual({
           abi: JSON.stringify(mockAbi), 
           name: 'mock scan abi', 
           source: scanName
         })
       })
 
-      it(`retrieves an ABI from sourcify when the ${scanName} request fails`, () => {
+      it(`retrieves a contract from sourcify when the ${scanName} request fails`, () => {
         mockApiResponse('sourcify.dev', sourcifyEndpoint, 200, sourcifyResponse)
         mockApiResponse(scanDomain, scanEndpoint, 400, '')
     
-        return expect(fetchAbi('0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0', chainId)).resolves.toStrictEqual({
+        return expect(fetchContract('0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0', chainId)).resolves.toStrictEqual({
           abi: JSON.stringify(mockAbi), 
           name: 'mock sourcify abi', 
           source: 'sourcify'
@@ -142,15 +142,15 @@ describe('#fetchAbi', () => {
         mockApiResponse('sourcify.dev', sourcifyEndpoint, 200, sourcifyResponse)
         mockApiResponse(scanDomain, scanEndpoint, 200, scanNotFoundResponse)
     
-        return expect(fetchAbi('0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0', chainId)).resolves.toBeUndefined()
+        return expect(fetchContract('0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0', chainId)).resolves.toBeUndefined()
       })
     })
   })
 
-  it('retrieves an ABI from sourcify when the chain is unsupported for *scan lookup', () => {
+  it('retrieves a contract from sourcify when the chain is unsupported for *scan lookup', () => {
     mockApiResponse('sourcify.dev', '/server/files/any/4/0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0', 200, sourcifyResponse)
 
-    return expect(fetchAbi('0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0', '0x4')).resolves.toStrictEqual({
+    return expect(fetchContract('0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0', '0x4')).resolves.toStrictEqual({
       abi: JSON.stringify(mockAbi), 
       name: 'mock sourcify abi', 
       source: 'sourcify'

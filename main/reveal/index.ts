@@ -7,7 +7,7 @@ import proxyConnection from '../provider/proxy'
 import nebulaApi from '../nebula'
 
 import Erc20Contract from '../contracts/erc20'
-import { decodeCallData, fetchAbi, ContractSource } from '../contracts'
+import { decodeCallData, fetchContract, ContractSource } from '../contracts'
 import erc20 from '../externalData/balances/erc-20-abi'
 
 const erc20Abi = JSON.stringify(erc20)
@@ -99,7 +99,7 @@ const surface = {
   decode: async (contractAddress: string = '', chainId: string, calldata: string) => {
     // Decode calldata
     const contractSources: ContractSource[] = [{ name: 'ERC-20', source: 'Generic ERC-20', abi: erc20Abi }]
-    const contractSource = await fetchAbi(contractAddress, chainId)
+    const contractSource = await fetchContract(contractAddress, chainId)
   
     if (contractSource) {
       contractSources.push(contractSource)

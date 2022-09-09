@@ -1,58 +1,7 @@
 import log from 'electron-log'
-import fetch, { Response } from 'node-fetch'
-import { Interface, JsonFragment } from '@ethersproject/abi'
-import { hexToNumberString } from 'web3-utils'
-
-interface EtherscanSourceCodeResponse {
-  status: string,
-  message: string,
-  result: ContractSourceCodeResult[]
-}
-
-interface SourcifySourceCodeResponse {
-  status: string,
-  files: SourcifySourceCodeFile[]
-}
-
-interface SourcifySourceCodeFile {
-  name: string
-  path: string
-  content: string
-}
-
-interface SourcifyMetadataFileContent {
-  compiler: { version: string },
-  language: string,
-  output: {
-    abi: JsonFragment[],
-    devdoc: Partial<{
-      details: string
-      title: string
-    }>
-  },
-  settings: Partial<{
-    compilationTarget: {
-      [K: string]: string
-    },
-    evmVersion: string
-    metadata: { 
-      [K: string]: string
-    }
-  }>,
-  sources: {
-    [K: string]: {
-      [J: string]: string | string[]
-    }
-  },
-  version: number
-}
-
-interface ContractSourceCodeResult {
-  SourceCode: string,
-  ABI: string,
-  ContractName: string,
-  Implementation: string
-}
+import { Interface } from '@ethersproject/abi'
+import { fetchSourcifyContract } from './sourcifyAbi'
+import { chainSupported, fetchScanContract } from './scanAbi'
 
 export interface ContractSource {
   abi: string,
@@ -72,11 +21,6 @@ export interface DecodedCallData {
   }>
 }
 
-type SourceCodeResults = {
-  scanResult?: EtherscanSourceCodeResponse['result']
-  sourcifyResult?: SourcifyMetadataFileContent
-}
-
 function parseAbi (abiData: string): Interface | undefined {
   try {
     return new Interface(abiData)
@@ -85,90 +29,16 @@ function parseAbi (abiData: string): Interface | undefined {
   }
 }
 
-const scanEndpointMap = {
-  '0x1': {
-    name: 'etherscan',
-    url: (contractAddress: Address) => `https://api.etherscan.io/api?module=contract&action=getsourcecode&address=${contractAddress}&apikey=3SYU5MW5QK8RPCJV1XVICHWKT774993S24`,
-  },
-  '0x89': {
-    name: 'polygonscan',
-    url: (contractAddress: Address) => `https://api.polygonscan.com/api?module=contract&action=getsourcecode&address=${contractAddress}&apikey=2P3U9T63MT26T1X64AAE368UNTS9RKEEBB`,
-  },
-  '0xa': {
-    name: 'optimistic.etherscan',
-    url: (contractAddress: Address) => `https://api-optimistic.etherscan.io/api?module=contract&action=getsourcecode&address=${contractAddress}&apikey=3SYU5MW5QK8RPCJV1XVICHWKT774993S24`,
-  },
-  '0xa4b1': {
-    name: 'arbiscan',
-    url: (contractAddress: Address) => `https://api.arbiscan.io/api?module=contract&action=getsourcecode&address=${contractAddress}&apikey=VP126CP67QVH9ZEKAZT1UZ751VZ6ZTIZAD`
-  }
-}
-
-function sourcifyEndpoint (contractAddress: Address, chainId: string) {
-  return `https://sourcify.dev/server/files/any/${hexToNumberString(chainId)}/${contractAddress}`
-}
-
-async function parseResponse <T>(response: Response): Promise<T | undefined> {
-  if (response?.status !== 200 || !(response?.headers.get('content-type') || '').toLowerCase().includes('json')) {
-    return Promise.resolve(undefined)
-  }
-  return await response.json()
-}
-
-async function fetchSourceCode (contractAddress: Address, chainId: string) {
-  const scanEndpoint = scanEndpointMap[chainId as keyof typeof scanEndpointMap]
-  const scanEndpointUrl = scanEndpoint?.url(contractAddress)
-  const sourcifyEndpointUrl = sourcifyEndpoint(contractAddress, chainId)
-  const sourceCodeRequests = [fetch(sourcifyEndpointUrl)]
-  
-  if (scanEndpointUrl) {
-    sourceCodeRequests.push(fetch(scanEndpointUrl))
-  }
-  const sourceCodeResponses = await Promise.all(sourceCodeRequests)
-  const [sourcifyRes, scanRes] = sourceCodeResponses
-  
+export async function fetchContract (contractAddress: Address, chainId: string): Promise<ContractSource | undefined> {
   try {
-    const parsedScanResponse = await parseResponse<EtherscanSourceCodeResponse>(scanRes)
-    const parsedSourcifyResponse = await parseResponse<SourcifySourceCodeResponse>(sourcifyRes)
-    const sourceCodeResults: SourceCodeResults = {
-      scanResult: parsedScanResponse?.message === 'OK' ? parsedScanResponse.result : undefined,
-      sourcifyResult: parsedSourcifyResponse && ['partial', 'full'].includes(parsedSourcifyResponse.status) ? JSON.parse(parsedSourcifyResponse.files[0].content) : undefined
-    }
-
-    return sourceCodeResults
-  } catch (e) {
-    console.log('source code response parsing error', e)
-    return {}
-  }
-}
-
-export async function fetchAbi (contractAddress: Address, chainId: string): Promise<ContractSource | undefined> {
-  try {
-    const { scanResult, sourcifyResult } = await fetchSourceCode(contractAddress, chainId)
+    const [sourcifyContract, scanContract] = await Promise.all([fetchSourcifyContract(contractAddress, chainId), fetchScanContract(contractAddress, chainId)])
     
-    // sourcify
-    if (sourcifyResult?.output) {
-      // if no scan result and scan supports the chain, return undefined
-      if (scanResult && scanResult[0].ABI === 'Contract source code not verified' && Object.keys(scanEndpointMap).includes(chainId)) {
-        return undefined
-      }
-
-      const { abi, devdoc: { title } } = sourcifyResult.output
-      return { abi: JSON.stringify(abi), name: title as string, source: 'sourcify' }
-    }
-
-    // etherscan compatible
-    if (scanResult?.length) {
-      const source = scanResult[0]
-      const implementation = source.Implementation
-
-      if (implementation) {
-        // this is a proxy contract, return the ABI for the source
-        return fetchAbi(implementation, chainId)
-      }
-
-      return { abi: source.ABI, name: source.ContractName, source: scanEndpointMap[chainId as keyof typeof scanEndpointMap].name }
-    }
+    // if no scan result and scan supports the chain, return undefined
+    if (scanContract && scanContract.abi === 'Contract source code not verified' && chainSupported(chainId)) {
+      return undefined
+    }    
+    
+    return sourcifyContract || scanContract
   } catch (e) {
     log.warn(`could not fetch source code for contract ${contractAddress}`, e)
   }
