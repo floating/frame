@@ -1,7 +1,5 @@
 import { intToHex } from 'ethereumjs-util'
 
-const oneGwei = 1e9
-
 // TODO: move these to a declaration file?
 interface FeeHistoryResponse {
   baseFeePerGas: string[],
@@ -86,7 +84,7 @@ export default class GasCalculator {
 
     // only consider priority fees from blocks that aren't almost empty or almost full
     const eligibleRewardsBlocks = blocks.filter(block => block.gasUsedRatio >= 0.1 && block.gasUsedRatio <= 0.9).map(block => block.rewards[0])
-    const medianReward = eligibleRewardsBlocks.sort()[Math.floor(eligibleRewardsBlocks.length / 2)] || oneGwei
+    const medianReward = eligibleRewardsBlocks.sort()[Math.floor(eligibleRewardsBlocks.length / 2)] || 0
 
     return {
       nextBaseFee: intToHex(nextBlockFee),
