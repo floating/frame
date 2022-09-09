@@ -76,6 +76,10 @@ export async function fetchEtherscanContract (contractAddress: Address, chainId:
         return fetchEtherscanContract(implementation, chainId)
       }
 
+      if (source.ABI === 'Contract source code not verified') {
+        return undefined
+      }
+
       return { abi: source.ABI, name: source.ContractName, source: endpointMap[chainId as keyof typeof endpointMap].name }
     }
   } catch (e) {
