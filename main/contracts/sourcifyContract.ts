@@ -42,7 +42,7 @@ interface SourcifyMetadataFileContent {
   version: number
 }
 
-function sourcifyEndpoint (contractAddress: Address, chainId: string) {
+function getEndpointUrl (contractAddress: Address, chainId: string) {
   return `https://sourcify.dev/server/files/any/${hexToNumberString(chainId)}/${contractAddress}`
 }
 
@@ -54,13 +54,13 @@ async function parseResponse <T>(response: Response): Promise<T | undefined> {
 }
 
 async function fetchSourceCode (contractAddress: Address, chainId: string): Promise<SourcifyMetadataFileContent | undefined> {
-  const sourcifyEndpointUrl = sourcifyEndpoint(contractAddress, chainId)  
-  const sourcifyRes = await fetch(sourcifyEndpointUrl)
+  const endpointUrl = getEndpointUrl(contractAddress, chainId)  
+  const res = await fetch(endpointUrl)
   
   try {
-    const parsedSourcifyResponse = await parseResponse<SourcifySourceCodeResponse>(sourcifyRes)
+    const parsedResponse = await parseResponse<SourcifySourceCodeResponse>(res)
 
-    return parsedSourcifyResponse && ['partial', 'full'].includes(parsedSourcifyResponse.status) ? JSON.parse(parsedSourcifyResponse.files[0].content) : undefined
+    return parsedResponse && ['partial', 'full'].includes(parsedResponse.status) ? JSON.parse(parsedResponse.files[0].content) : undefined
   } catch (e) {
     console.log('source code response parsing error', e)
     return undefined
@@ -69,10 +69,10 @@ async function fetchSourceCode (contractAddress: Address, chainId: string): Prom
 
 export async function fetchSourcifyContract (contractAddress: Address, chainId: string): Promise<ContractSource | undefined> {
   try {
-    const sourcifyResult = await fetchSourceCode(contractAddress, chainId)
+    const result = await fetchSourceCode(contractAddress, chainId)
     
-    if (sourcifyResult?.output) {
-      const { abi, devdoc: { title } } = sourcifyResult.output
+    if (result?.output) {
+      const { abi, devdoc: { title } } = result.output
       return { abi: JSON.stringify(abi), name: title as string, source: 'sourcify' }
     }
   } catch (e) {
