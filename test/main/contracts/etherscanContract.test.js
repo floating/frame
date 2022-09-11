@@ -100,13 +100,13 @@ describe('#fetchEtherscanContract', () => {
       it(`does not retrieve a contract from ${etherscanName} when the request fails`, () => {
         mockApiResponse(etherscanDomain, etherscanEndpoint, 400, etherscanResponse)
     
-        return expect(fetchEtherscanContract('0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0', chainId)).resolves.toBeUndefined()
+        return expect(fetchEtherscanContract('0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0', chainId)).rejects.toBe('Contract 0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0 not found in Etherscan')
       })
 
       it(`does not retrieve a contract from ${etherscanName} when the contract is not found`, () => {
         mockApiResponse(etherscanDomain, etherscanEndpoint, 200, etherscanNotFoundResponse)
     
-        return expect(fetchEtherscanContract('0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0', chainId)).resolves.toBeUndefined()
+        return expect(fetchEtherscanContract('0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0', chainId)).rejects.toBe('Contract 0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0 not found in Etherscan')
       })
     })
   })

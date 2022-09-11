@@ -77,13 +77,15 @@ export async function fetchEtherscanContract (contractAddress: Address, chainId:
       }
 
       if (source.ABI === 'Contract source code not verified') {
-        return undefined
+        return Promise.reject(`Contract ${contractAddress} not found in Etherscan`)
       }
 
       return { abi: source.ABI, name: source.ContractName, source: endpointMap[chainId as keyof typeof endpointMap].name }
     }
+    return Promise.reject(`Contract ${contractAddress} not found in Etherscan`)
   } catch (e) {
     log.warn(`could not fetch source code for contract ${contractAddress}`, e)
+    return Promise.reject(`Contract ${contractAddress} not found in Etherscan`)
   }
 }
 

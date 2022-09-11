@@ -60,7 +60,7 @@ async function fetchSourceCode (contractAddress: Address, chainId: string): Prom
   try {
     const parsedResponse = await parseResponse<SourcifySourceCodeResponse>(res)
 
-    return parsedResponse && ['partial', 'full'].includes(parsedResponse.status) ? JSON.parse(parsedResponse.files[0].content) : undefined
+    return parsedResponse && ['partial', 'full'].includes(parsedResponse.status) ? JSON.parse(parsedResponse.files[0].content) : Promise.reject(`Contract ${contractAddress} not found in Sourcify`)
   } catch (e) {
     console.log('source code response parsing error', e)
     return undefined
@@ -77,6 +77,7 @@ export async function fetchSourcifyContract (contractAddress: Address, chainId: 
     }
   } catch (e) {
     log.warn(`could not fetch source code for contract ${contractAddress}`, e)
+    return Promise.reject(`Contract ${contractAddress} not found in Sourcify`)
   }
 }
 
