@@ -32,15 +32,14 @@ function parseAbi (abiData: string): Interface | undefined {
 export async function fetchContract (contractAddress: Address, chainId: string): Promise<ContractSource | undefined> {
   try {
     const fetches = [fetchSourcifyContract, fetchEtherscanContract]
-    const contracts = await Promise.all(fetches.map((getContract) => getContract(contractAddress, chainId)))
 
-    // if no etherscan result and etherscan supports the chain, return undefined
-    if (!contracts[1] && chainSupported(chainId)) {
+    const contract = await Promise.any(fetches.map((getContract) => getContract(contractAddress, chainId)))
+
+    if (!contract) {
       return undefined
     }
     
-    // return the first valid contract
-    return contracts.find((contract) => !!contract)
+    return contract
   } catch (e) {
     log.warn(`could not fetch source code for contract ${contractAddress}`, e)
   }
