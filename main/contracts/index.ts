@@ -46,13 +46,14 @@ export async function fetchContract (contractAddress: Address, chainId: string):
 
   while (!contract && i < fetches.length) {
     contract = await fetches[i]
-
-    if (contract) return contract
-
     i += 1
   }
   
-  log.warn(`could not fetch source code for contract ${contractAddress}`)
+  if (!contract) {
+    log.warn(`could not fetch source code for contract ${contractAddress}`)
+  }
+
+  return contract
 }
 
 export function decodeCallData (calldata: string, abi: string) {
