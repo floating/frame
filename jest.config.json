@@ -10,7 +10,7 @@
     "^uuid$": "<rootDir>/node_modules/uuid/dist/index.js",
     "\\.svg$": "<rootDir>/test/jest.svg.js"
   },
-  "testTimeout": 1000,
+  "testTimeout": 100,
   "fakeTimers": {
     "enableGlobally": true
   },
