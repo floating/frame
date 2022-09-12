@@ -60,7 +60,7 @@ class Inventory extends React.Component {
     const inventory = this.store('main.inventory', this.props.account)
     const collections = Object.keys(inventory || {})
     return (
-      <div className=''>
+      <div className='accountViewScroll'>
         <div className='inventoryWrapper'>
           {collections.length ? (
             this.renderInventoryList()

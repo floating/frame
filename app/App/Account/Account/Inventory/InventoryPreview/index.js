@@ -27,7 +27,8 @@ class Inventory extends React.Component {
 
     const c = this.store('main.inventory', this.props.account, collection)
     const itemMatch = Object.keys(c.items).some(item => {
-      return c.items[item].name.toLowerCase().indexOf(filter.toLowerCase()) !== -1
+      const { name } = c.items[item] || {}
+      return (name || '').toLowerCase().indexOf(filter.toLowerCase()) !== -1
     })
 
     const match = (

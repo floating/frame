@@ -118,9 +118,7 @@ class _AccountModule extends React.Component {
     
     if (expanded) {
       return (
-        <div>
-          {this.getModule(id, account, expanded, expandedData, filter)}
-        </div>
+        this.getModule(id, account, expanded, expandedData, filter)
       )
     } else {
       return (
@@ -323,11 +321,13 @@ const AccountMain = Restore.connect(_AccountMain)
 // AccountView is a reusable template that provides the option to nav back to main
 class _AccountView extends React.Component {
   render () {
+    const { position = {} } = this.store('windows.panel.nav')[0] || {}
     return (
       <div className='accountView'
         // TODO: sync via nav
         style={{
-          bottom: '200px'
+          top: position.top || '140px',
+          bottom: position.bottom || '40px'
         }}
       >
         <div className='accountViewMenu cardShow'>
