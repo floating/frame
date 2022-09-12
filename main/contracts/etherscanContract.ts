@@ -15,23 +15,17 @@ interface ContractSourceCodeResult {
   Implementation: string
 }
 
+const sourceCapture = /^https?:\/\/(?:api[\.-]?)?(?<source>.*)\//
+
+const getEndpoint = (domain: string, contractAddress: string, apiKey: string) => {
+  return `https://${domain}/api?module=contract&action=getsourcecode&address=${contractAddress}&apikey=${apiKey}`
+}
+
 const endpointMap = {
-  '0x1': {
-    name: 'etherscan',
-    url: (contractAddress: Address) => `https://api.etherscan.io/api?module=contract&action=getsourcecode&address=${contractAddress}&apikey=3SYU5MW5QK8RPCJV1XVICHWKT774993S24`,
-  },
-  '0x89': {
-    name: 'polygonscan',
-    url: (contractAddress: Address) => `https://api.polygonscan.com/api?module=contract&action=getsourcecode&address=${contractAddress}&apikey=2P3U9T63MT26T1X64AAE368UNTS9RKEEBB`,
-  },
-  '0xa': {
-    name: 'optimistic.etherscan',
-    url: (contractAddress: Address) => `https://api-optimistic.etherscan.io/api?module=contract&action=getsourcecode&address=${contractAddress}&apikey=3SYU5MW5QK8RPCJV1XVICHWKT774993S24`,
-  },
-  '0xa4b1': {
-    name: 'arbiscan',
-    url: (contractAddress: Address) => `https://api.arbiscan.io/api?module=contract&action=getsourcecode&address=${contractAddress}&apikey=VP126CP67QVH9ZEKAZT1UZ751VZ6ZTIZAD`
-  }
+  '0x1': (contractAddress: Address) => getEndpoint('api.etherscan.io', contractAddress, '3SYU5MW5QK8RPCJV1XVICHWKT774993S24'),
+  '0x89': (contractAddress: Address) => getEndpoint('api.polygonscan.com', contractAddress, '2P3U9T63MT26T1X64AAE368UNTS9RKEEBB'),
+  '0xa': (contractAddress: Address) => getEndpoint('api-optimistic.etherscan.io', contractAddress, '3SYU5MW5QK8RPCJV1XVICHWKT774993S24'),
+  '0xa4b1': (contractAddress: Address) => getEndpoint('api.arbiscan.io', contractAddress, 'VP126CP67QVH9ZEKAZT1UZ751VZ6ZTIZAD')
 }
 
 async function parseResponse <T>(response: Response): Promise<T | undefined> {
@@ -41,20 +35,16 @@ async function parseResponse <T>(response: Response): Promise<T | undefined> {
   return Promise.resolve(undefined)
 }
 
-async function fetchSourceCode (contractAddress: Address, chainId: string): Promise<ContractSourceCodeResult[] | undefined> {
-  const endpoint = endpointMap[chainId as keyof typeof endpointMap]
-  const endpointUrl = endpoint?.url(contractAddress)
+async function fetchSourceCode (endpoint: string): Promise<ContractSourceCodeResult[] | undefined> {
+  const res = await fetch(endpoint)
   
-  if (endpointUrl) {
-    const res = await fetch(endpointUrl)  
-    try {
-      const parsedResponse = await parseResponse<EtherscanSourceCodeResponse>(res)
+  try {
+    const parsedResponse = await parseResponse<EtherscanSourceCodeResponse>(res)
 
-      return parsedResponse?.message === 'OK' ? parsedResponse.result : undefined
-    } catch (e) {
-      console.log('source code response parsing error', e)
-      return undefined
-    }
+    return parsedResponse?.message === 'OK' ? parsedResponse.result : undefined
+  } catch (e) {
+    log.warn('Source code response parsing error', e)
+    return undefined
   }
 }
 
@@ -63,8 +53,15 @@ export function chainSupported (chainId: string) {
 }
 
 export async function fetchEtherscanContract (contractAddress: Address, chainId: string): Promise<ContractSource | undefined> {
+  if (!(chainId in endpointMap)) {
+    return
+  }
+
+  const endpointChain = chainId as keyof typeof endpointMap
+
   try {
-    const result = await fetchSourceCode(contractAddress, chainId)
+    const endpoint = endpointMap[endpointChain](contractAddress)
+    const result = await fetchSourceCode(endpoint)
 
     // etherscan compatible
     if (result?.length) {
@@ -77,10 +74,11 @@ export async function fetchEtherscanContract (contractAddress: Address, chainId:
       }
 
       if (source.ABI === 'Contract source code not verified') {
-        return Promise.reject(`Contract ${contractAddress} not found in Etherscan`)
+        log.warn(`Contract ${contractAddress} does not have verified ABI in Etherscan`)
+        return undefined
       }
 
-      return { abi: source.ABI, name: source.ContractName, source: endpointMap[chainId as keyof typeof endpointMap].name }
+      return { abi: source.ABI, name: source.ContractName, source: endpoint.match(sourceCapture)?.groups?.source || '' }
     }
   } catch (e) {
     log.warn(`Contract ${contractAddress} not found in Etherscan`, e)
