@@ -78,7 +78,7 @@
 
   .signerStatusIndicator
     position absolute
-    top 27px
+    top 26px
     right 18px
     font-size 12px
     text-transform uppercase
@@ -102,7 +102,7 @@
     font-size 12px
     text-transform uppercase
     text-align center
-    font-weight 300
+    font-weight 600
     letter-spacing 0px
     border 1px solid var(--ghostY)
     color var(--outerspace)
@@ -379,14 +379,13 @@
 
     .signerAccount
       display flex
-      height 28px
+      height 37px
       margin 4px 6px
       width calc(100% - 12px)
       position relative
       background var(--ghostB)
       color var(--outerspace)
-      border-radius 8px
-      border 2px solid rgba(0, 0, 0, 0)
+      border-radius 12px
       box-sizing border-box
       cursor pointer
 
@@ -395,8 +394,8 @@
 
       .signerAccountIndex
         position absolute
-        top 0
-        left 2px
+        top 3px
+        left 3px
         bottom 2px
         width 30px
         display flex
@@ -410,9 +409,9 @@
         align-items center
         position absolute
         left 30px
-        bottom 1px
+        bottom 6px
         right 40px
-        font-size 14px
+        font-size 16px
         overflow hidden
         font-family 'FiraCode'
 
@@ -421,8 +420,8 @@
 
       .signerAccountCheck
         position absolute
-        top 9px
-        right 10px
+        top 16px
+        right 16px
         bottom 0
         width 6px
         height 6px
@@ -434,7 +433,9 @@
         background var(--ghostZ)
 
     .signerAccountAdded
-      border 2px solid var(--good)
+      background var(--good)
+      color var(--goodOver)
+
       .signerAccountCheck
         color var(--good)
         background var(--good)
@@ -445,7 +446,8 @@
 .signerOk
   .signerAccounts
     .signerAccountAdded
-      border 2px solid var(--good)
+      background var(--good)
+      color var(--goodOver)
       .signerAccountCheck
         color var(--good)
         background var(--good)
@@ -453,10 +455,11 @@
 .signerLocked
   .signerAccounts
     .signerAccountAdded
-      border 2px solid var(--moon)
+      background var(--moon)
+      color var(--moonOver)
       .signerAccountCheck
-        color var(--moon)
-        background var(--moon)
+        color var(--moonOver)
+        background var(--moonOver)
 
 .signerLoading
   height 60px
