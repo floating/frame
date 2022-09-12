@@ -93,7 +93,7 @@ describe('#fetchEtherscanContract', () => {
     return expect(fetchEtherscanContract(contractAddress, '0x1')).resolves.toBeUndefined()
   })
 
-  it('does not retrieve a contract from an unsupported chain', () => {
+  it('does not retrieve a contract from an unsupported chain', async () => {
     return expect(fetchEtherscanContract(contractAddress, '0x4')).resolves.toBeUndefined()
   })
 })

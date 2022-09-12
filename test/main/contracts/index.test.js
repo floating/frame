@@ -22,6 +22,8 @@ const mockAbi = [
   }
 ]
 
+const flushPromises = () => new Promise(jest.requireActual('timers').setImmediate)
+
 beforeAll(() => {
   jest.useFakeTimers()
 })
@@ -62,8 +64,6 @@ describe('#fetchContract', () => {
       source: 'sourcify'
     })
   })
-
-  const flushPromises = () => new Promise(jest.requireActual('timers').setImmediate)
 
   it('waits for a contract from sourcify even if etherscan returns first', async () => {
     const sourcifyResponse = new Promise(resolve => setTimeout(() => resolve(mockContractSource('sourcify')), 40))
