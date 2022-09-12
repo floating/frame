@@ -3,6 +3,10 @@ import nock from 'nock'
 
 import { fetchEtherscanContract } from '../../../main/contracts/etherscanContract'
 
+nock.emitter.on('no match', () => {
+  console.error(' ===> NO MATCH!')
+})
+
 const mockAbi = [
   { 
     inputs: [],
