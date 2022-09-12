@@ -52,8 +52,8 @@ export default class GasCalculator {
     const payload = rpcPayload('eth_feeHistory', [blockCount, newestBlock, rewardPercentiles])
 
     const feeHistory: FeeHistoryResponse = await this.connection.send(payload)
-    console.log(`feeHistory for chain ${chainId}`, feeHistory)
 
+    
     const feeHistoryBlocks = feeHistory.baseFeePerGas.map((baseFee, i) => {
       return {
         baseFee: parseInt(baseFee, 16),
@@ -61,6 +61,7 @@ export default class GasCalculator {
         rewards: (feeHistory.reward[i] || []).map(reward => parseInt(reward, 16))
       }
     })
+    console.log(`feeHistory for chain ${chainId}`, feeHistoryBlocks.map(({ rewards, gasUsedRatio }) => `${rewards[0]} - ${gasUsedRatio}`))
 
     return feeHistoryBlocks
   }
@@ -90,7 +91,7 @@ export default class GasCalculator {
       }
       const nextPercentile = lowerPercentile + 5
       log.info('increasing percentile to ', nextPercentile)
-      const nextBlocks = await this._getFeeHistory(10, [nextPercentile], chainId)
+      const nextBlocks = await this._getFeeHistory(10, [nextPercentile], chainId, intToHex(31979691))
       return await this._getMedianReward(nextBlocks, nextPercentile, chainId)
     }
     
@@ -99,7 +100,7 @@ export default class GasCalculator {
 
   async getFeePerGas (chainId: string): Promise<GasFees> {
     // fetch the last 10 blocks and the bottom 10% of priority fees paid for each block
-    const blocks = await this._getFeeHistory(10, [10], chainId)
+    const blocks = chainId === '137' ? await this._getFeeHistory(10, [10], chainId, intToHex(31979691)) : await this._getFeeHistory(10, [10], chainId)
     
     // plan for max fee of 2 full blocks, each one increasing the fee by 12.5%
     const nextBlockFee = blocks[blocks.length - 1].baseFee // base fee for next block
@@ -109,9 +110,9 @@ export default class GasCalculator {
     const eligibleRewardsBlocks = blocks.filter(block => block.gasUsedRatio >= 0.1 && block.gasUsedRatio <= 0.9).map(block => block.rewards[0])
     let medianReward = eligibleRewardsBlocks.sort()[Math.floor(eligibleRewardsBlocks.length / 2)]
 
-    if (!medianReward && chainId === '137') {
+    if (chainId === '137') {
       // increase number of blocks
-      const moreBlocks = await this._getFeeHistory(20, [10], chainId)
+      const moreBlocks = await this._getFeeHistory(90, [10], chainId, intToHex(31979721))
       const moreEligibleRewardsBlocks = moreBlocks.filter(block => block.gasUsedRatio >= 0.1 && block.gasUsedRatio <= 0.9).map(block => block.rewards[0])
       const medianRewardMoreBlocks = moreEligibleRewardsBlocks.sort()[Math.floor(moreEligibleRewardsBlocks.length / 2)]
 
@@ -123,8 +124,8 @@ export default class GasCalculator {
       const medianRewardGasUsedRatio = unfilteredEligibleRewardsBlocks.sort()[Math.floor(unfilteredEligibleRewardsBlocks.length / 2)]
       
       // log out proposed fixes
-      log.info(`Gas calculator hit one gwei for chain: ${chainId}`)
-      // log.info('median reward percentile approach: ', medianRewardPercentile)
+      log.info(`Gas calculator proto for: ${chainId}`)
+      log.info('median reward percentile approach: ', medianRewardPercentile)
       log.info('gas used ratio approach: ', medianRewardGasUsedRatio)
       log.info('doubled number of blocks approach', medianRewardMoreBlocks)
 
