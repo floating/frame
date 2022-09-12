@@ -76,8 +76,7 @@ export async function fetchSourcifyContract (contractAddress: Address, chainId: 
       return { abi: JSON.stringify(abi), name: title as string, source: 'sourcify' }
     }
   } catch (e) {
-    log.warn(`could not fetch source code for contract ${contractAddress}`, e)
-    return Promise.reject(`Contract ${contractAddress} not found in Sourcify`)
+    log.warn(`Contract ${contractAddress} not found in Sourcify`, e)
   }
 }
 

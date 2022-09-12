@@ -3,6 +3,15 @@ import { Interface } from '@ethersproject/abi'
 import { fetchSourcifyContract } from './sourcifyContract'
 import { chainSupported, fetchEtherscanContract } from './etherscanContract'
 
+// this list should be in order of descending priority as each source will
+// be searched in turn
+const fetchSources = [
+  fetchSourcifyContract,
+  fetchEtherscanContract
+]
+
+type ContractSourceResult = ContractSource | undefined
+
 export interface ContractSource {
   abi: string,
   name: string,
@@ -29,20 +38,21 @@ function parseAbi (abiData: string): Interface | undefined {
   }
 }
 
-export async function fetchContract (contractAddress: Address, chainId: string): Promise<ContractSource | undefined> {
-  try {
-    const fetches = [fetchSourcifyContract, fetchEtherscanContract]
+export async function fetchContract (contractAddress: Address, chainId: string): Promise<ContractSourceResult> {
+  const fetches = fetchSources.map((getContract) => getContract(contractAddress, chainId))
 
-    const contract = await Promise.any(fetches.map((getContract) => getContract(contractAddress, chainId)))
+  let contract: ContractSourceResult = undefined
+  let i = 0
 
-    if (!contract) {
-      return undefined
-    }
-    
-    return contract
-  } catch (e) {
-    log.warn(`could not fetch source code for contract ${contractAddress}`, e)
+  while (!contract && i < fetches.length) {
+    contract = await fetches[i]
+
+    if (contract) return contract
+
+    i += 1
   }
+  
+  log.warn(`could not fetch source code for contract ${contractAddress}`)
 }
 
 export function decodeCallData (calldata: string, abi: string) {
