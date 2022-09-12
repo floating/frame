@@ -24,14 +24,6 @@ const mockAbi = [
 
 const flushPromises = () => new Promise(jest.requireActual('timers').setImmediate)
 
-beforeAll(() => {
-  jest.useFakeTimers()
-})
-
-afterAll(() => {
-  jest.useRealTimers()
-})
-
 describe('#fetchContract', () => {
   it('retrieves a contract from sourcify', async () => {
     fetchSourcifyContract.mockResolvedValue(mockContractSource('sourcify'))

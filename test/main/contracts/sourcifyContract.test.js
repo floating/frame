@@ -45,6 +45,8 @@ const sourcifyNotFoundResponse = {
 }
 
 beforeAll(() => {
+  jest.useRealTimers()
+
   nock.disableNetConnect()
   log.transports.console.level = false
 })
