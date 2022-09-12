@@ -3,7 +3,7 @@ import nock from 'nock'
 
 import { fetchSourcifyContract } from '../../../main/contracts/sourcifyContract'
 
-function mockApiResponse (domain, path, status, body = sourcifyResponse, headers = { 'content-type': 'application/json' }) {
+function mockApiResponse (domain, path, status, body, headers = { 'content-type': 'application/json' }) {
   nock(`https://${domain}`)
     .get(path)
     .reply(status, body, headers)
@@ -57,9 +57,15 @@ afterAll(() => {
 
 describe('#fetchSourcifyContract', () => {
   const contractAddress = '0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0'
+  const domain = 'sourcify.dev'
+  const endpoint = `/server/files/any/137/${contractAddress}`
+
+  const mockSourcifyApi = (status, response) => {
+    mockApiResponse(domain, endpoint, status, response)
+  }
 
   it('retrieves a contract from sourcify', async () => {
-    mockApiResponse('sourcify.dev', `/server/files/any/137/${contractAddress}`, 200)
+    mockSourcifyApi(200, sourcifyResponse)
 
     return expect(fetchSourcifyContract(contractAddress, '0x89')).resolves.toStrictEqual({
       abi: JSON.stringify(mockAbi), 
@@ -69,13 +75,13 @@ describe('#fetchSourcifyContract', () => {
   })
 
   it('does not retrieve a contract when the request fails', async () => {
-    mockApiResponse('sourcify.dev', `/server/files/any/137/${contractAddress}`, 400)
+    mockSourcifyApi(400)
 
     return expect(fetchSourcifyContract(contractAddress, '0x89')).resolves.toBeUndefined()
   })
 
   it('does not retrieve a contract when the contract is not found', async () => {
-    mockApiResponse('sourcify.dev', `/server/files/any/137/${contractAddress}`, 200, sourcifyNotFoundResponse)
+    mockSourcifyApi(200, sourcifyNotFoundResponse)
 
     return expect(fetchSourcifyContract(contractAddress, '0x89')).resolves.toBeUndefined()
   })
