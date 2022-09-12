@@ -111,13 +111,12 @@
   .accountMainScroll
     position absolute
     top 0
-    left 0
     right 0
     bottom 0
+    left 0
     overflow-y scroll
     overflow-x hidden
     transform translate3d(0, 0, 0)
-    z-index 2000
 
   .accountMainSlide
     position relative 
@@ -126,6 +125,8 @@
     transition var(--standardSlow)
     transition-delay 0.32s
     padding-bottom 90px
+    pointer-events none
+    z-index 999
 
   .signerAddress
     font-size 10px
@@ -191,7 +192,7 @@
       justify-content center
       align-items center
       font-size 13.5px
-      font-weight 600
+      font-weight 300
       pointer-events none
       z-index 8
       cursor pointer
@@ -547,12 +548,15 @@
     width 100%
 
 .accountModule
-  position absolute 
+  position absolute
   top 0
   left 2px
   right 2px
   transform translate3d(0, 0, 0)
   transition var(--standardFast)
+  overflow hidden
+  pointer-events auto
+
 .moduleExpanded
   .accountModuleInner
     background none
@@ -678,7 +682,7 @@
     text-transform uppercase
     border-top 1px solid var(--ghostA)
     box-sizing border-box
-    font-weight 500
+    font-weight 300
     letter-spacing 1px
     padding 12px 
     height 42px

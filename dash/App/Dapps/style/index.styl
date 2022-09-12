@@ -61,7 +61,7 @@
 //     margin-top 2px
 //     font-size 8px
 //     text-transform uppercase
-//     font-weight bold
+//     font-weight 300
 
 
 .originSwapOrigin
@@ -69,7 +69,7 @@
   width 100%
   color var(--moon)
   font-size 20px
-  font-weight 500
+  font-weight 300
   display flex
   align-items center
   justify-content center
@@ -83,7 +83,7 @@
   justify-content center
   text-transform uppercase
   font-size 11px
-  font-weight 500
+  font-weight 300
   padding-bottom 6px
   
 .originSwapChainList
@@ -93,7 +93,7 @@
   .originChainItem
     position relative
     display flex
-    justify-content center
+    justify-content flex-start
     align-items center
     height 64px
     margin 6px
@@ -102,7 +102,6 @@
     background var(--ghostA)
     box-shadow 0px 4px 8px var(--ghostY)
     margin-bottom 10px
-    font-weight 500
     font-size 18px
 
   .originChainItem:hover
@@ -112,7 +111,7 @@
     border-bottom 0px solid var(--ghostX)
 
   .originChainItemIcon
-    padding 1px 11px 0px 0px
+    padding 1px 16px 0px 16px
     *
       cursor pointer
   
@@ -125,7 +124,7 @@
     display flex
     justify-content center
     align-items center
-    background var(--ghostZ)
+    background var(--ghostB)
     border-radius 8px
 
   .originChainItemActive

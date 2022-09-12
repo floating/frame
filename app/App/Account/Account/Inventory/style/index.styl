@@ -1,15 +1,29 @@
 .inventoryWrapper
   background var(--ghostZ)
   margin 0px 6px 6px 6px
-  padding 0px 0px
+  padding 0px 3px 3px 3px
   border-radius 20px
   overflow auto
+
+  .inventoryCollection:first-child
+    border-top-left-radius 17px
+    border-top-right-radius 17px
+
+  .inventoryCollection:last-child
+    border-bottom-left-radius 17px
+    border-bottom-right-radius 17px
+
+  .inventoryCollection:first-child:last-child
+    border-radius 17px
+
+.inventoryCollection:hover
+  background var(--ghostB)
 
 .inventoryCollection
   position relative
   border-radius 8px
   z-index 300
-  margin 5px
+  margin-top 3px
   background var(--ghostA)
 
   .inventoryCollectionTop
@@ -20,15 +34,11 @@
     padding 3px 9px 3px 12px
     font-size 14px
     cursor pointer
-    border-radius 8px
     height 42px
     font-weight 300
 
     *
       pointer-events none
-
-  .inventoryCollectionTop:hover
-    background var(--ghostB)
 
   .inventoryCollectionImage
     height 42px
@@ -99,7 +109,7 @@
   .inventoryCollectionCount
     width 48px
     height 24px
-    background var(--ghostA)
+    background var(--ghostB)
     display flex
     justify-content center
     align-items center

@@ -91,7 +91,7 @@ class BalancesExpanded extends React.Component {
 
     return (
       <div 
-        className=''
+        className='bbb123'
       >
         {scanning ? (
           <div className='signerBalancesLoading'>
