@@ -1,7 +1,7 @@
 const { ipcMain, dialog } = require('electron')
 const fs = require('fs')
 const utils = require('web3-utils')
-const crypto = require('crypto')
+const { randomBytes } = require('crypto')
 
 const accounts = require('../accounts').default
 const signers = require('../signers').default
@@ -12,12 +12,8 @@ const dapps = require('../dapps')
 // const ens = require('../ens')
 // const ipfs = require('../ipfs')
 
-function randomLetters (num) {
-  return [...Array(num)].map(() => String.fromCharCode(65 + Math.floor(Math.random() * 26))).join('')
-}
-
 const { resolveName } = require('../accounts/aragon')
-const { arraysEqual } = require('../../resources/utils')
+const { arraysEqual, randomLetters } = require('../../resources/utils')
 const { default: TrezorBridge } = require('../../main/signers/trezor/bridge')
 
 const rpc = {
@@ -92,7 +88,7 @@ const rpc = {
       paired: true,
       deviceName: (deviceName || 'GridPlus').substring(0, 14),
       tag: randomLetters(6),
-      privKey: crypto.randomBytes(32).toString('hex')  
+      privKey: randomBytes(32).toString('hex')  
     })
 
     cb(null, { id: 'lattice-' + deviceId })
