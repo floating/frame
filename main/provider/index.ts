@@ -2,7 +2,7 @@ import { v4 as uuid } from 'uuid'
 import EventEmitter from 'events'
 import log from 'electron-log'
 import utils from 'web3-utils'
-import { recoverTypedMessage, Version } from 'eth-sig-util'
+import { recoverTypedSignature, SignTypedDataVersion } from '@metamask/eth-sig-util'
 import crypto from 'crypto'
 import {
   addHexPrefix,
@@ -46,6 +46,7 @@ import {
   createOriginChainObserver as OriginChainObserver,
   getActiveChains
 } from './chains'
+import { TypedData } from '../accounts/types'
 
 
 type Subscription = {
@@ -256,7 +257,7 @@ export class Provider extends EventEmitter {
   }
 
   approveSignTypedData (req: SignTypedDataRequest, cb: Callback<string>) {
-    const res = (data: any) => {
+    const res = (data: unknown) => {
       if (this.handlers[req.handlerId]) this.handlers[req.handlerId](data)
       delete this.handlers[req.handlerId]
     }
@@ -264,22 +265,21 @@ export class Provider extends EventEmitter {
     const payload = req.payload
     const [address, data] = payload.params
 
-    const dataToSign = (Array.isArray(data)) ? [...data] : { ...data }
+    const dataToSign = (Array.isArray(data)) ? [...data] : { ...data } as TypedData
 
-    accounts.signTypedData(req.version, address, dataToSign, (err, signature) => {
+    accounts.signTypedData(req.version, address, dataToSign, (err, signature = '') => {
       if (err) {
         resError(err.message, payload, res)
         cb(err)
       } else {
-        const sig = signature || ''
         try {
-          const recoveredAddress = recoverTypedMessage({ data, sig }, req.version)
+          const recoveredAddress = recoverTypedSignature({ data, signature, version: req.version })
           if (recoveredAddress.toLowerCase() !== address.toLowerCase()) {
             throw new Error('TypedData signature verification failed')
           }
 
-          res({ id: payload.id, jsonrpc: payload.jsonrpc, result: sig })
-          cb(null, sig)
+          res({ id: payload.id, jsonrpc: payload.jsonrpc, result: signature })
+          cb(null, signature)
         } catch (e) {
           const err = e as Error
           resError(err.message, payload, res)
@@ -557,7 +557,7 @@ export class Provider extends EventEmitter {
     accounts.addRequest(req, _res)
   }
 
-  signTypedData (rawPayload: RPCRequestPayload, version: Version, res: RPCRequestCallback) {
+  signTypedData (rawPayload: RPCRequestPayload, version: SignTypedDataVersion, res: RPCRequestCallback) {
     // ensure param order is [address, data, ...] regardless of version
     const orderedParams = utils.isAddress(rawPayload.params[1]) && !utils.isAddress(rawPayload.params[0])
       ? [rawPayload.params[1], rawPayload.params[0], ...rawPayload.params.slice(2)]
@@ -840,7 +840,7 @@ export class Provider extends EventEmitter {
 
     if (['eth_signTypedData', 'eth_signTypedData_v1', 'eth_signTypedData_v3', 'eth_signTypedData_v4'].includes(method)) {
       const underscoreIndex = method.lastIndexOf('_')
-      const version = (underscoreIndex > 3 ? method.substring(underscoreIndex + 1).toUpperCase() : undefined) as Version
+      const version = (underscoreIndex > 3 ? method.substring(underscoreIndex + 1).toUpperCase() : undefined) as SignTypedDataVersion
       return this.signTypedData(payload, version, res)
     }
     

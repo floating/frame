@@ -8,7 +8,8 @@ import { sign, signerCompatibility, londonToLegacy } from '../../../transaction'
 import { TransactionData } from '../../../../resources/domain/transaction'
 import { TypedTransaction } from '@ethereumjs/tx'
 import { Derivation, getDerivationPath } from '../../Signer/derive'
-import { TypedData } from 'eth-sig-util'
+import { TypedData } from '../../../accounts/types'
+import { MessageTypes, TypedMessage } from '@metamask/eth-sig-util'
 
 const ADDRESS_LIMIT = 10
 const HARDENED_OFFSET = 0x80000000
@@ -257,7 +258,7 @@ export default class Lattice extends Signer {
     }
   }
 
-  async signTypedData (index: number, version: string, typedData: TypedData, cb: Callback<string>) {
+  async signTypedData (index: number, version: string, typedData: TypedMessage<MessageTypes>, cb: Callback<string>) {
     const versionNum = (version.match(/[Vv](\d+)/) || [])[1]
 
     if ((parseInt(versionNum) || 0) < 4) {

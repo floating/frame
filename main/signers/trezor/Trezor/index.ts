@@ -1,10 +1,9 @@
 import log from 'electron-log'
 import utils from 'web3-utils'
 import { padToEven, stripHexPrefix, addHexPrefix } from 'ethereumjs-util'
-import { TypedData, TypedDataUtils } from 'eth-sig-util'
+import { MessageTypes, SignTypedDataVersion, TypedDataUtils, TypedMessage } from '@metamask/eth-sig-util'
 import type { Device as TrezorDevice } from 'trezor-connect'
 
-// @ts-ignore
 import { v5 as uuid } from 'uuid'
 
 import Signer from '../../Signer'
@@ -14,6 +13,7 @@ import { sign, londonToLegacy, signerCompatibility } from '../../../transaction'
 import { Derivation, getDerivationPath } from '../../Signer/derive'
 import { TypedTransaction } from '@ethereumjs/tx'
 import TrezorBridge, { ConnectError } from '../bridge'
+import { TypedData } from '../../../accounts/types'
 
 const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
 
@@ -239,9 +239,9 @@ export default class Trezor extends Signer {
 
       if (this.isTrezorOne()) {
         // Trezor One requires hashed input
-        const { types, primaryType, domain, message } = TypedDataUtils.sanitizeData(typedData)
-        const domainSeparatorHash = TypedDataUtils.hashStruct('EIP712Domain', domain, types, true).toString('hex')
-        const messageHash = TypedDataUtils.hashStruct(primaryType as any, message, types, true).toString('hex')
+        const { types, primaryType, domain, message } = TypedDataUtils.sanitizeData(typedData as TypedMessage<MessageTypes>)
+        const domainSeparatorHash = TypedDataUtils.hashStruct('EIP712Domain', domain, types, SignTypedDataVersion.V4).toString('hex')
+        const messageHash = TypedDataUtils.hashStruct(primaryType as any, message, types, SignTypedDataVersion.V4).toString('hex')
   
         signature = await TrezorBridge.signTypedHash(this.device, path, typedData, domainSeparatorHash, messageHash)
       } else {

@@ -2,7 +2,7 @@ import EventEmitter from 'events'
 import log from 'electron-log'
 import { shell, Notification } from 'electron'
 import { addHexPrefix, intToHex} from 'ethereumjs-util'
-import { TypedData, Version } from 'eth-sig-util'
+import { SignTypedDataVersion } from '@metamask/eth-sig-util'
 import { v5 as uuidv5 } from 'uuid'
 
 import store from '../store'
@@ -16,7 +16,7 @@ import provider from '../provider'
 import { Chain } from '../chains'
 import { ApprovalType } from '../../resources/constants'
 import {
-  AccountRequest, AccessRequest,
+  TypedData, AccountRequest, AccessRequest,
   TransactionRequest, TransactionReceipt,
   ReplacementType, RequestStatus, RequestMode
 } from './types'
@@ -479,7 +479,7 @@ export class Accounts extends EventEmitter {
     currentAccount.signMessage(message, cb)
   }
 
-  signTypedData (version: Version, address: Address, typedData: TypedData, cb: Callback<string>) {
+  signTypedData (version: SignTypedDataVersion, address: Address, typedData: TypedData, cb: Callback<string>) {
     const currentAccount = this.current()
 
     if (!currentAccount) return cb(new Error('No Account Selected'))

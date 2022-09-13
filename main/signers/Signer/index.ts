@@ -6,6 +6,7 @@ import { TransactionData } from '../../../resources/domain/transaction'
 import { deriveHDAccounts } from './derive'
 import crypt from '../../crypt'
 import { TypedData } from 'eth-sig-util'
+import { MessageTypes, TypedMessage } from '@metamask/eth-sig-util'
 
 export interface SignerSummary {
   id: string,
@@ -108,7 +109,7 @@ export default class Signer extends EventEmitter {
     console.warn('Signer:' + this.type + ' did not implement a signTransaction method')
   }
 
-  signTypedData (index: number, version: string, typedData: TypedData, cb: Callback<string>) {
+  signTypedData (index: number, version: string, typedData: TypedMessage<MessageTypes>, cb: Callback<string>) {
     return cb(new Error(`Signer: ${this.type} does not support eth_signTypedData`), undefined)
   }
 }

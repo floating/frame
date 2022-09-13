@@ -1,7 +1,6 @@
 import log from 'electron-log'
 import { v5 as uuid } from 'uuid'
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-noevents'
-import { TypedData } from 'eth-sig-util'
 
 import { Request, RequestQueue } from './requestQueue'
 import Signer from '../../Signer'
@@ -9,6 +8,7 @@ import LedgerEthereumApp from './eth'
 import { Derivation, getDerivationPath } from '../../Signer/derive'
 import { TransactionData } from '../../../../resources/domain/transaction'
 import { signerCompatibility, londonToLegacy } from '../../../transaction'
+import { TypedData } from '../../../accounts/types'
 
 const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
 
