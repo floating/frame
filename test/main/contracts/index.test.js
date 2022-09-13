@@ -1,3 +1,4 @@
+import log from 'electron-log'
 import { fetchContract } from '../../../main/contracts'
 import { fetchSourcifyContract } from '../../../main/contracts/sourcifyContract'
 import { fetchEtherscanContract } from '../../../main/contracts/etherscanContract'
@@ -23,6 +24,14 @@ const mockAbi = [
 ]
 
 const flushPromises = () => new Promise(jest.requireActual('timers').setImmediate)
+
+beforeAll(() => {
+  log.transports.console.level = false
+})
+
+afterAll(() => {
+  log.transports.console.level = 'debug'
+})
 
 describe('#fetchContract', () => {
   it('retrieves a contract from sourcify', async () => {
