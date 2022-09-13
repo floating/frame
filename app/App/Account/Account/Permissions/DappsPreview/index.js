@@ -25,10 +25,6 @@ class Balances extends React.Component {
   }
 
   render () {
-    const i = 0
-    // const transform = viewIndex === i ? 'translateX(0)' : viewIndex > i ? 'translateX(-100%)' : 'translateX(100%)'
-    // const id = this.store('selected.current')
-    // const address = this.store('main.accounts', this.props.id, 'address')
     const permissions = this.store('main.permissions', this.props.account) || {}
     let permissionList = Object.keys(permissions).sort((a, b) => a.origin < b.origin ? -1 : 1)
     if (!this.props.expanded) permissionList = permissionList.slice(0, 3)
@@ -89,4 +85,3 @@ class Balances extends React.Component {
 }
 
 export default Restore.connect(Balances)
-

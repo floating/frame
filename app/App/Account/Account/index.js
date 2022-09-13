@@ -14,6 +14,7 @@ import Launcher from './Launcher'
 import Permissions from './Permissions'
 import Requests from './Requests'
 import Settings from './Settings'
+import Signer from './Signer'
 import SignerStatus from './SignerStatus'
 
 // move 
@@ -73,6 +74,13 @@ class _AccountModule extends React.Component {
         account={account}
         expanded={expanded}
         filter={filter}
+      /> :
+      id === 'signer' ? <Signer
+        moduleId={id}
+        account={account}
+        expanded={expanded}
+        filter={filter}
+        signer={this.props.signer}
       /> :
       id === 'settings' ? <Settings
         moduleId={id}
@@ -261,6 +269,8 @@ class _AccountMain extends React.Component {
         <div className='panelFilterInput'>
           <input 
             tabIndex='-1'
+            type='text' 
+            spellCheck='false'
             onChange={(e) => {
               const value = e.target.value
               this.setState({ accountModuleFilter: value  })

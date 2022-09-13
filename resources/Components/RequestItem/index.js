@@ -58,6 +58,9 @@ class _RequestItem extends React.Component {
               step: 'confirm', 
               accountId: account, 
               requestId: req.handlerId
+            },
+            position: {
+              bottom: '200px'
             }
           }
           link.send('nav:forward', 'panel', crumb)

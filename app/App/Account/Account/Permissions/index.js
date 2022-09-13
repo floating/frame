@@ -1,19 +1,19 @@
 import React from 'react'
 import Restore from 'react-restore'
 
-import DappPreview from './DappPreview'
-import DappExpanded from './DappExpanded'
+import DappsPreview from './DappsPreview'
+import DappsExpanded from './DappsExpanded'
 
-class Dapp extends React.Component {
+class Dapps extends React.Component {
   render () {
     return (
       this.props.expanded ? (
-        <DappExpanded {...this.props} />
+        <DappsExpanded {...this.props} />
       ) : (
-        <DappPreview {...this.props} />
+        <DappsPreview {...this.props} />
       )
     )
   }
 }
 
-export default Restore.connect(Dapp)
+export default Restore.connect(Dapps)
