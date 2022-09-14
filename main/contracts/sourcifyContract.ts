@@ -1,8 +1,9 @@
 import log from 'electron-log'
-import fetch, { Response } from 'node-fetch'
+import { Response } from 'node-fetch'
 import { JsonFragment } from '@ethersproject/abi'
 import { hexToNumberString } from 'web3-utils'
 import type { ContractSource } from '.'
+import { fetchWithTimeout } from '../../resources/utils/fetch'
 
 interface SourcifySourceCodeResponse {
   status: string,
@@ -54,18 +55,10 @@ async function parseResponse <T>(response: Response): Promise<T | undefined> {
 }
 
 async function fetchSourceCode (contractAddress: Address, chainId: string): Promise<SourcifyMetadataFileContent | undefined> {
-  const controller = new AbortController()
-  const signal = controller.signal
   const endpointUrl = getEndpointUrl(contractAddress, chainId)
   
   try {
-    const res = await Promise.race([  //@ts-ignore
-      fetch(endpointUrl, { signal }),
-      new Promise((_resolve, reject) => setTimeout(() => {
-        controller.abort()
-        reject()
-      }, 4000))
-    ])
+    const res = await fetchWithTimeout(endpointUrl, {}, 4000)
     const parsedResponse = await parseResponse<SourcifySourceCodeResponse>(res as Response)
 
     return parsedResponse && ['partial', 'full'].includes(parsedResponse.status) ? JSON.parse(parsedResponse.files[0].content) : Promise.reject(`Contract ${contractAddress} not found in Sourcify`)
