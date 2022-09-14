@@ -38,24 +38,6 @@ function parseAbi (abiData: string): Interface | undefined {
   }
 }
 
-export async function fetchContract (contractAddress: Address, chainId: string): Promise<ContractSourceResult> {
-  const fetches = fetchSources.map((getContract) => getContract(contractAddress, chainId))
-
-  let contract: ContractSourceResult = undefined
-  let i = 0
-
-  while (!contract && i < fetches.length) {
-    contract = await fetches[i]
-    i += 1
-  }
-  
-  if (!contract) {
-    log.warn(`could not fetch source code for contract ${contractAddress}`)
-  }
-
-  return contract
-}
-
 export function decodeCallData (calldata: string, abi: string) {
   const contractInterface = parseAbi(abi)
 
@@ -74,5 +56,23 @@ export function decodeCallData (calldata: string, abi: string) {
       log.warn('unknown ABI method for signature', sighash)
     }
   }
+}
+
+export async function fetchContract (contractAddress: Address, chainId: string): Promise<ContractSourceResult> {
+  const fetches = fetchSources.map((getContract) => getContract(contractAddress, chainId))
+
+  let contract: ContractSourceResult = undefined
+  let i = 0
+
+  while (!contract && i < fetches.length) {
+    contract = await fetches[i]
+    i += 1
+  }
+  
+  if (!contract) {
+    log.warn(`could not fetch source code for contract ${contractAddress}`)
+  }
+
+  return contract
 }
 
