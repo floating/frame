@@ -70,7 +70,7 @@ async function fetchSourceCode (contractAddress: Address, chainId: string): Prom
 
     return parsedResponse && ['partial', 'full'].includes(parsedResponse.status) ? JSON.parse(parsedResponse.files[0].content) : Promise.reject(`Contract ${contractAddress} not found in Sourcify`)
   } catch (e) {
-    log.error((e as Error).name === 'AbortError' ? 'Sourcify request timed out' : 'Unable to parse Sourcify response');
+    log.warn((e as Error).name === 'AbortError' ? 'Sourcify request timed out' : 'Unable to parse Sourcify response', e);
     return undefined
   }
 }
