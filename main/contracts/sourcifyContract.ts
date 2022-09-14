@@ -54,8 +54,8 @@ async function parseResponse <T>(response: Response): Promise<T | undefined> {
 }
 
 async function fetchSourceCode (contractAddress: Address, chainId: string): Promise<SourcifyMetadataFileContent | undefined> {
-  const controller = new AbortController();
-  const signal = controller.signal;
+  const controller = new AbortController()
+  const signal = controller.signal
   const endpointUrl = getEndpointUrl(contractAddress, chainId)
   
   try {
