@@ -35,11 +35,19 @@ async function parseResponse <T>(response: Response): Promise<T | undefined> {
   return Promise.resolve(undefined)
 }
 
-async function fetchSourceCode (endpoint: string): Promise<ContractSourceCodeResult[] | undefined> {
-  const res = await fetch(endpoint)
+async function fetchSourceCode (endpointUrl: string): Promise<ContractSourceCodeResult[] | undefined> {
+  const controller = new AbortController()
+  const signal = controller.signal
   
   try {
-    const parsedResponse = await parseResponse<EtherscanSourceCodeResponse>(res)
+    const res = await Promise.race([  //@ts-ignore
+      fetch(endpointUrl, { signal }),
+      new Promise((_resolve, reject) => setTimeout(() => {
+        controller.abort()
+        reject()
+      }, 4000))
+    ])
+    const parsedResponse = await parseResponse<EtherscanSourceCodeResponse>(res as Response)
 
     return parsedResponse?.message === 'OK' ? parsedResponse.result : undefined
   } catch (e) {
