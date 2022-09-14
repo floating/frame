@@ -5,6 +5,7 @@ import BigNumber from 'bignumber.js'
 import link from '../../../../../../resources/link'
 import svg from '../../../../../../resources/svg'
 import { isNetworkConnected } from '../../../../../../resources/utils/chains'
+import chainMeta from '../../../../../../resources/chainMeta'
 import { NATIVE_CURRENCY } from '../../../../../../resources/utils/constants'
 
 import { formatUsdRate, balance } from '../helpers'
@@ -46,6 +47,22 @@ class BalancesPreview extends React.Component {
     if (this.resizeObserver) this.resizeObserver.disconnect()
   }
 
+  isFilterMatch (balance) {
+    const { filter = ''} =  this.props
+
+    const chainHex = '0x' + balance.chainId.toString(16)
+    const chainName = chainMeta[chainHex] ? chainMeta[chainHex].name : ''
+
+    const match = (
+      !filter ||
+      chainName.toLowerCase().indexOf(filter.toLowerCase()) !== -1 ||
+      balance.name.toLowerCase().indexOf(filter.toLowerCase()) !== -1 ||
+      balance.symbol.toLowerCase().indexOf(filter.toLowerCase()) !== -1
+    )
+
+    return match
+  }
+
   getBalances (rawBalances, rates) {
     const networks = this.store('main.networks.ethereum')
     const networksMeta = this.store('main.networksMeta.ethereum')
@@ -80,8 +97,11 @@ class BalancesPreview extends React.Component {
     const rates = this.store('main.rates')
 
     const { balances: allBalances, totalDisplayValue, totalValue } = this.getBalances(storedBalances, rates)
-    const balances = allBalances.slice(0, this.props.expanded ? allBalances.length : 4)
 
+    // if filter only show balances that match filter
+    const filteredBlanaces = allBalances.filter(rawBalance => this.isFilterMatch(rawBalance))
+    const balances = filteredBlanaces.slice(0, 4)
+    
     const lastBalanceUpdate = this.store('main.accounts', address, 'balances.lastUpdated')
 
     // scan if balances are more than a minute old
@@ -123,7 +143,7 @@ class BalancesPreview extends React.Component {
                 }
                 link.send('nav:forward', 'panel', crumb)
               }}>
-                {allBalances.length - 4 > 0 ? `+${allBalances.length - 4} More` : 'More'}
+                {allBalances.length - balances.length > 0 ? `+${allBalances.length - balances.length} More` : 'More'}
               </div>
             </div>
           ) : (

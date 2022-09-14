@@ -10,14 +10,29 @@
   padding 10px 0px
   cursor pointer
 
+.signerBalancesExpanded
+  background blue
+  width 100%
+
 .signerBalancesWrap
   margin 0px 6px 6px 6px
-  padding 0px 5px 5px 5px
+  padding 0px 3px 3px 3px
   box-sizing border-box
   overflow auto
   background var(--ghostZ)
-  border-radius 12px
+  border-radius 20px
   min-height 70px
+
+  .signerBalance:first-child
+    border-top-right-radius 17px
+    border-top-left-radius 17px
+
+  .signerBalance:last-child
+    border-bottom-right-radius 17px
+    border-bottom-left-radius 17px
+
+  .signerBalance:first-child:last-child
+    border-bottom-right-radius 17px
 
 .signerBalanceWarningTitle
   position relative
@@ -46,11 +61,11 @@
 
 .signerBalanceTotal
   position relative
-  height 48px
+  height 64px
   width 100%
   z-index 200000
   font-size 14px
-  margin-bottom 6px
+  margin-bottom 4px
 
   .signerBalanceButtons
     display flex
@@ -59,31 +74,29 @@
     height 100%
 
   .signerBalanceButton
-    height 36px
-    margin-left 8px
-    background var(--ghostA)
+    height 40px
+    margin-left 6px
+    background var(--ghostB)
     border 3px solid var(--ghostZ)
-    border-radius 14px
+    border-radius 20px
+    box-sizing border-box
     cursor pointer
     z-index 4000
     display flex
     justify-content center
     align-items center
     font-size 11px
-    font-weight 500
+    font-weight 400
     letter-spacing 1px
     text-transform uppercase
-    padding 0px 15px 0px 16px
-
-  .signerBalanceAddToken
-    width 84px
+    padding 1px 20px 0px 21px
 
     *
       pointer-events none
       margin-left 2px
 
   .signerBalanceButton:hover
-    background var(--ghostB)
+    background var(--ghostC)
     color var(--outerspace)
     // color var(--good)
 
@@ -103,11 +116,11 @@
       text-transform uppercase
       font-size 8px
       letter-spacing 1px
-      font-weight 600
+      font-weight 300
 
     .signerBalanceTotalValue
       font-size 17px
-      font-family FiraCode, monospace
+      font-family 'FiraCode'
       letter-spacing -1px
       font-size 15px
       text-align center
@@ -119,7 +132,7 @@
   top 38px
   left 5px
   right 5px
-  height 70px
+  bottom 0px
   z-index 200
   border-radius 11px
   display flex
@@ -149,8 +162,8 @@
   transition 0.1s ease-out all
   background var(--ghostA)
   border-radius 8px
-  margin-top 5px
-  font-family 'Exo2'
+  margin-top 3px
+  font-family 'MainFont'
 
   .signerBalanceInner
     position relative
@@ -159,18 +172,18 @@
 
   .signerBalanceIcon
     position absolute
-    top 16px
-    left 10px
+    top 18px
+    left 12px
 
   .signerBalanceCurrency
     position absolute
     left 62px
-    top 23px
+    top 24px
     right 135px
     font-size 14px
     display flex
     align-items center
-    font-weight 600
+    font-weight 400
     white-space nowrap
     z-index 2
     overflow hidden
@@ -182,7 +195,7 @@
     font-size 10px
     display flex
     align-items center
-    font-weight 600
+    font-weight 500
     white-space nowrap
     z-index 2
     text-transform uppercase
@@ -197,12 +210,12 @@
     bottom 10px
     left 62px
     font-size 12px
-    font-weight 600
+    font-weight 400
     color var(--outerspace06)
     display flex
     align-items center
     justify-content space-between
-    font-family FiraCode, monospace
+    font-family 'FiraCode'
 
   .signerBalanceOk
     display flex
@@ -268,7 +281,7 @@
       justify-content center
       align-items center
       font-size 11px
-      font-weight 600
+      font-weight 300
       letter-spacing -0.5px
       margin-left -0.5px
      
@@ -289,23 +302,20 @@
     text-align center
     display flex
     align-items center
-    // border-left 1px solid var(--doubleThick)
-    // border-right 1px solid var(--doubleThick)
-    font-family FiraCode, monospace
+    font-family 'FiraCode'
     letter-spacing -1px
-    font-weight 100
+    font-weight 300
 
     .signerBalanceSymbol
-      font-family 'Exo2', sans-serif
-      margin-right 2px
-      font-weight 600
+      font-family 'MainFont'
+      font-weight 400
       font-size 13px
       line-height 13px
       position relative
-      top -1.5px
+      top -1px
       letter-spacing 1px
       color var(--outerspace)
-      padding 5px 4px 4px 5px
+      padding 5px
       border-radius 6px
 
   .signerBalanceEquivalent
@@ -316,7 +326,7 @@
     color var(--outerspace05)
     display flex
     align-items center
-    font-family FiraCode, monospace
+    font-family 'FiraCode'
 
 .signerBalance:last-child
   border-bottom none

@@ -358,7 +358,7 @@ class Signer extends React.Component {
           </div>
         )}
         {this.state.showControls || disconnected ? (
-          <div className='signerControls cardShow'>
+          <div className='signerControls'>
             {!!permissionId ? (
               <div className='signerControlDetail'>
                 <div className='signerControlDetailKey'>

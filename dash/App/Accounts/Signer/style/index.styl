@@ -6,7 +6,7 @@
   background var(--ghostA)
   box-sizing border-box
   margin 3px 0px 40px 0px
-  border-radius 12px
+  border-radius 26px
   box-shadow 0px 4px 8px var(--ghostY)
 
   .signerTop
@@ -20,17 +20,17 @@
 
   .signerName
     position absolute
-    top 16px
+    top 17px
     left 48px
     height 28px
     padding 0px 7px
     border-radius 8px
-    font-size 20px
+    font-size 18px
+    font-weight 300
     display flex
     align-items center
     box-sizing border-box
-    font-weight 400
-    font-family 'Exo2', sans-serif
+    font-family 'MainFont'
     text-transform capitalize
     letter-spacing 0px
 
@@ -38,7 +38,6 @@
       position absolute
       width 28px
       height 28px
-      // background red
       right -34px
       color var(--good)
       display flex
@@ -79,7 +78,7 @@
 
   .signerStatusIndicator
     position absolute
-    top 27px
+    top 26px
     right 18px
     font-size 12px
     text-transform uppercase
@@ -97,15 +96,15 @@
     background var(--good)
 
   .signerStatusText
-    padding 8px 32px
-    margin 0px 8px 8px 8px
-    border-radius 8px
+    padding 16px 32px
+    margin 0px 6px 16px 6px
+    border-radius 20px
     font-size 12px
     text-transform uppercase
     text-align center
     font-weight 600
     letter-spacing 0px
-    border 1px solid var(--ghostY)
+    border 3px solid var(--ghostZ)
     color var(--outerspace)
 
   .signerStatusError
@@ -130,53 +129,64 @@
     display flex
     justify-content center
     align-items center
-    padding 8px 16px 10px 16px
+    padding 22px 16px 10px 16px
 
     .signerBottomPages
       border-radius 8px
-      font-size 12px
+      font-size 13px
       font-weight 400
-      width 56px
+      width 66px
       text-align center
 
     .signerBottomPageBack
-      background var(--ghostB)
+      background var(--ghostA)
       padding 2px 1px 2px 2px
-      height 24px
-      width 24px
-      border-radius 12px
+      height 30px
+      width 45px
+      border-radius 15px
       cursor pointer
       box-sizing border-box
+      border 3px solid var(--ghostZ)
+      cursor pointer
+      box-sizing border-box
+      display flex
+      justify-content center
       *
         pointer-events none
 
     .signerBottomPageNext
-      background var(--ghostB)
+      background var(--ghostA)
       transform rotate(180deg)
       padding 2px 2px 2px 1px
-      height 24px
-      width 24px
-      border-radius 12px
+      height 30px
+      width 45px
+      border-radius 15px
       cursor pointer
       box-sizing border-box
+      border 3px solid var(--ghostZ)
+      display flex
+      justify-content center
       *
         pointer-events none
 
+    .signerBottomPageBack:hover, .signerBottomPageNext:hover
+      background var(--ghostB)
+
   .signerDrawer
     position relative
-    height 46px
+    height 60px
 
     .showControls
       position absolute
       height 20px
-      border-radius 12px
-      border 1px solid var(--ghostZ)
+      border-radius 13px
+      border 3px solid var(--ghostZ)
       background var(--ghostA)
       z-index 2
-      top 9px
+      top 14px
       left 50%
       width 100px
-      margin-left -50px
+      margin-left -53px
       padding-bottom 2px
       letter-spacing 1px
       font-size 11px
@@ -185,16 +195,16 @@
       align-items center
       text-transform uppercase
       cursor pointer
-      color var(--outerspace03)
+      color var(--outerspace)
       transition var(--standardFast)
       font-weight 400
 
     .showControls:hover
-      background var(--ghostC)
+      background var(--ghostB)
       color var(--outerspace)
 
     .showControlsLine
-      height 1px
+      height 3px
       position absolute 
       top 50%
       left 0
@@ -204,7 +214,7 @@
       margin-top -3px
 
   .signerControls
-    padding-top 10px
+    padding-top 0px
 
     .signerControlDetail
       height 40px
@@ -225,13 +235,13 @@
 
       .signerControlDetailValue
         margin 4px
-        font-family 'Fira Code', monospace
+        font-family 'FiraCode'
 
     .signerControlOption
       height 40px
       margin 0px 10px 11px 10px
       background var(--ghostB)
-      border-radius 9px
+      border-radius 17px
       color var(--outerspace)
       display flex
       justify-content center
@@ -304,7 +314,7 @@
        font-size 22px
        letter-spacing 6px
        padding-left 6px
-       font-family 'Exo2', OpenSans, sans-serif
+       font-family 'MainFont'
 
     .signerLatticePairSubmit
       width 100px
@@ -321,7 +331,7 @@
       letter-spacing 1px
       font-size 13px
       text-transform uppercase
-      font-weight 500
+      font-weight 300
       padding-left 1px
 
       *
@@ -340,7 +350,7 @@
   .signerAccountsTitleActive
     text-transform uppercase
     font-size 10px
-    font-weight 600
+    font-weight 300
     letter-spacing 1px
     display flex
     justify-content center
@@ -364,9 +374,10 @@
 
   .signerAccounts
     //position absolute
-    bottom 30px
-    right 8px
-    left 8px
+    // bottom 30px
+    // right 8px
+    // left 8px
+    margin 0px 6px
     // padding 8px
     text-align center
     
@@ -377,17 +388,29 @@
     // height 204px
     overflow hidden
     // overflow-x hidden
+    background var(--ghostZ)
+    border-radius 20px
+
+    .signerAccount:first-child
+      border-top-right-radius 17px
+      border-top-left-radius 17px
+
+    .signerAccount:last-child
+      border-bottom-right-radius 17px
+      border-bottom-left-radius 17px
+
+    .signerAccount:first-child:last-child
+      border-radius 17px
 
     .signerAccount
       display flex
-      height 28px
-      margin 4px 6px
-      width calc(100% - 12px)
+      height 36px
+      margin 3px
+      width calc(100% - 6px)
       position relative
-      background var(--ghostB)
+      background var(--ghostA)
       color var(--outerspace)
       border-radius 8px
-      border 2px solid rgba(0, 0, 0, 0)
       box-sizing border-box
       cursor pointer
 
@@ -396,14 +419,14 @@
 
       .signerAccountIndex
         position absolute
-        top 0
-        left 2px
-        bottom 2px
+        top 2px
+        left 3px
+        bottom 3px
         width 30px
         display flex
         justify-content center
         align-items center
-        // background red
+        font-weight 500
         
       .signerAccountAddress
         display flex
@@ -411,23 +434,19 @@
         align-items center
         position absolute
         left 30px
-        bottom 1px
+        bottom 7px
         right 40px
-        font-weight 200
-        font-size 14px
-        letter-spacing 1px
-        // background blue
+        font-size 15px
         overflow hidden
-        font-family FiraCode, monospace
-        // padding 6px
+        font-family 'FiraCode'
 
         svg
           margin 2px 4px 0px 4px
 
       .signerAccountCheck
         position absolute
-        top 9px
-        right 10px
+        top 15px
+        right 16px
         bottom 0
         width 6px
         height 6px
@@ -436,32 +455,36 @@
         justify-content center
         align-items center
         color var(--ghostZ)
-        background var(--ghostZ)
+        background var(--outerspace)
 
     .signerAccountAdded
-      border 2px solid var(--good)
+      // background var(--good)
+      color var(--good)
+
       .signerAccountCheck
-        color var(--good)
+        // rcolor var(--good)
         background var(--good)
 
-    .signerAccountlast-child
-      border-bottom none
+    .signerAccount:hover
+      background var(--ghostB)
 
 .signerOk
   .signerAccounts
     .signerAccountAdded
-      border 2px solid var(--good)
+      // background var(--good)
+      color var(--good)
       .signerAccountCheck
-        color var(--good)
+        // color var(--good)
         background var(--good)
 
-.signerLocked
-  .signerAccounts
-    .signerAccountAdded
-      border 2px solid var(--moon)
-      .signerAccountCheck
-        color var(--moon)
-        background var(--moon)
+// .signerLocked
+//   .signerAccounts
+//     .signerAccountAdded
+//       // background var(--moon)
+//       color var(--moon)
+//       .signerAccountCheck
+//         // color var(--moon)
+//         background var(--moon)
 
 .signerLoading
   height 60px
@@ -555,7 +578,7 @@
     .signerPinMessageOr
       font-size 10px
       text-transform uppercase
-      font-weight 600
+      font-weight 300
       padding 5px
 
     .signerPinMessage
@@ -594,7 +617,7 @@
       font-size 12px
       text-transform uppercase
       text-align center
-      font-weight 600
+      font-weight 300
       display flex
       justify-content center
 

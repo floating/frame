@@ -71,7 +71,7 @@
     padding 0px 0px 5px 0px
 
   .signerAddress
-    font-family FiraCode, monospace
+    font-family 'FiraCode'
 
     .transactionToAddressLargeWrap
       position absolute
@@ -86,21 +86,16 @@
       bottom 0px
       left 0px
       max-width 100%
-      font-weight 600
+      font-weight 300
       display flex
       font-size 15px
       opacity 1
-      cursor pointer
-      *
-        pointer-events none
 
       .transactionToAddressLargeEllipsis
         padding 2px 1px
-    
 
     .transactionToAddressLarge:hover
       background var(--ghostC)
-
         
     .transactionToAddressCopy
       display flex
@@ -113,7 +108,7 @@
       text-transform uppercase
       font-weight 400
       letter-spacing 1px
-      font-family OpenSans, sans-serif
+      font-family 'MainFont'
       color var(--outerspace08)
       border-radius 10px
       transform translateY(0px)
@@ -130,7 +125,7 @@
       justify-content center
       align-items center
       font-size 13.5px
-      font-weight 600    
+      font-weight 300    
       z-index 80
       cursor pointer
       * 
@@ -142,7 +137,7 @@
         right 18px
         top 25px
         left 18px
-        font-family 'Exo2'
+        font-family 'MainFont'
         text-align center
 
         svg
@@ -152,12 +147,11 @@
 
     .transactionToAddressENS
       transform translateY(-11px)
-      font-weight 600
+      font-weight 300
 
     .transactionToAddressFullHidden
       opacity 0
       pointer-events none
-
 
   .signerTop
     position relative
@@ -170,6 +164,10 @@
     background var(--ghostA)
     margin 0px 0px 6px 0px
     box-shadow 0px 4px 8px var(--ghostY)
+    cursor pointer
+
+    * 
+      pointer-events none !important
 
     div
       z-index 3004
@@ -197,7 +195,7 @@
       position absolute
       color var(--outerspace01)
       font-size 16px
-      font-weight 500
+      font-weight 300
       transition var(--standardFast)
       box-shadow 0px 2px 2px var(--ghostY)
       
@@ -217,12 +215,12 @@
       content ''
       position absolute
       z-index 3
-      inset 3px
+      inset 0px
       background var(--good)
-      border-top-left-radius 10px
-      border-bottom-left-radius 10px
-      border-top-right-radius 6px
-      border-bottom-right-radius 6px
+      border-top-left-radius 12px
+      border-bottom-left-radius 12px
+      border-top-right-radius 7px
+      border-bottom-right-radius 7px
 
     .transactionToAddress
       .transactionToAddressLarge
@@ -414,7 +412,7 @@
         text-transform uppercase
         font-size 11px
         line-height 10px
-        font-weight 600
+        font-weight 300
         letter-spacing 2px
         color var(--spacewhite)
         opacity 1
@@ -548,8 +546,8 @@
       .signerNameText
         position relative
         transition var(--standard)
-        font-size 18px
-        font-family 'Ubuntu'
+        font-size 17px
+        font-family 'MainFont'
         display flex
         justify-content center
         align-items center
@@ -624,7 +622,7 @@
         border-radius 6px
         font-size 11px
         text-transform uppercase
-        font-weight 600
+        font-weight 300
         display flex
         justify-content center
         align-items center
@@ -770,7 +768,7 @@
           justify-content space-between
           align-items center
           padding 0px 20px 0px 20px
-          font-family FiraCode, monospace
+          font-family 'FiraCode'
           color var(--outerspace08)
           position relative
           z-index 4
@@ -806,7 +804,7 @@
         display flex
         justify-content center
         align-items center
-        font-family FiraCode, monospace
+        font-family 'FiraCode'
         position relative
         z-index 2
         transition var(--standardSlow)
@@ -1080,7 +1078,7 @@
   width 100%
   height 40px
   background var(--ghostB)
-  border-radius 12px
+  border-radius 20px
   color var(--outerspace)
   display flex
   justify-content center

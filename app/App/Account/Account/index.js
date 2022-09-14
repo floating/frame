@@ -14,6 +14,7 @@ import Launcher from './Launcher'
 import Permissions from './Permissions'
 import Requests from './Requests'
 import Settings from './Settings'
+import Signer from './Signer'
 import SignerStatus from './SignerStatus'
 
 // move 
@@ -25,6 +26,75 @@ import AddTokenRequest from './Requests/AddTokenRequest'
 import SignTypedDataRequest from './Requests/SignTypedDataRequest'
 
 class _AccountModule extends React.Component {
+  getModule (id, account, expanded, expandedData, filter) {
+    return(
+      id === 'gas' ? <Gas 
+        moduleId={id} 
+        id={account}
+        expanded={expanded}
+        filter={filter}
+      /> :
+      id === 'requests' ? <Requests 
+        _id={id}
+        id={account}
+        addresses={this.props.addresses} 
+        minimized={this.props.minimized} 
+        status={this.props.status} 
+        signer={this.props.signer}
+        expanded={expanded}
+        filter={filter}
+      /> :
+      id === 'activity' ? <Activity 
+        moduleId={id} 
+        id={account}
+        expanded={expanded}
+        filter={filter}
+      /> :
+      id === 'launcher' ? <Launcher 
+        moduleId={id}
+        id={account} 
+        expanded={expanded}
+        filter={filter}
+      /> :
+      id === 'inventory' ? <Inventory 
+        moduleId={id} 
+        account={account}
+        expanded={expanded}
+        expandedData={expandedData}
+        filter={filter}
+      /> :
+      id === 'permissions' ? <Permissions
+        moduleId={id}
+        account={account}
+        expanded={expanded}
+        filter={filter}
+      /> :
+      id === 'balances' ? <Balances
+        moduleId={id}
+        account={account}
+        expanded={expanded}
+        filter={filter}
+      /> :
+      id === 'signer' ? <Signer
+        moduleId={id}
+        account={account}
+        expanded={expanded}
+        filter={filter}
+        signer={this.props.signer}
+      /> :
+      id === 'settings' ? <Settings
+        moduleId={id}
+        account={account}
+        expanded={expanded}
+        filter={filter}
+      /> :
+      <Default 
+        moduleId={id}
+        expanded={expanded}
+        filter={filter}
+      />
+    )
+  }
   render () {
     const { 
       id, 
@@ -33,12 +103,13 @@ class _AccountModule extends React.Component {
       index,
       expanded, 
       expandedData,
-      account
+      account,
+      filter
     } = this.props
     let hidden = false
     let style = { 
       transform: `translateY(${top}px)`, 
-      zIndex: 10000 - index, 
+      zIndex: 9999 - index, 
       height: module.height,
       opacity: 1
     }
@@ -46,11 +117,25 @@ class _AccountModule extends React.Component {
     if (hidden) {
       style = { 
         transform: `translateY(${top}px)`, 
-        zIndex: 10000 - index, 
+        zIndex: 9999 - index, 
         height: 0,
         opacity: 0,
         overflow: 'hidden'
       }
+    }
+    
+    if (expanded) {
+      return (
+        this.getModule(id, account, expanded, expandedData, filter)
+      )
+    } else {
+      return (
+        <div className={'accountModule'} style={style}>
+          <div className='accountModuleInner cardShow' style={{ animationDelay: (index * 0.1) + 's'}}>
+            {this.getModule(id, account, expanded, expandedData, filter)}
+          </div>  
+        </div>
+      )
     }
 
     return (
@@ -61,6 +146,7 @@ class _AccountModule extends React.Component {
               moduleId={id} 
               id={account}
               expanded={expanded}
+              filter={filter}
             /> :
             id === 'requests' ? <Requests 
               _id={id}
@@ -70,41 +156,49 @@ class _AccountModule extends React.Component {
               status={this.props.status} 
               signer={this.props.signer}
               expanded={expanded}
+              filter={filter}
             /> :
             id === 'activity' ? <Activity 
               moduleId={id} 
               id={account}
               expanded={expanded}
+              filter={filter}
             /> :
             id === 'launcher' ? <Launcher 
               moduleId={id}
               id={account} 
               expanded={expanded}
+              filter={filter}
             /> :
             id === 'inventory' ? <Inventory 
               moduleId={id} 
               account={account}
               expanded={expanded}
               expandedData={expandedData}
+              filter={filter}
             /> :
             id === 'permissions' ? <Permissions
               moduleId={id}
               account={account}
               expanded={expanded}
+              filter={filter}
             /> :
             id === 'balances' ? <Balances
               moduleId={id}
               account={account}
               expanded={expanded}
+              filter={filter}
             /> :
             id === 'settings' ? <Settings
               moduleId={id}
               account={account}
               expanded={expanded}
+              filter={filter}
             /> :
             <Default 
               moduleId={id}
               expanded={expanded}
+              filter={filter}
             />
           }
         </div>  
@@ -168,26 +262,28 @@ class _AccountMain extends React.Component {
   renderAccountFilter () {
     const accountOpen = this.store('selected.open')
     return (
-      <div className='panelFilter'>
+      <div className='panelFilterAccount'>
         <div className='panelFilterIcon'>
           {svg.search(12)}
         </div>
         <div className='panelFilterInput'>
           <input 
             tabIndex='-1'
+            type='text' 
+            spellCheck='false'
             onChange={(e) => {
               const value = e.target.value
-              this.setState({ accountFilter: value  })
-              link.send('tray:action', 'setAccountFilter', value)
+              this.setState({ accountModuleFilter: value  })
+              // link.send('tray:action', 'setAccountFilter', value)
             }}
-            value={this.state.accountFilter}
+            value={this.state.accountModuleFilter}
           />
         </div>
-        {this.state.accountFilter ? (
+        {this.state.accountModuleFilter ? (
           <div 
             className='panelFilterClear'
             onClick={() => {
-              this.setState({ accountFilter: '' })
+              this.setState({ accountModuleFilter: '' })
               link.send('tray:action', 'setAccountFilter', '')
             }}
           >
@@ -210,15 +306,16 @@ class _AccountMain extends React.Component {
         id={id} 
         account={this.props.id}
         module={module} 
-        top={slideHeight - module.height + 40}
+        top={slideHeight - module.height - 7}
         index={i}
+        filter={this.state.accountModuleFilter}
       />
     })
     return (
       <div className='accountMain'>
-        {this.renderAccountFilter()}
         {this.renderSignerStatus()}
-        <div className='accountMainScroll' style={{ pointerEvents: this.state.expandedModule ? 'none' : 'auto' }}>
+        <div className='accountMainScroll'>
+          {this.renderAccountFilter()}
           <div className='accountMainSlide' style={{ height: slideHeight + 'px' }}>
             {modules}
           </div>
@@ -234,8 +331,15 @@ const AccountMain = Restore.connect(_AccountMain)
 // AccountView is a reusable template that provides the option to nav back to main
 class _AccountView extends React.Component {
   render () {
+    const { position = {} } = this.store('windows.panel.nav')[0] || {}
     return (
-      <div className='accountView'>
+      <div className='accountView'
+        // TODO: sync via nav
+        style={{
+          top: position.top || '140px',
+          bottom: position.bottom || '40px'
+        }}
+      >
         <div className='accountViewMenu cardShow'>
           <div 
             className='accountViewBack'

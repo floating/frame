@@ -62,7 +62,7 @@ class AccountSelector extends React.Component {
     const open = this.store('selected.open')
     if (open) return null
     return (
-      <div className='panelFilter'>
+      <div className='panelFilterMain'>
         <div className='panelFilterIcon'>
           {svg.search(12)}
         </div>
@@ -130,27 +130,23 @@ class AccountSelector extends React.Component {
           if (ref) this.scroll = ref 
         }}
       >
-
-      {/* <div className='accountSelectorScrollWrap' style={current && scrollTop > 0 ? { marginTop: '-' + scrollTop + 'px' } : {}}> */}
-      <div className='accountSelectorScrollWrap'>
-        {displayAccounts.length ? (
-          displayAccounts.map((id, i) => {
-            const account = accounts[id]
-            return <AccountController key={id} {...account} index={i} reportScroll={() => this.reportScroll()} resetScroll={() => this.resetScroll()} />
-          })
-        ) : Object.keys(accounts).length === 0 ? (
-          <div className='noSigners'>
-            {'No Accounts Added'}
-          </div>
-        ) : (
-          <div className='noSigners'>
-            {'No Matching Accounts'}
-          </div>
-        )}
-      </div>
-
-
-        
+        {/* <div className='accountSelectorScrollWrap' style={current && scrollTop > 0 ? { marginTop: '-' + scrollTop + 'px' } : {}}> */}
+        <div className='accountSelectorScrollWrap'>
+          {displayAccounts.length ? (
+            displayAccounts.map((id, i) => {
+              const account = accounts[id]
+              return <AccountController key={id} {...account} index={i} reportScroll={() => this.reportScroll()} resetScroll={() => this.resetScroll()} />
+            })
+          ) : Object.keys(accounts).length === 0 ? (
+            <div className='noSigners'>
+              {'No Accounts Added'}
+            </div>
+          ) : (
+            <div className='noSigners'>
+              {'No Matching Accounts'}
+            </div>
+          )}
+        </div>
       </div>
     )
   }

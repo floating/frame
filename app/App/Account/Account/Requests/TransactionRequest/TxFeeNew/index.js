@@ -5,6 +5,8 @@ import BigNumber from 'bignumber.js'
 import { usesBaseFee } from '../../../../../../../resources/domain/transaction'
 import link from '../../../../../../../resources/link'
 
+import { GasFeesSource } from '../../../../../../../resources/domain/transaction'
+
 const FEE_WARNING_THRESHOLD_USD = 50
 
 class TxFee extends React.Component {
@@ -57,7 +59,7 @@ class TxFee extends React.Component {
     const minFeeUSD = minFee.shiftedBy(-18).multipliedBy(nativeUSD)
 
     const currentSymbol = this.store('main.networks', this.props.chain.type, this.props.chain.id, 'symbol') || '?'
-    
+
     return (
       <div className='_txMain' style={{ animationDelay: (0.1 * this.props.i) + 's' }}>
         <div className='_txMainInner'>
@@ -108,6 +110,15 @@ class TxFee extends React.Component {
                 ) : null}
               </div>
             </div>
+            {req.feesUpdatedByUser ? (
+              <div className='_txMainTag'>
+                {`Gas values set by user`}
+              </div>
+            ) : req.data.gasFeesSource !== GasFeesSource.Frame ? (
+              <div className='_txMainTag'>
+                {`Gas values set by ${req.data.gasFeesSource}`}
+              </div>
+            ) : null}
           </div>
         </div>
       </div>

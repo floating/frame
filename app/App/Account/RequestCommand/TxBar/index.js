@@ -1,6 +1,6 @@
 import React from 'react'
 import Restore from 'react-restore'
-import svg from '../../../../resources/svg'
+import svg from '../../../../../resources/svg'
 
 class TxBar extends React.Component {
   render () {
@@ -21,7 +21,7 @@ class TxBar extends React.Component {
       progressIconClass += ' txProgressStepIconHidden'
       txBarClass += ' txBarError'
     }
-    const slideMap = ['370px', '255px', '165px', '75px', '-40px']
+    const slideMap = ['375px', '268.5px', '181px', '93.5px', '-35px']
     const slide = slideMap[position]
 
     return (
@@ -41,7 +41,7 @@ class TxBar extends React.Component {
                 <div className={position > 2 ? 'txProgressStepCenter txProgressStepCenterOn' : 'txProgressStepCenter'} />
               </div>
               <div className='txProgressStep'>
-                <div className={progressIconClass} style={{ padding: '7px 12px' }}>{svg.octicon('check', { height: 24 })}</div>
+                <div className={progressIconClass} style={{ padding: '11px 12px' }}>{svg.cube(16)}</div>
                 <div className='txProgressStepMarker' />
                 <div className={position > 3 ? 'txProgressStepCenter txProgressStepCenterOn' : 'txProgressStepCenter'} />
               </div>

@@ -739,5 +739,32 @@ export default {
       </div>
     )
   },
+  arrowRight: size => {
+    return (
+      <div style={{ width: size + 'px', height: size + 'px' }}>
+        <svg viewBox='0 0 384 512' width={size + 'px'} height={size + 'px'}>
+          <path fill='currentColor' d='M342.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L274.7 256 105.4 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z' />
+        </svg>
+      </div>
+    )
+  },
+  block: size => {
+    return (
+      <div style={{ width: size + 'px', height: size + 'px' }}>
+        <svg viewBox='0 0 448 512' width={size + 'px'} height={size + 'px'}>
+          <path fill='currentColor' d='M0 96C0 60.7 28.7 32 64 32H384c35.3 0 64 28.7 64 64V416c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V96zm96 8c0-13.3-10.7-24-24-24s-24 10.7-24 24s10.7 24 24 24s24-10.7 24-24zm280 24c13.3 0 24-10.7 24-24s-10.7-24-24-24s-24 10.7-24 24s10.7 24 24 24zM96 408c0-13.3-10.7-24-24-24s-24 10.7-24 24s10.7 24 24 24s24-10.7 24-24zm280 24c13.3 0 24-10.7 24-24s-10.7-24-24-24s-24 10.7-24 24s10.7 24 24 24z' />
+        </svg>
+      </div>
+    )
+  },
+  addBlock: size => {
+    return (
+      <div style={{ width: size + 'px', height: size + 'px' }}>
+        <svg viewBox='0 0 512 512' width={size + 'px'} height={size + 'px'}>
+          <path fill='currentColor' d='M80 32h96c26.5 0 48 21.5 48 48v96c0 26.5-21.5 48-48 48H80c-26.5 0-48-21.5-48-48V80c0-26.5 21.5-48 48-48zm0 256h96c26.5 0 48 21.5 48 48v96c0 26.5-21.5 48-48 48H80c-26.5 0-48-21.5-48-48V336c0-26.5 21.5-48 48-48zM288 80c0-26.5 21.5-48 48-48h96c26.5 0 48 21.5 48 48v96c0 26.5-21.5 48-48 48H336c-26.5 0-48-21.5-48-48V80zm96 192c13.3 0 24 10.7 24 24v64h64c13.3 0 24 10.7 24 24s-10.7 24-24 24H408v64c0 13.3-10.7 24-24 24s-24-10.7-24-24V408H296c-13.3 0-24-10.7-24-24s10.7-24 24-24h64V296c0-13.3 10.7-24 24-24z' />
+        </svg>
+      </div>
+    )
+  },
   octicon: (name, settings) => <Octicon icon={getIconByName(name)} height={settings.height} />
 }

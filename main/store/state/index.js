@@ -65,6 +65,7 @@ const initial = {
         'inventory',
         'permissions',
         // 'verify',
+        'signer',
         'settings'
       ],
       modules: {

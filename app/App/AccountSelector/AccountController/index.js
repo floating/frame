@@ -380,6 +380,9 @@ class Account extends React.Component {
               style={open ? { boxShadow: '0px 4px 8px rgba(0, 0, 0, 0)' } : {}}
               // onMouseEnter={() => this.setState({ openHover: true })} 
               // onMouseLeave={() => this.setState({ openHover: false })}
+              onClick={() => {
+                if (!this.props.active) this.typeClick()
+              }}
             >
               {!this.state.addressHover ? (
                 <>
