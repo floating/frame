@@ -1,7 +1,7 @@
 import http, { IncomingMessage, ServerResponse } from 'http'
 import log from 'electron-log'
 
-import provider, { ProviderDataPayload } from '../provider'
+import provider from '../provider'
 import accounts from '../accounts'
 import store from '../store'
 
@@ -82,7 +82,7 @@ const handler = (req: IncomingMessage, res: ServerResponse) => {
         extendSession(payload._origin)
       }
 
-      if (protectedMethods.indexOf(payload.method) > -1 && !(await isTrusted(origin))) {
+      if (protectedMethods.indexOf(payload.method) > -1 && !(await isTrusted(payload))) {
         let error = { message: `Permission denied, approve ${origin} in Frame to continue`, code: 4001 }
         // Review
         if (!accounts.getSelectedAddresses()[0]) error = { message: 'No Frame account selected', code: 4001 }
@@ -145,33 +145,15 @@ const handler = (req: IncomingMessage, res: ServerResponse) => {
   }
 }
 
-// Track subscriptions
-provider.on('data', (payload: ProviderDataPayload) => {
-  if (pollSubs[payload.params.subscription]) {
-    const { id, origin } = pollSubs[payload.params.subscription]
+provider.on('data:subscription', (payload: RPC.Susbcription.Response) => {
+  const subscription = pollSubs[payload.params.subscription]
+  if (subscription) {
+    const { id } = subscription
+
     polls[id] = polls[id] || []
 
-    if (!payload.params.origin || payload.params.origin === origin) {
-      const { origin, ...params } = payload.params
-      const responsePayload = { ...payload, params }
-
-      polls[id].push(JSON.stringify(responsePayload))
-
-      pending[id]?.send()
-    }
-  }
-})
-
-provider.on('data:address', (account, payload) => { // Make sure the subscription has access based on current account
-  if (pollSubs[payload.params.subscription]) {
-    const { id, origin } = pollSubs[payload.params.subscription]
-    const permissions = storeApi.getPermissions(account) || {}
-    const permission = Object.values(permissions).find(p => p.origin === origin) || { provider: false }
-
-    if (!permission.provider) payload.params.result = []
-    polls[id] = polls[id] || []
     polls[id].push(JSON.stringify(payload))
-    if (pending[id]) pending[id].send()
+    pending[id]?.send()
   }
 })
 

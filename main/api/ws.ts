@@ -1,5 +1,5 @@
 import WebSocket from 'ws'
-import { v4 as uuid, v5 as uuidv5 } from 'uuid'
+import { v4 as uuid } from 'uuid'
 import  log from 'electron-log'
 
 import store from '../store'
@@ -86,7 +86,7 @@ const handler = (socket: FrameWebSocket, req: IncomingMessage) => {
       extendSession(payload._origin)
     }
 
-    if (protectedMethods.indexOf(payload.method) > -1 && !(await isTrusted(origin))) {
+    if (protectedMethods.indexOf(payload.method) > -1 && !(await isTrusted(payload))) {
       let error = { message: 'Permission denied, approve ' + origin + ' in Frame to continue', code: 4001 }
       // review
       if (!accounts.getSelectedAddresses()[0]) error = { message: 'No Frame account selected', code: 4001 }
@@ -120,26 +120,11 @@ const handler = (socket: FrameWebSocket, req: IncomingMessage) => {
 export default function (server: Server) {
   const ws = new WebSocket.Server({ server })
   ws.on('connection', handler)
-  // Send data to the socket that initiated the subscription
-  provider.on('data', payload => {
+
+  provider.on('data:subscription', (payload: RPC.Susbcription.Response) => {
     const subscription = subs[payload.params.subscription]
 
-    // if an origin is passed, make sure the subscription is from that origin
-    if (subscription && (!payload.params.origin || payload.params.origin === subscription.originId)) {
-      subscription.socket.send(JSON.stringify(payload))
-    }
-  })
-
-  provider.on('data:address', (address, payload) => { // Make sure the subscription has access based on current account
-    const subscription = subs[payload.params.subscription]
     if (subscription) {
-      const permissions = storeApi.getPermissions(address) || {}
-      const permission = Object.values(permissions).find(({ origin }) => {
-        const originId = uuidv5(origin, uuidv5.DNS)
-        return originId === subscription.originId
-      }) || { provider: false }
-
-      if (!permission.provider) payload.params.result = []
       subscription.socket.send(JSON.stringify(payload))
     }
   })

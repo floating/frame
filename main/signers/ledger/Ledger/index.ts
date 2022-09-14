@@ -23,11 +23,6 @@ export const Status = {
   NEEDS_RECONNECTION: 'Please reconnect this Ledger device'
 }
 
-interface DeviceError {
-  statusCode: number,
-  message: string
-}
-
 interface Address {
   address: string,
   publicKey: string,
@@ -67,6 +62,15 @@ function getStatusForError (err: DeviceError) {
   }
 
   return Status.NEEDS_RECONNECTION
+}
+
+export class DeviceError extends Error {
+  readonly statusCode
+
+  constructor (msg: string, code = -1) {
+    super(msg)
+    this.statusCode = code    
+  }
 }
 
 export default class Ledger extends Signer {
@@ -213,14 +217,15 @@ export default class Ledger extends Signer {
 
   private async checkDeviceStatus () {
     const check = new Promise(async (resolve: (err: DeviceError | undefined) => void) => {
-      setTimeout(() => resolve({ statusCode: -1, message: 'status check timed out' }), 3000)
+      setTimeout(() => {
+        resolve(new DeviceError('status check timed out'))
+      }, 3000)
 
       try {
         await this.eth?.getAddress("44'/60'/0'/0", false, false)
         resolve(undefined)
-      } catch (e: unknown) {
-        const err = e as DeviceError
-        resolve({ message: err.message, statusCode: err.statusCode || -1 })
+      } catch (e) {
+        resolve(e as DeviceError)
       }
     })
 
@@ -377,7 +382,7 @@ export default class Ledger extends Signer {
             const err = new Error('Address does not match device')
             log.error(err)
 
-            this.handleError({ statusCode: -1, message: 'failed to verify device address' })
+            this.handleError(new DeviceError('failed to verify device address'))
 
             return cb(err, undefined)
           }
@@ -391,7 +396,7 @@ export default class Ledger extends Signer {
 
           // if the address couldn't be verified for any reason the signer can no longer
           // be used, so force it to be closed by setting the status code to unhandled error
-          this.handleError({ message, statusCode: -1 })
+          this.handleError(new DeviceError(message))
           log.error('error verifying message on Ledger', err.toString())
 
           cb(new Error(message), undefined)
