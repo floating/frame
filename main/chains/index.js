@@ -16,6 +16,7 @@ const { default: GasCalculator } = require('../transaction/gasCalculator')
 // TODO: create a more general chain config that can use the block number
 // and ethereumjs/common to determine the state of various EIPs
 // Note that Arbitrum is in the list because it does not currently charge priority fees
+// https://support.arbitrum.io/hc/en-us/articles/4415963644955-How-the-fees-are-calculated-on-Arbitrum
 const legacyChains = [250, 4002, 42161]
 
 const resError = (error, payload, res) => res({ 
