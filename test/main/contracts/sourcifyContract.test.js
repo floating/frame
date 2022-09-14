@@ -2,11 +2,12 @@ import log from 'electron-log'
 import nock from 'nock'
 
 import { fetchSourcifyContract } from '../../../main/contracts/sourcifyContract'
+import { flushPromises } from '../../util'
 
-function mockApiResponse (domain, path, status, body, delay = 0, headers = { 'content-type': 'application/json' }) {
+function mockApiResponse (domain, path, status, body, timeout = 0, headers = { 'content-type': 'application/json' }) {
   nock(`https://${domain}`)
     .get(path)
-    .delay(delay)
+    .delay(timeout)
     .reply(status, body, headers)
 }
 
@@ -26,8 +27,6 @@ const mockAbi = [
     type: 'function'
   }
 ]
-
-const flushPromises = () => new Promise(jest.requireActual('timers').setImmediate)
 
 const sourcifyResponse = {
   status: 'partial',
