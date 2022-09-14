@@ -2,10 +2,14 @@ import log from 'electron-log'
 import nock from 'nock'
 
 import { fetchEtherscanContract } from '../../../main/contracts/etherscanContract'
+import { flushPromises } from '../../util'
 
-nock.emitter.on('no match', () => {
-  console.error(' ===> NO MATCH!')
-})
+function mockApiResponse (domain, path, status, body, timeout = 0, headers = { 'content-type': 'application/json' }) {
+  nock(`https://${domain}`)
+    .get(path)
+    .delay(timeout)
+    .reply(status, body, headers)
+}
 
 const mockAbi = [
   { 
@@ -25,8 +29,7 @@ const mockAbi = [
 ]
 
 beforeAll(() => {
-  jest.useRealTimers()
-
+  jest.useFakeTimers({ doNotFake: ['setImmediate', 'nextTick'] })
   nock.disableNetConnect()
   log.transports.console.level = false
 })
@@ -37,12 +40,16 @@ afterAll(() => {
   log.transports.console.level = 'debug'
 })
 
+afterEach(() => { 
+  nock.abortPendingRequests()
+})
+
 describe('#fetchEtherscanContract', () => {
   const contractAddress = '0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0'
   const getPath = (apiKey) => `/api?module=contract&action=getsourcecode&address=${contractAddress}&apikey=${apiKey}`
 
-  const mockEtherscanApi = (status, response) => {
-    return mockApiResponse('api.etherscan.io', getPath('3SYU5MW5QK8RPCJV1XVICHWKT774993S24'), status, response)
+  const mockEtherscanApi = (status, response, timeout) => {
+    return mockApiResponse('api.etherscan.io', getPath('3SYU5MW5QK8RPCJV1XVICHWKT774993S24'), status, response, timeout)
   }
 
   const chains = [
@@ -102,10 +109,22 @@ describe('#fetchEtherscanContract', () => {
   it('does not retrieve a contract from an unsupported chain', async () => {
     return expect(fetchEtherscanContract(contractAddress, '0x4')).resolves.toBeUndefined()
   })
+
+  it('does not retrieve a contract when the request times out', async () => {
+    mockEtherscanApi(200,{
+      message: 'OK',
+      result: [{
+        ABI: JSON.stringify(mockAbi),
+        ContractName: `mock etherscan abi`
+      }]
+    }, 10000)
+
+    const contract = expect(fetchEtherscanContract(contractAddress, '0x1')).resolves.toBeUndefined()
+    
+    jest.advanceTimersByTime(4000)
+    await flushPromises()
+
+    return contract
+  })
 })
 
-function mockApiResponse (domain, path, status, body, headers = { 'content-type': 'application/json' }) {
-  nock(`https://${domain}`)
-    .get(path)
-    .reply(status, body, headers)
-}
