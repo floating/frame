@@ -32,42 +32,42 @@ class Signer extends React.Component {
     if (type === 'lattice') {
       return (
         <div className='moduleItemSignerType'>
-          <div className='moduleItemIcon'>{svg.lattice(22)}</div>
+          <div className='moduleItemIcon'>{svg.lattice(18)}</div>
           <div>{'GridPlus Lattice1'}</div>
         </div>
       )
     } else if (type === 'ledger') {
       return (
         <div className='moduleItemSignerType'>
-          <div className='moduleItemIcon'>{svg.ledger(19)}</div>
+          <div className='moduleItemIcon'>{svg.ledger(16)}</div>
           <div>{'Ledger Device'}</div>
         </div>
       )
     } else if (type === 'trezor') {
       return (
         <div className='moduleItemSignerType'>
-          <div className='moduleItemIcon'>{svg.trezor(17)}</div>
+          <div className='moduleItemIcon'>{svg.trezor(15)}</div>
           <div>{'Trezor Device'}</div>
         </div>
       )
     } else if (type === 'aragon') {
       return (
         <div className='moduleItemSignerType'>
-          <div className='moduleItemIcon'>{svg.aragon(30)}</div>
+          <div className='moduleItemIcon'>{svg.aragon(26)}</div>
           <div>{'Agent Actor'}</div>
         </div>
       )
     } else if (type === 'seed') {
       return (
         <div className='moduleItemSignerType'>
-          <div className='moduleItemIcon'>{svg.seedling(23)}</div>
+          <div className='moduleItemIcon'>{svg.seedling(16)}</div>
           <div>{'Seed Signer'}</div>
         </div>
       )
     } else if (type === 'keyring') {
       return (
         <div className='moduleItemSignerType'>
-          <div className='moduleItemIcon'>{svg.key(20)}</div>
+          <div className='moduleItemIcon'>{svg.key(17)}</div>
           <div>{'Keyring Signer'}</div>
         </div>
       )
