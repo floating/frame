@@ -54,19 +54,23 @@ async function parseResponse <T>(response: Response): Promise<T | undefined> {
 }
 
 async function fetchSourceCode (contractAddress: Address, chainId: string): Promise<SourcifyMetadataFileContent | undefined> {
-  //@ts-ignore
-  const signal = AbortSignal.timeout(5000);
+  const controller = new AbortController();
+  const signal = controller.signal;
   const endpointUrl = getEndpointUrl(contractAddress, chainId)
   
   try {
-    const res = await fetch(endpointUrl, { signal })
-    const parsedResponse = await parseResponse<SourcifySourceCodeResponse>(res)
+    const res = await Promise.race([  //@ts-ignore
+      fetch(endpointUrl, { signal }),
+      new Promise((_resolve, reject) => setTimeout(() => {
+        controller.abort()
+        reject()
+      }, 4000))
+    ])
+    const parsedResponse = await parseResponse<SourcifySourceCodeResponse>(res as Response)
 
     return parsedResponse && ['partial', 'full'].includes(parsedResponse.status) ? JSON.parse(parsedResponse.files[0].content) : Promise.reject(`Contract ${contractAddress} not found in Sourcify`)
   } catch (e) {
-    if ((e as Error).name === "AbortError") {
-      console.error("The HTTP request was automatically cancelled.");
-    }
+    log.error((e as Error).name === 'AbortError' ? 'Sourcify request timed out' : 'Unable to parse Sourcify response');
     return undefined
   }
 }

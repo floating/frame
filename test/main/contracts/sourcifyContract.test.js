@@ -48,7 +48,7 @@ const sourcifyNotFoundResponse = {
 }
 
 beforeAll(() => {
-  jest.useFakeTimers({ doNotFake: ['nextTick', 'setImmediate'] })
+  jest.useFakeTimers({ doNotFake: ['setImmediate', 'nextTick'] })
   nock.disableNetConnect()
   log.transports.console.level = false
 })
@@ -59,8 +59,9 @@ afterAll(() => {
   log.transports.console.level = 'debug'
 })
 
-beforeEach(() => {
-  // jest.spyOn(global, 'clearTimeout')  
+
+afterEach(() => { 
+  nock.abortPendingRequests()
 })
 
 describe('#fetchSourcifyContract', () => {
@@ -110,12 +111,11 @@ describe('#fetchSourcifyContract', () => {
    
     mockSourcifyApi(200, sourcifyNotFoundResponse, 10000)
 
-    const contract = fetchSourcifyContract(contractAddress, '0x89')
+    const contract = expect(fetchSourcifyContract(contractAddress, '0x89')).resolves.toBeUndefined()
     
-    jest.advanceTimersByTime(5010)
-    // jest.runOnlyPendingTimers()
+    jest.advanceTimersByTime(4000)
     await flushPromises()
 
-    return expect(contract).resolves.toBeUndefined()
+    return contract
   })
 })
