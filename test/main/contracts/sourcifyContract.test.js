@@ -3,9 +3,10 @@ import nock from 'nock'
 
 import { fetchSourcifyContract } from '../../../main/contracts/sourcifyContract'
 
-function mockApiResponse (domain, path, status, body, headers = { 'content-type': 'application/json' }) {
+function mockApiResponse (domain, path, status, body, delay = 0, headers = { 'content-type': 'application/json' }) {
   nock(`https://${domain}`)
     .get(path)
+    .delay(delay)
     .reply(status, body, headers)
 }
 
@@ -26,6 +27,8 @@ const mockAbi = [
   }
 ]
 
+const flushPromises = () => new Promise(jest.requireActual('timers').setImmediate)
+
 const sourcifyResponse = {
   status: 'partial',
   files: [{
@@ -45,8 +48,7 @@ const sourcifyNotFoundResponse = {
 }
 
 beforeAll(() => {
-  jest.useRealTimers()
-
+  jest.useFakeTimers({ doNotFake: ['nextTick', 'setImmediate'] })
   nock.disableNetConnect()
   log.transports.console.level = false
 })
@@ -57,19 +59,27 @@ afterAll(() => {
   log.transports.console.level = 'debug'
 })
 
+beforeEach(() => {
+  // jest.spyOn(global, 'clearTimeout')  
+})
+
 describe('#fetchSourcifyContract', () => {
   const contractAddress = '0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0'
   const domain = 'sourcify.dev'
   const endpoint = `/server/files/any/137/${contractAddress}`
 
-  const mockSourcifyApi = (status, response) => {
-    mockApiResponse(domain, endpoint, status, response)
+  const mockSourcifyApi = (status, response, delay) => {
+    mockApiResponse(domain, endpoint, status, response, delay)
   }
 
   it('retrieves a contract from sourcify', async () => {
     mockSourcifyApi(200, sourcifyResponse)
 
-    return expect(fetchSourcifyContract(contractAddress, '0x89')).resolves.toStrictEqual({
+    const contract = fetchSourcifyContract(contractAddress, '0x89')
+    
+    jest.advanceTimersByTime(0);
+
+    return expect(contract).resolves.toStrictEqual({
       abi: JSON.stringify(mockAbi), 
       name: 'mock sourcify abi', 
       source: 'sourcify'
@@ -79,12 +89,33 @@ describe('#fetchSourcifyContract', () => {
   it('does not retrieve a contract when the request fails', async () => {
     mockSourcifyApi(400)
 
-    return expect(fetchSourcifyContract(contractAddress, '0x89')).resolves.toBeUndefined()
+    const contract = fetchSourcifyContract(contractAddress, '0x89')
+    
+    jest.advanceTimersByTime(0);
+
+    return expect(contract).resolves.toBeUndefined()
   })
 
   it('does not retrieve a contract when the contract is not found', async () => {
     mockSourcifyApi(200, sourcifyNotFoundResponse)
 
-    return expect(fetchSourcifyContract(contractAddress, '0x89')).resolves.toBeUndefined()
+    const contract = fetchSourcifyContract(contractAddress, '0x89')
+    
+    jest.advanceTimersByTime(0);
+
+    return expect(contract).resolves.toBeUndefined()
+  })
+
+  it('does not retrieve a contract when the request times out', async () => {
+   
+    mockSourcifyApi(200, sourcifyNotFoundResponse, 10000)
+
+    const contract = fetchSourcifyContract(contractAddress, '0x89')
+    
+    jest.advanceTimersByTime(5010)
+    // jest.runOnlyPendingTimers()
+    await flushPromises()
+
+    return expect(contract).resolves.toBeUndefined()
   })
 })

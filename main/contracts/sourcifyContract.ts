@@ -54,15 +54,19 @@ async function parseResponse <T>(response: Response): Promise<T | undefined> {
 }
 
 async function fetchSourceCode (contractAddress: Address, chainId: string): Promise<SourcifyMetadataFileContent | undefined> {
-  const endpointUrl = getEndpointUrl(contractAddress, chainId)  
-  const res = await fetch(endpointUrl)
+  //@ts-ignore
+  const signal = AbortSignal.timeout(5000);
+  const endpointUrl = getEndpointUrl(contractAddress, chainId)
   
   try {
+    const res = await fetch(endpointUrl, { signal })
     const parsedResponse = await parseResponse<SourcifySourceCodeResponse>(res)
 
     return parsedResponse && ['partial', 'full'].includes(parsedResponse.status) ? JSON.parse(parsedResponse.files[0].content) : Promise.reject(`Contract ${contractAddress} not found in Sourcify`)
   } catch (e) {
-    console.log('source code response parsing error', e)
+    if ((e as Error).name === "AbortError") {
+      console.error("The HTTP request was automatically cancelled.");
+    }
     return undefined
   }
 }
