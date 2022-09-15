@@ -107,7 +107,6 @@ describe('#fetchSourcifyContract', () => {
     const contract = expect(fetchSourcifyContract(contractAddress, '0x89')).resolves.toBeUndefined()
     
     jest.advanceTimersByTime(4000)
-    await flushPromises()
 
     return contract
   })
