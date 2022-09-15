@@ -76,8 +76,6 @@ describe('#fetchSourcifyContract', () => {
     mockSourcifyApi(200, sourcifyResponse)
 
     const contract = fetchSourcifyContract(contractAddress, '0x89')
-    
-    jest.advanceTimersByTime(0)
 
     return expect(contract).resolves.toStrictEqual({
       abi: JSON.stringify(mockAbi), 
@@ -90,8 +88,6 @@ describe('#fetchSourcifyContract', () => {
     mockSourcifyApi(400)
 
     const contract = fetchSourcifyContract(contractAddress, '0x89')
-    
-    jest.advanceTimersByTime(0)
 
     return expect(contract).resolves.toBeUndefined()
   })
@@ -100,8 +96,6 @@ describe('#fetchSourcifyContract', () => {
     mockSourcifyApi(200, sourcifyNotFoundResponse)
 
     const contract = fetchSourcifyContract(contractAddress, '0x89')
-    
-    jest.advanceTimersByTime(0)
 
     return expect(contract).resolves.toBeUndefined()
   })
