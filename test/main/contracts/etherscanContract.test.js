@@ -122,7 +122,6 @@ describe('#fetchEtherscanContract', () => {
     const contract = expect(fetchEtherscanContract(contractAddress, '0x1')).resolves.toBeUndefined()
     
     jest.advanceTimersByTime(4000)
-    await flushPromises()
 
     return contract
   })
