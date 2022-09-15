@@ -2,7 +2,6 @@ import log from 'electron-log'
 import nock from 'nock'
 
 import { fetchSourcifyContract } from '../../../main/contracts/sourcifyContract'
-import { flushPromises } from '../../util'
 
 function mockApiResponse (domain, path, status, body, timeout = 0, headers = { 'content-type': 'application/json' }) {
   nock(`https://${domain}`)
