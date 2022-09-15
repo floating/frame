@@ -14,4 +14,4 @@ test('Deploy Contract', done => {
   }).catch(err => {
     console.log(err)
   })
-}, 30 * 1000)
+})
