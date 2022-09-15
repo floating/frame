@@ -77,7 +77,7 @@ describe('#fetchSourcifyContract', () => {
 
     const contract = fetchSourcifyContract(contractAddress, '0x89')
     
-    jest.advanceTimersByTime(0);
+    jest.advanceTimersByTime(0)
 
     return expect(contract).resolves.toStrictEqual({
       abi: JSON.stringify(mockAbi), 
@@ -91,7 +91,7 @@ describe('#fetchSourcifyContract', () => {
 
     const contract = fetchSourcifyContract(contractAddress, '0x89')
     
-    jest.advanceTimersByTime(0);
+    jest.advanceTimersByTime(0)
 
     return expect(contract).resolves.toBeUndefined()
   })
@@ -101,7 +101,7 @@ describe('#fetchSourcifyContract', () => {
 
     const contract = fetchSourcifyContract(contractAddress, '0x89')
     
-    jest.advanceTimersByTime(0);
+    jest.advanceTimersByTime(0)
 
     return expect(contract).resolves.toBeUndefined()
   })
