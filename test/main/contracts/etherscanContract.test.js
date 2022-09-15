@@ -111,7 +111,7 @@ describe('#fetchEtherscanContract', () => {
   })
 
   it('does not retrieve a contract when the request times out', async () => {
-    mockEtherscanApi(200,{
+    mockEtherscanApi(200, {
       message: 'OK',
       result: [{
         ABI: JSON.stringify(mockAbi),
