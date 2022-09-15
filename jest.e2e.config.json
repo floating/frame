@@ -1,0 +1,7 @@
+{
+  "roots": [
+    "test/e2e"
+  ],
+  "testTimeout": 30000
+}
+  
