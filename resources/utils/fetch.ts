@@ -1,7 +1,10 @@
 import fetch, { RequestInit } from 'node-fetch'
+import { AbortSignal } from 'node-fetch/externals'
 
 export async function fetchWithTimeout (url: string, options: RequestInit, timeout: number) {  
-  const controller = new AbortController() 
+  const controller = new AbortController()
+
   setTimeout(() => controller.abort(), timeout)
-  return fetch(url, { ...options, signal: controller.signal as RequestInit['signal'] })
+
+  return fetch(url, { ...options, signal: controller.signal as AbortSignal })
 }
