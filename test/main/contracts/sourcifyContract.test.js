@@ -102,7 +102,7 @@ describe('#fetchSourcifyContract', () => {
 
   it('does not retrieve a contract when the request times out', async () => {
    
-    mockSourcifyApi(200, sourcifyNotFoundResponse, 10000)
+    mockSourcifyApi(200, sourcifyResponse, 10000)
 
     const contract = expect(fetchSourcifyContract(contractAddress, '0x89')).resolves.toBeUndefined()
     
