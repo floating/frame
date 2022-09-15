@@ -6,7 +6,7 @@ jest.mock('../../main/store/persist')
 let frame
 
 beforeEach(done => {
-  frame = provider('frame')
+  frame = provider('frame', { origin: 'frame.test' })
   frame.once('connect', () => {
     frame.request({ method: 'eth_accounts', params: [] }).then(() => done())
   })
