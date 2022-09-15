@@ -57,7 +57,6 @@ afterAll(() => {
   log.transports.console.level = 'debug'
 })
 
-
 afterEach(() => { 
   nock.abortPendingRequests()
 })
@@ -74,9 +73,7 @@ describe('#fetchSourcifyContract', () => {
   it('retrieves a contract from sourcify', async () => {
     mockSourcifyApi(200, sourcifyResponse)
 
-    const contract = fetchSourcifyContract(contractAddress, '0x89')
-
-    return expect(contract).resolves.toStrictEqual({
+    return expect(fetchSourcifyContract(contractAddress, '0x89')).resolves.toStrictEqual({
       abi: JSON.stringify(mockAbi), 
       name: 'mock sourcify abi', 
       source: 'sourcify'
@@ -86,21 +83,16 @@ describe('#fetchSourcifyContract', () => {
   it('does not retrieve a contract when the request fails', async () => {
     mockSourcifyApi(400)
 
-    const contract = fetchSourcifyContract(contractAddress, '0x89')
-
-    return expect(contract).resolves.toBeUndefined()
+    return expect(fetchSourcifyContract(contractAddress, '0x89')).resolves.toBeUndefined()
   })
 
   it('does not retrieve a contract when the contract is not found', async () => {
     mockSourcifyApi(200, sourcifyNotFoundResponse)
 
-    const contract = fetchSourcifyContract(contractAddress, '0x89')
-
-    return expect(contract).resolves.toBeUndefined()
+    return expect(fetchSourcifyContract(contractAddress, '0x89')).resolves.toBeUndefined()
   })
 
   it('does not retrieve a contract when the request times out', async () => {
-   
     mockSourcifyApi(200, sourcifyResponse, 10000)
 
     const contract = expect(fetchSourcifyContract(contractAddress, '0x89')).resolves.toBeUndefined()
