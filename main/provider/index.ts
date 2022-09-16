@@ -39,6 +39,7 @@ import {
   requestPermissions,
   resError,
   hasPermission,
+  respondToJsonRPC,
 } from './helpers'
 
 import {
@@ -181,6 +182,8 @@ export class Provider extends EventEmitter {
     const response = chainConnected
       ? { result: intToHex(targetChain.id) }
       : { error: { message: 'not connected', code: 1 } }
+
+      
 
     res({ id: payload.id, jsonrpc: payload.jsonrpc, ...response })
   }
@@ -852,9 +855,8 @@ export class Provider extends EventEmitter {
     if (method === 'wallet_getEthereumChains') return this.getChains(payload, res)
     if (method === 'wallet_getAssets') return this.getAssets(payload as RPC.GetAssets.Request, accounts.current(), res as RPCCallback<RPC.GetAssets.Response>)
 
-    // Connection dependent methods need to pass targetChain
-    if (method === 'net_version') return this.getNetVersion(payload, res, targetChain)
-    if (method === 'eth_chainId') return this.getChainId(payload, res, targetChain)
+    if (method === 'net_version') return respondToJsonRPC(payload.id, targetChain.id, res)
+    if (method === 'eth_chainId') return respondToJsonRPC(payload.id, intToHex(targetChain.id), res)
 
     // remove custom data
     const { _origin, chainId, ...rpcPayload } = payload
