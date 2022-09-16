@@ -1,7 +1,6 @@
 import log from 'electron-log'
 import { isValidAddress, addHexPrefix } from 'ethereumjs-util'
 import BigNumber from 'bignumber.js'
-import { Version } from 'eth-sig-util'
 
 import { AccessRequest, AccountRequest, Accounts, RequestMode, TransactionRequest } from '..'
 import nebulaApi from '../../nebula'
@@ -10,7 +9,7 @@ import windows from '../../windows'
 import nav from '../../windows/nav'
 import store from '../../store'
 import { Aragon } from '../aragon'
-import { TransactionData, getAddress } from '../../../resources/domain/transaction'
+import { TransactionData } from '../../../resources/domain/transaction'
 import { capitalize } from '../../../resources/utils'
 import { getType as getSignerType, Type as SignerType } from '../../signers/Signer'
 
@@ -19,6 +18,7 @@ import { ApprovalType } from '../../../resources/constants'
 import Erc20Contract from '../../contracts/erc20'
 
 import reveal from '../../reveal'
+import type { TypedMessage } from '../types'
 
 const nebula = nebulaApi()
 
@@ -540,15 +540,15 @@ class FrameAccount {
     }
   }
 
-  signTypedData (version: Version, typedData: any, cb: Callback<string>) {
-    if (!typedData) return cb(new Error('No data to sign'))
-    if (typeof (typedData) !== 'object') return cb(new Error('Data to sign has the wrong format'))
+  signTypedData (typedMessage: TypedMessage, cb: Callback<string>) {
+    if (!typedMessage) return cb(new Error('No data to sign'))
+    if (typeof (typedMessage) !== 'object') return cb(new Error('Data to sign has the wrong format'))
     if (this.signer) {
       const s = signers.get(this.signer)
       if (!s) return cb(new Error(`Cannot find signer for this account`))
       const index = s.addresses.map(a => a.toLowerCase()).indexOf(this.address)
       if (index === -1) cb(new Error(`Signer cannot sign for this address`))
-      s.signTypedData(index, version, typedData, cb)
+      s.signTypedData(index, typedMessage, cb)
     } else if (this.smart && this.smart.actor) {
       const actingAccount = this.accounts.get(this.smart.actor)
       if (!actingAccount) return cb(new Error(`Could not find acting account: ${this.smart.actor}`))
@@ -556,7 +556,7 @@ class FrameAccount {
       if (!actingSigner || !actingSigner.verifyAddress) return cb(new Error(`Could not find acting account signer: ${actingAccount.signer}`))
       const index = actingSigner.addresses.map(a => a.toLowerCase()).indexOf(actingAccount.address)
       if (index === -1) cb(new Error(`Acting signer cannot sign for this address, could not find acting address in signer: ${actingAccount.address}`))
-      actingSigner.signTypedData(index, version, typedData, cb)
+      actingSigner.signTypedData(index, typedMessage, cb)
     } else {
       cb(new Error('No signer found for this account'))
     }

@@ -1,6 +1,7 @@
-import { TypedDataV1, TypedMessage, MessageTypes, SignTypedDataVersion } from '@metamask/eth-sig-util'
+import { SignTypedDataVersion } from '@metamask/eth-sig-util'
+import type { TypedMessage } from '../accounts/types'
 
-export function getVersionFromTypedData (typedData: TypedDataV1 | TypedMessage<MessageTypes>) {
+export function getVersionFromTypedData (typedData: TypedMessage['data']) {
   if (Array.isArray(typedData)) {
     return SignTypedDataVersion.V1
   }

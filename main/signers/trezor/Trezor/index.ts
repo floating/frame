@@ -1,19 +1,18 @@
 import log from 'electron-log'
 import utils from 'web3-utils'
 import { padToEven, stripHexPrefix, addHexPrefix } from 'ethereumjs-util'
-import { MessageTypes, SignTypedDataVersion, TypedDataUtils, TypedMessage } from '@metamask/eth-sig-util'
+import { SignTypedDataVersion, TypedDataUtils } from '@metamask/eth-sig-util'
 import type { Device as TrezorDevice } from 'trezor-connect'
+import { TypedTransaction } from '@ethereumjs/tx'
 
 import { v5 as uuid } from 'uuid'
 
 import Signer from '../../Signer'
 import { TransactionData } from '../../../../resources/domain/transaction'
 import { sign, londonToLegacy, signerCompatibility } from '../../../transaction'
-
 import { Derivation, getDerivationPath } from '../../Signer/derive'
-import { TypedTransaction } from '@ethereumjs/tx'
 import TrezorBridge, { ConnectError } from '../bridge'
-import { TypedData } from '../../../accounts/types'
+import type { TypedMessage } from '../../../accounts/types'
 
 const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
 
@@ -222,11 +221,9 @@ export default class Trezor extends Signer {
     }
   }
 
-  async signTypedData (index: number, version: string, typedData: TypedData, cb: Callback<string>) {
-    const versionNum = (version.match(/[Vv](\d+)/) || [])[1]
-
-    if ((parseInt(versionNum) || 0) < 4) {
-      return cb(new Error(`Invalid version (${version}), Trezor only supports eth_signTypedData version 4+`), undefined)
+  async signTypedData (index: number, typedMessage: TypedMessage<SignTypedDataVersion.V4>, cb: Callback<string>) {
+    if (typedMessage.version !== SignTypedDataVersion.V4) {
+      return cb(new Error(`Invalid version (${typedMessage.version}), Trezor only supports eth_signTypedData version 4+`), undefined)
     }
 
     try {
@@ -239,13 +236,13 @@ export default class Trezor extends Signer {
 
       if (this.isTrezorOne()) {
         // Trezor One requires hashed input
-        const { types, primaryType, domain, message } = TypedDataUtils.sanitizeData(typedData as TypedMessage<MessageTypes>)
+        const { types, primaryType, domain, message } = TypedDataUtils.sanitizeData(typedMessage.data)
         const domainSeparatorHash = TypedDataUtils.hashStruct('EIP712Domain', domain, types, SignTypedDataVersion.V4).toString('hex')
         const messageHash = TypedDataUtils.hashStruct(primaryType as any, message, types, SignTypedDataVersion.V4).toString('hex')
   
-        signature = await TrezorBridge.signTypedHash(this.device, path, typedData, domainSeparatorHash, messageHash)
+        signature = await TrezorBridge.signTypedHash(this.device, path, typedMessage, domainSeparatorHash, messageHash)
       } else {
-        signature = await TrezorBridge.signTypedData(this.device, path, typedData)
+        signature = await TrezorBridge.signTypedData(this.device, path, typedMessage)
       }
 
       cb(null, addHexPrefix(signature))

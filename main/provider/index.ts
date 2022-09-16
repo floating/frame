@@ -46,7 +46,7 @@ import {
   createOriginChainObserver as OriginChainObserver,
   getActiveChains
 } from './chains'
-import { TypedData } from '../accounts/types'
+import type { TypedData, TypedMessage } from '../accounts/types'
 
 
 type Subscription = {
@@ -262,18 +262,16 @@ export class Provider extends EventEmitter {
       delete this.handlers[req.handlerId]
     }
 
-    const payload = req.payload
-    const [address, data] = payload.params
+    const { payload, typedMessage } = req
+    const [address] = payload.params
 
-    const dataToSign = (Array.isArray(data)) ? [...data] : { ...data } as TypedData
-
-    accounts.signTypedData(req.version, address, dataToSign, (err, signature = '') => {
+    accounts.signTypedData(address, typedMessage, (err, signature = '') => {
       if (err) {
         resError(err.message, payload, res)
         cb(err)
       } else {
         try {
-          const recoveredAddress = recoverTypedSignature({ data, signature, version: req.version })
+          const recoveredAddress = recoverTypedSignature({ ...typedMessage, signature })
           if (recoveredAddress.toLowerCase() !== address.toLowerCase()) {
             throw new Error('TypedData signature verification failed')
           }
@@ -568,7 +566,7 @@ export class Provider extends EventEmitter {
       params: orderedParams
     }
 
-    let [from = '', typedData = {}, ...additionalParams] = payload.params
+    let [from = '', typedData = {}, ...additionalParams] = payload.params as SignTypedDataRequest['payload']['params']
 
     const targetAccount = accounts.get(from.toLowerCase())
 
@@ -598,14 +596,18 @@ export class Provider extends EventEmitter {
     const signerType = getSignerType(targetAccount.lastSignerType)
 
     // check for signers that only support signing a specific version of typed data
-    if (version !== 'V4' && signerType && [SignerType.Ledger, SignerType.Lattice, SignerType.Trezor].includes(signerType)) {
+    if (version !== SignTypedDataVersion.V4 && signerType && [SignerType.Ledger, SignerType.Lattice, SignerType.Trezor].includes(signerType)) {
       const signerName = capitalize(signerType)
       return resError(`${signerName} only supports eth_signTypedData_v4+`, payload, res)
     }
 
     const handlerId = this.addRequestHandler(res)
+    const typedMessage: TypedMessage<typeof version> = {
+      data: typedData,
+      version
+    }
 
-    accounts.addRequest({ handlerId, type: 'signTypedData', version, payload, account: targetAccount.address, origin: payload._origin } as SignTypedDataRequest)
+    accounts.addRequest({ handlerId, type: 'signTypedData', typedMessage, payload, account: targetAccount.address, origin: payload._origin } as SignTypedDataRequest)
   }
 
   subscribe (payload: RPC.Subscribe.Request, res: RPCSuccessCallback) {
