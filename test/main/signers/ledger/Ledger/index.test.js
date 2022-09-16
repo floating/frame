@@ -2,6 +2,7 @@ import Ledger, { Status } from '../../../../../main/signers/ledger/Ledger'
 import Eth from '../../../../../main/signers/ledger/Ledger/eth'
 import { Derivation } from '../../../../../main/signers/Signer/derive'
 import log from 'electron-log'
+import { SignTypedDataVersion } from '@metamask/eth-sig-util'
 
 jest.mock('../../../../../main/signers/ledger/Ledger/eth')
 jest.mock('@ledgerhq/hw-transport-node-hid-noevents')
@@ -404,7 +405,7 @@ describe('#signTypedData', () => {
 
     ledger.once('update', () => done('Ledger unexpectedly updated!'))
 
-    ledger.signTypedData(5, 'V4', 'all sorts of typed data', (err, signature) => {
+    ledger.signTypedData(5, { version: SignTypedDataVersion.V4, data: 'typed data' }, (err, signature) => {
       verifyDone(done, () => {
         expect(ledger.status).toBe(Status.OK)
         expect(err).toBeFalsy()
@@ -418,7 +419,7 @@ describe('#signTypedData', () => {
   it('fails to sign pre-v4 typed data', done => {
     ledger.once('update', () => done('Ledger unexpectedly updated!'))
 
-    ledger.signTypedData(5, 'V3', 'all sorts of typed data', (err, signature) => {
+    ledger.signTypedData(5, { version: SignTypedDataVersion.V3, data: 'typed data' }, (err, signature) => {
       verifyDone(done, () => {
         expect(ledger.status).toBe(Status.OK)
         expect(signature).toBeUndefined()
@@ -433,7 +434,7 @@ describe('#signTypedData', () => {
     ledger.once('update', () => done('Ledger unexpectedly updated!'))
     ledger.once('close', () => done('Ledger unexpectedly closed!'))
 
-    ledger.signTypedData(5, 'V4', 'typed data', (err, signature) => {
+    ledger.signTypedData(5, { version: SignTypedDataVersion.V4, data: 'typed data' }, (err, signature) => {
       verifyDone(done, () => {
         expect(ledger.status).toBe(Status.OK)
         expect(signature).toBeUndefined()
@@ -450,7 +451,7 @@ describe('#signTypedData', () => {
     ledger.once('update', () => done('Ledger unexpectedly updated!'))
     ledger.once('close', () => done('Ledger unexpectedly closed!'))
 
-    ledger.signTypedData(5, 'V4', 'typed data', (err, signature) => {
+    ledger.signTypedData(5, { version: SignTypedDataVersion.V4, data: 'typed data' }, (err, signature) => {
       verifyDone(done, () => {
         expect(ledger.status).toBe(Status.OK)
         expect(signature).toBeUndefined()
@@ -487,7 +488,7 @@ describe('#signTypedData', () => {
       const callback = new Promise((resolve, reject) => {
         setup()
 
-        ledger.signTypedData(5, 'V4', 'typed data', (err, signature) => {
+        ledger.signTypedData(5, { version: SignTypedDataVersion.V4, data: 'typed data' }, (err, signature) => {
           verifyPromise(resolve, reject, () => {
             expect(signature).toBeUndefined()
             expect(err.message).toMatch(/Sign message error/)
