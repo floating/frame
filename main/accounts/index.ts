@@ -478,13 +478,13 @@ export class Accounts extends EventEmitter {
     currentAccount.signMessage(message, cb)
   }
 
-  signTypedData (address: Address, typedData: TypedMessage, cb: Callback<string>) {
+  signTypedData (address: Address, typedMessage: TypedMessage, cb: Callback<string>) {
     const currentAccount = this.current()
 
     if (!currentAccount) return cb(new Error('No Account Selected'))
     if (address.toLowerCase() !== currentAccount.getSelectedAddress().toLowerCase()) return cb(new Error('signMessage: Wrong Account Selected'))
 
-    currentAccount.signTypedData(typedData, cb)
+    currentAccount.signTypedData(typedMessage, cb)
   }
 
   signTransaction (rawTx: TransactionData, cb: Callback<string>) {
