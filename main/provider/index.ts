@@ -46,7 +46,7 @@ import {
   createOriginChainObserver as OriginChainObserver,
   getActiveChains
 } from './chains'
-import type { TypedData, TypedMessage } from '../accounts/types'
+import type { LegacyTypedData, TypedData, TypedMessage } from '../accounts/types'
 
 
 type Subscription = {
@@ -566,7 +566,11 @@ export class Provider extends EventEmitter {
       params: orderedParams
     }
 
-    let [from = '', typedData = {}, ...additionalParams] = payload.params as SignTypedDataRequest['payload']['params']
+    let [from = '', typedData, ...additionalParams] = payload.params as [string, LegacyTypedData | TypedData | string, ...unknown[]]
+
+    if (!typedData) {
+      return resError(`Missing typed data`, payload, res)
+    }
 
     const targetAccount = accounts.get(from.toLowerCase())
 
@@ -577,7 +581,7 @@ export class Provider extends EventEmitter {
     // HACK: Standards clearly say, that second param is an object but it seems like in the wild it can be a JSON-string.
     if (typeof (typedData) === 'string') {
       try {
-        typedData = JSON.parse(typedData)
+        typedData = JSON.parse(typedData) as LegacyTypedData | TypedData
         payload.params = [from, typedData, ...additionalParams]
       } catch (e) {
         return resError('Malformed typed data', payload, res)
