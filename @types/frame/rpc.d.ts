@@ -24,8 +24,8 @@ interface InternalPayload {
 }
 
 interface JSONRPCRequestPayload extends RPCId {
-  params: any[],
-  method: string,
+  params?: readonly any[]
+  method: string
   chainId?: string
 }
 

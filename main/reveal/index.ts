@@ -1,7 +1,6 @@
 // Reveal details about pending transactions
 
 import log from 'electron-log'
-// @ts-ignore
 import EthereumProvider from 'ethereum-provider'
 import proxyConnection from '../provider/proxy'
 import nebulaApi from '../nebula'
