@@ -1,5 +1,5 @@
 import { addHexPrefix, stripHexPrefix } from 'ethereumjs-util'
-import Common from '@ethereumjs/common'
+import { Common } from '@ethereumjs/common'
 
 import { maxFee, londonToLegacy, signerCompatibility, populate, sign } from '../../../main/transaction'
 import { GasFeesSource } from '../../../resources/domain/transaction'

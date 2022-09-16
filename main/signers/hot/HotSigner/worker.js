@@ -1,7 +1,7 @@
 const crypto = require('crypto')
 const ethSigUtil = require('eth-sig-util')
 const { TransactionFactory } = require('@ethereumjs/tx')
-const Common = require('@ethereumjs/common').default
+const { Common } = require('@ethereumjs/common')
 
 const {
   BN,
