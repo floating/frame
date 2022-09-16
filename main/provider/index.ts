@@ -164,30 +164,6 @@ export class Provider extends EventEmitter {
     this.emit('data:subscription', payload)
   }
 
-  getNetVersion (payload: RPCRequestPayload, res: RPCRequestCallback, targetChain: Chain) {
-    const connection = this.connection.connections[targetChain.type][targetChain.id]
-    const chainConnected = connection && (connection.primary?.connected || connection.secondary?.connected)
-
-    const response = chainConnected
-      ? { result: connection.chainId }
-      : { error: { message: 'not connected', code: 1 } }
-
-    res({ id: payload.id, jsonrpc: payload.jsonrpc, ...response })
-  }
-
-  getChainId (payload: RPCRequestPayload, res: RPCSuccessCallback, targetChain: Chain) {
-    const connection = this.connection.connections[targetChain.type][targetChain.id]
-    const chainConnected = (connection.primary?.connected || connection.secondary?.connected)
-
-    const response = chainConnected
-      ? { result: intToHex(targetChain.id) }
-      : { error: { message: 'not connected', code: 1 } }
-
-      
-
-    res({ id: payload.id, jsonrpc: payload.jsonrpc, ...response })
-  }
-
   declineRequest (req: AccountRequest) {
     const res = (data: any) => {
       if (this.handlers[req.handlerId]) this.handlers[req.handlerId](data)
@@ -715,53 +691,51 @@ export class Provider extends EventEmitter {
       return resError('only ERC-20 tokens are supported', payload, cb)
     }
 
-    this.getChainId(payload, resp => {
-      const chainId = parseInt(resp.result)
+    const chainId = targetChain.id
 
-      const address = (tokenData.address || '').toLowerCase()
-      const symbol = (tokenData.symbol || '').toUpperCase()
-      const decimals = parseInt(tokenData.decimals || '1')
+    const address = (tokenData.address || '').toLowerCase()
+    const symbol = (tokenData.symbol || '').toUpperCase()
+    const decimals = parseInt(tokenData.decimals || '1')
 
-      if (!address) {
-        return resError('tokens must define an address', payload, cb)
-      }
+    if (!address) {
+      return resError('tokens must define an address', payload, cb)
+    }
 
-      const res = () => {
-        cb({ id: payload.id, jsonrpc: '2.0', result: true })
-      }
+    const res = () => {
+      cb({ id: payload.id, jsonrpc: '2.0', result: true })
+    }
 
-      // don't attempt to add the token if it's already been added
-      const tokenExists = store('main.tokens.custom').some((token: Token) => token.chainId === chainId && token.address === address)
-      if (tokenExists) {
-        return res()
-      }
+    // don't attempt to add the token if it's already been added
+    const tokenExists = store('main.tokens.custom').some((token: Token) => token.chainId === chainId && token.address === address)
+    if (tokenExists) {
+      return res()
+    }
 
-      const token = {
-        chainId,
-        name: tokenData.name || capitalize(symbol),
-        address,
-        symbol,
-        decimals,
-        logoURI: tokenData.image || tokenData.logoURI || ''
-      }
+    const token = {
+      chainId,
+      name: tokenData.name || capitalize(symbol),
+      address,
+      symbol,
+      decimals,
+      logoURI: tokenData.image || tokenData.logoURI || ''
+    }
 
-      // const result = {
-      //   suggestedAssetMeta: {
-      //     asset: { token }
-      //   }
-      // }
+    // const result = {
+    //   suggestedAssetMeta: {
+    //     asset: { token }
+    //   }
+    // }
 
-      const handlerId = this.addRequestHandler(res)
+    const handlerId = this.addRequestHandler(res)
 
-      accounts.addRequest({
-        handlerId,
-        type: 'addToken',
-        token,
-        account: (accounts.current() as FrameAccount).id,
-        origin: payload._origin,
-        payload
-      } as AddTokenRequest, res)
-    }, targetChain)
+    accounts.addRequest({
+      handlerId,
+      type: 'addToken',
+      token,
+      account: (accounts.current() as FrameAccount).id,
+      origin: payload._origin,
+      payload
+    } as AddTokenRequest, res)
   }
 
   private parseTargetChain (payload: RPCRequestPayload): Chain {
