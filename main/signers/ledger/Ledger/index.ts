@@ -448,7 +448,7 @@ export default class Ledger extends Signer {
           const path = this.getPath(index)
           const signedData = await this.eth.signTypedData(path, typedMessage.data)
 
-          log.info('successfully signed typed data on Ledger: ', typedMessage)
+          log.info('successfully signed typed data on Ledger: ', typedMessage.data)
 
           cb(null, signedData)
         } catch (e) {
