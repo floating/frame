@@ -541,8 +541,8 @@ class FrameAccount {
   }
 
   signTypedData (typedMessage: TypedMessage, cb: Callback<string>) {
-    if (!typedMessage) return cb(new Error('No data to sign'))
-    if (typeof (typedMessage) !== 'object') return cb(new Error('Data to sign has the wrong format'))
+    if (!typedMessage.data) return cb(new Error('No data to sign'))
+    if (typeof (typedMessage.data) !== 'object') return cb(new Error('Data to sign has the wrong format'))
     if (this.signer) {
       const s = signers.get(this.signer)
       if (!s) return cb(new Error(`Cannot find signer for this account`))
