@@ -41,6 +41,8 @@ class Balance extends React.Component {
       }
       return `(${direction === 1 ? '+' : ''}${balance.priceChange}%)`
     }
+    const chain = this.store('main.networks.ethereum', chainId)
+    const chainName = chain ? chain.name : ''
 
     return (
       <div className={i === 0 ? 'signerBalance signerBalanceBase' : 'signerBalance'} key={symbol} onMouseDown={() => this.setState({ selected: i })}>
@@ -56,7 +58,7 @@ class Balance extends React.Component {
             className='signerBalanceChain'
             style={{ color: chainMeta[chainHex] ? chainMeta[chainHex].primaryColor : '' }}
           >
-            {chainMeta[chainHex] ? chainMeta[chainHex].name : '' }
+            {chainName}
           </div>
           <div className='signerBalanceCurrency'>
             {name}
