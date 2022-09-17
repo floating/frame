@@ -21,7 +21,7 @@ let balances: BalanceLoader
 const eth = ethProvider('frame', { origin: 'frame-internal', name: 'scanWorker' })
 const tokenLoader = new TokenLoader()
 
-eth.on('error', e => {
+eth.on('error', (e: Error) => {
   log.error('Error in balances worker', e)
   disconnect()
 })

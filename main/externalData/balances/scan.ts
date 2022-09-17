@@ -8,7 +8,7 @@ import multicall, { Call, supportsChain as multicallSupportsChain } from '../../
 import erc20TokenAbi from './erc-20-abi'
 
 import { groupByChain, TokensByChain } from './reducers'
-import { EthereumProvider } from 'eth-provider'
+import type { EthereumProvider } from 'eth-provider'
 
 let id = 1
 const erc20Interface = new Interface(erc20TokenAbi)
@@ -58,7 +58,9 @@ export default function (eth: EthereumProvider) {
       const rawBalance = await eth.request({
         method: 'eth_getBalance',
         params: [address, 'latest'],
-        chainId: addHexPrefix(chainId.toString(16))
+        chainId: addHexPrefix(chainId.toString(16)),
+        jsonrpc: '2.0',
+        id: chainId
       })
 
       // TODO: do all coins have 18 decimals?

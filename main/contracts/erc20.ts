@@ -14,7 +14,7 @@ function createWeb3ProviderWrapper (chainId: string) {
       jsonrpc: '2.0',
       _origin: 'frame-internal',
       chainId
-    }
+    } as RPCRequestPayload
     provider.sendAsync(wrappedPayload, cb)
   }
 
