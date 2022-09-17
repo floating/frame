@@ -1,6 +1,6 @@
 import { BN, addHexPrefix, stripHexPrefix, bnToHex, intToHex } from 'ethereumjs-util'
 import { TransactionFactory, TypedTransaction } from '@ethereumjs/tx'
-import { Common } from '@ethereumjs/common'
+import Common from '@ethereumjs/common'
 
 import chainConfig from '../chains/config'
 import { AppVersion, SignerSummary } from '../signers/Signer'
