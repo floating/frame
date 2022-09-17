@@ -59,9 +59,7 @@ export default function (eth: EthereumProvider) {
       const rawBalance = await eth.request({
         method: 'eth_getBalance',
         params: [address, 'latest'],
-        chainId: addHexPrefix(chainId.toString(16)),
-        jsonrpc: '2.0',
-        id: chainId
+        chainId: addHexPrefix(chainId.toString(16))
       })
 
       // TODO: do all coins have 18 decimals?
@@ -77,8 +75,6 @@ export default function (eth: EthereumProvider) {
 
     const response = await eth.request({
       method: 'eth_call',
-      jsonrpc: '2.0',
-      id: id += 1,
       chainId: addHexPrefix(token.chainId.toString(16)),
       params: [{ to: token.address, value: '0x0', data: functionData }, 'latest']
     })
