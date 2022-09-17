@@ -61,7 +61,7 @@
   "dependencies": {
     "@aragon/wrapper": "5.5.3",
     "@ethereumjs/common": "3.0.0",
-    "@ethereumjs/tx": "4.0.0",
+    "@ethereumjs/tx": "3.5.2",
     "@ethersproject/contracts": "5.7.0",
     "@ethersproject/providers": "5.7.1",
     "@framelabs/pylon-client": "0.0.8",
