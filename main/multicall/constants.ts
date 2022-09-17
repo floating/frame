@@ -1,4 +1,4 @@
-import type { EthereumProvider } from 'eth-provider'
+import type EthereumProvider from 'ethereum-provider'
 
 export enum MulticallVersion {
   V1 = 1, V2 = 2

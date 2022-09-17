@@ -6,9 +6,10 @@ import log from 'electron-log'
 
 import multicall, { Call, supportsChain as multicallSupportsChain } from '../../multicall'
 import erc20TokenAbi from './erc-20-abi'
-
 import { groupByChain, TokensByChain } from './reducers'
-import type { EthereumProvider } from 'eth-provider'
+
+import type { BytesLike } from '@ethersproject/bytes'
+import type EthereumProvider from 'ethereum-provider'
 
 let id = 1
 const erc20Interface = new Interface(erc20TokenAbi)
@@ -64,7 +65,7 @@ export default function (eth: EthereumProvider) {
       })
 
       // TODO: do all coins have 18 decimals?
-      return { ...createBalance(rawBalance, 18), chainId }
+      return { ...createBalance(rawBalance as string, 18), chainId }
     } catch (e) {
       log.error(`error loading native currency balance for chain id: ${chainId}`, e)
       return { balance: '0x0', displayValue: '0.0', chainId }
@@ -82,7 +83,7 @@ export default function (eth: EthereumProvider) {
       params: [{ to: token.address, value: '0x0', data: functionData }, 'latest']
     })
 
-    const result = erc20Interface.decodeFunctionResult('balanceOf', response)
+    const result = erc20Interface.decodeFunctionResult('balanceOf', response as BytesLike)
 
     return result.balance.toHexString()
   }

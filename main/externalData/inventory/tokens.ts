@@ -1,10 +1,11 @@
 import log from 'electron-log'
 
 import ethProvider from 'eth-provider'
+import EthereumProvider from 'ethereum-provider'
+import sushiswapTokenList from '@sushiswap/default-token-list'
 
 import nebulaApi from '../../nebula'
 import defaultTokenList from './default-tokens.json'
-import sushiswapTokenList from '@sushiswap/default-token-list'
 
 const TOKENS_ENS_DOMAIN = 'tokens.frame.eth'
 
@@ -41,7 +42,7 @@ export default class TokenLoader {
   private tokenList: Token[] = []
   private nextLoad?: NodeJS.Timeout | null
 
-  private readonly eth = ethProvider('frame', { origin: 'frame-internal', name: 'tokenLoader' })
+  private readonly eth = ethProvider('frame', { origin: 'frame-internal', name: 'tokenLoader' }) as EthereumProvider
   private readonly nebula = nebulaApi(this.eth)
 
   constructor () {
