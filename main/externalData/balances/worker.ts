@@ -1,5 +1,6 @@
 import log from 'electron-log'
 
+import EthereumProvider from 'ethereum-provider'
 import ethProvider from 'eth-provider'
 
 log.transports.console.format = '[scanWorker] {h}:{i}:{s}.{ms} {text}'
@@ -18,10 +19,10 @@ interface ExternalDataWorkerMessage {
 let heartbeat: NodeJS.Timeout
 let balances: BalanceLoader
 
-const eth = ethProvider('frame', { origin: 'frame-internal', name: 'scanWorker' })
+const eth = ethProvider('frame', { origin: 'frame-internal', name: 'scanWorker' }) as EthereumProvider
 const tokenLoader = new TokenLoader()
 
-eth.on('error', (e: Error) => {
+eth.on('error', (e) => {
   log.error('Error in balances worker', e)
   disconnect()
 })
@@ -36,7 +37,7 @@ eth.on('connect', async () => {
 
 async function getChains () {
   try {
-    const chains: string[] = await eth.request({ method: 'wallet_getChains' })
+    const chains = await eth.request({ method: 'wallet_getChains', params: [], jsonrpc: '2.0', id: 1 }) as string[]
     return chains.map(chain => parseInt(chain))
   } catch (e) {
     log.error('could not load chains', e)
