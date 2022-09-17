@@ -1,6 +1,7 @@
 import React from 'react'
 import Restore from 'react-restore'
 import link from '../../../../../../resources/link'
+import svg from '../../../../../../resources/svg'
 
 class Verify extends React.Component {
   constructor (...args) {
@@ -43,12 +44,12 @@ class Verify extends React.Component {
           </>
         ) : (
           <>
-            <div className='panelBlockButton panelBlockItem' onMouseDown={() => this.verifyAddress()}>
-              {signerKind === 'hot' ? 'Verify Address' : 'Verify Address on Device'}
+            <div className='moduleItem moduleItemButton' onMouseDown={() => this.verifyAddress()}>
+              {svg.doubleCheck(20)}
             </div>
             {this.state.verifyAddressResponse ? (
               <div 
-                className={'panelBlockValue panelBlockItem cardShow'}
+                className={'moduleItem cardShow'}
                 style={{
                   color: this.state.verifyAddressSuccess ? 'var(--good)' : 'var(--bad)'
                 }}

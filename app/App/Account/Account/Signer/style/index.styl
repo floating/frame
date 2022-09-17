@@ -11,7 +11,7 @@
 
 .moduleItem
   position relative
-  justify-content space-between
+  justify-content center
   padding 8px
   font-size 12px
   font-weight 300
@@ -22,10 +22,14 @@
   margin 3px
   border-radius 8px
   display flex
-  justify-content space-between
   align-items center
-  padding 16px
+  padding 8px 16px
+  min-height 40px
+  box-sizing border-box
   text-transform uppercase
+
+  // .moduleSubItem
+  //   background blue
 
   .moduleItemSignerType
     display flex
@@ -37,3 +41,13 @@
 
   .moduleItemIcon
     margin-right 12px
+
+.moduleItemButton:hover
+  background var(--ghostB)
+  cursor pointer
+  * 
+    pointer-events none
+
+.moduleItemSpace
+  justify-content space-between
+  padding 24px

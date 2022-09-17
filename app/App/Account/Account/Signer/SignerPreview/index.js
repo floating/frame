@@ -3,8 +3,14 @@ import Restore from 'react-restore'
 import link from '../../../../../../resources/link'
 import svg from '../../../../../../resources/svg'
 
-function isHardwareSigner (account = {}) {
+import Verify from '../Verify'
+
+const isHardwareSigner = (account = {}) => {
   return ['ledger', 'lattice', 'trezor'].includes(account.lastSignerType)
+}
+
+const isWatchOnly = (account = {}) => {
+  return ['address'].includes(account.lastSignerType.toLowerCase())
 }
 
 class Signer extends React.Component {
@@ -33,48 +39,49 @@ class Signer extends React.Component {
       return (
         <div className='moduleItemSignerType'>
           <div className='moduleItemIcon'>{svg.lattice(18)}</div>
-          <div>{'GridPlus Lattice1'}</div>
+          <div>{'GridPlus'}</div>
         </div>
       )
     } else if (type === 'ledger') {
       return (
         <div className='moduleItemSignerType'>
           <div className='moduleItemIcon'>{svg.ledger(16)}</div>
-          <div>{'Ledger Device'}</div>
+          <div>{'Ledger'}</div>
         </div>
       )
     } else if (type === 'trezor') {
       return (
         <div className='moduleItemSignerType'>
           <div className='moduleItemIcon'>{svg.trezor(15)}</div>
-          <div>{'Trezor Device'}</div>
+          <div>{'Trezor'}</div>
         </div>
       )
     } else if (type === 'aragon') {
       return (
         <div className='moduleItemSignerType'>
           <div className='moduleItemIcon'>{svg.aragon(26)}</div>
-          <div>{'Agent Actor'}</div>
+          <div>{'Aragon Agent'}</div>
         </div>
       )
     } else if (type === 'seed') {
       return (
         <div className='moduleItemSignerType'>
           <div className='moduleItemIcon'>{svg.seedling(16)}</div>
-          <div>{'Seed Signer'}</div>
+          <div>{'Seed'}</div>
         </div>
       )
     } else if (type === 'keyring') {
       return (
         <div className='moduleItemSignerType'>
           <div className='moduleItemIcon'>{svg.key(17)}</div>
-          <div>{'Keyring Signer'}</div>
+          <div>{'Keyring'}</div>
         </div>
       )
     } else {
       return (
         <div className='moduleItemSignerType'>
-          <div>{'No Signer, watch-only'}</div>
+          <div className='moduleItemIcon'>{svg.mask(20)}</div>
+          <div>{'Watch-only'}</div>
         </div>
       )
     }
@@ -93,6 +100,7 @@ class Signer extends React.Component {
     }
 
     const hardwareSigner = isHardwareSigner(activeAccount)
+    const watchOnly = isWatchOnly(activeAccount)
     const status = (signer && signer.status) || (hardwareSigner ? 'Disconnected' : 'No Signer')
 
     return (
@@ -105,12 +113,14 @@ class Signer extends React.Component {
           <span>{'Signer'}</span>
         </div>
         <div className='moduleMainPermissions'>
-          <div className='moduleItem'>
+          <div className='moduleItem moduleItemSpace moduleItemButton'>
             {this.renderSignerType(activeAccount.lastSignerType)}
-            <div className=''>{status}</div>
+            <div>{status}</div>
           </div>
-          {!hardwareSigner ? (
-            <div className='moduleItem'>{status === 'locked' ? 'Unlock' : 'Lock'}</div>
+          {!watchOnly ? (
+            <Verify 
+              id={this.props.account}
+            />
           ) : null}
         </div>
       </div>

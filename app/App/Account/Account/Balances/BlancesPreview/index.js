@@ -117,7 +117,7 @@ class BalancesPreview extends React.Component {
           <span>{svg.tokens(13)}</span>
           <span>{'Balances'}</span>
         </div>
-        {scanning ? (
+        {balances.length && scanning === 0 ? (
           <div className='signerBalancesLoading'>
             <div className='loader' />
           </div>

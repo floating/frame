@@ -250,7 +250,7 @@
         z-index 300000
         border-radius 13px
         width 48px
-        background var(--ghostB)
+        background var(--ghostA)
         display flex
         justify-content center
         align-items center
@@ -392,7 +392,7 @@
           height 38px
 
         svg
-          color var(--ghostE)
+          color var(--ghostD)
           filter drop-shadow(0px 10px 0px 0px var(--thick)) 
 
         .trezorImage
@@ -639,26 +639,39 @@
           svg
             transition var(--standardSlow)
 
+  .signerTop:hover
+    background var(--ghostB)
+
+  // .signerTopActive:hover
+  //   background var(--ghostA)
+
+  .okSigner
+    .signerTop:hover
+      background var(--ghostA)
+
   .signerTopActive
     .signerSelect
       pointer-events auto !important
-    .transactionToAddressLargeWrap
-      pointer-events auto !important
+    // .transactionToAddressLargeWrap
+    //   pointer-events auto !important
 
-    .transactionToAddressLarge, .transactionToAddressFull
-      cursor pointer !important
+    // .transactionToAddressLarge, .transactionToAddressFull
+    //   cursor pointer !important
 
-    .transactionToAddressFullHidden
-      pointer-events none !important
+    // .transactionToAddressFullHidden
+    //   pointer-events none !important
 
-    .signerType
-      cursor pointer
-      pointer-events auto
-    .signerSelectIconWrap
-      cursor pointer
-    .signerTypeHot:hover
-      cursor pointer
-      color var(--moon)
+    // .signerType
+    //   cursor pointer
+    //   pointer-events auto
+    // .signerSelectIconWrap
+    //   cursor pointer
+    // .signerTypeHot:hover
+    //   cursor pointer
+    //   color var(--moon)
+
+  // .signerActive:hover
+  //   background var(--ghostZ) !important
 
   .accountListWrap
     position absolute
@@ -1114,7 +1127,7 @@
   color var(--good)
 
 .moduleButtonLocked
-  color var(--ghostG)
+  color var(--ghostD)
 
 .moduleButtonLocked:hover
   background var(--ghostB)

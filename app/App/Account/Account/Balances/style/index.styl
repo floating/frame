@@ -1,3 +1,9 @@
+@keyframes moveGradient
+  0%
+    background-position 0%
+  100%
+    background-position -300%
+
 .balancesBlock
   margin-bottom 60px
   box-sizing border-box
@@ -129,15 +135,16 @@
 
 .signerBalancesLoading
   position absolute
-  top 38px
-  left 5px
-  right 5px
-  bottom 0px
+  top 46px
+  left 9px
+  right 9px
+  bottom 78px
   z-index 200
-  border-radius 11px
+  border-radius 17px
   display flex
   justify-content center
   align-items center
+  background var(--ghostA)
 
   .loader, .loader:after
     border-radius 100%
@@ -151,9 +158,9 @@
     border-top 3px solid var(--ghostZ)
     border-right 3px solid var(--ghostZ)
     border-bottom 3px solid var(--ghostZ)
-    border-left 3px solid var(--ghostE)
+    border-left 3px solid var(--ghostD)
     transform translateZ(0)
-    animation load8 0.4s infinite linear !important
+    animation load8 0.6s infinite linear !important
 
 .signerBalance
   position relative
@@ -164,11 +171,24 @@
   border-radius 8px
   margin-top 3px
   font-family 'MainFont'
+  overflow hidden
+
+  .signerBalanceLoading
+    position absolute
+    top 0
+    right 0
+    bottom 0
+    left 0
+    background linear-gradient(90deg, var(--ghostB0) 36%, var(--ghostB) 48%, var(--ghostB) 52%, var(--ghostB0) 64%)
+    background-size 400% 100%
+    background-position 0%
+    animation moveGradient 6s infinite linear
+    transition var(--standardFast)
 
   .signerBalanceInner
     position relative
     height 100%
-    transition var(--standard)
+    transition var(--standardSlow)
 
   .signerBalanceIcon
     position absolute
@@ -276,7 +296,7 @@
       border-radius 13px
       position absolute
       background var(--outerspace)
-      color var(--ghostF)
+      color var(--ghostD)
       display flex
       justify-content center
       align-items center

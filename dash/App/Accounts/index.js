@@ -197,15 +197,11 @@ class Dash extends React.Component {
         /> 
        ) : (
         <div className='cardShow'>
-          <div className='newAccount' onClick={() => link.send('tray:action', 'navDash', { view: 'accounts', data: { showAddAccounts: true } })}>
-            <div className='newAccountIcon'>{svg.plus(16)}</div> 
-            Add New Account
-          </div>
           <div className='signers'>
             <div className='signersMid'>
-              <div className='signersHeader'>
+              {/* <div className='signersHeader'>
                 Your Hardware Signers
-              </div>
+              </div> */}
               <div className='signersList'>
                 {hardwareSigners.length ? (
                   hardwareSigners
@@ -217,9 +213,9 @@ class Dash extends React.Component {
                   </div>
                 )}
               </div>
-              <div className='signersHeader'>
+              {/* <div className='signersHeader'>
                 Your Hot Signers
-              </div>
+              </div> */}
               <div className='signersList'>
                 {hotSigners.length ? (
                   hotSigners.map((signer, index) => <Signer index={index} key={signer.id} {...signer} />)
@@ -230,6 +226,10 @@ class Dash extends React.Component {
                 )}
               </div>
             </div>
+          </div>
+          <div className='newAccount' onClick={() => link.send('tray:action', 'navDash', { view: 'accounts', data: { showAddAccounts: true } })}>
+            <div className='newAccountIcon'>{svg.plus(16)}</div> 
+            Add New Account
           </div>
         </div>
       )

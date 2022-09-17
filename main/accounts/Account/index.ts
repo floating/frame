@@ -456,8 +456,8 @@ class FrameAccount {
           cb(new Error('Could not find address in signer'))
         }
       } else {
-        log.info('No signer active to verify address')
-        cb(new Error('No signer active to verify address'))
+        log.info('Signer not accessible to verify address')
+        cb(new Error('Signer not accessible to verify address'))
       }
     }
   }
