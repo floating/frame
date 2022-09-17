@@ -37,7 +37,7 @@ eth.on('connect', async () => {
 
 async function getChains () {
   try {
-    const chains = await eth.request({ method: 'wallet_getChains', params: [], jsonrpc: '2.0', id: 1 }) as string[]
+    const chains = await eth.request({ method: 'wallet_getChains', params: [] }) as string[]
     return chains.map(chain => parseInt(chain))
   } catch (e) {
     log.error('could not load chains', e)

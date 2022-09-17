@@ -34,8 +34,6 @@ async function makeCall (functionName: string, params: any[], config: MulticallC
   const data = multicallInterface.encodeFunctionData(functionName, params)
 
   const response = await config.provider.request({
-    id: 1,
-    jsonrpc: '2.0',
     method: 'eth_call',
     params: [
       { to: config.address, data }, 'latest'
