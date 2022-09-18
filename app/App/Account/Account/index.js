@@ -136,6 +136,7 @@ class _AccountModule extends React.Component {
         </div>
       )
     }
+  }
 }
 
 const AccountModule = Restore.connect(_AccountModule)
