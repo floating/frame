@@ -1,7 +1,7 @@
 import React from 'react'
 import Restore from 'react-restore'
-import link from '../../../../../resources/link'
-import svg from '../../../../../resources/svg'
+import link from '../../../../resources/link'
+import svg from '../../../../resources/svg'
 
 function isHardwareSigner (type = '') {
   return ['ledger', 'trezor', 'lattice'].includes(type.toLowerCase())
@@ -69,18 +69,18 @@ class SignerStatus extends React.Component {
     )
   }
 
-  componentDidMount () {
-    setTimeout(() => {
-      document.addEventListener('mousedown', (e) => {
-        if (this.props.open && this.statusRef && this.statusRef.current && !this.statusRef.current.contains(e.target)) {
-          this.props.setSignerStatusOpen(false)
-        }
-      })
-      if (this.inputRef.current) {
-        this.inputRef.current.focus()
-      }
-    }, 100)
-  }
+  // componentDidMount () {
+  //   setTimeout(() => {
+  //     document.addEventListener('mousedown', (e) => {
+  //       if (this.props.open && this.statusRef && this.statusRef.current && !this.statusRef.current.contains(e.target)) {
+  //         this.props.setSignerStatusOpen(false)
+  //       }
+  //     })
+  //     if (this.inputRef.current) {
+  //       this.inputRef.current.focus()
+  //     }
+  //   }, 100)
+  // }
 
   render () {
     const { shake } = this.state
@@ -96,7 +96,6 @@ class SignerStatus extends React.Component {
           </div>
           <div className='signerStatusMain'>
             <div className='signerUnlockWrap'>
-              <div className='signerUnlockHeader'>The signer for this account is locked</div>
               <input ref={this.inputRef} className='signerUnlockInput' type='password' value={this.state.unlockInput} onChange={this.unlockChange.bind(this)} onKeyDown={e => {
                 if (e.key === 'Enter') {
                   e.preventDefault()

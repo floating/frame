@@ -1,8 +1,11 @@
 import React from 'react'
 import Restore from 'react-restore'
 
-import link from '../../../../resources/link'
-import svg from '../../../../resources/svg'
+import link from '../../../resources/link'
+import svg from '../../../resources/svg'
+
+import SignerStatus from './SignerStatus'
+
 
 function isHardwareSigner (type = '') {
   return ['ledger', 'trezor', 'lattice'].includes(type.toLowerCase())
@@ -240,7 +243,7 @@ class Signer extends React.Component {
     )
   }
 
-  render () {
+  renderPreview () {
     const signer = this.store('main.signers', this.props.id)
     const { page, addressLimit } = this.state
     const startIndex = page * addressLimit
@@ -266,7 +269,7 @@ class Signer extends React.Component {
     if (isLocked) signerClass += ' signerLocked'
 
     return (
-      <div className={signerClass} style={{ zIndex: 1000 - this.props.index }}>
+      <div className={signerClass + ' cardShow'} style={{ zIndex: 1000 - this.props.index }}>
         <div className='signerTop'>
           <div className='signerIcon'>
           {(_ => {
@@ -279,14 +282,24 @@ class Signer extends React.Component {
             return <div className='signerIconWrap'>{svg.logo(20)}</div>
           })()}
           </div>
-          <div className='signerType' style={this.props.inSetup ? {top: '21px'} : {top: '24px'}}>{this.props.model}</div>
+          {/* <div className='signerType' style={this.props.inSetup ? {top: '21px'} : {top: '24px'}}>{this.props.model}</div> */}
           <div className='signerName'>
             {this.props.name}
-            <div className='signerNameUpdate'>
+            {/* <div className='signerNameUpdate'>
               {svg.save(14)}
-            </div>
+            </div> */}
           </div>
-          {this.status()}
+          <div className='signerExpand' onClick={() => {
+            const crumb = {
+              view: 'expandedSigner', 
+              data: { signer: signer.id }
+            }
+            // link.send('nav:forward', 'dash', crumb)
+            link.send('tray:action', 'navDash', crumb)
+          }}>
+            {svg.open(16)}
+          </div>
+          {/* {this.status()} */}
         </div>
         {this.statusText()}
         {this.props.type === 'lattice' && status === 'pair' ? (
@@ -317,6 +330,157 @@ class Signer extends React.Component {
             </div> */}
             <div className='signerAccounts'>{signer.addresses.slice(startIndex, startIndex + addressLimit).map((address, index) => {
               const added = this.store('main.accounts', address.toLowerCase())
+              if (!added) return null
+              return (
+                <div key={address} className={!added ?  'signerAccount' : 'signerAccount'} onClick={() => {
+                  if (this.store('main.accounts', address.toLowerCase())) {
+                    link.rpc('removeAccount', address, {}, () => { })
+                  } else {
+                    link.rpc('createAccount', address, { type: signer.type }, (e) => {
+                      if (e) console.error(e)
+                    })
+                  }
+                }}>
+                  <div className='signerAccountIndex'>{index + 1 + startIndex}</div>
+                  <div className='signerAccountAddress'>{address.substr(0, 11)} {svg.octicon('kebab-horizontal', { height: 20 })} {address.substr(address.length - 10)}</div>
+                  <div className='signerAccountCheck' />
+                </div>
+              )
+            })}</div>
+            <div className='signerBottom'>
+              <div className='signerBottomPageBack' onMouseDown={() => this.nextPage(true)}>{svg.triangleLeft(20)}</div>
+              <div className='signerBottomPages'>{(page + 1) + ' / ' + Math.ceil(signer.addresses.length / addressLimit)}</div>
+              <div className='signerBottomPageNext' onMouseDown={() => this.nextPage()}>{svg.triangleLeft(20)}</div>
+            </div>
+          </>
+        ) : this.props.type === 'trezor' && (status === 'need pin' || status === 'enter passphrase') ? (
+          <div className='signerInterface'>
+            {this.renderTrezorPin(this.props.type === 'trezor' && status === 'need pin')}
+            {this.renderTrezorPhrase(this.props.type === 'trezor' && status === 'enter passphrase')}
+          </div> 
+        ) : loading ? (
+          <div className='signerLoading'>
+            <div className='signerLoadingLoader' />
+          </div>
+        ): <></>}
+        {/* {disconnected || this.props.inSetup ? null : (
+          <div className='signerDrawer'>
+            <div className='showControls' onMouseDown={() => this.setState({ showControls: !this.state.showControls })}>
+              {this.state.showControls ? 'hide' : 'more'}
+            </div>
+            <div className='showControlsLine' />
+          </div>
+        )} */}
+        {/* {this.state.showControls || disconnected ? (
+          <div className='signerControls'>
+            {!!permissionId ? (
+              <div className='signerControlDetail'>
+                <div className='signerControlDetailKey'>
+                  {'PERMISSION ID:'}
+                </div>
+                <div className='signerControlDetailValue'>
+                  {permissionId}
+                </div>
+              </div>
+            ) : null}
+            {canReconnect ? this.reconnectButton(hwSigner) : null}
+            <div className='signerControlOption signerControlOptionImportant' onMouseDown={() => {
+              link.send('dash:removeSigner', this.props.id)
+            }}>Remove Signer</div>
+            </div>
+        ) : null} */}
+      </div>
+    )
+  }
+
+  renderSignerStatus () {
+    // const current = (this.store('selected.current') === this.props.id) && this.props.status === 'ok'
+    // const open = current && this.store('selected.open')
+
+    // const signerStatusOpen = current && this.store('selected.signerStatusOpen')
+
+    // const signer = this.store('main.signers', this.props.id)
+
+    // const account = this.store('main.accounts', this.props.id)
+    // let signer
+
+    // if (account.signer) {
+    //   signer = this.store('main.signers', account.signer)
+    // } else if (account.smart)  {
+    //   const actingSigner = this.store('main.accounts', account.smart.actor, 'signer')
+    //   if (actingSigner) signer = this.store('main.signers', actingSigner)
+    // }
+    // if (!signerStatusOpen || !open) return null
+
+    const signer = this.store('main.signers', this.props.id)
+
+    return (
+      <SignerStatus 
+        signer={signer}
+      />
+    )
+  }
+
+  
+
+  renderExpanded () {
+    const signer = this.store('main.signers', this.props.id)
+    const { page, addressLimit } = this.state
+    const startIndex = page * addressLimit
+
+    const status = this.getStatus()
+
+    const hwSigner = isHardwareSigner(this.props.type)
+    const loading = isLoading(status)
+    const disconnected = isDisconnected(this.props.type, status, loading)
+
+    // TODO: create well-defined signer states that drive these UI features
+    const canReconnect =
+      (this.props.type !== 'trezor' || status === 'disconnected' || status.includes('reconnect'))
+
+    // UI changes for this status only apply to hot signers
+    const isLocked = !hwSigner && status === 'locked'
+    const permissionId = (this.props.tag || this.props.tag === '')
+      ? 'Frame' + (this.props.tag ? `-${this.props.tag}` : '')
+      : undefined
+
+    let signerClass = 'signer'
+    if (status === 'ok') signerClass += ' signerOk'
+    if (isLocked) signerClass += ' signerLocked'
+
+    return (
+      <div className={signerClass} style={{ zIndex: 1000 - this.props.index }}>
+        {this.statusText()}
+        {this.props.type === 'lattice' && status === 'pair' ? (
+          <div className='signerLatticePair'>
+            <div className='signerLatticePairTitle'>Please input your Lattice's pairing code</div>
+            <div className='signerLatticePairInput'>
+              <input
+                autoFocus
+                tabIndex='1' value={this.state.latticePairCode}
+                onChange={e => this.setState({ latticePairCode: (e.target.value || '').toUpperCase() })}
+                onKeyPress={e => {
+                  if (e.key === 'Enter') this.pairToLattice()
+                }}
+              />
+            </div>
+            <div
+              onMouseDown={() => this.pairToLattice()}
+              className='signerLatticePairSubmit'
+            >Pair</div>
+          </div>
+        ) : status === 'ok' || isLocked ? (
+          <>
+            {this.renderSignerStatus()}
+            {/* <div className='signerAccountsTitle'>
+              <span className={activeAccounts.length > 0 ? 'signerAccountsTitleActive signerAccountsTitleActiveOn' : 'signerAccountsTitleActive'}>
+                <span>{'active accounts'}</span> 
+                <span className='signerAccountsTitleActiveCount'>{activeAccounts.length}</span> 
+              </span>
+            </div> */}
+            <div className='signerAccounts'>{signer.addresses.slice(startIndex, startIndex + addressLimit).map((address, index) => {
+              const added = this.store('main.accounts', address.toLowerCase())
+
               return (
                 <div key={address} className={!added ?  'signerAccount' : 'signerAccount signerAccountAdded'} onClick={() => {
                   if (this.store('main.accounts', address.toLowerCase())) {
@@ -349,34 +513,33 @@ class Signer extends React.Component {
             <div className='signerLoadingLoader' />
           </div>
         ): <></>}
-        {disconnected || this.props.inSetup ? null : (
-          <div className='signerDrawer'>
-            <div className='showControls' onMouseDown={() => this.setState({ showControls: !this.state.showControls })}>
-              {this.state.showControls ? 'hide' : 'more'}
-            </div>
-            <div className='showControlsLine' />
-          </div>
-        )}
-        {this.state.showControls || disconnected ? (
-          <div className='signerControls'>
-            {!!permissionId ? (
-              <div className='signerControlDetail'>
-                <div className='signerControlDetailKey'>
-                  {'PERMISSION ID:'}
-                </div>
-                <div className='signerControlDetailValue'>
-                  {permissionId}
-                </div>
+        <div className='signerControls'>
+          {!!permissionId ? (
+            <div className='signerControlDetail'>
+              <div className='signerControlDetailKey'>
+                {'PERMISSION ID:'}
               </div>
-            ) : null}
-            {canReconnect ? this.reconnectButton(hwSigner) : null}
-            <div className='signerControlOption signerControlOptionImportant' onMouseDown={() => {
-              link.send('dash:removeSigner', this.props.id)
-            }}>Remove Signer</div>
+              <div className='signerControlDetailValue'>
+                {permissionId}
+              </div>
             </div>
-        ) : null}
+          ) : null}
+          {canReconnect ? this.reconnectButton(hwSigner) : null}
+          <div className='signerControlOption signerControlOptionImportant' onMouseDown={() => {
+            link.send('dash:removeSigner', this.props.id)
+          }}>Remove Signer</div>
+        </div>
       </div>
     )
+  }
+
+  render () {
+    const { expanded } = this.props
+    if (expanded) {
+      return this.renderExpanded()
+    } else {
+      return this.renderPreview()
+    }
   }
 }
 

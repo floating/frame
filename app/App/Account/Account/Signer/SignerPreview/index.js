@@ -113,7 +113,16 @@ class Signer extends React.Component {
           <span>{'Signer'}</span>
         </div>
         <div className='moduleMainPermissions'>
-          <div className='moduleItem moduleItemSpace moduleItemButton'>
+          <div 
+            className='moduleItem moduleItemSpace moduleItemButton' 
+            onClick={() => {
+              const crumb = {
+                view: 'expandedSigner', 
+                data: { signer: signer.id }
+              }
+              // link.send('nav:forward', 'dash', crumb)
+              link.send('tray:action', 'navDash', crumb)
+          }}>
             {this.renderSignerType(activeAccount.lastSignerType)}
             <div>{status}</div>
           </div>
