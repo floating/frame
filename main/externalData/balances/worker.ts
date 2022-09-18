@@ -19,7 +19,7 @@ interface ExternalDataWorkerMessage {
 let heartbeat: NodeJS.Timeout
 let balances: BalanceLoader
 
-const eth = ethProvider('frame', { origin: 'frame-internal', name: 'scanWorker' }) as EthereumProvider
+const eth = ethProvider('frame', { origin: 'frame-internal', name: 'scanWorker' })
 const tokenLoader = new TokenLoader()
 
 eth.on('error', (e) => {
