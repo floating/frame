@@ -4,6 +4,8 @@
   overflow hidden
   box-sizing border-box
   margin 6px 0px 24px 0px
+  // padding 16px 0px
+  padding-bottom 24px
   border-radius 27px
   background var(--ghostA)
   box-shadow 0px 4px 8px var(--ghostY)
@@ -11,53 +13,75 @@
 
   .signerTop
     position relative
-    height 62px
-
-  .signerIcon
-    position absolute
-    top 20px
-    left 18px
-
-  .signerName
-    position absolute
-    top 17px
-    left 44px
-    height 28px
-    padding 0px 7px
-    border-radius 8px
-    font-size 18px
-    font-weight 300
     display flex
+    justify-content space-between
     align-items center
-    box-sizing border-box
-    font-family 'MainFont'
-    text-transform capitalize
-    letter-spacing 0px
-    font-size 16px
-    font-weight 400
+    padding 16px
+    
+    // height 50px
 
-    .signerNameUpdate
-      position absolute
-      width 28px
+  // .signerIcon
+  //   position absolute
+  //   top 20px
+  //   left 18px
+
+  .signerDetails
+    display flex
+    justify-content center
+    align-items center
+
+    .signerName
+      // position absolute
+      // top 17px
+      // left 44px
       height 28px
-      right -34px
-      color var(--good)
+      padding-left 14px
+      border-radius 8px
+      font-size 18px
+      font-weight 300
       display flex
       align-items center
-      cursor pointer
-      pointer-events none
-      opacity 0
-      *
+      box-sizing border-box
+      font-family 'MainFont'
+      text-transform capitalize
+      letter-spacing 0px
+      font-size 16px
+      font-weight 400
+
+      .signerNameUpdate
+        position absolute
+        width 28px
+        height 28px
+        right -34px
+        color var(--good)
+        display flex
+        align-items center
+        cursor pointer
         pointer-events none
+        opacity 0
+        *
+          pointer-events none
 
   .signerExpand
-    position absolute
-    top 22px
-    right 22px
-    height 28px
+    // position absolute
+    // top 16px
+    // right 6px
+    height 32px
+    width 64px
+    border-radius 20px
+    box-sizing border-box
+    background var(--ghostA)
+    border 3px solid var(--ghostZ)
     cursor pointer
+    display flex
+    justify-content center
+    align-items center
+
     *
       pointer-events none
+
+  .signerExpand:hover
+    background var(--ghostB)
 
   .signerNameFocused
     background var(--ghostZ)
@@ -108,7 +132,7 @@
 
   .signerStatusText
     padding 16px 32px
-    margin 0px 6px 16px 6px
+    margin 0px 6px 6px 6px
     border-radius 20px
     font-size 12px
     text-transform uppercase
@@ -388,7 +412,7 @@
     // bottom 30px
     // right 8px
     // left 8px
-    margin 0px 6px
+    margin 7px 6px
     // padding 8px
     text-align center
     
@@ -469,8 +493,11 @@
         background var(--outerspace)
 
     .signerAccountAdded
-      // background var(--good)
-      color var(--good)
+      background var(--ghostB)
+      // color var(--good)
+
+      .signerAccountIndex
+        color var(--good)
 
       .signerAccountCheck
         // rcolor var(--good)
@@ -478,6 +505,9 @@
 
     .signerAccount:hover
       background var(--ghostB)
+
+    .signerAccountAdded:hover
+      background var(--ghostC)
 
 .signerOk
   .signerAccounts
@@ -683,5 +713,16 @@
 
   .expandedSignerIcon
     margin-right 12px
+
+.signerAddedAccountTitle
+  display flex
+  justify-content center
+  align-items center
+  text-transform uppercase
+  font-size 9px
+  margin 2px 0px 4px 0px
+  font-weight 500
+  letter-spacing 1px
+  padding-top 8px
 
 @import '../SignerStatus/style'

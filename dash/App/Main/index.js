@@ -235,12 +235,12 @@ class Settings extends React.Component {
               >
                 {svg.firefox(28)}
               </div>
-              <div 
+              {/* <div 
                 className='snipItBrowserExtensionIcon snipItBrowserExtensionIconSafari'
                 onClick={() => link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'openExternal', notifyData: { url: 'https://addons.mozilla.org/en-US/firefox/addon/frame-extension' } }})}
               >
                 {svg.safari(28)}
-              </div>
+              </div> */}
             </div>
             <div>Inject a connection with our browser extension!</div>
           </div>

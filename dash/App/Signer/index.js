@@ -268,26 +268,32 @@ class Signer extends React.Component {
     if (status === 'ok') signerClass += ' signerOk'
     if (isLocked) signerClass += ' signerLocked'
 
+    const addedAccounts = signer.addresses.filter(address => {
+      return Boolean(this.store('main.accounts', address.toLowerCase()))
+    })
+
     return (
       <div className={signerClass + ' cardShow'} style={{ zIndex: 1000 - this.props.index }}>
         <div className='signerTop'>
-          <div className='signerIcon'>
-          {(_ => {
-            const type = this.props.type
-            if (type === 'ledger') return <div className='signerIconWrap signerIconHardware'>{svg.ledger(20)}</div>
-            if (type === 'trezor') return <div className='signerIconWrap signerIconHardware'>{svg.trezor(20)}</div>
-            if (type === 'seed' || type === 'ring') return <div className='signerIconWrap signerIconHot'>{svg.flame(23)}</div>
-            if (type === 'aragon') return <div className='signerIconWrap signerIconSmart'>{svg.aragon(28)}</div>
-            if (type === 'lattice') return <div className='signerIconWrap signerIconSmart'>{svg.lattice(22)}</div>
-            return <div className='signerIconWrap'>{svg.logo(20)}</div>
-          })()}
-          </div>
-          {/* <div className='signerType' style={this.props.inSetup ? {top: '21px'} : {top: '24px'}}>{this.props.model}</div> */}
-          <div className='signerName'>
-            {this.props.name}
-            {/* <div className='signerNameUpdate'>
-              {svg.save(14)}
-            </div> */}
+          <div className='signerDetails'>
+            <div className='signerIcon'>
+            {(_ => {
+              const type = this.props.type
+              if (type === 'ledger') return <div className='signerIconWrap signerIconHardware'>{svg.ledger(20)}</div>
+              if (type === 'trezor') return <div className='signerIconWrap signerIconHardware'>{svg.trezor(20)}</div>
+              if (type === 'seed' || type === 'ring') return <div className='signerIconWrap signerIconHot'>{svg.flame(23)}</div>
+              if (type === 'aragon') return <div className='signerIconWrap signerIconSmart'>{svg.aragon(28)}</div>
+              if (type === 'lattice') return <div className='signerIconWrap signerIconSmart'>{svg.lattice(22)}</div>
+              return <div className='signerIconWrap'>{svg.logo(20)}</div>
+            })()}
+            </div>
+            {/* <div className='signerType' style={this.props.inSetup ? {top: '21px'} : {top: '24px'}}>{this.props.model}</div> */}
+            <div className='signerName'>
+              {this.props.name}
+              {/* <div className='signerNameUpdate'>
+                {svg.save(14)}
+              </div> */}
+            </div>
           </div>
           <div className='signerExpand' onClick={() => {
             const crumb = {
@@ -297,67 +303,35 @@ class Signer extends React.Component {
             // link.send('nav:forward', 'dash', crumb)
             link.send('tray:action', 'navDash', crumb)
           }}>
-            {svg.open(16)}
+            {svg.open(14)}
           </div>
           {/* {this.status()} */}
         </div>
         {this.statusText()}
-        {this.props.type === 'lattice' && status === 'pair' ? (
-          <div className='signerLatticePair'>
-            <div className='signerLatticePairTitle'>Please input your Lattice's pairing code</div>
-            <div className='signerLatticePairInput'>
-              <input
-                autoFocus
-                tabIndex='1' value={this.state.latticePairCode}
-                onChange={e => this.setState({ latticePairCode: (e.target.value || '').toUpperCase() })}
-                onKeyPress={e => {
-                  if (e.key === 'Enter') this.pairToLattice()
-                }}
-              />
-            </div>
-            <div
-              onMouseDown={() => this.pairToLattice()}
-              className='signerLatticePairSubmit'
-            >Pair</div>
-          </div>
-        ) : status === 'ok' || isLocked ? (
+        {status === 'ok' || isLocked ? (
           <>
-            {/* <div className='signerAccountsTitle'>
-              <span className={activeAccounts.length > 0 ? 'signerAccountsTitleActive signerAccountsTitleActiveOn' : 'signerAccountsTitleActive'}>
-                <span>{'active accounts'}</span> 
-                <span className='signerAccountsTitleActiveCount'>{activeAccounts.length}</span> 
-              </span>
-            </div> */}
-            <div className='signerAccounts'>{signer.addresses.slice(startIndex, startIndex + addressLimit).map((address, index) => {
-              const added = this.store('main.accounts', address.toLowerCase())
-              if (!added) return null
-              return (
-                <div key={address} className={!added ?  'signerAccount' : 'signerAccount'} onClick={() => {
-                  if (this.store('main.accounts', address.toLowerCase())) {
-                    link.rpc('removeAccount', address, {}, () => { })
-                  } else {
-                    link.rpc('createAccount', address, { type: signer.type }, (e) => {
-                      if (e) console.error(e)
-                    })
-                  }
-                }}>
-                  <div className='signerAccountIndex'>{index + 1 + startIndex}</div>
-                  <div className='signerAccountAddress'>{address.substr(0, 11)} {svg.octicon('kebab-horizontal', { height: 20 })} {address.substr(address.length - 10)}</div>
-                  <div className='signerAccountCheck' />
-                </div>
-              )
-            })}</div>
-            <div className='signerBottom'>
-              <div className='signerBottomPageBack' onMouseDown={() => this.nextPage(true)}>{svg.triangleLeft(20)}</div>
-              <div className='signerBottomPages'>{(page + 1) + ' / ' + Math.ceil(signer.addresses.length / addressLimit)}</div>
-              <div className='signerBottomPageNext' onMouseDown={() => this.nextPage()}>{svg.triangleLeft(20)}</div>
-            </div>
+            <div className='signerAddedAccountTitle'>{'added accounts'}</div>
+            <div className='signerAccounts'>
+              {addedAccounts.map((address) => {
+                const index = signer.addresses.indexOf(address) + 1
+                return (
+                  <div key={address} className={'signerAccount signerAccountAdded'} onClick={() => {
+                    // if (this.store('main.accounts', address.toLowerCase())) {
+                    //   link.rpc('removeAccount', address, {}, () => { })
+                    // } else {
+                    //   link.rpc('createAccount', address, { type: signer.type }, (e) => {
+                    //     if (e) console.error(e)
+                    //   })
+                    // }
+                  }}>
+                    <div className='signerAccountIndex'>{index}</div>
+                    <div className='signerAccountAddress'>{address.substr(0, 11)} {svg.octicon('kebab-horizontal', { height: 20 })} {address.substr(address.length - 10)}</div>
+                    <div className='signerAccountCheck' />
+                  </div>
+                )
+              }
+            )}</div>
           </>
-        ) : this.props.type === 'trezor' && (status === 'need pin' || status === 'enter passphrase') ? (
-          <div className='signerInterface'>
-            {this.renderTrezorPin(this.props.type === 'trezor' && status === 'need pin')}
-            {this.renderTrezorPhrase(this.props.type === 'trezor' && status === 'enter passphrase')}
-          </div> 
         ) : loading ? (
           <div className='signerLoading'>
             <div className='signerLoadingLoader' />

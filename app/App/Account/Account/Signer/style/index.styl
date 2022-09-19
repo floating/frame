@@ -1,3 +1,10 @@
+.moduleItemRow
+  display flex
+  margin-bottom -3px
+
+.moduleItemRow:last-child
+  margin-bottom 0px
+
 .moduleItem:first-child
   border-top-left-radius 17px
   border-top-right-radius 17px
@@ -8,6 +15,28 @@
 
 .moduleItem:first-child:last-child
   border-radius 17px
+
+.moduleItemRow
+  .moduleItem
+    margin-right 0px
+    border-radius 8px
+
+  .moduleItem:first-child
+    border-top-left-radius 17px
+    border-bottom-left-radius 17px
+    
+  .moduleItem:last-child
+    border-top-right-radius 17px
+    border-bottom-right-radius 17px
+    margin-right 3px
+
+  .moduleItem:first-child:last-child
+    border-radius 17px
+    margin-left 3px
+
+  .moduleItemSpace
+    justify-content space-between
+    padding 16px
 
 .moduleItem
   position relative
@@ -27,6 +56,7 @@
   min-height 40px
   box-sizing border-box
   text-transform uppercase
+  flex 1
 
   // .moduleSubItem
   //   background blue
@@ -48,6 +78,17 @@
   * 
     pointer-events none
 
-.moduleItemSpace
-  justify-content space-between
-  padding 24px
+.moduleItemSignerStatus
+  display flex
+  padding 12px 16px
+  border-radius 16px
+  background var(--ghostB)
+  display relative
+  top 1px
+
+  svg
+    position relative
+    top -1px
+
+  span
+    padding-left 12px
