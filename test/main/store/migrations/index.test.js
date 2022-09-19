@@ -528,3 +528,89 @@ describe('migration 20', () => {
     expect(updatedState.main.mute.aragonAccountMigrationWarning).toBe(true)
   })
 })
+
+describe('migration 21', () => {
+  beforeEach(() => {
+    state = {
+      main: {
+        _version: 20,
+        networks: {
+          ethereum: { }
+        },
+        networksMeta: {
+          ethereum: { }
+        }
+      }
+    }
+  })
+
+  it('adds Sepolia network information when none exists', () => {
+    delete state.main.networks.ethereum[11155111]
+
+    const updatedState = migrations.apply(state, 21)
+
+    const sepolia = updatedState.main.networks.ethereum[11155111]
+
+    expect(sepolia).toMatchObject({
+      id: 11155111,
+      type: 'ethereum',
+      layer: 'testnet',
+      symbol: 'ETH',
+      name: 'Sepolia',
+      explorer: 'https://sepolia.etherscan.io',
+      gas: { price: { selected: 'standard', levels: {} } }
+    })
+
+    expect(sepolia.connection.primary.on).toBe(true)
+    expect(sepolia.connection.primary.current).toBe('infura')
+    expect(sepolia.connection.secondary.on).toBe(false)
+    expect(sepolia.connection.secondary.current).toBe('custom')
+    expect(sepolia.on).toBe(false)
+  })
+
+  it('does not change existing Sepolia network information', () => {
+    state.main.networks.ethereum[11155111] = {
+      explorer: 'https://custom-explorer.sepolia.dev',
+      connection: {
+        primary: { on: true, current: 'local' }
+      }
+    }
+
+    const updatedState = migrations.apply(state, 21)
+
+    const sepolia = updatedState.main.networks.ethereum[11155111]
+
+    expect(sepolia.explorer).toBe('https://custom-explorer.sepolia.dev')
+    expect(sepolia.connection.primary.on).toBe(true)
+    expect(sepolia.connection.primary.current).toBe('local')
+  })
+
+  it('adds Sepolia network meta information when none exists', () => {
+    delete state.main.networksMeta.ethereum[11155111]
+
+    const updatedState = migrations.apply(state, 21)
+
+    const sepolia = updatedState.main.networksMeta.ethereum[11155111]
+
+    expect(sepolia.gas.fees.maxFeePerGas).toBe(undefined)
+    expect(sepolia).toMatchObject({
+      gas: { fees: {} , price: { selected: 'standard', levels: {} } }
+    })
+  })
+
+  it('does not change existing Sepolia meta network information', () => {
+    state.main.networksMeta.ethereum[11155111] = {
+      gas: {
+        fees: {
+          maxFeePerGas: '0xf'
+        }
+      }
+    }
+
+    const updatedState = migrations.apply(state, 21)
+
+    const sepolia = updatedState.main.networksMeta.ethereum[11155111]
+
+    expect(sepolia.gas.fees.maxFeePerGas).toBe('0xf')
+  })
+})
