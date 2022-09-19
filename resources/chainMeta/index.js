@@ -11,27 +11,9 @@ export default {
     icon: '',
     primaryColor: 'var(--good)'
   },
-  '0x3': {
-    chainId: 3,
-    name: 'ropsten',
-    icon: '',
-    primaryColor: 'rgb(255, 153, 51)'
-  },
-  '0x4': {
-    chainId: 4,
-    name: 'rinkeby',
-    icon: '',
-    primaryColor: 'rgb(255, 153, 51)'
-  },
   '0x5': {
     chainId: 5,
     name: 'görli',
-    icon: '',
-    primaryColor: 'rgb(255, 153, 51)'
-  },
-  '0x2a': {
-    chainId: 42,
-    name: 'kovan',
     icon: '',
     primaryColor: 'rgb(255, 153, 51)'
   },
@@ -64,5 +46,11 @@ export default {
     name: 'arbitrum',
     icon: arbitrum,
     primaryColor: 'rgb(62, 173, 241)'
+  },
+  '0xaa36a7': {
+    chainId: 11155111,
+    name: 'sepolia',
+    icon: '',
+    primaryColor: 'rgb(255, 153, 51)'
   }
 }
