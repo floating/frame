@@ -56,14 +56,14 @@ export default function (eth: EthereumProvider) {
 
   async function getNativeCurrencyBalance (address: string, chainId: number) {
     try {
-      const rawBalance = await eth.request({
+      const rawBalance: string = await eth.request({
         method: 'eth_getBalance',
         params: [address, 'latest'],
         chainId: addHexPrefix(chainId.toString(16))
       })
 
       // TODO: do all coins have 18 decimals?
-      return { ...createBalance(rawBalance as string, 18), chainId }
+      return { ...createBalance(rawBalance, 18), chainId }
     } catch (e) {
       log.error(`error loading native currency balance for chain id: ${chainId}`, e)
       return { balance: '0x0', displayValue: '0.0', chainId }
@@ -73,13 +73,13 @@ export default function (eth: EthereumProvider) {
   async function getTokenBalance (token: TokenDefinition, owner: string)  {
     const functionData = erc20Interface.encodeFunctionData('balanceOf', [owner])
 
-    const response = await eth.request({
+    const response: BytesLike = await eth.request({
       method: 'eth_call',
       chainId: addHexPrefix(token.chainId.toString(16)),
       params: [{ to: token.address, value: '0x0', data: functionData }, 'latest']
     })
 
-    const result = erc20Interface.decodeFunctionResult('balanceOf', response as BytesLike)
+    const result = erc20Interface.decodeFunctionResult('balanceOf', response)
 
     return result.balance.toHexString()
   }

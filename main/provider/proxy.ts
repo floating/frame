@@ -11,8 +11,8 @@ class ProviderProxyConnection extends EventEmitter {
     this.emit('provider:send', payload)
   }
 
-  async close () {
-    
+  close () {
+    this.emit('close')
   }
 }
 

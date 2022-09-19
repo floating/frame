@@ -33,7 +33,7 @@ function chainConfig (chainId: number, eth: EthereumProvider): MulticallConfig {
 async function makeCall (functionName: string, params: any[], config: MulticallConfig) {
   const data = multicallInterface.encodeFunctionData(functionName, params)
 
-  const response = await config.provider.request({
+  const response: BytesLike = await config.provider.request({
     method: 'eth_call',
     params: [
       { to: config.address, data }, 'latest'
@@ -41,7 +41,7 @@ async function makeCall (functionName: string, params: any[], config: MulticallC
     chainId: addHexPrefix(config.chainId.toString(16))
   })
 
-  return multicallInterface.decodeFunctionResult(functionName, response as BytesLike)
+  return multicallInterface.decodeFunctionResult(functionName, response)
 }
 
 function buildCallData <R, T> (calls: Call<R, T>[]) {
