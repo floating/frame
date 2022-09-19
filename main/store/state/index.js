@@ -232,12 +232,6 @@ const initial = {
           alchemy: ['wss://eth-mainnet.ws.alchemyapi.io/v2/NBms1eV9i16RFHpFqQxod56OLdlucIq0', 'https://eth-mainnet.alchemyapi.io/v2/NBms1eV9i16RFHpFqQxod56OLdlucIq0'],
           infura: 'infura'
         },
-        3: {
-          infura: 'infuraRopsten'
-        },
-        4: {
-          infura: 'infuraRinkeby'
-        },
         5: {
           infura: ['wss://goerli.infura.io/ws/v3/786ade30f36244469480aa5c2bf0743b', 'https://goerli.infura.io/ws/v3/786ade30f36244469480aa5c2bf0743b'],
           mudit: 'https://rpc.goerli.mudit.blog',
@@ -247,9 +241,6 @@ const initial = {
         10: {
           optimism: 'https://mainnet.optimism.io',
           infura: 'https://optimism-mainnet.infura.io/v3/786ade30f36244469480aa5c2bf0743b'
-        },
-        42: {
-          infura: 'infuraKovan'
         },
         74: {
           idchain: 'wss://idchain.one/ws/'
@@ -262,6 +253,9 @@ const initial = {
         },
         42161: {
           infura: 'https://arbitrum-mainnet.infura.io/v3/786ade30f36244469480aa5c2bf0743b'
+        },
+        11155111: {
+          infura: ['wss://sepolia.infura.io/ws/v3/786ade30f36244469480aa5c2bf0743b', 'https://sepolia.infura.io/ws/v3/786ade30f36244469480aa5c2bf0743b']
         }
       }
     },
@@ -285,44 +279,6 @@ const initial = {
             secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
           },
           on: true
-        },
-        3: {
-          id: 3,
-          type: 'ethereum',
-          layer: 'testnet',
-          symbol: 'ETH',
-          name: 'Ropsten',
-          explorer: 'https://ropsten.etherscan.io',
-          gas: {
-            price: {
-              selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-            }
-          },
-          connection: {
-            primary: { on: true, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
-            secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
-          },
-          on: false
-        },
-        4: {
-          id: 4,
-          type: 'ethereum',
-          layer: 'testnet',
-          symbol: 'ETH',
-          name: 'Rinkeby',
-          explorer: 'https://rinkeby.etherscan.io',
-          gas: {
-            price: {
-              selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-            }
-          },
-          connection: {
-            primary: { on: true, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
-            secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
-          },
-          on: false
         },
         5: {
           id: 5,
@@ -362,42 +318,6 @@ const initial = {
           },
           on: false
         },
-        42: {
-          id: 42,
-          type: 'ethereum',
-          layer: 'testnet',
-          symbol: 'ETH',
-          name: 'Kovan',
-          explorer: 'https://kovan.etherscan.io',
-          gas: {
-            price: {
-              selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-            }
-          },
-          connection: {
-            primary: { on: true, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
-            secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
-          },
-          on: false
-        },
-        // 74: {
-        //   id: 74,
-        //   type: 'ethereum',
-        //   symbol: 'EIDI',
-        //   name: 'IDChain',
-        //   explorer: 'https://explorer.idchain.one',
-        //   gas: {
-        //     price: {
-        //       selected: 'standard',
-        //       levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-        //     }
-        //   },
-        //   connection: {
-        //     primary: { on: true, current: 'idchain', status: 'loading', connected: false, type: '', network: '', custom: '' },
-        //     secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
-        //   }
-        // },
         100: {
           id: 100,
           type: 'ethereum',
@@ -454,32 +374,31 @@ const initial = {
             secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
           },
           on: false
+        },
+        11155111: {
+          id: 11155111,
+          type: 'ethereum',
+          layer: 'testnet',
+          symbol: 'ETH',
+          name: 'Sepolia',
+          explorer: 'https://sepolia.etherscan.io',
+          gas: {
+            price: {
+              selected: 'standard',
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+            }
+          },
+          connection: {
+            primary: { on: true, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
+            secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
+          },
+          on: false
         }
       }
     }),
     networksMeta: main('networksMeta', {
       ethereum: {
         1: {
-          blockHeight: 0,
-          gas: {
-            fees: {},
-            price: {
-              selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-            }
-          }
-        },
-        3: {
-          blockHeight: 0,
-          gas: {
-            fees: {},
-            price: {
-              selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-            }
-          }
-        },
-        4: {
           blockHeight: 0,
           gas: {
             fees: {},
@@ -500,16 +419,6 @@ const initial = {
           }
         },
         10: {
-          blockHeight: 0,
-          gas: {
-            fees: {},
-            price: {
-              selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-            }
-          }
-        },
-        42: {
           blockHeight: 0,
           gas: {
             fees: {},
@@ -540,6 +449,16 @@ const initial = {
           }
         },
         42161: {
+          blockHeight: 0,
+          gas: {
+            fees: {},
+            price: {
+              selected: 'standard',
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+            }
+          }
+        },
+        11155111: {
           blockHeight: 0,
           gas: {
             fees: {},
