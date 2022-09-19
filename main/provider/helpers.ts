@@ -107,7 +107,7 @@ export function resError (errorData: string | EVMError, request: RPCId, res: RPC
     : { message: errorData.message, code: errorData.code || -1 }
   
   log.warn(error)
-  res({ id: request.id, jsonrpc: '2.0', error })
+  res({ id: request.id, jsonrpc: request.jsonrpc, error })
 }
   
 export function getSignedAddress (signed: string, message: string, cb: Callback<String>) {
