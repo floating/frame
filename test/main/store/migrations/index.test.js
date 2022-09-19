@@ -539,6 +539,9 @@ describe('migration 21', () => {
         },
         networksMeta: {
           ethereum: { }
+        },
+        networkPresets: {
+          ethereum: { }
         }
       }
     }
@@ -612,5 +615,17 @@ describe('migration 21', () => {
     const sepolia = updatedState.main.networksMeta.ethereum[11155111]
 
     expect(sepolia.gas.fees.maxFeePerGas).toBe('0xf')
+  })
+
+  it('adds Sepolia network preset information when none exists', () => {
+    delete state.main.networkPresets.ethereum[11155111]
+
+    const updatedState = migrations.apply(state, 21)
+
+    const sepolia = updatedState.main.networkPresets.ethereum[11155111]
+
+    expect(sepolia).toMatchObject({
+      infura: ['wss://sepolia.infura.io/ws/v3/786ade30f36244469480aa5c2bf0743b', 'https://sepolia.infura.io/ws/v3/786ade30f36244469480aa5c2bf0743b']
+    })
   })
 })

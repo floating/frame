@@ -444,6 +444,12 @@ const migrations = {
       }
     }
 
+    if (!initial.main.networkPresets.ethereum[11155111]) {
+      initial.main.networkPresets.ethereum[11155111] = {
+        infura: ['wss://sepolia.infura.io/ws/v3/786ade30f36244469480aa5c2bf0743b', 'https://sepolia.infura.io/ws/v3/786ade30f36244469480aa5c2bf0743b']
+      }
+    }
+
     return initial
   },
 }
