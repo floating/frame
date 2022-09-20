@@ -229,33 +229,31 @@ const initial = {
           local: 'direct'
         },
         1: {
-          alchemy: ['wss://eth-mainnet.ws.alchemyapi.io/v2/NBms1eV9i16RFHpFqQxod56OLdlucIq0', 'https://eth-mainnet.alchemyapi.io/v2/NBms1eV9i16RFHpFqQxod56OLdlucIq0'],
+          alchemy: 'alchemy',
           infura: 'infura'
         },
         5: {
-          infura: ['wss://goerli.infura.io/ws/v3/786ade30f36244469480aa5c2bf0743b', 'https://goerli.infura.io/ws/v3/786ade30f36244469480aa5c2bf0743b'],
-          mudit: 'https://rpc.goerli.mudit.blog',
-          slockit: 'https://rpc.slock.it/goerli',
-          prylabs: 'https://goerli.prylabs.net'
+          infura: 'infuraGoerli',
+          mudit: 'muditGoerli'
         },
         10: {
-          optimism: 'https://mainnet.optimism.io',
-          infura: 'https://optimism-mainnet.infura.io/v3/786ade30f36244469480aa5c2bf0743b'
+          optimism: 'optimism',
+          infura: 'infuraOptimism'
         },
         74: {
-          idchain: 'wss://idchain.one/ws/'
+          idchain: 'idChain'
         },
         100: {
-          poa: 'https://rpc.gnosischain.com/'
+          poa: 'gnosis'
         },
         137: {
-          infura: 'https://polygon-mainnet.infura.io/v3/786ade30f36244469480aa5c2bf0743b'
+          infura: 'infuraPolygon'
         },
         42161: {
-          infura: 'https://arbitrum-mainnet.infura.io/v3/786ade30f36244469480aa5c2bf0743b'
+          infura: 'infuraArbitrum'
         },
         11155111: {
-          infura: ['wss://sepolia.infura.io/ws/v3/786ade30f36244469480aa5c2bf0743b', 'https://sepolia.infura.io/ws/v3/786ade30f36244469480aa5c2bf0743b']
+          infura: 'infuraSepolia'
         }
       }
     },
