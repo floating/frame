@@ -3,6 +3,7 @@ import fantom from './icons/fantom.svg'
 import optimism from './icons/optimism.svg'
 import polygon from './icons/polygon.svg'
 import xdai from './icons/xdai.svg'
+
 export default {
   '0x1': {
     chainId: 1,
