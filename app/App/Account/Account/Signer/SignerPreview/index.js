@@ -3,8 +3,12 @@ import Restore from 'react-restore'
 import link from '../../../../../../resources/link'
 import svg from '../../../../../../resources/svg'
 
-function isHardwareSigner (account = {}) {
+const isHardwareSigner = (account = {}) => {
   return ['ledger', 'lattice', 'trezor'].includes(account.lastSignerType)
+}
+
+const isWatchOnly = (account = {}) => {
+  return ['address'].includes(account.lastSignerType.toLowerCase())
 }
 
 class Signer extends React.Component {
@@ -18,6 +22,10 @@ class Signer extends React.Component {
         }
       })
     }
+    this.state = {
+      verifyAddressSuccess: false,
+      verifyAddressResponse: ''
+    }
   }
 
   componentDidMount () {
@@ -28,57 +36,72 @@ class Signer extends React.Component {
     if (this.resizeObserver) this.resizeObserver.disconnect()
   }
 
+  verifyAddress () {
+    link.rpc('verifyAddress', err => {
+      if (err) {
+        this.setState({ verifyAddressSuccess: false, verifyAddressResponse: err })
+      } else {
+        this.setState({ verifyAddressSuccess: true, verifyAddressResponse: 'Address matched!' })
+      }
+      setTimeout(() => {
+        this.setState({ verifyAddressSuccess: false, verifyAddressResponse: '' })
+      }, 5000)
+    })
+  }
+
   renderSignerType (type) {
     if (type === 'lattice') {
       return (
         <div className='moduleItemSignerType'>
           <div className='moduleItemIcon'>{svg.lattice(18)}</div>
-          <div>{'GridPlus Lattice1'}</div>
+          <div>{'GridPlus'}</div>
         </div>
       )
     } else if (type === 'ledger') {
       return (
         <div className='moduleItemSignerType'>
           <div className='moduleItemIcon'>{svg.ledger(16)}</div>
-          <div>{'Ledger Device'}</div>
+          <div>{'Ledger'}</div>
         </div>
       )
     } else if (type === 'trezor') {
       return (
         <div className='moduleItemSignerType'>
           <div className='moduleItemIcon'>{svg.trezor(15)}</div>
-          <div>{'Trezor Device'}</div>
+          <div>{'Trezor'}</div>
         </div>
       )
     } else if (type === 'aragon') {
       return (
         <div className='moduleItemSignerType'>
           <div className='moduleItemIcon'>{svg.aragon(26)}</div>
-          <div>{'Agent Actor'}</div>
+          <div>{'Aragon Agent'}</div>
         </div>
       )
     } else if (type === 'seed') {
       return (
         <div className='moduleItemSignerType'>
           <div className='moduleItemIcon'>{svg.seedling(16)}</div>
-          <div>{'Seed Signer'}</div>
+          <div>{'Seed'}</div>
         </div>
       )
     } else if (type === 'keyring') {
       return (
         <div className='moduleItemSignerType'>
           <div className='moduleItemIcon'>{svg.key(17)}</div>
-          <div>{'Keyring Signer'}</div>
+          <div>{'Keyring'}</div>
         </div>
       )
     } else {
       return (
         <div className='moduleItemSignerType'>
-          <div>{'No Signer, watch-only'}</div>
+          <div className='moduleItemIcon'>{svg.mask(20)}</div>
+          <div>{'Watch-only'}</div>
         </div>
       )
     }
   }
+
 
   render () {
     const activeAccount =  this.store('main.accounts', this.props.account)
@@ -93,7 +116,12 @@ class Signer extends React.Component {
     }
 
     const hardwareSigner = isHardwareSigner(activeAccount)
+    const watchOnly = isWatchOnly(activeAccount)
     const status = (signer && signer.status) || (hardwareSigner ? 'Disconnected' : 'No Signer')
+
+    const signerType = this.store('main.accounts', this.props.id, 'lastSignerType')
+    // const signerKind = (signerType === 'seed' || signerType === 'ring') ? 'hot' : 'device'
+    const account = this.store('main.accounts', this.props.id)
 
     return (
       <div 
@@ -105,12 +133,54 @@ class Signer extends React.Component {
           <span>{'Signer'}</span>
         </div>
         <div className='moduleMainPermissions'>
-          <div className='moduleItem'>
-            {this.renderSignerType(activeAccount.lastSignerType)}
-            <div className=''>{status}</div>
+          <div className='moduleItemRow'>
+            <div 
+              className='moduleItem moduleItemSpace moduleItemButton' 
+              style={{ flex: 6 }}
+              onClick={() => {
+                const crumb = {
+                  view: 'expandedSigner', 
+                  data: { signer: signer.id }
+                }
+                // link.send('nav:forward', 'dash', crumb)
+                link.send('tray:action', 'navDash', crumb)
+            }}>
+              {this.renderSignerType(activeAccount.lastSignerType)}
+              <div className='moduleItemSignerStatus'>
+                {svg.lock(14)}
+                <span>{status}</span>
+              </div>
+            </div>
+
+            {!watchOnly ? (
+              <div 
+                className='moduleItem moduleItemButton' 
+                onMouseDown={() => this.verifyAddress()}
+              >
+                {svg.doubleCheck(20)}
+              </div>
+            ) : null}
           </div>
-          {!hardwareSigner ? (
-            <div className='moduleItem'>{status === 'locked' ? 'Unlock' : 'Lock'}</div>
+          
+          {this.state.verifyAddressResponse ? (
+            <div 
+              className={'moduleItem cardShow'}
+              style={{
+                color: this.state.verifyAddressSuccess ? 'var(--good)' : 'var(--bad)'
+              }}
+            >
+              {this.state.verifyAddressResponse}
+            </div>
+          ) : null}
+          {account.smart ? (
+            <div className='moduleItem'>
+              <div>{account.smart.type} Account</div>
+              <div>DAO exists on this chain: ?</div>
+              <div>Agent Address: {account.address}</div>
+              <div>Acting Account: {account.smart.actor}</div>
+              <div>DAO Address: {account.smart.dao}</div>
+              <div>IPFS Gateway: {'https://ipfs.aragon.org'}</div>
+            </div>
           ) : null}
         </div>
       </div>
@@ -119,4 +189,3 @@ class Signer extends React.Component {
 }
 
 export default Restore.connect(Signer)
-

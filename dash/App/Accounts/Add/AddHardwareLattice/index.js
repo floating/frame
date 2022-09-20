@@ -1,7 +1,7 @@
 import React from 'react'
 import Restore from 'react-restore'
 
-import Signer from '../../Signer'
+import Signer from '../../../Signer'
 
 import link from '../../../../../resources/link'
 import svg from '../../../../../resources/svg'

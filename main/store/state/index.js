@@ -163,12 +163,12 @@ const initial = {
     colorway: main('colorway', 'dark'),
     colorwayPrimary: {
       dark: {
-        background: '#1c1c1b',
-        text: '#ecf1ff'
+        background: 'rgb(20, 17, 22)',
+        text: 'rgb(236, 241, 255)'
       },
       light: {
-        background: '#cdcde5',
-        text: '#1e3250'
+        background: 'rgb(227, 221, 236)',
+        text: 'rgb(20, 40, 60)'
       }
     },
     mute: {

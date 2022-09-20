@@ -3,7 +3,7 @@ import Restore from 'react-restore'
 import link from '../../../../../../resources/link'
 import svg from '../../../../../../resources/svg'
 
-import Verify from '../Verify'
+// import Verify from '../Verify'
 
 class Settings extends React.Component {
   constructor (...args) {
@@ -18,7 +18,8 @@ class Settings extends React.Component {
     }
     this.state = {
       expand: false,
-      name: ''
+      name: '',
+      showMore: false
     }
   }
 
@@ -39,20 +40,43 @@ class Settings extends React.Component {
     const account = this.store('main.accounts', this.props.account)
     return (
       <div ref={this.moduleRef}>
-        <div className='previewButton'>
-          <div className='panelBlockValues'>
-            <div className='panelBlockButton panelBlockItem' onMouseDown={() => {
-              const crumb = {
-                view: 'expandedModule', 
-                data: {
-                  id: this.props.moduleId,
-                  account: this.props.account
-                }
+        <div className='balancesBlock'>
+          <div className='moduleHeaderBlank'>
+          </div>
+          <div className='moduleMainPermissions'>
+            <div 
+              className='moduleItem moduleItemButton' 
+              onClick={() => {
+                // const crumb = {
+                //   view: 'expandedModule', 
+                //   data: {
+                //     id: this.props.moduleId,
+                //     account: this.props.account
+                //   }
+                // }
+                // link.send('nav:forward', 'panel', crumb)
+                this.setState({ showMore: !this.state.showMore })
               }
-              link.send('nav:forward', 'panel', crumb)
-            }}>
-              Account Settings
+            }>
+              {this.state.showMore ? 'less' : 'more'}
             </div>
+            {this.state.showMore ? (
+              <>
+                <div className='moduleItem moduleItemButton cardShow'>
+                  {'Show Name with ENS'}
+                </div>
+                <div className='moduleItem moduleItemButton cardShow'>
+                  {'Update Name'}
+                </div>
+                <div className='moduleItem moduleItemButton cardShow' onClick={() => {
+                  link.rpc('removeAccount', this.props.account, {}, () => {})
+                }}
+                  style={{ color: 'var(--bad)' }}
+                >
+                  {'Remove Account'}
+                </div>
+              </>
+            ) : null}
           </div>
         </div>
       </div>

@@ -1,52 +1,98 @@
+.expandedSigner
+  position relative
+  overflow hidden
+  box-sizing border-box
+  margin 6px
+  padding-bottom 24px
+  border-radius 27px
+  background var(--ghostA)
+  transform translate3d(0, 0, 0)
+  padding-top 8px
+
 .signer
   position relative
   width 100%
-  // height 300px
   overflow hidden
-  background var(--ghostA)
   box-sizing border-box
-  margin 3px 0px 40px 0px
-  border-radius 26px
+  margin 6px 0px 24px 0px
+  padding-bottom 24px
+  border-radius 27px
+  background var(--ghostA)
   box-shadow 0px 4px 8px var(--ghostY)
+  transform translate3d(0, 0, 0)
 
+.signer, .expandedSigner
   .signerTop
     position relative
-    height 62px
-
-  .signerIcon
-    position absolute
-    top 20px
-    left 18px
-
-  .signerName
-    position absolute
-    top 17px
-    left 48px
-    height 28px
-    padding 0px 7px
-    border-radius 8px
-    font-size 18px
-    font-weight 300
     display flex
+    justify-content space-between
     align-items center
-    box-sizing border-box
-    font-family 'MainFont'
-    text-transform capitalize
-    letter-spacing 0px
+    padding 16px
+    
+    // height 50px
 
-    .signerNameUpdate
-      position absolute
-      width 28px
+  // .signerIcon
+  //   position absolute
+  //   top 20px
+  //   left 18px
+
+  .signerDetails
+    display flex
+    justify-content center
+    align-items center
+
+    .signerName
+      // position absolute
+      // top 17px
+      // left 44px
       height 28px
-      right -34px
-      color var(--good)
+      padding-left 14px
+      border-radius 8px
+      font-size 18px
+      font-weight 300
       display flex
       align-items center
-      cursor pointer
-      pointer-events none
-      opacity 0
-      *
+      box-sizing border-box
+      font-family 'MainFont'
+      text-transform capitalize
+      letter-spacing 0px
+      font-size 16px
+      font-weight 400
+
+      .signerNameUpdate
+        position absolute
+        width 28px
+        height 28px
+        right -34px
+        color var(--good)
+        display flex
+        align-items center
+        cursor pointer
         pointer-events none
+        opacity 0
+        *
+          pointer-events none
+
+  .signerExpand
+    // position absolute
+    // top 16px
+    // right 6px
+    height 32px
+    width 64px
+    border-radius 20px
+    box-sizing border-box
+    background var(--ghostA)
+    border 3px solid var(--ghostZ)
+    cursor pointer
+    display flex
+    justify-content center
+    align-items center
+
+    *
+      pointer-events none
+
+  .signerExpand:hover
+    background var(--ghostB)
 
   .signerNameFocused
     background var(--ghostZ)
@@ -96,8 +142,8 @@
     background var(--good)
 
   .signerStatusText
-    padding 16px 32px
-    margin 0px 6px 16px 6px
+    padding 32px
+    margin 0px 6px 6px 6px
     border-radius 20px
     font-size 12px
     text-transform uppercase
@@ -129,7 +175,7 @@
     display flex
     justify-content center
     align-items center
-    padding 22px 16px 10px 16px
+    padding 18px 16px 10px 16px
 
     .signerBottomPages
       border-radius 8px
@@ -214,7 +260,7 @@
       margin-top -3px
 
   .signerControls
-    padding-top 0px
+    padding-top 16px
 
     .signerControlDetail
       height 40px
@@ -238,10 +284,10 @@
         font-family 'FiraCode'
 
     .signerControlOption
-      height 40px
+      height 52px
       margin 0px 10px 11px 10px
-      background var(--ghostB)
-      border-radius 17px
+      background var(--ghostA)
+      border-radius 20px
       color var(--outerspace)
       display flex
       justify-content center
@@ -252,28 +298,13 @@
       letter-spacing 0px
       box-sizing border-box
       text-transform uppercase
-      box-shadow 0px 2px 2px var(--ghostA)
+      border 3px solid var(--ghostZ)
 
       *
         pointer-events none
 
     .signerControlOption:hover
-      background var(--ghostC)
-      box-shadow 0px 4px 6px var(--ghostA)
-
-    // .signerControlOption
-    //   height 40px
-    //   background var(--ghostC)
-    //   margin 0px 10px 10px 10px
-    //   border-radius 8px
-    //   display flex
-    //   justify-content center
-    //   align-items center
-    //   font-size 14px
-    //   cursor pointer
-
-    //   *
-    //     pointer-events none
+      background var(--ghostB)
 
     .signerControlOptionImportant
       color var(--bad)
@@ -377,7 +408,7 @@
     // bottom 30px
     // right 8px
     // left 8px
-    margin 0px 6px
+    margin 7px 6px
     // padding 8px
     text-align center
     
@@ -458,8 +489,11 @@
         background var(--outerspace)
 
     .signerAccountAdded
-      // background var(--good)
-      color var(--good)
+      background var(--ghostB)
+      // color var(--good)
+
+      // .signerAccountIndex
+      //   color var(--good)
 
       .signerAccountCheck
         // rcolor var(--good)
@@ -467,6 +501,16 @@
 
     .signerAccount:hover
       background var(--ghostB)
+
+    .signerAccountAdded:hover
+      background var(--ghostC)
+
+    .signerAccountDisabled
+      cursor auto
+
+    .signerAccountDisabled:hover
+      background var(--ghostA)
+      
 
 .signerOk
   .signerAccounts
@@ -658,3 +702,30 @@
           svg
             transform scale(2.1)
             transition none
+
+.expandedSignerTitle
+  display flex
+  justify-content center
+  align-items center
+  text-transform none
+  font-family 'MainFont'
+  letter-spacing 0px
+  font-size 16px
+  font-weight 400
+  padding-right 2px
+
+  .expandedSignerIcon
+    margin-right 12px
+
+.signerAddedAccountTitle
+  display flex
+  justify-content center
+  align-items center
+  text-transform uppercase
+  font-size 9px
+  margin 2px 0px 4px 0px
+  font-weight 500
+  letter-spacing 1px
+  padding-top 8px
+
+@import '../SignerStatus/style'
