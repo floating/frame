@@ -22,6 +22,7 @@ jobs:
         sudo apt update -y
         sudo apt install -y libudev-dev
     - run: npm run setup:ci
+    - run: cat main/provider/helpers.ts
     - run: npx tsc
     - run: npm run copy-assets
     - run: npm run test:unit
