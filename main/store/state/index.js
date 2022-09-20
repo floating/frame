@@ -233,15 +233,11 @@ const initial = {
           infura: 'infura'
         },
         5: {
-          infura: 'infuraGoerli',
-          mudit: 'muditGoerli'
+          infura: 'infuraGoerli'
         },
         10: {
           optimism: 'optimism',
           infura: 'infuraOptimism'
-        },
-        74: {
-          idchain: 'idChain'
         },
         100: {
           poa: 'gnosis'
