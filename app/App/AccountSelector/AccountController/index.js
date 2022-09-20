@@ -274,14 +274,22 @@ class Account extends React.Component {
             <div className='signerDetailsName'>{this.props.name}</div>
             <div 
               className='signerDetailsAddress' 
-              onMouseOver={(e) => {
+              onClick={(e) => {
                 e.stopPropagation()
                 e.preventDefault()
                 this.setState({ addressHover: true })
               }}
+              onMouseOver={(e) => {
+                e.stopPropagation()
+                e.preventDefault()
+                this.addressTimeout = setTimeout(() => {
+                  this.setState({ addressHover: true })
+                }, 500)   
+              }}
               onMouseLeave={(e) => {
                 e.stopPropagation()
                 e.preventDefault()
+                clearTimeout(this.addressTimeout)
                 this.setState({ addressHover: false, copied: false })
               }}
             >
