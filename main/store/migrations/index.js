@@ -410,6 +410,12 @@ const migrations = {
   },
   21: initial => {
     // add sepolia network information
+    if (!initial.main.networkPresets.ethereum[11155111]) {
+      initial.main.networkPresets.ethereum[11155111] = {
+        infura: 'infuraSepolia'
+      }
+    }
+
     if (!initial.main.networks.ethereum[11155111]) {
       initial.main.networks.ethereum[11155111] = {
         id: 11155111,
@@ -441,12 +447,6 @@ const migrations = {
             levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
           }
         }
-      }
-    }
-
-    if (!initial.main.networkPresets.ethereum[11155111]) {
-      initial.main.networkPresets.ethereum[11155111] = {
-        infura: ['wss://sepolia.infura.io/ws/v3/786ade30f36244469480aa5c2bf0743b', 'https://sepolia.infura.io/ws/v3/786ade30f36244469480aa5c2bf0743b']
       }
     }
 
