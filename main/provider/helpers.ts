@@ -97,6 +97,10 @@ export function isCurrentAccount (address: string, account: FrameAccount | null)
   return address && (accountToCheck.id.toLowerCase() === address.toLowerCase())
 }
   
+export function respondToJsonRPC (id: number, result: unknown, res: RPCRequestCallback) {
+  res({ id, jsonrpc: '2.0', result })
+}
+  
 export function resError (errorData: string | EVMError, request: RPCId, res: RPCErrorCallback) {
   const error = (typeof errorData === 'string')
     ? { message: errorData, code: -1 }

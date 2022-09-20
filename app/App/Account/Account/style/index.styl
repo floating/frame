@@ -55,6 +55,14 @@
   opacity 0
   transition var(--standard)
 
+.footerModule
+  position absolute
+  bottom 0px
+  left 0px 
+  right 0px
+  height 200px
+  z-index 99999999
+
 .signer
   position relative
   z-index 3001
@@ -103,13 +111,12 @@
   .accountMainScroll
     position absolute
     top 0
-    left 0
     right 0
     bottom 0
+    left 0
     overflow-y scroll
     overflow-x hidden
     transform translate3d(0, 0, 0)
-    z-index 2000
 
   .accountMainSlide
     position relative 
@@ -118,10 +125,12 @@
     transition var(--standardSlow)
     transition-delay 0.32s
     padding-bottom 90px
+    pointer-events none
+    z-index 999
 
   .signerAddress
     font-size 10px
-    font-family FiraCode, monospace
+    font-family 'FiraCode'
     letter-spacing 0px
     position absolute
     top 0px
@@ -166,7 +175,7 @@
       text-transform uppercase
       font-weight 400
       letter-spacing 1px
-      font-family OpenSans, sans-serif
+      font-family 'MainFont'
       color var(--outerspace08)
       border-radius 10px
       transform translateY(0px)
@@ -183,7 +192,7 @@
       justify-content center
       align-items center
       font-size 13.5px
-      font-weight 600
+      font-weight 300
       pointer-events none
       z-index 8
       cursor pointer
@@ -318,7 +327,7 @@
           justify-content space-between
           align-items center
           padding 0px 20px 0px 20px
-          font-family FiraCode, monospace
+          font-family 'FiraCode'
           color var(--outerspace08)
           position relative
           z-index 4
@@ -354,7 +363,7 @@
         display flex
         justify-content center
         align-items center
-        font-family FiraCode, monospace
+        font-family 'FiraCode'
         position relative
         z-index 2
         transition var(--standardSlow)
@@ -539,13 +548,18 @@
     width 100%
 
 .accountModule
-  position absolute 
+  position absolute
   top 0
   left 2px
   right 2px
   transform translate3d(0, 0, 0)
   transition var(--standardFast)
+  overflow hidden
+  pointer-events auto
+  padding-bottom 7px
+
 .moduleExpanded
+  min-height 100%
   .accountModuleInner
     background none
     box-shadow none
@@ -556,8 +570,8 @@
   top 0
   left 0px
   right 0px
-  bottom 0px
-  border-radius 20px
+  bottom 7px
+  border-radius 26px
   background var(--ghostA)
   box-shadow 0px 4px 8px var(--ghostY)
   transform translate3d(0, 0, 0)
@@ -573,12 +587,12 @@
     
   .moduleHeader
     position relative
-    font-size 11px
+    font-size 10px
     text-transform uppercase
-    font-weight 600
     letter-spacing 2px
-    padding 16px 0px 14px 16px
-    font-family 'Ubuntu'
+    padding 16px 0px 14px 18px
+    font-family 'MainFont'
+    font-weight 500
     box-sizing border-box
     display flex
     align-items center
@@ -639,7 +653,7 @@
     display flex
     justify-content center
     color var(--ghostZ)
-    font-weight 100
+    font-weight 300
     font-size 24px
 
   //.moduleButtonBad:hover
@@ -670,7 +684,7 @@
     text-transform uppercase
     border-top 1px solid var(--ghostA)
     box-sizing border-box
-    font-weight 500
+    font-weight 300
     letter-spacing 1px
     padding 12px 
     height 42px
@@ -766,6 +780,7 @@
 @import '../Launcher/style'
 @import '../SignerStatus/style'
 @import '../Settings/style'
+@import '../Signer/style'
 
 @import './view'
   

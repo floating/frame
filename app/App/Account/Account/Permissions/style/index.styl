@@ -4,7 +4,7 @@
 .moduleMainPermissions
   background var(--ghostZ)
   margin 0px 6px 6px 6px
-  border-radius 12px
+  border-radius 20px
   overflow auto
 
 .signerPermissionOrigin
@@ -16,18 +16,29 @@
   text-align left
   white-space nowrap
   font-weight 300
-  margin-top 2px
+  margin-top 4px
+
+.signerPermission:first-child
+  border-top-left-radius 17px
+  border-top-right-radius 17px
+
+.signerPermission:last-child
+  border-bottom-left-radius 17px
+  border-bottom-right-radius 17px
+
+.signerPermission:first-child:last-child
+  border-radius 17px
 
 .signerPermission
   position relative
   justify-content space-between
   padding 12px
   font-size 15px
-  font-weight 200
+  font-weight 300
   transform translateZ(0)
   z-index 2000
   background var(--ghostA)
-  margin 5px
+  margin 3px
   border-radius 8px
 
   .signerPermissionControls

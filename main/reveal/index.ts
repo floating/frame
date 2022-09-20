@@ -6,7 +6,10 @@ import proxyConnection from '../provider/proxy'
 import nebulaApi from '../nebula'
 
 import Erc20Contract from '../contracts/erc20'
-import { decodeContractCall } from '../contracts'
+import { decodeCallData, fetchContract, ContractSource } from '../contracts'
+import erc20 from '../externalData/balances/erc-20-abi'
+
+const erc20Abi = JSON.stringify(erc20)
 
 const nebula = nebulaApi()
 const provider = new EthereumProvider(proxyConnection)
@@ -94,8 +97,27 @@ const surface = {
   },
   decode: async (contractAddress: string = '', chainId: string, calldata: string) => {
     // Decode calldata
-    const decodedCalldata = await decodeContractCall(contractAddress, chainId, calldata)
-    return decodedCalldata
+    const contractSources: ContractSource[] = [{ name: 'ERC-20', source: 'Generic ERC-20', abi: erc20Abi }]
+    const contractSource = await fetchContract(contractAddress, chainId)
+  
+    if (contractSource) {
+      contractSources.push(contractSource)
+    }
+  
+    for (const { name, source, abi } of contractSources.reverse()) {
+      const decodedCall = decodeCallData(calldata, abi)
+  
+      if (decodedCall) {
+        return {
+          contractAddress: contractAddress.toLowerCase(),
+          contractName: name,
+          source,
+          ...decodedCall
+        }
+      }
+    }
+  
+    log.warn(`Unable to decode data for contract ${contractAddress}`)
   },
   recog: async (contractAddress: string = '', chainId: string, calldata: string) => {
     // Recognize actions from standard tx types

@@ -83,7 +83,7 @@ describe('#send', () => {
   it('passes the given target chain to the connection', () => {
     connection.connections.ethereum[10] = { chainConfig: { hardfork: 'london', chainId: 10 }, primary: { connected: true } }
 
-    const request = { method: 'eth_testFrame'  }
+    const request = { method: 'eth_testFrame' }
 
     send({ ...request, chainId: '0xa' })
 
@@ -124,7 +124,7 @@ describe('#send', () => {
     it('returns the current chain id from the store', () => {
       store.set('main.networks.ethereum', 1, { id: 1 })
 
-      send({ method: 'eth_chainId', chainId: '0x1' }, response => {
+      send({ method: 'eth_chainId' }, response => {
         expect(response.result).toBe('0x1')
       })
     })
@@ -134,15 +134,6 @@ describe('#send', () => {
 
       send({ method: 'eth_chainId', chainId: '0x4' }, response => {
         expect(response.result).toBe('0x4')
-      })
-    })
-
-    it('returns an error for a disconnected chain', () => {
-      connection.connections.ethereum[11] = { chainConfig: chainConfig(11, 'london'), primary: { connected: false } }
-
-      send({ method: 'eth_chainId', chainId: '0xb' }, response => {
-        expect(response.error.message).toBe('not connected')
-        expect(response.result).toBeUndefined()
       })
     })
   })

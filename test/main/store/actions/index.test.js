@@ -180,6 +180,14 @@ describe('#addNetwork', () => {
 
     expect(networksMeta.ethereum['137']).toEqual({
       blockHeight: 0,
+      symbol: 'MATIC',
+      name: 'Polygon',
+      nativeCurrency: {
+        symbol: 'MATIC',
+        name: '',
+        icon: '',
+        decimals: 18
+      },
       gas: {
         price: {
           selected: 'standard',

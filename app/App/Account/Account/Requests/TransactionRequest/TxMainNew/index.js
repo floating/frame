@@ -107,26 +107,20 @@ class TxRecipient extends React.Component {
             headerMode={true}
           />
           <div className='_txMainValues'>
-            {txMeta.replacement ? (
-              txMeta.possible ? (
-                <div className='_txMainTag _txMainTagWarning'>
-                  valid replacement
-                </div>
-              ) : (
-                <div className='_txMainTag _txMainTagWarning'>
-                  {txMeta.notice || 'invalid duplicate'}
-                </div>
-              )
-            ) : null}
             <div className='_txMainValue _txMainValueClickable' onClick={() => {
               link.send('nav:update', 'panel', { data: { step: 'viewData' } })
             }}>
               <div className='_txDescription'>
-                {req.recipientType === 'external' ? (
+                {!req.to && req.data.data && req.data.data !== '0x' && req.data.data !== '0x0' ? (
+                  <div className='_txDescriptionSummary'>
+                    <div>{`Deploying Contract`}</div>
+                    <div>{`on ${chainName}`}</div>
+                  </div>
+                ) : req.recipientType === 'external' ? (
                   <div className='_txDescriptionSummary'>
                     {req.data.value && req.data.value !== '0x' && req.data.value !== '0x0' ? (
                       <div>{`Sending ${currentSymbol}`}</div>
-                    ) : req.data.data && req.data.data !== '0x' && req.data.data !== '0x0'  ? (
+                    ) : req.data.data && req.data.data !== '0x' && req.data.data !== '0x0' ? (
                       <div>{`Sending Data`}</div>
                     ) : (
                       <div>{`Empty Transaction`}</div>
@@ -148,6 +142,17 @@ class TxRecipient extends React.Component {
                 )}
               </div>
             </div>
+            {txMeta.replacement ? (
+              txMeta.possible ? (
+                <div className='_txMainTag _txMainTagWarning'>
+                  valid replacement
+                </div>
+              ) : (
+                <div className='_txMainTag _txMainTagWarning'>
+                  {txMeta.notice || 'invalid duplicate'}
+                </div>
+              )
+            ) : null}
             {req.data.data && req.data.data !== '0x' && req.data.data !== '0x0' ? (
               <div className='_txMainTag _txMainTagWarning'>
                 {'Transaction includes data'}

@@ -289,6 +289,14 @@ module.exports = {
 
       const defaultMeta = {
         blockHeight: 0,
+        name: net.name,
+        symbol: net.symbol,
+        nativeCurrency: {
+          symbol: net.symbol,
+          icon: '',
+          name: '',
+          decimals: 18
+        },
         gas: {
           price: {
             selected: 'standard',
