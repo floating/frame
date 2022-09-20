@@ -3,7 +3,6 @@ import fantom from './icons/fantom.svg'
 import optimism from './icons/optimism.svg'
 import polygon from './icons/polygon.svg'
 import xdai from './icons/xdai.svg'
-
 export default {
   '0x1': {
     chainId: 1,
@@ -11,9 +10,27 @@ export default {
     icon: '',
     primaryColor: 'var(--good)'
   },
+  '0x3': {
+    chainId: 3,
+    name: 'ropsten',
+    icon: '',
+    primaryColor: 'rgb(255, 153, 51)'
+  },
+  '0x4': {
+    chainId: 4,
+    name: 'rinkeby',
+    icon: '',
+    primaryColor: 'rgb(255, 153, 51)'
+  },
   '0x5': {
     chainId: 5,
     name: 'görli',
+    icon: '',
+    primaryColor: 'rgb(255, 153, 51)'
+  },
+  '0x2a': {
+    chainId: 42,
+    name: 'kovan',
     icon: '',
     primaryColor: 'rgb(255, 153, 51)'
   },
