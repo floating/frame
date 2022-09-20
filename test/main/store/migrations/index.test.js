@@ -625,7 +625,7 @@ describe('migration 21', () => {
     const sepolia = updatedState.main.networkPresets.ethereum[11155111]
 
     expect(sepolia).toMatchObject({
-      infura: ['wss://sepolia.infura.io/ws/v3/786ade30f36244469480aa5c2bf0743b', 'https://sepolia.infura.io/ws/v3/786ade30f36244469480aa5c2bf0743b']
+      infura: 'infuraSepolia'
     })
   })
 })
