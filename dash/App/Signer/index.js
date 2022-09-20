@@ -423,7 +423,7 @@ class Signer extends React.Component {
     if (isLocked) signerClass += ' signerLocked'
 
     return (
-      <div className={signerClass} style={{ zIndex: 1000 - this.props.index }}>
+      <div className={'expandedSigner cardShow'} style={{ zIndex: 1000 - this.props.index }}>
         {this.statusText()}
         {this.props.type === 'lattice' && status === 'pair' ? (
           <div className='signerLatticePair'>

@@ -74,7 +74,7 @@ class FrameAccount {
     this.lastSignerType = lastSignerType || (options.type as SignerType)
 
     this.active = active
-    this.name = name || capitalize(lastSignerType || '') + ' Account'
+    this.name = name || capitalize(this.lastSignerType|| '') + ' Account'
     this.ensName = ensName
 
     this.created = created || `new:${Date.now()}`

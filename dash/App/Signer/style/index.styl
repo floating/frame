@@ -1,16 +1,27 @@
+.expandedSigner
+  position relative
+  overflow hidden
+  box-sizing border-box
+  margin 6px
+  padding-bottom 24px
+  border-radius 27px
+  background var(--ghostA)
+  transform translate3d(0, 0, 0)
+  padding-top 8px
+
 .signer
   position relative
   width 100%
   overflow hidden
   box-sizing border-box
   margin 6px 0px 24px 0px
-  // padding 16px 0px
   padding-bottom 24px
   border-radius 27px
   background var(--ghostA)
   box-shadow 0px 4px 8px var(--ghostY)
   transform translate3d(0, 0, 0)
 
+.signer, .expandedSigner
   .signerTop
     position relative
     display flex
@@ -131,7 +142,7 @@
     background var(--good)
 
   .signerStatusText
-    padding 16px 32px
+    padding 32px
     margin 0px 6px 6px 6px
     border-radius 20px
     font-size 12px
@@ -164,7 +175,7 @@
     display flex
     justify-content center
     align-items center
-    padding 22px 16px 10px 16px
+    padding 18px 16px 10px 16px
 
     .signerBottomPages
       border-radius 8px
@@ -249,7 +260,7 @@
       margin-top -3px
 
   .signerControls
-    padding-top 0px
+    padding-top 16px
 
     .signerControlDetail
       height 40px
@@ -273,10 +284,10 @@
         font-family 'FiraCode'
 
     .signerControlOption
-      height 40px
+      height 52px
       margin 0px 10px 11px 10px
-      background var(--ghostB)
-      border-radius 17px
+      background var(--ghostA)
+      border-radius 20px
       color var(--outerspace)
       display flex
       justify-content center
@@ -287,28 +298,13 @@
       letter-spacing 0px
       box-sizing border-box
       text-transform uppercase
-      box-shadow 0px 2px 2px var(--ghostA)
+      border 3px solid var(--ghostZ)
 
       *
         pointer-events none
 
     .signerControlOption:hover
-      background var(--ghostC)
-      box-shadow 0px 4px 6px var(--ghostA)
-
-    // .signerControlOption
-    //   height 40px
-    //   background var(--ghostC)
-    //   margin 0px 10px 10px 10px
-    //   border-radius 8px
-    //   display flex
-    //   justify-content center
-    //   align-items center
-    //   font-size 14px
-    //   cursor pointer
-
-    //   *
-    //     pointer-events none
+      background var(--ghostB)
 
     .signerControlOptionImportant
       color var(--bad)
@@ -496,8 +492,8 @@
       background var(--ghostB)
       // color var(--good)
 
-      .signerAccountIndex
-        color var(--good)
+      // .signerAccountIndex
+      //   color var(--good)
 
       .signerAccountCheck
         // rcolor var(--good)
@@ -508,6 +504,13 @@
 
     .signerAccountAdded:hover
       background var(--ghostC)
+
+    .signerAccountDisabled
+      cursor auto
+
+    .signerAccountDisabled:hover
+      background var(--ghostA)
+      
 
 .signerOk
   .signerAccounts
