@@ -535,7 +535,27 @@ describe('migration 21', () => {
       main: {
         _version: 20,
         networks: {
-          ethereum: { }
+          ethereum: { 
+            5: {
+              id: 5,
+              type: 'ethereum',
+              layer: 'testnet',
+              symbol: 'ETH',
+              name: 'Görli',
+              explorer: 'https://goerli.etherscan.io',
+              gas: {
+                price: {
+                  selected: 'standard',
+                  levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+                }
+              },
+              connection: {
+                primary: { on: true, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
+                secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
+              },
+              on: false
+            }
+          }
         },
         networksMeta: {
           ethereum: { }
@@ -621,11 +641,56 @@ describe('migration 21', () => {
     delete state.main.networkPresets.ethereum[11155111]
 
     const updatedState = migrations.apply(state, 21)
-
     const sepolia = updatedState.main.networkPresets.ethereum[11155111]
 
     expect(sepolia).toMatchObject({
       infura: 'infuraSepolia'
+    })
+  })
+
+  const removedGoerliRPCs = ['mudit', 'slockit', 'prylabs']
+
+  removedGoerliRPCs.forEach((removedRPCName) => {
+    it(`resets and turns off goerli when the ${removedRPCName} RPC is active as a primary connection`, () => {
+      state.main.networks.ethereum[5].connection.primary = { 
+        on: true, 
+        current: removedRPCName, 
+        status: 'disconnected', 
+        connected: false, 
+        type: '', 
+        network: '', 
+        custom: '' 
+      }
+
+      const updatedState = migrations.apply(state, 21)
+      const goerli = updatedState.main.networks.ethereum[5]
+
+      expect(goerli.connection).toMatchObject({
+        primary: { on: true, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
+        secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
+      })
+      expect(goerli.on).toBe(false)
+    })
+
+    it(`resets and turns off goerli when the ${removedRPCName} RPC is active as a secondary connection`, () => {
+      state.main.networks.ethereum[5].connection.secondary = { 
+        on: true, 
+        current: removedRPCName, 
+        status: 'disconnected', 
+        connected: false, 
+        type: '', 
+        network: '', 
+        custom: '' 
+      }
+
+      const updatedState = migrations.apply(state, 21)
+      const goerli = updatedState.main.networks.ethereum[5]
+
+      expect(goerli.connection).toMatchObject({
+        primary: { on: true, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
+        secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
+      })
+      expect(goerli.on).toBe(false)
     })
   })
 })
