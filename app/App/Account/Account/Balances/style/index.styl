@@ -2,7 +2,7 @@
   0%
     background-position 0%
   100%
-    background-position -300%
+    background-position -400%
 
 .balancesBlock
   margin-bottom 60px
@@ -179,16 +179,16 @@
     right 0
     bottom 0
     left 0
-    background linear-gradient(90deg, var(--ghostB0) 36%, var(--ghostB) 48%, var(--ghostB) 52%, var(--ghostB0) 64%)
-    background-size 400% 100%
+    background linear-gradient(90deg, var(--ghostB0) 25%, var(--ghostB) 48%, var(--ghostB) 52%, var(--ghostB0) 75%)
+    background-size 500% 100%
     background-position 0%
-    animation moveGradient 6s infinite linear
+    animation moveGradient 5s infinite linear
     transition var(--standardFast)
 
   .signerBalanceInner
     position relative
     height 100%
-    transition var(--standardSlow)
+    transition all linear 0.8s
 
   .signerBalanceIcon
     position absolute
@@ -198,9 +198,9 @@
   .signerBalanceCurrency
     position absolute
     left 62px
-    top 24px
+    top 25px
     right 135px
-    font-size 14px
+    font-size 15px
     display flex
     align-items center
     font-weight 400
@@ -211,7 +211,7 @@
   .signerBalanceChain
     position absolute
     left 60px
-    top 8px
+    top 9px
     font-size 10px
     display flex
     align-items center
@@ -227,10 +227,10 @@
   .signerBalancePrice
     position absolute
     right 12px
-    bottom 10px
+    bottom 8px
     left 62px
     font-size 12px
-    font-weight 400
+    font-weight 300
     color var(--outerspace06)
     display flex
     align-items center
@@ -317,23 +317,23 @@
   .signerBalanceValue
     position absolute
     right 12px
-    top 21px
+    top 23px
     font-size 19px
     text-align center
     display flex
     align-items center
     font-family 'FiraCode'
     letter-spacing -1px
-    font-weight 300
+    font-weight 250
 
     .signerBalanceSymbol
       font-family 'MainFont'
       font-weight 500
-      font-size 12px
+      font-size 13px
       line-height 13px
       position relative
-      top -1px
-      letter-spacing 1px
+      top -0.5px
+      letter-spacing 0.5px
       color var(--outerspace)
       padding 3px 6px
       border-radius 6px

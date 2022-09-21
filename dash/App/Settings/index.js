@@ -231,24 +231,6 @@ class Settings extends React.Component {
               {'Mouse to display\'s right edge to summon Frame'}
             </div>
           </div>
-          <div className='signerPermission localSetting' style={{ zIndex: 210 }}>
-            <div className='signerPermissionControls'>
-              <div className='signerPermissionSetting'>Adjustable Nonce</div>
-              <div
-                className={this.store('main.nonceAdjust') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onClick={_ => {
-                  link.send('tray:action', 'toggleNonceAdjust')
-                  if (!this.store('main.nonceAdjust')) {
-                    link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'nonceWarning', notifyData: {}} })
-                  }
-                }}
-              >
-                <div className='signerPermissionToggleSwitch' />
-              </div>
-            </div>
-            <div className='signerPermissionDetails'>
-              {'Adds the ability to edit a transaction\'s nonce'}
-            </div>
-          </div>
           {/* <div className='signerPermission localSetting' style={{ zIndex: 6 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Show USD Value</div>
@@ -285,6 +267,25 @@ class Settings extends React.Component {
               <span>
                 Help improve Frame by anonymously reporting errors
               </span>
+            </div>
+          </div>
+
+          <div className='signerPermission localSetting' style={{ zIndex: 210 }}>
+            <div className='signerPermissionControls'>
+              <div className='signerPermissionSetting'>Adjustable Nonce</div>
+              <div
+                className={this.store('main.nonceAdjust') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onClick={_ => {
+                  link.send('tray:action', 'toggleNonceAdjust')
+                  if (!this.store('main.nonceAdjust')) {
+                    link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'nonceWarning', notifyData: {}} })
+                  }
+                }}
+              >
+                <div className='signerPermissionToggleSwitch' />
+              </div>
+            </div>
+            <div className='signerPermissionDetails'>
+              {'Adds the ability to edit a transaction\'s nonce'}
             </div>
           </div>
 

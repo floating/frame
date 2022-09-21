@@ -93,15 +93,15 @@ class SignerStatus extends React.Component {
         <div className='signerStatusWrap'>
           <div className='signerStatusMain'>
             <div className='signerUnlockWrap'>
-              <input ref={this.inputRef} className='signerUnlockInput' type='password' value={this.state.unlockInput} onChange={this.unlockChange.bind(this)} onKeyDown={e => {
+              <input autoFocus={true} ref={this.inputRef} className='signerUnlockInput' type='password' value={this.state.unlockInput} onChange={this.unlockChange.bind(this)} onKeyDown={e => {
                 if (e.key === 'Enter') {
                   e.preventDefault()
                   this.unlockSubmit()
                 }
               }} />
+              <div className='signerUnlockInputLabel'>{'Enter password to unlock'}</div>
               <div className='signerUnlockSubmit' onClick={this.unlockSubmit.bind(this)} >{'Unlock'}</div>
             </div>
-            <div className='signerUnlockInputLabel'>{'Enter signer password to unlock'}</div>
           </div>
         </div>
       </div>

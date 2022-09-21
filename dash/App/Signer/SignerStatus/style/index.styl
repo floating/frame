@@ -57,26 +57,12 @@
     border-radius 20px
     // box-shadow 0px 0px 10px var(--ghostZ), 0px 10px 20px var(--ghostZ)
     padding 3px
-    margin 26px 6px 32px 6px
+    margin 20px 6px 21px 6px
 
 .signerStatusHidden
   transform translateY(-40px)
   opacity 0
   pointer-events none
-
-.signerUnlockInputLabel
-  background var(--ghostA)
-  font-size 10px
-  border-radius 8px
-  border-bottom-left-radius 17px
-  border-bottom-right-radius 17px
-  display flex
-  justify-content center
-  align-items center
-  padding 9px 0px 8px 0px
-  text-transform uppercase
-  margin-top 3px
-  font-weight 400
 
 .signerUnlockWrap
   display flex
@@ -93,11 +79,12 @@
     text-shadow 0px 1px 2px var(--ghostX)
 
   .signerUnlockInput
-    height 56px
+    position relative
+    height 61px
     width 100%
     border 0
     outline 0
-    background var(--ghostA)
+    background var(--ghostZ)
     font-size 26px
     letter-spacing 6px
     display flex
@@ -106,20 +93,35 @@
     text-align center
     color var(--outerspace)
     box-sizing border-box
-    background var(--ghostB)
-    color var(--moon)
     border-radius 8px
     border-top-right-radius 17px
     border-top-left-radius 17px
     position relative
     z-index 4
+    padding-bottom 10px
+
+  .signerUnlockInputLabel
+    position absolute
+    top 46px
+    font-size 9px
+    border-radius 8px
+    border-bottom-left-radius 17px
+    border-bottom-right-radius 17px
+    display flex
+    justify-content center
+    align-items center
+    text-transform uppercase
+    margin-top 4px
+    font-weight 400
+    z-index 40000
 
   .signerUnlockSubmit
-    height 38px
+    height 30px
     background var(--ghostA)
     color var(--outerspace)
     font-size 12px
     box-sizing border-box
+    padding-top 1px
     margin 3px 0px 0px 0px
     width 140px
     border-radius 8px
@@ -131,8 +133,8 @@
     width 100%
     text-transform uppercase
     cursor pointer 
-    border-top-left-radius 8px
-    border-top-right-radius 8px
+    border-bottom-left-radius 17px
+    border-bottom-right-radius 17px
 
     *
       pointer-events none
