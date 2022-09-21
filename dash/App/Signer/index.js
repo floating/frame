@@ -303,19 +303,19 @@ class Signer extends React.Component {
             // link.send('nav:forward', 'dash', crumb)
             link.send('tray:action', 'navDash', crumb)
           }}>
-            {svg.open(14)}
+            {svg.bars(16)}
           </div>
           {/* {this.status()} */}
         </div>
         {this.statusText()}
         {status === 'ok' || isLocked ? (
           <>
-            <div className='signerAddedAccountTitle'>{'added accounts'}</div>
+            <div className='signerAddedAccountTitle'>{'active accounts'}</div>
             <div className='signerAccounts'>
               {addedAccounts.map((address) => {
                 const index = signer.addresses.indexOf(address) + 1
                 return (
-                  <div key={address} className={'signerAccount signerAccountAdded'} onClick={() => {
+                  <div key={address} className={'signerAccount signerAccountAdded signerAccountDisabled'} onClick={() => {
                     // if (this.store('main.accounts', address.toLowerCase())) {
                     //   link.rpc('removeAccount', address, {}, () => { })
                     // } else {

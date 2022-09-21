@@ -387,7 +387,15 @@ class FrameAccount {
       const inRequestView = panelNav.map((crumb: any) => crumb.view).includes('requestView')
 
       if (accountOpen && !inRequestView) {
-        const crumb = { view: 'requestView', data: { step: 'confirm', accountId: account, requestId: req.handlerId } } as const
+        const crumb = { 
+          view: 'requestView', 
+          data: { 
+            step: 'confirm', accountId: account, requestId: req.handlerId 
+          },
+          position: {
+            bottom: '200px'
+          }
+        } as const
         nav.forward('panel', crumb)
       }
     }
