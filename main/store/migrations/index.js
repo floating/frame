@@ -449,6 +449,21 @@ const migrations = {
         }
       }
     }
+    
+    // reset and switch off goerli if any removed RPCs are active
+    const removedGoerliRPCs = ['mudit', 'slockit', 'prylabs']
+    const goerliPrimaryConnection = initial.main.networks.ethereum[5].connection.primary.current
+    const goerliSecondaryConnection = initial.main.networks.ethereum[5].connection.primary.current
+    if (removedGoerliRPCs.includes(goerliPrimaryConnection) || removedGoerliRPCs.includes(goerliSecondaryConnection)) {
+      initial.main.networks.ethereum[5] = {
+        ...initial.main.networks.ethereum[5],
+        connection: {
+          primary: { on: true, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
+          secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
+        },
+        on: false
+      }
+    }
 
     return initial
   },
