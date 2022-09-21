@@ -74,7 +74,7 @@ class FrameAccount {
     this.lastSignerType = lastSignerType || (options.type as SignerType)
 
     this.active = active
-    this.name = name || capitalize(lastSignerType || '') + ' Account'
+    this.name = name || capitalize(this.lastSignerType || '') + ' Account'
     this.ensName = ensName
 
     this.created = created || `new:${Date.now()}`
@@ -387,7 +387,15 @@ class FrameAccount {
       const inRequestView = panelNav.map((crumb: any) => crumb.view).includes('requestView')
 
       if (accountOpen && !inRequestView) {
-        const crumb = { view: 'requestView', data: { step: 'confirm', accountId: account, requestId: req.handlerId } } as const
+        const crumb = { 
+          view: 'requestView', 
+          data: { 
+            step: 'confirm', accountId: account, requestId: req.handlerId 
+          },
+          position: {
+            bottom: '200px'
+          }
+        } as const
         nav.forward('panel', crumb)
       }
     }
@@ -456,8 +464,8 @@ class FrameAccount {
           cb(new Error('Could not find address in signer'))
         }
       } else {
-        log.info('No signer active to verify address')
-        cb(new Error('No signer active to verify address'))
+        log.info('Signer not accessible to verify address')
+        cb(new Error('Signer not accessible to verify address'))
       }
     }
   }

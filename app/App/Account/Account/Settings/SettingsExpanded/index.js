@@ -3,7 +3,7 @@ import Restore from 'react-restore'
 import link from '../../../../../../resources/link'
 import svg from '../../../../../../resources/svg'
 
-import Verify from '../Verify'
+// import Verify from '../../Signer/Verify'
 
 class Settings extends React.Component {
   constructor (...args) {
@@ -67,36 +67,25 @@ class Settings extends React.Component {
             </div>
           ) : null}
 
-          <div className='panelBlock'>
+          {/* <div className='panelBlock'>
             <div className='panelBlockTitle'>
               Signer
             </div>
             <div className='panelBlockValues'>
               {account.signer ? (
                 <div className='panelBlockValue panelBlockItem'>
-                  {`${account.lastSignerType} signer connected`}
+                  `${account.lastSignerType} signer connected`}
                 </div>
               ) : (
                 <div className='panelBlockValue panelBlockItem'>
                   {'signer disconnected'}
                 </div>
               )}
-              <Verify 
+              {/* <Verify 
                 id={this.props.account}
               />
             </div>
-          </div>
-          <div className='panelBlock'>
-            <div className='panelBlockValues'>
-              <div className='panelBlockButton panelBlockItem' onMouseDown={() => {
-                link.rpc('removeAccount', this.props.account, {}, () => {})
-              }}
-                style={{ color: 'var(--bad)' }}
-              >
-                {'Remove This Account'}
-              </div>
-            </div>
-          </div>
+          </div> */}
           {/* <div className='moduleRow'>ENS Name: {account.ensName  ? account.ensName : 'none'}</div> */}
           {/* <div className='moduleRow'>Account Added: {account.created}</div> */}
         </div>

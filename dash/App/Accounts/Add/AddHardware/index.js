@@ -5,7 +5,7 @@ import link from '../../../../../resources/link'
 import svg from '../../../../../resources/svg'
 import RingIcon from '../../../../../resources/Components/RingIcon'
 
-import Signer from '../../Signer'
+import Signer from '../../../Signer'
 
 class AddHardware extends React.Component {
   constructor (...args) {

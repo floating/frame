@@ -15,7 +15,6 @@ import Permissions from './Permissions'
 import Requests from './Requests'
 import Settings from './Settings'
 import Signer from './Signer'
-import SignerStatus from './SignerStatus'
 
 // move 
 import ProviderRequest from './Requests/ProviderRequest'
@@ -137,73 +136,6 @@ class _AccountModule extends React.Component {
         </div>
       )
     }
-
-    return (
-      <div className={'accountModule'} style={style}>
-        <div className='accountModuleInner cardShow' style={{ animationDelay: (index * 0.1) + 's'}}>
-          {
-            id === 'gas' ? <Gas 
-              moduleId={id} 
-              id={account}
-              expanded={expanded}
-              filter={filter}
-            /> :
-            id === 'requests' ? <Requests 
-              _id={id}
-              id={account}
-              addresses={this.props.addresses} 
-              minimized={this.props.minimized} 
-              status={this.props.status} 
-              signer={this.props.signer}
-              expanded={expanded}
-              filter={filter}
-            /> :
-            id === 'activity' ? <Activity 
-              moduleId={id} 
-              id={account}
-              expanded={expanded}
-              filter={filter}
-            /> :
-            id === 'launcher' ? <Launcher 
-              moduleId={id}
-              id={account} 
-              expanded={expanded}
-              filter={filter}
-            /> :
-            id === 'inventory' ? <Inventory 
-              moduleId={id} 
-              account={account}
-              expanded={expanded}
-              expandedData={expandedData}
-              filter={filter}
-            /> :
-            id === 'permissions' ? <Permissions
-              moduleId={id}
-              account={account}
-              expanded={expanded}
-              filter={filter}
-            /> :
-            id === 'balances' ? <Balances
-              moduleId={id}
-              account={account}
-              expanded={expanded}
-              filter={filter}
-            /> :
-            id === 'settings' ? <Settings
-              moduleId={id}
-              account={account}
-              expanded={expanded}
-              filter={filter}
-            /> :
-            <Default 
-              moduleId={id}
-              expanded={expanded}
-              filter={filter}
-            />
-          }
-        </div>  
-      </div>
-    )
   }
 }
 
@@ -230,34 +162,10 @@ class _AccountMain extends React.Component {
   // }
   
 
-  setSignerStatusOpen (value) {
-    link.send('tray:action', 'setAccountSignerStatusOpen', value)
-  }
-  
-  renderSignerStatus () {
-    const current = (this.store('selected.current') === this.props.id) && this.props.status === 'ok'
-    const open = current && this.store('selected.open')
+  // setSignerStatusOpen (value) {
+  //   link.send('tray:action', 'setAccountSignerStatusOpen', value)
+  // }
 
-    const signerStatusOpen = current && this.store('selected.signerStatusOpen')
-
-    const account = this.store('main.accounts', this.props.id)
-    let signer
-
-    if (account.signer) {
-      signer = this.store('main.signers', account.signer)
-    } else if (account.smart)  {
-      const actingSigner = this.store('main.accounts', account.smart.actor, 'signer')
-      if (actingSigner) signer = this.store('main.signers', actingSigner)
-    }
-    if (!signerStatusOpen || !open) return null
-    return (
-      <SignerStatus 
-        open={open}
-        signer={signer}
-        setSignerStatusOpen={this.setSignerStatusOpen}
-      />
-    )
-  }
 
   renderAccountFilter () {
     const accountOpen = this.store('selected.open')
@@ -313,7 +221,6 @@ class _AccountMain extends React.Component {
     })
     return (
       <div className='accountMain'>
-        {this.renderSignerStatus()}
         <div className='accountMainScroll'>
           {this.renderAccountFilter()}
           <div className='accountMainSlide' style={{ height: slideHeight + 'px' }}>

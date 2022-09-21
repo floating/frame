@@ -1,5 +1,6 @@
 import log from 'electron-log'
 
+import EthereumProvider from 'ethereum-provider'
 import ethProvider from 'eth-provider'
 
 log.transports.console.format = '[scanWorker] {h}:{i}:{s}.{ms} {text}'
@@ -21,7 +22,7 @@ let balances: BalanceLoader
 const eth = ethProvider('frame', { origin: 'frame-internal', name: 'scanWorker' })
 const tokenLoader = new TokenLoader()
 
-eth.on('error', e => {
+eth.on('error', (e) => {
   log.error('Error in balances worker', e)
   disconnect()
 })

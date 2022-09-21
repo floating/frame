@@ -785,18 +785,6 @@ class Settings extends React.Component {
           </div>
         </div> */}
         <div className='localSettingsWrap'>
-          <div className='newAccount' onClick={() => link.send('tray:action', 'navDash', {
-            view: 'notify',
-            data: {
-              notify: 'addChain',
-              notifyData: {
-                chain: { type: 'ethereum' }
-              }
-            }})
-          }>
-            <div className='newAccountIcon'>{svg.plus(16)}</div> 
-            Add New Chain
-          </div>
           {this.renderConnections('mainnet')}
           <div className='networkBreak'>
             <div className='networkBreakLayer'>Rollups</div>
@@ -815,6 +803,18 @@ class Settings extends React.Component {
           </div>
           {this.renderConnections('other')}
           {this.discord()}
+          <div className='newAccount' onClick={() => link.send('tray:action', 'navDash', {
+            view: 'notify',
+            data: {
+              notify: 'addChain',
+              notifyData: {
+                chain: { type: 'ethereum' }
+              }
+            }})
+          }>
+            <div className='newAccountIcon'>{svg.plus(16)}</div> 
+            Add New Chain
+          </div>
         </div>
       </div>
     )

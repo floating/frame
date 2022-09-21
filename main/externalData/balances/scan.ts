@@ -6,9 +6,10 @@ import log from 'electron-log'
 
 import multicall, { Call, supportsChain as multicallSupportsChain } from '../../multicall'
 import erc20TokenAbi from './erc-20-abi'
-
 import { groupByChain, TokensByChain } from './reducers'
-import { EthereumProvider } from 'eth-provider'
+
+import type { BytesLike } from '@ethersproject/bytes'
+import type EthereumProvider from 'ethereum-provider'
 
 let id = 1
 const erc20Interface = new Interface(erc20TokenAbi)
@@ -55,7 +56,7 @@ export default function (eth: EthereumProvider) {
 
   async function getNativeCurrencyBalance (address: string, chainId: number) {
     try {
-      const rawBalance = await eth.request({
+      const rawBalance: string = await eth.request({
         method: 'eth_getBalance',
         params: [address, 'latest'],
         chainId: addHexPrefix(chainId.toString(16))
@@ -72,10 +73,8 @@ export default function (eth: EthereumProvider) {
   async function getTokenBalance (token: TokenDefinition, owner: string)  {
     const functionData = erc20Interface.encodeFunctionData('balanceOf', [owner])
 
-    const response = await eth.request({
+    const response: BytesLike = await eth.request({
       method: 'eth_call',
-      jsonrpc: '2.0',
-      id: id += 1,
       chainId: addHexPrefix(token.chainId.toString(16)),
       params: [{ to: token.address, value: '0x0', data: functionData }, 'latest']
     })
