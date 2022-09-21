@@ -1,14 +1,12 @@
-import React from 'react'
+import React, { Children } from 'react'
 import Restore from 'react-restore'
 import link from '../../../../../../../resources/link'
-import svg from '../../../../../../../resources/svg'
 import utils from 'web3-utils'
 import BigNumber from 'bignumber.js'
 import Transfer from './erc20/transfer'
 import Recipient from './recipient'
 import Destination from './destination'
 import Register from './ens/register'
-
 
 const ActionBox = ({ title, subHead, animationIndex, children }) => {
   return (
@@ -30,9 +28,11 @@ const ActionBox = ({ title, subHead, animationIndex, children }) => {
             }
           </div>
         </div>
-        <div className='_txMainValues'>
-          {children}
-        </div>
+        {Children.count(children) > 0 &&
+          <div className='_txMainValues'>
+            {children}
+          </div>
+        }
       </div>
     </div>
   )
@@ -60,7 +60,6 @@ class TxSending extends React.Component {
     const chainName = this.store('main.networks.ethereum', chainId, 'name')
 
     const { action } = this.props
-    console.log('ACTION', JSON.stringify(action))
     const [actionClass, actionType] = action.id.split(':')
 
     if (actionClass === 'erc20') {
@@ -92,11 +91,16 @@ class TxSending extends React.Component {
       }
     }
 
-
     if (actionClass === 'ens') {
-      if (actionType === 'register') {
-        const { address, domain } = action.data || {}
+      const { address, domain } = action.data || {}
 
+      if (actionType === 'commit') {
+        return (
+          <ActionBox title={'Commitment to Register ENS Domain'} animationIndex={this.props.i} />
+        )
+      }
+        
+      if (actionType === 'register') {
         return (
           <ActionBox title={'Registering ENS Domain'} animationIndex={this.props.i}>
             <Register

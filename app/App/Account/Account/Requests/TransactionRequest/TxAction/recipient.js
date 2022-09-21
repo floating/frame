@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import svg from '../../../../../../../resources/svg'
 
 let copyTimeout = null
 

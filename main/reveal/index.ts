@@ -7,18 +7,34 @@ import nebulaApi from '../nebula'
 
 import Erc20Contract from '../contracts/erc20'
 import { decodeCallData, fetchContract, ContractSource } from '../contracts'
-import ensAbi from '../contracts/abi/ens'
+import { registrarController } from '../contracts/abi/ens'
 import erc20 from '../externalData/balances/erc-20-abi'
 import { Interface } from '@ethersproject/abi'
 import { addHexPrefix } from 'ethereumjs-util'
 
 const knownContracts: Record<string, DecodeFunction> = {
-  '0x00000000000c2e074ec69a0dfb2997ba6c7d2e1e': (calldata) => {
-    const ens = new Interface(ensAbi)
+  [registrarController.address.toLowerCase()]: (calldata) => {
+    try {
+      const ens = new Interface(registrarController.abi)
+      const decoded = ens.parseTransaction({ data: calldata })
+      const { name } = decoded || {}
 
-    return {
-      id: 'ens:register',
-      data: { address: '0xb120c885f1527394C78D50e7C7DA57DEfb24F612', domain: 'jordan.eth' }
+      if (name === 'commit') {
+        return {
+          id: 'ens:commit'
+        }
+      }
+
+      if (name === 'register') {
+        const { owner, name } = decoded.args
+
+        return {
+          id: 'ens:register',
+          data: { address: owner, domain: name }
+        }
+      }
+    } catch (e) {
+      log.warn('Could not decode ENS registrar controller call', { calldata })
     }
   }
 }
@@ -32,17 +48,17 @@ const provider = new EthereumProvider(proxyConnection)
 provider.setChain('0x1')
 
 // TODO: put these types in a standard actions location
-export type ActionType = 'erc20:approval' | 'erc20:transfer' | 'ens:register'
+export type ActionType = 'erc20:approval' | 'erc20:transfer' | 'ens:commit' | 'ens:register'
 export type Action = {
   id: ActionType
-  data: any
+  data?: any
 }
 
 type Actions = Array<Action>
 
 type EntityType = 'external' | 'contract' | 'unknown'
 
-type DecodeFunction = (calldata: string) => Action
+type DecodeFunction = (calldata: string) => Action | undefined
 
 async function resolveEntityType (address: string, chainId: number): Promise<EntityType> {
   if (!address || !chainId) return 'unknown'
@@ -106,10 +122,7 @@ async function recogErc20 (contractAddress: string, chainId: number, calldata: s
 }
 
 function identifyKnownContractActions (contractAddress: string, chainId: number, calldata: string): Action | undefined {
-  console.log({ realContract: contractAddress })
-  //const knownContract = knownContracts[contractAddress.toLowerCase()]
-
-  const knownContract = knownContracts['0x00000000000c2e074ec69a0dfb2997ba6c7d2e1e']
+  const knownContract = knownContracts[contractAddress.toLowerCase()]
 
   if (knownContract) {
     return knownContract(calldata)
@@ -155,11 +168,10 @@ const surface = {
   recog: async (contractAddress: string = '', chainId: number, calldata: string) => {
     // Recognize actions from standard tx types
     const actions = ([] as Actions).concat(
-      //await recogErc20(contractAddress, chainId, calldata) || [],
+      await recogErc20(contractAddress, chainId, calldata) || [],
       identifyKnownContractActions(contractAddress, chainId, calldata) || []
     )
 
-    console.log({ recognizedActions: actions })
     return actions
   },
   simulate: async () => {}
