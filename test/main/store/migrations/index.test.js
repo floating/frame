@@ -600,7 +600,6 @@ describe('migration 21', () => {
     }
 
     const updatedState = migrations.apply(state, 21)
-
     const sepolia = updatedState.main.networks.ethereum[11155111]
 
     expect(sepolia.explorer).toBe('https://custom-explorer.sepolia.dev')
@@ -612,7 +611,6 @@ describe('migration 21', () => {
     delete state.main.networksMeta.ethereum[11155111]
 
     const updatedState = migrations.apply(state, 21)
-
     const sepolia = updatedState.main.networksMeta.ethereum[11155111]
 
     expect(sepolia.gas.fees.maxFeePerGas).toBe(undefined)
@@ -631,7 +629,6 @@ describe('migration 21', () => {
     }
 
     const updatedState = migrations.apply(state, 21)
-
     const sepolia = updatedState.main.networksMeta.ethereum[11155111]
 
     expect(sepolia.gas.fees.maxFeePerGas).toBe('0xf')
