@@ -104,7 +104,7 @@ class TxSending extends React.Component {
         return (
           <ActionBox title={'Registering ENS Domain'} animationIndex={this.props.i}>
             <Register
-              address={address} domain={domain} copyAddress={(copied) => link.send('tray:clipboardData', copied)} />
+              address={address} domain={`${domain}.eth`} copyAddress={(copied) => link.send('tray:clipboardData', copied)} />
           </ActionBox>
         )
       }

@@ -10,14 +10,26 @@ import { decodeCallData, fetchContract, ContractSource } from '../contracts'
 import { registrarController } from '../contracts/abi/ens'
 import erc20 from '../externalData/balances/erc-20-abi'
 import { Interface } from '@ethersproject/abi'
+
+import type { BigNumber } from 'ethers'
+
 import { addHexPrefix } from 'ethereumjs-util'
+
+namespace ENS {
+  export type Register = {
+    name: string
+    owner: string
+    duration: BigNumber
+    resolver?: string
+  }
+}
 
 const knownContracts: Record<string, DecodeFunction> = {
   [registrarController.address.toLowerCase()]: (calldata) => {
     try {
       const ens = new Interface(registrarController.abi)
       const decoded = ens.parseTransaction({ data: calldata })
-      const { name } = decoded || {}
+      const { name = '' } = decoded || {}
 
       if (name === 'commit') {
         return {
@@ -25,8 +37,8 @@ const knownContracts: Record<string, DecodeFunction> = {
         }
       }
 
-      if (name === 'register') {
-        const { owner, name } = decoded.args
+      if (['register', 'registerwithconfig'].includes(name.toLowerCase())) {
+        const { owner, name, duration, resolver } = decoded.args as unknown as ENS.Register
 
         return {
           id: 'ens:register',
