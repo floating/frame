@@ -46,8 +46,8 @@ export default class AutoUpdater extends EventEmitter {
     this.electronAutoUpdater.allowPrerelease = false
     this.electronAutoUpdater.autoDownload = false
   
-    this.electronAutoUpdater.on('error', (err: string) => {
-      this.emit('error', new Error(err))
+    this.electronAutoUpdater.on('error', (err: Error, message?: string) => {
+      this.emit('error', new Error(message || err.message || ''))
     })
   
     this.electronAutoUpdater.on('checking-for-update', () => {
@@ -90,7 +90,7 @@ export default class AutoUpdater extends EventEmitter {
         const result = await this.electronAutoUpdater.checkForUpdates()
 
         if (!result) {
-          this.electronAutoUpdater.emit('update-not-available', 'updater is not active')
+          this.electronAutoUpdater.emit('update-not-available', { version: '', files: [], sha512: '', path: '', releaseDate: '' })
         }
       } catch (e) {
         // in case of failure an error is emitted, but for some reason an exception is also thrown

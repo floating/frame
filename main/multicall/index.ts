@@ -3,7 +3,8 @@ import { Interface } from '@ethersproject/abi'
 import { addHexPrefix } from 'ethereumjs-util'
 import log from 'electron-log'
 
-import type { EthereumProvider } from 'eth-provider'
+import type { BytesLike } from '@ethersproject/bytes'
+import type EthereumProvider from 'ethereum-provider'
 
 import {
   abi,
@@ -32,9 +33,7 @@ function chainConfig (chainId: number, eth: EthereumProvider): MulticallConfig {
 async function makeCall (functionName: string, params: any[], config: MulticallConfig) {
   const data = multicallInterface.encodeFunctionData(functionName, params)
 
-  const response = await config.provider.request({
-    id: 1,
-    jsonrpc: '2.0',
+  const response: BytesLike = await config.provider.request({
     method: 'eth_call',
     params: [
       { to: config.address, data }, 'latest'

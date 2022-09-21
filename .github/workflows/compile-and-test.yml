@@ -15,12 +15,12 @@ jobs:
     - uses: actions/checkout@v2
     - uses: actions/setup-node@v2
       with:
-        node-version: 16.13.2
+        node-version: 16.15.0
     - name: create NPM config file
       run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_AUTH_TOKEN }}" > ./.npmrc
     - run: |
         sudo apt update -y
         sudo apt install -y libudev-dev
-    - run: npm run setup
+    - run: npm run setup:ci
     - run: npm run compile
     - run: npm run test:unit

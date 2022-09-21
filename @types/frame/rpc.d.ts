@@ -16,7 +16,7 @@ enum SubscriptionType {
 
 interface RPCId {
   id: number,
-  jsonrpc: string
+  jsonrpc: '2.0'
 }
 
 interface InternalPayload {
@@ -24,8 +24,8 @@ interface InternalPayload {
 }
 
 interface JSONRPCRequestPayload extends RPCId {
-  params: any[],
-  method: string,
+  params: readonly any[]
+  method: string
   chainId?: string
 }
 
