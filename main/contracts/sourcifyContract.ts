@@ -1,7 +1,6 @@
 import log from 'electron-log'
 import { Response } from 'node-fetch'
 import { JsonFragment } from '@ethersproject/abi'
-import { hexToNumberString } from 'web3-utils'
 import type { ContractSource } from '.'
 import { fetchWithTimeout } from '../../resources/utils/fetch'
 
@@ -43,8 +42,8 @@ interface SourcifyMetadataFileContent {
   version: number
 }
 
-function getEndpointUrl (contractAddress: Address, chainId: string) {
-  return `https://sourcify.dev/server/files/any/${hexToNumberString(chainId)}/${contractAddress}`
+function getEndpointUrl (contractAddress: Address, chainId: number) {
+  return `https://sourcify.dev/server/files/any/${chainId}/${contractAddress}`
 }
 
 async function parseResponse <T>(response: Response): Promise<T | undefined> {
@@ -54,7 +53,7 @@ async function parseResponse <T>(response: Response): Promise<T | undefined> {
   return Promise.resolve(undefined)
 }
 
-async function fetchSourceCode (contractAddress: Address, chainId: string): Promise<SourcifyMetadataFileContent | undefined> {
+async function fetchSourceCode (contractAddress: Address, chainId: number): Promise<SourcifyMetadataFileContent | undefined> {
   const endpointUrl = getEndpointUrl(contractAddress, chainId)
   
   try {
@@ -68,7 +67,7 @@ async function fetchSourceCode (contractAddress: Address, chainId: string): Prom
   }
 }
 
-export async function fetchSourcifyContract (contractAddress: Address, chainId: string): Promise<ContractSource | undefined> {
+export async function fetchSourcifyContract (contractAddress: Address, chainId: number): Promise<ContractSource | undefined> {
   try {
     const result = await fetchSourceCode(contractAddress, chainId)
     

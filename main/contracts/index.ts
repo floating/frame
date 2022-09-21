@@ -58,7 +58,7 @@ export function decodeCallData (calldata: string, abi: string) {
   }
 }
 
-export async function fetchContract (contractAddress: Address, chainId: string): Promise<ContractSourceResult> {
+export async function fetchContract (contractAddress: Address, chainId: number): Promise<ContractSourceResult> {
   const fetches = fetchSources.map((getContract) => getContract(contractAddress, chainId))
 
   let contract: ContractSourceResult = undefined

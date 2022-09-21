@@ -261,7 +261,7 @@ class FrameAccount {
     const calldata = req.data.data
     if (!calldata) return
 
-    const contract = new Erc20Contract(contractAddress, req.data.chainId)
+    const contract = new Erc20Contract(contractAddress, parseInt(req.data.chainId, 16))
     const decodedData = contract.decodeCallData(calldata)
 
     if (decodedData) {
@@ -303,7 +303,7 @@ class FrameAccount {
 
     if (to) { // Get recipient identity
       try {
-        const recipient = await reveal.identity(to, chainId)
+        const recipient = await reveal.identity(to, parseInt(chainId, 16))
         const knownTxRequest = this.requests[req.handlerId] as TransactionRequest
   
         if (recipient && knownTxRequest) {
@@ -322,7 +322,7 @@ class FrameAccount {
 
     if (to && calldata && calldata !== '0x' && parseInt(calldata, 16) !== 0) { 
       try { // Decode calldata
-        const decodedData = await reveal.decode(to, chainId, calldata)
+        const decodedData = await reveal.decode(to, parseInt(chainId, 16), calldata)
         const knownTxRequest = this.requests[req.handlerId] as TransactionRequest
   
         if (knownTxRequest && decodedData) {
@@ -340,7 +340,7 @@ class FrameAccount {
 
     if (to && calldata && calldata !== '0x' && parseInt(calldata, 16) !== 0) { 
       try { // Recognize actions
-        const actions = await reveal.recog(to, chainId, calldata)
+        const actions = await reveal.recog(to, parseInt(chainId, 16), calldata)
         const knownTxRequest = this.requests[req.handlerId] as TransactionRequest
 
         if (knownTxRequest && actions ) {

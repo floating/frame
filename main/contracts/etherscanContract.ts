@@ -23,10 +23,10 @@ const getEndpoint = (domain: string, contractAddress: string, apiKey: string) =>
 }
 
 const endpointMap = {
-  '0x1': (contractAddress: Address) => getEndpoint('api.etherscan.io', contractAddress, '3SYU5MW5QK8RPCJV1XVICHWKT774993S24'),
-  '0x89': (contractAddress: Address) => getEndpoint('api.polygonscan.com', contractAddress, '2P3U9T63MT26T1X64AAE368UNTS9RKEEBB'),
-  '0xa': (contractAddress: Address) => getEndpoint('api-optimistic.etherscan.io', contractAddress, '3SYU5MW5QK8RPCJV1XVICHWKT774993S24'),
-  '0xa4b1': (contractAddress: Address) => getEndpoint('api.arbiscan.io', contractAddress, 'VP126CP67QVH9ZEKAZT1UZ751VZ6ZTIZAD')
+  1: (contractAddress: Address) => getEndpoint('api.etherscan.io', contractAddress, '3SYU5MW5QK8RPCJV1XVICHWKT774993S24'),
+  10: (contractAddress: Address) => getEndpoint('api-optimistic.etherscan.io', contractAddress, '3SYU5MW5QK8RPCJV1XVICHWKT774993S24'),
+  137: (contractAddress: Address) => getEndpoint('api.polygonscan.com', contractAddress, '2P3U9T63MT26T1X64AAE368UNTS9RKEEBB'),
+  42161: (contractAddress: Address) => getEndpoint('api.arbiscan.io', contractAddress, 'VP126CP67QVH9ZEKAZT1UZ751VZ6ZTIZAD')
 }
 
 async function parseResponse <T>(response: Response): Promise<T | undefined> {
@@ -52,7 +52,7 @@ export function chainSupported (chainId: string) {
   return Object.keys(endpointMap).includes(chainId)
 }
 
-export async function fetchEtherscanContract (contractAddress: Address, chainId: string): Promise<ContractSource | undefined> {
+export async function fetchEtherscanContract (contractAddress: Address, chainId: number): Promise<ContractSource | undefined> {
   if (!(chainId in endpointMap)) {
     return
   }

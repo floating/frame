@@ -3,8 +3,40 @@ import Restore from 'react-restore'
 import link from '../../../../../../../resources/link'
 import svg from '../../../../../../../resources/svg'
 import utils from 'web3-utils'
-import { getAddress } from '@ethersproject/address'
 import BigNumber from 'bignumber.js'
+import Transfer from './erc20/transfer'
+import Recipient from './recipient'
+import Destination from './destination'
+import Register from './ens/register'
+
+
+const ActionBox = ({ title, subHead, animationIndex, children }) => {
+  return (
+    <div className='_txMain' style={{ animationDelay: (0.1 * animationIndex) + 's' }}>
+      <div className='_txMainInner'>
+        <div className='_txLabel'>
+          <div>
+            <span>{title}</span>
+            {subHead &&
+              <span style={{ 
+                opacity: 0.8, 
+                fontSize: '9px',
+                position: 'relative',
+                top: '-1px',
+                left: '4px'
+              }}>
+                {`(${subHead})`}
+              </span>
+            }
+          </div>
+        </div>
+        <div className='_txMainValues'>
+          {children}
+        </div>
+      </div>
+    </div>
+  )
+}
 
 class TxSending extends React.Component {
   constructor (...args) {
@@ -28,82 +60,52 @@ class TxSending extends React.Component {
     const chainName = this.store('main.networks.ethereum', chainId, 'name')
 
     const { action } = this.props
-    const { amount, decimals, name, recipient, symbol, recipientType, recipientEns } = action.data || {}
-    const value = new BigNumber(amount) 
-    const displayValue = value.dividedBy('1e' + decimals).toFixed(6)
-    const address = recipient
-    // const ensName = (recipientEns && recipientEns.length < 25) ? recipientEns : ''
-    const layer = this.store('main.networks', this.props.chain.type, this.props.chain.id, 'layer')
+    console.log('ACTION', JSON.stringify(action))
+    const [actionClass, actionType] = action.id.split(':')
 
-    if (action.type === 'erc20:transfer') {
-      const rate = this.store('main.rates', contract)
-      const rateUSD = rate && rate.usd && layer !== 'testnet' ? rate.usd.price : 0
-      return (
-        <div className='_txMain' style={{ animationDelay: (0.1 * this.props.i) + 's' }}>
-          <div className='_txMainInner'>
-            <div className='_txLabel'>
-              <div>
-                <span>{`Sending ${symbol}`}</span>
-                <span style={{ 
-                  opacity: 0.8, 
-                  fontSize: '9px',
-                  position: 'relative',
-                  top: '-1px',
-                  left: '4px'
-                }}>
-                  {`(${name})`}
-                </span>
-              </div>
-            </div>
-            <div className='_txMainValues'>
-              <div className='_txMainTransferring'>
-                <div className='_txMainTransferringPart _txMainTransferringPartLarge'>
-                  <span className='_txMainTransferringSymbol'>{symbol}</span>
-                  <span className='_txMainTransferringAmount'>{displayValue}</span>
-                </div>
-                <div className='_txMainTransferringPart'>
-                  <span className='_txMainTransferringEq'>{'≈'}</span>
-                  <span className='_txMainTransferringEqSymbol'>{'$'}</span>
-                  <span className='_txMainTransferringEqAmount'>{(displayValue * rateUSD).toFixed(2)}</span>
-                </div>
-              </div>
-              {address && recipientType === 'contract' ? (
-                <div className='_txMainTag'>
-                  {`to contract on ${chainName}`}
-                </div>
-              ) : address ? (
-                <div className='_txMainTag'>
-                  {`to account on ${chainName}`}
-                </div>
-              ) : null}
-              {address ? (
-                <div className='_txMainValue'>
-                  {recipientEns
-                    ? <span className='_txRecipient'>{recipientEns}</span>
-                    : <span className='_txRecipient'>{address.substring(0, 8)}{svg.octicon('kebab-horizontal', { height: 15 })}{address.substring(address.length - 6)}</span>
-                  }
-                  {/* {req.decodedData && req.decodedData.contractName ? ( 
-                    <span className={'_txDataValueMethod'}>{(() => {
-                      if (req.decodedData.contractName.length > 11) return `${req.decodedData.contractName.substr(0, 9)}..`
-                      return req.decodedData.contractName
-                    })()}</span>
-                  ) : null} */}
-                  <div className='_txRecipientFull' onClick={() => {
-                    this.copyAddress(address)
-                  }}>
-                    {this.state.copied ? (
-                      <span>{'Address Copied'}</span>
-                    ) : (
-                      <span className='_txRecipientFira'>{address}</span>
-                    )}
-                  </div>
-                </div>
-              ) : null}
-            </div>
-          </div>
-        </div>
-      )
+    if (actionClass === 'erc20') {
+      if (actionType === 'transfer') {
+        const { amount, decimals, name, recipient: recipientAddress, symbol, recipientType, recipientEns } = action.data || {}
+        const value = new BigNumber(amount) 
+        const displayValue = value.dividedBy('1e' + decimals).toFixed(6)
+        // const ensName = (recipientEns && recipientEns.length < 25) ? recipientEns : ''
+
+        const layer = this.store('main.networks', this.props.chain.type, this.props.chain.id, 'layer')    
+        const rate = this.store('main.rates', contract)
+        const rateUSD = rate && rate.usd && layer !== 'testnet' ? rate.usd.price : 0
+  
+        const destination = recipientType && <Destination chain={chainName} recipientType={recipientType} />
+        const recipient = recipientAddress && 
+          <Recipient
+            address={recipientAddress}
+            ens={recipientEns}
+            copyAddress={(copied) => link.send('tray:clipboardData', copied)}
+          />
+  
+        return (
+          <ActionBox title={`Sending ${symbol}`} subHead={name} animationIndex={this.props.i}>
+            <Transfer symbol={symbol} rate={rateUSD} displayValue={displayValue} />
+            {destination}
+            {recipient}
+          </ActionBox>
+        )
+      }
     }
+
+
+    if (actionClass === 'ens') {
+      if (actionType === 'register') {
+        const { address, domain } = action.data || {}
+
+        return (
+          <ActionBox title={'Registering ENS Domain'} animationIndex={this.props.i}>
+            <Register
+              address={address} domain={domain} copyAddress={(copied) => link.send('tray:clipboardData', copied)} />
+          </ActionBox>
+        )
+      }
+    }
+
     return null
   }
 }
