@@ -86,7 +86,7 @@
     "electron-log": "4.4.7",
     "electron-updater": "5.0.1",
     "eth-ens-namehash": "2.0.8",
-    "eth-provider": "0.12.1",
+    "eth-provider": "0.13.3",
     "eth-sig-util": "3.0.1",
     "ethereum-public-key-to-address": "0.0.5",
     "extract-zip": "2.0.1",
