@@ -91,25 +91,6 @@ class TxSending extends React.Component {
       }
     }
 
-    if (actionClass === 'ens') {
-      const { address, domain } = action.data || {}
-
-      if (actionType === 'commit') {
-        return (
-          <ActionBox title={'Commitment to Register ENS Domain'} animationIndex={this.props.i} />
-        )
-      }
-        
-      if (actionType === 'register') {
-        return (
-          <ActionBox title={'Registering ENS Domain'} animationIndex={this.props.i}>
-            <Register
-              address={address} domain={`${domain}.eth`} copyAddress={(copied) => link.send('tray:clipboardData', copied)} />
-          </ActionBox>
-        )
-      }
-    }
-
     return null
   }
 }

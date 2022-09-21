@@ -29,6 +29,7 @@ const knownContracts: Record<string, DecodeFunction> = {
     try {
       const ens = new Interface(registrarController.abi)
       const decoded = ens.parseTransaction({ data: calldata })
+      console.log({ decoded })
       const { name = '' } = decoded || {}
 
       if (name === 'commit') {
@@ -42,7 +43,7 @@ const knownContracts: Record<string, DecodeFunction> = {
 
         return {
           id: 'ens:register',
-          data: { address: owner, domain: name }
+          data: { address: owner, name: `${name}.eth` }
         }
       }
     } catch (e) {
@@ -134,6 +135,7 @@ async function recogErc20 (contractAddress: string, chainId: number, calldata: s
 }
 
 function identifyKnownContractActions (contractAddress: string, chainId: number, calldata: string): Action | undefined {
+  console.log({ contractAddress })
   const knownContract = knownContracts[contractAddress.toLowerCase()]
 
   if (knownContract) {
@@ -178,6 +180,7 @@ const surface = {
     log.warn(`Unable to decode data for contract ${contractAddress}`)
   },
   recog: async (contractAddress: string = '', chainId: number, calldata: string) => {
+    console.log('WACHED?')
     // Recognize actions from standard tx types
     const actions = ([] as Actions).concat(
       await recogErc20(contractAddress, chainId, calldata) || [],

@@ -18,7 +18,7 @@ const Recipient = ({ address, ens, copyAddress, textSize = 16 }) => {
     <>
       <div className='_txMainValue'>
         {ens
-          ? <span className='_txRecipient' style={{ 'font-size': `${textSize}px` }}>{ens}</span>
+          ? <span className='_txRecipient' style={{ 'fontSize': `${textSize}px` }}>{ens}</span>
           : <span className='_txRecipient'>{address.substring(0, 8)}{svg.octicon('kebab-horizontal', { height: 15 })}{address.substring(address.length - 6)}</span>
         }
         {/* {req.decodedData && req.decodedData.contractName ? ( 
