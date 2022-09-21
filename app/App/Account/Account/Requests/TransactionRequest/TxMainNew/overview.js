@@ -2,6 +2,7 @@ import React from 'react'
 import { utils } from 'ethers'
 
 import link from '../../../../../../../resources/link'
+import EnsOverview from '../../Ens'
 
 const isNonZeroHex = (hex) => !!hex && !['0x', '0x0'].includes(hex)
 
@@ -9,16 +10,19 @@ function renderRecognizedAction (req, symbol) {
   const { recognizedActions: actions = [] } = req
 
   return actions.length > 0 && actions.map(action => {
-    const { id, data } = action
-    if (id === 'erc20:transfer') {
-      return <SendOverview amountHex={data.amount} decimals={data.decimals} symbol={symbol} />
-    } else if (id === 'ens:register') {
-      return (
-        <>
-          <div className='_txDescriptionSummaryLine'>Registering ENS Name</div>
-          <div className='_txDescriptionSummaryLine _txDescriptionSummaryHeadline'>{data.name}</div>
-        </>
-      )
+    const { id = '', data } = action
+
+    const [actionClass, actionType] = id.split(':')
+
+    console.log({ actionClass, actionType })
+
+    if (actionClass === 'erc20') {
+      if (actionType === 'transfer') {
+        return <SendOverview amountHex={data.amount} decimals={data.decimals} symbol={symbol} />
+      }
+    } else if (actionClass === 'ens') {
+      console.log('its ENS!')
+      return <EnsOverview type={actionType} data={data} />
     }
   })
 }
@@ -78,7 +82,7 @@ const TxOverview = ({ req, chainName, symbol, txMeta }) => {
       }}>
         <div className='_txDescription'>
           <TxDescription chain={chainName}>
-            {description || <EmptyTransactionOverview />}
+            {description}
           </TxDescription>
         </div>
       </div>

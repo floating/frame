@@ -19,8 +19,13 @@ namespace ENS {
   export type Register = {
     name: string
     owner: string
-    duration: BigNumber
+    duration: BigNumber // seconds
     resolver?: string
+  }
+
+  export type Renew = {
+    name: string
+    duration: BigNumber // seconds
   }
 }
 
@@ -43,7 +48,16 @@ const knownContracts: Record<string, DecodeFunction> = {
 
         return {
           id: 'ens:register',
-          data: { address: owner, name: `${name}.eth` }
+          data: { address: owner, name, duration: duration.toNumber() }
+        }
+      }
+
+      if (name === 'renew') {
+        const { name, duration } = decoded.args as unknown as ENS.Renew
+
+        return {
+          id: 'ens:renew',
+          data: { name, duration: duration.toNumber() }
         }
       }
     } catch (e) {
@@ -61,7 +75,7 @@ const provider = new EthereumProvider(proxyConnection)
 provider.setChain('0x1')
 
 // TODO: put these types in a standard actions location
-export type ActionType = 'erc20:approval' | 'erc20:transfer' | 'ens:commit' | 'ens:register'
+export type ActionType = 'erc20:approval' | 'erc20:transfer' | 'ens:commit' | 'ens:register' | 'ens:renew'
 export type Action = {
   id: ActionType
   data?: any
