@@ -45,7 +45,9 @@ function decode (abi: ReadonlyArray<Fragment | JsonFragment | string>, calldata:
 
 function getNameForTokenId (account: string, tokenId: string) {
   const ensInventory: InventoryCollection = store('main.inventory', account, 'ens') || {}
-  const record = Object.values(ensInventory.items).find(ens => ens.tokenId === tokenId) || { name: '' }
+  const items = ensInventory.items || {}
+
+  const record = Object.values(items).find(ens => ens.tokenId === tokenId) || { name: '' }
 
   return record.name
 }
@@ -128,7 +130,7 @@ const mainnetRegistar = registrar({
 const mainnetRegistrarController = registarController({
   name: 'ETHRegistrarController',
   address: '0x283Af0B28c62C092C9727F1Ee09c02CA627EB7F5',
-  chainId: 4
+  chainId: 1
 })
 
 export default [mainnetRegistar, mainnetRegistrarController]
