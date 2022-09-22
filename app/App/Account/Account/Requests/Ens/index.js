@@ -1,24 +1,37 @@
 import React from 'react'
 
+const timeFormat = new Intl.DateTimeFormat('en', { dateStyle: 'medium' })
+
+function formatTime (amount, unit) {
+  return `for ${amount} ${unit}${amount > 1 ? 's' : ''}`
+}
+
 function formatDuration (duration) {
-  if (duration < 60) return '< 1 minute'
-  if (duration < 3600) return `${Math.floor(duration / 60)} minutes`
-  if (duration < (3600 * 24)) return `${Math.floor(duration / 3600)} hours`
-  if (duration < (3600 * 24 * 7)) return `${Math.floor(duration / (3600 * 24))} days`
-  if (duration < (3600 * 24 * 30)) return `${Math.floor(duration / (3600 * 24 * 7))} weeks`
-  if (duration < (3600 * 24 * 365)) return `${Math.floor(duration / (3600 * 24 * 30))} months`
-  return `${Math.floor(duration / (3600 * 24 * 365))} years`
+  if (duration < 60) return 'for < 1 minute'
+  if (duration < 3600) return formatTime(Math.floor(duration / 60), 'minute')
+  if (duration < (3600 * 24)) return formatTime(Math.floor(duration / 3600), 'hour')
+
+  const endDate = new Date()
+  endDate.setSeconds(endDate.getSeconds() + duration)
+
+  return `until ${timeFormat.format(endDate)}`
 }
 
 const EnsOverview = ({ type, data }) => {
-  console.log({ type, data })
+  if (type === 'commit') {
+    return (
+      <>
+        <div className='_txDescriptionSummaryLine'>Submitting ENS Commitment</div>
+      </>
+    )
+  }
   
   if (type === 'register') {
     return (
       <>
         <div className='_txDescriptionSummaryLine'>Registering ENS Name</div>
         <div className='_txDescriptionSummaryLine _txDescriptionSummaryHeadline'>{data.name}</div>
-        <div className='_txDescriptionSummaryLine'>{`for ${formatDuration(data.duration)}`}</div>
+        <div className='_txDescriptionSummaryLine'>{`${formatDuration(data.duration)}`}</div>
       </>
     )
   }
@@ -29,6 +42,30 @@ const EnsOverview = ({ type, data }) => {
         <div className='_txDescriptionSummaryLine'>Renewing ENS Name</div>
         <div className='_txDescriptionSummaryLine _txDescriptionSummaryHeadline'>{data.name}</div>
         <div className='_txDescriptionSummaryLine'>{`for ${formatDuration(data.duration)}`}</div>
+      </>
+    )
+  }
+
+  if (type === 'transfer') {
+    return (
+      <>
+        <div className='_txDescriptionSummaryLine'>Transferring ENS Name</div>
+        <div className='_txDescriptionSummaryLine _txDescriptionSummaryHeadline'>{data.name}</div>
+        <div className='_txDescriptionSummaryLine'>from</div>
+        <div className='_txDescriptionSummaryLine _txDescriptionSummaryMidline'>{data.from}</div>
+        <div className='_txDescriptionSummaryLine'>to</div>
+        <div className='_txDescriptionSummaryLine _txDescriptionSummaryMidline'>{data.to}</div>
+      </>
+    )
+  }
+
+  if (type === 'approve') {
+    return (
+      <>
+        <div className='_txDescriptionSummaryLine'>Granting approval to</div>
+        <div className='_txDescriptionSummaryLine _txDescriptionSummaryMidline'>{data.operator}</div>
+        <div className='_txDescriptionSummaryLine'>as an approved operator for</div>
+        <div className='_txDescriptionSummaryLine _txDescriptionSummaryHeadline'>{data.name}</div>
       </>
     )
   }

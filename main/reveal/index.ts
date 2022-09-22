@@ -7,64 +7,14 @@ import nebulaApi from '../nebula'
 
 import Erc20Contract from '../contracts/erc20'
 import { decodeCallData, fetchContract, ContractSource } from '../contracts'
-import { registrarController } from '../contracts/abi/ens'
+import ensContracts from '../contracts/deployments/ens'
 import erc20 from '../externalData/balances/erc-20-abi'
-import { Interface } from '@ethersproject/abi'
-
-import type { BigNumber } from 'ethers'
 
 import { addHexPrefix } from 'ethereumjs-util'
 
-namespace ENS {
-  export type Register = {
-    name: string
-    owner: string
-    duration: BigNumber // seconds
-    resolver?: string
-  }
-
-  export type Renew = {
-    name: string
-    duration: BigNumber // seconds
-  }
-}
-
-const knownContracts: Record<string, DecodeFunction> = {
-  [registrarController.address.toLowerCase()]: (calldata) => {
-    try {
-      const ens = new Interface(registrarController.abi)
-      const decoded = ens.parseTransaction({ data: calldata })
-      console.log({ decoded })
-      const { name = '' } = decoded || {}
-
-      if (name === 'commit') {
-        return {
-          id: 'ens:commit'
-        }
-      }
-
-      if (['register', 'registerwithconfig'].includes(name.toLowerCase())) {
-        const { owner, name, duration, resolver } = decoded.args as unknown as ENS.Register
-
-        return {
-          id: 'ens:register',
-          data: { address: owner, name, duration: duration.toNumber() }
-        }
-      }
-
-      if (name === 'renew') {
-        const { name, duration } = decoded.args as unknown as ENS.Renew
-
-        return {
-          id: 'ens:renew',
-          data: { name, duration: duration.toNumber() }
-        }
-      }
-    } catch (e) {
-      log.warn('Could not decode ENS registrar controller call', { calldata })
-    }
-  }
-}
+const knownContracts: Contract[] = [
+  ...ensContracts
+]
 
 const erc20Abi = JSON.stringify(erc20)
 
@@ -75,7 +25,15 @@ const provider = new EthereumProvider(proxyConnection)
 provider.setChain('0x1')
 
 // TODO: put these types in a standard actions location
-export type ActionType = 'erc20:approval' | 'erc20:transfer' | 'ens:commit' | 'ens:register' | 'ens:renew'
+export type ActionType =
+  'erc20:approval' |
+  'erc20:transfer' |
+  'ens:commit' |
+  'ens:register' |
+  'ens:renew' |
+  'ens:transfer' |
+  'ens:approve'
+
 export type Action = {
   id: ActionType
   data?: any
@@ -84,6 +42,12 @@ export type Action = {
 type Actions = Array<Action>
 
 type EntityType = 'external' | 'contract' | 'unknown'
+export interface Contract {
+  name: string
+  address: Address
+  chainId: number
+  decode: DecodeFunction
+}
 
 type DecodeFunction = (calldata: string) => Action | undefined
 
@@ -149,11 +113,15 @@ async function recogErc20 (contractAddress: string, chainId: number, calldata: s
 }
 
 function identifyKnownContractActions (contractAddress: string, chainId: number, calldata: string): Action | undefined {
-  console.log({ contractAddress })
-  const knownContract = knownContracts[contractAddress.toLowerCase()]
+  const knownContract = knownContracts.find(contract =>
+    contract.address.toLowerCase() === contractAddress.toLowerCase() && contract.chainId === chainId)
 
   if (knownContract) {
-    return knownContract(calldata)
+    try {
+      return knownContract.decode(calldata)
+    } catch (e) {
+      log.warn('Could not decode known contract action', { contractAddress, chainId, calldata }, e)
+    }
   }
 }
 
@@ -194,7 +162,6 @@ const surface = {
     log.warn(`Unable to decode data for contract ${contractAddress}`)
   },
   recog: async (contractAddress: string = '', chainId: number, calldata: string) => {
-    console.log('WACHED?')
     // Recognize actions from standard tx types
     const actions = ([] as Actions).concat(
       await recogErc20(contractAddress, chainId, calldata) || [],

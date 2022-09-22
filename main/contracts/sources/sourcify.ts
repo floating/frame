@@ -1,8 +1,10 @@
 import log from 'electron-log'
 import { Response } from 'node-fetch'
 import { JsonFragment } from '@ethersproject/abi'
-import type { ContractSource } from '.'
-import { fetchWithTimeout } from '../../resources/utils/fetch'
+
+import { fetchWithTimeout } from '../../../resources/utils/fetch'
+
+import type { ContractSource } from '..'
 
 interface SourcifySourceCodeResponse {
   status: string,

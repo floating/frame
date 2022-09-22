@@ -1,7 +1,7 @@
 import log from 'electron-log'
 import { Interface } from '@ethersproject/abi'
-import { fetchSourcifyContract } from './sourcifyContract'
-import { fetchEtherscanContract } from './etherscanContract'
+import { fetchSourcifyContract } from './sources/sourcify'
+import { fetchEtherscanContract } from './sources/etherscan'
 
 // this list should be in order of descending priority as each source will
 // be searched in turn
