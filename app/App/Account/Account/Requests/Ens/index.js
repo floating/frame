@@ -47,25 +47,30 @@ const EnsOverview = ({ type, data }) => {
   }
 
   if (type === 'transfer') {
+    const { name, tokenId, from, to } = data
+    const display = name || tokenId
+
     return (
       <>
-        <div className='_txDescriptionSummaryLine'>Transferring ENS Name</div>
-        <div className='_txDescriptionSummaryLine _txDescriptionSummaryHeadline'>{data.name}</div>
+        <div className='_txDescriptionSummaryLine'>{`Transferring ENS Name${name ? '' : ' with token id'}`}</div>
+        <div className='_txDescriptionSummaryLine _txDescriptionSummaryHeadline'>{display}</div>
         <div className='_txDescriptionSummaryLine'>from</div>
-        <div className='_txDescriptionSummaryLine _txDescriptionSummaryMidline'>{data.from}</div>
+        <div className='_txDescriptionSummaryLine _txDescriptionSummaryMidline'>{from}</div>
         <div className='_txDescriptionSummaryLine'>to</div>
-        <div className='_txDescriptionSummaryLine _txDescriptionSummaryMidline'>{data.to}</div>
+        <div className='_txDescriptionSummaryLine _txDescriptionSummaryMidline'>{to}</div>
       </>
     )
   }
 
   if (type === 'approve') {
+    const { operator, name } = data
+
     return (
       <>
         <div className='_txDescriptionSummaryLine'>Granting approval to</div>
-        <div className='_txDescriptionSummaryLine _txDescriptionSummaryMidline'>{data.operator}</div>
+        <div className='_txDescriptionSummaryLine _txDescriptionSummaryMidline'>{operator}</div>
         <div className='_txDescriptionSummaryLine'>as an approved operator for</div>
-        <div className='_txDescriptionSummaryLine _txDescriptionSummaryHeadline'>{data.name}</div>
+        <div className='_txDescriptionSummaryLine _txDescriptionSummaryHeadline'>{name}</div>
       </>
     )
   }

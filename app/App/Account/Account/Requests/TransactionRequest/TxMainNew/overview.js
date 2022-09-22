@@ -14,14 +14,11 @@ function renderRecognizedAction (req, symbol) {
 
     const [actionClass, actionType] = id.split(':')
 
-    console.log({ actionClass, actionType })
-
     if (actionClass === 'erc20') {
       if (actionType === 'transfer') {
         return <SendOverview amountHex={data.amount} decimals={data.decimals} symbol={symbol} />
       }
     } else if (actionClass === 'ens') {
-      console.log('its ENS!')
       return <EnsOverview type={actionType} data={data} />
     }
   })
@@ -59,18 +56,16 @@ const TxOverview = ({ req, chainName, symbol, txMeta }) => {
 
   // TODO: empty vs unknown transactions
 
-  console.log({ req, isContractCall, method })
-
   if (isContractDeploy) {
     description = <DeployContractOverview />
-  } else if (isSend) {
-    description = <SendOverview amountHex={value} decimals={18} symbol={symbol} />
   } else if (isContractCall) {
     description = renderRecognizedAction(req, symbol)
 
     if (!description && !!method) {
       description = <GenericContractOverview method={method} />
     }
+  } else if (isSend) {
+    description = <SendOverview amountHex={value} decimals={18} symbol={symbol} />
   } else if (isNonZeroHex(calldata)) {
     description = <DataOverview />
   }
@@ -82,7 +77,7 @@ const TxOverview = ({ req, chainName, symbol, txMeta }) => {
       }}>
         <div className='_txDescription'>
           <TxDescription chain={chainName}>
-            {description}
+            {description || <EmptyTransactionOverview />}
           </TxDescription>
         </div>
       </div>

@@ -340,7 +340,12 @@ class FrameAccount {
 
     if (to && calldata && calldata !== '0x' && parseInt(calldata, 16) !== 0) { 
       try { // Recognize actions
-        const actions = await reveal.recog(to, parseInt(chainId, 16), calldata)
+        const actions = await reveal.recog(calldata, {
+          contractAddress: to,
+          chainId: parseInt(chainId, 16),
+          account: this.address
+        })
+
         const knownTxRequest = this.requests[req.handlerId] as TransactionRequest
 
         if (knownTxRequest && actions ) {

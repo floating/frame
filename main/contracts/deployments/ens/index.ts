@@ -3,6 +3,7 @@ import { Fragment, Interface } from 'ethers/lib/utils'
 
 import { registrar as registrarAbi, registrarController as registrarControllerAbi } from './abi'
 import { Contract } from '../../../reveal'
+import store from '../../../store'
 
 import type { JsonFragment } from '@ethersproject/abi'
 
@@ -22,10 +23,12 @@ namespace ENS {
   export type Transfer = {
     from: string
     to: string
+    tokenId: BigNumber
   }
 
   export type Approval = {
     to: string
+    tokenId: BigNumber
   }
 }
 
@@ -40,29 +43,41 @@ function decode (abi: ReadonlyArray<Fragment | JsonFragment | string>, calldata:
   return contractApi.parseTransaction({ data: calldata })
 }
 
+function getNameForTokenId (account: string, tokenId: string) {
+  const ensInventory: InventoryCollection = store('main.inventory', account, 'ens') || {}
+  const record = Object.values(ensInventory.items).find(ens => ens.tokenId === tokenId) || { name: '' }
+
+  return record.name
+}
+
 const registrar = ({ name = 'ENS Registrar', address, chainId }: DeploymentLocation): Contract => {
   return {
     name,
     chainId,
     address,
-    decode: (calldata: string) => {
+    decode: (calldata: string, { account } = {}) => {
       const { name, args } = decode(registrarAbi, calldata)
 
       if (['transferfrom', 'safetransferfrom'].includes(name.toLowerCase())) {
-        const { from, to } = args as unknown as ENS.Transfer
+        const { from, to, tokenId } = args as unknown as ENS.Transfer
+        const token = tokenId.toString()
+        const name = (account && getNameForTokenId(account, token)) || ''
 
         return {
           id: 'ens:transfer',
-          data: { name: 'jordan.eth', from, to }
+          data: {
+            name: name, from, to, tokenId: token }
         }
       }
 
       if (name === 'approve') {
-        const { to } = args as unknown as ENS.Approval
+        const { to, tokenId } = args as unknown as ENS.Approval
+        const token = tokenId.toString()
+        const name = (account && getNameForTokenId(account, token)) || ''
 
         return {
           id: 'ens:approve',
-          data: { name: 'jordan.eth', operator: to }
+          data: { name, operator: to, tokenId: token }
         }
       }
     }
@@ -113,7 +128,7 @@ const mainnetRegistar = registrar({
 const mainnetRegistrarController = registarController({
   name: 'ETHRegistrarController',
   address: '0x283Af0B28c62C092C9727F1Ee09c02CA627EB7F5',
-  chainId: 1
+  chainId: 4
 })
 
 export default [mainnetRegistar, mainnetRegistrarController]

@@ -49,7 +49,16 @@ export interface Contract {
   decode: DecodeFunction
 }
 
-type DecodeFunction = (calldata: string) => Action | undefined
+type RecognitionContext = {
+  contractAddress: string
+  chainId: number
+  account?: string
+}
+
+type DecodeContext = {
+  account?: Address
+}
+type DecodeFunction = (calldata: string, context?: DecodeContext) => Action | undefined
 
 async function resolveEntityType (address: string, chainId: number): Promise<EntityType> {
   if (!address || !chainId) return 'unknown'
@@ -112,15 +121,15 @@ async function recogErc20 (contractAddress: string, chainId: number, calldata: s
   }
 }
 
-function identifyKnownContractActions (contractAddress: string, chainId: number, calldata: string): Action | undefined {
+function identifyKnownContractActions (calldata: string, context: RecognitionContext): Action | undefined {
   const knownContract = knownContracts.find(contract =>
-    contract.address.toLowerCase() === contractAddress.toLowerCase() && contract.chainId === chainId)
+    contract.address.toLowerCase() === context.contractAddress.toLowerCase() && contract.chainId === context.chainId)
 
   if (knownContract) {
     try {
-      return knownContract.decode(calldata)
+      return knownContract.decode(calldata, context)
     } catch (e) {
-      log.warn('Could not decode known contract action', { contractAddress, chainId, calldata }, e)
+      log.warn('Could not decode known contract action', { calldata, context }, e)
     }
   }
 }
@@ -161,11 +170,11 @@ const surface = {
   
     log.warn(`Unable to decode data for contract ${contractAddress}`)
   },
-  recog: async (contractAddress: string = '', chainId: number, calldata: string) => {
+  recog: async (calldata: string, context: RecognitionContext) => {
     // Recognize actions from standard tx types
     const actions = ([] as Actions).concat(
-      await recogErc20(contractAddress, chainId, calldata) || [],
-      identifyKnownContractActions(contractAddress, chainId, calldata) || []
+      await recogErc20(context.contractAddress, context.chainId, calldata) || [],
+      identifyKnownContractActions(calldata, context) || []
     )
 
     return actions
