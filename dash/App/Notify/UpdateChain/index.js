@@ -31,8 +31,9 @@ function UpdateChain ({ chain }) {
         chain={{ ...chain, color }}
         labels={labels}
         existingChain={true}
-        onSubmit={(updatedChain) => {
+        onSubmit={(updatedChain, updatedChainMeta) => {
           link.send('tray:action', 'updateNetwork', chain, updatedChain)
+          link.send('tray:action', 'setChainColor', chain.id, updatedChainMeta.color)
         }}
       />
 

@@ -19,7 +19,7 @@ function isNetworkReady (network) {
   )
 }
 
-const EditFormSubmitButton = ({ network, labels, onSubmit, validateSubmit }) => {
+const EditFormSubmitButton = ({ network, networkMeta, labels, onSubmit, validateSubmit }) => {
   const [submitted, setSubmitted] = useState(false)
 
   if (submitted) {
@@ -44,7 +44,7 @@ const EditFormSubmitButton = ({ network, labels, onSubmit, validateSubmit }) => 
         }, 400)
 
         setSubmitted(true)
-        onSubmit(network)
+        onSubmit(network, networkMeta)
       }}
       text={labels.submit}
     />
@@ -64,7 +64,8 @@ export default function ChainEditForm ({
   const [explorer, setExplorer] = useState(chain.explorer || networkDefaults.explorer)
   const [symbol, setSymbol] = useState(chain.symbol || networkDefaults.symbol)
   const [isTestnet, setIsTestnet] = useState(chain.isTestnet || networkDefaults.isTestnet)
-
+  const [color, setColor] = useState(chain.color)
+  
   return (
     <>
       <div role='title' className='addChainTitle'>{labels.title}</div>
@@ -167,8 +168,8 @@ export default function ChainEditForm ({
         <div className='chainExplorer chainInputField'>
           <label htmlFor='chainExplorer' className='chainInputLabel'>Chain Color</label>
           <Dropdown
-            syncValue={chain.color}
-            onChange={(value) => link.send('tray:action', 'setChainColor', chainId, value)}
+            syncValue={color}
+            onChange={(value) => setColor(value)}
             options={[
               { text: 'Color1', value: 'accent1', style: { color: 'var(--accent1)' } },
               { text: 'Color2', value: 'accent2', style: { color: 'var(--accent2)' } },
@@ -207,6 +208,7 @@ export default function ChainEditForm ({
           network={{
             id: chainId, name, explorer, symbol, isTestnet, type: chain.type
           }}
+          networkMeta={{ color }}
           onSubmit={onSubmit}
           validateSubmit={validateSubmit}
         />
