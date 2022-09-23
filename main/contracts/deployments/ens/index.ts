@@ -121,7 +121,7 @@ const registarController = ({ name = 'ENS Registrar Controller', address, chainI
   }
 }
 
-const mainnetRegistar = registrar({
+const mainnetRegistrar = registrar({
   name: '.eth Permanent Registrar',
   address: '0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85',
   chainId: 1
@@ -134,4 +134,4 @@ const mainnetRegistrarController = registarController({
 })
 
 // TODO: in the future the addresses for these contracts can be discovered in real time
-export default [mainnetRegistar, mainnetRegistrarController]
+export default [mainnetRegistrar, mainnetRegistrarController]
