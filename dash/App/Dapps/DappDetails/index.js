@@ -3,7 +3,7 @@ import Restore from 'react-restore'
 import link from '../../../../resources/link'
 // import { isNetworkConnected, isNetworkEnabled } from '../../../../resources/utils/chains'
 import RingIcon from '../../../../resources/Components/RingIcon'
-import chainMeta from '../../../../resources/chainMeta'
+import chainIcons from '../../../../resources/chainIcons'
 import svg from '../../../../resources/svg'
 
 class DappDetails extends React.Component {
@@ -13,15 +13,15 @@ class DappDetails extends React.Component {
       <div className='originSwapChainList'>
         {Object.keys(this.store('main.networks.ethereum')).filter(id => {
           return this.store('main.networks.ethereum', id, 'on')
-        }).map(id => {
-          const hexId = '0x' + parseInt(id).toString('16')
+        }).map((id, chain) => {
           const selected = origin.chain.id === parseInt(id)
+          const chainColor = this.store('main.networksMeta.ethereum', id, 'primaryColor')
           return (
             <div 
               className={'originChainItem'} 
               style={selected ? {
                 color: 'var(--ghostB)',
-                background: chainMeta[hexId] ? chainMeta[hexId].primaryColor : 'var(--moon)'
+                background: chainColor ? `var(--${chainColor})` : 'var(--moon)'
               } : {}}
               onClick={() => {
                 link.send('tray:action', 'switchOriginChain', this.props.originId, parseInt(id), 'ethereum')
@@ -29,17 +29,17 @@ class DappDetails extends React.Component {
             >
               <div className='originChainItemIcon'>
                 <RingIcon 
-                  color={chainMeta[hexId] ? chainMeta[hexId].primaryColor : 'var(--moon)'} 
-                  img={chainMeta[hexId] ? chainMeta[hexId].icon : ''} 
+                  color={`var(--${chainColor})`}
+                  img={chainIcons(chain.name)}
                 />
               </div>
               
-              {this.store('main.networks.ethereum', id, 'name')}
+              {chain.name}
 
               <div 
                 className='originChainItemCheck'
                 style={selected ? {
-                  background: chainMeta[hexId] ? chainMeta[hexId].primaryColor : 'var(--moon)'
+                  background: chainColor ? `var(--${chainColor})` : 'var(--moon)'
                 } : {}}
               >
                 {selected ? svg.check(28) : null}

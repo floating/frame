@@ -487,6 +487,9 @@ module.exports = {
   setBlockHeight: (u, chainId, blockHeight) => {
     u('main.networksMeta.ethereum', chainId, (chainMeta) => ({ ...chainMeta, blockHeight }))
   },
+  setChainColor: (u, chainId, color) => {
+    u('main.networksMeta.ethereum', chainId, (chainMeta) => ({ ...chainMeta, primaryColor: color }))
+  },
   expandDock: (u, expand) => {
     u('dock.expand', (s) => expand)
   },

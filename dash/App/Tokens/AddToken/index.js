@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import Restore from 'react-restore'
+import chainIcons from '../../../../resources/chainIcons'
 import RingIcon from '../../../../resources/Components/RingIcon'
-import chainMeta from '../../../../resources/chainMeta'
 import link from '../../../../resources/link'
 import svg from '../../../../resources/svg'
 import { intToHex } from '../../../../resources/utils'
@@ -26,32 +26,33 @@ class AddTokenChainScreenComponent extends Component {
       </div>
       <div className='newTokenChainSelectChain'>
       <div className='originSwapChainList'>
-        {activeChains.map(chain => {
-          const selected = selectedChainId === chain.id
-          const hexChainId = intToHex(chain.id)
+        {activeChains.map((chain) => {
+          const chainId = chain.id
+          const selected = selectedChainId === chainId
+          const chainColor = this.store('main.networksMeta.ethereum', chainId, 'primaryColor')
           const chainName = chain.name
 
           return (
             <div
               className='originChainItem'
-              key={chain.id}
+              key={chainId}
               role='button'
               style={selected ? {
                 color: 'var(--ghostB)',
-                background: chainMeta[hexChainId] ? chainMeta[hexChainId].primaryColor : 'var(--moon)'
+                background: chainColor ? `var(--${chainColor})` : 'var(--moon)'
               } : {}}
               onClick={() => {
-                this.setState({ chainId: chain.id })
+                this.setState({ chainId })
 
                 setTimeout(() => {
-                  link.send('tray:action', 'navDash', { view: 'tokens', data: { notify: 'addToken', notifyData: { chainId: chain.id }} })
+                  link.send('tray:action', 'navDash', { view: 'tokens', data: { notify: 'addToken', notifyData: { chainId }} })
                 }, 200)
               }}
             >
               <div className='originChainItemIcon'>
                 <RingIcon
-                  color={chainMeta[hexChainId] ? chainMeta[hexChainId].primaryColor : 'var(--moon)'}
-                  img={chainMeta[hexChainId] ? chainMeta[hexChainId].icon : ''}
+                  color={chainColor ? `var(--${chainColor})` : 'var(--moon)'}
+                  img={chainIcons(chainName)}
                   small={true}
                 />
               </div>
@@ -108,7 +109,7 @@ class AddTokenAddressScreenComponent extends Component {
 
   render () {
     const { chainId, chainName } = this.props
-    const hexId = intToHex(parseInt(chainId))
+    const chainColor = this.store('main.networksMeta.ethereum', chainId, 'primaryColor')
 
     return (
       <div className='newTokenView cardShow'>
@@ -118,7 +119,7 @@ class AddTokenAddressScreenComponent extends Component {
             <div 
               className='newTokenChainSelectSubtitle'
               style={{
-                color: chainMeta[hexId] ? chainMeta[hexId].primaryColor : 'var(--moon)'
+                color: chainColor ? `var(--${chainColor})` : 'var(--moon)'
               }}
             >
               {`on ${chainName}`}
@@ -210,7 +211,7 @@ class AddTokenFormScreen extends Component {
       address &&
       Number.isInteger(this.state.decimals)
     )
-    const hexId = intToHex(parseInt(chainId))
+    const chainColor = this.store('main.networksMeta.ethereum', chainId, 'primaryColor')
     
     return (
       <div className='notifyBoxWrap cardShow' onMouseDown={e => e.stopPropagation()}>
@@ -229,7 +230,7 @@ class AddTokenFormScreen extends Component {
                 <div 
                   className='newTokenChainSelectSubtitle'
                   style={{
-                    color: chainMeta[hexId] ? chainMeta[hexId].primaryColor : 'var(--moon)'
+                    color: chainColor ? `var(--${chainColor})` : 'var(--moon)'
                   }}
                 >
                   {`on ${chainName}`}

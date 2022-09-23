@@ -1,12 +1,13 @@
 import React from 'react'
 import Restore from 'react-restore'
 import link from '../../../../../../../resources/link'
-import svg from '../../../../../../../resources/svg'
 import utils from 'web3-utils'
 
-import chainMeta from '../../../../../../../resources/chainMeta'
 import RequestItem from '../../../../../../../resources/Components/RequestItem'
 import TxOverview from './overview'
+
+import RequestItem from '../../../../../../../resources/Components/RequestItem'
+import chainIcons from '../../../../../../../resources/chainIcons'
 
 
 class TxRecipient extends React.Component {
@@ -35,7 +36,7 @@ class TxRecipient extends React.Component {
     const txMeta = { replacement: false, possible: true, notice: '' }
 
     const { accountId } = this.props
-    const hexId = '0x' + parseInt(req.data.chainId).toString('16')
+    const chainColor = this.store('main.networksMeta.ethereum', chainId, 'primaryColor')
 
     // TODO
     // if (signer locked) {
@@ -80,9 +81,9 @@ class TxRecipient extends React.Component {
             req={req}
             account={accountId}
             handlerId={req.handlerId}
-            title={chainName + ' Transaction'}
-            color={chainMeta[hexId] ? chainMeta[hexId].primaryColor : ''}
-            img={chainMeta[hexId] ? chainMeta[hexId].icon : ''}
+            title={`${chainName} Transaction`}
+            color={`var(--${chainColor})`}
+            img={chainIcons(chainName)}
             headerMode={true}
           />
 

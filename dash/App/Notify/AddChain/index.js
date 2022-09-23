@@ -81,9 +81,10 @@ class AddChain extends React.Component {
   }
 
   render () {
+    const color = this.store('main.networksMeta.ethereum', this.props.chain.id, 'primaryColor')
     return (
       <ChainEditForm
-        chain={this.props.chain}
+        chain={{ ...this.props.chain, color }}
         labels={labels}
         onSubmit={this.onSubmit.bind(this)}
         validateSubmit={this.validateSubmit.bind(this)}

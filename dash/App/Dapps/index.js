@@ -5,9 +5,9 @@ import { isNetworkConnected, isNetworkEnabled } from '../../../resources/utils/c
 // import svg from '../../../resources/svg'
 
 import RingIcon from '../../../resources/Components/RingIcon'
-import chainMeta from '../../../resources/chainMeta'
 
 import DappDetails from './DappDetails'
+import chainIcons from '../../../resources/chainIcons'
 
 function bySessionStartTime (a, b) {
   return b.session.startedAt - a.session.startedAt
@@ -127,19 +127,19 @@ class _OriginModule extends React.Component {
 
 const OriginModule = Restore.connect(_OriginModule)
 
-const ChainOrigins = ({ chain, origins }) => {
-  const hexId = '0x' + parseInt(chain.id).toString('16')
+const ChainOrigins = ({ chain: { id, name }, origins }) => {
+  const chainColor = this.store('main.networksMeta.ethereum', id, 'primaryColor')
   return (
     <>
       <div className='originTitle'>
         <div className='originTitleIcon'>
           <RingIcon 
             small={true}
-            color={chainMeta[hexId] ? chainMeta[hexId].primaryColor : ''} 
-            img={chainMeta[hexId] ? chainMeta[hexId].icon : ''} 
+            color={`var(--${chainColor})`}
+            img={chainIcons(name)}
           />
         </div>
-        <div className='originTitleText'>{chain.name}</div>
+        <div className='originTitleText'>{name}</div>
       </div>
       {origins.connected.map((origin) => <OriginModule origin={origin} connected={true} />)}
       {origins.disconnected.map((origin) => <OriginModule origin={origin} connected={false} />)}

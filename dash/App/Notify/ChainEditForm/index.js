@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 
 import link from '../../../../resources/link'
+import Dropdown from '../../../../resources/Components/Dropdown'
 import { DisabledSubmitButton, SubmitButton } from '../Button'
 
 const networkDefaults = {
@@ -158,6 +159,26 @@ export default function ChainEditForm ({
             onBlur={(e) => {
               if (e.target.value === '') setExplorer(networkDefaults.explorer)
             }}
+          />
+        </div>
+      </div>
+
+      <div className='chainRow'>
+        <div className='chainExplorer chainInputField'>
+          <label htmlFor='chainExplorer' className='chainInputLabel'>Chain Color</label>
+          <Dropdown
+            syncValue={chain.color}
+            onChange={(value) => link.send('tray:action', 'setChainColor', chainId, value)}
+            options={[
+              { text: 'Color1', value: 'accent1', style: { color: 'var(--accent1)' } },
+              { text: 'Color2', value: 'accent2', style: { color: 'var(--accent2)' } },
+              { text: 'Color3', value: 'accent3', style: { color: 'var(--accent3)' } },
+              { text: 'Color4', value: 'accent4', style: { color: 'var(--accent4)' } },
+              { text: 'Color5', value: 'accent5', style: { color: 'var(--accent5)' } },
+              { text: 'Color6', value: 'accent6', style: { color: 'var(--accent6)' } },
+              { text: 'Color7', value: 'accent7', style: { color: 'var(--accent7)' } },
+              { text: 'Color8', value: 'accent8', style: { color: 'var(--accent8)' } }
+            ]}
           />
         </div>
       </div>

@@ -11,7 +11,6 @@ import Gas from '../../../resources/Components/Gas'
 
 import Connection from './Connection'
 
-import chainMeta from '../../../resources/chainMeta'
 
 class _SettingsModule extends React.Component {
   constructor (props, context) {
@@ -533,7 +532,9 @@ class _Network extends React.Component {
     const change24hr = this.store('main.networksMeta.ethereum', this.state.id, 'nativeCurrency.usd.change24hr') || '?'
     // const symbol = this.store('main.networks.ethereum', this.state.id, 'symbol') || '?'
 
-    const hexId = '0x' + parseInt(id).toString('16')
+    const color = this.store('main.networksMeta.ethereum', id, 'primaryColor')
+
+    console.log('found colour', id, color, chainIcons(name))
 
     if (
       filter &&
@@ -549,8 +550,8 @@ class _Network extends React.Component {
         <div className='networkActive'>
           <div className='chainBadge'>
             <RingIcon 
-              color={chainMeta[hexId] ? chainMeta[hexId].primaryColor : ''} 
-              img={chainMeta[hexId] ? chainMeta[hexId].icon : ''} 
+              color={`var(--${color})`}
+              img={chainIcons(name)}
             />
           </div>
           <div className='networkName'>

@@ -2,7 +2,6 @@ import React from 'react'
 import Restore from 'react-restore'
 
 import RingIcon from '../../../resources/Components/RingIcon'
-// import chainMeta from '../../../../../resources/chainMeta'
 
 import link from '../../../resources/link'
 import svg from '../../../resources/svg'

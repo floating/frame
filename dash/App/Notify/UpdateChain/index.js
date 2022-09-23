@@ -23,11 +23,12 @@ function UpdateChain ({ chain }) {
       />
     )
   }
+  const color = this.store('main.networksMeta.ethereum', chain.id, 'primaryColor')
 
   return (
     <>
       <ChainEditForm
-        chain={chain}
+        chain={{ ...chain, color }}
         labels={labels}
         existingChain={true}
         onSubmit={(updatedChain) => {

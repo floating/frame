@@ -13,10 +13,10 @@ import Restore from 'react-restore'
 // }
 
 import RequestItem from '../../../../../resources/Components/RequestItem'
-import chainMeta from '../../../../../resources/chainMeta'
 
 import link from '../../../../../resources/link'
 import svg from '../../../../../resources/svg'
+import chainIcons from '../../../../../resources/chainIcons'
 
 class Requests extends React.Component {
   constructor (props, context) {
@@ -194,10 +194,9 @@ class Requests extends React.Component {
                   />
                 )
               } else if (req.type === 'transaction')  {
-                const chainName = this.store('main.networks.ethereum', parseInt(req.data.chainId, 16), 'name') 
-                const hexId = req.data.chainId
-                chainMeta[hexId] ? chainMeta[hexId].primaryColor : ''
-                chainMeta[hexId] ? chainMeta[hexId].icon : ''
+                const chainId = parseInt(req.data.chainId, 16)
+                const chainName = this.store('main.networks.ethereum', chainId, 'name') 
+                const chainColor = this.store('main.networksMeta.ethereum', chainId, 'primaryColor')
                 
                 return (
                   <RequestItem 
@@ -206,9 +205,9 @@ class Requests extends React.Component {
                     account={this.props.id}
                     handlerId={req.handlerId}
                     i={i}
-                    title={chainName + ' Transaction'}
-                    color={chainMeta[hexId] ? chainMeta[hexId].primaryColor : ''}
-                    img={chainMeta[hexId] ? chainMeta[hexId].icon : ''}
+                    title={`${chainName} Transaction`}
+                    color={chainColor ? `var(--${chainColor})`: ''}
+                    img={chainIcons(chainName)}
                   />
                 )
               }

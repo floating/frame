@@ -403,7 +403,33 @@ const initial = {
               selected: 'standard',
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
             }
-          }
+          },
+          icon: '',
+          primaryColor: 'accent7'
+        },
+        3: {
+          blockHeight: 0,
+          gas: {
+            fees: {},
+            price: {
+              selected: 'standard',
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+            }
+          },
+          icon: '',
+          primaryColor: 'accent5'
+        },
+        4: {
+          blockHeight: 0,
+          gas: {
+            fees: {},
+            price: {
+              selected: 'standard',
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+            }
+          },
+          icon: '',
+          primaryColor: 'accent5'
         },
         5: {
           blockHeight: 0,
@@ -413,7 +439,9 @@ const initial = {
               selected: 'standard',
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
             }
-          }
+          },
+          icon: '',
+          primaryColor: 'accent5'
         },
         10: {
           blockHeight: 0,
@@ -423,7 +451,21 @@ const initial = {
               selected: 'standard',
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
             }
-          }
+          },
+          icon: 'optimism',
+          primaryColor: 'accent6'
+        },
+        42: {
+          blockHeight: 0,
+          gas: {
+            fees: {},
+            price: {
+              selected: 'standard',
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+            }
+          },
+          icon: '',
+          primaryColor: 'accent5'
         },
         100: {
           blockHeight: 0,
@@ -433,7 +475,9 @@ const initial = {
               selected: 'standard',
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
             }
-          }
+          },
+          icon: 'xdai',
+          primaryColor: 'accent4'
         },
         137: {
           blockHeight: 0,
@@ -443,7 +487,21 @@ const initial = {
               selected: 'standard',
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
             }
-          }
+          },
+          icon: 'polygon',
+          primaryColor: 'accent3'
+        },
+        250: {
+          blockHeight: 0,
+          gas: {
+            fees: {},
+            price: {
+              selected: 'standard',
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+            }
+          },
+          icon: 'fantom',
+          primaryColor: 'accent2'
         },
         42161: {
           blockHeight: 0,
@@ -453,7 +511,9 @@ const initial = {
               selected: 'standard',
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
             }
-          }
+          },
+          icon: 'arbitrum',
+          primaryColor: 'accent1'
         },
         11155111: {
           blockHeight: 0,
@@ -463,7 +523,9 @@ const initial = {
               selected: 'standard',
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
             }
-          }
+          },
+          icon: '',
+          primaryColor: 'accent1'
         }
       }
     }),
