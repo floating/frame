@@ -537,7 +537,7 @@
   bottom 0px
   left 0px
   right 0px
-  animation 0.32s fadeUp var(--cubic)
+  animation 0.32s fadeUp ease-out
 
   .requestNoticeInner
     height 100%
@@ -692,6 +692,7 @@
   flex-wrap wrap
   z-index 999999999
   width 100%
+  font-weight 400
 
   .txActionButtonsRow
     width 100%
@@ -725,6 +726,9 @@
       align-items center
       padding-top 3px
       box-sizing border-box
+      background var(--ghostA)
+      box-shadow 0px 1px 2px var(--ghostX)
+      border-bottom 2px solid var(--ghostZ)
 
     .txActionButton
       background var(--ghostA)
@@ -738,6 +742,9 @@
       align-items center
       padding-top 3px
       box-sizing border-box
+      background var(--ghostA)
+      box-shadow 0px 1px 2px var(--ghostX)
+      border-bottom 2px solid var(--ghostZ)
     
     .txActionButton:hover
       background var(--ghostB)
@@ -1269,10 +1276,9 @@
 @keyframes fadeUp
   0%
     opacity 0
-    transform translateY(30px)
-  50%
+  70%
     opacity 0
-    transform translateY(30px)
+    transform translateY(10px)
   100%
     opacity 1
     transform translateY(0px)
@@ -1295,7 +1301,7 @@
   right 8px
   border-radius 24px
   background var(--ghostZ)
-  animation 0.32s fadeUp var(--cubic)
+  animation 0.32s fadeUp ease-out
 
   .requestDecline
     position absolute
@@ -1587,6 +1593,9 @@ span:last-child
   opacity 0
 
 .txNonceControl
+  position absolute
+  top 0
+  right -130px
   width 130px
   display flex
   justify-conent space-between
@@ -1599,7 +1608,6 @@ span:last-child
   align-items center
   font-size 10px
   text-transform uppercase
-  border-right 1px solid var(--ghostC)
   cursor pointer
 
   *
@@ -2250,25 +2258,34 @@ span:last-child
 
   .simpleJsonChild
     width 100%
-    margin-top 10px
+    margin-top 22px
 
   .simpleJsonKey
-    font-size 14px
+    font-size 13px
     width 100%
-    color var(--moon)
-    font-family 'FiraCode'
+    font-weight 500
+    padding 0px 0px 0px 2px
+    border-radius 12.5px
+    box-sizing border-box
+    max-width fit-content
+
+  .simpleJsonKeyTx
+    text-transform uppercase
+    font-size 11px
 
   .simpleJsonValue
-    margin 10px 10px 10px 3px
-    border-left 2px solid var(--outerspace01)
-    padding-left 10px
-    font-size 16px
+    margin 8px 10px 10px 3px
+    border-left 2px solid var(--good)
+    padding 4px 7px 2px 7px
+    font-size 13px
     width calc(100% - 3px)
     box-sizing border-box
     word-wrap break-word
     font-family 'FiraCode'
+    font-weight 300
     user-select all !important
-
+    max-width fit-content
+    position relative
 
 @import './next'
 @import '../TransactionRequest/style'

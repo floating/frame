@@ -103,12 +103,10 @@ class Requests extends React.Component {
         ref={this.moduleRef}
         className='balancesBlock'
       >
-        {!this.props.expanded ? (
-          <div className={'moduleHeader'}>
-           <span>{svg.inbox(13)}</span>
-           <span>{'Requests'}</span>
-          </div>
-        ) : null}
+        <div className={'moduleHeader'}>
+          <span>{svg.inbox(13)}</span>
+          <span>{'Requests'}</span>
+        </div>
         <div className='requestContainerWrap'>
           <div className='requestContainer'>
             {!requests.length ? (

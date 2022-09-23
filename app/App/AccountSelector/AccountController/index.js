@@ -386,6 +386,8 @@ class Account extends React.Component {
     if (this.store('selected.view') === 'settings') signerClass += ' signerInSettings'
     if (this.store('selected.showAccounts')) signerClass += ' signerAccountExpand'
 
+    let signerTopClass = this.props.active ? 'signerTop signerTopActive' : 'signerTop'
+
     const style = {}
     const initial = this.store('selected.position.initial')
 
@@ -402,10 +404,10 @@ class Account extends React.Component {
       style.transform = open ? `translateY(${initial.top * -1}px)` : 'translateY(0px)'
     } else if (this.store('selected.current') !== '') {
       // Not currently selected, but another signer is
-      style.opacity = 0
       style.pointerEvents = 'none'
       style.transition = '300ms cubic-bezier(.82,0,.12,1) all'
       if (this.store('selected.open')) {
+        signerTopClass += ' signerTopNoHover'
         // Not open, but another signer is
         style.transform = this.props.index > this.store('selected.position.initial.index') ? 'translate(0px, 100px)' : 'translate(0px, -20px)'
         style.opacity = 0
@@ -443,9 +445,6 @@ class Account extends React.Component {
 
     let requests = this.store('main.accounts', this.props.id, 'requests') || {}
     requests = Object.keys(requests).filter(r => requests[r].mode === 'normal')
-
-    let signerTopClass = this.props.active ? 'signerTop signerTopActive' : 'signerTop'
-    if (this.store('selected.current') !== '') signerTopClass += ' signerTopNoHover'
 
     return (
       <div 
