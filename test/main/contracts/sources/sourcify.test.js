@@ -1,7 +1,7 @@
 import log from 'electron-log'
 import nock from 'nock'
 
-import { fetchSourcifyContract } from '../../../main/contracts/sourcifyContract'
+import { fetchSourcifyContract } from '../../../../main/contracts/sources/sourcify'
 
 function mockApiResponse (domain, path, status, body, timeout = 0, headers = { 'content-type': 'application/json' }) {
   nock(`https://${domain}`)
@@ -73,7 +73,7 @@ describe('#fetchSourcifyContract', () => {
   it('retrieves a contract from sourcify', async () => {
     mockSourcifyApi(200, sourcifyResponse)
 
-    return expect(fetchSourcifyContract(contractAddress, '0x89')).resolves.toStrictEqual({
+    return expect(fetchSourcifyContract(contractAddress, 137)).resolves.toStrictEqual({
       abi: JSON.stringify(mockAbi), 
       name: 'mock sourcify abi', 
       source: 'sourcify'
@@ -83,19 +83,19 @@ describe('#fetchSourcifyContract', () => {
   it('does not retrieve a contract when the request fails', async () => {
     mockSourcifyApi(400)
 
-    return expect(fetchSourcifyContract(contractAddress, '0x89')).resolves.toBeUndefined()
+    return expect(fetchSourcifyContract(contractAddress, 137)).resolves.toBeUndefined()
   })
 
   it('does not retrieve a contract when the contract is not found', async () => {
     mockSourcifyApi(200, sourcifyNotFoundResponse)
 
-    return expect(fetchSourcifyContract(contractAddress, '0x89')).resolves.toBeUndefined()
+    return expect(fetchSourcifyContract(contractAddress, 137)).resolves.toBeUndefined()
   })
 
   it('does not retrieve a contract when the request times out', async () => {
     mockSourcifyApi(200, sourcifyResponse, 10000)
 
-    const contract = expect(fetchSourcifyContract(contractAddress, '0x89')).resolves.toBeUndefined()
+    const contract = expect(fetchSourcifyContract(contractAddress, 137)).resolves.toBeUndefined()
     
     jest.advanceTimersByTime(4000)
 

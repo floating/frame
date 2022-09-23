@@ -133,4 +133,5 @@ const mainnetRegistrarController = registarController({
   chainId: 1
 })
 
+// TODO: in the future the addresses for these contracts can be discovered in real time
 export default [mainnetRegistar, mainnetRegistrarController]

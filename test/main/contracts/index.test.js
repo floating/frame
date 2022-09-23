@@ -1,10 +1,10 @@
 import log from 'electron-log'
 import { fetchContract } from '../../../main/contracts'
-import { fetchSourcifyContract } from '../../../main/contracts/sourcifyContract'
-import { fetchEtherscanContract } from '../../../main/contracts/etherscanContract'
+import { fetchSourcifyContract } from '../../../main/contracts/sources/sourcify'
+import { fetchEtherscanContract } from '../../../main/contracts/sources/etherscan'
 
-jest.mock('../../../main/contracts/sourcifyContract')
-jest.mock('../../../main/contracts/etherscanContract')
+jest.mock('../../../main/contracts/sources/sourcify')
+jest.mock('../../../main/contracts/sources/etherscan')
 
 const mockAbi = [
   { 
@@ -37,7 +37,7 @@ describe('#fetchContract', () => {
   it('retrieves a contract from sourcify', async () => {
     fetchSourcifyContract.mockResolvedValue(mockContractSource('sourcify'))
 
-    return expect(fetchContract('0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0', '1')).resolves.toStrictEqual({
+    return expect(fetchContract('0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0', 1)).resolves.toStrictEqual({
       abi: JSON.stringify(mockAbi),
       name: 'mock sourcify abi', 
       source: 'sourcify'
@@ -48,7 +48,7 @@ describe('#fetchContract', () => {
     fetchSourcifyContract.mockResolvedValue(undefined)
     fetchEtherscanContract.mockResolvedValue(mockContractSource('etherscan'))
 
-    return expect(fetchContract('0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0', '1')).resolves.toStrictEqual({
+    return expect(fetchContract('0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0', 1)).resolves.toStrictEqual({
       abi: JSON.stringify(mockAbi), 
       name: 'mock etherscan abi', 
       source: 'etherscan'
@@ -59,7 +59,7 @@ describe('#fetchContract', () => {
     fetchSourcifyContract.mockResolvedValue(mockContractSource('sourcify'))
     fetchEtherscanContract.mockResolvedValue(mockContractSource('etherscan'))
 
-    return expect(fetchContract('0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0', '1')).resolves.toStrictEqual({
+    return expect(fetchContract('0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0', 1)).resolves.toStrictEqual({
       abi: JSON.stringify(mockAbi),
       name: 'mock sourcify abi',
       source: 'sourcify'
@@ -73,7 +73,7 @@ describe('#fetchContract', () => {
     fetchSourcifyContract.mockReturnValue(sourcifyResponse)
     fetchEtherscanContract.mockReturnValue(etherscanResponse)
 
-    const result = expect(fetchContract('0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0', '1')).resolves.toStrictEqual({
+    const result = expect(fetchContract('0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0', 1)).resolves.toStrictEqual({
       abi: JSON.stringify(mockAbi),
       name: 'mock sourcify abi',
       source: 'sourcify'
@@ -91,7 +91,7 @@ describe('#fetchContract', () => {
     fetchSourcifyContract.mockResolvedValue(undefined)
     fetchEtherscanContract.mockResolvedValue(undefined)
 
-    return expect(fetchContract('0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0', '1')).resolves.toBeUndefined()
+    return expect(fetchContract('0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0', 1)).resolves.toBeUndefined()
   })
 })
 
