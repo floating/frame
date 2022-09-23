@@ -111,7 +111,7 @@ class TxRecipient extends React.Component {
               link.send('nav:update', 'panel', { data: { step: 'viewData' } })
             }}>
               <div className='_txDescription'>
-                {!req.to && req.data.data && req.data.data !== '0x' && req.data.data !== '0x0' ? (
+                {!req.data.to && req.data.data && req.data.data !== '0x' && req.data.data !== '0x0' ? (
                   <div className='_txDescriptionSummary'>
                     <div>{`Deploying Contract`}</div>
                     <div>{`on ${chainName}`}</div>
@@ -136,7 +136,7 @@ class TxRecipient extends React.Component {
                       this.renderRecognizedActions(req)
                     ) : req.decodedData && req.decodedData.method ? (
                       <div>{`Calling Contract Method ${req.decodedData.method}`}</div>
-                    ) : null}
+                    ) : <div>{`Calling Contract`}</div>}
                     <div>{`on ${chainName}`}</div>
                   </div>
                 )}

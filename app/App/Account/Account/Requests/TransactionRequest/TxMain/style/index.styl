@@ -1,3 +1,15 @@
+@keyframes shake 
+  0% 
+    transform translate3d(0px, 0px, 0) rotate(-0.4deg) scale(1)
+  25% 
+    transform translate3d(-0.7px, -1px, 0) rotate(0.4deg) scale(1.01)
+  50% 
+    transform translate3d(0.7px, 1px, 0) rotate(-0.4deg) scale(1.02)
+  75% 
+    transform translate3d(-0.7px, 0.3px, 0) rotate(0.2deg) scale(1.01)
+  100% 
+    transform translate3d(0.7px, 0.7px, 0) rotate(-0.4deg) scale(1)
+
 ._txMain
   position relative
   z-index 100001
@@ -7,6 +19,7 @@
   padding 0px 0px 5px 0px
   overflow hidden
   box-shadow 0px 4px 8px var(--ghostY)
+  border-bottom 2px solid var(--ghostZ)
 
   ._txMainInner
     margin 0px 5px
@@ -19,8 +32,9 @@
       transition none
       transform translate3d(0, 0, 0)
       font-family 'MainFont'
-      overflow hidden
-      padding 0px 5px 5px 5px
+      // overflow hidden
+      display flow-root
+      padding 0px 3px 3px 3px
       background var(--ghostZ)
 
       svg
@@ -94,14 +108,16 @@
         display flex
         justify-content center
         align-items center
-        border-radius 12px
+        border-radius 14px
         -webkit-app-region no-drag
         transition none
         transform translate3d(0, 0, 0)
         font-family 'MainFont'
         padding 12px
+        margin-top 3px
         background var(--ghostA)
-        margin-top 5px
+        box-shadow 0px 1px 2px var(--ghostX)
+        border-bottom 2px solid var(--ghostZ)
         
         svg
           position relative
@@ -109,15 +125,29 @@
           padding 0px 3px 0px 4px
 
       ._txMainValueClickable
+        transition all linear 0.1s
         cursor pointer
-        background var(--ghostA)
-        
+        margin-bottom 0px
+        position relative
+        z-index 3
+
         *
+          position relative
+          z-index 2
           pointer-events none
 
       ._txMainValueClickable:hover
         background var(--ghostB)
-      
+        transform translateY(-1px)
+        border-bottom 2px solid var(--ghostZ)
+        box-shadow 0px 8px 30px -12px var(--ghostX)
+
+        
+      ._txMainValueClickable:active
+        background var(--ghostB)
+        transform translateY(0px)
+        box-shadow 0px 2px 4px var(--ghostX)
+
   ._txMainTag
     position relative
     z-index 100001
@@ -134,6 +164,8 @@
     margin-top 5px
     border-radius 12px
     background var(--ghostA)
+    box-shadow 0px 1px 2px var(--ghostX)
+    border-bottom 2px solid var(--ghostZ)
 
   ._txMainTagWarning
     color var(--moon)

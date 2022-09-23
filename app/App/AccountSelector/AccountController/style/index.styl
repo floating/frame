@@ -244,6 +244,7 @@
     background var(--ghostA)
     margin 0px 0px 6px 0px
     box-shadow 0px 4px 8px var(--ghostY)
+    border-bottom 2px solid var(--ghostZ)
     cursor pointer
     overflow hidden
 
@@ -514,11 +515,17 @@
   // .okSigner
   //   .signerTop:hover
   //     background var(--ghostA)
-
-  .signerTopNoHover
+  .signerTopActive
     cursor auto
+    border-bottom 2px solid var(--ghostZ0)
+    position relative
+    top -5px
+    .signerSelect
+      pointer-events auto !important
+      .signerSelectButton
+        pointer-events auto !important
 
-  .signerTopNoHover:hover
+  .signerTopActive:hover
     background var(--ghostA) !important
     .signerSelect
       .signerSelectButton
@@ -526,6 +533,27 @@
         background var(--ghostA)
       .signerSelectButton:hover
         background var(--ghostB)
+
+
+  .signerTopNoHover
+    pointer-events none !important
+    * 
+      pointer-events none !important
+    // border-bottom 2px solid var(--ghostZ0)
+    // position relative
+    // .signerSelect
+    //   pointer-events auto !important
+    //   .signerSelectButton
+    //     pointer-events auto !important
+
+  // .signerTopNoHover:hover
+    // background var(--ghostA) !important
+    // .signerSelect
+    //   .signerSelectButton
+    //     pointer-events auto !important
+    //     background var(--ghostA)
+    //   .signerSelectButton:hover
+    //     background var(--ghostB)
 
   .accountListWrap
     position absolute

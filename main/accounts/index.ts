@@ -511,7 +511,14 @@ export class Accounts extends EventEmitter {
     const signer = currentAccount.getSigner()
     if (!signer) return cb(new Error('No signer'))
 
-    if (signer.status === 'locked') return cb(new Error('Signer locked'))
+    if (signer.status === 'locked') {
+      const crumb = {
+        view: 'expandedSigner', 
+        data: { signer: signer.id }
+      }
+      store.navDash(crumb)
+      return cb(new Error('Signer locked'))
+    }
 
     const data = this.getTransactionRequest(currentAccount, handlerId).data
     cb(null, signerCompatibility(data, signer.summary()))
@@ -911,13 +918,14 @@ export class Accounts extends EventEmitter {
 
     const txRequest = this.getTransactionRequest(currentAccount, handlerId)
 
-    // TODO: Figure out root casue for data object being frozen here
     txRequest.data = Object.assign({}, txRequest.data)
 
     if (txRequest && txRequest.type === 'transaction') {
       const nonce = txRequest.data && txRequest.data.nonce
       if (nonce) {
-        const adjustedNonce = intToHex(parseInt(nonce, 16) + nonceAdjust)
+        let updatedNonce = parseInt(nonce, 16) + nonceAdjust
+        if (updatedNonce < 0) updatedNonce = 0
+        const adjustedNonce = intToHex(updatedNonce)
 
         txRequest.data.nonce = adjustedNonce
         currentAccount.update()
@@ -926,8 +934,9 @@ export class Accounts extends EventEmitter {
         this.sendRequest({ method: 'eth_getTransactionCount', chainId, params: [from, 'pending'] }, (res: RPCResponsePayload) => {
           if (res.result) {
             const newNonce = parseInt(res.result, 16)
-            const adjustedNonce = intToHex(nonceAdjust === 1 ? newNonce : newNonce + nonceAdjust)
-
+            let updatedNonce = nonceAdjust === 1 ? newNonce : newNonce + nonceAdjust
+            if (updatedNonce < 0) updatedNonce = 0
+            const adjustedNonce = intToHex(updatedNonce)
             txRequest.data.nonce = adjustedNonce
             currentAccount.update()
           }

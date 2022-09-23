@@ -50,7 +50,7 @@ class _RequestItem extends React.Component {
     return (
       <div 
         key={req.handlerId}
-        className={headerMode ? 'requestItem requestItemHeader' : 'requestItem cardShow' }
+        className={headerMode ? 'requestItem requestItemHeader' : 'requestItem' }
         onClick={() => {
           const crumb = { 
             view: 'requestView',

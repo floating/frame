@@ -25,6 +25,19 @@ import AddTokenRequest from './Requests/AddTokenRequest'
 import SignTypedDataRequest from './Requests/SignTypedDataRequest'
 
 class _AccountModule extends React.Component {
+  // constructor (props, context) {
+  //   super(props, context)
+  //   this.moduleRef = React.createRef()
+  //   this.state = {
+  //     transform: '',
+  //     transition: ''
+  //   }
+  //   this.xOffset = 2
+  //   this.yOffset = 2
+  //   this.attack = 0
+  //   this.release = 1
+  //   this.perspective = 500
+  // }
   getModule (id, account, expanded, expandedData, filter) {
     return(
       id === 'gas' ? <Gas 
@@ -94,6 +107,29 @@ class _AccountModule extends React.Component {
       />
     )
   }
+  // map (value, istart, istop, ostart, ostop) {
+  //   console.log(value, istart, istop, ostart, ostop)
+  //   return ostart + (ostop - ostart) * ((value - istart) / (istop - istart))
+  // }
+
+  // set3d (e) {
+  //   if (this.moduleRef.current) {
+  //     const rectTransform = this.moduleRef.current
+  //     const perspective = 'perspective(' + this.perspective + 'px) '
+  
+  //     let dy = 0 // e.clientY - rectTransform.offsetTop
+  //     let dx = e.clientX - rectTransform.offsetLeft
+  //     let xRot = this.map(dx, 0, rectTransform.clientWidth, - this.xOffset, this.xOffset)
+  //     let yRot = 0 // this.map(dy, 0, rectTransform.clientHeight, this.yOffset, - this.yOffset)
+  //     let propXRot = 'rotateX(' + yRot + 'deg) '
+  //     let propYRot = 'rotateY(' + xRot + 'deg)'
+
+  //     console.log({ transform: perspective + propXRot + propYRot })
+  
+  //     this.setState({ transform: perspective + propXRot + propYRot })
+  //   }
+  // }
+
   render () {
     const { 
       id, 
@@ -129,9 +165,41 @@ class _AccountModule extends React.Component {
       )
     } else {
       return (
-        <div className={'accountModule'} style={style}>
-          <div className='accountModuleInner cardShow' style={{ animationDelay: (index * 0.1) + 's'}}>
-            {this.getModule(id, account, expanded, expandedData, filter)}
+        <div 
+          className={'accountModule'} 
+          ref={this.moduleRef}
+          style={style}
+          // onMouseEnter={() => {
+          //   this.setState({
+          //     transition: 'transform ' + this.attack + 's'
+          //   })
+          // }}
+          // onMouseMove={(e) => {
+          //   e.persist()
+          //   this.set3d(e)
+          // }}
+          // onMouseLeave={() => {
+          //   const perspective = 'perspective(' + this.perspective + 'px) '
+          //   this.setState({
+          //     transition: 'transform ' + this.release + 's',
+          //     transform: perspective + 'rotateX(0deg) rotateY(0deg)'
+          //   })
+          // }}
+        >
+          <div 
+            className='accountModuleInner cardShow'>
+              <div 
+                className='accountModuleCard'
+                style={{ 
+                  animationDelay: (index * 0.1) + 's',
+                  transformStyle: 'preserve-3d',
+                  transform: this.state.transform,
+                  transition: this.state.transition
+                }}>
+                  {this.getModule(id, account, expanded, expandedData, filter)}
+              </div>
+
+            
           </div>  
         </div>
       )
@@ -208,13 +276,13 @@ class _AccountMain extends React.Component {
     let slideHeight = 0
     const modules = accountModuleOrder.map((id, i) => {
       const module = accountModules[id] || { height: 0 }
-      slideHeight += module.height + 7
+      slideHeight += module.height + 12
       return <AccountModule
         key={id}
         id={id} 
         account={this.props.id}
         module={module} 
-        top={slideHeight - module.height - 7}
+        top={slideHeight - module.height - 12}
         index={i}
         filter={this.state.accountModuleFilter}
       />
