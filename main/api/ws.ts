@@ -77,7 +77,12 @@ const handler = (socket: FrameWebSocket, req: IncomingMessage) => {
     const origin = parseOrigin(requestOrigin)
 
     // Extension custom action for summoning Frame
-    if (origin === 'frame-extension' && rawPayload.method === 'frame_summon') return windows.toggleTray()
+    if (origin === 'frame-extension') {
+      if (rawPayload.method === 'frame_summon') return windows.toggleTray()
+      if (rawPayload.method === 'eth_chainId') return res({ id: rawPayload.id, jsonrpc: rawPayload.jsonrpc, result: rawPayload.chainId })
+      if (rawPayload.method === 'net_version') return res({ id: rawPayload.id, jsonrpc: rawPayload.jsonrpc, result: parseInt(rawPayload.chainId || '', 16) })
+    }
+
     if (logTraffic) log.info(`req -> | ${(socket.isFrameExtension ? 'ext' : 'ws')} | ${origin} | ${rawPayload.method} | -> | ${rawPayload.params}`)
 
     const { payload, hasSession } = updateOrigin(rawPayload, origin, rawPayload.__extensionConnecting)
