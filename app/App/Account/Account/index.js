@@ -190,12 +190,13 @@ class _AccountModule extends React.Component {
             className='accountModuleInner cardShow'>
               <div 
                 className='accountModuleCard'
-                style={{ 
-                  animationDelay: (index * 0.1) + 's',
-                  transformStyle: 'preserve-3d',
-                  transform: this.state.transform,
-                  transition: this.state.transition
-                }}>
+                // style={{ 
+                //   animationDelay: (index * 0.1) + 's',
+                //   transformStyle: 'preserve-3d',
+                //   transform: this.state.transform,
+                //   transition: this.state.transition
+                // }}
+                >
                   {this.getModule(id, account, expanded, expandedData, filter)}
               </div>
 
