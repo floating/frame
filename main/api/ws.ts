@@ -79,8 +79,13 @@ const handler = (socket: FrameWebSocket, req: IncomingMessage) => {
     // Extension custom action for summoning Frame
     if (origin === 'frame-extension') {
       if (rawPayload.method === 'frame_summon') return windows.toggleTray()
-      if (rawPayload.method === 'eth_chainId') return res({ id: rawPayload.id, jsonrpc: rawPayload.jsonrpc, result: rawPayload.chainId })
-      if (rawPayload.method === 'net_version') return res({ id: rawPayload.id, jsonrpc: rawPayload.jsonrpc, result: parseInt(rawPayload.chainId || '', 16) })
+
+      if (rawPayload.chainId) {
+        // all requests from the extension should have the chainId param but legacy versions may not
+        const { id, jsonrpc } = rawPayload
+        if (rawPayload.method === 'eth_chainId') return res({ id, jsonrpc, result: rawPayload.chainId })
+        if (rawPayload.method === 'net_version') return res({ id, jsonrpc, result: parseInt(rawPayload.chainId, 16) })
+      }
     }
 
     if (logTraffic) log.info(`req -> | ${(socket.isFrameExtension ? 'ext' : 'ws')} | ${origin} | ${rawPayload.method} | -> | ${rawPayload.params}`)
