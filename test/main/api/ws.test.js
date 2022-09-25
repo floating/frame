@@ -1,6 +1,7 @@
 import WebSocket from 'ws'
 import { EventEmitter } from 'stream'
 
+import store from '../../../main/store'
 import ws from '../../../main/api/ws'
 
 let socketConnection, mockSocket
@@ -18,6 +19,8 @@ jest.mock('../../../main/accounts', () => {})
 jest.mock('../../../main/windows', () => {})
 
 beforeEach(() => {
+  store.initOrigin = jest.fn()
+
   socketConnection = new EventEmitter()
   mockSocket = new EventEmitter()
   mockSocket.readyState = WebSocket.OPEN
@@ -29,7 +32,7 @@ beforeEach(() => {
 })
 
 it('always responds to an extension request for chain id with the requested chain id', done => {
-  const rpcRequest = { id: 9, jsonrpc: '2.0', method: 'eth_chainId', params: [], chainId: '0x1' }
+  const rpcRequest = { id: 9, jsonrpc: '2.0', method: 'eth_chainId', params: [] }
 
   mockSocket.send = (response) => {
     const responsePayload = JSON.parse(response)
@@ -44,7 +47,7 @@ it('always responds to an extension request for chain id with the requested chai
 })
 
 it('always responds to an extension request for net version with the requested chain', done => {
-  const rpcRequest = { id: 9, jsonrpc: '2.0', method: 'net_version', params: [], chainId: '0x1' }
+  const rpcRequest = { id: 9, jsonrpc: '2.0', method: 'net_version', params: [] }
 
   mockSocket.send = (response) => {
     const responsePayload = JSON.parse(response)
