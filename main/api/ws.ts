@@ -84,8 +84,8 @@ const handler = (socket: FrameWebSocket, req: IncomingMessage) => {
       extendSession(payload._origin)
     }
 
-    // Extension custom action for summoning Frame
     if (origin === 'frame-extension') {
+      // custom extension action for summoning Frame
       if (rawPayload.method === 'frame_summon') return windows.toggleTray()
 
       const { id, jsonrpc } = rawPayload
