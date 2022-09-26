@@ -8,7 +8,7 @@ const networkDefaults = {
   name: 'Chain Name',
   explorer: 'Block Explorer',
   symbol: 'Native Symbol',
-  layer: 'other'
+  isTestnet: false
 }
 
 function isNetworkReady (network) {
@@ -62,7 +62,7 @@ export default function ChainEditForm ({
   const [chainId, setChainId] = useState(parseInt(chain.id) || networkDefaults.id)
   const [explorer, setExplorer] = useState(chain.explorer || networkDefaults.explorer)
   const [symbol, setSymbol] = useState(chain.symbol || networkDefaults.symbol)
-  const [layer, setLayer] = useState(chain.layer || networkDefaults.layer)
+  const [isTestnet, setIsTestnet] = useState(chain.isTestnet || networkDefaults.isTestnet)
   
   return (
     <>
@@ -171,42 +171,10 @@ export default function ChainEditForm ({
       }
 
       <div className='chainRow'>
-        <div className='chainLayers chainInputField'>
-          <div role='label' className='chainInputLabel'>Chain Type</div>
-          <div role='radiogroup' className='chainLayerOptions'>
-            <div
-              role='radio'
-              aria-checked={layer === 'rollup'}
-              className={layer === 'rollup' ?  'chainLayerOption chainLayerOptionOn' : 'chainLayerOption'}
-              onMouseDown={() => setLayer('rollup')}
-            >Rollup</div>
-            <div
-              role='radio'
-              aria-checked={layer === 'sidechain'}
-              className={layer === 'sidechain' ?  'chainLayerOption chainLayerOptionOn' : 'chainLayerOption'}
-              onMouseDown={() => setLayer('sidechain')}
-            >Sidechain</div>
-            <div
-              role='radio'
-              aria-checked={layer === 'testnet'}
-              className={layer === 'testnet' ?  'chainLayerOption chainLayerOptionOn' : 'chainLayerOption'}
-              onMouseDown={() => setLayer('testnet')}
-            >Testnet</div>
-            <div
-              role='radio'
-              aria-checked={layer === 'other'}
-              className={layer === 'other' ?  'chainLayerOption chainLayerOptionOn' : 'chainLayerOption'}
-              onMouseDown={() => setLayer('other')}
-            >Other</div>
-          </div>
-        </div>
-      </div>
-
-      <div className='chainRow'>
         <EditFormSubmitButton 
           labels={labels} 
           network={{
-            id: chainId, name, explorer, symbol, layer, type: chain.type
+            id: chainId, name, explorer, symbol, isTestnet, type: chain.type
           }}
           onSubmit={onSubmit}
           validateSubmit={validateSubmit}

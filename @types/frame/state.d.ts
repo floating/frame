@@ -17,6 +17,7 @@ interface Network {
   name: string
   symbol: string
   layer: string
+  isTestnet: boolean
   explorer: string
   on: boolean
   connection: {

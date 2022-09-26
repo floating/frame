@@ -10,8 +10,6 @@ import RingIcon from '../../../resources/Components/RingIcon'
 import Gas from '../../../resources/Components/Gas'
 
 import Connection from './Connection'
-import Usage from './Usage'
-import Tokens from './Tokens'
 
 import chainMeta from '../../../resources/chainMeta'
 
@@ -24,7 +22,7 @@ class _SettingsModule extends React.Component {
   }
   render () {
     
-    const { id, name, type, explorer, symbol, layer, changed } = this.props
+    const { id, type, symbol, changed } = this.props
     const price = this.store('main.networksMeta.ethereum', id, 'nativeCurrency.usd.price') || '?'
     return (
       <div className='sliceContainer' ref={this.ref}>
@@ -69,18 +67,6 @@ class _SettingsModule extends React.Component {
                   onBlur={(e) => {
                     if (e.target.value === '') this.setState({ symbol: this.props.symbol })
                   }}
-                />
-                <Dropdown
-                  syncValue={this.state.layer}
-                  onChange={layer => this.setState({ layer })}
-                  options={type === 'ethereum' && id === 1 ? [
-                    { text: 'mainnet', value: 'mainnet'}
-                  ] : [
-                    { text: 'rollup', value: 'rollup'}, 
-                    { text: 'sidechain', value: 'sidechain'}, 
-                    { text: 'testnet', value: 'testnet'}, 
-                    { text: 'other', value: 'other'}
-                  ]}
                 />
               </div>
               <div className='chainConfigRow'>
@@ -389,7 +375,7 @@ class _Network extends React.Component {
   constructor (props, context) {
     super(props, context)
     this.customMessage = 'Custom Endpoint'
-    const { id, name, type, explorer, symbol, layer } = this.props
+    const { id, name, type, explorer, symbol } = this.props
     this.network = id
     this.networkType = type
     const primaryCustom = context.store('main.networks', this.networkType, this.network, 'connection.primary.custom') || this.customMessage
@@ -404,8 +390,7 @@ class _Network extends React.Component {
       name, 
       explorer, 
       type, 
-      symbol, 
-      layer,
+      symbol,
       submitted: false, 
       newNetworkId: this.newNetworkIdDefault,
       newNetworkName: this.newNetworkNameDefault,
@@ -527,17 +512,15 @@ class _Network extends React.Component {
       this.state.name && 
       this.state.symbol && 
       this.state.explorer && 
-      this.state.type &&
-      this.state.layer && (
+      this.state.type && (
         this.props.id !== this.state.id ||
         this.props.name !== this.state.name ||
         this.props.symbol !== this.state.symbol ||
         this.props.explorer !== this.state.explorer ||
-        this.props.type !== this.state.type || 
-        this.props.layer !== this.state.layer
+        this.props.type !== this.state.type
       )
     )
-    const { id, name, type, explorer, symbol, layer, connection, filter } = this.props
+    const { id, name, type, explorer, symbol, connection, filter } = this.props
    
     const networkPresets = this.store('main.networkPresets', type)
     let presets = networkPresets[id] || {}
@@ -558,8 +541,7 @@ class _Network extends React.Component {
       !this.state.name.includes(filter) && 
       !this.state.symbol.includes(filter) && 
       !this.state.explorer.includes(filter) && 
-      !this.state.type.includes(filter) &&
-      !this.state.layer.includes(filter)
+      !this.state.type.includes(filter)
     ) return null
 
     return (
@@ -587,7 +569,7 @@ class _Network extends React.Component {
           {/* <div className='chainIdBadgeBackground' /> */}
 
           <div className='chainSettings' onClick={() => {
-            const chain = { id, type, name, symbol, explorer, layer }
+            const chain = { id, type, name, symbol, explorer }
 
             link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'updateChain', notifyData: { chain }} })
           }}>
@@ -693,11 +675,13 @@ class Settings extends React.Component {
   //   this.setState({ expandNetwork: expand !== undefined ? expand : !this.state.expandNetwork })
   // }
 
-  renderConnections (layer) {
+  renderConnections (testnetsOnly = false) {
     const nets = []
     const networks = this.store('main.networks')
 
     const { filter } = this.state
+
+    console.log('rendering connection', { testnetsOnly })
 
     Object.keys(networks).forEach(type => {
       nets.push(
@@ -706,9 +690,10 @@ class Settings extends React.Component {
             .map(id => parseInt(id))
             .sort((a, b) => a - b)
             .filter(id => {
-              if (!networks[type][id].layer && layer === 'other') return true
-              return networks[type][id].layer === layer
-            }).map(id => {
+              console.log({ id, isTestnet: networks[type][id].isTestnet })
+              return networks[type][id].isTestnet === testnetsOnly
+            })
+            .map(id => {
               return <Network
                 key={type + id}
                 id={id}
@@ -717,7 +702,6 @@ class Settings extends React.Component {
                 explorer={networks[type][id].explorer}
                 type={type}
                 connection={networks[type][id].connection}
-                layer={networks[type][id].layer}
                 on={networks[type][id].on}
                 filter={filter}
               />
@@ -785,23 +769,11 @@ class Settings extends React.Component {
           </div>
         </div> */}
         <div className='localSettingsWrap'>
-          {this.renderConnections('mainnet')}
-          <div className='networkBreak'>
-            <div className='networkBreakLayer'>Rollups</div>
-          </div>
-          {this.renderConnections('rollup')}
-          <div className='networkBreak'>
-            <div className='networkBreakLayer'>Sidechains</div>
-          </div>
-          {this.renderConnections('sidechain')}
+          {this.renderConnections()}
           <div className='networkBreak'>
             <div className='networkBreakLayer'>Testnets</div>
           </div>
-          {this.renderConnections('testnet')}
-          <div className='networkBreak'>
-            <div className='networkBreakLayer'>Other</div>
-          </div>
-          {this.renderConnections('other')}
+          {this.renderConnections(true)}
           {this.discord()}
           <div className='newAccount' onClick={() => link.send('tray:action', 'navDash', {
             view: 'notify',
