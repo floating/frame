@@ -77,7 +77,21 @@ describe('rendering', () => {
     expect(testnetToggle.getAttribute('aria-checked')).toBe('false')
   })
 
+  it('renders the default chain color', () => {
+    const { getByLabelText } = renderForm()
+
+    const blockExplorerInput = getByLabelText('Chain Color')
+    expect(blockExplorerInput.value).toEqual('accent5')
+  })
+
   it('renders the provided title label', () => {
+    const { getByRole } = renderForm({ labels: { title: 'Add New Chain' }})
+
+    const titleSection = getByRole('title')
+    expect(titleSection.textContent).toBe('Add New Chain')
+  })
+
+  it('renders the color dropdown', () => {
     const { getByRole } = renderForm({ labels: { title: 'Add New Chain' }})
 
     const titleSection = getByRole('title')
@@ -147,7 +161,7 @@ describe('submitting', () => {
 
     await user.click(getByRole('button'))
 
-    expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining(chain))
+    expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining(chain), { color: 'accent5' })
   })
 
   it('displays the submitted label after the user clicks submit', async () => {
