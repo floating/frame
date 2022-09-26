@@ -6,10 +6,6 @@ import utils from 'web3-utils'
 import RequestItem from '../../../../../../../resources/Components/RequestItem'
 import TxOverview from './overview'
 
-import RequestItem from '../../../../../../../resources/Components/RequestItem'
-import chainIcons from '../../../../../../../resources/chainIcons'
-
-
 class TxRecipient extends React.Component {
   constructor (...args) {
     super(...args)

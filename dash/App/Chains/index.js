@@ -11,7 +11,6 @@ import Gas from '../../../resources/Components/Gas'
 
 import Connection from './Connection'
 
-
 class _SettingsModule extends React.Component {
   constructor (props, context) {
     super(props, context)

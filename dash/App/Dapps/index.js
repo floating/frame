@@ -7,7 +7,6 @@ import { isNetworkConnected, isNetworkEnabled } from '../../../resources/utils/c
 import RingIcon from '../../../resources/Components/RingIcon'
 
 import DappDetails from './DappDetails'
-import chainIcons from '../../../resources/chainIcons'
 
 function bySessionStartTime (a, b) {
   return b.session.startedAt - a.session.startedAt

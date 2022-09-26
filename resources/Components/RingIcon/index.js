@@ -5,14 +5,13 @@ import svg from '../../../resources/svg'
 
 
 const Icon = ({ svgName, svgSize, img, small }) => {
-  console.log('trying to render icon', svgName)
   if (svgName) {
-    const name = svgName.toLowerCase()
+    const iconName = svgName.toLowerCase()
     const ethChains = ['mainnet', 'görli', 'sepolia', 'ropsten', 'rinkeby', 'kovan']
-    if (ethChains.includes(name)) {
+    if (ethChains.includes(iconName)) {
       return svg.eth(small ? 13 : 18)
     }
-    const svgIcon = svg[name]
+    const svgIcon = svg[iconName]
     return svgIcon ? svgIcon(svgSize) : null
   }
   if (img) {

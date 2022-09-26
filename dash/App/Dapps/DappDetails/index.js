@@ -1,9 +1,7 @@
 import React, {  createRef } from 'react'
 import Restore from 'react-restore'
 import link from '../../../../resources/link'
-// import { isNetworkConnected, isNetworkEnabled } from '../../../../resources/utils/chains'
 import RingIcon from '../../../../resources/Components/RingIcon'
-import chainIcons from '../../../../resources/chainIcons'
 import svg from '../../../../resources/svg'
 
 class DappDetails extends React.Component {

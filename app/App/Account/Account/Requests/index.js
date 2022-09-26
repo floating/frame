@@ -16,7 +16,6 @@ import RequestItem from '../../../../../resources/Components/RequestItem'
 
 import link from '../../../../../resources/link'
 import svg from '../../../../../resources/svg'
-import chainIcons from '../../../../../resources/chainIcons'
 
 class Requests extends React.Component {
   constructor (props, context) {

@@ -405,31 +405,7 @@ const initial = {
             }
           },
           icon: '',
-          primaryColor: 'accent7'
-        },
-        3: {
-          blockHeight: 0,
-          gas: {
-            fees: {},
-            price: {
-              selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-            }
-          },
-          icon: '',
-          primaryColor: 'accent5'
-        },
-        4: {
-          blockHeight: 0,
-          gas: {
-            fees: {},
-            price: {
-              selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-            }
-          },
-          icon: '',
-          primaryColor: 'accent5'
+          primaryColor: 'accent8'
         },
         5: {
           blockHeight: 0,
@@ -441,7 +417,7 @@ const initial = {
             }
           },
           icon: '',
-          primaryColor: 'accent5'
+          primaryColor: 'accent7'
         },
         10: {
           blockHeight: 0,
@@ -455,18 +431,6 @@ const initial = {
           icon: 'optimism',
           primaryColor: 'accent6'
         },
-        42: {
-          blockHeight: 0,
-          gas: {
-            fees: {},
-            price: {
-              selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-            }
-          },
-          icon: '',
-          primaryColor: 'accent5'
-        },
         100: {
           blockHeight: 0,
           gas: {
@@ -477,7 +441,7 @@ const initial = {
             }
           },
           icon: 'xdai',
-          primaryColor: 'accent4'
+          primaryColor: 'accent5'
         },
         137: {
           blockHeight: 0,
@@ -489,7 +453,7 @@ const initial = {
             }
           },
           icon: 'polygon',
-          primaryColor: 'accent3'
+          primaryColor: 'accent4'
         },
         250: {
           blockHeight: 0,
@@ -501,7 +465,7 @@ const initial = {
             }
           },
           icon: 'fantom',
-          primaryColor: 'accent2'
+          primaryColor: 'accent3'
         },
         42161: {
           blockHeight: 0,
@@ -513,7 +477,7 @@ const initial = {
             }
           },
           icon: 'arbitrum',
-          primaryColor: 'accent1'
+          primaryColor: 'accent2'
         },
         11155111: {
           blockHeight: 0,

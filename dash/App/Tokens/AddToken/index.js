@@ -1,10 +1,8 @@
 import React, { Component } from 'react'
 import Restore from 'react-restore'
-import chainIcons from '../../../../resources/chainIcons'
 import RingIcon from '../../../../resources/Components/RingIcon'
 import link from '../../../../resources/link'
 import svg from '../../../../resources/svg'
-import { intToHex } from '../../../../resources/utils'
 
 class AddTokenChainScreenComponent extends Component {
   constructor (...args) {
