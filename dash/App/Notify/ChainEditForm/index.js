@@ -9,7 +9,8 @@ const networkDefaults = {
   name: 'Chain Name',
   explorer: 'Block Explorer',
   symbol: 'Native Symbol',
-  isTestnet: false
+  isTestnet: false,
+  color: 'accent5'
 }
 
 function isNetworkReady (network) {
@@ -64,7 +65,7 @@ export default function ChainEditForm ({
   const [explorer, setExplorer] = useState(chain.explorer || networkDefaults.explorer)
   const [symbol, setSymbol] = useState(chain.symbol || networkDefaults.symbol)
   const [isTestnet, setIsTestnet] = useState(chain.isTestnet || networkDefaults.isTestnet)
-  const [color, setColor] = useState(chain.color)
+  const [color, setColor] = useState(chain.color || networkDefaults.color)
   
   return (
     <>
