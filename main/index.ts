@@ -220,7 +220,7 @@ ipcMain.on('tray:addToken', (e, token, req) => {
   if (token) {
     log.info('adding custom token', token)
     store.addCustomTokens([token])
-    store.navBack()
+    store.navBack('dash')
     const crumb = { view: 'tokens', data: {} }
     store.navForward('dash', crumb)
   }
