@@ -648,7 +648,6 @@ module.exports = {
     })
   },
   navDash: (u, navItem) => {
-    console.log('navDash', navItem)
     u('windows.dash.nav', nav => {
       if (JSON.stringify(nav[0]) !== JSON.stringify(navItem)) nav.unshift(navItem)      
       return nav

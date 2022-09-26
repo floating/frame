@@ -13,16 +13,27 @@
 
 .requestItem:hover
   background var(--ghostB)
+  transform translateY(-1px)
+  border-bottom 2px solid var(--ghostZ)
+  box-shadow 0px 8px 30px -12px var(--ghostX)
+  position relative
+  z-index 300000
+  
+.requestItem:active
+  background var(--ghostB)
+  transform translateY(0px)
+  box-shadow 0px 2px 4px var(--ghostX)
+  position relative
+  z-index 300000
 
 .requestItem
-  border-radius 16px
+  border-radius 17px
   background var(--ghostA)
   cursor pointer
   position relative
   width 100%
   z-index 1
-  margin-top 5px
-  padding 12px 0px 10px 0px
+  padding 8px 0px 10px 0px
   overflow hidden
   font-family 'MainFont'
   font-weight 300
@@ -31,6 +42,10 @@
   // background-size 400% 400%
   // background-position 0% 300%
   // background linear-gradient(90deg, var(--ghostC), var(--ghostA))
+  background var(--ghostA)
+  box-shadow 0px 4px 6px var(--ghostY)
+  border-bottom 2px solid var(--ghostZ)
+  cursor pointer
   *
     pointer-events none
 
@@ -284,17 +299,42 @@
   //   .requestItemDetailsSlide
   //     background linear-gradient(90deg, var(--ghostB), var(--ghostC))
 
-.requestItemHeader
+
+.requestItem:hover
+  background var(--ghostB)
+  transform translateY(-1px)
+  border-bottom 2px solid var(--ghostZ)
+  box-shadow 0px 8px 30px -12px var(--ghostX)
+  
+.requestItem:active
+  background var(--ghostB)
+  transform translateY(0px)
+  box-shadow 0px 2px 4px var(--ghostX)
+
+.requestItem
+  border-radius 17px
+  background var(--ghostA)
+  cursor pointer
+  position relative
+  width 100%
+  z-index 1
+  margin-top 3px
+  padding 12px 0px 10px 0px
+  overflow hidden
+  font-family 'MainFont'
+  font-weight 300
+  // height 70px
+  // transition all linear 1s
+  // background-size 400% 400%
+  // background-position 0% 300%
+  // background linear-gradient(90deg, var(--ghostC), var(--ghostA))
+  background var(--ghostA)
+  box-shadow 0px 4px 6px var(--ghostY)
+  border-bottom 2px solid var(--ghostZ)
+
+
+.requestItemHeader, .requestItemHeader:hover, .requestItemHeader:active
   background none
   box-shadow none
-
-  // .requestItemDetails
-  //   .requestItemDetailsSlide
-  //     background var(--ghostB)
-
-.requestItemHeader:hover
-  background none
-
-  // .requestItemDetails
-  //   .requestItemDetailsSlide
-  //     background var(--ghostB)
+  border-bottom none
+  transform none
