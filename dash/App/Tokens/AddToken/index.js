@@ -164,7 +164,7 @@ class AddTokenAddressScreenComponent extends Component {
 
 const AddTokenAddressScreen = Restore.connect(AddTokenAddressScreenComponent)
 
-class AddTokenFormScreen extends Component {
+class AddTokenFormScreenComponent extends Component {
   constructor (props, context) {
     super(props, context)
 
@@ -359,6 +359,8 @@ class AddTokenFormScreen extends Component {
     )
   }
 }
+
+const AddTokenFormScreen = Restore.connect(AddTokenFormScreenComponent)
 
 class AddToken extends Component {
   constructor (props, context) {
