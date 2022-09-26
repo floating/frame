@@ -1,14 +1,16 @@
 .requestToken
-  position relative
+  display flex
+  justify-content center
+  align-items center
+  flex-direction column
   transform translateZ(0px)
-  overflow scroll
-
-  .requestTokenInner
-    display flex
-    justify-content center
-    align-items center
-    flex-direction column
-    min-height 100%
+  margin 16px 4px
+  border-radius 20px
+  width calc(100% - 16px)
+  box-sizing border-box
+  background var(--ghostA)
+  box-shadow 0px 6px 6px var(--ghostY)
+  font-family 'MainFont'
 
   .requestTokenOrigin
     font-size 22px

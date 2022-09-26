@@ -593,17 +593,17 @@ module.exports = {
   },
   // Dashboard
   toggleDash: (u, force) => {
-    u('dash.showing', s => force === 'hide' ? false : force === 'show' ? true : !s)
+    u('windows.dash.showing', s => force === 'hide' ? false : force === 'show' ? true : !s)
   },
   closeDash: (u) => {
-    u('dash.showing', () => false)
-    u('dash.nav', () => ([])) // Reset nav
+    u('windows.dash.showing', () => false)
+    u('windows.dash.nav', () => ([])) // Reset nav
   },
   setDash: (u, update) => {
     if (!update.showing) {
-      u('dash.nav', () => ([])) // Reset nav
+      u('windows.dash.nav', () => ([])) // Reset nav
     }
-    u('dash', dash => Object.assign(dash, update))
+    u('windows.dash', dash => Object.assign(dash, update))
   },
   navForward: (u, windowId, crumb) => {
     if (!windowId || !crumb) return log.warn('Invalid nav forward', windowId, crumb)
@@ -648,34 +648,34 @@ module.exports = {
     })
   },
   navDash: (u, navItem) => {
-    u('dash.nav', nav => {
+    console.log('navDash', navItem)
+    u('windows.dash.nav', nav => {
       if (JSON.stringify(nav[0]) !== JSON.stringify(navItem)) nav.unshift(navItem)      
       return nav
     })
-    u('dash.showing', () => true)
+    u('windows.dash.showing', () => true)
   },
   backDash: (u, numSteps = 1) => {
-    u('dash.nav', nav => {
+    u('windows.dash.nav', nav => {
       while (numSteps > 0 && nav.length > 0) {
         nav.shift()
         numSteps -= 1
       }
-
       return nav
     })
   },
   muteBetaDisclosure: (u) => {
     u('main.mute.betaDisclosure', () => true)
     const navItem = { view: 'accounts', data: {} }
-    u('dash.nav', nav => {
+    u('windows.dash.nav', nav => {
       if (JSON.stringify(nav[0]) !== JSON.stringify(navItem)) nav.unshift(navItem)      
       return nav
     })
-    u('dash.showing', () => true)
+    u('windows.dash.showing', () => true)
   },
   muteAragonAccountMigrationWarning: (u) => {
     u('main.mute.aragonAccountMigrationWarning', () => true)
-    u('dash.showing', () => true)
+    u('windows.dash.showing', () => true)
   },
   // Dapp Frame
   appDapp: (u, dapp) => {

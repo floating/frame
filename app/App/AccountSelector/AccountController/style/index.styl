@@ -515,24 +515,6 @@
   // .okSigner
   //   .signerTop:hover
   //     background var(--ghostA)
-  .signerTopActive
-    cursor auto
-    border-bottom 2px solid var(--ghostZ0)
-    position relative
-    top -5px
-    .signerSelect
-      pointer-events auto !important
-      .signerSelectButton
-        pointer-events auto !important
-
-  .signerTopActive:hover
-    background var(--ghostA) !important
-    .signerSelect
-      .signerSelectButton
-        pointer-events auto !important
-        background var(--ghostA)
-      .signerSelectButton:hover
-        background var(--ghostB)
 
 
   .signerTopNoHover
@@ -889,6 +871,24 @@
 
   .openSigner
     pointer-events none
+    .signerTop
+      cursor auto
+      position relative
+      border-bottom 2px solid var(--ghostZ0)
+      top -5px
+      .signerSelect
+        pointer-events auto !important
+        .signerSelectButton
+          pointer-events auto !important
+
+    .signerTop:hover
+      background var(--ghostA) !important
+      .signerSelect
+        .signerSelectButton
+          pointer-events auto !important
+          background var(--ghostA)
+        .signerSelectButton:hover
+          background var(--ghostB)
 
   .signerSelectDown.signerSelectRight
     right 0

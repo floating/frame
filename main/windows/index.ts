@@ -140,7 +140,7 @@ function initTrayWindow () {
   setTimeout(() => {
     windows.tray.on('blur', () => {
       const frameShowing = frameManager.isFrameShowing()
-      if (store('main.autohide') && !store('dash.showing') && !frameShowing) {
+      if (store('main.autohide') && !store('windows.dash.showing') && !frameShowing) {
         tray.hide(true)
       }
     })
@@ -186,7 +186,7 @@ class Tray {
         store.trayOpen(true)
       }
       this.ready = true
-      if (store('dash.showing')) {
+      if (store('windows.dash.showing')) {
         setTimeout(() => {
           dash.show()
         }, 300)
@@ -301,7 +301,7 @@ class Dash {
 
 ipcMain.on('tray:quit', () => app.quit())
 ipcMain.on('tray:mouseout', () => {
-  if (glide && !store('dash.showing')) {
+  if (glide && !store('windows.dash.showing')) {
     glide = false
     tray.hide()
   }

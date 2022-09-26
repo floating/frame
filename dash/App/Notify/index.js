@@ -11,6 +11,7 @@ import frameIcon from './FrameIcon.png'
 import Confirm from '../../../resources/Components/Confirm'
 import AddChain from './AddChain'
 import UpdateChain from './UpdateChain'
+import AddToken from './AddToken'
 
 const FEE_WARNING_THRESHOLD_USD = 50
 
@@ -601,6 +602,48 @@ class Notify extends React.Component {
                 onAccept={onAccept}
                 onDecline={onDecline}
               />
+            </div>
+          </div>
+        </div>
+      )
+    } else if (notify === 'openExternal') {
+      return (
+        <div className='notify cardShow'>
+          {this.openExternal(notifyData)}
+        </div>
+      )
+    } else if (notify === 'openExplorer') {
+      return (
+        <div className='notify cardShow'>
+          {this.openExplorer(notifyData)}
+        </div>
+      )
+    } else if (notify === 'addChain') {
+      return (
+        <div className='notify cardShow'>
+          <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
+            <div className='notifyBoxSlide'>
+              <AddChain {...notifyData} />
+            </div>
+          </div>
+        </div>
+      )
+    } else if (notify === 'updateChain') {
+      return (
+        <div className='notify cardShow'>
+          <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
+            <div className='notifyBoxSlide'>
+              <UpdateChain {...notifyData} />
+            </div>
+          </div>
+        </div>
+      )
+    } else if (notify === 'addToken') {
+      return (
+        <div className='notify cardShow'>
+          <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
+            <div className='notifyBoxSlide'>
+              <AddToken {...notifyData} />
             </div>
           </div>
         </div>

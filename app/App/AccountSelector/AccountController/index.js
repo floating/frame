@@ -382,7 +382,7 @@ class Account extends React.Component {
     this.selected = current && !minimized
     let signerClass = 'signer'
     if (this.props.status === 'ok') signerClass += ' okSigner'
-    if (this.store('selected.current')) signerClass += ' openSigner'
+    if (open) signerClass += ' openSigner'
     if (this.store('selected.view') === 'settings') signerClass += ' signerInSettings'
     if (this.store('selected.showAccounts')) signerClass += ' signerAccountExpand'
 

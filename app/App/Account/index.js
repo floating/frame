@@ -168,7 +168,7 @@ class _Footer extends React.Component {
                   onClick={() => {
                     if (this.state.allowInput) {
                       link.send('tray:resolveRequest', req, null)
-                      link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'addChain', notifyData: { chain } } })
+                      link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'addChain', notifyData: { chain: req.chain } } })
                     }
                   }
                 }>
