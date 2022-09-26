@@ -410,12 +410,6 @@ const migrations = {
   },
   21: initial => {
     // add sepolia network information
-    if (!initial.main.networkPresets.ethereum[11155111]) {
-      initial.main.networkPresets.ethereum[11155111] = {
-        infura: 'infuraSepolia'
-      }
-    }
-
     if (!initial.main.networks.ethereum[11155111]) {
       initial.main.networks.ethereum[11155111] = {
         id: 11155111,
@@ -450,19 +444,35 @@ const migrations = {
       }
     }
     
-    // reset and switch off goerli if any removed RPCs are active
+    // we removed support for the following goerli RPCs so reset the connections 
+    // to defaults when the user was previously connecting to them
     const removedGoerliRPCs = ['mudit', 'slockit', 'prylabs']
     const goerliPrimaryConnection = initial.main.networks.ethereum[5].connection.primary.current
     const goerliSecondaryConnection = initial.main.networks.ethereum[5].connection.secondary.current
-    if (removedGoerliRPCs.includes(goerliPrimaryConnection) || removedGoerliRPCs.includes(goerliSecondaryConnection)) {
+    
+    if (removedGoerliRPCs.includes(goerliPrimaryConnection)) {
       initial.main.networks.ethereum[5] = {
         ...initial.main.networks.ethereum[5],
         connection: {
-          primary: { on: true, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
-          secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
-        },
-        on: false
+          ...initial.main.networks.ethereum[5].connection,
+          primary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
+        }
       }
+    }
+    if (removedGoerliRPCs.includes(goerliSecondaryConnection)) {
+      initial.main.networks.ethereum[5] = {
+        ...initial.main.networks.ethereum[5],
+        connection: {
+          ...initial.main.networks.ethereum[5].connection,
+          secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
+        }
+      }
+    }
+
+    // if neither primary nor secondary is enabled then we switch the overall connection off
+    const enabledConnection = initial.main.networks.ethereum[5].connection.primary.on || initial.main.networks.ethereum[5].connection.secondary.on
+    if (!enabledConnection) {
+      initial.main.networks.ethereum[5].connection.on = false
     }
 
     return initial
