@@ -375,6 +375,7 @@ const initial = {
           id: 11155111,
           type: 'ethereum',
           layer: 'testnet',
+          isTestnet: true,
           symbol: 'ETH',
           name: 'Sepolia',
           explorer: 'https://sepolia.etherscan.io',

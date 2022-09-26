@@ -106,8 +106,8 @@ class _SettingsModule extends React.Component {
               <div className='chainConfigSave cardShow'>
                 <div
                   className='moduleButton moduleButtonGood' onMouseDown={() => {
-                    const net = { id: this.props.id, name: this.props.name, type: this.props.type, symbol: this.props.symbol, explorer: this.props.explorer, layer: this.props.layer }
-                    const newNet = { id: this.state.id, name: this.state.name, type: this.state.type, symbol: this.state.symbol, explorer: this.state.explorer, layer: this.state.layer }
+                    const net = { id: this.props.id, name: this.props.name, type: this.props.type, symbol: this.props.symbol, explorer: this.props.explorer }
+                    const newNet = { id: this.state.id, name: this.state.name, type: this.state.type, symbol: this.state.symbol, explorer: this.state.explorer }
                     let empty = false
                     Object.keys(newNet).forEach(k => {
                       if (typeof newNet[k] === 'string') {

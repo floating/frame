@@ -63,7 +63,7 @@ export default function ChainEditForm ({
   const [explorer, setExplorer] = useState(chain.explorer || networkDefaults.explorer)
   const [symbol, setSymbol] = useState(chain.symbol || networkDefaults.symbol)
   const [isTestnet, setIsTestnet] = useState(chain.isTestnet || networkDefaults.isTestnet)
-  
+
   return (
     <>
       <div role='title' className='addChainTitle'>{labels.title}</div>
@@ -169,6 +169,16 @@ export default function ChainEditForm ({
           )
         })
       }
+
+      <div className='chainRow'>
+        <label id='testnet-label' className='chainInputLabel'>Is Testnet?</label>
+        <div id='testnetToggle' role='checkbox' aria-checked={isTestnet} aria-labelledby='testnet-label'
+            className={isTestnet ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'}
+            onClick={() => setIsTestnet(!isTestnet)}
+          >
+            <div className='signerPermissionToggleSwitch' />
+          </div>
+      </div>
 
       <div className='chainRow'>
         <EditFormSubmitButton 
