@@ -52,7 +52,7 @@ it('edits the existing chain when the user clicks submit', async () => {
     name: 'Mainnet',
     symbol: 'ETH',
     explorer: 'https://etherscan.io',
-    layer: 'other'
+    isTestnet: false
   }
 
   const { user, getByRole, getByLabelText } = setupComponent(<UpdateChain chain={chain} />)
@@ -68,7 +68,7 @@ it('edits the existing chain when the user clicks submit', async () => {
     symbol: 'ETH',
     explorer: 'https://my-custom-explorer.net',
     type: 'ethereum',
-    layer: 'other'
+    isTestnet: false
   })
 })
 
@@ -78,8 +78,7 @@ it('opens a confirmation when removing a chain', async () => {
     type: 'ethereum',
     name: 'Mainnet',
     symbol: 'ETH',
-    explorer: 'https://etherscan.io',
-    layer: 'other'
+    explorer: 'https://etherscan.io'
   }
 
   const { user, getByRole } = setupComponent(<UpdateChain chain={chain} />)

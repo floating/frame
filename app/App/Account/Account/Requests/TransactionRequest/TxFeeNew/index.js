@@ -30,9 +30,9 @@ class TxFee extends React.Component {
       id: parseInt(req.data.chainId, 'hex')
     }
 
-    const layer = this.store('main.networks', chain.type, chain.id, 'layer')
+    const isTestnet = this.store('main.networks', chain.type, chain.id, 'isTestnet')
     const nativeCurrency = this.store('main.networksMeta', chain.type, chain.id, 'nativeCurrency')
-    const nativeUSD = nativeCurrency && nativeCurrency.usd && layer !== 'testnet' ? nativeCurrency.usd.price : 0
+    const nativeUSD = nativeCurrency && nativeCurrency.usd && !isTestnet ? nativeCurrency.usd.price : 0
 
     let maxFeePerGas, maxFee, maxFeeUSD
 

@@ -69,9 +69,9 @@ class TxSending extends React.Component {
         const displayValue = value.dividedBy('1e' + decimals).toFixed(6)
         // const ensName = (recipientEns && recipientEns.length < 25) ? recipientEns : ''
 
-        const layer = this.store('main.networks', this.props.chain.type, this.props.chain.id, 'layer')    
+        const isTestnet = this.store('main.networks', this.props.chain.type, this.props.chain.id, 'isTestnet')    
         const rate = this.store('main.rates', contract)
-        const rateUSD = rate && rate.usd && layer !== 'testnet' ? rate.usd.price : 0
+        const rateUSD = rate && rate.usd && !isTestnet ? rate.usd.price : 0
   
         const destination = recipientType && <Destination chain={chainName} recipientType={recipientType} />
         const recipient = recipientAddress && 

@@ -754,3 +754,35 @@ describe('migration 21', () => {
     expect(goerli.on).toBe(false)
   })
 })
+
+describe('migration 22', () => {
+  beforeEach(() => {
+    state = {
+      main: {
+        _version: 21,
+        networks: {
+          ethereum: {
+            1: {
+              layer: 'mainnet'
+            },
+            5: {
+              layer: 'testnet'
+            }
+          }
+        }
+      }
+    }
+  })
+
+  it('sets the isTestnet flag to false on a non-testnet', () => {
+    const updatedState = migrations.apply(state, 22)
+
+    expect(updatedState.main.networks.ethereum[1].isTestnet).toBe(false)
+  })
+
+  it('sets the isTestnet flag to true on a testnet', () => {
+    const updatedState = migrations.apply(state, 22)
+
+    expect(updatedState.main.networks.ethereum[5].isTestnet).toBe(true)
+  })
+})

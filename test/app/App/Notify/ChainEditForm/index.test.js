@@ -70,18 +70,11 @@ describe('rendering', () => {
     expect(blockExplorerInput.value).toEqual('Block Explorer')
   })
 
-  it('renders the correct button for the provided layer', () => {
-    const { getByRole } = renderForm({ chain: { layer: 'testnet' }})
+  it('renders the testnet toggle as "off" by default', () => {
+    const { getByLabelText } = renderForm()
 
-    const otherLayerButton = getByRole('radio', { checked: true })
-    expect(otherLayerButton.textContent).toBe('Testnet')
-  })
-
-  it('renders the "other" layer button by default', () => {
-    const { getByRole } = renderForm()
-
-    const otherLayerButton = getByRole('radio', { checked: true })
-    expect(otherLayerButton.textContent).toBe('Other')
+    const testnetToggle = getByLabelText('Is Testnet?')
+    expect(testnetToggle.getAttribute('aria-checked')).toBe('false')
   })
 
   it('renders the provided title label', () => {
@@ -132,6 +125,17 @@ describe('editing', () => {
 
     const chainIdInput = queryByLabelText('Chain ID', { selector: 'input' })
     expect(chainIdInput).toBeNull()
+  })
+})
+
+describe('updating fields', () => {
+  it('allows the user to mark a chain as a testnet', async () => {
+    const { user, getByLabelText } = renderForm()
+
+    const testnetToggle = getByLabelText('Is Testnet?')
+    await user.click(testnetToggle)
+
+    expect(testnetToggle.getAttribute('aria-checked')).toBe('true')
   })
 })
 

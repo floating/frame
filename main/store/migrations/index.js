@@ -475,6 +475,14 @@ const migrations = {
 
     return initial
   },
+  22: (initial) => {
+    // set "isTestnet" flag on all chains based on layer value
+    Object.values(initial.main.networks.ethereum).forEach(chain => {
+      chain.isTestnet = chain.layer === 'testnet'
+    })
+
+    return initial
+  }
 }
 
 // Version number of latest known migration

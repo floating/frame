@@ -113,7 +113,7 @@ describe('submitting', () => {
           explorer: 'https://rinkeby.arbiscan.io',
           primaryRpc: 'https://arbitrum-rinkeby.infura.com',
           secondaryRpc: 'https://myrpc.arbrink.net',
-          layer: 'sidechain'
+          isTestnet: false
         }}
     />)
     
@@ -127,7 +127,7 @@ describe('submitting', () => {
         symbol: 'ETH',
         explorer: 'https://rinkeby.arbiscan.io',
         type: 'ethereum',
-        layer: 'sidechain',
+        isTestnet: false,
         primaryRpc: 'https://arbitrum-rinkeby.infura.com',
         secondaryRpc: 'https://myrpc.arbrink.net'
       }
