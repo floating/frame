@@ -79,7 +79,7 @@ class BalancesPreview extends React.Component {
         const name = isNative ? nativeCurrencyInfo.name || networks[rawBalance.chainId].name : rawBalance.name
         const decimals = isNative ? 18 : rawBalance.decimals
 
-        return balance({ ...rawBalance, logoURI, name, decimals }, networks[rawBalance.chainId].isTestnet ? 0 : rate.usd)
+        return balance({ ...rawBalance, logoURI, name, decimals }, networks[rawBalance.chainId].isTestnet ? { price: 0 } : rate.usd)
       })
       .sort((a, b) => {
         return b.totalValue.minus(a.totalValue).toNumber()

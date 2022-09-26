@@ -31,8 +31,8 @@ export function balance (rawBalance, quote = {}) {
     ...rawBalance,
     displayBalance: formatBalance(balance, totalValue, balanceDecimals),
     price: formatUsdRate(usdRate),
-    priceChange: !usdRate.isNaN() && BigNumber(quote['change24hr'] || 0).toFixed(2),
+    priceChange: !usdRate.isZero() && !usdRate.isNaN() && BigNumber(quote['change24hr'] || 0).toFixed(2),
     totalValue: totalValue.isNaN() ? BigNumber(0) : totalValue,
-    displayValue: formatUsdRate(totalValue, 0)
+    displayValue: totalValue.isZero() ? '0' : formatUsdRate(totalValue, 0)
   }
 }

@@ -687,10 +687,7 @@ class Settings extends React.Component {
           {Object.keys(networks[type])
             .map(id => parseInt(id))
             .sort((a, b) => a - b)
-            .filter(id => {
-              console.log({ id, isTestnet: networks[type][id].isTestnet })
-              return networks[type][id].isTestnet === testnetsOnly
-            })
+            .filter(id => networks[type][id].isTestnet === testnetsOnly)
             .map(id => {
               return <Network
                 key={type + id}
@@ -726,8 +723,7 @@ class Settings extends React.Component {
         networkOptions.push({ text: networks[type][id].name, value: type + ':' + id })
       })
     })
-    const { findHover, findFocus, findInput } = this.state
-    console.log( findHover, findFocus, findInput )
+
     return (
       <div className={'localSettings cardShow'}>
         {/* <div 
