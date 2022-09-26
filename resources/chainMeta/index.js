@@ -64,5 +64,11 @@ export default {
     name: 'arbitrum',
     icon: arbitrum,
     primaryColor: 'rgb(62, 173, 241)'
+  },
+  '0xaa36a7': {
+    chainId: 11155111,
+    name: 'sepolia',
+    icon: '',
+    primaryColor: 'rgb(255, 153, 51)'
   }
 }

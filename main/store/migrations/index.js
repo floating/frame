@@ -407,7 +407,74 @@ const migrations = {
     })
 
     return initial
-  }
+  },
+  21: initial => {
+    // add sepolia network information
+    if (!initial.main.networks.ethereum[11155111]) {
+      initial.main.networks.ethereum[11155111] = {
+        id: 11155111,
+        type: 'ethereum',
+        layer: 'testnet',
+        symbol: 'ETH',
+        name: 'Sepolia',
+        explorer: 'https://sepolia.etherscan.io',
+        gas: {
+          price: {
+            selected: 'standard',
+            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+          }
+        },
+        connection: {
+          primary: { on: true, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
+          secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
+        },
+        on: false
+      }
+    }
+
+    if (!initial.main.networksMeta.ethereum[11155111]) {
+      initial.main.networksMeta.ethereum[11155111] = {
+        gas: {
+          fees: {},
+          price: {
+            selected: 'standard',
+            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+          }
+        }
+      }
+    }
+    
+    // we removed support for the following goerli RPCs so reset the connections 
+    // to defaults when the user was previously connecting to them
+    const removedGoerliRPCs = ['mudit', 'slockit', 'prylabs']
+    const goerli = initial.main.networks.ethereum[5]
+    const goerliPrimaryConnection = goerli.connection.primary.current
+    const goerliSecondaryConnection = goerli.connection.secondary.current
+    
+    if (removedGoerliRPCs.includes(goerliPrimaryConnection)) {
+      initial.main.networks.ethereum[5] = {
+        ...goerli,
+        connection: {
+          ...goerli.connection,
+          primary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
+        }
+      }
+    }
+    if (removedGoerliRPCs.includes(goerliSecondaryConnection)) {
+      initial.main.networks.ethereum[5] = {
+        ...goerli,
+        connection: {
+          ...goerli.connection,
+          secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
+        }
+      }
+    }
+
+    // if neither primary nor secondary is enabled then we switch the overall connection off
+    initial.main.networks.ethereum[5].connection.on = goerli.connection.primary.on || goerli.connection.secondary.on
+
+    return initial
+  },
 }
 
 // Version number of latest known migration

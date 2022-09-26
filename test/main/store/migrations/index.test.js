@@ -528,3 +528,229 @@ describe('migration 20', () => {
     expect(updatedState.main.mute.aragonAccountMigrationWarning).toBe(true)
   })
 })
+
+describe('migration 21', () => {
+  beforeEach(() => {
+    state = {
+      main: {
+        _version: 20,
+        networks: {
+          ethereum: { 
+            5: {
+              id: 5,
+              type: 'ethereum',
+              layer: 'testnet',
+              symbol: 'ETH',
+              name: 'Görli',
+              explorer: 'https://goerli.etherscan.io',
+              gas: {
+                price: {
+                  selected: 'standard',
+                  levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+                }
+              },
+              connection: {
+                primary: { on: true, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
+                secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
+              },
+              on: false
+            }
+          }
+        },
+        networksMeta: {
+          ethereum: { }
+        },
+        networkPresets: {
+          ethereum: { }
+        }
+      }
+    }
+  })
+
+  it('adds Sepolia network information when none exists', () => {
+    delete state.main.networks.ethereum[11155111]
+
+    const updatedState = migrations.apply(state, 21)
+
+    const sepolia = updatedState.main.networks.ethereum[11155111]
+
+    expect(sepolia).toMatchObject({
+      id: 11155111,
+      type: 'ethereum',
+      layer: 'testnet',
+      symbol: 'ETH',
+      name: 'Sepolia',
+      explorer: 'https://sepolia.etherscan.io',
+      gas: { price: { selected: 'standard', levels: {} } }
+    })
+
+    expect(sepolia.connection.primary.on).toBe(true)
+    expect(sepolia.connection.primary.current).toBe('infura')
+    expect(sepolia.connection.secondary.on).toBe(false)
+    expect(sepolia.connection.secondary.current).toBe('custom')
+    expect(sepolia.on).toBe(false)
+  })
+
+  it('does not change existing Sepolia network information', () => {
+    state.main.networks.ethereum[11155111] = {
+      explorer: 'https://custom-explorer.sepolia.dev',
+      connection: {
+        primary: { on: true, current: 'local' }
+      }
+    }
+
+    const updatedState = migrations.apply(state, 21)
+    const sepolia = updatedState.main.networks.ethereum[11155111]
+
+    expect(sepolia.explorer).toBe('https://custom-explorer.sepolia.dev')
+    expect(sepolia.connection.primary.on).toBe(true)
+    expect(sepolia.connection.primary.current).toBe('local')
+  })
+
+  it('adds Sepolia network meta information when none exists', () => {
+    delete state.main.networksMeta.ethereum[11155111]
+
+    const updatedState = migrations.apply(state, 21)
+    const sepolia = updatedState.main.networksMeta.ethereum[11155111]
+
+    expect(sepolia.gas.fees.maxFeePerGas).toBe(undefined)
+    expect(sepolia).toMatchObject({
+      gas: { fees: {} , price: { selected: 'standard', levels: {} } }
+    })
+  })
+
+  it('does not change existing Sepolia meta network information', () => {
+    state.main.networksMeta.ethereum[11155111] = {
+      gas: {
+        fees: {
+          maxFeePerGas: '0xf'
+        }
+      }
+    }
+
+    const updatedState = migrations.apply(state, 21)
+    const sepolia = updatedState.main.networksMeta.ethereum[11155111]
+
+    expect(sepolia.gas.fees.maxFeePerGas).toBe('0xf')
+  })
+
+  const removedGoerliRPCs = ['mudit', 'slockit', 'prylabs']
+
+  removedGoerliRPCs.forEach((removedRPCName) => {
+    it(`resets the primary connection when the ${removedRPCName} RPC is selected`, () => {
+      state.main.networks.ethereum[5].connection.primary = { 
+        on: true, 
+        current: removedRPCName, 
+        status: 'disconnected', 
+        connected: false, 
+        type: '', 
+        network: '', 
+        custom: '' 
+      }
+
+      const updatedState = migrations.apply(state, 21)
+      const goerli = updatedState.main.networks.ethereum[5]
+
+      expect(goerli.connection.primary).toMatchObject({
+        on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: ''
+      })
+    })
+
+    it(`resets the secondary connection when the ${removedRPCName} RPC is selected`, () => {
+      state.main.networks.ethereum[5].connection.primary = { 
+        on: true, 
+        current: removedRPCName, 
+        status: 'disconnected', 
+        connected: false, 
+        type: '', 
+        network: '', 
+        custom: '' 
+      }
+
+      const updatedState = migrations.apply(state, 21)
+      const goerli = updatedState.main.networks.ethereum[5]
+
+      expect(goerli.connection.secondary).toMatchObject({
+        on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: ''
+      })
+    })
+  })
+
+  it('turns off goerli if the primary connection was reset whilst the secondary connection is inactive', () => {
+    state.main.networks.ethereum[5].connection.primary = { 
+      on: false, 
+      current: 'prylabs', 
+      status: 'disconnected', 
+      connected: false, 
+      type: '', 
+      network: '', 
+      custom: '' 
+    }
+    state.main.networks.ethereum[5].connection.secondary = { 
+      on: false, 
+      current: 'infura', 
+      status: 'loading', 
+      connected: false, 
+      type: '', 
+      network: '', 
+      custom: '' 
+    }
+
+    const updatedState = migrations.apply(state, 21)
+    const goerli = updatedState.main.networks.ethereum[5]
+
+    expect(goerli.on).toBe(false)
+  })
+
+  it('turns off goerli if the secondary connection was reset whilst the primary connection is inactive', () => {
+    state.main.networks.ethereum[5].connection.primary = { 
+      on: false, 
+      current: 'infura', 
+      status: 'loading', 
+      connected: false, 
+      type: '', 
+      network: '', 
+      custom: '' 
+    }
+    state.main.networks.ethereum[5].connection.secondary = { 
+      on: false, 
+      current: 'prylabs', 
+      status: 'disconnected', 
+      connected: false, 
+      type: '', 
+      network: '', 
+      custom: '' 
+    }
+
+    const updatedState = migrations.apply(state, 21)
+    const goerli = updatedState.main.networks.ethereum[5]
+
+    expect(goerli.on).toBe(false)
+  })
+
+  it('turns off goerli if both connections were reset', () => {
+    state.main.networks.ethereum[5].connection.primary = { 
+      on: true, 
+      current: 'mudit', 
+      status: 'connected', 
+      connected: true, 
+      type: '', 
+      network: '', 
+      custom: '' 
+    }
+    state.main.networks.ethereum[5].connection.secondary = { 
+      on: false, 
+      current: 'prylabs', 
+      status: 'disconnected', 
+      connected: false, 
+      type: '', 
+      network: '', 
+      custom: '' 
+    }
+
+    const updatedState = migrations.apply(state, 21)
+    const goerli = updatedState.main.networks.ethereum[5]
+
+    expect(goerli.on).toBe(false)
+  })
+})
