@@ -145,7 +145,6 @@ describe('submitting', () => {
     const chain = { id: 10, name: 'Optimism' }
     const { user, getByRole } = renderValidForm({ onSubmit, chain })
 
-
     await user.click(getByRole('button'))
 
     expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining(chain))

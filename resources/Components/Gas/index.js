@@ -121,7 +121,7 @@ class GasSummaryComponent extends Component {
 
     const isTestnet = this.store('main.networks', type, id, 'isTestnet')
     const nativeCurrency = this.store('main.networksMeta', type, id, 'nativeCurrency')
-    const nativeUSD = BigNumber(nativeCurrency && nativeCurrency.usd && isTestnet ? nativeCurrency.usd.price : 0)
+    const nativeUSD = BigNumber(nativeCurrency && nativeCurrency.usd && !isTestnet ? nativeCurrency.usd.price : 0)
 
     if (id === 10) {
       // Optimism specific calculations

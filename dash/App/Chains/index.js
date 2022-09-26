@@ -681,8 +681,6 @@ class Settings extends React.Component {
 
     const { filter } = this.state
 
-    console.log('rendering connection', { testnetsOnly })
-
     Object.keys(networks).forEach(type => {
       nets.push(
         <div key={type}>
