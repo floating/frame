@@ -2,8 +2,6 @@ import React from 'react'
 import Restore from 'react-restore'
 import svg from '../../../resources/svg'
 
-
-
 const Icon = ({ svgName, svgSize, img, small }) => {
   if (svgName) {
     const iconName = svgName.toLowerCase()
