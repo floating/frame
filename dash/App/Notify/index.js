@@ -648,38 +648,6 @@ class Notify extends React.Component {
           </div>
         </div>
       )
-    } else if (notify === 'openExternal') {
-      return (
-        <div className='notify cardShow'>
-          {this.openExternal(notifyData)}
-        </div>
-      )
-    } else if (notify === 'openExplorer') {
-      return (
-        <div className='notify cardShow'>
-          {this.openExplorer(notifyData)}
-        </div>
-      )
-    } else if (notify === 'addChain') {
-      return (
-        <div className='notify cardShow'>
-          <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
-            <div className='notifyBoxSlide'>
-              <AddChain {...notifyData} />
-            </div>
-          </div>
-        </div>
-      )
-    } else if (notify === 'updateChain') {
-      return (
-        <div className='notify cardShow'>
-          <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
-            <div className='notifyBoxSlide'>
-              <UpdateChain {...notifyData} />
-            </div>
-          </div>
-        </div>
-      )
     } else {
       return null
     }
