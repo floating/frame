@@ -83,7 +83,7 @@ class TxRecipient extends React.Component {
             handlerId={req.handlerId}
             title={`${chainName} Transaction`}
             color={`var(--${chainColor})`}
-            img={chainIcons(chainName)}
+            svgLookup={{ name: chainName }}
             headerMode={true}
           />
 

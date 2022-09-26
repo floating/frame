@@ -534,8 +534,6 @@ class _Network extends React.Component {
 
     const color = this.store('main.networksMeta.ethereum', id, 'primaryColor')
 
-    console.log('found colour', id, color, chainIcons(name))
-
     if (
       filter &&
       !this.state.id.toString().includes(filter) && 
@@ -551,7 +549,7 @@ class _Network extends React.Component {
           <div className='chainBadge'>
             <RingIcon 
               color={`var(--${color})`}
-              img={chainIcons(name)}
+              svgLookup={{ name }}
             />
           </div>
           <div className='networkName'>

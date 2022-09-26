@@ -207,7 +207,7 @@ class Requests extends React.Component {
                     i={i}
                     title={`${chainName} Transaction`}
                     color={chainColor ? `var(--${chainColor})`: ''}
-                    img={chainIcons(chainName)}
+                    svgLookup={{ name: chainName }}
                   />
                 )
               }

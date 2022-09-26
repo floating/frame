@@ -30,7 +30,7 @@ class DappDetails extends React.Component {
               <div className='originChainItemIcon'>
                 <RingIcon 
                   color={`var(--${chainColor})`}
-                  img={chainIcons(chain.name)}
+                  svgLookup={{ name }}
                 />
               </div>
               

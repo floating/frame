@@ -1,21 +1,32 @@
 import React from 'react'
 import Restore from 'react-restore'
-import link from '../../../resources/link'
 import svg from '../../../resources/svg'
+
+
+
+const Icon = ({ svgName, svgSize, img, small }) => {
+  console.log('trying to render icon', svgName)
+  if (svgName) {
+    const name = svgName.toLowerCase()
+    const ethChains = ['mainnet', 'görli', 'sepolia', 'ropsten', 'rinkeby', 'kovan']
+    if (ethChains.includes(name)) {
+      return svg.eth(small ? 13 : 18)
+    }
+    const svgIcon = svg[name]
+    return svgIcon ? svgIcon(svgSize) : null
+  }
+  if (img) {
+    return <img src={img} />
+  }
+  return svg.eth(small ? 13 : 18)
+}
 
 class RingIcon extends React.Component {
   constructor (...args) {
     super(...args)
     this.state = {}
   }
-  // glitch (el) {
-  //   return (
-  //     <div className={this.state.glitchOn ? 'glitch glitchOn' : 'glitch'}>
-  //       {[...Array(10).keys()].map(i => <div key={i + 'hg'} className='line'>{el}</div>)}
-  //       {!this.state.glitchOn ? <div className='line lastLine'>{el}</div> : null }
-  //     </div>
-  //   )
-  // }
+
   render () {
     const { color, svgLookup, img, small } = this.props
     return (
@@ -26,13 +37,7 @@ class RingIcon extends React.Component {
         }}
       >
         <div className='ringIconInner' style={{ background: color }}>
-          {svgLookup ? (
-            svg[svgLookup.name] ? svg[svgLookup.name](svgLookup.size) : null
-          ) : img ? (
-            <img src={img} />
-          ) : (
-            svg.eth(small ? 13 : 18)
-          )}
+          <Icon svgName={svgLookup.name} svgSize={svgLookup.size} img={img} small={small} />
         </div>
       </div>
     )

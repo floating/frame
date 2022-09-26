@@ -52,7 +52,7 @@ class AddTokenChainScreenComponent extends Component {
               <div className='originChainItemIcon'>
                 <RingIcon
                   color={chainColor ? `var(--${chainColor})` : 'var(--moon)'}
-                  img={chainIcons(chainName)}
+                  svgLookup={{ name }}
                   small={true}
                 />
               </div>

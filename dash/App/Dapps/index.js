@@ -136,7 +136,7 @@ const ChainOrigins = ({ chain: { id, name }, origins }) => {
           <RingIcon 
             small={true}
             color={`var(--${chainColor})`}
-            img={chainIcons(name)}
+            svgLookup={{ name }}
           />
         </div>
         <div className='originTitleText'>{name}</div>
