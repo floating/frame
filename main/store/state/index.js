@@ -417,7 +417,7 @@ const initial = {
             }
           },
           icon: '',
-          primaryColor: 'accent7'
+          primaryColor: 'accent5'
         },
         10: {
           blockHeight: 0,
@@ -441,7 +441,7 @@ const initial = {
             }
           },
           icon: 'xdai',
-          primaryColor: 'accent5'
+          primaryColor: 'accent1'
         },
         137: {
           blockHeight: 0,
@@ -489,7 +489,7 @@ const initial = {
             }
           },
           icon: '',
-          primaryColor: 'accent1'
+          primaryColor: 'accent5'
         }
       }
     }),
