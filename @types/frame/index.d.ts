@@ -6,9 +6,3 @@
 
 type NullableTimeout = NodeJS.Timeout | null
 type Callback<T> = (err: Error | null, result?: T) => void
-
-// required to be able to import svg files
-declare module '*.svg' {
-  const content: string;
-  export default content;
-}
