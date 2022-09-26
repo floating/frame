@@ -22,6 +22,7 @@
 Frame is a native web3 interface that lets you sign data, securely manage accounts and transparently interact with dapps via web3 protocols like Ethereum and IPFS!
 
 ### Features
+
 - **First-class Hardware Signer Support**
   - Use your GridPlus, Ledger and Trezor accounts with any dapp!
 - **Extensive Software Signer Support**
@@ -36,21 +37,29 @@ Frame is a native web3 interface that lets you sign data, securely manage accoun
   - macOS, Windows and Linux!
 
 ### Talks
-  - [Frame at Aracon](https://www.youtube.com/watch?v=wlZWLiy2GD0)
+
+- [Frame at Aracon](https://www.youtube.com/watch?v=wlZWLiy2GD0)
 
 ### Installation
 
 #### Downloads
-  - [All Releases](https://github.com/floating/frame/releases)
+
+- [All Releases](https://github.com/floating/frame/releases)
 
 #### Arch Linux
 
 If you use an arch-based distro, you can use an AUR Helper like [yay](https://github.com/Jguer/yay) to install Frame by running `yay -S frame-eth` or for the development version: `yay -S frame-eth-dev`.
 
 #### Run Source
+
 ```bash
 # Clone
 › git clone https://github.com/floating/frame
+
+# Use node v16
+› nvm install 16.15.0
+› nvm use 16.15.0
+
 
 # Install
 › npm run setup
@@ -64,10 +73,12 @@ If you use an arch-based distro, you can use an AUR Helper like [yay](https://gi
 **On Ubuntu:** Run `sudo apt-get install build-essential libudev-dev` **before** running the demo.
 
 #### Build Apps
-  ```bash
-  › npm run bundle # Create app bundle
-  › npm run build # Build apps for current platform
-  ```
+
+```bash
+› npm run bundle # Create app bundle
+› npm run build # Build apps for current platform
+```
+
 ### Usage
 
 #### Connect to Frame natively
@@ -79,10 +90,11 @@ Frame exposes system-wide JSON-RPC endpoints `ws://127.0.0.1:1248` and `http://1
 Frame also has a browser extension for injecting a Frame-connected [EIP-1193](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1193.md) provider into web apps as `window.ethereum`. This can be used to inject a connection when an app does not provide the option to connect to Frame natively.
 
 ### Related
-  - [Frame Chat](https://discord.gg/UH7NGqY) - Feel free to drop in and ask questions!
-  - [Frame Browser Extension](https://github.com/floating/frame-extension) - Use Frame with any web dapp
-  - [eth-provider](https://github.com/floating/eth-provider) - A universal Ethereum provider
-  - [Restore](https://github.com/floating/restore) - A predictable and observable state container for React apps
+
+- [Frame Chat](https://discord.gg/UH7NGqY) - Feel free to drop in and ask questions!
+- [Frame Browser Extension](https://github.com/floating/frame-extension) - Use Frame with any web dapp
+- [eth-provider](https://github.com/floating/eth-provider) - A universal Ethereum provider
+- [Restore](https://github.com/floating/restore) - A predictable and observable state container for React apps
 
 <h2>
   <h5 align="center">
