@@ -11,7 +11,6 @@ import { groupByChain, TokensByChain } from './reducers'
 import type { BytesLike } from '@ethersproject/bytes'
 import type EthereumProvider from 'ethereum-provider'
 
-let id = 1
 const erc20Interface = new Interface(erc20TokenAbi)
 
 interface ExternalBalance {

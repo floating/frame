@@ -4,10 +4,9 @@ import link from '../../../../../../../resources/link'
 import svg from '../../../../../../../resources/svg'
 import utils from 'web3-utils'
 
-import BigNumber from 'bignumber.js'
-
 import chainMeta from '../../../../../../../resources/chainMeta'
 import RequestItem from '../../../../../../../resources/Components/RequestItem'
+import TxOverview from './overview'
 
 
 class TxRecipient extends React.Component {
@@ -24,26 +23,6 @@ class TxRecipient extends React.Component {
   }
   hexToDisplayValue (hex) {
     return (Math.round(parseFloat(utils.fromWei(hex, 'ether')) * 1000000) / 1000000).toFixed(6)
-  }
-
-  renderRecognizedActions (req) {
-    if (req && req.recognizedActions) {
-      return req.recognizedActions.map(action => {
-        const { type, data } = action
-        if (type === 'erc20:transfer') {
-          const amount = new BigNumber(data.amount) 
-          const decimals = new BigNumber('1e' + data.decimals)
-          const displayAmount = amount.dividedBy(decimals)
-          return (
-            <div className='_txDescriptionSummary'>
-              {`Sending ${displayAmount.toString()} ${data.symbol}`}
-            </div>
-          )
-        }
-        return null
-      })
-    }
-    return null
   }
 
   render () {
@@ -106,59 +85,9 @@ class TxRecipient extends React.Component {
             img={chainMeta[hexId] ? chainMeta[hexId].icon : ''}
             headerMode={true}
           />
-          <div className='_txMainValues'>
-            <div className='_txMainValue _txMainValueClickable' onClick={() => {
-              link.send('nav:update', 'panel', { data: { step: 'viewData' } })
-            }}>
-              <div className='_txDescription'>
-                {!req.data.to && req.data.data && req.data.data !== '0x' && req.data.data !== '0x0' ? (
-                  <div className='_txDescriptionSummary'>
-                    <div>{`Deploying Contract`}</div>
-                    <div>{`on ${chainName}`}</div>
-                  </div>
-                ) : req.recipientType === 'external' ? (
-                  <div className='_txDescriptionSummary'>
-                    {req.data.value && req.data.value !== '0x' && req.data.value !== '0x0' ? (
-                      <div>{`Sending ${currentSymbol}`}</div>
-                    ) : req.data.data && req.data.data !== '0x' && req.data.data !== '0x0' ? (
-                      <div>{`Sending Data`}</div>
-                    ) : (
-                      <div>{`Empty Transaction`}</div>
-                    )}
-                    <div>{`on ${chainName}`}</div>
-                  </div>
-                ) : ( // Recipient is contract
-                  <div className='_txDescriptionSummary'>
-                    {req.data.value && req.data.value !== '0x' && req.data.value !== '0x0' ? (
-                      <div>{`Sending ${currentSymbol}`}</div>
-                    ) : null}
-                    {req.recognizedActions.length ? (
-                      this.renderRecognizedActions(req)
-                    ) : req.decodedData && req.decodedData.method ? (
-                      <div>{`Calling Contract Method ${req.decodedData.method}`}</div>
-                    ) : <div>{`Calling Contract`}</div>}
-                    <div>{`on ${chainName}`}</div>
-                  </div>
-                )}
-              </div>
-            </div>
-            {txMeta.replacement ? (
-              txMeta.possible ? (
-                <div className='_txMainTag _txMainTagWarning'>
-                  valid replacement
-                </div>
-              ) : (
-                <div className='_txMainTag _txMainTagWarning'>
-                  {txMeta.notice || 'invalid duplicate'}
-                </div>
-              )
-            ) : null}
-            {req.data.data && req.data.data !== '0x' && req.data.data !== '0x0' ? (
-              <div className='_txMainTag _txMainTagWarning'>
-                {'Transaction includes data'}
-              </div>
-            ) : null}
-          </div>
+
+          <TxOverview req={req} chainName={chainName} symbol={currentSymbol} txMeta={txMeta} />
+
         </div>
       </div>
     )

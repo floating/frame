@@ -1,7 +1,7 @@
 import log from 'electron-log'
 import nock from 'nock'
 
-import { fetchEtherscanContract } from '../../../main/contracts/etherscanContract'
+import { fetchEtherscanContract } from '../../../../main/contracts/sources/etherscan'
 
 function mockApiResponse (domain, path, status, body, timeout = 0, headers = { 'content-type': 'application/json' }) {
   nock(`https://${domain}`)
@@ -52,10 +52,10 @@ describe('#fetchEtherscanContract', () => {
   }
 
   const chains = [
-    { chainId: '0x1', domain: 'api.etherscan.io', apiKey: '3SYU5MW5QK8RPCJV1XVICHWKT774993S24' },
-    { chainId: '0x89', domain: 'api.polygonscan.com', apiKey: '2P3U9T63MT26T1X64AAE368UNTS9RKEEBB' },
-    { chainId: '0xa', domain: 'api-optimistic.etherscan.io', apiKey: '3SYU5MW5QK8RPCJV1XVICHWKT774993S24' },
-    { chainId: '0xa4b1', domain: 'api.arbiscan.io', apiKey: 'VP126CP67QVH9ZEKAZT1UZ751VZ6ZTIZAD' }
+    { chainId: 1, domain: 'api.etherscan.io', apiKey: '3SYU5MW5QK8RPCJV1XVICHWKT774993S24' },
+    { chainId: 137, domain: 'api.polygonscan.com', apiKey: '2P3U9T63MT26T1X64AAE368UNTS9RKEEBB' },
+    { chainId: 10, domain: 'api-optimistic.etherscan.io', apiKey: '3SYU5MW5QK8RPCJV1XVICHWKT774993S24' },
+    { chainId: 42161, domain: 'api.arbiscan.io', apiKey: 'VP126CP67QVH9ZEKAZT1UZ751VZ6ZTIZAD' }
   ]
 
   chains.forEach(chain => {
@@ -81,7 +81,7 @@ describe('#fetchEtherscanContract', () => {
   it('does not retrieve a contract from etherscan when the request fails', async () => {
     mockEtherscanApi(400)
 
-    return expect(fetchEtherscanContract(contractAddress, '0x1')).resolves.toBeUndefined()
+    return expect(fetchEtherscanContract(contractAddress, 1)).resolves.toBeUndefined()
   })
 
   it('does not retrieve a contract from etherscan when the contract is not found', async () => {
@@ -90,7 +90,7 @@ describe('#fetchEtherscanContract', () => {
       result: undefined
     })
 
-    return expect(fetchEtherscanContract(contractAddress, '0x1')).resolves.toBeUndefined()
+    return expect(fetchEtherscanContract(contractAddress, 1)).resolves.toBeUndefined()
   })
 
   it('does not retrieve a contract from etherscan when the ABI is unverified', async () => {
@@ -102,11 +102,11 @@ describe('#fetchEtherscanContract', () => {
       }]
     })
 
-    return expect(fetchEtherscanContract(contractAddress, '0x1')).resolves.toBeUndefined()
+    return expect(fetchEtherscanContract(contractAddress, 1)).resolves.toBeUndefined()
   })
 
   it('does not retrieve a contract from an unsupported chain', async () => {
-    return expect(fetchEtherscanContract(contractAddress, '0x4')).resolves.toBeUndefined()
+    return expect(fetchEtherscanContract(contractAddress, 4)).resolves.toBeUndefined()
   })
 
   it('does not retrieve a contract when the request times out', async () => {
@@ -118,7 +118,7 @@ describe('#fetchEtherscanContract', () => {
       }]
     }, 10000)
 
-    const contract = expect(fetchEtherscanContract(contractAddress, '0x1')).resolves.toBeUndefined()
+    const contract = expect(fetchEtherscanContract(contractAddress, 1)).resolves.toBeUndefined()
     
     jest.advanceTimersByTime(4000)
 

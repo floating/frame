@@ -75,6 +75,71 @@ taskWithDefaultParams('send-token-approval', 'approve token contract for spendin
     })
 })
 
+const ensAbis = require('./compiled/main/contracts/deployments/ens/abi.js')
+const registrarContract = new utils.Interface(ensAbis.registrar)
+const registrarControllerContract = new utils.Interface(ensAbis.registrarController)
+
+const ensActions = {
+  commit: () => {
+    return {
+      to: '0x283Af0B28c62C092C9727F1Ee09c02CA627EB7F5',
+      data: registrarControllerContract.encodeFunctionData('commit', [utils.formatBytes32String('testing-frame')])
+    }
+  },
+  register: ({ name, account, duration = 31536000 }) => {
+    return {
+      to: '0x283Af0B28c62C092C9727F1Ee09c02CA627EB7F5',
+      data: registrarControllerContract.encodeFunctionData('register', [name, account, duration, utils.formatBytes32String('asupersecret')])
+    }
+  },
+  renew: ({ name, duration = 31536000 }) => {
+    return {
+      to: '0x283Af0B28c62C092C9727F1Ee09c02CA627EB7F5',
+      data: registrarControllerContract.encodeFunctionData('renew', [name, duration])
+    }
+  },
+  transfer: ({ account, to, tokenid }) => {
+    return {
+      to: '0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85',
+      data: registrarContract.encodeFunctionData('transferFrom', [account, to, tokenid])
+    }
+  },
+  approve: ({ to, tokenid }) => {
+    return {
+      to: '0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85',
+      data: registrarContract.encodeFunctionData('approve', [to, tokenid])
+    }
+  }
+}
+
+taskWithDefaultParams('ens', 'interact with ENS contracts')
+  .addPositionalParam('action', `one of <${Object.keys(ensActions).join('|')}>`)
+  .addOptionalParam('name', 'ens domain name')
+  .addOptionalParam('to', 'destination account')
+  .addOptionalParam('duration', 'duration for action, in seconds')
+  .addOptionalParam('tokenid', 'token id for ERC-721 representaion of domain name')
+  .setAction(async (params) => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => reject(new Error('request timed out!')), 60 * 1000)
+
+    const chainId = '0x' + parseInt(params.chain || 1).toString(16)
+    const eth = ethProvider(params.provider === 'hardhat' ? 'http://127.0.0.1:8545' : params.provider, { origin: 'frame-hardhat-worker' })
+
+    eth.request({ method: 'eth_accounts', params: [], id: 2, chainId, jsonrpc: '2.0' })
+      .then(accounts => {
+        const contractCall = ensActions[params.action]({ ...params, account: accounts[0] })
+        return {
+          value: '0x0',
+          from: accounts[0],
+          ...contractCall 
+        }
+      })
+      .then(tx => { console.log({ tx }); return eth.request({ method: 'eth_sendTransaction', params: [tx], id: 2, chainId }) })
+      .then(resolve)
+      .catch(reject)
+    })
+})
+
 module.exports = {
   defaultNetwork: 'hardhat',
   networks: {
