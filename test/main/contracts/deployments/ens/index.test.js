@@ -123,6 +123,13 @@ describe('registrar controller', () => {
         })
       })
     })
+
+    it('adds a .eth extension to a name to be registered', () => {
+      const calldata = registrarControllerInterface.encodeFunctionData('register', ['frame', to, 31536000, utils.formatBytes32String('asecretphrase')])
+      const action = registrarController.decode(calldata)
+
+      expect(action.data.name).toBe('frame.eth')
+    })
   })
 
   it('recognizes a call to renew an ENS name', () => {

@@ -52,6 +52,11 @@ function getNameForTokenId (account: string, tokenId: string) {
   return record.name
 }
 
+function ethName (name: string) {
+  // assumes all names will be registered in the .eth domain, in the future this may not be the case
+  return name.includes('.eth') ? name : `${name}.eth`
+}
+
 const registrar = ({ name = 'ENS Registrar', address, chainId }: DeploymentLocation): Contract => {
   return {
     name,
@@ -105,7 +110,7 @@ const registarController = ({ name = 'ENS Registrar Controller', address, chainI
 
         return {
           id: 'ens:register',
-          data: { address: owner, name, duration: duration.toNumber() }
+          data: { address: owner, name: ethName(name), duration: duration.toNumber() }
         }
       }
 
@@ -114,7 +119,7 @@ const registarController = ({ name = 'ENS Registrar Controller', address, chainI
 
         return {
           id: 'ens:renew',
-          data: { name, duration: duration.toNumber() }
+          data: { name: ethName(name), duration: duration.toNumber() }
         }
       }
     }
