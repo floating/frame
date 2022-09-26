@@ -27,14 +27,14 @@
     ._txMainValues
       font-size 17px
       font-weight 400
-      border-radius 16px
+      border-radius 20px
       -webkit-app-region no-drag
       transition none
       transform translate3d(0, 0, 0)
       font-family 'MainFont'
       // overflow hidden
       display flow-root
-      padding 0px 3px 3px 3px
+      padding 3px 3px 3px 3px
       background var(--ghostZ)
 
       svg
@@ -108,13 +108,13 @@
         display flex
         justify-content center
         align-items center
-        border-radius 14px
+        border-radius 17px
         -webkit-app-region no-drag
         transition none
         transform translate3d(0, 0, 0)
         font-family 'MainFont'
         padding 12px
-        margin-top 3px
+        margin-top 1px
         background var(--ghostA)
         box-shadow 0px 1px 2px var(--ghostX)
         border-bottom 2px solid var(--ghostZ)
@@ -141,6 +141,8 @@
         transform translateY(-1px)
         border-bottom 2px solid var(--ghostZ)
         box-shadow 0px 8px 30px -12px var(--ghostX)
+        position relative
+        z-index 300000
 
         
       ._txMainValueClickable:active
@@ -160,8 +162,8 @@
     text-transform uppercase
     letter-spacing 1px
     text-align center
-    padding 5px 0px 5px 0px
-    margin-top 5px
+    padding 8px 0px 8px 0px
+    margin-top 1px
     border-radius 12px
     background var(--ghostA)
     box-shadow 0px 1px 2px var(--ghostX)

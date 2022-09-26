@@ -77,7 +77,7 @@ class TxFee extends React.Component {
                 </div>
               </div>
               <div className='_txMainValuesColumn' style={{ flex: '1' }}>
-                <div className='_txFeeTotal'>
+                <div className='_txMainValue _txFeeTotal'>
                   <div>
                     <span className='_txFeeETH'>
                       {currentSymbol || '?'}

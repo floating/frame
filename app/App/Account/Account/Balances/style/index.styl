@@ -21,12 +21,12 @@
 
 .signerBalancesWrap
   margin 0px 6px 6px 6px
-  padding 0px 3px 3px 3px
+  padding 2px 3px 1px 3px
   box-sizing border-box
   overflow auto
   background var(--ghostZ)
   border-radius 20px
-  min-height 70px
+  min-height 120px
 
   .signerBalance:first-child
     border-top-right-radius 17px
@@ -78,10 +78,29 @@
     align-items center
     height 100%
 
+    .moduleItemButton
+      background var(--ghostA)
+      box-shadow 0px 4px 6px var(--ghostY)
+      border-bottom 2px solid var(--ghostZ)
+      cursor pointer
+      * 
+        pointer-events none
+
+    .moduleItemButton:hover
+      background var(--ghostB)
+      transform translateY(-1px)
+      border-bottom 2px solid var(--ghostZ)
+      box-shadow 0px 8px 30px -12px var(--ghostX)
+      
+    .moduleItemButton:active
+      background var(--ghostB)
+      transform translateY(0px)
+      box-shadow 0px 2px 4px var(--ghostX)
+
   .signerBalanceButton
     height 40px
     margin-left 13px
-    background var(--ghostB)
+    background var(--ghostA)
     border 3px solid var(--ghostZ)
     border-radius 20px
     box-sizing border-box
@@ -101,7 +120,7 @@
       margin-left 2px
 
   .signerBalanceButton:hover
-    background var(--ghostC)
+    background var(--ghostB)
     color var(--outerspace)
     // color var(--good)
 
@@ -168,9 +187,11 @@
   transition 0.1s ease-out all
   background var(--ghostA)
   border-radius 8px
-  margin-top 3px
+  margin-top 1px
   font-family 'MainFont'
   overflow hidden
+  box-shadow 0px 4px 6px var(--ghostY)
+  border-bottom 2px solid var(--ghostZ)
 
   .signerBalanceLoading
     position absolute
@@ -346,9 +367,6 @@
     display flex
     align-items center
     font-family 'FiraCode'
-
-.signerBalance:last-child
-  border-bottom none
 
 .signerBalanceSliderDisplay
   position absolute

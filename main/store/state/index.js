@@ -96,10 +96,6 @@ const initial = {
       }
     }
   },
-  dash: { // Dash view
-    showing: false,
-    nav: []
-  },
   flow: {},
   dapps: {},
   view: {

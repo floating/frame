@@ -29,7 +29,7 @@ class Dash extends React.Component {
     }
   }
   renderPanel () {
-    const { view, data } = this.store('dash.nav')[0] || { view: 'default', data: {} }
+    const { view, data } = this.store('windows.dash.nav')[0] || { view: 'default', data: {} }
     if (view === 'accounts') return <Accounts data={data} />
     if (view === 'expandedSigner' && data.signer) {
       const signer = this.store('main.signers', data.signer)

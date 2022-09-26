@@ -4,8 +4,7 @@ import link from '../../../resources/link'
 import svg from '../../../resources/svg'
 
 class Command extends React.Component {
-  renderSignerIcon () {
-    const type = this.props.type
+  renderSignerIcon (type) {
     if (type === 'ledger') {
       return (
         <div className='expandedSignerIcon'>
@@ -38,22 +37,23 @@ class Command extends React.Component {
     
   }
   renderSignerTitle () {
-    const signer = 'expandedSigner'
+    const { view, data = {} } = this.store('windows.dash.nav')[0] || { view: '', data: {} }
+    const signer = data.signer ? this.store('main.signers', data.signer) : {}
     return (
       <div className='expandedSignerTitle'>
         {/* <div className='signerType' style={this.props.inSetup ? {top: '21px'} : {top: '24px'}}>{this.props.model}</div> */}
-        {this.renderSignerIcon()}
+        {this.renderSignerIcon(signer.type)}
         <div className='signerName'>
-          {'Signer Name'}
+          {signer.name}
         </div>
       </div>
     )
   }
   render () {
-    const { view, data } = this.store('dash.nav')[0] || { view: '', data: {} }
+    const { view, data } = this.store('windows.dash.nav')[0] || { view: '', data: {} }
     return (
       <div className='command'>
-        {this.store('dash.nav').length ? (
+        {this.store('windows.dash.nav').length ? (
           <div 
             className='commandItem commandItemBack cardShow'
             onClick={() => {

@@ -220,8 +220,11 @@ ipcMain.on('tray:addToken', (e, token, req) => {
   if (token) {
     log.info('adding custom token', token)
     store.addCustomTokens([token])
+    store.navBack('dash')
+    const crumb = { view: 'tokens', data: {} }
+    store.navForward('dash', crumb)
   }
-  accounts.resolveRequest(req)
+  if (req) accounts.resolveRequest(req)
 })
 
 ipcMain.on('tray:removeToken', (e, token) => {
@@ -321,7 +324,7 @@ app.on('ready', () => {
   })
 
   store.observer(() => {
-    if (store('dash.showing')) {
+    if (store('windows.dash.showing')) {
       windows.showDash()
     } else {
       windows.hideDash()
