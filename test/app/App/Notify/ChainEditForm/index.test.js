@@ -80,8 +80,8 @@ describe('rendering', () => {
   it('renders the default chain color', () => {
     const { getByLabelText } = renderForm()
 
-    const blockExplorerInput = getByLabelText('Chain Color')
-    expect(blockExplorerInput.value).toEqual('accent5')
+    const chainColorDropdown = getByLabelText('Chain Color')
+    expect(chainColorDropdown.value).toEqual('accent5')
   })
 
   it('renders the provided title label', () => {
