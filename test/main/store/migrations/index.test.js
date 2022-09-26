@@ -637,7 +637,7 @@ describe('migration 21', () => {
   const removedGoerliRPCs = ['mudit', 'slockit', 'prylabs']
 
   removedGoerliRPCs.forEach((removedRPCName) => {
-    it(`resets the primary connection when the ${removedRPCName} RPC is active`, () => {
+    it(`resets the primary connection when the ${removedRPCName} RPC is selected`, () => {
       state.main.networks.ethereum[5].connection.primary = { 
         on: true, 
         current: removedRPCName, 
@@ -656,49 +656,11 @@ describe('migration 21', () => {
       })
     })
 
-    it(`resets the primary connection when the ${removedRPCName} RPC is inactive`, () => {
-      state.main.networks.ethereum[5].connection.primary = { 
-        on: false, 
-        current: removedRPCName, 
-        status: 'loading', 
-        connected: false, 
-        type: '', 
-        network: '', 
-        custom: '' 
-      }
-
-      const updatedState = migrations.apply(state, 21)
-      const goerli = updatedState.main.networks.ethereum[5]
-
-      expect(goerli.connection.primary).toMatchObject({
-        on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: ''
-      })
-    })
-
-    it(`resets the secondary connection when the ${removedRPCName} RPC is active`, () => {
+    it(`resets the secondary connection when the ${removedRPCName} RPC is selected`, () => {
       state.main.networks.ethereum[5].connection.primary = { 
         on: true, 
         current: removedRPCName, 
         status: 'disconnected', 
-        connected: false, 
-        type: '', 
-        network: '', 
-        custom: '' 
-      }
-
-      const updatedState = migrations.apply(state, 21)
-      const goerli = updatedState.main.networks.ethereum[5]
-
-      expect(goerli.connection.secondary).toMatchObject({
-        on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: ''
-      })
-    })
-
-    it(`resets the secondary connection when the ${removedRPCName} RPC is inactive`, () => {
-      state.main.networks.ethereum[5].connection.primary = { 
-        on: false, 
-        current: removedRPCName, 
-        status: 'loading', 
         connected: false, 
         type: '', 
         network: '', 
@@ -737,10 +699,6 @@ describe('migration 21', () => {
     const updatedState = migrations.apply(state, 21)
     const goerli = updatedState.main.networks.ethereum[5]
 
-    expect(goerli.connection).toMatchObject({
-      primary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' },
-      secondary: { on: false, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' }
-    })
     expect(goerli.on).toBe(false)
   })
 
@@ -767,10 +725,6 @@ describe('migration 21', () => {
     const updatedState = migrations.apply(state, 21)
     const goerli = updatedState.main.networks.ethereum[5]
 
-    expect(goerli.connection).toMatchObject({
-      primary: { on: false, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
-      secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
-    })
     expect(goerli.on).toBe(false)
   })
 
@@ -797,10 +751,6 @@ describe('migration 21', () => {
     const updatedState = migrations.apply(state, 21)
     const goerli = updatedState.main.networks.ethereum[5]
 
-    expect(goerli.connection).toMatchObject({
-      primary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' },
-      secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
-    })
     expect(goerli.on).toBe(false)
   })
 })
