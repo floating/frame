@@ -634,17 +634,6 @@ describe('migration 21', () => {
     expect(sepolia.gas.fees.maxFeePerGas).toBe('0xf')
   })
 
-  it('adds Sepolia network preset information when none exists', () => {
-    delete state.main.networkPresets.ethereum[11155111]
-
-    const updatedState = migrations.apply(state, 21)
-    const sepolia = updatedState.main.networkPresets.ethereum[11155111]
-
-    expect(sepolia).toMatchObject({
-      infura: 'infuraSepolia'
-    })
-  })
-
   const removedGoerliRPCs = ['mudit', 'slockit', 'prylabs']
 
   removedGoerliRPCs.forEach((removedRPCName) => {
