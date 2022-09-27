@@ -91,13 +91,6 @@ describe('rendering', () => {
     expect(titleSection.textContent).toBe('Add New Chain')
   })
 
-  it('renders the color dropdown', () => {
-    const { getByRole } = renderForm({ labels: { title: 'Add New Chain' }})
-
-    const titleSection = getByRole('title')
-    expect(titleSection.textContent).toBe('Add New Chain')
-  })
-
   it('renders instructions to fill in data if no chain name has been entered', () => {
     const { getByRole } = renderForm({
       chain: { id: 1 },
