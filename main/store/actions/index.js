@@ -146,7 +146,8 @@ module.exports = {
     })
   },
   removeSigner: (u, id) => {
-    // If in signer view, nav backwards
+    
+    // if in signer view, nav backwards
     u('windows.dash.nav', nav => {
       if (nav[0]) {
         const { data = {} } = nav[0]

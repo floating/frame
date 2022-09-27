@@ -141,7 +141,7 @@ export default class LedgerSignerAdapter extends SignerAdapter {
     ledger.on('close', () => {
       this.emit('remove', ledger.id)
     })
-    
+
     ledger.on('unlock', () => {
       ledger.connect()
     })
