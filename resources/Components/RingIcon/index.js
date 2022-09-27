@@ -12,7 +12,7 @@ const Icon = ({ svgName, svgSize = 16, img, small }) => {
     // will be moved when we have a way for users to define custom icons
     const defaultChains = ['arbitrum', 'polygon', 'fantom', 'gnosis', 'optimism']
     if (defaultChains.includes(iconName)) {
-      return <img src={`https://frame.nyc3.cdn.digitaloceanspaces.com/icons/${iconName === 'gnosis' ? 'xdai' : iconName}.svg`} />
+      return <img src={`https://frame.nyc3.cdn.digitaloceanspaces.com/icons/${iconName}.svg`} />
     }
     const svgIcon = svg[iconName]
     return svgIcon ? svgIcon(svgSize) : null
