@@ -152,8 +152,8 @@ module.exports = {
       if (nav[0]) {
         const { data = {} } = nav[0]
         if (data.signer === id) nav.shift()
-        return nav
-      }
+      } 
+      return nav
     })
 
     u('main.signers', signers => {
