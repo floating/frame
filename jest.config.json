@@ -7,7 +7,6 @@
     "<rootDir>/test/main/signers/ledger/adapter"    
   ],
   "moduleNameMapper": {
-    "^uuid$": "<rootDir>/node_modules/uuid/dist/index.js",
     "\\.svg$": "<rootDir>/test/jest.svg.js"
   },
   "testTimeout": 100,
