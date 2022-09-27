@@ -9,6 +9,11 @@ const Icon = ({ svgName, svgSize, img, small }) => {
     if (ethChains.includes(iconName)) {
       return svg.eth(small ? 13 : 18)
     }
+    // will be moved when we have a way for users to define custom icons
+    const defaultChains = ['arbitrum', 'polygon', 'fantom', 'gnosis', 'optimism']
+    if (defaultChains.includes(iconName)) {
+      return <img src={`https://frame.nyc3.cdn.digitaloceanspaces.com/icons/${iconName}.svg`} />
+    }
     const svgIcon = svg[iconName]
     return svgIcon ? svgIcon(svgSize) : null
   }
