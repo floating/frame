@@ -118,20 +118,18 @@ function initTrayWindow () {
   const { width, height, x, y } = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
   windows.tray.setPosition(width + x, height + y)
   
-  if (process.platform === 'linux') {
-    const quitMenuItem = { label: 'Quit', click: () => app.quit() }
-    const menuShow = Menu.buildFromTemplate([{ label: 'Show', click: () => tray.show() }, quitMenuItem])
-    const menuHide = Menu.buildFromTemplate([{ label: 'Hide', click: () => tray.hide() }, quitMenuItem])
-    windows.tray.on('show', () => {
-      tray.setContextMenu(menuHide)
-    })
-    windows.tray.on('hide', () => {
-      tray.setContextMenu(menuShow)
-    })
-    setTimeout(() => {
-      windows.tray.on('focus', () => tray.show())
-    }, 2000)
-  }
+  const quitMenuItem = { label: 'Quit', click: () => app.quit() }
+  const menuShow = Menu.buildFromTemplate([{ label: 'Show', click: () => tray.show() }, quitMenuItem])
+  const menuHide = Menu.buildFromTemplate([{ label: 'Hide', click: () => tray.hide() }, quitMenuItem])
+  windows.tray.on('show', () => {
+    tray.setContextMenu(menuHide)
+  })
+  windows.tray.on('hide', () => {
+    tray.setContextMenu(menuShow)
+  })
+  setTimeout(() => {
+    windows.tray.on('focus', () => tray.show())
+  }, 2000)
   
   if (isDev) {
     windows.tray.webContents.openDevTools()
