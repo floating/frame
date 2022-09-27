@@ -228,12 +228,24 @@ const initial = {
           alchemy: 'alchemy',
           infura: 'infura'
         },
+        3: {
+          alchemy: 'alchemyRopsten',
+          infura: 'infuraRopsten'
+        },
+        4: {
+          alchemy: 'alchemyRinkeby',
+          infura: 'infuraRinkeby'
+        },
         5: {
           infura: 'infuraGoerli'
         },
         10: {
           optimism: 'optimism',
           infura: 'infuraOptimism'
+        },
+        42: {
+          alchemy: 'alchemyKovan',
+          infura: 'infuraKovan'
         },
         100: {
           poa: 'gnosis'
