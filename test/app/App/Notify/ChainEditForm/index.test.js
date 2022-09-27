@@ -78,10 +78,9 @@ describe('rendering', () => {
   })
 
   it('renders the default chain color', () => {
-    const { getByLabelText } = renderForm()
+    const { getByRole } = renderForm()
 
-    const chainColorDropdown = getByLabelText('Chain Color')
-    expect(chainColorDropdown.value).toEqual('accent5')
+    expect(getByRole('option', { selected: true }).textContent).toBe('Color5')
   })
 
   it('renders the provided title label', () => {
