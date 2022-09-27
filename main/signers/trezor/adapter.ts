@@ -153,6 +153,10 @@ export default class TrezorSignerAdapter extends SignerAdapter {
 
     log.info(`Trezor ${trezor.id} detected`)
 
+    trezor.on('close', () => {
+      this.emit('remove', trezor.id)
+    })
+
     trezor.on('update', () => {
       this.emit('update', trezor)
     })
