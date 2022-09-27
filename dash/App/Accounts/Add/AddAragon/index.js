@@ -162,7 +162,7 @@ class AddAragon extends React.Component {
           <div className='addAccountItemTop'>
             <div className='addAccountItemTopType'>
               <div className='addAccountItemIcon'>
-                <RingIcon svgLookup={{ name: 'aragon', size: 24 }} />
+                <RingIcon svgName={'aragon'} svgSize={24} />
               </div>
               <div className='addAccountItemTopTitle'>Aragon DAO</div>
             </div>

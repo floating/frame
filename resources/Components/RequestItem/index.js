@@ -34,7 +34,7 @@ class _RequestItem extends React.Component {
     clearInterval(this.timer)
   }
   render () {
-    const { account, handlerId, i, title, svgLookup, img, color, headerMode, txNonce } = this.props
+    const { account, handlerId, i, title, svgName, img, color, headerMode, txNonce } = this.props
     const req = this.store('main.accounts', account, 'requests', handlerId)
 
     const status = req.status || 'pending'
@@ -69,7 +69,7 @@ class _RequestItem extends React.Component {
           <div className='requestItemIcon'>
             <RingIcon 
               color={color}
-              svgLookup={svgLookup}
+              svgName={svgName}
             />
           </div>
           <div className='requestItemMain'>

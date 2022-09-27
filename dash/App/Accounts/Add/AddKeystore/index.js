@@ -127,7 +127,7 @@ class AddRing extends React.Component {
             <div className='addAccountItemTopType'>
               <div className='addAccountItemIcon'>
                 <div className='addAccountItemIconType addAccountItemIconHot'>
-                  <RingIcon svgLookup={{ name: 'file', size: 16 }} />
+                  <RingIcon svgName={'file'} />
                 </div>
                 <div className='addAccountItemIconHex addAccountItemIconHexHot' />
               </div>

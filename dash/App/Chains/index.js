@@ -548,7 +548,7 @@ class _Network extends React.Component {
           <div className='chainBadge'>
             <RingIcon 
               color={`var(--${color})`}
-              svgLookup={{ name }}
+              svgName={name}
             />
           </div>
           <div className='networkName'>

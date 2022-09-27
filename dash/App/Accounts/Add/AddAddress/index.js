@@ -103,7 +103,7 @@ class AddPhrase extends React.Component {
           <div className='addAccountItemTop'>
             <div className='addAccountItemTopType'>
               <div className='addAccountItemIcon'>
-                <RingIcon svgLookup={{ name: 'mask', size: 24 }} />
+                <RingIcon svgName={'mask'} svgSize={24} />
               </div>
               <div className='addAccountItemTopTitle'>Watch Account</div>
             </div>

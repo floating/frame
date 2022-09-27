@@ -2,7 +2,7 @@ import React from 'react'
 import Restore from 'react-restore'
 import svg from '../../../resources/svg'
 
-const Icon = ({ svgName, svgSize, img, small }) => {
+const Icon = ({ svgName, svgSize = 16, img, small }) => {
   if (svgName) {
     const iconName = svgName.toLowerCase()
     const ethChains = ['mainnet', 'görli', 'sepolia', 'ropsten', 'rinkeby', 'kovan']
@@ -12,7 +12,7 @@ const Icon = ({ svgName, svgSize, img, small }) => {
     // will be moved when we have a way for users to define custom icons
     const defaultChains = ['arbitrum', 'polygon', 'fantom', 'gnosis', 'optimism']
     if (defaultChains.includes(iconName)) {
-      return <img src={`https://frame.nyc3.cdn.digitaloceanspaces.com/icons/${iconName}.svg`} />
+      return <img src={`https://frame.nyc3.cdn.digitaloceanspaces.com/icons/${iconName === 'gnosis' ? 'xdai' : iconName}.svg`} />
     }
     const svgIcon = svg[iconName]
     return svgIcon ? svgIcon(svgSize) : null
@@ -30,7 +30,7 @@ class RingIcon extends React.Component {
   }
 
   render () {
-    const { color, svgLookup, img, small } = this.props
+    const { color, svgName, svgSize, img, small } = this.props
     return (
       <div 
         className={small ? 'ringIcon ringIconSmall' : 'ringIcon'}
@@ -39,7 +39,7 @@ class RingIcon extends React.Component {
         }}
       >
         <div className='ringIconInner' style={{ background: color }}>
-          <Icon svgName={svgLookup.name} svgSize={svgLookup.size} img={img} small={small} />
+          <Icon svgName={svgName} svgSize={svgSize} img={img} small={small} />
         </div>
       </div>
     )
