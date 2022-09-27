@@ -208,14 +208,14 @@ class Account extends React.Component {
     const ensName = this.store('main.accounts', this.props.id, 'ensName')
     if (ensName) {
       if (ensName.length <= 13) {
-        return 19
+        return 17
       } else {
-        let size = 19 - (ensName.length - 13)
+        let size = 17 - (ensName.length - 13)
         if (size < 8) size = 8
         return size
       }
     } else {
-      return 21
+      return 17
     }
   }
 
