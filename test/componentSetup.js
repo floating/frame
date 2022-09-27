@@ -5,8 +5,10 @@ export function advanceTimers (ms = 0) {
   act(() => {
     jest.advanceTimersByTime(ms)
   })
+
   return Promise.resolve()
 }
+
 export function setupComponent (jsx, options = {}) {
   return {
     user: userEvent.setup({

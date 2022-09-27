@@ -16,14 +16,6 @@ const hexStr = (val) => `0x${BigNumber(val).times(1e9).toString(16)}`
 const AdjustFee = Restore.connect(AdjustFeeComponent, store)
 let req
 
-beforeAll(() => {
-  jest.useFakeTimers()
-})
-
-afterAll(() => {
-  jest.useRealTimers()
-})
-
 beforeEach(() => {
   req = { 
     data: { 
@@ -104,6 +96,30 @@ describe('base fee input', () => {
 
     expect(baseFeeInput.value).toBe('')
     expect(link.rpc).not.toHaveBeenCalled()
+  })
+
+  it('renders a small fraction of a gwei', async () => {
+    const { user, getByLabelText } = setupComponent(<AdjustFee req={req} />)
+    const baseFeeInput = getByLabelText('Base Fee (GWEI)')
+
+    await user.clear(baseFeeInput)
+    await user.type(baseFeeInput, '0.00000001')
+
+    advanceTimers(500)
+
+    expect(baseFeeInput.value).toBe('0.00000001')
+  })
+
+  it('renders a decimal point', async () => {
+    const { user, getByLabelText } = setupComponent(<AdjustFee req={req} />)
+    const baseFeeInput = getByLabelText('Base Fee (GWEI)')
+
+    await user.clear(baseFeeInput)
+    await user.type(baseFeeInput, '.')
+
+    advanceTimers(500)
+
+    expect(baseFeeInput.value).toBe('.')
   })
 
   it('increments integer values when the up arrow key is pressed', async () => {

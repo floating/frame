@@ -5,12 +5,14 @@ import BigNumber from 'bignumber.js'
 import link from '../../../../../../../resources/link'
 import { usesBaseFee } from '../../../../../../../resources/domain/transaction'
 
+const numberFormat = { groupSeparator: '', decimalSeparator: '.' }
+
 function toDisplayFromWei (bn) {
-  return bn.shiftedBy(-9).decimalPlaces(9).toString()
+  return bn.shiftedBy(-9).decimalPlaces(9).toFormat(numberFormat)
 }
 
 function toDisplayFromGwei (bn) {
-  return bn.decimalPlaces(9).toString()
+  return bn.decimalPlaces(9).toFormat(numberFormat)
 }
 
 function trimGwei (bn) {
@@ -60,8 +62,10 @@ const totalFee = ({ gasPrice, baseFee, priorityFee, gasLimit }) => gasPrice ? ga
 const limitGasUnits = (bn) => limitRange(bn, 0, 12.5e6)
 
 const FeeOverlayInput = ({ initialValue, labelText, tabIndex, decimals, onReceiveValue, limiter }) => {
+  const labelId = `txFeeOverlayLabel_${tabIndex}`
   const [value, setValue] = useState(initialValue)
   const [submitTimeout, setSubmitTimeout] = useState(0)
+
   const submitValue = (newValueStr, newValue) => {
     setValue(newValueStr)
     clearTimeout(submitTimeout)
@@ -74,7 +78,6 @@ const FeeOverlayInput = ({ initialValue, labelText, tabIndex, decimals, onReceiv
       }, 500)
     )
   }
-  const labelId = `txFeeOverlayLabel_${tabIndex}`
 
   return (
     <>
@@ -88,11 +91,18 @@ const FeeOverlayInput = ({ initialValue, labelText, tabIndex, decimals, onReceiv
             const value = (decimals ? /[0-9\.]*/ : /[0-9]*/).exec(e.target.value)
             if (!value) {
               return
-            } 
+            }
+
+            if (value[0] === '.') {
+              setValue('.')
+              clearTimeout(submitTimeout)
+              return
+            }
 
             // prevent decimal point being overwritten as user is typing a float
             if (value[0].endsWith('.')) {
               const formattedNum = formatForInput(value[0].slice(0, -1), decimals)
+
               setValue(`${formattedNum}.`)
               clearTimeout(submitTimeout)
               return
