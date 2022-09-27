@@ -520,7 +520,8 @@ class _Network extends React.Component {
         this.props.type !== this.state.type
       )
     )
-    const { id, name, type, explorer, symbol, connection, filter } = this.props
+
+    const { id, name, type, explorer, symbol, isTestnet, filter } = this.props
    
     const networkPresets = this.store('main.networkPresets', type)
     let presets = networkPresets[id] || {}
@@ -569,7 +570,7 @@ class _Network extends React.Component {
           {/* <div className='chainIdBadgeBackground' /> */}
 
           <div className='chainSettings' onClick={() => {
-            const chain = { id, type, name, symbol, explorer }
+            const chain = { id, type, name, isTestnet, symbol, explorer }
 
             link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'updateChain', notifyData: { chain }} })
           }}>
@@ -695,6 +696,7 @@ class Settings extends React.Component {
                 name={networks[type][id].name}
                 symbol={networks[type][id].symbol}
                 explorer={networks[type][id].explorer}
+                isTestnet={networks[type][id].isTestnet}
                 type={type}
                 connection={networks[type][id].connection}
                 on={networks[type][id].on}
