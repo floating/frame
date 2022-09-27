@@ -61,22 +61,22 @@ const totalFee = ({ gasPrice, baseFee, priorityFee, gasLimit }) => gasPrice ? ga
 
 const limitGasUnits = (bn) => limitRange(bn, 0, 12.5e6)
 
+let submitTimeout = null
+
 const FeeOverlayInput = ({ initialValue, labelText, tabIndex, decimals, onReceiveValue, limiter }) => {
-  const labelId = `txFeeOverlayLabel_${tabIndex}`
   const [value, setValue] = useState(initialValue)
-  const [submitTimeout, setSubmitTimeout] = useState(0)
+  const labelId = `txFeeOverlayLabel_${tabIndex}`
 
   const submitValue = (newValueStr, newValue) => {
     setValue(newValueStr)
+
     clearTimeout(submitTimeout)
 
-    setSubmitTimeout(
-      setTimeout(() => {
-        const limitedValue = limiter(decimals ? gweiToWei(trimGwei(newValue)) : newValue)
-        onReceiveValue(limitedValue)
-        setValue(formatForInput(limitedValue, decimals, true))
-      }, 500)
-    )
+    submitTimeout = setTimeout(() => {
+      const limitedValue = limiter(decimals ? gweiToWei(trimGwei(newValue)) : newValue)
+      onReceiveValue(limitedValue)
+      setValue(formatForInput(limitedValue, decimals, true))
+    }, 500)
   }
 
   return (
@@ -88,39 +88,24 @@ const FeeOverlayInput = ({ initialValue, labelText, tabIndex, decimals, onReceiv
           className='txFeeOverlayInput' 
           aria-labelledby={labelId}
           onChange={(e) => {
-            const value = (decimals ? /[0-9\.]*/ : /[0-9]*/).exec(e.target.value)
-            if (!value) {
-              return
-            }
+            const parsedInput = (decimals ? /[0-9\.]*/ : /[0-9]*/).exec(e.target.value)
+            const enteredValue = parsedInput[0] || ''
 
-            if (value[0] === '.') {
-              setValue('.')
-              clearTimeout(submitTimeout)
-              return
-            }
+            if (enteredValue === '.' || enteredValue === '') return setValue(enteredValue)
+
+            const numericValue = BigNumber(e.target.value)
+            if (numericValue.isNaN()) return
+
+            clearTimeout(submitTimeout)
 
             // prevent decimal point being overwritten as user is typing a float
-            if (value[0].endsWith('.')) {
-              const formattedNum = formatForInput(value[0].slice(0, -1), decimals)
+            if (enteredValue.endsWith('.')) {
+              const formattedNum = formatForInput(enteredValue.slice(0, -1), decimals)
 
-              setValue(`${formattedNum}.`)
-              clearTimeout(submitTimeout)
-              return
+              return setValue(`${formattedNum}.`)
             }
 
-            // allow user to delete the existing value (without submitting an empty string)  
-            if (value[0] === '') {
-              setValue('')
-              clearTimeout(submitTimeout)
-              return                
-            }
-
-            const parsedValue = BigNumber(value[0])
-            if (parsedValue.isNaN()) {
-              return
-            }
-
-            submitValue(value[0], parsedValue)
+            submitValue(enteredValue, numericValue)
           }}
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
