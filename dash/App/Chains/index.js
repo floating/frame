@@ -531,7 +531,7 @@ class _Network extends React.Component {
     const change24hr = this.store('main.networksMeta.ethereum', this.state.id, 'nativeCurrency.usd.change24hr') || '?'
     // const symbol = this.store('main.networks.ethereum', this.state.id, 'symbol') || '?'
 
-    const color = this.store('main.networksMeta.ethereum', id, 'primaryColor')
+    const { primaryColor, icon } = this.store('main.networksMeta.ethereum', id)
 
     if (
       filter &&
@@ -547,7 +547,8 @@ class _Network extends React.Component {
         <div className='networkActive'>
           <div className='chainBadge'>
             <RingIcon 
-              color={`var(--${color})`}
+              color={`var(--${primaryColor})`}
+              img={icon}
               svgName={name}
             />
           </div>

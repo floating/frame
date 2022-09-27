@@ -50,7 +50,7 @@ class Balance extends React.Component {
         <div className='signerBalanceInner' style={{ opacity: !scanning ? 1 : 0 }}>
           <div className='signerBalanceIcon'>
             <RingIcon 
-              img={balance.logoURI && symbol.toUpperCase() !== 'ETH' && `https://proxy.pylon.link?type=icon&target=${encodeURIComponent(balance.logoURI)}`}
+              img={symbol.toUpperCase() !== 'ETH' && balance.logoURI}
               alt={symbol.toUpperCase()}
               color={chainColor ? `var(--${chainColor})` : ''}
             />

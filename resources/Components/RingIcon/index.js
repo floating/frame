@@ -3,23 +3,20 @@ import Restore from 'react-restore'
 import svg from '../../../resources/svg'
 
 const Icon = ({ svgName, svgSize = 16, img, small }) => {
+  if (img) {
+    return <img src={`https://proxy.pylon.link?type=icon&target=${encodeURIComponent(img)}`} />
+  }
   if (svgName) {
     const iconName = svgName.toLowerCase()
     const ethChains = ['mainnet', 'görli', 'sepolia', 'ropsten', 'rinkeby', 'kovan']
     if (ethChains.includes(iconName)) {
       return svg.eth(small ? 13 : 18)
     }
-    // will be (re)moved when we have a way for users to define custom icons
-    const defaultChains = ['arbitrum', 'polygon', 'fantom', 'gnosis', 'optimism']
-    if (defaultChains.includes(iconName)) {
-      return <img src={`https://frame.nyc3.cdn.digitaloceanspaces.com/icons/${iconName}.svg`} />
-    }
+
     const svgIcon = svg[iconName]
     return svgIcon ? svgIcon(svgSize) : null
   }
-  if (img) {
-    return <img src={img} />
-  }
+
   return svg.eth(small ? 13 : 18)
 }
 

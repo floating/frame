@@ -428,7 +428,7 @@ const initial = {
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
             }
           },
-          icon: 'optimism',
+          icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/optimism.svg',
           primaryColor: 'accent6'
         },
         100: {
@@ -440,7 +440,7 @@ const initial = {
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
             }
           },
-          icon: 'xdai',
+          icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/gnosis.svg',
           primaryColor: 'accent1'
         },
         137: {
@@ -452,7 +452,7 @@ const initial = {
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
             }
           },
-          icon: 'polygon',
+          icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/polygon.svg',
           primaryColor: 'accent4'
         },
         250: {
@@ -464,7 +464,7 @@ const initial = {
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
             }
           },
-          icon: 'fantom',
+          icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/fantom.svg',
           primaryColor: 'accent3'
         },
         42161: {
@@ -476,7 +476,7 @@ const initial = {
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
             }
           },
-          icon: 'arbitrum',
+          icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/arbitrum.svg',
           primaryColor: 'accent2'
         },
         11155111: {
