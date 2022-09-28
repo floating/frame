@@ -190,7 +190,6 @@ class Tray {
         }, 300)
       }
     }
-    this.electronTray.on('click', () => this.toggle())
     ipcMain.on('tray:ready', this.readyHandler)
     initTrayWindow()
   }
