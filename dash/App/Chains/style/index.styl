@@ -313,7 +313,8 @@
   text-transform uppercase
   font-weight 400
   letter-spacing 1px
-  color var(--outerspace05)
+  margin-top 28px
+  color var(--outerspace06)
   cursor pointer
 
 .viewLicense:hover
@@ -350,6 +351,9 @@
 .connectionLevels
   position relative
   z-index 999999999
+
+  .connectionLevel
+    position relative
 
   .connectionTitle
     height 12px
@@ -595,7 +599,6 @@
   padding 8px 16px
   margin 2px
   transform scale(1)
-  border-bottom 3px solid var(--ghostY)
 
   .connectionOptionToggle
     width 100%
@@ -732,10 +735,7 @@
     align-items center
     flex-direction column
     transform translateZ(0)
-    color var(--outerspace08)
-
-  .appInfoLineReset:hover
-    color var(--outerspace08)
+    color var(--outerspace06)
 
   .appInfoLineReset
     margin-top 15px
@@ -745,7 +745,6 @@
     text-transform uppercase
     font-weight 400
     letter-spacing 1px
-    color var(--outerspace05)
     line-height 30px
    
     .appInfoLineResetConfirm
@@ -753,11 +752,18 @@
       span
         margin-left 15px
     
-    .appInfoLineResetButton, .appInfoLineResetConfirmButton
+    .appInfoLineResetButton
+      cursor pointer
+
+    .appInfoLineResetButton:hover
+      color var(--bad)
+      
+    .appInfoLineResetConfirmButton
+      color var(--outerspace)
       cursor pointer
     
     .appInfoLineResetConfirmButton:hover
-      color var(--outerspace)
+      color var(--bad)
 
   .appInfoLineVersion
     height 40px

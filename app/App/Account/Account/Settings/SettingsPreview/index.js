@@ -62,9 +62,9 @@ class Settings extends React.Component {
             </div>
             {this.state.showMore ? (
               <>
-                <div className='moduleItem moduleItemButton cardShow'>
+                {/* <div className='moduleItem moduleItemButton cardShow'>
                   {'Show Name with ENS'}
-                </div>
+                </div> */}
                 <div className='moduleItem moduleItemButton cardShow'>
                   {'Update Name'}
                 </div>

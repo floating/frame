@@ -257,7 +257,7 @@
       right 64px
       width 60px
       z-index 300000
-      height 38px
+      height 39px
       width 38px
       padding-left 2px
       box-sizing border-box
@@ -277,6 +277,7 @@
       font-weight 400
       transition var(--standardFast)
       box-shadow 0px 2px 2px var(--ghostY)
+      border-bottom 2px solid var(--ghostZ)
       z-index 999999999
       pointer-events none
       
@@ -302,6 +303,7 @@
       border-bottom-left-radius 12px
       border-top-right-radius 7px
       border-bottom-right-radius 7px
+      border-bottom 2px solid var(--goodShade)
 
     .transactionToAddress
       .transactionToAddressLarge
@@ -326,7 +328,7 @@
         position absolute 
         top 3px
         right 3px
-        bottom 3px
+        bottom 2px
         z-index 300000
         border-radius 13px
         width 48px
@@ -340,14 +342,23 @@
         border-bottom-left-radius 8px
         padding-right 4px
         box-sizing border-box
+        border-bottom 2px solid var(--ghostZ)
         box-shadow 0px 2px 2px var(--ghostY)
+        transform translateY(0px)
         cursor pointer
-        transition background 0.2s linear
+        transition background 0.1s linear
         *
           pointer-events none
       
       .signerSelectButton:hover
         background var(--ghostC)
+        transform translateY(-1px)
+        box-shadow 0px 2px 4px var(--ghostX)
+
+      .signerSelectButton:active
+        background var(--ghostC)
+        transform translateY(0px)
+        box-shadow 0px 2px 1px var(--ghostX)
       
       .signerSelectIconWrap
         padding 1px 0px 0px 2px

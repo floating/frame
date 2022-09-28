@@ -125,7 +125,7 @@ function initTrayWindow () {
   }
   
   const hideMenuItem = {
-    label: 'Hide', 
+    label: 'Dismiss', 
     click: () => tray.hide(), 
     accelerator: 'Alt+/', 
     registerAccelerator: false,
