@@ -53,6 +53,8 @@ class BalancesExpanded extends React.Component {
     const balances = rawBalances
       // only show balances from connected networks
       .filter(rawBalance => isNetworkConnected(networks[rawBalance.chainId]))
+      // filter zero balances except where they are native currencies
+      .filter((rawBalance) => isNativeCurrency(rawBalance.address) || !BigNumber(rawBalance.balance || 0).isZero())
       .map(rawBalance => {
         const isNative = isNativeCurrency(rawBalance.address)
         const nativeCurrencyInfo = networksMeta[rawBalance.chainId].nativeCurrency || {}
