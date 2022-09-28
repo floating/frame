@@ -32,6 +32,8 @@ interface NetworkMetadata {
   nativeCurrency: NativeCurrency
   symbol: string
   gas: GasData
+  icon: string
+  primaryColor: string
 }
 
 interface Session {
