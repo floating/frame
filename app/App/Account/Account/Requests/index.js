@@ -13,7 +13,6 @@ import Restore from 'react-restore'
 // }
 
 import RequestItem from '../../../../../resources/Components/RequestItem'
-import chainMeta from '../../../../../resources/chainMeta'
 
 import link from '../../../../../resources/link'
 import svg from '../../../../../resources/svg'
@@ -125,7 +124,7 @@ class Requests extends React.Component {
                     i={i}
                     title={'Account Access'} 
                     color={'var(--outerspace)'}
-                    svgLookup={{ name: 'accounts', size: 16 }}
+                    svgName={'accounts'}
                   />
                 )
               } else if (req.type === 'sign') {
@@ -138,7 +137,7 @@ class Requests extends React.Component {
                     i={i}
                     title={'Sign Message'}
                     color={'var(--outerspace)'}
-                    svgLookup={{ name: 'sign', size: 16 }}
+                    svgName={'sign'}
                   />
                 )
               } else if (req.type === 'signTypedData') {
@@ -151,7 +150,7 @@ class Requests extends React.Component {
                     i={i}
                     title={'Sign Data'} 
                     color={'var(--outerspace)'}
-                    svgLookup={{ name: 'sign', size: 16 }}
+                    svgName={'sign'}
                   />
                 )
               } else if (req.type === 'addChain') { 
@@ -164,7 +163,7 @@ class Requests extends React.Component {
                     i={i} 
                     title={'Add Chain'} 
                     color={'var(--outerspace)'}
-                    svgLookup={{ name: 'chain', size: 16 }}
+                    svgName={'chain'}
                   />
                 )
               } else if (req.type === 'switchChain') {
@@ -177,7 +176,7 @@ class Requests extends React.Component {
                     i={i}
                     title={'Switch Chain'}
                     color={'var(--outerspace)'}
-                    svgLookup={{ name: 'chain', size: 16 }}
+                    svgName={'chain'}
                   />
                 )
               } else if (req.type === 'addToken')  {
@@ -190,14 +189,13 @@ class Requests extends React.Component {
                     i={i}
                     title={'Add Tokens'}
                     color={'var(--outerspace)'}
-                    svgLookup={{ name: 'tokens', size: 16 }}
+                    svgName={'tokens'}
                   />
                 )
               } else if (req.type === 'transaction')  {
-                const chainName = this.store('main.networks.ethereum', parseInt(req.data.chainId, 16), 'name') 
-                const hexId = req.data.chainId
-                chainMeta[hexId] ? chainMeta[hexId].primaryColor : ''
-                chainMeta[hexId] ? chainMeta[hexId].icon : ''
+                const chainId = parseInt(req.data.chainId, 16)
+                const chainName = this.store('main.networks.ethereum', chainId, 'name') 
+                const chainColor = this.store('main.networksMeta.ethereum', chainId, 'primaryColor')
                 
                 return (
                   <RequestItem 
@@ -206,9 +204,9 @@ class Requests extends React.Component {
                     account={this.props.id}
                     handlerId={req.handlerId}
                     i={i}
-                    title={chainName + ' Transaction'}
-                    color={chainMeta[hexId] ? chainMeta[hexId].primaryColor : ''}
-                    img={chainMeta[hexId] ? chainMeta[hexId].icon : ''}
+                    title={`${chainName} Transaction`}
+                    color={chainColor ? `var(--${chainColor})`: ''}
+                    svgName={chainName}
                   />
                 )
               }

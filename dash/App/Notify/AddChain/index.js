@@ -57,7 +57,7 @@ class AddChain extends React.Component {
     return existingChains.includes(parseInt(chainId))
   }
 
-  onSubmit (submittedChain) {
+  onSubmit (submittedChain, submittedChainMeta) {
     const chainToAdd = {
       ...submittedChain,
       primaryRpc: this.state.primaryRpc,
@@ -65,6 +65,7 @@ class AddChain extends React.Component {
     }
 
     link.send('tray:addChain', chainToAdd)
+    link.send('tray:action', 'setChainColor', chainToAdd.id, submittedChainMeta.color)
   }
 
   validateSubmit (enteredChain) {
@@ -81,9 +82,10 @@ class AddChain extends React.Component {
   }
 
   render () {
+    const color = this.store('main.networksMeta.ethereum', this.props.chain.id, 'primaryColor')
     return (
       <ChainEditForm
-        chain={this.props.chain}
+        chain={{ ...this.props.chain, color }}
         labels={labels}
         onSubmit={this.onSubmit.bind(this)}
         validateSubmit={this.validateSubmit.bind(this)}

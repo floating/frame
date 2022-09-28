@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 
 import link from '../../../../resources/link'
+import Dropdown from '../../../../resources/Components/Dropdown'
 import { DisabledSubmitButton, SubmitButton } from '../Button'
 
 const networkDefaults = {
@@ -8,7 +9,8 @@ const networkDefaults = {
   name: 'Chain Name',
   explorer: 'Block Explorer',
   symbol: 'Native Symbol',
-  isTestnet: false
+  isTestnet: false,
+  color: 'accent5'
 }
 
 function isNetworkReady (network) {
@@ -18,7 +20,7 @@ function isNetworkReady (network) {
   )
 }
 
-const EditFormSubmitButton = ({ network, labels, onSubmit, validateSubmit }) => {
+const EditFormSubmitButton = ({ network, networkMeta, labels, onSubmit, validateSubmit }) => {
   const [submitted, setSubmitted] = useState(false)
 
   if (submitted) {
@@ -43,7 +45,7 @@ const EditFormSubmitButton = ({ network, labels, onSubmit, validateSubmit }) => 
         }, 400)
 
         setSubmitted(true)
-        onSubmit(network)
+        onSubmit(network, networkMeta)
       }}
       text={labels.submit}
     />
@@ -63,7 +65,8 @@ export default function ChainEditForm ({
   const [explorer, setExplorer] = useState(chain.explorer || networkDefaults.explorer)
   const [symbol, setSymbol] = useState(chain.symbol || networkDefaults.symbol)
   const [isTestnet, setIsTestnet] = useState(chain.isTestnet || networkDefaults.isTestnet)
-
+  const [color, setColor] = useState(chain.color || networkDefaults.color)
+  
   return (
     <>
       <div role='title' className='addChainTitle'>{labels.title}</div>
@@ -162,6 +165,26 @@ export default function ChainEditForm ({
         </div>
       </div>
 
+      <div className='chainRow'>
+        <div className='chainExplorer chainInputField'>
+          <label htmlFor='chainExplorer' className='chainInputLabel'>Chain Color</label>
+          <Dropdown
+            syncValue={color}
+            onChange={(value) => setColor(value)}
+            options={[
+              { text: 'Color1', value: 'accent1', style: { color: 'var(--accent1)' } },
+              { text: 'Color2', value: 'accent2', style: { color: 'var(--accent2)' } },
+              { text: 'Color3', value: 'accent3', style: { color: 'var(--accent3)' } },
+              { text: 'Color4', value: 'accent4', style: { color: 'var(--accent4)' } },
+              { text: 'Color5', value: 'accent5', style: { color: 'var(--accent5)' } },
+              { text: 'Color6', value: 'accent6', style: { color: 'var(--accent6)' } },
+              { text: 'Color7', value: 'accent7', style: { color: 'var(--accent7)' } },
+              { text: 'Color8', value: 'accent8', style: { color: 'var(--accent8)' } }
+            ]}
+          />
+        </div>
+      </div>
+
       {
         additionalFields.map((field, i) => {
           return (
@@ -186,6 +209,7 @@ export default function ChainEditForm ({
           network={{
             id: chainId, name, explorer, symbol, isTestnet, type: chain.type
           }}
+          networkMeta={{ color }}
           onSubmit={onSubmit}
           validateSubmit={validateSubmit}
         />

@@ -5,7 +5,6 @@ import BigNumber from 'bignumber.js'
 import link from '../../../../../../resources/link'
 import svg from '../../../../../../resources/svg'
 import { isNetworkConnected } from '../../../../../../resources/utils/chains'
-import chainMeta from '../../../../../../resources/chainMeta'
 import { NATIVE_CURRENCY } from '../../../../../../resources/utils/constants'
 
 import { formatUsdRate, balance } from '../helpers'
@@ -50,8 +49,7 @@ class BalancesPreview extends React.Component {
   isFilterMatch (balance) {
     const { filter = ''} =  this.props
 
-    const chainHex = '0x' + balance.chainId.toString(16)
-    const chainName = chainMeta[chainHex] ? chainMeta[chainHex].name : ''
+    const chainName = this.store('main.networks.ethereum', balance.chainId, 'name')
 
     const match = (
       !filter ||

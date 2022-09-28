@@ -482,6 +482,15 @@ const migrations = {
     })
 
     return initial
+  },
+  23: (initial) => {
+    // set icon and primaryColor values on all chains
+    Object.values(initial.main.networksMeta.ethereum).forEach(chain => {
+      chain.icon = ''
+      chain.primaryColor = 'accent5'
+    })
+
+    return initial
   }
 }
 

@@ -28,9 +28,9 @@ class AddHardware extends React.Component {
             <div className='addAccountItemTopType'>
               <div className='addAccountItemIcon'>
                 {this.props.type === 'ledger' ? (
-                  <RingIcon svgLookup={{ name: 'ledger', size: 15 }} />
+                  <RingIcon svgName={'ledger'} svgSize={15} />
                 ) : (
-                  <RingIcon svgLookup={{ name: 'trezor', size: 15 }} />
+                  <RingIcon svgName={'trezor'} svgSize={15} />
                 )}
                 <div className='addAccountItemIconHex addAccountItemIconHexHardware' />
               </div>

@@ -1,7 +1,6 @@
 import React from 'react'
 import Restore from 'react-restore'
 
-import chainMeta from '../../../../../../resources/chainMeta'
 import RingIcon from '../../../../../../resources/Components/RingIcon'
 
 import svg from '../../../../../../resources/svg'
@@ -43,6 +42,7 @@ class Balance extends React.Component {
     }
     const chain = this.store('main.networks.ethereum', chainId)
     const chainName = chain ? chain.name : ''
+    const chainColor = this.store('main.networksMeta.ethereum', chainId, 'primaryColor')
 
     return (
       <div className={i === 0 ? 'signerBalance signerBalanceBase' : 'signerBalance'} key={symbol} onMouseDown={() => this.setState({ selected: i })}>
@@ -50,14 +50,14 @@ class Balance extends React.Component {
         <div className='signerBalanceInner' style={{ opacity: !scanning ? 1 : 0 }}>
           <div className='signerBalanceIcon'>
             <RingIcon 
-              img={balance.logoURI && symbol.toUpperCase() !== 'ETH' && `https://proxy.pylon.link?type=icon&target=${encodeURIComponent(balance.logoURI)}`}
+              img={symbol.toUpperCase() !== 'ETH' && balance.logoURI}
               alt={symbol.toUpperCase()}
-              color={chainMeta[chainHex] ? chainMeta[chainHex].primaryColor : '' }
+              color={chainColor ? `var(--${chainColor})` : ''}
             />
           </div>
           <div 
             className='signerBalanceChain'
-            style={{ color: chainMeta[chainHex] ? chainMeta[chainHex].primaryColor : '' }}
+            style={{ color: chainColor ? `var(--${chainColor})` : '' }}
           >
             {chainName}
           </div>

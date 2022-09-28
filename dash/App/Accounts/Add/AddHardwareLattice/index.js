@@ -115,7 +115,7 @@ class AddHardwareLattice extends React.Component {
             <div className='addAccountItemTopType'>
               <div className='addAccountItemIcon'>
                 <div className='addAccountItemIconType addAccountItemIconHardware'>
-                  <RingIcon svgLookup={{ name: 'lattice', size: 20 }} />
+                  <RingIcon svgName={'lattice'} svgSize={20} />
                 </div>
               </div>
               <div className='addAccountItemTopTitle'>GridPlus</div>

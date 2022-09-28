@@ -786,3 +786,30 @@ describe('migration 22', () => {
     expect(updatedState.main.networks.ethereum[5].isTestnet).toBe(true)
   })
 })
+
+describe('migration 23', () => {
+  beforeEach(() => {
+    state = {
+      main: {
+        _version: 22,
+        networksMeta: {
+          ethereum: {
+            1: { }
+          }
+        }
+      }
+    }
+  })
+
+  it('sets the icon value on a chain', () => {
+    const updatedState = migrations.apply(state, 23)
+
+    expect(updatedState.main.networksMeta.ethereum[1].icon).toBe('')
+  })
+
+  it('sets the primaryColor value on a chain', () => {
+    const updatedState = migrations.apply(state, 23)
+
+    expect(updatedState.main.networksMeta.ethereum[1].primaryColor).toBe('accent5')
+  })
+})
