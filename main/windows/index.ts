@@ -129,7 +129,7 @@ function initTrayWindow () {
     click: () => tray.hide(), 
     accelerator: 'Alt+/', 
     registerAccelerator: false,
-    toolTip: 'Show Frame'
+    toolTip: 'Hide Frame'
   }
 
   const showMenuItem = { 
