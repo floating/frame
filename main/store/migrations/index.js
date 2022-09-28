@@ -485,9 +485,29 @@ const migrations = {
   },
   23: (initial) => {
     // set icon and primaryColor values on all chains
-    Object.values(initial.main.networksMeta.ethereum).forEach(chain => {
-      chain.icon = ''
-      chain.primaryColor = 'accent5'
+    Object.entries(initial.main.networksMeta.ethereum).forEach(([id, chain]) => {
+      if (id === '1') {
+        chain.icon = ''
+        chain.primaryColor = 'accent1' // Main
+      } else if (id === '10') {
+        chain.icon = 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/optimism.svg'
+        chain.primaryColor = 'accent4' // Optimism
+      } else if (id === '100') {
+        chain.icon = 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/gnosis.svg'
+        chain.primaryColor = 'accent5' // Gnosis
+      } else if (id === '137') {
+        chain.icon = 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/polygon.svg'
+        chain.primaryColor = 'accent6' // Polygon
+      } else if (id === '42161') {
+        chain.icon = 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/arbitrum.svg'
+        chain.primaryColor = 'accent7' // Arbitrum
+      } else if (['3', '4', '5', '42', '11155111'].includes(id)) {
+        chain.icon = ''
+        chain.primaryColor = 'accent2' // Testnets
+      } else {
+        chain.icon = ''
+        chain.primaryColor = 'accent3' // Default
+      }   
     })
 
     return initial

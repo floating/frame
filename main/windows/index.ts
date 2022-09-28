@@ -117,15 +117,51 @@ function initTrayWindow () {
 
   const { width, height, x, y } = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
   windows.tray.setPosition(width + x, height + y)
+
+  const separatorMenuItem = {
+    label: 'Frame',
+    click: () => {}, 
+    type: 'separator'
+  }
   
-  const quitMenuItem = { label: 'Quit', click: () => app.quit() }
-  const menuShow = Menu.buildFromTemplate([{ label: 'Show', click: () => tray.show() }, quitMenuItem])
-  const menuHide = Menu.buildFromTemplate([{ label: 'Hide', click: () => tray.hide() }, quitMenuItem])
+  const hideMenuItem = {
+    label: 'Hide', 
+    click: () => tray.hide(), 
+    accelerator: 'Alt+/', 
+    registerAccelerator: false,
+    toolTip: 'Show Frame'
+  }
+
+  const showMenuItem = { 
+    label: 'Summon', 
+    click: () => tray.show(), 
+    accelerator: 'Alt+/', 
+    registerAccelerator: false,
+    toolTip: 'Show Frame'
+  }
+
+  const quitMenuItem = {
+    label: 'Quit',
+    click: () => app.quit()
+  }
+
   windows.tray.on('show', () => {
-    tray.setContextMenu(menuHide)
+    tray.setContextMenu(
+      Menu.buildFromTemplate([
+        hideMenuItem,
+        separatorMenuItem,
+        quitMenuItem
+      ])
+    )
   })
   windows.tray.on('hide', () => {
-    tray.setContextMenu(menuShow)
+    tray.setContextMenu(
+      Menu.buildFromTemplate([
+        showMenuItem,
+        separatorMenuItem,
+        quitMenuItem
+      ])
+    )
   })
   setTimeout(() => {
     windows.tray.on('focus', () => tray.show())

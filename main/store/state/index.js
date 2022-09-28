@@ -154,7 +154,7 @@ const initial = {
   },
   platform: process.platform,
   main: {
-    _version: main('_version', 20),
+    _version: main('_version', 23),
     instanceId: main('instanceId', generateUuid()),
     colorway: main('colorway', 'dark'),
     colorwayPrimary: {
@@ -417,7 +417,7 @@ const initial = {
             }
           },
           icon: '',
-          primaryColor: 'accent8'
+          primaryColor: 'accent1' // Mainnet
         },
         5: {
           blockHeight: 0,
@@ -429,7 +429,7 @@ const initial = {
             }
           },
           icon: '',
-          primaryColor: 'accent5'
+          primaryColor: 'accent2' // Testnet
         },
         10: {
           blockHeight: 0,
@@ -441,7 +441,7 @@ const initial = {
             }
           },
           icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/optimism.svg',
-          primaryColor: 'accent6'
+          primaryColor: 'accent4' // Optimism
         },
         100: {
           blockHeight: 0,
@@ -453,7 +453,7 @@ const initial = {
             }
           },
           icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/gnosis.svg',
-          primaryColor: 'accent1'
+          primaryColor: 'accent5' // Gnosis
         },
         137: {
           blockHeight: 0,
@@ -465,19 +465,7 @@ const initial = {
             }
           },
           icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/polygon.svg',
-          primaryColor: 'accent4'
-        },
-        250: {
-          blockHeight: 0,
-          gas: {
-            fees: {},
-            price: {
-              selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-            }
-          },
-          icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/fantom.svg',
-          primaryColor: 'accent3'
+          primaryColor: 'accent6' // Polygon
         },
         42161: {
           blockHeight: 0,
@@ -489,7 +477,7 @@ const initial = {
             }
           },
           icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/arbitrum.svg',
-          primaryColor: 'accent2'
+          primaryColor: 'accent7' // Arbitrum
         },
         11155111: {
           blockHeight: 0,
@@ -501,7 +489,7 @@ const initial = {
             }
           },
           icon: '',
-          primaryColor: 'accent5'
+          primaryColor: 'accent2' // Testnet
         }
       }
     }),
