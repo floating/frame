@@ -17,6 +17,8 @@ function randomLetters (num) {
 }
 
 const { resolveName } = require('../accounts/aragon')
+const { resolveAspisAddress } = require('../accounts/aspis')
+
 const { arraysEqual } = require('../../resources/utils')
 const { default: TrezorBridge } = require('../../main/signers/trezor/bridge')
 
@@ -164,6 +166,9 @@ const rpc = {
   addAragon (account, cb) {
     accounts.addAragon(account, cb)
   },
+  addAspis (account, cb) {
+    accounts.addAspis(account, cb)
+  },
   createFromAddress (address, cb) {
     if (!utils.isAddress(address)) return cb(new Error('Invalid Address'))
     accounts.add(address, { type: 'Address' })
@@ -221,6 +226,9 @@ const rpc = {
   },
   resolveAragonName (name, cb) {
     resolveName(name).then(result => cb(null, result)).catch(cb)
+  },
+  resolveAspisAddress (address, cb) {
+    resolveAspisAddress(address).then(result => cb(null, result)).catch(cb)
   },
   verifyAddress (cb) {
     const res = (err, data) => cb(err, data || false)
