@@ -489,6 +489,7 @@ module.exports = {
     u('main.origins', () => ({}))
   },
   removeOrigin: (u, originId) => {
+    u('windows.dash.nav', () => ([])) // Reset nav
     u('main.origins', origins => {
       delete origins[originId]
       return origins

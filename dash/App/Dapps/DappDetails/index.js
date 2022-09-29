@@ -74,7 +74,6 @@ class DappDetails extends React.Component {
           style={{ color: 'var(--bad)' }}
           onClick={() => {
             link.send('tray:removeOrigin', this.props.originId)
-            link.send('tray:action', 'backDash')
           }}
         >
           Remove Dapp
