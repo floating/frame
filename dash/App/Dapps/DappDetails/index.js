@@ -17,11 +17,7 @@ class DappDetails extends React.Component {
           const { primaryColor, icon } = this.store('main.networksMeta.ethereum', id)
           return (
             <div 
-              className={'originChainItem'} 
-              style={selected ? {
-                color: 'var(--ghostB)',
-                background: primaryColor ? `var(--${primaryColor})` : 'var(--moon)'
-              } : {}}
+              className={'originChainItem'}
               onClick={() => {
                 link.send('tray:action', 'switchOriginChain', this.props.originId, parseInt(id), 'ethereum')
               }}
@@ -37,9 +33,6 @@ class DappDetails extends React.Component {
 
               <div 
                 className='originChainItemCheck'
-                style={selected ? {
-                  background: primaryColor ? `var(--${primaryColor})` : 'var(--moon)'
-                } : {}}
               >
                 {selected ? svg.check(28) : null}
               </div>

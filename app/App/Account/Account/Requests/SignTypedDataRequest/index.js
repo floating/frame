@@ -108,44 +108,12 @@ class TransactionRequest extends React.Component {
         {type === 'signTypedData' ? (
           <div className='approveRequest'>
             <div className='approveTransactionPayload'>
-              {notice ? (
-                <div className='requestNotice'>
-                  {(_ => {
-                    if (status === 'pending') {
-                      return (
-                        <div key={status} className='requestNoticeInner cardShow'>
-                          <div style={{ paddingBottom: 20 }}><div className='loader' /></div>
-                          <div className='requestNoticeInnerText'>See Signer</div>
-                          <div className='cancelRequest' onMouseDown={() => this.decline(this.props.req.handlerId, this.props.req)}>Cancel</div>
-                        </div>
-                      )
-                    } else if (status === 'success') {
-                      return (
-                        <div key={status} className='requestNoticeInner cardShow requestNoticeSuccess'>
-                          <div>{svg.octicon('check', { height: 80 })}</div>
-                          <div className='requestNoticeInnerText'>{notice}</div>
-                        </div>
-                      )
-                    } else if (status === 'error' || status === 'declined') {
-                      return (
-                        <div key={status} className='requestNoticeInner cardShow requestNoticeError'>
-                          <div>{svg.octicon('circle-slash', { height: 80 })}</div>
-                          <div className='requestNoticeInnerText'>{notice}</div>
-                        </div>
-                      )
-                    } else {
-                      return <div key={notice} className='requestNoticeInner cardShow'>{notice}</div>
-                    }
-                  })()}
+              <>
+                <div className='requestMeta'>
+                  <div className='requestMetaOrigin'>{originName}</div>
                 </div>
-              ) : (
-                <>
-                  <div className='requestMeta'>
-                    <div className='requestMetaOrigin'>{originName}</div>
-                  </div>
-                  {messageToSign}
-                </>
-              )}
+                {messageToSign}
+              </>
             </div>
           </div>
         ) : (
