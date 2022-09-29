@@ -10,6 +10,7 @@ import AddPhrase from './Add/AddPhrase'
 import AddRing from './Add/AddRing'
 import AddKeystore from './Add/AddKeystore'
 import AddAddress from './Add/AddAddress'
+import AddAspis from './Add/AddAspis'
 
 class AddAccounts extends React.Component {
   constructor (...args) {
@@ -81,6 +82,13 @@ class AddAccounts extends React.Component {
       </div>
     )
   }
+  renderAddAspis () {
+    return (
+      <div className='addAccounts cardShow'>
+       <AddAspis close={this.props.close} />
+      </div>
+    )
+  }
   renderDefault () {
     return (
       <div className='addAccounts cardShow'>
@@ -92,6 +100,7 @@ class AddAccounts extends React.Component {
         <div className='accountTypeSelect' onClick={() => this.setState({ view: 'ledger' })}>Ledger Device</div>
         <div className='accountTypeSelect' onClick={() => this.setState({ view: 'trezor' })}>Trezor Device</div>
         <div className='accountTypeSelect' onClick={() => this.setState({ view: 'aragon' })}>Aragon DAO</div>
+        <div className='accountTypeSelect' onClick={() => this.setState({ view: 'aspis' })}>ASPIS DAO</div>
         {/* <div className='accountTypeSelect' onClick={() => this.setState({ view: 'gnosis' })}>Gnosis Safe</div> */}
         <div className='accountTypeSelect' onClick={() => this.setState({ view: 'seed' })}>Seed Phrase</div>
         <div className='accountTypeSelect' onClick={() => this.setState({ view: 'keyring' })}>Private Key</div>
@@ -108,6 +117,8 @@ class AddAccounts extends React.Component {
       return this.renderAddAragon()
     // } else if (view === 'gnosis')  {
     //   return this.renderAddGnosis()
+    } else if (view === 'aspis') {
+      return this.renderAddAspis()
     } else if (view === 'ledger')  {
       return this.renderAddLedger()
     } else if (view === 'trezor')  {

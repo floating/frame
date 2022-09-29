@@ -10,6 +10,7 @@ import signers from '../../signers'
 import windows from '../../windows'
 import store from '../../store'
 import { Aragon } from '../aragon'
+import { Aspis } from '../aspis'
 import { TransactionData } from '../../../resources/domain/transaction'
 import { capitalize } from '../../../resources/utils'
 import { getType as getSignerType, Type as SignerType } from '../../signers/Signer'
@@ -63,6 +64,7 @@ class FrameAccount {
   signer: string
   signerStatus: string
   aragon?: Aragon
+  aspis?: Aspis
 
   accounts: Accounts
   requests: Record<string, AccountRequest> = {}
@@ -95,6 +97,9 @@ class FrameAccount {
 
       if (this.smart.type === 'aragon') {
         this.aragon = new Aragon(this.smart)
+      }
+      if (this.smart.type === 'aspis') {
+        this.aspis = new Aspis(this.smart)
       }
     }
 
@@ -347,6 +352,29 @@ class FrameAccount {
           const rawTx = txRequest.data
           rawTx.data = rawTx.data || '0x'
           this.aragon.pathTransaction(rawTx, (err, pathTx) => {
+            if (err) return this.resError(err, req.payload, res)
+
+            const tx = pathTx as TransactionData
+            Object.keys(tx).forEach(key => { // Number to hex conversion
+              const k = key as keyof RPC.SendTransaction.TxParams
+              if (tx[k] && typeof tx[k] === 'number') tx[k] = addHexPrefix((tx[k] || 0).toString(16))
+            })
+            txRequest.data = tx
+            add(req)
+          })
+        } else {
+          add(req)
+        }
+      } else {
+        add(req)
+      }
+      if (this.smart.type === 'aspis') {
+        if (req.type === 'transaction') {
+          const txRequest = (req as TransactionRequest)
+          if (!this.aspis) return this.resError('Could not resolve ASPIS account', txRequest.payload, res)
+          const rawTx = txRequest.data
+          rawTx.data = rawTx.data || '0x'
+          this.aspis.pathTransaction(rawTx, (err, pathTx) => {
             if (err) return this.resError(err, req.payload, res)
 
             const tx = pathTx as TransactionData

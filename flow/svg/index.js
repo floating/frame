@@ -157,6 +157,24 @@ module.exports = {
       </div>
     )
   },
+  aspis: size => {
+    return (
+      <div style={{ width: size + 'px', height: size + 'px' }}>
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M37.3464 48H10.9891L0 39.453L16.8878 0H31.5971L48 39.453L37.3464 48ZM33.9048 36.1388L24.0852 12.9915L14.0952 36.1388H33.9048Z" fill="url(#paint0_linear_2_2)"/>
+            <defs>
+            <linearGradient id="paint0_linear_2_2" x1="24" y1="0" x2="24" y2="48" gradientUnits="userSpaceOnUse">
+            <stop stop-color="white"/>
+            <stop offset="0.120359" stop-color="white"/>
+            <stop offset="0.30814" stop-color="#D5D5D5"/>
+            <stop offset="0.580034" stop-color="#8B8B8B"/>
+            <stop offset="0.872067" stop-color="#3F3F3F"/>
+            </linearGradient>
+            </defs>
+        </svg>                    
+      </div>
+    )
+  },
   lattice: size => {
     return (
       <div style={{ width: size + 'px', height: size + 'px' }}>

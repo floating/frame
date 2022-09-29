@@ -88,7 +88,24 @@ export class Accounts extends EventEmitter {
 
     cb(null, this.accounts[account.address].summary())
   }
+  
+  addAspis (account: Account, cb: Callback<Account>) {
+    const existing = accountsApi.getAccount(account.address)
+    if (existing.id) return cb(null, existing) // Account already exists
 
+    log.info('ASPIS account not found, creating account')
+
+    const accountOpts = {
+      ...account,
+      lastSignerType: getSignerType(account.lastSignerType),
+      options: { type: 'aspis' }
+    }
+
+    this.accounts[account.address] = new FrameAccount(accountOpts, this)
+
+    cb(null, this.accounts[account.address].summary())
+  }
+  
   async add (address: Address, options = {}, cb: Callback<Account> = () => {}) {
     if (!address) return cb(new Error('No address, will not add account'))
     address = address.toLowerCase()
@@ -362,10 +379,8 @@ export class Accounts extends EventEmitter {
   // Set Current Account
   setSigner (id: string, cb: Callback<Account>) {
     const previouslyActiveAccount = this.current()
-
     this._current = id
     const currentAccount = this.current()
-
     if (!currentAccount) {
       const err = new Error('could not set signer')
       log.error(`no current account with id: ${id}`, err.stack)
