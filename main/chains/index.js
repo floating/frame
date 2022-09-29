@@ -287,7 +287,7 @@ class ChainConnection extends EventEmitter {
             this.secondary.status = 'chain mismatch'
             this.update('secondary')
           } else {
-            this.primary.status = status
+            this.secondary.status = status
             this.update('secondary')
           }
         })
