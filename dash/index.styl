@@ -62,6 +62,7 @@ div
       font-size 18px
       display flex
       align-items center
+      font-weight 400
 
       .originTitleIcon
         margin 9px 16px
@@ -72,11 +73,11 @@ div
     .clearOriginsButton
       background var(--ghostA)
       margin 74px 6px 7px 6px
-      height 64px
+      height 38px
       border-radius 20px
-      font-weight 300
+      font-weight 500
       box-sizing border-box
-      padding 16px
+      padding 18px 16px 16px 17px
       text-align center
       margin-bottom 5px
       display flex
@@ -85,10 +86,22 @@ div
       font-size 13px
       text-transform uppercase
       cursor pointer
+      border-bottom 2px solid var(--ghostZ)
       box-shadow 0px 2px 4px var(--ghostY)
+      letter-spacing 1px
+      transform translateY(0px)
+      *
+        pointer-events none
 
     .clearOriginsButton:hover
       background var(--ghostB)
+      box-shadow 0px 4px 8px var(--ghostY)
+      transform translateY(-1px)
+
+    .clearOriginsButton:active
+      background var(--ghostB)
+      box-shadow 0px 1px 2px var(--ghostY)
+      transform translateY(0px)
 
   .panelScrollOverlay
     position absolute
@@ -162,12 +175,25 @@ div
       background var(--ghostA)
       box-shadow 0px 4px 8px var(--ghostY)
       font-size 16px
+      border-bottom 2px solid var(--ghostZ)
+      transform translateY(0px)
+      position relative
+      *
+        pointer-event none
 
       .accountTypeSelectIcon
         margin-right 12px
 
     .accountTypeSelect:hover
+      transform translateY(-1px)
+      box-shadow 0px 4px 12px var(--ghostY)
       background var(--ghostB)
+      z-index 200
+
+    .accountTypeSelect:active
+      transform translateY(0px)
+      box-shadow 0px 2px 4px var(--ghostY)
+      z-index 201
 
   .newAccount
     height 54px

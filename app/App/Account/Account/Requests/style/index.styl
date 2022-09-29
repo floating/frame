@@ -341,12 +341,13 @@
     align-items center
     transition var(--standard)
     background var(--ghostA)
-    color var(--outerspace06)
+    color var(--outerspace04)
     margin-top 3px
     height 48px
+    font-weight 400
     border-radius 17px
+    padding-top 2px
     border-bottom 2px solid var(--ghostZ)
-    margin-bottom 1px
     box-shadow 0px 2px 4px var(--ghostY)
 
   .recentRequests
@@ -383,75 +384,75 @@
   color var(--outerspace)
   transform translateZ(0)
 
-  .requestMeta
-    position relative
-    width 100%
-    margin-top 8px
-    margin-bottom 10px
-    font-size 10px
-    font-weight 300
-    // margin-bottom 48px
-    position relative
+.requestMeta
+  position relative
+  width 100%
+  margin-top 8px
+  margin-bottom 10px
+  font-size 10px
+  font-weight 300
+  position relative
+  display flex
+  align-items space-between
+  width 100%
+  box-sizing border-box
+  height 72px
+  display none
+
+  .requestMetaChainIcon
+    position absolute 
+    left 12px
+    top 12px
+    background var(--ghostZ)
+    width 48px
+    height 48px
+    border-radius 24px
+    overflow hidden
     display flex
-    align-items space-between
-    width 100%
-    box-sizing border-box
-    height 72px
+    justify-content center
+    align-items center
+    color var(--outerspace)
 
-    .requestMetaChainIcon
-      position absolute 
-      left 12px
-      top 12px
-      background var(--ghostZ)
-      width 48px
-      height 48px
-      border-radius 24px
-      overflow hidden
-      display flex
-      justify-content center
-      align-items center
+    img
+      max-height 24px
+      max-width 24px
       color var(--outerspace)
+  
+  .requestMetaChainInfo
+    position absolute 
+    left 72px
+    top 0
+    bottom 1px
+    right 64px
+    display flex
+    justify-content center
+    align-items flex-start
+    flex-direction column
 
-      img
-        max-height 24px
-        max-width 24px
-        color var(--outerspace)
-    
-    .requestMetaChainInfo
-      position absolute 
-      left 72px
-      top 0
-      bottom 1px
-      right 64px
-      display flex
-      justify-content center
-      align-items flex-start
-      flex-direction column
+.requestMetaChain
+  font-size 18px
+  text-align left
+  font-weight 400
+  padding-left 0px
+  font-family 'MainFont'
+  display flex
+  align-items center
 
-      .requestMetaChain
-        font-size 18px
-        text-align left
-        font-weight 400
-        padding-left 0px
-        font-family 'MainFont'
-        display flex
-        align-items center
+.requestMetaOrigin
+  font-size 12px
+  text-align left
+  font-weight 400
+  padding-left 0px
+  font-family 'MainFont'
+  display flex
+  align-items center
+  position relative
+  top 1px
+  left 0px
 
-      .requestMetaOrigin
-        font-size 12px
-        text-align left
-        font-weight 400
-        padding-left 0px
-        font-family 'MainFont'
-        display flex
-        align-items center
-        position relative
-        top 1px
-        left 0px
-
-        .requestMetaOriginIcon
-          margin-right 4px
-          color var(--good)
+  .requestMetaOriginIcon
+    margin-right 4px
+    color var(--good)
 
 .requestMetaNonce
   height 24px
@@ -542,42 +543,45 @@
   right 0px
   animation 0.32s fadeUp ease-out
 
-  .requestNoticeInner
-    height 100%
-    width 100%
-    position relative
+.requestNoticeInner
+  height 100%
+  width 100%
+  position relative
+  display flex
+  justify-content center
+  align-items center
+  flex-direction column
 
-    .requestNoticeInnerText
-      position absolute
-      top 50px
-      left 0px
-      right 0px
-      height 54px
-      font-size 12px
-      font-weight 400
-      text-transform uppercase
-      letter-spacing 2px
-      white-space normal
-      display flex
-      justify-content center
-      align-items center
-      
-    .cancelRequest
-      margin-top 30px
-      font-size 10px
-      background var(--thin)
-      height 20px
-      padding 0px 20px 0px 22px
-      border-radius 8px
-      letter-spacing 2px
-      font-weight 300
-      display flex
-      justify-content center
-      align-items center
-      text-transform uppercase
+  .requestNoticeInnerText
+    font-size 12px
+    font-weight 400
+    text-transform uppercase
+    letter-spacing 2px
+    margin-top 8px
+    white-space normal
+    display flex
+    justify-content center
+    align-items center
+    
+  .cancelRequest
+    margin-top 16px
+    font-size 10px
+    background var(--thin)
+    height 20px
+    padding 0px 20px 0px 22px
+    border-radius 8px
+    letter-spacing 2px
+    font-weight 400
+    display flex
+    justify-content center
+    align-items center
+    text-transform uppercase
+    cursor pointer
+    *
+      pointer-events none
 
-    .cancelRequest:hover
-      background var(--thick)
+  .cancelRequest:hover
+    background var(--thick)
 
 .requestProvider
   display flex

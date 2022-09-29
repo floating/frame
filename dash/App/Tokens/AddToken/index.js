@@ -35,10 +35,6 @@ class AddTokenChainScreenComponent extends Component {
               className='originChainItem'
               key={chainId}
               role='button'
-              style={selected ? {
-                color: 'var(--ghostB)',
-                background: primaryColor ? `var(--${primaryColor})` : 'var(--moon)'
-              } : {}}
               onClick={() => {
                 this.setState({ chainId })
 

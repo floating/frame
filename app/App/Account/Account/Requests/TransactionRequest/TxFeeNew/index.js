@@ -88,7 +88,7 @@ class TxFee extends React.Component {
                   </div>
                 </div>
                 {this.toDisplayUSD(maxFeeUSD) !== '0.00' ? (
-                  <div className='_txMainTag'>
+                  <div className='_txMainTagFee'>
                     <div className={maxFeeUSD.toNumber() > FEE_WARNING_THRESHOLD_USD || this.toDisplayUSD(maxFeeUSD) === '0.00' ? '_txFeeValueDefault _txFeeValueDefaultWarn' : '_txFeeValueDefault'}>
                       <span className=''>
                         ≈

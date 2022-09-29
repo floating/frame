@@ -150,6 +150,18 @@ export default class LedgerSignerAdapter extends SignerAdapter {
 
     this.emit('add', ledger)
     
+    // Show signer in dash window
+    store.navReplace('dash', [
+      {
+        view: 'expandedSigner', 
+        data: { signer: ledger.id }
+      },
+      {
+        view: 'accounts',
+        data: {}
+      }
+    ])
+
     await this.handleConnectedDevice(ledger)
   }
 

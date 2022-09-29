@@ -80,7 +80,12 @@ class AddHardwareLattice extends React.Component {
       if (err) {
         this.setState({ status: err, error: true })
       } else {
-        this.setState({ status: 'Successful', error: false })
+        link.send('tray:action', 'navBack', 'dash')
+        const crumb = {
+          view: 'expandedSigner', 
+          data: { signer: signer.id }
+        }
+        link.send('tray:action', 'navDash', crumb)
       }
     })
   }

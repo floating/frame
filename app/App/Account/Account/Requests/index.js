@@ -195,7 +195,7 @@ class Requests extends React.Component {
               } else if (req.type === 'transaction')  {
                 const chainId = parseInt(req.data.chainId, 16)
                 const chainName = this.store('main.networks.ethereum', chainId, 'name') 
-                const chainColor = this.store('main.networksMeta.ethereum', chainId, 'primaryColor')
+                const { primaryColor, icon } = this.store('main.networksMeta.ethereum', chainId)
                 
                 return (
                   <RequestItem 
@@ -205,8 +205,8 @@ class Requests extends React.Component {
                     handlerId={req.handlerId}
                     i={i}
                     title={`${chainName} Transaction`}
-                    color={chainColor ? `var(--${chainColor})`: ''}
-                    svgName={chainName}
+                    color={primaryColor ? `var(--${primaryColor})`: ''}
+                    img={icon}
                   />
                 )
               }

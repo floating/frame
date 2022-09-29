@@ -489,6 +489,7 @@ module.exports = {
     u('main.origins', () => ({}))
   },
   removeOrigin: (u, originId) => {
+    u('windows.dash.nav', () => ([])) // Reset nav
     u('main.origins', origins => {
       delete origins[originId]
       return origins
@@ -643,6 +644,13 @@ module.exports = {
       return nav
     })
     if (navigate) u('windows', windowId, 'showing', () => true)
+  },
+  navReplace: (u, windowId, crumbs = []) => {
+    u('windows', windowId, win => {
+      win.nav = crumbs
+      win.showing = true
+      return win
+    })
   },
   navClearReq: (u, handlerId) => {
     u('windows.panel.nav', nav => {

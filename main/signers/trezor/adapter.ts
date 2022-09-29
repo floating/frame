@@ -165,6 +165,18 @@ export default class TrezorSignerAdapter extends SignerAdapter {
 
     this.emit('add', trezor)
 
+    // Show signer in dash window
+    store.navReplace('dash', [
+      {
+        view: 'expandedSigner', 
+        data: { signer: trezor.id }
+      },
+      {
+        view: 'accounts',
+        data: {}
+      }
+    ])
+
     setTimeout(() => {
       if (trezor.status === Status.INITIAL && !trezor.device) {
         // if the trezor hasn't connected in a reasonable amount of time, consider it disconnected

@@ -146,15 +146,14 @@
     background var(--good)
 
   .signerStatusText
-    padding 16px 32px
+    padding 16px 32px 16px 32px
     margin 0px 6px 6px 6px
     border-radius 20px
     font-size 12px
     text-transform uppercase
     text-align center
-    font-weight 600
-    letter-spacing 0px
-    border 3px solid var(--ghostZ)
+    font-weight 500
+    letter-spacing 1px
     color var(--outerspace)
 
   .signerStatusError
@@ -436,6 +435,17 @@
 
     .signerAccount:first-child:last-child
       border-radius 17px
+
+    .signerAccountsAdd
+      padding 16px
+      font-size 12px
+      cursor pointer
+      text-transform uppercase
+      font-weight 400
+      letter-spacing 1px
+
+    .signerAccountsAdd:hover
+      color var(--good)
 
     .signerAccount
       display flex
