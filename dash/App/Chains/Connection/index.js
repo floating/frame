@@ -180,7 +180,7 @@ class ChainModule extends React.Component {
         {this.renderConnection(id, connection, networkMeta.blockHeight)}
         {this.state.expanded ? (
           <div className='connectionLevels'>
-            <div className='signerPermission signerPermissionNetwork cardShow' style={{ zIndex: 2 }}>
+            <div className='connectionLevel cardShow' style={{ zIndex: 2 }}>
               <div className={connection.primary.on ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
                 <div className='connectionOptionToggle'>
                   <div className='signerPermissionSetting'>Primary</div>
@@ -217,7 +217,7 @@ class ChainModule extends React.Component {
                 ) : null}
               </div>
             </div>
-            <div className='signerPermission signerPermissionNetwork cardShow' style={{ zIndex: 1 }}>
+            <div className='connectionLevel cardShow' style={{ zIndex: 1 }}>
               <div className={connection.secondary.on ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
                 <div className='connectionOptionToggle'>
                   <div className='signerPermissionSetting'>Secondary</div>

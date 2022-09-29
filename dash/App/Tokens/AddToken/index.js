@@ -27,7 +27,7 @@ class AddTokenChainScreenComponent extends Component {
         {activeChains.map((chain) => {
           const chainId = chain.id
           const selected = selectedChainId === chainId
-          const chainColor = this.store('main.networksMeta.ethereum', chainId, 'primaryColor')
+          const { primaryColor, icon } = this.store('main.networksMeta.ethereum', chainId)
           const chainName = chain.name
 
           return (
@@ -37,7 +37,7 @@ class AddTokenChainScreenComponent extends Component {
               role='button'
               style={selected ? {
                 color: 'var(--ghostB)',
-                background: chainColor ? `var(--${chainColor})` : 'var(--moon)'
+                background: primaryColor ? `var(--${primaryColor})` : 'var(--moon)'
               } : {}}
               onClick={() => {
                 this.setState({ chainId })
@@ -49,8 +49,8 @@ class AddTokenChainScreenComponent extends Component {
             >
               <div className='originChainItemIcon'>
                 <RingIcon
-                  color={chainColor ? `var(--${chainColor})` : 'var(--moon)'}
-                  svgName={chainName}
+                  color={primaryColor ? `var(--${primaryColor})` : 'var(--moon)'}
+                  img={icon}
                   small={true}
                 />
               </div>

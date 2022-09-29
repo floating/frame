@@ -207,11 +207,7 @@ class Dash extends React.Component {
                   hardwareSigners
                     .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
                     .map((signer, index) => <Signer index={index} key={signer.id} {...signer} />)
-                ) : (
-                  <div className='noSigners'>
-                    {'No hardware signers detected'}
-                  </div>
-                )}
+                ) : null}
               </div>
               {/* <div className='signersHeader'>
                 Your Hot Signers
@@ -219,11 +215,7 @@ class Dash extends React.Component {
               <div className='signersList'>
                 {hotSigners.length ? (
                   hotSigners.map((signer, index) => <Signer index={index} key={signer.id} {...signer} />)
-                ) : (
-                  <div className='noSigners'>
-                    {'No hot signers detected'}
-                  </div>
-                )}
+                ) : null}
               </div>
             </div>
           </div>

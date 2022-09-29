@@ -452,6 +452,7 @@ class Signer extends React.Component {
                 <span className='signerAccountsTitleActiveCount'>{activeAccounts.length}</span> 
               </span>
             </div> */}
+            <div className='signerAddedAccountTitle'>{'available accounts'}</div>
             <div className='signerAccounts'>{signer.addresses.slice(startIndex, startIndex + addressLimit).map((address, index) => {
               const added = this.store('main.accounts', address.toLowerCase())
 

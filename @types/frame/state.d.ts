@@ -27,11 +27,11 @@ interface Network {
 }
 
 interface NetworkMetadata {
-  id: number
-  name: string
-  nativeCurrency: NativeCurrency
-  symbol: string
+  blockHeight: number
   gas: GasData
+  icon: string
+  primaryColor: string
+  nativeCurrency: NativeCurrency
 }
 
 interface Session {

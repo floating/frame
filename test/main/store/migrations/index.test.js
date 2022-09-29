@@ -794,7 +794,17 @@ describe('migration 23', () => {
         _version: 22,
         networksMeta: {
           ethereum: {
-            1: { }
+            1: {}, // Mainnet
+            3: {}, // Known Testnet
+            4: {}, // Known Testnet
+            5: {}, // Known Testnet
+            10: {}, // Optimism
+            42: {}, // Known Testnet
+            100: {}, // Gnosis
+            137: {}, // Polygon
+            8888: {}, // Unknown Chain
+            42161: {}, // Arbitrum
+            11155111: {}, // Known Testnet
           }
         }
       }
@@ -803,13 +813,33 @@ describe('migration 23', () => {
 
   it('sets the icon value on a chain', () => {
     const updatedState = migrations.apply(state, 23)
-
-    expect(updatedState.main.networksMeta.ethereum[1].icon).toBe('')
+    const chains = updatedState.main.networksMeta.ethereum
+    expect(chains[1].icon).toBe('')
+    expect(chains[3].icon).toBe('')
+    expect(chains[4].icon).toBe('')
+    expect(chains[5].icon).toBe('')
+    expect(chains[10].icon).toBe('https://frame.nyc3.cdn.digitaloceanspaces.com/icons/optimism.svg')
+    expect(chains[42].icon).toBe('')
+    expect(chains[100].icon).toBe('https://frame.nyc3.cdn.digitaloceanspaces.com/icons/gnosis.svg')
+    expect(chains[137].icon).toBe('https://frame.nyc3.cdn.digitaloceanspaces.com/icons/polygon.svg')
+    expect(chains[8888].icon).toBe('')
+    expect(chains[42161].icon).toBe('https://frame.nyc3.cdn.digitaloceanspaces.com/icons/arbitrum.svg')
+    expect(chains[11155111].icon).toBe('')
   })
 
   it('sets the primaryColor value on a chain', () => {
     const updatedState = migrations.apply(state, 23)
-
-    expect(updatedState.main.networksMeta.ethereum[1].primaryColor).toBe('accent5')
+    const chains = updatedState.main.networksMeta.ethereum
+    expect(chains[1].primaryColor).toBe('accent1')
+    expect(chains[3].primaryColor).toBe('accent2')
+    expect(chains[4].primaryColor).toBe('accent2')
+    expect(chains[5].primaryColor).toBe('accent2')
+    expect(chains[10].primaryColor).toBe('accent4')
+    expect(chains[42].primaryColor).toBe('accent2')
+    expect(chains[100].primaryColor).toBe('accent5')
+    expect(chains[137].primaryColor).toBe('accent6')
+    expect(chains[8888].primaryColor).toBe('accent3')
+    expect(chains[42161].primaryColor).toBe('accent7')
+    expect(chains[11155111].primaryColor).toBe('accent2')
   })
 })
