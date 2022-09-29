@@ -591,8 +591,7 @@ describe('#removeOrigin', () => {
   let origins
 
   const updaterFn = (node, update) => {
-    expect(node).toBe('main.origins')
-    origins = update(origins)
+    if (node === 'main.origins') origins = update(origins)
   }
 
   const removeOrigin = (originId) => removeOriginAction(updaterFn, originId)
