@@ -38,7 +38,7 @@ function isConnected ({ status }) {
 }
 
 function getActiveConnection (primary, secondary) {
-  if (secondary.on && (!primary.on || (isConnected(secondary) && !isConnected(primary)))) {
+  if (secondary.on && (!primary.on || !isConnected(primary))) {
     return secondary
   }
 
