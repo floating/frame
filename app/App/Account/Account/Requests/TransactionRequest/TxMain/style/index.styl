@@ -34,7 +34,7 @@
       font-family 'MainFont'
       // overflow hidden
       display flow-root
-      padding 3px 3px 3px 3px
+      padding 3px 3px 1px 3px
       background var(--ghostZ)
 
       svg
@@ -149,6 +149,25 @@
         background var(--ghostB)
         transform translateY(0px)
         box-shadow 0px 2px 4px var(--ghostX)
+
+  ._txMainTagFee
+    position relative
+    z-index 100001
+    overflow hidden
+    font-size 11px
+    font-weight 400
+    text-transform uppercase
+    letter-spacing 1px
+    text-align center
+    display flex
+    align-items center
+    justify-content center
+    height 52px
+    margin-top 1px
+    border-radius 16px
+    background var(--ghostA)
+    box-shadow 0px 1px 2px var(--ghostX)
+    border-bottom 2px solid var(--ghostZ)
 
   ._txMainTag
     position relative

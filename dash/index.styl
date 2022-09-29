@@ -162,12 +162,25 @@ div
       background var(--ghostA)
       box-shadow 0px 4px 8px var(--ghostY)
       font-size 16px
+      border-bottom 2px solid var(--ghostZ)
+      transform translateY(0px)
+      position relative
+      *
+        pointer-event none
 
       .accountTypeSelectIcon
         margin-right 12px
 
     .accountTypeSelect:hover
+      transform translateY(-1px)
+      box-shadow 0px 4px 12px var(--ghostY)
       background var(--ghostB)
+      z-index 200
+
+    .accountTypeSelect:active
+      transform translateY(0px)
+      box-shadow 0px 2px 4px var(--ghostY)
+      z-index 201
 
   .newAccount
     height 54px

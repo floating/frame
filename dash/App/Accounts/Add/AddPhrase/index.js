@@ -61,7 +61,12 @@ class AddPhrase extends React.Component {
       if (err) {
         this.setState({ status: err, error: true })
       } else {
-        this.setState({ status: 'Successful', error: false, createdSignerId: signer.id })
+        link.send('tray:action', 'navBack', 'dash')
+        const crumb = {
+          view: 'expandedSigner', 
+          data: { signer: signer.id }
+        }
+        link.send('tray:action', 'navDash', crumb)
       }
     })
   }
@@ -147,15 +152,6 @@ class AddPhrase extends React.Component {
                     <input type='password' tabIndex='-1' value={this.state.password} ref={this.forms[1]} onChange={e => this.onChange('password', e)} onFocus={e => this.onFocus('password', e)} onBlur={e => this.onBlur('password', e)} onKeyPress={e => this.keyPress(e)} />
                   </div>
                   <div className='addAccountItemOptionSubmit' onMouseDown={() => this.create()}>Create</div>
-                </div>
-                <div className='addAccountItemOptionSetupFrame'>
-                  {signer ? <Signer key={signer.id} {...signer} inSetup={true} />
-                  : (
-                    <>
-                      <div className='addAccountItemOptionTitle'>{this.state.status}</div>
-                      {this.state.error ? <div className='addAccountItemOptionSubmit' onMouseDown={() => this.restart()}>try again</div> : null}
-                    </>
-                  )} 
                 </div>
               </div>
             </div>

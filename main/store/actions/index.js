@@ -644,6 +644,13 @@ module.exports = {
     })
     if (navigate) u('windows', windowId, 'showing', () => true)
   },
+  navReplace: (u, windowId, crumbs = []) => {
+    u('windows', windowId, win => {
+      win.nav = crumbs
+      win.showing = true
+      return win
+    })
+  },
   navClearReq: (u, handlerId) => {
     u('windows.panel.nav', nav => {
       const newNav = nav.filter(navItem => {

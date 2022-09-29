@@ -70,6 +70,8 @@ class TxRecipient extends React.Component {
       })
     }
 
+    const { primaryColor, icon } = this.store('main.networksMeta.ethereum', chainId)
+                
     return (
       <div className='_txMain' style={{ animationDelay: (0.1 * this.props.i) + 's' }}>
         <div className='_txMainInner'>
@@ -78,8 +80,8 @@ class TxRecipient extends React.Component {
             account={accountId}
             handlerId={req.handlerId}
             title={`${chainName} Transaction`}
-            color={`var(--${chainColor})`}
-            svgName={chainName}
+            color={primaryColor ? `var(--${chainColor})` : ``}
+            img={icon}
             headerMode={true}
           />
 

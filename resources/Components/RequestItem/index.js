@@ -70,6 +70,7 @@ class _RequestItem extends React.Component {
             <RingIcon 
               color={color}
               svgName={svgName}
+              img={img}
             />
           </div>
           <div className='requestItemMain'>

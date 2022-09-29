@@ -231,6 +231,14 @@ class Signer extends React.Component {
     this.setState({ latticePairCode: '' })
   }
 
+  expand (id) {
+    const crumb = {
+      view: 'expandedSigner', 
+      data: { signer: id }
+    }
+    link.send('tray:action', 'navDash', crumb)
+  }
+
   reconnectButton (hwSigner) {
     return (
       <div className='signerControlOption'
@@ -295,14 +303,7 @@ class Signer extends React.Component {
               </div> */}
             </div>
           </div>
-          <div className='signerExpand' onClick={() => {
-            const crumb = {
-              view: 'expandedSigner', 
-              data: { signer: signer.id }
-            }
-            // link.send('nav:forward', 'dash', crumb)
-            link.send('tray:action', 'navDash', crumb)
-          }}>
+          <div className='signerExpand' onClick={() => this.expand(signer.id)}>
             {svg.bars(16)}
           </div>
           {/* {this.status()} */}
@@ -310,9 +311,11 @@ class Signer extends React.Component {
         {this.statusText()}
         {status === 'ok' || isLocked ? (
           <>
-            <div className='signerAddedAccountTitle'>{'active accounts'}</div>
+            <div className='signerAddedAccountTitle'>
+              {addedAccounts.length ? 'active accounts' : 'no active accounts'}
+            </div>
             <div className='signerAccounts'>
-              {addedAccounts.map((address) => {
+              {addedAccounts.length ? addedAccounts.map((address) => {
                 const index = signer.addresses.indexOf(address) + 1
                 return (
                   <div key={address} className={'signerAccount signerAccountAdded signerAccountDisabled'} onClick={() => {
@@ -329,14 +332,18 @@ class Signer extends React.Component {
                     <div className='signerAccountCheck' />
                   </div>
                 )
-              }
-            )}</div>
+              }) : (
+                <div className='signerAccountsAdd' onClick={() => this.expand(signer.id)}>
+                  {'View available accounts'}
+                </div>
+              )}
+            </div>
           </>
         ) : loading ? (
           <div className='signerLoading'>
             <div className='signerLoadingLoader' />
           </div>
-        ): <></>}
+        ) : <></>}
         {/* {disconnected || this.props.inSetup ? null : (
           <div className='signerDrawer'>
             <div className='showControls' onMouseDown={() => this.setState({ showControls: !this.state.showControls })}>
