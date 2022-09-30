@@ -41,8 +41,8 @@ export class RequestQueue {
   }
   
   stop () {
-    this.running = false
     clearTimeout(this.requestPoller)
+    this.running = false
   }
 
   close (message: string) {
