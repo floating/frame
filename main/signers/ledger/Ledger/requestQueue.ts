@@ -1,6 +1,7 @@
 import log from 'electron-log'
 
 export interface Request {
+  abort: (message: string) => void
   execute: () => Promise<any>,
   type: string
 }
@@ -44,12 +45,13 @@ export class RequestQueue {
     clearTimeout(this.requestPoller)
   }
 
-  close () {
+  close (message: string) {
     this.stop()
-    this.clear()
+    this.clear(message)
   }
 
-  clear () {
+  clear (message: string) {
+    this.requestQueue.forEach((request) => request.abort(message))
     this.requestQueue = []
   }
 
