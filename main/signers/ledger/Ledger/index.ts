@@ -155,7 +155,7 @@ export default class Ledger extends Signer {
       this.emit('update')
     }
 
-    this.requestQueue.close()
+    this.requestQueue.close('Ledger disconnected')
 
     clearTimeout(this.statusPoller)
 
@@ -266,7 +266,8 @@ export default class Ledger extends Signer {
             }
 
             return this.checkDeviceStatus()
-          }
+          },
+          abort: () => {}
         })
       }
 
@@ -289,7 +290,7 @@ export default class Ledger extends Signer {
   // *** request enqueuing methods *** //
 
   deriveAddresses () {
-    this.requestQueue.clear()
+    this.requestQueue.clear('Ledger deriving addresses')
     this.addresses = []
 
     this.updateStatus(Status.DERIVING)
@@ -303,7 +304,7 @@ export default class Ledger extends Signer {
   }
 
   private deriveLiveAddresses () {
-    const requests = []
+    const requests: Request[] = []
 
     for (let i = 0; i < this.accountLimit; i++) {
       requests.push({
@@ -330,7 +331,8 @@ export default class Ledger extends Signer {
           } catch (e) {
             this.handleError(e as DeviceError)
           }
-        }
+        },
+        abort: () => { }
       })
     }
 
@@ -362,7 +364,8 @@ export default class Ledger extends Signer {
         } catch (e) {
           this.handleError(e as DeviceError)
         }
-      }
+      },
+      abort: () => { }
     })
   }
 
@@ -401,6 +404,9 @@ export default class Ledger extends Signer {
 
           cb(new Error(message), undefined)
         }
+      },
+      abort: (message) => {
+        cb(new Error(message), undefined)
       }
     })
   }
@@ -428,6 +434,9 @@ export default class Ledger extends Signer {
 
           cb(new Error(message), undefined)
         }
+      },
+      abort: (message) => {
+        cb(new Error(message), undefined)
       }
     })
   }
@@ -461,6 +470,9 @@ export default class Ledger extends Signer {
 
           cb(new Error(message), undefined)
         }
+      },
+      abort: (message) => {
+        cb(new Error(message), undefined)
       }
     })
   }
@@ -491,6 +503,9 @@ export default class Ledger extends Signer {
 
           cb(new Error(message), undefined)
         }
+      },
+      abort: (message) => {
+        cb(new Error(message), undefined)
       }
     })
   }
