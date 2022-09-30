@@ -486,7 +486,7 @@ export class Accounts extends EventEmitter {
     currentAccount.signTypedData(version, typedData, cb)
   }
 
-  signTransaction (rawTx: TransactionData, cb: Callback<string>) {
+  signTransaction (rawTx: TransactionData, handlerId: string, cb: Callback<string>) {
     const currentAccount = this.current()
 
     if (!currentAccount) return cb(new Error('No Account Selected'))
@@ -495,7 +495,7 @@ export class Accounts extends EventEmitter {
     const matchActor = (rawTx.from || '').toLowerCase() === (currentAccount.smart ? currentAccount.smart.actor.toLowerCase() : false)
     
     if (matchSelected || matchActor) {
-      currentAccount.signTransaction(rawTx, cb)
+      currentAccount.signTransaction(rawTx, handlerId, cb)
     } else {
       cb(new Error('signMessage: Account does not match currently selected'))
     }
@@ -596,6 +596,7 @@ export class Accounts extends EventEmitter {
     const currentAccount = this.current()
     
     log.info('setRequestPending', handlerId)
+    console.log('setRequestPending', req, currentAccount?.requests[handlerId])
 
     if (currentAccount && currentAccount.requests[handlerId]) {
       currentAccount.requests[handlerId].status = RequestStatus.Pending

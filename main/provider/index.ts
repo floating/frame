@@ -312,7 +312,7 @@ export class Provider extends EventEmitter {
       resError(err, payload, res)
       cb(new Error(err))
     } else {
-      accounts.signTransaction(rawTx, (err, signedTx) => { // Sign Transaction
+      accounts.signTransaction(rawTx, req.handlerId, (err, signedTx) => { // Sign Transaction
         if (err) {
           resError(err, payload, res)
           cb(err)
@@ -351,7 +351,7 @@ export class Provider extends EventEmitter {
   }
 
   approveTransactionRequest (req: TransactionRequest, cb: Callback<string>) {
-    log.info('approveRequest', req)
+    console.log('approveRequest', req)
 
     accounts.lockRequest(req.handlerId)
     if (req.data.nonce) return this.signAndSend(req, cb)

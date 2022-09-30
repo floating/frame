@@ -477,7 +477,7 @@ export default class Ledger extends Signer {
     })
   }
 
-  signTransaction (index: number, rawTx: TransactionData, cb: Callback<string>) {
+  signTransaction (index: number, rawTx: TransactionData, cb: Callback<string>, resetCb: () => void) {
     const compatibility = signerCompatibility(rawTx, this.summary())
     const ledgerTx = compatibility.compatible ? { ...rawTx } : londonToLegacy(rawTx)
 
@@ -505,7 +505,7 @@ export default class Ledger extends Signer {
         }
       },
       abort: (message) => {
-        cb(new Error(message), undefined)
+        resetCb()
       }
     })
   }

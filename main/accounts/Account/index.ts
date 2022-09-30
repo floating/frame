@@ -575,7 +575,15 @@ class FrameAccount {
     }
   }
 
-  signTransaction (rawTx: TransactionData, cb: Callback<string>) {
+  resetRequest (handlerId: string) {
+    if (this.requests[handlerId]) {
+      this.requests[handlerId].status = undefined
+      this.requests[handlerId].notice = undefined
+      this.update()
+    }
+  }
+
+  signTransaction (rawTx: TransactionData, handlerId: string, cb: Callback<string>) {
     // if(index === typeof 'object' && cb === typeof 'undefined' && typeof rawTx === 'function') cb = rawTx; rawTx = index; index = 0;
     this.validateTransaction(rawTx, (err) => {
       if (err) return cb(err)
@@ -585,7 +593,7 @@ class FrameAccount {
 
         const index = s.addresses.map(a => a.toLowerCase()).indexOf(this.address)
         if (index === -1) cb(new Error(`Signer cannot sign for this address`))
-        s.signTransaction(index, rawTx, cb)
+        s.signTransaction(index, rawTx, cb, () => this.resetRequest(handlerId))
       } else if (this.smart && this.smart.actor) {
         const actingAccount = this.accounts.get(this.smart.actor)
         if (!actingAccount) return cb(new Error(`Could not find acting account: ${this.smart.actor}`))
