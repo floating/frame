@@ -270,14 +270,20 @@ describe('#verifyAddress', () => {
     {
       testCase: 'the derivation type is not initialized',
       setup: () => ledger.derivation = undefined
+    },
+    {
+      testCase: 'the device is disconnected',
+      expectedError: 'Ledger disconnected',
+      expectedStatus: Status.DISCONNECTED,
+      postExec: () => ledger.disconnect()
     }
   ]
 
-  errorCases.forEach(({ testCase, setup = () => {}, expectedError = 'Verify address error' }) => {
+  errorCases.forEach(({ testCase, expectedStatus = Status.NEEDS_RECONNECTION, setup = () => {}, postExec = () => {}, expectedError = 'Verify address error' }) => {
     it(`fails if ${testCase}`, async () => {
       const statusUpdate = new Promise((resolve, reject) => {
         ledger.on('update', () => {
-          verifyPromise(resolve, reject, () => expect(ledger.status).toBe(Status.NEEDS_RECONNECTION))
+          verifyPromise(resolve, reject, () => expect(ledger.status).toBe(expectedStatus))
         })
       })
 
@@ -290,6 +296,8 @@ describe('#verifyAddress', () => {
             expect(err.message).toBe(expectedError)
           })
         })
+
+        postExec()
       })
 
       runNextRequest()
@@ -359,14 +367,20 @@ signingMethods.forEach(signingMethod => {
       {
         testCase: 'the derivation type is not initialized',
         setup: () => ledger.derivation = undefined
+      },
+      {
+        testCase: 'the device is disconnected',
+        expectedError: 'Ledger disconnected',
+        expectedStatus: Status.DISCONNECTED,
+        postExec: () => ledger.disconnect()
       }
     ]
 
-    errorCases.forEach(({ testCase, setup = () => {} }) => {
+    errorCases.forEach(({ testCase, expectedError = `Sign ${signType} error`, expectedStatus = Status.NEEDS_RECONNECTION, setup = () => {}, postExec = () => {} }) => {
       it(`fails if ${testCase}`, async () => {
         const statusUpdate = new Promise((resolve, reject) => {
           ledger.on('update', () => {
-            verifyPromise(resolve, reject, () => expect(ledger.status).toBe(Status.NEEDS_RECONNECTION))
+            verifyPromise(resolve, reject, () => expect(ledger.status).toBe(expectedStatus))
           })
         })
 
@@ -376,9 +390,11 @@ signingMethods.forEach(signingMethod => {
           ledger[signingMethod](3, 'hello, Frame!', (err, signature) => {
             verifyPromise(resolve, reject, () => {
               expect(signature).toBeUndefined()
-              expect(err.message).toBe(`Sign ${signType} error`)
+              expect(err.message).toBe(expectedError)
             })
           })
+
+          postExec()
         })
 
         runNextRequest()
@@ -473,14 +489,20 @@ describe('#signTypedData', () => {
     {
       testCase: 'the derivation type is not initialized',
       setup: () => ledger.derivation = undefined
+    },
+    {
+      testCase: 'the device is disconnected',
+      expectedError: 'Ledger disconnected',
+      expectedStatus: Status.DISCONNECTED,
+      postExec: () => ledger.disconnect()
     }
   ]
 
-  errorCases.forEach(({ testCase, setup = () => {} }) => {
+  errorCases.forEach(({ testCase, expectedError = /Sign message error/, expectedStatus = Status.NEEDS_RECONNECTION, setup = () => {}, postExec = () => {} }) => {
     it(`fails if ${testCase}`, async () => {
       const statusUpdate = new Promise((resolve, reject) => {
         ledger.on('update', () => {
-          verifyPromise(resolve, reject, () => expect(ledger.status).toBe(Status.NEEDS_RECONNECTION))
+          verifyPromise(resolve, reject, () => expect(ledger.status).toBe(expectedStatus))
         })
       })
 
@@ -490,9 +512,11 @@ describe('#signTypedData', () => {
         ledger.signTypedData(5, 'V4', 'typed data', (err, signature) => {
           verifyPromise(resolve, reject, () => {
             expect(signature).toBeUndefined()
-            expect(err.message).toMatch(/Sign message error/)
+            expect(err.message).toMatch(expectedError)
           })
         })
+
+        postExec()
       })
 
       runNextRequest()
