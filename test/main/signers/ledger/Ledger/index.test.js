@@ -273,7 +273,7 @@ describe('#verifyAddress', () => {
     },
     {
       testCase: 'the device is disconnected',
-      expectedError: 'Ledger disconnected',
+      expectedError: 'Device disconnected',
       expectedStatus: Status.DISCONNECTED,
       postExec: () => ledger.disconnect()
     }
@@ -370,7 +370,7 @@ signingMethods.forEach(signingMethod => {
       },
       {
         testCase: 'the device is disconnected',
-        expectedError: 'Ledger disconnected',
+        expectedError: 'Device disconnected',
         expectedStatus: Status.DISCONNECTED,
         postExec: () => ledger.disconnect()
       }
@@ -492,7 +492,7 @@ describe('#signTypedData', () => {
     },
     {
       testCase: 'the device is disconnected',
-      expectedError: 'Ledger disconnected',
+      expectedError: 'Device disconnected',
       expectedStatus: Status.DISCONNECTED,
       postExec: () => ledger.disconnect()
     }
