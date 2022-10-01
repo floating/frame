@@ -583,7 +583,7 @@ class FrameAccount {
     }
   }
 
-  signTransaction (rawTx: TransactionData, handlerId: string, cb: Callback<string>) {
+  signTransaction (rawTx: TransactionData, cb: Callback<string>) {
     // if(index === typeof 'object' && cb === typeof 'undefined' && typeof rawTx === 'function') cb = rawTx; rawTx = index; index = 0;
     this.validateTransaction(rawTx, (err) => {
       if (err) return cb(err)

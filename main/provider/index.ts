@@ -312,7 +312,7 @@ export class Provider extends EventEmitter {
       resError(err, payload, res)
       cb(new Error(err))
     } else {
-      accounts.signTransaction(rawTx, req.handlerId, (err, signedTx) => { // Sign Transaction
+      accounts.signTransaction(rawTx, (err, signedTx) => { // Sign Transaction
         if (err && err.message === 'Device disconnected') {
           accounts.resetRequest(req)
         } else if (err) {  
