@@ -155,7 +155,7 @@ export default class Ledger extends Signer {
       this.emit('update')
     }
 
-    this.requestQueue.close('Ledger disconnected')
+    this.requestQueue.close('Device disconnected')
 
     clearTimeout(this.statusPoller)
 
@@ -267,7 +267,7 @@ export default class Ledger extends Signer {
 
             return this.checkDeviceStatus()
           },
-          abort: () => {}
+          reset: () => {}
         })
       }
 
@@ -332,7 +332,7 @@ export default class Ledger extends Signer {
             this.handleError(e as DeviceError)
           }
         },
-        abort: () => { }
+        reset: () => { }
       })
     }
 
@@ -365,7 +365,7 @@ export default class Ledger extends Signer {
           this.handleError(e as DeviceError)
         }
       },
-      abort: () => { }
+      reset: () => { }
     })
   }
 
@@ -405,7 +405,7 @@ export default class Ledger extends Signer {
           cb(new Error(message), undefined)
         }
       },
-      abort: (message) => {
+      reset: (message) => {
         cb(new Error(message), undefined)
       }
     })
@@ -435,7 +435,7 @@ export default class Ledger extends Signer {
           cb(new Error(message), undefined)
         }
       },
-      abort: (message) => {
+      reset: (message) => {
         cb(new Error(message), undefined)
       }
     })
@@ -471,13 +471,13 @@ export default class Ledger extends Signer {
           cb(new Error(message), undefined)
         }
       },
-      abort: (message) => {
+      reset: (message) => {
         cb(new Error(message), undefined)
       }
     })
   }
 
-  signTransaction (index: number, rawTx: TransactionData, cb: Callback<string>, resetCb: () => void) {
+  signTransaction (index: number, rawTx: TransactionData, cb: Callback<string>) {
     const compatibility = signerCompatibility(rawTx, this.summary())
     const ledgerTx = compatibility.compatible ? { ...rawTx } : londonToLegacy(rawTx)
 
@@ -504,8 +504,8 @@ export default class Ledger extends Signer {
           cb(new Error(message), undefined)
         }
       },
-      abort: (message) => {
-        resetCb()
+      reset: (message) => {
+        cb(new Error(message), undefined)
       }
     })
   }

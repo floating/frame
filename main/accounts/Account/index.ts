@@ -575,7 +575,7 @@ class FrameAccount {
     }
   }
 
-  resetRequest (handlerId: string) {
+  resetRequest ({ handlerId }: AccountRequest) {
     if (this.requests[handlerId]) {
       this.requests[handlerId].status = undefined
       this.requests[handlerId].notice = undefined
@@ -593,7 +593,7 @@ class FrameAccount {
 
         const index = s.addresses.map(a => a.toLowerCase()).indexOf(this.address)
         if (index === -1) cb(new Error(`Signer cannot sign for this address`))
-        s.signTransaction(index, rawTx, cb, () => this.resetRequest(handlerId))
+        s.signTransaction(index, rawTx, cb)
       } else if (this.smart && this.smart.actor) {
         const actingAccount = this.accounts.get(this.smart.actor)
         if (!actingAccount) return cb(new Error(`Could not find acting account: ${this.smart.actor}`))

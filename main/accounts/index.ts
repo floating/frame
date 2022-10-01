@@ -550,6 +550,13 @@ export class Accounts extends EventEmitter {
     }
   }
 
+  resetRequest (req: AccountRequest) {
+    const currentAccount = this.current()
+    if (currentAccount) {
+      currentAccount.resetRequest(req)
+    }
+  }
+
   addRequest (req: AccountRequest, res?: RPCCallback<any>) {
     log.info('addRequest', JSON.stringify(req))
 

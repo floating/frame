@@ -104,7 +104,7 @@ export default class Signer extends EventEmitter {
     console.warn('Signer:' + this.type + ' did not implement a signMessage method')
   }
 
-  signTransaction (index: number, rawTx: TransactionData, cb: Callback<string>, resetCb = () => {}) {
+  signTransaction (index: number, rawTx: TransactionData, cb: Callback<string>) {
     console.warn('Signer:' + this.type + ' did not implement a signTransaction method')
   }
 

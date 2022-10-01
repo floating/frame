@@ -1,7 +1,7 @@
 import log from 'electron-log'
 
 export interface Request {
-  abort: (message: string) => void
+  reset: (message: string) => void
   execute: () => Promise<any>,
   type: string
 }
@@ -51,7 +51,7 @@ export class RequestQueue {
   }
 
   clear (message: string) {
-    this.requestQueue.forEach((request) => request.abort(message))
+    this.requestQueue.forEach((request) => request.reset(message))
     this.requestQueue = []
   }
 
