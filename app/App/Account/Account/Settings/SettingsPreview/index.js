@@ -19,7 +19,9 @@ class Settings extends React.Component {
     this.state = {
       expand: false,
       name: '',
-      showMore: false
+      showMore: false,
+      newName: '',
+      editName: false
     }
   }
 
@@ -55,23 +57,73 @@ class Settings extends React.Component {
                 //   }
                 // }
                 // link.send('nav:forward', 'panel', crumb)
-                this.setState({ showMore: !this.state.showMore })
+                this.setState({ showMore: !this.state.showMore, editName: false })
               }
             }>
               {this.state.showMore ? 'less' : 'more'}
             </div>
             {this.state.showMore ? (
               <>
-                <div className='moduleItem moduleItemButton cardShow'>
+                {/* <div 
+                  className='moduleItem moduleItemButton cardShow'
+                  style={ this.state.editName ? { opacity: 0.3, pointerEvents: 'none' } : { opacity: 1 } }
+                >
                   {'Show Name with ENS'}
-                </div>
-                <div className='moduleItem moduleItemButton cardShow'>
-                  {'Update Name'}
-                </div>
-                <div className='moduleItem moduleItemButton cardShow' onClick={() => {
-                  link.rpc('removeAccount', this.props.account, {}, () => {})
-                }}
-                  style={{ color: 'var(--bad)' }}
+                </div> */}
+                {this.state.editName ? (
+                  <div
+                    key={'input'} 
+                    className='moduleItem cardShow moduleItemInput'
+                  >
+                    {/* <div className='moduleItemEditNameTitle'>
+                      {'Update Account Name'}
+                    </div> */}
+                    <div
+                      className='moduleItemEditName'
+                    >
+                      <input 
+                        autoFocus
+                        type='text'
+                        tabIndex='-1'
+                        value={this.state.name} 
+                        onChange={(e) => {
+                          this.setState({ name: e.target.value })
+                          link.send('tray:renameAccount', this.props.account, e.target.value)
+                        }}
+                        onKeyPress={e => { 
+                          if (e.key === 'Enter') {
+                            this.setState({ editName: false })
+                          }
+                        }}
+                      />
+                      {/* <div className='moduleItemInputSubmit'>
+                        {svg.check(18)}
+                      </div> */}
+                    </div>
+                  </div> 
+                ) : (
+                  <div 
+                    className='moduleItem moduleItemButton'
+                    onClick={() => {
+                      this.setState({ editName: true })
+                    }}
+                  >
+                    {'Update Name'}
+                  </div>
+                )}
+                <div 
+                  className='moduleItem moduleItemButton'
+                  style={this.state.editName ? { 
+                    opacity: 0.3, 
+                    pointerEvents: 'none',
+                    color: 'var(--bad)'
+                  } : { 
+                    opacity: 1,
+                    color: 'var(--bad)'
+                  } }
+                  onClick={() => {
+                    link.rpc('removeAccount', this.props.account, {}, () => {})
+                  }}
                 >
                   {'Remove Account'}
                 </div>

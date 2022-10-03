@@ -219,10 +219,6 @@ class Dash extends React.Component {
               </div>
             </div>
           </div>
-          <div className='newAccount' onClick={() => link.send('tray:action', 'navDash', { view: 'accounts', data: { showAddAccounts: true } })}>
-            <div className='newAccountIcon'>{svg.plus(16)}</div> 
-            Add New Account
-          </div>
         </div>
       )
     )

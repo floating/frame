@@ -12,6 +12,12 @@
   box-sizing border-box
   padding-bottom 32px
 
+// .chainRow
+//   width 100%
+//   display flex
+//   justify-content space-between
+//   padding 0px 5px 20px 5px
+//   box-sizing border-box
 
 
 // .chainRow:last-child
@@ -23,41 +29,21 @@
 .chainColorSwatches
   display flex
   margin 16px
-  background var(--ghostZ)
-  border-radius 16px
-  padding 3px
-
   .chainColorSwatch
-    height 27px
+    height 32px
     width calc(100% / 8)
-    margin-left 3px
+    margin 4px
     border-radius 6px
     cursor pointer
     box-shadow 0px 2px 4px var(--ghostX)
-    box-sizing border-box
 
   .chainColorSwatch:hover
     transform translateY(-1px)
     box-shadow 0px 4px 8px var(--ghostX)
-    position relative
-    z-index 100
   
-  // .chainColorSwatch:active
-  //   transform translateY(0px)
-  //   box-shadow 0px 1px 2px var(--ghostX)
-
-  .chainColorSwatch:first-child
-    border-top-left-radius 12px
-    border-bottom-left-radius 12px
-    margin-left 0px
-
-  .chainColorSwatch:last-child
-    border-top-right-radius 12px
-    border-bottom-right-radius 12px
-
-  .chainColorSwatchSelected
-    box-shadow 0px 4px 8px var(--ghostX)
-    transform translateY(-1px)
+  .chainColorSwatch:active
+    transform translateY(0px)
+    box-shadow 0px 1px 2px var(--ghostX)
 
 
 
@@ -127,19 +113,9 @@
   svg
     margin-right 10px
 
-.chainRow
-  width 100%
-  display flex
-  justify-content space-between
-  padding 0px 8px 20px 8px
-  box-sizing border-box
-
-.chainRowTestnet
-  padding 16px 16px 16px 16px
-  font-size 16px
-
-.chainRowRemove
-  padding 48px 16px 32px 16px
+// .addChainSubmit:hover
+//   background var(--ghostD)
+//   color var(--good)
 
 .addChainSubmitEnabled
   background var(--ghostD)

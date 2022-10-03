@@ -2,7 +2,8 @@ import React from 'react'
 import Restore from 'react-restore'
 
 // import Native from '../../resources/Native'
-// import link from '../../resources/link'
+import svg from '../../resources/svg'
+import link from '../../resources/link'
 
 import Command from './Command'
 
@@ -28,6 +29,48 @@ class Dash extends React.Component {
       selected: 'home'
     }
   }
+  renderFooter () {
+    const { view, data } = this.store('windows.dash.nav')[0] || { view: 'default', data: {} }
+    if (view === 'accounts') {
+      return (
+        <div className='dashFooter'>
+          <div className='dashFooterButton' onClick={() => link.send('tray:action', 'navDash', { view: 'accounts', data: { showAddAccounts: true } })}>
+            <div className='newAccountIcon'>{svg.plus(16)}</div> 
+            Add New Account
+          </div>
+        </div>
+      )
+    } else if (view === 'chains') {
+
+      return (
+        <div className='dashFooter'>
+          <div className='dashFooterButton' onClick={() => link.send('tray:action', 'navDash', {
+            view: 'notify',
+            data: {
+              notify: 'addChain',
+              notifyData: {
+                chain: { type: 'ethereum' }
+              }
+            }})
+          }>
+            <div className='newAccountIcon'>{svg.plus(16)}</div> 
+            Add New Chain
+          </div>
+        </div>
+      )
+    } else if (view === 'tokens') {
+      return (
+        <div className='dashFooter'>
+          <div className='dashFooterButton' onClick={() => link.send('tray:action', 'navDash', { view: 'tokens', data: { notify: 'addToken', notifyData: this.props.req }})}>
+            <div className='newAccountIcon'>{svg.plus(16)}</div> 
+            Add New Token
+          </div>
+        </div>
+      )
+    } else {
+      return null
+    }
+  }
   renderPanel () {
     const { view, data } = this.store('windows.dash.nav')[0] || { view: 'default', data: {} }
     if (view === 'accounts') return <Accounts data={data} />
@@ -43,15 +86,19 @@ class Dash extends React.Component {
     return <Main />
   }
   render () {
+    const { bottom } = this.store('windows.dash.nav')[0] || {}
     return (
       <div className='dash'>
         <Command />
-        <div className='dashMain'>
+        <div className='dashMain'
+          style={{ bottom: bottom || '40px' }}
+        >
           <div className='dashMainOverlay' />
           <div className='dashMainScroll'>
             {this.renderPanel()}
           </div>
         </div>
+        {this.renderFooter()}
       </div>
     )
   }

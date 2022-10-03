@@ -56,7 +56,7 @@ class ChainModule extends React.Component {
     const secondaryCustom = context.store('main.networks', type, id, 'connection.secondary.custom') || this.customMessage
 
     this.state = {
-      expanded: false,      
+      expanded: props.expanded || false,      
       primaryCustom, 
       secondaryCustom, 
     }
@@ -180,7 +180,7 @@ class ChainModule extends React.Component {
         {this.renderConnection(id, connection, networkMeta.blockHeight)}
         {this.state.expanded ? (
           <div className='connectionLevels'>
-            <div className='connectionLevel cardShow' style={{ zIndex: 2 }}>
+            <div className='connectionLevel' style={{ zIndex: 2 }}>
               <div className={connection.primary.on ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
                 <div className='connectionOptionToggle'>
                   <div className='signerPermissionSetting'>Primary</div>
@@ -190,7 +190,7 @@ class ChainModule extends React.Component {
                 </div>
                 {connection.primary.on ? (
                   <>
-                    <div className='connectionOptionDetails cardShow'>
+                    <div className='connectionOptionDetails'>
                       <div className='connectionOptionDetailsInset'>
                         {renderStatus('primary')}
                         <Dropdown
@@ -217,7 +217,7 @@ class ChainModule extends React.Component {
                 ) : null}
               </div>
             </div>
-            <div className='connectionLevel cardShow' style={{ zIndex: 1 }}>
+            <div className='connectionLevel' style={{ zIndex: 1 }}>
               <div className={connection.secondary.on ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
                 <div className='connectionOptionToggle'>
                   <div className='signerPermissionSetting'>Secondary</div>
@@ -227,7 +227,7 @@ class ChainModule extends React.Component {
                 </div>
                 {connection.secondary.on ? (
                   <>
-                    <div className='connectionOptionDetails cardShow'>
+                    <div className='connectionOptionDetails'>
                       <div className='connectionOptionDetailsInset'>
                         {renderStatus('secondary')}
                         <Dropdown

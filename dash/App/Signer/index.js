@@ -304,7 +304,7 @@ class Signer extends React.Component {
             </div>
           </div>
           <div className='signerExpand' onClick={() => this.expand(signer.id)}>
-            {svg.bars(16)}
+            {svg.bars(14)}
           </div>
           {/* {this.status()} */}
         </div>

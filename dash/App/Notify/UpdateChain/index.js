@@ -37,7 +37,7 @@ function UpdateChain ({ chain }) {
         }}
       />
 
-      <div className='chainRow'>
+      <div className='chainRow chainRowRemove'>
         <RemoveChainButton />
       </div>
     </>

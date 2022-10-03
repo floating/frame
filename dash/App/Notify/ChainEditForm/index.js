@@ -71,26 +71,24 @@ export default function ChainEditForm ({
     <>
       <div role='title' className='addChainTitle'>{labels.title}</div>
 
-      <div className='addChain'>
-        <div className='chainRow'>
-          <div className='chainName chainInputField'>
-            <label htmlFor='chainName' className='chainInputLabel'>Chain Name</label>
-            <input
-              id='chainName'
-              className={name === networkDefaults.name ? 'chainInput chainInputDim' : 'chainInput'}
-              value={name}
-              spellCheck='false'
-              onChange={(e) => {
-                setChainName(e.target.value)
-              }}
-              onFocus={(e) => {
-                if (e.target.value === networkDefaults.name) setChainName('')
-              }}
-              onBlur={(e) => {
-                if (e.target.value === '') setChainName(networkDefaults.name)
-              }}
-            />
-          </div>
+      <div className='chainRow'>
+        <div className='chainName chainInputField'>
+          <label htmlFor='chainName' className='chainInputLabel'>Chain Name</label>
+          <input
+            id='chainName'
+            className={name === networkDefaults.name ? 'chainInput chainInputDim' : 'chainInput'}
+            value={name}
+            spellCheck='false'
+            onChange={(e) => {
+              setChainName(e.target.value)
+            }}
+            onFocus={(e) => {
+              if (e.target.value === networkDefaults.name) setChainName('')
+            }}
+            onBlur={(e) => {
+              if (e.target.value === '') setChainName(networkDefaults.name)
+            }}
+          />
         </div>
       </div>
 
@@ -165,33 +163,35 @@ export default function ChainEditForm ({
         </div>
       </div>
 
-      <div className='chainRow'>
-        <div className='chainExplorer chainInputField'>
-          <label htmlFor='chainExplorer' className='chainInputLabel'>Chain Color</label>
-          <Dropdown
-            syncValue={color}
-            onChange={(value) => setColor(value)}
-            options={[
-              { text: 'Color1', value: 'accent1', style: { color: 'var(--accent1)' } },
-              { text: 'Color2', value: 'accent2', style: { color: 'var(--accent2)' } },
-              { text: 'Color3', value: 'accent3', style: { color: 'var(--accent3)' } },
-              { text: 'Color4', value: 'accent4', style: { color: 'var(--accent4)' } },
-              { text: 'Color5', value: 'accent5', style: { color: 'var(--accent5)' } },
-              { text: 'Color6', value: 'accent6', style: { color: 'var(--accent6)' } },
-              { text: 'Color7', value: 'accent7', style: { color: 'var(--accent7)' } },
-              { text: 'Color8', value: 'accent8', style: { color: 'var(--accent8)' } }
-            ]}
-          />
-        </div>
+      <div className='chainColorSwatches'>
+        {[
+          { text: 'Color1', value: 'accent1', style: { color: 'var(--accent1)' } },
+          { text: 'Color2', value: 'accent2', style: { color: 'var(--accent2)' } },
+          { text: 'Color3', value: 'accent3', style: { color: 'var(--accent3)' } },
+          { text: 'Color4', value: 'accent4', style: { color: 'var(--accent4)' } },
+          { text: 'Color5', value: 'accent5', style: { color: 'var(--accent5)' } },
+          { text: 'Color6', value: 'accent6', style: { color: 'var(--accent6)' } },
+          { text: 'Color7', value: 'accent7', style: { color: 'var(--accent7)' } },
+          { text: 'Color8', value: 'accent8', style: { color: 'var(--accent8)' } }
+        ].map(colorOption => {
+          return (
+            <div
+              className='chainColorSwatch'
+              style={{ background: `var(--${colorOption.value})` }}
+              onClick={() => setColor(colorOption.value)}
+            >
+            </div>
+          )
+        })}
       </div>
 
-      {
+      {/* {
         additionalFields.map((field, i) => {
           return (
             <div key={i} className='chainRow'>{field}</div>
           )
         })
-      }
+      } */}
 
       <div className='chainRow'>
         <label id='testnet-label' className='chainInputLabel'>Is Testnet?</label>
