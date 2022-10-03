@@ -843,3 +843,49 @@ describe('migration 23', () => {
     expect(chains[11155111].primaryColor).toBe('accent2')
   })
 })
+
+describe('migration 24', () => {
+  beforeEach(() => {
+    state = {
+      main: {
+        _version: 23,
+        networksMeta: {
+          ethereum: {
+            1: {}
+          }
+        }
+      }
+    }
+  })
+
+  it('sets the nativeCurrency value on a chain', () => {
+    const updatedState = migrations.apply(state, 24)
+    const chains = updatedState.main.networksMeta.ethereum
+    
+    expect(chains[1].nativeCurrency).toStrictEqual({ usd: { price: 0, change24hr: 0 }, icon: '', name: '', symbol: '', decimals: 0 })
+  })
+
+  it('does not set the nativeCurrency value on a chain when it already exists', () => {
+    state.main.networksMeta.ethereum[1] = {
+      nativeCurrency: {
+        usd: {
+          price: 1324.43,
+          change24hr: 2.375239369802938
+        },
+        icon: 'https://assets.coingecko.com/coins/images/279/large/ethereum.png?1595348880',
+        name: 'Ether'
+      }
+    }
+    const updatedState = migrations.apply(state, 24)
+    const chains = updatedState.main.networksMeta.ethereum
+    
+    expect(chains[1].nativeCurrency).toStrictEqual({
+      usd: {
+        price: 1324.43,
+        change24hr: 2.375239369802938
+      },
+      icon: 'https://assets.coingecko.com/coins/images/279/large/ethereum.png?1595348880',
+      name: 'Ether'
+    })
+  })
+})

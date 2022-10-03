@@ -416,6 +416,16 @@ const initial = {
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
             }
           },
+          nativeCurrency: {
+            usd: {
+              price: 0,
+              change24hr: 0
+            },
+            icon: '',
+            name: '',
+            symbol: '',
+            decimals: 0
+          },
           icon: '',
           primaryColor: 'accent1' // Mainnet
         },
@@ -427,6 +437,16 @@ const initial = {
               selected: 'standard',
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
             }
+          },
+          nativeCurrency: {
+            usd: {
+              price: 0,
+              change24hr: 0
+            },
+            icon: '',
+            name: '',
+            symbol: '',
+            decimals: 0
           },
           icon: '',
           primaryColor: 'accent2' // Testnet
@@ -440,6 +460,16 @@ const initial = {
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
             }
           },
+          nativeCurrency: {
+            usd: {
+              price: 0,
+              change24hr: 0
+            },
+            icon: '',
+            name: '',
+            symbol: '',
+            decimals: 0
+          },
           icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/optimism.svg',
           primaryColor: 'accent4' // Optimism
         },
@@ -451,6 +481,16 @@ const initial = {
               selected: 'standard',
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
             }
+          },
+          nativeCurrency: {
+            usd: {
+              price: 0,
+              change24hr: 0
+            },
+            icon: '',
+            name: '',
+            symbol: '',
+            decimals: 0
           },
           icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/gnosis.svg',
           primaryColor: 'accent5' // Gnosis
@@ -464,6 +504,16 @@ const initial = {
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
             }
           },
+          nativeCurrency: {
+            usd: {
+              price: 0,
+              change24hr: 0
+            },
+            icon: '',
+            name: '',
+            symbol: '',
+            decimals: 0
+          },
           icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/polygon.svg',
           primaryColor: 'accent6' // Polygon
         },
@@ -476,6 +526,16 @@ const initial = {
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
             }
           },
+          nativeCurrency: {
+            usd: {
+              price: 0,
+              change24hr: 0
+            },
+            icon: '',
+            name: '',
+            symbol: '',
+            decimals: 0
+          },
           icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/arbitrum.svg',
           primaryColor: 'accent7' // Arbitrum
         },
@@ -487,6 +547,16 @@ const initial = {
               selected: 'standard',
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
             }
+          },
+          nativeCurrency: {
+            usd: {
+              price: 0,
+              change24hr: 0
+            },
+            icon: '',
+            name: '',
+            symbol: '',
+            decimals: 0
           },
           icon: '',
           primaryColor: 'accent2' // Testnet
