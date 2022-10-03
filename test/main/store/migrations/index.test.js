@@ -880,14 +880,12 @@ describe('migration 24', () => {
     const chains = updatedState.main.networksMeta.ethereum
     
     expect(chains[1].nativeCurrency).toStrictEqual({
-      nativeCurrency: {
-        usd: {
-          price: 1324.43,
-          change24hr: 2.375239369802938
-        },
-        icon: 'https://assets.coingecko.com/coins/images/279/large/ethereum.png?1595348880',
-        name: 'Ether'
-      }
+      usd: {
+        price: 1324.43,
+        change24hr: 2.375239369802938
+      },
+      icon: 'https://assets.coingecko.com/coins/images/279/large/ethereum.png?1595348880',
+      name: 'Ether'
     })
   })
 })
