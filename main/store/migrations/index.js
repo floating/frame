@@ -511,6 +511,16 @@ const migrations = {
     })
 
     return initial
+  },
+  24: (initial) => {
+    // set default nativeCurrency where it doesn't exist
+    Object.values(initial.main.networksMeta.ethereum).forEach((chain) => {
+      if (!chain.nativeCurrency) {
+        chain.nativeCurrency = { usd: { price: 0, change24hr: 0 }, icon: '', name: '', symbol: '', decimals: 0 }
+      }
+    })
+
+    return initial
   }
 }
 
