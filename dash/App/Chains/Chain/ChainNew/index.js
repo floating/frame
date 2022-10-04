@@ -1,9 +1,6 @@
 import React, { useState } from 'react'
 import link from '../../../../../resources/link'
 
-// import Connection from '../Connection'
-import { SubmitButton } from '../Buttons'
-
 import { ChainHeader, EditChainColor, EditChainName, EditChainSymbol, EditChainId, EditTestnet, EditChainExplorer } from '../Components'
 
 const chainDefault = {
@@ -16,33 +13,71 @@ const chainDefault = {
   primaryColor: 'accent2'
 }
 
-function RPCInput ({ label, text, defaultText, updateText }) {
-  const id = label.split(' ').map(s => s.toLowerCase()).join('-')
+// function RPCInput ({ label, text, defaultText, updateText }) {
+//   const id = label.split(' ').map(s => s.toLowerCase()).join('-')
 
+//   return (
+//     <div className='chainExplorer chainInputField'>
+//       <label htmlFor={id} className='chainInputLabel'>{label}</label>
+//       <input
+//         id={id}
+//         className={text === defaultText ? 'chainInput chainInputDim' : 'chainInput'}
+//         value={text}
+//         spellCheck='false'
+//         onChange={(e) => {
+//           updateText(e.target.value)
+//         }}
+//         onFocus={(e) => {
+//           if (e.target.value === defaultText) updateText('')
+//         }}
+//         onBlur={(e) => {
+//           if (e.target.value === '') updateText(defaultText)
+//         }}
+//       />
+//     </div>
+//   )
+// }
+
+const SubmitChainButton = ({ text, enabled, textColor, onClick }) => {
   return (
-    <div className='chainExplorer chainInputField'>
-      <label htmlFor={id} className='chainInputLabel'>{label}</label>
-      <input
-        id={id}
-        className={text === defaultText ? 'chainInput chainInputDim' : 'chainInput'}
-        value={text}
-        spellCheck='false'
-        onChange={(e) => {
-          updateText(e.target.value)
-        }}
-        onFocus={(e) => {
-          if (e.target.value === defaultText) updateText('')
-        }}
-        onBlur={(e) => {
-          if (e.target.value === '') updateText(defaultText)
-        }}
-      />
+    <div
+      role='button'
+      className={enabled ? 'addTokenSubmit addTokenSubmitEnabled' : 'addTokenSubmit'} 
+      style={{ color: textColor }}
+      onClick={(e) => {
+        // Left Click
+        if (e.button === 0) onClick()
+      }}
+    >
+      <span>{text}</span>
     </div>
   )
 }
 
-const validateChain = () => {
+const isChainFilled = chain => {
+  return (
+    chain.id && chain.id !== chainDefault.id &&
+    chain.name && chain.name !== chainDefault.name &&
+    chain.symbol && chain.symbol !== chainDefault.symbol
+  )
+}
 
+const chainIdExists = (chainId) => {
+  if (window.store) {
+    const existingChains = Object.keys(store('main.networks.ethereum')).map(id => parseInt(id))
+    return existingChains.includes(parseInt(chainId))
+  }
+  return false
+}
+
+const validateChain = chain => { 
+  if (!isChainFilled(chain)) {
+    return { valid: false, text: 'Fill Chain Details' }
+  } else if (chainIdExists(chain.id)) {
+    return { valid: false, text: 'Chain ID Already Exists' }
+  } else {
+    return { valid: true, text: 'Add Chain' }
+  }
 }
 
 export default ({ id, name, type, explorer, symbol, isTestnet, primaryColor }) => {
@@ -64,6 +99,18 @@ export default ({ id, name, type, explorer, symbol, isTestnet, primaryColor }) =
   const [currentChainId, setChainId] = useState(newChain.id)
   const [currentExplorer, setExplorer] = useState(newChain.explorer)
   const [currentTestnet, setTestnet] = useState(newChain.isTestnet)
+
+  const updatedChain = {
+    type: 'ethereum',
+    id: currentChainId,
+    name: currentName,
+    explorer: currentExplorer,
+    symbol: currentSymbol,
+    isTestnet: currentTestnet,
+    primaryColor: currentColor,
+  }
+
+  const chainValidation = validateChain(updatedChain)
 
   return (
     <div key={'expandedChain'} className='network cardShow'>
@@ -132,34 +179,13 @@ export default ({ id, name, type, explorer, symbol, isTestnet, primaryColor }) =
       /> */}
       
       <div className='chainRow chainRowRemove'>
-        <SubmitButton
-          text='Add Chain'
-          handleClick={() => {
-            const updatedChain = {
-              type: 'ethereum',
-              id: currentChainId,
-              name: currentName,
-              explorer: currentExplorer,
-              symbol: currentSymbol,
-              isTestnet: currentTestnet,
-              primaryColor: currentColor,
-            }
-
-
-            // const chainToAdd = {
-            //   ...submittedChain,
-            //   primaryRpc: this.state.primaryRpc,
-            //   secondaryRpc: this.state.secondaryRpc
-            // }
-        
-            // link.send('tray:addChain', chainToAdd)
-
-            // chainIdExists (chainId) {
-            //   const existingChains = Object.keys(this.store('main.networks.ethereum')).map(id => parseInt(id))
-            //   return existingChains.includes(parseInt(chainId))
-            // }
-
-            console.log('VALIDATE and SUBMIT THIS UPDATED CHAIN', updatedChain)
+        <SubmitChainButton
+          text={chainValidation.text}
+          textColor={chainValidation.valid ? 'var(--good)' : ''}
+          enabled={chainValidation.valid}
+          onClick={() => {
+            link.send('tray:addChain', updatedChain)
+            link.send('tray:action', 'backDash')
           }}
         />
       </div>

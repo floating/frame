@@ -301,6 +301,7 @@ module.exports = {
         blockHeight: 0,
         name: net.name,
         symbol: net.symbol,
+        primaryColor: net.primaryColor,
         nativeCurrency: {
           symbol: net.symbol,
           icon: '',
@@ -350,6 +351,12 @@ module.exports = {
             main.origins[origin].chain = updatedNetwork
           }
         })
+
+        main.networksMeta[updatedNetwork.type][updatedNetwork.id] = main.networksMeta[updatedNetwork.type][updatedNetwork.id] || {}
+        main.networksMeta[updatedNetwork.type][updatedNetwork.id].symbol = newNet.symbol
+
+        main.networksMeta[updatedNetwork.type][updatedNetwork.id].nativeCurrency = main.networksMeta[updatedNetwork.type][updatedNetwork.id].nativeCurrency || {}
+        main.networksMeta[updatedNetwork.type][updatedNetwork.id].nativeCurrency.symbol = newNet.symbol
         
         return main
       })

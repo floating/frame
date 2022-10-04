@@ -2,14 +2,17 @@ import React, { useState } from 'react'
 import link from '../../../../../resources/link'
 
 import Connection from '../Connection'
-import { DangerousSubmitButton } from '../Buttons'
 
-import { ChainHeader, EditChainColor, EditChainName, EditChainSymbol, EditChainId, EditTestnet, EditChainExplorer, ChainFooter } from '../Components'
+import { SubmitChainButton, ChainHeader, EditChainColor, EditChainName, EditChainSymbol, EditChainId, EditTestnet, EditChainExplorer, ChainFooter } from '../Components'
+
+const updateChain = (chain, updatedChain) => {
+  link.send('tray:action', 'updateNetwork', chain, updatedChain)
+}
 
 export default (props) => {
   // props
   const { id, name, type, explorer, symbol, isTestnet, filter, on, connection, primaryColor, icon, price } = props
-  const chain = { id, type, name, isTestnet, symbol, explorer }
+  const chain = { id, type, name, isTestnet, symbol, explorer, primaryColor }
 
   // state
   const [currentColor, setPrimaryColor] = useState(primaryColor)
@@ -18,6 +21,16 @@ export default (props) => {
   // const [currentChainId, setChainId] = useState(id)
   const [currentExplorer, setExplorer] = useState(explorer)
   const [currentTestnet, setTestnet] = useState(isTestnet)
+
+  const updatedChain= {
+    id,
+    type,
+    name: currentName,
+    primaryColor: currentColor,
+    isTestnet: currentTestnet,
+    symbol: currentSymbol,
+    explorer: currentExplorer
+  }
 
   return (
     <div key={'expandedChain'} className='network cardShow'>
@@ -41,50 +54,56 @@ export default (props) => {
         currentName={currentName}
         onChange={name => {
           setName(name)
-          // link.send('tray:action', 'setChainColor', chain.id, color)
-          console.log('Update chain name to ', name)
+          updatedChain.name = name
+          updateChain(chain, updatedChain)
         }}
       />
       <EditChainExplorer
         currentExplorer={currentExplorer}
         onChange={explorer => {
           setExplorer(explorer)
-          // link.send('tray:action', 'setChainColor', chain.id, color)
-          console.log('Update chain explorer to ', explorer)
+          updatedChain.explorer = explorer
+          updateChain(chain, updatedChain)
         }}
       />
       <EditChainSymbol
         currentSymbol={currentSymbol}
         onChange={symbol => {
           setSymbol(symbol)
-          // link.send('tray:action', 'setChainColor', chain.id, color)
-          console.log('Update chain symbol to ', symbol)
+          updatedChain.symbol = symbol
+          updateChain(chain, updatedChain)
         }}
       />
       <ChainFooter 
         symbol={symbol} 
         price={price} 
       />
-      <EditTestnet
-        testnet={currentTestnet}
-        onChange={testnet => {
-          setTestnet(testnet)
-          // link.send('tray:action', 'setChainColor', chain.id, color)
-          console.log('Update chain testnet to ', testnet)
-        }}
-      />
+      {id !== 1 ? (
+        <EditTestnet
+          testnet={currentTestnet}
+          onChange={testnet => {
+            setTestnet(testnet)
+            updatedChain.isTestnet = testnet
+            updateChain(chain, updatedChain)
+          }}
+        />
+      ) : null}
       <div className='chainModules'>
         <Connection expanded={true} connection={connection} {...chain} />
       </div>
-      <div className='chainRow chainRowRemove'>
-        <DangerousSubmitButton
-          text='Remove Chain'
-          handleClick={() => {
-            const confirmAction = { view: 'notify', data: { notify: 'confirmRemoveChain', notifyData: { chain } } }
-            link.send('tray:action', 'navDash', confirmAction)
-          }}
-        />
-      </div>
+      {id !== 1 ? (
+        <div className='chainRow chainRowRemove'>
+          <SubmitChainButton
+            text='Remove Chain'
+            enabled={true}
+            textColor={'var(--bad)'}
+            onClick={() => {
+              const confirmAction = { view: 'notify', data: { notify: 'confirmRemoveChain', notifyData: { chain } } }
+              link.send('tray:action', 'navDash', confirmAction)
+            }}
+          />
+        </div>
+      ) : <div style={{ height: '8px' }} />}
     </div>
   )
 }

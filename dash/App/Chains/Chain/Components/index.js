@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+
 import link from '../../../../../resources/link'
 import svg from '../../../../../resources/svg'
 import RingIcon from '../../../../../resources/Components/RingIcon'
@@ -11,6 +12,22 @@ const networkDefaults = {
   symbol: 'Native Symbol',
   isTestnet: false,
   color: 'accent3'
+}
+
+export const SubmitChainButton = ({ text, enabled, textColor, onClick }) => {
+  return (
+    <div
+      role='button'
+      className={enabled ? 'addTokenSubmit addTokenSubmitEnabled' : 'addTokenSubmit'} 
+      style={{ color: textColor }}
+      onClick={(e) => {
+        // Left Click
+        if (e.button === 0) onClick()
+      }}
+    >
+      <span>{text}</span>
+    </div>
+  )
 }
 
 export const ChainHeader = ({ type, id, primaryColor, icon, svgName, name, on, showExpand, showToggle }) => {
@@ -170,7 +187,7 @@ export const EditChainExplorer = ({ currentExplorer, onChange }) => {
         value={currentExplorer}
         spellCheck='false'
         onChange={(e) => { 
-          onChange(e.target.value) 
+          onChange(e.target.value)
         }}
         onFocus={(e) => {
           if (e.target.value === networkDefaults.explorer) onChange('')
