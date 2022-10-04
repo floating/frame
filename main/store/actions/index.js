@@ -506,6 +506,8 @@ module.exports = {
     u('main.networksMeta.ethereum', chainsMeta => {
       if (chainsMeta[chainId]) {
         chainsMeta[chainId] = { ...chainsMeta[chainId], blockHeight }
+      } else {
+        log.error(`Action Error: setBlockHeight chainId: ${chainId} not found in chainsMeta`)
       }
       return chainsMeta
     })
@@ -514,6 +516,8 @@ module.exports = {
     u('main.networksMeta.ethereum', chainsMeta => {
       if (chainsMeta[chainId]) {
         chainsMeta[chainId] = { ...chainsMeta[chainId], primaryColor: color }
+      } else {
+        log.error(`Action Error: setChainColor chainId: ${chainId} not found in chainsMeta`)
       }
       return chainsMeta
     })
