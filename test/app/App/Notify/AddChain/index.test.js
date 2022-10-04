@@ -4,12 +4,25 @@ import Restore from 'react-restore'
 import store from '../../../../../main/store'
 import link from '../../../../../resources/link'
 import { setupComponent } from '../../../../componentSetup'
-import AddChainComponent from '../../../../../dash/App/Notify/AddChain'
+// import AddChainComponent from '../../../../../dash/App/Notify/AddChain'
+
+import ChainComponent from '../../../../../dash/App/Chains/Chain'
 
 jest.mock('../../../../../main/store/persist')
 jest.mock('../../../../../resources/link', () => ({ send: jest.fn() }))
 
-const AddChain = Restore.connect(AddChainComponent, store)
+const Chain = Restore.connect(ChainComponent, store)
+
+{/* <Chain
+key={newChain.type + newChain.id}
+id={newChain.id}
+name={newChain.name}
+symbol={newChain.symbol}
+explorer={newChain.explorer}
+isTestnet={newChain.isTestnet}
+type={newChain.type}
+view={'setup'}
+/> */}
 
 beforeAll(() => {
   jest.useFakeTimers()
@@ -23,21 +36,26 @@ afterAll(() => {
 
 describe('rendering', () => {
   it('renders the first provided RPC as the primary RPC', () => {
-    const { getByLabelText } = setupComponent(<AddChain chain={{ primaryRpc: 'https://myrpc.polygon.net' }} />)
+    const chainConfig = { view: 'setup', primaryRpc: 'https://myrpc.polygon.net' }
+    const { getByLabelText } = setupComponent(<Chain {...chainConfig} />)
 
     const primaryRpcInput = getByLabelText('Primary RPC')
     expect(primaryRpcInput.value).toEqual('https://myrpc.polygon.net')
   })
 
   it('renders the default primary RPC text', () => {
-    const { getByLabelText } = setupComponent(<AddChain chain={{}} />)
+    const chainConfig = { view: 'setup' }
+    const { getByLabelText } = setupComponent(<Chain {...chainConfig} />)
+    // const { getByLabelText } = setupComponent(<AddChain chain={{}} />)
 
     const primaryRpcInput = getByLabelText('Primary RPC')
     expect(primaryRpcInput.value).toEqual('Primary Endpoint')
   })
 
   it('renders the second provided RPC as the secondary RPC', () => {
-    const { getByLabelText } = setupComponent(<AddChain chain={{ secondaryRpc: 'https://my-backup-rpc.polygon.net'}} />)
+    const chainConfig = { view: 'setup', primaryRpc: 'https://my-backup-rpc.polygon.net' }
+    const { getByLabelText } = setupComponent(<Chain {...chainConfig} />)
+    // const { getByLabelText } = setupComponent(<AddChain chain={{ secondaryRpc: 'https://my-backup-rpc.polygon.net' }} />)
 
     const secondaryRpcInput = getByLabelText('Secondary RPC')
     expect(secondaryRpcInput.value).toEqual('https://my-backup-rpc.polygon.net')

@@ -11,7 +11,9 @@ const networkDefaults = {
   explorer: 'Block Explorer',
   symbol: 'Native Symbol',
   isTestnet: false,
-  color: 'accent3'
+  color: 'accent3',
+  primaryRpc: 'Primary RPC Endpoint',
+  secondaryRpc: 'Secondary RPC Endpoint'
 }
 
 export const SubmitChainButton = ({ text, enabled, textColor, onClick }) => {
@@ -20,10 +22,7 @@ export const SubmitChainButton = ({ text, enabled, textColor, onClick }) => {
       role='button'
       className={enabled ? 'addTokenSubmit addTokenSubmitEnabled' : 'addTokenSubmit'} 
       style={{ color: textColor }}
-      onClick={(e) => {
-        // Left Click
-        if (e.button === 0) onClick()
-      }}
+      onClick={onClick}
     >
       <span>{text}</span>
     </div>
@@ -73,21 +72,21 @@ export const ChainHeader = ({ type, id, primaryColor, icon, svgName, name, on, s
   )
 }
 
+const accents = ['accent1', 'accent2', 'accent3', 'accent4', 'accent5', 'accent6', 'accent7', 'accent8']
+
 export const EditChainColor = ({currentColor, onChange}) => {
   return (
     <div className='chainRow'>
       <div className='chainInputLabel'>Chain Color</div>
       <div className='chainColorSwatches'>
-        {[ 'accent1', 'accent2', 'accent3', 'accent4', 'accent5', 'accent6', 'accent7', 'accent8'].map(color => {
-          return (
-            <div
-              key={color}
-              className={currentColor === color ? 'chainColorSwatch chainColorSwatchSelected' : 'chainColorSwatch'}
-              style={{ background: `var(--${color})` }}
-              onClick={() => onChange(color)}
-            />
-          )
-        })}
+        {accents.map(color => (
+          <div
+            key={color}
+            className={currentColor === color ? 'chainColorSwatch chainColorSwatchSelected' : 'chainColorSwatch'}
+            style={{ background: `var(--${color})` }}
+            onClick={() => onChange(color)}
+          />
+        ))}
       </div>
     </div>
   )
@@ -165,8 +164,8 @@ export const EditChainId = ({ chainId, onChange }) => {
 
 export const EditTestnet = ({ testnet, onChange }) => {
   return (
-    <div className='chainRow chainRowTestnet'>
-      <label id='testnet-label' className=''>Is this chain a testnet?</label>
+    <div className='chainRowTestnet'>
+      <label id='testnet-label'>Testnet</label>
       <div id='testnetToggle' role='checkbox' aria-checked={testnet} aria-labelledby='testnet-label'
         className={testnet ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'}
         onClick={() => onChange(!testnet)}
@@ -199,6 +198,52 @@ export const EditChainExplorer = ({ currentExplorer, onChange }) => {
     </div>
   )
 }
+
+// export const EditPrimaryRPC = ({ currentExplorer, onChange }) => {
+//   return (
+//     <div className='chainRow'>
+//       <label htmlFor='chainExplorer' className='chainInputLabel'>Block Explorer</label>
+//       <input
+//         id='chainExplorer'
+//         className={currentExplorer === networkDefaults.explorer ? 'chainInput chainInputDim' : 'chainInput'}
+//         value={currentExplorer}
+//         spellCheck='false'
+//         onChange={(e) => { 
+//           onChange(e.target.value)
+//         }}
+//         onFocus={(e) => {
+//           if (e.target.value === networkDefaults.explorer) onChange('')
+//         }}
+//         onBlur={(e) => {
+//           if (e.target.value === '') onChange(networkDefaults.explorer)
+//         }}
+//       />
+//     </div>
+//   )
+// }
+
+// export const EditSecondaryRPC  = ({ currentExplorer, onChange }) => {
+//   return (
+//     <div className='chainRow'>
+//       <label htmlFor='chainExplorer' className='chainInputLabel'>Block Explorer</label>
+//       <input
+//         id='chainExplorer'
+//         className={currentExplorer === networkDefaults.explorer ? 'chainInput chainInputDim' : 'chainInput'}
+//         value={currentExplorer}
+//         spellCheck='false'
+//         onChange={(e) => { 
+//           onChange(e.target.value)
+//         }}
+//         onFocus={(e) => {
+//           if (e.target.value === networkDefaults.explorer) onChange('')
+//         }}
+//         onBlur={(e) => {
+//           if (e.target.value === '') onChange(networkDefaults.explorer)
+//         }}
+//       />
+//     </div>
+//   )
+// }
 
 export const ChainFooter = ({ symbol, price }) => {
   return (

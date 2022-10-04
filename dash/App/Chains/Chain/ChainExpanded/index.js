@@ -11,7 +11,7 @@ const updateChain = (chain, updatedChain) => {
 
 export default (props) => {
   // props
-  const { id, name, type, explorer, symbol, isTestnet, filter, on, connection, primaryColor, icon, price } = props
+  const { id, name, type, explorer, symbol, isTestnet, on, connection, primaryColor, icon, price } = props
   const chain = { id, type, name, isTestnet, symbol, explorer, primaryColor }
 
   // state
@@ -21,7 +21,7 @@ export default (props) => {
   const [currentExplorer, setExplorer] = useState(explorer)
   const [currentTestnet, setTestnet] = useState(isTestnet)
 
-  const updatedChain= {
+  const updatedChain = {
     id,
     type,
     name: currentName,

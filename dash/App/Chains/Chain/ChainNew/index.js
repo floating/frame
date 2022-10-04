@@ -124,43 +124,36 @@ export default ({ id, name, type, explorer, symbol, isTestnet, primaryColor }) =
         currentColor={currentColor} 
         onChange={color => {
           setPrimaryColor(color)
-          link.send('tray:action', 'setChainColor', id, color)
         }}
       />
       <EditChainName
         currentName={currentName}
         onChange={name => {
           setName(name)
-          console.log('Update chain name to ', name)
         }}
       />
       <EditChainId
         chainId={currentChainId}
         onChange={id => {
           setChainId(id)
-          console.log('Update chain id to ', id)
         }}
       />
       <EditChainExplorer
         currentExplorer={currentExplorer}
         onChange={explorer => {
           setExplorer(explorer)
-          console.log('Update chain explorer to ', explorer)
         }}
       />
       <EditChainSymbol
         currentSymbol={currentSymbol}
         onChange={symbol => {
           setSymbol(symbol)
-          console.log('Update chain symbol to ', symbol)
         }}
       />
       <EditTestnet
         testnet={currentTestnet}
         onChange={testnet => {
           setTestnet(testnet)
-          // On color change, update existing chain
-          console.log('Update chain testnet to ', testnet)
         }}
       />
 
