@@ -59,12 +59,12 @@ export default (props) => {
         symbol={symbol} 
         price={price} 
       />
-      {id !== 1 ? (
+      {!isMainnet && (
         <EditTestnet
           testnet={currentTestnet}
           onChange={setTestnet}
         />
-      ) : null}
+      )}
       <div className='chainModules'>
         <Connection expanded={true} connection={connection} {...chain} />
       </div>

@@ -57,7 +57,7 @@ export const ChainHeader = ({ type, id, primaryColor, icon, svgName, name, on, s
         ) : null}
         {showToggle ? <div 
           className={on ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} 
-          onClick={id !== 1 ? () => link.send('tray:action', 'activateNetwork', type, id, !on) : null}
+          onClick={!isMainnet ? () => link.send('tray:action', 'activateNetwork', type, id, !on) : null}
         >
           {isMainnet ? (
             <div className='signerPermissionToggleSwitchLocked'>
