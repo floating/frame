@@ -30,6 +30,7 @@ export const SubmitChainButton = ({ text, enabled, textColor, onClick }) => {
 }
 
 export const ChainHeader = ({ type, id, primaryColor, icon, svgName, name, on, showExpand, showToggle }) => {
+  const isMainnet = id === 1
   return (
     <div className='signerTop'>
       <div className='signerDetails'>
@@ -58,7 +59,7 @@ export const ChainHeader = ({ type, id, primaryColor, icon, svgName, name, on, s
           className={on ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} 
           onClick={id !== 1 ? () => link.send('tray:action', 'activateNetwork', type, id, !on) : null}
         >
-          {id === 1 ? (
+          {isMainnet ? (
             <div className='signerPermissionToggleSwitchLocked'>
               {svg.lock(10)}
               <div className='signerPermissionToggleSwitch' />

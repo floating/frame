@@ -23,6 +23,8 @@ export default (props) => {
     link.send('tray:action', 'updateNetwork', chain, updatedChain)
   }, [currentColor, currentName, currentSymbol, currentExplorer, currentTestnet])
 
+  const isMainnet = id === 1
+
   return (
     <div key={'expandedChain'} className='network cardShow'>
       <ChainHeader 
@@ -66,7 +68,7 @@ export default (props) => {
       <div className='chainModules'>
         <Connection expanded={true} connection={connection} {...chain} />
       </div>
-      {id !== 1 ? (
+      {!isMainnet ? (
         <div className='chainRow chainRowRemove'>
           <SubmitChainButton
             text='Remove Chain'
