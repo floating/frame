@@ -1,12 +1,12 @@
 import React, { createRef } from 'react'
 import Restore from 'react-restore'
 
-import Dropdown from '../../../../resources/Components/Dropdown'
-import { isInvalidCustomTarget } from '../../../../resources/connections'
-import { capitalize } from '../../../../resources/utils'
+import Dropdown from '../../../../../resources/Components/Dropdown'
+import { isInvalidCustomTarget } from '../../../../../resources/connections'
+import { capitalize } from '../../../../../resources/utils'
 
-import link from '../../../../resources/link'
-import svg from '../../../../resources/svg'
+import link from '../../../../../resources/link'
+import svg from '../../../../../resources/svg'
 
 const ConnectionIndicator = ({ className, connection }) => {
   const isConnected = connection.status === 'connected'
@@ -130,7 +130,10 @@ class ChainModule extends React.Component {
   }
 
   render () {
-    const { id, type, connection } = this.props
+    const { id, type } = this.props
+
+    const networks = this.store('main.networks')
+    const connection = networks[type][id].connection
 
     const networkMeta = this.store('main.networksMeta.ethereum', id)
     const networkPresets = this.store('main.networkPresets', type)

@@ -12,35 +12,30 @@
   box-sizing border-box
   padding-bottom 32px
 
-
-
-// .chainRow:last-child
-//   padding 0px 5px 0px 5px
-
-.chainName
-  width 100%
-
 .chainColorSwatches
   display flex
-  margin 16px
+  margin-top 4px
+  margin-bottom 4px
   background var(--ghostZ)
   border-radius 16px
   padding 3px
 
   .chainColorSwatch
-    height 27px
+    height 16px
     width calc(100% / 8)
     margin-left 3px
-    border-radius 6px
+    border-radius 3px
     cursor pointer
-    box-shadow 0px 2px 4px var(--ghostX)
+    // box-shadow 0px 2px 4px var(--ghostX)
     box-sizing border-box
+    position relative
 
   .chainColorSwatch:hover
     transform translateY(-1px)
     box-shadow 0px 4px 8px var(--ghostX)
     position relative
     z-index 100
+    margin-bottom -1px
   
   // .chainColorSwatch:active
   //   transform translateY(0px)
@@ -55,14 +50,18 @@
     border-top-right-radius 12px
     border-bottom-right-radius 12px
 
-  .chainColorSwatchSelected
-    box-shadow 0px 4px 8px var(--ghostX)
-    transform translateY(-1px)
-
-
-
-.chainInputField
-  text-align left
+  .chainColorSwatchSelected::before
+    content ''
+    position absolute
+    width 5px 
+    height 5px
+    border-radius 2.5px
+    top 50%
+    left 50%
+    margin-top -2.5px
+    margin-left -2.5px
+    background var(--ghostZ)
+    z-index 3000000
 
 .chainId
   width calc(50% - 5px)
@@ -81,12 +80,12 @@
   outline none
   border none
   text-align center
-  font-size 16px
+  font-size 18px
   width 100%
   background var(--ghostZ)
-  border-radius 8px
+  border-radius 20px
   font-family 'MainFont'
-  padding 10px
+  padding 16px
   font-weight 300
   color var(--outerspace)
   margin-top 5px
@@ -95,11 +94,11 @@
   color var(--outerspace03)
 
 .chainInputLabel
-  font-size 11px
+  font-size 10px
   text-transform uppercase
-  font-weight 300
-  padding-left 10px
-  letter-spacing 0.5px
+  font-weight 500
+  padding 8px 0px 4px 16px
+  letter-spacing 1px
 
 .chainFieldDisplay
   padding 10px
@@ -127,20 +126,6 @@
   svg
     margin-right 10px
 
-.chainRow
-  width 100%
-  display flex
-  justify-content space-between
-  padding 0px 8px 20px 8px
-  box-sizing border-box
-
-.chainRowTestnet
-  padding 16px 16px 16px 16px
-  font-size 16px
-
-.chainRowRemove
-  padding 48px 16px 32px 16px
-
 .addChainSubmitEnabled
   background var(--ghostD)
   color var(--good)
@@ -149,3 +134,19 @@
   * 
     pointer-events none
     
+.chainRow
+  width 100%
+  display flex
+  justify-content space-between
+  padding 0px 16px 16px 16px
+  box-sizing border-box
+  flex-direction column
+
+.chainRowTestnet
+  padding 16px 20px 32px 20px
+  font-size 16px
+  flex-direction row
+  justify-content center
+
+.chainRowRemove
+  padding 8px 0px 8px 0px

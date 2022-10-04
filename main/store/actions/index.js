@@ -496,10 +496,20 @@ module.exports = {
     })
   },
   setBlockHeight: (u, chainId, blockHeight) => {
-    u('main.networksMeta.ethereum', chainId, (chainMeta) => ({ ...chainMeta, blockHeight }))
+    u('main.networksMeta.ethereum', chainsMeta => {
+      if (chainsMeta[chainId]) {
+        chainsMeta[chainId] = { ...chainsMeta[chainId], blockHeight }
+      }
+      return chainsMeta
+    })
   },
   setChainColor: (u, chainId, color) => {
-    u('main.networksMeta.ethereum', chainId, (chainMeta) => ({ ...chainMeta, primaryColor: color }))
+    u('main.networksMeta.ethereum', chainsMeta => {
+      if (chainsMeta[chainId]) {
+        chainsMeta[chainId] = { ...chainsMeta[chainId], primaryColor: color }
+      }
+      return chainsMeta
+    })
   },
   expandDock: (u, expand) => {
     u('dock.expand', (s) => expand)

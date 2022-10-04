@@ -45,12 +45,9 @@ class Dash extends React.Component {
       return (
         <div className='dashFooter'>
           <div className='dashFooterButton' onClick={() => link.send('tray:action', 'navDash', {
-            view: 'notify',
+            view: 'chains',
             data: {
-              notify: 'addChain',
-              notifyData: {
-                chain: { type: 'ethereum' }
-              }
+              newChain: {}
             }})
           }>
             <div className='newAccountIcon'>{svg.plus(16)}</div> 

@@ -187,9 +187,9 @@ class GasSummaryComponent extends Component {
           <div className='sliceTileGasPriceUnit'>{'gwei'}</div>
         </div>
         <div className='sliceGasEstimateBlock'>
-          {this.feeEstimatesUSD().map((estimate) =>{
+          {this.feeEstimatesUSD().map((estimate, i) =>{
             return (
-              <div className='gasEstimate'>
+              <div className='gasEstimate' key={i}>
                 <div className='gasEstimateRange'>
                   <span className='gasEstimateSymbol'>{!estimate.low || estimate.low >= 0.01 ? `$` : '<$'}</span>
                   <span className='gasEstimateRangeLow'>{`${!estimate.low ? 0 : estimate.low < 0.01 ? 0.01 : estimate.low < 1 ? estimate.low.toFixed(2) : estimate.low}`}</span>
