@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 
 import link from '../../../../../resources/link'
 import svg from '../../../../../resources/svg'

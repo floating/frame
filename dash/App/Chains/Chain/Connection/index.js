@@ -64,20 +64,6 @@ class ChainModule extends React.Component {
     this.ref = createRef()
   }
 
-  // clickHandler (e) {
-  //   if (!e.composedPath().includes(this.ref.current)) {
-  //     if (this.state.expanded) this.setState({ expanded: false })
-  //   }
-  // }
-
-  // componentDidMount () {
-  //   document.addEventListener('click', this.clickHandler.bind(this))
-  // }
-
-  // componentDidUnmount () {
-  //   document.removeEventListener('click', this.clickHandler.bind(this))
-  // }
-
   renderConnection (id, { primary, secondary }, blockHeight) {
     const connection = getActiveConnection(primary, secondary)
 

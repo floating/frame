@@ -18,7 +18,6 @@ export default (props) => {
   const [currentColor, setPrimaryColor] = useState(primaryColor)
   const [currentName, setName] = useState(name)
   const [currentSymbol, setSymbol] = useState(symbol)
-  // const [currentChainId, setChainId] = useState(id)
   const [currentExplorer, setExplorer] = useState(explorer)
   const [currentTestnet, setTestnet] = useState(isTestnet)
 

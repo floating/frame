@@ -1,20 +1,9 @@
 import React, { useState } from 'react'
 import Restore from 'react-restore'
-// import link from '../../../../resources/link'
-// import svg from '../../../../resources/svg'
-// import RingIcon from '../../../../resources/Components/RingIcon'
-// import Gas from '../../../../resources/Components/Gas'
-
-// import Connection from './Connection'
-// import { DangerousSubmitButton } from './Buttons'
-
-// import { ChainHeader, EditChainColor, EditChainName, EditChainSymbol, EditChainId, EditTestnet, EditChainExplorer, ChainFooter } from './Components'
 
 import ChainPreview from './ChainPreview'
 import ChainExpanded from './ChainExpanded'
 import ChainNew from './ChainNew'
-
-// import Filter from '../Filter'
 
 class Chain extends React.Component {
   renderNew () {

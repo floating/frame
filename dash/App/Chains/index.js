@@ -146,12 +146,7 @@ class Settings extends React.Component {
     )
   }
 
-  renderNewChain (chain) {
-    const { id, type, name, isTestnet, symbol, explorer } = chain
-
-    const chainDefaults = {}
-    const newChain = Object.assign(chainDefaults, chain)
-
+  renderNewChain (newChain) {
     return (
       <div className={'localSettings cardShow'}>
         <div className='localSettingsWrap'>
