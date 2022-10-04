@@ -1,17 +1,14 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import link from '../../../../../resources/link'
 
 import Connection from '../Connection'
 
 import { SubmitChainButton, ChainHeader, EditChainColor, EditChainName, EditChainSymbol, EditChainId, EditTestnet, EditChainExplorer, ChainFooter } from '../Components'
 
-const updateChain = (chain, updatedChain) => {
-  link.send('tray:action', 'updateNetwork', chain, updatedChain)
-}
 
 export default (props) => {
   // props
-  const { id, name, type, explorer, symbol, isTestnet, on, connection, primaryColor, icon, price } = props
+  const { id, name, type, explorer, symbol, isTestnet, filter, on, connection, primaryColor, icon, price } = props
   const chain = { id, type, name, isTestnet, symbol, explorer, primaryColor }
 
   // state
@@ -21,15 +18,10 @@ export default (props) => {
   const [currentExplorer, setExplorer] = useState(explorer)
   const [currentTestnet, setTestnet] = useState(isTestnet)
 
-  const updatedChain = {
-    id,
-    type,
-    name: currentName,
-    primaryColor: currentColor,
-    isTestnet: currentTestnet,
-    symbol: currentSymbol,
-    explorer: currentExplorer
-  }
+  useEffect(() => {
+    const updatedChain = { id, type, name: currentName, primaryColor: currentColor, isTestnet: currentTestnet, symbol: currentSymbol, explorer: currentExplorer }
+    link.send('tray:action', 'updateNetwork', chain, updatedChain)
+  }, [currentColor, currentName, currentSymbol, currentExplorer, currentTestnet])
 
   return (
     <div key={'expandedChain'} className='network cardShow'>
@@ -51,27 +43,15 @@ export default (props) => {
       />
       <EditChainName
         currentName={currentName}
-        onChange={name => {
-          setName(name)
-          updatedChain.name = name
-          updateChain(chain, updatedChain)
-        }}
+        onChange={setName}
       />
       <EditChainExplorer
         currentExplorer={currentExplorer}
-        onChange={explorer => {
-          setExplorer(explorer)
-          updatedChain.explorer = explorer
-          updateChain(chain, updatedChain)
-        }}
+        onChange={setExplorer}
       />
       <EditChainSymbol
         currentSymbol={currentSymbol}
-        onChange={symbol => {
-          setSymbol(symbol)
-          updatedChain.symbol = symbol
-          updateChain(chain, updatedChain)
-        }}
+        onChange={setSymbol}
       />
       <ChainFooter 
         symbol={symbol} 
@@ -80,11 +60,7 @@ export default (props) => {
       {id !== 1 ? (
         <EditTestnet
           testnet={currentTestnet}
-          onChange={testnet => {
-            setTestnet(testnet)
-            updatedChain.isTestnet = testnet
-            updateChain(chain, updatedChain)
-          }}
+          onChange={setTestnet}
         />
       ) : null}
       <div className='chainModules'>
