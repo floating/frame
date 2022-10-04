@@ -117,7 +117,7 @@ class Signer extends React.Component {
 
     const hardwareSigner = isHardwareSigner(activeAccount)
     const watchOnly = isWatchOnly(activeAccount)
-    let status = (signer && signer.status) || (hardwareSigner ? 'Disconnected' : 'No Signer')
+    const status = (signer && signer.status) || (hardwareSigner ? 'Disconnected' : 'No Signer')
 
     // const signerType = this.store('main.accounts', this.props.id, 'lastSignerType')
     // const signerKind = (signerType === 'seed' || signerType === 'ring') ? 'hot' : 'device'
