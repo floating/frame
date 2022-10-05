@@ -525,6 +525,9 @@ const migrations = {
   25: (initial) => {
     // add accountsMeta
     initial.main.accountsMeta = {}
+    Object.entries(initial.main.accounts).forEach(([id, { name }]) => {
+      initial.main.accountsMeta[id] = { name }
+    })
 
     return initial
   }
