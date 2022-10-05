@@ -8,6 +8,7 @@ import ChainNew from './ChainNew'
 class Chain extends React.Component {
   renderNew () {
     const { id, name, type, explorer, symbol, isTestnet, filter, on, connection, primaryRpc, secondaryRpc } = this.props
+    const existingChains = Object.keys(this.store('main.networks.ethereum')).map(id => parseInt(id))
     return (
       <ChainNew
         id={id}
@@ -17,6 +18,7 @@ class Chain extends React.Component {
         symbol={symbol}
         primaryRpc={primaryRpc}
         secondaryRpc={secondaryRpc}
+        existingChains={existingChains}
       />
     )
   }

@@ -118,8 +118,8 @@ class ChainModule extends React.Component {
   render () {
     const { id, type } = this.props
 
-    const networks = this.store('main.networks')
-    const connection = networks[type][id].connection
+    const connection = this.store('main.networks', type, id, 'connection')
+    if (!connection) return null
 
     const networkMeta = this.store('main.networksMeta.ethereum', id)
     const networkPresets = this.store('main.networkPresets', type)

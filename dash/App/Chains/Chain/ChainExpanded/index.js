@@ -5,7 +5,6 @@ import Connection from '../Connection'
 
 import { SubmitChainButton, ChainHeader, EditChainColor, EditChainName, EditChainSymbol, EditChainId, EditTestnet, EditChainExplorer, ChainFooter } from '../Components'
 
-
 export default (props) => {
   // props
   const { id, name, type, explorer, symbol, isTestnet, filter, on, connection, primaryColor, icon, price } = props

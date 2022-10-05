@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import link from '../../../../../resources/link'
 
+import chainDefault from '../chainDefault'
+
 import { 
   ChainHeader, 
   EditChainColor, 
@@ -9,33 +11,9 @@ import {
   EditChainId, 
   EditTestnet, 
   EditChainExplorer,
-  EditRPC
+  EditRPC,
+  SubmitChainButton
 } from '../Components'
-
-const chainDefault = {
-  type: 'ethereum',
-  id: 'Chain ID',
-  name: 'Chain Name',
-  explorer: 'Block Explorer',
-  symbol: 'Native Symbol',
-  isTestnet: false,
-  primaryColor: 'accent2',
-  primaryRpc: 'Primary RPC Endpoint',
-  secondaryRpc: 'Secondary RPC Endpoint'
-}
-
-const SubmitChainButton = ({ text, enabled, textColor, onClick }) => {
-  return (
-    <div
-      role='button'
-      className={enabled ? 'addTokenSubmit addTokenSubmitEnabled' : 'addTokenSubmit'} 
-      style={{ color: textColor }}
-      onClick={onClick}
-    >
-      <span>{text}</span>
-    </div>
-  )
-}
 
 const isChainFilled = chain => {
   return (
@@ -45,25 +23,7 @@ const isChainFilled = chain => {
   )
 }
 
-const chainIdExists = (chainId) => {
-  if (window.store) {
-    const existingChains = Object.keys(store('main.networks.ethereum')).map(id => parseInt(id))
-    return existingChains.includes(parseInt(chainId))
-  }
-  return false
-}
-
-const validateChain = chain => { 
-  if (!isChainFilled(chain)) {
-    return { valid: false, text: 'Fill Chain Details' }
-  } else if (chainIdExists(chain.id)) {
-    return { valid: false, text: 'Chain ID Already Exists' }
-  } else {
-    return { valid: true, text: 'Add Chain' }
-  }
-}
-
-export default ({ id, name, type, explorer, symbol, isTestnet, primaryColor, primaryRpc, secondaryRpc }) => {
+export default ({ id, name, type, explorer, symbol, isTestnet, primaryColor, primaryRpc, secondaryRpc, existingChains }) => {
 
   const newChain = {
     id: id || chainDefault.id,
@@ -97,6 +57,16 @@ export default ({ id, name, type, explorer, symbol, isTestnet, primaryColor, pri
     primaryColor: currentColor,
     primaryRpc: currentPrimaryRPC,
     secondaryRpc: currentSecondaryRPC
+  }
+
+  const validateChain = chain => { 
+    if (existingChains.includes(parseInt(chain.id))) {
+      return { valid: false, text: 'Chain ID Already Exists' }
+    } else if (!isChainFilled(chain)) {
+      return { valid: false, text: 'Fill Chain Details' }
+    }  else {
+      return { valid: true, text: 'Add Chain' }
+    }
   }
 
   const chainValidation = validateChain(updatedChain)
@@ -151,8 +121,10 @@ export default ({ id, name, type, explorer, symbol, isTestnet, primaryColor, pri
           textColor={chainValidation.valid ? 'var(--good)' : ''}
           enabled={chainValidation.valid}
           onClick={() => {
-            link.send('tray:addChain', updatedChain)
-            link.send('tray:action', 'backDash')
+            if (chainValidation.valid) {
+              link.send('tray:addChain', updatedChain)
+              link.send('tray:action', 'backDash')
+            }
           }}
         />
       </div>

@@ -4,17 +4,7 @@ import link from '../../../../../resources/link'
 import svg from '../../../../../resources/svg'
 import RingIcon from '../../../../../resources/Components/RingIcon'
 
-const networkDefaults = {
-  type: 'ethereum',
-  id: 'Chain ID',
-  name: 'Chain Name',
-  explorer: 'Block Explorer',
-  symbol: 'Native Symbol',
-  isTestnet: false,
-  color: 'accent3',
-  primaryRpc: 'Primary RPC Endpoint',
-  secondaryRpc: 'Secondary RPC Endpoint'
-}
+import chainDefault from '../chainDefault'
 
 export const SubmitChainButton = ({ text, enabled, textColor, onClick }) => {
   return (
@@ -42,7 +32,7 @@ export const ChainHeader = ({ type, id, primaryColor, icon, svgName, name, on, s
           />
         </div>
         {/* <div className='signerType' style={this.props.inSetup ? {top: '21px'} : {top: '24px'}}>{this.props.model}</div> */}
-        <div className='signerName'>
+        <div role='chainName' className='signerName'>
           {name}
         </div>
       </div>
@@ -99,15 +89,15 @@ export const EditChainName = ({currentName, onChange}) => {
       <label htmlFor='chainName' className='chainInputLabel'>Chain Name</label>
       <input
         id='chainName'
-        className={currentName === networkDefaults.name ? 'chainInput chainInputDim' : 'chainInput'}
+        className={currentName === chainDefault.name ? 'chainInput chainInputDim' : 'chainInput'}
         value={currentName}
         spellCheck='false'
         onChange={(e) => onChange(e.target.value)}
         onFocus={(e) => {
-          if (e.target.value === networkDefaults.name) onChange('')
+          if (e.target.value === chainDefault.name) onChange('')
         }}
         onBlur={(e) => {
-          if (e.target.value === '') onChange(networkDefaults.name)
+          if (e.target.value === '') onChange(chainDefault.name)
         }}
       />
     </div>
@@ -120,7 +110,7 @@ export const EditChainSymbol = ({ currentSymbol, onChange }) => {
       <label htmlFor='chainSymbol' className='chainInputLabel'>Native Symbol</label>
       <input
         id='chainSymbol'
-        className={currentSymbol === networkDefaults.symbol ? 'chainInput chainInputDim' : 'chainInput'}
+        className={currentSymbol === chainDefault.symbol ? 'chainInput chainInputDim' : 'chainInput'}
         value={currentSymbol}
         spellCheck='false'
         onChange={(e) => {
@@ -128,10 +118,10 @@ export const EditChainSymbol = ({ currentSymbol, onChange }) => {
           onChange(e.target.value)
         }}
         onFocus={(e) => {
-          if (e.target.value === networkDefaults.symbol) onChange('')
+          if (e.target.value === chainDefault.symbol) onChange('')
         }}
         onBlur={(e) => {
-          if (e.target.value === '') onChange(networkDefaults.symbol)
+          if (e.target.value === '') onChange(chainDefault.symbol)
         }}
       />
     </div>
@@ -144,7 +134,7 @@ export const EditChainId = ({ chainId, onChange }) => {
       <label htmlFor='chainId' className='chainInputLabel'>Chain ID</label>
       <input
         id='chainId'
-        className={chainId === networkDefaults.id ? 'chainInput chainInputDim' : 'chainInput'}
+        className={chainId === chainDefault.id ? 'chainInput chainInputDim' : 'chainInput'}
         value={chainId}
         spellCheck='false'
         onChange={(e) => {
@@ -153,10 +143,10 @@ export const EditChainId = ({ chainId, onChange }) => {
           }
         }}
         onFocus={(e) => {
-          if (e.target.value === networkDefaults.id) onChange('')
+          if (e.target.value === chainDefault.id) onChange('')
         }}
         onBlur={(e) => {
-          if (e.target.value === '') onChange(networkDefaults.id)
+          if (e.target.value === '') onChange(chainDefault.id)
         }}
       />
     </div>
@@ -166,8 +156,10 @@ export const EditChainId = ({ chainId, onChange }) => {
 export const EditTestnet = ({ testnet, onChange }) => {
   return (
     <div className='chainRowTestnet'>
-      <label id='testnet-label'>Testnet</label>
-      <div id='testnetToggle' role='checkbox' aria-checked={testnet} aria-labelledby='testnet-label'
+      <label>Testnet</label>
+      <div 
+        role='chainTestnet' 
+        aria-checked={testnet}
         className={testnet ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'}
         onClick={() => onChange(!testnet)}
       >
@@ -183,17 +175,17 @@ export const EditChainExplorer = ({ currentExplorer, onChange }) => {
       <label htmlFor='chainExplorer' className='chainInputLabel'>Block Explorer</label>
       <input
         id='chainExplorer'
-        className={currentExplorer === networkDefaults.explorer ? 'chainInput chainInputDim' : 'chainInput'}
+        className={currentExplorer === chainDefault.explorer ? 'chainInput chainInputDim' : 'chainInput'}
         value={currentExplorer}
         spellCheck='false'
         onChange={(e) => { 
           onChange(e.target.value)
         }}
         onFocus={(e) => {
-          if (e.target.value === networkDefaults.explorer) onChange('')
+          if (e.target.value === chainDefault.explorer) onChange('')
         }}
         onBlur={(e) => {
-          if (e.target.value === '') onChange(networkDefaults.explorer)
+          if (e.target.value === '') onChange(chainDefault.explorer)
         }}
       />
     </div>
@@ -201,11 +193,12 @@ export const EditChainExplorer = ({ currentExplorer, onChange }) => {
 }
 
 export const EditRPC = ({ currentRPC, label, rpcDefault = 'RPC Endpoint', onChange }) => {
+  const id = label.split(' ').map(s => s.toLowerCase()).join('-')
   return (
     <div className='chainRow'>
-      <label htmlFor='chainExplorer' className='chainInputLabel'>{label}</label>
+      <label htmlFor={id} className='chainInputLabel'>{label}</label>
       <input
-        id='chainExplorer'
+        id={id}
         className={currentRPC === rpcDefault ? 'chainInput chainInputDim' : 'chainInput'}
         value={currentRPC}
         spellCheck='false'
