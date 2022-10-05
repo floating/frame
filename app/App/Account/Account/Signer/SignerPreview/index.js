@@ -23,8 +23,8 @@ class Signer extends React.Component {
       })
     }
     this.state = {
-      verifyAddressSuccess: false,
-      verifyAddressResponse: ''
+      notifySuccess: false,
+      notifyText: ''
     }
   }
 
@@ -39,12 +39,12 @@ class Signer extends React.Component {
   verifyAddress () {
     link.rpc('verifyAddress', err => {
       if (err) {
-        this.setState({ verifyAddressSuccess: false, verifyAddressResponse: err })
+        this.setState({ notifySuccess: false, notifyText: err })
       } else {
-        this.setState({ verifyAddressSuccess: true, verifyAddressResponse: 'Address matched!' })
+        this.setState({ notifySuccess: true, notifyText: 'Address matched!' })
       }
       setTimeout(() => {
-        this.setState({ verifyAddressSuccess: false, verifyAddressResponse: '' })
+        this.setState({ notifySuccess: false, notifyText: '' })
       }, 5000)
     })
   }
@@ -104,13 +104,13 @@ class Signer extends React.Component {
 
 
   render () {
-    const activeAccount =  this.store('main.accounts', this.props.account)
+    const activeAccount = this.store('main.accounts', this.props.account)
 
     let signer
 
     if (activeAccount.signer) {
       signer = this.store('main.signers', activeAccount.signer)
-    } else if (activeAccount .smart)  {
+    } else if (activeAccount.smart)  {
       const actingSigner = this.store('main.accounts', activeAccount.smart.actor, 'signer')
       if (actingSigner) signer = this.store('main.signers', actingSigner)
     }
@@ -119,7 +119,7 @@ class Signer extends React.Component {
     const watchOnly = isWatchOnly(activeAccount)
     const status = (signer && signer.status) || (hardwareSigner ? 'Disconnected' : 'No Signer')
 
-    const signerType = this.store('main.accounts', this.props.id, 'lastSignerType')
+    // const signerType = this.store('main.accounts', this.props.id, 'lastSignerType')
     // const signerKind = (signerType === 'seed' || signerType === 'ring') ? 'hot' : 'device'
     const account = this.store('main.accounts', this.props.id)
 
@@ -138,6 +138,19 @@ class Signer extends React.Component {
               className='moduleItem moduleItemSpace moduleItemButton' 
               style={{ flex: 6 }}
               onClick={() => {
+                if (!signer) {
+                  this.setState({
+                    notifySuccess: false,
+                    notifyText: hardwareSigner ? 'Signer Disconnected' : 'There is no signer for this account'
+                  })
+
+                  setTimeout(() => {
+                    this.setState({ notifySuccess: false, notifyText: '' })
+                  }, 5000)
+                  
+                  return
+                }
+
                 const crumb = {
                   view: 'expandedSigner', 
                   data: { signer: signer.id }
@@ -162,14 +175,14 @@ class Signer extends React.Component {
             ) : null}
           </div>
           
-          {this.state.verifyAddressResponse ? (
+          {this.state.notifyText ? (
             <div 
               className={'moduleItem cardShow'}
               style={{
-                color: this.state.verifyAddressSuccess ? 'var(--good)' : 'var(--bad)'
+                color: this.state.notifySuccess ? 'var(--good)' : 'var(--bad)'
               }}
             >
-              {this.state.verifyAddressResponse}
+              {this.state.notifyText}
             </div>
           ) : null}
           {account.smart ? (
