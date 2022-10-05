@@ -74,8 +74,8 @@ class AddHardware extends React.Component {
             )}
           </div>
           <div
-            className='addAccountItemFooter' onMouseDown={() => {
-              const open = url => link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'openExternal', notifyData: { url }} })
+            className='addAccountItemFooter' onClick={() => {
+              const open = url => link.send('tray:openExternal', url)
               if (this.deviceName === 'ledger') return open('https://shop.ledger.com/pages/ledger-nano-x?r=1fb484cde64f')
               if (this.deviceName === 'trezor') return open('https://shop.trezor.io/?offer_id=10&aff_id=3270')
             }}

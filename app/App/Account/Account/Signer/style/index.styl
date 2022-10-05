@@ -43,7 +43,7 @@
 .moduleItem
   position relative
   justify-content center
-  padding 8px
+  padding 12px
   font-size 12px
   font-weight 300
   transform translateZ(0)
@@ -54,7 +54,7 @@
   border-radius 8px
   display flex
   align-items center
-  padding 8px 16px
+  padding 16px
   min-height 40px
   box-sizing border-box
   text-transform uppercase
@@ -77,6 +77,10 @@
   .moduleItemIcon
     margin-right 12px
 
+.moduleItemInput
+  padding 8px
+  overflow hidden
+
 .moduleItemButton
   cursor pointer
   * 
@@ -92,6 +96,52 @@
   background var(--ghostB)
   transform translateY(0px)
   box-shadow 0px 2px 4px var(--ghostX)
+
+.moduleItemEditNameTitle
+  position absolute
+  top 28px
+  left 30px
+  right 0px
+  font-size 8px
+
+.moduleItemEditName
+  display flex
+  width 100%
+  overflow hidden
+
+  input
+    border-radius 0px
+    transition var(--standardFast)
+    font-size 18px
+
+  input:hover, input:focus
+    background var(--ghostA)
+    box-shadow 0px 0px 0px 0px var(--ghostZ)
+
+  .moduleItemInputSubmit
+    padding 16px
+    border-radius 12px
+    margin-left 3px
+    background var(--ghostB)
+    border-bottom 2px solid var(--ghostZ)
+    transition var(--standardFast)
+    box-shadow 0px 2px 4px 0px var(--ghostY)
+    box-sizing border-box
+    cursor pointer
+    margin 8px
+    *
+      pointer-events none
+
+.moduleItemInputSubmit:hover
+  transform translateY(-1px)
+  background var(--ghostC)
+  box-shadow 0px 4px 8px 0px var(--ghostY)
+
+.moduleItemInputSubmit:active
+  transform translateY(0px)
+  background var(--ghostC)
+  box-shadow 0px 1px 2px 0px var(--ghostY)
+  color var(--good)
 
 .moduleItemSignerStatus
   display flex

@@ -1,12 +1,12 @@
 import React, { createRef } from 'react'
 import Restore from 'react-restore'
 
-import Dropdown from '../../../../resources/Components/Dropdown'
-import { isInvalidCustomTarget } from '../../../../resources/connections'
-import { capitalize } from '../../../../resources/utils'
+import Dropdown from '../../../../../resources/Components/Dropdown'
+import { isInvalidCustomTarget } from '../../../../../resources/connections'
+import { capitalize } from '../../../../../resources/utils'
 
-import link from '../../../../resources/link'
-import svg from '../../../../resources/svg'
+import link from '../../../../../resources/link'
+import svg from '../../../../../resources/svg'
 
 const ConnectionIndicator = ({ className, connection }) => {
   const isConnected = connection.status === 'connected'
@@ -56,27 +56,13 @@ class ChainModule extends React.Component {
     const secondaryCustom = context.store('main.networks', type, id, 'connection.secondary.custom') || this.customMessage
 
     this.state = {
-      expanded: false,      
+      expanded: props.expanded || false,      
       primaryCustom, 
       secondaryCustom, 
     }
 
     this.ref = createRef()
   }
-
-  // clickHandler (e) {
-  //   if (!e.composedPath().includes(this.ref.current)) {
-  //     if (this.state.expanded) this.setState({ expanded: false })
-  //   }
-  // }
-
-  // componentDidMount () {
-  //   document.addEventListener('click', this.clickHandler.bind(this))
-  // }
-
-  // componentDidUnmount () {
-  //   document.removeEventListener('click', this.clickHandler.bind(this))
-  // }
 
   renderConnection (id, { primary, secondary }, blockHeight) {
     const connection = getActiveConnection(primary, secondary)
@@ -130,7 +116,10 @@ class ChainModule extends React.Component {
   }
 
   render () {
-    const { id, type, connection } = this.props
+    const { id, type } = this.props
+
+    const connection = this.store('main.networks', type, id, 'connection')
+    if (!connection) return null
 
     const networkMeta = this.store('main.networksMeta.ethereum', id)
     const networkPresets = this.store('main.networkPresets', type)
@@ -180,7 +169,7 @@ class ChainModule extends React.Component {
         {this.renderConnection(id, connection, networkMeta.blockHeight)}
         {this.state.expanded ? (
           <div className='connectionLevels'>
-            <div className='connectionLevel cardShow' style={{ zIndex: 2 }}>
+            <div className='connectionLevel' style={{ zIndex: 2 }}>
               <div className={connection.primary.on ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
                 <div className='connectionOptionToggle'>
                   <div className='signerPermissionSetting'>Primary</div>
@@ -190,7 +179,7 @@ class ChainModule extends React.Component {
                 </div>
                 {connection.primary.on ? (
                   <>
-                    <div className='connectionOptionDetails cardShow'>
+                    <div className='connectionOptionDetails'>
                       <div className='connectionOptionDetailsInset'>
                         {renderStatus('primary')}
                         <Dropdown
@@ -217,7 +206,7 @@ class ChainModule extends React.Component {
                 ) : null}
               </div>
             </div>
-            <div className='connectionLevel cardShow' style={{ zIndex: 1 }}>
+            <div className='connectionLevel' style={{ zIndex: 1 }}>
               <div className={connection.secondary.on ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
                 <div className='connectionOptionToggle'>
                   <div className='signerPermissionSetting'>Secondary</div>
@@ -227,7 +216,7 @@ class ChainModule extends React.Component {
                 </div>
                 {connection.secondary.on ? (
                   <>
-                    <div className='connectionOptionDetails cardShow'>
+                    <div className='connectionOptionDetails'>
                       <div className='connectionOptionDetailsInset'>
                         {renderStatus('secondary')}
                         <Dropdown

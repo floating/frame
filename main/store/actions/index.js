@@ -301,6 +301,7 @@ module.exports = {
         blockHeight: 0,
         name: net.name,
         symbol: net.symbol,
+        primaryColor: net.primaryColor,
         nativeCurrency: {
           symbol: net.symbol,
           icon: '',
@@ -350,6 +351,12 @@ module.exports = {
             main.origins[origin].chain = updatedNetwork
           }
         })
+
+        main.networksMeta[updatedNetwork.type][updatedNetwork.id] = main.networksMeta[updatedNetwork.type][updatedNetwork.id] || {}
+        main.networksMeta[updatedNetwork.type][updatedNetwork.id].symbol = newNet.symbol
+
+        main.networksMeta[updatedNetwork.type][updatedNetwork.id].nativeCurrency = main.networksMeta[updatedNetwork.type][updatedNetwork.id].nativeCurrency || {}
+        main.networksMeta[updatedNetwork.type][updatedNetwork.id].nativeCurrency.symbol = newNet.symbol
         
         return main
       })
@@ -496,10 +503,24 @@ module.exports = {
     })
   },
   setBlockHeight: (u, chainId, blockHeight) => {
-    u('main.networksMeta.ethereum', chainId, (chainMeta) => ({ ...chainMeta, blockHeight }))
+    u('main.networksMeta.ethereum', chainsMeta => {
+      if (chainsMeta[chainId]) {
+        chainsMeta[chainId] = { ...chainsMeta[chainId], blockHeight }
+      } else {
+        log.error(`Action Error: setBlockHeight chainId: ${chainId} not found in chainsMeta`)
+      }
+      return chainsMeta
+    })
   },
   setChainColor: (u, chainId, color) => {
-    u('main.networksMeta.ethereum', chainId, (chainMeta) => ({ ...chainMeta, primaryColor: color }))
+    u('main.networksMeta.ethereum', chainsMeta => {
+      if (chainsMeta[chainId]) {
+        chainsMeta[chainId] = { ...chainsMeta[chainId], primaryColor: color }
+      } else {
+        log.error(`Action Error: setChainColor chainId: ${chainId} not found in chainsMeta`)
+      }
+      return chainsMeta
+    })
   },
   expandDock: (u, expand) => {
     u('dock.expand', (s) => expand)

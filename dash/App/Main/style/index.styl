@@ -4,13 +4,20 @@
   justify-content center
   align-items center
 
+  .requestFeatureButton:active
+    transform translateY(0px)
+    box-shadow 0px 1px 2px var(--ghostY)
+    background var(--ghostB)
+
   .requestFeatureButton:hover
+    transform translateY(-1px)
+    box-shadow 0px 4px 8px var(--ghostY)
     background var(--ghostB)
 
   .requestFeatureButton
     padding 0px 30px
-    border-radius 20px
-    height 64px
+    border-radius 26px
+    height 74px
     font-size 14px
     display flex
     justify-content center
@@ -67,7 +74,14 @@
     padding 10px
     width 100%
     
+    .snipItBrowserExtensionIcon:active
+      transform translateY(0px)
+      box-shadow 0px 1px 2px var(--ghostY)
+      background var(--ghostB)
+
     .snipItBrowserExtensionIcon:hover
+      transform translateY(-1px)
+      box-shadow 0px 4px 8px var(--ghostY)
       background var(--ghostB)
 
     .snipItBrowserExtensionIcon
@@ -75,10 +89,10 @@
       justify-content center
       align-items center
       background var(--ghostA)
-      height 64px
-      width 64px
-      border-radius 20px
-      margin 16px
+      height 74px
+      width 74px
+      border-radius 26px
+      margin 8px
       cursor pointer
       background var(--ghostA)
       border-bottom 2px solid var(--ghostZ)
@@ -98,7 +112,7 @@
 //     border-radius 26px
 
 .dashModule
-  height 110px
+  height 120px
   background var(--ghostA)
   margin-bottom 8px
   border-radius 26px
@@ -106,13 +120,12 @@
   display flex
   justify-content center
   align-items center
-  box-shadow 0px 4px 8px var(--ghostY)
   margin 6px
   font-size 18px
   font-weight 300
   border-radius 26px
   background var(--ghostA)
-  box-shadow 0px 4px 6px var(--ghostY)
+  box-shadow 0px 2px 4px var(--ghostY)
   border-bottom 2px solid var(--ghostZ)
 
   *
@@ -122,6 +135,15 @@
     margin-right 20px
 
 .dashModule:hover
+  transform translateY(-1px)
+  box-shadow 0px 4px 8px var(--ghostY)
+  background var(--ghostB)
+  z-index 200
+  position relative
+
+.dashModule:active
+  transform translateY(0px)
+  box-shadow 0px 1px 2px var(--ghostY)
   background var(--ghostB)
 
 .signerSettings
@@ -278,7 +300,7 @@
     font-weight 300
     font-size 18px
     position relative
-    padding-top 3px
+    padding-top 4px
 
 .localSetting
   background var(--ghostA)
@@ -315,10 +337,11 @@
   background var(--bad)
   height 20px
   width 40px
+  margin-right 6px
+  margin-left 12px
   border-radius 10px
   transition var(--standard)
   transform translateZ(0)
-  margin-top 4px
   cursor pointer
 
   .signerPermissionToggleSwitch
@@ -333,6 +356,36 @@
     transform translateZ(0)
     pointer-events none
     border-bottom 2px solid var(--ghostZ)
+
+  .signerPermissionToggleSwitchLocked
+    position absolute
+    top 0px
+    left 0px
+    bottom 0px
+    right 0px
+    border-radius 10px
+    display flex
+    align-items center
+    justify-content center
+    cursor pointer
+    *
+      pointer-events none
+
+    .signerPermissionToggleSwitch
+      opacity 1
+      transition var(--standard)
+
+    svg
+      transition var(--standard)
+      opacity 0
+      color var(--ghostC)
+
+  .signerPermissionToggleSwitchLocked:hover
+    .signerPermissionToggleSwitch
+      opacity 0
+
+    svg
+      opacity 1
 
 .signerPermissionToggleOn
   background var(--good)

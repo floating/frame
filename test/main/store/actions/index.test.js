@@ -950,9 +950,9 @@ describe('#activateNetwork', () => {
 describe('#setBlockHeight', () => {
   let main
 
-  const updaterFn = (node, chainId, update) => {
+  const updaterFn = (node, update) => {
     expect(node).toBe('main.networksMeta.ethereum')
-    main.networksMeta.ethereum[chainId] = update(main.networksMeta.ethereum[chainId])
+    main.networksMeta.ethereum = update(main.networksMeta.ethereum)
   }
 
   beforeEach(() => {

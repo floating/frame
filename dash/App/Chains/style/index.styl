@@ -1,6 +1,6 @@
 .network
   background var(--ghostA)
-  margin 6px 6px 6px 6px
+  margin 6px 6px 4px 6px
   position relative
   box-shadow 0px 4px 8px var(--ghostY)
   border-radius 27px
@@ -11,102 +11,72 @@
   .chainModules
     padding-bottom 0px
 
-  .networkActive
-    position relative
-    display flex
-    align-items space-between
-    width 100%
-    box-sizing border-box
-    height 74px
+  // .networkActive
+  //   position relative
+  //   display flex
+  //   align-items space-between
+  //   width 100%
+  //   box-sizing border-box
+  //   height 74px
 
-    .chainBadge
-      position absolute
-      left 16px
-      top 18px
-      border-radius 16px
-      background var(--ghostB)
-      box-sizing border-box
-      display flex
-      justify-content center
-      align-items center
-      color var(--outerspace)
+  //   .chainBadge
+  //     position absolute
+  //     left 16px
+  //     top 18px
+  //     border-radius 16px
+  //     background var(--ghostB)
+  //     box-sizing border-box
+  //     display flex
+  //     justify-content center
+  //     align-items center
+  //     color var(--outerspace)
 
-      img
-        max-height 22px
-        max-width 22px
-        color var(--outerspace)
+  //     img
+  //       max-height 22px
+  //       max-width 22px
+  //       color var(--outerspace)
 
-    .networkName
-      position absolute
-      left 66px
-      right 100px
-      top 1px
-      bottom 1px
-      font-size 18px
-      text-align left
-      font-weight 300
-      padding-left 0px
-      font-family 'MainFont'
-      display flex
-      align-items center
+  //   .networkName
+  //     position absolute
+  //     left 66px
+  //     right 100px
+  //     top 1px
+  //     bottom 1px
+  //     font-size 18px
+  //     text-align left
+  //     font-weight 300
+  //     padding-left 0px
+  //     font-family 'MainFont'
+  //     display flex
+  //     align-items center
 
-    .signerPermissionToggle
-      position absolute
-      right 16px
-      top 50%
-      margin-top -9px
-      height 18px
-      width 38px
-      border-radius 12px
+// .signerPermissionToggle
+//   // position absolute
+//   // right 16px
+//   // top 50%
+//   margin-top -9px
+//   height 18px
+//   width 38px
+//   border-radius 12px
 
-      .signerPermissionToggleSwitch
-        position absolute
-        top 2px
-        left 2px
-        bottom 2px
-        width 14px
-        border-radius 10px
-
-      .signerPermissionToggleSwitchLocked
-        position absolute
-        top 0px
-        left 0px
-        bottom 0px
-        right 0px
-        border-radius 10px
-        display flex
-        align-items center
-        justify-content center
-        cursor pointer
-        *
-          pointer-events none
-
-        .signerPermissionToggleSwitch
-          opacity 1
-          transition var(--standard)
-
-        svg
-          transition var(--standard)
-          opacity 0
-          color var(--ghostC)
-
-      .signerPermissionToggleSwitchLocked:hover
-        .signerPermissionToggleSwitch
-          opacity 0
-
-        svg
-          opacity 1
+//   .signerPermissionToggleSwitch
+//     position absolute
+//     top 2px
+//     left 2px
+//     bottom 2px
+//     width 14px
+//     border-radius 10px
 
 
-    .signerPermissionToggleOn
-      background var(--good)
-      .signerPermissionToggleSwitch
-        position absolute
-        transform translateX(20px)
+// .signerPermissionToggleOn
+//   background var(--good)
+//   .signerPermissionToggleSwitch
+//     position absolute
+//     transform translateX(20px)
 
-  .phaseNetworkLine
-    position relative
-    height 84px
+.phaseNetworkLine
+  position relative
+  height 84px
 
 .localSettings
   position absolute
@@ -246,7 +216,6 @@
     z-index 5
 
   .localSettingsWrap
-    padding 0px 0px 64px 0px
     overflow-x hidden
     overflow-y scroll
     position relative
@@ -380,7 +349,7 @@
   justify-content center
   align-items center
   position relative
-  padding 10px 15px 24px 13px
+  padding 10px 15px 10px 13px
   font-family 'FiraCode'
   font-size 12px
   font-weight 300
@@ -624,12 +593,12 @@
     .connectionOptionDetailsInset
       height 25px
       width 100%
-      color var(--outerspace08)
+      // color var(--outerspace08)
       display flex
       justify-content space-between
       align-items center
       text-transform uppercase
-      font-size 12px
+      font-size 11px
       letter-spacing 1px
       font-weight 400
       // margin 0px -15px -15px -15px
@@ -740,6 +709,7 @@
   .appInfoLineReset
     margin-top 15px
     margin-left 4px
+    margin-bottom 32px
     text-align center
     font-size 11px
     text-transform uppercase
@@ -895,11 +865,11 @@
 .networkBreak
   padding 16px 16px 0px 16px
   margin-bottom 8px
-  font-size 11px
+  font-size 10px
   text-transform uppercase
   letter-spacing 2px
-  font-weight 300
-  color var(--outerspace03)
+  font-weight 500
+  color var(--outerspace)
 
 .networkBreak:first-child
   padding 0px 16px 0px 16px
@@ -970,5 +940,4 @@
   cursor pointer
   padding 8px
 
-@import '../Usage/style/index.styl'
-@import '../Tokens/style/index.styl'
+@import '../Chain/style/index.styl'

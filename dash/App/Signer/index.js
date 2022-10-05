@@ -304,7 +304,7 @@ class Signer extends React.Component {
             </div>
           </div>
           <div className='signerExpand' onClick={() => this.expand(signer.id)}>
-            {svg.bars(16)}
+            {svg.bars(14)}
           </div>
           {/* {this.status()} */}
         </div>
@@ -402,8 +402,6 @@ class Signer extends React.Component {
     )
   }
 
-  
-
   renderExpanded () {
     const signer = this.store('main.signers', this.props.id)
     const { page, addressLimit } = this.state
@@ -431,6 +429,7 @@ class Signer extends React.Component {
 
     return (
       <div className={'expandedSigner cardShow'} style={{ zIndex: 1000 - this.props.index }}>
+        {<div style={{ height: '22px' }} />}
         {this.statusText()}
         {this.props.type === 'lattice' && status === 'pair' ? (
           <div className='signerLatticePair'>
