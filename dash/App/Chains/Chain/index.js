@@ -7,7 +7,7 @@ import ChainNew from './ChainNew'
 
 class Chain extends React.Component {
   renderNew () {
-    const { id, name, type, explorer, symbol, isTestnet, filter, on, connection } = this.props
+    const { id, name, type, explorer, symbol, isTestnet, filter, on, connection, primaryRpc, secondaryRpc } = this.props
     return (
       <ChainNew
         id={id}
@@ -15,6 +15,8 @@ class Chain extends React.Component {
         type={type}
         explorer={explorer}
         symbol={symbol}
+        primaryRpc={primaryRpc}
+        secondaryRpc={secondaryRpc}
       />
     )
   }

@@ -200,51 +200,28 @@ export const EditChainExplorer = ({ currentExplorer, onChange }) => {
   )
 }
 
-// export const EditPrimaryRPC = ({ currentExplorer, onChange }) => {
-//   return (
-//     <div className='chainRow'>
-//       <label htmlFor='chainExplorer' className='chainInputLabel'>Block Explorer</label>
-//       <input
-//         id='chainExplorer'
-//         className={currentExplorer === networkDefaults.explorer ? 'chainInput chainInputDim' : 'chainInput'}
-//         value={currentExplorer}
-//         spellCheck='false'
-//         onChange={(e) => { 
-//           onChange(e.target.value)
-//         }}
-//         onFocus={(e) => {
-//           if (e.target.value === networkDefaults.explorer) onChange('')
-//         }}
-//         onBlur={(e) => {
-//           if (e.target.value === '') onChange(networkDefaults.explorer)
-//         }}
-//       />
-//     </div>
-//   )
-// }
-
-// export const EditSecondaryRPC  = ({ currentExplorer, onChange }) => {
-//   return (
-//     <div className='chainRow'>
-//       <label htmlFor='chainExplorer' className='chainInputLabel'>Block Explorer</label>
-//       <input
-//         id='chainExplorer'
-//         className={currentExplorer === networkDefaults.explorer ? 'chainInput chainInputDim' : 'chainInput'}
-//         value={currentExplorer}
-//         spellCheck='false'
-//         onChange={(e) => { 
-//           onChange(e.target.value)
-//         }}
-//         onFocus={(e) => {
-//           if (e.target.value === networkDefaults.explorer) onChange('')
-//         }}
-//         onBlur={(e) => {
-//           if (e.target.value === '') onChange(networkDefaults.explorer)
-//         }}
-//       />
-//     </div>
-//   )
-// }
+export const EditRPC = ({ currentRPC, label, rpcDefault = 'RPC Endpoint', onChange }) => {
+  return (
+    <div className='chainRow'>
+      <label htmlFor='chainExplorer' className='chainInputLabel'>{label}</label>
+      <input
+        id='chainExplorer'
+        className={currentRPC === rpcDefault ? 'chainInput chainInputDim' : 'chainInput'}
+        value={currentRPC}
+        spellCheck='false'
+        onChange={(e) => { 
+          onChange(e.target.value)
+        }}
+        onFocus={(e) => {
+          if (e.target.value === rpcDefault) onChange('')
+        }}
+        onBlur={(e) => {
+          if (e.target.value === '') onChange(rpcDefault)
+        }}
+      />
+    </div>
+  )
+}
 
 export const ChainFooter = ({ symbol, price }) => {
   return (

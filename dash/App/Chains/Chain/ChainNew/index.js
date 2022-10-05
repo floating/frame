@@ -1,7 +1,16 @@
 import React, { useState } from 'react'
 import link from '../../../../../resources/link'
 
-import { ChainHeader, EditChainColor, EditChainName, EditChainSymbol, EditChainId, EditTestnet, EditChainExplorer } from '../Components'
+import { 
+  ChainHeader, 
+  EditChainColor, 
+  EditChainName, 
+  EditChainSymbol, 
+  EditChainId, 
+  EditTestnet, 
+  EditChainExplorer,
+  EditRPC
+} from '../Components'
 
 const chainDefault = {
   type: 'ethereum',
@@ -10,33 +19,10 @@ const chainDefault = {
   explorer: 'Block Explorer',
   symbol: 'Native Symbol',
   isTestnet: false,
-  primaryColor: 'accent2'
+  primaryColor: 'accent2',
+  primaryRpc: 'Primary RPC Endpoint',
+  secondaryRpc: 'Secondary RPC Endpoint'
 }
-
-// function RPCInput ({ label, text, defaultText, updateText }) {
-//   const id = label.split(' ').map(s => s.toLowerCase()).join('-')
-
-//   return (
-//     <div className='chainExplorer chainInputField'>
-//       <label htmlFor={id} className='chainInputLabel'>{label}</label>
-//       <input
-//         id={id}
-//         className={text === defaultText ? 'chainInput chainInputDim' : 'chainInput'}
-//         value={text}
-//         spellCheck='false'
-//         onChange={(e) => {
-//           updateText(e.target.value)
-//         }}
-//         onFocus={(e) => {
-//           if (e.target.value === defaultText) updateText('')
-//         }}
-//         onBlur={(e) => {
-//           if (e.target.value === '') updateText(defaultText)
-//         }}
-//       />
-//     </div>
-//   )
-// }
 
 const SubmitChainButton = ({ text, enabled, textColor, onClick }) => {
   return (
@@ -44,10 +30,7 @@ const SubmitChainButton = ({ text, enabled, textColor, onClick }) => {
       role='button'
       className={enabled ? 'addTokenSubmit addTokenSubmitEnabled' : 'addTokenSubmit'} 
       style={{ color: textColor }}
-      onClick={(e) => {
-        // Left Click
-        if (e.button === 0) onClick()
-      }}
+      onClick={onClick}
     >
       <span>{text}</span>
     </div>
@@ -80,7 +63,7 @@ const validateChain = chain => {
   }
 }
 
-export default ({ id, name, type, explorer, symbol, isTestnet, primaryColor }) => {
+export default ({ id, name, type, explorer, symbol, isTestnet, primaryColor, primaryRpc, secondaryRpc }) => {
 
   const newChain = {
     id: id || chainDefault.id,
@@ -90,6 +73,8 @@ export default ({ id, name, type, explorer, symbol, isTestnet, primaryColor }) =
     symbol: symbol || chainDefault.symbol,
     isTestnet: isTestnet || chainDefault.isTestnet,
     primaryColor: primaryColor || chainDefault.primaryColor,
+    primaryRpc: primaryRpc || chainDefault.primaryRpc,
+    secondaryRpc: secondaryRpc || chainDefault.secondaryRpc
   }
 
   // state
@@ -99,6 +84,8 @@ export default ({ id, name, type, explorer, symbol, isTestnet, primaryColor }) =
   const [currentChainId, setChainId] = useState(newChain.id)
   const [currentExplorer, setExplorer] = useState(newChain.explorer)
   const [currentTestnet, setTestnet] = useState(newChain.isTestnet)
+  const [currentPrimaryRPC, setPrimaryRPC] = useState(newChain.primaryRpc)
+  const [currentSecondaryRPC, setSecondaryRPC] = useState(newChain.secondaryRpc)
 
   const updatedChain = {
     type: 'ethereum',
@@ -108,6 +95,8 @@ export default ({ id, name, type, explorer, symbol, isTestnet, primaryColor }) =
     symbol: currentSymbol,
     isTestnet: currentTestnet,
     primaryColor: currentColor,
+    primaryRpc: currentPrimaryRPC,
+    secondaryRpc: currentSecondaryRPC
   }
 
   const chainValidation = validateChain(updatedChain)
@@ -122,55 +111,40 @@ export default ({ id, name, type, explorer, symbol, isTestnet, primaryColor }) =
       />
       <EditChainColor 
         currentColor={currentColor} 
-        onChange={color => {
-          setPrimaryColor(color)
-        }}
+        onChange={setPrimaryColor}
       />
       <EditChainName
         currentName={currentName}
-        onChange={name => {
-          setName(name)
-        }}
+        onChange={setName}
       />
       <EditChainId
         chainId={currentChainId}
-        onChange={id => {
-          setChainId(id)
-        }}
+        onChange={setChainId}
       />
       <EditChainExplorer
         currentExplorer={currentExplorer}
-        onChange={explorer => {
-          setExplorer(explorer)
-        }}
+        onChange={setExplorer}
       />
       <EditChainSymbol
         currentSymbol={currentSymbol}
-        onChange={symbol => {
-          setSymbol(symbol)
-        }}
+        onChange={setSymbol}
+      />
+      <EditRPC
+        currentRPC={currentPrimaryRPC}
+        label={'Primary RPC'} 
+        rpcDefault={chainDefault.primaryRpc}
+        onChange={setPrimaryRPC}
+      />
+      <EditRPC
+        currentRPC={currentSecondaryRPC}
+        label={'Secondary RPC'} 
+        rpcDefault={chainDefault.secondaryRpc}
+        onChange={setSecondaryRPC}
       />
       <EditTestnet
         testnet={currentTestnet}
-        onChange={testnet => {
-          setTestnet(testnet)
-        }}
+        onChange={setTestnet}
       />
-
-      {/* <RPCInput
-        text={this.state.primaryRpc}
-        defaultText={defaults.primaryRpc}
-        label='Primary RPC'
-        updateText={(text) => this.setState({ primaryRpc: text })}
-      />
-      
-      <RPCInput
-        text={this.state.secondaryRpc}
-        defaultText={defaults.secondaryRpc}
-        label='Secondary RPC'
-        updateText={(text) => this.setState({ secondaryRpc: text })}
-      /> */}
-      
       <div className='chainRow chainRowRemove'>
         <SubmitChainButton
           text={chainValidation.text}

@@ -158,6 +158,8 @@ class Settings extends React.Component {
             explorer={newChain.explorer}
             isTestnet={newChain.isTestnet}
             type={newChain.type}
+            primaryRpc={newChain.primaryRpc}
+            secondaryRpc={newChain.secondaryRpc}
             view={'setup'}
           />
         </div>

@@ -55,10 +55,12 @@ export default (props) => {
         currentSymbol={currentSymbol}
         onChange={setSymbol}
       />
-      <ChainFooter 
-        symbol={symbol} 
-        price={price} 
-      />
+      <div className='chainRow'>
+        <ChainFooter
+          symbol={symbol}
+          price={price}
+        />
+      </div>
       {!isMainnet && (
         <EditTestnet
           testnet={currentTestnet}
