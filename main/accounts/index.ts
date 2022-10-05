@@ -94,11 +94,13 @@ export class Accounts extends EventEmitter {
     if (account) return cb(null, account) // Account already exists...
     log.info('Account not found, creating account')
     const created = 'new:' + Date.now()
-    this.accounts[address] = new FrameAccount({ address, created, options, active: false }, this)
+    const { name } = store('main.accountsMeta', address)
+    this.accounts[address] = new FrameAccount({ name, address, created, options, active: false }, this)
   }
 
   rename (id: string, name: string) {
     this.accounts[id].rename(name)
+    this.update(this.accounts[id].summary())
   }
 
   update (account: Account) {

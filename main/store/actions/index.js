@@ -133,10 +133,13 @@ module.exports = {
     })
   },
   updateAccount: (u, updatedAccount) => {
-    u('main.accounts', updatedAccount.id, account => {
+    u('main.accounts', updatedAccount.id, (account = {}) => {
       // if (account) return updatedAccount // Account exists
       // if (add) return updatedAccount // Account is new and should be added
-      return { ...updatedAccount, balances: (account || {}).balances }
+      return { ...updatedAccount, balances: account.balances }
+    })
+    u('main.accountsMeta', updatedAccount.id, (accountMeta = {}) => {
+      return { ...accountMeta, name: updatedAccount.name }
     })
   },
   removeAccount: (u, id) => {
