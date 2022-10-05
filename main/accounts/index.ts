@@ -9,7 +9,7 @@ import store from '../store'
 import ExternalDataScanner, { DataScanner } from '../externalData'
 import { getType as getSignerType } from '../signers/Signer'
 import FrameAccount from './Account'
-import { usesBaseFee, TransactionData } from '../../resources/domain/transaction'
+import { usesBaseFee, TransactionData, GasFeesSource } from '../../resources/domain/transaction'
 import { signerCompatibility, maxFee, SignerCompatibility } from '../transaction'
 import { weiIntToEthInt, hexToInt } from '../../resources/utils'
 import provider from '../provider'
@@ -735,17 +735,17 @@ export class Accounts extends EventEmitter {
     if (request.feesUpdatedByUser && !userUpdate) throw new Error('Fee has been updated by user')
 
     const tx = request.data
+    const { gasFeesSource, type: txType } = tx
     const gasLimit = parseInt(tx.gasLimit || '0x0', 16)
-    const txType = tx.type
 
     if (usesBaseFee(tx)) {
       const maxFeePerGas = parseInt(tx.maxFeePerGas || '0x0', 16)
       const maxPriorityFeePerGas = parseInt(tx.maxPriorityFeePerGas || '0x0', 16)
       const currentBaseFee = maxFeePerGas - maxPriorityFeePerGas
-      return { currentAccount, inputValue, maxFeePerGas, maxPriorityFeePerGas, gasLimit, currentBaseFee, txType, gasPrice: 0 }
+      return { currentAccount, inputValue, maxFeePerGas, maxPriorityFeePerGas, gasLimit, currentBaseFee, txType, gasFeesSource, gasPrice: 0 }
     } else {
       const gasPrice = parseInt(tx.gasPrice || '0x0', 16)
-      return { currentAccount, inputValue, gasPrice, gasLimit, txType, currentBaseFee: 0, maxPriorityFeePerGas: 0, maxFeePerGas: 0 }
+      return { currentAccount, inputValue, gasPrice, gasLimit, txType, gasFeesSource, currentBaseFee: 0, maxPriorityFeePerGas: 0, maxFeePerGas: 0 }
     }
   }
 
@@ -768,7 +768,11 @@ export class Accounts extends EventEmitter {
 
   setBaseFee (baseFee: string, handlerId: string, userUpdate: boolean, cb: Callback<void>) {
     try {
-      const { currentAccount, maxPriorityFeePerGas, gasLimit, currentBaseFee, txType } = this.txFeeUpdate(baseFee, handlerId, userUpdate)
+      const { currentAccount, maxPriorityFeePerGas, gasLimit, currentBaseFee, txType, gasFeesSource } = this.txFeeUpdate(baseFee, handlerId, userUpdate)
+
+      if (gasFeesSource === GasFeesSource.Dapp) {
+        return cb(null)
+      }
       
       // New value
       const newBaseFee = parseInt(this.limitedHexValue(baseFee, 0, 9999 * 1e9), 16)
@@ -801,8 +805,12 @@ export class Accounts extends EventEmitter {
 
   setPriorityFee (priorityFee: string, handlerId: string, userUpdate: boolean, cb: Callback<void>) {
     try {
-      const { currentAccount, maxPriorityFeePerGas, gasLimit, currentBaseFee, txType } = this.txFeeUpdate(priorityFee, handlerId, userUpdate)
+      const { currentAccount, maxPriorityFeePerGas, gasLimit, currentBaseFee, txType, gasFeesSource } = this.txFeeUpdate(priorityFee, handlerId, userUpdate)
       
+      if (gasFeesSource === GasFeesSource.Dapp) {
+        return cb(null)
+      }
+
       // New values
       const newMaxPriorityFeePerGas = parseInt(this.limitedHexValue(priorityFee, 0, 9999 * 1e9), 16)
 
@@ -841,7 +849,11 @@ export class Accounts extends EventEmitter {
 
   setGasPrice (price: string, handlerId: string, userUpdate: boolean, cb: Callback<void>) {
     try {
-      const { currentAccount, gasLimit, gasPrice, txType } = this.txFeeUpdate(price, handlerId, userUpdate)
+      const { currentAccount, gasLimit, gasPrice, txType, gasFeesSource } = this.txFeeUpdate(price, handlerId, userUpdate)
+
+      if (gasFeesSource === GasFeesSource.Dapp) {
+        return cb(null)
+      }
 
       // New values
       const newGasPrice = parseInt(this.limitedHexValue(price, 0, 9999 * 1e9), 16)
@@ -874,7 +886,11 @@ export class Accounts extends EventEmitter {
 
   setGasLimit (limit: string, handlerId: string, userUpdate: boolean, cb: Callback<void>) {
     try {
-      const { currentAccount, maxFeePerGas, gasPrice, txType } = this.txFeeUpdate(limit, handlerId, userUpdate)
+      const { currentAccount, maxFeePerGas, gasPrice, txType, gasFeesSource } = this.txFeeUpdate(limit, handlerId, userUpdate)
+
+      if (gasFeesSource === GasFeesSource.Dapp) {
+        return cb(null)
+      }
       
       // New values
       const newGasLimit = parseInt(this.limitedHexValue(limit, 0, 12.5e6), 16)
