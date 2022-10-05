@@ -521,6 +521,12 @@ const migrations = {
     })
 
     return initial
+  },
+  25: (initial) => {
+    // add accountsMeta
+    initial.main.accountsMeta = {}
+
+    return initial
   }
 }
 
