@@ -17,14 +17,14 @@ export default (props) => {
         showExpand={true}
         showToggle={true}
       />
-      {on ? (
+      {on && (
         <div className='chainModules'>
           <Connection {...props} />
           <Gas chainId={id} /> 
           <ChainFooter symbol={symbol} price={price} />
           <div style={{ height: '14px' }} />
         </div>
-      ) : null}
+      )}
     </div>
   )
 }

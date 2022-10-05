@@ -17,10 +17,15 @@ export default (props) => {
   const [currentExplorer, setExplorer] = useState(explorer)
   const [currentTestnet, setTestnet] = useState(isTestnet)
 
+  // effects
   useEffect(() => {
     const updatedChain = { id, type, name: currentName, primaryColor: currentColor, isTestnet: currentTestnet, symbol: currentSymbol, explorer: currentExplorer }
     link.send('tray:action', 'updateNetwork', chain, updatedChain)
   }, [currentColor, currentName, currentSymbol, currentExplorer, currentTestnet])
+
+  useEffect(() => {
+    link.send('tray:action', 'setChainColor', chain.id, currentColor)
+  }, [currentColor])
 
   const isMainnet = id === 1
 
@@ -37,10 +42,7 @@ export default (props) => {
       />
       <EditChainColor 
         currentColor={primaryColor} 
-        onChange={color => {
-          setPrimaryColor(color)
-          link.send('tray:action', 'setChainColor', chain.id, color)
-        }}
+        onChange={setPrimaryColor}
       />
       <EditChainName
         currentName={currentName}

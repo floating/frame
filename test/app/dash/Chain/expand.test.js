@@ -12,7 +12,6 @@ jest.mock('../../../../resources/link', () => ({ send: jest.fn() }))
 const Chain = Restore.connect(ChainComponent, store)
 
 beforeAll(() => {
-  jest.useFakeTimers()
   store.addNetwork({
     id: 1337,
     type: 'ethereum',

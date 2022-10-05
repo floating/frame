@@ -37,15 +37,15 @@ export const ChainHeader = ({ type, id, primaryColor, icon, svgName, name, on, s
         </div>
       </div>
       <div className='signerMenuItems'>
-        {showExpand ? (
+        {showExpand && (
           <div className='signerExpand' onClick={() => {
             const chain = { id, type }
             link.send('tray:action', 'navDash', { view: 'chains', data: { selectedChain: chain } })
           }}>
             {svg.bars(14)}
           </div>
-        ) : null}
-        {showToggle ? <div 
+        )}
+        {showToggle && <div 
           className={on ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} 
           onClick={!isMainnet ? () => link.send('tray:action', 'activateNetwork', type, id, !on) : null}
         >
@@ -57,7 +57,7 @@ export const ChainHeader = ({ type, id, primaryColor, icon, svgName, name, on, s
           ) : (
             <div className='signerPermissionToggleSwitch' />
           )}
-        </div> : null}
+        </div>}
       </div>
     </div>
   )
