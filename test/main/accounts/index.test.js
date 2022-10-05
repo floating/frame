@@ -2,6 +2,7 @@ import log from 'electron-log'
 import { addHexPrefix } from 'ethereumjs-util'
 import store from '../../../main/store'
 import provider from '../../../main/provider'
+import { GasFeesSource } from '../../../resources/domain/transaction'
 
 jest.mock('../../../main/provider', () => ({ send: jest.fn(), emit: jest.fn() }))
 jest.mock('../../../main/signers', () => ({ get: jest.fn() }))
@@ -173,6 +174,16 @@ describe('#setBaseFee', () => {
     }, 1, false)
   })
 
+  it('does not set a base fee on an automatic update if fees were set by the dapp', done => {
+    request.data.gasFeesSource = GasFeesSource.Dapp
+
+    setBaseFee('0x1dcd65000', err => {
+      expect(err.message).toBeTruthy()
+      expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(request.data.maxFeePerGas)
+      done()
+    }, 1, false)
+  })
+
   it('applies automatic base fee update', done => {
     request.data.maxFeePerGas = gweiToHex(10)
     request.data.maxPriorityFeePerGas = gweiToHex(2)
@@ -324,6 +335,16 @@ describe('#setPriorityFee', () => {
 
   it('does not set a priority fee on an automatic update if fees were manually set by the user', done => {
     request.feesUpdatedByUser = true
+
+    setPriorityFee('0x12a05f200', err => {
+      expect(err.message).toBeTruthy()
+      expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(request.data.maxFeePerGas)
+      done()
+    }, 1, false)
+  })
+
+  it('does not set a priority fee on an automatic update if fees were set by the dapp', done => {
+    request.data.gasFeesSource = GasFeesSource.Dapp
 
     setPriorityFee('0x12a05f200', err => {
       expect(err.message).toBeTruthy()
@@ -485,6 +506,16 @@ describe('#setGasPrice', () => {
     }, 1, false)
   })
 
+  it('does not set a gas price on an automatic update if fees were set by the dapp', done => {
+    request.data.gasFeesSource = GasFeesSource.Dapp
+
+    setGasPrice('0x23', err => {
+      expect(err.message).toBeTruthy()
+      expect(Accounts.current().requests[1].data.gasPrice).toBe(request.data.gasPrice)
+      done()
+    }, 1, false)
+  })
+
   it('sets a valid gas price', done => {
     setGasPrice('0x23', err => {
       try {
@@ -615,6 +646,16 @@ describe('#setGasLimit', () => {
 
   it('does not set a gas limit on an automatic update if fees were manually set by the user', done => {
     request.feesUpdatedByUser = true
+
+    setGasLimit('0x61a8', err => {
+      expect(err.message).toBeTruthy()
+      expect(Accounts.current().requests[1].data.gasLimit).toBe(request.data.gasLimit)
+      done()
+    }, 1, false)
+  })
+
+  it('does not set a gas limit on an automatic update if fees were set by the dapp', done => {
+    request.data.gasFeesSource = GasFeesSource.Dapp
 
     setGasLimit('0x61a8', err => {
       expect(err.message).toBeTruthy()
