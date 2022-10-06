@@ -16,6 +16,15 @@ const { resolveName } = require('../accounts/aragon')
 const { arraysEqual, randomLetters } = require('../../resources/utils')
 const { default: TrezorBridge } = require('../../main/signers/trezor/bridge')
 
+const callbackWhenDone = (fn, cb) => {
+  try {
+    fn()
+    cb(null)
+  } catch (e) {
+    cb (e)
+  }
+}
+
 const rpc = {
   getState: cb => {
     cb(null, store())
@@ -221,19 +230,16 @@ const rpc = {
     accounts.verifyAddress(true, res)
   },
   setBaseFee (fee, handlerId, cb) {
-    accounts.setBaseFee(fee, handlerId, true, cb)
-    // store.setGasDefault(netType, netId, level, price)
+    callbackWhenDone(() => accounts.setBaseFee(fee, handlerId, true), cb)
   },
   setPriorityFee (fee, handlerId, cb) {
-    accounts.setPriorityFee(fee, handlerId, true, cb)
-    // store.setGasDefault(netType, netId, level, price)
+    callbackWhenDone(() => accounts.setPriorityFee(fee, handlerId, true), cb)
   },
   setGasPrice (price,handlerId, cb) {
-    accounts.setGasPrice(price, handlerId, true, cb)
-    // store.setGasDefault(netType, netId, level, price)
+    callbackWhenDone(() => accounts.setGasPrice(price, handlerId, true), cb)
   },
   setGasLimit (limit, handlerId, cb) {
-    accounts.setGasLimit(limit, handlerId, true, cb)
+    callbackWhenDone(() => accounts.setGasLimit(limit, handlerId, true), cb)
   },
   removeFeeUpdateNotice (handlerId, cb) {
     accounts.removeFeeUpdateNotice(handlerId, cb)

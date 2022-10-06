@@ -418,17 +418,21 @@ export class Accounts extends EventEmitter {
           (!chainId || parseInt(req.data.chainId, 16) === chainId))
 
       transactions.forEach(([id, req]) => {
-        const tx = req.data
-        const chain = { type: 'ethereum', id: parseInt(tx.chainId, 16) }
-        const gas = store('main.networksMeta', chain.type, chain.id, 'gas')
+        try {
+          const tx = req.data
+          const chain = { type: 'ethereum', id: parseInt(tx.chainId, 16) }
+          const gas = store('main.networksMeta', chain.type, chain.id, 'gas')
 
-        if (usesBaseFee(tx)) {
-          const { maxBaseFeePerGas, maxPriorityFeePerGas } = gas.price.fees
-          this.setPriorityFee(maxPriorityFeePerGas, id, false, e => { if (e) log.error(e) })
-          this.setBaseFee(maxBaseFeePerGas, id, false, e => { if (e) log.error(e) })
-        } else {
-          const gasPrice = gas.price.levels.fast
-          this.setGasPrice(gasPrice, id, false, e => { if (e) log.error(e) })
+          if (usesBaseFee(tx)) {
+            const { maxBaseFeePerGas, maxPriorityFeePerGas } = gas.price.fees
+            this.setPriorityFee(maxPriorityFeePerGas, id, false)
+            this.setBaseFee(maxBaseFeePerGas, id, false)
+          } else {
+            const gasPrice = gas.price.levels.fast
+            this.setGasPrice(gasPrice, id, false)
+          }
+        } catch (e) {
+          log.error('Could not update gas fees for transaction', e)
         }
       })
     }
@@ -758,7 +762,7 @@ export class Accounts extends EventEmitter {
     }
   }
 
-  private completeTxFeeUpdate (currentAccount: FrameAccount, handlerId: string, userUpdate: boolean, previousFee: any, cb: Callback<void>) {
+  private completeTxFeeUpdate (currentAccount: FrameAccount, handlerId: string, userUpdate: boolean, previousFee: any) {
     const txRequest = this.getTransactionRequest(currentAccount, handlerId)
 
     if (userUpdate) {
@@ -771,139 +775,121 @@ export class Accounts extends EventEmitter {
     }
 
     currentAccount.update()
-
-    cb(null)
   }
 
-  setBaseFee (baseFee: string, handlerId: string, userUpdate: boolean, cb: Callback<void>) {
-    try {
-      const { currentAccount, maxPriorityFeePerGas, gasLimit, currentBaseFee, txType } = this.txFeeUpdate(baseFee, handlerId, userUpdate)
-      
-      // New value
-      const newBaseFee = parseInt(this.limitedHexValue(baseFee, 0, 9999 * 1e9), 16)
+  setBaseFee (baseFee: string, handlerId: string, userUpdate: boolean) {
+    const { currentAccount, maxPriorityFeePerGas, gasLimit, currentBaseFee, txType } = this.txFeeUpdate(baseFee, handlerId, userUpdate)
 
-      // No change
-      if (newBaseFee === currentBaseFee) return cb(null)
+    // New value
+    const newBaseFee = parseInt(this.limitedHexValue(baseFee, 0, 9999 * 1e9), 16)
 
-      const txRequest = this.getTransactionRequest(currentAccount, handlerId)
-      const tx = txRequest.data
+    // No change
+    if (newBaseFee === currentBaseFee) return
 
-      // New max fee per gas
-      const newMaxFeePerGas = newBaseFee + maxPriorityFeePerGas
-      const maxTotalFee = maxFee(tx)
+    const txRequest = this.getTransactionRequest(currentAccount, handlerId)
+    const tx = txRequest.data
 
-      // Limit max fee
-      if (newMaxFeePerGas * gasLimit > maxTotalFee) {
-        tx.maxFeePerGas = intToHex(Math.floor(maxTotalFee / gasLimit))
-      } else {
-        tx.maxFeePerGas = intToHex(newMaxFeePerGas)
-      }
+    // New max fee per gas
+    const newMaxFeePerGas = newBaseFee + maxPriorityFeePerGas
+    const maxTotalFee = maxFee(tx)
 
-      // Complete update
-      const previousFee = { type: txType, baseFee: intToHex(currentBaseFee), priorityFee: intToHex(maxPriorityFeePerGas) }
-
-      this.completeTxFeeUpdate(currentAccount, handlerId, userUpdate, previousFee, cb)
-    } catch (e) {
-      cb(e as Error)
+    // Limit max fee
+    if (newMaxFeePerGas * gasLimit > maxTotalFee) {
+      tx.maxFeePerGas = intToHex(Math.floor(maxTotalFee / gasLimit))
+    } else {
+      tx.maxFeePerGas = intToHex(newMaxFeePerGas)
     }
+
+    // Complete update
+    const previousFee = { type: txType, baseFee: intToHex(currentBaseFee), priorityFee: intToHex(maxPriorityFeePerGas) }
+
+    this.completeTxFeeUpdate(currentAccount, handlerId, userUpdate, previousFee)
   }
 
-  setPriorityFee (priorityFee: string, handlerId: string, userUpdate: boolean, cb: Callback<void>) {
-    try {
-      const { currentAccount, maxPriorityFeePerGas, gasLimit, currentBaseFee, txType } = this.txFeeUpdate(priorityFee, handlerId, userUpdate)
-      
-      // New values
-      const newMaxPriorityFeePerGas = parseInt(this.limitedHexValue(priorityFee, 0, 9999 * 1e9), 16)
-
-      // No change
-      if (newMaxPriorityFeePerGas === maxPriorityFeePerGas) return cb(null)
-
-      const tx = this.getTransactionRequest(currentAccount, handlerId).data
-
-      // New max fee per gas
-      const newMaxFeePerGas = currentBaseFee + newMaxPriorityFeePerGas
-      const maxTotalFee = maxFee(tx)
+  setPriorityFee (priorityFee: string, handlerId: string, userUpdate: boolean) {
+    const { currentAccount, maxPriorityFeePerGas, gasLimit, currentBaseFee, txType } = this.txFeeUpdate(priorityFee, handlerId, userUpdate)
     
-      // Limit max fee
-      if (newMaxFeePerGas * gasLimit > maxTotalFee) {
-        const limitedMaxFeePerGas = Math.floor(maxTotalFee / gasLimit)
-        const limitedMaxPriorityFeePerGas = limitedMaxFeePerGas - currentBaseFee
-        tx.maxPriorityFeePerGas = intToHex(limitedMaxPriorityFeePerGas)
-        tx.maxFeePerGas = intToHex(limitedMaxFeePerGas)
-      } else {
-        tx.maxFeePerGas = intToHex(newMaxFeePerGas)
-        tx.maxPriorityFeePerGas = intToHex(newMaxPriorityFeePerGas)
-      }
+    // New values
+    const newMaxPriorityFeePerGas = parseInt(this.limitedHexValue(priorityFee, 0, 9999 * 1e9), 16)
+
+    // No change
+    if (newMaxPriorityFeePerGas === maxPriorityFeePerGas) return
+
+    const tx = this.getTransactionRequest(currentAccount, handlerId).data
+
+    // New max fee per gas
+    const newMaxFeePerGas = currentBaseFee + newMaxPriorityFeePerGas
+    const maxTotalFee = maxFee(tx)
+  
+    // Limit max fee
+    if (newMaxFeePerGas * gasLimit > maxTotalFee) {
+      const limitedMaxFeePerGas = Math.floor(maxTotalFee / gasLimit)
+      const limitedMaxPriorityFeePerGas = limitedMaxFeePerGas - currentBaseFee
+      tx.maxPriorityFeePerGas = intToHex(limitedMaxPriorityFeePerGas)
+      tx.maxFeePerGas = intToHex(limitedMaxFeePerGas)
+    } else {
+      tx.maxFeePerGas = intToHex(newMaxFeePerGas)
+      tx.maxPriorityFeePerGas = intToHex(newMaxPriorityFeePerGas)
+    }
+  
+    const previousFee = { 
+      type: txType, 
+      baseFee: intToHex(currentBaseFee),
+      priorityFee: intToHex(maxPriorityFeePerGas)
+    }
+
+    // Complete update
+    this.completeTxFeeUpdate(currentAccount, handlerId, userUpdate, previousFee)
+  }
+
+  setGasPrice (price: string, handlerId: string, userUpdate: boolean) {
+    const { currentAccount, gasLimit, gasPrice, txType } = this.txFeeUpdate(price, handlerId, userUpdate)
+
+    // New values
+    const newGasPrice = parseInt(this.limitedHexValue(price, 0, 9999 * 1e9), 16)
+
+    // No change
+    if (newGasPrice === gasPrice) return
+
+    const txRequest = this.getTransactionRequest(currentAccount, handlerId)
+    const tx = txRequest.data
+    const maxTotalFee = maxFee(tx)
+
+    // Limit max fee
+    if (newGasPrice * gasLimit > maxTotalFee) {
+      tx.gasPrice = intToHex(Math.floor(maxTotalFee / gasLimit))
+    } else {
+      tx.gasPrice = intToHex(newGasPrice)
+    }
+
+    const previousFee = {
+      type: txType, 
+      gasPrice: intToHex(gasPrice)
+    }
+
+    // Complete update
+    this.completeTxFeeUpdate(currentAccount, handlerId, userUpdate, previousFee)
+  }
+
+  setGasLimit (limit: string, handlerId: string, userUpdate: boolean) {
+    const { currentAccount, maxFeePerGas, gasPrice, txType } = this.txFeeUpdate(limit, handlerId, userUpdate)
     
-      const previousFee = { 
-        type: txType, 
-        baseFee: intToHex(currentBaseFee),
-        priorityFee: intToHex(maxPriorityFeePerGas)
-      }
+    // New values
+    const newGasLimit = parseInt(this.limitedHexValue(limit, 0, 12.5e6), 16)
 
-      // Complete update
-      this.completeTxFeeUpdate(currentAccount, handlerId, userUpdate, previousFee, cb)
-    } catch (e) {
-      cb(e as Error)
+    const txRequest = this.getTransactionRequest(currentAccount, handlerId)
+    const tx = txRequest.data
+    const maxTotalFee = maxFee(tx)
+
+    const fee = txType === '0x2' ? maxFeePerGas : gasPrice
+    if (newGasLimit * fee > maxTotalFee) {
+      tx.gasLimit = intToHex(Math.floor(maxTotalFee / fee))
+    } else {
+      tx.gasLimit = intToHex(newGasLimit)
     }
-  }
 
-  setGasPrice (price: string, handlerId: string, userUpdate: boolean, cb: Callback<void>) {
-    try {
-      const { currentAccount, gasLimit, gasPrice, txType } = this.txFeeUpdate(price, handlerId, userUpdate)
-
-      // New values
-      const newGasPrice = parseInt(this.limitedHexValue(price, 0, 9999 * 1e9), 16)
-
-      // No change
-      if (newGasPrice === gasPrice) return cb(null)
-
-      const txRequest = this.getTransactionRequest(currentAccount, handlerId)
-      const tx = txRequest.data
-      const maxTotalFee = maxFee(tx)
-
-      // Limit max fee
-      if (newGasPrice * gasLimit > maxTotalFee) {
-        tx.gasPrice = intToHex(Math.floor(maxTotalFee / gasLimit))
-      } else {
-        tx.gasPrice = intToHex(newGasPrice)
-      }
-
-      const previousFee = {
-        type: txType, 
-        gasPrice: intToHex(gasPrice)
-      }
-
-      // Complete update
-      this.completeTxFeeUpdate(currentAccount, handlerId, userUpdate, previousFee, cb)
-    } catch (e) {
-      cb(e as Error)
-    }
-  }
-
-  setGasLimit (limit: string, handlerId: string, userUpdate: boolean, cb: Callback<void>) {
-    try {
-      const { currentAccount, maxFeePerGas, gasPrice, txType } = this.txFeeUpdate(limit, handlerId, userUpdate)
-      
-      // New values
-      const newGasLimit = parseInt(this.limitedHexValue(limit, 0, 12.5e6), 16)
-
-      const txRequest = this.getTransactionRequest(currentAccount, handlerId)
-      const tx = txRequest.data
-      const maxTotalFee = maxFee(tx)
-
-      const fee = txType === '0x2' ? maxFeePerGas : gasPrice
-      if (newGasLimit * fee > maxTotalFee) {
-        tx.gasLimit = intToHex(Math.floor(maxTotalFee / fee))
-      } else {
-        tx.gasLimit = intToHex(newGasLimit)
-      }
-
-      // Complete update
-      this.completeTxFeeUpdate(currentAccount, handlerId, userUpdate, false, cb)
-    } catch (e) {
-      cb(e as Error)
-    }
+    // Complete update
+    this.completeTxFeeUpdate(currentAccount, handlerId, userUpdate, false)
   }
 
   removeFeeUpdateNotice (handlerId: string, cb: Callback<void>) {
