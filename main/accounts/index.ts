@@ -9,7 +9,7 @@ import store from '../store'
 import ExternalDataScanner, { DataScanner } from '../externalData'
 import { getType as getSignerType } from '../signers/Signer'
 import FrameAccount from './Account'
-import { usesBaseFee, TransactionData } from '../../resources/domain/transaction'
+import { usesBaseFee, TransactionData, GasFeesSource } from '../../resources/domain/transaction'
 import { signerCompatibility, maxFee, SignerCompatibility } from '../transaction'
 import { weiIntToEthInt, hexToInt } from '../../resources/utils'
 import provider from '../provider'
@@ -406,7 +406,11 @@ export class Accounts extends EventEmitter {
       const transactions = Object.entries(currentAccount.requests)
         .filter(([_, req]) => req.type === 'transaction')
         .map(([_, req]) => [_, req] as [string, TransactionRequest])
-        .filter(([_, req]) => !req.locked && !req.feesUpdatedByUser && (!chainId || parseInt(req.data.chainId, 16) === chainId))
+        .filter(([_, req]) => 
+          !req.locked &&
+          !req.feesUpdatedByUser &&
+          req.data.gasFeesSource === GasFeesSource.Frame &&
+          (!chainId || parseInt(req.data.chainId, 16) === chainId))
 
       transactions.forEach(([id, req]) => {
         const tx = req.data
