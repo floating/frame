@@ -9,7 +9,7 @@ import store from '../store'
 import ExternalDataScanner, { DataScanner } from '../externalData'
 import { getType as getSignerType } from '../signers/Signer'
 import FrameAccount from './Account'
-import { usesBaseFee, TransactionData } from '../../resources/domain/transaction'
+import { usesBaseFee, TransactionData, GasFeesSource } from '../../resources/domain/transaction'
 import { signerCompatibility, maxFee, SignerCompatibility } from '../transaction'
 import { weiIntToEthInt, hexToInt } from '../../resources/utils'
 import provider from '../provider'
@@ -87,14 +87,19 @@ export class Accounts extends EventEmitter {
     cb(null, this.accounts[account.address].summary())
   }
 
-  async add (address: Address, options = {}, cb: Callback<Account> = () => {}) {
+  async add (address: Address, options = {}, cb: Callback<FrameAccount> = () => {}) {
     if (!address) return cb(new Error('No address, will not add account'))
     address = address.toLowerCase()
-    const account = store('main.accounts', address)
-    if (account) return cb(null, account) // Account already exists...
-    log.info('Account not found, creating account')
-    const created = 'new:' + Date.now()
-    this.accounts[address] = new FrameAccount({ address, created, options, active: false }, this)
+
+    let account = store('main.accounts', address)
+    if (!account) {
+      log.info(`Account ${address} not found, creating account`)
+      const created = 'new:' + Date.now()
+      this.accounts[address] = new FrameAccount({ address, created, options, active: false }, this)
+      account = this.accounts[address]
+    }
+
+    return cb(null, account)
   }
 
   rename (id: string, name: string) {
@@ -406,7 +411,11 @@ export class Accounts extends EventEmitter {
       const transactions = Object.entries(currentAccount.requests)
         .filter(([_, req]) => req.type === 'transaction')
         .map(([_, req]) => [_, req] as [string, TransactionRequest])
-        .filter(([_, req]) => !req.locked && !req.feesUpdatedByUser && (!chainId || parseInt(req.data.chainId, 16) === chainId))
+        .filter(([_, req]) => 
+          !req.locked &&
+          !req.feesUpdatedByUser &&
+          req.data.gasFeesSource === GasFeesSource.Frame &&
+          (!chainId || parseInt(req.data.chainId, 16) === chainId))
 
       transactions.forEach(([id, req]) => {
         const tx = req.data
