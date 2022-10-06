@@ -94,7 +94,7 @@ export class Accounts extends EventEmitter {
     if (account) return cb(null, account) // Account already exists...
     log.info('Account not found, creating account')
     const created = 'new:' + Date.now()
-    const { name } = store('main.accountsMeta', address)
+    const { name = '' } = store('main.accountsMeta', address) || {}
     this.accounts[address] = new FrameAccount({ name, address, created, options, active: false }, this)
   }
 
