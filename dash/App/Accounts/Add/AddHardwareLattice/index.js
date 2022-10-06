@@ -75,7 +75,7 @@ class AddHardwareLattice extends React.Component {
     this.focusActive()
   }
 
-  createLattice () {
+  createLattice (cb) {
     link.rpc('createLattice', this.state.deviceId, this.state.deviceName, (err, signer) => {
       if (err) {
         this.setState({ status: err, error: true })
@@ -86,6 +86,7 @@ class AddHardwareLattice extends React.Component {
           data: { signer: signer.id }
         }
         link.send('tray:action', 'navDash', crumb)
+        cb()
       }
     })
   }
@@ -167,8 +168,7 @@ class AddHardwareLattice extends React.Component {
                       onBlur={e => this.onBlur('deviceId', e)} 
                       onKeyPress={e => { 
                         if (e.key === 'Enter') {
-                          this.createLattice()
-                          this.next()
+                          this.createLattice(() => this.next())
                         }
                       }}
                     />
@@ -176,8 +176,7 @@ class AddHardwareLattice extends React.Component {
                   <div
                     className='addAccountItemOptionSubmit'
                     onMouseDown={() => {
-                      this.createLattice()
-                      this.next()
+                      this.createLattice(() => this.next())
                     }}
                   >Create
                   </div>
