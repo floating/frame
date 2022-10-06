@@ -2,8 +2,10 @@ import log from 'electron-log'
 import { addHexPrefix } from 'ethereumjs-util'
 import store from '../../../main/store'
 import provider from '../../../main/provider'
+import Accounts from '../../../main/accounts'
+import { GasFeesSource } from '../../../resources/domain/transaction'
 
-jest.mock('../../../main/provider', () => ({ send: jest.fn(), emit: jest.fn() }))
+jest.mock('../../../main/provider', () => ({ send: jest.fn(), emit: jest.fn(), on: jest.fn() }))
 jest.mock('../../../main/signers', () => ({ get: jest.fn() }))
 jest.mock('../../../main/windows', () => ({ broadcast: jest.fn(), showTray: jest.fn() }))
 jest.mock('../../../main/windows/nav', () => ({ on: jest.fn(), forward: jest.fn() }))
@@ -28,6 +30,7 @@ const account = {
   tokens: {},
   created: '12819530:1626189153547'
 }
+
 const account2 = {
   id: '0xef8f1bbe054ad30c6af774ed7a7c70a74ef77ac5',
   name: 'Ledger Account',
@@ -41,27 +44,17 @@ const account2 = {
   created: '15315799:1660153882707',
 } 
 
-let Accounts, request
+let request
 
-beforeAll(async () => {
+beforeAll(() => {
   log.transports.console.level = false
-
-  jest.useFakeTimers()
-
-  store.updateAccount(account)
-  store.updateAccount(account2)
-
-  // need to import this after mocks are set up
-  Accounts = (await import('../../../main/accounts')).default
 })
 
 afterAll(() => {
   log.transports.console.level = 'debug'
-
-  jest.useRealTimers()
 })
 
-beforeEach(() => {
+beforeEach(done => {
   request = {
     handlerId: 1,
     type: 'transaction',
@@ -82,10 +75,10 @@ beforeEach(() => {
     }
   }
 
-  Accounts.setSigner(account.address, jest.fn())
-
-  provider.emit = jest.fn()
-  provider.send = jest.fn()
+  Accounts.add(account2.address)
+  Accounts.add(account.address, account, (err, account) => {
+    Accounts.setSigner(account.address, done)
+  })
 })
 
 afterEach(() => {
@@ -98,6 +91,45 @@ afterEach(() => {
 
 it('sets the account signer', () => {
   expect(Accounts.current().address).toBe('0x22dd63c3619818fdbc262c78baee43cb61e9cccf')
+})
+
+describe('#updatePendingFees', () => {
+  beforeEach(() => {
+    request.data.gasFeesSource = GasFeesSource.Frame
+
+    store.setGasFees('ethereum', parseInt(request.data.chainId), {
+      maxBaseFeePerGas: gweiToHex(9),
+      maxPriorityFeePerGas: gweiToHex(2)
+    })
+  })
+
+  it('updates the pending fees for a transaction', () => {
+    Accounts.addRequest(request)
+    Accounts.updatePendingFees(parseInt(request.data.chainId))
+
+    expect(request.data.maxFeePerGas).toBe(gweiToHex(11))
+    expect(request.data.maxPriorityFeePerGas).toBe(gweiToHex(2))
+  })
+
+  it('does not update a transaction with gas fees provided by a dapp', () => {
+    request.data.gasFeesSource = GasFeesSource.Dapp
+
+    Accounts.addRequest(request)
+    Accounts.updatePendingFees(parseInt(request.data.chainId))
+
+    expect(request.data.maxFeePerGas).toBe(gweiToHex(9))
+    expect(request.data.maxPriorityFeePerGas).toBe(gweiToHex(1))
+  })
+
+  it('does not update a transaction if gas fees have been updated by the user', () => {
+    request.feesUpdatedByUser = true
+
+    Accounts.addRequest(request)
+    Accounts.updatePendingFees(parseInt(request.data.chainId))
+
+    expect(request.data.maxFeePerGas).toBe(gweiToHex(9))
+    expect(request.data.maxPriorityFeePerGas).toBe(gweiToHex(1))
+  })
 })
 
 describe('#setBaseFee', () => {
@@ -697,7 +729,7 @@ describe('#adjustNonce', () => {
   let onChainNonce
 
   beforeEach(() => {
-    provider.send.mockImplementation((payload, cb) => {
+    provider.send = jest.fn((payload, cb) => {
       expect(payload).toEqual(expect.objectContaining({
         id: 1,
         jsonrpc: '2.0',
