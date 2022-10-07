@@ -36,3 +36,15 @@ export function isInvalidCustomTarget (target: string) {
 
   return false
 }
+
+export function isConnected ({ status }: Connection) {
+  return status !== 'disconnected'
+}
+
+export function getActiveConnection (primary: Connection, secondary: Connection) {
+  if (secondary.on && (!primary.on || !isConnected(primary))) {
+    return secondary
+  }
+
+  return primary
+}

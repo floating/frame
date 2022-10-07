@@ -2,7 +2,7 @@ import React, { createRef } from 'react'
 import Restore from 'react-restore'
 
 import Dropdown from '../../../../../resources/Components/Dropdown'
-import { isInvalidCustomTarget } from '../../../../../resources/connections'
+import { getActiveConnection, isInvalidCustomTarget } from '../../../../../resources/connections'
 import { capitalize } from '../../../../../resources/utils'
 
 import link from '../../../../../resources/link'
@@ -32,18 +32,6 @@ const ConnectionStatus = ({ connection }) =>
       {connection.current}
     </div>
   </>
-
-function isConnected ({ status }) {
-  return status !== 'disconnected'
-}
-
-function getActiveConnection (primary, secondary) {
-  if (secondary.on && (!primary.on || !isConnected(primary))) {
-    return secondary
-  }
-
-  return primary
-}
 
 class ChainModule extends React.Component {
   constructor (props, context) {
