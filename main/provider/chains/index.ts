@@ -1,5 +1,6 @@
 // @ts-ignore
 import deepEqual from 'deep-equal'
+import { getActiveConnection, isConnected } from '../../../resources/connections'
 
 import store from '../../store'
 
@@ -67,6 +68,7 @@ function getActiveChains (): RPC.GetEthereumChains.Chain[] {
   
   return Object.values(chains)
     .filter(chain => chain.on)
+    .filter(({ connection: { primary, secondary } }) => isConnected(getActiveConnection(primary, secondary)))
     .sort((a, b) => a.id - b.id)
     .map(chain => {
       const { id, explorer, name } = chain
