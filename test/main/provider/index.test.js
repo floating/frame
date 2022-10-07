@@ -439,8 +439,8 @@ describe('#send', () => {
   describe('#wallet_getEthereumChains', () => {
     it('returns a list of active chains', () => {
       store.set('main.networks.ethereum', {
-        137: { name: 'polygon', id: 137, explorer: 'https://polygonscan.com', on: true },
-        1: { name: 'mainnet', id: 1, explorer: 'https://etherscan.io', on: true }
+        137: { name: 'polygon', id: 137, explorer: 'https://polygonscan.com', connection: { primary: {}, secondary: {} }, on: true },
+        1: { name: 'mainnet', id: 1, explorer: 'https://etherscan.io', connection: { primary: {}, secondary: {} }, on: true }
       })
 
       store.set('main.networksMeta.ethereum', {
@@ -1488,6 +1488,7 @@ describe('state change events', () => {
         name: 'test',
         id: 1,
         explorer: 'https://etherscan.io',
+        connection: { primary: {}, secondary: {} },
         on: true
       }
     }
@@ -1547,6 +1548,7 @@ describe('state change events', () => {
       name: 'Polygon',
       id: 137,
       explorer: 'https://polygonscan.com',
+      connection: { primary: {}, secondary: {} },
       on: true
     }
 
