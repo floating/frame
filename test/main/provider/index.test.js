@@ -437,12 +437,7 @@ describe('#send', () => {
   })
 
   describe('#wallet_getEthereumChains', () => {
-    it('returns a list of active chains', () => {
-      store.set('main.networks.ethereum', {
-        137: { name: 'polygon', id: 137, explorer: 'https://polygonscan.com', connection: { primary: {}, secondary: {} }, on: true },
-        1: { name: 'mainnet', id: 1, explorer: 'https://etherscan.io', connection: { primary: {}, secondary: {} }, on: true }
-      })
-
+    beforeEach(() => {
       store.set('main.networksMeta.ethereum', {
         1: {
           nativeCurrency: {
@@ -460,6 +455,13 @@ describe('#send', () => {
             icon: 'matic'
           }
         }
+      })
+    })
+
+    it('returns a list of active chains', () => {
+      store.set('main.networks.ethereum', {
+        137: { name: 'polygon', id: 137, explorer: 'https://polygonscan.com', connection: { primary: {}, secondary: {} }, on: true },
+        1: { name: 'mainnet', id: 1, explorer: 'https://etherscan.io', connection: { primary: {}, secondary: {} }, on: true }
       })
 
       send({ method: 'wallet_getEthereumChains', id: 14, jsonrpc: '2.0' }, response => {
@@ -488,6 +490,30 @@ describe('#send', () => {
             nativeCurrency: {
               name: 'Matic',
               symbol: 'MATIC',
+              decimals: 18
+            }
+          }
+        ])
+      })
+    })
+
+    it('does not return disconnected chains', () => {
+      store.set('main.networks.ethereum', {
+        137: { name: 'polygon', id: 137, explorer: 'https://polygonscan.com', connection: { primary: { status: 'disconnected' }, secondary: { status: 'disconnected' } }, on: true },
+        1: { name: 'mainnet', id: 1, explorer: 'https://etherscan.io', connection: { primary: {}, secondary: {} }, on: true }
+      })
+      
+      send({ method: 'wallet_getEthereumChains', id: 14, jsonrpc: '2.0' }, response => {
+        expect(response.result).toStrictEqual([
+          {
+            name: 'mainnet',
+            chainId: 1,
+            networkId: 1,
+            icon: [{ url: 'ethereum' }],
+            explorers: [{ url: 'https://etherscan.io' }],
+            nativeCurrency: {
+              name: 'Ether',
+              symbol: 'ETH',
               decimals: 18
             }
           }
