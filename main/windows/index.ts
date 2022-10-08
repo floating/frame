@@ -118,6 +118,9 @@ function initTrayWindow () {
   const { width, height, x, y } = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
   windows.tray.setPosition(width + x, height + y)
 
+  const hideFrame = () => tray.hide()
+  const showFrame = () => tray.show()
+
   const separatorMenuItem = {
     label: 'Frame',
     click: () => {}, 
@@ -126,7 +129,7 @@ function initTrayWindow () {
   
   const hideMenuItem = {
     label: 'Dismiss', 
-    click: () => tray.hide(), 
+    click: hideFrame, 
     accelerator: 'Alt+/', 
     registerAccelerator: false,
     toolTip: 'Dismiss Frame'
@@ -134,7 +137,7 @@ function initTrayWindow () {
 
   const showMenuItem = { 
     label: 'Summon', 
-    click: () => tray.show(), 
+    click: showFrame, 
     accelerator: 'Alt+/', 
     registerAccelerator: false,
     toolTip: 'Summon Frame'
@@ -146,7 +149,15 @@ function initTrayWindow () {
   }
 
   windows.tray.on('show', () => {
-    tray.setContextMenu(
+    if (process.platform === 'win32') {
+      tray.electronTray.off('mouse-down', showFrame)
+      tray.electronTray.on('mouse-down', hideFrame)
+    } else {
+      tray.electronTray.off('click', showFrame)
+      tray.electronTray.on('click', hideFrame)
+    }
+
+    tray.electronTray.setContextMenu(
       Menu.buildFromTemplate([
         hideMenuItem,
         separatorMenuItem,
@@ -155,7 +166,15 @@ function initTrayWindow () {
     )
   })
   windows.tray.on('hide', () => {
-    tray.setContextMenu(
+    if (process.platform === 'win32') {
+      tray.electronTray.off('mouse-down', hideFrame)
+      tray.electronTray.on('mouse-down', showFrame)
+    } else {
+      tray.electronTray.off('click', hideFrame)
+      tray.electronTray.on('click', showFrame)
+    }
+
+    tray.electronTray.setContextMenu(
       Menu.buildFromTemplate([
         showMenuItem,
         separatorMenuItem,
@@ -199,8 +218,8 @@ class Tray {
   private recentAutoHideTimeout?: NodeJS.Timeout
   private gasObserver: Observer
   private ready: boolean
-  private electronTray: ElectronTray
   private readyHandler: () => void
+  public electronTray: ElectronTray
 
   constructor () {
     this.electronTray = new ElectronTray(path.join(__dirname, process.platform === 'darwin' ? './IconTemplate.png' : './Icon.png'))
@@ -232,10 +251,6 @@ class Tray {
 
   isReady () {
     return this.ready
-  }
-
-  setContextMenu (menu: Menu) {
-    return this.electronTray.setContextMenu(menu)
   }
 
   hide (autohide: boolean = false) {
