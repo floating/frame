@@ -165,7 +165,9 @@ function initTrayWindow () {
     //   tray.electronTray.off('click', showFrame)
     //   tray.electronTray.on('click', hideFrame)
     // }
-    tray.electronTray.closeContextMenu()
+    if (process.platform === 'win32') {
+      tray.electronTray.closeContextMenu()
+    }
     tray.electronTray.setContextMenu(hideMenu)
     // tray.electronTray.popUpContextMenu()
   })
@@ -174,7 +176,9 @@ function initTrayWindow () {
     //   tray.electronTray.off('click', hideFrame)
     //   tray.electronTray.on('click', showFrame)
     // }
-    tray.electronTray.closeContextMenu()
+    if (process.platform === 'win32') {
+      tray.electronTray.closeContextMenu()
+    }
     tray.electronTray.setContextMenu(showMenu)
     // tray.electronTray.popUpContextMenu()
   })
@@ -231,13 +235,12 @@ class Tray {
       }
       this.electronTray.setTitle(title)
     })
-    const windowsTrayClickHandler = () => {
-      // this.electronTray.closeContextMenu()
-      this.toggle()
-      // this.electronTray.popUpContextMenu()
-    }  
     this.readyHandler = () => {
-      this.electronTray.on('click', windowsTrayClickHandler)
+      this.electronTray.on('click', () => {
+        if (process.platform === 'win32') {
+          this.toggle()
+        }
+      })
       if (showOnReady) {
         store.trayOpen(true)
       }
