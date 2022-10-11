@@ -193,10 +193,14 @@ function initTrayWindow () {
   
   setTimeout(() => {
     windows.tray.on('blur', () => {
-      const frameShowing = frameManager.isFrameShowing()
-      if (store('main.autohide') && !store('windows.dash.showing') && !frameShowing) {
-        tray.hide(true)
-      }
+      setTimeout(() => {
+        const frameShowing = frameManager.isFrameShowing()
+        console.log('blur', frameShowing, tray.canAutoHide())
+        if (!frameShowing && tray.canAutoHide() && store('main.autohide') && !store('windows.dash.showing')) {
+          console.log('autohide')
+          tray.hide(true)
+        }
+      }, 100)
     })
     windows.tray.focus()
   }, 1260)
@@ -215,6 +219,8 @@ function initTrayWindow () {
 }
 
 class Tray {
+  private recentElectronTrayClick = false
+  private recentElectronTrayClickTimeout?: NodeJS.Timeout
   private recentAutohide = false
   private recentAutoHideTimeout?: NodeJS.Timeout
   private gasObserver: Observer
@@ -237,6 +243,13 @@ class Tray {
     })
     this.readyHandler = () => {
       this.electronTray.on('click', () => {
+        console.log('recent tray click')
+        this.recentElectronTrayClick = true
+        clearTimeout(this.recentElectronTrayClickTimeout as NodeJS.Timeout)
+        this.recentElectronTrayClickTimeout = setTimeout(() => {
+          console.log('recent tray click timed out')
+          this.recentElectronTrayClick = false
+        }, 50);
         if (process.platform === 'win32') {
           this.toggle()
         }
@@ -261,6 +274,10 @@ class Tray {
 
   isVisible () {
     return (windows.tray as BrowserWindow).isVisible()
+  }
+
+  canAutoHide () {
+    return !this.recentElectronTrayClick
   }
 
   hide (autohide: boolean = false) {
