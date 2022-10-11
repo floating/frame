@@ -328,6 +328,7 @@ app.on('ready', () => {
       windows.showDash()
     } else {
       windows.hideDash()
+      windows.focusTray()
     }
   })
   store.observer(() => {

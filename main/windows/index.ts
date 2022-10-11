@@ -455,6 +455,9 @@ export default {
   hideDash () {
     dash.hide()
   },
+  focusTray () {
+    windows.tray.focus()
+  },
   refocusFrame (frameId: string) {
     frameManager.refocus(frameId)
   },
