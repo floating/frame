@@ -159,11 +159,11 @@ const initial = {
     colorway: main('colorway', 'dark'),
     colorwayPrimary: {
       dark: {
-        background: 'rgb(20, 17, 22)',
-        text: 'rgb(236, 241, 255)'
+        background: 'rgb(21, 17, 23)',
+        text: 'rgb(241, 241, 255)'
       },
       light: {
-        background: 'rgb(227, 221, 236)',
+        background: 'rgb(224, 217, 233)',
         text: 'rgb(20, 40, 60)'
       }
     },
