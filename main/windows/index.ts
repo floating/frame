@@ -270,13 +270,13 @@ class Tray {
   }
 
   hide (autohide: boolean = false) {
-    store.toggleDash('hide');
+    store.toggleDash('hide')
     if (autohide) {
-      this.recentAutohide = true;
-      clearTimeout(this.recentAutoHideTimeout as NodeJS.Timeout);
+      this.recentAutohide = true
+      clearTimeout(this.recentAutoHideTimeout as NodeJS.Timeout)
       this.recentAutoHideTimeout = setTimeout(() => {
-        this.recentAutohide = false;
-      }, 50);
+        this.recentAutohide = false
+      }, 50)
     }
 
     if (windows && windows.tray) {
