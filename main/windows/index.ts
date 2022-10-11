@@ -238,7 +238,7 @@ class Tray {
         clearTimeout(this.recentElectronTrayClickTimeout as NodeJS.Timeout)
         this.recentElectronTrayClickTimeout = setTimeout(() => {
           this.recentElectronTrayClick = false
-        }, 50);
+        }, 50)
         if (process.platform === 'win32') {
           this.toggle()
         }
