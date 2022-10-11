@@ -1,18 +1,5 @@
 import { padToEven } from 'ethereumjs-util'
 
-type Color = { r: number, g: number, b: number }
-
-export type ColorwayPalette = {
-  accent1: Color
-  accent2: Color
-  accent3: Color
-  accent4: Color
-  accent5: Color
-  accent6: Color
-  accent7: Color
-  accent8: Color
-}
-
 const light: ColorwayPalette = {
   accent1: { r: 0, g: 210, b: 190 },
   accent2: { r: 255, g: 153, b: 51 },

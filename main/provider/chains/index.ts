@@ -1,7 +1,7 @@
 // @ts-ignore
 import deepEqual from 'deep-equal'
 
-import { ColorwayPalette, getColor } from '../../../resources/colors'
+import { getColor } from '../../../resources/colors'
 import store from '../../store'
 
 // typed access to state
@@ -79,7 +79,7 @@ function getActiveChains (): RPC.GetEthereumChains.Chain[] {
       const { icon: currencyIcon, name: currencyName, symbol, decimals } = nativeCurrency
 
       const icons = currencyIcon ? [{ url: currencyIcon }] : []
-      const colors = primaryColor ? [getColor(primaryColor as keyof ColorwayPalette, colorway)] : []
+      const colors = primaryColor ? [getColor(primaryColor, colorway)] : []
 
       return ({
         chainId: id,
