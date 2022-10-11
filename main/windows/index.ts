@@ -150,9 +150,6 @@ function initTrayWindow () {
 
   windows.tray.on('show', () => {
     if (process.platform === 'win32') {
-      tray.electronTray.off('mouse-down', showFrame)
-      tray.electronTray.on('mouse-down', hideFrame)
-    } else {
       tray.electronTray.off('click', showFrame)
       tray.electronTray.on('click', hideFrame)
     }
@@ -167,9 +164,6 @@ function initTrayWindow () {
   })
   windows.tray.on('hide', () => {
     if (process.platform === 'win32') {
-      tray.electronTray.off('mouse-down', hideFrame)
-      tray.electronTray.on('mouse-down', showFrame)
-    } else {
       tray.electronTray.off('click', hideFrame)
       tray.electronTray.on('click', showFrame)
     }
