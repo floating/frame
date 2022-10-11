@@ -521,6 +521,9 @@ describe('#send', () => {
             networkId: 1,
             icon: [{ url: 'ethereum' }],
             explorers: [{ url: 'https://etherscan.io' }],
+            external: {
+              wallet: { colors: [{ r: 255, b: 174, g: 0, hex: '#ff00ae' }] },
+            },
             nativeCurrency: {
               name: 'Ether',
               symbol: 'ETH',
