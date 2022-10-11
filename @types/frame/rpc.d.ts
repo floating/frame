@@ -81,6 +81,17 @@ declare namespace RPC {
   }
 
   namespace GetEthereumChains {
+    interface Color {
+      r: number
+      g: number
+      b: number
+      hex: string
+    }
+
+    interface WalletMetadata {
+      colors?: Color[]
+    }
+
     interface Icon {
       url: string
       width?: number
@@ -108,6 +119,9 @@ declare namespace RPC {
       icon: Icon[]
       nativeCurrency: NativeCurrency
       explorers: Explorer[]
+      external: {
+        wallet?: WalletMetadata
+      }
     }
 
     interface Request extends Omit<RPCRequestPayload, 'method'> {
