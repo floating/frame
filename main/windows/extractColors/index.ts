@@ -104,7 +104,7 @@ async function extractColors (url: string, ens: string) {
 
   view.webContents.on('will-navigate', e => e.preventDefault())
   view.webContents.on('will-attach-webview', e => e.preventDefault())
-  view.webContents.on('new-window', e => e.preventDefault())
+  view.webContents.setWindowOpenHandler(() => ({ action: 'deny' }))
 
   view.webContents.session.webRequest.onBeforeSendHeaders((details, cb) => {
     if (!details || !details.frame) return cb({ cancel: true }) // Reject the request

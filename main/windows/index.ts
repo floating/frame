@@ -151,7 +151,7 @@ function initTrayWindow () {
   windows.tray.on('closed', () => delete windows.tray)
   windows.tray.webContents.on('will-navigate', e => e.preventDefault()) // Prevent navigation
   windows.tray.webContents.on('will-attach-webview', e => e.preventDefault()) // Prevent attaching <webview>
-  windows.tray.webContents.on('new-window', e => e.preventDefault()) // Prevent new windows
+  windows.tray.webContents.setWindowOpenHandler(() => ({ action: 'deny' })) // Prevent new windows
   windows.tray.webContents.session.setPermissionRequestHandler((webContents, permission, res) => res(false))
   windows.tray.setResizable(false)
   windows.tray.setMovable(false)
@@ -373,7 +373,7 @@ ipcMain.on('tray:mouseout', () => {
 app.on('web-contents-created', (_e, contents) => {
   contents.on('will-navigate', e => e.preventDefault())
   contents.on('will-attach-webview', e => e.preventDefault())
-  contents.on('new-window', e => e.preventDefault())
+  contents.setWindowOpenHandler(() => ({ action: 'deny' }))
 })
 
 app.on('ready', () => {
