@@ -24,6 +24,48 @@ let dash: Dash
 let mouseTimeout: NodeJS.Timeout
 let glide = false
 
+const hideFrame = () => tray.hide()
+const showFrame = () => tray.show()
+
+const separatorMenuItem = {
+  label: 'Frame',
+  click: () => {}, 
+  type: 'separator'
+}
+
+const hideMenuItem = {
+  label: 'Dismiss', 
+  click: hideFrame, 
+  accelerator: 'Alt+/', 
+  registerAccelerator: false,
+  toolTip: 'Dismiss Frame'
+}
+
+const showMenuItem = { 
+  label: 'Summon', 
+  click: showFrame, 
+  accelerator: 'Alt+/', 
+  registerAccelerator: false,
+  toolTip: 'Summon Frame'
+}
+
+const quitMenuItem = {
+  label: 'Quit',
+  click: () => app.quit()
+}
+
+const hideMenu = Menu.buildFromTemplate([
+  hideMenuItem,
+  separatorMenuItem,
+  quitMenuItem
+])
+
+const showMenu = Menu.buildFromTemplate([
+  showMenuItem,
+  separatorMenuItem,
+  quitMenuItem
+])
+
 const topRight = (window: BrowserWindow) => {
   const area = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
   const screenSize = area
@@ -118,64 +160,25 @@ function initTrayWindow () {
   const { width, height, x, y } = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
   windows.tray.setPosition(width + x, height + y)
 
-  const hideFrame = () => tray.hide()
-  const showFrame = () => tray.show()
-
-  const separatorMenuItem = {
-    label: 'Frame',
-    click: () => {}, 
-    type: 'separator'
-  }
-  
-  const hideMenuItem = {
-    label: 'Dismiss', 
-    click: hideFrame, 
-    accelerator: 'Alt+/', 
-    registerAccelerator: false,
-    toolTip: 'Dismiss Frame'
-  }
-
-  const showMenuItem = { 
-    label: 'Summon', 
-    click: showFrame, 
-    accelerator: 'Alt+/', 
-    registerAccelerator: false,
-    toolTip: 'Summon Frame'
-  }
-
-  const quitMenuItem = {
-    label: 'Quit',
-    click: () => app.quit()
-  }
-
   windows.tray.on('show', () => {
-    if (process.platform === 'win32') {
-      tray.electronTray.off('click', showFrame)
-      tray.electronTray.on('click', hideFrame)
-    }
-
-    tray.electronTray.setContextMenu(
-      Menu.buildFromTemplate([
-        hideMenuItem,
-        separatorMenuItem,
-        quitMenuItem
-      ])
-    )
+    // if (process.platform === 'win32') {
+    //   tray.electronTray.off('click', showFrame)
+    //   tray.electronTray.on('click', hideFrame)
+    // }
+    tray.electronTray.closeContextMenu()
+    tray.electronTray.setContextMenu(hideMenu)
+    // tray.electronTray.popUpContextMenu()
   })
   windows.tray.on('hide', () => {
-    if (process.platform === 'win32') {
-      tray.electronTray.off('click', hideFrame)
-      tray.electronTray.on('click', showFrame)
-    }
-
-    tray.electronTray.setContextMenu(
-      Menu.buildFromTemplate([
-        showMenuItem,
-        separatorMenuItem,
-        quitMenuItem
-      ])
-    )
+    // if (process.platform === 'win32') {
+    //   tray.electronTray.off('click', hideFrame)
+    //   tray.electronTray.on('click', showFrame)
+    // }
+    tray.electronTray.closeContextMenu()
+    tray.electronTray.setContextMenu(showMenu)
+    // tray.electronTray.popUpContextMenu()
   })
+
   setTimeout(() => {
     windows.tray.on('focus', () => tray.show())
   }, 2000)
@@ -228,7 +231,13 @@ class Tray {
       }
       this.electronTray.setTitle(title)
     })
+    const windowsTrayClickHandler = () => {
+      // this.electronTray.closeContextMenu()
+      this.toggle()
+      // this.electronTray.popUpContextMenu()
+    }  
     this.readyHandler = () => {
+      this.electronTray.on('click', windowsTrayClickHandler)
       if (showOnReady) {
         store.trayOpen(true)
       }
@@ -245,6 +254,10 @@ class Tray {
 
   isReady () {
     return this.ready
+  }
+
+  isVisible () {
+    return (windows.tray as BrowserWindow).isVisible()
   }
 
   hide (autohide: boolean = false) {
@@ -273,7 +286,7 @@ class Tray {
     if (!windows.tray) {
       return init()
     }
-    windows.tray.setPosition(0, 0)
+    // windows.tray.setPosition(0, 0)
     windows.tray.setAlwaysOnTop(true)
     windows.tray.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
     windows.tray.setResizable(false) // Keeps height consistent
@@ -298,8 +311,7 @@ class Tray {
   toggle () {
     if (!this.isReady() || this.recentAutohide) return
 
-    const showing = (windows.tray as BrowserWindow).isVisible()
-    showing ? this.hide() : this.show()
+    this.isVisible() ? this.hide() : this.show()
   }
 
   destroy () {
