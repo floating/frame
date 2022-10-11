@@ -33,8 +33,6 @@ jest.mock('../../../main/provider/helpers', () => {
 beforeAll(async () => {
   log.transports.console.level = false
 
-  jest.useFakeTimers()
-
   accounts.getAccounts = () => [address]
   accounts.addRequest = (req, res) => {
     store.set('main.accounts', req.account, 'requests', { [req.handlerId]: req })
@@ -45,10 +43,10 @@ beforeAll(async () => {
 
 afterAll(() => {
   log.transports.console.level = 'debug'
-  jest.useRealTimers()
 })
 
 beforeEach(() => {
+  store.set('main.colorway', 'light')
   store.set('main.accounts', {})
   store.set('main.origins', {})
   
@@ -440,6 +438,7 @@ describe('#send', () => {
     beforeEach(() => {
       store.set('main.networksMeta.ethereum', {
         1: {
+          primaryColor: 'accent3',
           nativeCurrency: {
             name: 'Ether',
             symbol: 'ETH',
@@ -448,6 +447,7 @@ describe('#send', () => {
           }
         },
         137: {
+          primaryColor: 'accent7',
           nativeCurrency: {
             name: 'Matic',
             symbol: 'MATIC',
@@ -475,6 +475,11 @@ describe('#send', () => {
             networkId: 1,
             icon: [{ url: 'ethereum' }],
             explorers: [{ url: 'https://etherscan.io' }],
+            external: {
+              wallet: {
+                colors: [{ r: 255, g: 0, b: 174, hex: '#ff00ae' }]
+              }
+            },
             nativeCurrency: {
               name: 'Ether',
               symbol: 'ETH',
@@ -487,6 +492,11 @@ describe('#send', () => {
             networkId: 137,
             icon: [{ url: 'matic' }],
             explorers: [{ url: 'https://polygonscan.com' }],
+            external: {
+              wallet: {
+                colors: [{ r: 62, g: 173, b: 241, hex: '#3eadf1' }]
+              }
+            },
             nativeCurrency: {
               name: 'Matic',
               symbol: 'MATIC',
@@ -1521,6 +1531,7 @@ describe('state change events', () => {
 
     const networksMeta = {
       1: {
+        primaryColor: 'accent5',
         nativeCurrency: {
           name: 'Ether',
           symbol: 'ETH',
@@ -1547,6 +1558,11 @@ describe('state change events', () => {
           networkId: 1,
           icon: [{ url: 'ethereum' }],
           explorers: [{ url: 'https://etherscan.io' }],
+          external: {
+            wallet: {
+              colors: [{ r: 90, g: 181, b: 178, hex: '#5ab5b2' }]
+            }
+          },
           nativeCurrency: {
             name: 'Ether',
             symbol: 'ETH',
@@ -1559,6 +1575,11 @@ describe('state change events', () => {
           networkId: 137,
           icon: [],
           explorers: [{ url: 'https://polygonscan.com' }],
+          external: {
+            wallet: {
+              colors: [{ r: 60, g: 40, b: 234, hex: '#3c28ea' }]
+            }
+          },
           nativeCurrency: {
             name: 'Matic',
             symbol: 'MATIC',
@@ -1579,7 +1600,7 @@ describe('state change events', () => {
     }
 
     store.set('main.networks.ethereum', { ...networks, 137: polygon })
-    store.set('main.networksMeta.ethereum', { ...networksMeta, 137: { nativeCurrency: { symbol: 'MATIC', name: 'Matic', decimals: 18 }} })
+    store.set('main.networksMeta.ethereum', { ...networksMeta, 137: { primaryColor: 'accent8', nativeCurrency: { symbol: 'MATIC', name: 'Matic', decimals: 18 }} })
 
     store.getObserver('provider:chains').fire()
   })
