@@ -82,8 +82,10 @@ declare namespace RPC {
 
   namespace GetEthereumChains {
     interface Color {
-      hue: string
-      opacity: number
+      r: number
+      g: number
+      b: number
+      hex: string
     }
 
     interface WalletMetadata {

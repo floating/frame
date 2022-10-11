@@ -33,15 +33,15 @@ const chains = {
 const chainMeta = {
   '1': {
     nativeCurrency: ether,
-    primaryColor: 'green'
+    primaryColor: 'accent1'
   },
   '4': {
     nativeCurrency: {
       ...ether, name: 'Rinkeby Ether'
     },
-    primaryColor: 'orange'
+    primaryColor: 'accent2'
   },
-  '137': { nativeCurrency: {} }
+  '137': { nativeCurrency: {}, primaryColor: 'accent6' }
 }
 
 beforeEach(() => {
@@ -71,7 +71,7 @@ describe('#getActiveChains', () => {
       }],
       external: {
         wallet: {
-          colors: [{ hue: 'green', opacity: 1 }]
+          colors: [{ r: 0, g: 210, b: 190, hex: '0x00d2be' }]
         }
       }
     })
@@ -91,7 +91,7 @@ describe('#createChainsObserver', () => {
   it('invokes the handler with EVM chain objects', () => {
     const optimism = { name: 'Optimism', id: 10, explorer: 'https://optimistic.etherscan.io', on: true }
 
-    setChains({ ...chains, '10': optimism}, { ...chainMeta, '10': { nativeCurrency: ether }})
+    setChains({ ...chains, '10': optimism}, { ...chainMeta, '10': { nativeCurrency: ether, primaryColor: 'accent4' }})
 
     observer()
 
@@ -111,7 +111,7 @@ describe('#createChainsObserver', () => {
         }],
         external: {
           wallet: {
-            colors: [{ hue: 'green', opacity: 1 }]
+            colors: [{ r: 0, g: 210, b: 190, hex: '0x00d2be' }]
           }
         }
       }, {
@@ -129,7 +129,7 @@ describe('#createChainsObserver', () => {
         }],
         external: {
           wallet: {
-            colors: [{ hue: 'orange', opacity: 1 }]
+            colors: [{ r: 255, g: 153, b: 51, hex: '0xff9933' }]
           }
         }
       }, {
@@ -147,7 +147,7 @@ describe('#createChainsObserver', () => {
         }],
         external: {
           wallet: {
-            colors: []
+            colors: [{ r: 246, g: 36, b: 35, hex: '0xf62423' }]
           }
         }
       }])
@@ -270,6 +270,10 @@ function setChains (chainState, chainMetaState = chainMeta) {
 
     if (node === 'main.networksMeta.ethereum') {
       return chainMetaState
+    }
+
+    if (node === 'main.colorway') {
+      return 'dark'
     }
 
     throw new Error('unexpected store access!')

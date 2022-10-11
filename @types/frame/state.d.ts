@@ -86,6 +86,8 @@ interface GasLevels {
 
 type HexAmount = string
 
+enum Colorway { light = 'light', dark = 'dark' }
+
 interface Balance {
   chainId: number,
   address: Address,
