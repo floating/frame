@@ -161,26 +161,20 @@ function initTrayWindow () {
   windows.tray.setPosition(width + x, height + y)
 
   windows.tray.on('show', () => {
-    // if (process.platform === 'win32') {
-    //   tray.electronTray.off('click', showFrame)
-    //   tray.electronTray.on('click', hideFrame)
-    // }
     if (process.platform === 'win32') {
       tray.electronTray.closeContextMenu()
     }
-    tray.electronTray.setContextMenu(hideMenu)
-    // tray.electronTray.popUpContextMenu()
+    setTimeout(() => {
+      tray.electronTray.setContextMenu(hideMenu)
+    }, 100)
   })
   windows.tray.on('hide', () => {
-    // if (process.platform === 'win32') {
-    //   tray.electronTray.off('click', hideFrame)
-    //   tray.electronTray.on('click', showFrame)
-    // }
     if (process.platform === 'win32') {
       tray.electronTray.closeContextMenu()
     }
-    tray.electronTray.setContextMenu(showMenu)
-    // tray.electronTray.popUpContextMenu()
+    setTimeout(() => {
+      tray.electronTray.setContextMenu(showMenu)
+    }, 100)
   })
 
   setTimeout(() => {
@@ -194,10 +188,7 @@ function initTrayWindow () {
   setTimeout(() => {
     windows.tray.on('blur', () => {
       setTimeout(() => {
-        const frameShowing = frameManager.isFrameShowing()
-        console.log('blur', frameShowing, tray.canAutoHide())
-        if (!frameShowing && tray.canAutoHide() && store('main.autohide') && !store('windows.dash.showing')) {
-          console.log('autohide')
+        if (tray.canAutoHide()) {
           tray.hide(true)
         }
       }, 100)
@@ -243,11 +234,9 @@ class Tray {
     })
     this.readyHandler = () => {
       this.electronTray.on('click', () => {
-        console.log('recent tray click')
         this.recentElectronTrayClick = true
         clearTimeout(this.recentElectronTrayClickTimeout as NodeJS.Timeout)
         this.recentElectronTrayClickTimeout = setTimeout(() => {
-          console.log('recent tray click timed out')
           this.recentElectronTrayClick = false
         }, 50);
         if (process.platform === 'win32') {
@@ -277,7 +266,7 @@ class Tray {
   }
 
   canAutoHide () {
-    return !this.recentElectronTrayClick
+    return !this.recentElectronTrayClick && store('main.autohide') && !store('windows.dash.showing') && frameManager.isFrameShowing()
   }
 
   hide (autohide: boolean = false) {
