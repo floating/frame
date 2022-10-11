@@ -22,7 +22,14 @@ const chains = {
     name: 'Ethereum Testnet Rinkeby',
     id: 4,
     explorer: 'https://rinkeby.etherscan.io',
-    connection: { primary: {}, secondary: {} },
+    connection: { primary: { status: 'connected', on: true }, secondary: { status: 'connected', on: true } },
+    on: true
+  },
+  '5': {
+    name: 'Ethereum Testnet Görli',
+    id: 5,
+    explorer: 'https://goerli.etherscan.io',
+    connection: { primary: { status: 'disconnected', on: true }, secondary: { status: 'disconnected', on: true } },
     on: true
   },
   '137': {
@@ -40,6 +47,11 @@ const chainMeta = {
   '4': {
     nativeCurrency: {
       ...ether, name: 'Rinkeby Ether'
+    }
+  },
+  '5': {
+    nativeCurrency: {
+      ...ether, name: 'Görli Ether'
     }
   },
   '137': { nativeCurrency: {} }
@@ -189,6 +201,32 @@ describe('#createChainsObserver', () => {
 
     const changedChains = handler.chainsChanged.mock.calls[0][0]
     expect(changedChains.map(c => c.chainId)).toEqual([1, 4])
+  })
+
+  it('invokes the handler when a connected chain is disconnected', () => {
+    const { '4': { ...rinkeby } } = chains
+    rinkeby.connection.primary.status = 'disconnected'
+    rinkeby.connection.secondary.status = 'disconnected'
+
+    setChains({ ...chains, '4': rinkeby })
+
+    observer()
+
+    const changedChains = handler.chainsChanged.mock.calls[0][0]
+    expect(changedChains.map(c => c.chainId)).toEqual([1])
+  })
+
+  it('invokes the handler when a disconnected chain is connected', () => {
+    const { '5': { ...goerli } } = chains
+    goerli.connection.primary.status = 'connected'
+    goerli.connection.secondary.status = 'connected'
+
+    setChains({ ...chains, '5': goerli })
+
+    observer()
+
+    const changedChains = handler.chainsChanged.mock.calls[0][0]
+    expect(changedChains.map(c => c.chainId)).toEqual([1, 5])
   })
 
   it('does not invoke the handler when no chains have changed', () => {
