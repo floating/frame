@@ -475,7 +475,7 @@ describe('#send', () => {
             explorers: [{ url: 'https://etherscan.io' }],
             external: {
               wallet: {
-                colors: [{ r: 255, g: 0, b: 174, hex: '0xff00ae' }]
+                colors: [{ r: 255, g: 0, b: 174, hex: '#ff00ae' }]
               }
             },
             nativeCurrency: {
@@ -492,7 +492,7 @@ describe('#send', () => {
             explorers: [{ url: 'https://polygonscan.com' }],
             external: {
               wallet: {
-                colors: [{ r: 62, g: 173, b: 241, hex: '0x3eadf1' }]
+                colors: [{ r: 62, g: 173, b: 241, hex: '#3eadf1' }]
               }
             },
             nativeCurrency: {
@@ -1533,7 +1533,7 @@ describe('state change events', () => {
           explorers: [{ url: 'https://etherscan.io' }],
           external: {
             wallet: {
-              colors: [{ r: 90, g: 181, b: 178, hex: '0x5ab5b2' }]
+              colors: [{ r: 90, g: 181, b: 178, hex: '#5ab5b2' }]
             }
           },
           nativeCurrency: {
@@ -1550,7 +1550,7 @@ describe('state change events', () => {
           explorers: [{ url: 'https://polygonscan.com' }],
           external: {
             wallet: {
-              colors: [{ r: 60, g: 40, b: 234, hex: '0x3c28ea' }]
+              colors: [{ r: 60, g: 40, b: 234, hex: '#3c28ea' }]
             }
           },
           nativeCurrency: {

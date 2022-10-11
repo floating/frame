@@ -71,7 +71,7 @@ describe('#getActiveChains', () => {
       }],
       external: {
         wallet: {
-          colors: [{ r: 0, g: 210, b: 190, hex: '0x00d2be' }]
+          colors: [{ r: 0, g: 210, b: 190, hex: '#00d2be' }]
         }
       }
     })
@@ -111,7 +111,7 @@ describe('#createChainsObserver', () => {
         }],
         external: {
           wallet: {
-            colors: [{ r: 0, g: 210, b: 190, hex: '0x00d2be' }]
+            colors: [{ r: 0, g: 210, b: 190, hex: '#00d2be' }]
           }
         }
       }, {
@@ -129,7 +129,7 @@ describe('#createChainsObserver', () => {
         }],
         external: {
           wallet: {
-            colors: [{ r: 255, g: 153, b: 51, hex: '0xff9933' }]
+            colors: [{ r: 255, g: 153, b: 51, hex: '#ff9933' }]
           }
         }
       }, {
@@ -147,7 +147,7 @@ describe('#createChainsObserver', () => {
         }],
         external: {
           wallet: {
-            colors: [{ r: 246, g: 36, b: 35, hex: '0xf62423' }]
+            colors: [{ r: 246, g: 36, b: 35, hex: '#f62423' }]
           }
         }
       }])

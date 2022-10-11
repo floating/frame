@@ -31,7 +31,7 @@ function toHex (color: number) {
 export function getColor (key: keyof ColorwayPalette, colorway: Colorway) {
   const color = colorways[colorway][key]
 
-  return { ...color, hex: `0x${toHex(color.r)}${toHex(color.g)}${toHex(color.b)}`}
+  return { ...color, hex: `#${toHex(color.r)}${toHex(color.g)}${toHex(color.b)}`}
 }
 
 export { light as LIGHT, dark as DARK }
