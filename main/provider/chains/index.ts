@@ -70,10 +70,11 @@ function getActiveChains (): RPC.GetEthereumChains.Chain[] {
     .sort((a, b) => a.id - b.id)
     .map(chain => {
       const { id, explorer, name } = chain
-      const { nativeCurrency } = meta[id]
+      const { nativeCurrency, primaryColor } = meta[id]
       const { icon: currencyIcon, name: currencyName, symbol, decimals } = nativeCurrency
 
       const icons = currencyIcon ? [{ url: currencyIcon }] : []
+      const colors = primaryColor ? [{ hue: primaryColor, opacity: 1 }] : []
 
       return ({
         chainId: id,
@@ -83,7 +84,10 @@ function getActiveChains (): RPC.GetEthereumChains.Chain[] {
           name: currencyName, symbol, decimals
         },
         icon: icons,
-        explorers: [{ url: explorer }]
+        explorers: [{ url: explorer }],
+        external: {
+          wallet: { colors }
+        }
       })
     })
 }

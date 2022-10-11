@@ -32,12 +32,14 @@ const chains = {
 
 const chainMeta = {
   '1': {
-    nativeCurrency: ether
+    nativeCurrency: ether,
+    primaryColor: 'green'
   },
   '4': {
     nativeCurrency: {
       ...ether, name: 'Rinkeby Ether'
-    }
+    },
+    primaryColor: 'orange'
   },
   '137': { nativeCurrency: {} }
 }
@@ -66,7 +68,12 @@ describe('#getActiveChains', () => {
       },
       explorers: [{
         url: 'https://etherscan.io'
-      }]
+      }],
+      external: {
+        wallet: {
+          colors: [{ hue: 'green', opacity: 1 }]
+        }
+      }
     })
   })
 })
@@ -101,7 +108,12 @@ describe('#createChainsObserver', () => {
         },
         explorers: [{
           url: 'https://etherscan.io'
-        }]
+        }],
+        external: {
+          wallet: {
+            colors: [{ hue: 'green', opacity: 1 }]
+          }
+        }
       }, {
         chainId: 4,
         networkId: 4,
@@ -114,7 +126,12 @@ describe('#createChainsObserver', () => {
         },
         explorers: [{
           url: 'https://rinkeby.etherscan.io'
-        }]
+        }],
+        external: {
+          wallet: {
+            colors: [{ hue: 'orange', opacity: 1 }]
+          }
+        }
       }, {
         chainId: 10,
         networkId: 10,
@@ -127,7 +144,12 @@ describe('#createChainsObserver', () => {
         },
         explorers: [{
           url: 'https://optimistic.etherscan.io'
-        }]
+        }],
+        external: {
+          wallet: {
+            colors: []
+          }
+        }
       }])
   })
 

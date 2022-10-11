@@ -445,6 +445,7 @@ describe('#send', () => {
 
       store.set('main.networksMeta.ethereum', {
         1: {
+          primaryColor: 'black',
           nativeCurrency: {
             name: 'Ether',
             symbol: 'ETH',
@@ -473,6 +474,11 @@ describe('#send', () => {
             networkId: 1,
             icon: [{ url: 'ethereum' }],
             explorers: [{ url: 'https://etherscan.io' }],
+            external: {
+              wallet: {
+                colors: [{ hue: 'black', opacity: 1 }]
+              }
+            },
             nativeCurrency: {
               name: 'Ether',
               symbol: 'ETH',
@@ -485,6 +491,11 @@ describe('#send', () => {
             networkId: 137,
             icon: [{ url: 'matic' }],
             explorers: [{ url: 'https://polygonscan.com' }],
+            external: {
+              wallet: {
+                colors: []
+              }
+            },
             nativeCurrency: {
               name: 'Matic',
               symbol: 'MATIC',
@@ -1494,6 +1505,7 @@ describe('state change events', () => {
 
     const networksMeta = {
       1: {
+        primaryColor: 'red',
         nativeCurrency: {
           name: 'Ether',
           symbol: 'ETH',
@@ -1520,6 +1532,11 @@ describe('state change events', () => {
           networkId: 1,
           icon: [{ url: 'ethereum' }],
           explorers: [{ url: 'https://etherscan.io' }],
+          external: {
+            wallet: {
+              colors: [{ hue: 'red', opacity: 1 }]
+            }
+          },
           nativeCurrency: {
             name: 'Ether',
             symbol: 'ETH',
@@ -1532,6 +1549,11 @@ describe('state change events', () => {
           networkId: 137,
           icon: [],
           explorers: [{ url: 'https://polygonscan.com' }],
+          external: {
+            wallet: {
+              colors: []
+            }
+          },
           nativeCurrency: {
             name: 'Matic',
             symbol: 'MATIC',
