@@ -266,17 +266,17 @@ class Tray {
   }
 
   canAutoHide () {
-    return !this.recentElectronTrayClick && store('main.autohide') && !store('windows.dash.showing') && frameManager.isFrameShowing()
+    return !this.recentElectronTrayClick && store('main.autohide') && !store('windows.dash.showing') && !frameManager.isFrameShowing()
   }
 
   hide (autohide: boolean = false) {
     store.toggleDash('hide');
     if (autohide) {
-        this.recentAutohide = true;
-        clearTimeout(this.recentAutoHideTimeout as NodeJS.Timeout);
-        this.recentAutoHideTimeout = setTimeout(() => {
-            this.recentAutohide = false;
-        }, 50);
+      this.recentAutohide = true;
+      clearTimeout(this.recentAutoHideTimeout as NodeJS.Timeout);
+      this.recentAutoHideTimeout = setTimeout(() => {
+        this.recentAutohide = false;
+      }, 50);
     }
 
     if (windows && windows.tray) {
