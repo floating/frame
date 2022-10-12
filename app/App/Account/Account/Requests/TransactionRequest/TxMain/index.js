@@ -30,8 +30,7 @@ class TxSending extends React.Component {
     const value = req.data.value || '0x'
     const displayValue = this.hexToDisplayValue(value)
     const currentSymbol = this.store('main.networks', this.props.chain.type, this.props.chain.id, 'symbol') || '?'
-    const chainId = parseInt(this.props.chain.id, 16)
-    const chainName = this.store('main.networks.ethereum', chainId, 'name')
+    const chainName = this.store('main.networks.ethereum', this.props.chain.id, 'name')
     if (value === '0x' || parseInt(value, 16) === 0) return null
     return (
       <div className='_txMain' style={{ animationDelay: (0.1 * this.props.i) + 's' }}>
