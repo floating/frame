@@ -435,12 +435,7 @@ describe('#send', () => {
   })
 
   describe('#wallet_getEthereumChains', () => {
-    it('returns a list of active chains', () => {
-      store.set('main.networks.ethereum', {
-        137: { name: 'polygon', id: 137, explorer: 'https://polygonscan.com', on: true },
-        1: { name: 'mainnet', id: 1, explorer: 'https://etherscan.io', on: true }
-      })
-
+    beforeEach(() => {
       store.set('main.networksMeta.ethereum', {
         1: {
           primaryColor: 'accent3',
@@ -460,6 +455,13 @@ describe('#send', () => {
             icon: 'matic'
           }
         }
+      })
+    })
+
+    it('returns a list of active chains', () => {
+      store.set('main.networks.ethereum', {
+        137: { name: 'polygon', id: 137, explorer: 'https://polygonscan.com', connection: { primary: { connected: true }, secondary: { connected: false } }, on: true },
+        1: { name: 'mainnet', id: 1, explorer: 'https://etherscan.io', connection: { primary: { connected: true }, secondary: { connected: false} }, on: true }
       })
 
       send({ method: 'wallet_getEthereumChains', id: 14, jsonrpc: '2.0' }, response => {
@@ -498,6 +500,33 @@ describe('#send', () => {
             nativeCurrency: {
               name: 'Matic',
               symbol: 'MATIC',
+              decimals: 18
+            }
+          }
+        ])
+      })
+    })
+
+    it('does not return disconnected chains', () => {
+      store.set('main.networks.ethereum', {
+        137: { name: 'polygon', id: 137, explorer: 'https://polygonscan.com', connection: { primary: { connected: false }, secondary: { connected: false } }, on: true },
+        1: { name: 'mainnet', id: 1, explorer: 'https://etherscan.io', connection: { primary: { connected: true }, secondary: { connected: false } }, on: true }
+      })
+      
+      send({ method: 'wallet_getEthereumChains', id: 14, jsonrpc: '2.0' }, response => {
+        expect(response.result).toStrictEqual([
+          {
+            name: 'mainnet',
+            chainId: 1,
+            networkId: 1,
+            icon: [{ url: 'ethereum' }],
+            explorers: [{ url: 'https://etherscan.io' }],
+            external: {
+              wallet: { colors: [{ r: 255, b: 174, g: 0, hex: '#ff00ae' }] },
+            },
+            nativeCurrency: {
+              name: 'Ether',
+              symbol: 'ETH',
               decimals: 18
             }
           }
@@ -1498,6 +1527,7 @@ describe('state change events', () => {
         name: 'test',
         id: 1,
         explorer: 'https://etherscan.io',
+        connection: { primary: { connected: true }, secondary: { connected: false } },
         on: true
       }
     }
@@ -1568,6 +1598,7 @@ describe('state change events', () => {
       name: 'Polygon',
       id: 137,
       explorer: 'https://polygonscan.com',
+      connection: { primary: { connected: true }, secondary: { connected: false } },
       on: true
     }
 

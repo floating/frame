@@ -33,12 +33,8 @@ const ConnectionStatus = ({ connection }) =>
     </div>
   </>
 
-function isConnected ({ status }) {
-  return status !== 'disconnected'
-}
-
 function getActiveConnection (primary, secondary) {
-  if (secondary.on && (!primary.on || !isConnected(primary))) {
+  if (secondary.on && (!primary.on || primary.status === 'disconnected')) {
     return secondary
   }
 
