@@ -460,7 +460,7 @@ describe('#send', () => {
 
     it('returns a list of active chains', () => {
       store.set('main.networks.ethereum', {
-        137: { name: 'polygon', id: 137, explorer: 'https://polygonscan.com', connection: { primary: { connected: true }, secondary: { connected: false} }, on: true },
+        137: { name: 'polygon', id: 137, explorer: 'https://polygonscan.com', connection: { primary: { connected: true }, secondary: { connected: false } }, on: true },
         1: { name: 'mainnet', id: 1, explorer: 'https://etherscan.io', connection: { primary: { connected: true }, secondary: { connected: false} }, on: true }
       })
 
