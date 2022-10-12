@@ -29,7 +29,7 @@ const chains = {
     name: 'Ethereum Testnet Görli',
     id: 5,
     explorer: 'https://goerli.etherscan.io',
-    connection: { primary: { status: 'disconnected', connected:false, on: true }, secondary: { status: 'disconnected', connected: false, on: true } },
+    connection: { primary: { status: 'disconnected', connected: false, on: true }, secondary: { status: 'disconnected', connected: false, on: true } },
     on: true
   },
   '137': {
