@@ -30,7 +30,7 @@ interface NetworkMetadata {
   blockHeight: number
   gas: GasData
   icon: string
-  primaryColor: string
+  primaryColor: keyof ColorwayPalette
   nativeCurrency: NativeCurrency
 }
 
@@ -85,6 +85,20 @@ interface GasLevels {
 }
 
 type HexAmount = string
+
+enum Colorway { light = 'light', dark = 'dark' }
+
+type Color = { r: number, g: number, b: number }
+type ColorwayPalette = {
+  accent1: Color
+  accent2: Color
+  accent3: Color
+  accent4: Color
+  accent5: Color
+  accent6: Color
+  accent7: Color
+  accent8: Color
+}
 
 interface Balance {
   chainId: number,

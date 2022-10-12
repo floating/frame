@@ -32,14 +32,16 @@ const chains = {
 
 const chainMeta = {
   '1': {
-    nativeCurrency: ether
+    nativeCurrency: ether,
+    primaryColor: 'accent1'
   },
   '4': {
     nativeCurrency: {
       ...ether, name: 'Rinkeby Ether'
-    }
+    },
+    primaryColor: 'accent2'
   },
-  '137': { nativeCurrency: {} }
+  '137': { nativeCurrency: {}, primaryColor: 'accent6' }
 }
 
 beforeEach(() => {
@@ -66,7 +68,12 @@ describe('#getActiveChains', () => {
       },
       explorers: [{
         url: 'https://etherscan.io'
-      }]
+      }],
+      external: {
+        wallet: {
+          colors: [{ r: 0, g: 210, b: 190, hex: '#00d2be' }]
+        }
+      }
     })
   })
 })
@@ -84,7 +91,7 @@ describe('#createChainsObserver', () => {
   it('invokes the handler with EVM chain objects', () => {
     const optimism = { name: 'Optimism', id: 10, explorer: 'https://optimistic.etherscan.io', on: true }
 
-    setChains({ ...chains, '10': optimism}, { ...chainMeta, '10': { nativeCurrency: ether }})
+    setChains({ ...chains, '10': optimism}, { ...chainMeta, '10': { nativeCurrency: ether, primaryColor: 'accent4' }})
 
     observer()
 
@@ -101,7 +108,12 @@ describe('#createChainsObserver', () => {
         },
         explorers: [{
           url: 'https://etherscan.io'
-        }]
+        }],
+        external: {
+          wallet: {
+            colors: [{ r: 0, g: 210, b: 190, hex: '#00d2be' }]
+          }
+        }
       }, {
         chainId: 4,
         networkId: 4,
@@ -114,7 +126,12 @@ describe('#createChainsObserver', () => {
         },
         explorers: [{
           url: 'https://rinkeby.etherscan.io'
-        }]
+        }],
+        external: {
+          wallet: {
+            colors: [{ r: 255, g: 153, b: 51, hex: '#ff9933' }]
+          }
+        }
       }, {
         chainId: 10,
         networkId: 10,
@@ -127,7 +144,12 @@ describe('#createChainsObserver', () => {
         },
         explorers: [{
           url: 'https://optimistic.etherscan.io'
-        }]
+        }],
+        external: {
+          wallet: {
+            colors: [{ r: 246, g: 36, b: 35, hex: '#f62423' }]
+          }
+        }
       }])
   })
 
@@ -248,6 +270,10 @@ function setChains (chainState, chainMetaState = chainMeta) {
 
     if (node === 'main.networksMeta.ethereum') {
       return chainMetaState
+    }
+
+    if (node === 'main.colorway') {
+      return 'dark'
     }
 
     throw new Error('unexpected store access!')
