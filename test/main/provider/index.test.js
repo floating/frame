@@ -460,8 +460,8 @@ describe('#send', () => {
 
     it('returns a list of active chains', () => {
       store.set('main.networks.ethereum', {
-        137: { name: 'polygon', id: 137, explorer: 'https://polygonscan.com', connection: { primary: {}, secondary: {} }, on: true },
-        1: { name: 'mainnet', id: 1, explorer: 'https://etherscan.io', connection: { primary: {}, secondary: {} }, on: true }
+        137: { name: 'polygon', id: 137, explorer: 'https://polygonscan.com', connection: { primary: { connected: true }, secondary: { connected: false} }, on: true },
+        1: { name: 'mainnet', id: 1, explorer: 'https://etherscan.io', connection: { primary: { connected: true }, secondary: { connected: false} }, on: true }
       })
 
       send({ method: 'wallet_getEthereumChains', id: 14, jsonrpc: '2.0' }, response => {
@@ -509,8 +509,8 @@ describe('#send', () => {
 
     it('does not return disconnected chains', () => {
       store.set('main.networks.ethereum', {
-        137: { name: 'polygon', id: 137, explorer: 'https://polygonscan.com', connection: { primary: { status: 'disconnected' }, secondary: { status: 'disconnected' } }, on: true },
-        1: { name: 'mainnet', id: 1, explorer: 'https://etherscan.io', connection: { primary: {}, secondary: {} }, on: true }
+        137: { name: 'polygon', id: 137, explorer: 'https://polygonscan.com', connection: { primary: { connected: false }, secondary: { connected: false } }, on: true },
+        1: { name: 'mainnet', id: 1, explorer: 'https://etherscan.io', connection: { primary: { connected: true }, secondary: { connected: false } }, on: true }
       })
       
       send({ method: 'wallet_getEthereumChains', id: 14, jsonrpc: '2.0' }, response => {
@@ -1527,7 +1527,7 @@ describe('state change events', () => {
         name: 'test',
         id: 1,
         explorer: 'https://etherscan.io',
-        connection: { primary: {}, secondary: {} },
+        connection: { primary: { connected: true }, secondary: { connected: false } },
         on: true
       }
     }
@@ -1598,7 +1598,7 @@ describe('state change events', () => {
       name: 'Polygon',
       id: 137,
       explorer: 'https://polygonscan.com',
-      connection: { primary: {}, secondary: {} },
+      connection: { primary: { connected: true }, secondary: { connected: false } },
       on: true
     }
 

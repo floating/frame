@@ -15,27 +15,27 @@ const chains = {
     name: 'Ethereum Mainnet',
     id: 1,
     explorer: 'https://etherscan.io',
-    connection: { primary: {}, secondary: {} },
+    connection: { primary: { connected: true }, secondary: { connected: false } },
     on: true
   },
   '4': {
     name: 'Ethereum Testnet Rinkeby',
     id: 4,
     explorer: 'https://rinkeby.etherscan.io',
-    connection: { primary: { status: 'connected', on: true }, secondary: { status: 'connected', on: true } },
+    connection: { primary: { status: 'connected', connected: true, on: true }, secondary: { status: 'standby', connected: false, on: true } },
     on: true
   },
   '5': {
     name: 'Ethereum Testnet Görli',
     id: 5,
     explorer: 'https://goerli.etherscan.io',
-    connection: { primary: { status: 'disconnected', on: true }, secondary: { status: 'disconnected', on: true } },
+    connection: { primary: { status: 'disconnected', connected:false, on: true }, secondary: { status: 'disconnected', connected: false, on: true } },
     on: true
   },
   '137': {
     name: 'Polygon',
     id: 137,
-    connection: { primary: {}, secondary: {} },
+    connection: { primary: { connected: true }, secondary: { connected: false } },
     on: false
   }
 }
@@ -105,7 +105,13 @@ describe('#createChainsObserver', () => {
   })
 
   it('invokes the handler with EVM chain objects', () => {
-    const optimism = { name: 'Optimism', id: 10, explorer: 'https://optimistic.etherscan.io', connection: { primary: {}, secondary: {} }, on: true }
+    const optimism = {
+      name: 'Optimism',
+      id: 10,
+      explorer: 'https://optimistic.etherscan.io',
+      connection: { primary: { connected: true }, secondary: { connected: false } },
+      on: true
+    }
 
     setChains({ ...chains, '10': optimism}, { ...chainMeta, '10': { nativeCurrency: ether, primaryColor: 'accent4' }})
 
@@ -170,7 +176,13 @@ describe('#createChainsObserver', () => {
   })
 
   it('invokes the handler when a chain is added', () => {
-    const optimism = { name: 'Optimism', id: 10, explorer: 'https://optimistic.etherscan.io', connection: { primary: {}, secondary: {} }, on: true }
+    const optimism = {
+      name: 'Optimism',
+      id: 10,
+      explorer: 'https://optimistic.etherscan.io',
+      connection: { primary: { connected: true }, secondary: { connected: false } },
+      on: true
+    }
 
     setChains({ ...chains, '10': optimism}, { ...chainMeta, '10': { nativeCurrency: ether }})
 
@@ -228,8 +240,7 @@ describe('#createChainsObserver', () => {
 
   it('invokes the handler when a connected chain is disconnected', () => {
     const { '4': { ...rinkeby } } = chains
-    rinkeby.connection.primary.status = 'disconnected'
-    rinkeby.connection.secondary.status = 'disconnected'
+    rinkeby.connection.primary.connected = false
 
     setChains({ ...chains, '4': rinkeby })
 
@@ -241,8 +252,7 @@ describe('#createChainsObserver', () => {
 
   it('invokes the handler when a disconnected chain is connected', () => {
     const { '5': { ...goerli } } = chains
-    goerli.connection.primary.status = 'connected'
-    goerli.connection.secondary.status = 'connected'
+    goerli.connection.primary.connected = true
 
     setChains({ ...chains, '5': goerli })
 
