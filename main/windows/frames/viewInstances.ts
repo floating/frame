@@ -34,7 +34,7 @@ export default {
   
     viewInstance.webContents.on('will-navigate', e => e.preventDefault())
     viewInstance.webContents.on('will-attach-webview', e => e.preventDefault())
-    viewInstance.webContents.on('new-window', e => e.preventDefault())
+    viewInstance.webContents.setWindowOpenHandler(() => ({ action: 'deny' }))
 
     const { session } = extract(view.url)
 
