@@ -14,7 +14,9 @@ function toDisplayUSD (bn) {
 }
 
 function toDisplayEther (bn) {
-  return parseFloat(bn.shiftedBy(-18).toFixed(6).toString())
+  const ether = bn.shiftedBy(-18).decimalPlaces(6, BigNumber.ROUND_FLOOR)
+
+  return ether.isZero() ? '< 0.000001' : ether.toFormat()
 }
 
 function toDisplayGwei (bn) {
@@ -80,6 +82,7 @@ class TxFee extends React.Component {
     const minFeeUSD = minFee.shiftedBy(-18).multipliedBy(nativeUSD)
 
     const currentSymbol = this.store('main.networks', this.props.chain.type, this.props.chain.id, 'symbol') || '?'
+    const displayEther = toDisplayEther(maxFee)
 
     return (
       <div className='_txMain' style={{ animationDelay: (0.1 * this.props.i) + 's' }}>
@@ -101,7 +104,7 @@ class TxFee extends React.Component {
                       {currentSymbol || '?'}
                     </span>
                     <span className='_txFeeETHValue'>
-                      {toDisplayEther(maxFee)}
+                      {displayEther}
                     </span>
                   </div>
                 </div>
