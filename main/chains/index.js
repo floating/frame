@@ -82,6 +82,7 @@ class ChainConnection extends EventEmitter {
         try {
           // only consider this an EIP-1559 block if fee market can be loaded
           feeMarket = await gasCalculator.getFeePerGas()
+          console.log({ feeMarket })
 
           this.chainConfig.setHardforkByBlockNumber(block.number)
 

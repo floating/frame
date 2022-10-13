@@ -60,7 +60,7 @@ export default class GasCalculator {
       { minRatio: 0, maxRatio: Number.MAX_SAFE_INTEGER, blockSampleSize: blocks.length }
     ]
 
-    const eligibleRewardsBlocks = rewardCalculationStrategies.reduce((foundBlocks, strategy, i) => {
+    const eligibleRewardsBlocks = rewardCalculationStrategies.reduce((foundBlocks, strategy) => {
       if (foundBlocks.length === 0) {
         const blockSample = blocks.slice(blocks.length - Math.min(strategy.blockSampleSize, blocks.length))
         const eligibleBlocks = blockSample.filter(block => block.gasUsedRatio > strategy.minRatio && block.gasUsedRatio <= strategy.maxRatio)
@@ -97,7 +97,9 @@ export default class GasCalculator {
     const nextBlockFee = blocks[blocks.length - 1].baseFee // base fee for next block
     const calculatedFee = Math.ceil(nextBlockFee * 1.125 * 1.125)
 
-    const medianBlockReward = this.calculateReward(blocks)
+    // the last block contains only the base fee for the next block but no fee history, so
+    // don't use it in the block reward calculation
+    const medianBlockReward = this.calculateReward(blocks.slice(0, blocks.length - 1))
 
     return {
       nextBaseFee: intToHex(nextBlockFee),
