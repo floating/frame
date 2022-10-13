@@ -168,7 +168,7 @@ describe('#getFeePerGas', () => {
     it('uses any block in the sample if no other blocks are eligible', async () => {
       // index in array represents distance away from current block
       gasUsedRatios[13] = 0.012
-      gasUsedRatios[19] = 1.0239
+      gasUsedRatios[19] = 1.2239
       gasUsedRatios[26] = 1.122
       gasUsedRatios[28] = 0.073
 

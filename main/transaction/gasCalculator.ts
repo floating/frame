@@ -45,19 +45,22 @@ export default class GasCalculator {
   }
 
   private calculateReward (blocks: Block[]) {
+    const recentBlocks = 10
+    const allBlocks = blocks.length
+
     // these strategies will be tried in descending order until one finds
     // at least 1 eligible block from which to calculate the reward
     const rewardCalculationStrategies = [
       // use recent blocks (last 10) that weren't almost empty or almost full
-      { minRatio: 0.1, maxRatio: 0.9, blockSampleSize: 11 },
+      { minRatio: 0.1, maxRatio: 0.9, blockSampleSize: recentBlocks },
       // include recent blocks that were full
-      { minRatio: 0.1, maxRatio: 1, blockSampleSize: 11 },
+      { minRatio: 0.1, maxRatio: 1.05, blockSampleSize: recentBlocks },
       // use the entire block sample but still limit to blocks that were not almost empty
-      { minRatio: 0.1, maxRatio: 1, blockSampleSize: blocks.length },
+      { minRatio: 0.1, maxRatio: 1.05, blockSampleSize: allBlocks },
       // use any recent block with transactions
-      { minRatio: 0, maxRatio: Number.MAX_SAFE_INTEGER, blockSampleSize: 11 },
+      { minRatio: 0, maxRatio: Number.MAX_SAFE_INTEGER, blockSampleSize: recentBlocks },
       // use any block with transactions
-      { minRatio: 0, maxRatio: Number.MAX_SAFE_INTEGER, blockSampleSize: blocks.length }
+      { minRatio: 0, maxRatio: Number.MAX_SAFE_INTEGER, blockSampleSize: allBlocks }
     ]
 
     const eligibleRewardsBlocks = rewardCalculationStrategies.reduce((foundBlocks, strategy) => {
