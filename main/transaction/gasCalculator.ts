@@ -51,7 +51,7 @@ export default class GasCalculator {
     // these strategies will be tried in descending order until one finds
     // at least 1 eligible block from which to calculate the reward
     const rewardCalculationStrategies = [
-      // use recent blocks (last 10) that weren't almost empty or almost full
+      // use recent blocks that weren't almost empty or almost full
       { minRatio: 0.1, maxRatio: 0.9, blockSampleSize: recentBlocks },
       // include recent blocks that were full
       { minRatio: 0.1, maxRatio: 1.05, blockSampleSize: recentBlocks },
