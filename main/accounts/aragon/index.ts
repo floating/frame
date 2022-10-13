@@ -82,12 +82,13 @@ async function resolveName (name: string, chainId: number) {
   })
 }
 
-function isConnected(chainType: string, chainId: number) {
-  const connection = store('main.networks', chainType, chainId, 'connection')
+function isConnected(chain: Chain) {
+  const connection = store('main.networks', chain.type, chain.id, 'connection')
   if (!connection) {
-    return
+    return false
   }
   const status = [connection.primary.status, connection.secondary.status]
+  
   return status.includes('connected')
 }
 
@@ -119,7 +120,7 @@ class Aragon {
   }
 
   setup () {
-    if (isConnected(this.chain.type, this.chain.id) && !this.wrap && !this.inSetup) {
+    if (isConnected(this.chain) && !this.wrap && !this.inSetup) {
       setTimeout(() => {
         log.info('\n ** Setting Up Aragon DAO:', this.dao)
         this.inSetup = true
