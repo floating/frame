@@ -22,15 +22,17 @@ function toDisplayGwei (bn) {
 }
 
 function toDisplayWei (bn) {
-  return parseFloat(bn.toFixed(3).toString())
+  return bn.toFormat(0)
 }
 
 const GasDisplay = ({ maxFeePerGas }) => {
   const gasGwei = toDisplayGwei(maxFeePerGas)
-  const displayValue = gasGwei || toDisplayWei(maxFeePerGas)
+  const shouldDisplayWei = gasGwei === '0.000'
+  const displayValue = shouldDisplayWei ? toDisplayWei(maxFeePerGas) : gasGwei
+  const displayLabel = shouldDisplayWei ? 'Wei' : 'Gwei'
   return <div className='_txFeeGwei'>
     <span className='_txFeeGweiValue'>{displayValue}</span>
-    <span className='_txFeeGweiLabel'>{gasGwei ? 'Gwei' : 'Wei'}</span>
+    <span className='_txFeeGweiLabel'>{displayLabel}</span>
   </div>
 }                    
 
