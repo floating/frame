@@ -82,6 +82,15 @@ async function resolveName (name: string, chainId: number) {
   })
 }
 
+function isConnected(chainType: string, chainId: number) {
+  const connection = store('main.networks', chainType, chainId, 'connection')
+  if (!connection) {
+    return
+  }
+  const status = [connection.primary.status, connection.secondary.status]
+  return status.includes('connected')
+}
+
 export interface AragonOptions {
   dao: Address,
   agent: Address,
@@ -110,9 +119,7 @@ class Aragon {
   }
 
   setup () {
-    const connection = store('main.networks', this.chain.type, this.chain.id, 'connection')
-    const status = [connection.primary.status, connection.secondary.status]
-    if (status.indexOf('connected') > -1 && !this.wrap && !this.inSetup) {
+    if (isConnected(this.chain.type, this.chain.id) && !this.wrap && !this.inSetup) {
       setTimeout(() => {
         log.info('\n ** Setting Up Aragon DAO:', this.dao)
         this.inSetup = true
