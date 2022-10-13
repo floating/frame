@@ -9,19 +9,36 @@ import { GasFeesSource } from '../../../../../../../resources/domain/transaction
 
 const FEE_WARNING_THRESHOLD_USD = 50
 
+function toDisplayUSD (bn) {
+  return bn.toFixed(2, BigNumber.ROUND_UP).toString()
+}
+
+function toDisplayEther (bn) {
+  return parseFloat(bn.shiftedBy(-18).toFixed(6).toString())
+}
+
+function toDisplayGwei (bn) {
+  return parseFloat(bn.shiftedBy(-9).toFixed(3).toString())
+}
+
+function toDisplayWei (bn) {
+  return parseFloat(bn.toFixed(3).toString())
+}
+
+const GasDisplay = ({ maxFeePerGas }) => {
+  const gasGwei = toDisplayGwei(maxFeePerGas)
+  const displayValue = gasGwei || toDisplayWei(maxFeePerGas)
+  return <div className='_txFeeGwei'>
+    <span className='_txFeeGweiValue'>{displayValue}</span>
+    <span className='_txFeeGweiLabel'>{gasGwei ? 'Gwei' : 'Wei'}</span>
+  </div>
+}                    
+
 class TxFee extends React.Component {
   constructor (props, context) {
     super(props, context)
   }
-  toDisplayUSD (bn) {
-    return bn.toFixed(2, BigNumber.ROUND_UP).toString()
-  }
-  toDisplayEther (bn) {
-    return parseFloat(bn.shiftedBy(-18).toFixed(6).toString())
-  }
-  toDisplayGwei (bn) {
-    return parseFloat(bn.shiftedBy(-9).toFixed(3).toString())
-  }
+
   render () {
     const req = this.props.req
 
@@ -70,10 +87,7 @@ class TxFee extends React.Component {
                 <div className='_txFeeBar _txMainValue _txMainValueClickable' onClick={() => {
                   link.send('nav:update', 'panel', { data: { step: 'adjustFee' } })
                 }}>
-                  <div className='_txFeeGwei'>
-                    <span className='_txFeeGweiValue'>{this.toDisplayGwei(maxFeePerGas)}</span>
-                    <span className='_txFeeGweiLabel'>Gwei</span>
-                  </div>
+                  <GasDisplay maxFeePerGas={maxFeePerGas} />
                 </div>
               </div>
               <div className='_txMainValuesColumn' style={{ flex: '1' }}>
@@ -83,24 +97,24 @@ class TxFee extends React.Component {
                       {currentSymbol || '?'}
                     </span>
                     <span className='_txFeeETHValue'>
-                      {this.toDisplayEther(maxFee)}
+                      {toDisplayEther(maxFee)}
                     </span>
                   </div>
                 </div>
-                {this.toDisplayUSD(maxFeeUSD) !== '0.00' ? (
+                {toDisplayUSD(maxFeeUSD) !== '0.00' ? (
                   <div className='_txMainTagFee'>
-                    <div className={maxFeeUSD.toNumber() > FEE_WARNING_THRESHOLD_USD || this.toDisplayUSD(maxFeeUSD) === '0.00' ? '_txFeeValueDefault _txFeeValueDefaultWarn' : '_txFeeValueDefault'}>
+                    <div className={maxFeeUSD.toNumber() > FEE_WARNING_THRESHOLD_USD || toDisplayUSD(maxFeeUSD) === '0.00' ? '_txFeeValueDefault _txFeeValueDefaultWarn' : '_txFeeValueDefault'}>
                       <span className=''>
                         ≈
                       </span>
                       <span className=''>
-                        {`$${this.toDisplayUSD(minFeeUSD)}`}
+                        {`$${toDisplayUSD(minFeeUSD)}`}
                       </span>
                       <span className=''>
                         {'-'}
                       </span>
                       <span className=''>
-                        {`$${this.toDisplayUSD(maxFeeUSD)}`}
+                        {`$${toDisplayUSD(maxFeeUSD)}`}
                       </span>
                       <span className=''>
                         {`in ${currentSymbol || '?'}`}
