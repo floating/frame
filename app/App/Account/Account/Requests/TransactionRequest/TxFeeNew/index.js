@@ -18,7 +18,9 @@ function toDisplayEther (bn) {
 }
 
 function toDisplayGwei (bn) {
-  return parseFloat(bn.shiftedBy(-9).toFixed(3).toString())
+  const gwei = bn.shiftedBy(-9).decimalPlaces(3, BigNumber.ROUND_FLOOR)
+
+  return gwei.isZero() ? '' : gwei.toFormat()
 }
 
 function toDisplayWei (bn) {
@@ -27,7 +29,7 @@ function toDisplayWei (bn) {
 
 const GasDisplay = ({ maxFeePerGas }) => {
   const gasGwei = toDisplayGwei(maxFeePerGas)
-  const shouldDisplayWei = gasGwei === '0.000'
+  const shouldDisplayWei = gasGwei === ''
   const displayValue = shouldDisplayWei ? toDisplayWei(maxFeePerGas) : gasGwei
   const displayLabel = shouldDisplayWei ? 'Wei' : 'Gwei'
   return <div className='_txFeeGwei'>
