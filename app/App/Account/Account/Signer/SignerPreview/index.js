@@ -85,7 +85,7 @@ class Signer extends React.Component {
           <div>{'Seed'}</div>
         </div>
       )
-    } else if (type === 'keyring') {
+    } else if (type === 'ring') {
       return (
         <div className='moduleItemSignerType'>
           <div className='moduleItemIcon'>{svg.key(17)}</div>
