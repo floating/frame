@@ -87,8 +87,8 @@ function isConnected(chain: Chain) {
   if (!connection) {
     return false
   }
-  const status = [connection.primary.status, connection.secondary.status]
-  
+
+  const status = [connection.primary.status, connection.secondary.status]  
   return status.includes('connected')
 }
 
