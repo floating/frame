@@ -33,6 +33,7 @@ beforeEach(() => {
 
 it('renders a total gas price of whole-number gwei', () => {
   req.data.type = '0x0'
+  req.data.gasPrice = addHexPrefix(1e10.toString(16))
 
   const { getByTestId } = setupComponent(<TxFee req={req} />)
   const baseFeeInput = getByTestId('gas-display')
