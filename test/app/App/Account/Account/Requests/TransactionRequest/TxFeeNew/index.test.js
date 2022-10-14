@@ -34,12 +34,11 @@ describe('gas display', () => {
   it('renders a total gas price of whole-number gwei', () => {
     req.data.type = '0x0'
     req.data.gasPrice = addHexPrefix(1e10.toString(16))
-  
+
     const { getByTestId } = setupComponent(<TxFee req={req} />)
     const baseFeeInput = getByTestId('gas-display')
-  
-    const formattedString = getFormattedString(baseFeeInput.textContent, ['G'])
-    expect(formattedString).toBe('10 Gwei')
+
+    expect(baseFeeInput.textContent).toBe('10Gwei')
   })
   
   it('renders a total gas price of gwei with decimals', () => {
@@ -48,9 +47,8 @@ describe('gas display', () => {
   
     const { getByTestId } = setupComponent(<TxFee req={req} />)
     const baseFeeInput = getByTestId('gas-display')
-  
-    const formattedString = getFormattedString(baseFeeInput.textContent, ['G'])
-    expect(formattedString).toBe('12.369 Gwei')
+
+    expect(baseFeeInput.textContent).toBe('12.369Gwei')
   })
   
   it('renders a total gas price of less than 1 million wei', () => {
@@ -60,8 +58,7 @@ describe('gas display', () => {
     const { getByTestId } = setupComponent(<TxFee req={req} />)
     const baseFeeInput = getByTestId('gas-display')
   
-    const formattedString = getFormattedString(baseFeeInput.textContent, ['W'])
-    expect(formattedString).toBe('945,000 Wei')
+    expect(baseFeeInput.textContent).toBe('945,000Wei')
   })
 })
 
@@ -72,9 +69,8 @@ describe('usd estimate display', () => {
   
     const { getByTestId } = setupComponent(<TxFee req={req} />)
     const baseFeeInput = getByTestId('usd-estimate-display')
-  
-    const formattedString = getFormattedString(baseFeeInput.textContent, ['<', 'i'])
-    expect(formattedString).toBe('≈ < $0.01 in MATIC')
+
+    expect(baseFeeInput.textContent).toBe('≈< $0.01in MATIC')
   })
 
   it('renders an estimate for between less than a cent and one cent', () => {
@@ -83,20 +79,18 @@ describe('usd estimate display', () => {
   
     const { getByTestId } = setupComponent(<TxFee req={req} />)
     const baseFeeInput = getByTestId('usd-estimate-display')
-  
-    const formattedString = getFormattedString(baseFeeInput.textContent, ['<', 'i'])
-    expect(formattedString).toBe('≈ < $0.01-$0.01 in MATIC')
+
+    expect(baseFeeInput.textContent).toBe('≈< $0.01-$0.01in MATIC')
   })
 
-  it('renders an estimate for between > $1 values', () => {
+  it('xxxrenders an estimate for between > $1 values', () => {
     req.data.type = '0x0'
     req.data.gasPrice = addHexPrefix(5e14.toString(16))
   
     const { getByTestId } = setupComponent(<TxFee req={req} />)
     const baseFeeInput = getByTestId('usd-estimate-display')
   
-    const formattedString = getFormattedString(baseFeeInput.textContent, ['$', 'i'])
-    expect(formattedString).toBe('≈ $5.88-$11.18 in MATIC')
+    expect(baseFeeInput.textContent).toBe('≈$5.88-$11.18in MATIC')
   })
 
   it('renders a warning when the estimate is over the fee threshold', () => {
@@ -109,11 +103,3 @@ describe('usd estimate display', () => {
     expect(baseFeeInput.children[0].classList.contains('_txFeeValueDefaultWarn')).toBe(true)
   })
 })
-
-function getFormattedString (textValue, splitValues) {
-  let newTextValue = textValue
-  splitValues.forEach((splitValue) => {
-    newTextValue = newTextValue.replace(splitValue, ` ${splitValue}`)
-  })
-  return newTextValue
-}
