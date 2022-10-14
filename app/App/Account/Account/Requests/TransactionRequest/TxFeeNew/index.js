@@ -2,15 +2,14 @@ import React from 'react'
 import Restore from 'react-restore'
 import BigNumber from 'bignumber.js'
 
-import { usesBaseFee } from '../../../../../../../resources/domain/transaction'
+import { usesBaseFee, GasFeesSource } from '../../../../../../../resources/domain/transaction'
 import link from '../../../../../../../resources/link'
-
-import { GasFeesSource } from '../../../../../../../resources/domain/transaction'
 
 const FEE_WARNING_THRESHOLD_USD = 50
 
 function toDisplayUSD (bn) {
-  return bn.toFixed(2, BigNumber.ROUND_UP).toString()
+  const usd = bn.decimalPlaces(2, BigNumber.ROUND_FLOOR)
+  return usd.isZero() ? '< $0.01' : `$${usd.toFormat()}`
 }
 
 function toDisplayEther (bn) {
@@ -54,28 +53,19 @@ const USDEstimateDisplay = ({ maxFeePerGas, maxGas, maxFeeUSD, nativeUSD, symbol
   const minFeeUSD = minFee.shiftedBy(-18).multipliedBy(nativeUSD)
   const displayMinFeeUSD = toDisplayUSD(minFeeUSD)
   const displayMaxFeeUSD = toDisplayUSD(maxFeeUSD)
-
-  if (displayMaxFeeUSD === '0.00') {
-    return null
-  }
   
-  return <div className='_txMainTagFee'>
+  return <div data-testid='usd-estimate-display' className='_txMainTagFee'>
     <div className={maxFeeUSD.toNumber() > FEE_WARNING_THRESHOLD_USD ? '_txFeeValueDefault _txFeeValueDefaultWarn' : '_txFeeValueDefault'}>
-      <span className=''>
-        ≈
-      </span>
-      <span className=''>
-        {`$${displayMinFeeUSD}`}
-      </span>
-      <span className=''>
-        {'-'}
-      </span>
-      <span className=''>
-        {`$${displayMaxFeeUSD}`}
-      </span>
-      <span className=''>
-        {`in ${symbol}`}
-      </span>
+      <span>{'≈'}</span>
+      {displayMaxFeeUSD === '< $0.01' ? 
+      <span>{displayMaxFeeUSD}</span> : 
+      <>      
+        <span>{displayMinFeeUSD}</span>
+        <span>{'-'}</span>
+        <span>{displayMaxFeeUSD}</span>
+      </>
+      }
+      <span>{`in ${symbol}`}</span>
     </div>
   </div>
 }
