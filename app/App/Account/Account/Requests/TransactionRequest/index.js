@@ -187,7 +187,7 @@ class TransactionRequest extends React.Component {
                   return <TxAction key={'action' + action.type + i} i={2 + i} {...this.props} req={req} chain={chain} action={action} />
                 })}
                 <TxRecipient i={3 + recognizedActions.length} {...this.props} req={req} />
-                <TxFeeNew i={4 + recognizedActions.length} {...this.props} req={req} chain={chain} />
+                <TxFeeNew i={4 + recognizedActions.length} {...this.props} req={req} />
               </div>
             </div>
           </div>

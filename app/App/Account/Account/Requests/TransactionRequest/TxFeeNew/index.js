@@ -30,14 +30,16 @@ function toDisplayWei (bn) {
 }
 
 const GasDisplay = ({ maxFeePerGas }) => {
-  const gasGwei = toDisplayGwei(maxFeePerGas)
-  const shouldDisplayWei = gasGwei === ''
-  const displayValue = shouldDisplayWei ? toDisplayWei(maxFeePerGas) : gasGwei
-  const displayLabel = shouldDisplayWei ? 'Wei' : 'Gwei'
-  return <div className='_txFeeGwei'>
-    <span className='_txFeeGweiValue'>{displayValue}</span>
-    <span className='_txFeeGweiLabel'>{displayLabel}</span>
-  </div>
+  const gweiDisplayValue = toDisplayGwei(maxFeePerGas)
+  const displayValue = gweiDisplayValue || toDisplayWei(maxFeePerGas)
+  const displayLabel = !!gweiDisplayValue ? 'Gwei' : 'Wei'
+
+  return (
+    <div data-testid='gas-display' className='_txFeeGwei'>
+      <span className='_txFeeGweiValue'>{displayValue}</span>
+      <span className='_txFeeGweiLabel'>{displayLabel}</span>
+    </div>
+  )
 }                    
 
 class TxFee extends React.Component {
@@ -50,10 +52,10 @@ class TxFee extends React.Component {
 
     const chain = { 
       type: 'ethereum', 
-      id: parseInt(req.data.chainId, 'hex')
+      id: parseInt(req.data.chainId, 16)
     }
 
-    const isTestnet = this.store('main.networks', chain.type, chain.id, 'isTestnet')
+    const { symbol = '?', isTestnet } = this.store('main.networks', chain.type, chain.id)
     const nativeCurrency = this.store('main.networksMeta', chain.type, chain.id, 'nativeCurrency')
     const nativeUSD = nativeCurrency && nativeCurrency.usd && !isTestnet ? nativeCurrency.usd.price : 0
 
@@ -80,8 +82,6 @@ class TxFee extends React.Component {
 
     const minFee = minFeePerGas.multipliedBy(minGas)
     const minFeeUSD = minFee.shiftedBy(-18).multipliedBy(nativeUSD)
-
-    const currentSymbol = this.store('main.networks', this.props.chain.type, this.props.chain.id, 'symbol') || '?'
     const displayEther = toDisplayEther(maxFee)
 
     return (
@@ -101,7 +101,7 @@ class TxFee extends React.Component {
                 <div className='_txMainValue _txFeeTotal'>
                   <div>
                     <span className='_txFeeETH'>
-                      {currentSymbol || '?'}
+                      {symbol}
                     </span>
                     <span className='_txFeeETHValue'>
                       {displayEther}
@@ -124,7 +124,7 @@ class TxFee extends React.Component {
                         {`$${toDisplayUSD(maxFeeUSD)}`}
                       </span>
                       <span className=''>
-                        {`in ${currentSymbol || '?'}`}
+                        {`in ${symbol}`}
                       </span>
                     </div>
                   </div>
