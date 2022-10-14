@@ -30,17 +30,19 @@ function toDisplayWei (bn) {
 }
 
 const GasDisplay = ({ maxFeePerGas }) => {
-  const gasGwei = toDisplayGwei(maxFeePerGas)
-  const shouldDisplayWei = gasGwei === ''
-  const displayValue = shouldDisplayWei ? toDisplayWei(maxFeePerGas) : gasGwei
-  const displayLabel = shouldDisplayWei ? 'Wei' : 'Gwei'
-  return <div className='_txFeeGwei'>
-    <span className='_txFeeGweiValue'>{displayValue}</span>
-    <span className='_txFeeGweiLabel'>{displayLabel}</span>
-  </div>
-}
+  const gweiDisplayValue = toDisplayGwei(maxFeePerGas)
+  const displayValue = gweiDisplayValue || toDisplayWei(maxFeePerGas)
+  const displayLabel = !!gweiDisplayValue ? 'Gwei' : 'Wei'
 
-const USDEstimateDisplay = ({ maxFeePerGas, maxGas, maxFeeUSD, nativeUSD, currentSymbol }) => {
+  return (
+    <div data-testid='gas-display' className='_txFeeGwei'>
+      <span className='_txFeeGweiValue'>{displayValue}</span>
+      <span className='_txFeeGweiLabel'>{displayLabel}</span>
+    </div>
+  )
+}     
+
+const USDEstimateDisplay = ({ maxFeePerGas, maxGas, maxFeeUSD, nativeUSD, symbol }) => {
   // accounts for two potential 12.5% block fee increases
   const reduceFactor = BigNumber(9).dividedBy(8)
   const minFeePerGas = maxFeePerGas.dividedBy(reduceFactor).dividedBy(reduceFactor)
@@ -72,7 +74,7 @@ const USDEstimateDisplay = ({ maxFeePerGas, maxGas, maxFeeUSD, nativeUSD, curren
         {`$${displayMaxFeeUSD}`}
       </span>
       <span className=''>
-        {`in ${currentSymbol || '?'}`}
+        {`in ${symbol}`}
       </span>
     </div>
   </div>
@@ -88,10 +90,10 @@ class TxFee extends React.Component {
 
     const chain = { 
       type: 'ethereum', 
-      id: parseInt(req.data.chainId, 'hex')
+      id: parseInt(req.data.chainId, 16)
     }
 
-    const isTestnet = this.store('main.networks', chain.type, chain.id, 'isTestnet')
+    const { symbol = '?', isTestnet } = this.store('main.networks', chain.type, chain.id)
     const nativeCurrency = this.store('main.networksMeta', chain.type, chain.id, 'nativeCurrency')
     const nativeUSD = nativeCurrency && nativeCurrency.usd && !isTestnet ? nativeCurrency.usd.price : 0
 
@@ -109,7 +111,6 @@ class TxFee extends React.Component {
       maxFeeUSD = maxFee.shiftedBy(-18).multipliedBy(nativeUSD)
     }
 
-    const currentSymbol = this.store('main.networks', this.props.chain.type, this.props.chain.id, 'symbol') || '?'
     const displayEther = toDisplayEther(maxFee)
 
     return (
@@ -129,14 +130,14 @@ class TxFee extends React.Component {
                 <div className='_txMainValue _txFeeTotal'>
                   <div>
                     <span className='_txFeeETH'>
-                      {currentSymbol || '?'}
+                      {symbol}
                     </span>
                     <span className='_txFeeETHValue'>
                       {displayEther}
                     </span>
                   </div>
                 </div>
-                <USDEstimateDisplay maxFeePerGas={maxFeePerGas} maxGas={maxGas} maxFeeUSD={maxFeeUSD} nativeUSD={nativeUSD} currentSymbol={currentSymbol} />
+                <USDEstimateDisplay maxFeePerGas={maxFeePerGas} maxGas={maxGas} maxFeeUSD={maxFeeUSD} nativeUSD={nativeUSD} symbol={symbol} />
               </div>
             </div>
             {req.feesUpdatedByUser ? (
