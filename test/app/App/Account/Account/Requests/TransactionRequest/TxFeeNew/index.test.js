@@ -92,14 +92,4 @@ describe('usd estimate display', () => {
   
     expect(baseFeeInput.textContent).toBe('≈$5.88-$11.18in MATIC')
   })
-
-  it('renders a warning when the estimate is over the fee threshold', () => {
-    req.data.type = '0x0'
-    req.data.gasPrice = addHexPrefix(5e16.toString(16))
-  
-    const { getByTestId } = setupComponent(<TxFee req={req} />)
-    const baseFeeInput = getByTestId('usd-estimate-display')
-  
-    expect(baseFeeInput.children[0].classList.contains('_txFeeValueDefaultWarn')).toBe(true)
-  })
 })
