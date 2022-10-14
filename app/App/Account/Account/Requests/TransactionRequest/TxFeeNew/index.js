@@ -38,7 +38,45 @@ const GasDisplay = ({ maxFeePerGas }) => {
     <span className='_txFeeGweiValue'>{displayValue}</span>
     <span className='_txFeeGweiLabel'>{displayLabel}</span>
   </div>
-}                    
+}
+
+const USDEstimateDisplay = ({ maxFeePerGas, maxGas, maxFeeUSD, nativeUSD, currentSymbol }) => {
+  // accounts for two potential 12.5% block fee increases
+  const reduceFactor = BigNumber(9).dividedBy(8)
+  const minFeePerGas = maxFeePerGas.dividedBy(reduceFactor).dividedBy(reduceFactor)
+
+  // accounts for the 50% padding in the gas estimate in the provider
+  const minGas = maxGas.dividedBy(BigNumber(1.5))
+
+  const minFee = minFeePerGas.multipliedBy(minGas)
+  const minFeeUSD = minFee.shiftedBy(-18).multipliedBy(nativeUSD)
+  const displayMinFeeUSD = toDisplayUSD(minFeeUSD)
+  const displayMaxFeeUSD = toDisplayUSD(maxFeeUSD)
+
+  if (displayMaxFeeUSD === '0.00') {
+    return null
+  }
+  
+  return <div className='_txMainTagFee'>
+    <div className={maxFeeUSD.toNumber() > FEE_WARNING_THRESHOLD_USD ? '_txFeeValueDefault _txFeeValueDefaultWarn' : '_txFeeValueDefault'}>
+      <span className=''>
+        ≈
+      </span>
+      <span className=''>
+        {`$${displayMinFeeUSD}`}
+      </span>
+      <span className=''>
+        {'-'}
+      </span>
+      <span className=''>
+        {`$${displayMaxFeeUSD}`}
+      </span>
+      <span className=''>
+        {`in ${currentSymbol || '?'}`}
+      </span>
+    </div>
+  </div>
+}
 
 class TxFee extends React.Component {
   constructor (props, context) {
@@ -71,16 +109,6 @@ class TxFee extends React.Component {
       maxFeeUSD = maxFee.shiftedBy(-18).multipliedBy(nativeUSD)
     }
 
-    // accounts for two potential 12.5% block fee increases
-    const reduceFactor = BigNumber(9).dividedBy(8)
-    const minFeePerGas = maxFeePerGas.dividedBy(reduceFactor).dividedBy(reduceFactor)
-
-    // accounts for the 50% padding in the gas estimate in the provider
-    const minGas = maxGas.dividedBy(BigNumber(1.5))
-
-    const minFee = minFeePerGas.multipliedBy(minGas)
-    const minFeeUSD = minFee.shiftedBy(-18).multipliedBy(nativeUSD)
-
     const currentSymbol = this.store('main.networks', this.props.chain.type, this.props.chain.id, 'symbol') || '?'
     const displayEther = toDisplayEther(maxFee)
 
@@ -108,27 +136,7 @@ class TxFee extends React.Component {
                     </span>
                   </div>
                 </div>
-                {toDisplayUSD(maxFeeUSD) !== '0.00' ? (
-                  <div className='_txMainTagFee'>
-                    <div className={maxFeeUSD.toNumber() > FEE_WARNING_THRESHOLD_USD || toDisplayUSD(maxFeeUSD) === '0.00' ? '_txFeeValueDefault _txFeeValueDefaultWarn' : '_txFeeValueDefault'}>
-                      <span className=''>
-                        ≈
-                      </span>
-                      <span className=''>
-                        {`$${toDisplayUSD(minFeeUSD)}`}
-                      </span>
-                      <span className=''>
-                        {'-'}
-                      </span>
-                      <span className=''>
-                        {`$${toDisplayUSD(maxFeeUSD)}`}
-                      </span>
-                      <span className=''>
-                        {`in ${currentSymbol || '?'}`}
-                      </span>
-                    </div>
-                  </div>
-                ) : null}
+                <USDEstimateDisplay maxFeePerGas={maxFeePerGas} maxGas={maxGas} maxFeeUSD={maxFeeUSD} nativeUSD={nativeUSD} currentSymbol={currentSymbol} />
               </div>
             </div>
             {req.feesUpdatedByUser ? (
