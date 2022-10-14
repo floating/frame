@@ -6,13 +6,14 @@ import type { VersionUpdate } from '.'
 
 import packageInfo from '../../package.json'
 
+const repo = packageInfo.repository.split(':')[1]
+const version = packageInfo.version
+
 const httpOptions = {
   host: 'api.github.com',
-  path: '/repos/floating/frame/releases',
+  path: `/repos/${repo}/releases`,
   headers: { 'User-Agent': 'request' }
 }
-
-const version = packageInfo.version
 
 interface GithubRelease {
   prerelease: boolean,
