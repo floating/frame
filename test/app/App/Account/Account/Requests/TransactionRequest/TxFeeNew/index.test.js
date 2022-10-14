@@ -83,7 +83,7 @@ describe('usd estimate display', () => {
     expect(baseFeeInput.textContent).toBe('≈< $0.01-$0.01in MATIC')
   })
 
-  it('xxxrenders an estimate for between > $1 values', () => {
+  it('renders an estimate for between > $1 values', () => {
     req.data.type = '0x0'
     req.data.gasPrice = addHexPrefix(5e14.toString(16))
   
