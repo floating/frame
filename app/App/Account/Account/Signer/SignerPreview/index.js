@@ -39,7 +39,7 @@ class Signer extends React.Component {
   verifyAddress (hardwareSigner) {
     if (hardwareSigner) {
       // prompt for on-signer verification
-      this.setState({ notifySuccess: false, notifyText: 'See Signer for address verification' })
+      this.setState({ notifySuccess: false, notifyText: 'Verify address on signer' })
     }
     link.rpc('verifyAddress', err => {
       if (err) {
