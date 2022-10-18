@@ -36,8 +36,8 @@ class Signer extends React.Component {
     if (this.resizeObserver) this.resizeObserver.disconnect()
   }
 
-  verifyAddress (signerType) {
-    if (['ledger', 'trezor'].includes(signerType)) {
+  verifyAddress (hardwareSigner) {
+    if (hardwareSigner) {
       // prompt for on-signer verification
       this.setState({ notifySuccess: false, notifyText: 'See Signer for address verification' })
     }
@@ -172,7 +172,7 @@ class Signer extends React.Component {
             {!watchOnly ? (
               <div 
                 className='moduleItem moduleItemButton' 
-                onMouseDown={() => this.verifyAddress(activeAccount.lastSignerType)}
+                onMouseDown={() => this.verifyAddress(hardwareSigner)}
               >
                 {svg.doubleCheck(20)}
               </div>
