@@ -36,7 +36,11 @@ class Signer extends React.Component {
     if (this.resizeObserver) this.resizeObserver.disconnect()
   }
 
-  verifyAddress () {
+  verifyAddress (signerType) {
+    if (['ledger', 'trezor'].includes(signerType)) {
+      // prompt for on-signer verification
+      this.setState({ notifySuccess: false, notifyText: 'See Signer for address verification' })
+    }
     link.rpc('verifyAddress', err => {
       if (err) {
         this.setState({ notifySuccess: false, notifyText: err })
@@ -168,7 +172,7 @@ class Signer extends React.Component {
             {!watchOnly ? (
               <div 
                 className='moduleItem moduleItemButton' 
-                onMouseDown={() => this.verifyAddress()}
+                onMouseDown={() => this.verifyAddress(activeAccount.lastSignerType)}
               >
                 {svg.doubleCheck(20)}
               </div>
