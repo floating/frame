@@ -85,7 +85,7 @@ class TxRecipient extends React.Component {
             headerMode={true}
           />
 
-          <TxOverview req={req} chainName={chainName} symbol={currentSymbol} txMeta={txMeta} />
+          <TxOverview req={req} chainName={chainName} chainColor={primaryColor} symbol={currentSymbol} txMeta={txMeta} />
 
         </div>
       </div>

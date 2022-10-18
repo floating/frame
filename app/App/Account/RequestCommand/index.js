@@ -82,7 +82,7 @@ class RequestCommand extends React.Component {
       }
     }
 
-    let displayStatus = req.status
+    let displayStatus = req.notice || req.status
     if (displayStatus === 'verifying') displayStatus = 'waiting for block'
 
     return (

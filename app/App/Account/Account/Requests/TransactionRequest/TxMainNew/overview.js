@@ -24,10 +24,10 @@ function renderRecognizedAction (req, symbol) {
   })
 }
 
-const TxDescription = ({ chain, children }) => (
+const TxDescription = ({ chain, children, chainColor }) => (
   <div className='_txDescriptionSummary'>
     {children}
-    <div className='_txDescriptionSummaryLine'>{`on ${chain}`}</div>
+    <div className='_txDescriptionSummaryTag' style={{ color: `var(--${chainColor})` }}>{`on ${chain}`}</div>
   </div>
 )
 
@@ -35,7 +35,7 @@ const SendOverview = ({ amountHex, decimals, symbol }) => {
   const displayAmount = utils.formatUnits(amountHex, decimals)
 
   return  (
-    <div>{`Sending ${displayAmount} ${symbol}`}</div>
+    <div>{`Send ${displayAmount} ${symbol}`}</div>
   )
 }
 
@@ -44,7 +44,7 @@ const GenericContractOverview = ({ method }) => (<div>{`Calling Contract Method 
 const DataOverview = () => (<div>Sending data</div>)
 const EmptyTransactionOverview = () => (<div>Empty Transaction</div>)
 
-const TxOverview = ({ req, chainName, symbol, txMeta }) => {
+const TxOverview = ({ req, chainName, chainColor, symbol, txMeta, simple }) => {
   const { recipientType, decodedData: { method } = {}, data: tx = {} } = req
   const { to, value, data: calldata } = tx
   
@@ -70,13 +70,15 @@ const TxOverview = ({ req, chainName, symbol, txMeta }) => {
     description = <DataOverview />
   }
 
+  if (simple) return description || <EmptyTransactionOverview />
+
   return (
     <div className='_txMainValues'>
       <div className='_txMainValue _txMainValueClickable' onClick={() => {
         link.send('nav:update', 'panel', { data: { step: 'viewData' } })
       }}>
         <div className='_txDescription'>
-          <TxDescription chain={chainName}>
+          <TxDescription chain={chainName} chainColor={chainColor}>
             {description || <EmptyTransactionOverview />}
           </TxDescription>
         </div>
