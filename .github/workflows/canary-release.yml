@@ -85,7 +85,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Bump version
         id: package_version
-        uses: KageKirin/bump-node-package-version@v0
+        uses: KageKirin/bump-node-package-version@v1.0.0
         with:
           regex: /(\d)\.(\d)\.[\d]-canary\.(\d)/
           patch: true
