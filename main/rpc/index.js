@@ -2,6 +2,7 @@ const { ipcMain, dialog } = require('electron')
 const fs = require('fs')
 const utils = require('web3-utils')
 const crypto = require('crypto')
+const { generateOwnershipWallet } = require('urbit-key-generation')
 
 const accounts = require('../accounts').default
 const signers = require('../signers').default
@@ -88,13 +89,13 @@ const rpc = {
     }
 
     store.updateLattice(deviceId, {
-      deviceId, 
+      deviceId,
       baseUrl: 'https://signing.gridpl.us',
       endpointMode: 'default',
       paired: true,
       deviceName: (deviceName || 'GridPlus').substring(0, 14),
       tag: randomLetters(6),
-      privKey: crypto.randomBytes(32).toString('hex')  
+      privKey: crypto.randomBytes(32).toString('hex')
     })
 
     cb(null, { id: 'lattice-' + deviceId })
@@ -181,6 +182,11 @@ const rpc = {
   },
   createFromPhrase (phrase, password, cb) {
     signers.createFromPhrase(phrase, password, cb)
+  },
+  createFromMasterTicket (ship, ticket, cb) {
+    generateOwnershipWallet({ ship, ticket })
+      .then(wallet => this.createFromPhrase(wallet.seed, ticket, cb))
+      .catch((err) => cb(err, null))
   },
   locateKeystore (cb) {
     dialog.showOpenDialog({ properties: ['openFile'] }).then(file => {

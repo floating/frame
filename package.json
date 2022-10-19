@@ -103,6 +103,8 @@
     "react-transition-group": "4.4.2",
     "semver": "7.3.6",
     "trezor-connect": "8.2.9-extended",
+    "urbit-key-generation": "^0.20.1",
+    "urbit-ob": "^5.0.1",
     "uuid": "8.3.2",
     "web3-utils": "1.7.3",
     "ws": "8.5.0",

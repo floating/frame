@@ -10,6 +10,7 @@ import AddPhrase from './Add/AddPhrase'
 import AddRing from './Add/AddRing'
 import AddKeystore from './Add/AddKeystore'
 import AddAddress from './Add/AddAddress'
+import AddUrbitID from './Add/AddUrbitID'
 
 class AddAccounts extends React.Component {
   constructor (...args) {
@@ -21,7 +22,7 @@ class AddAccounts extends React.Component {
   renderAddNonsigning () {
     return (
       <div className='addAccounts cardShow'>
-       <AddAddress close={this.props.close} />          
+       <AddAddress close={this.props.close} />
       </div>
     )
   }
@@ -43,6 +44,13 @@ class AddAccounts extends React.Component {
     return (
       <div className='addAccounts cardShow'>
        <AddPhrase close={this.props.close} />
+      </div>
+    )
+  }
+  renderAddUrbitID () {
+    return (
+      <div className='addAccounts cardShow'>
+       <AddUrbitID close={this.props.close} />
       </div>
     )
   }
@@ -92,6 +100,7 @@ class AddAccounts extends React.Component {
         <div className='accountTypeSelect' onClick={() => this.setState({ view: 'ledger' })}>Ledger Device</div>
         <div className='accountTypeSelect' onClick={() => this.setState({ view: 'trezor' })}>Trezor Device</div>
         <div className='accountTypeSelect' onClick={() => this.setState({ view: 'aragon' })}>Aragon DAO</div>
+        <div className='accountTypeSelect' onClick={() => this.setState({ view: 'urbit-id' })}>Urbit ID</div>
         {/* <div className='accountTypeSelect' onClick={() => this.setState({ view: 'gnosis' })}>Gnosis Safe</div> */}
         <div className='accountTypeSelect' onClick={() => this.setState({ view: 'seed' })}>Seed Phrase</div>
         <div className='accountTypeSelect' onClick={() => this.setState({ view: 'keyring' })}>Private Key</div>
@@ -106,6 +115,8 @@ class AddAccounts extends React.Component {
       return this.renderDefault()
     } else if (view === 'aragon')  {
       return this.renderAddAragon()
+    } else if (view === 'urbit-id') {
+      return this.renderAddUrbitID();
     // } else if (view === 'gnosis')  {
     //   return this.renderAddGnosis()
     } else if (view === 'ledger')  {
@@ -140,7 +151,7 @@ class Dash extends React.Component {
       const hardwareSigners = Object.keys(this.store('main.signers')).map(s => {
         const signer = this.store('main.signers', s)
         if (
-          signer.type === 'ledger' || 
+          signer.type === 'ledger' ||
           signer.type === 'trezor' ||
           signer.type === 'lattice'
         ) {
@@ -152,7 +163,7 @@ class Dash extends React.Component {
       const hotSigners = Object.keys(this.store('main.signers')).map(s => {
         const signer = this.store('main.signers', s)
         if (
-          signer.type === 'seed' || 
+          signer.type === 'seed' ||
           signer.type === 'ring'
         ) {
           return signer
@@ -160,12 +171,12 @@ class Dash extends React.Component {
           return false
         }
       }).filter(s => s)
-      
+
       return (
       <div className='dash'>
         {this.state.showAddAccounts ? <AddAccounts close={() => this.setState({ showAddAccounts: false })} /> : null}
         <div className='newAccount' onClick={() => this.setState({ showAddAccounts: !this.state.showAddAccounts })}>
-          <div className='newAccountIcon'>{'+'}</div> 
+          <div className='newAccountIcon'>{'+'}</div>
           Add New Account
         </div>
         <div className='signers'>
