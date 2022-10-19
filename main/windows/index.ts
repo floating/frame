@@ -266,8 +266,10 @@ class Tray {
   }
 
   showContextMenu () {
-    if(this.contextMenu) {
-      this.electronTray.popUpContextMenu(this.contextMenu)
+    if (this.contextMenu) {
+      setTimeout(() => {
+        this.electronTray.popUpContextMenu(this.contextMenu)
+      }, process.platform === 'win32' ? 100 : 0)
     }
   }
 
