@@ -24,7 +24,7 @@ jobs:
           repo_token: ${{ secrets.GH_RELEASE_DEPLOYMENT_TOKEN }}
           automatic_release_tag: v${{ steps.package-version.outputs.current-version }}
           prerelease: true
-          draft: true
+          draft: false
           title: ${{ steps.package-version.outputs.current-version }}
 
   build_release:
