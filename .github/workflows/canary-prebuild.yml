@@ -1,4 +1,4 @@
-name: Build and publish canary release
+name: Build and publish canary prebuilds
 
 on:
   push:
@@ -27,10 +27,10 @@ jobs:
       uses: marvinpinto/action-automatic-releases@latest
       with:
         repo_token: ${{ secrets.GH_RELEASE_DEPLOYMENT_TOKEN }}
-        automatic_release_tag: v${{ steps.package-version.outputs.current-version }}
+        automatic_release_tag: v${{ steps.package-version.outputs.current-version }}.pre
         prerelease: true
         draft: true
-        title: ${{ steps.package-version.outputs.current-version}}
+        title: ${{ steps.package-version.outputs.current-version}} Prebuild
 
   build_release:
     needs: [create_canary_release]
