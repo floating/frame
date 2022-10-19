@@ -126,7 +126,7 @@ function initDashWindow () {
   windows.dash.loadURL(dashUrl.toString())
 }
 
-function initTrayWindow () {
+function initTrayWindow (trayObj: Tray) {
   windows.tray = new BrowserWindow({
     width: trayWidth,
     frame: false,
@@ -161,20 +161,20 @@ function initTrayWindow () {
   windows.tray.setPosition(width + x, height + y)
 
   windows.tray.on('show', () => {
-    if (process.platform === 'win32') {
-      tray.electronTray.closeContextMenu()
-    }
-    setTimeout(() => {
-      tray.electronTray.setContextMenu(hideMenu)
-    }, 100)
+    // if (process.platform === 'win32') {
+    //   tray.electronTray.closeContextMenu()
+    // }
+    // setTimeout(() => {
+    trayObj.setContextMenu(hideMenu)
+    //}, 100)
   })
   windows.tray.on('hide', () => {
-    if (process.platform === 'win32') {
-      tray.electronTray.closeContextMenu()
-    }
-    setTimeout(() => {
-      tray.electronTray.setContextMenu(showMenu)
-    }, 100)
+    // if (process.platform === 'win32') {
+    //   tray.electronTray.closeContextMenu()
+    // }
+    // setTimeout(() => {
+    trayObj.setContextMenu(showMenu)
+    // }, 100)
   })
 
   setTimeout(() => {
@@ -217,7 +217,8 @@ class Tray {
   private gasObserver: Observer
   private ready: boolean
   private readyHandler: () => void
-  public electronTray: ElectronTray
+  private electronTray: ElectronTray
+  private contextMenu?: Menu
 
   constructor () {
     this.electronTray = new ElectronTray(path.join(__dirname, process.platform === 'darwin' ? './IconTemplate.png' : './Icon.png'))
@@ -233,15 +234,18 @@ class Tray {
       this.electronTray.setTitle(title)
     })
     this.readyHandler = () => {
+      this.electronTray.setIgnoreDoubleClickEvents(true)
+      this.electronTray.on('right-click', () => this.showContextMenu())
       this.electronTray.on('click', () => {
-        this.recentElectronTrayClick = true
-        clearTimeout(this.recentElectronTrayClickTimeout as NodeJS.Timeout)
-        this.recentElectronTrayClickTimeout = setTimeout(() => {
-          this.recentElectronTrayClick = false
-        }, 50)
-        if (process.platform === 'win32') {
-          this.toggle()
-        }
+        // this.electronTray.closeContextMenu()
+        // this.recentElectronTrayClick = true
+        // clearTimeout(this.recentElectronTrayClickTimeout as NodeJS.Timeout)
+        // this.recentElectronTrayClickTimeout = setTimeout(() => {
+        //   this.recentElectronTrayClick = false
+        // }, 50)
+        // //if (process.platform === 'win32') {
+        this.toggle()
+        //}
       })
       if (showOnReady) {
         store.trayOpen(true)
@@ -254,7 +258,17 @@ class Tray {
       }
     }
     ipcMain.on('tray:ready', this.readyHandler)
-    initTrayWindow()
+    initTrayWindow(this)
+  }
+
+  setContextMenu (menu: Menu) {
+    this.contextMenu = menu 
+  }
+
+  showContextMenu () {
+    if(this.contextMenu) {
+      this.electronTray.popUpContextMenu(this.contextMenu)
+    }
   }
 
   isReady () {
