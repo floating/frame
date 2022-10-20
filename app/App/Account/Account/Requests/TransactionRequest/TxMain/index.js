@@ -5,6 +5,39 @@ import svg from '../../../../../../../resources/svg'
 import utils from 'web3-utils'
 import { getAddress } from '@ethersproject/address'
 
+const ClusterValue = ({ children, style = {}, onClick, grow = 1, pointerEvents = false }) => {
+  let valueClass = 'clusterValue'
+  if (onClick) valueClass += ' clusterValueClickable'
+  if (pointerEvents) valueClass += ' clusterValueInteractable'
+  style.flexGrow = grow
+  return (
+    <div 
+      className={valueClass} 
+      style={style}
+      onClick={onClick}
+    >
+      {children}
+    </div>
+  )
+}
+
+const ClusterRow = ({ children, style = {} }) => {
+  return (
+    <div className='clusterRow' style={style}>
+      {children}
+    </div>
+  )
+}
+
+const Cluster = ({ children, style = {} }) => {
+  return (
+    <div className='cluster' style={style}>
+      {children}
+    </div>
+  )
+}
+
+
 class TxSending extends React.Component {
   constructor (...args) {
     super(...args)
@@ -38,51 +71,61 @@ class TxSending extends React.Component {
           <div className='_txLabel'>
             <div>{`Send ${currentSymbol}`}</div>
           </div>
-          <div className='_txMainValues'>
-            <div className='_txMainTransferring'>
-              <div className='_txMainValue _txMainTransferringPartLarge'>
-                <span className='_txMainTransferringSymbol'>{currentSymbol}</span>
-                <span className='_txMainTransferringAmount'>{displayValue}</span>
-              </div>
-              <div className='_txMainValue'>
+          <Cluster>
+            <ClusterRow>
+              <ClusterValue grow={2}>
+                <div className='txSendingValue'>
+                  <span className='txSendingValueSymbol'>{currentSymbol}</span>
+                  <span className='txSendingValueAmount'>{displayValue}</span>
+                </div>
+              </ClusterValue>
+              <ClusterValue>
                 <span className='_txMainTransferringEq'>{'≈'}</span>
                 <span className='_txMainTransferringEqSymbol'>{'$'}</span>
                 <span className='_txMainTransferringEqAmount'>{(displayValue * etherUSD).toFixed(2)}</span>
-              </div>
-            </div>
+              </ClusterValue>
+            </ClusterRow>
+
             {address && req.recipientType === 'contract' ? (
-              <div className='_txMainTag'>
-                {`to contract on ${chainName}`}
-              </div>
+              <ClusterRow>
+                <ClusterValue>
+                  <div className='clusterTag'>
+                    {`to contract on ${chainName}`}
+                  </div>
+                </ClusterValue>
+              </ClusterRow>
             ) : address ? (
-              <div className='_txMainTag'>
-                {`to account on ${chainName}`}
-              </div>
+              <ClusterRow>
+                <ClusterValue>
+                  <div className='clusterTag'>
+                    {`to account on ${chainName}`}
+                  </div>    
+                </ClusterValue>
+              </ClusterRow>
             ) : null}
-            {address ? (
-              <div className='_txMainValue'>
-                {ensName
-                  ? <span className='_txRecipient'>{ensName}</span>
-                  : <span className='_txRecipient'>{address.substring(0, 8)}{svg.octicon('kebab-horizontal', { height: 15 })}{address.substring(address.length - 6)}</span>
-                }
-                {/* {req.decodedData && req.decodedData.contractName ? ( 
-                  <span className={'_txDataValueMethod'}>{(() => {
-                    if (req.decodedData.contractName.length > 11) return `${req.decodedData.contractName.substr(0, 9)}..`
-                    return req.decodedData.contractName
-                  })()}</span>
-                ) : null} */}
-                <div className='_txRecipientFull' onClick={() => {
+
+            {address && (
+              <ClusterRow>
+                <ClusterValue pointerEvents={true} onClick={() => {
                   this.copyAddress(address)
                 }}>
-                  {this.state.copied ? (
-                    <span>{'Address Copied'}</span>
-                  ) : (
-                    <span className='_txRecipientFira'>{address}</span>
-                  )}
-                </div>
-              </div>
-            ) : null}
-          </div>
+                  <div className='clusterAddress'>
+                    {ensName
+                      ? <span className='clusterAddressRecipient'>{ensName}</span>
+                      : <span className='clusterAddressRecipient'>{address.substring(0, 8)}{svg.octicon('kebab-horizontal', { height: 15 })}{address.substring(address.length - 6)}</span>
+                    }
+                    <div className='clusterAddressRecipientFull'>
+                      {this.state.copied ? (
+                        <span>{'Address Copied'}</span>
+                      ) : (
+                        <span className='clusterFira'>{address}</span>
+                      )}
+                    </div>
+                  </div>
+                </ClusterValue>
+              </ClusterRow>
+            )}
+          </Cluster>
         </div>
       </div>
     )

@@ -65,6 +65,8 @@ class _RequestItem extends React.Component {
           link.send('nav:forward', 'panel', crumb)
         }}
       >
+        <div className='requestItemBackground' style={{ background: `linear-gradient(135deg, ${color} 0%, transparent 100%)`}} />
+        <div className='requestItemCorner' style={{ background: color }} />
         <div className='requestItemTitle'>
           <div className='requestItemIcon'>
             <RingIcon 

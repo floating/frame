@@ -6,7 +6,7 @@ import EnsOverview from '../../Ens'
 
 const isNonZeroHex = (hex) => !!hex && !['0x', '0x0'].includes(hex)
 
-function renderRecognizedAction (req, symbol) {
+function renderRecognizedAction (req) {
   const { recognizedActions: actions = [] } = req
 
   return actions.length > 0 && actions.map(action => {
@@ -16,7 +16,7 @@ function renderRecognizedAction (req, symbol) {
 
     if (actionClass === 'erc20') {
       if (actionType === 'transfer') {
-        return <SendOverview amountHex={data.amount} decimals={data.decimals} symbol={symbol} />
+        return <SendOverview amountHex={data.amount} decimals={data.decimals} symbol={data.symbol} />
       }
     } else if (actionClass === 'ens') {
       return <EnsOverview type={actionType} data={data} />
@@ -59,7 +59,7 @@ const TxOverview = ({ req, chainName, chainColor, symbol, txMeta, simple }) => {
   if (isContractDeploy) {
     description = <DeployContractOverview />
   } else if (isContractCall) {
-    description = renderRecognizedAction(req, symbol)
+    description = renderRecognizedAction(req)
 
     if (!description && !!method) {
       description = <GenericContractOverview method={method} />

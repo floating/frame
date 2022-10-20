@@ -18,6 +18,10 @@
   box-shadow 0px 8px 30px -12px var(--ghostX)
   position relative
   z-index 300000
+  background var(--ghostB)
+  transform translateY(-1px)
+  border-bottom 2px solid var(--ghostZ)
+  box-shadow 0px 8px 30px -12px var(--ghostX)
   
 .requestItem:active
   background var(--ghostB)
@@ -25,29 +29,55 @@
   box-shadow 0px 2px 4px var(--ghostX)
   position relative
   z-index 300000
+  background var(--ghostB)
+  transform translateY(0px)
+  box-shadow 0px 2px 4px var(--ghostX)
 
 .requestItem
-  border-radius 17px
-  background var(--ghostA)
   cursor pointer
   position relative
   width 100%
   z-index 1
-  padding 8px 0px 10px 0px
   overflow hidden
   font-family 'MainFont'
   font-weight 300
-  // height 70px
-  // transition all linear 1s
-  // background-size 400% 400%
-  // background-position 0% 300%
-  // background linear-gradient(90deg, var(--ghostC), var(--ghostA))
-  background var(--ghostA)
+  box-shadow 0px 4px 6px var(--ghostY)
+  border-bottom 2px solid var(--ghostZ)
+  border-radius 17px
+  background var(--ghostB)
+  cursor pointer
+  position relative
+  width 100%
+  z-index 1
+  margin-top 3px
+  overflow hidden
+  font-family 'MainFont'
+  font-weight 300
   box-shadow 0px 4px 6px var(--ghostY)
   border-bottom 2px solid var(--ghostZ)
   cursor pointer
   *
     pointer-events none
+
+  .requestItemBackground
+    position absolute
+    top 0px
+    left 0px
+    right 0px
+    bottom 0
+    border-radius 1.5px
+    background linear-gradient(135deg, transparent 0%, transparent 50%)
+    opacity 0.05
+
+  .requestItemCorner
+    position absolute
+    top -420px
+    left -120px
+    width 460px
+    height 460px
+    transform rotate(65deg)
+    border-radius 6px
+    opacity 0
 
   .requestItemDetails
     position relative
@@ -60,6 +90,8 @@
     font-size 9px
     border-radius 12px
     color var(--moon)
+    background var(--ghostA)
+    margin 8px
 
     span
       letter-spacing 4px
@@ -122,7 +154,6 @@
       display flex
       justify-content center
       align-items center
-      // background var(--moon)
       width 20px
       border-radius 10px
 
@@ -143,37 +174,34 @@
     position relative
     font-family 'MainFont'
     font-weight 300
-    width 100%
     display flex
     justify-content flex-start
     align-items center
-    padding 8px 0px
     font-size 14px
     font-weight 300
+    border-radius 14px
+    padding 0px 19px 0px 10px
+    margin-top 10px
 
     .requestItemTitleTime
       position absolute
       top 0
       right 0
       bottom 0
-      padding 12px
+      padding 6px
       display flex
       justify-content center
       align-items center
 
       .requestItemTitleTimeItem
-        // background var(--ghostZ)
         height 26px
         padding 0px 16px
-        border-radius 13px
+        border-radius 8px
         display flex
         justify-content center
         align-items center
         font-size 12px
-        background var(--ghostC)
-        border-bottom 2px solid var(--ghostZ)
-        box-shadow 0px 1px 2px var(--ghostX)
-
+        border 2px solid var(--ghostA)
     .requestItemMain
       margin-left 10px
       margin-bottom 3px
@@ -235,16 +263,13 @@
     display flex
     justify-content center
     align-items center
-    margin-left 12px
     border-radius 10px
-    background var(--ghostA)
     z-index 2
     border-radius 20px
     -webkit-app-region no-drag
     transition none
     pointer-events auto
     transform translate3d(0, 0, 0)
-    background var(--ghostB)
     cursor pointer
 
     // .requestItemIconFrame
@@ -299,43 +324,12 @@
   //     background linear-gradient(90deg, var(--ghostB), var(--ghostC))
 
 
-.requestItem:hover
-  background var(--ghostB)
-  transform translateY(-1px)
-  border-bottom 2px solid var(--ghostZ)
-  box-shadow 0px 8px 30px -12px var(--ghostX)
-  
-.requestItem:active
-  background var(--ghostB)
-  transform translateY(0px)
-  box-shadow 0px 2px 4px var(--ghostX)
-
-.requestItem
-  border-radius 17px
-  background var(--ghostA)
-  cursor pointer
-  position relative
-  width 100%
-  z-index 1
-  margin-top 3px
-  padding 12px 0px 10px 0px
-  overflow hidden
-  font-family 'MainFont'
-  font-weight 300
-  // height 70px
-  // transition all linear 1s
-  // background-size 400% 400%
-  // background-position 0% 300%
-  // background linear-gradient(90deg, var(--ghostC), var(--ghostA))
-  background var(--ghostA)
-  box-shadow 0px 4px 6px var(--ghostY)
-  border-bottom 2px solid var(--ghostZ)
 
 .requestItemSummary
   display flex
   justify-content center
   align-items center
-  padding 16px 16px 10px 16px
+  padding 8px 16px 18px 16px
   font-size 12px
   font-weight 500
 
@@ -344,3 +338,5 @@
   box-shadow none
   border-bottom none
   transform none
+  margin-top 0px
+  margin-bottom 0px

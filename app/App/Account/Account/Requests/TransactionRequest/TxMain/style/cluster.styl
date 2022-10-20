@@ -1,0 +1,90 @@
+.cluster
+  font-size 17px
+  font-weight 400
+  border-radius 20px
+  -webkit-app-region no-drag
+  transition none
+  transform translate3d(0, 0, 0)
+  font-family 'MainFont'
+  display flow-root
+  background var(--ghostZ)
+  margin 6px
+  padding 2px 0px 1px 0px
+
+  .clusterRow
+    display flex
+    justify-content center
+    align-items stretch
+    font-weight 300
+    margin-top 1px
+    margin-left 3px
+
+    .clusterValue
+      flex-grow 1
+      display flex
+      justify-content center
+      align-items center
+      border-radius 12px
+      background var(--ghostA)
+      margin-right 3px
+      font-size 14px
+      display flex
+      justify-content center
+      align-items center
+      border-radius 6px
+      -webkit-app-region no-drag
+      transition none
+      transform translate3d(0, 0, 0)
+      font-family 'MainFont'
+      background var(--ghostA)
+      box-shadow 0px 1px 2px var(--ghostX)
+      border-bottom 2px solid var(--ghostZ)
+      overflow hidden
+      
+      svg
+        position relative
+        top -0px
+        padding 0px 3px 0px 4px
+
+      *
+        pointer-events none
+
+    .clusterValueClickable
+      transition all linear 0.1s
+      cursor pointer
+      margin-bottom 0px
+      position relative
+      z-index 3
+
+    .clusterValueInteractable
+      *
+        pointer-events auto
+
+    .clusterValueClickable:hover
+      background var(--ghostB)
+      transform translateY(-1px)
+      border-bottom 2px solid var(--ghostZ)
+      box-shadow 0px 4px 30px -8px var(--ghostX)
+      position relative
+      z-index 300000
+    
+    .clusterValueClickable:active
+      background var(--ghostB)
+      transform translateY(0px)
+      box-shadow 0px 2px 4px var(--ghostX)
+
+  .clusterRow:first-child
+    .clusterValue
+      border-radius 8px
+    .clusterValue:first-child
+      border-top-left-radius 18px
+    .clusterValue:last-child
+      border-top-right-radius 18px
+
+  .clusterRow:last-child
+    .clusterValue
+      border-radius 8px
+    .clusterValue:first-child
+      border-bottom-left-radius 18px
+    .clusterValue:last-child
+      border-bottom-right-radius 18px
