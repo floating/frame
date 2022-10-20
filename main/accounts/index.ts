@@ -595,7 +595,7 @@ export class Accounts extends EventEmitter {
     if (currentAccount && currentAccount.requests[handlerId]) {
       const txRequest = this.getTransactionRequest(currentAccount, handlerId)
 
-      txRequest.status = RequestStatus.Error
+      txRequest.status = RequestStatus.Declined
       txRequest.notice = 'Signature Declined'
       txRequest.mode = RequestMode.Monitor
 
