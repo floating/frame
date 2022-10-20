@@ -16,7 +16,6 @@
     justify-content center
     align-items stretch
     font-weight 300
-    margin-top 1px
     margin-left 3px
 
     .clusterValue
@@ -40,6 +39,7 @@
       box-shadow 0px 1px 2px var(--ghostX)
       border-bottom 2px solid var(--ghostZ)
       overflow hidden
+      margin-top 1px
       
       svg
         position relative
@@ -88,3 +88,94 @@
       border-bottom-left-radius 18px
     .clusterValue:last-child
       border-bottom-right-radius 18px
+
+    .clusterColumn
+      display flex
+      flex-direction column
+      flex-grow 1
+      font-size 14px
+      align-items stretch
+
+    .clusterColumn:first-child
+      .clusterValue
+        border-radius 4px
+      .clusterValue:first-child
+        border-top-left-radius 18px
+        // background blue
+      .clusterValue:last-child
+        border-bottom-left-radius 18px
+        // background red
+        
+    .clusterColumn:last-child
+      .clusterValue
+        border-radius 4px
+      .clusterValue:first-child
+        border-top-right-radius 18px
+        // background yellow
+      .clusterValue:last-child
+        border-bottom-right-radius 18px
+       //  background green
+
+    // .clusterValue
+    //   border-radius 8px
+    // .clusterValue:first-child
+    //   border-top-left-radius 18px
+    // .clusterValue:last-child
+    //   border-top-right-radius 18px
+
+
+.clusterTag
+  text-transform uppercase
+  font-size 11px
+  font-weight 500
+  padding 8px
+
+.clusterAddress
+  padding 12px
+  font-size 14px
+  font-weight 600
+  cursor pointer
+
+.clusterAddressRecipient
+  font-size 16px
+  font-weight 300
+  font-family 'FiraCode'
+  display flex
+  justify-content center
+  align-items center
+  pointer-events none
+  
+  svg
+    padding 0px 4px !important
+
+.clusterAddressRecipientFull
+  position absolute 
+  top 0
+  left 0
+  bottom 0px
+  right 0
+  padding-bottom 1px
+  display flex
+  justify-content center
+  align-items center
+  cursor pointer
+  z-index 40000
+  border-radius 8px
+  font-weight 500
+  background var(--ghostB)
+  opacity 0
+  z-index 4
+  box-shadow 0px 4px 4px var(--ghostZ)
+  transition 0.05s linear all
+
+.clusterFira
+  position relative
+  top 1.5px
+  left 1px
+  font-weight 300
+  font-size 13px 
+  font-family 'FiraCode'
+
+.clusterAddressRecipientFull:hover
+  opacity 1
+  transform translateX(0px) scale(1)

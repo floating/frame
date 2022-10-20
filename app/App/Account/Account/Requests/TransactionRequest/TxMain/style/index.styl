@@ -11,7 +11,7 @@
     transform translate3d(0.7px, 0.7px, 0) rotate(-0.4deg) scale(1)
 
 .txSendingValue
-  height 50px
+  min-height 50px
   display flex
   justify-content center
   align-items center
@@ -28,64 +28,7 @@
 .txSendingValueAmount
   font-size 20px
   position relative
-  top -1px
-
-.clusterTag
-  text-transform uppercase
-  color var(--moon)
-  font-size 11px
-  font-weight 600
-  padding 8px
-
-.clusterAddress
-  padding 12px
-  font-size 14px
-  font-weight 600
-  cursor pointer
-
-.clusterAddressRecipient
-  font-size 16px
-  font-weight 300
-  font-family 'FiraCode'
-  display flex
-  justify-content center
-  align-items center
-  pointer-events none
-  
-  svg
-    padding 0px 4px !important
-
-.clusterAddressRecipientFull
-  position absolute 
-  top 0
-  left 0
-  bottom 0px
-  right 0
-  padding-bottom 1px
-  display flex
-  justify-content center
-  align-items center
-  cursor pointer
-  z-index 40000
-  border-radius 8px
-  font-weight 500
-  background var(--ghostB)
-  opacity 0
-  z-index 4
-  box-shadow 0px 4px 4px var(--ghostZ)
-  transition 0.05s linear all
-
-.clusterFira
-  position relative
-  top 1.5px
-  left 1px
-  font-weight 300
-  font-size 13px 
-  font-family 'FiraCode'
-
-.clusterAddressRecipientFull:hover
-  opacity 1
-  transform translateX(0px) scale(1)    
+  top -1px    
 
 ._txMain
   position relative
@@ -286,5 +229,3 @@
 
 // ._txMain:active
 //   animation shake-little 2s ease-in-out infinite
-
-@import './cluster.styl'

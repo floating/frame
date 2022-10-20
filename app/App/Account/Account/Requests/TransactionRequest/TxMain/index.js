@@ -5,38 +5,7 @@ import svg from '../../../../../../../resources/svg'
 import utils from 'web3-utils'
 import { getAddress } from '@ethersproject/address'
 
-const ClusterValue = ({ children, style = {}, onClick, grow = 1, pointerEvents = false }) => {
-  let valueClass = 'clusterValue'
-  if (onClick) valueClass += ' clusterValueClickable'
-  if (pointerEvents) valueClass += ' clusterValueInteractable'
-  style.flexGrow = grow
-  return (
-    <div 
-      className={valueClass} 
-      style={style}
-      onClick={onClick}
-    >
-      {children}
-    </div>
-  )
-}
-
-const ClusterRow = ({ children, style = {} }) => {
-  return (
-    <div className='clusterRow' style={style}>
-      {children}
-    </div>
-  )
-}
-
-const Cluster = ({ children, style = {} }) => {
-  return (
-    <div className='cluster' style={style}>
-      {children}
-    </div>
-  )
-}
-
+import { Cluster, ClusterRow, ClusterValue } from '../../../../../../../resources/Components/Cluster'
 
 class TxSending extends React.Component {
   constructor (...args) {
