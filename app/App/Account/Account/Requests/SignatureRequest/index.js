@@ -81,41 +81,7 @@ class TransactionRequest extends React.Component {
         {type === 'sign' ? (
           <div className='approveRequest'>
             <div className='approveTransactionPayload'>
-              {notice ? (
-                <div className='requestCover'>
-                  {(_ => {
-                    if (status === 'pending') {
-                      return (
-                        <div key={status} className='requestNoticeInner cardShow'>
-                          <div style={{ paddingBottom: 20 }}><div className='loader' /></div>
-                          <div className='requestNoticeInnerText'>See Signer</div>
-                          <div className='cancelRequest' onClick={() => this.decline(this.props.req.handlerId, this.props.req)}>Cancel</div>
-                        </div>
-                      )
-                    } else if (status === 'success') {
-                      return (
-                        <div key={status} className='requestNoticeInner cardShow requestNoticeSuccess'>
-                          <div>{svg.octicon('check', { height: 80 })}</div>
-                          <div className='requestNoticeInnerText'>{notice}</div>
-                        </div>
-                      )
-                    } else if (status === 'error' || status === 'declined') {
-                      return (
-                        <div key={status} className='requestNoticeInner cardShow requestNoticeError'>
-                          <div>{svg.octicon('circle-slash', { height: 80 })}</div>
-                          <div className='requestNoticeInnerText'>{notice}</div>
-                        </div>
-                      )
-                    } else {
-                      return <div key={notice} className='requestNoticeInner cardShow'>{notice}</div>
-                    }
-                  })()}
-                </div>
-              ) : (
-                <>
-                  {this.renderMessage(message)}
-                </>
-              )}
+              {this.renderMessage(message)}
             </div>
           </div>
         ) : (

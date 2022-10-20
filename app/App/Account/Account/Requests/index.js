@@ -12,6 +12,8 @@ import Restore from 'react-restore'
 //   return ['ledger', 'lattice', 'trezor'].includes(account.lastSignerType)
 // }
 
+import TxOverview from './TransactionRequest/TxMainNew/overview'
+
 import RequestItem from '../../../../../resources/Components/RequestItem'
 
 import link from '../../../../../resources/link'
@@ -195,19 +197,24 @@ class Requests extends React.Component {
               } else if (req.type === 'transaction')  {
                 const chainId = parseInt(req.data.chainId, 16)
                 const chainName = this.store('main.networks.ethereum', chainId, 'name') 
+                const currentSymbol = this.store('main.networks.ethereum', chainId, 'symbol') || '?'
                 const { primaryColor, icon } = this.store('main.networksMeta.ethereum', chainId)
-                
+                const txMeta = { replacement: false, possible: true, notice: '' }
                 return (
-                  <RequestItem 
-                    key={req.type + i}
-                    req={req}
-                    account={this.props.id}
-                    handlerId={req.handlerId}
-                    i={i}
-                    title={`${chainName} Transaction`}
-                    color={primaryColor ? `var(--${primaryColor})`: ''}
-                    img={icon}
-                  />
+                  <div>
+                    <RequestItem 
+                      key={req.type + i}
+                      req={req}
+                      account={this.props.id}
+                      handlerId={req.handlerId}
+                      i={i}
+                      title={`${chainName} Transaction`}
+                      color={primaryColor ? `var(--${primaryColor})`: ''}
+                      img={icon}
+                    >
+                      <TxOverview req={req} chainName={chainName} chainColor={primaryColor} symbol={currentSymbol} txMeta={txMeta} simple={true} />
+                    </RequestItem>
+                  </div>
                 )
               }
             })}

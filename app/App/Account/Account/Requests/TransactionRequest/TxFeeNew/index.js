@@ -5,6 +5,8 @@ import BigNumber from 'bignumber.js'
 import { usesBaseFee, GasFeesSource } from '../../../../../../../resources/domain/transaction'
 import link from '../../../../../../../resources/link'
 
+import { ClusterBox, Cluster, ClusterRow, ClusterColumn, ClusterValue } from '../../../../../../../resources/Components/Cluster'
+
 const FEE_WARNING_THRESHOLD_USD = 50
 
 function toDisplayUSD (bn) {
@@ -54,7 +56,7 @@ const USDEstimateDisplay = ({ maxFeePerGas, maxGas, maxFeeUSD, nativeUSD, symbol
   const displayMinFeeUSD = toDisplayUSD(minFeeUSD)
   const displayMaxFeeUSD = toDisplayUSD(maxFeeUSD)
   
-  return <div data-testid='usd-estimate-display' className='_txMainTagFee'>
+  return <div data-testid='usd-estimate-display' className='clusterTag'>
     <div className={maxFeeUSD.toNumber() > FEE_WARNING_THRESHOLD_USD ? '_txFeeValueDefault _txFeeValueDefaultWarn' : '_txFeeValueDefault'}>
       <span>{'≈'}</span>
       {displayMaxFeeUSD === '< $0.01' ? 
@@ -104,44 +106,47 @@ class TxFee extends React.Component {
     const displayEther = toDisplayEther(maxFee)
 
     return (
-      <div className='_txMain' style={{ animationDelay: (0.1 * this.props.i) + 's' }}>
-        <div className='_txMainInner'>
-          <div className='_txLabel'>Fee</div>
-          <div className='_txMainValues'>
-            <div className='_txMainValuesRow'>
-              <div className='_txMainValuesColumn' style={{ flex: '1' }}>
-                <div className='_txFeeBar _txMainValue _txMainValueClickable' onClick={() => {
-                  link.send('nav:update', 'panel', { data: { step: 'adjustFee' } })
-                }}>
-                  <GasDisplay maxFeePerGas={maxFeePerGas} />
+      <ClusterBox title={'fee'} animationSlot={this.props.i}>
+        <Cluster>
+          <ClusterRow>
+            <ClusterColumn>
+              <ClusterValue onClick={() => {
+                link.send('nav:update', 'panel', { data: { step: 'adjustFee' } })
+              }}>
+                <GasDisplay maxFeePerGas={maxFeePerGas} />
+              </ClusterValue>
+            </ClusterColumn>
+            <ClusterColumn grow={2}>
+              <ClusterValue>
+                <div className='txSendingValue'>
+                  <span className='txSendingValueSymbol'>{symbol}</span>
+                  <span className='txSendingValueAmount'>{displayEther}</span>
                 </div>
-              </div>
-              <div className='_txMainValuesColumn' style={{ flex: '1' }}>
-                <div className='_txMainValue _txFeeTotal'>
-                  <div>
-                    <span className='_txFeeETH'>
-                      {symbol}
-                    </span>
-                    <span className='_txFeeETHValue'>
-                      {displayEther}
-                    </span>
-                  </div>
-                </div>
+              </ClusterValue>
+              <ClusterValue>
                 <USDEstimateDisplay maxFeePerGas={maxFeePerGas} maxGas={maxGas} maxFeeUSD={maxFeeUSD} nativeUSD={nativeUSD} symbol={symbol} />
-              </div>
-            </div>
-            {req.feesUpdatedByUser ? (
-              <div className='_txMainTag'>
-                {`Gas values set by user`}
-              </div>
-            ) : req.data.gasFeesSource !== GasFeesSource.Frame ? (
-              <div className='_txMainTag'>
-                {`Gas values set by ${req.data.gasFeesSource}`}
-              </div>
-            ) : null}
-          </div>
-        </div>
-      </div>
+              </ClusterValue>
+            </ClusterColumn>
+          </ClusterRow>
+          {req.feesUpdatedByUser ? (
+            <ClusterRow>
+              <ClusterValue>
+                <div className='clusterTag'>
+                  {`Gas values set by user`}
+                </div>
+              </ClusterValue>
+            </ClusterRow>
+          ) : req.data.gasFeesSource !== GasFeesSource.Frame ? (
+            <ClusterRow>
+              <ClusterValue>
+                <div className='clusterTag'>
+                  {`Gas values set by ${req.data.gasFeesSource}`}
+                </div>
+              </ClusterValue>
+            </ClusterRow>
+          ) : null}
+        </Cluster>
+      </ClusterBox>
     )
   }
 }

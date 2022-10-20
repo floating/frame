@@ -7,36 +7,7 @@ import Transfer from './erc20/transfer'
 import Recipient from './recipient'
 import Destination from './destination'
 import Register from './ens/register'
-
-const ActionBox = ({ title, subHead, animationIndex, children }) => {
-  return (
-    <div className='_txMain' style={{ animationDelay: (0.1 * animationIndex) + 's' }}>
-      <div className='_txMainInner'>
-        <div className='_txLabel'>
-          <div>
-            <span>{title}</span>
-            {subHead &&
-              <span style={{ 
-                opacity: 0.8, 
-                fontSize: '9px',
-                position: 'relative',
-                top: '-1px',
-                left: '4px'
-              }}>
-                {`(${subHead})`}
-              </span>
-            }
-          </div>
-        </div>
-        {Children.count(children) > 0 &&
-          <div className='_txMainValues'>
-            {children}
-          </div>
-        }
-      </div>
-    </div>
-  )
-}
+import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../../../resources/Components/Cluster'
 
 class TxSending extends React.Component {
   constructor (...args) {
@@ -65,6 +36,8 @@ class TxSending extends React.Component {
     if (actionClass === 'erc20') {
       if (actionType === 'transfer') {
         const { amount, decimals, name, recipient: recipientAddress, symbol, recipientType, recipientEns } = action.data || {}
+        const address = recipientAddress
+        const ensName = recipientEns
         const value = new BigNumber(amount) 
         const displayValue = value.dividedBy('1e' + decimals).toFixed(6)
         // const ensName = (recipientEns && recipientEns.length < 25) ? recipientEns : ''
@@ -82,16 +55,65 @@ class TxSending extends React.Component {
           />
   
         return (
-          <ActionBox title={`Sending ${symbol}`} subHead={name} animationIndex={this.props.i}>
-            <Transfer symbol={symbol} rate={rateUSD} displayValue={displayValue} />
-            {destination}
-            {recipient}
-          </ActionBox>
+          <ClusterBox title={`Sending ${symbol}`} subtitle={name} animationSlot={this.props.i}>
+            <Cluster>
+              <ClusterRow>
+                <ClusterValue grow={2}>
+                  <div className='txSendingValue'>
+                    <span className='txSendingValueSymbol'>{symbol}</span>
+                    <span className='txSendingValueAmount'>{displayValue}</span>
+                  </div>
+                </ClusterValue>
+                <ClusterValue>
+                  <span className='_txMainTransferringEq'>{'≈'}</span>
+                  <span className='_txMainTransferringEqSymbol'>{'$'}</span>
+                  <span className='_txMainTransferringEqAmount'>{(displayValue * rateUSD).toFixed(2)}</span>
+                </ClusterValue>
+              </ClusterRow>
+              {address && recipientType === 'contract' ? (
+                <ClusterRow>
+                  <ClusterValue>
+                    <div className='clusterTag'>
+                      {`to contract on ${chainName}`}
+                    </div>
+                  </ClusterValue>
+                </ClusterRow>
+              ) : address ? (
+                <ClusterRow>
+                  <ClusterValue>
+                    <div className='clusterTag'>
+                      {`to account on ${chainName}`}
+                    </div>    
+                  </ClusterValue>
+                </ClusterRow>
+              ) : null}
+
+              {address && (
+                <ClusterRow>
+                  <ClusterValue pointerEvents={true} onClick={() => {
+                    this.copyAddress(address)
+                  }}>
+                    <div className='clusterAddress'>
+                      {ensName
+                        ? <span className='clusterAddressRecipient'>{ensName}</span>
+                        : <span className='clusterAddressRecipient'>{address.substring(0, 8)}{svg.octicon('kebab-horizontal', { height: 15 })}{address.substring(address.length - 6)}</span>
+                      }
+                      <div className='clusterAddressRecipientFull'>
+                        {this.state.copied ? (
+                          <span>{'Address Copied'}</span>
+                        ) : (
+                          <span className='clusterFira'>{address}</span>
+                        )}
+                      </div>
+                    </div>
+                  </ClusterValue>
+                </ClusterRow>
+              )}
+            </Cluster>
+          </ClusterBox>
         )
       }
     }
-
-    return null
   }
 }
 

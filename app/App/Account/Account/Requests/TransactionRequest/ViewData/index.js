@@ -5,8 +5,8 @@ import svg from '../../../../../../../resources/svg'
 import link from '../../../../../../../resources/link'
 
 const txFieldPriority = [
-  'nonce',
   'chainId',
+  'nonce',
   'value',
   'data',
   'to',
@@ -147,7 +147,7 @@ class ViewData extends React.Component {
           {this.renderDecodedData()}
         </div> */}
         <div className='txViewData'>
-          {/* <div className='txViewDataHeader'>{'Raw Transaction'}</div> */}
+          <div className='txViewDataHeader'>{'Raw Transaction'}</div>
           <SimpleTxJSON json={tx} req={req} />
         </div>
       </div>

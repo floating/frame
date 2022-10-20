@@ -20,6 +20,10 @@ const FEE_WARNING_THRESHOLD_USD = 50
 
 // import Filter from '../../Components/Filter'
 
+const isHardwareSigner = (account = {}) => {
+  return ['ledger', 'lattice', 'trezor'].includes(account.lastSignerType)
+}
+
 let firstScroll = true
 
 class _Footer extends React.Component {
@@ -39,12 +43,13 @@ class _Footer extends React.Component {
     const crumb = this.store('windows.panel.nav')[0] || {}
     if (crumb.view === 'requestView') {
       const { accountId, requestId } = crumb.data
+      const account = this.store('main.accounts', accountId)
       const req = this.store('main.accounts', accountId, 'requests', requestId)
       if (req) {
         if (req.type === 'transaction' && crumb.data.step === 'confirm') {
           return (
             <div className='footerModule'>
-              <RequestCommand req={req} />
+              <RequestCommand req={req} signingDelay={isHardwareSigner(account) ? 0 : 2000} />
             </div>
           )
         } else if (req.type === 'access') {
@@ -73,30 +78,61 @@ class _Footer extends React.Component {
             </div>
           )
         } else if (req.type === 'sign') {
+          const { status, notice } = req
           return (
             <div className='footerModule'>
-              <div className='requestApprove'>
-                <div 
-                  className='requestDecline' 
-                  style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none'}}
-                  onClick={() => { if (this.state.allowInput) this.decline(req.handlerId, req) 
-                }}>
-                  <div className='requestDeclineButton _txButton _txButtonBad'>
-                    <span>Decline</span>
+              {notice ? (
+                <div className='requestNotice'>
+                  {(_ => {
+                    if (status === 'pending') {
+                      return (
+                        <div key={status} className='requestNoticeInner cardShow'>
+                          <div style={{ paddingBottom: 20 }}><div className='loader' /></div>
+                          <div className='requestNoticeInnerText'>See Signer</div>
+                          <div className='cancelRequest' onClick={() => this.decline(req.handlerId, req)}>Cancel</div>
+                        </div>
+                      )
+                    } else if (status === 'success') {
+                      return (
+                        <div key={status} className='requestNoticeInner cardShow requestNoticeSuccess'>
+                          <div>{svg.octicon('check', { height: 40 })}</div>
+                          <div className='requestNoticeInnerText'>{notice}</div>
+                        </div>
+                      )
+                    } else if (status === 'error' || status === 'declined') {
+                      return (
+                        <div key={status} className='requestNoticeInner cardShow requestNoticeError'>
+                          <div>{svg.octicon('circle-slash', { height: 40 })}</div>
+                          <div className='requestNoticeInnerText'>{notice}</div>
+                        </div>
+                      )
+                    } else {
+                      return <div key={notice} className='requestNoticeInner cardShow'>{notice}</div>
+                    }
+                  })()}
+                </div> 
+              ) : ( 
+                <div className='requestApprove'>
+                  <div 
+                    className='requestDecline' 
+                    style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none'}} 
+                    onClick={() => { if (this.state.allowInput) this.decline(req.handlerId, req) 
+                  }}>
+                    <div className='requestDeclineButton _txButton _txButtonBad'>
+                      <span>Decline</span>
+                    </div>
+                  </div>
+                  <div 
+                    className='requestSign' 
+                    style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none'}}
+                    onClick={() => { if (this.state.allowInput) this.approve(req.handlerId, req) 
+                  }}>
+                    <div className='requestSignButton _txButton'>
+                      <span>Sign</span>
+                    </div>
                   </div>
                 </div>
-                <div 
-                  className='requestSign' 
-                  style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none'}}
-                  onClick={() => {
-                    if (this.state.allowInput) this.approve(req.handlerId, req) 
-                  }}
-                >
-                  <div className='requestSignButton _txButton'>
-                    <span>Sign</span>
-                  </div>
-                </div>
-              </div>
+              )}
             </div>
           )
         } else if (req.type === 'signTypedData') {

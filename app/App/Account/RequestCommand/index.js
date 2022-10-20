@@ -23,7 +23,7 @@ class RequestCommand extends React.Component {
 
     setTimeout(() => {
       this.setState({ allowInput: true })
-    }, props.signingDelay || 1500)
+    }, props.signingDelay || 0)
   }
 
   approve (reqId, req) {
@@ -82,7 +82,7 @@ class RequestCommand extends React.Component {
       }
     }
 
-    let displayStatus = req.status
+    let displayStatus = req.notice || req.status
     if (displayStatus === 'verifying') displayStatus = 'waiting for block'
 
     return (
