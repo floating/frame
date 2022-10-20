@@ -4,6 +4,7 @@
   "description": "System-wide web3",
   "main": "compiled/main",
   "scripts": {
+    "prepare": "husky install",
     "clean": "npx rimraf dist bundle compiled .parcel-cache node_modules",
     "setup:full": "npm run clean && npm cache clean --force && npm install --cache /tmp/empty-cache --ignore-scripts && allow-scripts && npm audit fix",
     "setup:clean": "npm run clean && npm run setup",
@@ -30,6 +31,8 @@
     "launch:dev:worker": "cross-env NODE_ENV=development LOG_WORKER=true electron ./compiled/main",
     "launch:dev:rinkeby": "cross-env NODE_ENV=development RINKEBY=true electron ./compiled/main",
     "launch:inspect": "cross-env NODE_ENV=production electron --inspect ./compiled/main",
+    "format": "prettier --write '**/*.{j,t}s'",
+    "format:check": "prettier --check '**/*.{j,t}s'",
     "prod": "npm run compile && npm run bundle && npm run launch",
     "hot": "trap \"kill 0\" exit && npm run bundle:bridge && npm run compile && npm run dev-server & wait-on http://localhost:1234/app/tray.dev.html && npm run launch:hot",
     "compile": "npm run copy-assets && tsc",
@@ -47,7 +50,6 @@
     "test:unit:components": "npm run test:exec -- --env=jsdom --testTimeout=500 ./test/app",
     "test:e2e": "npm run test:exec -- --env=node --config ./jest.e2e.config.json ./test/e2e",
     "test:usbAdapters": "ELECTRON_RUN_AS_NODE=true ./node_modules/.bin/electron ./node_modules/jest/bin/jest.js ./test/main/signers/ledger/adapter.test.js --testPathIgnorePatterns=''",
-    "standard": "standardx --fix --verbose",
     "local:rpc": "ganache-cli --account=\"0x2d6945dbddb8dcf5492004e6f720f8e971196ff61a61c4be99714ebc71e06c00,  5000000000000000000000\" --account=\"0xaef6a68a47c1628081e4e6df195f5f712ae4eb7da332a6d74dca06ae32a3e7ae,5000\""
   },
   "author": {
@@ -145,17 +147,19 @@
     "electron-builder": "23.6.0",
     "eslint": "8.28.0",
     "hardhat": "2.12.2",
+    "husky": "8.0.1",
     "jest": "29.3.1",
     "jest-environment-jsdom": "29.3.1",
+    "lint-staged": "13.0.3",
     "nock": "13.2.9",
     "node-abi": "3.28.0",
     "node-gyp": "9.3.0",
     "node-watch": "0.7.3",
     "parcel": "2.8.0",
     "prebuild-install": "7.1.1",
+    "prettier": "2.8.0",
     "rimraf": "3.0.2",
     "shx": "0.3.4",
-    "standardx": "7.0.0",
     "stylus": "0.59.0",
     "ts-jest": "29.0.3",
     "typescript": "4.9.3",
@@ -173,10 +177,9 @@
     "string_decoder": false,
     "url": false
   },
-  "standardx": {
-    "parser": "babel-eslint",
-    "env": [
-      "jest"
+  "lint-staged": {
+    "**/*.{yml,json,md,ts,js}": [
+      "prettier --write"
     ]
   },
   "engines": {
