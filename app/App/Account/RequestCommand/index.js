@@ -192,6 +192,7 @@ class RequestCommand extends React.Component {
         <div className={'requestNoticeInnerText'}>
           {displayStatus}
         </div>
+        <div className='cancelRequest' onClick={() => this.decline(req)}>Cancel</div>
       </>
     )
   }
