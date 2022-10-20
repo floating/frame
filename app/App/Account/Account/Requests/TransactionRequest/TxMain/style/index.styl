@@ -39,9 +39,21 @@
   overflow hidden
   box-shadow 0px 4px 8px var(--ghostY)
   border-bottom 2px solid var(--ghostZ)
+  padding 0
 
   ._txMainInner
+    position relative
     margin 0px 0px
+    overflow hidden
+
+    ._txMainBackground
+      position absolute
+      top 0
+      right 0
+      bottom 0
+      left 0
+      opacity 0.05
+      display none
     
     ._txMainValues
       font-size 17px

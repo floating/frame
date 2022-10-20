@@ -20,6 +20,10 @@ const FEE_WARNING_THRESHOLD_USD = 50
 
 // import Filter from '../../Components/Filter'
 
+const isHardwareSigner = (account = {}) => {
+  return ['ledger', 'lattice', 'trezor'].includes(account.lastSignerType)
+}
+
 let firstScroll = true
 
 class _Footer extends React.Component {
@@ -39,12 +43,13 @@ class _Footer extends React.Component {
     const crumb = this.store('windows.panel.nav')[0] || {}
     if (crumb.view === 'requestView') {
       const { accountId, requestId } = crumb.data
+      const account = this.store('main.accounts', accountId)
       const req = this.store('main.accounts', accountId, 'requests', requestId)
       if (req) {
         if (req.type === 'transaction' && crumb.data.step === 'confirm') {
           return (
             <div className='footerModule'>
-              <RequestCommand req={req} />
+              <RequestCommand req={req} signingDelay={isHardwareSigner(account) ? 0 : 2000} />
             </div>
           )
         } else if (req.type === 'access') {

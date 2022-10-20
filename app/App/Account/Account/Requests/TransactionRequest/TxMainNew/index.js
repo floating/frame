@@ -32,7 +32,6 @@ class TxRecipient extends React.Component {
     const txMeta = { replacement: false, possible: true, notice: '' }
 
     const { accountId } = this.props
-    const chainColor = this.store('main.networksMeta.ethereum', chainId, 'primaryColor')
 
     // TODO
     // if (signer locked) {
@@ -71,16 +70,19 @@ class TxRecipient extends React.Component {
     }
 
     const { primaryColor, icon } = this.store('main.networksMeta.ethereum', chainId)
-                
     return (
       <div className='_txMain' style={{ animationDelay: (0.1 * this.props.i) + 's' }}>
         <div className='_txMainInner'>
+          <div 
+            className='_txMainBackground'
+            style={{ background: `linear-gradient(135deg, var(--${primaryColor}) 0%, transparent 100%)` }}         
+          />
           <RequestItem 
             req={req}
             account={accountId}
             handlerId={req.handlerId}
             title={`${chainName} Transaction`}
-            color={primaryColor ? `var(--${chainColor})` : ``}
+            color={primaryColor ? `var(--${primaryColor})` : ``}
             img={icon}
             headerMode={true}
           />
