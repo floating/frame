@@ -1,4 +1,3 @@
-
 import { Interface } from '@ethersproject/abi'
 import { addHexPrefix } from 'ethereumjs-util'
 import log from 'electron-log'
@@ -61,8 +60,7 @@ function getResultData (results: any, call: string[], target: string) {
   const callInterface = memoizedInterfaces[fnSignature]
   const fnName = getFunctionNameFromSignature(fnSignature)
   try {
-    const decoded = callInterface.decodeFunctionResult(fnName, results);
-    return decoded;
+    return callInterface.decodeFunctionResult(fnName, results)
   } catch (e) {
     log.warn(`Failed to decode ${fnName},`, {target, results})
     const outputs = callInterface.getFunction(fnName).outputs || []
