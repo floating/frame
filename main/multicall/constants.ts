@@ -44,6 +44,10 @@ export const multicallAddresses: Record<number, { version: MulticallVersion, add
     version: MulticallVersion.V2,
     address: '0x5ba1e12693dc8f9c48aad8770482f4739beed696', // goerli
   },
+  10: {
+    version: MulticallVersion.V2,
+    address: '0xed386Fe855C1EFf2f843B910923Dd8846E45C5A4' // optimism
+  },
   30: {
     version: MulticallVersion.V1,
     address: '0x6c62bf5440de2cb157205b15c424bceb5c3368f5' // RSK mainnet
@@ -71,6 +75,10 @@ export const multicallAddresses: Record<number, { version: MulticallVersion, add
   137: {
     version: MulticallVersion.V1,
     address: '0x11ce4b23bd875d7f5c6a31084f55fde1e9a87507', // polygon
+  },
+  42161:{
+    version: MulticallVersion.V2,
+    address:'0x7a8eaD64B79C466d8A9Bcfd2a7B7BF938F9Cb542'
   },
   80001: {
     version: MulticallVersion.V1,
