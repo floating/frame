@@ -57,16 +57,15 @@ function buildCallData <R, T> (calls: Call<R, T>[]) {
 }
 
 function getResultData(results: any, call: string[]) {
-  const [fnSignature] = call;
-  const callInterface = memoizedInterfaces[fnSignature];
-  const fnName = getFunctionNameFromSignature(fnSignature);
+  const [fnSignature] = call
+  const callInterface = memoizedInterfaces[fnSignature]
+  const fnName = getFunctionNameFromSignature(fnSignature)
   try {
-    const decoded = callInterface.decodeFunctionResult(fnName, results);
-    return decoded;
+    return callInterface.decodeFunctionResult(fnName, results)
   } catch (e) {
-    log.warn(`Failed to decode ${fnName} `, results);
-    const outputs = callInterface.getFunction('balanceOf').outputs || [];
-    return outputs.map(() => null);
+    log.warn(`Failed to decode ${fnName} `, results)
+    const outputs = callInterface.getFunction(fnName).outputs || []
+    return outputs.map(() => null)
   }
 }
 
