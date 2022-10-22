@@ -1,0 +1,34 @@
+name: Update application version after release has been published
+
+on:
+  push:
+    branches:
+      - 'develop'
+  #release:
+   # types: [published]
+
+env:
+  GH_TOKEN: ${{ secrets.GH_RELEASE_DEPLOYMENT_TOKEN }}
+
+jobs:
+  bump_release:
+    if: github.repository == 'frame-labs/frame-canary'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Generate next version
+        id: update-version
+        run: echo "NEW_VERSION=$(grep -Eo '[[:digit:]].[[:digit:]].[[:digit:]]-canary.[[:digit:]]' package.json | awk -F. '{$NF = $NF + 1;} 1' OFS=.)"
+      - name: Set version
+        id: package_version
+        uses: KageKirin/set-node-package-version@v0
+        with:
+          version: ${{ steps.update-version.outputs.NEW_VERSION }}
+      - name: Test output
+        run: cat package.json
+
+      # - name: Commit new version
+      #   run: |
+      #     git commit -am "CI: bump version to ${{ steps.update-version.outputs.NEW_VERSION }}"
+      #     git push https://${{ env.GH_TOKEN }}@github.com/frame-labs/frame-canary
