@@ -23,11 +23,8 @@ jobs:
       - name: Test new version
         run: echo ${{ steps.update-version.outputs.NEW_VERSION }}
       - name: Set version
-        id: package_version
-        uses: KageKirin/set-node-package-version@v0
-        with:
-          regex: /(\d)\.(\d)\.[\d]-canary\.(\d)/
-          version: ${{ steps.update-version.outputs.NEW_VERSION }}
+        id: set-version
+        run: sed -i "s/[[:digit:]].[[:digit:]].[[:digit:]]-canary.[[:digit:]]/${{ steps.update-version.outputs.NEW_VERSION }}/" package.json
       - name: Test output
         run: cat package.json
 
