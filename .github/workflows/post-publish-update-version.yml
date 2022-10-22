@@ -24,6 +24,7 @@ jobs:
         id: package_version
         uses: KageKirin/set-node-package-version@v0
         with:
+          regex: \d\.\d\.\d-canary\.\d
           version: ${{ steps.update-version.outputs.NEW_VERSION }}
       - name: Test output
         run: cat package.json
