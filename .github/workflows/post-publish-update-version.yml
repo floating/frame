@@ -13,7 +13,7 @@ env:
 jobs:
   bump_release:
     # if: github.repository == 'frame-labs/frame-canary'
-    # runs-on: ubuntu-latest
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
