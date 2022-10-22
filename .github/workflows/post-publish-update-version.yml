@@ -3,7 +3,7 @@ name: Update application version after release has been published
 on:
   push:
     branches:
-      - 'develop'
+      - 'update-ga'
   #release:
    # types: [published]
 
