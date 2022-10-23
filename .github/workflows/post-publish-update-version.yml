@@ -26,7 +26,7 @@ jobs:
           skip-tag: 'true'
           skip-push: 'true'
           bump-policy: 'ignore'
-          version-type: 'prerelease'
+          version-type: 'rc'
           preid: 'canary'
       # - name: Generate next version
       #   id: update-version
