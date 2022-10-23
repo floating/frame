@@ -28,6 +28,7 @@ jobs:
           bump-policy: 'ignore'
           version-type: 'rc'
           preid: 'canary'
+          default: prerelease
       # - name: Generate next version
       #   id: update-version
       #   run: echo "NEW_VERSION=$(grep -o '[[:digit:]].[[:digit:]].[[:digit:]]-canary.[[:digit:]]' package.json | awk -F. '{$NF = $NF + 1;} 1' OFS=.)" >> $GITHUB_OUTPUT
