@@ -19,9 +19,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Generate next version
         id: update-version
-        run: echo "NEW_VERSION=$(grep -Eo '[[:digit:]].[[:digit:]].[[:digit:]]-canary.[[:digit:]]' package.json | awk -F. '{$NF = $NF + 1;} 1' OFS=.)" >> $GITHUB_OUTPUT
-      - name: Test new version
-        run: echo ${{ steps.update-version.outputs.NEW_VERSION }}
+        run: echo "NEW_VERSION=$(grep -o '[[:digit:]].[[:digit:]].[[:digit:]]-canary.[[:digit:]]' package.json | awk -F. '{$NF = $NF + 1;} 1' OFS=.)" >> $GITHUB_OUTPUT
       - name: Set version
         id: set-version
         run: sed -i "s/[[:digit:]].[[:digit:]].[[:digit:]]-canary.[[:digit:]]/${{ steps.update-version.outputs.NEW_VERSION }}/" package.json
