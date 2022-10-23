@@ -1,6 +1,6 @@
 {
   "name": "frame-canary",
-  "version": "0.5.0-rc.7",
+  "version": "0.5.0-canary.7",
   "description": "System-wide web3",
   "main": "compiled/main",
   "scripts": {

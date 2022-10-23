@@ -17,24 +17,24 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name:  'Automated Version Bump'
-        uses:  'phips28/gh-action-bump-version@master'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_RELEASE_DEPLOYMENT_TOKEN }}
-        with:
-          skip-commit:  'true'
-          skip-tag: 'true'
-          skip-push: 'true'
-          bump-policy: 'ignore'
-          version-type: 'rc'
-          preid: 'canary'
-          default: prerelease
-      # - name: Generate next version
-      #   id: update-version
-      #   run: echo "NEW_VERSION=$(grep -o '[[:digit:]].[[:digit:]].[[:digit:]]-canary.[[:digit:]]' package.json | awk -F. '{$NF = $NF + 1;} 1' OFS=.)" >> $GITHUB_OUTPUT
-      # - name: Set version
-      #   id: set-version
-      #   run: sed -i "s/[[:digit:]].[[:digit:]].[[:digit:]]-canary.[[:digit:]]/${{ steps.update-version.outputs.NEW_VERSION }}/" package.json
+      # - name:  'Automated Version Bump'
+      #   uses:  'phips28/gh-action-bump-version@master'
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GH_RELEASE_DEPLOYMENT_TOKEN }}
+      #   with:
+      #     skip-commit:  'true'
+      #     skip-tag: 'true'
+      #     skip-push: 'true'
+      #     bump-policy: 'ignore'
+      #     version-type: 'rc'
+      #     preid: 'canary'
+      #     default: prerelease
+      - name: Generate next version
+        id: update-version
+        run: echo "NEW_VERSION=$(grep -o '[[:digit:]].[[:digit:]].[[:digit:]]-canary.[[:digit:]]' package.json | awk -F. '{$NF = $NF + 1;} 1' OFS=.)" >> $GITHUB_OUTPUT
+      - name: Set version
+        id: set-version
+        run: sed -i "s/[[:digit:]].[[:digit:]].[[:digit:]]-canary.[[:digit:]]/${{ steps.update-version.outputs.NEW_VERSION }}/" package.json
       - name: Test output
         run: cat package.json
 
