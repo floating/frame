@@ -12,6 +12,7 @@ import RequestCommand from './RequestCommand'
 
 import svg from '../../../resources/svg'
 import link from '../../../resources/link'
+import { isHardwareSigner } from '../../../resources/utils/signers'
 
 // import { usesBaseFee } from '../../../resources/domain/transaction'
 
@@ -19,11 +20,6 @@ const FEE_WARNING_THRESHOLD_USD = 50
 
 
 // import Filter from '../../Components/Filter'
-
-const isHardwareSigner = (account = {}) => {
-  return ['ledger', 'lattice', 'trezor'].includes(account.lastSignerType)
-}
-
 let firstScroll = true
 
 class _Footer extends React.Component {
@@ -49,7 +45,7 @@ class _Footer extends React.Component {
         if (req.type === 'transaction' && crumb.data.step === 'confirm') {
           return (
             <div className='footerModule'>
-              <RequestCommand req={req} signingDelay={isHardwareSigner(account) ? 0 : 2000} />
+              <RequestCommand req={req} signingDelay={isHardwareSigner(account.lastSignerType) ? 0 : 2000} />
             </div>
           )
         } else if (req.type === 'access') {

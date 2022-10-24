@@ -2,10 +2,7 @@ import React from 'react'
 import Restore from 'react-restore'
 import link from '../../../../resources/link'
 import svg from '../../../../resources/svg'
-
-function isHardwareSigner (type = '') {
-  return ['ledger', 'trezor', 'lattice'].includes(type.toLowerCase())
-}
+import { isHardwareSigner } from '../../../../resources/utils/signers'
 
 class SignerStatus extends React.Component {
   constructor (...args) {

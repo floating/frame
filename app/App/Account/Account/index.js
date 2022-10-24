@@ -23,6 +23,7 @@ import SignatureRequest from './Requests/SignatureRequest'
 import ChainRequest from './Requests/ChainRequest'
 import AddTokenRequest from './Requests/AddTokenRequest'
 import SignTypedDataRequest from './Requests/SignTypedDataRequest'
+import { isHardwareSigner } from '../../../../resources/utils/signers'
 
 class _AccountModule extends React.Component {
   // constructor (props, context) {
@@ -340,11 +341,6 @@ class _AccountView extends React.Component {
 
 const AccountView = Restore.connect(_AccountView)
 
-function isHardwareSigner (account = {}) {
-  return ['ledger', 'lattice', 'trezor'].includes(account.lastSignerType)
-}
-
-
 class _AccountBody extends React.Component {
   constructor (...args) {
     super(...args)
@@ -354,7 +350,7 @@ class _AccountBody extends React.Component {
   } 
   renderRequest (req, data) {
     const activeAccount =  this.store('main.accounts', this.props.id)
-    const signingDelay = isHardwareSigner(activeAccount) ? 200 : 1500
+    const signingDelay = isHardwareSigner(activeAccount.lastSignerType) ? 200 : 1500
 
     if (req.type === 'transaction') {
       return (
