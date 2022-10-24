@@ -20,7 +20,7 @@ jobs:
       id: package-version
       uses: martinbeentjes/npm-get-version-action@master
     - name: check for existing release
-      run: gh release list --exclude-drafts | grep -e ".*v${{ steps.package-version.outputs.current-version }}" && exit 1
+      run: gh release list --exclude-drafts | grep -e ".*v${{ steps.package-version.outputs.current-version }}" || exit 1
     - name: remove old draft releases
       run: gh release list | grep -e "Draft.*v${{ steps.package-version.outputs.current-version }}" | awk '{print $3}' | xargs -r gh release delete
     - name: create new draft release
