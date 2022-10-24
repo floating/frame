@@ -1,4 +1,3 @@
-
 import { Interface } from '@ethersproject/abi'
 import { addHexPrefix } from 'ethereumjs-util'
 import log from 'electron-log'

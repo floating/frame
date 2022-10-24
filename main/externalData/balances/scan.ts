@@ -47,7 +47,7 @@ export default function (eth: EthereumProvider) {
       call: ['function balanceOf(address address) returns (uint256 value)', owner],
       returns: [
         (bn?: EthersBigNumber) => {
-          const hexString = bn ? bn.toHexString() : "0x00"
+          const hexString = bn ? bn.toHexString() : '0x00'
           return createBalance(hexString, token.decimals)
         }
       ]
