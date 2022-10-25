@@ -552,6 +552,7 @@ export class Accounts extends EventEmitter {
       }
     }
     
+    // missing signers
     if (!signer) {
       return cb(new Error('No signer'))
     }
