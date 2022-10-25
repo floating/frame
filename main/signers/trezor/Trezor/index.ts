@@ -33,11 +33,6 @@ export const Status = {
   ENTERING_PASSPHRASE: 'waiting for input on device'
 }
 
-export function userActionRequiredForSigning (status: string) {
-  const userActionStatuses = [Status.LOCKED, Status.DISCONNECTED, Status.NEEDS_PASSPHRASE, Status.NEEDS_PIN, Status.NEEDS_RECONNECTION]
-  return userActionStatuses.some((statusValue) => statusValue === status)
-}
-
 function createErrorMessage (message: string, cause: string = '') {
   // the cause may need to be transformed into a more informative message
   return cause.toLowerCase().match(/forbidden key path/)

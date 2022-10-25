@@ -21,9 +21,6 @@ import {
   ReplacementType, RequestStatus, RequestMode
 } from './types'
 import { isHardwareSigner } from '../../resources/utils/signers'
-import { userActionRequiredForSigning as ledgerUserActionRequired } from '../signers/ledger/Ledger'
-import { userActionRequiredForSigning as trezorUserActionRequired } from '../signers/trezor/Trezor'
-import { userActionRequiredForSigning as latticeUserActionRequired } from '../signers/lattice/Lattice'
 
 function notify (title: string, body: string, action: (event: Electron.Event) => void) {
   const notification = new Notification({ title, body })
@@ -529,42 +526,26 @@ export class Accounts extends EventEmitter {
 
     const lastSignerType = getSignerType(currentAccount.lastSignerType)
     const signer = currentAccount.getSigner()
+    const isHardware = isHardwareSigner(lastSignerType)
     
-    // hardware signers - handle locked and other states requiring user action
-    if (!signer && isHardwareSigner(lastSignerType)) {
-      const lockedSigners = Object.keys(store('main.signers'))
+    // handle locked and other states requiring user action
+    if (!signer && isHardware || signer && !isHardware) {
+      const unavailableSigners = Object.keys(store('main.signers'))
         .map((s) => store('main.signers', s))
-        .filter(({ type, status }) => {
-          const isLocked = {
-            trezor: () => trezorUserActionRequired(status),
-            ledger: () => ledgerUserActionRequired(status),
-            lattice: () => latticeUserActionRequired(status)
-          }
-          return getSignerType(type) === lastSignerType && isLocked[type as keyof typeof isLocked]()
-      })
+        .filter(({ type, status }) => getSignerType(type) === lastSignerType && status !== 'ok')
 
-      if (lockedSigners.length) {
-        const crumb = lockedSigners.length === 1 ? 
-          { view: 'expandedSigner', data: { signer: lockedSigners[0].id } } : 
+      if (unavailableSigners.length) {
+        const crumb = unavailableSigners.length === 1 ? 
+          { view: 'expandedSigner', data: { signer: unavailableSigners[0].id } } : 
           { view: 'accounts', data: {} }
         store.navDash(crumb)
-        return cb(new Error('Signer locked'))
+        return cb(new Error('Signer unavailable'))
       }
     }
     
     // missing signers
     if (!signer) {
       return cb(new Error('No signer'))
-    }
-
-    // hot signers - handle locked state
-    if (signer.status === 'locked') {
-      const crumb = {
-        view: 'expandedSigner', 
-        data: { signer: signer.id }
-      }
-      store.navDash(crumb)
-      return cb(new Error('Signer locked'))
     }
 
     const data = this.getTransactionRequest(currentAccount, handlerId).data

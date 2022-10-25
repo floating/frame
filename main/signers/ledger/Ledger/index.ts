@@ -29,11 +29,6 @@ interface Address {
   chainCode?: string | undefined
 }
 
-export function userActionRequiredForSigning (status: string) {
-  const userActionStatuses = [Status.LOCKED, Status.DISCONNECTED, Status.WRONG_APP, Status.NEEDS_RECONNECTION]
-  return userActionStatuses.some((statusValue) => statusValue === status)
-}
-
 function wasRequestRejected(err: DeviceError) {
   return [27013].includes(err.statusCode)
 }

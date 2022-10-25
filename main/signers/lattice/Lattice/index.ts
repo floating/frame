@@ -37,11 +37,6 @@ export const Status = {
   NEEDS_RECONNECTION: 'Please reload this Lattice1 device'
 }
 
-export function userActionRequiredForSigning (status: string) {
-  const userActionStatuses = [Status.LOCKED, Status.DISCONNECTED, Status.READY_FOR_PAIRING, Status.NEEDS_RECONNECTION]
-  return userActionStatuses.some((statusValue) => statusValue === status)
-}
-
 function devicePermission (tag: string) {
   return tag ? `Frame-${tag}` : 'Frame'
 }
