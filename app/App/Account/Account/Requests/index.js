@@ -197,8 +197,7 @@ class Requests extends React.Component {
               } else if (req.type === 'transaction')  {
                 const chainId = parseInt(req.data.chainId, 16)
                 const chainName = this.store('main.networks.ethereum', chainId, 'name') 
-                const currentSymbol = this.store('main.networks.ethereum', chainId, 'symbol') || '?'
-                const { primaryColor, icon } = this.store('main.networksMeta.ethereum', chainId)
+                const { primaryColor, icon, nativeCurrency:{symbol: currentSymbol = '?'} } = this.store('main.networksMeta.ethereum', chainId)
                 const txMeta = { replacement: false, possible: true, notice: '' }
                 return (
                   <div>

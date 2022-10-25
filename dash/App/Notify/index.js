@@ -233,7 +233,7 @@ class Notify extends React.Component {
                 const isTestnet = this.store('main.networks', chain.type, chain.id, 'isTestnet')
                 const nativeCurrency = this.store('main.networksMeta', chain.type, chain.id, 'nativeCurrency')
                 const nativeUSD = nativeCurrency && nativeCurrency.usd && !isTestnet ? nativeCurrency.usd.price : 0
-                const currentSymbol = this.store('main.networks', chain.type, chain.id, 'symbol') || '?'
+                const currentSymbol = '?'
 
                 let maxFeePerGas, maxFee, maxFeeUSD
 
