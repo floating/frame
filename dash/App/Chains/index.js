@@ -126,6 +126,7 @@ class Settings extends React.Component {
   renderChain (chain) {
     const { id, type } = chain
     const networks = this.store('main.networks')
+    const metadata = this.store('main.networksMeta')
     return (
       <div className={'localSettings cardShow'}>
         <div className='localSettingsWrap'>
@@ -133,7 +134,7 @@ class Settings extends React.Component {
             key={type + id}
             id={id}
             name={networks[type][id].name}
-            symbol={networks[type][id].symbol}
+            symbol={metadata[type][id].nativeCurrency.symbol}
             explorer={networks[type][id].explorer}
             isTestnet={networks[type][id].isTestnet}
             type={type}

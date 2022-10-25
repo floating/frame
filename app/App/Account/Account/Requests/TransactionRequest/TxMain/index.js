@@ -27,11 +27,10 @@ class TxSending extends React.Component {
     const address = req.data.to ? getAddress(req.data.to) : ''
     const ensName = (req.recipient && req.recipient.length < 25) ? req.recipient : ''
     const isTestnet = this.store('main.networks', this.props.chain.type, this.props.chain.id, 'isTestnet')
-    const nativeCurrency = this.store('main.networksMeta', this.props.chain.type, this.props.chain.id, 'nativeCurrency')
+    const {nativeCurrency, nativeCurrency:{symbol: currentSymbol = '?'}} = this.store('main.networksMeta', this.props.chain.type, this.props.chain.id)
     const etherUSD = nativeCurrency && nativeCurrency.usd && !isTestnet ? nativeCurrency.usd.price : 0
     const value = req.data.value || '0x'
     const displayValue = this.hexToDisplayValue(value)
-    const currentSymbol = this.store('main.networks', this.props.chain.type, this.props.chain.id, 'symbol') || '?'
     const chainName = this.store('main.networks.ethereum', this.props.chain.id, 'name')
     if (value === '0x' || parseInt(value, 16) === 0) return null
     return (

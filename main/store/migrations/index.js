@@ -521,6 +521,14 @@ const migrations = {
     })
 
     return initial
+  },
+  25: (initial) => {
+    Object.values(initial.main.networks.ethereum).forEach((network) => {
+      if(Object.hasOwn(network, "symbol")){
+        delete network.symbol
+      }
+    })
+    return initial
   }
 }
 
