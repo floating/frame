@@ -644,7 +644,10 @@ export class Provider extends EventEmitter {
 
       // Check if chain exists 
       const exists = Boolean(store('main.networks.ethereum', chainId))
-      if (exists === false) throw ({message: 'Chain does not exist', code: 4902})
+      if (!exists) {
+        const err: EVMError = {message: 'Chain does not exist', code: 4902}
+        return resError(err, payload, res )
+      }
 
       const originId = payload._origin
       const origin = getPayloadOrigin(payload)
