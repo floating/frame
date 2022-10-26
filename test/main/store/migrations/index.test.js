@@ -957,6 +957,12 @@ describe('migration 26', () => {
                 secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
               },
               on: false
+            },
+            10: {
+              connection: {
+                primary: { current: 'custom' },
+                secondary: { current: 'local' }
+              }
             }
           }
         },
@@ -971,7 +977,7 @@ describe('migration 26', () => {
   })
 
   it('removes the symbol property on a network', () => {
-    const updatedState = migrations.apply(state, 25)
+    const updatedState = migrations.apply(state, 26)
     const networks = updatedState.main.networks.ethereum
     
     expect(Object.hasOwn(networks[5], "symbol")).toBeFalsy()
