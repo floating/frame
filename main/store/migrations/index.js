@@ -536,7 +536,14 @@ const migrations = {
         secondary: removeOptimismConnection(optimism.connection.secondary)
       }
     }
-
+    return initial
+  },
+  26: (initial) => {
+      Object.values(initial.main.networks.ethereum).forEach((network) => {
+        const {symbol, id} = network
+        initial.main.networksMeta.ethereum[id].nativeCurrency.symbol = initial.main.networksMeta.ethereum[id].nativeCurrency.symbol || symbol
+        delete network.symbol
+    })
     return initial
   }
 }

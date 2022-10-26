@@ -154,7 +154,7 @@ const initial = {
   },
   platform: process.platform,
   main: {
-    _version: main('_version', 23),
+    _version: main('_version', 26),
     instanceId: main('instanceId', generateUuid()),
     colorway: main('colorway', 'dark'),
     colorwayPrimary: {
@@ -266,7 +266,6 @@ const initial = {
           id: 1,
           type: 'ethereum',
           layer: 'mainnet',
-          symbol: 'ETH',
           name: 'Mainnet',
           isTestnet: false,
           explorer: 'https://etherscan.io',
@@ -287,7 +286,6 @@ const initial = {
           type: 'ethereum',
           layer: 'testnet',
           isTestnet: true,
-          symbol: 'ETH',
           name: 'Görli',
           explorer: 'https://goerli.etherscan.io',
           gas: {
@@ -307,7 +305,6 @@ const initial = {
           type: 'ethereum',
           layer: 'rollup',
           isTestnet: false,
-          symbol: 'ETH',
           name: 'Optimism',
           explorer: 'https://optimistic.etherscan.io',
           gas: {
@@ -327,7 +324,6 @@ const initial = {
           type: 'ethereum',
           layer: 'sidechain',
           isTestnet: false,
-          symbol: 'xDAI',
           name: 'Gnosis',
           explorer: 'https://blockscout.com/xdai/mainnet',
           gas: {
@@ -347,7 +343,6 @@ const initial = {
           type: 'ethereum',
           layer: 'sidechain',
           isTestnet: false,
-          symbol: 'MATIC',
           name: 'Polygon',
           explorer: 'https://polygonscan.com',
           gas: {
@@ -367,7 +362,6 @@ const initial = {
           type: 'ethereum',
           layer: 'rollup',
           isTestnet: false,
-          symbol: 'ETH',
           name: 'Arbitrum',
           explorer: 'https://arbiscan.io',
           gas: {
@@ -387,7 +381,6 @@ const initial = {
           type: 'ethereum',
           layer: 'testnet',
           isTestnet: true,
-          symbol: 'ETH',
           name: 'Sepolia',
           explorer: 'https://sepolia.etherscan.io',
           gas: {
@@ -416,6 +409,7 @@ const initial = {
             }
           },
           nativeCurrency: {
+            symbol: 'ETH',
             usd: {
               price: 0,
               change24hr: 0
@@ -438,6 +432,7 @@ const initial = {
             }
           },
           nativeCurrency: {
+            symbol: 'ETH',
             usd: {
               price: 0,
               change24hr: 0
@@ -460,6 +455,7 @@ const initial = {
             }
           },
           nativeCurrency: {
+            symbol: 'ETH',
             usd: {
               price: 0,
               change24hr: 0
@@ -482,6 +478,7 @@ const initial = {
             }
           },
           nativeCurrency: {
+            symbol: 'xDAI',
             usd: {
               price: 0,
               change24hr: 0
@@ -504,6 +501,7 @@ const initial = {
             }
           },
           nativeCurrency: {
+            symbol: 'MATIC',
             usd: {
               price: 0,
               change24hr: 0
@@ -526,6 +524,7 @@ const initial = {
             }
           },
           nativeCurrency: {
+            symbol: 'ETH',
             usd: {
               price: 0,
               change24hr: 0
@@ -548,6 +547,7 @@ const initial = {
             }
           },
           nativeCurrency: {
+            symbol: 'ETH',
             usd: {
               price: 0,
               change24hr: 0

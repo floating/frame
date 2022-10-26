@@ -15,7 +15,6 @@ interface Chain {
 interface Network {
   id: number
   name: string
-  symbol: string
   layer: string
   isTestnet: boolean
   explorer: string

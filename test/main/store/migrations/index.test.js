@@ -931,3 +931,40 @@ describe('migration 25', () => {
     })
   })
 })
+
+describe('migration 26', () => {
+  beforeEach(() => {
+    state = {
+      main: {
+        _version: 25,
+        networks: {
+          ethereum: { 
+            5: {
+              id: 5,
+              type: 'ethereum',
+              layer: 'testnet',
+              symbol: 'ETH',
+              name: 'Görli',
+            },
+          }
+        },
+        networksMeta: {
+          ethereum: {
+            5: {
+              nativeCurrency: {
+                symbol: "ETH"
+              }
+            }
+          }
+      }
+    }
+  }})
+
+  it('removes the symbol property on a network', () => {
+    const updatedState = migrations.apply(state, 26)
+    const networks = updatedState.main.networks.ethereum
+    const metadata = updatedState.main.networksMeta.ethereum
+    expect(networks[5].symbol).toBeFalsy()
+    expect(metadata[5].nativeCurrency.symbol).toBe("ETH")
+  })
+})

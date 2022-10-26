@@ -85,8 +85,8 @@ class TxFee extends React.Component {
       id: parseInt(req.data.chainId, 16)
     }
 
-    const { symbol = '?', isTestnet } = this.store('main.networks', chain.type, chain.id)
-    const nativeCurrency = this.store('main.networksMeta', chain.type, chain.id, 'nativeCurrency')
+    const { isTestnet } = this.store('main.networks', chain.type, chain.id)
+    const {nativeCurrency, nativeCurrency: {symbol}} = this.store('main.networksMeta', chain.type, chain.id,)
     const nativeUSD = nativeCurrency && nativeCurrency.usd && !isTestnet ? nativeCurrency.usd.price : 0
 
     let maxFeePerGas, maxFee, maxFeeUSD

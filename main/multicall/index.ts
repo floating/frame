@@ -59,7 +59,6 @@ function getResultData (results: any, call: string[], target: string) {
   const [fnSignature] = call
   const callInterface = memoizedInterfaces[fnSignature]
   const fnName = getFunctionNameFromSignature(fnSignature)
-
   try {
     return callInterface.decodeFunctionResult(fnName, results);
   } catch (e) {

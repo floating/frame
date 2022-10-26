@@ -219,10 +219,9 @@ class RequestCommand extends React.Component {
     }
 
     const isTestnet = this.store('main.networks', chain.type, chain.id, 'isTestnet')
-    const nativeCurrency = this.store('main.networksMeta', chain.type, chain.id, 'nativeCurrency')
+    const {nativeCurrency, nativeCurrency:{symbol: currentSymbol = '?'}} = this.store('main.networksMeta', chain.type, chain.id)
     const nativeUSD = nativeCurrency && nativeCurrency.usd && !isTestnet ? nativeCurrency.usd.price : 0
     // const value = this.hexToDisplayValue(req.data.value || '0x')
-    const currentSymbol = this.store('main.networks', chain.type, chain.id, 'symbol') || '?'
 
     const gasLimit = BigNumber(req.data.gasLimit, 16)
     const maxFeePerGas = BigNumber(usesBaseFee(req.data) ? req.data.maxFeePerGas : req.data.gasPrice, 16) 

@@ -300,7 +300,6 @@ module.exports = {
       const defaultMeta = {
         blockHeight: 0,
         name: net.name,
-        symbol: net.symbol,
         primaryColor: net.primaryColor,
         nativeCurrency: {
           symbol: net.symbol,
