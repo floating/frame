@@ -66,7 +66,7 @@ class Settings extends React.Component {
   renderConnections (testnetsOnly = false) {
     const nets = []
     const networks = this.store('main.networks')
-
+    const metadata = this.store('main.networksMeta')
     const { filter } = this.state
 
     Object.keys(networks).forEach(type => {
@@ -83,7 +83,8 @@ class Settings extends React.Component {
             })
             .map(id => {
               const key = type + id
-              const { symbol, explorer, isTestnet, connection, on, name } =  networks[type][id]
+              const { explorer, isTestnet, connection, on, name } =  networks[type][id]
+              const {nativeCurrency:{symbol = '?'}} = metadata[type][id]
               const chain = { key, id, type, symbol, explorer, isTestnet, connection, on, filter, name }
               return <Chain {...chain} view={'preview'} />
             })
