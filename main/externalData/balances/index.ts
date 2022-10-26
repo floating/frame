@@ -10,7 +10,7 @@ export default function (store: Store) {
   const storeApi = {
     getActiveAddress: () => (store('selected.current') || '') as Address,
     getNetwork: (id: number) => (store('main.networks.ethereum', id) || {}) as Network,
-    getNativeCurrencySymbol:(id: number) => store('main.networksMeta.ethereum', id, 'nativeCurrency', 'symbol') as string || '?',
+    getNativeCurrencySymbol:(id: number) => store('main.networksMeta.ethereum', id, 'nativeCurrency', 'symbol') as string,
     getConnectedNetworks: () => {
       const networks = (Object.values(store('main.networks.ethereum') || {})) as Network[]
       return networks
