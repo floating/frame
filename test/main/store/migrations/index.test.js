@@ -936,7 +936,7 @@ describe('migration 26', () => {
   beforeEach(() => {
     state = {
       main: {
-        _version: 20,
+        _version: 25,
         networks: {
           ethereum: { 
             5: {
@@ -945,32 +945,8 @@ describe('migration 26', () => {
               layer: 'testnet',
               symbol: 'ETH',
               name: 'Görli',
-              explorer: 'https://goerli.etherscan.io',
-              gas: {
-                price: {
-                  selected: 'standard',
-                  levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-                }
-              },
-              connection: {
-                primary: { on: true, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
-                secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
-              },
-              on: false
             },
-            10: {
-              connection: {
-                primary: { current: 'custom' },
-                secondary: { current: 'local' }
-              }
-            }
           }
-        },
-        networksMeta: {
-          ethereum: { }
-        },
-        networkPresets: {
-          ethereum: { }
         }
       }
     }
@@ -979,7 +955,6 @@ describe('migration 26', () => {
   it('removes the symbol property on a network', () => {
     const updatedState = migrations.apply(state, 26)
     const networks = updatedState.main.networks.ethereum
-    
-    expect(Object.hasOwn(networks[5], "symbol")).toBeFalsy()
+    expect(networks[5].symbol).toBeFalsy()
   })
 })
