@@ -523,7 +523,23 @@ const migrations = {
     return initial
   },
   25: (initial) => {
-    Object.values(initial.main.networks.ethereum).forEach((network) => {
+    const optimism = initial.main.networks.ethereum[10]
+    const removeOptimismConnection = (connection) => ({
+      ...connection,
+      current: connection.current === 'optimism' ? 'infura' : connection.current
+    })
+
+    initial.main.networks.ethereum[10] = {
+      ...optimism,
+      connection: {
+        primary: removeOptimismConnection(optimism.connection.primary),
+        secondary: removeOptimismConnection(optimism.connection.secondary)
+      }
+    }
+    return initial
+  },
+  26: (initial) => {
+      Object.values(initial.main.networks.ethereum).forEach((network) => {
       if(Object.hasOwn(network, "symbol")){
         delete network.symbol
       }

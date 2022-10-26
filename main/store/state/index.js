@@ -240,7 +240,6 @@ const initial = {
           infura: 'infuraGoerli'
         },
         10: {
-          optimism: 'optimism',
           infura: 'infuraOptimism'
         },
         42: {
@@ -318,7 +317,7 @@ const initial = {
             }
           },
           connection: {
-            primary: { on: true, current: 'optimism', status: 'loading', connected: false, type: '', network: '', custom: '' },
+            primary: { on: true, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
             secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
           },
           on: false

@@ -890,7 +890,49 @@ describe('migration 24', () => {
   })
 })
 
-describe.only('migration 25', () => {
+describe('migration 25', () => {
+  beforeEach(() => {
+    state = {
+      main: {
+        _version: 24,
+        networks: {
+          ethereum: {
+            10: {
+              connection: {
+                primary: { current: 'custom' },
+                secondary: { current: 'local' }
+              }
+            }
+          }
+        }
+      }
+    }
+  })
+
+  const connectionPriorities = ['primary', 'secondary']
+
+  connectionPriorities.forEach((priority) => {
+    it(`updates a ${priority} optimism connection to Infura`, () => {
+      state.main.networks.ethereum[10].connection[priority].current = 'optimism'
+
+      const updatedState = migrations.apply(state, 25)
+      const optimism = updatedState.main.networks.ethereum[10]
+
+      expect(optimism.connection[priority].current).toBe('infura')
+    })
+
+    it(`does not update an existing custom ${priority} optimism connection`, () => {
+      state.main.networks.ethereum[10].connection[priority].current = 'custom'
+
+      const updatedState = migrations.apply(state, 25)
+      const optimism = updatedState.main.networks.ethereum[10]
+
+      expect(optimism.connection[priority].current).toBe('custom')
+    })
+  })
+})
+
+describe('migration 26', () => {
   beforeEach(() => {
     state = {
       main: {
