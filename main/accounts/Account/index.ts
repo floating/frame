@@ -10,7 +10,7 @@ import windows from '../../windows'
 import nav from '../../windows/nav'
 import store from '../../store'
 import { Aragon } from '../aragon'
-import { TransactionData, getAddress } from '../../../resources/domain/transaction'
+import { TransactionData } from '../../../resources/domain/transaction'
 import { capitalize } from '../../../resources/utils'
 import { getType as getSignerType, Type as SignerType } from '../../signers/Signer'
 
@@ -34,7 +34,7 @@ interface SignerOptions {
 
 interface AccountOptions {
   address?: Address,
-  name?: string,
+  name: string,
   ensName?: string,
   created?: string,
   lastSignerType?: SignerType,
@@ -74,7 +74,7 @@ class FrameAccount {
     this.lastSignerType = lastSignerType || (options.type as SignerType)
 
     this.active = active
-    this.name = name || capitalize(this.lastSignerType || '') + ' Account'
+    this.name = name
     this.ensName = ensName
 
     this.created = created || `new:${Date.now()}`

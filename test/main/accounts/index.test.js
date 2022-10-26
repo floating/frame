@@ -75,8 +75,8 @@ beforeEach(done => {
     }
   }
 
-  Accounts.add(account2.address)
-  Accounts.add(account.address, account, (err, account) => {
+  Accounts.add(account2.address, 'Test Account 2')
+  Accounts.add(account.address, 'Test Account 1', account, (err, account) => {
     Accounts.setSigner(account.address, done)
   })
 })

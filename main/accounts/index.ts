@@ -87,15 +87,17 @@ export class Accounts extends EventEmitter {
     cb(null, this.accounts[account.address].summary())
   }
 
-  async add (address: Address, options = {}, cb: Callback<FrameAccount> = () => {}) {
+  async add (address: Address, name = '', options = {}, cb: Callback<FrameAccount> = () => {}) {
     if (!address) return cb(new Error('No address, will not add account'))
     address = address.toLowerCase()
 
     let account = store('main.accounts', address)
     if (!account) {
       log.info(`Account ${address} not found, creating account`)
+
       const created = 'new:' + Date.now()
-      this.accounts[address] = new FrameAccount({ address, created, options, active: false }, this)
+
+      this.accounts[address] = new FrameAccount({ address, name, created, options, active: false }, this)
       account = this.accounts[address]
     }
 
