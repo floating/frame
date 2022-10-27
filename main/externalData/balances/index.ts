@@ -167,7 +167,12 @@ export default function (store: Store) {
     const currentTokenBalances = storeApi.getTokenBalances(address)
     const changedBalances = balances.filter(newBalance => {
       const currentBalance = currentTokenBalances.find(b => b.address === newBalance.address && b.chainId === newBalance.chainId)
-      return (!currentBalance || currentBalance.balance !== newBalance.balance)
+
+      // do not add newly found tokens with a zero balance
+      const isNewBalance = !currentBalance && parseInt(newBalance.balance) !== 0
+      const isChangedBalance = !!currentBalance && currentBalance.balance !== newBalance.balance
+
+      return isNewBalance || isChangedBalance
     })
 
     if (changedBalances.length > 0) {
