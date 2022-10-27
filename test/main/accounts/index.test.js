@@ -78,9 +78,7 @@ beforeEach(done => {
 
   Accounts.add(account2.address, 'Test Account 2')
   Accounts.add(account.address, 'Test Account 1', account, (err, account) => {
-    if (account) {
       Accounts.setSigner(account.address, done)
-    }
   })
 })
 
@@ -712,17 +710,17 @@ describe('#signerCompatibility', () => {
   
   signerTypes.forEach((signerType) => {
     it(`should open the signer menu when a ${signerType} signer is not available`, (done) => {
-      Accounts.addRequest(request)
-      signers.get.mockReturnValue('12')
-      Accounts.accounts[account.id].signer = '12'
-      Accounts.accounts[account.id].lastSignerType = signerType
-      Accounts.accounts[account.id].signerStatus = 'locked'
-      store.newSigner({
+      const newSigner = {
         id: '12',
         type: signerType,
         addresses: [account.id],
         status: 'locked'
-      })
+      }
+      Accounts.accounts[account.id].signer = newSigner.id
+      Accounts.accounts[account.id].lastSignerType = signerType
+      store.newSigner(newSigner)
+      signers.get.mockReturnValue(newSigner)
+      Accounts.addRequest(request)
       Accounts.signerCompatibility('1', (err) => {
         expect(err.message).toBe('Signer unavailable')
         expect(store.navDash).toHaveBeenCalledWith({
