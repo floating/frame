@@ -280,8 +280,8 @@ class RequestCommand extends React.Component {
                 link.rpc('signerCompatibility', req.handlerId, (e, compatibility) => {
                   if (e === 'No signer')  {
                     this.store.notify('noSignerWarning', { req })
-                  } else if (e === 'Signer locked') {
-                    this.store.notify('signerLockedWarning', { req })
+                  } else if (e === 'Signer unavailable') {
+                    this.store.notify('signerUnavailableWarning', { req })
                   } else if (!compatibility.compatible && !this.store('main.mute.signerCompatibilityWarning')) {
                     this.store.notify('signerCompatibilityWarning', { req, compatibility, chain: chain })
                   } else if ((maxFeeUSD.toNumber() > FEE_WARNING_THRESHOLD_USD || this.toDisplayUSD(maxFeeUSD) === '0.00') && !this.store('main.mute.gasFeeWarning')) {

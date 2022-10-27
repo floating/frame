@@ -2,10 +2,7 @@ import React from 'react'
 import Restore from 'react-restore'
 import link from '../../../../../../resources/link'
 import svg from '../../../../../../resources/svg'
-
-const isHardwareSigner = (account = {}) => {
-  return ['ledger', 'lattice', 'trezor'].includes(account.lastSignerType)
-}
+import { isHardwareSigner } from '../../../../../../resources/domain/signer'
 
 const isWatchOnly = (account = {}) => {
   return ['address'].includes(account.lastSignerType.toLowerCase())
@@ -111,7 +108,7 @@ class Signer extends React.Component {
       if (actingSigner) signer = this.store('main.signers', actingSigner)
     }
 
-    const hardwareSigner = isHardwareSigner(activeAccount)
+    const hardwareSigner = isHardwareSigner(activeAccount.lastSignerType)
     const watchOnly = isWatchOnly(activeAccount)
     const status = (signer && signer.status) || (hardwareSigner ? 'Disconnected' : 'No Signer')
 

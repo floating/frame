@@ -8,9 +8,6 @@ import Restore from 'react-restore'
 // import ChainRequest from './ChainRequest'
 // import AddTokenRequest from './AddTokenRequest'
 // import SignTypedDataRequest from './SignTypedDataRequest'
-// function isHardwareSigner (account = {}) {
-//   return ['ledger', 'lattice', 'trezor'].includes(account.lastSignerType)
-// }
 
 import TxOverview from './TransactionRequest/TxMainNew/overview'
 

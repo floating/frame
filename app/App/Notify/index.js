@@ -271,16 +271,16 @@ class Notify extends React.Component {
     )
   }
 
-  signerLockedWarning ({ req = {} }) {
+  signerUnavailableWarning ({ req = {} }) {
     return (
       <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
         <div className='notifyBox'>
           <div className='notifyTitle'>
-            Signer locked!
+            Signer unavailable for signing!
           </div>
           <div className='notifyBody'>
             <div className='notifyBodyQuestion'>
-              Please unlock this signer and try again
+              Please check the signer for this account and try again
             </div>
           </div>
           <div className='notifyInput'>
@@ -606,13 +606,13 @@ class Notify extends React.Component {
           {this.noSignerWarning(this.store('view.notifyData'))}
         </div>
       )
-    } else if (notify === 'signerLockedWarning') {
+    } else if (notify === 'signerUnavailableWarning') {
       return (
         <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
           {/* <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
             {'close'}
           </div> */}
-          {this.signerLockedWarning(this.store('view.notifyData'))}
+          {this.signerUnavailableWarning(this.store('view.notifyData'))}
         </div>
       )
     } else if (notify === 'signerCompatibilityWarning') {

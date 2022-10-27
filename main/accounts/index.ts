@@ -10,6 +10,7 @@ import ExternalDataScanner, { DataScanner } from '../externalData'
 import { getType as getSignerType } from '../signers/Signer'
 import FrameAccount from './Account'
 import { usesBaseFee, TransactionData, GasFeesSource } from '../../resources/domain/transaction'
+import { isHardwareSigner } from '../../resources/domain/signer'
 import { signerCompatibility, maxFee, SignerCompatibility } from '../transaction'
 import { weiIntToEthInt, hexToInt } from '../../resources/utils'
 import provider from '../provider'
@@ -523,16 +524,27 @@ export class Accounts extends EventEmitter {
     const request = currentAccount.requests[handlerId] && currentAccount.requests[handlerId].type === 'transaction'
     if (!request) return cb(new Error(`Could not locate request ${handlerId}`))
 
+    const lastSignerType = getSignerType(currentAccount.lastSignerType)
     const signer = currentAccount.getSigner()
-    if (!signer) return cb(new Error('No signer'))
+    const isHardware = isHardwareSigner(lastSignerType)
+    
+    // handle locked and other states requiring user action
+    if (isHardware || signer) {
+      const unavailableSigners = (Object.values(store('main.signers')) as Signer[])
+        .filter(({ type, status }) => getSignerType(type) === lastSignerType && status !== 'ok')
 
-    if (signer.status === 'locked') {
-      const crumb = {
-        view: 'expandedSigner', 
-        data: { signer: signer.id }
+      if (unavailableSigners.length) {
+        const crumb = unavailableSigners.length === 1 ? 
+          { view: 'expandedSigner', data: { signer: unavailableSigners[0].id } } : 
+          { view: 'accounts', data: {} }
+        store.navDash(crumb)
+        return cb(new Error('Signer unavailable'))
       }
-      store.navDash(crumb)
-      return cb(new Error('Signer locked'))
+    }
+    
+    // missing signers
+    if (!signer) {
+      return cb(new Error('No signer'))
     }
 
     const data = this.getTransactionRequest(currentAccount, handlerId).data
