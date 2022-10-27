@@ -120,7 +120,7 @@ class AccountSelector extends React.Component {
       const account = accounts[id]
       const { address, name, ensName, lastSignerType } = account
 
-      return !filter || filterMatches(filter, ([address, name, ensName, lastSignerType]))
+      return !filter || filterMatches(filter, [address, name, ensName, lastSignerType])
     })
 
     return (
