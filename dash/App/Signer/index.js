@@ -3,6 +3,7 @@ import Restore from 'react-restore'
 
 import link from '../../../resources/link'
 import svg from '../../../resources/svg'
+import { capitalize } from '../../../resources/utils'
 
 import SignerStatus from './SignerStatus'
 
@@ -467,7 +468,7 @@ class Signer extends React.Component {
                   if (this.store('main.accounts', address.toLowerCase())) {
                     link.rpc('removeAccount', address, {}, () => { })
                   } else {
-                    link.rpc('createAccount', address, { type: signer.type }, (e) => {
+                    link.rpc('createAccount', address, `${capitalize(signer.type)} Account`, { type: signer.type }, (e) => {
                       if (e) console.error(e)
                     })
                   }

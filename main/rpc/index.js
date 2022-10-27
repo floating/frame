@@ -172,9 +172,9 @@ const rpc = {
     accounts.add(address, { type: 'Address' })
     cb()
   },
-  createAccount (address, options, cb) {
+  createAccount (address, name, options, cb) {
     if (!utils.isAddress(address)) return cb(new Error('Invalid Address'))
-    accounts.add(address, options)
+    accounts.add(address, name, options)
     cb()
   },
   removeAccount (address, options, cb) {
