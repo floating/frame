@@ -302,7 +302,6 @@ class Account extends React.Component {
                   <div className='signerDetailsAddressPart'>{formattedAddress.substr(formattedAddress.length - 3)}</div>
                 </>
               )}
-              
             </div>
           </div>
         )
@@ -311,7 +310,7 @@ class Account extends React.Component {
   }
 
   renderStatus () {
-    const { address, ensName, active } = this.store('main.accounts', this.props.id)
+    const { address, ensName } = this.store('main.accounts', this.props.id)
     const formattedAddress = getAddress(address)
 
     let requests = this.store('main.accounts', this.props.id, 'requests') || {}

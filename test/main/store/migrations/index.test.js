@@ -1,5 +1,6 @@
 import log from 'electron-log'
 import migrations from '../../../../main/store/migrations'
+import { capitalize } from '../../../../resources/utils'
 
 let state
 
@@ -966,5 +967,41 @@ describe('migration 26', () => {
     const metadata = updatedState.main.networksMeta.ethereum
     expect(networks[5].symbol).toBeFalsy()
     expect(metadata[5].nativeCurrency.symbol).toBe("ETH")
+  })
+})
+
+describe('migration 27', () => {
+  beforeEach(() => {
+    state = {
+      main: {
+        _version: 26,
+        accounts: { }
+      }
+    }
+  })
+
+  const address = '0x87c6418C2A3D6d502C85ed4454cAaDA0BD664AbA'
+  const accountTypes = ['seed', 'ring']
+
+  accountTypes.forEach((type) => {
+    it(`migrates a ${type} account to be called a hot account`, () => {
+      state.main.accounts[address] = {
+        name: `${capitalize(type)} Account`
+      }
+
+      const updatedState = migrations.apply(state, 27)
+
+      expect(updatedState.main.accounts[address].name).toBe('Hot Account')
+    })
+  })
+
+  it('does not migrate an account with a changed name', () => {
+    state.main.accounts[address] = {
+      name: `My Kewl Account`
+    }
+
+    const updatedState = migrations.apply(state, 27)
+
+    expect(updatedState.main.accounts[address].name).toBe('My Kewl Account')
   })
 })

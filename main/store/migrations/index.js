@@ -539,11 +539,27 @@ const migrations = {
     return initial
   },
   26: (initial) => {
-      Object.values(initial.main.networks.ethereum).forEach((network) => {
-        const {symbol, id} = network
-        initial.main.networksMeta.ethereum[id].nativeCurrency.symbol = initial.main.networksMeta.ethereum[id].nativeCurrency.symbol || symbol
-        delete network.symbol
+    Object.values(initial.main.networks.ethereum).forEach((network) => {
+      const {symbol, id} = network
+      initial.main.networksMeta.ethereum[id].nativeCurrency.symbol = initial.main.networksMeta.ethereum[id].nativeCurrency.symbol || symbol
+      delete network.symbol
     })
+
+    return initial
+  },
+  27: (initial) => {
+    // change any accounts with the old names of "seed signer" or "ring signer" to "hot signer"
+
+    const accounts = Object.entries(initial.main.accounts).map(([id, account]) => {
+      const name = ['ring account', 'seed account'].includes((account.name || '').toLowerCase())
+        ? 'Hot Account'
+        : account.name
+
+      return [id, { ...account, name }]
+    })
+
+    initial.main.accounts = Object.fromEntries(accounts)
+
     return initial
   }
 }

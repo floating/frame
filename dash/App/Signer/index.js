@@ -4,9 +4,9 @@ import Restore from 'react-restore'
 import link from '../../../resources/link'
 import svg from '../../../resources/svg'
 import { capitalize } from '../../../resources/utils'
+import { getSignerType } from '../../../resources/domain/signer'
 
 import SignerStatus from './SignerStatus'
-
 
 function isHardwareSigner (type = '') {
   return ['ledger', 'trezor', 'lattice'].includes(type.toLowerCase())
@@ -412,7 +412,6 @@ class Signer extends React.Component {
 
     const hwSigner = isHardwareSigner(this.props.type)
     const loading = isLoading(status)
-    const disconnected = isDisconnected(this.props.type, status, loading)
 
     // TODO: create well-defined signer states that drive these UI features
     const canReconnect =
@@ -468,7 +467,8 @@ class Signer extends React.Component {
                   if (this.store('main.accounts', address.toLowerCase())) {
                     link.rpc('removeAccount', address, {}, () => { })
                   } else {
-                    link.rpc('createAccount', address, `${capitalize(signer.type)} Account`, { type: signer.type }, (e) => {
+                    const type = getSignerType(signer)
+                    link.rpc('createAccount', address, `${capitalize(type)} Account`, { type: signer.type }, (e) => {
                       if (e) console.error(e)
                     })
                   }
