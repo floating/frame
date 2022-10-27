@@ -2,10 +2,9 @@ import React from 'react'
 import Restore from 'react-restore'
 
 import link from '../../../../../resources/link'
-import svg from '../../../../../resources/svg'
 import RingIcon from '../../../../../resources/Components/RingIcon'
 
-class AddPhrase extends React.Component {
+class AddAddress extends React.Component {
   constructor (...args) {
     super(...args)
     this.state = {
@@ -55,7 +54,7 @@ class AddPhrase extends React.Component {
 
   create () {
     this.setState({ index: ++this.state.index })
-    link.rpc('createFromAddress', this.state.address, (err, signer) => {
+    link.rpc('createFromAddress', this.state.address, 'Watch Account', (err) => {
       if (err) {
         this.setState({ status: err, error: true })
       } else {
@@ -141,4 +140,4 @@ class AddPhrase extends React.Component {
   }
 }
 
-export default Restore.connect(AddPhrase)
+export default Restore.connect(AddAddress)

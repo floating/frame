@@ -125,7 +125,7 @@ class AddAccounts extends React.Component {
         </div>
         <div className='accountTypeSelect' onClick={() => this.createNewAccount('nonsigning')}>
           <div className='accountTypeSelectIcon'>{svg.mask(24)}</div>
-          <div className='accountTypeSelectIcon'>{'Watch-only Account'}</div>
+          <div className='accountTypeSelectIcon'>{'Watch Account'}</div>
         </div>
       </div>
     )
