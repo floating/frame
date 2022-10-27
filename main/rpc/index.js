@@ -169,7 +169,7 @@ const rpc = {
   },
   createFromAddress (address, cb) {
     if (!utils.isAddress(address)) return cb(new Error('Invalid Address'))
-    accounts.add(address, { type: 'Address' })
+    accounts.add(address, '', { type: 'Address' })
     cb()
   },
   createAccount (address, name, options, cb) {
