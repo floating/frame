@@ -4,6 +4,7 @@ import store from '../../../main/store'
 import provider from '../../../main/provider'
 import Accounts from '../../../main/accounts'
 import { GasFeesSource } from '../../../resources/domain/transaction'
+import signers from '../../../main/signers'
 
 jest.mock('../../../main/provider', () => ({ send: jest.fn(), emit: jest.fn(), on: jest.fn() }))
 jest.mock('../../../main/signers', () => ({ get: jest.fn() }))
@@ -77,7 +78,9 @@ beforeEach(done => {
 
   Accounts.add(account2.address, 'Test Account 2')
   Accounts.add(account.address, 'Test Account 1', account, (err, account) => {
-    Accounts.setSigner(account.address, done)
+    if (account) {
+      Accounts.setSigner(account.address, done)
+    }
   })
 })
 
@@ -693,5 +696,54 @@ describe('#removeRequests', () => {
     Accounts.removeRequests('4')
 
     expect(Accounts.removeRequest).not.toHaveBeenCalled()
+  })
+})
+
+describe('#signerCompatibility', () => {
+  beforeEach(() => {
+    store.navDash = jest.fn()
+  })
+
+  afterEach(() => {
+    store.removeSigner('12')
+  })
+
+  const signerTypes = ['trezor', 'ledger', 'lattice', 'ring', 'seed', 'aragon']
+  
+  signerTypes.forEach((signerType) => {
+    it(`should open the signer menu when a ${signerType} signer is not available`, (done) => {
+      Accounts.addRequest(request)
+      signers.get.mockReturnValue('12')
+      Accounts.accounts[account.id].signer = '12'
+      Accounts.accounts[account.id].lastSignerType = signerType
+      Accounts.accounts[account.id].signerStatus = 'locked'
+      store.newSigner({
+        id: '12',
+        type: signerType,
+        addresses: [account.id],
+        status: 'locked'
+      })
+      Accounts.signerCompatibility('1', (err) => {
+        expect(err.message).toBe('Signer unavailable')
+        expect(store.navDash).toHaveBeenCalledWith({
+          data: {
+            signer: '12'
+          },
+          view: 'expandedSigner'
+        })
+        done()
+      })
+    })
+  })
+  
+
+  it('should return an error when there is no signer', (done) => {
+    store.removeSigner('12')
+    Accounts.accounts[account.id].signer = undefined
+    Accounts.signerCompatibility('1', (err) => {
+      expect(err.message).toBe('No signer')
+      expect(store.navDash).not.toHaveBeenCalled()
+      done()
+    })
   })
 })
