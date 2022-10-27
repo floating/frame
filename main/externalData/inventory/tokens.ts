@@ -1,7 +1,6 @@
 import log from 'electron-log'
 
 import ethProvider from 'eth-provider'
-import EthereumProvider from 'ethereum-provider'
 import sushiswapTokenList from '@sushiswap/default-token-list'
 
 import nebulaApi from '../../nebula'
