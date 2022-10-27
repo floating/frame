@@ -2,7 +2,7 @@ import React from 'react'
 import Restore from 'react-restore'
 import link from '../../../../resources/link'
 import svg from '../../../../resources/svg'
-import { isHardwareSigner } from '../../../../resources/utils/signers'
+import { isHardwareSigner } from '../../../../resources/domain/signer'
 
 class SignerStatus extends React.Component {
   constructor (...args) {

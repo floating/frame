@@ -1,23 +1,13 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import Restore from 'react-restore'
-import utils from 'web3-utils'
-import BigNumber from 'bignumber.js'
 
 import Account from './Account'
-// import TxBar from './RequestCommand/TxBar'
-// import TxConfirmations from './TxConfirmations'
-import Time from './Time'
 import RequestCommand from './RequestCommand'
 
 import svg from '../../../resources/svg'
 import link from '../../../resources/link'
-import { isHardwareSigner } from '../../../resources/utils/signers'
-
-// import { usesBaseFee } from '../../../resources/domain/transaction'
-
-const FEE_WARNING_THRESHOLD_USD = 50
-
+import { isHardwareSigner } from '../../../resources/domain/signer'
 
 // import Filter from '../../Components/Filter'
 let firstScroll = true

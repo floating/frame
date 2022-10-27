@@ -2,7 +2,7 @@ import React from 'react'
 import Restore from 'react-restore'
 import link from '../../../../../../resources/link'
 import svg from '../../../../../../resources/svg'
-import { isHardwareSigner } from '../../../../../../resources/utils/signers'
+import { isHardwareSigner } from '../../../../../../resources/domain/signer'
 
 const isWatchOnly = (account = {}) => {
   return ['address'].includes(account.lastSignerType.toLowerCase())

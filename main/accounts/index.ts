@@ -10,6 +10,7 @@ import ExternalDataScanner, { DataScanner } from '../externalData'
 import { getType as getSignerType } from '../signers/Signer'
 import FrameAccount from './Account'
 import { usesBaseFee, TransactionData, GasFeesSource } from '../../resources/domain/transaction'
+import { isHardwareSigner } from '../../resources/domain/signer'
 import { signerCompatibility, maxFee, SignerCompatibility } from '../transaction'
 import { weiIntToEthInt, hexToInt } from '../../resources/utils'
 import provider from '../provider'
@@ -20,7 +21,6 @@ import {
   TransactionRequest, TransactionReceipt,
   ReplacementType, RequestStatus, RequestMode
 } from './types'
-import { isHardwareSigner } from '../../resources/utils/signers'
 
 function notify (title: string, body: string, action: (event: Electron.Event) => void) {
   const notification = new Notification({ title, body })

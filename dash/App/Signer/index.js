@@ -5,13 +5,10 @@ import link from '../../../resources/link'
 import svg from '../../../resources/svg'
 import { capitalize } from '../../../resources/utils'
 import { getSignerType } from '../../../resources/domain/signer'
-import { isHardwareSigner } from '../../../resources/utils/signers'
+import { isHardwareSigner } from '../../../resources/domain/signer'
 
 import SignerStatus from './SignerStatus'
 
-function isHardwareSigner (type = '') {
-  return ['ledger', 'trezor', 'lattice'].includes(type.toLowerCase())
-}
 function isLoading (status = '') {
   const statusToCheck = status.toLowerCase()
   return ['loading', 'connecting', 'addresses', 'input', 'pairing'].some(s => statusToCheck.includes(s))
