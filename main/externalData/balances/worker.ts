@@ -1,6 +1,4 @@
 import log from 'electron-log'
-
-import EthereumProvider from 'ethereum-provider'
 import ethProvider from 'eth-provider'
 
 log.transports.console.format = '[scanWorker] {h}:{i}:{s}.{ms} {text}'
