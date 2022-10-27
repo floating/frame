@@ -154,7 +154,7 @@ const initial = {
   },
   platform: process.platform,
   main: {
-    _version: main('_version', 26),
+    _version: main('_version', 27),
     instanceId: main('instanceId', generateUuid()),
     colorway: main('colorway', 'dark'),
     colorwayPrimary: {

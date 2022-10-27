@@ -323,7 +323,8 @@ class Notify extends React.Component {
   }
 
   signerCompatibilityWarning ({ req = {}, compatibility = {}, chain = {} }) {
-    const { signer, tx, compatible } = compatibility
+    const { signer, tx } = compatibility
+
     return (
       <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
         <div className='notifyBox'>

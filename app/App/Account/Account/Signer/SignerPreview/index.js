@@ -82,18 +82,11 @@ class Signer extends React.Component {
           <div>{'Aragon Agent'}</div>
         </div>
       )
-    } else if (type === 'seed') {
+    } else if (type === 'seed' || type === 'ring') {
       return (
         <div className='moduleItemSignerType'>
-          <div className='moduleItemIcon'>{svg.seedling(16)}</div>
-          <div>{'Seed'}</div>
-        </div>
-      )
-    } else if (type === 'ring') {
-      return (
-        <div className='moduleItemSignerType'>
-          <div className='moduleItemIcon'>{svg.key(17)}</div>
-          <div>{'Keyring'}</div>
+          <div className='moduleItemIcon'>{svg.flame(16)}</div>
+          <div>{'Hot'}</div>
         </div>
       )
     } else {

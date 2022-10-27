@@ -6,6 +6,7 @@ import { TransactionData } from '../../../resources/domain/transaction'
 import { deriveHDAccounts } from './derive'
 import crypt from '../../crypt'
 import { TypedData } from 'eth-sig-util'
+import { getSignerType } from '../../../resources/domain/signer'
 
 export interface SignerSummary {
   id: string,
@@ -75,7 +76,7 @@ export default class Signer extends EventEmitter {
   summary (): SignerSummary {
     return {
       id: this.id,
-      name: this.name || this.type + ' signer',
+      name: this.name || `${getSignerType(this)} signer`,
       type: this.type,
       model: this.model,
       addresses: this.addresses.map(addr => addHexPrefix(addr.toString())),
