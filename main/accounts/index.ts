@@ -529,7 +529,7 @@ export class Accounts extends EventEmitter {
     const isHardware = isHardwareSigner(lastSignerType)
     
     // handle locked and other states requiring user action
-    if (!signer && isHardware || signer && !isHardware) {
+    if (isHardware || signer) {
       const unavailableSigners = (Object.values(store('main.signers')) as Signer[])
         .filter(({ type, status }) => getSignerType(type) === lastSignerType && status !== 'ok')
 
