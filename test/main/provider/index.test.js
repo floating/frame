@@ -265,15 +265,16 @@ describe('#send', () => {
       })
     })
 
-    it('should reject if the chain does not exist in the store', done => {
+    it('should reject with the correct error if the chain does not exist in the store', done => {
       send({
         method: 'wallet_switchEthereumChain', 
         params: [{
           chainId: '0x1234'
         }],
         _origin: '8073729a-5e59-53b7-9e69-5d9bcff94087'
-      }, () => {
+      }, (response) => {
         try {
+          expect(response.error.code).toBe(4902)
           expect(accountRequests).toHaveLength(0)
           done()
         } catch (e) { 
