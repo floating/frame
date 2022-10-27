@@ -167,9 +167,9 @@ const rpc = {
   addAragon (account, cb) {
     accounts.addAragon(account, cb)
   },
-  createFromAddress (address, cb) {
+  createFromAddress (address, name, cb) {
     if (!utils.isAddress(address)) return cb(new Error('Invalid Address'))
-    accounts.add(address, 'Watch Only Account', { type: 'Address' })
+    accounts.add(address, name, { type: 'Address' })
     cb()
   },
   createAccount (address, name, options, cb) {

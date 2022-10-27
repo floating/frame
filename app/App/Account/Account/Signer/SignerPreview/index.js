@@ -106,7 +106,6 @@ class Signer extends React.Component {
     }
   }
 
-
   render () {
     const activeAccount = this.store('main.accounts', this.props.account)
 
