@@ -78,7 +78,7 @@ beforeEach(done => {
 
   Accounts.add(account2.address, 'Test Account 2')
   Accounts.add(account.address, 'Test Account 1', account, (err, account) => {
-      Accounts.setSigner(account.address, done)
+    Accounts.setSigner(account.address, done)
   })
 })
 
@@ -716,11 +716,14 @@ describe('#signerCompatibility', () => {
         addresses: [account.id],
         status: 'locked'
       }
-      Accounts.accounts[account.id].signer = newSigner.id
-      Accounts.accounts[account.id].lastSignerType = signerType
+
       store.newSigner(newSigner)
       signers.get.mockReturnValue(newSigner)
+
+      Accounts.accounts[account.id].signer = newSigner.id
+      Accounts.accounts[account.id].lastSignerType = signerType
       Accounts.addRequest(request)
+
       Accounts.signerCompatibility('1', (err) => {
         expect(err.message).toBe('Signer unavailable')
         expect(store.navDash).toHaveBeenCalledWith({
