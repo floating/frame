@@ -1,7 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import Restore from 'react-restore'
-import utils from 'web3-utils'
 
 import AccountController from './AccountController'
 
@@ -9,6 +8,12 @@ import svg from '../../../resources/svg'
 import link from '../../../resources/link'
 
 let firstScroll = true
+
+function filterMatches (text = '', fields) {
+  const filter = text.toLowerCase()
+
+  return fields.some(field => (field || '').toLowerCase().includes(filter))
+}
 
 class AccountSelector extends React.Component {
   constructor (...args) {
@@ -71,7 +76,7 @@ class AccountSelector extends React.Component {
             tabIndex='-1'
             onChange={(e) => {
               const value = e.target.value
-              this.setState({ accountFilter: value  })
+              this.setState({ accountFilter: value })
               link.send('tray:action', 'setAccountFilter', value)
             }}
             value={this.state.accountFilter}
@@ -113,15 +118,10 @@ class AccountSelector extends React.Component {
     
     const displayAccounts = sortedAccounts.filter((id, i) => {
       const account = accounts[id]
-      return !(
-        filter &&
-        !account.address.includes(filter) &&
-        !account.name.includes(filter) &&
-        !account.ensName.includes(filter) &&
-        !account.lastSignerType.includes(filter)
-      )
-    })
+      const { address, name, ensName, lastSignerType } = account
 
+      return !filter || filterMatches(filter, ([address, name, ensName, lastSignerType]))
+    })
 
     return (
       <div 

@@ -237,7 +237,6 @@ class _AccountMain extends React.Component {
 
 
   renderAccountFilter () {
-    const accountOpen = this.store('selected.open')
     return (
       <div className='panelFilterAccount'>
         <div className='panelFilterIcon'>
@@ -250,8 +249,7 @@ class _AccountMain extends React.Component {
             spellCheck='false'
             onChange={(e) => {
               const value = e.target.value
-              this.setState({ accountModuleFilter: value  })
-              // link.send('tray:action', 'setAccountFilter', value)
+              this.setState({ accountModuleFilter: value })
             }}
             value={this.state.accountModuleFilter}
           />
