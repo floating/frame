@@ -534,10 +534,11 @@ export class Accounts extends EventEmitter {
     const lastSignerType = getSignerType(currentAccount.lastSignerType) as Type
     
     getAvailableSigner(currentAccount.getSigner(), lastSignerType, storeApi.getSigners, (error?: Error | null, signer?: Signer) => {
-      const crumb = signer ? signerPanelCrumb(signer) : accountPanelCrumb()
-      store.navDash(crumb)
-
       if (error) {
+        if (error.message === 'Signer unavailable') {
+          const crumb = signer ? signerPanelCrumb(signer) : accountPanelCrumb()
+          store.navDash(crumb)
+        }
         cb(error)
         return
       }
