@@ -740,7 +740,7 @@ describe('#signerCompatibility', () => {
     store.removeSigner(activeSigner.id)
     store.removeSigner(lockedSeedSigner.id)
 
-    //Accounts.removeRequests([request.handlerId])
+    Accounts.removeRequests([request.handlerId])
   })
 
   const signerTypes = ['trezor', 'ledger', 'lattice']
