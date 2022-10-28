@@ -2,7 +2,7 @@ import React from 'react'
 import Restore from 'react-restore'
 import link from '../../../../../../resources/link'
 import svg from '../../../../../../resources/svg'
-import { checkSignerAvailability, isHardwareSigner } from '../../../../../../resources/domain/signer'
+import { getAvailableSigner, isHardwareSigner } from '../../../../../../resources/domain/signer'
 
 const isWatchOnly = (account = {}) => {
   return ['address'].includes(account.lastSignerType.toLowerCase())
@@ -129,7 +129,7 @@ class Signer extends React.Component {
               className='moduleItem moduleItemSpace moduleItemButton' 
               style={{ flex: 6 }}
               onClick={() => {
-                checkSignerAvailability(signer, activeAccount.lastSignerType, getSigners, (error, availableSigner) => {
+                getAvailableSigner(signer, activeAccount.lastSignerType, getSigners, (error, availableSigner) => {
                   if (error) {
                     this.setState({
                       notifySuccess: false,

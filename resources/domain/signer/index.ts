@@ -23,26 +23,30 @@ export function isHardwareSigner (type = '') {
   return ['ledger', 'trezor', 'lattice'].includes(type.toLowerCase())
 }
 
-export function checkSignerAvailability (signer: Signer, lastSignerType: Type, getSigners: () => Signer[], cb: Callback<Signer>) {
-  const isHardware = isHardwareSigner(lastSignerType)
+export function getAvailableSigner (signer: Signer, lastSignerType: Type, getSigners: () => Signer[], cb: Callback<Signer>) {
+  const isSignerReady = ({ status }: Signer) => status === 'ok'
 
-  // handle locked and other states requiring user action
-  if (isHardware && !signer) {
-    const unavailableSigners = (getSigners() as Signer[])
-      .filter(({ type, status }) => getSignerType(type) === lastSignerType && status !== 'ok')
-
-    if (unavailableSigners.length) {
-      return cb(new Error('Signer unavailable'), unavailableSigners[0])
-    }
-  }
-
-  if (signer && signer.status !== 'ok') {
-    return cb(new Error('Signer unavailable'), signer)
-  }
-  
-  // missing signers
   if (!signer) {
-    return cb(new Error('No signer'), undefined)
+    // if no signer is active, check if this account was previously relying on a
+    // hardware signer that is currently disconnected
+    if (isHardwareSigner(lastSignerType)) {
+      const unavailableSigners = getSigners()
+          .filter(signer => getSignerType(signer.type) === lastSignerType && !isSignerReady(signer))
+
+      // if there is only one matching disconnected signer, open the signer panel so it can be unlocked
+      // when there are more than one matching signer, open the account panel so the user can choose
+      if (unavailableSigners.length) {
+        return cb(new Error('Signer unavailable'), unavailableSigners.length === 1 ? unavailableSigners[0] : undefined)
+      }
+    }
+
+    return cb(new Error('No signer'))
+  }
+
+  if (!isSignerReady(signer)) {
+    // if the signer is not ready to sign, open the signer panel so that
+    // the user can unlock it or reconnect
+    return cb(new Error('Signer unavailable'), signer)
   }
 
   return cb(null, signer)

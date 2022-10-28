@@ -10,7 +10,7 @@ import ExternalDataScanner, { DataScanner } from '../externalData'
 import Signer from '../signers/Signer'
 import FrameAccount from './Account'
 import { usesBaseFee, TransactionData, GasFeesSource } from '../../resources/domain/transaction'
-import { checkSignerAvailability, getSignerType } from '../../resources/domain/signer'
+import { getAvailableSigner, getSignerType, Type } from '../../resources/domain/signer'
 import { signerCompatibility as transactionCompatibility, maxFee, SignerCompatibility } from '../transaction'
 import { weiIntToEthInt, hexToInt } from '../../resources/utils'
 import provider from '../provider'
@@ -528,11 +528,11 @@ export class Accounts extends EventEmitter {
 
     const request = currentAccount.requests[handlerId]
     if (!request) return cb(new Error(`Could not locate request ${handlerId}`))
+
+    const lastSignerType = getSignerType(currentAccount.lastSignerType) as Type
     
-    checkSignerAvailability(currentAccount.getSigner(), currentAccount.lastSignerType, () => Object.values(store('main.signers')), (error: Error | null, signer?: Signer) => {
-      const crumb = signer ? 
-        { view: 'expandedSigner', data: { signer: signer.id } } : 
-        { view: 'accounts', data: {} }
+    getAvailableSigner(currentAccount.getSigner(), lastSignerType, storeApi.getSigners, (error?: Error | null, signer?: Signer) => {
+      const crumb = signer ? signerPanelCrumb(signer.id) : accountPanelCrumb()
       store.navDash(crumb)
 
       if (error) {
@@ -542,52 +542,12 @@ export class Accounts extends EventEmitter {
 
       if (currentAccount.requests[handlerId].type === 'transaction') {
         const data = this.getTransactionRequest(currentAccount, handlerId).data
-        cb(null, signerCompatibility(data, (signer as Signer).summary()))
+        cb(null, transactionCompatibility(data, (signer as Signer).summary()))
         return
       }
       
       cb(null, { signer: (signer as Signer).type, tx: '', compatible: true })
     })
-
-    const lastSignerType = getSignerType(currentAccount.lastSignerType)
-    const signer = currentAccount.getSigner()
-
-    const signerUnavailable = (id?: string) => {
-      const crumb = id ? signerPanelCrumb(id) : accountPanelCrumb()
-
-      store.navDash(crumb)
-      return cb(new Error('Signer unavailable'))
-    }
-
-    const isSignerReady = ({ status }: Signer) => status === 'ok'
-
-    if (!signer) {
-      // if no signer is active, check if this account was previously relying on a
-      // hardware signer that is currently disconnected
-      if (isHardwareSigner(lastSignerType)) {
-        const unavailableSigners = 
-          storeApi
-            .getSigners()
-            .filter(signer => getSignerType(signer.type) === lastSignerType && !isSignerReady(signer))
-
-        // if there is only one matching disconnected signer, open the signer panel so it can be unlocked
-        if (unavailableSigners.length === 1) return signerUnavailable(unavailableSigners[0].id)
-
-        // if there is more than one matching signer, open the account panel so the user can choose
-        if (unavailableSigners.length > 1) return signerUnavailable()
-      }
-
-      return cb(new Error('No signer'))
-    }
-
-    if (!isSignerReady(signer)) {
-      // if the signer is not ready to sign, open the signer panel so that
-      // the user can unlock it or reconnect
-      return signerUnavailable(signer.id)
-    }
-
-    const data = this.getTransactionRequest(currentAccount, handlerId).data
-    cb(null, transactionCompatibility(data, signer.summary()))
   }
 
   close () {
