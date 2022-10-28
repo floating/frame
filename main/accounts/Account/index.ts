@@ -377,7 +377,6 @@ class FrameAccount {
       }
 
       this.update()
-      windows.showTray()
       store.setSignerView('default')
       store.setPanelView('default')
 
@@ -391,7 +390,7 @@ class FrameAccount {
       const panelNav = store('windows.panel.nav') || []
       const inRequestView = panelNav.map((crumb: any) => crumb.view).includes('requestView')
 
-      if (accountOpen && !inRequestView) {
+      if (accountOpen && (!store('tray.open') || !inRequestView)) {
         const crumb = { 
           view: 'requestView', 
           data: { 
@@ -401,8 +400,13 @@ class FrameAccount {
             bottom: '200px'
           }
         } as const
+        if (inRequestView) nav.back('panel')
         nav.forward('panel', crumb)
       }
+
+      setTimeout(() => {
+        windows.showTray()
+      }, 100)
     }
     // Add a filter to make sure we're adding the request to an account that controls the outcome
     if (this.smart) {
