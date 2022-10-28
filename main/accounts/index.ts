@@ -549,7 +549,6 @@ export class Accounts extends EventEmitter {
         const unavailableSigners = 
           allSigners.filter(signer => getSignerType(signer.type) === lastSignerType && !isSignerReady(signer))
 
-          console.log('WE HERE')
         // if there is only one matching disconnected signer, open the signer panel so it can be unlocked
         if (unavailableSigners.length === 1) return signerUnavailable(unavailableSigners[0].id)
 
