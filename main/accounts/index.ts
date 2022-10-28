@@ -5,22 +5,27 @@ import { addHexPrefix, intToHex} from 'ethereumjs-util'
 import { TypedData, Version } from 'eth-sig-util'
 import { v5 as uuidv5 } from 'uuid'
 
+import provider from '../provider'
 import store from '../store'
+import FrameAccount from './Account'
 import ExternalDataScanner, { DataScanner } from '../externalData'
 import Signer from '../signers/Signer'
 import FrameAccount from './Account'
 import { usesBaseFee, TransactionData, GasFeesSource } from '../../resources/domain/transaction'
 import { getAvailableSigner, getSignerType, Type } from '../../resources/domain/signer'
 import { signerCompatibility as transactionCompatibility, maxFee, SignerCompatibility } from '../transaction'
+
 import { weiIntToEthInt, hexToInt } from '../../resources/utils'
-import provider from '../provider'
 import { ApprovalType } from '../../resources/constants'
+import { accountPanelCrumb, signerPanelCrumb } from '../../resources/domain/nav'
+import { usesBaseFee, TransactionData, GasFeesSource } from '../../resources/domain/transaction'
+import { isHardwareSigner } from '../../resources/domain/signer'
+
 import {
   AccountRequest, AccessRequest,
   TransactionRequest, TransactionReceipt,
   ReplacementType, RequestStatus, RequestMode
 } from './types'
-import { accountPanelCrumb, signerPanelCrumb } from '../../resources/domain/nav'
 
 import type { Chain } from '../chains'
 

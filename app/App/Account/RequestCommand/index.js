@@ -329,7 +329,7 @@ class RequestCommand extends React.Component {
       <div className='footerModule'>
         {notice ? (
           <div className='requestNotice'>
-            {(_ => {
+            {(() => {
               if (status === 'pending') {
                 return (
                   <div key={status} className='requestNoticeInner cardShow'>
@@ -396,8 +396,9 @@ class RequestCommand extends React.Component {
 
   render () {
     const { req } = this.props
-    const crumb = this.store('windows.panel.nav')[0] || {}
     if (!req) return null
+    const crumb = this.store('windows.panel.nav')[0] || {}
+
     if (req.type === 'transaction' && crumb.data.step === 'confirm') {
       return this.renderTxCommand()
     } else if (req.type === 'sign' || req.type === 'signTypedData') {
