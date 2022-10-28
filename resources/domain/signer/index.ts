@@ -1,4 +1,3 @@
-import type FrameAccount from '../../../main/accounts/Account'
 import type Signer from '../../../main/signers/Signer'
 
 // in order of increasing priority
