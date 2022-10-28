@@ -3,14 +3,17 @@ import { addHexPrefix } from 'ethereumjs-util'
 import store from '../../../main/store'
 import provider from '../../../main/provider'
 import Accounts from '../../../main/accounts'
-import { GasFeesSource } from '../../../resources/domain/transaction'
 import signers from '../../../main/signers'
+import { signerCompatibility } from '../../../main/transaction'
+
+import { GasFeesSource } from '../../../resources/domain/transaction'
 
 jest.mock('../../../main/provider', () => ({ send: jest.fn(), emit: jest.fn(), on: jest.fn() }))
 jest.mock('../../../main/signers', () => ({ get: jest.fn() }))
 jest.mock('../../../main/windows', () => ({ broadcast: jest.fn(), showTray: jest.fn() }))
 jest.mock('../../../main/windows/nav', () => ({ on: jest.fn(), forward: jest.fn() }))
 jest.mock('../../../main/externalData')
+jest.mock('../../../main/transaction')
 
 jest.mock('../../../main/store/persist')
 
@@ -698,53 +701,112 @@ describe('#removeRequests', () => {
 })
 
 describe('#signerCompatibility', () => {
+  let activeSigner
+
+  const lockedSeedSigner = {
+    id: '13',
+    type: 'seed',
+    addresses: [account.id],
+    status: 'locked'
+  }
+
   beforeEach(() => {
     store.navDash = jest.fn()
+
+    activeSigner = {
+      id: '12',
+      addresses: [account.id],
+      summary: jest.fn()
+    }
+
+    store.newSigner(lockedSeedSigner)
+
+    signers.get.mockImplementation((id) => {
+      if (id === activeSigner.id) return activeSigner
+      if (id === lockedSeedSigner.id) return lockedSeedSigner
+    })
+
+    Accounts.accounts[account.id].lastSignerType = 'seed'
+    Accounts.accounts[account.id].signer = activeSigner.id
+    Accounts.addRequest(request)
   })
 
   afterEach(() => {
-    store.removeSigner('12')
+    store.removeSigner(activeSigner.id)
+    store.removeSigner(lockedSeedSigner.id)
   })
 
-  const signerTypes = ['trezor', 'ledger', 'lattice', 'ring', 'seed', 'aragon']
+  const signerTypes = ['trezor', 'ledger', 'lattice']
   
   signerTypes.forEach((signerType) => {
-    it(`should open the signer menu when a ${signerType} signer is not available`, (done) => {
-      const newSigner = {
-        id: '12',
-        type: signerType,
-        addresses: [account.id],
-        status: 'locked'
-      }
+    it(`should open the signer menu when a ${signerType} signer is not available`, () => {
+      const cb = jest.fn()
 
-      store.newSigner(newSigner)
-      signers.get.mockReturnValue(newSigner)
+      activeSigner.status = 'disconnected'
+      activeSigner.type = signerType
+      store.newSigner(activeSigner)
 
-      Accounts.accounts[account.id].signer = newSigner.id
+      Accounts.accounts[account.id].signer = undefined
       Accounts.accounts[account.id].lastSignerType = signerType
-      Accounts.addRequest(request)
 
-      Accounts.signerCompatibility('1', (err) => {
-        expect(err.message).toBe('Signer unavailable')
-        expect(store.navDash).toHaveBeenCalledWith({
-          data: {
-            signer: '12'
-          },
-          view: 'expandedSigner'
-        })
-        done()
+      Accounts.signerCompatibility(request.handlerId, cb)
+
+      expect(cb).toHaveBeenCalledWith(new Error('Signer unavailable'))
+      expect(store.navDash).toHaveBeenCalledWith({
+        data: {
+          signer: activeSigner.id
+        },
+        view: 'expandedSigner'
       })
     })
   })
-  
 
-  it('should return an error when there is no signer', (done) => {
-    store.removeSigner('12')
-    Accounts.accounts[account.id].signer = undefined
-    Accounts.signerCompatibility('1', (err) => {
-      expect(err.message).toBe('No signer')
-      expect(store.navDash).not.toHaveBeenCalled()
-      done()
+  it('should not open the signer menu if the current signer is ready', () => {
+    const cb = jest.fn()
+    const compatibility = { signer: activeSigner.id, tx: 'sometx', compatible: true }
+
+    activeSigner.status = 'ok'
+    signerCompatibility.mockReturnValue(compatibility)
+
+    Accounts.signerCompatibility(request.handlerId, cb)
+    
+    expect(store.navDash).not.toHaveBeenCalled()
+    expect(cb).toHaveBeenCalledWith(null, compatibility)
+  })
+
+  it('should open the signer panel for a signer that is not ready', () => {
+    const cb = jest.fn()
+
+    activeSigner.status = 'locked'
+
+    Accounts.signerCompatibility(request.handlerId, cb)
+    
+    expect(store.navDash).toHaveBeenCalledWith({
+      data: {
+        signer: activeSigner.id
+      },
+      view: 'expandedSigner'
     })
+  })
+
+  it('should return an error when the signer is not ready', () => {
+    const cb = jest.fn()
+
+    activeSigner.status = 'locked'
+
+    Accounts.signerCompatibility(request.handlerId, cb)
+    
+    expect(cb).toHaveBeenCalledWith(new Error('Signer unavailable'))
+  })
+
+  it('should return an error when there is no signer', () => {
+    const cb = jest.fn()
+
+    Accounts.accounts[account.id].signer = undefined
+
+    Accounts.signerCompatibility(request.handlerId, cb)
+    
+    expect(store.navDash).not.toHaveBeenCalled()
+    expect(cb).toHaveBeenCalledWith(new Error('No signer'))
   })
 })
