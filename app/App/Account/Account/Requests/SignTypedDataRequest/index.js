@@ -1,6 +1,6 @@
 import React from 'react'
 import Restore from 'react-restore'
-import utils from 'web3-utils'
+import {formatEther} from '@ethersproject/units'
 import svg from '../../../../../../resources/svg'
 import link from '../../../../../../resources/link'
 
@@ -56,7 +56,7 @@ class TransactionRequest extends React.Component {
   }
 
   hexToDisplayValue (hex) {
-    return (Math.round(parseFloat(utils.fromWei(hex, 'ether')) * 1000000) / 1000000).toFixed(6)
+    return (Math.round(parseFloat(formatEther(hex)) * 1000000) / 1000000).toFixed(6)
   }
 
   render () {

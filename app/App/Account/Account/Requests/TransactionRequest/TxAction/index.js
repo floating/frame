@@ -1,7 +1,7 @@
 import React, { Children } from 'react'
 import Restore from 'react-restore'
 import link from '../../../../../../../resources/link'
-import utils from 'web3-utils'
+import {formatEther} from '@ethersproject/units'
 import BigNumber from 'bignumber.js'
 import Transfer from './erc20/transfer'
 import Recipient from './recipient'
@@ -22,7 +22,7 @@ class TxSending extends React.Component {
     setTimeout(_ => this.setState({ copied: false }), 1000)
   }
   hexToDisplayValue (hex) {
-    return (Math.round(parseFloat(utils.fromWei(hex, 'ether')) * 1000000) / 1000000).toFixed(6)
+    return (Math.round(parseFloat(formatEther(hex)) * 1000000) / 1000000).toFixed(6)
   }
   render () {
     const req = this.props.req

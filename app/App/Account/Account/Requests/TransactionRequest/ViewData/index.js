@@ -1,6 +1,6 @@
 import React from 'react'
 import Restore from 'react-restore'
-import utils from 'web3-utils'
+import { hexToAscii } from '../../../../../../../resources/utils'
 import svg from '../../../../../../../resources/svg'
 import link from '../../../../../../../resources/link'
 
@@ -162,7 +162,7 @@ class ViewData extends React.Component {
 
     return (
       <div className='txViewData '>
-        {utils.toAscii(req.data.data || '0x') ? (
+        {hexToAscii(req.data.data || '') ? (
           <div className='transactionDataBodyInner'>
             <div>
               

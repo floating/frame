@@ -1,6 +1,6 @@
 const { ipcMain, dialog } = require('electron')
 const fs = require('fs')
-const utils = require('web3-utils')
+const {isAddress} = require('ethers').utils
 const { randomBytes } = require('crypto')
 
 const accounts = require('../accounts').default
@@ -168,12 +168,12 @@ const rpc = {
     accounts.addAragon(account, cb)
   },
   createFromAddress (address, name, cb) {
-    if (!utils.isAddress(address)) return cb(new Error('Invalid Address'))
+    if (!isAddress(address)) return cb(new Error('Invalid Address'))
     accounts.add(address, name, { type: 'Address' })
     cb()
   },
   createAccount (address, name, options, cb) {
-    if (!utils.isAddress(address)) return cb(new Error('Invalid Address'))
+    if (!isAddress(address)) return cb(new Error('Invalid Address'))
     accounts.add(address, name, options)
     cb()
   },

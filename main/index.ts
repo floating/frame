@@ -1,7 +1,6 @@
 import { app, ipcMain, protocol, shell, clipboard, globalShortcut, powerMonitor, BrowserWindow } from 'electron'
 import path from 'path'
 import log from 'electron-log'
-import { numberToHex } from 'web3-utils'
 import url from 'url'
 
 // DO NOT MOVE - env var below is required to enable watch mode for development on the renderer process and must be set before all local imports 

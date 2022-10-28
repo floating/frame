@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import Restore from 'react-restore'
-import utils from 'web3-utils'
+import {formatEther} from '@ethersproject/units'
 import BigNumber from 'bignumber.js'
 
 // import Account from './Account'
@@ -35,7 +35,7 @@ class RequestCommand extends React.Component {
   }
 
   hexToDisplayValue (hex) {
-    return (Math.round(parseFloat(utils.fromWei(hex, 'ether')) * 1000000) / 1000000).toFixed(6)
+    return (Math.round(parseFloat(formatEther(hex)) * 1000000) / 1000000).toFixed(6)
   }
 
   toDisplayUSD (bn) {
