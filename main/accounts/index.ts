@@ -567,8 +567,8 @@ export class Accounts extends EventEmitter {
       // the user can unlock it or reconnect
       return signerUnavailable(signer.id)
     }
-    
-    if (currentAccount.requests[handlerId].type === 'transaction') {
+
+    if (request.type === 'transaction') {
       const data = this.getTransactionRequest(currentAccount, handlerId).data
       cb(null, transactionCompatibility(data, signer.summary()))
     } else {
