@@ -521,7 +521,7 @@ export class Accounts extends EventEmitter {
     const currentAccount = this.current()
     if (!currentAccount) return cb(new Error('Could not locate account'))
 
-    const request = currentAccount.requests[handlerId] && currentAccount.requests[handlerId].type === 'transaction'
+    const request = currentAccount.requests[handlerId]
     if (!request) return cb(new Error(`Could not locate request ${handlerId}`))
 
     const lastSignerType = getSignerType(currentAccount.lastSignerType)
@@ -529,7 +529,7 @@ export class Accounts extends EventEmitter {
     const isHardware = isHardwareSigner(lastSignerType)
     
     // handle locked and other states requiring user action
-    if (isHardware || signer) {
+    if (isHardware && !signer) {
       const unavailableSigners = (Object.values(store('main.signers')) as Signer[])
         .filter(({ type, status }) => getSignerType(type) === lastSignerType && status !== 'ok')
 
@@ -541,14 +541,24 @@ export class Accounts extends EventEmitter {
         return cb(new Error('Signer unavailable'))
       }
     }
+
+    if (signer && signer.status !== 'ok') {
+      const crumb = { view: 'expandedSigner', data: { signer: signer.id } }
+      store.navDash(crumb)
+      return cb(new Error('Signer unavailable'))
+    }
     
     // missing signers
     if (!signer) {
       return cb(new Error('No signer'))
     }
 
-    const data = this.getTransactionRequest(currentAccount, handlerId).data
-    cb(null, signerCompatibility(data, signer.summary()))
+    if (currentAccount.requests[handlerId].type === 'transaction') {
+      const data = this.getTransactionRequest(currentAccount, handlerId).data
+      cb(null, signerCompatibility(data, signer.summary()))
+    } else {
+      cb(null, { signer: signer.type, tx: '', compatible: true })
+    }
   }
 
   close () {

@@ -1,5 +1,6 @@
 import React, { Children } from 'react'
 import Restore from 'react-restore'
+import svg from '../../../../../../../resources/svg'
 import link from '../../../../../../../resources/link'
 import utils from 'web3-utils'
 import BigNumber from 'bignumber.js'

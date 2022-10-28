@@ -9,7 +9,7 @@ import TxBar from './TxBar'
 import TxConfirmations from './TxConfirmations'
 import Time from '../Time'
 
-// import svg from '../../../../resources/svg'
+import svg from '../../../../resources/svg'
 import link from '../../../../resources/link'
 
 import { usesBaseFee } from '../../../../resources/domain/transaction'
@@ -302,7 +302,7 @@ class RequestCommand extends React.Component {
     )
   }
 
-  render () {
+  renderTxCommand () {
     const { req } = this.props
     const { notice } = req
 
@@ -319,6 +319,92 @@ class RequestCommand extends React.Component {
         </div>
       </div>
     )
+  }
+
+  renderSignDataCommand () {
+    const { req } = this.props
+    const { status, notice } = req
+
+    return (
+      <div className='footerModule'>
+        {notice ? (
+          <div className='requestNotice'>
+            {(_ => {
+              if (status === 'pending') {
+                return (
+                  <div key={status} className='requestNoticeInner cardShow'>
+                    <div style={{ paddingBottom: 20 }}><div className='loader' /></div>
+                    <div className='requestNoticeInnerText'>See Signer</div>
+                    <div className='cancelRequest' onClick={() => this.decline(req)}>Cancel</div>
+                  </div>
+                )
+              } else if (status === 'success') {
+                return (
+                  <div key={status} className='requestNoticeInner cardShow requestNoticeSuccess'>
+                    <div>{svg.octicon('check', { height: 40 })}</div>
+                    <div className='requestNoticeInnerText'>{notice}</div>
+                  </div>
+                )
+              } else if (status === 'error' || status === 'declined') {
+                return (
+                  <div key={status} className='requestNoticeInner cardShow requestNoticeError'>
+                    <div>{svg.octicon('circle-slash', { height: 40 })}</div>
+                    <div className='requestNoticeInnerText'>{notice}</div>
+                  </div>
+                )
+              } else {
+                return <div key={notice} className='requestNoticeInner cardShow'>{notice}</div>
+              }
+            })()}
+          </div> 
+        ) : ( 
+          <div className='requestApprove'>
+            <div 
+              className='requestDecline' 
+              style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none'}} 
+              onClick={() => { if (this.state.allowInput) this.decline(req) 
+            }}>
+              <div className='requestDeclineButton _txButton _txButtonBad'>
+                <span>Decline</span>
+              </div>
+            </div>
+            <div 
+              className='requestSign' 
+              style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none'}}
+              onClick={() => { 
+                if (this.state.allowInput) {
+                  link.rpc('signerCompatibility', req.handlerId, (e, compatibility) => {
+                    if (e === 'No signer')  {
+                      this.store.notify('noSignerWarning', { req })
+                    } else if (e === 'Signer unavailable') {
+                      this.store.notify('signerUnavailableWarning', { req })
+                    } else {
+                      this.approve(req.handlerId, req)
+                    }
+                  })
+                }
+              }}>
+              <div className='requestSignButton _txButton'>
+                <span>Sign</span>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  render () {
+    const { req } = this.props
+    const crumb = this.store('windows.panel.nav')[0] || {}
+    if (!req) return null
+    if (req.type === 'transaction' && crumb.data.step === 'confirm') {
+      return this.renderTxCommand()
+    } else if (req.type === 'sign' || req.type === 'signTypedData') {
+      return this.renderSignDataCommand()
+    } else {
+      return null
+    }
   }
 }
 
