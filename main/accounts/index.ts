@@ -7,10 +7,10 @@ import { v5 as uuidv5 } from 'uuid'
 
 import store from '../store'
 import ExternalDataScanner, { DataScanner } from '../externalData'
-import { getType as getSignerType } from '../signers/Signer'
+import Signer from '../signers/Signer'
 import FrameAccount from './Account'
 import { usesBaseFee, TransactionData, GasFeesSource } from '../../resources/domain/transaction'
-import { isHardwareSigner } from '../../resources/domain/signer'
+import { checkSignerAvailability, getSignerType } from '../../resources/domain/signer'
 import { signerCompatibility, maxFee, SignerCompatibility } from '../transaction'
 import { weiIntToEthInt, hexToInt } from '../../resources/utils'
 import provider from '../provider'
@@ -523,42 +523,26 @@ export class Accounts extends EventEmitter {
 
     const request = currentAccount.requests[handlerId]
     if (!request) return cb(new Error(`Could not locate request ${handlerId}`))
-
-    const lastSignerType = getSignerType(currentAccount.lastSignerType)
-    const signer = currentAccount.getSigner()
-    const isHardware = isHardwareSigner(lastSignerType)
     
-    // handle locked and other states requiring user action
-    if (isHardware && !signer) {
-      const unavailableSigners = (Object.values(store('main.signers')) as Signer[])
-        .filter(({ type, status }) => getSignerType(type) === lastSignerType && status !== 'ok')
-
-      if (unavailableSigners.length) {
-        const crumb = unavailableSigners.length === 1 ? 
-          { view: 'expandedSigner', data: { signer: unavailableSigners[0].id } } : 
-          { view: 'accounts', data: {} }
-        store.navDash(crumb)
-        return cb(new Error('Signer unavailable'))
-      }
-    }
-
-    if (signer && signer.status !== 'ok') {
-      const crumb = { view: 'expandedSigner', data: { signer: signer.id } }
+    checkSignerAvailability(currentAccount.getSigner(), currentAccount.lastSignerType, () => Object.values(store('main.signers')), (error: Error | null, signer?: Signer) => {
+      const crumb = signer ? 
+        { view: 'expandedSigner', data: { signer: signer.id } } : 
+        { view: 'accounts', data: {} }
       store.navDash(crumb)
-      return cb(new Error('Signer unavailable'))
-    }
-    
-    // missing signers
-    if (!signer) {
-      return cb(new Error('No signer'))
-    }
 
-    if (currentAccount.requests[handlerId].type === 'transaction') {
-      const data = this.getTransactionRequest(currentAccount, handlerId).data
-      cb(null, signerCompatibility(data, signer.summary()))
-    } else {
-      cb(null, { signer: signer.type, tx: '', compatible: true })
-    }
+      if (error) {
+        cb(error)
+        return
+      }
+
+      if (currentAccount.requests[handlerId].type === 'transaction') {
+        const data = this.getTransactionRequest(currentAccount, handlerId).data
+        cb(null, signerCompatibility(data, (signer as Signer).summary()))
+        return
+      }
+      
+      cb(null, { signer: (signer as Signer).type, tx: '', compatible: true })
+    })
   }
 
   close () {

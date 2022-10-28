@@ -2,7 +2,7 @@ import React from 'react'
 import Restore from 'react-restore'
 import link from '../../../../../../resources/link'
 import svg from '../../../../../../resources/svg'
-import { isHardwareSigner } from '../../../../../../resources/domain/signer'
+import { checkSignerAvailability, isHardwareSigner } from '../../../../../../resources/domain/signer'
 
 const isWatchOnly = (account = {}) => {
   return ['address'].includes(account.lastSignerType.toLowerCase())
@@ -111,10 +111,8 @@ class Signer extends React.Component {
     const hardwareSigner = isHardwareSigner(activeAccount.lastSignerType)
     const watchOnly = isWatchOnly(activeAccount)
     const status = (signer && signer.status) || (hardwareSigner ? 'Disconnected' : 'No Signer')
-
-    // const signerType = this.store('main.accounts', this.props.id, 'lastSignerType')
-    // const signerKind = (signerType === 'seed' || signerType === 'ring') ? 'hot' : 'device'
     const account = this.store('main.accounts', this.props.id)
+    const getSigners = () => Object.values(this.store('main.signers'))
 
     return (
       <div 
@@ -131,25 +129,23 @@ class Signer extends React.Component {
               className='moduleItem moduleItemSpace moduleItemButton' 
               style={{ flex: 6 }}
               onClick={() => {
-                if (!signer) {
-                  this.setState({
-                    notifySuccess: false,
-                    notifyText: hardwareSigner ? 'Signer Disconnected' : 'There is no signer for this account'
-                  })
+                checkSignerAvailability(signer, activeAccount.lastSignerType, getSigners, (error, availableSigner) => {
+                  if (error) {
+                    this.setState({
+                      notifySuccess: false,
+                      notifyText: error.message
+                    })
+  
+                    setTimeout(() => {
+                      this.setState({ notifySuccess: false, notifyText: '' })
+                    }, 5000)
+                  }
 
-                  setTimeout(() => {
-                    this.setState({ notifySuccess: false, notifyText: '' })
-                  }, 5000)
-                  
-                  return
-                }
-
-                const crumb = {
-                  view: 'expandedSigner', 
-                  data: { signer: signer.id }
-                }
-                // link.send('nav:forward', 'dash', crumb)
-                link.send('tray:action', 'navDash', crumb)
+                  const crumb = availableSigner ? 
+                    { view: 'expandedSigner', data: { signer: availableSigner.id } } : 
+                    { view: 'accounts', data: {} }
+                  link.send('tray:action', 'navDash', crumb)
+                })
             }}>
               {this.renderSignerType(activeAccount.lastSignerType)}
               <div className='moduleItemSignerStatus'>

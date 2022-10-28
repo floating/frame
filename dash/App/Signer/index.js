@@ -4,7 +4,7 @@ import Restore from 'react-restore'
 import link from '../../../resources/link'
 import svg from '../../../resources/svg'
 import { capitalize } from '../../../resources/utils'
-import { getSignerType } from '../../../resources/domain/signer'
+import { getSignerDisplayType } from '../../../resources/domain/signer'
 import { isHardwareSigner } from '../../../resources/domain/signer'
 
 import SignerStatus from './SignerStatus'
@@ -464,7 +464,7 @@ class Signer extends React.Component {
                   if (this.store('main.accounts', address.toLowerCase())) {
                     link.rpc('removeAccount', address, {}, () => { })
                   } else {
-                    const type = getSignerType(signer)
+                    const type = getSignerDisplayType(signer)
                     link.rpc('createAccount', address, `${capitalize(type)} Account`, { type: signer.type }, (e) => {
                       if (e) console.error(e)
                     })
