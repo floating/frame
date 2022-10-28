@@ -185,6 +185,7 @@ const initial = {
     launch: main('launch', false),
     reveal: main('reveal', false),
     nonceAdjust: main('nonceAdjust', false),
+    showLocalNameWithENS: main('showLocalNameWithENS', false),
     autohide: main('autohide', false),
     accountCloseLock: main('accountCloseLock', false),
     hardwareDerivation: main('hardwareDerivation', 'mainnet'),

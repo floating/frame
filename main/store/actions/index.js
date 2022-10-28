@@ -83,6 +83,7 @@ module.exports = {
   toggleLaunch: u => u('main.launch', launch => !launch),
   toggleReveal: u => u('main.reveal', reveal => !reveal),
   toggleNonceAdjust: u => u('main.nonceAdjust', nonceAdjust => !nonceAdjust),
+  toggleShowLocalNameWithENS: u => u('main.showLocalNameWithENS', showLocalNameWithENS => !showLocalNameWithENS),
   setPermission: (u, address, permission) => {
     u('main.permissions', address, (permissions = {}) => {
       permissions[permission.handlerId] = permission

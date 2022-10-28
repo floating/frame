@@ -6,8 +6,6 @@ import link from '../../../../resources/link'
 
 import { getAddress } from '../../../../resources/domain/transaction'
 
-const showAccountNameWithENS = false
-
 class Account extends React.Component {
   constructor (...args) {
     super(...args)
@@ -249,7 +247,7 @@ class Account extends React.Component {
         </div>
       )
     } else {
-      if (ensName && !showAccountNameWithENS) {
+      if (ensName && !this.store('main.showLocalNameWithENS')) {
         return (
           <div className='signerDetails'>
             <div 
