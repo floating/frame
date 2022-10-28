@@ -528,7 +528,7 @@ describe('#setGasLimit', () => {
     const maxFeePerGas = 400e9 // 400 gwei
     const maxLimit = maxTotalFee / maxFeePerGas
     const gasLimit = weiToHex(maxLimit + 1e5) // add 10000 to exceed the maximum limit
-    
+
     request.data.type = '0x2'
     request.data.maxFeePerGas = weiToHex(maxFeePerGas)
     maxFee.mockReturnValue(maxTotalFee)
