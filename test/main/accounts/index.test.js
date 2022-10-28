@@ -4,7 +4,7 @@ import store from '../../../main/store'
 import provider from '../../../main/provider'
 import Accounts from '../../../main/accounts'
 import signers from '../../../main/signers'
-import { signerCompatibility } from '../../../main/transaction'
+import { signerCompatibility, maxFee } from '../../../main/transaction'
 
 import { GasFeesSource } from '../../../resources/domain/transaction'
 
@@ -227,14 +227,15 @@ describe('#setBaseFee', () => {
   it('does not exceed the max allowable fee', () => {
     const maxTotal = 2e18 // 2 ETH
     const gasLimit = 1e7
-    const maxFee = maxTotal / gasLimit
-    const highBaseFee = weiToHex(maxFee + 10e9) // add 10 gwei to exceed the maximum limit
+    const maxTotalFee = maxTotal / gasLimit
+    const highBaseFee = weiToHex(maxTotalFee + 10e9) // add 10 gwei to exceed the maximum limit
 
     request.data.gasLimit = weiToHex(gasLimit)
+    maxFee.mockReturnValue(maxTotal)
 
     setBaseFee(highBaseFee)
 
-    expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(weiToHex(maxFee))
+    expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(weiToHex(maxTotalFee))
   })
 
   it('updates the feesUpdatedByUser flag', () => {
@@ -333,19 +334,20 @@ describe('#setPriorityFee', () => {
   it('does not exceed the max allowable fee', () => {
     const maxTotal = 2e18 // 2 ETH
     const gasLimit = 1e7
-    const maxFee = maxTotal / gasLimit
+    const maxTotalFee = maxTotal / gasLimit
 
     request.data.gasLimit = weiToHex(gasLimit)
     request.data.maxFeePerGas = gweiToHex(190)
     request.data.maxPriorityFeePerGas = gweiToHex(40)
+    maxFee.mockReturnValue(maxTotal)
 
     const highPriorityFee = 60e9 // add 20 gwei to the above to exceed the maximum limit
-    const expectedPriorityFee = maxFee - (parseInt(request.data.maxFeePerGas) - parseInt(request.data.maxPriorityFeePerGas))
+    const expectedPriorityFee = maxTotalFee - (parseInt(request.data.maxFeePerGas) - parseInt(request.data.maxPriorityFeePerGas))
 
     setPriorityFee(highPriorityFee)
 
     expect(Accounts.current().requests[1].data.maxPriorityFeePerGas).toBe(weiToHex(expectedPriorityFee))
-    expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(weiToHex(maxFee))
+    expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(weiToHex(maxTotalFee))
   })
 
   it('updates the feesUpdatedByUser flag', () => {
@@ -422,14 +424,15 @@ describe('#setGasPrice', () => {
   it('does not exceed the max gas price', () => {
     const maxTotal = 2e18 // 2 ETH
     const gasLimit = 1e7
-    const maxFee = maxTotal / gasLimit
-    const highPrice = weiToHex(maxFee + 10e9) // 250 gwei
+    const maxTotalFee = maxTotal / gasLimit
+    const highPrice = weiToHex(maxTotalFee + 10e9) // 250 gwei
 
     request.data.gasLimit = weiToHex(gasLimit)
+    maxFee.mockReturnValue(maxTotal)
 
     setGasPrice(highPrice)
 
-    expect(Accounts.current().requests[1].data.gasPrice).toBe(weiToHex(maxFee))
+    expect(Accounts.current().requests[1].data.gasPrice).toBe(weiToHex(maxTotalFee))
   })
 
   it('caps the gas price at 9999 gwei', () => {
@@ -506,13 +509,14 @@ describe('#setGasLimit', () => {
   })
 
   it('does not exceed the max fee for pre-EIP-1559 transactions', () => {
-    const maxFee = 2e18 // 2 ETH
+    const maxTotalFee = 2e18 // 2 ETH
     const gasPrice = 400e9 // 400 gwei
-    const maxLimit = maxFee / gasPrice
+    const maxLimit = maxTotalFee / gasPrice
     const gasLimit = weiToHex(maxLimit + 1e5) // add 10000 to exceed the maximum limit
 
     request.data.type = '0x0'
     request.data.gasPrice = weiToHex(gasPrice)
+    maxFee.mockReturnValue(maxTotalFee)
 
     setGasLimit(gasLimit)
 
@@ -520,13 +524,14 @@ describe('#setGasLimit', () => {
   })
 
   it('does not exceed the max fee for post-EIP-1559 transactions', () => {
-    const maxFee = 2e18 // 2 ETH
+    const maxTotalFee = 2e18 // 2 ETH
     const maxFeePerGas = 400e9 // 400 gwei
-    const maxLimit = maxFee / maxFeePerGas
+    const maxLimit = maxTotalFee / maxFeePerGas
     const gasLimit = weiToHex(maxLimit + 1e5) // add 10000 to exceed the maximum limit
-
+    
     request.data.type = '0x2'
     request.data.maxFeePerGas = weiToHex(maxFeePerGas)
+    maxFee.mockReturnValue(maxTotalFee)
 
     setGasLimit(gasLimit)
 
@@ -734,6 +739,8 @@ describe('#signerCompatibility', () => {
   afterEach(() => {
     store.removeSigner(activeSigner.id)
     store.removeSigner(lockedSeedSigner.id)
+
+    //Accounts.removeRequests([request.handlerId])
   })
 
   const signerTypes = ['trezor', 'ledger', 'lattice']
