@@ -4,8 +4,7 @@ import Restore from 'react-restore'
 import link from '../../../resources/link'
 import svg from '../../../resources/svg'
 import { capitalize } from '../../../resources/utils'
-import { getSignerDisplayType } from '../../../resources/domain/signer'
-import { isHardwareSigner } from '../../../resources/domain/signer'
+import { isHardwareSignerType, getSignerDisplayType } from '../../../resources/domain/signer'
 
 import SignerStatus from './SignerStatus'
 
@@ -192,7 +191,7 @@ class Signer extends React.Component {
         <div className='signerStatusText signerStatusReady'>{'ready to sign'}</div>
       )
     } else if (status === 'locked') {
-      const hwSigner = isHardwareSigner(this.props.type)
+      const hwSigner = isHardwareSignerType(this.props.type)
       const lockText = hwSigner
         ? 'Please unlock your ' + this.props.type
         : 'locked'
@@ -256,7 +255,7 @@ class Signer extends React.Component {
 
     const status = this.getStatus()
 
-    const hwSigner = isHardwareSigner(this.props.type)
+    const hwSigner = isHardwareSignerType(this.props.type)
     const loading = isLoading(status)
     const disconnected = isDisconnected(this.props.type, status, loading)
 
@@ -407,7 +406,7 @@ class Signer extends React.Component {
 
     const status = this.getStatus()
 
-    const hwSigner = isHardwareSigner(this.props.type)
+    const hwSigner = isHardwareSignerType(this.props.type)
     const loading = isLoading(status)
 
     // TODO: create well-defined signer states that drive these UI features

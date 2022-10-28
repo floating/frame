@@ -1,8 +1,9 @@
 import React from 'react'
 import Restore from 'react-restore'
+
 import link from '../../../../../../resources/link'
 import svg from '../../../../../../resources/svg'
-import { getAvailableSigner, isHardwareSigner } from '../../../../../../resources/domain/signer'
+import { findUnavailableSigners, isHardwareSignerType } from '../../../../../../resources/domain/signer'
 import { accountPanelCrumb, signerPanelCrumb } from '../../../../../../resources/domain/nav'
 
 const isWatchOnly = (account = {}) => {
@@ -100,20 +101,19 @@ class Signer extends React.Component {
   render () {
     const activeAccount = this.store('main.accounts', this.props.account)
 
-    let signer
+    let activeSigner
 
     if (activeAccount.signer) {
-      signer = this.store('main.signers', activeAccount.signer)
+      activeSigner = this.store('main.signers', activeAccount.signer)
     } else if (activeAccount.smart)  {
       const actingSigner = this.store('main.accounts', activeAccount.smart.actor, 'signer')
-      if (actingSigner) signer = this.store('main.signers', actingSigner)
+      if (actingSigner) activeSigner = this.store('main.signers', actingSigner)
     }
 
-    const hardwareSigner = isHardwareSigner(activeAccount.lastSignerType)
+    const hardwareSigner = isHardwareSignerType(activeAccount.lastSignerType)
     const watchOnly = isWatchOnly(activeAccount)
-    const status = (signer && signer.status) || (hardwareSigner ? 'Disconnected' : 'No Signer')
+    const status = (activeSigner && activeSigner.status) || (hardwareSigner ? 'Disconnected' : 'No Signer')
     const account = this.store('main.accounts', this.props.id)
-    const getSigners = () => Object.values(this.store('main.signers'))
 
     return (
       <div 
@@ -130,21 +130,28 @@ class Signer extends React.Component {
               className='moduleItem moduleItemSpace moduleItemButton' 
               style={{ flex: 6 }}
               onClick={() => {
-                getAvailableSigner(signer, activeAccount.lastSignerType, getSigners, (error, availableSigner) => {
-                  if (error) {
-                    this.setState({
-                      notifySuccess: false,
-                      notifyText: error.message
-                    })
-  
-                    setTimeout(() => {
-                      this.setState({ notifySuccess: false, notifyText: '' })
-                    }, 5000)
-                  }
+                const getUnavailableSigner = () => {
+                  const signers = Object.values(this.store('main.signers'))
+                  const unavailableSigners = findUnavailableSigners(activeAccount.lastSignerType, signers)
 
-                  const crumb = availableSigner ? signerPanelCrumb(availableSigner) : accountPanelCrumb()
-                  link.send('tray:action', 'navDash', crumb)
-                })
+                  return unavailableSigners.length === 1 && unavailableSigners[0]
+                }
+
+                const signer = activeSigner || getUnavailableSigner()
+
+                if (!signer) {
+                  this.setState({
+                    notifySuccess: false,
+                    notifyText: error.message
+                  })
+
+                  setTimeout(() => {
+                    this.setState({ notifySuccess: false, notifyText: '' })
+                  }, 5000)
+                }
+
+                const crumb = !!signer ? signerPanelCrumb(signer) : accountPanelCrumb()
+                link.send('tray:action', 'navDash', crumb)
             }}>
               {this.renderSignerType(activeAccount.lastSignerType)}
               <div className='moduleItemSignerStatus'>
