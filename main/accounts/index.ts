@@ -41,7 +41,7 @@ const storeApi = {
     return (store('main.accounts', id) || {}) as Account
   },
   getSigners: function () {
-    return (store('main.signers') || {}) as Record<string, Signer>
+    return Object.values((store('main.signers') || {}) as Record<string, Signer>)
   }
 }
 
@@ -545,9 +545,10 @@ export class Accounts extends EventEmitter {
       // if no signer is active, check if this account was previously relying on a
       // hardware signer that is currently disconnected
       if (isHardwareSigner(lastSignerType)) {
-        const allSigners = Object.values(storeApi.getSigners())
         const unavailableSigners = 
-          allSigners.filter(signer => getSignerType(signer.type) === lastSignerType && !isSignerReady(signer))
+          storeApi
+            .getSigners()
+            .filter(signer => getSignerType(signer.type) === lastSignerType && !isSignerReady(signer))
 
         // if there is only one matching disconnected signer, open the signer panel so it can be unlocked
         if (unavailableSigners.length === 1) return signerUnavailable(unavailableSigners[0].id)
