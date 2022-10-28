@@ -142,7 +142,7 @@ class Signer extends React.Component {
                 if (!signer) {
                   this.setState({
                     notifySuccess: false,
-                    notifyText: error.message
+                    notifyText: 'Signer Unavailable'
                   })
 
                   setTimeout(() => {
