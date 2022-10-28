@@ -3,6 +3,7 @@ import Restore from 'react-restore'
 import link from '../../../../../../resources/link'
 import svg from '../../../../../../resources/svg'
 import { getAvailableSigner, isHardwareSigner } from '../../../../../../resources/domain/signer'
+import { accountPanelCrumb, signerPanelCrumb } from '../../../../../../resources/domain/nav'
 
 const isWatchOnly = (account = {}) => {
   return ['address'].includes(account.lastSignerType.toLowerCase())
@@ -141,9 +142,7 @@ class Signer extends React.Component {
                     }, 5000)
                   }
 
-                  const crumb = availableSigner ? 
-                    { view: 'expandedSigner', data: { signer: availableSigner.id } } : 
-                    { view: 'accounts', data: {} }
+                  const crumb = availableSigner ? signerPanelCrumb(availableSigner) : accountPanelCrumb()
                   link.send('tray:action', 'navDash', crumb)
                 })
             }}>
