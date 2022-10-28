@@ -11,16 +11,18 @@ import Signer from '../signers/Signer'
 import FrameAccount from './Account'
 import { usesBaseFee, TransactionData, GasFeesSource } from '../../resources/domain/transaction'
 import { checkSignerAvailability, getSignerType } from '../../resources/domain/signer'
-import { signerCompatibility, maxFee, SignerCompatibility } from '../transaction'
+import { signerCompatibility as transactionCompatibility, maxFee, SignerCompatibility } from '../transaction'
 import { weiIntToEthInt, hexToInt } from '../../resources/utils'
 import provider from '../provider'
-import { Chain } from '../chains'
 import { ApprovalType } from '../../resources/constants'
 import {
   AccountRequest, AccessRequest,
   TransactionRequest, TransactionReceipt,
   ReplacementType, RequestStatus, RequestMode
 } from './types'
+import { accountPanelCrumb, signerPanelCrumb } from '../../resources/domain/nav'
+
+import type { Chain } from '../chains'
 
 function notify (title: string, body: string, action: (event: Electron.Event) => void) {
   const notification = new Notification({ title, body })
@@ -31,13 +33,16 @@ function notify (title: string, body: string, action: (event: Electron.Event) =>
 
 const frameOriginId = uuidv5('frame-internal', uuidv5.DNS)
 
-const accountsApi = {
+const storeApi = {
   getAccounts: function () {
     return (store('main.accounts') || {}) as Record<string, Account>
   },
   getAccount: function (id: string) {
     return (store('main.accounts', id) || {}) as Account
   },
+  getSigners: function () {
+    return Object.values((store('main.signers') || {}) as Record<string, Signer>)
+  }
 }
 
 export { RequestMode, AccountRequest, AccessRequest, TransactionRequest, SignTypedDataRequest, AddChainRequest, AddTokenRequest } from './types'
@@ -51,7 +56,7 @@ export class Accounts extends EventEmitter {
   constructor () {
     super()
 
-    this.accounts = Object.entries(accountsApi.getAccounts()).reduce((accounts, [id, account]) => {
+    this.accounts = Object.entries(storeApi.getAccounts()).reduce((accounts, [id, account]) => {
       accounts[id] = new FrameAccount(JSON.parse(JSON.stringify(account)), this)
 
       return accounts
@@ -72,7 +77,7 @@ export class Accounts extends EventEmitter {
 
   // Public
   addAragon (account: Account, cb: Callback<Account>) {
-    const existing = accountsApi.getAccount(account.address)
+    const existing = storeApi.getAccount(account.address)
     if (existing.id) return cb(null, existing) // Account already exists
 
     log.info('Aragon account not found, creating account')
@@ -543,6 +548,46 @@ export class Accounts extends EventEmitter {
       
       cb(null, { signer: (signer as Signer).type, tx: '', compatible: true })
     })
+
+    const lastSignerType = getSignerType(currentAccount.lastSignerType)
+    const signer = currentAccount.getSigner()
+
+    const signerUnavailable = (id?: string) => {
+      const crumb = id ? signerPanelCrumb(id) : accountPanelCrumb()
+
+      store.navDash(crumb)
+      return cb(new Error('Signer unavailable'))
+    }
+
+    const isSignerReady = ({ status }: Signer) => status === 'ok'
+
+    if (!signer) {
+      // if no signer is active, check if this account was previously relying on a
+      // hardware signer that is currently disconnected
+      if (isHardwareSigner(lastSignerType)) {
+        const unavailableSigners = 
+          storeApi
+            .getSigners()
+            .filter(signer => getSignerType(signer.type) === lastSignerType && !isSignerReady(signer))
+
+        // if there is only one matching disconnected signer, open the signer panel so it can be unlocked
+        if (unavailableSigners.length === 1) return signerUnavailable(unavailableSigners[0].id)
+
+        // if there is more than one matching signer, open the account panel so the user can choose
+        if (unavailableSigners.length > 1) return signerUnavailable()
+      }
+
+      return cb(new Error('No signer'))
+    }
+
+    if (!isSignerReady(signer)) {
+      // if the signer is not ready to sign, open the signer panel so that
+      // the user can unlock it or reconnect
+      return signerUnavailable(signer.id)
+    }
+
+    const data = this.getTransactionRequest(currentAccount, handlerId).data
+    cb(null, transactionCompatibility(data, signer.summary()))
   }
 
   close () {

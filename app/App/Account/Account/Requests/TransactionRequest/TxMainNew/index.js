@@ -27,7 +27,7 @@ class TxRecipient extends React.Component {
     const chainId = parseInt(req.data.chainId, 16)
 
     const chainName = this.store('main.networks.ethereum', chainId, 'name')
-    const currentSymbol = this.store('main.networks.ethereum', chainId, 'symbol') || '?'
+    const currentSymbol = this.store('main.networksMeta.ethereum', chainId, 'nativeCurrency.symbol') || '?'
 
     const txMeta = { replacement: false, possible: true, notice: '' }
 

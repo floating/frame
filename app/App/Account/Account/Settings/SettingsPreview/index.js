@@ -64,12 +64,6 @@ class Settings extends React.Component {
             </div>
             {this.state.showMore ? (
               <>
-                {/* <div 
-                  className='moduleItem moduleItemButton cardShow'
-                  style={ this.state.editName ? { opacity: 0.3, pointerEvents: 'none' } : { opacity: 1 } }
-                >
-                  {'Show Name with ENS'}
-                </div> */}
                 {this.state.editName ? (
                   <div
                     key={'input'} 
