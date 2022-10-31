@@ -62,7 +62,7 @@ class DappDetails extends React.Component {
             link.send('tray:openExternal', `https://${origin.name}/`)
           }
         }>{'launch dapp'}</div> */}
-        <div 
+        {/* <div 
           className='clearOriginsButton' 
           style={{ color: 'var(--bad)' }}
           onClick={() => {
@@ -71,7 +71,7 @@ class DappDetails extends React.Component {
           }}
         >
           Remove Dapp
-        </div>  
+        </div>   */}
       </div>
     )
   }
