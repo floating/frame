@@ -55,7 +55,7 @@ async function tokenBalanceScan (address: Address, tokensToOmit: Token[] = [], c
   try {
     // for chains that support multicall, we can attempt to load every token that we know about,
     // for all other chains we need to call each contract individually so don't scan every contract
-    const eligibleChains = (chains || await getChains()).filter(chainSupportsScan)
+    const eligibleChains = chains || await getChains()
     const tokenLists = eligibleChains.map(chainId => tokenLoader.getTokens(chainId))
     const tokens = tokenLists.reduce((all, tokenList) => {
       return all.concat(
