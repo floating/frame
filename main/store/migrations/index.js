@@ -561,6 +561,11 @@ const migrations = {
     initial.main.accounts = Object.fromEntries(accounts)
 
     return initial
+  },
+  28: (initial) => {
+    initial.main.networksMeta.ethereum[5].nativeCurrency.symbol = "görETH"
+    initial.main.networksMeta.ethereum[11155111].nativeCurrency.symbol = "sepETH"
+    return initial
   }
 }
 

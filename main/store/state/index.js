@@ -154,7 +154,7 @@ const initial = {
   },
   platform: process.platform,
   main: {
-    _version: main('_version', 27),
+    _version: main('_version', 28),
     instanceId: main('instanceId', generateUuid()),
     colorway: main('colorway', 'dark'),
     colorwayPrimary: {
@@ -433,15 +433,14 @@ const initial = {
             }
           },
           nativeCurrency: {
-            symbol: 'ETH',
+            symbol: 'görETH',
             usd: {
               price: 0,
               change24hr: 0
             },
             icon: '',
             name: '',
-            symbol: '',
-            decimals: 0
+            decimals: 18
           },
           icon: '',
           primaryColor: 'accent2' // Testnet
@@ -548,15 +547,14 @@ const initial = {
             }
           },
           nativeCurrency: {
-            symbol: 'ETH',
+            symbol: 'sepETH',
             usd: {
               price: 0,
               change24hr: 0
             },
             icon: '',
             name: '',
-            symbol: '',
-            decimals: 0
+            decimals: 18
           },
           icon: '',
           primaryColor: 'accent2' // Testnet

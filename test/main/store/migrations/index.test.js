@@ -1005,3 +1005,59 @@ describe('migration 27', () => {
     expect(updatedState.main.accounts[address].name).toBe('My Kewl Account')
   })
 })
+
+describe('migration 28', () => {
+  beforeEach(() => {
+    state = {
+      main: {
+        _version: 27,
+        networks: {
+          ethereum: { 
+            5: {
+              id: 5,
+              type: 'ethereum',
+              layer: 'testnet',
+              name: 'Görli',
+              nativeCurrency: {
+                symbol: 'ETH',
+                decimals: 18
+              },
+
+            },
+            11155111: { 
+              type: 'ethereum',
+              layer: 'testnet',
+              name: 'Sepolia',
+              nativeCurrency: {
+                symbol: 'ETH',
+                decimals: 18
+              },
+            }
+          }
+        },
+        networksMeta: {
+          ethereum: {
+            5: {
+              nativeCurrency: {
+                symbol: "ETH"
+              }
+            },
+            11155111: {
+              nativeCurrency: {
+                symbol: 'ETH',
+                decimals: 18
+              },
+            }
+          }
+      }
+    }
+  }})
+
+  it('updates the symbols for Gorli and Sepolia testnets', () => {
+    const updatedState = migrations.apply(state, 28)
+    const networks = updatedState.main.networks.ethereum
+    const metadata = updatedState.main.networksMeta.ethereum
+    expect(metadata[5].nativeCurrency.symbol).toBe("görETH")
+    expect(metadata[11155111].nativeCurrency.symbol).toBe("sepETH")
+  })
+})
