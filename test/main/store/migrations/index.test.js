@@ -1014,10 +1014,6 @@ describe('migration 28', () => {
         networks: {
           ethereum: { 
             5: {
-              id: 5,
-              type: 'ethereum',
-              layer: 'testnet',
-              name: 'Görli',
               nativeCurrency: {
                 symbol: 'ETH',
                 decimals: 18
@@ -1025,9 +1021,6 @@ describe('migration 28', () => {
 
             },
             11155111: { 
-              type: 'ethereum',
-              layer: 'testnet',
-              name: 'Sepolia',
               nativeCurrency: {
                 symbol: 'ETH',
                 decimals: 18
@@ -1053,11 +1046,15 @@ describe('migration 28', () => {
     }
   }})
 
-  it('updates the symbols for Gorli and Sepolia testnets', () => {
+  it('updates the symbol for Sepolia testnet', () => {
     const updatedState = migrations.apply(state, 28)
-    const networks = updatedState.main.networks.ethereum
+    const metadata = updatedState.main.networksMeta.ethereum
+    expect(metadata[11155111].nativeCurrency.symbol).toBe("sepETH")
+  })
+
+  it('updates the symbol for Gorli testnet', () => {
+    const updatedState = migrations.apply(state, 28)
     const metadata = updatedState.main.networksMeta.ethereum
     expect(metadata[5].nativeCurrency.symbol).toBe("görETH")
-    expect(metadata[11155111].nativeCurrency.symbol).toBe("sepETH")
   })
 })
