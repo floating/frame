@@ -276,6 +276,7 @@ class FrameAccount {
     if (to && calldata && calldata !== '0x' && parseInt(calldata, 16) !== 0) { 
       try { // Decode calldata
         const decodedData = await reveal.decode(to, parseInt(chainId, 16), calldata)
+
         const knownTxRequest = this.requests[req.handlerId] as TransactionRequest
   
         if (knownTxRequest && decodedData) {
@@ -291,7 +292,7 @@ class FrameAccount {
   private async recognizeActions (req: TransactionRequest) {
     const { to, chainId, data: calldata } = req.data
 
-    if (to && calldata && calldata !== '0x' && parseInt(calldata, 16) !== 0) { 
+    if (to && calldata && calldata !== '0x' && parseInt(calldata, 16) !== 0) {
       try { // Recognize actions
         const actions = await reveal.recog(calldata, {
           contractAddress: to,
@@ -301,7 +302,7 @@ class FrameAccount {
 
         const knownTxRequest = this.requests[req.handlerId] as TransactionRequest
 
-        if (knownTxRequest && actions ) {
+        if (knownTxRequest && actions) {
           knownTxRequest.recognizedActions = actions
           this.update()
         } 
