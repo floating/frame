@@ -3,7 +3,7 @@ import Restore from 'react-restore'
 
 import link from '../../../../../../resources/link'
 import svg from '../../../../../../resources/svg'
-import { findUnavailableSigners, isHardwareSignerType } from '../../../../../../resources/domain/signer'
+import { findUnavailableSigners, isHardwareSigner } from '../../../../../../resources/domain/signer'
 import { accountPanelCrumb, signerPanelCrumb } from '../../../../../../resources/domain/nav'
 
 const isWatchOnly = (account = {}) => {
@@ -110,7 +110,7 @@ class Signer extends React.Component {
       if (actingSigner) activeSigner = this.store('main.signers', actingSigner)
     }
 
-    const hardwareSigner = isHardwareSignerType(activeAccount.lastSignerType)
+    const hardwareSigner = isHardwareSigner(activeAccount.lastSignerType)
     const watchOnly = isWatchOnly(activeAccount)
     const status = (activeSigner && activeSigner.status) || (hardwareSigner ? 'Disconnected' : 'No Signer')
     const account = this.store('main.accounts', this.props.id)

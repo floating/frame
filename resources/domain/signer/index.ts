@@ -18,8 +18,10 @@ export function getSignerDisplayType (signer: Signer) {
   return ['ring', 'seed'].includes(signer.type.toLowerCase()) ? 'hot' : signer.type
 }
 
-export function isHardwareSignerType (type = '') {
-  return ['ledger', 'trezor', 'lattice'].includes(type.toLowerCase())
+export function isHardwareSigner (typeOrSigner: string | Signer = '') {
+  const signerType = (typeof typeOrSigner === 'string') ? typeOrSigner : (typeOrSigner as Signer).type
+
+  return ['ledger', 'trezor', 'lattice'].includes(signerType.toLowerCase())
 }
 
 export function isSignerReady (signer: Signer) {
@@ -27,7 +29,7 @@ export function isSignerReady (signer: Signer) {
 }
 
 export function findUnavailableSigners (signerTypeValue: string, signers: Signer[]): Signer[] {
-  if (!isHardwareSignerType(signerTypeValue)) return []
+  if (!isHardwareSigner(signerTypeValue)) return []
 
   return signers.filter(signer => signer.type === signerTypeValue && !isSignerReady(signer))
 }

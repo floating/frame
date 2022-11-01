@@ -23,7 +23,7 @@ import SignatureRequest from './Requests/SignatureRequest'
 import ChainRequest from './Requests/ChainRequest'
 import AddTokenRequest from './Requests/AddTokenRequest'
 import SignTypedDataRequest from './Requests/SignTypedDataRequest'
-import { isHardwareSignerType } from '../../../../resources/domain/signer'
+import { isHardwareSigner } from '../../../../resources/domain/signer'
 
 class _AccountModule extends React.Component {
   // constructor (props, context) {
@@ -350,7 +350,7 @@ class _AccountBody extends React.Component {
   } 
   renderRequest (req, data) {
     const activeAccount =  this.store('main.accounts', this.props.id)
-    const signingDelay = isHardwareSignerType(activeAccount.lastSignerType) ? 200 : 1500
+    const signingDelay = isHardwareSigner(activeAccount.lastSignerType) ? 200 : 1500
 
     if (req.type === 'transaction') {
       return (

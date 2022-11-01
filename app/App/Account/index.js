@@ -6,7 +6,7 @@ import Account from './Account'
 import RequestCommand from './RequestCommand'
 
 import link from '../../../resources/link'
-import { isHardwareSignerType } from '../../../resources/domain/signer'
+import { isHardwareSigner } from '../../../resources/domain/signer'
 
 // import Filter from '../../Components/Filter'
 let firstScroll = true
@@ -34,7 +34,7 @@ class _Footer extends React.Component {
         if (req.type === 'transaction' && crumb.data.step === 'confirm') {
           return (
             <div className='footerModule'>
-              <RequestCommand req={req} signingDelay={isHardwareSignerType(account.lastSignerType) ? 0 : 2000} />
+              <RequestCommand req={req} signingDelay={isHardwareSigner(account.lastSignerType) ? 0 : 2000} />
             </div>
           )
         } else if (req.type === 'access') {
@@ -65,7 +65,7 @@ class _Footer extends React.Component {
         } else if (req.type === 'sign' || req.type === 'signTypedData') {
           return (
             <div className='footerModule'>
-              <RequestCommand req={req} signingDelay={isHardwareSignerType(account.lastSignerType) ? 0 : 2000} />
+              <RequestCommand req={req} signingDelay={isHardwareSigner(account.lastSignerType) ? 0 : 2000} />
             </div>
           )
         } else if (req.type === 'addChain' || req.type === 'switchChain') {
