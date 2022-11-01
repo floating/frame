@@ -1011,28 +1011,12 @@ describe('migration 28', () => {
     state = {
       main: {
         _version: 27,
-        networks: {
-          ethereum: { 
-            5: {
-              nativeCurrency: {
-                symbol: 'ETH',
-                decimals: 18
-              },
-
-            },
-            11155111: { 
-              nativeCurrency: {
-                symbol: 'ETH',
-                decimals: 18
-              },
-            }
-          }
-        },
         networksMeta: {
           ethereum: {
             5: {
               nativeCurrency: {
-                symbol: "ETH"
+                symbol: "ETH",
+                decimals: 0
               }
             },
             11155111: {
@@ -1056,5 +1040,11 @@ describe('migration 28', () => {
     const updatedState = migrations.apply(state, 28)
     const metadata = updatedState.main.networksMeta.ethereum
     expect(metadata[5].nativeCurrency.symbol).toBe("görETH")
+  })
+
+  it('updates decimals to 18 if they are currently 0', () => {
+    const updatedState = migrations.apply(state, 28)
+    const metadata = updatedState.main.networksMeta.ethereum
+    expect(metadata[5].nativeCurrency.decimals).toBe(18)
   })
 })

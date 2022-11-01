@@ -415,10 +415,9 @@ const initial = {
               price: 0,
               change24hr: 0
             },
-            icon: '',
-            name: '',
-            symbol: '',
-            decimals: 0
+            icon: "https://assets.coingecko.com/coins/images/279/large/ethereum.png?1595348880",
+            name: 'Ether',
+            decimals: 18
           },
           icon: '',
           primaryColor: 'accent1' // Mainnet
@@ -439,7 +438,7 @@ const initial = {
               change24hr: 0
             },
             icon: '',
-            name: '',
+            name: 'Görli Ether',
             decimals: 18
           },
           icon: '',
@@ -461,8 +460,8 @@ const initial = {
               change24hr: 0
             },
             icon: '',
-            name: '',
-            symbol: '',
+            name: 'Ether',
+            symbol: '18',
             decimals: 0
           },
           icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/optimism.svg',
@@ -486,7 +485,7 @@ const initial = {
             icon: '',
             name: '',
             symbol: '',
-            decimals: 0
+            decimals: 18
           },
           icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/gnosis.svg',
           primaryColor: 'accent5' // Gnosis
@@ -508,8 +507,7 @@ const initial = {
             },
             icon: '',
             name: '',
-            symbol: '',
-            decimals: 0
+            decimals: 18
           },
           icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/polygon.svg',
           primaryColor: 'accent6' // Polygon
@@ -530,9 +528,9 @@ const initial = {
               change24hr: 0
             },
             icon: '',
-            name: '',
+            name: 'Ether',
             symbol: '',
-            decimals: 0
+            decimals: 18
           },
           icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/arbitrum.svg',
           primaryColor: 'accent7' // Arbitrum
@@ -553,7 +551,7 @@ const initial = {
               change24hr: 0
             },
             icon: '',
-            name: '',
+            name: 'Sepolia Ether',
             decimals: 18
           },
           icon: '',
