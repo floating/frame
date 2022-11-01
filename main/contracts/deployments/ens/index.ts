@@ -83,7 +83,6 @@ const registrar = ({ name = 'ENS Registrar', address, chainId }: DeploymentLocat
 
         return {
           id: 'ens:transfer',
-          bleh: 'tet',
           data: {
             name: name, from, to, tokenId: token }
         } as EnsTransferAction

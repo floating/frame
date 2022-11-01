@@ -132,6 +132,9 @@ const rpc = {
       }
     })
   },
+  confirmRequestApproval (req, approvalType, approvalData, cb) {
+    accounts.confirmRequestApproval(req.handlerId, approvalType, approvalData)
+  },
   updateRequest (req, actionId, data, cb) {
     accounts.updateRequest(req.handlerId, actionId, data)
   },

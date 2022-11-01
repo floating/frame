@@ -25,6 +25,7 @@ import {
 
 import type { Chain } from '../chains'
 import { ActionType } from '../transaction/actions'
+import { ApprovalType } from '../../resources/constants'
 
 function notify (title: string, body: string, action: (event: Electron.Event) => void) {
   const notification = new Notification({ title, body })
@@ -136,6 +137,21 @@ export class Accounts extends EventEmitter {
       currentAccount.update()
 
       return txRequest
+    }
+  }
+
+  confirmRequestApproval (reqId: string, approvalType: ApprovalType, approvalData: any) {
+    log.info('confirmRequestApproval', reqId, approvalType)
+
+    const currentAccount = this.current()
+    if (currentAccount && currentAccount.requests[reqId]) {
+      const txRequest = this.getTransactionRequest(currentAccount, reqId)
+
+      const approval = (txRequest.approvals || []).find(a => a.type === approvalType)
+
+      if (approval) {
+        approval.approve(approvalData)
+      }
     }
   }
 
