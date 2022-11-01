@@ -63,10 +63,21 @@ describe('#getRawTx', () => {
     expect(tx.nonce).toBe('0x168')
   })
 
-  it('should convert an invalid integer nonce to undefined', () => {
-    const tx = getRawTx({ nonce: 'invalid' })
+  it('should pass through an undefined nonce', () => {
+    const tx = getRawTx({ nonce: undefined })
 
     expect(tx.nonce).toBeUndefined()
+  })
+
+  const invalidNonces = [
+    { description: 'non-numeric', nonce: 'invalid' }, 
+    { description: 'negative integer', nonce: '-360' }, 
+    { description: 'non-integer numeric', nonce: '3.60' }
+  ]
+  invalidNonces.forEach(({ description, nonce }) => {
+    it(`should reject a ${description} nonce`, () => {
+      expect(() => getRawTx({ nonce })).toThrowError('Invalid nonce')
+    })
   })
 })
 

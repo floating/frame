@@ -71,11 +71,17 @@ export function feeTotalOverMax (rawTx: TransactionData, maxTotalFee: number) {
 export function getRawTx (newTx: RPC.SendTransaction.TxParams, accountId: string | undefined): TransactionData {
   const { gas, gasLimit, gasPrice, data, value, type, to, ...rawTx } = newTx
   const getNonce = () => {
-    if (isHexString(rawTx.nonce)) {
+    // pass through hex string or undefined
+    if (rawTx.nonce === undefined || isHexString(rawTx.nonce)) {
       return rawTx.nonce
     }
+
+    // convert positive integer strings to hex, reject everything else
     const nonceBN = new BN(rawTx.nonce as string)
-    return nonceBN.isNaN() ? undefined : addHexPrefix(nonceBN.abs().integerValue().toString(16))
+    if (nonceBN.isNaN() || !nonceBN.isInteger() || nonceBN.isNegative()) {
+      throw new Error('Invalid nonce')
+    }
+    return addHexPrefix(nonceBN.toString(16))
   }
   const parsedValue = !value || parseInt(value, 16) === 0 ? '0x0' : addHexPrefix(unpadHexString(value) || '0')
 
