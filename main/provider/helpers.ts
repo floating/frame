@@ -12,12 +12,12 @@ import {
 import log from 'electron-log'
 import BN from 'bignumber.js'
 import { v5 as uuidv5 } from 'uuid'
+import { isHexString } from 'ethers/lib/utils'
 
 import store from '../store'
 import protectedMethods from '../api/protectedMethods'
 import { getAddress, usesBaseFee, TransactionData, GasFeesSource } from '../../resources/domain/transaction'
 import FrameAccount from '../accounts/Account'
-import { isHexString } from 'ethers/lib/utils'
 
 const permission = (date: number, method: string) => ({ parentCapability: method, date })
 
