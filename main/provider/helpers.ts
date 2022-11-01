@@ -77,7 +77,7 @@ export function getRawTx (newTx: RPC.SendTransaction.TxParams, accountId: string
     }
 
     // convert positive integer strings to hex, reject everything else
-    const nonceBN = new BN(rawTx.nonce as string)
+    const nonceBN = new BN(rawTx.nonce)
     if (nonceBN.isNaN() || !nonceBN.isInteger() || nonceBN.isNegative()) {
       throw new Error('Invalid nonce')
     }
