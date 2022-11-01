@@ -2,10 +2,21 @@ import { BigNumber } from 'ethers'
 import { Fragment, Interface } from 'ethers/lib/utils'
 
 import { registrar as registrarAbi, registrarController as registrarControllerAbi } from './abi'
-import { Contract } from '../../../reveal'
 import store from '../../../store'
 
+
+import type {
+  ApproveAction as EnsApprovalAction,
+  TransferAction as EnsTransferAction,
+  RegisterAction as EnsRegistrationAction,
+  RenewAction as EnsRenewalAction
+} from '../../../transaction/actions/ens'
+
 import type { JsonFragment } from '@ethersproject/abi'
+import type { DecodableContract } from '../../../transaction/actions'
+
+// TODO: fix typing on contract types
+type EnsContract = DecodableContract<unknown>
 
 namespace ENS {
   export type Register = {
@@ -57,7 +68,7 @@ function ethName (name: string) {
   return name.includes('.eth') ? name : `${name}.eth`
 }
 
-const registrar = ({ name = 'ENS Registrar', address, chainId }: DeploymentLocation): Contract => {
+const registrar = ({ name = 'ENS Registrar', address, chainId }: DeploymentLocation): EnsContract => {
   return {
     name,
     chainId,
@@ -72,9 +83,10 @@ const registrar = ({ name = 'ENS Registrar', address, chainId }: DeploymentLocat
 
         return {
           id: 'ens:transfer',
+          bleh: 'tet',
           data: {
             name: name, from, to, tokenId: token }
-        }
+        } as EnsTransferAction
       }
 
       if (name === 'approve') {
@@ -85,13 +97,13 @@ const registrar = ({ name = 'ENS Registrar', address, chainId }: DeploymentLocat
         return {
           id: 'ens:approve',
           data: { name, operator: to, tokenId: token }
-        }
+        } as EnsApprovalAction
       }
     }
   }
 }
 
-const registarController = ({ name = 'ENS Registrar Controller', address, chainId }: DeploymentLocation): Contract => {
+const registarController = ({ name = 'ENS Registrar Controller', address, chainId }: DeploymentLocation): EnsContract => {
   return {
     name,
     chainId,
@@ -111,7 +123,7 @@ const registarController = ({ name = 'ENS Registrar Controller', address, chainI
         return {
           id: 'ens:register',
           data: { address: owner, name: ethName(name), duration: duration.toNumber() }
-        }
+        } as EnsRegistrationAction
       }
 
       if (name === 'renew') {
@@ -120,7 +132,7 @@ const registarController = ({ name = 'ENS Registrar Controller', address, chainI
         return {
           id: 'ens:renew',
           data: { name: ethName(name), duration: duration.toNumber() }
-        }
+        } as EnsRenewalAction
       }
     }
   }

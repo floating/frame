@@ -12,7 +12,7 @@ const supportedApprovals = [
 
 class TxApproval extends React.Component {
   approve (req, type, data = {}, cb = () => {}) {
-    link.rpc('confirmRequestApproval', req, type, data, cb)    
+    link.rpc('updateRequest', req, type, data, cb)    
   }
 
   decline (req, cb = () => {}) {

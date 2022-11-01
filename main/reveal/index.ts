@@ -2,6 +2,9 @@
 
 import log from 'electron-log'
 import EthereumProvider from 'ethereum-provider'
+import { addHexPrefix } from 'ethereumjs-util'
+import BigNumber from 'bignumber.js'
+
 import proxyConnection from '../provider/proxy'
 import nebulaApi from '../nebula'
 
@@ -10,9 +13,11 @@ import { decodeCallData, fetchContract, ContractSource } from '../contracts'
 import ensContracts from '../contracts/deployments/ens'
 import erc20 from '../externalData/balances/erc-20-abi'
 
-import { addHexPrefix } from 'ethereumjs-util'
+import type { ApproveAction as Erc20Approval, TransferAction as Erc20Transfer } from '../transaction/actions/erc20'
+import type { Action, DecodableContract, EntityType } from '../transaction/actions'
 
-const knownContracts: Contract[] = [
+// TODO: fix generic typing here
+const knownContracts: DecodableContract<unknown>[] = [
   ...ensContracts
 ]
 
@@ -24,41 +29,12 @@ const provider = new EthereumProvider(proxyConnection)
 // TODO: Discuss the need to set chain for the proxy connection
 provider.setChain('0x1')
 
-// TODO: put these types in a standard actions location
-export type ActionType =
-  'erc20:approval' |
-  'erc20:transfer' |
-  'ens:commit' |
-  'ens:register' |
-  'ens:renew' |
-  'ens:transfer' |
-  'ens:approve'
-
-export type Action = {
-  id: ActionType
-  data?: any
-}
-
-type Actions = Array<Action>
-
-type EntityType = 'external' | 'contract' | 'unknown'
-export interface Contract {
-  name: string
-  address: Address
-  chainId: number
-  decode: DecodeFunction
-}
 
 type RecognitionContext = {
   contractAddress: string
   chainId: number
   account?: string
 }
-
-type DecodeContext = {
-  account?: Address
-}
-type DecodeFunction = (calldata: string, context?: DecodeContext) => Action | undefined
 
 async function resolveEntityType (address: string, chainId: number): Promise<EntityType> {
   if (!address || !chainId) return 'unknown'
@@ -90,7 +66,7 @@ async function resolveEnsName (address: string): Promise<string> {
   }
 }
 
-async function recogErc20 (contractAddress: string, chainId: number, calldata: string): Promise<Action | undefined> {
+async function recogErc20 (contractAddress: string, chainId: number, calldata: string): Promise<Action<unknown> | undefined> {
   if (contractAddress) {
     try {
       const contract = new Erc20Contract(contractAddress, chainId)
@@ -101,10 +77,26 @@ async function recogErc20 (contractAddress: string, chainId: number, calldata: s
           const spender = decoded.args[0].toLowerCase()
           const amount = decoded.args[1].toHexString()
           const { ens, type } = await surface.identity(spender, chainId)
+          const data = { spender, amount, decimals, name, symbol, spenderEns: ens, spenderType: type }
+
           return {
-            id: 'erc20:approval',
-            data: { spender, amount, decimals, name, symbol, spenderEns: ens, spenderType: type }
-          }
+            id: 'erc20:approve',
+            data: { spender, amount, decimals, name, symbol, spenderEns: ens, spenderType: type },
+            update: ({ amount }) => {
+              // amount is a hex string
+              const approvedAmount = new BigNumber(amount || '').toString()
+    
+              // TODO: need to propagate call data back to the request itself
+              // req.data.data = contract.encodeCallData('approve', [spender, data.amount])
+    
+              // if (req.decodedData) {
+              //   req.decodedData.args[1].value = approvedAmount
+              // }
+
+              log.verbose(`Updating Erc20 approve amount to ${approvedAmount} for contract ${contractAddress} and spender ${spender}`)
+              data.amount = approvedAmount
+            }
+          } as Erc20Approval
         } else if (Erc20Contract.isTransfer(decoded)) {
           const recipient = decoded.args[0].toLowerCase()
           const amount = decoded.args[1].toHexString()
@@ -112,7 +104,7 @@ async function recogErc20 (contractAddress: string, chainId: number, calldata: s
           return { 
             id: 'erc20:transfer',
             data: { recipient, amount, decimals, name, symbol, recipientEns: ens, recipientType: type }
-          }
+          } as Erc20Transfer
         }
       }
     } catch (e) {
@@ -121,7 +113,7 @@ async function recogErc20 (contractAddress: string, chainId: number, calldata: s
   }
 }
 
-function identifyKnownContractActions (calldata: string, context: RecognitionContext): Action | undefined {
+function identifyKnownContractActions (calldata: string, context: RecognitionContext): Action<unknown> | undefined {
   const knownContract = knownContracts.find(contract =>
     contract.address.toLowerCase() === context.contractAddress.toLowerCase() && contract.chainId === context.chainId)
 
@@ -172,7 +164,7 @@ const surface = {
   },
   recog: async (calldata: string, context: RecognitionContext) => {
     // Recognize actions from standard tx types
-    const actions = ([] as Actions).concat(
+    const actions = ([] as Action<unknown>[]).concat(
       await recogErc20(context.contractAddress, context.chainId, calldata) || [],
       identifyKnownContractActions(calldata, context) || []
     )
