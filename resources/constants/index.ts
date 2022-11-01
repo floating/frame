@@ -1,8 +1,6 @@
 export enum ApprovalType {
   OtherChainApproval = 'approveOtherChain',
-  GasLimitApproval = 'approveGasLimit',
-  TokenSpendApproval = 'approveTokenSpend',
-  TokenSpendRevocation = 'revokeTokenSpend'
+  GasLimitApproval = 'approveGasLimit'
 }
 
 const ADDRESS_DISPLAY_CHARS = 8
