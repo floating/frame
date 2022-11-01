@@ -5,7 +5,6 @@ import Restore from 'react-restore'
 import Account from './Account'
 import RequestCommand from './RequestCommand'
 
-import svg from '../../../resources/svg'
 import link from '../../../resources/link'
 import { isHardwareSigner } from '../../../resources/domain/signer'
 

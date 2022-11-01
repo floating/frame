@@ -397,8 +397,8 @@ class RequestCommand extends React.Component {
   render () {
     const { req } = this.props
     if (!req) return null
-
     const crumb = this.store('windows.panel.nav')[0] || {}
+
     if (req.type === 'transaction' && crumb.data.step === 'confirm') {
       return this.renderTxCommand()
     } else if (req.type === 'sign' || req.type === 'signTypedData') {

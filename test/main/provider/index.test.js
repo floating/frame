@@ -5,7 +5,7 @@ import { hasPermission } from '../../../main/provider/helpers'
 import store from '../../../main/store'
 import chainConfig from '../../../main/chains/config'
 import { weiToHex, gweiToHex } from '../../../resources/utils'
-import { Type as SignerType } from '../../../main/signers/Signer'
+import { Type as SignerType } from '../../../resources/domain/signer'
 
 import { validate as validateUUID } from 'uuid'
 import { utils } from 'ethers'
