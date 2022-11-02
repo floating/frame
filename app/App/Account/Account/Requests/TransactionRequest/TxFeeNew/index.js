@@ -2,26 +2,15 @@ import React from 'react'
 import Restore from 'react-restore'
 import BigNumber from 'bignumber.js'
 
-import { usesBaseFee, GasFeesSource } from '../../../../../../../resources/domain/transaction'
+import { GasFeesSource, toUSD, toEther, usesBaseFee } from '../../../../../../../resources/domain/transaction'
 import link from '../../../../../../../resources/link'
 
 import { ClusterBox, Cluster, ClusterRow, ClusterColumn, ClusterValue } from '../../../../../../../resources/Components/Cluster'
 
 const FEE_WARNING_THRESHOLD_USD = 50
 
-function toDisplayUSD (bn) {
-  const usd = bn.decimalPlaces(2, BigNumber.ROUND_FLOOR)
-  return usd.isZero() ? '< $0.01' : `$${usd.toFormat()}`
-}
-
-function toDisplayEther (bn) {
-  const ether = bn.shiftedBy(-18).decimalPlaces(6, BigNumber.ROUND_FLOOR)
-
-  return ether.isZero() ? '< 0.000001' : ether.toFormat()
-}
-
 function toDisplayGwei (bn) {
-  const gwei = bn.shiftedBy(-9).decimalPlaces(3, BigNumber.ROUND_FLOOR)
+  const gwei = bn.shiftedBy(-9).decimalPlaces(6, BigNumber.ROUND_FLOOR)
 
   return gwei.isZero() ? '' : gwei.toFormat()
 }
@@ -43,21 +32,13 @@ const GasDisplay = ({ maxFeePerGas }) => {
   )
 }     
 
-const USDEstimateDisplay = ({ maxFeePerGas, maxGas, maxFeeUSD, nativeUSD, symbol }) => {
-  // accounts for two potential 12.5% block fee increases
-  const reduceFactor = BigNumber(9).dividedBy(8)
-  const minFeePerGas = maxFeePerGas.dividedBy(reduceFactor).dividedBy(reduceFactor)
-
-  // accounts for the 50% padding in the gas estimate in the provider
-  const minGas = maxGas.dividedBy(BigNumber(1.5))
-
-  const minFee = minFeePerGas.multipliedBy(minGas)
-  const minFeeUSD = minFee.shiftedBy(-18).multipliedBy(nativeUSD)
-  const displayMinFeeUSD = toDisplayUSD(minFeeUSD)
-  const displayMaxFeeUSD = toDisplayUSD(maxFeeUSD)
+const USDEstimateDisplay = ({ minFee, maxFee, nativeCurrency, isTestnet }) => {
+  const { displayUSD: displayMinFeeUSD } = toUSD(minFee, nativeCurrency, isTestnet)
+  const { usd: maxFeeUSD, displayUSD: displayMaxFeeUSD } = toUSD(maxFee, nativeCurrency, isTestnet)
+  const displayMaxFeeWarning = maxFeeUSD > FEE_WARNING_THRESHOLD_USD
   
   return <div data-testid='usd-estimate-display' className='clusterTag'>
-    <div className={maxFeeUSD.toNumber() > FEE_WARNING_THRESHOLD_USD ? '_txFeeValueDefault _txFeeValueDefaultWarn' : '_txFeeValueDefault'}>
+    <div className={`_txFeeValueDefault${displayMaxFeeWarning ? ' _txFeeValueDefaultWarn' : ''}`}>
       <span>{'≈'}</span>
       {displayMaxFeeUSD === '< $0.01' ? 
       <span>{displayMaxFeeUSD}</span> : 
@@ -67,7 +48,7 @@ const USDEstimateDisplay = ({ maxFeePerGas, maxGas, maxFeeUSD, nativeUSD, symbol
         <span>{displayMaxFeeUSD}</span>
       </>
       }
-      <span>{`in ${symbol}`}</span>
+      <span>{`in ${nativeCurrency.symbol}`}</span>
     </div>
   </div>
 }
@@ -79,34 +60,28 @@ class TxFee extends React.Component {
 
   render () {
     const req = this.props.req
-
     const chain = { 
       type: 'ethereum', 
       id: parseInt(req.data.chainId, 16)
     }
-
     const { isTestnet } = this.store('main.networks', chain.type, chain.id)
-    const {nativeCurrency, nativeCurrency: {symbol}} = this.store('main.networksMeta', chain.type, chain.id,)
-    const nativeUSD = nativeCurrency && nativeCurrency.usd && !isTestnet ? nativeCurrency.usd.price : 0
-
-    let maxFeePerGas, maxFee, maxFeeUSD
+    const { nativeCurrency } = this.store('main.networksMeta', chain.type, chain.id)
 
     const maxGas = BigNumber(req.data.gasLimit, 16)
+    const maxFeePerGas = BigNumber(req.data[usesBaseFee(req.data) ? 'maxFeePerGas' : 'gasPrice'], 16)
+    const maxFee = maxFeePerGas.multipliedBy(maxGas)
+    const { displayEther } = toEther(maxFee, 6)
 
-    if (usesBaseFee(req.data)) {
-      maxFeePerGas = BigNumber(req.data.maxFeePerGas, 16)
-      maxFee = maxFeePerGas.multipliedBy(maxGas)
-      maxFeeUSD = maxFee.shiftedBy(-18).multipliedBy(nativeUSD)
-    } else {
-      maxFeePerGas = BigNumber(req.data.gasPrice, 16)
-      maxFee = maxFeePerGas.multipliedBy(maxGas)
-      maxFeeUSD = maxFee.shiftedBy(-18).multipliedBy(nativeUSD)
-    }
+    // accounts for two potential 12.5% block fee increases
+    const reduceFactor = BigNumber(9).dividedBy(8)
+    const minFeePerGas = maxFeePerGas.dividedBy(reduceFactor).dividedBy(reduceFactor)
 
-    const displayEther = toDisplayEther(maxFee)
-
+    // accounts for the 50% padding in the gas estimate in the provider
+    const minGas = maxGas.dividedBy(BigNumber(1.5))
+    const minFee = minFeePerGas.multipliedBy(minGas)
+    
     return (
-      <ClusterBox title={'fee'} animationSlot={this.props.i}>
+      <ClusterBox title='fee' animationSlot={this.props.i}>
         <Cluster>
           <ClusterRow>
             <ClusterColumn>
@@ -119,12 +94,12 @@ class TxFee extends React.Component {
             <ClusterColumn grow={2}>
               <ClusterValue>
                 <div className='txSendingValue'>
-                  <span className='txSendingValueSymbol'>{symbol}</span>
+                  <span className='txSendingValueSymbol'>{nativeCurrency.symbol}</span>
                   <span className='txSendingValueAmount'>{displayEther}</span>
                 </div>
               </ClusterValue>
               <ClusterValue>
-                <USDEstimateDisplay maxFeePerGas={maxFeePerGas} maxGas={maxGas} maxFeeUSD={maxFeeUSD} nativeUSD={nativeUSD} symbol={symbol} />
+                <USDEstimateDisplay minFee={minFee} maxFee={maxFee} nativeCurrency={nativeCurrency} isTestnet={isTestnet} />
               </ClusterValue>
             </ClusterColumn>
           </ClusterRow>

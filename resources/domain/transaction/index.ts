@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js'
 import { JsonTx } from '@ethereumjs/tx'
 import { getAddress as getChecksumAddress } from '@ethersproject/address'
 
@@ -14,6 +15,25 @@ export interface TransactionData extends Omit<JsonTx, 'chainId' | 'type'> {
   chainId: string,
   type: string,
   gasFeesSource: GasFeesSource,
+}
+
+export function toUSD (bn: BigNumber, nativeCurrency: Rate, isTestnet = false) {
+  const nativeUSD = nativeCurrency && nativeCurrency.usd && !isTestnet ? nativeCurrency.usd.price : 0
+  const usd = bn.shiftedBy(-18).multipliedBy(nativeUSD).decimalPlaces(2, BigNumber.ROUND_FLOOR)
+
+  return {
+    usd,
+    displayUSD: usd.isZero() ? '< $0.01' : `$${usd.toFormat()}`
+  }
+}
+
+export function toEther (bn: BigNumber, decimalPlaces = 18) {
+  const ether = bn.shiftedBy(-18).decimalPlaces(decimalPlaces, BigNumber.ROUND_FLOOR)
+
+  return {
+    ether,
+    displayEther: ether.isZero() ? '< 0.000001' : ether.toFormat()
+  }
 }
 
 export function typeSupportsBaseFee (type: string) {
