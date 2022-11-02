@@ -32,7 +32,7 @@ export function toEther (bn: BigNumber, decimalPlaces = 18) {
 
   return {
     ether,
-    displayEther: ether.isZero() ? '< 0.000001' : ether.toFormat()
+    displayEther: decimalPlaces < 18 && ether.isZero() ? `< ${BigNumber(`1e-${decimalPlaces}`).toFormat()}` : ether.toFormat()
   }
 }
 
