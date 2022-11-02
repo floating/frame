@@ -22,6 +22,24 @@ class Inventory extends React.Component {
     if (this.resizeObserver) this.resizeObserver.disconnect()
   }
 
+  isFilterMatch (collection) {
+    const { filter = '' } =  this.props
+
+    const c = this.store('main.inventory', this.props.account, collection)
+    const itemMatch = Object.keys(c.items).some(item => {
+      const { name } = c.items[item] || {}
+      return (name || '').toLowerCase().indexOf(filter.toLowerCase()) !== -1
+    })
+
+    const match = (
+      !filter ||
+      c.meta.name.toLowerCase().indexOf(filter.toLowerCase()) !== -1 ||
+      itemMatch
+    )
+
+    return match
+  }
+
   displayCollections () {
     const inventory = this.store('main.inventory', this.props.account)
     const collections = Object.keys(inventory || {})
@@ -31,7 +49,7 @@ class Inventory extends React.Component {
       if (assetsLengthA > assetsLengthB) return -1
       if (assetsLengthA < assetsLengthB) return 1
       return 0
-    }).slice(0, 6)
+    }).filter(c => this.isFilterMatch(c)).slice(0, 6)
   }
 
   renderInventoryList () {

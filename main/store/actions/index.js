@@ -83,6 +83,7 @@ module.exports = {
   toggleLaunch: u => u('main.launch', launch => !launch),
   toggleReveal: u => u('main.reveal', reveal => !reveal),
   toggleNonceAdjust: u => u('main.nonceAdjust', nonceAdjust => !nonceAdjust),
+  toggleShowLocalNameWithENS: u => u('main.showLocalNameWithENS', showLocalNameWithENS => !showLocalNameWithENS),
   setPermission: (u, address, permission) => {
     u('main.permissions', address, (permissions = {}) => {
       permissions[permission.handlerId] = permission
@@ -146,6 +147,16 @@ module.exports = {
     })
   },
   removeSigner: (u, id) => {
+
+    // if in signer view, nav backwards
+    u('windows.dash.nav', (nav = []) => {
+      if (nav[0]) {
+        const { data = {} } = nav[0]
+        if (data.signer === id) nav.shift()
+      } 
+      return nav
+    })
+
     u('main.signers', signers => {
       delete signers[id]
       return signers
@@ -289,6 +300,14 @@ module.exports = {
 
       const defaultMeta = {
         blockHeight: 0,
+        name: net.name,
+        primaryColor: net.primaryColor,
+        nativeCurrency: {
+          symbol: net.symbol,
+          icon: '',
+          name: '',
+          decimals: 18
+        },
         gas: {
           price: {
             selected: 'standard',
@@ -332,6 +351,12 @@ module.exports = {
             main.origins[origin].chain = updatedNetwork
           }
         })
+
+        main.networksMeta[updatedNetwork.type][updatedNetwork.id] = main.networksMeta[updatedNetwork.type][updatedNetwork.id] || {}
+        main.networksMeta[updatedNetwork.type][updatedNetwork.id].symbol = newNet.symbol
+
+        main.networksMeta[updatedNetwork.type][updatedNetwork.id].nativeCurrency = main.networksMeta[updatedNetwork.type][updatedNetwork.id].nativeCurrency || {}
+        main.networksMeta[updatedNetwork.type][updatedNetwork.id].nativeCurrency.symbol = newNet.symbol
         
         return main
       })
@@ -471,13 +496,31 @@ module.exports = {
     u('main.origins', () => ({}))
   },
   removeOrigin: (u, originId) => {
+    u('windows.dash.nav', () => ([])) // Reset nav
     u('main.origins', origins => {
       delete origins[originId]
       return origins
     })
   },
   setBlockHeight: (u, chainId, blockHeight) => {
-    u('main.networksMeta.ethereum', chainId, (chainMeta) => ({ ...chainMeta, blockHeight }))
+    u('main.networksMeta.ethereum', chainsMeta => {
+      if (chainsMeta[chainId]) {
+        chainsMeta[chainId] = { ...chainsMeta[chainId], blockHeight }
+      } else {
+        log.error(`Action Error: setBlockHeight chainId: ${chainId} not found in chainsMeta`)
+      }
+      return chainsMeta
+    })
+  },
+  setChainColor: (u, chainId, color) => {
+    u('main.networksMeta.ethereum', chainsMeta => {
+      if (chainsMeta[chainId]) {
+        chainsMeta[chainId] = { ...chainsMeta[chainId], primaryColor: color }
+      } else {
+        log.error(`Action Error: setChainColor chainId: ${chainId} not found in chainsMeta`)
+      }
+      return chainsMeta
+    })
   },
   expandDock: (u, expand) => {
     u('dock.expand', (s) => expand)
@@ -585,17 +628,17 @@ module.exports = {
   },
   // Dashboard
   toggleDash: (u, force) => {
-    u('dash.showing', s => force === 'hide' ? false : force === 'show' ? true : !s)
+    u('windows.dash.showing', s => force === 'hide' ? false : force === 'show' ? true : !s)
   },
   closeDash: (u) => {
-    u('dash.showing', () => false)
-    u('dash.nav', () => ([])) // Reset nav
+    u('windows.dash.showing', () => false)
+    u('windows.dash.nav', () => ([])) // Reset nav
   },
   setDash: (u, update) => {
     if (!update.showing) {
-      u('dash.nav', () => ([])) // Reset nav
+      u('windows.dash.nav', () => ([])) // Reset nav
     }
-    u('dash', dash => Object.assign(dash, update))
+    u('windows.dash', dash => Object.assign(dash, update))
   },
   navForward: (u, windowId, crumb) => {
     if (!windowId || !crumb) return log.warn('Invalid nav forward', windowId, crumb)
@@ -623,6 +666,13 @@ module.exports = {
     })
     if (navigate) u('windows', windowId, 'showing', () => true)
   },
+  navReplace: (u, windowId, crumbs = []) => {
+    u('windows', windowId, win => {
+      win.nav = crumbs
+      win.showing = true
+      return win
+    })
+  },
   navClearReq: (u, handlerId) => {
     u('windows.panel.nav', nav => {
       const newNav = nav.filter(navItem => {
@@ -640,34 +690,33 @@ module.exports = {
     })
   },
   navDash: (u, navItem) => {
-    u('dash.nav', nav => {
+    u('windows.dash.nav', nav => {
       if (JSON.stringify(nav[0]) !== JSON.stringify(navItem)) nav.unshift(navItem)      
       return nav
     })
-    u('dash.showing', () => true)
+    u('windows.dash.showing', () => true)
   },
   backDash: (u, numSteps = 1) => {
-    u('dash.nav', nav => {
+    u('windows.dash.nav', nav => {
       while (numSteps > 0 && nav.length > 0) {
         nav.shift()
         numSteps -= 1
       }
-
       return nav
     })
   },
   muteBetaDisclosure: (u) => {
     u('main.mute.betaDisclosure', () => true)
     const navItem = { view: 'accounts', data: {} }
-    u('dash.nav', nav => {
+    u('windows.dash.nav', nav => {
       if (JSON.stringify(nav[0]) !== JSON.stringify(navItem)) nav.unshift(navItem)      
       return nav
     })
-    u('dash.showing', () => true)
+    u('windows.dash.showing', () => true)
   },
   muteAragonAccountMigrationWarning: (u) => {
     u('main.mute.aragonAccountMigrationWarning', () => true)
-    u('dash.showing', () => true)
+    u('windows.dash.showing', () => true)
   },
   // Dapp Frame
   appDapp: (u, dapp) => {

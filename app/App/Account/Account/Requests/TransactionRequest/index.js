@@ -18,7 +18,7 @@ import TxApproval from './TxApproval'
 class TransactionRequest extends React.Component {
   constructor (props, context) {
     super(props, context)
-    this.state = { allowInput: false, dataView: false }
+    this.state = { allowInput: false, dataView: false, showHashDetails: false }
 
     setTimeout(() => {
       this.setState({ allowInput: true })
@@ -82,10 +82,10 @@ class TransactionRequest extends React.Component {
   }
 
   renderAdjustFee () {
-    const { accountId, handlerId, step } = this.props
+    const { accountId, handlerId } = this.props
     const req = this.store('main.accounts', accountId, 'requests', handlerId)
     return (
-      <AdjustFee {...this.props} req={req} />
+      <AdjustFee req={req} />
     )
   }
 
@@ -180,32 +180,15 @@ class TransactionRequest extends React.Component {
                 allowOtherChain={this.allowOtherChain.bind(this)} />
             ) : null}
             <div className='approveTransactionPayload'>
-                <div className='_txBody'>
-                  <TxMainNew i={0} {...this.props} req={req} chain={chain} />
-                  <TxMain i={1} {...this.props} req={req} chain={chain} />
-                  {recognizedActions.map((action, i) => {
-                    return <TxAction key={'action' + action.type + i} i={2 + i} {...this.props} req={req} chain={chain} action={action} />
-                  })}
-                  <TxRecipient i={3 + recognizedActions.length} {...this.props} req={req} />
-                  <TxFeeNew i={4 + recognizedActions.length} {...this.props} req={req} chain={chain} />
-                </div>
-            </div>
-            <div className={req.automaticFeeUpdateNotice ? 'requestFooter requestFooterActive' : 'requestFooter'}>
-              <div className='requestApproveFee'>
-                <div className='requestApproveFeeText'>{'Fee Updated'}</div>
-                <div className='requestApproveFeeButton' onClick={() => {
-                  link.rpc('removeFeeUpdateNotice', req.handlerId, e => { if (e) console.error(e) })
-                }}>{'Ok'}</div>
+              <div className='_txBody'>
+                <TxMainNew i={0} {...this.props} req={req} chain={chain} />
+                <TxMain i={1} {...this.props} req={req} chain={chain} />
+                {recognizedActions.map((action, i) => {
+                  return <TxAction key={'action' + action.type + i} i={2 + i} {...this.props} req={req} chain={chain} action={action} />
+                })}
+                <TxRecipient i={3 + recognizedActions.length} {...this.props} req={req} />
+                <TxFeeNew i={4 + recognizedActions.length} {...this.props} req={req} />
               </div>
-              {/* <div className='' onClick={() => {
-                const { previousFee } = req.automaticFeeUpdateNotice
-                if (previousFee.type === '0x2') {
-                  link.rpc('setBaseFee', previousFee.baseFee, req.handlerId, e => { if (e) console.error(e) })
-                  link.rpc('setPriorityFee', previousFee.priorityFee, req.handlerId, e => { if (e) console.error(e) })
-                } else if (previousFee.type === '0x0')  {
-                  link.rpc('setGasPrice', previousFee.gasPrice, req.handlerId, e => { if (e) console.error(e) })
-                }
-              }}>{'Revert'}</div> */}
             </div>
           </div>
         ) : (

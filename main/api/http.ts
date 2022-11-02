@@ -82,7 +82,7 @@ const handler = (req: IncomingMessage, res: ServerResponse) => {
         extendSession(payload._origin)
       }
 
-      if (protectedMethods.indexOf(payload.method) > -1 && !(await isTrusted(origin))) {
+      if (protectedMethods.indexOf(payload.method) > -1 && !(await isTrusted(payload))) {
         let error = { message: `Permission denied, approve ${origin} in Frame to continue`, code: 4001 }
         // Review
         if (!accounts.getSelectedAddresses()[0]) error = { message: 'No Frame account selected', code: 4001 }

@@ -15,8 +15,8 @@ interface Chain {
 interface Network {
   id: number
   name: string
-  symbol: string
   layer: string
+  isTestnet: boolean
   explorer: string
   on: boolean
   connection: {
@@ -26,11 +26,11 @@ interface Network {
 }
 
 interface NetworkMetadata {
-  id: number
-  name: string
-  nativeCurrency: NativeCurrency
-  symbol: string
+  blockHeight: number
   gas: GasData
+  icon: string
+  primaryColor: keyof ColorwayPalette
+  nativeCurrency: NativeCurrency
 }
 
 interface Session {
@@ -85,6 +85,20 @@ interface GasLevels {
 
 type HexAmount = string
 
+enum Colorway { light = 'light', dark = 'dark' }
+
+type Color = { r: number, g: number, b: number }
+type ColorwayPalette = {
+  accent1: Color
+  accent2: Color
+  accent3: Color
+  accent4: Color
+  accent5: Color
+  accent6: Color
+  accent7: Color
+  accent8: Color
+}
+
 interface Balance {
   chainId: number,
   address: Address,
@@ -110,6 +124,18 @@ interface Token {
   decimals: number,
   logoURI?: string
 }
+
+type InventoryAsset = {
+  name: string
+  [field: string]: any
+}
+
+type InventoryCollection = {
+  meta: any,
+  items: Record<string, InventoryAsset>
+}
+
+type Inventory = Record<string, InventoryCollection>
 
 interface ViewMetadata {
   id: string,

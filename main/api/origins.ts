@@ -20,23 +20,21 @@ export function parseOrigin (origin?: string) {
   return origin.replace(protocolRegex, '')
 }
 
-function isRealOrigin (origin: string) {
-  return origin !== 'Unknown'
-}
-
 function invalidOrigin (origin: string) {
   return origin !== origin.replace(/[^0-9a-z/:.[\]-]/gi, '')
 }
 
-function addPermissionRequest (address: Address, origin: string) {
+function addPermissionRequest (address: Address, fullPayload: RPCRequestPayload) {
+  const { _origin: originId, ...payload } = fullPayload
+
   return new Promise((resolve, reject) => {
-    const handlerId = uuidv5(origin, uuidv5.DNS)
-    const request: AccessRequest = { payload: undefined as any, handlerId, type: 'access', origin: handlerId, account: address }
+    const request: AccessRequest = { payload, handlerId: originId, type: 'access', origin: originId, account: address }
 
     accounts.addRequest(request, () => {
+      const { name: originName } = store('main.origins', originId)
       const permissions = store('main.permissions', address) || {}
       const perms = Object.keys(permissions).map(id => permissions[id])
-      const permIndex = perms.map(p => p.origin).indexOf(origin)
+      const permIndex = perms.map(p => p.origin).indexOf(originName)
       if (perms[permIndex] && perms[permIndex].provider) {
         resolve(true)
       } else {
@@ -51,8 +49,7 @@ export function updateOrigin (payload: JSONRPCRequestPayload, origin: string, co
 
   const originId = uuidv5(origin, uuidv5.DNS)
   const existingOrigin = store('main.origins', originId)
-
-  if (!connectionMessage && isRealOrigin(origin)) {
+  if (!connectionMessage) {
     hasSession = true
 
     // the extension will attempt to send messages (eth_chainId and net_version) in order
@@ -101,20 +98,22 @@ export function isFrameExtension (req: IncomingMessage) {
   }
 }
 
-export async function isTrusted (origin?: string) {
-  if (!origin || origin === 'null') origin = 'Unknown' // Permission granted to unknown origins only persist until the Frame is closed, they are not permanent
-  if (invalidOrigin(origin)) return false
-  if (origin === 'frame-extension') return true
+export async function isTrusted (payload: RPCRequestPayload) {
+  // Permission granted to unknown origins only persist until the Frame is closed, they are not permanent
+  const { name: originName } = store('main.origins', payload._origin)
+
+  if (invalidOrigin(originName)) return false
+  if (originName === 'frame-extension') return true
   const account = accounts.current()
   if (!account) return
   const address = account.address
   if (!address) return
   const permissions = store('main.permissions', address) || {}
   const perms = Object.keys(permissions).map(id => permissions[id])
-  const permIndex = perms.map(p => p.origin).indexOf(origin)
+  const permIndex = perms.map(p => p.origin).indexOf(originName)
   if (permIndex === -1) {
     try {
-      return await addPermissionRequest(address, origin)
+      return await addPermissionRequest(address, payload)
     } catch (e) {
       log.error(e)
       return false

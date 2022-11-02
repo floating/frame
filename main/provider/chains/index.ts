@@ -1,6 +1,7 @@
 // @ts-ignore
 import deepEqual from 'deep-equal'
 
+import { getColor } from '../../../resources/colors'
 import store from '../../store'
 
 // typed access to state
@@ -13,6 +14,9 @@ const storeApi = {
   },
   getChainsMeta: (): Record<string, NetworkMetadata> => {
     return store('main.networksMeta.ethereum') || {}
+  },
+  getColorway: (): Colorway => {
+    return store('main.colorway') as Colorway
   }
 }
 
@@ -64,16 +68,18 @@ function createOriginChainObserver (handler: ChainChangedHandler & NetworkChange
 function getActiveChains (): RPC.GetEthereumChains.Chain[] {
   const chains = storeApi.getChains()
   const meta = storeApi.getChainsMeta()
+  const colorway = storeApi.getColorway()
   
   return Object.values(chains)
-    .filter(chain => chain.on)
+    .filter(chain => chain.on && (chain.connection.primary.connected || chain.connection.secondary.connected))
     .sort((a, b) => a.id - b.id)
     .map(chain => {
       const { id, explorer, name } = chain
-      const { nativeCurrency } = meta[id]
+      const { nativeCurrency, primaryColor } = meta[id]
       const { icon: currencyIcon, name: currencyName, symbol, decimals } = nativeCurrency
 
       const icons = currencyIcon ? [{ url: currencyIcon }] : []
+      const colors = primaryColor ? [getColor(primaryColor, colorway)] : []
 
       return ({
         chainId: id,
@@ -83,7 +89,10 @@ function getActiveChains (): RPC.GetEthereumChains.Chain[] {
           name: currencyName, symbol, decimals
         },
         icon: icons,
-        explorers: [{ url: explorer }]
+        explorers: [{ url: explorer }],
+        external: {
+          wallet: { colors }
+        }
       })
     })
 }

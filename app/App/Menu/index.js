@@ -55,7 +55,7 @@ class Launcher extends React.Component {
         <div 
           className={'panelMenuItem panelMenuItemOpen'}
           onClick={() => link.send('tray:action', 'setDash', { 
-            showing: !this.store('dash.showing')
+            showing: !this.store('windows.dash.showing')
           })}
           onMouseEnter={() => this.setState({ glitchOn: true })}
           onMouseOver={() => this.setState({ glitchOn: true })}

@@ -1,24 +1,18 @@
 import log from 'electron-log'
-import fetch from 'node-fetch'
 import { Interface } from '@ethersproject/abi'
-import erc20 from '../externalData/balances/erc-20-abi'
+import { fetchSourcifyContract } from './sources/sourcify'
+import { fetchEtherscanContract } from './sources/etherscan'
 
-const erc20Abi = JSON.stringify(erc20)
+// this list should be in order of descending priority as each source will
+// be searched in turn
+const fetchSources = [
+  fetchSourcifyContract,
+  fetchEtherscanContract
+]
 
-interface EtherscanSourceCodeResponse {
-  status: string,
-  message: string,
-  result: ContractSourceCodeResult[]
-}
+type ContractSourceResult = ContractSource | undefined
 
-interface ContractSourceCodeResult {
-  SourceCode: string,
-  ABI: string,
-  ContractName: string,
-  Implementation: string
-}
-
-interface ContractSource {
+export interface ContractSource {
   abi: string,
   name: string,
   source: string
@@ -44,50 +38,6 @@ function parseAbi (abiData: string): Interface | undefined {
   }
 }
 
-// function scanEndpoint (contractAddress: Address, chainId: string) {
-//   if (chainId === '0x1') {
-//     return `https://api.etherscan.io/api?module=contract&action=getsourcecode&address=${contractAddress}&apikey=3SYU5MW5QK8RPCJV1XVICHWKT774993S24`
-//   } else if (chainId === '0x89') {
-//     return `https://api.polygonscan.com/api?module=contract&action=getsourcecode&address=0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270&apikey=YourApiKeyToken`
-//   } else if ('optimism') {
-//     return `https://api-optimistic.etherscan.io/api?module=contract&action=getsourcecode&address=0x80AA7cb0006d5DDD91cce684229Ac6e398864606&apikey=YourApiKeyToken`
-//   } else if ('arbitrum') {
-//     return `https://api.arbiscan.io/api?module=contract&action=getsourcecode&address=0x0000000000000000000000000000000000001004&apikey=YourApiKeyToken`
-//   }
-// }
-
-async function fetchSourceCode (contractAddress: Address, chainId: string) {
-  const res = await fetch(`https://api.etherscan.io/api?module=contract&action=getsourcecode&address=${contractAddress}&apikey=3SYU5MW5QK8RPCJV1XVICHWKT774993S24`)
-
-  if (res.status === 200 && (res.headers.get('content-type') || '').toLowerCase().includes('json')) {
-    const parsedResponse = await (res.json() as Promise<EtherscanSourceCodeResponse>)
-
-    if (parsedResponse.message === 'OK') return parsedResponse.result
-  }
-
-  return []
-}
-
-async function fetchAbi (contractAddress: Address, chainId: string): Promise<ContractSourceCodeResult | undefined> {
-  try {
-    const sources = await fetchSourceCode(contractAddress, chainId)
-
-    if (sources.length > 0) {
-      const source = sources[0]
-      const implementation = source.Implementation
-
-      if (implementation) {
-        // this is a proxy contract, return the ABI for the source
-        return fetchAbi(implementation, chainId)
-      }
-
-      return source
-    }
-  } catch (e) {
-    log.warn(`could not fetch source code for contract ${contractAddress}`, e)
-  }
-}
-
 export function decodeCallData (calldata: string, abi: string) {
   const contractInterface = parseAbi(abi)
 
@@ -108,26 +58,21 @@ export function decodeCallData (calldata: string, abi: string) {
   }
 }
 
-export async function decodeContractCall (contractAddress: Address, chainId: string, calldata: string): Promise<DecodedCallData | undefined> {
-  const contractSources: ContractSource[] = [{ name: 'ERC-20', source: 'Generic ERC-20', abi: erc20Abi }]
-  const contractSource = await fetchAbi(contractAddress, chainId)
+export async function fetchContract (contractAddress: Address, chainId: number): Promise<ContractSourceResult> {
+  const fetches = fetchSources.map((getContract) => getContract(contractAddress, chainId))
 
-  if (contractSource) {
-    contractSources.push({ name: contractSource.ContractName, source: 'etherscan', abi: contractSource.ABI })
+  let contract: ContractSourceResult = undefined
+  let i = 0
+
+  while (!contract && i < fetches.length) {
+    contract = await fetches[i]
+    i += 1
+  }
+  
+  if (!contract) {
+    log.warn(`could not fetch source code for contract ${contractAddress}`)
   }
 
-  for (const source of contractSources.reverse()) {
-    const decodedCall = decodeCallData(calldata, source.abi)
-
-    if (decodedCall) {
-      return {
-        contractAddress: contractAddress.toLowerCase(),
-        contractName: source.name,
-        source: source.source,
-        ...decodedCall
-      }
-    }
-  }
-
-  log.warn(`Unable to decode data for contract ${contractAddress}`)
+  return contract
 }
+

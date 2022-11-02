@@ -10,7 +10,6 @@ import nebula from 'nebula'
 // @ts-ignore
 process.versions.electron = electron
 
-// @ts-ignore
 import EthereumProvider from 'ethereum-provider'
 import proxyConnection from '../provider/proxy'
 import { EventEmitter } from 'stream'

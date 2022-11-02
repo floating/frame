@@ -213,7 +213,7 @@ class AddAragon extends React.Component {
           <div
             className='addAccountItemSummary' onMouseDown={() => {
               const net = this.store('main.currentNetwork.id')
-              const open = url => link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'openExternal', notifyData: { url }} })
+              const open = url => link.send('tray:openExternal', url)
               if (net === '1') return open('https://mainnet.aragon.org')
               if (net === '4') return open('https://rinkeby.aragon.org')
               return open('https://aragon.org')

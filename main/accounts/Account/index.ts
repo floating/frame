@@ -10,8 +10,7 @@ import nav from '../../windows/nav'
 import store from '../../store'
 import { Aragon } from '../aragon'
 import { TransactionData } from '../../../resources/domain/transaction'
-import { capitalize } from '../../../resources/utils'
-import { getType as getSignerType, Type as SignerType } from '../../signers/Signer'
+import { Type as SignerType, getSignerType } from '../../../resources/domain/signer'
 
 import provider from '../../provider'
 import { ApprovalType } from '../../../resources/constants'
@@ -34,7 +33,7 @@ interface SignerOptions {
 
 interface AccountOptions {
   address?: Address,
-  name?: string,
+  name: string,
   ensName?: string,
   created?: string,
   lastSignerType?: SignerType,
@@ -74,7 +73,7 @@ class FrameAccount {
     this.lastSignerType = lastSignerType || (options.type as SignerType)
 
     this.active = active
-    this.name = name || capitalize(lastSignerType || '') + ' Account'
+    this.name = name
     this.ensName = ensName
 
     this.created = created || `new:${Date.now()}`
@@ -261,7 +260,7 @@ class FrameAccount {
     const calldata = req.data.data
     if (!calldata) return
 
-    const contract = new Erc20Contract(contractAddress, req.data.chainId)
+    const contract = new Erc20Contract(contractAddress, parseInt(req.data.chainId, 16))
     const decodedData = contract.decodeCallData(calldata)
 
     if (decodedData) {
@@ -303,7 +302,7 @@ class FrameAccount {
 
     if (to) { // Get recipient identity
       try {
-        const recipient = await reveal.identity(to, chainId)
+        const recipient = await reveal.identity(to, parseInt(chainId, 16))
         const knownTxRequest = this.requests[req.handlerId] as TransactionRequest
   
         if (recipient && knownTxRequest) {
@@ -322,7 +321,7 @@ class FrameAccount {
 
     if (to && calldata && calldata !== '0x' && parseInt(calldata, 16) !== 0) { 
       try { // Decode calldata
-        const decodedData = await reveal.decode(to, chainId, calldata)
+        const decodedData = await reveal.decode(to, parseInt(chainId, 16), calldata)
         const knownTxRequest = this.requests[req.handlerId] as TransactionRequest
   
         if (knownTxRequest && decodedData) {
@@ -340,7 +339,12 @@ class FrameAccount {
 
     if (to && calldata && calldata !== '0x' && parseInt(calldata, 16) !== 0) { 
       try { // Recognize actions
-        const actions = await reveal.recog(to, chainId, calldata)
+        const actions = await reveal.recog(calldata, {
+          contractAddress: to,
+          chainId: parseInt(chainId, 16),
+          account: this.address
+        })
+
         const knownTxRequest = this.requests[req.handlerId] as TransactionRequest
 
         if (knownTxRequest && actions ) {
@@ -372,7 +376,6 @@ class FrameAccount {
       }
 
       this.update()
-      windows.showTray()
       store.setSignerView('default')
       store.setPanelView('default')
 
@@ -386,10 +389,23 @@ class FrameAccount {
       const panelNav = store('windows.panel.nav') || []
       const inRequestView = panelNav.map((crumb: any) => crumb.view).includes('requestView')
 
-      if (accountOpen && !inRequestView) {
-        const crumb = { view: 'requestView', data: { step: 'confirm', accountId: account, requestId: req.handlerId } } as const
+      if (accountOpen && (!store('tray.open') || !inRequestView)) {
+        const crumb = { 
+          view: 'requestView', 
+          data: { 
+            step: 'confirm', accountId: account, requestId: req.handlerId 
+          },
+          position: {
+            bottom: '200px'
+          }
+        } as const
+        if (inRequestView) nav.back('panel')
         nav.forward('panel', crumb)
       }
+
+      setTimeout(() => {
+        windows.showTray()
+      }, 100)
     }
     // Add a filter to make sure we're adding the request to an account that controls the outcome
     if (this.smart) {
@@ -456,8 +472,8 @@ class FrameAccount {
           cb(new Error('Could not find address in signer'))
         }
       } else {
-        log.info('No signer active to verify address')
-        cb(new Error('No signer active to verify address'))
+        log.info('Signer not accessible to verify address')
+        cb(new Error('Signer not accessible to verify address'))
       }
     }
   }

@@ -6,13 +6,10 @@
   right 8px
   bottom 40px
   left 8px
-  border-radius 16px
-  z-index 4
+  border-radius 26px
+  z-index 999
   display flex
-  justify-content center
   align-items center
-  border-radius 18px
-  transition var(--standard)
   overflow hidden
   display flex
   justify-content center
@@ -23,7 +20,7 @@
   .accountSelectorScroll
     width 100%
     max-height 100%
-    border-radius 24px
+    border-radius 26px
     transition var(--standard)
     overflow-y scroll
     overflow-x hidden
@@ -33,6 +30,8 @@
       padding 48px 6px 48px 6px
       box-sizing border-box
       will-change scroll-position
+      z-index 999
+      pointer-events none
 
       .noSigners
         width 100%
@@ -59,7 +58,7 @@
           font-size 14px
           margin 20px
           text-align center
-          font-weight 500
+          font-weight 300
           background var(--outerspace)
           color var(--spacewhite)
           line-height 24px
@@ -97,10 +96,8 @@
           .featureBoxSubtext
             margin-top 8px
             font-size 10px
-            font-weight 500
-            font-family FiraCode, monospace
+            font-family 'FiraCode'
             justify-content center
-            letter-spacing 1px
             opacity 0.7
 
 @keyframes appear
@@ -112,66 +109,80 @@
     filter blur(0px)
     opacity 1
 
-.panelFilter
-  position absolute
+.panelFilterMain
+  position fixed
   top 0px
   left 0px
   right 0px
   height 48px
-  z-index 2
+  z-index 99
   overflow hidden
   animation appear 1s cubic-bezier(.82,0,.12,1)
 
-  .panelFilterIcon
-    position absolute
-    top 0
-    left 0
-    bottom 0
-    width 48px
-    display flex
-    justify-content center
-    align-items center
+.panelFilterAccount
+  position sticky
+  top 0px
+  left 0px
+  right 0px
+  height 48px
+  width 100%
+  z-index 99
+  overflow hidden
+  animation appear 1s cubic-bezier(.82,0,.12,1)
 
-  .panelFilterInput
-    position absolute
-    top 0
-    left 0
-    bottom 0
-    right 0
+.panelFilterIcon
+  position absolute
+  top 4px
+  left 0
+  bottom 0
+  width 48px
+  display flex
+  justify-content center
+  align-items center
 
-    input 
-      width 100%
-      height 100%
-      border none
-      outline none
-      text-align center
-      background transparent
-      color var(--outerspace)
-      font-size 18px
-      font-family 'Exo2'
-      padding-bottom 4px
+.panelFilterInput
+  position absolute
+  top 0
+  left 30px
+  bottom 0
+  right 30px
 
-  .panelFilterClear
-    position absolute
-    top 0
-    right 0
-    bottom 0
-    width 48px
-    display flex
-    justify-content center
-    align-items center
+  input, input:hover, input:focus
+    width 100%
+    height 100%
+    border none
+    outline none
+    text-align center
+    background transparent
     color var(--outerspace)
-    cursor pointer
-    border-bottom-left-radius 9px
+    font-size 20px
+    font-family 'MainFont'
+    font-weight 300
+    box-shadow none
 
-    *
-      pointer-events none
+.panelFilterClear
+  position absolute
+  top 8px
+  right 3px
+  bottom 8px
+  width 40px
+  display flex
+  justify-content center
+  align-items center
+  color var(--outerspace)
+  cursor pointer
+  border-radius 20px
 
-  .panelFilterClear:hover
-    background linear-gradient(45deg, var(--ghostA), var(--ghostZ))
+  *
+    pointer-events none
 
-.accountSelectorDisabled
-  pointer-events none
+.panelFilterClear:hover
+  background var(--ghostA)
+
+.accountSelectorOpen
   transform translateY(-14px)
   transition var(--standard)
   z-index 999999999
+  pointer-events none
+  *
+    pointer-events none

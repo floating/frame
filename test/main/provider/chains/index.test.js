@@ -15,31 +15,49 @@ const chains = {
     name: 'Ethereum Mainnet',
     id: 1,
     explorer: 'https://etherscan.io',
+    connection: { primary: { connected: true }, secondary: { connected: false } },
     on: true
   },
   '4': {
     name: 'Ethereum Testnet Rinkeby',
     id: 4,
     explorer: 'https://rinkeby.etherscan.io',
+    connection: { primary: { status: 'connected', connected: true, on: true }, secondary: { status: 'standby', connected: false, on: true } },
+    on: true
+  },
+  '5': {
+    name: 'Ethereum Testnet Görli',
+    id: 5,
+    explorer: 'https://goerli.etherscan.io',
+    connection: { primary: { status: 'disconnected', connected: false, on: true }, secondary: { status: 'disconnected', connected: false, on: true } },
     on: true
   },
   '137': {
     name: 'Polygon',
     id: 137,
+    connection: { primary: { connected: true }, secondary: { connected: false } },
     on: false
   }
 }
 
 const chainMeta = {
   '1': {
-    nativeCurrency: ether
+    nativeCurrency: ether,
+    primaryColor: 'accent1'
   },
   '4': {
     nativeCurrency: {
       ...ether, name: 'Rinkeby Ether'
-    }
+    },
+    primaryColor: 'accent2'
   },
-  '137': { nativeCurrency: {} }
+  '5': {
+    nativeCurrency: {
+      ...ether, name: 'Görli Ether'
+    },
+    primaryColor: 'accent2'
+  },
+  '137': { nativeCurrency: {}, primaryColor: 'accent6' }
 }
 
 beforeEach(() => {
@@ -66,7 +84,12 @@ describe('#getActiveChains', () => {
       },
       explorers: [{
         url: 'https://etherscan.io'
-      }]
+      }],
+      external: {
+        wallet: {
+          colors: [{ r: 0, g: 210, b: 190, hex: '#00d2be' }]
+        }
+      }
     })
   })
 })
@@ -82,9 +105,15 @@ describe('#createChainsObserver', () => {
   })
 
   it('invokes the handler with EVM chain objects', () => {
-    const optimism = { name: 'Optimism', id: 10, explorer: 'https://optimistic.etherscan.io', on: true }
+    const optimism = {
+      name: 'Optimism',
+      id: 10,
+      explorer: 'https://optimistic.etherscan.io',
+      connection: { primary: { connected: true }, secondary: { connected: false } },
+      on: true
+    }
 
-    setChains({ ...chains, '10': optimism}, { ...chainMeta, '10': { nativeCurrency: ether }})
+    setChains({ ...chains, '10': optimism}, { ...chainMeta, '10': { nativeCurrency: ether, primaryColor: 'accent4' }})
 
     observer()
 
@@ -101,7 +130,12 @@ describe('#createChainsObserver', () => {
         },
         explorers: [{
           url: 'https://etherscan.io'
-        }]
+        }],
+        external: {
+          wallet: {
+            colors: [{ r: 0, g: 210, b: 190, hex: '#00d2be' }]
+          }
+        }
       }, {
         chainId: 4,
         networkId: 4,
@@ -114,7 +148,12 @@ describe('#createChainsObserver', () => {
         },
         explorers: [{
           url: 'https://rinkeby.etherscan.io'
-        }]
+        }],
+        external: {
+          wallet: {
+            colors: [{ r: 255, g: 153, b: 51, hex: '#ff9933' }]
+          }
+        }
       }, {
         chainId: 10,
         networkId: 10,
@@ -127,12 +166,23 @@ describe('#createChainsObserver', () => {
         },
         explorers: [{
           url: 'https://optimistic.etherscan.io'
-        }]
+        }],
+        external: {
+          wallet: {
+            colors: [{ r: 246, g: 36, b: 35, hex: '#f62423' }]
+          }
+        }
       }])
   })
 
   it('invokes the handler when a chain is added', () => {
-    const optimism = { name: 'Optimism', id: 10, explorer: 'https://optimistic.etherscan.io', on: true }
+    const optimism = {
+      name: 'Optimism',
+      id: 10,
+      explorer: 'https://optimistic.etherscan.io',
+      connection: { primary: { connected: true }, secondary: { connected: false } },
+      on: true
+    }
 
     setChains({ ...chains, '10': optimism}, { ...chainMeta, '10': { nativeCurrency: ether }})
 
@@ -188,6 +238,30 @@ describe('#createChainsObserver', () => {
     expect(changedChains.map(c => c.chainId)).toEqual([1, 4])
   })
 
+  it('invokes the handler when a connected chain is disconnected', () => {
+    const { '4': { ...rinkeby } } = chains
+    rinkeby.connection.primary.connected = false
+
+    setChains({ ...chains, '4': rinkeby })
+
+    observer()
+
+    const changedChains = handler.chainsChanged.mock.calls[0][0]
+    expect(changedChains.map(c => c.chainId)).toEqual([1])
+  })
+
+  it('invokes the handler when a disconnected chain is connected', () => {
+    const { '5': { ...goerli } } = chains
+    goerli.connection.primary.connected = true
+
+    setChains({ ...chains, '5': goerli })
+
+    observer()
+
+    const changedChains = handler.chainsChanged.mock.calls[0][0]
+    expect(changedChains.map(c => c.chainId)).toEqual([1, 5])
+  })
+
   it('does not invoke the handler when no chains have changed', () => {
     observer()
 
@@ -202,7 +276,7 @@ describe('#createOriginChainObserver', () => {
   const originId = '8073729a-5e59-53b7-9e69-5d9bcff94087'
   const frameTestOrigin = {
     name: 'test.frame',
-    chain: { id: 137, type: 'ethereum' }
+    chain: { id: 137, type: 'ethereum', connection: { primary: {}, secondary: {} } }
   }
 
   beforeEach(() => {
@@ -248,6 +322,10 @@ function setChains (chainState, chainMetaState = chainMeta) {
 
     if (node === 'main.networksMeta.ethereum') {
       return chainMetaState
+    }
+
+    if (node === 'main.colorway') {
+      return 'dark'
     }
 
     throw new Error('unexpected store access!')

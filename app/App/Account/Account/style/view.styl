@@ -20,10 +20,12 @@
     right 6px
     left 6px
     height 54px
-    background var(--ghostA)
     border-radius 20px
-    box-shadow 0px 8px 16px var(--ghostY)
-    z-index 5999999999999999999
+    box-shadow 0px 2px 4px var(--ghostX)
+    z-index 59999999
+    background var(--ghostA)
+    box-shadow 0px 2px 4px var(--ghostY)
+    border-bottom 2px solid var(--ghostZ)
 
     .accountViewTitle
       position absolute
@@ -36,9 +38,9 @@
       align-items center
       text-transform uppercase
       letter-spacing 2px
-      font-weight 500
+      font-weight 400
       pointer-events none
-      font-family 'Exo2'
+      font-family 'MainFont'
 
       .accountViewIcon
         pointer-events none
@@ -83,9 +85,6 @@
     z-index 3
     padding-top 30px
     border-radius 24px
-    overflow-y scroll
-    padding-top 80px
-    padding-bottom 80px
 
 .accountView::before
   content ''

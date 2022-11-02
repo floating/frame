@@ -6,9 +6,9 @@
   bottom 40px
   z-index 1
   pointer-events none
-  transition var(--standard)
+  transition all 0.24s ease-out
   background var(--ghostZ)
-  border-radius 26px
+  border-radius 30px
 
 .overlay
   position absolute
@@ -18,10 +18,11 @@
   bottom 40px
   z-index 1000 // top
   pointer-events none
-  transition var(--standard), box-shadow 0s
-  border-radius 26px
+  transition all 0.24s ease-out, box-shadow 0s
+  border-radius 30px
   opacity 1
-  box-shadow inset 0px 0px 16px var(--ghostX)
+  box-shadow inset 0px 0px 8px var(--ghostY)
+  border-top 2px solid var(--ghostZ)
 
 .overlayMonitor
   opacity 1

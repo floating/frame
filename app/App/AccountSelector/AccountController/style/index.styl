@@ -1,24 +1,8 @@
-@keyframes arrowSlide
+@keyframes slideUp
   0%
     opacity 0
-    transform translateY(5px)
-  20%
-    opacity 1
-  40%
-    opacity 0
-    transform translateY(-15px)
   100%
-    opacity 0
-
-@keyframes arrowSlideSingle
-  0%
-    opacity 0
-    transform translateY(3px)
-  50%
     opacity 1
-  100%
-    opacity 0
-    transform translateY(-3px)
 
 @keyframes headShake
   0%
@@ -70,8 +54,104 @@
     z-index 3002
     padding 0px 0px 5px 0px
 
+  .signerDetailsFullAddress
+    position absolute
+    display flex
+    justify-content center
+    align-items center
+    flex-direction column
+    top 0
+    left 0px
+    right 0px
+    bottom 0px
+    cursor pointer
+    pointer-events auto
+    // animation slideUp linear 0.2s
+    *
+      pointer-events none
+
+    .signerDetailsFullAddressCopied
+      display flex
+      align-items center
+      justify-content center
+      font-size 14px
+      font-weight 500
+      span
+        margin-left 8px
+
+    .signerDetailsFullAddressText
+      display flex
+      align-items center
+      max-width fit-content
+      font-family 'FiraCode'
+      margin-top 4px
+      pointer-events auto
+      border-radius 1px
+      font-size 13.5px
+      position relative
+      cursor pointer
+
+  .signerDetails
+    position absolute
+    display flex
+    justify-content center
+    flex-direction column
+    top 0
+    left 60px
+    right 120px
+    bottom 0px
+    pointer-events none
+
+    .signerDetailsENSName
+      font-family 'FiraCode'
+      letter-spacing -1px
+      font-size 16px
+      font-weight 300
+      margin-top 5px
+      pointer-events auto
+      max-width fit-content
+
+    .signerDetailsName
+      font-family 'MainFont'
+      font-size 16px
+      font-weight 400
+      margin-top 4px
+      pointer-events none
+
+    .signerDetailsAddressCopy
+      margin-left 10px
+      display flex
+      align-items center
+      padding 0px 6px 0px 0px
+      border-radius 12px
+      display none
+
+    .signerDetailsAddress
+      display flex
+      align-items center
+      max-width fit-content
+      font-family 'FiraCode'
+      margin-top 2px
+      pointer-events auto
+      padding 0px 0px 2px 1px 
+      border-radius 12px
+      font-size 15px
+      position relative
+      cursor pointer
+      left -1px
+      transition all linear 500ms
+      *
+        pointer-events none
+
+      .signerDetailsAddressDivide
+         position relative
+         padding 0px 1px 0px 2px
+    
+    .signerDetailsAddress:hover
+      color var(--moon)
+
   .signerAddress
-    font-family FiraCode, monospace
+    font-family 'FiraCode'
 
     .transactionToAddressLargeWrap
       position absolute
@@ -86,21 +166,16 @@
       bottom 0px
       left 0px
       max-width 100%
-      font-weight 600
+      font-weight 300
       display flex
       font-size 15px
       opacity 1
-      cursor pointer
-      *
-        pointer-events none
 
       .transactionToAddressLargeEllipsis
         padding 2px 1px
-    
 
     .transactionToAddressLarge:hover
       background var(--ghostC)
-
         
     .transactionToAddressCopy
       display flex
@@ -113,7 +188,7 @@
       text-transform uppercase
       font-weight 400
       letter-spacing 1px
-      font-family OpenSans, sans-serif
+      font-family 'MainFont'
       color var(--outerspace08)
       border-radius 10px
       transform translateY(0px)
@@ -130,7 +205,7 @@
       justify-content center
       align-items center
       font-size 13.5px
-      font-weight 600    
+      font-weight 300    
       z-index 80
       cursor pointer
       * 
@@ -142,7 +217,7 @@
         right 18px
         top 25px
         left 18px
-        font-family 'Exo2'
+        font-family 'MainFont'
         text-align center
 
         svg
@@ -152,24 +227,26 @@
 
     .transactionToAddressENS
       transform translateY(-11px)
-      font-weight 600
+      font-weight 300
 
     .transactionToAddressFullHidden
       opacity 0
       pointer-events none
-
 
   .signerTop
     position relative
     opacity 1
     z-index 3030000
     border-radius 20px
-    transition var(--standard), background 0s linear
+    transition var(--standard), background 0.2s linear
     z-index 9999000
     height 74px
     background var(--ghostA)
     margin 0px 0px 6px 0px
     box-shadow 0px 4px 8px var(--ghostY)
+    border-bottom 2px solid var(--ghostZ)
+    cursor pointer
+    overflow hidden
 
     div
       z-index 3004
@@ -180,7 +257,7 @@
       right 64px
       width 60px
       z-index 300000
-      height 38px
+      height 39px
       width 38px
       padding-left 2px
       box-sizing border-box
@@ -197,9 +274,12 @@
       position absolute
       color var(--outerspace01)
       font-size 16px
-      font-weight 500
+      font-weight 400
       transition var(--standardFast)
       box-shadow 0px 2px 2px var(--ghostY)
+      border-bottom 2px solid var(--ghostZ)
+      z-index 999999999
+      pointer-events none
       
       span
         position relative
@@ -217,12 +297,13 @@
       content ''
       position absolute
       z-index 3
-      inset 3px
+      inset 0px
       background var(--good)
-      border-top-left-radius 10px
-      border-bottom-left-radius 10px
-      border-top-right-radius 6px
-      border-bottom-right-radius 6px
+      border-top-left-radius 12px
+      border-bottom-left-radius 12px
+      border-top-right-radius 7px
+      border-bottom-right-radius 7px
+      border-bottom 2px solid var(--goodShade)
 
     .transactionToAddress
       .transactionToAddressLarge
@@ -241,18 +322,17 @@
       transition none
       transform translate3d(0, 0, 0)
       background var(--ghostZ)
-      position absolute
       cursor pointer
 
       .signerSelectButton
         position absolute 
         top 3px
         right 3px
-        bottom 3px
+        bottom 2px
         z-index 300000
         border-radius 13px
         width 48px
-        background var(--ghostB)
+        background var(--ghostA)
         display flex
         justify-content center
         align-items center
@@ -262,13 +342,23 @@
         border-bottom-left-radius 8px
         padding-right 4px
         box-sizing border-box
+        border-bottom 2px solid var(--ghostZ)
         box-shadow 0px 2px 2px var(--ghostY)
+        transform translateY(0px)
         cursor pointer
+        transition background 0.1s linear
         *
           pointer-events none
       
       .signerSelectButton:hover
         background var(--ghostC)
+        transform translateY(-1px)
+        box-shadow 0px 2px 4px var(--ghostX)
+
+      .signerSelectButton:active
+        background var(--ghostC)
+        transform translateY(0px)
+        box-shadow 0px 2px 1px var(--ghostX)
       
       .signerSelectIconWrap
         padding 1px 0px 0px 2px
@@ -316,6 +406,7 @@
       border-radius 2px
       width 4px
       background var(--ghostZ)
+      pointer-events none
     
     .accountIndicatorGood
       background var(--good)
@@ -334,6 +425,7 @@
       -webkit-app-region no-drag
       box-sizing border-box
       z-index 300000
+      pointer-events none
 
       .signerTypeStatusBadge
         position absolute
@@ -360,7 +452,7 @@
       .signerSelectIconWrap
         position absolute
         top 3px
-        left 17px
+        left 14px
         width 41px
         bottom 0px
         display flex
@@ -394,7 +486,7 @@
           height 38px
 
         svg
-          color var(--ghostE)
+          color var(--ghostD)
           filter drop-shadow(0px 10px 0px 0px var(--thick)) 
 
         .trezorImage
@@ -414,7 +506,7 @@
         text-transform uppercase
         font-size 11px
         line-height 10px
-        font-weight 600
+        font-weight 300
         letter-spacing 2px
         color var(--spacewhite)
         opacity 1
@@ -422,245 +514,39 @@
         margin-left 2px
         display none
 
-    .signerInner
-      position absolute
-      top -5px
-      left 0px
-      right 0px
-      bottom 2px
-      display flex
-      justify-content center
-      align-items center
-      overflow hidden
-      transition .42s cubic-bezier(0.175, 0.885, 0.32, 1.275) all, 0.1s linear top, 0.1s linear bottom, 0.1s linear box-shadow, 0.1s linear opacity
-      -webkit-app-region no-drag
-      z-index 25
-      transform translateZ(0)
-
-      .signerInset
-        position absolute
-        top 0px
-        left 0px
-        right 0px
-        bottom 2px
-        border-radius 12px
-        color var(--outerspace)
-
-    .signerInnerActive
-      top 0px
-      bottom -2px
-      box-shadow 0px 1px 1px rgba(5, 5, 45, 0.4)
-      transform translateY(0px)
-
-    .signerInnerDisconnected
-      pointer-events none
-      opacity 0
-      transform translateY(-50px)
-
-    .signerMin
-      position absolute
-      right 0
-      top 0
-      bottom 0
-      width 40px
-      display flex
-      justify-content center
-      align-items center
-
-    .signerStatus
-      font-size 16px
-      width 100%
-      transition var(--standard)
-      position absolute
-      display flex
-      text-align center
-      flex-direction column
-      font-weight 300
-
-      .signerStatusNotOk
-        padding 20px 40px
-        display flex
-        justify-content center
-        align-items center
-        flex-direction column
-
-        .signerPinDisplay
-          display flex
-          justify-content center
-          align-items center
-          transition var(--standard)
-          svg
-            margin 0px 5px
-
-        .signerPinMessage
-          height 30px
-          margin-top 15px
-          margin-bottom 15px
-          width 140px
-          display flex
-          justify-content center
-          align-items center
-          transition var(--standard)
-          overflow hidden
-          position relative
-          border-radius 3px
-          box-shadow 0px 2px 3px var(--thick0), 0px 4px 9px var(--thick0) !important
-
-          .signerPinDelete
-            position absolute
-            display flex
-            justify-content center
-            align-items center
-            top 0
-            bottom 0
-            width 39px
-            left -40px
-            transition var(--standard)
-            border-right 1px solid var(--thick)
-
-        .signerPinSubmit
-          margin-top 0px
-          margin-bottom 0px
-          background var(--ghostD)
-          box-shadow 0px 2px 3px var(--thick), 0px 5px 9px var(--thick) !important
-          padding-left 40px
-          width 100px
-
-          .signerPinDelete
-            left 0px
-
-    .signerAccounts
-      position relative
-      display flex
-      transition var(--standardFast)
-
-    .signerName
-      position absolute
-      top 16px
-      left 66px
-      overflow hidden
-      display flex
-      justify-content center
-      align-items center
-      transform translateZ(0)
-      z-index 3004
-
-      .signerNameText
-        position relative
-        transition var(--standard)
-        font-size 18px
-        font-family 'Ubuntu'
-        display flex
-        justify-content center
-        align-items center
-        z-index 10
-        font-weight 300
-
-      .signerNameTextENS
-        opacity 0
-
-      .signerNameEdit
-        position absolute
-        right 0px
-        top 10px
-        bottom 7px
-        width 26px
-        border-radius 3px
-        display flex
-        justify-content center
-        align-items center
-        color var(--spacewhite)
-        transition var(--standard)
-        opacity 0
-        z-index 9
-        background rgba(255, 255, 255, 0)
-        box-shadow 0px 0px 0px rgba(5, 5, 45, 0)
-
-        svg
-          transition var(--standard)
-          color var(--outerspace)
-
-      .signerNameEdit:hover
-        transition var(--standard)
-        background rgba(255, 255, 255, 0.4)
-        box-shadow 0px 1px 1px rgba(5, 5, 45, 0.2)
-
-    .signerNameSettings
-      transition var(--standard)
-      .signerNameText
-        padding-right 35px
-      .signerNameEdit
-        transition var(--standard)
-        opacity 1
-
-    .signerInfo
-      position relative
-      font-size 16px
-      letter-spacing 0px
-      position relative
-      height 0px
-      padding-top 0px
-      text-align center
-      transform translateZ(0)
-      transition var(--standard)
-      opacity 0
-      margin-top 2px
-      display none
-
-    .addressSelect
-      width 100%
-      height 31px
-      border-radius 6px
-      position absolute
-      bottom 0
-      z-index 5
-      transform translateZ(0px)
-      display none
-
-      .addressSelectButton
-        width 100%
-        height 30px
-        min-height 30px
-        border-radius 6px
-        font-size 11px
-        text-transform uppercase
-        font-weight 600
-        display flex
-        justify-content center
-        align-items center
-        box-sizing border-box
-        color var(--outerspace)
-        letter-spacing 1px
-
-        .addressSelectArrow
-          // margin-top 5px
-          transform translateZ(0)
-          margin 1px 8px 0px 7px
-          transition var(--standardFast)
-          will-change transform
-          svg
-            transition var(--standardSlow)
-
-  .signerTopActive
+  .signerTop:hover
+    background var(--ghostB)
     .signerSelect
-      pointer-events auto !important
-    .transactionToAddressLargeWrap
-      pointer-events auto !important
+      .signerSelectButton
+        background var(--ghostB)
 
-    .transactionToAddressLarge, .transactionToAddressFull
-      cursor pointer !important
+  // .signerTopActive:hover
+  //   background var(--ghostA)
+  
+  // .okSigner
+  //   .signerTop:hover
+  //     background var(--ghostA)
 
-    .transactionToAddressFullHidden
+
+  .signerTopNoHover
+    pointer-events none !important
+    * 
       pointer-events none !important
+    // border-bottom 2px solid var(--ghostZ0)
+    // position relative
+    // .signerSelect
+    //   pointer-events auto !important
+    //   .signerSelectButton
+    //     pointer-events auto !important
 
-    .signerType
-      cursor pointer
-      pointer-events auto
-    .signerSelectIconWrap
-      cursor pointer
-    .signerTypeHot:hover
-      cursor pointer
-      color var(--moon)
+  // .signerTopNoHover:hover
+    // background var(--ghostA) !important
+    // .signerSelect
+    //   .signerSelectButton
+    //     pointer-events auto !important
+    //     background var(--ghostA)
+    //   .signerSelectButton:hover
+    //     background var(--ghostB)
 
   .accountListWrap
     position absolute
@@ -770,7 +656,7 @@
           justify-content space-between
           align-items center
           padding 0px 20px 0px 20px
-          font-family FiraCode, monospace
+          font-family 'FiraCode'
           color var(--outerspace08)
           position relative
           z-index 4
@@ -806,7 +692,7 @@
         display flex
         justify-content center
         align-items center
-        font-family FiraCode, monospace
+        font-family 'FiraCode'
         position relative
         z-index 2
         transition var(--standardSlow)
@@ -994,15 +880,26 @@
     font-size 12px
     width 100%
 
-.openSigner
-  .signerMid
-    > div
-      opacity 1
-  .signerTop
-    .signerStatus
-      .signerInfo
-        opacity 1
-        height 20px
+  .openSigner
+    pointer-events none
+    .signerTop
+      cursor auto
+      position relative
+      border-bottom 2px solid var(--ghostZ0)
+      top -5px
+      .signerSelect
+        pointer-events auto !important
+        .signerSelectButton
+          pointer-events auto !important
+
+    .signerTop:hover
+      background var(--ghostA) !important
+      .signerSelect
+        .signerSelectButton
+          pointer-events auto !important
+          background var(--ghostA)
+        .signerSelectButton:hover
+          background var(--ghostB)
 
   .signerSelectDown.signerSelectRight
     right 0
@@ -1080,7 +977,7 @@
   width 100%
   height 40px
   background var(--ghostB)
-  border-radius 12px
+  border-radius 20px
   color var(--outerspace)
   display flex
   justify-content center
@@ -1116,7 +1013,7 @@
   color var(--good)
 
 .moduleButtonLocked
-  color var(--ghostG)
+  color var(--ghostD)
 
 .moduleButtonLocked:hover
   background var(--ghostB)

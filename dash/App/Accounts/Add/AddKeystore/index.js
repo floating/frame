@@ -59,7 +59,12 @@ class AddRing extends React.Component {
       if (err) {
         this.setState({ status: err, error: true })
       } else {
-        this.setState({ status: 'Successful', error: false })
+        link.send('tray:action', 'navBack', 'dash')
+        const crumb = {
+          view: 'expandedSigner', 
+          data: { signer: signer.id }
+        }
+        link.send('tray:action', 'navDash', crumb)
       }
     })
   }
@@ -127,7 +132,7 @@ class AddRing extends React.Component {
             <div className='addAccountItemTopType'>
               <div className='addAccountItemIcon'>
                 <div className='addAccountItemIconType addAccountItemIconHot'>
-                  <RingIcon svgLookup={{ name: 'file', size: 16 }} />
+                  <RingIcon svgName={'file'} />
                 </div>
                 <div className='addAccountItemIconHex addAccountItemIconHexHot' />
               </div>

@@ -1,127 +1,133 @@
 .expandedModule
   padding-top 16px
 
+.previewButton
+  border-radius 26px
+  background var(--ghostA)
+  padding 6px
+  // box-shadow 0px 2px 8px var(--ghostY)
+
 .panelBlock
-  border-radius 20px
+  border-radius 26px
   background var(--ghostA)
   padding 6px
   box-shadow 0px 2px 8px var(--ghostY)
   margin 0px 4px 20px 4px 
 
-  input
-    z-index 200
-    user-select auto
-    background transparent
-    background var(--ghostA)
-    outline none
-    border none
-    // margin-left 8px
-    width 100%
-    color var(--outerspace)
-    border-radius 12px
-    text-align center
-    font-size 16px
-    font-weight 500
-    padding 14px
-    font-family 'Exo2'
-    transition var(--standardFast)
+input
+  z-index 200
+  user-select auto
+  background transparent
+  background var(--ghostA)
+  outline none
+  border none
+  // margin-left 8px
+  width 100%
+  color var(--outerspace)
+  border-radius 16px
+  text-align center
+  font-size 16px
+  font-weight 300
+  padding 14px
+  font-family 'MainFont'
+  transition var(--standardFast)
 
-  input:hover
-    background var(--ghostB)
-    transition var(--standardFast)
-    box-shadow 0px 6px 42px 0px var(--ghostZ)
+input:hover
+  background var(--ghostB)
+  transition var(--standardFast)
+  box-shadow 0px 6px 42px 0px var(--ghostZ)
 
-  input:focus
-    background var(--ghostC)
-    transition var(--standardFast)
-    box-shadow 0px 6px 42px 0px var(--ghostZ)
+input:focus
+  background var(--ghostC)
+  transition var(--standardFast)
+  box-shadow 0px 6px 42px 0px var(--ghostZ)
 
-  .panelBlockTitle
-    font-weight 600
+.panelBlockTitle
+  font-weight 300
+  font-size 11px
+  text-transform uppercase
+  font-family 'MainFont'
+  padding 2px 0px 10px 10px
+  letter-spacing 1px
+
+.panelBlockItem:not(:first-child)
+  margin-top 3px
+
+.panelBlockValues
+  font-size 17px
+  font-weight 400
+  border-radius 20px
+  -webkit-app-region no-drag
+  transition none
+  pointer-events auto
+  transform translate3d(0, 0, 0)
+  font-family 'MainFont'
+  padding 3px
+  background var(--ghostZ)
+
+  .panelBlockValue
     font-size 11px
-    text-transform uppercase
-    font-family 'Exo2'
-    padding 2px 0px 10px 10px
-    letter-spacing 1px
-
-  .panelBlockItem:not(:first-child)
-    margin-top 4px
-  
-  .panelBlockValues
-    font-size 17px
     font-weight 400
-    border-radius 16px
+    display flex
+    justify-content center
+    align-items center
     -webkit-app-region no-drag
     transition none
     pointer-events auto
     transform translate3d(0, 0, 0)
-    font-family 'Ubuntu'
-    padding 4px 4px 4px 4px
-    background var(--ghostZ)
-
-    .panelBlockValue
-      font-size 12px
-      font-weight 500
-      display flex
-      justify-content center
-      align-items center
-      border-radius 12px
-      -webkit-app-region no-drag
-      transition none
-      pointer-events auto
-      transform translate3d(0, 0, 0)
-      padding 8px
-      text-transform uppercase
-      background var(--ghostA)
-      
-      svg
-        position relative
-        top -0px
-        padding 0px 3px 0px 4px
-
-    .panelBlockButton
-      font-size 14px
-      font-weight 400
-      display flex
-      justify-content center
-      align-items center
-      border-radius 12px
-      -webkit-app-region no-drag
-      transition none
-      pointer-events auto
-      transform translate3d(0, 0, 0)
-      font-family 'Ubuntu'
-      padding 16px
-      background var(--ghostA)
-      cursor pointer
-      transition var(--standardFast)
-      box-shadow 0px 0px 0px 0px var(--ghostZ)
-      text-transform uppercase
-
-    .panelBlockButton:hover
-      background var(--ghostB)
-      transition var(--standardFast)
-      box-shadow 0px 6px 22px 0px var(--ghostZ)
-
-    .panelBlockButton:active
-      transform translateY(1px)
-      background var(--ghostB)
-      transition var(--standardFast)
-      box-shadow 0px 2px 4px 0px var(--ghostZ)
+    padding 18px 16px 16px 16px
+    border-radius 16px
+    text-transform uppercase
+    background var(--ghostA)
     
-    .panelBlockTag
+    svg
       position relative
-      z-index 100001
-      overflow hidden
-      font-size 11px
-      font-weight 600
-      text-transform uppercase
-      letter-spacing 1px
-      text-align center
-      padding 5px 0px 5px 0px
-      margin-top 5px
-      border-radius 12px
-      background var(--ghostA)
+      top -0px
+      padding 0px 3px 0px 4px
+
+  .panelBlockButton
+    font-size 14px
+    font-weight 400
+    display flex
+    justify-content center
+    align-items center
+    border-radius 17px
+    -webkit-app-region no-drag
+    transition none
+    pointer-events auto
+    transform translate3d(0, 0, 0)
+    font-family 'MainFont'
+    padding 18px 16px 16px 16px
+    background var(--ghostA)
+    cursor pointer
+    transition var(--standardFast)
+    box-shadow 0px 0px 0px 0px var(--ghostZ)
+    text-transform uppercase
+
+  .panelBlockButton:hover
+    background var(--ghostB)
+    transition var(--standardFast)
+    // box-shadow 0px 6px 22px 0px var(--ghostZ)
+
+  .panelBlockButton:active
+    transform translateY(1px)
+    background var(--ghostB)
+    transition var(--standardFast)
+    box-shadow 0px 2px 4px 0px var(--ghostZ)
+  
+  .panelBlockTag
+    position relative
+    z-index 100001
+    overflow hidden
+    font-size 11px
+    font-weight 300
+    text-transform uppercase
+    letter-spacing 1px
+    text-align center
+    padding 5px 0px 5px 0px
+    margin-top 5px
+    border-radius 12px
+    background var(--ghostA)
 
 .settingsRowInset
   padding 8px
@@ -157,7 +163,7 @@
   color var(--badOver)
   font-size 14px
   padding 20px
-  font-weight 600
+  font-weight 300
   display flex
   justify-content center
   text-align center

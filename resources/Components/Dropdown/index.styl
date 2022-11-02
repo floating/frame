@@ -10,10 +10,10 @@
   letter-spacing 1px
   height 28px
   border-radius 24px
-  font-weight 400
+  font-weight 300
   width 130px
-  font-size 12px
-  font-family 'Ubuntu'
+  font-size 13px
+  font-family 'MainFont'
   text-transform uppercase
   background var(--ghostB)
   overflow hidden
@@ -23,20 +23,21 @@
   z-index 99999999999999999
   pointer-events auto
   cursor pointer
-  box-shadow 0px 2px 3px var(--ghostZ)
+  box-shadow 0px 2px 4px -2px var(--ghostY)
+  border-bottom 2px solid var(--ghostZ)
 
 .dropdown:hover
-  background var(--ghostC)
+  background var(--ghostB)
 
 .darkerDrop
-  background var(--ghostC)
+  background var(--ghostB)
   .dropdownItem
     .dropdownItemIndicator
       background var(--ghostA)
 
 .dropdownExpanded
   padding 18px 0px 18px 0px
-  box-shadow 0px 8px 32px 8px var(--ghostY)
+  box-shadow 0px 8px 16px 0px var(--ghostX)
 
 .dropdownItems
   transition var(--standardFast)
@@ -51,6 +52,7 @@
   box-sizing border-box
   transform translateZ(0)
   margin 0px 9px 0px 12px
+  font-weight 400
   overflow hidden
   position relative
   z-index 99999999999999

@@ -1,10 +1,10 @@
 import log from 'electron-log'
 
 import ethProvider from 'eth-provider'
+import sushiswapTokenList from '@sushiswap/default-token-list'
 
 import nebulaApi from '../../nebula'
 import defaultTokenList from './default-tokens.json'
-import sushiswapTokenList from '@sushiswap/default-token-list'
 
 const TOKENS_ENS_DOMAIN = 'tokens.frame.eth'
 

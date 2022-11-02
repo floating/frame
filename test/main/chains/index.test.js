@@ -38,7 +38,7 @@ class MockConnection extends EventEmitter {
             baseFeePerGas: [gweiToHex(15), gweiToHex(8), gweiToHex(9), gweiToHex(8), gweiToHex(7)],
             gasUsedRatio: [0.11, 0.8, 0.2, 0.5],
             reward: [
-              [gweiToHex(1), gweiToHex(1), gweiToHex(1), gweiToHex(1),]
+              [gweiToHex(1)], [gweiToHex(1)], [gweiToHex(1)], [gweiToHex(1)]
             ]
           })
         }

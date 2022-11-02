@@ -1,97 +1,55 @@
 @font-face
-  font-family 'OpenSans'
-  font-weight 200
-  src url('./fonts/OpenSans/OpenSans-Light.ttf')
-
-@font-face
-  font-family 'OpenSans'
-  font-style normal
-  font-weight 300
-  src url('./fonts/OpenSans/OpenSans-Regular.ttf')
-
-@font-face
-  font-family 'OpenSans'
-  font-weight 400
-  src url('./fonts/OpenSans/OpenSans-SemiBold.ttf')
-
-@font-face
-  font-family 'OpenSans'
-  font-style bold
-  font-weight 600
-  src url('./fonts/OpenSans/OpenSans-Bold.ttf')
+  font-family 'VCR'
+  font-weight 100 700
+  src url('./fonts/VCR/VCR.ttf')
 
 @font-face
   font-family 'FiraCode'
   font-weight 100
+  src url('./fonts/FiraCode/FiraCode-Light.ttf')
+
+@font-face
+  font-family 'FiraCode'
+  font-weight 200
+  src url('./fonts/FiraCode/FiraCode-Regular.ttf')
+
+@font-face
+  font-family 'FiraCode'
+  font-weight 250
   src url('./fonts/FiraCode/FiraCode-Retina.ttf')
 
-// @font-face
-//   font-family 'FiraCode'
-//   font-weight 100
-//   src url('./fonts/FiraCode/FiraCode-Regular.ttf')
-
-// @font-face
-//   font-family 'FiraCode'
-//   font-weight 100
-//   src url('./fonts/FiraCode/FiraCode-Light.ttf')
-
 @font-face
-  font-family 'Exo2'
-  font-weight 100
-  src url('./fonts/Exo2/Exo2-Light.ttf')
-
-@font-face
-  font-family 'Exo2'
-  font-weight 200
-  src url('./fonts/Exo2/Exo2-Medium.ttf')
-
-@font-face
-  font-family 'Exo2'
+  font-family 'FiraCode'
   font-weight 300
-  src url('./fonts/Exo2/Exo2-Regular.ttf')
+  src url('./fonts/FiraCode/FiraCode-Medium.ttf')
 
 @font-face
-  font-family 'Exo2'
+  font-family 'FiraCode'
   font-weight 400
-  src url('./fonts/Exo2/Exo2-Medium.ttf')
+  src url('./fonts/FiraCode/FiraCode-SemiBold.ttf')
 
 @font-face
-  font-family 'Exo2'
+  font-family 'FiraCode'
   font-weight 500
-  src url('./fonts/Exo2/Exo2-SemiBold.ttf')
+  src url('./fonts/FiraCode/FiraCode-Bold.ttf')
 
 @font-face
-  font-family 'Exo2'
-  font-weight 600
-  src url('./fonts/Exo2/Exo2-Bold.ttf')
-
-@font-face
-  font-family 'Exo2'
-  font-weight 700
-  src url('./fonts/Exo2/Exo2-ExtraBold.ttf')
-
-@font-face
-  font-family 'Exo2'
-  font-weight 800
-  src url('./fonts/Exo2/Exo2-Black.ttf')
-
-@font-face
-  font-family 'Ubuntu'
+  font-family 'MainFont'
   font-weight 200
   src url('./fonts/Ubuntu/Ubuntu-Light.ttf')
 
 @font-face
-  font-family 'Ubuntu'
+  font-family 'MainFont'
   font-weight 300
   src url('./fonts/Ubuntu/Ubuntu-Regular.ttf')
 
 @font-face
-  font-family 'Ubuntu'
+  font-family 'MainFont'
   font-weight 400
   src url('./fonts/Ubuntu/Ubuntu-Medium.ttf')
 
 @font-face
-  font-family 'Ubuntu'
+  font-family 'MainFont'
   font-weight 500
   src url('./fonts/Ubuntu/Ubuntu-Bold.ttf')
 
@@ -318,6 +276,16 @@ body
   --mint rgba(215, 255, 255, 1)
   --mintOver rgba(15, 55, 55, 1)
 
+  // Accents
+  --accent1 rgb(0, 210, 190) // Main
+  --accent2 rgb(255, 153, 51) // Testnets
+  --accent3 rgb(255, 0, 174) // Default
+  --accent4 rgb(246, 36, 35) // Optimism
+  --accent5 rgb(90, 181, 178) // Gnosis
+  --accent6 rgb(140, 97, 232) // Polygon
+  --accent7 rgb(62, 173, 241) // Arbitrum
+  --accent8 rgb(60, 40, 234) // Other
+
   // // Shadows
   // --cardDrop 0px 1px 1px rgba(0, 34, 32, 0.1)
 
@@ -337,14 +305,25 @@ body
   // --bg rgba(228, 232, 248, 1) // #dadfea // #dce1e8
   // --bg0 rgba(228, 232, 248, 0)
   --v #4e5758
-  --outerspace01 rgba(1, 21, 72, 0.1)
-  --outerspace02 rgba(4, 24, 72, 0.2)
-  --outerspace03 rgba(7, 27, 72, 0.3)
-  --outerspace05 rgba(10, 30, 72, 0.5)
-  --outerspace06 rgba(13, 33, 72, 0.6)
-  --outerspace07 rgba(16, 36, 72, 0.7)
-  --outerspace08 rgba(19, 39, 72, 0.8)
-  --outerspace rgba(30, 42, 72, 1)
+  --outerspace01 rgba(4, 8, 28, 0.1)
+  --outerspace02 rgba(6, 12, 32, 0.2)
+  --outerspace03 rgba(8, 16, 36, 0.3)
+  --outerspace05 rgba(10, 20, 40, 0.5)
+  --outerspace06 rgba(12, 24, 44, 0.6)
+  --outerspace07 rgba(14, 28, 48, 0.7)
+  --outerspace08 rgba(16, 32, 52, 0.8)
+  --outerspace09 rgba(18, 36, 56, 0.9)
+  --outerspace rgba(20, 40, 60, 1)
+
+  // --outerspace01 rgba(1, 21, 44, 0.1)
+  // --outerspace02 rgba(4, 24, 48, 0.2)
+  // --outerspace03 rgba(7, 27, 52, 0.3)
+  // --outerspace05 rgba(10, 30, 56, 0.5)
+  // --outerspace06 rgba(13, 33, 60, 0.6)
+  // --outerspace07 rgba(16, 36, 64, 0.7)
+  // --outerspace08 rgba(19, 39, 68, 0.8)
+  // --outerspace09 rgba(22, 42, 72, 0.9)
+  // --outerspace rgba(25, 45, 76, 1)
 
   --nebula #3a4547
   // --outerspaceShade #1c2526
@@ -354,49 +333,51 @@ body
 
   --outerspaceDark #0b1819
   --spacewhite rgba(247, 251, 255, 1)
+  
+  --ghostX02 rgba(192, 181, 211, 0.2)
+  --ghostX04 rgba(192, 181, 211, 0.4)
+  --ghostX09 rgba(192, 181, 211, 0.9)
+  --ghostX rgba(192, 181, 211, 1)
+  --ghostY rgba(208, 199, 222, 1)
+  --ghostZ0 rgba(224, 217, 233, 0)
+  --ghostZ05 rgba(224, 217, 233, 0.5)
+  --ghostZ08 rgba(224, 217, 233, 0.8)
+  --ghostZ rgba(224, 217, 233, 1)
 
-  --ghostX02 rgba(207, 195, 222, 0.2)
-  --ghostX04 rgba(207, 195, 222, 0.4)
-  --ghostX09 rgba(207, 195, 222, 0.9)
-  --ghostX rgba(207, 195, 222, 1)
-  --ghostY rgba(215, 205, 228, 1)
-  --ghostZ0 rgba(223, 215, 234, 0)
-  --ghostZ05 rgba(223, 215, 234, 0.5)
-  --ghostZ08 rgba(223, 215, 234, 0.8)
-  --ghostZ rgba(223, 215, 234, 1)
+  --ghostA rgba(240, 230, 243, 1)
 
-  --ghostA rgba(239, 229, 242, 1)
-  --ghostB0 rgba(243, 235, 245, 0)
-  --ghostB rgba(243, 235, 245, 1)
-  --ghostC0 rgba(247, 241, 248, 0)
-  --ghostC rgba(247, 241, 248, 1)
-  --ghostD rgba(251, 247, 251, 1)
-  --ghostE04 rgba(255, 253, 254, 0.4)
-  --ghostE rgba(255, 253, 254, 1)
-  --ghostF rgba(255, 255, 255, 1)
+  --ghostB0 rgba(244, 238, 246, 0)
+  --ghostB rgba(244, 238, 246, 1)
+  --ghostC0 rgba(248, 246, 249, 0)
+  --ghostC rgba(248, 246, 249, 1)
+  --ghostD rgba(252, 254, 252, 1)
 
-  --moon rgba(245, 90, 100, 1)
-  --moonDark rgba(225, 80, 80, 1)
+
+  // --ghostE04 rgba(255, 253, 254, 0.4)
+  // --ghostE rgba(255, 253, 254, 1)
+  // --ghostF rgba(255, 255, 255, 1)
+
+  --moon rgb(255, 100, 110)
+  --moonDark rgba(215, 90, 40, 1)
   --moonLight rgba(255, 135, 135, 1)
-  --moonOver rgba(255, 225, 240, 1)
+  --moonOver rgba(255, 240, 240, 1)
 
   --goodHighlighter rgb(150, 210, 180)
   --goodHighlight rgb(120, 210, 180)
-  --good rgb(0, 175, 145)
+  --good rgb(0, 170, 120)
   --goodOver rgba(230, 255, 255, 1)
   --goodUp rgb(0, 200, 200)
   --goodDark rgb(0, 90, 90)
   // --bad rgba(215, 100, 135, 1)
   --badOver rgba(255, 235, 240, 1)
-  --bad rgba(235, 90, 140, 1) // rgba(235, 90, 140, 1)
-  --bad0 rgba(235, 90, 140, 0)
+  --bad rgba(255, 50, 100, 1) // rgba(235, 90, 140, 1)
+  --bad0 rgba(235, 30, 140, 0)
 
   ::selection 
     background-color var(--outerspace02)
 
-  --overlayA rgba(200, 255, 255, 0.14) 
-  --overlayB rgba(191, 255, 240, 0.14)
-
+  --overlayA rgba(200, 255, 255, 0.2) 
+  --overlayB rgba(191, 255, 240, 0.2)
 
   --thinner rgba(16, 44, 180, .02)
   --thin rgba(16, 44, 180, .04)
@@ -405,18 +386,22 @@ body
   --tripleThick rgba(16, 44, 180, .21)
   --thick0 rgba(16, 44, 180, 0)
 
+
+  // Accent Overrides
+  --accent1 rgb(0, 170, 120) // Main
+
 .dark
   --v #4e5758
-  --outerspace01 rgba(217, 225, 255, 0.1)
-  --outerspace02 rgba(219, 227, 255, 0.2)
-  --outerspace03 rgba(221, 229, 255, 0.3)
-  --outerspace04 rgba(223, 231, 255, 0.4)
-  --outerspace05 rgba(225, 233, 255, 0.5)
-  --outerspace06 rgba(227, 235, 255, 0.6)
-  --outerspace07 rgba(229, 237, 255, 0.7)
-  --outerspace08 rgba(231, 239, 255, 0.8)
-  --outerspace09 rgba(233, 241, 255, 0.9)
-  --outerspace rgba(236, 241, 255, 1)
+  --outerspace01 rgba(214, 214, 217, 0.1)
+  --outerspace02 rgba(217, 217, 222, 0.2)
+  --outerspace03 rgba(220, 220, 227, 0.3)
+  --outerspace04 rgba(223, 223, 237, 0.4)
+  --outerspace05 rgba(226, 226, 240, 0.5)
+  --outerspace06 rgba(229, 229, 243, 0.6)
+  --outerspace07 rgba(232, 232, 246, 0.7)
+  --outerspace08 rgba(235, 235, 249, 0.8)
+  --outerspace09 rgba(238, 238, 252, 0.9)
+  --outerspace rgba(241, 241, 255, 1)
   --nebula #3a4547
   
   // --outerspaceShade #1c2526
@@ -427,27 +412,26 @@ body
   --outerspaceDark #0b1819
   --spacewhite rgba(38, 42, 50, 1) 
 
-  --ghostX09 rgba(14, 11, 16, 0.9)
-  --ghostX04 rgba(14, 11, 16, 0.4)
-  --ghostX rgba(14, 11, 16, 1)
-  --ghostY rgba(18, 15, 20, 1) 
-  --ghostZ0 rgba(22, 19, 24, 0)
-  --ghostZ05 rgba(22, 19, 24, 0.5)
-  --ghostZ08 rgba(22, 19, 24, 0.8)
-  --ghostZ rgba(22, 19, 24, 1)
+  --ghostX09 rgba(11, 7, 13, 0.9)
+  --ghostX04 rgba(11, 7, 13, 0.4)
+  --ghostX rgba(11, 7, 13, 1)
 
-  --ghostA rgba(26, 23, 28, 1)
-  --ghostB0 rgba(30, 27, 32, 0)
-  --ghostB rgba(30, 27, 32, 1)
-  --ghostC0 rgba(34, 31, 36, 0)
-  --ghostC rgba(34, 31, 36, 1)
-  --ghostD rgba(38, 35, 40, 1)
-  --ghostE04 rgba(42, 39, 44, 0.4)
-  --ghostE rgba(42, 39, 44, 1)
-  --ghostF rgba(46, 43, 48 1)
-  --ghostG rgba(50, 47, 52, 1)
+  --ghostY rgba(16, 12, 18, 1)
+
+  --ghostZ0 rgba(21, 17, 23, 0)
+  --ghostZ05 rgba(21, 17, 23, 0.5)
+  --ghostZ08 rgba(21, 17, 23, 0.8)
+  --ghostZ rgba(21, 17, 23, 1) 
+
+  --ghostA rgba(26, 22, 28, 1)
+  --ghostB0 rgba(29, 25, 33, 0)
+  --ghostB rgba(29, 25, 33, 1)
+  --ghostC0 rgba(33, 29, 38, 0)
+  --ghostC rgba(33, 29, 38, 1)
+  --ghostD rgba(37, 33, 43, 1)
 
   --moon rgba(255, 165, 155, 1)
+  --moonOver rgba(135, 25, 0, 1)
 
   ::selection 
     background-color var(--outerspace02)
@@ -752,4 +736,4 @@ body
 
 @import './Native/style'
 @import './Components'
-@import './magic.styl'
+

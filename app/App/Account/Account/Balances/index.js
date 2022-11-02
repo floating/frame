@@ -3,7 +3,7 @@
 import React from 'react'
 import Restore from 'react-restore'
 
-import BalancesPreview from './BlancesPreview'
+import BalancesPreview from './BalancesPreview'
 import BalancesExpanded from './BalancesExpanded'
 
 class Balances extends React.Component {

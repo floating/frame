@@ -1,6 +1,7 @@
 import log from 'electron-log'
 
 import Wrapper, { ensResolve } from '@aragon/wrapper'
+import EthereumProvider from 'ethereum-provider'
 
 import store from '../../store'
 import appNames from './appNames'
@@ -8,8 +9,6 @@ import { Provider, TransactionMetadata } from '../../provider'
 import proxyConnection from '../../provider/proxy'
 import { Chain } from '../../chains'
 
-// @ts-ignore
-import EthereumProvider from 'ethereum-provider'
 
 const addresses: Record<number, Address> = {
   1: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
@@ -83,6 +82,16 @@ async function resolveName (name: string, chainId: number) {
   })
 }
 
+function isConnected(chain: Chain) {
+  const connection = store('main.networks', chain.type, chain.id, 'connection')
+  if (!connection) {
+    return false
+  }
+
+  const status = [connection.primary.status, connection.secondary.status]  
+  return status.includes('connected')
+}
+
 export interface AragonOptions {
   dao: Address,
   agent: Address,
@@ -111,9 +120,7 @@ class Aragon {
   }
 
   setup () {
-    const connection = store('main.networks', this.chain.type, this.chain.id, 'connection')
-    const status = [connection.primary.status, connection.secondary.status]
-    if (status.indexOf('connected') > -1 && !this.wrap && !this.inSetup) {
+    if (isConnected(this.chain) && !this.wrap && !this.inSetup) {
       setTimeout(() => {
         log.info('\n ** Setting Up Aragon DAO:', this.dao)
         this.inSetup = true

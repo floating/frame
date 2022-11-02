@@ -2,6 +2,7 @@ import type { MessageTypes, SignTypedDataVersion, TypedDataV1, TypedMessage as B
 import type { DecodedCallData } from '../contracts'
 import type { Chain } from '../chains'
 import type { TransactionData } from '../../resources/domain/transaction'
+import { Action } from '../reveal'
 
 export enum ReplacementType {
   Speed = 'speed',
@@ -72,10 +73,7 @@ export interface TransactionRequest extends Omit<AccountRequest, 'type'> {
   completed?: number,
   feesUpdatedByUser: boolean,
   recipientType: string,
-  recognizedActions: Array<{
-    type: string,
-    data: {}
-  }>
+  recognizedActions: Action[]
 }
 
 export type TypedData<T extends MessageTypes = MessageTypes> = BaseTypedMessage<T>

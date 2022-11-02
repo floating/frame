@@ -5,7 +5,7 @@ import link from '../../../../../resources/link'
 import svg from '../../../../../resources/svg'
 import RingIcon from '../../../../../resources/Components/RingIcon'
 
-import Signer from '../../Signer'
+import Signer from '../../../Signer'
 
 class AddHardware extends React.Component {
   constructor (...args) {
@@ -28,9 +28,9 @@ class AddHardware extends React.Component {
             <div className='addAccountItemTopType'>
               <div className='addAccountItemIcon'>
                 {this.props.type === 'ledger' ? (
-                  <RingIcon svgLookup={{ name: 'ledger', size: 15 }} />
+                  <RingIcon svgName={'ledger'} svgSize={15} />
                 ) : (
-                  <RingIcon svgLookup={{ name: 'trezor', size: 15 }} />
+                  <RingIcon svgName={'trezor'} svgSize={15} />
                 )}
                 <div className='addAccountItemIconHex addAccountItemIconHexHardware' />
               </div>
@@ -74,8 +74,8 @@ class AddHardware extends React.Component {
             )}
           </div>
           <div
-            className='addAccountItemFooter' onMouseDown={() => {
-              const open = url => link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'openExternal', notifyData: { url }} })
+            className='addAccountItemFooter' onClick={() => {
+              const open = url => link.send('tray:openExternal', url)
               if (this.deviceName === 'ledger') return open('https://shop.ledger.com/pages/ledger-nano-x?r=1fb484cde64f')
               if (this.deviceName === 'trezor') return open('https://shop.trezor.io/?offer_id=10&aff_id=3270')
             }}

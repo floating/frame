@@ -61,9 +61,8 @@ class BalancesExpanded extends React.Component {
         const logoURI = isNative ? nativeCurrencyInfo.icon : rawBalance.logoURI
         const name = isNative ? nativeCurrencyInfo.name || networks[rawBalance.chainId].name : rawBalance.name
         const decimals = isNative ? 18 : rawBalance.decimals
-        const chainLayer = networks[rawBalance.chainId].layer || 'testnet'
 
-        return balance({ ...rawBalance, logoURI, name, decimals }, chainLayer === 'testnet' ? 0 : rate.usd)
+        return balance({ ...rawBalance, logoURI, name, decimals }, networks[rawBalance.chainId].isTestnet ? { price: 0 } : rate.usd)
       })
       .sort((a, b) => {
         return b.totalValue.minus(a.totalValue).toNumber()
@@ -90,7 +89,7 @@ class BalancesExpanded extends React.Component {
 
     return (
       <div 
-        className=''
+        className='accountViewScroll'
       >
         {scanning ? (
           <div className='signerBalancesLoading'>

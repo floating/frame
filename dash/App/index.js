@@ -1,22 +1,36 @@
 import React from 'react'
 import Restore from 'react-restore'
 
-// import Native from '../../resources/Native'
-// import link from '../../resources/link'
-
 import Command from './Command'
-
 import Main from './Main'
 import Accounts from './Accounts'
-
+import Signer from './Signer'
 import Chains from './Chains'
-
 import Notify from './Notify'
-
 import Dapps from './Dapps'
 import Tokens from './Tokens'
 import Settings from './Settings'
+import svg from '../../resources/svg'
+import link from '../../resources/link'
+import { capitalize } from '../../resources/utils'
 
+function itemName(view) {
+  return capitalize(view.slice(0, -1))
+}
+
+const AddNewItemButton = ({ view, req }) => {
+  const dataMap = {
+    accounts: { showAddAccounts: true },
+    chains: { newChain: {} },
+    tokens: { notify: 'addToken', notifyData: req }
+  }
+  return <div className='dashFooter'>
+    <div className='dashFooterButton' onClick={() => link.send('tray:action', 'navDash', { view, data: dataMap[view] })}>
+      <div className='newAccountIcon'>{svg.plus(16)}</div> 
+      Add New {itemName(view)}
+    </div>
+  </div>
+}
 
 class Dash extends React.Component {
   constructor(props, context) {
@@ -27,9 +41,14 @@ class Dash extends React.Component {
       selected: 'home'
     }
   }
-  renderPanel () {
-    const { view, data } = this.store('dash.nav')[0] || { view: 'default', data: {} }
+
+  renderPanel (view, data) {
     if (view === 'accounts') return <Accounts data={data} />
+    if (view === 'expandedSigner' && data.signer) {
+      const signer = this.store('main.signers', data.signer)
+      if (!signer) return null
+      return <Signer expanded={true} key={signer.id + ':expanded'} {...signer} />
+    }
     if (view === 'chains') return <Chains data={data} />
     if (view === 'dapps') return <Dapps data={data} />
     if (view === 'tokens') return <Tokens data={data} />
@@ -37,16 +56,23 @@ class Dash extends React.Component {
     if (view === 'notify') return <Notify data={data} />
     return <Main />
   }
+
   render () {
+    const { view, data } = this.store('windows.dash.nav')[0] || { view: 'default', data: {} }
+    const showAddButton = ['chains', 'accounts', 'tokens'].includes(view)
     return (
       <div className='dash'>
         <Command />
-        <div className='dashMain'>
+        <div 
+          className='dashMain'
+          style={{ bottom: showAddButton ? '120px' : '40px' }}
+        >
           <div className='dashMainOverlay' />
           <div className='dashMainScroll'>
-            {this.renderPanel()}
+            {this.renderPanel(view, data)}
           </div>
         </div>
+        {showAddButton && <AddNewItemButton view={view} req={this.props.req} />}
       </div>
     )
   }

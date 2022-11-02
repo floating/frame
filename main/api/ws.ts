@@ -76,8 +76,6 @@ const handler = (socket: FrameWebSocket, req: IncomingMessage) => {
 
     const origin = parseOrigin(requestOrigin)
 
-    // Extension custom action for summoning Frame
-    if (origin === 'frame-extension' && rawPayload.method === 'frame_summon') return windows.toggleTray()
     if (logTraffic) log.info(`req -> | ${(socket.isFrameExtension ? 'ext' : 'ws')} | ${origin} | ${rawPayload.method} | -> | ${rawPayload.params}`)
 
     const { payload, hasSession } = updateOrigin(rawPayload, origin, rawPayload.__extensionConnecting)
@@ -86,7 +84,17 @@ const handler = (socket: FrameWebSocket, req: IncomingMessage) => {
       extendSession(payload._origin)
     }
 
-    if (protectedMethods.indexOf(payload.method) > -1 && !(await isTrusted(origin))) {
+    if (origin === 'frame-extension') {
+      // custom extension action for summoning Frame
+      if (rawPayload.method === 'frame_summon') return windows.toggleTray()
+
+      const { id, jsonrpc } = rawPayload
+      const chainId = payload.chainId as string
+      if (rawPayload.method === 'eth_chainId') return res({ id, jsonrpc, result: chainId })
+      if (rawPayload.method === 'net_version') return res({ id, jsonrpc, result: parseInt(chainId, 16) })
+    }
+
+    if (protectedMethods.indexOf(payload.method) > -1 && !(await isTrusted(payload))) {
       let error = { message: 'Permission denied, approve ' + origin + ' in Frame to continue', code: 4001 }
       // review
       if (!accounts.getSelectedAddresses()[0]) error = { message: 'No Frame account selected', code: 4001 }

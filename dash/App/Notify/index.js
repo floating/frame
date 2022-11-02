@@ -6,49 +6,14 @@ import link from '../../../resources/link'
 import BigNumber from 'bignumber.js'
 import { usesBaseFee } from '../../../main/transaction'
 
-import frameIcon from './FrameIcon.png'
-
 import Confirm from '../../../resources/Components/Confirm'
-import AddChain from './AddChain'
-import UpdateChain from './UpdateChain'
+import AddToken from './AddToken'
 
 const FEE_WARNING_THRESHOLD_USD = 50
 
 const capitalize = s => s[0].toUpperCase() + s.slice(1)
 
 class Notify extends React.Component {
-  mainnet () {
-    return (
-      <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
-        <div className='notifyBox'>
-          <div className='notifyFrameIcon'>
-            <img src={frameIcon} />
-          </div>
-          <div className='notifyTitle'>
-            Welcome to Frame!
-          </div>
-          <div className='notifySubtitle'>
-            System-wide web3
-          </div>
-          <div className='notifyBody'>
-            <div className='notifyBodyLine'>
-              Please read <span onMouseDown={() => { link.send('tray:openExternal', 'https://github.com/floating/frame/blob/master/LICENSE') }}>our license</span>, use at your own risk and verify transactions and account details on a signing device whenever possible.
-            </div>
-          </div>
-          <div className='notifyInput'>
-            <div
-              className='notifyInputOption notifyInputSingleButton' onMouseDown={() => {
-                link.send('tray:action', 'muteWelcomeWarning')
-                link.send('tray:action', 'backDash')
-              }}
-            >
-              <div className='notifyInputOptionText'>Let's go!</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
 
   betaDisclosure () {
     return (
@@ -107,64 +72,6 @@ class Notify extends React.Component {
       </div>
     )
   }
-
-  // rinkeby () {
-  //   return (
-  //     <div className='notifyBoxWrap' style={this.store('view.notify') === 'rinkeby' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
-  //       <div className='notifyClose' onMouseDown={() => link.send('tray:action', 'backDash')}>{svg.octicon('x', { height: 18 })}</div>
-  //       <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
-  //         <div className='notifyTitle'>
-  //           Parity 💔 Rinkeby
-  //         </div>
-  //         <div className='notifyBody'>
-  //           <div className='notifyBodyLine'>Unfortunately, Parity does not support the Rinkeby testnet.</div>
-  //           <div className='notifyBodyLine'>Please select another Ethereum client or use the secondary connection.</div>
-  //         </div>
-  //         <div className='notifyInput'>
-  //           <div className='notifyInputOption notifyInputSingleButton' onMouseDown={() => link.send('tray:action', 'backDash')}>
-  //             <div className='notifyInputOptionText'>OK</div>
-  //           </div>
-  //         </div>
-  //       </div>
-  //     </div>
-  //   )
-  // }
-
-  // ipfsAlreadyRunning () {
-  //   return (
-  //     <div className='notifyBoxWrap' style={this.store('view.notify') === 'ipfsAlreadyRunning' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
-  //       <div className='notifyClose' onMouseDown={() => link.send('tray:action', 'backDash')}>{svg.octicon('x', { height: 18 })}</div>
-  //       <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
-  //         <div className='notifyBody'>
-  //           <div className='notifyBodyLine'>IPFS daemon is already running on this machine.</div>
-  //         </div>
-  //         <div className='notifyInput'>
-  //           <div className='notifyInputOption notifyInputSingleButton' onMouseDown={() => link.send('tray:action', 'backDash')}>
-  //             <div className='notifyInputOptionText'>Ok</div>
-  //           </div>
-  //         </div>
-  //       </div>
-  //     </div>
-  //   )
-  // }
-
-  // parityAlreadyRunning () {
-  //   return (
-  //     <div className='notifyBoxWrap' style={this.store('view.notify') === 'parityAlreadyRunning' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
-  //       <div className='notifyClose' onMouseDown={() => link.send('tray:action', 'backDash')}>{svg.octicon('x', { height: 18 })}</div>
-  //       <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
-  //         <div className='notifyBody'>
-  //           <div className='notifyBodyLine'>Parity is already running on this machine.</div>
-  //         </div>
-  //         <div className='notifyInput'>
-  //           <div className='notifyInputOption notifyInputSingleButton' onMouseDown={() => link.send('tray:action', 'backDash')}>
-  //             <div className='notifyInputOptionText'>Ok</div>
-  //           </div>
-  //         </div>
-  //       </div>
-  //     </div>
-  //   )
-  // }
 
   nonceWarning () {
     return (
@@ -240,16 +147,16 @@ class Notify extends React.Component {
     )
   }
 
-  signerLockedWarning ({ req = {} }) {
+  signerUnavailableWarning ({ req = {} }) {
     return (
       <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
         <div className='notifyBox'>
           <div className='notifyTitle'>
-            Signer locked!
+            Signer unavailable for signing!
           </div>
           <div className='notifyBody'>
             <div className='notifyBodyQuestion'>
-              Please unlock this signer and try again
+              Please check the signer for this account and try again
             </div>
           </div>
           <div className='notifyInput'>
@@ -323,10 +230,9 @@ class Notify extends React.Component {
             <div
               className='notifyInputOption notifyInputProceed' onMouseDown={() => {
                 // TODO: Transacionns need a better flow to respond to mutiple notifications after hitting sign
-                const layer = this.store('main.networks', chain.type, chain.id, 'layer')
-                const nativeCurrency = this.store('main.networksMeta', chain.type, chain.id, 'nativeCurrency')
-                const nativeUSD = nativeCurrency && nativeCurrency.usd && layer !== 'testnet' ? nativeCurrency.usd.price : 0
-                const currentSymbol = this.store('main.networks', chain.type, chain.id, 'symbol') || '?'
+                const isTestnet = this.store('main.networks', chain.type, chain.id, 'isTestnet')
+                const {nativeCurrency, nativeCurrency:{symbol: currentSymbol = '?'}} = this.store('main.networksMeta', chain.type, chain.id)
+                const nativeUSD = nativeCurrency && nativeCurrency.usd && !isTestnet ? nativeCurrency.usd.price : 0
 
                 let maxFeePerGas, maxFee, maxFeeUSD
 
@@ -548,10 +454,10 @@ class Notify extends React.Component {
           {this.noSignerWarning(notifyData)}
         </div>
       )
-    } else if (notify === 'signerLockedWarning') {
+    } else if (notify === 'signerUnavailableWarning') {
       return (
         <div className='notify cardShow'>
-          {this.signerLockedWarning(notifyData)}
+          {this.signerUnavailableWarning(notifyData)}
         </div>
       )
     } else if (notify === 'signerCompatibilityWarning') {
@@ -617,22 +523,12 @@ class Notify extends React.Component {
           {this.openExplorer(notifyData)}
         </div>
       )
-    } else if (notify === 'addChain') {
+    } else if (notify === 'addToken') {
       return (
         <div className='notify cardShow'>
           <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
             <div className='notifyBoxSlide'>
-              <AddChain {...notifyData} />
-            </div>
-          </div>
-        </div>
-      )
-    } else if (notify === 'updateChain') {
-      return (
-        <div className='notify cardShow'>
-          <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
-            <div className='notifyBoxSlide'>
-              <UpdateChain {...notifyData} />
+              <AddToken {...notifyData} />
             </div>
           </div>
         </div>
@@ -642,104 +538,5 @@ class Notify extends React.Component {
     }
   }
 }
-
-// Notification Cycle for Testing
-
-// intro
-// contractData
-// mainnet
-// rinkeby
-// ipfsAlreadyRunning
-// parityAlreadyRunning
-// gasFeeWarning
-// contractData
-// hotAccountWarning
-
-// let notifications = [
-//   {
-//     name: 'intro',
-//     data: {}
-//   },
-//   {
-//     name: 'mainnet',
-//     data: {}
-//   },
-//
-//   {
-//     name: 'rinkeby',
-//     data: {}
-//   },
-//   {
-//     name: 'ipfsAlreadyRunning',
-//     data: {}
-//   },
-//   {
-//     name: 'parityAlreadyRunning',
-//     data: {}
-//   },
-//   {
-//     name: 'gasFeeWarning',
-//     data: {
-//       req: {
-//         handlerId: 'c9a46b23-dced-45a3-a961-cbc5b7873de5',
-//         type: 'transaction',
-//         data: {
-//           value: '0x11e42f05714a67',
-//           to: '0x355587247da36c3130da888d9f608ccf0d2351ce',
-//           from: '0x355587247da36c3130da888d9f608ccf0d2351ce',
-//           gasPrice: '0x3b9aca00',
-//           gas: '0x5208',
-//           chainId: '0x4'
-//         },
-//         payload: {
-//           jsonrpc: '2.0',
-//           id: 3416,
-//           method: 'eth_sendTransaction',
-//           params: [],
-//           account: '0x355587247DA36C3130dA888d9F608ccF0D2351ce'
-//         }
-//       },
-//       feeUSD: 200
-//     }
-//   },
-//   {
-//     name: 'contractData',
-//     data: {}
-//   },
-//   {
-//     name: 'openExternal',
-//     data: {
-//       url: 'https://frame.sh'
-//     }
-//   },
-//   {
-//     name: 'openExplorer',
-//     data: {
-//       hash: '0x1234'
-//     }
-//   },
-//   {
-//     name: 'hotAccountWarning',
-//     data: {}
-//   }
-// ]
-//
-//
-// let i = -1
-// const checkKey = (e) => {
-//   if ((e || window.event).key === 'ArrowRight') {
-//     i++
-//     if (!notifications[i]) i = 0
-//     console.log(notifications[i].name, notifications[i].data)
-//     store.notify(notifications[i].name, notifications[i].data)
-//   } else if ((e || window.event).key === 'ArrowLeft') {
-//     i--
-//     if (!notifications[i]) i = notifications.length - 1
-//     console.log(notifications[i].name, notifications[i].data)
-//     store.notify(notifications[i].name, notifications[i].data)
-//   }
-// }
-
-// window.addEventListener('keyup', checkKey, true)
 
 export default Restore.connect(Notify)

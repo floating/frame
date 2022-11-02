@@ -1,7 +1,7 @@
 import React from 'react'
 import Restore from 'react-restore'
 
-import Signer from '../../Signer'
+import Signer from '../../../Signer'
 
 import link from '../../../../../resources/link'
 import svg from '../../../../../resources/svg'
@@ -80,7 +80,12 @@ class AddHardwareLattice extends React.Component {
       if (err) {
         this.setState({ status: err, error: true })
       } else {
-        this.setState({ status: 'Successful', error: false })
+        link.send('tray:action', 'navBack', 'dash')
+        const crumb = {
+          view: 'expandedSigner', 
+          data: { signer: signer.id }
+        }
+        link.send('tray:action', 'navDash', crumb)
       }
     })
   }
@@ -115,7 +120,7 @@ class AddHardwareLattice extends React.Component {
             <div className='addAccountItemTopType'>
               <div className='addAccountItemIcon'>
                 <div className='addAccountItemIconType addAccountItemIconHardware'>
-                  <RingIcon svgLookup={{ name: 'lattice', size: 20 }} />
+                  <RingIcon svgName={'lattice'} svgSize={20} />
                 </div>
               </div>
               <div className='addAccountItemTopTitle'>GridPlus</div>

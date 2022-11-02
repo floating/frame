@@ -27,7 +27,7 @@
     align-items center
     text-transform uppercase
     font-size 11px
-    font-weight 600
+    font-weight 300
     cursor pointer
     background var(--ghostB)
     color var(--moon)
@@ -36,13 +36,13 @@
       pointer-events none
 
   .notifyBoxWrap
-    border-radius 20px
+    border-radius 27px
     box-sizing border-box
     position absolute
-    top 5px
-    bottom 5px
-    left 5px
-    right 5px
+    top 6px
+    bottom 6px
+    left 6px
+    right 6px
     transition var(--standard)
     background var(--ghostA)
     display flex
@@ -119,14 +119,13 @@
           padding 0px 0px 
           text-transform uppercase
           font-size 16px
-          font-weight 500
-          font-family 'Exo2'
+          font-weight 300
+          font-family 'MainFont'
 
         .notifyBodyLineUrl
           padding-bottom 56px
-          font-family FiraCode, monospace
+          font-family 'FiraCode'
           font-size 16px
-          font-weight 100
           word-break break-all
  
         .notifyBodyUpdate
@@ -137,7 +136,7 @@
           border-radius 8px
           margin-top 50px
           font-size 13px
-          font-weight 500
+          font-weight 300
 
         .notifyBodyBlock
           padding 8px
@@ -157,11 +156,9 @@
 
         .notifyBodyHash
           font-size 14px
-          font-family FiraCode, monospace
+          font-family 'FiraCode'
           background var(--ghostB)
-          letter-spacing 2px
           line-height 20px
-          // margin-left 4px
           box-shadow inset 0px 2px 14px var(--ghostB)
           padding 18px
           border-radius 12px
@@ -329,5 +326,3 @@
         div
           font-size 14px
           line-height 26px
-
-@import '../ChainEditForm/style'

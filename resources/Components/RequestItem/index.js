@@ -2,7 +2,6 @@ import React from 'react'
 import Restore from 'react-restore'
 
 import RingIcon from '../../../resources/Components/RingIcon'
-// import chainMeta from '../../../../../resources/chainMeta'
 
 import link from '../../../resources/link'
 import svg from '../../../resources/svg'
@@ -35,12 +34,22 @@ class _RequestItem extends React.Component {
     clearInterval(this.timer)
   }
   render () {
-    const { account, handlerId, i, title, svgLookup, img, color, headerMode, txNonce } = this.props
+    const { account, handlerId, i, title, svgName, img, color, headerMode, txNonce, children } = this.props
     const req = this.store('main.accounts', account, 'requests', handlerId)
+
+    const status = req.notice || req.status || 'pending'
+
+    let requestItemDetailsClass = 'requestItemDetails'
+    if (status === 'confirming') {
+      requestItemDetailsClass += ' requestItemDetailsGood'
+    } else if (status === 'error') {
+      requestItemDetailsClass += ' requestItemDetailsBad'
+    }
+
     return (
       <div 
         key={req.handlerId}
-        className={headerMode ? 'requestItem requestItemHeader' : 'requestItem cardShow' }
+        className={headerMode ? 'requestItem requestItemHeader' : 'requestItem' }
         onClick={() => {
           const crumb = { 
             view: 'requestView',
@@ -48,22 +57,21 @@ class _RequestItem extends React.Component {
               step: 'confirm', 
               accountId: account, 
               requestId: req.handlerId
+            },
+            position: {
+              bottom: '200px'
             }
           }
           link.send('nav:forward', 'panel', crumb)
         }}
       >
-        <div className='requestItemDetails'>
-          <div className='requestItemDetailsSlide'>
-            <div className='requestItemDetailsIndicator' />
-            {req.status || 'pending'}
-          </div>
-        </div>
+        <div className='requestItemBackground' style={headerMode ? {} : { background: `linear-gradient(135deg, ${color} 0%, transparent 100%)`}} />
+        <div className='requestItemCorner' style={{ background: color }} />
         <div className='requestItemTitle'>
           <div className='requestItemIcon'>
             <RingIcon 
               color={color}
-              svgLookup={svgLookup}
+              svgName={svgName}
               img={img}
             />
           </div>
@@ -108,6 +116,18 @@ class _RequestItem extends React.Component {
             </div>
           )}
         </div>
+        <div className={requestItemDetailsClass}>
+          <div className='requestItemDetailsSlide'>
+            <div className='requestItemDetailsIndicator' />
+            <span>{status}</span>
+            <div className='requestItemDetailsIndicator' />
+          </div>
+        </div>
+        {children && (
+          <div className='requestItemSummary'>
+            {children}
+          </div>
+        )}
       </div>
     )
   }

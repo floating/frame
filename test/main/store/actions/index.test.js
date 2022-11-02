@@ -94,12 +94,6 @@ describe('#addNetwork', () => {
     expect(networks.ethereum['137'].symbol).toBe('MATIC')
   })
 
-  it('adds a network with the correct layer', () => {
-    addNetwork(polygonNetwork)
-
-    expect(networks.ethereum['137'].layer).toBe('sidechain')
-  })
-
   it('adds a network with the correct explorer', () => {
     addNetwork(polygonNetwork)
 
@@ -180,6 +174,13 @@ describe('#addNetwork', () => {
 
     expect(networksMeta.ethereum['137']).toEqual({
       blockHeight: 0,
+      name: 'Polygon',
+      nativeCurrency: {
+        symbol: 'MATIC',
+        name: '',
+        icon: '',
+        decimals: 18
+      },
       gas: {
         price: {
           selected: 'standard',
@@ -589,8 +590,7 @@ describe('#removeOrigin', () => {
   let origins
 
   const updaterFn = (node, update) => {
-    expect(node).toBe('main.origins')
-    origins = update(origins)
+    if (node === 'main.origins') origins = update(origins)
   }
 
   const removeOrigin = (originId) => removeOriginAction(updaterFn, originId)
@@ -949,9 +949,9 @@ describe('#activateNetwork', () => {
 describe('#setBlockHeight', () => {
   let main
 
-  const updaterFn = (node, chainId, update) => {
+  const updaterFn = (node, update) => {
     expect(node).toBe('main.networksMeta.ethereum')
-    main.networksMeta.ethereum[chainId] = update(main.networksMeta.ethereum[chainId])
+    main.networksMeta.ethereum = update(main.networksMeta.ethereum)
   }
 
   beforeEach(() => {

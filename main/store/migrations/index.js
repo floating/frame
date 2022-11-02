@@ -407,6 +407,160 @@ const migrations = {
     })
 
     return initial
+  },
+  21: initial => {
+    // add sepolia network information
+    if (!initial.main.networks.ethereum[11155111]) {
+      initial.main.networks.ethereum[11155111] = {
+        id: 11155111,
+        type: 'ethereum',
+        layer: 'testnet',
+        symbol: 'ETH',
+        name: 'Sepolia',
+        explorer: 'https://sepolia.etherscan.io',
+        gas: {
+          price: {
+            selected: 'standard',
+            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+          }
+        },
+        connection: {
+          primary: { on: true, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
+          secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
+        },
+        on: false
+      }
+    }
+
+    if (!initial.main.networksMeta.ethereum[11155111]) {
+      initial.main.networksMeta.ethereum[11155111] = {
+        gas: {
+          fees: {},
+          price: {
+            selected: 'standard',
+            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+          }
+        }
+      }
+    }
+    
+    // we removed support for the following goerli RPCs so reset the connections 
+    // to defaults when the user was previously connecting to them
+    const removedGoerliRPCs = ['mudit', 'slockit', 'prylabs']
+    const goerli = initial.main.networks.ethereum[5]
+    const goerliPrimaryConnection = goerli.connection.primary.current
+    const goerliSecondaryConnection = goerli.connection.secondary.current
+    
+    if (removedGoerliRPCs.includes(goerliPrimaryConnection)) {
+      initial.main.networks.ethereum[5] = {
+        ...goerli,
+        connection: {
+          ...goerli.connection,
+          primary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
+        }
+      }
+    }
+    if (removedGoerliRPCs.includes(goerliSecondaryConnection)) {
+      initial.main.networks.ethereum[5] = {
+        ...goerli,
+        connection: {
+          ...goerli.connection,
+          secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
+        }
+      }
+    }
+
+    // if neither primary nor secondary is enabled then we switch the overall connection off
+    initial.main.networks.ethereum[5].connection.on = goerli.connection.primary.on || goerli.connection.secondary.on
+
+    return initial
+  },
+  22: (initial) => {
+    // set "isTestnet" flag on all chains based on layer value
+    Object.values(initial.main.networks.ethereum).forEach(chain => {
+      chain.isTestnet = chain.layer === 'testnet'
+    })
+
+    return initial
+  },
+  23: (initial) => {
+    // set icon and primaryColor values on all chains
+    Object.entries(initial.main.networksMeta.ethereum).forEach(([id, chain]) => {
+      if (id === '1') {
+        chain.icon = ''
+        chain.primaryColor = 'accent1' // Main
+      } else if (id === '10') {
+        chain.icon = 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/optimism.svg'
+        chain.primaryColor = 'accent4' // Optimism
+      } else if (id === '100') {
+        chain.icon = 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/gnosis.svg'
+        chain.primaryColor = 'accent5' // Gnosis
+      } else if (id === '137') {
+        chain.icon = 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/polygon.svg'
+        chain.primaryColor = 'accent6' // Polygon
+      } else if (id === '42161') {
+        chain.icon = 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/arbitrum.svg'
+        chain.primaryColor = 'accent7' // Arbitrum
+      } else if (['3', '4', '5', '42', '11155111'].includes(id)) {
+        chain.icon = ''
+        chain.primaryColor = 'accent2' // Testnets
+      } else {
+        chain.icon = ''
+        chain.primaryColor = 'accent3' // Default
+      }   
+    })
+
+    return initial
+  },
+  24: (initial) => {
+    // set default nativeCurrency where it doesn't exist
+    Object.values(initial.main.networksMeta.ethereum).forEach((chain) => {
+      if (!chain.nativeCurrency) {
+        chain.nativeCurrency = { usd: { price: 0, change24hr: 0 }, icon: '', name: '', symbol: '', decimals: 0 }
+      }
+    })
+
+    return initial
+  },
+  25: (initial) => {
+    const optimism = initial.main.networks.ethereum[10]
+    const removeOptimismConnection = (connection) => ({
+      ...connection,
+      current: connection.current === 'optimism' ? 'infura' : connection.current
+    })
+
+    initial.main.networks.ethereum[10] = {
+      ...optimism,
+      connection: {
+        primary: removeOptimismConnection(optimism.connection.primary),
+        secondary: removeOptimismConnection(optimism.connection.secondary)
+      }
+    }
+    return initial
+  },
+  26: (initial) => {
+    Object.values(initial.main.networks.ethereum).forEach((network) => {
+      const {symbol, id} = network
+      initial.main.networksMeta.ethereum[id].nativeCurrency.symbol = initial.main.networksMeta.ethereum[id].nativeCurrency.symbol || symbol
+      delete network.symbol
+    })
+
+    return initial
+  },
+  27: (initial) => {
+    // change any accounts with the old names of "seed signer" or "ring signer" to "hot signer"
+
+    const accounts = Object.entries(initial.main.accounts).map(([id, account]) => {
+      const name = ['ring account', 'seed account'].includes((account.name || '').toLowerCase())
+        ? 'Hot Account'
+        : account.name
+
+      return [id, { ...account, name }]
+    })
+
+    initial.main.accounts = Object.fromEntries(accounts)
+
+    return initial
   }
 }
 

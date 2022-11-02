@@ -84,12 +84,6 @@ describe('#updateOrigin', () => {
       expect(payload.chainId).toBe('0x1')
     })
 
-    it('does not assign a session to an unknown origin', () => {
-      const { hasSession } = updateOrigin({}, 'Unknown')
-
-      expect(hasSession).toBe(false)
-    })
-
     it('adds the configured chain for an existing origin to the payload', () => {
       store.set('main.origins', uuidv5('frame.test', uuidv5.DNS), { chain: { id: 137 } })
 

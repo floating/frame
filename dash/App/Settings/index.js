@@ -231,7 +231,46 @@ class Settings extends React.Component {
               {'Mouse to display\'s right edge to summon Frame'}
             </div>
           </div>
-          <div className='signerPermission localSetting' style={{ zIndex: 210 }}>
+          {/* <div className='signerPermission localSetting' style={{ zIndex: 6 }}>
+            <div className='signerPermissionControls'>
+              <div className='signerPermissionSetting'>Show USD Value</div>
+              <div className={this.store('main.showUSDValue') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onClick={_ => link.send('tray:action', 'toggleUSDValue')}>
+                <div className='signerPermissionToggleSwitch' />
+              </div>
+            </div>
+            <div className='signerPermissionDetails'>
+              Show USD value of Ether and token balances
+            </div>
+          </div> */}
+          {this.store('platform') === 'darwin' ? (
+            <div className='signerPermission localSetting' style={{ zIndex: 210 }}>
+              <div className='signerPermissionControls'>
+                <div className='signerPermissionSetting'>Display Gas in Menubar</div>
+                <div className={this.store('main.menubarGasPrice') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onClick={_ => link.send('tray:action', 'setMenubarGasPrice', !this.store('main.menubarGasPrice'))}>
+                  <div className='signerPermissionToggleSwitch' />
+                </div>
+              </div>
+              <div className='signerPermissionDetails'>
+                Show current gas price (Gwei) in menubar
+              </div>
+            </div>
+          ) : null}
+
+          <div className='signerPermission localSetting' style={{ zIndex: 209 }}>
+            <div className='signerPermissionControls'>
+              <div className='signerPermissionSetting'>Error Reporting</div>
+              <div className={this.store('main.privacy.errorReporting') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onClick={_ => link.send('tray:action', 'setErrorReporting', !this.store('main.privacy.errorReporting'))}>
+                <div className='signerPermissionToggleSwitch' />
+              </div>
+            </div>
+            <div className='signerPermissionDetails'>
+              <span>
+                Help improve Frame by anonymously reporting errors
+              </span>
+            </div>
+          </div>
+
+          <div className='signerPermission localSetting' style={{ zIndex: 208 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Adjustable Nonce</div>
               <div
@@ -249,46 +288,25 @@ class Settings extends React.Component {
               {'Adds the ability to edit a transaction\'s nonce'}
             </div>
           </div>
-          {/* <div className='signerPermission localSetting' style={{ zIndex: 6 }}>
-            <div className='signerPermissionControls'>
-              <div className='signerPermissionSetting'>Show USD Value</div>
-              <div className={this.store('main.showUSDValue') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onClick={_ => link.send('tray:action', 'toggleUSDValue')}>
-                <div className='signerPermissionToggleSwitch' />
-              </div>
-            </div>
-            <div className='signerPermissionDetails'>
-              Show USD value of Ether and token balances
-            </div>
-          </div> */}
-          {this.store('platform') === 'darwin' ? (
-            <div className='signerPermission localSetting' style={{ zIndex: 209 }}>
-              <div className='signerPermissionControls'>
-                <div className='signerPermissionSetting'>Display Gas in Menubar</div>
-                <div className={this.store('main.menubarGasPrice') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onClick={_ => link.send('tray:action', 'setMenubarGasPrice', !this.store('main.menubarGasPrice'))}>
-                  <div className='signerPermissionToggleSwitch' />
-                </div>
-              </div>
-              <div className='signerPermissionDetails'>
-                Show current gas price (Gwei) in menubar
-              </div>
-            </div>
-          ) : null}
 
-          <div className='signerPermission localSetting' style={{ zIndex: 198 }}>
+          <div className='signerPermission localSetting' style={{ zIndex: 207 }}>
             <div className='signerPermissionControls'>
-              <div className='signerPermissionSetting'>Error Reporting</div>
-              <div className={this.store('main.privacy.errorReporting') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onClick={_ => link.send('tray:action', 'setErrorReporting', !this.store('main.privacy.errorReporting'))}>
+              <div className='signerPermissionSetting'>Show Account Name with ENS</div>
+              <div
+                className={this.store('main.showLocalNameWithENS') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} 
+                onClick={() => {
+                  link.send('tray:action', 'toggleShowLocalNameWithENS')
+                }}
+              >
                 <div className='signerPermissionToggleSwitch' />
               </div>
             </div>
             <div className='signerPermissionDetails'>
-              <span>
-                Help improve Frame by anonymously reporting errors
-              </span>
+              {'Show local account name when ENS is resolved'}
             </div>
           </div>
-
-          <div className='signerPermission localSetting' style={{ zIndex: 208 }}>
+          
+          <div className='signerPermission localSetting' style={{ zIndex: 206 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Colorway</div>
               <Dropdown
@@ -304,7 +322,7 @@ class Settings extends React.Component {
             </div>
           </div>
 
-          <div className='signerPermission localSetting' style={{ zIndex: 207 }}>
+          <div className='signerPermission localSetting' style={{ zIndex: 205 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Trezor Derivation</div>
               <Dropdown
@@ -317,7 +335,7 @@ class Settings extends React.Component {
               {'Derivation path for connected Trezor devices'}
             </div>
           </div>
-          <div className='signerPermission localSetting' style={{ zIndex: 206 }}>
+          <div className='signerPermission localSetting' style={{ zIndex: 204 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Ledger Derivation</div>
               <Dropdown
@@ -331,7 +349,7 @@ class Settings extends React.Component {
             </div>
           </div>
           {this.store('main.ledger.derivation') === 'live' ? (
-            <div className='signerPermission localSetting' style={{ zIndex: 205 }}>
+            <div className='signerPermission localSetting' style={{ zIndex: 203 }}>
               <div className='signerPermissionControls'>
                 <div className='signerPermissionSetting'>Ledger Live Accounts</div>
                 <Dropdown
@@ -350,7 +368,7 @@ class Settings extends React.Component {
               </div>
             </div>
           ) : null}
-          <div className='signerPermission localSetting' style={{ zIndex: 204 }}>
+          <div className='signerPermission localSetting' style={{ zIndex: 202 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Lattice Derivation</div>
               <Dropdown
@@ -363,7 +381,7 @@ class Settings extends React.Component {
               {'Derivation path for connected Lattice devices'}
             </div>
           </div>
-          <div className='signerPermission localSetting' style={{ zIndex: 203 }}>
+          <div className='signerPermission localSetting' style={{ zIndex: 201 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Lattice Accounts</div>
               <Dropdown
@@ -381,7 +399,7 @@ class Settings extends React.Component {
               The number of lattice accounts to derive
             </div>
           </div>
-          <div className='signerPermission localSetting' style={{ zIndex: 202 }}>
+          <div className='signerPermission localSetting' style={{ zIndex: 200 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Lattice Relay</div>
               <Dropdown
@@ -398,7 +416,7 @@ class Settings extends React.Component {
             </div>
           </div>
 
-          <div className='signerPermission localSetting' style={{ zIndex: 200 }}>
+          <div className='signerPermission localSetting' style={{ zIndex: 199 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Lock Hot Signers on</div>
               <Dropdown

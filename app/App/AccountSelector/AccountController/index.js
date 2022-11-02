@@ -30,13 +30,13 @@ class Account extends React.Component {
   }
   
   onScroll () {
-    this.setState({ addressHover: false }) 
+    this.setState({ addressHover: false, copied: false }) 
   }
 
   copyAddress () {
     link.send('tray:clipboardData', getAddress(this.props.id))
     this.setState({ copied: true })
-    setTimeout(_ => this.setState({ copied: false }), 1800)
+    setTimeout(() => this.setState({ copied: false }), 1800)
   }
 
   unlockChange (e) {
@@ -206,19 +206,109 @@ class Account extends React.Component {
     const ensName = this.store('main.accounts', this.props.id, 'ensName')
     if (ensName) {
       if (ensName.length <= 13) {
-        return 19
+        return 17
       } else {
-        let size = 19 - (ensName.length - 13)
+        let size = 17 - (ensName.length - 13)
         if (size < 8) size = 8
         return size
       }
     } else {
-      return 21
+      return 17
+    }
+  }
+
+  renderDetails () {
+    const { address, ensName, active } = this.store('main.accounts', this.props.id)
+    const formattedAddress = getAddress(address)
+
+    let requests = this.store('main.accounts', this.props.id, 'requests') || {}
+    requests = Object.keys(requests).filter(r => requests[r].mode === 'normal')
+
+    if (this.state.addressHover) {
+      return (
+        <div 
+          className='signerDetailsFullAddress'
+          onClick={(e) => {
+            e.stopPropagation()
+            e.preventDefault()
+            if (this.state.addressHover) this.copyAddress()
+          }}
+        >
+         {this.state.copied ? (
+          <div className='signerDetailsFullAddressCopied'>
+            {svg.copy(16)}
+            <span>{'Address Copied'}</span>
+          </div>
+         ) : (
+          <div className='signerDetailsFullAddressText'>
+            {formattedAddress}
+          </div>
+         )}
+        </div>
+      )
+    } else {
+      if (ensName && !this.store('main.showLocalNameWithENS')) {
+        return (
+          <div className='signerDetails'>
+            <div 
+              className='signerDetailsENSName'
+              onMouseOver={(e) => {
+                e.stopPropagation()
+                e.preventDefault()
+                this.setState({ addressHover: true })
+              }}
+              onMouseLeave={(e) => {
+                e.stopPropagation()
+                e.preventDefault()
+                this.setState({ addressHover: false, copied: false })
+              }}
+              style={{ fontSize: this.getAddressSize() + 'px' }}
+            >{ensName}</div>
+          </div>
+        )
+      } else {
+        return (
+          <div className='signerDetails'>
+            <div className='signerDetailsName'>{this.props.name}</div>
+            <div 
+              className='signerDetailsAddress' 
+              onClick={(e) => {
+                e.stopPropagation()
+                e.preventDefault()
+                this.setState({ addressHover: true })
+              }}
+              onMouseOver={(e) => {
+                e.stopPropagation()
+                e.preventDefault()
+                this.addressTimeout = setTimeout(() => {
+                  this.setState({ addressHover: true })
+                }, 500)   
+              }}
+              onMouseLeave={(e) => {
+                e.stopPropagation()
+                e.preventDefault()
+                clearTimeout(this.addressTimeout)
+                this.setState({ addressHover: false, copied: false })
+              }}
+            >
+              {ensName ? (
+                <div className='signerDetailsAddressPart'>{ensName}</div>
+              ) : (
+                <>
+                  <div className='signerDetailsAddressPart'>{formattedAddress.substring(0, 5)}</div>
+                  <div className='signerDetailsAddressDivide'>{svg.ellipsis(16)}</div>
+                  <div className='signerDetailsAddressPart'>{formattedAddress.substr(formattedAddress.length - 3)}</div>
+                </>
+              )}
+            </div>
+          </div>
+        )
+      }
     }
   }
 
   renderStatus () {
-    const { address, ensName, active } = this.store('main.accounts', this.props.id)
+    const { address, ensName } = this.store('main.accounts', this.props.id)
     const formattedAddress = getAddress(address)
 
     let requests = this.store('main.accounts', this.props.id, 'requests') || {}
@@ -278,17 +368,6 @@ class Account extends React.Component {
             </div>
           </div>
         </div>
-        {(() => {
-          if (this.state.addressHover) return null
-          let requestBadgeClass = 'accountNotificationBadge'
-          if (active) requestBadgeClass += ' accountNotificationBadgeReady'
-          if (requests.length > 0) requestBadgeClass += ' accountNotificationBadgeActive'
-          return (
-            <div className={requestBadgeClass}>
-              <span>{requests.length}</span>
-            </div>
-          )
-        })()}
       </>
     )
   }
@@ -303,6 +382,8 @@ class Account extends React.Component {
     if (open) signerClass += ' openSigner'
     if (this.store('selected.view') === 'settings') signerClass += ' signerInSettings'
     if (this.store('selected.showAccounts')) signerClass += ' signerAccountExpand'
+
+    let signerTopClass = this.props.active ? 'signerTop signerTopActive' : 'signerTop'
 
     const style = {}
     const initial = this.store('selected.position.initial')
@@ -320,10 +401,10 @@ class Account extends React.Component {
       style.transform = open ? `translateY(${initial.top * -1}px)` : 'translateY(0px)'
     } else if (this.store('selected.current') !== '') {
       // Not currently selected, but another signer is
-      style.opacity = 0
       style.pointerEvents = 'none'
       style.transition = '300ms cubic-bezier(.82,0,.12,1) all'
       if (this.store('selected.open')) {
+        signerTopClass += ' signerTopNoHover'
         // Not open, but another signer is
         style.transform = this.props.index > this.store('selected.position.initial.index') ? 'translate(0px, 100px)' : 'translate(0px, -20px)'
         style.opacity = 0
@@ -359,13 +440,16 @@ class Account extends React.Component {
     //   style.height = style.height - data.aux.height
     // }
 
+    let requests = this.store('main.accounts', this.props.id, 'requests') || {}
+    requests = Object.keys(requests).filter(r => requests[r].mode === 'normal')
+
     return (
       <div 
         className='signerWrap' 
         style={current ? { height: initial.height + 'px' } : {}} 
         onMouseDown={() => this.closeAccounts()}
         onMouseLeave={() => {
-          this.setState({ addressHover: false })
+          this.setState({ addressHover: false, copied: false })
         }}
       >
         <div 
@@ -376,31 +460,46 @@ class Account extends React.Component {
           }
         }>
           <div 
-              className={this.props.active ? 'signerTop signerTopActive' : 'signerTop'} 
-              style={open ? { boxShadow: '0px 4px 8px rgba(0, 0, 0, 0)' } : {}}
-              // onMouseEnter={() => this.setState({ openHover: true })} 
-              // onMouseLeave={() => this.setState({ openHover: false })}
-            >
-              {!this.state.addressHover ? (
-                <>
-                  {this.renderSignerIndicator()}
-                  {this.renderType()}
-                  {/* <div className='accountGrabber' style={open ? { opacity: 0, pointerEvents: 'none' } : {}}>
-                    {svg.grab(35)}
-                  </div> */}
-                  <div className='signerSelect' onClick={this.typeClick.bind(this)}>
-                    <div className='signerSelectButton'>
-                      <div className='signerSelectIconWrap'>
-                        <div className='signerSelectIcon' style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}>
-                          {svg.chevron(26)}
-                        </div>
+            className={signerTopClass} 
+            style={open ? { boxShadow: '0px 4px 8px rgba(0, 0, 0, 0)' } : {}}
+            // onMouseEnter={() => this.setState({ openHover: true })} 
+            // onMouseLeave={() => this.setState({ openHover: false })}
+            onClick={() => {
+              if (!open) this.typeClick()
+            }}
+          >
+            {!this.state.addressHover ? (
+              <>
+                {this.renderSignerIndicator()}
+                {this.renderType()}
+                {/* <div className='accountGrabber' style={open ? { opacity: 0, pointerEvents: 'none' } : {}}>
+                  {svg.grab(35)}
+                </div> */}
+                {(() => {
+                  if (this.state.addressHover) return null
+                  let requestBadgeClass = 'accountNotificationBadge'
+                  if (this.props.active) requestBadgeClass += ' accountNotificationBadgeReady'
+                  if (requests.length > 0) requestBadgeClass += ' accountNotificationBadgeActive'
+                  return (
+                    <div className={requestBadgeClass}>
+                      <span>{requests.length}</span>
+                    </div>
+                  )
+                })()}
+                <div className='signerSelect' onClick={this.typeClick.bind(this)}>
+                  <div className='signerSelectButton'>
+                    <div className='signerSelectIconWrap'>
+                      <div className='signerSelectIcon' style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+                        {svg.chevron(26)}
                       </div>
                     </div>
                   </div>
-                </>
-              ) : null}
-              {this.renderStatus()}
-            </div>
+                </div>
+              </>
+            ) : null}
+            {/* {this.renderStatus()} */}
+            {this.renderDetails()}
+          </div>
         </div>
       </div>
     )

@@ -65,6 +65,7 @@ const initial = {
         'inventory',
         'permissions',
         // 'verify',
+        'signer',
         'settings'
       ],
       modules: {
@@ -94,10 +95,6 @@ const initial = {
         }
       }
     }
-  },
-  dash: { // Dash view
-    showing: false,
-    nav: []
   },
   flow: {},
   dapps: {},
@@ -157,17 +154,17 @@ const initial = {
   },
   platform: process.platform,
   main: {
-    _version: main('_version', 20),
+    _version: main('_version', 27),
     instanceId: main('instanceId', generateUuid()),
     colorway: main('colorway', 'dark'),
     colorwayPrimary: {
       dark: {
-        background: '#1c1c1b',
-        text: '#ecf1ff'
+        background: 'rgb(21, 17, 23)',
+        text: 'rgb(241, 241, 255)'
       },
       light: {
-        background: '#cdcde5',
-        text: '#1e3250'
+        background: 'rgb(224, 217, 233)',
+        text: 'rgb(20, 40, 60)'
       }
     },
     mute: {
@@ -188,6 +185,7 @@ const initial = {
     launch: main('launch', false),
     reveal: main('reveal', false),
     nonceAdjust: main('nonceAdjust', false),
+    showLocalNameWithENS: main('showLocalNameWithENS', false),
     autohide: main('autohide', false),
     accountCloseLock: main('accountCloseLock', false),
     hardwareDerivation: main('hardwareDerivation', 'mainnet'),
@@ -228,39 +226,38 @@ const initial = {
           local: 'direct'
         },
         1: {
-          alchemy: ['wss://eth-mainnet.ws.alchemyapi.io/v2/NBms1eV9i16RFHpFqQxod56OLdlucIq0', 'https://eth-mainnet.alchemyapi.io/v2/NBms1eV9i16RFHpFqQxod56OLdlucIq0'],
+          alchemy: 'alchemy',
           infura: 'infura'
         },
         3: {
+          alchemy: 'alchemyRopsten',
           infura: 'infuraRopsten'
         },
         4: {
+          alchemy: 'alchemyRinkeby',
           infura: 'infuraRinkeby'
         },
         5: {
-          infura: ['wss://goerli.infura.io/ws/v3/786ade30f36244469480aa5c2bf0743b', 'https://goerli.infura.io/ws/v3/786ade30f36244469480aa5c2bf0743b'],
-          mudit: 'https://rpc.goerli.mudit.blog',
-          slockit: 'https://rpc.slock.it/goerli',
-          prylabs: 'https://goerli.prylabs.net'
+          infura: 'infuraGoerli'
         },
         10: {
-          optimism: 'https://mainnet.optimism.io',
-          infura: 'https://optimism-mainnet.infura.io/v3/786ade30f36244469480aa5c2bf0743b'
+          infura: 'infuraOptimism'
         },
         42: {
+          alchemy: 'alchemyKovan',
           infura: 'infuraKovan'
         },
-        74: {
-          idchain: 'wss://idchain.one/ws/'
-        },
         100: {
-          poa: 'https://rpc.gnosischain.com/'
+          poa: 'gnosis'
         },
         137: {
-          infura: 'https://polygon-mainnet.infura.io/v3/786ade30f36244469480aa5c2bf0743b'
+          infura: 'infuraPolygon'
         },
         42161: {
-          infura: 'https://arbitrum-mainnet.infura.io/v3/786ade30f36244469480aa5c2bf0743b'
+          infura: 'infuraArbitrum'
+        },
+        11155111: {
+          infura: 'infuraSepolia'
         }
       }
     },
@@ -270,8 +267,8 @@ const initial = {
           id: 1,
           type: 'ethereum',
           layer: 'mainnet',
-          symbol: 'ETH',
           name: 'Mainnet',
+          isTestnet: false,
           explorer: 'https://etherscan.io',
           gas: {
             price: {
@@ -285,49 +282,11 @@ const initial = {
           },
           on: true
         },
-        3: {
-          id: 3,
-          type: 'ethereum',
-          layer: 'testnet',
-          symbol: 'ETH',
-          name: 'Ropsten',
-          explorer: 'https://ropsten.etherscan.io',
-          gas: {
-            price: {
-              selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-            }
-          },
-          connection: {
-            primary: { on: true, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
-            secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
-          },
-          on: false
-        },
-        4: {
-          id: 4,
-          type: 'ethereum',
-          layer: 'testnet',
-          symbol: 'ETH',
-          name: 'Rinkeby',
-          explorer: 'https://rinkeby.etherscan.io',
-          gas: {
-            price: {
-              selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-            }
-          },
-          connection: {
-            primary: { on: true, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
-            secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
-          },
-          on: false
-        },
         5: {
           id: 5,
           type: 'ethereum',
           layer: 'testnet',
-          symbol: 'ETH',
+          isTestnet: true,
           name: 'Görli',
           explorer: 'https://goerli.etherscan.io',
           gas: {
@@ -346,28 +305,9 @@ const initial = {
           id: 10,
           type: 'ethereum',
           layer: 'rollup',
-          symbol: 'ETH',
+          isTestnet: false,
           name: 'Optimism',
           explorer: 'https://optimistic.etherscan.io',
-          gas: {
-            price: {
-              selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-            }
-          },
-          connection: {
-            primary: { on: true, current: 'optimism', status: 'loading', connected: false, type: '', network: '', custom: '' },
-            secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
-          },
-          on: false
-        },
-        42: {
-          id: 42,
-          type: 'ethereum',
-          layer: 'testnet',
-          symbol: 'ETH',
-          name: 'Kovan',
-          explorer: 'https://kovan.etherscan.io',
           gas: {
             price: {
               selected: 'standard',
@@ -380,28 +320,11 @@ const initial = {
           },
           on: false
         },
-        // 74: {
-        //   id: 74,
-        //   type: 'ethereum',
-        //   symbol: 'EIDI',
-        //   name: 'IDChain',
-        //   explorer: 'https://explorer.idchain.one',
-        //   gas: {
-        //     price: {
-        //       selected: 'standard',
-        //       levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-        //     }
-        //   },
-        //   connection: {
-        //     primary: { on: true, current: 'idchain', status: 'loading', connected: false, type: '', network: '', custom: '' },
-        //     secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
-        //   }
-        // },
         100: {
           id: 100,
           type: 'ethereum',
           layer: 'sidechain',
-          symbol: 'xDAI',
+          isTestnet: false,
           name: 'Gnosis',
           explorer: 'https://blockscout.com/xdai/mainnet',
           gas: {
@@ -420,7 +343,7 @@ const initial = {
           id: 137,
           type: 'ethereum',
           layer: 'sidechain',
-          symbol: 'MATIC',
+          isTestnet: false,
           name: 'Polygon',
           explorer: 'https://polygonscan.com',
           gas: {
@@ -439,9 +362,28 @@ const initial = {
           id: 42161,
           type: 'ethereum',
           layer: 'rollup',
-          symbol: 'ETH',
+          isTestnet: false,
           name: 'Arbitrum',
           explorer: 'https://arbiscan.io',
+          gas: {
+            price: {
+              selected: 'standard',
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+            }
+          },
+          connection: {
+            primary: { on: true, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
+            secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
+          },
+          on: false
+        },
+        11155111: {
+          id: 11155111,
+          type: 'ethereum',
+          layer: 'testnet',
+          isTestnet: true,
+          name: 'Sepolia',
+          explorer: 'https://sepolia.etherscan.io',
           gas: {
             price: {
               selected: 'standard',
@@ -466,27 +408,20 @@ const initial = {
               selected: 'standard',
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
             }
-          }
-        },
-        3: {
-          blockHeight: 0,
-          gas: {
-            fees: {},
-            price: {
-              selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-            }
-          }
-        },
-        4: {
-          blockHeight: 0,
-          gas: {
-            fees: {},
-            price: {
-              selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-            }
-          }
+          },
+          nativeCurrency: {
+            symbol: 'ETH',
+            usd: {
+              price: 0,
+              change24hr: 0
+            },
+            icon: '',
+            name: '',
+            symbol: '',
+            decimals: 0
+          },
+          icon: '',
+          primaryColor: 'accent1' // Mainnet
         },
         5: {
           blockHeight: 0,
@@ -496,7 +431,20 @@ const initial = {
               selected: 'standard',
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
             }
-          }
+          },
+          nativeCurrency: {
+            symbol: 'ETH',
+            usd: {
+              price: 0,
+              change24hr: 0
+            },
+            icon: '',
+            name: '',
+            symbol: '',
+            decimals: 0
+          },
+          icon: '',
+          primaryColor: 'accent2' // Testnet
         },
         10: {
           blockHeight: 0,
@@ -506,17 +454,20 @@ const initial = {
               selected: 'standard',
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
             }
-          }
-        },
-        42: {
-          blockHeight: 0,
-          gas: {
-            fees: {},
-            price: {
-              selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-            }
-          }
+          },
+          nativeCurrency: {
+            symbol: 'ETH',
+            usd: {
+              price: 0,
+              change24hr: 0
+            },
+            icon: '',
+            name: '',
+            symbol: '',
+            decimals: 0
+          },
+          icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/optimism.svg',
+          primaryColor: 'accent4' // Optimism
         },
         100: {
           blockHeight: 0,
@@ -526,7 +477,20 @@ const initial = {
               selected: 'standard',
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
             }
-          }
+          },
+          nativeCurrency: {
+            symbol: 'xDAI',
+            usd: {
+              price: 0,
+              change24hr: 0
+            },
+            icon: '',
+            name: '',
+            symbol: '',
+            decimals: 0
+          },
+          icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/gnosis.svg',
+          primaryColor: 'accent5' // Gnosis
         },
         137: {
           blockHeight: 0,
@@ -536,7 +500,20 @@ const initial = {
               selected: 'standard',
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
             }
-          }
+          },
+          nativeCurrency: {
+            symbol: 'MATIC',
+            usd: {
+              price: 0,
+              change24hr: 0
+            },
+            icon: '',
+            name: '',
+            symbol: '',
+            decimals: 0
+          },
+          icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/polygon.svg',
+          primaryColor: 'accent6' // Polygon
         },
         42161: {
           blockHeight: 0,
@@ -546,7 +523,43 @@ const initial = {
               selected: 'standard',
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
             }
-          }
+          },
+          nativeCurrency: {
+            symbol: 'ETH',
+            usd: {
+              price: 0,
+              change24hr: 0
+            },
+            icon: '',
+            name: '',
+            symbol: '',
+            decimals: 0
+          },
+          icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/arbitrum.svg',
+          primaryColor: 'accent7' // Arbitrum
+        },
+        11155111: {
+          blockHeight: 0,
+          gas: {
+            fees: {},
+            price: {
+              selected: 'standard',
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+            }
+          },
+          nativeCurrency: {
+            symbol: 'ETH',
+            usd: {
+              price: 0,
+              change24hr: 0
+            },
+            icon: '',
+            name: '',
+            symbol: '',
+            decimals: 0
+          },
+          icon: '',
+          primaryColor: 'accent2' // Testnet
         }
       }
     }),

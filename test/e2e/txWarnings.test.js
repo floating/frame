@@ -22,7 +22,7 @@ test('Failing Transaction (Mainnet)', async () => {
     frame.close()
     return Boolean(e)
   }
-}, 30 * 1000)
+})
 
 // test('Failing Transaction (Goerli)', async done => {
 //   try {
@@ -41,4 +41,4 @@ test('Failing Transaction (Mainnet)', async () => {
 //     done()
 //   }
 //   frame.close()
-// }, 30 * 1000)
+// })

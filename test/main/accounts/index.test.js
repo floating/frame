@@ -2,12 +2,18 @@ import log from 'electron-log'
 import { addHexPrefix } from 'ethereumjs-util'
 import store from '../../../main/store'
 import provider from '../../../main/provider'
+import Accounts from '../../../main/accounts'
+import signers from '../../../main/signers'
+import { signerCompatibility, maxFee } from '../../../main/transaction'
 
-jest.mock('../../../main/provider', () => ({ send: jest.fn(), emit: jest.fn() }))
+import { GasFeesSource } from '../../../resources/domain/transaction'
+
+jest.mock('../../../main/provider', () => ({ send: jest.fn(), emit: jest.fn(), on: jest.fn() }))
 jest.mock('../../../main/signers', () => ({ get: jest.fn() }))
 jest.mock('../../../main/windows', () => ({ broadcast: jest.fn(), showTray: jest.fn() }))
 jest.mock('../../../main/windows/nav', () => ({ on: jest.fn(), forward: jest.fn() }))
 jest.mock('../../../main/externalData')
+jest.mock('../../../main/transaction')
 
 jest.mock('../../../main/store/persist')
 
@@ -28,6 +34,7 @@ const account = {
   tokens: {},
   created: '12819530:1626189153547'
 }
+
 const account2 = {
   id: '0xef8f1bbe054ad30c6af774ed7a7c70a74ef77ac5',
   name: 'Ledger Account',
@@ -41,27 +48,17 @@ const account2 = {
   created: '15315799:1660153882707',
 } 
 
-let Accounts, request
+let request
 
-beforeAll(async () => {
+beforeAll(() => {
   log.transports.console.level = false
-
-  jest.useFakeTimers()
-
-  store.updateAccount(account)
-  store.updateAccount(account2)
-
-  // need to import this after mocks are set up
-  Accounts = (await import('../../../main/accounts')).default
 })
 
 afterAll(() => {
   log.transports.console.level = 'debug'
-
-  jest.useRealTimers()
 })
 
-beforeEach(() => {
+beforeEach(done => {
   request = {
     handlerId: 1,
     type: 'transaction',
@@ -82,10 +79,10 @@ beforeEach(() => {
     }
   }
 
-  Accounts.setSigner(account.address, jest.fn())
-
-  provider.emit = jest.fn()
-  provider.send = jest.fn()
+  Accounts.add(account2.address, 'Test Account 2')
+  Accounts.add(account.address, 'Test Account 1', account, (err, account) => {
+    Accounts.setSigner(account.address, done)
+  })
 })
 
 afterEach(() => {
@@ -100,162 +97,154 @@ it('sets the account signer', () => {
   expect(Accounts.current().address).toBe('0x22dd63c3619818fdbc262c78baee43cb61e9cccf')
 })
 
+describe('#updatePendingFees', () => {
+  beforeEach(() => {
+    request.data.gasFeesSource = GasFeesSource.Frame
+
+    store.setGasFees('ethereum', parseInt(request.data.chainId), {
+      maxBaseFeePerGas: gweiToHex(9),
+      maxPriorityFeePerGas: gweiToHex(2)
+    })
+  })
+
+  it('updates the pending fees for a transaction', () => {
+    Accounts.addRequest(request)
+    Accounts.updatePendingFees(parseInt(request.data.chainId))
+
+    expect(request.data.maxFeePerGas).toBe(gweiToHex(11))
+    expect(request.data.maxPriorityFeePerGas).toBe(gweiToHex(2))
+  })
+
+  it('does not update a transaction with gas fees provided by a dapp', () => {
+    request.data.gasFeesSource = GasFeesSource.Dapp
+
+    Accounts.addRequest(request)
+    Accounts.updatePendingFees(parseInt(request.data.chainId))
+
+    expect(request.data.maxFeePerGas).toBe(gweiToHex(9))
+    expect(request.data.maxPriorityFeePerGas).toBe(gweiToHex(1))
+  })
+
+  it('does not update a transaction if gas fees have been updated by the user', () => {
+    request.feesUpdatedByUser = true
+
+    Accounts.addRequest(request)
+    Accounts.updatePendingFees(parseInt(request.data.chainId))
+
+    expect(request.data.maxFeePerGas).toBe(gweiToHex(9))
+    expect(request.data.maxPriorityFeePerGas).toBe(gweiToHex(1))
+  })
+})
+
 describe('#setBaseFee', () => {
   beforeEach(() => {
     Accounts.addRequest(request, jest.fn())
   })
 
-  const setBaseFee = (baseFee, cb, requestId = 1, userUpdate = false) => Accounts.setBaseFee(baseFee, requestId, userUpdate, cb)
+  const setBaseFee = (baseFee, requestId = 1, userUpdate = false) => Accounts.setBaseFee(baseFee, requestId, userUpdate)
 
-  it('does not set an undefined base fee', done => {
-    setBaseFee(undefined, err => {
-      expect(err.message).toBeTruthy()
-      done()
-    })
+  it('does not set an undefined base fee', () => {
+    expect(() => setBaseFee(undefined)).toThrowError()
   })
 
-  it('does not set an invalid base fee', done => {
-    setBaseFee('wrong', err => {
-      expect(err.message).toBeTruthy()
-      done()
-    })
+  it('does not set an invalid base fee', () => {
+    expect(() => setBaseFee('wrong')).toThrowError()
   })
 
-  it('does not set a negative base fee', done => {
-    setBaseFee('-0x12a05f200', err => {
-      expect(err.message).toBeTruthy()
-      done()
-    })
+  it('does not set a negative base fee', () => {
+    expect(() => setBaseFee('-0x12a05f200')).toThrowError()
   })
 
-  it('does not set a base fee if no account is active', done => {
-    Accounts.unsetSigner(jest.fn())
+  it('does not set a base fee for an inactive account', () => {
+    Accounts.setSigner(undefined, jest.fn())
 
-    setBaseFee('0x1dcd65000', err => {
-      expect(err.message).toBeTruthy()
-      done()
-    })
+    expect(() => setBaseFee('0x1dcd65000')).toThrowError(/no account selected/i)
   })
 
-  it('fails to find the request', done => {
-    setBaseFee('0x1dcd65000', err => {
-      expect(err.message).toBeTruthy()
-      done()
-    }, 2)
+  it('fails to find the request', () => {
+    expect(() => setBaseFee('0x1dcd65000', 2)).toThrowError(/could not find transaction/i)
   })
 
-  it('does not set a base fee on a non-transaction request', done => {
+  it('does not set a base fee on a non-transaction request', () => {
     request.type = 'message'
 
-    setBaseFee('0x1dcd65000', err => {
-      expect(err.message).toBeTruthy()
-      done()
-    })
+    expect(() => setBaseFee('0x1dcd65000')).toThrowError()
   })
 
-  it('does not set a base fee on a locked request', done => {
+  it('does not set a base fee on a locked request', () => {
     request.locked = true
 
-    setBaseFee('0x1dcd65000', err => {
-      expect(err.message).toBeTruthy()
-      expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(request.data.maxFeePerGas)
-      done()
-    })
+    expect(() => setBaseFee('0x1dcd65000')).toThrowError()
+    expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(request.data.maxFeePerGas)
   })
 
-  it('does not set a base fee on an automatic update if fees were manually set by the user', done => {
+  it('does not set a base fee on an automatic update if fees were manually set by the user', () => {
     request.feesUpdatedByUser = true
 
-    setBaseFee('0x1dcd65000', err => {
-      expect(err.message).toBeTruthy()
-      expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(request.data.maxFeePerGas)
-      done()
-    }, 1, false)
+    expect(() => setBaseFee('0x1dcd65000')).toThrowError()
+    expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(request.data.maxFeePerGas)
   })
 
-  it('applies automatic base fee update', done => {
+  it('applies automatic base fee update', () => {
     request.data.maxFeePerGas = gweiToHex(10)
     request.data.maxPriorityFeePerGas = gweiToHex(2)
 
     const updatedBaseFee = 6 // gwei
 
-    setBaseFee(gweiToHex(updatedBaseFee), err => {
-      try {
-        expect(err).toBeFalsy()
-        expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(weiToHex(2e9 + (updatedBaseFee * 1e9)))
-        done()
-      } catch (e) { done(e) }
-    })
+    setBaseFee(gweiToHex(updatedBaseFee))
+
+    expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(weiToHex(2e9 + (updatedBaseFee * 1e9)))
   })
 
-  it('applies user-initiated base fee update', done => {
+  it('applies user-initiated base fee update', () => {
     request.data.maxFeePerGas = gweiToHex(10)
     request.data.maxPriorityFeePerGas = gweiToHex(2)
 
-    setBaseFee(gweiToHex(6), err => {
-      try {
-        expect(err).toBeFalsy()
-        expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(gweiToHex(8))
-        done()
-      } catch (e) { done(e) }
-    }, 1, true)
+    setBaseFee(gweiToHex(6), 1, true)
+
+    expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(gweiToHex(8))
   })
 
-  it('does not update if the base fee has not changed', done => {
+  it('does not update if the base fee has not changed', () => {
     request.data.maxFeePerGas = gweiToHex(10)
     request.data.maxPriorityFeePerGas = gweiToHex(2)
 
-    setBaseFee(gweiToHex(8), err => {
-      try {
-        expect(err).toBeFalsy()
-        expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(gweiToHex(10))
-        done()
-      } catch (e) { done(e) }
-    })
+    setBaseFee(gweiToHex(8))
+
+    expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(gweiToHex(10))
   })
 
-  it('caps the base fee at 9999 gwei', done => {
+  it('caps the base fee at 9999 gwei', () => {
     const highBaseFee = gweiToHex(10200)
     const maxBaseFee = 9999e9
     const expectedMaxFee = weiToHex(maxBaseFee + parseInt(request.data.maxPriorityFeePerGas))
 
-    setBaseFee(highBaseFee, err => {
-      try {
-        expect(err).toBeFalsy()
-        expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(expectedMaxFee)
-        done()
-      } catch (e) { done(e) }
-    })
+    setBaseFee(highBaseFee)
+
+    expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(expectedMaxFee)
   })
 
-  it('does not exceed the max allowable fee', done => {
+  it('does not exceed the max allowable fee', () => {
     const maxTotal = 2e18 // 2 ETH
     const gasLimit = 1e7
-    const maxFee = maxTotal / gasLimit
-    const highBaseFee = weiToHex(maxFee + 10e9) // add 10 gwei to exceed the maximum limit
+    const maxTotalFee = maxTotal / gasLimit
+    const highBaseFee = weiToHex(maxTotalFee + 10e9) // add 10 gwei to exceed the maximum limit
 
     request.data.gasLimit = weiToHex(gasLimit)
+    maxFee.mockReturnValue(maxTotal)
 
-    setBaseFee(highBaseFee, err => {
-      try {
-        expect(err).toBeFalsy()
-        expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(weiToHex(maxFee))
-        done()
-      } catch (e) { done(e) }
-    })
+    setBaseFee(highBaseFee)
+
+    expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(weiToHex(maxTotalFee))
   })
 
-  it('updates the feesUpdatedByUser flag', done => {
+  it('updates the feesUpdatedByUser flag', () => {
     request.data.maxFeePerGas = gweiToHex(10)
     request.data.maxPriorityFeePerGas = gweiToHex(2)
 
-    setBaseFee(gweiToHex(10), err => {
-      try {
-        expect(err).toBeFalsy()
-        expect(Accounts.current().requests[1].feesUpdatedByUser).toBe(true)
-        done()
-      } catch (e) { done(e) }
-    }, 1, true)
+    setBaseFee(gweiToHex(10), 1, true)
+
+    expect(Accounts.current().requests[1].feesUpdatedByUser).toBe(true)
   })
 })
 
@@ -264,150 +253,107 @@ describe('#setPriorityFee', () => {
     Accounts.addRequest(request, jest.fn())
   })
 
-  const setPriorityFee = (fee, cb, requestId = 1, userUpdate = false) => Accounts.setPriorityFee(fee, requestId, userUpdate, cb)
+  const setPriorityFee = (fee, requestId = 1, userUpdate = false) => Accounts.setPriorityFee(fee, requestId, userUpdate)
 
-  it('does not set an undefined priority fee', done => {
-    setPriorityFee(undefined, err => {
-      expect(err.message).toBeTruthy()
-      done()
-    })
+  it('does not set an undefined priority fee', () => {
+    expect(() => setPriorityFee(undefined)).toThrowError()
   })
 
-  it('does not set an invalid priority fee', done => {
-    setPriorityFee('incorrect', err => {
-      expect(err.message).toBeTruthy()
-      done()
-    })
+  it('does not set an invalid priority fee', () => {
+    expect(() => setPriorityFee('incorrect')).toThrowError()
   })
 
-  it('does not set a negative priority fee', done => {
-    setPriorityFee('-0x12a05f200', err => {
-      expect(err.message).toBeTruthy()
-      done()
-    })
+  it('does not set a negative priority fee', () => {
+    expect(() => setPriorityFee('-0x12a05f200')).toThrowError()
   })
 
-  it('does not set a priority fee if no account is active', done => {
-    Accounts.unsetSigner(jest.fn())
+  it('does not set a priority fee if no account is active', () => {
+    Accounts.setSigner(undefined, jest.fn())
 
-    setPriorityFee('0x12a05f200', err => {
-      expect(err.message).toBeTruthy()
-      done()
-    })
+    expect(() => setPriorityFee('0x12a05f200')).toThrowError(/no account selected/i)
   })
 
-  it('fails to find the request', done => {
-    setPriorityFee('0x12a05f200', err => {
-      expect(err.message).toBeTruthy()
-      done()
-    }, 2)
+  it('fails to find the request', () => {
+    expect(() => setPriorityFee('0x12a05f200', 2)).toThrowError(/could not find transaction/i)
   })
 
-  it('does not set a priority fee on a non-transaction request', done => {
+  it('does not set a priority fee on a non-transaction request', () => {
     request.type = 'message'
 
-    setPriorityFee('0x12a05f200', err => {
-      expect(err.message).toBeTruthy()
-      done()
-    })
+    expect(() => setPriorityFee('0x12a05f200')).toThrowError()
   })
 
-  it('does not set a priority fee on a locked request', done => {
+  it('does not set a priority fee on a locked request', () => {
     request.locked = true
 
-    setPriorityFee('0x12a05f200', err => {
-      expect(err.message).toBeTruthy()
-      expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(request.data.maxFeePerGas)
-      done()
-    })
+    expect(() => setPriorityFee('0x12a05f200')).toThrowError()
+    expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(request.data.maxFeePerGas)
   })
 
-  it('does not set a priority fee on an automatic update if fees were manually set by the user', done => {
+  it('does not set a priority fee on an automatic update if fees were manually set by the user', () => {
     request.feesUpdatedByUser = true
 
-    setPriorityFee('0x12a05f200', err => {
-      expect(err.message).toBeTruthy()
-      expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(request.data.maxFeePerGas)
-      done()
-    }, 1, false)
+    expect(() => setPriorityFee('0x12a05f200')).toThrowError()
+    expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(request.data.maxFeePerGas)
   })
 
 
-  it('sets a valid priority fee', done => {
+  it('sets a valid priority fee', () => {
     const priorityFee = 2e9 // 2 gwei
     const priorityFeeChange = priorityFee - parseInt(request.data.maxPriorityFeePerGas)
     const expectedMaxFee = weiToHex(priorityFeeChange + parseInt(request.data.maxFeePerGas))
 
-    setPriorityFee(weiToHex(priorityFee), err => {
-      try {
-        expect(err).toBeFalsy()
-        expect(Accounts.current().requests[1].data.maxPriorityFeePerGas).toBe(weiToHex(priorityFee))
-        expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(expectedMaxFee)
-        done()
-      } catch (e) { done(e) }
-    })
+    setPriorityFee(weiToHex(priorityFee))
+
+    expect(Accounts.current().requests[1].data.maxPriorityFeePerGas).toBe(weiToHex(priorityFee))
+    expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(expectedMaxFee)
   })
 
-  it('does not update if the priority fee has not changed', done => {
+  it('does not update if the priority fee has not changed', () => {
     request.data.maxFeePerGas = gweiToHex(10)
     request.data.maxPriorityFeePerGas = gweiToHex(2)
 
-    setPriorityFee(gweiToHex(2), err => {
-      try {
-        expect(err).toBeFalsy()
-        expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(gweiToHex(10))
-        expect(Accounts.current().requests[1].data.maxPriorityFeePerGas).toBe(gweiToHex(2))
-        done()
-      } catch (e) { done(e) }
-    })
+    setPriorityFee(gweiToHex(2))
+
+    expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(gweiToHex(10))
+    expect(Accounts.current().requests[1].data.maxPriorityFeePerGas).toBe(gweiToHex(2))
   })
 
-  it('caps the priority fee at 9999 gwei', done => {
+  it('caps the priority fee at 9999 gwei', () => {
     const highPriorityFee = gweiToHex(10200)
     const maxPriorityFee = 9999e9
     const priorityFeeChange = maxPriorityFee - parseInt(request.data.maxPriorityFeePerGas)
     const expectedMaxFee = weiToHex(priorityFeeChange + parseInt(request.data.maxFeePerGas))
 
-    setPriorityFee(highPriorityFee, err => {
-      try {
-        expect(err).toBeFalsy()
-        expect(Accounts.current().requests[1].data.maxPriorityFeePerGas).toBe(weiToHex(maxPriorityFee))
-        expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(expectedMaxFee)
-        done()
-      } catch (e) { done(e) }
-    })
+    setPriorityFee(highPriorityFee)
+
+    expect(Accounts.current().requests[1].data.maxPriorityFeePerGas).toBe(weiToHex(maxPriorityFee))
+    expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(expectedMaxFee)
   })
 
-  it('does not exceed the max allowable fee', done => {
+  it('does not exceed the max allowable fee', () => {
     const maxTotal = 2e18 // 2 ETH
     const gasLimit = 1e7
-    const maxFee = maxTotal / gasLimit
+    const maxTotalFee = maxTotal / gasLimit
 
     request.data.gasLimit = weiToHex(gasLimit)
     request.data.maxFeePerGas = gweiToHex(190)
     request.data.maxPriorityFeePerGas = gweiToHex(40)
+    maxFee.mockReturnValue(maxTotal)
 
     const highPriorityFee = 60e9 // add 20 gwei to the above to exceed the maximum limit
-    const expectedPriorityFee = maxFee - (parseInt(request.data.maxFeePerGas) - parseInt(request.data.maxPriorityFeePerGas))
+    const expectedPriorityFee = maxTotalFee - (parseInt(request.data.maxFeePerGas) - parseInt(request.data.maxPriorityFeePerGas))
 
-    setPriorityFee(highPriorityFee, err => {
-      try {
-        expect(err).toBeFalsy()
-        expect(Accounts.current().requests[1].data.maxPriorityFeePerGas).toBe(weiToHex(expectedPriorityFee))
-        expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(weiToHex(maxFee))
-        done()
-      } catch (e) { done(e) }
-    })
+    setPriorityFee(highPriorityFee)
+
+    expect(Accounts.current().requests[1].data.maxPriorityFeePerGas).toBe(weiToHex(expectedPriorityFee))
+    expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(weiToHex(maxTotalFee))
   })
 
-  it('updates the feesUpdatedByUser flag', done => {
-    setPriorityFee('0x12a05f200', err => {
-      try {
-        expect(err).toBeFalsy()
-        expect(Accounts.current().requests[1].feesUpdatedByUser).toBe(true)
-        done()
-      } catch (e) { done(e) }
-    }, 1, true)
+  it('updates the feesUpdatedByUser flag', () => {
+    setPriorityFee('0x12a05f200', 1, true)
+
+    expect(Accounts.current().requests[1].feesUpdatedByUser).toBe(true)
   })
 })
 
@@ -417,136 +363,93 @@ describe('#setGasPrice', () => {
     request.data.type = '0x0'
   })
 
-  const setGasPrice = (price, cb, requestId = 1, userUpdate = false) => Accounts.setGasPrice(price, requestId, userUpdate, cb)
+  const setGasPrice = (price, requestId = 1, userUpdate = false) => Accounts.setGasPrice(price, requestId, userUpdate)
 
-  it('does not set an undefined gas price', done => {
-    setGasPrice(undefined, err => {
-      expect(err.message).toBeTruthy()
-      done()
-    })
+  it('does not set an undefined gas price', () => {
+    expect(() => setGasPrice(undefined)).toThrowError()
   })
 
-  it('does not set an invalid gas price', done => {
-    setGasPrice(Number.NaN, err => {
-      expect(err.message).toBeTruthy()
-      done()
-    })
+  it('does not set an invalid gas price', () => {
+    expect(() => setGasPrice(Number.NaN)).toThrowError()
   })
 
-  it('does not set a negative gas price', done => {
-    setGasPrice('-0x23', err => {
-      expect(err.message).toBeTruthy()
-      done()
-    })
+  it('does not set a negative gas price', () => {
+    expect(() => setGasPrice('-0x23')).toThrowError()
   })
 
-  it('does not set a gas price if no account is active', done => {
-    Accounts.unsetSigner(jest.fn())
+  it('does not set a gas price if no account is active', () => {
+    Accounts.setSigner(undefined, jest.fn())
 
-    setGasPrice('0x23', err => {
-      expect(err.message).toBeTruthy()
-      done()
-    })
+    expect(() => setGasPrice('0x23')).toThrowError(/no account selected/i)
   })
 
-  it('fails to find the request', done => {
-    setGasPrice('0x23', err => {
-      expect(err.message).toBeTruthy()
-      done()
-    }, 2)
+  it('fails to find the request', () => {
+    expect(() => setGasPrice('0x23', 2)).toThrowError(/could not find transaction/i)
   })
 
-  it('does not set a gas price on a non-transaction request', done => {
+  it('does not set a gas price on a non-transaction request', () => {
     request.type = 'message'
 
-    setGasPrice('0x23', err => {
-      expect(err.message).toBeTruthy()
-      done()
-    })
+    expect(() => setGasPrice('0x23')).toThrowError()
   })
 
-  it('does not set a gas price on a locked request', done => {
+  it('does not set a gas price on a locked request', () => {
     request.locked = true
 
-    setGasPrice('0x23', err => {
-      expect(err.message).toBeTruthy()
-      expect(Accounts.current().requests[1].data.gasPrice).toBe(request.data.gasPrice)
-      done()
-    })
+    expect(() => setGasPrice('0x23')).toThrowError()
+    expect(Accounts.current().requests[1].data.gasPrice).toBe(request.data.gasPrice)
   })
 
-  it('does not set a gas price on an automatic update if fees were manually set by the user', done => {
+  it('does not set a gas price on an automatic update if fees were manually set by the user', () => {
     request.feesUpdatedByUser = true
 
-    setGasPrice('0x23', err => {
-      expect(err.message).toBeTruthy()
-      expect(Accounts.current().requests[1].data.gasPrice).toBe(request.data.gasPrice)
-      done()
-    }, 1, false)
+    expect(() => setGasPrice('0x23')).toThrowError()
+    expect(Accounts.current().requests[1].data.gasPrice).toBe(request.data.gasPrice)
   })
 
-  it('sets a valid gas price', done => {
-    setGasPrice('0x23', err => {
-      try {
-        expect(err).toBeFalsy()
-        expect(Accounts.current().requests[1].data.gasPrice).toBe('0x23')
-        done()
-      } catch (e) { done(e) }
-    })
+  it('sets a valid gas price', () => {
+    setGasPrice('0x23')
+
+    expect(Accounts.current().requests[1].data.gasPrice).toBe('0x23')
   })
 
-  it('does not update if the gas price has not changed', done => {
+  it('does not update if the gas price has not changed', () => {
     request.data.gasPrice = gweiToHex(10)
 
-    setGasPrice(gweiToHex(10), err => {
-      try {
-        expect(err).toBeFalsy()
-        expect(Accounts.current().requests[1].data.gasPrice).toBe(gweiToHex(10))
-        done()
-      } catch (e) { done(e) }
-    })
+    setGasPrice(gweiToHex(10))
+
+    expect(Accounts.current().requests[1].data.gasPrice).toBe(gweiToHex(10))
   })
 
-  it('does not exceed the max gas price', done => {
+  it('does not exceed the max gas price', () => {
     const maxTotal = 2e18 // 2 ETH
     const gasLimit = 1e7
-    const maxFee = maxTotal / gasLimit
-    const highPrice = weiToHex(maxFee + 10e9) // 250 gwei
+    const maxTotalFee = maxTotal / gasLimit
+    const highPrice = weiToHex(maxTotalFee + 10e9) // 250 gwei
 
     request.data.gasLimit = weiToHex(gasLimit)
+    maxFee.mockReturnValue(maxTotal)
 
-    setGasPrice(highPrice, err => {
-      try {
-        expect(err).toBeFalsy()
-        expect(Accounts.current().requests[1].data.gasPrice).toBe(weiToHex(maxFee))
-        done()
-      } catch (e) { done(e) }
-    })
+    setGasPrice(highPrice)
+
+    expect(Accounts.current().requests[1].data.gasPrice).toBe(weiToHex(maxTotalFee))
   })
 
-  it('caps the gas price at 9999 gwei', done => {
+  it('caps the gas price at 9999 gwei', () => {
     const maxPrice = gweiToHex(9999)
     const highPrice = gweiToHex(10200)
 
-    setGasPrice(highPrice, err => {
-      try {
-        expect(err).toBeFalsy()
-        expect(Accounts.current().requests[1].data.gasPrice).toBe(maxPrice)
-        done()
-      } catch (e) { done(e) }
-    })
+    setGasPrice(highPrice)
+
+    expect(Accounts.current().requests[1].data.gasPrice).toBe(maxPrice)
   })
 
-  it('updates the feesUpdatedByUser flag', done => {
+  it('updates the feesUpdatedByUser flag', () => {
     request.data.gasPrice = gweiToHex(30)
     
-    setGasPrice(gweiToHex(45), err => {
-      try {
-        expect(err).toBeFalsy()
-        expect(Accounts.current().requests[1].feesUpdatedByUser).toBe(true)
-        done()
-      } catch (e) { done(e) }
-    }, 1, true)
+    setGasPrice(gweiToHex(45), 1, true)
+
+    expect(Accounts.current().requests[1].feesUpdatedByUser).toBe(true)
   })
 })
 
@@ -555,141 +458,99 @@ describe('#setGasLimit', () => {
     Accounts.addRequest(request, jest.fn())
   })
 
-  const setGasLimit = (limit, cb, requestId = 1, userUpdate = false) => Accounts.setGasLimit(limit, requestId, userUpdate, cb)
+  const setGasLimit = (limit, requestId = 1, userUpdate = false) => Accounts.setGasLimit(limit, requestId, userUpdate)
 
-  it('does not set an undefined gas limit', done => {
-    setGasLimit(undefined, err => {
-      expect(err.message).toBeTruthy()
-      done()
-    })
+  it('does not set an undefined gas limit', () => {
+    expect(() => setGasLimit(undefined)).toThrowError()
   })
 
-  it('does not set an invalid gas limit', done => {
-    setGasLimit(Number.NaN, err => {
-      expect(err.message).toBeTruthy()
-      done()
-    })
+  it('does not set an invalid gas limit', () => {
+    expect(() => setGasLimit(Number.NaN)).toThrowError()
   })
 
-  it('does not set a negative gas limit', done => {
-    setGasLimit('-0x61a8', err => {
-      expect(err.message).toBeTruthy()
-      done()
-    })
+  it('does not set a negative gas limit', () => {
+    expect(() => setGasLimit('-0x61a8')).toThrowError()
   })
 
-  it('does not set a gas limit if no account is active', done => {
-    Accounts.unsetSigner(jest.fn())
+  it('does not set a gas limit if no account is active', () => {
+    Accounts.setSigner(undefined, jest.fn())
 
-    setGasLimit('0x61a8', err => {
-      expect(err.message).toBeTruthy()
-      done()
-    })
+    expect(() => setGasLimit('0x61a8')).toThrowError(/no account selected/i)
   })
 
-  it('fails to find the request', done => {
-    setGasLimit('0x61a8', err => {
-      expect(err.message).toBeTruthy()
-      done()
-    }, 2)
+  it('fails to find the request', () => {
+    expect(() => setGasLimit('0x61a8', 2)).toThrowError(/could not find transaction/i)
   })
 
-  it('does not set a gas limit on a non-transaction request', done => {
+  it('does not set a gas limit on a non-transaction request', () => {
     request.type = 'message'
 
-    setGasLimit('0x61a8', err => {
-      expect(err.message).toBeTruthy()
-      done()
-    })
+    expect(() => setGasLimit('0x61a8')).toThrowError()
   })
 
-  it('does not set a gas limit on a locked request', done => {
+  it('does not set a gas limit on a locked request', () => {
     request.locked = true
 
-    setGasLimit('0x61a8', err => {
-      expect(err.message).toBeTruthy()
-      expect(Accounts.current().requests[1].data.gasLimit).toBe(request.data.gasLimit)
-      done()
-    })
+    expect(() => setGasLimit('0x61a8')).toThrowError()
+    expect(Accounts.current().requests[1].data.gasLimit).toBe(request.data.gasLimit)
   })
 
-  it('does not set a gas limit on an automatic update if fees were manually set by the user', done => {
+  it('does not set a gas limit on an automatic update if fees were manually set by the user', () => {
     request.feesUpdatedByUser = true
 
-    setGasLimit('0x61a8', err => {
-      expect(err.message).toBeTruthy()
-      expect(Accounts.current().requests[1].data.gasLimit).toBe(request.data.gasLimit)
-      done()
-    }, 1, false)
+    expect(() => setGasLimit('0x61a8')).toThrowError()
+    expect(Accounts.current().requests[1].data.gasLimit).toBe(request.data.gasLimit)
   })
 
-  it('sets a valid gas limit', done => {
-    setGasLimit('0x61a8', err => {
-      try {
-        expect(err).toBeFalsy()
-        expect(Accounts.current().requests[1].data.gasLimit).toBe('0x61a8')
-        done()
-      } catch (e) { done(e) }
-    })
+  it('sets a valid gas limit', () => {
+    setGasLimit('0x61a8')
+
+    expect(Accounts.current().requests[1].data.gasLimit).toBe('0x61a8')
   })
 
-  it('does not exceed the max fee for pre-EIP-1559 transactions', done => {
-    const maxFee = 2e18 // 2 ETH
+  it('does not exceed the max fee for pre-EIP-1559 transactions', () => {
+    const maxTotalFee = 2e18 // 2 ETH
     const gasPrice = 400e9 // 400 gwei
-    const maxLimit = maxFee / gasPrice
+    const maxLimit = maxTotalFee / gasPrice
     const gasLimit = weiToHex(maxLimit + 1e5) // add 10000 to exceed the maximum limit
 
     request.data.type = '0x0'
     request.data.gasPrice = weiToHex(gasPrice)
+    maxFee.mockReturnValue(maxTotalFee)
 
-    setGasLimit(gasLimit, err => {
-      try {
-        expect(err).toBeFalsy()
-        expect(Accounts.current().requests[1].data.gasLimit).toBe(weiToHex(maxLimit))
-        done()
-      } catch (e) { done(e) }
-    })
+    setGasLimit(gasLimit)
+
+    expect(Accounts.current().requests[1].data.gasLimit).toBe(weiToHex(maxLimit))
   })
 
-  it('does not exceed the max fee for post-EIP-1559 transactions', done => {
-    const maxFee = 2e18 // 2 ETH
+  it('does not exceed the max fee for post-EIP-1559 transactions', () => {
+    const maxTotalFee = 2e18 // 2 ETH
     const maxFeePerGas = 400e9 // 400 gwei
-    const maxLimit = maxFee / maxFeePerGas
+    const maxLimit = maxTotalFee / maxFeePerGas
     const gasLimit = weiToHex(maxLimit + 1e5) // add 10000 to exceed the maximum limit
 
     request.data.type = '0x2'
     request.data.maxFeePerGas = weiToHex(maxFeePerGas)
+    maxFee.mockReturnValue(maxTotalFee)
 
-    setGasLimit(gasLimit, err => {
-      try {
-        expect(err).toBeFalsy()
-        expect(Accounts.current().requests[1].data.gasLimit).toBe(weiToHex(maxLimit))
-        done()
-      } catch (e) { done(e) }
-    })
+    setGasLimit(gasLimit)
+
+    expect(Accounts.current().requests[1].data.gasLimit).toBe(weiToHex(maxLimit))
   })
 
-  it('caps the gas limit at 12.5e6', done => {
+  it('caps the gas limit at 12.5e6', () => {
     const maxLimit = weiToHex(12.5e6)
     const highLimit = weiToHex(13e6)
 
-    setGasLimit(highLimit, err => {
-      try {
-        expect(err).toBeFalsy()
-        expect(Accounts.current().requests[1].data.gasLimit).toBe(maxLimit)
-        done()
-      } catch (e) { done(e) }
-    })
+    setGasLimit(highLimit)
+
+    expect(Accounts.current().requests[1].data.gasLimit).toBe(maxLimit)
   })
 
-  it('updates the feesUpdatedByUser flag', done => {
-    setGasLimit('0x61a8', err => {
-      try {
-        expect(err).toBeFalsy()
-        expect(Accounts.current().requests[1].feesUpdatedByUser).toBe(true)
-        done()
-      } catch (e) { done(e) }
-    }, 1, true)
+  it('updates the feesUpdatedByUser flag', () => {
+    setGasLimit('0x61a8', 1, true)
+
+    expect(Accounts.current().requests[1].feesUpdatedByUser).toBe(true)
   })
 })
 
@@ -697,7 +558,7 @@ describe('#adjustNonce', () => {
   let onChainNonce
 
   beforeEach(() => {
-    provider.send.mockImplementation((payload, cb) => {
+    provider.send = jest.fn((payload, cb) => {
       expect(payload).toEqual(expect.objectContaining({
         id: 1,
         jsonrpc: '2.0',
@@ -841,5 +702,118 @@ describe('#removeRequests', () => {
     Accounts.removeRequests('4')
 
     expect(Accounts.removeRequest).not.toHaveBeenCalled()
+  })
+})
+
+describe('#signerCompatibility', () => {
+  let activeSigner
+
+  const lockedSeedSigner = {
+    id: '13',
+    type: 'seed',
+    addresses: [account.id],
+    status: 'locked'
+  }
+
+  beforeEach(() => {
+    store.navDash = jest.fn()
+
+    activeSigner = {
+      id: '12',
+      addresses: [account.id],
+      summary: jest.fn()
+    }
+
+    store.newSigner(lockedSeedSigner)
+
+    signers.get.mockImplementation((id) => {
+      if (id === activeSigner.id) return activeSigner
+      if (id === lockedSeedSigner.id) return lockedSeedSigner
+    })
+
+    Accounts.accounts[account.id].lastSignerType = 'seed'
+    Accounts.accounts[account.id].signer = activeSigner.id
+    Accounts.addRequest(request)
+  })
+
+  afterEach(() => {
+    store.removeSigner(activeSigner.id)
+    store.removeSigner(lockedSeedSigner.id)
+
+    Accounts.removeRequests([request.handlerId])
+  })
+
+  const signerTypes = ['trezor', 'ledger', 'lattice']
+  
+  signerTypes.forEach((signerType) => {
+    it(`should open the signer menu when a ${signerType} signer is not available`, () => {
+      const cb = jest.fn()
+
+      activeSigner.status = 'disconnected'
+      activeSigner.type = signerType
+      store.newSigner(activeSigner)
+
+      Accounts.accounts[account.id].signer = undefined
+      Accounts.accounts[account.id].lastSignerType = signerType
+
+      Accounts.signerCompatibility(request.handlerId, cb)
+
+      expect(cb).toHaveBeenCalledWith(new Error('Signer unavailable'))
+      expect(store.navDash).toHaveBeenCalledWith({
+        data: {
+          signer: activeSigner.id
+        },
+        view: 'expandedSigner'
+      })
+    })
+  })
+
+  it('should not open the signer menu if the current signer is ready', () => {
+    const cb = jest.fn()
+    const compatibility = { signer: activeSigner.id, tx: 'sometx', compatible: true }
+
+    activeSigner.status = 'ok'
+    signerCompatibility.mockReturnValue(compatibility)
+
+    Accounts.signerCompatibility(request.handlerId, cb)
+    
+    expect(store.navDash).not.toHaveBeenCalled()
+    expect(cb).toHaveBeenCalledWith(null, compatibility)
+  })
+
+  it('should open the signer panel for a signer that is not ready', () => {
+    const cb = jest.fn()
+
+    activeSigner.status = 'locked'
+
+    Accounts.signerCompatibility(request.handlerId, cb)
+    
+    expect(store.navDash).toHaveBeenCalledWith({
+      data: {
+        signer: activeSigner.id
+      },
+      view: 'expandedSigner'
+    })
+  })
+
+  it('should return an error when the signer is not ready', () => {
+    const cb = jest.fn()
+
+    activeSigner.status = 'locked'
+
+    Accounts.signerCompatibility(request.handlerId, cb)
+    
+    expect(cb).toHaveBeenCalledWith(new Error('Signer unavailable'))
+  })
+
+  it('should return an error when there is no signer', () => {
+    const cb = jest.fn()
+
+    Accounts.accounts[account.id].signer = undefined
+
+    Accounts.signerCompatibility(request.handlerId, cb)
+    
+    expect(store.navDash).not.toHaveBeenCalled()
+    expect(cb).toHaveBeenCalledWith(new Error('No signer'))
   })
 })

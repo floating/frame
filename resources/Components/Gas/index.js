@@ -119,9 +119,9 @@ class GasSummaryComponent extends Component {
       }
     ]
 
-    const layer = this.store('main.networks', type, id, 'layer')
+    const isTestnet = this.store('main.networks', type, id, 'isTestnet')
     const nativeCurrency = this.store('main.networksMeta', type, id, 'nativeCurrency')
-    const nativeUSD = BigNumber(nativeCurrency && nativeCurrency.usd && layer !== 'testnet' ? nativeCurrency.usd.price : 0)
+    const nativeUSD = BigNumber(nativeCurrency && nativeCurrency.usd && !isTestnet ? nativeCurrency.usd.price : 0)
 
     if (id === 10) {
       // Optimism specific calculations
@@ -161,7 +161,7 @@ class GasSummaryComponent extends Component {
   feeEstimatesUSD () {
     const { chainId, displayFeeMarket, gasPrice } = this.props
     const type = 'ethereum'
-    const currentSymbol = this.store('main.networks', type, chainId, 'symbol') || 'ETH'
+    const currentSymbol = this.store('main.networksMeta', type, chainId, 'nativeCurrency', 'symbol') || 'ETH'
     
     if (!displayFeeMarket) {
       return this.txEstimates(type, chainId, gasPrice, null, currentSymbol)
@@ -187,9 +187,9 @@ class GasSummaryComponent extends Component {
           <div className='sliceTileGasPriceUnit'>{'gwei'}</div>
         </div>
         <div className='sliceGasEstimateBlock'>
-          {this.feeEstimatesUSD().map((estimate) =>{
+          {this.feeEstimatesUSD().map((estimate, i) =>{
             return (
-              <div className='gasEstimate'>
+              <div className='gasEstimate' key={i}>
                 <div className='gasEstimateRange'>
                   <span className='gasEstimateSymbol'>{!estimate.low || estimate.low >= 0.01 ? `$` : '<$'}</span>
                   <span className='gasEstimateRangeLow'>{`${!estimate.low ? 0 : estimate.low < 0.01 ? 0.01 : estimate.low < 1 ? estimate.low.toFixed(2) : estimate.low}`}</span>

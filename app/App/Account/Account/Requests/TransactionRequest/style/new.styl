@@ -3,8 +3,8 @@
   border-radius 19px
   transform translateY(0px)
   cursor pointer
-  box-shadow 0px 4px 4px var(--ghostX)
   position relative
+  overflow hidden
 
   *
     pointer-events none
@@ -12,21 +12,14 @@
 ._txButton:hover
   // background var(--good)
   color var(--goodOver)
-  box-shadow 0px 6px 6px var(--ghostX)
+  box-shadow 0px 12px 12px var(--ghostZ)
   animation 5s shake ease-in-out infinite alternate
 
 ._txButton:hover::after
   content ''
   position absolute
-  top 4px
-  left 4px
-  right 4px
-  bottom 4px
+  inset 0
   background white
-  border-top-right-radius 15px
-  border-bottom-right-radius 15px
-  border-top-left-radius 6px
-  border-bottom-left-radius 6px
   background var(--good)
   z-index 3
 
@@ -36,25 +29,18 @@
 ._txButtonBad:hover::after
   content ''
   position absolute
-  top 4px
-  left 4px
-  right 4px
-  bottom 4px
+  inset 0
   background white
-  border-top-left-radius 15px
-  border-bottom-left-radius 15px
-  border-top-right-radius 6px
-  border-bottom-right-radius 6px
   color var(--badOver)
   background var(--bad)
   z-index 3
 
 ._txButton:active
   transform translateY(0px)
-  animation-name shake-little
-  animation-duration 2s
-  animation-timing-function: ease-in-out
-  animation-iteration-count: infinite
+  // animation-name shake-little
+  // animation-duration 2s
+  // animation-timing-function: ease-in-out
+  // animation-iteration-count: infinite
   box-shadow 0px 2px 2px var(--ghostX)
 
 @keyframes shake 
@@ -172,9 +158,25 @@
   0%, 100% 
     transform: translate(0, 0) rotate(0)  
 
-
 .txViewData
-  padding 32px 8px
+  margin 32px 8px
+  background var(--ghostA)
+  padding 32px 6px 64px 6px
+  border-radius 20px
+  border-bottom 2px solid var(--ghostZ)
+  box-shadow 0px 2px 4px var(--ghostX)
+
+  .txViewDataHeader
+    padding 0px 0px
+    margin-bottom 32px
+    font-family 'VCR'
+    text-transform uppercase
+    font-size 14px
+    text-align center
+    font-weight 400
+    letter-spacing 6px
+    margin-left 4px
+    opacity 1
 
 ._txModule
   position absolute
@@ -196,7 +198,7 @@
     display flex
     flex-direction row
     align-items stretch
-    font-weight 500
+    font-weight 300
     // overflow hidden
 
     ._txModuleSlice
@@ -207,7 +209,7 @@
       font-size 12px
       // border-right 1px solid var(--ghostA)
       padding 0px 6px
-      font-family FiraCode, monospace
+      font-family 'FiraCode'
 
 ._txBody
   width 100%
@@ -216,7 +218,7 @@
 
 ._txDescription
   width 100%
-  font-family 'Ubuntu'
+  font-family 'MainFont'
   font-size 16px
   font-weight 400
   cursor pointer
@@ -231,11 +233,19 @@
     align-items center
     flex-direction column
 
-    ._txDescriptionSummaryLine
-      padding-bottom 10px
+    ._txDescriptionSummaryTag
+      padding-top 4px
       display flex
       justify-content center
       align-items center
+      font-size 12px
+      font-weight 500
+      text-transform uppercase
+
+    ._txDescriptionSummaryHeadline
+      font-size 26px
+
+    ._txDescriptionSummaryMidline
       font-size 12px
 
   ._txDescriptionTag

@@ -1,15 +1,40 @@
+.accountViewScroll
+  position absolute 
+  top 0
+  bottom 0
+  left 0
+  right 0
+  padding-top 40px
+  overflow-y scroll
+  overflow-x hidden
+  border-radius 26px
+
 .inventoryWrapper
   background var(--ghostZ)
   margin 0px 6px 6px 6px
-  padding 0px 0px
-  border-radius 14px
+  padding 0px 3px 1px 3px
+  border-radius 20px
   overflow auto
+
+  .inventoryCollection:first-child
+    border-top-left-radius 17px
+    border-top-right-radius 17px
+
+  .inventoryCollection:last-child
+    border-bottom-left-radius 17px
+    border-bottom-right-radius 17px
+
+  .inventoryCollection:first-child:last-child
+    border-radius 17px
+
+.inventoryCollection:hover
+  background var(--ghostB)
 
 .inventoryCollection
   position relative
   border-radius 8px
   z-index 300
-  margin 5px
+  margin-top 3px
   background var(--ghostA)
 
   .inventoryCollectionTop
@@ -20,67 +45,11 @@
     padding 3px 9px 3px 12px
     font-size 14px
     cursor pointer
-    border-radius 8px
     height 42px
     font-weight 300
 
     *
       pointer-events none
-
-  .inventoryCollectionTop:hover
-    background var(--ghostB)
-
-  .inventoryCollectionImage
-    height 42px
-    width 42px
-    border-radius 4px
-    background var(--ghostA)
-    overflow hidden
-
-    img
-      height 42px
-      width 42px
-      object-fit cover
-
-  .inventoryCollectionItems
-    position absolute
-    top 189px
-    bottom 0
-    left 0
-    right 0
-    padding 8px 0px 5px 4px
-    display flex
-    flex-wrap wrap
-    align-content flex-start
-    overflow-y scroll
-
-    .inventoryCollectionItem
-      width 83px
-      height 83px
-      border 3px solid var(--ghostB)
-      background var(--ghostZ)
-      padding 0px 5px 5px 0px
-      border-radius 8px
-      padding 3px
-      box-sizing border-box
-
-      cursor pointer
-      *
-        pointer-events none
-
-      img
-        width 100%
-        height 100%
-        border-radius 4px
-        box-shadow 0px 2px 0px var(--ghostZ)
-        object-fit cover
-        transition 0.03s linear
-
-    .inventoryCollectionItem:hover
-      img
-        transform scale(1.1)
-        border-radius 5px
-        box-shadow 0px 3px 6px var(--ghostX)
 
   .inventoryCollectionLine
     position absolute
@@ -99,7 +68,7 @@
   .inventoryCollectionCount
     width 48px
     height 24px
-    background var(--ghostA)
+    background var(--ghostB)
     display flex
     justify-content center
     align-items center
@@ -116,7 +85,7 @@
 .inventoryNotFound
   font-size 10px
   text-transform uppercase
-  font-weight 600
+  font-weight 400
   letter-spacing 1px
   padding-left 1px
   display flex
@@ -124,18 +93,21 @@
   align-items center
   transition var(--standard)
   background var(--ghostA)
-  color var(--outerspace05)
-  margin 5px
+  color var(--outerspace04)
+  font-weight 400
+  margin-top 3px
   height 48px
-  border-radius 10px
+  border-radius 17px
   padding-top 2px
   box-sizing border-box
+  box-shadow 0px 4px 6px var(--ghostY)
+  border-bottom 2px solid var(--ghostZ)
 
 .inventoryPreviewTitle
   background var(--ghostB)
   box-shadow 0px 1px 4px var(--ghostA)
   position absolute
-  top 158px
+  top 267px
   left 3px
   right 3px
   height 30px
@@ -153,11 +125,11 @@
 
 .inventoryPreview
   position absolute
-  top 2px
+  top 33px
   left 3px
   right 3px
-  height 154px
-  background var(--ghostA)
+  height 130px
+  padding 50px
   z-index 3
   display flex
   justify-content center
@@ -200,3 +172,59 @@
 .moduleExpanded
   .inventoryCollectionItems
     position relative
+
+.inventoryDisplay
+  position absolute
+  top 0
+  right 0
+  bottom 0
+  left 0
+
+  .inventoryCollectionImage
+    height 42px
+    width 42px
+    border-radius 4px
+    background var(--ghostA)
+    overflow hidden
+
+    img
+      height 42px
+      width 42px
+      object-fit cover
+
+  .inventoryCollectionItems
+    position absolute
+    top 290px
+    bottom 0
+    left 0
+    right 0
+    padding 14px 0px 4px 4px
+    display flex
+    flex-wrap wrap
+    align-content flex-start
+    overflow-y scroll
+    border-bottom-left-radius 26px
+    border-bottom-right-radius 26px
+
+    .inventoryCollectionItem
+      width 94px
+      height 94px
+      border-radius 12px
+      padding 4px
+      box-sizing border-box
+      cursor pointer
+      *
+        pointer-events none
+
+      img
+        width 100%
+        height 100%
+        border-radius 16px
+        box-shadow 0px 2px 0px var(--ghostZ)
+        object-fit cover
+        transition 0.03s linear
+
+    .inventoryCollectionItem:hover
+      img
+        transform scale(1.1)
+        box-shadow 0px 3px 6px var(--ghostX)

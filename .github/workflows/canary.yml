@@ -19,6 +19,8 @@ jobs:
     - name: read version from package.json
       id: package-version
       uses: martinbeentjes/npm-get-version-action@master
+    - name: check for existing release
+      run: (gh release list --exclude-drafts | grep -e ".*v${{ steps.package-version.outputs.current-version }}" && exit 1) || exit 0
     - name: remove old draft releases
       run: gh release list | grep -e "Draft.*v${{ steps.package-version.outputs.current-version }}" | awk '{print $3}' | xargs -r gh release delete
     - name: create new draft release
@@ -59,7 +61,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
-          node-version: 16.13.2
+          node-version: 16.15.0
           cache: 'npm'
       - name: install Linux dev tools
         if: matrix.os == 'ubuntu-latest'
@@ -68,7 +70,7 @@ jobs:
           sudo apt install -y libudev-dev
       - name: create NPM config file
         run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_AUTH_TOKEN }}" > ./.npmrc
-      - run: npm run setup
+      - run: npm run setup:ci
       - run: npm run compile
       - run: npm run test:unit:main -- --testTimeout=500 --verbose
       - run: npm run bundle

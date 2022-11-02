@@ -4,21 +4,26 @@ import { shell, Notification } from 'electron'
 import { addHexPrefix, intToHex} from 'ethereumjs-util'
 import { v5 as uuidv5 } from 'uuid'
 
-import store from '../store'
-import ExternalDataScanner, { DataScanner } from '../externalData'
-import { getType as getSignerType } from '../signers/Signer'
-import FrameAccount from './Account'
-import { usesBaseFee, TransactionData } from '../../resources/domain/transaction'
-import { signerCompatibility, maxFee, SignerCompatibility } from '../transaction'
-import { weiIntToEthInt, hexToInt } from '../../resources/utils'
 import provider from '../provider'
-import { Chain } from '../chains'
+import store from '../store'
+import FrameAccount from './Account'
+import ExternalDataScanner, { DataScanner } from '../externalData'
+import Signer from '../signers/Signer'
+import { signerCompatibility as transactionCompatibility, maxFee, SignerCompatibility } from '../transaction'
+
+import { weiIntToEthInt, hexToInt } from '../../resources/utils'
 import { ApprovalType } from '../../resources/constants'
+import { accountPanelCrumb, signerPanelCrumb } from '../../resources/domain/nav'
+import { usesBaseFee, TransactionData, GasFeesSource } from '../../resources/domain/transaction'
+import { findUnavailableSigners, getSignerType, isSignerReady } from '../../resources/domain/signer'
+
 import {
   AccountRequest, AccessRequest,
   TransactionRequest, TransactionReceipt,
   ReplacementType, RequestStatus, RequestMode, TypedMessage
 } from './types'
+
+import type { Chain } from '../chains'
 
 function notify (title: string, body: string, action: (event: Electron.Event) => void) {
   const notification = new Notification({ title, body })
@@ -29,13 +34,16 @@ function notify (title: string, body: string, action: (event: Electron.Event) =>
 
 const frameOriginId = uuidv5('frame-internal', uuidv5.DNS)
 
-const accountsApi = {
+const storeApi = {
   getAccounts: function () {
     return (store('main.accounts') || {}) as Record<string, Account>
   },
   getAccount: function (id: string) {
     return (store('main.accounts', id) || {}) as Account
   },
+  getSigners: function () {
+    return Object.values((store('main.signers') || {}) as Record<string, Signer>)
+  }
 }
 
 export { RequestMode, AccountRequest, AccessRequest, TransactionRequest, SignTypedDataRequest, AddChainRequest, AddTokenRequest } from './types'
@@ -49,7 +57,7 @@ export class Accounts extends EventEmitter {
   constructor () {
     super()
 
-    this.accounts = Object.entries(accountsApi.getAccounts()).reduce((accounts, [id, account]) => {
+    this.accounts = Object.entries(storeApi.getAccounts()).reduce((accounts, [id, account]) => {
       accounts[id] = new FrameAccount(JSON.parse(JSON.stringify(account)), this)
 
       return accounts
@@ -70,7 +78,7 @@ export class Accounts extends EventEmitter {
 
   // Public
   addAragon (account: Account, cb: Callback<Account>) {
-    const existing = accountsApi.getAccount(account.address)
+    const existing = storeApi.getAccount(account.address)
     if (existing.id) return cb(null, existing) // Account already exists
 
     log.info('Aragon account not found, creating account')
@@ -86,14 +94,21 @@ export class Accounts extends EventEmitter {
     cb(null, this.accounts[account.address].summary())
   }
 
-  async add (address: Address, options = {}, cb: Callback<Account> = () => {}) {
+  async add (address: Address, name = '', options = {}, cb: Callback<FrameAccount> = () => {}) {
     if (!address) return cb(new Error('No address, will not add account'))
     address = address.toLowerCase()
-    const account = store('main.accounts', address)
-    if (account) return cb(null, account) // Account already exists...
-    log.info('Account not found, creating account')
-    const created = 'new:' + Date.now()
-    this.accounts[address] = new FrameAccount({ address, created, options, active: false }, this)
+
+    let account = store('main.accounts', address)
+    if (!account) {
+      log.info(`Account ${address} not found, creating account`)
+
+      const created = 'new:' + Date.now()
+
+      this.accounts[address] = new FrameAccount({ address, name, created, options, active: false }, this)
+      account = this.accounts[address]
+    }
+
+    return cb(null, account)
   }
 
   rename (id: string, name: string) {
@@ -154,18 +169,9 @@ export class Accounts extends EventEmitter {
       // Set the gas default to asap
       store.setGasDefault(targetChain.type, targetChain.id, 'asap', levels.asap)
 
-      const tx = {
-        id: 1,
-        jsonrpc: '2.0',
-        method: 'eth_sendTransaction',
-        chainId: addHexPrefix(targetChain.id.toString(16)),
-        params: [] as any[]
-      }
-
-      if (type === ReplacementType.Speed) {
-        tx.params = [data]
-      } else {
-        tx.params = [{
+      const params = type === ReplacementType.Speed
+        ? [data]
+        : [{
           from: currentAccount.getSelectedAddress(),
           to: currentAccount.getSelectedAddress(),
           value: '0x0',
@@ -173,6 +179,13 @@ export class Accounts extends EventEmitter {
           chainId: addHexPrefix(targetChain.id.toString(16)),
           _origin: currentAccount.requests[id].origin
         }]
+
+      const tx = {
+        id: 1,
+        jsonrpc: '2.0',
+        method: 'eth_sendTransaction',
+        chainId: addHexPrefix(targetChain.id.toString(16)),
+        params
       }
 
       this.sendRequest(tx, (res: RPCResponsePayload) => {
@@ -407,20 +420,28 @@ export class Accounts extends EventEmitter {
       const transactions = Object.entries(currentAccount.requests)
         .filter(([_, req]) => req.type === 'transaction')
         .map(([_, req]) => [_, req] as [string, TransactionRequest])
-        .filter(([_, req]) => !req.locked && !req.feesUpdatedByUser && (!chainId || parseInt(req.data.chainId, 16) === chainId))
+        .filter(([_, req]) => 
+          !req.locked &&
+          !req.feesUpdatedByUser &&
+          req.data.gasFeesSource === GasFeesSource.Frame &&
+          (!chainId || parseInt(req.data.chainId, 16) === chainId))
 
       transactions.forEach(([id, req]) => {
-        const tx = req.data
-        const chain = { type: 'ethereum', id: parseInt(tx.chainId, 16) }
-        const gas = store('main.networksMeta', chain.type, chain.id, 'gas')
+        try {
+          const tx = req.data
+          const chain = { type: 'ethereum', id: parseInt(tx.chainId, 16) }
+          const gas = store('main.networksMeta', chain.type, chain.id, 'gas')
 
-        if (usesBaseFee(tx)) {
-          const { maxBaseFeePerGas, maxPriorityFeePerGas } = gas.price.fees
-          this.setPriorityFee(maxPriorityFeePerGas, id, false, e => { if (e) log.error(e) })
-          this.setBaseFee(maxBaseFeePerGas, id, false, e => { if (e) log.error(e) })
-        } else {
-          const gasPrice = gas.price.levels.fast
-          this.setGasPrice(gasPrice, id, false, e => { if (e) log.error(e) })
+          if (usesBaseFee(tx)) {
+            const { maxBaseFeePerGas, maxPriorityFeePerGas } = gas.price.fees
+            this.setPriorityFee(maxPriorityFeePerGas, id, false)
+            this.setBaseFee(maxBaseFeePerGas, id, false)
+          } else {
+            const gasPrice = gas.price.levels.fast
+            this.setGasPrice(gasPrice, id, false)
+          }
+        } catch (e) {
+          log.error('Could not update gas fees for transaction', e)
         }
       })
     }
@@ -506,16 +527,50 @@ export class Accounts extends EventEmitter {
     const currentAccount = this.current()
     if (!currentAccount) return cb(new Error('Could not locate account'))
 
-    const request = currentAccount.requests[handlerId] && currentAccount.requests[handlerId].type === 'transaction'
+    const request = currentAccount.requests[handlerId]
     if (!request) return cb(new Error(`Could not locate request ${handlerId}`))
-
+    
     const signer = currentAccount.getSigner()
-    if (!signer) return cb(new Error('No signer'))
 
-    if (signer.status === 'locked') return cb(new Error('Signer locked'))
+    const signerUnavailable = (knownSigner?: Signer) => {
+      const crumb = knownSigner ? signerPanelCrumb(knownSigner) : accountPanelCrumb()
 
-    const data = this.getTransactionRequest(currentAccount, handlerId).data
-    cb(null, signerCompatibility(data, signer.summary()))
+      store.navDash(crumb)
+      return cb(new Error('Signer unavailable'))
+    }
+
+    const getCompatibility = () => {
+      if (request.type === 'transaction') {
+        const data = this.getTransactionRequest(currentAccount, handlerId).data
+        return transactionCompatibility(data, signer.summary())
+      }
+
+      // all requests besides transactions are always compatible
+      return { signer: signer.type, tx: '', compatible: true }
+    }
+
+    if (!signer) {
+      // if no signer is active, check if this account was previously relying on a
+      // hardware signer that is currently disconnected
+      const unavailableSigners = findUnavailableSigners(currentAccount.lastSignerType, storeApi.getSigners())
+
+      // if there is only one matching disconnected signer, open the signer panel so it can be unlocked
+      if (unavailableSigners.length === 1) return signerUnavailable(unavailableSigners[0])
+
+      // if there is more than one matching signer, open the account panel so the user can choose
+      if (unavailableSigners.length > 1) return signerUnavailable()
+  
+      // otherwise there are no signers that can be found
+      return cb(new Error('No signer'))
+    }
+
+    if (!isSignerReady(signer)) {
+      // if the signer is not ready to sign, open the signer panel so that
+      // the user can unlock it or reconnect
+      return signerUnavailable(signer)
+    }
+    
+    cb(null, getCompatibility())
   }
 
   close () {
@@ -576,7 +631,7 @@ export class Accounts extends EventEmitter {
     if (currentAccount && currentAccount.requests[handlerId]) {
       const txRequest = this.getTransactionRequest(currentAccount, handlerId)
 
-      txRequest.status = RequestStatus.Error
+      txRequest.status = RequestStatus.Declined
       txRequest.notice = 'Signature Declined'
       txRequest.mode = RequestMode.Monitor
 
@@ -743,7 +798,7 @@ export class Accounts extends EventEmitter {
     }
   }
 
-  private completeTxFeeUpdate (currentAccount: FrameAccount, handlerId: string, userUpdate: boolean, previousFee: any, cb: Callback<void>) {
+  private completeTxFeeUpdate (currentAccount: FrameAccount, handlerId: string, userUpdate: boolean, previousFee: any) {
     const txRequest = this.getTransactionRequest(currentAccount, handlerId)
 
     if (userUpdate) {
@@ -756,139 +811,121 @@ export class Accounts extends EventEmitter {
     }
 
     currentAccount.update()
-
-    cb(null)
   }
 
-  setBaseFee (baseFee: string, handlerId: string, userUpdate: boolean, cb: Callback<void>) {
-    try {
-      const { currentAccount, maxPriorityFeePerGas, gasLimit, currentBaseFee, txType } = this.txFeeUpdate(baseFee, handlerId, userUpdate)
-      
-      // New value
-      const newBaseFee = parseInt(this.limitedHexValue(baseFee, 0, 9999 * 1e9), 16)
+  setBaseFee (baseFee: string, handlerId: string, userUpdate: boolean) {
+    const { currentAccount, maxPriorityFeePerGas, gasLimit, currentBaseFee, txType } = this.txFeeUpdate(baseFee, handlerId, userUpdate)
 
-      // No change
-      if (newBaseFee === currentBaseFee) return cb(null)
+    // New value
+    const newBaseFee = parseInt(this.limitedHexValue(baseFee, 0, 9999 * 1e9), 16)
 
-      const txRequest = this.getTransactionRequest(currentAccount, handlerId)
-      const tx = txRequest.data
+    // No change
+    if (newBaseFee === currentBaseFee) return
 
-      // New max fee per gas
-      const newMaxFeePerGas = newBaseFee + maxPriorityFeePerGas
-      const maxTotalFee = maxFee(tx)
+    const txRequest = this.getTransactionRequest(currentAccount, handlerId)
+    const tx = txRequest.data
 
-      // Limit max fee
-      if (newMaxFeePerGas * gasLimit > maxTotalFee) {
-        tx.maxFeePerGas = intToHex(Math.floor(maxTotalFee / gasLimit))
-      } else {
-        tx.maxFeePerGas = intToHex(newMaxFeePerGas)
-      }
+    // New max fee per gas
+    const newMaxFeePerGas = newBaseFee + maxPriorityFeePerGas
+    const maxTotalFee = maxFee(tx)
 
-      // Complete update
-      const previousFee = { type: txType, baseFee: intToHex(currentBaseFee), priorityFee: intToHex(maxPriorityFeePerGas) }
-
-      this.completeTxFeeUpdate(currentAccount, handlerId, userUpdate, previousFee, cb)
-    } catch (e) {
-      cb(e as Error)
+    // Limit max fee
+    if (newMaxFeePerGas * gasLimit > maxTotalFee) {
+      tx.maxFeePerGas = intToHex(Math.floor(maxTotalFee / gasLimit))
+    } else {
+      tx.maxFeePerGas = intToHex(newMaxFeePerGas)
     }
+
+    // Complete update
+    const previousFee = { type: txType, baseFee: intToHex(currentBaseFee), priorityFee: intToHex(maxPriorityFeePerGas) }
+
+    this.completeTxFeeUpdate(currentAccount, handlerId, userUpdate, previousFee)
   }
 
-  setPriorityFee (priorityFee: string, handlerId: string, userUpdate: boolean, cb: Callback<void>) {
-    try {
-      const { currentAccount, maxPriorityFeePerGas, gasLimit, currentBaseFee, txType } = this.txFeeUpdate(priorityFee, handlerId, userUpdate)
-      
-      // New values
-      const newMaxPriorityFeePerGas = parseInt(this.limitedHexValue(priorityFee, 0, 9999 * 1e9), 16)
-
-      // No change
-      if (newMaxPriorityFeePerGas === maxPriorityFeePerGas) return cb(null)
-
-      const tx = this.getTransactionRequest(currentAccount, handlerId).data
-
-      // New max fee per gas
-      const newMaxFeePerGas = currentBaseFee + newMaxPriorityFeePerGas
-      const maxTotalFee = maxFee(tx)
+  setPriorityFee (priorityFee: string, handlerId: string, userUpdate: boolean) {
+    const { currentAccount, maxPriorityFeePerGas, gasLimit, currentBaseFee, txType } = this.txFeeUpdate(priorityFee, handlerId, userUpdate)
     
-      // Limit max fee
-      if (newMaxFeePerGas * gasLimit > maxTotalFee) {
-        const limitedMaxFeePerGas = Math.floor(maxTotalFee / gasLimit)
-        const limitedMaxPriorityFeePerGas = limitedMaxFeePerGas - currentBaseFee
-        tx.maxPriorityFeePerGas = intToHex(limitedMaxPriorityFeePerGas)
-        tx.maxFeePerGas = intToHex(limitedMaxFeePerGas)
-      } else {
-        tx.maxFeePerGas = intToHex(newMaxFeePerGas)
-        tx.maxPriorityFeePerGas = intToHex(newMaxPriorityFeePerGas)
-      }
+    // New values
+    const newMaxPriorityFeePerGas = parseInt(this.limitedHexValue(priorityFee, 0, 9999 * 1e9), 16)
+
+    // No change
+    if (newMaxPriorityFeePerGas === maxPriorityFeePerGas) return
+
+    const tx = this.getTransactionRequest(currentAccount, handlerId).data
+
+    // New max fee per gas
+    const newMaxFeePerGas = currentBaseFee + newMaxPriorityFeePerGas
+    const maxTotalFee = maxFee(tx)
+  
+    // Limit max fee
+    if (newMaxFeePerGas * gasLimit > maxTotalFee) {
+      const limitedMaxFeePerGas = Math.floor(maxTotalFee / gasLimit)
+      const limitedMaxPriorityFeePerGas = limitedMaxFeePerGas - currentBaseFee
+      tx.maxPriorityFeePerGas = intToHex(limitedMaxPriorityFeePerGas)
+      tx.maxFeePerGas = intToHex(limitedMaxFeePerGas)
+    } else {
+      tx.maxFeePerGas = intToHex(newMaxFeePerGas)
+      tx.maxPriorityFeePerGas = intToHex(newMaxPriorityFeePerGas)
+    }
+  
+    const previousFee = { 
+      type: txType, 
+      baseFee: intToHex(currentBaseFee),
+      priorityFee: intToHex(maxPriorityFeePerGas)
+    }
+
+    // Complete update
+    this.completeTxFeeUpdate(currentAccount, handlerId, userUpdate, previousFee)
+  }
+
+  setGasPrice (price: string, handlerId: string, userUpdate: boolean) {
+    const { currentAccount, gasLimit, gasPrice, txType } = this.txFeeUpdate(price, handlerId, userUpdate)
+
+    // New values
+    const newGasPrice = parseInt(this.limitedHexValue(price, 0, 9999 * 1e9), 16)
+
+    // No change
+    if (newGasPrice === gasPrice) return
+
+    const txRequest = this.getTransactionRequest(currentAccount, handlerId)
+    const tx = txRequest.data
+    const maxTotalFee = maxFee(tx)
+
+    // Limit max fee
+    if (newGasPrice * gasLimit > maxTotalFee) {
+      tx.gasPrice = intToHex(Math.floor(maxTotalFee / gasLimit))
+    } else {
+      tx.gasPrice = intToHex(newGasPrice)
+    }
+
+    const previousFee = {
+      type: txType, 
+      gasPrice: intToHex(gasPrice)
+    }
+
+    // Complete update
+    this.completeTxFeeUpdate(currentAccount, handlerId, userUpdate, previousFee)
+  }
+
+  setGasLimit (limit: string, handlerId: string, userUpdate: boolean) {
+    const { currentAccount, maxFeePerGas, gasPrice, txType } = this.txFeeUpdate(limit, handlerId, userUpdate)
     
-      const previousFee = { 
-        type: txType, 
-        baseFee: intToHex(currentBaseFee),
-        priorityFee: intToHex(maxPriorityFeePerGas)
-      }
+    // New values
+    const newGasLimit = parseInt(this.limitedHexValue(limit, 0, 12.5e6), 16)
 
-      // Complete update
-      this.completeTxFeeUpdate(currentAccount, handlerId, userUpdate, previousFee, cb)
-    } catch (e) {
-      cb(e as Error)
+    const txRequest = this.getTransactionRequest(currentAccount, handlerId)
+    const tx = txRequest.data
+    const maxTotalFee = maxFee(tx)
+
+    const fee = txType === '0x2' ? maxFeePerGas : gasPrice
+    if (newGasLimit * fee > maxTotalFee) {
+      tx.gasLimit = intToHex(Math.floor(maxTotalFee / fee))
+    } else {
+      tx.gasLimit = intToHex(newGasLimit)
     }
-  }
 
-  setGasPrice (price: string, handlerId: string, userUpdate: boolean, cb: Callback<void>) {
-    try {
-      const { currentAccount, gasLimit, gasPrice, txType } = this.txFeeUpdate(price, handlerId, userUpdate)
-
-      // New values
-      const newGasPrice = parseInt(this.limitedHexValue(price, 0, 9999 * 1e9), 16)
-
-      // No change
-      if (newGasPrice === gasPrice) return cb(null)
-
-      const txRequest = this.getTransactionRequest(currentAccount, handlerId)
-      const tx = txRequest.data
-      const maxTotalFee = maxFee(tx)
-
-      // Limit max fee
-      if (newGasPrice * gasLimit > maxTotalFee) {
-        tx.gasPrice = intToHex(Math.floor(maxTotalFee / gasLimit))
-      } else {
-        tx.gasPrice = intToHex(newGasPrice)
-      }
-
-      const previousFee = {
-        type: txType, 
-        gasPrice: intToHex(gasPrice)
-      }
-
-      // Complete update
-      this.completeTxFeeUpdate(currentAccount, handlerId, userUpdate, previousFee, cb)
-    } catch (e) {
-      cb(e as Error)
-    }
-  }
-
-  setGasLimit (limit: string, handlerId: string, userUpdate: boolean, cb: Callback<void>) {
-    try {
-      const { currentAccount, maxFeePerGas, gasPrice, txType } = this.txFeeUpdate(limit, handlerId, userUpdate)
-      
-      // New values
-      const newGasLimit = parseInt(this.limitedHexValue(limit, 0, 12.5e6), 16)
-
-      const txRequest = this.getTransactionRequest(currentAccount, handlerId)
-      const tx = txRequest.data
-      const maxTotalFee = maxFee(tx)
-
-      const fee = txType === '0x2' ? maxFeePerGas : gasPrice
-      if (newGasLimit * fee > maxTotalFee) {
-        tx.gasLimit = intToHex(Math.floor(maxTotalFee / fee))
-      } else {
-        tx.gasLimit = intToHex(newGasLimit)
-      }
-
-      // Complete update
-      this.completeTxFeeUpdate(currentAccount, handlerId, userUpdate, false, cb)
-    } catch (e) {
-      cb(e as Error)
-    }
+    // Complete update
+    this.completeTxFeeUpdate(currentAccount, handlerId, userUpdate, false)
   }
 
   removeFeeUpdateNotice (handlerId: string, cb: Callback<void>) {
@@ -912,13 +949,14 @@ export class Accounts extends EventEmitter {
 
     const txRequest = this.getTransactionRequest(currentAccount, handlerId)
 
-    // TODO: Figure out root casue for data object being frozen here
     txRequest.data = Object.assign({}, txRequest.data)
 
     if (txRequest && txRequest.type === 'transaction') {
       const nonce = txRequest.data && txRequest.data.nonce
       if (nonce) {
-        const adjustedNonce = intToHex(parseInt(nonce, 16) + nonceAdjust)
+        let updatedNonce = parseInt(nonce, 16) + nonceAdjust
+        if (updatedNonce < 0) updatedNonce = 0
+        const adjustedNonce = intToHex(updatedNonce)
 
         txRequest.data.nonce = adjustedNonce
         currentAccount.update()
@@ -927,8 +965,9 @@ export class Accounts extends EventEmitter {
         this.sendRequest({ method: 'eth_getTransactionCount', chainId, params: [from, 'pending'] }, (res: RPCResponsePayload) => {
           if (res.result) {
             const newNonce = parseInt(res.result, 16)
-            const adjustedNonce = intToHex(nonceAdjust === 1 ? newNonce : newNonce + nonceAdjust)
-
+            let updatedNonce = nonceAdjust === 1 ? newNonce : newNonce + nonceAdjust
+            if (updatedNonce < 0) updatedNonce = 0
+            const adjustedNonce = intToHex(updatedNonce)
             txRequest.data.nonce = adjustedNonce
             currentAccount.update()
           }

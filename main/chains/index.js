@@ -11,11 +11,13 @@ const { default: BlockMonitor } = require('./blocks')
 const { default: chainConfig } = require('./config')
 const { default: GasCalculator } = require('../transaction/gasCalculator')
 
-// these chain IDs are known to not support EIP-1559 and will be forced
+// These chain IDs are known to not support EIP-1559 and will be forced
 // not to use that mechanism
 // TODO: create a more general chain config that can use the block number
 // and ethereumjs/common to determine the state of various EIPs
-const legacyChains = [250, 4002]
+// Note that Arbitrum is in the list because it does not currently charge priority fees
+// https://support.arbitrum.io/hc/en-us/articles/4415963644955-How-the-fees-are-calculated-on-Arbitrum
+const legacyChains = [250, 4002, 42161]
 
 const resError = (error, payload, res) => res({ 
   id: payload.id, 
@@ -58,7 +60,7 @@ class ChainConnection extends EventEmitter {
   _createProvider (target, priority) {
     this.update(priority)
 
-    this[priority].provider = provider(target, { name: priority, infuraId: '786ade30f36244469480aa5c2bf0743b' })
+    this[priority].provider = provider(target, { name: priority, infuraId: '786ade30f36244469480aa5c2bf0743b', alchemyId: 'NBms1eV9i16RFHpFqQxod56OLdlucIq0' })
     this[priority].blockMonitor = this._createBlockMonitor(this[priority].provider, priority)
   }
 
@@ -285,7 +287,7 @@ class ChainConnection extends EventEmitter {
             this.secondary.status = 'chain mismatch'
             this.update('secondary')
           } else {
-            this.primary.status = status
+            this.secondary.status = status
             this.update('secondary')
           }
         })

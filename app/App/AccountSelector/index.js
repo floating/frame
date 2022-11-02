@@ -1,7 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import Restore from 'react-restore'
-import utils from 'web3-utils'
 
 import AccountController from './AccountController'
 
@@ -9,6 +8,12 @@ import svg from '../../../resources/svg'
 import link from '../../../resources/link'
 
 let firstScroll = true
+
+function filterMatches (text = '', fields) {
+  const filter = text.toLowerCase()
+
+  return fields.some(field => (field || '').toLowerCase().includes(filter))
+}
 
 class AccountSelector extends React.Component {
   constructor (...args) {
@@ -62,7 +67,7 @@ class AccountSelector extends React.Component {
     const open = this.store('selected.open')
     if (open) return null
     return (
-      <div className='panelFilter'>
+      <div className='panelFilterMain'>
         <div className='panelFilterIcon'>
           {svg.search(12)}
         </div>
@@ -71,7 +76,7 @@ class AccountSelector extends React.Component {
             tabIndex='-1'
             onChange={(e) => {
               const value = e.target.value
-              this.setState({ accountFilter: value  })
+              this.setState({ accountFilter: value })
               link.send('tray:action', 'setAccountFilter', value)
             }}
             value={this.state.accountFilter}
@@ -113,15 +118,10 @@ class AccountSelector extends React.Component {
     
     const displayAccounts = sortedAccounts.filter((id, i) => {
       const account = accounts[id]
-      return !(
-        filter &&
-        !account.address.includes(filter) &&
-        !account.name.includes(filter) &&
-        !account.ensName.includes(filter) &&
-        !account.lastSignerType.includes(filter)
-      )
-    })
+      const { address, name, ensName, lastSignerType } = account
 
+      return !filter || filterMatches(filter, [address, name, ensName, lastSignerType])
+    })
 
     return (
       <div 
@@ -130,27 +130,23 @@ class AccountSelector extends React.Component {
           if (ref) this.scroll = ref 
         }}
       >
-
-      {/* <div className='accountSelectorScrollWrap' style={current && scrollTop > 0 ? { marginTop: '-' + scrollTop + 'px' } : {}}> */}
-      <div className='accountSelectorScrollWrap'>
-        {displayAccounts.length ? (
-          displayAccounts.map((id, i) => {
-            const account = accounts[id]
-            return <AccountController key={id} {...account} index={i} reportScroll={() => this.reportScroll()} resetScroll={() => this.resetScroll()} />
-          })
-        ) : Object.keys(accounts).length === 0 ? (
-          <div className='noSigners'>
-            {'No Accounts Added'}
-          </div>
-        ) : (
-          <div className='noSigners'>
-            {'No Matching Accounts'}
-          </div>
-        )}
-      </div>
-
-
-        
+        {/* <div className='accountSelectorScrollWrap' style={current && scrollTop > 0 ? { marginTop: '-' + scrollTop + 'px' } : {}}> */}
+        <div className='accountSelectorScrollWrap'>
+          {displayAccounts.length ? (
+            displayAccounts.map((id, i) => {
+              const account = accounts[id]
+              return <AccountController key={id} {...account} index={i} reportScroll={() => this.reportScroll()} resetScroll={() => this.resetScroll()} />
+            })
+          ) : Object.keys(accounts).length === 0 ? (
+            <div className='noSigners'>
+              {'No Accounts Added'}
+            </div>
+          ) : (
+            <div className='noSigners'>
+              {'No Matching Accounts'}
+            </div>
+          )}
+        </div>
       </div>
     )
   }
@@ -159,7 +155,7 @@ class AccountSelector extends React.Component {
     const open = this.store('selected.open')
 
     return (
-      <div className={open ? 'accountSelector accountSelectorDisabled' : 'accountSelector'}>
+      <div className={open ? 'accountSelector accountSelectorOpen' : 'accountSelector'}>
         {this.renderAccountFilter()}
         {this.renderAccountList()}
       </div>

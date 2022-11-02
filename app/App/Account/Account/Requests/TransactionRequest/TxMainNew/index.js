@@ -1,14 +1,10 @@
 import React from 'react'
 import Restore from 'react-restore'
 import link from '../../../../../../../resources/link'
-import svg from '../../../../../../../resources/svg'
 import utils from 'web3-utils'
 
-import BigNumber from 'bignumber.js'
-
-import chainMeta from '../../../../../../../resources/chainMeta'
 import RequestItem from '../../../../../../../resources/Components/RequestItem'
-
+import TxOverview from './overview'
 
 class TxRecipient extends React.Component {
   constructor (...args) {
@@ -26,37 +22,16 @@ class TxRecipient extends React.Component {
     return (Math.round(parseFloat(utils.fromWei(hex, 'ether')) * 1000000) / 1000000).toFixed(6)
   }
 
-  renderRecognizedActions (req) {
-    if (req && req.recognizedActions) {
-      return req.recognizedActions.map(action => {
-        const { type, data } = action
-        if (type === 'erc20:transfer') {
-          const amount = new BigNumber(data.amount) 
-          const decimals = new BigNumber('1e' + data.decimals)
-          const displayAmount = amount.dividedBy(decimals)
-          return (
-            <div className='_txDescriptionSummary'>
-              {`Sending ${displayAmount.toString()} ${data.symbol}`}
-            </div>
-          )
-        }
-        return null
-      })
-    }
-    return null
-  }
-
   render () {
     const req = this.props.req
     const chainId = parseInt(req.data.chainId, 16)
 
     const chainName = this.store('main.networks.ethereum', chainId, 'name')
-    const currentSymbol = this.store('main.networks.ethereum', chainId, 'symbol') || '?'
+    const currentSymbol = this.store('main.networksMeta.ethereum', chainId, 'nativeCurrency.symbol') || '?'
 
     const txMeta = { replacement: false, possible: true, notice: '' }
 
     const { accountId } = this.props
-    const hexId = '0x' + parseInt(req.data.chainId).toString('16')
 
     // TODO
     // if (signer locked) {
@@ -94,66 +69,26 @@ class TxRecipient extends React.Component {
       })
     }
 
+    const { primaryColor, icon } = this.store('main.networksMeta.ethereum', chainId)
     return (
       <div className='_txMain' style={{ animationDelay: (0.1 * this.props.i) + 's' }}>
         <div className='_txMainInner'>
+          <div 
+            className='_txMainBackground'
+            style={{ background: `linear-gradient(135deg, var(--${primaryColor}) 0%, transparent 100%)` }}         
+          />
           <RequestItem 
             req={req}
             account={accountId}
             handlerId={req.handlerId}
-            title={chainName + ' Transaction'}
-            color={chainMeta[hexId] ? chainMeta[hexId].primaryColor : ''}
-            img={chainMeta[hexId] ? chainMeta[hexId].icon : ''}
+            title={`${chainName} Transaction`}
+            color={primaryColor ? `var(--${primaryColor})` : ``}
+            img={icon}
             headerMode={true}
           />
-          <div className='_txMainValues'>
-            {txMeta.replacement ? (
-              txMeta.possible ? (
-                <div className='_txMainTag _txMainTagWarning'>
-                  valid replacement
-                </div>
-              ) : (
-                <div className='_txMainTag _txMainTagWarning'>
-                  {txMeta.notice || 'invalid duplicate'}
-                </div>
-              )
-            ) : null}
-            <div className='_txMainValue _txMainValueClickable' onClick={() => {
-              link.send('nav:update', 'panel', { data: { step: 'viewData' } })
-            }}>
-              <div className='_txDescription'>
-                {req.recipientType === 'external' ? (
-                  <div className='_txDescriptionSummary'>
-                    {req.data.value && req.data.value !== '0x' && req.data.value !== '0x0' ? (
-                      <div>{`Sending ${currentSymbol}`}</div>
-                    ) : req.data.data && req.data.data !== '0x' && req.data.data !== '0x0'  ? (
-                      <div>{`Sending Data`}</div>
-                    ) : (
-                      <div>{`Empty Transaction`}</div>
-                    )}
-                    <div>{`on ${chainName}`}</div>
-                  </div>
-                ) : ( // Recipient is contract
-                  <div className='_txDescriptionSummary'>
-                    {req.data.value && req.data.value !== '0x' && req.data.value !== '0x0' ? (
-                      <div>{`Sending ${currentSymbol}`}</div>
-                    ) : null}
-                    {req.recognizedActions.length ? (
-                      this.renderRecognizedActions(req)
-                    ) : req.decodedData && req.decodedData.method ? (
-                      <div>{`Calling Contract Method ${req.decodedData.method}`}</div>
-                    ) : null}
-                    <div>{`on ${chainName}`}</div>
-                  </div>
-                )}
-              </div>
-            </div>
-            {req.data.data && req.data.data !== '0x' && req.data.data !== '0x0' ? (
-              <div className='_txMainTag _txMainTagWarning'>
-                {'Transaction includes data'}
-              </div>
-            ) : null}
-          </div>
+
+          <TxOverview req={req} chainName={chainName} chainColor={primaryColor} symbol={currentSymbol} txMeta={txMeta} />
+
         </div>
       </div>
     )

@@ -2,9 +2,10 @@ import log from 'electron-log'
 import EventEmitter from 'stream'
 import { addHexPrefix } from 'ethereumjs-util'
 
-import { TransactionData } from '../../../resources/domain/transaction'
 import { deriveHDAccounts } from './derive'
 import crypt from '../../crypt'
+import { TransactionData } from '../../../resources/domain/transaction'
+import { getSignerDisplayType } from '../../../resources/domain/signer'
 import type { TypedMessage } from '../../accounts/types'
 
 export interface SignerSummary {
@@ -21,20 +22,6 @@ export interface AppVersion {
   major: number,
   minor: number,
   patch: number
-}
-
-// in order of increasing priority
-export enum Type {
-  Ring = 'ring',
-  Seed = 'seed',
-  Aragon = 'aragon',
-  Trezor = 'trezor',
-  Ledger = 'ledger',
-  Lattice = 'lattice'
-}
-
-export function getType (typeValue: string) {
-  return Object.values(Type).find(type => type === typeValue)
 }
 
 export default class Signer extends EventEmitter {
@@ -75,7 +62,7 @@ export default class Signer extends EventEmitter {
   summary (): SignerSummary {
     return {
       id: this.id,
-      name: this.name || this.type + ' signer',
+      name: this.name || `${getSignerDisplayType(this)} signer`,
       type: this.type,
       model: this.model,
       addresses: this.addresses.map(addr => addHexPrefix(addr.toString())),

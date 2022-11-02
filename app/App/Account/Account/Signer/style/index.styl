@@ -1,0 +1,156 @@
+.moduleItemRow
+  display flex
+  margin-bottom -3px
+
+.moduleItemRow:last-child
+  margin-bottom 0px
+
+.moduleItem:first-child
+  border-top-left-radius 17px
+  border-top-right-radius 17px
+  margin-top 3px 
+
+.moduleItem:last-child
+  border-bottom-left-radius 17px
+  border-bottom-right-radius 17px
+
+.moduleItem:first-child:last-child
+  border-radius 17px
+
+.moduleItemRow
+  .moduleItem
+    margin-right 0px
+    border-radius 8px
+    margin-top 3px
+
+  .moduleItem:first-child
+    border-top-left-radius 17px
+    border-bottom-left-radius 17px
+    
+  .moduleItem:last-child
+    border-top-right-radius 17px
+    border-bottom-right-radius 17px
+    margin-right 3px
+
+  .moduleItem:first-child:last-child
+    border-radius 17px
+    margin-left 3px
+
+  .moduleItemSpace
+    justify-content space-between
+    padding 20px
+
+.moduleItem
+  position relative
+  justify-content center
+  padding 12px
+  font-size 12px
+  font-weight 300
+  transform translateZ(0)
+  z-index 2000
+  background var(--ghostA)
+  font-weight 400
+  margin 1px 3px 1px 3px
+  border-radius 8px
+  display flex
+  align-items center
+  padding 16px
+  min-height 40px
+  box-sizing border-box
+  text-transform uppercase
+  flex 1
+  background var(--ghostA)
+  box-shadow 0px 4px 6px var(--ghostY)
+  border-bottom 2px solid var(--ghostZ)
+
+  // .moduleSubItem
+  //   background blue
+
+  .moduleItemSignerType
+    display flex
+    justify-content center
+    align-items center
+    font-weight 300
+    font-size 16px
+    text-transform none
+
+  .moduleItemIcon
+    margin-right 12px
+
+.moduleItemInput
+  padding 8px
+  overflow hidden
+
+.moduleItemButton
+  cursor pointer
+  * 
+    pointer-events none
+
+.moduleItemButton:hover
+  background var(--ghostB)
+  transform translateY(-1px)
+  border-bottom 2px solid var(--ghostZ)
+  box-shadow 0px 8px 30px -12px var(--ghostX)
+   
+.moduleItemButton:active
+  background var(--ghostB)
+  transform translateY(0px)
+  box-shadow 0px 2px 4px var(--ghostX)
+
+.moduleItemEditNameTitle
+  position absolute
+  top 28px
+  left 30px
+  right 0px
+  font-size 8px
+
+.moduleItemEditName
+  display flex
+  width 100%
+  overflow hidden
+
+  input
+    border-radius 0px
+    transition var(--standardFast)
+    font-size 18px
+
+  input:hover, input:focus
+    background var(--ghostA)
+    box-shadow 0px 0px 0px 0px var(--ghostZ)
+
+  .moduleItemInputSubmit
+    padding 16px
+    border-radius 12px
+    margin-left 3px
+    background var(--ghostB)
+    border-bottom 2px solid var(--ghostZ)
+    transition var(--standardFast)
+    box-shadow 0px 2px 4px 0px var(--ghostY)
+    box-sizing border-box
+    cursor pointer
+    margin 8px
+    *
+      pointer-events none
+
+.moduleItemInputSubmit:hover
+  transform translateY(-1px)
+  background var(--ghostC)
+  box-shadow 0px 4px 8px 0px var(--ghostY)
+
+.moduleItemInputSubmit:active
+  transform translateY(0px)
+  background var(--ghostC)
+  box-shadow 0px 1px 2px 0px var(--ghostY)
+  color var(--good)
+
+.moduleItemSignerStatus
+  display flex
+  display relative
+  top 1px
+
+  svg
+    position relative
+    top -1px
+
+  span
+    padding-left 12px

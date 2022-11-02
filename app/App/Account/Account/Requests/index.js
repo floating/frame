@@ -8,12 +8,10 @@ import Restore from 'react-restore'
 // import ChainRequest from './ChainRequest'
 // import AddTokenRequest from './AddTokenRequest'
 // import SignTypedDataRequest from './SignTypedDataRequest'
-// function isHardwareSigner (account = {}) {
-//   return ['ledger', 'lattice', 'trezor'].includes(account.lastSignerType)
-// }
+
+import TxOverview from './TransactionRequest/TxMainNew/overview'
 
 import RequestItem from '../../../../../resources/Components/RequestItem'
-import chainMeta from '../../../../../resources/chainMeta'
 
 import link from '../../../../../resources/link'
 import svg from '../../../../../resources/svg'
@@ -103,12 +101,10 @@ class Requests extends React.Component {
         ref={this.moduleRef}
         className='balancesBlock'
       >
-        {!this.props.expanded ? (
-          <div className={'moduleHeader'}>
-           <span>{svg.inbox(13)}</span>
-           <span>{'Requests'}</span>
-          </div>
-        ) : null}
+        <div className={'moduleHeader'}>
+          <span>{svg.inbox(13)}</span>
+          <span>{'Requests'}</span>
+        </div>
         <div className='requestContainerWrap'>
           <div className='requestContainer'>
             {!requests.length ? (
@@ -127,7 +123,7 @@ class Requests extends React.Component {
                     i={i}
                     title={'Account Access'} 
                     color={'var(--outerspace)'}
-                    svgLookup={{ name: 'accounts', size: 16 }}
+                    svgName={'accounts'}
                   />
                 )
               } else if (req.type === 'sign') {
@@ -140,7 +136,7 @@ class Requests extends React.Component {
                     i={i}
                     title={'Sign Message'}
                     color={'var(--outerspace)'}
-                    svgLookup={{ name: 'sign', size: 16 }}
+                    svgName={'sign'}
                   />
                 )
               } else if (req.type === 'signTypedData') {
@@ -153,7 +149,7 @@ class Requests extends React.Component {
                     i={i}
                     title={'Sign Data'} 
                     color={'var(--outerspace)'}
-                    svgLookup={{ name: 'sign', size: 16 }}
+                    svgName={'sign'}
                   />
                 )
               } else if (req.type === 'addChain') { 
@@ -166,7 +162,7 @@ class Requests extends React.Component {
                     i={i} 
                     title={'Add Chain'} 
                     color={'var(--outerspace)'}
-                    svgLookup={{ name: 'chain', size: 16 }}
+                    svgName={'chain'}
                   />
                 )
               } else if (req.type === 'switchChain') {
@@ -179,7 +175,7 @@ class Requests extends React.Component {
                     i={i}
                     title={'Switch Chain'}
                     color={'var(--outerspace)'}
-                    svgLookup={{ name: 'chain', size: 16 }}
+                    svgName={'chain'}
                   />
                 )
               } else if (req.type === 'addToken')  {
@@ -192,26 +188,29 @@ class Requests extends React.Component {
                     i={i}
                     title={'Add Tokens'}
                     color={'var(--outerspace)'}
-                    svgLookup={{ name: 'tokens', size: 16 }}
+                    svgName={'tokens'}
                   />
                 )
               } else if (req.type === 'transaction')  {
-                const chainName = this.store('main.networks.ethereum', parseInt(req.data.chainId, 16), 'name') 
-                const hexId = req.data.chainId
-                chainMeta[hexId] ? chainMeta[hexId].primaryColor : ''
-                chainMeta[hexId] ? chainMeta[hexId].icon : ''
-                
+                const chainId = parseInt(req.data.chainId, 16)
+                const chainName = this.store('main.networks.ethereum', chainId, 'name') 
+                const { primaryColor, icon, nativeCurrency:{symbol: currentSymbol = '?'} } = this.store('main.networksMeta.ethereum', chainId)
+                const txMeta = { replacement: false, possible: true, notice: '' }
                 return (
-                  <RequestItem 
-                    key={req.type + i}
-                    req={req}
-                    account={this.props.id}
-                    handlerId={req.handlerId}
-                    i={i}
-                    title={chainName + ' Transaction'}
-                    color={chainMeta[hexId] ? chainMeta[hexId].primaryColor : ''}
-                    img={chainMeta[hexId] ? chainMeta[hexId].icon : ''}
-                  />
+                  <div>
+                    <RequestItem 
+                      key={req.type + i}
+                      req={req}
+                      account={this.props.id}
+                      handlerId={req.handlerId}
+                      i={i}
+                      title={`${chainName} Transaction`}
+                      color={primaryColor ? `var(--${primaryColor})`: ''}
+                      img={icon}
+                    >
+                      <TxOverview req={req} chainName={chainName} chainColor={primaryColor} symbol={currentSymbol} txMeta={txMeta} simple={true} />
+                    </RequestItem>
+                  </div>
                 )
               }
             })}

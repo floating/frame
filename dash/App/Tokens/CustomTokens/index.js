@@ -14,10 +14,6 @@ class CustomTokens extends React.Component {
 
     return (
       <div className='cardShow' onMouseDown={e => e.stopPropagation()}>
-        <div className='newAccount' onClick={() => link.send('tray:action', 'navDash', { view: 'tokens', data: { notify: 'addToken', notifyData: this.props.req }})}>
-          <div className='newAccountIcon'>{svg.plus(16)}</div> 
-          Add New Token
-        </div>
         <div className='customTokens'>
           <div className='customTokensList'>
             {tokens.length > 0 ? [].concat(tokens).sort((a, b) => {

@@ -9,12 +9,12 @@ class Inventory extends React.Component {
     }
   }
 
-  displayCollection () {
+  render () {
     const inventory = this.store('main.inventory', this.props.account)
     const expandedData = this.props.expandedData || {}
     const k = expandedData.currentCollection
     return (
-      <div className='expandedModule inventoryCollection'>
+      <div className='inventoryDisplay'>
         <div className='inventoryPreview'>
           {this.state.hoverAsset ? (
             <div className='inventoryPreviewMedia'>
@@ -65,14 +65,6 @@ class Inventory extends React.Component {
           })}
           <div className='inventoryCollectionLine' />
         </div>
-      </div>
-    )
-  }
-
-  render () {
-    return (
-      <div className='inventoryWrapper'>
-        {this.displayCollection()}
       </div>
     )
   }

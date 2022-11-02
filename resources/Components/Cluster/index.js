@@ -1,0 +1,67 @@
+import React from 'react'
+
+export const ClusterValue = ({ children, style = {}, onClick, grow = 1, pointerEvents = false }) => {
+  let valueClass = 'clusterValue'
+  if (onClick) valueClass += ' clusterValueClickable'
+  if (pointerEvents) valueClass += ' clusterValueInteractable'
+  style.flexGrow = grow
+  return (
+    <div 
+      className={valueClass} 
+      style={style}
+      onClick={onClick}
+    >
+      {children}
+    </div>
+  )
+}
+
+export const ClusterRow = ({ children, style = {} }) => {
+  return (
+    <div className='clusterRow' style={style}>
+      {children}
+    </div>
+  )
+}
+
+export const ClusterColumn = ({ children, style = {}, grow = 1 }) => {
+  style.flexGrow = grow
+  return (
+    <div className='clusterColumn' style={style}>
+      {children}
+    </div>
+  )
+}
+
+export const Cluster = ({ children, style = {} }) => {
+  return (
+    <div className='cluster' style={style}>
+      {children}
+    </div>
+  )
+}
+
+export const ClusterBox = ({ title, subtitle, children, style = {}, animationSlot = 0 }) => {
+  style.animationDelay = (0.1 * animationSlot) + 's'
+  return (
+    <div className='_txMain' style={style}>
+      <div className='_txMainInner'>
+        <div className='_txLabel'>
+          <div>{title}</div>
+          {subtitle &&
+            <span style={{ 
+              opacity: 0.9, 
+              fontSize: '9px',
+              position: 'relative',
+              top: '0px',
+              left: '4px'
+            }}>
+              {`(${subtitle})`}
+            </span>
+          }
+        </div>
+        {children}
+      </div>
+    </div>
+  )
+}

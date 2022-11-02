@@ -63,7 +63,7 @@ const Dropdown = ({ options, syncValue, initialValue, style, className = '', onC
             const ariaSelected = index === selectedIndex ? 'true' : 'false'
             
             return (
-              <div key={option.text + index} className="dropdownItem" role="option" aria-selected={ariaSelected} value={option.value} onMouseDown={() => handleSelect(option, index)}>
+              <div key={option.text + index} className="dropdownItem" role="option" style={option.style} aria-selected={ariaSelected} value={option.value} onMouseDown={() => handleSelect(option, index)}>
                 {text}
                 {indicator(option)}
               </div>

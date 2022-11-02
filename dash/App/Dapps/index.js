@@ -5,7 +5,6 @@ import { isNetworkConnected, isNetworkEnabled } from '../../../resources/utils/c
 // import svg from '../../../resources/svg'
 
 import RingIcon from '../../../resources/Components/RingIcon'
-import chainMeta from '../../../resources/chainMeta'
 
 import DappDetails from './DappDetails'
 
@@ -127,19 +126,18 @@ class _OriginModule extends React.Component {
 
 const OriginModule = Restore.connect(_OriginModule)
 
-const ChainOrigins = ({ chain, origins }) => {
-  const hexId = '0x' + parseInt(chain.id).toString('16')
+const ChainOrigins = ({ chain: { name }, origins, primaryColor, icon }) => {
   return (
     <>
       <div className='originTitle'>
         <div className='originTitleIcon'>
           <RingIcon 
             small={true}
-            color={chainMeta[hexId] ? chainMeta[hexId].primaryColor : ''} 
-            img={chainMeta[hexId] ? chainMeta[hexId].icon : ''} 
+            color={`var(--${primaryColor})`}
+            img={icon}
           />
         </div>
-        <div className='originTitleText'>{chain.name}</div>
+        <div className='originTitleText'>{name}</div>
       </div>
       {origins.connected.map((origin) => <OriginModule origin={origin} connected={true} />)}
       {origins.disconnected.map((origin) => <OriginModule origin={origin} connected={false} />)}
@@ -172,10 +170,11 @@ class Dapps extends React.Component {
           {
             enabledChains.map(chain => {
               const chainOrigins = getOriginsForChain(chain, origins)
+              const { primaryColor, icon } = this.store('main.networksMeta.ethereum', chain.id)
   
               return chainOrigins.length === 0
                 ? <></>
-                : <ChainOrigins chain={chain} origins={chainOrigins} />
+                : <ChainOrigins chain={chain} origins={chainOrigins} primaryColor={primaryColor} icon={icon} />
             })
           }
           <div className={'clearOriginsButton'} onClick={clearOriginsClickHandler} >

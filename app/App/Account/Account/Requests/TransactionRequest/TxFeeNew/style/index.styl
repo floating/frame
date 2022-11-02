@@ -4,7 +4,7 @@
   display flex
   justify-content center
   align-items center
-  border-radius 8px
+  border-radius 12px
   display flex
   justify-content center
   align-items center
@@ -12,12 +12,12 @@
   transition none
   pointer-events auto
   transform translate3d(0, 0, 0)
-  font-family 'Exo2'
+  font-family 'MainFont'
   padding 0px
   background var(--ghostA)
   margin-top 5px
   cursor pointer
-  flex-grow: 1
+  flex-grow 1
 
   *
     pointer-events none
@@ -27,53 +27,35 @@
     top -0px
     padding 0px 3px 0px 4px
 
-._txFeeTotal
-  font-size 15px
-  font-weight 500
-  display flex
-  justify-content center
-  align-items center
-  border-radius 8px
-  -webkit-app-region no-drag
-  transition none
-  pointer-events auto
-  transform translate3d(0, 0, 0)
-  font-family 'Exo2'
-  padding 0px
-  background var(--ghostA)
-  margin-top 5px
-  cursor pointer
-  flex-grow 1
-
 ._txFeeGwei
   cursor pointer
   transform translateY(0px)
-  padding-top 1px
   display flex
   justify-content center
   align-items center
-  padding 6px 16px 4px 20px
+  padding 20px
 
   *
     pointer-events none
 
   ._txFeeGweiValue
-    font-family FiraCode, monospace
-    font-size 20px
-    font-weight 600
+    font-weight 300
+    font-size 23px
     display flex
     align-items center
     justify-content center
+    position relative
+    top -1px
     
   ._txFeeGweiLabel
     display flex
     align-items center
     justify-content center
-    font-family 'Exo2'
+    font-family 'MainFont'
     padding-left 4px
     position relative
-    top -1px
-    font-weight 600
+    top 0px
+    font-weight 300
     font-size 11px
     text-transform uppercase
 
@@ -90,24 +72,25 @@
 
 ._txFeeGwei:active
   transform translateY(0px)
-  animation-name shake-little
-  animation-duration 2s
-  animation-timing-function: ease-in-out
-  animation-iteration-count: infinite
+  // animation-name shake-little
+  // animation-duration 2s
+  // animation-timing-function: ease-in-out
+  // animation-iteration-count: infinite
   // box-shadow 0px 5px 8px 0px var(--ghostZ)
 
 ._txFeeUSDTagValue
   font-size 13px
-  font-weight 500
+  font-weight 300
 
 ._txFeeValue
   position relative
   display flex
   align-items center
   justify-content center
-  font-weight 500
+  font-weight 300
   font-size 14px
   margin-left 10px
+  font-size 18px
 
   ._txFeeValueDefault
     opacity 1
@@ -132,13 +115,14 @@
   ._txFeeETH
     padding-right 6px
     opacity 1
-    font-family Exo2
+    font-family 'MainFont'
 
   ._txFeeETHValue
     padding-right 0px
+    font-size 18px
 
   ._txFeeUSD
-    font-weight 500
+    font-weight 300
     position relative
     font-size 13px
 
@@ -148,7 +132,7 @@
   ._txFeeUSDDescription
     position relative
     font-size 11px
-    font-family Exo2
+    font-family 'MainFont'
     padding-left 2px
 
   ._txFeeEq

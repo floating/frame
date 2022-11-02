@@ -162,7 +162,7 @@ class AddAragon extends React.Component {
           <div className='addAccountItemTop'>
             <div className='addAccountItemTopType'>
               <div className='addAccountItemIcon'>
-                <RingIcon svgLookup={{ name: 'aragon', size: 24 }} />
+                <RingIcon svgName={'aragon'} svgSize={24} />
               </div>
               <div className='addAccountItemTopTitle'>Aragon DAO</div>
             </div>
@@ -224,9 +224,9 @@ class AddAragon extends React.Component {
             </div>
           </div>
           <div
-            className='addAccountItemFooter' onMouseDown={() => {
+            className='addAccountItemFooter' onClick={() => {
               const net = this.store('main.currentNetwork.id')
-              const open = url => link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'openExternal', notifyData: { url }} })
+              const open = url => link.send('tray:openExternal', url)
               if (net === '1') return open('https://mainnet.aragon.org')
               if (net === '4') return open('https://rinkeby.aragon.org')
               return open('https://aragon.org')

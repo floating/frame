@@ -121,11 +121,14 @@ ipcMain.on('tray:resetAllSettings', () => {
 })
 
 ipcMain.on('tray:replaceTx', async (e, id, type) => {
-  try {
-    await accounts.replaceTx(id, type)
-  } catch (e) {
-    log.error('tray:replaceTx Error', e)
-  }
+  store.navBack('panel')
+  setTimeout(async () => {
+    try {
+      await accounts.replaceTx(id, type)
+    } catch (e) {
+      log.error('tray:replaceTx Error', e)
+    }
+  }, 1000)
 })
 
 ipcMain.on('tray:clipboardData', (e, data) => {
@@ -176,7 +179,7 @@ ipcMain.on('tray:rejectRequest', (e, req) => {
 
 ipcMain.on('tray:openExternal', (e, url) => {
   const validHost = externalWhitelist.some(entry => url === entry || url.startsWith(entry + '/'))
-  if (validHost || true) {
+  if (validHost) {
     store.setDash({ showing: false })
     shell.openExternal(url)
   }
@@ -209,7 +212,7 @@ ipcMain.on('tray:switchChain', (e, type, id, req) => {
 })
 
 ipcMain.handle('tray:getTokenDetails', (e, contractAddress, chainId) => {
-  const contract = new Erc20Contract(contractAddress, numberToHex(chainId))
+  const contract = new Erc20Contract(contractAddress, chainId)
   return contract.getTokenData()
 })
 
@@ -217,8 +220,11 @@ ipcMain.on('tray:addToken', (e, token, req) => {
   if (token) {
     log.info('adding custom token', token)
     store.addCustomTokens([token])
+    store.navBack('dash')
+    const crumb = { view: 'tokens', data: {} }
+    store.navForward('dash', crumb)
   }
-  accounts.resolveRequest(req)
+  if (req) accounts.resolveRequest(req)
 })
 
 ipcMain.on('tray:removeToken', (e, token) => {
@@ -318,10 +324,11 @@ app.on('ready', () => {
   })
 
   store.observer(() => {
-    if (store('dash.showing')) {
+    if (store('windows.dash.showing')) {
       windows.showDash()
     } else {
       windows.hideDash()
+      windows.focusTray()
     }
   })
   store.observer(() => {

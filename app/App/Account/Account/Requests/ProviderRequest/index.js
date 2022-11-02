@@ -1,12 +1,13 @@
 import React from 'react'
 import Restore from 'react-restore'
 import svg from '../../../../../../resources/svg'
-import link from '../../../../../../resources/link'
 
 class ProviderRequest extends React.Component {
   constructor (...args) {
     super(...args)
+
     this.state = { allowInput: false }
+
     setTimeout(() => {
       this.setState({ allowInput: true })
     }, 200)

@@ -1,11 +1,12 @@
 import { TransactionDescription } from '@ethersproject/abi'
 import { Contract } from '@ethersproject/contracts'
 import { Web3Provider } from '@ethersproject/providers'
+import { addHexPrefix } from 'ethereumjs-util'
 import log from 'electron-log'
 import erc20Abi from '../externalData/balances/erc-20-abi'
 import provider from '../provider'
 
-function createWeb3ProviderWrapper (chainId: string) {
+function createWeb3ProviderWrapper (chainId: number) {
   const wrappedSend = (request: { method: string, params?: any[] }, cb: (error: any, response: any) => void) => {
     const wrappedPayload = {
       method: request.method,
@@ -13,8 +14,9 @@ function createWeb3ProviderWrapper (chainId: string) {
       id: 1,
       jsonrpc: '2.0',
       _origin: 'frame-internal',
-      chainId
-    }
+      chainId: addHexPrefix(chainId.toString(16))
+    } as const
+
     provider.sendAsync(wrappedPayload, cb)
   }
 
@@ -27,7 +29,7 @@ function createWeb3ProviderWrapper (chainId: string) {
 export default class Erc20Contract {
   private contract: Contract
 
-  constructor (address: Address, chainId: string) {
+  constructor (address: Address, chainId: number) {
     const web3Provider = new Web3Provider(createWeb3ProviderWrapper(chainId))
     this.contract = new Contract(address, erc20Abi, web3Provider)
   }

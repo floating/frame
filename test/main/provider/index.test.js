@@ -5,7 +5,7 @@ import { hasPermission } from '../../../main/provider/helpers'
 import store from '../../../main/store'
 import chainConfig from '../../../main/chains/config'
 import { weiToHex, gweiToHex } from '../../../resources/utils'
-import { Type as SignerType } from '../../../main/signers/Signer'
+import { Type as SignerType } from '../../../resources/domain/signer'
 
 import { validate as validateUUID } from 'uuid'
 import { utils } from 'ethers'
@@ -34,8 +34,6 @@ jest.mock('../../../main/provider/helpers', () => {
 beforeAll(async () => {
   log.transports.console.level = false
 
-  jest.useFakeTimers()
-
   accounts.getAccounts = () => [address]
   accounts.addRequest = (req, res) => {
     store.set('main.accounts', req.account, 'requests', { [req.handlerId]: req })
@@ -46,10 +44,10 @@ beforeAll(async () => {
 
 afterAll(() => {
   log.transports.console.level = 'debug'
-  jest.useRealTimers()
 })
 
 beforeEach(() => {
+  store.set('main.colorway', 'light')
   store.set('main.accounts', {})
   store.set('main.origins', {})
   
@@ -84,7 +82,7 @@ describe('#send', () => {
   it('passes the given target chain to the connection', () => {
     connection.connections.ethereum[10] = { chainConfig: { hardfork: 'london', chainId: 10 }, primary: { connected: true } }
 
-    const request = { method: 'eth_testFrame'  }
+    const request = { method: 'eth_testFrame' }
 
     send({ ...request, chainId: '0xa' })
 
@@ -268,15 +266,16 @@ describe('#send', () => {
       })
     })
 
-    it('should reject if the chain does not exist in the store', done => {
+    it('should reject with the correct error if the chain does not exist in the store', done => {
       send({
         method: 'wallet_switchEthereumChain', 
         params: [{
           chainId: '0x1234'
         }],
         _origin: '8073729a-5e59-53b7-9e69-5d9bcff94087'
-      }, () => {
+      }, (response) => {
         try {
+          expect(response.error.code).toBe(4902)
           expect(accountRequests).toHaveLength(0)
           done()
         } catch (e) { 
@@ -298,7 +297,7 @@ describe('#send', () => {
           expect(response.error).toBe(undefined)
 
           const permissions = response.result
-          expect(permissions).toHaveLength(14)
+          expect(permissions).toHaveLength(15)
           expect(permissions.map(p => p.parentCapability)).toEqual(expect.arrayContaining(
             [
               'eth_coinbase',
@@ -314,7 +313,8 @@ describe('#send', () => {
               'eth_signTypedData_v3',
               'eth_signTypedData_v4',
               'wallet_addEthereumChain',
-              'wallet_getAssets'
+              'wallet_getAssets',
+              'wallet_watchAsset'
             ]
           ))
 
@@ -437,14 +437,10 @@ describe('#send', () => {
   })
 
   describe('#wallet_getEthereumChains', () => {
-    it('returns a list of active chains', () => {
-      store.set('main.networks.ethereum', {
-        137: { name: 'polygon', id: 137, explorer: 'https://polygonscan.com', on: true },
-        1: { name: 'mainnet', id: 1, explorer: 'https://etherscan.io', on: true }
-      })
-
+    beforeEach(() => {
       store.set('main.networksMeta.ethereum', {
         1: {
+          primaryColor: 'accent3',
           nativeCurrency: {
             name: 'Ether',
             symbol: 'ETH',
@@ -453,6 +449,7 @@ describe('#send', () => {
           }
         },
         137: {
+          primaryColor: 'accent7',
           nativeCurrency: {
             name: 'Matic',
             symbol: 'MATIC',
@@ -460,6 +457,13 @@ describe('#send', () => {
             icon: 'matic'
           }
         }
+      })
+    })
+
+    it('returns a list of active chains', () => {
+      store.set('main.networks.ethereum', {
+        137: { name: 'polygon', id: 137, explorer: 'https://polygonscan.com', connection: { primary: { connected: true }, secondary: { connected: false } }, on: true },
+        1: { name: 'mainnet', id: 1, explorer: 'https://etherscan.io', connection: { primary: { connected: true }, secondary: { connected: false} }, on: true }
       })
 
       send({ method: 'wallet_getEthereumChains', id: 14, jsonrpc: '2.0' }, response => {
@@ -473,6 +477,11 @@ describe('#send', () => {
             networkId: 1,
             icon: [{ url: 'ethereum' }],
             explorers: [{ url: 'https://etherscan.io' }],
+            external: {
+              wallet: {
+                colors: [{ r: 255, g: 0, b: 174, hex: '#ff00ae' }]
+              }
+            },
             nativeCurrency: {
               name: 'Ether',
               symbol: 'ETH',
@@ -485,9 +494,41 @@ describe('#send', () => {
             networkId: 137,
             icon: [{ url: 'matic' }],
             explorers: [{ url: 'https://polygonscan.com' }],
+            external: {
+              wallet: {
+                colors: [{ r: 62, g: 173, b: 241, hex: '#3eadf1' }]
+              }
+            },
             nativeCurrency: {
               name: 'Matic',
               symbol: 'MATIC',
+              decimals: 18
+            }
+          }
+        ])
+      })
+    })
+
+    it('does not return disconnected chains', () => {
+      store.set('main.networks.ethereum', {
+        137: { name: 'polygon', id: 137, explorer: 'https://polygonscan.com', connection: { primary: { connected: false }, secondary: { connected: false } }, on: true },
+        1: { name: 'mainnet', id: 1, explorer: 'https://etherscan.io', connection: { primary: { connected: true }, secondary: { connected: false } }, on: true }
+      })
+      
+      send({ method: 'wallet_getEthereumChains', id: 14, jsonrpc: '2.0' }, response => {
+        expect(response.result).toStrictEqual([
+          {
+            name: 'mainnet',
+            chainId: 1,
+            networkId: 1,
+            icon: [{ url: 'ethereum' }],
+            explorers: [{ url: 'https://etherscan.io' }],
+            external: {
+              wallet: { colors: [{ r: 255, b: 174, g: 0, hex: '#ff00ae' }] },
+            },
+            nativeCurrency: {
+              name: 'Ether',
+              symbol: 'ETH',
               decimals: 18
             }
           }
@@ -1489,12 +1530,14 @@ describe('state change events', () => {
         name: 'test',
         id: 1,
         explorer: 'https://etherscan.io',
+        connection: { primary: { connected: true }, secondary: { connected: false } },
         on: true
       }
     }
 
     const networksMeta = {
       1: {
+        primaryColor: 'accent5',
         nativeCurrency: {
           name: 'Ether',
           symbol: 'ETH',
@@ -1521,6 +1564,11 @@ describe('state change events', () => {
           networkId: 1,
           icon: [{ url: 'ethereum' }],
           explorers: [{ url: 'https://etherscan.io' }],
+          external: {
+            wallet: {
+              colors: [{ r: 90, g: 181, b: 178, hex: '#5ab5b2' }]
+            }
+          },
           nativeCurrency: {
             name: 'Ether',
             symbol: 'ETH',
@@ -1533,6 +1581,11 @@ describe('state change events', () => {
           networkId: 137,
           icon: [],
           explorers: [{ url: 'https://polygonscan.com' }],
+          external: {
+            wallet: {
+              colors: [{ r: 60, g: 40, b: 234, hex: '#3c28ea' }]
+            }
+          },
           nativeCurrency: {
             name: 'Matic',
             symbol: 'MATIC',
@@ -1548,11 +1601,12 @@ describe('state change events', () => {
       name: 'Polygon',
       id: 137,
       explorer: 'https://polygonscan.com',
+      connection: { primary: { connected: true }, secondary: { connected: false } },
       on: true
     }
 
     store.set('main.networks.ethereum', { ...networks, 137: polygon })
-    store.set('main.networksMeta.ethereum', { ...networksMeta, 137: { nativeCurrency: { symbol: 'MATIC', name: 'Matic', decimals: 18 }} })
+    store.set('main.networksMeta.ethereum', { ...networksMeta, 137: { primaryColor: 'accent8', nativeCurrency: { symbol: 'MATIC', name: 'Matic', decimals: 18 }} })
 
     store.getObserver('provider:chains').fire()
   })

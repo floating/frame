@@ -7,7 +7,7 @@
 .addTokenTitle
   padding 40px 0px 60px 0px
   font-size 24px
-  font-weight 100
+  font-weight 300
 
 .addToken
   font-size 16px
@@ -34,8 +34,7 @@
   flex-direction column
 
 .newTokenChainAddress
-  font-family 'Fira Code', monospace
-  font-weight 400
+  font-family 'FiraCode'
   font-size 18px
   svg
     margin 4px 5px
@@ -46,13 +45,13 @@
 .newTokenChainSelectSubtitle
   margin-top 3px
   font-size 10px
-  font-weight bold
+  font-weight 300
   text-transform uppercase
 
 .newTokenChainSelectFooter
   margin-top 40px
   font-size 10px
-  font-weight bold
+  font-weight 300
   text-transform uppercase
 
 .tokenRow
@@ -102,11 +101,11 @@
   font-size 16px
   padding 0px
   width 100%
-  font-family 'Exo2'
-  background var(--ghostY)
-  border-radius 12px
+  font-family 'MainFont'
+  background var(--ghostA)
+  border-radius 20px
   padding 23px 3px 20px 3px
-  font-weight 500
+  font-weight 300
   color var(--outerspace)
   
   &.dropdown
@@ -122,20 +121,18 @@
 
 .tokenInputDim
   font-size 16px !important
-  // rfont-family OpenSans, sans-serif !important
   font-weight 300 !important
   color var(--outerspace03)
 
 .tokenInputAddress
-  font-family 'Fira Code', monospace
-  font-weight 500
-  font-size 13px
-  background var(--ghostY)
+  font-family 'FiraCode'
+  font-weight 300
+  font-size 14px
 
 .tokenSetAddress
   font-size 13px
   text-transform uppercase
-  font-weight 500
+  font-weight 300
   padding 10px 50px
   background var(--ghostA)
   border-radius 12px
@@ -145,77 +142,39 @@
 .tokenSetAddress:hover
   background var(--ghostB)
 
-.tokenLayers
-  width 100%
-  // padding 0px 0px
-  margin-top 25px
-
-.tokenLayerOptions
-  display flex
-  flex-wrap wrap
-  justify-content space-between
-
-.tokenLayerOption
-  background var(--ghostC)
-  margin-bottom 5px
-  height 42px
-  border-radius 8px
-  box-sizing border-box
-  padding 8px
-  cursor pointer
-  width calc(50% - 2.5px)
-  box-sizing border-box
-  font-weight 300
-  border 2px solid transparent
-  * 
-    pointer-events none
-
-.tokenLayerOption:hover
-  background var(--ghostD)
-  color var(--good)
-
-.tokenLayerOptionOn
-  color var(--good)
-  border 2px solid var(--good)
-
-.tokenLayerOptionOn:hover
-  background var(--ghostD)
-  color var(--good)
-
 .addTokenSubmit
   background var(--ghostA)
-  width 100%
-  margin 0px 25px
-  height 48px
-  border-radius 16px
-  font-weight 500
+  margin 0px 8px
+  height 64px
+  border-radius 20px
+  font-weight 300
   box-sizing border-box
   padding 13px
   text-align center
-  margin-bottom 5px
   display flex
   justify-content center
   align-items center
   font-size 15px
   text-transform uppercase
-  opacity 0.5
+  border 3px solid var(--ghostZ)
+  pointer-events none
+
+  span
+    opacity 0.4
 
   svg
     margin-right 10px
 
-// .addTokenSubmit:hover
-//   background var(--ghostE)
-//   color var(--good)
+.addTokenSubmit:hover
+  background var(--ghostA)
 
 .addTokenSubmitEnabled
   background var(--ghostB)
-  opacity 1
   cursor pointer
-  * 
+  pointer-events auto
+  span
     pointer-events none
+    opacity 1
 
-.addTokenSubmitGood
-  color var(--good)
-
-.addTokenSubmitBad
-  color var(--bad)
+.addTokenSubmitEnabled:hover
+  background var(--ghostC)

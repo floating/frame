@@ -4,7 +4,7 @@ import Restore from 'react-restore'
 import link from '../../../resources/link'
 import svg from '../../../resources/svg'
 
-import Signer from './Signer'
+import Signer from '../Signer'
 
 import AddHardware from './Add/AddHardware'
 import AddHardwareLattice from './Add/AddHardwareLattice'
@@ -125,7 +125,7 @@ class AddAccounts extends React.Component {
         </div>
         <div className='accountTypeSelect' onClick={() => this.createNewAccount('nonsigning')}>
           <div className='accountTypeSelectIcon'>{svg.mask(24)}</div>
-          <div className='accountTypeSelectIcon'>{'Watch-only Account'}</div>
+          <div className='accountTypeSelectIcon'>{'Watch Account'}</div>
         </div>
       </div>
     )
@@ -197,37 +197,25 @@ class Dash extends React.Component {
         /> 
        ) : (
         <div className='cardShow'>
-          <div className='newAccount' onClick={() => link.send('tray:action', 'navDash', { view: 'accounts', data: { showAddAccounts: true } })}>
-            <div className='newAccountIcon'>{svg.plus(16)}</div> 
-            Add New Account
-          </div>
           <div className='signers'>
             <div className='signersMid'>
-              <div className='signersHeader'>
+              {/* <div className='signersHeader'>
                 Your Hardware Signers
-              </div>
+              </div> */}
               <div className='signersList'>
                 {hardwareSigners.length ? (
                   hardwareSigners
                     .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
                     .map((signer, index) => <Signer index={index} key={signer.id} {...signer} />)
-                ) : (
-                  <div className='noSigners'>
-                    {'No hardware signers detected'}
-                  </div>
-                )}
+                ) : null}
               </div>
-              <div className='signersHeader'>
+              {/* <div className='signersHeader'>
                 Your Hot Signers
-              </div>
+              </div> */}
               <div className='signersList'>
                 {hotSigners.length ? (
                   hotSigners.map((signer, index) => <Signer index={index} key={signer.id} {...signer} />)
-                ) : (
-                  <div className='noSigners'>
-                    {'No hot signers detected'}
-                  </div>
-                )}
+                ) : null}
               </div>
             </div>
           </div>

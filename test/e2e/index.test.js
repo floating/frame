@@ -16,7 +16,7 @@ test('Send Transaction', done => {
   }).catch(err => {
     console.log(err)
   })
-}, 30 * 1000)
+})
 
 test('sign_personal and ecRecover', done => {
   const message = 'Frame Test'
@@ -33,7 +33,7 @@ test('sign_personal and ecRecover', done => {
       console.log(err)
     })
   })
-}, 30 * 1000)
+})
 
 test('eth_sign and ecRecover', done => {
   const message = 'Frame Test'
@@ -50,4 +50,4 @@ test('eth_sign and ecRecover', done => {
       console.log(err)
     })
   })
-}, 30 * 1000)
+})

@@ -18,7 +18,7 @@ import packageFile from '../../package.json'
 import proxyConnection from './proxy'
 import accounts, { AccountRequest, TransactionRequest, SignTypedDataRequest, AddChainRequest, AddTokenRequest } from '../accounts'
 import Chains, { Chain } from '../chains'
-import { getType as getSignerType, Type as SignerType } from '../signers/Signer'
+import { getSignerType, Type as SignerType } from '../../resources/domain/signer'
 import { TransactionData } from '../../resources/domain/transaction'
 import { populate as populateTransaction, maxFee } from '../transaction'
 import FrameAccount from '../accounts/Account'
@@ -650,7 +650,10 @@ export class Provider extends EventEmitter {
 
       // Check if chain exists 
       const exists = Boolean(store('main.networks.ethereum', chainId))
-      if (exists === false) throw new Error('Chain does not exist')
+      if (!exists) {
+        const err: EVMError = {message: 'Chain does not exist', code: 4902}
+        return resError(err, payload, res )
+      }
 
       const originId = payload._origin
       const origin = getPayloadOrigin(payload)

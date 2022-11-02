@@ -1,9 +1,9 @@
-
 import { Interface } from '@ethersproject/abi'
 import { addHexPrefix } from 'ethereumjs-util'
 import log from 'electron-log'
 
-import type { EthereumProvider } from 'eth-provider'
+import type { BytesLike } from '@ethersproject/bytes'
+import type EthereumProvider from 'ethereum-provider'
 
 import {
   abi,
@@ -32,9 +32,7 @@ function chainConfig (chainId: number, eth: EthereumProvider): MulticallConfig {
 async function makeCall (functionName: string, params: any[], config: MulticallConfig) {
   const data = multicallInterface.encodeFunctionData(functionName, params)
 
-  const response = await config.provider.request({
-    id: 1,
-    jsonrpc: '2.0',
+  const response: BytesLike = await config.provider.request({
     method: 'eth_call',
     params: [
       { to: config.address, data }, 'latest'
@@ -57,12 +55,17 @@ function buildCallData <R, T> (calls: Call<R, T>[]) {
   })
 }
 
-function getResultData (results: any, call: string[]) {
+function getResultData (results: any, call: string[], target: string) {
   const [fnSignature] = call
   const callInterface = memoizedInterfaces[fnSignature]
   const fnName = getFunctionNameFromSignature(fnSignature)
-
-  return callInterface.decodeFunctionResult(fnName, results)
+  try {
+    return callInterface.decodeFunctionResult(fnName, results);
+  } catch (e) {
+    log.warn(`Failed to decode ${fnName},`, {target, results})
+    const outputs = callInterface.getFunction(fnName).outputs || []
+    return outputs.map(() => null)
+  }
 }
 
 function getFunctionNameFromSignature (signature: string) {
@@ -87,8 +90,8 @@ async function aggregate <R, T> (calls: Call<R, T>[], config: MulticallConfig): 
   const aggData = buildCallData(calls)
   const response = await makeCall('aggregate', [aggData], config)
 
-  return calls.map(({ call, returns }, i) => {
-    const resultData = getResultData(response.returndata[i], call)
+  return calls.map(({ call, returns, target }, i) => {
+    const resultData = getResultData(response.returndata[i], call, target)
 
     return { success: true, returnValues: returns.map((handler, j) => handler(resultData[j])) }
   })
@@ -98,14 +101,14 @@ async function tryAggregate <R, T> (calls: Call<R, T>[], config: MulticallConfig
   const aggData = buildCallData(calls)
   const response = await makeCall('tryAggregate', [false, aggData], config)
 
-  return calls.map(({ call, returns }, i) => {
+  return calls.map(({ call, returns, target }, i) => {
     const results = response.result[i]
 
     if (!results.success) {
       return { success: false, returnValues: [] }
     }
 
-    const resultData = getResultData(results.returndata, call)
+    const resultData = getResultData(results.returndata, call, target)
 
     return { success: true, returnValues: returns.map((handler, j) => handler(resultData[j])) }
   })
