@@ -12,7 +12,7 @@ import TrezorConnect, {
   UI_EVENT
 } from 'trezor-connect'
 
-export class ConnectError extends Error {
+export class DeviceError extends Error {
   readonly code
 
   constructor (msg: string, code?: string) {
@@ -169,7 +169,7 @@ class TrezorBridge extends EventEmitter {
         throw new Error('Trezor unreachable, please try again')
       }
 
-      const err = e as ConnectError
+      const err = e as DeviceError
 
       if (err.code === 'Device_CallInProgress') {
         return new Promise<T>(resolve => {
