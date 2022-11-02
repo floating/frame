@@ -335,9 +335,7 @@ class AddTokenFormScreenComponent extends Component {
                     const token = { name, symbol, chainId, address, decimals, logoURI: this.isDefault('logoURI') ? '' : logoURI }
                     link.send('tray:addToken', token, req)
                     setTimeout(() => {
-                      link.send('tray:action', 'backDash')
-                      link.send('tray:action', 'backDash')
-                      link.send('tray:action', 'backDash')
+                      link.send('tray:action', 'backDash', 3)
                     }, 400)
                   }}
                 >
