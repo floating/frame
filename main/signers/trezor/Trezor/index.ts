@@ -13,7 +13,7 @@ import { sign, londonToLegacy, signerCompatibility } from '../../../transaction'
 
 import { Derivation, getDerivationPath } from '../../Signer/derive'
 import { TypedTransaction } from '@ethereumjs/tx'
-import TrezorBridge, { ConnectError } from '../bridge'
+import TrezorBridge, { DeviceError } from '../bridge'
 
 const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
 
@@ -83,8 +83,8 @@ export default class Trezor extends Signer {
       // this prompts a login of pin and/or passphrase
       await TrezorBridge.getAccountInfo(device, this.getPath(0))
     } catch (e) {
-      const err = e as ConnectError
-      this.handleError(createErrorMessage(Status.NEEDS_RECONNECTION, err.message))
+      const err = e as DeviceError
+      this.handleError(new DeviceError(createErrorMessage(Status.NEEDS_RECONNECTION, err.message), 'ACCOUNT_ACCESS_FAILURE'))
 
       throw e
     }
@@ -121,14 +121,21 @@ export default class Trezor extends Signer {
   }
 
   private handleUnrecoverableError () {
-    this.handleError(Status.NEEDS_RECONNECTION)
+    this.handleError(new DeviceError('Unrecoverable error', 'UNRECOVERABLE'))
   }
 
-  private handleError (message: string, code?: string) {
-    this.status = message
+  private handleError (error: DeviceError) {
+    const errorStatusMap = {
+      ADDRESS_NO_MATCH_DEVICE: Status.NEEDS_RECONNECTION,
+      UNRECOVERABLE: Status.NEEDS_RECONNECTION,
+      ADDRESS_VERIFICATION_FAILURE: Status.NEEDS_RECONNECTION,
+      ACCOUNT_ACCESS_FAILURE: Status.NEEDS_RECONNECTION
+    }
+    const newStatus = errorStatusMap[error.code as keyof typeof errorStatusMap]
+    if (newStatus) {
+      this.status = newStatus
+    }
 
-    // TODO: handle different codes differently
-    // this.status = Status.NEEDS_RECONNECTION
     this.emit('update')
   }
 
@@ -152,7 +159,7 @@ export default class Trezor extends Signer {
       if (reportedAddress !== current) {
         log.error(`address from Frame (${current}) does not match address from Trezor device (${reportedAddress})`)
         
-        this.handleError('address does not match device, reconnect your Trezor')
+        this.handleError(new DeviceError('address does not match device, reconnect your Trezor', 'ADDRESS_NO_MATCH_DEVICE'))
 
         cb(new Error('Address does not match device'), undefined)
       } else {
@@ -162,10 +169,10 @@ export default class Trezor extends Signer {
     } catch (e: unknown) {
       clearTimeout(waitForInput)
 
-      const err = e as ConnectError
+      const err = e as DeviceError
 
       log.error('error verifying Trezor address', err)
-      this.handleError(createErrorMessage('could not verify address, reconnect your Trezor', err.message))
+      this.handleError(new DeviceError(createErrorMessage('could not verify address, reconnect your Trezor', err.message), 'ADDRESS_VERIFICATION_FAILURE'))
 
       cb(new Error(err.message))
     }
@@ -184,7 +191,7 @@ export default class Trezor extends Signer {
 
       this.deriveHDAccounts(publicKey.publicKey, publicKey.chainCode, (err, accounts = []) => {
         if (err) {
-          this.handleError('could not derive addresses, reconnect your Trezor')
+          this.handleError(new DeviceError('could not derive addresses, reconnect your Trezor', 'DERIVATION_FAILURE'))
           return
         }
 
@@ -201,7 +208,7 @@ export default class Trezor extends Signer {
       })
     } catch (e: unknown) {
       log.error('could not get public key from Trezor', e)
-      this.handleError('could not derive addresses, reconnect your Trezor')
+      this.handleError(new DeviceError('could not derive addresses, reconnect your Trezor', 'DERIVATION_FAILURE'))
     }
   }
 
@@ -216,8 +223,7 @@ export default class Trezor extends Signer {
       
       cb(null, addHexPrefix(signature))
     } catch (e: unknown) {
-      const err = e as ConnectError
-      this.handleError(err.message, err.code)
+      const err = e as DeviceError
       cb(new Error(err.message))
     }
   }
@@ -250,8 +256,7 @@ export default class Trezor extends Signer {
 
       cb(null, addHexPrefix(signature))
     } catch (e: unknown) {
-      const err = e as ConnectError
-      this.handleError(err.message, err.code)
+      const err = e as DeviceError
       cb(new Error(err.message))
     }
   }
@@ -272,7 +277,7 @@ export default class Trezor extends Signer {
         try {
           return await TrezorBridge.signTransaction(this.device, path, trezorTx)
         } catch (e: unknown) {
-          const err = e as ConnectError
+          const err = e as DeviceError
           const errMsg = err.message.toLowerCase().match(/forbidden key path/)
             ? `Turn off strict Trezor safety checks in order to use the ${this.derivation} derivation path on this chain`
             : err.message
@@ -283,8 +288,7 @@ export default class Trezor extends Signer {
 
       cb(null, addHexPrefix(signedTx.serialize().toString('hex')))
     } catch (e: unknown) {
-      const err = e as ConnectError
-      this.handleError(err.message, err.code)
+      const err = e as DeviceError
       cb(err)
     }
   }
