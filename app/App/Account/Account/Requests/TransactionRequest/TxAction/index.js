@@ -147,59 +147,28 @@ class TxSending extends React.Component {
         return (
           <ClusterBox title={title} animationSlot={this.props.i}>
             <Cluster>
-              {!revoke && (
+              {revoke ? (
                 <ClusterRow>
-                  <ClusterValue grow={2}>
-                    <div className='txSendingValue'>
-                      <span className='txSendingValueSymbol'>{symbol}</span>
-                      <span className='txSendingValueAmount'>{displayValue}</span>
+                  <ClusterValue onClick={() => {
+                    link.send('nav:update', 'panel', { data: { step: 'adjustApproval', approval: action } })
+                  }}>
+                    <div className='clusterFocus'>
+                      <div>{`Revoking Approval`}</div>
+                      <div>{`To Spend ${symbol} on ${chainName}`}</div>
                     </div>
                   </ClusterValue>
-                  <ClusterValue>
-                    <span className='_txMainTransferringEq'>{'≈'}</span>
-                    <span className='_txMainTransferringEqSymbol'>{'$'}</span>
-                    <span className='_txMainTransferringEqAmount'>{(displayValue * rateUSD).toFixed(2)}</span>
+                </ClusterRow>
+              ) : (
+                <ClusterRow>
+                  <ClusterValue onClick={() => {
+                    link.send('nav:update', 'panel', { data: { step: 'adjustApproval', approval: action } })
+                  }}>
+                    <div className='clusterFocus'>
+                      <div>{`Granting Approval`}</div>
+                      <div>{`To Spend ${symbol} on ${chainName}`}</div>
+                    </div>    
                   </ClusterValue>
                 </ClusterRow>
-              )}
-
-              {revoke ? (
-                <>
-                  <ClusterRow>
-                    <ClusterValue onClick={() => {
-                      link.send('nav:update', 'panel', { data: { step: 'adjustApproval', approval: action } })
-                    }}>
-                      <div className='clusterFocus'>
-                        <div>{`Revoking Approval`}</div>
-                        <div>{`To Spend ${symbol} on ${chainName}`}</div>
-                      </div>
-                    </ClusterValue>
-                  </ClusterRow>
-                  {/* <ClusterRow>
-                    <ClusterValue>
-                      <div className='clusterTag'>
-                        {``}
-                      </div>    
-                    </ClusterValue>
-                  </ClusterRow> */}
-                </>
-              ) : (
-                <>
-                  <ClusterRow>
-                    <ClusterValue>
-                      <div className='clusterFocus'>
-                        {`granting approval to spend ${symbol}`}
-                      </div>    
-                    </ClusterValue>
-                  </ClusterRow>
-                  <ClusterRow>
-                    <ClusterValue>
-                      <div className='clusterTag'>
-                        {`on ${chainName} to`}
-                      </div>    
-                    </ClusterValue>
-                  </ClusterRow>
-                </>
               )}
 
               {address && (
@@ -223,6 +192,22 @@ class TxSending extends React.Component {
                   </ClusterValue>
                 </ClusterRow>
               )}
+
+              {/* {!revoke && (
+                <ClusterRow>
+                  <ClusterValue grow={2}>
+                    <div className='txSendingValue'>
+                      <span className='txSendingValueSymbol'>{symbol}</span>
+                      <span className='txSendingValueAmount'>{displayValue}</span>
+                    </div>
+                  </ClusterValue>
+                  <ClusterValue>
+                    <span className='_txMainTransferringEq'>{'≈'}</span>
+                    <span className='_txMainTransferringEqSymbol'>{'$'}</span>
+                    <span className='_txMainTransferringEqAmount'>{(displayValue * rateUSD).toFixed(2)}</span>
+                  </ClusterValue>
+                </ClusterRow>
+              )} */}
             </Cluster>
           </ClusterBox>
         )

@@ -39,6 +39,7 @@
   letter-spacing 2px
   color var(--good)
   margin-bottom 10px
+  text-align center
 
 .approveTokenSpendPresets
   display flex
@@ -85,7 +86,8 @@
   justify-content center
   align-items center
   flex-direction column
-  // padding 20px
+  padding-top 40px
+  padding-bottom 40px
 
   .approveTokenSpendSpender
     font-size 12px
@@ -132,13 +134,10 @@
     justify-content center
     align-items center
     flex-direction column
-    background var(--ghostB)
     width calc(100%)
     padding 0px 20px 2px 22px
     box-sizing border-box
-    // border-radius 15px
     margin-top 4px
-    // color var(--moon)
 
     .approveTokenSpendTokenSymbol
       text-transform uppercase
@@ -246,3 +245,15 @@
 .updateTokenApproval
   padding 20px
   margin-top 30px
+
+.updateTokenApprovalSubmit
+  margin 40px 0px 0px 0px
+  padding 10px
+  background var(--ghostA)
+  text-align center
+  height 20px
+  border-radius 20px
+  cursor pointer
+
+.updateTokenApprovalSubmit:hover
+  background var(--ghostB)
