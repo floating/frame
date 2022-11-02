@@ -416,18 +416,6 @@ describe('#signTypedData', () => {
     runNextRequest()
   })
 
-  it('fails to sign pre-v4 typed data', done => {
-    ledger.once('update', () => done('Ledger unexpectedly updated!'))
-
-    ledger.signTypedData(5, { version: SignTypedDataVersion.V3, data: 'typed data' }, (err, signature) => {
-      verifyDone(done, () => {
-        expect(ledger.status).toBe(Status.OK)
-        expect(signature).toBeUndefined()
-        expect(err.message.toLowerCase().indexOf('invalid version')).toBeGreaterThanOrEqual(0)
-      })
-    })
-  })
-
   it('fails if the signing request is rejected by the user', done => {
     Eth.mock.instances[0].signTypedData.mockRejectedValue({ statusCode: 27013 })
 

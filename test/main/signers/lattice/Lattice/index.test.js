@@ -507,16 +507,6 @@ describe('#signTypedData', () => {
     })
   })
 
-  it('is not able to sign typed data less than V4', done => {
-    lattice.signTypedData(2, { version: SignTypedDataVersion.V3, data: 'typed data' }, (err, res) => {
-      try {
-        expect(err.message.toLowerCase()).toMatch(/invalid version/)
-        expect(res).toBe(undefined)
-        done()
-      } catch (e) { done(e) }
-    })
-  })
-
   it('returns an error on failure', done => {
     // wrong index, mock function expects 2, not 3
     lattice.signTypedData(3, { version: SignTypedDataVersion.V4, data: 'typed data' }, (err, res) => {
