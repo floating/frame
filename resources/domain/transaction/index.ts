@@ -17,8 +17,8 @@ export interface TransactionData extends Omit<JsonTx, 'chainId' | 'type'> {
   gasFeesSource: GasFeesSource,
 }
 
-export function toUSD (bn: BigNumber, nativeCurrency: Rate, isTestnet = false) {
-  const nativeUSD = nativeCurrency && nativeCurrency.usd && !isTestnet ? nativeCurrency.usd.price : 0
+export function toUSD (bn: BigNumber, currencyRate: Rate, isTestnet = false) {
+  const nativeUSD = BigNumber(isTestnet ? 0 : currencyRate.usd.price)
   const usd = bn.shiftedBy(-18).multipliedBy(nativeUSD).decimalPlaces(2, BigNumber.ROUND_FLOOR)
 
   return {
