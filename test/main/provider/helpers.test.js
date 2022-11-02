@@ -50,6 +50,35 @@ describe('#getRawTx', () => {
 
     expect(tx.value).toBe('0x0')
   })
+
+  it('should pass through a hex nonce', () => {
+    const tx = getRawTx({ nonce: '0x168' })
+
+    expect(tx.nonce).toBe('0x168')
+  })
+
+  it('should convert a valid integer nonce into hex', () => {
+    const tx = getRawTx({ nonce: '360' })
+
+    expect(tx.nonce).toBe('0x168')
+  })
+
+  it('should pass through an undefined nonce', () => {
+    const tx = getRawTx({ nonce: undefined })
+
+    expect(tx.nonce).toBeUndefined()
+  })
+
+  const invalidNonces = [
+    { description: 'non-numeric', nonce: 'invalid' }, 
+    { description: 'negative integer', nonce: '-360' }, 
+    { description: 'non-integer numeric', nonce: '3.60' }
+  ]
+  invalidNonces.forEach(({ description, nonce }) => {
+    it(`should reject a ${description} nonce`, () => {
+      expect(() => getRawTx({ nonce })).toThrowError('Invalid nonce')
+    })
+  })
 })
 
 describe('#getSignedAddress', () => {

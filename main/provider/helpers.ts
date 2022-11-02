@@ -10,7 +10,9 @@ import {
   hashPersonalMessage,
 } from 'ethereumjs-util'
 import log from 'electron-log'
+import BN from 'bignumber.js'
 import { v5 as uuidv5 } from 'uuid'
+import { isHexString } from 'ethers/lib/utils'
 
 import store from '../store'
 import protectedMethods from '../api/protectedMethods'
@@ -68,6 +70,19 @@ export function feeTotalOverMax (rawTx: TransactionData, maxTotalFee: number) {
 
 export function getRawTx (newTx: RPC.SendTransaction.TxParams, accountId: string | undefined): TransactionData {
   const { gas, gasLimit, gasPrice, data, value, type, to, ...rawTx } = newTx
+  const getNonce = () => {
+    // pass through hex string or undefined
+    if (rawTx.nonce === undefined || isHexString(rawTx.nonce)) {
+      return rawTx.nonce
+    }
+
+    // convert positive integer strings to hex, reject everything else
+    const nonceBN = new BN(rawTx.nonce)
+    if (nonceBN.isNaN() || !nonceBN.isInteger() || nonceBN.isNegative()) {
+      throw new Error('Invalid nonce')
+    }
+    return addHexPrefix(nonceBN.toString(16))
+  }
   const parsedValue = !value || parseInt(value, 16) === 0 ? '0x0' : addHexPrefix(unpadHexString(value) || '0')
 
   const tx: TransactionData = {
@@ -78,6 +93,7 @@ export function getRawTx (newTx: RPC.SendTransaction.TxParams, accountId: string
     data: addHexPrefix(padToEven(stripHexPrefix(data || '0x'))),
     gasLimit: gasLimit || gas,
     chainId: rawTx.chainId,
+    nonce: getNonce(), 
     gasFeesSource: GasFeesSource.Dapp,
   }
 
