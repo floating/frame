@@ -81,7 +81,7 @@ async function recogErc20 (contractAddress: string, chainId: number, calldata: s
 
           return {
             id: 'erc20:approve',
-            data: { spender, amount, decimals, name, symbol, spenderEns: ens, spenderType: type },
+            data: { spender, amount, decimals, name, symbol, spenderEns: ens, spenderType: type, contract: contractAddress },
             update: ({ amount }) => {
               // amount is a hex string
               const approvedAmount = new BigNumber(amount || '').toString()
