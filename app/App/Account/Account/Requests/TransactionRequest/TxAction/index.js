@@ -192,22 +192,6 @@ class TxSending extends React.Component {
                   </ClusterValue>
                 </ClusterRow>
               )}
-
-              {/* {!revoke && (
-                <ClusterRow>
-                  <ClusterValue grow={2}>
-                    <div className='txSendingValue'>
-                      <span className='txSendingValueSymbol'>{symbol}</span>
-                      <span className='txSendingValueAmount'>{displayValue}</span>
-                    </div>
-                  </ClusterValue>
-                  <ClusterValue>
-                    <span className='_txMainTransferringEq'>{'≈'}</span>
-                    <span className='_txMainTransferringEqSymbol'>{'$'}</span>
-                    <span className='_txMainTransferringEqAmount'>{(displayValue * rateUSD).toFixed(2)}</span>
-                  </ClusterValue>
-                </ClusterRow>
-              )} */}
             </Cluster>
           </ClusterBox>
         )

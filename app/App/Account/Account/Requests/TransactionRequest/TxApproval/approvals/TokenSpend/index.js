@@ -168,7 +168,7 @@ class TokenSpend extends React.Component {
                   <div className='approveTokenSpendConfirmSymbol'>{data.symbol}</div>
                 </div>
               ) : (
-                <div className=''>
+                <div className='approveTokenSpendEdit'>
                   <div className='approveTokenSpendEditTitle'>
                     {'Token Spend Limit'}
                   </div>
