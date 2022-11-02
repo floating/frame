@@ -166,7 +166,8 @@ export class Accounts extends EventEmitter {
       const action = (request.recognizedActions || []).find(a => a.id === actionId)
 
       if (action && action.update) {
-        action.update(data)
+        action.update(request, data)
+        currentAccount.update()
       }
     }
   }

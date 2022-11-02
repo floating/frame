@@ -136,6 +136,7 @@ const rpc = {
     accounts.confirmRequestApproval(req.handlerId, approvalType, approvalData)
   },
   updateRequest (reqId, actionId, data, cb = () => {}) {
+    console.log('update request', { reqId, actionId, data })
     accounts.updateRequest(reqId, actionId, data)
   },
   approveRequest (req, cb) {

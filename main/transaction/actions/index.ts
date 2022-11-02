@@ -1,5 +1,6 @@
 import type { ActionType as Erc20Actions } from './erc20'
 import type { ActionType as EnsActions } from './ens'
+import type { AccountRequest } from '../../accounts'
 
 export type EntityType = 'unknown' | 'contract' | 'external'
 export type ActionType = Erc20Actions | EnsActions
@@ -7,7 +8,7 @@ export type ActionType = Erc20Actions | EnsActions
 export type Action<T> = {
   id: ActionType
   data?: T
-  update?: (params: Partial<T>) => {}
+  update?: (request: AccountRequest, params: Partial<T>) => {}
 }
 
 type DecodeContext = {

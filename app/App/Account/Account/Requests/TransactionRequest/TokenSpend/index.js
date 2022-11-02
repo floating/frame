@@ -240,7 +240,7 @@ class TokenSpend extends React.Component {
                 ) : null}
               </div>
               <div className='updateTokenApprovalSubmit' onClick={() => {
-                link.rpc('updateRequest', req.handlerId, approval.id, { amount: this.state.amount })  
+                link.rpc('updateRequest', req.handlerId, approval.id, { amount: this.state.amount }, () => {})
               }}>
                 {'Update Approval'}
               </div>

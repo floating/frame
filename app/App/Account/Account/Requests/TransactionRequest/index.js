@@ -95,6 +95,7 @@ class TransactionRequest extends React.Component {
     const { approval } = crumb.data
     const { accountId, handlerId } = this.props
     const req = this.store('main.accounts', accountId, 'requests', handlerId)
+
     return (
       <AdjustTokenApproval req={req} approval={approval} />
     )

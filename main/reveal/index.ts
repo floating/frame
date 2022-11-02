@@ -15,6 +15,7 @@ import erc20 from '../externalData/balances/erc-20-abi'
 
 import type { ApproveAction as Erc20Approval, TransferAction as Erc20Transfer } from '../transaction/actions/erc20'
 import type { Action, DecodableContract, EntityType } from '../transaction/actions'
+import type { TransactionRequest } from '../accounts'
 
 // TODO: fix generic typing here
 const knownContracts: DecodableContract<unknown>[] = [
@@ -77,24 +78,25 @@ async function recogErc20 (contractAddress: string, chainId: number, calldata: s
           const spender = decoded.args[0].toLowerCase()
           const amount = decoded.args[1].toHexString()
           const { ens, type } = await surface.identity(spender, chainId)
-          const data = { spender, amount, decimals, name, symbol, spenderEns: ens, spenderType: type }
+          const data = { spender, amount, decimals, name, symbol, spenderEns: ens, spenderType: type, contract: contractAddress }
 
           return {
             id: 'erc20:approve',
-            data: { spender, amount, decimals, name, symbol, spenderEns: ens, spenderType: type, contract: contractAddress },
-            update: ({ amount }) => {
+            data,
+            update: (request, { amount }) => {
               // amount is a hex string
               const approvedAmount = new BigNumber(amount || '').toString()
-    
-              // TODO: need to propagate call data back to the request itself
-              // req.data.data = contract.encodeCallData('approve', [spender, data.amount])
-    
-              // if (req.decodedData) {
-              //   req.decodedData.args[1].value = approvedAmount
-              // }
 
               log.verbose(`Updating Erc20 approve amount to ${approvedAmount} for contract ${contractAddress} and spender ${spender}`)
-              data.amount = approvedAmount
+
+              const txRequest = request as TransactionRequest
+
+              data.amount = amount
+              txRequest.data.data = contract.encodeCallData('approve', [spender, approvedAmount])
+
+              if (txRequest.decodedData) {
+                txRequest.decodedData.args[1].value = approvedAmount
+              }
             }
           } as Erc20Approval
         } else if (Erc20Contract.isTransfer(decoded)) {
