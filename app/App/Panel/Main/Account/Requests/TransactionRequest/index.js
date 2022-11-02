@@ -318,9 +318,9 @@ class TransactionRequest extends React.Component {
                               onMouseDown={() => {
                                 if (req && req.tx && req.tx.hash) {
                                   if (this.store('main.mute.explorerWarning')) {
-                                    link.send('tray:openExplorer', req.tx.hash, this.chain)
+                                    link.send('tray:openExplorer', 'transaction', req.tx.hash, this.chain)
                                   } else {
-                                    this.store.notify('openExplorer', { hash: req.tx.hash, chain: this.chain })
+                                    this.store.notify('openExplorer', { type: 'transaction', hash_or_address: req.tx.hash, chain: this.chain })
                                   }
                                 }
                               }}

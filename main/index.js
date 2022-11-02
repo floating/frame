@@ -197,12 +197,13 @@ ipcMain.on('tray:openExternal', (e, url) => {
   if (validHost) shell.openExternal(url)
 })
 
-ipcMain.on('tray:openExplorer', (e, hash, chain) => {
+ipcMain.on('tray:openExplorer', (e, type, hash_or_address, chain) => {
   // remove trailing slashes from the base url
   const explorer = (store('main.networks', chain.type, chain.id, 'explorer') || '').replace(/\/+$/, '')
 
   if (explorer) {
-    shell.openExternal(`${explorer}/tx/${hash}`)
+    const directory = type === 'transaction' ? 'tx' : 'address';
+    shell.openExternal(`${explorer}/${directory}/${hash_or_address}`)
   }
 })
 

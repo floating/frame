@@ -76,6 +76,18 @@ class Settings extends React.Component {
               }}>Remove This Account</div>
             </>
           )}
+          <br />
+          <div className='moduleButton' onMouseDown={() => {
+            const chain = this.store('main.currentNetwork')
+
+            if (this.store('main.mute.explorerWarning')) {
+              link.send('tray:openExplorer', 'address', account.address, chain)
+            } else {
+              this.store.notify('openExplorer', { type: 'address', hash_or_address: account.address, chain })
+            }
+          }}>
+            Open in Explorer
+          </div>
         </div>
       </div>
     )

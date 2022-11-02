@@ -469,17 +469,29 @@ class Notify extends React.Component {
     )
   }
 
-  openExplorer ({ hash, chain }) {
+  openExplorer ({ type, chain, hash_or_address }) {
+	let notifyBody = <div></div>
+	if (type === 'transaction') {
+		notifyBody = <div className='notifyBody'>
+			<div className='notifyBodyLine'>Frame will open a block explorer in your browser for transaction:</div>
+			<div className='notifyBodyElement'>{hash_or_address}</div>
+		</div>
+	} else {
+		notifyBody = <div className='notifyBody'>
+			<div className='notifyBodyLine'>Frame will open a block explorer in your browser for address:</div>
+			<div className='notifyBodyElement'>{hash_or_address}</div>
+		</div> 
+	}
+
     return (
       <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
         <div className='notifyBox'>
           <div className='notifyTitle'>
             Open Block Explorer
           </div>
-          <div className='notifyBody'>
-            <div className='notifyBodyLine'>Frame will open a block explorer in your browser for transaction:</div>
-            <div className='notifyBodyHash'>{hash}</div>
-          </div>
+
+          { notifyBody }
+
           <div className='notifyInput'>
             <div
               className='notifyInputOption notifyInputDeny' onMouseDown={() => {
@@ -490,7 +502,7 @@ class Notify extends React.Component {
             </div>
             <div
               className='notifyInputOption notifyInputProceed' onMouseDown={() => {
-                link.send('tray:openExplorer', hash, chain)
+                link.send('tray:openExplorer', type, hash_or_address, chain)
                 this.store.notify()
               }}
             >
@@ -508,7 +520,7 @@ class Notify extends React.Component {
               ) : null}
             </div>
             <div className='notifyCheckText'>
-              {'Don\'t show this warning again'}
+				Don't show this warning again
             </div>
           </div>
         </div>
