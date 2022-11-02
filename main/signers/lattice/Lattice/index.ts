@@ -260,10 +260,6 @@ export default class Lattice extends Signer {
   }
 
   async signTypedData (index: number, typedMessage: TypedMessage<SignTypedDataVersion.V4>, cb: Callback<string>) {
-    if (typedMessage.version !== SignTypedDataVersion.V4) {
-      return cb(new Error(`Invalid version (${typedMessage.version}), Lattice only supports eth_signTypedData version 4+`))
-    }
-
     try {
       const signature = await this.sign(index, 'eip712', typedMessage.data)
 

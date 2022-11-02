@@ -434,10 +434,6 @@ export default class Ledger extends Signer {
   }
 
   signTypedData (index: number, typedMessage: TypedMessage<SignTypedDataVersion.V4>, cb: Callback<string>) {
-    if (typedMessage.version !== SignTypedDataVersion.V4) {
-      return cb(new Error(`Invalid version (${typedMessage.version}), Ledger only supports eth_signTypedData version 4+`), undefined)
-    }
-
     this.enqueueRequests({
       type: 'signTypedData',
       execute: async () => {

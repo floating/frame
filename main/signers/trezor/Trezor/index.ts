@@ -222,10 +222,6 @@ export default class Trezor extends Signer {
   }
 
   async signTypedData (index: number, typedMessage: TypedMessage<SignTypedDataVersion.V4>, cb: Callback<string>) {
-    if (typedMessage.version !== SignTypedDataVersion.V4) {
-      return cb(new Error(`Invalid version (${typedMessage.version}), Trezor only supports eth_signTypedData version 4+`), undefined)
-    }
-
     try {
       if (!this.device) {
         throw new Error('Trezor is not connected')
