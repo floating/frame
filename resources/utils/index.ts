@@ -84,8 +84,6 @@ function accountSort (accounts:Record<string, Account>, a:string, b:string) {
   }
 }
 
-
-
 export {
   getErrorCode,
   randomLetters,
