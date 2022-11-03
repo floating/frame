@@ -109,13 +109,11 @@ export class Provider extends EventEmitter {
     })
 
     this.connection.on('update', (chain: Chain, event) => {
-      console.log('CHANI UPDATE', { chain, event })
       if (event.type === 'fees') {
         return accounts.updatePendingFees(chain.id)
       }
 
       if (event.type === 'status') {
-        console.log('EMITTING', `status:${chain.type}:${chain.id}`)
         this.emit(`status:${chain.type}:${chain.id}`, event.status)
       }
     })
