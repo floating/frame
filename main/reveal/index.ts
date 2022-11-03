@@ -12,6 +12,7 @@ import Erc20Contract from '../contracts/erc20'
 import { decodeCallData, fetchContract, ContractSource } from '../contracts'
 import ensContracts from '../contracts/deployments/ens'
 import erc20 from '../externalData/balances/erc-20-abi'
+import { MAX_HEX } from '../../resources/utils/constants'
 
 import type { ApproveAction as Erc20Approval, TransferAction as Erc20Transfer } from '../transaction/actions/erc20'
 import type { Action, DecodableContract, EntityType } from '../transaction/actions'
@@ -29,7 +30,6 @@ const provider = new EthereumProvider(proxyConnection)
 
 // TODO: Discuss the need to set chain for the proxy connection
 provider.setChain('0x1')
-
 
 type RecognitionContext = {
   contractAddress: string
@@ -92,10 +92,10 @@ async function recogErc20 (contractAddress: string, chainId: number, calldata: s
               const txRequest = request as TransactionRequest
 
               data.amount = amount
-              txRequest.data.data = contract.encodeCallData('approve', [spender, approvedAmount])
+              txRequest.data.data = contract.encodeCallData('approve', [spender, amount])
 
               if (txRequest.decodedData) {
-                txRequest.decodedData.args[1].value = approvedAmount
+                txRequest.decodedData.args[1].value = amount === MAX_HEX ? 'unlimited' : approvedAmount
               }
             }
           } as Erc20Approval

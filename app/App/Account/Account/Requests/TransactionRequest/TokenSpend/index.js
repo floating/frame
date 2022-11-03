@@ -5,10 +5,9 @@ import BigNumber from 'bignumber.js'
 import svg from '../../../../../../../resources/svg'
 import link from '../../../../../../../resources/link'
 
-import { ADDRESS_DISPLAY_CHARS, ApprovalType } from '../../../../../../../resources/constants'
+import { ADDRESS_DISPLAY_CHARS, MAX_HEX } from '../../../../../../../resources/constants'
 
 const numberRegex = /\.0+$|(\.[0-9]*[1-9])0+$/
-const MAX_HEX = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
 
 const digitsLookup = [
   { value: 1, symbol: '' },
