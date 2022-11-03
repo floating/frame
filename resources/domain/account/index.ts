@@ -8,16 +8,12 @@ export function accountSort (accounts:Record<string, Account>, a:string, b:strin
 
     if (aBlockStr === 'new' && bBlockStr !== 'new') return -1
     if (bBlockStr !== 'new' && aBlockStr === 'new') return 1
-    if (aBlockStr === 'new' && bBlockStr === 'new') return aLocal >= bLocal ? -1: 1
+    if (aBlockStr === 'new' && bBlockStr === 'new') return bLocal - aLocal
 
     const aBlock = parseInt(aBlockStr)
     const bBlock = parseInt(bBlockStr)
 
-    if (aBlock > bBlock) return -1
-    if (aBlock < bBlock) return 1
-    if (aBlock === bBlock) return aLocal >= bLocal ? -1 : 1
-
-    return 0
+    return bBlock-aBlock
   } catch (e) {
     console.error(e)
     return 0

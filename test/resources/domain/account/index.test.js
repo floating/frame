@@ -17,7 +17,7 @@ beforeEach(() => {
 })
 
 describe('accountSort', () => {
-  it('should correctly sort a set of accouunts which are all new', () => {
+  it('should correctly sort a set of accounts in descending order by creation time when `creation` properties have the "new" prefix', () => {
     const newAccounts = accounts.filter(accountFilter())
     const newAccountAddresses = newAccounts.map(acc => acc.address)
     const sorted = newAccountAddresses.sort((a,b) => accountSort(accountsObj, a, b))
@@ -25,7 +25,7 @@ describe('accountSort', () => {
     expect(sorted).toStrictEqual(orderedAddresses)
   })
 
-  it('should correctly sort a set of accouunts which are all using the block prefix', () => {
+  it('should correctly sort a set of accounts in descending order by creation time when `creation` properties have a numeric block prefix', () => {
     const blockAccounts = accounts.filter(accountFilter(false))
     const blockAccountAddresses = blockAccounts.map(acc => acc.address)
     const sorted = blockAccountAddresses.sort((a,b) => accountSort(accountsObj, a, b))
@@ -33,7 +33,7 @@ describe('accountSort', () => {
     expect(sorted).toStrictEqual(orderedAddresses)
   })
 
-  it('should correctly sort a set of accouunts regardless of prefix', () => {
+  it('should correctly sort a set of accounts in descending order by creation time when `creation` properties have both prefixes', () => {
     const accountAddresses = accounts.map(acc => acc.address)
     const sorted = accountAddresses.sort((a,b) => accountSort(accountsObj, a, b))
     const newAccountAddresses = accounts.filter(accountFilter()).map(x => x.address)
