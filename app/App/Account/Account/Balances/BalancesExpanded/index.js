@@ -57,10 +57,10 @@ class BalancesExpanded extends React.Component {
         const isNative = isNativeCurrency(rawBalance.address)
         const nativeCurrencyInfo = networksMeta[rawBalance.chainId].nativeCurrency || {}
 
-        const rate = (isNative && nativeCurrencyInfo )|| rates[rawBalance.address || rawBalance.symbol] || {}
+        const rate = isNative ? nativeCurrencyInfo  : rates[rawBalance.address || rawBalance.symbol] || {}
         const logoURI = (isNative && nativeCurrencyInfo.icon) || rawBalance.logoURI
-        const name = (isNative && nativeCurrencyInfo.name || networks[rawBalance.chainId].name) || rawBalance.name
-        const decimals = (isNative && nativeCurrencyInfo.decimals || 18) || rawBalance.decimals
+        const name = (isNative && nativeCurrencyInfo.name) || rawBalance.name
+        const decimals = isNative ? nativeCurrencyInfo.decimals || 18 : rawBalance.decimals
         const symbol = (isNative && nativeCurrencyInfo.symbol) || rawBalance.symbol
 
         return balance({ ...rawBalance, logoURI, name, decimals, symbol }, networks[rawBalance.chainId].isTestnet ? { price: 0 } : rate.usd)

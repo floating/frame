@@ -102,7 +102,6 @@ export default function rates (pylon: Pylon, store: Store) {
 
     log.verbose('subscribing to rates updates for native currencies on chains:', assetIds.filter(a => a.type === AssetType.NativeCurrency).map(a => a.chainId))
     log.verbose('subscribing to rates updates for tokens:', assetIds.filter(a => a.type === AssetType.Token).map(a => a.address))
-    // log.verbose('subscribing to chain updates for chains:', chains)
 
     pylon.rates(assetIds)
   }
