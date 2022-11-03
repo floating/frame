@@ -1,6 +1,7 @@
 import React from 'react'
 import Restore from 'react-restore'
 
+import {accountSort} from '../../../../../resources/utils'
 import link from '../../../../../resources/link'
 import svg from '../../../../../resources/svg'
 
@@ -145,6 +146,7 @@ class AddAragon extends React.Component {
 
   render () {
     let itemClass = 'addAccountItem addAccountItemSmart'
+    const accounts = this.store('main.accounts')
     if (this.state.adding) itemClass += ' addAccountItemAdding'
     return (
       <div className={itemClass} style={{ transitionDelay: (0.64 * this.props.index / 4) + 's' }}>
@@ -182,11 +184,11 @@ class AddAragon extends React.Component {
                 <div className='addAccountItemOptionSetupFrame'>
                   <div className='addAccountItemOptionTitle'>Choose acting account</div>
                   <div className='addAccountItemOptionList'>
-                    {Object.keys(this.store('main.accounts'))
+                    {Object.keys(accounts)
                       .filter(id => this.accountFilter(id))
-                      .sort((a, b) => this.accountSort(a, b))
+                      .sort((a, b) => accountSort(accounts, a, b))
                       .map(id => {
-                        const account = this.store('main.accounts', id)
+                        const account = accounts[id]
                         return <div key={id} className='addAccountItemOptionListItem' onMouseDown={e => this.actorAccount(id)}>{account.name}</div>
                       })}
                   </div>

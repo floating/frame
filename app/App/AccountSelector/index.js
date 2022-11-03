@@ -4,6 +4,7 @@ import Restore from 'react-restore'
 
 import AccountController from './AccountController'
 
+import {accountSort} from '../../../resources/utils'
 import svg from '../../../resources/svg'
 import link from '../../../resources/link'
 
@@ -35,32 +36,6 @@ class AccountSelector extends React.Component {
         this.scroll.scrollTo({ top: -999999999999, left: 0, behavior: 'smooth' })
       }
     }, 3000)
-  }
-
-  accountSort (accounts, a, b) {
-    try {
-      let [aBlock, aLocal] = accounts[a].created.split(':')
-      let [bBlock, bLocal] = accounts[b].created.split(':')
-  
-      aLocal = parseInt(aLocal)
-      bLocal = parseInt(bLocal)
-  
-      if (aBlock === 'new' && bBlock !== 'new') return -1
-      if (bBlock !== 'new' && aBlock === 'new') return 1
-      if (aBlock === 'new' && bBlock === 'new') return aLocal >= bLocal ? 1 : 0
-  
-      aBlock = parseInt(aBlock)
-      bBlock = parseInt(bBlock)
-  
-      if (aBlock > bBlock) return -1
-      if (aBlock < bBlock) return -1
-      if (aBlock === bBlock) return aLocal >= bLocal ? 1 : 0
-
-      return 0
-    } catch (e) {
-      console.error(e)
-      return 0
-    }
   }
 
   renderAccountFilter () {
@@ -100,10 +75,9 @@ class AccountSelector extends React.Component {
   renderAccountList () {
     const accounts = this.store('main.accounts')
     const current = this.store('selected.current')
-    const scrollTop = this.store('selected.position.scrollTop')
     const open = current && this.store('selected.open')
 
-    const sortedAccounts = Object.keys(accounts).sort((a, b) => this.accountSort(accounts, a, b))
+    const sortedAccounts = Object.keys(accounts).sort((a, b) => accountSort(accounts, a, b))
 
     const filter = this.store('panel.accountFilter')
 

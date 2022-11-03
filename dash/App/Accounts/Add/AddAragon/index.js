@@ -4,6 +4,7 @@ import Restore from 'react-restore'
 import link from '../../../../../resources/link'
 import svg from '../../../../../resources/svg'
 import RingIcon from '../../../../../resources/Components/RingIcon'
+import {accountSort} from '../../../../../resources/utils'
 
 class AddAragon extends React.Component {
   constructor (...args) {
@@ -155,6 +156,7 @@ class AddAragon extends React.Component {
 
   render () {
     let itemClass = 'addAccountItem addAccountItemSmart addAccountItemAdding'
+    const accounts = this.store('main.accounts')
     return (
       <div className={itemClass}>
         <div className='addAccountItemBar addAccountItemSmart' />
@@ -192,11 +194,11 @@ class AddAragon extends React.Component {
                 <div className='addAccountItemOptionSetupFrame'>
                   <div className='addAccountItemOptionTitle'>Choose acting account</div>
                   <div className='addAccountItemOptionList'>
-                    {Object.keys(this.store('main.accounts'))
+                    {Object.keys(accounts)
                       .filter(id => this.accountFilter(id))
-                      .sort((a, b) => this.accountSort(a, b))
+                      .sort((a, b) => accountSort(accounts, a, b))
                       .map(id => {
-                        const account = this.store('main.accounts', id)
+                        const account = accounts[id]
                         return <div key={id} className='addAccountItemOptionListItem' onMouseDown={e => this.actorAccount(id)}>
                           <div className='actingAccountAddress'>{id ? id.substring(0, 8) : ''}{svg.octicon('kebab-horizontal', { height: 16 })}{id ? id.substr(id.length - 6) : ''}</div>
                           <div className='actingAccountTag'>{account.name}</div>
