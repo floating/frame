@@ -4,7 +4,7 @@ import Restore from 'react-restore'
 
 import AccountController from './AccountController'
 
-import {accountSort} from '../../../resources/utils'
+import { accountSort } from '../../../resources/domain/account'
 import svg from '../../../resources/svg'
 import link from '../../../resources/link'
 
@@ -75,6 +75,7 @@ class AccountSelector extends React.Component {
   renderAccountList () {
     const accounts = this.store('main.accounts')
     const current = this.store('selected.current')
+    const scrollTop = this.store('selected.position.scrollTop')
     const open = current && this.store('selected.open')
 
     const sortedAccounts = Object.keys(accounts).sort((a, b) => accountSort(accounts, a, b))

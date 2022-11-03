@@ -4,7 +4,7 @@ import Restore from 'react-restore'
 import link from '../../../../../resources/link'
 import svg from '../../../../../resources/svg'
 import RingIcon from '../../../../../resources/Components/RingIcon'
-import {accountSort} from '../../../../../resources/utils'
+import { accountSort } from '../../../resources/domain/account'
 
 class AddAragon extends React.Component {
   constructor (...args) {

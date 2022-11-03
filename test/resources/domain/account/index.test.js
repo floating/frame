@@ -1,4 +1,4 @@
-import { accountSort } from '../../../resources/utils'
+import { accountSort } from '../../../../resources/domain/account'
 
 const blockNumber  = Math.floor(Math.random() * 10000)
 const accountFilter = (newOnly = true) => ({created}) => newOnly ? created.startsWith("new") : !created.startsWith("new")
