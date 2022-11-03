@@ -73,24 +73,6 @@ export default function rates (pylon: Pylon, store: Store) {
     }
   }
 
-  // function handleChainUpdates (updates: ChainUpdate[]) {
-  //   if (updates.length === 0) return
-
-  //   log.debug(`got chain updates for ${updates.map(u => u.id)}`)
-    
-  //   updates.forEach(update => {
-  //     const { chainId, nativeCurrency } = update.data
-  //     const { iconURI, name, symbol, decimals } = nativeCurrency
-
-  //     storeApi.setNativeCurrencyData(chainId, {
-  //       icon: iconURI,
-  //       name,
-  //       symbol,
-  //       decimals: decimals || 18
-  //     })
-  //   })
-  // }
-
   function updateSubscription (chains: number[], address?: Address) {
     const subscribedCurrencies = chains.map(chainId => ({ type: AssetType.NativeCurrency, chainId }))
     const knownTokens = storeApi.getKnownTokens(address).filter(token => chains.includes(token.chainId))
@@ -112,7 +94,6 @@ export default function rates (pylon: Pylon, store: Store) {
     log.verbose('stopping asset updates')
 
     pylon.off('rates', handleRatesUpdates)
-    // pylon.off('chains', handleChainUpdates)
 
     pylon.rates([])
   }

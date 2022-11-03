@@ -575,8 +575,7 @@ const migrations = {
     goerliSymbol === "ETH" && (initial.main.networksMeta.ethereum[5].nativeCurrency.symbol = "görETH")
     sepoliaSymbol === "ETH" && (initial.main.networksMeta.ethereum[11155111].nativeCurrency.symbol = "sepETH")
     Object.values(initial.main.networksMeta.ethereum).forEach((metadata) => {
-      const {nativeCurrency:{decimals}} = metadata
-      if (!decimals) metadata.nativeCurrency.decimals = 18
+      metadata.nativeCurrency.decimals = metadata.nativeCurrency.decimals || 18
     })
     return initial
   }
