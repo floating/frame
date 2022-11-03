@@ -57,6 +57,7 @@ function getErrorCode (e: Error) {
 
   return e.code
 }
+
 export {
   getErrorCode,
   randomLetters,
