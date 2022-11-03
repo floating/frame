@@ -1,7 +1,7 @@
 export function accountSort (accounts:Record<string, Account>, a:string, b:string) {
   try {
-    let [aBlockStr, aLocalStr] = accounts[a].created.split(':')
-    let [bBlockStr, bLocalStr] = accounts[b].created.split(':')
+    const [aBlockStr, aLocalStr] = accounts[a].created.split(':')
+    const [bBlockStr, bLocalStr] = accounts[b].created.split(':')
 
     const aLocal = parseInt(aLocalStr)
     const bLocal = parseInt(bLocalStr)

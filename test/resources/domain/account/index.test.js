@@ -1,44 +1,70 @@
 import { accountSort } from '../../../../resources/domain/account'
 
-const blockNumber  = Math.floor(Math.random() * 10000)
-const accountFilter = (newOnly = true) => ({created}) => newOnly ? created.startsWith("new") : !created.startsWith("new")
-const addresses = ["0xa7888f85bd76deef3bd03d4dbcf57765a49883b3", "0x66b870ddf78c975af5cd8edc6de25eca81791de1", "0xc1e42f862d202b4a0ed552c1145735ee088f6ccf", "0x9c5083dd4838e120dbeac44c052179692aa5dac5", "0x2326d4fb2737666dda96bd6314e3d4418246cfe8", "0xe70981f2aeb601a12001465c7a5e52aa76adcbec", "0xa1efa0adecb7f5691605899d13285928ae025844"]
-const accountsObj = addresses.reduce((acc, address, index) => (Object.assign(acc, {[address]:{
+
+const makeMockAccount = (address, timestamp = Date.now(), block = 0, name = address) => ({
   address,
-  name: address,
-  created: index % 2 === 0 ? `${blockNumber + index}:${Date.now()}` : `new:${Date.now() + (index * 10)}`,
-}})
-), {})
-let accounts = Object.values(accountsObj)
+  name,
+  created: block ? `${block}:${timestamp}` : `new:${timestamp}`
+})
+
+const addresses = ["0xa7888f85bd76deef3bd03d4dbcf57765a49883b3", "0x66b870ddf78c975af5cd8edc6de25eca81791de1", "0xc1e42f862d202b4a0ed552c1145735ee088f6ccf", "0x9c5083dd4838e120dbeac44c052179692aa5dac5", "0x2326d4fb2737666dda96bd6314e3d4418246cfe8", "0xe70981f2aeb601a12001465c7a5e52aa76adcbec", "0xa1efa0adecb7f5691605899d13285928ae025844"]
+let now = 0
 
 beforeEach(() => {
-  //shuffle accounts
-  accounts = accounts.sort(() => 0.5 - Math.random());
+  now = Date.now()
 })
 
 describe('accountSort', () => {
-  it('should correctly sort a set of accounts in descending order by creation time when `creation` properties have the "new" prefix', () => {
-    const newAccounts = accounts.filter(accountFilter())
-    const newAccountAddresses = newAccounts.map(acc => acc.address)
-    const sorted = newAccountAddresses.sort((a,b) => accountSort(accountsObj, a, b))
-    const orderedAddresses = addresses.filter(x => newAccountAddresses.includes(x)).reverse();
-    expect(sorted).toStrictEqual(orderedAddresses)
+  it('should correctly sort a set of accounts in descending order by creation time according to timestamp', () => {
+    const acc1 =  makeMockAccount(addresses[0])
+    const acc2 = makeMockAccount(addresses[1], now + 500)
+    const acc3 = makeMockAccount(addresses[2], now + 800)
+    const acc4 = makeMockAccount(addresses[3], now + 2000)
+
+    const accountsDictionary = {
+      [addresses[0]]: acc1,
+      [addresses[1]]: acc2,
+      [addresses[2]]: acc3,
+      [addresses[3]]: acc4,
+    }
+
+    const unsorted = [acc2, acc3, acc1, acc4]
+    const sorted = unsorted.map(x => x.address).sort((a,b) => accountSort(accountsDictionary, a, b))
+    expect(sorted).toStrictEqual([acc4.address, acc3.address, acc2.address, acc1.address])
   })
 
-  it('should correctly sort a set of accounts in descending order by creation time when `creation` properties have a numeric block prefix', () => {
-    const blockAccounts = accounts.filter(accountFilter(false))
-    const blockAccountAddresses = blockAccounts.map(acc => acc.address)
-    const sorted = blockAccountAddresses.sort((a,b) => accountSort(accountsObj, a, b))
-    const orderedAddresses = addresses.filter(x => blockAccountAddresses.includes(x)).reverse();
-    expect(sorted).toStrictEqual(orderedAddresses)
+  it('should correctly sort a set of accounts in descending order by creation time according to block number', () => {
+    const acc1 =  makeMockAccount(addresses[0], now, 10 )
+    const acc2 = makeMockAccount(addresses[1], now, 20)
+    const acc3 = makeMockAccount(addresses[2], now, 21)
+    const acc4 = makeMockAccount(addresses[3], now, 30)
+
+    const accountsDictionary = {
+      [addresses[0]]: acc1,
+      [addresses[1]]: acc2,
+      [addresses[2]]: acc3,
+      [addresses[3]]: acc4,
+    }
+    
+    const unsorted = [acc2, acc4, acc3, acc1]
+    const sorted = unsorted.map(x => x.address).sort((a,b) => accountSort(accountsDictionary, a, b))
+    expect(sorted).toStrictEqual([acc4.address, acc3.address, acc2.address, acc1.address])
   })
 
-  it('should correctly sort a set of accounts in descending order by creation time when `creation` properties have both prefixes', () => {
-    const accountAddresses = accounts.map(acc => acc.address)
-    const sorted = accountAddresses.sort((a,b) => accountSort(accountsObj, a, b))
-    const newAccountAddresses = accounts.filter(accountFilter()).map(x => x.address)
-    const orderedNewAddresses = addresses.filter(x => newAccountAddresses.includes(x)).reverse();
-    const orderedBlockAddresses = addresses.filter(x => !newAccountAddresses.includes(x)).reverse();
-    expect(sorted).toStrictEqual([...orderedNewAddresses, ...orderedBlockAddresses])
+  it('should correctly sort a set of accounts in descending order by creation time according to block number and timestamp', () => {
+    const acc1 =  makeMockAccount(addresses[0], now)
+    const acc2 = makeMockAccount(addresses[1], now, 20)
+    const acc3 = makeMockAccount(addresses[2], now+800, 999)
+    const acc4 = makeMockAccount(addresses[3], now + 100, 31)
+
+    const accountsDictionary = {
+      [addresses[0]]: acc1,
+      [addresses[1]]: acc2,
+      [addresses[2]]: acc3,
+      [addresses[3]]: acc4,
+    }
+    const unsorted = [acc2, acc3, acc1, acc4]
+    const sorted = unsorted.map(x => x.address).sort((a,b) => accountSort(accountsDictionary, a, b))
+    expect(sorted).toStrictEqual([acc1.address, acc3.address, acc4.address, acc2.address])
   })
 })
