@@ -41,5 +41,4 @@ describe('accountSort', () => {
     const orderedBlockAddresses = addresses.filter(x => !newAccountAddresses.includes(x)).reverse();
     expect(sorted).toStrictEqual([...orderedNewAddresses, ...orderedBlockAddresses])
   })
-  
 })
