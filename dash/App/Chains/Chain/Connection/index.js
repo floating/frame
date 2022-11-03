@@ -14,10 +14,14 @@ const ConnectionIndicator = ({ className, connection }) => {
   const isPending = connection.status === 'pending'
   const isSyncing = connection.status === 'syncing'
   const isStandBy = connection.status === 'standby'
+  const isDegraded = connection.status === 'degraded'
+
   let status = 'Bad'
 
   if (isConnected) {
     status = 'Good'
+  } else if (isDegraded) {
+    status = 'Warning'
   } else if (isLoading || isPending || isSyncing || isStandBy) {
     status = 'Pending'
   }

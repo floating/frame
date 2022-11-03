@@ -65,7 +65,7 @@ class ChainConnection extends EventEmitter {
   }
 
   _handleConnection (priority) {
-    this.update(priority)
+    this._updateStatus(priority, 'connected')
     this.emit('connect')
   }
 
@@ -73,7 +73,7 @@ class ChainConnection extends EventEmitter {
     const monitor = new BlockMonitor(provider)
     const allowEip1559 = !legacyChains.includes(parseInt(this.chainId))
 
-    monitor.on('data', async block => {
+    monitor.on('data', async (block) => {
       let feeMarket = null
 
       const gasCalculator = new GasCalculator(provider)
@@ -115,7 +115,7 @@ class ChainConnection extends EventEmitter {
         store.setGasFees(this.type, this.chainId, feeMarket)
         store.setBlockHeight(this.chainId, parseInt(block.number, 16))
 
-        this.emit('update', { type: 'fees', chainId: parseInt(this.chainId) })
+        this.emit('update', { type: 'fees' })
       } catch (e) {
         log.error(`could not update gas prices for chain ${this.chainId}`, { feeMarket, chainConfig: this.chainConfig }, e)
       }
@@ -161,6 +161,15 @@ class ChainConnection extends EventEmitter {
     provider.sendAsync({ jsonrpc: '2.0', method: 'web3_clientVersion', params: [], id: 1 }, cb) 
   }
 
+  _updateStatus (priority, status) {
+    log.debug('Chains.updateStatus', { priority, status })
+
+    this[priority].status = status
+    this.update(priority)
+
+    this.emit('update', { type: 'status', status })
+  }
+
   resetConnection (priority /* 'primary' | 'secondary' */, status, target) {
     log.debug('resetConnection', { priority, status, target })
 
@@ -175,13 +184,11 @@ class ChainConnection extends EventEmitter {
 
     if (['off', 'disconnected', 'standby'].includes(status)) {
       if (this[priority].status !== status) {
-        this[priority].status = status
-
         if (['off', 'disconnected'].includes(status)) {
           this[priority].network = ''
         }
 
-        this.update(priority)
+        this._updateStatus(priority, status)
       }
     } else {
       this[priority].currentTarget = target
@@ -255,15 +262,15 @@ class ChainConnection extends EventEmitter {
               this.primary.type = ''
               this.primary.status = 'error'
               this.update('secondary')
+
+              //this._updateStatus('secondary', 'error')
             } else {
               this.secondary.network = !err && response && !response.error ? response.result : ''
               if (this.secondary.network && this.secondary.network !== this.chainId) {
                 this.secondary.connected = false
                 this.secondary.type = ''
-                this.secondary.status = 'chain mismatch'
-                this.update('secondary')
+                this._updateStatus('secondary', 'chain mismatch')
               } else {
-                this.secondary.status = 'connected'
                 this.secondary.connected = true
                 this.secondary.type = ''
 
@@ -284,11 +291,9 @@ class ChainConnection extends EventEmitter {
           if (status === 'connected' && this.secondary.network && this.secondary.network !== this.chainId) {
             this.secondary.connected = false
             this.secondary.type = ''
-            this.secondary.status = 'chain mismatch'
-            this.update('secondary')
-          } else {
-            this.secondary.status = status
-            this.update('secondary')
+            this._updateStatus('secondary', 'chain mismatch')
+          } else if (this.secondary.status !== status) {
+            this._updateStatus('secondary', status)
           }
         })
         this.secondary.provider.on('data', data => this.emit('data', data))
@@ -321,19 +326,21 @@ class ChainConnection extends EventEmitter {
             if (err) {
               this.primary.connected = false
               this.primary.type = ''
-              this.primary.status = 'error'
-              this.update('primary')
+
+              this._updateStatus('primary', 'error')
             } else {
               this.primary.network = !err && response && !response.error ? response.result : ''
               if (this.primary.network && this.primary.network !== this.chainId) {
                 this.primary.connected = false
                 this.primary.type = ''
-                this.primary.status = 'chain mismatch'
-                this.update('primary')
+                this._updateStatus('primary', 'chain mismatch')
               } else {
-                this.primary.status = 'connected'
                 this.primary.connected = true
                 this.primary.type = ''
+                //this.primary.status = 'connected'
+
+                //this.update('primary')
+                //this.emit('connect')
 
                 this._handleConnection('primary')
               }
@@ -353,11 +360,10 @@ class ChainConnection extends EventEmitter {
           if (status === 'connected' && this.primary.network && this.primary.network !== this.chainId) {
             this.primary.connected = false
             this.primary.type = ''
-            this.primary.status = 'chain mismatch'
-            this.update('primary')
-          } else {
-            this.primary.status = status
-            this.update('primary')
+
+            this._updateStatus('primary', 'chain mismatch')
+          } else if (this.primary.status !== status) {
+            this._updateStatus('primary', status)
           }
         })
         this.primary.provider.on('data', data => this.emit('data', data))
@@ -445,7 +451,7 @@ class Chains extends EventEmitter {
             })
 
             this.connections[type][chainId].on('update', (...args) => {
-              this.emit('update', { type, id: chainId }, ...args)
+              this.emit('update', { type, id: parseInt(chainId) }, ...args)
             })
 
             this.connections[type][chainId].on('error', (...args) => {

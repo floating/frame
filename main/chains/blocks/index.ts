@@ -4,36 +4,36 @@ import log from 'electron-log'
 import type { BigNumber } from 'bignumber.js'
 
 interface Connection extends EventEmitter {
-  send (payload: JSONRPCRequestPayload): Promise<any>,
+  send (payload: JSONRPCRequestPayload): Promise<any>
   chainId: string
 }
 
 interface SubscriptionMessage {
-  type: 'eth_subscription',
+  type: 'eth_subscription'
   data: {
-    subscription: string,
+    subscription: string
     result: Block
   }
 }
 
 interface Block {
-  number: string,
-  hash: string | null,
-  parentHash: string,
-  nonce: string | null,
-  sha3Uncles: string,
-  logsBloom: string | null,
-  transactionsRoot: string,
-  stateRoot: string,
-  miner: string,
-  difficulty: BigNumber,
-  totalDifficulty: BigNumber,
-  extraData: string,
-  size: number,
-  gasLimit: number,
-  gasUsed: number,
-  timestamp: number,
-  uncles: string[],
+  number: string
+  hash: string | null
+  parentHash: string
+  nonce: string | null
+  sha3Uncles: string
+  logsBloom: string | null
+  transactionsRoot: string
+  stateRoot: string
+  miner: string
+  difficulty: BigNumber
+  totalDifficulty: BigNumber
+  extraData: string
+  size: number
+  gasLimit: number
+  gasUsed: number
+  timestamp: number
+  uncles: string[]
 }
 
 class BlockMonitor extends EventEmitter {
@@ -104,10 +104,8 @@ class BlockMonitor extends EventEmitter {
   getLatestBlock () {
     this.connection
       .send({ id: 1, jsonrpc: '2.0', method: 'eth_getBlockByNumber', params: ['latest', false] })
-      .then(this.handleBlock)
-      .catch(err => {
-        log.error(`Could not load block for chain ${this.connection.chainId}`, err)
-      })
+      .then(block => this.handleBlock(block))
+      .catch(err => this.handleError(`Could not load block for chain ${this.connection.chainId}`, err))
   }
 
   handleMessage (message: SubscriptionMessage) {
@@ -117,11 +115,21 @@ class BlockMonitor extends EventEmitter {
   }
 
   handleBlock (block: Block) {
-    if (!block) return log.error('handleBlock received undefined block')
+    if (parseInt(this.connection.chainId) === 11155111 && Math.random() < 0.5) {
+      return this.handleError('BAD BLOCK')
+    }
+    if (!block) return this.handleError('handleBlock received undefined block')
+
     if (block.number !== this.latestBlock) {
       this.latestBlock = block.number
+      this.connection.emit('status', 'connected')
       this.emit('data', block)
     }
+  }
+
+  handleError (...args: any) {
+    this.connection.emit('status', 'degraded')
+    log.error(...args)
   }
 }
 

@@ -12,7 +12,7 @@ class TxBar extends React.Component {
     else if (req.status === 'sending') position = 2
     else if (req.status === 'verifying') position = 3
     else if (req.status === 'verified') position = 4
-    else if (req.status === 'confirming' || req.status === 'confirmed') {
+    else if (req.status === 'confirming' || req.status === 'confirmed' || req.status === 'sent') {
       position = 4
       progressIconClass += ' txProgressStepIconHidden'
       txBarClass += ' txBarSuccess'
