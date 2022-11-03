@@ -263,7 +263,7 @@ class ChainConnection extends EventEmitter {
               this.primary.status = 'error'
               this.update('secondary')
 
-              //this._updateStatus('secondary', 'error')
+              this._updateStatus('secondary', 'error')
             } else {
               this.secondary.network = !err && response && !response.error ? response.result : ''
               if (this.secondary.network && this.secondary.network !== this.chainId) {
@@ -337,10 +337,6 @@ class ChainConnection extends EventEmitter {
               } else {
                 this.primary.connected = true
                 this.primary.type = ''
-                //this.primary.status = 'connected'
-
-                //this.update('primary')
-                //this.emit('connect')
 
                 this._handleConnection('primary')
               }
