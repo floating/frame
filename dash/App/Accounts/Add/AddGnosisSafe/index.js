@@ -1,7 +1,7 @@
 import React from 'react'
 import Restore from 'react-restore'
 
-import { accountSort } from '../../../resources/domain/account'
+import { accountSort } from '../../../../../resources/domain/account'
 
 import link from '../../../../../resources/link'
 import svg from '../../../../../resources/svg'
