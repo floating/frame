@@ -330,6 +330,7 @@ export class Accounts extends EventEmitter {
             } catch (e) {
               log.error('error awaiting confirmations', e)
               clear()
+              setTxSent()
               setTimeout(() => this.accounts[account.address] && this.removeRequest(account, requestId), 60 * 1000)
               return
             }
@@ -383,6 +384,7 @@ export class Accounts extends EventEmitter {
               } catch (e) {
                 log.error(e)
 
+                setTxSent()
                 return removeSubscription(60 * 1000)
               }
 
