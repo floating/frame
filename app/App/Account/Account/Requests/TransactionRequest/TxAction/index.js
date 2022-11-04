@@ -1,14 +1,11 @@
-import React, { Children } from 'react'
+import React from 'react'
 import Restore from 'react-restore'
+import utils from 'web3-utils'
+
 import svg from '../../../../../../../resources/svg'
 import link from '../../../../../../../resources/link'
-import utils from 'web3-utils'
-import BigNumber from 'bignumber.js'
-import Transfer from './erc20/transfer'
-import Recipient from './recipient'
-import Destination from './destination'
-import Register from './ens/register'
 import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../../../resources/Components/Cluster'
+import { DisplayValue } from '../../../../../../../resources/domain/transaction/displayValue'
 
 class TxSending extends React.Component {
   constructor (...args) {
@@ -39,21 +36,13 @@ class TxSending extends React.Component {
         const { amount, decimals, name, recipient: recipientAddress, symbol, recipientType, recipientEns } = action.data || {}
         const address = recipientAddress
         const ensName = recipientEns
-        const value = new BigNumber(amount) 
-        const displayValue = value.dividedBy('1e' + decimals).toFixed(6)
+        const value = new DisplayValue(amount)
         // const ensName = (recipientEns && recipientEns.length < 25) ? recipientEns : ''
 
         const isTestnet = this.store('main.networks', this.props.chain.type, this.props.chain.id, 'isTestnet')    
         const rate = this.store('main.rates', contract)
-        const rateUSD = rate && rate.usd && !isTestnet ? rate.usd.price : 0
-  
-        const destination = recipientType && <Destination chain={chainName} recipientType={recipientType} />
-        const recipient = recipientAddress && 
-          <Recipient
-            address={recipientAddress}
-            ens={recipientEns}
-            copyAddress={(copied) => link.send('tray:clipboardData', copied)}
-          />
+        const { displayEther: displayValue } = value.toEther(18, decimals)
+        const { displayUSD } = value.toUSD(rate, isTestnet)
   
         return (
           <ClusterBox title={`Sending ${symbol}`} subtitle={name} animationSlot={this.props.i}>
@@ -67,8 +56,7 @@ class TxSending extends React.Component {
                 </ClusterValue>
                 <ClusterValue>
                   <span className='_txMainTransferringEq'>{'≈'}</span>
-                  <span className='_txMainTransferringEqSymbol'>{'$'}</span>
-                  <span className='_txMainTransferringEqAmount'>{(displayValue * rateUSD).toFixed(2)}</span>
+                  <span className='_txMainTransferringEqAmount'>{displayUSD}</span>
                 </ClusterValue>
               </ClusterRow>
               {address && recipientType === 'contract' ? (

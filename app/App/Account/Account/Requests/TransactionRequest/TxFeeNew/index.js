@@ -2,26 +2,16 @@ import React from 'react'
 import Restore from 'react-restore'
 import BigNumber from 'bignumber.js'
 
-import { GasFeesSource, toUSD, toEther, usesBaseFee } from '../../../../../../../resources/domain/transaction'
+import { GasFeesSource, usesBaseFee } from '../../../../../../../resources/domain/transaction'
+import { DisplayValue } from '../../../../../../../resources/domain/transaction/displayValue'
 import link from '../../../../../../../resources/link'
-
 import { ClusterBox, Cluster, ClusterRow, ClusterColumn, ClusterValue } from '../../../../../../../resources/Components/Cluster'
 
 const FEE_WARNING_THRESHOLD_USD = 50
 
-function toDisplayGwei (bn) {
-  const gwei = bn.shiftedBy(-9).decimalPlaces(6, BigNumber.ROUND_FLOOR)
-
-  return gwei.isZero() ? '' : gwei.toFormat()
-}
-
-function toDisplayWei (bn) {
-  return bn.toFormat(0)
-}
-
 const GasDisplay = ({ maxFeePerGas }) => {
-  const gweiDisplayValue = toDisplayGwei(maxFeePerGas)
-  const displayValue = gweiDisplayValue || toDisplayWei(maxFeePerGas)
+  const gweiDisplayValue = maxFeePerGas.toGwei()
+  const displayValue = gweiDisplayValue || maxFeePerGas.toWei()
   const displayLabel = !!gweiDisplayValue ? 'Gwei' : 'Wei'
 
   return (
@@ -33,8 +23,8 @@ const GasDisplay = ({ maxFeePerGas }) => {
 }     
 
 const USDEstimateDisplay = ({ minFee, maxFee, nativeCurrency, isTestnet }) => {
-  const { displayUSD: displayMinFeeUSD } = toUSD(minFee, nativeCurrency, isTestnet)
-  const { usd: maxFeeUSD, displayUSD: displayMaxFeeUSD } = toUSD(maxFee, nativeCurrency, isTestnet)
+  const { displayUSD: displayMinFeeUSD } = minFee.toUSD(nativeCurrency, isTestnet)
+  const { usd: maxFeeUSD, displayUSD: displayMaxFeeUSD } = maxFee.toUSD(nativeCurrency, isTestnet)
   const displayMaxFeeWarning = maxFeeUSD > FEE_WARNING_THRESHOLD_USD
   
   return <div data-testid='usd-estimate-display' className='clusterTag'>
@@ -68,9 +58,9 @@ class TxFee extends React.Component {
     const { nativeCurrency } = this.store('main.networksMeta', chain.type, chain.id)
 
     const maxGas = BigNumber(req.data.gasLimit, 16)
-    const maxFeePerGas = BigNumber(req.data[usesBaseFee(req.data) ? 'maxFeePerGas' : 'gasPrice'], 16)
-    const maxFee = maxFeePerGas.multipliedBy(maxGas)
-    const { displayEther } = toEther(maxFee, 6)
+    const maxFeePerGas = BigNumber(req.data[usesBaseFee(req.data) ? 'maxFeePerGas' : 'gasPrice'])
+    const maxFee = new DisplayValue(maxFeePerGas.multipliedBy(maxGas))
+    const { displayEther } = maxFee.toEther(6)
 
     // accounts for two potential 12.5% block fee increases
     const reduceFactor = BigNumber(9).dividedBy(8)
@@ -78,7 +68,7 @@ class TxFee extends React.Component {
 
     // accounts for the 50% padding in the gas estimate in the provider
     const minGas = maxGas.dividedBy(BigNumber(1.5))
-    const minFee = minFeePerGas.multipliedBy(minGas)
+    const minFee = new DisplayValue(minFeePerGas.multipliedBy(minGas))
     
     return (
       <ClusterBox title='fee' animationSlot={this.props.i}>
@@ -88,7 +78,7 @@ class TxFee extends React.Component {
               <ClusterValue onClick={() => {
                 link.send('nav:update', 'panel', { data: { step: 'adjustFee' } })
               }}>
-                <GasDisplay maxFeePerGas={maxFeePerGas} />
+                <GasDisplay maxFeePerGas={new DisplayValue(maxFeePerGas)} />
               </ClusterValue>
             </ClusterColumn>
             <ClusterColumn grow={2}>

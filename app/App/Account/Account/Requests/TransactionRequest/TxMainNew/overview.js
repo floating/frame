@@ -1,8 +1,8 @@
 import React from 'react'
-import { utils } from 'ethers'
 
 import link from '../../../../../../../resources/link'
 import EnsOverview from '../../Ens'
+import { DisplayValue } from '../../../../../../../resources/domain/transaction/displayValue'
 
 const isNonZeroHex = (hex) => !!hex && !['0x', '0x0'].includes(hex)
 
@@ -32,7 +32,8 @@ const TxDescription = ({ chain, children, chainColor }) => (
 )
 
 const SendOverview = ({ amountHex, decimals, symbol }) => {
-  const displayAmount = utils.formatUnits(amountHex, decimals)
+  const display = new DisplayValue(amountHex)
+  const { displayEther: displayAmount } = display.toEther(18, decimals)
 
   return  (
     <div>{`Send ${displayAmount} ${symbol}`}</div>
