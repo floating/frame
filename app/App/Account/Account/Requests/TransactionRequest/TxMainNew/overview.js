@@ -33,7 +33,7 @@ const TxDescription = ({ chain, children, chainColor }) => (
 
 const SendOverview = ({ amountHex, decimals, symbol }) => {
   const display = new DisplayValue(amountHex)
-  const { displayEther: displayAmount } = display.toEther()
+  const { displayEther: displayAmount } = display.toEther(decimals)
 
   return  (
     <div>{`Send ${displayAmount} ${symbol}`}</div>

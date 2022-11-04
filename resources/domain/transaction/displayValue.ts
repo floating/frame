@@ -22,8 +22,8 @@ export class DisplayValue {
     }
   }
 
-  toEther (decimalPlaces = 18) {
-    const ether = this.bn.shiftedBy(-18).decimalPlaces(decimalPlaces, BigNumber.ROUND_FLOOR)
+  toEther (decimalPlaces = 18, shiftedBy?: number) {
+    const ether = this.bn.shiftedBy(shiftedBy !== undefined ? shiftedBy : -decimalPlaces).decimalPlaces(decimalPlaces, BigNumber.ROUND_FLOOR)
   
     return {
       ether,

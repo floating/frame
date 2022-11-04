@@ -60,7 +60,7 @@ class TxFee extends React.Component {
     const maxGas = BigNumber(req.data.gasLimit, 16)
     const maxFeePerGas = BigNumber(req.data[usesBaseFee(req.data) ? 'maxFeePerGas' : 'gasPrice'])
     const maxFee = new DisplayValue(maxFeePerGas.multipliedBy(maxGas))
-    const { displayEther } = maxFee.toEther(6)
+    const { displayEther } = maxFee.toEther(6, -18)
 
     // accounts for two potential 12.5% block fee increases
     const reduceFactor = BigNumber(9).dividedBy(8)
