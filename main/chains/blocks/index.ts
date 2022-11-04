@@ -115,9 +115,6 @@ class BlockMonitor extends EventEmitter {
   }
 
   handleBlock (block: Block) {
-    if (parseInt(this.connection.chainId) === 11155111 && Math.random() < 0.5) {
-      return this.handleError('BAD BLOCK')
-    }
     if (!block) return this.handleError('handleBlock received undefined block')
 
     if (block.number !== this.latestBlock) {
