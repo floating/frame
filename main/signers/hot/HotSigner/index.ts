@@ -8,7 +8,7 @@ import { v4 as uuid } from 'uuid'
 
 import Signer from '../../Signer'
 import store from '../../../store'
-import { Message, PseudoCallback } from './worker'
+import { PseudoCallback } from './worker'
 import type { TypedMessage } from '../../../accounts/types'
 import { TransactionData } from '../../../../resources/domain/transaction'
 // Mock windows module during tests
@@ -19,8 +19,8 @@ const SIGNERS_PATH = path.resolve(USER_DATA, 'signers')
 
 export type StoredSigner = { 
   addresses: string[]
-  encryptedKeys: string[]
-  encryptedSeed: string
+  encryptedKeys?: string[]
+  encryptedSeed?: string
   type: string
   network: string
 }
@@ -46,7 +46,7 @@ export class HotSigner extends Signer {
   protected encryptedSeed?: string
   public status = 'locked'
   
-  constructor (signer: StoredSigner, workerPath: string) {
+  constructor (workerPath: string, signer?: StoredSigner, ) {
     super()
     this.addresses = signer ? signer.addresses : []
     this.worker = fork(workerPath)

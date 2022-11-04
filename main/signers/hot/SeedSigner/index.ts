@@ -9,14 +9,14 @@ import { PseudoCallback } from '../HotSigner/worker'
 
 const WORKER_PATH = path.resolve(__dirname, 'worker.js')
 
-class SeedSigner extends HotSigner {
+export class SeedSigner extends HotSigner {
   protected encryptedSeed = ''
   public type = 'seed'
   public model = 'phrase'
 
-  constructor (signer: StoredSigner) {
-    super(signer, WORKER_PATH)
-    this.encryptedSeed = signer?.encryptedSeed
+  constructor (signer?: StoredSigner) {
+    super(WORKER_PATH, signer)
+    this.encryptedSeed = signer?.encryptedSeed || ''
     if (this.encryptedSeed) this.update()
   }
 
@@ -62,5 +62,3 @@ class SeedSigner extends HotSigner {
     super.unlock(password, { encryptedSeed: this.encryptedSeed }, cb)
   }
 }
-
-module.exports = SeedSigner

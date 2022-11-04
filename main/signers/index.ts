@@ -9,8 +9,8 @@ import TrezorAdapter  from './trezor/adapter'
 import LatticeAdapter from './lattice/adapter'
 
 import hot from './hot'
-import RingSigner from './hot/RingSigner'
-import HotSigner from './hot/HotSigner'
+import { RingSigner } from './hot/RingSigner'
+import { HotSigner } from './hot/HotSigner'
 
 import store from '../store'
 
@@ -30,7 +30,7 @@ interface AdapterSpec {
   }
 }
 
-type Keystore = string | { version: number }
+export type Keystore = string | { version: number }
 
 class Signers extends EventEmitter {
   private adapters: AdapterSpec;

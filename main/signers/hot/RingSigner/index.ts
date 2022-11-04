@@ -63,9 +63,9 @@ export class RingSigner extends HotSigner {
   public type = 'ring'
   public model = 'keyring'
 
-  constructor (signer: StoredSigner) {
-    super(signer, WORKER_PATH)
-    this.encryptedKeys = (signer && signer.encryptedKeys)
+  constructor (signer?: StoredSigner) {
+    super(WORKER_PATH, signer)
+    this.encryptedKeys = (signer && signer.encryptedKeys) || []
     if (this.encryptedKeys) this.update()
   }
 

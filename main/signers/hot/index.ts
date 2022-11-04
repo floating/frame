@@ -1,24 +1,24 @@
-const path = require('path')
-const fs = require('fs')
-const { ensureDirSync } = require('fs-extra')
-const { app } = require('electron')
-const log = require('electron-log')
-const bip39 = require('bip39')
-const zxcvbn = require('zxcvbn')
+import path from 'path'
+import fs from 'fs'
+import { ensureDirSync } from 'fs-extra'
+import { app } from 'electron'
+import log from 'electron-log'
+import bip39 from 'bip39'
+import zxcvbn from 'zxcvbn'
+import { stripHexPrefix } from 'ethereumjs-util'
 
-const crypt = require('../../crypt')
+import crypt from '../../crypt'
 
-const SeedSigner = require('./SeedSigner')
-const RingSigner = require('./RingSigner')
-const { stripHexPrefix } = require('ethereumjs-util')
+import { SeedSigner } from './SeedSigner'
+import { RingSigner } from './RingSigner'
 
-const USER_DATA = app ? app.getPath('userData') : path.resolve(path.dirname(require.main.filename), '../.userData');
+const USER_DATA = app ? app.getPath('userData') : path.resolve(path.dirname(require.main ? require.main.filename : ''), '../.userData');
 const SIGNERS_PATH = path.resolve(USER_DATA, 'signers')
 
-const wait = async ms => new Promise(resolve => setTimeout(resolve, ms))
+const wait = async (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
-module.exports = {
-  newPhrase: (cb) => {
+export = {
+  newPhrase: (cb: Callback<string>) => {
     cb(null, bip39.generateMnemonic())
   },
   createFromSeed: (signers, seed, password, cb) => {
@@ -108,9 +108,9 @@ module.exports = {
           const id = crypt.stringToKey(addresses.join()).toString('hex')
           if (!signers.exists(id)) {
             if (type === 'seed') {
-              signers.add(new SeedSigner({ network, addresses, encryptedSeed }))
+              signers.add(new SeedSigner({ network, addresses, encryptedSeed, type }))
             } else if (type === 'ring') {
-              signers.add(new RingSigner({ network, addresses, encryptedKeys }))
+              signers.add(new RingSigner({ network, addresses, encryptedKeys, type }))
             }
           }
         }
