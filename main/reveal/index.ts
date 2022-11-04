@@ -12,7 +12,7 @@ import Erc20Contract from '../contracts/erc20'
 import { decodeCallData, fetchContract, ContractSource } from '../contracts'
 import ensContracts from '../contracts/deployments/ens'
 import erc20 from '../externalData/balances/erc-20-abi'
-import { MAX_HEX } from '../../resources/utils/constants'
+import { MAX_HEX } from '../../resources/constants'
 
 import type { ApproveAction as Erc20Approval, TransferAction as Erc20Transfer } from '../transaction/actions/erc20'
 import type { Action, DecodableContract, EntityType } from '../transaction/actions'

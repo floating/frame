@@ -1,6 +1,6 @@
 import store from '../../store'
 
-import { NATIVE_CURRENCY } from '../../../resources/utils/constants'
+import { NATIVE_CURRENCY } from '../../../resources/constants'
 
 interface AssetsChangedHandler {
   assetsChanged: (address: Address, assets: RPC.GetAssets.Assets) => void
