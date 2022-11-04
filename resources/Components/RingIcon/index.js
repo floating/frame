@@ -27,10 +27,13 @@ class RingIcon extends React.Component {
   }
 
   render () {
-    const { color, svgName, svgSize, img, small } = this.props
+    const { color, svgName, svgSize, img, small, block } = this.props
+    let ringIconClass = 'ringIcon'
+    if (small) ringIconClass += ' ringIconSmall'
+    if (block) ringIconClass += ' ringIconBlock'
     return (
       <div 
-        className={small ? 'ringIcon ringIconSmall' : 'ringIcon'}
+        className={ringIconClass}
         style={{
           borderColor: color
         }}

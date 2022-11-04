@@ -65,29 +65,26 @@ class _RequestItem extends React.Component {
           link.send('nav:forward', 'panel', crumb)
         }}
       >
-        <div className='requestItemBackground' style={headerMode ? {} : { background: `linear-gradient(135deg, ${color} 0%, transparent 100%)`}} />
-        <div className='requestItemCorner' style={{ background: color }} />
+        <div className='requestItemBackground' 
+          style={{ 
+            background: `linear-gradient(155deg, ${color} 0%, transparent 100%)`
+          }} 
+        />
+        <div className='requestItemLine' style={{ background: color }}>
+        </div>
         <div className='requestItemTitle'>
           <div className='requestItemIcon'>
             <RingIcon 
               color={color}
               svgName={svgName}
               img={img}
+              // small={true}
+              block={true}
             />
           </div>
           <div className='requestItemMain'>
             <div className='requestItemTitleMain'>
               {title}
-            </div>
-            <div className='requestItemTitleSub'>
-              <div 
-                className='requestItemTitleSubIcon'
-              >
-                {svg.window(10)}
-              </div>
-              <div className='requestItemTitleSubText'>
-                {this.store('main.origins', req.origin, 'name')}
-              </div>
             </div>
           </div>
           {txNonce ? (
@@ -115,19 +112,18 @@ class _RequestItem extends React.Component {
               </div>
             </div>
           )}
-        </div>
+        </div>  
+        {children}
         <div className={requestItemDetailsClass}>
           <div className='requestItemDetailsSlide'>
             <div className='requestItemDetailsIndicator' />
             <span>{status}</span>
-            <div className='requestItemDetailsIndicator' />
+            {/* <div className='requestItemDetailsIndicator' /> */}
+          </div>
+          <div>
+            {`View >`}
           </div>
         </div>
-        {children && (
-          <div className='requestItemSummary'>
-            {children}
-          </div>
-        )}
       </div>
     )
   }

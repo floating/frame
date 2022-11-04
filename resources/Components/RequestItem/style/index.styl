@@ -1,3 +1,9 @@
+@keyframes lit
+  0%
+    opacity 0
+  100%
+    opacity 1
+
 .requestItem::after
   position absolute
   content ''
@@ -62,8 +68,9 @@
     bottom 0
     border-radius 1.5px
     background linear-gradient(135deg, transparent 0%, transparent 50%)
-    opacity 0.05
-    display none
+    opacity 0
+    z-index 200
+    border-radius 18px
 
   .requestItemCorner
     position absolute
@@ -79,32 +86,28 @@
     position relative
     display flex
     align-items center
-    justify-content flex-start
+    justify-content space-between
     text-transform uppercase
     font-weight 400
-    padding 4px 12px 4px 12px
-    font-size 9px
-    border-radius 12px
+    font-size 11px
     color var(--moon)
-    background var(--ghostA)
-    margin 8px
+    margin 14px
 
     span
-      letter-spacing 4px
+      letter-spacing 1px
       padding-left 8px
 
     .requestItemDetailsSlide
-      width 100%
       display flex
       align-items center
-      justify-content center
 
     .requestItemDetailsIndicator
-      height 2px
-      flex 1
-      border-radius 1px
+      height 6px
+      width 6px
+      border-radius 3px
       background var(--moon)
       z-index 4
+      animation lit infinite linear alternate 1s
 
   .requestItemDetailsGood
     color var(--good)
@@ -166,6 +169,20 @@
       justify-content center
       align-items center
 
+  .requestItemLine
+    background var(--good)
+    height 2px
+    border-radius 2px
+    margin 14px
+    box-sizing border-box
+    display flex
+
+    .requestItemLineDash
+      width calc((100% / 16) - 8px) 
+      margin-right 8px
+      height 2px
+      display none
+
   .requestItemTitle
     position relative
     font-family 'MainFont'
@@ -175,32 +192,27 @@
     align-items center
     font-size 14px
     font-weight 300
-    border-radius 14px
-    padding 0px 19px 0px 10px
-    margin-top 10px
+    margin 14px
 
     .requestItemTitleTime
       position absolute
       top 0
       right 0
       bottom 0
-      padding 6px
       display flex
       justify-content center
       align-items center
 
       .requestItemTitleTimeItem
         height 26px
-        padding 0px 16px
-        border-radius 8px
         display flex
         justify-content center
         align-items center
         font-size 12px
-        border 2px solid var(--ghostA)
+        font-weight 600
+
     .requestItemMain
       margin-left 10px
-      margin-bottom 3px
 
     .requestItemTitleMain
       font-size 16px
@@ -214,15 +226,14 @@
     align-items center
     font-size 11px
     font-weight 300
-    padding-bottom 4px
-    
+
     .requestItemTitleSubIcon
-      margin -1px 5px 0px 1px
+      margin 1px 10px 0px 1px
       color var(--outerspace)
 
     .requestItemTitleSubText
       font-weight 400
-      margin -3px 0px 0px 0px
+      margin 0px 0px 0px 0px
 
   .requestItemTime
     position absolute
