@@ -17,7 +17,8 @@ const windows = app ? require('../../../windows') : { broadcast: () => {} }
 const USER_DATA = app ? app.getPath('userData') : path.resolve(path.dirname(require.main ? require.main.filename : ''), '../.userData')
 const SIGNERS_PATH = path.resolve(USER_DATA, 'signers')
 
-export type StoredSigner = { 
+export type StoredSigner = {
+  id: string
   addresses: string[]
   encryptedKeys?: string[]
   encryptedSeed?: string

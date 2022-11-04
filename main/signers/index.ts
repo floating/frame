@@ -32,7 +32,7 @@ interface AdapterSpec {
 
 export type Keystore = string | { version: number }
 
-class Signers extends EventEmitter {
+export class Signers extends EventEmitter {
   private adapters: AdapterSpec;
   private scans: { [key: string]: any};
 
@@ -223,7 +223,7 @@ class Signers extends EventEmitter {
 
     // @ts-ignore
     if (signer && signer.unlock) {
-      (signer as HotSigner).unlock(password, cb)
+      (signer as HotSigner).unlock(password, {}, cb)
     } else {
       log.error('Signer not unlockable via password, no unlock method')
     }
