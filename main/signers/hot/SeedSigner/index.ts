@@ -1,24 +1,29 @@
-const path = require('path')
-const HotSigner = require('../HotSigner')
-const bip39 = require('bip39')
-const hdKey = require('hdkey')
-const publicKeyToAddress = require('ethereum-public-key-to-address')
+import path from 'path'
+import bip39 from 'bip39'
+import hdKey from 'hdkey'
+//@ts-ignore
+import publicKeyToAddress from 'ethereum-public-key-to-address'
+
+import { HotSigner, SignerData, StoredSigner } from '../HotSigner'
+import { PseudoCallback } from '../HotSigner/worker'
 
 const WORKER_PATH = path.resolve(__dirname, 'worker.js')
 
 class SeedSigner extends HotSigner {
-  constructor (signer) {
+  protected encryptedSeed = ''
+  public type = 'seed'
+  public model = 'phrase'
+
+  constructor (signer: StoredSigner) {
     super(signer, WORKER_PATH)
-    this.encryptedSeed = (signer && signer.encryptedSeed)
-    this.type = 'seed'
-    this.model = 'phrase'
+    this.encryptedSeed = signer?.encryptedSeed
     if (this.encryptedSeed) this.update()
   }
 
-  addSeed (seed, password, cb) {
+  addSeed (seed: string, password: Buffer, cb: PseudoCallback) {
     if (this.encryptedSeed) return cb(new Error('This signer already has a seed'))
 
-    this._callWorker({ method: 'encryptSeed', params: { seed, password } }, (err, encryptedSeed) => {
+    this.callWorker({ method: 'encryptSeed', params: { seed, password } }, (err: Error | null, encryptedSeed?: string) => {
       if (err) return cb(err)
 
       // Derive addresses
@@ -32,15 +37,15 @@ class SeedSigner extends HotSigner {
       }
 
       // Update signer
-      this.encryptedSeed = encryptedSeed
+      this.encryptedSeed = encryptedSeed as string
       this.addresses = addresses
       this.update()
 
-      cb(null)
+      cb()
     })
   }
 
-  async addPhrase (phrase, password, cb) {
+  async addPhrase (phrase: string, password: Buffer, cb: PseudoCallback) {
     // Validate phrase
     if (!bip39.validateMnemonic(phrase)) return cb(new Error('Invalid mnemonic phrase'))
     // Get seed
@@ -53,7 +58,7 @@ class SeedSigner extends HotSigner {
     super.save({ encryptedSeed: this.encryptedSeed })
   }
 
-  unlock (password, cb) {
+  unlock (password: Buffer, _data: SignerData, cb: PseudoCallback) {
     super.unlock(password, { encryptedSeed: this.encryptedSeed }, cb)
   }
 }

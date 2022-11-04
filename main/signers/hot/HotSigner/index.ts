@@ -1,30 +1,59 @@
-const path = require('path')
-const fs = require('fs')
-const { ensureDirSync, removeSync } = require('fs-extra')
-const { fork } = require('child_process')
-const { app } = require('electron')
-const log = require('electron-log')
-const { v4: uuid } = require('uuid')
+import path from 'path'
+import fs from 'fs'
+import { ensureDirSync, removeSync } from 'fs-extra'
+import { ChildProcess, fork } from 'child_process'
+import { app } from 'electron'
+import log from 'electron-log'
+import { v4 as uuid } from 'uuid'
 
-const Signer = require('../../Signer').default
-const store = require('../../../store').default
+import Signer from '../../Signer'
+import store from '../../../store'
+import { Message, PseudoCallback } from './worker'
+import type { TypedMessage } from '../../../accounts/types'
+import { TransactionData } from '../../../../resources/domain/transaction'
 // Mock windows module during tests
 const windows = app ? require('../../../windows') : { broadcast: () => {} }
 // Mock user data dir during tests
-const USER_DATA = app ? app.getPath('userData') : path.resolve(path.dirname(require.main.filename), '../.userData')
+const USER_DATA = app ? app.getPath('userData') : path.resolve(path.dirname(require.main ? require.main.filename : ''), '../.userData')
 const SIGNERS_PATH = path.resolve(USER_DATA, 'signers')
 
-class HotSigner extends Signer {
-  constructor (signer, workerPath) {
+export type StoredSigner = { 
+  addresses: string[]
+  encryptedKeys: string[]
+  encryptedSeed: string
+  type: string
+  network: string
+}
+
+export type SignerData = {
+  encryptedKeys?: string[]
+  encryptedSeed?: string
+}
+
+export type WorkerPayload = {
+  method: string,
+  params?: {
+
+  }
+}
+
+export class HotSigner extends Signer {
+  private ready = false
+  private network = ''
+  private worker: ChildProcess
+  private token = ''
+  protected encryptedKeys?: string[]
+  protected encryptedSeed?: string
+  public status = 'locked'
+  
+  constructor (signer: StoredSigner, workerPath: string) {
     super()
-    this.status = 'locked'
     this.addresses = signer ? signer.addresses : []
-    this._worker = fork(workerPath)
+    this.worker = fork(workerPath)
     this._getToken()
-    this.ready = false
   }
 
-  save (data) {
+  save (data: SignerData) {
     // Construct signer
     const { id, addresses, type, network } = this
     const signer = { id, addresses, type, network, ...data }
@@ -52,8 +81,8 @@ class HotSigner extends Signer {
     log.info('Signer erased from disk')
   }
 
-  lock (cb) {
-    this._callWorker({ method: 'lock' }, () => {
+  lock (cb: Callback<Signer>) {
+    this.callWorker({ method: 'lock' }, () => {
       this.status = 'locked'
       this.update()
       log.info('Signer locked')
@@ -61,20 +90,20 @@ class HotSigner extends Signer {
     })
   }
 
-  unlock (password, data, cb) {
+  unlock (password: Buffer, data: SignerData, cb: PseudoCallback) {
     const params = { password, ...data }
-    this._callWorker({ method: 'unlock', params }, (err, result) => {
+    this.callWorker({ method: 'unlock', params }, (err: Error | null, _result?: unknown) => {
       if (err) return cb(err)
       this.status = 'ok'
       this.update()
       log.info('Signer unlocked')
-      cb(null)
+      cb()
     })
   }
 
   close () {
-    if (this.ready) this._worker.disconnect()
-    else this.once('ready', () => this._worker.disconnect())
+    if (this.ready) this.worker.disconnect()
+    else this.once('ready', () => this.worker.disconnect())
     store.removeSigner(this.id)
     log.info('Signer closed')
   }
@@ -86,16 +115,16 @@ class HotSigner extends Signer {
     // On new ID ->
     if (!this.id) {
       // Update id
-      this.id = derivedId
+      this.id = derivedId as string
       // Write to disk
       this.save({ encryptedKeys: this.encryptedKeys, encryptedSeed: this.encryptedSeed })
     } else if (this.id !== derivedId) { // On changed ID
       // Erase from disk
-      this.delete(this.id)
+      this.delete()
       // Remove from store
       store.removeSigner(this.id)
       // Update id
-      this.id = derivedId
+      this.id = derivedId as string
       // Write to disk
       this.save({ encryptedKeys: this.encryptedKeys, encryptedSeed: this.encryptedSeed })
     }
@@ -104,24 +133,25 @@ class HotSigner extends Signer {
     log.info('Signer updated')
   }
 
-  signMessage (index, message, cb) {
+  signMessage (index: number, message: string, cb: Callback<string>) {
     const payload = { method: 'signMessage', params: { index, message } }
-    this._callWorker(payload, cb)
+    this.callWorker(payload, cb)
   }
 
-  signTypedData (index, version, typedData, cb) {
-    const payload = { method: 'signTypedData', params: { index, typedData, version } }
-    this._callWorker(payload, cb)
+  signTypedData (index: number, typedMessage: TypedMessage, cb: Callback<string>) {
+    console.log('got td', typedMessage)
+    const payload = { method: 'signTypedData', params: { index, typedMessage } }
+    this.callWorker(payload, cb)
   }
 
-  signTransaction (index, rawTx, cb) {
+  signTransaction (index: number, rawTx: TransactionData, cb: Callback<string>) {
     const payload = { method: 'signTransaction', params: { index, rawTx } }
-    this._callWorker(payload, cb)
+    this.callWorker(payload, cb)
   }
 
-  verifyAddress (index, address, display, cb = () => {}) {
+  verifyAddress (index: number, address: string, display: boolean, cb: Callback<boolean>) {
     const payload = { method: 'verifyAddress', params: { index, address } }
-    this._callWorker(payload, (err, verified) => {
+    this.callWorker(payload, (err: Error | null, verified?: string) => {
       if (err || !verified) {
         if (!err) {
           store.notify('hotSignerMismatch')
@@ -138,41 +168,39 @@ class HotSigner extends Signer {
         cb(err)
       } else {
         log.info('Hot signer verify address matched')
-        cb(null, verified)
+        cb(null, verified === 'true')
       }
     })
   }
 
   _getToken () {
-    const listener = ({ type, token }) => {
+    const listener = ({ type, token }: { type: string, token: string }) => {
       if (type === 'token') {
-        this._token = token
-        this._worker.removeListener('message', listener)
+        this.token = token
+        this.worker.removeListener('message', listener)
         this.ready = true
         this.emit('ready')
       }
     }
-    this._worker.addListener('message', listener)
+    this.worker.addListener('message', listener)
   }
 
-  _callWorker (payload, cb) {
-    if (!this._worker) throw Error('Worker not running')
+  protected callWorker (payload: WorkerPayload, cb: Callback<any>): void | NodeJS.Timeout {
+    if (!this.worker) throw Error('Worker not running')
     // If token not yet received -> retry in 100 ms
-    if (!this._token) return setTimeout(() => this._callWorker(payload, cb), 100)
+    if (!this.token) return setTimeout(() => this.callWorker(payload, cb), 100)
     // Generate message id
     const id = uuid()
     // Handle response
-    const listener = (response) => {
+    const listener = (response: any) => {
       if (response.type === 'rpc' && response.id === id) {
         const error = response.error ? new Error(response.error) : null
         cb(error, response.result)
-        this._worker.removeListener('message', listener)
+        this.worker.removeListener('message', listener)
       }
     }
-    this._worker.addListener('message', listener)
+    this.worker.addListener('message', listener)
     // Make RPC call
-    this._worker.send({ id, token: this._token, ...payload })
+    this.worker.send({ id, token: this.token, ...payload })
   }
 }
-
-module.exports = HotSigner
