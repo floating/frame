@@ -22,12 +22,12 @@ export class DisplayValue {
     }
   }
 
-  toEther (decimalPlaces = 18, formatDP = undefined) {
+  toEther (decimalPlaces = 18) {
     const ether = this.bn.shiftedBy(-18).decimalPlaces(decimalPlaces, BigNumber.ROUND_FLOOR)
   
     return {
       ether,
-      displayEther: decimalPlaces < 18 && ether.isZero() ? `< ${BigNumber(`1e-${decimalPlaces}`).toFormat(formatDP)}` : ether.toFormat(formatDP)
+      displayEther: decimalPlaces < 18 && ether.isZero() ? `< ${BigNumber(`1e-${decimalPlaces}`).toFormat()}` : ether.toFormat()
     }
   }
 

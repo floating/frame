@@ -41,7 +41,7 @@ class TxSending extends React.Component {
 
         const isTestnet = this.store('main.networks', this.props.chain.type, this.props.chain.id, 'isTestnet')    
         const rate = this.store('main.rates', contract)
-        const { displayEther: displayValue } = value.toEther(18, decimals)
+        const { displayEther: displayValue } = value.toEther()
         const { displayUSD } = value.toUSD(rate, isTestnet)
   
         return (
