@@ -24,7 +24,7 @@ class TxSending extends React.Component {
   render () {
     const req = this.props.req
     const value = new DisplayValue(req.data.value || '0x')
-    if (value.isZero()) {
+    if (value.bn.isZero()) {
       return null
     }
 

@@ -7,10 +7,6 @@ export class DisplayValue {
   constructor(value: string | number | BigNumber) {
     this.bn = BigNumber(value, isHexString(value) ? 16 : undefined)
   }
-
-  isZero () {
-    return this.bn.isZero()
-  }
   
   toUSD (currencyRate: Rate, isTestnet = false) {
     const nativeUSD = BigNumber(isTestnet || !currencyRate ? 0 : currencyRate.usd.price)
