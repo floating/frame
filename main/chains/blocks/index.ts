@@ -71,7 +71,7 @@ class BlockMonitor extends EventEmitter {
       .then(subId => this.subscriptionId = subId)
       .catch(err => {
         // subscriptions are not supported, poll for block changes instead
-        this._clearSubscription()
+        this.clearSubscription()
         
         this.poller = setInterval(this.getLatestBlock, 15 * 1000)
       })
@@ -83,38 +83,38 @@ class BlockMonitor extends EventEmitter {
     this.connection.off('close', this.stop)
 
     if (this.subscriptionId) {
-      this._clearSubscription()
+      this.clearSubscription()
     }
 
     if (this.poller) {
-      this._stopPoller()
+      this.stopPoller()
     }
   }
 
-  _clearSubscription () {
+  private clearSubscription () {
     this.connection.off('message', this.handleMessage)
     this.subscriptionId = ''
   }
 
-  _stopPoller () {
+  private stopPoller () {
     clearInterval(<NodeJS.Timeout>this.poller)
     this.poller = undefined
   }
 
-  getLatestBlock () {
+  private getLatestBlock () {
     this.connection
       .send({ id: 1, jsonrpc: '2.0', method: 'eth_getBlockByNumber', params: ['latest', false] })
       .then(block => this.handleBlock(block))
       .catch(err => this.handleError(`Could not load block for chain ${this.connection.chainId}`, err))
   }
 
-  handleMessage (message: SubscriptionMessage) {
+  private handleMessage (message: SubscriptionMessage) {
     if (message.type === 'eth_subscription' && message.data.subscription === this.subscriptionId) {
       this.handleBlock(message.data.result)
     }
   }
 
-  handleBlock (block: Block) {
+  private handleBlock (block: Block) {
     if (!block) return this.handleError('handleBlock received undefined block')
 
     if (block.number !== this.latestBlock) {
@@ -124,7 +124,7 @@ class BlockMonitor extends EventEmitter {
     }
   }
 
-  handleError (...args: any) {
+  private handleError (...args: any) {
     this.connection.emit('status', 'degraded')
     log.error(...args)
   }
