@@ -185,32 +185,6 @@ class Main extends React.Component {
     }, 3000)
   }
 
-  accountSort (accounts, a, b) {
-    try {
-      let [aBlock, aLocal] = accounts[a].created.split(':')
-      let [bBlock, bLocal] = accounts[b].created.split(':')
-  
-      aLocal = parseInt(aLocal)
-      bLocal = parseInt(bLocal)
-  
-      if (aBlock === 'new' && bBlock !== 'new') return -1
-      if (bBlock !== 'new' && aBlock === 'new') return 1
-      if (aBlock === 'new' && bBlock === 'new') return aLocal >= bLocal ? 1 : 0
-  
-      aBlock = parseInt(aBlock)
-      bBlock = parseInt(bBlock)
-  
-      if (aBlock > bBlock) return -1
-      if (aBlock < bBlock) return -1
-      if (aBlock === bBlock) return aLocal >= bLocal ? 1 : 0
-
-      return 0
-    } catch (e) {
-      console.error(e)
-      return 0
-    }
-  }
-
   render () {
     const accounts = this.store('main.accounts')
     const current = this.store('selected.current')

@@ -4,6 +4,7 @@ import Restore from 'react-restore'
 import link from '../../../../../resources/link'
 import svg from '../../../../../resources/svg'
 import RingIcon from '../../../../../resources/Components/RingIcon'
+import { accountSort as byCreation } from '../../../../../resources/domain/account'
 
 class AddAragon extends React.Component {
   constructor (...args) {
@@ -105,41 +106,6 @@ class AddAragon extends React.Component {
     })
   }
 
-  accountSort (a, b) {
-    const accounts = this.store('main.accounts')
-    try {
-      let [aBlock, aLocal] = accounts[a].created.split(':')
-      let [bBlock, bLocal] = accounts[b].created.split(':')
-  
-      aLocal = parseInt(aLocal)
-      bLocal = parseInt(bLocal)
-  
-      if (aBlock === 'new' && bBlock !== 'new') return -1
-      if (bBlock !== 'new' && aBlock === 'new') return 1
-      if (aBlock === 'new' && bBlock === 'new') return aLocal >= bLocal ? 1 : 0
-  
-      aBlock = parseInt(aBlock)
-      bBlock = parseInt(bBlock)
-  
-      if (aBlock > bBlock) return -1
-      if (aBlock < bBlock) return -1
-      if (aBlock === bBlock) return aLocal >= bLocal ? 1 : 0
-
-      return 0
-    } catch (e) {
-      log.error(e)
-      return 0
-    }
-  }
-
-  accountFilter (id) {
-    // Need to migrate accounts to use network type
-    // const network = this.store('main.currentNetwork.id')
-    const account = this.store('main.accounts', id)
-    if (account.type === 'aragon') return false
-    return true 
-  }
-
   restart () {
     this.setState({ adding: false, agent: '0x0000000000000000000000000000000000000000', index: 0, name: '' })
     setTimeout(() => {
@@ -155,6 +121,7 @@ class AddAragon extends React.Component {
 
   render () {
     let itemClass = 'addAccountItem addAccountItemSmart addAccountItemAdding'
+    const accounts = this.store('main.accounts')
     return (
       <div className={itemClass}>
         <div className='addAccountItemBar addAccountItemSmart' />
@@ -192,14 +159,13 @@ class AddAragon extends React.Component {
                 <div className='addAccountItemOptionSetupFrame'>
                   <div className='addAccountItemOptionTitle'>Choose acting account</div>
                   <div className='addAccountItemOptionList'>
-                    {Object.keys(this.store('main.accounts'))
-                      .filter(id => this.accountFilter(id))
-                      .sort((a, b) => this.accountSort(a, b))
-                      .map(id => {
-                        const account = this.store('main.accounts', id)
+                    {Object.values(accounts)
+                      .filter(account => account.type !== 'aragon' )
+                      .sort(byCreation)
+                      .map(({id, name}) => {
                         return <div key={id} className='addAccountItemOptionListItem' onMouseDown={e => this.actorAccount(id)}>
                           <div className='actingAccountAddress'>{id ? id.substring(0, 8) : ''}{svg.octicon('kebab-horizontal', { height: 16 })}{id ? id.substr(id.length - 6) : ''}</div>
-                          <div className='actingAccountTag'>{account.name}</div>
+                          <div className='actingAccountTag'>{name}</div>
                         </div>
                       })}
                   </div>
