@@ -56,6 +56,7 @@ class TxSending extends React.Component {
                 </ClusterValue>
                 <ClusterValue>
                   <span className='_txMainTransferringEq'>{'≈'}</span>
+                  <span className='_txMainTransferringEqSymbol'>{'$'}</span>
                   <span className='_txMainTransferringEqAmount'>{displayUSD}</span>
                 </ClusterValue>
               </ClusterRow>

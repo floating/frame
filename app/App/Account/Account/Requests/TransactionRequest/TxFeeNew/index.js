@@ -30,12 +30,12 @@ const USDEstimateDisplay = ({ minFee, maxFee, nativeCurrency, isTestnet }) => {
   return <div data-testid='usd-estimate-display' className='clusterTag'>
     <div className={`_txFeeValueDefault${displayMaxFeeWarning ? ' _txFeeValueDefaultWarn' : ''}`}>
       <span>{'≈'}</span>
-      {displayMaxFeeUSD === '< $0.01' ? 
-      <span>{displayMaxFeeUSD}</span> : 
+      {displayMaxFeeUSD === '< 0.01' ? 
+      <span>{`$${displayMaxFeeUSD}`}</span> : 
       <>      
-        <span>{displayMinFeeUSD}</span>
+        <span>{`$${displayMinFeeUSD}`}</span>
         <span>{'-'}</span>
-        <span>{displayMaxFeeUSD}</span>
+        <span>{`$${displayMaxFeeUSD}`}</span>
       </>
       }
       <span>{`in ${nativeCurrency.symbol}`}</span>

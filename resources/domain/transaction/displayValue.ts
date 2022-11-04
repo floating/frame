@@ -14,7 +14,7 @@ export class DisplayValue {
   
     return {
       usd,
-      displayUSD: usd.isZero() ? '< $0.01' : `$${usd.toFormat()}`
+      displayUSD: usd.isZero() ? '< 0.01' : usd.toFormat()
     }
   }
 
