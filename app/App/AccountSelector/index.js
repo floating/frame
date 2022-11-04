@@ -4,7 +4,7 @@ import Restore from 'react-restore'
 
 import AccountController from './AccountController'
 
-import { accountSort } from '../../../resources/domain/account'
+import { accountSort as byCreation } from '../../../resources/domain/account'
 import svg from '../../../resources/svg'
 import link from '../../../resources/link'
 
@@ -78,8 +78,7 @@ class AccountSelector extends React.Component {
     const scrollTop = this.store('selected.position.scrollTop')
     const open = current && this.store('selected.open')
 
-    const sortedAccounts = Object.keys(accounts).sort((a, b) => accountSort(accounts, a, b))
-
+    const sortedAccounts = Object.values(accounts).sort(byCreation)
     const filter = this.store('panel.accountFilter')
 
     const { data } = this.store('panel.nav')[0] || {}
@@ -91,35 +90,35 @@ class AccountSelector extends React.Component {
     const crumb = this.store('windows.panel.nav')[0] || {}
     // if (crumb.view === 'requestView') panelScrollStyle.bottom = '142px'
     
-    const displayAccounts = sortedAccounts.filter((id, i) => {
-      const account = accounts[id]
-      const { address, name, ensName, lastSignerType } = account
-
-      return !filter || filterMatches(filter, [address, name, ensName, lastSignerType])
-    })
+    const displayAccounts = sortedAccounts.filter(
+      ({ address, name, ensName, lastSignerType }) =>
+        !filter ||
+        filterMatches(filter, [address, name, ensName, lastSignerType])
+    )
 
     return (
-      <div 
-        className='accountSelectorScroll'
-        ref={ref => { 
-          if (ref) this.scroll = ref 
+      <div
+        className="accountSelectorScroll"
+        ref={(ref) => {
+          if (ref) this.scroll = ref;
         }}
       >
         {/* <div className='accountSelectorScrollWrap' style={current && scrollTop > 0 ? { marginTop: '-' + scrollTop + 'px' } : {}}> */}
-        <div className='accountSelectorScrollWrap'>
+        <div className="accountSelectorScrollWrap">
           {displayAccounts.length ? (
-            displayAccounts.map((id, i) => {
-              const account = accounts[id]
-              return <AccountController key={id} {...account} index={i} reportScroll={() => this.reportScroll()} resetScroll={() => this.resetScroll()} />
-            })
+            displayAccounts.map((account, i) => (
+              <AccountController
+                key={account.id}
+                {...account}
+                index={i}
+                reportScroll={() => this.reportScroll()}
+                resetScroll={() => this.resetScroll()}
+              />
+            ))
           ) : Object.keys(accounts).length === 0 ? (
-            <div className='noSigners'>
-              {'No Accounts Added'}
-            </div>
+            <div className="noSigners">{'No Accounts Added'}</div>
           ) : (
-            <div className='noSigners'>
-              {'No Matching Accounts'}
-            </div>
+            <div className="noSigners">{'No Matching Accounts'}</div>
           )}
         </div>
       </div>

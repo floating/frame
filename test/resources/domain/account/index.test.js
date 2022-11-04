@@ -1,4 +1,4 @@
-import { accountSort } from '../../../../resources/domain/account'
+import { accountSort as byCreation } from '../../../../resources/domain/account'
 
 
 const makeMockAccount = (address, timestamp = Date.now(), block = 0, name = address) => ({
@@ -21,16 +21,10 @@ describe('accountSort', () => {
     const acc3 = makeMockAccount(addresses[2], now + 800)
     const acc4 = makeMockAccount(addresses[3], now + 2000)
 
-    const accountsDictionary = {
-      [addresses[0]]: acc1,
-      [addresses[1]]: acc2,
-      [addresses[2]]: acc3,
-      [addresses[3]]: acc4,
-    }
-
     const unsorted = [acc2, acc3, acc1, acc4]
-    const sorted = unsorted.map(x => x.address).sort((a,b) => accountSort(accountsDictionary, a, b))
-    expect(sorted).toStrictEqual([acc4.address, acc3.address, acc2.address, acc1.address])
+    const sorted = unsorted.sort(byCreation)
+
+    expect(sorted).toStrictEqual([acc4, acc3, acc2, acc1])
   })
 
   it('should correctly sort a set of accounts in descending order by creation time according to block number', () => {
@@ -39,16 +33,10 @@ describe('accountSort', () => {
     const acc3 = makeMockAccount(addresses[2], now, 21)
     const acc4 = makeMockAccount(addresses[3], now, 30)
 
-    const accountsDictionary = {
-      [addresses[0]]: acc1,
-      [addresses[1]]: acc2,
-      [addresses[2]]: acc3,
-      [addresses[3]]: acc4,
-    }
-    
     const unsorted = [acc2, acc4, acc3, acc1]
-    const sorted = unsorted.map(x => x.address).sort((a,b) => accountSort(accountsDictionary, a, b))
-    expect(sorted).toStrictEqual([acc4.address, acc3.address, acc2.address, acc1.address])
+    const sorted = unsorted.sort(byCreation)
+
+    expect(sorted).toStrictEqual([acc4, acc3, acc2, acc1])
   })
 
   it('should correctly sort a set of accounts in descending order by creation time according to block number and timestamp', () => {
@@ -57,14 +45,9 @@ describe('accountSort', () => {
     const acc3 = makeMockAccount(addresses[2], now+800, 999)
     const acc4 = makeMockAccount(addresses[3], now + 100, 31)
 
-    const accountsDictionary = {
-      [addresses[0]]: acc1,
-      [addresses[1]]: acc2,
-      [addresses[2]]: acc3,
-      [addresses[3]]: acc4,
-    }
     const unsorted = [acc2, acc3, acc1, acc4]
-    const sorted = unsorted.map(x => x.address).sort((a,b) => accountSort(accountsDictionary, a, b))
-    expect(sorted).toStrictEqual([acc1.address, acc3.address, acc4.address, acc2.address])
+    const sorted = unsorted.sort(byCreation)
+    
+    expect(sorted).toStrictEqual([acc1, acc3, acc4, acc2])
   })
 })
