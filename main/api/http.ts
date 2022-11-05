@@ -41,12 +41,6 @@ function extendSession (originId: string) {
   }
 }
 
-const storeApi = {
-  getPermissions: (address: Address) => {
-    return store('main.permissions', address) as Record<string, Permission>
-  }
-}
-
 const cleanup = (id: string) => {
   delete polls[id]
   delete pending[id]
@@ -59,6 +53,7 @@ const cleanup = (id: string) => {
 }
 
 const handler = (req: IncomingMessage, res: ServerResponse) => {
+  console.log('handling HTTP ERQUETS')
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
   res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept')

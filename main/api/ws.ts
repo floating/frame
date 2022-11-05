@@ -50,6 +50,7 @@ function extendSession (originId: string) {
 }
 
 const handler = (socket: FrameWebSocket, req: IncomingMessage) => {
+  console.log('HANDLING SOCKET CONNECTION!')
   socket.id = uuid()
   socket.origin = req.headers.origin
   socket.isFrameExtension = isFrameExtension(req)

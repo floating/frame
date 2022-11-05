@@ -1,8 +1,9 @@
 import { app, ipcMain, protocol, shell, clipboard, globalShortcut, powerMonitor, BrowserWindow } from 'electron'
 import path from 'path'
 import log from 'electron-log'
-import { numberToHex } from 'web3-utils'
 import url from 'url'
+
+console.log('MAIN', { ipcMain })
 
 // DO NOT MOVE - env var below is required to enable watch mode for development on the renderer process and must be set before all local imports 
 process.env.BUNDLE_LOCATION = process.env.BUNDLE_LOCATION || path.resolve(__dirname, './../..', 'bundle')
@@ -19,7 +20,6 @@ import signers from './signers'
 import persist from './store/persist'
 import showUnhandledExceptionDialog from './windows/dialog/unhandledException'
 import Erc20Contract from './contracts/erc20'
-import provider from './provider'
 import { getErrorCode } from '../resources/utils'
 import { FrameInstance } from './windows/frames/frameInstances'
 
@@ -254,6 +254,7 @@ ipcMain.on('tray:syncPath', (e, path, value) => {
 })
 
 ipcMain.on('tray:ready', () => {
+  console.log('TRAY READY!')
   require('./api')
 
   if (!dev) {
