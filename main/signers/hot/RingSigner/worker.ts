@@ -23,7 +23,7 @@ class RingSignerWorker extends HotSignerWorker {
       this.keys = this._decrypt(encryptedKeys, password)
         .split(':')
         .map((key) => Buffer.from(key, 'hex'))
-      cb()
+      cb(null)
     } catch (e) {
       cb(new Error('Invalid password'))
     }
@@ -31,7 +31,7 @@ class RingSignerWorker extends HotSignerWorker {
 
   lock (_payload: undefined, cb: PseudoCallback) {
     this.keys = undefined
-    cb()
+    cb(null)
   }
 
   addKey ({ encryptedKeys, key, password }: { encryptedKeys: string, key: string, password: Buffer }, cb: PseudoCallback) {
@@ -42,7 +42,7 @@ class RingSignerWorker extends HotSignerWorker {
     else keys = [key]
     // Encrypt and return list of keys
     encryptedKeys = this._encryptKeys(keys, password)
-    cb(undefined, encryptedKeys)
+    cb(null, encryptedKeys)
   }
 
   removeKey ({ encryptedKeys, index, password }: { encryptedKeys: string, index: number, password: Buffer }, cb: PseudoCallback) {
@@ -53,7 +53,7 @@ class RingSignerWorker extends HotSignerWorker {
     keys = keys.filter((key) => key !== keys[index])
     // Return encrypted list (or null if empty)
     const result = keys.length > 0 ? this._encryptKeys(keys, password) : undefined
-    cb(undefined, result)
+    cb(null, result)
   }
 
   signMessage ({ index, message }: { index?: number, message: string }, cb: PseudoCallback) {
@@ -79,7 +79,7 @@ class RingSignerWorker extends HotSignerWorker {
 
   verifyAddress ({ index, address }: { index: number, address: string }, cb: PseudoCallback) {
     const message = '0x' + crypto.randomBytes(32).toString('hex')
-    this.signMessage({ index, message }, (err?: Error, signedMessage?: string) => {
+    this.signMessage({ index, message }, (err: Error | null, signedMessage?: string) => {
       // Handle signing errors
       if (err) return cb(err)
       // Signature -> buffer
@@ -94,7 +94,7 @@ class RingSignerWorker extends HotSignerWorker {
       const hash = hashPersonalMessage(toBuffer(message))
       const verifiedAddress = '0x' + pubToAddress(ecrecover(hash, v, r, s)).toString('hex')
       // Return result
-      cb(undefined, verifiedAddress.toLowerCase() === address.toLowerCase() ? 'true' : 'false')
+      cb(null, verifiedAddress.toLowerCase() === address.toLowerCase() ? 'true' : 'false')
     })
   }
 

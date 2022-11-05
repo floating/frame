@@ -44,9 +44,7 @@ describe('#signTransaction', () => {
 
   chains.forEach(chain => {
     it(`signs a transaction on ${chain.name}`, done => {
-      const tx = { ...rawTx, chainId: chain.chainId.toString(16) }
-
-      worker.signTransaction(key, tx, (err, signature) => {
+      worker.signTransaction({ key, rawTx: { ...rawTx, chainId: chain.chainId.toString(16) } }, (err, signature) => {
         try {
           expect(err).toBe(null)
           expect(signature).toBe(chain.expectedSignature)
@@ -59,9 +57,9 @@ describe('#signTransaction', () => {
   it('rejects a transaction with an unknown chain id', done => {
     const { chainId, ...tx } = rawTx
 
-    worker.signTransaction(key, tx, err => {
+    worker.signTransaction({ key, rawTx }, err => {
       try {
-        expect(err).toBe('could not determine chain id for transaction')
+        expect(err.message).toBe('could not determine chain id for transaction')
         done()
       } catch (e) { done(e) }
     })

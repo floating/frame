@@ -28,7 +28,7 @@ class SeedSignerWorker extends HotSignerWorker {
   unlock ({ encryptedSeed, password }: { encryptedSeed: string, password: Buffer }, cb: PseudoCallback) {
     try {
       this.seed = this._decrypt(encryptedSeed, password)
-      cb()
+      cb(null)
     } catch (e) {
       cb(new Error('Invalid password'))
     }
@@ -36,11 +36,11 @@ class SeedSignerWorker extends HotSignerWorker {
 
   lock (_payload: undefined, cb: PseudoCallback) {
     this.seed = undefined
-    cb()
+    cb(null)
   }
 
   encryptSeed ({ seed, password }: { seed: Buffer, password: Buffer }, cb: PseudoCallback) {
-    cb(undefined, this._encrypt(seed.toString('hex'), password))
+    cb(null, this._encrypt(seed.toString('hex'), password))
   }
 
   signMessage ({ index, message }: { index?: number, message: string }, cb: PseudoCallback) {
@@ -87,7 +87,7 @@ class SeedSignerWorker extends HotSignerWorker {
       const hash = hashPersonalMessage(toBuffer(message))
       const verifiedAddress = '0x' + pubToAddress(ecrecover(hash, v, r, s)).toString('hex')
       // Return result
-      cb(undefined, verifiedAddress.toLowerCase() === address.toLowerCase() ? 'true' : 'false')
+      cb(null, verifiedAddress.toLowerCase() === address.toLowerCase() ? 'true' : 'false')
     })
   }
 }

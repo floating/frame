@@ -22,7 +22,7 @@ function chainConfig (chain: number, hardfork: string) {
     : Common.custom({ chainId: chainId.toNumber() }, { baseChain: 'mainnet', hardfork })
 }
 
-export type PseudoCallback = (err?: Error, result?: string) => void
+export type PseudoCallback = (err: Error | null, result?: string) => void
 export type Message = { 
   id: string 
   method: string
@@ -84,13 +84,13 @@ export class HotSignerWorker {
     // Return serialized signed message
     const hex = Buffer.concat([Buffer.from(signed.r), Buffer.from(signed.s), Buffer.from([signed.v])]).toString('hex')
 
-    cb(undefined, addHexPrefix(hex))
+    cb(null, addHexPrefix(hex))
   }
 
   signTypedData ({ key, typedMessage: { data, version } }: { key: Buffer, typedMessage: TypedMessage }, cb: PseudoCallback) {
     try {
       const signature = signTypedData<typeof version, MessageTypes>({ privateKey: key, data, version })
-      cb(undefined, signature)
+      cb(null, signature)
     } catch (e) {
       cb(e as Error)
     }
@@ -110,7 +110,7 @@ export class HotSignerWorker {
     const signedTx = tx.sign(key)
     const serialized = signedTx.serialize().toString('hex')
 
-    cb(undefined, addHexPrefix(serialized))
+    cb(null, addHexPrefix(serialized))
   }
 
   verifyAddress ({ index, address }: { index: number, address: string }, cb: PseudoCallback) {
