@@ -21,7 +21,7 @@ function toDisplayEther (bn) {
 }
 
 function toDisplayGwei (bn) {
-  const gwei = bn.shiftedBy(-9).decimalPlaces(3, BigNumber.ROUND_FLOOR)
+  const gwei = bn.shiftedBy(-9).decimalPlaces(6, BigNumber.ROUND_FLOOR)
 
   return gwei.isZero() ? '' : gwei.toFormat()
 }
