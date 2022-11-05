@@ -1,8 +1,10 @@
 @keyframes lit
   0%
-    opacity 0
-  100%
     opacity 1
+  80%
+    opacity 1
+  100%
+    opacity 0.5
 
 .requestItem::after
   position absolute
@@ -24,6 +26,9 @@
   transform translateY(-1px)
   border-bottom 2px solid var(--ghostZ)
   box-shadow 0px 8px 30px -12px var(--ghostX)
+
+  .clusterValue
+    background var(--ghostB) !important
   
 .requestItem:active
   transform translateY(0px)
@@ -33,6 +38,19 @@
   background var(--ghostB)
   transform translateY(0px)
   box-shadow 0px 2px 4px var(--ghostX)
+
+.requestItem:first-child
+  border-radius 16px
+  border-bottom-left-radius 8px
+  border-bottom-right-radius 8px
+
+.requestItem:last-child
+  border-radius 16px
+  border-top-left-radius 8px
+  border-top-right-radius 8px
+
+.requestItem:first-child:last-child
+  border-radius 16px
 
 .requestItem
   cursor pointer
@@ -44,7 +62,7 @@
   font-weight 300
   box-shadow 0px 4px 6px var(--ghostY)
   border-bottom 2px solid var(--ghostZ)
-  border-radius 17px
+  border-radius 8px
   background var(--ghostA)
   cursor pointer
   position relative
@@ -57,8 +75,7 @@
   box-shadow 0px 4px 6px var(--ghostY)
   border-bottom 2px solid var(--ghostZ)
   cursor pointer
-  *
-    pointer-events none
+  transition all linear 0.1s
 
   .requestItemBackground
     position absolute
@@ -67,10 +84,11 @@
     right 0px
     bottom 0
     border-radius 1.5px
-    background linear-gradient(135deg, transparent 0%, transparent 50%)
-    opacity 0
+    background linear-gradient(90deg, transparent 0%, transparent 100%)
+    opacity 0.05
     z-index 200
     border-radius 18px
+    display none
 
   .requestItemCorner
     position absolute
@@ -90,8 +108,8 @@
     text-transform uppercase
     font-weight 400
     font-size 11px
-    color var(--moon)
-    margin 14px
+    margin 14px 14px 11px 14px
+    letter-spacing 1px
 
     span
       letter-spacing 1px
@@ -102,12 +120,39 @@
       align-items center
 
     .requestItemDetailsIndicator
-      height 6px
-      width 6px
-      border-radius 3px
-      background var(--moon)
-      z-index 4
-      animation lit infinite linear alternate 1s
+      height 12px
+      width 12px
+      margin 0px 1px
+      display flex
+      justify-content center
+      align-items center
+      border-radius 6px
+      box-shadow inset 0px 0px 3px var(--ghostY)
+
+      .requestItemDetailsIndicatorMarker
+        height 6px
+        width 6px
+        border-radius 3px
+        background var(--moon)
+        z-index 4
+        animation lit infinite ease-in-out alternate 1s
+
+    .requestItemDetailsView
+      display flex
+      justify-content center
+      align-items center
+      margin-right 2px
+      .requestItemDetailsViewText
+        font-weight 400
+        margin-right 0px
+      .requestItemDetailsViewArrow
+        display flex
+        justify-content center
+        align-items center
+        div 
+          width 8px
+        svg
+          transform rotate(90deg)
 
   .requestItemDetailsGood
     color var(--good)
@@ -169,39 +214,67 @@
       justify-content center
       align-items center
 
+
+  @keyframes wave
+    0%
+      transform translateX(0)
+    100%
+      transform translateX(12px)
+
   .requestItemLine
-    background var(--good)
-    height 2px
-    border-radius 2px
-    margin 14px
+    position absolute
+    bottom -2px
+    width 50px
+    right 0px
+    margin 0px
     box-sizing border-box
     display flex
+    overflow hidden
+    opacity 1
+    padding 8px 0px
+    border-radius 20px
+    box-shadow inset 0px 0px 4px var(--ghostY)
+    
+    svg
+      width 300%
+      position relative
+      left -100%
+      stroke-width 25px
+      animation wave 1.4s linear infinite
 
-    .requestItemLineDash
-      width calc((100% / 16) - 8px) 
-      margin-right 8px
-      height 2px
-      display none
+  .requestItemIcon
+    width 32px
+    height 32px
+    overflow hidden
+    display flex
+    justify-content center
+    align-items center
+    border-radius 12px
+    z-index 2
+    -webkit-app-region no-drag
+    transition none
+    pointer-events auto
+    transform translate3d(0, 0, 0)
 
   .requestItemTitle
     position relative
     font-family 'MainFont'
     font-weight 300
     display flex
-    justify-content flex-start
+    justify-content space-between
     align-items center
     font-size 14px
     font-weight 300
-    margin 14px
+    border-radius 26px
+    margin 8px 8px 0px 8px
+    overflow hidden
 
     .requestItemTitleTime
-      position absolute
-      top 0
-      right 0
-      bottom 0
+      height 32px
       display flex
       justify-content center
       align-items center
+      padding 0px 8px
 
       .requestItemTitleTimeItem
         height 26px
@@ -209,16 +282,25 @@
         justify-content center
         align-items center
         font-size 12px
-        font-weight 600
+        font-weight 400
 
     .requestItemMain
-      margin-left 10px
+      height 26px
+      border-radius 6px
+      display flex
+      justify-content flex-start
+      align-items center
+      box-sizing border-box
+
+    .requestItemTitleLeft
+      display flex
+      justify-content flex-start
+      align-items center
+      box-sizing border-box
 
     .requestItemTitleMain
-      font-size 16px
       font-weight 400
-      margin-bottom 5px
-      margin-top 5px
+      margin-left 4px
 
   .requestItemTitleSub
     display flex
@@ -241,7 +323,6 @@
     right 24px
     bottom 0px
     font-size 12px
-    font-weight 300
     display flex
     justify-content center
     align-items center
@@ -264,27 +345,6 @@
     svg
       position relative
       top 1px
-
-  .requestItemIcon
-    width 39px
-    display flex
-    justify-content center
-    align-items center
-    border-radius 10px
-    z-index 2
-    border-radius 20px
-    -webkit-app-region no-drag
-    transition none
-    pointer-events auto
-    transform translate3d(0, 0, 0)
-    cursor pointer
-
-    // .requestItemIconFrame
-    //   color var(--good)
-    //   border-radius 8px
-    //   display flex
-    //   justify-content center
-    //   align-items center
 
   .requestItemOrigin
     top 16px
@@ -347,3 +407,4 @@
   transform none
   margin-top 0px
   margin-bottom 0px
+  pointer-events none

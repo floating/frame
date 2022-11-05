@@ -24,6 +24,12 @@ function renderRecognizedAction (req) {
       }
     } else if (actionClass === 'ens') {
       return <EnsOverview type={actionType} data={data} />
+    } else {
+      return (
+        <div className='_txDescriptionSummaryLine'>
+          Calling Contract
+        </div>
+      )
     }
   })
 }
@@ -48,7 +54,7 @@ const GenericContractOverview = ({ method }) => (<div>{`Calling Contract Method 
 const DataOverview = () => (<div>Sending data</div>)
 const EmptyTransactionOverview = () => (<div>Empty Transaction</div>)
 
-const TxOverview = ({ req, chainName, chainColor, symbol, originName, txMeta, simple }) => {
+const TxOverview = ({ req, chainName, chainColor, symbol, originName, txMeta, simple, valueColor }) => {
   const { recipientType, decodedData: { method } = {}, data: tx = {} } = req
   const { to, value, data: calldata } = tx
   
@@ -77,9 +83,12 @@ const TxOverview = ({ req, chainName, chainColor, symbol, originName, txMeta, si
   return (
     <Cluster>
       <ClusterRow>
-        <ClusterValue onClick={() => {
-          link.send('nav:update', 'panel', { data: { step: 'viewData' } })
-        }}>
+        <ClusterValue 
+          onClick={() => {
+            link.send('nav:update', 'panel', { data: { step: 'viewData' } })
+          }}
+          style={{ background: valueColor }}
+        >
           <div className='_txDescription'>
             <TxDescription chain={chainName} chainColor={chainColor}>
               <div className='requestItemTitleSub'>
@@ -93,7 +102,7 @@ const TxOverview = ({ req, chainName, chainColor, symbol, originName, txMeta, si
                 </div>
               </div>
               <div className='_txDescriptionSummaryMain'>
-                {description || 'Calling Contract'}
+                {description}
               </div>
             </TxDescription>
           </div>
@@ -120,15 +129,15 @@ const TxOverview = ({ req, chainName, chainColor, symbol, originName, txMeta, si
               </ClusterRow>
             )
           )}
-          <ClusterRow>
-            <ClusterValue>
-              {isNonZeroHex(calldata) && (
+          {isNonZeroHex(calldata) && (
+            <ClusterRow>
+              <ClusterValue>
                 <div className='_txMainTag _txMainTagWarning'>
                   {'Transaction includes data'}
                 </div>
-              )}
-            </ClusterValue>
-          </ClusterRow>
+              </ClusterValue>
+            </ClusterRow>
+          )}
         </>
       )}
     </Cluster>

@@ -133,7 +133,7 @@ class Requests extends React.Component {
                     <Cluster>
                       <ClusterRow>
                         <ClusterValue grow={2}>
-                          <div className='requestItemTitleSub'>
+                          <div className='requestItemTitleSub' style={{ padding: '16px' }}>
                             <div 
                               className='requestItemTitleSubIcon'
                             >
@@ -305,28 +305,26 @@ class Requests extends React.Component {
                 const txMeta = { replacement: false, possible: true, notice: '' }
                 const originName = this.store('main.origins', req.origin, 'name')
                 return (
-                  <div>
-                    <RequestItem 
-                      key={req.type + i}
-                      req={req}
-                      account={this.props.id}
-                      handlerId={req.handlerId}
-                      i={i}
-                      title={`${chainName} Transaction`}
-                      color={primaryColor ? `var(--${primaryColor})`: ''}
-                      img={icon}
-                    >
-                      <TxOverview 
-                        req={req} 
-                        chainName={chainName} 
-                        chainColor={primaryColor} 
-                        symbol={currentSymbol} 
-                        txMeta={txMeta} 
-                        originName={originName}
-                        simple={true}
-                      />
-                    </RequestItem>
-                  </div>
+                  <RequestItem 
+                    key={req.type + i}
+                    req={req}
+                    account={this.props.id}
+                    handlerId={req.handlerId}
+                    i={i}
+                    title={`${chainName} Transaction`}
+                    color={primaryColor ? `var(--${primaryColor})`: ''}
+                    img={icon}
+                  >
+                    <TxOverview 
+                      req={req} 
+                      chainName={chainName} 
+                      chainColor={primaryColor} 
+                      symbol={currentSymbol} 
+                      txMeta={txMeta} 
+                      originName={originName}
+                      simple={true}
+                    />
+                  </RequestItem>
                 )
               }
             })}

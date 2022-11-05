@@ -38,7 +38,7 @@ class RingIcon extends React.Component {
           borderColor: color
         }}
       >
-        <div className='ringIconInner' style={{ background: color }}>
+        <div className='ringIconInner' style={block ? { color } : { background: color }}>
           <Icon svgName={svgName} svgSize={svgSize} img={img} small={small} />
         </div>
       </div>

@@ -829,5 +829,14 @@ export default {
       </div>
     )
   },
+  sine: size  => {
+    return (
+      <div style={{ width: '100%' }}>
+        <svg viewBox='0 0 2500 100'>
+          <path fill='transparent' stroke='currentColor' d='M 0 50 Q 50 0, 100 50 Q 150 100, 200 50 Q 250 0, 300 50 Q 350 100, 400 50 Q 450 0, 500 50 Q 550 100, 600 50 Q 650 0, 700 50 Q 750 100, 800 50 Q 850 0, 900 50 Q 950 100, 1000 50 Q 1050 0, 1100 50 Q 1150 100, 1200 50 Q 1250 0, 1300 50 Q 1350 100, 1400 50 Q 1450 0, 1500 50 Q 1550 100, 1600 50 Q 1650 0, 1700 50 Q 1750 100, 1800 50 Q 1850 0, 1900 50 Q 1950 100, 2000 50 Q 2050 0, 2100 50 Q 2150 100, 2200 50 Q 2250 0, 2300 50 Q 2350 100, 2400 50 Q 2450 0, 2500 50 Q 2550 100, 2600 50 Q 2650 0, 2700 50' />
+        </svg>
+      </div>
+    )
+  },
   octicon: (name, settings) => <Octicon icon={getIconByName(name)} height={settings.height} />
 }

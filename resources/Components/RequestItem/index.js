@@ -50,7 +50,7 @@ class _RequestItem extends React.Component {
       <div 
         key={req.handlerId}
         className={headerMode ? 'requestItem requestItemHeader' : 'requestItem' }
-        onClick={() => {
+        onClick={!headerMode ? () => {
           const crumb = { 
             view: 'requestView',
             data: {
@@ -63,66 +63,64 @@ class _RequestItem extends React.Component {
             }
           }
           link.send('nav:forward', 'panel', crumb)
-        }}
+        } : null}
       >
         <div className='requestItemBackground' 
           style={{ 
-            background: `linear-gradient(155deg, ${color} 0%, transparent 100%)`
+            background: `linear-gradient(180deg, ${color} 0%, transparent 80%)`
           }} 
         />
-        <div className='requestItemLine' style={{ background: color }}>
-        </div>
         <div className='requestItemTitle'>
-          <div className='requestItemIcon'>
-            <RingIcon 
-              color={color}
-              svgName={svgName}
-              img={img}
-              // small={true}
-              block={true}
-            />
+          <div className='requestItemTitleLeft'>
+            <div className='requestItemIcon'>
+              <RingIcon 
+                color={color}
+                svgName={svgName}
+                img={img}
+                small={true}
+              />
+            </div>
+            <div className='requestItemMain'>
+              <div className='requestItemTitleMain'>
+                {title}
+              </div>
+            </div>
           </div>
-          <div className='requestItemMain'>
-            <div className='requestItemTitleMain'>
-              {title}
+          <div 
+            className='requestItemTitleTime'
+          >
+            <div className='requestItemTitleTimeItem'>
+              {this.state.ago}
             </div>
           </div>
-          {txNonce ? (
-            <div 
-              className='requestMetaNonce'
-            >
-              <div className='txNonceControl'>
-                <div className='txNonceButton txNonceButtonLower' onMouseDown={() => link.send('tray:adjustNonce', req.handlerId, -1)}>
-                  {svg.octicon('chevron-down', { height: 14 })}
-                </div>
-                <div className='txNonceButton txNonceButtonRaise' onMouseDown={() => link.send('tray:adjustNonce', req.handlerId, 1)}>
-                  {svg.octicon('chevron-up', { height: 14 })}
-                </div>
-                
-              </div>
-              <div className='txNonceLabel'>Nonce</div>
-              <div className={'txNonceNumber'}>
-                {nonce}
-              </div>
-            </div>
-          ) : (
-            <div className='requestItemTitleTime'>
-              <div className='requestItemTitleTimeItem'>
-                {this.state.ago}
-              </div>
-            </div>
-          )}
-        </div>  
+        </div>
+        <div style={headerMode ? { pointerEvents: 'auto' } : { pointerEvents: 'none' }}>
         {children}
+        </div>
         <div className={requestItemDetailsClass}>
           <div className='requestItemDetailsSlide'>
-            <div className='requestItemDetailsIndicator' />
+            <div className='requestItemDetailsIndicator'>
+              <div className='requestItemDetailsIndicatorMarker' />
+            </div>
             <span>{status}</span>
             {/* <div className='requestItemDetailsIndicator' /> */}
           </div>
-          <div>
-            {`View >`}
-          </div>
+          {headerMode ? (
+            <div className='requestItemLine' style={{ color: 'var(--moon)' }}>
+              {svg.sine()}
+            </div>
+          ) : (
+            <div className='requestItemDetailsView'>
+              <div className='requestItemDetailsViewText'>
+                {`View`}
+              </div>
+              <div className='requestItemDetailsViewArrow'>
+                <div>{svg.chevron(15)}</div>
+                <div>{svg.chevron(15)}</div>
+                <div>{svg.chevron(15)}</div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     )
