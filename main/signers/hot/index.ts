@@ -39,12 +39,14 @@ export = {
     })
   },
   createFromPhrase: (signers: Signers, phrase: string, password: string, cb: Callback<SeedSigner>) => {
+    console.log('creating signer')
     if (!phrase) return cb(new Error('Phrase required to create hot signer'))
     if (!password) return cb(new Error('Password required to create hot signer'))
     if (password.length < 12) return cb(new Error('Hot account password is too short'))
     if (zxcvbn(password).score < 3) return cb(new Error('Hot account password is too weak'))
     const signer = new SeedSigner()
     signer.addPhrase(phrase, password, err => {
+      console.log('addphrase', err)
       if (err) {
         signer.close()
         return cb(err)

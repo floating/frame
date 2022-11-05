@@ -56,28 +56,28 @@ class RingSignerWorker extends HotSignerWorker {
     cb(null, result)
   }
 
-  signMessage ({ index, message }: { index?: number, message: string }, cb: PseudoCallback) {
+  signMessage ({ index, message }: { index?: number, message?: string }, cb: PseudoCallback) {
     // Make sure signer is unlocked
     if (!this.keys) return cb(new Error('Signer locked'))
     // Sign message
     super.signMessage({ key: this.keys[index as number], message }, cb)
   }
 
-  signTypedData ({ index, typedMessage }: { index?: number, typedMessage: TypedMessage }, cb: PseudoCallback) {
+  signTypedData ({ index, typedMessage }: { index?: number, typedMessage?: TypedMessage }, cb: PseudoCallback) {
     // Make sure signer is unlocked
     if (!this.keys) return cb(new Error('Signer locked'))
     // Sign Typed Data
     super.signTypedData({ key: this.keys[index as number], typedMessage }, cb)
   }
 
-  signTransaction ({ index, rawTx }: { index?: number, rawTx: TransactionData }, cb: PseudoCallback) {
+  signTransaction ({ index, rawTx }: { index?: number, rawTx?: TransactionData }, cb: PseudoCallback) {
     // Make sure signer is unlocked
     if (!this.keys) return cb(new Error('Signer locked'))
     // Sign transaction
     super.signTransaction({ key: this.keys[index as number], rawTx }, cb)
   }
 
-  verifyAddress ({ index, address }: { index: number, address: string }, cb: PseudoCallback) {
+  verifyAddress ({ index, address }: { index?: number, address?: string }, cb: PseudoCallback) {
     const message = '0x' + crypto.randomBytes(32).toString('hex')
     this.signMessage({ index, message }, (err: Error | null, signedMessage?: string) => {
       // Handle signing errors
@@ -94,7 +94,7 @@ class RingSignerWorker extends HotSignerWorker {
       const hash = hashPersonalMessage(toBuffer(message))
       const verifiedAddress = '0x' + pubToAddress(ecrecover(hash, v, r, s)).toString('hex')
       // Return result
-      cb(null, verifiedAddress.toLowerCase() === address.toLowerCase() ? 'true' : 'false')
+      cb(null, verifiedAddress.toLowerCase() === (address as string).toLowerCase() ? 'true' : 'false')
     })
   }
 
@@ -106,6 +106,32 @@ class RingSignerWorker extends HotSignerWorker {
   _encryptKeys (keys: string[], password: Buffer) {
     const keyString = keys.join(':')
     return this._encrypt(keyString, password)
+  }
+
+  handleMessage ({ id, method, params, token }: Message) {
+    // Define (pseudo) callback
+    const pseudoCallback = (error: Error | null, result?: string) => {
+      // Add correlation id to response
+      const response = { id, error, result, type: 'rpc' }
+      console.log('handleMessage cb', response)
+      // Send response to parent process
+      if (process.send) {
+        process.send(response)
+      }
+    }
+    // Verify token
+    if (!crypto.timingSafeEqual(Buffer.from(token), Buffer.from(this.token))) return pseudoCallback(new Error('Invalid token'))
+    // If method exists -> execute
+    const callableMethods = {
+      signMessage: this.signMessage.bind(this), 
+      signTypedData: this.signTypedData.bind(this),
+      signTransaction: this.signTransaction.bind(this),
+      verifyAddress: this.verifyAddress.bind(this)
+    }
+    const methodToCall = callableMethods[method as keyof typeof callableMethods]
+    if (methodToCall) return methodToCall(params, pseudoCallback)
+    // Else return error
+    pseudoCallback(new Error(`Invalid method: '${method}'`))
   }
 }
 

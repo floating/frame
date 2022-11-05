@@ -88,7 +88,7 @@ describe('Seed signer', () => {
 
   test('Unlock with wrong password', (done) => {
     try {
-      signer.unlock('Wrong password', err => {
+      signer.unlock('Wrong password', {}, err => {
         expect(err).toBeTruthy()
         expect(signer.status).toBe('locked')
         done()
@@ -98,7 +98,7 @@ describe('Seed signer', () => {
 
   test('Unlock', (done) => {
     try {
-      signer.unlock(PASSWORD, err => {
+      signer.unlock(PASSWORD, {}, err => {
         expect(err).toBe(null)
         done()
       })
@@ -159,7 +159,7 @@ describe('Seed signer', () => {
 
   test('Lock', (done) => {
     try {
-      signer.lock(err => {
+      signer.lock({}, err => {
         expect(err).toBe(null)
         expect(signer.status).toBe('locked')
         done()

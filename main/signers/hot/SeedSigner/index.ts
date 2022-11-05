@@ -1,5 +1,5 @@
 import path from 'path'
-import bip39 from 'bip39'
+import { validateMnemonic, mnemonicToSeed } from 'bip39'
 import hdKey from 'hdkey'
 //@ts-ignore
 import publicKeyToAddress from 'ethereum-public-key-to-address'
@@ -24,6 +24,7 @@ export class SeedSigner extends HotSigner {
     if (this.encryptedSeed) return cb(new Error('This signer already has a seed'))
 
     this.callWorker({ method: 'encryptSeed', params: { seed, password } }, (err: Error | null, encryptedSeed?: string) => {
+      console.log('encryptseed error', err)
       if (err) return cb(err)
 
       // Derive addresses
@@ -47,9 +48,9 @@ export class SeedSigner extends HotSigner {
 
   async addPhrase (phrase: string, password: string, cb: Callback<Signer>) {
     // Validate phrase
-    if (!bip39.validateMnemonic(phrase)) return cb(new Error('Invalid mnemonic phrase'))
+    if (!validateMnemonic(phrase)) return cb(new Error('Invalid mnemonic phrase'))
     // Get seed
-    const seed = await bip39.mnemonicToSeed(phrase)
+    const seed = await mnemonicToSeed(phrase)
     // Add seed to signer
     this.addSeed(seed.toString('hex'), password, cb)
   }

@@ -23,22 +23,15 @@ function chainConfig (chain: number, hardfork: string) {
 }
 
 export type PseudoCallback = (err: Error | null, result?: string) => void
-export type Message = { 
+export interface Message { 
   id: string 
   method: string
-  params: {
-    index: number
-    key: Buffer
-    message: string
-    typedMessage: TypedMessage
-    rawTx: TransactionData
-    address: string
-  }
+  params: Record<string, unknown>
   token: string
 }
 
 export class HotSignerWorker {
-  private token: string
+  protected token: string
   public type = ''
 
   constructor () {
@@ -50,36 +43,15 @@ export class HotSignerWorker {
   }
 
   handleMessage ({ id, method, params, token }: Message) {
-    // Define (pseudo) callback
-    const pseudoCallback = (error?: Error, result?: string) => {
-      // Add correlation id to response
-      const response = { id, error, result, type: 'rpc' }
-      // Send response to parent process
-      if (process.send) {
-        process.send(response)
-      }
-    }
-    // Verify token
-    if (!crypto.timingSafeEqual(Buffer.from(token), Buffer.from(this.token))) return pseudoCallback(new Error('Invalid token'))
-    // If method exists -> execute
-    const callableMethods = {
-      signMessage: this.signMessage.bind(this), 
-      signTypedData: this.signTypedData.bind(this),
-      signTransaction: this.signTransaction.bind(this),
-      verifyAddress: this.verifyAddress.bind(this)
-    }
-    const methodToCall = callableMethods[method as keyof typeof callableMethods]
-    if (methodToCall) return methodToCall(params, pseudoCallback)
-    // Else return error
-    pseudoCallback(new Error(`Invalid method: '${method}'`))
+    log.warn(`HotSignerWorker: ${this.type} did not implement a handleMessage method`)
   }
 
-  signMessage ({ key, message }: { index?: number, key: Buffer, message: string }, cb: PseudoCallback) {
+  signMessage ({ key, message }: { index?: number, key?: Buffer, message?: string }, cb: PseudoCallback) {
     // Hash message
     const hash = hashPersonalMessage(toBuffer(message))
 
     // Sign message
-    const signed = ecsign(hash, key)
+    const signed = ecsign(hash, key as Buffer)
 
     // Return serialized signed message
     const hex = Buffer.concat([Buffer.from(signed.r), Buffer.from(signed.s), Buffer.from([signed.v])]).toString('hex')
@@ -87,18 +59,19 @@ export class HotSignerWorker {
     cb(null, addHexPrefix(hex))
   }
 
-  signTypedData ({ key, typedMessage: { data, version } }: { key: Buffer, typedMessage: TypedMessage }, cb: PseudoCallback) {
+  signTypedData ({ key, typedMessage }: { key?: Buffer, typedMessage?: TypedMessage }, cb: PseudoCallback) {
     try {
-      const signature = signTypedData<typeof version, MessageTypes>({ privateKey: key, data, version })
+      const { data, version } = typedMessage as TypedMessage
+      const signature = signTypedData<typeof version, MessageTypes>({ privateKey: key as Buffer, data, version })
       cb(null, signature)
     } catch (e) {
       cb(e as Error)
     }
   }
 
-  signTransaction ({ key, rawTx }: { key: Buffer, rawTx: TransactionData }, cb: PseudoCallback) {
-    if (!rawTx.chainId) {
-      console.error(`invalid chain id ${rawTx.chainId} for transaction`)
+  signTransaction ({ key, rawTx }: { key?: Buffer, rawTx?: TransactionData }, cb: PseudoCallback) {
+    if (!rawTx?.chainId) {
+      console.error(`invalid chain id ${rawTx?.chainId} for transaction`)
       return cb(new Error('could not determine chain id for transaction'))
     }
 
@@ -107,13 +80,13 @@ export class HotSignerWorker {
     const common = chainConfig(chainId, hardfork)
 
     const tx = TransactionFactory.fromTxData(rawTx, { common })
-    const signedTx = tx.sign(key)
+    const signedTx = tx.sign(key as Buffer)
     const serialized = signedTx.serialize().toString('hex')
 
     cb(null, addHexPrefix(serialized))
   }
 
-  verifyAddress ({ index, address }: { index: number, address: string }, cb: PseudoCallback) {
+  verifyAddress ({ index, address }: { index?: number, address?: string }, cb: PseudoCallback) {
     log.warn(`HotSignerWorker: ${this.type} did not implement a verifyAddress method`)
   }
 

@@ -25,25 +25,25 @@ class SeedSignerWorker extends HotSignerWorker {
     return key.privateKey
   }
 
-  unlock ({ encryptedSeed, password }: { encryptedSeed: string, password: Buffer }, cb: PseudoCallback) {
+  unlock ({ encryptedSeed, password }: { encryptedSeed?: string, password?: Buffer }, cb: PseudoCallback) {
     try {
-      this.seed = this._decrypt(encryptedSeed, password)
+      this.seed = this._decrypt(encryptedSeed as string, password as Buffer)
       cb(null)
     } catch (e) {
       cb(new Error('Invalid password'))
     }
   }
 
-  lock (_payload: undefined, cb: PseudoCallback) {
+  lock (_payload: unknown, cb: PseudoCallback) {
     this.seed = undefined
     cb(null)
   }
 
-  encryptSeed ({ seed, password }: { seed: Buffer, password: Buffer }, cb: PseudoCallback) {
-    cb(null, this._encrypt(seed.toString('hex'), password))
+  encryptSeed ({ seed, password }: { seed?: Buffer, password?: Buffer }, cb: PseudoCallback) {
+    cb(null, this._encrypt((seed as Buffer).toString('hex'), password as Buffer))
   }
 
-  signMessage ({ index, message }: { index?: number, message: string }, cb: PseudoCallback) {
+  signMessage ({ index, message }: { index?: number, message?: string }, cb: PseudoCallback) {
     // Make sure signer is unlocked
     if (!this.seed) return cb(new Error('Signer locked'))
     // Derive private key
@@ -52,7 +52,7 @@ class SeedSignerWorker extends HotSignerWorker {
     super.signMessage({ key, message }, cb)
   }
 
-  signTypedData ({ index, typedMessage }: { index?: number, typedMessage: TypedMessage }, cb: PseudoCallback) {
+  signTypedData ({ index, typedMessage }: { index?: number, typedMessage?: TypedMessage }, cb: PseudoCallback) {
     // Make sure signer is unlocked
     if (!this.seed) return cb(new Error('Signer locked'))
     // Derive private key
@@ -61,7 +61,7 @@ class SeedSignerWorker extends HotSignerWorker {
     super.signTypedData({ key, typedMessage }, cb)
   }
 
-  signTransaction ({ index, rawTx }: { index?: number, rawTx: TransactionData }, cb: PseudoCallback) {
+  signTransaction ({ index, rawTx }: { index?: number, rawTx?: TransactionData }, cb: PseudoCallback) {
     // Make sure signer is unlocked
     if (!this.seed) return cb(new Error('Signer locked'))
     // Derive private key
@@ -70,7 +70,7 @@ class SeedSignerWorker extends HotSignerWorker {
     super.signTransaction({ key, rawTx }, cb)
   }
 
-  verifyAddress ({ index, address }: { index: number, address: string }, cb: PseudoCallback) {
+  verifyAddress ({ index, address }: { index?: number, address?: string }, cb: PseudoCallback) {
     const message = '0x' + crypto.randomBytes(32).toString('hex')
     this.signMessage({ index, message }, (err, signedMessage) => {
       // Handle signing errors
@@ -87,8 +87,37 @@ class SeedSignerWorker extends HotSignerWorker {
       const hash = hashPersonalMessage(toBuffer(message))
       const verifiedAddress = '0x' + pubToAddress(ecrecover(hash, v, r, s)).toString('hex')
       // Return result
-      cb(null, verifiedAddress.toLowerCase() === address.toLowerCase() ? 'true' : 'false')
+      cb(null, verifiedAddress.toLowerCase() === (address as string).toLowerCase() ? 'true' : 'false')
     })
+  }
+
+  handleMessage ({ id, method, params, token }: Message) {
+    // Define (pseudo) callback
+    const pseudoCallback = (error: Error | null, result?: string) => {
+      // Add correlation id to response
+      const response = { id, error, result, type: 'rpc' }
+      console.log('handleMessage cb', response)
+      // Send response to parent process
+      if (process.send) {
+        process.send(response)
+      }
+    }
+    // Verify token
+    if (!crypto.timingSafeEqual(Buffer.from(token), Buffer.from(this.token))) return pseudoCallback(new Error('Invalid token'))
+    // If method exists -> execute
+    const callableMethods = {
+      signMessage: this.signMessage.bind(this), 
+      signTypedData: this.signTypedData.bind(this),
+      signTransaction: this.signTransaction.bind(this),
+      verifyAddress: this.verifyAddress.bind(this),
+      encryptSeed: this.encryptSeed.bind(this),
+      lock: this.lock.bind(this),
+      unlock: this.unlock.bind(this)
+    }
+    const methodToCall = callableMethods[method as keyof typeof callableMethods]
+    if (methodToCall) return methodToCall(params, pseudoCallback)
+    // Else return error
+    pseudoCallback(new Error(`Invalid method: '${method}'`))
   }
 }
 

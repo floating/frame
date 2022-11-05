@@ -214,7 +214,7 @@ export class Signers extends EventEmitter {
 
     // @ts-ignore
     if (signer && signer.lock) {
-      (signer as HotSigner).lock(cb)
+      (signer as HotSigner).lock({}, cb)
     }
   }
 

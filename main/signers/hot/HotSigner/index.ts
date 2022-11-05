@@ -81,7 +81,7 @@ export class HotSigner extends Signer {
     log.info('Signer erased from disk')
   }
 
-  lock (cb: Callback<Signer>) {
+  lock (_params: {}, cb: Callback<Signer>) {
     this.callWorker({ method: 'lock' }, () => {
       this.status = 'locked'
       this.update()
@@ -157,7 +157,7 @@ export class HotSigner extends Signer {
           store.notify('hotSignerMismatch')
           err = new Error('Unable to verify address')
         }
-        this.lock(() => {
+        this.lock({}, () => {
           if (err) {
             log.error('HotSigner verifyAddress: Unable to verify address')
           } else {
@@ -186,7 +186,8 @@ export class HotSigner extends Signer {
   }
 
   protected callWorker (payload: WorkerPayload, cb: Callback<any>): void | NodeJS.Timeout {
-    if (!this.worker) throw Error('Worker not running')
+    
+    if (!this.worker) throw new Error('Worker not running')
     // If token not yet received -> retry in 100 ms
     if (!this.token) return setTimeout(() => this.callWorker(payload, cb), 100)
     // Generate message id
@@ -194,6 +195,7 @@ export class HotSigner extends Signer {
     // Handle response
     const listener = (response: any) => {
       if (response.type === 'rpc' && response.id === id) {
+        console.log('callworker listener', response)
         const error = response.error ? new Error(response.error) : null
         cb(error, response.result)
         this.worker.removeListener('message', listener)
