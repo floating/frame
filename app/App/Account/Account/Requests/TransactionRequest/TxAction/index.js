@@ -40,7 +40,7 @@ class TxSending extends React.Component {
         const address = recipientAddress
         const ensName = recipientEns
         const value = new BigNumber(amount) 
-        const displayValue = value.dividedBy('1e' + decimals).toFixed(6)
+        const displayValue = value.dividedBy('1e' + decimals).decimalPlaces(6).toFormat()
         // const ensName = (recipientEns && recipientEns.length < 25) ? recipientEns : ''
 
         const isTestnet = this.store('main.networks', this.props.chain.type, this.props.chain.id, 'isTestnet')    
