@@ -50,7 +50,17 @@ describe('gas display', () => {
 
     expect(baseFeeInput.textContent).toBe('12.369Gwei')
   })
-  
+
+  it('renders a total gas price of more than 1 thousand wei in gwei', () => {
+    req.data.type = '0x0'
+    req.data.gasPrice = addHexPrefix((945e3).toString(16))
+
+    const { getByTestId } = setupComponent(<TxFee req={req} />)
+    const baseFeeInput = getByTestId('gas-display')
+
+    expect(baseFeeInput.textContent).toBe('0.000945Gwei')
+  })
+
   it('renders a total gas price of less than 1 thousand wei', () => {
     req.data.type = '0x0'
     req.data.gasPrice = addHexPrefix((945).toString(16))
@@ -70,7 +80,7 @@ describe('usd estimate display', () => {
     const { getByTestId } = setupComponent(<TxFee req={req} />)
     const baseFeeInput = getByTestId('usd-estimate-display')
 
-    expect(baseFeeInput.textContent).toBe('≈$< 0.01in MATIC')
+    expect(baseFeeInput.textContent).toBe('≈< $0.01in MATIC')
   })
 
   it('renders an estimate for between less than a cent and one cent', () => {
@@ -80,7 +90,7 @@ describe('usd estimate display', () => {
     const { getByTestId } = setupComponent(<TxFee req={req} />)
     const baseFeeInput = getByTestId('usd-estimate-display')
 
-    expect(baseFeeInput.textContent).toBe('≈$< 0.01-$0.01in MATIC')
+    expect(baseFeeInput.textContent).toBe('≈< $0.01-$0.01in MATIC')
   })
 
   it('renders an estimate for between > $1 values', () => {
