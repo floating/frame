@@ -1,4 +1,4 @@
-import HotSignerWorker from '../../../../../main/signers/hot/HotSigner/worker'
+import { HotSignerWorker } from '../../../../../main/signers/hot/HotSigner/worker'
 
 let worker
 
