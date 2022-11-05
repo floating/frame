@@ -2,12 +2,12 @@ import path from 'path'
 import log from 'electron-log'
 import Wallet from 'ethereumjs-wallet'
 import { HotSigner, SignerData, StoredSigner } from '../HotSigner'
-import { PseudoCallback } from '../HotSigner/worker'
+import Signer from '../../Signer'
 
 const { fromPrivateKey, fromV1, fromV3 } = Wallet
 const WORKER_PATH = path.resolve(__dirname, 'worker.js')
 
-interface V1Keystore {
+export interface V1Keystore {
   Address: string;
   Crypto: {
       CipherText: string;
@@ -43,7 +43,7 @@ interface PBKDFParamsOut {
   salt: string;
 }
 type KDFParamsOut = ScryptKDFParamsOut | PBKDFParamsOut;
-interface V3Keystore {
+export interface V3Keystore {
   crypto: {
       cipher: string;
       cipherparams: {
@@ -73,11 +73,11 @@ export class RingSigner extends HotSigner {
     super.save({ encryptedKeys: this.encryptedKeys })
   }
 
-  unlock (password: Buffer, _data: SignerData, cb: PseudoCallback) {
+  unlock (password: string, _data: SignerData, cb: Callback<Signer>) {
     super.unlock(password, { encryptedKeys: this.encryptedKeys }, cb)
   }
 
-  addPrivateKey (key: string, password: Buffer, cb: PseudoCallback) {
+  addPrivateKey (key: string, password: string, cb: Callback<Signer>) {
     // Validate private key
     let wallet
     try {
@@ -110,11 +110,11 @@ export class RingSigner extends HotSigner {
 
       // If signer was unlock -> update keys in worker
       if (this.status === 'ok') this.unlock(password, {}, cb)
-      else cb()
+      else cb(null)
     })
   }
 
-  removePrivateKey (index: number, password: Buffer, cb: PseudoCallback) {
+  removePrivateKey (index: number, password: string, cb: Callback<Signer>) {
     // Call worker
     const params = { encryptedKeys: this.encryptedKeys, index, password }
     this.callWorker({ method: 'removeKey', params }, (err: Error | null, encryptedKeys: string[]) => {
@@ -133,12 +133,12 @@ export class RingSigner extends HotSigner {
 
       // If signer was unlock -> update keys in worker
       if (this.status === 'ok') this.unlock(password, {}, cb)
-      else cb()
+      else cb(null)
     })
   }
 
   // TODO: Encrypt all keys together so that they all get the same password
-  async addKeystore (keystore: V3Keystore | V1Keystore, keystorePassword: string, password: Buffer, cb: PseudoCallback) {
+  async addKeystore (keystore: V3Keystore | V1Keystore, keystorePassword: string, password: string, cb: Callback<Signer>) {
     let wallet
     // Try to generate wallet from keystore
     try {

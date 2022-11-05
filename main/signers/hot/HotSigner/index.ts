@@ -8,7 +8,6 @@ import { v4 as uuid } from 'uuid'
 
 import Signer from '../../Signer'
 import store from '../../../store'
-import { PseudoCallback } from './worker'
 import type { TypedMessage } from '../../../accounts/types'
 import { TransactionData } from '../../../../resources/domain/transaction'
 // Mock windows module during tests
@@ -91,14 +90,14 @@ export class HotSigner extends Signer {
     })
   }
 
-  unlock (password: Buffer, data: SignerData, cb: PseudoCallback) {
+  unlock (password: string, data: SignerData, cb: Callback<Signer>) {
     const params = { password, ...data }
     this.callWorker({ method: 'unlock', params }, (err: Error | null, _result?: unknown) => {
       if (err) return cb(err)
       this.status = 'ok'
       this.update()
       log.info('Signer unlocked')
-      cb()
+      cb(null)
     })
   }
 

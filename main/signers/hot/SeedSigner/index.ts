@@ -5,7 +5,7 @@ import hdKey from 'hdkey'
 import publicKeyToAddress from 'ethereum-public-key-to-address'
 
 import { HotSigner, SignerData, StoredSigner } from '../HotSigner'
-import { PseudoCallback } from '../HotSigner/worker'
+import Signer from '../../Signer'
 
 const WORKER_PATH = path.resolve(__dirname, 'worker.js')
 
@@ -20,7 +20,7 @@ export class SeedSigner extends HotSigner {
     if (this.encryptedSeed) this.update()
   }
 
-  addSeed (seed: string, password: Buffer, cb: PseudoCallback) {
+  addSeed (seed: string, password: string, cb: Callback<Signer>) {
     if (this.encryptedSeed) return cb(new Error('This signer already has a seed'))
 
     this.callWorker({ method: 'encryptSeed', params: { seed, password } }, (err: Error | null, encryptedSeed?: string) => {
@@ -41,11 +41,11 @@ export class SeedSigner extends HotSigner {
       this.addresses = addresses
       this.update()
 
-      cb()
+      cb(null)
     })
   }
 
-  async addPhrase (phrase: string, password: Buffer, cb: PseudoCallback) {
+  async addPhrase (phrase: string, password: string, cb: Callback<Signer>) {
     // Validate phrase
     if (!bip39.validateMnemonic(phrase)) return cb(new Error('Invalid mnemonic phrase'))
     // Get seed
@@ -58,7 +58,7 @@ export class SeedSigner extends HotSigner {
     super.save({ encryptedSeed: this.encryptedSeed })
   }
 
-  unlock (password: Buffer, _data: SignerData, cb: PseudoCallback) {
+  unlock (password: string, _data: SignerData, cb: Callback<Signer>) {
     super.unlock(password, { encryptedSeed: this.encryptedSeed }, cb)
   }
 }
