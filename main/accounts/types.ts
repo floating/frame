@@ -20,6 +20,7 @@ export enum RequestStatus {
   Verifying = 'verifying',
   Confirming = 'confirming',
   Confirmed = 'confirmed',
+  Sent = 'sent',
   Declined = 'declined',
   Error = 'error',
   Success = 'success'
@@ -28,15 +29,15 @@ export enum RequestStatus {
 type RequestType = 'sign' | 'signTypedData' | 'transaction' | 'access' | 'addChain' | 'switchChain' | 'addToken'
 
 export interface AccountRequest {
-  type: RequestType,
-  origin: string,
-  payload: JSONRPCRequestPayload,
-  handlerId: string,
-  account: string,
-  status?: RequestStatus,
-  mode?: RequestMode,
-  notice?: string,
-  created?: number,
+  type: RequestType
+  origin: string
+  payload: JSONRPCRequestPayload
+  handlerId: string
+  account: string
+  status?: RequestStatus
+  mode?: RequestMode
+  notice?: string
+  created?: number
   res?: (response?: RPCResponsePayload) => void
 }
 
