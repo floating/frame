@@ -396,7 +396,7 @@ class FrameAccount {
             step: 'confirm', accountId: account, requestId: req.handlerId 
           },
           position: {
-            bottom: '200px'
+            bottom: (req || {}).type === 'transaction' ? '200px' : '140px'
           }
         } as const
         if (inRequestView) nav.back('panel')

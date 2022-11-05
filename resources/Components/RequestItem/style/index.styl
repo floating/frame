@@ -233,6 +233,7 @@
     opacity 1
     padding 8px 0px
     border-radius 20px
+    background var(--ghostZ05)
     box-shadow inset 0px 0px 4px var(--ghostY)
     
     svg
@@ -242,6 +243,14 @@
       stroke-width 25px
       animation wave 1.4s linear infinite
 
+  .requestItemLineShadow
+    background none
+    color var(--ghostX)
+    box-shadow none
+    svg
+      bottom -2px
+      filter blur(1px)
+      
   .requestItemIcon
     width 32px
     height 32px
@@ -259,14 +268,14 @@
   .requestItemTitle
     position relative
     font-family 'MainFont'
-    font-weight 300
+    font-weight 400
     display flex
     justify-content space-between
     align-items center
-    font-size 14px
+    font-size 15px
     font-weight 300
     border-radius 26px
-    margin 8px 8px 0px 8px
+    margin 8px 8px 4px 8px
     overflow hidden
 
     .requestItemTitleTime
@@ -285,7 +294,7 @@
         font-weight 400
 
     .requestItemMain
-      height 26px
+      height 36px
       border-radius 6px
       display flex
       justify-content flex-start
@@ -297,10 +306,12 @@
       justify-content flex-start
       align-items center
       box-sizing border-box
+      margin-left 0px
 
     .requestItemTitleMain
       font-weight 400
-      margin-left 4px
+      margin-left 8px
+      top -2px
 
   .requestItemTitleSub
     display flex
@@ -310,7 +321,7 @@
     font-weight 300
 
     .requestItemTitleSubIcon
-      margin 1px 10px 0px 1px
+      margin 1px 9px 0px -5px
       color var(--outerspace)
 
     .requestItemTitleSubText

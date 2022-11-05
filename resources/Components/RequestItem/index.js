@@ -59,7 +59,7 @@ class _RequestItem extends React.Component {
               requestId: req.handlerId
             },
             position: {
-              bottom: '200px'
+              bottom: req.type === 'transaction' ? '200px' : '140px'
             }
           }
           link.send('nav:forward', 'panel', crumb)
@@ -106,9 +106,14 @@ class _RequestItem extends React.Component {
             {/* <div className='requestItemDetailsIndicator' /> */}
           </div>
           {headerMode ? (
-            <div className='requestItemLine' style={{ color: 'var(--moon)' }}>
-              {svg.sine()}
-            </div>
+            <>
+              <div className='requestItemLine' style={{ color: 'var(--moon)' }}>
+                {svg.sine()}
+              </div>
+              <div className='requestItemLine requestItemLineShadow'>
+                {svg.sine()}
+              </div>
+            </>
           ) : (
             <div className='requestItemDetailsView'>
               <div className='requestItemDetailsViewText'>
