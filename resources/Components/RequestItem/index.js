@@ -37,14 +37,14 @@ class _RequestItem extends React.Component {
     const { account, handlerId, i, title, svgName, img, color, headerMode, txNonce, children } = this.props
     const req = this.store('main.accounts', account, 'requests', handlerId)
 
-    const status = req.notice || req.status || 'pending'
-
     let requestItemDetailsClass = 'requestItemDetails'
-    if (status === 'confirming') {
+    if (['sending', 'verifying', 'confirming', 'confirmed'].includes(req.status)) {
       requestItemDetailsClass += ' requestItemDetailsGood'
-    } else if (status === 'error') {
+    } else if (['error', 'declined'].includes(req.status)) {
       requestItemDetailsClass += ' requestItemDetailsBad'
     }
+
+    const status = (req.notice || req.status || 'pending').toLowerCase()
 
     return (
       <div 
@@ -107,7 +107,7 @@ class _RequestItem extends React.Component {
           </div>
           {headerMode ? (
             <>
-              <div className='requestItemLine' style={{ color: 'var(--moon)' }}>
+              <div className='requestItemLine'>
                 {svg.sine()}
               </div>
               <div className='requestItemLine requestItemLineShadow'>

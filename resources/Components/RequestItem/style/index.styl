@@ -114,6 +114,8 @@
     span
       letter-spacing 1px
       padding-left 8px
+      top -1px
+      position relative
 
     .requestItemDetailsSlide
       display flex
@@ -135,6 +137,8 @@
         border-radius 3px
         background var(--moon)
         z-index 4
+        position relative
+        top -1px
         animation lit infinite ease-in-out alternate 1s
 
     .requestItemDetailsView
@@ -155,14 +159,22 @@
           transform rotate(90deg)
 
   .requestItemDetailsGood
-    color var(--good)
+    .requestItemLine
+      color var(--good)
+    .requestItemLineShadow
+      color var(--ghostX)
     .requestItemDetailsIndicator
-      background var(--good)
+      .requestItemDetailsIndicatorMarker
+        background var(--good)
 
   .requestItemDetailsBad
-    color var(--bad)
+    .requestItemLine
+      color var(--bad)
+    .requestItemLineShadow
+      color var(--ghostX)
     .requestItemDetailsIndicator
-      background var(--bad)
+      .requestItemDetailsIndicatorMarker
+        background var(--bad)
 
   .requestItemRow
     position relative
@@ -235,6 +247,7 @@
     border-radius 20px
     background var(--ghostZ05)
     box-shadow inset 0px 0px 4px var(--ghostY)
+    color var(--moon)
     
     svg
       width 300%
