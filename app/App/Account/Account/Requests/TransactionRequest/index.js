@@ -92,12 +92,16 @@ class TransactionRequest extends React.Component {
 
   renderAdjustTokenApproval () {
     const crumb = this.store('windows.panel.nav')[0] || {}
-    const { approval } = crumb.data
+    const { actionId, requestedAmountHex } = crumb.data
     const { accountId, handlerId } = this.props
-    const req = this.store('main.accounts', accountId, 'requests', handlerId)
 
     return (
-      <AdjustTokenApproval req={req} approval={approval} />
+      <AdjustTokenApproval 
+        accountId={accountId} 
+        handlerId={handlerId} 
+        actionId={actionId} 
+        requestedAmountHex={requestedAmountHex}
+      />
     )
   }
 

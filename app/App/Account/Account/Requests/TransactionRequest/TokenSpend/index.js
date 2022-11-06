@@ -4,6 +4,7 @@ import BigNumber from 'bignumber.js'
 
 import svg from '../../../../../../../resources/svg'
 import link from '../../../../../../../resources/link'
+import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../../../resources/Components/Cluster'
 
 import { ADDRESS_DISPLAY_CHARS, MAX_HEX } from '../../../../../../../resources/constants'
 
@@ -21,28 +22,16 @@ const digitsLookup = [
 function nFormat (n, digits = 2)  {
   const num = Number(n)
   const item = digitsLookup.slice().reverse().find(item => num >= item.value)
-
-  return item ? {
-    number: (num / item.value).toFixed(digits).replace(numberRegex, '$1'),
-    symbol: item.symbol
-  } : {
-    number: '0',
-    symbol: ''
-  }
+  return item ? (num / item.value).toFixed(digits).replace(numberRegex, '$1') : '0'
 }
 
 class TokenSpend extends React.Component {
   constructor (...args) {
     super(...args)
-    const { approval: { data } } = this.props
-
-    this.decimals = data.decimals || 0
-    this.requestedAmount = '0x' + new BigNumber(data.amount).integerValue().toString(16)
     this.state = {
       inPreview: false,
       inEditApproval: false,
       mode: 'requested',
-      amount: this.requestedAmount,
       customInput: ''
     }
   }
@@ -51,12 +40,12 @@ class TokenSpend extends React.Component {
     this.setState({ amount })
   }
 
-  setCustomAmount (value) {
+  setCustomAmount (value, decimals) {
     if (value === '') {
       this.setState({ mode: 'custom', amount: '0x0', customInput: value })
     } else {
       const max = new BigNumber(MAX_HEX)
-      const custom = new BigNumber(value).shiftedBy(this.decimals)
+      const custom = new BigNumber(value).shiftedBy(decimals)
 
       let amount
       if (max.comparedTo(custom) === -1) {
@@ -73,179 +62,216 @@ class TokenSpend extends React.Component {
     this.setState({ inEditApproval: true })
   }
 
-  doneEditing () {
-    if (this.state.mode === 'custom' && this.state.customInput === '') {
-      this.setState({ mode: 'requested', amount: this.requestedAmount })
-    }
+  updateApproval (amount) {
+    const { handlerId, actionId } = this.props
+    link.rpc('updateRequest', handlerId, actionId, { amount }, () => {})
+  }
 
-    this.setState({ exiting: true })
-    setTimeout(() => {
-      this.setState({ exiting: false, inEditApproval: false })
-    }, 600)
+  copySpenderAddress (data) {
+    link.send('tray:clipboardData', data)
+    this.setState({ copiedSpenderAddress: true })
+    setTimeout(() => this.setState({ copiedSpenderAddress: false }), 1000)
+  }
+
+  copyTokenAddress (data) {
+    link.send('tray:clipboardData', data)
+    this.setState({ copiedTokenAddress: true })
+    setTimeout(() => this.setState({ copiedTokenAddress: false }), 1000)
   }
 
   render () {
-    const { req, revoke, approval, onApprove, onDecline  } = this.props
+    const { accountId, handlerId, actionId, requestedAmountHex } = this.props
+    const req = this.store('main.accounts', accountId, 'requests', handlerId)
+    if (!req) return null
+    const approval = (req.recognizedActions || []).find(action => action.id === actionId)
+    if (!approval) return null
     const { data } = approval
+    const decimals = data.decimals || 0
+    const requestedAmount = requestedAmountHex
+    const customInput = '0x' + new BigNumber(this.state.customInput).shiftedBy(decimals).integerValue().toString(16)
+    const value = new BigNumber(data.amount)
+    const revoke = value.eq(0)
 
-    const displayInt = new BigNumber(this.state.amount).shiftedBy(-this.decimals).integerValue()
+    const displayInt = value.shiftedBy(-decimals).integerValue()
 
-    const displayAmount = this.state.amount === MAX_HEX ? {
-      number: '',
-      symbol: 'unlimited'
-    } : displayInt > 9e12 ? {
-      number: '',
-      symbol: approval.data.decimals ? '~unlimited' : 'unknown'
-    } : nFormat(displayInt)
+    const displayAmount = data.amount === MAX_HEX 
+      ? 'unlimited' 
+      : displayInt > 9e12 
+        ? decimals ? '~unlimited' : 'unknown' 
+        : nFormat(displayInt)
 
     const symbol = data.symbol || '???'
     const name = data.name || 'Unknown Token'
 
-    const inputLock = !data.symbol || !data.name || !this.decimals
+    const inputLock = !data.symbol || !data.name || !decimals
 
+    const spenderEns = data.spenderEns
+    const spender = data.spender
+
+    const tokenAddress = data.contract
+    
     return (
       <div className='updateTokenApproval'>
-        <div className='approveTransactionWarningTitle'>
-          {revoke ? 'revoke token approval' : 'token approval'}
-        </div>
-        <div className=''>
-          <div className='approveTokenSpendDescription'>
-            {data.spender ? (
-              <div className='approveTokenSpendSpenderAddress'>
-                <div className='approveTokenSpendSpenderAddressLarge'>
-                  {
-                    // 0x prefix plus leading characters of address
-                    data.spender.substring(0, 2 + ADDRESS_DISPLAY_CHARS)
+        <ClusterBox title={'token approval details'} style={{ marginTop: '64px' }}>
+          <Cluster>
+            <ClusterRow>
+              <ClusterValue pointerEvents={'auto'} onClick={() => {
+                this.copySpenderAddress(spender)
+              }}>
+                <div className='clusterAddress'>
+                  {spenderEns
+                    ? <span className='clusterAddressRecipient'>{spenderEns}</span>
+                    : <span className='clusterAddressRecipient'>{spender.substring(0, 8)}{svg.octicon('kebab-horizontal', { height: 15 })}{spender.substring(spender.length - 6)}</span>
                   }
-                  {svg.octicon('kebab-horizontal', { height: 15 })}
-                  {data.spender.substr(data.spender.length - ADDRESS_DISPLAY_CHARS)}
+                  <div className='clusterAddressRecipientFull'>
+                    {this.state.copiedSpenderAddress ? (
+                      <span>{'Address Copied'}</span>
+                    ) : (
+                      <span className='clusterFira'>{spender}</span>
+                    )}
+                  </div>
                 </div>
-                <div
-                  className='approveTokenSpendSpenderAddressFull'
-                  onClick={() => {
-                    link.send('tray:clipboardData', data.spender)
-                    this.setState({ copyTokenRequester: true })
-                    setTimeout(() => {
-                      this.setState({ copyTokenRequester: false })
-                    }, 1000)
-                  }}
-                >
-                  {this.state.copyTokenRequester ? 'ADDRESS COPIED' : data.spender}
+              </ClusterValue>
+            </ClusterRow>
+            <ClusterRow>
+              <ClusterValue>
+                <div className='clusterTag' style={{ color: 'var(--moon)' }}>
+                  {this.state.mode === 'custom' && !this.state.customInput ? (
+                    <span>{'set approval to spend'}</span>
+                  ) : revoke ? (
+                    <span>{'revoke approval to spend'}</span>
+                  ) : (
+                    <span>{'grant approval to spend'}</span>
+                  )}
                 </div>
-              </div>
-            ) : null}
-            <div className='approveTokenSpendSub'>
-              {revoke ? 'wants to revoke approval to spend' : 'wants approval to spend'}
-            </div>
-            <div className='approveTokenSpendToken'>
-              <div className='approveTokenSpendTokenSymbol'>
-                {symbol}
-              </div>
-              <div
-                className='approveTokenSpendTokenContract'
-                onClick={() => {
-                  link.send('tray:clipboardData', data.contract)
-                  this.setState({ copyTokenContract: true })
-                  setTimeout(() => {
-                    this.setState({ copyTokenContract: false })
-                  }, 1000)
-                }}
-              >
-                {this.state.copyTokenContract ? 'ADDRESS COPIED' : data.contract}
-              </div>
-            </div>
-            <div className='approveTokenSpendTokenName'>
-              {name}
-            </div>
-          </div>
-        </div>
-        <div className={''}>
-          {this.state.exiting ? (
-            <div className='approveTokenSpendConfirm'>
-              {displayAmount.number ? <div className='approveTokenSpendConfirmNumber'>{displayAmount.number}</div> : null}
-              {displayAmount.symbol ? <div className='approveTokenSpendConfirmNumberText'>{displayAmount.symbol}</div> : null}
-              <div className='approveTokenSpendConfirmSymbol'>{data.symbol}</div>
-            </div>
-          ) : (
-            <div className=''>
-              <div className='approveTokenSpendEditTitle'>
-                {'Token Spend Limit'}
-              </div>
-              <div className='approveTokenSpendAmount'>
-                <div className='approveTokenSpendSymbol'>
-                  {symbol}
+              </ClusterValue>
+            </ClusterRow>
+            <ClusterRow>
+              <ClusterValue pointerEvents={'auto'} onClick={() => {
+                this.copyTokenAddress(tokenAddress )
+              }}>
+                <div className='clusterAddress'>
+                  <span className='clusterAddressRecipient'>{name}</span>
+                  <div className='clusterAddressRecipientFull'>
+                    {this.state.copiedTokenAddress ? (
+                      <span>{'Address Copied'}</span>
+                    ) : (
+                      <span className='clusterFira'>{tokenAddress}</span>
+                    )}
+                  </div>
                 </div>
-                {this.state.mode === 'custom' ? (
-                  <input
-                    autoFocus
-                    type='text'
-                    aria-label='Custom Amount'
-                    value={this.state.customInput}
-                    onChange={(e) => {
-                      e.preventDefault()
-                      e.stopPropagation()
-                      this.setCustomAmount(e.target.value)
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') return this.doneEditing()
-                    }}
-                  />
-                ) : (
-                  <div>
+              </ClusterValue>
+            </ClusterRow>
+          </Cluster>
+          <Cluster style={{ marginTop: '16px' }}>
+            <ClusterRow>
+              <ClusterValue transparent={true} pointerEvents={'auto'}>
+                <div className='approveTokenSpendAmount'>
+                  <div className='approveTokenSpendAmountLabel'>
+                    {symbol}
+                  </div>
+                  {this.state.mode === 'custom' && data.amount !== customInput ? (
+                    <div className='approveTokenSpendAmountSubmit'>
+                      {'update'}
+                    </div>
+                  ) : (
+                    <div 
+                      key={this.state.mode + data.amount}
+                      className='approveTokenSpendAmountSubmit' 
+                      style={{ color: 'var(--good)' 
+                    }}>
+                      {svg.check(20)}
+                    </div>
+                  )}
+                  {this.state.mode === 'custom' ? (
+                    <input
+                      autoFocus
+                      type='text'
+                      aria-label='Custom Amount'
+                      value={this.state.customInput}
+                      onChange={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        this.setCustomAmount(e.target.value, decimals)
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.target.blur()
+                          if (this.state.customInput === '') {
+                            this.setState({ mode: 'requested', amount: requestedAmount })
+                            this.updateApproval(requestedAmount)
+                          } else {
+                            this.updateApproval(this.state.amount)
+                          }  
+                        }
+                      }}
+                    />
+                  ) : (
                     <div
                       className='approveTokenSpendAmountNoInput'
                       role='textbox'
                       style={inputLock ? { cursor: 'default' } : null}
                       onClick={inputLock ? null : () => {
-                        this.setCustomAmount(this.state.customInput)
+                        this.setCustomAmount(this.state.customInput, decimals)
                       }}
-                    >
-                      <div className='approveTokenSpendAmountNoInputNumber'>{displayAmount.number}</div>
-                      <div className='approveTokenSpendAmountNoInputSymbol'>{displayAmount.symbol}</div>
+                    > 
+                      <div className='approveTokenSpendAmountNoInputNumber'>
+                        {displayAmount}
+                      </div>
                     </div>
+                  )}
+                  <div className='approveTokenSpendAmountSubtitle'>
+                    Set Token Approval Spend Limit
                   </div>
-                )}
-              </div>
-              <div className='approveTokenSpendPresets'>
-                <div
-                  className={this.state.mode === 'requested' ? 'approveTokenSpendPresetButton approveTokenSpendPresetButtonSelected' : 'approveTokenSpendPresetButton'}
-                  role='button'
-                  onClick={() => {
-                    this.setState({ mode: 'requested', amount: this.requestedAmount })
-                  }}
-                >
-                  Requested
                 </div>
-                <div
-                  className={this.state.mode === 'unlimited' ? 'approveTokenSpendPresetButton approveTokenSpendPresetButtonSelected' : 'approveTokenSpendPresetButton'}
+              </ClusterValue>
+            </ClusterRow>
+            <ClusterRow>
+              <ClusterValue onClick={() => {
+                this.setState({ mode: 'requested', amount: requestedAmount })
+                this.updateApproval(requestedAmount)
+              }}>
+                <div 
+                  className='clusterTag'
+                  style={this.state.mode === 'requested' ? { color: 'var(--good)' } : {}}
                   role='button'
-                  onClick={() => {
-                    const amount = MAX_HEX
-                    this.setState({ mode: 'unlimited', amount })
-                  }}
                 >
-                  <span className='approveTokenSpendPresetButtonInfinity'>{'Unlimited'}</span>
+                  {'Requested'}
                 </div>
+              </ClusterValue>
+            </ClusterRow>
+            <ClusterRow>
+              <ClusterValue onClick={() => {
+                const amount = MAX_HEX
+                this.setState({ mode: 'unlimited', amount })
+                this.updateApproval(amount)
+              }}>
+                <div 
+                  className='clusterTag'
+                  style={this.state.mode === 'unlimited' ? { color: 'var(--good)' } : {}}
+                  role='button'
+                >
+                  {'Unlimited'}
+                </div>
+              </ClusterValue>
+            </ClusterRow>
+            <ClusterRow>
+              <ClusterValue onClick={() => {
+                this.setCustomAmount(this.state.customInput, decimals)
+              }}>
                 {!inputLock ? (
                   <div
-                    className={this.state.mode === 'custom' ? 'approveTokenSpendPresetButton approveTokenSpendPresetButtonSelected' : 'approveTokenSpendPresetButton'}
+                    className={'clusterTag'}
+                    style={this.state.mode === 'custom' ? { color: 'var(--good)' } : {}}
                     role='button'
-                    onClick={() => {
-                      this.setCustomAmount(this.state.customInput)
-                    }}
                   >
                     Custom
                   </div>
                 ) : null}
-              </div>
-              <div className='updateTokenApprovalSubmit' onClick={() => {
-                link.rpc('updateRequest', req.handlerId, approval.id, { amount: this.state.amount }, () => {})
-              }}>
-                {'Update Approval'}
-              </div>
-            </div>
-          )}
-        </div>
+              </ClusterValue>
+            </ClusterRow>
+          </Cluster>
+        </ClusterBox>
       </div>
     )
   }

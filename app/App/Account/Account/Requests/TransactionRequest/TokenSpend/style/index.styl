@@ -171,17 +171,75 @@
     color var(--good)
 
 .approveTokenSpendAmount
-  background var(--ghostB)
-  height 40px
-  width calc(100% - 10px)
-  border-radius 20px
-  padding-top 2px
-  padding-right 100px
-  padding-left 10px
+  // background blue // var(--ghostB)
+  height 80px
+  padding-bottom 10px
+  width 100%
+  // border-radius 20px
+  // padding-top 2px
+  // padding-right 100px
+  // padding-left 10px
   box-sizing border-box
   position relative
   overflow hidden
   font-weight 400
+
+  .approveTokenSpendAmountLabel
+    position absolute
+    left 0
+    top 0
+    bottom 12px
+    display flex
+    justify-content center
+    align-items center
+    padding-left 20px
+    font-size 16px
+    color var(--good)
+
+  @keyframes land
+    0%
+      transform scale(1.4)
+    100%
+      transform scale(1)
+
+  .approveTokenSpendAmountSubmit
+    position absolute
+    right 0
+    top 0
+    bottom 10px
+    display flex
+    justify-content center
+    align-items center
+    padding-right 20px
+    padding-left 16px
+    font-size 10px
+    font-weight 500
+    text-transform uppercase
+    color var(--moon)
+    cursor pointer
+    z-index 2000
+    animation land 0.5s ease-in-out
+    *
+      pointer-events none !important
+
+  .approveTokenSpendAmountSubmit:hover
+    color var(--good)
+
+  .approveTokenSpendAmountSubtitle
+    position absolute
+    bottom 4px
+    left 0
+    right 0
+    font-size 8px
+    display flex
+    justify-content center
+    align-items center
+    text-transform uppercase
+    margin-top 4px
+    font-weight 500
+    z-index 40000
+    letter-spacing 1px
+    margin-left -1px
 
   input
     background transparent
@@ -193,6 +251,12 @@
     color var(--outerspace)
     font-size 20px
     font-family 'FiraCode'
+    border-radius 0px
+    padding-left 70px
+    padding-right 70px
+
+  input:focus, input:hover, input:active
+    background transparent
 
   .approveTokenSpendAmountNoInput
     background transparent
@@ -203,6 +267,7 @@
     color var(--outerspace)
     font-size 20px
     font-family 'FiraCode'
+    font-weight 300
     display flex
     justify-content center
     align-items center
@@ -210,41 +275,13 @@
     *
       pointer-events none
 
-    .approveTokenSpendAmountNoInputSymbol
-      font-family 'MainFont'
-      text-transform uppercase
-      font-size 14px
-      line-height 8px
-      position relative
-      top -1px
-      left 4px
-      letter-spacing 1px
-      color var(--moon)
-
-  .approveTokenSpendSymbol
-    position absolute
-    top 0
-    right 0
-    bottom 0
-    width 95px
-    background var(--ghostD)
-    display flex
-    justify-content center
-    align-items center
-    border-radius 6px
-    font-size 15px
-    font-weight 300
-    box-sizing border-box
-    text-transform uppercase
-
 .approveTokenSpendAmountExit
   transition var(--standardFast)
   transform scale(0.9)
   color var(--good)
 
 .updateTokenApproval
-  padding 20px
-  margin-top 30px
+  margin-top 40px
 
 .updateTokenApprovalSubmit
   margin 40px 0px 0px 0px

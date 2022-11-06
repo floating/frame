@@ -10,6 +10,25 @@ import Destination from './destination'
 import Register from './ens/register'
 import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../../../resources/Components/Cluster'
 
+import { ADDRESS_DISPLAY_CHARS, MAX_HEX } from '../../../../../../../resources/constants'
+
+const numberRegex = /\.0+$|(\.[0-9]*[1-9])0+$/
+
+const digitsLookup = [
+  { value: 1, symbol: '' },
+  { value: 1e6, symbol: 'million' },
+  { value: 1e9, symbol: 'billion' },
+  { value: 1e12, symbol: 'trillion' },
+  { value: 1e15, symbol: 'quadrillion' },
+  { value: 1e18, symbol: 'quintillion' }
+]
+
+function nFormat (n, digits = 2)  {
+  const num = Number(n)
+  const item = digitsLookup.slice().reverse().find(item => num >= item.value)
+  return item ? (num / item.value).toFixed(digits).replace(numberRegex, '$1') : '0'
+}
+
 class TxSending extends React.Component {
   constructor (...args) {
     super(...args)
@@ -135,42 +154,40 @@ class TxSending extends React.Component {
 
 
         const revoke = value.eq(0)
+        const displayInt = new BigNumber(amount).shiftedBy(-decimals).integerValue()
 
-        let title
-
-        if (revoke) {
-          title = `Revoking Approval`
-        } else {
-          title = `Granting Approval`
-        }
+        const displayAmount = this.state.amount === MAX_HEX 
+        ? 'unlimited' 
+        : displayInt > 9e12 
+          ? decimals ? '~unlimited' : 'unknown' 
+          : nFormat(displayInt)
 
         return (
-          <ClusterBox title={title} animationSlot={this.props.i}>
+          <ClusterBox title={'Token Approval'} animationSlot={this.props.i}>
             <Cluster>
               {revoke ? (
                 <ClusterRow>
                   <ClusterValue onClick={() => {
-                    link.send('nav:update', 'panel', { data: { step: 'adjustApproval', approval: action } })
+                    link.send('nav:update', 'panel', { data: { step: 'adjustApproval', actionId: action.id, requestedAmountHex: amount } })
                   }}>
                     <div className='clusterFocus'>
-                      <div>{`Revoking Approval`}</div>
-                      <div>{`To Spend ${symbol} on ${chainName}`}</div>
+                      <div>{`Revoking Approval To Spend `}</div>
+                      <div className='clusterFocusHighlight'>{`${symbol}`}</div>
                     </div>
                   </ClusterValue>
                 </ClusterRow>
               ) : (
                 <ClusterRow>
                   <ClusterValue onClick={() => {
-                    link.send('nav:update', 'panel', { data: { step: 'adjustApproval', approval: action } })
+                    link.send('nav:update', 'panel', { data: { step: 'adjustApproval', actionId: action.id, requestedAmountHex: amount } })
                   }}>
                     <div className='clusterFocus'>
-                      <div>{`Granting Approval`}</div>
-                      <div>{`To Spend ${symbol} on ${chainName}`}</div>
+                      <div>{`Granting Approval To Spend`}</div>
+                      <div className='clusterFocusHighlight'>{`${displayAmount} ${symbol}`}</div>
                     </div>    
                   </ClusterValue>
                 </ClusterRow>
               )}
-
               {address && (
                 <ClusterRow>
                   <ClusterValue pointerEvents={true} onClick={() => {
