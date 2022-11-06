@@ -18,11 +18,15 @@ electronApp.relaunch = jest.fn()
 electronApp.getName = () => 'Frame Test App'
 electronApp.getVersion = () => '1.0'
 electronApp.getPath = () => `${process.cwd()}/test/e2e`
-electronApp.requestSingleInstanceLock = jest.fn()
+electronApp.requestSingleInstanceLock = jest.fn(() => true)
 
 const ipc = new EventEmitter()
+ipc.handle = jest.fn()
+
+const powerMonitor = new EventEmitter()
 
 module.exports = {
   app: electronApp,
-  ipcMain: ipc
+  ipcMain: ipc,
+  powerMonitor
 }
