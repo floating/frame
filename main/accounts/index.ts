@@ -13,7 +13,6 @@ import Signer from '../signers/Signer'
 import { signerCompatibility as transactionCompatibility, maxFee, SignerCompatibility } from '../transaction'
 
 import { weiIntToEthInt, hexToInt } from '../../resources/utils'
-import { ApprovalType } from '../../resources/constants'
 import { accountPanelCrumb, signerPanelCrumb } from '../../resources/domain/nav'
 import { usesBaseFee, TransactionData, GasFeesSource } from '../../resources/domain/transaction'
 import { findUnavailableSigners, getSignerType, isSignerReady } from '../../resources/domain/signer'
@@ -25,6 +24,8 @@ import {
 } from './types'
 
 import type { Chain } from '../chains'
+import { ActionType } from '../transaction/actions'
+import { ApprovalType } from '../../resources/constants'
 
 function notify (title: string, body: string, action: (event: Electron.Event) => void) {
   const notification = new Notification({ title, body })
@@ -150,6 +151,23 @@ export class Accounts extends EventEmitter {
 
       if (approval) {
         approval.approve(approvalData)
+      }
+    }
+  }
+
+  // TODO: can we make this typed for the action type?
+  updateRequest (reqId: string, actionId: ActionType, data: any) {
+    log.verbose('updateRequest', reqId, actionId, data)
+
+    const currentAccount = this.current()
+    if (currentAccount && currentAccount.requests[reqId]) {
+      const request = this.getTransactionRequest(currentAccount, reqId)
+
+      const action = (request.recognizedActions || []).find(a => a.id === actionId)
+
+      if (action && action.update) {
+        action.update(request, data)
+        currentAccount.update()
       }
     }
   }

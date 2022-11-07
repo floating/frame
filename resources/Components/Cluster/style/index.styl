@@ -48,6 +48,16 @@
       *
         pointer-events none
 
+      .clusterInputLabel
+        position absolute
+        top 0
+        left 0
+        right 0
+        width 60px
+        display flex
+        justify-content center
+        align-items center
+
     .clusterValueClickable
       cursor pointer
       margin-bottom 0px
@@ -70,6 +80,11 @@
       background var(--ghostB)
       transform translateY(0px)
       box-shadow 0px 2px 4px var(--ghostX)
+
+    .clusterValueTransparent
+      background transparent
+      box-shadow none
+      border-bottom 2px solid transparent
 
   .clusterRow:first-child
     .clusterValue
@@ -115,6 +130,19 @@
   font-size 11px
   font-weight 500
   padding 8px
+  text-align center
+
+.clusterFocus
+  text-transform uppercase
+  font-size 13px
+  line-height 20px
+  font-weight 500
+  padding 16px 8px
+  text-align center
+
+  .clusterFocusHighlight
+    font-size 16px
+    color var(--good)
 
 .clusterAddress
   padding 12px

@@ -14,6 +14,7 @@ import TxRecipient from './TxRecipient'
 import AdjustFee from './AdjustFee'
 import ViewData from './ViewData'
 import TxApproval from './TxApproval'
+import TokenSpend from './TokenSpend'
 
 class TransactionRequest extends React.Component {
   constructor (props, context) {
@@ -86,6 +87,25 @@ class TransactionRequest extends React.Component {
     const req = this.store('main.accounts', accountId, 'requests', handlerId)
     return (
       <AdjustFee req={req} />
+    )
+  }
+
+  renderTokenSpend () {
+    const crumb = this.store('windows.panel.nav')[0] || {}
+    const { actionId, requestedAmountHex } = crumb.data
+    const { accountId, handlerId } = this.props
+    const req = this.store('main.accounts', accountId, 'requests', handlerId)
+    if (!req) return null
+    const approval = (req.recognizedActions || []).find(action => action.id === actionId)
+    if (!approval) return null
+    return (
+      <TokenSpend 
+        approval={approval}
+        requestedAmountHex={requestedAmountHex}
+        updateApproval={(amount) => {
+          link.rpc('updateRequest', handlerId, actionId, { amount }, () => {})
+        }}
+      />
     )
   }
 
@@ -202,6 +222,8 @@ class TransactionRequest extends React.Component {
     const req = this.store('main.accounts', accountId, 'requests', handlerId)
     if (step === 'adjustFee') {
       return this.renderAdjustFee()
+    } else if (step === 'adjustApproval') {
+      return this.renderTokenSpend()
     } else if (step === 'viewData') {
       return this.renderViewData()
     } else if (step === 'confirm') {

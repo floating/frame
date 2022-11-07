@@ -1,6 +1,5 @@
 import log from 'electron-log'
 import { isValidAddress, addHexPrefix } from 'ethereumjs-util'
-import BigNumber from 'bignumber.js'
 import { Version } from 'eth-sig-util'
 
 import { AccessRequest, AccountRequest, Accounts, RequestMode, TransactionRequest } from '..'
@@ -15,7 +14,6 @@ import { Type as SignerType, getSignerType } from '../../../resources/domain/sig
 
 import provider from '../../provider'
 import { ApprovalType } from '../../../resources/constants'
-import Erc20Contract from '../../contracts/erc20'
 
 import reveal from '../../reveal'
 
@@ -253,50 +251,6 @@ class FrameAccount {
     res({ id: payload.id, jsonrpc: payload.jsonrpc, error })
   }
 
-  private async checkForErc20Approve (req: TransactionRequest) {
-    const contractAddress = req.data.to
-    if (!contractAddress) return
-
-    const calldata = req.data.data
-    if (!calldata) return
-
-    const contract = new Erc20Contract(contractAddress, parseInt(req.data.chainId, 16))
-    const decodedData = contract.decodeCallData(calldata)
-
-    if (decodedData) {
-      if (Erc20Contract.isApproval(decodedData)) {
-        const spender = decodedData.args[0].toLowerCase()
-        const amount = decodedData.args[1].toHexString()
-        const { decimals, name, symbol } = await contract.getTokenData()
-  
-        this.addRequiredApproval(
-          req,
-          new BigNumber(amount).isZero() ? ApprovalType.TokenSpendRevocation : ApprovalType.TokenSpendApproval,
-          {
-            decimals,
-            name,
-            symbol,
-            amount,
-            contract: contractAddress,
-            spender
-          },
-          (data: { amount: string }) => {
-            // amount is a hex string
-            const approvedAmount = new BigNumber(data.amount).toString()
-            log.info(`changing approved amount for request ${req.handlerId} to ${approvedAmount}`)
-  
-            req.data.data = contract.encodeCallData('approve', [spender, data.amount])
-  
-            if (req.decodedData) {
-              req.decodedData.args[1].value = approvedAmount
-            }
-          }
-        )
-        this.update()
-      }
-    }
-  }
-
   private async recipientIdentity (req: TransactionRequest) {
     const { to, chainId } = req.data
 
@@ -322,6 +276,7 @@ class FrameAccount {
     if (to && calldata && calldata !== '0x' && parseInt(calldata, 16) !== 0) { 
       try { // Decode calldata
         const decodedData = await reveal.decode(to, parseInt(chainId, 16), calldata)
+
         const knownTxRequest = this.requests[req.handlerId] as TransactionRequest
   
         if (knownTxRequest && decodedData) {
@@ -337,7 +292,7 @@ class FrameAccount {
   private async recognizeActions (req: TransactionRequest) {
     const { to, chainId, data: calldata } = req.data
 
-    if (to && calldata && calldata !== '0x' && parseInt(calldata, 16) !== 0) { 
+    if (to && calldata && calldata !== '0x' && parseInt(calldata, 16) !== 0) {
       try { // Recognize actions
         const actions = await reveal.recog(calldata, {
           contractAddress: to,
@@ -347,7 +302,7 @@ class FrameAccount {
 
         const knownTxRequest = this.requests[req.handlerId] as TransactionRequest
 
-        if (knownTxRequest && actions ) {
+        if (knownTxRequest && actions) {
           knownTxRequest.recognizedActions = actions
           this.update()
         } 
@@ -372,7 +327,6 @@ class FrameAccount {
 
       if ((req || {}).type === 'transaction') {
         this.revealDetails(req)
-        await this.checkForErc20Approve(req)
       }
 
       this.update()
