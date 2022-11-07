@@ -48,9 +48,8 @@ class _RequestItem extends React.Component {
     }
 
     const status = (req.status || 'pending').toLowerCase()
-    // const notice = (req.notice || 'pending').toLowerCase()
-    const notice = 'nonce too high. expected nonce to be 77 but got 79. note that transactions can\'t be queued when automining'
-
+    const notice = (req.notice || 'pending').toLowerCase()
+    
     return (
       <div 
         key={req.handlerId}
