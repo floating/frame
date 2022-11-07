@@ -10,7 +10,7 @@ import Destination from './destination'
 import Register from './ens/register'
 import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../../../resources/Components/Cluster'
 
-import { ADDRESS_DISPLAY_CHARS, MAX_HEX } from '../../../../../../../resources/constants'
+import { MAX_HEX } from '../../../../../../../resources/constants'
 
 const numberRegex = /\.0+$|(\.[0-9]*[1-9])0+$/
 
@@ -23,10 +23,27 @@ const digitsLookup = [
   { value: 1e18, symbol: 'quintillion' }
 ]
 
-function nFormat (n, digits = 2)  {
+function formatNumber (n, digits = 2)  {
   const num = Number(n)
   const item = digitsLookup.slice().reverse().find(item => num >= item.value)
-  return item ? (num / item.value).toFixed(digits).replace(numberRegex, '$1') + ' ' + item.symbol : '0'
+
+  const formatted = (value) => `${value.toFixed(digits).replace(numberRegex, '$1')} ${item.symbol}`
+	  
+	return item ? formatted(num / item.value) : '0'
+}
+
+function isUnlimited (amount) {
+  return amount === MAX_HEX
+}
+
+function formatDisplayInteger (amount, decimals) {
+  const displayInt = new BigNumber(amount).shiftedBy(-decimals).integerValue()
+
+  if (displayInt > 9e12) {
+    return decimals ? '~unlimited' : 'unknown'
+  }
+
+  return formatNumber(displayInt)
 }
 
 class TxSending extends React.Component {
@@ -154,13 +171,7 @@ class TxSending extends React.Component {
 
 
         const revoke = value.eq(0)
-        const displayInt = new BigNumber(amount).shiftedBy(-decimals).integerValue()
-
-        const displayAmount = this.state.amount === MAX_HEX 
-        ? 'unlimited' 
-        : displayInt > 9e12 
-          ? decimals ? '~unlimited' : 'unknown' 
-          : nFormat(displayInt)
+        const displayAmount = isUnlimited(this.state.amount) ? 'unlimited' : formatDisplayInteger(amount, decimals)
 
         return (
           <ClusterBox title={'Token Approval'} animationSlot={this.props.i}>
