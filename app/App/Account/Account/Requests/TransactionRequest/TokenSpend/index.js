@@ -22,7 +22,7 @@ const digitsLookup = [
 function nFormat (n, digits = 2)  {
   const num = Number(n)
   const item = digitsLookup.slice().reverse().find(item => num >= item.value)
-  return item ? (num / item.value).toFixed(digits).replace(numberRegex, '$1') : '0'
+  return item ? (num / item.value).toFixed(digits).replace(numberRegex, '$1') + ' ' + item.symbol : '0'
 }
 
 class TokenSpend extends React.Component {
@@ -62,11 +62,6 @@ class TokenSpend extends React.Component {
     this.setState({ inEditApproval: true })
   }
 
-  updateApproval (amount) {
-    const { handlerId, actionId } = this.props
-    link.rpc('updateRequest', handlerId, actionId, { amount }, () => {})
-  }
-
   copySpenderAddress (data) {
     link.send('tray:clipboardData', data)
     this.setState({ copiedSpenderAddress: true })
@@ -80,11 +75,8 @@ class TokenSpend extends React.Component {
   }
 
   render () {
-    const { accountId, handlerId, actionId, requestedAmountHex } = this.props
-    const req = this.store('main.accounts', accountId, 'requests', handlerId)
-    if (!req) return null
-    const approval = (req.recognizedActions || []).find(action => action.id === actionId)
-    if (!approval) return null
+    const {approval, updateApproval, requestedAmountHex } = this.props
+
     const { data } = approval
     const decimals = data.decimals || 0
     const requestedAmount = requestedAmountHex
@@ -171,7 +163,18 @@ class TokenSpend extends React.Component {
                     {symbol}
                   </div>
                   {this.state.mode === 'custom' && data.amount !== customInput ? (
-                    <div className='approveTokenSpendAmountSubmit'>
+                    <div 
+                      className='approveTokenSpendAmountSubmit'
+                      role='button'
+                      onClick={() => {
+                        if (this.state.customInput === '') {
+                          this.setState({ mode: 'requested', amount: requestedAmount })
+                          updateApproval(requestedAmount)
+                        } else {
+                          updateApproval(this.state.amount)
+                        }
+                      }}
+                    >
                       {'update'}
                     </div>
                   ) : (
@@ -199,9 +202,9 @@ class TokenSpend extends React.Component {
                           e.target.blur()
                           if (this.state.customInput === '') {
                             this.setState({ mode: 'requested', amount: requestedAmount })
-                            this.updateApproval(requestedAmount)
+                            updateApproval(requestedAmount)
                           } else {
-                            this.updateApproval(this.state.amount)
+                            updateApproval(this.state.amount)
                           }  
                         }
                       }}
@@ -215,9 +218,7 @@ class TokenSpend extends React.Component {
                         this.setCustomAmount(this.state.customInput, decimals)
                       }}
                     > 
-                      <div className='approveTokenSpendAmountNoInputNumber'>
-                        {displayAmount}
-                      </div>
+                      {displayAmount}
                     </div>
                   )}
                   <div className='approveTokenSpendAmountSubtitle'>
@@ -229,7 +230,7 @@ class TokenSpend extends React.Component {
             <ClusterRow>
               <ClusterValue onClick={() => {
                 this.setState({ mode: 'requested', amount: requestedAmount })
-                this.updateApproval(requestedAmount)
+                updateApproval(requestedAmount)
               }}>
                 <div 
                   className='clusterTag'
@@ -244,7 +245,7 @@ class TokenSpend extends React.Component {
               <ClusterValue onClick={() => {
                 const amount = MAX_HEX
                 this.setState({ mode: 'unlimited', amount })
-                this.updateApproval(amount)
+                updateApproval(amount)
               }}>
                 <div 
                   className='clusterTag'
@@ -255,11 +256,11 @@ class TokenSpend extends React.Component {
                 </div>
               </ClusterValue>
             </ClusterRow>
-            <ClusterRow>
-              <ClusterValue onClick={() => {
-                this.setCustomAmount(this.state.customInput, decimals)
-              }}>
-                {!inputLock ? (
+            {!inputLock && (
+              <ClusterRow>
+                <ClusterValue onClick={() => {
+                  this.setCustomAmount(this.state.customInput, decimals)
+                }}>
                   <div
                     className={'clusterTag'}
                     style={this.state.mode === 'custom' ? { color: 'var(--good)' } : {}}
@@ -267,9 +268,9 @@ class TokenSpend extends React.Component {
                   >
                     Custom
                   </div>
-                ) : null}
-              </ClusterValue>
-            </ClusterRow>
+                </ClusterValue>
+              </ClusterRow>
+            )}
           </Cluster>
         </ClusterBox>
       </div>

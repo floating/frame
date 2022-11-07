@@ -26,7 +26,7 @@ const digitsLookup = [
 function nFormat (n, digits = 2)  {
   const num = Number(n)
   const item = digitsLookup.slice().reverse().find(item => num >= item.value)
-  return item ? (num / item.value).toFixed(digits).replace(numberRegex, '$1') : '0'
+  return item ? (num / item.value).toFixed(digits).replace(numberRegex, '$1') + ' ' + item.symbol : '0'
 }
 
 class TxSending extends React.Component {
