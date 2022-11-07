@@ -37,20 +37,20 @@ class _RequestItem extends React.Component {
     const { account, handlerId, i, title, svgName, img, color, headerMode, txNonce, children } = this.props
     const req = this.store('main.accounts', account, 'requests', handlerId)
 
-    const status = req.notice || req.status || 'pending'
-
     let requestItemDetailsClass = 'requestItemDetails'
-    if (status === 'confirming') {
+    if (['sending', 'verifying', 'confirming', 'confirmed'].includes(req.status)) {
       requestItemDetailsClass += ' requestItemDetailsGood'
-    } else if (status === 'error') {
+    } else if (['error', 'declined'].includes(req.status)) {
       requestItemDetailsClass += ' requestItemDetailsBad'
     }
+
+    const status = (req.notice || req.status || 'pending').toLowerCase()
 
     return (
       <div 
         key={req.handlerId}
         className={headerMode ? 'requestItem requestItemHeader' : 'requestItem' }
-        onClick={() => {
+        onClick={!headerMode ? () => {
           const crumb = { 
             view: 'requestView',
             data: {
@@ -59,75 +59,74 @@ class _RequestItem extends React.Component {
               requestId: req.handlerId
             },
             position: {
-              bottom: '200px'
+              bottom: req.type === 'transaction' ? '200px' : '140px'
             }
           }
           link.send('nav:forward', 'panel', crumb)
-        }}
+        } : null}
       >
-        <div className='requestItemBackground' style={headerMode ? {} : { background: `linear-gradient(135deg, ${color} 0%, transparent 100%)`}} />
-        <div className='requestItemCorner' style={{ background: color }} />
+        <div className='requestItemBackground' 
+          style={{ 
+            background: `linear-gradient(180deg, ${color} 0%, transparent 80%)`
+          }} 
+        />
         <div className='requestItemTitle'>
-          <div className='requestItemIcon'>
-            <RingIcon 
-              color={color}
-              svgName={svgName}
-              img={img}
-            />
-          </div>
-          <div className='requestItemMain'>
-            <div className='requestItemTitleMain'>
-              {title}
+          <div className='requestItemTitleLeft'>
+            <div className='requestItemIcon'>
+              <RingIcon 
+                color={color}
+                svgName={svgName}
+                img={img}
+                small={true}
+              />
             </div>
-            <div className='requestItemTitleSub'>
-              <div 
-                className='requestItemTitleSubIcon'
-              >
-                {svg.window(10)}
-              </div>
-              <div className='requestItemTitleSubText'>
-                {this.store('main.origins', req.origin, 'name')}
+            <div className='requestItemMain'>
+              <div className='requestItemTitleMain'>
+                {title}
               </div>
             </div>
           </div>
-          {txNonce ? (
-            <div 
-              className='requestMetaNonce'
-            >
-              <div className='txNonceControl'>
-                <div className='txNonceButton txNonceButtonLower' onMouseDown={() => link.send('tray:adjustNonce', req.handlerId, -1)}>
-                  {svg.octicon('chevron-down', { height: 14 })}
-                </div>
-                <div className='txNonceButton txNonceButtonRaise' onMouseDown={() => link.send('tray:adjustNonce', req.handlerId, 1)}>
-                  {svg.octicon('chevron-up', { height: 14 })}
-                </div>
-                
-              </div>
-              <div className='txNonceLabel'>Nonce</div>
-              <div className={'txNonceNumber'}>
-                {nonce}
-              </div>
+          <div 
+            className='requestItemTitleTime'
+          >
+            <div className='requestItemTitleTimeItem'>
+              {this.state.ago}
             </div>
+          </div>
+        </div>
+        <div style={headerMode ? { pointerEvents: 'auto' } : { pointerEvents: 'none' }}>
+        {children}
+        </div>
+        <div className={requestItemDetailsClass}>
+          <div className='requestItemDetailsSlide'>
+            <div className='requestItemDetailsIndicator'>
+              <div className='requestItemDetailsIndicatorMarker' />
+            </div>
+            <span>{status}</span>
+            {/* <div className='requestItemDetailsIndicator' /> */}
+          </div>
+          {headerMode ? (
+            <>
+              <div className='requestItemLine'>
+                {svg.sine()}
+              </div>
+              <div className='requestItemLine requestItemLineShadow'>
+                {svg.sine()}
+              </div>
+            </>
           ) : (
-            <div className='requestItemTitleTime'>
-              <div className='requestItemTitleTimeItem'>
-                {this.state.ago}
+            <div className='requestItemDetailsView'>
+              <div className='requestItemDetailsViewText'>
+                {`View`}
+              </div>
+              <div className='requestItemDetailsViewArrow'>
+                <div>{svg.chevron(15)}</div>
+                <div>{svg.chevron(15)}</div>
+                <div>{svg.chevron(15)}</div>
               </div>
             </div>
           )}
         </div>
-        <div className={requestItemDetailsClass}>
-          <div className='requestItemDetailsSlide'>
-            <div className='requestItemDetailsIndicator' />
-            <span>{status}</span>
-            <div className='requestItemDetailsIndicator' />
-          </div>
-        </div>
-        {children && (
-          <div className='requestItemSummary'>
-            {children}
-          </div>
-        )}
       </div>
     )
   }

@@ -6,7 +6,7 @@ import utils from 'web3-utils'
 import RequestItem from '../../../../../../../resources/Components/RequestItem'
 import TxOverview from './overview'
 
-class TxRecipient extends React.Component {
+class TxMain extends React.Component {
   constructor (...args) {
     super(...args)
     this.state = {
@@ -70,6 +70,7 @@ class TxRecipient extends React.Component {
     }
 
     const { primaryColor, icon } = this.store('main.networksMeta.ethereum', chainId)
+    const originName = this.store('main.origins', req.origin, 'name')
     return (
       <div className='_txMain' style={{ animationDelay: (0.1 * this.props.i) + 's' }}>
         <div className='_txMainInner'>
@@ -85,10 +86,16 @@ class TxRecipient extends React.Component {
             color={primaryColor ? `var(--${primaryColor})` : ``}
             img={icon}
             headerMode={true}
-          />
-
-          <TxOverview req={req} chainName={chainName} chainColor={primaryColor} symbol={currentSymbol} txMeta={txMeta} />
-
+          >
+            <TxOverview 
+              req={req} 
+              chainName={chainName} 
+              chainColor={primaryColor} 
+              symbol={currentSymbol} 
+              txMeta={txMeta} 
+              originName={originName}
+            />
+          </RequestItem>
         </div>
       </div>
     )
@@ -99,4 +106,4 @@ class TxRecipient extends React.Component {
 {this.state.copied ? <span>{'Copied'}{svg.octicon('clippy', { height: 14 })}</span> : req.data.to}
 </div> */}
 
-export default Restore.connect(TxRecipient)
+export default Restore.connect(TxMain)
