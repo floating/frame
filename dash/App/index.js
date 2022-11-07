@@ -59,7 +59,7 @@ class Dash extends React.Component {
 
   render () {
     const { view, data } = this.store('windows.dash.nav')[0] || { view: 'default', data: {} }
-    const showAddButton = ['chains', 'accounts', 'tokens'].includes(view) && (!data || Object.keys(data).length === 0)
+    const showAddButton = ['chains', 'accounts', 'tokens'].includes(view)
     return (
       <div className='dash'>
         <Command />
