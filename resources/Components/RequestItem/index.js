@@ -37,16 +37,13 @@ class _RequestItem extends React.Component {
     const { account, handlerId, i, title, svgName, img, color, headerMode, txNonce, children } = this.props
     const req = this.store('main.accounts', account, 'requests', handlerId)
 
-    const goodState = ['sending', 'verifying', 'confirming', 'confirmed'].includes(req.status)
-    const badState = ['error', 'declined'].includes(req.status)
-
     let requestItemDetailsClass = 'requestItemDetails'
     let requestItemNoticeClass = 'requestItemNotice'
-    
-    if (goodState) {
+
+    if (['sending', 'verifying', 'confirming', 'confirmed'].includes(req.status)) {
       requestItemDetailsClass += ' requestItemDetailsGood'
       requestItemNoticeClass += ' requestItemNoticeGood'
-    } else if (badState) {
+    } else if (['error', 'declined'].includes(req.status)) {
       requestItemDetailsClass += ' requestItemDetailsBad'
       requestItemNoticeClass += ' requestItemNoticeBad'
     }
