@@ -6,7 +6,6 @@ import svg from '../../../../../../../resources/svg'
 import link from '../../../../../../../resources/link'
 import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../../../resources/Components/Cluster'
 
-// import { ADDRESS_DISPLAY_CHARS, MAX_HEX } from '../../../../../../../resources/constants'
 import { MAX_HEX } from '../../../../../../../resources/constants'
 import { formatDisplayInteger, isUnlimited } from '../../../../../../../resources/utils/numbers'
 
