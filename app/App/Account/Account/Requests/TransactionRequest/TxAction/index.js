@@ -10,40 +10,7 @@ import Destination from './destination'
 import Register from './ens/register'
 import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../../../resources/Components/Cluster'
 
-import { MAX_HEX } from '../../../../../../../resources/constants'
-
-const numberRegex = /\.0+$|(\.[0-9]*[1-9])0+$/
-
-const digitsLookup = [
-  { value: 1, symbol: '' },
-  { value: 1e6, symbol: 'million' },
-  { value: 1e9, symbol: 'billion' },
-  { value: 1e12, symbol: 'trillion' },
-  { value: 1e15, symbol: 'quadrillion' },
-  { value: 1e18, symbol: 'quintillion' }
-]
-
-function formatNumber (n, digits = 2)  {
-  const num = Number(n)
-  const item = digitsLookup.slice().reverse().find(item => num >= item.value)
-  const formatted = (value) => `${value.toFixed(digits).replace(numberRegex, '$1')} ${item.symbol}`
-	  
-  return item ? formatted(num / item.value) : '0'
-}
-
-function isUnlimited (amount) {
-  return amount === MAX_HEX
-}
-
-function formatDisplayInteger (amount, decimals) {
-  const displayInt = new BigNumber(amount).shiftedBy(-decimals).integerValue()
-
-  if (displayInt > 9e12) {
-    return decimals ? '~unlimited' : 'unknown'
-  }
-
-  return formatNumber(displayInt)
-}
+import { formatDisplayInteger, isUnlimited } from '../../../../../../../resources/utils/numbers'
 
 class TxSending extends React.Component {
   constructor (...args) {

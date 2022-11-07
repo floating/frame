@@ -6,24 +6,8 @@ import svg from '../../../../../../../resources/svg'
 import link from '../../../../../../../resources/link'
 import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../../../resources/Components/Cluster'
 
-import { ADDRESS_DISPLAY_CHARS, MAX_HEX } from '../../../../../../../resources/constants'
-
-const numberRegex = /\.0+$|(\.[0-9]*[1-9])0+$/
-
-const digitsLookup = [
-  { value: 1, symbol: '' },
-  { value: 1e6, symbol: 'million' },
-  { value: 1e9, symbol: 'billion' },
-  { value: 1e12, symbol: 'trillion' },
-  { value: 1e15, symbol: 'quadrillion' },
-  { value: 1e18, symbol: 'quintillion' }
-]
-
-function nFormat (n, digits = 2)  {
-  const num = Number(n)
-  const item = digitsLookup.slice().reverse().find(item => num >= item.value)
-  return item ? (num / item.value).toFixed(digits).replace(numberRegex, '$1') + ' ' + item.symbol : '0'
-}
+import { MAX_HEX } from '../../../../../../../resources/constants'
+import { formatDisplayInteger, isUnlimited } from '../../../../../../../resources/utils/numbers'
 
 class TokenSpend extends React.Component {
   constructor (...args) {
@@ -44,6 +28,9 @@ class TokenSpend extends React.Component {
     if (value === '') {
       this.setState({ mode: 'custom', amount: '0x0', customInput: value })
     } else {
+      // only allow ints
+      if (!/^\d+$/.test(value)) return
+
       const max = new BigNumber(MAX_HEX)
       const custom = new BigNumber(value).shiftedBy(decimals)
 
@@ -84,13 +71,7 @@ class TokenSpend extends React.Component {
     const value = new BigNumber(data.amount)
     const revoke = value.eq(0)
 
-    const displayInt = value.shiftedBy(-decimals).integerValue()
-
-    const displayAmount = data.amount === MAX_HEX 
-      ? 'unlimited' 
-      : displayInt > 9e12 
-        ? decimals ? '~unlimited' : 'unknown' 
-        : nFormat(displayInt)
+    const displayAmount = isUnlimited(data.amount) ? 'unlimited' : formatDisplayInteger(data.amount, decimals)
 
     const symbol = data.symbol || '???'
     const name = data.name || 'Unknown Token'
