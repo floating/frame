@@ -1,6 +1,8 @@
 import React from 'react'
 import Restore from 'react-restore'
 
+import { accountSort as byCreation } from '../../../../../resources/domain/account'
+
 import link from '../../../../../resources/link'
 import svg from '../../../../../resources/svg'
 
@@ -111,25 +113,6 @@ class AddAragon extends React.Component {
     })
   }
 
-  accountSort (a, b) {
-    const accounts = this.store('main.accounts')
-    a = accounts[a].created
-    b = accounts[b].created
-    if (a === -1 && b !== -1) return -1
-    if (a !== -1 && b === -1) return 1
-    if (a > b) return -1
-    if (a < b) return 1
-    return 0
-  }
-
-  accountFilter (id) {
-    // Need to migrate accounts to use network type
-    const network = this.store('main.currentNetwork.id')
-    const account = this.store('main.accounts', id)
-    if (account.type === 'aragon') return false
-    return account.network === network
-  }
-
   restart () {
     this.setState({ adding: false, agent: '0x0000000000000000000000000000000000000000', index: 0, name: '' })
     setTimeout(() => {
@@ -145,84 +128,170 @@ class AddAragon extends React.Component {
 
   render () {
     let itemClass = 'addAccountItem addAccountItemSmart'
+    const accounts = this.store('main.accounts')
     if (this.state.adding) itemClass += ' addAccountItemAdding'
     return (
-      <div className={itemClass} style={{ transitionDelay: (0.64 * this.props.index / 4) + 's' }}>
-        <div className='addAccountItemBar addAccountItemSmart' />
-        <div className='addAccountItemWrap'>
-          <div className='addAccountItemTop'>
-            <div className='addAccountItemIcon'>
-              <div className='addAccountItemIconType addAccountItemIconSmart' style={{ paddingTop: '6px' }}>{svg.aragon(30)}</div>
-              <div className='addAccountItemIconHex addAccountItemIconHexSmart' />
+      <div
+        className={itemClass}
+        style={{ transitionDelay: (0.64 * this.props.index) / 4 + 's' }}
+      >
+        <div className="addAccountItemBar addAccountItemSmart" />
+        <div className="addAccountItemWrap">
+          <div className="addAccountItemTop">
+            <div className="addAccountItemIcon">
+              <div
+                className="addAccountItemIconType addAccountItemIconSmart"
+                style={{ paddingTop: '6px' }}
+              >
+                {svg.aragon(30)}
+              </div>
+              <div className="addAccountItemIconHex addAccountItemIconHexSmart" />
             </div>
-            <div className='addAccountItemTopTitle'>Aragon</div>
-            <div className='addAccountItemTopTitle' />
+            <div className="addAccountItemTopTitle">Aragon</div>
+            <div className="addAccountItemTopTitle" />
           </div>
-          <div className='addAccountItemSummary'>An Aragon smart account allows you to use your Aragon DAO with any dapp</div>
-          <div className='addAccountItemOption'>
-            <div className='addAccountItemOptionIntro' onMouseDown={() => this.adding()}>
-              <div className='addAccountItemDeviceTitle'>Add Aragon Account</div>
+          <div className="addAccountItemSummary">
+            An Aragon smart account allows you to use your Aragon DAO with any
+            dapp
+          </div>
+          <div className="addAccountItemOption">
+            <div
+              className="addAccountItemOptionIntro"
+              onMouseDown={() => this.adding()}
+            >
+              <div className="addAccountItemDeviceTitle">
+                Add Aragon Account
+              </div>
             </div>
-            <div className='addAccountItemOptionSetup' style={{ transform: `translateX(-${100 * this.state.index}%)` }}>
-              <div className='addAccountItemOptionSetupFrames'>
-                <div className='addAccountItemOptionSetupFrame'>
-                  <div className='addAccountItemOptionTitle'>enter chain id</div>
-                  <div className='addAccountItemOptionInputPhrase'>
-                    <input tabIndex='-1' ref={this.forms[0]} value={this.state.chainId} onChange={e => this.onChange('chainId', e)} onFocus={e => this.onFocus('chainId', e)} onBlur={e => this.onBlur('chainId', e)} onKeyPress={e => { if (e.key === 'Enter') this.next() }} />
+            <div
+              className="addAccountItemOptionSetup"
+              style={{ transform: `translateX(-${100 * this.state.index}%)` }}
+            >
+              <div className="addAccountItemOptionSetupFrames">
+                <div className="addAccountItemOptionSetupFrame">
+                  <div className="addAccountItemOptionTitle">
+                    enter chain id
                   </div>
-                  <div className='addAccountItemOptionSubmit' onMouseDown={() => this.next()}>Next</div>
-                </div>
-                <div className='addAccountItemOptionSetupFrame'>
-                  <div className='addAccountItemOptionTitle'>enter dao name</div>
-                  <div className='addAccountItemOptionInputPhrase'>
-                    <input tabIndex='-1' ref={this.forms[1]} value={this.state.name} onChange={e => this.onChange('name', e)} onFocus={e => this.onFocus('name', e)} onBlur={e => this.onBlur('name', e)} onKeyPress={e => { if (e.key === 'Enter') this.next() }} />
+                  <div className="addAccountItemOptionInputPhrase">
+                    <input
+                      tabIndex="-1"
+                      ref={this.forms[0]}
+                      value={this.state.chainId}
+                      onChange={(e) => this.onChange('chainId', e)}
+                      onFocus={(e) => this.onFocus('chainId', e)}
+                      onBlur={(e) => this.onBlur('chainId', e)}
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter') this.next();
+                      }}
+                    />
                   </div>
-                  <div className='addAccountItemOptionSubmit' onMouseDown={() => this.next()}>Next</div>
-                </div>
-                <div className='addAccountItemOptionSetupFrame'>
-                  <div className='addAccountItemOptionTitle'>Choose acting account</div>
-                  <div className='addAccountItemOptionList'>
-                    {Object.keys(this.store('main.accounts'))
-                      .filter(id => this.accountFilter(id))
-                      .sort((a, b) => this.accountSort(a, b))
-                      .map(id => {
-                        const account = this.store('main.accounts', id)
-                        return <div key={id} className='addAccountItemOptionListItem' onMouseDown={e => this.actorAccount(id)}>{account.name}</div>
-                      })}
+                  <div
+                    className="addAccountItemOptionSubmit"
+                    onMouseDown={() => this.next()}
+                  >
+                    Next
                   </div>
                 </div>
-                <div className='addAccountItemOptionSetupFrame'>
-                  <div className='addAccountItemOptionTitle'>Choose acting address</div>
-                  <div className='addAccountItemOptionList'>
-                    {(this.store('main.accounts', this.state.actorId, 'addresses') || []).map((a, i) => {
-                      return (
-                        <div key={a + i} className='addAccountItemOptionListItem fira' onMouseDown={e => this.actorAddress(a, i)}>
-                          {a ? a.substring(0, 10) : ''}{svg.octicon('kebab-horizontal', { height: 16 })}{a ? a.substr(a.length - 10) : ''}
+                <div className="addAccountItemOptionSetupFrame">
+                  <div className="addAccountItemOptionTitle">
+                    enter dao name
+                  </div>
+                  <div className="addAccountItemOptionInputPhrase">
+                    <input
+                      tabIndex="-1"
+                      ref={this.forms[1]}
+                      value={this.state.name}
+                      onChange={(e) => this.onChange('name', e)}
+                      onFocus={(e) => this.onFocus('name', e)}
+                      onBlur={(e) => this.onBlur('name', e)}
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter') this.next();
+                      }}
+                    />
+                  </div>
+                  <div
+                    className="addAccountItemOptionSubmit"
+                    onMouseDown={() => this.next()}
+                  >
+                    Next
+                  </div>
+                </div>
+                <div className="addAccountItemOptionSetupFrame">
+                  <div className="addAccountItemOptionTitle">
+                    Choose acting account
+                  </div>
+                  <div className="addAccountItemOptionList">
+                    {Object.values(accounts)
+                      .filter((account) => account.type !== 'gnosis')
+                      .sort(byCreation)
+                      .map(({ id, name }) => (
+                        <div
+                          key={id}
+                          className="addAccountItemOptionListItem"
+                          onMouseDown={(e) => this.actorAccount(id)}
+                        >
+                          {name}
                         </div>
-                      )
+                      ))}
+                  </div>
+                </div>
+                <div className="addAccountItemOptionSetupFrame">
+                  <div className="addAccountItemOptionTitle">
+                    Choose acting address
+                  </div>
+                  <div className="addAccountItemOptionList">
+                    {(
+                      this.store(
+                        'main.accounts',
+                        this.state.actorId,
+                        'addresses'
+                      ) || []
+                    ).map((a, i) => {
+                      return (
+                        <div
+                          key={a + i}
+                          className="addAccountItemOptionListItem fira"
+                          onMouseDown={(e) => this.actorAddress(a, i)}
+                        >
+                          {a ? a.substring(0, 10) : ''}
+                          {svg.octicon('kebab-horizontal', { height: 16 })}
+                          {a ? a.substr(a.length - 10) : ''}
+                        </div>
+                      );
                     })}
                   </div>
                 </div>
-                <div className='addAccountItemOptionSetupFrame'>
-                  <div className='addAccountItemOptionTitle'>{this.state.status}</div>
-                  {this.state.error ? <div className='addAccountItemOptionSubmit' onMouseDown={() => this.restart()}>try again</div> : null}
+                <div className="addAccountItemOptionSetupFrame">
+                  <div className="addAccountItemOptionTitle">
+                    {this.state.status}
+                  </div>
+                  {this.state.error ? (
+                    <div
+                      className="addAccountItemOptionSubmit"
+                      onMouseDown={() => this.restart()}
+                    >
+                      try again
+                    </div>
+                  ) : null}
                 </div>
               </div>
             </div>
           </div>
           <div
-            className='addAccountItemSummary' onMouseDown={() => {
-              const net = this.store('main.currentNetwork.id')
-              const open = url => link.send('tray:openExternal', url)
-              if (net === '1') return open('https://mainnet.aragon.org')
-              if (net === '4') return open('https://rinkeby.aragon.org')
-              return open('https://aragon.org')
+            className="addAccountItemSummary"
+            onMouseDown={() => {
+              const net = this.store('main.currentNetwork.id');
+              const open = (url) => link.send('tray:openExternal', url);
+              if (net === '1') return open('https://mainnet.aragon.org');
+              if (net === '4') return open('https://rinkeby.aragon.org');
+              return open('https://aragon.org');
             }}
-          >{'Don\'t have a dao? Create one'}
+          >
+            {"Don't have a dao? Create one"}
           </div>
         </div>
       </div>
-    )
+    );
   }
 }
 

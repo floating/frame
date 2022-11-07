@@ -275,18 +275,28 @@ export class Accounts extends EventEmitter {
     })
   }
 
-  private async txMonitor (account: FrameAccount, id: string, hash: string) {
+  private async txMonitor (account: FrameAccount, requestId: string, hash: string) {
     if (!account) return log.error('txMonitor had no target account')
 
-    const txRequest = this.getTransactionRequest(account, id)
+    const txRequest = this.getTransactionRequest(account, requestId)
     const rawTx = txRequest.data
     txRequest.tx = { hash, confirmations: 0 }
 
     account.update()
 
+    const isChainAvailable = (status: string) => !['disconnected', 'degraded'].includes(status.toLowerCase())
+
+    const setTxSent = () => {
+      txRequest.status = RequestStatus.Sent
+      txRequest.notice = 'Sent'
+      
+      if (txRequest.tx) txRequest.tx.confirmations = 0
+      account.update()
+    }
+
     if (!rawTx.chainId) {
       log.error('txMonitor had no target chain')
-      setTimeout(() => this.accounts[account.address] && this.removeRequest(account, id), 8 * 1000)
+      setTimeout(() => this.accounts[account.address] && this.removeRequest(account, requestId), 8 * 1000)
     } else {
       const targetChain: Chain = {
         type: 'ethereum',
@@ -305,7 +315,7 @@ export class Accounts extends EventEmitter {
 
             let confirmations
             try {
-              confirmations = await this.confirmations(account, id, hash, targetChain)
+              confirmations = await this.confirmations(account, requestId, hash, targetChain)
               txRequest.tx = { ...txRequest.tx, confirmations }
 
               account.update()
@@ -314,24 +324,43 @@ export class Accounts extends EventEmitter {
                 txRequest.status = RequestStatus.Confirmed
                 txRequest.notice = 'Confirmed'
                 account.update()
-                setTimeout(() => this.accounts[account.address] && this.removeRequest(account, id), 8000)
-                clearTimeout(monitorTimer)
+                setTimeout(() => this.accounts[account.address] && this.removeRequest(account, requestId), 8000)
+                clear()
               }
             } catch (e) {
               log.error('error awaiting confirmations', e)
-              clearTimeout(monitorTimer)
-              setTimeout(() => this.accounts[account.address] && this.removeRequest(account, id), 60 * 1000)
+              clear()
+              setTxSent()
+              setTimeout(() => this.accounts[account.address] && this.removeRequest(account, requestId), 60 * 1000)
               return
             }
           }
+
           setTimeout(() => monitor(), 3000)
           const monitorTimer = setInterval(monitor, 15000)
+
+          const statusHandler = (status: string) => {
+            if (!isChainAvailable(status)) {
+              setTxSent()
+              clear()
+            }
+          }
+
+          const { type, id } = targetChain
+
+          provider.on(`status:${type}:${id}`, statusHandler)
+
+          const clear = () => {
+            clearInterval(monitorTimer)
+            provider.off(`status:${type}:${id}`, statusHandler)
+          }
         } else if (newHeadRes.result) {
           const headSub = newHeadRes.result
 
           const removeSubscription = async (requestRemoveTimeout: number) => {
-            setTimeout(() => this.accounts[account.address] && this.removeRequest(account, id), requestRemoveTimeout)
+            setTimeout(() => this.accounts[account.address] && this.removeRequest(account, requestId), requestRemoveTimeout)
             provider.off(`data:${targetChain.type}:${targetChain.id}`, handler)
+            provider.off(`status:${targetChain.type}:${targetChain.id}`, statusHandler)
             this.sendRequest({ method: 'eth_unsubscribe', chainId: targetChainId, params: [headSub] }, (res: RPCResponsePayload) => {
               if (res.error) {
                 log.error('error sending message eth_unsubscribe', res)
@@ -339,15 +368,23 @@ export class Accounts extends EventEmitter {
             })
           }
 
+          const statusHandler = (status: string) => {
+            if (!isChainAvailable(status)) {
+              setTxSent()
+              removeSubscription(60 * 1000)
+            }
+          }
+
           const handler = async (payload: RPCRequestPayload) => {
             if (payload.method === 'eth_subscription' && (payload.params as any).subscription === headSub) {
               // const newHead = payload.params.result
               let confirmations
               try {
-                confirmations = await this.confirmations(account, id, hash, targetChain)
+                confirmations = await this.confirmations(account, requestId, hash, targetChain)
               } catch (e) {
                 log.error(e)
 
+                setTxSent()
                 return removeSubscription(60 * 1000)
               }
 
@@ -364,12 +401,10 @@ export class Accounts extends EventEmitter {
             }
           }
 
-          provider.on(`data:${targetChain.type}:${targetChain.id}`, handler)
-          // provider.on('data', ({ type, id }, ...args) => {
-          //   if (id === targetChain.id) {
-          //     handler(args)
-          //   }
-          // })
+          const { type, id } = targetChain
+
+          provider.on(`status:${type}:${id}`, statusHandler)
+          provider.on(`data:${type}:${id}`, handler)
         }
       })
     }

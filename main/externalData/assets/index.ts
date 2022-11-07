@@ -73,24 +73,6 @@ export default function rates (pylon: Pylon, store: Store) {
     }
   }
 
-  function handleChainUpdates (updates: ChainUpdate[]) {
-    if (updates.length === 0) return
-
-    log.debug(`got chain updates for ${updates.map(u => u.id)}`)
-
-    updates.forEach(update => {
-      const { chainId, nativeCurrency } = update.data
-      const { iconURI, name, symbol, decimals } = nativeCurrency
-
-      storeApi.setNativeCurrencyData(chainId, {
-        icon: iconURI,
-        name,
-        symbol,
-        decimals: decimals || 18
-      })
-    })
-  }
-
   function updateSubscription (chains: number[], address?: Address) {
     const subscribedCurrencies = chains.map(chainId => ({ type: AssetType.NativeCurrency, chainId }))
     const knownTokens = storeApi.getKnownTokens(address).filter(token => chains.includes(token.chainId))
@@ -106,28 +88,22 @@ export default function rates (pylon: Pylon, store: Store) {
     log.verbose('starting asset updates')
 
     pylon.on('rates', handleRatesUpdates)
-    pylon.on('chains', handleChainUpdates)
   }
 
   function stop () {
     log.verbose('stopping asset updates')
 
     pylon.off('rates', handleRatesUpdates)
-    pylon.off('chains', handleChainUpdates)
 
     pylon.rates([])
-    pylon.chains([])
   }
 
   function setAssets (assetIds: AssetId[]) {
-    const chains = [...new Set(assetIds.map(id => id.chainId))]
 
     log.verbose('subscribing to rates updates for native currencies on chains:', assetIds.filter(a => a.type === AssetType.NativeCurrency).map(a => a.chainId))
     log.verbose('subscribing to rates updates for tokens:', assetIds.filter(a => a.type === AssetType.Token).map(a => a.address))
-    log.verbose('subscribing to chain updates for chains:', chains)
 
     pylon.rates(assetIds)
-    pylon.chains(chains)
   }
 
   return {
