@@ -38,13 +38,18 @@ class _RequestItem extends React.Component {
     const req = this.store('main.accounts', account, 'requests', handlerId)
 
     let requestItemDetailsClass = 'requestItemDetails'
+    let requestItemNoticeClass = 'requestItemNotice'
     if (['sending', 'verifying', 'confirming', 'confirmed'].includes(req.status)) {
       requestItemDetailsClass += ' requestItemDetailsGood'
+      requestItemNoticeClass += ' requestItemNoticeGood'
     } else if (['error', 'declined'].includes(req.status)) {
       requestItemDetailsClass += ' requestItemDetailsBad'
+      requestItemNoticeClass += ' requestItemNoticeBad'
     }
 
-    const status = (req.notice || req.status || 'pending').toLowerCase()
+    const status = (req.status || 'pending').toLowerCase()
+    // const notice = (req.notice || 'pending').toLowerCase()
+    const notice = 'nonce too high. expected nonce to be 77 but got 79. note that transactions can\'t be queued when automining'
 
     return (
       <div 
@@ -127,6 +132,11 @@ class _RequestItem extends React.Component {
             </div>
           )}
         </div>
+        {notice && notice !== status && (
+          <div className='requestItemNotice'>
+            {notice}
+          </div>
+        )}
       </div>
     )
   }
