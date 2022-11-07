@@ -26,10 +26,9 @@ const digitsLookup = [
 function formatNumber (n, digits = 2)  {
   const num = Number(n)
   const item = digitsLookup.slice().reverse().find(item => num >= item.value)
-
   const formatted = (value) => `${value.toFixed(digits).replace(numberRegex, '$1')} ${item.symbol}`
 	  
-	return item ? formatted(num / item.value) : '0'
+  return item ? formatted(num / item.value) : '0'
 }
 
 function isUnlimited (amount) {
