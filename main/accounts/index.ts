@@ -217,7 +217,6 @@ export class Accounts extends EventEmitter {
   }
 
   private sendRequest ({method, params, chainId, _origin = frameOriginId}: { method: string, params: any[], chainId: string, _origin?: string }, cb: RPCRequestCallback) {
-    _origin
     provider.send({ id: 1, jsonrpc: '2.0', method, params, chainId, _origin }, cb)
   }
 
