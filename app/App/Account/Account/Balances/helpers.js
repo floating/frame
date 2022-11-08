@@ -36,3 +36,14 @@ export function balance (rawBalance, quote = {}) {
     displayValue: totalValue.isZero() ? '0' : formatUsdRate(totalValue, 0)
   }
 }
+
+export const sortByTotalValue = (a, b) => {
+  if (a.totalValue.plus(b.totalValue).gt(0)) {
+    return b.totalValue.minus(a.totalValue).toNumber()
+  }
+  const balanceA = BigNumber(a.balance || 0).shiftedBy(-a.decimals)
+  const balanceB = BigNumber(b.balance || 0).shiftedBy(-b.decimals)
+
+  return balanceB.minus(balanceA).toNumber()
+
+}

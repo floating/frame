@@ -7,7 +7,7 @@ import svg from '../../../../../../resources/svg'
 import { isNetworkConnected } from '../../../../../../resources/utils/chains'
 import { NATIVE_CURRENCY } from '../../../../../../resources/constants'
 
-import { formatUsdRate, balance } from '../helpers'
+import { formatUsdRate, balance, sortByTotalValue as byTotalValue } from '../helpers'
 import Balance from '../Balance'
 
 function isNativeCurrency (address) {
@@ -79,9 +79,7 @@ class BalancesPreview extends React.Component {
 
         return balance({ ...rawBalance, logoURI, name, decimals }, networks[rawBalance.chainId].isTestnet ? { price: 0 } : rate.usd)
       })
-      .sort((a, b) => {
-        return b.totalValue.minus(a.totalValue).toNumber()
-      })
+      .sort(byTotalValue)
 
     const totalValue = balances.reduce((a, b) => a.plus(b.totalValue), BigNumber(0))
 
