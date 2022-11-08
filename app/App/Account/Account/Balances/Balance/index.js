@@ -30,7 +30,7 @@ class Balance extends React.Component {
         priceChangeClass += ' signerBalanceCurrentPriceChangeDown'
       }
     }
-    let name = balance.name || ''
+    let name = balance.name
     if (name.length > 19) name = name.substr(0, 17) + '..'
 
     const chainHex = '0x' + chainId.toString(16)
