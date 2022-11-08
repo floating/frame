@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js'
+import { NATIVE_CURRENCY } from '../../../../../resources/constants'
 
 const UNKNOWN = '?'
 
@@ -35,4 +36,8 @@ export function balance (rawBalance, quote = {}) {
     totalValue: totalValue.isNaN() ? BigNumber(0) : totalValue,
     displayValue: totalValue.isZero() ? '0' : formatUsdRate(totalValue, 0)
   }
+}
+
+export function isNativeCurrency (address) {
+  return address === NATIVE_CURRENCY
 }
