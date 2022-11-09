@@ -7,7 +7,7 @@ import svg from '../../../../../../resources/svg'
 import { isNetworkConnected } from '../../../../../../resources/utils/chains'
 import { NATIVE_CURRENCY } from '../../../../../../resources/constants'
 
-import { formatUsdRate, balance, sortByTotalValue as byTotalValue } from '../helpers'
+import { formatUsdRate, balance, sortByTotalValue as byTotalValue } from '../../../../../../resources/domain/balance'
 import Balance from '../Balance'
 
 function isNativeCurrency (address) {

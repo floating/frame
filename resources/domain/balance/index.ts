@@ -2,7 +2,7 @@ import BigNumber from 'bignumber.js'
 
 const UNKNOWN = '?'
 
-export function formatBalance (balance, totalValue, decimals = 8) {
+export function formatBalance (balance:any, totalValue:BigNumber, decimals = 8) {
   const isZero = balance.isZero()
   if (!isZero && balance.toNumber() < 0.001 && totalValue.toNumber() < 1) return '<0.001'
 
@@ -12,7 +12,7 @@ export function formatBalance (balance, totalValue, decimals = 8) {
   }).format(balance.toFixed(decimals, BigNumber.ROUND_FLOOR))
 }
 
-export function formatUsdRate (rate, decimals = 2) {
+export function formatUsdRate (rate:any, decimals = 2) {
   return rate.isNaN()
     ? UNKNOWN
     : new Intl.NumberFormat('us-US', {
@@ -21,7 +21,7 @@ export function formatUsdRate (rate, decimals = 2) {
       }).format(rate.toFixed(decimals, BigNumber.ROUND_FLOOR))
 }
 
-export function balance (rawBalance, quote = {}) {
+export function balance (rawBalance: any, quote:any = {}) {
   const balance = BigNumber(rawBalance.balance || 0).shiftedBy(-rawBalance.decimals)
   const usdRate = BigNumber(quote.price)
   const totalValue = balance.times(usdRate)
@@ -37,9 +37,10 @@ export function balance (rawBalance, quote = {}) {
   }
 }
 
-export const sortByTotalValue = (a, b) => {
-  if (a.totalValue.plus(b.totalValue).gt(0)) {
-    return b.totalValue.minus(a.totalValue).toNumber()
+export const sortByTotalValue = (a:any, b:any) => {
+  const difference = b.totalValue.minus(a.totalValue)
+  if (!difference.isZero()) {
+    return difference
   }
   const balanceA = BigNumber(a.balance || 0).shiftedBy(-a.decimals)
   const balanceB = BigNumber(b.balance || 0).shiftedBy(-b.decimals)

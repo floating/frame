@@ -8,7 +8,7 @@ import { isNetworkConnected } from '../../../../../../resources/utils/chains'
 import { NATIVE_CURRENCY } from '../../../../../../resources/constants'
 
 import Balance from '../Balance'
-import { formatUsdRate, balance, sortByTotalValue as byTotalValue } from '../helpers'
+import { formatUsdRate, balance, sortByTotalValue as byTotalValue } from '../../../../../../resources/domain/balance'
 
 function isNativeCurrency (address) {
   return address === NATIVE_CURRENCY
