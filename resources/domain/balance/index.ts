@@ -1,6 +1,14 @@
 import BigNumber from 'bignumber.js'
 import { NATIVE_CURRENCY } from '../../constants'
 
+interface DisplayedBalance extends Balance {
+  displayBalance: string
+  price: string
+  priceChange: string | false
+  totalValue: BigNumber
+  displayValue: string
+}
+
 const UNKNOWN = '?'
 
 export function formatBalance (balance:any, totalValue:BigNumber, decimals = 8) {
@@ -13,16 +21,16 @@ export function formatBalance (balance:any, totalValue:BigNumber, decimals = 8) 
   }).format(balance.toFixed(decimals, BigNumber.ROUND_FLOOR))
 }
 
-export function formatUsdRate (rate:any, decimals = 2) {
+export function formatUsdRate (rate:BigNumber, decimals = 2) {
   return rate.isNaN()
     ? UNKNOWN
     : new Intl.NumberFormat('us-US', {
         minimumFractionDigits: decimals,
         maximumFractionDigits: decimals
-      }).format(rate.toFixed(decimals, BigNumber.ROUND_FLOOR))
+      }).format(Number(rate.toFixed(decimals, BigNumber.ROUND_FLOOR)))
 }
 
-export function balance (rawBalance: any, quote:any = {}) {
+export function balance (rawBalance: Balance, quote:Rate['usd'] = {price: BigNumber(0), change24hr: BigNumber(0)}): DisplayedBalance {
   const balance = BigNumber(rawBalance.balance || 0).shiftedBy(-rawBalance.decimals)
   const usdRate = BigNumber(quote.price)
   const totalValue = balance.times(usdRate)
@@ -38,7 +46,7 @@ export function balance (rawBalance: any, quote:any = {}) {
   }
 }
 
-export const sortByTotalValue = (a:any, b:any) => {
+export const sortByTotalValue = (a:DisplayedBalance, b:DisplayedBalance) => {
   const difference = b.totalValue.minus(a.totalValue)
   if (!difference.isZero()) {
     return difference
@@ -46,7 +54,7 @@ export const sortByTotalValue = (a:any, b:any) => {
   const balanceA = BigNumber(a.balance || 0).shiftedBy(-a.decimals)
   const balanceB = BigNumber(b.balance || 0).shiftedBy(-b.decimals)
 
-  return balanceB.minus(balanceA).toNumber()
+  return balanceB.minus(balanceA)
 }
 
 export function isNativeCurrency (address: string) {
