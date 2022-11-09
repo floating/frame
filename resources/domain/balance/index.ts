@@ -11,14 +11,14 @@ interface DisplayedBalance extends Balance {
 
 const UNKNOWN = '?'
 
-export function formatBalance (balance:any, totalValue:BigNumber, decimals = 8) {
+export function formatBalance (balance:BigNumber, totalValue:BigNumber, decimals = 8) {
   const isZero = balance.isZero()
   if (!isZero && balance.toNumber() < 0.001 && totalValue.toNumber() < 1) return '<0.001'
 
   return new Intl.NumberFormat('us-US', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 8
-  }).format(balance.toFixed(decimals, BigNumber.ROUND_FLOOR))
+  }).format(Number(balance.toFixed(decimals, BigNumber.ROUND_FLOOR)))
 }
 
 export function formatUsdRate (rate:BigNumber, decimals = 2) {
@@ -30,7 +30,7 @@ export function formatUsdRate (rate:BigNumber, decimals = 2) {
       }).format(Number(rate.toFixed(decimals, BigNumber.ROUND_FLOOR)))
 }
 
-export function balance (rawBalance: Balance, quote:Rate['usd'] = {price: BigNumber(0), change24hr: BigNumber(0)}): DisplayedBalance {
+export function balance (rawBalance: Balance, quote:Rate['usd']): DisplayedBalance {
   const balance = BigNumber(rawBalance.balance || 0).shiftedBy(-rawBalance.decimals)
   const usdRate = BigNumber(quote.price)
   const totalValue = balance.times(usdRate)
