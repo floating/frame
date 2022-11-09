@@ -1,28 +1,36 @@
 import BigNumber from 'bignumber.js'
-import { NATIVE_CURRENCY } from '../../../../../resources/constants'
+import { NATIVE_CURRENCY } from '../../constants'
+
+interface DisplayedBalance extends Balance {
+  displayBalance: string
+  price: string
+  priceChange: string | false
+  totalValue: BigNumber
+  displayValue: string
+}
 
 const UNKNOWN = '?'
 
-export function formatBalance (balance, totalValue, decimals = 8) {
+export function formatBalance (balance:BigNumber, totalValue:BigNumber, decimals = 8) {
   const isZero = balance.isZero()
   if (!isZero && balance.toNumber() < 0.001 && totalValue.toNumber() < 1) return '<0.001'
 
   return new Intl.NumberFormat('us-US', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 8
-  }).format(balance.toFixed(decimals, BigNumber.ROUND_FLOOR))
+  }).format(Number(balance.toFixed(decimals, BigNumber.ROUND_FLOOR)))
 }
 
-export function formatUsdRate (rate, decimals = 2) {
+export function formatUsdRate (rate:BigNumber, decimals = 2) {
   return rate.isNaN()
     ? UNKNOWN
     : new Intl.NumberFormat('us-US', {
         minimumFractionDigits: decimals,
         maximumFractionDigits: decimals
-      }).format(rate.toFixed(decimals, BigNumber.ROUND_FLOOR))
+      }).format(Number(rate.toFixed(decimals, BigNumber.ROUND_FLOOR)))
 }
 
-export function balance (rawBalance, quote = {}) {
+export function balance (rawBalance: Balance, quote:Rate['usd']): DisplayedBalance {
   const balance = BigNumber(rawBalance.balance || 0).shiftedBy(-rawBalance.decimals)
   const usdRate = BigNumber(quote.price)
   const totalValue = balance.times(usdRate)
@@ -38,6 +46,17 @@ export function balance (rawBalance, quote = {}) {
   }
 }
 
-export function isNativeCurrency (address) {
+export const sortByTotalValue = (a:DisplayedBalance, b:DisplayedBalance) => {
+  const difference = b.totalValue.minus(a.totalValue)
+  if (!difference.isZero()) {
+    return difference
+  }
+  const balanceA = BigNumber(a.balance || 0).shiftedBy(-a.decimals)
+  const balanceB = BigNumber(b.balance || 0).shiftedBy(-b.decimals)
+
+  return balanceB.minus(balanceA)
+}
+
+export function isNativeCurrency (address: string) {
   return address === NATIVE_CURRENCY
 }

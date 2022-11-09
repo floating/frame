@@ -6,7 +6,7 @@ import link from '../../../../../../resources/link'
 import svg from '../../../../../../resources/svg'
 import { isNetworkConnected } from '../../../../../../resources/utils/chains'
 import Balance from '../Balance'
-import { formatUsdRate, balance, isNativeCurrency } from '../helpers'
+import { formatUsdRate, balance, sortByTotalValue as byTotalValue, isNativeCurrency } from '../../../../../../resources/domain/balance'
 
 class BalancesExpanded extends React.Component {
   constructor (...args) {
@@ -59,9 +59,7 @@ class BalancesExpanded extends React.Component {
 
         return balance({ ...rawBalance, logoURI, name, decimals, symbol }, networks[rawBalance.chainId].isTestnet ? { price: 0 } : rate.usd)
       })
-      .sort((a, b) => {
-        return b.totalValue.minus(a.totalValue).toNumber()
-      })
+      .sort(byTotalValue)
 
     const totalValue = balances.reduce((a, b) => a.plus(b.totalValue), BigNumber(0))
 
