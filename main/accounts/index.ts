@@ -13,7 +13,6 @@ import Signer from '../signers/Signer'
 import { signerCompatibility as transactionCompatibility, maxFee, SignerCompatibility } from '../transaction'
 
 import { weiIntToEthInt, hexToInt } from '../../resources/utils'
-import { ApprovalType } from '../../resources/constants'
 import { accountPanelCrumb, signerPanelCrumb } from '../../resources/domain/nav'
 import { usesBaseFee, TransactionData, GasFeesSource } from '../../resources/domain/transaction'
 import { findUnavailableSigners, getSignerType, isSignerReady } from '../../resources/domain/signer'
@@ -25,6 +24,8 @@ import {
 } from './types'
 
 import type { Chain } from '../chains'
+import { ActionType } from '../transaction/actions'
+import { ApprovalType } from '../../resources/constants'
 
 function notify (title: string, body: string, action: (event: Electron.Event) => void) {
   const notification = new Notification({ title, body })
@@ -154,6 +155,23 @@ export class Accounts extends EventEmitter {
     }
   }
 
+  // TODO: can we make this typed for the action type?
+  updateRequest (reqId: string, actionId: ActionType, data: any) {
+    log.verbose('updateRequest', reqId, actionId, data)
+
+    const currentAccount = this.current()
+    if (currentAccount && currentAccount.requests[reqId]) {
+      const request = this.getTransactionRequest(currentAccount, reqId)
+
+      const action = (request.recognizedActions || []).find(a => a.id === actionId)
+
+      if (action && action.update) {
+        action.update(request, data)
+        currentAccount.update()
+      }
+    }
+  }
+
   async replaceTx (id: string, type: ReplacementType) {
     const currentAccount = this.current()
 
@@ -178,15 +196,17 @@ export class Accounts extends EventEmitter {
           value: '0x0',
           nonce: data.nonce,
           chainId: addHexPrefix(targetChain.id.toString(16)),
-          _origin: currentAccount.requests[id].origin
         }]
+      
+      const _origin = type === ReplacementType.Speed ? currentAccount.requests[id].origin : frameOriginId
 
       const tx = {
         id: 1,
         jsonrpc: '2.0',
         method: 'eth_sendTransaction',
         chainId: addHexPrefix(targetChain.id.toString(16)),
-        params
+        params,
+        _origin
       }
 
       this.sendRequest(tx, (res: RPCResponsePayload) => {
@@ -196,8 +216,8 @@ export class Accounts extends EventEmitter {
     })
   }
 
-  private sendRequest (payload: { method: string, params: any[], chainId: string }, cb: RPCRequestCallback) {
-    provider.send({ id: 1, jsonrpc: '2.0', ...payload, _origin: frameOriginId }, cb)
+  private sendRequest ({method, params, chainId, _origin = frameOriginId}: { method: string, params: any[], chainId: string, _origin?: string }, cb: RPCRequestCallback) {
+    provider.send({ id: 1, jsonrpc: '2.0', method, params, chainId, _origin }, cb)
   }
 
   private async confirmations (account: FrameAccount, id: string, hash: string, targetChain: Chain) {

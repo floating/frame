@@ -1,6 +1,6 @@
 import log from 'electron-log'
 
-import { NATIVE_CURRENCY } from '../../../resources/utils/constants'
+import { NATIVE_CURRENCY } from '../../../resources/constants'
 import BalancesWorkerController from './controller'
 import { CurrencyBalance, TokenBalance } from './scan'
 

@@ -135,6 +135,9 @@ const rpc = {
   confirmRequestApproval (req, approvalType, approvalData, cb) {
     accounts.confirmRequestApproval(req.handlerId, approvalType, approvalData)
   },
+  updateRequest (reqId, actionId, data, cb = () => {}) {
+    accounts.updateRequest(reqId, actionId, data)
+  },
   approveRequest (req, cb) {
     accounts.setRequestPending(req)
     if (req.type === 'transaction') {

@@ -1,9 +1,10 @@
 import React from 'react'
 
-export const ClusterValue = ({ children, style = {}, onClick, grow = 1, pointerEvents = false }) => {
+export const ClusterValue = ({ children, style = {}, onClick, grow = 1, pointerEvents = false, transparent = false }) => {
   let valueClass = 'clusterValue'
   if (onClick) valueClass += ' clusterValueClickable'
   if (pointerEvents) valueClass += ' clusterValueInteractable'
+  if (transparent) valueClass += ' clusterValueTransparent'
   style.flexGrow = grow
   return (
     <div 
