@@ -56,7 +56,13 @@ class AddTokenChainScreenComponent extends Component {
           })}
       </div>
       </div>
-      <div className='newTokenChainSelectFooter'>
+      <div
+        className='newTokenChainSelectFooter'
+        role='button'
+        onClick={() => {
+          link.send('tray:action', 'navDash', { view: 'chains', data: { } })
+        }}
+      >
         {'Chain not listed? Enable it in Chains'}
       </div>
     </div>
