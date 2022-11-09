@@ -1,10 +1,8 @@
 import React from 'react'
-import ReactDOM from 'react-dom'
 import Restore from 'react-restore'
 import utils from 'web3-utils'
 import BigNumber from 'bignumber.js'
 
-// import Account from './Account'
 import TxBar from './TxBar'
 import TxConfirmations from './TxConfirmations'
 import Time from '../Time'
@@ -86,7 +84,7 @@ class RequestCommand extends React.Component {
     if (displayStatus === 'verifying') displayStatus = 'waiting for block'
 
     return (
-      <>
+      <div style={{ background: 'red' }}>
         <div className={(req && req.tx && req.tx.hash) ? 'requestFooter requestFooterActive' : 'requestFooter'}>
           <div className='txActionButtons'
             onMouseLeave={() => {
@@ -193,7 +191,7 @@ class RequestCommand extends React.Component {
           {displayStatus}
         </div>
         <div className='cancelRequest' onClick={() => this.decline(req)}>Cancel</div>
-      </>
+      </div>
     )
   }
 
@@ -262,7 +260,13 @@ class RequestCommand extends React.Component {
             </div>
           </div>
         </div>
-        <div className='requestApprove'>
+        <div className='requestApprove'
+        style={{
+          position: 'absolute',
+          bottom:'8px',
+          left: '0px',
+          right: '0px'
+        }}>
           <div
             className='requestDecline' 
             onClick={() => {
@@ -326,7 +330,7 @@ class RequestCommand extends React.Component {
     const { status, notice } = req
 
     return (
-      <div className='footerModule'>
+      <div>
         {notice ? (
           <div className='requestNotice'>
             {(() => {
