@@ -8,7 +8,7 @@ const mockBalance = (totalValue, balance, decimals = 0) => ({
 })
 
 describe('#sortByTotalValue', () => {
-  it('should balances in descending order by total value', () => {
+  it('should sort balances in descending order by total value', () => {
     const values = [10, 100, 60]
     const unsorted = values.map(mockBalance)
 
