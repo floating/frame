@@ -58,7 +58,7 @@ class AddTokenChainScreenComponent extends Component {
       </div>
       <div
         className='newTokenChainSelectFooter'
-        role='button'
+        role='link'
         onClick={() => {
           link.send('tray:action', 'navDash', { view: 'chains', data: { } })
         }}
