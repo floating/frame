@@ -56,7 +56,6 @@ class TxSending extends React.Component {
             ens={recipientEns}
             copyAddress={(copied) => link.send('tray:clipboardData', copied)}
           />
-  
         return (
           <ClusterBox title={`Sending ${symbol}`} subtitle={name} animationSlot={this.props.i}>
             <Cluster>
@@ -70,7 +69,7 @@ class TxSending extends React.Component {
                 <ClusterValue>
                   <span className='_txMainTransferringEq'>{'≈'}</span>
                   <span className='_txMainTransferringEqSymbol'>{'$'}</span>
-                  <span className='_txMainTransferringEqAmount'>{(displayValue * rateUSD).toFixed(2)}</span>
+                  <span className='_txMainTransferringEqAmount'>{!rateUSD ? '?' : (displayValue * rateUSD).toFixed(2)}</span>
                 </ClusterValue>
               </ClusterRow>
               {address && recipientType === 'contract' ? (
