@@ -84,7 +84,7 @@ class RequestCommand extends React.Component {
     if (displayStatus === 'verifying') displayStatus = 'waiting for block'
 
     return (
-      <div style={{ background: 'red' }}>
+      <div>
         <div className={(req && req.tx && req.tx.hash) ? 'requestFooter requestFooterActive' : 'requestFooter'}>
           <div className='txActionButtons'
             onMouseLeave={() => {
