@@ -5,14 +5,8 @@ import BigNumber from 'bignumber.js'
 import link from '../../../../../../resources/link'
 import svg from '../../../../../../resources/svg'
 import { isNetworkConnected } from '../../../../../../resources/utils/chains'
-import { NATIVE_CURRENCY } from '../../../../../../resources/constants'
-
 import Balance from '../Balance'
-import { formatUsdRate, balance, sortByTotalValue as byTotalValue } from '../../../../../../resources/domain/balance'
-
-function isNativeCurrency (address) {
-  return address === NATIVE_CURRENCY
-}
+import { formatUsdRate, balance, sortByTotalValue as byTotalValue, isNativeCurrency } from '../../../../../../resources/domain/balance'
 
 class BalancesExpanded extends React.Component {
   constructor (...args) {
@@ -59,7 +53,7 @@ class BalancesExpanded extends React.Component {
 
         const rate = isNative ? nativeCurrencyInfo  : rates[rawBalance.address || rawBalance.symbol] || {}
         const logoURI = (isNative && nativeCurrencyInfo.icon) || rawBalance.logoURI
-        const name = (isNative && nativeCurrencyInfo.name) || rawBalance.name
+        const name = isNative ? nativeCurrencyInfo.name || networks[rawBalance.chainId].name : rawBalance.name
         const decimals = isNative ? nativeCurrencyInfo.decimals || 18 : rawBalance.decimals
         const symbol = (isNative && nativeCurrencyInfo.symbol) || rawBalance.symbol
 

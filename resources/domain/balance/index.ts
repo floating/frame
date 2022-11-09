@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js'
+import { NATIVE_CURRENCY } from '../../constants'
 
 const UNKNOWN = '?'
 
@@ -46,5 +47,8 @@ export const sortByTotalValue = (a:any, b:any) => {
   const balanceB = BigNumber(b.balance || 0).shiftedBy(-b.decimals)
 
   return balanceB.minus(balanceA).toNumber()
+}
 
+export function isNativeCurrency (address: string) {
+  return address === NATIVE_CURRENCY
 }

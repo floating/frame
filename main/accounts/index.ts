@@ -196,15 +196,17 @@ export class Accounts extends EventEmitter {
           value: '0x0',
           nonce: data.nonce,
           chainId: addHexPrefix(targetChain.id.toString(16)),
-          _origin: currentAccount.requests[id].origin
         }]
+      
+      const _origin = type === ReplacementType.Speed ? currentAccount.requests[id].origin : frameOriginId
 
       const tx = {
         id: 1,
         jsonrpc: '2.0',
         method: 'eth_sendTransaction',
         chainId: addHexPrefix(targetChain.id.toString(16)),
-        params
+        params,
+        _origin
       }
 
       this.sendRequest(tx, (res: RPCResponsePayload) => {
@@ -214,8 +216,8 @@ export class Accounts extends EventEmitter {
     })
   }
 
-  private sendRequest (payload: { method: string, params: any[], chainId: string }, cb: RPCRequestCallback) {
-    provider.send({ id: 1, jsonrpc: '2.0', ...payload, _origin: frameOriginId }, cb)
+  private sendRequest ({method, params, chainId, _origin = frameOriginId}: { method: string, params: any[], chainId: string, _origin?: string }, cb: RPCRequestCallback) {
+    provider.send({ id: 1, jsonrpc: '2.0', method, params, chainId, _origin }, cb)
   }
 
   private async confirmations (account: FrameAccount, id: string, hash: string, targetChain: Chain) {
