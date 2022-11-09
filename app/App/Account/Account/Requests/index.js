@@ -163,7 +163,7 @@ class Requests extends React.Component {
                     <Cluster>
                       <ClusterRow>
                         <ClusterValue grow={2}>
-                          <div className='requestItemTitleSub'>
+                          <div className='requestItemTitleSub'  style={{ padding: '16px' }}>
                             <div 
                               className='requestItemTitleSubIcon'
                             >
@@ -193,7 +193,7 @@ class Requests extends React.Component {
                     <Cluster>
                       <ClusterRow>
                         <ClusterValue grow={2}>
-                          <div className='requestItemTitleSub'>
+                          <div className='requestItemTitleSub'  style={{ padding: '16px' }}>
                             <div 
                               className='requestItemTitleSubIcon'
                             >
@@ -223,7 +223,7 @@ class Requests extends React.Component {
                     <Cluster>
                       <ClusterRow>
                         <ClusterValue grow={2}>
-                          <div className='requestItemTitleSub'>
+                          <div className='requestItemTitleSub'  style={{ padding: '16px' }}>
                             <div 
                               className='requestItemTitleSubIcon'
                             >
@@ -253,7 +253,7 @@ class Requests extends React.Component {
                     <Cluster>
                       <ClusterRow>
                         <ClusterValue grow={2}>
-                          <div className='requestItemTitleSub'>
+                          <div className='requestItemTitleSub'  style={{ padding: '16px' }}>
                             <div 
                               className='requestItemTitleSubIcon'
                             >
@@ -283,7 +283,7 @@ class Requests extends React.Component {
                     <Cluster>
                       <ClusterRow>
                         <ClusterValue grow={2}>
-                          <div className='requestItemTitleSub'>
+                          <div className='requestItemTitleSub' style={{ padding: '16px' }}>
                             <div 
                               className='requestItemTitleSubIcon'
                             >
