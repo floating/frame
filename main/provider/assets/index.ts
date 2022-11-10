@@ -2,6 +2,8 @@ import store from '../../store'
 
 import { NATIVE_CURRENCY } from '../../../resources/constants'
 
+export type UsdRate = { usd: Rate }
+
 interface AssetsChangedHandler {
   assetsChanged: (address: Address, assets: RPC.GetAssets.Assets) => void
 }
@@ -16,10 +18,10 @@ const storeApi = {
     
     return (currency || { usd: { price: 0 } })
   },
-  getRate: (address: Address): Rate => {
+  getUsdRate: (address: Address): UsdRate => {
     const rate = store('main.rates', address.toLowerCase())
    
-    return (rate || { usd: { price: 0 } })
+    return { usd: (rate || { price: 0 }) }
   },
   getLastUpdated: (account: Address): number => {
     return store('main.accounts', account, 'balances.lastUpdated')
@@ -71,12 +73,12 @@ function fetchAssets (accountId: string) {
         currencyInfo: currency
       })
     } else {
-      const { usd } = storeApi.getRate(balance.address)
+      const usdRate = storeApi.getUsdRate(balance.address)
 
       assets.erc20.push({
         ...balance,
         tokenInfo: {
-          lastKnownPrice: { usd }
+          lastKnownPrice: usdRate
         }
       })
     }
