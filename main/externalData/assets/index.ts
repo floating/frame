@@ -2,6 +2,7 @@ import log from 'electron-log'
 
 import Pylon, { AssetType } from '@framelabs/pylon-client'
 import { AssetId } from '@framelabs/pylon-client/dist/assetId'
+import { UsdRate } from '../../provider/assets'
 
 interface RateUpdate {
   id: AssetId
@@ -11,25 +12,12 @@ interface RateUpdate {
   }
 }
 
-interface ChainUpdate {
-  id: number
-  data: {
-    chainId: number
-    nativeCurrency: {
-      symbol: string
-      iconURI: string
-      name: string
-      decimals?: number
-    }
-  }
-}
-
 export default function rates (pylon: Pylon, store: Store) {
   const storeApi = {
     getKnownTokens: (address?: Address) => ((address && store('main.tokens.known', address)) || []) as Token[],
     setNativeCurrencyData: (chainId: number, currencyData: NativeCurrency) => store.setNativeCurrencyData('ethereum', chainId, currencyData),
-    setNativeCurrencyRate: (chainId: number, rate: Rate) => store.setNativeCurrencyData('ethereum', chainId, rate),
-    setTokenRates: (rates: Record<Address, Rate>) => store.setRates(rates)
+    setNativeCurrencyRate: (chainId: number, rate: Rate) => store.setNativeCurrencyData('ethereum', chainId, { usd: rate }),
+    setTokenRates: (rates: Record<Address, UsdRate>) => store.setRates(rates)
   }
 
   function handleRatesUpdates (updates: RateUpdate[]) {
@@ -42,10 +30,8 @@ export default function rates (pylon: Pylon, store: Store) {
       
       nativeCurrencyUpdates.forEach(u => {
         storeApi.setNativeCurrencyRate(u.id.chainId, {
-          usd: {
-            price: u.data.usd,
-            change24hr: u.data.usd_24h_change
-          }
+          price: u.data.usd,
+          change24hr: u.data.usd_24h_change
         })
       })
     }
@@ -67,7 +53,7 @@ export default function rates (pylon: Pylon, store: Store) {
         }
 
         return allRates
-      }, {} as Record<string, Rate>)
+      }, {} as Record<string, UsdRate>)
 
       storeApi.setTokenRates(tokenRates)
     }
