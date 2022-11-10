@@ -95,6 +95,7 @@ class AddAddress extends React.Component {
 
   render () {
     let itemClass = 'addAccountItem addAccountItemSmart addAccountItemAdding'
+    const {error} = this.state
     return (
       <div className={itemClass} style={{ transitionDelay: (0.64 * this.props.index / 4) + 's' }}>
         <div className='addAccountItemBar addAccountItemMock' />
@@ -127,8 +128,16 @@ class AddAddress extends React.Component {
                   <div className='addAccountItemOptionSubmit' onClick={() => this.create()}>Create</div>
                 </div>
                 <div className='addAccountItemOptionSetupFrame'>
-                  <div className='addAccountItemOptionTitle'>{this.state.status}</div>
-                  {this.state.error ? <div className='addAccountItemOptionSubmit' onClick={() => this.restart()}>try again</div> : null}
+                  {error ? 
+                  <>
+                    <div className='addAccountItemOptionTitle'>{this.state.status }</div>
+                    <div className='addAccountItemOptionSubmit' onClick={() => this.restart()}>try again</div>
+                  </>
+                  :
+                  <>
+                   <div className='addAccountItemOptionTitle'>{"account added successfully"}</div>
+                   <div className='addAccountItemOptionSubmit' onClick={() => link.send('tray:action', 'navDash', { view: 'accounts', data: {} })}>back</div>
+                  </>}
                 </div>
               </div>
             </div>
