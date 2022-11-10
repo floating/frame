@@ -11,6 +11,7 @@ import svg from '../../../../resources/svg'
 import link from '../../../../resources/link'
 
 import { usesBaseFee } from '../../../../resources/domain/transaction'
+import { isCancelableRequest } from '../../../../resources/domain/request'
 
 const FEE_WARNING_THRESHOLD_USD = 50
 
@@ -54,18 +55,7 @@ class RequestCommand extends React.Component {
     if (success) requestClass += ' signerRequestSuccess'
     if (req.status === 'confirmed') requestClass += ' signerRequestConfirmed'
     else if (error) requestClass += ' signerRequestError'
-
-
-    const cancelableRequest = ![
-      'sent', 
-      'sending', 
-      'verifying', 
-      'confirming', 
-      'confirmed', 
-      'error', 
-      'declined'
-    ].includes(status)
-
+    
     const chain = { 
       type: 'ethereum', 
       id: parseInt(req.data.chainId, 'hex')
@@ -201,7 +191,7 @@ class RequestCommand extends React.Component {
         <div className={'requestNoticeInnerText'}>
           {displayStatus}
         </div>
-        {cancelableRequest && (
+        {isCancelableRequest(status) && (
           <div className='cancelRequest' onClick={() => this.decline(req)}>Cancel</div>
         )}
       </div>
