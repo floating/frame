@@ -40,7 +40,7 @@ class _RequestItem extends React.Component {
     let requestItemDetailsClass = 'requestItemDetails'
     let requestItemNoticeClass = 'requestItemNotice'
 
-    if (['sending', 'verifying', 'confirming', 'confirmed'].includes(req.status)) {
+    if (['sent', 'sending', 'verifying', 'confirming', 'confirmed'].includes(req.status)) {
       requestItemDetailsClass += ' requestItemDetailsGood'
       requestItemNoticeClass += ' requestItemNoticeGood'
     } else if (['error', 'declined'].includes(req.status)) {
@@ -49,7 +49,9 @@ class _RequestItem extends React.Component {
     }
 
     const status = (req.status || 'pending').toLowerCase()
-    const notice = (req.notice || 'pending').toLowerCase()
+    const notice = (req.notice || '').toLowerCase()
+
+    const inactive = ['error', 'declined', 'confirmed'].includes(req.status)
 
     return (
       <div 
@@ -100,25 +102,25 @@ class _RequestItem extends React.Component {
           </div>
         </div>
         <div style={headerMode ? { pointerEvents: 'auto' } : { pointerEvents: 'none' }}>
-        {children}
+          {children}
         </div>
         <div className={requestItemDetailsClass}>
           <div className='requestItemDetailsSlide'>
-            <div className='requestItemDetailsIndicator'>
+            <div className={inactive ? 'requestItemDetailsIndicator requestItemDetailsIndicatorStill' : 'requestItemDetailsIndicator'}>
               <div className='requestItemDetailsIndicatorMarker' />
             </div>
             <span>{status}</span>
             {/* <div className='requestItemDetailsIndicator' /> */}
           </div>
           {headerMode ? (
-            <>
+            <div className={inactive ? 'requestItemWave requestItemWaveDisabled' : 'requestItemWave'}>
               <div className='requestItemLine'>
                 {svg.sine()}
               </div>
               <div className='requestItemLine requestItemLineShadow'>
                 {svg.sine()}
               </div>
-            </>
+            </div>
           ) : (
             <div className='requestItemDetailsView'>
               <div className='requestItemDetailsViewText'>

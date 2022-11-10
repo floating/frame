@@ -32,7 +32,7 @@ export function formatUsdRate (rate:BigNumber, decimals = 2) {
 
 export function balance (rawBalance: Balance, quote:Rate['usd']): DisplayedBalance {
   const balance = BigNumber(rawBalance.balance || 0).shiftedBy(-rawBalance.decimals)
-  const usdRate = BigNumber(quote.price)
+  const usdRate = BigNumber(quote ? quote.price : 0)
   const totalValue = balance.times(usdRate)
   const balanceDecimals = Math.max(2, usdRate.shiftedBy(1).toFixed(0, BigNumber.ROUND_DOWN).length)
 
