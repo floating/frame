@@ -21,7 +21,7 @@ const storeApi = {
   getUsdRate: (address: Address): UsdRate => {
     const rate = store('main.rates', address.toLowerCase())
    
-    return { usd: (rate || { price: 0 }) }
+    return (rate || { usd: { price: 0 } })
   },
   getLastUpdated: (account: Address): number => {
     return store('main.accounts', account, 'balances.lastUpdated')
