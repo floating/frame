@@ -1,13 +1,43 @@
 import BigNumber from 'bignumber.js'
-import { sortByTotalValue as byTotalValue } from '../../../../resources/domain/balance'
+import { sortByTotalValue as byTotalValue, createBalance } from '../../../../resources/domain/balance'
 
-const mockBalance = (totalValue, balance = 0, decimals = 0) => ({
-  totalValue: BigNumber(totalValue),
-  decimals,
-  balance
+describe('#createBalance', () => {
+  it('creates a balance with an unknown price when no quote is available', () => {
+    const quote = undefined
+    const balance = createBalance({ balance: '0x2ed3afa800', decimals: 18 }, quote)
+
+    expect(balance.price).toBe('?')
+  })
+
+  it('creates a balance with no price change data when no quote is available', () => {
+    const quote = undefined
+    const balance = createBalance({ balance: '0x2ed3afa800', decimals: 18 }, quote)
+
+    expect(balance.priceChange).toBeFalsy()
+  })
+
+  it('creates a balance with zero total value when no quote is available', () => {
+    const quote = undefined
+    const balance = createBalance({ balance: '0x2ed3afa800', decimals: 18 }, quote)
+
+    expect(balance.totalValue.toNumber()).toBe(0)
+  })
+
+  it('creates a balance with an unknown display value when no quote is available', () => {
+    const quote = undefined
+    const balance = createBalance({ balance: '0x2ed3afa800', decimals: 18 }, quote)
+
+    expect(balance.displayValue).toBe('?')
+  })
 })
 
 describe('#sortByTotalValue', () => {
+  const mockBalance = (totalValue, balance = 0, decimals = 0) => ({
+    totalValue: BigNumber(totalValue),
+    decimals,
+    balance
+  })
+
   it('should sort balances in descending order by total value', () => {
     const values = [10, 100, 60]
     const unsorted = values.map(mockBalance)

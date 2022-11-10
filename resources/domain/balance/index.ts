@@ -30,7 +30,7 @@ export function formatUsdRate (rate:BigNumber, decimals = 2) {
       }).format(Number(rate.toFixed(decimals, BigNumber.ROUND_FLOOR)))
 }
 
-export function balance (rawBalance: Balance, quote?: Rate): DisplayedBalance {
+export function createBalance (rawBalance: Balance, quote?: Rate): DisplayedBalance {
   const balance = BigNumber(rawBalance.balance || 0).shiftedBy(-rawBalance.decimals)
   const usdRate = new BigNumber(quote?.price || NaN)
   const change24hr = new BigNumber(quote?.['change24hr'] || 0)
