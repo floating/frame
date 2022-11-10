@@ -327,11 +327,16 @@
 
     .requestItemMain
       height 36px
-      border-radius 6px
       display flex
       justify-content flex-start
       align-items center
       box-sizing border-box
+
+      .requestItemTitleMain
+        white-space nowrap
+        overflow hidden
+        text-overflow ellipsis
+        width 220px
 
     .requestItemTitleLeft
       display flex
@@ -433,7 +438,10 @@
   //   .requestItemDetailsSlide
   //     background linear-gradient(90deg, var(--ghostB), var(--ghostC))
 
-
+  .requestItemWaveDisabled
+    .requestItemLine
+      svg
+        animation-play-state paused
 
 .requestItemSummary
   display flex

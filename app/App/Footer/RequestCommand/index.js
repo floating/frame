@@ -55,6 +55,17 @@ class RequestCommand extends React.Component {
     if (req.status === 'confirmed') requestClass += ' signerRequestConfirmed'
     else if (error) requestClass += ' signerRequestError'
 
+
+    const cancelableRequest = ![
+      'sent', 
+      'sending', 
+      'verifying', 
+      'confirming', 
+      'confirmed', 
+      'error', 
+      'declined'
+    ].includes(status)
+
     const chain = { 
       type: 'ethereum', 
       id: parseInt(req.data.chainId, 'hex')
@@ -190,7 +201,9 @@ class RequestCommand extends React.Component {
         <div className={'requestNoticeInnerText'}>
           {displayStatus}
         </div>
-        <div className='cancelRequest' onClick={() => this.decline(req)}>Cancel</div>
+        {cancelableRequest && (
+          <div className='cancelRequest' onClick={() => this.decline(req)}>Cancel</div>
+        )}
       </div>
     )
   }

@@ -37,7 +37,9 @@ function renderRecognizedAction (req) {
 const TxDescription = ({ chain, children, chainColor }) => (
   <div className='_txDescriptionSummary'>
     {children}
-    <div className='_txDescriptionSummaryTag' style={{ color: `var(--${chainColor})` }}>{`on ${chain}`}</div>
+    <div className='_txDescriptionSummaryTag' style={{ color: `var(--${chainColor})` }}>
+      {`on ${chain}`}
+    </div>
   </div>
 )
 
