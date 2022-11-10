@@ -11,7 +11,7 @@ interface DisplayedBalance extends Balance {
 
 const UNKNOWN = '?'
 
-export function formatBalance (balance:BigNumber, totalValue:BigNumber, decimals = 8) {
+export function formatBalance (balance: BigNumber, totalValue: BigNumber, decimals = 8) {
   const isZero = balance.isZero()
   if (!isZero && balance.toNumber() < 0.001 && totalValue.toNumber() < 1) return '<0.001'
 
@@ -48,7 +48,7 @@ export function balance (rawBalance: Balance, quote?: Rate): DisplayedBalance {
   }
 }
 
-export const sortByTotalValue = (a:DisplayedBalance, b:DisplayedBalance) => {
+export const sortByTotalValue = (a: DisplayedBalance, b: DisplayedBalance) => {
   const difference = b.totalValue.minus(a.totalValue)
   if (!difference.isZero()) {
     return difference
