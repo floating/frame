@@ -1,7 +1,7 @@
 import { v5 as uuidv5 } from 'uuid'
 import log from 'electron-log'
 
-import { parseOrigin, updateOrigin } from '../../../main/api/origins'
+import { parseOrigin, updateOrigin, isTrusted } from '../../../main/api/origins'
 import store from '../../../main/store'
 
 jest.mock('../../../main/accounts', () => {})
@@ -149,5 +149,21 @@ describe('#updateOrigin', () => {
 
       expect(origin).toBe('Unknown')
     })
+  })
+})
+
+describe('#isTrusted', () => {
+  it('trusts all requests from the frame extension', async () => {
+    const payload = { _origin: 'bf93061b-3575-40c5-b526-4932b02e1f3f' }
+    store.set('main.origins', payload._origin, { name: 'frame-extension' })
+
+    return expect(isTrusted(payload)).resolves.toBe(true)
+  })
+
+  it('does not trust any request with an invalid origin', async () => {
+    const payload = { _origin: 'bf93061b-3575-40c5-b526-4932b02e1f3f' }
+    store.set('main.origins', payload._origin, { name: '!nvalid origin' })
+
+    return expect(isTrusted(payload)).resolves.toBe(false)
   })
 })
