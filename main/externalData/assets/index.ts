@@ -21,7 +21,6 @@ export default function rates (pylon: Pylon, store: Store) {
   }
 
   function handleRatesUpdates (updates: RateUpdate[]) {
-    console.log('RATES UPDATES', { updates })
     if (updates.length === 0) return
 
     const nativeCurrencyUpdates = updates.filter(u => u.id.type === AssetType.NativeCurrency)
