@@ -51,7 +51,7 @@ class _RequestItem extends React.Component {
     const status = (req.status || 'pending').toLowerCase()
     const notice = (req.notice || '').toLowerCase()
 
-    const waveDone = ['error', 'declined', 'confirmed'].includes(req.status)
+    const inactive = ['error', 'declined', 'confirmed'].includes(req.status)
 
     return (
       <div 
@@ -106,14 +106,14 @@ class _RequestItem extends React.Component {
         </div>
         <div className={requestItemDetailsClass}>
           <div className='requestItemDetailsSlide'>
-            <div className='requestItemDetailsIndicator'>
+            <div className={inactive ? 'requestItemDetailsIndicator requestItemDetailsIndicatorStill' : 'requestItemDetailsIndicator'}>
               <div className='requestItemDetailsIndicatorMarker' />
             </div>
             <span>{status}</span>
             {/* <div className='requestItemDetailsIndicator' /> */}
           </div>
           {headerMode ? (
-            <div className={waveDone ? 'requestItemWave requestItemWaveDisabled' : 'requestItemWave'}>
+            <div className={inactive ? 'requestItemWave requestItemWaveDisabled' : 'requestItemWave'}>
               <div className='requestItemLine'>
                 {svg.sine()}
               </div>
