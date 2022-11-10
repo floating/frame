@@ -30,20 +30,34 @@ export function formatUsdRate (rate:BigNumber, decimals = 2) {
       }).format(Number(rate.toFixed(decimals, BigNumber.ROUND_FLOOR)))
 }
 
-export function balance (rawBalance: Balance, quote:Rate['usd']): DisplayedBalance {
-  const balance = BigNumber(rawBalance.balance || 0).shiftedBy(-rawBalance.decimals)
-  const usdRate = BigNumber(quote.price)
-  const totalValue = balance.times(usdRate)
-  const balanceDecimals = Math.max(2, usdRate.shiftedBy(1).toFixed(0, BigNumber.ROUND_DOWN).length)
+export function balance(
+  rawBalance: Balance,
+  quote: Rate['usd'] = {
+    price: BigNumber(0),
+    change24hr: BigNumber(0),
+  }
+): DisplayedBalance {
+  const balance = BigNumber(rawBalance.balance || 0).shiftedBy(
+    -rawBalance.decimals
+  );
+  const usdRate = BigNumber(quote.price);
+  const totalValue = balance.times(usdRate);
+  const balanceDecimals = Math.max(
+    2,
+    usdRate.shiftedBy(1).toFixed(0, BigNumber.ROUND_DOWN).length
+  );
 
   return {
     ...rawBalance,
     displayBalance: formatBalance(balance, totalValue, balanceDecimals),
     price: formatUsdRate(usdRate),
-    priceChange: !usdRate.isZero() && !usdRate.isNaN() && BigNumber(quote['change24hr'] || 0).toFixed(2),
+    priceChange:
+      !usdRate.isZero() &&
+      !usdRate.isNaN() &&
+      BigNumber(quote['change24hr'] || 0).toFixed(2),
     totalValue: totalValue.isNaN() ? BigNumber(0) : totalValue,
-    displayValue: totalValue.isZero() ? '0' : formatUsdRate(totalValue, 0)
-  }
+    displayValue: totalValue.isZero() ? '0' : formatUsdRate(totalValue, 0),
+  };
 }
 
 export const sortByTotalValue = (a:DisplayedBalance, b:DisplayedBalance) => {
