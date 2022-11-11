@@ -29,11 +29,6 @@ class _RequestItem extends React.Component {
     this.timer = setInterval(() => {
       this.setState({ ago: this.getElapsedTime() + ' ago' })
     }, 1000)
-    if (!this.props.headerMode) (
-      setTimeout(() => {
-        this.setState({ show: true })
-      }, 500)
-    )
   }
   componentWillUnmount () {
     clearInterval(this.timer)
