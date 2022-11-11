@@ -14,7 +14,7 @@ const TxFee = Restore.connect(TxFeeComponent, store)
 let req
 
 beforeEach(() => {
-  store.setNativeCurrencyData('ethereum', 137, { symbol: 'MATIC', price: 0.86 })
+  store.setNativeCurrencyData('ethereum', 137, { usd: { symbol: 'MATIC', price: 0.86 }})
 
   req = {
     feesUpdatedByUser: false,
