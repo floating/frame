@@ -35,7 +35,13 @@ function invalidOrigin (origin: string) {
   return origin !== origin.replace(/[^0-9a-z/:.[\]-]/gi, '')
 }
 
-function addPermissionRequest (address: Address, fullPayload: RPCRequestPayload) {
+async function getPermission (address: Address, origin: string, payload: RPCRequestPayload) {
+  const permission = storeApi.getPermission(address, origin)
+
+  return permission || requestPermission(address, payload)
+}
+
+async function requestPermission (address: Address, fullPayload: RPCRequestPayload) {
   const { _origin: originId, ...payload } = fullPayload
 
   return new Promise<Permission | undefined>((resolve) => {
@@ -117,8 +123,7 @@ export async function isTrusted (payload: RPCRequestPayload) {
     return false
   }
 
-  const { address } = currentAccount
-  const permission = storeApi.getPermission(address, originName) || await addPermissionRequest(address, payload)
+  const permission = await getPermission(currentAccount.address, originName, payload)
 
   return !!permission?.provider
 }
