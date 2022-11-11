@@ -1,10 +1,8 @@
 import React from 'react'
-import ReactDOM from 'react-dom'
 import Restore from 'react-restore'
 import utils from 'web3-utils'
 import BigNumber from 'bignumber.js'
 
-// import Account from './Account'
 import TxBar from './TxBar'
 import TxConfirmations from './TxConfirmations'
 import Time from '../Time'
@@ -13,6 +11,7 @@ import svg from '../../../../resources/svg'
 import link from '../../../../resources/link'
 
 import { usesBaseFee } from '../../../../resources/domain/transaction'
+import { isCancelableRequest } from '../../../../resources/domain/request'
 
 const FEE_WARNING_THRESHOLD_USD = 50
 
@@ -56,7 +55,7 @@ class RequestCommand extends React.Component {
     if (success) requestClass += ' signerRequestSuccess'
     if (req.status === 'confirmed') requestClass += ' signerRequestConfirmed'
     else if (error) requestClass += ' signerRequestError'
-
+    
     const chain = { 
       type: 'ethereum', 
       id: parseInt(req.data.chainId, 'hex')
@@ -86,7 +85,7 @@ class RequestCommand extends React.Component {
     if (displayStatus === 'verifying') displayStatus = 'waiting for block'
 
     return (
-      <>
+      <div>
         <div className={(req && req.tx && req.tx.hash) ? 'requestFooter requestFooterActive' : 'requestFooter'}>
           <div className='txActionButtons'
             onMouseLeave={() => {
@@ -192,8 +191,10 @@ class RequestCommand extends React.Component {
         <div className={'requestNoticeInnerText'}>
           {displayStatus}
         </div>
-        <div className='cancelRequest' onClick={() => this.decline(req)}>Cancel</div>
-      </>
+        {isCancelableRequest(status) && (
+          <div className='cancelRequest' onClick={() => this.decline(req)}>Cancel</div>
+        )}
+      </div>
     )
   }
 
@@ -262,7 +263,13 @@ class RequestCommand extends React.Component {
             </div>
           </div>
         </div>
-        <div className='requestApprove'>
+        <div className='requestApprove'
+        style={{
+          position: 'absolute',
+          bottom:'8px',
+          left: '0px',
+          right: '0px'
+        }}>
           <div
             className='requestDecline' 
             onClick={() => {
@@ -326,7 +333,7 @@ class RequestCommand extends React.Component {
     const { status, notice } = req
 
     return (
-      <div className='footerModule'>
+      <div>
         {notice ? (
           <div className='requestNotice'>
             {(() => {

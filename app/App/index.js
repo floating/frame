@@ -9,6 +9,7 @@ import Badge from './Badge'
 
 import Backdrop from './Backdrop'
 import AccountSelector from './AccountSelector'
+import Footer from './Footer'
 
 // import DevTools from 'restore-devtools'
 // <DevTools />
@@ -79,6 +80,7 @@ class Panel extends React.Component {
         <AccountSelector />
         <Account />
         <Backdrop />
+        <Footer />
       </div>
     )
   }

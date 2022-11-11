@@ -41,11 +41,17 @@ const initial = {
   windows: {
     panel: {
       show: false,
-      nav: []
+      nav: [],
+      footer: {
+        height: 40
+      }
     },
     dash: {
       show: false,
-      nav: []
+      nav: [],
+      footer: {
+        height: 40
+      }
     },
     frames: []
   },

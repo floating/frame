@@ -806,6 +806,9 @@ module.exports = {
   },
   setAccountFilter: (u, value) => {
     u('panel.accountFilter', () => value)
+  },
+  setFooterHeight: (u, win, height) => {
+    u('windows', win, 'footer.height', () => height < 40 ? 40 : height)
   }
   // toggleUSDValue: (u) => {
   //   u('main.showUSDValue', show => !show)

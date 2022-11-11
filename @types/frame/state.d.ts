@@ -57,6 +57,7 @@ interface NativeCurrency {
   icon: string
   name: string
   decimals: number
+  usd?: Rate
 }
 
 interface GasData {
@@ -110,10 +111,8 @@ interface Balance {
 }
 
 interface Rate {
-  [K: string]: {
-    price: BigNumber,
-    change24hr: BigNumber
-  }
+  price: number
+  change24hr: number
 }
 
 interface Token {
