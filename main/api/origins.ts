@@ -112,18 +112,17 @@ export function isFrameExtension (req: IncomingMessage) {
 export async function isTrusted (payload: RPCRequestPayload) {
   // Permission granted to unknown origins only persist until the Frame is closed, they are not permanent
   const { name: originName } = store('main.origins', payload._origin) as { name: string }
-
-  if (invalidOrigin(originName)) {
-    return false
-  }
+  const currentAccount = accounts.current()
 
   if (originName === 'frame-extension' && trustedExtensionMethods.includes(payload.method)) {
     return true
   }
 
-  const { address } = accounts.current() || {}
-  if (!address) return false
-  
+  if (invalidOrigin(originName) || !currentAccount) {
+    return false
+  }
+
+  const { address } = currentAccount
   const permission = getExistingPermission(address, originName) || await addPermissionRequest(address, payload)
 
   return !!permission?.provider

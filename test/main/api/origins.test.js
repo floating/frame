@@ -181,6 +181,15 @@ describe('#isTrusted', () => {
     return expect(isTrusted(payload)).resolves.toBe(false)
   })
 
+  it('does not trust a request if no account is selected', async () => {
+    const payload = { _origin: 'bf93061b-3575-40c5-b526-4932b02e1f3f' }
+    store.set('main.origins', payload._origin, { name: 'test.frame.eth' })
+
+    accounts.current.mockReturnValueOnce(undefined)
+
+    return expect(isTrusted(payload)).resolves.toBe(false)
+  })
+
   it('trusts an origin that has been previously granted permission', async () => {
     const address = '0xDAFEA492D9c6733ae3d56b7Ed1ADB60692c98Bc5'
     const payload = { method: 'eth_accounts', _origin: 'bf93061b-3575-40c5-b526-4932b02e1f3f' }
