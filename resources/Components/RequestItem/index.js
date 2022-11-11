@@ -10,8 +10,7 @@ class _RequestItem extends React.Component {
   constructor (props, context) {
     super(props, context)
     this.state = {
-      ago: this.getElapsedTime() + ' ago',
-      show: Boolean(props.headerMode)
+      ago: this.getElapsedTime() + ' ago'
     }
   }
   getElapsedTime () {
@@ -40,7 +39,7 @@ class _RequestItem extends React.Component {
     clearInterval(this.timer)
   }
   render () {
-    if (!this.state.show) return null
+    if (!this.state.ago === '0s') return null
     const { account, handlerId, i, title, svgName, img, color, headerMode, txNonce, children } = this.props
     const req = this.store('main.accounts', account, 'requests', handlerId)
 
