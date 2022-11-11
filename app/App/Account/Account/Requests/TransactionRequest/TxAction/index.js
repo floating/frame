@@ -43,7 +43,7 @@ class TxSending extends React.Component {
 
         const isTestnet = this.store('main.networks', this.props.chain.type, this.props.chain.id, 'isTestnet')    
         const currencyRate = this.store('main.rates', contract)
-        const { ether, fiat } = displayValueData(amount, { decimals, currencyRate, currencyName: 'usd', isTestnet })
+        const { ether, fiat } = displayValueData(amount, { decimals, currencyRate, isTestnet })
   
         return (
           <ClusterBox title={`Sending ${symbol}`} subtitle={name} animationSlot={this.props.i}>

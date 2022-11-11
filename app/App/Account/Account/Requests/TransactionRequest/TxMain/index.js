@@ -34,7 +34,7 @@ class TxSending extends React.Component {
     const isTestnet = this.store('main.networks', this.props.chain.type, this.props.chain.id, 'isTestnet')
     const { nativeCurrency, nativeCurrency: { symbol: currentSymbol = '?' }} = this.store('main.networksMeta', this.props.chain.type, this.props.chain.id)
     const chainName = this.store('main.networks.ethereum', this.props.chain.id, 'name')
-    const { ether, fiat } = displayValueData(value, { currencyName: 'usd', currencyRate: nativeCurrency, isTestnet })
+    const { ether, fiat } = displayValueData(value, { currencyRate: nativeCurrency, isTestnet })
     
     return (
       <div className='_txMain' style={{ animationDelay: (0.1 * this.props.i) + 's' }}>
