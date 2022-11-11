@@ -2,7 +2,7 @@ import React from 'react'
 
 import link from '../../../../../../../resources/link'
 import EnsOverview from '../../Ens'
-import { DisplayValue } from '../../../../../../../resources/domain/transaction/displayValue'
+import { displayValueData } from '../../../../../../../resources/domain/transaction/displayValue'
 
 const isNonZeroHex = (hex) => !!hex && !['0x', '0x0'].includes(hex)
 
@@ -32,11 +32,10 @@ const TxDescription = ({ chain, children, chainColor }) => (
 )
 
 const SendOverview = ({ amountHex, decimals, symbol }) => {
-  const display = new DisplayValue(amountHex)
-  const { displayEther: displayAmount } = display.toEther(decimals)
+  const { ether } = displayValueData(amountHex, { decimals })
 
   return  (
-    <div>{`Send ${displayAmount} ${symbol}`}</div>
+    <div>{`Send ${ether.displayValue}${ether.displayUnit ? ether.displayUnit.shortName : ''} ${symbol}`}</div>
   )
 }
 

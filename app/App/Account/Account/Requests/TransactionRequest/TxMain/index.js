@@ -1,11 +1,12 @@
 import React from 'react'
 import Restore from 'react-restore'
+import { BigNumber } from 'bignumber.js'
 
 import link from '../../../../../../../resources/link'
 import svg from '../../../../../../../resources/svg'
 import { Cluster, ClusterRow, ClusterValue } from '../../../../../../../resources/Components/Cluster'
 import { getAddress } from '../../../../../../../resources/domain/transaction'
-import { DisplayValue } from '../../../../../../../resources/domain/transaction/displayValue'
+import { displayValueData } from '../../../../../../../resources/domain/transaction/displayValue'
 
 class TxSending extends React.Component {
   constructor (...args) {
@@ -23,8 +24,8 @@ class TxSending extends React.Component {
 
   render () {
     const req = this.props.req
-    const value = new DisplayValue(req.data.value || '0x')
-    if (value.bn.isZero()) {
+    const value = req.data.value || '0x'
+    if (BigNumber(value).isZero()) {
       return null
     }
 
@@ -33,8 +34,7 @@ class TxSending extends React.Component {
     const isTestnet = this.store('main.networks', this.props.chain.type, this.props.chain.id, 'isTestnet')
     const { nativeCurrency, nativeCurrency: { symbol: currentSymbol = '?' }} = this.store('main.networksMeta', this.props.chain.type, this.props.chain.id)
     const chainName = this.store('main.networks.ethereum', this.props.chain.id, 'name')
-    const { displayEther: displayValue } = value.toEther()
-    const { displayUSD } = value.toUSD(nativeCurrency, isTestnet)
+    const { ether, fiat } = displayValueData(value, { currencyName: 'usd', currencyRate: nativeCurrency, isTestnet })
     
     return (
       <div className='_txMain' style={{ animationDelay: (0.1 * this.props.i) + 's' }}>
@@ -47,13 +47,13 @@ class TxSending extends React.Component {
               <ClusterValue grow={2}>
                 <div className='txSendingValue'>
                   <span className='txSendingValueSymbol'>{currentSymbol}</span>
-                  <span className='txSendingValueAmount'>{displayValue}</span>
+                  <span className='txSendingValueAmount'>{`${ether.displayValue}${ether.displayUnit ? ether.displayUnit : ''}`}</span>
                 </div>
               </ClusterValue>
               <ClusterValue>
                 <span className='_txMainTransferringEq'>{'≈'}</span>
                 <span className='_txMainTransferringEqSymbol'>{'$'}</span>
-                <span className='_txMainTransferringEqAmount'>{displayUSD}</span>
+                <span className='_txMainTransferringEqAmount'>`${fiat.displayValue}${fiat.displayUnit ? fiat.displayUnit : ''}`</span>
               </ClusterValue>
             </ClusterRow>
 

@@ -5,7 +5,7 @@ import utils from 'web3-utils'
 import svg from '../../../../../../../resources/svg'
 import link from '../../../../../../../resources/link'
 import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../../../resources/Components/Cluster'
-import { DisplayValue } from '../../../../../../../resources/domain/transaction/displayValue'
+import { displayValueData } from '../../../../../../../resources/domain/transaction/displayValue'
 
 class TxSending extends React.Component {
   constructor (...args) {
@@ -36,13 +36,12 @@ class TxSending extends React.Component {
         const { amount, decimals, name, recipient: recipientAddress, symbol, recipientType, recipientEns } = action.data || {}
         const address = recipientAddress
         const ensName = recipientEns
-        const value = new DisplayValue(amount)
+        
         // const ensName = (recipientEns && recipientEns.length < 25) ? recipientEns : ''
 
         const isTestnet = this.store('main.networks', this.props.chain.type, this.props.chain.id, 'isTestnet')    
-        const rate = this.store('main.rates', contract)
-        const { displayEther: displayValue } = value.toEther(decimals)
-        const { displayUSD } = value.toUSD(rate, isTestnet)
+        const currencyRate = this.store('main.rates', contract)
+        const { ether, fiat } = displayValueData(amount, { decimals, currencyRate, currencyName: 'usd', isTestnet })
   
         return (
           <ClusterBox title={`Sending ${symbol}`} subtitle={name} animationSlot={this.props.i}>
@@ -51,13 +50,13 @@ class TxSending extends React.Component {
                 <ClusterValue grow={2}>
                   <div className='txSendingValue'>
                     <span className='txSendingValueSymbol'>{symbol}</span>
-                    <span className='txSendingValueAmount'>{displayValue}</span>
+                    <span className='txSendingValueAmount'>{`${ether.displayValue}${ether.displayUnit ? ether.displayUnit.shortName : ''}`}</span>
                   </div>
                 </ClusterValue>
                 <ClusterValue>
                   <span className='_txMainTransferringEq'>{'≈'}</span>
                   <span className='_txMainTransferringEqSymbol'>{'$'}</span>
-                  <span className='_txMainTransferringEqAmount'>{displayUSD}</span>
+                  <span className='_txMainTransferringEqAmount'>{`${fiat.displayValue}${fiat.displayUnit ? fiat.displayUnit.shortName : ''}`}</span>
                 </ClusterValue>
               </ClusterRow>
               {address && recipientType === 'contract' ? (
