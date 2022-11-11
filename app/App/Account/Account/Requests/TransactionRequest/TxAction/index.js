@@ -42,7 +42,7 @@ class TxSending extends React.Component {
         // const ensName = (recipientEns && recipientEns.length < 25) ? recipientEns : ''
 
         const isTestnet = this.store('main.networks', this.props.chain.type, this.props.chain.id, 'isTestnet')    
-        const currencyRate = this.store('main.rates', contract)
+        const rate = this.store('main.rates', contract)
   
         return (
           <ClusterBox title={`Sending ${symbol}`} subtitle={name} animationSlot={this.props.i}>
@@ -55,7 +55,7 @@ class TxSending extends React.Component {
                 </ClusterValue>
                 <ClusterValue>
                   <span className='_txMainTransferringEq'>{'≈'}</span>
-                  <DisplayValue type='fiat' value={amount} valueDataParams={{ currencyRate, isTestnet }} currencySymbol='$' />
+                  <DisplayValue type='fiat' value={amount} valueDataParams={{ currencyRate: rate && rate.usd, isTestnet }} currencySymbol='$' />
                 </ClusterValue>
               </ClusterRow>
               {address && recipientType === 'contract' ? (
@@ -101,26 +101,10 @@ class TxSending extends React.Component {
           </ClusterBox>
         )
       } else if (actionType === 'approve') {
-        const { amount, decimals, name, spender: recipientAddress, symbol, spenderType, spenderEns } = action.data || {}
+        const { amount, decimals, spender: recipientAddress, symbol, spenderEns } = action.data || {}
         const address = recipientAddress
         const ensName = spenderEns
-        const value = new BigNumber(amount) 
-        const displayValue = value.dividedBy('1e' + decimals).toFixed(6)
-        // const ensName = (recipientEns && recipientEns.length < 25) ? recipientEns : ''
-
-        const isTestnet = this.store('main.networks', this.props.chain.type, this.props.chain.id, 'isTestnet')    
-        const rate = this.store('main.rates', contract)
-        const rateUSD = rate && rate.usd && !isTestnet ? rate.usd.price : 0
-  
-        const destination = spenderType && <Destination chain={chainName} recipientType={spenderType} />
-        const recipient = recipientAddress && 
-          <Recipient
-            address={recipientAddress}
-            ens={spenderEns}
-            copyAddress={(copied) => link.send('tray:clipboardData', copied)}
-          />
-
-
+        const value = new BigNumber(amount)
         const revoke = value.eq(0)
         const displayAmount = isUnlimited(this.state.amount) ? 'unlimited' : formatDisplayInteger(amount, decimals)
 

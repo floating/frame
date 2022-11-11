@@ -1,6 +1,7 @@
 import React from 'react'
 import Restore from 'react-restore'
 
+import { DisplayValue } from '../../../../../../resources/Components/DisplayValue'
 import RingIcon from '../../../../../../resources/Components/RingIcon'
 
 import svg from '../../../../../../resources/svg'
@@ -65,7 +66,7 @@ class Balance extends React.Component {
             {name}
           </div>
           <div className='signerBalanceValue' style={(balance.displayBalance || '0').length >= 12 ? { fontSize: '15px', top: '10px' } : {}}>
-            <span 
+            {/* <span 
               className='signerBalanceSymbol'
             >
               {symbol.toUpperCase()}
@@ -74,7 +75,8 @@ class Balance extends React.Component {
               style={(balance.displayBalance || '0').length >= 12 ? { marginTop: '-3px' } : {}}
             >
               {balance.displayBalance}
-            </span>
+            </span> */}
+            <DisplayValue type='ether' value={balance.balance} valueDataParams={{ decimalsOverride: 6, decimals: balance.decimals }} currencySymbol={symbol.toUpperCase()} />
           </div>
           <div className='signerBalancePrice'>
             <div className='signerBalanceOk'>

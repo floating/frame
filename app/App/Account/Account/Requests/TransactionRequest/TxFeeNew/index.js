@@ -61,7 +61,7 @@ class TxFee extends React.Component {
     const maxFeePerGas = BigNumber(req.data[usesBaseFee(req.data) ? 'maxFeePerGas' : 'gasPrice'])
     const maxFee = displayValueData(
       maxFeePerGas.multipliedBy(maxGas), 
-      { decimalsOverride: 6, currencyRate: nativeCurrency, isTestnet }
+      { decimalsOverride: 6, currencyRate: nativeCurrency.usd, isTestnet }
     )
 
     // accounts for two potential 12.5% block fee increases
@@ -72,7 +72,7 @@ class TxFee extends React.Component {
     const minGas = maxGas.dividedBy(BigNumber(1.5))
     const minFee = displayValueData(
       minFeePerGas.multipliedBy(minGas), 
-      { currencyRate: nativeCurrency, isTestnet }
+      { currencyRate: nativeCurrency.usd, isTestnet }
     )
     
     return (

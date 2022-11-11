@@ -50,7 +50,7 @@ class TxSending extends React.Component {
               </ClusterValue>
               <ClusterValue>
                 <span className='_txMainTransferringEq'>{'≈'}</span>
-                <DisplayValue type='fiat' value={value} valueDataParams={{ currencyRate: nativeCurrency, isTestnet }} currencySymbol={currentSymbol} />
+                <DisplayValue type='fiat' value={value} valueDataParams={{ currencyRate: nativeCurrency.usd, isTestnet }} currencySymbol={currentSymbol} />
               </ClusterValue>
             </ClusterRow>
 
