@@ -5,7 +5,7 @@ import utils from 'web3-utils'
 import svg from '../../../../../../../resources/svg'
 import link from '../../../../../../../resources/link'
 import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../../../resources/Components/Cluster'
-import { displayValueData } from '../../../../../../../resources/domain/transaction/displayValue'
+import { displayValueData } from '../../../../../../../resources/utils/displayValue'
 
 import { formatDisplayInteger, isUnlimited } from '../../../../../../../resources/utils/numbers'
 

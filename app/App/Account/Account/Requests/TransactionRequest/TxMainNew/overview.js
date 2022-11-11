@@ -2,7 +2,7 @@ import React from 'react'
 
 import link from '../../../../../../../resources/link'
 import EnsOverview from '../../Ens'
-import { displayValueData } from '../../../../../../../resources/domain/transaction/displayValue'
+import { displayValueData } from '../../../../../../../resources/utils/displayValue'
 
 import svg from '../../../../../../../resources/svg'
 

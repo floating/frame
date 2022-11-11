@@ -3,7 +3,7 @@ import Restore from 'react-restore'
 import BigNumber from 'bignumber.js'
 
 import { GasFeesSource, usesBaseFee } from '../../../../../../../resources/domain/transaction'
-import { displayValueData } from '../../../../../../../resources/domain/transaction/displayValue'
+import { displayValueData } from '../../../../../../../resources/utils/displayValue'
 import link from '../../../../../../../resources/link'
 import { ClusterBox, Cluster, ClusterRow, ClusterColumn, ClusterValue } from '../../../../../../../resources/Components/Cluster'
 
