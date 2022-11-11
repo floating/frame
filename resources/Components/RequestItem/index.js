@@ -11,7 +11,7 @@ class _RequestItem extends React.Component {
     super(props, context)
     this.state = {
       ago: this.getElapsedTime() + ' ago',
-      show: false
+      show: Boolean(props.headerMode)
     }
   }
   getElapsedTime () {
@@ -30,9 +30,11 @@ class _RequestItem extends React.Component {
     this.timer = setInterval(() => {
       this.setState({ ago: this.getElapsedTime() + ' ago' })
     }, 1000)
-    setTimeout(() => {
-      this.setState({ show: true })
-    }, 500)
+    if (!this.props.headerMode) (
+      setTimeout(() => {
+        this.setState({ show: true })
+      }, 500)
+    )
   }
   componentWillUnmount () {
     clearInterval(this.timer)

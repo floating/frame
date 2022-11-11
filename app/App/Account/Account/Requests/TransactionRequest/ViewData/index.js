@@ -17,6 +17,20 @@ const txFieldPriority = [
   'maxPriorityFeePerGas'
 ]
 
+const displayJsonValue = (json, key) => {
+  if (json[key] && !json[key].startsWith('0x')) {
+    return json[key]
+  } else if (['chainId', 'nonce', 'gasLimit', 'gasPrice', 'maxFeePerGas', 'maxPriorityFeePerGas'].includes(key)) { // convert these keys to ints
+    try {
+      return parseInt(json[key], 16)
+    } catch (e) {
+      return json[key]
+    }
+  } else {
+    return json[key]
+  }
+}
+
 const SimpleTxJSON = ({ json, req }) => {
   return (
     <div className='simpleJson'>
@@ -33,7 +47,7 @@ const SimpleTxJSON = ({ json, req }) => {
             {typeof json[key] === 'object' ? (
               <SimpleJSON json={json[key]} key={key} />
             ) : (
-              json[key]
+              displayJsonValue(json, key)
             )}
             {key === 'nonce' ? (
               <div className='txNonceControl'>
@@ -164,10 +178,6 @@ class ViewData extends React.Component {
       <div className='txViewData '>
         {utils.toAscii(req.data.data || '0x') ? (
           <div className='transactionDataBodyInner'>
-            <div>
-              
-            </div>
-            
             <div className='txDataOverlayRaw'>
               <div className='txDataOverlayRawTitle'>{'Raw Transaction Data'}</div>
               <div className='txDataOverlayRawData' onClick={() => this.copyData(req.data.data)}>
