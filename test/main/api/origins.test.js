@@ -156,34 +156,41 @@ describe('#updateOrigin', () => {
 })
 
 describe('#isTrusted', () => {
-  const trustedExtensionMethods = ['wallet_getEthereumChains']
+  const frameTestOriginId = 'bf93061b-3575-40c5-b526-4932b02e1f3f'
 
-  trustedExtensionMethods.forEach((method) => {
-    it(`trusts all requests for ${method} from the frame extension`, async () => {
-      const payload = { method, _origin: 'bf93061b-3575-40c5-b526-4932b02e1f3f' }
+  beforeEach(() => {
+    store.set('main.origins', frameTestOriginId, { name: 'test.frame.eth' })
+  })
+
+  describe('extension requests', () => {
+    const trustedExtensionMethods = ['wallet_getEthereumChains']
+  
+    trustedExtensionMethods.forEach((method) => {
+      it(`trusts all requests for ${method} from the frame extension`, async () => {
+        const payload = { method, _origin: 'ac93061b-3575-40c5-b526-4932b02e1f3f' }
+        store.set('main.origins', payload._origin, { name: 'frame-extension' })
+    
+        return expect(isTrusted(payload)).resolves.toBe(true)
+      })
+    })
+  
+    it('does not trust requests from the frame extension by default', async () => {
+      const payload = { method: 'eth_accounts', _origin: 'ac93061b-3575-40c5-b526-4932b02e1f3f' }
       store.set('main.origins', payload._origin, { name: 'frame-extension' })
   
-      return expect(isTrusted(payload)).resolves.toBe(true)
+      return expect(isTrusted(payload)).resolves.toBe(false)
     })
   })
 
-  it('does not trust request from the frame extension by default', async () => {
-    const payload = { method: 'eth_accounts', _origin: 'bf93061b-3575-40c5-b526-4932b02e1f3f' }
-    store.set('main.origins', payload._origin, { name: 'frame-extension' })
-
-    return expect(isTrusted(payload)).resolves.toBe(false)
-  })
-
   it('does not trust any request with an invalid origin', async () => {
-    const payload = { _origin: 'bf93061b-3575-40c5-b526-4932b02e1f3f' }
+    const payload = { _origin: 'ac93061b-3575-40c5-b526-4932b02e1f3f' }
     store.set('main.origins', payload._origin, { name: '!nvalid origin' })
 
     return expect(isTrusted(payload)).resolves.toBe(false)
   })
 
   it('does not trust a request if no account is selected', async () => {
-    const payload = { _origin: 'bf93061b-3575-40c5-b526-4932b02e1f3f' }
-    store.set('main.origins', payload._origin, { name: 'test.frame.eth' })
+    const payload = { _origin: frameTestOriginId }
 
     accounts.current.mockReturnValueOnce(undefined)
 
@@ -192,11 +199,10 @@ describe('#isTrusted', () => {
 
   it('trusts an origin that has been previously granted permission', async () => {
     const address = '0xDAFEA492D9c6733ae3d56b7Ed1ADB60692c98Bc5'
-    const payload = { method: 'eth_accounts', _origin: 'bf93061b-3575-40c5-b526-4932b02e1f3f' }
+    const payload = { method: 'eth_accounts', _origin: frameTestOriginId }
     
     accounts.current.mockReturnValueOnce({ address })
 
-    store.set('main.origins', payload._origin, { name: 'test.frame.eth' })
     store.set('main.permissions', address, {
       'c004cc87-bfa3-50f5-812f-3d70dd8f82c6': {
         origin: 'test.frame.eth',
@@ -209,15 +215,15 @@ describe('#isTrusted', () => {
 
   it('sends a request to grant permission to the user', async () => {
     const address = '0xDAFEA492D9c6733ae3d56b7Ed1ADB60692c98Bc5'
-    const payload = { method: 'eth_accounts', _origin: 'bf93061b-3575-40c5-b526-4932b02e1f3f' }
+    const payload = { method: 'eth_accounts', _origin: frameTestOriginId }
     
     accounts.current.mockReturnValueOnce({ address })
 
     accounts.addRequest.mockImplementationOnce((request, cb) => {
       expect(request).toStrictEqual({
         type: 'access',
-        handlerId: 'bf93061b-3575-40c5-b526-4932b02e1f3f',
-        origin: 'bf93061b-3575-40c5-b526-4932b02e1f3f',
+        handlerId: frameTestOriginId,
+        origin: frameTestOriginId,
         account: address,
         payload: {
           method: 'eth_accounts'
@@ -227,31 +233,35 @@ describe('#isTrusted', () => {
       cb()
     })
 
-    store.set('main.origins', payload._origin, { name: 'test.frame.eth' })
-
     return expect(isTrusted(payload)).resolves
   })
 
-  it('grants permission after a request being accepted by the user', async () => {
-    const address = '0xDAFEA492D9c6733ae3d56b7Ed1ADB60692c98Bc5'
-    const payload = { method: 'eth_accounts', _origin: 'bf93061b-3575-40c5-b526-4932b02e1f3f' }
-    
-    accounts.current.mockReturnValueOnce({ address })
+  const userActions = [
+    { actionTaken: 'accepted', outcome: 'grants' },
+    { actionTaken: 'declined', outcome: 'refuses' }
+  ]
 
-    // simulate accepted request
-    accounts.addRequest.mockImplementationOnce((request, cb) => {
-      store.set('main.permissions', address, {
-        'c004cc87-bfa3-50f5-812f-3d70dd8f82c6': {
-          origin: 'test.frame.eth',
-          provider: true
-        }
+  userActions.forEach(({ actionTaken, outcome }) => {
+    it(`${outcome} permission after a request is ${actionTaken} by the user`, async () => {
+      const permissionGranted = actionTaken === 'grants'
+      const address = '0xDAFEA492D9c6733ae3d56b7Ed1ADB60692c98Bc5'
+      const payload = { method: 'eth_accounts', _origin: 'bf93061b-3575-40c5-b526-4932b02e1f3f' }
+      
+      accounts.current.mockReturnValueOnce({ address })
+  
+      // simulate accepted request
+      accounts.addRequest.mockImplementationOnce((request, cb) => {
+        store.set('main.permissions', address, {
+          'c004cc87-bfa3-50f5-812f-3d70dd8f82c6': {
+            origin: 'test.frame.eth',
+            provider: permissionGranted
+          }
+        })
+  
+        cb()
       })
-
-      cb()
+  
+      return expect(isTrusted(payload)).resolves.toBe(permissionGranted)
     })
-
-    store.set('main.origins', payload._origin, { name: 'test.frame.eth' })
-
-    return expect(isTrusted(payload)).resolves.toBe(true)
   })
 })
