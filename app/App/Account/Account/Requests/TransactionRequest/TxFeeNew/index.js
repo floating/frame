@@ -2,6 +2,7 @@ import React from 'react'
 import Restore from 'react-restore'
 import BigNumber from 'bignumber.js'
 
+import { DisplayValue } from '../../../../../../../resources/Components/DisplayValue'
 import { GasFeesSource, usesBaseFee } from '../../../../../../../resources/domain/transaction'
 import { displayValueData } from '../../../../../../../resources/utils/displayValue'
 import link from '../../../../../../../resources/link'
@@ -23,20 +24,19 @@ const GasDisplay = ({ maxFeePerGas }) => {
 }     
 
 const USDEstimateDisplay = ({ minFee, maxFee, nativeCurrency }) => {
-  const { fiat: minFeeFiat } = minFee
-  const { fiat: maxFeeFiat } = maxFee
-  const displayMaxFeeWarning = maxFeeFiat.value > FEE_WARNING_THRESHOLD_USD
+  const { fiat: { value: maxFeeValue, approximationSymbol: maxFeeApproximation } } = maxFee
+  const displayMaxFeeWarning = maxFeeValue > FEE_WARNING_THRESHOLD_USD
   
   return <div data-testid='usd-estimate-display' className='clusterTag'>
     <div className={`_txFeeValueDefault${displayMaxFeeWarning ? ' _txFeeValueDefaultWarn' : ''}`}>
       <span>{'≈'}</span>
-      {maxFeeFiat.approximationSymbol === '<' ? 
-      <span>{`$${maxFeeFiat.displayValue}${maxFeeFiat.displayUnit ? maxFeeFiat.displayUnit : ''}`}</span> : 
-      <>      
-        <span>{`$${minFeeFiat.displayValue}${minFeeFiat.displayUnit ? minFeeFiat.displayUnit : ''}`}</span>
-        <span>{'-'}</span>
-        <span>{`$${maxFeeFiat.displayValue}${maxFeeFiat.displayUnit ? maxFeeFiat.displayUnit : ''}`}</span>
-      </>
+      {maxFeeApproximation === '<' ? 
+        <DisplayValue type='fiat' valueData={maxFee} currencySymbol='$' /> : 
+        <>      
+          <DisplayValue type='fiat' valueData={minFee} currencySymbol='$' />
+          <span>{'-'}</span>
+          <DisplayValue type='fiat' valueData={maxFee} currencySymbol='$' />
+        </>
       }
       <span>{`in ${nativeCurrency.symbol}`}</span>
     </div>
@@ -61,7 +61,7 @@ class TxFee extends React.Component {
     const maxFeePerGas = BigNumber(req.data[usesBaseFee(req.data) ? 'maxFeePerGas' : 'gasPrice'])
     const maxFee = displayValueData(
       maxFeePerGas.multipliedBy(maxGas), 
-      { decimalsOverride: 6, currencyName: 'usd', currencyRate: nativeCurrency, isTestnet }
+      { decimalsOverride: 6, currencyRate: nativeCurrency, isTestnet }
     )
 
     // accounts for two potential 12.5% block fee increases
@@ -72,7 +72,7 @@ class TxFee extends React.Component {
     const minGas = maxGas.dividedBy(BigNumber(1.5))
     const minFee = displayValueData(
       minFeePerGas.multipliedBy(minGas), 
-      { currencyName: 'usd', currencyRate: nativeCurrency, isTestnet }
+      { currencyRate: nativeCurrency, isTestnet }
     )
     
     return (
