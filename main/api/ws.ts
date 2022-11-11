@@ -18,25 +18,19 @@ const subs: Record<string, Subscription> = {}
 const connectionMonitors: Record<string, NodeJS.Timeout> = {}
 
 interface Subscription {
-  originId: string,
+  originId: string
   socket: FrameWebSocket
 }
 
 interface FrameWebSocket extends WebSocket {
-  id: string,
-  origin?: string,
+  id: string
+  origin?: string
   isFrameExtension: boolean
 }
 
 interface ExtensionPayload extends JSONRPCRequestPayload {
-  __frameOrigin?: string,
+  __frameOrigin?: string
   __extensionConnecting?: boolean
-}
-
-const storeApi = {
-  getPermissions: (address: Address) => {
-    return store('main.permissions', address) as Record<string, Permission>
-  }
 }
 
 function extendSession (originId: string) {
