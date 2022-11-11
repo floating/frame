@@ -5,9 +5,9 @@ import utils from 'web3-utils'
 import svg from '../../../../../../../resources/svg'
 import link from '../../../../../../../resources/link'
 import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../../../resources/Components/Cluster'
-import { displayValueData } from '../../../../../../../resources/utils/displayValue'
 
 import { formatDisplayInteger, isUnlimited } from '../../../../../../../resources/utils/numbers'
+import { DisplayValue } from '../../../../../../../resources/Components/DisplayValue'
 
 class TxSending extends React.Component {
   constructor (...args) {
@@ -43,7 +43,6 @@ class TxSending extends React.Component {
 
         const isTestnet = this.store('main.networks', this.props.chain.type, this.props.chain.id, 'isTestnet')    
         const currencyRate = this.store('main.rates', contract)
-        const { ether, fiat } = displayValueData(amount, { decimals, currencyRate, isTestnet })
   
         return (
           <ClusterBox title={`Sending ${symbol}`} subtitle={name} animationSlot={this.props.i}>
@@ -51,14 +50,12 @@ class TxSending extends React.Component {
               <ClusterRow>
                 <ClusterValue grow={2}>
                   <div className='txSendingValue'>
-                    <span className='txSendingValueSymbol'>{symbol}</span>
-                    <span className='txSendingValueAmount'>{`${ether.displayValue}${ether.displayUnit ? ether.displayUnit.shortName : ''}`}</span>
+                    <DisplayValue type='ether' value={amount} valueDataParams={{ decimals }} currencySymbol={symbol} />
                   </div>
                 </ClusterValue>
                 <ClusterValue>
                   <span className='_txMainTransferringEq'>{'≈'}</span>
-                  <span className='_txMainTransferringEqSymbol'>{'$'}</span>
-                  <span className='_txMainTransferringEqAmount'>{`${fiat.displayValue}${fiat.displayUnit ? fiat.displayUnit.shortName : ''}`}</span>
+                  <DisplayValue type='fiat' value={amount} valueDataParams={{ currencyRate, isTestnet }} currencySymbol='$' />
                 </ClusterValue>
               </ClusterRow>
               {address && recipientType === 'contract' ? (

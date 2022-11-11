@@ -89,8 +89,7 @@ class TxFee extends React.Component {
             <ClusterColumn grow={2}>
               <ClusterValue>
                 <div className='txSendingValue'>
-                  <span className='txSendingValueSymbol'>{nativeCurrency.symbol}</span>
-                  <span className='txSendingValueAmount'>{`${maxFee.ether.displayValue}${maxFee.ether.displayUnit ? maxFee.ether.displayUnit.shortName : ''}`}</span>
+                  <DisplayValue type='ether' valueData={maxFee} currencySymbol={nativeCurrency.symbol} />
                 </div>
               </ClusterValue>
               <ClusterValue>

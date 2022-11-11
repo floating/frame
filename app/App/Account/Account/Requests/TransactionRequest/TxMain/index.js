@@ -6,7 +6,7 @@ import link from '../../../../../../../resources/link'
 import svg from '../../../../../../../resources/svg'
 import { Cluster, ClusterRow, ClusterValue } from '../../../../../../../resources/Components/Cluster'
 import { getAddress } from '../../../../../../../resources/domain/transaction'
-import { displayValueData } from '../../../../../../../resources/utils/displayValue'
+import { DisplayValue } from '../../../../../../../resources/Components/DisplayValue'
 
 class TxSending extends React.Component {
   constructor (...args) {
@@ -34,7 +34,6 @@ class TxSending extends React.Component {
     const isTestnet = this.store('main.networks', this.props.chain.type, this.props.chain.id, 'isTestnet')
     const { nativeCurrency, nativeCurrency: { symbol: currentSymbol = '?' }} = this.store('main.networksMeta', this.props.chain.type, this.props.chain.id)
     const chainName = this.store('main.networks.ethereum', this.props.chain.id, 'name')
-    const { ether, fiat } = displayValueData(value, { currencyRate: nativeCurrency, isTestnet })
     
     return (
       <div className='_txMain' style={{ animationDelay: (0.1 * this.props.i) + 's' }}>
@@ -46,14 +45,12 @@ class TxSending extends React.Component {
             <ClusterRow>
               <ClusterValue grow={2}>
                 <div className='txSendingValue'>
-                  <span className='txSendingValueSymbol'>{currentSymbol}</span>
-                  <span className='txSendingValueAmount'>{`${ether.displayValue}${ether.displayUnit ? ether.displayUnit : ''}`}</span>
+                  <DisplayValue type='ether' value={value} currencySymbol={currentSymbol} />
                 </div>
               </ClusterValue>
               <ClusterValue>
                 <span className='_txMainTransferringEq'>{'≈'}</span>
-                <span className='_txMainTransferringEqSymbol'>{'$'}</span>
-                <span className='_txMainTransferringEqAmount'>`${fiat.displayValue}${fiat.displayUnit ? fiat.displayUnit : ''}`</span>
+                <DisplayValue type='fiat' value={value} valueDataParams={{ currencyRate: nativeCurrency, isTestnet }} currencySymbol={currentSymbol} />
               </ClusterValue>
             </ClusterRow>
 

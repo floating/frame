@@ -2,11 +2,11 @@ import React from 'react'
 
 import link from '../../../../../../../resources/link'
 import EnsOverview from '../../Ens'
-import { displayValueData } from '../../../../../../../resources/utils/displayValue'
 
 import svg from '../../../../../../../resources/svg'
 
-import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../../../resources/Components/Cluster'
+import { Cluster, ClusterRow, ClusterValue } from '../../../../../../../resources/Components/Cluster'
+import { DisplayValue } from '../../../../../../../resources/Components/DisplayValue'
 
 const isNonZeroHex = (hex) => !!hex && !['0x', '0x0'].includes(hex)
 
@@ -44,10 +44,11 @@ const TxDescription = ({ chain, children, chainColor }) => (
 )
 
 const SendOverview = ({ amountHex, decimals, symbol }) => {
-  const { ether } = displayValueData(amountHex, { decimals })
-
   return  (
-    <div>{`Send ${ether.displayValue}${ether.displayUnit ? ether.displayUnit.shortName : ''} ${symbol}`}</div>
+    <div>
+      <span>{'Send'}</span>
+      <DisplayValue type='ether' value={amountHex} valueDataParams={{ decimals }} currencySymbol={symbol} currencySymbolPosition='last' />
+    </div>
   )
 }
 
