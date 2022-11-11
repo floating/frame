@@ -6,6 +6,9 @@ import svg from '../../../../../../resources/svg'
 import { findUnavailableSigners, isHardwareSigner } from '../../../../../../resources/domain/signer'
 import { accountPanelCrumb, signerPanelCrumb } from '../../../../../../resources/domain/nav'
 
+
+import { Cluster, ClusterRow, ClusterColumn, ClusterValue } from '../../../../../../resources/Components/Cluster'
+
 const isWatchOnly = (account = {}) => {
   return ['address'].includes(account.lastSignerType.toLowerCase())
 }
@@ -124,73 +127,82 @@ class Signer extends React.Component {
           <span style={{ position: 'relative', top: '2px' }}>{svg.sign(19)}</span>
           <span>{'Signer'}</span>
         </div>
-        <div className='moduleMainPermissions'>
-          <div className='moduleItemRow'>
-            <div 
-              className='moduleItem moduleItemSpace moduleItemButton' 
-              style={{ flex: 6 }}
-              onClick={() => {
-                const getUnavailableSigner = () => {
-                  const signers = Object.values(this.store('main.signers'))
-                  const unavailableSigners = findUnavailableSigners(activeAccount.lastSignerType, signers)
-
-                  return unavailableSigners.length === 1 && unavailableSigners[0]
-                }
-
-                const signer = activeSigner || getUnavailableSigner()
-
-                if (!signer) {
-                  this.setState({
-                    notifySuccess: false,
-                    notifyText: 'Signer Unavailable'
-                  })
-
-                  setTimeout(() => {
-                    this.setState({ notifySuccess: false, notifyText: '' })
-                  }, 5000)
-                }
-
-                const crumb = !!signer ? signerPanelCrumb(signer) : accountPanelCrumb()
-                link.send('tray:action', 'navDash', crumb)
-            }}>
-              {this.renderSignerType(activeAccount.lastSignerType)}
-              <div className='moduleItemSignerStatus'>
-                {svg.lock(14)}
-                <span>{status}</span>
-              </div>
-            </div>
-
-            {!watchOnly ? (
-              <div 
-                className='moduleItem moduleItemButton' 
-                onMouseDown={() => this.verifyAddress(hardwareSigner)}
-              >
-                {svg.doubleCheck(20)}
-              </div>
-            ) : null}
-          </div>
-          
-          {this.state.notifyText ? (
-            <div 
-              className={'moduleItem cardShow'}
-              style={{
-                color: this.state.notifySuccess ? 'var(--good)' : 'var(--bad)'
-              }}
-            >
-              {this.state.notifyText}
-            </div>
-          ) : null}
-          {account.smart ? (
-            <div className='moduleItem'>
-              <div>{account.smart.type} Account</div>
-              <div>DAO exists on this chain: ?</div>
-              <div>Agent Address: {account.address}</div>
-              <div>Acting Account: {account.smart.actor}</div>
-              <div>DAO Address: {account.smart.dao}</div>
-              <div>IPFS Gateway: {'https://ipfs.aragon.org'}</div>
-            </div>
-          ) : null}
-        </div>
+        <Cluster>
+          <ClusterRow>
+            <ClusterColumn>
+              <ClusterValue
+                onClick={() => {
+                  const getUnavailableSigner = () => {
+                    const signers = Object.values(this.store('main.signers'))
+                    const unavailableSigners = findUnavailableSigners(activeAccount.lastSignerType, signers)
+                    return unavailableSigners.length === 1 && unavailableSigners[0]
+                  }
+                  const signer = activeSigner || getUnavailableSigner()
+                  if (!signer) {
+                    this.setState({
+                      notifySuccess: false,
+                      notifyText: 'Signer Unavailable'
+                    })
+                    setTimeout(() => {
+                      this.setState({ notifySuccess: false, notifyText: '' })
+                    }, 5000)
+                  }
+                  const crumb = !!signer ? signerPanelCrumb(signer) : accountPanelCrumb()
+                  link.send('tray:action', 'navDash', crumb)
+              }}>
+                <div 
+                  style={{
+                    padding: '20px'
+                  }}
+                >
+                  {this.renderSignerType(activeAccount.lastSignerType)}
+                </div>
+              </ClusterValue>
+              <ClusterValue>
+                <div className='clusterTag' style={{ marginLeft: '10px', padding: '20px' }}>
+                  {status}
+                </div>
+              </ClusterValue>
+            </ClusterColumn>
+            <ClusterColumn width={'80px'}>
+              {!watchOnly && (            
+                <ClusterValue
+                  onClick={() => this.verifyAddress(hardwareSigner)}
+                >
+                  {svg.doubleCheck(20)}
+                </ClusterValue>
+              )}
+            </ClusterColumn>
+          </ClusterRow>
+          {this.state.notifyText && (
+            <ClusterRow>
+              <ClusterValue>
+                <div
+                  className='clusterTag'
+                  style={{
+                    color: this.state.notifySuccess ? 'var(--good)' : 'var(--bad)'
+                  }}
+                >
+                  {this.state.notifyText}
+                </div>
+              </ClusterValue>
+            </ClusterRow>
+          )}
+          {account.smart && (
+            <ClusterRow>
+               <ClusterValue>
+                <div className='clusterTag'>
+                  <div>{account.smart.type} Account</div>
+                  <div>DAO exists on this chain: ?</div>
+                  <div>Agent Address: {account.address}</div>
+                  <div>Acting Account: {account.smart.actor}</div>
+                  <div>DAO Address: {account.smart.dao}</div>
+                  <div>IPFS Gateway: {'https://ipfs.aragon.org'}</div>
+                </div>
+              </ClusterValue>
+            </ClusterRow>
+          )}
+        </Cluster>
       </div>
     )
   }
