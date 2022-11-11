@@ -1,5 +1,5 @@
 import { BigNumber } from 'bignumber.js'
-import { displayValueData } from '../../../../resources/utils/displayValue'
+import { displayValueData } from '../../../resources/utils/displayValue'
 
 describe('wei', () => {
   it('should return a wei value', () => {
@@ -22,7 +22,7 @@ describe('gwei', () => {
 
 describe('fiat currency', () => {
   it('should return zero when no currency rate is provided', () => {
-    const value = displayValueData(356e24, { currencyName: 'usd' })
+    const value = displayValueData(356e24)
     expect(value.fiat).toStrictEqual({
       approximationSymbol: '<',
       displayValue: '0.01', 
@@ -31,7 +31,7 @@ describe('fiat currency', () => {
   })
 
   it('should return "testnet zero" when isTestnet is true', () => {
-    const value = displayValueData(356e24, { currencyName: 'usd', currencyRate: { usd: { price: BigNumber(1.3) }}, isTestnet: true })
+    const value = displayValueData(356e24, { currencyRate: { price: BigNumber(1.3) }, isTestnet: true })
     expect(value.fiat).toStrictEqual({
       displayValue: '?',
       value: BigNumber(0)
@@ -39,7 +39,7 @@ describe('fiat currency', () => {
   })
 
   it('should return a value of thousands', () => {
-    const value = displayValueData(356e20, { currencyName: 'usd', currencyRate: { usd: { price: BigNumber(1) }}})
+    const value = displayValueData(356e20, { currencyRate: { price: BigNumber(1) }})
     expect(value.fiat).toStrictEqual({
       displayUnit: {
         fullName: 'thousand',
@@ -51,7 +51,7 @@ describe('fiat currency', () => {
   })
 
   it('should return a value of millions', () => {
-    const value = displayValueData(356e23, { currencyName: 'usd', currencyRate: { usd: { price: BigNumber(1) }}})
+    const value = displayValueData(356e23, { currencyRate: { price: BigNumber(1) }})
     expect(value.fiat).toStrictEqual({
       displayUnit: {
         fullName: 'million',
@@ -63,7 +63,7 @@ describe('fiat currency', () => {
   })
 
   it('should return a value of billions', () => {
-    const value = displayValueData(356e26, { currencyName: 'usd', currencyRate: { usd: { price: BigNumber(1) }}})
+    const value = displayValueData(356e26, { currencyRate: { price: BigNumber(1) }})
     expect(value.fiat).toStrictEqual({
       displayUnit: {
         fullName: 'billion',
@@ -75,7 +75,7 @@ describe('fiat currency', () => {
   })
 
   it('should return a value of trillions', () => {
-    const value = displayValueData(356e29, { currencyName: 'usd', currencyRate: { usd: { price: BigNumber(1) }}})
+    const value = displayValueData(356e29, { currencyRate: { price: BigNumber(1) }})
     expect(value.fiat).toStrictEqual({
       displayUnit: {
         fullName: 'trillion',
@@ -87,7 +87,7 @@ describe('fiat currency', () => {
   })
 
   it('should return a value of quadrillions', () => {
-    const value = displayValueData(356e32, { currencyName: 'usd', currencyRate: { usd: { price: BigNumber(1) }}})
+    const value = displayValueData(356e32, { currencyRate: { price: BigNumber(1) }})
     expect(value.fiat).toStrictEqual({
       displayUnit: {
         fullName: 'quadrillion',

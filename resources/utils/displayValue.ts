@@ -50,7 +50,6 @@ function getDisplayValue (bn: BigNumber) {
 }
 
 type DisplayValueDataParams = { 
-  currencyName?: string, 
   currencyRate?: Rate, 
   decimals: number, 
   decimalsOverride?: number, 
@@ -65,37 +64,37 @@ type Currency = {
 
 type SourceValue = string | number | BigNumber
 
-export function displayValueData (value: SourceValue, params: DisplayValueDataParams) {
-  const { currencyName, currencyRate, decimals = 18, decimalsOverride, isTestnet = false } = params || {} as DisplayValueDataParams
-  const bn = BigNumber(value, isHexString(value) ? 16 : undefined)
+export function displayValueData (sourceValue: SourceValue, params: DisplayValueDataParams) {
+  const { currencyRate, decimals = 18, decimalsOverride, isTestnet = false } = params || {} as DisplayValueDataParams
+  const bn = BigNumber(sourceValue, isHexString(sourceValue) ? 16 : undefined)
   const currency: { [K: string]: Currency } = {}
 
-  if (currencyName) {
-    const nativeCurrency = BigNumber(isTestnet || !currencyRate ? 0 : currencyRate[currencyName as keyof typeof currencyRate].price)
+  const getFiatCurrency = (): Currency => {  
+    const nativeCurrency = BigNumber(isTestnet || !currencyRate ? 0 : currencyRate.price)
     const value = bn.shiftedBy(-18).multipliedBy(nativeCurrency).decimalPlaces(2, BigNumber.ROUND_FLOOR)
-    const getFiatCurrency = (): Currency => {
-      if (isTestnet) {
-        return {
-          value, 
-          displayValue: '?'
-        }
-      }
-      if (value.isZero()) {
-        return {
-          value,
-          approximationSymbol: '<',
-          displayValue: '0.01'
-        }
-      }  
     
+    if (isTestnet) {
       return {
-        value,
-        ...getDisplayValue(value)
+        value, 
+        displayValue: '?'
       }
     }
 
-    currency.fiat = getFiatCurrency()
+    if (value.isZero()) {
+      return {
+        value,
+        approximationSymbol: '<',
+        displayValue: '0.01'
+      }
+    }  
+  
+    return {
+      value,
+      ...getDisplayValue(value)
+    }
   }
+
+  currency.fiat = getFiatCurrency()
 
   const getEtherCurrency = () => {
     const value = bn.shiftedBy(-decimals).decimalPlaces(decimalsOverride || decimals, BigNumber.ROUND_FLOOR)
