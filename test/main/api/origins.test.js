@@ -249,7 +249,7 @@ describe('#isTrusted', () => {
       
       accounts.current.mockReturnValueOnce({ address })
   
-      // simulate accepted request
+      // simulate user acting on request
       accounts.addRequest.mockImplementationOnce((request, cb) => {
         store.set('main.permissions', address, {
           'c004cc87-bfa3-50f5-812f-3d70dd8f82c6': {
