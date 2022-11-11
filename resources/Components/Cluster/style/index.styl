@@ -24,7 +24,6 @@
       justify-content center
       align-items center
       border-radius 12px
-      background var(--ghostA)
       margin-right 3px
       font-size 14px
       display flex
@@ -32,7 +31,7 @@
       align-items center
       border-radius 8px
       -webkit-app-region no-drag
-      transition none
+      transition all linear 0.1s
       transform translate3d(0, 0, 0)
       font-family 'MainFont'
       background var(--ghostA)
@@ -49,8 +48,17 @@
       *
         pointer-events none
 
+      .clusterInputLabel
+        position absolute
+        top 0
+        left 0
+        right 0
+        width 60px
+        display flex
+        justify-content center
+        align-items center
+
     .clusterValueClickable
-      transition all linear 0.1s
       cursor pointer
       margin-bottom 0px
       position relative
@@ -72,6 +80,11 @@
       background var(--ghostB)
       transform translateY(0px)
       box-shadow 0px 2px 4px var(--ghostX)
+
+    .clusterValueTransparent
+      background transparent
+      box-shadow none
+      border-bottom 2px solid transparent
 
   .clusterRow:first-child
     .clusterValue
@@ -117,6 +130,19 @@
   font-size 11px
   font-weight 500
   padding 8px
+  text-align center
+
+.clusterFocus
+  text-transform uppercase
+  font-size 13px
+  line-height 20px
+  font-weight 500
+  padding 16px 8px
+  text-align center
+
+  .clusterFocusHighlight
+    font-size 16px
+    color var(--good)
 
 .clusterAddress
   padding 12px

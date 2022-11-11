@@ -5,7 +5,7 @@ import BigNumber from 'bignumber.js'
 import link from '../../../../../../resources/link'
 import svg from '../../../../../../resources/svg'
 import { isNetworkConnected } from '../../../../../../resources/utils/chains'
-import { NATIVE_CURRENCY } from '../../../../../../resources/utils/constants'
+import { NATIVE_CURRENCY } from '../../../../../../resources/constants'
 
 import Balance from '../Balance'
 import { formatUsdRate, balance } from '../helpers'

@@ -33,14 +33,14 @@ class _Footer extends React.Component {
       if (req) {
         if (req.type === 'transaction' && crumb.data.step === 'confirm') {
           return (
-            <div className='footerModule'>
+            <div className='footerModule' style={{ height: '200px' }}>
               <RequestCommand req={req} signingDelay={isHardwareSigner(account.lastSignerType) ? 0 : 2000} />
             </div>
           )
         } else if (req.type === 'access') {
           return (
             <div className='footerModule'>
-              <div className='requestApprove'>
+              <div className='requestApprove requestApproveSimple'>
                 <div 
                   className='requestDecline' 
                   style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none'}}
