@@ -110,7 +110,7 @@ interface Balance {
 }
 
 interface Rate {
-  usd: {
+  [K: string]: {
     price: BigNumber,
     change24hr: BigNumber
   }
