@@ -136,7 +136,7 @@ class AddAddress extends React.Component {
                   :
                   <>
                    <div className='addAccountItemOptionTitle'>{'account added successfully'}</div>
-                   <div className='addAccountItemOptionSubmit' onClick={() => link.send('tray:action', 'navBack', 'dash', 2)}>back</div>
+                   <div className='addAccountItemOptionSubmit' onClick={() => link.send('nav:back', 'dash', 2)}>back</div>
                   </>}
                 </div>
               </div>
