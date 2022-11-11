@@ -56,14 +56,17 @@ type DisplayValueDataParams = {
   decimalsOverride?: number, 
   isTestnet: boolean 
 }
+
 type Currency = { 
   value: BigNumber, 
   displayValue: string, 
   approximationSymbol?: string 
 }
 
-export function displayValueData (value: string | number | BigNumber, params = {}) {
-  const { currencyName, currencyRate, decimals = 18, decimalsOverride, isTestnet = false } = params as DisplayValueDataParams
+type SourceValue = string | number | BigNumber
+
+export function displayValueData (value: SourceValue, params: DisplayValueDataParams) {
+  const { currencyName, currencyRate, decimals = 18, decimalsOverride, isTestnet = false } = params || {} as DisplayValueDataParams
   const bn = BigNumber(value, isHexString(value) ? 16 : undefined)
   const currency: { [K: string]: Currency } = {}
 
