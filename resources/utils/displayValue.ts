@@ -5,7 +5,7 @@ const displayUnitMapping = {
   thousand: {
     lowerBound: BigNumber(999),
     upperBound: BigNumber(999999),
-    unitDisplay: 'k'
+    unitDisplay: 'K'
   },
   million: {
     lowerBound: BigNumber(999999),
@@ -15,17 +15,17 @@ const displayUnitMapping = {
   billion: {
     lowerBound: BigNumber(999999999),
     upperBound: BigNumber(999999999999),
-    unitDisplay: 'Bn'
+    unitDisplay: 'B'
   },
   trillion: {
     lowerBound: BigNumber(999999999999),
     upperBound: BigNumber(999999999999999),
-    unitDisplay: 'Tn'
+    unitDisplay: 'T'
   },
   quadrillion: {
     lowerBound: BigNumber(999999999999999),
     upperBound: BigNumber(Infinity),
-    unitDisplay: 'Qn'
+    unitDisplay: 'Q'
   }
 }
 

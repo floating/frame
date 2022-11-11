@@ -43,7 +43,7 @@ describe('fiat currency', () => {
     expect(value.fiat).toStrictEqual({
       displayUnit: {
         fullName: 'thousand',
-        shortName: 'k',
+        shortName: 'K',
       },
       displayValue: '35.6',
       value: BigNumber(35600)
@@ -67,7 +67,7 @@ describe('fiat currency', () => {
     expect(value.fiat).toStrictEqual({
       displayUnit: {
         fullName: 'billion',
-        shortName: 'Bn',
+        shortName: 'B',
       },
       displayValue: '35.6',
       value: BigNumber(35600000000)
@@ -79,7 +79,7 @@ describe('fiat currency', () => {
     expect(value.fiat).toStrictEqual({
       displayUnit: {
         fullName: 'trillion',
-        shortName: 'Tn',
+        shortName: 'T',
       },
       displayValue: '35.6',
       value: BigNumber(35600000000000)
@@ -91,7 +91,7 @@ describe('fiat currency', () => {
     expect(value.fiat).toStrictEqual({
       displayUnit: {
         fullName: 'quadrillion',
-        shortName: 'Qn',
+        shortName: 'Q',
       },
       displayValue: '35.6',
       value: BigNumber(35600000000000000)
@@ -114,7 +114,7 @@ describe('ether currency', () => {
     expect(value.ether).toStrictEqual({
       displayUnit: {
         fullName: 'thousand',
-        shortName: 'k',
+        shortName: 'K',
       },
       displayValue: '35.6',
       value: BigNumber(35600)
@@ -138,7 +138,7 @@ describe('ether currency', () => {
     expect(value.ether).toStrictEqual({
       displayUnit: {
         fullName: 'billion',
-        shortName: 'Bn',
+        shortName: 'B',
       },
       displayValue: '35.6',
       value: BigNumber(35600000000)
@@ -150,7 +150,7 @@ describe('ether currency', () => {
     expect(value.ether).toStrictEqual({
       displayUnit: {
         fullName: 'trillion',
-        shortName: 'Tn',
+        shortName: 'T',
       },
       displayValue: '35.6',
       value: BigNumber(35600000000000)
@@ -162,7 +162,7 @@ describe('ether currency', () => {
     expect(value.ether).toStrictEqual({
       displayUnit: {
         fullName: 'quadrillion',
-        shortName: 'Qn',
+        shortName: 'Q',
       },
       displayValue: '35.6',
       value: BigNumber(35600000000000000)
