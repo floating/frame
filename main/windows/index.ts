@@ -104,6 +104,12 @@ const detectMouse = () => {
   }, 50)
 }
 
+function logPid (name: string) {
+  windows[name].webContents.once('did-finish-load', () => {
+    log.info(`created ${name} renderer process, pid: ${windows[name].webContents.getOSProcessId()}`)
+  })
+}
+
 function initDashWindow () {
   windows.dash = new BrowserWindow({
     width: trayWidth,
@@ -121,6 +127,8 @@ function initDashWindow () {
       backgroundThrottling: false // Allows repaint when window is hidden
     }
   })
+
+  logPid('dash')
 
   const dashUrl = new URL(path.join(process.env.BUNDLE_LOCATION, 'dash.html'), 'file:')
   windows.dash.loadURL(dashUrl.toString())
@@ -153,6 +161,9 @@ function initTrayWindow () {
   windows.tray.webContents.on('will-attach-webview', e => e.preventDefault()) // Prevent attaching <webview>
   windows.tray.webContents.setWindowOpenHandler(() => ({ action: 'deny' })) // Prevent new windows
   windows.tray.webContents.session.setPermissionRequestHandler((webContents, permission, res) => res(false))
+
+  logPid('tray')
+
   windows.tray.setResizable(false)
   windows.tray.setMovable(false)
   windows.tray.setSize(0, 0)
