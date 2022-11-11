@@ -1,7 +1,6 @@
 import { v5 as uuidv5 } from 'uuid'
 import { IncomingMessage } from 'http'
 import queryString from 'query-string'
-import log from 'electron-log'
 
 import accounts, { AccessRequest } from '../accounts'
 import store from '../store'
@@ -20,9 +19,9 @@ const trustedExtensionMethods = [
 ]
 
 const storeApi = {
-  getPermissions: (address: Address) => {
+  getPermission: (address: Address, origin: string) => {
     const permissions: Record<string, Permission> = store('main.permissions', address) || {}
-    return Object.values(permissions)
+    return Object.values(permissions).find(p => p.origin === origin)
   }
 }
 
@@ -36,10 +35,6 @@ function invalidOrigin (origin: string) {
   return origin !== origin.replace(/[^0-9a-z/:.[\]-]/gi, '')
 }
 
-function getExistingPermission (address: Address, originName: string) {
-  return storeApi.getPermissions(address).find(p => p.origin === originName)
-}
-
 function addPermissionRequest (address: Address, fullPayload: RPCRequestPayload) {
   const { _origin: originId, ...payload } = fullPayload
 
@@ -48,7 +43,7 @@ function addPermissionRequest (address: Address, fullPayload: RPCRequestPayload)
 
     accounts.addRequest(request, () => {
       const { name: originName } = store('main.origins', originId)
-      const permission = getExistingPermission(address, originName)
+      const permission = storeApi.getPermission(address, originName)
 
       resolve(permission)
     })
@@ -123,7 +118,7 @@ export async function isTrusted (payload: RPCRequestPayload) {
   }
 
   const { address } = currentAccount
-  const permission = getExistingPermission(address, originName) || await addPermissionRequest(address, payload)
+  const permission = storeApi.getPermission(address, originName) || await addPermissionRequest(address, payload)
 
   return !!permission?.provider
 }
