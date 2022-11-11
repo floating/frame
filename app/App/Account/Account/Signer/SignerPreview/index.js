@@ -159,7 +159,7 @@ class Signer extends React.Component {
                 </div>
               </ClusterValue>
               <ClusterValue>
-                <div className='clusterTag' style={{ marginLeft: '10px', padding: '20px' }}>
+                <div className='clusterTag' style={{ marginLeft: '10px', padding: '12px' }}>
                   {status}
                 </div>
               </ClusterValue>
