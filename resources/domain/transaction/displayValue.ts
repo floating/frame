@@ -101,7 +101,7 @@ export function displayValueData (value: string | number | BigNumber, params = {
       return {
         value,
         approximationSymbol: '<',
-        displayValue: BigNumber(`1e-${decimals}`).toFormat()
+        displayValue: BigNumber(`1e-${decimalsOverride}`).toFormat()
       }
     }
 
