@@ -47,8 +47,8 @@ interface Origin {
 }
 
 interface Permission {
-  origin: string,
-  provider: boolean, // whether or not to grant access
+  origin: string
+  provider: boolean // whether or not to grant access
   handlerId?: string
 }
 
