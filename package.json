@@ -2,7 +2,6 @@
   "name": "frame-canary",
   "version": "0.5.0-canary.9",
   "description": "System-wide web3",
-  "main": "compiled/main",
   "scripts": {
     "clean": "npx rimraf dist bundle compiled .cache node_modules",
     "setup:full": "npm run clean && npm cache clean --force && npm install --cache /tmp/empty-cache --ignore-scripts && allow-scripts && npm audit fix",
@@ -51,7 +50,6 @@
     "test:unit:components": "npm run test:exec -- --env=jsdom --testTimeout=500 ./test/app",
     "test:e2e": "npm run test:exec -- --env=node --config ./jest.e2e.config.json ./test/e2e",
     "test:usbAdapters": "ELECTRON_RUN_AS_NODE=true ./node_modules/.bin/electron ./node_modules/jest/bin/jest.js ./test/main/signers/ledger/adapter.test.js --testPathIgnorePatterns=''",
-    "standard": "standardx --fix --verbose",
     "local:rpc": "ganache-cli --account=\"0x2d6945dbddb8dcf5492004e6f720f8e971196ff61a61c4be99714ebc71e06c00,  5000000000000000000000\" --account=\"0xaef6a68a47c1628081e4e6df195f5f712ae4eb7da332a6d74dca06ae32a3e7ae,5000\""
   },
   "author": {
@@ -77,7 +75,6 @@
     "@sushiswap/default-token-list": "34.3.1",
     "abi-codec": "0.0.9",
     "auto-launch": "5.0.5",
-    "babel-polyfill": "6.26.0",
     "bip39": "3.0.4",
     "cheerio": "1.0.0-rc.12",
     "conf": "10.2.0",
@@ -112,19 +109,6 @@
     "zxcvbn": "4.4.2"
   },
   "devDependencies": {
-    "@babel/core": "7.19.3",
-    "@babel/node": "7.19.1",
-    "@babel/plugin-proposal-decorators": "7.19.3",
-    "@babel/plugin-proposal-do-expressions": "7.18.6",
-    "@babel/plugin-proposal-export-default-from": "7.18.10",
-    "@babel/plugin-proposal-function-bind": "7.18.9",
-    "@babel/plugin-proposal-function-sent": "7.18.6",
-    "@babel/plugin-proposal-pipeline-operator": "7.18.9",
-    "@babel/plugin-proposal-throw-expressions": "7.18.6",
-    "@babel/plugin-syntax-import-meta": "7.10.4",
-    "@babel/preset-env": "7.19.3",
-    "@babel/preset-react": "7.18.6",
-    "@babel/preset-typescript": "7.18.6",
     "@lavamoat/allow-scripts": "2.0.3",
     "@lavamoat/preinstall-always-fail": "1.0.0",
     "@ledgerhq/hw-transport-mocker": "6.27.5",
@@ -148,7 +132,6 @@
     "@types/uuid": "8.3.4",
     "@types/ws": "8.5.3",
     "assert": "^2.0.0",
-    "babel-eslint": "10.1.0",
     "electron": "20.3.0",
     "electron-builder": "23.3.3",
     "electron-notarize": "1.2.1",
@@ -168,7 +151,6 @@
     "querystring-es3": "^0.2.1",
     "rimraf": "3.0.2",
     "shx": "0.3.4",
-    "standardx": "7.0.0",
     "stream-browserify": "^3.0.0",
     "stylus": "0.59.0",
     "ts-jest": "29.0.3",
@@ -177,26 +159,12 @@
   "engines": {
     "electron": "20"
   },
-  "standardx": {
-    "parser": "babel-eslint",
-    "env": [
-      "jest"
-    ]
-  },
-  "eslintConfig": {
-    "rules": {
-      "multiline-ternary": 0,
-      "react/no-direct-mutation-state": 0,
-      "react/no-find-dom-node": 0
-    }
-  },
   "bridge": "./bundle/bridge.js",
   "inject": "./bundle/inject.js",
   "tray": "./bundle/tray.html",
   "dash": "./bundle/dash.html",
   "dapp": "./bundle/dapp.html",
   "targets": {
-    "main": false,
     "bridge": {
       "context": "electron-renderer"
     },
@@ -228,13 +196,10 @@
       "@aragon/wrapper>web3>web3-bzz": true,
       "@aragon/wrapper>web3>web3-core>web3-core-requestmanager>web3-providers-ws>websocket>es5-ext": true,
       "@aragon/wrapper>web3>web3-shh": true,
-      "@babel/node>core-js": true,
       "@lavamoat/preinstall-always-fail": false,
       "@ledgerhq/hw-transport-node-hid-noevents>node-hid": false,
       "@ledgerhq/hw-transport-node-hid-singleton>node-hid": false,
       "@ledgerhq/hw-transport-node-hid-singleton>usb": false,
-      "babel-polyfill>babel-runtime>core-js": true,
-      "babel-polyfill>core-js": true,
       "electron": true,
       "ethereum-waffle>@ethereum-waffle/provider>ganache-core>ethereumjs-util>ethereum-cryptography>secp256k1": false,
       "ethereum-waffle>@ethereum-waffle/provider>ganache-core>ethereumjs-vm>core-js-pure": false,
@@ -257,6 +222,7 @@
       "parcel>@parcel/fs>@parcel/types>@parcel/fs>@parcel/watcher": true,
       "parcel>@parcel/fs>@parcel/watcher": true,
       "parcel>@parcel/package-manager>@parcel/fs>@parcel/watcher": true,
+      "react-restore>babel-core>babel-runtime>core-js": true,
       "react-restore>babel-core>babel-register>core-js": true,
       "trezor-connect>@trezor/transport>protobufjs": false,
       "trezor-connect>@trezor/utxo-lib>blake-hash": false,
