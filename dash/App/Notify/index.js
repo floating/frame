@@ -4,7 +4,7 @@ import svg from '../../../resources/svg'
 import link from '../../../resources/link'
 
 import BigNumber from 'bignumber.js'
-import { usesBaseFee } from '../../../main/transaction'
+import { usesBaseFee } from '../../../resources/domain/transaction'
 
 import Confirm from '../../../resources/Components/Confirm'
 import AddToken from './AddToken'
