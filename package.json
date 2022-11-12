@@ -11,20 +11,20 @@
     "setup": "npm install --ignore-scripts && npm run install:scripts",
     "install:scripts": "allow-scripts",
     "start": "npm run launch",
-    "bundle": "npm run bundle:bridge && npm run bundle:tray && npm run bundle:dash  && npm run bundle:dapp && npm run bundle:dapp:inject",
-    "bundle:bridge": "parcel build resources/bridge/index.js --public-url . -d bundle -o bridge.js --target electron",
-    "bundle:tray": "parcel build app/tray.html --public-url . -d bundle --target browser",
-    "bundle:flow": "parcel build flow/flow.html --public-url . -d bundle --target browser",
-    "bundle:dash": "parcel build dash/dash.html --public-url . -d bundle --target browser",
-    "bundle:dapp": "parcel build dapp/dapp.html --public-url . -d bundle --target browser",
-    "bundle:dapp:inject": "parcel build main/dapps/server/inject/index.js --public-url . -d bundle -o inject.js --target browser",
+    "bundle": "npm run bundle:bridge && npm run bundle:tray && npm run bundle:dash && npm run bundle:dapp && npm run bundle:dapp:inject",
+    "bundle:bridge": "parcel build resources/bridge/index.js --target bridge --public-url .",
+    "bundle:tray": "parcel build app/tray.html --target tray --public-url .",
+    "bundle:flow": "parcel build flow/flow.html --target flow --public-url .",
+    "bundle:dash": "parcel build dash/dash.html --target dash --public-url .",
+    "bundle:dapp": "parcel build dapp/dapp.html --target dapp --public-url .",
+    "bundle:dapp:inject": "parcel build main/dapps/server/inject/index.js --target inject --public-url .",
     "watch": "npm run watch:compile & npm run watch:tray & npm run watch:dash & npm run watch:dapp & npm run watch:bridge & npm run watch:dapp:inject",
-    "watch:bridge": "parcel watch resources/bridge/index.js --public-url . -d bundle -o bridge.js --target electron --no-hmr",
-    "watch:tray": "parcel watch app/tray.html --public-url . -d bundle --target browser --no-hmr",
-    "watch:flow": "parcel watch flow/flow.html --public-url . -d bundle --target browser --no-hmr",
-    "watch:dash": "parcel watch dash/dash.html --public-url . -d bundle --target browser --no-hmr",
-    "watch:dapp": "parcel watch dapp/dapp.html --public-url . -d bundle --target browser --no-hmr",
-    "watch:dapp:inject": "parcel watch main/dapps/server/inject/index.js --public-url . -d bundle -o inject.js --target browser",
+    "watch:bridge": "parcel watch resources/bridge/index.js --target bridge --public-url . --no-hmr",
+    "watch:tray": "parcel watch app/tray.html --target browser --public-url . --no-hmr",
+    "watch:flow": "parcel watch flow/flow.html --target browser --public-url . --no-hmr",
+    "watch:dash": "parcel watch dash/dash.html --target browser --public-url . --no-hmr",
+    "watch:dapp": "parcel watch dapp/dapp.html --target browser --public-url . --no-hmr",
+    "watch:dapp:inject": "parcel watch main/dapps/server/inject/index.js --target browser --public-url .",
     "dev": "npm run compile && npm run bundle && npm run launch:dev",
     "inspect": "npm run bundle && npm run launch:inspect",
     "launch": "cross-env NODE_ENV=production electron ./compiled/main",
@@ -130,6 +130,10 @@
     "@ledgerhq/hw-transport-mocker": "6.27.5",
     "@nomiclabs/hardhat-ethers": "^2.1.1",
     "@nomiclabs/hardhat-waffle": "2.0.3",
+    "@parcel/config-default": "^2.8.0",
+    "@parcel/transformer-css": "^2.8.0",
+    "@parcel/transformer-stylus": "^2.8.0",
+    "@parcel/transformer-typescript-tsc": "^2.8.0",
     "@sentry/types": "7.14.0",
     "@testing-library/dom": "8.18.1",
     "@testing-library/react": "13.4.0",
@@ -143,6 +147,7 @@
     "@types/node-hid": "1.3.1",
     "@types/uuid": "8.3.4",
     "@types/ws": "8.5.3",
+    "assert": "^2.0.0",
     "babel-eslint": "10.1.0",
     "electron": "20.3.0",
     "electron-builder": "23.3.3",
@@ -157,14 +162,20 @@
     "node-abi": "3.25.0",
     "node-gyp": "9.1.0",
     "node-watch": "0.7.3",
-    "parcel-bundler": "1.12.5",
+    "parcel": "^2.8.0",
     "prebuild-install": "7.1.1",
+    "punycode": "^1.4.1",
+    "querystring-es3": "^0.2.1",
     "rimraf": "3.0.2",
     "shx": "0.3.4",
     "standardx": "7.0.0",
+    "stream-browserify": "^3.0.0",
     "stylus": "0.59.0",
     "ts-jest": "29.0.3",
     "typescript": "4.8.4"
+  },
+  "engines": {
+    "electron": "20"
   },
   "standardx": {
     "parser": "babel-eslint",
@@ -177,6 +188,32 @@
       "multiline-ternary": 0,
       "react/no-direct-mutation-state": 0,
       "react/no-find-dom-node": 0
+    }
+  },
+  "bridge": "./bundle/bridge.js",
+  "inject": "./bundle/inject.js",
+  "tray": "./bundle/tray.html",
+  "dash": "./bundle/dash.html",
+  "dapp": "./bundle/dapp.html",
+  "targets": {
+    "main": false,
+    "bridge": {
+      "context": "electron-renderer"
+    },
+    "dash": {
+      "context": "browser"
+    },
+    "dapp": {
+      "context": "browser"
+    },
+    "inject": {
+      "context": "browser"
+    },
+    "tray": {
+      "context": "browser"
+    },
+    "default": {
+      "distDir": "./bundle"
     }
   },
   "browserslist": [
@@ -213,10 +250,13 @@
       "hardhat>keccak": true,
       "hdkey>secp256k1": true,
       "node-hid": false,
-      "parcel-bundler": true,
-      "parcel-bundler>@parcel/watcher>chokidar>fsevents": false,
-      "parcel-bundler>core-js": false,
-      "parcel-bundler>deasync": true,
+      "parcel>@parcel/core>@parcel/cache>@parcel/fs>@parcel/watcher": true,
+      "parcel>@parcel/core>@parcel/cache>lmdb": true,
+      "parcel>@parcel/core>@parcel/fs>@parcel/watcher": true,
+      "parcel>@parcel/core>msgpackr>msgpackr-extract": true,
+      "parcel>@parcel/fs>@parcel/types>@parcel/fs>@parcel/watcher": true,
+      "parcel>@parcel/fs>@parcel/watcher": true,
+      "parcel>@parcel/package-manager>@parcel/fs>@parcel/watcher": true,
       "react-restore>babel-core>babel-register>core-js": true,
       "trezor-connect>@trezor/transport>protobufjs": false,
       "trezor-connect>@trezor/utxo-lib>blake-hash": false,
