@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, screen, Tray as ElectronTray, Menu, globalShortcut, IpcMainEvent, WebContents } from 'electron'
+import { app, BrowserWindow, ipcMain, screen, Tray as ElectronTray, Menu, globalShortcut, IpcMainEvent, WebContents, BrowserWindowConstructorOptions } from 'electron'
 import path from 'path'
 import log from 'electron-log'
 import EventEmitter from 'events'
@@ -110,8 +110,20 @@ function logPid (name: string) {
   })
 }
 
+function createWindow (name: string, opts: BrowserWindowConstructorOptions) {
+  log.verbose(`Creating ${name} window`)
+
+  const browserWindow = new BrowserWindow(opts)
+
+  browserWindow.webContents.once('did-finish-load', () => {
+    log.info(`Created ${name} renderer process, pid:`, browserWindow.webContents.getOSProcessId())
+  })
+
+  return browserWindow
+}
+
 function initDashWindow () {
-  windows.dash = new BrowserWindow({
+  windows.dash = createWindow('dash', {
     width: trayWidth,
     frame: false,
     transparent: process.platform === 'darwin',
@@ -128,14 +140,12 @@ function initDashWindow () {
     }
   })
 
-  logPid('dash')
-
   const dashUrl = new URL(path.join(process.env.BUNDLE_LOCATION, 'dash.html'), 'file:')
   windows.dash.loadURL(dashUrl.toString())
 }
 
 function initTrayWindow () {
-  windows.tray = new BrowserWindow({
+  windows.tray = createWindow('tray', {
     width: trayWidth,
     frame: false,
     transparent: process.platform === 'darwin',
@@ -161,8 +171,6 @@ function initTrayWindow () {
   windows.tray.webContents.on('will-attach-webview', e => e.preventDefault()) // Prevent attaching <webview>
   windows.tray.webContents.setWindowOpenHandler(() => ({ action: 'deny' })) // Prevent new windows
   windows.tray.webContents.session.setPermissionRequestHandler((webContents, permission, res) => res(false))
-
-  logPid('tray')
 
   windows.tray.setResizable(false)
   windows.tray.setMovable(false)
