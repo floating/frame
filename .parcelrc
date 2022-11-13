@@ -5,7 +5,7 @@
     "*.{ts,tsx}": ["@parcel/transformer-typescript-tsc"],
     // Parcel uses its own transpiler
     // override the default Parcel config to exclude babel
-    "*.{html,js,mjs,jsx,cjs,ts,tsx}": [
+    "*.{js,mjs,jsx,cjs,ts,tsx}": [
       "@parcel/transformer-js",
       "@parcel/transformer-react-refresh-wrap"
     ]
