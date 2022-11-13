@@ -104,12 +104,6 @@ const detectMouse = () => {
   }, 50)
 }
 
-function logPid (name: string) {
-  windows[name].webContents.once('did-finish-load', () => {
-    log.info(`created ${name} renderer process, pid: ${windows[name].webContents.getOSProcessId()}`)
-  })
-}
-
 function createWindow (name: string, opts: BrowserWindowConstructorOptions) {
   log.verbose(`Creating ${name} window`)
 
