@@ -72,7 +72,7 @@ class BalancesPreview extends React.Component {
         const decimals = isNative ? nativeCurrencyInfo.decimals || 18 : rawBalance.decimals
         const symbol = (isNative && nativeCurrencyInfo.symbol) || rawBalance.symbol
       
-        return createBalance({ ...rawBalance, logoURI, name, decimals, symbol }, networks[rawBalance.chainId].isTestnet ? { price: 0 } : rate.usd)      
+        return createBalance({ ...rawBalance, logoURI, name, decimals, symbol }, rate.usd)      
       })
       .sort(byTotalValue)
 
@@ -89,8 +89,8 @@ class BalancesPreview extends React.Component {
     const { balances: allBalances, totalDisplayValue, totalValue } = this.getBalances(storedBalances, rates)
 
     // if filter only show balances that match filter
-    const filteredBlanaces = allBalances.filter(rawBalance => this.isFilterMatch(rawBalance))
-    const balances = filteredBlanaces.slice(0, 4)
+    const filteredBalances = allBalances.filter(rawBalance => this.isFilterMatch(rawBalance))
+    const balances = filteredBalances.slice(0, 4)
     
     const lastBalanceUpdate = this.store('main.accounts', address, 'balances.lastUpdated')
 

@@ -64,7 +64,7 @@ export function displayValueData (sourceValue: SourceValue, params: DisplayValue
   const currencyHelperMap = {
     fiat: () => {  
       const nativeCurrency = BigNumber(isTestnet || !currencyRate ? 0 : currencyRate.price)
-      const value = bn.shiftedBy(-18).multipliedBy(nativeCurrency).decimalPlaces(2, BigNumber.ROUND_FLOOR)
+      const value = bn.shiftedBy(-decimals).multipliedBy(nativeCurrency).decimalPlaces(decimalsOverride !== undefined ? decimalsOverride : 2, BigNumber.ROUND_FLOOR)
       
       if (isTestnet || value.isNaN()) {
         return {

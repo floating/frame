@@ -3,8 +3,8 @@ import Restore from 'react-restore'
 
 import { DisplayValue } from '../../../../../../resources/Components/DisplayValue'
 import RingIcon from '../../../../../../resources/Components/RingIcon'
-
 import svg from '../../../../../../resources/svg'
+
 class Balance extends React.Component {
   // constructor (...args) {
   //   super(...args)
@@ -34,7 +34,6 @@ class Balance extends React.Component {
     let name = balance.name
     if (name.length > 19) name = name.substr(0, 17) + '..'
 
-    const chainHex = '0x' + chainId.toString(16)
     const priceChange = () => {
       if (!balance.priceChange) {
         return ''
@@ -66,16 +65,6 @@ class Balance extends React.Component {
             {name}
           </div>
           <div className='signerBalanceValue' style={(balance.displayBalance || '0').length >= 12 ? { fontSize: '15px', top: '10px' } : {}}>
-            {/* <span 
-              className='signerBalanceSymbol'
-            >
-              {symbol.toUpperCase()}
-            </span>
-            <span
-              style={(balance.displayBalance || '0').length >= 12 ? { marginTop: '-3px' } : {}}
-            >
-              {balance.displayBalance}
-            </span> */}
             <DisplayValue type='ether' value={balance.balance} valueDataParams={{ decimalsOverride: 6, decimals: balance.decimals }} currencySymbol={symbol.toUpperCase()} />
           </div>
           <div className='signerBalancePrice'>
@@ -87,10 +76,7 @@ class Balance extends React.Component {
                 <span>{priceChange()}</span>
               </span>
             </div>
-            <div className='signerBalanceCurrentValue'>
-              {svg.usd(10)}{balance.displayValue}
-            </div>
-            <DisplayValue type='fiat' value={balance.balance} valueDataParams={{ currencyRate: balance.usdRate, isTestnet: chain.isTestnet }} currencySymbol='$' />
+            <DisplayValue type='fiat' value={balance.balance} valueDataParams={{ decimals: balance.decimals, decimalsOverride: 0, currencyRate: balance.usdRate, isTestnet: chain.isTestnet }} currencySymbol='$' />
           </div>
         </div>
       </div>
