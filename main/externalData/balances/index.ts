@@ -70,6 +70,10 @@ export default function (store: Store) {
     workerController.on('tokenBalances', (address, balances) => {
       handleUpdate(address, handleTokenBalanceUpdate.bind(null, balances))
     })
+
+    workerController.on('tokenBlacklist', (address, tokens) => {
+      handleUpdate(address, handleTokenBlacklistUpdate.bind(null, tokens))
+    })
   }
 
   function restart () {
@@ -198,6 +202,14 @@ export default function (store: Store) {
     }
 
     store.accountTokensUpdated(address)
+  }
+
+  function handleTokenBlacklistUpdate (tokens: Token[]) {
+    tokens.forEach(({ address: contractAddress, chainId }) => {
+      // TODO: can do this all at once rather than one by one, also can check
+      // in action handler if these balances exist to prevent extra re-renders
+      store.removeBalance(chainId, contractAddress)
+    })
   }
 
   function setAddress (address: Address) {

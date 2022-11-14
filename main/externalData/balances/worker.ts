@@ -51,7 +51,17 @@ function sendToMainProcess (data: any) {
   }
 }
 
-async function tokenBalanceScan (address: Address, tokensToOmit: Token[] = [], chains?: number[]) {
+async function updateBlacklist (address: Address, chains: number[]) {
+  try {
+    const blacklistTokens = tokenLoader.getBlacklist(chains)
+
+    sendToMainProcess({ type: 'tokenBlacklist', address, tokens: blacklistTokens })
+  } catch (e) {
+    log.error('error updating token blacklist', e)
+  }
+}
+
+async function tokenBalanceScan (address: Address, tokensToOmit: Token[] = [], chains: number[]) {
   try {
     // for chains that support multicall, we can attempt to load every token that we know about,
     // for all other chains we need to call each contract individually so don't scan every contract
@@ -73,7 +83,7 @@ async function tokenBalanceScan (address: Address, tokensToOmit: Token[] = [], c
 }
 
 async function fetchTokenBalances (address: Address, tokens: Token[]) {
-  const omittedTokens = tokenLoader.getTokens({omitted: true})
+  const omittedTokens = tokenLoader.getTokens()
   const omittedTokensSet = new Set(omittedTokens.map(({address, chainId}) => `${chainId}:${address}`))
   const [toFetch, toOmit] = tokens.reduce((acc: [Token[], TokenBalance[]], token) => {
     const {address, chainId, symbol, name, decimals} = token
@@ -131,8 +141,11 @@ function resetHeartbeat () {
 const messageHandler: { [command: string]: (...params: any) => void } = {
   updateChainBalance: chainBalanceScan,
   fetchTokenBalances: fetchTokenBalances,
-  tokenBalanceScan: tokenBalanceScan,
-  heartbeat: resetHeartbeat
+  heartbeat: resetHeartbeat,
+  tokenBalanceScan: (address, tokensToOmit, chains) => {
+    updateBlacklist(address, chains)
+    tokenBalanceScan(address, tokensToOmit, chains)
+  },
 }
 
 process.on('message', (message: ExternalDataWorkerMessage) => {
