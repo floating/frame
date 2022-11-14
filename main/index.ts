@@ -1,7 +1,6 @@
 import { app, ipcMain, protocol, shell, clipboard, globalShortcut, powerMonitor, BrowserWindow } from 'electron'
 import path from 'path'
 import log from 'electron-log'
-import { numberToHex } from 'web3-utils'
 import url from 'url'
 
 // DO NOT MOVE - env var below is required to enable watch mode for development on the renderer process and must be set before all local imports 
@@ -19,7 +18,6 @@ import signers from './signers'
 import persist from './store/persist'
 import showUnhandledExceptionDialog from './windows/dialog/unhandledException'
 import Erc20Contract from './contracts/erc20'
-import provider from './provider'
 import { getErrorCode } from '../resources/utils'
 import { FrameInstance } from './windows/frames/frameInstances'
 
@@ -39,6 +37,24 @@ const hasInstanceLock = app.requestSingleInstanceLock()
 if (!hasInstanceLock) {
   log.info('another instance of Frame is running - exiting...')
   app.exit(1)
+}
+
+if (dev) {
+  const cpuMonitoringInterval = 10 // seconds
+  const cpuThreshold = 30 // percent
+
+  setTimeout(() => {
+    app.getAppMetrics()
+
+    setInterval(() => {
+      const cpuUsers = app.getAppMetrics().filter(metric => metric.cpu.percentCPUUsage > cpuThreshold)
+
+      if (cpuUsers.length > 0) {
+        log.verbose(`Following processes used more than ${cpuThreshold}% CPU over the last ${cpuMonitoringInterval} seconds`)
+        log.verbose(JSON.stringify(cpuUsers, undefined, 2))
+      }
+    }, cpuMonitoringInterval * 1000)
+  }, 10_000)
 }
 
 require('./rpc')
