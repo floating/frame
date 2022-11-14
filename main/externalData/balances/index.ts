@@ -205,11 +205,14 @@ export default function (store: Store) {
   }
 
   function handleTokenBlacklistUpdate (tokens: Token[]) {
-    tokens.forEach(({ address: contractAddress, chainId }) => {
-      // TODO: can do this all at once rather than one by one, also can check
-      // in action handler if these balances exist to prevent extra re-renders
-      store.removeBalance(chainId, contractAddress)
-    })
+    const tokensToRemoveSet = new Set(tokens.map(({address, chainId}) => `${chainId}:${address.toLowerCase()}`))
+    console.log('removing blacklisted tokens from balances...')
+    store.removeBalances(tokensToRemoveSet)
+    // tokens.forEach(({ address: contractAddress, chainId }) => {
+    //   // TODO: can do this all at once rather than one by one, also can check
+    //   // in action handler if these balances exist to prevent extra re-renders
+    //   store.removeBalance(chainId, contractAddress)
+    // })
   }
 
   function setAddress (address: Address) {

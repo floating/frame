@@ -567,6 +567,14 @@ module.exports = {
       return balances
     })
   },
+  removeBalances: (u, tokensSet) => {
+    u('main.balances', (balances = {}) => {
+      for (const accountAddress in balances) {
+        balances[accountAddress] = balances[accountAddress].filter(({chainId, address}) => !tokensSet.has(`${chainId}:${address.toLowerCase()}`))        
+      }
+      return balances
+    })
+  },
   setScanning: (u, address, scanning) => {
     if (scanning) {
       u('main.scanning', address, () => true)

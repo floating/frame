@@ -66,7 +66,7 @@ async function tokenBalanceScan (address: Address, tokensToOmit: Token[] = [], c
     // for chains that support multicall, we can attempt to load every token that we know about,
     // for all other chains we need to call each contract individually so don't scan every contract
     const eligibleChains = (chains || await getChains()).filter(chainSupportsScan)
-    const tokenLists = eligibleChains.map(chainId => tokenLoader.getTokens({chainId}))
+    const tokenLists = eligibleChains.map(chainId => tokenLoader.getTokens([chainId]))
     const tokens = tokenLists.reduce((all, tokenList) => {
       return all.concat(
         tokenList.filter(token => tokensToOmit.every(t => t.chainId !== token.chainId || t.address !== token.address))
@@ -83,31 +83,10 @@ async function tokenBalanceScan (address: Address, tokensToOmit: Token[] = [], c
 }
 
 async function fetchTokenBalances (address: Address, tokens: Token[]) {
-  const omittedTokens = tokenLoader.getTokens()
-  const omittedTokensSet = new Set(omittedTokens.map(({address, chainId}) => `${chainId}:${address}`))
-  const [toFetch, toOmit] = tokens.reduce((acc: [Token[], TokenBalance[]], token) => {
-    const {address, chainId, symbol, name, decimals} = token
-    if(omittedTokensSet.has(`${chainId}:${address}`)) {
-      acc[0].push(token)
-    } else {
-      acc[1].push(
-        {
-          symbol,
-          name,
-          chainId,
-          address,
-          decimals,
-          balance: '0',
-          displayBalance: '0'
-        }
-      )
-    }
-    return acc
-  }, [[],[]])
   try {
-    const tokenBalances = await balances.getTokenBalances(address, toFetch)
+    const tokenBalances = await balances.getTokenBalances(address, tokens)
 
-    sendToMainProcess({ type: 'tokenBalances', address, balances: tokenBalances.concat(toOmit) })
+    sendToMainProcess({ type: 'tokenBalances', address, balances: tokenBalances})
   } catch (e) {
     log.error('error fetching token balances', e)
   }
