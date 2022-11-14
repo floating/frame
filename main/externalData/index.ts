@@ -91,11 +91,23 @@ export default function () {
     handleTokensUpdate(customTokens)
   }, 'externalData:customTokens')
 
+  const trayObserver = store.observer(() => {
+    const open = store('tray.open')
+
+    console.log(' >>>>>>>>>>>>>>>>>>>> IS TRAY OPEN?!?!?!', open)
+    if (!open) {
+      balances.pause()
+    } else {
+      balances.resume()
+    }
+  }, 'externalData:tray')
+
   return {
     close: () => {
       allNetworksObserver.remove()
       activeAddressObserver.remove()
       customTokensObserver.remove()
+      trayObserver.remove()
 
       inventory.stop()
       rates.stop()
