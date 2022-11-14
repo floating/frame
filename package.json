@@ -130,7 +130,6 @@
     "@nomiclabs/hardhat-ethers": "2.1.1",
     "@nomiclabs/hardhat-waffle": "2.0.3",
     "@parcel/config-default": "2.8.0",
-    "@parcel/resolver-default": "^2.8.0",
     "@parcel/transformer-css": "2.8.0",
     "@parcel/transformer-stylus": "2.8.0",
     "@parcel/transformer-typescript-tsc": "2.8.0",
