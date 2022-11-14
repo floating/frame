@@ -40,7 +40,7 @@ interface TokenSpec extends Token {
 export default class TokenLoader {
   // private tokenList: Token[]
   private tokens: TokenSpec[] = defaultTokenList.tokens as TokenSpec[]
-  private omitSet: Set<string> = new Set<string>()
+  private omitSet: Set<TokenSpec> = new Set<TokenSpec>()
   private nextLoad?: NodeJS.Timeout | null
 
   private readonly eth = ethProvider('frame', { origin: 'frame-internal', name: 'tokenLoader' })
@@ -124,12 +124,11 @@ export default class TokenLoader {
     }
   }
 
-  getTokens ({chainId, omitted = false} : {chainId?: number, omitted?: boolean}) {
-    return this.tokens.filter(token => {
-      const chainIdFilter = chainId ? token.chainId === chainId : true
-      const omittedFilter = token.extensions?.omit && omitted
-      return chainIdFilter && omittedFilter
-    }
-)
+  getTokens (chains: number[]) {
+    return this.tokens.filter(token => !token.extensions.omit && chains.includes(token.chainId))
+  }
+
+  getBlacklist (chains: number[]) {
+    return [...this.omitSet].filter(token => chains.includes(token.chainId))
   }
 }
