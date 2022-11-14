@@ -28,7 +28,7 @@ link.invoke = (...args) => {
 }
 
 window.addEventListener('message', e => {
-  if (e.origin !== 'file://') return
+  if (e.origin !== 'file://' || e.data.source?.includes('react-devtools')) return
   const data = unwrap(e.data)
   const args = data.args || []
   if (e.origin === 'file://' && data.source !== source) {

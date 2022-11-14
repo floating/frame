@@ -1,8 +1,8 @@
 import { app, ipcMain, protocol, shell, clipboard, globalShortcut, powerMonitor, BrowserWindow } from 'electron'
 import path from 'path'
 import log from 'electron-log'
-import { numberToHex } from 'web3-utils'
 import url from 'url'
+import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer';
 
 // DO NOT MOVE - env var below is required to enable watch mode for development on the renderer process and must be set before all local imports 
 process.env.BUNDLE_LOCATION = process.env.BUNDLE_LOCATION || path.resolve(__dirname, './../..', 'bundle')
@@ -19,7 +19,6 @@ import signers from './signers'
 import persist from './store/persist'
 import showUnhandledExceptionDialog from './windows/dialog/unhandledException'
 import Erc20Contract from './contracts/erc20'
-import provider from './provider'
 import { getErrorCode } from '../resources/utils'
 import { FrameInstance } from './windows/frames/frameInstances'
 
@@ -47,6 +46,21 @@ errors.init()
 log.info(`Chrome: v${process.versions.chrome}`)
 log.info(`Electron: v${process.versions.electron}`)
 log.info(`Node: v${process.versions.node}`)
+
+
+async function installElectronDevToolExtensions(): Promise<void> {
+  if (process.env.NODE_ENV !== 'production') {
+    try {
+      await installExtension([REACT_DEVELOPER_TOOLS], {
+        forceDownload: false,
+        loadExtensionOptions: { allowFileAccess: true }
+      })
+      console.info(`[INFO] Successfully added devtools extensions`);
+    } catch (err) {
+      console.warn('[WARN] An error occurred while trying to add devtools extensions:\n', err);
+    }
+  }
+}
 
 // prevent showing the exit dialog more than once
 let closing = false
@@ -312,6 +326,9 @@ app.on('ready', () => {
   menu()
   windows.init()
   if (app.dock) app.dock.hide()
+  ;(async () => {
+    await installElectronDevToolExtensions()
+  })()
 
   protocol.interceptFileProtocol('file', (req, cb) => {
     const appOrigin = path.resolve(__dirname, '../../')

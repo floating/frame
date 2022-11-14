@@ -11,7 +11,7 @@ const wrap = v => v !== undefined || v !== null ? JSON.stringify(v) : v
 const source = 'bridge:link'
 
 window.addEventListener('message', e => {
-  if (e.origin !== 'file://') return
+  if (e.origin !== 'file://' || e.data.source?.includes('react-devtools')) return
   const data = unwrap(e.data)
   if (e.origin === 'file://' && data.source !== source) {
     if (data.method === 'rpc') return rpc(...data.args, (...args) => e.source.postMessage(wrap({ method: 'rpc', id: data.id, args, source }), e.origin))
@@ -45,6 +45,7 @@ ipcRenderer.on('main:reload:style', (e, name, ok) => {
 // })
 
 ipcRenderer.on('main:dapp', (...args) => {
+  console.log(args, source)
   args.shift()
   window.postMessage(wrap({ method: 'event', channel: 'dapp', args, source }), '*')
 })
