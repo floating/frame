@@ -81,10 +81,9 @@ class Backdrop extends React.Component {
   // }
   render () {
     const accountOpen = this.store('selected.open')
-    const { position = {} } = this.store('windows.panel.nav')[0] || {}
+    const footerHeight = this.store('windows.panel.footer.height')
     const top = accountOpen ? '140px' : '80px'
-    const bottom = position.bottom || '40px'
-
+    const bottom = footerHeight + 'px'
     return (
       <>
         <div className={'overlay'} style={{ top, bottom }} />

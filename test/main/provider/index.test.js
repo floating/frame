@@ -297,7 +297,7 @@ describe('#send', () => {
           expect(response.error).toBe(undefined)
 
           const permissions = response.result
-          expect(permissions).toHaveLength(15)
+          expect(permissions).toHaveLength(16)
           expect(permissions.map(p => p.parentCapability)).toEqual(expect.arrayContaining(
             [
               'eth_coinbase',
@@ -313,6 +313,7 @@ describe('#send', () => {
               'eth_signTypedData_v3',
               'eth_signTypedData_v4',
               'wallet_addEthereumChain',
+              'wallet_getEthereumChains',
               'wallet_getAssets',
               'wallet_watchAsset'
             ]

@@ -222,7 +222,7 @@
   font-size 16px
   font-weight 400
   cursor pointer
-  padding 10px 0px
+  padding 12px
 
   *
     pointer-events none
@@ -233,14 +233,19 @@
     align-items center
     flex-direction column
 
+    ._txDescriptionSummaryMain
+      padding 12px
+      text-align center
+
     ._txDescriptionSummaryTag
-      padding-top 4px
-      display flex
-      justify-content center
-      align-items center
       font-size 12px
       font-weight 500
       text-transform uppercase
+      text-align center
+      white-space nowrap
+      overflow hidden
+      text-overflow ellipsis
+      width 300px
 
     ._txDescriptionSummaryHeadline
       font-size 26px

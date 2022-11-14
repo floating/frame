@@ -92,9 +92,11 @@ export class Provider extends EventEmitter {
       this.connected = true
       this.emit('connect', ...args)
     })
+
     this.connection.on('close', () => { 
       this.connected = false
     })
+
     this.connection.on('data', (chain, ...args) => {
       if ((args[0] || {}).method === 'eth_subscription') {
         this.emit('data:subscription', ...args)
@@ -102,12 +104,18 @@ export class Provider extends EventEmitter {
 
       this.emit(`data:${chain.type}:${chain.id}`, ...args)
     })
+
     this.connection.on('error', (chain, err) => {
       log.error(err)
     })
-    this.connection.on('update', (chain, event) => {
+
+    this.connection.on('update', (chain: Chain, event) => {
       if (event.type === 'fees') {
-        return accounts.updatePendingFees(event.chainId)
+        return accounts.updatePendingFees(chain.id)
+      }
+
+      if (event.type === 'status') {
+        this.emit(`status:${chain.type}:${chain.id}`, event.status)
       }
     })
 

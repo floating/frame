@@ -1,7 +1,6 @@
 import { v5 as uuidv5 } from 'uuid'
 import { IncomingMessage } from 'http'
 import queryString from 'query-string'
-import log from 'electron-log'
 
 import accounts, { AccessRequest } from '../accounts'
 import store from '../store'
@@ -10,8 +9,20 @@ const dev = process.env.NODE_ENV === 'development'
 const protocolRegex = /^(?:ws|http)s?:\/\//
 
 interface OriginUpdateResult {
-  payload: RPCRequestPayload,
+  payload: RPCRequestPayload
   hasSession: boolean
+}
+
+// allows the Frame extension to request specific methods
+const trustedExtensionMethods = [
+  'wallet_getEthereumChains'
+]
+
+const storeApi = {
+  getPermission: (address: Address, origin: string) => {
+    const permissions: Record<string, Permission> = store('main.permissions', address) || {}
+    return Object.values(permissions).find(p => p.origin === origin)
+  }
 }
 
 export function parseOrigin (origin?: string) {
@@ -24,22 +35,23 @@ function invalidOrigin (origin: string) {
   return origin !== origin.replace(/[^0-9a-z/:.[\]-]/gi, '')
 }
 
-function addPermissionRequest (address: Address, fullPayload: RPCRequestPayload) {
+async function getPermission (address: Address, origin: string, payload: RPCRequestPayload) {
+  const permission = storeApi.getPermission(address, origin)
+
+  return permission || requestPermission(address, payload)
+}
+
+async function requestPermission (address: Address, fullPayload: RPCRequestPayload) {
   const { _origin: originId, ...payload } = fullPayload
 
-  return new Promise((resolve, reject) => {
+  return new Promise<Permission | undefined>((resolve) => {
     const request: AccessRequest = { payload, handlerId: originId, type: 'access', origin: originId, account: address }
 
     accounts.addRequest(request, () => {
       const { name: originName } = store('main.origins', originId)
-      const permissions = store('main.permissions', address) || {}
-      const perms = Object.keys(permissions).map(id => permissions[id])
-      const permIndex = perms.map(p => p.origin).indexOf(originName)
-      if (perms[permIndex] && perms[permIndex].provider) {
-        resolve(true)
-      } else {
-        reject(new Error('Origin does not have provider permissions'))
-      }
+      const permission = storeApi.getPermission(address, originName)
+
+      resolve(permission)
     })
   })
 }
@@ -100,25 +112,18 @@ export function isFrameExtension (req: IncomingMessage) {
 
 export async function isTrusted (payload: RPCRequestPayload) {
   // Permission granted to unknown origins only persist until the Frame is closed, they are not permanent
-  const { name: originName } = store('main.origins', payload._origin)
+  const { name: originName } = store('main.origins', payload._origin) as { name: string }
+  const currentAccount = accounts.current()
 
-  if (invalidOrigin(originName)) return false
-  if (originName === 'frame-extension') return true
-  const account = accounts.current()
-  if (!account) return
-  const address = account.address
-  if (!address) return
-  const permissions = store('main.permissions', address) || {}
-  const perms = Object.keys(permissions).map(id => permissions[id])
-  const permIndex = perms.map(p => p.origin).indexOf(originName)
-  if (permIndex === -1) {
-    try {
-      return await addPermissionRequest(address, payload)
-    } catch (e) {
-      log.error(e)
-      return false
-    }
-  } else {
-    return perms[permIndex] && perms[permIndex].provider
+  if (originName === 'frame-extension' && trustedExtensionMethods.includes(payload.method)) {
+    return true
   }
+
+  if (invalidOrigin(originName) || !currentAccount) {
+    return false
+  }
+
+  const permission = await getPermission(currentAccount.address, originName, payload)
+
+  return !!permission?.provider
 }

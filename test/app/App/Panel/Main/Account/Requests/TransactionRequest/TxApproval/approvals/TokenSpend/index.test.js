@@ -4,115 +4,44 @@ import { addHexPrefix } from 'ethereumjs-util'
 
 import Restore from 'react-restore'
 import store from '../../../../../../../../../../../main/store'
-import ApproveTokenSpendComponent from '../../../../../../../../../../../app/App/Account/Account/Requests/TransactionRequest/TxApproval/approvals/TokenSpend'
-import { ApprovalType } from '../../../../../../../../../../../resources/constants'
+import ApproveTokenSpendComponent from '../../../../../../../../../../../app/App/Account/Account/Requests/TransactionRequest/TokenSpend'
 
 jest.mock('../../../../../../../../../../../main/store/persist')
 
 const TokenSpend = Restore.connect(ApproveTokenSpendComponent, store)
 
-it('allows the user to reject an approval', done => {
-  const onApprove = () => done('should not have approved!')
-
-  const { queryByRole } = render(
-    <TokenSpend
-      onApprove={onApprove}
-      onDecline={done}
-      approval={{ data: { decimals: 6, amount: addHexPrefix(100e6.toString(16)) } }} 
-    />
-  )
-
-  const reject = queryByRole('button', { name: 'Reject' })
-  fireEvent.click(reject)
-})
-
-it('allows the user to proceed', done => {
-  const onApprove = function (req, approvalType, data) {
-    try {
-      expect(approvalType).toBe(ApprovalType.TokenSpendApproval)
-
-      // 100 * 1e6 to account for decimals
-      expect(data.amount).toBe('0x5f5e100')
-      done()
-    } catch (e) { done(e) }
-  }
-
-  const { queryByRole } = render(<TokenSpend onApprove={onApprove} approval={{ data: { decimals: 6, amount: addHexPrefix(100e6.toString(16)) } }} />)
-
-  const proceed = queryByRole('button', { name: 'Proceed' })
-  fireEvent.click(proceed)
-})
-
-describe('revoking an approval', () => {
-  it('allows the user to reject a revocation approval', done => {
-    const onApprove = () => done('should not have approved!')
-
-    const { queryByRole } = render(
-      <TokenSpend
-        onApprove={onApprove}
-        onDecline={done}
-        approval={{ data: { decimals: 6, amount: addHexPrefix(100e6.toString(16)) } }}
-        revoke
-      />
-    )
-
-    const reject = queryByRole('button', { name: 'Reject' })
-    fireEvent.click(reject)
-  })
-
-  it('allows the user to proceed', done => {
-    const onApprove = function (req, approvalType, data) {
-      try {
-        expect(approvalType).toBe(ApprovalType.TokenSpendRevocation)
-
-        // 100 * 1e6 to account for decimals
-        expect(data.amount).toBe('0x0')
-        done()
-      } catch (e) { done(e) }
-    }
-
-    const { queryByRole } = render(
-      <TokenSpend
-        onApprove={onApprove}
-        approval={{ data: { decimals: 6, amount: '0x00' } }} 
-        revoke
-      />
-    )
-
-    const proceed = queryByRole('button', { name: 'Proceed' })
-    fireEvent.click(proceed)
-  })
-})
-
 describe('changing approval amounts', () => {
   it('allows the user to set the token approval to a custom amount', async () => {
     return new Promise(async (resolve, reject) => {
-      const onApprove = function (req, approvalType, data) {
-        try {
-          expect(approvalType).toBe(ApprovalType.TokenSpendApproval)
-
-          // 50 * 1e6 to account for decimals
-          expect(data.amount).toBe('0x2faf080')
-          resolve()
-        } catch (e) { reject(e) }
+      const requestedAmountHex = '0x011170'
+      const approval = {
+        id: 'erc20:approve',
+        data: {
+          spender: '0x9bc5baf874d2da8d216ae9f137804184ee5afef4',
+          amount: requestedAmountHex,
+          decimals: 4,
+          name: 'TST',
+          symbol: 'TST',
+          spenderEns: '',
+          spenderType: 'external',
+          contract: '0x1eba19f260421142AD9Bf5ba193f6d4A0825e698'
+        }
       }
 
-      const { queryByRole } = render(
+      const { queryByRole, getByText } = render(
         <TokenSpend
-          onApprove={onApprove}
-          approval={{
-            data: {
-              symbol: 'aUSDC',
-              name: 'Aave USDC',
-              decimals: 6,
-              amount: addHexPrefix(100e6.toString(16))
+          approval={approval}
+          requestedAmountHex={requestedAmountHex}
+          updateApproval={(amount) => {
+            try {
+              expect(amount).toBe('0x7a120')
+              resolve()
+            } catch (e) { 
+              reject(e) 
             }
           }}
         />
       )
-
-      const edit = queryByRole('button', { name: 'Edit' })
-      fireEvent.click(edit)
 
       const custom = queryByRole('button', { name: 'Custom' })
       fireEvent.click(custom)
@@ -120,165 +49,194 @@ describe('changing approval amounts', () => {
       const enterAmount = queryByRole('textbox', { name: 'Custom Amount' })
       fireEvent.change(enterAmount, { target: { value: '50' } })
 
-      const proceed = queryByRole('button', { name: 'Proceed' })
-      fireEvent.click(proceed)
+      const updateCustom = getByText('update')
+      fireEvent.click(updateCustom)
     })
   })
 
-  it('does not allows the user to set the token approval to a custom amount for an unknown token', async () => {
-    return new Promise(async (resolve, reject) => {
-      const onApprove = function (req, approvalType, data) {
-        try {
-          expect(approvalType).toBe(ApprovalType.TokenSpendApproval)
+  it('does not allows the user to set the token approval to a custom amount for an unknown token', () => {
+    const requestedAmountHex = addHexPrefix(100e6.toString(16))
 
-          // 50 * 1e6 to account for decimals
-          expect(data.amount).toBe('0x2faf080')
-          resolve()
-        } catch (e) { reject(e) }
+    const approval = {
+      id: 'erc20:approve',
+      data: {
+        spender: '0x9bc5baf874d2da8d216ae9f137804184ee5afef4',
+        amount: requestedAmountHex,
+        decimals: 6,
+        symbol: 'aUSDC',
+        spenderEns: '',
+        spenderType: 'external',
+        contract: '0x1eba19f260421142AD9Bf5ba193f6d4A0825e698'
       }
-
-      const { queryByRole } = render(
-        <TokenSpend
-          onApprove={onApprove}
-          approval={{
-            data: {
-              symbol: 'aUSDC',
-              name: 'Aave USDC',
-              decimals: 6,
-              amount: addHexPrefix(100e6.toString(16))
-            }
-          }}
-        />
-      )
-
-      const edit = queryByRole('button', { name: 'Edit' })
-      fireEvent.click(edit)
-
-      const custom = queryByRole('button', { name: 'Custom' })
-      fireEvent.click(custom)
-
-      const enterAmount = queryByRole('textbox', { name: 'Custom Amount' })
-      fireEvent.change(enterAmount, { target: { value: '50' } })
-
-      const proceed = queryByRole('button', { name: 'Proceed' })
-      fireEvent.click(proceed)
-    })
-  })
-
-  it('allows the user to set the token approval to unlimited', done => {
-    const onApprove = function (req, approvalType, data) {
-      try {
-        expect(approvalType).toBe(ApprovalType.TokenSpendApproval)
-        expect(data.amount).toBe('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff')
-        done()
-      } catch (e) { done(e) }
     }
 
-    const { queryByRole } = render(<TokenSpend onApprove={onApprove} approval={{ data: { amount: addHexPrefix(100e6.toString(16)) } }} />)
-
-    const edit = queryByRole('button', { name: 'Edit' })
-    fireEvent.click(edit)
-
-    const setUnlimited = queryByRole('button', { name: 'Unlimited' })
-    fireEvent.click(setUnlimited)
-
-    const proceed = queryByRole('button', { name: 'Proceed' })
-    fireEvent.click(proceed)
-  })
-
-  it('allows the user to revert the token approval back to the original amount when no decimal data is present', done => {
-    const onApprove = function (req, approvalType, data) {
-      try {
-        expect(approvalType).toBe(ApprovalType.TokenSpendApproval)
-
-        // 50 * 1e6 to account for decimals
-        expect(data.amount).toBe('0x2faf080')
-        done()
-      } catch (e) { done(e) }
-    }
-
-    const { queryByRole } = render(<TokenSpend onApprove={onApprove} approval={{ data: { amount: addHexPrefix(50e6.toString(16)) } }} />)
-
-    const edit = queryByRole('button', { name: 'Edit' })
-    fireEvent.click(edit)
-
-    const setUnlimited = queryByRole('button', { name: 'Unlimited' })
-    fireEvent.click(setUnlimited)
-
-    const setRequested = queryByRole('button', { name: 'Requested' })
-    fireEvent.click(setRequested)
-
-    const proceed = queryByRole('button', { name: 'Proceed' })
-    fireEvent.click(proceed)
-  })
-
-  it('allows the user to revert the token approval back to the original request', done => {
-    const onApprove = function (req, approvalType, data) {
-      try {
-        expect(approvalType).toBe(ApprovalType.TokenSpendApproval)
-
-        // 100 * 1e6 to account for decimals
-        expect(data.amount).toBe('0x5f5e100')
-        done()
-      } catch (e) { done(e) }
-    }
-
-    const { queryByRole } = render(
+    const { queryByRole, getByText } = render(
       <TokenSpend
-        onApprove={onApprove}
-        approval={{
-          data: {
-            symbol: 'aUSDC',
-            name: 'Aave USDC',
-            decimals: 6,
-            amount: addHexPrefix(100e6.toString(16))
-          }
-        }} 
+        approval={approval}
+        requestedAmountHex={requestedAmountHex}
+        updateApproval={() => {}}
       />
     )
 
-    const edit = queryByRole('button', { name: 'Edit' })
-    fireEvent.click(edit)
-
     const custom = queryByRole('button', { name: 'Custom' })
-    fireEvent.click(custom)
+    expect(custom).toBe(null)
+  })
 
-    const enterAmount = queryByRole('textbox', { name: 'Custom Amount' })
-    fireEvent.change(enterAmount, { target: { value: '50' } })
+  it('allows the user to set the token approval to unlimited', async () => {
+    return new Promise(async (resolve, reject) => {
+      const requestedAmountHex = '0x011170'
 
-    const requested = queryByRole('button', { name: 'Requested' })
-    fireEvent.click(requested)
+      const approval = {
+        id: 'erc20:approve',
+        data: {
+          spender: '0x9bc5baf874d2da8d216ae9f137804184ee5afef4',
+          amount: requestedAmountHex,
+          decimals: 4,
+          name: 'TST',
+          symbol: 'TST',
+          spenderEns: '',
+          spenderType: 'external',
+          contract: '0x1eba19f260421142AD9Bf5ba193f6d4A0825e698'
+        }
+      }
 
-    const proceed = queryByRole('button', { name: 'Proceed' })
-    fireEvent.click(proceed)
+      const { queryByRole, getByText } = render(
+        <TokenSpend
+          approval={approval}
+          requestedAmountHex={requestedAmountHex}
+          updateApproval={(amount) => {
+            try {
+              expect(amount).toBe('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff')
+              resolve()
+            } catch (e) { 
+              reject(e) 
+            }
+          }}
+        />
+      )
+
+      const custom = queryByRole('button', { name: 'Custom' })
+      fireEvent.click(custom)
+
+      const setUnlimited = queryByRole('button', { name: 'Unlimited' })
+      fireEvent.click(setUnlimited)
+    })
+  })
+
+  it('allows the user to revert the token approval back to the original amount when no decimal data is present', async () => {
+    return new Promise(async (resolve, reject) => {
+      const requestedAmountHex = '0x011170'
+
+      const approval = {
+        id: 'erc20:approve',
+        data: {
+          spender: '0x9bc5baf874d2da8d216ae9f137804184ee5afef4',
+          amount: requestedAmountHex,
+          name: 'TST',
+          symbol: 'TST',
+          spenderEns: '',
+          spenderType: 'external',
+          contract: '0x1eba19f260421142AD9Bf5ba193f6d4A0825e698'
+        }
+      }
+
+      const { queryByRole, getByText } = render(
+        <TokenSpend
+          approval={approval}
+          requestedAmountHex={requestedAmountHex}
+          updateApproval={(amount) => {
+            try {
+              if (amount === '0x011170') resolve()
+            } catch (e) { 
+              reject(e) 
+            }
+          }}
+        />
+      )
+
+      const setUnlimited = queryByRole('button', { name: 'Unlimited' })
+      fireEvent.click(setUnlimited)
+
+      const setRequested = queryByRole('button', { name: 'Requested' })
+      fireEvent.click(setRequested)
+    })
+  })
+
+  it('allows the user to revert the token approval back to the original request', async () => {
+    return new Promise(async (resolve, reject) => {
+      const requestedAmountHex = '0x011170'
+
+      const approval = {
+        id: 'erc20:approve',
+        data: {
+          spender: '0x9bc5baf874d2da8d216ae9f137804184ee5afef4',
+          amount: requestedAmountHex,
+          decimals: 4,
+          name: 'TST',
+          symbol: 'TST',
+          spenderEns: '',
+          spenderType: 'external',
+          contract: '0x1eba19f260421142AD9Bf5ba193f6d4A0825e698'
+        }
+      }
+
+      const { queryByRole, getByText } = render(
+        <TokenSpend
+          approval={approval}
+          requestedAmountHex={requestedAmountHex}
+          updateApproval={(amount) => {
+            try {
+              if (amount === '0x011170') resolve()
+            } catch (e) { 
+              reject(e) 
+            }
+          }}
+        />
+      )
+
+      const setUnlimited = queryByRole('button', { name: 'Unlimited' })
+      fireEvent.click(setUnlimited)
+
+      const setRequested = queryByRole('button', { name: 'Requested' })
+      fireEvent.click(setRequested)
+    })
   })
 
   const requiredApprovalData = ['decimals', 'symbol', 'name']
 
   requiredApprovalData.forEach(field => {
     it(`does not allow the user to edit the amount if ${field} is not present in approval data`, () => {
-      const data = {
-        symbol: 'aUSDC',
-        name: 'Aave USDC',
-        decimals: 6,
-        amount: addHexPrefix(100e6.toString(16))
+      const requestedAmountHex = addHexPrefix(100e6.toString(16))
+      const approval = {
+        id: 'erc20:approve',
+        data: {
+          spender: '0x9bc5baf874d2da8d216ae9f137804184ee5afef4',
+          amount: requestedAmountHex,
+          decimals: 6,
+          name: 'TST',
+          symbol: 'TST',
+          spenderEns: '',
+          spenderType: 'external',
+          contract: '0x1eba19f260421142AD9Bf5ba193f6d4A0825e698'
+        }
       }
 
-      delete data[field]
+      delete approval.data[field]
 
-      const { queryByRole } = render(<TokenSpend approval={{ data }} />)
-
-      const edit = queryByRole('button', { name: 'Edit' })
-      fireEvent.click(edit)
+      const { queryByRole } = render(
+        <TokenSpend
+          approval={approval}
+          requestedAmountHex={requestedAmountHex}
+          updateApproval={() => {}}
+        />
+      )
 
       const custom = queryByRole('button', { name: 'Custom' })
       expect(custom).toBeNull()
 
       const requestedAmount = queryByRole('textbox')
-      const children = requestedAmount.querySelectorAll('div')
-      const displayedContent = [...children].map(c => c.textContent).join(' ').trim()
-
-      expect(displayedContent).toBe(data.decimals ? '100' : '100 million')
+      const displayedContent = requestedAmount.textContent.trim()
+      expect(displayedContent).toBe(approval.data.decimals ? '100' : '100 million')
 
       // ensure click on requested amount textbox doesn't allow user to enter a custom amount
       fireEvent.click(requestedAmount)
@@ -298,26 +256,34 @@ describe('formatting amounts', () => {
 
   formattedAmounts.forEach(spec => {
     it(`formats a requested amount of ${spec.amount} as ${spec.formatted}`, () => {
-      const { queryByRole } = render(
+
+      const amount = addHexPrefix((spec.amount * 1e6).toString(16))
+      const requestedAmountHex = amount
+
+      const approval = {
+        id: 'erc20:approve',
+        data: {
+          spender: '0x9bc5baf874d2da8d216ae9f137804184ee5afef4',
+          amount: amount,
+          decimals: 6,
+          name: 'TST',
+          symbol: 'TST',
+          spenderEns: '',
+          spenderType: 'external',
+          contract: '0x1eba19f260421142AD9Bf5ba193f6d4A0825e698'
+        }
+      }
+
+      const { queryByRole, getByText } = render(
         <TokenSpend
-          approval={{
-            data: {
-              symbol: 'aUSDC',
-              name: 'Aave USDC',
-              decimals: 6,
-              amount: addHexPrefix((spec.amount * 1e6).toString(16))
-            }
-          }} 
+          approval={approval}
+          requestedAmountHex={requestedAmountHex}
+          updateApproval={() => {}}
         />
       )
 
-      const edit = queryByRole('button', { name: 'Edit' })
-      fireEvent.click(edit)
-
       const requestedAmount = queryByRole('textbox')
-      const children = requestedAmount.querySelectorAll('div')
-      const displayedContent = [...children].map(c => c.textContent).join(' ').trim()
-
+      const displayedContent = requestedAmount.textContent.trim()
       expect(displayedContent).toBe(spec.formatted)
     })
   })

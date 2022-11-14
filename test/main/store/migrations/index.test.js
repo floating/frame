@@ -1005,3 +1005,60 @@ describe('migration 27', () => {
     expect(updatedState.main.accounts[address].name).toBe('My Kewl Account')
   })
 })
+
+describe('migration 28', () => {
+  beforeEach(() => {
+    state = {
+      main: {
+        _version: 27,
+        networksMeta: {
+          ethereum: {
+            5: {
+              nativeCurrency: {
+                symbol: "ETH",
+                decimals: 0
+              }
+            },
+            11155111: {
+              nativeCurrency: {
+                symbol: 'ETH',
+                decimals: 18
+              },
+            }
+          }
+      }
+    }
+  }})
+
+  it('updates the symbol for Sepolia testnet if it is currently ETH', () => {
+    const updatedState = migrations.apply(state, 28)
+    const metadata = updatedState.main.networksMeta.ethereum
+    expect(metadata[11155111].nativeCurrency.symbol).toBe("sepETH")
+  })
+
+  it('updates the symbol for Gorli testnet if it is currently ETH', () => {
+    const updatedState = migrations.apply(state, 28)
+    const metadata = updatedState.main.networksMeta.ethereum
+    expect(metadata[5].nativeCurrency.symbol).toBe("görETH")
+  })
+
+  it('does not update the symbol for Gorli testnet if it is not ETH', () => {
+    state.main.networksMeta.ethereum[5].nativeCurrency.symbol = "CUSTOM"
+    const updatedState = migrations.apply(state, 28)
+    const metadata = updatedState.main.networksMeta.ethereum
+    expect(metadata[5].nativeCurrency.symbol).toBe("CUSTOM")
+  })
+
+  it('does not update the symbol for Sepolia testnet if it is not ETH', () => {
+    state.main.networksMeta.ethereum[11155111].nativeCurrency.symbol = "CUSTOM"
+    const updatedState = migrations.apply(state, 28)
+    const metadata = updatedState.main.networksMeta.ethereum
+    expect(metadata[11155111].nativeCurrency.symbol).toBe("CUSTOM")
+  })
+
+  it('updates decimals to 18 if they are currently 0', () => {
+    const updatedState = migrations.apply(state, 28)
+    const metadata = updatedState.main.networksMeta.ethereum
+    expect(metadata[5].nativeCurrency.decimals).toBe(18)
+  })
+})

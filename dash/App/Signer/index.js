@@ -505,6 +505,7 @@ class Signer extends React.Component {
           {canReconnect ? this.reconnectButton(hwSigner) : null}
           <div className='signerControlOption signerControlOptionImportant' onClick={() => {
             link.send('dash:removeSigner', this.props.id)
+            link.send('tray:action', 'backDash')
           }}>Remove Signer</div>
         </div>
       </div>

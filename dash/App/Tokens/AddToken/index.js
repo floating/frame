@@ -57,7 +57,16 @@ class AddTokenChainScreenComponent extends Component {
       </div>
       </div>
       <div className='newTokenChainSelectFooter'>
-        {'Chain not listed? Enable it in Chains'}
+        {'Chain not listed?'}
+        <div 
+          className='newTokenEnableChainLink'
+          role='link'
+          onClick={() => {
+            link.send('tray:action', 'navDash', { view: 'chains', data: { } })
+          }}
+        >
+          {'Enable it in Chains'}
+        </div>
       </div>
     </div>
   }
@@ -335,9 +344,7 @@ class AddTokenFormScreenComponent extends Component {
                     const token = { name, symbol, chainId, address, decimals, logoURI: this.isDefault('logoURI') ? '' : logoURI }
                     link.send('tray:addToken', token, req)
                     setTimeout(() => {
-                      link.send('tray:action', 'backDash')
-                      link.send('tray:action', 'backDash')
-                      link.send('tray:action', 'backDash')
+                      link.send('tray:action', 'backDash', 3)
                     }, 400)
                   }}
                 >

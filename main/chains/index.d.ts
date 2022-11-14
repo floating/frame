@@ -3,7 +3,7 @@ import { chainsType } from '@ethereumjs/common/dist/types'
 import { EventEmitter } from 'stream'
 
 export interface Chain {
-  id: number,
+  id: number
   type: 'ethereum'
 }
 

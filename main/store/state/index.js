@@ -41,11 +41,17 @@ const initial = {
   windows: {
     panel: {
       show: false,
-      nav: []
+      nav: [],
+      footer: {
+        height: 40
+      }
     },
     dash: {
       show: false,
-      nav: []
+      nav: [],
+      footer: {
+        height: 40
+      }
     },
     frames: []
   },
@@ -154,7 +160,7 @@ const initial = {
   },
   platform: process.platform,
   main: {
-    _version: main('_version', 27),
+    _version: main('_version', 28),
     instanceId: main('instanceId', generateUuid()),
     colorway: main('colorway', 'dark'),
     colorwayPrimary: {
@@ -415,10 +421,9 @@ const initial = {
               price: 0,
               change24hr: 0
             },
-            icon: '',
-            name: '',
-            symbol: '',
-            decimals: 0
+            icon: "https://assets.coingecko.com/coins/images/279/large/ethereum.png?1595348880",
+            name: 'Ether',
+            decimals: 18
           },
           icon: '',
           primaryColor: 'accent1' // Mainnet
@@ -433,15 +438,14 @@ const initial = {
             }
           },
           nativeCurrency: {
-            symbol: 'ETH',
+            symbol: 'görETH',
             usd: {
               price: 0,
               change24hr: 0
             },
             icon: '',
-            name: '',
-            symbol: '',
-            decimals: 0
+            name: 'Görli Ether',
+            decimals: 18
           },
           icon: '',
           primaryColor: 'accent2' // Testnet
@@ -462,8 +466,8 @@ const initial = {
               change24hr: 0
             },
             icon: '',
-            name: '',
-            symbol: '',
+            name: 'Ether',
+            symbol: '18',
             decimals: 0
           },
           icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/optimism.svg',
@@ -487,7 +491,7 @@ const initial = {
             icon: '',
             name: '',
             symbol: '',
-            decimals: 0
+            decimals: 18
           },
           icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/gnosis.svg',
           primaryColor: 'accent5' // Gnosis
@@ -509,8 +513,7 @@ const initial = {
             },
             icon: '',
             name: '',
-            symbol: '',
-            decimals: 0
+            decimals: 18
           },
           icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/polygon.svg',
           primaryColor: 'accent6' // Polygon
@@ -531,9 +534,9 @@ const initial = {
               change24hr: 0
             },
             icon: '',
-            name: '',
+            name: 'Ether',
             symbol: '',
-            decimals: 0
+            decimals: 18
           },
           icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/arbitrum.svg',
           primaryColor: 'accent7' // Arbitrum
@@ -548,15 +551,14 @@ const initial = {
             }
           },
           nativeCurrency: {
-            symbol: 'ETH',
+            symbol: 'sepETH',
             usd: {
               price: 0,
               change24hr: 0
             },
             icon: '',
-            name: '',
-            symbol: '',
-            decimals: 0
+            name: 'Sepolia Ether',
+            decimals: 18
           },
           icon: '',
           primaryColor: 'accent2' // Testnet

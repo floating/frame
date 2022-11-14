@@ -47,8 +47,8 @@ interface Origin {
 }
 
 interface Permission {
-  origin: string,
-  provider: boolean, // whether or not to grant access
+  origin: string
+  provider: boolean // whether or not to grant access
   handlerId?: string
 }
 
@@ -57,6 +57,7 @@ interface NativeCurrency {
   icon: string
   name: string
   decimals: number
+  usd?: Rate
 }
 
 interface GasData {
@@ -110,10 +111,8 @@ interface Balance {
 }
 
 interface Rate {
-  usd: {
-    price: BigNumber,
-    change24hr: BigNumber
-  }
+  price: number
+  change24hr: number
 }
 
 interface Token {

@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom'
 import Restore from 'react-restore'
 
 import Account from './Account'
-import RequestCommand from './RequestCommand'
 
 import link from '../../../resources/link'
 import { isHardwareSigner } from '../../../resources/domain/signer'
@@ -33,14 +32,14 @@ class _Footer extends React.Component {
       if (req) {
         if (req.type === 'transaction' && crumb.data.step === 'confirm') {
           return (
-            <div className='footerModule'>
+            <div className='footerModule' style={{ height: '200px' }}>
               <RequestCommand req={req} signingDelay={isHardwareSigner(account.lastSignerType) ? 0 : 2000} />
             </div>
           )
         } else if (req.type === 'access') {
           return (
             <div className='footerModule'>
-              <div className='requestApprove'>
+              <div className='requestApprove requestApproveSimple'>
                 <div 
                   className='requestDecline' 
                   style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none'}}
@@ -64,9 +63,7 @@ class _Footer extends React.Component {
           )
         } else if (req.type === 'sign' || req.type === 'signTypedData') {
           return (
-            <div className='footerModule'>
-              <RequestCommand req={req} signingDelay={isHardwareSigner(account.lastSignerType) ? 0 : 2000} />
-            </div>
+            <RequestCommand req={req} signingDelay={isHardwareSigner(account.lastSignerType) ? 0 : 1500} />
           )
         } else if (req.type === 'addChain' || req.type === 'switchChain') {
           return (
@@ -185,32 +182,6 @@ class Main extends React.Component {
     }, 3000)
   }
 
-  accountSort (accounts, a, b) {
-    try {
-      let [aBlock, aLocal] = accounts[a].created.split(':')
-      let [bBlock, bLocal] = accounts[b].created.split(':')
-  
-      aLocal = parseInt(aLocal)
-      bLocal = parseInt(bLocal)
-  
-      if (aBlock === 'new' && bBlock !== 'new') return -1
-      if (bBlock !== 'new' && aBlock === 'new') return 1
-      if (aBlock === 'new' && bBlock === 'new') return aLocal >= bLocal ? 1 : 0
-  
-      aBlock = parseInt(aBlock)
-      bBlock = parseInt(bBlock)
-  
-      if (aBlock > bBlock) return -1
-      if (aBlock < bBlock) return -1
-      if (aBlock === bBlock) return aLocal >= bLocal ? 1 : 0
-
-      return 0
-    } catch (e) {
-      console.error(e)
-      return 0
-    }
-  }
-
   render () {
     const accounts = this.store('main.accounts')
     const current = this.store('selected.current')
@@ -229,7 +200,6 @@ class Main extends React.Component {
           reportScroll={() => this.reportScroll()} 
           resetScroll={() => this.resetScroll()} 
         />
-        <Footer />
       </>
     )
   }
