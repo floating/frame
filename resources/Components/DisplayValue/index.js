@@ -5,7 +5,7 @@ const CurrencySymbol = ({ symbol }) => <span className='currencySymbol'>{symbol}
 
 export const DisplayValue = ({ value, valueData, valueDataParams, currencySymbol, type = 'ether', currencySymbolPosition = 'first' }) => {
   const data = valueData || displayValueData(value, valueDataParams)
-  const { approximationSymbol = '', displayValue, displayUnit } = data[type]
+  const { approximationSymbol = '', displayValue, displayUnit } = data[type]()
   
   return <div className='displayValue'>
     <span className='approximation'>{approximationSymbol}</span>

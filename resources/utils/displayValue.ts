@@ -56,71 +56,69 @@ type DisplayValueDataParams = {
   isTestnet: boolean 
 }
 
-type Currency = { 
-  value: BigNumber, 
-  displayValue: string, 
-  approximationSymbol?: string 
-}
-
 type SourceValue = string | number | BigNumber
 
 export function displayValueData (sourceValue: SourceValue, params: DisplayValueDataParams) {
   const { currencyRate, decimals = 18, decimalsOverride, isTestnet = false } = params || {} as DisplayValueDataParams
   const bn = BigNumber(sourceValue, isHexString(sourceValue) ? 16 : undefined)
-  const currency: { [K: string]: Currency } = {}
+  const currencyHelperMap = {
+    fiat: () => {  
+      const nativeCurrency = BigNumber(isTestnet || !currencyRate ? 0 : currencyRate.price)
+      const value = bn.shiftedBy(-18).multipliedBy(nativeCurrency).decimalPlaces(2, BigNumber.ROUND_FLOOR)
+      
+      if (isTestnet || value.isNaN()) {
+        return {
+          value, 
+          displayValue: '?'
+        }
+      }
 
-  const getFiatCurrency = (): Currency => {  
-    const nativeCurrency = BigNumber(isTestnet || !currencyRate ? 0 : currencyRate.price)
-    const value = bn.shiftedBy(-18).multipliedBy(nativeCurrency).decimalPlaces(2, BigNumber.ROUND_FLOOR)
+      if (value.isZero()) {
+        return {
+          value,
+          approximationSymbol: '<',
+          displayValue: '0.01'
+        }
+      }  
     
-    if (isTestnet) {
-      return {
-        value, 
-        displayValue: '?'
-      }
-    }
-
-    if (value.isZero()) {
       return {
         value,
-        approximationSymbol: '<',
-        displayValue: '0.01'
+        ...getDisplayValue(value)
       }
-    }  
+    },
+    ether: () => {
+      const value = bn.shiftedBy(-decimals).decimalPlaces(decimalsOverride || decimals, BigNumber.ROUND_FLOOR)
+    
+      if (decimalsOverride && value.isZero()) {
+        return {
+          value,
+          approximationSymbol: '<',
+          displayValue: BigNumber(`1e-${decimalsOverride}`).toFormat()
+        }
+      }
   
-    return {
-      value,
-      ...getDisplayValue(value)
-    }
-  }
-
-  currency.fiat = getFiatCurrency()
-
-  const getEtherCurrency = () => {
-    const value = bn.shiftedBy(-decimals).decimalPlaces(decimalsOverride || decimals, BigNumber.ROUND_FLOOR)
-  
-    if (decimalsOverride && value.isZero()) {
       return {
         value,
-        approximationSymbol: '<',
-        displayValue: BigNumber(`1e-${decimalsOverride}`).toFormat()
+        ...getDisplayValue(value)
       }
-    }
+    },
+    gwei: () => {
+      const value = bn.shiftedBy(-9).decimalPlaces(6, BigNumber.ROUND_FLOOR)
 
-    return {
-      value,
-      ...getDisplayValue(value)
-    }
+      // return bnGwei.isZero() ? '' : bnGwei.toFormat()
+      return {
+        value,
+        ...getDisplayValue(value)
+      }
+    },
+    wei: () => ({
+      value: bn,
+      displayValue: bn.toFormat(0)
+    })
   }
-
-  currency.ether = getEtherCurrency()
-
-  const bnGwei = bn.shiftedBy(-9).decimalPlaces(6, BigNumber.ROUND_FLOOR)
   
   return {
     bn,
-    ...currency,
-    gwei: bnGwei.isZero() ? '' : bnGwei.toFormat(),
-    wei: bn.toFormat(0)
+    ...currencyHelperMap
   }
 }

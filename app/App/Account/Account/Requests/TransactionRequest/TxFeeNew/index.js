@@ -11,9 +11,10 @@ import { ClusterBox, Cluster, ClusterRow, ClusterColumn, ClusterValue } from '..
 const FEE_WARNING_THRESHOLD_USD = 50
 
 const GasDisplay = ({ maxFeePerGas }) => {
-  const gweiDisplayValue = maxFeePerGas.gwei
-  const displayValue = gweiDisplayValue || maxFeePerGas.wei
-  const displayLabel = !!gweiDisplayValue ? 'Gwei' : 'Wei'
+  const { displayValue: gweiDisplayValue } = maxFeePerGas.gwei()
+  const shouldDisplayWei = gweiDisplayValue === '0'
+  const displayValue = shouldDisplayWei ? maxFeePerGas.wei().displayValue : gweiDisplayValue
+  const displayLabel = shouldDisplayWei ? 'Wei' : 'Gwei'
 
   return (
     <div data-testid='gas-display' className='_txFeeGwei'>
@@ -24,7 +25,7 @@ const GasDisplay = ({ maxFeePerGas }) => {
 }     
 
 const USDEstimateDisplay = ({ minFee, maxFee, nativeCurrency }) => {
-  const { fiat: { value: maxFeeValue, approximationSymbol: maxFeeApproximation } } = maxFee
+  const { value: maxFeeValue, approximationSymbol: maxFeeApproximation } = maxFee.fiat()
   const displayMaxFeeWarning = maxFeeValue > FEE_WARNING_THRESHOLD_USD
   
   return <div data-testid='usd-estimate-display' className='clusterTag'>

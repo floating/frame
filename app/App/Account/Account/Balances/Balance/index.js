@@ -90,6 +90,7 @@ class Balance extends React.Component {
             <div className='signerBalanceCurrentValue'>
               {svg.usd(10)}{balance.displayValue}
             </div>
+            <DisplayValue type='fiat' value={balance.balance} valueDataParams={{ currencyRate: balance.usdRate, isTestnet: chain.isTestnet }} currencySymbol='$' />
           </div>
         </div>
       </div>
