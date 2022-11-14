@@ -93,7 +93,7 @@ export default function (store: Store) {
 
         log.debug(`Resuming balances scan for address ${address}`)
 
-        startScan(storeApi.getActiveAddress())
+        startScan(address)
       }
     }
   }

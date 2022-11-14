@@ -94,7 +94,6 @@ export default function () {
   const trayObserver = store.observer(() => {
     const open = store('tray.open')
 
-    console.log(' >>>>>>>>>>>>>>>>>>>> IS TRAY OPEN?!?!?!', open)
     if (!open) {
       balances.pause()
     } else {
