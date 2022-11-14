@@ -21,7 +21,8 @@ class Balance extends React.Component {
 
   render () {
     const { symbol, balance, i, scanning, chainId } = this.props
-    const change = parseFloat(balance.priceChange)
+    const { priceChange, decimals, balance: balanceValue, usdRate: currencyRate, logoURI, price, displayBalance = '0' } = balance
+    const change = parseFloat(priceChange)
     const direction = change < 0 ? -1 : change > 0 ? 1 : 0
     let priceChangeClass = 'signerBalanceCurrentPriceChange'
     if (direction !== 0) {
@@ -34,14 +35,14 @@ class Balance extends React.Component {
     let name = balance.name
     if (name.length > 19) name = name.substr(0, 17) + '..'
 
-    const priceChange = () => {
-      if (!balance.priceChange) {
+    const displayPriceChange = () => {
+      if (!priceChange) {
         return ''
       }
-      return `(${direction === 1 ? '+' : ''}${balance.priceChange}%)`
+      return `(${direction === 1 ? '+' : ''}${priceChange}%)`
     }
     const chain = this.store('main.networks.ethereum', chainId)
-    const chainName = chain ? chain.name : ''
+    const { name: chainName = '', isTestnet = false } = chain
     const chainColor = this.store('main.networksMeta.ethereum', chainId, 'primaryColor')
 
     return (
@@ -50,7 +51,7 @@ class Balance extends React.Component {
         <div className='signerBalanceInner' style={{ opacity: !scanning ? 1 : 0 }}>
           <div className='signerBalanceIcon'>
             <RingIcon 
-              img={symbol.toUpperCase() !== 'ETH' && balance.logoURI}
+              img={symbol.toUpperCase() !== 'ETH' && logoURI}
               alt={symbol.toUpperCase()}
               color={chainColor ? `var(--${chainColor})` : ''}
             />
@@ -64,19 +65,19 @@ class Balance extends React.Component {
           <div className='signerBalanceCurrency'>
             {name}
           </div>
-          <div className='signerBalanceValue' style={(balance.displayBalance || '0').length >= 12 ? { fontSize: '15px', top: '10px' } : {}}>
-            <DisplayValue type='ether' value={balance.balance} valueDataParams={{ decimalsOverride: 6, decimals: balance.decimals }} currencySymbol={symbol.toUpperCase()} />
+          <div className='signerBalanceValue' style={displayBalance.length >= 12 ? { fontSize: '15px', top: '10px' } : {}}>
+            <DisplayValue type='ether' value={balanceValue} valueDataParams={{ decimals }} currencySymbol={symbol.toUpperCase()} />
           </div>
           <div className='signerBalancePrice'>
             <div className='signerBalanceOk'>
               <span className='signerBalanceCurrentPrice'>
-                {svg.usd(10)}{balance.price}
+                <DisplayValue type='fiat' value={`1e${decimals}`} valueDataParams={{ decimals, currencyRate, isTestnet, displayFullValue: true }} decimalsOverride={2} currencySymbol='$' />
               </span>
               <span className={priceChangeClass}>
-                <span>{priceChange()}</span>
+                <span>{displayPriceChange()}</span>
               </span>
             </div>
-            <DisplayValue type='fiat' value={balance.balance} valueDataParams={{ decimals: balance.decimals, decimalsOverride: 0, currencyRate: balance.usdRate, isTestnet: chain.isTestnet }} currencySymbol='$' />
+            <DisplayValue type='fiat' value={balanceValue} valueDataParams={{ decimals, currencyRate, isTestnet }} decimalsOverride={0} currencySymbol='$' />
           </div>
         </div>
       </div>

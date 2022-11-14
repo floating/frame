@@ -3,9 +3,13 @@ import { displayValueData } from '../../utils/displayValue'
 
 const CurrencySymbol = ({ symbol }) => <span className='currencySymbol'>{symbol}</span>
 
-export const DisplayValue = ({ value, valueData, valueDataParams, currencySymbol, type = 'ether', currencySymbolPosition = 'first' }) => {
+export const DisplayValue = ({ value, valueData, valueDataParams, currencySymbol, type = 'ether', decimalsOverride, currencySymbolPosition = 'first' }) => {
   const data = valueData || displayValueData(value, valueDataParams)
-  const { approximationSymbol = '', displayValue, displayUnit } = data[type]()
+  const defaultDecimals = {
+    ether: 6,
+    fiat: 2
+  }
+  const { approximationSymbol = '', displayValue, displayUnit } = data[type](decimalsOverride === undefined ? defaultDecimals[type] : decimalsOverride)
   
   return <div className='displayValue'>
     <span className='approximation'>{approximationSymbol}</span>

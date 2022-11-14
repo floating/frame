@@ -22,7 +22,7 @@ export function formatBalance (balance: BigNumber, totalValue: BigNumber, decima
   }).format(Number(balance.toFixed(decimals, BigNumber.ROUND_FLOOR)))
 }
 
-export function formatUsdRate (rate:BigNumber, decimals = 2) {
+export function formatUsdRate (rate: BigNumber, decimals = 2) {
   return rate.isNaN()
     ? UNKNOWN
     : new Intl.NumberFormat('us-US', {

@@ -29,42 +29,44 @@ const displayUnitMapping = {
   }
 }
 
-function getDisplayValue (bn: BigNumber) {
-  // large numbers
-  for (const [unitName, { lowerBound, upperBound, unitDisplay }] of Object.entries(displayUnitMapping)) {
-    if (bn.isGreaterThan(lowerBound) && bn.isLessThan(upperBound)) {
-      return {
-        displayValue: bn.shiftedBy(-(lowerBound.sd(true))).sd(3).toFormat(),
-        displayUnit: {
-          fullName: unitName,
-          shortName: unitDisplay
+function getDisplayValue (bn: BigNumber, decimalsOverride?: number, displayFullValue?: boolean) {
+  if (!displayFullValue) {
+    // shorthand display of large numbers
+    for (const [unitName, { lowerBound, upperBound, unitDisplay }] of Object.entries(displayUnitMapping)) {
+      if (bn.isGreaterThan(lowerBound) && bn.isLessThan(upperBound)) {
+        return {
+          displayValue: bn.shiftedBy(-(lowerBound.sd(true))).sd(3).toFormat(),
+          displayUnit: {
+            fullName: unitName,
+            shortName: unitDisplay
+          }
         }
       }
     }
   }
 
-  // small numbers < 1000
+  // display small numbers or full values
   return {
-    displayValue: bn.toFormat()
+    displayValue: bn.toFormat(decimalsOverride)
   }
 }
 
 type DisplayValueDataParams = { 
-  currencyRate?: Rate, 
-  decimals: number, 
-  decimalsOverride?: number, 
-  isTestnet: boolean 
+  currencyRate?: Rate
+  displayFullValue?: boolean 
+  decimals: number
+  isTestnet: boolean
 }
 
 type SourceValue = string | number | BigNumber
 
 export function displayValueData (sourceValue: SourceValue, params: DisplayValueDataParams) {
-  const { currencyRate, decimals = 18, decimalsOverride, isTestnet = false } = params || {} as DisplayValueDataParams
+  const { currencyRate, decimals = 18, isTestnet = false, displayFullValue = false } = params || {} as DisplayValueDataParams
   const bn = BigNumber(sourceValue, isHexString(sourceValue) ? 16 : undefined)
   const currencyHelperMap = {
-    fiat: () => {  
+    fiat: (decimalsOverride: number) => {  
       const nativeCurrency = BigNumber(isTestnet || !currencyRate ? 0 : currencyRate.price)
-      const value = bn.shiftedBy(-decimals).multipliedBy(nativeCurrency).decimalPlaces(decimalsOverride !== undefined ? decimalsOverride : 2, BigNumber.ROUND_FLOOR)
+      const value = bn.shiftedBy(-decimals).multipliedBy(nativeCurrency).decimalPlaces(decimalsOverride, BigNumber.ROUND_FLOOR)
       
       if (isTestnet || value.isNaN()) {
         return {
@@ -83,10 +85,10 @@ export function displayValueData (sourceValue: SourceValue, params: DisplayValue
     
       return {
         value,
-        ...getDisplayValue(value)
+        ...getDisplayValue(value, decimalsOverride, displayFullValue)
       }
     },
-    ether: () => {
+    ether: (decimalsOverride: number) => {
       const value = bn.shiftedBy(-decimals).decimalPlaces(decimalsOverride || decimals, BigNumber.ROUND_FLOOR)
     
       if (decimalsOverride && value.isZero()) {

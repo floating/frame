@@ -72,7 +72,7 @@ class BalancesPreview extends React.Component {
         const decimals = isNative ? nativeCurrencyInfo.decimals || 18 : rawBalance.decimals
         const symbol = (isNative && nativeCurrencyInfo.symbol) || rawBalance.symbol
       
-        return createBalance({ ...rawBalance, logoURI, name, decimals, symbol }, rate.usd)      
+        return createBalance({ ...rawBalance, logoURI, name, decimals, symbol }, networks[rawBalance.chainId].isTestnet ? { price: 0 } : rate.usd)      
       })
       .sort(byTotalValue)
 

@@ -25,7 +25,7 @@ const GasDisplay = ({ maxFeePerGas }) => {
 }     
 
 const USDEstimateDisplay = ({ minFee, maxFee, nativeCurrency }) => {
-  const { value: maxFeeValue, approximationSymbol: maxFeeApproximation } = maxFee.fiat()
+  const { value: maxFeeValue, approximationSymbol: maxFeeApproximation } = maxFee.fiat(2)
   const displayMaxFeeWarning = maxFeeValue > FEE_WARNING_THRESHOLD_USD
   
   return <div data-testid='usd-estimate-display' className='clusterTag'>
@@ -62,7 +62,7 @@ class TxFee extends React.Component {
     const maxFeePerGas = BigNumber(req.data[usesBaseFee(req.data) ? 'maxFeePerGas' : 'gasPrice'])
     const maxFee = displayValueData(
       maxFeePerGas.multipliedBy(maxGas), 
-      { decimalsOverride: 6, currencyRate: nativeCurrency.usd, isTestnet }
+      { currencyRate: nativeCurrency.usd, isTestnet }
     )
 
     // accounts for two potential 12.5% block fee increases
