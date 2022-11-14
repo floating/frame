@@ -39,10 +39,10 @@ if (!hasInstanceLock) {
   app.exit(1)
 }
 
-const cpuMonitoringInterval = 10 // seconds
-const cpuThreshold = 30 // percent
-
 if (dev) {
+  const cpuMonitoringInterval = 10 // seconds
+  const cpuThreshold = 30 // percent
+
   setTimeout(() => {
     app.getAppMetrics()
 
