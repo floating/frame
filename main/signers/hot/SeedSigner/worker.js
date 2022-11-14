@@ -35,13 +35,13 @@ class SeedSignerWorker extends HotSignerWorker {
     super.signMessage(key, message, pseudoCallback)
   }
 
-  signTypedData (params, pseudoCallback) {
+  signTypedData ({ index, typedMessage }, pseudoCallback) {
     // Make sure signer is unlocked
     if (!this.seed) return pseudoCallback('Signer locked')
     // Derive private key
-    const key = this._derivePrivateKey(params.index)
+    const key = this._derivePrivateKey(index)
     // Sign message
-    super.signTypedData(key, params, pseudoCallback)
+    super.signTypedData({ key, typedMessage }, pseudoCallback)
   }
 
   signTransaction ({ index, rawTx }, pseudoCallback) {
