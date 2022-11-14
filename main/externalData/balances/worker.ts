@@ -6,7 +6,7 @@ log.transports.console.level = process.env.LOG_WORKER ? 'debug' : 'info'
 log.transports.file.level = ['development', 'test'].includes(process.env.NODE_ENV || 'development') ? false : 'verbose'
 
 import { supportsChain as chainSupportsScan } from '../../multicall'
-import balancesLoader, { BalanceLoader } from './scan'
+import balancesLoader, { BalanceLoader, TokenBalance } from './scan'
 import TokenLoader from '../inventory/tokens'
 
 interface ExternalDataWorkerMessage {
@@ -56,7 +56,7 @@ async function tokenBalanceScan (address: Address, tokensToOmit: Token[] = [], c
     // for chains that support multicall, we can attempt to load every token that we know about,
     // for all other chains we need to call each contract individually so don't scan every contract
     const eligibleChains = (chains || await getChains()).filter(chainSupportsScan)
-    const tokenLists = eligibleChains.map(chainId => tokenLoader.getTokens(chainId))
+    const tokenLists = eligibleChains.map(chainId => tokenLoader.getTokens({chainId}))
     const tokens = tokenLists.reduce((all, tokenList) => {
       return all.concat(
         tokenList.filter(token => tokensToOmit.every(t => t.chainId !== token.chainId || t.address !== token.address))
@@ -73,10 +73,31 @@ async function tokenBalanceScan (address: Address, tokensToOmit: Token[] = [], c
 }
 
 async function fetchTokenBalances (address: Address, tokens: Token[]) {
+  const omittedTokens = tokenLoader.getTokens({omitted: true})
+  const omittedTokensSet = new Set(omittedTokens.map(({address, chainId}) => `${chainId}:${address}`))
+  const [toFetch, toOmit] = tokens.reduce((acc: [Token[], TokenBalance[]], token) => {
+    const {address, chainId, symbol, name, decimals} = token
+    if(omittedTokensSet.has(`${chainId}:${address}`)) {
+      acc[0].push(token)
+    } else {
+      acc[1].push(
+        {
+          symbol,
+          name,
+          chainId,
+          address,
+          decimals,
+          balance: '0',
+          displayBalance: '0'
+        }
+      )
+    }
+    return acc
+  }, [[],[]])
   try {
-    const tokenBalances = await balances.getTokenBalances(address, tokens)
+    const tokenBalances = await balances.getTokenBalances(address, toFetch)
 
-    sendToMainProcess({ type: 'tokenBalances', address, balances: tokenBalances })
+    sendToMainProcess({ type: 'tokenBalances', address, balances: tokenBalances.concat(toOmit) })
   } catch (e) {
     log.error('error fetching token balances', e)
   }
