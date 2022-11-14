@@ -25,8 +25,13 @@ export const ClusterRow = ({ children, style = {} }) => {
   )
 }
 
-export const ClusterColumn = ({ children, style = {}, grow = 1 }) => {
+export const ClusterColumn = ({ children, style = {}, grow = 1, width }) => {
   style.flexGrow = grow
+  if (width) {
+    style.width = width
+    style.minWidth = width
+    style.maxWidth = width
+  }
   return (
     <div className='clusterColumn' style={style}>
       {children}
