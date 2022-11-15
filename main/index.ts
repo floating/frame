@@ -28,10 +28,11 @@ app.commandLine.appendSwitch('ignore-gpu-blacklist', 'true')
 app.commandLine.appendSwitch('enable-native-gpu-memory-buffers', 'true')
 app.commandLine.appendSwitch('force-color-profile', 'srgb')
 
-log.transports.console.level = process.env.LOG_LEVEL || 'info'
+const dev = process.env.NODE_ENV === 'development'
+
+log.transports.console.level = process.env.LOG_LEVEL || (dev ? 'verbose' : 'info')
 log.transports.file.level = ['development', 'test'].includes(process.env.NODE_ENV) ? false : 'verbose'
 
-const dev = process.env.NODE_ENV === 'development'
 const hasInstanceLock = app.requestSingleInstanceLock()
 
 if (!hasInstanceLock) {
