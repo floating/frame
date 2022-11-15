@@ -30,7 +30,17 @@ const displayUnitMapping = {
 }
 const maxDisplayValue = BigNumber(999999999999999999999)
 
-function getDisplayValue (bn: BigNumber, context: string, decimalsOverride?: number, displayFullValue?: boolean) {
+function getShorthandDisplayValue (bn: BigNumber, shiftedBy: number, decimalPlaces: number) {
+  const value = bn.shiftedBy(shiftedBy)
+
+  if (decimalPlaces !== 2) {
+    return value.decimalPlaces(decimalPlaces).toFormat()
+  }
+
+  return value.sd(3).toFormat()
+}
+
+function getDisplay (bn: BigNumber, context: string, decimalsOverride: number, displayFullValue?: boolean) {
   if (bn.isZero()) {
     return {
       approximationSymbol: '<',
@@ -47,7 +57,7 @@ function getDisplayValue (bn: BigNumber, context: string, decimalsOverride?: num
         // maximum display value is hard coded because maxDisplayValue is above the bignumber 15sd limit
         return {
           approximationSymbol: displayMax ? '>' : '',
-          displayValue: displayMax ? '999,999' : bn.shiftedBy(-(lowerBound.sd(true))).sd(3).toFormat(),
+          displayValue: displayMax ? '999,999' : getShorthandDisplayValue(bn, -(lowerBound.sd(true)), decimalsOverride),
           displayUnit: {
             fullName: unitName,
             shortName: unitDisplay
@@ -89,7 +99,7 @@ export function displayValueData (sourceValue: SourceValue, params: DisplayValue
     
       return {
         value,
-        ...getDisplayValue(value, 'fiat', decimalsOverride, displayFullValue)
+        ...getDisplay(value, 'fiat', decimalsOverride, displayFullValue)
       }
     },
     ether: (decimalsOverride = 6) => {
@@ -97,7 +107,7 @@ export function displayValueData (sourceValue: SourceValue, params: DisplayValue
   
       return {
         value,
-        ...getDisplayValue(value, 'ether', decimalsOverride)
+        ...getDisplay(value, 'ether', decimalsOverride, displayFullValue)
       }
     },
     gwei: () => {
