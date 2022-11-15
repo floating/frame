@@ -1,5 +1,5 @@
 import React from 'react'
-import ReactDOM from 'react-dom'
+import { createRoot } from 'react-dom/client';
 import Restore from 'react-restore'
 
 import _store from './store'
@@ -20,7 +20,8 @@ link.rpc('getState', (err, state) => {
     document.body.className = store('main.colorway')
   })
   const Flow = Restore.connect(App, store)
-  ReactDOM.render(<Flow />, document.getElementById('flow'))
+  const root = createRoot(document.getElementById('flow'));
+  root.render(<Flow />)
 })
 // document.addEventListener('mouseout', e => { if (e.clientX < 0) link.send('tray:mouseout') })
 // document.addEventListener('contextmenu', e => link.send('tray:contextmenu', e.clientX, e.clientY))
