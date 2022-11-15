@@ -93,12 +93,13 @@ class Requests extends React.Component {
 
   render () {
     const activeAccount =  this.store('main.accounts', this.props.id)
-    const requests = Object.values(activeAccount.requests || {})
-
-    requests.sort((a, b) => {
+    const requests = Object.values(activeAccount.requests || {}).sort((a, b) => {
       if (a.created > b.created) return -1
       if (a.created < b.created) return 1
       return 0
+    }).filter(req => {
+      const elapsed = Date.now() - (req && req.created || 0)
+      return elapsed > 1000
     })
 
     return (

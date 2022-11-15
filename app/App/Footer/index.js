@@ -32,7 +32,7 @@ class Footer extends React.Component {
     if (this.observer) this.observer.observe(this.footerRef.current)
   }
   componentWillUnmount () {
-    this.observer.unobserve()
+    if (this.footerRef && this.footerRef.current && this.observer) this.observer.unobserve(this.footerRef.current)
   }
   approve (reqId, req) {
     link.rpc('approveRequest', req, () => {}) // Move to link.send
