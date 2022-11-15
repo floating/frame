@@ -4,8 +4,8 @@ import Pylon from '@framelabs/pylon-client'
 import store from '../store'
 import Inventory from './inventory'
 import Rates from './assets'
-import { arraysMatch, debounce } from '../../resources/utils'
 import Balances from './balances'
+import { arraysMatch, debounce } from '../../resources/utils'
 
 export interface DataScanner {
   close: () => void
@@ -30,6 +30,7 @@ export default function () {
   const balances = Balances(store)
 
   let connectedChains: number[] = [], activeAccount: Address = ''
+  let pauseScanningDelay: NodeJS.Timeout | undefined
 
   inventory.start()
   rates.start()
@@ -91,15 +92,38 @@ export default function () {
     handleTokensUpdate(customTokens)
   }, 'externalData:customTokens')
 
+  const trayObserver = store.observer(() => {
+    const open = store('tray.open')
+
+    if (!open) {
+      // pause balance scanning after the tray is out of view for one minute
+      if (!pauseScanningDelay) {
+        pauseScanningDelay = setTimeout(balances.pause, 1000)
+      }
+    } else {
+      if (pauseScanningDelay) {
+        clearTimeout(pauseScanningDelay)
+        pauseScanningDelay = undefined
+
+        balances.resume()
+      }
+    }
+  }, 'externalData:tray')
+
   return {
     close: () => {
       allNetworksObserver.remove()
       activeAddressObserver.remove()
       customTokensObserver.remove()
+      trayObserver.remove()
 
       inventory.stop()
       rates.stop()
       balances.stop()
+
+      if (pauseScanningDelay) {
+        clearTimeout(pauseScanningDelay)
+      }
     }
   } as DataScanner
 }
