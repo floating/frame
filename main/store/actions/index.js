@@ -619,6 +619,15 @@ module.exports = {
       return existing.filter(token => !includesToken(tokens, token))
     })
   },
+  removeKnownTokensAllAccounts: (u, tokensSet) => {
+    u('main.tokens.known', (known = {}) => {
+      for (const accountAddress in known) {
+        known[accountAddress] = known[accountAddress].filter(({chainId, address}) => !tokensSet.has(`${chainId}:${address.toLowerCase()}`))        
+      }
+      return known
+    })
+  }
+  ,
   setColorway: (u, colorway) => {
     u('main.colorway', () => {
       return colorway

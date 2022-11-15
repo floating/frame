@@ -17,6 +17,12 @@ interface TokenBalanceMessage extends Omit<WorkerMessage, 'type'> {
   balances: TokenBalance[]
 }
 
+interface TokenBlacklistMessage extends Omit<WorkerMessage, 'type'> {
+  type: 'tokenBlacklist',
+  address: Address,
+  tokens: Token[]
+}
+
 interface ChainBalanceMessage extends Omit<WorkerMessage, 'type'> {
   type: 'chainBalances',
   address: Address,
@@ -64,6 +70,11 @@ export default class BalancesWorkerController extends EventEmitter {
       if (message.type === 'tokenBalances') {
         const { address, balances } = (message as TokenBalanceMessage)
         this.emit('tokenBalances', address, balances)
+      }
+
+      if (message.type === 'tokenBlacklist') {
+        const { address, tokens } = (message as TokenBlacklistMessage)
+        this.emit('tokenBlacklist', address, tokens)
       }
     })
   

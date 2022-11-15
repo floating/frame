@@ -206,13 +206,8 @@ export default function (store: Store) {
 
   function handleTokenBlacklistUpdate (tokens: Token[]) {
     const tokensToRemoveSet = new Set(tokens.map(({address, chainId}) => `${chainId}:${address.toLowerCase()}`))
-    log.info('removing blacklisted tokens from balances...')
     store.removeBalances(tokensToRemoveSet)
-    // tokens.forEach(({ address: contractAddress, chainId }) => {
-    //   // TODO: can do this all at once rather than one by one, also can check
-    //   // in action handler if these balances exist to prevent extra re-renders
-    //   store.removeBalance(chainId, contractAddress)
-    // })
+    store.removeKnownTokensAllAccounts(tokensToRemoveSet)
   }
 
   function setAddress (address: Address) {
@@ -220,7 +215,7 @@ export default function (store: Store) {
       log.warn(`tried to set address to ${address} but balances controller is not running`)
       return
     }
-
+ 
     if (address) {
       log.verbose('setting address for balances updates', address)
       startScan(address)

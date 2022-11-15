@@ -83,7 +83,9 @@ async function tokenBalanceScan (address: Address, tokensToOmit: Token[] = [], c
 
 async function fetchTokenBalances (address: Address, tokens: Token[]) {
   try {
-    const tokenBalances = await balances.getTokenBalances(address, tokens)
+    const blacklistSet = new Set(tokenLoader.getBlacklist([]).map(({chainId, address}) => `${chainId}:${address.toLowerCase()}`))
+    const filteredTokens = tokens.filter(({chainId, address}) => !blacklistSet.has(`${chainId}:${address.toLowerCase()}`))
+    const tokenBalances = await balances.getTokenBalances(address, filteredTokens)
 
     sendToMainProcess({ type: 'tokenBalances', address, balances: tokenBalances})
   } catch (e) {

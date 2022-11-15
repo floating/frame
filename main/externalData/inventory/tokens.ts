@@ -103,7 +103,7 @@ export default class TokenLoader {
     return this.tokens.filter(token => !token.extensions?.omit && chains.includes(token.chainId))
   }
 
-  getBlacklist (chains: number[]) {
-    return this.tokens.filter(token => chains.includes(token.chainId))
+  getBlacklist (chainsFilter: number[]) {
+    return this.tokens.filter(token => token.extensions?.omit && !chainsFilter.length || chainsFilter.includes(token.chainId))
   }
 }
