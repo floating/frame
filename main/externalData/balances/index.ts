@@ -86,7 +86,7 @@ export default function (store: Store) {
 
   function pause () {
     if (stopScan()) {
-      log.debug(`Pausing balances scan`)
+      log.debug('Pausing balances scan')
 
       onResume = () => {
         const address = storeApi.getActiveAddress()
@@ -113,6 +113,8 @@ export default function (store: Store) {
 
   function startScan (address: Address) {
     stopScan()
+
+    if (onResume) onResume = null
 
     log.verbose(`starting balances scan for ${address}`)
 
