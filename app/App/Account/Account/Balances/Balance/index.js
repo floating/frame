@@ -66,7 +66,7 @@ class Balance extends React.Component {
             {name}
           </div>
           <div className='signerBalanceValue' style={displayBalance.length >= 12 ? { fontSize: '15px', top: '10px' } : {}}>
-            <DisplayValue type='ether' value={balanceValue} valueDataParams={{ decimals }} currencySymbol={symbol.toUpperCase()} />
+            <DisplayValue type='ether' value={balanceValue} valueDataParams={{ decimals }} />
           </div>
           <div className='signerBalancePrice'>
             <div className='signerBalanceOk'>

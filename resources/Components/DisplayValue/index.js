@@ -7,11 +7,11 @@ export const DisplayValue = ({ value, valueData, valueDataParams, currencySymbol
   const data = valueData || displayValueData(value, valueDataParams)
   const { approximationSymbol = '', displayValue, displayUnit } = data[type](decimalsOverride)
   
-  return <div className='displayValue'>
+  return <div className='displayValue' data-test-id='display-value'>
     <span className='approximation'>{approximationSymbol}</span>
-    {currencySymbolPosition === 'first' && <CurrencySymbol symbol={currencySymbol} />}
+    {currencySymbol && currencySymbolPosition === 'first' && <CurrencySymbol symbol={currencySymbol} />}
     <span className='value'>{displayValue}</span>
     <span className='unit'>{displayUnit ? displayUnit.shortName : ''}</span>
-    {currencySymbolPosition === 'last' && <CurrencySymbol symbol={currencySymbol} />}
+    {currencySymbol && currencySymbolPosition === 'last' && <CurrencySymbol symbol={currencySymbol} />}
   </div>
 }
