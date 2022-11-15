@@ -28,14 +28,26 @@ const displayUnitMapping = {
     unitDisplay: 'Q'
   }
 }
+const maxDisplayValue = BigNumber(999999999999999999999)
 
-function getDisplayValue (bn: BigNumber, decimalsOverride?: number, displayFullValue?: boolean) {
+function getDisplayValue (bn: BigNumber, context: string, decimalsOverride?: number, displayFullValue?: boolean) {
+  if (bn.isZero()) {
+    return {
+      approximationSymbol: '<',
+      displayValue: BigNumber(`1e-${decimalsOverride}`).toFormat()
+    }
+  }
+
   if (!displayFullValue) {
     // shorthand display of large numbers
     for (const [unitName, { lowerBound, upperBound, unitDisplay }] of Object.entries(displayUnitMapping)) {
       if (bn.isGreaterThan(lowerBound) && bn.isLessThan(upperBound)) {
+        const displayMax = bn.isGreaterThan(maxDisplayValue)
+
+        // maximum display value is hard coded because maxDisplayValue is above the bignumber 15sd limit
         return {
-          displayValue: bn.shiftedBy(-(lowerBound.sd(true))).sd(3).toFormat(),
+          approximationSymbol: displayMax ? '>' : '',
+          displayValue: displayMax ? '999,999' : bn.shiftedBy(-(lowerBound.sd(true))).sd(3).toFormat(),
           displayUnit: {
             fullName: unitName,
             shortName: unitDisplay
@@ -47,7 +59,7 @@ function getDisplayValue (bn: BigNumber, decimalsOverride?: number, displayFullV
 
   // display small numbers or full values
   return {
-    displayValue: bn.toFormat(decimalsOverride)
+    displayValue: bn.toFormat(context === 'fiat' ? decimalsOverride : undefined)
   }
 }
 
@@ -64,7 +76,7 @@ export function displayValueData (sourceValue: SourceValue, params: DisplayValue
   const { currencyRate, decimals = 18, isTestnet = false, displayFullValue = false } = params || {} as DisplayValueDataParams
   const bn = BigNumber(sourceValue, isHexString(sourceValue) ? 16 : undefined)
   const currencyHelperMap = {
-    fiat: (decimalsOverride: number) => {  
+    fiat: (decimalsOverride = 2) => {  
       const nativeCurrency = BigNumber(isTestnet || !currencyRate ? 0 : currencyRate.price)
       const value = bn.shiftedBy(-decimals).multipliedBy(nativeCurrency).decimalPlaces(decimalsOverride, BigNumber.ROUND_FLOOR)
       
@@ -74,43 +86,26 @@ export function displayValueData (sourceValue: SourceValue, params: DisplayValue
           displayValue: '?'
         }
       }
-
-      if (value.isZero()) {
-        return {
-          value,
-          approximationSymbol: '<',
-          displayValue: '0.01'
-        }
-      }  
     
       return {
         value,
-        ...getDisplayValue(value, decimalsOverride, displayFullValue)
+        ...getDisplayValue(value, 'fiat', decimalsOverride, displayFullValue)
       }
     },
-    ether: (decimalsOverride: number) => {
+    ether: (decimalsOverride = 6) => {
       const value = bn.shiftedBy(-decimals).decimalPlaces(decimalsOverride || decimals, BigNumber.ROUND_FLOOR)
-    
-      if (decimalsOverride && value.isZero()) {
-        return {
-          value,
-          approximationSymbol: '<',
-          displayValue: BigNumber(`1e-${decimalsOverride}`).toFormat()
-        }
-      }
   
       return {
         value,
-        ...getDisplayValue(value)
+        ...getDisplayValue(value, 'ether', decimalsOverride)
       }
     },
     gwei: () => {
       const value = bn.shiftedBy(-9).decimalPlaces(6, BigNumber.ROUND_FLOOR)
 
-      // return bnGwei.isZero() ? '' : bnGwei.toFormat()
       return {
         value,
-        ...getDisplayValue(value)
+        displayValue: value.isZero() ? '0' : value.toFormat()
       }
     },
     wei: () => ({

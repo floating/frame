@@ -41,6 +41,7 @@ describe('fiat currency', () => {
   it('should return a value of thousands', () => {
     const value = displayValueData(356e20, { currencyRate: { price: BigNumber(1) }})
     expect(value.fiat()).toStrictEqual({
+      approximationSymbol: '',
       displayUnit: {
         fullName: 'thousand',
         shortName: 'K',
@@ -53,6 +54,7 @@ describe('fiat currency', () => {
   it('should return a value of millions', () => {
     const value = displayValueData(356e23, { currencyRate: { price: BigNumber(1) }})
     expect(value.fiat()).toStrictEqual({
+      approximationSymbol: '',
       displayUnit: {
         fullName: 'million',
         shortName: 'M',
@@ -65,6 +67,7 @@ describe('fiat currency', () => {
   it('should return a value of billions', () => {
     const value = displayValueData(356e26, { currencyRate: { price: BigNumber(1) }})
     expect(value.fiat()).toStrictEqual({
+      approximationSymbol: '',
       displayUnit: {
         fullName: 'billion',
         shortName: 'B',
@@ -77,6 +80,7 @@ describe('fiat currency', () => {
   it('should return a value of trillions', () => {
     const value = displayValueData(356e29, { currencyRate: { price: BigNumber(1) }})
     expect(value.fiat()).toStrictEqual({
+      approximationSymbol: '',
       displayUnit: {
         fullName: 'trillion',
         shortName: 'T',
@@ -89,12 +93,26 @@ describe('fiat currency', () => {
   it('should return a value of quadrillions', () => {
     const value = displayValueData(356e32, { currencyRate: { price: BigNumber(1) }})
     expect(value.fiat()).toStrictEqual({
+      approximationSymbol: '',
       displayUnit: {
         fullName: 'quadrillion',
         shortName: 'Q',
       },
       displayValue: '35.6',
       value: BigNumber(35600000000000000)
+    })
+  })
+
+  it('should return a maximum value', () => {
+    const value = displayValueData(356e50, { currencyRate: { price: BigNumber(1) }})
+    expect(value.fiat()).toStrictEqual({
+      approximationSymbol: '>',
+      displayUnit: {
+        fullName: 'quadrillion',
+        shortName: 'Q',
+      },
+      displayValue: '999,999',
+      value: BigNumber(3.56e+34)
     })
   })
 })
@@ -112,6 +130,7 @@ describe('ether currency', () => {
   it('should return a value of thousands', () => {
     const value = displayValueData(356e20)
     expect(value.ether()).toStrictEqual({
+      approximationSymbol: '',
       displayUnit: {
         fullName: 'thousand',
         shortName: 'K',
@@ -124,6 +143,7 @@ describe('ether currency', () => {
   it('should return a value of millions', () => {
     const value = displayValueData(356e23)
     expect(value.ether()).toStrictEqual({
+      approximationSymbol: '',
       displayUnit: {
         fullName: 'million',
         shortName: 'M',
@@ -136,6 +156,7 @@ describe('ether currency', () => {
   it('should return a value of billions', () => {
     const value = displayValueData(356e26)
     expect(value.ether()).toStrictEqual({
+      approximationSymbol: '',
       displayUnit: {
         fullName: 'billion',
         shortName: 'B',
@@ -148,6 +169,7 @@ describe('ether currency', () => {
   it('should return a value of trillions', () => {
     const value = displayValueData(356e29)
     expect(value.ether()).toStrictEqual({
+      approximationSymbol: '',
       displayUnit: {
         fullName: 'trillion',
         shortName: 'T',
@@ -160,12 +182,26 @@ describe('ether currency', () => {
   it('should return a value of quadrillions', () => {
     const value = displayValueData(356e32)
     expect(value.ether()).toStrictEqual({
+      approximationSymbol: '',
       displayUnit: {
         fullName: 'quadrillion',
         shortName: 'Q',
       },
       displayValue: '35.6',
       value: BigNumber(35600000000000000)
+    })
+  })
+
+  it('should return a maximum value', () => {
+    const value = displayValueData(356e50)
+    expect(value.ether()).toStrictEqual({
+      approximationSymbol: '>',
+      displayUnit: {
+        fullName: 'quadrillion',
+        shortName: 'Q',
+      },
+      displayValue: '999,999',
+      value: BigNumber(3.56e+34)
     })
   })
 })

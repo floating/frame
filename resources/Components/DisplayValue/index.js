@@ -5,11 +5,7 @@ const CurrencySymbol = ({ symbol }) => <span className='currencySymbol'>{symbol}
 
 export const DisplayValue = ({ value, valueData, valueDataParams, currencySymbol, type = 'ether', decimalsOverride, currencySymbolPosition = 'first' }) => {
   const data = valueData || displayValueData(value, valueDataParams)
-  const defaultDecimals = {
-    ether: 6,
-    fiat: 2
-  }
-  const { approximationSymbol = '', displayValue, displayUnit } = data[type](decimalsOverride === undefined ? defaultDecimals[type] : decimalsOverride)
+  const { approximationSymbol = '', displayValue, displayUnit } = data[type](decimalsOverride)
   
   return <div className='displayValue'>
     <span className='approximation'>{approximationSymbol}</span>
