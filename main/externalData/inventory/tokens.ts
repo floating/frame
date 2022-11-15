@@ -1,16 +1,16 @@
 import log from 'electron-log'
 
 import ethProvider from 'eth-provider'
-import sushiswapTokenList from '@sushiswap/default-token-list'
 
 import nebulaApi from '../../nebula'
 import defaultTokenList from './default-tokens.json'
+import newTokens from './tokenList.json'
 
 const TOKENS_ENS_DOMAIN = 'tokens.frame.eth'
 
 interface TokenSpec extends Token {
-  extensions: {
-    omit: boolean
+  extensions?: {
+    omit?: boolean
   }
 }
 
@@ -28,7 +28,8 @@ export default class TokenLoader {
 
   private async loadTokenList (timeout = 60_000) {
     try {
-      const updatedTokens = await this.fetchTokenList(timeout)
+      // const updatedTokens = await this.fetchTokenList(timeout)
+      const updatedTokens = newTokens.tokens
       log.info(`Fetched ${updatedTokens.length} tokens`)
       this.tokens = updatedTokens
       this.nextLoad = setTimeout(() => this.loadTokenList(), 10 * 60_000)
@@ -99,10 +100,10 @@ export default class TokenLoader {
   }
 
   getTokens (chains: number[]) {
-    return this.tokens.filter(token => !token.extensions.omit && chains.includes(token.chainId))
+    return this.tokens.filter(token => !token.extensions?.omit && chains.includes(token.chainId))
   }
 
   getBlacklist (chains: number[]) {
-    return this.tokens.filter(token => token.extensions.omit && chains.includes(token.chainId))
+    return this.tokens.filter(token => chains.includes(token.chainId))
   }
 }

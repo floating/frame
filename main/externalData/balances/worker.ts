@@ -54,7 +54,6 @@ function sendToMainProcess (data: any) {
 async function updateBlacklist (address: Address, chains: number[]) {
   try {
     const blacklistTokens = tokenLoader.getBlacklist(chains)
-
     sendToMainProcess({ type: 'tokenBlacklist', address, tokens: blacklistTokens })
   } catch (e) {
     log.error('error updating token blacklist', e)

@@ -206,7 +206,7 @@ export default function (store: Store) {
 
   function handleTokenBlacklistUpdate (tokens: Token[]) {
     const tokensToRemoveSet = new Set(tokens.map(({address, chainId}) => `${chainId}:${address.toLowerCase()}`))
-    console.log('removing blacklisted tokens from balances...')
+    log.info('removing blacklisted tokens from balances...')
     store.removeBalances(tokensToRemoveSet)
     // tokens.forEach(({ address: contractAddress, chainId }) => {
     //   // TODO: can do this all at once rather than one by one, also can check
