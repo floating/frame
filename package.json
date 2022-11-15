@@ -19,12 +19,12 @@
     "bundle:dapp": "parcel build dapp/dapp.html --target dapp --public-url .",
     "bundle:dapp:inject": "parcel build main/dapps/server/inject/index.js --target inject --public-url .",
     "watch": "npm run watch:compile & npm run watch:tray & npm run watch:dash & npm run watch:dapp & npm run watch:bridge & npm run watch:dapp:inject",
-    "watch:bridge": "parcel watch resources/bridge/index.js --target bridge --public-url . --no-hmr",
-    "watch:tray": "parcel watch app/tray.html --target browser --public-url . --no-hmr",
-    "watch:flow": "parcel watch flow/flow.html --target browser --public-url . --no-hmr",
-    "watch:dash": "parcel watch dash/dash.html --target browser --public-url . --no-hmr",
-    "watch:dapp": "parcel watch dapp/dapp.html --target browser --public-url . --no-hmr",
-    "watch:dapp:inject": "parcel watch main/dapps/server/inject/index.js --target browser --public-url .",
+    "watch:bridge": "parcel watch resources/bridge/index.js --target bridge --no-hmr",
+    "watch:tray": "parcel watch app/tray.html --target tray --public-url . --no-hmr",
+    "watch:flow": "parcel watch flow/flow.html --target flow --public-url . --no-hmr",
+    "watch:dash": "parcel watch dash/dash.html --target dash --public-url . --no-hmr",
+    "watch:dapp": "parcel watch dapp/dapp.html --target dapp --public-url . --no-hmr",
+    "watch:dapp:inject": "parcel watch main/dapps/server/inject/index.js --target inject --public-url .",
     "dev": "npm run compile && npm run bundle && npm run launch:dev",
     "inspect": "npm run bundle && npm run launch:inspect",
     "launch": "cross-env NODE_ENV=production electron ./compiled/main",
@@ -180,7 +180,8 @@
   "targets": {
     "main": false,
     "bridge": {
-      "context": "electron-renderer"
+      "context": "electron-renderer",
+      "isLibrary": true
     },
     "dash": {
       "context": "browser"
