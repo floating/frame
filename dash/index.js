@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/electron'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import { createRoot } from 'react-dom/client';
 import Restore from 'react-restore'
 
 import _store from './store'
@@ -23,8 +23,9 @@ link.rpc('getState', (err, state) => {
       document.body.className = store('main.colorway')
     }, 100)
   })
-  const Flow = Restore.connect(App, store)
-  ReactDOM.render(<Flow />, document.getElementById('flow'))
+  const Dash = Restore.connect(App, store)
+  const root = createRoot(document.getElementById('dash'));
+  root.render(<Dash />)
 })
 
 document.addEventListener('contextmenu', e => link.send('*:contextmenu', e.clientX, e.clientY))

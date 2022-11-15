@@ -1,17 +1,6 @@
-// import svg from '../app/../resources/svg'
-// import Native from './Native'
-
-// link.on('location', location => {
-//   updateDapp(location.dapp)
-//   document.title = location.ens
-//   // setColor(location.dapp.color)
-//   //  document.body.style.color = color.text
-//   // style={{ color: color ? color.text : 'none',  background: color ? color.bg : 'none' }}
-// })
-
 import * as Sentry from '@sentry/electron'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import { createRoot } from 'react-dom/client';
 import Restore from 'react-restore'
 
 import App from './App'
@@ -39,7 +28,8 @@ link.rpc('getFrameId', (err, frameId) => {
       }, 100)
     })
     const DappFrame = Restore.connect(App, store)
-    ReactDOM.render(<DappFrame />, document.getElementById('frame'))
+    const root = createRoot(document.getElementById('frame'));
+    root.render(<DappFrame />)
   })
 })
 

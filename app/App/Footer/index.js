@@ -31,7 +31,7 @@ class Footer extends React.Component {
     })
     if (this.observer) this.observer.observe(this.footerRef.current)
   }
-  componentDidUnmount () {
+  componentWillUnmount () {
     this.observer.unobserve()
   }
   approve (reqId, req) {
