@@ -585,10 +585,9 @@ const migrations = {
     initial.main.accountsMeta = {}
     Object.entries(initial.main.accounts).forEach(([id, { name }]) => {
       const accountMetaId = uuidv5(id, accountNS)
-      const timestamp = Date.now()
       initial.main.accountsMeta[accountMetaId] = { 
         name,
-        timestamp
+        lastUpdated: Date.now()
       }
     })
 

@@ -1,4 +1,5 @@
 import log from 'electron-log'
+import { getSignerDisplayType } from '../../../resources/domain/signer'
 
 const panelActions = require('./panel')
 const supportedNetworkTypes = ['ethereum']
@@ -140,10 +141,13 @@ module.exports = {
       return { ...updatedAccount, balances: account.balances }
     })
   },
-  updateAccountMeta: (u, accountMetaId, updatedAccount) => {
+  updateAccountMeta: (u, accountMetaId, { name = '', lastSignerType = '' }) => {
     u('main.accountsMeta', accountMetaId, (accountMeta = {}) => {
-      const timestamp = Date.now()
-      return { ...accountMeta, name: updatedAccount.name, timestamp }
+      const nameIsDefault = name.toLowerCase() === `${getSignerDisplayType(lastSignerType)} account`
+      if (nameIsDefault) {
+        return accountMeta
+      }
+      return { ...accountMeta, name, lastUpdated: Date.now() }
     })
   },
   removeAccount: (u, id) => {

@@ -26,7 +26,7 @@ import {
 import type { Chain } from '../chains'
 import { ActionType } from '../transaction/actions'
 import { ApprovalType } from '../../resources/constants'
-import { accountNS } from '../../resources/accounts'
+import { accountNS } from '../../resources/domain/account'
 
 function notify (title: string, body: string, action: (event: Electron.Event) => void) {
   const notification = new Notification({ title, body })
