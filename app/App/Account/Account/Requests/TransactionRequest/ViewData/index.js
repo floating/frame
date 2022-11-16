@@ -1,6 +1,5 @@
 import React from 'react'
 import Restore from 'react-restore'
-import utils from 'web3-utils'
 import svg from '../../../../../../../resources/svg'
 import link from '../../../../../../../resources/link'
 

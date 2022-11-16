@@ -1,12 +1,10 @@
 import React from 'react'
 import Restore from 'react-restore'
-import { fromWei, isHex } from 'web3-utils'
-import { stripHexPrefix } from 'ethereumjs-util'
-import svg from '../../../../../../resources/svg'
-import link from '../../../../../../resources/link'
+import { isHexString } from '@ethersproject/bytes'
+import {stripHexPrefix} from './../../../../../../resources/utils'
 
 function decodeMessage (rawMessage) {
-  if (isHex(rawMessage)) {
+  if (isHexString(rawMessage)) {
     const buff = Buffer.from(stripHexPrefix(rawMessage), 'hex')
     return buff.length === 32 ? rawMessage : buff.toString('utf8')
   }
@@ -39,10 +37,6 @@ class TransactionRequest extends React.Component {
 
   toggleDataView (id) {
     this.setState({ dataView: !this.state.dataView })
-  }
-
-  hexToDisplayValue (hex) {
-    return (Math.round(parseFloat(fromWei(hex, 'ether')) * 1000000) / 1000000).toFixed(6)
   }
 
   renderMessage (message) {

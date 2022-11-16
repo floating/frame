@@ -89,7 +89,7 @@
     "eth-ens-namehash": "2.0.8",
     "eth-provider": "0.13.6",
     "eth-sig-util": "3.0.1",
-    "ethereum-public-key-to-address": "0.0.5",
+    "ethereumjs-util": "^7.1.5",
     "extract-zip": "2.0.1",
     "fs-extra": "10.1.0",
     "get-pixels": "3.3.3",
@@ -106,7 +106,6 @@
     "semver": "7.3.7",
     "trezor-connect": "8.2.11-extended",
     "uuid": "9.0.0",
-    "web3-utils": "1.8.0",
     "ws": "8.9.0",
     "zxcvbn": "4.4.2"
   },

@@ -1,5 +1,6 @@
 import { JsonTx } from '@ethereumjs/tx'
 import { getAddress as getChecksumAddress } from '@ethersproject/address'
+import { formatEther } from '@ethersproject/units'
 
 export enum GasFeesSource {
   Dapp = 'Dapp',

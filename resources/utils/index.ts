@@ -9,6 +9,11 @@ const hexToInt = (hexStr: string) => parseInt(hexStr, 16)
 const weiHexToGweiInt = (weiHex: string) => hexToInt(weiHex) / 1e9
 const weiIntToEthInt = (wei: number) => wei / 1e18
 const gweiToWeiHex = (gwei: number) => intToHex(gweiToWei(gwei))
+const stripHexPrefix = (hex: string): string => hex.toLowerCase().startsWith("0x") ? hex.slice(2) : hex
+const hexToAscii = (hex: string) => {
+  const match = stripHexPrefix(hex).match(/.{1,2}/g)
+  return match ? match.reduce( (acc, v) => acc + String.fromCharCode(parseInt(v, 16)), '') : ''
+}
 
 function randomLetters (num: number) {
   return [...Array(num)].map(() => String.fromCharCode(65 + randomInt(0, 26))).join('')
@@ -73,5 +78,7 @@ export {
   hexToInt,
   weiHexToGweiInt,
   weiIntToEthInt,
-  gweiToWeiHex
+  gweiToWeiHex,
+  stripHexPrefix,
+  hexToAscii,
 }
