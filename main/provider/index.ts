@@ -18,7 +18,7 @@ import packageFile from '../../package.json'
 import proxyConnection from './proxy'
 import accounts, { AccountRequest, TransactionRequest, SignTypedDataRequest, AddChainRequest, AddTokenRequest } from '../accounts'
 import Chains, { Chain } from '../chains'
-import { getType as getSignerType, Type as SignerType } from '../signers/Signer'
+import { getSignerType, Type as SignerType } from '../../resources/domain/signer'
 import { TransactionData } from '../../resources/domain/transaction'
 import { populate as populateTransaction, maxFee } from '../transaction'
 import FrameAccount from '../accounts/Account'
@@ -91,9 +91,11 @@ export class Provider extends EventEmitter {
       this.connected = true
       this.emit('connect', ...args)
     })
+
     this.connection.on('close', () => { 
       this.connected = false
     })
+
     this.connection.on('data', (chain, ...args) => {
       if ((args[0] || {}).method === 'eth_subscription') {
         this.emit('data:subscription', ...args)
@@ -101,12 +103,18 @@ export class Provider extends EventEmitter {
 
       this.emit(`data:${chain.type}:${chain.id}`, ...args)
     })
+
     this.connection.on('error', (chain, err) => {
       log.error(err)
     })
-    this.connection.on('update', (chain, event) => {
+
+    this.connection.on('update', (chain: Chain, event) => {
       if (event.type === 'fees') {
-        return accounts.updatePendingFees(event.chainId)
+        return accounts.updatePendingFees(chain.id)
+      }
+
+      if (event.type === 'status') {
+        this.emit(`status:${chain.type}:${chain.id}`, event.status)
       }
     })
 
@@ -644,7 +652,10 @@ export class Provider extends EventEmitter {
 
       // Check if chain exists 
       const exists = Boolean(store('main.networks.ethereum', chainId))
-      if (exists === false) throw new Error('Chain does not exist')
+      if (!exists) {
+        const err: EVMError = {message: 'Chain does not exist', code: 4902}
+        return resError(err, payload, res )
+      }
 
       const originId = payload._origin
       const origin = getPayloadOrigin(payload)

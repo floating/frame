@@ -117,54 +117,5 @@
   .panelHeaderUpdateOn
     background var(--good)
 
-  .panelHeaderUpdateNotify
-    background linear-gradient(
-      135deg,
-      var(--ghostX),
-      var(--ghostX),
-      var(--ghostX),
-      var(--good),
-      var(--good),
-      var(--good),
-      var(--ghostX),
-      var(--ghostX),
-      var(--ghostX)
-    )
-    background-size 1000% 100%
-    background-position 0 50%
-    animation moveGradient 4s infinite reverse ease-in
-
-  .panelHeaderUpdateIssue // Notify
-    // background linear-gradient(
-    //   60deg,
-    //   hsl(224, 85%, 66%),
-    //   hsl(269, 85%, 66%),
-    //   hsl(314, 85%, 66%),
-    //   hsl(359, 85%, 66%),
-    //   hsl(44, 85%, 66%),
-    //   hsl(89, 85%, 66%),
-    //   hsl(134, 85%, 66%),
-    //   hsl(179, 85%, 66%)
-    // )
-    background linear-gradient(
-      135deg,
-      var(--ghostX),
-      var(--ghostX),
-      var(--ghostX),
-      var(--moon),
-      var(--moon),
-      var(--moon),
-      var(--ghostX),
-      var(--ghostX),
-      var(--ghostX)
-    )
-    background-size 1000% 100%
-    background-position 0 50%
-    animation moveGradient 4s infinite reverse ease-in
-
-@keyframes moveGradient
-  100% 
-    background-position 100% 50%
-
 @import '../Account/style'
 

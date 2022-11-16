@@ -6,8 +6,6 @@ import link from '../../../../resources/link'
 
 import { getAddress } from '../../../../resources/domain/transaction'
 
-const showAccountNameWithENS = false
-
 class Account extends React.Component {
   constructor (...args) {
     super(...args)
@@ -249,7 +247,7 @@ class Account extends React.Component {
         </div>
       )
     } else {
-      if (ensName && !showAccountNameWithENS) {
+      if (ensName && !this.store('main.showLocalNameWithENS')) {
         return (
           <div className='signerDetails'>
             <div 
@@ -302,7 +300,6 @@ class Account extends React.Component {
                   <div className='signerDetailsAddressPart'>{formattedAddress.substr(formattedAddress.length - 3)}</div>
                 </>
               )}
-              
             </div>
           </div>
         )
@@ -311,7 +308,7 @@ class Account extends React.Component {
   }
 
   renderStatus () {
-    const { address, ensName, active } = this.store('main.accounts', this.props.id)
+    const { address, ensName } = this.store('main.accounts', this.props.id)
     const formattedAddress = getAddress(address)
 
     let requests = this.store('main.accounts', this.props.id, 'requests') || {}

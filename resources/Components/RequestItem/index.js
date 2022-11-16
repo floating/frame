@@ -34,23 +34,30 @@ class _RequestItem extends React.Component {
     clearInterval(this.timer)
   }
   render () {
-    const { account, handlerId, i, title, svgName, img, color, headerMode, txNonce } = this.props
+    const { account, handlerId, i, title, svgName, img, color, headerMode, txNonce, children } = this.props
     const req = this.store('main.accounts', account, 'requests', handlerId)
 
-    const status = req.status || 'pending'
-
     let requestItemDetailsClass = 'requestItemDetails'
-    if (status === 'confirming') {
+    let requestItemNoticeClass = 'requestItemNotice'
+
+    if (['sent', 'sending', 'verifying', 'confirming', 'confirmed'].includes(req.status)) {
       requestItemDetailsClass += ' requestItemDetailsGood'
-    } else if (status === 'error') {
+      requestItemNoticeClass += ' requestItemNoticeGood'
+    } else if (['error', 'declined'].includes(req.status)) {
       requestItemDetailsClass += ' requestItemDetailsBad'
+      requestItemNoticeClass += ' requestItemNoticeBad'
     }
+
+    const status = (req.status || 'pending').toLowerCase()
+    const notice = (req.notice || '').toLowerCase()
+
+    const inactive = ['error', 'declined', 'confirmed'].includes(req.status)
 
     return (
       <div 
         key={req.handlerId}
         className={headerMode ? 'requestItem requestItemHeader' : 'requestItem' }
-        onClick={() => {
+        onClick={!headerMode ? () => {
           const crumb = { 
             view: 'requestView',
             data: {
@@ -59,68 +66,79 @@ class _RequestItem extends React.Component {
               requestId: req.handlerId
             },
             position: {
-              bottom: '200px'
+              bottom: req.type === 'transaction' ? '200px' : '140px'
             }
           }
           link.send('nav:forward', 'panel', crumb)
-        }}
+        } : null}
       >
+        <div className='requestItemBackground' 
+          style={{ 
+            background: `linear-gradient(180deg, ${color} 0%, transparent 80%)`
+          }} 
+        />
         <div className='requestItemTitle'>
-          <div className='requestItemIcon'>
-            <RingIcon 
-              color={color}
-              svgName={svgName}
-              img={img}
-            />
-          </div>
-          <div className='requestItemMain'>
-            <div className='requestItemTitleMain'>
-              {title}
+          <div className='requestItemTitleLeft'>
+            <div className='requestItemIcon'>
+              <RingIcon 
+                color={color}
+                svgName={svgName}
+                img={img}
+                small={true}
+              />
             </div>
-            <div className='requestItemTitleSub'>
-              <div 
-                className='requestItemTitleSubIcon'
-              >
-                {svg.window(10)}
-              </div>
-              <div className='requestItemTitleSubText'>
-                {this.store('main.origins', req.origin, 'name')}
+            <div className='requestItemMain'>
+              <div className='requestItemTitleMain'>
+                {title}
               </div>
             </div>
           </div>
-          {txNonce ? (
-            <div 
-              className='requestMetaNonce'
-            >
-              <div className='txNonceControl'>
-                <div className='txNonceButton txNonceButtonLower' onMouseDown={() => link.send('tray:adjustNonce', req.handlerId, -1)}>
-                  {svg.octicon('chevron-down', { height: 14 })}
-                </div>
-                <div className='txNonceButton txNonceButtonRaise' onMouseDown={() => link.send('tray:adjustNonce', req.handlerId, 1)}>
-                  {svg.octicon('chevron-up', { height: 14 })}
-                </div>
-                
+          <div 
+            className='requestItemTitleTime'
+          >
+            <div className='requestItemTitleTimeItem'>
+              {this.state.ago}
+            </div>
+          </div>
+        </div>
+        <div style={headerMode ? { pointerEvents: 'auto' } : { pointerEvents: 'none' }}>
+          {children}
+        </div>
+        <div className={requestItemDetailsClass}>
+          <div className='requestItemDetailsSlide'>
+            <div className={inactive ? 'requestItemDetailsIndicator requestItemDetailsIndicatorStill' : 'requestItemDetailsIndicator'}>
+              <div className='requestItemDetailsIndicatorMarker' />
+            </div>
+            <span>{status}</span>
+            {/* <div className='requestItemDetailsIndicator' /> */}
+          </div>
+          {headerMode ? (
+            <div className={inactive ? 'requestItemWave requestItemWaveDisabled' : 'requestItemWave'}>
+              <div className='requestItemLine'>
+                {svg.sine()}
               </div>
-              <div className='txNonceLabel'>Nonce</div>
-              <div className={'txNonceNumber'}>
-                {nonce}
+              <div className='requestItemLine requestItemLineShadow'>
+                {svg.sine()}
               </div>
             </div>
           ) : (
-            <div className='requestItemTitleTime'>
-              <div className='requestItemTitleTimeItem'>
-                {this.state.ago}
+            <div className='requestItemDetailsView'>
+              <div className='requestItemDetailsViewText'>
+                {`View`}
+              </div>
+              <div className='requestItemDetailsViewArrow'>
+                <div>{svg.chevron(15)}</div>
+                <div>{svg.chevron(15)}</div>
+                <div>{svg.chevron(15)}</div>
               </div>
             </div>
           )}
         </div>
-        <div className={requestItemDetailsClass}>
-          <div className='requestItemDetailsSlide'>
-            <div className='requestItemDetailsIndicator' />
-            <span>{status}</span>
-            <div className='requestItemDetailsIndicator' />
+        {notice && notice !== status && (
+          <div className={requestItemNoticeClass}>
+            {notice}
           </div>
-        </div>
+        )}
       </div>
     )
   }

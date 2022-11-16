@@ -6,7 +6,7 @@ import utils from 'web3-utils'
 import RequestItem from '../../../../../../../resources/Components/RequestItem'
 import TxOverview from './overview'
 
-class TxRecipient extends React.Component {
+class TxMain extends React.Component {
   constructor (...args) {
     super(...args)
     this.state = {
@@ -27,12 +27,11 @@ class TxRecipient extends React.Component {
     const chainId = parseInt(req.data.chainId, 16)
 
     const chainName = this.store('main.networks.ethereum', chainId, 'name')
-    const currentSymbol = this.store('main.networks.ethereum', chainId, 'symbol') || '?'
+    const currentSymbol = this.store('main.networksMeta.ethereum', chainId, 'nativeCurrency.symbol') || '?'
 
     const txMeta = { replacement: false, possible: true, notice: '' }
 
     const { accountId } = this.props
-    const chainColor = this.store('main.networksMeta.ethereum', chainId, 'primaryColor')
 
     // TODO
     // if (signer locked) {
@@ -71,22 +70,32 @@ class TxRecipient extends React.Component {
     }
 
     const { primaryColor, icon } = this.store('main.networksMeta.ethereum', chainId)
-                
+    const originName = this.store('main.origins', req.origin, 'name')
     return (
       <div className='_txMain' style={{ animationDelay: (0.1 * this.props.i) + 's' }}>
         <div className='_txMainInner'>
+          <div 
+            className='_txMainBackground'
+            style={{ background: `linear-gradient(135deg, var(--${primaryColor}) 0%, transparent 100%)` }}         
+          />
           <RequestItem 
             req={req}
             account={accountId}
             handlerId={req.handlerId}
             title={`${chainName} Transaction`}
-            color={primaryColor ? `var(--${chainColor})` : ``}
+            color={primaryColor ? `var(--${primaryColor})` : ``}
             img={icon}
             headerMode={true}
-          />
-
-          <TxOverview req={req} chainName={chainName} symbol={currentSymbol} txMeta={txMeta} />
-
+          >
+            <TxOverview 
+              req={req} 
+              chainName={chainName} 
+              chainColor={primaryColor} 
+              symbol={currentSymbol} 
+              txMeta={txMeta} 
+              originName={originName}
+            />
+          </RequestItem>
         </div>
       </div>
     )
@@ -97,4 +106,4 @@ class TxRecipient extends React.Component {
 {this.state.copied ? <span>{'Copied'}{svg.octicon('clippy', { height: 14 })}</span> : req.data.to}
 </div> */}
 
-export default Restore.connect(TxRecipient)
+export default Restore.connect(TxMain)

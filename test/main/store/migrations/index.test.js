@@ -1,5 +1,6 @@
 import log from 'electron-log'
 import migrations from '../../../../main/store/migrations'
+import { capitalize } from '../../../../resources/utils'
 
 let state
 
@@ -887,5 +888,177 @@ describe('migration 24', () => {
       icon: 'https://assets.coingecko.com/coins/images/279/large/ethereum.png?1595348880',
       name: 'Ether'
     })
+  })
+})
+
+describe('migration 25', () => {
+  beforeEach(() => {
+    state = {
+      main: {
+        _version: 24,
+        networks: {
+          ethereum: {
+            10: {
+              connection: {
+                primary: { current: 'custom' },
+                secondary: { current: 'local' }
+              }
+            }
+          }
+        }
+      }
+    }
+  })
+
+  const connectionPriorities = ['primary', 'secondary']
+
+  connectionPriorities.forEach((priority) => {
+    it(`updates a ${priority} optimism connection to Infura`, () => {
+      state.main.networks.ethereum[10].connection[priority].current = 'optimism'
+
+      const updatedState = migrations.apply(state, 25)
+      const optimism = updatedState.main.networks.ethereum[10]
+
+      expect(optimism.connection[priority].current).toBe('infura')
+    })
+
+    it(`does not update an existing custom ${priority} optimism connection`, () => {
+      state.main.networks.ethereum[10].connection[priority].current = 'custom'
+
+      const updatedState = migrations.apply(state, 25)
+      const optimism = updatedState.main.networks.ethereum[10]
+
+      expect(optimism.connection[priority].current).toBe('custom')
+    })
+  })
+})
+
+describe('migration 26', () => {
+  beforeEach(() => {
+    state = {
+      main: {
+        _version: 25,
+        networks: {
+          ethereum: { 
+            5: {
+              id: 5,
+              type: 'ethereum',
+              layer: 'testnet',
+              symbol: 'ETH',
+              name: 'Görli',
+            },
+          }
+        },
+        networksMeta: {
+          ethereum: {
+            5: {
+              nativeCurrency: {
+                symbol: "ETH"
+              }
+            }
+          }
+      }
+    }
+  }})
+
+  it('removes the symbol property on a network', () => {
+    const updatedState = migrations.apply(state, 26)
+    const networks = updatedState.main.networks.ethereum
+    const metadata = updatedState.main.networksMeta.ethereum
+    expect(networks[5].symbol).toBeFalsy()
+    expect(metadata[5].nativeCurrency.symbol).toBe("ETH")
+  })
+})
+
+describe('migration 27', () => {
+  beforeEach(() => {
+    state = {
+      main: {
+        _version: 26,
+        accounts: { }
+      }
+    }
+  })
+
+  const address = '0x87c6418C2A3D6d502C85ed4454cAaDA0BD664AbA'
+  const accountTypes = ['seed', 'ring']
+
+  accountTypes.forEach((type) => {
+    it(`migrates a ${type} account to be called a hot account`, () => {
+      state.main.accounts[address] = {
+        name: `${capitalize(type)} Account`
+      }
+
+      const updatedState = migrations.apply(state, 27)
+
+      expect(updatedState.main.accounts[address].name).toBe('Hot Account')
+    })
+  })
+
+  it('does not migrate an account with a changed name', () => {
+    state.main.accounts[address] = {
+      name: `My Kewl Account`
+    }
+
+    const updatedState = migrations.apply(state, 27)
+
+    expect(updatedState.main.accounts[address].name).toBe('My Kewl Account')
+  })
+})
+
+describe('migration 28', () => {
+  beforeEach(() => {
+    state = {
+      main: {
+        _version: 27,
+        networksMeta: {
+          ethereum: {
+            5: {
+              nativeCurrency: {
+                symbol: "ETH",
+                decimals: 0
+              }
+            },
+            11155111: {
+              nativeCurrency: {
+                symbol: 'ETH',
+                decimals: 18
+              },
+            }
+          }
+      }
+    }
+  }})
+
+  it('updates the symbol for Sepolia testnet if it is currently ETH', () => {
+    const updatedState = migrations.apply(state, 28)
+    const metadata = updatedState.main.networksMeta.ethereum
+    expect(metadata[11155111].nativeCurrency.symbol).toBe("sepETH")
+  })
+
+  it('updates the symbol for Gorli testnet if it is currently ETH', () => {
+    const updatedState = migrations.apply(state, 28)
+    const metadata = updatedState.main.networksMeta.ethereum
+    expect(metadata[5].nativeCurrency.symbol).toBe("görETH")
+  })
+
+  it('does not update the symbol for Gorli testnet if it is not ETH', () => {
+    state.main.networksMeta.ethereum[5].nativeCurrency.symbol = "CUSTOM"
+    const updatedState = migrations.apply(state, 28)
+    const metadata = updatedState.main.networksMeta.ethereum
+    expect(metadata[5].nativeCurrency.symbol).toBe("CUSTOM")
+  })
+
+  it('does not update the symbol for Sepolia testnet if it is not ETH', () => {
+    state.main.networksMeta.ethereum[11155111].nativeCurrency.symbol = "CUSTOM"
+    const updatedState = migrations.apply(state, 28)
+    const metadata = updatedState.main.networksMeta.ethereum
+    expect(metadata[11155111].nativeCurrency.symbol).toBe("CUSTOM")
+  })
+
+  it('updates decimals to 18 if they are currently 0', () => {
+    const updatedState = migrations.apply(state, 28)
+    const metadata = updatedState.main.networksMeta.ethereum
+    expect(metadata[5].nativeCurrency.decimals).toBe(18)
   })
 })

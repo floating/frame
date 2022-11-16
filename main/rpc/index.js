@@ -16,6 +16,15 @@ const { resolveName } = require('../accounts/aragon')
 const { arraysEqual, randomLetters } = require('../../resources/utils')
 const { default: TrezorBridge } = require('../../main/signers/trezor/bridge')
 
+const callbackWhenDone = (fn, cb) => {
+  try {
+    fn()
+    cb(null)
+  } catch (e) {
+    cb (e)
+  }
+}
+
 const rpc = {
   getState: cb => {
     cb(null, store())
@@ -126,6 +135,9 @@ const rpc = {
   confirmRequestApproval (req, approvalType, approvalData, cb) {
     accounts.confirmRequestApproval(req.handlerId, approvalType, approvalData)
   },
+  updateRequest (reqId, actionId, data, cb = () => {}) {
+    accounts.updateRequest(reqId, actionId, data)
+  },
   approveRequest (req, cb) {
     accounts.setRequestPending(req)
     if (req.type === 'transaction') {
@@ -158,14 +170,14 @@ const rpc = {
   addAragon (account, cb) {
     accounts.addAragon(account, cb)
   },
-  createFromAddress (address, cb) {
+  createFromAddress (address, name, cb) {
     if (!utils.isAddress(address)) return cb(new Error('Invalid Address'))
-    accounts.add(address, { type: 'Address' })
+    accounts.add(address, name, { type: 'Address' })
     cb()
   },
-  createAccount (address, options, cb) {
+  createAccount (address, name, options, cb) {
     if (!utils.isAddress(address)) return cb(new Error('Invalid Address'))
-    accounts.add(address, options)
+    accounts.add(address, name, options)
     cb()
   },
   removeAccount (address, options, cb) {
@@ -221,19 +233,16 @@ const rpc = {
     accounts.verifyAddress(true, res)
   },
   setBaseFee (fee, handlerId, cb) {
-    accounts.setBaseFee(fee, handlerId, true, cb)
-    // store.setGasDefault(netType, netId, level, price)
+    callbackWhenDone(() => accounts.setBaseFee(fee, handlerId, true), cb)
   },
   setPriorityFee (fee, handlerId, cb) {
-    accounts.setPriorityFee(fee, handlerId, true, cb)
-    // store.setGasDefault(netType, netId, level, price)
+    callbackWhenDone(() => accounts.setPriorityFee(fee, handlerId, true), cb)
   },
   setGasPrice (price,handlerId, cb) {
-    accounts.setGasPrice(price, handlerId, true, cb)
-    // store.setGasDefault(netType, netId, level, price)
+    callbackWhenDone(() => accounts.setGasPrice(price, handlerId, true), cb)
   },
   setGasLimit (limit, handlerId, cb) {
-    accounts.setGasLimit(limit, handlerId, true, cb)
+    callbackWhenDone(() => accounts.setGasLimit(limit, handlerId, true), cb)
   },
   removeFeeUpdateNotice (handlerId, cb) {
     accounts.removeFeeUpdateNotice(handlerId, cb)

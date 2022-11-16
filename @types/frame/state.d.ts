@@ -15,7 +15,6 @@ interface Chain {
 interface Network {
   id: number
   name: string
-  symbol: string
   layer: string
   isTestnet: boolean
   explorer: string
@@ -30,7 +29,7 @@ interface NetworkMetadata {
   blockHeight: number
   gas: GasData
   icon: string
-  primaryColor: string
+  primaryColor: keyof ColorwayPalette
   nativeCurrency: NativeCurrency
 }
 
@@ -48,8 +47,8 @@ interface Origin {
 }
 
 interface Permission {
-  origin: string,
-  provider: boolean, // whether or not to grant access
+  origin: string
+  provider: boolean // whether or not to grant access
   handlerId?: string
 }
 
@@ -58,6 +57,7 @@ interface NativeCurrency {
   icon: string
   name: string
   decimals: number
+  usd?: Rate
 }
 
 interface GasData {
@@ -86,6 +86,20 @@ interface GasLevels {
 
 type HexAmount = string
 
+enum Colorway { light = 'light', dark = 'dark' }
+
+type Color = { r: number, g: number, b: number }
+type ColorwayPalette = {
+  accent1: Color
+  accent2: Color
+  accent3: Color
+  accent4: Color
+  accent5: Color
+  accent6: Color
+  accent7: Color
+  accent8: Color
+}
+
 interface Balance {
   chainId: number,
   address: Address,
@@ -97,10 +111,8 @@ interface Balance {
 }
 
 interface Rate {
-  usd: {
-    price: BigNumber,
-    change24hr: BigNumber
-  }
+  price: number
+  change24hr: number
 }
 
 interface Token {

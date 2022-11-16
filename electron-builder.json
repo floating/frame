@@ -25,7 +25,8 @@
     },
     "win": {
       "publisherName": "Frame Labs, Inc.",
-      "signAndEditExecutable": true
+      "signAndEditExecutable": true,
+      "icon": "build/icons/icon.png"
     },
     "files": [
       "compiled",

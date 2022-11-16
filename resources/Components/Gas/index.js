@@ -161,7 +161,7 @@ class GasSummaryComponent extends Component {
   feeEstimatesUSD () {
     const { chainId, displayFeeMarket, gasPrice } = this.props
     const type = 'ethereum'
-    const currentSymbol = this.store('main.networks', type, chainId, 'symbol') || 'ETH'
+    const currentSymbol = this.store('main.networksMeta', type, chainId, 'nativeCurrency', 'symbol') || 'ETH'
     
     if (!displayFeeMarket) {
       return this.txEstimates(type, chainId, gasPrice, null, currentSymbol)

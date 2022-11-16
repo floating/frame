@@ -8,11 +8,15 @@ import Restore from 'react-restore'
 // import ChainRequest from './ChainRequest'
 // import AddTokenRequest from './AddTokenRequest'
 // import SignTypedDataRequest from './SignTypedDataRequest'
-// function isHardwareSigner (account = {}) {
-//   return ['ledger', 'lattice', 'trezor'].includes(account.lastSignerType)
-// }
+
+import TxOverview from './TransactionRequest/TxMainNew/overview'
 
 import RequestItem from '../../../../../resources/Components/RequestItem'
+
+
+import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../resources/Components/Cluster'
+
+
 
 import link from '../../../../../resources/link'
 import svg from '../../../../../resources/svg'
@@ -89,12 +93,13 @@ class Requests extends React.Component {
 
   render () {
     const activeAccount =  this.store('main.accounts', this.props.id)
-    const requests = Object.values(activeAccount.requests || {})
-
-    requests.sort((a, b) => {
+    const requests = Object.values(activeAccount.requests || {}).sort((a, b) => {
       if (a.created > b.created) return -1
       if (a.created < b.created) return 1
       return 0
+    }).filter(req => {
+      const elapsed = Date.now() - (req && req.created || 0)
+      return elapsed > 1000
     })
 
     return (
@@ -125,7 +130,24 @@ class Requests extends React.Component {
                     title={'Account Access'} 
                     color={'var(--outerspace)'}
                     svgName={'accounts'}
-                  />
+                  >
+                    <Cluster>
+                      <ClusterRow>
+                        <ClusterValue grow={2}>
+                          <div className='requestItemTitleSub' style={{ padding: '16px' }}>
+                            <div 
+                              className='requestItemTitleSubIcon'
+                            >
+                              {svg.window(10)}
+                            </div>
+                            <div className='requestItemTitleSubText'>
+                              {this.store('main.origins', req.origin, 'name')}
+                            </div>
+                          </div>
+                        </ClusterValue>
+                      </ClusterRow>
+                    </Cluster>
+                  </RequestItem>
                 )
               } else if (req.type === 'sign') {
                 return (
@@ -138,7 +160,24 @@ class Requests extends React.Component {
                     title={'Sign Message'}
                     color={'var(--outerspace)'}
                     svgName={'sign'}
-                  />
+                  >
+                    <Cluster>
+                      <ClusterRow>
+                        <ClusterValue grow={2}>
+                          <div className='requestItemTitleSub'  style={{ padding: '16px' }}>
+                            <div 
+                              className='requestItemTitleSubIcon'
+                            >
+                              {svg.window(10)}
+                            </div>
+                            <div className='requestItemTitleSubText'>
+                              {this.store('main.origins', req.origin, 'name')}
+                            </div>
+                          </div>
+                        </ClusterValue>
+                      </ClusterRow>
+                    </Cluster>
+                  </RequestItem>
                 )
               } else if (req.type === 'signTypedData') {
                 return (
@@ -151,7 +190,24 @@ class Requests extends React.Component {
                     title={'Sign Data'} 
                     color={'var(--outerspace)'}
                     svgName={'sign'}
-                  />
+                  >
+                    <Cluster>
+                      <ClusterRow>
+                        <ClusterValue grow={2}>
+                          <div className='requestItemTitleSub'  style={{ padding: '16px' }}>
+                            <div 
+                              className='requestItemTitleSubIcon'
+                            >
+                              {svg.window(10)}
+                            </div>
+                            <div className='requestItemTitleSubText'>
+                              {this.store('main.origins', req.origin, 'name')}
+                            </div>
+                          </div>
+                        </ClusterValue>
+                      </ClusterRow>
+                    </Cluster>
+                  </RequestItem>
                 )
               } else if (req.type === 'addChain') { 
                 return (
@@ -164,7 +220,24 @@ class Requests extends React.Component {
                     title={'Add Chain'} 
                     color={'var(--outerspace)'}
                     svgName={'chain'}
-                  />
+                  >
+                    <Cluster>
+                      <ClusterRow>
+                        <ClusterValue grow={2}>
+                          <div className='requestItemTitleSub'  style={{ padding: '16px' }}>
+                            <div 
+                              className='requestItemTitleSubIcon'
+                            >
+                              {svg.window(10)}
+                            </div>
+                            <div className='requestItemTitleSubText'>
+                              {this.store('main.origins', req.origin, 'name')}
+                            </div>
+                          </div>
+                        </ClusterValue>
+                      </ClusterRow>
+                    </Cluster>
+                  </RequestItem>
                 )
               } else if (req.type === 'switchChain') {
                 return (
@@ -177,7 +250,24 @@ class Requests extends React.Component {
                     title={'Switch Chain'}
                     color={'var(--outerspace)'}
                     svgName={'chain'}
-                  />
+                  >
+                    <Cluster>
+                      <ClusterRow>
+                        <ClusterValue grow={2}>
+                          <div className='requestItemTitleSub'  style={{ padding: '16px' }}>
+                            <div 
+                              className='requestItemTitleSubIcon'
+                            >
+                              {svg.window(10)}
+                            </div>
+                            <div className='requestItemTitleSubText'>
+                              {this.store('main.origins', req.origin, 'name')}
+                            </div>
+                          </div>
+                        </ClusterValue>
+                      </ClusterRow>
+                    </Cluster>
+                  </RequestItem>
                 )
               } else if (req.type === 'addToken')  {
                 return (
@@ -190,13 +280,31 @@ class Requests extends React.Component {
                     title={'Add Tokens'}
                     color={'var(--outerspace)'}
                     svgName={'tokens'}
-                  />
+                  >
+                    <Cluster>
+                      <ClusterRow>
+                        <ClusterValue grow={2}>
+                          <div className='requestItemTitleSub' style={{ padding: '16px' }}>
+                            <div 
+                              className='requestItemTitleSubIcon'
+                            >
+                              {svg.window(10)}
+                            </div>
+                            <div className='requestItemTitleSubText'>
+                              {this.store('main.origins', req.origin, 'name')}
+                            </div>
+                          </div>
+                        </ClusterValue>
+                      </ClusterRow>
+                    </Cluster>
+                  </RequestItem>
                 )
               } else if (req.type === 'transaction')  {
                 const chainId = parseInt(req.data.chainId, 16)
                 const chainName = this.store('main.networks.ethereum', chainId, 'name') 
-                const { primaryColor, icon } = this.store('main.networksMeta.ethereum', chainId)
-                
+                const { primaryColor, icon, nativeCurrency:{symbol: currentSymbol = '?'} } = this.store('main.networksMeta.ethereum', chainId)
+                const txMeta = { replacement: false, possible: true, notice: '' }
+                const originName = this.store('main.origins', req.origin, 'name')
                 return (
                   <RequestItem 
                     key={req.type + i}
@@ -207,7 +315,17 @@ class Requests extends React.Component {
                     title={`${chainName} Transaction`}
                     color={primaryColor ? `var(--${primaryColor})`: ''}
                     img={icon}
-                  />
+                  >
+                    <TxOverview 
+                      req={req} 
+                      chainName={chainName} 
+                      chainColor={primaryColor} 
+                      symbol={currentSymbol} 
+                      txMeta={txMeta} 
+                      originName={originName}
+                      simple={true}
+                    />
+                  </RequestItem>
                 )
               }
             })}

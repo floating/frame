@@ -199,15 +199,15 @@ class Settings extends React.Component {
       <div className={'localSettings cardShow'}>
         <div className='localSettingsWrap'>
           <div className='dashModules'>
-            <div className='dashModule' onClick={() => link.send('tray:action', 'navDash', { view: 'accounts', data: {}, bottom: '120px' })}>
+            <div className='dashModule' onClick={() => link.send('tray:action', 'navDash', { view: 'accounts', data: {} })}>
               <div className='dashModuleIcon'>{svg.accounts(24)}</div>
               <div className='dashModuleTitle'>{'Accounts'}</div>
             </div>
-            <div className='dashModule' onClick={() => link.send('tray:action', 'navDash', { view: 'chains', data: { }, bottom: '120px' })}>
+            <div className='dashModule' onClick={() => link.send('tray:action', 'navDash', { view: 'chains', data: { } })}>
               <div className='dashModuleIcon'>{svg.chain(24)}</div>
               <div className='dashModuleTitle'>{'Chains'}</div>
             </div>
-            <div className='dashModule' onClick={() => link.send('tray:action', 'navDash', { view: 'tokens', data: {}, bottom: '120px' })}>
+            <div className='dashModule' onClick={() => link.send('tray:action', 'navDash', { view: 'tokens', data: {} })}>
               <div className='dashModuleIcon'>{svg.tokens(24)}</div>
               <div className='dashModuleTitle'>{'Tokens'}</div>
             </div>

@@ -4,9 +4,13 @@ import { utils } from 'ethers'
 import link from '../../../../../../../resources/link'
 import EnsOverview from '../../Ens'
 
+import svg from '../../../../../../../resources/svg'
+
+import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../../../resources/Components/Cluster'
+
 const isNonZeroHex = (hex) => !!hex && !['0x', '0x0'].includes(hex)
 
-function renderRecognizedAction (req, symbol) {
+function renderRecognizedAction (req) {
   const { recognizedActions: actions = [] } = req
 
   return actions.length > 0 && actions.map(action => {
@@ -16,18 +20,26 @@ function renderRecognizedAction (req, symbol) {
 
     if (actionClass === 'erc20') {
       if (actionType === 'transfer') {
-        return <SendOverview amountHex={data.amount} decimals={data.decimals} symbol={symbol} />
+        return <SendOverview amountHex={data.amount} decimals={data.decimals} symbol={data.symbol} />
       }
     } else if (actionClass === 'ens') {
       return <EnsOverview type={actionType} data={data} />
+    } else {
+      return (
+        <div className='_txDescriptionSummaryLine'>
+          Calling Contract
+        </div>
+      )
     }
   })
 }
 
-const TxDescription = ({ chain, children }) => (
+const TxDescription = ({ chain, children, chainColor }) => (
   <div className='_txDescriptionSummary'>
     {children}
-    <div className='_txDescriptionSummaryLine'>{`on ${chain}`}</div>
+    <div className='_txDescriptionSummaryTag' style={{ color: `var(--${chainColor})` }}>
+      {`on ${chain}`}
+    </div>
   </div>
 )
 
@@ -35,7 +47,7 @@ const SendOverview = ({ amountHex, decimals, symbol }) => {
   const displayAmount = utils.formatUnits(amountHex, decimals)
 
   return  (
-    <div>{`Sending ${displayAmount} ${symbol}`}</div>
+    <div>{`Send ${displayAmount} ${symbol}`}</div>
   )
 }
 
@@ -44,7 +56,7 @@ const GenericContractOverview = ({ method }) => (<div>{`Calling Contract Method 
 const DataOverview = () => (<div>Sending data</div>)
 const EmptyTransactionOverview = () => (<div>Empty Transaction</div>)
 
-const TxOverview = ({ req, chainName, symbol, txMeta }) => {
+const TxOverview = ({ req, chainName, chainColor, symbol, originName, txMeta, simple, valueColor }) => {
   const { recipientType, decodedData: { method } = {}, data: tx = {} } = req
   const { to, value, data: calldata } = tx
   
@@ -59,7 +71,7 @@ const TxOverview = ({ req, chainName, symbol, txMeta }) => {
   if (isContractDeploy) {
     description = <DeployContractOverview />
   } else if (isContractCall) {
-    description = renderRecognizedAction(req, symbol)
+    description = renderRecognizedAction(req)
 
     if (!description && !!method) {
       description = <GenericContractOverview method={method} />
@@ -71,35 +83,68 @@ const TxOverview = ({ req, chainName, symbol, txMeta }) => {
   }
 
   return (
-    <div className='_txMainValues'>
-      <div className='_txMainValue _txMainValueClickable' onClick={() => {
-        link.send('nav:update', 'panel', { data: { step: 'viewData' } })
-      }}>
-        <div className='_txDescription'>
-          <TxDescription chain={chainName}>
-            {description || <EmptyTransactionOverview />}
-          </TxDescription>
-        </div>
-      </div>
-      {txMeta.replacement ? (
-        txMeta.possible ? (
-          <div className='_txMainTag _txMainTagWarning'>
-            valid replacement
+    <Cluster>
+      <ClusterRow>
+        <ClusterValue 
+          onClick={() => {
+            link.send('nav:update', 'panel', { data: { step: 'viewData' } })
+          }}
+          style={{ background: valueColor }}
+        >
+          <div className='_txDescription'>
+            <TxDescription chain={chainName} chainColor={chainColor}>
+              <div className='requestItemTitleSub'>
+                <div 
+                  className='requestItemTitleSubIcon'
+                >
+                  {svg.window(10)}
+                </div>
+                <div className='requestItemTitleSubText'>
+                  {originName}
+                </div>
+              </div>
+              <div className='_txDescriptionSummaryMain'>
+                {description}
+              </div>
+            </TxDescription>
           </div>
-        ) : (
-          <div className='_txMainTag _txMainTagWarning'>
-            {txMeta.notice || 'invalid duplicate'}
-          </div>
-        )
-      ) : null}
-      {isNonZeroHex(calldata) ? (
-        <div className='_txMainTag _txMainTagWarning'>
-          {'Transaction includes data'}
-        </div>
-      ) : null}
-    </div>
+        </ClusterValue>
+      </ClusterRow>
+      {!simple && (
+        <>
+          {txMeta.replacement && (
+            txMeta.possible ? (
+              <ClusterRow>
+                <ClusterValue>
+                  <div className='_txMainTag _txMainTagWarning'>
+                    valid replacement
+                  </div>
+                </ClusterValue>
+              </ClusterRow> 
+            ) : (
+              <ClusterRow>
+                <ClusterValue>
+                  <div className='_txMainTag _txMainTagWarning'>
+                    {txMeta.notice || 'invalid duplicate'}
+                  </div>
+                </ClusterValue>
+              </ClusterRow>
+            )
+          )}
+          {isNonZeroHex(calldata) && (
+            <ClusterRow>
+              <ClusterValue>
+                <div className='_txMainTag _txMainTagWarning'>
+                  {'Transaction includes data'}
+                </div>
+              </ClusterValue>
+            </ClusterRow>
+          )}
+        </>
+      )}
+    </Cluster>
   )
-      }
+}
 
 
 export default TxOverview

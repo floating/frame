@@ -3,13 +3,10 @@ import Restore from 'react-restore'
 
 import link from '../../../resources/link'
 import svg from '../../../resources/svg'
+import { capitalize } from '../../../resources/utils'
+import { isHardwareSigner, getSignerDisplayType } from '../../../resources/domain/signer'
 
 import SignerStatus from './SignerStatus'
-
-
-function isHardwareSigner (type = '') {
-  return ['ledger', 'trezor', 'lattice'].includes(type.toLowerCase())
-}
 
 function isLoading (status = '') {
   const statusToCheck = status.toLowerCase()
@@ -411,7 +408,6 @@ class Signer extends React.Component {
 
     const hwSigner = isHardwareSigner(this.props.type)
     const loading = isLoading(status)
-    const disconnected = isDisconnected(this.props.type, status, loading)
 
     // TODO: create well-defined signer states that drive these UI features
     const canReconnect =
@@ -467,7 +463,8 @@ class Signer extends React.Component {
                   if (this.store('main.accounts', address.toLowerCase())) {
                     link.rpc('removeAccount', address, {}, () => { })
                   } else {
-                    link.rpc('createAccount', address, { type: signer.type }, (e) => {
+                    const type = getSignerDisplayType(signer)
+                    link.rpc('createAccount', address, `${capitalize(type)} Account`, { type: signer.type }, (e) => {
                       if (e) console.error(e)
                     })
                   }
@@ -508,6 +505,7 @@ class Signer extends React.Component {
           {canReconnect ? this.reconnectButton(hwSigner) : null}
           <div className='signerControlOption signerControlOptionImportant' onClick={() => {
             link.send('dash:removeSigner', this.props.id)
+            link.send('tray:action', 'backDash')
           }}>Remove Signer</div>
         </div>
       </div>

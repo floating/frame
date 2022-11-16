@@ -61,7 +61,8 @@ class AddPhrase extends React.Component {
       if (err) {
         this.setState({ status: err, error: true })
       } else {
-        link.send('tray:action', 'navBack', 'dash')
+        // reset nav state to before the start of the flow and open the new signer
+        link.send('tray:action', 'backDash', 2)
         const crumb = {
           view: 'expandedSigner', 
           data: { signer: signer.id }

@@ -2,7 +2,7 @@ import type { Version } from 'eth-sig-util'
 import type { DecodedCallData } from '../contracts'
 import type { Chain } from '../chains'
 import type { TransactionData } from '../../resources/domain/transaction'
-import { Action } from '../reveal'
+import type { Action } from '../transaction/actions'
 
 export enum ReplacementType {
   Speed = 'speed',
@@ -20,6 +20,7 @@ export enum RequestStatus {
   Verifying = 'verifying',
   Confirming = 'confirming',
   Confirmed = 'confirmed',
+  Sent = 'sent',
   Declined = 'declined',
   Error = 'error',
   Success = 'success'
@@ -28,20 +29,20 @@ export enum RequestStatus {
 type RequestType = 'sign' | 'signTypedData' | 'transaction' | 'access' | 'addChain' | 'switchChain' | 'addToken'
 
 export interface AccountRequest {
-  type: RequestType,
-  origin: string,
-  payload: JSONRPCRequestPayload,
-  handlerId: string,
-  account: string,
-  status?: RequestStatus,
-  mode?: RequestMode,
-  notice?: string,
-  created?: number,
+  type: RequestType
+  origin: string
+  payload: JSONRPCRequestPayload
+  handlerId: string
+  account: string
+  status?: RequestStatus
+  mode?: RequestMode
+  notice?: string
+  created?: number
   res?: (response?: RPCResponsePayload) => void
 }
 
 export interface TransactionReceipt {
-  gasUsed: string,
+  gasUsed: string
   blockNumber: string
 }
 
@@ -73,7 +74,7 @@ export interface TransactionRequest extends Omit<AccountRequest, 'type'> {
   completed?: number,
   feesUpdatedByUser: boolean,
   recipientType: string,
-  recognizedActions: Action[]
+  recognizedActions: Action<unknown>[]
 }
 
 export interface SignTypedDataRequest extends Omit<AccountRequest, 'type'> {

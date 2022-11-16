@@ -39,6 +39,7 @@ class Command extends React.Component {
   renderSignerTitle () {
     const { view, data = {} } = this.store('windows.dash.nav')[0] || { view: '', data: {} }
     const signer = data.signer ? this.store('main.signers', data.signer) : {}
+    if (!signer) return null
     return (
       <div className='expandedSignerTitle'>
         {/* <div className='signerType' style={this.props.inSetup ? {top: '21px'} : {top: '24px'}}>{this.props.model}</div> */}

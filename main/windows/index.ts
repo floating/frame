@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, screen, Tray as ElectronTray, Menu, globalShortcut, IpcMainEvent, WebContents } from 'electron'
+import { app, BrowserWindow, ipcMain, screen, Tray as ElectronTray, Menu, globalShortcut, IpcMainEvent, WebContents, BrowserWindowConstructorOptions } from 'electron'
 import path from 'path'
 import log from 'electron-log'
 import EventEmitter from 'events'
@@ -23,6 +23,48 @@ let tray: Tray
 let dash: Dash
 let mouseTimeout: NodeJS.Timeout
 let glide = false
+
+const hideFrame = () => tray.hide()
+const showFrame = () => tray.show()
+
+const separatorMenuItem = {
+  label: 'Frame',
+  click: () => {}, 
+  type: 'separator'
+}
+
+const hideMenuItem = {
+  label: 'Dismiss', 
+  click: hideFrame, 
+  accelerator: 'Alt+/', 
+  registerAccelerator: false,
+  toolTip: 'Dismiss Frame'
+}
+
+const showMenuItem = { 
+  label: 'Summon', 
+  click: showFrame, 
+  accelerator: 'Alt+/', 
+  registerAccelerator: false,
+  toolTip: 'Summon Frame'
+}
+
+const quitMenuItem = {
+  label: 'Quit',
+  click: () => app.quit()
+}
+
+const hideMenu = Menu.buildFromTemplate([
+  hideMenuItem,
+  separatorMenuItem,
+  quitMenuItem
+])
+
+const showMenu = Menu.buildFromTemplate([
+  showMenuItem,
+  separatorMenuItem,
+  quitMenuItem
+])
 
 const topRight = (window: BrowserWindow) => {
   const area = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
@@ -62,8 +104,20 @@ const detectMouse = () => {
   }, 50)
 }
 
+function createWindow (name: string, opts: BrowserWindowConstructorOptions) {
+  log.verbose(`Creating ${name} window`)
+
+  const browserWindow = new BrowserWindow(opts)
+
+  browserWindow.webContents.once('did-finish-load', () => {
+    log.info(`Created ${name} renderer process, pid:`, browserWindow.webContents.getOSProcessId())
+  })
+
+  return browserWindow
+}
+
 function initDashWindow () {
-  windows.dash = new BrowserWindow({
+  windows.dash = createWindow('dash', {
     width: trayWidth,
     frame: false,
     transparent: process.platform === 'darwin',
@@ -85,7 +139,7 @@ function initDashWindow () {
 }
 
 function initTrayWindow () {
-  windows.tray = new BrowserWindow({
+  windows.tray = createWindow('tray', {
     width: trayWidth,
     frame: false,
     transparent: process.platform === 'darwin',
@@ -109,8 +163,9 @@ function initTrayWindow () {
   windows.tray.on('closed', () => delete windows.tray)
   windows.tray.webContents.on('will-navigate', e => e.preventDefault()) // Prevent navigation
   windows.tray.webContents.on('will-attach-webview', e => e.preventDefault()) // Prevent attaching <webview>
-  windows.tray.webContents.on('new-window', e => e.preventDefault()) // Prevent new windows
+  windows.tray.webContents.setWindowOpenHandler(() => ({ action: 'deny' })) // Prevent new windows
   windows.tray.webContents.session.setPermissionRequestHandler((webContents, permission, res) => res(false))
+
   windows.tray.setResizable(false)
   windows.tray.setMovable(false)
   windows.tray.setSize(0, 0)
@@ -118,51 +173,23 @@ function initTrayWindow () {
   const { width, height, x, y } = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
   windows.tray.setPosition(width + x, height + y)
 
-  const separatorMenuItem = {
-    label: 'Frame',
-    click: () => {}, 
-    type: 'separator'
-  }
-  
-  const hideMenuItem = {
-    label: 'Dismiss', 
-    click: () => tray.hide(), 
-    accelerator: 'Alt+/', 
-    registerAccelerator: false,
-    toolTip: 'Dismiss Frame'
-  }
-
-  const showMenuItem = { 
-    label: 'Summon', 
-    click: () => tray.show(), 
-    accelerator: 'Alt+/', 
-    registerAccelerator: false,
-    toolTip: 'Summon Frame'
-  }
-
-  const quitMenuItem = {
-    label: 'Quit',
-    click: () => app.quit()
-  }
-
   windows.tray.on('show', () => {
-    tray.setContextMenu(
-      Menu.buildFromTemplate([
-        hideMenuItem,
-        separatorMenuItem,
-        quitMenuItem
-      ])
-    )
+    if (process.platform === 'win32') {
+      tray.electronTray.closeContextMenu()
+    }
+    setTimeout(() => {
+      tray.electronTray.setContextMenu(hideMenu)
+    }, 100)
   })
   windows.tray.on('hide', () => {
-    tray.setContextMenu(
-      Menu.buildFromTemplate([
-        showMenuItem,
-        separatorMenuItem,
-        quitMenuItem
-      ])
-    )
+    if (process.platform === 'win32') {
+      tray.electronTray.closeContextMenu()
+    }
+    setTimeout(() => {
+      tray.electronTray.setContextMenu(showMenu)
+    }, 100)
   })
+
   setTimeout(() => {
     windows.tray.on('focus', () => tray.show())
   }, 2000)
@@ -173,10 +200,11 @@ function initTrayWindow () {
   
   setTimeout(() => {
     windows.tray.on('blur', () => {
-      const frameShowing = frameManager.isFrameShowing()
-      if (store('main.autohide') && !store('windows.dash.showing') && !frameShowing) {
-        tray.hide(true)
-      }
+      setTimeout(() => {
+        if (tray.canAutoHide()) {
+          tray.hide(true)
+        }
+      }, 100)
     })
     windows.tray.focus()
   }, 1260)
@@ -195,12 +223,14 @@ function initTrayWindow () {
 }
 
 class Tray {
+  private recentElectronTrayClick = false
+  private recentElectronTrayClickTimeout?: NodeJS.Timeout
   private recentAutohide = false
   private recentAutoHideTimeout?: NodeJS.Timeout
   private gasObserver: Observer
   private ready: boolean
-  private electronTray: ElectronTray
   private readyHandler: () => void
+  public electronTray: ElectronTray
 
   constructor () {
     this.electronTray = new ElectronTray(path.join(__dirname, process.platform === 'darwin' ? './IconTemplate.png' : './Icon.png'))
@@ -216,6 +246,16 @@ class Tray {
       this.electronTray.setTitle(title)
     })
     this.readyHandler = () => {
+      this.electronTray.on('click', () => {
+        this.recentElectronTrayClick = true
+        clearTimeout(this.recentElectronTrayClickTimeout as NodeJS.Timeout)
+        this.recentElectronTrayClickTimeout = setTimeout(() => {
+          this.recentElectronTrayClick = false
+        }, 50)
+        if (process.platform === 'win32') {
+          this.toggle()
+        }
+      })
       if (showOnReady) {
         store.trayOpen(true)
       }
@@ -234,18 +274,22 @@ class Tray {
     return this.ready
   }
 
-  setContextMenu (menu: Menu) {
-    return this.electronTray.setContextMenu(menu)
+  isVisible () {
+    return (windows.tray as BrowserWindow).isVisible()
+  }
+
+  canAutoHide () {
+    return !this.recentElectronTrayClick && store('main.autohide') && !store('windows.dash.showing') && !frameManager.isFrameShowing()
   }
 
   hide (autohide: boolean = false) {
-    store.toggleDash('hide');
+    store.toggleDash('hide')
     if (autohide) {
-        this.recentAutohide = true;
-        clearTimeout(this.recentAutoHideTimeout as NodeJS.Timeout);
-        this.recentAutoHideTimeout = setTimeout(() => {
-            this.recentAutohide = false;
-        }, 50);
+      this.recentAutohide = true
+      clearTimeout(this.recentAutoHideTimeout as NodeJS.Timeout)
+      this.recentAutoHideTimeout = setTimeout(() => {
+        this.recentAutohide = false
+      }, 50)
     }
 
     if (windows && windows.tray) {
@@ -264,7 +308,7 @@ class Tray {
     if (!windows.tray) {
       return init()
     }
-    windows.tray.setPosition(0, 0)
+    // windows.tray.setPosition(0, 0)
     windows.tray.setAlwaysOnTop(true)
     windows.tray.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
     windows.tray.setResizable(false) // Keeps height consistent
@@ -289,8 +333,7 @@ class Tray {
   toggle () {
     if (!this.isReady() || this.recentAutohide) return
 
-    const showing = (windows.tray as BrowserWindow).isVisible()
-    showing ? this.hide() : this.show()
+    this.isVisible() ? this.hide() : this.show()
   }
 
   destroy () {
@@ -343,7 +386,7 @@ ipcMain.on('tray:mouseout', () => {
 app.on('web-contents-created', (_e, contents) => {
   contents.on('will-navigate', e => e.preventDefault())
   contents.on('will-attach-webview', e => e.preventDefault())
-  contents.on('new-window', e => e.preventDefault())
+  contents.setWindowOpenHandler(() => ({ action: 'deny' }))
 })
 
 app.on('ready', () => {
@@ -424,6 +467,9 @@ export default {
   },
   hideDash () {
     dash.hide()
+  },
+  focusTray () {
+    windows.tray.focus()
   },
   refocusFrame (frameId: string) {
     frameManager.refocus(frameId)

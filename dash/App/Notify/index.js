@@ -147,16 +147,16 @@ class Notify extends React.Component {
     )
   }
 
-  signerLockedWarning ({ req = {} }) {
+  signerUnavailableWarning ({ req = {} }) {
     return (
       <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
         <div className='notifyBox'>
           <div className='notifyTitle'>
-            Signer locked!
+            Signer unavailable for signing!
           </div>
           <div className='notifyBody'>
             <div className='notifyBodyQuestion'>
-              Please unlock this signer and try again
+              Please check the signer for this account and try again
             </div>
           </div>
           <div className='notifyInput'>
@@ -231,9 +231,8 @@ class Notify extends React.Component {
               className='notifyInputOption notifyInputProceed' onMouseDown={() => {
                 // TODO: Transacionns need a better flow to respond to mutiple notifications after hitting sign
                 const isTestnet = this.store('main.networks', chain.type, chain.id, 'isTestnet')
-                const nativeCurrency = this.store('main.networksMeta', chain.type, chain.id, 'nativeCurrency')
+                const {nativeCurrency, nativeCurrency:{symbol: currentSymbol = '?'}} = this.store('main.networksMeta', chain.type, chain.id)
                 const nativeUSD = nativeCurrency && nativeCurrency.usd && !isTestnet ? nativeCurrency.usd.price : 0
-                const currentSymbol = this.store('main.networks', chain.type, chain.id, 'symbol') || '?'
 
                 let maxFeePerGas, maxFee, maxFeeUSD
 
@@ -455,10 +454,10 @@ class Notify extends React.Component {
           {this.noSignerWarning(notifyData)}
         </div>
       )
-    } else if (notify === 'signerLockedWarning') {
+    } else if (notify === 'signerUnavailableWarning') {
       return (
         <div className='notify cardShow'>
-          {this.signerLockedWarning(notifyData)}
+          {this.signerUnavailableWarning(notifyData)}
         </div>
       )
     } else if (notify === 'signerCompatibilityWarning') {

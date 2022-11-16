@@ -2,10 +2,7 @@ import React from 'react'
 import Restore from 'react-restore'
 import link from '../../../../resources/link'
 import svg from '../../../../resources/svg'
-
-function isHardwareSigner (type = '') {
-  return ['ledger', 'trezor', 'lattice'].includes(type.toLowerCase())
-}
+import { isHardwareSigner } from '../../../../resources/domain/signer'
 
 class SignerStatus extends React.Component {
   constructor (...args) {
@@ -86,9 +83,8 @@ class SignerStatus extends React.Component {
     const { shake } = this.state
 
     const signer = this.props.signer || {}
-    const isHardware = isHardwareSigner(signer.type)
 
-    return !isHardware && signer.id && signer.status === 'locked' ? (
+    return !isHardwareSigner(signer) && signer.id && signer.status === 'locked' ? (
       <div className={shake ? 'signerStatus headShake' : 'signerStatus'} ref={this.statusRef}>
         <div className='signerStatusWrap'>
           <div className='signerStatusMain'>

@@ -523,6 +523,63 @@ const migrations = {
     return initial
   },
   25: (initial) => {
+    const optimism = initial.main.networks.ethereum[10]
+    const removeOptimismConnection = (connection) => ({
+      ...connection,
+      current: connection.current === 'optimism' ? 'infura' : connection.current
+    })
+
+    initial.main.networks.ethereum[10] = {
+      ...optimism,
+      connection: {
+        primary: removeOptimismConnection(optimism.connection.primary),
+        secondary: removeOptimismConnection(optimism.connection.secondary)
+      }
+    }
+    return initial
+  },
+  26: (initial) => {
+    Object.values(initial.main.networks.ethereum).forEach((network) => {
+      const {symbol, id} = network
+      initial.main.networksMeta.ethereum[id].nativeCurrency.symbol = initial.main.networksMeta.ethereum[id].nativeCurrency.symbol || symbol
+      delete network.symbol
+    })
+
+    return initial
+  },
+  27: (initial) => {
+    // change any accounts with the old names of "seed signer" or "ring signer" to "hot signer"
+
+    const accounts = Object.entries(initial.main.accounts).map(([id, account]) => {
+      const name = ['ring account', 'seed account'].includes((account.name || '').toLowerCase())
+        ? 'Hot Account'
+        : account.name
+
+      return [id, { ...account, name }]
+    })
+
+    initial.main.accounts = Object.fromEntries(accounts)
+
+    return initial
+  },
+  28: (initial) => {
+    const networkMeta = initial.main.networksMeta.ethereum
+    const {
+      5: {
+        nativeCurrency: { symbol: goerliSymbol },
+      },
+      11155111: {
+        nativeCurrency: { symbol: sepoliaSymbol },
+      },
+    } = networkMeta;
+    goerliSymbol === "ETH" && (initial.main.networksMeta.ethereum[5].nativeCurrency.symbol = "görETH")
+    sepoliaSymbol === "ETH" && (initial.main.networksMeta.ethereum[11155111].nativeCurrency.symbol = "sepETH")
+    Object.values(initial.main.networksMeta.ethereum).forEach((metadata) => {
+      metadata.nativeCurrency.decimals = metadata.nativeCurrency.decimals || 18
+    })
+    return initial
+  },
+  29: (initial) => {
     // add accountsMeta
     initial.main.accountsMeta = {}
     Object.entries(initial.main.accounts).forEach(([id, { name }]) => {

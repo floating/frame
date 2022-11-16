@@ -167,14 +167,16 @@
   box-shadow 0px 2px 4px var(--ghostX)
 
   .txViewDataHeader
-    padding-top 40px
-    padding-bottom 16px
+    padding 0px 0px
+    margin-bottom 32px
     font-family 'VCR'
     text-transform uppercase
-    font-size 16px
+    font-size 14px
     text-align center
-    letter-spacing 4px
-    text-shadow 0px 0px 10px var(--ghostD)
+    font-weight 400
+    letter-spacing 6px
+    margin-left 4px
+    opacity 1
 
 ._txModule
   position absolute
@@ -220,7 +222,7 @@
   font-size 16px
   font-weight 400
   cursor pointer
-  padding 10px 0px
+  padding 12px
 
   *
     pointer-events none
@@ -231,12 +233,19 @@
     align-items center
     flex-direction column
 
-    ._txDescriptionSummaryLine
-      padding-bottom 10px
-      display flex
-      justify-content center
-      align-items center
+    ._txDescriptionSummaryMain
+      padding 12px
+      text-align center
+
+    ._txDescriptionSummaryTag
       font-size 12px
+      font-weight 500
+      text-transform uppercase
+      text-align center
+      white-space nowrap
+      overflow hidden
+      text-overflow ellipsis
+      width 300px
 
     ._txDescriptionSummaryHeadline
       font-size 26px

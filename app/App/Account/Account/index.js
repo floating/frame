@@ -23,6 +23,7 @@ import SignatureRequest from './Requests/SignatureRequest'
 import ChainRequest from './Requests/ChainRequest'
 import AddTokenRequest from './Requests/AddTokenRequest'
 import SignTypedDataRequest from './Requests/SignTypedDataRequest'
+import { isHardwareSigner } from '../../../../resources/domain/signer'
 
 class _AccountModule extends React.Component {
   // constructor (props, context) {
@@ -237,7 +238,6 @@ class _AccountMain extends React.Component {
 
 
   renderAccountFilter () {
-    const accountOpen = this.store('selected.open')
     return (
       <div className='panelFilterAccount'>
         <div className='panelFilterIcon'>
@@ -250,8 +250,7 @@ class _AccountMain extends React.Component {
             spellCheck='false'
             onChange={(e) => {
               const value = e.target.value
-              this.setState({ accountModuleFilter: value  })
-              // link.send('tray:action', 'setAccountFilter', value)
+              this.setState({ accountModuleFilter: value })
             }}
             value={this.state.accountModuleFilter}
           />
@@ -288,8 +287,9 @@ class _AccountMain extends React.Component {
         filter={this.state.accountModuleFilter}
       />
     })
+    const footerHeight = this.store('windows.panel.footer.height')
     return (
-      <div className='accountMain'>
+      <div className='accountMain' style={{ bottom: footerHeight + 'px' }}>
         <div className='accountMainScroll'>
           {this.renderAccountFilter()}
           <div className='accountMainSlide' style={{ height: slideHeight + 'px' }}>
@@ -307,15 +307,10 @@ const AccountMain = Restore.connect(_AccountMain)
 // AccountView is a reusable template that provides the option to nav back to main
 class _AccountView extends React.Component {
   render () {
-    const { position = {} } = this.store('windows.panel.nav')[0] || {}
+    const accountOpen = this.store('selected.open')
+    const footerHeight = this.store('windows.panel.footer.height')
     return (
-      <div className='accountView'
-        // TODO: sync via nav
-        style={{
-          top: position.top || '140px',
-          bottom: position.bottom || '40px'
-        }}
-      >
+      <div className='accountView' style={{ top: accountOpen ? '140px' : '80px', bottom: footerHeight + 'px' }}>
         <div className='accountViewMenu cardShow'>
           <div 
             className='accountViewBack'
@@ -342,11 +337,6 @@ class _AccountView extends React.Component {
 
 const AccountView = Restore.connect(_AccountView)
 
-function isHardwareSigner (account = {}) {
-  return ['ledger', 'lattice', 'trezor'].includes(account.lastSignerType)
-}
-
-
 class _AccountBody extends React.Component {
   constructor (...args) {
     super(...args)
@@ -356,7 +346,7 @@ class _AccountBody extends React.Component {
   } 
   renderRequest (req, data) {
     const activeAccount =  this.store('main.accounts', this.props.id)
-    const signingDelay = isHardwareSigner(activeAccount) ? 200 : 1500
+    const signingDelay = isHardwareSigner(activeAccount.lastSignerType) ? 200 : 1500
 
     if (req.type === 'transaction') {
       return (

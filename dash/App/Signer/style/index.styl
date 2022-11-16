@@ -48,13 +48,16 @@
     border-radius 8px
     font-size 18px
     font-weight 300
-    display flex
-    align-items center
+    padding-top 4px
     box-sizing border-box
     font-family 'MainFont'
     text-transform capitalize
     letter-spacing 0px
     font-weight 400
+    white-space nowrap
+    overflow hidden
+    text-overflow ellipsis
+    width 190px
 
     .signerNameUpdate
       position absolute
@@ -524,6 +527,7 @@
   border-left 3px solid var(--good)
   transform translateZ(0)
   animation load8 0.5s infinite linear
+  will-change transform
 
 @keyframes load8
   0%

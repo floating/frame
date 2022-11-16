@@ -106,9 +106,9 @@ class _OriginModule extends React.Component {
           }}
         >
           <Indicator key={origin.session.lastUpdatedAt} connected={connected} />
-          <div className='sliceOriginTile'>
+          <div className='sliceOriginTitle'>
             {origin.name}
-          </div> 
+          </div>
           <div className='sliceOriginReqs'>
             <div className='sliceOriginReqsNumber'>{this.state.averageRequests}</div>
             <div className='sliceOriginReqsLabel'>{'reqs/min'}</div>

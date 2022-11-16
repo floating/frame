@@ -83,6 +83,7 @@ module.exports = {
   toggleLaunch: u => u('main.launch', launch => !launch),
   toggleReveal: u => u('main.reveal', reveal => !reveal),
   toggleNonceAdjust: u => u('main.nonceAdjust', nonceAdjust => !nonceAdjust),
+  toggleShowLocalNameWithENS: u => u('main.showLocalNameWithENS', showLocalNameWithENS => !showLocalNameWithENS),
   setPermission: (u, address, permission) => {
     u('main.permissions', address, (permissions = {}) => {
       permissions[permission.handlerId] = permission
@@ -149,16 +150,6 @@ module.exports = {
     })
   },
   removeSigner: (u, id) => {
-
-    // if in signer view, nav backwards
-    u('windows.dash.nav', (nav = []) => {
-      if (nav[0]) {
-        const { data = {} } = nav[0]
-        if (data.signer === id) nav.shift()
-      } 
-      return nav
-    })
-
     u('main.signers', signers => {
       delete signers[id]
       return signers
@@ -303,7 +294,6 @@ module.exports = {
       const defaultMeta = {
         blockHeight: 0,
         name: net.name,
-        symbol: net.symbol,
         primaryColor: net.primaryColor,
         nativeCurrency: {
           symbol: net.symbol,
@@ -680,7 +670,7 @@ module.exports = {
     u('windows.panel.nav', nav => {
       const newNav = nav.filter(navItem => {
         const item = navItem || {}
-        return !item?.req?.handlerId === handlerId
+        return item?.data?.requestId !== handlerId
       })
       return newNav
     })
@@ -819,6 +809,9 @@ module.exports = {
   },
   setAccountFilter: (u, value) => {
     u('panel.accountFilter', () => value)
+  },
+  setFooterHeight: (u, win, height) => {
+    u('windows', win, 'footer.height', () => height < 40 ? 40 : height)
   }
   // toggleUSDValue: (u) => {
   //   u('main.showUSDValue', show => !show)

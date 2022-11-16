@@ -60,8 +60,12 @@
   bottom 0px
   left 0px 
   right 0px
-  height 200px
+  min-height 40px
   z-index 99999999
+  transition var(--standard)
+
+  .footerWrap
+    width 100%
 
 .signer
   position relative
@@ -646,6 +650,7 @@
       border-left 3px solid var(--good)
       transform translateZ(0)
       animation load 0.5s infinite linear
+      will-change transform
 
   .moduleHeader:before
     background none

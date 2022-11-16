@@ -1,25 +1,13 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import Restore from 'react-restore'
-import utils from 'web3-utils'
-import BigNumber from 'bignumber.js'
 
 import Account from './Account'
-// import TxBar from './RequestCommand/TxBar'
-// import TxConfirmations from './TxConfirmations'
-import Time from './Time'
-import RequestCommand from './RequestCommand'
 
-import svg from '../../../resources/svg'
 import link from '../../../resources/link'
-
-// import { usesBaseFee } from '../../../resources/domain/transaction'
-
-const FEE_WARNING_THRESHOLD_USD = 50
-
+import { isHardwareSigner } from '../../../resources/domain/signer'
 
 // import Filter from '../../Components/Filter'
-
 let firstScroll = true
 
 class _Footer extends React.Component {
@@ -39,18 +27,19 @@ class _Footer extends React.Component {
     const crumb = this.store('windows.panel.nav')[0] || {}
     if (crumb.view === 'requestView') {
       const { accountId, requestId } = crumb.data
+      const account = this.store('main.accounts', accountId)
       const req = this.store('main.accounts', accountId, 'requests', requestId)
       if (req) {
         if (req.type === 'transaction' && crumb.data.step === 'confirm') {
           return (
-            <div className='footerModule'>
-              <RequestCommand req={req} />
+            <div className='footerModule' style={{ height: '200px' }}>
+              <RequestCommand req={req} signingDelay={isHardwareSigner(account.lastSignerType) ? 0 : 2000} />
             </div>
           )
         } else if (req.type === 'access') {
           return (
             <div className='footerModule'>
-              <div className='requestApprove'>
+              <div className='requestApprove requestApproveSimple'>
                 <div 
                   className='requestDecline' 
                   style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none'}}
@@ -72,90 +61,9 @@ class _Footer extends React.Component {
               </div>
             </div>
           )
-        } else if (req.type === 'sign') {
+        } else if (req.type === 'sign' || req.type === 'signTypedData') {
           return (
-            <div className='footerModule'>
-              <div className='requestApprove'>
-                <div 
-                  className='requestDecline' 
-                  style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none'}}
-                  onClick={() => { if (this.state.allowInput) this.decline(req.handlerId, req) 
-                }}>
-                  <div className='requestDeclineButton _txButton _txButtonBad'>
-                    <span>Decline</span>
-                  </div>
-                </div>
-                <div 
-                  className='requestSign' 
-                  style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none'}}
-                  onClick={() => {
-                    if (this.state.allowInput) this.approve(req.handlerId, req) 
-                  }}
-                >
-                  <div className='requestSignButton _txButton'>
-                    <span>Sign</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )
-        } else if (req.type === 'signTypedData') {
-          const { status, notice } = req
-          return (
-            <div className='footerModule'>
-              {notice ? (
-                <div className='requestNotice'>
-                  {(_ => {
-                    if (status === 'pending') {
-                      return (
-                        <div key={status} className='requestNoticeInner cardShow'>
-                          <div style={{ paddingBottom: 20 }}><div className='loader' /></div>
-                          <div className='requestNoticeInnerText'>See Signer</div>
-                          <div className='cancelRequest' onClick={() => this.decline(req.handlerId, req)}>Cancel</div>
-                        </div>
-                      )
-                    } else if (status === 'success') {
-                      return (
-                        <div key={status} className='requestNoticeInner cardShow requestNoticeSuccess'>
-                          <div>{svg.octicon('check', { height: 40 })}</div>
-                          <div className='requestNoticeInnerText'>{notice}</div>
-                        </div>
-                      )
-                    } else if (status === 'error' || status === 'declined') {
-                      return (
-                        <div key={status} className='requestNoticeInner cardShow requestNoticeError'>
-                          <div>{svg.octicon('circle-slash', { height: 40 })}</div>
-                          <div className='requestNoticeInnerText'>{notice}</div>
-                        </div>
-                      )
-                    } else {
-                      return <div key={notice} className='requestNoticeInner cardShow'>{notice}</div>
-                    }
-                  })()}
-                </div> 
-              ) : ( 
-                <div className='requestApprove'>
-                  <div 
-                    className='requestDecline' 
-                    style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none'}} 
-                    onClick={() => { if (this.state.allowInput) this.decline(req.handlerId, req) 
-                  }}>
-                    <div className='requestDeclineButton _txButton _txButtonBad'>
-                      <span>Decline</span>
-                    </div>
-                  </div>
-                  <div 
-                    className='requestSign' 
-                    style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none'}}
-                    onClick={() => { if (this.state.allowInput) this.approve(req.handlerId, req) 
-                  }}>
-                    <div className='requestSignButton _txButton'>
-                      <span>Sign</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
+            <RequestCommand req={req} signingDelay={isHardwareSigner(account.lastSignerType) ? 0 : 1500} />
           )
         } else if (req.type === 'addChain' || req.type === 'switchChain') {
           return (
@@ -274,32 +182,6 @@ class Main extends React.Component {
     }, 3000)
   }
 
-  accountSort (accounts, a, b) {
-    try {
-      let [aBlock, aLocal] = accounts[a].created.split(':')
-      let [bBlock, bLocal] = accounts[b].created.split(':')
-  
-      aLocal = parseInt(aLocal)
-      bLocal = parseInt(bLocal)
-  
-      if (aBlock === 'new' && bBlock !== 'new') return -1
-      if (bBlock !== 'new' && aBlock === 'new') return 1
-      if (aBlock === 'new' && bBlock === 'new') return aLocal >= bLocal ? 1 : 0
-  
-      aBlock = parseInt(aBlock)
-      bBlock = parseInt(bBlock)
-  
-      if (aBlock > bBlock) return -1
-      if (aBlock < bBlock) return -1
-      if (aBlock === bBlock) return aLocal >= bLocal ? 1 : 0
-
-      return 0
-    } catch (e) {
-      console.error(e)
-      return 0
-    }
-  }
-
   render () {
     const accounts = this.store('main.accounts')
     const current = this.store('selected.current')
@@ -318,7 +200,6 @@ class Main extends React.Component {
           reportScroll={() => this.reportScroll()} 
           resetScroll={() => this.resetScroll()} 
         />
-        <Footer />
       </>
     )
   }

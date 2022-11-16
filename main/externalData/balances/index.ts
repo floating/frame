@@ -1,6 +1,6 @@
 import log from 'electron-log'
 
-import { NATIVE_CURRENCY } from '../../../resources/utils/constants'
+import { NATIVE_CURRENCY } from '../../../resources/constants'
 import BalancesWorkerController from './controller'
 import { CurrencyBalance, TokenBalance } from './scan'
 
@@ -10,6 +10,7 @@ export default function (store: Store) {
   const storeApi = {
     getActiveAddress: () => (store('selected.current') || '') as Address,
     getNetwork: (id: number) => (store('main.networks.ethereum', id) || {}) as Network,
+    getNativeCurrencySymbol:(id: number) => store('main.networksMeta.ethereum', id, 'nativeCurrency', 'symbol') as string,
     getConnectedNetworks: () => {
       const networks = (Object.values(store('main.networks.ethereum') || {})) as Network[]
       return networks
@@ -29,6 +30,7 @@ export default function (store: Store) {
 
   let scan: NodeJS.Timeout | null
   let workerController: BalancesWorkerController | null
+  let onResume: Function | null
 
   function attemptRestart () {
     log.warn(`balances controller stopped, restarting in ${RESTART_WAIT} seconds`)
@@ -76,6 +78,26 @@ export default function (store: Store) {
     setAddress(storeApi.getActiveAddress())
   }
 
+  function resume () {
+    if (onResume) onResume()
+
+    onResume = null
+  }
+
+  function pause () {
+    if (stopScan()) {
+      log.debug('Pausing balances scan')
+
+      onResume = () => {
+        const address = storeApi.getActiveAddress()
+
+        log.debug(`Resuming balances scan for address ${address}`)
+
+        startScan(address)
+      }
+    }
+  }
+
   function stop () {
     log.verbose('stopping balances updates')
 
@@ -91,6 +113,8 @@ export default function (store: Store) {
 
   function startScan (address: Address) {
     stopScan()
+
+    if (onResume) onResume = null
 
     log.verbose(`starting balances scan for ${address}`)
 
@@ -109,12 +133,15 @@ export default function (store: Store) {
   }
 
   function stopScan () {
-    log.debug('stopping balances scan')
-
     if (scan) {
+      log.debug('stopping balances scan')
       clearTimeout(scan)
       scan = null
+
+      return true
     }
+
+    return false
   }
 
   function updateActiveBalances (address: Address) {
@@ -155,7 +182,7 @@ export default function (store: Store) {
       .forEach(balance => {
         store.setBalance(address, {
           ...balance,
-          symbol: storeApi.getNetwork(balance.chainId).symbol,
+          symbol: storeApi.getNativeCurrencySymbol(balance.chainId),
           address: NATIVE_CURRENCY
         })
       })
@@ -166,7 +193,12 @@ export default function (store: Store) {
     const currentTokenBalances = storeApi.getTokenBalances(address)
     const changedBalances = balances.filter(newBalance => {
       const currentBalance = currentTokenBalances.find(b => b.address === newBalance.address && b.chainId === newBalance.chainId)
-      return (!currentBalance || currentBalance.balance !== newBalance.balance)
+
+      // do not add newly found tokens with a zero balance
+      const isNewBalance = !currentBalance && parseInt(newBalance.balance) !== 0
+      const isChangedBalance = !!currentBalance && currentBalance.balance !== newBalance.balance
+
+      return isNewBalance || isChangedBalance
     })
 
     if (changedBalances.length > 0) {
@@ -229,5 +261,5 @@ export default function (store: Store) {
     runWhenReady(() => workerController?.updateKnownTokenBalances(address, tokens))
   }
 
-  return { start, stop, setAddress, addNetworks, addTokens }
+  return { start, stop, resume, pause, setAddress, addNetworks, addTokens }
 }

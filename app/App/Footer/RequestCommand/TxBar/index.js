@@ -12,7 +12,7 @@ class TxBar extends React.Component {
     else if (req.status === 'sending') position = 2
     else if (req.status === 'verifying') position = 3
     else if (req.status === 'verified') position = 4
-    else if (req.status === 'confirming' || req.status === 'confirmed') {
+    else if (req.status === 'confirming' || req.status === 'confirmed' || req.status === 'sent') {
       position = 4
       progressIconClass += ' txProgressStepIconHidden'
       txBarClass += ' txBarSuccess'
@@ -21,7 +21,7 @@ class TxBar extends React.Component {
       progressIconClass += ' txProgressStepIconHidden'
       txBarClass += ' txBarError'
     }
-    const slideMap = ['375px', '268.5px', '181px', '93.5px', '-35px']
+    const slideMap = ['375px', '268.5px', '181px', '93.5px', '0px']
     const slide = slideMap[position]
 
     return (
@@ -50,11 +50,13 @@ class TxBar extends React.Component {
           <div className='txProgressFront'>
             <div className='txProgressSlide' style={{ right: slide }}>
               <div className='txProgressTail' />
-              <div className='txProgressLoading'>
-                <div className='txProgressLoadingDot' />
-                <div className='txProgressLoadingCenter' />
-                <div className='txProgressLoadingBox' />
-              </div>
+              {position < 4 && (
+                <div className='txProgressLoading'>
+                  <div className='txProgressLoadingDot' />
+                  <div className='txProgressLoadingCenter' />
+                  <div className='txProgressLoadingBox' />
+                </div>
+              )}
             </div>
           </div>
         </div>

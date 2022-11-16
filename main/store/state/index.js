@@ -41,11 +41,17 @@ const initial = {
   windows: {
     panel: {
       show: false,
-      nav: []
+      nav: [],
+      footer: {
+        height: 40
+      }
     },
     dash: {
       show: false,
-      nav: []
+      nav: [],
+      footer: {
+        height: 40
+      }
     },
     frames: []
   },
@@ -154,16 +160,16 @@ const initial = {
   },
   platform: process.platform,
   main: {
-    _version: main('_version', 23),
+    _version: main('_version', 28),
     instanceId: main('instanceId', generateUuid()),
     colorway: main('colorway', 'dark'),
     colorwayPrimary: {
       dark: {
-        background: 'rgb(20, 17, 22)',
-        text: 'rgb(236, 241, 255)'
+        background: 'rgb(21, 17, 23)',
+        text: 'rgb(241, 241, 255)'
       },
       light: {
-        background: 'rgb(227, 221, 236)',
+        background: 'rgb(224, 217, 233)',
         text: 'rgb(20, 40, 60)'
       }
     },
@@ -185,6 +191,7 @@ const initial = {
     launch: main('launch', false),
     reveal: main('reveal', false),
     nonceAdjust: main('nonceAdjust', false),
+    showLocalNameWithENS: main('showLocalNameWithENS', false),
     autohide: main('autohide', false),
     accountCloseLock: main('accountCloseLock', false),
     hardwareDerivation: main('hardwareDerivation', 'mainnet'),
@@ -241,7 +248,6 @@ const initial = {
           infura: 'infuraGoerli'
         },
         10: {
-          optimism: 'optimism',
           infura: 'infuraOptimism'
         },
         42: {
@@ -268,7 +274,6 @@ const initial = {
           id: 1,
           type: 'ethereum',
           layer: 'mainnet',
-          symbol: 'ETH',
           name: 'Mainnet',
           isTestnet: false,
           explorer: 'https://etherscan.io',
@@ -289,7 +294,6 @@ const initial = {
           type: 'ethereum',
           layer: 'testnet',
           isTestnet: true,
-          symbol: 'ETH',
           name: 'Görli',
           explorer: 'https://goerli.etherscan.io',
           gas: {
@@ -309,7 +313,6 @@ const initial = {
           type: 'ethereum',
           layer: 'rollup',
           isTestnet: false,
-          symbol: 'ETH',
           name: 'Optimism',
           explorer: 'https://optimistic.etherscan.io',
           gas: {
@@ -319,7 +322,7 @@ const initial = {
             }
           },
           connection: {
-            primary: { on: true, current: 'optimism', status: 'loading', connected: false, type: '', network: '', custom: '' },
+            primary: { on: true, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
             secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
           },
           on: false
@@ -329,7 +332,6 @@ const initial = {
           type: 'ethereum',
           layer: 'sidechain',
           isTestnet: false,
-          symbol: 'xDAI',
           name: 'Gnosis',
           explorer: 'https://blockscout.com/xdai/mainnet',
           gas: {
@@ -349,7 +351,6 @@ const initial = {
           type: 'ethereum',
           layer: 'sidechain',
           isTestnet: false,
-          symbol: 'MATIC',
           name: 'Polygon',
           explorer: 'https://polygonscan.com',
           gas: {
@@ -369,7 +370,6 @@ const initial = {
           type: 'ethereum',
           layer: 'rollup',
           isTestnet: false,
-          symbol: 'ETH',
           name: 'Arbitrum',
           explorer: 'https://arbiscan.io',
           gas: {
@@ -389,7 +389,6 @@ const initial = {
           type: 'ethereum',
           layer: 'testnet',
           isTestnet: true,
-          symbol: 'ETH',
           name: 'Sepolia',
           explorer: 'https://sepolia.etherscan.io',
           gas: {
@@ -418,14 +417,14 @@ const initial = {
             }
           },
           nativeCurrency: {
+            symbol: 'ETH',
             usd: {
               price: 0,
               change24hr: 0
             },
-            icon: '',
-            name: '',
-            symbol: '',
-            decimals: 0
+            icon: "https://assets.coingecko.com/coins/images/279/large/ethereum.png?1595348880",
+            name: 'Ether',
+            decimals: 18
           },
           icon: '',
           primaryColor: 'accent1' // Mainnet
@@ -440,14 +439,14 @@ const initial = {
             }
           },
           nativeCurrency: {
+            symbol: 'görETH',
             usd: {
               price: 0,
               change24hr: 0
             },
             icon: '',
-            name: '',
-            symbol: '',
-            decimals: 0
+            name: 'Görli Ether',
+            decimals: 18
           },
           icon: '',
           primaryColor: 'accent2' // Testnet
@@ -462,13 +461,14 @@ const initial = {
             }
           },
           nativeCurrency: {
+            symbol: 'ETH',
             usd: {
               price: 0,
               change24hr: 0
             },
             icon: '',
-            name: '',
-            symbol: '',
+            name: 'Ether',
+            symbol: '18',
             decimals: 0
           },
           icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/optimism.svg',
@@ -484,6 +484,7 @@ const initial = {
             }
           },
           nativeCurrency: {
+            symbol: 'xDAI',
             usd: {
               price: 0,
               change24hr: 0
@@ -491,7 +492,7 @@ const initial = {
             icon: '',
             name: '',
             symbol: '',
-            decimals: 0
+            decimals: 18
           },
           icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/gnosis.svg',
           primaryColor: 'accent5' // Gnosis
@@ -506,14 +507,14 @@ const initial = {
             }
           },
           nativeCurrency: {
+            symbol: 'MATIC',
             usd: {
               price: 0,
               change24hr: 0
             },
             icon: '',
             name: '',
-            symbol: '',
-            decimals: 0
+            decimals: 18
           },
           icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/polygon.svg',
           primaryColor: 'accent6' // Polygon
@@ -528,14 +529,15 @@ const initial = {
             }
           },
           nativeCurrency: {
+            symbol: 'ETH',
             usd: {
               price: 0,
               change24hr: 0
             },
             icon: '',
-            name: '',
+            name: 'Ether',
             symbol: '',
-            decimals: 0
+            decimals: 18
           },
           icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/arbitrum.svg',
           primaryColor: 'accent7' // Arbitrum
@@ -550,14 +552,14 @@ const initial = {
             }
           },
           nativeCurrency: {
+            symbol: 'sepETH',
             usd: {
               price: 0,
               change24hr: 0
             },
             icon: '',
-            name: '',
-            symbol: '',
-            decimals: 0
+            name: 'Sepolia Ether',
+            decimals: 18
           },
           icon: '',
           primaryColor: 'accent2' // Testnet

@@ -10,19 +10,50 @@
   100% 
     transform translate3d(0.7px, 0.7px, 0) rotate(-0.4deg) scale(1)
 
+.txSendingValue
+  min-height 50px
+  display flex
+  justify-content center
+  align-items center
+  font-size 18px
+  font-weight 300
+
+.txSendingValueSymbol
+  font-size 14px
+  margin-right 5px
+  position relative
+  top -1px
+  font-weight 600
+
+.txSendingValueAmount
+  font-size 20px
+  position relative
+  top -1px    
+
 ._txMain
   position relative
   z-index 100001
   background var(--ghostA)
   margin 16px 6px
-  border-radius 20px
-  padding 0px 0px 5px 0px
+  border-radius 26px
   overflow hidden
   box-shadow 0px 4px 8px var(--ghostY)
   border-bottom 2px solid var(--ghostZ)
+  padding 0
 
   ._txMainInner
-    margin 0px 5px
+    position relative
+    margin 0px 0px
+    overflow hidden
+
+    ._txMainBackground
+      position absolute
+      top 0
+      right 0
+      bottom 0
+      left 0
+      opacity 0.05
+      display none
     
     ._txMainValues
       font-size 17px
@@ -32,10 +63,10 @@
       transition none
       transform translate3d(0, 0, 0)
       font-family 'MainFont'
-      // overflow hidden
       display flow-root
       padding 3px 3px 1px 3px
       background var(--ghostZ)
+      margin 6px
 
       svg
         position relative
@@ -56,7 +87,7 @@
         margin-right 0px
 
       ._txMainTransferring
-        margin-top 5px
+        margin-top 0px
         display flex
         justify-content center
         align-items stretch
@@ -70,15 +101,11 @@
           justify-content center
           align-items center
           border-radius 12px
-          padding 7px 0px
           background var(--ghostA)
           margin-right 5px
 
         ._txMainTransferringPart:last-child
           margin-right 0px
-
-        ._txMainTransferringPartLarge
-          flex-grow 2
           
       ._txMainTransferringSymbol
         font-size 14px
@@ -183,10 +210,6 @@
     text-align center
     padding 8px 0px 8px 0px
     margin-top 1px
-    border-radius 12px
-    background var(--ghostA)
-    box-shadow 0px 1px 2px var(--ghostX)
-    border-bottom 2px solid var(--ghostZ)
 
   ._txMainTagWarning
     color var(--moon)
