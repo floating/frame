@@ -1,5 +1,5 @@
 const crypto = require('crypto')
-const { signTypedMessage } = require('@metamask/eth-sig-util')
+const { signTypedData } = require('@metamask/eth-sig-util')
 const { TransactionFactory } = require('@ethereumjs/tx')
 const Common = require('@ethereumjs/common').default
 
