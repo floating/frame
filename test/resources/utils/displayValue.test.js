@@ -373,8 +373,8 @@ describe('ether currency', () => {
   })
 
   describe('when not displaying decimals', () => {
-    it('should return a value of less than a dollar', () => {
-      const value = displayValueData(356e12, { currencyRate: { price: BigNumber(1) }})
+    it('should return a value of less than 1', () => {
+      const value = displayValueData(356e12)
       expect(value.ether({ displayDecimals: false })).toStrictEqual({
         approximationSymbol: '<',
         displayValue: '1', 
@@ -383,7 +383,7 @@ describe('ether currency', () => {
     })
 
     it('should return a value less than 1000 without decimals', () => {
-      const value = displayValueData(999999e15, { currencyRate: { price: BigNumber(1) }})
+      const value = displayValueData(999999e15)
       expect(value.ether({ displayDecimals: false })).toStrictEqual({
         displayValue: '999', 
         value: BigNumber(999.999)
@@ -393,7 +393,7 @@ describe('ether currency', () => {
 
   describe('shorthand large values', () => {
     it('should return a value of thousands to 3dp', () => {
-      const value = displayValueData(356253e17, { currencyRate: { price: BigNumber(1) }})
+      const value = displayValueData(356253e17)
       expect(value.ether()).toStrictEqual({
         approximationSymbol: '',
         displayUnit: {
@@ -406,7 +406,7 @@ describe('ether currency', () => {
     })
 
     it('should round down a value of thousands to 3dp', () => {
-      const value = displayValueData(356259e17, { currencyRate: { price: BigNumber(1) }})
+      const value = displayValueData(356259e17)
       expect(value.ether()).toStrictEqual({
         approximationSymbol: '',
         displayUnit: {
@@ -419,7 +419,7 @@ describe('ether currency', () => {
     })
 
     it('should return an exact value of thousands', () => {
-      const value = displayValueData(35e21, { currencyRate: { price: BigNumber(1) }})
+      const value = displayValueData(35e21)
       expect(value.ether()).toStrictEqual({
         approximationSymbol: '',
         displayUnit: {
@@ -432,7 +432,7 @@ describe('ether currency', () => {
     })
 
     it('should return a value of millions to 3dp', () => {
-      const value = displayValueData(356253e20, { currencyRate: { price: BigNumber(1) }})
+      const value = displayValueData(356253e20)
       expect(value.ether()).toStrictEqual({
         approximationSymbol: '',
         displayUnit: {
@@ -445,7 +445,7 @@ describe('ether currency', () => {
     })
 
     it('should round down a value of millions to 3dp', () => {
-      const value = displayValueData(356259e20, { currencyRate: { price: BigNumber(1) }})
+      const value = displayValueData(356259e20)
       expect(value.ether()).toStrictEqual({
         approximationSymbol: '',
         displayUnit: {
@@ -458,7 +458,7 @@ describe('ether currency', () => {
     })
 
     it('should return an exact value of millions', () => {
-      const value = displayValueData(35e24, { currencyRate: { price: BigNumber(1) }})
+      const value = displayValueData(35e24)
       expect(value.ether()).toStrictEqual({
         approximationSymbol: '',
         displayUnit: {
@@ -471,7 +471,7 @@ describe('ether currency', () => {
     })
 
     it('should return a value of billions to 3dp', () => {
-      const value = displayValueData(356253e23, { currencyRate: { price: BigNumber(1) }})
+      const value = displayValueData(356253e23)
       expect(value.ether()).toStrictEqual({
         approximationSymbol: '',
         displayUnit: {
@@ -484,7 +484,7 @@ describe('ether currency', () => {
     })
 
     it('should round down a value of billions to 3dp', () => {
-      const value = displayValueData(356259e23, { currencyRate: { price: BigNumber(1) }})
+      const value = displayValueData(356259e23)
       expect(value.ether()).toStrictEqual({
         approximationSymbol: '',
         displayUnit: {
@@ -497,7 +497,7 @@ describe('ether currency', () => {
     })
 
     it('should return an exact value of billions', () => {
-      const value = displayValueData(35e27, { currencyRate: { price: BigNumber(1) }})
+      const value = displayValueData(35e27)
       expect(value.ether()).toStrictEqual({
         approximationSymbol: '',
         displayUnit: {
@@ -510,7 +510,7 @@ describe('ether currency', () => {
     })
 
     it('should return a value of trillions to 3dp', () => {
-      const value = displayValueData(356253e26, { currencyRate: { price: BigNumber(1) }})
+      const value = displayValueData(356253e26)
       expect(value.ether()).toStrictEqual({
         approximationSymbol: '',
         displayUnit: {
@@ -523,7 +523,7 @@ describe('ether currency', () => {
     })
 
     it('should round down a value of trillions to 3dp', () => {
-      const value = displayValueData(356259e26, { currencyRate: { price: BigNumber(1) }})
+      const value = displayValueData(356259e26)
       expect(value.ether()).toStrictEqual({
         approximationSymbol: '',
         displayUnit: {
@@ -536,7 +536,7 @@ describe('ether currency', () => {
     })
 
     it('should return an exact value of trillions', () => {
-      const value = displayValueData(35e30, { currencyRate: { price: BigNumber(1) }})
+      const value = displayValueData(35e30)
       expect(value.ether()).toStrictEqual({
         approximationSymbol: '',
         displayUnit: {
@@ -549,7 +549,7 @@ describe('ether currency', () => {
     })
 
     it('should return a value of quadrillions to 3dp', () => {
-      const value = displayValueData(356253e29, { currencyRate: { price: BigNumber(1) }})
+      const value = displayValueData(356253e29)
       expect(value.ether()).toStrictEqual({
         approximationSymbol: '',
         displayUnit: {
@@ -562,7 +562,7 @@ describe('ether currency', () => {
     })
 
     it('should round down a value of quadrillions to 3dp', () => {
-      const value = displayValueData(356259e29, { currencyRate: { price: BigNumber(1) }})
+      const value = displayValueData(356259e29)
       expect(value.ether()).toStrictEqual({
         approximationSymbol: '',
         displayUnit: {
@@ -575,7 +575,7 @@ describe('ether currency', () => {
     })
 
     it('should return an exact value of quadrillions', () => {
-      const value = displayValueData(35e33, { currencyRate: { price: BigNumber(1) }})
+      const value = displayValueData(35e33)
       expect(value.ether()).toStrictEqual({
         approximationSymbol: '',
         displayUnit: {
@@ -588,7 +588,7 @@ describe('ether currency', () => {
     })
 
     it('should return a maximum value', () => {
-      const value = displayValueData(356e50, { currencyRate: { price: BigNumber(1) }})
+      const value = displayValueData(356e50)
       expect(value.ether()).toStrictEqual({
         approximationSymbol: '>',
         displayUnit: {
@@ -601,21 +601,3 @@ describe('ether currency', () => {
     })
   })
 })
-
-//   it('should handle values smaller than the number of decimals requested', () => {
-//     const value = displayValueData(356e-8, { decimalsOverride: 6 })
-//     expect(value.ether()).toStrictEqual({
-//       approximationSymbol: '<',
-//       displayValue: '0.000001', 
-//       value: BigNumber(0)
-//     })
-//   })  // 999.0000111111 1203.0002231223
-
-//   it('should handle values smaller than the number of decimals requested', () => {
-//     const value = displayValueData((998.0000111111 * 1e18))
-//     expect(value.ether()).toStrictEqual({
-//       approximationSymbol: '<',
-//       displayValue: '0.000001', 
-//       value: BigNumber(0)
-//     })
-//   })
