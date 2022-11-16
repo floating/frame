@@ -59,6 +59,8 @@ function getErrorCode (e: Error) {
 }
 
 const matchFilter = (filter: string = '', properties: string[] = []) => {
+  if (!filter) return true
+  if (typeof filter !== 'string' || !Array.isArray(properties)) return false
   const filterItems = filter.split(' ')
   return filterItems.every((item = '') => {
     item = item.toLowerCase()

@@ -2,6 +2,7 @@ import React from 'react'
 import Restore from 'react-restore'
 import link from '../../../../../../resources/link'
 import svg from '../../../../../../resources/svg'
+import { matchFilter } from '../../../../../../resources/utils'
 
 class Balances extends React.Component {
   constructor (...args) {
@@ -26,8 +27,11 @@ class Balances extends React.Component {
 
   render () {
     const permissions = this.store('main.permissions', this.props.account) || {}
-    let permissionList = Object.keys(permissions).sort((a, b) => a.origin < b.origin ? -1 : 1)
-    if (!this.props.expanded) permissionList = permissionList.slice(0, 3)
+    let permissionList = Object.keys(permissions).filter((o) => {
+      const { filter = '' } =  this.props
+      return matchFilter(filter, [permissions[o].origin])
+    }).sort((a, b) => a.origin < b.origin ? -1 : 1)
+    if (!this.props.expanded) permissionList = permissionList.slice(0, 4)
     
     return (
       <div 
