@@ -140,8 +140,8 @@ module.exports = {
       return { ...updatedAccount, balances: account.balances }
     })
   },
-  updateAccountMeta: (u, updatedAccount) => {
-    u('main.accountsMeta', updatedAccount.id, (accountMeta = {}) => {
+  updateAccountMeta: (u, accountMetaId, updatedAccount) => {
+    u('main.accountsMeta', accountMetaId, (accountMeta = {}) => {
       const timestamp = Date.now()
       return { ...accountMeta, name: updatedAccount.name, timestamp }
     })

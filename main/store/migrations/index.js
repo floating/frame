@@ -1,4 +1,5 @@
 import log from 'electron-log'
+import { accountNS } from '../../../resources/accounts'
 
 const migrations = {
   4: initial => {
@@ -583,8 +584,9 @@ const migrations = {
     // add accountsMeta
     initial.main.accountsMeta = {}
     Object.entries(initial.main.accounts).forEach(([id, { name }]) => {
+      const accountMetaId = uuidv5(id, accountNS)
       const timestamp = Date.now()
-      initial.main.accountsMeta[id] = { 
+      initial.main.accountsMeta[accountMetaId] = { 
         name,
         timestamp
       }
