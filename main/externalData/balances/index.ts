@@ -6,7 +6,7 @@ import { CurrencyBalance, TokenBalance } from './scan'
 
 const RESTART_WAIT = 5 // seconds
 
-// time wait in between scans, in seconds
+// time to wait in between scans, in seconds
 const scanInterval = {
   active: 20,
   inactive: 60 * 10
