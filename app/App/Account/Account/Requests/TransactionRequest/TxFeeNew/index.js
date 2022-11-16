@@ -25,7 +25,7 @@ const GasDisplay = ({ maxFeePerGas }) => {
 }     
 
 const USDEstimateDisplay = ({ minFee, maxFee, nativeCurrency }) => {
-  const { value: maxFeeValue, approximationSymbol: maxFeeApproximation } = maxFee.fiat(2)
+  const { value: maxFeeValue, approximationSymbol: maxFeeApproximation } = maxFee.fiat()
   const displayMaxFeeWarning = maxFeeValue > FEE_WARNING_THRESHOLD_USD
   
   return <div data-testid='usd-estimate-display' className='clusterTag'>
