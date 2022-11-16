@@ -41,11 +41,11 @@ it('should render a fiat value', () => {
   expect(displayValue.textContent).toBe('$5.34T')
 })
 
-it('should override decimals on a fiat value', () => {
-  const { getByTestId } = setupComponent(<DisplayValue value={356e28} decimalsOverride={1} valueDataParams={{ currencyRate: { price: 1.5 }}} type='fiat' currencySymbol='$' />)
+it('should not display decimals on a small fiat value when displayDecimals is set to false', () => {
+  const { getByTestId } = setupComponent(<DisplayValue value={356e16} displayDecimals={false} valueDataParams={{ currencyRate: { price: 1.5 }}} type='fiat' currencySymbol='$' />)
   const displayValue = getByTestId('display-value')
 
-  expect(displayValue.textContent).toBe('$5.3T')
+  expect(displayValue.textContent).toBe('$5')
 })
 
 it('should not render a shorthand unit when displayFullValue is specified on a fiat value', () => {
@@ -62,11 +62,11 @@ it('should render an ether value', () => {
   expect(displayValue.textContent).toBe('ETH3.56T')
 })
 
-it('should override decimals on an ether value', () => {
-  const { getByTestId } = setupComponent(<DisplayValue value={3567265e21} decimalsOverride={4} type='ether' currencySymbol='ETH' />)
+it('should not display decimals on a small ether value when displayDecimals is set to false', () => {
+  const { getByTestId } = setupComponent(<DisplayValue value={356e16} displayDecimals={false} type='ether' currencySymbol='ETH' />)
   const displayValue = getByTestId('display-value')
 
-  expect(displayValue.textContent).toBe('ETH3.5673B')
+  expect(displayValue.textContent).toBe('ETH3')
 })
 
 it('should not render a shorthand unit when displayFullValue is specified on an ether value', () => {
