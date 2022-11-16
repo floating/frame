@@ -22,10 +22,18 @@ link.rpc('getState', (err, state) => {
   if (!store('main.mute.betaDisclosure')) store.notify('betaDisclosure')
   if (!store('main.mute.aragonAccountMigrationWarning')) store.notify('aragonAccountMigrationWarning')
   store.observer(() => {
-    document.body.className = 'clip ' + store('main.colorway')
+    document.body.classList.remove('dark', 'light')
+    document.body.classList.add('clip', store('main.colorway'))
     setTimeout(() => {
-      document.body.className = store('main.colorway')
+      document.body.classList.remove('clip')
     }, 100)
+  })
+  store.observer(() => {
+    if (store('tray.open')) {
+      document.body.classList.remove('suspend')
+    } else {
+      document.body.classList.add('suspend')
+    }
   })
   const Frame = Restore.connect(App, store)
   ReactDOM.render(<Frame />, document.getElementById('frame'))
