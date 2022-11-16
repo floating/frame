@@ -17,7 +17,12 @@ export default function (store: Store) {
         .filter(n => (n.connection.primary || {}).connected || (n.connection.secondary || {}).connected)
     },
     getCustomTokens: () => (store('main.tokens.custom') || []) as Token[],
-    getKnownTokens: (address?: Address) => ((address && store('main.tokens.known', address)) || []) as Token[],
+    getKnownTokens: (address?: Address): Token[] => {
+      if(address){
+        return (address && store('main.tokens.known', address)) || []
+      }
+      return Object.values((store('main.tokens.known') as Record<string, Token>)).flat()
+    },
     getCurrencyBalances: (address: Address) => {
       return ((store('main.balances', address) || []) as Balance[])
         .filter(balance => balance.address === NATIVE_CURRENCY)
@@ -25,7 +30,8 @@ export default function (store: Store) {
     getTokenBalances: (address: Address) => {
       return ((store('main.balances', address) || []) as Balance[])
         .filter(balance => balance.address !== NATIVE_CURRENCY)
-    }
+    },
+    getBalances: ():Balance[] => Object.values((store('main.balances') as Record<string, Balance>)).flat()
   }
 
   let scan: NodeJS.Timeout | null
@@ -206,8 +212,12 @@ export default function (store: Store) {
 
   function handleTokenBlacklistUpdate (tokens: Token[]) {
     const tokensToRemoveSet = new Set(tokens.map(({address, chainId}) => `${chainId}:${address.toLowerCase()}`))
-    store.removeBalances(tokensToRemoveSet)
-    store.removeKnownTokensAllAccounts(tokensToRemoveSet)
+    const allBalances = storeApi.getBalances()
+    const allKnownTokens = storeApi.getKnownTokens()
+    const balancesContainsBlacklistedTokens =  allBalances.some(({address, chainId}) => tokensToRemoveSet.has(`${chainId}:${address.toLowerCase()}`))
+    const knownTokensContainsBlacklistedTokens = allKnownTokens.some(({address, chainId}) => tokensToRemoveSet.has(`${chainId}:${address.toLowerCase()}`))
+    if ( balancesContainsBlacklistedTokens ) store.removeBalances(tokensToRemoveSet)
+    if ( knownTokensContainsBlacklistedTokens ) store.removeKnownTokensAllAccounts(tokensToRemoveSet)
   }
 
   function setAddress (address: Address) {
