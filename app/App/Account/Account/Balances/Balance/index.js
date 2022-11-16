@@ -71,13 +71,13 @@ class Balance extends React.Component {
           <div className='signerBalancePrice'>
             <div className='signerBalanceOk'>
               <span className='signerBalanceCurrentPrice'>
-                <DisplayValue type='fiat' value={`1e${decimals}`} valueDataParams={{ decimals, currencyRate, isTestnet, displayFullValue: true }} decimalsOverride={2} currencySymbol='$' />
+                <DisplayValue type='fiat' value={`1e${decimals}`} valueDataParams={{ decimals, currencyRate, isTestnet, displayFullValue: true }} currencySymbol='$' />
               </span>
               <span className={priceChangeClass}>
                 <span>{displayPriceChange()}</span>
               </span>
             </div>
-            <DisplayValue type='fiat' value={balanceValue} valueDataParams={{ decimals, currencyRate, isTestnet }} decimalsOverride={0} currencySymbol='$' />
+            <DisplayValue type='fiat' value={balanceValue} valueDataParams={{ decimals, currencyRate, isTestnet }} currencySymbol='$' displayDecimals={false} />
           </div>
         </div>
       </div>

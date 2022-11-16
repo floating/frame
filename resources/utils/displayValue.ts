@@ -3,61 +3,52 @@ import { isHexString } from 'ethers/lib/utils'
 
 const displayUnitMapping = {
   thousand: {
-    lowerBound: BigNumber(999),
-    upperBound: BigNumber(999999),
+    lowerBound: BigNumber(999.99),
+    upperBound: BigNumber(999999.99),
     unitDisplay: 'K'
   },
   million: {
-    lowerBound: BigNumber(999999),
-    upperBound: BigNumber(999999999),
+    lowerBound: BigNumber(999999.99),
+    upperBound: BigNumber(999999999.99),
     unitDisplay: 'M'
   },
   billion: {
-    lowerBound: BigNumber(999999999),
-    upperBound: BigNumber(999999999999),
+    lowerBound: BigNumber(999999999.99),
+    upperBound: BigNumber(999999999999.99),
     unitDisplay: 'B'
   },
   trillion: {
-    lowerBound: BigNumber(999999999999),
-    upperBound: BigNumber(999999999999999),
+    lowerBound: BigNumber(999999999999.99),
+    upperBound: BigNumber(999999999999999).plus(0.99), // working around the 15sd limit
     unitDisplay: 'T'
   },
   quadrillion: {
-    lowerBound: BigNumber(999999999999999),
+    lowerBound: BigNumber(999999999999999).plus(0.99), // working around the 15sd limit
     upperBound: BigNumber(Infinity),
     unitDisplay: 'Q'
   }
 }
 const maxDisplayValue = BigNumber(999999999999999999999)
 
-function getShorthandDisplayValue (bn: BigNumber, shiftedBy: number, decimalPlaces: number) {
-  const value = bn.shiftedBy(shiftedBy)
-
-  if (decimalPlaces !== 2) {
-    return value.decimalPlaces(decimalPlaces).toFormat()
-  }
-
-  return value.sd(3).toFormat()
-}
-
-function getDisplay (bn: BigNumber, context: string, decimalsOverride: number, displayFullValue?: boolean) {
-  if (bn.isZero()) {
+function getDisplay (bn: BigNumber, context: string, decimals: number, displayFullValue?: boolean) {
+  const value = bn.decimalPlaces(decimals, BigNumber.ROUND_FLOOR)
+  if (value.isZero()) {
     return {
       approximationSymbol: '<',
-      displayValue: BigNumber(`1e-${decimalsOverride}`).toFormat()
+      displayValue: BigNumber(`1e-${decimals}`).toFormat()
     }
   }
 
   if (!displayFullValue) {
     // shorthand display of large numbers
     for (const [unitName, { lowerBound, upperBound, unitDisplay }] of Object.entries(displayUnitMapping)) {
-      if (bn.isGreaterThan(lowerBound) && bn.isLessThan(upperBound)) {
-        const displayMax = bn.isGreaterThan(maxDisplayValue)
+      if (value.isGreaterThan(lowerBound) && value.isLessThan(upperBound)) {
+        const displayMax = value.isGreaterThan(maxDisplayValue)
 
         // maximum display value is hard coded because maxDisplayValue is above the bignumber 15sd limit
         return {
           approximationSymbol: displayMax ? '>' : '',
-          displayValue: displayMax ? '999,999' : getShorthandDisplayValue(bn, -(lowerBound.sd(true)), decimalsOverride),
+          displayValue: displayMax ? '999,999' : value.shiftedBy(-(lowerBound.sd(true) - 2)).decimalPlaces(3, BigNumber.ROUND_FLOOR).toFormat(),
           displayUnit: {
             fullName: unitName,
             shortName: unitDisplay
@@ -69,7 +60,7 @@ function getDisplay (bn: BigNumber, context: string, decimalsOverride: number, d
 
   // display small numbers or full values
   return {
-    displayValue: bn.toFormat(context === 'fiat' ? decimalsOverride : undefined)
+    displayValue: value.toFormat(context === 'fiat' ? decimals : undefined)
   }
 }
 
@@ -86,9 +77,10 @@ export function displayValueData (sourceValue: SourceValue, params: DisplayValue
   const { currencyRate, decimals = 18, isTestnet = false, displayFullValue = false } = params || {} as DisplayValueDataParams
   const bn = BigNumber(sourceValue, isHexString(sourceValue) ? 16 : undefined)
   const currencyHelperMap = {
-    fiat: (decimalsOverride = 2) => {  
+    fiat: ({ displayDecimals } = { displayDecimals: true }) => {  
       const nativeCurrency = BigNumber(isTestnet || !currencyRate ? 0 : currencyRate.price)
-      const value = bn.shiftedBy(-decimals).multipliedBy(nativeCurrency).decimalPlaces(decimalsOverride, BigNumber.ROUND_FLOOR)
+      const displayedDecimals = displayDecimals ? 2 : 0
+      const value = bn.shiftedBy(-decimals).multipliedBy(nativeCurrency)
       
       if (isTestnet || value.isNaN()) {
         return {
@@ -99,15 +91,16 @@ export function displayValueData (sourceValue: SourceValue, params: DisplayValue
     
       return {
         value,
-        ...getDisplay(value, 'fiat', decimalsOverride, displayFullValue)
+        ...getDisplay(value, 'fiat', displayedDecimals, displayFullValue)
       }
     },
-    ether: (decimalsOverride = 6) => {
-      const value = bn.shiftedBy(-decimals).decimalPlaces(decimalsOverride || decimals, BigNumber.ROUND_FLOOR)
+    ether: (decimalsOverride?: number) => {
+      const displayDecimals = decimalsOverride === undefined ? 6 : decimalsOverride
+      const value = bn.shiftedBy(-decimals) //|| decimals
   
       return {
         value,
-        ...getDisplay(value, 'ether', decimalsOverride, displayFullValue)
+        ...getDisplay(value, 'ether', displayDecimals, displayFullValue)
       }
     },
     gwei: () => {
