@@ -159,7 +159,7 @@ export default function (store: Store) {
       }
 
       resetScan(address, interval)
-    }, interval)
+    }, interval * 1000)
   }
 
   function updateActiveBalances (address: Address) {
