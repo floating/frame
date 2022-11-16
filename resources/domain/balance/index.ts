@@ -62,3 +62,8 @@ export const sortByTotalValue = (a: DisplayedBalance, b: DisplayedBalance) => {
 export function isNativeCurrency (address: string) {
   return address === NATIVE_CURRENCY
 }
+
+export function toTokenId (token: Token) {
+  const {chainId, address} = token
+  return `${chainId}:${address}`
+}

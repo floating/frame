@@ -1,4 +1,6 @@
 import log from 'electron-log'
+import store from '..'
+import { toTokenId } from '../../../resources/domain/balance'
 
 const panelActions = require('./panel')
 const supportedNetworkTypes = ['ethereum']
@@ -568,12 +570,16 @@ module.exports = {
     })
   },
   removeBalances: (u, tokensSet) => {
-    u('main.balances', (balances = {}) => {
-      for (const accountAddress in balances) {
-        balances[accountAddress] = balances[accountAddress].filter(({chainId, address}) => !tokensSet.has(`${chainId}:${address.toLowerCase()}`))        
-      }
-      return balances
-    })
+    const allBalances = Object.values(store('main.balances')).flat()
+    const containsBlacklisted =  allBalances.some(token => tokensSet.has(toTokenId(token)))
+    if(containsBlacklisted){
+      u('main.balances', (balances = {}) => {
+        for (const accountAddress in balances) {
+          balances[accountAddress] = balances[accountAddress].filter(token => !tokensSet.has(toTokenId(token)))        
+        }
+        return balances
+      })
+  }
   },
   setScanning: (u, address, scanning) => {
     if (scanning) {
@@ -620,12 +626,16 @@ module.exports = {
     })
   },
   removeKnownTokensAllAccounts: (u, tokensSet) => {
-    u('main.tokens.known', (known = {}) => {
-      for (const accountAddress in known) {
-        known[accountAddress] = known[accountAddress].filter(({chainId, address}) => !tokensSet.has(`${chainId}:${address.toLowerCase()}`))        
-      }
-      return known
-    })
+    const knownTokens = Object.values(store('main.tokens.known')).flat()
+    const containsBlacklisted = knownTokens.some(token => tokensSet.has(toTokenId(token)))
+    if(containsBlacklisted){
+      u('main.tokens.known', (known = {}) => {
+        for (const accountAddress in known) {
+          known[accountAddress] = known[accountAddress].filter(token => !tokensSet.has(toTokenId(token)))        
+        }
+        return known
+      })
+  }
   }
   ,
   setColorway: (u, colorway) => {

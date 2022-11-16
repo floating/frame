@@ -4,6 +4,7 @@ import { ChildProcess, fork } from 'child_process'
 import { EventEmitter } from 'stream'
 
 import { CurrencyBalance, TokenBalance } from './scan'
+import { toTokenId } from '../../../resources/domain/balance'
 
 const BOOTSTRAP_TIMEOUT_SECONDS = 20
 
@@ -74,7 +75,8 @@ export default class BalancesWorkerController extends EventEmitter {
 
       if (message.type === 'tokenBlacklist') {
         const { address, tokens } = (message as TokenBlacklistMessage)
-        this.emit('tokenBlacklist', address, tokens)
+        const tokenSet = new Set(tokens.map(toTokenId))
+        this.emit('tokenBlacklist', address, tokenSet)
       }
     })
   

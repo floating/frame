@@ -8,6 +8,7 @@ log.transports.file.level = ['development', 'test'].includes(process.env.NODE_EN
 import { supportsChain as chainSupportsScan } from '../../multicall'
 import balancesLoader, { BalanceLoader, TokenBalance } from './scan'
 import TokenLoader from '../inventory/tokens'
+import { toTokenId } from '../../../resources/domain/balance'
 
 interface ExternalDataWorkerMessage {
   command: string,
@@ -83,8 +84,8 @@ async function tokenBalanceScan (address: Address, tokensToOmit: Token[] = [], c
 
 async function fetchTokenBalances (address: Address, tokens: Token[]) {
   try {
-    const blacklistSet = new Set(tokenLoader.getBlacklist([]).map(({chainId, address}) => `${chainId}:${address.toLowerCase()}`))
-    const filteredTokens = tokens.filter(({chainId, address}) => !blacklistSet.has(`${chainId}:${address.toLowerCase()}`))
+    const blacklistSet = new Set(tokenLoader.getBlacklist([]).map(toTokenId))
+    const filteredTokens = tokens.filter(token => !blacklistSet.has(toTokenId(token)))
     const tokenBalances = await balances.getTokenBalances(address, filteredTokens)
 
     sendToMainProcess({ type: 'tokenBalances', address, balances: tokenBalances})
