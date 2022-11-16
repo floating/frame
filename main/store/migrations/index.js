@@ -1,5 +1,5 @@
 import log from 'electron-log'
-import { accountNS } from '../../../resources/accounts'
+import { accountNS } from '../../../resources/domain/account'
 
 const migrations = {
   4: initial => {
