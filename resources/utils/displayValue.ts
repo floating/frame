@@ -94,13 +94,20 @@ export function displayValueData (sourceValue: SourceValue, params: DisplayValue
         ...getDisplay(value, 'fiat', displayedDecimals, displayFullValue)
       }
     },
-    ether: (decimalsOverride?: number) => {
-      const displayDecimals = decimalsOverride === undefined ? 6 : decimalsOverride
-      const value = bn.shiftedBy(-decimals) //|| decimals
+    ether: ({ displayDecimals } = { displayDecimals: true }) => {
+      const value = bn.shiftedBy(-decimals)
+      const getDisplayedDecimals = () => {
+        if (!displayDecimals) {
+          return 0
+        }
+        const preDecimalStr = value.toFixed(1, BigNumber.ROUND_FLOOR).split('.')[0]
+        const numNonDecimals = preDecimalStr === '0' ? 0 : preDecimalStr.length
+        return BigNumber(6).minus(BigNumber.min(3, BigNumber.min(6, numNonDecimals))).toNumber()
+      }
   
       return {
         value,
-        ...getDisplay(value, 'ether', displayDecimals, displayFullValue)
+        ...getDisplay(value, 'ether', getDisplayedDecimals(), displayFullValue)
       }
     },
     gwei: () => {
