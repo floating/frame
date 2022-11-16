@@ -109,45 +109,6 @@
   100%
     transform translateX(-300px) rotate(60deg)
 
-@keyframes pulse
-  0%
-    fill var(--outerspace)
-  50%
-    fill var(--outerspacePulse)
-  100%
-    fill var(--outerspace)
-
-@keyframes bars
-  0%
-    opacity 0
-  30%
-    opacity 1
-  60%
-    opacity 0
-
-.txProgressNoticeBar-10
-  animation bars 3000ms infinite linear 0s
-.txProgressNoticeBar-9
-  animation bars 3000ms infinite linear 0.1s
-.txProgressNoticeBar-8
-  animation bars 3000ms infinite linear 0.2s
-.txProgressNoticeBar-7
-  animation bars 3000ms infinite linear 0.3s
-.txProgressNoticeBar-6
-  animation bars 3000ms infinite linear 0.4s
-.txProgressNoticeBar-5
-  animation bars 3000ms infinite linear 0.5s
-.txProgressNoticeBar-4
-  animation bars 3000ms infinite linear 0.6s
-.txProgressNoticeBar-3
-  animation bars 3000ms infinite linear 0.7s
-.txProgressNoticeBar-2
-  animation bars 3000ms infinite linear 0.8s
-.txProgressNoticeBar-1
-  animation bars 3000ms infinite linear 0.9s
-.txProgressNoticeBar-0
-  animation bars 3000ms infinite linear 1s
-
 .spinner
   width 100px
   height 100px
@@ -155,6 +116,7 @@
   background-color var(--outerspace08)
   border-radius 100%
   animation sk-scaleout 600ms infinite var(--cubic)
+  will-change transform, opacity
 
 .signSuccess
   width 100px
@@ -182,101 +144,6 @@
 .slideUp-leave.slideUp-leave-active
   opacity 0
   margin-top -200px
-
-.txProgressNotice
-  position relative
-  width 100%
-  height 100%
-
-  .txProgressNoticeBars
-    position absolute
-    top 50%
-    margin-top -8px
-    left 8px
-    right 8px
-    height 16px
-    display flex
-    justify-content space-between
-    align-items center
-    transition var(--standard)
-
-    .txProgressNoticeBarDeadzone
-      width 17px
-      height 19px
-
-    .txProgressNoticeBar
-      opacity 0
-      width 4px
-      border-radius 2px
-      height 15px
-      background var(--thick)
-
-  .txProgressNoticeIcon
-    position absolute
-    top 50%
-    left 0
-    right 0
-    margin-top -80px
-    height 160px
-    width 100%
-    display flex
-    justify-content center
-    align-items center
-    z-index 1000
-
-  .txProgressCancel
-    position absolute
-    top 50%
-    left 100px
-    right 100px
-    margin-top 50px
-    height 20px
-    border-radius 12px
-    display flex
-    justify-content center
-    align-items center
-    z-index 1001
-    font-weight 300
-    background var(--thinner)
-
-  .txProgressCancel:hover
-    background var(--thin)
-
-  .txProgressNoticeText
-    position absolute
-    top 0
-    left 0
-    right 0
-    bottom 0
-    box-sizing border-box
-    display flex
-    justify-content center
-    align-items center
-    z-index 1001
-    font-weight 300
-    border-radius 12px
-    padding-bottom 6px
-
-  .txProgressNoticeLoader
-    height 100px
-    width 100px
-    margin-bottom 20px
-    position relative
-
-    .txProgressNoticeLoaderIcon
-      position absolute
-      top 0
-      left 0
-      height 100px
-      width 100px
-      z-index 1000004
-
-    .txProgressNoticeLoaderBars
-      position absolute
-      top 0
-      right 0
-      height 50px
-      width 50px
 
 .signerRequests
   z-index 200
@@ -480,6 +347,7 @@
     animation sheen 12s infinite ease
     background linear-gradient(90deg, rgba(247, 251, 255, 0), rgba(237, 241, 255, 0.7), rgba(247, 251, 255, 0))
     background-blend-mode multiply
+    will-change transform
 
 .signerRequestSuccess
   align-items center
@@ -671,7 +539,7 @@
   filter blur(20px)
   background linear-gradient(to top, var(--ghostZ) 25%, var(--ghostZ0) 100%)
   position absolute
-  bottom 200px
+  top -58px
   left 8px
   right 8px
   border-radius 24px
@@ -1454,6 +1322,7 @@
       transition var(--standardFast)
       animation pending 4.2s linear infinite
       color var(--ghostX)
+      will-change opacity
 
   .txProgressConfirmsItemActive
     svg
@@ -1854,12 +1723,6 @@ span
   height 100%
   display none
 
-  .txProgressNoticeHidden
-    transition var(--standard)
-    transform translateY(-25px)
-    opacity 0
-    pointer-events none
-
 .txStatusError
   top 30px
   bottom 0px
@@ -2071,6 +1934,7 @@ span
           top 37px
           right -8px
           margin-top -8px
+          will-change transform
 
           .txProgressLoadingBox
             position absolute

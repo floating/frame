@@ -30,6 +30,7 @@ export default function (store: Store) {
 
   let scan: NodeJS.Timeout | null
   let workerController: BalancesWorkerController | null
+  let onResume: Function | null
 
   function attemptRestart () {
     log.warn(`balances controller stopped, restarting in ${RESTART_WAIT} seconds`)
@@ -77,6 +78,26 @@ export default function (store: Store) {
     setAddress(storeApi.getActiveAddress())
   }
 
+  function resume () {
+    if (onResume) onResume()
+
+    onResume = null
+  }
+
+  function pause () {
+    if (stopScan()) {
+      log.debug('Pausing balances scan')
+
+      onResume = () => {
+        const address = storeApi.getActiveAddress()
+
+        log.debug(`Resuming balances scan for address ${address}`)
+
+        startScan(address)
+      }
+    }
+  }
+
   function stop () {
     log.verbose('stopping balances updates')
 
@@ -92,6 +113,8 @@ export default function (store: Store) {
 
   function startScan (address: Address) {
     stopScan()
+
+    if (onResume) onResume = null
 
     log.verbose(`starting balances scan for ${address}`)
 
@@ -110,12 +133,15 @@ export default function (store: Store) {
   }
 
   function stopScan () {
-    log.debug('stopping balances scan')
-
     if (scan) {
+      log.debug('stopping balances scan')
       clearTimeout(scan)
       scan = null
+
+      return true
     }
+
+    return false
   }
 
   function updateActiveBalances (address: Address) {
@@ -235,5 +261,5 @@ export default function (store: Store) {
     runWhenReady(() => workerController?.updateKnownTokenBalances(address, tokens))
   }
 
-  return { start, stop, setAddress, addNetworks, addTokens }
+  return { start, stop, resume, pause, setAddress, addNetworks, addTokens }
 }
