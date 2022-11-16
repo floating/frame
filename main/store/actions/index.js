@@ -139,8 +139,11 @@ module.exports = {
       // if (add) return updatedAccount // Account is new and should be added
       return { ...updatedAccount, balances: account.balances }
     })
+  },
+  updateAccountMeta: (u, updatedAccount) => {
     u('main.accountsMeta', updatedAccount.id, (accountMeta = {}) => {
-      return { ...accountMeta, name: updatedAccount.name }
+      const timestamp = Date.now()
+      return { ...accountMeta, name: updatedAccount.name, timestamp }
     })
   },
   removeAccount: (u, id) => {

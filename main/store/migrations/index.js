@@ -583,7 +583,11 @@ const migrations = {
     // add accountsMeta
     initial.main.accountsMeta = {}
     Object.entries(initial.main.accounts).forEach(([id, { name }]) => {
-      initial.main.accountsMeta[id] = { name }
+      const timestamp = Date.now()
+      initial.main.accountsMeta[id] = { 
+        name,
+        timestamp
+      }
     })
 
     return initial
