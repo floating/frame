@@ -65,13 +65,10 @@ async function tokenBalanceScan (address: Address, tokensToOmit: Token[] = [], c
   try {
     // for chains that support multicall, we can attempt to load every token that we know about,
     // for all other chains we need to call each contract individually so don't scan every contract
+    const omitSet = new Set(tokensToOmit.map(toTokenId))
     const eligibleChains = (chains || await getChains()).filter(chainSupportsScan)
-    const tokenLists = eligibleChains.map(chainId => tokenLoader.getTokens([chainId]))
-    const tokens = tokenLists.reduce((all, tokenList) => {
-      return all.concat(
-        tokenList.filter(token => tokensToOmit.every(t => t.chainId !== token.chainId || t.address !== token.address))
-      )
-    }, [] as Token[])
+    const tokenList = tokenLoader.getTokens(eligibleChains)
+    const tokens = tokenList.filter(token => !omitSet.has(toTokenId(token)))
 
     const tokenBalances = (await balances.getTokenBalances(address, tokens))
       .filter(balance => parseInt(balance.balance) > 0)
@@ -84,7 +81,7 @@ async function tokenBalanceScan (address: Address, tokensToOmit: Token[] = [], c
 
 async function fetchTokenBalances (address: Address, tokens: Token[]) {
   try {
-    const blacklistSet = new Set(tokenLoader.getBlacklist([]).map(toTokenId))
+    const blacklistSet = new Set(tokenLoader.getBlacklist().map(toTokenId))
     const filteredTokens = tokens.filter(token => !blacklistSet.has(toTokenId(token)))
     const tokenBalances = await balances.getTokenBalances(address, filteredTokens)
 

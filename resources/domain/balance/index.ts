@@ -63,7 +63,7 @@ export function isNativeCurrency (address: string) {
   return address === NATIVE_CURRENCY
 }
 
-export function toTokenId (token: Token) {
+export function toTokenId (token: Token|Balance ) {
   const {chainId, address} = token
   return `${chainId}:${address}`
 }

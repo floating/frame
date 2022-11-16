@@ -569,17 +569,16 @@ module.exports = {
       return balances
     })
   },
-  removeBalances: (u, tokensSet) => {
-    const allBalances = Object.values(store('main.balances')).flat()
-    const containsBlacklisted =  allBalances.some(token => tokensSet.has(toTokenId(token)))
-    if(containsBlacklisted){
-      u('main.balances', (balances = {}) => {
-        for (const accountAddress in balances) {
-          balances[accountAddress] = balances[accountAddress].filter(token => !tokensSet.has(toTokenId(token)))        
-        }
-        return balances
-      })
-  }
+  removeBalances: (u, tokensToRemove) => {
+    const needsRemoval = (balance) => tokensToRemove.has(toTokenId(balance))
+
+   Object.entries(store('main.balances')).forEach(([accountAddress, accountBalances]) => {
+      const filteredBalances = accountBalances.filter(balance => !needsRemoval(balance))
+      if(filteredBalances.length !== accountBalances.length) {
+        u('main.balances', accountAddress, () => filteredBalances)
+      }
+    }
+   )
   },
   setScanning: (u, address, scanning) => {
     if (scanning) {
@@ -625,19 +624,16 @@ module.exports = {
       return existing.filter(token => !includesToken(tokens, token))
     })
   },
-  removeKnownTokensAllAccounts: (u, tokensSet) => {
-    const knownTokens = Object.values(store('main.tokens.known')).flat()
-    const containsBlacklisted = knownTokens.some(token => tokensSet.has(toTokenId(token)))
-    if(containsBlacklisted){
-      u('main.tokens.known', (known = {}) => {
-        for (const accountAddress in known) {
-          known[accountAddress] = known[accountAddress].filter(token => !tokensSet.has(toTokenId(token)))        
-        }
-        return known
-      })
-  }
-  }
-  ,
+  removeKnownTokensAllAccounts: (u, tokensToRemove) => {
+    const needsRemoval = (token) => tokensToRemove.has(toTokenId(token))
+
+    Object.entries(store('main.tokens.known')).forEach(([accountAddress, accountKnownTokens]) => {
+      const filteredTokens = accountKnownTokens.filter(token => !needsRemoval(token))
+      if(filteredTokens.length !== accountKnownTokens.length) {
+        u('main.tokens.known', accountAddress, () => filteredTokens)
+      }
+    })
+  },
   setColorway: (u, colorway) => {
     u('main.colorway', () => {
       return colorway

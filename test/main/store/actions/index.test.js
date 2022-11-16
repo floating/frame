@@ -6,6 +6,7 @@ import {
   addNetwork as addNetworkAction,
   removeBalance as removeBalanceAction,
   setBalances as setBalancesAction,
+  removeBalances as removeBalancesAction,
   addCustomTokens as addCustomTokensAction,
   removeCustomTokens as removeTokensAction,
   addKnownTokens as addKnownTokensAction,
@@ -20,6 +21,7 @@ import {
   activateNetwork as activateNetworkAction,
   setBlockHeight as setBlockHeightAction
 } from '../../../../main/store/actions'
+import { toTokenId } from '../../../../resources/domain/balance'
 
 beforeAll(() => {
   log.transports.console.level = false
@@ -980,3 +982,29 @@ describe('#setBlockHeight', () => {
     expect(main.networksMeta.ethereum).toStrictEqual({ 1: { blockHeight: 0 }, 4: { blockHeight: 500 }, 137: { blockHeight: 0 } })
   })
 })
+
+// describe('#removeBalances', () => {
+//   let balances
+
+//   const updaterFn = (node, update) => {
+//     expect(node).toBe('main.balances')
+//     balances = update(balances)
+//   }
+//   const removeBalances = setToRemove => removeBalancesAction(updaterFn, setToRemove)
+
+
+//   beforeEach(() => {
+//     balances = {
+//         acc1: Object.values(testTokens).map(token => ({...token, balance: addHexPrefix(new BigNumber(100).toString(16))})),
+//         acc2: Object.values(testTokens).map(token => ({...token, balance: addHexPrefix(new BigNumber(120).toString(16))}))
+//       }
+//   })
+
+//   it('should remove all tokens from the removal set from any account', () => {
+//     const removalSet = new Set(Object.values(testTokens).map(toTokenId))
+//     removeBalances(removalSet)
+//     // expect(main.networksMeta.ethereum).toStrictEqual({ 1: { blockHeight: 0 }, 4: { blockHeight: 500 }, 137: { blockHeight: 0 } })
+//     expect(balances.acc1.length).toBe(0)
+//     expect(balances.acc2.length).toBe(0)
+//   })
+// })
