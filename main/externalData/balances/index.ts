@@ -6,6 +6,12 @@ import { CurrencyBalance, TokenBalance } from './scan'
 
 const RESTART_WAIT = 5 // seconds
 
+// time wait in between scans, in seconds
+const scanInterval = {
+  active: 20,
+  inactive: 60 * 10
+}
+
 export default function (store: Store) {
   const storeApi = {
     getActiveAddress: () => (store('selected.current') || '') as Address,
@@ -88,9 +94,12 @@ export default function (store: Store) {
     if (stopScan()) {
       log.debug('Pausing balances scan')
 
-      onResume = () => {
-        const address = storeApi.getActiveAddress()
+      const address = storeApi.getActiveAddress()
 
+      // even when paused ensure data is updated every 10 minutes
+      resetScan(address, scanInterval.inactive)
+
+      onResume = () => {
         log.debug(`Resuming balances scan for address ${address}`)
 
         startScan(address)
@@ -116,25 +125,22 @@ export default function (store: Store) {
 
     if (onResume) onResume = null
 
-    log.verbose(`starting balances scan for ${address}`)
+    log.verbose(`Starting balances scan for ${address}`)
 
-    const scanForAddress = () => {
-      // update balances for the active account every 20 seconds
+    const initiateScan = () => {
+      // do an initial scan before starting the timer
       setTimeout(() => {
         updateActiveBalances(address)
       }, 0)
 
-      scan = setTimeout(() => {
-        if (workerController?.isRunning()) scanForAddress()
-      }, 20 * 1000)
+      resetScan(address, scanInterval.active)
     }
 
-    runWhenReady(() => scanForAddress())
+    runWhenReady(() => initiateScan())
   }
 
   function stopScan () {
     if (scan) {
-      log.debug('stopping balances scan')
       clearTimeout(scan)
       scan = null
 
@@ -142,6 +148,18 @@ export default function (store: Store) {
     }
 
     return false
+  }
+
+  function resetScan (address: Address, interval: number) {
+    scan = setTimeout(() => {
+      if (workerController?.isRunning()) {
+        setTimeout(() => {
+          updateActiveBalances(address)
+        }, 0)
+      }
+
+      resetScan(address, interval)
+    }, interval)
   }
 
   function updateActiveBalances (address: Address) {
