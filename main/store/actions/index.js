@@ -672,10 +672,13 @@ module.exports = {
       return newNav
     })
   },
-  navBack: (u, windowId) => {
+  navBack: (u, windowId, numSteps = 1) => {
     if (!windowId) return log.warn('Invalid nav back', windowId)
     u('windows', windowId, 'nav', nav => {
-      nav.shift()
+      while (numSteps > 0 && nav.length > 0) {
+        nav.shift()
+        numSteps -= 1
+      }
       return nav
     })
   },
