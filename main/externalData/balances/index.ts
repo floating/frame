@@ -1,6 +1,7 @@
 import log from 'electron-log'
 
 import { NATIVE_CURRENCY } from '../../../resources/constants'
+import { toTokenId } from '../../../resources/domain/balance'
 import BalancesWorkerController from './controller'
 import { CurrencyBalance, TokenBalance } from './scan'
 
@@ -204,9 +205,23 @@ export default function (store: Store) {
     store.accountTokensUpdated(address)
   }
 
-  function handleTokenBlacklistUpdate (tokens: Set<string>) {
-    store.removeBalances(tokens)
-    store.removeKnownTokensAllAccounts(tokens)
+  function handleTokenBlacklistUpdate (tokensToRemove: Set<string>) {
+    const includesBlacklistedTokens = (arr: Balance[] | Token[]) => arr.some(val => tokensToRemove.has(toTokenId(val)))
+
+    const balances: Record<string, Balance[]> = store('main.balances')
+    const knownTokens: Record<string, Token[]> = store('main.tokens.known')
+
+    Object.entries(balances).forEach(([accountAddress, balances]) => {
+      if(includesBlacklistedTokens(balances)){
+        store.removeBalancesBySet(accountAddress, tokensToRemove)
+      }
+    })
+
+    Object.entries(knownTokens).forEach(([accountAddress, tokens]) => {
+      if(includesBlacklistedTokens(tokens)){
+        store.removeKnownTokensBySet(accountAddress, tokensToRemove)
+      }
+    })
   }
 
   function setAddress (address: Address) {

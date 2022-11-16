@@ -1,5 +1,4 @@
 import log from 'electron-log'
-import store from '..'
 import { toTokenId } from '../../../resources/domain/balance'
 
 const panelActions = require('./panel')
@@ -569,16 +568,10 @@ module.exports = {
       return balances
     })
   },
-  removeBalances: (u, tokensToRemove) => {
+  removeBalancesBySet: (u, address, tokensToRemove) => {
     const needsRemoval = (balance) => tokensToRemove.has(toTokenId(balance))
-
-   Object.entries(store('main.balances')).forEach(([accountAddress, accountBalances]) => {
-      const filteredBalances = accountBalances.filter(balance => !needsRemoval(balance))
-      if(filteredBalances.length !== accountBalances.length) {
-        u('main.balances', accountAddress, () => filteredBalances)
-      }
-    }
-   )
+    u('main.balances', address, (balances = []) => balances.filter(balance => !needsRemoval(balance))
+)
   },
   setScanning: (u, address, scanning) => {
     if (scanning) {
@@ -624,15 +617,9 @@ module.exports = {
       return existing.filter(token => !includesToken(tokens, token))
     })
   },
-  removeKnownTokensAllAccounts: (u, tokensToRemove) => {
+  removeKnownTokensBySet: (u, address, tokensToRemove) => {
     const needsRemoval = (token) => tokensToRemove.has(toTokenId(token))
-
-    Object.entries(store('main.tokens.known')).forEach(([accountAddress, accountKnownTokens]) => {
-      const filteredTokens = accountKnownTokens.filter(token => !needsRemoval(token))
-      if(filteredTokens.length !== accountKnownTokens.length) {
-        u('main.tokens.known', accountAddress, () => filteredTokens)
-      }
-    })
+    u('main.tokens.known', address, (existing = []) => existing.filter(token => !needsRemoval(token)))
   },
   setColorway: (u, colorway) => {
     u('main.colorway', () => {

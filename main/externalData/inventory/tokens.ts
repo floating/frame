@@ -15,7 +15,6 @@ interface TokenSpec extends Token {
 }
 
 export default class TokenLoader {
-  // private tokenList: Token[]
   private tokens: TokenSpec[] = defaultTokenList.tokens as TokenSpec[]
   private nextLoad?: NodeJS.Timeout | null
 
@@ -28,8 +27,7 @@ export default class TokenLoader {
 
   private async loadTokenList (timeout = 60_000) {
     try {
-      // const updatedTokens = await this.fetchTokenList(timeout)
-      const updatedTokens = newTokens.tokens
+      const updatedTokens = await this.fetchTokenList(timeout)
       log.info(`Fetched ${updatedTokens.length} tokens`)
       this.tokens = updatedTokens
       this.nextLoad = setTimeout(() => this.loadTokenList(), 10 * 60_000)

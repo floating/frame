@@ -6,10 +6,11 @@ import {
   addNetwork as addNetworkAction,
   removeBalance as removeBalanceAction,
   setBalances as setBalancesAction,
-  removeBalances as removeBalancesAction,
+  removeBalancesBySet as removeBalancesBySetAction,
   addCustomTokens as addCustomTokensAction,
   removeCustomTokens as removeTokensAction,
   addKnownTokens as addKnownTokensAction,
+  removeKnownTokensBySet as removeKnownTokensBySetAction,
   setScanning as setScanningAction,
   initOrigin as initOriginAction,
   clearOrigins as clearOriginsAction,
@@ -983,28 +984,65 @@ describe('#setBlockHeight', () => {
   })
 })
 
-// describe('#removeBalances', () => {
-//   let balances
+describe('#removeBalances', () => {
+  let balances
 
-//   const updaterFn = (node, update) => {
-//     expect(node).toBe('main.balances')
-//     balances = update(balances)
-//   }
-//   const removeBalances = setToRemove => removeBalancesAction(updaterFn, setToRemove)
+  const updaterFn = (node, address, update) => {
+    expect(node).toBe('main.balances')
+    expect(address).toBe(owner)
+
+    balances = update(balances)
+  }
+
+  const removeBalances = setToRemove => removeBalancesBySetAction(updaterFn, owner, setToRemove)
+
+  beforeEach(() => {
+    balances = Object.values(testTokens).map(token => ({...token, balance: addHexPrefix(new BigNumber(120).toString(16))}))
+  })
+
+  it('should remove all tokens from the removal set from an accounts balance', () => {
+    const removalSet = new Set(Object.values(testTokens).map(toTokenId))
+    removeBalances(removalSet)
+    expect(balances.length).toBe(0)
+  })
+
+  it('should only remove tokens from the removal set from an accounts balance', () => {
+    const removalSet = new Set()
+    removalSet.add(toTokenId(testTokens.badger))
+    removeBalances(removalSet)
+    expect(balances.length).toBe(1)
+  })
+})
+
+describe('#removeKnownTokensBySet', () => {
+  let knownTokens
+
+  const updaterFn = (node, address, update) => {
+    expect(node).toBe('main.tokens.known')
+    expect(address).toBe(owner)
+
+    knownTokens = update(knownTokens)
+  }
+
+  const removeKnownTokens = setToRemove => removeKnownTokensBySetAction(updaterFn, owner, setToRemove)
 
 
-//   beforeEach(() => {
-//     balances = {
-//         acc1: Object.values(testTokens).map(token => ({...token, balance: addHexPrefix(new BigNumber(100).toString(16))})),
-//         acc2: Object.values(testTokens).map(token => ({...token, balance: addHexPrefix(new BigNumber(120).toString(16))}))
-//       }
-//   })
 
-//   it('should remove all tokens from the removal set from any account', () => {
-//     const removalSet = new Set(Object.values(testTokens).map(toTokenId))
-//     removeBalances(removalSet)
-//     // expect(main.networksMeta.ethereum).toStrictEqual({ 1: { blockHeight: 0 }, 4: { blockHeight: 500 }, 137: { blockHeight: 0 } })
-//     expect(balances.acc1.length).toBe(0)
-//     expect(balances.acc2.length).toBe(0)
-//   })
-// })
+  beforeEach(() => {
+    knownTokens = Object.values(testTokens)
+  })
+
+  it('should remove all tokens from the removal set from an accounts known tokens', () => {
+    const removalSet = new Set(Object.values(testTokens).map(toTokenId))
+    removeKnownTokens(removalSet)
+    expect(knownTokens.length).toBe(0)
+  })
+
+  it('should only remove tokens from the removal set from an accounts known tokens', () => {
+    const removalSet = new Set()
+    removalSet.add(toTokenId(testTokens.badger))
+    removeKnownTokens(removalSet)
+    expect(knownTokens.length).toBe(1)
+  })
+})
+

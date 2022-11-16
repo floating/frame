@@ -33,11 +33,11 @@ afterEach(() => {
   tokenLoader.stop()
 })
 
-it('loads the included sushiswap token list', () => {
+it('loads the default token list initially', () => {
   const tokens = tokenLoader.getTokens([137])
 
   expect(tokens.length).toBeGreaterThan(50)
-  expect(tokens[0].name).toBe('Aave')
+  expect(tokens.find(token => token.name === "Aave")).toBeTruthy()
 })
 
 it('loads a token list from nebula', async () => {
