@@ -667,7 +667,7 @@ module.exports = {
     u('windows.panel.nav', nav => {
       const newNav = nav.filter(navItem => {
         const item = navItem || {}
-        return !item?.req?.handlerId === handlerId
+        return item?.data?.requestId !== handlerId
       })
       return newNav
     })
