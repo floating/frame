@@ -194,9 +194,13 @@ export default function (store: Store) {
       }
 
       // remove zero balances from the list of known tokens
-      const zeroBalances = new Set(
-        changedBalances.filter(b => parseInt(b.balance) === 0 && isKnown(b))
-      )
+      const zeroBalances = changedBalances.reduce((zeroBalSet, balance) => {
+        const tokenId = toTokenId(balance)
+        if (parseInt(balance.balance) === 0 && knownTokens.has(tokenId)) {
+          zeroBalSet.add(tokenId)
+        }
+        return zeroBalSet
+      }, new Set<string>())
 
       if (zeroBalances.size) {
         store.removeKnownTokens(address, zeroBalances)
