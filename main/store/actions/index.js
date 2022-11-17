@@ -568,7 +568,7 @@ module.exports = {
       return balances
     })
   },
-  removeBalancesBySet: (u, address, tokensToRemove) => {
+  removeBalances: (u, address, tokensToRemove) => {
     const needsRemoval = (balance) => tokensToRemove.has(toTokenId(balance))
     u('main.balances', address, (balances = []) => balances.filter(balance => !needsRemoval(balance))
 )
@@ -612,12 +612,7 @@ module.exports = {
       return [...existingTokens, ...tokensToAdd]
     })
   },
-  removeKnownTokens: (u, address, tokens) => {
-    u('main.tokens.known', address, (existing = []) => {
-      return existing.filter(token => !includesToken(tokens, token))
-    })
-  },
-  removeKnownTokensBySet: (u, address, tokensToRemove) => {
+  removeKnownTokens: (u, address, tokensToRemove) => {
     const needsRemoval = (token) => tokensToRemove.has(toTokenId(token))
     u('main.tokens.known', address, (existing = []) => existing.filter(token => !needsRemoval(token)))
   },

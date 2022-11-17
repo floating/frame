@@ -6,11 +6,11 @@ import {
   addNetwork as addNetworkAction,
   removeBalance as removeBalanceAction,
   setBalances as setBalancesAction,
-  removeBalancesBySet as removeBalancesBySetAction,
+  removeBalances as removeBalancesAction,
   addCustomTokens as addCustomTokensAction,
   removeCustomTokens as removeTokensAction,
   addKnownTokens as addKnownTokensAction,
-  removeKnownTokensBySet as removeKnownTokensBySetAction,
+  removeKnownTokens as removeKnownTokensAction,
   setScanning as setScanningAction,
   initOrigin as initOriginAction,
   clearOrigins as clearOriginsAction,
@@ -994,7 +994,7 @@ describe('#removeBalances', () => {
     balances = update(balances)
   }
 
-  const removeBalances = setToRemove => removeBalancesBySetAction(updaterFn, owner, setToRemove)
+  const removeBalances = setToRemove => removeBalancesAction(updaterFn, owner, setToRemove)
 
   beforeEach(() => {
     balances = Object.values(testTokens).map(token => ({...token, balance: addHexPrefix(new BigNumber(120).toString(16))}))
@@ -1014,7 +1014,7 @@ describe('#removeBalances', () => {
   })
 })
 
-describe('#removeKnownTokensBySet', () => {
+describe('#removeKnownTokens', () => {
   let knownTokens
 
   const updaterFn = (node, address, update) => {
@@ -1024,7 +1024,7 @@ describe('#removeKnownTokensBySet', () => {
     knownTokens = update(knownTokens)
   }
 
-  const removeKnownTokens = setToRemove => removeKnownTokensBySetAction(updaterFn, owner, setToRemove)
+  const removeKnownTokens = setToRemove => removeKnownTokensAction(updaterFn, owner, setToRemove)
 
 
 
@@ -1039,8 +1039,7 @@ describe('#removeKnownTokensBySet', () => {
   })
 
   it('should only remove tokens from the removal set from an accounts known tokens', () => {
-    const removalSet = new Set()
-    removalSet.add(toTokenId(testTokens.badger))
+    const removalSet = new Set([toTokenId(testTokens.badger)])
     removeKnownTokens(removalSet)
     expect(knownTokens.length).toBe(1)
   })

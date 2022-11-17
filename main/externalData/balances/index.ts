@@ -183,21 +183,26 @@ export default function (store: Store) {
     if (changedBalances.length > 0) {
       store.setBalances(address, changedBalances)
 
-      const knownTokens = storeApi.getKnownTokens(address)
+      const knownTokens = new Set(storeApi.getKnownTokens(address).map(toTokenId))
 
       // add any non-zero balances to the list of known tokens
       const unknownBalances = changedBalances
-        .filter(b => parseInt(b.balance) > 0 && !knownTokens.some(t => t.address === b.address && t.chainId === b.chainId))
+        .filter(b => parseInt(b.balance) > 0 && !knownTokens.has(toTokenId(b)))
 
       if (unknownBalances.length > 0) {
         store.addKnownTokens(address, unknownBalances)
       }
 
       // remove zero balances from the list of known tokens
-      const zeroBalances = changedBalances
-        .filter(b => parseInt(b.balance) === 0 && knownTokens.some(t => t.address === b.address && t.chainId === b.chainId))
+      const zeroBalances = changedBalances.reduce((zeroBalSet, b) => {
+        const tokenId = toTokenId(b)
+        if (parseInt(b.balance) === 0 && knownTokens.has(tokenId)) {
+          zeroBalSet.add(tokenId)
+        }
+        return zeroBalSet
+      }, new Set<string>())
 
-      if (zeroBalances.length > 0) {
+      if (zeroBalances.size) {
         store.removeKnownTokens(address, zeroBalances)
       }
     }
@@ -213,13 +218,13 @@ export default function (store: Store) {
 
     Object.entries(balances).forEach(([accountAddress, balances]) => {
       if(includesBlacklistedTokens(balances)){
-        store.removeBalancesBySet(accountAddress, tokensToRemove)
+        store.removeBalances(accountAddress, tokensToRemove)
       }
     })
 
     Object.entries(knownTokens).forEach(([accountAddress, tokens]) => {
       if(includesBlacklistedTokens(tokens)){
-        store.removeKnownTokensBySet(accountAddress, tokensToRemove)
+        store.removeKnownTokens(accountAddress, tokensToRemove)
       }
     })
   }

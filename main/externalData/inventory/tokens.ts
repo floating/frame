@@ -29,6 +29,8 @@ export default class TokenLoader {
       const updatedTokens = await this.fetchTokenList(timeout)
       log.info(`Fetched ${updatedTokens.length} tokens`)
       this.tokens = updatedTokens
+      log.info(`Updated token list to contain ${this.tokens.length} tokens`)
+
       this.nextLoad = setTimeout(() => this.loadTokenList(), 10 * 60_000)
     } catch (e) {
       log.warn('Could not fetch token list', e)
