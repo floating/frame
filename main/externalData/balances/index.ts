@@ -207,7 +207,7 @@ export default function (store: Store) {
   }
 
   function handleTokenBlacklistUpdate (tokensToRemove: Set<string>) {
-    const includesBlacklistedTokens = (arr: Balance[] | Token[]) => arr.some(val => tokensToRemove.has(toTokenId(val)))
+    const includesBlacklistedTokens = (arr: WithTokenId[]) => arr.some(val => tokensToRemove.has(toTokenId(val)))
 
     const balances: Record<string, Balance[]> = store('main.balances')
     const knownTokens: Record<string, Token[]> = store('main.tokens.known')
