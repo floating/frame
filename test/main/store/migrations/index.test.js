@@ -1106,7 +1106,7 @@ describe('migration 29', () => {
 
   const accountTypes = ['ring', 'seed', 'ledger', 'trezor', 'lattice', 'aragon']
   accountTypes.forEach((type) => {
-    it(`does not add a ${type} account with a default name`, () => {
+    it(`does not add ${type} accounts with a default name`, () => {
       state.main.accounts.test = {
         name: `${getSignerDisplayType(type)} account`,
         lastSignerType: type
