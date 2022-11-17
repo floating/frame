@@ -7,6 +7,7 @@ import svg from '../../../../../../resources/svg'
 import { isNetworkConnected } from '../../../../../../resources/utils/chains'
 import Balance from '../Balance'
 import { formatUsdRate, createBalance, sortByTotalValue as byTotalValue, isNativeCurrency } from '../../../../../../resources/domain/balance'
+import { matchFilter } from '../../../../../../resources/utils'
 
 class BalancesExpanded extends React.Component {
   constructor (...args) {
@@ -28,7 +29,8 @@ class BalancesExpanded extends React.Component {
       open: false,
       selected: 0,
       shadowTop: 0,
-      expand: false
+      expand: false,
+      balanceFilter: ''
     }
   }
 
@@ -59,11 +61,48 @@ class BalancesExpanded extends React.Component {
 
         return createBalance({ ...rawBalance, logoURI, name, decimals, symbol }, networks[rawBalance.chainId].isTestnet ? { price: 0 } : rate.usd)
       })
+      .filter(balance => {
+        const filter = this.state.balanceFilter
+        const chainName = this.store('main.networks.ethereum', balance.chainId, 'name')
+        return matchFilter(filter, [chainName, balance.name, balance.symbol])
+      })
       .sort(byTotalValue)
 
     const totalValue = balances.reduce((a, b) => a.plus(b.totalValue), BigNumber(0))
 
     return { balances, totalDisplayValue: formatUsdRate(totalValue, 0), totalValue }
+  }
+
+  renderAccountFilter () {
+    return (
+      <div className='panelFilterAccount'>
+        <div className='panelFilterIcon'>
+          {svg.search(12)}
+        </div>
+        <div className='panelFilterInput'>
+          <input 
+            tabIndex='-1'
+            type='text' 
+            spellCheck='false'
+            onChange={(e) => {
+              const value = e.target.value
+              this.setState({ balanceFilter: value })
+            }}
+            value={this.state.balanceFilter}
+          />
+        </div>
+        {this.state.balanceFilter ? (
+          <div 
+            className='panelFilterClear'
+            onClick={() => {
+              this.setState({ balanceFilter: '' })
+            }}
+          >
+            {svg.close(12)}
+          </div>
+        ) : null}
+      </div>
+    )
   }
 
   render () {
@@ -84,6 +123,7 @@ class BalancesExpanded extends React.Component {
       <div 
         className='accountViewScroll'
       >
+        {this.renderAccountFilter()}
         {scanning ? (
           <div className='signerBalancesLoading'>
             <div className='loader' />
