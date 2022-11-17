@@ -14,11 +14,11 @@ const displayUnitMapping = {
   },
   trillion: {
     lowerBound: BigNumber(1000000000000),
-    upperBound: BigNumber(1000000000000000), // .plus(0.99), // working around the 15sd limit
+    upperBound: BigNumber(1000000000000000),
     unitDisplay: 'T'
   },
   quadrillion: {
-    lowerBound: BigNumber(1000000000000000), // .plus(0.99), // working around the 15sd limit
+    lowerBound: BigNumber(1000000000000000),
     upperBound: BigNumber(Infinity),
     unitDisplay: 'Q'
   }
