@@ -2,35 +2,30 @@ import BigNumber from 'bignumber.js'
 import { isHexString } from 'ethers/lib/utils'
 
 const displayUnitMapping = {
-  thousand: {
-    lowerBound: BigNumber(999.99),
-    upperBound: BigNumber(999999.99),
-    unitDisplay: 'K'
-  },
   million: {
-    lowerBound: BigNumber(999999.99),
-    upperBound: BigNumber(999999999.99),
+    lowerBound: BigNumber(1000000),
+    upperBound: BigNumber(1000000000),
     unitDisplay: 'M'
   },
   billion: {
-    lowerBound: BigNumber(999999999.99),
-    upperBound: BigNumber(999999999999.99),
+    lowerBound: BigNumber(100000000),
+    upperBound: BigNumber(1000000000000),
     unitDisplay: 'B'
   },
   trillion: {
-    lowerBound: BigNumber(999999999999.99),
-    upperBound: BigNumber(999999999999999).plus(0.99), // working around the 15sd limit
+    lowerBound: BigNumber(1000000000000),
+    upperBound: BigNumber(1000000000000000), // .plus(0.99), // working around the 15sd limit
     unitDisplay: 'T'
   },
   quadrillion: {
-    lowerBound: BigNumber(999999999999999).plus(0.99), // working around the 15sd limit
+    lowerBound: BigNumber(1000000000000000), // .plus(0.99), // working around the 15sd limit
     upperBound: BigNumber(Infinity),
     unitDisplay: 'Q'
   }
 }
 const maxDisplayValue = BigNumber(999999999999999999999)
 
-function getDisplay (bn: BigNumber, context: string, decimals: number, displayFullValue?: boolean) {
+function getDisplay (bn: BigNumber, type: string, decimals: number, displayFullValue?: boolean) {
   const value = bn.decimalPlaces(decimals, BigNumber.ROUND_FLOOR)
   if (value.isZero()) {
     return {
@@ -42,13 +37,12 @@ function getDisplay (bn: BigNumber, context: string, decimals: number, displayFu
   if (!displayFullValue) {
     // shorthand display of large numbers
     for (const [unitName, { lowerBound, upperBound, unitDisplay }] of Object.entries(displayUnitMapping)) {
-      if (value.isGreaterThan(lowerBound) && value.isLessThan(upperBound)) {
+      if (value.isGreaterThanOrEqualTo(lowerBound) && value.isLessThan(upperBound)) {
         const displayMax = value.isGreaterThan(maxDisplayValue)
-
         // maximum display value is hard coded because maxDisplayValue is above the bignumber 15sd limit
         return {
           approximationSymbol: displayMax ? '>' : '',
-          displayValue: displayMax ? '999,999' : value.shiftedBy(-(lowerBound.sd(true) - 2)).decimalPlaces(3, BigNumber.ROUND_FLOOR).toFormat(),
+          displayValue: displayMax ? '999,999' : value.shiftedBy(-(lowerBound.sd(true) - 1)).decimalPlaces(2, BigNumber.ROUND_FLOOR).toFormat(),
           displayUnit: {
             fullName: unitName,
             shortName: unitDisplay
@@ -60,7 +54,7 @@ function getDisplay (bn: BigNumber, context: string, decimals: number, displayFu
 
   // display small numbers or full values
   return {
-    displayValue: value.toFormat(context === 'fiat' ? decimals : undefined)
+    displayValue: value.toFormat(type === 'fiat' ? decimals : undefined)
   }
 }
 
@@ -74,7 +68,14 @@ type DisplayValueDataParams = {
 type SourceValue = string | number | BigNumber
 
 export function displayValueData (sourceValue: SourceValue, params: DisplayValueDataParams) {
-  const { currencyRate, decimals = 18, isTestnet = false, displayFullValue = false } = params || {} as DisplayValueDataParams
+
+  const {
+    currencyRate, 
+    decimals = 18, 
+    isTestnet = false, 
+    displayFullValue = false 
+  } = (params || {}) as DisplayValueDataParams
+
   const bn = BigNumber(sourceValue, isHexString(sourceValue) ? 16 : undefined)
   const currencyHelperMap = {
     fiat: ({ displayDecimals } = { displayDecimals: true }) => {  
@@ -97,12 +98,12 @@ export function displayValueData (sourceValue: SourceValue, params: DisplayValue
     ether: ({ displayDecimals } = { displayDecimals: true }) => {
       const value = bn.shiftedBy(-decimals)
       const getDisplayedDecimals = () => {
-        if (!displayDecimals) {
-          return 0
-        }
+        if (!displayDecimals) return 0
+
         const preDecimalStr = value.toFixed(1, BigNumber.ROUND_FLOOR).split('.')[0]
         const numNonDecimals = preDecimalStr === '0' ? 0 : preDecimalStr.length
-        return BigNumber(6).minus(BigNumber.min(3, BigNumber.min(6, numNonDecimals))).toNumber()
+
+        return BigNumber(6).minus(BigNumber.min(6, BigNumber.min(6, numNonDecimals))).toNumber()
       }
   
       return {
