@@ -4,6 +4,7 @@ import { ChildProcess, fork } from 'child_process'
 import { EventEmitter } from 'stream'
 
 import { CurrencyBalance, TokenBalance } from './scan'
+import { toTokenId } from '../../../resources/domain/balance'
 
 const BOOTSTRAP_TIMEOUT_SECONDS = 20
 
@@ -15,6 +16,12 @@ interface TokenBalanceMessage extends Omit<WorkerMessage, 'type'> {
   type: 'tokenBalances',
   address: Address,
   balances: TokenBalance[]
+}
+
+interface TokenBlacklistMessage extends Omit<WorkerMessage, 'type'> {
+  type: 'tokenBlacklist',
+  address: Address,
+  tokens: Token[]
 }
 
 interface ChainBalanceMessage extends Omit<WorkerMessage, 'type'> {
@@ -64,6 +71,12 @@ export default class BalancesWorkerController extends EventEmitter {
       if (message.type === 'tokenBalances') {
         const { address, balances } = (message as TokenBalanceMessage)
         this.emit('tokenBalances', address, balances)
+      }
+
+      if (message.type === 'tokenBlacklist') {
+        const { address, tokens } = (message as TokenBlacklistMessage)
+        const tokenSet = new Set(tokens.map(toTokenId))
+        this.emit('tokenBlacklist', address, tokenSet)
       }
     })
   
