@@ -184,23 +184,19 @@ export default function (store: Store) {
       store.setBalances(address, changedBalances)
 
       const knownTokens = new Set(storeApi.getKnownTokens(address).map(toTokenId))
+      const isKnown = (balance: TokenBalance) => knownTokens.has(toTokenId(balance))
 
       // add any non-zero balances to the list of known tokens
-      const unknownBalances = changedBalances
-        .filter(b => parseInt(b.balance) > 0 && !knownTokens.has(toTokenId(b)))
+      const unknownBalances = changedBalances.filter(b => parseInt(b.balance) > 0 && !isKnown(b))
 
       if (unknownBalances.length > 0) {
         store.addKnownTokens(address, unknownBalances)
       }
 
       // remove zero balances from the list of known tokens
-      const zeroBalances = changedBalances.reduce((zeroBalSet, b) => {
-        const tokenId = toTokenId(b)
-        if (parseInt(b.balance) === 0 && knownTokens.has(tokenId)) {
-          zeroBalSet.add(tokenId)
-        }
-        return zeroBalSet
-      }, new Set<string>())
+      const zeroBalances = new Set(
+        changedBalances.filter(b => parseInt(b.balance) === 0 && isKnown(b))
+      )
 
       if (zeroBalances.size) {
         store.removeKnownTokens(address, zeroBalances)
