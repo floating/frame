@@ -93,7 +93,6 @@ export function decodeCallDataUsingDictionary (calldata: string) {
   }
 }
 
-
 export async function fetchContract (contractAddress: Address, chainId: number): Promise<ContractSourceResult> {
   const fetches = fetchSources.map((getContract) => getContract(contractAddress, chainId))
 
@@ -106,6 +105,7 @@ export async function fetchContract (contractAddress: Address, chainId: number):
     log.info({contract, bool: !contract})
     i += 1
   }
+  
   if (!contract) {
     log.warn(`could not fetch source code for contract ${contractAddress}`)
   }
