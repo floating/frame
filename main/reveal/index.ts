@@ -9,7 +9,7 @@ import proxyConnection from '../provider/proxy'
 import nebulaApi from '../nebula'
 
 import Erc20Contract from '../contracts/erc20'
-import { decodeCallData, fetchContract, ContractSource } from '../contracts'
+import { decodeCallData, fetchContract, ContractSource, decodeCallDataUsingDictionary } from '../contracts'
 import ensContracts from '../contracts/deployments/ens'
 import erc20 from '../externalData/balances/erc-20-abi'
 import { MAX_HEX } from '../../resources/constants'
@@ -141,6 +141,17 @@ const surface = {
     return { type, ens }
   },
   decode: async (contractAddress: string = '', chainId: number, calldata: string) => {
+    let decodedCall = decodeCallDataUsingDictionary(calldata)
+    if(decodedCall){
+      log.info('Decoded locally!!')
+      return {
+        contractAddress: contractAddress.toLowerCase(),
+        contractName: "",
+        source: 'Frame', //TODO: better name here?...
+        ...decodedCall
+      }
+    }
+
     // Decode calldata
     const contractSources: ContractSource[] = [{ name: 'ERC-20', source: 'Generic ERC-20', abi: erc20Abi }]
     const contractSource = await fetchContract(contractAddress, chainId)
@@ -148,9 +159,9 @@ const surface = {
     if (contractSource) {
       contractSources.push(contractSource)
     }
-  
+
     for (const { name, source, abi } of contractSources.reverse()) {
-      const decodedCall = decodeCallData(calldata, abi)
+      decodedCall = decodeCallData(calldata, abi)
   
       if (decodedCall) {
         return {
@@ -161,7 +172,7 @@ const surface = {
         }
       }
     }
-  
+
     log.warn(`Unable to decode data for contract ${contractAddress}`)
   },
   recog: async (calldata: string, context: RecognitionContext) => {

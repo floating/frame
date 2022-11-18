@@ -70,7 +70,7 @@ export async function fetchEtherscanContract (contractAddress: Address, chainId:
       const source = result[0]
       const implementation = source.Implementation
 
-      if (implementation) {
+      if (implementation && implementation !== contractAddress) {
         // this is a proxy contract, return the ABI for the source
         return fetchEtherscanContract(implementation, chainId)
       }
