@@ -1,6 +1,6 @@
 import log from 'electron-log'
 import migrations from '../../../../main/store/migrations'
-import { getSignerDisplayType } from '../../../../resources/domain/signer'
+import { getDefaultAccountName } from '../../../../resources/domain/account'
 import { capitalize } from '../../../../resources/utils'
 
 let state
@@ -1108,7 +1108,7 @@ describe('migration 29', () => {
   accountTypes.forEach((type) => {
     it(`does not add ${type} accounts with a default name`, () => {
       state.main.accounts.test = {
-        name: `${getSignerDisplayType(type)} account`,
+        name: getDefaultAccountName(type),
         lastSignerType: type
       }
       const updatedState = migrations.apply(state, 29)

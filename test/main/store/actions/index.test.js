@@ -18,8 +18,10 @@ import {
   removeNetwork as removeNetworkAction,
   updateNetwork as updateNetworkAction,
   activateNetwork as activateNetworkAction,
-  setBlockHeight as setBlockHeightAction
+  setBlockHeight as setBlockHeightAction,
+  updateAccountMeta as updateAccountMetaAction
 } from '../../../../main/store/actions'
+import { getDefaultAccountName } from '../../../../resources/domain/account'
 
 beforeAll(() => {
   log.transports.console.level = false
@@ -978,5 +980,69 @@ describe('#setBlockHeight', () => {
     setBlockHeight(4, 500)
 
     expect(main.networksMeta.ethereum).toStrictEqual({ 1: { blockHeight: 0 }, 4: { blockHeight: 500 }, 137: { blockHeight: 0 } })
+  })
+})
+
+describe('#updateAccountMeta', () => {
+  const realDateNow = Date.now.bind(global.Date)
+  let main
+
+  const updaterFn = (node, accountMetaId, update) => {
+    expect(node).toBe('main.accountsMeta')
+    main.accountsMeta[accountMetaId] = update(main.accountsMeta[accountMetaId])
+  }
+
+  beforeEach(() => {
+    main = {
+      accountsMeta: {
+        1: {
+          name: 'cool account',
+          lastUpdated: 1568682918135
+        }
+      },
+    }
+    global.Date.now = jest.fn(() => new Date('2022-11-17T11:01:58.135Z').valueOf())
+  })
+
+  afterEach(() => {
+    global.Date.now = realDateNow
+  })
+
+  const setAccountMeta = (accountMetaId, name, lastSignerType) => updateAccountMetaAction(updaterFn, accountMetaId, { name, lastSignerType })
+
+  it('should create a new value with the expected data', () => {
+    setAccountMeta(2, 'not so cool account', 'seed')
+
+    expect(main.accountsMeta).toStrictEqual({ 
+      1: { name: 'cool account', lastUpdated: 1568682918135 }, 
+      2: { name: 'not so cool account', lastUpdated: 1668682918135 }
+    })
+  })
+
+  it('should update an existing value with the expected data', () => {
+    setAccountMeta(1, 'not so cool account', 'seed')
+
+    expect(main.accountsMeta).toStrictEqual({
+      1: { name: 'not so cool account', lastUpdated: 1668682918135 }
+    })
+  })
+
+  const accountTypes = ['ring', 'seed', 'ledger', 'trezor', 'lattice', 'aragon']
+  accountTypes.forEach((type) => {
+    it(`should not create a new value for the ${type} account default label`, () => {
+      setAccountMeta(2, getDefaultAccountName(type), type)
+
+      expect(main.accountsMeta).toStrictEqual({ 
+        1: { name: 'cool account', lastUpdated: 1568682918135 }
+      })
+    })
+
+    it(`should not update an existing value with the ${type} account default label`, () => {
+      setAccountMeta(1, getDefaultAccountName(type), type)
+
+      expect(main.accountsMeta).toStrictEqual({
+        1: { name: 'cool account', lastUpdated: 1568682918135 }
+      })
+    })
   })
 })
