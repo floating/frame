@@ -6,8 +6,9 @@ log.transports.console.level = process.env.LOG_WORKER ? 'debug' : 'info'
 log.transports.file.level = ['development', 'test'].includes(process.env.NODE_ENV || 'development') ? false : 'verbose'
 
 import { supportsChain as chainSupportsScan } from '../../multicall'
-import balancesLoader, { BalanceLoader } from './scan'
+import balancesLoader, { BalanceLoader, TokenBalance } from './scan'
 import TokenLoader from '../inventory/tokens'
+import { toTokenId } from '../../../resources/domain/balance'
 
 interface ExternalDataWorkerMessage {
   command: string,
@@ -51,17 +52,23 @@ function sendToMainProcess (data: any) {
   }
 }
 
-async function tokenBalanceScan (address: Address, tokensToOmit: Token[] = [], chains?: number[]) {
+async function updateBlacklist (address: Address, chains: number[]) {
+  try {
+    const blacklistTokens = tokenLoader.getBlacklist(chains)
+    sendToMainProcess({ type: 'tokenBlacklist', address, tokens: blacklistTokens })
+  } catch (e) {
+    log.error('error updating token blacklist', e)
+  }
+}
+
+async function tokenBalanceScan (address: Address, tokensToOmit: Token[] = [], chains: number[]) {
   try {
     // for chains that support multicall, we can attempt to load every token that we know about,
     // for all other chains we need to call each contract individually so don't scan every contract
+    const omitSet = new Set(tokensToOmit.map(toTokenId))
     const eligibleChains = (chains || await getChains()).filter(chainSupportsScan)
-    const tokenLists = eligibleChains.map(chainId => tokenLoader.getTokens(chainId))
-    const tokens = tokenLists.reduce((all, tokenList) => {
-      return all.concat(
-        tokenList.filter(token => tokensToOmit.every(t => t.chainId !== token.chainId || t.address !== token.address))
-      )
-    }, [] as Token[])
+    const tokenList = tokenLoader.getTokens(eligibleChains)
+    const tokens = tokenList.filter(token => !omitSet.has(toTokenId(token)))
 
     const tokenBalances = (await balances.getTokenBalances(address, tokens))
       .filter(balance => parseInt(balance.balance) > 0)
@@ -74,9 +81,11 @@ async function tokenBalanceScan (address: Address, tokensToOmit: Token[] = [], c
 
 async function fetchTokenBalances (address: Address, tokens: Token[]) {
   try {
-    const tokenBalances = await balances.getTokenBalances(address, tokens)
+    const blacklistSet = new Set(tokenLoader.getBlacklist().map(toTokenId))
+    const filteredTokens = tokens.filter(token => !blacklistSet.has(toTokenId(token)))
+    const tokenBalances = await balances.getTokenBalances(address, filteredTokens)
 
-    sendToMainProcess({ type: 'tokenBalances', address, balances: tokenBalances })
+    sendToMainProcess({ type: 'tokenBalances', address, balances: tokenBalances})
   } catch (e) {
     log.error('error fetching token balances', e)
   }
@@ -110,8 +119,11 @@ function resetHeartbeat () {
 const messageHandler: { [command: string]: (...params: any) => void } = {
   updateChainBalance: chainBalanceScan,
   fetchTokenBalances: fetchTokenBalances,
-  tokenBalanceScan: tokenBalanceScan,
-  heartbeat: resetHeartbeat
+  heartbeat: resetHeartbeat,
+  tokenBalanceScan: (address, tokensToOmit, chains) => {
+    updateBlacklist(address, chains)
+    tokenBalanceScan(address, tokensToOmit, chains)
+  },
 }
 
 process.on('message', (message: ExternalDataWorkerMessage) => {

@@ -58,6 +58,19 @@ function getErrorCode (e: Error) {
   return e.code
 }
 
+const matchFilter = (filter: string = '', properties: string[] = []) => {
+  if (!filter) return true
+  if (typeof filter !== 'string' || !Array.isArray(properties)) return false
+  const filterItems = filter.split(' ')
+  return filterItems.every((item = '') => {
+    item = item.toLowerCase()
+    return properties.some(prop => {
+      prop = prop.toLowerCase()
+      return prop.indexOf(item) !== -1
+    })
+  })
+}
+
 export {
   getErrorCode,
   randomLetters,
@@ -73,5 +86,6 @@ export {
   hexToInt,
   weiHexToGweiInt,
   weiIntToEthInt,
-  gweiToWeiHex
+  gweiToWeiHex,
+  matchFilter
 }

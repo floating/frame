@@ -2,6 +2,7 @@ import React from 'react'
 import Restore from 'react-restore'
 import link from '../../../../../../resources/link'
 import svg from '../../../../../../resources/svg'
+import { matchFilter } from '../../../../../../resources/utils'
 
 class Inventory extends React.Component {
   constructor (...args) {
@@ -24,20 +25,15 @@ class Inventory extends React.Component {
 
   isFilterMatch (collection) {
     const { filter = '' } =  this.props
-
     const c = this.store('main.inventory', this.props.account, collection)
-    const itemMatch = Object.keys(c.items).some(item => {
-      const { name } = c.items[item] || {}
-      return (name || '').toLowerCase().indexOf(filter.toLowerCase()) !== -1
+    if (!c) return false
+    const collectionName = c.meta && c.meta.name
+    const collectionItems = c.items || {}
+    const itemNames = Object.keys(collectionItems).map(item => {
+      const { name } = collectionItems[item] || {}
+      return name
     })
-
-    const match = (
-      !filter ||
-      c.meta.name.toLowerCase().indexOf(filter.toLowerCase()) !== -1 ||
-      itemMatch
-    )
-
-    return match
+    return matchFilter(filter, [collectionName, ...itemNames])
   }
 
   displayCollections () {
