@@ -103,6 +103,10 @@ export default class TokenLoader {
   }
 
   getBlacklist (chains: number[] = []) {
-    return this.tokens.filter(token => token.extensions?.omit && !chains.length || chains.includes(token.chainId))
+    return this.tokens.filter(
+      (token) =>
+        token.extensions?.omit &&
+        (!chains.length || chains.includes(token.chainId))
+    )
   }
 }
