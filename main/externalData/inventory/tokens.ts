@@ -13,6 +13,10 @@ interface TokenSpec extends Token {
   }
 }
 
+function isBlacklisted (token: TokenSpec) {
+  return token.extensions?.omit
+}
+
 export default class TokenLoader {
   private tokens: TokenSpec[] = defaultTokenList.tokens as TokenSpec[]
   private nextLoad?: NodeJS.Timeout | null
@@ -99,14 +103,12 @@ export default class TokenLoader {
   }
 
   getTokens (chains: number[]) {
-    return this.tokens.filter(token => !token.extensions?.omit && chains.includes(token.chainId))
+    return this.tokens.filter(token => !isBlacklisted(token) && chains.includes(token.chainId))
   }
 
   getBlacklist (chains: number[] = []) {
-    return this.tokens.filter(
-      (token) =>
-        token.extensions?.omit &&
-        (!chains.length || chains.includes(token.chainId))
-    )
+    const chainMatches = (token: TokenSpec) => !chains.length || chains.includes(token.chainId)
+
+    return this.tokens.filter((token) => isBlacklisted(token) && chainMatches(token))
   }
 }
