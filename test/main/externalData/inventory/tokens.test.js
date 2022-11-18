@@ -17,7 +17,7 @@ let tokenLoader, mockEthProvider, mockNebula
 
 beforeEach(() => {
   mockNebula = {
-    resolve: async () => ({ record: {} }),
+    resolve: jest.fn().mockResolvedValue({ record: {} }),
     ipfs: {
       getJson: jest.fn()
     }

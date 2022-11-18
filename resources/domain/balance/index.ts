@@ -63,7 +63,7 @@ export function isNativeCurrency (address: string) {
   return address === NATIVE_CURRENCY
 }
 
-export function toTokenId (token: WithTokenId ) {
+export function toTokenId (token: WithTokenId) {
   const {chainId, address} = token
   return `${chainId}:${address.toLowerCase()}`
 }
