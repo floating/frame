@@ -5,22 +5,24 @@ import Restore from 'react-restore'
 import AccountController from './AccountController'
 
 import { accountSort as byCreation } from '../../../resources/domain/account'
+import { matchFilter } from '../../../resources/utils'
+
 import svg from '../../../resources/svg'
 import link from '../../../resources/link'
 
 let firstScroll = true
 
-function filterMatches (text = '', fields) {
-  const filter = text.toLowerCase()
+// function filterMatches (text = '', fields) {
+//   const filter = text.toLowerCase()
 
-  return fields.some(field => (field || '').toLowerCase().includes(filter))
-}
+//   return fields.some(field => (field || '').toLowerCase().includes(filter))
+// }
 
 class AccountSelector extends React.Component {
-  constructor (...args) {
-    super(...args)
+  constructor (props, context) {
+    super(props, context)
     this.state = {
-      accountFilter: ''
+      accountFilter: context.store('panel.accountFilter') || ''
     }
   }
 
@@ -49,6 +51,7 @@ class AccountSelector extends React.Component {
         <div className='panelFilterInput'>
           <input 
             tabIndex='-1'
+            spellCheck='false'
             onChange={(e) => {
               const value = e.target.value
               this.setState({ accountFilter: value })
@@ -57,7 +60,7 @@ class AccountSelector extends React.Component {
             value={this.state.accountFilter}
           />
         </div>
-        {this.state.accountFilter ? (
+        {this.store('panel.accountFilter') ? (
           <div 
             className='panelFilterClear'
             onClick={() => {
@@ -74,26 +77,13 @@ class AccountSelector extends React.Component {
 
   renderAccountList () {
     const accounts = this.store('main.accounts')
-    const current = this.store('selected.current')
-    const scrollTop = this.store('selected.position.scrollTop')
-    const open = current && this.store('selected.open')
-
     const sortedAccounts = Object.values(accounts).sort(byCreation)
     const filter = this.store('panel.accountFilter')
-
-    const { data } = this.store('panel.nav')[0] || {}
-
-    const panelScrollStyle = current ? { pointerEvents: 'none' } : {}
-
-    // if (open) panelScrollStyle.top = '146px'
-
-    const crumb = this.store('windows.panel.nav')[0] || {}
-    // if (crumb.view === 'requestView') panelScrollStyle.bottom = '142px'
     
     const displayAccounts = sortedAccounts.filter(
-      ({ address, name, ensName, lastSignerType }) =>
-        !filter ||
-        filterMatches(filter, [address, name, ensName, lastSignerType])
+      ({ address, name, ensName, lastSignerType }) => {
+        return matchFilter(filter, [address, name, ensName, lastSignerType])
+      } 
     )
 
     return (

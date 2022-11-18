@@ -100,9 +100,12 @@ type ColorwayPalette = {
   accent8: Color
 }
 
-interface Balance {
-  chainId: number,
-  address: Address,
+interface WithTokenId {
+  address: string
+  chainId: number
+}
+
+interface Balance extends WithTokenId {
   name: string,
   symbol: string,
   balance: HexAmount,
@@ -115,11 +118,9 @@ interface Rate {
   change24hr: number
 }
 
-interface Token {
-  chainId: number,
+interface Token extends WithTokenId {
   name: string,
   symbol: string,
-  address: string,
   decimals: number,
   logoURI?: string
 }

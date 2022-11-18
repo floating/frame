@@ -6,6 +6,8 @@ import link from '../../../../../../resources/link'
 import svg from '../../../../../../resources/svg'
 import { isNetworkConnected } from '../../../../../../resources/utils/chains'
 import { formatUsdRate, createBalance, sortByTotalValue as byTotalValue, isNativeCurrency } from '../../../../../../resources/domain/balance'
+import { matchFilter } from '../../../../../../resources/utils'
+
 import Balance from '../Balance'
 
 class BalancesPreview extends React.Component {
@@ -38,21 +40,6 @@ class BalancesPreview extends React.Component {
 
   componentWillUnmount () {
     if (this.resizeObserver) this.resizeObserver.disconnect()
-  }
-
-  isFilterMatch (balance) {
-    const { filter = ''} =  this.props
-
-    const chainName = this.store('main.networks.ethereum', balance.chainId, 'name')
-
-    const match = (
-      !filter ||
-      chainName.toLowerCase().indexOf(filter.toLowerCase()) !== -1 ||
-      balance.name.toLowerCase().indexOf(filter.toLowerCase()) !== -1 ||
-      balance.symbol.toLowerCase().indexOf(filter.toLowerCase()) !== -1
-    )
-
-    return match
   }
 
   getBalances (rawBalances, rates) {
@@ -89,7 +76,12 @@ class BalancesPreview extends React.Component {
     const { balances: allBalances, totalDisplayValue, totalValue } = this.getBalances(storedBalances, rates)
 
     // if filter only show balances that match filter
-    const filteredBalances = allBalances.filter(rawBalance => this.isFilterMatch(rawBalance))
+    const filteredBalances = allBalances.filter(balance => {
+      const { filter = ''} =  this.props
+      const chainName = this.store('main.networks.ethereum', balance.chainId, 'name')
+      return matchFilter(filter, [chainName, balance.name, balance.symbol])
+    })
+
     const balances = filteredBalances.slice(0, 4)
     
     const lastBalanceUpdate = this.store('main.accounts', address, 'balances.lastUpdated')

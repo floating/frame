@@ -101,7 +101,7 @@ class TxFee extends React.Component {
           {req.feesUpdatedByUser ? (
             <ClusterRow>
               <ClusterValue>
-                <div className='clusterTag'>
+                <div className='clusterTag' style={{ color: 'var(--good)' }}>
                   {`Gas values set by user`}
                 </div>
               </ClusterValue>
@@ -109,7 +109,7 @@ class TxFee extends React.Component {
           ) : req.data.gasFeesSource !== GasFeesSource.Frame ? (
             <ClusterRow>
               <ClusterValue>
-                <div className='clusterTag'>
+                <div className='clusterTag' style={{ color: 'var(--bad)' }}>
                   {`Gas values set by ${req.data.gasFeesSource}`}
                 </div>
               </ClusterValue>
