@@ -1,4 +1,8 @@
+import { getSignerDisplayType } from "../signer"
+
 export const accountNS = '114c39e5-cd7d-416f-ab9e-5ab6ab0218ce'
+
+export const isDefaultAccountName = ({ name, lastSignerType }: Account) => name.toLowerCase() === `${getSignerDisplayType(lastSignerType)} account`
 
 export function accountSort (a: Account, b:Account) {
   try {

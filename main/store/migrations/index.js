@@ -1,7 +1,6 @@
 import log from 'electron-log'
 import { v5 as uuidv5 } from 'uuid'
-import { accountNS } from '../../../resources/domain/account'
-import { getSignerDisplayType } from '../../../resources/domain/signer'
+import { accountNS, isDefaultAccountName } from '../../../resources/domain/account'
 
 const migrations = {
   4: initial => {
@@ -585,12 +584,11 @@ const migrations = {
   29: (initial) => {
     // add accountsMeta
     initial.main.accountsMeta = {}
-    Object.entries(initial.main.accounts).forEach(([id, { name, lastSignerType }]) => {
-      const nameIsDefault = name.toLowerCase() === `${getSignerDisplayType(lastSignerType)} account`
-      if (!nameIsDefault) {
+    Object.entries(initial.main.accounts).forEach(([id, account]) => {
+      if (!isDefaultAccountName(account)) {
         const accountMetaId = uuidv5(id, accountNS)
         initial.main.accountsMeta[accountMetaId] = { 
-          name,
+          name: account.name,
           lastUpdated: Date.now()
         }
       }

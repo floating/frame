@@ -21,6 +21,7 @@ import Erc20Contract from './contracts/erc20'
 import { getErrorCode } from '../resources/utils'
 import { FrameInstance } from './windows/frames/frameInstances'
 
+app.commandLine.appendSwitch('trace-warnings', 'true')
 app.commandLine.appendSwitch('enable-accelerated-2d-canvas', 'true')
 app.commandLine.appendSwitch('enable-gpu-rasterization', 'true')
 app.commandLine.appendSwitch('force-gpu-rasterization', 'true')
