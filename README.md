@@ -44,7 +44,8 @@ Frame is a native web3 interface that lets you sign data, securely manage accoun
 
 #### Downloads
 
-- [All Releases](https://github.com/floating/frame/releases)
+- [Production Releases](https://github.com/floating/frame/releases)
+- [Canary Releases](https://github.com/frame-labs/frame-canary/releases)
 
 #### Arch Linux
 
