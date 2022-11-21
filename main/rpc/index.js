@@ -181,7 +181,6 @@ const rpc = {
     cb()
   },
   removeAccount (address, options, cb) {
-    // if (!isAddress(address)) return cb(new Error('Invalid Address'))
     accounts.remove(address)
     cb()
   },
