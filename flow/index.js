@@ -20,7 +20,7 @@ link.rpc('getState', (err, state) => {
     document.body.className = store('main.colorway')
   })
   const Flow = Restore.connect(App, store)
-  const root = createRoot(document.getElementById('flow'));
+  const root = createRoot(document.getElementById('flow'))
   root.render(<Flow />)
 })
 // document.addEventListener('mouseout', e => { if (e.clientX < 0) link.send('tray:mouseout') })
