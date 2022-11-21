@@ -24,47 +24,52 @@ let dash: Dash
 let mouseTimeout: NodeJS.Timeout
 let glide = false
 
-const hideFrame = () => tray.hide()
-const showFrame = () => tray.show()
+const contextMenu = () => {
+  const displaySummonShortcut = store('main.shortcuts.altSlash')
+  const hideFrame = () => tray.hide()
+  const showFrame = () => tray.show()
+  const separatorMenuItem = {
+    label: 'Frame',
+    click: () => {}, 
+    type: 'separator'
+  }
+  const hideMenuItem = {
+    label: 'Dismiss', 
+    click: hideFrame, 
+    accelerator: 'Alt+/', 
+    registerAccelerator: false,
+    toolTip: 'Dismiss Frame'
+  }
+  const showMenuItem = { 
+    label: 'Summon', 
+    click: showFrame, 
+    accelerator: 'Alt+/', 
+    registerAccelerator: false,
+    toolTip: 'Summon Frame'
+  }
+  const quitMenuItem = {
+    label: 'Quit',
+    click: () => app.quit()
+  }
+  const menu = [quitMenuItem]
+  const showMenuWithSummon = [
+    showMenuItem,
+    separatorMenuItem,
+    quitMenuItem
+  ]
+  const hideMenuWithSummon = [
+    hideMenuItem,
+    separatorMenuItem,
+    quitMenuItem
+  ]
+  const menuMap = {
+    show: Menu.buildFromTemplate(displaySummonShortcut ? showMenuWithSummon : menu),
+    hide: Menu.buildFromTemplate(displaySummonShortcut ? hideMenuWithSummon : menu)
+  }
+  const menuType = tray.isVisible() ? 'hide' : 'show'
 
-const separatorMenuItem = {
-  label: 'Frame',
-  click: () => {}, 
-  type: 'separator'
+  return menuMap[menuType as keyof typeof menuMap]
 }
-
-const hideMenuItem = {
-  label: 'Dismiss', 
-  click: hideFrame, 
-  accelerator: 'Alt+/', 
-  registerAccelerator: false,
-  toolTip: 'Dismiss Frame'
-}
-
-const showMenuItem = { 
-  label: 'Summon', 
-  click: showFrame, 
-  accelerator: 'Alt+/', 
-  registerAccelerator: false,
-  toolTip: 'Summon Frame'
-}
-
-const quitMenuItem = {
-  label: 'Quit',
-  click: () => app.quit()
-}
-
-const hideMenu = Menu.buildFromTemplate([
-  hideMenuItem,
-  separatorMenuItem,
-  quitMenuItem
-])
-
-const showMenu = Menu.buildFromTemplate([
-  showMenuItem,
-  separatorMenuItem,
-  quitMenuItem
-])
 
 const topRight = (window: BrowserWindow) => {
   const area = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
@@ -178,7 +183,7 @@ function initTrayWindow () {
       tray.electronTray.closeContextMenu()
     }
     setTimeout(() => {
-      tray.electronTray.setContextMenu(hideMenu)
+      tray.electronTray.setContextMenu(contextMenu())
     }, 100)
   })
   windows.tray.on('hide', () => {
@@ -186,7 +191,7 @@ function initTrayWindow () {
       tray.electronTray.closeContextMenu()
     }
     setTimeout(() => {
-      tray.electronTray.setContextMenu(showMenu)
+      tray.electronTray.setContextMenu(contextMenu())
     }, 100)
   })
 
@@ -446,7 +451,15 @@ const broadcast = (channel: string, ...args: string[]) => {
 }
 
 // Data Change Events
-store.observer(() => broadcast('permissions', JSON.stringify(store('permissions'))))
+store.observer(() => {
+  broadcast('permissions', JSON.stringify(store('permissions')))
+})
+store.observer(() => {
+  if (tray?.isReady()) {
+    tray.electronTray.setContextMenu(contextMenu())
+  }
+})
+
 store.api.feed((_state, actions) => {
   actions.forEach(action => {
     action.updates.forEach(update => {
