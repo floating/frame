@@ -12,6 +12,8 @@ const {
   pubToAddress,
   ecrecover
 } = require('ethereumjs-util')
+const { SigningKey, keccak256 } = require('ethers/lib/utils')
+const { serialize } = require('@ethersproject/transactions')
 
 function chainConfig (chain, hardfork) {
   const chainId = new BN(chain)
@@ -70,14 +72,16 @@ class HotSignerWorker {
       console.error(`invalid chain id ${rawTx.chainId} for transaction`)
       return pseudoCallback('could not determine chain id for transaction')
     }
+    const {chainId, type, from, ...payload} = rawTx
+    payload['chainId'] = parseInt(chainId, 16)
+    payload['type'] = parseInt(rawTx.type || '0', 16)
+    const signingKey = new SigningKey(key)
+    const preImage = keccak256(
+      serialize(payload)
+    )
 
-    const chainId = parseInt(rawTx.chainId)
-    const hardfork = parseInt(rawTx.type) === 2 ? 'london' : 'berlin'
-    const common = chainConfig(chainId, hardfork)
-
-    const tx = TransactionFactory.fromTxData(rawTx, { common })
-    const signedTx = tx.sign(key)
-    const serialized = signedTx.serialize().toString('hex')
+    const signature = signingKey.signDigest(preImage)
+    const serialized = serialize(payload, signature)
 
     pseudoCallback(null, addHexPrefix(serialized))
   }
