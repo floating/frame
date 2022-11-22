@@ -1,6 +1,6 @@
 const crypto = require('crypto')
 const ethSigUtil = require('eth-sig-util')
-const {computePreImage} = require('../../../../resources/domain/transaction')
+const {computePreImage, convertToUnsignedTransaction} = require('../../../../resources/domain/transaction')
 const { serialize } = require('@ethersproject/transactions')
 
 const {
@@ -62,14 +62,12 @@ class HotSignerWorker {
       console.error(`invalid chain id ${rawTx.chainId} for transaction`)
       return pseudoCallback('could not determine chain id for transaction')
     }
-    const {chainId, type, from, ...payload} = rawTx
-    payload['chainId'] = parseInt(chainId, 16)
-    payload['type'] = parseInt(rawTx.type || '0', 16)
-    const preImage = computePreImage(payload)
+    const unsignedTransaction = convertToUnsignedTransaction(rawTx)
+    const preImage = computePreImage(unsignedTransaction)
 
     const signingKey = new SigningKey(key)
     const signature = signingKey.signDigest(preImage)
-    const serialized = serialize(payload, signature)
+    const serialized = serialize(unsignedTransaction, signature)
 
     pseudoCallback(null, addHexPrefix(serialized))
   }

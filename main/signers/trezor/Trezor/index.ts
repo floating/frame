@@ -12,7 +12,6 @@ import { TransactionData } from '../../../../resources/domain/transaction'
 import { sign, londonToLegacy, signerCompatibility } from '../../../transaction'
 
 import { Derivation, getDerivationPath } from '../../Signer/derive'
-import { TypedTransaction } from '@ethereumjs/tx'
 import TrezorBridge, { DeviceError } from '../bridge'
 
 const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
@@ -20,7 +19,7 @@ const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
 const defaultTrezorTVersion = { major_version: 2, minor_version: 3, patch_version: 0 }
 const defaultTrezorOneVersion = { major_version: 1, minor_version: 9, patch_version: 2 }
 
-export const Status = {
+export const Status = { 
   INITIAL: 'Connecting',
   OK: 'ok',
   LOADING: 'loading',
@@ -266,12 +265,12 @@ export default class Trezor extends Signer {
       const compatibility = signerCompatibility(rawTx, this.summary())
       const compatibleTx = compatibility.compatible ? { ...rawTx } : londonToLegacy(rawTx)
 
-      const signedTx = await sign(compatibleTx, async tx => {
+      const signedTx = await sign(compatibleTx, async (tx: TransactionData) => {
         if (!this.device) {
           throw new Error('Trezor is not connected')
         }
             
-        const trezorTx = this.normalizeTransaction(rawTx.chainId, tx)
+        const trezorTx = this.normalizeTransaction(tx)
         const path = this.getPath(index)
 
         try {
@@ -286,7 +285,7 @@ export default class Trezor extends Signer {
         }
       })
 
-      cb(null, addHexPrefix(signedTx.serialize().toString('hex')))
+      cb(null, signedTx)
     } catch (e: unknown) {
       const err = e as DeviceError
       cb(err)
@@ -301,15 +300,14 @@ export default class Trezor extends Signer {
     return (hex && padToEven(stripHexPrefix(hex))) || ''
   }
 
-  private normalizeTransaction (chainId: string, tx: TypedTransaction) {
-    const txJson = tx.toJSON()
-
+  private normalizeTransaction (tx: TransactionData) {
+    const {nonce, gasLimit, to, value, data, chainId} = tx
     const unsignedTx = {
-      nonce: this.normalize(txJson.nonce || ''),
-      gasLimit: this.normalize(txJson.gasLimit || ''),
-      to: this.normalize(txJson.to || ''),
-      value: this.normalize(txJson.value || ''),
-      data: this.normalize(txJson.data || ''),
+      nonce: this.normalize(nonce || ''),
+      gasLimit: this.normalize(gasLimit || ''),
+      to: this.normalize(to || ''),
+      value: this.normalize(value || ''),
+      data: this.normalize(data || ''),
       chainId: utils.hexToNumber(chainId)
     }
 

@@ -6,9 +6,10 @@ import Transport from '@ledgerhq/hw-transport'
 import Eth from '@ledgerhq/hw-app-eth'
 
 import { Derivation, getDerivationPath, deriveHDAccounts } from '../../Signer/derive'
-import { TransactionData } from '../../../../resources/domain/transaction'
+import { convertToUnsignedTransaction, TransactionData } from '../../../../resources/domain/transaction'
 import { sign } from '../../../transaction'
 import { DeviceError } from '.'
+import { serializeTransaction } from 'ethers/lib/utils'
 
 export default class LedgerEthereumApp {
   private eth: Eth;
@@ -68,16 +69,18 @@ export default class LedgerEthereumApp {
   }
 
   async signTransaction (path: string, ledgerTx: TransactionData) {
-    const signedTx = await sign(ledgerTx, tx => {
+    const signedTx = await sign(ledgerTx, (tx: TransactionData) => {
       // legacy transactions aren't RLP encoded before they're returned
-      const message = tx.getMessageToSign(false)
+      const message = serializeTransaction(
+        convertToUnsignedTransaction(tx)
+      )
       const legacyMessage = message[0] !== tx.type
-      const rawTxHex = legacyMessage ? rlp.encode(message).toString('hex') : message.toString('hex')
+      const rawTxHex = legacyMessage ? rlp.encode(message).toString('hex') : message
 
       return this.eth.signTransaction(path, rawTxHex, null)
     })
 
-    return addHexPrefix(signedTx.serialize().toString('hex'))
+    return addHexPrefix(signedTx)
   }
 
   async getAddress (path: string, display: boolean, chainCode: boolean) {

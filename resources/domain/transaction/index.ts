@@ -3,6 +3,7 @@ import { getAddress as getChecksumAddress } from '@ethersproject/address'
 import { UnsignedTransaction } from 'ethers'
 import { keccak256 } from 'ethers/lib/utils'
 import { serialize } from '@ethersproject/transactions'
+import { hexToInt } from '../../utils'
 
 export enum GasFeesSource {
   Dapp = 'Dapp',
@@ -42,4 +43,17 @@ export function getAddress (address: Address) {
 export function computePreImage(rawTx: UnsignedTransaction): string {
   const serialized = serialize(rawTx)
   return  keccak256(serialized)
+}
+
+export function convertToUnsignedTransaction(tx: TransactionData): UnsignedTransaction {
+  
+  const {chainId, type, from, nonce, ...remaining} = tx
+  const unsignedTx: UnsignedTransaction = {
+    ...remaining,
+    chainId: hexToInt(chainId),
+    type: hexToInt(type || "0x00"),
+    nonce: hexToInt(nonce || '0')
+  }
+
+  return unsignedTx
 }
