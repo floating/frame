@@ -5,10 +5,6 @@ import Common from '@ethereumjs/common'
 import chainConfig from '../chains/config'
 import { AppVersion, SignerSummary } from '../signers/Signer'
 import { GasFeesSource, TransactionData, typeSupportsBaseFee } from '../../resources/domain/transaction'
-import { splitSignature } from 'ethers/lib/utils'
-import { Signature as EthersSignature } from '@ethersproject/bytes'
-import { hexToInt } from '../../resources/utils'
-import { serialize, UnsignedTransaction } from '@ethersproject/transactions'
 
 const londonHardforkSigners: SignerCompatibilityByVersion = {
   seed: () => true,
@@ -139,35 +135,29 @@ function populate (rawTx: TransactionData, chainConfig: Common, gas: GasData): T
   return txData
 }
 
-function formatSignature ({ v, r, s }: Signature): EthersSignature {
-  return splitSignature({
-    v: hexToInt(v),
+function hexifySignature ({ v, r, s }: Signature) {
+  return {
+    v: addHexPrefix(v),
     r: addHexPrefix(r),
     s: addHexPrefix(s)
-  })
+  }
 }
 
-async function sign (rawTx: TransactionData, signingFn: (tx: UnsignedTransaction) => Promise<Signature>) {
+async function sign (rawTx: TransactionData, signingFn: (tx: TypedTransaction) => Promise<Signature>) {
   const common = chainConfig(parseInt(rawTx.chainId), parseInt(rawTx.type) === 2 ? 'london' : 'berlin')
 
   const tx = TransactionFactory.fromTxData(rawTx, { common })
-  const {from, type, chainId, nonce, ...txData} = rawTx
-  const unsignedTxData: UnsignedTransaction = {
-    ...txData,
-    nonce: hexToInt(nonce || '0x00'),
-    type: hexToInt(type),
-    chainId: hexToInt(chainId)
 
-  }
-  return signingFn(unsignedTxData).then(sig => {
+  return signingFn(tx).then(sig => {
+    const signature = hexifySignature(sig)
 
-    const signature = formatSignature(sig)
-    const serialized = serialize(
-      unsignedTxData,
-      signature
+    return TransactionFactory.fromTxData(
+      {
+      ...rawTx,
+      ...signature
+      },
+      { common }
     )
-
-    return serialized
   })
 }
 
