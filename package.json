@@ -4,7 +4,7 @@
   "description": "System-wide web3",
   "main": "compiled/main",
   "scripts": {
-    "clean": "npx rimraf dist bundle compiled .cache node_modules",
+    "clean": "npx rimraf dist bundle compiled .parcel-cache node_modules",
     "setup:full": "npm run clean && npm cache clean --force && npm install --cache /tmp/empty-cache --ignore-scripts && allow-scripts && npm audit fix",
     "setup:clean": "npm run clean && npm run setup",
     "setup:ci": "npm ci --ignore-scripts && npm run install:scripts",
@@ -145,8 +145,8 @@
     "@types/node-hid": "1.3.1",
     "@types/uuid": "8.3.4",
     "@types/ws": "8.5.3",
-    "babel-eslint": "10.1.0",
     "assert": "2.0.0",
+    "babel-eslint": "10.1.0",
     "electron": "21.3.0",
     "electron-builder": "23.6.0",
     "electron-notarize": "1.2.1",
@@ -172,6 +172,9 @@
     "ts-jest": "29.0.3",
     "typescript": "4.9.3"
   },
+  "overrides": {
+    "node-hid": "2.1.2"
+  },
   "standardx": {
     "parser": "babel-eslint",
     "env": [
@@ -179,7 +182,7 @@
     ]
   },
   "engines": {
-    "electron": "20"
+    "electron": "21"
   },
   "bridge": "./bundle/bridge.js",
   "inject": "./bundle/inject.js",
