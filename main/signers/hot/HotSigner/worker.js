@@ -1,10 +1,9 @@
 const crypto = require('crypto')
 const ethSigUtil = require('eth-sig-util')
-const { TransactionFactory } = require('@ethereumjs/tx')
-const Common = require('@ethereumjs/common').default
+const {computePreImage} = require('../../../../resources/domain/transaction')
+const { serialize } = require('@ethersproject/transactions')
 
 const {
-  BN,
   hashPersonalMessage,
   toBuffer,
   ecsign,
@@ -12,16 +11,7 @@ const {
   pubToAddress,
   ecrecover
 } = require('ethereumjs-util')
-const { SigningKey, keccak256 } = require('ethers/lib/utils')
-const { serialize } = require('@ethersproject/transactions')
-
-function chainConfig (chain, hardfork) {
-  const chainId = new BN(chain)
-
-  return Common.isSupportedChainId(chainId)
-    ? new Common({ chain: chainId.toNumber(), hardfork })
-    : Common.custom({ chainId: chainId.toNumber() }, { baseChain: 'mainnet', hardfork })
-}
+const { SigningKey } = require('ethers/lib/utils')
 
 class HotSignerWorker {
   constructor () {
@@ -75,11 +65,9 @@ class HotSignerWorker {
     const {chainId, type, from, ...payload} = rawTx
     payload['chainId'] = parseInt(chainId, 16)
     payload['type'] = parseInt(rawTx.type || '0', 16)
-    const signingKey = new SigningKey(key)
-    const preImage = keccak256(
-      serialize(payload)
-    )
+    const preImage = computePreImage(payload)
 
+    const signingKey = new SigningKey(key)
     const signature = signingKey.signDigest(preImage)
     const serialized = serialize(payload, signature)
 

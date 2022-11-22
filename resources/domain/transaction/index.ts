@@ -1,5 +1,8 @@
 import { JsonTx } from '@ethereumjs/tx'
 import { getAddress as getChecksumAddress } from '@ethersproject/address'
+import { UnsignedTransaction } from 'ethers'
+import { keccak256 } from 'ethers/lib/utils'
+import { serialize } from '@ethersproject/transactions'
 
 export enum GasFeesSource {
   Dapp = 'Dapp',
@@ -34,4 +37,9 @@ export function getAddress (address: Address) {
     console.warn(`could not checksum address ${address}, using lowercase address`, e)
     return lowerCaseAddress
   }
+}
+
+export function computePreImage(rawTx: UnsignedTransaction): string {
+  const serialized = serialize(rawTx)
+  return  keccak256(serialized)
 }
