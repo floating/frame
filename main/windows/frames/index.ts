@@ -195,8 +195,6 @@ export default class FrameManager {
       const { x, y } = frameInstance.getBounds()
       const frameScreen = screen.getDisplayNearestPoint({ x, y })
       const currentScreen = screen.getDisplayNearestPoint(screen.getCursorScreenPoint())
-      frameInstance.setVisibleOnAllWorkspaces(true)
-      frameInstance.setVisibleOnAllWorkspaces(false)
       if (currentScreen.id !== frameScreen.id) frameInstances.reposition(frameInstance)
       frameInstance.show()
       frameInstance.focus()

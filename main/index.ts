@@ -311,18 +311,20 @@ ipcMain.on('unsetCurrentView', async (e, ens) => {
 })
 
 ipcMain.on('*:addFrame', (e, id) => {
-  const existingFrame = store('main.frames', id)
-
-  if (existingFrame) {
-    windows.refocusFrame(id)
-  } else {
-    store.addFrame({
-      id,
-      currentView: '',
-      views: {}
-    })
-    dapps.open(id, 'send.frame.eth')
-  }
+  setTimeout(() => {
+    const existingFrame = store('main.frames', id)
+  
+    if (existingFrame) {
+      windows.refocusFrame(id)
+    } else {
+      store.addFrame({
+        id,
+        currentView: '',
+        views: {}
+      })
+      dapps.open(id, 'send.frame.eth')
+    }
+  }, 100)
 })
 
 app.on('ready', () => {
