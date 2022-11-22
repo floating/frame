@@ -11,20 +11,20 @@
     "setup": "npm install --ignore-scripts && npm run install:scripts",
     "install:scripts": "allow-scripts",
     "start": "npm run launch",
-    "bundle": "npm run bundle:bridge && npm run bundle:tray && npm run bundle:dash  && npm run bundle:dapp && npm run bundle:dapp:inject",
-    "bundle:bridge": "parcel build resources/bridge/index.js --public-url . -d bundle -o bridge.js --target electron",
-    "bundle:tray": "parcel build app/tray.html --public-url . -d bundle --target browser",
-    "bundle:flow": "parcel build flow/flow.html --public-url . -d bundle --target browser",
-    "bundle:dash": "parcel build dash/dash.html --public-url . -d bundle --target browser",
-    "bundle:dapp": "parcel build dapp/dapp.html --public-url . -d bundle --target browser",
-    "bundle:dapp:inject": "parcel build main/dapps/server/inject/index.js --public-url . -d bundle -o inject.js --target browser",
+    "bundle": "npm run bundle:bridge && npm run bundle:tray && npm run bundle:dash && npm run bundle:dapp && npm run bundle:dapp:inject",
+    "bundle:bridge": "parcel build resources/bridge/index.js --target bridge --public-url .",
+    "bundle:tray": "parcel build app/tray.html --target tray --public-url .",
+    "bundle:flow": "parcel build flow/flow.html --target flow --public-url .",
+    "bundle:dash": "parcel build dash/dash.html --target dash --public-url .",
+    "bundle:dapp": "parcel build dapp/dapp.html --target dapp --public-url .",
+    "bundle:dapp:inject": "parcel build main/dapps/server/inject/index.js --target inject --public-url .",
     "watch": "npm run watch:compile & npm run watch:tray & npm run watch:dash & npm run watch:dapp & npm run watch:bridge & npm run watch:dapp:inject",
-    "watch:bridge": "parcel watch resources/bridge/index.js --public-url . -d bundle -o bridge.js --target electron --no-hmr",
-    "watch:tray": "parcel watch app/tray.html --public-url . -d bundle --target browser --no-hmr",
-    "watch:flow": "parcel watch flow/flow.html --public-url . -d bundle --target browser --no-hmr",
-    "watch:dash": "parcel watch dash/dash.html --public-url . -d bundle --target browser --no-hmr",
-    "watch:dapp": "parcel watch dapp/dapp.html --public-url . -d bundle --target browser --no-hmr",
-    "watch:dapp:inject": "parcel watch main/dapps/server/inject/index.js --public-url . -d bundle -o inject.js --target browser",
+    "watch:bridge": "parcel watch resources/bridge/index.js --target bridge --no-hmr",
+    "watch:tray": "parcel watch app/tray.html --target tray --public-url . --no-hmr",
+    "watch:flow": "parcel watch flow/flow.html --target flow --public-url . --no-hmr",
+    "watch:dash": "parcel watch dash/dash.html --target dash --public-url . --no-hmr",
+    "watch:dapp": "parcel watch dapp/dapp.html --target dapp --public-url . --no-hmr",
+    "watch:dapp:inject": "parcel watch main/dapps/server/inject/index.js --target inject --public-url .",
     "dev": "npm run compile && npm run bundle && npm run launch:dev",
     "inspect": "npm run bundle && npm run launch:inspect",
     "launch": "cross-env NODE_ENV=production electron ./compiled/main",
@@ -76,7 +76,6 @@
     "@sentry/electron": "4.1.2",
     "abi-codec": "0.0.9",
     "auto-launch": "5.0.5",
-    "babel-polyfill": "6.26.0",
     "bip39": "3.0.4",
     "cheerio": "1.0.0-rc.12",
     "conf": "10.2.0",
@@ -129,6 +128,10 @@
     "@ledgerhq/hw-transport-mocker": "6.27.7",
     "@nomiclabs/hardhat-ethers": "2.2.1",
     "@nomiclabs/hardhat-waffle": "2.0.3",
+    "@parcel/config-default": "2.8.0",
+    "@parcel/transformer-css": "2.8.0",
+    "@parcel/transformer-stylus": "2.8.0",
+    "@parcel/transformer-typescript-tsc": "2.8.0",
     "@sentry/types": "7.20.1",
     "@testing-library/dom": "8.19.0",
     "@testing-library/react": "13.4.0",
@@ -143,6 +146,7 @@
     "@types/uuid": "8.3.4",
     "@types/ws": "8.5.3",
     "babel-eslint": "10.1.0",
+    "assert": "2.0.0",
     "electron": "21.3.0",
     "electron-builder": "23.6.0",
     "electron-notarize": "1.2.1",
@@ -156,11 +160,14 @@
     "node-abi": "3.28.0",
     "node-gyp": "9.3.0",
     "node-watch": "0.7.3",
-    "parcel-bundler": "1.12.5",
+    "parcel": "2.8.0",
     "prebuild-install": "7.1.1",
+    "punycode": "1.4.1",
+    "querystring-es3": "0.2.1",
     "rimraf": "3.0.2",
     "shx": "0.3.4",
     "standardx": "7.0.0",
+    "stream-browserify": "3.0.0",
     "stylus": "0.59.0",
     "ts-jest": "29.0.3",
     "typescript": "4.9.3"
@@ -171,11 +178,34 @@
       "jest"
     ]
   },
-  "eslintConfig": {
-    "rules": {
-      "multiline-ternary": 0,
-      "react/no-direct-mutation-state": 0,
-      "react/no-find-dom-node": 0
+  "engines": {
+    "electron": "20"
+  },
+  "bridge": "./bundle/bridge.js",
+  "inject": "./bundle/inject.js",
+  "tray": "./bundle/tray.html",
+  "dash": "./bundle/dash.html",
+  "dapp": "./bundle/dapp.html",
+  "targets": {
+    "main": false,
+    "bridge": {
+      "context": "electron-renderer",
+      "isLibrary": true
+    },
+    "dash": {
+      "context": "browser"
+    },
+    "dapp": {
+      "context": "browser"
+    },
+    "inject": {
+      "context": "browser"
+    },
+    "tray": {
+      "context": "browser"
+    },
+    "default": {
+      "distDir": "./bundle"
     }
   },
   "browserslist": [
@@ -195,8 +225,6 @@
       "@ledgerhq/hw-transport-node-hid-noevents>node-hid": false,
       "@ledgerhq/hw-transport-node-hid-singleton>node-hid": false,
       "@ledgerhq/hw-transport-node-hid-singleton>usb": false,
-      "babel-polyfill>babel-runtime>core-js": true,
-      "babel-polyfill>core-js": true,
       "electron": true,
       "ethereum-waffle>@ethereum-waffle/provider>ganache-core>ethereumjs-util>ethereum-cryptography>secp256k1": false,
       "ethereum-waffle>@ethereum-waffle/provider>ganache-core>ethereumjs-vm>core-js-pure": false,
@@ -212,10 +240,14 @@
       "hardhat>keccak": true,
       "hdkey>secp256k1": true,
       "node-hid": false,
-      "parcel-bundler": true,
-      "parcel-bundler>@parcel/watcher>chokidar>fsevents": false,
-      "parcel-bundler>core-js": false,
-      "parcel-bundler>deasync": true,
+      "parcel>@parcel/core>@parcel/cache>@parcel/fs>@parcel/watcher": false,
+      "parcel>@parcel/core>@parcel/cache>lmdb": false,
+      "parcel>@parcel/core>@parcel/fs>@parcel/watcher": false,
+      "parcel>@parcel/core>msgpackr>msgpackr-extract": false,
+      "parcel>@parcel/fs>@parcel/types>@parcel/fs>@parcel/watcher": false,
+      "parcel>@parcel/fs>@parcel/watcher": false,
+      "parcel>@parcel/package-manager>@parcel/fs>@parcel/watcher": false,
+      "react-restore>babel-core>babel-runtime>core-js": true,
       "react-restore>babel-core>babel-register>core-js": true,
       "trezor-connect>@trezor/transport>protobufjs": false,
       "trezor-connect>@trezor/utxo-lib>blake-hash": false,
