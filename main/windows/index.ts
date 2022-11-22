@@ -394,7 +394,7 @@ app.on('ready', () => {
 })
 
 if (isDev) {
-    app.on('ready', () => {
+  app.on('ready', () => {
     globalShortcut.register('CommandOrControl+R', () => {
       Object.keys(windows).forEach(win => {
         windows[win].reload()
@@ -405,8 +405,8 @@ if (isDev) {
   })
   if (process.env.BUNDLE_LOCATION) {
     const watch = require('node-watch')
-    watch(path.resolve(process.env.BUNDLE_LOCATION), { recursive: true }, (_evt: Event, name: string) => {
-    if (name.indexOf('css') > -1) {
+    watch(path.resolve(process.env.BUNDLE_LOCATION), { recursive: true }, (eventName: string, name: string) => {
+      if (eventName === 'update' && name.endsWith('.css')) {
         Object.keys(windows).forEach(win => {
           windows[win].webContents.send('main:reload:style', name)
         })

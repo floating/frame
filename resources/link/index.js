@@ -43,27 +43,32 @@ window.addEventListener('message', e => {
     } else if (data.method === 'event') {
       if (!data.channel) return console.log('link.on event had no channel')
       link.emit(data.channel, ...args)
-    } else if (data.method === 'reload') {
-      if (data.type === 'css') {
-        document.querySelectorAll('link').forEach(sheet => {
-          if (sheet.visited !== true && sheet.href.indexOf(data.target) > -1) {
-            if (sheet.isLoaded === false || !sheet.href || !(sheet.href.indexOf('.css') > -1)) return
-            sheet.visited = true
-            const clone = sheet.cloneNode()
-            clone.isLoaded = false
-            clone.addEventListener('load', () => {
-              clone.isLoaded = true
-              sheet.remove()
-            })
-            clone.addEventListener('error', () => {
-              clone.isLoaded = true
-              sheet.remove()
-            })
-            clone.href = sheet.href
-            sheet.parentNode.appendChild(clone)
-          }
-        })
+    } else if (data.method === 'reload' && data.type === 'css') {
+      const correctTargetForWindow = new RegExp(`${window.document.title.toLowerCase()}\.[^\.]+\.css$`)
+      if (!correctTargetForWindow.test(data.target)) {
+        return
       }
+
+      const sheets = document.querySelectorAll('link')
+      const sheet = sheets[1]
+
+      if (sheet.isLoaded === false || !sheet.href || !sheet.href.endsWith('.css')) {
+        return
+      }
+      
+      sheet.visited = true
+      const clone = sheet.cloneNode()
+      clone.isLoaded = false
+      clone.addEventListener('load', () => {
+        clone.isLoaded = true
+        sheet.remove()
+      })
+      clone.addEventListener('error', () => {
+        clone.isLoaded = true
+        sheet.remove()
+      })
+      clone.href = data.target
+      sheet.parentNode.appendChild(clone)
     }
   }
 }, false)
