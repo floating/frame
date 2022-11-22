@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/electron'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import { createRoot } from 'react-dom/client'
 import Restore from 'react-restore'
 
 import App from './App'
@@ -36,7 +36,8 @@ link.rpc('getState', (err, state) => {
     }
   })
   const Frame = Restore.connect(App, store)
-  ReactDOM.render(<Frame />, document.getElementById('frame'))
+  const root = createRoot(document.getElementById('frame'));
+  root.render(<Frame />)
 })
 // document.addEventListener('mouseover', e => link.send('tray:focus'))
 document.addEventListener('mouseout', e => { if (e.clientX < 0) link.send('tray:mouseout') })
