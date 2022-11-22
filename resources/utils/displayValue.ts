@@ -8,7 +8,7 @@ const displayUnitMapping = {
     unitDisplay: 'M'
   },
   billion: {
-    lowerBound: BigNumber(100000000),
+    lowerBound: BigNumber(1000000000),
     upperBound: BigNumber(1000000000000),
     unitDisplay: 'B'
   },

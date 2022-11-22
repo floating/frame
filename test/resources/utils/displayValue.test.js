@@ -77,46 +77,7 @@ describe('fiat currency', () => {
   })
 
   describe('shorthand large values', () => {
-    it('should return a value of thousands to 3dp', () => {
-      const value = displayValueData(356253e17, { currencyRate: { price: BigNumber(1) }})
-      expect(value.fiat()).toStrictEqual({
-        approximationSymbol: '',
-        displayUnit: {
-          fullName: 'thousand',
-          shortName: 'K',
-        },
-        displayValue: '35.625',
-        value: BigNumber(35625.3)
-      })
-    })
-
-    it('should round down a value of thousands to 3dp', () => {
-      const value = displayValueData(356259e17, { currencyRate: { price: BigNumber(1) }})
-      expect(value.fiat()).toStrictEqual({
-        approximationSymbol: '',
-        displayUnit: {
-          fullName: 'thousand',
-          shortName: 'K',
-        },
-        displayValue: '35.625',
-        value: BigNumber(35625.9)
-      })
-    })
-
-    it('should return an exact value of thousands', () => {
-      const value = displayValueData(35e21, { currencyRate: { price: BigNumber(1) }})
-      expect(value.fiat()).toStrictEqual({
-        approximationSymbol: '',
-        displayUnit: {
-          fullName: 'thousand',
-          shortName: 'K',
-        },
-        displayValue: '35',
-        value: BigNumber(35000)
-      })
-    })
-
-    it('should return a value of millions to 3dp', () => {
+    it('should return a value of millions to 2dp', () => {
       const value = displayValueData(356253e20, { currencyRate: { price: BigNumber(1) }})
       expect(value.fiat()).toStrictEqual({
         approximationSymbol: '',
@@ -124,12 +85,12 @@ describe('fiat currency', () => {
           fullName: 'million',
           shortName: 'M',
         },
-        displayValue: '35.625',
+        displayValue: '35.62',
         value: BigNumber(35625300)
       })
     })
 
-    it('should round down a value of millions to 3dp', () => {
+    it('should round down a value of millions to 2dp', () => {
       const value = displayValueData(356259e20, { currencyRate: { price: BigNumber(1) }})
       expect(value.fiat()).toStrictEqual({
         approximationSymbol: '',
@@ -137,7 +98,7 @@ describe('fiat currency', () => {
           fullName: 'million',
           shortName: 'M',
         },
-        displayValue: '35.625',
+        displayValue: '35.62',
         value: BigNumber(35625900)
       })
     })
@@ -155,28 +116,28 @@ describe('fiat currency', () => {
       })
     })
 
-    it('should return a value of billions to 3dp', () => {
-      const value = displayValueData(356253e23, { currencyRate: { price: BigNumber(1) }})
+    it('should return a value of billions to 2dp', () => {
+      const value = displayValueData(35.6253e27, { currencyRate: { price: BigNumber(1) }})
       expect(value.fiat()).toStrictEqual({
         approximationSymbol: '',
         displayUnit: {
           fullName: 'billion',
           shortName: 'B',
         },
-        displayValue: '35.625',
+        displayValue: '35.62',
         value: BigNumber(35625300000)
       })
     })
 
-    it('should round down a value of billions to 3dp', () => {
-      const value = displayValueData(356259e23, { currencyRate: { price: BigNumber(1) }})
+    it('should round down a value of billions to 2dp', () => {
+      const value = displayValueData(35.6259e27, { currencyRate: { price: BigNumber(1) }})
       expect(value.fiat()).toStrictEqual({
         approximationSymbol: '',
         displayUnit: {
           fullName: 'billion',
           shortName: 'B',
         },
-        displayValue: '35.625',
+        displayValue: '35.62',
         value: BigNumber(35625900000)
       })
     })
@@ -194,28 +155,28 @@ describe('fiat currency', () => {
       })
     })
 
-    it('should return a value of trillions to 3dp', () => {
-      const value = displayValueData(356253e26, { currencyRate: { price: BigNumber(1) }})
+    it('should return a value of trillions to 2dp', () => {
+      const value = displayValueData(35.6253e30, { currencyRate: { price: BigNumber(1) }})
       expect(value.fiat()).toStrictEqual({
         approximationSymbol: '',
         displayUnit: {
           fullName: 'trillion',
           shortName: 'T',
         },
-        displayValue: '35.625',
+        displayValue: '35.62',
         value: BigNumber(35625300000000)
       })
     })
 
-    it('should round down a value of trillions to 3dp', () => {
-      const value = displayValueData(356259e26, { currencyRate: { price: BigNumber(1) }})
+    it('should round down a value of trillions to 2dp', () => {
+      const value = displayValueData(35.6259e30, { currencyRate: { price: BigNumber(1) }})
       expect(value.fiat()).toStrictEqual({
         approximationSymbol: '',
         displayUnit: {
           fullName: 'trillion',
           shortName: 'T',
         },
-        displayValue: '35.625',
+        displayValue: '35.62',
         value: BigNumber(35625900000000)
       })
     })
@@ -233,28 +194,28 @@ describe('fiat currency', () => {
       })
     })
 
-    it('should return a value of quadrillions to 3dp', () => {
-      const value = displayValueData(356253e29, { currencyRate: { price: BigNumber(1) }})
+    it('should return a value of quadrillions to 2dp', () => {
+      const value = displayValueData(35.6253e33, { currencyRate: { price: BigNumber(1) }})
       expect(value.fiat()).toStrictEqual({
         approximationSymbol: '',
         displayUnit: {
           fullName: 'quadrillion',
           shortName: 'Q',
         },
-        displayValue: '35.625',
+        displayValue: '35.62',
         value: BigNumber(35625300000000000)
       })
     })
 
-    it('should round down a value of quadrillions to 3dp', () => {
-      const value = displayValueData(356259e29, { currencyRate: { price: BigNumber(1) }})
+    it('should round down a value of quadrillions to 2dp', () => {
+      const value = displayValueData(35.6259e33, { currencyRate: { price: BigNumber(1) }})
       expect(value.fiat()).toStrictEqual({
         approximationSymbol: '',
         displayUnit: {
           fullName: 'quadrillion',
           shortName: 'Q',
         },
-        displayValue: '35.625',
+        displayValue: '35.62',
         value: BigNumber(35625900000000000)
       })
     })
@@ -392,67 +353,28 @@ describe('ether currency', () => {
   })
 
   describe('shorthand large values', () => {
-    it('should return a value of thousands to 3dp', () => {
-      const value = displayValueData(356253e17)
-      expect(value.ether()).toStrictEqual({
-        approximationSymbol: '',
-        displayUnit: {
-          fullName: 'thousand',
-          shortName: 'K',
-        },
-        displayValue: '35.625',
-        value: BigNumber(35625.3)
-      })
-    })
-
-    it('should round down a value of thousands to 3dp', () => {
-      const value = displayValueData(356259e17)
-      expect(value.ether()).toStrictEqual({
-        approximationSymbol: '',
-        displayUnit: {
-          fullName: 'thousand',
-          shortName: 'K',
-        },
-        displayValue: '35.625',
-        value: BigNumber(35625.9)
-      })
-    })
-
-    it('should return an exact value of thousands', () => {
-      const value = displayValueData(35e21)
-      expect(value.ether()).toStrictEqual({
-        approximationSymbol: '',
-        displayUnit: {
-          fullName: 'thousand',
-          shortName: 'K',
-        },
-        displayValue: '35',
-        value: BigNumber(35000)
-      })
-    })
-
-    it('should return a value of millions to 3dp', () => {
-      const value = displayValueData(356253e20)
+    it('should return a value of millions to 2dp', () => {
+      const value = displayValueData(35.6253e24)
       expect(value.ether()).toStrictEqual({
         approximationSymbol: '',
         displayUnit: {
           fullName: 'million',
           shortName: 'M',
         },
-        displayValue: '35.625',
+        displayValue: '35.62',
         value: BigNumber(35625300)
       })
     })
 
-    it('should round down a value of millions to 3dp', () => {
-      const value = displayValueData(356259e20)
+    it('should round down a value of millions to 2dp', () => {
+      const value = displayValueData(35.6259e24)
       expect(value.ether()).toStrictEqual({
         approximationSymbol: '',
         displayUnit: {
           fullName: 'million',
           shortName: 'M',
         },
-        displayValue: '35.625',
+        displayValue: '35.62',
         value: BigNumber(35625900)
       })
     })
@@ -470,28 +392,28 @@ describe('ether currency', () => {
       })
     })
 
-    it('should return a value of billions to 3dp', () => {
-      const value = displayValueData(356253e23)
+    it('should return a value of billions to 2dp', () => {
+      const value = displayValueData(35.6253e27)
       expect(value.ether()).toStrictEqual({
         approximationSymbol: '',
         displayUnit: {
           fullName: 'billion',
           shortName: 'B',
         },
-        displayValue: '35.625',
+        displayValue: '35.62',
         value: BigNumber(35625300000)
       })
     })
 
-    it('should round down a value of billions to 3dp', () => {
-      const value = displayValueData(356259e23)
+    it('should round down a value of billions to 2dp', () => {
+      const value = displayValueData(35.6259e27)
       expect(value.ether()).toStrictEqual({
         approximationSymbol: '',
         displayUnit: {
           fullName: 'billion',
           shortName: 'B',
         },
-        displayValue: '35.625',
+        displayValue: '35.62',
         value: BigNumber(35625900000)
       })
     })
@@ -509,28 +431,28 @@ describe('ether currency', () => {
       })
     })
 
-    it('should return a value of trillions to 3dp', () => {
-      const value = displayValueData(356253e26)
+    it('should return a value of trillions to 2dp', () => {
+      const value = displayValueData(35.6253e30)
       expect(value.ether()).toStrictEqual({
         approximationSymbol: '',
         displayUnit: {
           fullName: 'trillion',
           shortName: 'T',
         },
-        displayValue: '35.625',
+        displayValue: '35.62',
         value: BigNumber(35625300000000)
       })
     })
 
-    it('should round down a value of trillions to 3dp', () => {
-      const value = displayValueData(356259e26)
+    it('should round down a value of trillions to 2dp', () => {
+      const value = displayValueData(35.6259e30)
       expect(value.ether()).toStrictEqual({
         approximationSymbol: '',
         displayUnit: {
           fullName: 'trillion',
           shortName: 'T',
         },
-        displayValue: '35.625',
+        displayValue: '35.62',
         value: BigNumber(35625900000000)
       })
     })
@@ -548,28 +470,28 @@ describe('ether currency', () => {
       })
     })
 
-    it('should return a value of quadrillions to 3dp', () => {
-      const value = displayValueData(356253e29)
+    it('should return a value of quadrillions to 2dp', () => {
+      const value = displayValueData(35.6253e33)
       expect(value.ether()).toStrictEqual({
         approximationSymbol: '',
         displayUnit: {
           fullName: 'quadrillion',
           shortName: 'Q',
         },
-        displayValue: '35.625',
+        displayValue: '35.62',
         value: BigNumber(35625300000000000)
       })
     })
 
-    it('should round down a value of quadrillions to 3dp', () => {
-      const value = displayValueData(356259e29)
+    it('should round down a value of quadrillions to 2dp', () => {
+      const value = displayValueData(35.6259e33)
       expect(value.ether()).toStrictEqual({
         approximationSymbol: '',
         displayUnit: {
           fullName: 'quadrillion',
           shortName: 'Q',
         },
-        displayValue: '35.625',
+        displayValue: '35.62',
         value: BigNumber(35625900000000000)
       })
     })
