@@ -310,7 +310,7 @@ class Tray {
     }
     // windows.tray.setPosition(0, 0)
     windows.tray.setAlwaysOnTop(true)
-    windows.tray.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
+    windows.tray.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true, skipTransformProcessType: true })
     windows.tray.setResizable(false) // Keeps height consistent
     const area = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
     windows.tray.setMinimumSize(trayWidth, isDev && !fullheight ? devHeight : area.height)
@@ -327,7 +327,7 @@ class Tray {
     if (windows && windows.tray && windows.tray.focus && !glide) {
       windows.tray.focus()
     }
-    windows.tray.setVisibleOnAllWorkspaces(false, { visibleOnFullScreen: true })
+    windows.tray.setVisibleOnAllWorkspaces(false, { visibleOnFullScreen: true, skipTransformProcessType: true })
   }
 
   toggle () {
@@ -359,7 +359,7 @@ class Dash {
     }
     setTimeout(() => {
       windows.dash.setAlwaysOnTop(true)
-      windows.dash.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
+      windows.dash.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true, skipTransformProcessType: true })
       windows.dash.setResizable(false) // Keeps height consistent
       const area = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
       windows.dash.setSize(trayWidth, isDev && !fullheight ? devHeight : area.height)
@@ -367,7 +367,7 @@ class Dash {
       windows.dash.setPosition(x - trayWidth - 5, y)
       windows.dash.show()
       windows.dash.focus()
-      windows.dash.setVisibleOnAllWorkspaces(false, { visibleOnFullScreen: true })
+      windows.dash.setVisibleOnAllWorkspaces(false, { visibleOnFullScreen: true, skipTransformProcessType: true })
       if (isDev) {
         windows.dash.webContents.openDevTools()
       }
