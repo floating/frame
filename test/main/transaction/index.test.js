@@ -2,7 +2,10 @@ import { addHexPrefix, stripHexPrefix } from 'ethereumjs-util'
 import Common from '@ethereumjs/common'
 
 import { maxFee, londonToLegacy, signerCompatibility, populate, sign } from '../../../main/transaction'
-import { GasFeesSource } from '../../../resources/domain/transaction'
+import { convertToUnsignedTransaction, GasFeesSource } from '../../../resources/domain/transaction'
+import { serialize } from '@ethersproject/transactions'
+import { parseTransaction } from 'ethers/lib/utils'
+import { hexToInt } from '../../../resources/utils'
 
 describe('#signerCompatibility', () => {
   it('is always compatible with legacy transactions', () => {
@@ -434,15 +437,18 @@ describe('#sign', () => {
       type: '0x0',
       gasPrice: '0x737be7600'
     }
-
-    const { type, ...expectedFields } = rawTx
+    
     const signedTx = await sign(rawTx, jest.fn().mockResolvedValueOnce(signature))
+    const expectedSignedTx = '0xf89433850737be76008261a8946635f83421bf059cd8111f180f0727128685bae48806f05b59d3b20000a800000000000000000000006635f83421bf059cd8111f180f0726635f83421bf059cd8111f180f07200a0d693b532a80fed6392b428604171fb32fdbf953728a3a7ecc7d4062b1652c042a024e9c602ac800b983b035700a14b23f78a253ab762deab5dc27e3555a750b354'
+    expect(signedTx).toBe(expectedSignedTx)
 
-    expect(signedTx.toJSON()).toMatchObject({
-      ...expectedFields,
+    const parsedSignedTx = parseTransaction(signedTx)
+    const expectedParsedSignedTx = {
+      ...parseTransaction(expectedSignedTx),
       ...signature,
-      v: '0x0' // additional zeroes are stripped
-    })
+      v: hexToInt(signature.v)
+    }
+    expect(parsedSignedTx).toMatchObject(expectedParsedSignedTx)
   })
 
   it('generates a signed eip-1559 transaction', async () => {
@@ -453,14 +459,18 @@ describe('#sign', () => {
       maxPriorityFeePerGas: '0x3'
     }
 
-    const { type, ...expectedFields } = rawTx
     const signedTx = await sign(rawTx, jest.fn().mockResolvedValueOnce(signature))
+    const expectedSignedTx = '0x02f897803303850737be76008261a8946635f83421bf059cd8111f180f0727128685bae48806f05b59d3b20000a800000000000000000000006635f83421bf059cd8111f180f0726635f83421bf059cd8111f180f072c080a0d693b532a80fed6392b428604171fb32fdbf953728a3a7ecc7d4062b1652c042a024e9c602ac800b983b035700a14b23f78a253ab762deab5dc27e3555a750b354'
+    expect(signedTx).toBe(expectedSignedTx)
 
-    expect(signedTx.toJSON()).toMatchObject({
-      ...expectedFields,
+    const parsedSignedTx = parseTransaction(signedTx)
+
+    const expectedParsed = {
+      ...parseTransaction(expectedSignedTx),
       ...signature,
-      v: '0x0' // additional zeroes are stripped
-    })
+      v: hexToInt(signature.v)
+    }
+    expect(parsedSignedTx).toMatchObject(expectedParsed)
   })
 
   it('adds hex prefixes to the signature', async () => {
@@ -470,9 +480,13 @@ describe('#sign', () => {
       s: stripHexPrefix(signature.s)
     }))
     
-    expect(signedTx.toJSON()).toMatchObject({
+    const {r, s, v} = parseTransaction(signedTx)
+
+    expect({
+      r,s,v
+    }).toMatchObject({
       ...signature,
-      v: '0x0' // additional zeroes are stripped
+      v: 0 // additional zeroes are stripped
     })
   })
 })

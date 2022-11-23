@@ -5,10 +5,10 @@ import { hexToNumber } from 'web3-utils'
 import log from 'electron-log'
 import Signer from '../../Signer'
 import { sign, signerCompatibility, londonToLegacy } from '../../../transaction'
-import { TransactionData } from '../../../../resources/domain/transaction'
-import { TypedTransaction } from '@ethereumjs/tx'
+import { convertToUnsignedTransaction, TransactionData } from '../../../../resources/domain/transaction'
 import { Derivation, getDerivationPath } from '../../Signer/derive'
 import { TypedData } from 'eth-sig-util'
+import { serializeTransaction } from 'ethers/lib/utils'
 
 const ADDRESS_LIMIT = 10
 const HARDENED_OFFSET = 0x80000000
@@ -281,8 +281,8 @@ export default class Lattice extends Signer {
       const latticeTx = compatibility.compatible ? { ...rawTx } : londonToLegacy(rawTx)
 
       const signedTx = await sign(latticeTx, async tx => {
-        const unsignedTx = this.createTransaction(index, rawTx.type, latticeTx.chainId, tx)
-        const signingOptions = await this.createTransactionSigningOptions(tx, unsignedTx)
+        const unsignedTx = this.createTransaction(index, rawTx.type, latticeTx.chainId, latticeTx)
+        const signingOptions = await this.createTransactionSigningOptions(latticeTx, unsignedTx)
 
         const signedTx = await connection.sign(signingOptions)
         const sig = signedTx?.sig as Signature
@@ -294,7 +294,7 @@ export default class Lattice extends Signer {
         }
       })
 
-      cb(null, addHexPrefix(signedTx.serialize().toString('hex')))
+      cb(null, signedTx)
     } catch (err) {
       log.error('error signing transaction with Lattice', err)
       return cb(new Error(err as string))
@@ -337,8 +337,8 @@ export default class Lattice extends Signer {
     return addHexPrefix(signature)
   }
 
-  private createTransaction (index: number, txType: string, chainId: string, tx: TypedTransaction) {
-    const { value, to, data, ...txJson } = tx.toJSON()
+  private createTransaction (index: number, txType: string, chainId: string, tx: TransactionData) {
+    const {to, value, data, nonce: nonceHex, gasLimit: gasLimitHex} = tx
     const type = hexToNumber(txType)
 
     const unsignedTx: any = {
@@ -346,8 +346,8 @@ export default class Lattice extends Signer {
       value,
       data,
       chainId,
-      nonce: hexToNumber(txJson.nonce || ''),
-      gasLimit: hexToNumber(txJson.gasLimit || ''),
+      nonce: hexToNumber(nonceHex || ''),
+      gasLimit: hexToNumber(gasLimitHex || ''),
       useEIP155: true,
       signerPath: this.getPath(index)
     }
@@ -359,7 +359,7 @@ export default class Lattice extends Signer {
     const optionalFields = ['gasPrice', 'maxFeePerGas', 'maxPriorityFeePerGas']
 
     optionalFields.forEach(field => {
-      if (field in txJson) {
+      if (field in tx) {
         // @ts-ignore
         unsignedTx[field] = hexToNumber(txJson[field])
       }
@@ -368,18 +368,16 @@ export default class Lattice extends Signer {
     return unsignedTx
   }
 
-  private async createTransactionSigningOptions (tx: TypedTransaction, unsignedTx: any) {
+  private async createTransactionSigningOptions (tx: TransactionData, unsignedTx: any) {
     const fwVersion = (this.connection as Client).getFwVersion()
 
     if (fwVersion && (fwVersion.major > 0 || fwVersion.minor >= 15)) {
-      const payload = tx.type ?
-        tx.getMessageToSign(false) :
-        encode(tx.getMessageToSign(false))
+      const payload = serializeTransaction(convertToUnsignedTransaction(tx))
 
-      const to = tx.to?.toString() ?? undefined
+      const to = tx.to ?? undefined
 
       const callDataDecoder = to
-        ? await Utils.fetchCalldataDecoder(tx.data, to, unsignedTx.chainId)
+        ? await Utils.fetchCalldataDecoder(tx.data || '0x', to, unsignedTx.chainId)
         : undefined
 
       const data = {

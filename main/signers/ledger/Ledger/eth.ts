@@ -70,14 +70,11 @@ export default class LedgerEthereumApp {
 
   async signTransaction (path: string, ledgerTx: TransactionData) {
     const signedTx = await sign(ledgerTx, (tx: TransactionData) => {
-      // legacy transactions aren't RLP encoded before they're returned
+      const unsigned =  convertToUnsignedTransaction(tx)
       const message = serializeTransaction(
-        convertToUnsignedTransaction(tx)
+        unsigned
       )
-      const legacyMessage = message[0] !== tx.type
-      const rawTxHex = legacyMessage ? rlp.encode(message).toString('hex') : message
-
-      return this.eth.signTransaction(path, rawTxHex, null)
+      return this.eth.signTransaction(path, message.substring(2), null)
     })
 
     return addHexPrefix(signedTx)

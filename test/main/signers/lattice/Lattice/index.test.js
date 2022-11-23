@@ -2,6 +2,7 @@ import Lattice from '../../../../../main/signers/lattice/Lattice'
 import { Client } from 'gridplus-sdk'
 import log from 'electron-log'
 import { Derivation } from '../../../../../main/signers/Signer/derive'
+import { parseTransaction } from 'ethers/lib/utils'
 
 jest.mock('gridplus-sdk')
 
@@ -565,7 +566,11 @@ describe('#signTransaction', () => {
     lattice.signTransaction(4, txToSign, (err, res) => {
       try {
         expect(err).toBe(null)
-        expect(res).toBe('0xcf80808080808080833ea8cd8396f7a0')
+        expect(res).toBe('0xd1808080808080820135833ea8cd8396f7a0')
+        const parsed = parseTransaction(res)
+        expect(parsed.chainId).toBe(137)
+        expect(parsed.value.isZero()).toBe(true)
+        expect(parsed.data).toBe('0x')
         done()
       } catch (e) { done(e) }
     })

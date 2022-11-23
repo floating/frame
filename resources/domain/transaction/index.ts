@@ -1,4 +1,3 @@
-import { JsonTx } from '@ethereumjs/tx'
 import { getAddress as getChecksumAddress } from '@ethersproject/address'
 import { UnsignedTransaction } from 'ethers'
 import { keccak256 } from 'ethers/lib/utils'
@@ -9,6 +8,26 @@ export enum GasFeesSource {
   Dapp = 'Dapp',
   Frame = 'Frame'
 }
+
+type JsonAccessListItem = { address: string; storageKeys: string[] }
+
+interface JsonTx {
+  nonce?: string
+  gasPrice?: string
+  gasLimit?: string
+  to?: string
+  data?: string
+  v?: string
+  r?: string
+  s?: string
+  value?: string
+  chainId?: string
+  accessList?: JsonAccessListItem[]
+  type?: string
+  maxPriorityFeePerGas?: string
+  maxFeePerGas?: string
+}
+
 
 export interface TransactionData extends Omit<JsonTx, 'chainId' | 'type'> {
   warning?: string,
