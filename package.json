@@ -18,7 +18,7 @@
     "bundle:dash": "parcel build dash/dash.html --target dash --public-url .",
     "bundle:dapp": "parcel build dapp/dapp.html --target dapp --public-url .",
     "bundle:dapp:inject": "parcel build main/dapps/server/inject/index.js --target inject --public-url .",
-    "serve": "npm run bundle:bridge && npm run watch:compile & cross-env NODE_ENV=development HMR=true parcel serve resources/bridge/index.js app/tray.dev.html flow/flow.dev.html dash/dash.dev.html dapp/dapp.html main/dapps/server/inject/index.js",
+    "serve": "npm run bundle:bridge && npm run watch:compile & cross-env NODE_ENV=development HMR=true parcel serve resources/bridge/index.js app/tray.dev.html flow/flow.dev.html dash/dash.dev.html dapp/dapp.dev.html main/dapps/server/inject/index.js",
     "dev": "npm run compile && npm run bundle && npm run launch:dev",
     "inspect": "npm run bundle && npm run launch:inspect",
     "launch": "cross-env NODE_ENV=production electron ./compiled/main",
