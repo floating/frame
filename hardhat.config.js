@@ -1,5 +1,3 @@
-require("@nomiclabs/hardhat-waffle")
-
 const { ethers, utils } = require('ethers')
 const ethProvider = require('eth-provider')
 

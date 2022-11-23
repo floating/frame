@@ -1,7 +1,5 @@
 import React from 'react'
 import Restore from 'react-restore'
-import utils from 'web3-utils'
-import svg from '../../../../../../resources/svg'
 import link from '../../../../../../resources/link'
 
 const SimpleJSON = ({ json }) => {
@@ -53,10 +51,6 @@ class TransactionRequest extends React.Component {
 
   toggleDataView (id) {
     this.setState({ dataView: !this.state.dataView })
-  }
-
-  hexToDisplayValue (hex) {
-    return (Math.round(parseFloat(utils.fromWei(hex, 'ether')) * 1000000) / 1000000).toFixed(6)
   }
 
   render () {

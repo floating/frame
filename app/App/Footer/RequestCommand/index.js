@@ -1,6 +1,5 @@
 import React from 'react'
 import Restore from 'react-restore'
-import utils from 'web3-utils'
 import BigNumber from 'bignumber.js'
 
 import TxBar from './TxBar'
@@ -31,10 +30,6 @@ class RequestCommand extends React.Component {
 
   decline (req) {
     link.rpc('declineRequest', req, () => {}) // Move to link.send
-  }
-
-  hexToDisplayValue (hex) {
-    return (Math.round(parseFloat(utils.fromWei(hex, 'ether')) * 1000000) / 1000000).toFixed(6)
   }
 
   toDisplayUSD (bn) {
@@ -222,7 +217,6 @@ class RequestCommand extends React.Component {
     const isTestnet = this.store('main.networks', chain.type, chain.id, 'isTestnet')
     const {nativeCurrency, nativeCurrency:{symbol: currentSymbol = '?'}} = this.store('main.networksMeta', chain.type, chain.id)
     const nativeUSD = nativeCurrency && nativeCurrency.usd && !isTestnet ? nativeCurrency.usd.price : 0
-    // const value = this.hexToDisplayValue(req.data.value || '0x')
 
     const gasLimit = BigNumber(req.data.gasLimit, 16)
     const maxFeePerGas = BigNumber(usesBaseFee(req.data) ? req.data.maxFeePerGas : req.data.gasPrice, 16) 

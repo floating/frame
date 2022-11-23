@@ -1,5 +1,4 @@
 import provider from 'eth-provider'
-import { hexToNumber, numberToHex } from 'web3-utils'
 
 jest.mock('../../main/store/persist')
 
@@ -23,17 +22,17 @@ it('should be able to change the chain for a given origin', async () => {
     frame.request({ method: 'eth_chainId' })
   ])
 
-  const targetChain = chains.find(c => c.chainId !== hexToNumber(currentChainId))
+  const targetChain = chains.find(c => c.chainId !== parseInt(currentChainId))
 
   if (!targetChain) throw new Error('no available chains to switch to!')
 
   return new Promise((resolve, reject) => {
     frame.on('chainChanged', async updatedChainId => {
       try {
-        expect(updatedChainId).toBe(numberToHex(targetChain.chainId))
+        expect(parseInt(updatedChainId)).toBe(targetChain.chainId)
 
         const chainId = await frame.request({ method: 'eth_chainId' })
-        expect(chainId).toBe(numberToHex(targetChain.chainId))
+        expect(parseInt(chainId)).toBe(targetChain.chainId)
         resolve()
       } catch (e) { reject(e) }
     })

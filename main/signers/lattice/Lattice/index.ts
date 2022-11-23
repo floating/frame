@@ -1,7 +1,7 @@
 import { Client, Utils, Constants } from 'gridplus-sdk'
 import { encode } from 'rlp'
 import { padToEven, addHexPrefix } from 'ethereumjs-util'
-import { hexToNumber } from 'web3-utils'
+import { hexToInt } from '../../../../resources/utils'
 import log from 'electron-log'
 import Signer from '../../Signer'
 import { sign, signerCompatibility, londonToLegacy } from '../../../transaction'
@@ -339,15 +339,15 @@ export default class Lattice extends Signer {
 
   private createTransaction (index: number, txType: string, chainId: string, tx: TypedTransaction) {
     const { value, to, data, ...txJson } = tx.toJSON()
-    const type = hexToNumber(txType)
+    const type = hexToInt(txType)
 
     const unsignedTx: any = {
       to,
       value,
       data,
       chainId,
-      nonce: hexToNumber(txJson.nonce || ''),
-      gasLimit: hexToNumber(txJson.gasLimit || ''),
+      nonce: hexToInt(txJson.nonce || ''),
+      gasLimit: hexToInt(txJson.gasLimit || ''),
       useEIP155: true,
       signerPath: this.getPath(index)
     }
@@ -361,7 +361,7 @@ export default class Lattice extends Signer {
     optionalFields.forEach(field => {
       if (field in txJson) {
         // @ts-ignore
-        unsignedTx[field] = hexToNumber(txJson[field])
+        unsignedTx[field] = hexToInt(txJson[field])
       }
     })
 
