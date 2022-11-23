@@ -6,7 +6,8 @@ import store from '../../store'
 import webPreferences from '../webPreferences'
 import topRight from './topRight'
 
-const enableHMR = process.env.NODE_ENV === 'development' && process.env.HMR === 'true'
+const isDev = process.env.NODE_ENV === 'development'
+const enableHMR = isDev && process.env.HMR === 'true'
 
 export interface FrameInstance extends BrowserWindow {
   frameId?: string,
@@ -73,7 +74,9 @@ export default {
     //   setTimeout(() => relayerOverlay(windows[dappFrameId]), 10)
     // })
 
-    // frameInstance.webContents.openDevTools({ mode: 'detach' })
+    if (isDev) {
+      frameInstance.webContents.openDevTools({ mode: 'detach' })
+    }
 
     return frameInstance
   }
