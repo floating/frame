@@ -22,7 +22,11 @@ link.send = (...args) => {
 
 const safeOrigins = ['file://']
 
+<<<<<<< HEAD
 if (process.env.NODE_ENV === 'development' && process.env.HMR === 'true') {
+=======
+if (process.env.HMR) {
+>>>>>>> 57acab1b (first pass at parcel serve + HMR)
   safeOrigins.push('http://localhost:1234')
 }
 

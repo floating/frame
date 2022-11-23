@@ -13,7 +13,11 @@ Sentry.init({ dsn: 'https://7b09a85b26924609bef5882387e2c4dc@o1204372.ingest.sen
 document.addEventListener('dragover', e => e.preventDefault())
 document.addEventListener('drop', e => e.preventDefault())
 
+<<<<<<< HEAD
 if (process.env.NODE_ENV !== 'development' || process.env.HMR !== 'true') {
+=======
+if (!process.env.HMR) {
+>>>>>>> 57acab1b (first pass at parcel serve + HMR)
   window.eval = global.eval = () => { throw new Error(`This app does not support window.eval()`) } // eslint-disable-line
 }
 

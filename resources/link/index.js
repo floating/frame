@@ -3,7 +3,10 @@ import EventEmitter from 'events'
 
 const source = 'tray:link'
 
-const unwrap = v => v !== undefined || v !== null ? JSON.parse(v) : v
+const unwrap = v => {
+  // console.log(v)
+  return v !== undefined || v !== null ? JSON.parse(v) : v
+}
 const wrap = v => v !== undefined || v !== null ? JSON.stringify(v) : v
 
 const handlers = {}
@@ -14,6 +17,7 @@ link.rpc = (...args) => {
   if (typeof cb !== 'function') throw new Error('link.rpc requires a callback')
   const id = v4()
   handlers[id] = cb
+  console.log('sending message yo', wrap({ id, args, source, method: 'rpc' }))
   window.postMessage(wrap({ id, args, source, method: 'rpc' }), '*')
 }
 link.send = (...args) => {
@@ -28,7 +32,11 @@ link.invoke = (...args) => {
 }
 const safeOrigins = ['file://']
 
+<<<<<<< HEAD
 if (process.env.NODE_ENV === 'development' && process.env.HMR === 'true') {
+=======
+if (process.env.HMR) {
+>>>>>>> 57acab1b (first pass at parcel serve + HMR)
   safeOrigins.push('http://localhost:1234')
 }
 
@@ -37,6 +45,10 @@ window.addEventListener('message', e => {
   const data = unwrap(e.data)
   const args = data.args || []
   if (data.source !== source) {
+<<<<<<< HEAD
+=======
+    console.log('link received message', data)
+>>>>>>> 57acab1b (first pass at parcel serve + HMR)
     if (data.method === 'rpc') {
       if (!handlers[data.id]) return console.log('link.rpc response had no handler')
       handlers[data.id](...args)
