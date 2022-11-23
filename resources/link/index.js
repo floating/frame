@@ -41,7 +41,7 @@ if (process.env.NODE_ENV === 'development' && process.env.HMR === 'true') {
 }
 
 window.addEventListener('message', e => {
-  if (!safeOrigins.includes(e.origin)) return
+  if (!safeOrigins.includes(e.origin) || e.data.source?.includes('react-devtools')) return
   const data = unwrap(e.data)
   const args = data.args || []
   if (data.source !== source) {
