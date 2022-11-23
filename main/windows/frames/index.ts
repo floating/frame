@@ -192,14 +192,8 @@ export default class FrameManager {
   refocus (id: string) {
     const frameInstance = this.frameInstances[id]
     if (frameInstance) {
-      // Mac and Linux Only
       frameInstance.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true, skipTransformProcessType: true })
       frameInstance.setVisibleOnAllWorkspaces(false, { visibleOnFullScreen: true, skipTransformProcessType: true })
-      // Windows
-      const { x, y } = frameInstance.getBounds()
-      const frameScreen = screen.getDisplayNearestPoint({ x, y })
-      const currentScreen = screen.getDisplayNearestPoint(screen.getCursorScreenPoint())
-      if (currentScreen.id !== frameScreen.id) frameInstances.reposition(frameInstance)
       frameInstance.show()
       frameInstance.focus()
     }
