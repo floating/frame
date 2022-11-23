@@ -7,8 +7,8 @@ import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-insta
 // DO NOT MOVE - env var below is required for app init and must be set before all local imports 
 process.env.BUNDLE_LOCATION = process.env.BUNDLE_LOCATION || path.resolve(__dirname, './../..', 'bundle')
 
-const dev = process.env.NODE_ENV === 'development'
-if (dev && process.env.HMR) {
+const isDev = process.env.NODE_ENV === 'development'
+if (isDev && process.env.HMR) {
   protocol.registerSchemesAsPrivileged([
     { scheme: 'http', privileges: { standard: true, bypassCSP: true, allowServiceWorkers: true, supportFetchAPI: true, corsEnabled: true, stream: true } }
   ])
@@ -37,12 +37,16 @@ app.commandLine.appendSwitch('enable-native-gpu-memory-buffers', 'true')
 app.commandLine.appendSwitch('force-color-profile', 'srgb')
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 const isDev = process.env.NODE_ENV === 'development'
 
 log.transports.console.level = process.env.LOG_LEVEL || (isDev ? 'verbose' : 'info')
 =======
 log.transports.console.level = process.env.LOG_LEVEL || (dev ? 'verbose' : 'info')
 >>>>>>> a75226de (add devtools)
+=======
+log.transports.console.level = process.env.LOG_LEVEL || (isDev ? 'verbose' : 'info')
+>>>>>>> eec13b55 (Update index.ts)
 log.transports.file.level = ['development', 'test'].includes(process.env.NODE_ENV) ? false : 'verbose'
 
 const hasInstanceLock = app.requestSingleInstanceLock()
@@ -353,7 +357,7 @@ app.on('ready', () => {
   menu()
   windows.init()
   if (app.dock) app.dock.hide()
-  if (process.env.NODE_ENV === 'development') {
+  if (isDev) {
     (async () => {
       await installElectronDevToolExtensions()
     })()
