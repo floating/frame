@@ -22,7 +22,7 @@ link.send = (...args) => {
 
 const safeOrigins = ['file://']
 
-if (process.env.HMR) {
+if (process.env.NODE_ENV === 'development' && process.env.HMR === 'true') {
   safeOrigins.push('http://localhost:1234')
 }
 

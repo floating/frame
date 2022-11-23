@@ -3,10 +3,7 @@ import EventEmitter from 'events'
 
 const source = 'tray:link'
 
-const unwrap = v => {
-  // console.log(v)
-  return v !== undefined || v !== null ? JSON.parse(v) : v
-}
+const unwrap = v => v !== undefined || v !== null ? JSON.parse(v) : v
 const wrap = v => v !== undefined || v !== null ? JSON.stringify(v) : v
 
 const handlers = {}
@@ -17,7 +14,6 @@ link.rpc = (...args) => {
   if (typeof cb !== 'function') throw new Error('link.rpc requires a callback')
   const id = v4()
   handlers[id] = cb
-  console.log('sending message yo', wrap({ id, args, source, method: 'rpc' }))
   window.postMessage(wrap({ id, args, source, method: 'rpc' }), '*')
 }
 link.send = (...args) => {
@@ -32,7 +28,7 @@ link.invoke = (...args) => {
 }
 const safeOrigins = ['file://']
 
-if (process.env.HMR) {
+if (process.env.NODE_ENV === 'development' && process.env.HMR === 'true') {
   safeOrigins.push('http://localhost:1234')
 }
 
@@ -41,7 +37,6 @@ window.addEventListener('message', e => {
   const data = unwrap(e.data)
   const args = data.args || []
   if (data.source !== source) {
-    console.log('link received message', data)
     if (data.method === 'rpc') {
       if (!handlers[data.id]) return console.log('link.rpc response had no handler')
       handlers[data.id](...args)

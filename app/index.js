@@ -4,25 +4,19 @@ import { createRoot } from 'react-dom/client'
 import Restore from 'react-restore'
 
 import App from './App'
-
 import link from '../resources/link'
 import _store from './store'
 
 Sentry.init({ dsn: 'https://7b09a85b26924609bef5882387e2c4dc@o1204372.ingest.sentry.io/6331069' })
 
-// window.removeAllAccountsAndSigners = () => link.send('tray:removeAllAccountsAndSigners')
-
 document.addEventListener('dragover', e => e.preventDefault())
 document.addEventListener('drop', e => e.preventDefault())
 
-if (!process.env.HMR) {
+if (process.env.NODE_ENV !== 'development' || process.env.HMR !== 'true') {
   window.eval = global.eval = () => { throw new Error(`This app does not support window.eval()`) } // eslint-disable-line
 }
 
-console.log('app index wut', link.rpc)
-
 link.rpc('getState', (err, state) => {
-  console.log('got state', err, state)
   if (err) return console.error('Could not get initial state from main.')
   const store = _store(state)
   if (!store('main.mute.betaDisclosure')) store.notify('betaDisclosure')
@@ -42,7 +36,6 @@ link.rpc('getState', (err, state) => {
     }
   })
   const Frame = Restore.connect(App, store)
-  console.log('creating root', document.getElementById('frame'))
   const root = createRoot(document.getElementById('frame'));
   root.render(<Frame />)
 })

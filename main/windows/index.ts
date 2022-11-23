@@ -24,6 +24,7 @@ let dash: Dash
 let mouseTimeout: NodeJS.Timeout
 let glide = false
 
+const enableHMR = process.env.NODE_ENV === 'development' && process.env.HMR === 'true'
 const hideFrame = () => tray.hide()
 const showFrame = () => tray.show()
 
@@ -134,7 +135,7 @@ function initDashWindow () {
     }
   })
 
-  const dashUrl = process.env.HMR ? 'http://localhost:1234/dash/dash.html' : new URL(path.join(process.env.BUNDLE_LOCATION, 'dash.html'), 'file:')
+  const dashUrl = enableHMR ? 'http://localhost:1234/dash/dash.html' : new URL(path.join(process.env.BUNDLE_LOCATION, 'dash.html'), 'file:')
   windows.dash.loadURL(dashUrl.toString())
 }
 
@@ -157,7 +158,7 @@ function initTrayWindow () {
     }
   })
 
-  const trayUrl = process.env.HMR ? 'http://localhost:1234/app/tray.html' : new URL(path.join(process.env.BUNDLE_LOCATION, 'tray.html'), 'file:')
+  const trayUrl = enableHMR ? 'http://localhost:1234/app/tray.html' : new URL(path.join(process.env.BUNDLE_LOCATION, 'tray.html'), 'file:')
   windows.tray.loadURL(trayUrl.toString())
 
   windows.tray.on('closed', () => delete windows.tray)
