@@ -324,7 +324,7 @@ ipcMain.on('*:addFrame', (e, id) => {
       })
       dapps.open(id, 'send.frame.eth')
     }
-  }, 100)
+  }, 50)
 })
 
 app.on('ready', () => {
