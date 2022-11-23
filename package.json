@@ -162,7 +162,6 @@
     "node-hid": "2.1.2"
   },
   "alias": {
-    "assert": false,
     "path": false,
     "punycode": false,
     "querystring": false,
@@ -217,6 +216,7 @@
     "allowScripts": {
       "$root$": false,
       "@aragon/wrapper>radspec>date-fns": true,
+      "@aragon/wrapper>radspec>web3-eth>web3-core>web3-core-requestmanager>web3-providers-ws>websocket>es5-ext": false,
       "@aragon/wrapper>web3": true,
       "@aragon/wrapper>web3>web3-bzz": true,
       "@aragon/wrapper>web3>web3-core>web3-core-requestmanager>web3-providers-ws>websocket>es5-ext": true,
@@ -232,9 +232,11 @@
       "hardhat>@nomicfoundation/ethereumjs-blockchain>level>classic-level": false,
       "hardhat>keccak": true,
       "hdkey>secp256k1": true,
+      "nebula>ipfs-http-client>ipfs-core-utils>ipfs-unixfs>protobufjs": false,
       "node-hid": false,
       "parcel>@parcel/core>@parcel/cache>@parcel/fs>@parcel/watcher": false,
       "parcel>@parcel/core>@parcel/cache>lmdb": false,
+      "parcel>@parcel/core>@parcel/cache>lmdb>msgpackr>msgpackr-extract": false,
       "parcel>@parcel/core>@parcel/fs>@parcel/watcher": false,
       "parcel>@parcel/core>msgpackr>msgpackr-extract": false,
       "parcel>@parcel/fs>@parcel/types>@parcel/fs>@parcel/watcher": false,
