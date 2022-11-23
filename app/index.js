@@ -13,6 +13,7 @@ document.addEventListener('dragover', e => e.preventDefault())
 document.addEventListener('drop', e => e.preventDefault())
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 if (process.env.NODE_ENV !== 'development' || process.env.HMR !== 'true') {
   window.eval = global.eval = () => { throw new Error(`This app does not support window.eval()`) } // eslint-disable-line
 }
@@ -24,8 +25,13 @@ if (!process.env.HMR) {
 console.log('app index wut', link.rpc)
 >>>>>>> 57acab1b (first pass at parcel serve + HMR)
 
+=======
+if (process.env.NODE_ENV !== 'development' || process.env.HMR !== 'true') {
+  window.eval = global.eval = () => { throw new Error(`This app does not support window.eval()`) } // eslint-disable-line
+}
+
+>>>>>>> 9a4e8f89 (remove logs, add dev check)
 link.rpc('getState', (err, state) => {
-  console.log('got state', err, state)
   if (err) return console.error('Could not get initial state from main.')
   const store = _store(state)
   if (!store('main.mute.betaDisclosure')) store.notify('betaDisclosure')
@@ -45,7 +51,6 @@ link.rpc('getState', (err, state) => {
     }
   })
   const Frame = Restore.connect(App, store)
-  console.log('creating root', document.getElementById('frame'))
   const root = createRoot(document.getElementById('frame'));
   root.render(<Frame />)
 })

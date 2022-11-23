@@ -14,10 +14,14 @@ document.addEventListener('dragover', e => e.preventDefault())
 document.addEventListener('drop', e => e.preventDefault())
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 if (process.env.NODE_ENV !== 'development' || process.env.HMR !== 'true') {
 =======
 if (!process.env.HMR) {
 >>>>>>> 57acab1b (first pass at parcel serve + HMR)
+=======
+if (process.env.NODE_ENV !== 'development' || process.env.HMR !== 'true') {
+>>>>>>> 9a4e8f89 (remove logs, add dev check)
   window.eval = global.eval = () => { throw new Error(`This app does not support window.eval()`) } // eslint-disable-line
 }
 

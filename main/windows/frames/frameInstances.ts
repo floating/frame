@@ -6,8 +6,12 @@ import store from '../../store'
 import webPreferences from '../webPreferences'
 import topRight from './topRight'
 
+<<<<<<< HEAD
 const isDev = process.env.NODE_ENV === 'development'
 const enableHMR = isDev && process.env.HMR === 'true'
+=======
+const enableHMR = process.env.NODE_ENV === 'development' && process.env.HMR === 'true'
+>>>>>>> 9a4e8f89 (remove logs, add dev check)
 
 export interface FrameInstance extends BrowserWindow {
   frameId?: string,
@@ -33,9 +37,13 @@ export default {
   },
   create: (frame: Frame) => {  
 <<<<<<< HEAD
+<<<<<<< HEAD
     const preload = path.resolve(__dirname, (process.env.BUNDLE_LOCATION || ''), 'bridge.js')
 =======
     const preload = process.env.HMR ? 'http://localhost:1234/bridge.js' : path.resolve(__dirname, (process.env.BUNDLE_LOCATION || ''), 'bridge.js')
+=======
+    const preload = enableHMR ? 'http://localhost:1234/bridge.js' : path.resolve(__dirname, (process.env.BUNDLE_LOCATION || ''), 'bridge.js')
+>>>>>>> 9a4e8f89 (remove logs, add dev check)
   
 >>>>>>> 57acab1b (first pass at parcel serve + HMR)
     const frameInstance: FrameInstance = new BrowserWindow({
@@ -55,10 +63,14 @@ export default {
     })
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     frameInstance.loadURL(enableHMR ? 'http://localhost:1234/dapp/dapp.dev.html' : `file://${process.env.BUNDLE_LOCATION}/dapp.html`)
 =======
     frameInstance.loadURL(process.env.HMR ? 'http://localhost:1234/dapp/dapp.html' : `file://${process.env.BUNDLE_LOCATION}/dapp.html`)
 >>>>>>> 57acab1b (first pass at parcel serve + HMR)
+=======
+    frameInstance.loadURL(enableHMR ? 'http://localhost:1234/dapp/dapp.html' : `file://${process.env.BUNDLE_LOCATION}/dapp.html`)
+>>>>>>> 9a4e8f89 (remove logs, add dev check)
   
     frameInstance.on('ready-to-show', () => {
       frameInstance.show()

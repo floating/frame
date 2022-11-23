@@ -136,10 +136,14 @@ function initDashWindow () {
   })
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   const dashUrl = enableHMR ? 'http://localhost:1234/dash/dash.dev.html' : new URL(path.join(process.env.BUNDLE_LOCATION, 'dash.html'), 'file:')
 =======
   const dashUrl = process.env.HMR ? 'http://localhost:1234/dash/dash.html' : new URL(path.join(process.env.BUNDLE_LOCATION, 'dash.html'), 'file:')
 >>>>>>> 57acab1b (first pass at parcel serve + HMR)
+=======
+  const dashUrl = enableHMR ? 'http://localhost:1234/dash/dash.html' : new URL(path.join(process.env.BUNDLE_LOCATION, 'dash.html'), 'file:')
+>>>>>>> 9a4e8f89 (remove logs, add dev check)
   windows.dash.loadURL(dashUrl.toString())
 }
 
@@ -163,10 +167,14 @@ function initTrayWindow () {
   })
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   const trayUrl = enableHMR ? 'http://localhost:1234/app/tray.dev.html' : new URL(path.join(process.env.BUNDLE_LOCATION, 'tray.html'), 'file:')
 =======
   const trayUrl = process.env.HMR ? 'http://localhost:1234/app/tray.html' : new URL(path.join(process.env.BUNDLE_LOCATION, 'tray.html'), 'file:')
 >>>>>>> 57acab1b (first pass at parcel serve + HMR)
+=======
+  const trayUrl = enableHMR ? 'http://localhost:1234/app/tray.html' : new URL(path.join(process.env.BUNDLE_LOCATION, 'tray.html'), 'file:')
+>>>>>>> 9a4e8f89 (remove logs, add dev check)
   windows.tray.loadURL(trayUrl.toString())
 
   windows.tray.on('closed', () => delete windows.tray)
