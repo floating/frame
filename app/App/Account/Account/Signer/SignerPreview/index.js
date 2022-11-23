@@ -164,15 +164,15 @@ class Signer extends React.Component {
                 </div>
               </ClusterValue>
             </ClusterColumn>
-            <ClusterColumn width={'80px'}>
-              {!watchOnly && (            
+            {!watchOnly && (    
+              <ClusterColumn width={'80px'}>
                 <ClusterValue
                   onClick={() => this.verifyAddress(hardwareSigner)}
                 >
                   {svg.doubleCheck(20)}
                 </ClusterValue>
-              )}
-            </ClusterColumn>
+              </ClusterColumn>
+            )}
           </ClusterRow>
           {this.state.notifyText && (
             <ClusterRow>
