@@ -1,12 +1,12 @@
 import React from 'react'
 import Restore from 'react-restore'
-import svg from '../../../../../../../resources/svg'
-import link from '../../../../../../../resources/link'
 import BigNumber from 'bignumber.js'
 
+import svg from '../../../../../../../resources/svg'
+import link from '../../../../../../../resources/link'
 import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../../../resources/Components/Cluster'
 import { formatDisplayInteger, isUnlimited } from '../../../../../../../resources/utils/numbers'
-import {getAddress} from '../../../../../../../resources/utils'
+import { getAddress } from '../../../../../../../resources/utils'
 
 class TxSending extends React.Component {
   constructor (...args) {
@@ -20,7 +20,6 @@ class TxSending extends React.Component {
     this.setState({ copied: true })
     setTimeout(_ => this.setState({ copied: false }), 1000)
   }
-
   render () {
     const req = this.props.req
     const contract = req.data.to.toLowerCase()
