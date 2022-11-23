@@ -89,7 +89,9 @@ export function convertToUnsignedTransaction(tx: TransactionData): UnsignedTrans
     chainId: hexToInt(chainIdHex),
     type,
     nonce: hexToInt(nonceHex),
+    gasLimit
   }
+  
   if(type === 2){
     Object.assign(unsignedTx, {
       maxFeePerGas,
@@ -97,7 +99,6 @@ export function convertToUnsignedTransaction(tx: TransactionData): UnsignedTrans
     })
   } else {
     Object.assign(unsignedTx, {
-      gasLimit,
       gasPrice
     })
   }
