@@ -49,7 +49,7 @@ export default {
       webPreferences: { ...webPreferences, preload }
     })
 
-    frameInstance.loadURL(enableHMR ? 'http://localhost:1234/dapp/dapp.html' : `file://${process.env.BUNDLE_LOCATION}/dapp.html`)
+    frameInstance.loadURL(enableHMR ? 'http://localhost:1234/dapp/dapp.dev.html' : `file://${process.env.BUNDLE_LOCATION}/dapp.html`)
   
     frameInstance.on('ready-to-show', () => {
       frameInstance.show()

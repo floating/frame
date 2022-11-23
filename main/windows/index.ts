@@ -135,7 +135,7 @@ function initDashWindow () {
     }
   })
 
-  const dashUrl = enableHMR ? 'http://localhost:1234/dash/dash.html' : new URL(path.join(process.env.BUNDLE_LOCATION, 'dash.html'), 'file:')
+  const dashUrl = enableHMR ? 'http://localhost:1234/dash/dash.dev.html' : new URL(path.join(process.env.BUNDLE_LOCATION, 'dash.html'), 'file:')
   windows.dash.loadURL(dashUrl.toString())
 }
 
@@ -158,7 +158,7 @@ function initTrayWindow () {
     }
   })
 
-  const trayUrl = enableHMR ? 'http://localhost:1234/app/tray.html' : new URL(path.join(process.env.BUNDLE_LOCATION, 'tray.html'), 'file:')
+  const trayUrl = enableHMR ? 'http://localhost:1234/app/tray.dev.html' : new URL(path.join(process.env.BUNDLE_LOCATION, 'tray.html'), 'file:')
   windows.tray.loadURL(trayUrl.toString())
 
   windows.tray.on('closed', () => delete windows.tray)
