@@ -14,9 +14,15 @@ Sentry.init({ dsn: 'https://7b09a85b26924609bef5882387e2c4dc@o1204372.ingest.sen
 
 document.addEventListener('dragover', e => e.preventDefault())
 document.addEventListener('drop', e => e.preventDefault())
-window.eval = global.eval = () => { throw new Error(`This app does not support window.eval()`) } // eslint-disable-line
+
+if (!process.env.HMR) {
+  window.eval = global.eval = () => { throw new Error(`This app does not support window.eval()`) } // eslint-disable-line
+}
+
+console.log('app index wut', link.rpc)
 
 link.rpc('getState', (err, state) => {
+  console.log('got state', err, state)
   if (err) return console.error('Could not get initial state from main.')
   const store = _store(state)
   if (!store('main.mute.betaDisclosure')) store.notify('betaDisclosure')
@@ -36,6 +42,7 @@ link.rpc('getState', (err, state) => {
     }
   })
   const Frame = Restore.connect(App, store)
+  console.log('creating root', document.getElementById('frame'))
   const root = createRoot(document.getElementById('frame'));
   root.render(<Frame />)
 })

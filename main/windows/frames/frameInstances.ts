@@ -29,7 +29,7 @@ export default {
     place(frameInstance)
   },
   create: (frame: Frame) => {  
-    const preload = path.resolve(__dirname, (process.env.BUNDLE_LOCATION || ''), 'bridge.js')
+    const preload = process.env.HMR ? 'http://localhost:1234/bridge.js' : path.resolve(__dirname, (process.env.BUNDLE_LOCATION || ''), 'bridge.js')
   
     const frameInstance: FrameInstance = new BrowserWindow({
       x: 0,
@@ -47,7 +47,7 @@ export default {
       webPreferences: { ...webPrefrences, preload }
     })
 
-    frameInstance.loadURL(`file://${process.env.BUNDLE_LOCATION}/dapp.html`)
+    frameInstance.loadURL(process.env.HMR ? 'http://localhost:1234/dapp/dapp.html' : `file://${process.env.BUNDLE_LOCATION}/dapp.html`)
   
     frameInstance.on('ready-to-show', () => {
       frameInstance.show()
