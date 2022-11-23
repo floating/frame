@@ -191,7 +191,10 @@
     "main": false,
     "bridge": {
       "context": "electron-renderer",
-      "isLibrary": true
+      "isLibrary": true,
+      "sourceMap": {
+        "inline": true
+      }
     },
     "dash": {
       "context": "browser"
