@@ -2,7 +2,7 @@ import React from 'react'
 import Restore from 'react-restore'
 import link from '../../../../../../../resources/link'
 import svg from '../../../../../../../resources/svg'
-import utils from 'web3-utils'
+import {formatEther} from '@ethersproject/units'
 import { getAddress } from '@ethersproject/address'
 
 import { Cluster, ClusterRow, ClusterValue } from '../../../../../../../resources/Components/Cluster'
@@ -20,7 +20,7 @@ class TxSending extends React.Component {
     setTimeout(_ => this.setState({ copied: false }), 1000)
   }
   hexToDisplayValue (hex) {
-    return (Math.round(parseFloat(utils.fromWei(hex, 'ether')) * 1000000) / 1000000).toFixed(6)
+    return (Math.round(parseFloat(formatEther(hex)) * 1000000) / 1000000).toFixed(6)
   }
   render () {
     const req = this.props.req

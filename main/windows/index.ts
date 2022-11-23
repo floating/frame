@@ -2,7 +2,7 @@ import { app, BrowserWindow, ipcMain, screen, Tray as ElectronTray, Menu, global
 import path from 'path'
 import log from 'electron-log'
 import EventEmitter from 'events'
-import { hexToNumber } from 'web3-utils'
+import { hexToInt } from '../../resources/utils'
 
 import store from '../store'
 import FrameManager from './frames'
@@ -240,7 +240,7 @@ class Tray {
       if (store('platform') === 'darwin' && store('main.menubarGasPrice')) {
         const gasPrice = store('main.networksMeta.ethereum', 1, 'gas.price.levels.fast')
         if (!gasPrice) return
-        const gasDisplay = Math.round(hexToNumber(gasPrice) / 1000000000).toString()
+        const gasDisplay = Math.round(hexToInt(gasPrice) / 1000000000).toString()
         title = gasDisplay // ɢ 🄶 Ⓖ ᴳᵂᴱᴵ
       }
       this.electronTray.setTitle(title)
