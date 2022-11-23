@@ -26,12 +26,17 @@ link.invoke = (...args) => {
     window.postMessage(wrap({ id, args, source, method: 'invoke' }), '*')
   })
 }
+const safeOrigins = ['file://']
+
+if (process.env.NODE_ENV === 'development' && process.env.HMR === 'true') {
+  safeOrigins.push('http://localhost:1234')
+}
 
 window.addEventListener('message', e => {
-  if (e.origin !== 'file://') return
+  if (!safeOrigins.includes(e.origin)) return
   const data = unwrap(e.data)
   const args = data.args || []
-  if (e.origin === 'file://' && data.source !== source) {
+  if (data.source !== source) {
     if (data.method === 'rpc') {
       if (!handlers[data.id]) return console.log('link.rpc response had no handler')
       handlers[data.id](...args)
@@ -43,32 +48,6 @@ window.addEventListener('message', e => {
     } else if (data.method === 'event') {
       if (!data.channel) return console.log('link.on event had no channel')
       link.emit(data.channel, ...args)
-    } else if (data.method === 'reload' && data.type === 'css') {
-      const correctTargetForWindow = new RegExp(`${window.document.title.toLowerCase()}\.[^\.]+\.css$`)
-      if (!correctTargetForWindow.test(data.target)) {
-        return
-      }
-
-      const sheets = document.querySelectorAll('link')
-      const sheet = sheets[1]
-
-      if (sheet.isLoaded === false || !sheet.href || !sheet.href.endsWith('.css')) {
-        return
-      }
-      
-      sheet.visited = true
-      const clone = sheet.cloneNode()
-      clone.isLoaded = false
-      clone.addEventListener('load', () => {
-        clone.isLoaded = true
-        sheet.remove()
-      })
-      clone.addEventListener('error', () => {
-        clone.isLoaded = true
-        sheet.remove()
-      })
-      clone.href = data.target
-      sheet.parentNode.appendChild(clone)
     }
   }
 }, false)

@@ -3,8 +3,10 @@ import path from 'path'
 
 import store from '../../store'
 
-import webPrefrences from '../webPreferences'
+import webPreferences from '../webPreferences'
 import topRight from './topRight'
+
+const enableHMR = process.env.NODE_ENV === 'development' && process.env.HMR === 'true'
 
 export interface FrameInstance extends BrowserWindow {
   frameId?: string,
@@ -29,7 +31,7 @@ export default {
     place(frameInstance)
   },
   create: (frame: Frame) => {  
-    const preload = path.resolve(__dirname, (process.env.BUNDLE_LOCATION || ''), 'bridge.js')
+    const preload = enableHMR ? 'http://localhost:1234/bridge.js' : path.resolve(__dirname, (process.env.BUNDLE_LOCATION || ''), 'bridge.js')
   
     const frameInstance: FrameInstance = new BrowserWindow({
       x: 0,
@@ -44,10 +46,10 @@ export default {
       trafficLightPosition: { x: 10, y: 9 },
       backgroundColor: store('main.colorwayPrimary', store('main.colorway'), 'background'),
       icon: path.join(__dirname, './AppIcon.png'),
-      webPreferences: { ...webPrefrences, preload }
+      webPreferences: { ...webPreferences, preload }
     })
 
-    frameInstance.loadURL(`file://${process.env.BUNDLE_LOCATION}/dapp.html`)
+    frameInstance.loadURL(enableHMR ? 'http://localhost:1234/dapp/dapp.dev.html' : `file://${process.env.BUNDLE_LOCATION}/dapp.html`)
   
     frameInstance.on('ready-to-show', () => {
       frameInstance.show()

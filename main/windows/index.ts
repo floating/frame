@@ -24,6 +24,7 @@ let dash: Dash
 let mouseTimeout: NodeJS.Timeout
 let glide = false
 
+const enableHMR = process.env.NODE_ENV === 'development' && process.env.HMR === 'true'
 const hideFrame = () => tray.hide()
 const showFrame = () => tray.show()
 
@@ -134,7 +135,7 @@ function initDashWindow () {
     }
   })
 
-  const dashUrl = new URL(path.join(process.env.BUNDLE_LOCATION, 'dash.html'), 'file:')
+  const dashUrl = enableHMR ? 'http://localhost:1234/dash/dash.dev.html' : new URL(path.join(process.env.BUNDLE_LOCATION, 'dash.html'), 'file:')
   windows.dash.loadURL(dashUrl.toString())
 }
 
@@ -157,7 +158,7 @@ function initTrayWindow () {
     }
   })
 
-  const trayUrl = new URL(path.join(process.env.BUNDLE_LOCATION, 'tray.html'), 'file:')
+  const trayUrl = enableHMR ? 'http://localhost:1234/app/tray.dev.html' : new URL(path.join(process.env.BUNDLE_LOCATION, 'tray.html'), 'file:')
   windows.tray.loadURL(trayUrl.toString())
 
   windows.tray.on('closed', () => delete windows.tray)
@@ -403,17 +404,6 @@ if (isDev) {
       frameManager.reloadFrames()
     })
   })
-  if (process.env.BUNDLE_LOCATION) {
-    const watch = require('node-watch')
-    watch(path.resolve(process.env.BUNDLE_LOCATION), { recursive: true }, (eventName: string, name: string) => {
-      if (eventName === 'update' && name.endsWith('.css')) {
-        Object.keys(windows).forEach(win => {
-          windows[win].webContents.send('main:reload:style', name)
-        })
-        frameManager.reloadFrames(name)
-      }
-    })
-  }
 }
 
 ipcMain.on('*:contextmenu', (e, x, y) => {

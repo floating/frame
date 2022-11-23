@@ -4,20 +4,21 @@
     <meta 
       http-equiv='Content-Security-Policy' 
       content="
-        default-src 'self'; 
+        default-src http://localhost:1234 'self' 'unsafe-inline' 'unsafe-eval'; 
         connect-src *; 
-        style-src 'self' 'unsafe-inline'; 
+        style-src http://localhost:1234 'self' 'unsafe-inline';
         frame-src https://connect.trezor.io; 
         object-src 'none';
-      " 
+        img-src *
+      "
     />
-    <title>Flow</title>
+    <title>Dash</title>
     <link rel='stylesheet' href='../resources/base.styl' type='text/css' />
     <link rel='stylesheet' href='./index.styl' type='text/css' />
   </head>
   <body>
     <div class='frameOverlay'></div>
-    <div id='flow'></div>
+    <div id='dash'></div>
     <script type='module' src='./index.js'></script>
   </body>
 </html>
