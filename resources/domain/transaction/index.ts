@@ -66,13 +66,43 @@ export function computePreImage(rawTx: UnsignedTransaction): string {
 
 export function convertToUnsignedTransaction(tx: TransactionData): UnsignedTransaction {
   
-  const {chainId, type, from, nonce, ...remaining} = tx
+  const {
+    to,
+    nonce: nonceHex = '0x00',
+    gasLimit,
+    gasPrice,
+    data = '0x',
+    value,
+    chainId: chainIdHex,
+    type: typeHex = '0x00',
+    accessList,
+    maxPriorityFeePerGas,
+    maxFeePerGas
+} = tx
+
+  const type = hexToInt(typeHex)
+
   const unsignedTx: UnsignedTransaction = {
-    ...remaining,
-    chainId: hexToInt(chainId),
-    type: hexToInt(type || "0x00"),
-    nonce: hexToInt(nonce || '0')
+    to,
+    data,
+    value,
+    chainId: hexToInt(chainIdHex),
+    type,
+    nonce: hexToInt(nonceHex),
+  }
+  if(type === 2){
+    Object.assign(unsignedTx, {
+      maxFeePerGas,
+      maxPriorityFeePerGas
+    })
+  } else {
+    Object.assign(unsignedTx, {
+      gasLimit,
+      gasPrice
+    })
   }
 
+  if(accessList && accessList.length) unsignedTx['accessList'] = accessList
+  
   return unsignedTx
 }

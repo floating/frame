@@ -468,7 +468,7 @@ export default class Ledger extends Signer {
   signTransaction (index: number, rawTx: TransactionData, cb: Callback<string>) {
     const compatibility = signerCompatibility(rawTx, this.summary())
     const ledgerTx = compatibility.compatible ? { ...rawTx } : londonToLegacy(rawTx)
-    
+
     this.enqueueRequests({
       type: 'signTransaction',
       execute: async () => {
