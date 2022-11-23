@@ -313,8 +313,10 @@ class Tray {
     windows.tray.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
     windows.tray.setResizable(false) // Keeps height consistent
     const area = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
-    windows.tray.setMinimumSize(trayWidth, isDev && !fullheight ? devHeight : area.height)
-    windows.tray.setSize(trayWidth, isDev && !fullheight ? devHeight : area.height)
+    const height = isDev && !fullheight ? devHeight : area.height
+    windows.tray.setMinimumSize(trayWidth, height)
+    windows.tray.setSize(trayWidth, height)
+    windows.tray.setMaximumSize(trayWidth, height)
     const pos = topRight(windows.tray)
     windows.tray.setPosition(pos.x, pos.y)
     if (!glide) {
@@ -362,7 +364,10 @@ class Dash {
       windows.dash.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
       windows.dash.setResizable(false) // Keeps height consistent
       const area = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
-      windows.dash.setSize(trayWidth, isDev && !fullheight ? devHeight : area.height)
+      const height = isDev && !fullheight ? devHeight : area.height
+      windows.dash.setMinimumSize(trayWidth, height)
+      windows.dash.setSize(trayWidth, height)
+      windows.dash.setMaximumSize(trayWidth, height)
       const {x, y} = topRight(windows.dash)
       windows.dash.setPosition(x - trayWidth - 5, y)
       windows.dash.show()
