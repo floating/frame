@@ -31,8 +31,7 @@ export default {
     place(frameInstance)
   },
   create: (frame: Frame) => {  
-    const preload = enableHMR ? 'http://localhost:1234/bridge.js' : path.resolve(__dirname, (process.env.BUNDLE_LOCATION || ''), 'bridge.js')
-  
+    const preload = path.resolve(__dirname, (process.env.BUNDLE_LOCATION || ''), 'bridge.js')
     const frameInstance: FrameInstance = new BrowserWindow({
       x: 0,
       y: 0,
