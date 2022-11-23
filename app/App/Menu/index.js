@@ -66,6 +66,7 @@ class Launcher extends React.Component {
         <div 
           className={'panelMenuItem panelMenuItemSend'}
           onClick={() => {
+            clearTimeout(this.clickTimer)
             this.clickTimer = setTimeout(() => {
               this.setState({ glitchOn: false })
               link.send('*:addFrame', 'dappLauncher')
