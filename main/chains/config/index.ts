@@ -1,12 +1,11 @@
-import { BN } from 'ethereumjs-util'
-import Common from '@ethereumjs/common'
+import {Common} from '@ethereumjs/common'
 
 function chainConfig (chain: number, hardfork: string) {
-  const chainId = new BN(chain)
+  const chainId = BigInt(chain)
 
   return Common.isSupportedChainId(chainId)
-    ? new Common({ chain: chainId.toNumber(), hardfork })
-    : Common.custom({ chainId: chainId.toNumber() }, { baseChain: 'mainnet', hardfork })
+    ? new Common({ chain: chainId, hardfork })
+    : Common.custom({ chainId }, { baseChain: 'mainnet', hardfork })
 }
 
 export default chainConfig

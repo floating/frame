@@ -1,4 +1,4 @@
-import { padToEven } from 'ethereumjs-util'
+import { padToEven } from '@ethereumjs/util'
 
 const light: ColorwayPalette = {
   accent1: { r: 0, g: 170, b: 120 },

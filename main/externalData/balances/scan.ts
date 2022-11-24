@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js'
 import { BigNumber as EthersBigNumber } from '@ethersproject/bignumber'
 import { Interface } from '@ethersproject/abi'
-import { addHexPrefix } from 'ethereumjs-util'
+import { addHexPrefix } from '@ethereumjs/util'
 import log from 'electron-log'
 
 import multicall, { Call, supportsChain as multicallSupportsChain } from '../../multicall'

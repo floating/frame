@@ -1,5 +1,5 @@
 import { Client, Utils, Constants } from 'gridplus-sdk'
-import { padToEven, addHexPrefix } from 'ethereumjs-util'
+import { padToEven, addHexPrefix } from '@ethereumjs/util'
 import { hexToInt } from '../../../../resources/utils'
 import log from 'electron-log'
 import Signer from '../../Signer'

@@ -9,7 +9,7 @@ import { Type as SignerType } from '../../../resources/domain/signer'
 
 import { validate as validateUUID } from 'uuid'
 import { utils } from 'ethers'
-import { addHexPrefix } from 'ethereumjs-util'
+import { addHexPrefix } from '@ethereumjs/util'
 import log from 'electron-log'
 
 const address = '0x22dd63c3619818fdbc262c78baee43cb61e9cccf'

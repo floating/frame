@@ -10,7 +10,7 @@ const {
   addHexPrefix,
   pubToAddress,
   ecrecover
-} = require('ethereumjs-util')
+} = require('@ethereumjs/util')
 const { SigningKey } = require('ethers/lib/utils')
 
 class HotSignerWorker {

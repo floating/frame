@@ -1,6 +1,6 @@
 import HDKey from 'hdkey'
 
-import { publicToAddress, toChecksumAddress } from 'ethereumjs-util'
+import { publicToAddress, toChecksumAddress } from '@ethereumjs/util'
 
 export enum Derivation {
   live = 'live', legacy = 'legacy', standard = 'standard', testnet = 'testnet'

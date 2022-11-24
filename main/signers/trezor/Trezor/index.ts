@@ -1,6 +1,6 @@
 import log from 'electron-log'
 import { hexToInt } from '../../../../resources/utils'
-import { padToEven, stripHexPrefix, addHexPrefix } from 'ethereumjs-util'
+import { padToEven, stripHexPrefix, addHexPrefix } from '@ethereumjs/util'
 import { TypedData, TypedDataUtils } from 'eth-sig-util'
 import type { Device as TrezorDevice } from 'trezor-connect'
 

@@ -8,7 +8,7 @@ import {
   pubToAddress,
   ecrecover,
   hashPersonalMessage,
-} from 'ethereumjs-util'
+} from '@ethereumjs/util'
 import log from 'electron-log'
 import BN from 'bignumber.js'
 import { v5 as uuidv5 } from 'uuid'
@@ -130,7 +130,7 @@ export function getSignedAddress (signed: string, message: string, cb: Callback<
   const r = toBuffer(signature.slice(0, 32))
   const s = toBuffer(signature.slice(32, 64))
   const hash = hashPersonalMessage(toBuffer(message))
-  const verifiedAddress = '0x' + pubToAddress(ecrecover(hash, v, r, s)).toString('hex')
+  const verifiedAddress = '0x' + pubToAddress(ecrecover(hash, BigInt(v), r, s)).toString('hex')
   cb(null, verifiedAddress)
 }
   
