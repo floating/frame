@@ -139,12 +139,10 @@ module.exports = {
   updateAccount: (u, updatedAccount, newName) => {
     const { id } = updatedAccount
     u('main.accounts', id, (account = {}) => {
-      // if (account) return updatedAccount // Account exists
-      // if (add) return updatedAccount // Account is new and should be added
-      return { ...updatedAccount, balances: account.balances }
+      return { ...updatedAccount, balances: account.balances || {} }
     })
-    const accountMetaId = uuidv5(id, accountNS)
-    if (newName && !isDefaultAccountName(newName)) {
+    if (newName && !isDefaultAccountName({ ...updatedAccount, name: newName })) {
+      const accountMetaId = uuidv5(id, accountNS)
       u('main.accountsMeta', accountMetaId, (accountMeta) => {
         return { ...accountMeta, name: newName, lastUpdated: Date.now() }
       })

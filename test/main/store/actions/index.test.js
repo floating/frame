@@ -21,9 +21,8 @@ import {
   updateNetwork as updateNetworkAction,
   activateNetwork as activateNetworkAction,
   setBlockHeight as setBlockHeightAction,
-  updateAccountMeta as updateAccountMetaAction
+  updateAccount as updateAccountAction
 } from '../../../../main/store/actions'
-import { getDefaultAccountName } from '../../../../resources/domain/account'
 import { toTokenId } from '../../../../resources/domain/balance'
 
 beforeAll(() => {
@@ -986,20 +985,32 @@ describe('#setBlockHeight', () => {
   })
 })
 
-describe('#updateAccountMeta', () => {
+describe('#updateAccount', () => {
   let main
 
-  const updaterFn = (node, accountMetaId, update) => {
-    expect(node).toBe('main.accountsMeta')
-    main.accountsMeta[accountMetaId] = update(main.accountsMeta[accountMetaId])
+  const updaterFn = (node, id, update) => {
+    if (node === 'main.accounts') {
+      main.accounts[id] = update(main.accounts[id])
+    }
+
+    if (node === 'main.accountsMeta') {
+      main.accountsMeta[id] = update(main.accountsMeta[id])
+    }
   }
 
   beforeEach(() => {
     jest.useFakeTimers() // somehow required despite being enabled globally
     jest.setSystemTime(new Date('2022-11-17T11:01:58.135Z'))
     main = {
-      accountsMeta: {
+      accounts: {
         1: {
+          id: '1',
+					lastSignerType: 'ledger',
+          balances: {}
+        }
+      },
+      accountsMeta: {
+        'e42ee170-4601-5428-bac5-d8d92fe049e8': {
           name: 'cool account',
           lastUpdated: 1568682918135
         }
@@ -1007,40 +1018,64 @@ describe('#updateAccountMeta', () => {
     }
   })
 
-  const setAccountMeta = (accountMetaId, name, lastSignerType) => updateAccountMetaAction(updaterFn, accountMetaId, { name, lastSignerType })
+  const setAccount = (id, updatedAccount, name) => updateAccountAction(updaterFn, { ...updatedAccount, id }, name)
 
-  it('should create a new value with the expected data', () => {
-    setAccountMeta(2, 'not so cool account', 'seed')
+  it('should update the account', () => {
+    setAccount('1', { lastSignerType: 'seed', status: 'ok' })
 
-    expect(main.accountsMeta).toStrictEqual({ 
-      1: { name: 'cool account', lastUpdated: 1568682918135 }, 
-      2: { name: 'not so cool account', lastUpdated: 1668682918135 }
+    expect(main.accounts).toStrictEqual({ 
+      1: { id: '1', lastSignerType: 'seed', status: 'ok', balances: {} }
     })
   })
 
-  it('should update an existing value with the expected data', () => {
-    setAccountMeta(1, 'not so cool account', 'seed')
+  it('should not update account balances', () => {
+    setAccount('1', { lastSignerType: 'seed', status: 'ok', balances: 'ignored' })
 
-    expect(main.accountsMeta).toStrictEqual({
-      1: { name: 'not so cool account', lastUpdated: 1668682918135 }
+    expect(main.accounts).toStrictEqual({ 
+      1: { id: '1', lastSignerType: 'seed', status: 'ok', balances: {} }
     })
   })
 
-  const accountTypes = ['ring', 'seed', 'ledger', 'trezor', 'lattice', 'aragon']
-  accountTypes.forEach((type) => {
-    it(`should not create a new value for the ${type} account default label`, () => {
-      setAccountMeta(2, getDefaultAccountName(type), type)
+  it('should create a new account', () => {
+    setAccount('2', { lastSignerType: 'seed', status: 'ok' })
 
-      expect(main.accountsMeta).toStrictEqual({ 
-        1: { name: 'cool account', lastUpdated: 1568682918135 }
+    expect(main.accounts).toStrictEqual({ 
+      1: { id: '1', lastSignerType: 'ledger', balances: {} },
+      2: { id: '2', lastSignerType: 'seed', status: 'ok', balances: {} }
+    })
+  })
+
+  describe('when passed a name', () => {
+    it('should update existing accountMeta with the expected data', () => {
+      setAccount('1', { lastSignerType: 'seed', status: 'ok' }, 'not so cool account')
+  
+      expect(main.accountsMeta).toStrictEqual({
+        'e42ee170-4601-5428-bac5-d8d92fe049e8': { name: 'not so cool account', lastUpdated: 1668682918135 }
       })
     })
 
-    it(`should not update an existing value with the ${type} account default label`, () => {
-      setAccountMeta(1, getDefaultAccountName(type), type)
+    it('should create new accountMeta with the expected data', () => {
+      setAccount('2', { lastSignerType: 'seed', status: 'ok' }, 'not so cool account')
+  
+      expect(main.accountsMeta).toStrictEqual({ 
+        'e42ee170-4601-5428-bac5-d8d92fe049e8': { name: 'cool account', lastUpdated: 1568682918135 }, 
+        '0d6c930e-3495-56cc-993f-8da3a6150003': { name: 'not so cool account', lastUpdated: 1668682918135 }
+      })
+    })
 
-      expect(main.accountsMeta).toStrictEqual({
-        1: { name: 'cool account', lastUpdated: 1568682918135 }
+    it(`should not create a new value for a default label`, () => {
+      setAccount('2', { lastSignerType: 'seed', status: 'ok' }, 'hot account')
+
+      expect(main.accountsMeta).toStrictEqual({ 
+        'e42ee170-4601-5428-bac5-d8d92fe049e8': { name: 'cool account', lastUpdated: 1568682918135 }
+      })
+    })
+
+    it(`should not update an existing value with a default label`, () => {
+      setAccount('1', { lastSignerType: 'seed', status: 'ok' }, 'hot account')
+
+      expect(main.accountsMeta).toStrictEqual({ 
+        'e42ee170-4601-5428-bac5-d8d92fe049e8': { name: 'cool account', lastUpdated: 1568682918135 }
       })
     })
   })
