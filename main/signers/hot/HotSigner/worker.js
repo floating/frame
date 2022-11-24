@@ -11,15 +11,8 @@ const {
   addHexPrefix,
   pubToAddress,
   ecrecover
-} = require('ethereumjs-util')
-
-function chainConfig (chain, hardfork) {
-  const chainId = new BN(chain)
-
-  return Common.isSupportedChainId(chainId)
-    ? new Common({ chain: chainId.toNumber(), hardfork })
-    : Common.custom({ chainId: chainId.toNumber() }, { baseChain: 'mainnet', hardfork })
-}
+} = require('@ethereumjs/util')
+const { SigningKey } = require('ethers/lib/utils')
 
 class HotSignerWorker {
   constructor () {

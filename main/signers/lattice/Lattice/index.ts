@@ -1,6 +1,5 @@
 import { Client, Utils, Constants } from 'gridplus-sdk'
-import { encode } from 'rlp'
-import { padToEven, addHexPrefix } from 'ethereumjs-util'
+import { padToEven, addHexPrefix } from '@ethereumjs/util'
 import { hexToInt } from '../../../../resources/utils'
 import log from 'electron-log'
 import { TypedTransaction } from '@ethereumjs/tx'

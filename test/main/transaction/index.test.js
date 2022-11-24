@@ -1,8 +1,13 @@
-import { addHexPrefix, stripHexPrefix } from 'ethereumjs-util'
-import Common from '@ethereumjs/common'
+import { addHexPrefix, stripHexPrefix } from '@ethereumjs/util'
+import {Common} from '@ethereumjs/common'
 
 import { maxFee, londonToLegacy, signerCompatibility, populate, sign } from '../../../main/transaction'
 import { GasFeesSource } from '../../../resources/domain/transaction'
+<<<<<<< HEAD
+=======
+import { parseTransaction } from 'ethers/lib/utils'
+import { hexToInt } from '../../../resources/utils'
+>>>>>>> e3c7db57 (updated version of common & utils)
 
 describe('#signerCompatibility', () => {
   it('is always compatible with legacy transactions', () => {

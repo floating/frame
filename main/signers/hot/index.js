@@ -10,7 +10,7 @@ const crypt = require('../../crypt')
 
 const SeedSigner = require('./SeedSigner')
 const RingSigner = require('./RingSigner')
-const { stripHexPrefix } = require('ethereumjs-util')
+const { stripHexPrefix } = require('@ethereumjs/util')
 
 const USER_DATA = app ? app.getPath('userData') : path.resolve(path.dirname(require.main.filename), '../.userData');
 const SIGNERS_PATH = path.resolve(USER_DATA, 'signers')
