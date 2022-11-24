@@ -987,7 +987,6 @@ describe('#setBlockHeight', () => {
 })
 
 describe('#updateAccountMeta', () => {
-  const realDateNow = Date.now.bind(global.Date)
   let main
 
   const updaterFn = (node, accountMetaId, update) => {
@@ -996,6 +995,8 @@ describe('#updateAccountMeta', () => {
   }
 
   beforeEach(() => {
+    jest.useFakeTimers() // somehow required despite being enabled globally
+    jest.setSystemTime(new Date('2022-11-17T11:01:58.135Z'))
     main = {
       accountsMeta: {
         1: {
@@ -1004,11 +1005,6 @@ describe('#updateAccountMeta', () => {
         }
       },
     }
-    global.Date.now = jest.fn(() => new Date('2022-11-17T11:01:58.135Z').valueOf())
-  })
-
-  afterEach(() => {
-    global.Date.now = realDateNow
   })
 
   const setAccountMeta = (accountMetaId, name, lastSignerType) => updateAccountMetaAction(updaterFn, accountMetaId, { name, lastSignerType })

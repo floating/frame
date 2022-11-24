@@ -1065,8 +1065,6 @@ describe('migration 28', () => {
 })
 
 describe('migration 29', () => {
-  const realDateNow = Date.now.bind(global.Date)
-
   beforeEach(() => {
     state = {
       main: {
@@ -1081,11 +1079,7 @@ describe('migration 29', () => {
         }
       }
     }
-    global.Date.now = jest.fn(() => new Date('2022-11-17T11:01:58.135Z').valueOf())
-  })
-
-  afterEach(() => {
-    global.Date.now = realDateNow
+    jest.setSystemTime(new Date('2022-11-17T11:01:58.135Z'))
   })
 
   it('adds the existing account names to accountsMeta under hashed keys with a timestamp', () => {
