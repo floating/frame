@@ -107,8 +107,8 @@ export class Accounts extends EventEmitter {
 
       const created = 'new:' + Date.now()
       const accountMetaId = uuidv5(address, accountNS)
-      const { name = '' } = store('main.accountsMeta', accountMetaId) || {}
-      this.accounts[address] = new FrameAccount({ address, name, created, options, active: false }, this)
+      const accountMeta = store('main.accountsMeta', accountMetaId) || { name }
+      this.accounts[address] = new FrameAccount({ address, name: accountMeta.name, created, options, active: false }, this)
       account = this.accounts[address]
     }
 
