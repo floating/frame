@@ -18,8 +18,9 @@
     "bundle:dash": "parcel build dash/dash.html --target dash --public-url .",
     "bundle:dapp": "parcel build dapp/dapp.html --target dapp --public-url .",
     "bundle:dapp:inject": "parcel build main/dapps/server/inject/index.js --target inject --public-url .",
-    "serve": "npm run bundle:bridge && npm run watch:compile & cross-env NODE_ENV=development HMR=true parcel serve resources/bridge/index.js app/tray.dev.html flow/flow.dev.html dash/dash.dev.html dapp/dapp.dev.html main/dapps/server/inject/index.js",
+    "serve": "npm run bundle:bridge && npm run dev-server & wait-on http://localhost:1234/app/tray.dev.html && npm run compile:watch",
     "dev": "npm run compile && npm run bundle && npm run launch:dev",
+    "dev-server": "cross-env NODE_ENV=development HMR=true parcel serve resources/bridge/index.js app/tray.dev.html flow/flow.dev.html dash/dash.dev.html dapp/dapp.dev.html main/dapps/server/inject/index.js",
     "inspect": "npm run bundle && npm run launch:inspect",
     "launch": "cross-env NODE_ENV=production electron ./compiled/main",
     "launch:dev": "cross-env NODE_ENV=development electron ./compiled/main --inspect",
@@ -30,11 +31,11 @@
     "launch:dev:rinkeby": "cross-env NODE_ENV=development RINKEBY=true electron ./compiled/main",
     "launch:inspect": "cross-env NODE_ENV=production electron --inspect ./compiled/main",
     "prod": "npm run compile && npm run bundle && npm run launch",
-    "hot": "npm run serve && npm run launch:hot",
-    "watch:compile": "shx mkdir -p ./compiled/main/windows && npm run copy-assets && tsc -w",
-    "compile": "tsc && npm run copy-assets",
+    "hot": "trap \"kill 0\" exit && npm run bundle:bridge && npm run dev-server & wait-on http://localhost:1234/app/tray.dev.html && npm run launch:hot",
+    "compile": "npm run copy-assets && tsc",
+    "compile:watch": "npm run copy-assets && tsc -w",
     "build": "npm run compile && sleep 4 && npm run bundle && sleep 4 && electron-builder",
-    "copy-assets": "shx cp ./main/windows/*.png ./compiled/main/windows",
+    "copy-assets": "shx mkdir -p ./compiled/main/windows && shx cp ./main/windows/*.png ./compiled/main/windows",
     "publish": "electron-builder -c.snap.publish=github",
     "release": "npm run compile && sleep 4 && npm run bundle && sleep 4 && npm run publish",
     "postinstall": "electron-builder install-app-deps",
@@ -157,7 +158,8 @@
     "standardx": "7.0.0",
     "stylus": "0.59.0",
     "ts-jest": "29.0.3",
-    "typescript": "4.9.3"
+    "typescript": "4.9.3",
+    "wait-on": "^6.0.1"
   },
   "overrides": {
     "node-hid": "2.1.2"
