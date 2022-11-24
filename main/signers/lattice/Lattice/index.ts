@@ -360,7 +360,7 @@ export default class Lattice extends Signer {
     optionalFields.forEach(field => {
       if (field in tx) {
         // @ts-ignore
-        unsignedTx[field] = hexToInt(txJson[field])
+        unsignedTx[field] = hexToInt(tx[field])
       }
     })
 

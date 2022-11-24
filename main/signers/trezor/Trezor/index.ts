@@ -315,7 +315,7 @@ export default class Trezor extends Signer {
 
     optionalFields.forEach(field => {
       // @ts-ignore
-      const val: string = txJson[field]
+      const val: string = tx[field]
       if (val) {
         // @ts-ignore
         unsignedTx[field] = this.normalize(val)
