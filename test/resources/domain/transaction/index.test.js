@@ -1,4 +1,5 @@
-import { getAddress, typeSupportsBaseFee, usesBaseFee } from '../../../../resources/domain/transaction'
+import { typeSupportsBaseFee, usesBaseFee } from '../../../../resources/domain/transaction'
+import { getAddress } from '../../../../resources/utils'
 
 describe('#typeSupportsBaseFee', () => {
   it('does not support a base fee for type 0', () => {
