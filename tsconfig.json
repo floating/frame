@@ -17,6 +17,6 @@
   "include": ["package.json", "./main/**/*.ts", "./main/**/*.js", "./resources/**/*.ts", "./resources/**/*.js"],
   "exclude": ["**/__mocks__/*"],
   "watchOptions": {
-    "excludeFiles": ["./node_modules/**/*.d.ts"]
+    "excludeFiles": ["./node_modules/**/*", "./package.json"]
   }
 }
