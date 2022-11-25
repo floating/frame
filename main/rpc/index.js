@@ -1,6 +1,7 @@
 const { ipcMain, dialog } = require('electron')
 const fs = require('fs')
 import {isAddress} from '@ethersproject/address'
+import { logger } from 'ethers'
 const { randomBytes } = require('crypto')
 
 const accounts = require('../accounts').default
@@ -9,6 +10,7 @@ const launch = require('../launch')
 const provider = require('../provider').default
 const store = require('../store').default
 const dapps = require('../dapps')
+const nebulaApi = require('../nebula').default
 // const ens = require('../ens')
 // const ipfs = require('../ipfs')
 
@@ -226,6 +228,21 @@ const rpc = {
   },
   resolveAragonName (name, chainId, cb) {
     resolveName(name, chainId).then(result => cb(null, result)).catch(cb)
+  },
+  resolveEnsName (name, cb) {
+    logger.info('resolving name ', name)
+    const nebula = nebulaApi()
+    nebula.ens.resolve(name).then(result => {
+      const {addresses: {eth: ethAddress}} = result
+      logger.info(ethAddress)
+      if(!ethAddress){
+        throw new Error(`No ETH address found for ENS domain ${name}`)
+      }
+      return cb(null, ethAddress)
+    }).catch(err => {
+      logger.debug('Unable to complete ENS resolution', {name, err})
+      return cb(err)
+    })
   },
   verifyAddress (cb) {
     const res = (err, data) => cb(err, data || false)

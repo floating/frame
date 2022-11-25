@@ -11,7 +11,6 @@ class AddAddress extends React.Component {
       index: 0,
       adding: false,
       address: '',
-      password: '',
       status: '',
       error: false
     }
@@ -22,11 +21,6 @@ class AddAddress extends React.Component {
     e.preventDefault()
     const update = {}
     const value = (e.target.value || '')
-    // value = value === ' ' ? '' : value
-    // value = value.replace(/[ \t]+/g, '_')
-    // value = value.replace(/\W/g, '')
-    // value = value.replace(/_/g, ' ')
-    // value = value.split(' ').length > 24 ? value.substring(0, value.lastIndexOf(' ') + 1) : value // Limit to 24 words max
     update[key] = value
     this.setState(update)
   }
@@ -54,17 +48,30 @@ class AddAddress extends React.Component {
 
   create () {
     this.setState({ index: ++this.state.index })
-    link.rpc('createFromAddress', this.state.address, 'Watch Account', (err) => {
+    const {address: input} = this.state
+    const createAccountCallback =  (address) => link.rpc('createFromAddress', address, 'Watch Account', (err) => {
       if (err) {
         this.setState({ status: err, error: true })
       } else {
         this.setState({ status: 'Successful', error: false })
       }
     })
+
+    if( input.toLowerCase().includes('.eth') ) {
+      link.rpc('resolveEnsName', input, (err, resolvedAddress) => {
+        if(err){
+          this.setState({ status: `Unable to resolve Ethereum address for ${input}`, error: true })
+        } else {
+          createAccountCallback(resolvedAddress)
+        }
+      })
+    } else {
+      createAccountCallback(input)
+    }
   }
 
   restart () {
-    this.setState({ index: 0, adding: false, address: '', password: '', success: false })
+    this.setState({ index: 0, adding: false, address: '', success: false })
     setTimeout(() => {
       this.setState({ status: '', error: false })
     }, 500)
@@ -107,7 +114,6 @@ class AddAddress extends React.Component {
               </div>
               <div className='addAccountItemTopTitle'>Watch Account</div>
             </div>
-            {/* <div className='addAccountItemClose' onClick={() => this.props.close()}>{'Done'}</div> */}
             <div className='addAccountItemSummary'>Watch accounts work like normal accounts but cannot sign</div>
           </div>
           <div className='addAccountItemOption'>
@@ -121,7 +127,7 @@ class AddAddress extends React.Component {
             <div className='addAccountItemOptionSetup' style={{ transform: `translateX(-${100 * this.state.index}%)` }}>
               <div className='addAccountItemOptionSetupFrames'>
                 <div className='addAccountItemOptionSetupFrame'>
-                  <div className='addAccountItemOptionTitle'>input address</div>
+                  <div className='addAccountItemOptionTitle'>input address or ENS domain</div>
                   <div className='addAccountItemOptionInputPhrase'>
                     <textarea tabIndex='-1' value={this.state.address} ref={this.forms[0]} onChange={e => this.onChange('address', e)} onFocus={e => this.onFocus('address', e)} onBlur={e => this.onBlur('address', e)} onKeyPress={e => this.keyPress(e)} />
                   </div>
