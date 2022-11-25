@@ -492,11 +492,6 @@ describe('#setScanning', () => {
 
   beforeAll(() => {
     isScanning = false
-    jest.useFakeTimers()
-  })
-
-  afterAll(() => {
-    jest.useRealTimers()
   })
 
   const updaterFn = (node, address, update) => {
@@ -538,11 +533,7 @@ describe('#initOrigin', () => {
 
   beforeEach(() => {
     origins = {}
-    jest.useFakeTimers().setSystemTime(creationDate)
-  })
-
-  afterEach(() => {
-    jest.useRealTimers()
+    jest.setSystemTime(creationDate)
   })
 
   it('creates a new origin', () => {
@@ -632,7 +623,7 @@ describe('#addOriginRequest', () => {
   const addOriginRequest = id => addOriginRequestAction(updaterFn, id)
 
   beforeEach(() => {
-    jest.useFakeTimers().setSystemTime(updateTime)
+    jest.setSystemTime(updateTime)
 
     origins = {
       activeOrigin: {
@@ -653,10 +644,6 @@ describe('#addOriginRequest', () => {
         }
       }
     }
-  })
-
-  afterEach(() => {
-    jest.useRealTimers()
   })
 
   it('updates the timestamp for an existing session', () => {
@@ -999,8 +986,8 @@ describe('#updateAccount', () => {
   }
 
   beforeEach(() => {
-    jest.useFakeTimers() // somehow required despite being enabled globally
     jest.setSystemTime(new Date('2022-11-17T11:01:58.135Z'))
+
     main = {
       accounts: {
         1: {
