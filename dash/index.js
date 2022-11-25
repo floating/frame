@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/electron'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import { createRoot } from 'react-dom/client'
 import Restore from 'react-restore'
 
 import _store from './store'
@@ -12,7 +12,11 @@ Sentry.init({ dsn: 'https://7b09a85b26924609bef5882387e2c4dc@o1204372.ingest.sen
 
 document.addEventListener('dragover', e => e.preventDefault())
 document.addEventListener('drop', e => e.preventDefault())
-window.eval = global.eval = () => { throw new Error(`This app does not support window.eval()`) } // eslint-disable-line
+
+if (process.env.NODE_ENV !== 'development' || process.env.HMR !== 'true') {
+  window.eval = global.eval = () => { throw new Error(`This app does not support window.eval()`) } // eslint-disable-line
+}
+
 link.rpc('getState', (err, state) => {
   if (err) return console.error('Could not get initial state from main')
   const store = _store(state)
@@ -23,8 +27,9 @@ link.rpc('getState', (err, state) => {
       document.body.className = store('main.colorway')
     }, 100)
   })
-  const Flow = Restore.connect(App, store)
-  ReactDOM.render(<Flow />, document.getElementById('flow'))
+  const Dash = Restore.connect(App, store)
+  const root = createRoot(document.getElementById('dash'))
+  root.render(<Dash />)
 })
 
 document.addEventListener('contextmenu', e => link.send('*:contextmenu', e.clientX, e.clientY))
