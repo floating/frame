@@ -1,5 +1,6 @@
 import log from 'electron-log'
 import migrations from '../../../../main/store/migrations'
+import { getDefaultAccountName } from '../../../../resources/domain/account'
 import { capitalize } from '../../../../resources/utils'
 
 let state
@@ -1060,5 +1061,59 @@ describe('migration 28', () => {
     const updatedState = migrations.apply(state, 28)
     const metadata = updatedState.main.networksMeta.ethereum
     expect(metadata[5].nativeCurrency.decimals).toBe(18)
+  })
+})
+
+describe('migration 29', () => {
+  beforeEach(() => {
+    state = {
+      main: {
+        _version: 28,
+        accounts: {
+          test: {
+            name: 'my test account'
+          },
+          look: {
+            name: 'such a cool account'
+          }
+        }
+      }
+    }
+    jest.setSystemTime(new Date('2022-11-17T11:01:58.135Z'))
+  })
+
+  it('adds the existing account names to accountsMeta under hashed keys with a timestamp', () => {
+    const updatedState = migrations.apply(state, 29)
+    const { accountsMeta } = updatedState.main
+    
+    expect(accountsMeta).toStrictEqual({
+      '6ae9081b-ba1c-54a5-a985-20e180d6fa9f': {
+        name: 'such a cool account',
+        lastUpdated: 1668682918135,
+      },
+      'c7b2d7b1-b0cc-5706-b708-cbc09b0bb7bf': {
+        name: 'my test account',
+        lastUpdated: 1668682918135
+      }
+    })
+  })
+
+  const accountTypes = ['ring', 'seed', 'ledger', 'trezor', 'lattice', 'aragon']
+  accountTypes.forEach((type) => {
+    it(`does not add ${type} accounts with a default name`, () => {
+      state.main.accounts.test = {
+        name: getDefaultAccountName(type),
+        lastSignerType: type
+      }
+      const updatedState = migrations.apply(state, 29)
+      const { accountsMeta } = updatedState.main
+      
+      expect(accountsMeta).toStrictEqual({
+        '6ae9081b-ba1c-54a5-a985-20e180d6fa9f': {
+          name: 'such a cool account',
+          lastUpdated: 1668682918135
+        }
+      })
+    })
   })
 })

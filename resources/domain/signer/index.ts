@@ -14,8 +14,9 @@ export function getSignerType (typeValue: string) {
   return Object.values(Type).find(type => type === typeValue)
 }
 
-export function getSignerDisplayType (signer: Signer) {
-  return ['ring', 'seed'].includes(signer.type.toLowerCase()) ? 'hot' : signer.type
+export function getSignerDisplayType (typeOrSigner: string | Signer = '') {
+  const signerType = (typeof typeOrSigner === 'string') ? typeOrSigner : (typeOrSigner as Signer).type
+  return ['ring', 'seed'].includes(signerType.toLowerCase()) ? 'hot' : signerType
 }
 
 export function isHardwareSigner (typeOrSigner: string | Signer = '') {

@@ -26,6 +26,7 @@ import {
 import type { Chain } from '../chains'
 import { ActionType } from '../transaction/actions'
 import { ApprovalType } from '../../resources/constants'
+import { accountNS } from '../../resources/domain/account'
 
 function notify (title: string, body: string, action: (event: Electron.Event) => void) {
   const notification = new Notification({ title, body })
@@ -105,8 +106,9 @@ export class Accounts extends EventEmitter {
       log.info(`Account ${address} not found, creating account`)
 
       const created = 'new:' + Date.now()
-
-      this.accounts[address] = new FrameAccount({ address, name, created, options, active: false }, this)
+      const accountMetaId = uuidv5(address, accountNS)
+      const accountMeta = store('main.accountsMeta', accountMetaId) || { name }
+      this.accounts[address] = new FrameAccount({ address, name: accountMeta.name, created, options, active: false }, this)
       account = this.accounts[address]
     }
 
@@ -115,6 +117,8 @@ export class Accounts extends EventEmitter {
 
   rename (id: string, name: string) {
     this.accounts[id].rename(name)
+    const account = this.accounts[id].summary()
+    this.update(account)
   }
 
   update (account: Account) {
