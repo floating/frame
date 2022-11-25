@@ -4,12 +4,12 @@
     <meta 
       http-equiv='Content-Security-Policy' 
       content="
-        default-src 'self'; 
+        default-src http://localhost:1234 'self' 'unsafe-inline' 'unsafe-eval'; 
         connect-src *; 
-        style-src 'self';
+        style-src http://localhost:1234 'self' 'unsafe-inline';
         frame-src https://connect.trezor.io; 
         object-src 'none';
-        img-src *;
+        img-src *
       "
     />
     <title>Dash</title>
