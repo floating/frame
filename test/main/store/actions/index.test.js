@@ -992,7 +992,8 @@ describe('#updateAccount', () => {
       accounts: {
         1: {
           id: '1',
-	  lastSignerType: 'ledger',
+          name: 'cool account',
+          lastSignerType: 'ledger',
           balances: {}
         }
       },
@@ -1005,65 +1006,63 @@ describe('#updateAccount', () => {
     }
   })
 
-  const setAccount = (id, updatedAccount, name) => updateAccountAction(updaterFn, { ...updatedAccount, id }, name)
+  const setAccount = (id, updatedAccount) => updateAccountAction(updaterFn, { ...updatedAccount, id })
 
   it('should update the account', () => {
-    setAccount('1', { lastSignerType: 'seed', status: 'ok' })
+    setAccount('1', { name: 'cool account', lastSignerType: 'seed', status: 'ok' })
 
-    expect(main.accounts).toStrictEqual({ 
-      1: { id: '1', lastSignerType: 'seed', status: 'ok', balances: {} }
+    expect(main.accounts).toStrictEqual({
+      1: { id: '1', name: 'cool account', lastSignerType: 'seed', status: 'ok', balances: {} }
     })
   })
 
   it('should not update account balances', () => {
-    setAccount('1', { lastSignerType: 'seed', status: 'ok', balances: 'ignored' })
+    setAccount('1', { name: 'cool account', lastSignerType: 'seed', status: 'ok', balances: 'ignored' })
 
     expect(main.accounts).toStrictEqual({ 
-      1: { id: '1', lastSignerType: 'seed', status: 'ok', balances: {} }
+      1: { id: '1', name: 'cool account', lastSignerType: 'seed', status: 'ok', balances: {} }
     })
   })
 
   it('should create a new account', () => {
-    setAccount('2', { lastSignerType: 'seed', status: 'ok' })
+    setAccount('2', { name: 'new cool account', lastSignerType: 'seed', status: 'ok' })
 
     expect(main.accounts).toStrictEqual({ 
-      1: { id: '1', lastSignerType: 'ledger', balances: {} },
-      2: { id: '2', lastSignerType: 'seed', status: 'ok', balances: {} }
+      1: { id: '1', name: 'cool account', lastSignerType: 'ledger', balances: {} },
+      2: { id: '2', name: 'new cool account', lastSignerType: 'seed', status: 'ok', balances: {} }
     })
   })
 
-  describe('when passed a name', () => {
-    it('should update existing accountMeta with the expected data', () => {
-      setAccount('1', { lastSignerType: 'seed', status: 'ok' }, 'not so cool account')
-  
-      expect(main.accountsMeta).toStrictEqual({
-        'e42ee170-4601-5428-bac5-d8d92fe049e8': { name: 'not so cool account', lastUpdated: 1668682918135 }
-      })
+  it('should update existing accountMeta with the expected data', () => {
+    setAccount('1', { name: 'not so cool account', lastSignerType: 'seed', status: 'ok' })
+
+    expect(main.accountsMeta).toStrictEqual({
+      'e42ee170-4601-5428-bac5-d8d92fe049e8': { name: 'not so cool account', lastUpdated: 1668682918135 }
     })
+  })
 
-    it('should create new accountMeta with the expected data', () => {
-      setAccount('2', { lastSignerType: 'seed', status: 'ok' }, 'not so cool account')
-  
-      expect(main.accountsMeta).toStrictEqual({ 
-        'e42ee170-4601-5428-bac5-d8d92fe049e8': { name: 'cool account', lastUpdated: 1568682918135 }, 
-        '0d6c930e-3495-56cc-993f-8da3a6150003': { name: 'not so cool account', lastUpdated: 1668682918135 }
-      })
+  it('should create new accountMeta with the expected data', () => {
+    setAccount('2', { name: 'not so cool account', lastSignerType: 'seed', status: 'ok' })
+
+    expect(main.accountsMeta).toStrictEqual({ 
+      'e42ee170-4601-5428-bac5-d8d92fe049e8': { name: 'cool account', lastUpdated: 1568682918135 }, 
+      '0d6c930e-3495-56cc-993f-8da3a6150003': { name: 'not so cool account', lastUpdated: 1668682918135 }
     })
+  })
 
-    it(`should not create a new value for a default label`, () => {
-      setAccount('2', { lastSignerType: 'seed', status: 'ok' }, 'hot account')
+  it(`should not create a new value for a default label`, () => {
+    setAccount('2', { name: 'hot account', lastSignerType: 'seed', status: 'ok' })
 
-      expect(main.accountsMeta).toStrictEqual({ 
-        'e42ee170-4601-5428-bac5-d8d92fe049e8': { name: 'cool account', lastUpdated: 1568682918135 }
-      })
+    expect(main.accountsMeta).toStrictEqual({ 
+      'e42ee170-4601-5428-bac5-d8d92fe049e8': { name: 'cool account', lastUpdated: 1568682918135 }
     })
+  })
 
-    it(`should not update an existing value with a default label`, () => {
-      setAccount('1', { lastSignerType: 'seed', status: 'ok' }, 'hot account')
+  it(`should not update an existing value with a default label`, () => {
+    setAccount('1', { name: 'hot account', lastSignerType: 'seed', status: 'ok' })
 
-      expect(main.accountsMeta).toStrictEqual({ 
-        'e42ee170-4601-5428-bac5-d8d92fe049e8': { name: 'cool account', lastUpdated: 1568682918135 }
-      })
+    expect(main.accountsMeta).toStrictEqual({ 
+      'e42ee170-4601-5428-bac5-d8d92fe049e8': { name: 'cool account', lastUpdated: 1568682918135 }
     })
   })
 })

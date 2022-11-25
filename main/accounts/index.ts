@@ -118,7 +118,7 @@ export class Accounts extends EventEmitter {
   rename (id: string, name: string) {
     this.accounts[id].rename(name)
     const account = this.accounts[id].summary()
-    store.updateAccount(account, name)
+    this.update(account)
   }
 
   update (account: Account) {
