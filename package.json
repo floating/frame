@@ -4,42 +4,38 @@
   "description": "System-wide web3",
   "main": "compiled/main",
   "scripts": {
-    "clean": "npx rimraf dist bundle compiled .cache node_modules",
+    "clean": "npx rimraf dist bundle compiled .parcel-cache node_modules",
     "setup:full": "npm run clean && npm cache clean --force && npm install --cache /tmp/empty-cache --ignore-scripts && allow-scripts && npm audit fix",
     "setup:clean": "npm run clean && npm run setup",
     "setup:ci": "npm ci --ignore-scripts && npm run install:scripts",
     "setup": "npm install --ignore-scripts && npm run install:scripts",
     "install:scripts": "allow-scripts",
     "start": "npm run launch",
-    "bundle": "npm run bundle:bridge && npm run bundle:tray && npm run bundle:dash  && npm run bundle:dapp && npm run bundle:dapp:inject",
-    "bundle:bridge": "parcel build resources/bridge/index.js --public-url . -d bundle -o bridge.js --target electron",
-    "bundle:tray": "parcel build app/tray.html --public-url . -d bundle --target browser",
-    "bundle:flow": "parcel build flow/flow.html --public-url . -d bundle --target browser",
-    "bundle:dash": "parcel build dash/dash.html --public-url . -d bundle --target browser",
-    "bundle:dapp": "parcel build dapp/dapp.html --public-url . -d bundle --target browser",
-    "bundle:dapp:inject": "parcel build main/dapps/server/inject/index.js --public-url . -d bundle -o inject.js --target browser",
-    "watch": "npm run watch:compile & npm run watch:tray & npm run watch:dash & npm run watch:dapp & npm run watch:bridge & npm run watch:dapp:inject",
-    "watch:bridge": "parcel watch resources/bridge/index.js --public-url . -d bundle -o bridge.js --target electron --no-hmr",
-    "watch:tray": "parcel watch app/tray.html --public-url . -d bundle --target browser --no-hmr",
-    "watch:flow": "parcel watch flow/flow.html --public-url . -d bundle --target browser --no-hmr",
-    "watch:dash": "parcel watch dash/dash.html --public-url . -d bundle --target browser --no-hmr",
-    "watch:dapp": "parcel watch dapp/dapp.html --public-url . -d bundle --target browser --no-hmr",
-    "watch:dapp:inject": "parcel watch main/dapps/server/inject/index.js --public-url . -d bundle -o inject.js --target browser",
+    "bundle": "npm run bundle:bridge && npm run bundle:tray && npm run bundle:dash && npm run bundle:dapp && npm run bundle:dapp:inject",
+    "bundle:bridge": "parcel build resources/bridge/index.js --target bridge --public-url .",
+    "bundle:tray": "parcel build app/tray.html --target tray --public-url .",
+    "bundle:flow": "parcel build flow/flow.html --target flow --public-url .",
+    "bundle:dash": "parcel build dash/dash.html --target dash --public-url .",
+    "bundle:dapp": "parcel build dapp/dapp.html --target dapp --public-url .",
+    "bundle:dapp:inject": "parcel build main/dapps/server/inject/index.js --target inject --public-url .",
+    "serve": "npm run bundle:bridge && npm run dev-server & wait-on http://localhost:1234/app/tray.dev.html && npm run compile:watch",
     "dev": "npm run compile && npm run bundle && npm run launch:dev",
+    "dev-server": "cross-env NODE_ENV=development HMR=true parcel serve resources/bridge/index.js app/tray.dev.html flow/flow.dev.html dash/dash.dev.html dapp/dapp.dev.html main/dapps/server/inject/index.js",
     "inspect": "npm run bundle && npm run launch:inspect",
     "launch": "cross-env NODE_ENV=production electron ./compiled/main",
     "launch:dev": "cross-env NODE_ENV=development electron ./compiled/main --inspect",
+    "launch:hot": "cross-env NODE_ENV=development HMR=true ELECTRON_DISABLE_SECURITY_WARNINGS=true electron ./compiled/main --inspect",
     "launch:dev:traffic": "cross-env NODE_ENV=development LOG_TRAFFIC=true electron ./compiled/main",
     "launch:dev:fullheight": "cross-env NODE_ENV=development FULL_HEIGHT=true electron ./compiled/main",
     "launch:dev:worker": "cross-env NODE_ENV=development LOG_WORKER=true electron ./compiled/main",
     "launch:dev:rinkeby": "cross-env NODE_ENV=development RINKEBY=true electron ./compiled/main",
     "launch:inspect": "cross-env NODE_ENV=production electron --inspect ./compiled/main",
     "prod": "npm run compile && npm run bundle && npm run launch",
-    "hot": "npm run compile && npm run bundle && npm run launch:hot",
-    "watch:compile": "shx mkdir -p ./compiled/main/windows && npm run copy-assets && tsc -w",
-    "compile": "tsc && npm run copy-assets",
+    "hot": "trap \"kill 0\" exit && npm run bundle:bridge && npm run compile && npm run dev-server & wait-on http://localhost:1234/app/tray.dev.html && npm run launch:hot",
+    "compile": "npm run copy-assets && tsc",
+    "compile:watch": "npm run copy-assets && tsc -w",
     "build": "npm run compile && sleep 4 && npm run bundle && sleep 4 && electron-builder",
-    "copy-assets": "shx cp ./main/windows/*.png ./compiled/main/windows",
+    "copy-assets": "shx mkdir -p ./compiled/main/windows && shx cp ./main/windows/*.png ./compiled/main/windows",
     "publish": "electron-builder -c.snap.publish=github",
     "release": "npm run compile && sleep 4 && npm run bundle && sleep 4 && npm run publish",
     "postinstall": "electron-builder install-app-deps",
@@ -75,7 +71,6 @@
     "@metamask/eth-sig-util": "5.0.2",
     "@sentry/electron": "4.1.2",
     "auto-launch": "5.0.5",
-    "babel-polyfill": "6.26.0",
     "bip39": "3.0.4",
     "cheerio": "1.0.0-rc.12",
     "conf": "10.2.0",
@@ -89,6 +84,7 @@
     "eth-provider": "0.13.6",
     "eth-sig-util": "3.0.1",
     "ethereumjs-util": "7.1.5",
+    "ethers": "5.7.2",
     "extract-zip": "2.0.1",
     "fs-extra": "10.1.0",
     "get-pixels": "3.3.3",
@@ -102,6 +98,7 @@
     "react-dom": "18.2.0",
     "react-restore": "0.5.0",
     "react-transition-group": "4.4.5",
+    "rlp": "3.0.0",
     "semver": "7.3.8",
     "trezor-connect": "8.2.11-extended",
     "uuid": "9.0.0",
@@ -125,6 +122,10 @@
     "@lavamoat/allow-scripts": "2.1.0",
     "@lavamoat/preinstall-always-fail": "1.0.0",
     "@ledgerhq/hw-transport-mocker": "6.27.7",
+    "@parcel/config-default": "2.8.0",
+    "@parcel/transformer-css": "2.8.0",
+    "@parcel/transformer-stylus": "2.8.0",
+    "@parcel/transformer-typescript-tsc": "2.8.0",
     "@sentry/types": "7.20.1",
     "@testing-library/dom": "8.19.0",
     "@testing-library/react": "13.4.0",
@@ -143,7 +144,6 @@
     "electron-builder": "23.6.0",
     "electron-notarize": "1.2.1",
     "eslint": "8.28.0",
-    "ethers": "5.7.2",
     "hardhat": "2.12.2",
     "jest": "29.3.1",
     "jest-environment-jsdom": "29.3.1",
@@ -151,14 +151,27 @@
     "node-abi": "3.28.0",
     "node-gyp": "9.3.0",
     "node-watch": "0.7.3",
-    "parcel-bundler": "1.12.5",
+    "parcel": "2.8.0",
     "prebuild-install": "7.1.1",
     "rimraf": "3.0.2",
     "shx": "0.3.4",
     "standardx": "7.0.0",
     "stylus": "0.59.0",
     "ts-jest": "29.0.3",
-    "typescript": "4.9.3"
+    "typescript": "4.9.3",
+    "wait-on": "^6.0.1"
+  },
+  "overrides": {
+    "node-hid": "2.1.2"
+  },
+  "alias": {
+    "crypto": false,
+    "path": false,
+    "punycode": false,
+    "querystring": false,
+    "stream": false,
+    "string_decoder": false,
+    "url": false
   },
   "standardx": {
     "parser": "babel-eslint",
@@ -166,21 +179,48 @@
       "jest"
     ]
   },
-  "eslintConfig": {
-    "rules": {
-      "multiline-ternary": 0,
-      "react/no-direct-mutation-state": 0,
-      "react/no-find-dom-node": 0
-    }
+  "engines": {
+    "electron": "21"
   },
   "browserslist": [
     "last 1 Electron major version"
   ],
+  "bridge": "./bundle/bridge.js",
+  "inject": "./bundle/inject.js",
+  "tray": "./bundle/tray.html",
+  "dash": "./bundle/dash.html",
+  "dapp": "./bundle/dapp.html",
+  "targets": {
+    "main": false,
+    "bridge": {
+      "context": "electron-renderer",
+      "isLibrary": true,
+      "sourceMap": {
+        "inline": true
+      }
+    },
+    "dash": {
+      "context": "browser"
+    },
+    "dapp": {
+      "context": "browser"
+    },
+    "inject": {
+      "context": "browser"
+    },
+    "tray": {
+      "context": "browser"
+    },
+    "default": {
+      "distDir": "./bundle"
+    }
+  },
   "repository": "github:frame-labs/frame-canary",
   "lavamoat": {
     "allowScripts": {
       "$root$": false,
       "@aragon/wrapper>radspec>date-fns": true,
+      "@aragon/wrapper>radspec>web3-eth>web3-core>web3-core-requestmanager>web3-providers-ws>websocket>es5-ext": false,
       "@aragon/wrapper>web3": true,
       "@aragon/wrapper>web3>web3-bzz": true,
       "@aragon/wrapper>web3>web3-core>web3-core-requestmanager>web3-providers-ws>websocket>es5-ext": true,
@@ -190,19 +230,23 @@
       "@ledgerhq/hw-transport-node-hid-noevents>node-hid": false,
       "@ledgerhq/hw-transport-node-hid-singleton>node-hid": false,
       "@ledgerhq/hw-transport-node-hid-singleton>usb": false,
-      "babel-polyfill>babel-runtime>core-js": true,
-      "babel-polyfill>core-js": true,
       "electron": true,
       "gridplus-sdk": false,
       "gridplus-sdk>secp256k1": true,
       "hardhat>@nomicfoundation/ethereumjs-blockchain>level>classic-level": false,
       "hardhat>keccak": true,
       "hdkey>secp256k1": true,
+      "nebula>ipfs-http-client>ipfs-core-utils>ipfs-unixfs>protobufjs": false,
       "node-hid": false,
-      "parcel-bundler": true,
-      "parcel-bundler>@parcel/watcher>chokidar>fsevents": false,
-      "parcel-bundler>core-js": false,
-      "parcel-bundler>deasync": true,
+      "parcel>@parcel/core>@parcel/cache>@parcel/fs>@parcel/watcher": false,
+      "parcel>@parcel/core>@parcel/cache>lmdb": false,
+      "parcel>@parcel/core>@parcel/cache>lmdb>msgpackr>msgpackr-extract": false,
+      "parcel>@parcel/core>@parcel/fs>@parcel/watcher": false,
+      "parcel>@parcel/core>msgpackr>msgpackr-extract": false,
+      "parcel>@parcel/fs>@parcel/types>@parcel/fs>@parcel/watcher": false,
+      "parcel>@parcel/fs>@parcel/watcher": false,
+      "parcel>@parcel/package-manager>@parcel/fs>@parcel/watcher": false,
+      "react-restore>babel-core>babel-runtime>core-js": true,
       "react-restore>babel-core>babel-register>core-js": true,
       "trezor-connect>@trezor/transport>protobufjs": false,
       "trezor-connect>@trezor/utxo-lib>blake-hash": false,

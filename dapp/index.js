@@ -1,17 +1,6 @@
-// import svg from '../app/../resources/svg'
-// import Native from './Native'
-
-// link.on('location', location => {
-//   updateDapp(location.dapp)
-//   document.title = location.ens
-//   // setColor(location.dapp.color)
-//   //  document.body.style.color = color.text
-//   // style={{ color: color ? color.text : 'none',  background: color ? color.bg : 'none' }}
-// })
-
 import * as Sentry from '@sentry/electron'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import { createRoot } from 'react-dom/client'
 import Restore from 'react-restore'
 
 import App from './App'
@@ -23,7 +12,10 @@ Sentry.init({ dsn: 'https://7b09a85b26924609bef5882387e2c4dc@o1204372.ingest.sen
 
 document.addEventListener('dragover', e => e.preventDefault())
 document.addEventListener('drop', e => e.preventDefault())
-window.eval = global.eval = () => { throw new Error(`This app does not support window.eval()`) } // eslint-disable-line
+
+if (process.env.NODE_ENV !== 'development' || process.env.HMR !== 'true') {
+  window.eval = global.eval = () => { throw new Error(`This app does not support window.eval()`) } // eslint-disable-line
+}
 
 link.rpc('getFrameId', (err, frameId) => {
   if (err) return console.error('Could not get frameId from main', err)
@@ -39,7 +31,8 @@ link.rpc('getFrameId', (err, frameId) => {
       }, 100)
     })
     const DappFrame = Restore.connect(App, store)
-    ReactDOM.render(<DappFrame />, document.getElementById('frame'))
+    const root = createRoot(document.getElementById('frame'));
+    root.render(<DappFrame />)
   })
 })
 
