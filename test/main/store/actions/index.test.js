@@ -1005,7 +1005,7 @@ describe('#updateAccount', () => {
       accounts: {
         1: {
           id: '1',
-					lastSignerType: 'ledger',
+	  lastSignerType: 'ledger',
           balances: {}
         }
       },
