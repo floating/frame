@@ -3,7 +3,6 @@ import Restore from 'react-restore'
 
 import DappTile from './DappTile'
 import Native from '../../resources/Native'
-import svg from '../../resources/svg'
 import link from '../../resources/link'
 
 class App extends React.Component {
@@ -52,9 +51,9 @@ class App extends React.Component {
           <div className='dappIcons'>
             <div className='dappIconsScroll'>
               <div className='dappIconsWrap'>
-                {Object.keys(store('main.dapps')).map(id => {
+                {Object.keys(store('main.dapps')).map((id, index) => {
                   return (
-                    <DappTile ens={store('main.dapps', id, 'ens')} />
+                    <DappTile key={`dapp-${index}`} ens={store('main.dapps', id, 'ens')} />
                   )
                 })}
               </div>

@@ -277,8 +277,10 @@ class Signer extends React.Component {
       return Boolean(this.store('main.accounts', address.toLowerCase()))
     })
 
+    const zIndex = 1000 - this.props.index
+
     return (
-      <div className={signerClass + ' cardShow'} style={{ zIndex: 1000 - this.props.index }}>
+      <div className={signerClass + ' cardShow'} style={{ zIndex }}>
         <div className='signerTop'>
           <div className='signerDetails'>
             <div className='signerIcon'>
@@ -400,34 +402,37 @@ class Signer extends React.Component {
   }
 
   renderExpanded () {
-    const signer = this.store('main.signers', this.props.id)
+    const { id, type, tag, index = 0 } = this.props
+    const signer = this.store('main.signers', id)
     const { page, addressLimit } = this.state
     const startIndex = page * addressLimit
 
     const status = this.getStatus()
 
-    const hwSigner = isHardwareSigner(this.props.type)
+    const hwSigner = isHardwareSigner(type)
     const loading = isLoading(status)
 
     // TODO: create well-defined signer states that drive these UI features
     const canReconnect =
-      (this.props.type !== 'trezor' || status === 'disconnected' || status.includes('reconnect'))
+      (type !== 'trezor' || status === 'disconnected' || status.includes('reconnect'))
 
     // UI changes for this status only apply to hot signers
     const isLocked = !hwSigner && status === 'locked'
-    const permissionId = (this.props.tag || this.props.tag === '')
-      ? 'Frame' + (this.props.tag ? `-${this.props.tag}` : '')
+    const permissionId = (tag || tag === '')
+      ? 'Frame' + (tag ? `-${tag}` : '')
       : undefined
 
     let signerClass = 'signer'
     if (status === 'ok') signerClass += ' signerOk'
     if (isLocked) signerClass += ' signerLocked'
 
+    const zIndex = 1000 - index
+
     return (
-      <div className={'expandedSigner cardShow'} style={{ zIndex: 1000 - this.props.index }}>
+      <div className={'expandedSigner cardShow'} style={{ zIndex }}>
         {<div style={{ height: '22px' }} />}
         {this.statusText()}
-        {this.props.type === 'lattice' && status === 'pair' ? (
+        {type === 'lattice' && status === 'pair' ? (
           <div className='signerLatticePair'>
             <div className='signerLatticePairTitle'>Please input your Lattice's pairing code</div>
             <div className='signerLatticePairInput'>
@@ -481,7 +486,7 @@ class Signer extends React.Component {
               <div className='signerBottomPageNext' onMouseDown={() => this.nextPage()}>{svg.triangleLeft(20)}</div>
             </div>
           </>
-        ) : this.props.type === 'trezor' && (status === 'need pin' || status === 'enter passphrase') ? (
+        ) : type === 'trezor' && (status === 'need pin' || status === 'enter passphrase') ? (
           <div className='signerInterface'>
             {this.renderTrezorPin(this.props.type === 'trezor' && status === 'need pin')}
             {this.renderTrezorPhrase(this.props.type === 'trezor' && status === 'enter passphrase')}
@@ -504,7 +509,7 @@ class Signer extends React.Component {
           ) : null}
           {canReconnect ? this.reconnectButton(hwSigner) : null}
           <div className='signerControlOption signerControlOptionImportant' onClick={() => {
-            link.send('dash:removeSigner', this.props.id)
+            link.send('dash:removeSigner', id)
             link.send('tray:action', 'backDash')
           }}>Remove Signer</div>
         </div>

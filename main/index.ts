@@ -3,7 +3,7 @@ import path from 'path'
 import log from 'electron-log'
 import url from 'url'
 
-// DO NOT MOVE - env var below is required to enable watch mode for development on the renderer process and must be set before all local imports 
+// DO NOT MOVE - env var below is required for app init and must be set before all local imports 
 process.env.BUNDLE_LOCATION = process.env.BUNDLE_LOCATION || path.resolve(__dirname, './../..', 'bundle')
 
 import * as errors from './errors'
@@ -28,9 +28,9 @@ app.commandLine.appendSwitch('ignore-gpu-blacklist', 'true')
 app.commandLine.appendSwitch('enable-native-gpu-memory-buffers', 'true')
 app.commandLine.appendSwitch('force-color-profile', 'srgb')
 
-const dev = process.env.NODE_ENV === 'development'
+const isDev = process.env.NODE_ENV === 'development'
 
-log.transports.console.level = process.env.LOG_LEVEL || (dev ? 'verbose' : 'info')
+log.transports.console.level = process.env.LOG_LEVEL || (isDev ? 'verbose' : 'info')
 log.transports.file.level = ['development', 'test'].includes(process.env.NODE_ENV) ? false : 'verbose'
 
 const hasInstanceLock = app.requestSingleInstanceLock()
@@ -40,7 +40,7 @@ if (!hasInstanceLock) {
   app.exit(1)
 }
 
-if (dev) {
+if (isDev) {
   const cpuMonitoringInterval = 10 // seconds
   const cpuThreshold = 30 // percent
 
@@ -273,7 +273,7 @@ ipcMain.on('tray:syncPath', (e, path, value) => {
 ipcMain.on('tray:ready', () => {
   require('./api')
 
-  if (!dev) {
+  if (!isDev) {
     startUpdater()
   }
 })
