@@ -1,7 +1,6 @@
 import React from 'react'
 import Restore from 'react-restore'
 import link from '../../../../../../../resources/link'
-import svg from '../../../../../../../resources/svg'
 
 class txData extends React.Component {
   constructor (...args) {
@@ -10,11 +9,7 @@ class txData extends React.Component {
       copied: false
     }
   }
-  copyAddress (data) {
-    link.send('tray:clipboardData', data)
-    this.setState({ copied: true })
-    setTimeout(_ => this.setState({ copied: false }), 1000)
-  }
+
   render () {
     const req = this.props.req
     return (
@@ -60,9 +55,5 @@ class txData extends React.Component {
     )
   }
 }
-
-{/* <div className='transactionToAddressFull' onMouseDown={this.copyAddress.bind(this, req.data.to)}>
-{this.state.copied ? <span>{'Copied'}{svg.octicon('clippy', { height: 14 })}</span> : req.data.to}
-</div> */}
 
 export default Restore.connect(txData)

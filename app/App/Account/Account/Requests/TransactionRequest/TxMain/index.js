@@ -3,9 +3,9 @@ import Restore from 'react-restore'
 import link from '../../../../../../../resources/link'
 import svg from '../../../../../../../resources/svg'
 import utils from 'web3-utils'
-import { getAddress } from '@ethersproject/address'
 
 import { Cluster, ClusterRow, ClusterValue } from '../../../../../../../resources/Components/Cluster'
+import {getAddress} from '../../../../../../../resources/utils' 
 
 class TxSending extends React.Component {
   constructor (...args) {

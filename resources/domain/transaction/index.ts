@@ -1,5 +1,4 @@
 import { JsonTx } from '@ethereumjs/tx'
-import { getAddress as getChecksumAddress } from '@ethersproject/address'
 
 export enum GasFeesSource {
   Dapp = 'Dapp',
@@ -24,14 +23,4 @@ export function usesBaseFee (rawTx: TransactionData) {
   return typeSupportsBaseFee(rawTx.type)
 }
 
-export function getAddress (address: Address) {
-  const lowerCaseAddress = address.toLowerCase()
 
-  try {
-    // this will throw if the address can't be checksummed
-    return getChecksumAddress(lowerCaseAddress)
-  } catch (e) {
-    console.warn(`could not checksum address ${address}, using lowercase address`, e)
-    return lowerCaseAddress
-  }
-}
