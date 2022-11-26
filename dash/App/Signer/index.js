@@ -8,6 +8,13 @@ import { isHardwareSigner, getSignerDisplayType } from '../../../resources/domai
 
 import SignerStatus from './SignerStatus'
 
+export const Types = {
+  Lattice: "lattice",
+  Trezor: "trezor",
+  Keystone: "keystone",
+  Ledger: "ledger"
+};
+
 function isLoading (status = '') {
   const statusToCheck = status.toLowerCase()
   return ['loading', 'connecting', 'addresses', 'input', 'pairing'].some(s => statusToCheck.includes(s))
@@ -21,7 +28,7 @@ function isDisconnected (type, status, isLoading) {
   if (type === 'trezor') {
     return (status === 'disconnected' || status.includes('reconnect')) && !isLoading
   }
-  
+
   return false
 }
 
@@ -195,8 +202,8 @@ class Signer extends React.Component {
       const lockText = hwSigner
         ? 'Please unlock your ' + this.props.type
         : 'locked'
-      
-      const classes = hwSigner 
+
+      const classes = hwSigner
         ? 'signerStatusText'
         : 'signerStatusText signerStatusIssue'
       return (
@@ -224,13 +231,13 @@ class Signer extends React.Component {
 
   pairToLattice () {
     link.rpc('latticePair', this.props.id, this.state.latticePairCode, () => {})
-    
+
     this.setState({ latticePairCode: '' })
   }
 
   expand (id) {
     const crumb = {
-      view: 'expandedSigner', 
+      view: 'expandedSigner',
       data: { signer: id }
     }
     link.send('tray:action', 'navDash', crumb)
@@ -394,7 +401,7 @@ class Signer extends React.Component {
     const signer = this.store('main.signers', this.props.id)
 
     return (
-      <SignerStatus 
+      <SignerStatus
         signer={signer}
       />
     )
@@ -451,8 +458,8 @@ class Signer extends React.Component {
             {this.renderSignerStatus()}
             {/* <div className='signerAccountsTitle'>
               <span className={activeAccounts.length > 0 ? 'signerAccountsTitleActive signerAccountsTitleActiveOn' : 'signerAccountsTitleActive'}>
-                <span>{'active accounts'}</span> 
-                <span className='signerAccountsTitleActiveCount'>{activeAccounts.length}</span> 
+                <span>{'active accounts'}</span>
+                <span className='signerAccountsTitleActiveCount'>{activeAccounts.length}</span>
               </span>
             </div> */}
             <div className='signerAddedAccountTitle'>{'available accounts'}</div>
@@ -487,7 +494,7 @@ class Signer extends React.Component {
           <div className='signerInterface'>
             {this.renderTrezorPin(this.props.type === 'trezor' && status === 'need pin')}
             {this.renderTrezorPhrase(this.props.type === 'trezor' && status === 'enter passphrase')}
-          </div> 
+          </div>
         ) : loading ? (
           <div className='signerLoading'>
             <div className='signerLoadingLoader' />
