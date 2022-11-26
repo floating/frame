@@ -142,7 +142,7 @@
     "babel-eslint": "10.1.0",
     "electron": "21.3.0",
     "electron-builder": "23.6.0",
-    "electron-devtools-installer": "^3.2.0",
+    "electron-devtools-installer": "3.2.0",
     "electron-notarize": "1.2.1",
     "eslint": "8.28.0",
     "hardhat": "2.12.2",
