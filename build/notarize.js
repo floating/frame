@@ -1,7 +1,7 @@
 const fs = require('fs')
 const { execFileSync } = require('child_process')
 const path = require('path')
-const electronNotarize = require('electron-notarize')
+const electronNotarize = require('@electron/notarize')
 
 module.exports = async function (params) {
   if (process.platform !== 'darwin') return // Only notarize the app on macOS
