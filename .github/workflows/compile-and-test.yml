@@ -16,6 +16,11 @@ jobs:
     - uses: actions/setup-node@v2
       with:
         node-version: 16.15.0
+    - uses: doyensec/electronegativity-action@v2
+    - name: Upload sarif
+      uses: github/codeql-action/upload-sarif@v1
+      with:
+        sarif_file: ../electronegativity_results
     - name: create NPM config file
       run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_AUTH_TOKEN }}" > ./.npmrc
     - run: |
@@ -24,3 +29,6 @@ jobs:
     - run: npm run setup:ci
     - run: npm run compile
     - run: npm run test:unit
+
+
+
