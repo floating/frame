@@ -2,6 +2,7 @@ import { app, ipcMain, protocol, shell, clipboard, globalShortcut, powerMonitor,
 import path from 'path'
 import log from 'electron-log'
 import url from 'url'
+import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer'
 
 // DO NOT MOVE - env var below is required for app init and must be set before all local imports 
 process.env.BUNDLE_LOCATION = process.env.BUNDLE_LOCATION || path.resolve(__dirname, './../..', 'bundle')
@@ -64,6 +65,18 @@ errors.init()
 log.info(`Chrome: v${process.versions.chrome}`)
 log.info(`Electron: v${process.versions.electron}`)
 log.info(`Node: v${process.versions.node}`)
+
+async function installElectronDevToolExtensions(): Promise<void> {
+  try {
+    await installExtension([REACT_DEVELOPER_TOOLS], {
+      forceDownload: false,
+      loadExtensionOptions: { allowFileAccess: true }
+    })
+    console.info(`[INFO] Successfully added devtools extensions`)
+  } catch (err) {
+    console.warn('[WARN] An error occurred while trying to add devtools extensions:\n', err)
+  }
+}
 
 // prevent showing the exit dialog more than once
 let closing = false
@@ -329,6 +342,11 @@ app.on('ready', () => {
   menu()
   windows.init()
   if (app.dock) app.dock.hide()
+  if (isDev) {
+    (async () => {
+      await installElectronDevToolExtensions()
+    })()
+  }
 
   protocol.interceptFileProtocol('file', (req, cb) => {
     const appOrigin = path.resolve(__dirname, '../../')
