@@ -219,24 +219,6 @@ class _AccountMain extends React.Component {
       expandedModule: ''
     }
   }
-  // computePositions () {
-  //   this.resizeObserver.disconnect()
-  //   const modulePositions = []
-  //   let slideHeight = 0
-  //   this.moduleRefs.forEach((ref, i) => {
-  //     modulePositions[i] = {}
-  //     modulePositions[i].top = slideHeight
-  //     modulePositions[i].height = ref && ref.current ? ref.current.clientHeight + 1 : 0
-  //     slideHeight += modulePositions[i].height
-  //   })
-  // }
-  
-
-  // setSignerStatusOpen (value) {
-  //   link.send('tray:action', 'setAccountSignerStatusOpen', value)
-  // }
-
-
   renderAccountFilter () {
     return (
       <div className='panelFilterAccount'>
@@ -260,7 +242,6 @@ class _AccountMain extends React.Component {
             className='panelFilterClear'
             onClick={() => {
               this.setState({ accountModuleFilter: '' })
-              link.send('tray:action', 'setAccountFilter', '')
             }}
           >
             {svg.close(12)}

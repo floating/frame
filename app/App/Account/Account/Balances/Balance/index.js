@@ -5,19 +5,6 @@ import RingIcon from '../../../../../../resources/Components/RingIcon'
 
 import svg from '../../../../../../resources/svg'
 class Balance extends React.Component {
-  // constructor (...args) {
-  //   super(...args)
-  //   this.state = {
-  //     initialMount: true
-  //   }
-  // }
-
-  // componentDidMount () {
-  //   setTimeout(() => {
-  //     this.setState({ initialMount: false })
-  //   }, 200)
-  // }
-
   render () {
     const { symbol, balance, i, scanning, chainId } = this.props
     const change = parseFloat(balance.priceChange)
@@ -33,7 +20,6 @@ class Balance extends React.Component {
     let name = balance.name
     if (name.length > 19) name = name.substr(0, 17) + '..'
 
-    const chainHex = '0x' + chainId.toString(16)
     const priceChange = () => {
       if (!balance.priceChange) {
         return ''
@@ -46,7 +32,7 @@ class Balance extends React.Component {
 
     return (
       <div className={i === 0 ? 'signerBalance signerBalanceBase' : 'signerBalance'} key={symbol} onMouseDown={() => this.setState({ selected: i })}>
-        <div className='signerBalanceLoading' style={{ opacity: !scanning ? 0 : 1, animationDelay: (0.15 * i) + 's' }} />
+        {scanning && <div className='signerBalanceLoading' style={{ animationDelay: (0.15 * i) + 's' }} />}
         <div className='signerBalanceInner' style={{ opacity: !scanning ? 1 : 0 }}>
           <div className='signerBalanceIcon'>
             <RingIcon 
@@ -68,7 +54,7 @@ class Balance extends React.Component {
             <span 
               className='signerBalanceSymbol'
             >
-              {symbol.toUpperCase()}
+              {symbol}
             </span>
             <span
               style={(balance.displayBalance || '0').length >= 12 ? { marginTop: '-3px' } : {}}

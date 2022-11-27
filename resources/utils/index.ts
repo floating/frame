@@ -1,5 +1,5 @@
 import { randomInt } from 'crypto'
-import { addHexPrefix, intToHex } from 'ethereumjs-util'
+import { addHexPrefix, intToHex, stripHexPrefix } from 'ethereumjs-util'
 
 const weiToGwei = (wei: number) => wei / 1e9
 const weiToHex = (wei: number) => addHexPrefix(wei.toString(16))
@@ -58,6 +58,19 @@ function getErrorCode (e: Error) {
   return e.code
 }
 
+const matchFilter = (filter: string = '', properties: string[] = []) => {
+  if (!filter) return true
+  if (typeof filter !== 'string' || !Array.isArray(properties)) return false
+  const filterItems = filter.split(' ')
+  return filterItems.every((item = '') => {
+    item = item.toLowerCase()
+    return properties.some(prop => {
+      prop = prop.toLowerCase()
+      return prop.indexOf(item) !== -1
+    })
+  })
+}
+
 export {
   getErrorCode,
   randomLetters,
@@ -73,5 +86,7 @@ export {
   hexToInt,
   weiHexToGweiInt,
   weiIntToEthInt,
-  gweiToWeiHex
+  gweiToWeiHex,
+  stripHexPrefix,
+  matchFilter
 }

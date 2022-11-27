@@ -6,9 +6,11 @@ import {
   addNetwork as addNetworkAction,
   removeBalance as removeBalanceAction,
   setBalances as setBalancesAction,
+  removeBalances as removeBalancesAction,
   addCustomTokens as addCustomTokensAction,
   removeCustomTokens as removeTokensAction,
   addKnownTokens as addKnownTokensAction,
+  removeKnownTokens as removeKnownTokensAction,
   setScanning as setScanningAction,
   initOrigin as initOriginAction,
   clearOrigins as clearOriginsAction,
@@ -20,6 +22,7 @@ import {
   activateNetwork as activateNetworkAction,
   setBlockHeight as setBlockHeightAction
 } from '../../../../main/store/actions'
+import { toTokenId } from '../../../../resources/domain/balance'
 
 beforeAll(() => {
   log.transports.console.level = false
@@ -980,3 +983,65 @@ describe('#setBlockHeight', () => {
     expect(main.networksMeta.ethereum).toStrictEqual({ 1: { blockHeight: 0 }, 4: { blockHeight: 500 }, 137: { blockHeight: 0 } })
   })
 })
+
+describe('#removeBalances', () => {
+  let balances
+
+  const updaterFn = (node, address, update) => {
+    expect(node).toBe('main.balances')
+    expect(address).toBe(owner)
+
+    balances = update(balances)
+  }
+
+  const removeBalances = setToRemove => removeBalancesAction(updaterFn, owner, setToRemove)
+
+  beforeEach(() => {
+    balances = Object.values(testTokens).map(token => ({...token, balance: addHexPrefix(new BigNumber(120).toString(16))}))
+  })
+
+  it('should remove all tokens from the removal set from an accounts balance', () => {
+    const removalSet = new Set(Object.values(testTokens).map(toTokenId))
+    removeBalances(removalSet)
+    expect(balances.length).toBe(0)
+  })
+
+  it('should only remove tokens from the removal set from an accounts balance', () => {
+    const removalSet = new Set()
+    removalSet.add(toTokenId(testTokens.badger))
+    removeBalances(removalSet)
+    expect(balances.length).toBe(1)
+  })
+})
+
+describe('#removeKnownTokens', () => {
+  let knownTokens
+
+  const updaterFn = (node, address, update) => {
+    expect(node).toBe('main.tokens.known')
+    expect(address).toBe(owner)
+
+    knownTokens = update(knownTokens)
+  }
+
+  const removeKnownTokens = setToRemove => removeKnownTokensAction(updaterFn, owner, setToRemove)
+
+
+
+  beforeEach(() => {
+    knownTokens = Object.values(testTokens)
+  })
+
+  it('should remove all tokens from the removal set from an accounts known tokens', () => {
+    const removalSet = new Set(Object.values(testTokens).map(toTokenId))
+    removeKnownTokens(removalSet)
+    expect(knownTokens.length).toBe(0)
+  })
+
+  it('should only remove tokens from the removal set from an accounts known tokens', () => {
+    const removalSet = new Set([toTokenId(testTokens.badger)])
+    removeKnownTokens(removalSet)
+    expect(knownTokens.length).toBe(1)
+  })
+})
+

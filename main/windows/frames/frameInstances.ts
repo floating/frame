@@ -3,8 +3,11 @@ import path from 'path'
 
 import store from '../../store'
 
-import webPrefrences from '../webPreferences'
+import webPreferences from '../webPreferences'
 import topRight from './topRight'
+
+const isDev = process.env.NODE_ENV === 'development'
+const enableHMR = isDev && process.env.HMR === 'true'
 
 export interface FrameInstance extends BrowserWindow {
   frameId?: string,
@@ -30,7 +33,6 @@ export default {
   },
   create: (frame: Frame) => {  
     const preload = path.resolve(__dirname, (process.env.BUNDLE_LOCATION || ''), 'bridge.js')
-  
     const frameInstance: FrameInstance = new BrowserWindow({
       x: 0,
       y: 0,
@@ -44,10 +46,10 @@ export default {
       trafficLightPosition: { x: 10, y: 9 },
       backgroundColor: store('main.colorwayPrimary', store('main.colorway'), 'background'),
       icon: path.join(__dirname, './AppIcon.png'),
-      webPreferences: { ...webPrefrences, preload }
+      webPreferences: { ...webPreferences, preload }
     })
 
-    frameInstance.loadURL(`file://${process.env.BUNDLE_LOCATION}/dapp.html`)
+    frameInstance.loadURL(enableHMR ? 'http://localhost:1234/dapp/dapp.dev.html' : `file://${process.env.BUNDLE_LOCATION}/dapp.html`)
   
     frameInstance.on('ready-to-show', () => {
       frameInstance.show()
@@ -72,7 +74,9 @@ export default {
     //   setTimeout(() => relayerOverlay(windows[dappFrameId]), 10)
     // })
 
-    // frameInstance.webContents.openDevTools({ mode: 'detach' })
+    if (isDev) {
+      frameInstance.webContents.openDevTools({ mode: 'detach' })
+    }
 
     return frameInstance
   }

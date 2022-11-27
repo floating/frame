@@ -1,8 +1,5 @@
 import React from 'react'
-import ReactDOM from 'react-dom'
 import Restore from 'react-restore'
-import utils from 'web3-utils'
-import BigNumber from 'bignumber.js'
 
 // import Account from './Account'
 // import TxBar from './TxBar'

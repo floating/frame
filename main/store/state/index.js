@@ -467,8 +467,8 @@ const initial = {
             },
             icon: '',
             name: 'Ether',
-            symbol: '18',
-            decimals: 0
+            symbol: 'ETH',
+            decimals: 18
           },
           icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/optimism.svg',
           primaryColor: 'accent4' // Optimism
@@ -535,7 +535,7 @@ const initial = {
             },
             icon: '',
             name: 'Ether',
-            symbol: '',
+            symbol: 'ETH',
             decimals: 18
           },
           icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/arbitrum.svg',

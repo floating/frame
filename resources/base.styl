@@ -194,10 +194,11 @@ body
   left 0
   background linear-gradient(-35deg, var(--overlayA) 0%, var(--overlayB) 100%)
   z-index 9999999999999999
-  // background-blend-mode screen
   pointer-events none
-  // opacity 0.01
-  // pointer-events none
+
+.suspend
+  *
+    animation-play-state paused !important
 
 .clip
   *
@@ -518,6 +519,7 @@ body
 .glitchOn
   .line
     display block
+    will-change clip-path
 
   .line:not(:first-child)
     position absolute
@@ -699,16 +701,16 @@ body
   80%
 	  transform translateX(0)
 	  color var(--outerspace)
-	85%
+  85%
 	  transform translateX(-3px)
 	  color var(--good)
-	90%
+  90%
 	  transform translateX(-1px)
 	  color var(--bad)
-	95%
+  95%
 	  transform translateX(-4px)
 	  color var(--outerspace)
-	100%
+  100%
 	  transform translateX(0)
 
 .line:nth-child(10)
@@ -740,4 +742,3 @@ body
 
 @import './Native/style'
 @import './Components'
-

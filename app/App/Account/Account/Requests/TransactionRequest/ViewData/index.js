@@ -1,6 +1,5 @@
 import React from 'react'
 import Restore from 'react-restore'
-import utils from 'web3-utils'
 import svg from '../../../../../../../resources/svg'
 import link from '../../../../../../../resources/link'
 
@@ -135,6 +134,25 @@ class ViewData extends React.Component {
     ) : 'Could not decode data..'
   }
 
+  decodeRawTx (tx) {
+    const decodeTx = {}
+    Object.keys(tx).forEach(key => {
+      if (tx[key] && !tx[key].startsWith('0x')) {
+        decodeTx[key] = tx[key]
+      } else if (['chainId', 'nonce', 'gasLimit', 'gasPrice', 'maxFeePerGas', 'maxPriorityFeePerGas'].includes(key)) {
+        try {
+          // convert these keys to ints
+          decodeTx[key] = parseInt(tx[key], 16)
+        } catch (e) {
+          decodeTx[key] = tx[key]
+        }
+      } else {
+        decodeTx[key] = tx[key]
+      }
+    })
+    return decodeTx
+  }
+
   render () {
     const { accountId, handlerId, step } = this.props
     const req = this.store('main.accounts', accountId, 'requests', handlerId)
@@ -148,46 +166,8 @@ class ViewData extends React.Component {
         </div> */}
         <div className='txViewData'>
           <div className='txViewDataHeader'>{'Raw Transaction'}</div>
-          <SimpleTxJSON json={tx} req={req} />
+          <SimpleTxJSON json={this.decodeRawTx(tx)} req={req} />
         </div>
-      </div>
-    )
-  }
-
-  renderOld () {
-    const { accountId, handlerId, step } = this.props
-    const req = this.store('main.accounts', accountId, 'requests', handlerId)
-    let nonce = parseInt(req.data.nonce, 'hex')
-    if (isNaN(nonce)) nonce = 'TBD'
-
-    return (
-      <div className='txViewData '>
-        {utils.toAscii(req.data.data || '0x') ? (
-          <div className='transactionDataBodyInner'>
-            <div>
-              
-            </div>
-            
-            <div className='txDataOverlayRaw'>
-              <div className='txDataOverlayRawTitle'>{'Raw Transaction Data'}</div>
-              <div className='txDataOverlayRawData' onClick={() => this.copyData(req.data.data)}>
-                {this.state.copiedData ? (
-                  <div className='txModuleDataBodyCopied'>
-                    <div>Copied Data</div>
-                    {svg.octicon('clippy', { height: 20 })}
-                  </div>
-                ) : null}
-                {req.data.data}
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className='txModuleTop'>
-            <div className='txModuleTopData' style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              No Data
-            </div>
-          </div>
-        )}
       </div>
     )
   }

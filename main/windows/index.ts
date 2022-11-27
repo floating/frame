@@ -1,8 +1,8 @@
-import { app, BrowserWindow, ipcMain, screen, Tray as ElectronTray, Menu, globalShortcut, IpcMainEvent, WebContents } from 'electron'
+import { app, BrowserWindow, ipcMain, screen, Tray as ElectronTray, Menu, globalShortcut, IpcMainEvent, WebContents, BrowserWindowConstructorOptions } from 'electron'
 import path from 'path'
 import log from 'electron-log'
 import EventEmitter from 'events'
-import { hexToNumber } from 'web3-utils'
+import { hexToInt } from '../../resources/utils'
 
 import store from '../store'
 import FrameManager from './frames'
@@ -24,6 +24,7 @@ let dash: Dash
 let mouseTimeout: NodeJS.Timeout
 let glide = false
 
+const enableHMR = process.env.NODE_ENV === 'development' && process.env.HMR === 'true'
 const hideFrame = () => tray.hide()
 const showFrame = () => tray.show()
 
@@ -104,8 +105,20 @@ const detectMouse = () => {
   }, 50)
 }
 
+function createWindow (name: string, opts: BrowserWindowConstructorOptions) {
+  log.verbose(`Creating ${name} window`)
+
+  const browserWindow = new BrowserWindow(opts)
+
+  browserWindow.webContents.once('did-finish-load', () => {
+    log.info(`Created ${name} renderer process, pid:`, browserWindow.webContents.getOSProcessId())
+  })
+
+  return browserWindow
+}
+
 function initDashWindow () {
-  windows.dash = new BrowserWindow({
+  windows.dash = createWindow('dash', {
     width: trayWidth,
     frame: false,
     transparent: process.platform === 'darwin',
@@ -122,12 +135,12 @@ function initDashWindow () {
     }
   })
 
-  const dashUrl = new URL(path.join(process.env.BUNDLE_LOCATION, 'dash.html'), 'file:')
+  const dashUrl = enableHMR ? 'http://localhost:1234/dash/dash.dev.html' : new URL(path.join(process.env.BUNDLE_LOCATION, 'dash.html'), 'file:')
   windows.dash.loadURL(dashUrl.toString())
 }
 
 function initTrayWindow () {
-  windows.tray = new BrowserWindow({
+  windows.tray = createWindow('tray', {
     width: trayWidth,
     frame: false,
     transparent: process.platform === 'darwin',
@@ -145,7 +158,7 @@ function initTrayWindow () {
     }
   })
 
-  const trayUrl = new URL(path.join(process.env.BUNDLE_LOCATION, 'tray.html'), 'file:')
+  const trayUrl = enableHMR ? 'http://localhost:1234/app/tray.dev.html' : new URL(path.join(process.env.BUNDLE_LOCATION, 'tray.html'), 'file:')
   windows.tray.loadURL(trayUrl.toString())
 
   windows.tray.on('closed', () => delete windows.tray)
@@ -153,6 +166,7 @@ function initTrayWindow () {
   windows.tray.webContents.on('will-attach-webview', e => e.preventDefault()) // Prevent attaching <webview>
   windows.tray.webContents.setWindowOpenHandler(() => ({ action: 'deny' })) // Prevent new windows
   windows.tray.webContents.session.setPermissionRequestHandler((webContents, permission, res) => res(false))
+
   windows.tray.setResizable(false)
   windows.tray.setMovable(false)
   windows.tray.setSize(0, 0)
@@ -227,7 +241,7 @@ class Tray {
       if (store('platform') === 'darwin' && store('main.menubarGasPrice')) {
         const gasPrice = store('main.networksMeta.ethereum', 1, 'gas.price.levels.fast')
         if (!gasPrice) return
-        const gasDisplay = Math.round(hexToNumber(gasPrice) / 1000000000).toString()
+        const gasDisplay = Math.round(hexToInt(gasPrice) / 1000000000).toString()
         title = gasDisplay // ɢ 🄶 Ⓖ ᴳᵂᴱᴵ
       }
       this.electronTray.setTitle(title)
@@ -381,7 +395,7 @@ app.on('ready', () => {
 })
 
 if (isDev) {
-    app.on('ready', () => {
+  app.on('ready', () => {
     globalShortcut.register('CommandOrControl+R', () => {
       Object.keys(windows).forEach(win => {
         windows[win].reload()
@@ -390,17 +404,6 @@ if (isDev) {
       frameManager.reloadFrames()
     })
   })
-  if (process.env.BUNDLE_LOCATION) {
-    const watch = require('node-watch')
-    watch(path.resolve(process.env.BUNDLE_LOCATION), { recursive: true }, (_evt: Event, name: string) => {
-    if (name.indexOf('css') > -1) {
-        Object.keys(windows).forEach(win => {
-          windows[win].webContents.send('main:reload:style', name)
-        })
-        frameManager.reloadFrames(name)
-      }
-    })
-  }
 }
 
 ipcMain.on('*:contextmenu', (e, x, y) => {

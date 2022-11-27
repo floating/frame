@@ -1,5 +1,5 @@
 import log from 'electron-log'
-import utils from 'web3-utils'
+import { hexToInt } from '../../../../resources/utils'
 import { padToEven, stripHexPrefix, addHexPrefix } from 'ethereumjs-util'
 import { SignTypedDataVersion, TypedDataUtils } from '@metamask/eth-sig-util'
 import type { Device as TrezorDevice } from 'trezor-connect'
@@ -303,7 +303,7 @@ export default class Trezor extends Signer {
       to: this.normalize(txJson.to || ''),
       value: this.normalize(txJson.value || ''),
       data: this.normalize(txJson.data || ''),
-      chainId: utils.hexToNumber(chainId)
+      chainId: hexToInt(chainId)
     }
 
     const optionalFields = ['gasPrice', 'maxFeePerGas', 'maxPriorityFeePerGas']

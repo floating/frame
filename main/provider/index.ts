@@ -1,8 +1,8 @@
 import { v4 as uuid } from 'uuid'
 import EventEmitter from 'events'
 import log from 'electron-log'
-import utils from 'web3-utils'
 import { recoverTypedSignature, SignTypedDataVersion } from '@metamask/eth-sig-util'
+import { isAddress } from '@ethersproject/address'
 import crypto from 'crypto'
 import {
   addHexPrefix,
@@ -534,7 +534,7 @@ export class Provider extends EventEmitter {
   _personalSign (payload: RPCRequestPayload, res: RPCRequestCallback) {
     const params = payload.params || []
 
-    if (utils.isAddress(params[0]) && !utils.isAddress(params[1])) {
+    if (isAddress(params[0]) && !isAddress(params[1])) {
       // personal_sign requests expect the first parameter to be the message and the second
       // parameter to be an address. however some clients send these in the opposite order
       // so try to detect that
@@ -565,7 +565,7 @@ export class Provider extends EventEmitter {
 
   signTypedData (rawPayload: RPCRequestPayload, version: SignTypedDataVersion, res: RPCRequestCallback) {
     // ensure param order is [address, data, ...] regardless of version
-    const orderedParams = utils.isAddress(rawPayload.params[1]) && !utils.isAddress(rawPayload.params[0])
+    const orderedParams = isAddress(rawPayload.params[1]) && !isAddress(rawPayload.params[0])
       ? [rawPayload.params[1], rawPayload.params[0], ...rawPayload.params.slice(2)]
       : [...rawPayload.params]
 

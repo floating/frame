@@ -1,4 +1,5 @@
 import log from 'electron-log'
+import { toTokenId } from '../../../resources/domain/balance'
 
 const panelActions = require('./panel')
 const supportedNetworkTypes = ['ethereum']
@@ -567,6 +568,11 @@ module.exports = {
       return balances
     })
   },
+  removeBalances: (u, address, tokensToRemove) => {
+    const needsRemoval = (balance) => tokensToRemove.has(toTokenId(balance))
+    u('main.balances', address, (balances = []) => balances.filter(balance => !needsRemoval(balance))
+)
+  },
   setScanning: (u, address, scanning) => {
     if (scanning) {
       u('main.scanning', address, () => true)
@@ -606,10 +612,9 @@ module.exports = {
       return [...existingTokens, ...tokensToAdd]
     })
   },
-  removeKnownTokens: (u, address, tokens) => {
-    u('main.tokens.known', address, (existing = []) => {
-      return existing.filter(token => !includesToken(tokens, token))
-    })
+  removeKnownTokens: (u, address, tokensToRemove) => {
+    const needsRemoval = (token) => tokensToRemove.has(toTokenId(token))
+    u('main.tokens.known', address, (existing = []) => existing.filter(token => !needsRemoval(token)))
   },
   setColorway: (u, colorway) => {
     u('main.colorway', () => {
@@ -667,15 +672,18 @@ module.exports = {
     u('windows.panel.nav', nav => {
       const newNav = nav.filter(navItem => {
         const item = navItem || {}
-        return !item?.req?.handlerId === handlerId
+        return item?.data?.requestId !== handlerId
       })
       return newNav
     })
   },
-  navBack: (u, windowId) => {
+  navBack: (u, windowId, numSteps = 1) => {
     if (!windowId) return log.warn('Invalid nav back', windowId)
     u('windows', windowId, 'nav', nav => {
-      nav.shift()
+      while (numSteps > 0 && nav.length > 0) {
+        nav.shift()
+        numSteps -= 1
+      }
       return nav
     })
   },
