@@ -86,11 +86,12 @@ async function extractColors (url: string, ens: string) {
   })
 
   let view: BrowserView | null = new BrowserView({ 
-    webPreferences: Object.assign({ 
+    webPreferences: { 
+      ...webPreferences,
       preload: path.resolve('./main/windows/viewPreload.js') ,
       partition: 'persist:' + ens,
       offscreen: true
-    }, webPreferences)
+    }
   })
 
   view.webContents.on('will-navigate', e => e.preventDefault())

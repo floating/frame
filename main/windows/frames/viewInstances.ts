@@ -4,10 +4,8 @@ import { URL } from 'url'
 import log from 'electron-log'
 
 import { FrameInstance } from './frameInstances'
-
 import store from '../../store'
 import webPreferences from '../webPreferences'
-
 import server from '../../dapps/server'
 
 interface extract {
@@ -26,10 +24,11 @@ export default {
   // Create a view instance on a frame
   create: (frameInstance: FrameInstance, view: ViewMetadata) => {
     const viewInstance = new BrowserView({ 
-      webPreferences: Object.assign({ 
+      webPreferences: {
+        ...webPreferences,
         preload: path.resolve('./main/windows/viewPreload.js'),
         partition: 'persist:' + view.ens
-      }, webPreferences)
+      }
     })
   
     viewInstance.webContents.on('will-navigate', e => e.preventDefault())
