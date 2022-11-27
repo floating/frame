@@ -82,16 +82,7 @@ async function extractColors (url: string, ens: string) {
     frame: false,
     titleBarStyle: 'hidden',
     paintWhenInitiallyHidden: true,
-    webPreferences: {
-      backgroundThrottling: false,
-      webviewTag: false,
-      nodeIntegration: false,
-      contextIsolation: true,
-      sandbox: true,
-      disableBlinkFeatures: 'Auxclick',
-      // enableRemoteModule: false,
-      offscreen: true
-    }
+    webPreferences: { ...webPreferences, backgroundThrottling: false, offscreen: true }
   })
 
   let view: BrowserView | null = new BrowserView({ 

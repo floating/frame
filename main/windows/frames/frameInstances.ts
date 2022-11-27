@@ -3,7 +3,7 @@ import path from 'path'
 
 import store from '../../store'
 
-import webPrefrences from '../webPreferences'
+import webPreferences from '../webPreferences'
 import topRight from './topRight'
 
 export interface FrameInstance extends BrowserWindow {
@@ -30,7 +30,6 @@ export default {
   },
   create: (frame: Frame) => {  
     const preload = path.resolve(__dirname, (process.env.BUNDLE_LOCATION || ''), 'bridge.js')
-  
     const frameInstance: FrameInstance = new BrowserWindow({
       x: 0,
       y: 0,
@@ -44,7 +43,7 @@ export default {
       trafficLightPosition: { x: 10, y: 9 },
       backgroundColor: store('main.colorwayPrimary', store('main.colorway'), 'background'),
       icon: path.join(__dirname, './AppIcon.png'),
-      webPreferences: { ...webPrefrences, preload }
+      webPreferences: { ...webPreferences, preload }
     })
 
     frameInstance.loadURL(`file://${process.env.BUNDLE_LOCATION}/dapp.html`)
@@ -58,21 +57,6 @@ export default {
     frameInstance.views = {}
 
     place(frameInstance)
-
-    // Create the frame's overlay view
-    // const overlayInstance = new BrowserView({ webPrefrences })
-    // frameInstance.addBrowserView(overlayInstance)
-    // overlayInstance.setBackgroundColor('#0000')
-    // overlayInstance.setBounds({ x: 0, y: 0, width, height })
-    // overlayInstance.setAutoResize({ width: true, height: true })
-    // overlayInstance.webContents.loadURL(`file://${__dirname}/index.html`)
-    // frameInstance.removeBrowserView(windows[dappFrameId].overlay)
-    // overlayInstance.webContents.on('did-finish-load', () => {
-    //   relayerOverlay(windows[dappFrameId])
-    //   setTimeout(() => relayerOverlay(windows[dappFrameId]), 10)
-    // })
-
-    // frameInstance.webContents.openDevTools({ mode: 'detach' })
 
     return frameInstance
   }

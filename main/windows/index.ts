@@ -6,6 +6,7 @@ import { hexToNumber } from 'web3-utils'
 
 import store from '../store'
 import FrameManager from './frames'
+import webPreferences from './webPreferences'
 
 type Windows = { [key: string]: BrowserWindow }
 
@@ -104,10 +105,23 @@ const detectMouse = () => {
   }, 50)
 }
 
-function createWindow (name: string, opts: BrowserWindowConstructorOptions) {
+function createWindow (name: string, opts?: BrowserWindowConstructorOptions) {
   log.verbose(`Creating ${name} window`)
 
-  const browserWindow = new BrowserWindow(opts)
+  const browserWindow = new BrowserWindow({ 
+    ...opts,
+    width: trayWidth,
+    frame: false,
+    transparent: process.platform === 'darwin',
+    show: false,
+    backgroundColor: store('main.colorwayPrimary', store('main.colorway'), 'background'),
+    skipTaskbar: process.platform !== 'linux',
+    webPreferences: { 
+      ...webPreferences,
+      preload: path.resolve(process.env.BUNDLE_LOCATION, 'bridge.js'),
+      backgroundThrottling: false // Allows repaint when window is hidden
+    } 
+  })
 
   browserWindow.webContents.once('did-finish-load', () => {
     log.info(`Created ${name} renderer process, pid:`, browserWindow.webContents.getOSProcessId())
@@ -117,22 +131,7 @@ function createWindow (name: string, opts: BrowserWindowConstructorOptions) {
 }
 
 function initDashWindow () {
-  windows.dash = createWindow('dash', {
-    width: trayWidth,
-    frame: false,
-    transparent: process.platform === 'darwin',
-    show: false,
-    backgroundColor: store('main.colorwayPrimary', store('main.colorway'), 'background'),
-    skipTaskbar: process.platform !== 'linux',
-    webPreferences: {
-      nodeIntegration: false,
-      contextIsolation: true,
-      sandbox: true,
-      disableBlinkFeatures: 'Auxclick',
-      preload: path.resolve(process.env.BUNDLE_LOCATION, 'bridge.js'),
-      backgroundThrottling: false // Allows repaint when window is hidden
-    }
-  })
+  windows.dash = createWindow('dash')
 
   const dashUrl = new URL(path.join(process.env.BUNDLE_LOCATION, 'dash.html'), 'file:')
   windows.dash.loadURL(dashUrl.toString())
@@ -140,21 +139,7 @@ function initDashWindow () {
 
 function initTrayWindow () {
   windows.tray = createWindow('tray', {
-    width: trayWidth,
-    frame: false,
-    transparent: process.platform === 'darwin',
-    show: false,
-    backgroundColor: store('main.colorwayPrimary', store('main.colorway'), 'background'),
-    icon: path.join(__dirname, './AppIcon.png'),
-    skipTaskbar: process.platform !== 'linux',
-    webPreferences: {
-      nodeIntegration: false,
-      contextIsolation: true,
-      sandbox: true,
-      disableBlinkFeatures: 'Auxclick',
-      preload: path.resolve(process.env.BUNDLE_LOCATION, 'bridge.js'),
-      backgroundThrottling: false // Allows repaint when window is hidden
-    }
+    icon: path.join(__dirname, './AppIcon.png')
   })
 
   const trayUrl = new URL(path.join(process.env.BUNDLE_LOCATION, 'tray.html'), 'file:')
