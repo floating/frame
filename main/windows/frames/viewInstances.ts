@@ -1,12 +1,10 @@
-import { BrowserView }  from 'electron'
-import path from 'path'
 import { URL } from 'url'
 import log from 'electron-log'
 
 import { FrameInstance } from './frameInstances'
 import store from '../../store'
-import webPreferences from '../webPreferences'
 import server from '../../dapps/server'
+import { createViewInstance } from '../window'
 
 interface extract {
   session: string, 
@@ -23,18 +21,7 @@ const extract = (l: string) : extract => {
 export default {
   // Create a view instance on a frame
   create: (frameInstance: FrameInstance, view: ViewMetadata) => {
-    const viewInstance = new BrowserView({ 
-      webPreferences: {
-        ...webPreferences,
-        preload: path.resolve('./main/windows/viewPreload.js'),
-        partition: 'persist:' + view.ens
-      }
-    })
-  
-    viewInstance.webContents.on('will-navigate', e => e.preventDefault())
-    viewInstance.webContents.on('will-attach-webview', e => e.preventDefault())
-    viewInstance.webContents.setWindowOpenHandler(() => ({ action: 'deny' }))
-
+    const viewInstance = createViewInstance(view.ens)
     const { session } = extract(view.url)
 
     viewInstance.webContents.session.webRequest.onBeforeSendHeaders((details, cb) => {

@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, screen, Tray as ElectronTray, Menu, globalShortcut, IpcMainEvent, WebContents, BrowserWindowConstructorOptions } from 'electron'
+import { app, BrowserWindow, ipcMain, screen, Tray as ElectronTray, Menu, globalShortcut, IpcMainEvent, WebContents } from 'electron'
 import path from 'path'
 import log from 'electron-log'
 import EventEmitter from 'events'
@@ -6,7 +6,7 @@ import { hexToNumber } from 'web3-utils'
 
 import store from '../store'
 import FrameManager from './frames'
-import webPreferences from './webPreferences'
+import { createWindow } from './window'
 
 type Windows = { [key: string]: BrowserWindow }
 
@@ -105,33 +105,10 @@ const detectMouse = () => {
   }, 50)
 }
 
-function createWindow (name: string, opts?: BrowserWindowConstructorOptions) {
-  log.verbose(`Creating ${name} window`)
-
-  const browserWindow = new BrowserWindow({ 
-    ...opts,
-    width: trayWidth,
-    frame: false,
-    transparent: process.platform === 'darwin',
-    show: false,
-    backgroundColor: store('main.colorwayPrimary', store('main.colorway'), 'background'),
-    skipTaskbar: process.platform !== 'linux',
-    webPreferences: { 
-      ...webPreferences,
-      preload: path.resolve(process.env.BUNDLE_LOCATION, 'bridge.js'),
-      backgroundThrottling: false // Allows repaint when window is hidden
-    } 
-  })
-
-  browserWindow.webContents.once('did-finish-load', () => {
-    log.info(`Created ${name} renderer process, pid:`, browserWindow.webContents.getOSProcessId())
-  })
-
-  return browserWindow
-}
-
 function initDashWindow () {
-  windows.dash = createWindow('dash')
+  windows.dash = createWindow('dash', { 
+    width: trayWidth 
+  })
 
   const dashUrl = new URL(path.join(process.env.BUNDLE_LOCATION, 'dash.html'), 'file:')
   windows.dash.loadURL(dashUrl.toString())
@@ -139,6 +116,7 @@ function initDashWindow () {
 
 function initTrayWindow () {
   windows.tray = createWindow('tray', {
+    width: trayWidth,
     icon: path.join(__dirname, './AppIcon.png')
   })
 

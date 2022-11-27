@@ -1,9 +1,7 @@
 import electron, { BrowserView, BrowserWindow }  from 'electron'
 import path from 'path'
 
-import store from '../../store'
-
-import webPreferences from '../webPreferences'
+import { createWindow } from '../window'
 import topRight from './topRight'
 
 export interface FrameInstance extends BrowserWindow {
@@ -28,22 +26,15 @@ export default {
   reposition: (frameInstance: FrameInstance) => {
     place(frameInstance)
   },
-  create: (frame: Frame) => {  
-    const preload = path.resolve(__dirname, (process.env.BUNDLE_LOCATION || ''), 'bridge.js')
-    const frameInstance: FrameInstance = new BrowserWindow({
+  create: (frame: Frame) => {
+    const frameInstance: FrameInstance = createWindow('frameInstance', {
       x: 0,
       y: 0,
       width: 0,
       height: 0,
-      transparent: process.platform === 'darwin',
-      // hasShadow: false,
-      show: false,
-      frame: false,
       titleBarStyle: 'hidden',
       trafficLightPosition: { x: 10, y: 9 },
-      backgroundColor: store('main.colorwayPrimary', store('main.colorway'), 'background'),
-      icon: path.join(__dirname, './AppIcon.png'),
-      webPreferences: { ...webPreferences, preload }
+      icon: path.join(__dirname, './AppIcon.png')
     })
 
     frameInstance.loadURL(`file://${process.env.BUNDLE_LOCATION}/dapp.html`)
