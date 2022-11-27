@@ -41,7 +41,7 @@ class SeedSignerWorker extends HotSignerWorker {
     // Derive private key
     const key = this._derivePrivateKey(index)
     // Sign message
-    super.signTypedData({ key, typedMessage }, pseudoCallback)
+    super.signTypedData(key, typedMessage, pseudoCallback)
   }
 
   signTransaction ({ index, rawTx }, pseudoCallback) {

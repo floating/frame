@@ -56,7 +56,7 @@ class HotSignerWorker {
     pseudoCallback(null, addHexPrefix(hex))
   }
 
-  signTypedData ({ key, typedMessage }, pseudoCallback) {
+  signTypedData (key, typedMessage, pseudoCallback) {
     try {
       const { data, version } = typedMessage
       const signature = signTypedData({ privateKey: key, data, version })
