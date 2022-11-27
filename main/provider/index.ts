@@ -563,7 +563,7 @@ export class Provider extends EventEmitter {
     accounts.addRequest(req, _res)
   }
 
-  signTypedData (rawPayload: RPCRequestPayload, version: SignTypedDataVersion, res: RPCRequestCallback) {
+  signTypedData (rawPayload: RPC.SignTypedData.Request, version: SignTypedDataVersion, res: RPCCallback<RPC.SignTypedData.Response>) {
     // ensure param order is [address, data, ...] regardless of version
     const orderedParams = isAddress(rawPayload.params[1]) && !isAddress(rawPayload.params[0])
       ? [rawPayload.params[1], rawPayload.params[0], ...rawPayload.params.slice(2)]
@@ -858,7 +858,7 @@ export class Provider extends EventEmitter {
     if (['eth_signTypedData', 'eth_signTypedData_v1', 'eth_signTypedData_v3', 'eth_signTypedData_v4'].includes(method)) {
       const underscoreIndex = method.lastIndexOf('_')
       const version = (underscoreIndex > 3 ? method.substring(underscoreIndex + 1).toUpperCase() : undefined) as SignTypedDataVersion
-      return this.signTypedData(payload, version, res)
+      return this.signTypedData(payload as RPC.SignTypedData.Request, version, res as RPCCallback<RPC.SignTypedData.Response>)
     }
     
     if (method === 'wallet_addEthereumChain') return this.addEthereumChain(payload, res)
