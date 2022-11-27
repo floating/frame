@@ -19,7 +19,7 @@ jobs:
     - name: Electronegativity
       uses: doyensec/electronegativity-action@v2.0
       with:
-        exclude-checks: LIMIT_NAVIGATION_GLOBAL_CHECK
+        exclude-checks: 'LIMIT_NAVIGATION_GLOBAL_CHECK'
     - name: Upload sarif
       uses: github/codeql-action/upload-sarif@v2
       with:
