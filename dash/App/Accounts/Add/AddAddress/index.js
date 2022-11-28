@@ -4,6 +4,8 @@ import Restore from 'react-restore'
 import link from '../../../../../resources/link'
 import RingIcon from '../../../../../resources/Components/RingIcon'
 
+const isEnsName = input => input.toLowerCase().includes('.eth')
+
 class AddAddress extends React.Component {
   constructor (...args) {
     super(...args)
@@ -12,7 +14,8 @@ class AddAddress extends React.Component {
       adding: false,
       address: '',
       status: '',
-      error: false
+      error: false,
+      resolvingEns: false
     }
     this.forms = [React.createRef(), React.createRef()]
   }
@@ -46,32 +49,41 @@ class AddAddress extends React.Component {
     this.focusActive()
   }
 
-  create () {
-    this.setState({ index: ++this.state.index })
-    const {address: input} = this.state
-    const createAccountCallback =  (address) => link.rpc('createFromAddress', address, 'Watch Account', (err) => {
+  setResolving() {
+    this.setState(({resolvingEns, ...state}) => ({
+      ...state,
+      resolvingEns: true
+    }))
+  }
+
+  createFromAddress (address) {
+    link.rpc('createFromAddress', address, 'Watch Account', (err) => {
+      this.setState({ index: ++this.state.index })
       if (err) {
         this.setState({ status: err, error: true })
       } else {
         this.setState({ status: 'Successful', error: false })
       }
     })
+  }
 
-    if( input.toLowerCase().includes('.eth') ) {
-      link.rpc('resolveEnsName', input, (err, resolvedAddress) => {
-        if(err || !resolvedAddress){
-          this.setState({ status: `Unable to resolve Ethereum address for ${input}`, error: true })
-        } else {
-          createAccountCallback(resolvedAddress)
-        }
-      })
-    } else {
-      createAccountCallback(input)
-    }
+  create () {
+    const {address: input} = this.state
+    if(!isEnsName(input)) return this.createFromAddress(input)
+
+    this.setResolving()
+    link.rpc('resolveEnsName', input, (err, resolvedAddress) => {
+      if(err || !resolvedAddress){
+        this.setState({ status: `Unable to resolve Ethereum address for ${input}`, error: true })
+      } else {
+        // If still waiting for the resolution to complete
+        if (this.state.address === input && this.state.resolvingEns) this.createFromAddress(resolvedAddress)
+      }
+    })
   }
 
   restart () {
-    this.setState({ index: 0, adding: false, address: '', success: false })
+    this.setState({ index: 0, adding: false, address: '', success: false, resolvingEns: false })
     setTimeout(() => {
       this.setState({ status: '', error: false })
     }, 500)
@@ -127,11 +139,23 @@ class AddAddress extends React.Component {
             <div className='addAccountItemOptionSetup' style={{ transform: `translateX(-${100 * this.state.index}%)` }}>
               <div className='addAccountItemOptionSetupFrames'>
                 <div className='addAccountItemOptionSetupFrame'>
-                  <div className='addAccountItemOptionTitle'>input address or ENS name</div>
-                  <div className='addAccountItemOptionInputPhrase'>
-                    <textarea tabIndex='-1' value={this.state.address} ref={this.forms[0]} onChange={e => this.onChange('address', e)} onFocus={e => this.onFocus('address', e)} onBlur={e => this.onBlur('address', e)} onKeyPress={e => this.keyPress(e)} />
-                  </div>
-                  <div className='addAccountItemOptionSubmit' onClick={() => this.create()}>Create</div>
+                  {this.state.resolvingEns ?
+                    <>
+                      <div className='addAccountItemOptionTitle'>Resolving ENS Name...</div>
+                      <div className='signerLoading'>
+                        <div className='signerLoadingLoader' />
+                      </div>
+                      <div className='addAccountItemOptionSubmit' onClick={() => this.restart()}>back</div>
+                    </>:
+                    <>
+                      <div className='addAccountItemOptionTitle'>input address or ENS name</div>
+                      <div className='addAccountItemOptionInputPhrase'>
+                        <textarea tabIndex='-1' value={this.state.address} ref={this.forms[0]} onChange={e => this.onChange('address', e)} onFocus={e => this.onFocus('address', e)} onBlur={e => this.onBlur('address', e)} onKeyPress={e => this.keyPress(e)} />
+                      </div>
+                      <div className='addAccountItemOptionSubmit' onClick={() => this.create()}>Create</div>
+                    </>
+                  }
+                 
                 </div>
                 <div className='addAccountItemOptionSetupFrame'>
                   {error ? 
