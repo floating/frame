@@ -59,7 +59,7 @@ class AddAddress extends React.Component {
 
     if( input.toLowerCase().includes('.eth') ) {
       link.rpc('resolveEnsName', input, (err, resolvedAddress) => {
-        if(err){
+        if(err || !resolvedAddress){
           this.setState({ status: `Unable to resolve Ethereum address for ${input}`, error: true })
         } else {
           createAccountCallback(resolvedAddress)
@@ -127,7 +127,7 @@ class AddAddress extends React.Component {
             <div className='addAccountItemOptionSetup' style={{ transform: `translateX(-${100 * this.state.index}%)` }}>
               <div className='addAccountItemOptionSetupFrames'>
                 <div className='addAccountItemOptionSetupFrame'>
-                  <div className='addAccountItemOptionTitle'>input address or ENS domain</div>
+                  <div className='addAccountItemOptionTitle'>input address or ENS name</div>
                   <div className='addAccountItemOptionInputPhrase'>
                     <textarea tabIndex='-1' value={this.state.address} ref={this.forms[0]} onChange={e => this.onChange('address', e)} onFocus={e => this.onFocus('address', e)} onBlur={e => this.onBlur('address', e)} onKeyPress={e => this.keyPress(e)} />
                   </div>

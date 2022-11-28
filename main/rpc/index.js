@@ -229,19 +229,17 @@ const rpc = {
   resolveAragonName (name, chainId, cb) {
     resolveName(name, chainId).then(result => cb(null, result)).catch(cb)
   },
-  resolveEnsName (name, cb) {
-    log.info('resolving name ', name)
+  async resolveEnsName (name, cb) {
+    try {
+    log.info('resolving ENS name ', {name})
     const nebula = nebulaApi()
-    nebula.ens.resolve(name).then(result => {
-      const {addresses: {eth: ethAddress}} = result
-      if(!ethAddress){
-        throw new Error(`No ETH address found for ENS domain ${name}`)
-      }
-      return cb(null, ethAddress)
-    }).catch(err => {
-      log.debug('Unable to complete ENS resolution', {name, err})
+    const {addresses: {eth: ethAddress}} = await nebula.ens.resolve(name)
+    return cb(null, ethAddress)
+    }
+    catch(err) {
+      log.debug(`Could not resolve ENS name ${name}`, err)
       return cb(err)
-    })
+    }
   },
   verifyAddress (cb) {
     const res = (err, data) => cb(err, data || false)
