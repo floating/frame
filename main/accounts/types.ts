@@ -1,4 +1,4 @@
-import type { Version } from 'eth-sig-util'
+import type { MessageTypes, SignTypedDataVersion, TypedDataV1, TypedMessage as BaseTypedMessage } from '@metamask/eth-sig-util'
 import type { DecodedCallData } from '../contracts'
 import type { Chain } from '../chains'
 import type { TransactionData } from '../../resources/domain/transaction'
@@ -77,9 +77,17 @@ export interface TransactionRequest extends Omit<AccountRequest, 'type'> {
   recognizedActions: Action<unknown>[]
 }
 
+export type TypedData<T extends MessageTypes = MessageTypes> = BaseTypedMessage<T>
+export type LegacyTypedData = TypedDataV1
+
+export interface TypedMessage<V extends SignTypedDataVersion = SignTypedDataVersion> {
+  data: V extends SignTypedDataVersion.V1 ? LegacyTypedData : TypedData
+  version: V
+}
+
 export interface SignTypedDataRequest extends Omit<AccountRequest, 'type'> {
   type: 'signTypedData',
-  version: Version
+  typedMessage: TypedMessage
 }
 
 export interface AccessRequest extends Omit<AccountRequest, 'type'> {

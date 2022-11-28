@@ -1,7 +1,7 @@
 import log from 'electron-log'
 import { v5 as uuid } from 'uuid'
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-noevents'
-import { TypedData } from 'eth-sig-util'
+import { SignTypedDataVersion } from '@metamask/eth-sig-util'
 
 import { Request, RequestQueue } from './requestQueue'
 import Signer from '../../Signer'
@@ -9,6 +9,7 @@ import LedgerEthereumApp from './eth'
 import { Derivation, getDerivationPath } from '../../Signer/derive'
 import { TransactionData } from '../../../../resources/domain/transaction'
 import { signerCompatibility, londonToLegacy } from '../../../transaction'
+import type { TypedMessage } from '../../../accounts/types'
 
 const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
 
@@ -432,13 +433,7 @@ export default class Ledger extends Signer {
     })
   }
 
-  signTypedData (index: number, version: string, typedData: TypedData, cb: Callback<string>) {
-    const versionNum = (version.match(/[Vv](\d+)/) || [])[1]
-
-    if ((parseInt(versionNum) || 0) < 4) {
-      return cb(new Error(`Invalid version (${version}), Ledger only supports eth_signTypedData version 4+`), undefined)
-    }
-
+  signTypedData (index: number, typedMessage: TypedMessage<SignTypedDataVersion.V4>, cb: Callback<string>) {
     this.enqueueRequests({
       type: 'signTypedData',
       execute: async () => {
@@ -447,9 +442,9 @@ export default class Ledger extends Signer {
           if (!this.derivation) throw new Error('attempted to sign typed data with unknown derivation!')
 
           const path = this.getPath(index)
-          const signedData = await this.eth.signTypedData(path, typedData)
+          const signedData = await this.eth.signTypedData(path, typedMessage.data)
 
-          log.info('successfully signed typed data on Ledger: ', typedData)
+          log.info('successfully signed typed data on Ledger: ', typedMessage.data)
 
           cb(null, signedData)
         } catch (e) {
