@@ -69,6 +69,13 @@ export function feeTotalOverMax (rawTx: TransactionData, maxTotalFee: number) {
   return totalFee > maxTotalFee
 }
 
+function parseValue(value?: string) {
+  const parsedHex = parseInt(value!!, 16)
+  return isNaN(parsedHex) || parsedHex === 0
+    ? '0x0'
+    : addHexPrefix(unpadHexString(value!!) || '0')
+}
+
 export function getRawTx (newTx: RPC.SendTransaction.TxParams, accountId: string | undefined): TransactionData {
   const { gas, gasLimit, gasPrice, data, value, type, to, ...rawTx } = newTx
   const getNonce = () => {
@@ -84,13 +91,12 @@ export function getRawTx (newTx: RPC.SendTransaction.TxParams, accountId: string
     }
     return addHexPrefix(nonceBN.toString(16))
   }
-  const parsedValue = !value || parseInt(value, 16) === 0 ? '0x0' : addHexPrefix(unpadHexString(value) || '0')
 
   const tx: TransactionData = {
     ...rawTx,
     from: rawTx.from || accountId,
     type: '0x0',
-    value: parsedValue,
+    value: parseValue(value),
     data: addHexPrefix(padToEven(stripHexPrefix(data || '0x'))),
     gasLimit: gasLimit || gas,
     chainId: rawTx.chainId,
