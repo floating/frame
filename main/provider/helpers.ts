@@ -70,10 +70,10 @@ export function feeTotalOverMax (rawTx: TransactionData, maxTotalFee: number) {
 }
 
 function parseValue(value?: string) {
-  const parsedHex = parseInt(value!!, 16)
+  const parsedHex = parseInt(value!, 16)
   return isNaN(parsedHex) || parsedHex === 0
     ? '0x0'
-    : addHexPrefix(unpadHexString(value!!) || '0')
+    : addHexPrefix(unpadHexString(value!) || '0')
 }
 
 export function getRawTx (newTx: RPC.SendTransaction.TxParams, accountId: string | undefined): TransactionData {
