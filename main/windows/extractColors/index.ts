@@ -95,7 +95,7 @@ async function extractColors (url: string, ens: string) {
     }
   })
 
-  let view: BrowserView | null = createViewInstance(ens)
+  let view: BrowserView | null = createViewInstance(ens, { offscreen: true })
 
   view.webContents.session.webRequest.onBeforeSendHeaders((details, cb) => {
     if (!details || !details.frame) return cb({ cancel: true }) // Reject the request

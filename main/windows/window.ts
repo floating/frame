@@ -36,9 +36,10 @@ export function createWindow (name: string, opts?: BrowserWindowConstructorOptio
   return browserWindow
 }
 
-export function createViewInstance (ens = '') {
+export function createViewInstance (ens = '', webPreferences: BrowserWindowConstructorOptions['webPreferences'] = {}) {
   const viewInstance = new BrowserView({ 
     webPreferences: {
+      ...webPreferences,
       contextIsolation: true,
       webviewTag: false,
       sandbox: true,
