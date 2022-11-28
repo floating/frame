@@ -1,6 +1,5 @@
 import React from 'react'
 import Restore from 'react-restore'
-import utils from 'web3-utils'
 import svg from '../../../../../../../resources/svg'
 import link from '../../../../../../../resources/link'
 
@@ -16,6 +15,10 @@ const txFieldPriority = [
   'maxFeePerGas',
   'maxPriorityFeePerGas'
 ]
+
+const nonceHasBeenChanged = (req) => {
+  return req.data.nonce && req.payload.nonce !== req.data.nonce
+}
 
 const SimpleTxJSON = ({ json, req }) => {
   return (
@@ -47,6 +50,11 @@ const SimpleTxJSON = ({ json, req }) => {
                 <div className='txNonceButton txNonceButtonRaise' onMouseDown={() => link.send('tray:adjustNonce', req.handlerId, 1)}>
                   {svg.octicon('chevron-up', { height: 14 })}
                 </div>
+                {nonceHasBeenChanged(req) && (
+                  <div className='txNonceButton txNonceButtonReset' onMouseDown={() => link.send('tray:resetNonce', req.handlerId)}>
+                    {svg.octicon('sync', { height: 14 })}
+                  </div>
+                )}
               </div>
             ) : null}
           </div>

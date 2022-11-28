@@ -254,6 +254,10 @@ ipcMain.on('tray:adjustNonce', (e, handlerId, nonceAdjust) => {
   accounts.adjustNonce(handlerId, nonceAdjust)
 })
 
+ipcMain.on('tray:resetNonce', (e, handlerId) => {
+  accounts.resetNonce(handlerId)
+})
+
 ipcMain.on('tray:removeOrigin', (e, handlerId) => {
   accounts.removeRequests(handlerId)
   store.removeOrigin(handlerId)
