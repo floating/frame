@@ -70,7 +70,7 @@ export function feeTotalOverMax (rawTx: TransactionData, maxTotalFee: number) {
 
 function parseValue(value?: string) {
   const parsedHex = value && parseInt(value, 16)
-  return !parsedHex ||isNaN(parsedHex) || parsedHex === 0
+  return !parsedHex || isNaN(parsedHex)
     ? '0x0'
     : addHexPrefix(unpadHexString(value!) || '0')
 }
