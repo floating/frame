@@ -4,7 +4,8 @@
     <meta 
       http-equiv='Content-Security-Policy' 
       content="
-        default-src 'self';
+        script-src 'strict-dynamic' 'nonce-8c7d2664-ae99-42c2-ae12-3304e9168f71';
+        base-uri 'self';
         connect-src *; 
         img-src blob: http://localhost:8421;
         style-src 'self';
@@ -18,6 +19,6 @@
   </head>
   <body>
     <div id='frame'></div>
-    <script src='./index.js'></script>
+    <script src='./index.js' nonce='8c7d2664-ae99-42c2-ae12-3304e9168f71'></script>
   </body>
 </html>

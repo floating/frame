@@ -4,7 +4,8 @@
     <meta 
       http-equiv='Content-Security-Policy' 
       content="
-        default-src 'self'; 
+        script-src 'strict-dynamic' 'nonce-7e49189a-cca8-455d-a66b-dd571342955d';
+        base-uri 'self';
         connect-src *; 
         style-src 'self';
         frame-src https://connect.trezor.io; 
@@ -20,6 +21,6 @@
   <body>
     <div class='frameOverlay'></div>
     <div id='flow'></div>
-    <script src='./index.js'></script>
+    <script src='./index.js' nonce='7e49189a-cca8-455d-a66b-dd571342955d'></script>
   </body>
 </html>
