@@ -1,11 +1,8 @@
 import {
-  BN,
   addHexPrefix,
-  stripHexPrefix,
-  bnToHex,
   intToHex,
-} from 'ethereumjs-util';
-import Common from '@ethereumjs/common';
+} from '@ethereumjs/util';
+import {Common} from '@ethereumjs/common';
 import { AppVersion, SignerSummary } from '../signers/Signer';
 import {
   convertToUnsignedTransaction,
@@ -15,6 +12,7 @@ import {
 } from '../../resources/domain/transaction';
 import { hexToInt } from '../../resources/utils';
 import { serializeTransaction, splitSignature } from 'ethers/lib/utils';
+import BigNumber from 'bignumber.js'
 
 const londonHardforkSigners: SignerCompatibilityByVersion = {
   seed: () => true,
@@ -54,10 +52,6 @@ export interface SignerCompatibility {
   signer: string;
   tx: string;
   compatible: boolean;
-}
-
-function toBN(hexStr: string) {
-  return new BN(stripHexPrefix(hexStr), 'hex');
 }
 
 function signerCompatibility(
@@ -108,7 +102,8 @@ function maxFee(rawTx: TransactionData) {
 }
 
 function calculateMaxFeePerGas(maxBaseFee: string, maxPriorityFee: string) {
-  return bnToHex(toBN(maxPriorityFee).add(toBN(maxBaseFee)));
+  const maxFeePerGas = BigNumber(maxPriorityFee).plus(maxBaseFee).toString(16)
+  return addHexPrefix(maxFeePerGas);
 }
 
 function populate(
@@ -126,8 +121,8 @@ function populate(
       !rawTx.gasPrice || isNaN(parseInt(rawTx.gasPrice, 16));
     if (useFrameGasPrice) {
       // no valid dapp-supplied value for gasPrice so we use the Frame-supplied value
-      const gasPrice = toBN(gas.price.levels.fast as string);
-      txData.gasPrice = bnToHex(gasPrice);
+      const gasPrice = BigNumber(gas.price.levels.fast as string).toString(16);
+      txData.gasPrice = addHexPrefix(gasPrice);
       txData.gasFeesSource = GasFeesSource.Frame;
     }
 
@@ -164,7 +159,7 @@ function populate(
 
   // if no valid dapp-supplied value for maxPriorityFeePerGas we use the Frame-supplied value
   txData.maxPriorityFeePerGas = useFrameMaxPriorityFeePerGas
-    ? bnToHex(toBN(maxPriorityFee))
+    ? addHexPrefix(BigNumber(maxPriorityFee).toString(16))
     : txData.maxPriorityFeePerGas;
 
   return txData;

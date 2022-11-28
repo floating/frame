@@ -1,4 +1,4 @@
-import { intToHex } from 'ethereumjs-util'
+import { intToHex } from '@ethereumjs/util'
 
 interface FeeHistoryResponse {
   baseFeePerGas: string[]

@@ -1,5 +1,5 @@
 import log from 'electron-log'
-import { isValidAddress, addHexPrefix } from 'ethereumjs-util'
+import { isValidAddress, addHexPrefix } from '@ethereumjs/util'
 import { Version } from 'eth-sig-util'
 
 import { AccessRequest, AccountRequest, Accounts, RequestMode, TransactionRequest } from '..'

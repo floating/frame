@@ -1,9 +1,8 @@
-import { addHexPrefix, stripHexPrefix } from 'ethereumjs-util'
-import Common from '@ethereumjs/common'
+import { addHexPrefix, stripHexPrefix } from '@ethereumjs/util'
+import {Common} from '@ethereumjs/common'
 
 import { maxFee, londonToLegacy, signerCompatibility, populate, sign } from '../../../main/transaction'
-import { convertToUnsignedTransaction, GasFeesSource } from '../../../resources/domain/transaction'
-import { serialize } from '@ethersproject/transactions'
+import { GasFeesSource } from '../../../resources/domain/transaction'
 import { parseTransaction } from 'ethers/lib/utils'
 import { hexToInt } from '../../../resources/utils'
 

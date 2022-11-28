@@ -10,7 +10,7 @@ const {
   addHexPrefix,
   pubToAddress,
   ecrecover
-} = require('ethereumjs-util')
+} = require('@ethereumjs/util')
 const { SigningKey } = require('ethers/lib/utils')
 
 class HotSignerWorker {
@@ -43,7 +43,7 @@ class HotSignerWorker {
     const signed = ecsign(hash, key)
 
     // Return serialized signed message
-    const hex = Buffer.concat([Buffer.from(signed.r), Buffer.from(signed.s), Buffer.from([signed.v])]).toString('hex')
+    const hex = Buffer.concat([Buffer.from(signed.r), Buffer.from(signed.s), Buffer.from([Number(signed.v)])]).toString('hex')
 
     pseudoCallback(null, addHexPrefix(hex))
   }
@@ -83,7 +83,7 @@ class HotSignerWorker {
       if (signature.length !== 65) return pseudoCallback(new Error('Frame verifyAddress signature has incorrect length'))
       // Verify address
       let v = signature[64]
-      v = v === 0 || v === 1 ? v + 27 : v
+      v = BigInt(v === 0 || v === 1 ? v + 27 : v)
       const r = toBuffer(signature.slice(0, 32))
       const s = toBuffer(signature.slice(32, 64))
       const hash = hashPersonalMessage(toBuffer(message))

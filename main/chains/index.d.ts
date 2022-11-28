@@ -1,4 +1,4 @@
-import Common from '@ethereumjs/common'
+import {Common} from '@ethereumjs/common'
 import { chainsType } from '@ethereumjs/common/dist/types'
 import { EventEmitter } from 'stream'
 

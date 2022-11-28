@@ -1,4 +1,4 @@
-import { rlp, addHexPrefix, stripHexPrefix, padToEven } from 'ethereumjs-util'
+import { addHexPrefix, stripHexPrefix, padToEven } from '@ethereumjs/util'
 import { TypedData, TypedDataUtils, TypedMessage } from 'eth-sig-util'
 import log from 'electron-log'
 

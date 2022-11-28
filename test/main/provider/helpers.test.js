@@ -1,5 +1,5 @@
 import log from 'electron-log'
-import { fromUtf8 } from 'ethereumjs-util'
+import { fromUtf8 } from '@ethereumjs/util'
 import { getRawTx, getSignedAddress, processTxForGasFees } from '../../../main/provider/helpers'
 import store from '../../../main/store'
 import { GasFeesSource } from '../../../resources/domain/transaction'

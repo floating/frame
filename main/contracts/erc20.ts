@@ -1,7 +1,7 @@
 import { TransactionDescription } from '@ethersproject/abi'
 import { Contract } from '@ethersproject/contracts'
 import { Web3Provider } from '@ethersproject/providers'
-import { addHexPrefix } from 'ethereumjs-util'
+import { addHexPrefix } from '@ethereumjs/util'
 import log from 'electron-log'
 import erc20Abi from '../externalData/balances/erc-20-abi'
 import provider from '../provider'

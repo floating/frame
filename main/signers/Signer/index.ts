@@ -1,6 +1,6 @@
 import log from 'electron-log'
 import EventEmitter from 'stream'
-import { addHexPrefix } from 'ethereumjs-util'
+import { addHexPrefix } from '@ethereumjs/util'
 
 import { TransactionData } from '../../../resources/domain/transaction'
 import { deriveHDAccounts } from './derive'
