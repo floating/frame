@@ -1,5 +1,5 @@
 const crypto = require('crypto')
-const ethSigUtil = require('eth-sig-util')
+const { signTypedData } = require('@metamask/eth-sig-util')
 const { TransactionFactory } = require('@ethereumjs/tx')
 const Common = require('@ethereumjs/common').default
 
@@ -56,9 +56,10 @@ class HotSignerWorker {
     pseudoCallback(null, addHexPrefix(hex))
   }
 
-  signTypedData (key, params, pseudoCallback) {
+  signTypedData (key, typedMessage, pseudoCallback) {
     try {
-      const signature = ethSigUtil.signTypedMessage(key, { data: params.typedData }, params.version)
+      const { data, version } = typedMessage
+      const signature = signTypedData({ privateKey: key, data, version })
       pseudoCallback(null, signature)
     } catch (e) {
       pseudoCallback(e.message)

@@ -1,8 +1,8 @@
 import { v4 as uuid } from 'uuid'
 import EventEmitter from 'events'
 import log from 'electron-log'
-import {isAddress} from '@ethersproject/address'
-import { recoverTypedMessage, Version } from 'eth-sig-util'
+import { recoverTypedSignature, SignTypedDataVersion } from '@metamask/eth-sig-util'
+import { isAddress } from '@ethersproject/address'
 import crypto from 'crypto'
 import {
   addHexPrefix,
@@ -46,6 +46,7 @@ import {
   createOriginChainObserver as OriginChainObserver,
   getActiveChains
 } from './chains'
+import type { LegacyTypedData, TypedData, TypedMessage } from '../accounts/types'
 
 
 type Subscription = {
@@ -264,30 +265,27 @@ export class Provider extends EventEmitter {
   }
 
   approveSignTypedData (req: SignTypedDataRequest, cb: Callback<string>) {
-    const res = (data: any) => {
+    const res = (data: unknown) => {
       if (this.handlers[req.handlerId]) this.handlers[req.handlerId](data)
       delete this.handlers[req.handlerId]
     }
 
-    const payload = req.payload
-    const [address, data] = payload.params
+    const { payload, typedMessage } = req
+    const [address] = payload.params
 
-    const dataToSign = (Array.isArray(data)) ? [...data] : { ...data }
-
-    accounts.signTypedData(req.version, address, dataToSign, (err, signature) => {
+    accounts.signTypedData(address, typedMessage, (err, signature = '') => {
       if (err) {
         resError(err.message, payload, res)
         cb(err)
       } else {
-        const sig = signature || ''
         try {
-          const recoveredAddress = recoverTypedMessage({ data, sig }, req.version)
+          const recoveredAddress = recoverTypedSignature({ ...typedMessage, signature })
           if (recoveredAddress.toLowerCase() !== address.toLowerCase()) {
             throw new Error('TypedData signature verification failed')
           }
 
-          res({ id: payload.id, jsonrpc: payload.jsonrpc, result: sig })
-          cb(null, sig)
+          res({ id: payload.id, jsonrpc: payload.jsonrpc, result: signature })
+          cb(null, signature)
         } catch (e) {
           const err = e as Error
           resError(err.message, payload, res)
@@ -565,7 +563,7 @@ export class Provider extends EventEmitter {
     accounts.addRequest(req, _res)
   }
 
-  signTypedData (rawPayload: RPCRequestPayload, version: Version, res: RPCRequestCallback) {
+  signTypedData (rawPayload: RPC.SignTypedData.Request, version: SignTypedDataVersion, res: RPCCallback<RPC.SignTypedData.Response>) {
     // ensure param order is [address, data, ...] regardless of version
     const orderedParams = isAddress(rawPayload.params[1]) && !isAddress(rawPayload.params[0])
       ? [rawPayload.params[1], rawPayload.params[0], ...rawPayload.params.slice(2)]
@@ -576,7 +574,11 @@ export class Provider extends EventEmitter {
       params: orderedParams
     }
 
-    let [from = '', typedData = {}, ...additionalParams] = payload.params
+    let [from = '', typedData, ...additionalParams] = payload.params
+
+    if (!typedData) {
+      return resError(`Missing typed data`, payload, res)
+    }
 
     const targetAccount = accounts.get(from.toLowerCase())
 
@@ -587,7 +589,7 @@ export class Provider extends EventEmitter {
     // HACK: Standards clearly say, that second param is an object but it seems like in the wild it can be a JSON-string.
     if (typeof (typedData) === 'string') {
       try {
-        typedData = JSON.parse(typedData)
+        typedData = JSON.parse(typedData) as LegacyTypedData | TypedData
         payload.params = [from, typedData, ...additionalParams]
       } catch (e) {
         return resError('Malformed typed data', payload, res)
@@ -606,14 +608,18 @@ export class Provider extends EventEmitter {
     const signerType = getSignerType(targetAccount.lastSignerType)
 
     // check for signers that only support signing a specific version of typed data
-    if (version !== 'V4' && signerType && [SignerType.Ledger, SignerType.Lattice, SignerType.Trezor].includes(signerType)) {
+    if (version !== SignTypedDataVersion.V4 && signerType && [SignerType.Ledger, SignerType.Lattice, SignerType.Trezor].includes(signerType)) {
       const signerName = capitalize(signerType)
       return resError(`${signerName} only supports eth_signTypedData_v4+`, payload, res)
     }
 
     const handlerId = this.addRequestHandler(res)
+    const typedMessage: TypedMessage<typeof version> = {
+      data: typedData,
+      version
+    }
 
-    accounts.addRequest({ handlerId, type: 'signTypedData', version, payload, account: targetAccount.address, origin: payload._origin } as SignTypedDataRequest)
+    accounts.addRequest({ handlerId, type: 'signTypedData', typedMessage, payload, account: targetAccount.address, origin: payload._origin } as SignTypedDataRequest)
   }
 
   subscribe (payload: RPC.Subscribe.Request, res: RPCSuccessCallback) {
@@ -851,8 +857,8 @@ export class Provider extends EventEmitter {
 
     if (['eth_signTypedData', 'eth_signTypedData_v1', 'eth_signTypedData_v3', 'eth_signTypedData_v4'].includes(method)) {
       const underscoreIndex = method.lastIndexOf('_')
-      const version = (underscoreIndex > 3 ? method.substring(underscoreIndex + 1).toUpperCase() : undefined) as Version
-      return this.signTypedData(payload, version, res)
+      const version = (underscoreIndex > 3 ? method.substring(underscoreIndex + 1).toUpperCase() : undefined) as SignTypedDataVersion
+      return this.signTypedData(payload as RPC.SignTypedData.Request, version, res as RPCCallback<RPC.SignTypedData.Response>)
     }
     
     if (method === 'wallet_addEthereumChain') return this.addEthereumChain(payload, res)
