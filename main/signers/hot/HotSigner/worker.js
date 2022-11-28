@@ -1,7 +1,7 @@
 const crypto = require('crypto')
-const ethSigUtil = require('eth-sig-util')
 const {computePreImage, convertToUnsignedTransaction} = require('../../../../resources/domain/transaction')
 const { serialize } = require('@ethersproject/transactions')
+const { signTypedData } = require('@metamask/eth-sig-util')
 
 const {
   hashPersonalMessage,
@@ -48,9 +48,10 @@ class HotSignerWorker {
     pseudoCallback(null, addHexPrefix(hex))
   }
 
-  signTypedData (key, params, pseudoCallback) {
+  signTypedData (key, typedMessage, pseudoCallback) {
     try {
-      const signature = ethSigUtil.signTypedMessage(key, { data: params.typedData }, params.version)
+      const { data, version } = typedMessage
+      const signature = signTypedData({ privateKey: key, data, version })
       pseudoCallback(null, signature)
     } catch (e) {
       pseudoCallback(e.message)

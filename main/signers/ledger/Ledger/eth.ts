@@ -1,15 +1,14 @@
 import { addHexPrefix, stripHexPrefix, padToEven } from '@ethereumjs/util'
-import { TypedData, TypedDataUtils, TypedMessage } from 'eth-sig-util'
+import { SignTypedDataVersion, TypedDataUtils } from '@metamask/eth-sig-util'
 import log from 'electron-log'
-
 import Transport from '@ledgerhq/hw-transport'
 import Eth from '@ledgerhq/hw-app-eth'
-
 import { Derivation, getDerivationPath, deriveHDAccounts } from '../../Signer/derive'
 import { convertToUnsignedTransaction, TransactionData } from '../../../../resources/domain/transaction'
 import { sign } from '../../../transaction'
 import { DeviceError } from '.'
 import { serializeTransaction } from 'ethers/lib/utils'
+import type { TypedData } from '../../../accounts/types'
 
 export default class LedgerEthereumApp {
   private eth: Eth;
@@ -56,8 +55,8 @@ export default class LedgerEthereumApp {
 
     try {
       const { domain, types, primaryType, message } = TypedDataUtils.sanitizeData(typedData)
-      domainSeparatorHex = TypedDataUtils.hashStruct('EIP712Domain', domain, types).toString('hex')
-      hashStructMessageHex = TypedDataUtils.hashStruct(primaryType as string, message, types).toString('hex')
+      domainSeparatorHex = TypedDataUtils.hashStruct('EIP712Domain', domain, types, SignTypedDataVersion.V4).toString('hex')
+      hashStructMessageHex = TypedDataUtils.hashStruct(primaryType as string, message, types, SignTypedDataVersion.V4).toString('hex')
     } catch (e) {
       throw new DeviceError('Invalid typed data', 99901)
     }

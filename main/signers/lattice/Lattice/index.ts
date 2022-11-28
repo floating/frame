@@ -2,12 +2,14 @@ import { Client, Utils, Constants } from 'gridplus-sdk'
 import { padToEven, addHexPrefix } from '@ethereumjs/util'
 import { hexToInt } from '../../../../resources/utils'
 import log from 'electron-log'
+import { SignTypedDataVersion } from '@metamask/eth-sig-util'
 import Signer from '../../Signer'
 import { sign, signerCompatibility, londonToLegacy } from '../../../transaction'
 import { convertToUnsignedTransaction, TransactionData } from '../../../../resources/domain/transaction'
 import { Derivation, getDerivationPath } from '../../Signer/derive'
 import { TypedData } from 'eth-sig-util'
 import { serializeTransaction } from 'ethers/lib/utils'
+import {TypedMessage} from '../../../accounts/types'
 
 const ADDRESS_LIMIT = 10
 const HARDENED_OFFSET = 0x80000000
@@ -256,15 +258,11 @@ export default class Lattice extends Signer {
     }
   }
 
-  async signTypedData (index: number, version: string, typedData: TypedData, cb: Callback<string>) {
-    const versionNum = (version.match(/[Vv](\d+)/) || [])[1]
-
-    if ((parseInt(versionNum) || 0) < 4) {
-      return cb(new Error(`Invalid version (${version}), Lattice only supports eth_signTypedData version 4+`))
-    }
-
+  async signTypedData (index: number, typedMessage: TypedMessage<SignTypedDataVersion.V4>, cb: Callback<string>) {
     try {
-      const signature = await this.sign(index, 'eip712', typedData)
+      //TODO: Why is this line not happy?
+      //@ts-ignore
+      const signature = await this.sign(index, 'eip712', typedMessage.data)
 
       return cb(null, signature)
     } catch (err) {

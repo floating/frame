@@ -11,6 +11,7 @@ import { validate as validateUUID } from 'uuid'
 import { utils } from 'ethers'
 import { addHexPrefix } from '@ethereumjs/util'
 import log from 'electron-log'
+import { SignTypedDataVersion } from '@metamask/eth-sig-util'
 
 const address = '0x22dd63c3619818fdbc262c78baee43cb61e9cccf'
 
@@ -1111,24 +1112,25 @@ describe('#send', () => {
     }
 
     const validRequests = [
-      { method: 'eth_signTypedData', params: [address, typedDataLegacy], version: 'V1', dataDescription: 'legacy' },
-      { method: 'eth_signTypedData', params: [address, typedData], version: 'V4', dataDescription: 'eip-712' },
-      { method: 'eth_signTypedData_v1', params: [address, typedDataLegacy], version: 'V1', dataDescription: 'legacy' },
-      { method: 'eth_signTypedData_v3', params: [address, typedData], version: 'V3', dataDescription: 'eip-712' },
-      { method: 'eth_signTypedData_v4', params: [address, typedData], version: 'V4', dataDescription: 'eip-712' },
-      { method: 'eth_signTypedData', params: [typedDataLegacy, address], version: 'V1', dataFirst: true, dataDescription: 'legacy' },
-      { method: 'eth_signTypedData', params: [typedData, address], version: 'V4', dataFirst: true, dataDescription: 'eip-712' },
-      { method: 'eth_signTypedData_v1', params: [typedDataLegacy, address], version: 'V1', dataFirst: true, dataDescription: 'legacy' },
-      { method: 'eth_signTypedData_v3', params: [typedData, address], version: 'V3', dataFirst: true, dataDescription: 'eip-712' },
-      { method: 'eth_signTypedData_v4', params: [typedData, address], version: 'V4', dataFirst: true, dataDescription: 'eip-712' }
+      { method: 'eth_signTypedData', params: [address, typedDataLegacy], version: SignTypedDataVersion.V1, dataDescription: 'legacy' },
+      { method: 'eth_signTypedData', params: [address, typedData], version: SignTypedDataVersion.V4, dataDescription: 'eip-712' },
+      { method: 'eth_signTypedData_v1', params: [address, typedDataLegacy], version: SignTypedDataVersion.V1, dataDescription: 'legacy' },
+      { method: 'eth_signTypedData_v3', params: [address, typedData], version: SignTypedDataVersion.V3, dataDescription: 'eip-712' },
+      { method: 'eth_signTypedData_v4', params: [address, typedData], version: SignTypedDataVersion.V4, dataDescription: 'eip-712' },
+      { method: 'eth_signTypedData', params: [typedDataLegacy, address], version: SignTypedDataVersion.V1, dataFirst: true, dataDescription: 'legacy' },
+      { method: 'eth_signTypedData', params: [typedData, address], version: SignTypedDataVersion.V4, dataFirst: true, dataDescription: 'eip-712' },
+      { method: 'eth_signTypedData_v1', params: [typedDataLegacy, address], version: SignTypedDataVersion.V1, dataFirst: true, dataDescription: 'legacy' },
+      { method: 'eth_signTypedData_v3', params: [typedData, address], version: SignTypedDataVersion.V3, dataFirst: true, dataDescription: 'eip-712' },
+      { method: 'eth_signTypedData_v4', params: [typedData, address], version: SignTypedDataVersion.V4, dataFirst: true, dataDescription: 'eip-712' }
     ]
 
     function verifyRequest (version, expectedPayload) {
       expect(accountRequests).toHaveLength(1)
       expect(accountRequests[0].handlerId).toBeTruthy()
       expect(accountRequests[0].payload.params[0]).toBe(address)
-      expect(accountRequests[0].payload.params[1]).toEqual(expectedPayload)
-      expect(accountRequests[0].version).toBe(version)
+      expect(accountRequests[0].payload.params[1]).toStrictEqual(expectedPayload)
+      expect(accountRequests[0].typedMessage.version).toBe(version)
+      expect(accountRequests[0].typedMessage.data).toStrictEqual(expectedPayload)
     }
     
     validRequests.forEach(({ method, params, version, dataFirst, dataDescription }) => {
@@ -1145,7 +1147,7 @@ describe('#send', () => {
 
       send({ method: 'eth_signTypedData', params })
 
-      verifyRequest('V4', typedData)
+      verifyRequest(SignTypedDataVersion.V4, typedData)
     })
 
     it('handles invalid EIP-712 data by defaulting to v4', () => {
@@ -1153,7 +1155,7 @@ describe('#send', () => {
 
       send({ method: 'eth_signTypedData', params })
 
-      verifyRequest('V4', typedDataInvalid)
+      verifyRequest(SignTypedDataVersion.V4, typedDataInvalid)
     })
 
     it('does not submit a request without a message', done => {
