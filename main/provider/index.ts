@@ -574,7 +574,7 @@ export class Provider extends EventEmitter {
       params: orderedParams
     }
 
-    let [from = '', typedData, ...additionalParams] = payload.params as [string, LegacyTypedData | TypedData | string, ...unknown[]]
+    let [from = '', typedData, ...additionalParams] = payload.params
 
     if (!typedData) {
       return resError(`Missing typed data`, payload, res)
