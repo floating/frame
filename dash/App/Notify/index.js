@@ -364,7 +364,7 @@ class Notify extends React.Component {
             <div
               className='notifyInputOption notifyInputProceed' onMouseDown={() => {
                 link.send('tray:openExternal', url)
-                link.send('tray:action', 'backDash')
+                link.send('tray:action', 'closeDash')
               }}
             >
               <div className='notifyInputOptionText'>Proceed</div>
