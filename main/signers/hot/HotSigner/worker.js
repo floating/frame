@@ -1,10 +1,8 @@
 const crypto = require('crypto')
 const { signTypedData } = require('@metamask/eth-sig-util')
 const { TransactionFactory } = require('@ethereumjs/tx')
-const Common = require('@ethereumjs/common').default
-
+const { Common } = require('@ethereumjs/common')
 const {
-  BN,
   hashPersonalMessage,
   toBuffer,
   ecsign,
@@ -12,7 +10,14 @@ const {
   pubToAddress,
   ecrecover
 } = require('@ethereumjs/util')
-const { SigningKey } = require('ethers/lib/utils')
+
+function chainConfig (chain, hardfork) {
+  const chainId = BigInt(chain)
+
+  return Common.isSupportedChainId(chainId)
+    ? new Common({ chain: chainId.toNumber(), hardfork })
+    : Common.custom({ chainId: chainId.toNumber() }, { baseChain: 'mainnet', hardfork })
+}
 
 class HotSignerWorker {
   constructor () {
