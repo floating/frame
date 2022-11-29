@@ -7,9 +7,8 @@ import Signer from '../../Signer'
 import { sign, signerCompatibility, londonToLegacy } from '../../../transaction'
 import { convertToUnsignedTransaction, TransactionData } from '../../../../resources/domain/transaction'
 import { Derivation, getDerivationPath } from '../../Signer/derive'
-import { TypedData } from 'eth-sig-util'
 import { serializeTransaction } from 'ethers/lib/utils'
-import {TypedMessage} from '../../../accounts/types'
+import { TypedData, TypedMessage } from '../../../accounts/types'
 
 const ADDRESS_LIMIT = 10
 const HARDENED_OFFSET = 0x80000000
@@ -260,8 +259,6 @@ export default class Lattice extends Signer {
 
   async signTypedData (index: number, typedMessage: TypedMessage<SignTypedDataVersion.V4>, cb: Callback<string>) {
     try {
-      //TODO: Why is this line not happy?
-      //@ts-ignore
       const signature = await this.sign(index, 'eip712', typedMessage.data)
 
       return cb(null, signature)
