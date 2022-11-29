@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, screen, Tray as ElectronTray, Menu, globalShortcut, IpcMainEvent, WebContents, BrowserWindowConstructorOptions } from 'electron'
+import { app, BrowserWindow, ipcMain, screen, Tray as ElectronTray, Menu, globalShortcut, IpcMainEvent, WebContents } from 'electron'
 import path from 'path'
 import log from 'electron-log'
 import EventEmitter from 'events'
@@ -6,6 +6,7 @@ import { hexToNumber } from 'web3-utils'
 
 import store from '../store'
 import FrameManager from './frames'
+import { createWindow } from './window'
 
 type Windows = { [key: string]: BrowserWindow }
 
@@ -104,34 +105,9 @@ const detectMouse = () => {
   }, 50)
 }
 
-function createWindow (name: string, opts: BrowserWindowConstructorOptions) {
-  log.verbose(`Creating ${name} window`)
-
-  const browserWindow = new BrowserWindow(opts)
-
-  browserWindow.webContents.once('did-finish-load', () => {
-    log.info(`Created ${name} renderer process, pid:`, browserWindow.webContents.getOSProcessId())
-  })
-
-  return browserWindow
-}
-
 function initDashWindow () {
-  windows.dash = createWindow('dash', {
-    width: trayWidth,
-    frame: false,
-    transparent: process.platform === 'darwin',
-    show: false,
-    backgroundColor: store('main.colorwayPrimary', store('main.colorway'), 'background'),
-    skipTaskbar: process.platform !== 'linux',
-    webPreferences: {
-      nodeIntegration: false,
-      contextIsolation: true,
-      sandbox: true,
-      disableBlinkFeatures: 'Auxclick',
-      preload: path.resolve(process.env.BUNDLE_LOCATION, 'bridge.js'),
-      backgroundThrottling: false // Allows repaint when window is hidden
-    }
+  windows.dash = createWindow('dash', { 
+    width: trayWidth 
   })
 
   const dashUrl = new URL(path.join(process.env.BUNDLE_LOCATION, 'dash.html'), 'file:')
@@ -141,31 +117,14 @@ function initDashWindow () {
 function initTrayWindow () {
   windows.tray = createWindow('tray', {
     width: trayWidth,
-    frame: false,
-    transparent: process.platform === 'darwin',
-    show: false,
-    backgroundColor: store('main.colorwayPrimary', store('main.colorway'), 'background'),
-    icon: path.join(__dirname, './AppIcon.png'),
-    skipTaskbar: process.platform !== 'linux',
-    webPreferences: {
-      nodeIntegration: false,
-      contextIsolation: true,
-      sandbox: true,
-      disableBlinkFeatures: 'Auxclick',
-      preload: path.resolve(process.env.BUNDLE_LOCATION, 'bridge.js'),
-      backgroundThrottling: false // Allows repaint when window is hidden
-    }
+    icon: path.join(__dirname, './AppIcon.png')
   })
 
   const trayUrl = new URL(path.join(process.env.BUNDLE_LOCATION, 'tray.html'), 'file:')
   windows.tray.loadURL(trayUrl.toString())
 
   windows.tray.on('closed', () => delete windows.tray)
-  windows.tray.webContents.on('will-navigate', e => e.preventDefault()) // Prevent navigation
-  windows.tray.webContents.on('will-attach-webview', e => e.preventDefault()) // Prevent attaching <webview>
-  windows.tray.webContents.setWindowOpenHandler(() => ({ action: 'deny' })) // Prevent new windows
   windows.tray.webContents.session.setPermissionRequestHandler((webContents, permission, res) => res(false))
-
   windows.tray.setResizable(false)
   windows.tray.setMovable(false)
   windows.tray.setSize(0, 0)
@@ -388,6 +347,10 @@ ipcMain.on('tray:mouseout', () => {
   }
 })
 
+// deny navigation, webview attachment & new windows on creation of webContents
+// also set elsewhere but enforced globally here to minimize possible vectors of attack 
+// - in the case of e.g. dependency injection 
+// - as a 'to be sure' against possibility of misconfiguration in the future
 app.on('web-contents-created', (_e, contents) => {
   contents.on('will-navigate', e => e.preventDefault())
   contents.on('will-attach-webview', e => e.preventDefault())

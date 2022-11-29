@@ -1,6 +1,6 @@
 import EventEmitter from 'events'
 import log from 'electron-log'
-import { shell, Notification } from 'electron'
+import { Notification } from 'electron'
 import { addHexPrefix, intToHex} from 'ethereumjs-util'
 import { TypedData, Version } from 'eth-sig-util'
 import { v5 as uuidv5 } from 'uuid'
@@ -25,6 +25,7 @@ import {
 
 import type { Chain } from '../chains'
 import { ActionType } from '../transaction/actions'
+import { openBlockExplorer } from '../windows/window'
 import { ApprovalType } from '../../resources/constants'
 import { accountNS } from '../../resources/domain/account'
 
@@ -282,12 +283,7 @@ export class Accounts extends EventEmitter {
 
               // If Frame is hidden, trigger native notification
               notify('Transaction Successful', body, () => {
-                const { type, id } = targetChain
-                const explorer = store('main.networks', type, id, 'explorer')
-
-                if (explorer) {
-                  shell.openExternal(explorer + '/tx/' + hash)
-                }
+                openBlockExplorer(hash, targetChain)
               })
             }
             const blockHeight = parseInt(res.result, 16)
