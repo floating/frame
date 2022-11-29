@@ -59,6 +59,7 @@
   "dependencies": {
     "@aragon/wrapper": "5.5.3",
     "@ethereumjs/common": "3.0.1",
+    "@ethereumjs/tx": "4.0.1",
     "@ethereumjs/util": "8.0.2",
     "@ethersproject/contracts": "5.7.0",
     "@ethersproject/providers": "5.7.2",
@@ -96,7 +97,6 @@
     "react-dom": "18.2.0",
     "react-restore": "0.5.0",
     "react-transition-group": "4.4.5",
-    "rlp": "3.0.0",
     "semver": "7.3.8",
     "trezor-connect": "8.2.11-extended",
     "uuid": "9.0.0",
