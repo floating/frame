@@ -19,13 +19,22 @@ const displayUnitMapping = {
   },
   quadrillion: {
     lowerBound: BigNumber('1000000000000000'),
-    upperBound: BigNumber(Infinity),
+    upperBound: BigNumber('999999000000000000000'),
     unitDisplay: 'Q'
   }
 }
 
+function isLargeNumber(bn: BigNumber) {
+  const largeNumberDisplayKeys = Object.keys(displayUnitMapping)
+  const firstLargeNumberDisplayKey = largeNumberDisplayKeys[0]
+  const firstLargeNumberDisplayValue = displayUnitMapping[firstLargeNumberDisplayKey as keyof typeof displayUnitMapping]
+  return bn.isGreaterThanOrEqualTo(firstLargeNumberDisplayValue.lowerBound)
+}
+
 function getDisplay (bn: BigNumber, type: string, decimals: number, displayFullValue?: boolean) {
   const value = bn.decimalPlaces(decimals, BigNumber.ROUND_FLOOR)
+
+  // minimum display value
   if (value.isZero()) {
     return {
       approximationSymbol: '<',
@@ -33,24 +42,37 @@ function getDisplay (bn: BigNumber, type: string, decimals: number, displayFullV
     }
   }
 
-  if (!displayFullValue) {
-    // shorthand display of large numbers
-    for (const [unitName, { lowerBound, upperBound, unitDisplay }] of Object.entries(displayUnitMapping)) {
-      if (value.isGreaterThanOrEqualTo(lowerBound) && value.isLessThan(upperBound)) {
-        return {
-          displayValue: value.shiftedBy(-(lowerBound.sd(true) - 1)).decimalPlaces(2, BigNumber.ROUND_FLOOR).toFormat(),
-          displayUnit: {
-            fullName: unitName,
-            shortName: unitDisplay
-          }
+  // small numbers
+  if (displayFullValue || !isLargeNumber(value)) {
+    return {
+      displayValue: value.toFormat(type === 'fiat' ? decimals : undefined)
+    }
+  }
+
+  // shorthand display of large numbers
+  for (const [unitName, { lowerBound, upperBound, unitDisplay }] of Object.entries(displayUnitMapping)) {
+    if (value.isGreaterThanOrEqualTo(lowerBound) && value.isLessThan(upperBound)) {
+      return {
+        displayValue: value.shiftedBy(-(lowerBound.sd(true) - 1)).decimalPlaces(2, BigNumber.ROUND_FLOOR).toFormat(),
+        displayUnit: {
+          fullName: unitName,
+          shortName: unitDisplay
         }
       }
     }
   }
-
-  // display small numbers or full values
+  
+  // maximum display value
+  const displayUnitKeys = Object.keys(displayUnitMapping)
+  const lastDisplayUnitKey = displayUnitKeys[displayUnitKeys.length - 1]
+  const lastDisplayUnitValue = displayUnitMapping[lastDisplayUnitKey as keyof typeof displayUnitMapping]
   return {
-    displayValue: value.toFormat(type === 'fiat' ? decimals : undefined)
+    approximationSymbol: '>',
+    displayValue: '999,999',
+    displayUnit: {
+      fullName: lastDisplayUnitKey,
+      shortName: lastDisplayUnitValue.unitDisplay
+    }
   }
 }
 
