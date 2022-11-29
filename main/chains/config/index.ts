@@ -1,4 +1,4 @@
-import {Common} from '@ethereumjs/common'
+import { Common } from '@ethereumjs/common'
 
 function chainConfig (chain: number, hardfork: string) {
   const chainId = BigInt(chain)
