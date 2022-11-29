@@ -178,6 +178,7 @@ ipcMain.on('tray:rejectRequest', (e, req) => {
 
 ipcMain.on('tray:openExternal', (e, url) => {
   openExternal(url)
+  store.setDash({ showing: false })
 })
 
 ipcMain.on('tray:openExplorer', (e, hash, chain) => {

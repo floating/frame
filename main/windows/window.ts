@@ -87,7 +87,6 @@ const isWhitelistedHost = (url: string) => externalWhitelist.some(entry => url =
 
 export function openExternal(url = '') {
   if (isWhitelistedHost(url) || isValidReleasePage(url)) {
-    store.setDash({ showing: false })
     shell.openExternal(url)
   }
 }
