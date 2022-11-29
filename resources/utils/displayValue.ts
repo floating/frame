@@ -3,27 +3,26 @@ import { isHexString } from 'ethers/lib/utils'
 
 const displayUnitMapping = {
   million: {
-    lowerBound: BigNumber(1000000),
-    upperBound: BigNumber(1000000000),
+    lowerBound: BigNumber('1000000'),
+    upperBound: BigNumber('1000000000'),
     unitDisplay: 'M'
   },
   billion: {
-    lowerBound: BigNumber(1000000000),
-    upperBound: BigNumber(1000000000000),
+    lowerBound: BigNumber('1000000000'),
+    upperBound: BigNumber('1000000000000'),
     unitDisplay: 'B'
   },
   trillion: {
-    lowerBound: BigNumber(1000000000000),
-    upperBound: BigNumber(1000000000000000),
+    lowerBound: BigNumber('1000000000000'),
+    upperBound: BigNumber('1000000000000000'),
     unitDisplay: 'T'
   },
   quadrillion: {
-    lowerBound: BigNumber(1000000000000000),
+    lowerBound: BigNumber('1000000000000000'),
     upperBound: BigNumber(Infinity),
     unitDisplay: 'Q'
   }
 }
-const maxDisplayValue = BigNumber(999999999999999999999)
 
 function getDisplay (bn: BigNumber, type: string, decimals: number, displayFullValue?: boolean) {
   const value = bn.decimalPlaces(decimals, BigNumber.ROUND_FLOOR)
@@ -38,11 +37,8 @@ function getDisplay (bn: BigNumber, type: string, decimals: number, displayFullV
     // shorthand display of large numbers
     for (const [unitName, { lowerBound, upperBound, unitDisplay }] of Object.entries(displayUnitMapping)) {
       if (value.isGreaterThanOrEqualTo(lowerBound) && value.isLessThan(upperBound)) {
-        const displayMax = value.isGreaterThan(maxDisplayValue)
-        // maximum display value is hard coded because maxDisplayValue is above the bignumber 15sd limit
         return {
-          approximationSymbol: displayMax ? '>' : '',
-          displayValue: displayMax ? '999,999' : value.shiftedBy(-(lowerBound.sd(true) - 1)).decimalPlaces(2, BigNumber.ROUND_FLOOR).toFormat(),
+          displayValue: value.shiftedBy(-(lowerBound.sd(true) - 1)).decimalPlaces(2, BigNumber.ROUND_FLOOR).toFormat(),
           displayUnit: {
             fullName: unitName,
             shortName: unitDisplay
