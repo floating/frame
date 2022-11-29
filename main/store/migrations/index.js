@@ -1,4 +1,6 @@
 import log from 'electron-log'
+import { v5 as uuidv5 } from 'uuid'
+import { accountNS, isDefaultAccountName } from '../../../resources/domain/account'
 
 const migrations = {
   4: initial => {
@@ -577,6 +579,21 @@ const migrations = {
     Object.values(initial.main.networksMeta.ethereum).forEach((metadata) => {
       metadata.nativeCurrency.decimals = metadata.nativeCurrency.decimals || 18
     })
+    return initial
+  },
+  29: (initial) => {
+    // add accountsMeta
+    initial.main.accountsMeta = {}
+    Object.entries(initial.main.accounts).forEach(([id, account]) => {
+      if (!isDefaultAccountName(account)) {
+        const accountMetaId = uuidv5(id, accountNS)
+        initial.main.accountsMeta[accountMetaId] = { 
+          name: account.name,
+          lastUpdated: Date.now()
+        }
+      }
+    })
+
     return initial
   }
 }

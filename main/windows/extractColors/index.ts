@@ -1,9 +1,8 @@
-import path from 'path'
 import log from 'electron-log'
 import pixels from 'get-pixels'
 import { BrowserWindow, BrowserView } from 'electron'
 
-import webPreferences from '../webPreferences'
+import { createViewInstance } from '../window'
 
 function mode (array: string[]) {
   if (array.length === 0) return ''
@@ -83,28 +82,20 @@ async function extractColors (url: string, ens: string) {
     titleBarStyle: 'hidden',
     paintWhenInitiallyHidden: true,
     webPreferences: {
-      backgroundThrottling: false,
-      webviewTag: false,
-      nodeIntegration: false,
       contextIsolation: true,
+      webviewTag: false,
       sandbox: true,
+      defaultEncoding: 'utf-8',
+      nodeIntegration: false,
+      scrollBounce: true,
+      navigateOnDragDrop: false,
       disableBlinkFeatures: 'Auxclick',
-      // enableRemoteModule: false,
-      offscreen: true
+      backgroundThrottling: false, 
+      offscreen: true 
     }
   })
 
-  let view: BrowserView | null = new BrowserView({ 
-    webPreferences: Object.assign({ 
-      preload: path.resolve('./main/windows/viewPreload.js') ,
-      partition: 'persist:' + ens,
-      offscreen: true
-    }, webPreferences)
-  })
-
-  view.webContents.on('will-navigate', e => e.preventDefault())
-  view.webContents.on('will-attach-webview', e => e.preventDefault())
-  view.webContents.setWindowOpenHandler(() => ({ action: 'deny' }))
+  let view: BrowserView | null = createViewInstance(ens, { offscreen: true })
 
   view.webContents.session.webRequest.onBeforeSendHeaders((details, cb) => {
     if (!details || !details.frame) return cb({ cancel: true }) // Reject the request

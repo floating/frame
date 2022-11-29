@@ -1,13 +1,12 @@
 import React from 'react'
 import Restore from 'react-restore'
+import BigNumber from 'bignumber.js'
+
 import svg from '../../../../../../../resources/svg'
 import link from '../../../../../../../resources/link'
-import BigNumber from 'bignumber.js'
-import Recipient from './recipient'
-import Destination from './destination'
 import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../../../resources/Components/Cluster'
-
 import { formatDisplayInteger, isUnlimited } from '../../../../../../../resources/utils/numbers'
+import { getAddress } from '../../../../../../../resources/utils'
 
 class TxSending extends React.Component {
   constructor (...args) {
@@ -21,7 +20,6 @@ class TxSending extends React.Component {
     this.setState({ copied: true })
     setTimeout(_ => this.setState({ copied: false }), 1000)
   }
-  
   render () {
     const req = this.props.req
     const contract = req.data.to.toLowerCase()
@@ -34,23 +32,15 @@ class TxSending extends React.Component {
     if (actionClass === 'erc20') {
       if (actionType === 'transfer') {
         const { amount, decimals, name, recipient: recipientAddress, symbol, recipientType, recipientEns } = action.data || {}
-        const address = recipientAddress
+        const address = getAddress(recipientAddress)
         const ensName = recipientEns
         const value = new BigNumber(amount) 
         const displayValue = value.dividedBy('1e' + decimals).decimalPlaces(6).toFormat()
-        // const ensName = (recipientEns && recipientEns.length < 25) ? recipientEns : ''
 
         const isTestnet = this.store('main.networks', this.props.chain.type, this.props.chain.id, 'isTestnet')    
         const rate = this.store('main.rates', contract)
         const rateUSD = rate && rate.usd && !isTestnet ? rate.usd.price : 0
   
-        const destination = recipientType && <Destination chain={chainName} recipientType={recipientType} />
-        const recipient = recipientAddress && 
-          <Recipient
-            address={recipientAddress}
-            ens={recipientEns}
-            copyAddress={(copied) => link.send('tray:clipboardData', copied)}
-          />
         return (
           <ClusterBox title={`Sending ${symbol}`} subtitle={name} animationSlot={this.props.i}>
             <Cluster>
@@ -110,25 +100,10 @@ class TxSending extends React.Component {
           </ClusterBox>
         )
       } else if (actionType === 'approve') {
-        const { amount, decimals, name, spender: recipientAddress, symbol, spenderType, spenderEns } = action.data || {}
-        const address = recipientAddress
+        const { amount, decimals, spender: recipientAddress, symbol, spenderEns } = action.data || {}
+        const address = getAddress(recipientAddress)
         const ensName = spenderEns
         const value = new BigNumber(amount) 
-        const displayValue = value.dividedBy('1e' + decimals).toFixed(6)
-        // const ensName = (recipientEns && recipientEns.length < 25) ? recipientEns : ''
-
-        const isTestnet = this.store('main.networks', this.props.chain.type, this.props.chain.id, 'isTestnet')    
-        const rate = this.store('main.rates', contract)
-        const rateUSD = rate && rate.usd && !isTestnet ? rate.usd.price : 0
-  
-        const destination = spenderType && <Destination chain={chainName} recipientType={spenderType} />
-        const recipient = recipientAddress && 
-          <Recipient
-            address={recipientAddress}
-            ens={spenderEns}
-            copyAddress={(copied) => link.send('tray:clipboardData', copied)}
-          />
-
 
         const revoke = value.eq(0)
         const displayAmount = isUnlimited(this.state.amount) ? 'unlimited' : formatDisplayInteger(amount, decimals)

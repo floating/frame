@@ -1,11 +1,11 @@
 import React from 'react'
 import Restore from 'react-restore'
-import { getAddress } from '@ethersproject/address'
 
 import link from '../../../../../../../resources/link'
 import svg from '../../../../../../../resources/svg'
 
 import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../../../resources/Components/Cluster'
+import {getAddress} from '../../../../../../../resources/utils'
 
 class TxRecipient extends React.Component {
   constructor (...args) {
@@ -25,7 +25,6 @@ class TxRecipient extends React.Component {
     const req = this.props.req
     const address = req.data.to ? getAddress(req.data.to) : ''
     const ensName = (req.recipient && req.recipient.length < 25) ? req.recipient : ''
-    const chainName = this.store('main.networks.ethereum', parseInt(req.data.chainId, 16), 'name') 
     const value = req.data.value || '0x'
     if (req.recipientType !== 'contract' && (value !== '0x' || parseInt(value, 16)) !== 0) return null
 
@@ -87,9 +86,5 @@ class TxRecipient extends React.Component {
     )
   }
 }
-
-{/* <div className='transactionToAddressFull' onMouseDown={this.copyAddress.bind(this, req.data.to)}>
-{this.state.copied ? <span>{'Copied'}{svg.octicon('clippy', { height: 14 })}</span> : req.data.to}
-</div> */}
 
 export default Restore.connect(TxRecipient)

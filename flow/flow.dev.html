@@ -4,20 +4,20 @@
     <meta 
       http-equiv='Content-Security-Policy' 
       content="
-        default-src 'self'; 
+        script-src 'strict-dynamic' 'nonce-91406ecf-ea41-4c5a-91ba-f12ca5cc1b0e' http://localhost:1234 'unsafe-eval';
+        base-uri 'self';
         connect-src *; 
-        style-src 'self' 'unsafe-inline'; 
-        frame-src https://connect.trezor.io; 
+        style-src 'self' http://localhost:1234 'unsafe-inline';
         object-src 'none';
       " 
     />
     <title>Flow</title>
-    <link rel='stylesheet' href='../resources/base.styl' type='text/css' />
-    <link rel='stylesheet' href='./index.styl' type='text/css' />
+    <link rel='stylesheet' href='../resources/base.styl' type='text/css'>
+    <link rel='stylesheet' href='./index.styl' type='text/css'>
   </head>
   <body>
     <div class='frameOverlay'></div>
     <div id='flow'></div>
-    <script type='module' src='./index.js'></script>
+    <script type='module' src='./index.js' nonce='91406ecf-ea41-4c5a-91ba-f12ca5cc1b0e'></script>
   </body>
 </html>

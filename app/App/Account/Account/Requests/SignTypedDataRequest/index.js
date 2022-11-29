@@ -1,6 +1,5 @@
 import React from 'react'
 import Restore from 'react-restore'
-import link from '../../../../../../resources/link'
 
 const SimpleJSON = ({ json }) => {
   return (
@@ -33,31 +32,10 @@ class TransactionRequest extends React.Component {
     }, props.signingDelay || 1500)
   }
 
-  copyAddress (e) {
-    e.preventDefault()
-    e.target.select()
-    document.execCommand('Copy')
-    this.setState({ copied: true })
-    setTimeout(_ => this.setState({ copied: false }), 1000)
-  }
-
-  approve (reqId, req) {
-    link.rpc('approveRequest', req, () => {}) // Move to link.send
-  }
-
-  decline (reqId, req) {
-    link.rpc('declineRequest', req, () => {}) // Move to link.send
-  }
-
-  toggleDataView (id) {
-    this.setState({ dataView: !this.state.dataView })
-  }
-
   render () {
     const { req } = this.props
     const type = req.type
     const status = req.status
-    const notice = req.notice
     const payload = req.payload
     const typedData = payload.params[1] || {}
     const originName = this.store('main.origins', req.origin, 'name')

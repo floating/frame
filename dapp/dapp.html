@@ -4,20 +4,22 @@
     <meta 
       http-equiv='Content-Security-Policy' 
       content="
-        default-src 'self';
+        script-src 'strict-dynamic' 'nonce-8c7d2664-ae99-42c2-ae12-3304e9168f71';
+        base-uri 'self';
         connect-src *; 
         img-src blob: http://localhost:8421;
         style-src 'self';
         frame-src 'none'; 
         object-src 'none';
+        require-trusted-types-for 'script';
       "
     />
     <title>Dapp</title>
-    <link rel='stylesheet' href='../resources/base.styl' type='text/css' />
-    <link rel='stylesheet' href='./index.styl' type='text/css' />
+    <link rel='stylesheet' href='../resources/base.styl' type='text/css'>
+    <link rel='stylesheet' href='./index.styl' type='text/css'>
   </head>
   <body>
     <div id='frame'></div>
-    <script type='module' src='./index.js'></script>
+    <script type='module' src='./index.js' nonce='8c7d2664-ae99-42c2-ae12-3304e9168f71'></script>
   </body>
 </html>

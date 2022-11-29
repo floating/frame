@@ -47,9 +47,8 @@ export function usesBaseFee (rawTx: TransactionData) {
   return typeSupportsBaseFee(rawTx.type)
 }
 
-export function getAddress (address: Address) {
+export function getAddress(address: string) {
   const lowerCaseAddress = address.toLowerCase()
-
   try {
     // this will throw if the address can't be checksummed
     return getChecksumAddress(lowerCaseAddress)
