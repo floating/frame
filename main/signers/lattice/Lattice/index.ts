@@ -1,14 +1,15 @@
 import { Client, Utils, Constants } from 'gridplus-sdk'
 import { padToEven, addHexPrefix } from '@ethereumjs/util'
-import { hexToInt } from '../../../../resources/utils'
-import log from 'electron-log'
 import { SignTypedDataVersion } from '@metamask/eth-sig-util'
+import { serializeTransaction } from 'ethers/lib/utils'
+import log from 'electron-log'
+
 import Signer from '../../Signer'
 import { sign, signerCompatibility, londonToLegacy } from '../../../transaction'
-import { convertToUnsignedTransaction, TransactionData } from '../../../../resources/domain/transaction'
 import { Derivation, getDerivationPath } from '../../Signer/derive'
-import { serializeTransaction } from 'ethers/lib/utils'
 import { TypedData, TypedMessage } from '../../../accounts/types'
+import { convertToUnsignedTransaction, TransactionData } from '../../../../resources/domain/transaction'
+import { hexToInt } from '../../../../resources/utils'
 
 const ADDRESS_LIMIT = 10
 const HARDENED_OFFSET = 0x80000000
