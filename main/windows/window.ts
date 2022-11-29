@@ -32,6 +32,9 @@ export function createWindow (name: string, opts?: BrowserWindowConstructorOptio
   browserWindow.webContents.once('did-finish-load', () => {
     log.info(`Created ${name} renderer process, pid:`, browserWindow.webContents.getOSProcessId())
   })
+  browserWindow.webContents.on('will-navigate', (e) => e.preventDefault()) // Prevent navigation
+  browserWindow.webContents.on('will-attach-webview', (e) => e.preventDefault()) // Prevent attaching <webview>
+  browserWindow.webContents.setWindowOpenHandler(() => ({ action: 'deny' })) // Prevent new windows
 
   return browserWindow
 }
