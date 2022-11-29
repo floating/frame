@@ -32,6 +32,9 @@ const Unit = ({ displayUnit }) => (
   </span>
 )
 
+export const DisplayFiatPrice = ({ decimals, currencyRate, isTestnet }) => 
+  <DisplayValue type='fiat' value={`1e${decimals}`} valueDataParams={{ decimals, currencyRate, isTestnet, displayFullValue: true }} currencySymbol='$' />
+
 export const DisplayValue = (props) => {
   const {
     value, 

@@ -1,9 +1,8 @@
 import React from 'react'
 import Restore from 'react-restore'
 
-import { DisplayValue } from '../../../../../../resources/Components/DisplayValue'
+import { DisplayFiatPrice, DisplayValue } from '../../../../../../resources/Components/DisplayValue'
 import RingIcon from '../../../../../../resources/Components/RingIcon'
-import svg from '../../../../../../resources/svg'
 
 class Balance extends React.Component {
   render () {
@@ -63,7 +62,7 @@ class Balance extends React.Component {
           <div className='signerBalancePrice'>
             <div className='signerBalanceOk'>
               <span className='signerBalanceCurrentPrice'>
-                <DisplayValue type='fiat' value={`1e${decimals}`} valueDataParams={{ decimals, currencyRate, isTestnet, displayFullValue: true }} currencySymbol='$' />
+                <DisplayFiatPrice decimals={decimals} currencyRate={currencyRate} isTestnet={isTestnet} />
               </span>
               <span className={priceChangeClass}>
                 <span>{displayPriceChange()}</span>
