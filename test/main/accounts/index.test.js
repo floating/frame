@@ -638,72 +638,25 @@ describe('#resetNonce', () => {
         method: 'eth_getTransactionCount',
         params: ['0x22dd63c3619818fdbc262c78baee43cb61e9cccf', 'pending']
       }))
-
       cb({ result: '0x3' })
     })
-
     request.data.nonce = '0x5'
     Accounts.addRequest(request, jest.fn())
   })
+  
   const resetNonce = (requestId = 1) => Accounts.resetNonce(requestId)
 
   it('it will un-set the nonce when not present inside the tx request payload', () => {
     delete request.payload.params[0].nonce
-
     resetNonce()
-
     expect(request.data.nonce).toBe(undefined)
   })
 
   it('it will revert to the nonce inside the tx request payload when present', () => {
     request.payload.params[0].nonce = '0x' + BigNumber(request.data.nonce).minus(1).toString(16)
-
     resetNonce()
-
     expect(request.data.nonce).toBe(request.payload.params[0].nonce)
   })
-})
-  let onChainNonce
-
-  beforeEach(() => {
-    provider.send = jest.fn((payload, cb) => {
-      expect(payload).toEqual(expect.objectContaining({
-        id: 1,
-        jsonrpc: '2.0',
-        method: 'eth_getTransactionCount',
-        params: ['0x22dd63c3619818fdbc262c78baee43cb61e9cccf', 'pending']
-      }))
-
-      cb({ result: onChainNonce })
-    })
-
-    onChainNonce = '0x0'
-    Accounts.addRequest(request, jest.fn())
-  })
-  const resetNonce = (requestId = 1) => Accounts.resetNonce(requestId)
-  const setTxDataNonce = ( newNonce, requestId = 1 ) => ( Accounts.current().requests[requestId].data.nonce = newNonce ) 
-  const clearRequestPayloadNonce = ( requestId =1 ) => delete Accounts.current().requests[requestId].payload.params[0].nonce
-
-  it('it will un-set the nonce when not present inside the tx request payload', () => {
-    const incrementedNonce = '0x' + BigNumber(request.data.nonce).plus(2).toString(16)
-    clearRequestPayloadNonce()
-
-    setTxDataNonce(incrementedNonce)
-    expect(Accounts.current().requests[1].data.nonce).toBe(incrementedNonce)
-
-    resetNonce()
-    expect(Accounts.current().requests[1].data.nonce).toBe(undefined)
-  })
-
-  it('it will revert to the nonce inside the tx request payload when present', () => {
-    const incrementedNonce = '0x' + BigNumber(request.data.nonce).minus(2).toString(16)
-    const nonceInsidePayload = request.payload.params[0].nonce
-    setTxDataNonce(incrementedNonce)
-    resetNonce()
-
-    expect(Accounts.current().requests[1].data.nonce).toBe(nonceInsidePayload)
-  })
-
 })
 
 describe('#resolveRequest', () => {
