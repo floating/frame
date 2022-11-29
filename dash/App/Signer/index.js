@@ -3,7 +3,7 @@ import Restore from 'react-restore'
 
 import link from '../../../resources/link'
 import svg from '../../../resources/svg'
-import { capitalize } from '../../../resources/utils'
+import { capitalize, getAddress } from '../../../resources/utils'
 import { isHardwareSigner, getSignerDisplayType } from '../../../resources/domain/signer'
 
 import SignerStatus from './SignerStatus'
@@ -314,6 +314,7 @@ class Signer extends React.Component {
             <div className='signerAccounts'>
               {addedAccounts.length ? addedAccounts.map((address) => {
                 const index = signer.addresses.indexOf(address) + 1
+                const checkSummedAddress = getAddress(address)
                 return (
                   <div key={address} className={'signerAccount signerAccountAdded signerAccountDisabled'} onClick={() => {
                     // if (this.store('main.accounts', address.toLowerCase())) {
@@ -325,7 +326,7 @@ class Signer extends React.Component {
                     // }
                   }}>
                     <div className='signerAccountIndex'>{index}</div>
-                    <div className='signerAccountAddress'>{address.substr(0, 11)} {svg.octicon('kebab-horizontal', { height: 20 })} {address.substr(address.length - 10)}</div>
+                    <div className='signerAccountAddress'>{checkSummedAddress.substr(0, 11)} {svg.octicon('kebab-horizontal', { height: 20 })} {checkSummedAddress.substr(address.length - 10)}</div>
                     <div className='signerAccountCheck' />
                   </div>
                 )
@@ -457,7 +458,7 @@ class Signer extends React.Component {
             <div className='signerAddedAccountTitle'>{'available accounts'}</div>
             <div className='signerAccounts'>{signer.addresses.slice(startIndex, startIndex + addressLimit).map((address, index) => {
               const added = this.store('main.accounts', address.toLowerCase())
-
+              const checkSummedAddress = getAddress(address)
               return (
                 <div key={address} className={!added ?  'signerAccount' : 'signerAccount signerAccountAdded'} onClick={() => {
                   if (this.store('main.accounts', address.toLowerCase())) {
@@ -470,7 +471,8 @@ class Signer extends React.Component {
                   }
                 }}>
                   <div className='signerAccountIndex'>{index + 1 + startIndex}</div>
-                  <div className='signerAccountAddress'>{address.substr(0, 11)} {svg.octicon('kebab-horizontal', { height: 20 })} {address.substr(address.length - 10)}</div>
+                  <div className='signerAccountAddress'>{
+                  checkSummedAddress.substr(0, 11)} {svg.octicon('kebab-horizontal', { height: 20 })} {checkSummedAddress.substr(address.length - 10)}</div>
                   <div className='signerAccountCheck' />
                 </div>
               )

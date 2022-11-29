@@ -1,5 +1,6 @@
 import { randomInt } from 'crypto'
 import { addHexPrefix, intToHex } from 'ethereumjs-util'
+import { getAddress as getChecksumAddress } from '@ethersproject/address';
 
 const weiToGwei = (wei: number) => wei / 1e9
 const weiToHex = (wei: number) => addHexPrefix(wei.toString(16))
@@ -71,6 +72,19 @@ const matchFilter = (filter: string = '', properties: string[] = []) => {
   })
 }
 
+function getAddress(address: Address) {
+  const lowerCaseAddress = address.toLowerCase();
+
+  try {
+    // this will throw if the address can't be checksummed
+    return getChecksumAddress(lowerCaseAddress);
+  } catch (e) {
+    console.warn(`could not checksum address ${address}, using lowercase address`, e);
+    return lowerCaseAddress;
+  }
+}
+
+
 export {
   getErrorCode,
   randomLetters,
@@ -87,5 +101,6 @@ export {
   weiHexToGweiInt,
   weiIntToEthInt,
   gweiToWeiHex,
-  matchFilter
+  matchFilter,
+  getAddress,
 }

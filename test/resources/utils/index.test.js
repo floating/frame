@@ -1,4 +1,4 @@
-import { matchFilter } from '../../../resources/utils'
+import { matchFilter, getAddress } from '../../../resources/utils'
 
 describe('matchFilter', () => {
   it('passes single filter match of properties', () => {
@@ -76,5 +76,15 @@ describe('matchFilter', () => {
     const properties = ['one']
     const matched = matchFilter(filter, properties)
     expect(matched).toStrictEqual(false)
+  })
+})
+
+describe('#getAddress', () => {
+  it('returns a checksummed address', () => {
+    expect(getAddress('0x81aa3e376ea6e4b238a213324220c1a515031d12')).toBe('0x81aA3e376ea6e4b238a213324220c1A515031D12')
+  })
+
+  it('corrects an incorrectly checksummed address', () => {
+    expect(getAddress('0x81aa3e376ea6e4b238a213324220C1a515031D12')).toBe('0x81aA3e376ea6e4b238a213324220c1A515031D12')
   })
 })

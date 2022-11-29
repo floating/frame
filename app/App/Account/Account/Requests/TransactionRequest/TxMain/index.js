@@ -4,9 +4,9 @@ import { BigNumber } from 'bignumber.js'
 
 import link from '../../../../../../../resources/link'
 import svg from '../../../../../../../resources/svg'
-import { Cluster, ClusterRow, ClusterValue } from '../../../../../../../resources/Components/Cluster'
-import { getAddress } from '../../../../../../../resources/domain/transaction'
 import { DisplayValue } from '../../../../../../../resources/Components/DisplayValue'
+import { Cluster, ClusterRow, ClusterValue } from '../../../../../../../resources/Components/Cluster'
+import { getAddress } from '../../../../../../../resources/utils' 
 
 class TxSending extends React.Component {
   constructor (...args) {

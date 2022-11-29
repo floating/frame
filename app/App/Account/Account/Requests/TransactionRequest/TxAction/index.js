@@ -1,13 +1,13 @@
 import React from 'react'
 import Restore from 'react-restore'
-import utils from 'web3-utils'
+import BigNumber from 'bignumber.js'
 
 import svg from '../../../../../../../resources/svg'
 import link from '../../../../../../../resources/link'
 import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../../../resources/Components/Cluster'
-
 import { formatDisplayInteger, isUnlimited } from '../../../../../../../resources/utils/numbers'
 import { DisplayValue } from '../../../../../../../resources/Components/DisplayValue'
+import { getAddress } from '../../../../../../../resources/utils'
 
 class TxSending extends React.Component {
   constructor (...args) {
@@ -21,9 +21,7 @@ class TxSending extends React.Component {
     this.setState({ copied: true })
     setTimeout(_ => this.setState({ copied: false }), 1000)
   }
-  hexToDisplayValue (hex) {
-    return (Math.round(parseFloat(utils.fromWei(hex, 'ether')) * 1000000) / 1000000).toFixed(6)
-  }
+
   render () {
     const req = this.props.req
     const contract = req.data.to.toLowerCase()
@@ -36,10 +34,12 @@ class TxSending extends React.Component {
     if (actionClass === 'erc20') {
       if (actionType === 'transfer') {
         const { amount, decimals, name, recipient: recipientAddress, symbol, recipientType, recipientEns } = action.data || {}
-        const address = recipientAddress
+        const address = getAddress(recipientAddress)
         const ensName = recipientEns
         
         // const ensName = (recipientEns && recipientEns.length < 25) ? recipientEns : ''
+        const value = new BigNumber(amount) 
+        const displayValue = value.dividedBy('1e' + decimals).decimalPlaces(6).toFormat()
 
         const isTestnet = this.store('main.networks', this.props.chain.type, this.props.chain.id, 'isTestnet')    
         const rate = this.store('main.rates', contract)

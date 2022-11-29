@@ -1,4 +1,4 @@
-import { app, ipcMain, protocol, shell, clipboard, globalShortcut, powerMonitor, BrowserWindow } from 'electron'
+import { app, ipcMain, protocol, clipboard, globalShortcut, powerMonitor, BrowserWindow } from 'electron'
 import path from 'path'
 import log from 'electron-log'
 import url from 'url'
@@ -17,9 +17,10 @@ import updater from './updater'
 import signers from './signers'
 import persist from './store/persist'
 import showUnhandledExceptionDialog from './windows/dialog/unhandledException'
+import { openBlockExplorer, openExternal } from './windows/window'
+import { FrameInstance } from './windows/frames/frameInstances'
 import Erc20Contract from './contracts/erc20'
 import { getErrorCode } from '../resources/utils'
-import { FrameInstance } from './windows/frames/frameInstances'
 
 app.commandLine.appendSwitch('enable-accelerated-2d-canvas', 'true')
 app.commandLine.appendSwitch('enable-gpu-rasterization', 'true')
@@ -105,25 +106,6 @@ function startUpdater () {
   updater.start()
 }
 
-const externalWhitelist = [
-  'https://frame.sh',
-  'https://chrome.google.com/webstore/detail/frame-alpha/ldcoohedfbjoobcadoglnnmmfbdlmmhf',
-  'https://addons.mozilla.org/en-US/firefox/addon/frame-extension',
-  'https://github.com/floating/frame/issues/new',
-  'https://github.com/floating/frame/blob/master/LICENSE',
-  'https://github.com/floating/frame/blob/0.5/LICENSE',
-  'https://aragon.org',
-  'https://mainnet.aragon.org',
-  'https://rinkeby.aragon.org',
-  'https://shop.ledger.com/pages/ledger-nano-x?r=1fb484cde64f',
-  'https://shop.trezor.io/?offer_id=10&aff_id=3270',
-  'https://discord.gg/UH7NGqY',
-  'https://frame.canny.io',
-  'https://feedback.frame.sh',
-  'https://wiki.trezor.io/Trezor_Bridge',
-  'https://opensea.io'
-]
-
 global.eval = () => { throw new Error(`This app does not support global.eval()`) } // eslint-disable-line
 
 ipcMain.on('tray:resetAllSettings', () => {
@@ -195,20 +177,12 @@ ipcMain.on('tray:rejectRequest', (e, req) => {
 })
 
 ipcMain.on('tray:openExternal', (e, url) => {
-  const validHost = externalWhitelist.some(entry => url === entry || url.startsWith(entry + '/'))
-  if (validHost) {
-    store.setDash({ showing: false })
-    shell.openExternal(url)
-  }
+  openExternal(url)
+  store.setDash({ showing: false })
 })
 
 ipcMain.on('tray:openExplorer', (e, hash, chain) => {
-  // remove trailing slashes from the base url
-  const explorer = (store('main.networks', chain.type, chain.id, 'explorer') || '').replace(/\/+$/, '')
-
-  if (explorer) {
-    shell.openExternal(`${explorer}/tx/${hash}`)
-  }
+  openBlockExplorer(hash, chain)
 })
 
 ipcMain.on('tray:copyTxHash', (e, hash) => {
@@ -252,6 +226,10 @@ ipcMain.on('tray:removeToken', (e, token) => {
 
 ipcMain.on('tray:adjustNonce', (e, handlerId, nonceAdjust) => {
   accounts.adjustNonce(handlerId, nonceAdjust)
+})
+
+ipcMain.on('tray:resetNonce', (e, handlerId) => {
+  accounts.resetNonce(handlerId)
 })
 
 ipcMain.on('tray:removeOrigin', (e, handlerId) => {
@@ -311,18 +289,20 @@ ipcMain.on('unsetCurrentView', async (e, ens) => {
 })
 
 ipcMain.on('*:addFrame', (e, id) => {
-  const existingFrame = store('main.frames', id)
-
-  if (existingFrame) {
-    windows.refocusFrame(id)
-  } else {
-    store.addFrame({
-      id,
-      currentView: '',
-      views: {}
-    })
-    dapps.open(id, 'send.frame.eth')
-  }
+  setTimeout(() => {
+    const existingFrame = store('main.frames', id)
+  
+    if (existingFrame) {
+      windows.refocusFrame(id)
+    } else {
+      store.addFrame({
+        id,
+        currentView: '',
+        views: {}
+      })
+      dapps.open(id, 'send.frame.eth')
+    }
+  }, 50)
 })
 
 app.on('ready', () => {

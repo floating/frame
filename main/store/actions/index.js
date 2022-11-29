@@ -1,4 +1,6 @@
 import log from 'electron-log'
+import { v5 as uuidv5 } from 'uuid'
+import { accountNS, isDefaultAccountName } from '../../../resources/domain/account'
 import { toTokenId } from '../../../resources/domain/balance'
 
 const panelActions = require('./panel')
@@ -135,11 +137,16 @@ module.exports = {
     })
   },
   updateAccount: (u, updatedAccount) => {
-    u('main.accounts', updatedAccount.id, account => {
-      // if (account) return updatedAccount // Account exists
-      // if (add) return updatedAccount // Account is new and should be added
-      return { ...updatedAccount, balances: (account || {}).balances }
+    const { id, name } = updatedAccount
+    u('main.accounts', id, (account = {}) => {
+      return { ...updatedAccount, balances: account.balances || {} }
     })
+    if (name && !isDefaultAccountName({ ...updatedAccount, name })) {
+      const accountMetaId = uuidv5(id, accountNS)
+      u('main.accountsMeta', accountMetaId, (accountMeta) => {
+        return { ...accountMeta, name, lastUpdated: Date.now() }
+      })
+    }
   },
   removeAccount: (u, id) => {
     u('main.accounts', accounts => {

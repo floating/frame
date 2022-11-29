@@ -1,7 +1,5 @@
 import React from 'react'
 import Restore from 'react-restore'
-import link from '../../../../../../../resources/link'
-import utils from 'web3-utils'
 
 import RequestItem from '../../../../../../../resources/Components/RequestItem'
 import TxOverview from './overview'
@@ -13,14 +11,7 @@ class TxMain extends React.Component {
       copied: false
     }
   }
-  copyAddress (data) {
-    link.send('tray:clipboardData', data)
-    this.setState({ copied: true })
-    setTimeout(_ => this.setState({ copied: false }), 1000)
-  }
-  hexToDisplayValue (hex) {
-    return (Math.round(parseFloat(utils.fromWei(hex, 'ether')) * 1000000) / 1000000).toFixed(6)
-  }
+
 
   render () {
     const req = this.props.req
@@ -101,9 +92,5 @@ class TxMain extends React.Component {
     )
   }
 }
-
-{/* <div className='transactionToAddressFull' onMouseDown={this.copyAddress.bind(this, req.data.to)}>
-{this.state.copied ? <span>{'Copied'}{svg.octicon('clippy', { height: 14 })}</span> : req.data.to}
-</div> */}
 
 export default Restore.connect(TxMain)
