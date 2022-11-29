@@ -1,4 +1,4 @@
-import { app, ipcMain, protocol, shell, clipboard, globalShortcut, powerMonitor, BrowserWindow } from 'electron'
+import { app, ipcMain, protocol, clipboard, globalShortcut, powerMonitor, BrowserWindow } from 'electron'
 import path from 'path'
 import log from 'electron-log'
 import url from 'url'

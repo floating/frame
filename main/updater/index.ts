@@ -1,8 +1,7 @@
-import { shell } from 'electron'
 import log from 'electron-log'
 
 import store from '../store'
-import windows from '../windows'
+import { openExternal } from '../windows/window'
 import AutoUpdater from './autoUpdater'
 import manualCheck from './manualCheck'
 
@@ -66,7 +65,7 @@ class Updater {
       this.autoUpdater.downloadUpdate()
     } else if (this.availableUpdate.startsWith('https')) {
       log.verbose(`Opening release page for version ${this.availableVersion}`)
-      shell.openExternal(this.availableUpdate)
+      openExternal(this.availableUpdate)
     }
   }
 

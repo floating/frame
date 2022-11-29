@@ -1,6 +1,6 @@
 import EventEmitter from 'events'
 import log from 'electron-log'
-import { shell, Notification } from 'electron'
+import { Notification } from 'electron'
 import { addHexPrefix, intToHex} from 'ethereumjs-util'
 import { TypedData, Version } from 'eth-sig-util'
 import { v5 as uuidv5 } from 'uuid'
