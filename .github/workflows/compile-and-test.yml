@@ -24,8 +24,8 @@ jobs:
       uses: github/codeql-action/upload-sarif@v2
       with:
         sarif_file: ../electronegativity_results
-    - name: create NPM config file
-      run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_AUTH_TOKEN }}" > ./.npmrc
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
     - run: |
         sudo apt update -y
         sudo apt install -y libudev-dev
