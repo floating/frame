@@ -1,4 +1,4 @@
-import { BrowserWindow, BrowserView, BrowserWindowConstructorOptions } from 'electron'
+import { BrowserWindow, BrowserView, BrowserWindowConstructorOptions, shell } from 'electron'
 import log from 'electron-log'
 import path from 'path'
 
@@ -58,4 +58,42 @@ export function createViewInstance (ens = '', webPreferences: BrowserWindowConst
   viewInstance.webContents.setWindowOpenHandler(() => ({ action: 'deny' }))
 
   return viewInstance
+}
+
+const externalWhitelist = [
+  'https://frame.sh',
+  'https://chrome.google.com/webstore/detail/frame-alpha/ldcoohedfbjoobcadoglnnmmfbdlmmhf',
+  'https://addons.mozilla.org/en-US/firefox/addon/frame-extension',
+  'https://github.com/floating/frame/issues/new',
+  'https://github.com/floating/frame/blob/master/LICENSE',
+  'https://github.com/floating/frame/blob/0.5/LICENSE',
+  'https://aragon.org',
+  'https://mainnet.aragon.org',
+  'https://rinkeby.aragon.org',
+  'https://shop.ledger.com/pages/ledger-nano-x?r=1fb484cde64f',
+  'https://shop.trezor.io/?offer_id=10&aff_id=3270',
+  'https://discord.gg/UH7NGqY',
+  'https://frame.canny.io',
+  'https://feedback.frame.sh',
+  'https://wiki.trezor.io/Trezor_Bridge',
+  'https://opensea.io'
+]
+
+const isValidReleasePage = (url: string) => url.startsWith('https://github.com/floating/frame/releases/tag') || url.startsWith('https://github.com/frame-labs/frame-canary/releases/tag')
+const isWhitelistedHost = (url: string) => externalWhitelist.some(entry => url === entry || url.startsWith(entry + '/'))
+
+export function openExternal(url = '') {
+  if (isWhitelistedHost(url) || isValidReleasePage(url)) {
+    store.setDash({ showing: false })
+    shell.openExternal(url)
+  }
+}
+
+export function openBlockExplorer(hash: string, { id, type }: Chain) {
+  // remove trailing slashes from the base url
+  const explorer = (store('main.networks', type, id, 'explorer') || '').replace(/\/+$/, '')
+
+  if (explorer) {
+    shell.openExternal(`${explorer}/tx/${hash}`)
+  }
 }

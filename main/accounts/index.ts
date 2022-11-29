@@ -25,6 +25,7 @@ import {
 
 import type { Chain } from '../chains'
 import { ActionType } from '../transaction/actions'
+import { openBlockExplorer } from '../windows/window'
 import { ApprovalType } from '../../resources/constants'
 
 function notify (title: string, body: string, action: (event: Electron.Event) => void) {
@@ -278,12 +279,7 @@ export class Accounts extends EventEmitter {
 
               // If Frame is hidden, trigger native notification
               notify('Transaction Successful', body, () => {
-                const { type, id } = targetChain
-                const explorer = store('main.networks', type, id, 'explorer')
-
-                if (explorer) {
-                  shell.openExternal(explorer + '/tx/' + hash)
-                }
+                openBlockExplorer(hash, targetChain)
               })
             }
             const blockHeight = parseInt(res.result, 16)
