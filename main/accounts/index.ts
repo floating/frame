@@ -1036,19 +1036,18 @@ export class Accounts extends EventEmitter {
     }
   }
 
-  resetNonce(handlerId: string) {
+  resetNonce (handlerId: string) {
     const currentAccount = this.current()
     if (!currentAccount) return log.error('No account selected during nonce reset')
 
     const txRequest = this.getTransactionRequest(currentAccount, handlerId)
-    const initialNonce = txRequest.payload.params[0].nonce
+    const initialNonce = txRequest.payload.params[0]?.nonce
     if(initialNonce){
       txRequest.data.nonce = initialNonce
-      currentAccount.update()
     } else {
       delete txRequest.data.nonce
-      currentAccount.update()
     }
+    currentAccount.update()
   }
 
   lockRequest (handlerId: string) {

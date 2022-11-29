@@ -1,11 +1,12 @@
 import log from 'electron-log'
 import { addHexPrefix } from 'ethereumjs-util'
+import BigNumber from 'bignumber.js'
+
 import store from '../../../main/store'
 import provider from '../../../main/provider'
 import Accounts from '../../../main/accounts'
 import signers from '../../../main/signers'
 import { signerCompatibility, maxFee } from '../../../main/transaction'
-
 import { GasFeesSource } from '../../../resources/domain/transaction'
 
 jest.mock('../../../main/provider', () => ({ send: jest.fn(), emit: jest.fn(), on: jest.fn() }))
@@ -59,23 +60,26 @@ afterAll(() => {
 })
 
 beforeEach(done => {
+  const from = '0x22dd63c3619818fdbc262c78baee43cb61e9cccf'
+  const nonce = '0xa'
   request = {
     handlerId: 1,
     type: 'transaction',
     data: {
-      from : '0x22dd63c3619818fdbc262c78baee43cb61e9cccf',
+      from,
       chainId: '0x1',
       gasLimit: weiToHex(21000),
       gasPrice: gweiToHex(30),
       type: '0x2',
       maxPriorityFeePerGas: gweiToHex(1),
       maxFeePerGas: gweiToHex(9),
-      nonce: '0xa'
+      nonce
     },
     payload: {
       jsonrpc: '2.0',
       id: 7,
-      method: 'eth_signTransaction'
+      method: 'eth_signTransaction',
+      params: [{from, nonce}]
     }
   }
 
@@ -623,6 +627,50 @@ describe('#adjustNonce', () => {
 
     expect(Accounts.current().requests[1].data.nonce).toBe(expectedNonce)
   })
+})
+
+describe('#resetNonce', () => {
+  let onChainNonce
+
+  beforeEach(() => {
+    provider.send = jest.fn((payload, cb) => {
+      expect(payload).toEqual(expect.objectContaining({
+        id: 1,
+        jsonrpc: '2.0',
+        method: 'eth_getTransactionCount',
+        params: ['0x22dd63c3619818fdbc262c78baee43cb61e9cccf', 'pending']
+      }))
+
+      cb({ result: onChainNonce })
+    })
+
+    onChainNonce = '0x0'
+    Accounts.addRequest(request, jest.fn())
+  })
+  const resetNonce = (requestId = 1) => Accounts.resetNonce(requestId)
+  const setTxDataNonce = ( newNonce, requestId = 1 ) => ( Accounts.current().requests[requestId].data.nonce = newNonce ) 
+  const clearRequestPayloadNonce = ( requestId =1 ) => delete Accounts.current().requests[requestId].payload.params[0].nonce
+
+  it('it will un-set the nonce when not present inside the tx request payload', () => {
+    const incrementedNonce = '0x' + BigNumber(request.data.nonce).plus(2).toString(16)
+    clearRequestPayloadNonce()
+
+    setTxDataNonce(incrementedNonce)
+    expect(Accounts.current().requests[1].data.nonce).toBe(incrementedNonce)
+
+    resetNonce()
+    expect(Accounts.current().requests[1].data.nonce).toBe(undefined)
+  })
+
+  it('it will revert to the nonce inside the tx request payload when present', () => {
+    const incrementedNonce = '0x' + BigNumber(request.data.nonce).minus(2).toString(16)
+    const nonceInsidePayload = request.payload.params[0].nonce
+    setTxDataNonce(incrementedNonce)
+    resetNonce()
+
+    expect(Accounts.current().requests[1].data.nonce).toBe(nonceInsidePayload)
+  })
+
 })
 
 describe('#resolveRequest', () => {
