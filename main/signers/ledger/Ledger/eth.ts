@@ -73,7 +73,7 @@ export default class LedgerEthereumApp {
       // legacy transactions aren't RLP encoded before they're returned
       const message = tx.getMessageToSign(false)
       const legacyMessage = message[0] !== tx.type
-      const rawTxHex = legacyMessage ? encode(message).toString('hex') : message.toString('hex')
+      const rawTxHex = legacyMessage ? encode(message).toString() : message.toString('hex')
 
       return this.eth.signTransaction(path, rawTxHex, null)
     })
