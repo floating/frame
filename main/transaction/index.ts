@@ -1,28 +1,15 @@
-<<<<<<< HEAD
-import { BN, addHexPrefix, stripHexPrefix, bnToHex, intToHex } from 'ethereumjs-util'
+import BigNumber from 'bignumber.js'
+import { addHexPrefix, intToHex } from '@ethereumjs/util'
 import { TransactionFactory, TypedTransaction } from '@ethereumjs/tx'
-import Common from '@ethereumjs/common'
+import { Common } from '@ethereumjs/common'
 
-import chainConfig from '../chains/config'
 import { AppVersion, SignerSummary } from '../signers/Signer'
-import { GasFeesSource, TransactionData, typeSupportsBaseFee } from '../../resources/domain/transaction'
-=======
 import {
-  addHexPrefix,
-  intToHex,
-} from '@ethereumjs/util';
-import {Common} from '@ethereumjs/common';
-import { AppVersion, SignerSummary } from '../signers/Signer';
-import {
-  convertToUnsignedTransaction,
   GasFeesSource,
   TransactionData,
   typeSupportsBaseFee,
-} from '../../resources/domain/transaction';
-import { hexToInt } from '../../resources/utils';
-import { serializeTransaction, splitSignature } from 'ethers/lib/utils';
-import BigNumber from 'bignumber.js'
->>>>>>> e3c7db57 (updated version of common & utils)
+} from '../../resources/domain/transaction'
+import chainConfig from '../chains/config'
 
 const londonHardforkSigners: SignerCompatibilityByVersion = {
   seed: () => true,
@@ -62,18 +49,10 @@ export interface SignerCompatibility  {
   compatible: boolean
 }
 
-<<<<<<< HEAD
-function toBN (hexStr: string) {
-  return new BN(stripHexPrefix(hexStr), 'hex')
-}
-
-function signerCompatibility (txData: TransactionData, signer: SignerSummary): SignerCompatibility {
-=======
 function signerCompatibility(
   txData: TransactionData,
   signer: SignerSummary
 ): SignerCompatibility {
->>>>>>> e3c7db57 (updated version of common & utils)
   if (typeSupportsBaseFee(txData.type)) {
     const compatible = (signer.type in londonHardforkSigners) && londonHardforkSigners[signer.type](signer.appVersion, signer.model)
     return { signer: signer.type, tx: 'london', compatible }
@@ -112,12 +91,8 @@ function maxFee (rawTx: TransactionData) {
 }
 
 function calculateMaxFeePerGas(maxBaseFee: string, maxPriorityFee: string) {
-<<<<<<< HEAD
-  return bnToHex(toBN(maxPriorityFee).add(toBN(maxBaseFee)))
-=======
   const maxFeePerGas = BigNumber(maxPriorityFee).plus(maxBaseFee).toString(16)
-  return addHexPrefix(maxFeePerGas);
->>>>>>> e3c7db57 (updated version of common & utils)
+  return addHexPrefix(maxFeePerGas)
 }
 
 function populate (rawTx: TransactionData, chainConfig: Common, gas: GasData): TransactionData {
@@ -130,17 +105,10 @@ function populate (rawTx: TransactionData, chainConfig: Common, gas: GasData): T
     const useFrameGasPrice = !rawTx.gasPrice || isNaN(parseInt(rawTx.gasPrice, 16))
     if (useFrameGasPrice) {
       // no valid dapp-supplied value for gasPrice so we use the Frame-supplied value
-<<<<<<< HEAD
-      const gasPrice = toBN(gas.price.levels.fast as string)
-      txData.gasPrice = bnToHex(gasPrice)
+      const gasPrice = BigNumber(gas.price.levels.fast as string).toString(16)
+      txData.gasPrice = addHexPrefix(gasPrice)
       txData.gasFeesSource = GasFeesSource.Frame
-    } 
-=======
-      const gasPrice = BigNumber(gas.price.levels.fast as string).toString(16);
-      txData.gasPrice = addHexPrefix(gasPrice);
-      txData.gasFeesSource = GasFeesSource.Frame;
     }
->>>>>>> e3c7db57 (updated version of common & utils)
 
     return txData
   }
@@ -167,17 +135,11 @@ function populate (rawTx: TransactionData, chainConfig: Common, gas: GasData): T
   txData.maxFeePerGas = useFrameMaxFeePerGas ? calculateMaxFeePerGas(gas.price.fees.maxBaseFeePerGas, maxPriorityFee) : txData.maxFeePerGas
 
   // if no valid dapp-supplied value for maxPriorityFeePerGas we use the Frame-supplied value
-<<<<<<< HEAD
-  txData.maxPriorityFeePerGas = useFrameMaxPriorityFeePerGas ? bnToHex(toBN(maxPriorityFee)) : txData.maxPriorityFeePerGas
-  
-  return txData
-=======
   txData.maxPriorityFeePerGas = useFrameMaxPriorityFeePerGas
     ? addHexPrefix(BigNumber(maxPriorityFee).toString(16))
-    : txData.maxPriorityFeePerGas;
+    : txData.maxPriorityFeePerGas
 
-  return txData;
->>>>>>> e3c7db57 (updated version of common & utils)
+  return txData
 }
 
 function hexifySignature ({ v, r, s }: Signature) {
