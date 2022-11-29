@@ -4,12 +4,12 @@
     <meta 
       http-equiv='Content-Security-Policy' 
       content="
-        default-src http://localhost:1234 'self' 'unsafe-inline' 'unsafe-eval';
-        connect-src *; 
-        style-src http://localhost:1234 'self' 'unsafe-inline';
-        frame-src https://connect.trezor.io; 
+        script-src 'strict-dynamic' 'nonce-2f0d956b-0d9c-4f1e-874a-57a1ec828872' http://localhost:1234 'unsafe-eval';
+        base-uri 'self';
+        connect-src *;
+        img-src *;
+        style-src 'self' http://localhost:1234 'unsafe-inline';
         object-src 'none';
-        img-src *
       "
     />
     <title>Tray</title>
@@ -19,6 +19,6 @@
   <body>
     <div class='frameOverlay'></div>
     <div id='frame'></div>
-    <script type='module' src='./index.js'></script>
+    <script type='module' src='./index.js' nonce='2f0d956b-0d9c-4f1e-874a-57a1ec828872'></script>
   </body>
 </html>

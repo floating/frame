@@ -4,12 +4,12 @@
     <meta 
       http-equiv='Content-Security-Policy' 
       content="
-        default-src http://localhost:1234 'self' 'unsafe-inline' 'unsafe-eval'; 
+        script-src 'strict-dynamic' 'nonce-7e49189a-cca8-455d-a66b-dd571342955d' http://localhost:1234 'unsafe-eval';
+        base-uri 'self';
         connect-src *; 
-        style-src http://localhost:1234 'self' 'unsafe-inline';
-        frame-src https://connect.trezor.io; 
+        style-src 'self' http://localhost:1234 'unsafe-inline';
+        img-src *;
         object-src 'none';
-        img-src *
       "
     />
     <title>Dash</title>
@@ -19,6 +19,6 @@
   <body>
     <div class='frameOverlay'></div>
     <div id='dash'></div>
-    <script type='module' src='./index.js'></script>
+    <script type='module' src='./index.js' nonce="7e49189a-cca8-455d-a66b-dd571342955d"></script>
   </body>
 </html>
