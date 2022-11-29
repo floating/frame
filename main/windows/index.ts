@@ -347,6 +347,10 @@ ipcMain.on('tray:mouseout', () => {
   }
 })
 
+// deny navigation, webview attachment & new windows on creation of webContents
+// also set elsewhere but enforced globally here to minimize possible vectors of attack 
+// - in the case of e.g. dependency injection 
+// - as a 'to be sure' against possibility of misconfiguration in the future
 app.on('web-contents-created', (_e, contents) => {
   contents.on('will-navigate', e => e.preventDefault())
   contents.on('will-attach-webview', e => e.preventDefault())
