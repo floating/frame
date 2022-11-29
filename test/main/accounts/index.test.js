@@ -630,6 +630,39 @@ describe('#adjustNonce', () => {
 })
 
 describe('#resetNonce', () => {
+  beforeEach(() => {
+    provider.send = jest.fn((payload, cb) => {
+      expect(payload).toEqual(expect.objectContaining({
+        id: 1,
+        jsonrpc: '2.0',
+        method: 'eth_getTransactionCount',
+        params: ['0x22dd63c3619818fdbc262c78baee43cb61e9cccf', 'pending']
+      }))
+
+      cb({ result: '0x3' })
+    })
+
+    request.data.nonce = '0x5'
+    Accounts.addRequest(request, jest.fn())
+  })
+  const resetNonce = (requestId = 1) => Accounts.resetNonce(requestId)
+
+  it('it will un-set the nonce when not present inside the tx request payload', () => {
+    delete request.payload.params[0].nonce
+
+    resetNonce()
+
+    expect(request.data.nonce).toBe(undefined)
+  })
+
+  it('it will revert to the nonce inside the tx request payload when present', () => {
+    request.payload.params[0].nonce = '0x' + BigNumber(request.data.nonce).minus(1).toString(16)
+
+    resetNonce()
+
+    expect(request.data.nonce).toBe(request.payload.params[0].nonce)
+  })
+})
   let onChainNonce
 
   beforeEach(() => {
