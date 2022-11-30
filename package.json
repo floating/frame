@@ -120,11 +120,8 @@
     "@babel/preset-env": "7.20.2",
     "@babel/preset-react": "7.18.6",
     "@babel/preset-typescript": "7.18.6",
-<<<<<<< HEAD
     "@electron/notarize": "1.2.3",
-=======
     "@framelabs/prettier-config": "*",
->>>>>>> f39b7164 (use remote formatting conf)
     "@lavamoat/allow-scripts": "2.1.0",
     "@lavamoat/preinstall-always-fail": "1.0.0",
     "@ledgerhq/hw-transport-mocker": "6.27.7",
