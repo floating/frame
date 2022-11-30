@@ -231,7 +231,7 @@ const rpc = {
   },
   async resolveEnsName (name, cb) {
     try {
-    log.info('resolving ENS name ', {name})
+    log.debug('Resolving ENS name', {name})
     const nebula = nebulaApi()
     const {addresses: {eth: ethAddress}} = await nebula.ens.resolve(name)
     return cb(null, ethAddress)
