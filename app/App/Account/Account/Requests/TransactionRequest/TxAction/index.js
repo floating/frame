@@ -15,6 +15,7 @@ class TxSending extends React.Component {
       copied: false
     }
   }
+  
   copyAddress (data) {
     link.send('tray:clipboardData', data)
     this.setState({ copied: true })

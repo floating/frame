@@ -9,6 +9,8 @@ const launch = require('../launch')
 const provider = require('../provider').default
 const store = require('../store').default
 const dapps = require('../dapps')
+const nebulaApi = require('../nebula').default
+const log = require('electron-log')
 // const ens = require('../ens')
 // const ipfs = require('../ipfs')
 
@@ -181,7 +183,6 @@ const rpc = {
     cb()
   },
   removeAccount (address, options, cb) {
-    // if (!utils.isAddress(address)) return cb(new Error('Invalid Address'))
     accounts.remove(address)
     cb()
   },
@@ -227,6 +228,18 @@ const rpc = {
   },
   resolveAragonName (name, chainId, cb) {
     resolveName(name, chainId).then(result => cb(null, result)).catch(cb)
+  },
+  async resolveEnsName (name, cb) {
+    try {
+    log.info('resolving ENS name ', {name})
+    const nebula = nebulaApi()
+    const {addresses: {eth: ethAddress}} = await nebula.ens.resolve(name)
+    return cb(null, ethAddress)
+    }
+    catch(err) {
+      log.debug(`Could not resolve ENS name ${name}`, err)
+      return cb(err)
+    }
   },
   verifyAddress (cb) {
     const res = (err, data) => cb(err, data || false)
