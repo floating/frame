@@ -69,9 +69,9 @@ export function feeTotalOverMax (rawTx: TransactionData, maxTotalFee: number) {
   return totalFee > maxTotalFee
 }
 
-function parseValue(value?: string) {
-  const parsedHex = parseInt(value || '', 16)
-  return (!!parsedHex && value && addHexPrefix(unpadHexString(value)) || '0x0'
+function parseValue(value = '') {
+  const parsedHex = parseInt(value, 16)
+  return (!!parsedHex && addHexPrefix(unpadHexString(value)) || '0x0')
 }
 
 export function getRawTx (newTx: RPC.SendTransaction.TxParams, accountId: string | undefined): TransactionData {
