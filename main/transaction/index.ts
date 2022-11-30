@@ -151,7 +151,7 @@ function hexifySignature ({ v, r, s }: Signature) {
 }
 
 async function sign (rawTx: TransactionData, signingFn: (tx: TypedTransaction) => Promise<Signature>) {
-  const common = chainConfig(parseInt(rawTx.chainId), parseInt(rawTx.type) === 2 ? 'london' : 'berlin')
+  const common = chainConfig(parseInt(rawTx.chainId, 16), parseInt(rawTx.type, 16) === 2 ? 'london' : 'berlin')
 
   const tx = TransactionFactory.fromTxData(rawTx, { common })
 
@@ -160,8 +160,8 @@ async function sign (rawTx: TransactionData, signingFn: (tx: TypedTransaction) =
 
     return TransactionFactory.fromTxData(
       {
-      ...rawTx,
-      ...signature
+        ...rawTx,
+        ...signature
       },
       { common }
     )

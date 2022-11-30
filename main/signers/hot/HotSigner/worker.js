@@ -15,8 +15,8 @@ function chainConfig (chain, hardfork) {
   const chainId = BigInt(chain)
 
   return Common.isSupportedChainId(chainId)
-    ? new Common({ chain: chainId.toNumber(), hardfork })
-    : Common.custom({ chainId: chainId.toNumber() }, { baseChain: 'mainnet', hardfork })
+    ? new Common({ chain: chainId, hardfork })
+    : Common.custom({ chainId: chainId }, { baseChain: 'mainnet', hardfork })
 }
 
 class HotSignerWorker {
@@ -49,7 +49,7 @@ class HotSignerWorker {
     const signed = ecsign(hash, key)
 
     // Return serialized signed message
-    const hex = Buffer.concat([Buffer.from(signed.r), Buffer.from(signed.s), Buffer.from([Number(signed.v)])]).toString('hex')
+    const hex = Buffer.concat([signed.r, signed.s, Buffer.from([Number(signed.v)])]).toString('hex')
 
     pseudoCallback(null, addHexPrefix(hex))
   }
@@ -70,7 +70,7 @@ class HotSignerWorker {
       return pseudoCallback('could not determine chain id for transaction')
     }
 
-    const chainId = parseInt(rawTx.chainId)
+    const chainId = parseInt(rawTx.chainId, 16)
     const hardfork = parseInt(rawTx.type) === 2 ? 'london' : 'berlin'
     const common = chainConfig(chainId, hardfork)
 

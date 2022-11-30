@@ -7,12 +7,13 @@ import Eth from '@ledgerhq/hw-app-eth'
 
 import { Derivation, getDerivationPath, deriveHDAccounts } from '../../Signer/derive'
 import { sign } from '../../../transaction'
-import type { TypedData } from '../../../accounts/types'
 import { DeviceError } from '.'
-import { TransactionData } from '../../../../resources/domain/transaction'
+
+import type { TypedData } from '../../../accounts/types'
+import type { TransactionData } from '../../../../resources/domain/transaction'
 
 export default class LedgerEthereumApp {
-  private eth: Eth;
+  private eth: Eth
 
   constructor (transport: Transport) {
     this.eth = new Eth(transport)
