@@ -92,7 +92,7 @@ class AddAddress extends React.Component {
       e.preventDefault()
       const formInput = this.forms[this.state.index]
       if (formInput) formInput.current.blur()
-      if (this.state.index === 1) return this.create()
+      if (this.state.index === 0) return this.create()
       this.next()
     }
   }
@@ -138,11 +138,11 @@ class AddAddress extends React.Component {
                 <div className='addAccountItemOptionSetupFrame'>
                   {this.state.resolvingEns ?
                     <>
-                      <div className='addAccountItemOptionTitle'>Resolving ENS Name...</div>
+                      <div className='addAccountItemOptionTitle'>Resolving ENS Name</div>
                       <div className='signerLoading'>
                         <div className='signerLoadingLoader' />
                       </div>
-                      <div className='addAccountItemOptionSubmit' onClick={() => this.restart()}>back</div>
+                      <div className='addAccountItemOptionSubmit' onClick={() => this.restart()} style={{marginTop: "5px"}}>back</div>
                     </>:
                     <>
                       <div className='addAccountItemOptionTitle'>input address or ENS name</div>
