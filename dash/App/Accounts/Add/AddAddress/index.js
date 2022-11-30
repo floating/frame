@@ -93,7 +93,6 @@ class AddAddress extends React.Component {
       const formInput = this.forms[this.state.index]
       if (formInput) formInput.current.blur()
       if (this.state.index === 0) return this.create()
-      this.next()
     }
   }
 
