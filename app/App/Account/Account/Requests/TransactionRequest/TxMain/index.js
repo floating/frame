@@ -1,11 +1,12 @@
 import React from 'react'
 import Restore from 'react-restore'
+import { BigNumber } from 'bignumber.js'
+
 import link from '../../../../../../../resources/link'
 import svg from '../../../../../../../resources/svg'
-import utils from 'web3-utils'
-
+import { DisplayValue } from '../../../../../../../resources/Components/DisplayValue'
 import { Cluster, ClusterRow, ClusterValue } from '../../../../../../../resources/Components/Cluster'
-import {getAddress} from '../../../../../../../resources/utils' 
+import { getAddress } from '../../../../../../../resources/utils' 
 
 class TxSending extends React.Component {
   constructor (...args) {
@@ -14,25 +15,26 @@ class TxSending extends React.Component {
       copied: false
     }
   }
+
   copyAddress (data) {
     link.send('tray:clipboardData', data)
     this.setState({ copied: true })
-    setTimeout(_ => this.setState({ copied: false }), 1000)
+    setTimeout(() => this.setState({ copied: false }), 1000)
   }
-  hexToDisplayValue (hex) {
-    return (Math.round(parseFloat(utils.fromWei(hex, 'ether')) * 1000000) / 1000000).toFixed(6)
-  }
+
   render () {
     const req = this.props.req
+    const value = req.data.value || '0x'
+    if (BigNumber(value).isZero()) {
+      return null
+    }
+
     const address = req.data.to ? getAddress(req.data.to) : ''
     const ensName = (req.recipient && req.recipient.length < 25) ? req.recipient : ''
     const isTestnet = this.store('main.networks', this.props.chain.type, this.props.chain.id, 'isTestnet')
-    const {nativeCurrency, nativeCurrency:{symbol: currentSymbol = '?'}} = this.store('main.networksMeta', this.props.chain.type, this.props.chain.id)
-    const etherUSD = nativeCurrency && nativeCurrency.usd && !isTestnet ? nativeCurrency.usd.price : 0
-    const value = req.data.value || '0x'
-    const displayValue = this.hexToDisplayValue(value)
+    const { nativeCurrency, nativeCurrency: { symbol: currentSymbol = '?' }} = this.store('main.networksMeta', this.props.chain.type, this.props.chain.id)
     const chainName = this.store('main.networks.ethereum', this.props.chain.id, 'name')
-    if (value === '0x' || parseInt(value, 16) === 0) return null
+    
     return (
       <div className='_txMain' style={{ animationDelay: (0.1 * this.props.i) + 's' }}>
         <div className='_txMainInner'>
@@ -43,14 +45,12 @@ class TxSending extends React.Component {
             <ClusterRow>
               <ClusterValue grow={2}>
                 <div className='txSendingValue'>
-                  <span className='txSendingValueSymbol'>{currentSymbol}</span>
-                  <span className='txSendingValueAmount'>{displayValue}</span>
+                  <DisplayValue type='ether' value={value} currencySymbol={currentSymbol} />
                 </div>
               </ClusterValue>
               <ClusterValue>
                 <span className='_txMainTransferringEq'>{'≈'}</span>
-                <span className='_txMainTransferringEqSymbol'>{'$'}</span>
-                <span className='_txMainTransferringEqAmount'>{(displayValue * etherUSD).toFixed(2)}</span>
+                <DisplayValue type='fiat' value={value} valueDataParams={{ currencyRate: nativeCurrency.usd, isTestnet }} currencySymbol='$' />
               </ClusterValue>
             </ClusterRow>
 

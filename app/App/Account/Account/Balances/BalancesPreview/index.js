@@ -76,13 +76,13 @@ class BalancesPreview extends React.Component {
     const { balances: allBalances, totalDisplayValue, totalValue } = this.getBalances(storedBalances, rates)
 
     // if filter only show balances that match filter
-    const filteredBlanaces = allBalances.filter(balance => {
+    const filteredBalances = allBalances.filter(balance => {
       const { filter = ''} =  this.props
       const chainName = this.store('main.networks.ethereum', balance.chainId, 'name')
       return matchFilter(filter, [chainName, balance.name, balance.symbol])
     })
 
-    const balances = filteredBlanaces.slice(0, 4)
+    const balances = filteredBalances.slice(0, 4)
     
     const lastBalanceUpdate = this.store('main.accounts', address, 'balances.lastUpdated')
 

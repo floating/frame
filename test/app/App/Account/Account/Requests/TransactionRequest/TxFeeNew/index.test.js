@@ -14,7 +14,7 @@ const TxFee = Restore.connect(TxFeeComponent, store)
 let req
 
 beforeEach(() => {
-  store.setNativeCurrencyData('ethereum', 137, { symbol:"MATIC", usd: { price: 0.86 } })
+  store.setNativeCurrencyData('ethereum', 137, { usd: { symbol: 'MATIC', price: 0.86 }})
 
   req = {
     feesUpdatedByUser: false,
@@ -80,7 +80,7 @@ describe('usd estimate display', () => {
     const { getByTestId } = setupComponent(<TxFee req={req} />)
     const baseFeeInput = getByTestId('usd-estimate-display')
 
-    expect(baseFeeInput.textContent).toBe('≈< $0.01in MATIC')
+    expect(baseFeeInput.textContent).toBe('≈<$0.01in MATIC')
   })
 
   it('renders an estimate for between less than a cent and one cent', () => {
@@ -90,7 +90,7 @@ describe('usd estimate display', () => {
     const { getByTestId } = setupComponent(<TxFee req={req} />)
     const baseFeeInput = getByTestId('usd-estimate-display')
 
-    expect(baseFeeInput.textContent).toBe('≈< $0.01-$0.01in MATIC')
+    expect(baseFeeInput.textContent).toBe('≈<$0.01-$0.01in MATIC')
   })
 
   it('renders an estimate for between > $1 values', () => {

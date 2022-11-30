@@ -1,12 +1,13 @@
 import React from 'react'
 import Restore from 'react-restore'
-import svg from '../../../../../../../resources/svg'
-import link from '../../../../../../../resources/link'
 import BigNumber from 'bignumber.js'
 
+import svg from '../../../../../../../resources/svg'
+import link from '../../../../../../../resources/link'
 import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../../../resources/Components/Cluster'
 import { formatDisplayInteger, isUnlimited } from '../../../../../../../resources/utils/numbers'
-import {getAddress} from '../../../../../../../resources/utils'
+import { DisplayValue } from '../../../../../../../resources/Components/DisplayValue'
+import { getAddress } from '../../../../../../../resources/utils'
 
 class TxSending extends React.Component {
   constructor (...args) {
@@ -35,12 +36,13 @@ class TxSending extends React.Component {
         const { amount, decimals, name, recipient: recipientAddress, symbol, recipientType, recipientEns } = action.data || {}
         const address = getAddress(recipientAddress)
         const ensName = recipientEns
+        
+        // const ensName = (recipientEns && recipientEns.length < 25) ? recipientEns : ''
         const value = new BigNumber(amount) 
         const displayValue = value.dividedBy('1e' + decimals).decimalPlaces(6).toFormat()
 
         const isTestnet = this.store('main.networks', this.props.chain.type, this.props.chain.id, 'isTestnet')    
         const rate = this.store('main.rates', contract)
-        const rateUSD = rate && rate.usd && !isTestnet ? rate.usd.price : 0
   
         return (
           <ClusterBox title={`Sending ${symbol}`} subtitle={name} animationSlot={this.props.i}>
@@ -48,14 +50,12 @@ class TxSending extends React.Component {
               <ClusterRow>
                 <ClusterValue grow={2}>
                   <div className='txSendingValue'>
-                    <span className='txSendingValueSymbol'>{symbol}</span>
-                    <span className='txSendingValueAmount'>{displayValue}</span>
+                    <DisplayValue type='ether' value={amount} valueDataParams={{ decimals }} currencySymbol={symbol} />
                   </div>
                 </ClusterValue>
                 <ClusterValue>
                   <span className='_txMainTransferringEq'>{'≈'}</span>
-                  <span className='_txMainTransferringEqSymbol'>{'$'}</span>
-                  <span className='_txMainTransferringEqAmount'>{!rateUSD ? '?' : (displayValue * rateUSD).toFixed(2)}</span>
+                  <DisplayValue type='fiat' value={amount} valueDataParams={{ currencyRate: rate && rate.usd, isTestnet }} currencySymbol='$' />
                 </ClusterValue>
               </ClusterRow>
               {address && recipientType === 'contract' ? (
@@ -102,10 +102,9 @@ class TxSending extends React.Component {
         )
       } else if (actionType === 'approve') {
         const { amount, decimals, spender: recipientAddress, symbol, spenderEns } = action.data || {}
-        const address = getAddress(recipientAddress)
+        const address = recipientAddress
         const ensName = spenderEns
-        const value = new BigNumber(amount) 
-
+        const value = new BigNumber(amount)
         const revoke = value.eq(0)
         const displayAmount = isUnlimited(this.state.amount) ? 'unlimited' : formatDisplayInteger(amount, decimals)
 
