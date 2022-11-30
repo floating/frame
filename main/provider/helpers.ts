@@ -8,7 +8,7 @@ import {
   pubToAddress,
   ecrecover,
   hashPersonalMessage,
-} from 'ethereumjs-util'
+} from '@ethereumjs/util'
 import log from 'electron-log'
 import BN from 'bignumber.js'
 import { v5 as uuidv5 } from 'uuid'
@@ -69,6 +69,11 @@ export function feeTotalOverMax (rawTx: TransactionData, maxTotalFee: number) {
   return totalFee > maxTotalFee
 }
 
+function parseValue(value = '') {
+  const parsedHex = parseInt(value, 16)
+  return (!!parsedHex && addHexPrefix(unpadHexString(value)) || '0x0')
+}
+
 export function getRawTx (newTx: RPC.SendTransaction.TxParams, accountId: string | undefined): TransactionData {
   const { gas, gasLimit, gasPrice, data, value, type, to, ...rawTx } = newTx
   const getNonce = () => {
@@ -84,13 +89,12 @@ export function getRawTx (newTx: RPC.SendTransaction.TxParams, accountId: string
     }
     return addHexPrefix(nonceBN.toString(16))
   }
-  const parsedValue = !value || parseInt(value, 16) === 0 ? '0x0' : addHexPrefix(unpadHexString(value) || '0')
 
   const tx: TransactionData = {
     ...rawTx,
     from: rawTx.from || accountId,
     type: '0x0',
-    value: parsedValue,
+    value: parseValue(value),
     data: addHexPrefix(padToEven(stripHexPrefix(data || '0x'))),
     gasLimit: gasLimit || gas,
     chainId: rawTx.chainId,
@@ -131,7 +135,7 @@ export function getSignedAddress (signed: string, message: string, cb: Callback<
   const r = toBuffer(signature.slice(0, 32))
   const s = toBuffer(signature.slice(32, 64))
   const hash = hashPersonalMessage(toBuffer(message))
-  const verifiedAddress = '0x' + pubToAddress(ecrecover(hash, v, r, s)).toString('hex')
+  const verifiedAddress = '0x' + pubToAddress(ecrecover(hash, BigInt(v), r, s)).toString('hex')
   cb(null, verifiedAddress)
 }
   

@@ -549,14 +549,19 @@ describe('#signTransaction', () => {
         expect(opts.data.signerPath[4]).toBe(4)
         expect(parseInt(opts.data.chainId)).toBe(137)
 
-        return expectedSignature
+        return {
+          sig: {
+            ...expectedSignature.sig,
+            v: Buffer.from('1b', 'hex')
+          }
+        }
       } catch (e) { done(e) }
     })
 
     lattice.signTransaction(4, txToSign, (err, res) => {
       try {
         expect(err).toBe(null)
-        expect(res).toBe('0xcf80808080808080833ea8cd8396f7a0')
+        expect(res).toBe('0xcf8080808080801b833ea8cd8396f7a0')
         done()
       } catch (e) { done(e) }
     })

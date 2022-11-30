@@ -3,7 +3,7 @@ import multicall, { supportsChain } from '../../../../main/multicall'
 
 import log from 'electron-log'
 import { ethers } from 'ethers'
-import { addHexPrefix, padToEven } from 'ethereumjs-util'
+import { addHexPrefix, padToEven } from '@ethereumjs/util'
 import ethProvider from 'eth-provider'
 import BigNumber from 'bignumber.js'
 

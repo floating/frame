@@ -1,16 +1,17 @@
-import { Client, Utils, Constants } from 'gridplus-sdk'
-import { encode } from 'rlp'
-import { padToEven, addHexPrefix } from 'ethereumjs-util'
-import { hexToInt } from '../../../../resources/utils'
 import log from 'electron-log'
+import { encode } from 'rlp'
+import { Client, Utils, Constants } from 'gridplus-sdk'
+import { padToEven, addHexPrefix } from '@ethereumjs/util'
 import { TypedTransaction } from '@ethereumjs/tx'
 import { SignTypedDataVersion } from '@metamask/eth-sig-util'
 
 import Signer from '../../Signer'
 import { sign, signerCompatibility, londonToLegacy } from '../../../transaction'
-import { TransactionData } from '../../../../resources/domain/transaction'
 import { Derivation, getDerivationPath } from '../../Signer/derive'
+import { hexToInt } from '../../../../resources/utils'
+
 import type { TypedData, TypedMessage } from '../../../accounts/types'
+import type { TransactionData } from '../../../../resources/domain/transaction'
 
 const ADDRESS_LIMIT = 10
 const HARDENED_OFFSET = 0x80000000

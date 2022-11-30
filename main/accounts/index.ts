@@ -1,7 +1,7 @@
 import EventEmitter from 'events'
 import log from 'electron-log'
 import { Notification } from 'electron'
-import { addHexPrefix, intToHex} from 'ethereumjs-util'
+import { addHexPrefix, intToHex } from '@ethereumjs/util'
 import { v5 as uuidv5 } from 'uuid'
 
 import provider from '../provider'

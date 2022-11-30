@@ -1,5 +1,5 @@
 import log from 'electron-log'
-import { isValidAddress, addHexPrefix } from 'ethereumjs-util'
+import { isValidAddress, addHexPrefix } from '@ethereumjs/util'
 
 import { AccessRequest, AccountRequest, Accounts, RequestMode, TransactionRequest } from '..'
 import nebulaApi from '../../nebula'
