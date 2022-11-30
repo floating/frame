@@ -461,10 +461,9 @@ describe('#sign', () => {
     const { type, ...expectedFields } = rawTx
     const signedTx = await sign(rawTx, jest.fn().mockResolvedValueOnce(signature))
 
-    expect(signedTx.toJSON()).toStrictEqual({
+    expect(signedTx.toJSON()).toMatchObject({
       ...expectedFields,
       ...signature,
-      accessList: [],
       v: '0x0' // additional zeroes are stripped
     })
   })
