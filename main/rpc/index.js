@@ -237,7 +237,7 @@ const rpc = {
     return cb(null, ethAddress)
     }
     catch(err) {
-      log.debug(`Could not resolve ENS name ${name}`, err)
+      log.warn(`Could not resolve ENS name ${name}`, err)
       return cb(err)
     }
   },
