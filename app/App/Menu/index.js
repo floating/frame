@@ -66,9 +66,12 @@ class Launcher extends React.Component {
         <div 
           className={'panelMenuItem panelMenuItemSend'}
           onClick={() => {
-            this.setState({ glitchOn: false })
-            link.send('*:addFrame', 'dappLauncher')
-            link.send('tray:action', 'setDash', { showing: false })
+            clearTimeout(this.clickTimer)
+            this.clickTimer = setTimeout(() => {
+              this.setState({ glitchOn: false })
+              link.send('*:addFrame', 'dappLauncher')
+              link.send('tray:action', 'setDash', { showing: false })
+            }, 50)
           }}
           onMouseEnter={() => this.setState({ glitchOn: true })}
           onMouseOver={() => this.setState({ glitchOn: true })}

@@ -45,6 +45,18 @@ interface EVMError {
 type RPCRequestPayload = JSONRPCRequestPayload & InternalPayload
 
 declare namespace RPC {
+
+  namespace SignTypedData {
+    interface Request extends Omit<RPCRequestPayload, ['method', 'params']> {
+      method: 'eth_signTypedData' | 'eth_signTypedData_v1' | 'eth_signTypedData_v3' | 'eth_signTypedData_v4',
+      params: [string, LegacyTypedData | TypedData | string, ...unknown[]]
+    }
+
+    interface Response extends Omit<RPCResponsePayload, 'result'> {
+      result?: string
+    }
+  }
+
   namespace GetAssets {
     interface Balance {
       chainId: number,

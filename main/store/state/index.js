@@ -215,6 +215,7 @@ const initial = {
       errorReporting: main('privacy.errorReporting', true)
     },
     accounts: main('accounts', {}),
+    accountsMeta: main('accountsMeta', {}),
     addresses: main('addresses', {}), // Should be removed after 0.5 release
     permissions: main('permissions', {}),
     balances: {},

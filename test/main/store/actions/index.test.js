@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js'
 import log from 'electron-log'
-import { addHexPrefix } from 'ethereumjs-util'
+import { addHexPrefix } from '@ethereumjs/util'
 
 import {
   addNetwork as addNetworkAction,
@@ -20,7 +20,8 @@ import {
   removeNetwork as removeNetworkAction,
   updateNetwork as updateNetworkAction,
   activateNetwork as activateNetworkAction,
-  setBlockHeight as setBlockHeightAction
+  setBlockHeight as setBlockHeightAction,
+  updateAccount as updateAccountAction
 } from '../../../../main/store/actions'
 import { toTokenId } from '../../../../resources/domain/balance'
 
@@ -491,11 +492,6 @@ describe('#setScanning', () => {
 
   beforeAll(() => {
     isScanning = false
-    jest.useFakeTimers()
-  })
-
-  afterAll(() => {
-    jest.useRealTimers()
   })
 
   const updaterFn = (node, address, update) => {
@@ -537,11 +533,7 @@ describe('#initOrigin', () => {
 
   beforeEach(() => {
     origins = {}
-    jest.useFakeTimers().setSystemTime(creationDate)
-  })
-
-  afterEach(() => {
-    jest.useRealTimers()
+    jest.setSystemTime(creationDate)
   })
 
   it('creates a new origin', () => {
@@ -631,7 +623,7 @@ describe('#addOriginRequest', () => {
   const addOriginRequest = id => addOriginRequestAction(updaterFn, id)
 
   beforeEach(() => {
-    jest.useFakeTimers().setSystemTime(updateTime)
+    jest.setSystemTime(updateTime)
 
     origins = {
       activeOrigin: {
@@ -652,10 +644,6 @@ describe('#addOriginRequest', () => {
         }
       }
     }
-  })
-
-  afterEach(() => {
-    jest.useRealTimers()
   })
 
   it('updates the timestamp for an existing session', () => {
@@ -981,6 +969,101 @@ describe('#setBlockHeight', () => {
     setBlockHeight(4, 500)
 
     expect(main.networksMeta.ethereum).toStrictEqual({ 1: { blockHeight: 0 }, 4: { blockHeight: 500 }, 137: { blockHeight: 0 } })
+  })
+})
+
+describe('#updateAccount', () => {
+  let main
+
+  const updaterFn = (node, id, update) => {
+    if (node === 'main.accounts') {
+      main.accounts[id] = update(main.accounts[id])
+    }
+
+    if (node === 'main.accountsMeta') {
+      main.accountsMeta[id] = update(main.accountsMeta[id])
+    }
+  }
+
+  beforeEach(() => {
+    jest.setSystemTime(new Date('2022-11-17T11:01:58.135Z'))
+
+    main = {
+      accounts: {
+        1: {
+          id: '1',
+          name: 'cool account',
+          lastSignerType: 'ledger',
+          balances: {}
+        }
+      },
+      accountsMeta: {
+        'e42ee170-4601-5428-bac5-d8d92fe049e8': {
+          name: 'cool account',
+          lastUpdated: 1568682918135
+        }
+      },
+    }
+  })
+
+  const setAccount = (id, updatedAccount) => updateAccountAction(updaterFn, { ...updatedAccount, id })
+
+  it('should update the account', () => {
+    setAccount('1', { name: 'cool account', lastSignerType: 'seed', status: 'ok' })
+
+    expect(main.accounts).toStrictEqual({
+      1: { id: '1', name: 'cool account', lastSignerType: 'seed', status: 'ok', balances: {} }
+    })
+  })
+
+  it('should not update account balances', () => {
+    setAccount('1', { name: 'cool account', lastSignerType: 'seed', status: 'ok', balances: 'ignored' })
+
+    expect(main.accounts).toStrictEqual({ 
+      1: { id: '1', name: 'cool account', lastSignerType: 'seed', status: 'ok', balances: {} }
+    })
+  })
+
+  it('should create a new account', () => {
+    setAccount('2', { name: 'new cool account', lastSignerType: 'seed', status: 'ok' })
+
+    expect(main.accounts).toStrictEqual({ 
+      1: { id: '1', name: 'cool account', lastSignerType: 'ledger', balances: {} },
+      2: { id: '2', name: 'new cool account', lastSignerType: 'seed', status: 'ok', balances: {} }
+    })
+  })
+
+  it('should update existing accountMeta with the expected data', () => {
+    setAccount('1', { name: 'not so cool account', lastSignerType: 'seed', status: 'ok' })
+
+    expect(main.accountsMeta).toStrictEqual({
+      'e42ee170-4601-5428-bac5-d8d92fe049e8': { name: 'not so cool account', lastUpdated: 1668682918135 }
+    })
+  })
+
+  it('should create new accountMeta with the expected data', () => {
+    setAccount('2', { name: 'not so cool account', lastSignerType: 'seed', status: 'ok' })
+
+    expect(main.accountsMeta).toStrictEqual({ 
+      'e42ee170-4601-5428-bac5-d8d92fe049e8': { name: 'cool account', lastUpdated: 1568682918135 }, 
+      '0d6c930e-3495-56cc-993f-8da3a6150003': { name: 'not so cool account', lastUpdated: 1668682918135 }
+    })
+  })
+
+  it(`should not create a new value for a default label`, () => {
+    setAccount('2', { name: 'hot account', lastSignerType: 'seed', status: 'ok' })
+
+    expect(main.accountsMeta).toStrictEqual({ 
+      'e42ee170-4601-5428-bac5-d8d92fe049e8': { name: 'cool account', lastUpdated: 1568682918135 }
+    })
+  })
+
+  it(`should not update an existing value with a default label`, () => {
+    setAccount('1', { name: 'hot account', lastSignerType: 'seed', status: 'ok' })
+
+    expect(main.accountsMeta).toStrictEqual({ 
+      'e42ee170-4601-5428-bac5-d8d92fe049e8': { name: 'cool account', lastUpdated: 1568682918135 }
+    })
   })
 })
 

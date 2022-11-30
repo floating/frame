@@ -1,24 +1,22 @@
 const crypto = require('crypto')
-const ethSigUtil = require('eth-sig-util')
+const { signTypedData } = require('@metamask/eth-sig-util')
 const { TransactionFactory } = require('@ethereumjs/tx')
-const Common = require('@ethereumjs/common').default
-
+const { Common } = require('@ethereumjs/common')
 const {
-  BN,
   hashPersonalMessage,
   toBuffer,
   ecsign,
   addHexPrefix,
   pubToAddress,
   ecrecover
-} = require('ethereumjs-util')
+} = require('@ethereumjs/util')
 
 function chainConfig (chain, hardfork) {
-  const chainId = new BN(chain)
+  const chainId = BigInt(chain)
 
   return Common.isSupportedChainId(chainId)
-    ? new Common({ chain: chainId.toNumber(), hardfork })
-    : Common.custom({ chainId: chainId.toNumber() }, { baseChain: 'mainnet', hardfork })
+    ? new Common({ chain: chainId, hardfork })
+    : Common.custom({ chainId: chainId }, { baseChain: 'mainnet', hardfork })
 }
 
 class HotSignerWorker {
@@ -51,14 +49,15 @@ class HotSignerWorker {
     const signed = ecsign(hash, key)
 
     // Return serialized signed message
-    const hex = Buffer.concat([Buffer.from(signed.r), Buffer.from(signed.s), Buffer.from([signed.v])]).toString('hex')
+    const hex = Buffer.concat([signed.r, signed.s, Buffer.from([Number(signed.v)])]).toString('hex')
 
     pseudoCallback(null, addHexPrefix(hex))
   }
 
-  signTypedData (key, params, pseudoCallback) {
+  signTypedData (key, typedMessage, pseudoCallback) {
     try {
-      const signature = ethSigUtil.signTypedMessage(key, { data: params.typedData }, params.version)
+      const { data, version } = typedMessage
+      const signature = signTypedData({ privateKey: key, data, version })
       pseudoCallback(null, signature)
     } catch (e) {
       pseudoCallback(e.message)
@@ -71,7 +70,7 @@ class HotSignerWorker {
       return pseudoCallback('could not determine chain id for transaction')
     }
 
-    const chainId = parseInt(rawTx.chainId)
+    const chainId = parseInt(rawTx.chainId, 16)
     const hardfork = parseInt(rawTx.type) === 2 ? 'london' : 'berlin'
     const common = chainConfig(chainId, hardfork)
 
@@ -93,7 +92,7 @@ class HotSignerWorker {
       if (signature.length !== 65) return pseudoCallback(new Error('Frame verifyAddress signature has incorrect length'))
       // Verify address
       let v = signature[64]
-      v = v === 0 || v === 1 ? v + 27 : v
+      v = BigInt(v === 0 || v === 1 ? v + 27 : v)
       const r = toBuffer(signature.slice(0, 32))
       const s = toBuffer(signature.slice(32, 64))
       const hash = hashPersonalMessage(toBuffer(message))

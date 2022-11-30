@@ -2,6 +2,7 @@ import Lattice from '../../../../../main/signers/lattice/Lattice'
 import { Client } from 'gridplus-sdk'
 import log from 'electron-log'
 import { Derivation } from '../../../../../main/signers/Signer/derive'
+import { SignTypedDataVersion } from '@metamask/eth-sig-util'
 
 jest.mock('gridplus-sdk')
 
@@ -497,7 +498,7 @@ describe('#signTypedData', () => {
   })
 
   it('signs a valid typed data message', done => {
-    lattice.signTypedData(2, 'V4', 'sign this please', (err, res) => {
+    lattice.signTypedData(2, { version: SignTypedDataVersion.V4, data: 'typed data' }, (err, res) => {
       try {
         expect(err).toBe(null)
         expect(res).toBe('0x3ea8cdabcd0401')
@@ -506,19 +507,9 @@ describe('#signTypedData', () => {
     })
   })
 
-  it('is not able to sign typed data less than V4', done => {
-    lattice.signTypedData(2, 'V3', 'sign this please', (err, res) => {
-      try {
-        expect(err.message.toLowerCase()).toMatch(/invalid version/)
-        expect(res).toBe(undefined)
-        done()
-      } catch (e) { done(e) }
-    })
-  })
-
   it('returns an error on failure', done => {
     // wrong index, mock function expects 2, not 3
-    lattice.signTypedData(3, 'V4', 'sign this please', (err, res) => {
+    lattice.signTypedData(3, { version: SignTypedDataVersion.V4, data: 'typed data' }, (err, res) => {
       try {
         expect(err).toBeTruthy()
         expect(res).toBe(undefined)
@@ -558,14 +549,19 @@ describe('#signTransaction', () => {
         expect(opts.data.signerPath[4]).toBe(4)
         expect(parseInt(opts.data.chainId)).toBe(137)
 
-        return expectedSignature
+        return {
+          sig: {
+            ...expectedSignature.sig,
+            v: Buffer.from('1b', 'hex')
+          }
+        }
       } catch (e) { done(e) }
     })
 
     lattice.signTransaction(4, txToSign, (err, res) => {
       try {
         expect(err).toBe(null)
-        expect(res).toBe('0xcf80808080808080833ea8cd8396f7a0')
+        expect(res).toBe('0xcf8080808080801b833ea8cd8396f7a0')
         done()
       } catch (e) { done(e) }
     })

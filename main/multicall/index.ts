@@ -1,5 +1,5 @@
 import { Interface } from '@ethersproject/abi'
-import { addHexPrefix } from 'ethereumjs-util'
+import { addHexPrefix } from '@ethereumjs/util'
 import log from 'electron-log'
 
 import type { BytesLike } from '@ethersproject/bytes'

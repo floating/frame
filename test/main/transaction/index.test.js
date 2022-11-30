@@ -1,5 +1,5 @@
-import { addHexPrefix, stripHexPrefix } from 'ethereumjs-util'
-import Common from '@ethereumjs/common'
+import { addHexPrefix, stripHexPrefix } from '@ethereumjs/util'
+import { Common } from '@ethereumjs/common'
 
 import { maxFee, londonToLegacy, signerCompatibility, populate, sign } from '../../../main/transaction'
 import { GasFeesSource } from '../../../resources/domain/transaction'
@@ -415,6 +415,7 @@ describe('#populate', () => {
 
 describe('#sign', () => {
   const baseTx = {
+    chainId: '0x1',
     nonce: '0x33',
     gasLimit: '0x61a8',
     value: '0x6f05b59d3b20000',
@@ -435,13 +436,17 @@ describe('#sign', () => {
       gasPrice: '0x737be7600'
     }
 
-    const { type, ...expectedFields } = rawTx
-    const signedTx = await sign(rawTx, jest.fn().mockResolvedValueOnce(signature))
+    const sig = {
+      ...signature, v: addHexPrefix((27).toString(16))
+    }
 
-    expect(signedTx.toJSON()).toMatchObject({
+    const { type, chainId, ...expectedFields } = rawTx
+    const signedTx = await sign(rawTx, jest.fn().mockResolvedValueOnce(sig))
+
+    expect(signedTx.toJSON()).toStrictEqual({
       ...expectedFields,
       ...signature,
-      v: '0x0' // additional zeroes are stripped
+      v: '0x1b'
     })
   })
 
@@ -465,14 +470,14 @@ describe('#sign', () => {
 
   it('adds hex prefixes to the signature', async () => {
     const signedTx = await sign(baseTx, jest.fn().mockResolvedValueOnce({
-      v: stripHexPrefix(signature.v),
+      v: stripHexPrefix('0x1b'),
       r: stripHexPrefix(signature.r),
       s: stripHexPrefix(signature.s)
     }))
     
     expect(signedTx.toJSON()).toMatchObject({
       ...signature,
-      v: '0x0' // additional zeroes are stripped
+      v: '0x1b'
     })
   })
 })

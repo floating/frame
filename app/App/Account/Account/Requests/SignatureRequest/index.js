@@ -1,7 +1,7 @@
 import React from 'react'
 import Restore from 'react-restore'
 import { isHexString } from '@ethersproject/bytes'
-import {stripHexPrefix} from './../../../../../../resources/utils'
+import { stripHexPrefix } from './../../../../../../resources/utils'
 
 function decodeMessage (rawMessage) {
   if (isHexString(rawMessage)) {
@@ -25,18 +25,6 @@ class TransactionRequest extends React.Component {
     setTimeout(() => {
       this.setState({ allowInput: true })
     }, props.signingDelay || 1500)
-  }
-
-  copyAddress (e) {
-    e.preventDefault()
-    e.target.select()
-    document.execCommand('Copy')
-    this.setState({ copied: true })
-    setTimeout(_ => this.setState({ copied: false }), 1000)
-  }
-
-  toggleDataView (id) {
-    this.setState({ dataView: !this.state.dataView })
   }
 
   renderMessage (message) {
@@ -67,9 +55,7 @@ class TransactionRequest extends React.Component {
     if (status === 'declined') requestClass += ' signerRequestDeclined'
     if (status === 'pending') requestClass += ' signerRequestPending'
     if (status === 'error') requestClass += ' signerRequestError'
-    const mode = this.props.req.mode
-    // const height = mode === 'monitor' ? '215px' : '340px'
-    // const z = mode === 'monitor' ? this.props.z + 2000 - (this.props.i * 2) : this.props.z
+
     return (
       <div key={this.props.req.id || this.props.req.handlerId} className={requestClass}>
         {type === 'sign' ? (

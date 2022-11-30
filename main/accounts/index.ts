@@ -1,8 +1,7 @@
 import EventEmitter from 'events'
 import log from 'electron-log'
-import { shell, Notification } from 'electron'
-import { addHexPrefix, intToHex} from 'ethereumjs-util'
-import { TypedData, Version } from 'eth-sig-util'
+import { Notification } from 'electron'
+import { addHexPrefix, intToHex } from '@ethereumjs/util'
 import { v5 as uuidv5 } from 'uuid'
 
 import provider from '../provider'
@@ -20,12 +19,14 @@ import { findUnavailableSigners, getSignerType, isSignerReady } from '../../reso
 import {
   AccountRequest, AccessRequest,
   TransactionRequest, TransactionReceipt,
-  ReplacementType, RequestStatus, RequestMode
+  ReplacementType, RequestStatus, RequestMode, TypedMessage
 } from './types'
 
 import type { Chain } from '../chains'
 import { ActionType } from '../transaction/actions'
+import { openBlockExplorer } from '../windows/window'
 import { ApprovalType } from '../../resources/constants'
+import { accountNS } from '../../resources/domain/account'
 
 function notify (title: string, body: string, action: (event: Electron.Event) => void) {
   const notification = new Notification({ title, body })
@@ -105,8 +106,9 @@ export class Accounts extends EventEmitter {
       log.info(`Account ${address} not found, creating account`)
 
       const created = 'new:' + Date.now()
-
-      this.accounts[address] = new FrameAccount({ address, name, created, options, active: false }, this)
+      const accountMetaId = uuidv5(address, accountNS)
+      const accountMeta = store('main.accountsMeta', accountMetaId) || { name }
+      this.accounts[address] = new FrameAccount({ address, name: accountMeta.name, created, options, active: false }, this)
       account = this.accounts[address]
     }
 
@@ -115,6 +117,8 @@ export class Accounts extends EventEmitter {
 
   rename (id: string, name: string) {
     this.accounts[id].rename(name)
+    const account = this.accounts[id].summary()
+    this.update(account)
   }
 
   update (account: Account) {
@@ -278,12 +282,7 @@ export class Accounts extends EventEmitter {
 
               // If Frame is hidden, trigger native notification
               notify('Transaction Successful', body, () => {
-                const { type, id } = targetChain
-                const explorer = store('main.networks', type, id, 'explorer')
-
-                if (explorer) {
-                  shell.openExternal(explorer + '/tx/' + hash)
-                }
+                openBlockExplorer(hash, targetChain)
               })
             }
             const blockHeight = parseInt(res.result, 16)
@@ -555,13 +554,13 @@ export class Accounts extends EventEmitter {
     currentAccount.signMessage(message, cb)
   }
 
-  signTypedData (version: Version, address: Address, typedData: TypedData, cb: Callback<string>) {
+  signTypedData (address: Address, typedMessage: TypedMessage, cb: Callback<string>) {
     const currentAccount = this.current()
 
     if (!currentAccount) return cb(new Error('No Account Selected'))
     if (address.toLowerCase() !== currentAccount.getSelectedAddress().toLowerCase()) return cb(new Error('signMessage: Wrong Account Selected'))
 
-    currentAccount.signTypedData(version, typedData, cb)
+    currentAccount.signTypedData(typedMessage, cb)
   }
 
   signTransaction (rawTx: TransactionData, cb: Callback<string>) {
@@ -1030,6 +1029,20 @@ export class Accounts extends EventEmitter {
         })
       }
     }
+  }
+
+  resetNonce (handlerId: string) {
+    const currentAccount = this.current()
+    if (!currentAccount) return log.error('No account selected during nonce reset')
+
+    const txRequest = this.getTransactionRequest(currentAccount, handlerId)
+    const initialNonce = txRequest.payload.params[0].nonce
+    if(initialNonce){
+      txRequest.data.nonce = initialNonce
+    } else {
+      delete txRequest.data.nonce
+    }
+    currentAccount.update()
   }
 
   lockRequest (handlerId: string) {

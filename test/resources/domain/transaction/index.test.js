@@ -1,4 +1,4 @@
-import { getAddress, typeSupportsBaseFee, usesBaseFee } from '../../../../resources/domain/transaction'
+import { typeSupportsBaseFee, usesBaseFee } from '../../../../resources/domain/transaction'
 
 describe('#typeSupportsBaseFee', () => {
   it('does not support a base fee for type 0', () => {
@@ -37,15 +37,5 @@ describe('#usesBaseFee', () => {
     }
 
     expect(usesBaseFee(tx)).toBe(true)
-  })
-})
-
-describe('#getAddress', () => {
-  it('returns a checksummed address', () => {
-    expect(getAddress('0x81aa3e376ea6e4b238a213324220c1a515031d12')).toBe('0x81aA3e376ea6e4b238a213324220c1A515031D12')
-  })
-
-  it('corrects an incorrectly checksummed address', () => {
-    expect(getAddress('0x81aa3e376ea6e4b238a213324220C1a515031D12')).toBe('0x81aA3e376ea6e4b238a213324220c1A515031D12')
   })
 })
