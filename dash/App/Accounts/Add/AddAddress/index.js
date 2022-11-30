@@ -50,10 +50,7 @@ class AddAddress extends React.Component {
   }
 
   setResolving() {
-    this.setState(({resolvingEns, ...state}) => ({
-      ...state,
-      resolvingEns: true
-    }))
+    this.setState({ resolvingEns: true })
   }
 
   createFromAddress (address) {
