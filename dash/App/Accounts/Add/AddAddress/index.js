@@ -64,17 +64,21 @@ class AddAddress extends React.Component {
     })
   }
 
+  hasCancelledResolution (input) {
+    return !(this.state.address === input && this.state.resolvingEns)
+  }
+
   create () {
     const {address: input} = this.state
     if(!isEnsName(input)) return this.createFromAddress(input)
 
     this.setResolving()
     link.rpc('resolveEnsName', input, (err, resolvedAddress) => {
+      if(this.hasCancelledResolution(input)) return
       if(err || !resolvedAddress){
         this.setState({ status: `Unable to resolve Ethereum address for ${input}`, error: true })
       } else {
-        // If still waiting for the resolution to complete
-        if (this.state.address === input && this.state.resolvingEns) this.createFromAddress(resolvedAddress)
+        this.createFromAddress(resolvedAddress)
       }
     })
   }
