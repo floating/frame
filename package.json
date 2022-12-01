@@ -121,7 +121,6 @@
     "@babel/preset-react": "7.18.6",
     "@babel/preset-typescript": "7.18.6",
     "@electron/notarize": "1.2.3",
-    "@framelabs/prettier-config": "*",
     "@lavamoat/allow-scripts": "2.1.0",
     "@lavamoat/preinstall-always-fail": "1.0.0",
     "@ledgerhq/hw-transport-mocker": "6.27.8",
