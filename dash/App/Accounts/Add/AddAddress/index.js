@@ -14,8 +14,7 @@ class AddAddress extends React.Component {
       adding: false,
       address: '',
       status: '',
-      error: false,
-      resolvingEns: false
+      error: false
     }
 
     this.forms = [React.createRef(), React.createRef()]
@@ -46,14 +45,18 @@ class AddAddress extends React.Component {
     }
   }
 
+  nextForm () {
+    this.setState({ index: this.state.index + 1 })
+  }
+
   next () {
-    this.setState({ index: ++this.state.index })
+    this.nextForm()
     this.focusActive()
   }
 
   async resolveEnsName (name) {
     return new Promise((resolve, reject) => {
-      this.cancelEnsResolution = () => reject('User canceled ENS resolution request')
+      this.cancelEnsResolution = () => reject('User canceled ENS resolution request for watch account')
 
       link.rpc('resolveEnsName', name, (err, resolvedAddress) => {
         if (err || !resolvedAddress) {
@@ -63,12 +66,10 @@ class AddAddress extends React.Component {
         }
 
         resolve(resolvedAddress)
+
+        this.nextForm()
       })
     })
-  }
-
-  setResolving (isResolving) {
-    this.setState({ resolvingEns: isResolving })
   }
 
   setError (status) {
@@ -88,31 +89,29 @@ class AddAddress extends React.Component {
   async create () {
     const { address: input } = this.state
 
-    this.setState({ index: ++this.state.index })
-
     if (!isEnsName(input)) {
+      this.setState({ index: this.state.index + 2 })
       return this.createFromAddress(input)
     }
 
-    this.setResolving(true)
+    this.nextForm()
 
     try {
       const resolvedAddress = await this.resolveEnsName(input)
       this.createFromAddress(resolvedAddress)
     } catch (e) {
       console.log(e)
-    } finally {
-      this.setResolving(false)
     }
   }
 
   restart () {
     this.cancelEnsResolution()
-    this.setState({ index: 0, adding: false, address: '', success: false, resolvingEns: false })
+    this.setState({ index: 0, adding: false, address: '', success: false })
 
     setTimeout(() => {
       this.setState({ status: '', error: false })
     }, 500)
+
     this.focusActive()
   }
 
@@ -138,7 +137,7 @@ class AddAddress extends React.Component {
   }
 
   render () {
-    const { error, resolvingEns } = this.state
+    const { status, error, address, index: formIndex } = this.state
 
     let itemClass = 'addAccountItem addAccountItemSmart addAccountItemAdding'
 
@@ -163,38 +162,37 @@ class AddAddress extends React.Component {
             >
               Add Address Account
             </div>
-            <div className='addAccountItemOptionSetup' style={{ transform: `translateX(-${100 * this.state.index}%)` }}>
+            <div className='addAccountItemOptionSetup' style={{ transform: `translateX(-${100 * formIndex}%)` }}>
               <div className='addAccountItemOptionSetupFrames'>
                 <div className='addAccountItemOptionSetupFrame'>
-                  {resolvingEns ?
-                    <>
-                      <div className='addAccountItemOptionTitle'>Resolving ENS Name</div>
-                      <div className='signerLoading'>
-                        <div className='signerLoadingLoader' />
-                      </div>
-                      <div className='addAccountItemOptionSubmit' onClick={() => this.restart()} style={{marginTop: "5px"}}>back</div>
-                    </>:
-                    <>
-                      <div className='addAccountItemOptionInputPhrase'>
-                        <label htmlFor='addressInput' role='label' className='addAccountItemOptionTitle'>input address or ENS name</label>
-                        <textarea id='addressInput' tabIndex='-1' value={this.state.address} ref={this.forms[0]} onChange={e => this.onChange('address', e)} onFocus={e => this.onFocus('address', e)} onBlur={e => this.onBlur('address', e)} onKeyPress={e => this.keyPress(e)} />
-                      </div>
-                      <div role='button' className='addAccountItemOptionSubmit' onClick={() => this.create()}>Create</div>
+                  <label htmlFor='addressInput' role='label' className='addAccountItemOptionTitle'>input address or ENS name</label>
+                  <div className='addAccountItemOptionInputPhrase'>
+                    <textarea id='addressInput' tabIndex='-1' value={address} ref={this.forms[0]} onChange={e => this.onChange('address', e)} onFocus={e => this.onFocus('address', e)} onBlur={e => this.onBlur('address', e)} onKeyPress={e => this.keyPress(e)} />
+                  </div>
+                  <div role='button' className='addAccountItemOptionSubmit' onClick={() => this.create()}>Create</div>
+                </div>
+
+                <div className='addAccountItemOptionSetupFrame'>
+                  <div className='addAccountResolvingEns'>
+                    <div className='addAccountItemOptionTitle'>Resolving ENS Name</div>
+                    <div className='signerLoading'>
+                      <div className='signerLoadingLoader' />
+                    </div>
+                    <div className='addAccountItemOptionSubmit' onClick={() => this.restart()}>back</div>
+                  </div>
+                </div>
+
+                <div className='addAccountItemOptionSetupFrame'>
+                  {error
+                    ? <>
+                      <div className='addAccountItemOptionTitle'>{status}</div>
+                      <div className='addAccountItemOptionSubmit' onClick={() => this.restart()}>try again</div>
+                     </>
+                    : <>
+                      <div className='addAccountItemOptionTitle'>{'account added successfully'}</div>
+                      <div className='addAccountItemOptionSubmit' onClick={() => link.send('nav:back', 'dash', 2)}>back</div>
                     </>
                   }
-                 
-                </div>
-                <div className='addAccountItemOptionSetupFrame'>
-                  {error ? 
-                  <>
-                    <div className='addAccountItemOptionTitle'>{this.state.status}</div>
-                    <div className='addAccountItemOptionSubmit' onClick={() => this.restart()}>try again</div>
-                  </>
-                  :
-                  <>
-                   <div className='addAccountItemOptionTitle'>{'account added successfully'}</div>
-                   <div className='addAccountItemOptionSubmit' onClick={() => link.send('nav:back', 'dash', 2)}>back</div>
-                  </>}
                 </div>
               </div>
             </div>
