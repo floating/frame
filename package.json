@@ -31,8 +31,8 @@
     "launch:dev:worker": "cross-env NODE_ENV=development LOG_WORKER=true electron ./compiled/main",
     "launch:dev:rinkeby": "cross-env NODE_ENV=development RINKEBY=true electron ./compiled/main",
     "launch:inspect": "cross-env NODE_ENV=production electron --inspect ./compiled/main",
-    "format": "prettier --write '**/*.{j,t}s'",
-    "format:check": "prettier --check '**/*.{j,t}s'",
+    "format": "prettier --write '**/*.{yml,json,md,ts,js,tsx,jsx}'",
+    "format:check": "prettier --check '**/*.{yml,json,md,ts,js,tsx,jsx}'",
     "prod": "npm run compile && npm run bundle && npm run launch",
     "hot": "trap \"kill 0\" exit && npm run bundle:bridge && npm run compile && npm run dev-server & wait-on http://localhost:1234/app/tray.dev.html && npm run launch:hot",
     "compile": "npm run copy-assets && tsc",
@@ -176,7 +176,7 @@
     "url": false
   },
   "lint-staged": {
-    "**/*.{yml,json,md,ts,js}": [
+    "**/*.{yml,json,md,ts,js,tsx,jsx}": [
       "prettier --write"
     ]
   },
