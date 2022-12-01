@@ -21,6 +21,11 @@
       "jsx": true
     }
   },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  },
   "overrides": [
     {
       "files": ["**/*.ts", "**/*.tsx"],
@@ -40,14 +45,19 @@
       ],
       "plugins": ["@typescript-eslint", "import", "promise", "react", "jsx-a11y"],
       "parserOptions": {
+        "ecmaVersion": 2020,
         "ecmaFeatures": {
           "jsx": true
-        }
+        },
+        "project": ["./tsconfig.json"]
       },
       "settings": {
         "import/resolver": {
           "typescript": true,
           "node": true
+        },
+        "react": {
+          "version": "detect"
         }
       },
       "rules": {
