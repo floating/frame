@@ -179,7 +179,7 @@
     ]
   },
   "engines": {
-    "electron": "21"
+    "electron": "22"
   },
   "browserslist": [
     "last 1 Electron major version"
