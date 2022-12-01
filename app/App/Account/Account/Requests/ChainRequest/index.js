@@ -4,7 +4,7 @@ import svg from '../../../../../../resources/svg'
 import link from '../../../../../../resources/link'
 
 class ChainRequest extends React.Component {
-  constructor (...args) {
+  constructor(...args) {
     super(...args)
     this.state = { allowInput: false }
     setTimeout(() => {
@@ -12,9 +12,9 @@ class ChainRequest extends React.Component {
     }, 200)
   }
 
-  render () {
+  render() {
     const { status, notice, type, chain } = this.props.req
-    
+
     let requestClass = 'signerRequest'
     if (status === 'success') requestClass += ' signerRequestSuccess'
     if (status === 'declined') requestClass += ' signerRequestDeclined'
@@ -37,23 +37,23 @@ class ChainRequest extends React.Component {
                   </div>
                 </div>
               ) : status === 'success' ? (
-                <div className='requestNoticeInner'>
-                  {svg.octicon('check', { height: 80 })}
-                </div>
+                <div className='requestNoticeInner'>{svg.octicon('check', { height: 80 })}</div>
               ) : status === 'error' || status === 'declined' ? (
-                <div className='requestNoticeInner'>
-                  {svg.octicon('circle-slash', { height: 80 })}
-                </div>
+                <div className='requestNoticeInner'>{svg.octicon('circle-slash', { height: 80 })}</div>
               ) : null}
             </div>
           ) : (
             <div className='approveTransactionPayload'>
               <div className='requestChainInner'>
                 <div className={originClass}>{this.store('main.origins', this.props.req.origin, 'name')}</div>
-                <div className={'requestChainOriginSub'}>{type === 'switchChain' ? 'wants to switch to chain' : 'wants to add chain'}</div>
-                <div className='requestChainName'>{type === 'switchChain' ? (
-                  this.store('main.networks', chain.type, parseInt(chain.id), 'name')
-                ) : chain.name}</div>
+                <div className={'requestChainOriginSub'}>
+                  {type === 'switchChain' ? 'wants to switch to chain' : 'wants to add chain'}
+                </div>
+                <div className='requestChainName'>
+                  {type === 'switchChain'
+                    ? this.store('main.networks', chain.type, parseInt(chain.id), 'name')
+                    : chain.name}
+                </div>
               </div>
             </div>
           )}

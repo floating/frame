@@ -3,7 +3,7 @@ import Restore from 'react-restore'
 import svg from '../../../../../../resources/svg'
 
 class ProviderRequest extends React.Component {
-  constructor (...args) {
+  constructor(...args) {
     super(...args)
 
     this.state = { allowInput: false }
@@ -13,7 +13,7 @@ class ProviderRequest extends React.Component {
     }, 200)
   }
 
-  render () {
+  render() {
     const status = this.props.req.status
     const notice = this.props.req.notice
     let requestClass = 'signerRequest'
@@ -37,24 +37,16 @@ class ProviderRequest extends React.Component {
                   </div>
                 </div>
               ) : status === 'success' ? (
-                <div className='requestNoticeInner'>
-                  {svg.octicon('check', { height: 80 })}
-                </div>
+                <div className='requestNoticeInner'>{svg.octicon('check', { height: 80 })}</div>
               ) : status === 'error' || status === 'declined' ? (
-                <div className='requestNoticeInner'>
-                  {svg.octicon('circle-slash', { height: 80 })}
-                </div>
+                <div className='requestNoticeInner'>{svg.octicon('circle-slash', { height: 80 })}</div>
               ) : null}
             </div>
           ) : (
             <div className='approveTransactionPayload'>
               <div className='requestProvider'>
-                <div className={originClass}>
-                  {originName}
-                </div>
-                <div className='requestProviderSub'>
-                  wants to connect
-                </div>
+                <div className={originClass}>{originName}</div>
+                <div className='requestProviderSub'>wants to connect</div>
               </div>
             </div>
           )}

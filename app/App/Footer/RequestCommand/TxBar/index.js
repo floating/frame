@@ -3,7 +3,7 @@ import Restore from 'react-restore'
 import svg from '../../../../../resources/svg'
 
 class TxBar extends React.Component {
-  render () {
+  render() {
     const req = this.props.req
     let position = 0
     let txBarClass = 'txBar'
@@ -31,19 +31,37 @@ class TxBar extends React.Component {
             <div className='txProgressLine' />
             <div className='txProgressSteps'>
               <div className='txProgressStep'>
-                <div className={progressIconClass} style={{ padding: '10px 11px' }}>{svg.sign(22)}</div>
+                <div className={progressIconClass} style={{ padding: '10px 11px' }}>
+                  {svg.sign(22)}
+                </div>
                 <div className='txProgressStepMarker' />
-                <div className={position > 1 ? 'txProgressStepCenter txProgressStepCenterOn' : 'txProgressStepCenter'} />
+                <div
+                  className={
+                    position > 1 ? 'txProgressStepCenter txProgressStepCenterOn' : 'txProgressStepCenter'
+                  }
+                />
               </div>
               <div className='txProgressStep'>
-                <div className={progressIconClass} style={{ padding: '11px 12px' }}>{svg.send(15)}</div>
+                <div className={progressIconClass} style={{ padding: '11px 12px' }}>
+                  {svg.send(15)}
+                </div>
                 <div className='txProgressStepMarker' />
-                <div className={position > 2 ? 'txProgressStepCenter txProgressStepCenterOn' : 'txProgressStepCenter'} />
+                <div
+                  className={
+                    position > 2 ? 'txProgressStepCenter txProgressStepCenterOn' : 'txProgressStepCenter'
+                  }
+                />
               </div>
               <div className='txProgressStep'>
-                <div className={progressIconClass} style={{ padding: '11px 12px' }}>{svg.cube(16)}</div>
+                <div className={progressIconClass} style={{ padding: '11px 12px' }}>
+                  {svg.cube(16)}
+                </div>
                 <div className='txProgressStepMarker' />
-                <div className={position > 3 ? 'txProgressStepCenter txProgressStepCenterOn' : 'txProgressStepCenter'} />
+                <div
+                  className={
+                    position > 3 ? 'txProgressStepCenter txProgressStepCenterOn' : 'txProgressStepCenter'
+                  }
+                />
               </div>
             </div>
           </div>

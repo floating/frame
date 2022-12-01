@@ -6,56 +6,56 @@ import Lattice from './Lattice'
 import { Derivation } from '../Signer/derive'
 
 interface GlobalLatticeSettings {
-  baseUrl: string,
-  accountLimit: number,
+  baseUrl: string
+  accountLimit: number
   derivation: Derivation
 }
 
 interface LatticeSettings extends GlobalLatticeSettings {
-  deviceName: string,
-  tag: string,
-  privKey: string,
+  deviceName: string
+  tag: string
+  privKey: string
   paired: boolean
 }
 
-function getLatticeSettings (deviceId: string): LatticeSettings {
+function getLatticeSettings(deviceId: string): LatticeSettings {
   const { baseUrl, derivation, accountLimit } = getGlobalLatticeSettings()
   const device = store('main.lattice', deviceId)
 
   return { ...device, baseUrl, derivation, accountLimit }
 }
 
-function getGlobalLatticeSettings (): GlobalLatticeSettings {
+function getGlobalLatticeSettings(): GlobalLatticeSettings {
   const accountLimit = store('main.latticeSettings.accountLimit')
   const derivation = store('main.latticeSettings.derivation')
   const endpointMode = store('main.latticeSettings.endpointMode')
-  const baseUrl = (endpointMode === 'custom')
-    ? store('main.latticeSettings.endpointCustom')
-    : 'https://signing.gridpl.us'
+  const baseUrl =
+    endpointMode === 'custom' ? store('main.latticeSettings.endpointCustom') : 'https://signing.gridpl.us'
 
   return { baseUrl, derivation, accountLimit }
 }
 
 export default class LatticeAdapter extends SignerAdapter {
-  private knownSigners: { [deviceId: string]: Lattice };
+  private knownSigners: { [deviceId: string]: Lattice }
 
-  private signerObserver: any;
-  private settingsObserver: any;
+  private signerObserver: any
+  private settingsObserver: any
 
-  constructor () {
+  constructor() {
     super('lattice')
 
     this.knownSigners = {}
   }
 
-  open () {
+  open() {
     this.settingsObserver = store.observer(() => {
       const { baseUrl, derivation, accountLimit } = getGlobalLatticeSettings()
 
-      Object.values(this.knownSigners).forEach(lattice => {
+      Object.values(this.knownSigners).forEach((lattice) => {
         if (!lattice.connection) return
-        
-        let needsUpdate = false, reloadAddresses = false
+
+        let needsUpdate = false,
+          reloadAddresses = false
 
         if (derivation !== lattice.derivation) {
           lattice.derivation = derivation
@@ -67,7 +67,7 @@ export default class LatticeAdapter extends SignerAdapter {
         if (accountLimit !== lattice.accountLimit) {
           lattice.accountLimit = accountLimit
 
-          reloadAddresses = reloadAddresses || (lattice.addresses.length < lattice.accountLimit)
+          reloadAddresses = reloadAddresses || lattice.addresses.length < lattice.accountLimit
           needsUpdate = true
         }
         if (baseUrl !== lattice.connection.baseUrl) {
@@ -137,7 +137,7 @@ export default class LatticeAdapter extends SignerAdapter {
 
         this.knownSigners[deviceId] = lattice
         this.emit('add', lattice)
-        
+
         if (device.paired) {
           // don't attempt to automatically connect if the Lattice isn't
           // paired as this could happen without the user noticing
@@ -149,12 +149,12 @@ export default class LatticeAdapter extends SignerAdapter {
     }, 'latticeSigners')
   }
 
-  close () {
+  close() {
     if (this.signerObserver) {
       this.signerObserver.remove()
       this.signerObserver = null
     }
-    
+
     if (this.settingsObserver) {
       this.settingsObserver.remove()
       this.settingsObserver = null
@@ -163,7 +163,7 @@ export default class LatticeAdapter extends SignerAdapter {
     this.knownSigners = {}
   }
 
-  remove (lattice: Lattice) {
+  remove(lattice: Lattice) {
     log.info(`removing Lattice ${lattice.deviceId}`)
 
     store.removeLattice(lattice.deviceId)
@@ -173,7 +173,7 @@ export default class LatticeAdapter extends SignerAdapter {
     }
   }
 
-  async reload (lattice: Lattice) {
+  async reload(lattice: Lattice) {
     log.info(`reloading Lattice ${lattice.deviceId}`)
 
     lattice.disconnect()

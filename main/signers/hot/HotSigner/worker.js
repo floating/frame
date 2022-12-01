@@ -8,10 +8,10 @@ const {
   ecsign,
   addHexPrefix,
   pubToAddress,
-  ecrecover
+  ecrecover,
 } = require('@ethereumjs/util')
 
-function chainConfig (chain, hardfork) {
+function chainConfig(chain, hardfork) {
   const chainId = BigInt(chain)
 
   return Common.isSupportedChainId(chainId)
@@ -20,12 +20,12 @@ function chainConfig (chain, hardfork) {
 }
 
 class HotSignerWorker {
-  constructor () {
+  constructor() {
     this.token = crypto.randomBytes(32).toString('hex')
     process.send({ type: 'token', token: this.token })
   }
 
-  handleMessage ({ id, method, params, token }) {
+  handleMessage({ id, method, params, token }) {
     // Define (pseudo) callback
     const pseudoCallback = (error, result) => {
       // Add correlation id to response
@@ -34,14 +34,15 @@ class HotSignerWorker {
       process.send(response)
     }
     // Verify token
-    if (!crypto.timingSafeEqual(Buffer.from(token), Buffer.from(this.token))) return pseudoCallback('Invalid token')
+    if (!crypto.timingSafeEqual(Buffer.from(token), Buffer.from(this.token)))
+      return pseudoCallback('Invalid token')
     // If method exists -> execute
     if (this[method]) return this[method](params, pseudoCallback)
     // Else return error
     pseudoCallback(`Invalid method: '${method}'`)
   }
 
-  signMessage (key, message, pseudoCallback) {
+  signMessage(key, message, pseudoCallback) {
     // Hash message
     const hash = hashPersonalMessage(toBuffer(message))
 
@@ -54,7 +55,7 @@ class HotSignerWorker {
     pseudoCallback(null, addHexPrefix(hex))
   }
 
-  signTypedData (key, typedMessage, pseudoCallback) {
+  signTypedData(key, typedMessage, pseudoCallback) {
     try {
       const { data, version } = typedMessage
       const signature = signTypedData({ privateKey: key, data, version })
@@ -64,7 +65,7 @@ class HotSignerWorker {
     }
   }
 
-  signTransaction (key, rawTx, pseudoCallback) {
+  signTransaction(key, rawTx, pseudoCallback) {
     if (!rawTx.chainId) {
       console.error(`invalid chain id ${rawTx.chainId} for transaction`)
       return pseudoCallback('could not determine chain id for transaction')
@@ -81,7 +82,7 @@ class HotSignerWorker {
     pseudoCallback(null, addHexPrefix(serialized))
   }
 
-  verifyAddress ({ index, address }, pseudoCallback) {
+  verifyAddress({ index, address }, pseudoCallback) {
     const message = '0x' + crypto.randomBytes(32).toString('hex')
     this.signMessage({ index, message }, (err, signedMessage) => {
       // Handle signing errors
@@ -89,7 +90,8 @@ class HotSignerWorker {
       // Signature -> buffer
       const signature = Buffer.from(signedMessage.replace('0x', ''), 'hex')
       // Ensure correct length
-      if (signature.length !== 65) return pseudoCallback(new Error('Frame verifyAddress signature has incorrect length'))
+      if (signature.length !== 65)
+        return pseudoCallback(new Error('Frame verifyAddress signature has incorrect length'))
       // Verify address
       let v = signature[64]
       v = BigInt(v === 0 || v === 1 ? v + 27 : v)
@@ -102,7 +104,7 @@ class HotSignerWorker {
     })
   }
 
-  _encrypt (string, password) {
+  _encrypt(string, password) {
     const salt = crypto.randomBytes(16)
     const iv = crypto.randomBytes(16)
     const cipher = crypto.createCipheriv('aes-256-cbc', this._hashPassword(password, salt), iv)
@@ -110,7 +112,7 @@ class HotSignerWorker {
     return salt.toString('hex') + ':' + iv.toString('hex') + ':' + encrypted.toString('hex')
   }
 
-  _decrypt (string, password) {
+  _decrypt(string, password) {
     const parts = string.split(':')
     const salt = Buffer.from(parts.shift(), 'hex')
     const iv = Buffer.from(parts.shift(), 'hex')
@@ -120,7 +122,7 @@ class HotSignerWorker {
     return decrypted.toString()
   }
 
-  _hashPassword (password, salt) {
+  _hashPassword(password, salt) {
     try {
       return crypto.scryptSync(password, salt, 32, { N: 32768, r: 8, p: 1, maxmem: 36000000 })
     } catch (e) {

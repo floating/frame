@@ -7,11 +7,11 @@ import server from '../../dapps/server'
 import { createViewInstance } from '../window'
 
 interface extract {
-  session: string, 
+  session: string
   ens: string
 }
 
-const extract = (l: string) : extract => {
+const extract = (l: string): extract => {
   const url = new URL(l)
   const session = url.searchParams.get('session') || ''
   const ens = url.port === '8421' ? url.hostname.replace('.localhost', '') || '' : ''
@@ -27,21 +27,22 @@ export default {
     viewInstance.webContents.session.webRequest.onBeforeSendHeaders((details, cb) => {
       if (!details || !details.frame) return cb({ cancel: true }) // Reject the request\
 
-      const appUrl = details.frame.url   
-      
-      if ( // Initial request for app
-        details.resourceType === 'mainFrame' && 
-        details.url === view.url && 
+      const appUrl = details.frame.url
+
+      if (
+        // Initial request for app
+        details.resourceType === 'mainFrame' &&
+        details.url === view.url &&
         !appUrl
       ) {
         return cb({ requestHeaders: details.requestHeaders }) // Leave untouched
-      } 
-      else if ( // devtools:// request
+      } else if (
+        // devtools:// request
         details.url.startsWith('devtools://')
       ) {
         return cb({ requestHeaders: details.requestHeaders }) // Leave untouched
-      } 
-      else if ( // Reqest from app
+      } else if (
+        // Reqest from app
         appUrl === view.url
       ) {
         const { ens, session } = extract(appUrl)
@@ -51,8 +52,7 @@ export default {
           details.requestHeaders['Origin'] = view.ens
           return cb({ requestHeaders: details.requestHeaders })
         }
-      } 
-      else {
+      } else {
         return cb({ cancel: true }) // Reject the request
       }
     })
@@ -63,28 +63,38 @@ export default {
 
     frameInstance.addBrowserView(viewInstance)
 
-    viewInstance.setBounds({ x: 0, y: fullscreen ? 0 : 32, width: width, height: fullscreen ? height : height - 32})
+    viewInstance.setBounds({
+      x: 0,
+      y: fullscreen ? 0 : 32,
+      width: width,
+      height: fullscreen ? height : height - 32,
+    })
 
     viewInstance.setAutoResize({ width: true, height: true })
-  
+
     viewInstance.webContents.setVisualZoomLevelLimits(1, 3)
-  
+
     frameInstance.removeBrowserView(viewInstance)
 
     // viewInstance.webContents.openDevTools({ mode: 'detach' })
 
-    viewInstance.webContents.session.cookies.set({
-      url: view.url,
-      name: '__frameSession', 
-      value: session
-    }).then(() => {
-      viewInstance.webContents.loadURL(view.url)
-    }, error => log.error(error))
+    viewInstance.webContents.session.cookies
+      .set({
+        url: view.url,
+        name: '__frameSession',
+        value: session,
+      })
+      .then(
+        () => {
+          viewInstance.webContents.loadURL(view.url)
+        },
+        (error) => log.error(error)
+      )
 
     viewInstance.webContents.on('did-finish-load', () => {
       store.updateFrameView(frameInstance.frameId, view.id, { ready: true })
     })
-  
+
     // Keep reference to view on frame instance
     frameInstance.views = { ...(frameInstance.views || {}), [view.id]: viewInstance }
   },
@@ -99,7 +109,7 @@ export default {
 
     if (frameInstance && !frameInstance.isDestroyed()) frameInstance.removeBrowserView(views[viewId])
 
-    const webcontents = (views[viewId].webContents as any)
+    const webcontents = views[viewId].webContents as any
     webcontents.destroy()
 
     delete views[viewId]
@@ -110,9 +120,14 @@ export default {
     const viewInstance = (frameInstance.views || {})[viewId]
     if (viewInstance) {
       const { width, height } = frameInstance.getBounds()
-      viewInstance.setBounds({ x: 0, y: fullscreen ? 0 : 32, width: width, height: fullscreen ? height : height - 32})
+      viewInstance.setBounds({
+        x: 0,
+        y: fullscreen ? 0 : 32,
+        width: width,
+        height: fullscreen ? height : height - 32,
+      })
       // viewInstance.setBounds({ x: 73, y: 16, width: width - 73, height: height - 16 })
       viewInstance.setAutoResize({ width: true, height: true })
     }
-  }
+  },
 }

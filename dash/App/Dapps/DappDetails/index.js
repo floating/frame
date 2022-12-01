@@ -1,49 +1,44 @@
-import React, {  createRef } from 'react'
+import React, { createRef } from 'react'
 import Restore from 'react-restore'
 import link from '../../../../resources/link'
 import RingIcon from '../../../../resources/Components/RingIcon'
 import svg from '../../../../resources/svg'
 
 class DappDetails extends React.Component {
-  updateOriginChain () {
+  updateOriginChain() {
     const origin = this.store('main.origins', this.props.originId)
     return (
       <div className='originSwapChainList'>
-        {Object.keys(this.store('main.networks.ethereum')).filter(id => {
-          return this.store('main.networks.ethereum', id, 'on')
-        }).map((id) => {
-          const chain = this.store('main.networks.ethereum', id)
-          const selected = origin.chain.id === parseInt(id)
-          const { primaryColor, icon } = this.store('main.networksMeta.ethereum', id)
-          return (
-            <div 
-              className={'originChainItem'}
-              onClick={() => {
-                link.send('tray:action', 'switchOriginChain', this.props.originId, parseInt(id), 'ethereum')
-              }}
-            >
-              <div className='originChainItemIcon'>
-                <RingIcon 
-                  color={`var(--${primaryColor})`}
-                  img={icon}
-                />
-              </div>
-              
-              {chain.name}
-
-              <div 
-                className='originChainItemCheck'
+        {Object.keys(this.store('main.networks.ethereum'))
+          .filter((id) => {
+            return this.store('main.networks.ethereum', id, 'on')
+          })
+          .map((id) => {
+            const chain = this.store('main.networks.ethereum', id)
+            const selected = origin.chain.id === parseInt(id)
+            const { primaryColor, icon } = this.store('main.networksMeta.ethereum', id)
+            return (
+              <div
+                className={'originChainItem'}
+                onClick={() => {
+                  link.send('tray:action', 'switchOriginChain', this.props.originId, parseInt(id), 'ethereum')
+                }}
               >
-                {selected ? svg.check(28) : null}
+                <div className='originChainItemIcon'>
+                  <RingIcon color={`var(--${primaryColor})`} img={icon} />
+                </div>
+
+                {chain.name}
+
+                <div className='originChainItemCheck'>{selected ? svg.check(28) : null}</div>
               </div>
-            </div>
-          )
-        })}
+            )
+          })}
       </div>
     )
   }
 
-  render () {
+  render() {
     const origin = this.store('main.origins', this.props.originId)
     return (
       <div className='cardShow'>
@@ -51,9 +46,7 @@ class DappDetails extends React.Component {
           {svg.window(20)}
           <div className='originSwapOriginText'>{origin.name}</div>
         </div>
-        <div className='originSwapTitle'>
-          default chain
-        </div>
+        <div className='originSwapTitle'>default chain</div>
         <div>{this.updateOriginChain()}</div>
         {/* <div 
           className='clearOriginsButton'
@@ -75,7 +68,6 @@ class DappDetails extends React.Component {
       </div>
     )
   }
-  
 }
 
 export default Restore.connect(DappDetails)

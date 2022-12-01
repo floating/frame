@@ -1,13 +1,17 @@
 import { SignTypedDataVersion } from '@metamask/eth-sig-util'
 import type { TypedMessage } from '../accounts/types'
 
-export function getVersionFromTypedData (typedData: TypedMessage['data']) {
+export function getVersionFromTypedData(typedData: TypedMessage['data']) {
   if (Array.isArray(typedData)) {
     return SignTypedDataVersion.V1
   }
 
-  const hasUndefinedType = () => typedData.types[typedData.primaryType].some(({ name }) => typedData.message[name] === undefined)
-  const containsArrays = () => Object.values(typedData.types).flat().some(({ type }) => type.endsWith('[]'))
+  const hasUndefinedType = () =>
+    typedData.types[typedData.primaryType].some(({ name }) => typedData.message[name] === undefined)
+  const containsArrays = () =>
+    Object.values(typedData.types)
+      .flat()
+      .some(({ type }) => type.endsWith('[]'))
 
   try {
     // arrays only supported by v4

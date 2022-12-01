@@ -3,46 +3,52 @@ import nock from 'nock'
 
 import { fetchSourcifyContract } from '../../../../main/contracts/sources/sourcify'
 
-function mockApiResponse (domain, path, status, body, timeout = 0, headers = { 'content-type': 'application/json' }) {
-  nock(`https://${domain}`)
-    .get(path)
-    .delay(timeout)
-    .reply(status, body, headers)
+function mockApiResponse(
+  domain,
+  path,
+  status,
+  body,
+  timeout = 0,
+  headers = { 'content-type': 'application/json' }
+) {
+  nock(`https://${domain}`).get(path).delay(timeout).reply(status, body, headers)
 }
 
 const mockAbi = [
-  { 
+  {
     inputs: [],
     name: 'retrieve',
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
-    type: 'function'
+    type: 'function',
   },
-  { 
-    inputs:[{ internalType:'uint256', name: 'num', type:'uint256'}],
+  {
+    inputs: [{ internalType: 'uint256', name: 'num', type: 'uint256' }],
     name: 'store',
-    outputs:[],
+    outputs: [],
     stateMutability: 'nonpayable',
-    type: 'function'
-  }
+    type: 'function',
+  },
 ]
 
 const sourcifyResponse = {
   status: 'partial',
-  files: [{
-    name: 'metadata.json',
-    path: '',
-    content: JSON.stringify({
-      output: {
-        abi: mockAbi, 
-        devdoc: { title: 'mock sourcify abi' }
-      }
-    })
-  }]
+  files: [
+    {
+      name: 'metadata.json',
+      path: '',
+      content: JSON.stringify({
+        output: {
+          abi: mockAbi,
+          devdoc: { title: 'mock sourcify abi' },
+        },
+      }),
+    },
+  ],
 }
 
 const sourcifyNotFoundResponse = {
-  error: 'Files have not been found!'
+  error: 'Files have not been found!',
 }
 
 beforeAll(() => {
@@ -57,7 +63,7 @@ afterAll(() => {
   log.transports.console.level = 'debug'
 })
 
-afterEach(() => { 
+afterEach(() => {
   nock.abortPendingRequests()
 })
 
@@ -74,9 +80,9 @@ describe('#fetchSourcifyContract', () => {
     mockSourcifyApi(200, sourcifyResponse)
 
     return expect(fetchSourcifyContract(contractAddress, 137)).resolves.toStrictEqual({
-      abi: JSON.stringify(mockAbi), 
-      name: 'mock sourcify abi', 
-      source: 'sourcify'
+      abi: JSON.stringify(mockAbi),
+      name: 'mock sourcify abi',
+      source: 'sourcify',
     })
   })
 
@@ -96,7 +102,7 @@ describe('#fetchSourcifyContract', () => {
     mockSourcifyApi(200, sourcifyResponse, 10000)
 
     const contract = expect(fetchSourcifyContract(contractAddress, 137)).resolves.toBeUndefined()
-    
+
     jest.advanceTimersByTime(4000)
 
     return contract

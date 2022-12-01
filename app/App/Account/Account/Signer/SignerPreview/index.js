@@ -6,44 +6,50 @@ import svg from '../../../../../../resources/svg'
 import { findUnavailableSigners, isHardwareSigner } from '../../../../../../resources/domain/signer'
 import { accountPanelCrumb, signerPanelCrumb } from '../../../../../../resources/domain/nav'
 
-
-import { Cluster, ClusterRow, ClusterColumn, ClusterValue } from '../../../../../../resources/Components/Cluster'
+import {
+  Cluster,
+  ClusterRow,
+  ClusterColumn,
+  ClusterValue,
+} from '../../../../../../resources/Components/Cluster'
 
 const isWatchOnly = (account = {}) => {
   return ['address'].includes(account.lastSignerType.toLowerCase())
 }
 
 class Signer extends React.Component {
-  constructor (...args) {
+  constructor(...args) {
     super(...args)
     this.moduleRef = React.createRef()
     if (!this.props.expanded) {
       this.resizeObserver = new ResizeObserver(() => {
         if (this.moduleRef && this.moduleRef.current) {
-          link.send('tray:action', 'updateAccountModule', this.props.moduleId, { height: this.moduleRef.current.clientHeight })
+          link.send('tray:action', 'updateAccountModule', this.props.moduleId, {
+            height: this.moduleRef.current.clientHeight,
+          })
         }
       })
     }
     this.state = {
       notifySuccess: false,
-      notifyText: ''
+      notifyText: '',
     }
   }
 
-  componentDidMount () {
+  componentDidMount() {
     if (this.resizeObserver) this.resizeObserver.observe(this.moduleRef.current)
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     if (this.resizeObserver) this.resizeObserver.disconnect()
   }
 
-  verifyAddress (hardwareSigner) {
+  verifyAddress(hardwareSigner) {
     if (hardwareSigner) {
       // prompt for on-signer verification
       this.setState({ notifySuccess: false, notifyText: 'Verify address on signer' })
     }
-    link.rpc('verifyAddress', err => {
+    link.rpc('verifyAddress', (err) => {
       if (err) {
         this.setState({ notifySuccess: false, notifyText: err })
       } else {
@@ -55,7 +61,7 @@ class Signer extends React.Component {
     })
   }
 
-  renderSignerType (type) {
+  renderSignerType(type) {
     if (type === 'lattice') {
       return (
         <div className='moduleItemSignerType'>
@@ -101,14 +107,14 @@ class Signer extends React.Component {
     }
   }
 
-  render () {
+  render() {
     const activeAccount = this.store('main.accounts', this.props.account)
 
     let activeSigner
 
     if (activeAccount.signer) {
       activeSigner = this.store('main.signers', activeAccount.signer)
-    } else if (activeAccount.smart)  {
+    } else if (activeAccount.smart) {
       const actingSigner = this.store('main.accounts', activeAccount.smart.actor, 'signer')
       if (actingSigner) activeSigner = this.store('main.signers', actingSigner)
     }
@@ -119,10 +125,7 @@ class Signer extends React.Component {
     const account = this.store('main.accounts', this.props.id)
 
     return (
-      <div 
-        className='balancesBlock'
-        ref={this.moduleRef}
-      >
+      <div className='balancesBlock' ref={this.moduleRef}>
         <div className='moduleHeader'>
           <span style={{ position: 'relative', top: '2px' }}>{svg.sign(19)}</span>
           <span>{'Signer'}</span>
@@ -141,7 +144,7 @@ class Signer extends React.Component {
                   if (!signer) {
                     this.setState({
                       notifySuccess: false,
-                      notifyText: 'Signer Unavailable'
+                      notifyText: 'Signer Unavailable',
                     })
                     setTimeout(() => {
                       this.setState({ notifySuccess: false, notifyText: '' })
@@ -149,10 +152,11 @@ class Signer extends React.Component {
                   }
                   const crumb = !!signer ? signerPanelCrumb(signer) : accountPanelCrumb()
                   link.send('tray:action', 'navDash', crumb)
-              }}>
-                <div 
+                }}
+              >
+                <div
                   style={{
-                    padding: '20px'
+                    padding: '20px',
                   }}
                 >
                   {this.renderSignerType(activeAccount.lastSignerType)}
@@ -164,11 +168,9 @@ class Signer extends React.Component {
                 </div>
               </ClusterValue>
             </ClusterColumn>
-            {!watchOnly && (    
+            {!watchOnly && (
               <ClusterColumn width={'80px'}>
-                <ClusterValue
-                  onClick={() => this.verifyAddress(hardwareSigner)}
-                >
+                <ClusterValue onClick={() => this.verifyAddress(hardwareSigner)}>
                   {svg.doubleCheck(20)}
                 </ClusterValue>
               </ClusterColumn>
@@ -180,7 +182,7 @@ class Signer extends React.Component {
                 <div
                   className='clusterTag'
                   style={{
-                    color: this.state.notifySuccess ? 'var(--good)' : 'var(--bad)'
+                    color: this.state.notifySuccess ? 'var(--good)' : 'var(--bad)',
                   }}
                 >
                   {this.state.notifyText}
@@ -190,7 +192,7 @@ class Signer extends React.Component {
           )}
           {account.smart && (
             <ClusterRow>
-               <ClusterValue>
+              <ClusterValue>
                 <div className='clusterTag'>
                   <div>{account.smart.type} Account</div>
                   <div>DAO exists on this chain: ?</div>

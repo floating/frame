@@ -1,28 +1,26 @@
 import type { Action } from '.'
 
-export type ActionType =
-  'ens:commit' |
-  'ens:register' |
-  'ens:renew' |
-  'ens:transfer' |
-  'ens:approve'
+export type ActionType = 'ens:commit' | 'ens:register' | 'ens:renew' | 'ens:transfer' | 'ens:approve'
 
 type Named = { name: string }
 type WithTokenId = { tokenId: string }
 type WithDuration = { duration: number }
 
-type Transfer = Named & WithTokenId & {
-  from: Address
-  to: Address
-}
+type Transfer = Named &
+  WithTokenId & {
+    from: Address
+    to: Address
+  }
 
-type Approve = Named & WithTokenId & {
-  operator: Address
-}
+type Approve = Named &
+  WithTokenId & {
+    operator: Address
+  }
 
-type Register = Named & WithDuration & {
-  address: Address
-}
+type Register = Named &
+  WithDuration & {
+    address: Address
+  }
 
 type Renew = Named & WithDuration
 

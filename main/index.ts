@@ -3,7 +3,7 @@ import path from 'path'
 import log from 'electron-log'
 import url from 'url'
 
-// DO NOT MOVE - env var below is required for app init and must be set before all local imports 
+// DO NOT MOVE - env var below is required for app init and must be set before all local imports
 process.env.BUNDLE_LOCATION = process.env.BUNDLE_LOCATION || path.resolve(__dirname, './../..', 'bundle')
 
 import * as errors from './errors'
@@ -49,10 +49,12 @@ if (isDev) {
     app.getAppMetrics()
 
     setInterval(() => {
-      const cpuUsers = app.getAppMetrics().filter(metric => metric.cpu.percentCPUUsage > cpuThreshold)
+      const cpuUsers = app.getAppMetrics().filter((metric) => metric.cpu.percentCPUUsage > cpuThreshold)
 
       if (cpuUsers.length > 0) {
-        log.verbose(`Following processes used more than ${cpuThreshold}% CPU over the last ${cpuMonitoringInterval} seconds`)
+        log.verbose(
+          `Following processes used more than ${cpuThreshold}% CPU over the last ${cpuMonitoringInterval} seconds`
+        )
         log.verbose(JSON.stringify(cpuUsers, undefined, 2))
       }
     }, cpuMonitoringInterval * 1000)
@@ -90,7 +92,7 @@ process.on('unhandledRejection', (e) => {
   log.error('Unhandled Rejection!', e)
 })
 
-function startUpdater () {
+function startUpdater() {
   powerMonitor.on('resume', () => {
     log.debug('System resuming, starting updater')
 
@@ -106,7 +108,9 @@ function startUpdater () {
   updater.start()
 }
 
-global.eval = () => { throw new Error(`This app does not support global.eval()`) } // eslint-disable-line
+global.eval = () => {
+  throw new Error(`This app does not support global.eval()`)
+} // eslint-disable-line
 
 ipcMain.on('tray:resetAllSettings', () => {
   persist.clear()
@@ -260,27 +264,27 @@ ipcMain.on('tray:updateRestart', () => {
   updater.quitAndInstall()
 })
 
-ipcMain.on('frame:close', e => {
+ipcMain.on('frame:close', (e) => {
   windows.close(e)
 })
 
-ipcMain.on('frame:min', e => {
+ipcMain.on('frame:min', (e) => {
   windows.min(e)
 })
 
-ipcMain.on('frame:max', e => {
+ipcMain.on('frame:max', (e) => {
   windows.max(e)
 })
 
-ipcMain.on('frame:unmax', e => {
+ipcMain.on('frame:unmax', (e) => {
   windows.unmax(e)
 })
 
 dapps.add({
   ens: 'send.frame.eth',
   config: {
-    key: 'value'
-  }
+    key: 'value',
+  },
 })
 
 ipcMain.on('unsetCurrentView', async (e, ens) => {
@@ -291,14 +295,14 @@ ipcMain.on('unsetCurrentView', async (e, ens) => {
 ipcMain.on('*:addFrame', (e, id) => {
   setTimeout(() => {
     const existingFrame = store('main.frames', id)
-  
+
     if (existingFrame) {
       windows.refocusFrame(id)
     } else {
       store.addFrame({
         id,
         currentView: '',
-        views: {}
+        views: {},
       })
       dapps.open(id, 'send.frame.eth')
     }
@@ -362,7 +366,9 @@ app.on('quit', () => {
   signers.close()
 })
 
-app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit() })
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') app.quit()
+})
 
 let launchStatus = store('main.launch')
 
