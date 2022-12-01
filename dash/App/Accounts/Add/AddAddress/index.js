@@ -17,7 +17,9 @@ class AddAddress extends React.Component {
       error: false,
       resolvingEns: false
     }
+
     this.forms = [React.createRef(), React.createRef()]
+    this.cancelEnsResolution = () => {}
   }
 
   onChange (key, e) {
@@ -49,38 +51,61 @@ class AddAddress extends React.Component {
     this.focusActive()
   }
 
+  async resolveEnsName (name) {
+    return new Promise((resolve, reject) => {
+      this.cancelEnsResolution = () => reject('User canceled ENS resolution request')
+
+      link.rpc('resolveEnsName', name, (err, resolvedAddress) => {
+        if (err || !resolvedAddress) {
+          const message = `Unable to resolve Ethereum address for ${name}`
+          this.setError(message)
+          reject(message)
+        }
+
+        resolve(resolvedAddress)
+      })
+    })
+  }
+
   setResolving() {
     this.setState({ resolvingEns: true })
+  }
+
+  setError (message) {
+    this.setState({ status: `Unable to resolve Ethereum address for ${message}`, error: true })
   }
 
   createFromAddress (address) {
     link.rpc('createFromAddress', address, 'Watch Account', (err) => {
       this.setState({ index: ++this.state.index })
       if (err) {
-        this.setState({ status: err, error: true })
+        this.setError(err)
       } else {
         this.setState({ status: 'Successful', error: false })
       }
     })
   }
 
-  create () {
-    const {address: input} = this.state
-    if(!isEnsName(input)) return this.createFromAddress(input)
+  async create () {
+    const { address: input } = this.state
+    if (!isEnsName(input)) {
+      return this.createFromAddress(input)
+    }
 
     this.setResolving()
-    link.rpc('resolveEnsName', input, (err, resolvedAddress) => {
-      if(err || !resolvedAddress){
-        this.setState({ status: `Unable to resolve Ethereum address for ${input}`, error: true })
-      } else {
-        // If still waiting for the resolution to complete
-        if (this.state.address === input && this.state.resolvingEns) this.createFromAddress(resolvedAddress)
-      }
-    })
+
+    try {
+      const resolvedAddress = await this.resolveEnsName()
+      this.createFromAddress(resolvedAddress)
+    } catch (e) {
+      console.log(e.message)
+    }
   }
 
   restart () {
+    this.cancelEnsResolution()
     this.setState({ index: 0, adding: false, address: '', success: false, resolvingEns: false })
+
     setTimeout(() => {
       this.setState({ status: '', error: false })
     }, 500)
