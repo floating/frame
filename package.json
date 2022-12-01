@@ -175,7 +175,6 @@
     "string_decoder": false,
     "url": false
   },
-  "prettier": "@framelabs/prettier-config",
   "lint-staged": {
     "**/*.{yml,json,md,ts,js}": [
       "prettier --write"
