@@ -3,12 +3,14 @@ import Restore from 'react-restore'
 import link from '../../../../../resources/link'
 
 class Verify extends React.Component {
-  constructor (...args) {
+  constructor(...args) {
     super(...args)
     this.moduleRef = React.createRef()
     this.resizeObserver = new ResizeObserver(() => {
       if (this.moduleRef && this.moduleRef.current) {
-        link.send('tray:action', 'updateAccountModule', this.props.moduleId, { height: this.moduleRef.current.clientHeight })
+        link.send('tray:action', 'updateAccountModule', this.props.moduleId, {
+          height: this.moduleRef.current.clientHeight,
+        })
       }
     })
 
@@ -16,18 +18,22 @@ class Verify extends React.Component {
       expand: false,
       verifyAddressSuccess: false,
       verifyAddressResponse: '',
-      verifyInProgress: false
+      verifyInProgress: false,
     }
   }
 
-  verifyAddress () {
+  verifyAddress() {
     this.setState({ verifyInProgress: true })
 
-    link.rpc('verifyAddress', err => {
+    link.rpc('verifyAddress', (err) => {
       if (err) {
         this.setState({ verifyInProgress: false, verifyAddressSuccess: false, verifyAddressResponse: err })
       } else {
-        this.setState({ verifyInProgress: false, verifyAddressSuccess: true, verifyAddressResponse: 'Address matched!' })
+        this.setState({
+          verifyInProgress: false,
+          verifyAddressSuccess: true,
+          verifyAddressResponse: 'Address matched!',
+        })
       }
 
       setTimeout(() => {
@@ -36,8 +42,8 @@ class Verify extends React.Component {
     })
   }
 
-  getText (signerType) {
-    const isHwSigner = (signerType === 'seed' || signerType === 'ring')
+  getText(signerType) {
+    const isHwSigner = signerType === 'seed' || signerType === 'ring'
 
     if (this.state.verifyInProgress) {
       return isHwSigner ? 'verifying' : 'check your device'
@@ -46,11 +52,11 @@ class Verify extends React.Component {
     return isHwSigner ? 'verify address' : 'verify address on device'
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.resizeObserver.observe(this.moduleRef.current)
-  } 
+  }
 
-  render () {
+  render() {
     const signerType = this.store('main.accounts', this.props.id, 'lastSignerType')
     const account = this.store('main.accounts', this.props.id)
     const buttonClasses = ['moduleButton']
@@ -63,7 +69,7 @@ class Verify extends React.Component {
       <div ref={this.moduleRef} className='balancesBlock'>
         {account.smart ? (
           <>
-            <div className='moduleHeader'>{'Smart Account'}</div>  
+            <div className='moduleHeader'>{'Smart Account'}</div>
             <div className='moduleMain moduleMainSettings'>
               <div>{account.smart.type} Account</div>
               <div>DAO exists on this chain: ?</div>
@@ -75,17 +81,28 @@ class Verify extends React.Component {
           </>
         ) : (
           <>
-            <div className='moduleHeader'>{'Verify Address'}</div>  
+            <div className='moduleHeader'>{'Verify Address'}</div>
             <div className='moduleMain'>
               <div className='signerVerifyText'>Verify that the address displayed in Frame is correct</div>
               {this.state.verifyAddressResponse ? (
-                <div className={this.state.verifyAddressSuccess ? 'signerVerifyResponse signerVerifyResponseSuccess cardShow' : 'signerVerifyResponse'}>{this.state.verifyAddressResponse}</div>
+                <div
+                  className={
+                    this.state.verifyAddressSuccess
+                      ? 'signerVerifyResponse signerVerifyResponseSuccess cardShow'
+                      : 'signerVerifyResponse'
+                  }
+                >
+                  {this.state.verifyAddressResponse}
+                </div>
               ) : null}
-              <div className={buttonClasses.join(' ')} onMouseDown={evt => {
-                if (evt.button === 0 && !this.state.verifyInProgress) {
-                  this.verifyAddress()
-                }
-              }}>
+              <div
+                className={buttonClasses.join(' ')}
+                onMouseDown={(evt) => {
+                  if (evt.button === 0 && !this.state.verifyInProgress) {
+                    this.verifyAddress()
+                  }
+                }}
+              >
                 {this.getText(signerType)}
               </div>
             </div>

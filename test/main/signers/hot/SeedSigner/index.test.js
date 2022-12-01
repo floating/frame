@@ -9,7 +9,11 @@ const PASSWORD = 'fr@///3_password'
 const SIGNER_PATH = path.resolve(__dirname, '../.userData/signers')
 
 jest.mock('electron')
-jest.mock('../../../../../compiled/main/store/persist', () => ({ get: jest.fn(), set: jest.fn(), queue: jest.fn() }))
+jest.mock('../../../../../compiled/main/store/persist', () => ({
+  get: jest.fn(),
+  set: jest.fn(),
+  queue: jest.fn(),
+}))
 jest.mock('../../../../../main/store/persist')
 
 // Stubs
@@ -45,12 +49,14 @@ describe('Seed signer', () => {
     const mnemonic = 'invalid mnemonic'
 
     try {
-      hot.createFromPhrase(signers, mnemonic, PASSWORD, err => {
+      hot.createFromPhrase(signers, mnemonic, PASSWORD, (err) => {
         expect(err).toBeTruthy()
         expect(store('main.signers')).toEqual({})
         done()
       })
-    } catch (e) { done(e) }
+    } catch (e) {
+      done(e)
+    }
   }, 1000)
 
   test('Create from phrase', (done) => {
@@ -64,7 +70,9 @@ describe('Seed signer', () => {
         expect(store(`main.signers.${signer.id}.id`)).toBe(signer.id)
         done()
       })
-    } catch (e) { done(e) }
+    } catch (e) {
+      done(e)
+    }
   }, 2000)
 
   test('Scan for signers', (done) => {
@@ -78,7 +86,7 @@ describe('Seed signer', () => {
         expect(count).toBe(1)
         done()
       },
-      exists: () => false
+      exists: () => false,
     }
 
     hot.scan(signers)
@@ -88,21 +96,25 @@ describe('Seed signer', () => {
 
   test('Unlock with wrong password', (done) => {
     try {
-      signer.unlock('Wrong password', err => {
+      signer.unlock('Wrong password', (err) => {
         expect(err).toBeTruthy()
         expect(signer.status).toBe('locked')
         done()
       })
-    } catch (e) { done (e) }
+    } catch (e) {
+      done(e)
+    }
   }, 2000)
 
   test('Unlock', (done) => {
     try {
-      signer.unlock(PASSWORD, err => {
+      signer.unlock(PASSWORD, (err) => {
         expect(err).toBe(null)
         done()
       })
-    } catch (e) { done (e) }
+    } catch (e) {
+      done(e)
+    }
   }, 400)
 
   test('Sign message', (done) => {
@@ -114,7 +126,9 @@ describe('Seed signer', () => {
         expect(result.length).toBe(132)
         done()
       })
-    } catch (e) { done(e) }
+    } catch (e) {
+      done(e)
+    }
   })
 
   test('Sign transaction', (done) => {
@@ -124,7 +138,7 @@ describe('Seed signer', () => {
       gasLimit: '0x30000',
       to: '0xfa3caabc8eefec2b5e2895e5afbf79379e7268a7',
       value: '0x0',
-      chainId: '0x1'
+      chainId: '0x1',
     }
 
     try {
@@ -134,7 +148,9 @@ describe('Seed signer', () => {
         expect(result.slice(0, 2)).toBe('0x')
         done()
       })
-    } catch (e) { done(e) }
+    } catch (e) {
+      done(e)
+    }
   }, 500)
 
   test('Verify address', (done) => {
@@ -144,7 +160,9 @@ describe('Seed signer', () => {
         expect(result).toBe(true)
         done()
       })
-    } catch (e) { done(e) }
+    } catch (e) {
+      done(e)
+    }
   }, 500)
 
   test('Verify wrong address', (done) => {
@@ -154,26 +172,32 @@ describe('Seed signer', () => {
         expect(result).toBe(undefined)
         done()
       })
-    } catch (e) { done(e) }
+    } catch (e) {
+      done(e)
+    }
   }, 500)
 
   test('Lock', (done) => {
     try {
-      signer.lock(err => {
+      signer.lock((err) => {
         expect(err).toBe(null)
         expect(signer.status).toBe('locked')
         done()
       })
-    } catch (e) { done(e) }
+    } catch (e) {
+      done(e)
+    }
   }, 2000)
 
   test('Sign message when locked', (done) => {
     try {
-      signer.signMessage(0, 'test', err => {
+      signer.signMessage(0, 'test', (err) => {
         expect(err.message).toBe('Signer locked')
         done()
       })
-    } catch (e) { done(e) }
+    } catch (e) {
+      done(e)
+    }
   })
 
   test('Close signer', (done) => {
@@ -181,6 +205,8 @@ describe('Seed signer', () => {
       signer.close()
       expect(store(`main.signers.${signer.id}`)).toBe(undefined)
       done()
-    } catch (e) { done(e) }
+    } catch (e) {
+      done(e)
+    }
   })
 })

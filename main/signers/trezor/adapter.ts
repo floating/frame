@@ -9,7 +9,7 @@ import TrezorBridge from './bridge'
 
 interface KnownSigners {
   [id: string]: {
-    signer: Trezor,
+    signer: Trezor
     eventHandlers: {
       [event: string]: (...args: any) => void
     }
@@ -20,15 +20,15 @@ export default class TrezorSignerAdapter extends SignerAdapter {
   private knownSigners: KnownSigners = {}
   private observer?: Observer
 
-  constructor () {
+  constructor() {
     super('trezor')
   }
 
-  open () {
+  open() {
     this.observer = store.observer(() => {
       const trezorDerivation = store('main.trezor.derivation')
 
-      Object.values(this.knownSigners).forEach(signerInfo => {
+      Object.values(this.knownSigners).forEach((signerInfo) => {
         const trezor = signerInfo.signer
         if (trezor.derivation !== trezorDerivation) {
           trezor.derivation = trezorDerivation
@@ -70,7 +70,7 @@ export default class TrezorSignerAdapter extends SignerAdapter {
     })
 
     TrezorBridge.on('trezor:disconnect', (device: TrezorDevice) => {
-      this.withSigner(device, signer => {
+      this.withSigner(device, (signer) => {
         log.info(`Trezor ${signer.id} disconnected`)
 
         this.remove(signer)
@@ -78,7 +78,7 @@ export default class TrezorSignerAdapter extends SignerAdapter {
     })
 
     TrezorBridge.on('trezor:update', (device: TrezorDevice) => {
-      this.withSigner(device, signer => {
+      this.withSigner(device, (signer) => {
         log.debug(`Trezor ${signer.id} updated`)
 
         signer.device = device
@@ -113,7 +113,7 @@ export default class TrezorSignerAdapter extends SignerAdapter {
     })
 
     TrezorBridge.on('trezor:needPin', (device: TrezorDevice) => {
-      this.withSigner(device, signer => {
+      this.withSigner(device, (signer) => {
         log.verbose(`Trezor ${signer.id} needs pin`)
 
         const currentStatus = signer.status
@@ -129,7 +129,7 @@ export default class TrezorSignerAdapter extends SignerAdapter {
     })
 
     TrezorBridge.on('trezor:needPhrase', (device: TrezorDevice) => {
-      this.withSigner(device, signer => {
+      this.withSigner(device, (signer) => {
         log.verbose(`Trezor ${signer.id} needs passphrase`, { status: signer.status })
 
         const currentStatus = signer.status
@@ -138,7 +138,7 @@ export default class TrezorSignerAdapter extends SignerAdapter {
           signer.status = currentStatus
           this.emit('update', signer)
         })
-        
+
         signer.status = Status.NEEDS_PASSPHRASE
         this.emit('update', signer)
       })
@@ -148,7 +148,7 @@ export default class TrezorSignerAdapter extends SignerAdapter {
     super.open()
   }
 
-  private initTrezor (path: string) {
+  private initTrezor(path: string) {
     const trezor = new Trezor(path)
 
     log.info(`Trezor ${trezor.id} detected`)
@@ -168,27 +168,27 @@ export default class TrezorSignerAdapter extends SignerAdapter {
     // Show signer in dash window
     store.navReplace('dash', [
       {
-        view: 'expandedSigner', 
-        data: { signer: trezor.id }
+        view: 'expandedSigner',
+        data: { signer: trezor.id },
       },
       {
         view: 'accounts',
-        data: {}
-      }
+        data: {},
+      },
     ])
 
     setTimeout(() => {
       if (trezor.status === Status.INITIAL && !trezor.device) {
         // if the trezor hasn't connected in a reasonable amount of time, consider it disconnected
-       trezor.status = Status.DISCONNECTED
-       this.emit('update', trezor)
+        trezor.status = Status.DISCONNECTED
+        this.emit('update', trezor)
       }
     }, 10_000)
 
     return trezor
   }
 
-  close () {
+  close() {
     if (this.observer) {
       this.observer.remove()
       this.observer = undefined
@@ -199,7 +199,7 @@ export default class TrezorSignerAdapter extends SignerAdapter {
     super.close()
   }
 
-  remove (trezor: Trezor) {
+  remove(trezor: Trezor) {
     if (trezor.id in this.knownSigners) {
       log.info(`removing Trezor ${trezor.id}`)
 
@@ -209,7 +209,7 @@ export default class TrezorSignerAdapter extends SignerAdapter {
     }
   }
 
-  reload (trezor: Trezor) {
+  reload(trezor: Trezor) {
     log.info(`reloading Trezor ${trezor.id}`)
 
     trezor.status = Status.INITIAL
@@ -225,11 +225,11 @@ export default class TrezorSignerAdapter extends SignerAdapter {
     }
   }
 
-  private addEventHandler (signer: Trezor, event: string, handler: (device: TrezorDevice) => void) {
+  private addEventHandler(signer: Trezor, event: string, handler: (device: TrezorDevice) => void) {
     this.knownSigners[signer.id].eventHandlers[event] = handler
   }
 
-  private handleEvent (signerId: string, event: string, ...args: any) {
+  private handleEvent(signerId: string, event: string, ...args: any) {
     const action = this.knownSigners[signerId]?.eventHandlers[event] || (() => {})
 
     delete this.knownSigners[signerId].eventHandlers[event]
@@ -237,7 +237,7 @@ export default class TrezorSignerAdapter extends SignerAdapter {
     action(args)
   }
 
-  private withSigner (device: TrezorDevice, fn: (signer: Trezor) => void) {
+  private withSigner(device: TrezorDevice, fn: (signer: Trezor) => void) {
     const signer = this.knownSigners[Trezor.generateId(device.path)]?.signer
 
     if (signer) fn(signer)

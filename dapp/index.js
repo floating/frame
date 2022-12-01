@@ -10,11 +10,13 @@ import _store from './store'
 
 Sentry.init({ dsn: 'https://7b09a85b26924609bef5882387e2c4dc@o1204372.ingest.sentry.io/6331069' })
 
-document.addEventListener('dragover', e => e.preventDefault())
-document.addEventListener('drop', e => e.preventDefault())
+document.addEventListener('dragover', (e) => e.preventDefault())
+document.addEventListener('drop', (e) => e.preventDefault())
 
 if (process.env.NODE_ENV !== 'development' || process.env.HMR !== 'true') {
-  window.eval = global.eval = () => { throw new Error(`This app does not support window.eval()`) } // eslint-disable-line
+  window.eval = global.eval = () => {
+    throw new Error(`This app does not support window.eval()`)
+  } // eslint-disable-line
 }
 
 link.rpc('getFrameId', (err, frameId) => {
@@ -31,9 +33,9 @@ link.rpc('getFrameId', (err, frameId) => {
       }, 100)
     })
     const DappFrame = Restore.connect(App, store)
-    const root = createRoot(document.getElementById('frame'));
+    const root = createRoot(document.getElementById('frame'))
     root.render(<DappFrame />)
   })
 })
 
-document.addEventListener('contextmenu', e => link.send('*:contextmenu', e.clientX, e.clientY))
+document.addEventListener('contextmenu', (e) => link.send('*:contextmenu', e.clientX, e.clientY))

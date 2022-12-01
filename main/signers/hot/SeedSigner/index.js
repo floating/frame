@@ -2,20 +2,20 @@ const path = require('path')
 const HotSigner = require('../HotSigner')
 const bip39 = require('bip39')
 const hdKey = require('hdkey')
-const {computeAddress} = require('ethers').utils
+const { computeAddress } = require('ethers').utils
 
 const WORKER_PATH = path.resolve(__dirname, 'worker.js')
 
 class SeedSigner extends HotSigner {
-  constructor (signer) {
+  constructor(signer) {
     super(signer, WORKER_PATH)
-    this.encryptedSeed = (signer && signer.encryptedSeed)
+    this.encryptedSeed = signer && signer.encryptedSeed
     this.type = 'seed'
     this.model = 'phrase'
     if (this.encryptedSeed) this.update()
   }
 
-  addSeed (seed, password, cb) {
+  addSeed(seed, password, cb) {
     if (this.encryptedSeed) return cb(new Error('This signer already has a seed'))
 
     this._callWorker({ method: 'encryptSeed', params: { seed, password } }, (err, encryptedSeed) => {
@@ -26,7 +26,7 @@ class SeedSigner extends HotSigner {
 
       const addresses = []
       for (let i = 0; i < 100; i++) {
-        const publicKey = wallet.derive('m/44\'/60\'/0\'/0/' + i).publicKey
+        const publicKey = wallet.derive("m/44'/60'/0'/0/" + i).publicKey
         const address = computeAddress(publicKey)
         addresses.push(address)
       }
@@ -40,7 +40,7 @@ class SeedSigner extends HotSigner {
     })
   }
 
-  async addPhrase (phrase, password, cb) {
+  async addPhrase(phrase, password, cb) {
     // Validate phrase
     if (!bip39.validateMnemonic(phrase)) return cb(new Error('Invalid mnemonic phrase'))
     // Get seed
@@ -49,11 +49,11 @@ class SeedSigner extends HotSigner {
     this.addSeed(seed.toString('hex'), password, cb)
   }
 
-  save () {
+  save() {
     super.save({ encryptedSeed: this.encryptedSeed })
   }
 
-  unlock (password, cb) {
+  unlock(password, cb) {
     super.unlock(password, { encryptedSeed: this.encryptedSeed }, cb)
   }
 }

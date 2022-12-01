@@ -79,7 +79,7 @@ class Backdrop extends React.Component {
   //     })
   //   }
   // }
-  render () {
+  render() {
     const accountOpen = this.store('selected.open')
     const footerHeight = this.store('windows.panel.footer.height')
     const top = accountOpen ? '140px' : '80px'

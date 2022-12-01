@@ -19,18 +19,18 @@ let firstScroll = true
 // }
 
 class AccountSelector extends React.Component {
-  constructor (props, context) {
+  constructor(props, context) {
     super(props, context)
     this.state = {
-      accountFilter: context.store('panel.accountFilter') || ''
+      accountFilter: context.store('panel.accountFilter') || '',
     }
   }
 
-  reportScroll () {
+  reportScroll() {
     this.store.initialScrollPos(ReactDOM.findDOMNode(this.scroll).scrollTop)
   }
 
-  resetScroll () {
+  resetScroll() {
     setTimeout(() => {
       if (firstScroll) {
         firstScroll = false
@@ -40,16 +40,14 @@ class AccountSelector extends React.Component {
     }, 3000)
   }
 
-  renderAccountFilter () {
+  renderAccountFilter() {
     const open = this.store('selected.open')
     if (open) return null
     return (
       <div className='panelFilterMain'>
-        <div className='panelFilterIcon'>
-          {svg.search(12)}
-        </div>
+        <div className='panelFilterIcon'>{svg.search(12)}</div>
         <div className='panelFilterInput'>
-          <input 
+          <input
             tabIndex='-1'
             spellCheck='false'
             onChange={(e) => {
@@ -61,7 +59,7 @@ class AccountSelector extends React.Component {
           />
         </div>
         {this.store('panel.accountFilter') ? (
-          <div 
+          <div
             className='panelFilterClear'
             onClick={() => {
               this.setState({ accountFilter: '' })
@@ -75,26 +73,24 @@ class AccountSelector extends React.Component {
     )
   }
 
-  renderAccountList () {
+  renderAccountList() {
     const accounts = this.store('main.accounts')
     const sortedAccounts = Object.values(accounts).sort(byCreation)
     const filter = this.store('panel.accountFilter')
-    
-    const displayAccounts = sortedAccounts.filter(
-      ({ address, name, ensName, lastSignerType }) => {
-        return matchFilter(filter, [address, name, ensName, lastSignerType])
-      } 
-    )
+
+    const displayAccounts = sortedAccounts.filter(({ address, name, ensName, lastSignerType }) => {
+      return matchFilter(filter, [address, name, ensName, lastSignerType])
+    })
 
     return (
       <div
-        className="accountSelectorScroll"
+        className='accountSelectorScroll'
         ref={(ref) => {
-          if (ref) this.scroll = ref;
+          if (ref) this.scroll = ref
         }}
       >
         {/* <div className='accountSelectorScrollWrap' style={current && scrollTop > 0 ? { marginTop: '-' + scrollTop + 'px' } : {}}> */}
-        <div className="accountSelectorScrollWrap">
+        <div className='accountSelectorScrollWrap'>
           {displayAccounts.length ? (
             displayAccounts.map((account, i) => (
               <AccountController
@@ -106,16 +102,16 @@ class AccountSelector extends React.Component {
               />
             ))
           ) : Object.keys(accounts).length === 0 ? (
-            <div className="noSigners">{'No Accounts Added'}</div>
+            <div className='noSigners'>{'No Accounts Added'}</div>
           ) : (
-            <div className="noSigners">{'No Matching Accounts'}</div>
+            <div className='noSigners'>{'No Matching Accounts'}</div>
           )}
         </div>
       </div>
     )
   }
 
-  render () {
+  render() {
     const open = this.store('selected.open')
 
     return (

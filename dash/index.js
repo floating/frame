@@ -10,11 +10,13 @@ import App from './App'
 
 Sentry.init({ dsn: 'https://7b09a85b26924609bef5882387e2c4dc@o1204372.ingest.sentry.io/6331069' })
 
-document.addEventListener('dragover', e => e.preventDefault())
-document.addEventListener('drop', e => e.preventDefault())
+document.addEventListener('dragover', (e) => e.preventDefault())
+document.addEventListener('drop', (e) => e.preventDefault())
 
 if (process.env.NODE_ENV !== 'development' || process.env.HMR !== 'true') {
-  window.eval = global.eval = () => { throw new Error(`This app does not support window.eval()`) } // eslint-disable-line
+  window.eval = global.eval = () => {
+    throw new Error(`This app does not support window.eval()`)
+  } // eslint-disable-line
 }
 
 link.rpc('getState', (err, state) => {
@@ -32,7 +34,7 @@ link.rpc('getState', (err, state) => {
   root.render(<Dash />)
 })
 
-document.addEventListener('contextmenu', e => link.send('*:contextmenu', e.clientX, e.clientY))
+document.addEventListener('contextmenu', (e) => link.send('*:contextmenu', e.clientX, e.clientY))
 
 // document.addEventListener('mouseout', e => { if (e.clientX < 0) link.send('tray:mouseout') })
 // document.addEventListener('contextmenu', e => link.send('tray:contextmenu', e.clientX, e.clientY))

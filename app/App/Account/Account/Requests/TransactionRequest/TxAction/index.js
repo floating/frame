@@ -4,24 +4,29 @@ import BigNumber from 'bignumber.js'
 
 import svg from '../../../../../../../resources/svg'
 import link from '../../../../../../../resources/link'
-import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../../../resources/Components/Cluster'
+import {
+  ClusterBox,
+  Cluster,
+  ClusterRow,
+  ClusterValue,
+} from '../../../../../../../resources/Components/Cluster'
 import { formatDisplayInteger, isUnlimited } from '../../../../../../../resources/utils/numbers'
 import { DisplayValue } from '../../../../../../../resources/Components/DisplayValue'
 import { getAddress } from '../../../../../../../resources/utils'
 
 class TxSending extends React.Component {
-  constructor (...args) {
+  constructor(...args) {
     super(...args)
     this.state = {
-      copied: false
+      copied: false,
     }
   }
-  copyAddress (data) {
+  copyAddress(data) {
     link.send('tray:clipboardData', data)
     this.setState({ copied: true })
-    setTimeout(_ => this.setState({ copied: false }), 1000)
+    setTimeout((_) => this.setState({ copied: false }), 1000)
   }
-  render () {
+  render() {
     const req = this.props.req
     const contract = req.data.to.toLowerCase()
     const chainId = parseInt(req.data.chainId, 16)
@@ -32,59 +37,84 @@ class TxSending extends React.Component {
 
     if (actionClass === 'erc20') {
       if (actionType === 'transfer') {
-        const { amount, decimals, name, recipient: recipientAddress, symbol, recipientType, recipientEns } = action.data || {}
+        const {
+          amount,
+          decimals,
+          name,
+          recipient: recipientAddress,
+          symbol,
+          recipientType,
+          recipientEns,
+        } = action.data || {}
         const address = getAddress(recipientAddress)
         const ensName = recipientEns
-        
-        // const ensName = (recipientEns && recipientEns.length < 25) ? recipientEns : ''
-        const value = new BigNumber(amount) 
-        const displayValue = value.dividedBy('1e' + decimals).decimalPlaces(6).toFormat()
 
-        const isTestnet = this.store('main.networks', this.props.chain.type, this.props.chain.id, 'isTestnet')    
+        // const ensName = (recipientEns && recipientEns.length < 25) ? recipientEns : ''
+        const value = new BigNumber(amount)
+        const displayValue = value
+          .dividedBy('1e' + decimals)
+          .decimalPlaces(6)
+          .toFormat()
+
+        const isTestnet = this.store('main.networks', this.props.chain.type, this.props.chain.id, 'isTestnet')
         const rate = this.store('main.rates', contract)
-  
+
         return (
           <ClusterBox title={`Sending ${symbol}`} subtitle={name} animationSlot={this.props.i}>
             <Cluster>
               <ClusterRow>
                 <ClusterValue grow={2}>
                   <div className='txSendingValue'>
-                    <DisplayValue type='ether' value={amount} valueDataParams={{ decimals }} currencySymbol={symbol} />
+                    <DisplayValue
+                      type='ether'
+                      value={amount}
+                      valueDataParams={{ decimals }}
+                      currencySymbol={symbol}
+                    />
                   </div>
                 </ClusterValue>
                 <ClusterValue>
                   <span className='_txMainTransferringEq'>{'≈'}</span>
-                  <DisplayValue type='fiat' value={amount} valueDataParams={{ currencyRate: rate && rate.usd, isTestnet }} currencySymbol='$' />
+                  <DisplayValue
+                    type='fiat'
+                    value={amount}
+                    valueDataParams={{ currencyRate: rate && rate.usd, isTestnet }}
+                    currencySymbol='$'
+                  />
                 </ClusterValue>
               </ClusterRow>
               {address && recipientType === 'contract' ? (
                 <ClusterRow>
                   <ClusterValue>
-                    <div className='clusterTag'>
-                      {`to contract on ${chainName}`}
-                    </div>
+                    <div className='clusterTag'>{`to contract on ${chainName}`}</div>
                   </ClusterValue>
                 </ClusterRow>
               ) : address ? (
                 <ClusterRow>
                   <ClusterValue>
-                    <div className='clusterTag'>
-                      {`to account on ${chainName}`}
-                    </div>    
+                    <div className='clusterTag'>{`to account on ${chainName}`}</div>
                   </ClusterValue>
                 </ClusterRow>
               ) : null}
 
               {address && (
                 <ClusterRow>
-                  <ClusterValue pointerEvents={true} onClick={() => {
-                    this.copyAddress(address)
-                  }}>
+                  <ClusterValue
+                    pointerEvents={true}
+                    onClick={() => {
+                      this.copyAddress(address)
+                    }}
+                  >
                     <div className='clusterAddress'>
-                      {ensName
-                        ? <span className='clusterAddressRecipient'>{ensName}</span>
-                        : <span className='clusterAddressRecipient'>{address.substring(0, 8)}{svg.octicon('kebab-horizontal', { height: 15 })}{address.substring(address.length - 6)}</span>
-                      }
+                      {ensName ? (
+                        <span className='clusterAddressRecipient'>{ensName}</span>
+                      ) : (
+                        <span className='clusterAddressRecipient'>
+                          {address.substring(0, 8)}
+                          {svg.octicon('kebab-horizontal', { height: 15 })}
+                          {address.substring(address.length - 6)}
+                        </span>
+                      )}
                       <div className='clusterAddressRecipientFull'>
                         {this.state.copied ? (
                           <span>{'Address Copied'}</span>
@@ -105,16 +135,22 @@ class TxSending extends React.Component {
         const ensName = spenderEns
         const value = new BigNumber(amount)
         const revoke = value.eq(0)
-        const displayAmount = isUnlimited(this.state.amount) ? 'unlimited' : formatDisplayInteger(amount, decimals)
+        const displayAmount = isUnlimited(this.state.amount)
+          ? 'unlimited'
+          : formatDisplayInteger(amount, decimals)
 
         return (
           <ClusterBox title={'Token Approval'} animationSlot={this.props.i}>
             <Cluster>
               {revoke ? (
                 <ClusterRow>
-                  <ClusterValue onClick={() => {
-                    link.send('nav:update', 'panel', { data: { step: 'adjustApproval', actionId: action.id, requestedAmountHex: amount } })
-                  }}>
+                  <ClusterValue
+                    onClick={() => {
+                      link.send('nav:update', 'panel', {
+                        data: { step: 'adjustApproval', actionId: action.id, requestedAmountHex: amount },
+                      })
+                    }}
+                  >
                     <div className='clusterFocus'>
                       <div>{`Revoking Approval To Spend `}</div>
                       <div className='clusterFocusHighlight'>{`${symbol}`}</div>
@@ -123,26 +159,38 @@ class TxSending extends React.Component {
                 </ClusterRow>
               ) : (
                 <ClusterRow>
-                  <ClusterValue onClick={() => {
-                    link.send('nav:update', 'panel', { data: { step: 'adjustApproval', actionId: action.id, requestedAmountHex: amount } })
-                  }}>
+                  <ClusterValue
+                    onClick={() => {
+                      link.send('nav:update', 'panel', {
+                        data: { step: 'adjustApproval', actionId: action.id, requestedAmountHex: amount },
+                      })
+                    }}
+                  >
                     <div className='clusterFocus'>
                       <div>{`Granting Approval To Spend`}</div>
                       <div className='clusterFocusHighlight'>{`${displayAmount} ${symbol}`}</div>
-                    </div>    
+                    </div>
                   </ClusterValue>
                 </ClusterRow>
               )}
               {address && (
                 <ClusterRow>
-                  <ClusterValue pointerEvents={true} onClick={() => {
-                    this.copyAddress(address)
-                  }}>
+                  <ClusterValue
+                    pointerEvents={true}
+                    onClick={() => {
+                      this.copyAddress(address)
+                    }}
+                  >
                     <div className='clusterAddress'>
-                      {ensName
-                        ? <span className='clusterAddressRecipient'>{ensName}</span>
-                        : <span className='clusterAddressRecipient'>{address.substring(0, 8)}{svg.octicon('kebab-horizontal', { height: 15 })}{address.substring(address.length - 6)}</span>
-                      }
+                      {ensName ? (
+                        <span className='clusterAddressRecipient'>{ensName}</span>
+                      ) : (
+                        <span className='clusterAddressRecipient'>
+                          {address.substring(0, 8)}
+                          {svg.octicon('kebab-horizontal', { height: 15 })}
+                          {address.substring(address.length - 6)}
+                        </span>
+                      )}
                       <div className='clusterAddressRecipientFull'>
                         {this.state.copied ? (
                           <span>{'Address Copied'}</span>

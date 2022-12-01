@@ -12,23 +12,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-node@v3
-      with:
-        node-version: 16.15.0
-    - name: Electronegativity
-      uses: doyensec/electronegativity-action@v2.0
-      with:
-        exclude-checks: 'LimitNavigationGlobalCheck'
-    - name: Upload sarif
-      uses: github/codeql-action/upload-sarif@v2
-      with:
-        sarif_file: ../electronegativity_results
-      env:
-        NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
-    - run: |
-        sudo apt update -y
-        sudo apt install -y libudev-dev
-    - run: npm run setup:ci
-    - run: npm run compile
-    - run: npm run test:unit
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.15.0
+      - name: Electronegativity
+        uses: doyensec/electronegativity-action@v2.0
+        with:
+          exclude-checks: 'LimitNavigationGlobalCheck'
+      - name: Upload sarif
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: ../electronegativity_results
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+      - run: |
+          sudo apt update -y
+          sudo apt install -y libudev-dev
+      - run: npm run setup:ci
+      - run: npm run compile
+      - run: npm run test:unit
