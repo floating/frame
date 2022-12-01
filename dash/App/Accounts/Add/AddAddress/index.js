@@ -71,8 +71,8 @@ class AddAddress extends React.Component {
     this.setState({ resolvingEns: true })
   }
 
-  setError (message) {
-    this.setState({ status: `Unable to resolve Ethereum address for ${message}`, error: true })
+  setError (status) {
+    this.setState({ status, error: true })
   }
 
   createFromAddress (address) {
