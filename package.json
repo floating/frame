@@ -33,6 +33,8 @@
     "launch:inspect": "cross-env NODE_ENV=production electron --inspect ./compiled/main",
     "format": "prettier --write '**/*.{j,t}s'",
     "format:check": "prettier --check '**/*.{j,t}s'",
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix .",
     "prod": "npm run compile && npm run bundle && npm run launch",
     "hot": "trap \"kill 0\" exit && npm run bundle:bridge && npm run compile && npm run dev-server & wait-on http://localhost:1234/app/tray.dev.html && npm run launch:hot",
     "compile": "npm run copy-assets && tsc",
