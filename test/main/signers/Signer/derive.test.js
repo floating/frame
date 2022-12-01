@@ -18,7 +18,7 @@ describe('#getDerivationPath', () => {
 
     expect(path).toBe("44'/60'/0'/0")
   })
-  
+
   it('provides a standard derivation path with no index', () => {
     const path = getDerivationPath(Derivation.standard)
 
@@ -71,6 +71,5 @@ describe('#getDerivationPath', () => {
     const path = getDerivationPath(Derivation.live, 0)
 
     expect(path).toBe("44'/60'/0'/0/0")
-    
   })
 })

@@ -6,17 +6,15 @@ import InventoryExpanded from './InventoryExpanded'
 import InventoryCollection from './InventoryCollection'
 
 class Inventory extends React.Component {
-  render () {
-    return (
-      this.props.expanded ? (
-        this.props.expandedData.currentCollection ? (
-          <InventoryCollection {...this.props} />
-        ) : (
-          <InventoryExpanded {...this.props} />
-        )
+  render() {
+    return this.props.expanded ? (
+      this.props.expandedData.currentCollection ? (
+        <InventoryCollection {...this.props} />
       ) : (
-        <InventoryPreview {...this.props} />
+        <InventoryExpanded {...this.props} />
       )
+    ) : (
+      <InventoryPreview {...this.props} />
     )
   }
 }

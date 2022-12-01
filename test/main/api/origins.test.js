@@ -29,16 +29,13 @@ describe('#updateOrigin', () => {
     it('adds a new origin to the store', () => {
       updateOrigin({}, 'frame.test')
 
-      expect(store.initOrigin).toHaveBeenCalledWith(
-        uuidv5('frame.test', uuidv5.DNS),
-        {
-          name: 'frame.test',
-          chain: {
-            type: 'ethereum',
-            id: 1
-          }
-        }
-      )
+      expect(store.initOrigin).toHaveBeenCalledWith(uuidv5('frame.test', uuidv5.DNS), {
+        name: 'frame.test',
+        chain: {
+          type: 'ethereum',
+          id: 1,
+        },
+      })
     })
 
     it('assigns a session to a new origin', () => {
@@ -164,20 +161,20 @@ describe('#isTrusted', () => {
 
   describe('extension requests', () => {
     const trustedExtensionMethods = ['wallet_getEthereumChains']
-  
+
     trustedExtensionMethods.forEach((method) => {
       it(`trusts all requests for ${method} from the frame extension`, async () => {
         const payload = { method, _origin: 'ac93061b-3575-40c5-b526-4932b02e1f3f' }
         store.set('main.origins', payload._origin, { name: 'frame-extension' })
-    
+
         return expect(isTrusted(payload)).resolves.toBe(true)
       })
     })
-  
+
     it('does not trust requests from the frame extension by default', async () => {
       const payload = { method: 'eth_accounts', _origin: 'ac93061b-3575-40c5-b526-4932b02e1f3f' }
       store.set('main.origins', payload._origin, { name: 'frame-extension' })
-  
+
       return expect(isTrusted(payload)).resolves.toBe(false)
     })
   })
@@ -200,14 +197,14 @@ describe('#isTrusted', () => {
   it('trusts an origin that has been previously granted permission', async () => {
     const address = '0xDAFEA492D9c6733ae3d56b7Ed1ADB60692c98Bc5'
     const payload = { method: 'eth_accounts', _origin: frameTestOriginId }
-    
+
     accounts.current.mockReturnValueOnce({ address })
 
     store.set('main.permissions', address, {
       'c004cc87-bfa3-50f5-812f-3d70dd8f82c6': {
         origin: 'test.frame.eth',
-        provider: true
-      }
+        provider: true,
+      },
     })
 
     return expect(isTrusted(payload)).resolves.toBe(true)
@@ -216,7 +213,7 @@ describe('#isTrusted', () => {
   it('sends a request to grant permission to the user', async () => {
     const address = '0xDAFEA492D9c6733ae3d56b7Ed1ADB60692c98Bc5'
     const payload = { method: 'eth_accounts', _origin: frameTestOriginId }
-    
+
     accounts.current.mockReturnValueOnce({ address })
 
     accounts.addRequest.mockImplementationOnce((request, cb) => {
@@ -226,8 +223,8 @@ describe('#isTrusted', () => {
         origin: frameTestOriginId,
         account: address,
         payload: {
-          method: 'eth_accounts'
-        }
+          method: 'eth_accounts',
+        },
       })
 
       cb()
@@ -238,7 +235,7 @@ describe('#isTrusted', () => {
 
   const userActions = [
     { actionTaken: 'accepted', outcome: 'grants' },
-    { actionTaken: 'declined', outcome: 'refuses' }
+    { actionTaken: 'declined', outcome: 'refuses' },
   ]
 
   userActions.forEach(({ actionTaken, outcome }) => {
@@ -246,21 +243,21 @@ describe('#isTrusted', () => {
       const permissionGranted = actionTaken === 'grants'
       const address = '0xDAFEA492D9c6733ae3d56b7Ed1ADB60692c98Bc5'
       const payload = { method: 'eth_accounts', _origin: 'bf93061b-3575-40c5-b526-4932b02e1f3f' }
-      
+
       accounts.current.mockReturnValueOnce({ address })
-  
+
       // simulate user acting on request
       accounts.addRequest.mockImplementationOnce((request, cb) => {
         store.set('main.permissions', address, {
           'c004cc87-bfa3-50f5-812f-3d70dd8f82c6': {
             origin: 'test.frame.eth',
-            provider: permissionGranted
-          }
+            provider: permissionGranted,
+          },
         })
-  
+
         cb()
       })
-  
+
       return expect(isTrusted(payload)).resolves.toBe(permissionGranted)
     })
   })

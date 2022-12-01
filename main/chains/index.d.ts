@@ -24,8 +24,8 @@ declare class Chains extends EventEmitter {
     }
   }
 
-  syncDataEmit (data: any): void;
-  send (payload: JSONRPCRequestPayload, cb: RPCRequestCallback, targetChain?: Chain): void;
+  syncDataEmit(data: any): void
+  send(payload: JSONRPCRequestPayload, cb: RPCRequestCallback, targetChain?: Chain): void
 }
 
 declare const chainConnection: Chains

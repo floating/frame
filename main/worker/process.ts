@@ -27,7 +27,7 @@ export default class WorkerProcess extends EventEmitter {
   private readonly worker: ChildProcess
   private readonly name: string
 
-  constructor (opts: WorkerOptions) {
+  constructor(opts: WorkerOptions) {
     super()
 
     this.name = opts.name
@@ -36,14 +36,10 @@ export default class WorkerProcess extends EventEmitter {
 
     log.verbose('creating worker with path:', opts.modulePath + ' ' + (opts.args || []).join(' '))
 
-    this.worker = fork(
-      opts.modulePath,
-      opts.args,
-      {
-        signal,
-        env: opts.env as NodeJS.ProcessEnv
-      }
-    )
+    this.worker = fork(opts.modulePath, opts.args, {
+      signal,
+      env: opts.env as NodeJS.ProcessEnv,
+    })
 
     log.info(`created ${this.name} worker, pid: ${this.worker.pid}`)
 
@@ -56,22 +52,22 @@ export default class WorkerProcess extends EventEmitter {
 
     this.worker.on('message', (message: WorkerProcessMessage) => this.emit(message.event, message.payload))
 
-    this.worker.once('error', err => {
+    this.worker.once('error', (err) => {
       log.warn(`worker process ${this.name} raised error: ${err}`)
       this.kill()
     })
 
-    this.worker.once('exit', code => {
+    this.worker.once('exit', (code) => {
       log.verbose(`worker process ${this.name} exited with code: ${code}`)
       this.kill()
     })
   }
 
-  send (command: string, ...args: any[]) {
+  send(command: string, ...args: any[]) {
     this.worker.send({ command, args })
   }
 
-  kill (signal?: NodeJS.Signals) {
+  kill(signal?: NodeJS.Signals) {
     this.emit('exit')
 
     this.removeAllListeners()

@@ -4,33 +4,29 @@ import { TransactionFactory, TypedTransaction } from '@ethereumjs/tx'
 import { Common } from '@ethereumjs/common'
 
 import { AppVersion, SignerSummary } from '../signers/Signer'
-import {
-  GasFeesSource,
-  TransactionData,
-  typeSupportsBaseFee,
-} from '../../resources/domain/transaction'
+import { GasFeesSource, TransactionData, typeSupportsBaseFee } from '../../resources/domain/transaction'
 import chainConfig from '../chains/config'
 
 const londonHardforkSigners: SignerCompatibilityByVersion = {
   seed: () => true,
   ring: () => true,
-  ledger: version => version.major >= 2 || (version.major >= 1 && version.minor >= 9),
+  ledger: (version) => version.major >= 2 || (version.major >= 1 && version.minor >= 9),
   trezor: (version, model) => {
     if ((model || '').toLowerCase() === 'trezor one') {
-      return version.major >= 2 ||
-        (
-          version.major >= 1 &&
-            (
-              version.minor > 10 ||
-              (version.minor === 10 && version.patch >= 4)
-            )
-        )
+      return (
+        version.major >= 2 ||
+        (version.major >= 1 && (version.minor > 10 || (version.minor === 10 && version.patch >= 4)))
+      )
     }
 
     // 3.x+, 2.5.x+, or 2.4.2+
-    return version.major >= 3 || (version.major === 2 && version.minor >= 5) || (version.major === 2 && version.minor === 4 && version.patch >= 2)
+    return (
+      version.major >= 3 ||
+      (version.major === 2 && version.minor >= 5) ||
+      (version.major === 2 && version.minor === 4 && version.patch >= 2)
+    )
   },
-  lattice: version =>  version.major >= 1 || version.minor >= 11
+  lattice: (version) => version.major >= 1 || version.minor >= 11,
 }
 
 type SignerCompatibilityByVersion = {
@@ -38,32 +34,33 @@ type SignerCompatibilityByVersion = {
 }
 
 export interface Signature {
-  v: string,
-  r: string,
+  v: string
+  r: string
   s: string
 }
 
-export interface SignerCompatibility  {
-  signer: string,
-  tx: string,
+export interface SignerCompatibility {
+  signer: string
+  tx: string
   compatible: boolean
 }
 
-function signerCompatibility(
-  txData: TransactionData,
-  signer: SignerSummary
-): SignerCompatibility {
+function signerCompatibility(txData: TransactionData, signer: SignerSummary): SignerCompatibility {
   if (typeSupportsBaseFee(txData.type)) {
-    const compatible = (signer.type in londonHardforkSigners) && londonHardforkSigners[signer.type](signer.appVersion, signer.model)
+    const compatible =
+      signer.type in londonHardforkSigners &&
+      londonHardforkSigners[signer.type](signer.appVersion, signer.model)
     return { signer: signer.type, tx: 'london', compatible }
   }
 
   return {
-    signer: signer.type, tx: 'legacy', compatible: true
+    signer: signer.type,
+    tx: 'legacy',
+    compatible: true,
   }
 }
 
-function londonToLegacy (txData: TransactionData): TransactionData {
+function londonToLegacy(txData: TransactionData): TransactionData {
   if (txData.type === '0x2') {
     const { type, maxFeePerGas, maxPriorityFeePerGas, ...tx } = txData
 
@@ -73,7 +70,7 @@ function londonToLegacy (txData: TransactionData): TransactionData {
   return txData
 }
 
-function maxFee (rawTx: TransactionData) {
+function maxFee(rawTx: TransactionData) {
   const chainId = parseInt(rawTx.chainId)
 
   // for ETH-based chains, the max fee should be 2 ETH
@@ -95,7 +92,7 @@ function calculateMaxFeePerGas(maxBaseFee: string, maxPriorityFee: string) {
   return addHexPrefix(maxFeePerGas)
 }
 
-function populate (rawTx: TransactionData, chainConfig: Common, gas: GasData): TransactionData {
+function populate(rawTx: TransactionData, chainConfig: Common, gas: GasData): TransactionData {
   const txData: TransactionData = { ...rawTx }
 
   // non-EIP-1559 case
@@ -115,10 +112,11 @@ function populate (rawTx: TransactionData, chainConfig: Common, gas: GasData): T
 
   // EIP-1559 case
   txData.type = intToHex(2)
-    
+
   const useFrameMaxFeePerGas = !rawTx.maxFeePerGas || isNaN(parseInt(rawTx.maxFeePerGas, 16))
-  const useFrameMaxPriorityFeePerGas = !rawTx.maxPriorityFeePerGas || isNaN(parseInt(rawTx.maxPriorityFeePerGas, 16))
-  
+  const useFrameMaxPriorityFeePerGas =
+    !rawTx.maxPriorityFeePerGas || isNaN(parseInt(rawTx.maxPriorityFeePerGas, 16))
+
   if (!useFrameMaxFeePerGas && !useFrameMaxPriorityFeePerGas) {
     // return tx unaltered when we are using no Frame-supplied values
     return txData
@@ -129,10 +127,14 @@ function populate (rawTx: TransactionData, chainConfig: Common, gas: GasData): T
     txData.gasFeesSource = GasFeesSource.Frame
   }
 
-  const maxPriorityFee = useFrameMaxPriorityFeePerGas ? gas.price.fees.maxPriorityFeePerGas : rawTx.maxPriorityFeePerGas as string
+  const maxPriorityFee = useFrameMaxPriorityFeePerGas
+    ? gas.price.fees.maxPriorityFeePerGas
+    : (rawTx.maxPriorityFeePerGas as string)
 
   // if no valid dapp-supplied value for maxFeePerGas we calculate it
-  txData.maxFeePerGas = useFrameMaxFeePerGas ? calculateMaxFeePerGas(gas.price.fees.maxBaseFeePerGas, maxPriorityFee) : txData.maxFeePerGas
+  txData.maxFeePerGas = useFrameMaxFeePerGas
+    ? calculateMaxFeePerGas(gas.price.fees.maxBaseFeePerGas, maxPriorityFee)
+    : txData.maxFeePerGas
 
   // if no valid dapp-supplied value for maxPriorityFeePerGas we use the Frame-supplied value
   txData.maxPriorityFeePerGas = useFrameMaxPriorityFeePerGas
@@ -142,36 +144,33 @@ function populate (rawTx: TransactionData, chainConfig: Common, gas: GasData): T
   return txData
 }
 
-function hexifySignature ({ v, r, s }: Signature) {
+function hexifySignature({ v, r, s }: Signature) {
   return {
     v: addHexPrefix(v),
     r: addHexPrefix(r),
-    s: addHexPrefix(s)
+    s: addHexPrefix(s),
   }
 }
 
-async function sign (rawTx: TransactionData, signingFn: (tx: TypedTransaction) => Promise<Signature>) {
-  const common = chainConfig(parseInt(rawTx.chainId, 16), parseInt(rawTx.type, 16) === 2 ? 'london' : 'berlin')
+async function sign(rawTx: TransactionData, signingFn: (tx: TypedTransaction) => Promise<Signature>) {
+  const common = chainConfig(
+    parseInt(rawTx.chainId, 16),
+    parseInt(rawTx.type, 16) === 2 ? 'london' : 'berlin'
+  )
 
   const tx = TransactionFactory.fromTxData(rawTx, { common })
 
-  return signingFn(tx).then(sig => {
+  return signingFn(tx).then((sig) => {
     const signature = hexifySignature(sig)
 
     return TransactionFactory.fromTxData(
       {
         ...rawTx,
-        ...signature
+        ...signature,
       },
       { common }
     )
   })
 }
 
-export {
-  maxFee,
-  populate,
-  sign,
-  signerCompatibility,
-  londonToLegacy
-}
+export { maxFee, populate, sign, signerCompatibility, londonToLegacy }

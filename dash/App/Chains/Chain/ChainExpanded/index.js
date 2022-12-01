@@ -3,11 +3,22 @@ import link from '../../../../../resources/link'
 
 import Connection from '../Connection'
 
-import { SubmitChainButton, ChainHeader, EditChainColor, EditChainName, EditChainSymbol, EditChainId, EditTestnet, EditChainExplorer, ChainFooter } from '../Components'
+import {
+  SubmitChainButton,
+  ChainHeader,
+  EditChainColor,
+  EditChainName,
+  EditChainSymbol,
+  EditChainId,
+  EditTestnet,
+  EditChainExplorer,
+  ChainFooter,
+} from '../Components'
 
 export default (props) => {
   // props
-  const { id, name, type, explorer, symbol, isTestnet, filter, on, connection, primaryColor, icon, price } = props
+  const { id, name, type, explorer, symbol, isTestnet, filter, on, connection, primaryColor, icon, price } =
+    props
   const chain = { id, type, name, isTestnet, symbol, explorer, primaryColor }
 
   // state
@@ -19,7 +30,15 @@ export default (props) => {
 
   // effects
   useEffect(() => {
-    const updatedChain = { id, type, name: currentName, primaryColor: currentColor, isTestnet: currentTestnet, symbol: currentSymbol, explorer: currentExplorer }
+    const updatedChain = {
+      id,
+      type,
+      name: currentName,
+      primaryColor: currentColor,
+      isTestnet: currentTestnet,
+      symbol: currentSymbol,
+      explorer: currentExplorer,
+    }
     link.send('tray:action', 'updateNetwork', chain, updatedChain)
   }, [currentColor, currentName, currentSymbol, currentExplorer, currentTestnet])
 
@@ -31,7 +50,7 @@ export default (props) => {
 
   return (
     <div key={'expandedChain'} className='network cardShow'>
-      <ChainHeader 
+      <ChainHeader
         type={type}
         id={id}
         primaryColor={currentColor}
@@ -40,34 +59,14 @@ export default (props) => {
         on={on}
         showToggle={true}
       />
-      <EditChainColor 
-        currentColor={primaryColor} 
-        onChange={setPrimaryColor}
-      />
-      <EditChainName
-        currentName={currentName}
-        onChange={setName}
-      />
-      <EditChainExplorer
-        currentExplorer={currentExplorer}
-        onChange={setExplorer}
-      />
-      <EditChainSymbol
-        currentSymbol={currentSymbol}
-        onChange={setSymbol}
-      />
+      <EditChainColor currentColor={primaryColor} onChange={setPrimaryColor} />
+      <EditChainName currentName={currentName} onChange={setName} />
+      <EditChainExplorer currentExplorer={currentExplorer} onChange={setExplorer} />
+      <EditChainSymbol currentSymbol={currentSymbol} onChange={setSymbol} />
       <div className='chainRow'>
-        <ChainFooter
-          symbol={symbol}
-          price={price}
-        />
+        <ChainFooter symbol={symbol} price={price} />
       </div>
-      {!isMainnet && (
-        <EditTestnet
-          testnet={currentTestnet}
-          onChange={setTestnet}
-        />
-      )}
+      {!isMainnet && <EditTestnet testnet={currentTestnet} onChange={setTestnet} />}
       <div className='chainModules'>
         <Connection expanded={true} connection={connection} {...chain} />
       </div>
@@ -78,12 +77,17 @@ export default (props) => {
             enabled={true}
             textColor={'var(--bad)'}
             onClick={() => {
-              const confirmAction = { view: 'notify', data: { notify: 'confirmRemoveChain', notifyData: { chain } } }
+              const confirmAction = {
+                view: 'notify',
+                data: { notify: 'confirmRemoveChain', notifyData: { chain } },
+              }
               link.send('tray:action', 'navDash', confirmAction)
             }}
           />
         </div>
-      ) : <div style={{ height: '8px' }} />}
+      ) : (
+        <div style={{ height: '8px' }} />
+      )}
     </div>
   )
 }

@@ -5,87 +5,87 @@ module.exports = {
       inputs: [
         {
           name: 'node',
-          type: 'bytes32'
-        }
+          type: 'bytes32',
+        },
       ],
       name: 'resolver',
       outputs: [
         {
           name: '',
-          type: 'address'
-        }
+          type: 'address',
+        },
       ],
-      type: 'function'
+      type: 'function',
     },
     {
       constant: true,
       inputs: [
         {
           name: 'node',
-          type: 'bytes32'
-        }
+          type: 'bytes32',
+        },
       ],
       name: 'owner',
       outputs: [
         {
           name: '',
-          type: 'address'
-        }
+          type: 'address',
+        },
       ],
-      type: 'function'
+      type: 'function',
     },
     {
       constant: false,
       inputs: [
         {
           name: 'node',
-          type: 'bytes32'
+          type: 'bytes32',
         },
         {
           name: 'resolver',
-          type: 'address'
-        }
+          type: 'address',
+        },
       ],
       name: 'setResolver',
       outputs: [],
-      type: 'function'
+      type: 'function',
     },
     {
       constant: false,
       inputs: [
         {
           name: 'node',
-          type: 'bytes32'
+          type: 'bytes32',
         },
         {
           name: 'label',
-          type: 'bytes32'
+          type: 'bytes32',
         },
         {
           name: 'owner',
-          type: 'address'
-        }
+          type: 'address',
+        },
       ],
       name: 'setSubnodeOwner',
       outputs: [],
-      type: 'function'
+      type: 'function',
     },
     {
       constant: false,
       inputs: [
         {
           name: 'node',
-          type: 'bytes32'
+          type: 'bytes32',
         },
         {
           name: 'owner',
-          type: 'address'
-        }
+          type: 'address',
+        },
       ],
       name: 'setOwner',
       outputs: [],
-      type: 'function'
-    }
+      type: 'function',
+    },
   ],
   resolver: [
     {
@@ -93,280 +93,280 @@ module.exports = {
       inputs: [
         {
           name: 'interfaceID',
-          type: 'bytes4'
-        }
+          type: 'bytes4',
+        },
       ],
       name: 'supportsInterface',
       outputs: [
         {
           name: '',
-          type: 'bool'
-        }
+          type: 'bool',
+        },
       ],
       payable: false,
       stateMutability: 'pure',
-      type: 'function'
+      type: 'function',
     },
     {
       constant: false,
       inputs: [
         {
           name: 'node',
-          type: 'bytes32'
+          type: 'bytes32',
         },
         {
           name: 'key',
-          type: 'string'
+          type: 'string',
         },
         {
           name: 'value',
-          type: 'string'
-        }
+          type: 'string',
+        },
       ],
       name: 'setText',
       outputs: [],
       payable: false,
       stateMutability: 'nonpayable',
-      type: 'function'
+      type: 'function',
     },
     {
       constant: true,
       inputs: [
         {
           name: 'node',
-          type: 'bytes32'
+          type: 'bytes32',
         },
         {
           name: 'contentTypes',
-          type: 'uint256'
-        }
+          type: 'uint256',
+        },
       ],
       name: 'ABI',
       outputs: [
         {
           name: 'contentType',
-          type: 'uint256'
+          type: 'uint256',
         },
         {
           name: 'data',
-          type: 'bytes'
-        }
+          type: 'bytes',
+        },
       ],
       payable: false,
       stateMutability: 'view',
-      type: 'function'
+      type: 'function',
     },
     {
       constant: false,
       inputs: [
         {
           name: 'node',
-          type: 'bytes32'
+          type: 'bytes32',
         },
         {
           name: 'x',
-          type: 'bytes32'
+          type: 'bytes32',
         },
         {
           name: 'y',
-          type: 'bytes32'
-        }
+          type: 'bytes32',
+        },
       ],
       name: 'setPubkey',
       outputs: [],
       payable: false,
       stateMutability: 'nonpayable',
-      type: 'function'
+      type: 'function',
     },
     {
       constant: false,
       inputs: [
         {
           name: 'node',
-          type: 'bytes32'
+          type: 'bytes32',
         },
         {
           name: 'hash',
-          type: 'bytes'
-        }
+          type: 'bytes',
+        },
       ],
       name: 'setContenthash',
       outputs: [],
       payable: false,
       stateMutability: 'nonpayable',
-      type: 'function'
+      type: 'function',
     },
     {
       constant: true,
       inputs: [
         {
           name: 'node',
-          type: 'bytes32'
-        }
+          type: 'bytes32',
+        },
       ],
       name: 'addr',
       outputs: [
         {
           name: '',
-          type: 'address'
-        }
+          type: 'address',
+        },
       ],
       payable: false,
       stateMutability: 'view',
-      type: 'function'
+      type: 'function',
     },
     {
       constant: true,
       inputs: [
         {
           name: 'node',
-          type: 'bytes32'
+          type: 'bytes32',
         },
         {
           name: 'key',
-          type: 'string'
-        }
+          type: 'string',
+        },
       ],
       name: 'text',
       outputs: [
         {
           name: '',
-          type: 'string'
-        }
+          type: 'string',
+        },
       ],
       payable: false,
       stateMutability: 'view',
-      type: 'function'
+      type: 'function',
     },
     {
       constant: false,
       inputs: [
         {
           name: 'node',
-          type: 'bytes32'
+          type: 'bytes32',
         },
         {
           name: 'contentType',
-          type: 'uint256'
+          type: 'uint256',
         },
         {
           name: 'data',
-          type: 'bytes'
-        }
+          type: 'bytes',
+        },
       ],
       name: 'setABI',
       outputs: [],
       payable: false,
       stateMutability: 'nonpayable',
-      type: 'function'
+      type: 'function',
     },
     {
       constant: true,
       inputs: [
         {
           name: 'node',
-          type: 'bytes32'
-        }
+          type: 'bytes32',
+        },
       ],
       name: 'name',
       outputs: [
         {
           name: '',
-          type: 'string'
-        }
+          type: 'string',
+        },
       ],
       payable: false,
       stateMutability: 'view',
-      type: 'function'
+      type: 'function',
     },
     {
       constant: false,
       inputs: [
         {
           name: 'node',
-          type: 'bytes32'
+          type: 'bytes32',
         },
         {
           name: 'name',
-          type: 'string'
-        }
+          type: 'string',
+        },
       ],
       name: 'setName',
       outputs: [],
       payable: false,
       stateMutability: 'nonpayable',
-      type: 'function'
+      type: 'function',
     },
     {
       constant: true,
       inputs: [
         {
           name: 'node',
-          type: 'bytes32'
-        }
+          type: 'bytes32',
+        },
       ],
       name: 'contenthash',
       outputs: [
         {
           name: '',
-          type: 'bytes'
-        }
+          type: 'bytes',
+        },
       ],
       payable: false,
       stateMutability: 'view',
-      type: 'function'
+      type: 'function',
     },
     {
       constant: true,
       inputs: [
         {
           name: 'node',
-          type: 'bytes32'
-        }
+          type: 'bytes32',
+        },
       ],
       name: 'pubkey',
       outputs: [
         {
           name: 'x',
-          type: 'bytes32'
+          type: 'bytes32',
         },
         {
           name: 'y',
-          type: 'bytes32'
-        }
+          type: 'bytes32',
+        },
       ],
       payable: false,
       stateMutability: 'view',
-      type: 'function'
+      type: 'function',
     },
     {
       constant: false,
       inputs: [
         {
           name: 'node',
-          type: 'bytes32'
+          type: 'bytes32',
         },
         {
           name: 'addr',
-          type: 'address'
-        }
+          type: 'address',
+        },
       ],
       name: 'setAddr',
       outputs: [],
       payable: false,
       stateMutability: 'nonpayable',
-      type: 'function'
+      type: 'function',
     },
     {
       inputs: [
         {
           name: 'ensAddr',
-          type: 'address'
-        }
+          type: 'address',
+        },
       ],
       payable: false,
       stateMutability: 'nonpayable',
-      type: 'constructor'
+      type: 'constructor',
     },
     {
       anonymous: false,
@@ -374,16 +374,16 @@ module.exports = {
         {
           indexed: true,
           name: 'node',
-          type: 'bytes32'
+          type: 'bytes32',
         },
         {
           indexed: false,
           name: 'a',
-          type: 'address'
-        }
+          type: 'address',
+        },
       ],
       name: 'AddrChanged',
-      type: 'event'
+      type: 'event',
     },
     {
       anonymous: false,
@@ -391,16 +391,16 @@ module.exports = {
         {
           indexed: true,
           name: 'node',
-          type: 'bytes32'
+          type: 'bytes32',
         },
         {
           indexed: false,
           name: 'name',
-          type: 'string'
-        }
+          type: 'string',
+        },
       ],
       name: 'NameChanged',
-      type: 'event'
+      type: 'event',
     },
     {
       anonymous: false,
@@ -408,16 +408,16 @@ module.exports = {
         {
           indexed: true,
           name: 'node',
-          type: 'bytes32'
+          type: 'bytes32',
         },
         {
           indexed: true,
           name: 'contentType',
-          type: 'uint256'
-        }
+          type: 'uint256',
+        },
       ],
       name: 'ABIChanged',
-      type: 'event'
+      type: 'event',
     },
     {
       anonymous: false,
@@ -425,21 +425,21 @@ module.exports = {
         {
           indexed: true,
           name: 'node',
-          type: 'bytes32'
+          type: 'bytes32',
         },
         {
           indexed: false,
           name: 'x',
-          type: 'bytes32'
+          type: 'bytes32',
         },
         {
           indexed: false,
           name: 'y',
-          type: 'bytes32'
-        }
+          type: 'bytes32',
+        },
       ],
       name: 'PubkeyChanged',
-      type: 'event'
+      type: 'event',
     },
     {
       anonymous: false,
@@ -447,21 +447,21 @@ module.exports = {
         {
           indexed: true,
           name: 'node',
-          type: 'bytes32'
+          type: 'bytes32',
         },
         {
           indexed: false,
           name: 'indexedKey',
-          type: 'string'
+          type: 'string',
         },
         {
           indexed: false,
           name: 'key',
-          type: 'string'
-        }
+          type: 'string',
+        },
       ],
       name: 'TextChanged',
-      type: 'event'
+      type: 'event',
     },
     {
       anonymous: false,
@@ -469,16 +469,16 @@ module.exports = {
         {
           indexed: true,
           name: 'node',
-          type: 'bytes32'
+          type: 'bytes32',
         },
         {
           indexed: false,
           name: 'hash',
-          type: 'bytes'
-        }
+          type: 'bytes',
+        },
       ],
       name: 'ContenthashChanged',
-      type: 'event'
-    }
-  ]
+      type: 'event',
+    },
+  ],
 }

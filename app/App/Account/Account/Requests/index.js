@@ -13,16 +13,13 @@ import TxOverview from './TransactionRequest/TxMainNew/overview'
 
 import RequestItem from '../../../../../resources/Components/RequestItem'
 
-
 import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../resources/Components/Cluster'
-
-
 
 import link from '../../../../../resources/link'
 import svg from '../../../../../resources/svg'
 
 class Requests extends React.Component {
-  constructor (props, context) {
+  constructor(props, context) {
     super(props, context)
     this.state = {
       minimized: false,
@@ -32,7 +29,9 @@ class Requests extends React.Component {
     this.moduleRef = React.createRef()
     this.resizeObserver = new ResizeObserver(() => {
       if (this.moduleRef && this.moduleRef.current) {
-        link.send('tray:action', 'updateAccountModule', props._id, { height: this.moduleRef.current.clientHeight })
+        link.send('tray:action', 'updateAccountModule', props._id, {
+          height: this.moduleRef.current.clientHeight,
+        })
       }
     })
   }
@@ -47,7 +46,7 @@ class Requests extends React.Component {
   //   }
   // }
 
-  minimize () {
+  minimize() {
     this.setState({ minimized: true })
   }
 
@@ -71,13 +70,15 @@ class Requests extends React.Component {
   //   }
   // }
 
-  componentDidMount () {
+  componentDidMount() {
     this.resizeObserver.observe(this.moduleRef.current)
     if (this.moduleRef && this.moduleRef.current) {
-      link.send('tray:action', 'updateAccountModule', this.props._id, { height: this.moduleRef.current.clientHeight })
+      link.send('tray:action', 'updateAccountModule', this.props._id, {
+        height: this.moduleRef.current.clientHeight,
+      })
     }
     setTimeout(() => {
-      const current = (this.store('selected.current') === this.props.id) && this.props.status === 'ok'
+      const current = this.store('selected.current') === this.props.id && this.props.status === 'ok'
       const open = current && this.store('selected.open')
       if (open && this.props.signer && this.unlockInput) {
         const signer = this.store('main.signers', this.props.signer)
@@ -87,26 +88,25 @@ class Requests extends React.Component {
   }
 
   // componentDidMount () {
-    
-  //   // link.send('tray:action', 'updateAccountModule', this.props.id, { height: this.moduleRef.current.clientHeight })
-  // } 
 
-  render () {
-    const activeAccount =  this.store('main.accounts', this.props.id)
-    const requests = Object.values(activeAccount.requests || {}).sort((a, b) => {
-      if (a.created > b.created) return -1
-      if (a.created < b.created) return 1
-      return 0
-    }).filter(req => {
-      const elapsed = Date.now() - (req && req.created || 0)
-      return elapsed > 1000
-    })
+  //   // link.send('tray:action', 'updateAccountModule', this.props.id, { height: this.moduleRef.current.clientHeight })
+  // }
+
+  render() {
+    const activeAccount = this.store('main.accounts', this.props.id)
+    const requests = Object.values(activeAccount.requests || {})
+      .sort((a, b) => {
+        if (a.created > b.created) return -1
+        if (a.created < b.created) return 1
+        return 0
+      })
+      .filter((req) => {
+        const elapsed = Date.now() - ((req && req.created) || 0)
+        return elapsed > 1000
+      })
 
     return (
-      <div 
-        ref={this.moduleRef}
-        className='balancesBlock'
-      >
+      <div ref={this.moduleRef} className='balancesBlock'>
         <div className={'moduleHeader'}>
           <span>{svg.inbox(13)}</span>
           <span>{'Requests'}</span>
@@ -123,11 +123,11 @@ class Requests extends React.Component {
                 return (
                   <RequestItem
                     key={req.type + i}
-                    req={req} 
+                    req={req}
                     account={this.props.id}
                     handlerId={req.handlerId}
                     i={i}
-                    title={'Account Access'} 
+                    title={'Account Access'}
                     color={'var(--outerspace)'}
                     svgName={'accounts'}
                   >
@@ -135,11 +135,7 @@ class Requests extends React.Component {
                       <ClusterRow>
                         <ClusterValue grow={2}>
                           <div className='requestItemTitleSub' style={{ padding: '16px' }}>
-                            <div 
-                              className='requestItemTitleSubIcon'
-                            >
-                              {svg.window(10)}
-                            </div>
+                            <div className='requestItemTitleSubIcon'>{svg.window(10)}</div>
                             <div className='requestItemTitleSubText'>
                               {this.store('main.origins', req.origin, 'name')}
                             </div>
@@ -151,7 +147,7 @@ class Requests extends React.Component {
                 )
               } else if (req.type === 'sign') {
                 return (
-                  <RequestItem 
+                  <RequestItem
                     key={req.type + i}
                     req={req}
                     account={this.props.id}
@@ -164,12 +160,8 @@ class Requests extends React.Component {
                     <Cluster>
                       <ClusterRow>
                         <ClusterValue grow={2}>
-                          <div className='requestItemTitleSub'  style={{ padding: '16px' }}>
-                            <div 
-                              className='requestItemTitleSubIcon'
-                            >
-                              {svg.window(10)}
-                            </div>
+                          <div className='requestItemTitleSub' style={{ padding: '16px' }}>
+                            <div className='requestItemTitleSubIcon'>{svg.window(10)}</div>
                             <div className='requestItemTitleSubText'>
                               {this.store('main.origins', req.origin, 'name')}
                             </div>
@@ -187,19 +179,15 @@ class Requests extends React.Component {
                     account={this.props.id}
                     handlerId={req.handlerId}
                     i={i}
-                    title={'Sign Data'} 
+                    title={'Sign Data'}
                     color={'var(--outerspace)'}
                     svgName={'sign'}
                   >
                     <Cluster>
                       <ClusterRow>
                         <ClusterValue grow={2}>
-                          <div className='requestItemTitleSub'  style={{ padding: '16px' }}>
-                            <div 
-                              className='requestItemTitleSubIcon'
-                            >
-                              {svg.window(10)}
-                            </div>
+                          <div className='requestItemTitleSub' style={{ padding: '16px' }}>
+                            <div className='requestItemTitleSubIcon'>{svg.window(10)}</div>
                             <div className='requestItemTitleSubText'>
                               {this.store('main.origins', req.origin, 'name')}
                             </div>
@@ -209,27 +197,23 @@ class Requests extends React.Component {
                     </Cluster>
                   </RequestItem>
                 )
-              } else if (req.type === 'addChain') { 
+              } else if (req.type === 'addChain') {
                 return (
-                  <RequestItem 
+                  <RequestItem
                     key={req.type + i}
-                    req={req} 
+                    req={req}
                     account={this.props.id}
                     handlerId={req.handlerId}
-                    i={i} 
-                    title={'Add Chain'} 
+                    i={i}
+                    title={'Add Chain'}
                     color={'var(--outerspace)'}
                     svgName={'chain'}
                   >
                     <Cluster>
                       <ClusterRow>
                         <ClusterValue grow={2}>
-                          <div className='requestItemTitleSub'  style={{ padding: '16px' }}>
-                            <div 
-                              className='requestItemTitleSubIcon'
-                            >
-                              {svg.window(10)}
-                            </div>
+                          <div className='requestItemTitleSub' style={{ padding: '16px' }}>
+                            <div className='requestItemTitleSubIcon'>{svg.window(10)}</div>
                             <div className='requestItemTitleSubText'>
                               {this.store('main.origins', req.origin, 'name')}
                             </div>
@@ -254,12 +238,8 @@ class Requests extends React.Component {
                     <Cluster>
                       <ClusterRow>
                         <ClusterValue grow={2}>
-                          <div className='requestItemTitleSub'  style={{ padding: '16px' }}>
-                            <div 
-                              className='requestItemTitleSubIcon'
-                            >
-                              {svg.window(10)}
-                            </div>
+                          <div className='requestItemTitleSub' style={{ padding: '16px' }}>
+                            <div className='requestItemTitleSubIcon'>{svg.window(10)}</div>
                             <div className='requestItemTitleSubText'>
                               {this.store('main.origins', req.origin, 'name')}
                             </div>
@@ -269,7 +249,7 @@ class Requests extends React.Component {
                     </Cluster>
                   </RequestItem>
                 )
-              } else if (req.type === 'addToken')  {
+              } else if (req.type === 'addToken') {
                 return (
                   <RequestItem
                     key={req.type + i}
@@ -285,11 +265,7 @@ class Requests extends React.Component {
                       <ClusterRow>
                         <ClusterValue grow={2}>
                           <div className='requestItemTitleSub' style={{ padding: '16px' }}>
-                            <div 
-                              className='requestItemTitleSubIcon'
-                            >
-                              {svg.window(10)}
-                            </div>
+                            <div className='requestItemTitleSubIcon'>{svg.window(10)}</div>
                             <div className='requestItemTitleSubText'>
                               {this.store('main.origins', req.origin, 'name')}
                             </div>
@@ -299,29 +275,33 @@ class Requests extends React.Component {
                     </Cluster>
                   </RequestItem>
                 )
-              } else if (req.type === 'transaction')  {
+              } else if (req.type === 'transaction') {
                 const chainId = parseInt(req.data.chainId, 16)
-                const chainName = this.store('main.networks.ethereum', chainId, 'name') 
-                const { primaryColor, icon, nativeCurrency:{symbol: currentSymbol = '?'} } = this.store('main.networksMeta.ethereum', chainId)
+                const chainName = this.store('main.networks.ethereum', chainId, 'name')
+                const {
+                  primaryColor,
+                  icon,
+                  nativeCurrency: { symbol: currentSymbol = '?' },
+                } = this.store('main.networksMeta.ethereum', chainId)
                 const txMeta = { replacement: false, possible: true, notice: '' }
                 const originName = this.store('main.origins', req.origin, 'name')
                 return (
-                  <RequestItem 
+                  <RequestItem
                     key={req.type + i}
                     req={req}
                     account={this.props.id}
                     handlerId={req.handlerId}
                     i={i}
                     title={`${chainName} Transaction`}
-                    color={primaryColor ? `var(--${primaryColor})`: ''}
+                    color={primaryColor ? `var(--${primaryColor})` : ''}
                     img={icon}
                   >
-                    <TxOverview 
-                      req={req} 
-                      chainName={chainName} 
-                      chainColor={primaryColor} 
-                      symbol={currentSymbol} 
-                      txMeta={txMeta} 
+                    <TxOverview
+                      req={req}
+                      chainName={chainName}
+                      chainColor={primaryColor}
+                      symbol={currentSymbol}
+                      txMeta={txMeta}
                       originName={originName}
                       simple={true}
                     />

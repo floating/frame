@@ -1,5 +1,7 @@
 // NPM modules
-const {utils: {Interface}} = require('ethers')
+const {
+  utils: { Interface },
+} = require('ethers')
 const namehash = require('eth-ens-namehash')
 const contentHash = require('content-hash')
 
@@ -35,7 +37,7 @@ exports.resolveName = async (name) => {
 
   // Decode output and return value
   const decodedOutput = resolverContractInterface.decodeFunctionResult('addr', output)
-  
+
   return decodedOutput[0]
 }
 

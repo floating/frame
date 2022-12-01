@@ -22,18 +22,14 @@ describe('initializing', () => {
       modulePath: './test.js',
       args: ['--someFlag', '-t'],
       env: {
-        MY_VAR: 'true'
-      }
+        MY_VAR: 'true',
+      },
     })
 
-    expect(fork).toHaveBeenCalledWith(
-      './test.js',
-      ['--someFlag', '-t'],
-      {
-        signal: expect.anything(),
-        env: { MY_VAR: 'true' }
-      }
-    )
+    expect(fork).toHaveBeenCalledWith('./test.js', ['--someFlag', '-t'], {
+      signal: expect.anything(),
+      env: { MY_VAR: 'true' },
+    })
   })
 
   it('kills the process after the provided timeout', () => {
@@ -41,7 +37,7 @@ describe('initializing', () => {
 
     worker = new WorkerProcess({
       name: 'test-worker',
-      timeout: 60000
+      timeout: 60000,
     })
 
     jest.advanceTimersByTime(60000)
@@ -60,7 +56,7 @@ describe('events', () => {
   it('emits an event when a message is received', () => {
     let emittedData = ''
 
-    worker.once('update', data => emittedData = data)
+    worker.once('update', (data) => (emittedData = data))
 
     childProcess.emit('message', { event: 'update', payload: 'hello, world!' })
 
@@ -70,7 +66,7 @@ describe('events', () => {
   it('exits if an error event is received', () => {
     let exitEmitted = false
 
-    worker.once('exit', () => exitEmitted = true)
+    worker.once('exit', () => (exitEmitted = true))
 
     childProcess.emit('error')
 
@@ -81,7 +77,7 @@ describe('events', () => {
   it('exits if an exit event is received', () => {
     let exitEmitted = false
 
-    worker.once('exit', () => exitEmitted = true)
+    worker.once('exit', () => (exitEmitted = true))
 
     childProcess.emit('exit')
 
@@ -98,37 +94,37 @@ describe('api', () => {
   describe('#send', () => {
     it('sends a command and args to the worker process', () => {
       worker.send('testCommand', { fruit: 'orange' }, 'metadata')
-  
+
       expect(childProcess.send).toHaveBeenCalledWith({
         command: 'testCommand',
-        args: [{ fruit: 'orange' }, 'metadata']
+        args: [{ fruit: 'orange' }, 'metadata'],
       })
     })
   })
-  
+
   describe('#kill', () => {
     it('emits an exit event', () => {
       let exitEmitted = false
-  
-      worker.once('exit', () => exitEmitted = true)
+
+      worker.once('exit', () => (exitEmitted = true))
       worker.kill()
-  
+
       expect(exitEmitted).toBe(true)
     })
-  
+
     it('kills the worker process', () => {
       worker.kill('SIGHUP')
-  
+
       expect(childProcess.kill).toHaveBeenCalledWith('SIGHUP')
     })
-  
+
     it('removes listeners after emitting the exit event', () => {
       let numExitEvents = 0
-  
-      worker.on('exit', () => numExitEvents += 1)
+
+      worker.on('exit', () => (numExitEvents += 1))
       worker.kill()
       worker.kill()
-  
+
       expect(numExitEvents).toBe(1)
     })
   })

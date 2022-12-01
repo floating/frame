@@ -17,13 +17,13 @@ const ADDRESS_LIMIT = 10
 const HARDENED_OFFSET = 0x80000000
 
 interface DeriveOptions {
-  retries: number,
+  retries: number
   derivation?: Derivation
 }
 
 interface Signature {
-  r: Buffer,
-  s: Buffer,
+  r: Buffer
+  s: Buffer
   v: Buffer
 }
 
@@ -37,18 +37,18 @@ export const Status = {
   PAIRING_FAILED: 'Pairing Failed',
   UNKNOWN_ERROR: 'Unknown Device Error',
   DISCONNECTED: 'disconnected',
-  NEEDS_RECONNECTION: 'Please reload this Lattice1 device'
+  NEEDS_RECONNECTION: 'Please reload this Lattice1 device',
 }
 
-function devicePermission (tag: string) {
+function devicePermission(tag: string) {
   return tag ? `Frame-${tag}` : 'Frame'
 }
 
-function parseError (err: Error) {
+function parseError(err: Error) {
   return (err.message || '').replace(/Error from device: /, '')
 }
 
-function getStatusForError (err: Error) {
+function getStatusForError(err: Error) {
   const errText = (err.message || '').toLowerCase()
 
   if (errText.includes('device locked')) {
@@ -70,7 +70,7 @@ export default class Lattice extends Signer {
   accountLimit = 5
   tag = ''
 
-  constructor (deviceId: string, name: string, tag: string) {
+  constructor(deviceId: string, name: string, tag: string) {
     super()
 
     this.id = 'lattice-' + deviceId
@@ -82,7 +82,7 @@ export default class Lattice extends Signer {
     this.model = 'Lattice1'
   }
 
-  async connect (baseUrl: string, privateKey: string) {
+  async connect(baseUrl: string, privateKey: string) {
     this.status = Status.CONNECTING
     this.emit('update')
 
@@ -99,7 +99,9 @@ export default class Lattice extends Signer {
 
       const { fix: patch, minor, major } = this.connection.getFwVersion() || { fix: 0, major: 0, minor: 0 }
 
-      log.info(`Connected to Lattice with deviceId=${this.deviceId} paired=${paired}, firmware v${major}.${minor}.${patch}`)
+      log.info(
+        `Connected to Lattice with deviceId=${this.deviceId} paired=${paired}, firmware v${major}.${minor}.${patch}`
+      )
 
       this.appVersion = { major, minor, patch }
 
@@ -120,7 +122,7 @@ export default class Lattice extends Signer {
     }
   }
 
-  disconnect () {
+  disconnect() {
     if (this.status === Status.OK) {
       this.status = Status.DISCONNECTED
       this.emit('update')
@@ -131,7 +133,7 @@ export default class Lattice extends Signer {
     this.addresses = []
   }
 
-  close () {
+  close() {
     this.emit('close')
     this.removeAllListeners()
 
@@ -140,7 +142,7 @@ export default class Lattice extends Signer {
     super.close()
   }
 
-  async pair (pairingCode: string) {
+  async pair(pairingCode: string) {
     log.info(`pairing to Lattice ${this.deviceId} with code`, pairingCode)
 
     this.status = Status.PAIRING
@@ -164,7 +166,7 @@ export default class Lattice extends Signer {
     }
   }
 
-  async deriveAddresses (derivation?: Derivation, retries = 2) {
+  async deriveAddresses(derivation?: Derivation, retries = 2) {
     this.status = Status.DERIVING
     this.emit('update')
 
@@ -177,7 +179,7 @@ export default class Lattice extends Signer {
     }
   }
 
-  private async derive (opts: DeriveOptions) {
+  private async derive(opts: DeriveOptions) {
     const { derivation, retries } = opts
 
     try {
@@ -194,9 +196,7 @@ export default class Lattice extends Signer {
         }
 
         const loadedAddresses = await connection.getAddresses(req)
-        this.addresses = [...this.addresses, ...loadedAddresses].map((addr) =>
-           addHexPrefix(addr.toString())
-        )
+        this.addresses = [...this.addresses, ...loadedAddresses].map((addr) => addHexPrefix(addr.toString()))
       }
 
       this.status = 'ok'
@@ -207,9 +207,12 @@ export default class Lattice extends Signer {
       const err = e as Error
 
       if (retries > 0) {
-        log.verbose(`Deriving ${this.derivation} Lattice addresses failed, trying ${retries} more times, error:`, err.message)
+        log.verbose(
+          `Deriving ${this.derivation} Lattice addresses failed, trying ${retries} more times, error:`,
+          err.message
+        )
 
-        return new Promise<string[]>(resolve => {
+        return new Promise<string[]>((resolve) => {
           setTimeout(() => {
             resolve(this.derive({ ...opts, retries: retries - 1 }))
           }, 3000)
@@ -222,7 +225,7 @@ export default class Lattice extends Signer {
     }
   }
 
-  async verifyAddress (index: number, currentAddress: string, display = true, cb: Callback<boolean>) {
+  async verifyAddress(index: number, currentAddress: string, display = true, cb: Callback<boolean>) {
     const connection = this.connection as Client
 
     log.info(`verifying address ${currentAddress} for Lattice ${connection.getAppName()}`)
@@ -249,7 +252,7 @@ export default class Lattice extends Signer {
     }
   }
 
-  async signMessage (index: number, message: string, cb: Callback<string>) {
+  async signMessage(index: number, message: string, cb: Callback<string>) {
     try {
       const signature = await this.sign(index, 'signPersonal', message)
 
@@ -260,7 +263,11 @@ export default class Lattice extends Signer {
     }
   }
 
-  async signTypedData (index: number, typedMessage: TypedMessage<SignTypedDataVersion.V4>, cb: Callback<string>) {
+  async signTypedData(
+    index: number,
+    typedMessage: TypedMessage<SignTypedDataVersion.V4>,
+    cb: Callback<string>
+  ) {
     try {
       const signature = await this.sign(index, 'eip712', typedMessage.data)
 
@@ -271,13 +278,13 @@ export default class Lattice extends Signer {
     }
   }
 
-  async signTransaction (index: number, rawTx: TransactionData, cb: Callback<string>) {
+  async signTransaction(index: number, rawTx: TransactionData, cb: Callback<string>) {
     try {
       const connection = this.connection as Client
       const compatibility = signerCompatibility(rawTx, this.summary())
       const latticeTx = compatibility.compatible ? { ...rawTx } : londonToLegacy(rawTx)
 
-      const signedTx = await sign(latticeTx, async tx => {
+      const signedTx = await sign(latticeTx, async (tx) => {
         const unsignedTx = this.createTransaction(index, rawTx.type, latticeTx.chainId, tx)
         const signingOptions = await this.createTransactionSigningOptions(tx, unsignedTx)
 
@@ -287,7 +294,7 @@ export default class Lattice extends Signer {
         return {
           v: sig.v.toString('hex'),
           r: sig.r.toString('hex'),
-          s: sig.s.toString('hex')
+          s: sig.s.toString('hex'),
         }
       })
 
@@ -298,43 +305,39 @@ export default class Lattice extends Signer {
     }
   }
 
-  summary () {
+  summary() {
     const summary = super.summary()
 
     return {
       ...summary,
       tag: this.tag,
-      addresses: this.addresses.slice(0, this.accountLimit || this.addresses.length)
+      addresses: this.addresses.slice(0, this.accountLimit || this.addresses.length),
     }
   }
 
-  private async sign (index: number, protocol: string, payload: string | TypedData) {
+  private async sign(index: number, protocol: string, payload: string | TypedData) {
     const connection = this.connection as Client
 
     const data = {
       protocol,
       payload,
-      signerPath: this.getPath(index)
+      signerPath: this.getPath(index),
     }
 
     const signOpts = {
       currency: 'ETH_MSG',
-      data: data
+      data: data,
     }
 
     const result = await connection.sign(signOpts)
     const sig = result?.sig as Signature
 
-    const signature = [
-      sig.r,
-      sig.s,
-      padToEven(sig.v.toString('hex'))
-    ].join('')
+    const signature = [sig.r, sig.s, padToEven(sig.v.toString('hex'))].join('')
 
     return addHexPrefix(signature)
   }
 
-  private createTransaction (index: number, txType: string, chainId: string, tx: TypedTransaction) {
+  private createTransaction(index: number, txType: string, chainId: string, tx: TypedTransaction) {
     const { value, to, data, ...txJson } = tx.toJSON()
     const type = hexToInt(txType)
 
@@ -346,7 +349,7 @@ export default class Lattice extends Signer {
       nonce: hexToInt(txJson.nonce || ''),
       gasLimit: hexToInt(txJson.gasLimit || ''),
       useEIP155: true,
-      signerPath: this.getPath(index)
+      signerPath: this.getPath(index),
     }
 
     if (type) {
@@ -355,7 +358,7 @@ export default class Lattice extends Signer {
 
     const optionalFields = ['gasPrice', 'maxFeePerGas', 'maxPriorityFeePerGas']
 
-    optionalFields.forEach(field => {
+    optionalFields.forEach((field) => {
       if (field in txJson) {
         // @ts-ignore
         unsignedTx[field] = hexToInt(txJson[field])
@@ -365,13 +368,11 @@ export default class Lattice extends Signer {
     return unsignedTx
   }
 
-  private async createTransactionSigningOptions (tx: TypedTransaction, unsignedTx: any) {
+  private async createTransactionSigningOptions(tx: TypedTransaction, unsignedTx: any) {
     const fwVersion = (this.connection as Client).getFwVersion()
 
     if (fwVersion && (fwVersion.major > 0 || fwVersion.minor >= 15)) {
-      const payload = tx.type ?
-        tx.getMessageToSign(false) :
-        encode(tx.getMessageToSign(false))
+      const payload = tx.type ? tx.getMessageToSign(false) : encode(tx.getMessageToSign(false))
 
       const to = tx.to?.toString() ?? undefined
 
@@ -385,23 +386,23 @@ export default class Lattice extends Signer {
         hashType: Constants.SIGNING.HASHES.KECCAK256,
         encodingType: Constants.SIGNING.ENCODINGS.EVM,
         signerPath: unsignedTx.signerPath,
-        decoder: callDataDecoder?.def
+        decoder: callDataDecoder?.def,
       }
 
       return { data, currency: unsignedTx.currency }
     }
-      
+
     return { currency: 'ETH', data: unsignedTx }
   }
 
-  private getPath (index: number) {
+  private getPath(index: number) {
     if (!this.derivation) {
       throw new Error('attempted to get base path with unknown derivation!')
     }
 
     const path = getDerivationPath(this.derivation, index)
 
-    return path.split('/').map(element => {
+    return path.split('/').map((element) => {
       if (element.endsWith("'")) {
         return parseInt(element.substring(0, element.length - 1)) + HARDENED_OFFSET
       }
@@ -410,7 +411,7 @@ export default class Lattice extends Signer {
     })
   }
 
-  private handleError (message: string, err: Error) {
+  private handleError(message: string, err: Error) {
     const status = getStatusForError(err)
     const parsedErrorMessage = parseError(err)
     const fullMessage = message + ': ' + parsedErrorMessage

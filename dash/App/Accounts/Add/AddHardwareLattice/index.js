@@ -7,13 +7,12 @@ import link from '../../../../../resources/link'
 import svg from '../../../../../resources/svg'
 import RingIcon from '../../../../../resources/Components/RingIcon'
 
-
-function parseDeviceName (name) {
+function parseDeviceName(name) {
   return name.replace(/\s+/g, '-').substring(0, 14)
 }
 
 class AddHardwareLattice extends React.Component {
-  constructor (...args) {
+  constructor(...args) {
     super(...args)
     this.state = {
       adding: false,
@@ -22,29 +21,27 @@ class AddHardwareLattice extends React.Component {
       error: false,
       deviceId: '',
       deviceName: 'GridPlus',
-      pairCode: ''
+      pairCode: '',
     }
     this.forms = [React.createRef(), React.createRef()]
   }
 
-  onChange (key, e) {
+  onChange(key, e) {
     e.preventDefault()
 
-    const value = (key === 'deviceName')
-      ? parseDeviceName(e.target.value)
-      : e.target.value
-    
+    const value = key === 'deviceName' ? parseDeviceName(e.target.value) : e.target.value
+
     this.setState({ [key]: value || '' })
   }
 
-  onBlur (key, e) {
+  onBlur(key, e) {
     e.preventDefault()
     const update = {}
     update[key] = this.state[key] || ''
     this.setState(update)
   }
 
-  onFocus (key, e) {
+  onFocus(key, e) {
     e.preventDefault()
     if (this.state[key] === '') {
       const update = {}
@@ -53,29 +50,29 @@ class AddHardwareLattice extends React.Component {
     }
   }
 
-  currentForm () {
+  currentForm() {
     return this.forms[this.state.index]
   }
 
-  blurActive () {
+  blurActive() {
     const formInput = this.currentForm()
     if (formInput && formInput.current) formInput.current.blur()
   }
 
-  focusActive () {
+  focusActive() {
     setTimeout(() => {
       const formInput = this.currentForm()
       if (formInput && formInput.current) formInput.current.focus()
     }, 500)
   }
 
-  next () {
+  next() {
     this.blurActive()
     this.setState({ index: ++this.state.index })
     this.focusActive()
   }
 
-  createLattice () {
+  createLattice() {
     link.rpc('createLattice', this.state.deviceId, this.state.deviceName, (err, signer) => {
       if (err) {
         this.setState({ status: err, error: true })
@@ -83,20 +80,20 @@ class AddHardwareLattice extends React.Component {
         // reset nav state to before the start of the flow and open the new signer
         link.send('tray:action', 'backDash', 2)
         const crumb = {
-          view: 'expandedSigner', 
-          data: { signer: signer.id }
+          view: 'expandedSigner',
+          data: { signer: signer.id },
         }
         link.send('tray:action', 'navDash', crumb)
       }
     })
   }
 
-  capitalize (s) {
+  capitalize(s) {
     if (typeof s !== 'string') return ''
     return s.charAt(0).toUpperCase() + s.slice(1)
   }
 
-  restart () {
+  restart() {
     this.setState({ adding: false, index: 0, pairCode: '' })
     setTimeout(() => {
       this.setState({ status: '', error: false })
@@ -104,7 +101,7 @@ class AddHardwareLattice extends React.Component {
     this.focusActive()
   }
 
-  render () {
+  render() {
     let itemClass = 'addAccountItem addAccountItemSmart addAccountItemAdding'
 
     let signer
@@ -114,7 +111,7 @@ class AddHardwareLattice extends React.Component {
     }
 
     return (
-      <div className={itemClass} style={{ transitionDelay: (0.64 * this.props.index / 4) + 's' }}>
+      <div className={itemClass} style={{ transitionDelay: (0.64 * this.props.index) / 4 + 's' }}>
         <div className='addAccountItemBar' />
         <div className='addAccountItemWrap'>
           <div className='addAccountItemTop'>
@@ -139,11 +136,13 @@ class AddHardwareLattice extends React.Component {
                   <div className='addAccountItemOptionTitle'>Device Name</div>
                   <div className='addAccountItemOptionInputPhrase'>
                     <input
-                      tabIndex='-1' ref={this.forms[0]} value={this.state.deviceName}
-                      onChange={e => this.onChange('deviceName', e)}
-                      onFocus={e => this.onFocus('deviceName', e)}
-                      onBlur={e => this.onBlur('deviceName', e)} 
-                      onKeyPress={e => { 
+                      tabIndex='-1'
+                      ref={this.forms[0]}
+                      value={this.state.deviceName}
+                      onChange={(e) => this.onChange('deviceName', e)}
+                      onFocus={(e) => this.onFocus('deviceName', e)}
+                      onBlur={(e) => this.onBlur('deviceName', e)}
+                      onKeyPress={(e) => {
                         if (e.key === 'Enter') {
                           this.next()
                         }
@@ -155,18 +154,21 @@ class AddHardwareLattice extends React.Component {
                     onMouseDown={() => {
                       this.next()
                     }}
-                  >Next
+                  >
+                    Next
                   </div>
                 </div>
                 <div className='addAccountItemOptionSetupFrame'>
                   <div className='addAccountItemOptionTitle'>Enter device id</div>
                   <div className='addAccountItemOptionInputPhrase'>
                     <input
-                      tabIndex='-1' ref={this.forms[1]} value={this.state.deviceId}
-                      onChange={e => this.onChange('deviceId', e)}
-                      onFocus={e => this.onFocus('deviceId', e)}
-                      onBlur={e => this.onBlur('deviceId', e)} 
-                      onKeyPress={e => { 
+                      tabIndex='-1'
+                      ref={this.forms[1]}
+                      value={this.state.deviceId}
+                      onChange={(e) => this.onChange('deviceId', e)}
+                      onFocus={(e) => this.onFocus('deviceId', e)}
+                      onBlur={(e) => this.onBlur('deviceId', e)}
+                      onKeyPress={(e) => {
                         if (e.key === 'Enter') {
                           this.createLattice()
                           this.next()
@@ -180,7 +182,8 @@ class AddHardwareLattice extends React.Component {
                       this.createLattice()
                       this.next()
                     }}
-                  >Create
+                  >
+                    Create
                   </div>
                 </div>
                 <div className='addAccountItemOptionSetupFrame'>
@@ -189,7 +192,11 @@ class AddHardwareLattice extends React.Component {
                   ) : (
                     <>
                       <div className='addAccountItemOptionTitle'>{this.state.status}</div>
-                      {this.state.error ? <div className='addAccountItemOptionSubmit' onMouseDown={() => this.restart()}>try again</div> : null}
+                      {this.state.error ? (
+                        <div className='addAccountItemOptionSubmit' onMouseDown={() => this.restart()}>
+                          try again
+                        </div>
+                      ) : null}
                     </>
                   )}
                 </div>

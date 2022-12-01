@@ -13,17 +13,17 @@ import Restore from 'react-restore'
 // const FEE_WARNING_THRESHOLD_USD = 50
 
 class Time extends React.Component {
-  constructor (...args) {
+  constructor(...args) {
     super(...args)
     this.state = {
-      time: Date.now()
+      time: Date.now(),
     }
     setInterval(() => {
       this.setState({ time: Date.now() })
     }, 1000)
   }
 
-  msToTime (duration) {
+  msToTime(duration) {
     const seconds = Math.floor((duration / 1000) % 60)
     const minutes = Math.floor((duration / (1000 * 60)) % 60)
     const hours = Math.floor((duration / (1000 * 60 * 60)) % 24)
@@ -42,16 +42,12 @@ class Time extends React.Component {
     return { time, label }
   }
 
-  render () {
+  render() {
     const { time, label } = this.msToTime(this.state.time - this.props.time)
     return (
       <div className='txProgressSuccessItem txProgressSuccessItemRight'>
-        <div className='txProgressSuccessItemValue'>
-          {time}
-        </div>
-        <div className='txProgressSuccessItemLabel'>
-          {label}
-        </div>
+        <div className='txProgressSuccessItemValue'>{time}</div>
+        <div className='txProgressSuccessItemLabel'>{label}</div>
       </div>
     )
   }

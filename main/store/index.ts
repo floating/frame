@@ -27,8 +27,8 @@ persist.set('main', store('main'))
 
 // Apply updates to persisted state
 store.api.feed((state, actionBatch) => {
-  actionBatch.forEach(action => {
-    action.updates.forEach(update => {
+  actionBatch.forEach((action) => {
+    action.updates.forEach((update) => {
       persist.queue(update.path, update.value)
     })
   })

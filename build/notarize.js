@@ -16,19 +16,15 @@ module.exports = async function (params) {
       appBundleId: appId,
       appPath: appPath,
       appleId: process.env.APPLE_ID,
-      appleIdPassword: process.env.APPLE_ID_PASSWORD
+      appleIdPassword: process.env.APPLE_ID_PASSWORD,
     })
 
     // verify signed and notarized application
-    execFileSync('spctl', [
-      '--assess',
-      '--type',
-      'execute',
-      '--verbose',
-      '--ignore-cache',
-      '--no-cache',
-      appPath
-    ], {})
+    execFileSync(
+      'spctl',
+      ['--assess', '--type', 'execute', '--verbose', '--ignore-cache', '--no-cache', appPath],
+      {}
+    )
 
     console.log(`Successfully notarized ${appId}`)
   } catch (error) {

@@ -4,12 +4,11 @@ import { Fragment, Interface } from 'ethers/lib/utils'
 import { registrar as registrarAbi, registrarController as registrarControllerAbi } from './abi'
 import store from '../../../store'
 
-
 import type {
   ApproveAction as EnsApprovalAction,
   TransferAction as EnsTransferAction,
   RegisterAction as EnsRegistrationAction,
-  RenewAction as EnsRenewalAction
+  RenewAction as EnsRenewalAction,
 } from '../../../transaction/actions/ens'
 
 import type { JsonFragment } from '@ethersproject/abi'
@@ -49,21 +48,21 @@ type DeploymentLocation = {
   chainId: number
 }
 
-function decode (abi: ReadonlyArray<Fragment | JsonFragment | string>, calldata: string) {
+function decode(abi: ReadonlyArray<Fragment | JsonFragment | string>, calldata: string) {
   const contractApi = new Interface(abi)
   return contractApi.parseTransaction({ data: calldata })
 }
 
-function getNameForTokenId (account: string, tokenId: string) {
+function getNameForTokenId(account: string, tokenId: string) {
   const ensInventory: InventoryCollection = store('main.inventory', account, 'ens') || {}
   const items = ensInventory.items || {}
 
-  const record = Object.values(items).find(ens => ens.tokenId === tokenId) || { name: '' }
+  const record = Object.values(items).find((ens) => ens.tokenId === tokenId) || { name: '' }
 
   return record.name
 }
 
-function ethName (name: string) {
+function ethName(name: string) {
   // assumes all names will be registered in the .eth domain, in the future this may not be the case
   return name.includes('.eth') ? name : `${name}.eth`
 }
@@ -84,7 +83,11 @@ const registrar = ({ name = 'ENS Registrar', address, chainId }: DeploymentLocat
         return {
           id: 'ens:transfer',
           data: {
-            name: name, from, to, tokenId: token }
+            name: name,
+            from,
+            to,
+            tokenId: token,
+          },
         } as EnsTransferAction
       }
 
@@ -95,14 +98,18 @@ const registrar = ({ name = 'ENS Registrar', address, chainId }: DeploymentLocat
 
         return {
           id: 'ens:approve',
-          data: { name, operator: to, tokenId: token }
+          data: { name, operator: to, tokenId: token },
         } as EnsApprovalAction
       }
-    }
+    },
   }
 }
 
-const registarController = ({ name = 'ENS Registrar Controller', address, chainId }: DeploymentLocation): EnsContract => {
+const registarController = ({
+  name = 'ENS Registrar Controller',
+  address,
+  chainId,
+}: DeploymentLocation): EnsContract => {
   return {
     name,
     chainId,
@@ -112,7 +119,7 @@ const registarController = ({ name = 'ENS Registrar Controller', address, chainI
 
       if (name === 'commit') {
         return {
-          id: 'ens:commit'
+          id: 'ens:commit',
         }
       }
 
@@ -121,7 +128,7 @@ const registarController = ({ name = 'ENS Registrar Controller', address, chainI
 
         return {
           id: 'ens:register',
-          data: { address: owner, name: ethName(name), duration: duration.toNumber() }
+          data: { address: owner, name: ethName(name), duration: duration.toNumber() },
         } as EnsRegistrationAction
       }
 
@@ -130,23 +137,23 @@ const registarController = ({ name = 'ENS Registrar Controller', address, chainI
 
         return {
           id: 'ens:renew',
-          data: { name: ethName(name), duration: duration.toNumber() }
+          data: { name: ethName(name), duration: duration.toNumber() },
         } as EnsRenewalAction
       }
-    }
+    },
   }
 }
 
 const mainnetRegistrar = registrar({
   name: '.eth Permanent Registrar',
   address: '0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85',
-  chainId: 1
+  chainId: 1,
 })
 
 const mainnetRegistrarController = registarController({
   name: 'ETHRegistrarController',
   address: '0x283Af0B28c62C092C9727F1Ee09c02CA627EB7F5',
-  chainId: 1
+  chainId: 1,
 })
 
 // TODO: in the future the addresses for these contracts can be discovered in real time

@@ -4,7 +4,7 @@ import Restore from 'react-restore'
 import SignerPreview from './SignerPreview'
 
 class Signer extends React.Component {
-  render () {
+  render() {
     return <SignerPreview {...this.props} />
   }
 }
