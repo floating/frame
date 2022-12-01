@@ -1,13 +1,14 @@
 import React from 'react'
 import Restore from 'react-restore'
 
+import { DisplayFiatPrice, DisplayValue } from '../../../../../../resources/Components/DisplayValue'
 import RingIcon from '../../../../../../resources/Components/RingIcon'
 
-import svg from '../../../../../../resources/svg'
 class Balance extends React.Component {
   render () {
     const { symbol, balance, i, scanning, chainId } = this.props
-    const change = parseFloat(balance.priceChange)
+    const { priceChange, decimals, balance: balanceValue, usdRate: currencyRate, logoURI, price, displayBalance = '0' } = balance
+    const change = parseFloat(priceChange)
     const direction = change < 0 ? -1 : change > 0 ? 1 : 0
     let priceChangeClass = 'signerBalanceCurrentPriceChange'
     if (direction !== 0) {
@@ -20,14 +21,14 @@ class Balance extends React.Component {
     let name = balance.name
     if (name.length > 19) name = name.substr(0, 17) + '..'
 
-    const priceChange = () => {
-      if (!balance.priceChange) {
+    const displayPriceChange = () => {
+      if (!priceChange) {
         return ''
       }
-      return `(${direction === 1 ? '+' : ''}${balance.priceChange}%)`
+      return `(${direction === 1 ? '+' : ''}${priceChange}%)`
     }
     const chain = this.store('main.networks.ethereum', chainId)
-    const chainName = chain ? chain.name : ''
+    const { name: chainName = '', isTestnet = false } = chain
     const chainColor = this.store('main.networksMeta.ethereum', chainId, 'primaryColor')
 
     return (
@@ -36,7 +37,7 @@ class Balance extends React.Component {
         <div className='signerBalanceInner' style={{ opacity: !scanning ? 1 : 0 }}>
           <div className='signerBalanceIcon'>
             <RingIcon 
-              img={symbol.toUpperCase() !== 'ETH' && balance.logoURI}
+              img={symbol.toUpperCase() !== 'ETH' && logoURI}
               alt={symbol.toUpperCase()}
               color={chainColor ? `var(--${chainColor})` : ''}
             />
@@ -50,30 +51,24 @@ class Balance extends React.Component {
           <div className='signerBalanceCurrency'>
             {name}
           </div>
-          <div className='signerBalanceValue' style={(balance.displayBalance || '0').length >= 12 ? { fontSize: '15px', top: '10px' } : {}}>
-            <span 
-              className='signerBalanceSymbol'
-            >
-              {symbol}
-            </span>
-            <span
-              style={(balance.displayBalance || '0').length >= 12 ? { marginTop: '-3px' } : {}}
-            >
-              {balance.displayBalance}
-            </span>
+          <div className='signerBalanceValue'>
+            <DisplayValue 
+              type='ether' 
+              value={balanceValue} 
+              valueDataParams={{ decimals }} 
+              currencySymbol={symbol}
+            />
           </div>
           <div className='signerBalancePrice'>
             <div className='signerBalanceOk'>
               <span className='signerBalanceCurrentPrice'>
-                {svg.usd(10)}{balance.price}
+                <DisplayFiatPrice decimals={decimals} currencyRate={currencyRate} isTestnet={isTestnet} />
               </span>
               <span className={priceChangeClass}>
-                <span>{priceChange()}</span>
+                <span>{displayPriceChange()}</span>
               </span>
             </div>
-            <div className='signerBalanceCurrentValue'>
-              {svg.usd(10)}{balance.displayValue}
-            </div>
+            <DisplayValue type='fiat' value={balanceValue} valueDataParams={{ decimals, currencyRate, isTestnet }} currencySymbol='$' displayDecimals={false} />
           </div>
         </div>
       </div>

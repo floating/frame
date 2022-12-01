@@ -1,7 +1,7 @@
 // status = Network Mismatch, Not Connected, Connected, Standby, Syncing
 
 const EventEmitter = require('events')
-const { addHexPrefix } = require('ethereumjs-util')
+const { addHexPrefix } = require('@ethereumjs/util')
 const { Hardfork } = require('@ethereumjs/common')
 const provider = require('eth-provider')
 const log = require('electron-log')

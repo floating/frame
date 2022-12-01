@@ -1,12 +1,12 @@
 import React from 'react'
-import { utils } from 'ethers'
 
 import link from '../../../../../../../resources/link'
 import EnsOverview from '../../Ens'
 
 import svg from '../../../../../../../resources/svg'
 
-import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../../../resources/Components/Cluster'
+import { Cluster, ClusterRow, ClusterValue } from '../../../../../../../resources/Components/Cluster'
+import { DisplayValue } from '../../../../../../../resources/Components/DisplayValue'
 
 const isNonZeroHex = (hex) => !!hex && !['0x', '0x0'].includes(hex)
 
@@ -44,10 +44,11 @@ const TxDescription = ({ chain, children, chainColor }) => (
 )
 
 const SendOverview = ({ amountHex, decimals, symbol }) => {
-  const displayAmount = utils.formatUnits(amountHex, decimals)
-
   return  (
-    <div>{`Send ${displayAmount} ${symbol}`}</div>
+    <div>
+      <span>{'Send'}</span>
+      <DisplayValue type='ether' value={amountHex} valueDataParams={{ decimals }} currencySymbol={symbol} currencySymbolPosition='last' />
+    </div>
   )
 }
 

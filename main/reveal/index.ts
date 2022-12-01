@@ -2,7 +2,7 @@
 
 import log from 'electron-log'
 import EthereumProvider from 'ethereum-provider'
-import { addHexPrefix } from 'ethereumjs-util'
+import { addHexPrefix } from '@ethereumjs/util'
 import BigNumber from 'bignumber.js'
 
 import proxyConnection from '../provider/proxy'

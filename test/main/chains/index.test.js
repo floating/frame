@@ -1,5 +1,5 @@
 import EventEmitter from 'events'
-import { addHexPrefix } from 'ethereumjs-util'
+import { addHexPrefix } from '@ethereumjs/util'
 import log from 'electron-log'
 
 import store from '../../../main/store'

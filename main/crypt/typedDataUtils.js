@@ -1,6 +1,6 @@
 // Translated to JavaScript from https://github.com/dicether/eip712/blob/master/src/eip712.ts
 const abi = require('ethereumjs-abi')
-const ethUtil = require('ethereumjs-util')
+const ethUtil = require('@ethereumjs/util')
 
 const PRIMITIVE_TYPES = [
   /^bytes[0-9]|[0-2][0-9]|3[0-2]$/,

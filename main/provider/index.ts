@@ -10,7 +10,7 @@ import {
   isHexString,
   isHexPrefixed,
   fromUtf8,
-} from 'ethereumjs-util'
+} from '@ethereumjs/util'
 
 import store from '../store'
 import packageFile from '../../package.json'
