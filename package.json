@@ -4,6 +4,7 @@
   "description": "System-wide web3",
   "main": "compiled/main",
   "scripts": {
+    "init": "npm run setup && husky install",
     "clean": "npx rimraf dist bundle compiled .parcel-cache node_modules",
     "setup:full": "npm run clean && npm cache clean --force && npm install --cache /tmp/empty-cache --ignore-scripts && allow-scripts && npm audit fix",
     "setup:clean": "npm run clean && npm run setup",
