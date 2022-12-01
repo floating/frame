@@ -151,7 +151,6 @@
     "eslint-import-resolver-typescript": "^3.5.2",
     "eslint-plugin-import": "2.26.0",
     "eslint-plugin-jest": "27.1.6",
-    "eslint-plugin-jest-dom": "4.0.3",
     "eslint-plugin-jsx-a11y": "6.6.1",
     "eslint-plugin-n": "15.5.1",
     "eslint-plugin-promise": "6.1.1",
@@ -198,7 +197,8 @@
     ]
   },
   "engines": {
-    "electron": "21"
+    "electron": "21",
+    "node": ">= 16.15.0"
   },
   "browserslist": [
     "last 1 Electron major version"
