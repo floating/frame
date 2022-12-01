@@ -9,7 +9,7 @@
     "setup:full": "npm run clean && npm cache clean --force && npm install --cache /tmp/empty-cache --ignore-scripts && allow-scripts && npm audit fix",
     "setup:clean": "npm run clean && npm run setup",
     "setup:ci": "npm ci --ignore-scripts && npm run install:scripts",
-    "setup": "npm install --ignore-scripts && npm run install:scripts",
+    "setup": "npm install --ignore-scripts && npm run install:scripts && husky install",
     "install:scripts": "allow-scripts",
     "start": "npm run launch",
     "bundle": "npm run bundle:bridge && npm run bundle:tray && npm run bundle:dash && npm run bundle:dapp && npm run bundle:dapp:inject",
