@@ -1,13 +1,13 @@
 import React from 'react'
 import Restore from 'react-restore'
 
-import store from '../../../../../../../main/store'
-import link from '../../../../../../../resources/link'
-import { setupComponent } from '../../../../../../componentSetup'
-import AddAdressComponent from '../../../../../../../dash/App/Accounts/Add/AddAddress'
+import store from '../../../../../../main/store'
+import link from '../../../../../../resources/link'
+import { setupComponent } from '../../../../../componentSetup'
+import AddAdressComponent from '../../../../../../dash/App/Accounts/Add/AddAddress'
 
-jest.mock('../../../../../../../main/store/persist')
-jest.mock('../../../../../../../resources/link', () => ({ rpc: jest.fn() }))
+jest.mock('../../../../../../main/store/persist')
+jest.mock('../../../../../../resources/link', () => ({ rpc: jest.fn() }))
 
 const AddAddress = Restore.connect(AddAdressComponent, store)
 const address = '0x690B9A9E9aa1C9dB991C7721a92d351Db4FaC990'
