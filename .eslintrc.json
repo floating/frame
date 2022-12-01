@@ -1,17 +1,22 @@
 {
   "extends": [
     "eslint:recommended",
-    "plugin:react/recommended",
     "plugin:import/recommended",
+    "plugin:jsx-a11y/recommended",
+    "plugin:n/recommended",
+    "plugin:promise/recommended",
+    "plugin:react/recommended",
+    "plugin:react-hooks/recommended",
     "prettier"
   ],
-  "plugins": ["import", "react"],
+  "plugins": ["import", "promise", "react", "jsx-a11y"],
   "rules": {
     "multiline-ternary": 0,
     "react/no-direct-mutation-state": 0,
     "react/no-find-dom-node": 0
   },
   "parserOptions": {
+    "ecmaVersion": 2020,
     "ecmaFeatures": {
       "jsx": true
     }
@@ -22,14 +27,18 @@
       "parser": "@typescript-eslint/parser",
       "extends": [
         "eslint:recommended",
-        "plugin:react/recommended",
-        "plugin:import/recommended",
-        "plugin:import/typescript",
         "plugin:@typescript-eslint/recommended",
         "plugin:@typescript-eslint/recommended-requiring-type-checking",
+        "plugin:import/recommended",
+        "plugin:import/typescript",
+        "plugin:jsx-a11y/recommended",
+        "plugin:n/recommended",
+        "plugin:promise/recommended",
+        "plugin:react/recommended",
+        "plugin:react-hooks/recommended",
         "prettier"
       ],
-      "plugins": ["@typescript-eslint", "import", "react"],
+      "plugins": ["@typescript-eslint", "import", "promise", "react", "jsx-a11y"],
       "parserOptions": {
         "ecmaFeatures": {
           "jsx": true
@@ -45,6 +54,17 @@
         "multiline-ternary": 0,
         "react/no-direct-mutation-state": 0,
         "react/no-find-dom-node": 0
+      }
+    },
+    {
+      "files": ["test/**"],
+      "plugins": ["jest", "testing-library"],
+      "extends": ["plugin:jest/recommended", "plugin:testing-library/react"],
+      "env": {
+        "jest/globals": true
+      },
+      "rules": {
+
       }
     }
   ]
