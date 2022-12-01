@@ -1,8 +1,7 @@
 import EventEmitter from 'events'
 import log from 'electron-log'
 import { Notification } from 'electron'
-import { addHexPrefix, intToHex} from 'ethereumjs-util'
-import { TypedData, Version } from 'eth-sig-util'
+import { addHexPrefix, intToHex } from '@ethereumjs/util'
 import { v5 as uuidv5 } from 'uuid'
 
 import provider from '../provider'
@@ -20,7 +19,7 @@ import { findUnavailableSigners, getSignerType, isSignerReady } from '../../reso
 import {
   AccountRequest, AccessRequest,
   TransactionRequest, TransactionReceipt,
-  ReplacementType, RequestStatus, RequestMode
+  ReplacementType, RequestStatus, RequestMode, TypedMessage
 } from './types'
 
 import type { Chain } from '../chains'
@@ -555,13 +554,13 @@ export class Accounts extends EventEmitter {
     currentAccount.signMessage(message, cb)
   }
 
-  signTypedData (version: Version, address: Address, typedData: TypedData, cb: Callback<string>) {
+  signTypedData (address: Address, typedMessage: TypedMessage, cb: Callback<string>) {
     const currentAccount = this.current()
 
     if (!currentAccount) return cb(new Error('No Account Selected'))
     if (address.toLowerCase() !== currentAccount.getSelectedAddress().toLowerCase()) return cb(new Error('signMessage: Wrong Account Selected'))
 
-    currentAccount.signTypedData(version, typedData, cb)
+    currentAccount.signTypedData(typedMessage, cb)
   }
 
   signTransaction (rawTx: TransactionData, cb: Callback<string>) {

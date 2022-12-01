@@ -1,6 +1,6 @@
 import React from 'react'
 import { fireEvent, render } from '@testing-library/react'
-import { addHexPrefix } from 'ethereumjs-util'
+import { addHexPrefix } from '@ethereumjs/util'
 
 import Restore from 'react-restore'
 import store from '../../../../../../../../../../../main/store'

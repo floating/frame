@@ -1,5 +1,5 @@
 import log from 'electron-log'
-import { addHexPrefix } from 'ethereumjs-util'
+import { addHexPrefix } from '@ethereumjs/util'
 import BigNumber from 'bignumber.js'
 
 import store from '../../../main/store'

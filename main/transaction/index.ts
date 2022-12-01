@@ -1,10 +1,15 @@
-import { BN, addHexPrefix, stripHexPrefix, bnToHex, intToHex } from 'ethereumjs-util'
+import BigNumber from 'bignumber.js'
+import { addHexPrefix, intToHex } from '@ethereumjs/util'
 import { TransactionFactory, TypedTransaction } from '@ethereumjs/tx'
-import Common from '@ethereumjs/common'
+import { Common } from '@ethereumjs/common'
 
-import chainConfig from '../chains/config'
 import { AppVersion, SignerSummary } from '../signers/Signer'
-import { GasFeesSource, TransactionData, typeSupportsBaseFee } from '../../resources/domain/transaction'
+import {
+  GasFeesSource,
+  TransactionData,
+  typeSupportsBaseFee,
+} from '../../resources/domain/transaction'
+import chainConfig from '../chains/config'
 
 const londonHardforkSigners: SignerCompatibilityByVersion = {
   seed: () => true,
@@ -44,11 +49,10 @@ export interface SignerCompatibility  {
   compatible: boolean
 }
 
-function toBN (hexStr: string) {
-  return new BN(stripHexPrefix(hexStr), 'hex')
-}
-
-function signerCompatibility (txData: TransactionData, signer: SignerSummary): SignerCompatibility {
+function signerCompatibility(
+  txData: TransactionData,
+  signer: SignerSummary
+): SignerCompatibility {
   if (typeSupportsBaseFee(txData.type)) {
     const compatible = (signer.type in londonHardforkSigners) && londonHardforkSigners[signer.type](signer.appVersion, signer.model)
     return { signer: signer.type, tx: 'london', compatible }
@@ -87,7 +91,8 @@ function maxFee (rawTx: TransactionData) {
 }
 
 function calculateMaxFeePerGas(maxBaseFee: string, maxPriorityFee: string) {
-  return bnToHex(toBN(maxPriorityFee).add(toBN(maxBaseFee)))
+  const maxFeePerGas = BigNumber(maxPriorityFee).plus(maxBaseFee).toString(16)
+  return addHexPrefix(maxFeePerGas)
 }
 
 function populate (rawTx: TransactionData, chainConfig: Common, gas: GasData): TransactionData {
@@ -100,10 +105,10 @@ function populate (rawTx: TransactionData, chainConfig: Common, gas: GasData): T
     const useFrameGasPrice = !rawTx.gasPrice || isNaN(parseInt(rawTx.gasPrice, 16))
     if (useFrameGasPrice) {
       // no valid dapp-supplied value for gasPrice so we use the Frame-supplied value
-      const gasPrice = toBN(gas.price.levels.fast as string)
-      txData.gasPrice = bnToHex(gasPrice)
+      const gasPrice = BigNumber(gas.price.levels.fast as string).toString(16)
+      txData.gasPrice = addHexPrefix(gasPrice)
       txData.gasFeesSource = GasFeesSource.Frame
-    } 
+    }
 
     return txData
   }
@@ -130,8 +135,10 @@ function populate (rawTx: TransactionData, chainConfig: Common, gas: GasData): T
   txData.maxFeePerGas = useFrameMaxFeePerGas ? calculateMaxFeePerGas(gas.price.fees.maxBaseFeePerGas, maxPriorityFee) : txData.maxFeePerGas
 
   // if no valid dapp-supplied value for maxPriorityFeePerGas we use the Frame-supplied value
-  txData.maxPriorityFeePerGas = useFrameMaxPriorityFeePerGas ? bnToHex(toBN(maxPriorityFee)) : txData.maxPriorityFeePerGas
-  
+  txData.maxPriorityFeePerGas = useFrameMaxPriorityFeePerGas
+    ? addHexPrefix(BigNumber(maxPriorityFee).toString(16))
+    : txData.maxPriorityFeePerGas
+
   return txData
 }
 
@@ -144,7 +151,7 @@ function hexifySignature ({ v, r, s }: Signature) {
 }
 
 async function sign (rawTx: TransactionData, signingFn: (tx: TypedTransaction) => Promise<Signature>) {
-  const common = chainConfig(parseInt(rawTx.chainId), parseInt(rawTx.type) === 2 ? 'london' : 'berlin')
+  const common = chainConfig(parseInt(rawTx.chainId, 16), parseInt(rawTx.type, 16) === 2 ? 'london' : 'berlin')
 
   const tx = TransactionFactory.fromTxData(rawTx, { common })
 
@@ -153,8 +160,8 @@ async function sign (rawTx: TransactionData, signingFn: (tx: TypedTransaction) =
 
     return TransactionFactory.fromTxData(
       {
-      ...rawTx,
-      ...signature
+        ...rawTx,
+        ...signature
       },
       { common }
     )

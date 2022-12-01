@@ -1,5 +1,5 @@
 import { randomInt } from 'crypto'
-import { addHexPrefix, intToHex } from 'ethereumjs-util'
+import { addHexPrefix, intToHex, stripHexPrefix } from '@ethereumjs/util'
 import { getAddress as getChecksumAddress } from '@ethersproject/address';
 
 const weiToGwei = (wei: number) => wei / 1e9
@@ -101,6 +101,7 @@ export {
   weiHexToGweiInt,
   weiIntToEthInt,
   gweiToWeiHex,
-  matchFilter,
   getAddress,
+  stripHexPrefix,
+  matchFilter
 }

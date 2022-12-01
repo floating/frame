@@ -21,7 +21,6 @@ class TxSending extends React.Component {
     this.setState({ copied: true })
     setTimeout(_ => this.setState({ copied: false }), 1000)
   }
-
   render () {
     const req = this.props.req
     const contract = req.data.to.toLowerCase()

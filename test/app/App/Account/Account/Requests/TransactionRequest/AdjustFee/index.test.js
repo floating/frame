@@ -1,6 +1,6 @@
 import React from 'react'
 import Restore from 'react-restore'
-import { addHexPrefix } from 'ethereumjs-util'
+import { addHexPrefix } from '@ethereumjs/util'
 import BigNumber from 'bignumber.js'
 
 import store from '../../../../../../../../main/store'

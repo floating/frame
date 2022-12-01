@@ -4,6 +4,9 @@ import path from 'path'
 import { createWindow } from '../window'
 import topRight from './topRight'
 
+const isDev = process.env.NODE_ENV === 'development'
+const enableHMR = isDev && process.env.HMR === 'true'
+
 export interface FrameInstance extends BrowserWindow {
   frameId?: string,
   views?: Record<string, BrowserView>,
@@ -37,7 +40,7 @@ export default {
       icon: path.join(__dirname, './AppIcon.png')
     })
 
-    frameInstance.loadURL(`file://${process.env.BUNDLE_LOCATION}/dapp.html`)
+    frameInstance.loadURL(enableHMR ? 'http://localhost:1234/dapp/dapp.dev.html' : `file://${process.env.BUNDLE_LOCATION}/dapp.html`)
   
     frameInstance.on('ready-to-show', () => {
       frameInstance.show()

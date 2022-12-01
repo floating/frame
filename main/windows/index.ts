@@ -2,7 +2,7 @@ import { app, BrowserWindow, ipcMain, screen, Tray as ElectronTray, Menu, global
 import path from 'path'
 import log from 'electron-log'
 import EventEmitter from 'events'
-import { hexToNumber } from 'web3-utils'
+import { hexToInt } from '../../resources/utils'
 
 import store from '../store'
 import FrameManager from './frames'
@@ -25,6 +25,7 @@ let dash: Dash
 let mouseTimeout: NodeJS.Timeout
 let glide = false
 
+const enableHMR = process.env.NODE_ENV === 'development' && process.env.HMR === 'true'
 const hideFrame = () => tray.hide()
 const showFrame = () => tray.show()
 
@@ -110,7 +111,7 @@ function initDashWindow () {
     width: trayWidth 
   })
 
-  const dashUrl = new URL(path.join(process.env.BUNDLE_LOCATION, 'dash.html'), 'file:')
+  const dashUrl = enableHMR ? 'http://localhost:1234/dash/dash.dev.html' : new URL(path.join(process.env.BUNDLE_LOCATION, 'dash.html'), 'file:')
   windows.dash.loadURL(dashUrl.toString())
 }
 
@@ -120,7 +121,7 @@ function initTrayWindow () {
     icon: path.join(__dirname, './AppIcon.png')
   })
 
-  const trayUrl = new URL(path.join(process.env.BUNDLE_LOCATION, 'tray.html'), 'file:')
+  const trayUrl = enableHMR ? 'http://localhost:1234/app/tray.dev.html' : new URL(path.join(process.env.BUNDLE_LOCATION, 'tray.html'), 'file:')
   windows.tray.loadURL(trayUrl.toString())
 
   windows.tray.on('closed', () => delete windows.tray)
@@ -199,7 +200,7 @@ class Tray {
       if (store('platform') === 'darwin' && store('main.menubarGasPrice')) {
         const gasPrice = store('main.networksMeta.ethereum', 1, 'gas.price.levels.fast')
         if (!gasPrice) return
-        const gasDisplay = Math.round(hexToNumber(gasPrice) / 1000000000).toString()
+        const gasDisplay = Math.round(hexToInt(gasPrice) / 1000000000).toString()
         title = gasDisplay // ɢ 🄶 Ⓖ ᴳᵂᴱᴵ
       }
       this.electronTray.setTitle(title)
@@ -362,7 +363,7 @@ app.on('ready', () => {
 })
 
 if (isDev) {
-    app.on('ready', () => {
+  app.on('ready', () => {
     globalShortcut.register('CommandOrControl+R', () => {
       Object.keys(windows).forEach(win => {
         windows[win].reload()
@@ -371,17 +372,6 @@ if (isDev) {
       frameManager.reloadFrames()
     })
   })
-  if (process.env.BUNDLE_LOCATION) {
-    const watch = require('node-watch')
-    watch(path.resolve(process.env.BUNDLE_LOCATION), { recursive: true }, (_evt: Event, name: string) => {
-    if (name.indexOf('css') > -1) {
-        Object.keys(windows).forEach(win => {
-          windows[win].webContents.send('main:reload:style', name)
-        })
-        frameManager.reloadFrames(name)
-      }
-    })
-  }
 }
 
 ipcMain.on('*:contextmenu', (e, x, y) => {

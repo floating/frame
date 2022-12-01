@@ -12,7 +12,6 @@ class TxMain extends React.Component {
     }
   }
 
-
   render () {
     const req = this.props.req
     const chainId = parseInt(req.data.chainId, 16)

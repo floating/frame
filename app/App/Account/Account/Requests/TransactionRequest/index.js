@@ -1,8 +1,6 @@
 import React from 'react'
 import Restore from 'react-restore'
 
-import link from '../../../../../../resources/link'
-
 // New Tx
 import TxMain from './TxMain'
 import TxMainNew from './TxMainNew'
@@ -13,6 +11,7 @@ import AdjustFee from './AdjustFee'
 import ViewData from './ViewData'
 import TxApproval from './TxApproval'
 import TokenSpend from './TokenSpend'
+import link from '../../../../../../resources/link'
 
 class TransactionRequest extends React.Component {
   constructor (props, context) {

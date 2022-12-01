@@ -8,19 +8,18 @@
         base-uri 'self';
         connect-src *; 
         style-src 'self';
-        frame-src https://connect.trezor.io; 
-        object-src 'none';
         img-src *;
+        object-src 'none';
         require-trusted-types-for 'script';
       "
     />
-    <title>Frame Flow</title>
+    <title>Dash</title>
     <link rel='stylesheet' href='../resources/base.styl' type='text/css'>
     <link rel='stylesheet' href='./index.styl' type='text/css'>
   </head>
   <body>
     <div class='frameOverlay'></div>
-    <div id='flow'></div>
-    <script src='./index.js' nonce='7e49189a-cca8-455d-a66b-dd571342955d'></script>
+    <div id='dash'></div>
+    <script type='module' src='./index.js' nonce='7e49189a-cca8-455d-a66b-dd571342955d'></script>
   </body>
 </html>
