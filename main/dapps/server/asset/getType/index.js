@@ -7,7 +7,7 @@ const types = {
   jpeg: 'image/jpeg',
   jpg: 'image/jpeg',
   gif: 'image/gif',
-  png: 'image/png'
+  png: 'image/png',
 }
 
-module.exports = path => types[path.substr(path.lastIndexOf('.') + 1)] || 'text/plain'
+module.exports = (path) => types[path.substr(path.lastIndexOf('.') + 1)] || 'text/plain'

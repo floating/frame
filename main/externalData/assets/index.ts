@@ -12,44 +12,47 @@ interface RateUpdate {
   }
 }
 
-export default function rates (pylon: Pylon, store: Store) {
+export default function rates(pylon: Pylon, store: Store) {
   const storeApi = {
-    getKnownTokens: (address?: Address) => ((address && store('main.tokens.known', address)) || []) as Token[],
-    setNativeCurrencyData: (chainId: number, currencyData: NativeCurrency) => store.setNativeCurrencyData('ethereum', chainId, currencyData),
-    setNativeCurrencyRate: (chainId: number, rate: Rate) => store.setNativeCurrencyData('ethereum', chainId, { usd: rate }),
-    setTokenRates: (rates: Record<Address, UsdRate>) => store.setRates(rates)
+    getKnownTokens: (address?: Address) =>
+      ((address && store('main.tokens.known', address)) || []) as Token[],
+    setNativeCurrencyData: (chainId: number, currencyData: NativeCurrency) =>
+      store.setNativeCurrencyData('ethereum', chainId, currencyData),
+    setNativeCurrencyRate: (chainId: number, rate: Rate) =>
+      store.setNativeCurrencyData('ethereum', chainId, { usd: rate }),
+    setTokenRates: (rates: Record<Address, UsdRate>) => store.setRates(rates),
   }
 
-  function handleRatesUpdates (updates: RateUpdate[]) {
+  function handleRatesUpdates(updates: RateUpdate[]) {
     if (updates.length === 0) return
 
-    const nativeCurrencyUpdates = updates.filter(u => u.id.type === AssetType.NativeCurrency)
+    const nativeCurrencyUpdates = updates.filter((u) => u.id.type === AssetType.NativeCurrency)
 
     if (nativeCurrencyUpdates.length > 0) {
-      log.debug(`got currency rate updates for chains: ${nativeCurrencyUpdates.map(u => u.id.chainId)}`)
-      
-      nativeCurrencyUpdates.forEach(u => {
+      log.debug(`got currency rate updates for chains: ${nativeCurrencyUpdates.map((u) => u.id.chainId)}`)
+
+      nativeCurrencyUpdates.forEach((u) => {
         storeApi.setNativeCurrencyRate(u.id.chainId, {
           price: u.data.usd,
-          change24hr: u.data.usd_24h_change
+          change24hr: u.data.usd_24h_change,
         })
       })
     }
 
-    const tokenUpdates = updates.filter(u => u.id.type === AssetType.Token)
+    const tokenUpdates = updates.filter((u) => u.id.type === AssetType.Token)
 
     if (tokenUpdates.length > 0) {
-      log.debug(`got token rate updates for addresses: ${tokenUpdates.map(u => u.id.address)}`)
+      log.debug(`got token rate updates for addresses: ${tokenUpdates.map((u) => u.id.address)}`)
 
       const tokenRates = tokenUpdates.reduce((allRates, update) => {
         // address is always defined for tokens
         const address = update.id.address as string
-        
+
         allRates[address] = {
           usd: {
             price: update.data.usd,
-            change24hr: update.data.usd_24h_change
-          }
+            change24hr: update.data.usd_24h_change,
+          },
         }
 
         return allRates
@@ -59,24 +62,25 @@ export default function rates (pylon: Pylon, store: Store) {
     }
   }
 
-  function updateSubscription (chains: number[], address?: Address) {
-    const subscribedCurrencies = chains.map(chainId => ({ type: AssetType.NativeCurrency, chainId }))
-    const knownTokens = storeApi.getKnownTokens(address).filter(token => chains.includes(token.chainId))
-    const subscribedTokens = knownTokens.map(token => ({ type: AssetType.Token, chainId: token.chainId, address: token.address }))
+  function updateSubscription(chains: number[], address?: Address) {
+    const subscribedCurrencies = chains.map((chainId) => ({ type: AssetType.NativeCurrency, chainId }))
+    const knownTokens = storeApi.getKnownTokens(address).filter((token) => chains.includes(token.chainId))
+    const subscribedTokens = knownTokens.map((token) => ({
+      type: AssetType.Token,
+      chainId: token.chainId,
+      address: token.address,
+    }))
 
-    setAssets([
-      ...subscribedCurrencies,
-      ...subscribedTokens
-    ])
+    setAssets([...subscribedCurrencies, ...subscribedTokens])
   }
 
-  function start () {
+  function start() {
     log.verbose('starting asset updates')
 
     pylon.on('rates', handleRatesUpdates)
   }
 
-  function stop () {
+  function stop() {
     log.verbose('stopping asset updates')
 
     pylon.off('rates', handleRatesUpdates)
@@ -84,15 +88,23 @@ export default function rates (pylon: Pylon, store: Store) {
     pylon.rates([])
   }
 
-  function setAssets (assetIds: AssetId[]) {
-
-    log.verbose('subscribing to rates updates for native currencies on chains:', assetIds.filter(a => a.type === AssetType.NativeCurrency).map(a => a.chainId))
-    log.verbose('subscribing to rates updates for tokens:', assetIds.filter(a => a.type === AssetType.Token).map(a => a.address))
+  function setAssets(assetIds: AssetId[]) {
+    log.verbose(
+      'subscribing to rates updates for native currencies on chains:',
+      assetIds.filter((a) => a.type === AssetType.NativeCurrency).map((a) => a.chainId)
+    )
+    log.verbose(
+      'subscribing to rates updates for tokens:',
+      assetIds.filter((a) => a.type === AssetType.Token).map((a) => a.address)
+    )
 
     pylon.rates(assetIds)
   }
 
   return {
-    start, stop, setAssets, updateSubscription
+    start,
+    stop,
+    setAssets,
+    updateSubscription,
   }
 }

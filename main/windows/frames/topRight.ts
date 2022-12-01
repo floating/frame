@@ -7,6 +7,6 @@ export default (window: FrameInstance) => {
   const windowSize = window.getSize()
   return {
     x: Math.floor(screenSize.x + screenSize.width - windowSize[0]),
-    y: screenSize.y
+    y: screenSize.y,
   }
 }

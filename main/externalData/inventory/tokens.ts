@@ -13,7 +13,7 @@ interface TokenSpec extends Token {
   }
 }
 
-function isBlacklisted (token: TokenSpec) {
+function isBlacklisted(token: TokenSpec) {
   return token.extensions?.omit
 }
 
@@ -24,11 +24,11 @@ export default class TokenLoader {
   private readonly eth = ethProvider('frame', { origin: 'frame-internal', name: 'tokenLoader' })
   private readonly nebula = nebulaApi(this.eth)
 
-  constructor () {
+  constructor() {
     this.eth.setChain('0x1')
   }
 
-  private async loadTokenList (timeout = 60_000) {
+  private async loadTokenList(timeout = 60_000) {
     try {
       const updatedTokens = await this.fetchTokenList(timeout)
       log.info(`Fetched ${updatedTokens.length} tokens`)
@@ -42,7 +42,7 @@ export default class TokenLoader {
     }
   }
 
-  private async fetchTokenList (timeout: number) {
+  private async fetchTokenList(timeout: number) {
     log.verbose(`Fetching tokens from ${TOKENS_ENS_DOMAIN}`)
 
     return new Promise<TokenSpec[]>(async (resolve, reject) => {
@@ -52,7 +52,9 @@ export default class TokenLoader {
 
       try {
         const tokenListRecord = await this.nebula.resolve(TOKENS_ENS_DOMAIN)
-        const tokenManifest: { tokens: TokenSpec[] } = await this.nebula.ipfs.getJson(tokenListRecord.record.content)
+        const tokenManifest: { tokens: TokenSpec[] } = await this.nebula.ipfs.getJson(
+          tokenListRecord.record.content
+        )
         const tokens = tokenManifest.tokens
 
         resolve(tokens)
@@ -64,10 +66,10 @@ export default class TokenLoader {
     })
   }
 
-  async start () {
+  async start() {
     log.verbose('Starting token loader')
 
-    return new Promise<void>(resolve => {
+    return new Promise<void>((resolve) => {
       const startLoading = async () => {
         clearTimeout(connectTimeout)
 
@@ -94,19 +96,19 @@ export default class TokenLoader {
       this.eth.once('connect', onConnect)
     })
   }
-  
-  stop () {
+
+  stop() {
     if (this.nextLoad) {
       clearInterval(this.nextLoad)
       this.nextLoad = null
     }
   }
 
-  getTokens (chains: number[]) {
-    return this.tokens.filter(token => !isBlacklisted(token) && chains.includes(token.chainId))
+  getTokens(chains: number[]) {
+    return this.tokens.filter((token) => !isBlacklisted(token) && chains.includes(token.chainId))
   }
 
-  getBlacklist (chains: number[] = []) {
+  getBlacklist(chains: number[] = []) {
     const chainMatches = (token: TokenSpec) => !chains.length || chains.includes(token.chainId)
 
     return this.tokens.filter((token) => isBlacklisted(token) && chainMatches(token))

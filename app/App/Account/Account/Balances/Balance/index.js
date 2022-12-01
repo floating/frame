@@ -5,9 +5,17 @@ import { DisplayFiatPrice, DisplayValue } from '../../../../../../resources/Comp
 import RingIcon from '../../../../../../resources/Components/RingIcon'
 
 class Balance extends React.Component {
-  render () {
+  render() {
     const { symbol, balance, i, scanning, chainId } = this.props
-    const { priceChange, decimals, balance: balanceValue, usdRate: currencyRate, logoURI, price, displayBalance = '0' } = balance
+    const {
+      priceChange,
+      decimals,
+      balance: balanceValue,
+      usdRate: currencyRate,
+      logoURI,
+      price,
+      displayBalance = '0',
+    } = balance
     const change = parseFloat(priceChange)
     const direction = change < 0 ? -1 : change > 0 ? 1 : 0
     let priceChangeClass = 'signerBalanceCurrentPriceChange'
@@ -32,30 +40,29 @@ class Balance extends React.Component {
     const chainColor = this.store('main.networksMeta.ethereum', chainId, 'primaryColor')
 
     return (
-      <div className={i === 0 ? 'signerBalance signerBalanceBase' : 'signerBalance'} key={symbol} onMouseDown={() => this.setState({ selected: i })}>
-        {scanning && <div className='signerBalanceLoading' style={{ animationDelay: (0.15 * i) + 's' }} />}
+      <div
+        className={i === 0 ? 'signerBalance signerBalanceBase' : 'signerBalance'}
+        key={symbol}
+        onMouseDown={() => this.setState({ selected: i })}
+      >
+        {scanning && <div className='signerBalanceLoading' style={{ animationDelay: 0.15 * i + 's' }} />}
         <div className='signerBalanceInner' style={{ opacity: !scanning ? 1 : 0 }}>
           <div className='signerBalanceIcon'>
-            <RingIcon 
+            <RingIcon
               img={symbol.toUpperCase() !== 'ETH' && logoURI}
               alt={symbol.toUpperCase()}
               color={chainColor ? `var(--${chainColor})` : ''}
             />
           </div>
-          <div 
-            className='signerBalanceChain'
-            style={{ color: chainColor ? `var(--${chainColor})` : '' }}
-          >
+          <div className='signerBalanceChain' style={{ color: chainColor ? `var(--${chainColor})` : '' }}>
             {chainName}
           </div>
-          <div className='signerBalanceCurrency'>
-            {name}
-          </div>
+          <div className='signerBalanceCurrency'>{name}</div>
           <div className='signerBalanceValue'>
-            <DisplayValue 
-              type='ether' 
-              value={balanceValue} 
-              valueDataParams={{ decimals }} 
+            <DisplayValue
+              type='ether'
+              value={balanceValue}
+              valueDataParams={{ decimals }}
               currencySymbol={symbol}
             />
           </div>
@@ -68,7 +75,13 @@ class Balance extends React.Component {
                 <span>{displayPriceChange()}</span>
               </span>
             </div>
-            <DisplayValue type='fiat' value={balanceValue} valueDataParams={{ decimals, currencyRate, isTestnet }} currencySymbol='$' displayDecimals={false} />
+            <DisplayValue
+              type='fiat'
+              value={balanceValue}
+              valueDataParams={{ decimals, currencyRate, isTestnet }}
+              currencySymbol='$'
+              displayDecimals={false}
+            />
           </div>
         </div>
       </div>

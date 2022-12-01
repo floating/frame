@@ -12,8 +12,8 @@ const knownTokens = [
   {
     chainId: 10,
     address: '0x4200000000000000000000000000000000000042',
-    symbol: 'OP'
-  }
+    symbol: 'OP',
+  },
 ]
 
 let balances
@@ -48,7 +48,7 @@ it('scans for balances as soon as the controller is ready', () => {
   balances.setAddress(address)
 
   expect(balancesController.updateKnownTokenBalances).not.toHaveBeenCalled()
-  
+
   balancesController.emit('ready')
   jest.advanceTimersByTime(0)
 

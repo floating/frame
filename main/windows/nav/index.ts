@@ -19,7 +19,7 @@ const nav = {
     // Replaces last crumb when navigate is false
     // Adds new crumb to nav array when navigate is true
     store.navUpdate(windowId, crumb, navigate)
-  }
+  },
 }
 
 ipcMain.on('nav:forward', (e, windowId: string, crumb: Breadcrumb) => {

@@ -8,11 +8,7 @@ const SimpleJSON = ({ json }) => {
         <div key={key + o} className='simpleJsonChild'>
           <div className='simpleJsonKey'>{key}:</div>
           <div className='simpleJsonValue'>
-            {typeof json[key] === 'object' ? (
-              <SimpleJSON json={json[key]} key={key} />
-            ) : (
-              json[key]
-            )}
+            {typeof json[key] === 'object' ? <SimpleJSON json={json[key]} key={key} /> : json[key]}
           </div>
         </div>
       ))}
@@ -21,7 +17,7 @@ const SimpleJSON = ({ json }) => {
 }
 
 class TransactionRequest extends React.Component {
-  constructor (...args) {
+  constructor(...args) {
     super(...args)
     this.state = { allowInput: false, dataView: false }
 
@@ -32,7 +28,7 @@ class TransactionRequest extends React.Component {
     }, props.signingDelay || 1500)
   }
 
-  render () {
+  render() {
     const { req } = this.props
     const type = req.type
     const status = req.status
@@ -46,35 +42,33 @@ class TransactionRequest extends React.Component {
     if (status === 'pending') requestClass += ' signerRequestPending'
     if (status === 'error') requestClass += ' signerRequestError'
 
-    const messageToSign = typedData.domain
-     ? (
-        <div className='signTypedData'>
-          <div className='signTypedDataInner'>
-            <div className='signTypedDataSection'>
-              <div className='signTypedDataTitle'>Domain</div>
-              <SimpleJSON json={typedData.domain} />
-            </div>
-            <div className='signTypedDataSection'>
-              <div className='signTypedDataTitle'>Message</div>
-              <SimpleJSON json={typedData.message} />
-            </div>
+    const messageToSign = typedData.domain ? (
+      <div className='signTypedData'>
+        <div className='signTypedDataInner'>
+          <div className='signTypedDataSection'>
+            <div className='signTypedDataTitle'>Domain</div>
+            <SimpleJSON json={typedData.domain} />
           </div>
-        </div>
-        )
-      : (
-        <div className='signTypedData'>
-          <div className='signTypedDataInner'>
-            <div className='signTypedDataSection'>
-            <SimpleJSON json={
-              typedData.reduce((data, elem) => {
-                data[elem.name] = elem.value
-                return data
-              }, {})
-            } />
+          <div className='signTypedDataSection'>
+            <div className='signTypedDataTitle'>Message</div>
+            <SimpleJSON json={typedData.message} />
           </div>
         </div>
       </div>
-      )
+    ) : (
+      <div className='signTypedData'>
+        <div className='signTypedDataInner'>
+          <div className='signTypedDataSection'>
+            <SimpleJSON
+              json={typedData.reduce((data, elem) => {
+                data[elem.name] = elem.value
+                return data
+              }, {})}
+            />
+          </div>
+        </div>
+      </div>
+    )
     return (
       <div key={this.props.req.id || this.props.req.handlerId} className={requestClass}>
         {type === 'signTypedData' ? (

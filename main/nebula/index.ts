@@ -33,6 +33,6 @@ export default function (provider = mainnetProvider) {
   return {
     once: events.once.bind(events),
     ready: () => ready,
-    ...nebula(pylonUrl, provider)
+    ...nebula(pylonUrl, provider),
   }
 }

@@ -4,15 +4,15 @@ import Restore from 'react-restore'
 import svg from '../../../../../../../../../resources/svg'
 
 class BasicApproval extends React.Component {
-  constructor (...args) {
+  constructor(...args) {
     super(...args)
 
     this.state = {
-      inPreview: false
+      inPreview: false,
     }
   }
 
-  render () {
+  render() {
     const { approval } = this.props
     return (
       <div className='approveTransactionWarning'>
@@ -44,7 +44,7 @@ class BasicApproval extends React.Component {
             Proceed
           </div>
         </div>
-        <div 
+        <div
           className='approveTransactionWarningFill'
           style={this.state.inPreview ? { opacity: 0 } : { opacity: 1 }}
         >

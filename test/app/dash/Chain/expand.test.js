@@ -18,7 +18,7 @@ beforeAll(() => {
     name: 'Leetnet',
     explorer: 'https://etherscan.io',
     symbol: 'ETH',
-    on: true
+    on: true,
   })
 })
 
@@ -31,7 +31,7 @@ describe('rendering', () => {
   it('renders the provided chain name', () => {
     const chainConfig = { view: 'expanded', name: 'Bizarro Mainnet' }
     const { getByLabelText } = setupComponent(<Chain {...chainConfig} />)
-    
+
     const chainNameInput = getByLabelText('Chain Name')
     expect(chainNameInput.value).toEqual('Bizarro Mainnet')
   })
@@ -39,7 +39,7 @@ describe('rendering', () => {
   it('renders the provided chain symbol', () => {
     const chainConfig = { view: 'expanded', symbol: 'AVAX' }
     const { getByLabelText } = setupComponent(<Chain {...chainConfig} />)
-    
+
     const chainNameInput = getByLabelText('Native Symbol')
     expect(chainNameInput.value).toEqual('AVAX')
   })
@@ -61,7 +61,7 @@ describe('updating', () => {
       name: 'Leetnet',
       explorer: 'https://etherscan.io',
       symbol: 'ETH',
-      on: true
+      on: true,
     }
 
     const { user, getByRole } = setupComponent(<Chain view='expanded' {...chainConfig} />)
@@ -71,7 +71,7 @@ describe('updating', () => {
       'tray:action',
       'navDash',
       expect.objectContaining({
-        view: 'notify'
+        view: 'notify',
       })
     )
   })

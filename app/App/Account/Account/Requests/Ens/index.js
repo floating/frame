@@ -2,14 +2,14 @@ import React from 'react'
 
 const timeFormat = new Intl.DateTimeFormat('en', { dateStyle: 'medium' })
 
-function formatTime (amount, unit) {
+function formatTime(amount, unit) {
   return `for ${amount} ${unit}${amount > 1 ? 's' : ''}`
 }
 
-function formatDuration (duration) {
+function formatDuration(duration) {
   if (duration < 60) return 'for < 1 minute'
   if (duration < 3600) return formatTime(Math.floor(duration / 60), 'minute')
-  if (duration < (3600 * 24)) return formatTime(Math.floor(duration / 3600), 'hour')
+  if (duration < 3600 * 24) return formatTime(Math.floor(duration / 3600), 'hour')
 
   const endDate = new Date()
   endDate.setSeconds(endDate.getSeconds() + duration)
@@ -25,7 +25,7 @@ const EnsOverview = ({ type, data }) => {
       </>
     )
   }
-  
+
   if (type === 'register') {
     return (
       <>
@@ -52,7 +52,9 @@ const EnsOverview = ({ type, data }) => {
 
     return (
       <>
-        <div className='_txDescriptionSummaryLine'>{`Transferring ENS Name${name ? '' : ' with token id'}`}</div>
+        <div className='_txDescriptionSummaryLine'>{`Transferring ENS Name${
+          name ? '' : ' with token id'
+        }`}</div>
         <div className='_txDescriptionSummaryLine _txDescriptionSummaryHeadline'>{display}</div>
         <div className='_txDescriptionSummaryLine'>from</div>
         <div className='_txDescriptionSummaryLine _txDescriptionSummaryMidline'>{from}</div>

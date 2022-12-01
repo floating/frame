@@ -2,10 +2,7 @@ import LedgerEthereumApp from '../../../../../main/signers/ledger/Ledger/eth'
 import { Derivation } from '../../../../../main/signers/Signer/derive'
 import log from 'electron-log'
 
-import {
-  openTransportReplayer,
-  RecordStore,
-} from '@ledgerhq/hw-transport-mocker'
+import { openTransportReplayer, RecordStore } from '@ledgerhq/hw-transport-mocker'
 
 // -------------------
 // uncomment this version of eth app creation to record interactions with the Ledger so they can be replayed.
@@ -34,7 +31,7 @@ afterAll(() => {
   log.transports.console.level = 'debug'
 })
 
-async function createEthApp (replayCodes = '') {
+async function createEthApp(replayCodes = '') {
   const record = RecordStore.fromString(replayCodes)
   const transport = await openTransportReplayer(record)
 
@@ -100,10 +97,12 @@ describe('#signMessage', () => {
       <= 1b5dfbee187e688cddacd854f3ed514c5a0a84ae972fe9ddeafb06436c92d7b1421ad9b725c7270d2c5b32ef824e0700ae354471a644d9cd06cb9f3422feba21319000
     `
 
-    const ethApp = await createEthApp(replayData)                 
+    const ethApp = await createEthApp(replayData)
     const signature = await ethApp.signMessage("44'/60'/0'/0/2", '0x68656c6c6f2c204672616d6521')
 
-    expect(signature).toBe('0x5dfbee187e688cddacd854f3ed514c5a0a84ae972fe9ddeafb06436c92d7b1421ad9b725c7270d2c5b32ef824e0700ae354471a644d9cd06cb9f3422feba213100')
+    expect(signature).toBe(
+      '0x5dfbee187e688cddacd854f3ed514c5a0a84ae972fe9ddeafb06436c92d7b1421ad9b725c7270d2c5b32ef824e0700ae354471a644d9cd06cb9f3422feba213100'
+    )
   }, 100)
 
   it('signs a message with no hex prefix', async () => {
@@ -115,7 +114,9 @@ describe('#signMessage', () => {
     const ethApp = await createEthApp(replayData)
     const signature = await ethApp.signMessage("44'/1'/0'/0/6", '68656c6c6f2c204672616d6521')
 
-    expect(signature).toBe('0xe5d40722e7df2660b8f7b68367ea885ddc68d4da701bb04565f60252909127e72cfe480f7227a2a3f6e8753d4ac9f4e3526f65d78fa3fbcc1ec3b3148bd85e3201')
+    expect(signature).toBe(
+      '0xe5d40722e7df2660b8f7b68367ea885ddc68d4da701bb04565f60252909127e72cfe480f7227a2a3f6e8753d4ac9f4e3526f65d78fa3fbcc1ec3b3148bd85e3201'
+    )
   }, 100)
 
   it('fails to sign a message with an invalid BIP 32 path', async () => {
@@ -157,16 +158,13 @@ describe('#signTypedData', () => {
       chainId: '4',
       name: 'Ether Mail',
       verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
-      version: '1'
+      version: '1',
     },
     message: {
       contents: 'Hello, Bob!',
       from: {
         name: 'Cow',
-        wallets: [
-          '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
-          '0xDeaDbeefdEAdbeefdEadbEEFdeadbeEFdEaDbeeF'
-        ]
+        wallets: ['0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826', '0xDeaDbeefdEAdbeefdEadbEEFdeadbeEFdEaDbeeF'],
       },
       to: [
         {
@@ -174,10 +172,10 @@ describe('#signTypedData', () => {
           wallets: [
             '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
             '0xB0BdaBea57B0BDABeA57b0bdABEA57b0BDabEa57',
-            '0xB0B0b0b0b0b0B000000000000000000000000000'
-          ]
-        }
-       ]
+            '0xB0B0b0b0b0b0B000000000000000000000000000',
+          ],
+        },
+      ],
     },
     primaryType: 'Mail',
     types: {
@@ -185,22 +183,22 @@ describe('#signTypedData', () => {
         { name: 'name', type: 'string' },
         { name: 'version', type: 'string' },
         { name: 'chainId', type: 'uint256' },
-        { name: 'verifyingContract', type: 'address' }
+        { name: 'verifyingContract', type: 'address' },
       ],
       Group: [
         { name: 'name', type: 'string' },
-        { name: 'members', type: 'Person[]' }
+        { name: 'members', type: 'Person[]' },
       ],
       Mail: [
         { name: 'from', type: 'Person' },
         { name: 'to', type: 'Person[]' },
-        { name: 'contents', type: 'string' }
+        { name: 'contents', type: 'string' },
       ],
       Person: [
         { name: 'name', type: 'string' },
-        { name: 'wallets', type: 'address[]' }
-      ]
-    }
+        { name: 'wallets', type: 'address[]' },
+      ],
+    },
   }
 
   it('signs valid v4 typed data', async () => {
@@ -212,7 +210,9 @@ describe('#signTypedData', () => {
     const ethApp = await createEthApp(replayData)
     const signature = await ethApp.signTypedData("44'/60'/0'/0", typedData)
 
-    expect(signature).toBe('0xee800a5a7e4e1668a8ebab2a5bce4c96424e0f80b7ba08fc48e063393196e0851c0f9dab8909655368974e8aec6dba5c15772d575189e31b894fb7f8286c63b900')
+    expect(signature).toBe(
+      '0xee800a5a7e4e1668a8ebab2a5bce4c96424e0f80b7ba08fc48e063393196e0851c0f9dab8909655368974e8aec6dba5c15772d575189e31b894fb7f8286c63b900'
+    )
   }, 100)
 
   it('fails to sign typed data with an invalid BIP 32 path', async () => {
@@ -258,7 +258,7 @@ describe('#signTransaction', () => {
     gasPrice: '0x1dcd65000',
     chainId: '0x4',
     type: '0x0',
-    nonce: '0x5'
+    nonce: '0x5',
   }
 
   const eip1559Tx = {
@@ -271,7 +271,7 @@ describe('#signTransaction', () => {
     type: '0x2',
     maxPriorityFeePerGas: '0x3b9aca00',
     maxFeePerGas: '0x3b9aca0b',
-    nonce: '0x6'
+    nonce: '0x6',
   }
 
   it('signs a pre-EIP-1193 transaction', async () => {
@@ -282,7 +282,9 @@ describe('#signTransaction', () => {
     const ethApp = await createEthApp(replayData)
     const signature = await ethApp.signTransaction("44'/60'/0'/0", legacyTx)
 
-    expect(signature).toBe('0xf86a058501dcd65000825208942f318c334780961fb129d2a6c30d0763d9a5c970865af3107a4000802ba087cdd3a45082a1d86c4dab5a1944360a69543dba2acacea01f19133a7ddef115a078365690e4bdcf1bb58242bb673d53f94d525bee4217b0f191048eaca8cade73')
+    expect(signature).toBe(
+      '0xf86a058501dcd65000825208942f318c334780961fb129d2a6c30d0763d9a5c970865af3107a4000802ba087cdd3a45082a1d86c4dab5a1944360a69543dba2acacea01f19133a7ddef115a078365690e4bdcf1bb58242bb673d53f94d525bee4217b0f191048eaca8cade73'
+    )
   }, 100)
 
   it('signs an EIP-1193 transaction', async () => {
@@ -294,7 +296,9 @@ describe('#signTransaction', () => {
     const ethApp = await createEthApp(replayData)
     const signature = await ethApp.signTransaction("44'/60'/0'/0", eip1559Tx)
 
-    expect(signature).toBe('0x02f8700406843b9aca00843b9aca0b825208942f318c334780961fb129d2a6c30d0763d9a5c970865af3107a400080c001a0ebefc9f798b04e3952310d6b82c48fda245df9edef77507d06025cdc5af4efa1a0570784cbcf84a0f03cac7771fbfeee4f4759034baf42ca735065554afa600ee3')
+    expect(signature).toBe(
+      '0x02f8700406843b9aca00843b9aca0b825208942f318c334780961fb129d2a6c30d0763d9a5c970865af3107a400080c001a0ebefc9f798b04e3952310d6b82c48fda245df9edef77507d06025cdc5af4efa1a0570784cbcf84a0f03cac7771fbfeee4f4759034baf42ca735065554afa600ee3'
+    )
   }, 100)
 
   it('fails to sign a transaction with an invalid BIP 32 path', async () => {

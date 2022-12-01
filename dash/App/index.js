@@ -22,27 +22,32 @@ const AddNewItemButton = ({ view, req }) => {
   const dataMap = {
     accounts: { showAddAccounts: true },
     chains: { newChain: {} },
-    tokens: { notify: 'addToken', notifyData: req }
+    tokens: { notify: 'addToken', notifyData: req },
   }
-  return <div className='dashFooter'>
-    <div className='dashFooterButton' onClick={() => link.send('tray:action', 'navDash', { view, data: dataMap[view] })}>
-      <div className='newAccountIcon'>{svg.plus(16)}</div> 
-      Add New {itemName(view)}
+  return (
+    <div className='dashFooter'>
+      <div
+        className='dashFooterButton'
+        onClick={() => link.send('tray:action', 'navDash', { view, data: dataMap[view] })}
+      >
+        <div className='newAccountIcon'>{svg.plus(16)}</div>
+        Add New {itemName(view)}
+      </div>
     </div>
-  </div>
+  )
 }
 
 class Dash extends React.Component {
   constructor(props, context) {
-    super(props, context);
+    super(props, context)
     this.input = React.createRef()
     this.state = {
       showAddAccounts: false,
-      selected: 'home'
+      selected: 'home',
     }
   }
 
-  renderPanel (view, data) {
+  renderPanel(view, data) {
     if (view === 'accounts') return <Accounts data={data} />
     if (view === 'expandedSigner' && data.signer) {
       const signer = this.store('main.signers', data.signer)
@@ -57,21 +62,17 @@ class Dash extends React.Component {
     return <Main />
   }
 
-  render () {
+  render() {
     const { view, data } = this.store('windows.dash.nav')[0] || { view: 'default', data: {} }
-    const showAddButton = ['chains', 'accounts', 'tokens'].includes(view) && (!data || Object.keys(data).length === 0)
+    const showAddButton =
+      ['chains', 'accounts', 'tokens'].includes(view) && (!data || Object.keys(data).length === 0)
 
     return (
       <div className='dash'>
         <Command />
-        <div 
-          className='dashMain'
-          style={{ bottom: showAddButton ? '120px' : '40px' }}
-        >
+        <div className='dashMain' style={{ bottom: showAddButton ? '120px' : '40px' }}>
           <div className='dashMainOverlay' />
-          <div className='dashMainScroll'>
-            {this.renderPanel(view, data)}
-          </div>
+          <div className='dashMainScroll'>{this.renderPanel(view, data)}</div>
         </div>
         {showAddButton && <AddNewItemButton view={view} req={this.props.req} />}
       </div>
