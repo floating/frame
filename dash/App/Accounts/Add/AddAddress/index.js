@@ -59,15 +59,13 @@ class AddAddress extends React.Component {
       this.cancelEnsResolution = () => reject('User canceled ENS resolution request for watch account')
 
       link.rpc('resolveEnsName', name, (err, resolvedAddress) => {
-        if (err || !resolvedAddress) {
-          const message = `Unable to resolve Ethereum address for ${name}`
-          this.setError(message)
-          reject(message)
-        }
-
-        resolve(resolvedAddress)
-
         this.nextForm()
+
+        if (resolvedAddress) return resolve(resolvedAddress)
+
+        const message = `Unable to resolve Ethereum address for ${name}`
+        this.setError(message)
+        reject(message)
       })
     })
   }
