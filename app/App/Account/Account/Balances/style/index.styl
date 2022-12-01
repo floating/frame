@@ -1,484 +1,424 @@
-.balancesBlock {
-  box-sizing: border-box;
-  overflow: auto;
-}
+.balancesBlock
+  box-sizing border-box
+  overflow auto
 
-.signerBalanceWarning {
-  position: relative;
-  border-top: 1px solid var(--ghostA);
-  font-weight: 400;
-  padding: 10px 0px;
-  cursor: pointer;
-}
+.signerBalanceWarning
+  position relative
+  border-top 1px solid var(--ghostA)
+  font-weight 400
+  padding 10px 0px
+  cursor pointer
 
-.signerBalancesExpanded {
-  width: 100%;
-}
+.signerBalancesExpanded
+  width 100%
 
-.signerBalancesWrap {
-  margin: 0px 6px 6px 6px;
-  padding: 2px 3px 1px 3px;
-  box-sizing: border-box;
-  overflow: auto;
-  background: var(--ghostZ);
-  border-radius: 20px;
-  min-height: 76px;
-  position: relative;
-  z-index: 999;
+.signerBalancesWrap
+  margin 0px 6px 6px 6px
+  padding 2px 3px 1px 3px
+  box-sizing border-box
+  overflow auto
+  background var(--ghostZ)
+  border-radius 20px
+  min-height 76px
+  position relative
+  z-index 999
 
-  .signerBalance:first-child {
-    border-top-right-radius: 17px;
-    border-top-left-radius: 17px;
-  }
+  .signerBalance:first-child
+    border-top-right-radius 17px
+    border-top-left-radius 17px
 
-  .signerBalance:last-child {
-    border-bottom-right-radius: 17px;
-    border-bottom-left-radius: 17px;
-  }
+  .signerBalance:last-child
+    border-bottom-right-radius 17px
+    border-bottom-left-radius 17px
 
-  .signerBalance:first-child:last-child {
-    border-bottom-right-radius: 17px;
-  }
-}
+  .signerBalance:first-child:last-child
+    border-bottom-right-radius 17px
 
-.signerBalanceWarningTitle {
-  position: relative;
-  height: 24px;
-  width: 100%;
-  z-index: 200000;
-  font-size: 10px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: var(--moon);
-  text-transform: uppercase;
-  pointer-events: none;
-}
+.signerBalanceWarningTitle
+  position relative
+  height 24px
+  width 100%
+  z-index 200000
+  font-size 10px
+  display flex
+  justify-content center
+  align-items center
+  color var(--moon)
+  text-transform uppercase
+  pointer-events none
 
-.signerBalanceWarningTitle:hover {
-  color: var(--moonLight);
-}
+.signerBalanceWarningTitle:hover
+  color var(--moonLight)
 
-.signerBalanceWarningMessage {
-  position: relative;
-  width: 100%;
-  text-align: center;
-  padding: 20px;
-  box-sizing: border-box;
-  font-size: 12px;
-  font-weight: 300;
-}
+.signerBalanceWarningMessage
+  position relative
+  width 100%
+  text-align center
+  padding 20px
+  box-sizing border-box
+  font-size 12px
+  font-weight 300
 
-.signerBalanceTotal {
-  position: relative;
-  height: 52px;
-  width: 100%;
-  z-index: 200000;
-  font-size: 14px;
-  margin-bottom: 6px;
+.signerBalanceTotal
+  position relative
+  height 52px
+  width 100%
+  z-index 200000
+  font-size 14px
+  margin-bottom 6px
 
-  .signerBalanceButtons {
-    display: flex;
-    justify-content: left;
-    align-items: center;
-    height: 100%;
+  .signerBalanceButtons
+    display flex
+    justify-content left
+    align-items center
+    height 100%
 
-    .moduleItemButton {
-      background: var(--ghostA);
-      box-shadow: 0px 4px 6px var(--ghostY);
-      border-bottom: 2px solid var(--ghostZ);
-      cursor: pointer;
+    .moduleItemButton
+      background var(--ghostA)
+      box-shadow 0px 4px 6px var(--ghostY)
+      border-bottom 2px solid var(--ghostZ)
+      cursor pointer
+      * 
+        pointer-events none
 
-      * {
-        pointer-events: none;
-      }
-    }
+    .moduleItemButton:hover
+      background var(--ghostB)
+      transform translateY(-1px)
+      border-bottom 2px solid var(--ghostZ)
+      box-shadow 0px 8px 30px -12px var(--ghostX)
+      
+    .moduleItemButton:active
+      background var(--ghostB)
+      transform translateY(0px)
+      box-shadow 0px 2px 4px var(--ghostX)
 
-    .moduleItemButton:hover {
-      background: var(--ghostB);
-      transform: translateY(-1px);
-      border-bottom: 2px solid var(--ghostZ);
-      box-shadow: 0px 8px 30px -12px var(--ghostX);
-    }
+  .signerBalanceButton
+    height 40px
+    margin-left 13px
+    background var(--ghostA)
+    border 3px solid var(--ghostZ)
+    border-radius 20px
+    box-sizing border-box
+    cursor pointer
+    z-index 4000
+    display flex
+    justify-content center
+    align-items center
+    font-size 11px
+    font-weight 400
+    letter-spacing 1px
+    text-transform uppercase
+    padding 1px 20px 0px 21px
 
-    .moduleItemButton:active {
-      background: var(--ghostB);
-      transform: translateY(0px);
-      box-shadow: 0px 2px 4px var(--ghostX);
-    }
-  }
+    *
+      pointer-events none
+      margin-left 2px
 
-  .signerBalanceButton {
-    height: 40px;
-    margin-left: 13px;
-    background: var(--ghostA);
-    border: 3px solid var(--ghostZ);
-    border-radius: 20px;
-    box-sizing: border-box;
-    cursor: pointer;
-    z-index: 4000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 11px;
-    font-weight: 400;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    padding: 1px 20px 0px 21px;
-
-    * {
-      pointer-events: none;
-      margin-left: 2px;
-    }
-  }
-
-  .signerBalanceButton:hover {
-    background: var(--ghostB);
-    color: var(--outerspace);
+  .signerBalanceButton:hover
+    background var(--ghostB)
+    color var(--outerspace)
     // color var(--good)
-  }
 
-  .signerBalanceTotalText {
-    position: absolute;
-    left: 16px;
-    right: 23px;
-    bottom: 0px;
-    top: 0px;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
+  .signerBalanceTotalText
+    position absolute
+    left 16px
+    right 23px
+    bottom 0px
+    top 0px
+    display flex
+    justify-content flex-end
+    align-items center
 
-    .signerBalanceTotalLabel {
-      margin-right: 10px;
-      margin-top: 1px;
-      text-transform: uppercase;
-      font-size: 10px;
-      letter-spacing: 1px;
-      font-weight: 500;
-    }
+    .signerBalanceTotalLabel
+      margin-right 10px
+      margin-top 1px
+      text-transform uppercase
+      font-size 10px
+      letter-spacing 1px
+      font-weight 500
 
-    .signerBalanceTotalValue {
-      font-size: 17px;
-      font-family: 'FiraCode';
-      letter-spacing: -1px;
-      font-size: 15px;
-      text-align: center;
-      display: flex;
-      align-items: center;
-    }
-  }
-}
+    .signerBalanceTotalValue
+      font-size 17px
+      font-family 'FiraCode'
+      letter-spacing -1px
+      font-size 15px
+      text-align center
+      display flex
+      align-items center
 
-.signerBalancesLoading {
-  position: absolute;
-  top: 46px;
-  left: 9px;
-  right: 9px;
-  bottom: 78px;
-  z-index: 200;
-  border-radius: 17px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: var(--ghostA);
+.signerBalancesLoading
+  position absolute
+  top 46px
+  left 9px
+  right 9px
+  bottom 78px
+  z-index 200
+  border-radius 17px
+  display flex
+  justify-content center
+  align-items center
+  background var(--ghostA)
 
-  .loader, .loader:after {
-    border-radius: 100%;
-    width: 22px;
-    height: 22px;
-  }
+  .loader, .loader:after
+    border-radius 100%
+    width 22px
+    height 22px
 
-  .loader {
-    font-size: 7px;
-    position: relative;
-    text-indent: -9999em;
-    border-top: 3px solid var(--ghostZ);
-    border-right: 3px solid var(--ghostZ);
-    border-bottom: 3px solid var(--ghostZ);
-    border-left: 3px solid var(--ghostD);
-    transform: translateZ(0);
-    animation: load8 0.6s infinite linear !important;
-    will-change: transform;
-  }
-}
+  .loader
+    font-size 7px
+    position relative
+    text-indent -9999em
+    border-top 3px solid var(--ghostZ)
+    border-right 3px solid var(--ghostZ)
+    border-bottom 3px solid var(--ghostZ)
+    border-left 3px solid var(--ghostD)
+    transform translateZ(0)
+    animation load8 0.6s infinite linear !important
+    will-change transform
 
-.signerBalance {
-  position: relative;
-  opacity: 1;
-  height: 70px;
-  transition: 0.1s ease-out all;
-  background: var(--ghostA);
-  border-radius: 8px;
-  margin-top: 1px;
-  font-family: 'MainFont';
-  overflow: hidden;
-  box-shadow: 0px 4px 6px var(--ghostY);
-  border-bottom: 2px solid var(--ghostZ);
+.signerBalance
+  position relative
+  opacity 1
+  height 70px
+  transition 0.1s ease-out all
+  background var(--ghostA)
+  border-radius 8px
+  margin-top 1px
+  font-family 'MainFont'
+  overflow hidden
+  box-shadow 0px 4px 6px var(--ghostY)
+  border-bottom 2px solid var(--ghostZ)
 
-  @keyframes sheenLoad {
-    0% {
-      transform: rotateZ(360deg) translateX(-100%);
-    }
+  @keyframes sheenLoad
+    0%
+      transform rotateZ(360deg) translateX(-100%)
+    100%
+      transform rotateZ(360deg) translateX(100%)
 
-    100% {
-      transform: rotateZ(360deg) translateX(100%);
-    }
-  }
+  .signerBalanceLoading
+    position absolute
+    top 0
+    bottom 0
+    left 0
+    transform rotateZ(360deg) translateX(-100%)
+    will-change transform
+    width 400%
+    background linear-gradient(90deg, var(--ghostB0) 25%, var(--ghostB) 48%, var(--ghostB) 52%, var(--ghostB0) 75%)
+    animation sheenLoad 5s infinite linear
+    transition var(--standardFast)
 
-  .signerBalanceLoading {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    transform: rotateZ(360deg) translateX(-100%);
-    will-change: transform;
-    width: 400%;
-    background: linear-gradient(90deg, var(--ghostB0) 25%, var(--ghostB) 48%, var(--ghostB) 52%, var(--ghostB0) 75%);
-    animation: sheenLoad 5s infinite linear;
-    transition: var(--standardFast);
-  }
+  .signerBalanceInner
+    position relative
+    height 100%
+    transition all linear 0.8s
 
-  .signerBalanceInner {
-    position: relative;
-    height: 100%;
-    transition: all linear 0.8s;
-  }
+  .signerBalanceIcon
+    position absolute
+    top 18px
+    left 12px
 
-  .signerBalanceIcon {
-    position: absolute;
-    top: 18px;
-    left: 12px;
-  }
+  .signerBalanceCurrency
+    position absolute
+    left 62px
+    top 26px
+    right 135px
+    font-size 14px
+    display flex
+    align-items center
+    font-weight 400
+    white-space nowrap
+    z-index 2
+    overflow hidden
 
-  .signerBalanceCurrency {
-    position: absolute;
-    left: 62px;
-    top: 25px;
-    right: 135px;
-    font-size: 15px;
-    display: flex;
-    align-items: center;
-    font-weight: 400;
-    white-space: nowrap;
-    z-index: 2;
-    overflow: hidden;
-  }
+  .signerBalanceChain
+    position absolute
+    left 60px
+    top 9px
+    font-size 10px
+    display flex
+    align-items center
+    font-weight 500
+    white-space nowrap
+    z-index 2
+    text-transform uppercase
+    letter-spacing 2px
+    height 12px
+    padding 0px 0px 0px 2px
+    border-radius 8px
+   
+  .signerBalancePrice
+    position absolute
+    right 12px
+    bottom 8px
+    left 62px
+    font-size 12px
+    font-weight 400
+    color var(--outerspace06)
+    display flex
+    align-items center
+    justify-content space-between
+    font-family 'FiraCode'
 
-  .signerBalanceChain {
-    position: absolute;
-    left: 60px;
-    top: 9px;
-    font-size: 10px;
-    display: flex;
-    align-items: center;
-    font-weight: 500;
-    white-space: nowrap;
-    z-index: 2;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    height: 12px;
-    padding: 0px 0px 0px 2px;
-    border-radius: 8px;
-  }
+  .signerBalanceOk
+    display flex
+    align-items center
+    justify-content center
 
-  .signerBalancePrice {
-    position: absolute;
-    right: 12px;
-    bottom: 8px;
-    left: 62px;
-    font-size: 12px;
-    font-weight: 400;
-    color: var(--outerspace06);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-family: 'FiraCode';
-  }
+  .signerBalanceCurrentValue
+    display flex
+    align-items center
 
-  .signerBalanceOk {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+  .signerBalanceCurrentPrice
+    display flex
+    align-items center
+    color var(--outerspace)
+    margin-left -2px
 
-  .signerBalanceCurrentValue {
-    display: flex;
-    align-items: center;
-  }
+  .signerBalanceCurrentPriceChange
+    display flex
+    align-items center
+    margin-left 4px
 
-  .signerBalanceCurrentPrice {
-    display: flex;
-    align-items: center;
-    color: var(--outerspace);
-    margin-left: -2px;
-  }
+  .signerBalanceCurrentPriceChangeUp
+    color var(--good)
 
-  .signerBalanceCurrentPriceChange {
-    display: flex;
-    align-items: center;
-    margin-left: 4px;
-  }
+  .signerBalanceCurrentPriceChangeDown
+    color var(--bad)
 
-  .signerBalanceCurrentPriceChangeUp {
-    color: var(--good);
-  }
+  .signerBalanceChainIcon
+    position absolute
+    left -6px
+    top 9px
+    height 16px
+    width 16px
+    background var(--foreverwhite)
+    border-radius 16px
+    overflow hidden
+    z-index 2
+    color black
+    box-shadow 0px 0px 2px var(--ghostA)
 
-  .signerBalanceCurrentPriceChangeDown {
-    color: var(--bad);
-  }
+  .signerBalanceLogo
+    position absolute
+    left 0px
+    top 13px
+    height 32px
+    width 32px
+    background var(--foreverwhite)
+    border-radius 16px
+    overflow hidden
+    z-index 1
 
-  .signerBalanceChainIcon {
-    position: absolute;
-    left: -6px;
-    top: 9px;
-    height: 16px;
-    width: 16px;
-    background: var(--foreverwhite);
-    border-radius: 16px;
-    overflow: hidden;
-    z-index: 2;
-    color: black;
-    box-shadow: 0px 0px 2px var(--ghostA);
-  }
+    img:before
+      content attr(alt)
+      top 0
+      bottom 0
+      left 0
+      right 0
+      border-radius 13px
+      position absolute
+      background var(--outerspace)
+      color var(--ghostD)
+      display flex
+      justify-content center
+      align-items center
+      font-size 11px
+      font-weight 300
+      letter-spacing -0.5px
+      margin-left -0.5px
+     
+    img
+      height 30px
+      width 30px
+      border-radius 15px
+      position absolute
+      top 1px
+      left 1px
+      overflow hidden
 
-  .signerBalanceLogo {
-    position: absolute;
-    left: 0px;
-    top: 13px;
-    height: 32px;
-    width: 32px;
-    background: var(--foreverwhite);
-    border-radius: 16px;
-    overflow: hidden;
-    z-index: 1;
+  .signerBalanceValue
+    position absolute
+    right 12px
+    top 24px
+    font-size 16px
+    text-align center
+    display flex
+    align-items center
+    font-family 'FiraCode'
+    font-weight 400
 
-    img:before {
-      content: attr(alt);
-      top: 0;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      border-radius: 13px;
-      position: absolute;
-      background: var(--outerspace);
-      color: var(--ghostD);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 11px;
-      font-weight: 300;
-      letter-spacing: -0.5px;
-      margin-left: -0.5px;
-    }
+    .displayValueSymbol
+      font-family 'MainFont'
+      font-weight 500
+      font-size 0.75em
+      line-height 13px
+      position relative
+      letter-spacing 0.5px
+      color var(--outerspace)
+      padding 3px 4px
+      border-radius 6px
 
-    img {
-      height: 30px;
-      width: 30px;
-      border-radius: 15px;
-      position: absolute;
-      top: 1px;
-      left: 1px;
-      overflow: hidden;
-    }
-  }
+  .signerBalanceEquivalent
+    position absolute
+    right 7px
+    bottom 5px
+    font-size 12px
+    color var(--outerspace05)
+    display flex
+    align-items center
+    font-family 'FiraCode'
 
-  .signerBalanceValue {
-    position: absolute;
-    right: 12px;
-    top: 23px;
-    font-size: 19px;
-    text-align: center;
-    display: flex;
-    align-items: center;
-    font-family: 'FiraCode';
-    letter-spacing: -1px;
-    font-weight: 250;
+.signerBalanceSliderDisplay
+  position absolute
+  top 0
+  left 0
+  right 0
+  transition none
 
-    .signerBalanceSymbol {
-      font-family: 'MainFont';
-      font-weight: 500;
-      font-size: 13px;
-      line-height: 13px;
-      position: relative;
-      top: -0.5px;
-      letter-spacing: 0.5px;
-      color: var(--outerspace);
-      padding: 3px 6px;
-      border-radius: 6px;
-    }
-  }
+.signerBalanceSliderShadow
+  position relative
+  opacity 0
 
-  .signerBalanceEquivalent {
-    position: absolute;
-    right: 7px;
-    bottom: 5px;
-    font-size: 12px;
-    color: var(--outerspace05);
-    display: flex;
-    align-items: center;
-    font-family: 'FiraCode';
-  }
-}
+.signerBalanceNoTokens
+  height 48px
+  display flex
+  justify-content center
+  align-items center
+  color var(--outerspace08)
+  text-transform uppercase
+  font-size 12px
+  border-bottom 1px solid var(--ghostA)
 
-.signerBalanceSliderDisplay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  transition: none;
-}
+.moduleLoading
+  height 40px
+  display flex
+  justify-content center
+  align-items center
+  padding 20px
+  border-bottom 1px solid var(--ghostA)
+  margin 0px 16px
 
-.signerBalanceSliderShadow {
-  position: relative;
-  opacity: 0;
-}
+.moduleLoadingLoader
+  border-radius 50%
+  width 30px
+  height 30px
+  margin 30px auto
+  font-size 10px
+  position relative
+  text-indent -9999em
+  border-top 3px solid var(--ghostZ)
+  border-right 3px solid var(--ghostZ)
+  border-bottom 3px solid var(--ghostZ)
+  border-left 3px solid var(--good)
+  transform translateZ(0)
+  animation load 0.5s infinite linear
+  will-change transform
 
-.signerBalanceNoTokens {
-  height: 48px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: var(--outerspace08);
-  text-transform: uppercase;
-  font-size: 12px;
-  border-bottom: 1px solid var(--ghostA);
-}
+@keyframes load
+  0%
+    -webkit-transform rotate(0deg)
+    transform rotate(0deg)
 
-.moduleLoading {
-  height: 40px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-  border-bottom: 1px solid var(--ghostA);
-  margin: 0px 16px;
-}
-
-.moduleLoadingLoader {
-  border-radius: 50%;
-  width: 30px;
-  height: 30px;
-  margin: 30px auto;
-  font-size: 10px;
-  position: relative;
-  text-indent: -9999em;
-  border-top: 3px solid var(--ghostZ);
-  border-right: 3px solid var(--ghostZ);
-  border-bottom: 3px solid var(--ghostZ);
-  border-left: 3px solid var(--good);
-  transform: translateZ(0);
-  animation: load 0.5s infinite linear;
-  will-change: transform;
-}
-
-@keyframes load {
-  0% {
-    -webkit-transform: rotate(0deg);
-    transform: rotate(0deg);
-  }
-
-  100% {
-    -webkit-transform: rotate(360deg);
-    transform: rotate(360deg);
-  }
-}
+  100%
+    -webkit-transform rotate(360deg)
+    transform rotate(360deg)

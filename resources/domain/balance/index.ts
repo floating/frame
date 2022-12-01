@@ -5,6 +5,7 @@ interface DisplayedBalance extends Balance {
   displayBalance: string
   price: string
   priceChange: string | false
+  usdRate: Rate
   totalValue: BigNumber
   displayValue: string
 }
@@ -21,7 +22,7 @@ export function formatBalance (balance: BigNumber, totalValue: BigNumber, decima
   }).format(Number(balance.toFixed(decimals, BigNumber.ROUND_FLOOR)))
 }
 
-export function formatUsdRate (rate:BigNumber, decimals = 2) {
+export function formatUsdRate (rate: BigNumber, decimals = 2) {
   return rate.isNaN()
     ? UNKNOWN
     : new Intl.NumberFormat('us-US', {
@@ -40,6 +41,7 @@ export function createBalance (rawBalance: Balance, quote?: Rate): DisplayedBala
 
   return {
     ...rawBalance,
+    usdRate: quote as Rate,
     displayBalance: formatBalance(balance, totalValue, balanceDecimals),
     price: formatUsdRate(usdRate),
     priceChange: !usdRate.isZero() && !usdRate.isNaN() && change24hr.toFixed(2),
