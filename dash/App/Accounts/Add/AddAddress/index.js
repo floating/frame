@@ -144,11 +144,11 @@ class AddAddress extends React.Component {
                       <div className='addAccountItemOptionSubmit' onClick={() => this.restart()} style={{marginTop: "5px"}}>back</div>
                     </>:
                     <>
-                      <div className='addAccountItemOptionTitle'>input address or ENS name</div>
                       <div className='addAccountItemOptionInputPhrase'>
-                        <textarea tabIndex='-1' value={this.state.address} ref={this.forms[0]} onChange={e => this.onChange('address', e)} onFocus={e => this.onFocus('address', e)} onBlur={e => this.onBlur('address', e)} onKeyPress={e => this.keyPress(e)} />
+                        <label htmlFor='addressInput' role='label' className='addAccountItemOptionTitle'>input address or ENS name</label>
+                        <textarea id='addressInput' tabIndex='-1' value={this.state.address} ref={this.forms[0]} onChange={e => this.onChange('address', e)} onFocus={e => this.onFocus('address', e)} onBlur={e => this.onBlur('address', e)} onKeyPress={e => this.keyPress(e)} />
                       </div>
-                      <div className='addAccountItemOptionSubmit' onClick={() => this.create()}>Create</div>
+                      <div role='button' className='addAccountItemOptionSubmit' onClick={() => this.create()}>Create</div>
                     </>
                   }
                  

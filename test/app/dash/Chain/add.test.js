@@ -12,12 +12,7 @@ jest.mock('../../../../resources/link', () => ({ send: jest.fn() }))
 const Chain = Restore.connect(ChainComponent, store)
 
 beforeAll(() => {
-  jest.useFakeTimers()
   store.removeNetwork({ type: 'ethereum', id: 137 })
-})
-
-afterAll(() => {
-  jest.useRealTimers()
 })
 
 describe('rendering', () => {
