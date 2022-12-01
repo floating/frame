@@ -67,8 +67,8 @@ class AddAddress extends React.Component {
     })
   }
 
-  setResolving() {
-    this.setState({ resolvingEns: true })
+  setResolving (isResolving) {
+    this.setState({ resolvingEns: isResolving })
   }
 
   setError (status) {
@@ -77,7 +77,6 @@ class AddAddress extends React.Component {
 
   createFromAddress (address) {
     link.rpc('createFromAddress', address, 'Watch Account', (err) => {
-      this.setState({ index: ++this.state.index })
       if (err) {
         this.setError(err)
       } else {
@@ -88,17 +87,22 @@ class AddAddress extends React.Component {
 
   async create () {
     const { address: input } = this.state
+
+    this.setState({ index: ++this.state.index })
+
     if (!isEnsName(input)) {
       return this.createFromAddress(input)
     }
 
-    this.setResolving()
+    this.setResolving(true)
 
     try {
-      const resolvedAddress = await this.resolveEnsName()
+      const resolvedAddress = await this.resolveEnsName(input)
       this.createFromAddress(resolvedAddress)
     } catch (e) {
-      console.log(e.message)
+      console.log(e)
+    } finally {
+      this.setResolving(false)
     }
   }
 
@@ -134,8 +138,10 @@ class AddAddress extends React.Component {
   }
 
   render () {
+    const { error, resolvingEns } = this.state
+
     let itemClass = 'addAccountItem addAccountItemSmart addAccountItemAdding'
-    const {error} = this.state
+
     return (
       <div className={itemClass} style={{ transitionDelay: (0.64 * this.props.index / 4) + 's' }}>
         <div className='addAccountItemBar addAccountItemMock' />
@@ -160,7 +166,7 @@ class AddAddress extends React.Component {
             <div className='addAccountItemOptionSetup' style={{ transform: `translateX(-${100 * this.state.index}%)` }}>
               <div className='addAccountItemOptionSetupFrames'>
                 <div className='addAccountItemOptionSetupFrame'>
-                  {this.state.resolvingEns ?
+                  {resolvingEns ?
                     <>
                       <div className='addAccountItemOptionTitle'>Resolving ENS Name</div>
                       <div className='signerLoading'>
@@ -181,7 +187,7 @@ class AddAddress extends React.Component {
                 <div className='addAccountItemOptionSetupFrame'>
                   {error ? 
                   <>
-                    <div className='addAccountItemOptionTitle'>{this.state.status }</div>
+                    <div className='addAccountItemOptionTitle'>{this.state.status}</div>
                     <div className='addAccountItemOptionSubmit' onClick={() => this.restart()}>try again</div>
                   </>
                   :
