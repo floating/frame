@@ -14,7 +14,7 @@ class Balance extends React.Component {
       usdRate: currencyRate,
       logoURI,
       price,
-      displayBalance = '0',
+      displayBalance = '0'
     } = balance
     const change = parseFloat(priceChange)
     const direction = change < 0 ? -1 : change > 0 ? 1 : 0

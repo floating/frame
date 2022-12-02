@@ -17,7 +17,7 @@ function createWeb3ProviderWrapper(chainId: number) {
       id: 1,
       jsonrpc: '2.0',
       _origin: 'frame-internal',
-      chainId: addHexPrefix(chainId.toString(16)),
+      chainId: addHexPrefix(chainId.toString(16))
     } as const
 
     provider.sendAsync(wrappedPayload, cb)
@@ -25,7 +25,7 @@ function createWeb3ProviderWrapper(chainId: number) {
 
   return {
     sendAsync: wrappedSend,
-    send: wrappedSend,
+    send: wrappedSend
   }
 }
 
@@ -76,20 +76,20 @@ export default class Erc20Contract {
       const calls = await Promise.all([
         this.contract.decimals(),
         this.contract.name(),
-        this.contract.symbol(),
+        this.contract.symbol()
       ])
 
       return {
         decimals: calls[0],
         name: calls[1],
-        symbol: calls[2],
+        symbol: calls[2]
       }
     } catch (e) {
       log.error(`getTokenData error: ${e}`)
       return {
         decimals: 0,
         name: '',
-        symbol: '',
+        symbol: ''
       }
     }
   }

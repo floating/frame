@@ -12,7 +12,7 @@ jest.mock('electron')
 jest.mock('../../../../../compiled/main/store/persist', () => ({
   get: jest.fn(),
   set: jest.fn(),
-  queue: jest.fn(),
+  queue: jest.fn()
 }))
 jest.mock('../../../../../main/store/persist')
 
@@ -86,7 +86,7 @@ describe('Seed signer', () => {
         expect(count).toBe(1)
         done()
       },
-      exists: () => false,
+      exists: () => false
     }
 
     hot.scan(signers)
@@ -138,7 +138,7 @@ describe('Seed signer', () => {
       gasLimit: '0x30000',
       to: '0xfa3caabc8eefec2b5e2895e5afbf79379e7268a7',
       value: '0x0',
-      chainId: '0x1',
+      chainId: '0x1'
     }
 
     try {

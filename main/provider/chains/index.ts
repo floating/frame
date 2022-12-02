@@ -17,7 +17,7 @@ const storeApi = {
   },
   getColorway: (): Colorway => {
     return store('main.colorway') as Colorway
-  },
+  }
 }
 
 interface ChainsChangedHandler {
@@ -90,13 +90,13 @@ function getActiveChains(): RPC.GetEthereumChains.Chain[] {
         nativeCurrency: {
           name: currencyName,
           symbol,
-          decimals,
+          decimals
         },
         icon: icons,
         explorers: [{ url: explorer }],
         external: {
-          wallet: { colors },
-        },
+          wallet: { colors }
+        }
       }
     })
 }

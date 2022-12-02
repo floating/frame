@@ -24,8 +24,8 @@ describe('changing approval amounts', () => {
           symbol: 'TST',
           spenderEns: '',
           spenderType: 'external',
-          contract: '0x1eba19f260421142AD9Bf5ba193f6d4A0825e698',
-        },
+          contract: '0x1eba19f260421142AD9Bf5ba193f6d4A0825e698'
+        }
       }
 
       const { queryByRole, getByText } = render(
@@ -66,8 +66,8 @@ describe('changing approval amounts', () => {
         symbol: 'aUSDC',
         spenderEns: '',
         spenderType: 'external',
-        contract: '0x1eba19f260421142AD9Bf5ba193f6d4A0825e698',
-      },
+        contract: '0x1eba19f260421142AD9Bf5ba193f6d4A0825e698'
+      }
     }
 
     const { queryByRole, getByText } = render(
@@ -92,8 +92,8 @@ describe('changing approval amounts', () => {
           symbol: 'TST',
           spenderEns: '',
           spenderType: 'external',
-          contract: '0x1eba19f260421142AD9Bf5ba193f6d4A0825e698',
-        },
+          contract: '0x1eba19f260421142AD9Bf5ba193f6d4A0825e698'
+        }
       }
 
       const { queryByRole, getByText } = render(
@@ -132,8 +132,8 @@ describe('changing approval amounts', () => {
           symbol: 'TST',
           spenderEns: '',
           spenderType: 'external',
-          contract: '0x1eba19f260421142AD9Bf5ba193f6d4A0825e698',
-        },
+          contract: '0x1eba19f260421142AD9Bf5ba193f6d4A0825e698'
+        }
       }
 
       const { queryByRole, getByText } = render(
@@ -172,8 +172,8 @@ describe('changing approval amounts', () => {
           symbol: 'TST',
           spenderEns: '',
           spenderType: 'external',
-          contract: '0x1eba19f260421142AD9Bf5ba193f6d4A0825e698',
-        },
+          contract: '0x1eba19f260421142AD9Bf5ba193f6d4A0825e698'
+        }
       }
 
       const { queryByRole, getByText } = render(
@@ -213,8 +213,8 @@ describe('changing approval amounts', () => {
           symbol: 'TST',
           spenderEns: '',
           spenderType: 'external',
-          contract: '0x1eba19f260421142AD9Bf5ba193f6d4A0825e698',
-        },
+          contract: '0x1eba19f260421142AD9Bf5ba193f6d4A0825e698'
+        }
       }
 
       delete approval.data[field]
@@ -243,7 +243,7 @@ describe('formatting amounts', () => {
     { amount: 92e5, formatted: '9.2 million' },
     { amount: 100e9, formatted: '100 billion' },
     { amount: 2e12, formatted: '2 trillion' },
-    { amount: 1e13, formatted: '~unlimited' },
+    { amount: 1e13, formatted: '~unlimited' }
   ]
 
   formattedAmounts.forEach((spec) => {
@@ -261,8 +261,8 @@ describe('formatting amounts', () => {
           symbol: 'TST',
           spenderEns: '',
           spenderType: 'external',
-          contract: '0x1eba19f260421142AD9Bf5ba193f6d4A0825e698',
-        },
+          contract: '0x1eba19f260421142AD9Bf5ba193f6d4A0825e698'
+        }
       }
 
       const { queryByRole, getByText } = render(

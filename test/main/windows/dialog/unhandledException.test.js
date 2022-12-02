@@ -4,12 +4,12 @@ import { app, dialog } from 'electron'
 jest.mock('electron', () => ({
   dialog: {
     showMessageBoxSync: jest.fn(),
-    showErrorBox: jest.fn(),
+    showErrorBox: jest.fn()
   },
   app: {
     quit: jest.fn(),
-    relaunch: jest.fn(),
-  },
+    relaunch: jest.fn()
+  }
 }))
 
 it('displays the error message to the user', () => {
@@ -18,7 +18,7 @@ it('displays the error message to the user', () => {
   expect(dialog.showMessageBoxSync).toHaveBeenCalledWith(
     undefined,
     expect.objectContaining({
-      detail: 'something bad happened',
+      detail: 'something bad happened'
     })
   )
 })
@@ -29,7 +29,7 @@ it('gives the user an option to accept the error or quit Frame', () => {
   expect(dialog.showMessageBoxSync).toHaveBeenCalledWith(
     undefined,
     expect.objectContaining({
-      buttons: ['OK', 'Quit'],
+      buttons: ['OK', 'Quit']
     })
   )
 })

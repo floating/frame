@@ -88,7 +88,7 @@ type HexAmount = string
 
 enum Colorway {
   light = 'light',
-  dark = 'dark',
+  dark = 'dark'
 }
 
 type Color = { r: number; g: number; b: number }

@@ -20,7 +20,7 @@ const storeApi = {
     return networks.filter(
       (n) => (n.connection.primary || {}).connected || (n.connection.secondary || {}).connected
     )
-  },
+  }
 }
 
 export default function () {
@@ -129,6 +129,6 @@ export default function () {
       if (pauseScanningDelay) {
         clearTimeout(pauseScanningDelay)
       }
-    },
+    }
   } as DataScanner
 }

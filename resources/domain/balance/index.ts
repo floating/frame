@@ -18,7 +18,7 @@ export function formatBalance(balance: BigNumber, totalValue: BigNumber, decimal
 
   return new Intl.NumberFormat('us-US', {
     minimumFractionDigits: 2,
-    maximumFractionDigits: 8,
+    maximumFractionDigits: 8
   }).format(Number(balance.toFixed(decimals, BigNumber.ROUND_FLOOR)))
 }
 
@@ -27,7 +27,7 @@ export function formatUsdRate(rate: BigNumber, decimals = 2) {
     ? UNKNOWN
     : new Intl.NumberFormat('us-US', {
         minimumFractionDigits: decimals,
-        maximumFractionDigits: decimals,
+        maximumFractionDigits: decimals
       }).format(Number(rate.toFixed(decimals, BigNumber.ROUND_FLOOR)))
 }
 
@@ -46,7 +46,7 @@ export function createBalance(rawBalance: Balance, quote?: Rate): DisplayedBalan
     price: formatUsdRate(usdRate),
     priceChange: !usdRate.isZero() && !usdRate.isNaN() && change24hr.toFixed(2),
     totalValue: totalValue.isNaN() ? BigNumber(0) : totalValue,
-    displayValue: totalValue.isZero() ? '0' : formatUsdRate(totalValue, 0),
+    displayValue: totalValue.isZero() ? '0' : formatUsdRate(totalValue, 0)
   }
 }
 

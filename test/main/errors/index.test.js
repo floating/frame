@@ -23,7 +23,7 @@ describe('#init', () => {
     expect(Sentry.init).toHaveBeenCalledWith({
       beforeSend: expect.any(Function),
       dsn: 'https://7b09a85b26924609bef5882387e2c4dc@o1204372.ingest.sentry.io/6331069',
-      ipcMode: 'test-ipcmode',
+      ipcMode: 'test-ipcmode'
     })
   })
 })
@@ -49,32 +49,32 @@ describe('sentry', () => {
         frames: [
           {
             module:
-              'C:\\Users\\RickyBobby\\AppData\\Local\\Programs\\frame\\resources\\app.asar\\node_modules\\electron-updater\\out\\AppUpdater',
+              'C:\\Users\\RickyBobby\\AppData\\Local\\Programs\\frame\\resources\\app.asar\\node_modules\\electron-updater\\out\\AppUpdater'
           },
           { module: 'node:domain' },
           {
             module:
-              'C:\\Users\\RickyBobby\\AppData\\Local\\Programs\\frame\\resources\\app.asar\\compiled\\main\\signers\\lattice\\Lattice\\index',
-          },
-        ],
-      },
+              'C:\\Users\\RickyBobby\\AppData\\Local\\Programs\\frame\\resources\\app.asar\\compiled\\main\\signers\\lattice\\Lattice\\index'
+          }
+        ]
+      }
     }
 
     const validEvent = {
       exception: {
-        values: [],
+        values: []
       },
       extra: {
         networks: '{}',
         networksMeta: '{}',
-        tokens: '{}',
+        tokens: '{}'
       },
       tags: {
-        'frame.instance_id': undefined,
+        'frame.instance_id': undefined
       },
       user: {
-        ip_address: undefined,
-      },
+        ip_address: undefined
+      }
     }
 
     it('should send exception type and value params after parsing stackframe modules', () => {
@@ -92,15 +92,15 @@ describe('sentry', () => {
           frames: [
             {
               module:
-                'C:\\Users\\RickyBobby\\AppData\\Local\\Programs\\frame\\resources\\app.asar\\node_modules\\electron-updater\\out\\AppUpdater',
+                'C:\\Users\\RickyBobby\\AppData\\Local\\Programs\\frame\\resources\\app.asar\\node_modules\\electron-updater\\out\\AppUpdater'
             },
             { module: 'node:domain' },
             {
               module:
-                'C:\\Users\\RickyBobby\\AppData\\Local\\Programs\\frame\\resources\\app.asar\\compiled\\main\\signers\\lattice\\Lattice\\index',
-            },
-          ],
-        },
+                'C:\\Users\\RickyBobby\\AppData\\Local\\Programs\\frame\\resources\\app.asar\\compiled\\main\\signers\\lattice\\Lattice\\index'
+            }
+          ]
+        }
       }
       const sentryEvent = simulateException(windowsException)
 
@@ -109,7 +109,7 @@ describe('sentry', () => {
       expect(stackFrameModules).toStrictEqual([
         '{asar}/node_modules/electron-updater/out/AppUpdater',
         'node:domain',
-        '{asar}/compiled/main/signers/lattice/Lattice/index',
+        '{asar}/compiled/main/signers/lattice/Lattice/index'
       ])
     })
 
@@ -120,15 +120,15 @@ describe('sentry', () => {
           frames: [
             {
               module:
-                '/home/RickyBobby/.config/frame/resources/app.asar/node_modules/electron-updater/out/AppUpdater',
+                '/home/RickyBobby/.config/frame/resources/app.asar/node_modules/electron-updater/out/AppUpdater'
             },
             { module: 'node:domain' },
             {
               module:
-                '/home/RickyBobby/.config/frame/resources/app.asar/compiled/main/signers/lattice/Lattice/index',
-            },
-          ],
-        },
+                '/home/RickyBobby/.config/frame/resources/app.asar/compiled/main/signers/lattice/Lattice/index'
+            }
+          ]
+        }
       }
 
       const sentryEvent = simulateException(linuxException)
@@ -138,7 +138,7 @@ describe('sentry', () => {
       expect(stackFrameModules).toStrictEqual([
         '{asar}/node_modules/electron-updater/out/AppUpdater',
         'node:domain',
-        '{asar}/compiled/main/signers/lattice/Lattice/index',
+        '{asar}/compiled/main/signers/lattice/Lattice/index'
       ])
     })
 

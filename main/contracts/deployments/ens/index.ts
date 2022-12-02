@@ -8,7 +8,7 @@ import type {
   ApproveAction as EnsApprovalAction,
   TransferAction as EnsTransferAction,
   RegisterAction as EnsRegistrationAction,
-  RenewAction as EnsRenewalAction,
+  RenewAction as EnsRenewalAction
 } from '../../../transaction/actions/ens'
 
 import type { JsonFragment } from '@ethersproject/abi'
@@ -86,8 +86,8 @@ const registrar = ({ name = 'ENS Registrar', address, chainId }: DeploymentLocat
             name: name,
             from,
             to,
-            tokenId: token,
-          },
+            tokenId: token
+          }
         } as EnsTransferAction
       }
 
@@ -98,17 +98,17 @@ const registrar = ({ name = 'ENS Registrar', address, chainId }: DeploymentLocat
 
         return {
           id: 'ens:approve',
-          data: { name, operator: to, tokenId: token },
+          data: { name, operator: to, tokenId: token }
         } as EnsApprovalAction
       }
-    },
+    }
   }
 }
 
 const registarController = ({
   name = 'ENS Registrar Controller',
   address,
-  chainId,
+  chainId
 }: DeploymentLocation): EnsContract => {
   return {
     name,
@@ -119,7 +119,7 @@ const registarController = ({
 
       if (name === 'commit') {
         return {
-          id: 'ens:commit',
+          id: 'ens:commit'
         }
       }
 
@@ -128,7 +128,7 @@ const registarController = ({
 
         return {
           id: 'ens:register',
-          data: { address: owner, name: ethName(name), duration: duration.toNumber() },
+          data: { address: owner, name: ethName(name), duration: duration.toNumber() }
         } as EnsRegistrationAction
       }
 
@@ -137,23 +137,23 @@ const registarController = ({
 
         return {
           id: 'ens:renew',
-          data: { name: ethName(name), duration: duration.toNumber() },
+          data: { name: ethName(name), duration: duration.toNumber() }
         } as EnsRenewalAction
       }
-    },
+    }
   }
 }
 
 const mainnetRegistrar = registrar({
   name: '.eth Permanent Registrar',
   address: '0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85',
-  chainId: 1,
+  chainId: 1
 })
 
 const mainnetRegistrarController = registarController({
   name: 'ETHRegistrarController',
   address: '0x283Af0B28c62C092C9727F1Ee09c02CA627EB7F5',
-  chainId: 1,
+  chainId: 1
 })
 
 // TODO: in the future the addresses for these contracts can be discovered in real time

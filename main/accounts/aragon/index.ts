@@ -16,7 +16,7 @@ const addresses: Record<number, Address> = {
   74: '0xede729eff031bc9f1a36f4361cd0d9585c9dc5f9',
   100: '0xaafca6b0c89521752e559650206d7c925fd0e530',
   137: '0x3c70a0190d09f34519e6e218364451add21b7d4b',
-  80001: '0x431f0eed904590b176f9ff8c36a1c4ff0ee9b982',
+  80001: '0x431f0eed904590b176f9ff8c36a1c4ff0ee9b982'
 }
 
 function registryAddress(chainId: number) {
@@ -51,10 +51,10 @@ async function resolveName(name: string, chainId: number) {
         provider: require('../../provider').default,
         apm: {
           ipfs: {
-            gateway: 'https://ipfs.eth.aragon.network/ipfs',
+            gateway: 'https://ipfs.eth.aragon.network/ipfs'
           },
-          ensRegistryAddress: registryAddress(chainId),
-        },
+          ensRegistryAddress: registryAddress(chainId)
+        }
       }
 
       const address = await resolveAragon(domain, chainId, options.apm.ensRegistryAddress)
@@ -131,8 +131,8 @@ class Aragon {
             provider: this.provider,
             apm: {
               ipfs: { gateway: 'https://ipfs.eth.aragon.network/ipfs' },
-              ensRegistryAddress: registryAddress(this.chain.id),
-            },
+              ensRegistryAddress: registryAddress(this.chain.id)
+            }
           }
         } catch (e) {
           console.log('TODO: If Aragon smart account setup fails disable it for current network', e)

@@ -8,7 +8,7 @@ const {
   ecsign,
   addHexPrefix,
   pubToAddress,
-  ecrecover,
+  ecrecover
 } = require('@ethereumjs/util')
 
 function chainConfig(chain, hardfork) {

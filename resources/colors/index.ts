@@ -8,7 +8,7 @@ const light: ColorwayPalette = {
   accent5: { r: 90, g: 181, b: 178 },
   accent6: { r: 140, g: 97, b: 232 },
   accent7: { r: 62, g: 173, b: 241 },
-  accent8: { r: 60, g: 40, b: 234 },
+  accent8: { r: 60, g: 40, b: 234 }
 }
 
 const dark: ColorwayPalette = {
@@ -19,7 +19,7 @@ const dark: ColorwayPalette = {
   accent5: { r: 90, g: 181, b: 178 },
   accent6: { r: 140, g: 97, b: 232 },
   accent7: { r: 62, g: 173, b: 241 },
-  accent8: { r: 60, g: 40, b: 234 },
+  accent8: { r: 60, g: 40, b: 234 }
 }
 
 const colorways: Record<Colorway, ColorwayPalette> = { light, dark }

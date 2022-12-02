@@ -49,17 +49,17 @@ const initial = {
       show: false,
       nav: [],
       footer: {
-        height: 40,
-      },
+        height: 40
+      }
     },
     dash: {
       show: false,
       nav: [],
       footer: {
-        height: 40,
-      },
+        height: 40
+      }
     },
-    frames: [],
+    frames: []
   },
   panel: {
     // Panel view
@@ -79,35 +79,35 @@ const initial = {
         'permissions',
         // 'verify',
         'signer',
-        'settings',
+        'settings'
       ],
       modules: {
         requests: {
-          height: 0,
+          height: 0
         },
         activity: {
-          height: 0,
+          height: 0
         },
         balances: {
-          height: 0,
+          height: 0
         },
         inventory: {
-          height: 0,
+          height: 0
         },
         permissions: {
-          height: 0,
+          height: 0
         },
         verify: {
-          height: 0,
+          height: 0
         },
         launcher: {
-          height: 0,
+          height: 0
         },
         gas: {
-          height: 100,
-        },
-      },
-    },
+          height: 100
+        }
+      }
+    }
   },
   flow: {},
   dapps: {},
@@ -120,12 +120,12 @@ const initial = {
     badge: '',
     addAccount: '', // Add view (needs to be merged into Phase)
     addNetwork: false, // Phase view (needs to be merged with Add)
-    clickGuard: false,
+    clickGuard: false
   },
   signers: {},
   tray: {
     open: false,
-    initial: true,
+    initial: true
   },
   balances: {},
   selected: {
@@ -136,7 +136,7 @@ const initial = {
     settings: {
       viewIndex: 0,
       views: ['permissions', 'verify', 'control'],
-      subIndex: 0,
+      subIndex: 0
     },
     addresses: [],
     showAccounts: false,
@@ -149,21 +149,21 @@ const initial = {
         right: 5,
         bottom: 5,
         height: 5,
-        index: 0,
-      },
-    },
+        index: 0
+      }
+    }
   },
   frame: {
-    type: 'tray',
+    type: 'tray'
   },
   node: {
-    provider: false,
+    provider: false
   },
   provider: {
-    events: [],
+    events: []
   },
   external: {
-    rates: {},
+    rates: {}
   },
   platform: process.platform,
   main: {
@@ -173,12 +173,12 @@ const initial = {
     colorwayPrimary: {
       dark: {
         background: 'rgb(21, 17, 23)',
-        text: 'rgb(241, 241, 255)',
+        text: 'rgb(241, 241, 255)'
       },
       light: {
         background: 'rgb(224, 217, 233)',
-        text: 'rgb(20, 40, 60)',
-      },
+        text: 'rgb(20, 40, 60)'
+      }
     },
     mute: {
       alphaWarning: main('mute.alphaWarning', false),
@@ -189,10 +189,10 @@ const initial = {
       gasFeeWarning: main('mute.gasFeeWarning', false),
       betaDisclosure: main('mute.betaDisclosure', false),
       signerCompatibilityWarning: main('mute.signerCompatibilityWarning', false),
-      aragonAccountMigrationWarning: main('mute.aragonAccountMigrationWarning', true),
+      aragonAccountMigrationWarning: main('mute.aragonAccountMigrationWarning', true)
     },
     shortcuts: {
-      altSlash: main('shortcuts.altSlash', true),
+      altSlash: main('shortcuts.altSlash', true)
     },
     // showUSDValue: main('showUSDValue', true),
     launch: main('launch', false),
@@ -208,18 +208,18 @@ const initial = {
       accountLimit: main('latticeSettings.accountLimit', 5),
       derivation: main('latticeSettings.derivation', 'standard'),
       endpointMode: main('latticeSettings.endpointMode', 'default'),
-      endpointCustom: main('latticeSettings.endpointCustom', ''),
+      endpointCustom: main('latticeSettings.endpointCustom', '')
     },
     ledger: {
       derivation: main('ledger.derivation', 'live'),
-      liveAccountLimit: main('ledger.liveAccountLimit', 5),
+      liveAccountLimit: main('ledger.liveAccountLimit', 5)
     },
     trezor: {
-      derivation: main('trezor.derivation', 'standard'),
+      derivation: main('trezor.derivation', 'standard')
     },
     origins: main('origins', {}),
     privacy: {
-      errorReporting: main('privacy.errorReporting', true),
+      errorReporting: main('privacy.errorReporting', true)
     },
     accounts: main('accounts', {}),
     accountsMeta: main('accountsMeta', {}),
@@ -232,48 +232,48 @@ const initial = {
     signers: {},
     savedSigners: {},
     updater: {
-      dontRemind: main('updater.dontRemind', []),
+      dontRemind: main('updater.dontRemind', [])
     },
     networkPresets: {
       ethereum: {
         default: {
-          local: 'direct',
+          local: 'direct'
         },
         1: {
           alchemy: 'alchemy',
-          infura: 'infura',
+          infura: 'infura'
         },
         3: {
           alchemy: 'alchemyRopsten',
-          infura: 'infuraRopsten',
+          infura: 'infuraRopsten'
         },
         4: {
           alchemy: 'alchemyRinkeby',
-          infura: 'infuraRinkeby',
+          infura: 'infuraRinkeby'
         },
         5: {
-          infura: 'infuraGoerli',
+          infura: 'infuraGoerli'
         },
         10: {
-          infura: 'infuraOptimism',
+          infura: 'infuraOptimism'
         },
         42: {
           alchemy: 'alchemyKovan',
-          infura: 'infuraKovan',
+          infura: 'infuraKovan'
         },
         100: {
-          poa: 'gnosis',
+          poa: 'gnosis'
         },
         137: {
-          infura: 'infuraPolygon',
+          infura: 'infuraPolygon'
         },
         42161: {
-          infura: 'infuraArbitrum',
+          infura: 'infuraArbitrum'
         },
         11155111: {
-          infura: 'infuraSepolia',
-        },
-      },
+          infura: 'infuraSepolia'
+        }
+      }
     },
     networks: main('networks', {
       ethereum: {
@@ -287,8 +287,8 @@ const initial = {
           gas: {
             price: {
               selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' },
-            },
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+            }
           },
           connection: {
             primary: {
@@ -298,7 +298,7 @@ const initial = {
               connected: false,
               type: '',
               network: '',
-              custom: '',
+              custom: ''
             },
             secondary: {
               on: false,
@@ -307,10 +307,10 @@ const initial = {
               connected: false,
               type: '',
               network: '',
-              custom: '',
-            },
+              custom: ''
+            }
           },
-          on: true,
+          on: true
         },
         5: {
           id: 5,
@@ -322,8 +322,8 @@ const initial = {
           gas: {
             price: {
               selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' },
-            },
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+            }
           },
           connection: {
             primary: {
@@ -333,7 +333,7 @@ const initial = {
               connected: false,
               type: '',
               network: '',
-              custom: '',
+              custom: ''
             },
             secondary: {
               on: false,
@@ -342,10 +342,10 @@ const initial = {
               connected: false,
               type: '',
               network: '',
-              custom: '',
-            },
+              custom: ''
+            }
           },
-          on: false,
+          on: false
         },
         10: {
           id: 10,
@@ -357,8 +357,8 @@ const initial = {
           gas: {
             price: {
               selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' },
-            },
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+            }
           },
           connection: {
             primary: {
@@ -368,7 +368,7 @@ const initial = {
               connected: false,
               type: '',
               network: '',
-              custom: '',
+              custom: ''
             },
             secondary: {
               on: false,
@@ -377,10 +377,10 @@ const initial = {
               connected: false,
               type: '',
               network: '',
-              custom: '',
-            },
+              custom: ''
+            }
           },
-          on: false,
+          on: false
         },
         100: {
           id: 100,
@@ -392,8 +392,8 @@ const initial = {
           gas: {
             price: {
               selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' },
-            },
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+            }
           },
           connection: {
             primary: {
@@ -403,7 +403,7 @@ const initial = {
               connected: false,
               type: '',
               network: '',
-              custom: '',
+              custom: ''
             },
             secondary: {
               on: false,
@@ -412,10 +412,10 @@ const initial = {
               connected: false,
               type: '',
               network: '',
-              custom: '',
-            },
+              custom: ''
+            }
           },
-          on: false,
+          on: false
         },
         137: {
           id: 137,
@@ -427,8 +427,8 @@ const initial = {
           gas: {
             price: {
               selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' },
-            },
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+            }
           },
           connection: {
             primary: {
@@ -438,7 +438,7 @@ const initial = {
               connected: false,
               type: '',
               network: '',
-              custom: '',
+              custom: ''
             },
             secondary: {
               on: false,
@@ -447,10 +447,10 @@ const initial = {
               connected: false,
               type: '',
               network: '',
-              custom: '',
-            },
+              custom: ''
+            }
           },
-          on: false,
+          on: false
         },
         42161: {
           id: 42161,
@@ -462,8 +462,8 @@ const initial = {
           gas: {
             price: {
               selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' },
-            },
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+            }
           },
           connection: {
             primary: {
@@ -473,7 +473,7 @@ const initial = {
               connected: false,
               type: '',
               network: '',
-              custom: '',
+              custom: ''
             },
             secondary: {
               on: false,
@@ -482,10 +482,10 @@ const initial = {
               connected: false,
               type: '',
               network: '',
-              custom: '',
-            },
+              custom: ''
+            }
           },
-          on: false,
+          on: false
         },
         11155111: {
           id: 11155111,
@@ -497,8 +497,8 @@ const initial = {
           gas: {
             price: {
               selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' },
-            },
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+            }
           },
           connection: {
             primary: {
@@ -508,7 +508,7 @@ const initial = {
               connected: false,
               type: '',
               network: '',
-              custom: '',
+              custom: ''
             },
             secondary: {
               on: false,
@@ -517,12 +517,12 @@ const initial = {
               connected: false,
               type: '',
               network: '',
-              custom: '',
-            },
+              custom: ''
+            }
           },
-          on: false,
-        },
-      },
+          on: false
+        }
+      }
     }),
     networksMeta: main('networksMeta', {
       ethereum: {
@@ -532,21 +532,21 @@ const initial = {
             fees: {},
             price: {
               selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' },
-            },
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+            }
           },
           nativeCurrency: {
             symbol: 'ETH',
             usd: {
               price: 0,
-              change24hr: 0,
+              change24hr: 0
             },
             icon: 'https://assets.coingecko.com/coins/images/279/large/ethereum.png?1595348880',
             name: 'Ether',
-            decimals: 18,
+            decimals: 18
           },
           icon: '',
-          primaryColor: 'accent1', // Mainnet
+          primaryColor: 'accent1' // Mainnet
         },
         5: {
           blockHeight: 0,
@@ -554,21 +554,21 @@ const initial = {
             fees: {},
             price: {
               selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' },
-            },
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+            }
           },
           nativeCurrency: {
             symbol: 'görETH',
             usd: {
               price: 0,
-              change24hr: 0,
+              change24hr: 0
             },
             icon: '',
             name: 'Görli Ether',
-            decimals: 18,
+            decimals: 18
           },
           icon: '',
-          primaryColor: 'accent2', // Testnet
+          primaryColor: 'accent2' // Testnet
         },
         10: {
           blockHeight: 0,
@@ -576,22 +576,22 @@ const initial = {
             fees: {},
             price: {
               selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' },
-            },
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+            }
           },
           nativeCurrency: {
             symbol: 'ETH',
             usd: {
               price: 0,
-              change24hr: 0,
+              change24hr: 0
             },
             icon: '',
             name: 'Ether',
             symbol: 'ETH',
-            decimals: 18,
+            decimals: 18
           },
           icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/optimism.svg',
-          primaryColor: 'accent4', // Optimism
+          primaryColor: 'accent4' // Optimism
         },
         100: {
           blockHeight: 0,
@@ -599,22 +599,22 @@ const initial = {
             fees: {},
             price: {
               selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' },
-            },
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+            }
           },
           nativeCurrency: {
             symbol: 'xDAI',
             usd: {
               price: 0,
-              change24hr: 0,
+              change24hr: 0
             },
             icon: '',
             name: '',
             symbol: '',
-            decimals: 18,
+            decimals: 18
           },
           icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/gnosis.svg',
-          primaryColor: 'accent5', // Gnosis
+          primaryColor: 'accent5' // Gnosis
         },
         137: {
           blockHeight: 0,
@@ -622,21 +622,21 @@ const initial = {
             fees: {},
             price: {
               selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' },
-            },
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+            }
           },
           nativeCurrency: {
             symbol: 'MATIC',
             usd: {
               price: 0,
-              change24hr: 0,
+              change24hr: 0
             },
             icon: '',
             name: '',
-            decimals: 18,
+            decimals: 18
           },
           icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/polygon.svg',
-          primaryColor: 'accent6', // Polygon
+          primaryColor: 'accent6' // Polygon
         },
         42161: {
           blockHeight: 0,
@@ -644,22 +644,22 @@ const initial = {
             fees: {},
             price: {
               selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' },
-            },
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+            }
           },
           nativeCurrency: {
             symbol: 'ETH',
             usd: {
               price: 0,
-              change24hr: 0,
+              change24hr: 0
             },
             icon: '',
             name: 'Ether',
             symbol: 'ETH',
-            decimals: 18,
+            decimals: 18
           },
           icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/arbitrum.svg',
-          primaryColor: 'accent7', // Arbitrum
+          primaryColor: 'accent7' // Arbitrum
         },
         11155111: {
           blockHeight: 0,
@@ -667,23 +667,23 @@ const initial = {
             fees: {},
             price: {
               selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' },
-            },
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+            }
           },
           nativeCurrency: {
             symbol: 'sepETH',
             usd: {
               price: 0,
-              change24hr: 0,
+              change24hr: 0
             },
             icon: '',
             name: 'Sepolia Ether',
-            decimals: 18,
+            decimals: 18
           },
           icon: '',
-          primaryColor: 'accent2', // Testnet
-        },
-      },
+          primaryColor: 'accent2' // Testnet
+        }
+      }
     }),
     ipfs: {},
     dapps: {},
@@ -693,12 +693,12 @@ const initial = {
       details: {},
       map: {
         added: [],
-        docked: [],
+        docked: []
       },
       storage: {},
-      removed: [],
-    },
-  },
+      removed: []
+    }
+  }
 }
 
 // --- remove state that should not persist from session to session
@@ -726,8 +726,8 @@ initial.main.origins = Object.entries(initial.main.origins).reduce((origins, [id
       ...origin,
       session: {
         ...origin.session,
-        endedAt: origin.session.lastUpdatedAt,
-      },
+        endedAt: origin.session.lastUpdatedAt
+      }
     }
   }
 

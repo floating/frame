@@ -6,7 +6,7 @@ class txData extends React.Component {
   constructor(...args) {
     super(...args)
     this.state = {
-      copied: false,
+      copied: false
     }
   }
 

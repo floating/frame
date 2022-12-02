@@ -2,7 +2,7 @@ const { app, dialog } = require('electron')
 
 enum ExitAction {
   OK,
-  Quit,
+  Quit
 }
 
 export default function (message: string, code?: string) {
@@ -21,7 +21,7 @@ export default function (message: string, code?: string) {
       type: 'error',
       buttons: Object.keys(ExitAction).slice(Object.keys(ExitAction).length / 2),
       defaultId: ExitAction.OK,
-      cancelId: ExitAction.OK,
+      cancelId: ExitAction.OK
     })
   }
 

@@ -71,7 +71,7 @@ export default class LedgerSignerAdapter extends SignerAdapter {
       },
       error: (err) => {
         log.error('USB error', err)
-      },
+      }
     })
 
     super.open()
@@ -152,12 +152,12 @@ export default class LedgerSignerAdapter extends SignerAdapter {
     store.navReplace('dash', [
       {
         view: 'expandedSigner',
-        data: { signer: ledger.id },
+        data: { signer: ledger.id }
       },
       {
         view: 'accounts',
-        data: {},
-      },
+        data: {}
+      }
     ])
 
     await this.handleConnectedDevice(ledger)
@@ -195,7 +195,7 @@ export default class LedgerSignerAdapter extends SignerAdapter {
         log.info(`Ledger ${ledger.model} detached from ${ledger.devicePath}`)
 
         this.remove(ledger)
-      }, 5000),
+      }, 5000)
     })
   }
 
@@ -215,7 +215,7 @@ export default class LedgerSignerAdapter extends SignerAdapter {
       attachedDevices,
       detachedLedgers,
       pendingDisconnections,
-      reconnections,
+      reconnections
     }
   }
 

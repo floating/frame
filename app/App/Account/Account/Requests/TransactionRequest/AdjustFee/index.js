@@ -199,8 +199,8 @@ class TxFeeOverlay extends Component {
     super(props, context)
     const {
       req: {
-        data: { gasLimit, maxPriorityFeePerGas, maxFeePerGas, gasPrice },
-      },
+        data: { gasLimit, maxPriorityFeePerGas, maxFeePerGas, gasPrice }
+      }
     } = props
     this.moduleRef = React.createRef()
     const maxFee = BigNumber(maxFeePerGas, 16)
@@ -209,13 +209,13 @@ class TxFeeOverlay extends Component {
       gasLimit: BigNumber(gasLimit, 16),
       gasPrice: BigNumber(gasPrice, 16),
       baseFee: maxFee.minus(priorityFee),
-      priorityFee,
+      priorityFee
     }
   }
 
   render() {
     const {
-      req: { data, handlerId },
+      req: { data, handlerId }
     } = this.props
     const { baseFee, gasLimit, priorityFee, gasPrice } = this.state
     const maxTotalFee = BigNumber(getMaxTotalFee(data))

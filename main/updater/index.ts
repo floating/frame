@@ -108,7 +108,7 @@ class Updater {
     log.verbose('Found available update', {
       version,
       location,
-      alreadyNotified: this.notified[version] || false,
+      alreadyNotified: this.notified[version] || false
     })
 
     if (!this.notified[version]) {

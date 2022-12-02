@@ -10,7 +10,7 @@ import AddTokenComponent from '../../../../../dash/App/Tokens/AddToken'
 jest.mock('../../../../../main/store/persist')
 jest.mock('../../../../../resources/link', () => ({
   invoke: jest.fn().mockResolvedValue({}),
-  send: jest.fn(),
+  send: jest.fn()
 }))
 
 const AddToken = Restore.connect(AddTokenComponent, store)
@@ -24,8 +24,8 @@ beforeAll(() => {
     symbol: 'ETH',
     on: true,
     connection: {
-      primary: { connected: true },
-    },
+      primary: { connected: true }
+    }
   })
 
   store.setPrimary('ethereum', 1, { connected: false })
@@ -39,8 +39,8 @@ beforeAll(() => {
     symbol: 'MATIC',
     on: true,
     connection: {
-      primary: { connected: true },
-    },
+      primary: { connected: true }
+    }
   })
 
   store.setPrimary('ethereum', 137, { connected: false })
@@ -67,9 +67,9 @@ describe('selecting token chain', () => {
       data: {
         notify: 'addToken',
         notifyData: {
-          chainId: 137,
-        },
-      },
+          chainId: 137
+        }
+      }
     })
   })
 })
@@ -98,9 +98,9 @@ describe('setting token address', () => {
         notify: 'addToken',
         notifyData: {
           chainId: 137,
-          address: '0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0',
-        },
-      },
+          address: '0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0'
+        }
+      }
     })
   })
 
@@ -153,7 +153,7 @@ describe('setting token details', () => {
     link.invoke.mockResolvedValue({
       name: 'Frame Test on Polygon',
       symbol: 'mFRT',
-      decimals: 18,
+      decimals: 18
     })
 
     link.send.mockImplementation(() => {

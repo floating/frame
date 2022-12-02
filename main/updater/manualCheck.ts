@@ -12,7 +12,7 @@ const version = packageInfo.version
 const httpOptions = {
   host: 'api.github.com',
   path: `/repos/${repo}/releases`,
-  headers: { 'User-Agent': 'request' },
+  headers: { 'User-Agent': 'request' }
 }
 
 interface GithubRelease {
@@ -64,7 +64,7 @@ export default function (opts?: CheckOptions) {
             log.warn('Manual check for update returned invalid response', {
               status: res.statusCode,
               contentType,
-              data: rawData,
+              data: rawData
             })
             return reject(
               new Error(`invalid response, status: ${res.statusCode} contentType: ${contentType}`)
@@ -84,7 +84,7 @@ export default function (opts?: CheckOptions) {
             log.verbose('Manual check found release', {
               currentVersion: version,
               latestVersion,
-              isNewerVersion,
+              isNewerVersion
             })
 
             resolve(

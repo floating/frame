@@ -25,7 +25,7 @@ const storeApi = {
   },
   getLastUpdated: (account: Address): number => {
     return store('main.accounts', account, 'balances.lastUpdated')
-  },
+  }
 }
 
 function createObserver(handler: AssetsChangedHandler) {
@@ -64,7 +64,7 @@ function fetchAssets(accountId: string) {
 
   const response = {
     nativeCurrency: [] as RPC.GetAssets.NativeCurrency[],
-    erc20: [] as RPC.GetAssets.Erc20[],
+    erc20: [] as RPC.GetAssets.Erc20[]
   }
 
   return balances.reduce((assets, balance) => {
@@ -73,7 +73,7 @@ function fetchAssets(accountId: string) {
 
       assets.nativeCurrency.push({
         ...balance,
-        currencyInfo: currency,
+        currencyInfo: currency
       })
     } else {
       const usdRate = storeApi.getUsdRate(balance.address)
@@ -81,8 +81,8 @@ function fetchAssets(accountId: string) {
       assets.erc20.push({
         ...balance,
         tokenInfo: {
-          lastKnownPrice: usdRate,
-        },
+          lastKnownPrice: usdRate
+        }
       })
     }
 

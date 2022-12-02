@@ -20,15 +20,15 @@ const mockAbi = [
     name: 'retrieve',
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [{ internalType: 'uint256', name: 'num', type: 'uint256' }],
     name: 'store',
     outputs: [],
     stateMutability: 'nonpayable',
-    type: 'function',
-  },
+    type: 'function'
+  }
 ]
 
 beforeAll(() => {
@@ -66,7 +66,7 @@ describe('#fetchEtherscanContract', () => {
     { chainId: 1, domain: 'api.etherscan.io', apiKey: '3SYU5MW5QK8RPCJV1XVICHWKT774993S24' },
     { chainId: 137, domain: 'api.polygonscan.com', apiKey: '2P3U9T63MT26T1X64AAE368UNTS9RKEEBB' },
     { chainId: 10, domain: 'api-optimistic.etherscan.io', apiKey: '3SYU5MW5QK8RPCJV1XVICHWKT774993S24' },
-    { chainId: 42161, domain: 'api.arbiscan.io', apiKey: 'VP126CP67QVH9ZEKAZT1UZ751VZ6ZTIZAD' },
+    { chainId: 42161, domain: 'api.arbiscan.io', apiKey: 'VP126CP67QVH9ZEKAZT1UZ751VZ6ZTIZAD' }
   ]
 
   chains.forEach((chain) => {
@@ -78,15 +78,15 @@ describe('#fetchEtherscanContract', () => {
         result: [
           {
             ABI: JSON.stringify(mockAbi),
-            ContractName: `mock ${name} abi`,
-          },
-        ],
+            ContractName: `mock ${name} abi`
+          }
+        ]
       })
 
       return expect(fetchEtherscanContract(contractAddress, chain.chainId)).resolves.toStrictEqual({
         abi: JSON.stringify(mockAbi),
         name: `mock ${name} abi`,
-        source: name,
+        source: name
       })
     })
   })
@@ -100,7 +100,7 @@ describe('#fetchEtherscanContract', () => {
   it('does not retrieve a contract from etherscan when the contract is not found', async () => {
     mockEtherscanApi(200, {
       message: 'OK',
-      result: undefined,
+      result: undefined
     })
 
     return expect(fetchEtherscanContract(contractAddress, 1)).resolves.toBeUndefined()
@@ -112,9 +112,9 @@ describe('#fetchEtherscanContract', () => {
       result: [
         {
           ABI: 'Contract source code not verified',
-          ContractName: '',
-        },
-      ],
+          ContractName: ''
+        }
+      ]
     })
 
     return expect(fetchEtherscanContract(contractAddress, 1)).resolves.toBeUndefined()
@@ -132,9 +132,9 @@ describe('#fetchEtherscanContract', () => {
         result: [
           {
             ABI: JSON.stringify(mockAbi),
-            ContractName: `mock etherscan abi`,
-          },
-        ],
+            ContractName: `mock etherscan abi`
+          }
+        ]
       },
       10000
     )

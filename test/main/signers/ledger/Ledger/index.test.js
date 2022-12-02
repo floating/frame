@@ -89,7 +89,7 @@ describe('#connect', () => {
       expect(ledger.appVersion).toEqual({
         major: 1,
         minor: 9,
-        patch: 2,
+        patch: 2
       })
     })
 
@@ -241,7 +241,7 @@ describe('#verifyAddress', () => {
             address:
               path === "44'/60'/0'/9"
                 ? '0xe9d6f5779cf6936de03c0bec631f3bb3e336d98d'
-                : '0xCd37a15BdfEc87D0e383E628da2399053D5948ca',
+                : '0xCd37a15BdfEc87D0e383E628da2399053D5948ca'
           })
         })
     )
@@ -263,25 +263,25 @@ describe('#verifyAddress', () => {
   const errorCases = [
     {
       testCase: 'the address does not match',
-      expectedError: 'Address does not match device',
+      expectedError: 'Address does not match device'
     },
     {
       testCase: 'the verification request is rejected by the user',
       expectedError: 'Verify request rejected by user',
-      setup: () => Eth.mock.instances[0].getAddress.mockRejectedValue({ statusCode: 27013 }),
+      setup: () => Eth.mock.instances[0].getAddress.mockRejectedValue({ statusCode: 27013 })
     },
     {
       testCase: 'there is a communication error',
-      setup: () => Eth.mock.instances[0].getAddress.mockRejectedValue({ statusCode: -1 }),
+      setup: () => Eth.mock.instances[0].getAddress.mockRejectedValue({ statusCode: -1 })
     },
     {
       testCase: 'the eth app is not initialized',
-      setup: () => (ledger.eth = undefined),
+      setup: () => (ledger.eth = undefined)
     },
     {
       testCase: 'the derivation type is not initialized',
-      setup: () => (ledger.derivation = undefined),
-    },
+      setup: () => (ledger.derivation = undefined)
+    }
   ]
 
   errorCases.forEach(({ testCase, setup = () => {}, expectedError = 'Verify address error' }) => {
@@ -367,16 +367,16 @@ signingMethods.forEach((signingMethod) => {
     const errorCases = [
       {
         testCase: 'there is a communication error',
-        setup: () => Eth.mock.instances[0][signingMethod].mockRejectedValue({ statusCode: -1 }),
+        setup: () => Eth.mock.instances[0][signingMethod].mockRejectedValue({ statusCode: -1 })
       },
       {
         testCase: 'the eth app is not initialized',
-        setup: () => (ledger.eth = undefined),
+        setup: () => (ledger.eth = undefined)
       },
       {
         testCase: 'the derivation type is not initialized',
-        setup: () => (ledger.derivation = undefined),
-      },
+        setup: () => (ledger.derivation = undefined)
+      }
     ]
 
     errorCases.forEach(({ testCase, setup = () => {} }) => {
@@ -458,7 +458,7 @@ describe('#signTypedData', () => {
   it('fails if the signing request is invalid', (done) => {
     Eth.mock.instances[0].signTypedData.mockRejectedValue({
       statusCode: 99901,
-      message: 'Invalid typed data',
+      message: 'Invalid typed data'
     })
 
     ledger.once('update', () => done('Ledger unexpectedly updated!'))
@@ -478,16 +478,16 @@ describe('#signTypedData', () => {
   const errorCases = [
     {
       testCase: 'there is a communication error',
-      setup: () => Eth.mock.instances[0].signTypedData.mockRejectedValue({ statusCode: -1 }),
+      setup: () => Eth.mock.instances[0].signTypedData.mockRejectedValue({ statusCode: -1 })
     },
     {
       testCase: 'the eth app is not initialized',
-      setup: () => (ledger.eth = undefined),
+      setup: () => (ledger.eth = undefined)
     },
     {
       testCase: 'the derivation type is not initialized',
-      setup: () => (ledger.derivation = undefined),
-    },
+      setup: () => (ledger.derivation = undefined)
+    }
   ]
 
   errorCases.forEach(({ testCase, setup = () => {} }) => {

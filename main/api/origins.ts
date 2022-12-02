@@ -20,7 +20,7 @@ const storeApi = {
   getPermission: (address: Address, origin: string) => {
     const permissions: Record<string, Permission> = store('main.permissions', address) || {}
     return Object.values(permissions).find((p) => p.origin === origin)
-  },
+  }
 }
 
 export function parseOrigin(origin?: string) {
@@ -48,7 +48,7 @@ async function requestPermission(address: Address, fullPayload: RPCRequestPayloa
       handlerId: originId,
       type: 'access',
       origin: originId,
-      account: address,
+      account: address
     }
 
     accounts.addRequest(request, () => {
@@ -83,8 +83,8 @@ export function updateOrigin(
         name: origin,
         chain: {
           id: 1,
-          type: 'ethereum',
-        },
+          type: 'ethereum'
+        }
       })
     }
   }
@@ -94,8 +94,8 @@ export function updateOrigin(
     payload: {
       ...payload,
       chainId: payload.chainId || `0x${(existingOrigin?.chain.id || 1).toString(16)}`,
-      _origin: originId,
-    },
+      _origin: originId
+    }
   }
 }
 

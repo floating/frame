@@ -35,7 +35,7 @@ class RingIcon extends React.Component {
       <div
         className={ringIconClass}
         style={{
-          borderColor: color,
+          borderColor: color
         }}
       >
         <div className='ringIconInner' style={block ? { color } : { background: color }}>

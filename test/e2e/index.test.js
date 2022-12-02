@@ -11,7 +11,7 @@ test('Send Transaction', (done) => {
         .sendTransaction({
           value: Web3.utils.toHex(Math.round(1000000000000000 * Math.random())),
           to: '0x030e6af4985f111c265ee3a279e5a9f6aa124fd5',
-          from: accounts[0],
+          from: accounts[0]
         })
         .on('transactionHash', (hash) => {
           expect(hash).toBeTruthy()

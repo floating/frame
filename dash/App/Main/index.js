@@ -19,7 +19,7 @@ class Settings extends React.Component {
       latticeEndpoint,
       latticeEndpointMode,
       resetConfirm: false,
-      expandNetwork: false,
+      expandNetwork: false
     }
     // context.store.observer(() => {
     //   const { type, id } = context.store('main.currentNetwork')

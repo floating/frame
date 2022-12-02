@@ -22,7 +22,7 @@ const nebula = nebulaApi()
 const storeApi = {
   getPermissions: function (address: Address) {
     return (store('main.permissions', address) || {}) as Record<string, Permission>
-  },
+  }
 }
 
 interface SignerOptions {
@@ -96,7 +96,7 @@ class FrameAccount {
       store.setPermission(this.address, {
         handlerId: 'send-dapp-native',
         origin: 'send.frame.eth',
-        provider: true,
+        provider: true
       })
     }
 
@@ -138,7 +138,7 @@ class FrameAccount {
             chainId: '0x1',
             method: 'eth_blockNumber',
             _origin: 'frame-internal',
-            params: [],
+            params: []
           },
           (response: any) => {
             if (response.result)
@@ -258,8 +258,8 @@ class FrameAccount {
         type,
         data,
         approved: false,
-        approve,
-      },
+        approve
+      }
     ]
   }
 
@@ -320,7 +320,7 @@ class FrameAccount {
         const actions = await reveal.recog(calldata, {
           contractAddress: to,
           chainId: parseInt(chainId, 16),
-          account: this.address,
+          account: this.address
         })
 
         const knownTxRequest = this.requests[req.handlerId] as TransactionRequest
@@ -372,11 +372,11 @@ class FrameAccount {
           data: {
             step: 'confirm',
             accountId: account,
-            requestId: req.handlerId,
+            requestId: req.handlerId
           },
           position: {
-            bottom: (req || {}).type === 'transaction' ? '200px' : '140px',
-          },
+            bottom: (req || {}).type === 'transaction' ? '200px' : '140px'
+          }
         } as const
         if (inRequestView) nav.back('panel')
         nav.forward('panel', crumb)
@@ -480,7 +480,7 @@ class FrameAccount {
         smart: this.smart,
         requests: this.requests,
         ensName: this.ensName,
-        created: this.created,
+        created: this.created
       })
     ) as Account
 
@@ -614,7 +614,7 @@ class FrameAccount {
       'gas',
       'gasPrice',
       'gasLimit',
-      'nonce',
+      'nonce'
     ]
     const keys = Object.keys(rawTx) as Array<keyof TransactionData>
 

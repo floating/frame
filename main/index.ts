@@ -283,8 +283,8 @@ ipcMain.on('frame:unmax', (e) => {
 dapps.add({
   ens: 'send.frame.eth',
   config: {
-    key: 'value',
-  },
+    key: 'value'
+  }
 })
 
 ipcMain.on('unsetCurrentView', async (e, ens) => {
@@ -302,7 +302,7 @@ ipcMain.on('*:addFrame', (e, id) => {
       store.addFrame({
         id,
         currentView: '',
-        views: {},
+        views: {}
       })
       dapps.open(id, 'send.frame.eth')
     }

@@ -19,8 +19,8 @@ beforeEach(() => {
   mockNebula = {
     resolve: jest.fn().mockResolvedValue({ record: {} }),
     ipfs: {
-      getJson: jest.fn(),
-    },
+      getJson: jest.fn()
+    }
   }
 
   mockEthProvider = { connected: true, setChain: jest.fn(), once: jest.fn(), off: jest.fn() }
@@ -41,7 +41,7 @@ describe('loading tokens', () => {
 
   it('loads a token list from nebula', async () => {
     mockNebula.ipfs.getJson.mockResolvedValueOnce({
-      tokens: [{ name: 'another-token', chainId: 299, address: '0x9999' }],
+      tokens: [{ name: 'another-token', chainId: 299, address: '0x9999' }]
     })
 
     await tokenLoader.start()
@@ -84,8 +84,8 @@ describe('#getBlacklist', () => {
       tokens: [
         { name: 'Optimism', chainId: 10, address: '0x9999', extensions: { omit: true } },
         { name: 'Polygon', chainId: 137, address: '0x9999' },
-        { name: 'Minereum', chainId: 137, address: '0x9999', extensions: { omit: true } },
-      ],
+        { name: 'Minereum', chainId: 137, address: '0x9999', extensions: { omit: true } }
+      ]
     })
 
     return tokenLoader.start()

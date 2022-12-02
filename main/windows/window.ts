@@ -29,8 +29,8 @@ export function createWindow(
       nodeIntegration: false,
       scrollBounce: true,
       navigateOnDragDrop: false,
-      disableBlinkFeatures: 'Auxclick',
-    },
+      disableBlinkFeatures: 'Auxclick'
+    }
   })
 
   browserWindow.webContents.once('did-finish-load', () => {
@@ -59,8 +59,8 @@ export function createViewInstance(
       navigateOnDragDrop: false,
       disableBlinkFeatures: 'Auxclick',
       preload: path.resolve('./main/windows/viewPreload.js'),
-      partition: `persist:${ens}`,
-    },
+      partition: `persist:${ens}`
+    }
   })
 
   viewInstance.webContents.on('will-navigate', (e) => e.preventDefault())
@@ -86,7 +86,7 @@ const externalWhitelist = [
   'https://frame.canny.io',
   'https://feedback.frame.sh',
   'https://wiki.trezor.io/Trezor_Bridge',
-  'https://opensea.io',
+  'https://opensea.io'
 ]
 
 const isValidReleasePage = (url: string) =>

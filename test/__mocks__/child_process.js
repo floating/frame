@@ -14,5 +14,5 @@ module.exports = {
     }
 
     return forkedChildProcess
-  }),
+  })
 }

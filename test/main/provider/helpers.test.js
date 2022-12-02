@@ -72,7 +72,7 @@ describe('#getRawTx', () => {
   const invalidNonces = [
     { description: 'non-numeric', nonce: 'invalid' },
     { description: 'negative integer', nonce: '-360' },
-    { description: 'non-integer numeric', nonce: '3.60' },
+    { description: 'non-integer numeric', nonce: '3.60' }
   ]
   invalidNonces.forEach(({ description, nonce }) => {
     it(`should reject a ${description} nonce`, () => {

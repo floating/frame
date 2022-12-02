@@ -47,7 +47,7 @@ async function pixelColor(image: Electron.NativeImage) {
         background: `rgb(${colorArray.join(', ')})`,
         backgroundShade: `rgb(${colorArray.map((v) => Math.max(parseInt(v) - 5, 0)).join(', ')})`,
         backgroundLight: `rgb(${colorArray.map((v) => Math.min(parseInt(v) + 50, 255)).join(', ')})`,
-        text: textColor(...(colorArray.map((a) => parseInt(a)) as [number, number, number])),
+        text: textColor(...(colorArray.map((a) => parseInt(a)) as [number, number, number]))
       }
 
       resolve(color)
@@ -93,8 +93,8 @@ async function extractColors(url: string, ens: string) {
       navigateOnDragDrop: false,
       disableBlinkFeatures: 'Auxclick',
       backgroundThrottling: false,
-      offscreen: true,
-    },
+      offscreen: true
+    }
   })
 
   let view: BrowserView | null = createViewInstance(ens, { offscreen: true })
@@ -119,7 +119,7 @@ async function extractColors(url: string, ens: string) {
     await view.webContents.session.cookies.set({
       url: url,
       name: '__frameSession',
-      value: session,
+      value: session
     })
 
     await view.webContents.loadURL(url)

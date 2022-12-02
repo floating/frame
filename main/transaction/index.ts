@@ -26,7 +26,7 @@ const londonHardforkSigners: SignerCompatibilityByVersion = {
       (version.major === 2 && version.minor === 4 && version.patch >= 2)
     )
   },
-  lattice: (version) => version.major >= 1 || version.minor >= 11,
+  lattice: (version) => version.major >= 1 || version.minor >= 11
 }
 
 type SignerCompatibilityByVersion = {
@@ -56,7 +56,7 @@ function signerCompatibility(txData: TransactionData, signer: SignerSummary): Si
   return {
     signer: signer.type,
     tx: 'legacy',
-    compatible: true,
+    compatible: true
   }
 }
 
@@ -148,7 +148,7 @@ function hexifySignature({ v, r, s }: Signature) {
   return {
     v: addHexPrefix(v),
     r: addHexPrefix(r),
-    s: addHexPrefix(s),
+    s: addHexPrefix(s)
   }
 }
 
@@ -166,7 +166,7 @@ async function sign(rawTx: TransactionData, signingFn: (tx: TypedTransaction) =>
     return TransactionFactory.fromTxData(
       {
         ...rawTx,
-        ...signature,
+        ...signature
       },
       { common }
     )

@@ -17,7 +17,7 @@ describe('#typeSupportsBaseFee', () => {
 describe('#usesBaseFee', () => {
   it('does not use a base fee for transaction type 0', () => {
     const tx = {
-      type: '0x0',
+      type: '0x0'
     }
 
     expect(usesBaseFee(tx)).toBe(false)
@@ -25,7 +25,7 @@ describe('#usesBaseFee', () => {
 
   it('does not use a base fee for transaction type 1', () => {
     const tx = {
-      type: '0x1',
+      type: '0x1'
     }
 
     expect(usesBaseFee(tx)).toBe(false)
@@ -33,7 +33,7 @@ describe('#usesBaseFee', () => {
 
   it('uses a base fee for transaction type 2', () => {
     const tx = {
-      type: '0x2',
+      type: '0x2'
     }
 
     expect(usesBaseFee(tx)).toBe(true)

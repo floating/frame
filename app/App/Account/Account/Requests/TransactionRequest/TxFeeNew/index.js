@@ -11,7 +11,7 @@ import {
   Cluster,
   ClusterRow,
   ClusterColumn,
-  ClusterValue,
+  ClusterValue
 } from '../../../../../../../resources/Components/Cluster'
 
 const FEE_WARNING_THRESHOLD_USD = 50
@@ -62,7 +62,7 @@ class TxFee extends React.Component {
     const req = this.props.req
     const chain = {
       type: 'ethereum',
-      id: parseInt(req.data.chainId, 16),
+      id: parseInt(req.data.chainId, 16)
     }
     const { isTestnet } = this.store('main.networks', chain.type, chain.id)
     const { nativeCurrency } = this.store('main.networksMeta', chain.type, chain.id)
@@ -71,7 +71,7 @@ class TxFee extends React.Component {
     const maxFeePerGas = BigNumber(req.data[usesBaseFee(req.data) ? 'maxFeePerGas' : 'gasPrice'])
     const maxFee = displayValueData(maxFeePerGas.multipliedBy(maxGas), {
       currencyRate: nativeCurrency.usd,
-      isTestnet,
+      isTestnet
     })
 
     // accounts for two potential 12.5% block fee increases
@@ -82,7 +82,7 @@ class TxFee extends React.Component {
     const minGas = maxGas.dividedBy(BigNumber(1.5))
     const minFee = displayValueData(minFeePerGas.multipliedBy(minGas), {
       currencyRate: nativeCurrency.usd,
-      isTestnet,
+      isTestnet
     })
 
     return (

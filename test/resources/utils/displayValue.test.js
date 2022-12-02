@@ -26,7 +26,7 @@ describe('fiat currency', () => {
     expect(value.fiat()).toStrictEqual({
       approximationSymbol: '<',
       displayValue: '0.01',
-      value: BigNumber(0),
+      value: BigNumber(0)
     })
   })
 
@@ -34,7 +34,7 @@ describe('fiat currency', () => {
     const value = displayValueData(356e24, { currencyRate: { price: BigNumber(1.3) }, isTestnet: true })
     expect(value.fiat()).toStrictEqual({
       displayValue: '?',
-      value: BigNumber(0),
+      value: BigNumber(0)
     })
   })
 
@@ -44,7 +44,7 @@ describe('fiat currency', () => {
       expect(value.fiat()).toStrictEqual({
         approximationSymbol: '<',
         displayValue: '0.01',
-        value: BigNumber(0.000356),
+        value: BigNumber(0.000356)
       })
     })
 
@@ -52,7 +52,7 @@ describe('fiat currency', () => {
       const value = displayValueData(999999e15, { currencyRate: { price: BigNumber(1) } })
       expect(value.fiat()).toStrictEqual({
         displayValue: '999.99',
-        value: BigNumber(999.999),
+        value: BigNumber(999.999)
       })
     })
   })
@@ -63,7 +63,7 @@ describe('fiat currency', () => {
       expect(value.fiat({ displayDecimals: false })).toStrictEqual({
         approximationSymbol: '<',
         displayValue: '1',
-        value: BigNumber(0.000356),
+        value: BigNumber(0.000356)
       })
     })
 
@@ -71,7 +71,7 @@ describe('fiat currency', () => {
       const value = displayValueData(999999e15, { currencyRate: { price: BigNumber(1) } })
       expect(value.fiat({ displayDecimals: false })).toStrictEqual({
         displayValue: '999',
-        value: BigNumber(999.999),
+        value: BigNumber(999.999)
       })
     })
   })
@@ -82,10 +82,10 @@ describe('fiat currency', () => {
       expect(value.fiat()).toStrictEqual({
         displayUnit: {
           fullName: 'million',
-          shortName: 'M',
+          shortName: 'M'
         },
         displayValue: '35.62',
-        value: BigNumber(35625300),
+        value: BigNumber(35625300)
       })
     })
 
@@ -94,10 +94,10 @@ describe('fiat currency', () => {
       expect(value.fiat()).toStrictEqual({
         displayUnit: {
           fullName: 'million',
-          shortName: 'M',
+          shortName: 'M'
         },
         displayValue: '35.62',
-        value: BigNumber(35625900),
+        value: BigNumber(35625900)
       })
     })
 
@@ -106,10 +106,10 @@ describe('fiat currency', () => {
       expect(value.fiat()).toStrictEqual({
         displayUnit: {
           fullName: 'million',
-          shortName: 'M',
+          shortName: 'M'
         },
         displayValue: '35',
-        value: BigNumber(35000000),
+        value: BigNumber(35000000)
       })
     })
 
@@ -118,10 +118,10 @@ describe('fiat currency', () => {
       expect(value.fiat()).toStrictEqual({
         displayUnit: {
           fullName: 'billion',
-          shortName: 'B',
+          shortName: 'B'
         },
         displayValue: '35.62',
-        value: BigNumber(35625300000),
+        value: BigNumber(35625300000)
       })
     })
 
@@ -130,10 +130,10 @@ describe('fiat currency', () => {
       expect(value.fiat()).toStrictEqual({
         displayUnit: {
           fullName: 'billion',
-          shortName: 'B',
+          shortName: 'B'
         },
         displayValue: '35.62',
-        value: BigNumber(35625900000),
+        value: BigNumber(35625900000)
       })
     })
 
@@ -142,10 +142,10 @@ describe('fiat currency', () => {
       expect(value.fiat()).toStrictEqual({
         displayUnit: {
           fullName: 'billion',
-          shortName: 'B',
+          shortName: 'B'
         },
         displayValue: '35',
-        value: BigNumber(35000000000),
+        value: BigNumber(35000000000)
       })
     })
 
@@ -154,10 +154,10 @@ describe('fiat currency', () => {
       expect(value.fiat()).toStrictEqual({
         displayUnit: {
           fullName: 'trillion',
-          shortName: 'T',
+          shortName: 'T'
         },
         displayValue: '35.62',
-        value: BigNumber(35625300000000),
+        value: BigNumber(35625300000000)
       })
     })
 
@@ -166,10 +166,10 @@ describe('fiat currency', () => {
       expect(value.fiat()).toStrictEqual({
         displayUnit: {
           fullName: 'trillion',
-          shortName: 'T',
+          shortName: 'T'
         },
         displayValue: '35.62',
-        value: BigNumber(35625900000000),
+        value: BigNumber(35625900000000)
       })
     })
 
@@ -178,10 +178,10 @@ describe('fiat currency', () => {
       expect(value.fiat()).toStrictEqual({
         displayUnit: {
           fullName: 'trillion',
-          shortName: 'T',
+          shortName: 'T'
         },
         displayValue: '35',
-        value: BigNumber(35000000000000),
+        value: BigNumber(35000000000000)
       })
     })
 
@@ -190,10 +190,10 @@ describe('fiat currency', () => {
       expect(value.fiat()).toStrictEqual({
         displayUnit: {
           fullName: 'quadrillion',
-          shortName: 'Q',
+          shortName: 'Q'
         },
         displayValue: '35.62',
-        value: BigNumber(35625300000000000),
+        value: BigNumber(35625300000000000)
       })
     })
 
@@ -202,10 +202,10 @@ describe('fiat currency', () => {
       expect(value.fiat()).toStrictEqual({
         displayUnit: {
           fullName: 'quadrillion',
-          shortName: 'Q',
+          shortName: 'Q'
         },
         displayValue: '35.62',
-        value: BigNumber(35625900000000000),
+        value: BigNumber(35625900000000000)
       })
     })
 
@@ -214,10 +214,10 @@ describe('fiat currency', () => {
       expect(value.fiat()).toStrictEqual({
         displayUnit: {
           fullName: 'quadrillion',
-          shortName: 'Q',
+          shortName: 'Q'
         },
         displayValue: '35',
-        value: BigNumber(35000000000000000),
+        value: BigNumber(35000000000000000)
       })
     })
 
@@ -227,10 +227,10 @@ describe('fiat currency', () => {
         approximationSymbol: '>',
         displayUnit: {
           fullName: 'quadrillion',
-          shortName: 'Q',
+          shortName: 'Q'
         },
         displayValue: '999,999',
-        value: BigNumber(3.56e34),
+        value: BigNumber(3.56e34)
       })
     })
   })
@@ -243,7 +243,7 @@ describe('ether currency', () => {
       expect(value.ether()).toStrictEqual({
         approximationSymbol: '<',
         displayValue: '0.000001',
-        value: BigNumber(3.56e-8),
+        value: BigNumber(3.56e-8)
       })
     })
 
@@ -251,7 +251,7 @@ describe('ether currency', () => {
       const value = displayValueData(998.5678111111e18)
       expect(value.ether()).toStrictEqual({
         displayValue: '998.567',
-        value: BigNumber(998.5678111111),
+        value: BigNumber(998.5678111111)
       })
     })
 
@@ -259,7 +259,7 @@ describe('ether currency', () => {
       const value = displayValueData(99.85678111111e18)
       expect(value.ether()).toStrictEqual({
         displayValue: '99.8567',
-        value: BigNumber(99.85678111111),
+        value: BigNumber(99.85678111111)
       })
     })
 
@@ -267,7 +267,7 @@ describe('ether currency', () => {
       const value = displayValueData(9.985678111111e18)
       expect(value.ether()).toStrictEqual({
         displayValue: '9.98567',
-        value: BigNumber(9.985678111111),
+        value: BigNumber(9.985678111111)
       })
     })
 
@@ -275,7 +275,7 @@ describe('ether currency', () => {
       const value = displayValueData(0.9985678111111e18)
       expect(value.ether()).toStrictEqual({
         displayValue: '0.998567',
-        value: BigNumber(0.9985678111111),
+        value: BigNumber(0.9985678111111)
       })
     })
 
@@ -283,7 +283,7 @@ describe('ether currency', () => {
       const value = displayValueData(0.09985678111111e18)
       expect(value.ether()).toStrictEqual({
         displayValue: '0.099856',
-        value: BigNumber(0.09985678111111),
+        value: BigNumber(0.09985678111111)
       })
     })
 
@@ -291,7 +291,7 @@ describe('ether currency', () => {
       const value = displayValueData(0.009985678111111e18)
       expect(value.ether()).toStrictEqual({
         displayValue: '0.009985',
-        value: BigNumber(0.009985678111111),
+        value: BigNumber(0.009985678111111)
       })
     })
 
@@ -299,7 +299,7 @@ describe('ether currency', () => {
       const value = displayValueData(0.0009985678111111e18)
       expect(value.ether()).toStrictEqual({
         displayValue: '0.000998',
-        value: BigNumber(0.0009985678111111),
+        value: BigNumber(0.0009985678111111)
       })
     })
 
@@ -307,7 +307,7 @@ describe('ether currency', () => {
       const value = displayValueData(0.00009985678111111e18)
       expect(value.ether()).toStrictEqual({
         displayValue: '0.000099',
-        value: BigNumber(0.00009985678111111),
+        value: BigNumber(0.00009985678111111)
       })
     })
 
@@ -315,7 +315,7 @@ describe('ether currency', () => {
       const value = displayValueData(0.000009985678111111e18)
       expect(value.ether()).toStrictEqual({
         displayValue: '0.000009',
-        value: BigNumber(0.000009985678111111),
+        value: BigNumber(0.000009985678111111)
       })
     })
   })
@@ -326,7 +326,7 @@ describe('ether currency', () => {
       expect(value.ether({ displayDecimals: false })).toStrictEqual({
         approximationSymbol: '<',
         displayValue: '1',
-        value: BigNumber(0.000356),
+        value: BigNumber(0.000356)
       })
     })
 
@@ -334,7 +334,7 @@ describe('ether currency', () => {
       const value = displayValueData(999999e15)
       expect(value.ether({ displayDecimals: false })).toStrictEqual({
         displayValue: '999',
-        value: BigNumber(999.999),
+        value: BigNumber(999.999)
       })
     })
   })
@@ -345,10 +345,10 @@ describe('ether currency', () => {
       expect(value.ether()).toStrictEqual({
         displayUnit: {
           fullName: 'million',
-          shortName: 'M',
+          shortName: 'M'
         },
         displayValue: '35.62',
-        value: BigNumber(35625300),
+        value: BigNumber(35625300)
       })
     })
 
@@ -357,10 +357,10 @@ describe('ether currency', () => {
       expect(value.ether()).toStrictEqual({
         displayUnit: {
           fullName: 'million',
-          shortName: 'M',
+          shortName: 'M'
         },
         displayValue: '35.62',
-        value: BigNumber(35625900),
+        value: BigNumber(35625900)
       })
     })
 
@@ -369,10 +369,10 @@ describe('ether currency', () => {
       expect(value.ether()).toStrictEqual({
         displayUnit: {
           fullName: 'million',
-          shortName: 'M',
+          shortName: 'M'
         },
         displayValue: '35',
-        value: BigNumber(35000000),
+        value: BigNumber(35000000)
       })
     })
 
@@ -381,10 +381,10 @@ describe('ether currency', () => {
       expect(value.ether()).toStrictEqual({
         displayUnit: {
           fullName: 'billion',
-          shortName: 'B',
+          shortName: 'B'
         },
         displayValue: '35.62',
-        value: BigNumber(35625300000),
+        value: BigNumber(35625300000)
       })
     })
 
@@ -393,10 +393,10 @@ describe('ether currency', () => {
       expect(value.ether()).toStrictEqual({
         displayUnit: {
           fullName: 'billion',
-          shortName: 'B',
+          shortName: 'B'
         },
         displayValue: '35.62',
-        value: BigNumber(35625900000),
+        value: BigNumber(35625900000)
       })
     })
 
@@ -405,10 +405,10 @@ describe('ether currency', () => {
       expect(value.ether()).toStrictEqual({
         displayUnit: {
           fullName: 'billion',
-          shortName: 'B',
+          shortName: 'B'
         },
         displayValue: '35',
-        value: BigNumber(35000000000),
+        value: BigNumber(35000000000)
       })
     })
 
@@ -417,10 +417,10 @@ describe('ether currency', () => {
       expect(value.ether()).toStrictEqual({
         displayUnit: {
           fullName: 'trillion',
-          shortName: 'T',
+          shortName: 'T'
         },
         displayValue: '35.62',
-        value: BigNumber(35625300000000),
+        value: BigNumber(35625300000000)
       })
     })
 
@@ -429,10 +429,10 @@ describe('ether currency', () => {
       expect(value.ether()).toStrictEqual({
         displayUnit: {
           fullName: 'trillion',
-          shortName: 'T',
+          shortName: 'T'
         },
         displayValue: '35.62',
-        value: BigNumber(35625900000000),
+        value: BigNumber(35625900000000)
       })
     })
 
@@ -441,10 +441,10 @@ describe('ether currency', () => {
       expect(value.ether()).toStrictEqual({
         displayUnit: {
           fullName: 'trillion',
-          shortName: 'T',
+          shortName: 'T'
         },
         displayValue: '35',
-        value: BigNumber(35000000000000),
+        value: BigNumber(35000000000000)
       })
     })
 
@@ -453,10 +453,10 @@ describe('ether currency', () => {
       expect(value.ether()).toStrictEqual({
         displayUnit: {
           fullName: 'quadrillion',
-          shortName: 'Q',
+          shortName: 'Q'
         },
         displayValue: '35.62',
-        value: BigNumber(35625300000000000),
+        value: BigNumber(35625300000000000)
       })
     })
 
@@ -465,10 +465,10 @@ describe('ether currency', () => {
       expect(value.ether()).toStrictEqual({
         displayUnit: {
           fullName: 'quadrillion',
-          shortName: 'Q',
+          shortName: 'Q'
         },
         displayValue: '35.62',
-        value: BigNumber(35625900000000000),
+        value: BigNumber(35625900000000000)
       })
     })
 
@@ -477,10 +477,10 @@ describe('ether currency', () => {
       expect(value.ether()).toStrictEqual({
         displayUnit: {
           fullName: 'quadrillion',
-          shortName: 'Q',
+          shortName: 'Q'
         },
         displayValue: '35',
-        value: BigNumber(35000000000000000),
+        value: BigNumber(35000000000000000)
       })
     })
 
@@ -490,10 +490,10 @@ describe('ether currency', () => {
         approximationSymbol: '>',
         displayUnit: {
           fullName: 'quadrillion',
-          shortName: 'Q',
+          shortName: 'Q'
         },
         displayValue: '999,999',
-        value: BigNumber(3.56e34),
+        value: BigNumber(3.56e34)
       })
     })
   })

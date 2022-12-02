@@ -41,7 +41,7 @@ export default class GasCalculator {
       return {
         baseFee: parseInt(baseFee, 16),
         gasUsedRatio: feeHistory.gasUsedRatio[i],
-        rewards: (feeHistory.reward[i] || []).map((reward) => parseInt(reward, 16)),
+        rewards: (feeHistory.reward[i] || []).map((reward) => parseInt(reward, 16))
       }
     })
 
@@ -64,7 +64,7 @@ export default class GasCalculator {
       // use any recent block with transactions
       { minRatio: 0, maxRatio: Number.MAX_SAFE_INTEGER, blockSampleSize: recentBlocks },
       // use any block with transactions
-      { minRatio: 0, maxRatio: Number.MAX_SAFE_INTEGER, blockSampleSize: allBlocks },
+      { minRatio: 0, maxRatio: Number.MAX_SAFE_INTEGER, blockSampleSize: allBlocks }
     ]
 
     const eligibleRewardsBlocks = rewardCalculationStrategies.reduce((foundBlocks, strategy) => {
@@ -98,7 +98,7 @@ export default class GasCalculator {
       slow: gasPrice,
       standard: gasPrice,
       fast: gasPrice,
-      asap: gasPrice,
+      asap: gasPrice
     }
   }
 
@@ -118,7 +118,7 @@ export default class GasCalculator {
       nextBaseFee: intToHex(nextBlockFee),
       maxBaseFeePerGas: intToHex(calculatedFee),
       maxPriorityFeePerGas: intToHex(medianBlockReward),
-      maxFeePerGas: intToHex(calculatedFee + medianBlockReward),
+      maxFeePerGas: intToHex(calculatedFee + medianBlockReward)
     }
   }
 }

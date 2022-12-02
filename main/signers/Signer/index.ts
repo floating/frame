@@ -68,7 +68,7 @@ export default class Signer extends EventEmitter {
       model: this.model,
       addresses: this.addresses.map((addr) => addHexPrefix(addr.toString())),
       status: this.status,
-      appVersion: this.appVersion || { major: 0, minor: 0, patch: 0 },
+      appVersion: this.appVersion || { major: 0, minor: 0, patch: 0 }
     }
   }
 

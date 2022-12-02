@@ -12,15 +12,15 @@ const mockAbi = [
     name: 'retrieve',
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [{ internalType: 'uint256', name: 'num', type: 'uint256' }],
     name: 'store',
     outputs: [],
     stateMutability: 'nonpayable',
-    type: 'function',
-  },
+    type: 'function'
+  }
 ]
 
 const flushPromises = () => new Promise(jest.requireActual('timers').setImmediate)
@@ -40,7 +40,7 @@ describe('#fetchContract', () => {
     return expect(fetchContract('0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0', 1)).resolves.toStrictEqual({
       abi: JSON.stringify(mockAbi),
       name: 'mock sourcify abi',
-      source: 'sourcify',
+      source: 'sourcify'
     })
   })
 
@@ -51,7 +51,7 @@ describe('#fetchContract', () => {
     return expect(fetchContract('0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0', 1)).resolves.toStrictEqual({
       abi: JSON.stringify(mockAbi),
       name: 'mock etherscan abi',
-      source: 'etherscan',
+      source: 'etherscan'
     })
   })
 
@@ -62,7 +62,7 @@ describe('#fetchContract', () => {
     return expect(fetchContract('0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0', 1)).resolves.toStrictEqual({
       abi: JSON.stringify(mockAbi),
       name: 'mock sourcify abi',
-      source: 'sourcify',
+      source: 'sourcify'
     })
   })
 
@@ -82,7 +82,7 @@ describe('#fetchContract', () => {
     ).resolves.toStrictEqual({
       abi: JSON.stringify(mockAbi),
       name: 'mock sourcify abi',
-      source: 'sourcify',
+      source: 'sourcify'
     })
 
     jest.advanceTimersByTime(20)
@@ -105,6 +105,6 @@ function mockContractSource(source) {
   return {
     abi: JSON.stringify(mockAbi),
     name: `mock ${source} abi`,
-    source,
+    source
   }
 }

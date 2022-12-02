@@ -56,7 +56,7 @@ const GasFeesMarket = ({ gasPrice, fees: { nextBaseFee, maxPriorityFeePerGas } }
   const [displayPriorityHint, setDisplayPriorityHint] = useState(false)
   const calculatedFees = {
     actualBaseFee: roundGwei(weiToGwei(hexToInt(nextBaseFee))),
-    priorityFee: levelDisplay(maxPriorityFeePerGas),
+    priorityFee: levelDisplay(maxPriorityFeePerGas)
   }
 
   return (
@@ -116,16 +116,16 @@ class GasSummaryComponent extends Component {
     const estimates = [
       {
         label: `Send ${currentSymbol}`,
-        estimatedGas: gasToSendEth,
+        estimatedGas: gasToSendEth
       },
       {
         label: 'Send Tokens',
-        estimatedGas: gasToSendToken,
+        estimatedGas: gasToSendToken
       },
       {
         label: 'Dex Swap',
-        estimatedGas: gasForDexSwap,
-      },
+        estimatedGas: gasForDexSwap
+      }
     ]
 
     const isTestnet = this.store('main.networks', type, id, 'isTestnet')
@@ -152,7 +152,7 @@ class GasSummaryComponent extends Component {
       return estimates.map(({ label, estimatedGas }, i) => ({
         low: optimismEstimate(l1GasEstimates[i], estimatedGas),
         high: optimismEstimate(l1GasEstimates[i], estimatedGas),
-        label,
+        label
       }))
     }
 
@@ -163,7 +163,7 @@ class GasSummaryComponent extends Component {
     return estimates.map(({ label, estimatedGas }) => ({
       low: txEstimate(low, estimatedGas, nativeUSD),
       high: txEstimate(gasPrice, estimatedGas, nativeUSD),
-      label,
+      label
     }))
   }
 
@@ -184,7 +184,7 @@ class GasSummaryComponent extends Component {
     )
     const calculatedFees = {
       actualBaseFee: roundGwei(weiToGwei(hexToInt(nextBaseFee))),
-      priorityFee: levelDisplay(maxPriorityFeePerGas),
+      priorityFee: levelDisplay(maxPriorityFeePerGas)
     }
 
     return this.txEstimates(type, chainId, gasPrice, calculatedFees, currentSymbol)
@@ -234,7 +234,7 @@ class Gas extends Component {
   constructor(...args) {
     super(...args)
     this.state = {
-      expand: false,
+      expand: false
     }
   }
 

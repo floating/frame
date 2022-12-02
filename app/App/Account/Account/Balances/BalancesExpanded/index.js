@@ -10,7 +10,7 @@ import {
   formatUsdRate,
   createBalance,
   sortByTotalValue as byTotalValue,
-  isNativeCurrency,
+  isNativeCurrency
 } from '../../../../../../resources/domain/balance'
 import { matchFilter } from '../../../../../../resources/utils'
 
@@ -24,7 +24,7 @@ class BalancesExpanded extends React.Component {
           clearTimeout(this.resizeTimer)
           this.resizeTimer = setTimeout(() => {
             link.send('tray:action', 'updateAccountModule', this.props.moduleId, {
-              height: this.moduleRef.current.clientHeight,
+              height: this.moduleRef.current.clientHeight
             })
           }, 100)
         }
@@ -37,7 +37,7 @@ class BalancesExpanded extends React.Component {
       selected: 0,
       shadowTop: 0,
       expand: false,
-      balanceFilter: '',
+      balanceFilter: ''
     }
   }
 

@@ -21,7 +21,7 @@ class AddHardwareLattice extends React.Component {
       error: false,
       deviceId: '',
       deviceName: 'GridPlus',
-      pairCode: '',
+      pairCode: ''
     }
     this.forms = [React.createRef(), React.createRef()]
   }
@@ -81,7 +81,7 @@ class AddHardwareLattice extends React.Component {
         link.send('tray:action', 'backDash', 2)
         const crumb = {
           view: 'expandedSigner',
-          data: { signer: signer.id },
+          data: { signer: signer.id }
         }
         link.send('tray:action', 'navDash', crumb)
       }

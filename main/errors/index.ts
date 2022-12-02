@@ -60,8 +60,8 @@ export function init() {
         exception: { values: getSentryExceptions(event) },
         user: { ...event.user, ip_address: undefined }, // remove IP address
         tags: { ...event.tags, 'frame.instance_id': store('main.instanceId') },
-        extra: getCrashReportFields(),
+        extra: getCrashReportFields()
       }
-    },
+    }
   })
 }

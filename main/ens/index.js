@@ -1,6 +1,6 @@
 // NPM modules
 const {
-  utils: { Interface },
+  utils: { Interface }
 } = require('ethers')
 const namehash = require('eth-ens-namehash')
 const contentHash = require('content-hash')

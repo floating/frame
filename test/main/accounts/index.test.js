@@ -35,7 +35,7 @@ const account = {
   requests: {},
   ensName: null,
   tokens: {},
-  created: '12819530:1626189153547',
+  created: '12819530:1626189153547'
 }
 
 const account2 = {
@@ -48,7 +48,7 @@ const account2 = {
   signer: '',
   requests: {},
   ensName: '',
-  created: '15315799:1660153882707',
+  created: '15315799:1660153882707'
 }
 
 let request
@@ -75,14 +75,14 @@ beforeEach((done) => {
       type: '0x2',
       maxPriorityFeePerGas: gweiToHex(1),
       maxFeePerGas: gweiToHex(9),
-      nonce,
+      nonce
     },
     payload: {
       jsonrpc: '2.0',
       id: 7,
       method: 'eth_signTransaction',
-      params: [{ from, nonce }],
-    },
+      params: [{ from, nonce }]
+    }
   }
 
   Accounts.add(account2.address, 'Test Account 2')
@@ -109,7 +109,7 @@ describe('#updatePendingFees', () => {
 
     store.setGasFees('ethereum', parseInt(request.data.chainId), {
       maxBaseFeePerGas: gweiToHex(9),
-      maxPriorityFeePerGas: gweiToHex(2),
+      maxPriorityFeePerGas: gweiToHex(2)
     })
   })
 
@@ -574,7 +574,7 @@ describe('#adjustNonce', () => {
           id: 1,
           jsonrpc: '2.0',
           method: 'eth_getTransactionCount',
-          params: ['0x22dd63c3619818fdbc262c78baee43cb61e9cccf', 'pending'],
+          params: ['0x22dd63c3619818fdbc262c78baee43cb61e9cccf', 'pending']
         })
       )
 
@@ -645,7 +645,7 @@ describe('#resetNonce', () => {
           id: 1,
           jsonrpc: '2.0',
           method: 'eth_getTransactionCount',
-          params: ['0x22dd63c3619818fdbc262c78baee43cb61e9cccf', 'pending'],
+          params: ['0x22dd63c3619818fdbc262c78baee43cb61e9cccf', 'pending']
         })
       )
       cb({ result: '0x3' })
@@ -758,7 +758,7 @@ describe('#signerCompatibility', () => {
     id: '13',
     type: 'seed',
     addresses: [account.id],
-    status: 'locked',
+    status: 'locked'
   }
 
   beforeEach(() => {
@@ -767,7 +767,7 @@ describe('#signerCompatibility', () => {
     activeSigner = {
       id: '12',
       addresses: [account.id],
-      summary: jest.fn(),
+      summary: jest.fn()
     }
 
     store.newSigner(lockedSeedSigner)
@@ -807,9 +807,9 @@ describe('#signerCompatibility', () => {
       expect(cb).toHaveBeenCalledWith(new Error('Signer unavailable'))
       expect(store.navDash).toHaveBeenCalledWith({
         data: {
-          signer: activeSigner.id,
+          signer: activeSigner.id
         },
-        view: 'expandedSigner',
+        view: 'expandedSigner'
       })
     })
   })
@@ -836,9 +836,9 @@ describe('#signerCompatibility', () => {
 
     expect(store.navDash).toHaveBeenCalledWith({
       data: {
-        signer: activeSigner.id,
+        signer: activeSigner.id
       },
-      view: 'expandedSigner',
+      view: 'expandedSigner'
     })
   })
 

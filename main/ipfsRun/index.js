@@ -53,7 +53,7 @@ const api = {
     if (files.length > 1) throw new Error(`Path ${path} is a directory, use .get() to return all files`)
     if (files[0].path !== path || files.length !== 1) throw new Error(`Path ${path} could not be found`)
     return files[0]
-  },
+  }
 }
 
 const start = async () => {

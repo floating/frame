@@ -9,7 +9,7 @@ const PRIMITIVE_TYPES = [
   /^address$/,
   /^bool$/,
   /^bytes$/,
-  /^string$/,
+  /^string$/
 ]
 
 function isPrimitiveType(type) {
@@ -104,7 +104,7 @@ function hashTypedData(typedData) {
     Buffer.concat([
       Buffer.from('1901', 'hex'),
       structHash('EIP712Domain', typedData.types, typedData.domain),
-      structHash(typedData.primaryType, typedData.types, typedData.message),
+      structHash(typedData.primaryType, typedData.types, typedData.message)
     ])
   )
 }

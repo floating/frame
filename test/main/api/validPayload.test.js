@@ -18,7 +18,7 @@ beforeEach(() => {
     id: 7,
     jsonrpc: '2.0',
     method: 'eth_getBalance',
-    params: ['0xc93452A74e596e81E4f73Ca1AcFF532089AD4c62'],
+    params: ['0xc93452A74e596e81E4f73Ca1AcFF532089AD4c62']
   }
 })
 
@@ -48,7 +48,7 @@ it('changes missing params to an empty array', () => {
 
   expect(result).toStrictEqual({
     ...payload,
-    params: [],
+    params: []
   })
 })
 

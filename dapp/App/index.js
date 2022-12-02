@@ -39,7 +39,7 @@ class App extends React.Component {
             borderTop: `3px solid ${currentDapp.colors.backgroundShade}`,
             borderRight: `3px solid ${currentDapp.colors.backgroundShade}`,
             borderBottom: `3px solid ${currentDapp.colors.backgroundShade}`,
-            borderLeft: `3px solid ${currentDapp.colors.backgroundLight}`,
+            borderLeft: `3px solid ${currentDapp.colors.backgroundLight}`
           }
         : {}
 
@@ -73,7 +73,7 @@ class App extends React.Component {
               <div
                 className='mainDappBackground'
                 style={{
-                  background: currentDapp.colors ? currentDapp.colors.background : 'none',
+                  background: currentDapp.colors ? currentDapp.colors.background : 'none'
                 }}
               >
                 <div className='mainDappBackgroundTop' />

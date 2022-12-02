@@ -2,7 +2,7 @@ import type {
   MessageTypes,
   SignTypedDataVersion,
   TypedDataV1,
-  TypedMessage as BaseTypedMessage,
+  TypedMessage as BaseTypedMessage
 } from '@metamask/eth-sig-util'
 import type { DecodedCallData } from '../contracts'
 import type { Chain } from '../chains'
@@ -11,12 +11,12 @@ import type { Action } from '../transaction/actions'
 
 export enum ReplacementType {
   Speed = 'speed',
-  Cancel = 'cancel',
+  Cancel = 'cancel'
 }
 
 export enum RequestMode {
   Normal = 'normal',
-  Monitor = 'monitor',
+  Monitor = 'monitor'
 }
 
 export enum RequestStatus {
@@ -28,7 +28,7 @@ export enum RequestStatus {
   Sent = 'sent',
   Declined = 'declined',
   Error = 'error',
-  Success = 'success',
+  Success = 'success'
 }
 
 type RequestType =

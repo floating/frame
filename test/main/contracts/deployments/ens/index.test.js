@@ -20,7 +20,7 @@ describe('registrar', () => {
   const registrarInterface = new Interface([
     'function transferFrom(address from, address to, uint256 tokenId)',
     'function safeTransferFrom(address from, address to, uint256 tokenId)',
-    'function approve(address to, uint256 tokenId)',
+    'function approve(address to, uint256 tokenId)'
   ])
 
   describe('transfers', () => {
@@ -33,14 +33,14 @@ describe('registrar', () => {
 
         expect(action).toStrictEqual({
           id: 'ens:transfer',
-          data: { name: '', from, to, tokenId },
+          data: { name: '', from, to, tokenId }
         })
       })
 
       it(`resolves the ENS name for a ${fn} call from the user's asset collection`, () => {
         const asset = {
           name: 'frame.eth',
-          tokenId,
+          tokenId
         }
 
         store.set('main.inventory', from, 'ens.items', { someId: asset })
@@ -50,7 +50,7 @@ describe('registrar', () => {
 
         expect(action).toStrictEqual({
           id: 'ens:transfer',
-          data: { name: 'frame.eth', from, to, tokenId },
+          data: { name: 'frame.eth', from, to, tokenId }
         })
       })
     })
@@ -63,14 +63,14 @@ describe('registrar', () => {
 
       expect(action).toStrictEqual({
         id: 'ens:approve',
-        data: { name: '', operator: to, tokenId },
+        data: { name: '', operator: to, tokenId }
       })
     })
 
     it(`resolves the ENS name for an approve call from the user's asset collection`, () => {
       const asset = {
         name: 'frame.eth',
-        tokenId,
+        tokenId
       }
 
       store.set('main.inventory', from, 'ens.items', { someId: asset })
@@ -80,7 +80,7 @@ describe('registrar', () => {
 
       expect(action).toStrictEqual({
         id: 'ens:approve',
-        data: { name: 'frame.eth', operator: to, tokenId },
+        data: { name: 'frame.eth', operator: to, tokenId }
       })
     })
   })
@@ -93,17 +93,17 @@ describe('registrar controller', () => {
     'function commit(bytes32 commitment)',
     'function register(string name, address owner, uint256 duration, bytes32 secret) payable',
     'function registerWithConfig(string name, address owner, uint256 duration, bytes32 secret, address resolver, address addr) payable',
-    'function renew(string name, uint256 duration) payable',
+    'function renew(string name, uint256 duration) payable'
   ])
 
   it('recognizes a call for a pre-commitment to registering an ENS name', () => {
     const calldata = registrarControllerInterface.encodeFunctionData('commit', [
-      utils.formatBytes32String('asecretphrase'),
+      utils.formatBytes32String('asecretphrase')
     ])
     const action = registrarController.decode(calldata)
 
     expect(action).toStrictEqual({
-      id: 'ens:commit',
+      id: 'ens:commit'
     })
   })
 
@@ -122,7 +122,7 @@ describe('registrar controller', () => {
 
         expect(action).toStrictEqual({
           id: 'ens:register',
-          data: { name: 'frame.eth', address: to, duration },
+          data: { name: 'frame.eth', address: to, duration }
         })
       })
     })
@@ -132,7 +132,7 @@ describe('registrar controller', () => {
         'frame',
         to,
         31536000,
-        utils.formatBytes32String('asecretphrase'),
+        utils.formatBytes32String('asecretphrase')
       ])
       const action = registrarController.decode(calldata)
 
@@ -147,7 +147,7 @@ describe('registrar controller', () => {
 
     expect(action).toStrictEqual({
       id: 'ens:renew',
-      data: { name: 'frame.eth', duration },
+      data: { name: 'frame.eth', duration }
     })
   })
 })

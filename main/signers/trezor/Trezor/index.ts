@@ -29,7 +29,7 @@ export const Status = {
   NEEDS_RECONNECTION: 'Please reconnect this Trezor device',
   NEEDS_PIN: 'Need Pin',
   NEEDS_PASSPHRASE: 'Enter Passphrase',
-  ENTERING_PASSPHRASE: 'waiting for input on device',
+  ENTERING_PASSPHRASE: 'waiting for input on device'
 }
 
 function createErrorMessage(message: string, cause: string = '') {
@@ -105,7 +105,7 @@ export default class Trezor extends Signer {
 
     return {
       ...summary,
-      capabilities: this.device?.features?.capabilities || [],
+      capabilities: this.device?.features?.capabilities || []
     }
   }
 
@@ -130,7 +130,7 @@ export default class Trezor extends Signer {
       ADDRESS_NO_MATCH_DEVICE: Status.NEEDS_RECONNECTION,
       UNRECOVERABLE: Status.NEEDS_RECONNECTION,
       ADDRESS_VERIFICATION_FAILURE: Status.NEEDS_RECONNECTION,
-      ACCOUNT_ACCESS_FAILURE: Status.NEEDS_RECONNECTION,
+      ACCOUNT_ACCESS_FAILURE: Status.NEEDS_RECONNECTION
     }
     const newStatus = errorStatusMap[error.code as keyof typeof errorStatusMap]
     if (newStatus) {
@@ -338,7 +338,7 @@ export default class Trezor extends Signer {
       to: this.normalize(txJson.to || ''),
       value: this.normalize(txJson.value || ''),
       data: this.normalize(txJson.data || ''),
-      chainId: hexToInt(chainId),
+      chainId: hexToInt(chainId)
     }
 
     const optionalFields = ['gasPrice', 'maxFeePerGas', 'maxPriorityFeePerGas']

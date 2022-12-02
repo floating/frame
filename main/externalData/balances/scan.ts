@@ -36,7 +36,7 @@ export interface BalanceLoader {
 function createBalance(rawBalance: string, decimals: number): ExternalBalance {
   return {
     balance: rawBalance,
-    displayBalance: new BigNumber(rawBalance).shiftedBy(-decimals).toString(),
+    displayBalance: new BigNumber(rawBalance).shiftedBy(-decimals).toString()
   }
 }
 
@@ -49,8 +49,8 @@ export default function (eth: EthereumProvider) {
         (bn?: EthersBigNumber) => {
           const hexString = bn ? bn.toHexString() : '0x00'
           return createBalance(hexString, token.decimals)
-        },
-      ],
+        }
+      ]
     }))
   }
 
@@ -59,7 +59,7 @@ export default function (eth: EthereumProvider) {
       const rawBalance: string = await eth.request({
         method: 'eth_getBalance',
         params: [address, 'latest'],
-        chainId: addHexPrefix(chainId.toString(16)),
+        chainId: addHexPrefix(chainId.toString(16))
       })
 
       // TODO: do all coins have 18 decimals?
@@ -76,7 +76,7 @@ export default function (eth: EthereumProvider) {
     const response: BytesLike = await eth.request({
       method: 'eth_call',
       chainId: addHexPrefix(token.chainId.toString(16)),
-      params: [{ to: token.address, value: '0x0', data: functionData }, 'latest'],
+      params: [{ to: token.address, value: '0x0', data: functionData }, 'latest']
     })
 
     const result = erc20Interface.decodeFunctionResult('balanceOf', response)
@@ -91,7 +91,7 @@ export default function (eth: EthereumProvider) {
 
         return {
           ...token,
-          ...createBalance(rawBalance, token.decimals),
+          ...createBalance(rawBalance, token.decimals)
         }
       } catch (e) {
         log.warn(`could not load balance for token with address ${token.address}`, e)
@@ -113,7 +113,7 @@ export default function (eth: EthereumProvider) {
       if (result.success) {
         acc.push({
           ...tokens[i],
-          ...result.returnValues[0],
+          ...result.returnValues[0]
         })
       }
 
@@ -141,6 +141,6 @@ export default function (eth: EthereumProvider) {
       )
 
       return ([] as TokenBalance[]).concat(...tokenBalances)
-    },
+    }
   } as BalanceLoader
 }

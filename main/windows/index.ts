@@ -7,7 +7,7 @@ import {
   Menu,
   globalShortcut,
   IpcMainEvent,
-  WebContents,
+  WebContents
 } from 'electron'
 import path from 'path'
 import log from 'electron-log'
@@ -42,7 +42,7 @@ const showFrame = () => tray.show()
 const separatorMenuItem = {
   label: 'Frame',
   click: () => {},
-  type: 'separator',
+  type: 'separator'
 }
 
 const hideMenuItem = {
@@ -50,7 +50,7 @@ const hideMenuItem = {
   click: hideFrame,
   accelerator: 'Alt+/',
   registerAccelerator: false,
-  toolTip: 'Dismiss Frame',
+  toolTip: 'Dismiss Frame'
 }
 
 const showMenuItem = {
@@ -58,12 +58,12 @@ const showMenuItem = {
   click: showFrame,
   accelerator: 'Alt+/',
   registerAccelerator: false,
-  toolTip: 'Summon Frame',
+  toolTip: 'Summon Frame'
 }
 
 const quitMenuItem = {
   label: 'Quit',
-  click: () => app.quit(),
+  click: () => app.quit()
 }
 
 const hideMenu = Menu.buildFromTemplate([hideMenuItem, separatorMenuItem, quitMenuItem])
@@ -76,7 +76,7 @@ const topRight = (window: BrowserWindow) => {
   const windowSize = window.getSize()
   return {
     x: Math.floor(screenSize.x + screenSize.width - windowSize[0]),
-    y: screenSize.y,
+    y: screenSize.y
   }
 }
 
@@ -110,7 +110,7 @@ const detectMouse = () => {
 
 function initDashWindow() {
   windows.dash = createWindow('dash', {
-    width: trayWidth,
+    width: trayWidth
   })
 
   const dashUrl = enableHMR
@@ -122,7 +122,7 @@ function initDashWindow() {
 function initTrayWindow() {
   windows.tray = createWindow('tray', {
     width: trayWidth,
-    icon: path.join(__dirname, './AppIcon.png'),
+    icon: path.join(__dirname, './AppIcon.png')
   })
 
   const trayUrl = enableHMR
@@ -285,7 +285,7 @@ class Tray {
     windows.tray.setAlwaysOnTop(true)
     windows.tray.setVisibleOnAllWorkspaces(true, {
       visibleOnFullScreen: true,
-      skipTransformProcessType: true,
+      skipTransformProcessType: true
     })
     windows.tray.setResizable(false) // Keeps height consistent
     const area = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
@@ -307,7 +307,7 @@ class Tray {
     }
     windows.tray.setVisibleOnAllWorkspaces(false, {
       visibleOnFullScreen: true,
-      skipTransformProcessType: true,
+      skipTransformProcessType: true
     })
   }
 
@@ -342,7 +342,7 @@ class Dash {
       windows.dash.setAlwaysOnTop(true)
       windows.dash.setVisibleOnAllWorkspaces(true, {
         visibleOnFullScreen: true,
-        skipTransformProcessType: true,
+        skipTransformProcessType: true
       })
       windows.dash.setResizable(false) // Keeps height consistent
       const area = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
@@ -356,7 +356,7 @@ class Dash {
       windows.dash.focus()
       windows.dash.setVisibleOnAllWorkspaces(false, {
         visibleOnFullScreen: true,
-        skipTransformProcessType: true,
+        skipTransformProcessType: true
       })
       if (isDev) {
         windows.dash.webContents.openDevTools()
@@ -472,5 +472,5 @@ export default {
   },
   send,
   broadcast,
-  init,
+  init
 }

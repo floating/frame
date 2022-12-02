@@ -10,7 +10,7 @@ import {
   Cluster,
   ClusterRow,
   ClusterColumn,
-  ClusterValue,
+  ClusterValue
 } from '../../../../../../resources/Components/Cluster'
 
 const isWatchOnly = (account = {}) => {
@@ -25,14 +25,14 @@ class Signer extends React.Component {
       this.resizeObserver = new ResizeObserver(() => {
         if (this.moduleRef && this.moduleRef.current) {
           link.send('tray:action', 'updateAccountModule', this.props.moduleId, {
-            height: this.moduleRef.current.clientHeight,
+            height: this.moduleRef.current.clientHeight
           })
         }
       })
     }
     this.state = {
       notifySuccess: false,
-      notifyText: '',
+      notifyText: ''
     }
   }
 
@@ -144,7 +144,7 @@ class Signer extends React.Component {
                   if (!signer) {
                     this.setState({
                       notifySuccess: false,
-                      notifyText: 'Signer Unavailable',
+                      notifyText: 'Signer Unavailable'
                     })
                     setTimeout(() => {
                       this.setState({ notifySuccess: false, notifyText: '' })
@@ -156,7 +156,7 @@ class Signer extends React.Component {
               >
                 <div
                   style={{
-                    padding: '20px',
+                    padding: '20px'
                   }}
                 >
                   {this.renderSignerType(activeAccount.lastSignerType)}
@@ -182,7 +182,7 @@ class Signer extends React.Component {
                 <div
                   className='clusterTag'
                   style={{
-                    color: this.state.notifySuccess ? 'var(--good)' : 'var(--bad)',
+                    color: this.state.notifySuccess ? 'var(--good)' : 'var(--bad)'
                   }}
                 >
                   {this.state.notifyText}

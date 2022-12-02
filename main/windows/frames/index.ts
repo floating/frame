@@ -196,11 +196,11 @@ export default class FrameManager {
     if (frameInstance) {
       frameInstance.setVisibleOnAllWorkspaces(true, {
         visibleOnFullScreen: true,
-        skipTransformProcessType: true,
+        skipTransformProcessType: true
       })
       frameInstance.setVisibleOnAllWorkspaces(false, {
         visibleOnFullScreen: true,
-        skipTransformProcessType: true,
+        skipTransformProcessType: true
       })
       frameInstance.show()
       frameInstance.focus()

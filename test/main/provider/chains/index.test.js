@@ -1,7 +1,7 @@
 import {
   createChainsObserver,
   createOriginChainObserver,
-  getActiveChains,
+  getActiveChains
 } from '../../../../main/provider/chains'
 import store from '../../../../main/store'
 
@@ -11,7 +11,7 @@ const ether = {
   name: 'Ether',
   symbol: 'ETH',
   icon: 'https://assets.coingecko.com/coins/images/ethereum.png',
-  decimals: 18,
+  decimals: 18
 }
 
 const chains = {
@@ -20,7 +20,7 @@ const chains = {
     id: 1,
     explorer: 'https://etherscan.io',
     connection: { primary: { connected: true }, secondary: { connected: false } },
-    on: true,
+    on: true
   },
   4: {
     name: 'Ethereum Testnet Rinkeby',
@@ -28,9 +28,9 @@ const chains = {
     explorer: 'https://rinkeby.etherscan.io',
     connection: {
       primary: { status: 'connected', connected: true, on: true },
-      secondary: { status: 'standby', connected: false, on: true },
+      secondary: { status: 'standby', connected: false, on: true }
     },
-    on: true,
+    on: true
   },
   5: {
     name: 'Ethereum Testnet Görli',
@@ -38,38 +38,38 @@ const chains = {
     explorer: 'https://goerli.etherscan.io',
     connection: {
       primary: { status: 'disconnected', connected: false, on: true },
-      secondary: { status: 'disconnected', connected: false, on: true },
+      secondary: { status: 'disconnected', connected: false, on: true }
     },
-    on: true,
+    on: true
   },
   137: {
     name: 'Polygon',
     id: 137,
     connection: { primary: { connected: true }, secondary: { connected: false } },
-    on: false,
-  },
+    on: false
+  }
 }
 
 const chainMeta = {
   1: {
     nativeCurrency: ether,
-    primaryColor: 'accent1',
+    primaryColor: 'accent1'
   },
   4: {
     nativeCurrency: {
       ...ether,
-      name: 'Rinkeby Ether',
+      name: 'Rinkeby Ether'
     },
-    primaryColor: 'accent2',
+    primaryColor: 'accent2'
   },
   5: {
     nativeCurrency: {
       ...ether,
-      name: 'Görli Ether',
+      name: 'Görli Ether'
     },
-    primaryColor: 'accent2',
+    primaryColor: 'accent2'
   },
-  137: { nativeCurrency: {}, primaryColor: 'accent6' },
+  137: { nativeCurrency: {}, primaryColor: 'accent6' }
 }
 
 beforeEach(() => {
@@ -92,18 +92,18 @@ describe('#getActiveChains', () => {
       nativeCurrency: {
         name: 'Ether',
         symbol: 'ETH',
-        decimals: 18,
+        decimals: 18
       },
       explorers: [
         {
-          url: 'https://etherscan.io',
-        },
+          url: 'https://etherscan.io'
+        }
       ],
       external: {
         wallet: {
-          colors: [{ r: 0, g: 210, b: 190, hex: '#00d2be' }],
-        },
-      },
+          colors: [{ r: 0, g: 210, b: 190, hex: '#00d2be' }]
+        }
+      }
     })
   })
 })
@@ -124,7 +124,7 @@ describe('#createChainsObserver', () => {
       id: 10,
       explorer: 'https://optimistic.etherscan.io',
       connection: { primary: { connected: true }, secondary: { connected: false } },
-      on: true,
+      on: true
     }
 
     setChains(
@@ -143,18 +143,18 @@ describe('#createChainsObserver', () => {
         nativeCurrency: {
           name: 'Ether',
           symbol: 'ETH',
-          decimals: 18,
+          decimals: 18
         },
         explorers: [
           {
-            url: 'https://etherscan.io',
-          },
+            url: 'https://etherscan.io'
+          }
         ],
         external: {
           wallet: {
-            colors: [{ r: 0, g: 210, b: 190, hex: '#00d2be' }],
-          },
-        },
+            colors: [{ r: 0, g: 210, b: 190, hex: '#00d2be' }]
+          }
+        }
       },
       {
         chainId: 4,
@@ -164,18 +164,18 @@ describe('#createChainsObserver', () => {
         nativeCurrency: {
           name: 'Rinkeby Ether',
           symbol: 'ETH',
-          decimals: 18,
+          decimals: 18
         },
         explorers: [
           {
-            url: 'https://rinkeby.etherscan.io',
-          },
+            url: 'https://rinkeby.etherscan.io'
+          }
         ],
         external: {
           wallet: {
-            colors: [{ r: 255, g: 153, b: 51, hex: '#ff9933' }],
-          },
-        },
+            colors: [{ r: 255, g: 153, b: 51, hex: '#ff9933' }]
+          }
+        }
       },
       {
         chainId: 10,
@@ -185,19 +185,19 @@ describe('#createChainsObserver', () => {
         nativeCurrency: {
           name: 'Ether',
           symbol: 'ETH',
-          decimals: 18,
+          decimals: 18
         },
         explorers: [
           {
-            url: 'https://optimistic.etherscan.io',
-          },
+            url: 'https://optimistic.etherscan.io'
+          }
         ],
         external: {
           wallet: {
-            colors: [{ r: 246, g: 36, b: 35, hex: '#f62423' }],
-          },
-        },
-      },
+            colors: [{ r: 246, g: 36, b: 35, hex: '#f62423' }]
+          }
+        }
+      }
     ])
   })
 
@@ -207,7 +207,7 @@ describe('#createChainsObserver', () => {
       id: 10,
       explorer: 'https://optimistic.etherscan.io',
       connection: { primary: { connected: true }, secondary: { connected: false } },
-      on: true,
+      on: true
     }
 
     setChains({ ...chains, 10: optimism }, { ...chainMeta, 10: { nativeCurrency: ether } })
@@ -230,7 +230,7 @@ describe('#createChainsObserver', () => {
 
   it('invokes the handler when a chain is activated', () => {
     const {
-      137: { ...polygon },
+      137: { ...polygon }
     } = chains
     polygon.on = true
 
@@ -244,7 +244,7 @@ describe('#createChainsObserver', () => {
 
   it('invokes the handler when a chain is deactivated', () => {
     const {
-      4: { ...rinkeby },
+      4: { ...rinkeby }
     } = chains
     rinkeby.on = false
 
@@ -258,7 +258,7 @@ describe('#createChainsObserver', () => {
 
   it('invokes the handler when a chain name changes', () => {
     const {
-      4: { ...rinkeby },
+      4: { ...rinkeby }
     } = chains
     rinkeby.name = 'Rink-a-Bee'
 
@@ -272,7 +272,7 @@ describe('#createChainsObserver', () => {
 
   it('invokes the handler when a connected chain is disconnected', () => {
     const {
-      4: { ...rinkeby },
+      4: { ...rinkeby }
     } = chains
     rinkeby.connection.primary.connected = false
 
@@ -286,7 +286,7 @@ describe('#createChainsObserver', () => {
 
   it('invokes the handler when a disconnected chain is connected', () => {
     const {
-      5: { ...goerli },
+      5: { ...goerli }
     } = chains
     goerli.connection.primary.connected = true
 
@@ -312,7 +312,7 @@ describe('#createOriginChainObserver', () => {
   const originId = '8073729a-5e59-53b7-9e69-5d9bcff94087'
   const frameTestOrigin = {
     name: 'test.frame',
-    chain: { id: 137, type: 'ethereum', connection: { primary: {}, secondary: {} } },
+    chain: { id: 137, type: 'ethereum', connection: { primary: {}, secondary: {} } }
   }
 
   beforeEach(() => {

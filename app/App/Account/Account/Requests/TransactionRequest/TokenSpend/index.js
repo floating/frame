@@ -8,7 +8,7 @@ import {
   ClusterBox,
   Cluster,
   ClusterRow,
-  ClusterValue,
+  ClusterValue
 } from '../../../../../../../resources/Components/Cluster'
 
 import { MAX_HEX } from '../../../../../../../resources/constants'
@@ -21,7 +21,7 @@ class TokenSpend extends React.Component {
       inPreview: false,
       inEditApproval: false,
       mode: 'requested',
-      customInput: '',
+      customInput: ''
     }
   }
 

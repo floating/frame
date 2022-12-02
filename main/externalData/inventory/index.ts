@@ -34,6 +34,6 @@ export default function inventory(pylon: Pylon, store: Store) {
   return {
     start,
     stop,
-    setAddresses,
+    setAddresses
   }
 }

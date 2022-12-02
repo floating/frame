@@ -7,5 +7,5 @@ module.exports = {
     launch
       .isEnabled()
       .then((enabled) => cb(null, enabled))
-      .catch(cb),
+      .catch(cb)
 }

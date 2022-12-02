@@ -2,7 +2,7 @@ import { JsonTx } from '@ethereumjs/tx'
 
 export enum GasFeesSource {
   Dapp = 'Dapp',
-  Frame = 'Frame',
+  Frame = 'Frame'
 }
 
 export interface TransactionData extends Omit<JsonTx, 'chainId' | 'type'> {

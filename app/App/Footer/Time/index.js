@@ -16,7 +16,7 @@ class Time extends React.Component {
   constructor(...args) {
     super(...args)
     this.state = {
-      time: Date.now(),
+      time: Date.now()
     }
     setInterval(() => {
       this.setState({ time: Date.now() })

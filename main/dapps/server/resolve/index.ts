@@ -11,7 +11,7 @@ const resolve = {
     if (cid) return cid
     const resolved = await nebula.resolve(app)
     return resolved.record.content
-  },
+  }
 }
 
 export default resolve

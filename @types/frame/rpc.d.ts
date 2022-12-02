@@ -11,7 +11,7 @@ enum SubscriptionType {
   ASSETS = 'assetsChanged',
   CHAIN = 'chainChanged',
   CHAINS = 'chainsChanged',
-  NETWORK = 'networkChanged',
+  NETWORK = 'networkChanged'
 }
 
 interface RPCId {

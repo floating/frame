@@ -22,7 +22,7 @@ class AccountSelector extends React.Component {
   constructor(props, context) {
     super(props, context)
     this.state = {
-      accountFilter: context.store('panel.accountFilter') || '',
+      accountFilter: context.store('panel.accountFilter') || ''
     }
   }
 

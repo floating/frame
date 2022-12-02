@@ -97,7 +97,7 @@ const rpc = {
       paired: true,
       deviceName: (deviceName || 'GridPlus').substring(0, 14),
       tag: randomLetters(6),
-      privKey: randomBytes(32).toString('hex'),
+      privKey: randomBytes(32).toString('hex')
     })
 
     cb(null, { id: 'lattice-' + deviceId })
@@ -122,14 +122,14 @@ const rpc = {
         status: provider.connection.primary.status,
         network: provider.connection.primary.network,
         type: provider.connection.primary.type,
-        connected: provider.connection.primary.connected,
+        connected: provider.connection.primary.connected
       },
       secondary: {
         status: provider.connection.secondary.status,
         network: provider.connection.secondary.network,
         type: provider.connection.secondary.type,
-        connected: provider.connection.secondary.connected,
-      },
+        connected: provider.connection.secondary.connected
+      }
     })
   },
   confirmRequestApproval(req, approvalType, approvalData, cb) {
@@ -285,7 +285,7 @@ const rpc = {
     } else {
       console.log('input needs to be ens name')
     }
-  },
+  }
 }
 
 const unwrap = (v) => (v !== undefined || v !== null ? JSON.parse(v) : v)

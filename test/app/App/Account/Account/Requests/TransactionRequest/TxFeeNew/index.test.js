@@ -25,8 +25,8 @@ beforeEach(() => {
       gasPrice: addHexPrefix((10e9).toString(16)),
       maxPriorityFeePerGas: addHexPrefix((3e9).toString(16)),
       maxFeePerGas: addHexPrefix((7e9).toString(16)),
-      gasFeesSource: GasFeesSource.Frame,
-    },
+      gasFeesSource: GasFeesSource.Frame
+    }
   }
 })
 

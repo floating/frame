@@ -21,7 +21,7 @@ it(
   async () => {
     const [chains, currentChainId] = await Promise.all([
       frame.request({ method: 'wallet_getEthereumChains' }),
-      frame.request({ method: 'eth_chainId' }),
+      frame.request({ method: 'eth_chainId' })
     ])
 
     const targetChain = chains.find((c) => c.chainId !== parseInt(currentChainId))
@@ -43,7 +43,7 @@ it(
 
       frame.request({
         method: 'wallet_switchEthereumChain',
-        params: [{ chainId: targetChain.chainId }],
+        params: [{ chainId: targetChain.chainId }]
       })
     })
   },

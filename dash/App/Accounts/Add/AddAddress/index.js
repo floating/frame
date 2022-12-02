@@ -13,7 +13,7 @@ class AddAddress extends React.Component {
       address: '',
       password: '',
       status: '',
-      error: false,
+      error: false
     }
     this.forms = [React.createRef(), React.createRef()]
   }

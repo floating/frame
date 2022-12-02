@@ -12,7 +12,7 @@ import {
   functionSignatureMatcher,
   multicallAddresses,
   MulticallConfig,
-  MulticallVersion,
+  MulticallVersion
 } from './constants'
 
 export { Call }
@@ -25,7 +25,7 @@ function chainConfig(chainId: number, eth: EthereumProvider): MulticallConfig {
     address: multicallAddresses[chainId].address,
     version: multicallAddresses[chainId].version,
     chainId,
-    provider: eth,
+    provider: eth
   }
 }
 
@@ -35,7 +35,7 @@ async function makeCall(functionName: string, params: any[], config: MulticallCo
   const response: BytesLike = await config.provider.request({
     method: 'eth_call',
     params: [{ to: config.address, data }, 'latest'],
-    chainId: addHexPrefix(config.chainId.toString(16)),
+    chainId: addHexPrefix(config.chainId.toString(16))
   })
 
   return multicallInterface.decodeFunctionResult(functionName, response)
@@ -153,6 +153,6 @@ export default function (chainId: number, eth: EthereumProvider) {
       const callResults = ([] as CallResult<T>[]).concat(...fetchResults)
 
       return callResults
-    },
+    }
   }
 }

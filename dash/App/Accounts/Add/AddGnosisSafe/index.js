@@ -16,7 +16,7 @@ class AddAragon extends React.Component {
       index: 0,
       status: '',
       error: false,
-      name: '',
+      name: ''
     }
     this.forms = [React.createRef(), React.createRef()]
   }
@@ -95,11 +95,11 @@ class AddAragon extends React.Component {
             // Reference to Frame account that will act on behalf of the agent
             id: this.state.actorId,
             index: actorIndex,
-            address: actorAddress, // External Signer
+            address: actorAddress // External Signer
           },
           dao: dao.apps.kernel.proxyAddress, // DAO Address
-          agent: dao.apps.agent.proxyAddress, // Agent Address
-        },
+          agent: dao.apps.agent.proxyAddress // Agent Address
+        }
       }
       link.rpc('addAragon', aragonAccount, (err) => {
         if (err) {

@@ -34,7 +34,7 @@ class Signer extends React.Component {
       addressLimit: 5,
       latticePairCode: '',
       tPin: '',
-      tPhrase: '',
+      tPhrase: ''
     }
   }
 
@@ -246,7 +246,7 @@ class Signer extends React.Component {
   expand(id) {
     const crumb = {
       view: 'expandedSigner',
-      data: { signer: id },
+      data: { signer: id }
     }
     link.send('tray:action', 'navDash', crumb)
   }

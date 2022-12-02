@@ -27,7 +27,7 @@ jest.mock('../../../main/provider/helpers', () => {
   // written relying on the real implementation so they need to be migrated individually
   return {
     ...helpers,
-    hasPermission: jest.fn(),
+    hasPermission: jest.fn()
   }
 })
 
@@ -62,8 +62,8 @@ beforeEach(() => {
   connection.connections = {
     ethereum: {
       1: { chainConfig: chainConfig(1, 'london'), primary: { connected: true } },
-      4: { chainConfig: chainConfig(4, 'london'), primary: { connected: true } },
-    },
+      4: { chainConfig: chainConfig(4, 'london'), primary: { connected: true } }
+    }
   }
 
   accounts.current = jest.fn(() => ({ id: address, getAccounts: () => [address] }))
@@ -83,7 +83,7 @@ describe('#send', () => {
   it('passes the given target chain to the connection', () => {
     connection.connections.ethereum[10] = {
       chainConfig: { hardfork: 'london', chainId: 10 },
-      primary: { connected: true },
+      primary: { connected: true }
     }
 
     const request = { method: 'eth_testFrame' }
@@ -143,7 +143,7 @@ describe('#send', () => {
     it('returns an error for a disconnected chain', () => {
       connection.connections.ethereum[11] = {
         chainConfig: chainConfig(11, 'london'),
-        primary: { connected: false },
+        primary: { connected: false }
       }
 
       send({ method: 'eth_chainId', chainId: '0xb' }, (response) => {
@@ -210,8 +210,8 @@ describe('#send', () => {
               symbol: 'NEW',
               primaryRpc: 'https://pylon.link',
               secondaryRpc: undefined,
-              explorer: 'https://explorer.pylon.link',
-            },
+              explorer: 'https://explorer.pylon.link'
+            }
           })
         )
 
@@ -225,10 +225,10 @@ describe('#send', () => {
           nativeCurrency: {
             name: 'New',
             symbol: 'NEW', // 2-6 characters long
-            decimals: 18,
+            decimals: 18
           },
           rpcUrls: ['https://pylon.link'],
-          blockExplorerUrls: ['https://explorer.pylon.link'],
+          blockExplorerUrls: ['https://explorer.pylon.link']
         },
         cb
       )
@@ -237,7 +237,7 @@ describe('#send', () => {
     it('should switch the chain for the requesting origin if the chain already exists', (done) => {
       store.set('main.networks.ethereum', 1, { id: 1 })
       store.set('main.origins', '8073729a-5e59-53b7-9e69-5d9bcff94087', {
-        chain: { id: 137, type: 'ethereum' },
+        chain: { id: 137, type: 'ethereum' }
       })
       store.switchOriginChain = jest.fn()
 
@@ -259,8 +259,8 @@ describe('#send', () => {
           chainId: '0x1', // A 0x-prefixed hexadecimal string
           chainName: 'Mainnet',
           nativeCurrency: {
-            symbol: 'ETH',
-          },
+            symbol: 'ETH'
+          }
         },
         cb
       )
@@ -271,7 +271,7 @@ describe('#send', () => {
     it('should switch to a chain and notify listeners if it exists in the store', (done) => {
       store.set('main.networks.ethereum', 1, { id: 1 })
       store.set('main.origins', {
-        '8073729a-5e59-53b7-9e69-5d9bcff94087': { chain: { id: 42161, type: 'ethereum' } },
+        '8073729a-5e59-53b7-9e69-5d9bcff94087': { chain: { id: 42161, type: 'ethereum' } }
       })
       store.switchOriginChain = jest.fn()
 
@@ -280,10 +280,10 @@ describe('#send', () => {
           method: 'wallet_switchEthereumChain',
           params: [
             {
-              chainId: '0x1',
-            },
+              chainId: '0x1'
+            }
           ],
-          _origin: '8073729a-5e59-53b7-9e69-5d9bcff94087',
+          _origin: '8073729a-5e59-53b7-9e69-5d9bcff94087'
         },
         () => {
           expect(store.switchOriginChain).toHaveBeenCalledWith(
@@ -302,10 +302,10 @@ describe('#send', () => {
           method: 'wallet_switchEthereumChain',
           params: [
             {
-              chainId: '0x1234',
-            },
+              chainId: '0x1234'
+            }
           ],
-          _origin: '8073729a-5e59-53b7-9e69-5d9bcff94087',
+          _origin: '8073729a-5e59-53b7-9e69-5d9bcff94087'
         },
         (response) => {
           try {
@@ -324,7 +324,7 @@ describe('#send', () => {
     it('returns all allowed permissions', (done) => {
       const request = {
         method: 'wallet_getPermissions',
-        _origin: '8073729a-5e59-53b7-9e69-5d9bcff94087',
+        _origin: '8073729a-5e59-53b7-9e69-5d9bcff94087'
       }
 
       send(request, (response) => {
@@ -350,7 +350,7 @@ describe('#send', () => {
               'wallet_addEthereumChain',
               'wallet_getEthereumChains',
               'wallet_getAssets',
-              'wallet_watchAsset',
+              'wallet_watchAsset'
             ])
           )
 
@@ -367,7 +367,7 @@ describe('#send', () => {
       const request = {
         method: 'wallet_requestPermissions',
         params: [{ eth_accounts: {} }, { eth_signTransaction: {} }],
-        _origin: '8073729a-5e59-53b7-9e69-5d9bcff94087',
+        _origin: '8073729a-5e59-53b7-9e69-5d9bcff94087'
       }
 
       send(request, (response) => {
@@ -404,10 +404,10 @@ describe('#send', () => {
             symbol: 'BADGER',
             name: 'BadgerDAO Token',
             decimals: 18,
-            image: 'https://badgerdao.io/icon.jpg',
-          },
+            image: 'https://badgerdao.io/icon.jpg'
+          }
         },
-        _origin: '8073729a-5e59-53b7-9e69-5d9bcff94087',
+        _origin: '8073729a-5e59-53b7-9e69-5d9bcff94087'
       }
     })
 
@@ -425,9 +425,9 @@ describe('#send', () => {
               symbol: 'BADGER',
               name: 'BadgerDAO Token',
               decimals: 18,
-              logoURI: 'https://badgerdao.io/icon.jpg',
+              logoURI: 'https://badgerdao.io/icon.jpg'
             },
-            payload: request,
+            payload: request
           })
         )
       })
@@ -482,8 +482,8 @@ describe('#send', () => {
             name: 'Ether',
             symbol: 'ETH',
             decimals: 18,
-            icon: 'ethereum',
-          },
+            icon: 'ethereum'
+          }
         },
         137: {
           primaryColor: 'accent7',
@@ -491,9 +491,9 @@ describe('#send', () => {
             name: 'Matic',
             symbol: 'MATIC',
             decimals: 18,
-            icon: 'matic',
-          },
-        },
+            icon: 'matic'
+          }
+        }
       })
     })
 
@@ -504,15 +504,15 @@ describe('#send', () => {
           id: 137,
           explorer: 'https://polygonscan.com',
           connection: { primary: { connected: true }, secondary: { connected: false } },
-          on: true,
+          on: true
         },
         1: {
           name: 'mainnet',
           id: 1,
           explorer: 'https://etherscan.io',
           connection: { primary: { connected: true }, secondary: { connected: false } },
-          on: true,
-        },
+          on: true
+        }
       })
 
       send({ method: 'wallet_getEthereumChains', id: 14, jsonrpc: '2.0' }, (response) => {
@@ -528,14 +528,14 @@ describe('#send', () => {
             explorers: [{ url: 'https://etherscan.io' }],
             external: {
               wallet: {
-                colors: [{ r: 255, g: 0, b: 174, hex: '#ff00ae' }],
-              },
+                colors: [{ r: 255, g: 0, b: 174, hex: '#ff00ae' }]
+              }
             },
             nativeCurrency: {
               name: 'Ether',
               symbol: 'ETH',
-              decimals: 18,
-            },
+              decimals: 18
+            }
           },
           {
             name: 'polygon',
@@ -545,15 +545,15 @@ describe('#send', () => {
             explorers: [{ url: 'https://polygonscan.com' }],
             external: {
               wallet: {
-                colors: [{ r: 62, g: 173, b: 241, hex: '#3eadf1' }],
-              },
+                colors: [{ r: 62, g: 173, b: 241, hex: '#3eadf1' }]
+              }
             },
             nativeCurrency: {
               name: 'Matic',
               symbol: 'MATIC',
-              decimals: 18,
-            },
-          },
+              decimals: 18
+            }
+          }
         ])
       })
     })
@@ -565,15 +565,15 @@ describe('#send', () => {
           id: 137,
           explorer: 'https://polygonscan.com',
           connection: { primary: { connected: false }, secondary: { connected: false } },
-          on: true,
+          on: true
         },
         1: {
           name: 'mainnet',
           id: 1,
           explorer: 'https://etherscan.io',
           connection: { primary: { connected: true }, secondary: { connected: false } },
-          on: true,
-        },
+          on: true
+        }
       })
 
       send({ method: 'wallet_getEthereumChains', id: 14, jsonrpc: '2.0' }, (response) => {
@@ -585,14 +585,14 @@ describe('#send', () => {
             icon: [{ url: 'ethereum' }],
             explorers: [{ url: 'https://etherscan.io' }],
             external: {
-              wallet: { colors: [{ r: 255, b: 174, g: 0, hex: '#ff00ae' }] },
+              wallet: { colors: [{ r: 255, b: 174, g: 0, hex: '#ff00ae' }] }
             },
             nativeCurrency: {
               name: 'Ether',
               symbol: 'ETH',
-              decimals: 18,
-            },
-          },
+              decimals: 18
+            }
+          }
         ])
       })
     })
@@ -607,7 +607,7 @@ describe('#send', () => {
         symbol: 'BADGER',
         balance: '0x1605d9ee98627100000',
         decimals: 18,
-        displayBalance: '6500',
+        displayBalance: '6500'
       },
       {
         address: '0x383518188c0c6d7730d91b2c03a03c837814a899',
@@ -616,7 +616,7 @@ describe('#send', () => {
         symbol: 'OHM',
         balance: '0xd14d13208',
         decimals: 9,
-        displayBalance: '56.183829',
+        displayBalance: '56.183829'
       },
       {
         address: '0x0000000000000000000000000000000000000000',
@@ -625,8 +625,8 @@ describe('#send', () => {
         symbol: 'AETH',
         balance: '0xd8f8753a603f70000',
         decimals: 18,
-        displayBalance: '250.15',
-      },
+        displayBalance: '250.15'
+      }
     ]
 
     beforeEach(() => {
@@ -691,7 +691,7 @@ describe('#send', () => {
     const request = {
       method: 'eth_getTransactionByHash',
       params: [txHash],
-      chainId: '0x' + chain.toString(16),
+      chainId: '0x' + chain.toString(16)
     }
 
     let blockResult
@@ -708,7 +708,7 @@ describe('#send', () => {
     it('returns the response from the connection', (done) => {
       blockResult = {
         blockHash: '0xc1b0227f0721a05357b2b417e3872c5f6f01da209422013fe66ee291527fb123',
-        blockNumber: '0xc80d08',
+        blockNumber: '0xc80d08'
       }
 
       send(request, (response) => {
@@ -724,7 +724,7 @@ describe('#send', () => {
       const fee = `0x${(10e9).toString(16)}`
 
       blockResult = {
-        maxFeePerGas: fee,
+        maxFeePerGas: fee
       }
 
       send(request, (response) => {
@@ -740,7 +740,7 @@ describe('#send', () => {
 
       blockResult = {
         gasPrice,
-        maxFeePerGas,
+        maxFeePerGas
       }
 
       send(request, (response) => {
@@ -768,7 +768,7 @@ describe('#send', () => {
         jsonrpc: '2.0',
         id: 7,
         method: 'eth_sendTransaction',
-        params: [tx],
+        params: [tx]
       }
 
       if (chainId) payload.chainId = chainId
@@ -783,7 +783,7 @@ describe('#send', () => {
         chainId: '0x1',
         gasLimit: weiToHex(21000),
         type: '0x1',
-        nonce: '0xa',
+        nonce: '0xa'
       }
 
       const chainIds = [1, 137]
@@ -795,13 +795,13 @@ describe('#send', () => {
             levels: { slow: '', standard: '', fast: gweiToHex(30), asap: '', custom: '' },
             fees: {
               maxPriorityFeePerGas: gweiToHex(1),
-              maxBaseFeePerGas: gweiToHex(8),
-            },
-          },
+              maxBaseFeePerGas: gweiToHex(8)
+            }
+          }
         })
 
         connection.connections.ethereum[chainId] = {
-          chainConfig: chainConfig(chainId, chainId === 1 ? 'london' : 'istanbul'),
+          chainConfig: chainConfig(chainId, chainId === 1 ? 'london' : 'istanbul')
         }
       })
     })
@@ -876,13 +876,13 @@ describe('#send', () => {
               levels: { slow: '', standard: '', fast: gweiToHex(30), asap: '', custom: '' },
               fees: {
                 maxPriorityFeePerGas: gweiToHex(1),
-                maxBaseFeePerGas: gweiToHex(8),
-              },
-            },
+                maxBaseFeePerGas: gweiToHex(8)
+              }
+            }
           })
 
           connection.connections.ethereum[chainId] = {
-            chainConfig: chainConfig(chainId, chainId === 1 ? 'london' : 'istanbul'),
+            chainConfig: chainConfig(chainId, chainId === 1 ? 'london' : 'istanbul')
           }
         })
       })
@@ -934,9 +934,9 @@ describe('#send', () => {
                 levels: { slow: '', standard: '', fast: gweiToHex(40), asap: '', custom: '' },
                 fees: {
                   maxPriorityFeePerGas: gweiToHex(1),
-                  maxBaseFeePerGas: gweiToHex(8),
-                },
-              },
+                  maxBaseFeePerGas: gweiToHex(8)
+                }
+              }
             })
 
             sendTransaction(() => {
@@ -1006,9 +1006,9 @@ describe('#send', () => {
                 levels: { slow: '', standard: '', fast: gweiToHex(40), asap: '', custom: '' },
                 fees: {
                   maxPriorityFeePerGas: gweiToHex(1),
-                  maxBaseFeePerGas: gweiToHex(20),
-                },
-              },
+                  maxBaseFeePerGas: gweiToHex(20)
+                }
+              }
             })
 
             sendTransaction(() => {
@@ -1046,9 +1046,9 @@ describe('#send', () => {
                 levels: { slow: '', standard: '', fast: gweiToHex(40), asap: '', custom: '' },
                 fees: {
                   maxPriorityFeePerGas: gweiToHex(2),
-                  maxBaseFeePerGas: gweiToHex(14),
-                },
-              },
+                  maxBaseFeePerGas: gweiToHex(14)
+                }
+              }
             })
 
             sendTransaction(() => {
@@ -1142,47 +1142,47 @@ describe('#send', () => {
           { name: 'name', type: 'string' },
           { name: 'version', type: 'string' },
           { name: 'chainId', type: 'uint256' },
-          { name: 'verifyingContract', type: 'address' },
+          { name: 'verifyingContract', type: 'address' }
         ],
         Person: [
           { name: 'name', type: 'string' },
-          { name: 'wallet', type: 'address' },
+          { name: 'wallet', type: 'address' }
         ],
         Mail: [
           { name: 'from', type: 'Person' },
           { name: 'to', type: 'Person' },
-          { name: 'contents', type: 'string' },
-        ],
+          { name: 'contents', type: 'string' }
+        ]
       },
       domain: 'domainData',
       primaryType: 'Mail',
       message: {
         from: {
           name: 'Cow',
-          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826'
         },
         to: {
           name: 'Bob',
-          wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+          wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB'
         },
-        contents: 'Hello!',
-      },
+        contents: 'Hello!'
+      }
     }
     const typedDataLegacy = [
       {
         type: 'string',
         name: 'fullName',
-        value: 'Satoshi Nakamoto',
+        value: 'Satoshi Nakamoto'
       },
       {
         type: 'uint32',
         name: 'userId',
-        value: '1212',
-      },
+        value: '1212'
+      }
     ]
     const typedDataInvalid = {
       ...typedData,
-      primaryType: 'b0rk',
+      primaryType: 'b0rk'
     }
 
     const validRequests = [
@@ -1190,67 +1190,67 @@ describe('#send', () => {
         method: 'eth_signTypedData',
         params: [address, typedDataLegacy],
         version: SignTypedDataVersion.V1,
-        dataDescription: 'legacy',
+        dataDescription: 'legacy'
       },
       {
         method: 'eth_signTypedData',
         params: [address, typedData],
         version: SignTypedDataVersion.V4,
-        dataDescription: 'eip-712',
+        dataDescription: 'eip-712'
       },
       {
         method: 'eth_signTypedData_v1',
         params: [address, typedDataLegacy],
         version: SignTypedDataVersion.V1,
-        dataDescription: 'legacy',
+        dataDescription: 'legacy'
       },
       {
         method: 'eth_signTypedData_v3',
         params: [address, typedData],
         version: SignTypedDataVersion.V3,
-        dataDescription: 'eip-712',
+        dataDescription: 'eip-712'
       },
       {
         method: 'eth_signTypedData_v4',
         params: [address, typedData],
         version: SignTypedDataVersion.V4,
-        dataDescription: 'eip-712',
+        dataDescription: 'eip-712'
       },
       {
         method: 'eth_signTypedData',
         params: [typedDataLegacy, address],
         version: SignTypedDataVersion.V1,
         dataFirst: true,
-        dataDescription: 'legacy',
+        dataDescription: 'legacy'
       },
       {
         method: 'eth_signTypedData',
         params: [typedData, address],
         version: SignTypedDataVersion.V4,
         dataFirst: true,
-        dataDescription: 'eip-712',
+        dataDescription: 'eip-712'
       },
       {
         method: 'eth_signTypedData_v1',
         params: [typedDataLegacy, address],
         version: SignTypedDataVersion.V1,
         dataFirst: true,
-        dataDescription: 'legacy',
+        dataDescription: 'legacy'
       },
       {
         method: 'eth_signTypedData_v3',
         params: [typedData, address],
         version: SignTypedDataVersion.V3,
         dataFirst: true,
-        dataDescription: 'eip-712',
+        dataDescription: 'eip-712'
       },
       {
         method: 'eth_signTypedData_v4',
         params: [typedData, address],
         version: SignTypedDataVersion.V4,
         dataFirst: true,
-        dataDescription: 'eip-712',
-      },
+        dataDescription: 'eip-712'
+      }
     ]
 
     function verifyRequest(version, expectedPayload) {
@@ -1440,7 +1440,7 @@ describe('#signAndSend', () => {
     request = {
       handlerId: 99,
       payload: { jsonrpc: '2.0', id: 2, method: 'eth_sendTransaction' },
-      data: tx,
+      data: tx
     }
   })
 
@@ -1503,15 +1503,15 @@ describe('#signAndSend', () => {
           levels: { slow: '', standard: '', fast: gweiToHex(30), asap: '', custom: '' },
           fees: {
             maxPriorityFeePerGas: gweiToHex(1),
-            maxBaseFeePerGas: gweiToHex(8),
-          },
-        },
+            maxBaseFeePerGas: gweiToHex(8)
+          }
+        }
       })
     })
 
     it('should not include an undefined "to" field', (done) => {
       const txJson = {
-        chainId: '0x1',
+        chainId: '0x1'
       }
 
       provider.fillTransaction(txJson, (err, { tx }) => {
@@ -1545,7 +1545,7 @@ describe('#signAndSend', () => {
             expect.objectContaining({
               id: request.payload.id,
               method: 'eth_sendRawTransaction',
-              params: [signedTx],
+              params: [signedTx]
             })
           )
 
@@ -1610,7 +1610,7 @@ describe('#signAndSend', () => {
 describe('#assetsChanged', () => {
   const subscription = {
     id: '0x9509a964a8d24a17fcfc7b77fc575b71',
-    originId: '8073729a-5e59-53b7-9e69-5d9bcff94087',
+    originId: '8073729a-5e59-53b7-9e69-5d9bcff94087'
   }
 
   beforeEach(() => {
@@ -1654,7 +1654,7 @@ describe('state change events', () => {
   // are all working correctly with each other
   const subscription = {
     id: '0x9509a964a8d24a17fcfc7b77fc575b71',
-    originId: '8073729a-5e59-53b7-9e69-5d9bcff94087',
+    originId: '8073729a-5e59-53b7-9e69-5d9bcff94087'
   }
 
   beforeEach(() => {
@@ -1676,7 +1676,7 @@ describe('state change events', () => {
     })
 
     store.set('main.origins', '8073729a-5e59-53b7-9e69-5d9bcff94087', {
-      chain: { id: 137, type: 'ethereum' },
+      chain: { id: 137, type: 'ethereum' }
     })
     store.getObserver('provider:origins').fire()
   })
@@ -1688,8 +1688,8 @@ describe('state change events', () => {
         id: 1,
         explorer: 'https://etherscan.io',
         connection: { primary: { connected: true }, secondary: { connected: false } },
-        on: true,
-      },
+        on: true
+      }
     }
 
     const networksMeta = {
@@ -1699,9 +1699,9 @@ describe('state change events', () => {
           name: 'Ether',
           symbol: 'ETH',
           decimals: 18,
-          icon: 'ethereum',
-        },
-      },
+          icon: 'ethereum'
+        }
+      }
     }
 
     // set the known state to compare the test event to
@@ -1723,14 +1723,14 @@ describe('state change events', () => {
           explorers: [{ url: 'https://etherscan.io' }],
           external: {
             wallet: {
-              colors: [{ r: 90, g: 181, b: 178, hex: '#5ab5b2' }],
-            },
+              colors: [{ r: 90, g: 181, b: 178, hex: '#5ab5b2' }]
+            }
           },
           nativeCurrency: {
             name: 'Ether',
             symbol: 'ETH',
-            decimals: 18,
-          },
+            decimals: 18
+          }
         },
         {
           name: 'Polygon',
@@ -1740,15 +1740,15 @@ describe('state change events', () => {
           explorers: [{ url: 'https://polygonscan.com' }],
           external: {
             wallet: {
-              colors: [{ r: 60, g: 40, b: 234, hex: '#3c28ea' }],
-            },
+              colors: [{ r: 60, g: 40, b: 234, hex: '#3c28ea' }]
+            }
           },
           nativeCurrency: {
             name: 'Matic',
             symbol: 'MATIC',
-            decimals: 18,
-          },
-        },
+            decimals: 18
+          }
+        }
       ])
 
       done()
@@ -1759,13 +1759,13 @@ describe('state change events', () => {
       id: 137,
       explorer: 'https://polygonscan.com',
       connection: { primary: { connected: true }, secondary: { connected: false } },
-      on: true,
+      on: true
     }
 
     store.set('main.networks.ethereum', { ...networks, 137: polygon })
     store.set('main.networksMeta.ethereum', {
       ...networksMeta,
-      137: { primaryColor: 'accent8', nativeCurrency: { symbol: 'MATIC', name: 'Matic', decimals: 18 } },
+      137: { primaryColor: 'accent8', nativeCurrency: { symbol: 'MATIC', name: 'Matic', decimals: 18 } }
     })
 
     store.getObserver('provider:chains').fire()
@@ -1784,14 +1784,14 @@ describe('state change events', () => {
       symbol: 'ETH',
       balance: '0xe7',
       address: '0x0000000000000000000000000000000000000000',
-      chainId: 1,
+      chainId: 1
     }
 
     const tokenPriceData = { usd: { price: 225.35 } }
     const tokenBalance = {
       symbol: 'OHM',
       balance: '0x606401fc9',
-      address: '0x383518188c0c6d7730d91b2c03a03c837814a899',
+      address: '0x383518188c0c6d7730d91b2c03a03c837814a899'
     }
 
     store.set('main.accounts', address, 'balances.lastUpdated', new Date())
@@ -1812,7 +1812,7 @@ describe('state change events', () => {
       expect(event.params.result).toEqual({
         account: address,
         nativeCurrency: [{ ...ethBalance, currencyInfo: ethPriceData }],
-        erc20: [{ ...tokenBalance, tokenInfo: { lastKnownPrice: { ...tokenPriceData } } }],
+        erc20: [{ ...tokenBalance, tokenInfo: { lastKnownPrice: { ...tokenPriceData } } }]
       })
 
       done()

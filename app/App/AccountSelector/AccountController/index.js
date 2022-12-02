@@ -15,7 +15,7 @@ class Account extends React.Component {
       highlightIndex: 0,
       unlockInput: '',
       openHover: false,
-      addressHover: false,
+      addressHover: false
     }
   }
 
@@ -76,7 +76,7 @@ class Account extends React.Component {
         top: bounds.top - 80,
         bottom: document.body.clientHeight - bounds.top - this.signer.clientHeight + 3,
         height: this.signer.clientHeight + 6,
-        index: this.props.index,
+        index: this.props.index
       })
       link.rpc('setSigner', this.props.id, (err, status) => {
         if (err) return console.log(err)

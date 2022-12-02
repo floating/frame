@@ -14,5 +14,5 @@ export default [
   'wallet_addEthereumChain',
   'wallet_getEthereumChains',
   'wallet_getAssets',
-  'wallet_watchAsset',
+  'wallet_watchAsset'
 ]

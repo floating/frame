@@ -8,7 +8,7 @@ class BasicApproval extends React.Component {
     super(...args)
 
     this.state = {
-      inPreview: false,
+      inPreview: false
     }
   }
 

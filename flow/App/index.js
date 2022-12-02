@@ -17,7 +17,7 @@ class Flow extends React.Component {
     super(props, context)
     this.input = React.createRef()
     this.state = {
-      input: '',
+      input: ''
     }
   }
   // componentDidMount(){

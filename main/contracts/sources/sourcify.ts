@@ -90,7 +90,7 @@ export async function fetchSourcifyContract(
     if (result?.output) {
       const {
         abi,
-        devdoc: { title },
+        devdoc: { title }
       } = result.output
       return { abi: JSON.stringify(abi), name: title as string, source: 'sourcify' }
     }

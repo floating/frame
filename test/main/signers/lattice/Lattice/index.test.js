@@ -53,7 +53,7 @@ describe('#connect', () => {
       return {
         connect: connectFn,
         getFwVersion: () => ({ major: 0, minor: 13, fix: 4 }),
-        getAppName: () => 'frame-test',
+        getAppName: () => 'frame-test'
       }
     })
 
@@ -181,7 +181,7 @@ describe('#connect', () => {
     expect(lattice.appVersion).toStrictEqual({
       major: 0,
       minor: 13,
-      patch: 4,
+      patch: 4
     })
   })
 })
@@ -194,7 +194,7 @@ describe('#pair', () => {
       pair: jest.fn(async (code) => {
         if (code === pairingCode) return true
         throw new Error('Error from device: Pairing failed')
-      }),
+      })
     }
   })
 
@@ -268,7 +268,7 @@ describe('#deriveAddresses', () => {
         return Array(opts.n)
           .fill()
           .map((_, i) => `addr${opts.startPath[4] + i}`)
-      }),
+      })
     }
   })
 
@@ -280,7 +280,7 @@ describe('#deriveAddresses', () => {
 
     expect(lattice.connection.getAddresses).toHaveBeenCalledWith(
       expect.objectContaining({
-        startPath: [0x80000000 + 44, 0x80000000 + 60, 0x80000000, 0, 0],
+        startPath: [0x80000000 + 44, 0x80000000 + 60, 0x80000000, 0, 0]
       })
     )
   })
@@ -295,7 +295,7 @@ describe('#deriveAddresses', () => {
 
     expect(lattice.connection.getAddresses).toHaveBeenCalledWith(
       expect.objectContaining({
-        startPath: [0x80000000 + 44, 0x80000000 + 60, 0x80000000, 5],
+        startPath: [0x80000000 + 44, 0x80000000 + 60, 0x80000000, 5]
       })
     )
   })
@@ -314,7 +314,7 @@ describe('#deriveAddresses', () => {
       expect(lattice.connection.getAddresses).toHaveBeenNthCalledWith(
         n + 1,
         expect.objectContaining({
-          startPath: [0x80000000 + 44, 0x80000000 + 60, 0x80000000 + n, 0, 0],
+          startPath: [0x80000000 + 44, 0x80000000 + 60, 0x80000000 + n, 0, 0]
         })
       )
     })
@@ -357,7 +357,7 @@ describe('#deriveAddresses', () => {
       '0xaddr6',
       '0xaddr7',
       '0xaddr8',
-      '0xaddr9',
+      '0xaddr9'
     ])
   })
 
@@ -486,13 +486,13 @@ describe('#signMessage', () => {
             sig: {
               r: '9af6cb',
               s: 'abcd04',
-              v: Buffer.from('01', 'hex'),
-            },
+              v: Buffer.from('01', 'hex')
+            }
           }
         }
 
         throw new Error('invalid message!')
-      }),
+      })
     }
   })
 
@@ -536,13 +536,13 @@ describe('#signTypedData', () => {
             sig: {
               r: '3ea8cd',
               s: 'abcd04',
-              v: Buffer.from('01', 'hex'),
-            },
+              v: Buffer.from('01', 'hex')
+            }
           }
         }
 
         throw new Error('invalid message!')
-      }),
+      })
     }
   })
 
@@ -574,15 +574,15 @@ describe('#signTypedData', () => {
 
 describe('#signTransaction', () => {
   const tx = {
-    chainId: '0x89',
+    chainId: '0x89'
   }
 
   const expectedSignature = {
     sig: {
       r: Buffer.from('3ea8cd', 'hex'),
       s: Buffer.from('96f7a0', 'hex'),
-      v: Buffer.from('00', 'hex'),
-    },
+      v: Buffer.from('00', 'hex')
+    }
   }
 
   beforeEach(() => {
@@ -605,8 +605,8 @@ describe('#signTransaction', () => {
         return {
           sig: {
             ...expectedSignature.sig,
-            v: Buffer.from('1b', 'hex'),
-          },
+            v: Buffer.from('1b', 'hex')
+          }
         }
       } catch (e) {
         done(e)

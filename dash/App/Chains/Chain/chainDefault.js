@@ -7,5 +7,5 @@ export default {
   isTestnet: false,
   primaryColor: 'accent2',
   primaryRpc: 'Primary Endpoint',
-  secondaryRpc: 'Secondary Endpoint',
+  secondaryRpc: 'Secondary Endpoint'
 }

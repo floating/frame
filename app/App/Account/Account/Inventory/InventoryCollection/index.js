@@ -5,7 +5,7 @@ class Inventory extends React.Component {
   constructor(...args) {
     super(...args)
     this.state = {
-      hoverAsset: false,
+      hoverAsset: false
     }
   }
 
@@ -34,7 +34,7 @@ class Inventory extends React.Component {
                   ? {
                       backgroundImage: `url(https://proxy.pylon.link?type=nft&target=${encodeURIComponent(
                         inventory[k].meta.image
-                      )})`,
+                      )})`
                     }
                   : {}
               }
@@ -65,13 +65,13 @@ class Inventory extends React.Component {
                       hoverAsset: {
                         name,
                         tokenId,
-                        img,
-                      },
+                        img
+                      }
                     })
                   }}
                   onMouseLeave={() => {
                     this.setState({
-                      hoverAsset: false,
+                      hoverAsset: false
                     })
                   }}
                 >

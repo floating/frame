@@ -1,7 +1,7 @@
 const create = function () {
   const internal = {
     state: {},
-    observers: {},
+    observers: {}
   }
 
   const store = function () {
@@ -49,7 +49,7 @@ const create = function () {
       },
       remove: () => {
         delete internal.observers[id]
-      },
+      }
     }
 
     internal.observers[id] = observer

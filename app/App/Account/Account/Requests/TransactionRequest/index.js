@@ -77,7 +77,7 @@ class TransactionRequest extends React.Component {
 
     const chain = {
       type: 'ethereum',
-      id: parseInt(req.data.chainId, 'hex'),
+      id: parseInt(req.data.chainId, 'hex')
     }
 
     const insufficientFundsMatch = originalNotice.includes('insufficient funds')

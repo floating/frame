@@ -7,7 +7,7 @@ import {
   toBuffer,
   pubToAddress,
   ecrecover,
-  hashPersonalMessage,
+  hashPersonalMessage
 } from '@ethereumjs/util'
 import log from 'electron-log'
 import BN from 'bignumber.js'
@@ -102,7 +102,7 @@ export function getRawTx(
     gasLimit: gasLimit || gas,
     chainId: rawTx.chainId,
     nonce: getNonce(),
-    gasFeesSource: GasFeesSource.Dapp,
+    gasFeesSource: GasFeesSource.Dapp
   }
 
   if (to) {
@@ -185,10 +185,10 @@ export function getActiveChainsFull() {
         nativeCurrency: {
           name: 'Ether',
           symbol: 'ETH',
-          decimals: 18,
+          decimals: 18
         },
         shortName: '',
-        icon: '',
+        icon: ''
       }
     })
 }
@@ -202,7 +202,7 @@ export function getActiveChainDetails() {
     .map((chain) => {
       return {
         id: intToHex(chain.id),
-        name: chain.name,
+        name: chain.name
       }
     })
 }

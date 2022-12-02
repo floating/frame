@@ -16,7 +16,7 @@ import { MAX_HEX } from '../../resources/constants'
 
 import type {
   ApproveAction as Erc20Approval,
-  TransferAction as Erc20Transfer,
+  TransferAction as Erc20Transfer
 } from '../transaction/actions/erc20'
 import type { Action, DecodableContract, EntityType } from '../transaction/actions'
 import type { TransactionRequest } from '../accounts'
@@ -46,7 +46,7 @@ async function resolveEntityType(address: string, chainId: number): Promise<Enti
       params: [address, 'latest'],
       jsonrpc: '2.0',
       id: 1,
-      chainId: addHexPrefix(chainId.toString(16)), // TODO: Verify this overrides setChain
+      chainId: addHexPrefix(chainId.toString(16)) // TODO: Verify this overrides setChain
     }
 
     const code = await provider.request(payload)
@@ -91,7 +91,7 @@ async function recogErc20(
             symbol,
             spenderEns: ens,
             spenderType: type,
-            contract: contractAddress,
+            contract: contractAddress
           }
 
           return {
@@ -113,7 +113,7 @@ async function recogErc20(
               if (txRequest.decodedData) {
                 txRequest.decodedData.args[1].value = amount === MAX_HEX ? 'unlimited' : approvedAmount
               }
-            },
+            }
           } as Erc20Approval
         } else if (Erc20Contract.isTransfer(decoded)) {
           const recipient = decoded.args[0].toLowerCase()
@@ -121,7 +121,7 @@ async function recogErc20(
           const { ens, type } = await surface.identity(recipient, chainId)
           return {
             id: 'erc20:transfer',
-            data: { recipient, amount, decimals, name, symbol, recipientEns: ens, recipientType: type },
+            data: { recipient, amount, decimals, name, symbol, recipientEns: ens, recipientType: type }
           } as Erc20Transfer
         }
       }
@@ -176,7 +176,7 @@ const surface = {
           contractAddress: contractAddress.toLowerCase(),
           contractName: name,
           source,
-          ...decodedCall,
+          ...decodedCall
         }
       }
     }
@@ -192,7 +192,7 @@ const surface = {
 
     return actions
   },
-  simulate: async () => {},
+  simulate: async () => {}
 }
 
 export default surface

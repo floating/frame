@@ -6,7 +6,7 @@ class Inventory extends React.Component {
   constructor(...args) {
     super(...args)
     this.state = {
-      hoverAsset: false,
+      hoverAsset: false
     }
   }
 
@@ -41,8 +41,8 @@ class Inventory extends React.Component {
               data: {
                 id: this.props.moduleId,
                 account: this.props.account,
-                currentCollection: k,
-              },
+                currentCollection: k
+              }
             }
             link.send('nav:forward', 'panel', crumb)
           }}

@@ -38,7 +38,7 @@ export default class WorkerProcess extends EventEmitter {
 
     this.worker = fork(opts.modulePath, opts.args, {
       signal,
-      env: opts.env as NodeJS.ProcessEnv,
+      env: opts.env as NodeJS.ProcessEnv
     })
 
     log.info(`created ${this.name} worker, pid: ${this.worker.pid}`)

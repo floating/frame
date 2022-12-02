@@ -268,8 +268,8 @@ module.exports = {
         gas: {
           price: {
             selected: 'standard',
-            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' },
-          },
+            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+          }
         },
         connection: {
           presets: { local: 'direct' },
@@ -280,7 +280,7 @@ module.exports = {
             connected: false,
             type: '',
             network: '',
-            custom: primaryRpc,
+            custom: primaryRpc
           },
           secondary: {
             on: false,
@@ -289,10 +289,10 @@ module.exports = {
             connected: false,
             type: '',
             network: '',
-            custom: secondaryRpc,
-          },
+            custom: secondaryRpc
+          }
         },
-        on: true,
+        on: true
       }
 
       const defaultMeta = {
@@ -303,14 +303,14 @@ module.exports = {
           symbol: net.symbol,
           icon: '',
           name: '',
-          decimals: 18,
+          decimals: 18
         },
         gas: {
           price: {
             selected: 'standard',
-            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' },
-          },
-        },
+            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+          }
+        }
       }
 
       u('main', (main) => {
@@ -448,8 +448,8 @@ module.exports = {
         session: {
           requests: 1,
           startedAt: now,
-          lastUpdatedAt: now,
-        },
+          lastUpdatedAt: now
+        }
       }
 
       return { ...origins, [originId]: createdOrigin }
@@ -470,8 +470,8 @@ module.exports = {
           requests,
           startedAt,
           endedAt: undefined,
-          lastUpdatedAt: now,
-        },
+          lastUpdatedAt: now
+        }
       }
     })
   },
@@ -658,7 +658,7 @@ module.exports = {
     u('windows', windowId, 'nav', (nav) => {
       const updatedNav = {
         view: nav[0].view || crumb.view,
-        data: Object.assign({}, nav[0].data, crumb.data),
+        data: Object.assign({}, nav[0].data, crumb.data)
       }
       if (JSON.stringify(nav[0]) !== JSON.stringify(updatedNav)) {
         if (navigate) {
@@ -827,7 +827,7 @@ module.exports = {
   },
   setFooterHeight: (u, win, height) => {
     u('windows', win, 'footer.height', () => (height < 40 ? 40 : height))
-  },
+  }
   // toggleUSDValue: (u) => {
   //   u('main.showUSDValue', show => !show)
   // }

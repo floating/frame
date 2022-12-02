@@ -6,5 +6,5 @@ const ReactComponent = forwardRef(Component)
 
 exports = {
   ReactComponent,
-  default: 'file.svg',
+  default: 'file.svg'
 }

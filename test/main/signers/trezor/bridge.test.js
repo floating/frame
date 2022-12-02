@@ -43,7 +43,7 @@ describe('connect events', () => {
 
     TrezorConnect.emit(DEVICE_EVENT, {
       type: DEVICE.CHANGED,
-      payload: { type: 'unacquired', path: '27', features: {} },
+      payload: { type: 'unacquired', path: '27', features: {} }
     })
   })
 
@@ -59,7 +59,7 @@ describe('connect events', () => {
 
     TrezorConnect.emit(DEVICE_EVENT, {
       type: DEVICE.CONNECT_UNACQUIRED,
-      payload: { type: 'unacquired', path: '27', features: {} },
+      payload: { type: 'unacquired', path: '27', features: {} }
     })
   })
 

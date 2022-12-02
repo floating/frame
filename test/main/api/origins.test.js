@@ -33,8 +33,8 @@ describe('#updateOrigin', () => {
         name: 'frame.test',
         chain: {
           type: 'ethereum',
-          id: 1,
-        },
+          id: 1
+        }
       })
     })
 
@@ -203,8 +203,8 @@ describe('#isTrusted', () => {
     store.set('main.permissions', address, {
       'c004cc87-bfa3-50f5-812f-3d70dd8f82c6': {
         origin: 'test.frame.eth',
-        provider: true,
-      },
+        provider: true
+      }
     })
 
     return expect(isTrusted(payload)).resolves.toBe(true)
@@ -223,8 +223,8 @@ describe('#isTrusted', () => {
         origin: frameTestOriginId,
         account: address,
         payload: {
-          method: 'eth_accounts',
-        },
+          method: 'eth_accounts'
+        }
       })
 
       cb()
@@ -235,7 +235,7 @@ describe('#isTrusted', () => {
 
   const userActions = [
     { actionTaken: 'accepted', outcome: 'grants' },
-    { actionTaken: 'declined', outcome: 'refuses' },
+    { actionTaken: 'declined', outcome: 'refuses' }
   ]
 
   userActions.forEach(({ actionTaken, outcome }) => {
@@ -251,8 +251,8 @@ describe('#isTrusted', () => {
         store.set('main.permissions', address, {
           'c004cc87-bfa3-50f5-812f-3d70dd8f82c6': {
             origin: 'test.frame.eth',
-            provider: permissionGranted,
-          },
+            provider: permissionGranted
+          }
         })
 
         cb()

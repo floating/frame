@@ -20,15 +20,15 @@ const mockAbi = [
     name: 'retrieve',
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [{ internalType: 'uint256', name: 'num', type: 'uint256' }],
     name: 'store',
     outputs: [],
     stateMutability: 'nonpayable',
-    type: 'function',
-  },
+    type: 'function'
+  }
 ]
 
 const sourcifyResponse = {
@@ -40,15 +40,15 @@ const sourcifyResponse = {
       content: JSON.stringify({
         output: {
           abi: mockAbi,
-          devdoc: { title: 'mock sourcify abi' },
-        },
-      }),
-    },
-  ],
+          devdoc: { title: 'mock sourcify abi' }
+        }
+      })
+    }
+  ]
 }
 
 const sourcifyNotFoundResponse = {
-  error: 'Files have not been found!',
+  error: 'Files have not been found!'
 }
 
 beforeAll(() => {
@@ -82,7 +82,7 @@ describe('#fetchSourcifyContract', () => {
     return expect(fetchSourcifyContract(contractAddress, 137)).resolves.toStrictEqual({
       abi: JSON.stringify(mockAbi),
       name: 'mock sourcify abi',
-      source: 'sourcify',
+      source: 'sourcify'
     })
   })
 

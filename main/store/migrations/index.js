@@ -106,8 +106,8 @@ const migrations = {
       gas: {
         price: {
           selected: 'standard',
-          levels: { slow: '', standard: '', fast: '', asap: '', custom: '' },
-        },
+          levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+        }
       },
       connection: {
         primary: {
@@ -117,7 +117,7 @@ const migrations = {
           connected: false,
           type: '',
           network: '',
-          custom: '',
+          custom: ''
         },
         secondary: {
           on: false,
@@ -126,9 +126,9 @@ const migrations = {
           connected: false,
           type: '',
           network: '',
-          custom: '',
-        },
-      },
+          custom: ''
+        }
+      }
     }
     return initial
   },
@@ -268,8 +268,8 @@ const migrations = {
       gas: {
         price: {
           selected: 'standard',
-          levels: { slow: '', standard: '', fast: '', asap: '', custom: '' },
-        },
+          levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+        }
       },
       connection: {
         primary: {
@@ -279,7 +279,7 @@ const migrations = {
           connected: false,
           type: '',
           network: '',
-          custom: '',
+          custom: ''
         },
         secondary: {
           on: false,
@@ -288,10 +288,10 @@ const migrations = {
           connected: false,
           type: '',
           network: '',
-          custom: '',
-        },
+          custom: ''
+        }
       },
-      on: false,
+      on: false
     }
     return initial
   },
@@ -344,9 +344,9 @@ const migrations = {
       gas: {
         price: {
           selected: 'standard',
-          levels: { slow: '', standard: '', fast: '', asap: '', custom: '' },
-        },
-      },
+          levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+        }
+      }
     }
 
     // ensure all network configurations have corresponding network meta
@@ -357,8 +357,8 @@ const migrations = {
         initial.main.networksMeta.ethereum[networkId].gas = {
           price: {
             selected: gasSettings.price.selected || defaultMeta.gas.price.selected,
-            levels: gasSettings.price.levels || defaultMeta.gas.price.levels,
-          },
+            levels: gasSettings.price.levels || defaultMeta.gas.price.levels
+          }
         }
       } else {
         initial.main.networksMeta.ethereum[networkId] = { ...defaultMeta }
@@ -386,8 +386,8 @@ const migrations = {
         gas: {
           price: {
             selected: 'standard',
-            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' },
-          },
+            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+          }
         },
         connection: {
           primary: {
@@ -397,7 +397,7 @@ const migrations = {
             connected: false,
             type: '',
             network: '',
-            custom: '',
+            custom: ''
           },
           secondary: {
             on: false,
@@ -406,10 +406,10 @@ const migrations = {
             connected: false,
             type: '',
             network: '',
-            custom: '',
-          },
+            custom: ''
+          }
         },
-        on: false,
+        on: false
       }
     }
 
@@ -419,9 +419,9 @@ const migrations = {
           fees: {},
           price: {
             selected: 'standard',
-            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' },
-          },
-        },
+            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+          }
+        }
       }
     }
 
@@ -509,8 +509,8 @@ const migrations = {
         gas: {
           price: {
             selected: 'standard',
-            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' },
-          },
+            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+          }
         },
         connection: {
           primary: {
@@ -520,7 +520,7 @@ const migrations = {
             connected: false,
             type: '',
             network: '',
-            custom: '',
+            custom: ''
           },
           secondary: {
             on: false,
@@ -529,10 +529,10 @@ const migrations = {
             connected: false,
             type: '',
             network: '',
-            custom: '',
-          },
+            custom: ''
+          }
         },
-        on: false,
+        on: false
       }
     }
 
@@ -542,9 +542,9 @@ const migrations = {
           fees: {},
           price: {
             selected: 'standard',
-            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' },
-          },
-        },
+            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+          }
+        }
       }
     }
 
@@ -567,9 +567,9 @@ const migrations = {
             connected: false,
             type: '',
             network: '',
-            custom: '',
-          },
-        },
+            custom: ''
+          }
+        }
       }
     }
     if (removedGoerliRPCs.includes(goerliSecondaryConnection)) {
@@ -584,9 +584,9 @@ const migrations = {
             connected: false,
             type: '',
             network: '',
-            custom: '',
-          },
-        },
+            custom: ''
+          }
+        }
       }
     }
 
@@ -642,7 +642,7 @@ const migrations = {
           icon: '',
           name: '',
           symbol: '',
-          decimals: 0,
+          decimals: 0
         }
       }
     })
@@ -653,15 +653,15 @@ const migrations = {
     const optimism = initial.main.networks.ethereum[10]
     const removeOptimismConnection = (connection) => ({
       ...connection,
-      current: connection.current === 'optimism' ? 'infura' : connection.current,
+      current: connection.current === 'optimism' ? 'infura' : connection.current
     })
 
     initial.main.networks.ethereum[10] = {
       ...optimism,
       connection: {
         primary: removeOptimismConnection(optimism.connection.primary),
-        secondary: removeOptimismConnection(optimism.connection.secondary),
-      },
+        secondary: removeOptimismConnection(optimism.connection.secondary)
+      }
     }
     return initial
   },
@@ -694,11 +694,11 @@ const migrations = {
     const networkMeta = initial.main.networksMeta.ethereum
     const {
       5: {
-        nativeCurrency: { symbol: goerliSymbol },
+        nativeCurrency: { symbol: goerliSymbol }
       },
       11155111: {
-        nativeCurrency: { symbol: sepoliaSymbol },
-      },
+        nativeCurrency: { symbol: sepoliaSymbol }
+      }
     } = networkMeta
     goerliSymbol === 'ETH' && (initial.main.networksMeta.ethereum[5].nativeCurrency.symbol = 'görETH')
     sepoliaSymbol === 'ETH' && (initial.main.networksMeta.ethereum[11155111].nativeCurrency.symbol = 'sepETH')
@@ -715,13 +715,13 @@ const migrations = {
         const accountMetaId = uuidv5(id, accountNS)
         initial.main.accountsMeta[accountMetaId] = {
           name: account.name,
-          lastUpdated: Date.now(),
+          lastUpdated: Date.now()
         }
       }
     })
 
     return initial
-  },
+  }
 }
 
 // Version number of latest known migration
@@ -743,5 +743,5 @@ module.exports = {
 
     return state
   },
-  latest,
+  latest
 }

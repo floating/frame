@@ -18,7 +18,7 @@ class AddAccounts extends React.Component {
   constructor(...args) {
     super(...args)
     this.state = {
-      view: 'default',
+      view: 'default'
     }
   }
   renderAddNonsigning() {
@@ -83,7 +83,7 @@ class AddAccounts extends React.Component {
   createNewAccount(type) {
     link.send('tray:action', 'navDash', {
       view: 'accounts',
-      data: { showAddAccounts: true, newAccountType: type },
+      data: { showAddAccounts: true, newAccountType: type }
     })
   }
   renderDefault() {
@@ -159,7 +159,7 @@ class Dash extends React.Component {
     super(props, context)
     this.input = React.createRef()
     this.state = {
-      showAddAccounts: false,
+      showAddAccounts: false
     }
   }
   render() {

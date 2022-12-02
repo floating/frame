@@ -34,7 +34,7 @@ class Settings extends React.Component {
       expandNetwork: false,
       findFocus: false,
       findHover: false,
-      findInput: '',
+      findInput: ''
     }
   }
 
@@ -87,7 +87,7 @@ class Settings extends React.Component {
               const key = type + id
               const { explorer, isTestnet, connection, on, name } = networks[type][id]
               const {
-                nativeCurrency: { symbol = '?' },
+                nativeCurrency: { symbol = '?' }
               } = metadata[type][id]
               const chain = { key, id, type, symbol, explorer, isTestnet, connection, on, filter, name }
               return <Chain {...chain} view={'preview'} />
