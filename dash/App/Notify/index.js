@@ -236,7 +236,7 @@ class Notify extends React.Component {
                 const isTestnet = this.store('main.networks', chain.type, chain.id, 'isTestnet')
                 const {
                   nativeCurrency,
-                  nativeCurrency: { symbol: currentSymbol = '?' },
+                  nativeCurrency: { symbol: currentSymbol = '?' }
                 } = this.store('main.networksMeta', chain.type, chain.id)
                 const nativeUSD =
                   nativeCurrency && nativeCurrency.usd && !isTestnet ? nativeCurrency.usd.price : 0
@@ -264,8 +264,8 @@ class Notify extends React.Component {
                     view: 'notify',
                     data: {
                       notify: 'gasFeeWarning',
-                      notifyData: { req, feeUSD: this.toDisplayUSD(maxFeeUSD), currentSymbol },
-                    },
+                      notifyData: { req, feeUSD: this.toDisplayUSD(maxFeeUSD), currentSymbol }
+                    }
                   })
                 } else {
                   link.rpc('approveRequest', req, () => {})

@@ -23,11 +23,11 @@ beforeEach(() => {
   store.set('main.lattice', 'NBaJ8e', {
     deviceName: 'Frame-testlattice',
     privKey: 'supersecretkey',
-    paired: true,
+    paired: true
   })
 
   store.set('main.latticeSettings', {
-    derivation: 'legacy',
+    derivation: 'legacy'
   })
 
   adapter = new LatticeSignerAdapter()
@@ -129,7 +129,7 @@ describe('#reload', () => {
 
 describe('settings changes', () => {
   const latticeSigner = {
-    deviceId: 'NBaJ8e',
+    deviceId: 'NBaJ8e'
   }
 
   let settingsObserver
@@ -142,7 +142,7 @@ describe('settings changes', () => {
 
     latticeSigner.addresses = Array(5).fill('addr')
     latticeSigner.connection = {
-      baseUrl: 'https://signing.gridpl.us',
+      baseUrl: 'https://signing.gridpl.us'
     }
 
     adapter.knownSigners['NBaJ8e'] = latticeSigner
@@ -182,12 +182,12 @@ describe('settings changes', () => {
 
   it('reloads a connected Lattice if the relay URL is changed back to the default', () => {
     latticeSigner.connection = {
-      baseUrl: 'https://customendpoint.io',
+      baseUrl: 'https://customendpoint.io'
     }
 
     store.set('main.latticeSettings', {
       endpointMode: 'standard',
-      endpointCustom: 'https://customendpoint.io',
+      endpointCustom: 'https://customendpoint.io'
     })
 
     settingsObserver.fire()

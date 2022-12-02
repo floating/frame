@@ -81,7 +81,7 @@ async function coinPrices(ids: string[], currencies = ['usd']): Promise<Rates> {
     vs_currencies: currencies.join(','),
     include_market_cap: 'true',
     include_24hr_vol: 'true',
-    include_24hr_change: 'true',
+    include_24hr_change: 'true'
   }
 
   return call(`${baseUrl}/simple/price`, queryParams)
@@ -97,7 +97,7 @@ async function tokenPrices(
     vs_currencies: currencies.join(','),
     include_market_cap: 'true',
     include_24hr_vol: 'true',
-    include_24hr_change: 'true',
+    include_24hr_change: 'true'
   }
 
   return call(`${baseUrl}/simple/token_price/${asset_platform}`, queryParams)
@@ -114,7 +114,7 @@ async function listCoins(include_platform = true): Promise<Array<Coin>> {
 async function listMarkets(ids: string[], vsCurrency = 'usd'): Promise<Array<Market>> {
   const queryParams = {
     vs_currency: vsCurrency,
-    ids: ids.join(','),
+    ids: ids.join(',')
   }
 
   return call(`${baseUrl}/coins/markets`, queryParams)
@@ -126,5 +126,5 @@ export default {
   tokenPrices,
   getCoin,
   listCoins,
-  listMarkets,
+  listMarkets
 }

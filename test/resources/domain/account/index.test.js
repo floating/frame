@@ -3,7 +3,7 @@ import { accountSort as byCreation } from '../../../../resources/domain/account'
 const makeMockAccount = (address, timestamp = Date.now(), block = 0, name = address) => ({
   address,
   name,
-  created: block ? `${block}:${timestamp}` : `new:${timestamp}`,
+  created: block ? `${block}:${timestamp}` : `new:${timestamp}`
 })
 
 const addresses = [
@@ -13,7 +13,7 @@ const addresses = [
   '0x9c5083dd4838e120dbeac44c052179692aa5dac5',
   '0x2326d4fb2737666dda96bd6314e3d4418246cfe8',
   '0xe70981f2aeb601a12001465c7a5e52aa76adcbec',
-  '0xa1efa0adecb7f5691605899d13285928ae025844',
+  '0xa1efa0adecb7f5691605899d13285928ae025844'
 ]
 let now = 0
 

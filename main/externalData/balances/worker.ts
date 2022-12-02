@@ -126,7 +126,7 @@ const messageHandler: { [command: string]: (...params: any) => void } = {
   tokenBalanceScan: (address, tokensToOmit, chains) => {
     updateBlacklist(address, chains)
     tokenBalanceScan(address, tokensToOmit, chains)
-  },
+  }
 }
 
 process.on('message', (message: ExternalDataWorkerMessage) => {

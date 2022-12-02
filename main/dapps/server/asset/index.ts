@@ -72,7 +72,7 @@ export default {
     } catch (e) {
       log.error('could not resolve dapp', (e as NodeJS.ErrnoException).message)
     }
-  },
+  }
 }
 
 //   ipfs.get(`${cid}/index.html`, (err, files) => {

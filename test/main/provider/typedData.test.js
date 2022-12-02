@@ -7,43 +7,43 @@ describe('#getVersionFromTypedData', () => {
         { name: 'name', type: 'string' },
         { name: 'version', type: 'string' },
         { name: 'chainId', type: 'uint256' },
-        { name: 'verifyingContract', type: 'address' },
+        { name: 'verifyingContract', type: 'address' }
       ],
       Person: [
         { name: 'name', type: 'string' },
-        { name: 'wallet', type: 'address' },
+        { name: 'wallet', type: 'address' }
       ],
       Mail: [
         { name: 'from', type: 'Person' },
         { name: 'to', type: 'Person' },
-        { name: 'contents', type: 'string' },
-      ],
+        { name: 'contents', type: 'string' }
+      ]
     },
     domain: 'domainData',
     primaryType: 'Mail',
     message: {
       from: {
         name: 'Cow',
-        wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826'
       },
       to: {
         name: 'Bob',
-        wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+        wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB'
       },
-      contents: 'Hello!',
-    },
+      contents: 'Hello!'
+    }
   }
   const typedDataLegacy = [
     {
       type: 'string',
       name: 'fullName',
-      value: 'Satoshi Nakamoto',
+      value: 'Satoshi Nakamoto'
     },
     {
       type: 'uint32',
       name: 'userId',
-      value: '1212',
-    },
+      value: '1212'
+    }
   ]
   const typedDataRecursive = {
     ...typedData,
@@ -52,24 +52,24 @@ describe('#getVersionFromTypedData', () => {
         { name: 'name', type: 'string' },
         { name: 'version', type: 'string' },
         { name: 'chainId', type: 'uint256' },
-        { name: 'verifyingContract', type: 'address' },
+        { name: 'verifyingContract', type: 'address' }
       ],
       Person: [
         { name: 'name', type: 'string' },
         { name: 'mother', type: 'Person' },
-        { name: 'father', type: 'Person' },
-      ],
+        { name: 'father', type: 'Person' }
+      ]
     },
     primaryType: 'Person',
     message: {
       name: 'Satoshi Nakamoto',
       mother: {
-        name: 'unknown',
+        name: 'unknown'
       },
       father: {
-        name: 'unknown',
-      },
-    },
+        name: 'unknown'
+      }
+    }
   }
   const typedDataArrays = {
     ...typedData,
@@ -78,26 +78,26 @@ describe('#getVersionFromTypedData', () => {
         { name: 'name', type: 'string' },
         { name: 'version', type: 'string' },
         { name: 'chainId', type: 'uint256' },
-        { name: 'verifyingContract', type: 'address' },
+        { name: 'verifyingContract', type: 'address' }
       ],
       Person: [
         { name: 'name', type: 'string' },
-        { name: 'wallet', type: 'address' },
+        { name: 'wallet', type: 'address' }
       ],
       Mail: [
         { name: 'from', type: 'Person' },
         { name: 'to', type: 'Person' },
-        { name: 'contents', type: 'string' },
+        { name: 'contents', type: 'string' }
       ],
       Group: [
         { name: 'name', type: 'string' },
-        { name: 'members', type: 'Person[]' },
-      ],
-    },
+        { name: 'members', type: 'Person[]' }
+      ]
+    }
   }
   const typedDataArraysInvalid = {
     ...typedDataArrays,
-    primaryType: 'b0rk',
+    primaryType: 'b0rk'
   }
   const typedDataNullCustomType = {
     ...typedData,
@@ -105,28 +105,28 @@ describe('#getVersionFromTypedData', () => {
       to: null,
       from: {
         name: 'Cow',
-        wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826'
       },
-      contents: 'Hello, Bob!',
-    },
+      contents: 'Hello, Bob!'
+    }
   }
   const typedDataUndefinedProperty = {
     ...typedData,
     message: {
       from: {
         name: 'Cow',
-        wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826'
       },
       to: {
         name: 'Bob',
-        wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+        wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB'
       },
-      contents: undefined,
-    },
+      contents: undefined
+    }
   }
   const typedDataInvalid = {
     ...typedData,
-    primaryType: 'b0rk',
+    primaryType: 'b0rk'
   }
 
   const validRequests = [
@@ -137,7 +137,7 @@ describe('#getVersionFromTypedData', () => {
     { data: typedDataArrays, version: 'V4', dataDescription: 'eip-712 with arrays' }, // unsupported by v3
     { data: typedDataArraysInvalid, version: 'V4', dataDescription: 'eip-712 invalid with arrays' },
     { data: typedDataNullCustomType, version: 'V4', dataDescription: 'eip-712 with null custom type' }, // unsupported by v3
-    { data: typedDataUndefinedProperty, version: 'V3', dataDescription: 'eip-712 with undefined property' }, // unsupported by v4
+    { data: typedDataUndefinedProperty, version: 'V3', dataDescription: 'eip-712 with undefined property' } // unsupported by v4
   ]
 
   validRequests.forEach(({ data, version, dataDescription }) => {

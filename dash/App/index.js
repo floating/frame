@@ -22,7 +22,7 @@ const AddNewItemButton = ({ view, req }) => {
   const dataMap = {
     accounts: { showAddAccounts: true },
     chains: { newChain: {} },
-    tokens: { notify: 'addToken', notifyData: req },
+    tokens: { notify: 'addToken', notifyData: req }
   }
   return (
     <div className='dashFooter'>
@@ -43,7 +43,7 @@ class Dash extends React.Component {
     this.input = React.createRef()
     this.state = {
       showAddAccounts: false,
-      selected: 'home',
+      selected: 'home'
     }
   }
 

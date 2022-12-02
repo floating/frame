@@ -9,5 +9,5 @@ module.exports = {
       state = ''
     }
     store.setDappStorage(hash, state)
-  },
+  }
 }

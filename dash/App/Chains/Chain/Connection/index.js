@@ -59,7 +59,7 @@ class ChainModule extends React.Component {
     this.state = {
       expanded: props.expanded || false,
       primaryCustom,
-      secondaryCustom,
+      secondaryCustom
     }
 
     this.ref = createRef()

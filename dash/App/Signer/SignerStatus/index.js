@@ -15,7 +15,7 @@ class SignerStatus extends React.Component {
     // })
     this.state = {
       expand: false,
-      shake: false,
+      shake: false
     }
     this.statusRef = React.createRef()
     this.inputRef = React.createRef()

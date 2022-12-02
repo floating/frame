@@ -38,7 +38,7 @@ function getOriginsForChain(chain, origins) {
     connected: connectedOrigins.sort(bySessionStartTime),
     disconnected: disconnectedOrigins
       .sort(byLastUpdated)
-      .filter((origin) => Date.now() - origin.session.lastUpdatedAt < 60 * 60 * 1000),
+      .filter((origin) => Date.now() - origin.session.lastUpdatedAt < 60 * 60 * 1000)
   }
 }
 
@@ -47,7 +47,7 @@ class Indicator extends React.Component {
     super(props)
 
     this.state = {
-      active: false,
+      active: false
     }
 
     setTimeout(() => {
@@ -80,7 +80,7 @@ class _OriginModule extends React.Component {
 
     this.state = {
       expanded: false,
-      averageRequests: '0.0',
+      averageRequests: '0.0'
     }
 
     this.ref = createRef()

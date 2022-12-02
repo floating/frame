@@ -17,7 +17,7 @@ describe('#loadAssets', () => {
       symbol: 'ETH',
       balance: '0xe7',
       address: '0x0000000000000000000000000000000000000000',
-      chainId: 1,
+      chainId: 1
     }
 
     store.set('main.networksMeta.ethereum.1.nativeCurrency', priceData)
@@ -25,7 +25,7 @@ describe('#loadAssets', () => {
 
     expect(loadAssets(account)).toEqual({
       nativeCurrency: [{ ...balance, currencyInfo: priceData }],
-      erc20: [],
+      erc20: []
     })
   })
 
@@ -34,7 +34,7 @@ describe('#loadAssets', () => {
     const balance = {
       symbol: 'OHM',
       balance: '0x606401fc9',
-      address: '0x383518188c0c6d7730d91b2c03a03c837814a899',
+      address: '0x383518188c0c6d7730d91b2c03a03c837814a899'
     }
 
     store.set('main.rates', balance.address, priceData)
@@ -42,7 +42,7 @@ describe('#loadAssets', () => {
 
     expect(loadAssets(account)).toEqual({
       nativeCurrency: [],
-      erc20: [{ ...balance, tokenInfo: { lastKnownPrice: { ...priceData } } }],
+      erc20: [{ ...balance, tokenInfo: { lastKnownPrice: { ...priceData } } }]
     })
   })
 
@@ -80,7 +80,7 @@ describe('#createObserver', () => {
       symbol: 'ETH',
       balance: '0xe7',
       address: '0x0000000000000000000000000000000000000000',
-      chainId: 1,
+      chainId: 1
     }
 
     store.set('main.networksMeta.ethereum.1.nativeCurrency', priceData)
@@ -90,7 +90,7 @@ describe('#createObserver', () => {
 
     expect(handler.assetsChanged).toHaveBeenCalledWith(account, {
       nativeCurrency: [{ ...balance, currencyInfo: priceData }],
-      erc20: [],
+      erc20: []
     })
   })
 
@@ -99,7 +99,7 @@ describe('#createObserver', () => {
     const balance = {
       symbol: 'OHM',
       balance: '0x606401fc9',
-      address: '0x383518188c0c6d7730d91b2c03a03c837814a899',
+      address: '0x383518188c0c6d7730d91b2c03a03c837814a899'
     }
 
     store.set('main.rates', balance.address, priceData)
@@ -109,7 +109,7 @@ describe('#createObserver', () => {
 
     expect(handler.assetsChanged).toHaveBeenCalledWith(account, {
       nativeCurrency: [],
-      erc20: [{ ...balance, tokenInfo: { lastKnownPrice: { ...priceData } } }],
+      erc20: [{ ...balance, tokenInfo: { lastKnownPrice: { ...priceData } } }]
     })
   })
 

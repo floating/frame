@@ -373,5 +373,5 @@ module.exports = {
       </div>
     )
   },
-  octicon: (name, settings) => <Octicon icon={getIconByName(name)} height={settings.height} />,
+  octicon: (name, settings) => <Octicon icon={getIconByName(name)} height={settings.height} />
 }

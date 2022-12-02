@@ -15,7 +15,7 @@ import accounts, {
   TransactionRequest,
   SignTypedDataRequest,
   AddChainRequest,
-  AddTokenRequest,
+  AddTokenRequest
 } from '../accounts'
 import Chains, { Chain } from '../chains'
 import { getSignerType, Type as SignerType } from '../../resources/domain/signer'
@@ -38,13 +38,13 @@ import {
   isCurrentAccount,
   requestPermissions,
   resError,
-  hasPermission,
+  hasPermission
 } from './helpers'
 
 import {
   createChainsObserver as ChainsObserver,
   createOriginChainObserver as OriginChainObserver,
-  getActiveChains,
+  getActiveChains
 } from './chains'
 import type { LegacyTypedData, TypedData, TypedMessage } from '../accounts/types'
 
@@ -66,7 +66,7 @@ export interface TransactionMetadata {
 }
 
 const storeApi = {
-  getOrigin: (id: string) => store('main.origins', id) as Origin,
+  getOrigin: (id: string) => store('main.origins', id) as Origin
 }
 
 const getPayloadOrigin = ({ _origin }: RPCRequestPayload) => storeApi.getOrigin(_origin)
@@ -81,7 +81,7 @@ export class Provider extends EventEmitter {
     assetsChanged: [],
     chainChanged: [],
     chainsChanged: [],
-    networkChanged: [],
+    networkChanged: []
   }
 
   constructor() {
@@ -167,7 +167,7 @@ export class Provider extends EventEmitter {
     const payload: RPC.Susbcription.Response = {
       jsonrpc: '2.0',
       method: 'eth_subscription',
-      params: { subscription, result },
+      params: { subscription, result }
     }
 
     this.emit('data:subscription', payload)
@@ -334,7 +334,7 @@ export class Provider extends EventEmitter {
                   id: req.payload.id,
                   jsonrpc: req.payload.jsonrpc,
                   method: 'eth_sendRawTransaction',
-                  params: [signedTx],
+                  params: [signedTx]
                 },
                 (response) => {
                   clearInterval(broadcastTimer)
@@ -350,7 +350,7 @@ export class Provider extends EventEmitter {
                 },
                 {
                   type: 'ethereum',
-                  id: parseInt(req.data.chainId, 16),
+                  id: parseInt(req.data.chainId, 16)
                 }
               )
             }
@@ -403,11 +403,11 @@ export class Provider extends EventEmitter {
       method: 'eth_estimateGas',
       params: [txParams],
       jsonrpc: '2.0',
-      id: 1,
+      id: 1
     }
     const targetChain: Chain = {
       type: 'ethereum',
-      id: parseInt(rawTx.chainId, 16),
+      id: parseInt(rawTx.chainId, 16)
     }
 
     return new Promise<string>((resolve, reject) => {
@@ -435,7 +435,7 @@ export class Provider extends EventEmitter {
   getNonce(rawTx: TransactionData, res: RPCRequestCallback) {
     const targetChain: Chain = {
       type: 'ethereum',
-      id: parseInt(rawTx.chainId, 16),
+      id: parseInt(rawTx.chainId, 16)
     }
 
     this.connection.send(
@@ -464,8 +464,8 @@ export class Provider extends EventEmitter {
                 type: ApprovalType.GasLimitApproval,
                 data: {
                   message: err.message,
-                  gasLimit: '0x00',
-                },
+                  gasLimit: '0x00'
+                }
               })
 
               return { ...rawTx, gasLimit: '0x00' }
@@ -503,7 +503,7 @@ export class Provider extends EventEmitter {
 
     const newTx = {
       ...txParams,
-      chainId: txChain || (targetChain as string),
+      chainId: txChain || (targetChain as string)
     }
 
     const currentAccount = accounts.current()
@@ -533,7 +533,7 @@ export class Provider extends EventEmitter {
           approvals: [],
           feesUpdatedByUser: feesUpdated || false,
           recipientType: '',
-          recognizedActions: [],
+          recognizedActions: []
         } as TransactionRequest
 
         accounts.addRequest(req, res)
@@ -585,7 +585,7 @@ export class Provider extends EventEmitter {
       type: 'sign',
       payload,
       account: (currentAccount as FrameAccount).getAccounts()[0],
-      origin: payload._origin,
+      origin: payload._origin
     } as const
 
     const _res = (data: any) => {
@@ -609,7 +609,7 @@ export class Provider extends EventEmitter {
 
     const payload = {
       ...rawPayload,
-      params: orderedParams,
+      params: orderedParams
     }
 
     let [from = '', typedData, ...additionalParams] = payload.params
@@ -658,7 +658,7 @@ export class Provider extends EventEmitter {
     const handlerId = this.addRequestHandler(res)
     const typedMessage: TypedMessage<typeof version> = {
       data: typedData,
-      version,
+      version
     }
 
     accounts.addRequest({
@@ -667,7 +667,7 @@ export class Provider extends EventEmitter {
       typedMessage,
       payload,
       account: targetAccount.address,
-      origin: payload._origin,
+      origin: payload._origin
     } as SignTypedDataRequest)
   }
 
@@ -756,11 +756,11 @@ export class Provider extends EventEmitter {
             symbol: nativeCurrency.symbol,
             primaryRpc: rpcUrls[0],
             secondaryRpc: rpcUrls[1],
-            explorer: blockExplorerUrls[0],
+            explorer: blockExplorerUrls[0]
           },
           account: (accounts.getAccounts() || [])[0],
           origin: payload._origin,
-          payload,
+          payload
         } as AddChainRequest,
         res
       )
@@ -805,7 +805,7 @@ export class Provider extends EventEmitter {
           address,
           symbol,
           decimals,
-          logoURI: tokenData.image || tokenData.logoURI || '',
+          logoURI: tokenData.image || tokenData.logoURI || ''
         }
 
         // const result = {
@@ -823,7 +823,7 @@ export class Provider extends EventEmitter {
             token,
             account: (accounts.current() as FrameAccount).id,
             origin: payload._origin,
-            payload,
+            payload
           } as AddTokenRequest,
           res
         )
@@ -893,7 +893,7 @@ export class Provider extends EventEmitter {
       res({
         id: payload.id,
         jsonrpc: payload.jsonrpc,
-        result: accounts.getSelectedAddresses().map((a) => a.toLowerCase()),
+        result: accounts.getSelectedAddresses().map((a) => a.toLowerCase())
       })
     }
 

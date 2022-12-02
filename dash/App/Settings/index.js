@@ -20,7 +20,7 @@ class Settings extends React.Component {
       latticeEndpoint,
       latticeEndpointMode,
       resetConfirm: false,
-      expandNetwork: false,
+      expandNetwork: false
     }
     // context.store.observer(() => {
     //   const { type, id } = context.store('main.currentNetwork')
@@ -364,7 +364,7 @@ class Settings extends React.Component {
                   if (!this.store('main.nonceAdjust')) {
                     link.send('tray:action', 'navDash', {
                       view: 'notify',
-                      data: { notify: 'nonceWarning', notifyData: {} },
+                      data: { notify: 'nonceWarning', notifyData: {} }
                     })
                   }
                 }}
@@ -402,7 +402,7 @@ class Settings extends React.Component {
                 onChange={(value) => link.send('tray:action', 'setColorway', value)}
                 options={[
                   { text: 'Dark', value: 'dark' },
-                  { text: 'Light', value: 'light' },
+                  { text: 'Light', value: 'light' }
                 ]}
               />
             </div>
@@ -420,7 +420,7 @@ class Settings extends React.Component {
                 options={[
                   { text: 'Standard', value: 'standard' },
                   { text: 'Legacy', value: 'legacy' },
-                  { text: 'Testnet', value: 'testnet' },
+                  { text: 'Testnet', value: 'testnet' }
                 ]}
               />
             </div>
@@ -436,7 +436,7 @@ class Settings extends React.Component {
                   { text: 'Live', value: 'live' },
                   { text: 'Legacy', value: 'legacy' },
                   { text: 'Standard', value: 'standard' },
-                  { text: 'Testnet', value: 'testnet' },
+                  { text: 'Testnet', value: 'testnet' }
                 ]}
               />
             </div>
@@ -453,7 +453,7 @@ class Settings extends React.Component {
                     { text: '5', value: 5 },
                     { text: '10', value: 10 },
                     { text: '20', value: 20 },
-                    { text: '40', value: 40 },
+                    { text: '40', value: 40 }
                   ]}
                 />
               </div>
@@ -469,7 +469,7 @@ class Settings extends React.Component {
                 options={[
                   { text: 'Standard', value: 'standard' },
                   { text: 'Legacy', value: 'legacy' },
-                  { text: 'Live', value: 'live' },
+                  { text: 'Live', value: 'live' }
                 ]}
               />
             </div>
@@ -485,7 +485,7 @@ class Settings extends React.Component {
                   { text: '5', value: 5 },
                   { text: '10', value: 10 },
                   { text: '20', value: 20 },
-                  { text: '40', value: 40 },
+                  { text: '40', value: 40 }
                 ]}
               />
             </div>
@@ -502,7 +502,7 @@ class Settings extends React.Component {
                 }}
                 options={[
                   { text: 'Default', value: 'default' },
-                  { text: 'Custom', value: 'custom' },
+                  { text: 'Custom', value: 'custom' }
                 ]}
               />
             </div>
@@ -530,7 +530,7 @@ class Settings extends React.Component {
                 onChange={(value) => link.send('tray:action', 'setAccountCloseLock', value)}
                 options={[
                   { text: 'Close', value: true },
-                  { text: 'Quit', value: false },
+                  { text: 'Quit', value: false }
                 ]}
               />
             </div>

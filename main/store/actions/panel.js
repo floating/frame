@@ -126,5 +126,5 @@ module.exports = {
     })
   },
   initialSignerPos: (u, pos) => u('selected.position.initial', (_) => pos),
-  initialScrollPos: (u, pos) => u('selected.position.scrollTop', (_) => pos),
+  initialScrollPos: (u, pos) => u('selected.position.scrollTop', (_) => pos)
 }

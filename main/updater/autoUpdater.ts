@@ -52,7 +52,7 @@ export default class AutoUpdater extends EventEmitter {
 
     this.electronAutoUpdater.on('checking-for-update', () => {
       log.verbose('Performing automatic check for updates', {
-        allowPrerelease: this.electronAutoUpdater.allowPrerelease,
+        allowPrerelease: this.electronAutoUpdater.allowPrerelease
       })
     })
 
@@ -97,7 +97,7 @@ export default class AutoUpdater extends EventEmitter {
             files: [],
             sha512: '',
             path: '',
-            releaseDate: '',
+            releaseDate: ''
           })
         }
       } catch (e) {

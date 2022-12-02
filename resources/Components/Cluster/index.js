@@ -6,7 +6,7 @@ export const ClusterValue = ({
   onClick,
   grow = 1,
   pointerEvents = false,
-  transparent = false,
+  transparent = false
 }) => {
   let valueClass = 'clusterValue'
   if (onClick) valueClass += ' clusterValueClickable'
@@ -64,7 +64,7 @@ export const ClusterBox = ({ title, subtitle, children, style = {}, animationSlo
                 fontSize: '9px',
                 position: 'relative',
                 top: '0px',
-                left: '4px',
+                left: '4px'
               }}
             >
               {`(${subtitle})`}

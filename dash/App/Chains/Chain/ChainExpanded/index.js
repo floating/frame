@@ -12,7 +12,7 @@ import {
   EditChainId,
   EditTestnet,
   EditChainExplorer,
-  ChainFooter,
+  ChainFooter
 } from '../Components'
 
 export default (props) => {
@@ -37,7 +37,7 @@ export default (props) => {
       primaryColor: currentColor,
       isTestnet: currentTestnet,
       symbol: currentSymbol,
-      explorer: currentExplorer,
+      explorer: currentExplorer
     }
     link.send('tray:action', 'updateNetwork', chain, updatedChain)
   }, [currentColor, currentName, currentSymbol, currentExplorer, currentTestnet])
@@ -79,7 +79,7 @@ export default (props) => {
             onClick={() => {
               const confirmAction = {
                 view: 'notify',
-                data: { notify: 'confirmRemoveChain', notifyData: { chain } },
+                data: { notify: 'confirmRemoveChain', notifyData: { chain } }
               }
               link.send('tray:action', 'navDash', confirmAction)
             }}

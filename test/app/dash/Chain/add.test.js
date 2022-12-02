@@ -128,8 +128,8 @@ describe('submitting', () => {
       symbol: 'ETH',
       on: true,
       connection: {
-        primary: { connected: true },
-      },
+        primary: { connected: true }
+      }
     })
 
     const chainConfig = { id: 1, name: 'Mainnet' }
@@ -148,7 +148,7 @@ describe('submitting', () => {
       explorer: 'https://rinkeby.arbiscan.io',
       primaryRpc: 'https://arbitrum-rinkeby.infura.com',
       secondaryRpc: 'https://myrpc.arbrink.net',
-      isTestnet: false,
+      isTestnet: false
     }
 
     const { user, getByRole } = setupComponent(<Chain view='setup' {...chainConfig} />)
@@ -164,7 +164,7 @@ describe('submitting', () => {
       type: 'ethereum',
       isTestnet: false,
       primaryRpc: 'https://arbitrum-rinkeby.infura.com',
-      secondaryRpc: 'https://myrpc.arbrink.net',
+      secondaryRpc: 'https://myrpc.arbrink.net'
     })
   })
 
@@ -174,7 +174,7 @@ describe('submitting', () => {
       name: 'Arbitrum Rinkeby',
       symbol: 'arETH',
       primaryRpc: 'https://arbitrum-rinkeby.infura.com',
-      secondaryRpc: 'https://myrpc.arbrink.net',
+      secondaryRpc: 'https://myrpc.arbrink.net'
     }
 
     const { user, getByRole, getByLabelText } = setupComponent(<Chain view='setup' {...chainConfig} />)
@@ -194,7 +194,7 @@ describe('submitting', () => {
       'tray:addChain',
       expect.objectContaining({
         primaryRpc: 'https://arbitrum-rpc.mydomain.com',
-        secondaryRpc: 'https://myrpc-rinkeby.arbitrum.io',
+        secondaryRpc: 'https://myrpc-rinkeby.arbitrum.io'
       })
     )
   })

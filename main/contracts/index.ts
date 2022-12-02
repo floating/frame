@@ -50,8 +50,8 @@ export function decodeCallData(calldata: string, abi: string) {
         args: abiMethod.inputs.map((input, i) => ({
           name: input.name,
           type: input.type,
-          value: decoded[i].toString(),
-        })),
+          value: decoded[i].toString()
+        }))
       }
     } catch (e) {
       log.warn('unknown ABI method for signature', sighash)

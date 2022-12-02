@@ -9,8 +9,8 @@ const githubReleasesResponse = [
   {
     html_url: 'https://frame.sh/the-next-great-release',
     prerelease: false,
-    tag_name: packageInfo.version,
-  },
+    tag_name: packageInfo.version
+  }
 ]
 
 const currentVersion = packageInfo.version
@@ -42,9 +42,9 @@ it('identifies that a newer version is available', async () => {
     {
       html_url: 'https://frame.sh/cutting-edge-frame-release',
       prerelease: true,
-      tag_name: `v${nextVersion}`,
+      tag_name: `v${nextVersion}`
     },
-    ...githubReleasesResponse,
+    ...githubReleasesResponse
   ]
 
   mockApiResponse(200, response)
@@ -60,9 +60,9 @@ it('ignores a release on the prerelease track', () => {
     {
       html_url: 'https://frame.sh/cutting-edge-frame-release',
       prerelease: true,
-      tag_name: `v${nextVersion}`,
+      tag_name: `v${nextVersion}`
     },
-    ...githubReleasesResponse,
+    ...githubReleasesResponse
   ]
 
   mockApiResponse(200, response)

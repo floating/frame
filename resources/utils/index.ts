@@ -99,5 +99,5 @@ export {
   gweiToWeiHex,
   getAddress,
   stripHexPrefix,
-  matchFilter,
+  matchFilter
 }

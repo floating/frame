@@ -16,7 +16,7 @@ module.exports = async function (params) {
       appBundleId: appId,
       appPath: appPath,
       appleId: process.env.APPLE_ID,
-      appleIdPassword: process.env.APPLE_ID_PASSWORD,
+      appleIdPassword: process.env.APPLE_ID_PASSWORD
     })
 
     // verify signed and notarized application

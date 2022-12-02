@@ -9,7 +9,7 @@ class Verify extends React.Component {
     this.resizeObserver = new ResizeObserver(() => {
       if (this.moduleRef && this.moduleRef.current) {
         link.send('tray:action', 'updateAccountModule', this.props.moduleId, {
-          height: this.moduleRef.current.clientHeight,
+          height: this.moduleRef.current.clientHeight
         })
       }
     })
@@ -18,7 +18,7 @@ class Verify extends React.Component {
       expand: false,
       verifyAddressSuccess: false,
       verifyAddressResponse: '',
-      verifyInProgress: false,
+      verifyInProgress: false
     }
   }
 
@@ -32,7 +32,7 @@ class Verify extends React.Component {
         this.setState({
           verifyInProgress: false,
           verifyAddressSuccess: true,
-          verifyAddressResponse: 'Address matched!',
+          verifyAddressResponse: 'Address matched!'
         })
       }
 

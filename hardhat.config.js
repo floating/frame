@@ -17,7 +17,7 @@ taskWithDefaultParams('send-tx', 'send a test transaction')
 
         const chainId = '0x' + parseInt(chain).toString(16)
         const eth = ethProvider(provider === 'hardhat' ? 'http://127.0.0.1:8545' : provider, {
-          origin: 'frame-hardhat-worker',
+          origin: 'frame-hardhat-worker'
         })
 
         eth
@@ -26,7 +26,7 @@ taskWithDefaultParams('send-tx', 'send a test transaction')
             value: utils.parseEther(amount || '.0002').toHexString(),
             from: accounts[0],
             to,
-            data: '0x',
+            data: '0x'
           }))
           .then((tx) => eth.request({ method: 'eth_sendTransaction', params: [tx], id: 2, chainId }))
           .then((txHash) => {
@@ -49,7 +49,7 @@ taskWithDefaultParams('send-token-approval', 'approve token contract for spendin
 
       const chainId = '0x' + parseInt(chain).toString(16)
       const eth = ethProvider(provider === 'hardhat' ? 'http://127.0.0.1:8545' : provider, {
-        origin: 'frame-hardhat-worker',
+        origin: 'frame-hardhat-worker'
       })
       const abi = new utils.Interface(['function approve(address spender, uint256 value)'])
 
@@ -64,7 +64,7 @@ taskWithDefaultParams('send-token-approval', 'approve token contract for spendin
             value: '0x0',
             from: accounts[0],
             to: contract,
-            data,
+            data
           }
         })
         .then((tx) => {
@@ -85,8 +85,8 @@ const ensActions = {
     return {
       to: '0x283Af0B28c62C092C9727F1Ee09c02CA627EB7F5',
       data: registrarControllerContract.encodeFunctionData('commit', [
-        utils.formatBytes32String('testing-frame'),
-      ]),
+        utils.formatBytes32String('testing-frame')
+      ])
     }
   },
   register: ({ name, account, duration = 31536000 }) => {
@@ -96,28 +96,28 @@ const ensActions = {
         name,
         account,
         duration,
-        utils.formatBytes32String('asupersecret'),
-      ]),
+        utils.formatBytes32String('asupersecret')
+      ])
     }
   },
   renew: ({ name, duration = 31536000 }) => {
     return {
       to: '0x283Af0B28c62C092C9727F1Ee09c02CA627EB7F5',
-      data: registrarControllerContract.encodeFunctionData('renew', [name, duration]),
+      data: registrarControllerContract.encodeFunctionData('renew', [name, duration])
     }
   },
   transfer: ({ account, to, tokenid }) => {
     return {
       to: '0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85',
-      data: registrarContract.encodeFunctionData('transferFrom', [account, to, tokenid]),
+      data: registrarContract.encodeFunctionData('transferFrom', [account, to, tokenid])
     }
   },
   approve: ({ to, tokenid }) => {
     return {
       to: '0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85',
-      data: registrarContract.encodeFunctionData('approve', [to, tokenid]),
+      data: registrarContract.encodeFunctionData('approve', [to, tokenid])
     }
-  },
+  }
 }
 
 taskWithDefaultParams('ens', 'interact with ENS contracts')
@@ -132,7 +132,7 @@ taskWithDefaultParams('ens', 'interact with ENS contracts')
 
       const chainId = '0x' + parseInt(params.chain || 1).toString(16)
       const eth = ethProvider(params.provider === 'hardhat' ? 'http://127.0.0.1:8545' : params.provider, {
-        origin: 'frame-hardhat-worker',
+        origin: 'frame-hardhat-worker'
       })
 
       eth
@@ -142,7 +142,7 @@ taskWithDefaultParams('ens', 'interact with ENS contracts')
           return {
             value: '0x0',
             from: accounts[0],
-            ...contractCall,
+            ...contractCall
           }
         })
         .then((tx) => {
@@ -162,13 +162,13 @@ module.exports = {
       initialBaseFeePerGas: 1_000_000_000,
       forking: {
         url: 'https://eth-rinkeby.alchemyapi.io/v2/NBms1eV9i16RFHpFqQxod56OLdlucIq0',
-        blockNumber: 9161860,
-      },
+        blockNumber: 9161860
+      }
     },
     arbitrum: {
       url: 'http://localhost:1248',
-      gasPrice: 0,
-    },
+      gasPrice: 0
+    }
   },
-  solidity: '0.8.4',
+  solidity: '0.8.4'
 }

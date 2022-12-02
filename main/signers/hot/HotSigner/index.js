@@ -46,7 +46,7 @@ class HotSigner extends Signer {
 
     // Overwrite file
     fs.writeFileSync(signerPath, '00000000000000000000000000000000000000000000000000000000000000000000', {
-      mode: 0o600,
+      mode: 0o600
     })
 
     // Remove file

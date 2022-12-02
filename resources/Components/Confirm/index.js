@@ -5,7 +5,7 @@ export default function ConfirmDialog({
   acceptText = 'OK',
   declineText = 'Decline',
   onAccept,
-  onDecline,
+  onDecline
 }) {
   const [submitted, setSubmitted] = useState(false)
 

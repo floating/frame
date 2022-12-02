@@ -37,7 +37,7 @@ class MockConnection extends EventEmitter {
           return resolve({
             baseFeePerGas: [gweiToHex(15), gweiToHex(8), gweiToHex(9), gweiToHex(8), gweiToHex(7)],
             gasUsedRatio: [0.11, 0.8, 0.2, 0.5],
-            reward: [[gweiToHex(1)], [gweiToHex(1)], [gweiToHex(1)], [gweiToHex(1)]],
+            reward: [[gweiToHex(1)], [gweiToHex(1)], [gweiToHex(1)], [gweiToHex(1)]]
           })
         }
 
@@ -58,20 +58,20 @@ const state = {
   main: {
     currentNetwork: {
       type: 'ethereum',
-      id: '4',
+      id: '4'
     },
     networkPresets: {
       ethereum: {
         default: {
-          local: 'direct',
+          local: 'direct'
         },
         4: {
-          infura: 'infuraRinkeby',
+          infura: 'infuraRinkeby'
         },
         137: {
-          infura: 'infuraPolygon',
-        },
-      },
+          infura: 'infuraPolygon'
+        }
+      }
     },
     networks: {
       ethereum: {
@@ -87,7 +87,7 @@ const state = {
               connected: false,
               type: '',
               network: '',
-              custom: '',
+              custom: ''
             },
             secondary: {
               on: false,
@@ -96,10 +96,10 @@ const state = {
               connected: false,
               type: '',
               network: '',
-              custom: '',
-            },
+              custom: ''
+            }
           },
-          on: true,
+          on: true
         },
         137: {
           id: 137,
@@ -113,7 +113,7 @@ const state = {
               connected: false,
               type: '',
               network: '',
-              custom: '',
+              custom: ''
             },
             secondary: {
               on: false,
@@ -122,12 +122,12 @@ const state = {
               connected: false,
               type: '',
               network: '',
-              custom: '',
-            },
+              custom: ''
+            }
           },
-          on: true,
-        },
-      },
+          on: true
+        }
+      }
     },
     networksMeta: {
       ethereum: {
@@ -135,21 +135,21 @@ const state = {
           gas: {
             price: {
               selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' },
-            },
-          },
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+            }
+          }
         },
         137: {
           gas: {
             price: {
               selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' },
-            },
-          },
-        },
-      },
-    },
-  },
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+            }
+          }
+        }
+      }
+    }
+  }
 }
 
 jest.mock('eth-provider', () => (target) => mockConnections[target].connection)
@@ -161,13 +161,13 @@ const mockConnections = {
   infuraRinkeby: {
     id: '4',
     name: 'rinkeby',
-    connection: new MockConnection(4),
+    connection: new MockConnection(4)
   },
   infuraPolygon: {
     id: '137',
     name: 'polygon',
-    connection: new MockConnection(137),
-  },
+    connection: new MockConnection(137)
+  }
 }
 
 let chains
@@ -223,7 +223,7 @@ Object.values(mockConnections).forEach((chain) => {
   it(`sets legacy gas prices on a new non-London block on ${chain.name}`, (done) => {
     gasPrice = gweiToHex(6)
     block = {
-      number: addHexPrefix((8897988 - 20).toString(16)),
+      number: addHexPrefix((8897988 - 20).toString(16))
     }
 
     observer = store.observer(() => {
@@ -242,7 +242,7 @@ Object.values(mockConnections).forEach((chain) => {
   it(`sets fee market prices on a new London block on ${chain.name}`, (done) => {
     block = {
       number: addHexPrefix((12965200).toString(16)),
-      baseFeePerGas: gweiToHex(9),
+      baseFeePerGas: gweiToHex(9)
     }
 
     const expectedBaseFee = 7e9 * 1.125 * 1.125

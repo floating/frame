@@ -10,7 +10,7 @@ const RESTART_WAIT = 5 // seconds
 // time to wait in between scans, in seconds
 const scanInterval = {
   active: 20,
-  inactive: 60 * 10,
+  inactive: 60 * 10
 }
 
 export default function (store: Store) {
@@ -36,7 +36,7 @@ export default function (store: Store) {
       return ((store('main.balances', address) || []) as Balance[]).filter(
         (balance) => balance.address !== NATIVE_CURRENCY
       )
-    },
+    }
   }
 
   let scan: NodeJS.Timeout | null
@@ -215,7 +215,7 @@ export default function (store: Store) {
         store.setBalance(address, {
           ...balance,
           symbol: storeApi.getNativeCurrencySymbol(balance.chainId),
-          address: NATIVE_CURRENCY,
+          address: NATIVE_CURRENCY
         })
       })
   }

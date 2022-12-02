@@ -9,7 +9,7 @@ import TrezorConnect, {
   DEVICE,
   DEVICE_EVENT,
   UI,
-  UI_EVENT,
+  UI_EVENT
 } from 'trezor-connect'
 
 export class DeviceError extends Error {
@@ -29,7 +29,7 @@ const config = {
   popup: false,
   webusb: false,
   debug: false,
-  lazyLoad: false,
+  lazyLoad: false
 }
 
 async function handleResponse<T>(p: Response<T>) {
@@ -82,7 +82,7 @@ class TrezorBridge extends EventEmitter {
       TrezorConnect.ethereumGetAddress({
         device,
         path,
-        showOnTrezor: display,
+        showOnTrezor: display
       })
     )
 
@@ -95,7 +95,7 @@ class TrezorBridge extends EventEmitter {
         device,
         path,
         message,
-        hex: true,
+        hex: true
       })
     )
 
@@ -108,7 +108,7 @@ class TrezorBridge extends EventEmitter {
         device,
         path,
         data,
-        metamask_v4_compat: true,
+        metamask_v4_compat: true
       })
     )
 
@@ -129,7 +129,7 @@ class TrezorBridge extends EventEmitter {
         data,
         domain_separator_hash: domainSeparatorHash,
         message_hash: messageHash,
-        metamask_v4_compat: true,
+        metamask_v4_compat: true
       })
     )
 
@@ -141,7 +141,7 @@ class TrezorBridge extends EventEmitter {
       TrezorConnect.ethereumSignTransaction({
         device,
         path,
-        transaction: tx,
+        transaction: tx
       })
     )
 
@@ -170,7 +170,7 @@ class TrezorBridge extends EventEmitter {
 
     TrezorConnect.uiResponse({
       type: UI.RECEIVE_PASSPHRASE,
-      payload: { value: '', passphraseOnDevice: true, save: true },
+      payload: { value: '', passphraseOnDevice: true, save: true }
     })
 
     this.emit('trezor:enteringPhrase', deviceId)

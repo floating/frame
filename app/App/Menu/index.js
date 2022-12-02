@@ -10,12 +10,12 @@ class Launcher extends React.Component {
     this.resizeObserver = new ResizeObserver(() => {
       if (this.moduleRef && this.moduleRef.current) {
         link.send('tray:action', 'updateAccountModule', this.props.moduleId, {
-          height: this.moduleRef.current.clientHeight,
+          height: this.moduleRef.current.clientHeight
         })
       }
     })
     this.state = {
-      expand: false,
+      expand: false
     }
     this.e = {
       p: [
@@ -28,9 +28,9 @@ class Launcher extends React.Component {
         'QXJyb3dMZWZ0',
         'QXJyb3dSaWdodA==',
         'Yg==',
-        'YQ==',
+        'YQ=='
       ],
-      i: 0,
+      i: 0
     }
   }
   h(e) {
@@ -76,7 +76,7 @@ class Launcher extends React.Component {
           className={'panelMenuItem panelMenuItemOpen'}
           onClick={() =>
             link.send('tray:action', 'setDash', {
-              showing: !this.store('windows.dash.showing'),
+              showing: !this.store('windows.dash.showing')
             })
           }
           onMouseEnter={() => this.setState({ glitchOn: true })}

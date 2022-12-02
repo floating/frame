@@ -8,7 +8,7 @@ let testConnection = {
     }
 
     return Promise.reject('unsupported method: ' + payload.method)
-  }),
+  })
 }
 
 describe('#getGasPrices', () => {
@@ -16,7 +16,7 @@ describe('#getGasPrices', () => {
 
   beforeEach(() => {
     requestHandlers = {
-      eth_gasPrice: () => gasPrice,
+      eth_gasPrice: () => gasPrice
     }
   })
 
@@ -72,9 +72,9 @@ describe('#getFeePerGas', () => {
           baseFeePerGas: Array(numBlocks).fill('0x8').concat([nextBlockBaseFee]),
           gasUsedRatio: fillEmptySlots(gasUsedRatios, numBlocks, 0).reverse(),
           oldestBlock: '0x89502f',
-          reward: fillEmptySlots(blockRewards, numBlocks, ['0x0']).reverse(),
+          reward: fillEmptySlots(blockRewards, numBlocks, ['0x0']).reverse()
         }
-      },
+      }
     }
   })
 
@@ -114,7 +114,7 @@ describe('#getFeePerGas', () => {
     it('excludes "empty" blocks from the priority fee calculation', async () => {
       // all empty blocks (gas ratios below 0.1) will be excluded from calculating the median priority fee
       gasUsedRatios = [
-        0.01024061496050893, 0.17942918604838942, 0.23114498292513627, 0.0801134637893198, 0.1801134637893198,
+        0.01024061496050893, 0.17942918604838942, 0.23114498292513627, 0.0801134637893198, 0.1801134637893198
       ]
       blockRewards = [['0xee6b2800'], ['0x3b9aca00'], ['0x77359400'], ['0x77359400'], ['0x3b9aca00']]
 

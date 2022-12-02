@@ -20,7 +20,7 @@ export default function rates(pylon: Pylon, store: Store) {
       store.setNativeCurrencyData('ethereum', chainId, currencyData),
     setNativeCurrencyRate: (chainId: number, rate: Rate) =>
       store.setNativeCurrencyData('ethereum', chainId, { usd: rate }),
-    setTokenRates: (rates: Record<Address, UsdRate>) => store.setRates(rates),
+    setTokenRates: (rates: Record<Address, UsdRate>) => store.setRates(rates)
   }
 
   function handleRatesUpdates(updates: RateUpdate[]) {
@@ -34,7 +34,7 @@ export default function rates(pylon: Pylon, store: Store) {
       nativeCurrencyUpdates.forEach((u) => {
         storeApi.setNativeCurrencyRate(u.id.chainId, {
           price: u.data.usd,
-          change24hr: u.data.usd_24h_change,
+          change24hr: u.data.usd_24h_change
         })
       })
     }
@@ -51,8 +51,8 @@ export default function rates(pylon: Pylon, store: Store) {
         allRates[address] = {
           usd: {
             price: update.data.usd,
-            change24hr: update.data.usd_24h_change,
-          },
+            change24hr: update.data.usd_24h_change
+          }
         }
 
         return allRates
@@ -68,7 +68,7 @@ export default function rates(pylon: Pylon, store: Store) {
     const subscribedTokens = knownTokens.map((token) => ({
       type: AssetType.Token,
       chainId: token.chainId,
-      address: token.address,
+      address: token.address
     }))
 
     setAssets([...subscribedCurrencies, ...subscribedTokens])
@@ -105,6 +105,6 @@ export default function rates(pylon: Pylon, store: Store) {
     start,
     stop,
     setAssets,
-    updateSubscription,
+    updateSubscription
   }
 }

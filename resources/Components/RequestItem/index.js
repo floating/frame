@@ -10,7 +10,7 @@ class _RequestItem extends React.Component {
   constructor(props, context) {
     super(props, context)
     this.state = {
-      ago: this.getElapsedTime() + ' ago',
+      ago: this.getElapsedTime() + ' ago'
     }
   }
   getElapsedTime() {
@@ -65,11 +65,11 @@ class _RequestItem extends React.Component {
                   data: {
                     step: 'confirm',
                     accountId: account,
-                    requestId: req.handlerId,
+                    requestId: req.handlerId
                   },
                   position: {
-                    bottom: req.type === 'transaction' ? '200px' : '140px',
-                  },
+                    bottom: req.type === 'transaction' ? '200px' : '140px'
+                  }
                 }
                 link.send('nav:forward', 'panel', crumb)
               }
@@ -79,7 +79,7 @@ class _RequestItem extends React.Component {
         <div
           className='requestItemBackground'
           style={{
-            background: `linear-gradient(180deg, ${color} 0%, transparent 80%)`,
+            background: `linear-gradient(180deg, ${color} 0%, transparent 80%)`
           }}
         />
         <div className='requestItemTitle'>

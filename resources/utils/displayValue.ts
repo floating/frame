@@ -5,23 +5,23 @@ const displayUnitMapping = {
   million: {
     lowerBound: BigNumber('1000000'),
     upperBound: BigNumber('1000000000'),
-    unitDisplay: 'M',
+    unitDisplay: 'M'
   },
   billion: {
     lowerBound: BigNumber('1000000000'),
     upperBound: BigNumber('1000000000000'),
-    unitDisplay: 'B',
+    unitDisplay: 'B'
   },
   trillion: {
     lowerBound: BigNumber('1000000000000'),
     upperBound: BigNumber('1000000000000000'),
-    unitDisplay: 'T',
+    unitDisplay: 'T'
   },
   quadrillion: {
     lowerBound: BigNumber('1000000000000000'),
     upperBound: BigNumber('999999000000000000000'),
-    unitDisplay: 'Q',
-  },
+    unitDisplay: 'Q'
+  }
 }
 
 function isLargeNumber(bn: BigNumber) {
@@ -39,14 +39,14 @@ function getDisplay(bn: BigNumber, type: string, decimals: number, displayFullVa
   if (value.isZero()) {
     return {
       approximationSymbol: '<',
-      displayValue: BigNumber(`1e-${decimals}`).toFormat(),
+      displayValue: BigNumber(`1e-${decimals}`).toFormat()
     }
   }
 
   // small numbers
   if (displayFullValue || !isLargeNumber(value)) {
     return {
-      displayValue: value.toFormat(type === 'fiat' ? decimals : undefined),
+      displayValue: value.toFormat(type === 'fiat' ? decimals : undefined)
     }
   }
 
@@ -60,8 +60,8 @@ function getDisplay(bn: BigNumber, type: string, decimals: number, displayFullVa
           .toFormat(),
         displayUnit: {
           fullName: unitName,
-          shortName: unitDisplay,
-        },
+          shortName: unitDisplay
+        }
       }
     }
   }
@@ -75,8 +75,8 @@ function getDisplay(bn: BigNumber, type: string, decimals: number, displayFullVa
     displayValue: '999,999',
     displayUnit: {
       fullName: lastDisplayUnitKey,
-      shortName: lastDisplayUnitValue.unitDisplay,
-    },
+      shortName: lastDisplayUnitValue.unitDisplay
+    }
   }
 }
 
@@ -94,7 +94,7 @@ export function displayValueData(sourceValue: SourceValue, params: DisplayValueD
     currencyRate,
     decimals = 18,
     isTestnet = false,
-    displayFullValue = false,
+    displayFullValue = false
   } = (params || {}) as DisplayValueDataParams
 
   const bn = BigNumber(sourceValue, isHexString(sourceValue) ? 16 : undefined)
@@ -107,13 +107,13 @@ export function displayValueData(sourceValue: SourceValue, params: DisplayValueD
       if (isTestnet || value.isNaN()) {
         return {
           value,
-          displayValue: '?',
+          displayValue: '?'
         }
       }
 
       return {
         value,
-        ...getDisplay(value, 'fiat', displayedDecimals, displayFullValue),
+        ...getDisplay(value, 'fiat', displayedDecimals, displayFullValue)
       }
     },
     ether: ({ displayDecimals } = { displayDecimals: true }) => {
@@ -131,7 +131,7 @@ export function displayValueData(sourceValue: SourceValue, params: DisplayValueD
 
       return {
         value,
-        ...getDisplay(value, 'ether', getDisplayedDecimals(), displayFullValue),
+        ...getDisplay(value, 'ether', getDisplayedDecimals(), displayFullValue)
       }
     },
     gwei: () => {
@@ -139,17 +139,17 @@ export function displayValueData(sourceValue: SourceValue, params: DisplayValueD
 
       return {
         value,
-        displayValue: value.isZero() ? '0' : value.toFormat(),
+        displayValue: value.isZero() ? '0' : value.toFormat()
       }
     },
     wei: () => ({
       value: bn,
-      displayValue: bn.toFormat(0),
-    }),
+      displayValue: bn.toFormat(0)
+    })
   }
 
   return {
     bn,
-    ...currencyHelperMap,
+    ...currencyHelperMap
   }
 }

@@ -7,7 +7,7 @@ export interface Request {
 
 const noRequest = {
   type: 'emptyQueue',
-  execute: () => Promise.resolve(),
+  execute: () => Promise.resolve()
 }
 
 export class RequestQueue {

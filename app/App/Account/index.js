@@ -14,7 +14,7 @@ class _Footer extends React.Component {
   constructor(...args) {
     super(...args)
     this.state = {
-      allowInput: true,
+      allowInput: true
     }
   }
   approve(reqId, req) {
@@ -150,7 +150,7 @@ class _Footer extends React.Component {
                       link.send('tray:resolveRequest', req, null)
                       link.send('tray:action', 'navDash', {
                         view: 'notify',
-                        data: { notify: 'addToken', notifyData: { token: req.token } },
+                        data: { notify: 'addToken', notifyData: { token: req.token } }
                       })
                     }
                   }}
@@ -176,7 +176,7 @@ class Main extends React.Component {
   constructor(...args) {
     super(...args)
     this.state = {
-      accountFilter: '',
+      accountFilter: ''
     }
   }
 

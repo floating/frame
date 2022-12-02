@@ -6,7 +6,7 @@ export enum Derivation {
   live = 'live',
   legacy = 'legacy',
   standard = 'standard',
-  testnet = 'testnet',
+  testnet = 'testnet'
 }
 
 export function deriveHDAccounts(publicKey: string, chainCode: string, cb: Callback<string[]>) {
@@ -34,7 +34,7 @@ const derivationPaths: { [key: string]: string } = {
   [Derivation.legacy.valueOf()]: "44'/60'/0'/<index>",
   [Derivation.standard.valueOf()]: "44'/60'/0'/0/<index>",
   [Derivation.testnet.valueOf()]: "44'/1'/0'/0/<index>",
-  [Derivation.live.valueOf()]: "44'/60'/<index>'/0/0",
+  [Derivation.live.valueOf()]: "44'/60'/<index>'/0/0"
 }
 
 export function getDerivationPath(derivation: Derivation, index = -1) {

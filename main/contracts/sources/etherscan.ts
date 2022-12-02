@@ -32,7 +32,7 @@ const endpointMap = {
   137: (contractAddress: Address) =>
     getEndpoint('api.polygonscan.com', contractAddress, '2P3U9T63MT26T1X64AAE368UNTS9RKEEBB'),
   42161: (contractAddress: Address) =>
-    getEndpoint('api.arbiscan.io', contractAddress, 'VP126CP67QVH9ZEKAZT1UZ751VZ6ZTIZAD'),
+    getEndpoint('api.arbiscan.io', contractAddress, 'VP126CP67QVH9ZEKAZT1UZ751VZ6ZTIZAD')
 }
 
 async function parseResponse<T>(response: Response): Promise<T | undefined> {
@@ -93,7 +93,7 @@ export async function fetchEtherscanContract(
       return {
         abi: source.ABI,
         name: source.ContractName,
-        source: endpoint.match(sourceCapture)?.groups?.source || '',
+        source: endpoint.match(sourceCapture)?.groups?.source || ''
       }
     }
   } catch (e) {

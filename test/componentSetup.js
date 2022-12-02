@@ -13,8 +13,8 @@ export function setupComponent(jsx, options = {}) {
   return {
     user: userEvent.setup({
       ...options,
-      advanceTimers: options.advanceTimers || advanceTimers,
+      advanceTimers: options.advanceTimers || advanceTimers
     }),
-    ...render(jsx),
+    ...render(jsx)
   }
 }

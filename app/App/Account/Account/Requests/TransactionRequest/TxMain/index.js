@@ -12,7 +12,7 @@ class TxSending extends React.Component {
   constructor(...args) {
     super(...args)
     this.state = {
-      copied: false,
+      copied: false
     }
   }
 
@@ -34,7 +34,7 @@ class TxSending extends React.Component {
     const isTestnet = this.store('main.networks', this.props.chain.type, this.props.chain.id, 'isTestnet')
     const {
       nativeCurrency,
-      nativeCurrency: { symbol: currentSymbol = '?' },
+      nativeCurrency: { symbol: currentSymbol = '?' }
     } = this.store('main.networksMeta', this.props.chain.type, this.props.chain.id)
     const chainName = this.store('main.networks.ethereum', this.props.chain.id, 'name')
 

@@ -18,7 +18,7 @@ beforeAll(() => {
     name: 'Leetnet',
     explorer: 'https://etherscan.io',
     symbol: 'ETH',
-    on: true,
+    on: true
   })
 })
 
@@ -61,7 +61,7 @@ describe('updating', () => {
       name: 'Leetnet',
       explorer: 'https://etherscan.io',
       symbol: 'ETH',
-      on: true,
+      on: true
     }
 
     const { user, getByRole } = setupComponent(<Chain view='expanded' {...chainConfig} />)
@@ -71,7 +71,7 @@ describe('updating', () => {
       'tray:action',
       'navDash',
       expect.objectContaining({
-        view: 'notify',
+        view: 'notify'
       })
     )
   })

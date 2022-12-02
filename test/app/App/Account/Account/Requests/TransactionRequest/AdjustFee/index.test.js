@@ -22,9 +22,9 @@ beforeEach(() => {
       type: '0x2',
       gasLimit: '0x61a8',
       maxPriorityFeePerGas: addHexPrefix((3e9).toString(16)),
-      maxFeePerGas: addHexPrefix((7e9).toString(16)),
+      maxFeePerGas: addHexPrefix((7e9).toString(16))
     },
-    handlerId: '1',
+    handlerId: '1'
   }
 })
 
@@ -55,7 +55,7 @@ describe('base fee input', () => {
     { amount: '9.2', submitted: '9.2' },
     { amount: '9.222222222222222', submitted: '9.222222222' },
     { amount: '9.500000', submitted: '9.5' },
-    { amount: 'gh-5.86bf', submitted: '5.86' },
+    { amount: 'gh-5.86bf', submitted: '5.86' }
   ]
 
   submittedAmounts.forEach((spec) => {
@@ -267,7 +267,7 @@ describe('priority fee input', () => {
     { amount: '9.2', submitted: '9.2' },
     { amount: '9.222222222222222', submitted: '9.222222222' },
     { amount: '9.500000', submitted: '9.5' },
-    { amount: 'gh-5.86bf', submitted: '5.86' },
+    { amount: 'gh-5.86bf', submitted: '5.86' }
   ]
 
   submittedAmounts.forEach((spec) => {
@@ -458,7 +458,7 @@ describe('gas limit input', () => {
     { amount: (100e9).toString(), submitted: '12500000' },
     { amount: (1e9).toString(), submitted: '12500000' },
     { amount: '9.2', submitted: '92' },
-    { amount: 'gh-5.86bf', submitted: '586' },
+    { amount: 'gh-5.86bf', submitted: '586' }
   ]
 
   submittedAmounts.forEach((spec) => {
@@ -603,9 +603,9 @@ describe('legacy transactions', () => {
       data: {
         type: '0x0',
         gasLimit: '0x61a8',
-        gasPrice: addHexPrefix((7e9).toString(16)),
+        gasPrice: addHexPrefix((7e9).toString(16))
       },
-      handlerId: '1',
+      handlerId: '1'
     }
   })
 
@@ -630,7 +630,7 @@ describe('legacy transactions', () => {
       { amount: '9.2', submitted: '9.2' },
       { amount: '9.222222222222222', submitted: '9.222222222' },
       { amount: '9.500000', submitted: '9.5' },
-      { amount: 'gh-5.86bf', submitted: '5.86' },
+      { amount: 'gh-5.86bf', submitted: '5.86' }
     ]
 
     submittedAmounts.forEach((spec) => {

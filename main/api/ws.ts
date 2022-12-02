@@ -132,7 +132,7 @@ const handler = (socket: FrameWebSocket, req: IncomingMessage) => {
           id: 1,
           method: 'eth_unsubscribe',
           _origin: subs[sub].originId,
-          params: [sub],
+          params: [sub]
         })
         delete subs[sub]
       }

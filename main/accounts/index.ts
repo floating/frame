@@ -24,7 +24,7 @@ import {
   ReplacementType,
   RequestStatus,
   RequestMode,
-  TypedMessage,
+  TypedMessage
 } from './types'
 
 import type { Chain } from '../chains'
@@ -51,7 +51,7 @@ const storeApi = {
   },
   getSigners: function () {
     return Object.values((store('main.signers') || {}) as Record<string, Signer>)
-  },
+  }
 }
 
 export {
@@ -61,7 +61,7 @@ export {
   TransactionRequest,
   SignTypedDataRequest,
   AddChainRequest,
-  AddTokenRequest,
+  AddTokenRequest
 } from './types'
 
 export class Accounts extends EventEmitter {
@@ -102,7 +102,7 @@ export class Accounts extends EventEmitter {
     const accountOpts = {
       ...account,
       lastSignerType: getSignerType(account.lastSignerType),
-      options: { type: 'aragon' },
+      options: { type: 'aragon' }
     }
 
     this.accounts[account.address] = new FrameAccount(accountOpts, this)
@@ -218,8 +218,8 @@ export class Accounts extends EventEmitter {
                 to: currentAccount.getSelectedAddress(),
                 value: '0x0',
                 nonce: data.nonce,
-                chainId: addHexPrefix(targetChain.id.toString(16)),
-              },
+                chainId: addHexPrefix(targetChain.id.toString(16))
+              }
             ]
 
       const _origin = type === ReplacementType.Speed ? currentAccount.requests[id].origin : frameOriginId
@@ -230,7 +230,7 @@ export class Accounts extends EventEmitter {
         method: 'eth_sendTransaction',
         chainId: addHexPrefix(targetChain.id.toString(16)),
         params,
-        _origin,
+        _origin
       }
 
       this.sendRequest(tx, (res: RPCResponsePayload) => {
@@ -245,7 +245,7 @@ export class Accounts extends EventEmitter {
       method,
       params,
       chainId,
-      _origin = frameOriginId,
+      _origin = frameOriginId
     }: { method: string; params: any[]; chainId: string; _origin?: string },
     cb: RPCRequestCallback
   ) {
@@ -277,7 +277,7 @@ export class Accounts extends EventEmitter {
                 txRequest.tx = {
                   ...txRequest.tx,
                   receipt: receiptRes.result,
-                  confirmations: txRequest.tx?.confirmations || 0,
+                  confirmations: txRequest.tx?.confirmations || 0
                 }
 
                 account.update()
@@ -367,7 +367,7 @@ export class Accounts extends EventEmitter {
     } else {
       const targetChain: Chain = {
         type: 'ethereum',
-        id: parseInt(rawTx.chainId, 16),
+        id: parseInt(rawTx.chainId, 16)
       }
 
       const targetChainId = addHexPrefix(targetChain.id.toString(16))
@@ -947,7 +947,7 @@ export class Accounts extends EventEmitter {
         gasLimit,
         currentBaseFee,
         txType,
-        gasPrice: 0,
+        gasPrice: 0
       }
     } else {
       const gasPrice = parseInt(tx.gasPrice || '0x0', 16)
@@ -959,7 +959,7 @@ export class Accounts extends EventEmitter {
         txType,
         currentBaseFee: 0,
         maxPriorityFeePerGas: 0,
-        maxFeePerGas: 0,
+        maxFeePerGas: 0
       }
     }
   }
@@ -1015,7 +1015,7 @@ export class Accounts extends EventEmitter {
     const previousFee = {
       type: txType,
       baseFee: intToHex(currentBaseFee),
-      priorityFee: intToHex(maxPriorityFeePerGas),
+      priorityFee: intToHex(maxPriorityFeePerGas)
     }
 
     this.completeTxFeeUpdate(currentAccount, handlerId, userUpdate, previousFee)
@@ -1054,7 +1054,7 @@ export class Accounts extends EventEmitter {
     const previousFee = {
       type: txType,
       baseFee: intToHex(currentBaseFee),
-      priorityFee: intToHex(maxPriorityFeePerGas),
+      priorityFee: intToHex(maxPriorityFeePerGas)
     }
 
     // Complete update
@@ -1083,7 +1083,7 @@ export class Accounts extends EventEmitter {
 
     const previousFee = {
       type: txType,
-      gasPrice: intToHex(gasPrice),
+      gasPrice: intToHex(gasPrice)
     }
 
     // Complete update

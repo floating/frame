@@ -8,8 +8,8 @@ let socketConnection, mockSocket
 
 const extensionRequest = {
   headers: {
-    origin: 'chrome-extension://ldcoohedfbjoobcadoglnnmmfbdlmmhf',
-  },
+    origin: 'chrome-extension://ldcoohedfbjoobcadoglnnmmfbdlmmhf'
+  }
 }
 
 jest.mock('ws')

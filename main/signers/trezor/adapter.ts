@@ -169,12 +169,12 @@ export default class TrezorSignerAdapter extends SignerAdapter {
     store.navReplace('dash', [
       {
         view: 'expandedSigner',
-        data: { signer: trezor.id },
+        data: { signer: trezor.id }
       },
       {
         view: 'accounts',
-        data: {},
-      },
+        data: {}
+      }
     ])
 
     setTimeout(() => {

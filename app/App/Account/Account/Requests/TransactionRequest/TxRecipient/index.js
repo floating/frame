@@ -8,7 +8,7 @@ import {
   ClusterBox,
   Cluster,
   ClusterRow,
-  ClusterValue,
+  ClusterValue
 } from '../../../../../../../resources/Components/Cluster'
 import { getAddress } from '../../../../../../../resources/utils'
 
@@ -16,7 +16,7 @@ class TxRecipient extends React.Component {
   constructor(...args) {
     super(...args)
     this.state = {
-      copied: false,
+      copied: false
     }
   }
 

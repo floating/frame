@@ -23,7 +23,7 @@ const resError = (error, payload, res) =>
   res({
     id: payload.id,
     jsonrpc: payload.jsonrpc,
-    error: typeof error === 'string' ? { message: error, code: -1 } : error,
+    error: typeof error === 'string' ? { message: error, code: -1 } : error
   })
 
 class ChainConnection extends EventEmitter {
@@ -41,7 +41,7 @@ class ChainConnection extends EventEmitter {
       network: '',
       type: '',
       currentTarget: '',
-      connected: false,
+      connected: false
     }
 
     this.secondary = {
@@ -49,7 +49,7 @@ class ChainConnection extends EventEmitter {
       network: '',
       type: '',
       currentTarget: '',
-      connected: false,
+      connected: false
     }
 
     this.observer = store.observer(() => {
@@ -64,7 +64,7 @@ class ChainConnection extends EventEmitter {
     this[priority].provider = provider(target, {
       name: priority,
       infuraId: '786ade30f36244469480aa5c2bf0743b',
-      alchemyId: 'NBms1eV9i16RFHpFqQxod56OLdlucIq0',
+      alchemyId: 'NBms1eV9i16RFHpFqQxod56OLdlucIq0'
     })
     this[priority].blockMonitor = this._createBlockMonitor(this[priority].provider, priority)
   }
@@ -113,7 +113,7 @@ class ChainConnection extends EventEmitter {
 
           store.setGasPrices(this.type, this.chainId, {
             ...gas,
-            custom: customLevel || gas.fast,
+            custom: customLevel || gas.fast
           })
         }
 
@@ -261,7 +261,7 @@ class ChainConnection extends EventEmitter {
         this.resetConnection('secondary', 'disconnected')
       } else if (!this.secondary.provider || this.secondary.currentTarget !== secondaryTarget) {
         log.info("Creating secondary connection because it didn't exist or the target changed", {
-          secondaryTarget,
+          secondaryTarget
         })
 
         this.resetConnection('secondary', 'loading', secondaryTarget)
@@ -329,7 +329,7 @@ class ChainConnection extends EventEmitter {
         this.resetConnection('primary', 'disconnected')
       } else if (!this.primary.provider || this.primary.currentTarget !== primaryTarget) {
         log.info("Creating primary connection because it didn't exist or the target changed", {
-          primaryTarget,
+          primaryTarget
         })
 
         this.resetConnection('primary', 'loading', primaryTarget)

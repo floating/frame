@@ -37,7 +37,7 @@ export const Status = {
   PAIRING_FAILED: 'Pairing Failed',
   UNKNOWN_ERROR: 'Unknown Device Error',
   DISCONNECTED: 'disconnected',
-  NEEDS_RECONNECTION: 'Please reload this Lattice1 device',
+  NEEDS_RECONNECTION: 'Please reload this Lattice1 device'
 }
 
 function devicePermission(tag: string) {
@@ -91,7 +91,7 @@ export default class Lattice extends Signer {
     this.connection = new Client({
       name: devicePermission(this.tag),
       baseUrl,
-      privKey: privateKey,
+      privKey: privateKey
     })
 
     try {
@@ -192,7 +192,7 @@ export default class Lattice extends Signer {
       while (this.addresses.length < this.accountLimit) {
         const req = {
           startPath: this.getPath(this.addresses.length),
-          n: Math.min(addressLimit, this.accountLimit - this.addresses.length),
+          n: Math.min(addressLimit, this.accountLimit - this.addresses.length)
         }
 
         const loadedAddresses = await connection.getAddresses(req)
@@ -294,7 +294,7 @@ export default class Lattice extends Signer {
         return {
           v: sig.v.toString('hex'),
           r: sig.r.toString('hex'),
-          s: sig.s.toString('hex'),
+          s: sig.s.toString('hex')
         }
       })
 
@@ -311,7 +311,7 @@ export default class Lattice extends Signer {
     return {
       ...summary,
       tag: this.tag,
-      addresses: this.addresses.slice(0, this.accountLimit || this.addresses.length),
+      addresses: this.addresses.slice(0, this.accountLimit || this.addresses.length)
     }
   }
 
@@ -321,12 +321,12 @@ export default class Lattice extends Signer {
     const data = {
       protocol,
       payload,
-      signerPath: this.getPath(index),
+      signerPath: this.getPath(index)
     }
 
     const signOpts = {
       currency: 'ETH_MSG',
-      data: data,
+      data: data
     }
 
     const result = await connection.sign(signOpts)
@@ -349,7 +349,7 @@ export default class Lattice extends Signer {
       nonce: hexToInt(txJson.nonce || ''),
       gasLimit: hexToInt(txJson.gasLimit || ''),
       useEIP155: true,
-      signerPath: this.getPath(index),
+      signerPath: this.getPath(index)
     }
 
     if (type) {
@@ -386,7 +386,7 @@ export default class Lattice extends Signer {
         hashType: Constants.SIGNING.HASHES.KECCAK256,
         encodingType: Constants.SIGNING.ENCODINGS.EVM,
         signerPath: unsignedTx.signerPath,
-        decoder: callDataDecoder?.def,
+        decoder: callDataDecoder?.def
       }
 
       return { data, currency: unsignedTx.currency }

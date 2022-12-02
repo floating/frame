@@ -125,5 +125,5 @@ module.exports = {
     setTimeout(scan, 4000)
 
     return scan
-  },
+  }
 }

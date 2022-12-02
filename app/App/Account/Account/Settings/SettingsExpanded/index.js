@@ -13,14 +13,14 @@ class Settings extends React.Component {
       this.resizeObserver = new ResizeObserver(() => {
         if (this.moduleRef && this.moduleRef.current) {
           link.send('tray:action', 'updateAccountModule', this.props.moduleId, {
-            height: this.moduleRef.current.clientHeight,
+            height: this.moduleRef.current.clientHeight
           })
         }
       })
     }
     this.state = {
       expand: false,
-      name: '',
+      name: ''
     }
   }
 

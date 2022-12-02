@@ -21,7 +21,7 @@ import {
   updateNetwork as updateNetworkAction,
   activateNetwork as activateNetworkAction,
   setBlockHeight as setBlockHeightAction,
-  updateAccount as updateAccountAction,
+  updateAccount as updateAccountAction
 } from '../../../../main/store/actions'
 import { toTokenId } from '../../../../resources/domain/balance'
 
@@ -40,14 +40,14 @@ const testTokens = {
     chainId: 1,
     address: '0xe41d2489571d322189246dafa5ebde1f4699f498',
     symbol: 'ZRX',
-    decimals: 18,
+    decimals: 18
   },
   badger: {
     chainId: 42161,
     address: '0xbfa641051ba0a0ad1b0acf549a89536a0d76472e',
     symbol: 'BADGER',
-    decimals: 18,
-  },
+    decimals: 18
+  }
 }
 
 describe('#addNetwork', () => {
@@ -57,7 +57,7 @@ describe('#addNetwork', () => {
     type: 'ethereum',
     layer: 'sidechain',
     explorer: 'https://polygonscan.com',
-    symbol: 'MATIC',
+    symbol: 'MATIC'
   }
 
   let networks, networksMeta
@@ -144,7 +144,7 @@ describe('#addNetwork', () => {
       connected: false,
       type: '',
       network: '',
-      custom: '',
+      custom: ''
     })
   })
 
@@ -158,7 +158,7 @@ describe('#addNetwork', () => {
       connected: false,
       type: '',
       network: '',
-      custom: '',
+      custom: ''
     })
   })
 
@@ -168,8 +168,8 @@ describe('#addNetwork', () => {
     expect(networks.ethereum['137'].gas).toEqual({
       price: {
         selected: 'standard',
-        levels: { slow: '', standard: '', fast: '', asap: '', custom: '' },
-      },
+        levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+      }
     })
   })
 
@@ -183,14 +183,14 @@ describe('#addNetwork', () => {
         symbol: 'MATIC',
         name: '',
         icon: '',
-        decimals: 18,
+        decimals: 18
       },
       gas: {
         price: {
           selected: 'standard',
-          levels: { slow: '', standard: '', fast: '', asap: '', custom: '' },
-        },
-      },
+          levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+        }
+      }
     })
   })
 
@@ -244,7 +244,7 @@ describe('#addNetwork', () => {
       type: 'ethereum',
       name: 'Matic v1',
       explorer: 'https://rpc-mainnet.maticvigil.com',
-      symbol: 'MATIC',
+      symbol: 'MATIC'
     })
 
     expect(networks.ethereum['137'].name).toBe('Polygon')
@@ -268,8 +268,8 @@ describe('#setBalances', () => {
     balances = [
       {
         ...testTokens.badger,
-        balance: addHexPrefix(new BigNumber(30.5).toString(16)),
-      },
+        balance: addHexPrefix(new BigNumber(30.5).toString(16))
+      }
     ]
   })
 
@@ -277,19 +277,19 @@ describe('#setBalances', () => {
     setBalances([
       {
         ...testTokens.zrx,
-        balance: addHexPrefix(new BigNumber(7983.2332).toString(16)),
-      },
+        balance: addHexPrefix(new BigNumber(7983.2332).toString(16))
+      }
     ])
 
     expect(balances).toEqual([
       {
         ...testTokens.badger,
-        balance: addHexPrefix(new BigNumber(30.5).toString(16)),
+        balance: addHexPrefix(new BigNumber(30.5).toString(16))
       },
       {
         ...testTokens.zrx,
-        balance: addHexPrefix(new BigNumber(7983.2332).toString(16)),
-      },
+        balance: addHexPrefix(new BigNumber(7983.2332).toString(16))
+      }
     ])
   })
 
@@ -297,15 +297,15 @@ describe('#setBalances', () => {
     setBalances([
       {
         ...testTokens.badger,
-        balance: addHexPrefix(new BigNumber(41.9).toString(16)),
-      },
+        balance: addHexPrefix(new BigNumber(41.9).toString(16))
+      }
     ])
 
     expect(balances).toEqual([
       {
         ...testTokens.badger,
-        balance: addHexPrefix(new BigNumber(41.9).toString(16)),
-      },
+        balance: addHexPrefix(new BigNumber(41.9).toString(16))
+      }
     ])
   })
 
@@ -313,15 +313,15 @@ describe('#setBalances', () => {
     setBalances([
       {
         ...testTokens.badger,
-        balance: '0x0',
-      },
+        balance: '0x0'
+      }
     ])
 
     expect(balances).toEqual([
       {
         ...testTokens.badger,
-        balance: '0x0',
-      },
+        balance: '0x0'
+      }
     ])
   })
 })
@@ -331,23 +331,23 @@ describe('#removeBalance', () => {
     [owner]: [
       {
         ...testTokens.zrx,
-        balance: addHexPrefix(BigNumber('798.564').toString(16)),
+        balance: addHexPrefix(BigNumber('798.564').toString(16))
       },
       {
         ...testTokens.badger,
-        balance: addHexPrefix(BigNumber('15.543').toString(16)),
-      },
+        balance: addHexPrefix(BigNumber('15.543').toString(16))
+      }
     ],
     '0xd0e3872f5fa8ecb49f1911f605c0da90689a484e': [
       {
         ...testTokens.zrx,
-        balance: addHexPrefix(BigNumber('8201.343').toString(16)),
+        balance: addHexPrefix(BigNumber('8201.343').toString(16))
       },
       {
         ...testTokens.badger,
-        balance: addHexPrefix(BigNumber('101.988').toString(16)),
-      },
-    ],
+        balance: addHexPrefix(BigNumber('101.988').toString(16))
+      }
+    ]
   }
 
   const updaterFn = (node, update) => {
@@ -394,7 +394,7 @@ describe('#addCustomTokens', () => {
 
     const updatedBadgerToken = {
       ...testTokens.badger,
-      symbol: 'BAD',
+      symbol: 'BAD'
     }
 
     addTokens([updatedBadgerToken])
@@ -432,7 +432,7 @@ describe('#removeCustomTokens', () => {
     const tokenToRemove = {
       chainId: 1,
       address: '0x383518188c0c6d7730d91b2c03a03c837814a899',
-      symbol: 'OHM',
+      symbol: 'OHM'
     }
 
     removeTokens([tokenToRemove])
@@ -443,7 +443,7 @@ describe('#removeCustomTokens', () => {
   it('does not remove a token with the same address but different chain id', () => {
     const tokenToRemove = {
       ...testTokens.badger,
-      chainId: 1,
+      chainId: 1
     }
 
     tokens = [testTokens.zrx, testTokens.badger, tokenToRemove]
@@ -456,7 +456,7 @@ describe('#removeCustomTokens', () => {
   it('does not remove a token with the same chain id but different address', () => {
     const tokenToRemove = {
       ...testTokens.zrx,
-      address: '0xa7a82dd06901f29ab14af63faf3358ad101724a8',
+      address: '0xa7a82dd06901f29ab14af63faf3358ad101724a8'
     }
 
     tokens = [testTokens.zrx, testTokens.badger, tokenToRemove]
@@ -493,7 +493,7 @@ describe('#addKnownTokens', () => {
 
     const updatedBadgerToken = {
       ...testTokens.badger,
-      symbol: 'BAD',
+      symbol: 'BAD'
     }
 
     addTokens([updatedBadgerToken])
@@ -562,13 +562,13 @@ describe('#initOrigin', () => {
       name: 'frame.test',
       chain: {
         id: 137,
-        type: 'ethereum',
+        type: 'ethereum'
       },
       session: {
         requests: 1,
         startedAt: creationDate.getTime(),
-        lastUpdatedAt: creationDate.getTime(),
-      },
+        lastUpdatedAt: creationDate.getTime()
+      }
     })
   })
 })
@@ -587,7 +587,7 @@ describe('#clearOrigins', () => {
     origins = {
       '91f6971d-ba85-52d7-a27e-6af206eb2433': {},
       '8073729a-5e59-53b7-9e69-5d9bcff94087': {},
-      'd7acc008-6411-5486-bb2d-0c0cfcddbb92': {},
+      'd7acc008-6411-5486-bb2d-0c0cfcddbb92': {}
     }
   })
 
@@ -611,7 +611,7 @@ describe('#removeOrigin', () => {
     origins = {
       '91f6971d-ba85-52d7-a27e-6af206eb2433': {},
       '8073729a-5e59-53b7-9e69-5d9bcff94087': {},
-      'd7acc008-6411-5486-bb2d-0c0cfcddbb92': {},
+      'd7acc008-6411-5486-bb2d-0c0cfcddbb92': {}
     }
   })
 
@@ -620,7 +620,7 @@ describe('#removeOrigin', () => {
 
     expect(origins).toEqual({
       '91f6971d-ba85-52d7-a27e-6af206eb2433': {},
-      'd7acc008-6411-5486-bb2d-0c0cfcddbb92': {},
+      'd7acc008-6411-5486-bb2d-0c0cfcddbb92': {}
     })
   })
 })
@@ -648,8 +648,8 @@ describe('#addOriginRequest', () => {
         session: {
           requests: 3,
           startedAt: creationTime,
-          lastUpdatedAt: creationTime,
-        },
+          lastUpdatedAt: creationTime
+        }
       },
       staleOrigin: {
         chain: { id: 42161, type: 'ethereum' },
@@ -657,9 +657,9 @@ describe('#addOriginRequest', () => {
           requests: 14,
           startedAt: creationTime,
           endedAt: endTime,
-          lastUpdatedAt: endTime,
-        },
-      },
+          lastUpdatedAt: endTime
+        }
+      }
     }
   })
 
@@ -706,8 +706,8 @@ describe('#switchOriginChain', () => {
   beforeEach(() => {
     origins = {
       '91f6971d-ba85-52d7-a27e-6af206eb2433': {
-        chain: { id: 1, type: 'ethereum' },
-      },
+        chain: { id: 1, type: 'ethereum' }
+      }
     }
   })
 
@@ -733,38 +733,38 @@ describe('#removeNetwork', () => {
     main = {
       origins: {
         '91f6971d-ba85-52d7-a27e-6af206eb2433': {
-          chain: { id: 1, type: 'ethereum' },
+          chain: { id: 1, type: 'ethereum' }
         },
         '8073729a-5e59-53b7-9e69-5d9bcff94087': {
-          chain: { id: 4, type: 'ethereum' },
+          chain: { id: 4, type: 'ethereum' }
         },
         'd7acc008-6411-5486-bb2d-0c0cfcddbb92': {
-          chain: { id: 50, type: 'cosmos' },
+          chain: { id: 50, type: 'cosmos' }
         },
         '695112ec-43e2-52a8-8f69-5c36837d6d13': {
-          chain: { id: 4, type: 'ethereum' },
-        },
+          chain: { id: 4, type: 'ethereum' }
+        }
       },
       networks: {
         ethereum: {
           1: {},
           4: {},
-          137: {},
+          137: {}
         },
         cosmos: {
-          50: {},
-        },
+          50: {}
+        }
       },
       networksMeta: {
         ethereum: {
           1: {},
           4: {},
-          137: {},
+          137: {}
         },
         cosmos: {
-          50: {},
-        },
-      },
+          50: {}
+        }
+      }
     }
   })
 
@@ -783,17 +783,17 @@ describe('#removeNetwork', () => {
 
     expect(main.origins).toStrictEqual({
       '91f6971d-ba85-52d7-a27e-6af206eb2433': {
-        chain: { id: 1, type: 'ethereum' },
+        chain: { id: 1, type: 'ethereum' }
       },
       '8073729a-5e59-53b7-9e69-5d9bcff94087': {
-        chain: { id: 1, type: 'ethereum' },
+        chain: { id: 1, type: 'ethereum' }
       },
       'd7acc008-6411-5486-bb2d-0c0cfcddbb92': {
-        chain: { id: 50, type: 'cosmos' },
+        chain: { id: 50, type: 'cosmos' }
       },
       '695112ec-43e2-52a8-8f69-5c36837d6d13': {
-        chain: { id: 1, type: 'ethereum' },
-      },
+        chain: { id: 1, type: 'ethereum' }
+      }
     })
   })
 
@@ -810,17 +810,17 @@ describe('#removeNetwork', () => {
 
       expect(main.origins).toStrictEqual({
         '91f6971d-ba85-52d7-a27e-6af206eb2433': {
-          chain: { id: 1, type: 'ethereum' },
+          chain: { id: 1, type: 'ethereum' }
         },
         '8073729a-5e59-53b7-9e69-5d9bcff94087': {
-          chain: { id: 4, type: 'ethereum' },
+          chain: { id: 4, type: 'ethereum' }
         },
         'd7acc008-6411-5486-bb2d-0c0cfcddbb92': {
-          chain: { id: 50, type: 'cosmos' },
+          chain: { id: 50, type: 'cosmos' }
         },
         '695112ec-43e2-52a8-8f69-5c36837d6d13': {
-          chain: { id: 4, type: 'ethereum' },
-        },
+          chain: { id: 4, type: 'ethereum' }
+        }
       })
     })
   })
@@ -838,38 +838,38 @@ describe('#updateNetwork', () => {
     main = {
       origins: {
         '91f6971d-ba85-52d7-a27e-6af206eb2433': {
-          chain: { id: 1, type: 'ethereum' },
+          chain: { id: 1, type: 'ethereum' }
         },
         '8073729a-5e59-53b7-9e69-5d9bcff94087': {
-          chain: { id: 4, type: 'ethereum' },
+          chain: { id: 4, type: 'ethereum' }
         },
         'd7acc008-6411-5486-bb2d-0c0cfcddbb92': {
-          chain: { id: 50, type: 'ethereum' },
+          chain: { id: 50, type: 'ethereum' }
         },
         '695112ec-43e2-52a8-8f69-5c36837d6d13': {
-          chain: { id: 4, type: 'ethereum' },
-        },
+          chain: { id: 4, type: 'ethereum' }
+        }
       },
       networks: {
         ethereum: {
           1: {},
           4: {},
-          137: {},
+          137: {}
         },
         cosmos: {
-          50: {},
-        },
+          50: {}
+        }
       },
       networksMeta: {
         ethereum: {
           1: {},
           4: {},
-          137: {},
+          137: {}
         },
         cosmos: {
-          50: {},
-        },
-      },
+          50: {}
+        }
+      }
     }
   })
 
@@ -885,7 +885,7 @@ describe('#updateNetwork', () => {
     expect(main.networks.ethereum).toStrictEqual({
       1: {},
       66: { id: 66, type: 'ethereum', name: 'test', explorer: 'explorer.test', symbol: 'TEST' },
-      137: {},
+      137: {}
     })
   })
 
@@ -898,7 +898,7 @@ describe('#updateNetwork', () => {
     expect(main.networks.ethereum).toStrictEqual({
       1: {},
       66: { id: 66, type: 'ethereum', name: 'test', explorer: 'explorer.test', symbol: 'TEST' },
-      137: {},
+      137: {}
     })
   })
 
@@ -910,17 +910,17 @@ describe('#updateNetwork', () => {
 
     expect(main.origins).toStrictEqual({
       '91f6971d-ba85-52d7-a27e-6af206eb2433': {
-        chain: expect.objectContaining({ id: 1, type: 'ethereum' }),
+        chain: expect.objectContaining({ id: 1, type: 'ethereum' })
       },
       '8073729a-5e59-53b7-9e69-5d9bcff94087': {
-        chain: expect.objectContaining({ id: 66, type: 'ethereum' }),
+        chain: expect.objectContaining({ id: 66, type: 'ethereum' })
       },
       'd7acc008-6411-5486-bb2d-0c0cfcddbb92': {
-        chain: expect.objectContaining({ id: 50, type: 'ethereum' }),
+        chain: expect.objectContaining({ id: 50, type: 'ethereum' })
       },
       '695112ec-43e2-52a8-8f69-5c36837d6d13': {
-        chain: expect.objectContaining({ id: 66, type: 'ethereum' }),
-      },
+        chain: expect.objectContaining({ id: 66, type: 'ethereum' })
+      }
     })
   })
 })
@@ -930,17 +930,17 @@ describe('#activateNetwork', () => {
     networks: {
       ethereum: {
         137: {
-          on: false,
-        },
-      },
+          on: false
+        }
+      }
     },
     origins: {
       'frame.test': {
         chain: {
-          id: 137,
-        },
-      },
-    },
+          id: 137
+        }
+      }
+    }
   }
 
   const updaterFn = (node, ...args) => {
@@ -987,16 +987,16 @@ describe('#setBlockHeight', () => {
       networksMeta: {
         ethereum: {
           1: {
-            blockHeight: 0,
+            blockHeight: 0
           },
           4: {
-            blockHeight: 0,
+            blockHeight: 0
           },
           137: {
-            blockHeight: 0,
-          },
-        },
-      },
+            blockHeight: 0
+          }
+        }
+      }
     }
   })
 
@@ -1008,7 +1008,7 @@ describe('#setBlockHeight', () => {
     expect(main.networksMeta.ethereum).toStrictEqual({
       1: { blockHeight: 0 },
       4: { blockHeight: 500 },
-      137: { blockHeight: 0 },
+      137: { blockHeight: 0 }
     })
   })
 })
@@ -1035,15 +1035,15 @@ describe('#updateAccount', () => {
           id: '1',
           name: 'cool account',
           lastSignerType: 'ledger',
-          balances: {},
-        },
+          balances: {}
+        }
       },
       accountsMeta: {
         'e42ee170-4601-5428-bac5-d8d92fe049e8': {
           name: 'cool account',
-          lastUpdated: 1568682918135,
-        },
-      },
+          lastUpdated: 1568682918135
+        }
+      }
     }
   })
 
@@ -1053,7 +1053,7 @@ describe('#updateAccount', () => {
     setAccount('1', { name: 'cool account', lastSignerType: 'seed', status: 'ok' })
 
     expect(main.accounts).toStrictEqual({
-      1: { id: '1', name: 'cool account', lastSignerType: 'seed', status: 'ok', balances: {} },
+      1: { id: '1', name: 'cool account', lastSignerType: 'seed', status: 'ok', balances: {} }
     })
   })
 
@@ -1061,7 +1061,7 @@ describe('#updateAccount', () => {
     setAccount('1', { name: 'cool account', lastSignerType: 'seed', status: 'ok', balances: 'ignored' })
 
     expect(main.accounts).toStrictEqual({
-      1: { id: '1', name: 'cool account', lastSignerType: 'seed', status: 'ok', balances: {} },
+      1: { id: '1', name: 'cool account', lastSignerType: 'seed', status: 'ok', balances: {} }
     })
   })
 
@@ -1070,7 +1070,7 @@ describe('#updateAccount', () => {
 
     expect(main.accounts).toStrictEqual({
       1: { id: '1', name: 'cool account', lastSignerType: 'ledger', balances: {} },
-      2: { id: '2', name: 'new cool account', lastSignerType: 'seed', status: 'ok', balances: {} },
+      2: { id: '2', name: 'new cool account', lastSignerType: 'seed', status: 'ok', balances: {} }
     })
   })
 
@@ -1078,7 +1078,7 @@ describe('#updateAccount', () => {
     setAccount('1', { name: 'not so cool account', lastSignerType: 'seed', status: 'ok' })
 
     expect(main.accountsMeta).toStrictEqual({
-      'e42ee170-4601-5428-bac5-d8d92fe049e8': { name: 'not so cool account', lastUpdated: 1668682918135 },
+      'e42ee170-4601-5428-bac5-d8d92fe049e8': { name: 'not so cool account', lastUpdated: 1668682918135 }
     })
   })
 
@@ -1087,7 +1087,7 @@ describe('#updateAccount', () => {
 
     expect(main.accountsMeta).toStrictEqual({
       'e42ee170-4601-5428-bac5-d8d92fe049e8': { name: 'cool account', lastUpdated: 1568682918135 },
-      '0d6c930e-3495-56cc-993f-8da3a6150003': { name: 'not so cool account', lastUpdated: 1668682918135 },
+      '0d6c930e-3495-56cc-993f-8da3a6150003': { name: 'not so cool account', lastUpdated: 1668682918135 }
     })
   })
 
@@ -1095,7 +1095,7 @@ describe('#updateAccount', () => {
     setAccount('2', { name: 'hot account', lastSignerType: 'seed', status: 'ok' })
 
     expect(main.accountsMeta).toStrictEqual({
-      'e42ee170-4601-5428-bac5-d8d92fe049e8': { name: 'cool account', lastUpdated: 1568682918135 },
+      'e42ee170-4601-5428-bac5-d8d92fe049e8': { name: 'cool account', lastUpdated: 1568682918135 }
     })
   })
 
@@ -1103,7 +1103,7 @@ describe('#updateAccount', () => {
     setAccount('1', { name: 'hot account', lastSignerType: 'seed', status: 'ok' })
 
     expect(main.accountsMeta).toStrictEqual({
-      'e42ee170-4601-5428-bac5-d8d92fe049e8': { name: 'cool account', lastUpdated: 1568682918135 },
+      'e42ee170-4601-5428-bac5-d8d92fe049e8': { name: 'cool account', lastUpdated: 1568682918135 }
     })
   })
 })
@@ -1123,7 +1123,7 @@ describe('#removeBalances', () => {
   beforeEach(() => {
     balances = Object.values(testTokens).map((token) => ({
       ...token,
-      balance: addHexPrefix(new BigNumber(120).toString(16)),
+      balance: addHexPrefix(new BigNumber(120).toString(16))
     }))
   })
 

@@ -12,7 +12,7 @@ import {
   EditTestnet,
   EditChainExplorer,
   EditRPC,
-  SubmitChainButton,
+  SubmitChainButton
 } from '../Components'
 
 const isChainFilled = (chain) => {
@@ -36,7 +36,7 @@ export default ({
   primaryColor,
   primaryRpc,
   secondaryRpc,
-  existingChains,
+  existingChains
 }) => {
   const newChain = {
     id: id || chainDefault.id,
@@ -47,7 +47,7 @@ export default ({
     isTestnet: isTestnet || chainDefault.isTestnet,
     primaryColor: primaryColor || chainDefault.primaryColor,
     primaryRpc: primaryRpc || chainDefault.primaryRpc,
-    secondaryRpc: secondaryRpc || chainDefault.secondaryRpc,
+    secondaryRpc: secondaryRpc || chainDefault.secondaryRpc
   }
 
   // state
@@ -69,7 +69,7 @@ export default ({
     isTestnet: currentTestnet,
     primaryColor: currentColor,
     primaryRpc: currentPrimaryRPC,
-    secondaryRpc: currentSecondaryRPC,
+    secondaryRpc: currentSecondaryRPC
   }
 
   const validateChain = (chain) => {

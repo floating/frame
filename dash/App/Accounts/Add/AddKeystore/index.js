@@ -16,11 +16,11 @@ class AddRing extends React.Component {
       error: false,
       mode: this.props.mode ? this.props.mode : 'manual',
       keystore: '',
-      keystorePassword: '',
+      keystorePassword: ''
     }
     this.forms = {
       keystorePassword: React.createRef(),
-      keystoreCreatePassword: React.createRef(),
+      keystoreCreatePassword: React.createRef()
     }
   }
 
@@ -68,7 +68,7 @@ class AddRing extends React.Component {
           link.send('tray:action', 'backDash', 2)
           const crumb = {
             view: 'expandedSigner',
-            data: { signer: signer.id },
+            data: { signer: signer.id }
           }
           link.send('tray:action', 'navDash', crumb)
         }
@@ -99,7 +99,7 @@ class AddRing extends React.Component {
       mode: 'manual',
       privateKey: '',
       keystore: '',
-      keystorePassword: '',
+      keystorePassword: ''
     })
     setTimeout(() => {
       this.setState({ status: '', error: false })
@@ -166,7 +166,7 @@ class AddRing extends React.Component {
                 setTimeout(() => {
                   link.send('tray:action', 'navDash', {
                     view: 'notify',
-                    data: { notify: 'hotAccountWarning', notifyData: {} },
+                    data: { notify: 'hotAccountWarning', notifyData: {} }
                   })
                 }, 800)
               }}

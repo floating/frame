@@ -22,13 +22,13 @@ describe('initializing', () => {
       modulePath: './test.js',
       args: ['--someFlag', '-t'],
       env: {
-        MY_VAR: 'true',
-      },
+        MY_VAR: 'true'
+      }
     })
 
     expect(fork).toHaveBeenCalledWith('./test.js', ['--someFlag', '-t'], {
       signal: expect.anything(),
-      env: { MY_VAR: 'true' },
+      env: { MY_VAR: 'true' }
     })
   })
 
@@ -37,7 +37,7 @@ describe('initializing', () => {
 
     worker = new WorkerProcess({
       name: 'test-worker',
-      timeout: 60000,
+      timeout: 60000
     })
 
     jest.advanceTimersByTime(60000)
@@ -97,7 +97,7 @@ describe('api', () => {
 
       expect(childProcess.send).toHaveBeenCalledWith({
         command: 'testCommand',
-        args: [{ fruit: 'orange' }, 'metadata'],
+        args: [{ fruit: 'orange' }, 'metadata']
       })
     })
   })

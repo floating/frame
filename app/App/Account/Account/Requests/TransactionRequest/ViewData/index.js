@@ -13,7 +13,7 @@ const txFieldPriority = [
   'gasLimit',
   'gasPrice',
   'maxFeePerGas',
-  'maxPriorityFeePerGas',
+  'maxPriorityFeePerGas'
 ]
 
 const nonceHasBeenChanged = (req) => {
@@ -84,7 +84,7 @@ class ViewData extends React.Component {
   constructor(props, context) {
     super(props, context)
     this.state = {
-      copiedData: false,
+      copiedData: false
     }
   }
 

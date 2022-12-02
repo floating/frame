@@ -10,7 +10,7 @@ const supportedApprovals = [
   ApprovalType.GasLimitApproval,
   ApprovalType.OtherChainApproval,
   ApprovalType.TokenSpendApproval,
-  ApprovalType.TokenSpendRevocation,
+  ApprovalType.TokenSpendRevocation
 ]
 
 class TxApproval extends React.Component {

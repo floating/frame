@@ -10,7 +10,7 @@ const digitsLookup = [
   { value: 1e9, symbol: 'billion' },
   { value: 1e12, symbol: 'trillion' },
   { value: 1e15, symbol: 'quadrillion' },
-  { value: 1e18, symbol: 'quintillion' },
+  { value: 1e18, symbol: 'quintillion' }
 ]
 
 export function formatNumber(n: number, digits = 2) {

@@ -8,7 +8,7 @@ import {
   ClusterBox,
   Cluster,
   ClusterRow,
-  ClusterValue,
+  ClusterValue
 } from '../../../../../../../resources/Components/Cluster'
 import { formatDisplayInteger, isUnlimited } from '../../../../../../../resources/utils/numbers'
 import { DisplayValue } from '../../../../../../../resources/Components/DisplayValue'
@@ -18,7 +18,7 @@ class TxSending extends React.Component {
   constructor(...args) {
     super(...args)
     this.state = {
-      copied: false,
+      copied: false
     }
   }
   copyAddress(data) {
@@ -44,7 +44,7 @@ class TxSending extends React.Component {
           recipient: recipientAddress,
           symbol,
           recipientType,
-          recipientEns,
+          recipientEns
         } = action.data || {}
         const address = getAddress(recipientAddress)
         const ensName = recipientEns
@@ -147,7 +147,7 @@ class TxSending extends React.Component {
                   <ClusterValue
                     onClick={() => {
                       link.send('nav:update', 'panel', {
-                        data: { step: 'adjustApproval', actionId: action.id, requestedAmountHex: amount },
+                        data: { step: 'adjustApproval', actionId: action.id, requestedAmountHex: amount }
                       })
                     }}
                   >
@@ -162,7 +162,7 @@ class TxSending extends React.Component {
                   <ClusterValue
                     onClick={() => {
                       link.send('nav:update', 'panel', {
-                        data: { step: 'adjustApproval', actionId: action.id, requestedAmountHex: amount },
+                        data: { step: 'adjustApproval', actionId: action.id, requestedAmountHex: amount }
                       })
                     }}
                   >

@@ -53,7 +53,7 @@ class RequestCommand extends React.Component {
 
     const chain = {
       type: 'ethereum',
-      id: parseInt(req.data.chainId, 'hex'),
+      id: parseInt(req.data.chainId, 'hex')
     }
 
     const isTestnet = this.store('main.networks', chain.type, chain.id, 'isTestnet')
@@ -202,13 +202,13 @@ class RequestCommand extends React.Component {
 
     const chain = {
       type: 'ethereum',
-      id: parseInt(req.data.chainId, 'hex'),
+      id: parseInt(req.data.chainId, 'hex')
     }
 
     const isTestnet = this.store('main.networks', chain.type, chain.id, 'isTestnet')
     const {
       nativeCurrency,
-      nativeCurrency: { symbol: currentSymbol = '?' },
+      nativeCurrency: { symbol: currentSymbol = '?' }
     } = this.store('main.networksMeta', chain.type, chain.id)
     const nativeUSD = nativeCurrency && nativeCurrency.usd && !isTestnet ? nativeCurrency.usd.price : 0
 
@@ -267,7 +267,7 @@ class RequestCommand extends React.Component {
             position: 'absolute',
             bottom: '8px',
             left: '0px',
-            right: '0px',
+            right: '0px'
           }}
         >
           <div
@@ -302,7 +302,7 @@ class RequestCommand extends React.Component {
                     this.store.notify('gasFeeWarning', {
                       req,
                       feeUSD: this.toDisplayUSD(maxFeeUSD),
-                      currentSymbol,
+                      currentSymbol
                     })
                   } else {
                     this.approve(req.handlerId, req)

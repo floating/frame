@@ -44,7 +44,7 @@ function extendSession(originId: string) {
 const storeApi = {
   getPermissions: (address: Address) => {
     return store('main.permissions', address) as Record<string, Permission>
-  },
+  }
 }
 
 const cleanup = (id: string) => {
@@ -127,7 +127,7 @@ const handler = (req: IncomingMessage, res: ServerResponse) => {
 
                 pending[id] = {
                   send: sendResponse,
-                  timer: setTimeout(sendResponse, 15 * 1000),
+                  timer: setTimeout(sendResponse, 15 * 1000)
                 }
               }
             }

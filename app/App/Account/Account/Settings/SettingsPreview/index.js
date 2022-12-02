@@ -13,7 +13,7 @@ class Settings extends React.Component {
       this.resizeObserver = new ResizeObserver(() => {
         if (this.moduleRef && this.moduleRef.current) {
           link.send('tray:action', 'updateAccountModule', this.props.moduleId, {
-            height: this.moduleRef.current.clientHeight,
+            height: this.moduleRef.current.clientHeight
           })
         }
       })
@@ -23,7 +23,7 @@ class Settings extends React.Component {
       name: '',
       showMore: false,
       newName: '',
-      editName: false,
+      editName: false
     }
   }
 
@@ -108,11 +108,11 @@ class Settings extends React.Component {
                       ? {
                           opacity: 0.3,
                           pointerEvents: 'none',
-                          color: 'var(--bad)',
+                          color: 'var(--bad)'
                         }
                       : {
                           opacity: 1,
-                          color: 'var(--bad)',
+                          color: 'var(--bad)'
                         }
                   }
                   onClick={() => {

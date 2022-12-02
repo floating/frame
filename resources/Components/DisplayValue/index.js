@@ -32,7 +32,7 @@ export const DisplayValue = (props) => {
     currencySymbol,
     type = 'ether',
     displayDecimals = true,
-    currencySymbolPosition = 'first',
+    currencySymbolPosition = 'first'
   } = props
 
   const data = valueData || displayValueData(value, valueDataParams)

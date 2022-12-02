@@ -25,7 +25,7 @@ describe('migration 13', () => {
               type: 'ethereum',
               layer: 'mainnet',
               symbol: 'ETH',
-              name: 'Mainnet',
+              name: 'Mainnet'
             },
             137: {
               id: 1,
@@ -36,20 +36,20 @@ describe('migration 13', () => {
               connection: {
                 primary: {
                   on: true,
-                  current: 'matic',
+                  current: 'matic'
                 },
                 secondary: {
                   on: false,
-                  current: 'local',
-                },
-              },
-            },
-          },
+                  current: 'local'
+                }
+              }
+            }
+          }
         },
         networksMeta: {
-          ethereum: {},
-        },
-      },
+          ethereum: {}
+        }
+      }
     }
   })
 
@@ -62,7 +62,7 @@ describe('migration 13', () => {
 
   it('adds default gas price info', () => {
     state.main.networksMeta.ethereum = {
-      1: {},
+      1: {}
     }
 
     const updatedState = migrations.apply(state, 13)
@@ -76,10 +76,10 @@ describe('migration 13', () => {
       1: {
         gas: {
           price: {
-            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' },
-          },
-        },
-      },
+            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+          }
+        }
+      }
     }
 
     const updatedState = migrations.apply(state, 13)
@@ -92,10 +92,10 @@ describe('migration 13', () => {
       1: {
         gas: {
           price: {
-            selected: 'standard',
-          },
-        },
-      },
+            selected: 'standard'
+          }
+        }
+      }
     }
 
     const updatedState = migrations.apply(state, 13)
@@ -112,11 +112,11 @@ describe('migration 13', () => {
           price: {
             selected: 'asap',
             levels: {
-              slow: '0x0a93',
-            },
-          },
-        },
-      },
+              slow: '0x0a93'
+            }
+          }
+        }
+      }
     }
 
     const updatedState = migrations.apply(state, 13)
@@ -142,20 +142,20 @@ describe('migration 14', () => {
               connection: {
                 primary: {
                   on: true,
-                  current: 'matic',
+                  current: 'matic'
                 },
                 secondary: {
                   on: false,
-                  current: 'local',
-                },
-              },
-            },
-          },
+                  current: 'local'
+                }
+              }
+            }
+          }
         },
         networksMeta: {
-          ethereum: {},
-        },
-      },
+          ethereum: {}
+        }
+      }
     }
   })
 
@@ -203,7 +203,7 @@ describe('migration 14', () => {
       symbol: 'ETH',
       name: 'Arbitrum',
       explorer: 'https://explorer.arbitrum.io',
-      gas: { price: { selected: 'standard', levels: {} } },
+      gas: { price: { selected: 'standard', levels: {} } }
     })
 
     expect(arbitrum.connection.primary.on).toBe(true)
@@ -217,8 +217,8 @@ describe('migration 14', () => {
     state.main.networks.ethereum[42161] = {
       explorer: 'https://custom-explorer.arbitrum.io',
       connection: {
-        primary: { on: true, current: 'local' },
-      },
+        primary: { on: true, current: 'local' }
+      }
     }
 
     const updatedState = migrations.apply(state, 14)
@@ -239,7 +239,7 @@ describe('migration 14', () => {
 
     expect(arbitrum.gas.fees.maxFeePerGas).toBe(undefined)
     expect(arbitrum).toMatchObject({
-      gas: { fees: {}, price: { selected: 'standard', levels: {} } },
+      gas: { fees: {}, price: { selected: 'standard', levels: {} } }
     })
   })
 
@@ -247,9 +247,9 @@ describe('migration 14', () => {
     state.main.networksMeta.ethereum[42161] = {
       gas: {
         fees: {
-          maxFeePerGas: '0xf',
-        },
-      },
+          maxFeePerGas: '0xf'
+        }
+      }
     }
 
     const updatedState = migrations.apply(state, 14)
@@ -277,20 +277,20 @@ describe('migration 15', () => {
               connection: {
                 primary: {
                   on: true,
-                  current: 'matic',
+                  current: 'matic'
                 },
                 secondary: {
                   on: false,
-                  current: 'local',
-                },
-              },
-            },
-          },
+                  current: 'local'
+                }
+              }
+            }
+          }
         },
         networksMeta: {
-          ethereum: {},
-        },
-      },
+          ethereum: {}
+        }
+      }
     }
   })
 
@@ -327,7 +327,7 @@ describe('migration 16', () => {
         _version: 15,
         currentNetwork: {
           type: 'ethereum',
-          id: '1',
+          id: '1'
         },
         networks: {
           ethereum: {
@@ -341,20 +341,20 @@ describe('migration 16', () => {
               connection: {
                 primary: {
                   on: true,
-                  current: 'matic',
+                  current: 'matic'
                 },
                 secondary: {
                   on: false,
-                  current: 'local',
-                },
-              },
-            },
-          },
+                  current: 'local'
+                }
+              }
+            }
+          }
         },
         networksMeta: {
-          ethereum: {},
-        },
-      },
+          ethereum: {}
+        }
+      }
     }
   })
 
@@ -378,13 +378,13 @@ describe('migration 17', () => {
         _version: 16,
         lattice: {
           McBbS7: {
-            deviceId: 'McBbS7',
-          },
+            deviceId: 'McBbS7'
+          }
         },
         latticeSettings: {
-          suffix: 'my-laptop',
-        },
-      },
+          suffix: 'my-laptop'
+        }
+      }
     }
   })
 
@@ -431,8 +431,8 @@ describe('migration 18', () => {
     state = {
       main: {
         _version: 17,
-        tokens: ['AVAX', 'OHM'],
-      },
+        tokens: ['AVAX', 'OHM']
+      }
     }
   })
 
@@ -467,14 +467,14 @@ describe('migration 19', () => {
         _version: 18,
         currentNetwork: {
           id: 1,
-          type: 'ethereum',
+          type: 'ethereum'
         },
         clients: {
           ipfs: {},
           geth: {},
-          parity: {},
-        },
-      },
+          parity: {}
+        }
+      }
     }
   })
 
@@ -495,16 +495,16 @@ describe('migration 20', () => {
       main: {
         _version: 19,
         mute: {
-          aragonAccountMigrationWarning: true,
+          aragonAccountMigrationWarning: true
         },
         accounts: {
           test: {
             smart: {
-              type: 'aragon',
-            },
-          },
-        },
-      },
+              type: 'aragon'
+            }
+          }
+        }
+      }
     }
   })
 
@@ -550,8 +550,8 @@ describe('migration 21', () => {
               gas: {
                 price: {
                   selected: 'standard',
-                  levels: { slow: '', standard: '', fast: '', asap: '', custom: '' },
-                },
+                  levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+                }
               },
               connection: {
                 primary: {
@@ -561,7 +561,7 @@ describe('migration 21', () => {
                   connected: false,
                   type: '',
                   network: '',
-                  custom: '',
+                  custom: ''
                 },
                 secondary: {
                   on: false,
@@ -570,20 +570,20 @@ describe('migration 21', () => {
                   connected: false,
                   type: '',
                   network: '',
-                  custom: '',
-                },
+                  custom: ''
+                }
               },
-              on: false,
-            },
-          },
+              on: false
+            }
+          }
         },
         networksMeta: {
-          ethereum: {},
+          ethereum: {}
         },
         networkPresets: {
-          ethereum: {},
-        },
-      },
+          ethereum: {}
+        }
+      }
     }
   })
 
@@ -601,7 +601,7 @@ describe('migration 21', () => {
       symbol: 'ETH',
       name: 'Sepolia',
       explorer: 'https://sepolia.etherscan.io',
-      gas: { price: { selected: 'standard', levels: {} } },
+      gas: { price: { selected: 'standard', levels: {} } }
     })
 
     expect(sepolia.connection.primary.on).toBe(true)
@@ -615,8 +615,8 @@ describe('migration 21', () => {
     state.main.networks.ethereum[11155111] = {
       explorer: 'https://custom-explorer.sepolia.dev',
       connection: {
-        primary: { on: true, current: 'local' },
-      },
+        primary: { on: true, current: 'local' }
+      }
     }
 
     const updatedState = migrations.apply(state, 21)
@@ -635,7 +635,7 @@ describe('migration 21', () => {
 
     expect(sepolia.gas.fees.maxFeePerGas).toBe(undefined)
     expect(sepolia).toMatchObject({
-      gas: { fees: {}, price: { selected: 'standard', levels: {} } },
+      gas: { fees: {}, price: { selected: 'standard', levels: {} } }
     })
   })
 
@@ -643,9 +643,9 @@ describe('migration 21', () => {
     state.main.networksMeta.ethereum[11155111] = {
       gas: {
         fees: {
-          maxFeePerGas: '0xf',
-        },
-      },
+          maxFeePerGas: '0xf'
+        }
+      }
     }
 
     const updatedState = migrations.apply(state, 21)
@@ -665,7 +665,7 @@ describe('migration 21', () => {
         connected: false,
         type: '',
         network: '',
-        custom: '',
+        custom: ''
       }
 
       const updatedState = migrations.apply(state, 21)
@@ -678,7 +678,7 @@ describe('migration 21', () => {
         connected: false,
         type: '',
         network: '',
-        custom: '',
+        custom: ''
       })
     })
 
@@ -690,7 +690,7 @@ describe('migration 21', () => {
         connected: false,
         type: '',
         network: '',
-        custom: '',
+        custom: ''
       }
 
       const updatedState = migrations.apply(state, 21)
@@ -703,7 +703,7 @@ describe('migration 21', () => {
         connected: false,
         type: '',
         network: '',
-        custom: '',
+        custom: ''
       })
     })
   })
@@ -716,7 +716,7 @@ describe('migration 21', () => {
       connected: false,
       type: '',
       network: '',
-      custom: '',
+      custom: ''
     }
     state.main.networks.ethereum[5].connection.secondary = {
       on: false,
@@ -725,7 +725,7 @@ describe('migration 21', () => {
       connected: false,
       type: '',
       network: '',
-      custom: '',
+      custom: ''
     }
 
     const updatedState = migrations.apply(state, 21)
@@ -742,7 +742,7 @@ describe('migration 21', () => {
       connected: false,
       type: '',
       network: '',
-      custom: '',
+      custom: ''
     }
     state.main.networks.ethereum[5].connection.secondary = {
       on: false,
@@ -751,7 +751,7 @@ describe('migration 21', () => {
       connected: false,
       type: '',
       network: '',
-      custom: '',
+      custom: ''
     }
 
     const updatedState = migrations.apply(state, 21)
@@ -768,7 +768,7 @@ describe('migration 21', () => {
       connected: true,
       type: '',
       network: '',
-      custom: '',
+      custom: ''
     }
     state.main.networks.ethereum[5].connection.secondary = {
       on: false,
@@ -777,7 +777,7 @@ describe('migration 21', () => {
       connected: false,
       type: '',
       network: '',
-      custom: '',
+      custom: ''
     }
 
     const updatedState = migrations.apply(state, 21)
@@ -795,14 +795,14 @@ describe('migration 22', () => {
         networks: {
           ethereum: {
             1: {
-              layer: 'mainnet',
+              layer: 'mainnet'
             },
             5: {
-              layer: 'testnet',
-            },
-          },
-        },
-      },
+              layer: 'testnet'
+            }
+          }
+        }
+      }
     }
   })
 
@@ -836,10 +836,10 @@ describe('migration 23', () => {
             137: {}, // Polygon
             8888: {}, // Unknown Chain
             42161: {}, // Arbitrum
-            11155111: {}, // Known Testnet
-          },
-        },
-      },
+            11155111: {} // Known Testnet
+          }
+        }
+      }
     }
   })
 
@@ -883,10 +883,10 @@ describe('migration 24', () => {
         _version: 23,
         networksMeta: {
           ethereum: {
-            1: {},
-          },
-        },
-      },
+            1: {}
+          }
+        }
+      }
     }
   })
 
@@ -899,7 +899,7 @@ describe('migration 24', () => {
       icon: '',
       name: '',
       symbol: '',
-      decimals: 0,
+      decimals: 0
     })
   })
 
@@ -908,11 +908,11 @@ describe('migration 24', () => {
       nativeCurrency: {
         usd: {
           price: 1324.43,
-          change24hr: 2.375239369802938,
+          change24hr: 2.375239369802938
         },
         icon: 'https://assets.coingecko.com/coins/images/279/large/ethereum.png?1595348880',
-        name: 'Ether',
-      },
+        name: 'Ether'
+      }
     }
     const updatedState = migrations.apply(state, 24)
     const chains = updatedState.main.networksMeta.ethereum
@@ -920,10 +920,10 @@ describe('migration 24', () => {
     expect(chains[1].nativeCurrency).toStrictEqual({
       usd: {
         price: 1324.43,
-        change24hr: 2.375239369802938,
+        change24hr: 2.375239369802938
       },
       icon: 'https://assets.coingecko.com/coins/images/279/large/ethereum.png?1595348880',
-      name: 'Ether',
+      name: 'Ether'
     })
   })
 })
@@ -938,12 +938,12 @@ describe('migration 25', () => {
             10: {
               connection: {
                 primary: { current: 'custom' },
-                secondary: { current: 'local' },
-              },
-            },
-          },
-        },
-      },
+                secondary: { current: 'local' }
+              }
+            }
+          }
+        }
+      }
     }
   })
 
@@ -982,20 +982,20 @@ describe('migration 26', () => {
               type: 'ethereum',
               layer: 'testnet',
               symbol: 'ETH',
-              name: 'Görli',
-            },
-          },
+              name: 'Görli'
+            }
+          }
         },
         networksMeta: {
           ethereum: {
             5: {
               nativeCurrency: {
-                symbol: 'ETH',
-              },
-            },
-          },
-        },
-      },
+                symbol: 'ETH'
+              }
+            }
+          }
+        }
+      }
     }
   })
 
@@ -1013,8 +1013,8 @@ describe('migration 27', () => {
     state = {
       main: {
         _version: 26,
-        accounts: {},
-      },
+        accounts: {}
+      }
     }
   })
 
@@ -1024,7 +1024,7 @@ describe('migration 27', () => {
   accountTypes.forEach((type) => {
     it(`migrates a ${type} account to be called a hot account`, () => {
       state.main.accounts[address] = {
-        name: `${capitalize(type)} Account`,
+        name: `${capitalize(type)} Account`
       }
 
       const updatedState = migrations.apply(state, 27)
@@ -1035,7 +1035,7 @@ describe('migration 27', () => {
 
   it('does not migrate an account with a changed name', () => {
     state.main.accounts[address] = {
-      name: `My Kewl Account`,
+      name: `My Kewl Account`
     }
 
     const updatedState = migrations.apply(state, 27)
@@ -1054,18 +1054,18 @@ describe('migration 28', () => {
             5: {
               nativeCurrency: {
                 symbol: 'ETH',
-                decimals: 0,
-              },
+                decimals: 0
+              }
             },
             11155111: {
               nativeCurrency: {
                 symbol: 'ETH',
-                decimals: 18,
-              },
-            },
-          },
-        },
-      },
+                decimals: 18
+              }
+            }
+          }
+        }
+      }
     }
   })
 
@@ -1109,13 +1109,13 @@ describe('migration 29', () => {
         _version: 28,
         accounts: {
           test: {
-            name: 'my test account',
+            name: 'my test account'
           },
           look: {
-            name: 'such a cool account',
-          },
-        },
-      },
+            name: 'such a cool account'
+          }
+        }
+      }
     }
     jest.setSystemTime(new Date('2022-11-17T11:01:58.135Z'))
   })
@@ -1127,12 +1127,12 @@ describe('migration 29', () => {
     expect(accountsMeta).toStrictEqual({
       '6ae9081b-ba1c-54a5-a985-20e180d6fa9f': {
         name: 'such a cool account',
-        lastUpdated: 1668682918135,
+        lastUpdated: 1668682918135
       },
       'c7b2d7b1-b0cc-5706-b708-cbc09b0bb7bf': {
         name: 'my test account',
-        lastUpdated: 1668682918135,
-      },
+        lastUpdated: 1668682918135
+      }
     })
   })
 
@@ -1141,7 +1141,7 @@ describe('migration 29', () => {
     it(`does not add ${type} accounts with a default name`, () => {
       state.main.accounts.test = {
         name: getDefaultAccountName(type),
-        lastSignerType: type,
+        lastSignerType: type
       }
       const updatedState = migrations.apply(state, 29)
       const { accountsMeta } = updatedState.main
@@ -1149,8 +1149,8 @@ describe('migration 29', () => {
       expect(accountsMeta).toStrictEqual({
         '6ae9081b-ba1c-54a5-a985-20e180d6fa9f': {
           name: 'such a cool account',
-          lastUpdated: 1668682918135,
-        },
+          lastUpdated: 1668682918135
+        }
       })
     })
   })

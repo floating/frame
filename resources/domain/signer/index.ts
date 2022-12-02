@@ -7,7 +7,7 @@ export enum Type {
   Aragon = 'aragon',
   Trezor = 'trezor',
   Ledger = 'ledger',
-  Lattice = 'lattice',
+  Lattice = 'lattice'
 }
 
 export function getSignerType(typeValue: string) {

@@ -113,7 +113,7 @@ class _AccountModule extends React.Component {
       transform: `translateY(${top}px)`,
       zIndex: 9999 - index,
       height: module.height,
-      opacity: 1,
+      opacity: 1
     }
     //  && !this.props.signer) hidden = true
     if (hidden) {
@@ -122,7 +122,7 @@ class _AccountModule extends React.Component {
         zIndex: 9999 - index,
         height: 0,
         opacity: 0,
-        overflow: 'hidden',
+        overflow: 'hidden'
       }
     }
 
@@ -177,7 +177,7 @@ class _AccountMain extends React.Component {
   constructor(...args) {
     super(...args)
     this.state = {
-      expandedModule: '',
+      expandedModule: ''
     }
   }
   renderAccountFilter() {
@@ -276,7 +276,7 @@ class _AccountBody extends React.Component {
   constructor(...args) {
     super(...args)
     this.state = {
-      view: 'request',
+      view: 'request'
     }
   }
   renderRequest(req, data) {

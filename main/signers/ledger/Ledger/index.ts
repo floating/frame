@@ -21,7 +21,7 @@ export const Status = {
   LOCKED: 'locked',
   WRONG_APP: 'Open your Ledger and select the Ethereum application',
   DISCONNECTED: 'Disconnected',
-  NEEDS_RECONNECTION: 'Please reconnect this Ledger device',
+  NEEDS_RECONNECTION: 'Please reconnect this Ledger device'
 }
 
 interface Address {
@@ -267,7 +267,7 @@ export default class Ledger extends Signer {
             }
 
             return this.checkDeviceStatus()
-          },
+          }
         })
       }
 
@@ -331,7 +331,7 @@ export default class Ledger extends Signer {
           } catch (e) {
             this.handleError(e as DeviceError)
           }
-        },
+        }
       })
     }
 
@@ -365,7 +365,7 @@ export default class Ledger extends Signer {
         } catch (e) {
           this.handleError(e as DeviceError)
         }
-      },
+      }
     })
   }
 
@@ -404,7 +404,7 @@ export default class Ledger extends Signer {
 
           cb(new Error(message), undefined)
         }
-      },
+      }
     })
   }
 
@@ -431,7 +431,7 @@ export default class Ledger extends Signer {
 
           cb(new Error(message), undefined)
         }
-      },
+      }
     })
   }
 
@@ -460,7 +460,7 @@ export default class Ledger extends Signer {
 
           cb(new Error(message), undefined)
         }
-      },
+      }
     })
   }
 
@@ -490,7 +490,7 @@ export default class Ledger extends Signer {
 
           cb(new Error(message), undefined)
         }
-      },
+      }
     })
   }
 

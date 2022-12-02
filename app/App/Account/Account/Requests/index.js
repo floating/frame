@@ -22,7 +22,7 @@ class Requests extends React.Component {
   constructor(props, context) {
     super(props, context)
     this.state = {
-      minimized: false,
+      minimized: false
       // unlockInput: '',
       // unlockHeadShake: false
     }
@@ -30,7 +30,7 @@ class Requests extends React.Component {
     this.resizeObserver = new ResizeObserver(() => {
       if (this.moduleRef && this.moduleRef.current) {
         link.send('tray:action', 'updateAccountModule', props._id, {
-          height: this.moduleRef.current.clientHeight,
+          height: this.moduleRef.current.clientHeight
         })
       }
     })
@@ -74,7 +74,7 @@ class Requests extends React.Component {
     this.resizeObserver.observe(this.moduleRef.current)
     if (this.moduleRef && this.moduleRef.current) {
       link.send('tray:action', 'updateAccountModule', this.props._id, {
-        height: this.moduleRef.current.clientHeight,
+        height: this.moduleRef.current.clientHeight
       })
     }
     setTimeout(() => {
@@ -281,7 +281,7 @@ class Requests extends React.Component {
                 const {
                   primaryColor,
                   icon,
-                  nativeCurrency: { symbol: currentSymbol = '?' },
+                  nativeCurrency: { symbol: currentSymbol = '?' }
                 } = this.store('main.networksMeta.ethereum', chainId)
                 const txMeta = { replacement: false, possible: true, notice: '' }
                 const originName = this.store('main.origins', req.origin, 'name')

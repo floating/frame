@@ -16,7 +16,7 @@ class AddPhrase extends React.Component {
       phrase: '',
       password: '',
       status: '',
-      error: false,
+      error: false
     }
     this.forms = [React.createRef(), React.createRef()]
   }
@@ -65,7 +65,7 @@ class AddPhrase extends React.Component {
         link.send('tray:action', 'backDash', 2)
         const crumb = {
           view: 'expandedSigner',
-          data: { signer: signer.id },
+          data: { signer: signer.id }
         }
         link.send('tray:action', 'navDash', crumb)
       }
@@ -139,7 +139,7 @@ class AddPhrase extends React.Component {
                   () =>
                     link.send('tray:action', 'navDash', {
                       view: 'notify',
-                      data: { notify: 'hotAccountWarning', notifyData: {} },
+                      data: { notify: 'hotAccountWarning', notifyData: {} }
                     }),
                   800
                 )

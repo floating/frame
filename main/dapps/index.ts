@@ -138,7 +138,7 @@ const surface = {
         ready: false,
         dappId,
         ens,
-        url,
+        url
       }
 
       server.sessions.add(ens, session)
@@ -147,7 +147,7 @@ const surface = {
     } else {
       store.updateDapp(dappId, { ens, status: 'initial', openWhenReady: true })
     }
-  },
+  }
 }
 
 export default surface

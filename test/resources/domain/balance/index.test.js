@@ -35,7 +35,7 @@ describe('#sortByTotalValue', () => {
   const mockBalance = (totalValue, balance = 0, decimals = 0) => ({
     totalValue: BigNumber(totalValue),
     decimals,
-    balance,
+    balance
   })
 
   it('should sort balances in descending order by total value', () => {

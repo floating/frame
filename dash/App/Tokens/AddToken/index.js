@@ -9,7 +9,7 @@ class AddTokenChainScreenComponent extends Component {
     super(...args)
 
     this.state = {
-      chainId: 0,
+      chainId: 0
     }
   }
 
@@ -40,7 +40,7 @@ class AddTokenChainScreenComponent extends Component {
                     setTimeout(() => {
                       link.send('tray:action', 'navDash', {
                         view: 'tokens',
-                        data: { notify: 'addToken', notifyData: { chainId } },
+                        data: { notify: 'addToken', notifyData: { chainId } }
                       })
                     }, 200)
                   }}
@@ -82,7 +82,7 @@ class AddTokenAddressScreenComponent extends Component {
     super(props, context)
 
     this.state = {
-      inputAddress: '',
+      inputAddress: ''
     }
   }
 
@@ -106,9 +106,9 @@ class AddTokenAddressScreenComponent extends Component {
         notify: 'addToken',
         notifyData: {
           address,
-          chainId,
-        },
-      },
+          chainId
+        }
+      }
     })
   }
 
@@ -124,7 +124,7 @@ class AddTokenAddressScreenComponent extends Component {
             <div
               className='newTokenChainSelectSubtitle'
               style={{
-                color: chainColor ? `var(--${chainColor})` : 'var(--moon)',
+                color: chainColor ? `var(--${chainColor})` : 'var(--moon)'
               }}
             >
               {`on ${chainName}`}
@@ -189,7 +189,7 @@ class AddTokenFormScreenComponent extends Component {
       name: tokenData.name || this.nameDefault,
       symbol: tokenData.symbol || this.symbolDefault,
       decimals: tokenData.decimals || this.decimalsDefault,
-      logoURI: tokenData.logoURI || this.logoURIDefault,
+      logoURI: tokenData.logoURI || this.logoURIDefault
     }
   }
 
@@ -212,7 +212,7 @@ class AddTokenFormScreenComponent extends Component {
       chainId,
       chainName,
       req,
-      tokenData: { address },
+      tokenData: { address }
     } = this.props
     const newTokenReady =
       this.state.name &&
@@ -239,7 +239,7 @@ class AddTokenFormScreenComponent extends Component {
                 <div
                   className='newTokenChainSelectSubtitle'
                   style={{
-                    color: chainColor ? `var(--${chainColor})` : 'var(--moon)',
+                    color: chainColor ? `var(--${chainColor})` : 'var(--moon)'
                   }}
                 >
                   {`on ${chainName}`}
@@ -353,7 +353,7 @@ class AddTokenFormScreenComponent extends Component {
                       chainId,
                       address,
                       decimals,
-                      logoURI: this.isDefault('logoURI') ? '' : logoURI,
+                      logoURI: this.isDefault('logoURI') ? '' : logoURI
                     }
                     link.send('tray:addToken', token, req)
                     setTimeout(() => {
@@ -383,8 +383,8 @@ class AddToken extends Component {
       tokenData: {
         name: '',
         symbol: '',
-        decimals: '',
-      },
+        decimals: ''
+      }
     }
   }
 

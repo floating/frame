@@ -23,7 +23,7 @@ class AddToken extends React.Component {
       chainId: (Number.isInteger(chainId) && chainId) || this.chainDefault,
       address: (this.token.address || '').toLowerCase() || this.addressDefault,
       decimals: (Number.isInteger(decimals) && decimals) || this.decimalsDefault,
-      logoURI: this.token.logoURI || this.logoURIDefault,
+      logoURI: this.token.logoURI || this.logoURIDefault
     }
   }
 

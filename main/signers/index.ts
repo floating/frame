@@ -42,7 +42,7 @@ class Signers extends EventEmitter {
 
     // TODO: convert these scans to adapters
     this.scans = {
-      hot: hot.scan(this),
+      hot: hot.scan(this)
     }
 
     registeredAdapters.forEach(this.addAdapter.bind(this))
@@ -68,17 +68,17 @@ class Signers extends EventEmitter {
       listeners: [
         {
           event: 'add',
-          handler: addFn,
+          handler: addFn
         },
         {
           event: 'remove',
-          handler: removeFn,
+          handler: removeFn
         },
         {
           event: 'update',
-          handler: updateFn,
-        },
-      ],
+          handler: updateFn
+        }
+      ]
     }
   }
 
