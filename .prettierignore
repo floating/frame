@@ -1,3 +1,7 @@
 bundle
 compiled
 package-lock.json
+.cache
+cache
+.vscode
+scratch*

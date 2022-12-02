@@ -22,7 +22,7 @@ jobs:
       - name: check for existing release
         run: (gh release list --exclude-drafts | grep -e ".*v${{ steps.package-version.outputs.current-version }}" && exit 1) || exit 0
       - name: remove old draft releases
-        run: gh release list | grep -e "Draft.*v${{ steps.package-version.outputs.current-version }}" | awk '{print $3}' | xargs -r gh release delete
+        run: gh release list | grep -e "Draft.*v${{ steps.package-version.outputs.current-version }}" | awk '{print $3}' | uniq | xargs -r gh release delete
       - name: create new draft release
         uses: marvinpinto/action-automatic-releases@latest
         with:
