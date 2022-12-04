@@ -33,6 +33,13 @@ function isLargeNumber(bn: BigNumber) {
 }
 
 function getDisplay(bn: BigNumber, type: string, decimals: number, displayFullValue?: boolean) {
+  // zero
+  if (bn.isZero()) {
+    return {
+      displayValue: type === 'fiat' ? bn.toFixed(decimals) : bn.toFormat()
+    }
+  }
+
   const value = bn.decimalPlaces(decimals, BigNumber.ROUND_FLOOR)
 
   // minimum display value
@@ -104,7 +111,7 @@ export function displayValueData(sourceValue: SourceValue, params: DisplayValueD
       const displayedDecimals = displayDecimals ? 2 : 0
       const value = bn.shiftedBy(-decimals).multipliedBy(nativeCurrency)
 
-      if (isTestnet || value.isNaN()) {
+      if (isTestnet || value.isNaN() || !currencyRate) {
         return {
           value,
           displayValue: '?'
