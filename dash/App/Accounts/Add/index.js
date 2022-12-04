@@ -11,6 +11,7 @@ import AddAragon from './AddAragon'
 import AddPhrase from './AddPhrase'
 import AddRing from './AddRing'
 import AddAddress from './AddAddress'
+import AddHardwareKeystone from './AddHardwareKeystone'
 
 const duration = { appear: 20, enter: 20, exit: 960 }
 
@@ -58,6 +59,7 @@ class Add extends React.Component {
                       <AddHardware index={1} type='ledger' />
                       <AddHardware index={2} type='trezor' />
                       <AddHardwareLattice index={3} type='lattice' />
+                      <AddHardwareKeystone index={4} type='keystone' />
                       <div className='addAccountHeader'><div style={{ marginRight: '10px' }}>{svg.lightbulb(12)}</div><div>Smart Accounts</div></div>
                       <AddAragon index={3} />
                       <div className='addAccountHeader'><div style={{ margin: '-1px 10px 0px 0px' }}>{svg.flame(18)}</div><div>Hot Accounts</div></div>

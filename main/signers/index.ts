@@ -7,6 +7,7 @@ import { SignerAdapter } from './adapters'
 import LedgerAdapter from './ledger/adapter'
 import TrezorAdapter  from './trezor/adapter'
 import LatticeAdapter from './lattice/adapter'
+import KeystoneAdapter from "./keystone/adapter";
 
 import hot from './hot'
 import RingSigner from './hot/RingSigner'
@@ -17,7 +18,8 @@ import store from '../store'
 const registeredAdapters = [
   new LedgerAdapter(),
   new TrezorAdapter(),
-  new LatticeAdapter()
+  new LatticeAdapter(),
+  new KeystoneAdapter()
 ]
 
 interface AdapterSpec {
@@ -112,7 +114,7 @@ class Signers extends EventEmitter {
 
   remove (id: string) {
     const signer = this.signers[id]
-    
+
     if (signer) {
       delete this.signers[id]
       store.removeSigner(id)
@@ -143,7 +145,7 @@ class Signers extends EventEmitter {
 
   reload (id: string) {
     const signer = this.signers[id]
-    
+
     if (signer) {
       const type = (signer.type === 'ring' || signer.type === 'seed') ? 'hot' : signer.type
 

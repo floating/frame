@@ -9,6 +9,7 @@ import { GasFeesSource, TransactionData, typeSupportsBaseFee } from '../../resou
 const londonHardforkSigners: SignerCompatibilityByVersion = {
   seed: () => true,
   ring: () => true,
+  keystone: () => true,
   ledger: version => version.major >= 2 || (version.major >= 1 && version.minor >= 9),
   trezor: (version, model) => {
     if ((model || '').toLowerCase() === 'trezor one') {
@@ -103,17 +104,17 @@ function populate (rawTx: TransactionData, chainConfig: Common, gas: GasData): T
       const gasPrice = toBN(gas.price.levels.fast as string)
       txData.gasPrice = bnToHex(gasPrice)
       txData.gasFeesSource = GasFeesSource.Frame
-    } 
+    }
 
     return txData
   }
 
   // EIP-1559 case
   txData.type = intToHex(2)
-    
+
   const useFrameMaxFeePerGas = !rawTx.maxFeePerGas || isNaN(parseInt(rawTx.maxFeePerGas, 16))
   const useFrameMaxPriorityFeePerGas = !rawTx.maxPriorityFeePerGas || isNaN(parseInt(rawTx.maxPriorityFeePerGas, 16))
-  
+
   if (!useFrameMaxFeePerGas && !useFrameMaxPriorityFeePerGas) {
     // return tx unaltered when we are using no Frame-supplied values
     return txData
@@ -131,7 +132,7 @@ function populate (rawTx: TransactionData, chainConfig: Common, gas: GasData): T
 
   // if no valid dapp-supplied value for maxPriorityFeePerGas we use the Frame-supplied value
   txData.maxPriorityFeePerGas = useFrameMaxPriorityFeePerGas ? bnToHex(toBN(maxPriorityFee)) : txData.maxPriorityFeePerGas
-  
+
   return txData
 }
 

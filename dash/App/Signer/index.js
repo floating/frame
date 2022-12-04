@@ -7,7 +7,7 @@ import { capitalize, getAddress } from '../../../resources/utils'
 import { isHardwareSigner, getSignerDisplayType } from '../../../resources/domain/signer'
 
 import SignerStatus from './SignerStatus'
-
+// TODO  rename as HardwareSigner
 export const Types = {
   Lattice: "lattice",
   Trezor: "trezor",
@@ -199,6 +199,7 @@ class Signer extends React.Component {
       )
     } else if (status === 'locked') {
       const hwSigner = isHardwareSigner(this.props.type)
+      const isKeystoneSigner = this.props.type === 'keystone'
       const lockText = hwSigner
         ? 'Please unlock your ' + this.props.type
         : 'locked'
@@ -293,6 +294,7 @@ class Signer extends React.Component {
               const type = this.props.type
               if (type === 'ledger') return <div className='signerIconWrap signerIconHardware'>{svg.ledger(20)}</div>
               if (type === 'trezor') return <div className='signerIconWrap signerIconHardware'>{svg.trezor(20)}</div>
+              if (type === 'keystone') return <div className='signerIconWrap signerIconHardware'>{svg.keystone(20)}</div>
               if (type === 'seed' || type === 'ring') return <div className='signerIconWrap signerIconHot'>{svg.flame(23)}</div>
               if (type === 'aragon') return <div className='signerIconWrap signerIconSmart'>{svg.aragon(28)}</div>
               if (type === 'lattice') return <div className='signerIconWrap signerIconSmart'>{svg.lattice(22)}</div>

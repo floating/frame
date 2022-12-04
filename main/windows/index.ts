@@ -29,22 +29,22 @@ const showFrame = () => tray.show()
 
 const separatorMenuItem = {
   label: 'Frame',
-  click: () => {}, 
+  click: () => {},
   type: 'separator'
 }
 
 const hideMenuItem = {
-  label: 'Dismiss', 
-  click: hideFrame, 
-  accelerator: 'Alt+/', 
+  label: 'Dismiss',
+  click: hideFrame,
+  accelerator: 'Alt+/',
   registerAccelerator: false,
   toolTip: 'Dismiss Frame'
 }
 
-const showMenuItem = { 
-  label: 'Summon', 
-  click: showFrame, 
-  accelerator: 'Alt+/', 
+const showMenuItem = {
+  label: 'Summon',
+  click: showFrame,
+  accelerator: 'Alt+/',
   registerAccelerator: false,
   toolTip: 'Summon Frame'
 }
@@ -164,7 +164,15 @@ function initTrayWindow () {
   windows.tray.webContents.on('will-navigate', e => e.preventDefault()) // Prevent navigation
   windows.tray.webContents.on('will-attach-webview', e => e.preventDefault()) // Prevent attaching <webview>
   windows.tray.webContents.setWindowOpenHandler(() => ({ action: 'deny' })) // Prevent new windows
-  windows.tray.webContents.session.setPermissionRequestHandler((webContents, permission, res) => res(false))
+  // windows.tray.webContents.session.setPermissionRequestHandler((webContents, permission, res) => res(false))
+  windows.tray.webContents.session.setPermissionRequestHandler((webContents, permission, res) => {
+    console.log({permission})
+    const page = webContents.getURL().split('/').pop()
+    if ((page === 'dash.html' || page === 'tray.html') && permission === 'media') {
+      return res(true)
+    }
+    res(false)
+  })
 
   windows.tray.setResizable(false)
   windows.tray.setMovable(false)
@@ -193,11 +201,11 @@ function initTrayWindow () {
   setTimeout(() => {
     windows.tray.on('focus', () => tray.show())
   }, 2000)
-  
+
   if (isDev) {
     windows.tray.webContents.openDevTools()
   }
-  
+
   setTimeout(() => {
     windows.tray.on('blur', () => {
       setTimeout(() => {

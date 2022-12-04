@@ -33,7 +33,7 @@ function validateNetworkSettings (network) {
 
 function includesToken (tokens, token) {
   const existingAddress = token.address.toLowerCase()
-  return tokens.some(t => 
+  return tokens.some(t =>
     t.address.toLowerCase() === existingAddress && t.chainId === token.chainId
   )
 }
@@ -184,6 +184,23 @@ module.exports = {
       })
     }
   },
+  syncKeystone: (u, value) => {
+    console.log('syncKeystone:', value)
+    u('main.keystone.devices', (prev = []) => [...prev, value])
+  },
+  updateKeystone: (u, value) => {
+    u('main.keystone.devices', () => value)
+  },
+  addKeystoneSignRequest: (u, value) => {
+    u('main.keystone.signRequests', (prev) => [...prev, value])
+  },
+  resetKeystoneSignRequest: (u, signRequestId) => {
+    u('main.keystone.signRequests', (prev) => prev.filter(({request}) => request.requestId !== signRequestId))
+    u('main.keystone.signature', () => null)
+  },
+  setKeystoneSignature: (u, value) => {
+    u('main.keystone.signature', () => value)
+  },
   setLatticeAccountLimit: (u, limit) => {
     u('main.latticeSettings.accountLimit', () => limit)
   },
@@ -274,22 +291,22 @@ module.exports = {
         },
         connection: {
           presets: { local: 'direct' },
-          primary: { 
-            on: true, 
-            current: 'custom', 
-            status: 'loading', 
-            connected: false, 
-            type: '', 
-            network: '', 
+          primary: {
+            on: true,
+            current: 'custom',
+            status: 'loading',
+            connected: false,
+            type: '',
+            network: '',
             custom: primaryRpc
           },
-          secondary: { 
-            on: false, 
-            current: 'custom', 
-            status: 'loading', 
-            connected: false, 
-            type: '', 
-            network: '', 
+          secondary: {
+            on: false,
+            current: 'custom',
+            status: 'loading',
+            connected: false,
+            type: '',
+            network: '',
             custom: secondaryRpc
           }
         },
@@ -331,7 +348,7 @@ module.exports = {
     try {
       net.id = validateNetworkSettings(net)
       newNet.id = validateNetworkSettings(newNet)
-      
+
       u('main', main => {
         const updatedNetwork = Object.assign({}, main.networks[net.type][net.id], newNet)
 
@@ -340,7 +357,7 @@ module.exports = {
             updatedNetwork[k] = updatedNetwork[k].trim()
           }
         })
-        
+
         delete main.networks[net.type][net.id]
         main.networks[updatedNetwork.type][updatedNetwork.id] = updatedNetwork
 
@@ -355,7 +372,7 @@ module.exports = {
 
         main.networksMeta[updatedNetwork.type][updatedNetwork.id].nativeCurrency = main.networksMeta[updatedNetwork.type][updatedNetwork.id].nativeCurrency || {}
         main.networksMeta[updatedNetwork.type][updatedNetwork.id].nativeCurrency.symbol = newNet.symbol
-        
+
         return main
       })
     } catch (e) {
@@ -645,7 +662,7 @@ module.exports = {
   navForward: (u, windowId, crumb) => {
     if (!windowId || !crumb) return log.warn('Invalid nav forward', windowId, crumb)
     u('windows', windowId, 'nav', nav => {
-      if (JSON.stringify(nav[0]) !== JSON.stringify(crumb)) nav.unshift(crumb)      
+      if (JSON.stringify(nav[0]) !== JSON.stringify(crumb)) nav.unshift(crumb)
       return nav
     })
     u('windows', windowId, 'showing', () => true)
@@ -696,7 +713,7 @@ module.exports = {
   },
   navDash: (u, navItem) => {
     u('windows.dash.nav', nav => {
-      if (JSON.stringify(nav[0]) !== JSON.stringify(navItem)) nav.unshift(navItem)      
+      if (JSON.stringify(nav[0]) !== JSON.stringify(navItem)) nav.unshift(navItem)
       return nav
     })
     u('windows.dash.showing', () => true)
@@ -714,7 +731,7 @@ module.exports = {
     u('main.mute.betaDisclosure', () => true)
     const navItem = { view: 'accounts', data: {} }
     u('windows.dash.nav', nav => {
-      if (JSON.stringify(nav[0]) !== JSON.stringify(navItem)) nav.unshift(navItem)      
+      if (JSON.stringify(nav[0]) !== JSON.stringify(navItem)) nav.unshift(navItem)
       return nav
     })
     u('windows.dash.showing', () => true)

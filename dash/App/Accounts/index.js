@@ -13,7 +13,7 @@ import AddPhrase from './Add/AddPhrase'
 import AddRing from './Add/AddRing'
 import AddKeystore from './Add/AddKeystore'
 import AddAddress from './Add/AddAddress'
-import AddHardwareKeystone from './AddHardwareKeystone'
+import AddHardwareKeystone from './Add/AddHardwareKeystone'
 
 
 class AddAccounts extends React.Component {
@@ -184,7 +184,8 @@ class Dash extends React.Component {
       if (
         signer.type === 'ledger' ||
         signer.type === 'trezor' ||
-        signer.type === 'lattice'
+        signer.type === 'lattice' ||
+        signer.type === 'keystone'
       ) {
         return signer
       } else {

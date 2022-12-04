@@ -7,10 +7,10 @@ const latestStateVersion = () => {
   const state = persist.get('main')
   if (!state || !state.__) {
     // log.info('Persisted state: returning base state')
-    return state 
+    return state
   }
 
-  // valid states are less than or equal to the latest migration we know about 
+  // valid states are less than or equal to the latest migration we know about
   const versions = Object.keys(state.__).filter(v => v <= migrations.latest).sort((a, b) => a - b)
 
   if (versions.length === 0) {
@@ -207,6 +207,11 @@ const initial = {
       derivation: main('ledger.derivation', 'live'),
       liveAccountLimit: main('ledger.liveAccountLimit', 5)
     },
+    keystone: main('keystone', {
+      devices: main('keystone.devices', []),
+      signRequests: main('keystone.signRequests', []),
+      signature: main('keystone.signature', null),
+    }),
     trezor: {
       derivation: main('trezor.derivation', 'standard')
     },
@@ -268,7 +273,7 @@ const initial = {
         }
       }
     },
-    networks: main('networks', { 
+    networks: main('networks', {
       ethereum: {
         1: {
           id: 1,
