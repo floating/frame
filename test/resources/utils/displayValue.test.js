@@ -6,6 +6,11 @@ describe('wei', () => {
     const displayValue = displayValueData(356)
     expect(displayValue.wei()).toStrictEqual({ displayValue: '356', value: BigNumber('356') })
   })
+
+  it('should return a zero wei value', () => {
+    const displayValue = displayValueData(0)
+    expect(displayValue.wei()).toStrictEqual({ displayValue: '0', value: BigNumber('0') })
+  })
 })
 
 describe('gwei', () => {
@@ -18,14 +23,18 @@ describe('gwei', () => {
     const displayValue = displayValueData(356e-18)
     expect(displayValue.gwei()).toStrictEqual({ displayValue: '0', value: BigNumber('0') })
   })
+
+  it('should return a zero gwei value', () => {
+    const displayValue = displayValueData(0)
+    expect(displayValue.gwei()).toStrictEqual({ displayValue: '0', value: BigNumber('0') })
+  })
 })
 
 describe('fiat currency', () => {
-  it('should return zero when no currency rate is provided', () => {
+  it('should return ? when no currency rate is provided', () => {
     const value = displayValueData(356e24)
     expect(value.fiat()).toStrictEqual({
-      approximationSymbol: '<',
-      displayValue: '0.01',
+      displayValue: '?',
       value: BigNumber(0)
     })
   })
@@ -55,6 +64,14 @@ describe('fiat currency', () => {
         value: BigNumber(999.999)
       })
     })
+
+    it('should return a zero value', () => {
+      const value = displayValueData(0, { currencyRate: { price: BigNumber(1.3) } })
+      expect(value.fiat()).toStrictEqual({
+        displayValue: '0.00',
+        value: BigNumber(0)
+      })
+    })
   })
 
   describe('when not displaying decimals', () => {
@@ -72,6 +89,14 @@ describe('fiat currency', () => {
       expect(value.fiat({ displayDecimals: false })).toStrictEqual({
         displayValue: '999',
         value: BigNumber(999.999)
+      })
+    })
+
+    it('should return a zero value', () => {
+      const value = displayValueData(0, { currencyRate: { price: BigNumber(1.3) } })
+      expect(value.fiat({ displayDecimals: false })).toStrictEqual({
+        displayValue: '0',
+        value: BigNumber(0)
       })
     })
   })
@@ -318,6 +343,14 @@ describe('ether currency', () => {
         value: BigNumber(0.000009985678111111)
       })
     })
+
+    it('should return a zero value', () => {
+      const value = displayValueData(0)
+      expect(value.ether()).toStrictEqual({
+        displayValue: '0',
+        value: BigNumber(0)
+      })
+    })
   })
 
   describe('when not displaying decimals', () => {
@@ -335,6 +368,14 @@ describe('ether currency', () => {
       expect(value.ether({ displayDecimals: false })).toStrictEqual({
         displayValue: '999',
         value: BigNumber(999.999)
+      })
+    })
+
+    it('should return a zero value', () => {
+      const value = displayValueData(0)
+      expect(value.ether({ displayDecimals: false })).toStrictEqual({
+        displayValue: '0',
+        value: BigNumber(0)
       })
     })
   })
