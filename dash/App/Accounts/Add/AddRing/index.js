@@ -143,7 +143,7 @@ class AddRing extends React.Component {
                 <div className='addAccountItemOptionSetupFrame'>
                   <div className='addAccountItemOptionTitle'>Enter Private Key</div>
                   <div className='addAccountItemOptionInputPhrase'>
-                    <input type='password' tabIndex='-1' ref={this.forms.enterPrivateKey} value={this.state.privateKey} onChange={e => this.onChange('privateKey', e)} onFocus={e => this.onFocus('privateKey', e)} onBlur={e => this.onBlur('privateKey', e)} onKeyPress={e => this.keyPress(e, () => this.next())} />
+                    <input autoFocus type='password' tabIndex='-1' ref={this.forms.enterPrivateKey} value={this.state.privateKey} onChange={e => this.onChange('privateKey', e)} onFocus={e => this.onFocus('privateKey', e)} onBlur={e => this.onBlur('privateKey', e)} onKeyPress={e => this.keyPress(e, () => this.next())} />
                   </div>
                   <div className='addAccountItemOptionSubmit' onClick={() => this.next()}>Next</div>
                 </div>

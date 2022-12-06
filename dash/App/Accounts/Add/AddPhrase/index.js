@@ -142,7 +142,7 @@ class AddPhrase extends React.Component {
                 <div className='addAccountItemOptionSetupFrame'>
                   <div className='addAccountItemOptionTitle'>seed phrase</div>
                   <div className='addAccountItemOptionInputPhrase'>
-                    <textarea tabIndex='-1' value={this.state.phrase} ref={this.forms[0]} onChange={e => this.onChange('phrase', e)} onFocus={e => this.onFocus('phrase', e)} onBlur={e => this.onBlur('phrase', e)} onKeyPress={e => this.keyPress(e)} />
+                    <textarea autoFocus tabIndex='-1' value={this.state.phrase} ref={this.forms[0]} onChange={e => this.onChange('phrase', e)} onFocus={e => this.onFocus('phrase', e)} onBlur={e => this.onBlur('phrase', e)} onKeyPress={e => this.keyPress(e)} />
                   </div>
                   <div className='addAccountItemOptionSubmit' onMouseDown={() => this.next()}>Next</div>
                 </div>
