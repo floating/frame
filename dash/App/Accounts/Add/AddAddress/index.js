@@ -18,7 +18,6 @@ class AddAddress extends React.Component {
     }
 
     this.forms = [React.createRef(), React.createRef()]
-    this.cancelEnsResolution = () => {}
   }
 
   onChange (key, e) {
@@ -54,20 +53,22 @@ class AddAddress extends React.Component {
     this.focusActive()
   }
 
+  hasCancelledResolution (input) {
+    return !(this.state.address === input && this.state.index === 1)
+  }
+
   async resolveEnsName (name) {
     return new Promise((resolve, reject) => {
-      this.cancelEnsResolution = () => reject('User canceled ENS resolution request for watch account')
+    link.rpc('resolveEnsName', name, async (err, resolvedAddress) => {
+      if(this.hasCancelledResolution(name)) return reject('User canceled ENS resolution request for watch account')
+      this.nextForm()
+      if (resolvedAddress) return resolve(resolvedAddress)
 
-      link.rpc('resolveEnsName', name, (err, resolvedAddress) => {
-        this.nextForm()
-
-        if (resolvedAddress) return resolve(resolvedAddress)
-
-        const message = `Unable to resolve Ethereum address for ${name}`
-        this.setError(message)
-        reject(message)
-      })
+      const message = `Unable to resolve Ethereum address for ${name}`
+      this.setError(message)
+      reject(message)
     })
+  })
   }
 
   setError (status) {
@@ -103,7 +104,6 @@ class AddAddress extends React.Component {
   }
 
   restart () {
-    this.cancelEnsResolution()
     this.setState({ index: 0, adding: false, address: '', success: false })
 
     setTimeout(() => {
@@ -171,14 +171,14 @@ class AddAddress extends React.Component {
                 </div>
 
                 <div className='addAccountItemOptionSetupFrame'>
-                  <div className='addAccountResolvingEns'>
-                    <div className='addAccountItemOptionTitle'>Resolving ENS Name</div>
-                    <div className='signerLoading'>
-                      <div className='signerLoadingLoader' />
-                    </div>
-                    <div className='addAccountItemOptionSubmit' onClick={() => this.restart()}>back</div>
+                <div className='addAccountResolvingEns'>
+                  <div className='addAccountItemOptionTitle'>Resolving ENS Name</div>
+                  <div className='signerLoading'>
+                    <div className='signerLoadingLoader' />
                   </div>
+                  <div className='addAccountItemOptionSubmit' onClick={() => this.restart()}>back</div>
                 </div>
+              </div>
 
                 <div className='addAccountItemOptionSetupFrame'>
                   {error
