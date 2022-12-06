@@ -64,7 +64,7 @@ class AddAddress extends React.Component {
     return new Promise((resolve, reject) => {
     link.rpc('resolveEnsName', name, async (err, resolvedAddress) => {
       if(this.hasCancelledResolution(name)) return reject('User canceled ENS resolution request for watch account')
-      this.next()
+      this.nextForm()
       if (resolvedAddress) return resolve(resolvedAddress)
 
       const message = `Unable to resolve Ethereum address for ${name}`
@@ -96,7 +96,7 @@ class AddAddress extends React.Component {
     const { address: input } = this.state
 
     if (!isEnsName(input)) {
-      this.next()
+      this.nextForm()
       return this.createFromAddress(input)
     }
 
