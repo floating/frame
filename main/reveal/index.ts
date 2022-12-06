@@ -97,12 +97,13 @@ async function recogErc20(
           return {
             id: 'erc20:approve',
             data,
-            update: (request, { amount }) => {
+            update: (request, { amount = '0x0' }) => {
               // amount is a hex string
-              const approvedAmount = new BigNumber(amount || '').toString()
+              const approvedAmount = new BigNumber(amount)
+              if(approvedAmount.isNaN()) throw new Error(`Invalid approval amount: ${amount}`)
 
               log.verbose(
-                `Updating Erc20 approve amount to ${approvedAmount} for contract ${contractAddress} and spender ${spender}`
+                `Updating Erc20 approve amount to ${approvedAmount.toString()} for contract ${contractAddress} and spender ${spender}`
               )
 
               const txRequest = request as TransactionRequest
@@ -111,7 +112,7 @@ async function recogErc20(
               txRequest.data.data = contract.encodeCallData('approve', [spender, amount])
 
               if (txRequest.decodedData) {
-                txRequest.decodedData.args[1].value = amount === MAX_HEX ? 'unlimited' : approvedAmount
+                txRequest.decodedData.args[1].value = amount === MAX_HEX ? 'unlimited' : approvedAmount.toString()
               }
             }
           } as Erc20Approval
