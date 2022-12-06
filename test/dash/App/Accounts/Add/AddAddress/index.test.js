@@ -30,11 +30,18 @@ it('shows the resolving screen when resolving an ENS name', async () => {
   expect(link.rpc).toHaveBeenCalledWith('resolveEnsName', ensName, expect.any(Function))
 })
 
-it('shows an error screen when an ENS name resolution times out', async () => {
+it('shows an error screen when ENS name resolution fails', async () => {
+  link.rpc.mockImplementationOnce((action, name, cb) => {
+    expect(action).toBe('resolveEnsName')
+    expect(name).toBe('vitalik.eth')
+    cb(new Error('testing!'))
+  })
+
   const component = setupComponent(<AddAddress />)
   const { getByText } = component
+
   await addByEnsName(component)
-  advanceTimers(10_000)
+
   expect(getByText(`Unable to resolve Ethereum address for ${ensName}`)).toBeTruthy()
 })
 
