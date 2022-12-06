@@ -1,6 +1,7 @@
 import { BaseKeyring, StoredKeyring } from "@keystonehq/base-eth-keyring";
 import { KeystoneInteractionProvider } from "./KeystoneInteractionProvider";
 import { TypedTransaction } from "@ethereumjs/tx";
+import log from "electron-log";
 
 export class KeystoneKeyring extends BaseKeyring {
   constructor(opts?: StoredKeyring) {
@@ -12,6 +13,7 @@ export class KeystoneKeyring extends BaseKeyring {
   };
 
   signTransaction(address: string, tx: any): Promise<any> {
+    log.info('signTransaction', tx)
     return super.signTransaction(address, tx);
   }
 

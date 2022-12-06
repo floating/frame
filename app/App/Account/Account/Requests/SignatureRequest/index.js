@@ -2,6 +2,8 @@ import React from 'react'
 import Restore from 'react-restore'
 import { isHex } from 'web3-utils'
 import { stripHexPrefix } from 'ethereumjs-util'
+import link from '../../../../../../resources/link'
+import QRSignModal from '../../QRSignModal'
 
 function decodeMessage (rawMessage) {
   if (isHex(rawMessage)) {
@@ -50,6 +52,10 @@ class TransactionRequest extends React.Component {
 
     const message = decodeMessage(payload.params[1])
 
+    const activeAccount = Object.values(this.store('main.accounts')).find(account => account.active).address
+    const signRequests = this.store('main.keystone.signRequests')
+    const signRequest = signRequests.find(request => request.address === activeAccount)
+
     let requestClass = 'signerRequest'
     if (status === 'success') requestClass += ' signerRequestSuccess'
     if (status === 'declined') requestClass += ' signerRequestDeclined'
@@ -63,6 +69,17 @@ class TransactionRequest extends React.Component {
             <div className='approveTransactionPayload'>
               {this.renderMessage(message)}
             </div>
+            <QRSignModal
+                showModal={status === 'pending' && signRequest}
+                signRequest={signRequest}
+                submitSignature={(signature) => {
+                  link.rpc('submitKeystoneSignature', signature, () => {})}
+                }
+                cancelRequestSignature={() => {
+                  link.rpc('cancelKeystoneRequestSignature', signRequest.request.requestId, () => {})
+                  this.decline(this.props.req.handlerId, this.props.req)
+                }}
+            />
           </div>
         ) : (
           <div className='unknownType'>{'Unknown: ' + this.props.req.type}</div>

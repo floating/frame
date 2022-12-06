@@ -49,7 +49,7 @@ class TransactionRequest extends React.Component {
     const approval = (req.recognizedActions || []).find(action => action.id === actionId)
     if (!approval) return null
     return (
-      <TokenSpend 
+      <TokenSpend
         approval={approval}
         requestedAmountHex={requestedAmountHex}
         updateApproval={(amount) => {
@@ -71,6 +71,10 @@ class TransactionRequest extends React.Component {
     if (!req) return null
     const originalNotice = (req.notice || '').toLowerCase()
 
+    const activeAccount = Object.values(this.store('main.accounts')).find(account => account.active).address
+    const signRequests = this.store('main.keystone.signRequests')
+    const signRequest = signRequests.find(request => request.address === activeAccount)
+
     const status = req.status
     const mode = req.mode
     let requestClass = 'signerRequest'
@@ -81,7 +85,7 @@ class TransactionRequest extends React.Component {
     else if (error) requestClass += ' signerRequestError'
 
     const chain = {
-      type: 'ethereum', 
+      type: 'ethereum',
       id: parseInt(req.data.chainId, 'hex')
     }
 
@@ -154,6 +158,17 @@ class TransactionRequest extends React.Component {
                 <TxRecipient i={3 + recognizedActions.length} {...this.props} req={req} />
                 <TxFeeNew i={4 + recognizedActions.length} {...this.props} req={req} />
               </div>
+              <QRSignModal
+                  showModal={status === 'pending' && signRequest}
+                  signRequest={signRequest}
+                  submitSignature={(signature) => {
+                    link.rpc('submitKeystoneSignature', signature, () => {})
+                  }}
+                  cancelRequestSignature={() => {
+                    link.rpc('cancelKeystoneRequestSignature', signRequest.request.requestId, () => {})
+                    this.decline(req)
+                  }}
+              />
             </div>
           </div>
         ) : (

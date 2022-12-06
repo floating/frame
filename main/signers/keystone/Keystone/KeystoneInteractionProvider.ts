@@ -4,23 +4,27 @@ import { InteractionProvider } from "@keystonehq/base-eth-keyring";
 import { EventEmitter } from "events";
 import {
   EthSignRequest,
-  ETHSignature, CryptoAccount,
+  ETHSignature,
+  CryptoAccount,
 } from "@keystonehq/bc-ur-registry-eth";
 import store from "../../../store";
 
 export interface SignRequest {
-  signerId: string,
-  address: Address,
+  signerId: string;
+  address: Address;
   request: {
-    requestId: string,
+    requestId: string;
     payload: {
-      type: string,
-      cbor: string,
-    }
-  }
+      type: string;
+      cbor: string;
+    };
+  };
 }
 
-export class KeystoneInteractionProvider extends EventEmitter implements InteractionProvider {
+export class KeystoneInteractionProvider
+  extends EventEmitter
+  implements InteractionProvider
+{
   static instance: KeystoneInteractionProvider;
 
   constructor() {
@@ -32,16 +36,15 @@ export class KeystoneInteractionProvider extends EventEmitter implements Interac
   }
 
   // This function is not used in Frame for syncing but is required in InteractionProvider
-  readCryptoHDKeyOrCryptoAccount = () => Promise.resolve(CryptoAccount.fromCBOR(Buffer.from('', "hex")))
+  readCryptoHDKeyOrCryptoAccount = () =>
+    Promise.resolve(CryptoAccount.fromCBOR(Buffer.from("", "hex")));
 
-  requestSignature = (
-    signRequest: EthSignRequest,
-  ): Promise<ETHSignature> => {
+  requestSignature = (signRequest: EthSignRequest): Promise<ETHSignature> => {
     return new Promise((resolve, reject) => {
       const ur = signRequest.toUR();
       const requestIdBuffer = signRequest.getRequestId();
-      if(!requestIdBuffer){
-          return reject('signer requestId missing')
+      if (!requestIdBuffer) {
+        return reject("signer requestId missing");
       }
       const requestId = uuid.stringify(requestIdBuffer);
       const signPayload = {
@@ -52,20 +55,22 @@ export class KeystoneInteractionProvider extends EventEmitter implements Interac
         },
       };
 
-      const accounts: Record<string, Account> = store('main.accounts')
-      const currentAccount = Object.values(accounts).find(account => account.active)
+      const accounts: Record<string, Account> = store("main.accounts");
+      const currentAccount = Object.values(accounts).find(
+        (account) => account.active
+      );
 
-      if(currentAccount) {
-        const { address, signer: signerId } = currentAccount
+      if (currentAccount) {
+        const { address, signer: signerId } = currentAccount;
         store.addKeystoneSignRequest({
           signerId,
           address,
-          request: signPayload
-        })
+          request: signPayload,
+        });
 
         this.once(`${requestId}-signed`, (cbor: string) => {
           const ethSignature = ETHSignature.fromCBOR(Buffer.from(cbor, "hex"));
-          store.resetKeystoneSignRequest(requestId)
+          store.resetKeystoneSignRequest(requestId);
           resolve(ethSignature);
         });
       }
@@ -73,6 +78,8 @@ export class KeystoneInteractionProvider extends EventEmitter implements Interac
   };
 
   submitSignature = (requestId: string, cbor: string) => {
-    this.emit(`${requestId}-signed`, cbor);
+    const msg = `${requestId}-signed`;
+    console.log("submitSignatureL", { msg });
+    this.emit(msg, cbor);
   };
 }

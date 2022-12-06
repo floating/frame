@@ -207,11 +207,11 @@ const initial = {
       derivation: main('ledger.derivation', 'live'),
       liveAccountLimit: main('ledger.liveAccountLimit', 5)
     },
-    keystone: main('keystone', {
+    keystone: {
       devices: main('keystone.devices', []),
       signRequests: main('keystone.signRequests', []),
       signature: main('keystone.signature', null),
-    }),
+    },
     trezor: {
       derivation: main('trezor.derivation', 'standard')
     },

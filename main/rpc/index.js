@@ -137,6 +137,17 @@ const rpc = {
     store.syncKeystone(ur)
     cb()
   },
+  submitKeystoneSignature(signature, cb) {
+    console.log('submitKeystoneSignature:', {signature})
+    //TODO LS submit the transaction
+    store.setKeystoneSignature(signature)
+    cb()
+  },
+  cancelKeystoneRequestSignature(signRequestId, cb) {
+    console.log('cancelKeystoneRequestSignature:', {signature})
+    store.resetKeystoneSignRequest(signRequestId)
+    cb()
+  },
 
   launchStatus: launch.status,
   providerSend: (payload, cb) => provider.send(payload, cb),

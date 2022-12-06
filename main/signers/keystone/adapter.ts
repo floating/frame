@@ -38,7 +38,8 @@ export default class KeystoneSignerAdapter extends SignerAdapter {
     this.signerObserver = store.observer(() => {
       const signRequests = store('main.keystone.signRequests')
       const signature = store('main.keystone.signature')
-
+      //TODO LS check if the signature is received
+      console.log('signerObserver:', signature)
       if(signature){
         const currentSignRequest = signRequests.find((signRequest: SignRequest) => {
           const ethSignature = ETHSignature.fromCBOR(Buffer.from(signature.cbor, 'hex'))
@@ -50,7 +51,7 @@ export default class KeystoneSignerAdapter extends SignerAdapter {
           const signId = stringify(requestId)
           return signId === signRequest.request.requestId
         })
-
+        console.log('signerObserver:', currentSignRequest)
         if(currentSignRequest){
           const {signerId, request} = currentSignRequest
           const currentSigner = this.knownSigners[signerId]
