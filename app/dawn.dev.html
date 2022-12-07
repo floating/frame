@@ -1,0 +1,27 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="
+        script-src 'strict-dynamic' 'nonce-8c7d2664-ae99-42c2-ae12-3304e9168f71' http://localhost:1234 'unsafe-eval';
+        base-uri 'self';
+        connect-src *; 
+        img-src blob: http://localhost:8421 http://localhost:1234 'unsafe-inline';
+        style-src 'self';
+        frame-src 'none'; 
+        object-src 'none';
+      "
+    />
+    <title>Dapp</title>
+    <link rel="stylesheet" href="../resources/base.styl" type="text/css" />
+    <link rel="stylesheet" href="./Dawn/index.styl" type="text/css" />
+    <script nonce="8c7d2664-ae99-42c2-ae12-3304e9168f71">
+      window.frameWindow = 'dawn'
+    </script>
+  </head>
+  <body>
+    <div id="dawn"></div>
+    <script type="module" src="./index.js" nonce="8c7d2664-ae99-42c2-ae12-3304e9168f71"></script>
+  </body>
+</html>

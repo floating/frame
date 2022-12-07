@@ -1,0 +1,52 @@
+.backdrop
+  position absolute
+  top 80px
+  right 8px
+  left 8px
+  bottom 40px
+  z-index 1
+  pointer-events none
+  transition var(--standard)
+  background var(--ghostZ)
+  border-radius 30px
+
+.overlay
+  position absolute
+  top 80px
+  right 8px
+  left 8px
+  bottom 40px
+  z-index 1000 // top
+  pointer-events none
+  transition var(--standard)
+  border-radius 30px
+  opacity 1
+  box-shadow inset 0px 0px 8px var(--ghostY)
+  border-top 2px solid var(--ghostZ)
+
+.overlayMonitor
+  opacity 1
+
+.light
+  .overlayMonitor::before
+    content ''
+    position absolute
+    top 0px
+    right 0px
+    left 0px
+    bottom 0px
+    border-radius 26px
+    opacity 0.1
+    background-image url('./Account/Account/Requests/style/wave.svg')
+
+.dark
+  .overlayMonitor::before
+    content ''
+    position absolute
+    top 0px
+    right 0px
+    left 0px
+    bottom 0px
+    border-radius 26px
+    opacity 0.1
+    background-image url('./Account/Account/Requests/style/waveDark.svg')

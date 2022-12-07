@@ -108,27 +108,20 @@ const detectMouse = () => {
   }, 50)
 }
 
-function initDashWindow() {
-  windows.dash = createWindow('dash', {
-    width: trayWidth
-  })
+function initWindow(id: string, opts: Electron.BrowserWindowConstructorOptions) {
+  windows[id] = createWindow(id, opts)
 
-  const dashUrl = enableHMR
-    ? 'http://localhost:1234/dash/dash.dev.html'
-    : new URL(path.join(process.env.BUNDLE_LOCATION, 'dash.html'), 'file:')
-  windows.dash.loadURL(dashUrl.toString())
+  const url = enableHMR
+    ? `http://localhost:1234/app/${id}.dev.html`
+    : new URL(path.join(process.env.BUNDLE_LOCATION, `${id}.html`), 'file:')
+  windows[id].loadURL(url.toString())
 }
 
 function initTrayWindow() {
-  windows.tray = createWindow('tray', {
+  initWindow('tray', {
     width: trayWidth,
     icon: path.join(__dirname, './AppIcon.png')
   })
-
-  const trayUrl = enableHMR
-    ? 'http://localhost:1234/app/tray.dev.html'
-    : new URL(path.join(process.env.BUNDLE_LOCATION, 'tray.html'), 'file:')
-  windows.tray.loadURL(trayUrl.toString())
 
   windows.tray.on('closed', () => delete windows.tray)
   windows.tray.webContents.session.setPermissionRequestHandler((webContents, permission, res) => res(false))
@@ -325,7 +318,53 @@ class Tray {
 
 class Dash {
   constructor() {
-    initDashWindow()
+    initWindow('dash', {
+      width: trayWidth
+    })
+  }
+
+  public hide() {
+    if (windows.dash && windows.dash.isVisible()) {
+      windows.dash.hide()
+    }
+  }
+
+  public show() {
+    if (!tray.isReady()) {
+      return
+    }
+    setTimeout(() => {
+      windows.dash.setAlwaysOnTop(true)
+      windows.dash.setVisibleOnAllWorkspaces(true, {
+        visibleOnFullScreen: true,
+        skipTransformProcessType: true
+      })
+      windows.dash.setResizable(false) // Keeps height consistent
+      const area = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
+      const height = isDev && !fullheight ? devHeight : area.height
+      windows.dash.setMinimumSize(trayWidth, height)
+      windows.dash.setSize(trayWidth, height)
+      windows.dash.setMaximumSize(trayWidth, height)
+      const { x, y } = topRight(windows.dash)
+      windows.dash.setPosition(x - trayWidth - 5, y)
+      windows.dash.show()
+      windows.dash.focus()
+      windows.dash.setVisibleOnAllWorkspaces(false, {
+        visibleOnFullScreen: true,
+        skipTransformProcessType: true
+      })
+      if (isDev) {
+        windows.dash.webContents.openDevTools()
+      }
+    }, 10)
+  }
+}
+
+class Dawn {
+  constructor() {
+    initWindow('dawn', {
+      width: trayWidth
+    })
   }
 
   public hide() {

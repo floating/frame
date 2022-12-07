@@ -110,3 +110,6 @@ export const removeView = (u, id, isCurrent) => {
 
 export const initialSignerPos = (u, pos) => u('selected.position.initial', (_) => pos)
 export const initialScrollPos = (u, pos) => u('selected.position.scrollTop', (_) => pos)
+
+// export const syncMain = (u, main) => u('main', (_) => main)
+// export const setType = (u, type) => u('type', (_) => type)
