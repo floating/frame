@@ -20,14 +20,14 @@ class BalancesExpanded extends React.Component {
     this.moduleRef = React.createRef()
     if (!this.props.expanded) {
       this.resizeObserver = new ResizeObserver(() => {
-        if (this.moduleRef && this.moduleRef.current) {
-          clearTimeout(this.resizeTimer)
-          this.resizeTimer = setTimeout(() => {
+        clearTimeout(this.resizeTimer)
+        this.resizeTimer = setTimeout(() => {
+          if (this.moduleRef && this.moduleRef.current) {
             link.send('tray:action', 'updateAccountModule', this.props.moduleId, {
               height: this.moduleRef.current.clientHeight
             })
-          }, 100)
-        }
+          }
+        }, 100)
       })
     }
 
