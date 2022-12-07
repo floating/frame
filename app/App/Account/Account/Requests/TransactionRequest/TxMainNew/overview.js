@@ -13,8 +13,9 @@ const isNonZeroHex = (hex) => !!hex && !['0x', '0x0'].includes(hex)
 function renderRecognizedAction(req) {
   const { recognizedActions: actions = [] } = req
 
-  return (
-    actions.length > 0 &&
+  return !actions.length ? (
+    <div className='_txDescriptionSummaryLine'>Calling Contract</div>
+  ) : (
     actions.map((action) => {
       const { id = '', data } = action
 
