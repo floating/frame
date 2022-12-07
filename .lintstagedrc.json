@@ -1,0 +1,3 @@
+{
+  "**/*.{yml,json,md,html,ts,js}": "prettier --check"
+}
