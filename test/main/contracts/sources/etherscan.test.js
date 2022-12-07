@@ -95,7 +95,7 @@ describe('#fetchEtherscanContract', () => {
     mockEtherscanApi(400)
 
     return expect(fetchEtherscanContract(contractAddress, 1)).resolves.toBeUndefined()
-  }, 500)
+  }, 200)
 
   it('does not retrieve a contract from etherscan when the contract is not found', async () => {
     mockEtherscanApi(200, {
@@ -104,7 +104,7 @@ describe('#fetchEtherscanContract', () => {
     })
 
     return expect(fetchEtherscanContract(contractAddress, 1)).resolves.toBeUndefined()
-  }, 500)
+  }, 200)
 
   it('does not retrieve a contract from etherscan when the ABI is unverified', async () => {
     mockEtherscanApi(200, {
@@ -118,11 +118,11 @@ describe('#fetchEtherscanContract', () => {
     })
 
     return expect(fetchEtherscanContract(contractAddress, 1)).resolves.toBeUndefined()
-  }, 500)
+  }, 200)
 
   it('does not retrieve a contract from an unsupported chain', async () => {
     return expect(fetchEtherscanContract(contractAddress, 4)).resolves.toBeUndefined()
-  }, 500)
+  }, 200)
 
   it('does not retrieve a contract when the request times out', async () => {
     mockEtherscanApi(
@@ -144,5 +144,5 @@ describe('#fetchEtherscanContract', () => {
     jest.advanceTimersByTime(4000)
 
     return contract
-  }, 500)
+  }, 200)
 })
