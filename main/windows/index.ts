@@ -32,6 +32,7 @@ const devHeight = 800
 
 let tray: Tray
 let dash: Dash
+let dawn: Dawn
 let mouseTimeout: NodeJS.Timeout
 let glide = false
 
@@ -168,11 +169,16 @@ function initTrayWindow() {
     windows.tray.focus()
   }, 1260)
 
-  if (!openedAtLogin) {
-    windows.tray.once('ready-to-show', () => {
+  windows.tray.once('ready-to-show', () => {
+    if (!openedAtLogin) {
       tray.show()
-    })
-  }
+    }
+    if (dawn) {
+      setTimeout(() => {
+        dawn.show()
+      }, 1000)
+    }
+  })
 
   setTimeout(() => {
     screen.on('display-added', () => tray.hide())
@@ -363,42 +369,50 @@ class Dash {
 class Dawn {
   constructor() {
     initWindow('dawn', {
-      width: trayWidth
+      x: 0,
+      y: 0,
+      width: 0,
+      height: 0,
+      titleBarStyle: 'hidden',
+      trafficLightPosition: { x: 10, y: 9 },
+      icon: path.join(__dirname, './AppIcon.png')
     })
   }
 
   public hide() {
-    if (windows.dash && windows.dash.isVisible()) {
-      windows.dash.hide()
+    if (windows.dawn && windows.dawn.isVisible()) {
+      windows.dawn.hide()
     }
   }
 
   public show() {
+    log.warn('loading dawn url', tray.isReady())
     if (!tray.isReady()) {
       return
     }
     setTimeout(() => {
-      windows.dash.setAlwaysOnTop(true)
-      windows.dash.setVisibleOnAllWorkspaces(true, {
-        visibleOnFullScreen: true,
-        skipTransformProcessType: true
+      windows.dawn.on('ready-to-show', () => {
+        windows.dawn.show()
       })
-      windows.dash.setResizable(false) // Keeps height consistent
+
       const area = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
-      const height = isDev && !fullheight ? devHeight : area.height
-      windows.dash.setMinimumSize(trayWidth, height)
-      windows.dash.setSize(trayWidth, height)
-      windows.dash.setMaximumSize(trayWidth, height)
-      const { x, y } = topRight(windows.dash)
-      windows.dash.setPosition(x - trayWidth - 5, y)
-      windows.dash.show()
-      windows.dash.focus()
-      windows.dash.setVisibleOnAllWorkspaces(false, {
+      const height = area.height - 160
+      const maxWidth = Math.floor(height * 1.24)
+      const targetWidth = area.width - 460
+      const width = targetWidth > maxWidth ? maxWidth : targetWidth
+      windows.dawn.setMinimumSize(400, 300)
+      windows.dawn.setSize(width, height)
+      const pos = topRight(windows.dawn)
+      windows.dawn.setPosition(pos.x - 440, pos.y + 80)
+      windows.dawn.setAlwaysOnTop(true)
+      windows.dawn.show()
+      windows.dawn.focus()
+      windows.dawn.setVisibleOnAllWorkspaces(false, {
         visibleOnFullScreen: true,
         skipTransformProcessType: true
       })
       if (isDev) {
-        windows.dash.webContents.openDevTools()
+        windows.dawn.webContents.openDevTools()
       }
     }, 10)
   }
@@ -453,6 +467,9 @@ const init = () => {
   }
   tray = new Tray()
   dash = new Dash()
+  if (!store('main.mute.onboardingWindow')) {
+    dawn = new Dawn()
+  }
 }
 
 const send = (id: string, channel: string, ...args: string[]) => {

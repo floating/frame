@@ -726,6 +726,9 @@ module.exports = {
     u('main.mute.aragonAccountMigrationWarning', () => true)
     u('windows.dash.showing', () => true)
   },
+  muteOnboardingWindow: (u) => {
+    u('main.mute.onboardingWindow', () => true)
+  },
   // Dapp Frame
   appDapp: (u, dapp) => {
     u('main.dapps', (dapps) => {
