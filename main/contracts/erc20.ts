@@ -42,10 +42,7 @@ export default class Erc20Contract {
   static isApproval(data: TransactionDescription) {
     const [spender, value] = data.args
     return (
-      data.name === 'approve' &&
-      data.args.length === 2 &&
-      isAddress(spender) &&
-      value instanceof BigNumber
+      data.name === 'approve' && data.args.length === 2 && isAddress(spender) && value instanceof BigNumber
     )
   }
 
