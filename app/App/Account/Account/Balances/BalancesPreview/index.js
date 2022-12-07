@@ -23,9 +23,10 @@ class BalancesPreview extends React.Component {
       this.resizeObserver = new ResizeObserver(() => {
         clearTimeout(this.resizeTimer)
         this.resizeTimer = setTimeout(() => {
-          if (this.moduleRef && this.moduleRef.current && this.moduleRef.current.clientHeight) {
-            const height = this.moduleRef.current.clientHeight
-            link.send('tray:action', 'updateAccountModule', this.props.moduleId, { height })
+          if (this.moduleRef && this.moduleRef.current) {
+            link.send('tray:action', 'updateAccountModule', this.props.moduleId, {
+              height: this.moduleRef.current.clientHeight
+            })
           }
         }, 100)
       })
