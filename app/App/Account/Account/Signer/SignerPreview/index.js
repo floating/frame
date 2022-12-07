@@ -108,18 +108,35 @@ class Signer extends React.Component {
   }
 
   getCurrentStatus(activeSigner, hardwareSigner) {
+    let status = ''
+    let style = {
+      marginLeft: '10px',
+      padding: '12px'
+    }
+
     if (activeSigner && activeSigner.status) {
-      let status = activeSigner.status
-      if (status.toLowerCase() === 'ok') {
-        return 'ready to sign'
+      if (activeSigner.status.toLowerCase() === 'ok') {
+        status = 'ready to sign'
+        style.color = 'var(--good)'
+      } else if (activeSigner.status.toLowerCase() === 'locked') {
+        style.color = 'var(--moon)'
+        status = activeSigner.status
       } else {
-        return status
+        status = activeSigner.status
       }
     } else if (hardwareSigner) {
-      return 'Disconnected'
+      style.color = 'var(--bad)'
+      status = 'Disconnected'
     } else {
-      return 'No Signer'
+      style.color = 'var(--bad)'
+      status = 'No Signer'
     }
+
+    return (
+      <div className='clusterTag' style={style}>
+        {status}
+      </div>
+    )
   }
 
   render() {
@@ -178,18 +195,7 @@ class Signer extends React.Component {
                   {this.renderSignerType(activeAccount.lastSignerType)}
                 </div>
               </ClusterValue>
-              <ClusterValue>
-                <div
-                  className='clusterTag'
-                  style={{
-                    marginLeft: '10px',
-                    padding: '12px',
-                    color: status === 'ready to sign' ? 'var(--good)' : ''
-                  }}
-                >
-                  {status}
-                </div>
-              </ClusterValue>
+              <ClusterValue>{this.getCurrentStatus(activeSigner, hardwareSigner)}</ClusterValue>
             </ClusterColumn>
             {!watchOnly && (
               <ClusterColumn width={'80px'}>
