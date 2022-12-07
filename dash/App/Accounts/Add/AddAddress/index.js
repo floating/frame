@@ -66,7 +66,7 @@ class AddAddress extends React.Component {
       link.rpc('resolveEnsName', name, (err, resolvedAddress) => {
         if (err) return reject(`Unable to resolve Ethereum address for ${name}`)
         
-        //resolve({ canceled: false, address: resolvedAddress })
+        resolve({ canceled: false, address: resolvedAddress })
       })
     })
   }

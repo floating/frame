@@ -54,11 +54,27 @@ it('shows an error screen when ENS name resolution fails', async () => {
   expect(getByRole('button', { name: 'try again' })).toBeTruthy()
 })
 
-it('shows a success screen after adding an account', async () => {
+it('shows a success screen after adding an account by address', async () => {
   const component = setupComponent(<AddAddress />)
   const { getByText, getByRole } = component
 
   await addByAccount(component)
+
+  expect(getByText('account added successfully')).toBeTruthy()
+  expect(getByRole('button', { name: 'back' })).toBeTruthy()
+})
+
+it('shows a success screen after adding an account by ENS name', async () => {
+  link.rpc.mockImplementationOnce((action, name, cb) => {
+    expect(action).toBe('resolveEnsName')
+    expect(name).toBe('vitalik.eth')
+    cb(null, '0xd8da6bf26964af9d7eed9e03e53415d37aa96045')
+  })
+
+  const component = setupComponent(<AddAddress />)
+  const { getByText, getByRole } = component
+
+  await addByEnsName(component)
 
   expect(getByText('account added successfully')).toBeTruthy()
   expect(getByRole('button', { name: 'back' })).toBeTruthy()
