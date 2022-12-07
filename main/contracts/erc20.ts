@@ -5,6 +5,8 @@ import { addHexPrefix } from '@ethereumjs/util'
 import log from 'electron-log'
 import erc20Abi from '../externalData/balances/erc-20-abi'
 import provider from '../provider'
+import { isAddress } from 'ethers/lib/utils'
+import { BigNumber } from 'ethers'
 
 function createWeb3ProviderWrapper(chainId: number) {
   const wrappedSend = (
@@ -38,24 +40,22 @@ export default class Erc20Contract {
   }
 
   static isApproval(data: TransactionDescription) {
+    const [spender, value] = data.args
     return (
       data.name === 'approve' &&
-      data.functionFragment.inputs.length === 2 &&
-      (data.functionFragment.inputs[0].name || '').toLowerCase().endsWith('spender') &&
-      data.functionFragment.inputs[0].type === 'address' &&
-      (data.functionFragment.inputs[1].name || '').toLowerCase().endsWith('value') &&
-      data.functionFragment.inputs[1].type === 'uint256'
+      data.args.length === 2 &&
+      isAddress(spender) &&
+      value instanceof BigNumber
     )
   }
 
   static isTransfer(data: TransactionDescription) {
+    const [to, value] = data.args
     return (
       data.name === 'transfer' &&
       data.functionFragment.inputs.length === 2 &&
-      (data.functionFragment.inputs[0].name || '').toLowerCase().endsWith('to') &&
-      data.functionFragment.inputs[0].type === 'address' &&
-      (data.functionFragment.inputs[1].name || '').toLowerCase().endsWith('value') &&
-      data.functionFragment.inputs[1].type === 'uint256'
+      isAddress(to) &&
+      value instanceof BigNumber
     )
   }
 

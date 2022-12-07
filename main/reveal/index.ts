@@ -99,7 +99,7 @@ async function recogErc20(
             data,
             update: (request, { amount }) => {
               // amount is a hex string
-              const approvedAmount = new BigNumber(amount || '').toString()
+              const approvedAmount = new BigNumber(amount || '0x0').toString()
 
               log.verbose(
                 `Updating Erc20 approve amount to ${approvedAmount} for contract ${contractAddress} and spender ${spender}`
