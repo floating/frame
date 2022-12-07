@@ -3,7 +3,6 @@ import Restore from 'react-restore'
 
 import link from '../../../../../resources/link'
 import RingIcon from '../../../../../resources/Components/RingIcon'
-import { logger } from 'ethers'
 
 const isEnsName = input => input.toLowerCase().includes('.eth')
 
@@ -20,6 +19,7 @@ class AddAddress extends React.Component {
     }
 
     this.forms = [React.createRef(), React.createRef()]
+    this.cancelEnsResolution = () => {}
   }
 
   onChange (key, e) {
@@ -55,27 +55,20 @@ class AddAddress extends React.Component {
     this.focusActive()
   }
 
-  hasCancelledResolution (input) {
-    return !(this.state.address === input || !this.state.resolvingEnsName)
-  }
-
   async resolveEnsName (name) {
-    this.resolving()
     return new Promise((resolve, reject) => {
-    link.rpc('resolveEnsName', name, async (err, resolvedAddress) => {
-      if(this.hasCancelledResolution(name)) return reject('User canceled ENS resolution request for watch account')
-      this.nextForm()
-      if (resolvedAddress) return resolve(resolvedAddress)
+      this.cancelEnsResolution = () => resolve({ canceled: true })
 
-      const message = `Unable to resolve Ethereum address for ${name}`
-      this.setError(message)
-      reject(message)
+      link.rpc('resolveEnsName', name, (err, resolvedAddress) => {
+        if (err) return reject(`Unable to resolve Ethereum address for ${name}`)
+        
+        resolve({ canceled: false, address: resolvedAddress })
+      })
     })
-  })
   }
-  
-  resolving() {
-    this.setState({resolvingEnsName: true})
+
+  setResolving () {
+    this.setState({ resolvingEnsName: true })
   }
 
   setError (status) {
@@ -95,20 +88,32 @@ class AddAddress extends React.Component {
   async create () {
     const { address: input } = this.state
 
-    if (!isEnsName(input)) {
+    const create = (address) => {
       this.nextForm()
-      return this.createFromAddress(input)
+      return this.createFromAddress(address)
+    }
+
+    if (!isEnsName(input)) {
+      return create(input)
     }
 
     try {
-      const resolvedAddress = await this.resolveEnsName(input)
-      this.createFromAddress(resolvedAddress)
+      this.setResolving()
+
+      const { canceled, address } = await this.resolveEnsName(input)
+
+      if (!canceled) {
+        create(address)
+      }
     } catch (e) {
+      this.setError(e)
+      this.nextForm()
       console.log(e)
     }
   }
 
   restart () {
+    this.cancelEnsResolution()
     this.setState({ index: 0, adding: false, address: '', success: false, resolvingEnsName: false })
 
     setTimeout(() => {
@@ -169,32 +174,33 @@ class AddAddress extends React.Component {
               <div className='addAccountItemOptionSetupFrames'>
 
                 <div className='addAccountItemOptionSetupFrame'>
-                  {!resolvingEnsName ? 
-                    <>
-                  <label htmlFor='addressInput' role='label' className='addAccountItemOptionTitle'>input address or ENS name</label>
-                  <div className='addAccountItemOptionInputPhrase'>
-                    <textarea autoFocus id='addressInput' tabIndex='-1' value={address} ref={this.forms[0]} onChange={e => this.onChange('address', e)} onFocus={e => this.onFocus('address', e)} onBlur={e => this.onBlur('address', e)} onKeyPress={e => this.keyPress(e)} />
-                  </div>
-                  <div role='button' className='addAccountItemOptionSubmit' onClick={() => this.create()}>Create</div>
-                    </> :                 
-                    <div className='addAccountResolvingEns'>
-                      <div className='addAccountItemOptionTitle'>Resolving ENS Name</div>
-                      <div className='signerLoading'>
-                        <div className='signerLoadingLoader' />
+                  {!resolvingEnsName
+                    ? <>
+                        <label htmlFor='addressInput' role='label' className='addAccountItemOptionTitle'>input address or ENS name</label>
+                        <div className='addAccountItemOptionInputPhrase'>
+                          <textarea autoFocus id='addressInput' tabIndex='-1' value={address} ref={this.forms[0]} onChange={e => this.onChange('address', e)} onFocus={e => this.onFocus('address', e)} onBlur={e => this.onBlur('address', e)} onKeyPress={e => this.keyPress(e)} />
+                        </div>
+                        <div role='button' className='addAccountItemOptionSubmit' onClick={() => this.create()}>Create</div>
+                      </>
+                    : <div className='addAccountResolvingEns'>
+                        <div className='addAccountItemOptionTitle'>Resolving ENS Name</div>
+                        <div className='signerLoading'>
+                          <div className='signerLoadingLoader' />
+                        </div>
+                        <div role='button' className='addAccountItemOptionSubmit' onClick={() => this.restart()}>back</div>
                       </div>
-                      <div className='addAccountItemOptionSubmit' onClick={() => this.restart()}>back</div>
-                    </div>}
+                    }
                 </div>
 
                 <div className='addAccountItemOptionSetupFrame'>
                   {error
                     ? <>
                       <div className='addAccountItemOptionTitle'>{status}</div>
-                      <div className='addAccountItemOptionSubmit' onClick={() => this.restart()}>try again</div>
+                      <div role='button' className='addAccountItemOptionSubmit' onClick={() => this.restart()}>try again</div>
                      </>
                     : <>
                       <div className='addAccountItemOptionTitle'>{'account added successfully'}</div>
-                      <div className='addAccountItemOptionSubmit' onClick={() => link.send('nav:back', 'dash', 2)}>back</div>
+                      <div role='button' className='addAccountItemOptionSubmit' onClick={() => link.send('nav:back', 'dash', 2)}>back</div>
                     </>
                   }
                 </div>

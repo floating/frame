@@ -3,7 +3,7 @@ import Restore from 'react-restore'
 
 import store from '../../../../../../main/store'
 import link from '../../../../../../resources/link'
-import { setupComponent, advanceTimers } from '../../../../../componentSetup'
+import { setupComponent } from '../../../../../componentSetup'
 import AddAdressComponent from '../../../../../../dash/App/Accounts/Add/AddAddress'
 
 jest.mock('../../../../../../main/store/persist')
@@ -26,6 +26,7 @@ it('shows the resolving screen when resolving an ENS name', async () => {
   const { getByText } = component
 
   await addByEnsName(component)
+
   expect(getByText('Resolving ENS Name')).toBeTruthy()
   expect(link.rpc).toHaveBeenCalledWith('resolveEnsName', ensName, expect.any(Function))
 })
@@ -38,20 +39,22 @@ it('shows an error screen when ENS name resolution fails', async () => {
   })
 
   const component = setupComponent(<AddAddress />)
-  const { getByText } = component
+  const { getByText, getByRole } = component
 
   await addByEnsName(component)
 
   expect(getByText(`Unable to resolve Ethereum address for ${ensName}`)).toBeTruthy()
+  expect(getByRole('button', { name: 'try again' })).toBeTruthy()
 })
 
 it('shows a success screen after adding an account', async () => {
   const component = setupComponent(<AddAddress />)
-  const { getByText } = component
+  const { getByText, getByRole } = component
 
   await addByAccount(component)
 
   expect(getByText('account added successfully')).toBeTruthy()
+  expect(getByRole('button', { name: 'back' })).toBeTruthy()
 })
 
 async function addByAccount (component) {

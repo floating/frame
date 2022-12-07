@@ -230,28 +230,15 @@ const rpc = {
     resolveName(name, chainId).then(result => cb(null, result)).catch(cb)
   },
   async resolveEnsName (name, cb) {
-    try {
     log.debug('Resolving ENS name', {name})
     const nebula = nebulaApi()
 
-    const resolveAddress = async () => {
-      const {addresses: {eth: ethAddress}} = await nebula.ens.resolve(name)
-      return [null, ethAddress]
-    }
-    const timeOut = async () => {
-      await new Promise(r => setTimeout(r, 8000))
-      return [new Error("Resolution timed out")]
-    }
-    
-    const resp = await Promise.race([
-      resolveAddress(),
-      timeOut()
-    ])
-
-    return cb(...resp)
+    try {
+      const { addresses: { eth: ethAddress } } = await nebula.ens.resolve(name, { timeout: 8000 })
+      cb(null, ethAddress)
     }
     catch(err) {
-      log.warn(`Could not resolve ENS name ${name}`, err)
+      log.warn(`Could not resolve ENS name ${name}:`, err)
       return cb(err)
     }
   },
