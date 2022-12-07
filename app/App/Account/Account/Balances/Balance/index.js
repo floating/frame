@@ -39,6 +39,8 @@ class Balance extends React.Component {
     const { name: chainName = '', isTestnet = false } = chain
     const chainColor = this.store('main.networksMeta.ethereum', chainId, 'primaryColor')
 
+    const ethMatch = logoURI.includes('/coins/images/279/large/ethereum.png')
+
     return (
       <div
         className={i === 0 ? 'signerBalance signerBalanceBase' : 'signerBalance'}
@@ -49,7 +51,7 @@ class Balance extends React.Component {
         <div className='signerBalanceInner' style={{ opacity: !scanning ? 1 : 0 }}>
           <div className='signerBalanceIcon'>
             <RingIcon
-              img={symbol.toUpperCase() !== 'ETH' && logoURI}
+              img={symbol.toUpperCase() !== 'ETH' && !isTestnet && !ethMatch && logoURI}
               alt={symbol.toUpperCase()}
               color={chainColor ? `var(--${chainColor})` : ''}
             />
