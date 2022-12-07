@@ -4,7 +4,7 @@ import Restore from 'react-restore'
 import store from '../../../../main/store'
 import link from '../../../../resources/link'
 import { setupComponent } from '../../../componentSetup'
-import ChainComponent from '../../../../dash/App/Chains/Chain'
+import ChainComponent from '../../../../app/Dash/Chains/Chain'
 
 jest.mock('../../../../main/store/persist')
 jest.mock('../../../../resources/link', () => ({ send: jest.fn() }))
