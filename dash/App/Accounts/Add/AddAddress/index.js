@@ -61,12 +61,12 @@ class AddAddress extends React.Component {
 
   async resolveEnsName (name) {
     return new Promise((resolve, reject) => {
-      this.cancelEnsResolution = () => resolve({ canceled: true })
+      this.cancelEnsResolution = () => reject({ canceled: true })
 
       link.rpc('resolveEnsName', name, (err, resolvedAddress) => {
-        if (err) return reject(`Unable to resolve Ethereum address for ${name}`)
+        if (err) return reject({ canceled: false, message: `Unable to resolve Ethereum address for ${name}` })
         
-        resolve({ canceled: false, address: resolvedAddress })
+        resolve(resolvedAddress)
       })
     })
   }
@@ -104,15 +104,13 @@ class AddAddress extends React.Component {
     try {
       this.setResolving()
 
-      const { canceled, address } = await this.resolveEnsName(input)
-
-      if (!canceled) {
-        create(address)
-      }
+      const address = await this.resolveEnsName(input)
+      create(address)
     } catch (e) {
-      this.setError(e)
-      this.nextForm()
-      console.log(e)
+      if (!e.canceled) {
+        this.setError(e.message)
+        this.nextForm()
+      }
     }
   }
 
