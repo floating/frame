@@ -204,7 +204,7 @@ describe('Ring signer', () => {
     } catch (e) {
       done(e)
     }
-  }, 500)
+  }, 600)
 
   test('Unlock', (done) => {
     try {

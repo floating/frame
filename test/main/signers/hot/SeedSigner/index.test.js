@@ -129,7 +129,7 @@ describe('Seed signer', () => {
     } catch (e) {
       done(e)
     }
-  })
+  }, 400)
 
   test('Sign transaction', (done) => {
     const rawTx = {
