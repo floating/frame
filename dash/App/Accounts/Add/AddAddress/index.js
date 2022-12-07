@@ -191,7 +191,7 @@ class AddAddress extends React.Component {
                         <div className='signerLoading'>
                           <div className='signerLoadingLoader' />
                         </div>
-                        <div role='button' className='addAccountItemOptionSubmit' onClick={() => this.restart()}>back</div>
+                        <div role='button' className='addAccountItemOptionSubmit' onClick={() => this.restart()}>cancel</div>
                       </div>
                     }
                 </div>

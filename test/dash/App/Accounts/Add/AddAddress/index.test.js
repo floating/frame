@@ -13,6 +13,13 @@ const AddAddress = Restore.connect(AddAdressComponent, store)
 const address = '0x690B9A9E9aa1C9dB991C7721a92d351Db4FaC990'
 const ensName = 'vitalik.eth'
 
+it('allows a user to enter an address or ENS name', async () => {
+  const { getByText, getByRole } = setupComponent(<AddAddress />)
+
+  expect(getByText('input address or ENS name')).toBeTruthy()
+  expect(getByRole('textbox')).toBeTruthy()
+})
+
 it('adds an account by address', async () => {
   const component = setupComponent(<AddAddress />)
 
@@ -55,6 +62,17 @@ it('shows a success screen after adding an account', async () => {
 
   expect(getByText('account added successfully')).toBeTruthy()
   expect(getByRole('button', { name: 'back' })).toBeTruthy()
+})
+
+it('restarts when a users cancels an ENS lookup', async () => {
+  const component = setupComponent(<AddAddress />)
+  const { user, getByText, getByRole } = component
+
+  await addByEnsName(component)
+  await user.click(getByRole('button', { name: 'cancel' }))
+
+  expect(getByText('input address or ENS name')).toBeTruthy()
+  expect(getByRole('textbox')).toBeTruthy()
 })
 
 async function addByAccount (component) {
