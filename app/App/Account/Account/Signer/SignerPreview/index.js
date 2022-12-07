@@ -107,6 +107,21 @@ class Signer extends React.Component {
     }
   }
 
+  getCurrentStatus(activeSigner, hardwareSigner) {
+    if (activeSigner && activeSigner.status) {
+      let status = activeSigner.status
+      if (status.toLowerCase() === 'ok') {
+        return 'ready to sign'
+      } else {
+        return status
+      }
+    } else if (hardwareSigner) {
+      return 'Disconnected'
+    } else {
+      return 'No Signer'
+    }
+  }
+
   render() {
     const activeAccount = this.store('main.accounts', this.props.account)
 
@@ -121,7 +136,8 @@ class Signer extends React.Component {
 
     const hardwareSigner = isHardwareSigner(activeAccount.lastSignerType)
     const watchOnly = isWatchOnly(activeAccount)
-    const status = (activeSigner && activeSigner.status) || (hardwareSigner ? 'Disconnected' : 'No Signer')
+    const status = this.getCurrentStatus(activeSigner, hardwareSigner)
+
     const account = this.store('main.accounts', this.props.id)
 
     return (
@@ -163,7 +179,14 @@ class Signer extends React.Component {
                 </div>
               </ClusterValue>
               <ClusterValue>
-                <div className='clusterTag' style={{ marginLeft: '10px', padding: '12px' }}>
+                <div
+                  className='clusterTag'
+                  style={{
+                    marginLeft: '10px',
+                    padding: '12px',
+                    color: status === 'ready to sign' ? 'var(--good)' : ''
+                  }}
+                >
                   {status}
                 </div>
               </ClusterValue>
