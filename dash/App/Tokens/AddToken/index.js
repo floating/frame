@@ -1,8 +1,24 @@
+import { isAddress } from 'ethers/lib/utils'
 import React, { Component } from 'react'
 import Restore from 'react-restore'
 import RingIcon from '../../../../resources/Components/RingIcon'
 import link from '../../../../resources/link'
 import svg from '../../../../resources/svg'
+
+const AddTokenErrorSceeen = ({ error, reset, next }) => {
+  return (
+    <div className='newTokenView cardShow'>
+      <div className='newTokenChainSelectTitle'>{error}</div>
+
+      <div className='tokenSetAddress' role='button' onClick={() => reset()}>
+        {'BACK'}
+      </div>
+      <div className='tokenSetAddress' role='button' onClick={() => next()}>
+        {'ADD ANYWAY'}
+      </div>
+    </div>
+  )
+}
 
 class AddTokenChainScreenComponent extends Component {
   constructor(...args) {
@@ -384,13 +400,38 @@ class AddToken extends Component {
         name: '',
         symbol: '',
         decimals: ''
-      }
+      },
+      error: null,
+      fetchedData: false
     }
   }
 
   async updateTokenData(contractAddress, chainId) {
-    const { name, symbol, decimals } = await link.invoke('tray:getTokenDetails', contractAddress, chainId)
-    this.setState({ tokenData: { name, symbol, decimals } })
+    const isValidAddress = isAddress(contractAddress)
+    if (!isValidAddress) return this.setState({ error: 'Invalid contract address' })
+    const { name, symbol, decimals, totalSupply } = await link.invoke(
+      'tray:getTokenDetails',
+      contractAddress,
+      chainId
+    )
+    if (!totalSupply) return this.setError('UNABLE TO CONFIRM TOKEN DATA ON CHAIN') //TODO: do uppercase with styling
+    this.setState({ tokenData: { name, symbol, decimals }, hasFetched: true })
+  }
+
+  reset() {
+    this.setState({
+      tokenData: {
+        name: '',
+        symbol: '',
+        decimals: ''
+      },
+      error: null,
+      fetchedData: false
+    })
+  }
+
+  setError(error) {
+    this.setState({ error })
   }
 
   render() {
@@ -398,10 +439,18 @@ class AddToken extends Component {
     const address = data && data.notifyData && data.notifyData.address
     const chainId = data && data.notifyData && data.notifyData.chainId
     const chainName = chainId ? this.store('main.networks.ethereum', chainId, 'name') : undefined
-
+    const { error, hasFetched } = this.state
+    if (error)
+      return (
+        <AddTokenErrorSceeen
+          error={error}
+          reset={this.reset.bind(this)}
+          next={() => this.setState({ error: null, hasFetched: true })}
+        />
+      )
     if (!chainId) {
       return <AddTokenChainScreen />
-    } else if (!address) {
+    } else if (!address || !hasFetched) {
       return (
         <AddTokenAddressScreen
           chainId={chainId}
