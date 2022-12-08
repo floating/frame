@@ -643,16 +643,6 @@ export class Accounts extends EventEmitter {
       return cb(new Error('Signer unavailable'))
     }
 
-    const getCompatibility = () => {
-      if (request.type === 'transaction') {
-        const data = this.getTransactionRequest(currentAccount, handlerId).data
-        return transactionCompatibility(data, signer.summary())
-      }
-
-      // all requests besides transactions are always compatible
-      return { signer: signer.type, tx: '', compatible: true }
-    }
-
     if (!signer) {
       // if no signer is active, check if this account was previously relying on a
       // hardware signer that is currently disconnected
@@ -672,6 +662,16 @@ export class Accounts extends EventEmitter {
       // if the signer is not ready to sign, open the signer panel so that
       // the user can unlock it or reconnect
       return signerUnavailable(signer)
+    }
+
+    const getCompatibility = () => {
+      if (request.type === 'transaction') {
+        const data = this.getTransactionRequest(currentAccount, handlerId).data
+        return transactionCompatibility(data, signer.summary())
+      }
+
+      // all requests besides transactions are always compatible
+      return { signer: signer.type, tx: '', compatible: true }
     }
 
     cb(null, getCompatibility())

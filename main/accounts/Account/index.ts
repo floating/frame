@@ -392,7 +392,7 @@ class FrameAccount {
   }
 
   getSigner() {
-    return this.signer && signers.get(this.signer)
+    return this.signer ? signers.get(this.signer) : undefined
   }
 
   verifyAddress(display: boolean, cb: Callback<boolean>) {
