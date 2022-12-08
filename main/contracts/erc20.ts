@@ -82,7 +82,7 @@ export default class Erc20Contract {
       this.contract.totalSupply() //totalSupply is mandatory on the ERC20 interface
     ])
 
-    const totalSupply = calls[3].status === 'fulfilled' ? calls[3].value.toString() : null
+    const totalSupply = calls[3].status === 'fulfilled' ? calls[3].value.toString() : ''
     return {
       decimals: takeDefaultIfRejected(calls[0], 0),
       name: takeDefaultIfRejected(calls[1], ''),

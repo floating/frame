@@ -399,23 +399,19 @@ class AddToken extends Component {
       tokenData: {
         name: '',
         symbol: '',
-        decimals: ''
+        decimals: '',
+        totalSupply: ''
       },
-      error: null,
-      fetchedData: false
+      error: null
     }
   }
 
   async updateTokenData(contractAddress, chainId) {
     const isValidAddress = isAddress(contractAddress)
     if (!isValidAddress) return this.setState({ error: 'Invalid contract address' })
-    const { name, symbol, decimals, totalSupply } = await link.invoke(
-      'tray:getTokenDetails',
-      contractAddress,
-      chainId
-    )
-    if (!totalSupply) return this.setError('UNABLE TO CONFIRM TOKEN DATA ON CHAIN') //TODO: do uppercase with styling
-    this.setState({ tokenData: { name, symbol, decimals }, hasFetched: true })
+    const tokenData = await link.invoke('tray:getTokenDetails', contractAddress, chainId)
+    const error = tokenData.totalSupply ? null : 'UNABLE TO CONFIRM TOKEN DATA ON CHAIN'
+    this.setState({ tokenData, error })
   }
 
   reset() {
@@ -423,10 +419,10 @@ class AddToken extends Component {
       tokenData: {
         name: '',
         symbol: '',
-        decimals: ''
+        decimals: '',
+        totalSupply: ''
       },
-      error: null,
-      fetchedData: false
+      error: null
     })
   }
 
@@ -439,18 +435,22 @@ class AddToken extends Component {
     const address = data && data.notifyData && data.notifyData.address
     const chainId = data && data.notifyData && data.notifyData.chainId
     const chainName = chainId ? this.store('main.networks.ethereum', chainId, 'name') : undefined
-    const { error, hasFetched } = this.state
+    const {
+      error,
+      hasFetched,
+      tokenData: { totalSupply }
+    } = this.state
     if (error)
       return (
         <AddTokenErrorSceeen
           error={error}
           reset={this.reset.bind(this)}
-          next={() => this.setState({ error: null, hasFetched: true })}
+          next={() => this.setState({ error: null, tokenData: { totalSupply: '0' } })}
         />
       )
     if (!chainId) {
       return <AddTokenChainScreen />
-    } else if (!address || !hasFetched) {
+    } else if (!totalSupply) {
       return (
         <AddTokenAddressScreen
           chainId={chainId}
