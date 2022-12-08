@@ -39,7 +39,7 @@ class Balance extends React.Component {
     const { name: chainName = '', isTestnet = false } = chain
     const chainColor = this.store('main.networksMeta.ethereum', chainId, 'primaryColor')
 
-    const ethMatch = logoURI && logoURI.includes('/coins/images/279/large/ethereum.png')
+    const ethMatch = logoURI?.includes('/coins/images/279/large/ethereum.png')
 
     return (
       <div
