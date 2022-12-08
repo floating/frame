@@ -19,23 +19,19 @@ if (process.env.NODE_ENV !== 'development' || process.env.HMR !== 'true') {
   } // eslint-disable-line
 }
 
-link.rpc('getFrameId', (err, frameId) => {
-  if (err) return console.error('Could not get frameId from main', err)
-  window.frameId = frameId
-  link.rpc('getState', (err, state) => {
-    if (err) return console.error('Could not get initial state from main')
-    const store = _store(state)
-    window.store = store
-    store.observer(() => {
-      document.body.className = 'clip ' + store('main.colorway')
-      setTimeout(() => {
-        document.body.className = store('main.colorway')
-      }, 100)
-    })
-    const DappFrame = Restore.connect(App, store)
-    const root = createRoot(document.getElementById('frame'))
-    root.render(<DappFrame />)
+link.rpc('getState', (err, state) => {
+  if (err) return console.error('Could not get initial state from main')
+  const store = _store(state)
+  window.store = store
+  store.observer(() => {
+    document.body.className = 'clip ' + store('main.colorway')
+    setTimeout(() => {
+      document.body.className = store('main.colorway')
+    }, 100)
   })
+  const DawnFrame = Restore.connect(App, store)
+  const root = createRoot(document.getElementById('frame'))
+  root.render(<DawnFrame />)
 })
 
 document.addEventListener('contextmenu', (e) => link.send('*:contextmenu', e.clientX, e.clientY))
