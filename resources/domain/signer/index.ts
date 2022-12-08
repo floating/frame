@@ -4,7 +4,6 @@ import type Signer from '../../../main/signers/Signer'
 export enum Type {
   Ring = 'ring',
   Seed = 'seed',
-  Aragon = 'aragon',
   Trezor = 'trezor',
   Ledger = 'ledger',
   Lattice = 'lattice'

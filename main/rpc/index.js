@@ -1,7 +1,8 @@
-const { ipcMain, dialog } = require('electron')
 const fs = require('fs')
-import { isAddress } from '@ethersproject/address'
+const { ipcMain, dialog } = require('electron')
+const log = require('electron-log')
 const { randomBytes } = require('crypto')
+import { isAddress } from '@ethersproject/address'
 
 const accounts = require('../accounts').default
 const signers = require('../signers').default
@@ -10,11 +11,7 @@ const provider = require('../provider').default
 const store = require('../store').default
 const dapps = require('../dapps')
 const nebulaApi = require('../nebula').default
-const log = require('electron-log')
-// const ens = require('../ens')
-// const ipfs = require('../ipfs')
 
-const { resolveName } = require('../accounts/aragon')
 const { arraysEqual, randomLetters } = require('../../resources/utils')
 const { default: TrezorBridge } = require('../../main/signers/trezor/bridge')
 
@@ -165,9 +162,6 @@ const rpc = {
       provider.declineRequest(req)
     }
   },
-  addAragon(account, cb) {
-    accounts.addAragon(account, cb)
-  },
   createFromAddress(address, name, cb) {
     if (!isAddress(address)) return cb(new Error('Invalid Address'))
     accounts.add(address, name, { type: 'Address' })
@@ -228,11 +222,6 @@ const rpc = {
   },
   remove(id) {
     signers.remove(id)
-  },
-  resolveAragonName(name, chainId, cb) {
-    resolveName(name, chainId)
-      .then((result) => cb(null, result))
-      .catch(cb)
   },
   async resolveEnsName(name, cb) {
     log.debug('Resolving ENS name', { name })

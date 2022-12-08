@@ -22,7 +22,6 @@ link.rpc('getState', (err, state) => {
   if (err) return console.error('Could not get initial state from main.')
   const store = _store(state)
   if (!store('main.mute.betaDisclosure')) store.notify('betaDisclosure')
-  if (!store('main.mute.aragonAccountMigrationWarning')) store.notify('aragonAccountMigrationWarning')
   store.observer(() => {
     document.body.classList.remove('dark', 'light')
     document.body.classList.add('clip', store('main.colorway'))

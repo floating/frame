@@ -189,8 +189,7 @@ const initial = {
       gasFeeWarning: main('mute.gasFeeWarning', false),
       betaDisclosure: main('mute.betaDisclosure', false),
       onboardingWindow: main('mute.onboardingWindow', false),
-      signerCompatibilityWarning: main('mute.signerCompatibilityWarning', false),
-      aragonAccountMigrationWarning: main('mute.aragonAccountMigrationWarning', true)
+      signerCompatibilityWarning: main('mute.signerCompatibilityWarning', false)
     },
     shortcuts: {
       altSlash: main('shortcuts.altSlash', true)

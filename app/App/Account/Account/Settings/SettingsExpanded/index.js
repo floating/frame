@@ -1,9 +1,6 @@
 import React from 'react'
 import Restore from 'react-restore'
 import link from '../../../../../../resources/link'
-import svg from '../../../../../../resources/svg'
-
-// import Verify from '../../Signer/Verify'
 
 class Settings extends React.Component {
   constructor(...args) {
@@ -56,38 +53,6 @@ class Settings extends React.Component {
               />
             </div>
           </div>
-
-          {account.smart ? (
-            <div className='panelBlock'>
-              <div className='panelBlockValues'>
-                <div className='panelBlockValue panelBlockItem'>
-                  Chain ID: {account.smart.chain && account.smart.chain.id}
-                </div>
-              </div>
-            </div>
-          ) : null}
-
-          {/* <div className='panelBlock'>
-            <div className='panelBlockTitle'>
-              Signer
-            </div>
-            <div className='panelBlockValues'>
-              {account.signer ? (
-                <div className='panelBlockValue panelBlockItem'>
-                  `${account.lastSignerType} signer connected`}
-                </div>
-              ) : (
-                <div className='panelBlockValue panelBlockItem'>
-                  {'signer disconnected'}
-                </div>
-              )}
-              {/* <Verify 
-                id={this.props.account}
-              />
-            </div>
-          </div> */}
-          {/* <div className='moduleRow'>ENS Name: {account.ensName  ? account.ensName : 'none'}</div> */}
-          {/* <div className='moduleRow'>Account Added: {account.created}</div> */}
         </div>
       </div>
     )

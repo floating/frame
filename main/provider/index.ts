@@ -206,21 +206,6 @@ export class Provider extends EventEmitter {
   }
 
   verifySignature(signed: string, message: string, address: string, cb: Callback<boolean>) {
-    if (signed.length === 134) {
-      // Aragon smart signed message
-      try {
-        signed = '0x' + signed.substring(4)
-
-        const currentAccount = accounts.current()
-        if (!currentAccount) return cb(new Error('no account selected'))
-
-        const actor = (currentAccount.smart && currentAccount.smart.actor) || ''
-        address = accounts.get(actor).address
-      } catch (e) {
-        return cb(new Error('Could not resolve message or actor for smart accoount'))
-      }
-    }
-
     getSignedAddress(signed, message, (err, verifiedAddress) => {
       if (err) return cb(err)
       if ((verifiedAddress || '').toLowerCase() !== address.toLowerCase())

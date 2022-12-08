@@ -83,13 +83,6 @@ class Signer extends React.Component {
           <div>{'Trezor'}</div>
         </div>
       )
-    } else if (type === 'aragon') {
-      return (
-        <div className='moduleItemSignerType'>
-          <div className='moduleItemIcon'>{svg.aragon(26)}</div>
-          <div>{'Aragon Agent'}</div>
-        </div>
-      )
     } else if (type === 'seed' || type === 'ring') {
       return (
         <div className='moduleItemSignerType'>
@@ -146,9 +139,6 @@ class Signer extends React.Component {
 
     if (activeAccount.signer) {
       activeSigner = this.store('main.signers', activeAccount.signer)
-    } else if (activeAccount.smart) {
-      const actingSigner = this.store('main.accounts', activeAccount.smart.actor, 'signer')
-      if (actingSigner) activeSigner = this.store('main.signers', actingSigner)
     }
 
     const hardwareSigner = isHardwareSigner(activeAccount.lastSignerType)
@@ -215,20 +205,6 @@ class Signer extends React.Component {
                   }}
                 >
                   {this.state.notifyText}
-                </div>
-              </ClusterValue>
-            </ClusterRow>
-          )}
-          {account.smart && (
-            <ClusterRow>
-              <ClusterValue>
-                <div className='clusterTag'>
-                  <div>{account.smart.type} Account</div>
-                  <div>DAO exists on this chain: ?</div>
-                  <div>Agent Address: {account.address}</div>
-                  <div>Acting Account: {account.smart.actor}</div>
-                  <div>DAO Address: {account.smart.dao}</div>
-                  <div>IPFS Gateway: {'https://ipfs.aragon.org'}</div>
                 </div>
               </ClusterValue>
             </ClusterRow>

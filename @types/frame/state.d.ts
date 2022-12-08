@@ -163,7 +163,7 @@ interface Dapp {
   current?: any
 }
 
-type SignerType = 'ring' | 'seed' | 'aragon' | 'trezor' | 'ledger' | 'lattice'
+type SignerType = 'ring' | 'seed' | 'trezor' | 'ledger' | 'lattice'
 type AccountStatus = 'ok'
 
 interface Signer {
@@ -184,22 +184,10 @@ interface Account {
   address: Address
   status: AccountStatus
   signer: string
-  smart?: SmartAccount
   requests: Record<string, any>
   ensName: string
   created: string
   balances: {
     lastUpdated?: number
   }
-}
-
-interface SmartAccount {
-  name: string
-  chain: Chain
-  type: string
-  actor: any // TODO: is this an address or an object?
-  agent: Address
-  ens: string
-  apps: any
-  dao: any
 }

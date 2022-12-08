@@ -124,16 +124,6 @@ class Account extends React.Component {
       } else if (signer.status === 'ok') {
         accountIndicatorClass += ' accountIndicatorGood'
       }
-    } else if (this.props.smart) {
-      const actingAccount = this.store('main.accounts', this.props.smart.actor)
-      if (!actingAccount) return
-      const actingSigner = this.store('main.signers', actingAccount.signer)
-      if (!actingSigner) return
-      if (actingSigner.status === 'locked') {
-        accountIndicatorClass += ' accountIndicatorLocked'
-      } else if (actingSigner.status === 'ok') {
-        accountIndicatorClass += ' accountIndicatorGood'
-      }
     }
     return <div className={accountIndicatorClass} />
   }
@@ -171,8 +161,6 @@ class Account extends React.Component {
             return <div className='signerSelectIconWrap signerIconTrezor'>{svg.trezor(24)}</div>
           if (type === 'seed' || type === 'ring')
             return <div className='signerSelectIconWrap'>{svg.flame(25)}</div>
-          if (type === 'aragon')
-            return <div className='signerSelectIconWrap signerIconSmart'>{svg.aragon(32)}</div>
           if (type === 'lattice')
             return <div className='signerSelectIconWrap signerIconSmart'>{svg.lattice(26)}</div>
           return <div className='signerSelectIconWrap'>{svg.logo(22)}</div>
@@ -486,15 +474,7 @@ class Account extends React.Component {
 
     if (account.signer) {
       signer = this.store('main.signers', account.signer)
-    } else if (account.smart) {
-      const actingSigner = this.store('main.accounts', account.smart.actor, 'signer')
-      if (actingSigner) signer = this.store('main.signers', actingSigner)
     }
-
-    // const { data } = this.store('panel.nav')[0] || {}
-    // if (data && data.aux && data.aux.height) {
-    //   style.height = style.height - data.aux.height
-    // }
 
     let requests = this.store('main.accounts', id, 'requests') || {}
     requests = Object.keys(requests).filter((r) => requests[r].mode === 'normal')

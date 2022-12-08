@@ -7,7 +7,6 @@ import svg from '../../../../resources/svg'
 
 import AddHardware from './AddHardware'
 import AddHardwareLattice from './AddHardwareLattice'
-import AddAragon from './AddAragon'
 import AddPhrase from './AddPhrase'
 import AddRing from './AddRing'
 import AddAddress from './AddAddress'
@@ -74,11 +73,6 @@ class Add extends React.Component {
                       <AddHardware index={1} type='ledger' />
                       <AddHardware index={2} type='trezor' />
                       <AddHardwareLattice index={3} type='lattice' />
-                      <div className='addAccountHeader'>
-                        <div style={{ marginRight: '10px' }}>{svg.lightbulb(12)}</div>
-                        <div>Smart Accounts</div>
-                      </div>
-                      <AddAragon index={3} />
                       <div className='addAccountHeader'>
                         <div style={{ margin: '-1px 10px 0px 0px' }}>{svg.flame(18)}</div>
                         <div>Hot Accounts</div>

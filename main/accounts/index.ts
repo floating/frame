@@ -92,24 +92,6 @@ export class Accounts extends EventEmitter {
     return account.getRequest(id)
   }
 
-  // Public
-  addAragon(account: Account, cb: Callback<Account>) {
-    const existing = storeApi.getAccount(account.address)
-    if (existing.id) return cb(null, existing) // Account already exists
-
-    log.info('Aragon account not found, creating account')
-
-    const accountOpts = {
-      ...account,
-      lastSignerType: getSignerType(account.lastSignerType),
-      options: { type: 'aragon' }
-    }
-
-    this.accounts[account.address] = new FrameAccount(accountOpts, this)
-
-    cb(null, this.accounts[account.address].summary())
-  }
-
   async add(address: Address, name = '', options = {}, cb: Callback<FrameAccount> = () => {}) {
     if (!address) return cb(new Error('No address, will not add account'))
     address = address.toLowerCase()
@@ -637,11 +619,8 @@ export class Accounts extends EventEmitter {
 
     const matchSelected =
       (rawTx.from || '').toLowerCase() === currentAccount.getSelectedAddress().toLowerCase()
-    const matchActor =
-      (rawTx.from || '').toLowerCase() ===
-      (currentAccount.smart ? currentAccount.smart.actor.toLowerCase() : false)
 
-    if (matchSelected || matchActor) {
+    if (matchSelected) {
       currentAccount.signTransaction(rawTx, cb)
     } else {
       cb(new Error('signMessage: Account does not match currently selected'))
