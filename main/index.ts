@@ -330,6 +330,12 @@ app.on('ready', () => {
     }
   })
   store.observer(() => {
+    if (!store('windows.dawn.showing')) {
+      windows.hideDawn()
+      windows.focusTray()
+    }
+  })
+  store.observer(() => {
     const altSlash = store('main.shortcuts.altSlash')
     if (altSlash) {
       globalShortcut.unregister('Alt+/')
