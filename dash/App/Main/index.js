@@ -8,10 +8,6 @@ class Settings extends React.Component {
   constructor(props, context) {
     super(props, context)
     this.customMessage = 'Custom Endpoint'
-    // this.network = context.store('main.currentNetwork.id')
-    // this.networkType = context.store('main.currentNetwork.type')
-    // const primaryCustom = context.store('main.networks', this.networkType, this.network, 'connection.primary.custom') || this.customMessage
-    // const secondaryCustom = context.store('main.networks', this.networkType, this.network, 'connection.secondary.custom') || this.customMessage
     const latticeEndpoint = context.store('main.latticeSettings.endpointCustom')
     const latticeEndpointMode = context.store('main.latticeSettings.endpointMode')
     this.state = {
@@ -19,24 +15,18 @@ class Settings extends React.Component {
       latticeEndpoint,
       latticeEndpointMode,
       resetConfirm: false,
-      expandNetwork: false
+      expandNetwork: false,
+      instanceIdHover: false,
+      instanceIdCopied: false
     }
-    // context.store.observer(() => {
-    //   const { type, id } = context.store('main.currentNetwork')
-    //   if (this.network !== id || this.networkType !== type) {
-    //     this.networkType = type
-    //     this.network = id
-    //     const primaryCustom = context.store('main.networks', type, id, 'connection.primary.custom') || this.customMessage
-    //     const secondaryCustom = context.store('main.networks', type, id, 'connection.secondary.custom') || this.customMessage
-    //     this.setState({ primaryCustom, secondaryCustom })
-    //   }
-    // })
   }
 
   appInfo() {
+    const appVersion = require('../../../package.json').version
+    const instanceId = this.store('main.instanceId')
     return (
       <div className='appInfo'>
-        <div className='appInfoLine appInfoLineVersion'>{'v' + require('../../../package.json').version}</div>
+        <div className='appInfoLine appInfoLineVersion'>{`v${appVersion}`}</div>
         <div className='appInfoLine appInfoLineReset'>
           {this.state.resetConfirm ? (
             <>
@@ -61,6 +51,36 @@ class Settings extends React.Component {
             <span className='appInfoLineResetButton' onClick={() => this.setState({ resetConfirm: true })}>
               Reset All Settings & Data
             </span>
+          )}
+        </div>
+        <div
+          className='appInfoLine appInfoLineInstanceId'
+          onMouseOver={(e) => {
+            e.stopPropagation()
+            e.preventDefault()
+            this.setState({ instanceIdHover: true })
+          }}
+          onMouseLeave={(e) => {
+            e.stopPropagation()
+            e.preventDefault()
+            this.setState({ instanceIdHover: false, instanceIdCopied: false })
+          }}
+          onClick={() => {
+            if (this.state.instanceIdHover) {
+              clearTimeout(this.instanceIdCopiedTimeout)
+              link.send('tray:clipboardData', instanceId)
+              this.setState({ instanceIdCopied: true })
+              this.instanceIdCopiedTimeout = setTimeout(
+                () => this.setState({ instanceIdCopied: false }),
+                1800
+              )
+            }
+          }}
+        >
+          {this.state.instanceIdCopied ? (
+            <span className='instanceIdCopied'>{'Instance ID Copied'}</span>
+          ) : (
+            instanceId
           )}
         </div>
       </div>
