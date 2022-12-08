@@ -2,6 +2,8 @@ import React from 'react'
 import Restore from 'react-restore'
 import styled from 'styled-components'
 
+import Native from '../../resources/Native'
+
 const StyledButton = styled.button`
   color: blue;
   font-size: 1em;
@@ -20,7 +22,14 @@ class App extends React.Component {
   render() {
     return (
       <div className='dawn'>
-        <StyledButton>{'A New Dawn'}</StyledButton>
+        <div className='splash'>
+          <Native />
+          <div className='overlay' />
+          <div className='mainLeft'></div>
+          <div className='main'>
+            <StyledButton>{'A New Dawn'}</StyledButton>
+          </div>
+        </div>
       </div>
     )
   }
