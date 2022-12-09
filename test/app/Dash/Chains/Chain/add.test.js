@@ -1,13 +1,13 @@
 import React from 'react'
 import Restore from 'react-restore'
 
-import store from '../../../../main/store'
-import link from '../../../../resources/link'
-import { setupComponent } from '../../../componentSetup'
-import ChainComponent from '../../../../app/Dash/Chains/Chain'
+import store from '../../../../../main/store'
+import link from '../../../../../resources/link'
+import { setupComponent } from '../../../../componentSetup'
+import ChainComponent from '../../../../../app/Dash/Chains/Chain'
 
-jest.mock('../../../../main/store/persist')
-jest.mock('../../../../resources/link', () => ({ send: jest.fn() }))
+jest.mock('../../../../../main/store/persist')
+jest.mock('../../../../../resources/link', () => ({ send: jest.fn() }))
 
 const Chain = Restore.connect(ChainComponent, store)
 
