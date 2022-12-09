@@ -1,3 +1,5 @@
+import { isValidAddress } from '@ethereumjs/util'
+import { Console } from 'console'
 import { isAddress } from 'ethers/lib/utils'
 import React, { Component } from 'react'
 import Restore from 'react-restore'
@@ -5,17 +7,32 @@ import RingIcon from '../../../../resources/Components/RingIcon'
 import link from '../../../../resources/link'
 import svg from '../../../../resources/svg'
 
-const AddTokenErrorSceeen = ({ error, reset, next }) => {
+const invalidFormatError = 'INVALID CONTRACT ADDRESS'
+const unableToVerifyError = `FAILED TO VERIFY TOKEN'S DATA`
+
+const navForward = async (notifyData) =>
+  link.send('nav:forward', 'dash', {
+    view: 'tokens',
+    data: {
+      notify: 'addToken',
+      notifyData
+    }
+  })
+
+//TODO: use the weird link system for the different stages too
+const AddTokenErrorSceeen = ({ error, address, chainId }) => {
   return (
     <div className='newTokenView cardShow'>
       <div className='newTokenChainSelectTitle'>{error}</div>
 
-      <div className='tokenSetAddress' role='button' onClick={() => reset()}>
+      <div className='tokenSetAddress' role='button' onClick={() => link.send('nav:back', 'dash')}>
         {'BACK'}
       </div>
-      <div className='tokenSetAddress' role='button' onClick={() => next()}>
-        {'ADD ANYWAY'}
-      </div>
+      {error === unableToVerifyError && (
+        <div className='tokenSetAddress' role='button' onClick={() => navForward({ address, chainId })}>
+          {'ADD ANYWAY'}
+        </div>
+      )}
     </div>
   )
 }
@@ -98,8 +115,15 @@ class AddTokenAddressScreenComponent extends Component {
     super(props, context)
 
     this.state = {
-      inputAddress: ''
+      inputAddress: '',
+      fetchingData: false
     }
+  }
+
+  async resolveTokenData(contractAddress, chainId) {
+    const tokenData = await link.invoke('tray:getTokenDetails', contractAddress, chainId)
+    const error = tokenData.totalSupply ? null : unableToVerifyError
+    return navForward({ error, tokenData, address: contractAddress, chainId })
   }
 
   isConnectedChain() {
@@ -111,32 +135,32 @@ class AddTokenAddressScreenComponent extends Component {
 
   submit(address) {
     const { chainId } = this.props
+    if (!this.isConnectedChain()) return
+    if (!isValidAddress(address))
+      return navForward({
+        error: invalidFormatError,
+        tokenData: undefined,
+        address: contractAddress,
+        chainId
+      })
 
-    if (this.isConnectedChain()) {
-      this.props.updateTokenData(address, chainId)
-    }
-
-    link.send('tray:action', 'navDash', {
-      view: 'tokens',
-      data: {
-        notify: 'addToken',
-        notifyData: {
-          address,
-          chainId
-        }
-      }
-    })
+    this.setState({ fetchingData: true })
+    this.resolveTokenData(address, chainId)
   }
 
   render() {
     const { chainId, chainName } = this.props
+    const { fetchingData } = this.state
     const chainColor = this.store('main.networksMeta.ethereum', chainId, 'primaryColor')
 
     return (
       <div className='newTokenView cardShow'>
         <div className='newTokenChainSelectTitle'>
-          <label id='newTokenAddressLabel'>{`Enter token's address`}</label>
-          {chainName ? (
+          <label id='newTokenAddressLabel'>
+            {fetchingData ? `Fetching token's data` : `Enter token's address`}
+          </label>
+
+          {chainName && (
             <div
               className='newTokenChainSelectSubtitle'
               style={{
@@ -145,41 +169,48 @@ class AddTokenAddressScreenComponent extends Component {
             >
               {`on ${chainName}`}
             </div>
-          ) : null}
+          )}
         </div>
-
-        <div className='tokenRow'>
-          <div className='tokenAddress'>
-            <input
-              aria-labelledby='newTokenAddressLabel'
-              className='tokenInput tokenInputAddress'
-              value={this.state.inputAddress}
-              spellCheck={false}
-              autoFocus={true}
-              onKeyPress={(e) => {
-                if (e.key === 'Enter') {
-                  this.submit(this.state.inputAddress)
-                }
-              }}
-              onChange={(e) => {
-                if (e.target.value.length > 42) {
-                  e.preventDefault()
-                } else {
-                  this.setState({ inputAddress: e.target.value })
-                }
-              }}
-            />
+        {fetchingData ? (
+          <div className='signerLoading'>
+            <div className='signerLoadingLoader' />
           </div>
-        </div>
-        <div
-          className='tokenSetAddress'
-          role='button'
-          onClick={() => {
-            this.submit(this.state.inputAddress)
-          }}
-        >
-          {'Set Address'}
-        </div>
+        ) : (
+          <>
+            <div className='tokenRow'>
+              <div className='tokenAddress'>
+                <input
+                  aria-labelledby='newTokenAddressLabel'
+                  className='tokenInput tokenInputAddress'
+                  value={this.state.inputAddress}
+                  spellCheck={false}
+                  autoFocus={true}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      this.submit(this.state.inputAddress)
+                    }
+                  }}
+                  onChange={(e) => {
+                    if (e.target.value.length > 42) {
+                      e.preventDefault()
+                    } else {
+                      this.setState({ inputAddress: e.target.value })
+                    }
+                  }}
+                />
+              </div>
+            </div>
+            <div
+              className='tokenSetAddress'
+              role='button'
+              onClick={() => {
+                this.submit(this.state.inputAddress)
+              }}
+            >
+              {'Set Address'}
+            </div>
+          </>
+        )}
       </div>
     )
   }
@@ -393,76 +424,25 @@ class AddTokenFormScreenComponent extends Component {
 const AddTokenFormScreen = Restore.connect(AddTokenFormScreenComponent)
 
 class AddToken extends Component {
-  constructor(props, context) {
-    super(props, context)
-    this.state = {
-      tokenData: {
-        name: '',
-        symbol: '',
-        decimals: '',
-        totalSupply: ''
-      },
-      error: null
-    }
-  }
-
-  async updateTokenData(contractAddress, chainId) {
-    const isValidAddress = isAddress(contractAddress)
-    if (!isValidAddress) return this.setState({ error: 'Invalid contract address' })
-    const tokenData = await link.invoke('tray:getTokenDetails', contractAddress, chainId)
-    const error = tokenData.totalSupply ? null : 'UNABLE TO CONFIRM TOKEN DATA ON CHAIN'
-    this.setState({ tokenData, error })
-  }
-
-  reset() {
-    this.setState({
-      tokenData: {
-        name: '',
-        symbol: '',
-        decimals: '',
-        totalSupply: ''
-      },
-      error: null
-    })
-  }
-
-  setError(error) {
-    this.setState({ error })
-  }
-
   render() {
     const { data, req } = this.props
-    const address = data && data.notifyData && data.notifyData.address
-    const chainId = data && data.notifyData && data.notifyData.chainId
+    const { address, chainId, error, tokenData } = data?.notifyData || {}
     const chainName = chainId ? this.store('main.networks.ethereum', chainId, 'name') : undefined
-    const {
-      error,
-      hasFetched,
-      tokenData: { totalSupply }
-    } = this.state
-    if (error)
-      return (
-        <AddTokenErrorSceeen
-          error={error}
-          reset={this.reset.bind(this)}
-          next={() => this.setState({ error: null, tokenData: { totalSupply: '0' } })}
-        />
-      )
-    if (!chainId) {
-      return <AddTokenChainScreen />
-    } else if (!totalSupply) {
-      return (
-        <AddTokenAddressScreen
-          chainId={chainId}
-          chainName={chainName}
-          updateTokenData={this.updateTokenData.bind(this)}
-        />
-      )
-    }
 
-    const tokenData = { address, ...this.state.tokenData }
+    if (!chainId) return <AddTokenChainScreen />
+    if (!address) return <AddTokenAddressScreen chainId={chainId} chainName={chainName} />
 
-    return <AddTokenFormScreen chainId={chainId} chainName={chainName} req={req} tokenData={tokenData} />
+    //Errors can only occur after the address form has been presented
+    if (error) return <AddTokenErrorSceeen error={error} address={address} chainId={chainId} />
+
+    return (
+      <AddTokenFormScreen
+        chainId={chainId}
+        chainName={chainName}
+        req={req}
+        tokenData={{ ...tokenData, address }}
+      />
+    )
   }
 }
 
