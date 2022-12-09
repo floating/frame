@@ -1156,7 +1156,7 @@ describe('migration 29', () => {
   })
 })
 
-fdescribe('migration 30', () => {
+describe('migration 30', () => {
   beforeEach(() => {
     state = {
       main: {
