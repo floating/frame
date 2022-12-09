@@ -242,11 +242,12 @@ const rpc = {
       const {
         addresses: { eth: ethAddress }
       } = await nebula.ens.resolve(name, { timeout: 8000 })
-      nebula.close()
       cb(null, ethAddress)
     } catch (err) {
       log.warn(`Could not resolve ENS name ${name}:`, err)
       return cb(err)
+    } finally {
+      nebula.close()
     }
   },
   verifyAddress(cb) {
