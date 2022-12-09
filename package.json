@@ -170,6 +170,7 @@
   "alias": {
     "crypto": false,
     "path": false,
+    "process": false,
     "punycode": false,
     "querystring": false,
     "stream": false,
