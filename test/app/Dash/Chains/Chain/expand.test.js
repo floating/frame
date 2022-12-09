@@ -1,17 +1,10 @@
 import React from 'react'
 import Restore from 'react-restore'
 
-<<<<<<<< HEAD:test/dash/Chain/expand.test.js
-import store from '../../../main/store'
-import link from '../../../resources/link'
-import { setupComponent } from '../../componentSetup'
-import ChainComponent from '../../../dash/App/Chains/Chain'
-========
 import store from '../../../../main/store'
 import link from '../../../../resources/link'
 import { setupComponent } from '../../../componentSetup'
 import ChainComponent from '../../../../app/Dash/Chains/Chain'
->>>>>>>> 726fa107 (fix test dirs):test/app/Dash/Chains/Chain/expand.test.js
 
 jest.mock('../../../main/store/persist')
 jest.mock('../../../resources/link', () => ({ send: jest.fn() }))
