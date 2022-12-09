@@ -9,6 +9,8 @@ const launch = require('../launch')
 const provider = require('../provider').default
 const store = require('../store').default
 const dapps = require('../dapps')
+const nebulaApi = require('../nebula').default
+const log = require('electron-log')
 // const ens = require('../ens')
 // const ipfs = require('../ipfs')
 
@@ -231,6 +233,22 @@ const rpc = {
     resolveName(name, chainId)
       .then((result) => cb(null, result))
       .catch(cb)
+  },
+  async resolveEnsName(name, cb) {
+    log.debug('Resolving ENS name', { name })
+    const nebula = nebulaApi()
+
+    try {
+      const {
+        addresses: { eth: ethAddress }
+      } = await nebula.ens.resolve(name, { timeout: 8000 })
+      cb(null, ethAddress)
+    } catch (err) {
+      log.warn(`Could not resolve ENS name ${name}:`, err)
+      return cb(err)
+    } finally {
+      nebula.close()
+    }
   },
   verifyAddress(cb) {
     const res = (err, data) => cb(err, data || false)
