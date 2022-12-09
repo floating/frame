@@ -3,7 +3,7 @@ import React from 'react'
 import { createRoot } from 'react-dom/client'
 import Restore from 'react-restore'
 
-import _store from './store'
+import store from './store'
 import link from '../resources/link'
 
 const isTray = window.frameWindow === 'tray'
@@ -31,27 +31,28 @@ if (process.env.NODE_ENV !== 'development' || process.env.HMR !== 'true') {
 
 link.rpc('getState', (err, state) => {
   if (err) return console.error('Could not get initial state from main')
-  const store = _store(state)
+  const storeInstance = store(state)
 
   if (isTray) {
     link.send('tray:ready') // turn on api
     link.send('tray:refreshMain')
-    if (!store('main.mute.betaDisclosure')) store.notify('betaDisclosure')
-    if (!store('main.mute.aragonAccountMigrationWarning')) store.notify('aragonAccountMigrationWarning')
+    if (!storeInstance('main.mute.betaDisclosure')) storeInstance.notify('betaDisclosure')
+    if (!storeInstance('main.mute.aragonAccountMigrationWarning'))
+      storeInstance.notify('aragonAccountMigrationWarning')
   }
 
-  window.store = store
-  store.observer(() => {
+  window.store = storeInstance
+  storeInstance.observer(() => {
     document.body.classList.remove('dark', 'light')
-    document.body.classList.add('clip', store('main.colorway'))
+    document.body.classList.add('clip', storeInstance('main.colorway'))
     setTimeout(() => {
       document.body.classList.remove('clip')
     }, 100)
   })
 
   if (isTray) {
-    store.observer(() => {
-      if (store('tray.open')) {
+    storeInstance.observer(() => {
+      if (storeInstance('tray.open')) {
         document.body.classList.remove('suspend')
       } else {
         document.body.classList.add('suspend')
@@ -60,7 +61,7 @@ link.rpc('getState', (err, state) => {
   }
   ;(async () => {
     const AppComponent = (await importMap[window.frameWindow]()).default
-    const RootComponent = Restore.connect(AppComponent, store)
+    const RootComponent = Restore.connect(AppComponent, storeInstance)
     const root = createRoot(document.getElementById(window.frameWindow))
     root.render(<RootComponent />)
   })()
