@@ -18,8 +18,6 @@ jobs:
           node-version: 16.15.0
       - name: Electronegativity
         uses: doyensec/electronegativity-action@v2.0
-        with:
-          exclude-checks: 'LimitNavigationGlobalCheck'
       - name: Upload sarif
         uses: github/codeql-action/upload-sarif@v2
         with:
