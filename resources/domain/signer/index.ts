@@ -2,6 +2,7 @@ import type Signer from '../../../main/signers/Signer'
 
 // in order of increasing priority
 export enum Type {
+  Watch = 'watch',
   Ring = 'ring',
   Seed = 'seed',
   Aragon = 'aragon',
