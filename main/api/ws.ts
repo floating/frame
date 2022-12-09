@@ -1,6 +1,6 @@
 import WebSocket from 'ws'
 import { v4 as uuid } from 'uuid'
-import  log from 'electron-log'
+import log from 'electron-log'
 
 import store from '../store'
 import provider from '../provider'
@@ -33,7 +33,7 @@ interface ExtensionPayload extends JSONRPCRequestPayload {
   __extensionConnecting?: boolean
 }
 
-function extendSession (originId: string) {
+function extendSession(originId: string) {
   if (originId) {
     clearTimeout(connectionMonitors[originId])
 
@@ -50,16 +50,19 @@ const handler = (socket: FrameWebSocket, req: IncomingMessage) => {
 
   const res = (payload: RPCResponsePayload) => {
     if (socket.readyState === WebSocket.OPEN) {
-      socket.send(JSON.stringify(payload), err => { if (err) log.info(err) })
+      socket.send(JSON.stringify(payload), (err) => {
+        if (err) log.info(err)
+      })
     }
   }
 
-  socket.on('message', async data => {
+  socket.on('message', async (data) => {
     const rawPayload = validPayload<ExtensionPayload>(data.toString())
     if (!rawPayload) return console.warn('Invalid Payload', data)
 
     let requestOrigin = socket.origin
-    if (socket.isFrameExtension) { // Request from extension, swap origin
+    if (socket.isFrameExtension) {
+      // Request from extension, swap origin
       if (rawPayload.__frameOrigin) {
         requestOrigin = rawPayload.__frameOrigin
         delete rawPayload.__frameOrigin
@@ -70,7 +73,12 @@ const handler = (socket: FrameWebSocket, req: IncomingMessage) => {
 
     const origin = parseOrigin(requestOrigin)
 
-    if (logTraffic) log.info(`req -> | ${(socket.isFrameExtension ? 'ext' : 'ws')} | ${origin} | ${rawPayload.method} | -> | ${rawPayload.params}`)
+    if (logTraffic)
+      log.info(
+        `req -> | ${socket.isFrameExtension ? 'ext' : 'ws'} | ${origin} | ${rawPayload.method} | -> | ${
+          rawPayload.params
+        }`
+      )
 
     const { payload, hasSession } = updateOrigin(rawPayload, origin, rawPayload.__extensionConnecting)
 
@@ -94,25 +102,38 @@ const handler = (socket: FrameWebSocket, req: IncomingMessage) => {
       if (!accounts.getSelectedAddresses()[0]) error = { message: 'No Frame account selected', code: 4001 }
       res({ id: payload.id, jsonrpc: payload.jsonrpc, error })
     } else {
-      provider.send(payload, response => {
+      provider.send(payload, (response) => {
         if (response && response.result) {
           if (payload.method === 'eth_subscribe') {
             subs[response.result] = { socket, originId: payload._origin }
           } else if (payload.method === 'eth_unsubscribe') {
-            payload.params.forEach(sub => { if (subs[sub]) delete subs[sub] })
+            payload.params.forEach((sub) => {
+              if (subs[sub]) delete subs[sub]
+            })
           }
         }
-        if (logTraffic) log.info(`<- res | ${(socket.isFrameExtension ? 'ext' : 'ws')} | ${origin} | ${payload.method} | <- | ${JSON.stringify(response.result || response.error)}`)
+        if (logTraffic)
+          log.info(
+            `<- res | ${socket.isFrameExtension ? 'ext' : 'ws'} | ${origin} | ${
+              payload.method
+            } | <- | ${JSON.stringify(response.result || response.error)}`
+          )
 
         res(response)
       })
     }
   })
-  socket.on('error', err => log.error(err))
-  socket.on('close', _ => {
-    Object.keys(subs).forEach(sub => {
+  socket.on('error', (err) => log.error(err))
+  socket.on('close', (_) => {
+    Object.keys(subs).forEach((sub) => {
       if (subs[sub].socket.id === socket.id) {
-        provider.send({ jsonrpc: '2.0', id: 1, method: 'eth_unsubscribe', _origin: subs[sub].originId, params: [sub] })
+        provider.send({
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'eth_unsubscribe',
+          _origin: subs[sub].originId,
+          params: [sub]
+        })
         delete subs[sub]
       }
     })

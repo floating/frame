@@ -4,7 +4,7 @@ import svg from '../../../../../../resources/svg'
 import link from '../../../../../../resources/link'
 
 class AddTokenRequest extends React.Component {
-  constructor (...args) {
+  constructor(...args) {
     super(...args)
     this.state = { allowInput: false }
     setTimeout(() => {
@@ -12,7 +12,7 @@ class AddTokenRequest extends React.Component {
     }, 200)
   }
 
-  render () {
+  render() {
     const status = this.props.req.status
     const notice = this.props.req.notice
 
@@ -31,21 +31,33 @@ class AddTokenRequest extends React.Component {
     const height = mode === 'monitor' ? '80px' : '340px'
     const token = this.props.req.token
     return (
-      <div key={this.props.req.id || this.props.req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height }}>
+      <div
+        key={this.props.req.id || this.props.req.handlerId}
+        className={requestClass}
+        style={{ transform: `translateY(${this.props.pos}px)`, height }}
+      >
         <div className='approveRequest'>
           {notice ? (
             <div className='requestNotice'>
-              {(_ => {
+              {((_) => {
                 if (status === 'pending') {
                   return (
                     <div className='requestNoticeInner scaleIn'>
-                      <div><div className='loader' /></div>
+                      <div>
+                        <div className='loader' />
+                      </div>
                     </div>
                   )
                 } else if (status === 'success') {
-                  return <div className='requestNoticeInner scaleIn'>{svg.octicon('check', { height: 80 })}</div>
+                  return (
+                    <div className='requestNoticeInner scaleIn'>{svg.octicon('check', { height: 80 })}</div>
+                  )
                 } else if (status === 'error' || status === 'declined') {
-                  return <div className='requestNoticeInner scaleIn'>{svg.octicon('circle-slash', { height: 80 })}</div>
+                  return (
+                    <div className='requestNoticeInner scaleIn'>
+                      {svg.octicon('circle-slash', { height: 80 })}
+                    </div>
+                  )
                 }
               })()}
             </div>
@@ -59,7 +71,9 @@ class AddTokenRequest extends React.Component {
               }
               <div className='requestToken scaleIn'>
                 <div className='requestTokenInner'>
-                  <div className={originClass}>{this.store('main.origins', this.props.req.origin, 'name')}</div>
+                  <div className={originClass}>
+                    {this.store('main.origins', this.props.req.origin, 'name')}
+                  </div>
                   <div className={'requestTokenOriginSub'}>{'wants to add a token'}</div>
                   <div className='requestTokenInfo'>
                     <div className='requestTokenSymbol'>{token.symbol.toUpperCase()}</div>

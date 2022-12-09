@@ -6,21 +6,28 @@ import link from '../../../../../../resources/link'
 import svg from '../../../../../../resources/svg'
 import { isNetworkConnected } from '../../../../../../resources/utils/chains'
 import Balance from '../Balance'
-import { formatUsdRate, createBalance, sortByTotalValue as byTotalValue, isNativeCurrency } from '../../../../../../resources/domain/balance'
+import {
+  formatUsdRate,
+  createBalance,
+  sortByTotalValue as byTotalValue,
+  isNativeCurrency
+} from '../../../../../../resources/domain/balance'
 import { matchFilter } from '../../../../../../resources/utils'
 
 class BalancesExpanded extends React.Component {
-  constructor (...args) {
+  constructor(...args) {
     super(...args)
     this.moduleRef = React.createRef()
     if (!this.props.expanded) {
       this.resizeObserver = new ResizeObserver(() => {
-        if (this.moduleRef && this.moduleRef.current) {
-          clearTimeout(this.resizeTimer)
-          this.resizeTimer = setTimeout(() => {
-            link.send('tray:action', 'updateAccountModule', this.props.moduleId, { height: this.moduleRef.current.clientHeight })
-          }, 100)
-        }
+        clearTimeout(this.resizeTimer)
+        this.resizeTimer = setTimeout(() => {
+          if (this.moduleRef && this.moduleRef.current) {
+            link.send('tray:action', 'updateAccountModule', this.props.moduleId, {
+              height: this.moduleRef.current.clientHeight
+            })
+          }
+        }, 100)
       })
     }
 
@@ -34,22 +41,22 @@ class BalancesExpanded extends React.Component {
     }
   }
 
-  componentDidMount () {
+  componentDidMount() {
     if (this.resizeObserver) this.resizeObserver.observe(this.moduleRef.current)
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     if (this.resizeObserver) this.resizeObserver.disconnect()
   }
 
-  getBalances (rawBalances, rates) {
+  getBalances(rawBalances, rates) {
     const networks = this.store('main.networks.ethereum')
     const networksMeta = this.store('main.networksMeta.ethereum')
 
     const balances = rawBalances
       // only show balances from connected networks
-      .filter(rawBalance => isNetworkConnected(networks[rawBalance.chainId]))
-      .map(rawBalance => {
+      .filter((rawBalance) => isNetworkConnected(networks[rawBalance.chainId]))
+      .map((rawBalance) => {
         const isNative = isNativeCurrency(rawBalance.address)
         const nativeCurrencyInfo = networksMeta[rawBalance.chainId].nativeCurrency || {}
 
@@ -59,9 +66,12 @@ class BalancesExpanded extends React.Component {
         const decimals = isNative ? nativeCurrencyInfo.decimals || 18 : rawBalance.decimals
         const symbol = (isNative && nativeCurrencyInfo.symbol) || rawBalance.symbol
 
-        return createBalance({ ...rawBalance, logoURI, name, decimals, symbol }, networks[rawBalance.chainId].isTestnet ? { price: 0 } : rate.usd)
+        return createBalance(
+          { ...rawBalance, logoURI, name, decimals, symbol },
+          networks[rawBalance.chainId].isTestnet ? { price: 0 } : rate.usd
+        )
       })
-      .filter(balance => {
+      .filter((balance) => {
         const filter = this.state.balanceFilter
         const chainName = this.store('main.networks.ethereum', balance.chainId, 'name')
         return matchFilter(filter, [chainName, balance.name, balance.symbol])
@@ -73,16 +83,14 @@ class BalancesExpanded extends React.Component {
     return { balances, totalDisplayValue: formatUsdRate(totalValue, 0), totalValue }
   }
 
-  renderAccountFilter () {
+  renderAccountFilter() {
     return (
       <div className='panelFilterAccount'>
-        <div className='panelFilterIcon'>
-          {svg.search(12)}
-        </div>
+        <div className='panelFilterIcon'>{svg.search(12)}</div>
         <div className='panelFilterInput'>
-          <input 
+          <input
             tabIndex='-1'
-            type='text' 
+            type='text'
             spellCheck='false'
             onChange={(e) => {
               const value = e.target.value
@@ -92,7 +100,7 @@ class BalancesExpanded extends React.Component {
           />
         </div>
         {this.state.balanceFilter ? (
-          <div 
+          <div
             className='panelFilterClear'
             onClick={() => {
               this.setState({ balanceFilter: '' })
@@ -105,7 +113,7 @@ class BalancesExpanded extends React.Component {
     )
   }
 
-  render () {
+  render() {
     const { address, lastSignerType } = this.store('main.accounts', this.props.account)
     const storedBalances = this.store('main.balances', address) || []
     const rates = this.store('main.rates')
@@ -116,13 +124,11 @@ class BalancesExpanded extends React.Component {
     const lastBalanceUpdate = this.store('main.accounts', address, 'balances.lastUpdated')
 
     // scan if balances are more than a minute old
-    const scanning = !lastBalanceUpdate || (new Date() - new Date(lastBalanceUpdate)) > (1000 * 60)
+    const scanning = !lastBalanceUpdate || new Date() - new Date(lastBalanceUpdate) > 1000 * 60
     const hotSigner = ['ring', 'seed'].includes(lastSignerType)
 
     return (
-      <div 
-        className='accountViewScroll'
-      >
+      <div className='accountViewScroll'>
         {this.renderAccountFilter()}
         {scanning ? (
           <div className='signerBalancesLoading'>
@@ -131,41 +137,51 @@ class BalancesExpanded extends React.Component {
         ) : null}
         <div className='signerBalancesWrap'>
           {balances.map(({ chainId, symbol, ...balance }, i) => {
-            return <Balance key={chainId + symbol} chainId={chainId} symbol={symbol} balance={balance} i={i} scanning={scanning} />
+            return (
+              <Balance
+                key={chainId + symbol}
+                chainId={chainId}
+                symbol={symbol}
+                balance={balance}
+                i={i}
+                scanning={scanning}
+              />
+            )
           })}
         </div>
-        <div 
-          className='signerBalanceTotal'
-          style={{ opacity: !scanning ? 1 : 0 }}
-        >
+        <div className='signerBalanceTotal' style={{ opacity: !scanning ? 1 : 0 }}>
           <div className='signerBalanceButtons'>
-            <div className='signerBalanceButton signerBalanceAddToken' onMouseDown={() => {
-              link.send('tray:action', 'navDash', { view: 'tokens', data: { notify: 'addToken' }})
-            }}>
+            <div
+              className='signerBalanceButton signerBalanceAddToken'
+              onMouseDown={() => {
+                link.send('tray:action', 'navDash', { view: 'tokens', data: { notify: 'addToken' } })
+              }}
+            >
               <span>Add Token</span>
             </div>
           </div>
           <div className='signerBalanceTotalText'>
-            <div className='signerBalanceTotalLabel'>
-              {'Total: '}
-            </div>
+            <div className='signerBalanceTotalLabel'>{'Total: '}</div>
             <div className='signerBalanceTotalValue'>
-              {svg.usd(11)}{balances.length > 0 ? totalDisplayValue : '---.--'}
+              {svg.usd(11)}
+              {balances.length > 0 ? totalDisplayValue : '---.--'}
             </div>
           </div>
         </div>
         {totalValue.toNumber() > 10000 && hotSigner ? (
-          <div 
+          <div
             className='signerBalanceWarning'
             onClick={() => this.setState({ showHighHotMessage: !this.state.showHighHotMessage })}
             style={scanning ? { opacity: 0 } : { opacity: 1 }}
           >
-            <div className='signerBalanceWarningTitle'>
-              {'high value account is using hot signer'}
-            </div>
-            {this.state.showHighHotMessage ? <div className='signerBalanceWarningMessage'>
-              {'We recommend using one of our supported hardware signers to increase the security of your account'}
-            </div> : null}
+            <div className='signerBalanceWarningTitle'>{'high value account is using hot signer'}</div>
+            {this.state.showHighHotMessage ? (
+              <div className='signerBalanceWarningMessage'>
+                {
+                  'We recommend using one of our supported hardware signers to increase the security of your account'
+                }
+              </div>
+            ) : null}
           </div>
         ) : null}
       </div>

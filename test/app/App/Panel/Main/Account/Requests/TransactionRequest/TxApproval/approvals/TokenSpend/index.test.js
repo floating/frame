@@ -1,6 +1,6 @@
 import React from 'react'
 import { fireEvent, render } from '@testing-library/react'
-import { addHexPrefix } from 'ethereumjs-util'
+import { addHexPrefix } from '@ethereumjs/util'
 
 import Restore from 'react-restore'
 import store from '../../../../../../../../../../../main/store'
@@ -36,8 +36,8 @@ describe('changing approval amounts', () => {
             try {
               expect(amount).toBe('0x7a120')
               resolve()
-            } catch (e) { 
-              reject(e) 
+            } catch (e) {
+              reject(e)
             }
           }}
         />
@@ -55,7 +55,7 @@ describe('changing approval amounts', () => {
   })
 
   it('does not allows the user to set the token approval to a custom amount for an unknown token', () => {
-    const requestedAmountHex = addHexPrefix(100e6.toString(16))
+    const requestedAmountHex = addHexPrefix((100e6).toString(16))
 
     const approval = {
       id: 'erc20:approve',
@@ -71,11 +71,7 @@ describe('changing approval amounts', () => {
     }
 
     const { queryByRole, getByText } = render(
-      <TokenSpend
-        approval={approval}
-        requestedAmountHex={requestedAmountHex}
-        updateApproval={() => {}}
-      />
+      <TokenSpend approval={approval} requestedAmountHex={requestedAmountHex} updateApproval={() => {}} />
     )
 
     const custom = queryByRole('button', { name: 'Custom' })
@@ -108,8 +104,8 @@ describe('changing approval amounts', () => {
             try {
               expect(amount).toBe('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff')
               resolve()
-            } catch (e) { 
-              reject(e) 
+            } catch (e) {
+              reject(e)
             }
           }}
         />
@@ -147,8 +143,8 @@ describe('changing approval amounts', () => {
           updateApproval={(amount) => {
             try {
               if (amount === '0x011170') resolve()
-            } catch (e) { 
-              reject(e) 
+            } catch (e) {
+              reject(e)
             }
           }}
         />
@@ -187,8 +183,8 @@ describe('changing approval amounts', () => {
           updateApproval={(amount) => {
             try {
               if (amount === '0x011170') resolve()
-            } catch (e) { 
-              reject(e) 
+            } catch (e) {
+              reject(e)
             }
           }}
         />
@@ -204,9 +200,9 @@ describe('changing approval amounts', () => {
 
   const requiredApprovalData = ['decimals', 'symbol', 'name']
 
-  requiredApprovalData.forEach(field => {
+  requiredApprovalData.forEach((field) => {
     it(`does not allow the user to edit the amount if ${field} is not present in approval data`, () => {
-      const requestedAmountHex = addHexPrefix(100e6.toString(16))
+      const requestedAmountHex = addHexPrefix((100e6).toString(16))
       const approval = {
         id: 'erc20:approve',
         data: {
@@ -224,11 +220,7 @@ describe('changing approval amounts', () => {
       delete approval.data[field]
 
       const { queryByRole } = render(
-        <TokenSpend
-          approval={approval}
-          requestedAmountHex={requestedAmountHex}
-          updateApproval={() => {}}
-        />
+        <TokenSpend approval={approval} requestedAmountHex={requestedAmountHex} updateApproval={() => {}} />
       )
 
       const custom = queryByRole('button', { name: 'Custom' })
@@ -254,9 +246,8 @@ describe('formatting amounts', () => {
     { amount: 1e13, formatted: '~unlimited' }
   ]
 
-  formattedAmounts.forEach(spec => {
+  formattedAmounts.forEach((spec) => {
     it(`formats a requested amount of ${spec.amount} as ${spec.formatted}`, () => {
-
       const amount = addHexPrefix((spec.amount * 1e6).toString(16))
       const requestedAmountHex = amount
 
@@ -275,11 +266,7 @@ describe('formatting amounts', () => {
       }
 
       const { queryByRole, getByText } = render(
-        <TokenSpend
-          approval={approval}
-          requestedAmountHex={requestedAmountHex}
-          updateApproval={() => {}}
-        />
+        <TokenSpend approval={approval} requestedAmountHex={requestedAmountHex} updateApproval={() => {}} />
       )
 
       const requestedAmount = queryByRole('textbox')

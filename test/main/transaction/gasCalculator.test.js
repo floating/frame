@@ -2,7 +2,7 @@ import GasCalculator from '../../../main/transaction/gasCalculator'
 
 let requestHandlers
 let testConnection = {
-  send: jest.fn(payload => {
+  send: jest.fn((payload) => {
     if (payload.method in requestHandlers) {
       return Promise.resolve(requestHandlers[payload.method](payload.params))
     }
@@ -89,8 +89,8 @@ describe('#getFeePerGas', () => {
   describe('calculating priority fee', () => {
     it('calculates the priority fee for the next block based on normal blocks', async () => {
       // all blocks with gas ratios between 0.1 and 0.9 will be considered for calculating the median priority fee
-      gasUsedRatios = [ 0.12024061496050893, 0.17942918604838942, 0.23114498292513627, 0.1801134637893198 ]
-      blockRewards = [ [ '0xee6b2800' ], [ '0x3b9aca00' ], [ '0x77359400' ], [ '0x3b9aca00' ] ]
+      gasUsedRatios = [0.12024061496050893, 0.17942918604838942, 0.23114498292513627, 0.1801134637893198]
+      blockRewards = [['0xee6b2800'], ['0x3b9aca00'], ['0x77359400'], ['0x3b9aca00']]
 
       const gas = new GasCalculator(testConnection)
 
@@ -98,11 +98,11 @@ describe('#getFeePerGas', () => {
 
       expect(fees.maxPriorityFeePerGas).toBe('0x77359400')
     })
-    
+
     it('excludes full blocks from the priority fee calculation', async () => {
       // all full blocks (gas ratios above 0.9) will be excluded from calculating the median priority fee
-      gasUsedRatios = [ 0.91024061496050893, 0.17942918604838942, 0.23114498292513627, 1, 0.1801134637893198 ]
-      blockRewards = [ [ '0xee6b2800' ], [ '0x3b9aca00' ], [ '0x77359400' ], [ '0x77359400' ], [ '0x3b9aca00' ] ]
+      gasUsedRatios = [0.91024061496050893, 0.17942918604838942, 0.23114498292513627, 1, 0.1801134637893198]
+      blockRewards = [['0xee6b2800'], ['0x3b9aca00'], ['0x77359400'], ['0x77359400'], ['0x3b9aca00']]
 
       const gas = new GasCalculator(testConnection)
 
@@ -110,11 +110,13 @@ describe('#getFeePerGas', () => {
 
       expect(fees.maxPriorityFeePerGas).toBe('0x3b9aca00')
     })
-    
+
     it('excludes "empty" blocks from the priority fee calculation', async () => {
       // all empty blocks (gas ratios below 0.1) will be excluded from calculating the median priority fee
-      gasUsedRatios = [ 0.01024061496050893, 0.17942918604838942, 0.23114498292513627, 0.0801134637893198, 0.1801134637893198 ]
-      blockRewards = [ [ '0xee6b2800' ], [ '0x3b9aca00' ], [ '0x77359400' ], [ '0x77359400' ], [ '0x3b9aca00' ] ]
+      gasUsedRatios = [
+        0.01024061496050893, 0.17942918604838942, 0.23114498292513627, 0.0801134637893198, 0.1801134637893198
+      ]
+      blockRewards = [['0xee6b2800'], ['0x3b9aca00'], ['0x77359400'], ['0x77359400'], ['0x3b9aca00']]
 
       const gas = new GasCalculator(testConnection)
 
@@ -122,11 +124,11 @@ describe('#getFeePerGas', () => {
 
       expect(fees.maxPriorityFeePerGas).toBe('0x3b9aca00')
     })
-    
+
     it('considers full blocks if no partial blocks are eligible', async () => {
       // full blocks (gas ratios above 0.9) will be considered only if no blocks with a ratio between 0.1 and 0.9 are available
-      gasUsedRatios = [ 0.99024061496050893, 0.07942918604838942, 0.03114498292513627, 1, 0.9801134637893198 ]
-      blockRewards = [ [ '0xee6b2800' ], [ '0x3b9aca01' ], [ '0x3b9aca00' ], [ '0x77359400' ], [ '0x3b9aca00' ] ]
+      gasUsedRatios = [0.99024061496050893, 0.07942918604838942, 0.03114498292513627, 1, 0.9801134637893198]
+      blockRewards = [['0xee6b2800'], ['0x3b9aca01'], ['0x3b9aca00'], ['0x77359400'], ['0x3b9aca00']]
 
       const gas = new GasCalculator(testConnection)
 
@@ -142,10 +144,10 @@ describe('#getFeePerGas', () => {
       gasUsedRatios[18] = 0.02 // this block should be ignored as the ratio is too low
       gasUsedRatios[27] = 0.73
 
-      blockRewards[11] = [ '0xee6b2800' ]
-      blockRewards[15] = [ '0x3b9aca00' ]
-      blockRewards[18] = [ '0x77359400' ] // this block should be ignored as the ratio is too low
-      blockRewards[27] = [ '0x9a359400' ]
+      blockRewards[11] = ['0xee6b2800']
+      blockRewards[15] = ['0x3b9aca00']
+      blockRewards[18] = ['0x77359400'] // this block should be ignored as the ratio is too low
+      blockRewards[27] = ['0x9a359400']
 
       const gas = new GasCalculator(testConnection)
 
@@ -155,8 +157,8 @@ describe('#getFeePerGas', () => {
     })
 
     it('uses any recent blocks if no blocks in the sample have the qualifying gas ratios', async () => {
-      gasUsedRatios = [ 1.09024061496050893, 0.07942918604838942, 0.03114498292513627, 1.1, 0.0801134637893198 ]
-      blockRewards = [ [ '0xee6b2800' ], [ '0x3b9aca01' ], [ '0x3b9aca00' ], [ '0x77359400' ], [ '0x3b9aca00' ] ]
+      gasUsedRatios = [1.09024061496050893, 0.07942918604838942, 0.03114498292513627, 1.1, 0.0801134637893198]
+      blockRewards = [['0xee6b2800'], ['0x3b9aca01'], ['0x3b9aca00'], ['0x77359400'], ['0x3b9aca00']]
 
       const gas = new GasCalculator(testConnection)
 
@@ -172,10 +174,10 @@ describe('#getFeePerGas', () => {
       gasUsedRatios[26] = 1.122
       gasUsedRatios[28] = 0.073
 
-      blockRewards[13] = [ '0xee6b2800' ]
-      blockRewards[19] = [ '0x3b9aca00' ]
-      blockRewards[26] = [ '0x77359400' ]
-      blockRewards[28] = [ '0x9a359400' ]
+      blockRewards[13] = ['0xee6b2800']
+      blockRewards[19] = ['0x3b9aca00']
+      blockRewards[26] = ['0x77359400']
+      blockRewards[28] = ['0x9a359400']
 
       const gas = new GasCalculator(testConnection)
 
@@ -183,7 +185,7 @@ describe('#getFeePerGas', () => {
 
       expect(fees.maxPriorityFeePerGas).toBe('0x9a359400')
     })
-    
+
     it('uses the priority fee from the latest block when no eligible blocks are available', async () => {
       const gas = new GasCalculator(testConnection)
 
@@ -196,7 +198,7 @@ describe('#getFeePerGas', () => {
 })
 
 // helper functions
-function fillEmptySlots (arr, targetLength, value) {
+function fillEmptySlots(arr, targetLength, value) {
   const target = arr.slice()
   let i = 0
 

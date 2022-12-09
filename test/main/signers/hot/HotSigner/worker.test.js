@@ -31,19 +31,64 @@ describe('#signTransaction', () => {
   }
 
   const chains = [
-    { name: 'mainnet', chainId: 1, expectedSignature: '0xf8698084b2d05e0082520894be188d6641e8b680743a4815dfa0f6208038960f86b5e620f480008025a0c8ca5f76f568578bebbdfc257be09d8e8a4512d0ffd45e991da86be8141d97e0a037179047d9810e211657d9dd60d4bac66ed576fd65ef65a55f007314587036ec' },
-    { name: 'rinkeby', chainId: 4, expectedSignature: '0xf8698084b2d05e0082520894be188d6641e8b680743a4815dfa0f6208038960f86b5e620f48000802ca0c711e0a0f6881bb8a4b8fff57f2ddd7539a1f72acd59706b2e2765c16dc05155a0698f6af80657857a0e8ba47632995fbec987bc427abf88d1c1c65c80dd67c8b9' },
-    { name: 'goerli', chainId: 5, expectedSignature: '0xf8698084b2d05e0082520894be188d6641e8b680743a4815dfa0f6208038960f86b5e620f48000802da074c3b69fa979e92253c7f66d323f91f7f11eb16dd2b4838a274b584ddb708895a03e76e91351b2be3fd4a065195a0c71a4359d0fe4230f5f3ae457b2cb5a30bf03' },
-    { name: 'optimism', chainId: 10, expectedSignature: '0xf8698084b2d05e0082520894be188d6641e8b680743a4815dfa0f6208038960f86b5e620f480008024a0ac95e29896e43248e2e91cbedb4fb367c3a4bf3100ac55ebf914ed8582f4e189a0240abc49b1178721a08cba8c95aea43f2a6daf2da34f7c9641fc1de253edada8' },
-    { name: 'optimistic kovan', chainId: 69, expectedSignature: '0xf8698084b2d05e0082520894be188d6641e8b680743a4815dfa0f6208038960f86b5e620f48000807ea08e096de4291afc19b88e46fa0bfb4e9d5a1073fb9e9534f7c0cb89ff81641a1ba05b357d98228466f265b4e782b80d78baba244af2fb335b77754a82fff471a0a4' },
-    { name: 'xdai', chainId: 100, expectedSignature: '0xf86a8084b2d05e0082520894be188d6641e8b680743a4815dfa0f6208038960f86b5e620f480008081a3a0de2c8b5a1ecccdb10fe7e524ff751cd15c8f93284c7cbb7de2a13a0e481bac83a01260a408c58b7d783be08fe6d073b5390581225ec48e8b9fafe97ce096870c89' },
-    { name: 'polygon', chainId: 137, expectedSignature: '0xf86a8084b2d05e0082520894be188d6641e8b680743a4815dfa0f6208038960f86b5e620f480008081d5a0d62d318003814f6ba963495353111d6923207ba972b539c49d89ad06a9062f2da00ff0ec849d44a6768262fafb040e343e2d2472c4eee8c833eacb2321038c7737' },
-    { name: 'arbitrum', chainId: 42161, expectedSignature: '0xf8698084b2d05e0082520894be188d6641e8b680743a4815dfa0f6208038960f86b5e620f480008024a0ac95e29896e43248e2e91cbedb4fb367c3a4bf3100ac55ebf914ed8582f4e189a0240abc49b1178721a08cba8c95aea43f2a6daf2da34f7c9641fc1de253edada8' },
-    { name: 'polygon-mumbai', chainId: 80001, expectedSignature: '0xf86b8084b2d05e0082520894be188d6641e8b680743a4815dfa0f6208038960f86b5e620f4800080826c95a0202d3b445db101e46ed9f91c6849117efa00a98fb52da4612d2790de1e1f6749a01a050bcb2819efe1bfd1276aa1fcc7ee66cd700a52f261cabb376f4e75d660be' }
+    {
+      name: 'mainnet',
+      chainId: 1,
+      expectedSignature:
+        '0xf8698084b2d05e0082520894be188d6641e8b680743a4815dfa0f6208038960f86b5e620f480008025a0c8ca5f76f568578bebbdfc257be09d8e8a4512d0ffd45e991da86be8141d97e0a037179047d9810e211657d9dd60d4bac66ed576fd65ef65a55f007314587036ec'
+    },
+    {
+      name: 'goerli',
+      chainId: 5,
+      expectedSignature:
+        '0xf8698084b2d05e0082520894be188d6641e8b680743a4815dfa0f6208038960f86b5e620f48000802da074c3b69fa979e92253c7f66d323f91f7f11eb16dd2b4838a274b584ddb708895a03e76e91351b2be3fd4a065195a0c71a4359d0fe4230f5f3ae457b2cb5a30bf03'
+    },
+    {
+      name: 'optimism',
+      chainId: 10,
+      expectedSignature:
+        '0xf8698084b2d05e0082520894be188d6641e8b680743a4815dfa0f6208038960f86b5e620f480008037a06340cc640986ddbc095d65bdd5217e4f25168e0fb7d097e4f6ce1c739e4adb96a0645e1173cf2fdc318c4af839dd52a3dc408b0c60b0246e96a0b0f5bf7edbe614'
+    },
+    {
+      name: 'optimistic kovan',
+      chainId: 69,
+      expectedSignature:
+        '0xf86a8084b2d05e0082520894be188d6641e8b680743a4815dfa0f6208038960f86b5e620f480008081aea0a0df2fd26c2f8a5e9531d6cbe7c8246d2f82a1524e17c545076e7637e0dcf338a028629bc1ae46c5e27eeb2cb41b9a87618e2224778138be8cb4e5c17d1c8d3494'
+    },
+    {
+      name: 'xdai',
+      chainId: 100,
+      expectedSignature:
+        '0xf86a8084b2d05e0082520894be188d6641e8b680743a4815dfa0f6208038960f86b5e620f480008081eba021839bde3d4c41b1fb83c5c97e7d9cb4f4d4fc86fc338faa44a3a223db4213a5a0157a154afec7aa17cd94f9c7a6a1545f701a99f0e1edb4997504eb9fd3ad8813'
+    },
+    {
+      name: 'polygon',
+      chainId: 137,
+      expectedSignature:
+        '0xf86b8084b2d05e0082520894be188d6641e8b680743a4815dfa0f6208038960f86b5e620f4800080820135a09235ef8a65bff6d8e117bd13653fafcb2225763f4a11aa29886464530e009cfaa03fcd6b8ac39c1b3f375efcd3e4558b5c44cf167f2de800a63a008a86ed3dba25'
+    },
+    {
+      name: 'arbitrum',
+      chainId: 42161,
+      expectedSignature:
+        '0xf86c8084b2d05e0082520894be188d6641e8b680743a4815dfa0f6208038960f86b5e620f480008083014985a07f874b1f31b10c8ec507f74a3803f6d6a52e93790e9e502bcf74b2cc07bb169aa013ff12c35ed91966d8e3f042971c0fab1d236f5888af7315007baa0eab0938c9'
+    },
+    {
+      name: 'polygon-mumbai',
+      chainId: 80001,
+      expectedSignature:
+        '0xf86c8084b2d05e0082520894be188d6641e8b680743a4815dfa0f6208038960f86b5e620f480008083027126a00f42c66986e1d7ca6e77891e3cf0cd8fe360ed0a92732523bf29756f18e37255a07688e781db1d625a2c4234c5a61c3a9093643a326060caf5b58ad05fdf1f4233'
+    },
+    {
+      name: 'sepolia',
+      chainId: 11155111,
+      expectedSignature:
+        '0xf86d8084b2d05e0082520894be188d6641e8b680743a4815dfa0f6208038960f86b5e620f48000808401546d72a0cf0656010c7e68ba6ad17a528f1e0280ec7b96ae93a2edbee399e771a2d46c85a07d77731cb4218a55bccc690d49238a82bc3051884356eb57bc2e582b57d5a46a'
+    }
   ]
 
-  chains.forEach(chain => {
-    it(`signs a transaction on ${chain.name}`, done => {
+  chains.forEach((chain) => {
+    it(`signs a transaction on ${chain.name}`, (done) => {
       const tx = { ...rawTx, chainId: chain.chainId.toString(16) }
 
       worker.signTransaction(key, tx, (err, signature) => {
@@ -51,19 +96,23 @@ describe('#signTransaction', () => {
           expect(err).toBe(null)
           expect(signature).toBe(chain.expectedSignature)
           done()
-        } catch (e) { done(e) }
+        } catch (e) {
+          done(e)
+        }
       })
     }, 200)
   })
 
-  it('rejects a transaction with an unknown chain id', done => {
+  it('rejects a transaction with an unknown chain id', (done) => {
     const { chainId, ...tx } = rawTx
 
-    worker.signTransaction(key, tx, err => {
+    worker.signTransaction(key, tx, (err) => {
       try {
         expect(err).toBe('could not determine chain id for transaction')
         done()
-      } catch (e) { done(e) }
+      } catch (e) {
+        done(e)
+      }
     })
   }, 200)
 })

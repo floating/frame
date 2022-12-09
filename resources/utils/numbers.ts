@@ -13,19 +13,22 @@ const digitsLookup = [
   { value: 1e18, symbol: 'quintillion' }
 ]
 
-export function formatNumber (n: number, digits = 2)  {
+export function formatNumber(n: number, digits = 2) {
   const num = Number(n)
-  const item = digitsLookup.slice().reverse().find(item => num >= item.value) || { value: 0, symbol : '?' }
+  const item = digitsLookup
+    .slice()
+    .reverse()
+    .find((item) => num >= item.value) || { value: 0, symbol: '?' }
   const formatted = (value: number) => `${value.toFixed(digits).replace(numberRegex, '$1')} ${item.symbol}`
 
   return item ? formatted(num / item.value) : '0'
 }
 
-export function isUnlimited (amount: string) {
+export function isUnlimited(amount: string) {
   return amount === MAX_HEX
 }
 
-export function formatDisplayInteger (amount: number, decimals: number) {
+export function formatDisplayInteger(amount: number, decimals: number) {
   const displayInt = new BigNumber(amount).shiftedBy(-decimals).integerValue().toNumber()
 
   if (displayInt > 9e12) {

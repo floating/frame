@@ -3,7 +3,9 @@ import store from '../../../main/store'
 
 jest.mock('@framelabs/pylon-client', () => jest.fn())
 jest.mock('../../../main/store')
-jest.mock('../../../main/externalData/inventory', () => jest.fn(() => ({ start: jest.fn(), stop: jest.fn() })))
+jest.mock('../../../main/externalData/inventory', () =>
+  jest.fn(() => ({ start: jest.fn(), stop: jest.fn() }))
+)
 jest.mock('../../../main/externalData/assets', () => jest.fn(() => ({ start: jest.fn(), stop: jest.fn() })))
 jest.mock('../../../main/externalData/balances', () => jest.fn(() => mockBalances))
 
@@ -48,7 +50,7 @@ describe('hiding and showing the tray', () => {
   })
 })
 
-function setTrayShown (shown) {
+function setTrayShown(shown) {
   store.set('tray.open', shown)
   store.getObserver('externalData:tray').fire()
 

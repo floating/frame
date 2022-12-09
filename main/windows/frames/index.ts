@@ -8,14 +8,14 @@ import store from '../../store'
 import frameInstances, { FrameInstance } from './frameInstances.js'
 import viewInstances from './viewInstances'
 
-function getFrames (): Record<string, Frame> {
+function getFrames(): Record<string, Frame> {
   return store('main.frames')
 }
 
 export default class FrameManager {
   private frameInstances: Record<string, FrameInstance> = {}
 
-  start () {
+  start() {
     store.observer(() => {
       const inFocus = store('main.focusedFrame')
 
@@ -27,14 +27,14 @@ export default class FrameManager {
     })
   }
 
-  manageFrames (frames: Record<string, Frame>, inFocus: string) {
+  manageFrames(frames: Record<string, Frame>, inFocus: string) {
     const frameIds = Object.keys(frames)
     const instanceIds = Object.keys(this.frameInstances)
-  
+
     // create an instance for each new frame in the store
     frameIds
-      .filter(frameId => !instanceIds.includes(frameId))
-      .forEach(frameId => {
+      .filter((frameId) => !instanceIds.includes(frameId))
+      .forEach((frameId) => {
         const frameInstance = frameInstances.create(frames[frameId])
 
         this.frameInstances[frameId] = frameInstance
@@ -55,7 +55,7 @@ export default class FrameManager {
         frameInstance.on('enter-full-screen', () => {
           store.updateFrame(frameId, { fullscreen: true })
         })
-        
+
         frameInstance.on('leave-full-screen', () => {
           const platform = store('platform')
           // Handle broken linux window events
@@ -81,14 +81,14 @@ export default class FrameManager {
           if (currentView && frameInstance) {
             frameInstance.views = frameInstance.views || {}
             frameInstance.views[currentView].webContents.focus()
-          } 
+          }
         })
       })
 
     // destroy each frame instance that is no longer in the store
     instanceIds
-      .filter(instanceId => !frameIds.includes(instanceId))
-      .forEach(instanceId => {
+      .filter((instanceId) => !frameIds.includes(instanceId))
+      .forEach((instanceId) => {
         const frameInstance = this.removeFrameInstance(instanceId)
 
         if (frameInstance) {
@@ -106,32 +106,36 @@ export default class FrameManager {
     }
   }
 
-  manageViews (frames: Record<string, Frame>) {
+  manageViews(frames: Record<string, Frame>) {
     const frameIds = Object.keys(frames)
-  
-    frameIds.forEach(frameId => {
+
+    frameIds.forEach((frameId) => {
       const frameInstance = this.frameInstances[frameId]
       if (!frameInstance) return log.error('Instance not found when managing views')
-  
+
       const frame = frames[frameId]
       const frameInstanceViews = frameInstance.views || {}
       const frameViewIds = Object.keys(frame.views)
       const instanceViewIds = Object.keys(frameInstanceViews)
-    
+
       instanceViewIds
-        .filter(instanceViewId => !frameViewIds.includes(instanceViewId))
-        .forEach(instanceViewId => viewInstances.destroy(frameInstance, instanceViewId))
-  
+        .filter((instanceViewId) => !frameViewIds.includes(instanceViewId))
+        .forEach((instanceViewId) => viewInstances.destroy(frameInstance, instanceViewId))
+
       // For each view in the store that belongs to this frame
-      frameViewIds.forEach(frameViewId => {
+      frameViewIds.forEach((frameViewId) => {
         const viewData = frame.views[frameViewId] || {}
         const viewInstance = frameInstanceViews[frameViewId] || {}
 
         // Create them
         if (!instanceViewIds.includes(frameViewId)) viewInstances.create(frameInstance, viewData)
-        
+
         // Show the correct one
-        if (frame.currentView === frameViewId && viewData.ready && frameInstance.showingView !== frameViewId) {
+        if (
+          frame.currentView === frameViewId &&
+          viewData.ready &&
+          frameInstance.showingView !== frameViewId
+        ) {
           frameInstance.addBrowserView(viewInstance)
           frameInstance.showingView = frameViewId
           viewInstances.position(frameInstance, frameViewId)
@@ -146,10 +150,10 @@ export default class FrameManager {
     })
   }
 
-  removeFrameInstance (frameId: string) {
+  removeFrameInstance(frameId: string) {
     const frameInstance = this.frameInstances[frameId]
 
-    Object.keys(frameInstance.views || {}).forEach(viewId => {
+    Object.keys(frameInstance.views || {}).forEach((viewId) => {
       viewInstances.destroy(frameInstance, viewId)
     })
 
@@ -162,44 +166,48 @@ export default class FrameManager {
     return frameInstance
   }
 
-  private sendMessageToFrame (frameId: string, channel: string, ...args: any) {
+  private sendMessageToFrame(frameId: string, channel: string, ...args: any) {
     const frameInstance = this.frameInstances[frameId]
 
     if (frameInstance && !frameInstance.isDestroyed()) {
       const webContents = frameInstance.webContents
       webContents.send(channel, ...args)
     } else {
-      log.error(new Error(`Tried to send a message to frame with id ${frameId} but it does not exist or has been destroyed`))
+      log.error(
+        new Error(
+          `Tried to send a message to frame with id ${frameId} but it does not exist or has been destroyed`
+        )
+      )
     }
   }
 
-  broadcast (channel: string, args: any[]) {
-    Object.keys(this.frameInstances).forEach(id => this.sendMessageToFrame(id, channel, ...args))
+  broadcast(channel: string, args: any[]) {
+    Object.keys(this.frameInstances).forEach((id) => this.sendMessageToFrame(id, channel, ...args))
   }
 
-  reloadFrames (style?: string) {
-    if (style) {
-      Object.keys(this.frameInstances).forEach(win => {
-        this.frameInstances[win].webContents.send('main:reload:style', style)
-      })
-    } else {
-      Object.keys(this.frameInstances).forEach(win => {
-        this.frameInstances[win].webContents.reload()
-      })
-    }
+  reloadFrames() {
+    Object.keys(this.frameInstances).forEach((win) => {
+      this.frameInstances[win].webContents.reload()
+    })
   }
 
-  refocus (id: string) {
+  refocus(id: string) {
     const frameInstance = this.frameInstances[id]
     if (frameInstance) {
-      frameInstance.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true, skipTransformProcessType: true })
-      frameInstance.setVisibleOnAllWorkspaces(false, { visibleOnFullScreen: true, skipTransformProcessType: true })
+      frameInstance.setVisibleOnAllWorkspaces(true, {
+        visibleOnFullScreen: true,
+        skipTransformProcessType: true
+      })
+      frameInstance.setVisibleOnAllWorkspaces(false, {
+        visibleOnFullScreen: true,
+        skipTransformProcessType: true
+      })
       frameInstance.show()
       frameInstance.focus()
     }
   }
 
-  isFrameShowing () {
-    return Object.keys(this.frameInstances).some(win => this.frameInstances[win].isVisible())
+  isFrameShowing() {
+    return Object.keys(this.frameInstances).some((win) => this.frameInstances[win].isVisible())
   }
 }

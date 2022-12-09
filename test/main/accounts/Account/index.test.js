@@ -3,7 +3,7 @@ import reveal from '../../../../main/reveal'
 import { fetchContract } from '../../../../main/contracts'
 
 jest.mock('../../../../main/reveal')
-jest.mock('../../../../main/contracts', () => { 
+jest.mock('../../../../main/contracts', () => {
   const real = jest.requireActual('../../../../main/contracts')
 
   return {
@@ -13,7 +13,7 @@ jest.mock('../../../../main/contracts', () => {
 })
 
 jest.mock('../../../../main/provider', () => ({ on: jest.fn() }))
-jest.mock('../../../../main/accounts', () => ({ RequestMode: { Normal: 'normal' }}))
+jest.mock('../../../../main/accounts', () => ({ RequestMode: { Normal: 'normal' } }))
 jest.mock('../../../../main/signers', () => ({}))
 jest.mock('../../../../main/windows', () => ({}))
 jest.mock('../../../../main/nebula', () => () => ({
@@ -53,7 +53,7 @@ beforeEach(() => {
 
 describe('#addRequest', () => {
   describe('recognizing requests', () => {
-    it('recognizes an ERC-20 approval', done => {
+    it('recognizes an ERC-20 approval', (done) => {
       const request = {
         handlerId: '123456',
         type: 'transaction',
@@ -63,10 +63,12 @@ describe('#addRequest', () => {
           data: '0x095ea7b30000000000000000000000009bc5baf874d2da8d216ae9f137804184ee5afef40000000000000000000000000000000000000000000000000000000000011170'
         }
       }
-      
-      reveal.recog.mockResolvedValue([{
-        id: 'erc20:approve'
-      }])
+
+      reveal.recog.mockResolvedValue([
+        {
+          id: 'erc20:approve'
+        }
+      ])
 
       accounts.update.mockImplementationOnce(() => {})
       accounts.update.mockImplementationOnce(() => {

@@ -7,11 +7,13 @@ const latestStateVersion = () => {
   const state = persist.get('main')
   if (!state || !state.__) {
     // log.info('Persisted state: returning base state')
-    return state 
+    return state
   }
 
-  // valid states are less than or equal to the latest migration we know about 
-  const versions = Object.keys(state.__).filter(v => v <= migrations.latest).sort((a, b) => a - b)
+  // valid states are less than or equal to the latest migration we know about
+  const versions = Object.keys(state.__)
+    .filter((v) => v <= migrations.latest)
+    .sort((a, b) => a - b)
 
   if (versions.length === 0) {
     // log.info('Persisted state: returning base state')
@@ -25,7 +27,11 @@ const latestStateVersion = () => {
 
 const get = (path, obj = latestStateVersion()) => {
   path.split('.').some((key, i) => {
-    if (typeof obj !== 'object') { obj = undefined } else { obj = obj[key] }
+    if (typeof obj !== 'object') {
+      obj = undefined
+    } else {
+      obj = obj[key]
+    }
     return obj === undefined // Stop navigating the path if we get to undefined value
   })
   return obj
@@ -55,7 +61,8 @@ const initial = {
     },
     frames: []
   },
-  panel: { // Panel view
+  panel: {
+    // Panel view
     showing: false,
     nav: [],
     show: false,
@@ -181,6 +188,7 @@ const initial = {
       signerRelockChange: main('mute.signerRelockChange', false),
       gasFeeWarning: main('mute.gasFeeWarning', false),
       betaDisclosure: main('mute.betaDisclosure', false),
+      onboardingWindow: main('mute.onboardingWindow', false),
       signerCompatibilityWarning: main('mute.signerCompatibilityWarning', false),
       aragonAccountMigrationWarning: main('mute.aragonAccountMigrationWarning', true)
     },
@@ -268,7 +276,7 @@ const initial = {
         }
       }
     },
-    networks: main('networks', { 
+    networks: main('networks', {
       ethereum: {
         1: {
           id: 1,
@@ -284,8 +292,24 @@ const initial = {
             }
           },
           connection: {
-            primary: { on: true, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
-            secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
+            primary: {
+              on: true,
+              current: 'infura',
+              status: 'loading',
+              connected: false,
+              type: '',
+              network: '',
+              custom: ''
+            },
+            secondary: {
+              on: false,
+              current: 'custom',
+              status: 'loading',
+              connected: false,
+              type: '',
+              network: '',
+              custom: ''
+            }
           },
           on: true
         },
@@ -303,8 +327,24 @@ const initial = {
             }
           },
           connection: {
-            primary: { on: true, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
-            secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
+            primary: {
+              on: true,
+              current: 'infura',
+              status: 'loading',
+              connected: false,
+              type: '',
+              network: '',
+              custom: ''
+            },
+            secondary: {
+              on: false,
+              current: 'custom',
+              status: 'loading',
+              connected: false,
+              type: '',
+              network: '',
+              custom: ''
+            }
           },
           on: false
         },
@@ -322,8 +362,24 @@ const initial = {
             }
           },
           connection: {
-            primary: { on: true, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
-            secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
+            primary: {
+              on: true,
+              current: 'infura',
+              status: 'loading',
+              connected: false,
+              type: '',
+              network: '',
+              custom: ''
+            },
+            secondary: {
+              on: false,
+              current: 'custom',
+              status: 'loading',
+              connected: false,
+              type: '',
+              network: '',
+              custom: ''
+            }
           },
           on: false
         },
@@ -341,8 +397,24 @@ const initial = {
             }
           },
           connection: {
-            primary: { on: true, current: 'poa', status: 'loading', connected: false, type: '', network: '', custom: '' },
-            secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
+            primary: {
+              on: true,
+              current: 'poa',
+              status: 'loading',
+              connected: false,
+              type: '',
+              network: '',
+              custom: ''
+            },
+            secondary: {
+              on: false,
+              current: 'custom',
+              status: 'loading',
+              connected: false,
+              type: '',
+              network: '',
+              custom: ''
+            }
           },
           on: false
         },
@@ -360,8 +432,24 @@ const initial = {
             }
           },
           connection: {
-            primary: { on: true, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
-            secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
+            primary: {
+              on: true,
+              current: 'infura',
+              status: 'loading',
+              connected: false,
+              type: '',
+              network: '',
+              custom: ''
+            },
+            secondary: {
+              on: false,
+              current: 'custom',
+              status: 'loading',
+              connected: false,
+              type: '',
+              network: '',
+              custom: ''
+            }
           },
           on: false
         },
@@ -379,8 +467,24 @@ const initial = {
             }
           },
           connection: {
-            primary: { on: true, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
-            secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
+            primary: {
+              on: true,
+              current: 'infura',
+              status: 'loading',
+              connected: false,
+              type: '',
+              network: '',
+              custom: ''
+            },
+            secondary: {
+              on: false,
+              current: 'custom',
+              status: 'loading',
+              connected: false,
+              type: '',
+              network: '',
+              custom: ''
+            }
           },
           on: false
         },
@@ -398,8 +502,24 @@ const initial = {
             }
           },
           connection: {
-            primary: { on: true, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
-            secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
+            primary: {
+              on: true,
+              current: 'infura',
+              status: 'loading',
+              connected: false,
+              type: '',
+              network: '',
+              custom: ''
+            },
+            secondary: {
+              on: false,
+              current: 'custom',
+              status: 'loading',
+              connected: false,
+              type: '',
+              network: '',
+              custom: ''
+            }
           },
           on: false
         }
@@ -422,7 +542,7 @@ const initial = {
               price: 0,
               change24hr: 0
             },
-            icon: "https://assets.coingecko.com/coins/images/279/large/ethereum.png?1595348880",
+            icon: 'https://assets.coingecko.com/coins/images/279/large/ethereum.png?1595348880',
             name: 'Ether',
             decimals: 18
           },
@@ -584,7 +704,7 @@ const initial = {
 
 // --- remove state that should not persist from session to session
 
-Object.keys(initial.main.accounts).forEach(id => {
+Object.keys(initial.main.accounts).forEach((id) => {
   // Remove permissions granted to unknown origins
   const permissions = initial.main.permissions[id]
   if (permissions) delete permissions[uuidv5('Unknown', uuidv5.DNS)]
@@ -593,8 +713,8 @@ Object.keys(initial.main.accounts).forEach(id => {
   initial.main.accounts[id].balances = { lastUpdated: undefined }
 })
 
-Object.values(initial.main.networksMeta).forEach(chains => {
-  Object.values(chains).forEach(chainMeta => {
+Object.values(initial.main.networksMeta).forEach((chains) => {
+  Object.values(chains).forEach((chainMeta) => {
     // remove stale price data
     chainMeta.nativeCurrency = { ...chainMeta.nativeCurrency, usd: { price: 0, change24hr: 0 } }
   })

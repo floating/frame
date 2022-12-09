@@ -48,7 +48,7 @@ it('scans for balances as soon as the controller is ready', () => {
   balances.setAddress(address)
 
   expect(balancesController.updateKnownTokenBalances).not.toHaveBeenCalled()
-  
+
   balancesController.emit('ready')
   jest.advanceTimersByTime(0)
 

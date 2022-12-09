@@ -9,11 +9,11 @@ import extractColors from '../windows/extractColors'
 
 const nebula = nebulaApi()
 
-function getDapp (dappId: string): Dapp {
+function getDapp(dappId: string): Dapp {
   return store('main.dapps', dappId)
 }
 
-async function getDappColors (dappId: string) {
+async function getDappColors(dappId: string) {
   const dapp = getDapp(dappId)
   const session = crypto.randomBytes(6).toString('hex')
   server.sessions.add(dapp.ens, session)
@@ -29,19 +29,19 @@ async function getDappColors (dappId: string) {
 }
 
 // TODO: change to correct manifest type one Nebula version with types are published
-async function updateDappContent (dappId: string, contentURI: string, manifest: any) {
+async function updateDappContent(dappId: string, contentURI: string, manifest: any) {
   // TODO: Make sure content is pinned before proceeding
   store.updateDapp(dappId, { content: contentURI, manifest })
 }
 
 let retryTimer: NodeJS.Timeout
-async function checkStatus (dappId: string) {
+async function checkStatus(dappId: string) {
   clearTimeout(retryTimer)
   const dapp = store('main.dapps', dappId)
-  try { 
+  try {
     const resolved = await nebula.resolve(dapp.ens)
 
-    const version = ((resolved.manifest || {}).version) || 'unknown'
+    const version = (resolved.manifest || {}).version || 'unknown'
 
     log.info(`resolved content for ${dapp.ens}, version: ${version}`)
 
@@ -56,7 +56,6 @@ async function checkStatus (dappId: string) {
 
     // The frame id 'dappLauncher' needs to refrence target frame
     if (dapp.openWhenReady) surface.open('dappLauncher', dapp.ens)
-
   } catch (e) {
     log.error('Check status error', e)
     const retry = dapp.checkStatusRetryCount || 0
@@ -71,29 +70,31 @@ async function checkStatus (dappId: string) {
 
   // Takes dapp entry and config
   // Checks if assets are correctly synced
-  // Checks if all assets are up to date with current manifest 
+  // Checks if all assets are up to date with current manifest
   // Installs new assets if changed and config is set to sync
   // Sets status to 'updating' when updating the bundle
   // Sets status to 'ready' when done
 
   // dapp.config // the user's prefrences for installing assets from the manifest
   // dapp.manifest // a copy of the latest manifest we have resolved for the dapp
-  // dapp.meta // meta info about the dapp including name, colors, icons, descriptions, 
+  // dapp.meta // meta info about the dapp including name, colors, icons, descriptions,
   // dapp.ens // ens name for this dapp
   // dapp.storage // local storage values for dapp
 }
 
 store.observer(() => {
   const dapps = store('main.dapps')
-  Object.keys(dapps || {}).filter(id => dapps[id].status === 'initial').forEach(id => {
-    store.updateDapp(id, { status: 'loading' })
+  Object.keys(dapps || {})
+    .filter((id) => dapps[id].status === 'initial')
+    .forEach((id) => {
+      store.updateDapp(id, { status: 'loading' })
 
-    if (nebula.ready()) {
-      checkStatus(id)
-    } else {
-      nebula.once('ready', () => checkStatus(id))
-    }
-  })
+      if (nebula.ready()) {
+        checkStatus(id)
+      } else {
+        nebula.once('ready', () => checkStatus(id))
+      }
+    })
 })
 
 let nextId = 0
@@ -118,13 +119,13 @@ const surface = {
     // If ens name has not been installed, start install
     store.appDapp({ id, ens, status, config, manifest: {}, current: {} })
   },
-  addServerSession (namehash: string /* , session */) {
+  addServerSession(namehash: string /* , session */) {
     // server.sessions.add(namehash, session)
   },
-  unsetCurrentView (frameId: string) {
+  unsetCurrentView(frameId: string) {
     store.setCurrentFrameView(frameId, '')
   },
-  open (frameId: string, ens: string) {
+  open(frameId: string, ens: string) {
     const session = crypto.randomBytes(6).toString('hex')
     const dappId = hash(ens)
 

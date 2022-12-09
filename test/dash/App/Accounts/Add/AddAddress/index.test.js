@@ -91,7 +91,7 @@ it('restarts when a users cancels an ENS lookup', async () => {
   expect(getByRole('textbox')).toBeTruthy()
 })
 
-async function addByAccount (component) {
+async function addByAccount(component) {
   const { user, getByRole, getByLabelText } = component
 
   const inputField = getByLabelText('input address or ENS name')
@@ -101,7 +101,7 @@ async function addByAccount (component) {
   await user.click(createButton)
 }
 
-async function addByEnsName (component) {
+async function addByEnsName(component) {
   const { user, getByRole, getByLabelText } = component
 
   const inputField = getByLabelText('input address or ENS name')

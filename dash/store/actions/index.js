@@ -4,6 +4,6 @@
 export const pathSync = (u, path, value) => u(path, () => value)
 
 export const notify = (u, type, data = {}) => {
-  u('view.notify', _ => type)
-  u('view.notifyData', _ => data)
+  u('view.notify', (_) => type)
+  u('view.notifyData', (_) => data)
 }

@@ -1,4 +1,4 @@
-import { padToEven } from 'ethereumjs-util'
+import { padToEven } from '@ethereumjs/util'
 
 const light: ColorwayPalette = {
   accent1: { r: 0, g: 170, b: 120 },
@@ -24,14 +24,14 @@ const dark: ColorwayPalette = {
 
 const colorways: Record<Colorway, ColorwayPalette> = { light, dark }
 
-function toHex (color: number) {
+function toHex(color: number) {
   return padToEven(color.toString(16))
 }
 
-export function getColor (key: keyof ColorwayPalette, colorway: Colorway) {
+export function getColor(key: keyof ColorwayPalette, colorway: Colorway) {
   const color = colorways[colorway][key]
 
-  return { ...color, hex: `#${toHex(color.r)}${toHex(color.g)}${toHex(color.b)}`}
+  return { ...color, hex: `#${toHex(color.r)}${toHex(color.g)}${toHex(color.b)}` }
 }
 
 export { light as LIGHT, dark as DARK }

@@ -6,23 +6,23 @@ import { isHardwareSigner } from '../../../resources/domain/signer'
 
 import RequestCommand from './RequestCommand'
 
-const measure = ref => {
-  if (!ref || !ref.current) return { height: 0, width: 0 } 
+const measure = (ref) => {
+  if (!ref || !ref.current) return { height: 0, width: 0 }
   const { clientHeight, clientWidth } = ref.current
-  return { height: clientHeight, width: clientWidth } 
+  return { height: clientHeight, width: clientWidth }
 }
 
 let lastHeight
 
 class Footer extends React.Component {
-  constructor (...args) {
+  constructor(...args) {
     super(...args)
     this.state = {
       allowInput: true
     }
     this.footerRef = React.createRef()
   }
-  componentDidMount () {
+  componentDidMount() {
     this.observer = new ResizeObserver(() => {
       const size = measure(this.footerRef)
       if (size.height !== lastHeight) {
@@ -31,16 +31,17 @@ class Footer extends React.Component {
     })
     if (this.observer) this.observer.observe(this.footerRef.current)
   }
-  componentWillUnmount () {
-    if (this.footerRef && this.footerRef.current && this.observer) this.observer.unobserve(this.footerRef.current)
+  componentWillUnmount() {
+    if (this.footerRef && this.footerRef.current && this.observer)
+      this.observer.unobserve(this.footerRef.current)
   }
-  approve (reqId, req) {
+  approve(reqId, req) {
     link.rpc('approveRequest', req, () => {}) // Move to link.send
   }
-  decline (reqId, req) {
+  decline(reqId, req) {
     link.rpc('declineRequest', req, () => {}) // Move to link.send
   }
-  renderFooter () {
+  renderFooter() {
     const crumb = this.store('windows.panel.nav')[0] || {}
 
     if (crumb.view === 'requestView') {
@@ -55,20 +56,24 @@ class Footer extends React.Component {
         } else if (req.type === 'access') {
           return (
             <div className='requestApprove'>
-              <div 
-                className='requestDecline' 
-                style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none'}}
-                onClick={() => { if (this.state.allowInput) link.send('tray:giveAccess', req, false) 
-              }}>
+              <div
+                className='requestDecline'
+                style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none' }}
+                onClick={() => {
+                  if (this.state.allowInput) link.send('tray:giveAccess', req, false)
+                }}
+              >
                 <div className='requestDeclineButton _txButton _txButtonBad'>
                   <span>Decline</span>
                 </div>
               </div>
-              <div 
-                className='requestSign' 
-                style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none'}}
-                onClick={() => { if (this.state.allowInput) link.send('tray:giveAccess', req, true) 
-              }}>
+              <div
+                className='requestSign'
+                style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none' }}
+                onClick={() => {
+                  if (this.state.allowInput) link.send('tray:giveAccess', req, true)
+                }}
+              >
                 <div className='requestSignButton _txButton'>
                   <span>Approve</span>
                 </div>
@@ -80,82 +85,90 @@ class Footer extends React.Component {
             <RequestCommand req={req} signingDelay={isHardwareSigner(account.lastSignerType) ? 0 : 1500} />
           )
         } else if (req.type === 'addChain' || req.type === 'switchChain') {
-          return (
-            req.type === 'switchChain' ? (
-              <div className='requestApprove'>
-                <div 
-                  className='requestDecline' 
-                  style={{ pointerEvents: this.state.allowInput? 'auto' : 'none'}}
-                  onClick={() => { if (this.state.allowInput) link.send('tray:switchChain', false, false, req) 
-                }}>
-                  <div className='requestDeclineButton _txButton _txButtonBad'>
-                    <span>Decline</span>
-                  </div>
-                </div>
-                <div 
-                  className='requestSign' 
-                  style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none'}}
-                  onClick={() => { if (this.state.allowInput) link.send('tray:switchChain', chain.type, parseInt(chain.id), req)
-                }}>
-                  <div className='requestSignButton _txButton'>
-                    <span>Switch</span>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className='requestApprove'>
-                <div 
-                  className='requestDecline' 
-                  style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none'}}
-                  onClick={() => { 
-                    if (this.state.allowInput) {
-                      link.send('tray:rejectRequest', req)
-                    }
-                  }
-                }>
-                  <div className='requestDeclineButton _txButton _txButtonBad'>
-                    <span>Decline</span>
-                  </div>
-                </div>
-                <div 
-                  className='requestSign' 
-                  style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none'}}
-                  onClick={() => {
-                    if (this.state.allowInput) {
-                      link.send('tray:resolveRequest', req, null)
-                      link.send('tray:action', 'navDash', { view: 'chains', data: { newChain: req.chain } })
-                    }
-                  }
-                }>
-                  <div className='requestSignButton _txButton'>
-                    <span>Review</span>
-                  </div>
-                </div>
-              </div>
-            )
-          )
-        } else if (req.type === 'addToken') {
-          return (
+          return req.type === 'switchChain' ? (
             <div className='requestApprove'>
               <div
                 className='requestDecline'
-                style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none'}}
-                onClick={() => { if (this.state.allowInput) link.send('tray:addToken', false, this.props.req)
-              }}>
+                style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none' }}
+                onClick={() => {
+                  if (this.state.allowInput) link.send('tray:switchChain', false, false, req)
+                }}
+              >
                 <div className='requestDeclineButton _txButton _txButtonBad'>
                   <span>Decline</span>
                 </div>
               </div>
               <div
                 className='requestSign'
-                style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none'}}
+                style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none' }}
+                onClick={() => {
+                  if (this.state.allowInput)
+                    link.send('tray:switchChain', chain.type, parseInt(chain.id), req)
+                }}
+              >
+                <div className='requestSignButton _txButton'>
+                  <span>Switch</span>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className='requestApprove'>
+              <div
+                className='requestDecline'
+                style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none' }}
+                onClick={() => {
+                  if (this.state.allowInput) {
+                    link.send('tray:rejectRequest', req)
+                  }
+                }}
+              >
+                <div className='requestDeclineButton _txButton _txButtonBad'>
+                  <span>Decline</span>
+                </div>
+              </div>
+              <div
+                className='requestSign'
+                style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none' }}
                 onClick={() => {
                   if (this.state.allowInput) {
                     link.send('tray:resolveRequest', req, null)
-                    link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'addToken', notifyData: { token: req.token } } })
+                    link.send('tray:action', 'navDash', { view: 'chains', data: { newChain: req.chain } })
                   }
-                }
-              }>
+                }}
+              >
+                <div className='requestSignButton _txButton'>
+                  <span>Review</span>
+                </div>
+              </div>
+            </div>
+          )
+        } else if (req.type === 'addToken') {
+          return (
+            <div className='requestApprove'>
+              <div
+                className='requestDecline'
+                style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none' }}
+                onClick={() => {
+                  if (this.state.allowInput) link.send('tray:addToken', false, this.props.req)
+                }}
+              >
+                <div className='requestDeclineButton _txButton _txButtonBad'>
+                  <span>Decline</span>
+                </div>
+              </div>
+              <div
+                className='requestSign'
+                style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none' }}
+                onClick={() => {
+                  if (this.state.allowInput) {
+                    link.send('tray:resolveRequest', req, null)
+                    link.send('tray:action', 'navDash', {
+                      view: 'notify',
+                      data: { notify: 'addToken', notifyData: { token: req.token } }
+                    })
+                  }
+                }}
+              >
                 <div className='requestSignButton _txButton'>
                   <span>Review</span>
                 </div>
@@ -168,10 +181,10 @@ class Footer extends React.Component {
       }
     }
   }
-  render () {
+  render() {
     const footerHeight = this.store('windows.panel.footer.height')
     return (
-      <div className='footerModule' style={{ height: footerHeight  + 'px' }}>
+      <div className='footerModule' style={{ height: footerHeight + 'px' }}>
         <div ref={this.footerRef} className='footerWrap'>
           {this.renderFooter()}
         </div>

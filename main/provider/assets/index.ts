@@ -15,20 +15,20 @@ const storeApi = {
   },
   getNativeCurrency: (chainId: number): NativeCurrency => {
     const currency = store('main.networksMeta.ethereum', chainId, 'nativeCurrency')
-    
-    return (currency || { usd: { price: 0 } })
+
+    return currency || { usd: { price: 0 } }
   },
   getUsdRate: (address: Address): UsdRate => {
     const rate = store('main.rates', address.toLowerCase())
-   
-    return (rate || { usd: { price: 0 } })
+
+    return rate || { usd: { price: 0 } }
   },
   getLastUpdated: (account: Address): number => {
     return store('main.accounts', account, 'balances.lastUpdated')
   }
 }
 
-function createObserver (handler: AssetsChangedHandler) {
+function createObserver(handler: AssetsChangedHandler) {
   let debouncedAssets: RPC.GetAssets.Assets | null = null
 
   return function () {
@@ -53,16 +53,19 @@ function createObserver (handler: AssetsChangedHandler) {
   }
 }
 
-function loadAssets (accountId: string) {
+function loadAssets(accountId: string) {
   if (isScanning(accountId)) throw new Error('assets not known for account')
-  
+
   return fetchAssets(accountId)
 }
-  
-function fetchAssets (accountId: string) {
+
+function fetchAssets(accountId: string) {
   const balances = storeApi.getBalances(accountId)
 
-  const response = { nativeCurrency: [] as RPC.GetAssets.NativeCurrency[], erc20: [] as RPC.GetAssets.Erc20[] }
+  const response = {
+    nativeCurrency: [] as RPC.GetAssets.NativeCurrency[],
+    erc20: [] as RPC.GetAssets.Erc20[]
+  }
 
   return balances.reduce((assets, balance) => {
     if (balance.address === NATIVE_CURRENCY) {
@@ -87,9 +90,9 @@ function fetchAssets (accountId: string) {
   }, response)
 }
 
-function isScanning (account: Address) {
+function isScanning(account: Address) {
   const lastUpdated = storeApi.getLastUpdated(account)
-  return !lastUpdated || (new Date().getTime() - lastUpdated) > (1000 * 60 * 5)
+  return !lastUpdated || new Date().getTime() - lastUpdated > 1000 * 60 * 5
 }
 
 export { loadAssets, createObserver }

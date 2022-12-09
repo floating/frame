@@ -9,14 +9,14 @@ const create = function () {
     return get(internal.state, path)
   }
 
-  function get (obj, path) {
+  function get(obj, path) {
     if (!obj) return obj
     if (path.length === 1) return obj[path[0]]
 
     return get(obj[path[0]], path.slice(1))
   }
 
-  function set (obj, path, value) {
+  function set(obj, path, value) {
     if (path.length === 1) {
       return { ...obj, [path[0]]: value }
     }
@@ -28,7 +28,10 @@ const create = function () {
 
   store.set = function () {
     const args = [...arguments]
-    const path = args.slice(0, args.length - 1).join('.').split('.')
+    const path = args
+      .slice(0, args.length - 1)
+      .join('.')
+      .split('.')
     const value = args.slice(-1)[0]
 
     internal.state = set(internal.state, path, value)
@@ -57,7 +60,7 @@ const create = function () {
   store.getObserver = function (id) {
     return internal.observers[id]
   }
-  
+
   return store
 }
 

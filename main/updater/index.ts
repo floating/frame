@@ -28,14 +28,12 @@ class Updater {
   private pendingCheck?: NodeJS.Timeout
   private notified: Record<string, boolean> = {}
 
-  start () {
+  start() {
     log.verbose('Starting updater', { useAutoUpdater })
 
     this.stopUpdates()
 
-    const check = useAutoUpdater
-      ? () => this.checkForAutoUpdate()
-      : () => this.checkForManualUpdate()
+    const check = useAutoUpdater ? () => this.checkForAutoUpdate() : () => this.checkForManualUpdate()
 
     this.setupCheck = setTimeout(() => {
       check()
@@ -43,17 +41,17 @@ class Updater {
     }, 10_000)
   }
 
-  stop () {
+  stop() {
     log.verbose('Stopping updater')
-    
+
     this.stopUpdates()
   }
 
-  get updateReady () {
+  get updateReady() {
     return this.installerReady
   }
 
-  fetchUpdate () {
+  fetchUpdate() {
     if (this.availableUpdate === 'auto') {
       if (!this.autoUpdater) {
         log.warn(`update ${this.availableVersion} is asking to be downloaded but autoUpdater is not running!`)
@@ -69,7 +67,7 @@ class Updater {
     }
   }
 
-  quitAndInstall () {
+  quitAndInstall() {
     if (this.installerReady) {
       if (!this.autoUpdater) {
         log.warn(`update ${this.availableVersion} is asking to be installed but autoUpdater is not running!`)
@@ -82,14 +80,14 @@ class Updater {
     }
   }
 
-  dismissUpdate () {
+  dismissUpdate() {
     log.verbose('Dismissed update', { version: this.availableVersion })
 
     this.availableUpdate = ''
     this.availableVersion = ''
   }
 
-  private stopUpdates () {
+  private stopUpdates() {
     if (this.setupCheck) {
       clearTimeout(this.setupCheck)
       this.setupCheck = undefined
@@ -106,8 +104,12 @@ class Updater {
     }
   }
 
-  private updateAvailable (version: string, location: string) {
-    log.verbose('Found available update', { version, location, alreadyNotified: this.notified[version] || false })
+  private updateAvailable(version: string, location: string) {
+    log.verbose('Found available update', {
+      version,
+      location,
+      alreadyNotified: this.notified[version] || false
+    })
 
     if (!this.notified[version]) {
       // a newer version is available
@@ -128,13 +130,13 @@ class Updater {
   }
 
   // an update has been downloaded and is ready to be installed
-  private readyForInstall () {
+  private readyForInstall() {
     this.installerReady = true
 
     store.updateBadge('updateReady')
   }
 
-  private checkForAutoUpdate () {
+  private checkForAutoUpdate() {
     log.debug('Doing automatic check for app update')
 
     const switchToManualUpdate = () => {
@@ -147,30 +149,30 @@ class Updater {
 
       this.autoUpdater.on('update-available', (update: VersionUpdate) => {
         const { version, location } = update
-  
+
         log.info('Auto check found available update', { version, location })
-  
+
         this.updateAvailable(version, location)
       })
-  
+
       this.autoUpdater.on('update-not-available', () => {
         log.info('No available updates found by auto check, checking manually')
         switchToManualUpdate()
       })
-  
+
       this.autoUpdater.on('update-downloaded', () => {
         log.info('Auto check update downloaded and ready for install')
-  
+
         if (!this.installerReady) this.readyForInstall()
       })
-  
+
       this.autoUpdater.on('error', (err: Error) => {
         this.installerReady = false
-  
+
         log.warn('Error auto checking for update, checking manually', err)
         switchToManualUpdate()
       })
-  
+
       this.autoUpdater.on('exit', () => {
         log.verbose('Auto updater exited')
         this.autoUpdater = undefined
@@ -180,7 +182,7 @@ class Updater {
     this.autoUpdater.checkForUpdates()
   }
 
-  private async checkForManualUpdate () {
+  private async checkForManualUpdate() {
     log.debug('Checking for app update manually')
 
     try {
@@ -191,7 +193,7 @@ class Updater {
       } else {
         const { version, location } = update
         log.debug('Manual check found available update', { version, location })
-  
+
         this.updateAvailable(version, location)
       }
     } catch (e) {

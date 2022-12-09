@@ -7,20 +7,20 @@ const log = require('electron-log')
 
 const windows = require('../windows')
 
-const defined = value => value !== undefined || value !== null
+const defined = (value) => value !== undefined || value !== null
 
 class Flex extends EventEmitter {
-  setReady () {
+  setReady() {
     this.ready = true
     this.emit('ready')
   }
 
-  rpc (...args) {
+  rpc(...args) {
     const cb = args.pop()
     if (typeof cb !== 'function') throw new Error('Flex methods require a callback')
     const id = uuid()
     handlers[id] = cb
-    args = args.map(arg => defined(arg) ? JSON.stringify(arg) : arg)
+    args = args.map((arg) => (defined(arg) ? JSON.stringify(arg) : arg))
     windows.send('tray', 'main:flex', JSON.stringify(id), ...args)
   }
 }
@@ -33,19 +33,21 @@ const handlers = {}
 
 ipcMain.on('tray:flex:res', (sender, id, ...args) => {
   if (!handlers[id]) return log.warn('Message from main RPC had no handler')
-  args = args.map(arg => defined(arg) ? JSON.parse(arg) : arg)
+  args = args.map((arg) => (defined(arg) ? JSON.parse(arg) : arg))
   handlers[id](...args)
   delete handlers[id]
 })
 
 ipcMain.on('tray:flex:event', (sender, eventName, ...args) => {
-  args = args.map(arg => defined(arg) ? JSON.parse(arg) : arg)
+  args = args.map((arg) => (defined(arg) ? JSON.parse(arg) : arg))
   flex.emit(eventName, ...args)
 })
 
 ipcMain.on('tray:ready', () => flex.setReady())
 
 // If flex is already ready, trigger new 'ready' listeners
-flex.on('newListener', (e, listener) => { if (e === 'ready' && flex.ready) listener() })
+flex.on('newListener', (e, listener) => {
+  if (e === 'ready' && flex.ready) listener()
+})
 
 module.exports = flex

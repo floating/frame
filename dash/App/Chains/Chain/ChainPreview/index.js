@@ -7,7 +7,7 @@ export default (props) => {
   const { type, id, primaryColor, icon, name, on, connection, symbol, price } = props
   return (
     <div className='network'>
-      <ChainHeader 
+      <ChainHeader
         type={type}
         id={id}
         primaryColor={primaryColor}
@@ -20,7 +20,7 @@ export default (props) => {
       {on && (
         <div className='chainModules'>
           <Connection {...props} />
-          <Gas chainId={id} /> 
+          <Gas chainId={id} />
           <ChainFooter symbol={symbol} price={price} />
           <div style={{ height: '14px' }} />
         </div>

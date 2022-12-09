@@ -1,7 +1,7 @@
 const userEvent = require('@testing-library/user-event').default
 const { render, act } = require('@testing-library/react')
 
-export function advanceTimers (ms = 0) {
+export function advanceTimers(ms = 0) {
   act(() => {
     jest.advanceTimersByTime(ms)
   })
@@ -9,7 +9,7 @@ export function advanceTimers (ms = 0) {
   return Promise.resolve()
 }
 
-export function setupComponent (jsx, options = {}) {
+export function setupComponent(jsx, options = {}) {
   return {
     user: userEvent.setup({
       ...options,

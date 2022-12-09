@@ -1,7 +1,7 @@
 import log from 'electron-log'
 
 export interface Request {
-  execute: () => Promise<any>,
+  execute: () => Promise<any>
   type: string
 }
 
@@ -11,22 +11,21 @@ const noRequest = {
 }
 
 export class RequestQueue {
-  private running = false;
+  private running = false
   private requestQueue: Array<Request> = []
   private requestPoller = setTimeout(() => {})
 
-  add (request: Request) {
+  add(request: Request) {
     this.requestQueue.push(request)
   }
 
-  pollRequest () {
+  pollRequest() {
     // each request must return a promise
-    const request = (this.requestQueue.length === 0) 
-      ? noRequest
-      : this.requestQueue.splice(0, 1)[0]
+    const request = this.requestQueue.length === 0 ? noRequest : this.requestQueue.splice(0, 1)[0]
 
-    request.execute()
-      .catch(err => log.warn('Ledger request queue caught unexpected error', err))
+    request
+      .execute()
+      .catch((err) => log.warn('Ledger request queue caught unexpected error', err))
       .finally(() => {
         if (this.running) {
           this.requestPoller = setTimeout(this.pollRequest.bind(this), 200)
@@ -34,26 +33,26 @@ export class RequestQueue {
       })
   }
 
-  start () {
+  start() {
     this.running = true
     this.pollRequest()
   }
-  
-  stop () {
+
+  stop() {
     this.running = false
     clearTimeout(this.requestPoller)
   }
 
-  close () {
+  close() {
     this.stop()
     this.clear()
   }
 
-  clear () {
+  clear() {
     this.requestQueue = []
   }
 
-  peekBack () {
+  peekBack() {
     return this.requestQueue[this.requestQueue.length - 1]
   }
 }

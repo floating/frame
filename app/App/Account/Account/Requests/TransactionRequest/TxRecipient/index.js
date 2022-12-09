@@ -4,27 +4,32 @@ import Restore from 'react-restore'
 import link from '../../../../../../../resources/link'
 import svg from '../../../../../../../resources/svg'
 
-import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../../../resources/Components/Cluster'
-import {getAddress} from '../../../../../../../resources/utils'
+import {
+  ClusterBox,
+  Cluster,
+  ClusterRow,
+  ClusterValue
+} from '../../../../../../../resources/Components/Cluster'
+import { getAddress } from '../../../../../../../resources/utils'
 
 class TxRecipient extends React.Component {
-  constructor (...args) {
+  constructor(...args) {
     super(...args)
     this.state = {
       copied: false
     }
   }
 
-  copyAddress (data) {
+  copyAddress(data) {
     link.send('tray:clipboardData', data)
     this.setState({ copied: true })
-    setTimeout(_ => this.setState({ copied: false }), 1000)
+    setTimeout((_) => this.setState({ copied: false }), 1000)
   }
 
-  render () {
+  render() {
     const req = this.props.req
     const address = req.data.to ? getAddress(req.data.to) : ''
-    const ensName = (req.recipient && req.recipient.length < 25) ? req.recipient : ''
+    const ensName = req.recipient && req.recipient.length < 25 ? req.recipient : ''
     const value = req.data.value || '0x'
     if (req.recipientType !== 'contract' && (value !== '0x' || parseInt(value, 16)) !== 0) return null
 
@@ -33,14 +38,22 @@ class TxRecipient extends React.Component {
       <ClusterBox title={title} animationSlot={this.props.i}>
         <Cluster>
           <ClusterRow>
-            <ClusterValue pointerEvents={true} onClick={() => {
-              this.copyAddress(address)
-            }}>
+            <ClusterValue
+              pointerEvents={true}
+              onClick={() => {
+                this.copyAddress(address)
+              }}
+            >
               <div className='clusterAddress'>
-                {ensName
-                  ? <span className='clusterAddressRecipient'>{ensName}</span>
-                  : <span className='clusterAddressRecipient'>{address.substring(0, 8)}{svg.octicon('kebab-horizontal', { height: 15 })}{address.substring(address.length - 6)}</span>
-                }
+                {ensName ? (
+                  <span className='clusterAddressRecipient'>{ensName}</span>
+                ) : (
+                  <span className='clusterAddressRecipient'>
+                    {address.substring(0, 8)}
+                    {svg.octicon('kebab-horizontal', { height: 15 })}
+                    {address.substring(address.length - 6)}
+                  </span>
+                )}
                 <div className='clusterAddressRecipientFull'>
                   {this.state.copied ? (
                     <span>{'Address Copied'}</span>
@@ -51,7 +64,7 @@ class TxRecipient extends React.Component {
               </div>
             </ClusterValue>
           </ClusterRow>
-          
+
           {req.decodedData && req.decodedData.method ? (
             <ClusterRow>
               <ClusterValue>
@@ -66,18 +79,14 @@ class TxRecipient extends React.Component {
           ) : req.recipientType === 'contract' ? (
             <ClusterRow>
               <ClusterValue>
-                <div className='clusterTag'>
-                  {'unknown action via unknown contract'}
-                </div>
+                <div className='clusterTag'>{'unknown action via unknown contract'}</div>
               </ClusterValue>
             </ClusterRow>
           ) : null}
           {req.decodedData && req.decodedData.source && (
             <ClusterRow>
               <ClusterValue>
-                <div className='clusterTag'>
-                  {'abi source: ' + req.decodedData.source}
-                </div>
+                <div className='clusterTag'>{'abi source: ' + req.decodedData.source}</div>
               </ClusterValue>
             </ClusterRow>
           )}

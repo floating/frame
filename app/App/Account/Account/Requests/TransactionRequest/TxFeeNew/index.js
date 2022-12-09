@@ -2,38 +2,25 @@ import React from 'react'
 import Restore from 'react-restore'
 import BigNumber from 'bignumber.js'
 
-import { usesBaseFee, GasFeesSource } from '../../../../../../../resources/domain/transaction'
+import { DisplayValue } from '../../../../../../../resources/Components/DisplayValue'
+import { GasFeesSource, usesBaseFee } from '../../../../../../../resources/domain/transaction'
+import { displayValueData } from '../../../../../../../resources/utils/displayValue'
 import link from '../../../../../../../resources/link'
-
-import { ClusterBox, Cluster, ClusterRow, ClusterColumn, ClusterValue } from '../../../../../../../resources/Components/Cluster'
+import {
+  ClusterBox,
+  Cluster,
+  ClusterRow,
+  ClusterColumn,
+  ClusterValue
+} from '../../../../../../../resources/Components/Cluster'
 
 const FEE_WARNING_THRESHOLD_USD = 50
 
-function toDisplayUSD (bn) {
-  const usd = bn.decimalPlaces(2, BigNumber.ROUND_FLOOR)
-  return usd.isZero() ? '< $0.01' : `$${usd.toFormat()}`
-}
-
-function toDisplayEther (bn) {
-  const ether = bn.shiftedBy(-18).decimalPlaces(6, BigNumber.ROUND_FLOOR)
-
-  return ether.isZero() ? '< 0.000001' : ether.toFormat()
-}
-
-function toDisplayGwei (bn) {
-  const gwei = bn.shiftedBy(-9).decimalPlaces(6, BigNumber.ROUND_FLOOR)
-
-  return gwei.isZero() ? '' : gwei.toFormat()
-}
-
-function toDisplayWei (bn) {
-  return bn.toFormat(0)
-}
-
 const GasDisplay = ({ maxFeePerGas }) => {
-  const gweiDisplayValue = toDisplayGwei(maxFeePerGas)
-  const displayValue = gweiDisplayValue || toDisplayWei(maxFeePerGas)
-  const displayLabel = !!gweiDisplayValue ? 'Gwei' : 'Wei'
+  const { displayValue: gweiDisplayValue } = maxFeePerGas.gwei()
+  const shouldDisplayWei = gweiDisplayValue === '0'
+  const displayValue = shouldDisplayWei ? maxFeePerGas.wei().displayValue : gweiDisplayValue
+  const displayLabel = shouldDisplayWei ? 'Wei' : 'Gwei'
 
   return (
     <div data-testid='gas-display' className='_txFeeGwei'>
@@ -41,90 +28,84 @@ const GasDisplay = ({ maxFeePerGas }) => {
       <span className='_txFeeGweiLabel'>{displayLabel}</span>
     </div>
   )
-}     
+}
 
-const USDEstimateDisplay = ({ maxFeePerGas, maxGas, maxFeeUSD, nativeUSD, symbol }) => {
-  // accounts for two potential 12.5% block fee increases
-  const reduceFactor = BigNumber(9).dividedBy(8)
-  const minFeePerGas = maxFeePerGas.dividedBy(reduceFactor).dividedBy(reduceFactor)
+const USDEstimateDisplay = ({ minFee, maxFee, nativeCurrency }) => {
+  const { value: maxFeeValue, approximationSymbol: maxFeeApproximation } = maxFee.fiat()
+  const displayMaxFeeWarning = maxFeeValue > FEE_WARNING_THRESHOLD_USD
 
-  // accounts for the 50% padding in the gas estimate in the provider
-  const minGas = maxGas.dividedBy(BigNumber(1.5))
-
-  const minFee = minFeePerGas.multipliedBy(minGas)
-  const minFeeUSD = minFee.shiftedBy(-18).multipliedBy(nativeUSD)
-  const displayMinFeeUSD = toDisplayUSD(minFeeUSD)
-  const displayMaxFeeUSD = toDisplayUSD(maxFeeUSD)
-  
-  return <div data-testid='usd-estimate-display' className='clusterTag'>
-    <div className={maxFeeUSD.toNumber() > FEE_WARNING_THRESHOLD_USD ? '_txFeeValueDefault _txFeeValueDefaultWarn' : '_txFeeValueDefault'}>
-      <span>{'≈'}</span>
-      {displayMaxFeeUSD === '< $0.01' ? 
-      <span>{displayMaxFeeUSD}</span> : 
-      <>      
-        <span>{displayMinFeeUSD}</span>
-        <span>{'-'}</span>
-        <span>{displayMaxFeeUSD}</span>
-      </>
-      }
-      <span>{`in ${symbol}`}</span>
+  return (
+    <div data-testid='usd-estimate-display' className='clusterTag'>
+      <div className={`_txFeeValueDefault${displayMaxFeeWarning ? ' _txFeeValueDefaultWarn' : ''}`}>
+        <span>{'≈'}</span>
+        {maxFeeApproximation === '<' ? (
+          <DisplayValue type='fiat' valueData={maxFee} currencySymbol='$' />
+        ) : (
+          <>
+            <DisplayValue type='fiat' valueData={minFee} currencySymbol='$' />
+            <span>{'-'}</span>
+            <DisplayValue type='fiat' valueData={maxFee} currencySymbol='$' />
+          </>
+        )}
+        <span>{`in ${nativeCurrency.symbol}`}</span>
+      </div>
     </div>
-  </div>
+  )
 }
 
 class TxFee extends React.Component {
-  constructor (props, context) {
+  constructor(props, context) {
     super(props, context)
   }
 
-  render () {
+  render() {
     const req = this.props.req
-
-    const chain = { 
-      type: 'ethereum', 
+    const chain = {
+      type: 'ethereum',
       id: parseInt(req.data.chainId, 16)
     }
-
     const { isTestnet } = this.store('main.networks', chain.type, chain.id)
-    const {nativeCurrency, nativeCurrency: {symbol}} = this.store('main.networksMeta', chain.type, chain.id,)
-    const nativeUSD = nativeCurrency && nativeCurrency.usd && !isTestnet ? nativeCurrency.usd.price : 0
-
-    let maxFeePerGas, maxFee, maxFeeUSD
+    const { nativeCurrency } = this.store('main.networksMeta', chain.type, chain.id)
 
     const maxGas = BigNumber(req.data.gasLimit, 16)
+    const maxFeePerGas = BigNumber(req.data[usesBaseFee(req.data) ? 'maxFeePerGas' : 'gasPrice'])
+    const maxFee = displayValueData(maxFeePerGas.multipliedBy(maxGas), {
+      currencyRate: nativeCurrency.usd,
+      isTestnet
+    })
 
-    if (usesBaseFee(req.data)) {
-      maxFeePerGas = BigNumber(req.data.maxFeePerGas, 16)
-      maxFee = maxFeePerGas.multipliedBy(maxGas)
-      maxFeeUSD = maxFee.shiftedBy(-18).multipliedBy(nativeUSD)
-    } else {
-      maxFeePerGas = BigNumber(req.data.gasPrice, 16)
-      maxFee = maxFeePerGas.multipliedBy(maxGas)
-      maxFeeUSD = maxFee.shiftedBy(-18).multipliedBy(nativeUSD)
-    }
+    // accounts for two potential 12.5% block fee increases
+    const reduceFactor = BigNumber(9).dividedBy(8)
+    const minFeePerGas = maxFeePerGas.dividedBy(reduceFactor).dividedBy(reduceFactor)
 
-    const displayEther = toDisplayEther(maxFee)
+    // accounts for the 50% padding in the gas estimate in the provider
+    const minGas = maxGas.dividedBy(BigNumber(1.5))
+    const minFee = displayValueData(minFeePerGas.multipliedBy(minGas), {
+      currencyRate: nativeCurrency.usd,
+      isTestnet
+    })
 
     return (
-      <ClusterBox title={'fee'} animationSlot={this.props.i}>
+      <ClusterBox title='fee' animationSlot={this.props.i}>
         <Cluster>
           <ClusterRow>
             <ClusterColumn>
-              <ClusterValue onClick={() => {
-                link.send('nav:update', 'panel', { data: { step: 'adjustFee' } })
-              }}>
-                <GasDisplay maxFeePerGas={maxFeePerGas} />
+              <ClusterValue
+                onClick={() => {
+                  link.send('nav:update', 'panel', { data: { step: 'adjustFee' } })
+                }}
+              >
+                <GasDisplay maxFeePerGas={displayValueData(maxFeePerGas)} />
               </ClusterValue>
             </ClusterColumn>
             <ClusterColumn grow={2}>
               <ClusterValue>
                 <div className='txSendingValue'>
-                  <span className='txSendingValueSymbol'>{symbol}</span>
-                  <span className='txSendingValueAmount'>{displayEther}</span>
+                  <DisplayValue type='ether' valueData={maxFee} currencySymbol={nativeCurrency.symbol} />
                 </div>
               </ClusterValue>
               <ClusterValue>
-                <USDEstimateDisplay maxFeePerGas={maxFeePerGas} maxGas={maxGas} maxFeeUSD={maxFeeUSD} nativeUSD={nativeUSD} symbol={symbol} />
+                <USDEstimateDisplay minFee={minFee} maxFee={maxFee} nativeCurrency={nativeCurrency} />
               </ClusterValue>
             </ClusterColumn>
           </ClusterRow>

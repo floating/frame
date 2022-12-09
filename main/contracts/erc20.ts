@@ -1,13 +1,16 @@
 import { TransactionDescription } from '@ethersproject/abi'
 import { Contract } from '@ethersproject/contracts'
 import { Web3Provider } from '@ethersproject/providers'
-import { addHexPrefix } from 'ethereumjs-util'
+import { addHexPrefix } from '@ethereumjs/util'
 import log from 'electron-log'
 import erc20Abi from '../externalData/balances/erc-20-abi'
 import provider from '../provider'
 
-function createWeb3ProviderWrapper (chainId: number) {
-  const wrappedSend = (request: { method: string, params?: any[] }, cb: (error: any, response: any) => void) => {
+function createWeb3ProviderWrapper(chainId: number) {
+  const wrappedSend = (
+    request: { method: string; params?: any[] },
+    cb: (error: any, response: any) => void
+  ) => {
     const wrappedPayload = {
       method: request.method,
       params: request.params || [],
@@ -29,30 +32,34 @@ function createWeb3ProviderWrapper (chainId: number) {
 export default class Erc20Contract {
   private contract: Contract
 
-  constructor (address: Address, chainId: number) {
+  constructor(address: Address, chainId: number) {
     const web3Provider = new Web3Provider(createWeb3ProviderWrapper(chainId))
     this.contract = new Contract(address, erc20Abi, web3Provider)
   }
 
-  static isApproval (data: TransactionDescription) {
+  static isApproval(data: TransactionDescription) {
     return (
       data.name === 'approve' &&
       data.functionFragment.inputs.length === 2 &&
-      (data.functionFragment.inputs[0].name || '').toLowerCase().endsWith('spender') && data.functionFragment.inputs[0].type === 'address' &&
-      (data.functionFragment.inputs[1].name || '').toLowerCase().endsWith('value') && data.functionFragment.inputs[1].type === 'uint256'
+      (data.functionFragment.inputs[0].name || '').toLowerCase().endsWith('spender') &&
+      data.functionFragment.inputs[0].type === 'address' &&
+      (data.functionFragment.inputs[1].name || '').toLowerCase().endsWith('value') &&
+      data.functionFragment.inputs[1].type === 'uint256'
     )
   }
 
-  static isTransfer (data: TransactionDescription) {
+  static isTransfer(data: TransactionDescription) {
     return (
       data.name === 'transfer' &&
       data.functionFragment.inputs.length === 2 &&
-      (data.functionFragment.inputs[0].name || '').toLowerCase().endsWith('to') && data.functionFragment.inputs[0].type === 'address' &&
-      (data.functionFragment.inputs[1].name || '').toLowerCase().endsWith('value') && data.functionFragment.inputs[1].type === 'uint256'
+      (data.functionFragment.inputs[0].name || '').toLowerCase().endsWith('to') &&
+      data.functionFragment.inputs[0].type === 'address' &&
+      (data.functionFragment.inputs[1].name || '').toLowerCase().endsWith('value') &&
+      data.functionFragment.inputs[1].type === 'uint256'
     )
   }
 
-  decodeCallData (calldata: string) {
+  decodeCallData(calldata: string) {
     try {
       return this.contract.interface.parseTransaction({ data: calldata })
     } catch (e) {
@@ -60,11 +67,11 @@ export default class Erc20Contract {
     }
   }
 
-  encodeCallData (fn: string, params: any[]) {
+  encodeCallData(fn: string, params: any[]) {
     return this.contract.interface.encodeFunctionData(fn, params)
   }
-  
-  async getTokenData () {
+
+  async getTokenData() {
     try {
       const calls = await Promise.all([
         this.contract.decimals(),

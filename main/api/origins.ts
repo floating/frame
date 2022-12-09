@@ -14,38 +14,42 @@ interface OriginUpdateResult {
 }
 
 // allows the Frame extension to request specific methods
-const trustedExtensionMethods = [
-  'wallet_getEthereumChains'
-]
+const trustedExtensionMethods = ['wallet_getEthereumChains']
 
 const storeApi = {
   getPermission: (address: Address, origin: string) => {
     const permissions: Record<string, Permission> = store('main.permissions', address) || {}
-    return Object.values(permissions).find(p => p.origin === origin)
+    return Object.values(permissions).find((p) => p.origin === origin)
   }
 }
 
-export function parseOrigin (origin?: string) {
+export function parseOrigin(origin?: string) {
   if (!origin) return 'Unknown'
 
   return origin.replace(protocolRegex, '')
 }
 
-function invalidOrigin (origin: string) {
+function invalidOrigin(origin: string) {
   return origin !== origin.replace(/[^0-9a-z/:.[\]-]/gi, '')
 }
 
-async function getPermission (address: Address, origin: string, payload: RPCRequestPayload) {
+async function getPermission(address: Address, origin: string, payload: RPCRequestPayload) {
   const permission = storeApi.getPermission(address, origin)
 
   return permission || requestPermission(address, payload)
 }
 
-async function requestPermission (address: Address, fullPayload: RPCRequestPayload) {
+async function requestPermission(address: Address, fullPayload: RPCRequestPayload) {
   const { _origin: originId, ...payload } = fullPayload
 
   return new Promise<Permission | undefined>((resolve) => {
-    const request: AccessRequest = { payload, handlerId: originId, type: 'access', origin: originId, account: address }
+    const request: AccessRequest = {
+      payload,
+      handlerId: originId,
+      type: 'access',
+      origin: originId,
+      account: address
+    }
 
     accounts.addRequest(request, () => {
       const { name: originName } = store('main.origins', originId)
@@ -56,7 +60,11 @@ async function requestPermission (address: Address, fullPayload: RPCRequestPaylo
   })
 }
 
-export function updateOrigin (payload: JSONRPCRequestPayload, origin: string, connectionMessage = false): OriginUpdateResult {
+export function updateOrigin(
+  payload: JSONRPCRequestPayload,
+  origin: string,
+  connectionMessage = false
+): OriginUpdateResult {
   let hasSession = false
 
   const originId = uuidv5(origin, uuidv5.DNS)
@@ -81,9 +89,9 @@ export function updateOrigin (payload: JSONRPCRequestPayload, origin: string, co
     }
   }
 
-  return { 
+  return {
     hasSession,
-    payload: { 
+    payload: {
       ...payload,
       chainId: payload.chainId || `0x${(existingOrigin?.chain.id || 1).toString(16)}`,
       _origin: originId
@@ -91,15 +99,19 @@ export function updateOrigin (payload: JSONRPCRequestPayload, origin: string, co
   }
 }
 
-export function isFrameExtension (req: IncomingMessage) {
+export function isFrameExtension(req: IncomingMessage) {
   const origin = req.headers.origin
   if (!origin) return false
 
   const query = queryString.parse((req.url || '').replace('/', ''))
-  const mozOrigin = origin.startsWith('moz-extension://') 
-  const extOrigin = origin.startsWith('chrome-extension://') || origin.startsWith('moz-extension://') || origin.startsWith('safari-web-extension://')
+  const mozOrigin = origin.startsWith('moz-extension://')
+  const extOrigin =
+    origin.startsWith('chrome-extension://') ||
+    origin.startsWith('moz-extension://') ||
+    origin.startsWith('safari-web-extension://')
 
-  if (origin === 'chrome-extension://ldcoohedfbjoobcadoglnnmmfbdlmmhf') { // Match production chrome
+  if (origin === 'chrome-extension://ldcoohedfbjoobcadoglnnmmfbdlmmhf') {
+    // Match production chrome
     return true
   } else if (mozOrigin || (dev && extOrigin)) {
     // In production, match any Firefox extension origin where query.identity === 'frame-extension'
@@ -110,7 +122,7 @@ export function isFrameExtension (req: IncomingMessage) {
   }
 }
 
-export async function isTrusted (payload: RPCRequestPayload) {
+export async function isTrusted(payload: RPCRequestPayload) {
   // Permission granted to unknown origins only persist until the Frame is closed, they are not permanent
   const { name: originName } = store('main.origins', payload._origin) as { name: string }
   const currentAccount = accounts.current()

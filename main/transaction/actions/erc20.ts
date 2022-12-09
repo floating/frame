@@ -6,7 +6,7 @@ type Erc20Spend = {
   amount: HexAmount
   decimals: number
   name: string
-  symbol: string,
+  symbol: string
   contract: Address
 }
 

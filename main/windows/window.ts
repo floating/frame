@@ -4,10 +4,14 @@ import path from 'path'
 
 import store from '../store'
 
-export function createWindow (name: string, opts?: BrowserWindowConstructorOptions, webPreferences: BrowserWindowConstructorOptions['webPreferences'] = {}) {
+export function createWindow(
+  name: string,
+  opts?: BrowserWindowConstructorOptions,
+  webPreferences: BrowserWindowConstructorOptions['webPreferences'] = {}
+) {
   log.verbose(`Creating ${name} window`)
 
-  const browserWindow = new BrowserWindow({ 
+  const browserWindow = new BrowserWindow({
     ...opts,
     frame: false,
     transparent: process.platform === 'darwin',
@@ -26,7 +30,7 @@ export function createWindow (name: string, opts?: BrowserWindowConstructorOptio
       scrollBounce: true,
       navigateOnDragDrop: false,
       disableBlinkFeatures: 'Auxclick'
-    } 
+    }
   })
 
   browserWindow.webContents.once('did-finish-load', () => {
@@ -39,8 +43,11 @@ export function createWindow (name: string, opts?: BrowserWindowConstructorOptio
   return browserWindow
 }
 
-export function createViewInstance (ens = '', webPreferences: BrowserWindowConstructorOptions['webPreferences'] = {}) {
-  const viewInstance = new BrowserView({ 
+export function createViewInstance(
+  ens = '',
+  webPreferences: BrowserWindowConstructorOptions['webPreferences'] = {}
+) {
+  const viewInstance = new BrowserView({
     webPreferences: {
       ...webPreferences,
       contextIsolation: true,
@@ -82,8 +89,11 @@ const externalWhitelist = [
   'https://opensea.io'
 ]
 
-const isValidReleasePage = (url: string) => url.startsWith('https://github.com/floating/frame/releases/tag') || url.startsWith('https://github.com/frame-labs/frame-canary/releases/tag')
-const isWhitelistedHost = (url: string) => externalWhitelist.some(entry => url === entry || url.startsWith(entry + '/'))
+const isValidReleasePage = (url: string) =>
+  url.startsWith('https://github.com/floating/frame/releases/tag') ||
+  url.startsWith('https://github.com/frame-labs/frame-canary/releases/tag')
+const isWhitelistedHost = (url: string) =>
+  externalWhitelist.some((entry) => url === entry || url.startsWith(entry + '/'))
 
 export function openExternal(url = '') {
   if (isWhitelistedHost(url) || isValidReleasePage(url)) {
