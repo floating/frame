@@ -1155,3 +1155,69 @@ describe('migration 29', () => {
     })
   })
 })
+
+fdescribe('migration 30', () => {
+  beforeEach(() => {
+    state = {
+      main: {
+        _version: 29,
+        accounts: {
+          'test dao agent address': {
+            name: 'my test aragon dao',
+            smart: {
+              type: 'aragon',
+              actor: 'my acting account',
+              dao: '0x0c188b183ff758500d1d18b432313d10e9f6b8a4',
+              agent: 'test dao agent address'
+            }
+          },
+          look: {
+            name: 'such a cool account'
+          }
+        }
+      }
+    }
+    jest.setSystemTime(new Date('2022-12-09T11:01:58.135Z'))
+  })
+
+  it('should migrate existing aragon accounts to watch only with a timestamp', () => {
+    const updatedState = migrations.apply(state, 30)
+    const { accounts } = updatedState.main
+
+    expect(accounts).toStrictEqual({
+      'test dao agent address': {
+        id: 'test dao agent address',
+        name: 'my test aragon dao',
+        address: 'test dao agent address',
+        lastSignerType: 'address',
+        created: 'new:1670583718135',
+        status: 'ok',
+        active: false,
+        signer: '',
+        requests: {},
+        ensName: '',
+        balances: {}
+      },
+      look: {
+        name: 'such a cool account'
+      }
+    })
+  })
+
+  it('should not migrate non-aragon accounts', () => {
+    state.main.accounts['test dao agent address'] = {
+      name: 'not really an aragon dao'
+    }
+    const updatedState = migrations.apply(state, 30)
+    const { accounts } = updatedState.main
+
+    expect(accounts).toStrictEqual({
+      'test dao agent address': {
+        name: 'not really an aragon dao'
+      },
+      look: {
+        name: 'such a cool account'
+      }
+    })
+  })
+})
