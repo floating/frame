@@ -1,13 +1,10 @@
 import { TransactionDescription } from '@ethersproject/abi'
 import { Contract } from '@ethersproject/contracts'
 import { Web3Provider } from '@ethersproject/providers'
-import { addHexPrefix, zeroAddress } from '@ethereumjs/util'
-import log from 'electron-log'
+import { addHexPrefix } from '@ethereumjs/util'
 import erc20Abi from '../externalData/balances/erc-20-abi'
 import provider from '../provider'
-
-const takeDefaultIfRejected = <T>(promise: PromiseSettledResult<T>, defaultValue: 0 | '' | null) =>
-  promise.status === 'fulfilled' ? promise.value : defaultValue
+import { BigNumber } from 'ethers'
 
 function createWeb3ProviderWrapper(chainId: number) {
   const wrappedSend = (
@@ -75,19 +72,19 @@ export default class Erc20Contract {
   }
 
   async getTokenData() {
-    const calls = await Promise.allSettled([
-      this.contract.decimals(),
-      this.contract.name(),
-      this.contract.symbol(),
-      this.contract.totalSupply() //totalSupply is mandatory on the ERC20 interface
+    const calls = await Promise.all([
+      ['decimals', this.contract.decimals().catch(() => 0)],
+      ['name', this.contract.name().catch(() => '')],
+      ['symbol', this.contract.symbol().catch(() => '')],
+      [
+        'totalSupply',
+        this.contract
+          .totalSupply()
+          .then((supply: BigNumber) => supply.toString())
+          .catch(() => '')
+      ] // totalSupply is mandatory on the ERC20 interface
     ])
 
-    const totalSupply = calls[3].status === 'fulfilled' ? calls[3].value.toString() : ''
-    return {
-      decimals: takeDefaultIfRejected(calls[0], 0),
-      name: takeDefaultIfRejected(calls[1], ''),
-      symbol: takeDefaultIfRejected(calls[2], ''),
-      totalSupply
-    }
+    return Object.fromEntries(calls)
   }
 }
