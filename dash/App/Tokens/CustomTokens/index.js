@@ -84,12 +84,13 @@ class CustomTokens extends React.Component {
                             console.log({ token })
                             link.send('nav:forward', 'dash', {
                               view: 'tokens',
-                              address: token.address,
                               data: {
                                 notify: 'addToken',
                                 notifyData: {
                                   error: null,
                                   isEdit: true,
+                                  address: token.address,
+                                  chainId: token.chainId,
                                   tokenData: token
                                 }
                               }

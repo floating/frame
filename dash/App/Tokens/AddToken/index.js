@@ -254,19 +254,37 @@ class AddTokenFormScreenComponent extends Component {
     return this.state[statePropName] === this[`${statePropName}Default`]
   }
 
+  saveToken({ chainId, req, isEdit }) {
+    const { name, symbol, address, decimals, logoURI } = this.state
+    const token = {
+      name,
+      symbol,
+      chainId,
+      address,
+      decimals,
+      logoURI: this.isDefault('logoURI') ? '' : logoURI
+    }
+    const backSteps = isEdit ? 1 : 3
+    link.send('tray:addToken', token, req)
+    setTimeout(() => {
+      link.send('nav:back', 'dash', backSteps)
+    }, 400)
+  }
+
   render() {
     const {
       chainId,
       chainName,
       req,
-      tokenData: { address }
+      tokenData: { address },
+      isEdit
     } = this.props
     const newTokenReady =
       this.state.name &&
       this.state.name !== this.nameDefault &&
       this.state.symbol &&
       this.state.symbol !== this.symbolDefault &&
-      Number.isInteger(chainId) &&
+      (isEdit || Number.isInteger(chainId)) &&
       address &&
       Number.isInteger(this.state.decimals)
     const chainColor = this.store('main.networksMeta.ethereum', chainId, 'primaryColor')
@@ -275,7 +293,7 @@ class AddTokenFormScreenComponent extends Component {
       <div className='notifyBoxWrap cardShow' onMouseDown={(e) => e.stopPropagation()}>
         <div className='notifyBoxSlide'>
           <div className='addTokenTop'>
-            <div className='addTokenTitle'>Add New Token</div>
+            <div className='addTokenTitle'>{isEdit ? 'Add New Token' : 'Edit Token'}</div>
             <div className='newTokenChainSelectTitle'>
               <div className='newTokenChainAddress' role='heading' aria-level='2'>
                 {address.substring(0, 10)}
@@ -387,28 +405,13 @@ class AddTokenFormScreenComponent extends Component {
                 </label>
               </div>
             </div>
-
             <div className='tokenRow'>
               {newTokenReady ? (
                 <div
                   className='addTokenSubmit addTokenSubmitEnabled'
-                  onMouseDown={() => {
-                    const { name, symbol, address, decimals, logoURI } = this.state
-                    const token = {
-                      name,
-                      symbol,
-                      chainId,
-                      address,
-                      decimals,
-                      logoURI: this.isDefault('logoURI') ? '' : logoURI
-                    }
-                    link.send('tray:addToken', token, req)
-                    setTimeout(() => {
-                      link.send('tray:action', 'backDash', 3)
-                    }, 400)
-                  }}
+                  onMouseDown={() => this.saveToken({ chainId, isEdit })}
                 >
-                  {this.props.isEdit ? 'Save Changes' : 'Add Token'}
+                  {isEdit ? 'Save' : 'Add Token'}
                 </div>
               ) : (
                 <div className='addTokenSubmit'>Fill in Token Details</div>
@@ -429,7 +432,7 @@ class AddToken extends Component {
     const { address, chainId, error, tokenData, isEdit } = data?.notifyData || {}
     const chainName = chainId ? this.store('main.networks.ethereum', chainId, 'name') : undefined
 
-    if (!chainId && !isEdit) return <AddTokenChainScreen />
+    if (!chainId) return <AddTokenChainScreen />
     if (!address) return <AddTokenAddressScreen chainId={chainId} chainName={chainName} />
 
     //Errors can only occur after the address form has been presented
