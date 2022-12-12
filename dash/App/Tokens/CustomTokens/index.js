@@ -79,6 +79,26 @@ class CustomTokens extends React.Component {
                           <div>{token.decimals}</div>
                         </div>
                         <div
+                          className='customTokensListItemEditButton'
+                          onClick={() => {
+                            console.log({ token })
+                            link.send('nav:forward', 'dash', {
+                              view: 'tokens',
+                              address: token.address,
+                              data: {
+                                notify: 'addToken',
+                                notifyData: {
+                                  error: null,
+                                  isEdit: true,
+                                  tokenData: token
+                                }
+                              }
+                            })
+                          }}
+                        >
+                          {'Edit Token'}
+                        </div>
+                        <div
                           className='customTokensListItemRemoveButton'
                           onClick={() => {
                             this.setState({ tokenExpanded: false })

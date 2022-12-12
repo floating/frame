@@ -1,6 +1,4 @@
 import { isValidAddress } from '@ethereumjs/util'
-import { Console } from 'console'
-import { isAddress } from 'ethers/lib/utils'
 import React, { Component } from 'react'
 import Restore from 'react-restore'
 import RingIcon from '../../../../resources/Components/RingIcon'
@@ -410,7 +408,7 @@ class AddTokenFormScreenComponent extends Component {
                     }, 400)
                   }}
                 >
-                  Add Token
+                  {this.props.isEdit ? 'Save Changes' : 'Add Token'}
                 </div>
               ) : (
                 <div className='addTokenSubmit'>Fill in Token Details</div>
@@ -428,10 +426,10 @@ const AddTokenFormScreen = Restore.connect(AddTokenFormScreenComponent)
 class AddToken extends Component {
   render() {
     const { data, req } = this.props
-    const { address, chainId, error, tokenData } = data?.notifyData || {}
+    const { address, chainId, error, tokenData, isEdit } = data?.notifyData || {}
     const chainName = chainId ? this.store('main.networks.ethereum', chainId, 'name') : undefined
 
-    if (!chainId) return <AddTokenChainScreen />
+    if (!chainId && !isEdit) return <AddTokenChainScreen />
     if (!address) return <AddTokenAddressScreen chainId={chainId} chainName={chainName} />
 
     //Errors can only occur after the address form has been presented
@@ -443,6 +441,7 @@ class AddToken extends Component {
         chainName={chainName}
         req={req}
         tokenData={{ ...tokenData, address }}
+        isEdit={isEdit}
       />
     )
   }
