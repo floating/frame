@@ -420,43 +420,50 @@ class Account extends React.Component {
   }
 
   render() {
-    const current = this.store('selected.current') === this.props.id && this.props.status === 'ok'
-    const open = current && this.store('selected.open')
+    const { id, status, active, index } = this.props
+
+    const selectedAccountId = this.store('selected.current')
+    const open = this.store('selected.open')
     const minimized = this.store('selected.minimized')
+    const selectedView = this.store('selected.view')
+    const showAccounts = this.store('selected.showAccounts')
+    const initialPosition = this.store('selected.position.initial')
+    const initialIndex = this.store('selected.position.initial.index')
+    const account = this.store('main.accounts', id)
+    const isAddAccountView = this.store('view.addAccount')
+
+    const current = selectedAccountId === id && status === 'ok'
+    const selectedAccountOpen = current && open
+
     this.selected = current && !minimized
     let signerClass = 'signer'
-    if (this.props.status === 'ok') signerClass += ' okSigner'
-    if (open) signerClass += ' openSigner'
-    if (this.store('selected.view') === 'settings') signerClass += ' signerInSettings'
-    if (this.store('selected.showAccounts')) signerClass += ' signerAccountExpand'
+    if (status === 'ok') signerClass += ' okSigner'
+    if (selectedAccountOpen) signerClass += ' openSigner'
+    if (selectedView === 'settings') signerClass += ' signerInSettings'
+    if (showAccounts) signerClass += ' signerAccountExpand'
 
-    let signerTopClass = this.props.active ? 'signerTop signerTopActive' : 'signerTop'
+    let signerTopClass = active ? 'signerTop signerTopActive' : 'signerTop'
 
     const style = {}
-    const initial = this.store('selected.position.initial')
 
     if (current) {
       // Currently selected
       style.position = 'absolute'
-      style.top = initial.top // open ? 40 : initial.top
-      style.bottom = initial.bottom // open ? 3 : initial.bottom
+      style.top = initialPosition.top // open ? 40 : initial.top
+      style.bottom = initialPosition.bottom // open ? 3 : initial.bottom
       style.left = '6px'
       style.right = '6px'
       style.zIndex = '100000000'
-      const panelHeight = document.body.offsetHeight
-      style.height = initial.height - 6
-      style.transform = open ? `translateY(${initial.top * -1}px)` : 'translateY(0px)'
-    } else if (this.store('selected.current') !== '') {
+      style.height = initialPosition.height - 6
+      style.transform = selectedAccountOpen ? `translateY(${initialPosition.top * -1}px)` : 'translateY(0px)'
+    } else if (selectedAccountId !== '') {
       // Not currently selected, but another signer is
       style.pointerEvents = 'none'
       style.transition = '300ms cubic-bezier(.82,0,.12,1) all'
-      if (this.store('selected.open')) {
+      if (selectedAccountOpen) {
         signerTopClass += ' signerTopNoHover'
         // Not open, but another signer is
-        style.transform =
-          this.props.index > this.store('selected.position.initial.index')
-            ? 'translate(0px, 100px)'
-            : 'translate(0px, -20px)'
+        style.transform = index > initialIndex ? 'translate(0px, 100px)' : 'translate(0px, -20px)'
         style.opacity = 0
         style.pointerEvents = 'none'
       } else {
@@ -466,7 +473,7 @@ class Account extends React.Component {
         style.opacity = 1
       }
     } else {
-      if (this.store('view.addAccount')) {
+      if (isAddAccountView) {
         style.opacity = 0
         style.pointerEvents = 'none'
       } else {
@@ -475,7 +482,6 @@ class Account extends React.Component {
       }
     }
 
-    const account = this.store('main.accounts', this.props.id)
     let signer
 
     if (account.signer) {
@@ -490,13 +496,13 @@ class Account extends React.Component {
     //   style.height = style.height - data.aux.height
     // }
 
-    let requests = this.store('main.accounts', this.props.id, 'requests') || {}
+    let requests = this.store('main.accounts', id, 'requests') || {}
     requests = Object.keys(requests).filter((r) => requests[r].mode === 'normal')
 
     return (
       <div
         className='signerWrap'
-        style={current ? { height: initial.height + 'px' } : {}}
+        style={current ? { height: initialPosition.height + 'px' } : {}}
         onMouseDown={() => this.closeAccounts()}
         onMouseLeave={() => {
           this.setState({ addressHover: false, copied: false })
@@ -511,11 +517,11 @@ class Account extends React.Component {
         >
           <div
             className={signerTopClass}
-            style={open ? { boxShadow: '0px 4px 8px rgba(0, 0, 0, 0)' } : {}}
+            style={selectedAccountOpen ? { boxShadow: '0px 4px 8px rgba(0, 0, 0, 0)' } : {}}
             // onMouseEnter={() => this.setState({ openHover: true })}
             // onMouseLeave={() => this.setState({ openHover: false })}
             onClick={() => {
-              if (!open) this.typeClick()
+              if (!selectedAccountOpen) this.typeClick()
             }}
           >
             {!this.state.addressHover ? (
@@ -528,7 +534,7 @@ class Account extends React.Component {
                 {(() => {
                   if (this.state.addressHover) return null
                   let requestBadgeClass = 'accountNotificationBadge'
-                  if (this.props.active) requestBadgeClass += ' accountNotificationBadgeReady'
+                  if (active) requestBadgeClass += ' accountNotificationBadgeReady'
                   if (requests.length > 0) requestBadgeClass += ' accountNotificationBadgeActive'
                   return (
                     <div className={requestBadgeClass}>
@@ -541,7 +547,7 @@ class Account extends React.Component {
                     <div className='signerSelectIconWrap'>
                       <div
                         className='signerSelectIcon'
-                        style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                        style={{ transform: selectedAccountOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
                       >
                         {svg.chevron(26)}
                       </div>

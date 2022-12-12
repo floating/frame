@@ -206,7 +206,7 @@ class Main extends React.Component {
     return (
       <>
         <Account
-          key={current.id}
+          key={current}
           {...currentAccount}
           index={1}
           reportScroll={() => this.reportScroll()}

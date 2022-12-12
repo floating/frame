@@ -122,6 +122,7 @@ class FrameAccount {
         }
       } else {
         this.signer = ''
+        this.lastSignerType = SignerType.Watch
       }
 
       this.smart = this.signer ? undefined : this.smart
