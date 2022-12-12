@@ -811,8 +811,8 @@ module.exports = {
     })
   },
   unsetAccount: (u) => {
-    u('selected.minimized', (_) => true)
     u('selected.open', (_) => false)
+    u('selected.minimized', (_) => true)
     u('selected.view', (_) => 'default')
     u('selected.showAccounts', (_) => false)
     u('windows.panel.nav', () => [])
