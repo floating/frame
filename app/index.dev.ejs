@@ -12,16 +12,16 @@
         object-src 'none';
       "
     />
-    <title>Flow</title>
+    <title><%= this.windowTitle %></title>
     <link rel="stylesheet" href="../resources/base.styl" type="text/css" />
-    <link rel="stylesheet" href="./Flow/index.styl" type="text/css" />
+    <link rel="stylesheet" href="./<%= this.windowTitle %>/index.styl" type="text/css" />
     <script nonce="2f0d956b-0d9c-4f1e-874a-57a1ec828872">
-      window.frameWindow = 'flow'
+      window.frameWindow = '<%= this.window %>'
     </script>
   </head>
   <body>
     <div class="frameOverlay"></div>
-    <div id="flow"></div>
+    <div id="<%= this.window %>"></div>
     <script type="module" src="../app/index.js" nonce="2f0d956b-0d9c-4f1e-874a-57a1ec828872"></script>
   </body>
 </html>

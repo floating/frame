@@ -9,13 +9,12 @@
         connect-src *;
         img-src *;
         style-src 'self' http://localhost:1234 'unsafe-inline';
-        frame-src 'none';
         object-src 'none';
       "
     />
     <title>Tray</title>
     <link rel="stylesheet" href="../resources/base.styl" type="text/css" />
-    <link rel="stylesheet" href="./index.styl" type="text/css" />
+    <link rel="stylesheet" href="./Tray/index.styl" type="text/css" />
     <script nonce="2f0d956b-0d9c-4f1e-874a-57a1ec828872">
       window.frameWindow = 'tray'
     </script>
@@ -23,6 +22,6 @@
   <body>
     <div class="frameOverlay"></div>
     <div id="tray"></div>
-    <script type="module" src="./index.js" nonce="2f0d956b-0d9c-4f1e-874a-57a1ec828872"></script>
+    <script type="module" src="../app/index.js" nonce="2f0d956b-0d9c-4f1e-874a-57a1ec828872"></script>
   </body>
 </html>

@@ -4,23 +4,24 @@
     <meta
       http-equiv="Content-Security-Policy"
       content="
-        script-src 'strict-dynamic' 'nonce-8cb3c02f-c8ce-4872-acc1-8d6184f8c6c7' http://localhost:1234 'unsafe-eval';
+        script-src 'strict-dynamic' 'nonce-2f0d956b-0d9c-4f1e-874a-57a1ec828872' http://localhost:1234 'unsafe-eval';
         base-uri 'self';
-        connect-src *; 
-        img-src blob:;
+        connect-src *;
+        img-src *;
         style-src 'self' http://localhost:1234 'unsafe-inline';
-        frame-src 'none'; 
         object-src 'none';
       "
     />
-    <title>Dapp</title>
+    <title>Dawn</title>
     <link rel="stylesheet" href="../resources/base.styl" type="text/css" />
-    <script nonce="8cb3c02f-c8ce-4872-acc1-8d6184f8c6c7">
+    <link rel="stylesheet" href="./Dawn/index.styl" type="text/css" />
+    <script nonce="2f0d956b-0d9c-4f1e-874a-57a1ec828872">
       window.frameWindow = 'dawn'
     </script>
   </head>
   <body>
-    <div id="frame"></div>
-    <script type="module" src="./index.js" nonce="8cb3c02f-c8ce-4872-acc1-8d6184f8c6c7"></script>
+    <div class="frameOverlay"></div>
+    <div id="dawn"></div>
+    <script type="module" src="../app/index.js" nonce="2f0d956b-0d9c-4f1e-874a-57a1ec828872"></script>
   </body>
 </html>

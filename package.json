@@ -12,17 +12,18 @@
     "setup:scripts": "allow-scripts",
     "setup": "npm run setup:deps && husky install",
     "start": "npm run launch",
-    "bundle": "npm run bundle:bridge && npm run bundle:tray && npm run bundle:dash && npm run bundle:dapp && npm run bundle:dawn && npm run bundle:dapp:inject",
+    "bundle": "npm run bundle:bridge && npm run bundle:tray && npm run bundle:dash && npm run bundle:dapp && npm run bundle:dawn && npm run bundle:flow && npm run bundle:dapp:inject",
     "bundle:bridge": "parcel build resources/bridge/index.js --target bridge --public-url .",
-    "bundle:tray": "parcel build app/tray.html --target tray --public-url .",
-    "bundle:flow": "parcel build app/flow.html --target flow --public-url .",
-    "bundle:dash": "parcel build app/dash.html --target dash --public-url .",
-    "bundle:dapp": "parcel build app/dapp.html --target dapp --public-url .",
-    "bundle:dawn": "parcel build app/dawn.html --target dawn --public-url .",
+    "bundle:tray": "cross-env WINDOW=tray parcel build app/index.ejs?window=tray --target tray --public-url .",
+    "bundle:flow": "cross-env WINDOW=flow parcel build app/index.ejs --target flow --public-url .",
+    "bundle:dash": "cross-env WINDOW=dash parcel build app/index.ejs --target dash --public-url .",
+    "bundle:dapp": "cross-env WINDOW=dapp parcel build app/index.ejs --target dapp --public-url .",
+    "bundle:dawn": "cross-env WINDOW=dawn parcel build app/index.ejs --target dawn --public-url .",
     "bundle:dapp:inject": "parcel build main/dapps/server/inject/index.js --target inject --public-url .",
-    "serve": "npm run bundle:bridge && npm run dev-server & wait-on http://localhost:1234/app/tray.dev.html && npm run compile:watch",
+    "bundle:dev": "cross-env NODE_ENV=development npm run bundle",
+    "serve": "npm run bundle:dev && npm run dev-server & wait-on http://localhost:1234/app/tray.dev.html && npm run compile:watch",
     "dev": "npm run compile && npm run bundle && npm run launch:dev",
-    "dev-server": "cross-env NODE_ENV=development HMR=true parcel serve resources/bridge/index.js app/tray.dev.html app/flow.dev.html app/dash.dev.html app/dapp.dev.html app/dawn.dev.html main/dapps/server/inject/index.js",
+    "dev-server": "cross-env NODE_ENV=development HMR=true parcel serve --log-level=verbose resources/bridge/index.js compiled/tray.html compiled/dash.html compiled/dapp.html compiled/dawn.html compiled/flow.html main/dapps/server/inject/index.js",
     "inspect": "npm run bundle && npm run launch:inspect",
     "launch": "cross-env NODE_ENV=production electron ./compiled/main",
     "launch:dev": "cross-env NODE_ENV=development electron ./compiled/main --inspect",
@@ -34,8 +35,10 @@
     "format": "prettier --write '**/*.{yml,json,md,ts,js}'",
     "format:check": "prettier --check '**/*.{yml,json,md,ts,js}'",
     "prod": "npm run compile && npm run bundle && npm run launch",
-    "hot": "trap \"kill 0\" exit && npm run bundle:bridge && npm run compile && npm run dev-server & wait-on http://localhost:1234/app/tray.dev.html && npm run launch:hot",
-    "compile": "npm run copy-assets && tsc",
+    "hot": "trap \"kill 0\" exit && npm run bundle:dev && npm run compile && npm run dev-server & wait-on http://localhost:1234/app/tray.dev.html && npm run launch:hot",
+    "compile": "npm run copy-assets && tsc && npm run compile:html",
+    "compile:html:dev": "node ./scripts/compileHtml.js --dev",
+    "compile:html": "node ./scripts/compileHtml.js",
     "compile:watch": "npm run copy-assets && tsc -w",
     "build": "npm run compile && sleep 4 && npm run bundle && sleep 4 && electron-builder",
     "copy-assets": "shx mkdir -p ./compiled/main/windows && shx cp ./main/windows/*.png ./compiled/main/windows",
@@ -142,6 +145,7 @@
     "@types/node-hid": "1.3.1",
     "@types/uuid": "9.0.0",
     "@types/ws": "8.5.3",
+    "ejs": "^3.1.8",
     "electron": "22.0.0",
     "electron-builder": "23.6.0",
     "eslint": "8.29.0",
@@ -154,8 +158,9 @@
     "node-abi": "3.30.0",
     "node-gyp": "9.3.0",
     "node-watch": "0.7.3",
-    "parcel": "2.8.0",
-    "parcel-transformer-ejs": "1.0.1",
+    "parcel": "2.8.1",
+    "parcel-resolver-querystrings": "file:../parcel-resolver-querystrings",
+    "parcel-transformer-ejs": "file:../parcel-transformer-ejs",
     "prebuild-install": "7.1.1",
     "prettier": "2.8.0",
     "rimraf": "3.0.2",
@@ -192,6 +197,7 @@
   "dash": "./bundle/dash.html",
   "dapp": "./bundle/dapp.html",
   "dawn": "./bundle/dawn.html",
+  "flow": "./bundle/flow.html",
   "targets": {
     "main": false,
     "bridge": {
@@ -208,6 +214,9 @@
       "context": "browser"
     },
     "dawn": {
+      "context": "browser"
+    },
+    "flow": {
       "context": "browser"
     },
     "inject": {
@@ -248,7 +257,13 @@
       "trezor-connect>@trezor/utxo-lib>blake-hash": false,
       "trezor-connect>@trezor/utxo-lib>tiny-secp256k1": false,
       "ws>bufferutil": false,
-      "ws>utf-8-validate": false
+      "ws>utf-8-validate": false,
+      "parcel-transformer-ejs>@parcel/plugin>@parcel/types>@parcel/cache>lmdb": false,
+      "parcel-transformer-ejs>@parcel/plugin>@parcel/types>@parcel/fs>@parcel/core>msgpackr>msgpackr-extract": false,
+      "parcel-transformer-ejs>@parcel/plugin>@parcel/types>@parcel/fs>@parcel/watcher": false,
+      "parcel-resolver-querystrings>@parcel/plugin>@parcel/types>@parcel/cache>lmdb": false,
+      "parcel-resolver-querystrings>@parcel/plugin>@parcel/types>@parcel/fs>@parcel/core>msgpackr>msgpackr-extract": false,
+      "parcel-resolver-querystrings>@parcel/plugin>@parcel/types>@parcel/fs>@parcel/watcher": false
     }
   }
 }
