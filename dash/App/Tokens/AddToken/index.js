@@ -140,7 +140,7 @@ class AddTokenAddressScreenComponent extends Component {
       return navForward({
         error: invalidFormatError,
         tokenData: undefined,
-        address: contractAddress,
+        address,
         chainId
       })
 
@@ -155,28 +155,30 @@ class AddTokenAddressScreenComponent extends Component {
 
     return (
       <div className='newTokenView cardShow'>
-        <div className='newTokenChainSelectTitle'>
-          <label id='newTokenAddressLabel'>
-            {fetchingData ? `Fetching token's data` : `Enter token's address`}
-          </label>
-
-          {chainName && (
-            <div
-              className='newTokenChainSelectSubtitle'
-              style={{
-                color: chainColor ? `var(--${chainColor})` : 'var(--moon)'
-              }}
-            >
-              {`on ${chainName}`}
-            </div>
-          )}
-        </div>
         {fetchingData ? (
-          <div className='signerLoading'>
-            <div className='signerLoadingLoader' />
-          </div>
+          <>
+            <div className='signerLoading'>
+              <div className='signerLoadingLoader' />
+            </div>
+            {'FETCHING TOKEN DATA'}
+          </>
         ) : (
           <>
+            <div className='newTokenChainSelectTitle'>
+              <label id='newTokenAddressLabel'>{`Enter token's address`}</label>
+
+              {chainName && (
+                <div
+                  className='newTokenChainSelectSubtitle'
+                  style={{
+                    color: chainColor ? `var(--${chainColor})` : 'var(--moon)'
+                  }}
+                >
+                  {`on ${chainName}`}
+                </div>
+              )}
+            </div>
+
             <div className='tokenRow'>
               <div className='tokenAddress'>
                 <input
