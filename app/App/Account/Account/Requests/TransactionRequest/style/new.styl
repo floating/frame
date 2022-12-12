@@ -159,12 +159,12 @@
     transform: translate(0, 0) rotate(0)  
 
 .txViewData
-  margin 32px 8px
-  background var(--ghostA)
+  margin 64px 8px
+  background var(--ghostZ)
   padding 32px 6px 64px 6px
   border-radius 20px
   border-bottom 2px solid var(--ghostZ)
-  box-shadow 0px 2px 4px var(--ghostX)
+  box-shadow 0px 2px 8px var(--ghostX), 0px -2px 12px var(--ghostY)
 
   .txViewDataHeader
     padding 0px 0px
@@ -215,6 +215,24 @@
   width 100%
   margin 0px 6px
   padding-top 22px
+
+.txDescriptionSummaryStandalone
+  display flex
+  justify-content center
+  align-items center
+  flex-direction column
+  padding 12px
+  margin 12px 12px 8px 12px
+  font-weight 400
+  // border-top 2px solid var(--ghostY)
+  // border-bottom 2px solid var(--ghostY)
+  // font-family VCR
+
+  // .txDescriptionSummaryStandaloneWrap
+  //   background: -webkit-linear-gradient(0deg, var(--good), var(--moon));
+  //   -webkit-background-clip: text;
+  //   -webkit-text-fill-color: transparent;
+
 
 ._txDescription
   width 100%

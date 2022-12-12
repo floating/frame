@@ -76,6 +76,7 @@
   border-bottom 2px solid var(--ghostZ)
   cursor pointer
   transition all linear 0.1s
+  // background blue
 
   .requestItemBackground
     position absolute
@@ -136,51 +137,51 @@
       top -1px
       position relative
 
-    .requestItemDetailsSlide
-      display flex
-      align-items center
+  .requestItemDetailsSlide
+    display flex
+    align-items center
 
-    .requestItemDetailsIndicator
-      height 12px
-      width 12px
-      margin 0px 1px
+  .requestItemDetailsIndicator
+    height 12px
+    width 12px
+    margin 0px 1px
+    display flex
+    justify-content center
+    align-items center
+    border-radius 6px
+    box-shadow inset 0px 0px 3px var(--ghostY)
+
+    .requestItemDetailsIndicatorMarker
+      height 6px
+      width 6px
+      border-radius 3px
+      background var(--moon)
+      z-index 4
+      position relative
+      top -1px
+      animation lit infinite ease-in-out alternate 1s
+      will-change opacity
+
+  .requestItemDetailsIndicatorStill
+    .requestItemDetailsIndicatorMarker
+      animation none
+
+  .requestItemDetailsView
+    display flex
+    justify-content center
+    align-items center
+    margin-right 2px
+    .requestItemDetailsViewText
+      font-weight 400
+      margin-right 0px
+    .requestItemDetailsViewArrow
       display flex
       justify-content center
       align-items center
-      border-radius 6px
-      box-shadow inset 0px 0px 3px var(--ghostY)
-
-      .requestItemDetailsIndicatorMarker
-        height 6px
-        width 6px
-        border-radius 3px
-        background var(--moon)
-        z-index 4
-        position relative
-        top -1px
-        animation lit infinite ease-in-out alternate 1s
-        will-change opacity
-
-    .requestItemDetailsIndicatorStill
-      .requestItemDetailsIndicatorMarker
-        animation none
-
-    .requestItemDetailsView
-      display flex
-      justify-content center
-      align-items center
-      margin-right 2px
-      .requestItemDetailsViewText
-        font-weight 400
-        margin-right 0px
-      .requestItemDetailsViewArrow
-        display flex
-        justify-content center
-        align-items center
-        div 
-          width 8px
-        svg
-          transform rotate(90deg)
+      div 
+        width 8px
+      svg
+        transform rotate(90deg)
 
   .requestItemDetailsGood
     .requestItemLine
@@ -335,8 +336,10 @@
       height 36px
       display flex
       justify-content flex-start
-      align-items center
+      // align-items center
+      flex-direction column
       box-sizing border-box
+      // background red
 
       .requestItemTitleMain
         white-space nowrap

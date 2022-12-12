@@ -89,43 +89,43 @@ class _RequestItem extends React.Component {
             </div>
             <div className='requestItemMain'>
               <div className='requestItemTitleMain'>{title}</div>
+              <div className='requestItemDetailsSlide'>
+                <div
+                  className={
+                    inactive
+                      ? 'requestItemDetailsIndicator requestItemDetailsIndicatorStill'
+                      : 'requestItemDetailsIndicator'
+                  }
+                >
+                  <div className='requestItemDetailsIndicatorMarker' />
+                </div>
+                <span>{status}</span>
+                {/* <div className='requestItemDetailsIndicator' /> */}
+              </div>
             </div>
           </div>
           <div className='requestItemTitleTime'>
             <div className='requestItemTitleTimeItem'>{this.state.ago}</div>
           </div>
+          <div className={requestItemDetailsClass}>
+            {headerMode ? (
+              <div className={inactive ? 'requestItemWave requestItemWaveDisabled' : 'requestItemWave'}>
+                <div className='requestItemLine'>{svg.sine()}</div>
+                <div className='requestItemLine requestItemLineShadow'>{svg.sine()}</div>
+              </div>
+            ) : (
+              <div className='requestItemDetailsView'>
+                <div className='requestItemDetailsViewText'>{`View`}</div>
+                <div className='requestItemDetailsViewArrow'>
+                  <div>{svg.chevron(15)}</div>
+                  <div>{svg.chevron(15)}</div>
+                  <div>{svg.chevron(15)}</div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
         <div style={headerMode ? { pointerEvents: 'auto' } : { pointerEvents: 'none' }}>{children}</div>
-        <div className={requestItemDetailsClass}>
-          <div className='requestItemDetailsSlide'>
-            <div
-              className={
-                inactive
-                  ? 'requestItemDetailsIndicator requestItemDetailsIndicatorStill'
-                  : 'requestItemDetailsIndicator'
-              }
-            >
-              <div className='requestItemDetailsIndicatorMarker' />
-            </div>
-            <span>{status}</span>
-            {/* <div className='requestItemDetailsIndicator' /> */}
-          </div>
-          {headerMode ? (
-            <div className={inactive ? 'requestItemWave requestItemWaveDisabled' : 'requestItemWave'}>
-              <div className='requestItemLine'>{svg.sine()}</div>
-              <div className='requestItemLine requestItemLineShadow'>{svg.sine()}</div>
-            </div>
-          ) : (
-            <div className='requestItemDetailsView'>
-              <div className='requestItemDetailsViewText'>{`View`}</div>
-              <div className='requestItemDetailsViewArrow'>
-                <div>{svg.chevron(15)}</div>
-                <div>{svg.chevron(15)}</div>
-                <div>{svg.chevron(15)}</div>
-              </div>
-            </div>
-          )}
-        </div>
         {notice && notice !== status && <div className={requestItemNoticeClass}>{notice}</div>}
       </div>
     )

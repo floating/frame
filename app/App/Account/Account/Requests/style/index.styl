@@ -185,13 +185,42 @@
   svg
     color var(--outerspace08)
 
+.requestGroup
+  padding 8px
+  padding-top 32px
+  display flex
+  align-items center
+
+  .requestGroupName
+    font-weight 400
+    // margin-left 8px
+    // margin-top -3px
+    font-size 12px
+    color var(--moon)
+
 .requestContainerWrap
-  margin 0px 6px 6px 6px
-  padding 0px 3px 1px 3px
+  margin 12px 6px
+  padding 0px 3px 21px 3px
   box-sizing border-box
   overflow auto
   background var(--ghostZ)
-  border-radius 20px
+  position relative
+  min-height calc(100% - 25px)
+
+  .requestContainerEmpty
+    position absolute
+    top 0
+    right 0
+    bottom 100px
+    left 0
+    display flex
+    justify-content center
+    align-items center
+    font-family VCR
+    font-size 18px
+    opacity 0.8
+    letter-spacing 1px
+    text-shadow 0px 3px var(--ghostX)
 
   .requestContainer
     width 100%

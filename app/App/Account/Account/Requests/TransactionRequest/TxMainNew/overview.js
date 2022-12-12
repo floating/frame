@@ -87,54 +87,57 @@ const TxOverview = ({ req, chainName, chainColor, symbol, originName, txMeta, si
   } else if (isNonZeroHex(calldata)) {
     description = <DataOverview />
   }
-
-  return (
-    <Cluster>
-      <ClusterRow>
-        <ClusterValue
-          onClick={() => {
-            link.send('nav:update', 'panel', { data: { step: 'viewData' } })
-          }}
-          style={{ background: valueColor }}
-        >
-          <div className='_txDescription'>
-            <TxDescription chain={chainName} chainColor={chainColor}>
-              <div className='requestItemTitleSub'>
-                <div className='requestItemTitleSubIcon'>{svg.window(10)}</div>
-                <div className='requestItemTitleSubText'>{originName}</div>
-              </div>
-              <div className='_txDescriptionSummaryMain'>{description}</div>
-            </TxDescription>
-          </div>
-        </ClusterValue>
-      </ClusterRow>
-      {!simple && (
-        <>
-          {txMeta.replacement &&
-            (txMeta.possible ? (
-              <ClusterRow>
-                <ClusterValue>
-                  <div className='_txMainTag _txMainTagWarning'>valid replacement</div>
-                </ClusterValue>
-              </ClusterRow>
-            ) : (
-              <ClusterRow>
-                <ClusterValue>
-                  <div className='_txMainTag _txMainTagWarning'>{txMeta.notice || 'invalid duplicate'}</div>
-                </ClusterValue>
-              </ClusterRow>
-            ))}
-          {isNonZeroHex(calldata) && (
+  if (simple) {
+    return (
+      <div className='txDescriptionSummaryStandalone'>
+        <span className='txDescriptionSummaryStandaloneWrap'>{description}</span>
+      </div>
+    )
+  } else {
+    return (
+      <Cluster>
+        <ClusterRow>
+          <ClusterValue
+            onClick={() => {
+              link.send('nav:update', 'panel', { data: { step: 'viewData' } })
+            }}
+            style={{ background: valueColor }}
+          >
+            <div className='_txDescription'>
+              <TxDescription chain={chainName} chainColor={chainColor}>
+                <div className='requestItemTitleSub'>
+                  <div className='requestItemTitleSubIcon'>{svg.window(10)}</div>
+                  <div className='requestItemTitleSubText'>{originName}</div>
+                </div>
+                <div className='_txDescriptionSummaryMain'>{description}</div>
+              </TxDescription>
+            </div>
+          </ClusterValue>
+        </ClusterRow>
+        {txMeta.replacement &&
+          (txMeta.possible ? (
             <ClusterRow>
               <ClusterValue>
-                <div className='_txMainTag _txMainTagWarning'>{'Transaction includes data'}</div>
+                <div className='_txMainTag _txMainTagWarning'>valid replacement</div>
               </ClusterValue>
             </ClusterRow>
-          )}
-        </>
-      )}
-    </Cluster>
-  )
+          ) : (
+            <ClusterRow>
+              <ClusterValue>
+                <div className='_txMainTag _txMainTagWarning'>{txMeta.notice || 'invalid duplicate'}</div>
+              </ClusterValue>
+            </ClusterRow>
+          ))}
+        {isNonZeroHex(calldata) && (
+          <ClusterRow>
+            <ClusterValue>
+              <div className='_txMainTag _txMainTagWarning'>{'Transaction includes data'}</div>
+            </ClusterValue>
+          </ClusterRow>
+        )}
+      </Cluster>
+    )
+  }
 }
 
 export default TxOverview
