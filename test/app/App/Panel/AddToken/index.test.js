@@ -1,6 +1,6 @@
 import React from 'react'
 import Restore from 'react-restore'
-import { render, waitFor } from '@testing-library/react'
+import { getByLabelText, getByRole, render, waitFor } from '@testing-library/react'
 
 import { setupComponent, advanceTimers } from '../../../../componentSetup'
 import store from '../../../../../main/store'
@@ -84,86 +84,109 @@ describe('setting token address', () => {
 
   it('should update add token navigation when an invalid contract address is entered', async () => {
     const { user, getByLabelText, getByRole } = setupComponent(
-      <AddToken data={{ notifyData: { chainId: 137 } }} />
+      <AddToken data={{ notifyData: { chainId: 1 } }} />
     )
     const contractAddressInput = getByLabelText(`Enter token's address`)
     await user.type(contractAddressInput, 'INVALID_ADDRESS')
     const setAddressButton = getByRole('button', { name: 'Set Address' })
     await user.click(setAddressButton)
-    await waitFor(
-      () =>
-        expect(link.send).toHaveBeenCalledWith('nav:forward', 'dash', {
-          view: 'tokens',
-          data: {
-            notify: 'addToken',
-            notifyData: {
-              chainId: 137,
-              address: 'INVALID_ADDRESS',
-              error: 'INVALID CONTRACT ADDRESS',
-              tokenData: undefined
-            }
-          }
-        }),
-      { timeout: 200 }
-    )
+
+    expect(link.send).toHaveBeenCalledTimes(1)
+    expect(link.send).toHaveBeenCalledWith('nav:forward', 'dash', {
+      view: 'tokens',
+      data: {
+        notify: 'addToken',
+        notifyData: {
+          chainId: 1,
+          address: 'INVALID_ADDRESS',
+          error: 'INVALID CONTRACT ADDRESS',
+          tokenData: undefined
+        }
+      }
+    })
   })
 
-  // it('should update add token navigation when a contracts details cannot be validated on-chain', async () => {
-  //   link.invoke.mockImplementationOnce((action, address, chainId) => {
-  //     expect(action).toBe('tray:getTokenDetails')
-  //     expect(address).toBe('0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0')
-  //     expect(chainId).toBe(137)
-  //     return {
-  //       decimals: 0,
-  //       name: '',
-  //       symbol: '',
-  //       totalSupply: ''
-  //     }
-  //   })
+  it('should update add token navigation when a contracts details cannot be validated on-chain', async () => {
+    link.invoke.mockImplementationOnce((action, address, chainId) => {
+      expect(action).toBe('tray:getTokenDetails')
+      expect(address).toBe('0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0')
+      expect(chainId).toBe(1)
+      return {
+        decimals: 0,
+        name: '',
+        symbol: '',
+        totalSupply: ''
+      }
+    })
 
-  //   const { user, getByLabelText, getByRole, getByDisplayValue } = setupComponent(
-  //     <AddToken data={{ notifyData: { chainId: 137 } }} />
-  //   )
-  //   const contractAddressLabel = getByLabelText(`Enter token's address`)
-  //   await user.type(contractAddressLabel, '0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0')
-  //   const setAddressButton = getByRole('button', { name: 'Set Address' })
-  //   await user.click(setAddressButton)
+    const { user, getByLabelText, getByRole } = setupComponent(
+      <AddToken data={{ notifyData: { chainId: 1 } }} />
+    )
+    const contractAddressLabel = getByLabelText(`Enter token's address`)
+    await user.type(contractAddressLabel, '0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0')
+    const setAddressButton = getByRole('button', { name: 'Set Address' })
+    await user.click(setAddressButton)
 
-  //   expect(link.send).toHaveBeenCalledTimes(1)
-  //   expect(link.send).toHaveBeenCalledWith('tray:action', 'navDash', {
-  //     view: 'tokens',
-  //     data: {
-  //       notify: 'addToken',
-  //       notifyData: {
-  //         chainId: 137,
-  //         address: '0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0',
-  //         error: `FAILED TO VERIFY TOKEN'S DATA`
-  //       }
-  //     }
-  //   })
-  // })
+    expect(link.invoke).toHaveBeenCalledTimes(1)
+    expect(link.send).toHaveBeenCalledTimes(1)
+    expect(link.send).toHaveBeenCalledWith('nav:forward', 'dash', {
+      view: 'tokens',
+      data: {
+        notify: 'addToken',
+        notifyData: {
+          chainId: 1,
+          address: '0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0',
+          error: `FAILED TO VERIFY TOKEN'S DATA`,
+          tokenData: {
+            decimals: 0,
+            name: '',
+            symbol: '',
+            totalSupply: ''
+          }
+        }
+      }
+    })
+  })
 
-  // it('should update add token navigation when an address is entered', async () => {
-  //   const { user, getByLabelText, getByRole } = setupComponent(
-  //     <AddToken data={{ notifyData: { chainId: 137 } }} />
-  //   )
+  it('should update add token navigation when a valid address is entered', async () => {
+    const mockTokenData = {
+      decimals: 420,
+      name: 'FAKE COIN',
+      symbol: 'FAKE',
+      totalSupply: '100000'
+    }
 
-  //   const contractAddressLabel = getByLabelText(`Enter token's address`)
-  //   await user.type(contractAddressLabel, '0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0')
-  //   const setAddressButton = getByRole('button', { name: 'Set Address' })
-  //   await user.click(setAddressButton)
+    link.invoke.mockImplementationOnce((action, address, chainId) => {
+      expect(action).toBe('tray:getTokenDetails')
+      expect(address).toBe('0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0')
+      expect(chainId).toBe(1)
+      return mockTokenData
+    })
 
-  //   expect(link.send).toHaveBeenCalledWith('tray:action', 'navDash', {
-  //     view: 'tokens',
-  //     data: {
-  //       notify: 'addToken',
-  //       notifyData: {
-  //         chainId: 137,
-  //         address: '0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0'
-  //       }
-  //     }
-  //   })
-  // })
+    const { user, getByLabelText, getByRole } = setupComponent(
+      <AddToken data={{ notifyData: { chainId: 1 } }} />
+    )
+
+    const contractAddressLabel = getByLabelText(`Enter token's address`)
+    await user.type(contractAddressLabel, '0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0')
+    const setAddressButton = getByRole('button', { name: 'Set Address' })
+    await user.click(setAddressButton)
+
+    expect(link.invoke).toHaveBeenCalledTimes(1)
+    expect(link.send).toHaveBeenCalledTimes(1)
+    expect(link.send).toHaveBeenCalledWith('nav:forward', 'dash', {
+      view: 'tokens',
+      data: {
+        notify: 'addToken',
+        notifyData: {
+          error: null,
+          chainId: 1,
+          address: '0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0',
+          tokenData: mockTokenData
+        }
+      }
+    })
+  })
 
   it('should retrieve token metadata from a connected chain when an address is entered', async () => {
     store.setPrimary('ethereum', 137, { connected: true })
@@ -185,59 +208,116 @@ describe('setting token address', () => {
   })
 })
 
-// describe('setting token details', () => {
-//   it('should prompt for default token details', () => {
-//     const { getByLabelText, getByRole } = render(
-//       <AddToken
-//         data={{ notifyData: { chainId: 137, address: '0x64aa3364F17a4D01c6f1751Fd97C2BD3D7e7f1D4' } }}
-//       />
-//     )
+describe('displaying errors', () => {
+  it('should show the correct error page when the error is "INVALID CONTRACT ADDRESS"', () => {
+    const { getAllByRole } = render(
+      <AddToken
+        data={{ notifyData: { chainId: 137, error: 'INVALID CONTRACT ADDRESS', address: '0xabc' } }}
+      />
+    )
 
-//     const contractAddressInput = getByRole('heading')
-//     const tokenNameInput = getByLabelText('Token Name')
-//     const tokenSymbolInput = getByLabelText('Symbol')
-//     const tokenDecimalsInput = getByLabelText('Decimals')
+    const buttons = getAllByRole('button')
+    expect(buttons.length).toBe(1)
+    expect(buttons[0].textContent).toBe('BACK')
+  })
 
-//     expect(contractAddressInput.textContent).toEqual('0x64aa3364D7e7f1D4')
-//     expect(tokenNameInput.value).toEqual('Token Name')
-//     expect(tokenSymbolInput.value).toEqual('SYMBOL')
-//     expect(tokenDecimalsInput.value).toEqual('?')
-//   })
+  it(`should show the correct error page when the error is "FAILED TO VERIFY TOKEN'S DATA"`, () => {
+    const { getAllByRole } = render(
+      <AddToken
+        data={{ notifyData: { chainId: 137, error: `FAILED TO VERIFY TOKEN'S DATA`, address: '0xabc' } }}
+      />
+    )
 
-//   it('should update with loaded token metadata', async () => {
-//     store.setPrimary('ethereum', 137, { connected: true })
+    const buttons = getAllByRole('button')
+    expect(buttons.length).toBe(2)
+    expect(buttons[0].textContent).toBe('BACK')
+    expect(buttons[1].textContent).toBe('ADD ANYWAY')
+  })
+})
 
-//     const { user, getByLabelText, getByRole, rerender } = setupComponent(
-//       <AddToken data={{ notifyData: { chainId: 137 } }} />
-//     )
+describe('setting token details', () => {
+  it('should display the correct copy when editing a token', () => {
+    const { getByTestId, getByRole } = render(
+      <AddToken
+        data={{
+          notifyData: {
+            chainId: 1,
+            address: '0x64aa3364F17a4D01c6f1751Fd97C2BD3D7e7f1D4',
+            isEdit: true,
+            tokenData: {
+              decimals: 12,
+              symbol: 'FAKE',
+              name: 'FAKE',
+              address: '0x64aa3364F17a4D01c6f1751Fd97C2BD3D7e7f1D4',
+              totalSupply: '100'
+            }
+          }
+        }}
+      />
+    )
+    const heading = getByTestId('addTokenFormTitle')
+    const button = getByRole('button')
+    expect(heading.textContent).toBe('Edit Token')
+    expect(button.textContent).toBe('Save')
+  })
 
-//     link.invoke.mockResolvedValue({
-//       name: 'Frame Test on Polygon',
-//       symbol: 'mFRT',
-//       decimals: 18
-//     })
+  it('should display the correct copy when adding a new token', () => {
+    const { getByTestId, getByRole } = render(
+      <AddToken
+        data={{
+          notifyData: { chainId: 1, address: '0x64aa3364F17a4D01c6f1751Fd97C2BD3D7e7f1D4' }
+        }}
+      />
+    )
+    const heading = getByTestId('addTokenFormTitle')
+    const button = getByRole('button')
+    expect(heading.textContent).toBe('Add New Token')
+    expect(button.textContent).toBe('Fill in Token Details')
+  })
 
-//     link.send.mockImplementation(() => {
-//       rerender(
-//         <AddToken
-//           data={{ notifyData: { chainId: 137, address: '0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0' } }}
-//         />
-//       )
-//     })
+  it('should prompt for default token details', () => {
+    const { getByLabelText, getByRole } = render(
+      <AddToken
+        data={{ notifyData: { chainId: 137, address: '0x64aa3364F17a4D01c6f1751Fd97C2BD3D7e7f1D4' } }}
+      />
+    )
 
-//     const contractAddressLabel = getByLabelText(`Enter token's address`)
-//     await user.type(contractAddressLabel, '0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0')
-//     const setAddressButton = getByRole('button', { name: 'Set Address' })
-//     await user.click(setAddressButton)
+    const contractAddressInput = getByRole('heading')
+    const tokenNameInput = getByLabelText('Token Name')
+    const tokenSymbolInput = getByLabelText('Symbol')
+    const tokenDecimalsInput = getByLabelText('Decimals')
 
-//     const contractAddressInput = getByRole('heading')
-//     const tokenNameInput = getByLabelText('Token Name')
-//     const tokenSymbolInput = getByLabelText('Symbol')
-//     const tokenDecimalsInput = getByLabelText('Decimals')
+    expect(contractAddressInput.textContent).toEqual('0x64aa3364D7e7f1D4')
+    expect(tokenNameInput.value).toEqual('Token Name')
+    expect(tokenSymbolInput.value).toEqual('SYMBOL')
+    expect(tokenDecimalsInput.value).toEqual('?')
+  })
 
-//     expect(contractAddressInput.textContent).toEqual('0x3432b6a6d9c964d0')
-//     await waitFor(() => expect(tokenNameInput.value).toEqual('Frame Test on Polygon'), { timeout: 200 })
-//     expect(tokenSymbolInput.value).toEqual('mFRT')
-//     expect(tokenDecimalsInput.value).toEqual('18')
-//   })
-// })
+  it('should populate fields with token data where available', async () => {
+    store.setPrimary('ethereum', 137, { connected: true })
+
+    const mockToken = { name: 'Frame Test on Polygon', symbol: 'mFRT', decimals: 18, totalSupply: '1066' }
+
+    const { getByLabelText, getByRole } = render(
+      <AddToken
+        data={{
+          notifyData: {
+            chainId: 1,
+            address: '0x64aa3364F17a4D01c6f1751Fd97C2BD3D7e7f1D4',
+            tokenData: mockToken
+          }
+        }}
+      />
+    )
+
+    const contractAddressInput = getByRole('heading')
+    const tokenNameInput = getByLabelText('Token Name')
+    const tokenSymbolInput = getByLabelText('Symbol')
+    const tokenDecimalsInput = getByLabelText('Decimals')
+
+    expect(contractAddressInput.textContent).toEqual('0x64aa3364D7e7f1D4')
+    await waitFor(() => expect(tokenNameInput.value).toEqual('Frame Test on Polygon'), { timeout: 200 })
+    expect(tokenSymbolInput.value).toEqual('mFRT')
+    expect(tokenDecimalsInput.value).toEqual('18')
+  })
+})

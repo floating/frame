@@ -119,6 +119,7 @@ class AddTokenAddressScreenComponent extends Component {
   }
 
   async resolveTokenData(contractAddress, chainId) {
+    if (this.isConnectedChain()) this.setState({ fetchingData: true })
     const tokenData = await link.invoke('tray:getTokenDetails', contractAddress, chainId)
     const error = tokenData.totalSupply ? null : unableToVerifyError
     return navForward({ error, tokenData, address: contractAddress, chainId })
@@ -133,7 +134,6 @@ class AddTokenAddressScreenComponent extends Component {
 
   submit(address) {
     const { chainId } = this.props
-    if (!this.isConnectedChain()) return
     if (!isValidAddress(address))
       return navForward({
         error: invalidFormatError,
@@ -141,8 +141,6 @@ class AddTokenAddressScreenComponent extends Component {
         address,
         chainId
       })
-
-    this.setState({ fetchingData: true })
     this.resolveTokenData(address, chainId)
   }
 
@@ -293,7 +291,9 @@ class AddTokenFormScreenComponent extends Component {
       <div className='notifyBoxWrap cardShow' onMouseDown={(e) => e.stopPropagation()}>
         <div className='notifyBoxSlide'>
           <div className='addTokenTop'>
-            <div className='addTokenTitle'>{isEdit ? 'Add New Token' : 'Edit Token'}</div>
+            <div className='addTokenTitle' data-testid='addTokenFormTitle'>
+              {isEdit ? 'Edit Token' : 'Add New Token'}
+            </div>
             <div className='newTokenChainSelectTitle'>
               <div className='newTokenChainAddress' role='heading' aria-level='2'>
                 {address.substring(0, 10)}
@@ -405,7 +405,7 @@ class AddTokenFormScreenComponent extends Component {
                 </label>
               </div>
             </div>
-            <div className='tokenRow'>
+            <div role='button' className='tokenRow'>
               {newTokenReady ? (
                 <div
                   className='addTokenSubmit addTokenSubmitEnabled'
