@@ -110,9 +110,8 @@ const detectMouse = () => {
 }
 
 function initWindow(id: string, opts: Electron.BrowserWindowConstructorOptions) {
-  const windowDir = id === 'tray' ? 'app' : id
   const url = enableHMR
-    ? `http://localhost:1234/${windowDir}/${id}.dev.html`
+    ? `http://localhost:1234/app/${id}.dev.html`
     : new URL(path.join(process.env.BUNDLE_LOCATION, `${id}.html`), 'file:')
 
   windows[id] = createWindow(id, opts)
