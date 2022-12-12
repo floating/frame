@@ -169,9 +169,6 @@
   },
   "alias": {
     "crypto": false,
-    "http": false,
-    "https": false,
-    "os": false,
     "path": false,
     "punycode": false,
     "querystring": false,
