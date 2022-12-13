@@ -460,7 +460,7 @@ class Account extends React.Component {
       // Not currently selected, but another signer is
       style.pointerEvents = 'none'
       style.transition = '300ms cubic-bezier(.82,0,.12,1) all'
-      if (selectedAccountOpen) {
+      if (open) {
         signerTopClass += ' signerTopNoHover'
         // Not open, but another signer is
         style.transform = index > initialIndex ? 'translate(0px, 100px)' : 'translate(0px, -20px)'
