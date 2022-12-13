@@ -73,18 +73,20 @@ export default class Erc20Contract {
 
   async getTokenData() {
     const calls = await Promise.all([
-      ['decimals', this.contract.decimals().catch(() => 0)],
-      ['name', this.contract.name().catch(() => '')],
-      ['symbol', this.contract.symbol().catch(() => '')],
-      [
-        'totalSupply',
-        this.contract
-          .totalSupply()
-          .then((supply: BigNumber) => supply.toString())
-          .catch(() => '')
-      ] // totalSupply is mandatory on the ERC20 interface
+      this.contract.decimals().catch(() => 0),
+      this.contract.name().catch(() => ''),
+      this.contract.symbol().catch(() => ''),
+      this.contract
+        .totalSupply()
+        .then((supply: BigNumber) => supply.toString())
+        .catch(() => '') // totalSupply is mandatory on the ERC20 interface
     ])
 
-    return Object.fromEntries(calls)
+    return {
+      decimals: calls[0],
+      name: calls[1],
+      symbol: calls[2],
+      totalSupply: calls[3]
+    }
   }
 }

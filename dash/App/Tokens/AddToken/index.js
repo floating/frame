@@ -263,6 +263,8 @@ class AddTokenFormScreenComponent extends Component {
       logoURI: this.isDefault('logoURI') ? '' : logoURI
     }
     const backSteps = isEdit ? 1 : 3
+    console.log('Inside save token')
+
     link.send('tray:addToken', token, req)
     setTimeout(() => {
       link.send('nav:back', 'dash', backSteps)
