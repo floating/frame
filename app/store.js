@@ -10,7 +10,7 @@ import link from '../resources/link'
 //   initialScrollPos: (u, pos) => u('selected.position.scrollTop', () => pos)
 // }
 
-import * as actions from './store.actions'
+import * as actions from '../resources/store/actions.panel'
 
 export default (state, cb) => {
   const store = Restore.create(state, actions)

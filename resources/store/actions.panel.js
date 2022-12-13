@@ -11,14 +11,13 @@ module.exports = {
       return Object.assign(module, update)
     })
   },
-  //   pathSync: (u, path, value) => u(path, () => value),
-  //   syncPanel: (u, panel) => u('panel', _ => panel),
+  pathSync: (u, path, value) => u(path, () => value),
+  syncPanel: (u, panel) => u('panel', () => panel),
   setSigner: (u, signer) => {
-    u('selected.current', (_) => signer.id)
-    u('selected.minimized', (_) => false)
-    u('selected.open', (_) => true)
+    u('selected.current', () => signer.id)
+    u('selected.minimized', () => false)
+    u('selected.open', () => true)
   },
-
   setSettingsView: (u, index, subindex = 0) => {
     u('selected.settings.viewIndex', () => index)
     u('selected.settings.subIndex', () => subindex)
@@ -32,8 +31,8 @@ module.exports = {
   },
   setBalance: (u, account, balance) => u('balances', account, (b) => balance),
   notify: (u, type, data = {}) => {
-    u('view.notify', (_) => type)
-    u('view.notifyData', (_) => data)
+    u('view.notify', () => type)
+    u('view.notifyData', () => data)
   },
   clickGuard: (u, on) => u('view.clickGuard', () => on),
   toggleAddAccount: (u) => u('view.addAccount', (show) => !show),
@@ -44,17 +43,17 @@ module.exports = {
   },
   setPanelView: (u, view) => u('panel.view', () => view),
   trayOpen: (u, open) => {
-    u('tray.open', (_) => open)
+    u('tray.open', () => open)
     if (open && trayInitial) {
       trayInitial = false
       setTimeout(() => {
-        u('tray.initial', (_) => false)
+        u('tray.initial', () => false)
       }, 30)
     }
   },
   setSignerView: (u, view) => {
-    u('selected.showAccounts', (_) => false)
-    u('selected.view', (_) => view)
+    u('selected.showAccounts', () => false)
+    u('selected.view', () => view)
   },
   accountPage: (u, page) => {
     u('selected.accountPage', () => page)
@@ -66,20 +65,20 @@ module.exports = {
       return events
     })
   },
-  setView: (u, view) => u('selected.view', (_) => view),
+  setView: (u, view) => u('selected.view', () => view),
   toggleDataView: (u, id) => {
     u('selected.requests', id, 'viewData', (view) => !view)
   },
   updateExternalRates: (u, rates) => u('main.rates', () => rates),
   resetSigner: (u) => {
-    u('selected.view', (_) => 'default')
-    u('selected.showAccounts', (_) => false)
+    u('selected.view', () => 'default')
+    u('selected.showAccounts', () => false)
   },
   unsetSigner: (u) => {
-    u('selected.minimized', (_) => true)
-    u('selected.open', (_) => false)
+    u('selected.minimized', () => true)
+    u('selected.open', () => false)
     resetSigner(u)
-    setTimeout((_) => {
+    setTimeout(() => {
       u('selected', (signer) => {
         signer.last = signer.current
         signer.current = ''
@@ -89,10 +88,10 @@ module.exports = {
       })
     }, 520)
   },
-  nodeProvider: (u, connected) => u('node.provider', (_) => connected),
-  setCurrent: (u, id) => u('view.current', (_) => id),
+  nodeProvider: (u, connected) => u('node.provider', () => connected),
+  setCurrent: (u, id) => u('view.current', () => id),
   updateUrl: (u, id, url) => u('view.data', id, 'url', () => url),
-  updateTitle: (u, id, title) => u('view.data', id, 'title', (_) => title),
+  updateTitle: (u, id, title) => u('view.data', id, 'title', () => title),
   reorderTabs: (u, from, to) => {
     u('view.list', (list) => {
       const _from = list[from]
@@ -103,7 +102,7 @@ module.exports = {
   },
   newView: (u) => {
     const id = v4()
-    u('view.current', (_) => id)
+    u('view.current', () => id)
     u('view.list', (list) => {
       list.push(id)
       return list
@@ -125,6 +124,6 @@ module.exports = {
       return view
     })
   },
-  initialSignerPos: (u, pos) => u('selected.position.initial', (_) => pos),
-  initialScrollPos: (u, pos) => u('selected.position.scrollTop', (_) => pos)
+  initialSignerPos: (u, pos) => u('selected.position.initial', () => pos),
+  initialScrollPos: (u, pos) => u('selected.position.scrollTop', () => pos)
 }
