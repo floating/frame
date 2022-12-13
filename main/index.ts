@@ -330,8 +330,8 @@ app.on('ready', () => {
     }
   })
   store.observer(() => {
-    if (!store('windows.dawn.showing')) {
-      windows.hideDawn()
+    if (!store('windows.onboard.showing')) {
+      windows.hideOnboard()
       windows.focusTray()
     }
   })

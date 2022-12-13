@@ -27,7 +27,7 @@ class App extends React.Component {
           <div className='overlay' />
           <div className='mainLeft'></div>
           <div className='main'>
-            <StyledButton>{'A New Dawn'}</StyledButton>
+            <StyledButton>{'Onboard'}</StyledButton>
           </div>
         </div>
       </div>

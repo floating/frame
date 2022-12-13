@@ -14,7 +14,7 @@ const importMap = {
   tray: () => import('./Tray'),
   dash: () => import('./Dash'),
   dapp: () => import('./Dapp'),
-  dawn: () => import('./Dawn'),
+  onboard: () => import('./Onboard'),
   flow: () => import('./Flow')
 }
 
