@@ -12,24 +12,24 @@ class _RequestItem extends React.Component {
   constructor(props, context) {
     super(props, context)
     this.state = {
-      ago: this.getElapsedTime() + ' ago'
+      ago: this.getElapsedTime()
     }
   }
   getElapsedTime() {
     const elapsed = Date.now() - ((this.props.req && this.props.req.created) || 0)
-    const secs = elapsed / 1000
-    const mins = secs / 60
-    const hrs = mins / 60
-    const days = hrs / 24
-    if (days >= 1) return Math.round(days) + 'd'
-    if (hrs >= 1) return Math.round(hrs) + 'h'
-    if (mins >= 1) return Math.round(mins) + 'm'
-    if (secs >= 1) return Math.round(secs) + 's'
-    return '0s'
+    const secs = Math.floor(elapsed / 1000)
+    const mins = Math.floor(secs / 60)
+    const hrs = Math.floor(mins / 60)
+    const days = Math.floor(hrs / 24)
+    if (days >= 1) return days + 'd ago'
+    if (hrs >= 1) return hrs + 'h ago'
+    if (mins >= 1) return mins + 'm ago'
+    if (secs >= 30) return secs + 's ago'
+    return 'NEW'
   }
   componentDidMount() {
     this.timer = setInterval(() => {
-      this.setState({ ago: this.getElapsedTime() + ' ago' })
+      this.setState({ ago: this.getElapsedTime() })
     }, 1000)
   }
   componentWillUnmount() {
@@ -107,7 +107,13 @@ class _RequestItem extends React.Component {
                 </div>
               </div>
               <div className='requestItemTitleTime'>
-                <div className='requestItemTitleTimeItem'>{this.state.ago}</div>
+                {this.state.ago === 'NEW' ? (
+                  <div className='requestItemTitleTimeItem' style={{ color: 'var(--good)' }}>
+                    {this.state.ago}
+                  </div>
+                ) : (
+                  <div className='requestItemTitleTimeItem'>{this.state.ago}</div>
+                )}
               </div>
               <div className={requestItemDetailsClass}>
                 <div className={inactive ? 'requestItemWave requestItemWaveDisabled' : 'requestItemWave'}>
