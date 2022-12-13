@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 import link from '../../../../../resources/link'
 import svg from '../../../../../resources/svg'
@@ -204,10 +204,12 @@ export const EditChainExplorer = ({ currentExplorer, onChange }) => {
 }
 
 export const EditRPC = ({ currentRPC, label, rpcDefault = 'RPC Endpoint', onChange }) => {
+  const [editing, setEditing] = useState(false)
   const id = label
     .split(' ')
     .map((s) => s.toLowerCase())
     .join('-')
+
   return (
     <div className='chainRow'>
       <label htmlFor={id} className='chainInputLabel'>
@@ -215,17 +217,17 @@ export const EditRPC = ({ currentRPC, label, rpcDefault = 'RPC Endpoint', onChan
       </label>
       <input
         id={id}
-        className={currentRPC === rpcDefault ? 'chainInput chainInputDim' : 'chainInput'}
-        value={currentRPC}
+        className={!currentRPC ? 'chainInput chainInputDim' : 'chainInput'}
+        value={currentRPC || (!editing && rpcDefault) || ''}
         spellCheck='false'
         onChange={(e) => {
           onChange(e.target.value)
         }}
-        onFocus={(e) => {
-          if (e.target.value === rpcDefault) onChange('')
+        onFocus={() => {
+          setEditing(true)
         }}
-        onBlur={(e) => {
-          if (e.target.value === '') onChange(rpcDefault)
+        onBlur={() => {
+          setEditing(false)
         }}
       />
     </div>
