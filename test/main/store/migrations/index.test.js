@@ -1157,50 +1157,47 @@ describe('migration 29', () => {
 })
 
 describe('migration 30', () => {
+  const address = '0xFeebabE6b0418eC13b30aAdF129F5DcDd4f70CeA'
+
+  const existingAccount = {
+    name: 'my test aragon dao',
+    created: 'new:1670583718135',
+    lastSignerType: 'aragon',
+    smart: {
+      type: 'aragon',
+      actor: 'my acting account',
+      dao: '0x0c188b183ff758500d1d18b432313d10e9f6b8a4',
+      agent: address
+    }
+  }
+
   beforeEach(() => {
     state = {
       main: {
         _version: 29,
         accounts: {
-          'test dao agent address': {
-            name: 'my test aragon dao',
-            smart: {
-              type: 'aragon',
-              actor: 'my acting account',
-              dao: '0x0c188b183ff758500d1d18b432313d10e9f6b8a4',
-              agent: 'test dao agent address'
-            }
-          },
-          look: {
-            name: 'such a cool account'
-          }
+          [address]: existingAccount
         }
       }
     }
-    jest.setSystemTime(new Date('2022-12-09T11:01:58.135Z'))
   })
 
-  it('should migrate existing aragon accounts to watch only with a timestamp', () => {
+  it('should migrate existing aragon accounts to watch only', () => {
     const updatedState = migrations.apply(state, 30)
     const { accounts } = updatedState.main
 
-    expect(accounts).toStrictEqual({
-      'test dao agent address': {
-        id: 'test dao agent address',
-        name: 'my test aragon dao',
-        address: 'test dao agent address',
-        lastSignerType: 'address',
-        created: 'new:1670583718135',
-        status: 'ok',
-        active: false,
-        signer: '',
-        requests: {},
-        ensName: '',
-        balances: {}
-      },
-      look: {
-        name: 'such a cool account'
-      }
+    expect(accounts[address]).toStrictEqual({
+      id: address,
+      name: existingAccount.name,
+      address,
+      lastSignerType: 'address',
+      created: existingAccount.created,
+      status: 'ok',
+      active: false,
+      signer: '',
+      requests: {},
+      ensName: '',
+      balances: {}
     })
   })
 
@@ -1208,16 +1205,12 @@ describe('migration 30', () => {
     state.main.accounts['test dao agent address'] = {
       name: 'not really an aragon dao'
     }
+
     const updatedState = migrations.apply(state, 30)
     const { accounts } = updatedState.main
 
-    expect(accounts).toStrictEqual({
-      'test dao agent address': {
-        name: 'not really an aragon dao'
-      },
-      look: {
-        name: 'such a cool account'
-      }
+    expect(accounts['test dao agent address']).toStrictEqual({
+      name: 'not really an aragon dao'
     })
   })
 })
