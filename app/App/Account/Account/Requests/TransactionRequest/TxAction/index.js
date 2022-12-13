@@ -11,7 +11,7 @@ import {
   ClusterValue
 } from '../../../../../../../resources/Components/Cluster'
 import { formatDisplayInteger, isUnlimited } from '../../../../../../../resources/utils/numbers'
-import { DisplayValue } from '../../../../../../../resources/Components/DisplayValue'
+import { DisplayValue, DisplayCoinBalance } from '../../../../../../../resources/Components/DisplayValue'
 import { getAddress } from '../../../../../../../resources/utils'
 
 class TxSending extends React.Component {
@@ -65,12 +65,7 @@ class TxSending extends React.Component {
               <ClusterRow>
                 <ClusterValue grow={2}>
                   <div className='txSendingValue'>
-                    <DisplayValue
-                      type='ether'
-                      value={amount}
-                      valueDataParams={{ decimals }}
-                      currencySymbol={symbol}
-                    />
+                    <DisplayCoinBalance amount={amount} decimals={decimals} symbol={symbol} />
                   </div>
                 </ClusterValue>
                 <ClusterValue>

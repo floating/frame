@@ -15,6 +15,16 @@ const Main = ({ displayValue }) => <span className='displayValueMain'>{displayVa
 
 const Unit = ({ displayUnit }) => <span className='displayValueUnit'>{displayUnit.shortName}</span>
 
+export const DisplayCoinBalance = ({ amount, decimals, symbol }) => (
+  <DisplayValue
+    type='ether'
+    value={amount}
+    valueDataParams={{ decimals }}
+    currencySymbol={symbol}
+    currencySymbolPosition='last'
+  />
+)
+
 export const DisplayFiatPrice = ({ decimals, currencyRate, isTestnet }) => (
   <DisplayValue
     type='fiat'
