@@ -60,10 +60,10 @@
   overflow hidden
   font-family 'MainFont'
   font-weight 300
-  box-shadow 0px 4px 6px var(--ghostY)
-  border-bottom 2px solid var(--ghostZ)
-  border-radius 8px
-  background var(--ghostA)
+  // box-shadow 0px 4px 6px var(--ghostY)
+  // border-bottom 2px solid var(--ghostZ)
+  // border-radius 8px
+  // background var(--ghostA)
   cursor pointer
   position relative
   width 100%
@@ -72,8 +72,8 @@
   overflow hidden
   font-family 'MainFont'
   font-weight 300
-  box-shadow 0px 4px 6px var(--ghostY)
-  border-bottom 2px solid var(--ghostZ)
+  // box-shadow 0px 4px 6px var(--ghostY)
+  // border-bottom 2px solid var(--ghostZ)
   cursor pointer
   transition all linear 0.1s
   // background blue
@@ -136,31 +136,6 @@
       padding-left 8px
       top -1px
       position relative
-
-  .requestItemDetailsSlide
-    display flex
-    align-items center
-
-  .requestItemDetailsIndicator
-    height 12px
-    width 12px
-    margin 0px 1px
-    display flex
-    justify-content center
-    align-items center
-    border-radius 6px
-    box-shadow inset 0px 0px 3px var(--ghostY)
-
-    .requestItemDetailsIndicatorMarker
-      height 6px
-      width 6px
-      border-radius 3px
-      background var(--moon)
-      z-index 4
-      position relative
-      top -1px
-      animation lit infinite ease-in-out alternate 1s
-      will-change opacity
 
   .requestItemDetailsIndicatorStill
     .requestItemDetailsIndicatorMarker
@@ -313,9 +288,11 @@
     align-items center
     font-size 15px
     font-weight 300
-    border-radius 26px
-    margin 8px 8px 4px 8px
+    // border-radius 26px
+    // margin 8px 8px 4px 8px
+    padding 15px 12px 6px 12px
     overflow hidden
+    // background blue
 
     .requestItemTitleTime
       height 32px
@@ -333,13 +310,11 @@
         font-weight 400
 
     .requestItemMain
-      height 36px
+      //  height 36px
       display flex
       justify-content flex-start
-      // align-items center
       flex-direction column
       box-sizing border-box
-      // background red
 
       .requestItemTitleMain
         white-space nowrap
@@ -357,7 +332,7 @@
     .requestItemTitleMain
       font-weight 400
       margin-left 8px
-      top -2px
+      // top -2px
 
   .requestItemTitleSub
     display flex
@@ -437,6 +412,38 @@
     transform scaleX(-1)
     position relative
     left 1px
+
+  .requestItemDetailsSlide
+    display flex
+    align-items center
+    text-transform uppercase
+    font-size 10px
+    font-weight 500
+    padding-left 6px
+    letter-spacing 1px
+    padding-top 4px
+
+  .requestItemDetailsIndicator
+    height 12px
+    width 12px
+    display flex
+    justify-content center
+    align-items center
+    border-radius 6px
+    box-shadow inset 0px 0px 3px var(--ghostX)
+    margin-right 4px
+
+    .requestItemDetailsIndicatorMarker
+      height 6px
+      width 6px
+      border-radius 3px
+      background var(--moon)
+      z-index 4
+      position relative
+      top 0px
+      animation lit infinite ease-in-out alternate 1s
+      will-change opacity
+
 
 // .requestItem:hover
 //   background-position 0% 0%

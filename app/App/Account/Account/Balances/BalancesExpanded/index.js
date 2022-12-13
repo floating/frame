@@ -161,7 +161,7 @@ class BalancesExpanded extends React.Component {
             </div>
           </div>
           <div className='signerBalanceTotalText'>
-            <div className='signerBalanceTotalLabel'>{'Total: '}</div>
+            <div className='signerBalanceTotalLabel'>{'Total'}</div>
             <div className='signerBalanceTotalValue'>
               {svg.usd(11)}
               {balances.length > 0 ? totalDisplayValue : '---.--'}

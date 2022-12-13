@@ -257,7 +257,7 @@ class _AccountView extends React.Component {
       >
         <div className='accountViewMenu cardShow'>
           <div className='accountViewBack' onClick={() => this.props.back()}>
-            {svg.chevronLeft(13)}
+            {svg.chevronLeft(16)}
           </div>
           <div className='accountViewTitle'>
             <div className='accountViewIcon'>{this.props.accountViewIcon}</div>

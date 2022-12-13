@@ -83,7 +83,7 @@ class Requests extends React.Component {
   // }
 
   renderPreview() {
-    console.log('this.props.moduleId', this.props.moduleId)
+    const reqCount = Object.keys(this.store('main.accounts', this.props.account, 'requests') || {}).length
     return (
       <div ref={this.moduleRef} className='balancesBlock'>
         <div
@@ -100,12 +100,21 @@ class Requests extends React.Component {
           }}
         >
           <div className={'requestPreviewContent'}>
-            <span>{svg.inbox(13)}</span>
-            <span>{'View Requests'}</span>
+            <div className={'requestPreviewContentTitle'}>
+              <span style={reqCount ? { color: 'var(--good)' } : {}}>{svg.inbox(13)}</span>
+              <span>{reqCount ? (reqCount === 1 ? '1 Request' : reqCount + ' Requests') : 'Requests'}</span>
+            </div>
+            <div className={'requestPreviewContentArrow'} style={reqCount ? { color: 'var(--good)' } : {}}>
+              {svg.arrowRight(14)}
+              {svg.arrowRight(14)}
+              {svg.arrowRight(14)}
+            </div>
           </div>
-          <div className={'requestsPreviewArrow1'} />
-          <div className={'requestsPreviewArrow2'} />
-          <div className={'requestsPreviewArrow3'} />
+          <div className={'requestsPreviewArrow'}>
+            <div className={'requestsPreviewArrow1'} />
+          </div>
+          {/* <div className={'requestsPreviewArrow2'} />
+          <div className={'requestsPreviewArrow3'} /> */}
           <div className={'requestsPreviewOverlay'} />
         </div>
       </div>
@@ -118,12 +127,13 @@ class Requests extends React.Component {
     const proxyFavicon = `https://proxy.pylon.link?type=icon&target=${encodeURIComponent(favicon)}`
 
     return (
-      <>
+      <ClusterBox>
         <div className='requestGroup'>
           {/* <RingIcon img={favicon} alt={'?'} small noRing /> */}
+          <div style={{ marginRight: '8px' }}>{svg.window(12)}</div>
           <div className='requestGroupName'>{groupName}</div>
         </div>
-        <div className='requestContainer'>
+        <Cluster>
           {!requests.length ? (
             <div key='noReq' className='noRequests'>
               No Pending Requests
@@ -320,8 +330,11 @@ class Requests extends React.Component {
               )
             }
           })}
-        </div>
-      </>
+        </Cluster>
+        {/* <div className='requestContainer'>
+          
+        </div> */}
+      </ClusterBox>
     )
   }
 
@@ -350,15 +363,15 @@ class Requests extends React.Component {
 
     return (
       <div className='accountViewScroll'>
-        <div className='requestContainerWrap'>
-          {groups.length === 0 ? (
+        {groups.length === 0 ? (
+          <div className='requestContainerWrap'>
             <div className='requestContainerEmpty'>{'NO PENDING REQUESTS'}</div>
-          ) : (
-            groups.map((origin) => {
-              return this.renderRequestGroup(origin, originSortedRequests[origin])
-            })
-          )}
-        </div>
+          </div>
+        ) : (
+          groups.map((origin) => {
+            return this.renderRequestGroup(origin, originSortedRequests[origin])
+          })
+        )}
       </div>
     )
   }

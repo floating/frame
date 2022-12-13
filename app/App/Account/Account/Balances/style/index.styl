@@ -96,7 +96,9 @@
     height 40px
     margin-left 13px
     background var(--ghostA)
-    border 3px solid var(--ghostZ)
+    border 2px solid var(--ghostY)
+    box-shadow 0px 1px 2px var(--ghostY)
+    // background blue
     border-radius 20px
     box-sizing border-box
     cursor pointer
@@ -128,24 +130,23 @@
     display flex
     justify-content flex-end
     align-items center
-    font-family VCR
+    color var(--mint)
 
     .signerBalanceTotalLabel
-      margin-right 10px
+      margin-right 6px
       margin-top 1px
       text-transform uppercase
-      font-size 10px
-      letter-spacing 1px
-      font-weight 500
+      font-size 12px
+      letter-spacing 0.5px
+      font-weight 600
 
     .signerBalanceTotalValue
       font-size 18px
-      // font-family 'FiraCode'
+      font-family 'FiraCode'
       letter-spacing -1px
       text-align center
       display flex
       align-items center
-      opacity 0.8
 
 .signerBalancesLoading
   position absolute
@@ -181,14 +182,15 @@
   position relative
   opacity 1
   height 70px
+  width 100%
   transition 0.1s ease-out all
-  background var(--ghostA)
-  border-radius 8px
-  margin-top 1px
+  // background var(--ghostA)
+  /// border-radius 8px
+  // margin-top 1px
   font-family 'MainFont'
   overflow hidden
-  box-shadow 0px 4px 6px var(--ghostY)
-  border-bottom 2px solid var(--ghostZ)
+  // box-shadow 0px 4px 6px var(--ghostY)
+  // border-bottom 2px solid var(--ghostZ)
 
   @keyframes sheenLoad
     0%
@@ -221,7 +223,7 @@
   .signerBalanceCurrency
     position absolute
     left 62px
-    top 26px
+    top 25px
     right 135px
     font-size 15px
     display flex
@@ -234,7 +236,7 @@
   .signerBalanceChain
     position absolute
     left 60px
-    top 9px
+    top 8px
     font-size 10px
     display flex
     align-items center
@@ -254,12 +256,11 @@
     left 62px
     font-size 12px
     font-weight 400
-    // color var(--outerspace06)
+    color var(--mint)
     display flex
     align-items center
     justify-content space-between
     font-family 'FiraCode'
-    opacity 0.6
 
   .signerBalanceOk
     display flex
@@ -273,7 +274,6 @@
   .signerBalanceCurrentPrice
     display flex
     align-items center
-    color var(--outerspace)
     margin-left -2px
 
   .signerBalanceCurrentPriceChange
@@ -341,7 +341,7 @@
   .signerBalanceValue
     position absolute
     right 10px
-    top 23px
+    top 22px
     font-size 20px
     text-align center
     display flex

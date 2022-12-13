@@ -3,6 +3,8 @@ import Restore from 'react-restore'
 
 import RingIcon from '../../../resources/Components/RingIcon'
 
+import { ClusterRow, ClusterValue } from '../../../resources/Components/Cluster'
+
 import link from '../../../resources/link'
 import svg from '../../../resources/svg'
 
@@ -54,80 +56,71 @@ class _RequestItem extends React.Component {
     const inactive = ['error', 'declined', 'confirmed'].includes(req.status)
 
     return (
-      <div
-        key={req.handlerId}
-        className={headerMode ? 'requestItem requestItemHeader' : 'requestItem'}
-        onClick={
-          !headerMode
-            ? () => {
-                const crumb = {
-                  view: 'requestView',
-                  data: {
-                    step: 'confirm',
-                    accountId: account,
-                    requestId: req.handlerId
-                  },
-                  position: {
-                    bottom: req.type === 'transaction' ? '200px' : '140px'
+      <ClusterRow>
+        <ClusterValue
+          onClick={
+            !headerMode
+              ? () => {
+                  const crumb = {
+                    view: 'requestView',
+                    data: {
+                      step: 'confirm',
+                      accountId: account,
+                      requestId: req.handlerId
+                    },
+                    position: {
+                      bottom: req.type === 'transaction' ? '200px' : '140px'
+                    }
                   }
+                  link.send('nav:forward', 'panel', crumb)
                 }
-                link.send('nav:forward', 'panel', crumb)
-              }
-            : null
-        }
-      >
-        <div
-          className='requestItemBackground'
-          style={{
-            background: `linear-gradient(180deg, ${color} 0%, transparent 80%)`
-          }}
-        />
-        <div className='requestItemTitle'>
-          <div className='requestItemTitleLeft'>
-            <div className='requestItemIcon'>
-              <RingIcon color={color} svgName={svgName} img={img} small={true} />
-            </div>
-            <div className='requestItemMain'>
-              <div className='requestItemTitleMain'>{title}</div>
-              <div className='requestItemDetailsSlide'>
-                <div
-                  className={
-                    inactive
-                      ? 'requestItemDetailsIndicator requestItemDetailsIndicatorStill'
-                      : 'requestItemDetailsIndicator'
-                  }
-                >
-                  <div className='requestItemDetailsIndicatorMarker' />
+              : null
+          }
+        >
+          <div key={req.handlerId} className={headerMode ? 'requestItem requestItemHeader' : 'requestItem'}>
+            <div
+              className='requestItemBackground'
+              style={{
+                background: `linear-gradient(180deg, ${color} 0%, transparent 80%)`
+              }}
+            />
+            <div className='requestItemTitle'>
+              <div className='requestItemTitleLeft'>
+                <div className='requestItemIcon'>
+                  <RingIcon color={color} svgName={svgName} img={img} small={true} />
                 </div>
-                <span>{status}</span>
-                {/* <div className='requestItemDetailsIndicator' /> */}
-              </div>
-            </div>
-          </div>
-          <div className='requestItemTitleTime'>
-            <div className='requestItemTitleTimeItem'>{this.state.ago}</div>
-          </div>
-          <div className={requestItemDetailsClass}>
-            {headerMode ? (
-              <div className={inactive ? 'requestItemWave requestItemWaveDisabled' : 'requestItemWave'}>
-                <div className='requestItemLine'>{svg.sine()}</div>
-                <div className='requestItemLine requestItemLineShadow'>{svg.sine()}</div>
-              </div>
-            ) : (
-              <div className='requestItemDetailsView'>
-                <div className='requestItemDetailsViewText'>{`View`}</div>
-                <div className='requestItemDetailsViewArrow'>
-                  <div>{svg.chevron(15)}</div>
-                  <div>{svg.chevron(15)}</div>
-                  <div>{svg.chevron(15)}</div>
+                <div className='requestItemMain'>
+                  <div className='requestItemTitleMain'>{title}</div>
+                  <div className='requestItemDetailsSlide'>
+                    <div
+                      className={
+                        inactive
+                          ? 'requestItemDetailsIndicator requestItemDetailsIndicatorStill'
+                          : 'requestItemDetailsIndicator'
+                      }
+                    >
+                      <div className='requestItemDetailsIndicatorMarker' />
+                    </div>
+                    <span>{status}</span>
+                    {/* <div className='requestItemDetailsIndicator' /> */}
+                  </div>
                 </div>
               </div>
-            )}
+              <div className='requestItemTitleTime'>
+                <div className='requestItemTitleTimeItem'>{this.state.ago}</div>
+              </div>
+              <div className={requestItemDetailsClass}>
+                <div className={inactive ? 'requestItemWave requestItemWaveDisabled' : 'requestItemWave'}>
+                  <div className='requestItemLine'>{svg.sine()}</div>
+                  <div className='requestItemLine requestItemLineShadow'>{svg.sine()}</div>
+                </div>
+              </div>
+            </div>
+            <div style={headerMode ? { pointerEvents: 'auto' } : { pointerEvents: 'none' }}>{children}</div>
+            {notice && notice !== status && <div className={requestItemNoticeClass}>{notice}</div>}
           </div>
-        </div>
-        <div style={headerMode ? { pointerEvents: 'auto' } : { pointerEvents: 'none' }}>{children}</div>
-        {notice && notice !== status && <div className={requestItemNoticeClass}>{notice}</div>}
-      </div>
+        </ClusterValue>
+      </ClusterRow>
     )
   }
 }

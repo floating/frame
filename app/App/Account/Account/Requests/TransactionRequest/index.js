@@ -68,7 +68,7 @@ class TransactionRequest extends React.Component {
 
     const status = req.status
     const mode = req.mode
-    let requestClass = 'signerRequest'
+    let requestClass = 'signerRequest cardShow'
     const success = req.status === 'confirming' || req.status === 'confirmed'
     const error = req.status === 'error' || req.status === 'declined'
     if (success) requestClass += ' signerRequestSuccess'
