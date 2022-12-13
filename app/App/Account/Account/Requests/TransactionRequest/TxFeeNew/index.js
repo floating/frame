@@ -2,7 +2,7 @@ import React from 'react'
 import Restore from 'react-restore'
 import BigNumber from 'bignumber.js'
 
-import { DisplayValue } from '../../../../../../../resources/Components/DisplayValue'
+import { DisplayCoinBalance, DisplayValue } from '../../../../../../../resources/Components/DisplayValue'
 import { GasFeesSource, usesBaseFee } from '../../../../../../../resources/domain/transaction'
 import { displayValueData } from '../../../../../../../resources/utils/displayValue'
 import link from '../../../../../../../resources/link'
@@ -101,7 +101,11 @@ class TxFee extends React.Component {
             <ClusterColumn grow={2}>
               <ClusterValue>
                 <div className='txSendingValue'>
-                  <DisplayValue type='ether' valueData={maxFee} currencySymbol={nativeCurrency.symbol} />
+                  <DisplayCoinBalance
+                    amount={maxFee.wei().value.toString()}
+                    decimals={18}
+                    symbol={nativeCurrency.symbol}
+                  />
                 </div>
               </ClusterValue>
               <ClusterValue>
