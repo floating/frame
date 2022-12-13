@@ -395,6 +395,10 @@ class Dawn {
         windows.dawn.show()
       })
 
+      windows.dawn.on('close', () => {
+        delete windows.dawn
+      })
+
       const area = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
       const height = area.height - 160
       const maxWidth = Math.floor(height * 1.24)
