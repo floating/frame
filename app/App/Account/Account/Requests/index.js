@@ -130,8 +130,11 @@ class Requests extends React.Component {
       <ClusterBox>
         <div className='requestGroup'>
           {/* <RingIcon img={favicon} alt={'?'} small noRing /> */}
-          <div style={{ marginRight: '8px' }}>{svg.window(12)}</div>
-          <div className='requestGroupName'>{groupName}</div>
+          <div className='requestGroupMain'>
+            <div style={{ marginRight: '8px' }}>{svg.window(12)}</div>
+            <div className='requestGroupName'>{groupName}</div>
+          </div>
+          <div className='requestGroupName'>{'clear all'}</div>
         </div>
         <Cluster>
           {!requests.length ? (
