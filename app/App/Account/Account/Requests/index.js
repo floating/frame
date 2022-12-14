@@ -24,8 +24,6 @@ class Requests extends React.Component {
     super(props, context)
     this.state = {
       minimized: false
-      // unlockInput: '',
-      // unlockHeadShake: false
     }
     this.moduleRef = React.createRef()
     if (!this.props.expanded) {
@@ -39,48 +37,13 @@ class Requests extends React.Component {
     }
   }
 
-  // trezorPin (num) {
-  //   this.tPin = this.tPin ? this.tPin + num.toString() : num.toString()
-  //   if (this.tPin.length === 4) {
-  //     link.rpc('trezorPin', this.props.account, this.tPin, (err, status) => {
-  //       if (err) throw new Error(err)
-  //     })
-  //     this.tPin = ''
-  //   }
-  // }
-
   minimize() {
     this.setState({ minimized: true })
   }
 
-  // unlockChange (e) {
-  //   this.setState({ unlockInput: e.target.value })
-  // }
-
-  // unlockSubmit (e) {
-  //   link.rpc('unlockSigner', this.props.signer.id, this.state.unlockInput, (err, result) => {
-  //     if (err) {
-  //       this.setState({ unlockHeadShake: true })
-  //       setTimeout(() => this.setState({ unlockHeadShake: false }), 1010)
-  //     }
-  //   })
-  // }
-
-  // keyPressUnlock (e) {
-  //   if (e.key === 'Enter') {
-  //     e.preventDefault()
-  //     this.unlockSubmit()
-  //   }
-  // }
-
   componentDidMount() {
     if (this.resizeObserver) this.resizeObserver.observe(this.moduleRef.current)
   }
-
-  // componentDidMount () {
-
-  //   // link.send('tray:action', 'updateAccountModule', this.props.account, { height: this.moduleRef.current.clientHeight })
-  // }
 
   renderPreview() {
     const reqCount = Object.keys(this.store('main.accounts', this.props.account, 'requests') || {}).length
@@ -113,8 +76,6 @@ class Requests extends React.Component {
           <div className={'requestsPreviewArrow'}>
             <div className={'requestsPreviewArrow1'} />
           </div>
-          {/* <div className={'requestsPreviewArrow2'} />
-          <div className={'requestsPreviewArrow3'} /> */}
           <div className={'requestsPreviewOverlay'} />
         </div>
       </div>
@@ -123,8 +84,8 @@ class Requests extends React.Component {
 
   renderRequestGroup(origin, requests) {
     const groupName = this.store('main.origins', origin, 'name')
-    const favicon = 'https://' + groupName + '/favicon.ico'
-    const proxyFavicon = `https://proxy.pylon.link?type=icon&target=${encodeURIComponent(favicon)}`
+    // const favicon = 'https://' + groupName + '/favicon.ico'
+    // const proxyFavicon = `https://proxy.pylon.link?type=icon&target=${encodeURIComponent(favicon)}`
 
     return (
       <ClusterBox>
@@ -334,17 +295,12 @@ class Requests extends React.Component {
             }
           })}
         </Cluster>
-        {/* <div className='requestContainer'>
-          
-        </div> */}
       </ClusterBox>
     )
   }
 
   renderExpanded() {
-    // console.log('this.props', this.props)
     const activeAccount = this.store('main.accounts', this.props.account)
-    // console.log('activeAccount', activeAccount)
     const requests = Object.values(activeAccount.requests || {})
       .sort((a, b) => {
         if (a.created > b.created) return -1

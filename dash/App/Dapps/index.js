@@ -181,9 +181,6 @@ class Dapps extends React.Component {
               <ChainOrigins chain={chain} origins={chainOrigins} primaryColor={primaryColor} icon={icon} />
             )
           })}
-          {/* <div className={'clearOriginsButton'} onClick={clearOriginsClickHandler}>
-            Clear All
-          </div> */}
         </div>
       )
     }

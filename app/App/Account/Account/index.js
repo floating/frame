@@ -43,16 +43,7 @@ class _AccountModule extends React.Component {
     return id === 'gas' ? (
       <Gas moduleId={id} id={account} expanded={expanded} filter={filter} />
     ) : id === 'requests' ? (
-      <Requests
-        moduleId={id}
-        account={account}
-        expanded={expanded}
-        filter={filter}
-        // addresses={this.props.addresses}
-        // minimized={this.props.minimized}
-        // status={this.props.status}
-        // signer={this.props.signer}
-      />
+      <Requests moduleId={id} account={account} expanded={expanded} filter={filter} />
     ) : id === 'activity' ? (
       <Activity moduleId={id} id={account} expanded={expanded} filter={filter} />
     ) : id === 'launcher' ? (

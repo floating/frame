@@ -18,18 +18,6 @@ class BalancesExpanded extends React.Component {
   constructor(...args) {
     super(...args)
     this.moduleRef = React.createRef()
-    // if (!this.props.expanded) {
-    //   this.resizeObserver = new ResizeObserver(() => {
-    //     clearTimeout(this.resizeTimer)
-    //     this.resizeTimer = setTimeout(() => {
-    //       if (this.moduleRef && this.moduleRef.current) {
-    //         link.send('tray:action', 'updateAccountModule', this.props.moduleId, {
-    //           height: this.moduleRef.current.clientHeight
-    //         })
-    //       }
-    //     }, 100)
-    //   })
-    // }
 
     this.state = {
       openActive: false,
@@ -39,14 +27,6 @@ class BalancesExpanded extends React.Component {
       expand: false,
       balanceFilter: ''
     }
-  }
-
-  componentDidMount() {
-    if (this.resizeObserver) this.resizeObserver.observe(this.moduleRef.current)
-  }
-
-  componentWillUnmount() {
-    if (this.resizeObserver) this.resizeObserver.disconnect()
   }
 
   getBalances(rawBalances, rates) {

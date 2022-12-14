@@ -572,9 +572,6 @@
 .requestsPreview:hover
   .requestsPreviewArrow
     transform translateX(0px)
-  // .requestPreviewContent
-  //   .requestPreviewContentArrow
-  //     color var(--good)
 
 .requestsPreview
   height 52px
@@ -588,17 +585,8 @@
   border-radius 26px
   cursor pointer
   overflow hidden
-  // transition var(--standardFast)
   *
     pointer-events none
-  // background blue
-  // background linear-gradient(45deg, var(--ghostY), var(--good))
-  // border 1px solid var(--ghostY)
-  // box-sizing border-box
-  // justify-content center
-  // background: -webkit-linear-gradient(0deg, var(), blue)
-  // -webkit-background-clip: text;
-  // -webkit-text-fill-color: transparent;
 
   .requestsPreviewOverlay
     position absolute
@@ -606,7 +594,6 @@
     right 0
     bottom 0
     left 0
-    // background linear-gradient(16deg, var(--overlayA), var(--overlayB))
     z-index 200
 
   .requestPreviewContent
@@ -661,28 +648,6 @@
       z-index 100
       filter blur(8px)
     
-  .requestsPreviewArrow2
-    position absolute
-    left -40px
-    // background var(--ghostZ)
-    width 257px
-    height 257px
-    transform rotate(45deg)
-    margin -7px
-    border-radius 8px
-    display none
-
-  .requestsPreviewArrow3
-    position absolute
-    left -80px
-    // background var(--ghostA)
-    width 257px
-    height 257px
-    transform rotate(45deg)
-    margin -7px
-    border-radius 8px
-    display none
-
   span
     margin-right 8px
 
@@ -692,7 +657,7 @@
     right 0
     bottom 0
     left 0
-    background var(--overlayA) // linear-gradient(-35deg, var(--overlayA) 0%, var(--overlayB) 100%)
+    background linear-gradient(-35deg, var(--overlayA) 0%, var(--overlayB) 100%)
     z-index 999
     pointer-events none
 
@@ -705,7 +670,6 @@
   transform translate3d(0, 0, 0)
   padding 0px 6px
   border-radius 26px
-  //backdrop-filter blur(2px)
 
   .accountModuleCard
     position relative
