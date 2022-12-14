@@ -185,13 +185,53 @@
   svg
     color var(--outerspace08)
 
+.requestGroup
+  padding 20px 20px 10px 20px
+  display flex
+  justify-content space-between
+
+  img 
+    border-radius 12px
+
+  .requestGroupMain
+    display flex
+    align-items center
+
+  .requestGroupName
+    font-weight 400
+    font-size 12px
+
+  .requestGroupButton
+    font-weight 400
+    font-size 12px
+    cursor pointer
+    opacity 0.8
+
+  .requestGroupButton:hover
+    opacity 1
+
 .requestContainerWrap
-  margin 0px 6px 6px 6px
-  padding 0px 3px 1px 3px
+  margin 12px 6px
+  padding 0px 3px 21px 3px
   box-sizing border-box
   overflow auto
   background var(--ghostZ)
-  border-radius 20px
+  position relative
+  min-height calc(100% - 25px)
+
+  .requestContainerEmpty
+    position absolute
+    top 0
+    right 0
+    bottom 100px
+    left 0
+    display flex
+    justify-content center
+    align-items center
+    font-family VCR
+    font-size 18px
+    letter-spacing 1px
+    font-weight 600
 
   .requestContainer
     width 100%

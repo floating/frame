@@ -2,6 +2,8 @@ import React from 'react'
 import Restore from 'react-restore'
 import link from '../../../../../../resources/link'
 
+import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../../resources/Components/Cluster'
+
 class Inventory extends React.Component {
   constructor(...args) {
     super(...args)
@@ -32,27 +34,29 @@ class Inventory extends React.Component {
     const displayCollections = this.displayCollections()
     return displayCollections.map((k) => {
       return (
-        <div
-          key={k}
-          className='inventoryCollection'
-          onClick={() => {
-            const crumb = {
-              view: 'expandedModule',
-              data: {
-                id: this.props.moduleId,
-                account: this.props.account,
-                currentCollection: k
+        <ClusterRow>
+          <ClusterValue
+            onClick={() => {
+              const crumb = {
+                view: 'expandedModule',
+                data: {
+                  id: this.props.moduleId,
+                  account: this.props.account,
+                  currentCollection: k
+                }
               }
-            }
-            link.send('nav:forward', 'panel', crumb)
-          }}
-        >
-          <div className='inventoryCollectionTop'>
-            <div className='inventoryCollectionName'>{inventory[k].meta.name}</div>
-            <div className='inventoryCollectionCount'>{Object.keys(inventory[k].items).length}</div>
-            <div className='inventoryCollectionLine' />
-          </div>
-        </div>
+              link.send('nav:forward', 'panel', crumb)
+            }}
+          >
+            <div key={k} className='inventoryCollection'>
+              <div className='inventoryCollectionTop'>
+                <div className='inventoryCollectionName'>{inventory[k].meta.name}</div>
+                <div className='inventoryCollectionCount'>{Object.keys(inventory[k].items).length}</div>
+                <div className='inventoryCollectionLine' />
+              </div>
+            </div>
+          </ClusterValue>
+        </ClusterRow>
       )
     })
   }
@@ -62,15 +66,25 @@ class Inventory extends React.Component {
     const collections = Object.keys(inventory || {})
     return (
       <div className='accountViewScroll'>
-        <div className='inventoryWrapper'>
-          {collections.length ? (
-            this.renderInventoryList()
-          ) : inventory ? (
-            <div className='inventoryNotFound'>No Items Found</div>
-          ) : (
-            <div className='inventoryNotFound'>Loading Items..</div>
-          )}
-        </div>
+        <ClusterBox style={{ marginTop: '20px' }}>
+          <Cluster>
+            {collections.length ? (
+              this.renderInventoryList()
+            ) : inventory ? (
+              <ClusterRow>
+                <ClusterValue>
+                  <div className='inventoryNotFound'>No Items Found</div>
+                </ClusterValue>
+              </ClusterRow>
+            ) : (
+              <ClusterRow>
+                <ClusterValue>
+                  <div className='inventoryNotFound'>Loading Items..</div>
+                </ClusterValue>
+              </ClusterRow>
+            )}
+          </Cluster>
+        </ClusterBox>
       </div>
     )
   }

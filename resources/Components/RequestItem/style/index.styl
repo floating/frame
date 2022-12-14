@@ -60,10 +60,6 @@
   overflow hidden
   font-family 'MainFont'
   font-weight 300
-  box-shadow 0px 4px 6px var(--ghostY)
-  border-bottom 2px solid var(--ghostZ)
-  border-radius 8px
-  background var(--ghostA)
   cursor pointer
   position relative
   width 100%
@@ -72,8 +68,6 @@
   overflow hidden
   font-family 'MainFont'
   font-weight 300
-  box-shadow 0px 4px 6px var(--ghostY)
-  border-bottom 2px solid var(--ghostZ)
   cursor pointer
   transition all linear 0.1s
 
@@ -124,11 +118,11 @@
     display flex
     align-items center
     justify-content space-between
-    text-transform uppercase
     font-weight 400
     font-size 11px
-    margin 14px 14px 11px 14px
     letter-spacing 1px
+    width 100px
+    height 30px
 
     span
       letter-spacing 1px
@@ -136,51 +130,26 @@
       top -1px
       position relative
 
-    .requestItemDetailsSlide
-      display flex
-      align-items center
+  .requestItemDetailsIndicatorStill
+    .requestItemDetailsIndicatorMarker
+      animation none
 
-    .requestItemDetailsIndicator
-      height 12px
-      width 12px
-      margin 0px 1px
-      display flex
-      justify-content center
-      align-items center
-      border-radius 6px
-      box-shadow inset 0px 0px 3px var(--ghostY)
-
-      .requestItemDetailsIndicatorMarker
-        height 6px
-        width 6px
-        border-radius 3px
-        background var(--moon)
-        z-index 4
-        position relative
-        top -1px
-        animation lit infinite ease-in-out alternate 1s
-        will-change opacity
-
-    .requestItemDetailsIndicatorStill
-      .requestItemDetailsIndicatorMarker
-        animation none
-
-    .requestItemDetailsView
+  .requestItemDetailsView
+    display flex
+    justify-content center
+    align-items center
+    margin-right 2px
+    .requestItemDetailsViewText
+      font-weight 400
+      margin-right 0px
+    .requestItemDetailsViewArrow
       display flex
       justify-content center
       align-items center
-      margin-right 2px
-      .requestItemDetailsViewText
-        font-weight 400
-        margin-right 0px
-      .requestItemDetailsViewArrow
-        display flex
-        justify-content center
-        align-items center
-        div 
-          width 8px
-        svg
-          transform rotate(90deg)
+      div 
+        width 8px
+      svg
+        transform rotate(90deg)
 
   .requestItemDetailsGood
     .requestItemLine
@@ -255,29 +224,31 @@
     0%
       transform translateX(0)
     100%
-      transform translateX(12px)
+      transform translateX(16px)
 
   .requestItemLine
     position absolute
-    bottom -2px
-    width 50px
+    top 0px
     right 0px
+    bottom 0px 
+    left 0px
     margin 0px
     box-sizing border-box
     display flex
     overflow hidden
     opacity 1
-    padding 8px 0px
+    padding 10.5px 0px
     border-radius 20px
-    background var(--ghostZ05)
+    background var(--ghostZ)
     box-shadow inset 0px 0px 4px var(--ghostY)
     color var(--moon)
+    display none
     
     svg
-      width 300%
+      width 200%
       position relative
       left -100%
-      stroke-width 25px
+      stroke-width 20px
       animation wave 1.4s linear infinite
       will-change transform
 
@@ -285,6 +256,7 @@
     background none
     color var(--ghostX)
     box-shadow none
+    display none
     svg
       bottom -2px
       filter blur(1px)
@@ -310,39 +282,41 @@
     display flex
     justify-content space-between
     align-items center
-    font-size 15px
+    font-size 16px
     font-weight 300
-    border-radius 26px
-    margin 8px 8px 4px 8px
+    padding 15px 12px 6px 12px
     overflow hidden
 
     .requestItemTitleTime
-      height 32px
+      position absolute
+      top 12px
+      right 18px
+      bottom 3px
       display flex
       justify-content center
       align-items center
-      padding 0px 8px
+      z-index 3000
 
       .requestItemTitleTimeItem
         height 26px
         display flex
         justify-content center
         align-items center
-        font-size 12px
+        font-size 13px
         font-weight 400
+        color var(--mint)
 
     .requestItemMain
-      height 36px
+      margin-top 1px
       display flex
       justify-content flex-start
-      align-items center
+      flex-direction column
       box-sizing border-box
 
       .requestItemTitleMain
         white-space nowrap
         overflow hidden
         text-overflow ellipsis
-        width 220px
 
     .requestItemTitleLeft
       display flex
@@ -354,7 +328,6 @@
     .requestItemTitleMain
       font-weight 400
       margin-left 8px
-      top -2px
 
   .requestItemTitleSub
     display flex
@@ -371,15 +344,6 @@
       font-weight 400
       margin 0px 0px 0px 0px
 
-  .requestItemTime
-    position absolute
-    top 0px  
-    right 24px
-    bottom 0px
-    font-size 12px
-    display flex
-    justify-content center
-    align-items center
 
   .requestItemSource
     position absolute
@@ -435,19 +399,48 @@
     position relative
     left 1px
 
-// .requestItem:hover
-//   background-position 0% 0%
-//   background linear-gradient(90deg, var(--ghostA), var(--ghostB))
-  
-
-  // .requestItemDetails
-  //   .requestItemDetailsSlide
-  //     background linear-gradient(90deg, var(--ghostB), var(--ghostC))
-
+  .requestItemDetailsSlide
+    display flex
+    align-items center
+    text-transform uppercase
+    font-size 10px
+    font-weight 500
+    padding-left 6px
+    letter-spacing 1px
+    padding-top 4px
+ 
+  .requestItemWave
+    display absolute
+    top 0
+    left 0
+    bottom 0
+    left 0
+    
   .requestItemWaveDisabled
     .requestItemLine
       svg
         animation-play-state paused
+
+  .requestItemDetailsIndicator
+    height 12px
+    width 12px
+    display flex
+    justify-content center
+    align-items center
+    border-radius 6px
+    box-shadow inset 0px 0px 3px var(--ghostX)
+    margin-right 4px
+
+    .requestItemDetailsIndicatorMarker
+      height 6px
+      width 6px
+      border-radius 3px
+      background var(--moon)
+      z-index 4
+      position relative
+      top 0px
+      animation lit infinite ease-in-out alternate 1s
+      will-change opacity
 
 .requestItemSummary
   display flex

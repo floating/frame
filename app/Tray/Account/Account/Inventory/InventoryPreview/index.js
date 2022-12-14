@@ -4,6 +4,8 @@ import link from '../../../../../../resources/link'
 import svg from '../../../../../../resources/svg'
 import { matchFilter } from '../../../../../../resources/utils'
 
+import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../../resources/Components/Cluster'
+
 class Inventory extends React.Component {
   constructor(...args) {
     super(...args)
@@ -58,27 +60,29 @@ class Inventory extends React.Component {
     const displayCollections = this.displayCollections()
     return displayCollections.map((k) => {
       return (
-        <div
-          key={k}
-          className='inventoryCollection'
-          onClick={() => {
-            const crumb = {
-              view: 'expandedModule',
-              data: {
-                id: this.props.moduleId,
-                account: this.props.account,
-                currentCollection: k
+        <ClusterRow>
+          <ClusterValue
+            onClick={() => {
+              const crumb = {
+                view: 'expandedModule',
+                data: {
+                  id: this.props.moduleId,
+                  account: this.props.account,
+                  currentCollection: k
+                }
               }
-            }
-            link.send('nav:forward', 'panel', crumb)
-          }}
-        >
-          <div className='inventoryCollectionTop'>
-            <div className='inventoryCollectionName'>{inventory[k].meta.name}</div>
-            <div className='inventoryCollectionCount'>{Object.keys(inventory[k].items).length}</div>
-            <div className='inventoryCollectionLine' />
-          </div>
-        </div>
+              link.send('nav:forward', 'panel', crumb)
+            }}
+          >
+            <div key={k} className='inventoryCollection'>
+              <div className='inventoryCollectionTop'>
+                <div className='inventoryCollectionName'>{inventory[k].meta.name}</div>
+                <div className='inventoryCollectionCount'>{Object.keys(inventory[k].items).length}</div>
+                <div className='inventoryCollectionLine' />
+              </div>
+            </div>
+          </ClusterValue>
+        </ClusterRow>
       )
     })
   }
@@ -94,15 +98,23 @@ class Inventory extends React.Component {
           <span>{svg.inventory(12)}</span>
           <span>{'Inventory'}</span>
         </div>
-        <div className='inventoryWrapper'>
+        <Cluster>
           {collections.length ? (
             this.renderInventoryList()
           ) : inventory ? (
-            <div className='inventoryNotFound'>No Items Found</div>
+            <ClusterRow>
+              <ClusterValue>
+                <div className='inventoryNotFound'>No Items Found</div>
+              </ClusterValue>
+            </ClusterRow>
           ) : (
-            <div className='inventoryNotFound'>Loading Items..</div>
+            <ClusterRow>
+              <ClusterValue>
+                <div className='inventoryNotFound'>Loading Items..</div>
+              </ClusterValue>
+            </ClusterRow>
           )}
-        </div>
+        </Cluster>
         {collections.length ? (
           <div className='signerBalanceTotal'>
             <div className='signerBalanceButtons'>
