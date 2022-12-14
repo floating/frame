@@ -2,7 +2,7 @@ import React from 'react'
 import Restore from 'react-restore'
 import BigNumber from 'bignumber.js'
 
-import { DisplayValue } from '../../../../../../../resources/Components/DisplayValue'
+import { DisplayCoinBalance, DisplayValue } from '../../../../../../../resources/Components/DisplayValue'
 import { GasFeesSource, usesBaseFee } from '../../../../../../../resources/domain/transaction'
 import { displayValueData } from '../../../../../../../resources/utils/displayValue'
 import link from '../../../../../../../resources/link'
@@ -39,12 +39,12 @@ const USDEstimateDisplay = ({ minFee, maxFee, nativeCurrency }) => {
       <div className={`_txFeeValueDefault${displayMaxFeeWarning ? ' _txFeeValueDefaultWarn' : ''}`}>
         <span>{'≈'}</span>
         {maxFeeApproximation === '<' ? (
-          <DisplayValue type='fiat' valueData={maxFee} currencySymbol='$' />
+          <DisplayValue type='fiat' value={maxFee} currencySymbol='$' />
         ) : (
           <>
-            <DisplayValue type='fiat' valueData={minFee} currencySymbol='$' />
+            <DisplayValue type='fiat' value={minFee} currencySymbol='$' />
             <span>{'-'}</span>
-            <DisplayValue type='fiat' valueData={maxFee} currencySymbol='$' />
+            <DisplayValue type='fiat' value={maxFee} currencySymbol='$' />
           </>
         )}
         <span>{`in ${nativeCurrency.symbol}`}</span>
@@ -101,7 +101,7 @@ class TxFee extends React.Component {
             <ClusterColumn grow={2}>
               <ClusterValue>
                 <div className='txSendingValue'>
-                  <DisplayValue type='ether' valueData={maxFee} currencySymbol={nativeCurrency.symbol} />
+                  <DisplayCoinBalance amount={maxFee} symbol={nativeCurrency.symbol} />
                 </div>
               </ClusterValue>
               <ClusterValue>

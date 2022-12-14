@@ -6,7 +6,7 @@ import { displayValueData } from '../../../../resources/utils/displayValue'
 
 it('should render the expected content when provided with valueData', () => {
   const valueData = new displayValueData(356e28)
-  const { getByTestId } = setupComponent(<DisplayValue valueData={valueData} />)
+  const { getByTestId } = setupComponent(<DisplayValue value={valueData} />)
   const displayValue = getByTestId('display-value')
 
   expect(displayValue.textContent).toBe('3.56T')
