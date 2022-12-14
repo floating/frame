@@ -726,6 +726,10 @@ module.exports = {
     u('main.mute.aragonAccountMigrationWarning', () => true)
     u('windows.dash.showing', () => true)
   },
+  closeDawn: (u) => {
+    u('main.mute.onboardingWindow', () => true)
+    u('windows.dawn.showing', () => false)
+  },
   // Dapp Frame
   appDapp: (u, dapp) => {
     u('main.dapps', (dapps) => {
@@ -807,8 +811,8 @@ module.exports = {
     })
   },
   unsetAccount: (u) => {
-    u('selected.minimized', (_) => true)
     u('selected.open', (_) => false)
+    u('selected.minimized', (_) => true)
     u('selected.view', (_) => 'default')
     u('selected.showAccounts', (_) => false)
     u('windows.panel.nav', () => [])

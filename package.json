@@ -12,16 +12,17 @@
     "setup:scripts": "allow-scripts",
     "setup": "npm run setup:deps && husky install",
     "start": "npm run launch",
-    "bundle": "npm run bundle:bridge && npm run bundle:tray && npm run bundle:dash && npm run bundle:dapp && npm run bundle:dapp:inject",
+    "bundle": "npm run bundle:bridge && npm run bundle:tray && npm run bundle:dash && npm run bundle:dapp && npm run bundle:dawn && npm run bundle:dapp:inject",
     "bundle:bridge": "parcel build resources/bridge/index.js --target bridge --public-url .",
     "bundle:tray": "parcel build app/tray.html --target tray --public-url .",
     "bundle:flow": "parcel build flow/flow.html --target flow --public-url .",
     "bundle:dash": "parcel build dash/dash.html --target dash --public-url .",
     "bundle:dapp": "parcel build dapp/dapp.html --target dapp --public-url .",
+    "bundle:dawn": "parcel build dawn/dawn.html --target dawn --public-url .",
     "bundle:dapp:inject": "parcel build main/dapps/server/inject/index.js --target inject --public-url .",
     "serve": "npm run bundle:bridge && npm run dev-server & wait-on http://localhost:1234/app/tray.dev.html && npm run compile:watch",
     "dev": "npm run compile && npm run bundle && npm run launch:dev",
-    "dev-server": "cross-env NODE_ENV=development HMR=true parcel serve resources/bridge/index.js app/tray.dev.html flow/flow.dev.html dash/dash.dev.html dapp/dapp.dev.html main/dapps/server/inject/index.js",
+    "dev-server": "cross-env NODE_ENV=development HMR=true parcel serve resources/bridge/index.js app/tray.dev.html flow/flow.dev.html dash/dash.dev.html dapp/dapp.dev.html dawn/dawn.dev.html main/dapps/server/inject/index.js",
     "inspect": "npm run bundle && npm run launch:inspect",
     "launch": "cross-env NODE_ENV=production electron ./compiled/main",
     "launch:dev": "cross-env NODE_ENV=development electron ./compiled/main --inspect",
@@ -100,6 +101,7 @@
     "react-transition-group": "4.4.5",
     "rlp": "3.0.0",
     "semver": "7.3.8",
+    "styled-components": "5.3.6",
     "trezor-connect": "8.2.12-extended",
     "uuid": "9.0.0",
     "ws": "8.11.0",
@@ -185,6 +187,7 @@
   "tray": "./bundle/tray.html",
   "dash": "./bundle/dash.html",
   "dapp": "./bundle/dapp.html",
+  "dawn": "./bundle/dawn.html",
   "targets": {
     "main": false,
     "bridge": {
@@ -198,6 +201,9 @@
       "context": "browser"
     },
     "dapp": {
+      "context": "browser"
+    },
+    "dawn": {
       "context": "browser"
     },
     "inject": {
@@ -233,11 +239,13 @@
       "parcel>@parcel/fs>@parcel/watcher": false,
       "react-restore>babel-core>babel-register>core-js": true,
       "react-restore>babel-core>babel-runtime>core-js": true,
+      "styled-components": false,
       "trezor-connect>@trezor/transport>protobufjs": false,
       "trezor-connect>@trezor/utxo-lib>blake-hash": false,
       "trezor-connect>@trezor/utxo-lib>tiny-secp256k1": false,
       "ws>bufferutil": false,
-      "ws>utf-8-validate": false
+      "ws>utf-8-validate": false,
+      "nebula>ipfs-http-client>ipfs-core-utils>ipfs-unixfs>protobufjs": false
     }
   }
 }

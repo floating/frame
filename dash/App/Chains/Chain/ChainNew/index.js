@@ -55,8 +55,8 @@ export default ({
     symbol: symbol || chainDefault.symbol,
     isTestnet: isTestnet || chainDefault.isTestnet,
     primaryColor: primaryColor || chainDefault.primaryColor,
-    primaryRpc: primaryRpc || chainDefault.primaryRpc,
-    secondaryRpc: secondaryRpc || chainDefault.secondaryRpc
+    primaryRpc: primaryRpc || '',
+    secondaryRpc: secondaryRpc || ''
   }
 
   // state

@@ -1,23 +1,18 @@
 import React from 'react'
 import Restore from 'react-restore'
 
-import store from '../../../../main/store'
-import link from '../../../../resources/link'
-import { setupComponent } from '../../../componentSetup'
-import ChainComponent from '../../../../dash/App/Chains/Chain'
+import store from '../../../main/store'
+import link from '../../../resources/link'
+import { setupComponent } from '../../componentSetup'
+import ChainComponent from '../../../dash/App/Chains/Chain'
 
-jest.mock('../../../../main/store/persist')
-jest.mock('../../../../resources/link', () => ({ send: jest.fn() }))
+jest.mock('../../../main/store/persist')
+jest.mock('../../../resources/link', () => ({ send: jest.fn() }))
 
 const Chain = Restore.connect(ChainComponent, store)
 
 beforeAll(() => {
-  jest.useFakeTimers()
   store.removeNetwork({ type: 'ethereum', id: 137 })
-})
-
-afterAll(() => {
-  jest.useRealTimers()
 })
 
 describe('rendering', () => {

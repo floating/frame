@@ -32,6 +32,7 @@ const devHeight = 800
 
 let tray: Tray
 let dash: Dash
+let dawn: Dawn
 let mouseTimeout: NodeJS.Timeout
 let glide = false
 
@@ -108,27 +109,21 @@ const detectMouse = () => {
   }, 50)
 }
 
-function initDashWindow() {
-  windows.dash = createWindow('dash', {
-    width: trayWidth
-  })
+function initWindow(id: string, opts: Electron.BrowserWindowConstructorOptions) {
+  const windowDir = id === 'tray' ? 'app' : id
+  const url = enableHMR
+    ? `http://localhost:1234/${windowDir}/${id}.dev.html`
+    : new URL(path.join(process.env.BUNDLE_LOCATION, `${id}.html`), 'file:')
 
-  const dashUrl = enableHMR
-    ? 'http://localhost:1234/dash/dash.dev.html'
-    : new URL(path.join(process.env.BUNDLE_LOCATION, 'dash.html'), 'file:')
-  windows.dash.loadURL(dashUrl.toString())
+  windows[id] = createWindow(id, opts)
+  windows[id].loadURL(url.toString())
 }
 
 function initTrayWindow() {
-  windows.tray = createWindow('tray', {
+  initWindow('tray', {
     width: trayWidth,
     icon: path.join(__dirname, './AppIcon.png')
   })
-
-  const trayUrl = enableHMR
-    ? 'http://localhost:1234/app/tray.dev.html'
-    : new URL(path.join(process.env.BUNDLE_LOCATION, 'tray.html'), 'file:')
-  windows.tray.loadURL(trayUrl.toString())
 
   windows.tray.on('closed', () => delete windows.tray)
   windows.tray.webContents.session.setPermissionRequestHandler((webContents, permission, res) => res(false))
@@ -175,11 +170,11 @@ function initTrayWindow() {
     windows.tray.focus()
   }, 1260)
 
-  if (!openedAtLogin) {
-    windows.tray.once('ready-to-show', () => {
+  windows.tray.once('ready-to-show', () => {
+    if (!openedAtLogin) {
       tray.show()
-    })
-  }
+    }
+  })
 
   setTimeout(() => {
     screen.on('display-added', () => tray.hide())
@@ -232,6 +227,11 @@ class Tray {
         setTimeout(() => {
           dash.show()
         }, 300)
+      }
+      if (dawn) {
+        setTimeout(() => {
+          dawn.show()
+        }, 600)
       }
     }
     ipcMain.on('tray:ready', this.readyHandler)
@@ -325,7 +325,9 @@ class Tray {
 
 class Dash {
   constructor() {
-    initDashWindow()
+    initWindow('dash', {
+      width: trayWidth
+    })
   }
 
   public hide() {
@@ -360,6 +362,58 @@ class Dash {
       })
       if (isDev) {
         windows.dash.webContents.openDevTools()
+      }
+    }, 10)
+  }
+}
+
+class Dawn {
+  constructor() {
+    initWindow('dawn', {
+      x: 0,
+      y: 0,
+      width: 0,
+      height: 0,
+      titleBarStyle: 'hidden',
+      trafficLightPosition: { x: 10, y: 9 },
+      icon: path.join(__dirname, './AppIcon.png')
+    })
+  }
+
+  public hide() {
+    if (windows.dawn && windows.dawn.isVisible()) {
+      windows.dawn.hide()
+    }
+  }
+
+  public show() {
+    log.warn('loading dawn url', tray.isReady())
+    if (!tray.isReady()) {
+      return
+    }
+    setTimeout(() => {
+      windows.dawn.on('ready-to-show', () => {
+        windows.dawn.show()
+      })
+
+      const area = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
+      const height = area.height - 160
+      const maxWidth = Math.floor(height * 1.24)
+      const targetWidth = area.width - 460
+      const width = targetWidth > maxWidth ? maxWidth : targetWidth
+      windows.dawn.setMinimumSize(400, 300)
+      windows.dawn.setSize(width, height)
+      const pos = topRight(windows.dawn)
+      windows.dawn.setPosition(pos.x - 440, pos.y + 80)
+      windows.dawn.setAlwaysOnTop(true)
+      windows.dawn.show()
+      windows.dawn.focus()
+      windows.dawn.setVisibleOnAllWorkspaces(false, {
+        visibleOnFullScreen: true,
+        skipTransformProcessType: true
+      })
+      if (isDev) {
+        windows.dawn.webContents.openDevTools()
       }
     }, 10)
   }
@@ -414,6 +468,9 @@ const init = () => {
   }
   tray = new Tray()
   dash = new Dash()
+  if (!store('main.mute.onboardingWindow')) {
+    dawn = new Dawn()
+  }
 }
 
 const send = (id: string, channel: string, ...args: string[]) => {
@@ -448,6 +505,9 @@ export default {
   },
   showDash() {
     dash.show()
+  },
+  hideDawn() {
+    dawn.hide()
   },
   hideDash() {
     dash.hide()
