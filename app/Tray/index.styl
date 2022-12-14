@@ -1,0 +1,72 @@
+html, body
+  margin 0
+  border 0
+  font-family 'MainFont'
+  font-weight 300
+  -webkit-app-region no-drag
+  overflow hidden
+  color var(--outerspace)
+  background var(--ghostA)
+
+div
+  user-select none
+  cursor default
+
+::-webkit-scrollbar
+  width 0px
+  background transparent
+
+.clip
+  *
+    transition none !important
+
+#panel
+  // background rgba(228, 232, 248, 1)
+  margin 0px
+  // border-radius 12px
+  // box-shadow 0px 1px 5px 1px rgba(33, 45, 46, 0.1), 0px 0px 0px 1px rgba(110, 120, 140, 0.2)
+  overflow hidden
+
+  #bar
+    right 360px
+
+  #bot
+    left 5px
+    right 360px
+
+  #drop
+    left 5px
+    bottom 5px
+    right 360px
+    border-radius 3px
+
+  #views
+    right 360px
+    bottom 5px
+    left 5px
+    border-bottom-right-radius 3px
+    border-bottom-left-radius 3px
+
+    .screen
+      z-index 20000
+
+.session
+  position fixed
+  top 0px
+  right 15px
+  height 37px
+  font-weight 400
+  border-bottom-left-radius 4px
+  display flex
+  justify-content center
+  align-items center
+  user-select none
+  cursor default
+  font-size 14px
+  transition var(--standard)
+  z-index 1000
+
+.hidden
+  visibility hidden
+  
+@import './style'
