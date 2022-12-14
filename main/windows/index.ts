@@ -37,26 +37,25 @@ let mouseTimeout: NodeJS.Timeout
 let glide = false
 
 const enableHMR = isDev && process.env.HMR === 'true'
-const contextMenu = () => {
-  const displaySummonShortcut = store('main.shortcuts.altSlash')
+const contextMenu = (displaySummonShortcut: boolean = store('main.shortcuts.altSlash')) => {
   const hideFrame = () => tray.hide()
   const showFrame = () => tray.show()
   const separatorMenuItem = {
     label: 'Frame',
-    click: () => {}, 
+    click: () => {},
     type: 'separator'
   }
   const hideMenuItem = {
-    label: 'Dismiss', 
-    click: hideFrame, 
-    accelerator: 'Alt+/', 
+    label: 'Dismiss',
+    click: hideFrame,
+    accelerator: 'Alt+/',
     registerAccelerator: false,
     toolTip: 'Dismiss Frame'
   }
-  const showMenuItem = { 
-    label: 'Summon', 
-    click: showFrame, 
-    accelerator: 'Alt+/', 
+  const showMenuItem = {
+    label: 'Summon',
+    click: showFrame,
+    accelerator: 'Alt+/',
     registerAccelerator: false,
     toolTip: 'Summon Frame'
   }
@@ -64,20 +63,19 @@ const contextMenu = () => {
     label: 'Quit',
     click: () => app.quit()
   }
-  const menu = [quitMenuItem]
-  const showMenuWithSummon = [
-    showMenuItem,
-    separatorMenuItem,
-    quitMenuItem
-  ]
-  const hideMenuWithSummon = [
-    hideMenuItem,
-    separatorMenuItem,
-    quitMenuItem
-  ]
+
+  if (displaySummonShortcut) {
+    ;[showMenuItem, hideMenuItem].forEach((menuItem) => {
+      menuItem.accelerator = 'Alt+/'
+      menuItem.registerAccelerator = false
+    })
+  }
+
+  const showMenu = [showMenuItem, separatorMenuItem, quitMenuItem]
+  const hideMenu = [hideMenuItem, separatorMenuItem, quitMenuItem]
   const menuMap = {
-    show: Menu.buildFromTemplate(displaySummonShortcut ? showMenuWithSummon : menu),
-    hide: Menu.buildFromTemplate(displaySummonShortcut ? hideMenuWithSummon : menu)
+    show: Menu.buildFromTemplate(showMenu),
+    hide: Menu.buildFromTemplate(hideMenu)
   }
   const menuType = tray.isVisible() ? 'hide' : 'show'
 
@@ -500,12 +498,11 @@ const broadcast = (channel: string, ...args: string[]) => {
 }
 
 // Data Change Events
-store.observer(() => {
-  broadcast('permissions', JSON.stringify(store('permissions')))
-})
+store.observer(() => broadcast('permissions', JSON.stringify(store('permissions'))))
 store.observer(() => {
   if (tray?.isReady()) {
-    tray.electronTray.setContextMenu(contextMenu())
+    const displaySummonShortcut = store('main.shortcuts.altSlash')
+    tray.electronTray.setContextMenu(contextMenu(displaySummonShortcut))
   }
 })
 
