@@ -95,8 +95,35 @@ type DisplayValueDataParams = {
 }
 
 type SourceValue = string | number | BigNumber
+type DisplayUnit = {
+  fullName: string
+  shortName: string
+}
+export type DisplayValueData = {
+  fiat: () => {
+    value: BigNumber
+    displayValue: string
+    approximationSymbol?: string
+    displayUnit?: DisplayUnit
+  }
+  ether: () => {
+    value: BigNumber
+    displayValue: string
+    approximationSymbol?: string
+    displayUnit?: DisplayUnit
+  }
+  gwei: () => {
+    value: BigNumber
+    displayValue: string
+  }
+  wei: () => {
+    value: BigNumber
+    displayValue: string
+  }
+  bn: BigNumber
+}
 
-export function displayValueData(sourceValue: SourceValue, params: DisplayValueDataParams) {
+export function displayValueData(sourceValue: SourceValue, params: DisplayValueDataParams): DisplayValueData {
   const {
     currencyRate,
     decimals = 18,

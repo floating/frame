@@ -39,12 +39,12 @@ const USDEstimateDisplay = ({ minFee, maxFee, nativeCurrency }) => {
       <div className={`_txFeeValueDefault${displayMaxFeeWarning ? ' _txFeeValueDefaultWarn' : ''}`}>
         <span>{'≈'}</span>
         {maxFeeApproximation === '<' ? (
-          <DisplayValue type='fiat' valueData={maxFee} currencySymbol='$' />
+          <DisplayValue type='fiat' value={maxFee} currencySymbol='$' />
         ) : (
           <>
-            <DisplayValue type='fiat' valueData={minFee} currencySymbol='$' />
+            <DisplayValue type='fiat' value={minFee} currencySymbol='$' />
             <span>{'-'}</span>
-            <DisplayValue type='fiat' valueData={maxFee} currencySymbol='$' />
+            <DisplayValue type='fiat' value={maxFee} currencySymbol='$' />
           </>
         )}
         <span>{`in ${nativeCurrency.symbol}`}</span>
@@ -101,11 +101,7 @@ class TxFee extends React.Component {
             <ClusterColumn grow={2}>
               <ClusterValue>
                 <div className='txSendingValue'>
-                  <DisplayCoinBalance
-                    amount={maxFee.wei().value.toString()}
-                    decimals={18}
-                    symbol={nativeCurrency.symbol}
-                  />
+                  <DisplayCoinBalance amount={maxFee} symbol={nativeCurrency.symbol} />
                 </div>
               </ClusterValue>
               <ClusterValue>
