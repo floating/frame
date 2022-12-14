@@ -170,7 +170,7 @@ class Dapps extends React.Component {
       return <DappDetails originId={dappDetails} />
     } else {
       return (
-        <div className='cardShow'>
+        <div className='cardShow' style={{ padding: '0px 0px 64px 0px' }}>
           {enabledChains.map((chain) => {
             const chainOrigins = getOriginsForChain(chain, origins)
             const { primaryColor, icon } = this.store('main.networksMeta.ethereum', chain.id)
@@ -181,9 +181,9 @@ class Dapps extends React.Component {
               <ChainOrigins chain={chain} origins={chainOrigins} primaryColor={primaryColor} icon={icon} />
             )
           })}
-          <div className={'clearOriginsButton'} onClick={clearOriginsClickHandler}>
+          {/* <div className={'clearOriginsButton'} onClick={clearOriginsClickHandler}>
             Clear All
-          </div>
+          </div> */}
         </div>
       )
     }

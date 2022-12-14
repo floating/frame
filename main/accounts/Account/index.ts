@@ -364,22 +364,37 @@ class FrameAccount {
 
       // Does the current panel nav include a 'requestView'
       const panelNav = store('windows.panel.nav') || []
+      const inExpandedRequestsView =
+        panelNav[0]?.view === 'expandedModule' && panelNav[0]?.data?.id === 'requests'
       const inRequestView = panelNav.map((crumb: any) => crumb.view).includes('requestView')
 
-      if (accountOpen && (!store('tray.open') || !inRequestView)) {
-        const crumb = {
-          view: 'requestView',
+      if (accountOpen) {
+        if (inRequestView) {
+          nav.back('panel')
+          nav.back('panel')
+        } else if (inExpandedRequestsView) {
+          nav.back('panel')
+        }
+
+        nav.forward('panel', {
+          view: 'expandedModule',
           data: {
-            step: 'confirm',
-            accountId: account,
-            requestId: req.handlerId
-          },
-          position: {
-            bottom: (req || {}).type === 'transaction' ? '200px' : '140px'
+            id: 'requests',
+            account: account
           }
-        } as const
-        if (inRequestView) nav.back('panel')
-        nav.forward('panel', crumb)
+        })
+
+        if (!store('tray.open') || !inRequestView) {
+          const crumb = {
+            view: 'requestView',
+            data: {
+              step: 'confirm',
+              accountId: account,
+              requestId: req.handlerId
+            }
+          } as const
+          nav.forward('panel', crumb)
+        }
       }
 
       setTimeout(() => {

@@ -13,6 +13,8 @@ import {
 } from '../../../../../../resources/domain/balance'
 import { matchFilter } from '../../../../../../resources/utils'
 
+import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../../resources/Components/Cluster'
+
 import Balance from '../Balance'
 
 class BalancesPreview extends React.Component {
@@ -111,20 +113,24 @@ class BalancesPreview extends React.Component {
             <div className='loader' />
           </div>
         ) : null}
-        <div className='signerBalancesWrap'>
+        <Cluster>
           {balances.map(({ chainId, symbol, ...balance }, i) => {
             return (
-              <Balance
-                key={chainId + symbol}
-                chainId={chainId}
-                symbol={symbol}
-                balance={balance}
-                i={i}
-                scanning={scanning}
-              />
+              <ClusterRow>
+                <ClusterValue>
+                  <Balance
+                    key={chainId + symbol}
+                    chainId={chainId}
+                    symbol={symbol}
+                    balance={balance}
+                    i={i}
+                    scanning={scanning}
+                  />
+                </ClusterValue>
+              </ClusterRow>
             )
           })}
-        </div>
+        </Cluster>
         <div className='signerBalanceTotal' style={{ opacity: !scanning ? 1 : 0 }}>
           {!this.props.expanded ? (
             <div className='signerBalanceButtons'>
@@ -159,7 +165,7 @@ class BalancesPreview extends React.Component {
             </div>
           )}
           <div className='signerBalanceTotalText'>
-            <div className='signerBalanceTotalLabel'>{'Total: '}</div>
+            <div className='signerBalanceTotalLabel'>{'Total'}</div>
             <div className='signerBalanceTotalValue'>
               {svg.usd(11)}
               {balances.length > 0 ? totalDisplayValue : '---.--'}

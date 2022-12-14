@@ -569,6 +569,133 @@
     box-shadow none
     border-radius none
 
+.requestsPreview:hover
+  .requestsPreviewArrow
+    transform translateX(0px)
+  // .requestPreviewContent
+  //   .requestPreviewContentArrow
+  //     color var(--good)
+
+.requestsPreview
+  height 52px
+  position relative
+  font-size 11px
+  text-transform uppercase
+  letter-spacing 2px
+  font-family 'MainFont'
+  font-weight 500
+  box-sizing border-box
+  border-radius 26px
+  cursor pointer
+  overflow hidden
+  // transition var(--standardFast)
+  *
+    pointer-events none
+  // background blue
+  // background linear-gradient(45deg, var(--ghostY), var(--good))
+  // border 1px solid var(--ghostY)
+  // box-sizing border-box
+  // justify-content center
+  // background: -webkit-linear-gradient(0deg, var(), blue)
+  // -webkit-background-clip: text;
+  // -webkit-text-fill-color: transparent;
+
+  .requestsPreviewOverlay
+    position absolute
+    top 0
+    right 0
+    bottom 0
+    left 0
+    // background linear-gradient(16deg, var(--overlayA), var(--overlayB))
+    z-index 200
+
+  .requestPreviewContent
+    position absolute
+    top 0
+    right 0
+    bottom 0
+    left 0
+    display flex
+    align-items center
+    justify-content space-between
+    cursor pointer
+    z-index 200
+    padding 16px 0px 16px 20px
+    box-sizing border-box
+    overflow hidden
+    border-radius 26px
+
+    .requestPreviewContentTitle
+      display flex
+      align-items center
+
+    .requestPreviewContentArrow
+      display flex
+      align-items center
+      padding-right 20px
+      transition var(--standard)
+
+      div
+        max-width 13px
+        
+  .requestsPreviewArrow
+     position absolute
+     top 0
+     right 0
+     bottom 0
+     left 0px
+     transform translateX(-440px)
+     transition var(--standard)
+
+    .requestsPreviewArrow1
+      position absolute
+      background var(--ghostA)
+      left 0px
+      margin -157px
+      width 367px
+      height 367px
+      transform rotate(45deg)
+      margin-left 0px
+      border-radius 12px
+      pointer-events none
+      z-index 100
+      filter blur(8px)
+    
+  .requestsPreviewArrow2
+    position absolute
+    left -40px
+    // background var(--ghostZ)
+    width 257px
+    height 257px
+    transform rotate(45deg)
+    margin -7px
+    border-radius 8px
+    display none
+
+  .requestsPreviewArrow3
+    position absolute
+    left -80px
+    // background var(--ghostA)
+    width 257px
+    height 257px
+    transform rotate(45deg)
+    margin -7px
+    border-radius 8px
+    display none
+
+  span
+    margin-right 8px
+
+  .requestsBadgeOverlay
+    position absolute
+    top 0
+    right 0
+    bottom 0
+    left 0
+    background var(--overlayA) // linear-gradient(-35deg, var(--overlayA) 0%, var(--overlayB) 100%)
+    z-index 999
+    pointer-events none
+
 .accountModuleInner
   position absolute
   top 0
@@ -577,11 +704,15 @@
   bottom 7px
   transform translate3d(0, 0, 0)
   padding 0px 6px
+  border-radius 26px
+  //backdrop-filter blur(2px)
+
   .accountModuleCard
+    position relative
     border-radius 26px
-    background var(--ghostA)
-    box-shadow 0px 4px 6px var(--ghostY)
-    border-bottom 2px solid var(--ghostZ)
+    background var(--ghostAZ)
+    box-shadow 0px 4px 8px var(--ghostY), 0px 2px 8px var(--ghostY)
+    border-bottom 2px solid var(--ghostY)
 
   .moduleHeader:before
     content ''
@@ -600,7 +731,8 @@
     font-size 11px
     text-transform uppercase
     letter-spacing 2px
-    padding 16px 0px 14px 20px
+    padding 20px 0px 10px 20px
+    height 30px
     font-family 'MainFont'
     font-weight 500
     box-sizing border-box
