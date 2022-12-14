@@ -1,6 +1,6 @@
 import React from 'react'
 import Restore from 'react-restore'
-import { getByLabelText, getByRole, render, waitFor } from '@testing-library/react'
+import { render, waitFor } from '@testing-library/react'
 
 import { setupComponent, advanceTimers } from '../../../../componentSetup'
 import store from '../../../../../main/store'
@@ -82,7 +82,7 @@ describe('setting token address', () => {
     expect(contractAddressInput.textContent).toBe('')
   })
 
-  it('should update add token navigation when an invalid contract address is entered', async () => {
+  it('should update add token navigation with an error when a user submits an invalid contract address', async () => {
     const { user, getByLabelText, getByRole } = setupComponent(
       <AddToken data={{ notifyData: { chainId: 1 } }} />
     )
@@ -107,6 +107,7 @@ describe('setting token address', () => {
   })
 
   it('should update add token navigation when a contracts details cannot be validated on-chain', async () => {
+    store.setPrimary('ethereum', 1, { connected: true })
     link.invoke.mockImplementationOnce((action, address, chainId) => {
       expect(action).toBe('tray:getTokenDetails')
       expect(address).toBe('0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0')
@@ -136,7 +137,7 @@ describe('setting token address', () => {
         notifyData: {
           chainId: 1,
           address: '0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0',
-          error: `FAILED TO VERIFY TOKEN'S DATA`,
+          error: `COULD NOT FIND TOKEN WITH ADDRESS 0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0`,
           tokenData: {
             decimals: 0,
             name: '',
@@ -148,7 +149,7 @@ describe('setting token address', () => {
     })
   })
 
-  it('should update add token navigation when a valid address is entered', async () => {
+  it('should update add token navigation with the contract details when a valid address is entered for a connected chain', async () => {
     const mockTokenData = {
       decimals: 420,
       name: 'FAKE COIN',
@@ -187,29 +188,10 @@ describe('setting token address', () => {
       }
     })
   })
-
-  it('should retrieve token metadata from a connected chain when an address is entered', async () => {
-    store.setPrimary('ethereum', 137, { connected: true })
-
-    const { user, getByLabelText, getByRole } = setupComponent(
-      <AddToken data={{ notifyData: { chainId: 137 } }} />
-    )
-
-    const contractAddressLabel = getByLabelText(`Enter token's address`)
-    await user.type(contractAddressLabel, '0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0')
-    const setAddressButton = getByRole('button', { name: 'Set Address' })
-    await user.click(setAddressButton)
-
-    expect(link.invoke).toHaveBeenCalledWith(
-      'tray:getTokenDetails',
-      '0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0',
-      137
-    )
-  })
 })
 
 describe('displaying errors', () => {
-  it('should show the correct error page when the error is "INVALID CONTRACT ADDRESS"', () => {
+  it('should allow the user to navigate back when displaying an error', () => {
     const { getAllByRole } = render(
       <AddToken
         data={{ notifyData: { chainId: 137, error: 'INVALID CONTRACT ADDRESS', address: '0xabc' } }}
@@ -221,10 +203,12 @@ describe('displaying errors', () => {
     expect(buttons[0].textContent).toBe('BACK')
   })
 
-  it(`should show the correct error page when the error is "FAILED TO VERIFY TOKEN'S DATA"`, () => {
+  it(`should allow the user to proceed if we are unable to verify the token data`, () => {
     const { getAllByRole } = render(
       <AddToken
-        data={{ notifyData: { chainId: 137, error: `FAILED TO VERIFY TOKEN'S DATA`, address: '0xabc' } }}
+        data={{
+          notifyData: { chainId: 137, error: `COULD NOT FIND TOKEN WITH ADDRESS BLAH BLAH`, address: '0xabc' }
+        }}
       />
     )
 

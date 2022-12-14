@@ -6,7 +6,7 @@ import link from '../../../../resources/link'
 import svg from '../../../../resources/svg'
 
 const invalidFormatError = 'INVALID CONTRACT ADDRESS'
-const unableToVerifyError = `FAILED TO VERIFY TOKEN'S DATA`
+const unableToVerifyError = `COULD NOT FIND TOKEN WITH ADDRESS`
 
 const navForward = async (notifyData) =>
   link.send('nav:forward', 'dash', {
@@ -17,7 +17,6 @@ const navForward = async (notifyData) =>
     }
   })
 
-//TODO: use the weird link system for the different stages too
 const AddTokenErrorSceeen = ({ error, address, chainId }) => {
   return (
     <div className='newTokenView cardShow'>
@@ -26,7 +25,7 @@ const AddTokenErrorSceeen = ({ error, address, chainId }) => {
       <div className='tokenSetAddress' role='button' onClick={() => link.send('nav:back', 'dash')}>
         {'BACK'}
       </div>
-      {error === unableToVerifyError && (
+      {error.includes(unableToVerifyError) && (
         <div className='tokenSetAddress' role='button' onClick={() => navForward({ address, chainId })}>
           {'ADD ANYWAY'}
         </div>
@@ -119,9 +118,17 @@ class AddTokenAddressScreenComponent extends Component {
   }
 
   async resolveTokenData(contractAddress, chainId) {
-    if (this.isConnectedChain()) this.setState({ fetchingData: true })
+    if (!this.isConnectedChain()) {
+      return navForward({
+        error: `${unableToVerifyError} ${contractAddress}`,
+        address: contractAddress,
+        chainId
+      })
+    }
+
+    this.setState({ fetchingData: true })
     const tokenData = await link.invoke('tray:getTokenDetails', contractAddress, chainId)
-    const error = tokenData.totalSupply ? null : unableToVerifyError
+    const error = tokenData.totalSupply ? null : `${unableToVerifyError} ${contractAddress}`
     return navForward({ error, tokenData, address: contractAddress, chainId })
   }
 
@@ -263,7 +270,6 @@ class AddTokenFormScreenComponent extends Component {
       logoURI: this.isDefault('logoURI') ? '' : logoURI
     }
     const backSteps = isEdit ? 1 : 3
-    console.log('Inside save token')
 
     link.send('tray:addToken', token, req)
     setTimeout(() => {
@@ -284,7 +290,7 @@ class AddTokenFormScreenComponent extends Component {
       this.state.name !== this.nameDefault &&
       this.state.symbol &&
       this.state.symbol !== this.symbolDefault &&
-      (isEdit || Number.isInteger(chainId)) &&
+      Number.isInteger(chainId) &&
       address &&
       Number.isInteger(this.state.decimals)
     const chainColor = this.store('main.networksMeta.ethereum', chainId, 'primaryColor')

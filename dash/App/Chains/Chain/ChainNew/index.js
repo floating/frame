@@ -27,8 +27,6 @@ const isChainFilled = (chain) => {
 }
 
 const isValidRpc = (urlStr) => {
-  // Default values:
-  if (['Secondary Endpoint', 'Primary Endpoint', ''].includes(urlStr)) return true
   try {
     const url = new URL(urlStr)
     return ['http:', 'https:', 'ws:', 'wss:'].includes(url.protocol)
@@ -89,9 +87,9 @@ export default ({
     } else if (!isChainFilled(chain)) {
       return { valid: false, text: 'Fill Chain Details' }
     } else if (!isValidRpc(chain.primaryRpc)) {
-      return { valid: false, text: 'Invalid primary RPC URL' }
+      return { valid: false, text: 'Invalid primary RPC' }
     } else if (!isValidRpc(chain.secondaryRpc)) {
-      return { valid: false, text: 'Invalid secondary RPC URL' }
+      return { valid: false, text: 'Invalid secondary RPC' }
     } else {
       return { valid: true, text: 'Add Chain' }
     }
