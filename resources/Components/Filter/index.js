@@ -3,7 +3,7 @@ import Restore from 'react-restore'
 import svg from '../../../resources/svg'
 
 class Filter extends React.Component {
-  constructor (...args) {
+  constructor(...args) {
     super(...args)
     this.state = {
       expand: false
@@ -32,49 +32,52 @@ class Filter extends React.Component {
   // componentWillUnmount () {
   //   document.removeEventListener('keydown', this.h.bind(this))
   // }
-  glitch (el) {
+  glitch(el) {
     return (
       <div className={this.state.glitchOn ? 'glitch glitchOn' : 'glitch'}>
-        {[...Array(10).keys()].map(i => <div key={i + 'hg'} className='line'>{el}</div>)}
-        {!this.state.glitchOn ? <div className='line lastLine'>{el}</div> : null }
+        {[...Array(10).keys()].map((i) => (
+          <div key={i + 'hg'} className='line'>
+            {el}
+          </div>
+        ))}
+        {!this.state.glitchOn ? <div className='line lastLine'>{el}</div> : null}
       </div>
     )
   }
-  render () {
+  render() {
     const { buttonActionName, buttonAction } = this.props
     return (
       <div className='filter'>
         <div className='filterWrap'>
-          <div className='filterIcon'>
-            {svg.search(18)}
-          </div>
-          <input 
+          <div className='filterIcon'>{svg.search(18)}</div>
+          <input
             className='filterInput'
-            spellCheck={false} 
-            tabIndex={-1} 
+            spellCheck={false}
+            tabIndex={-1}
             onChange={(e) => this.props.onInput(e.target.value)}
           />
         </div>
         {buttonActionName ? (
-          <div 
+          <div
             className='filterButton'
-            onClick={() => { 
-              this.setState({ glitchOn: false }) 
+            onClick={() => {
+              this.setState({ glitchOn: false })
               if (buttonAction) buttonAction()
             }}
             onMouseEnter={() => this.setState({ glitchOn: true })}
             onMouseOver={() => this.setState({ glitchOn: true })}
             onMouseLeave={() => this.setState({ glitchOn: false })}
           >
-            {this.glitch(<div className='filterButtonInner'>
-              {'+'}
-              {svg.chain(14)}
-            </div>)}
+            {this.glitch(
+              <div className='filterButtonInner'>
+                {'+'}
+                {svg.chain(14)}
+              </div>
+            )}
           </div>
         ) : null}
       </div>
     )
-    
   }
 }
 

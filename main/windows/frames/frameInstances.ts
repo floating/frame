@@ -1,14 +1,15 @@
-import electron, { BrowserView, BrowserWindow }  from 'electron'
+import electron, { BrowserView, BrowserWindow } from 'electron'
 import path from 'path'
 
-import store from '../../store'
-
-import webPrefrences from '../webPreferences'
+import { createWindow } from '../window'
 import topRight from './topRight'
 
+const isDev = process.env.NODE_ENV === 'development'
+const enableHMR = isDev && process.env.HMR === 'true'
+
 export interface FrameInstance extends BrowserWindow {
-  frameId?: string,
-  views?: Record<string, BrowserView>,
+  frameId?: string
+  views?: Record<string, BrowserView>
   showingView?: string
 }
 
@@ -20,7 +21,7 @@ const place = (frameInstance: FrameInstance) => {
   const width = targetWidth > maxWidth ? maxWidth : targetWidth
   frameInstance.setMinimumSize(400, 300)
   frameInstance.setSize(width, height)
-  const pos = topRight(frameInstance) 
+  const pos = topRight(frameInstance)
   frameInstance.setPosition(pos.x - 440, pos.y + 80)
 }
 
@@ -28,51 +29,32 @@ export default {
   reposition: (frameInstance: FrameInstance) => {
     place(frameInstance)
   },
-  create: (frame: Frame) => {  
-    const preload = path.resolve(__dirname, (process.env.BUNDLE_LOCATION || ''), 'bridge.js')
-  
-    const frameInstance: FrameInstance = new BrowserWindow({
+  create: (frame: Frame) => {
+    const frameInstance: FrameInstance = createWindow('frameInstance', {
       x: 0,
       y: 0,
       width: 0,
       height: 0,
-      transparent: process.platform === 'darwin',
-      // hasShadow: false,
-      show: false,
-      frame: false,
       titleBarStyle: 'hidden',
       trafficLightPosition: { x: 10, y: 9 },
-      backgroundColor: store('main.colorwayPrimary', store('main.colorway'), 'background'),
-      icon: path.join(__dirname, './AppIcon.png'),
-      webPreferences: { ...webPrefrences, preload }
+      icon: path.join(__dirname, './AppIcon.png')
     })
 
-    frameInstance.loadURL(`file://${process.env.BUNDLE_LOCATION}/dapp.html`)
-  
+    frameInstance.loadURL(
+      enableHMR
+        ? 'http://localhost:1234/dapp/dapp.dev.html'
+        : `file://${process.env.BUNDLE_LOCATION}/dapp.html`
+    )
+
     frameInstance.on('ready-to-show', () => {
       frameInstance.show()
     })
-    
+
     frameInstance.showingView = ''
     frameInstance.frameId = frame.id
     frameInstance.views = {}
 
     place(frameInstance)
-
-    // Create the frame's overlay view
-    // const overlayInstance = new BrowserView({ webPrefrences })
-    // frameInstance.addBrowserView(overlayInstance)
-    // overlayInstance.setBackgroundColor('#0000')
-    // overlayInstance.setBounds({ x: 0, y: 0, width, height })
-    // overlayInstance.setAutoResize({ width: true, height: true })
-    // overlayInstance.webContents.loadURL(`file://${__dirname}/index.html`)
-    // frameInstance.removeBrowserView(windows[dappFrameId].overlay)
-    // overlayInstance.webContents.on('did-finish-load', () => {
-    //   relayerOverlay(windows[dappFrameId])
-    //   setTimeout(() => relayerOverlay(windows[dappFrameId]), 10)
-    // })
-
-    // frameInstance.webContents.openDevTools({ mode: 'detach' })
 
     return frameInstance
   }

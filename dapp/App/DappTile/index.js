@@ -3,17 +3,20 @@ import Restore from 'react-restore'
 import link from '../../../resources/link'
 
 class App extends React.Component {
-  constructor (...args) {
+  constructor(...args) {
     super(...args)
     this.state = {}
   }
 
-  render () {
+  render() {
     return (
       <div className='dappTile'>
-        <div className='dappIcon' onClick={() => {
-          link.send('runDapp', this.props.ens)
-        }}>
+        <div
+          className='dappIcon'
+          onClick={() => {
+            link.send('runDapp', this.props.ens)
+          }}
+        >
           {this.props.ens.substr(0, 3)}
         </div>
       </div>

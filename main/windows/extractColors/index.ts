@@ -1,14 +1,14 @@
-import path from 'path'
 import log from 'electron-log'
 import pixels from 'get-pixels'
 import { BrowserWindow, BrowserView } from 'electron'
 
-import webPreferences from '../webPreferences'
+import { createViewInstance } from '../window'
 
-function mode (array: string[]) {
+function mode(array: string[]) {
   if (array.length === 0) return ''
   const modeMap: Record<string, number> = {}
-  let maxEl = array[0]; let maxCount = 1
+  let maxEl = array[0]
+  let maxCount = 1
   for (let i = 0; i < array.length; i++) {
     const el = array[i]
     if (!modeMap[el]) {
@@ -24,7 +24,7 @@ function mode (array: string[]) {
   return maxEl
 }
 
-async function pixelColor (image: Electron.NativeImage) {
+async function pixelColor(image: Electron.NativeImage) {
   return new Promise((resolve, reject) => {
     pixels(image.toPNG(), 'image/png', (err, pixels) => {
       if (err) return reject(err)
@@ -44,10 +44,10 @@ async function pixelColor (image: Electron.NativeImage) {
       const colorArray = selectedColor.split(', ')
 
       const color = {
-        background: `rgb(${colorArray.join(', ')})`, 
-        backgroundShade: `rgb(${colorArray.map(v => Math.max(parseInt(v) - 5, 0)).join(', ')})`,
-        backgroundLight: `rgb(${colorArray.map(v => Math.min(parseInt(v) + 50, 255)).join(', ')})`,
-        text: textColor(...(colorArray.map(a => parseInt(a)) as [number, number, number]))
+        background: `rgb(${colorArray.join(', ')})`,
+        backgroundShade: `rgb(${colorArray.map((v) => Math.max(parseInt(v) - 5, 0)).join(', ')})`,
+        backgroundLight: `rgb(${colorArray.map((v) => Math.min(parseInt(v) + 50, 255)).join(', ')})`,
+        text: textColor(...(colorArray.map((a) => parseInt(a)) as [number, number, number]))
       }
 
       resolve(color)
@@ -55,23 +55,24 @@ async function pixelColor (image: Electron.NativeImage) {
   })
 }
 
-async function getColor (view: BrowserView) {
+async function getColor(view: BrowserView) {
   const image = await view.webContents.capturePage()
   return pixelColor(image)
 }
 
-function textColor (r: number, g: number, b: number) { // http://alienryderflex.com/hsp.html
+function textColor(r: number, g: number, b: number) {
+  // http://alienryderflex.com/hsp.html
   return Math.sqrt(0.299 * (r * r) + 0.587 * (g * g) + 0.114 * (b * b)) > 127.5 ? 'black' : 'white'
 }
 
-function extractSession (l: string) {
+function extractSession(l: string) {
   const url = new URL(l)
   const session = url.searchParams.get('session') || ''
   const ens = url.port === '8421' ? url.hostname.replace('.localhost', '') || '' : ''
   return { session, ens }
 }
 
-async function extractColors (url: string, ens: string) {
+async function extractColors(url: string, ens: string) {
   let window: BrowserWindow | null = new BrowserWindow({
     x: 0,
     y: 0,
@@ -83,35 +84,27 @@ async function extractColors (url: string, ens: string) {
     titleBarStyle: 'hidden',
     paintWhenInitiallyHidden: true,
     webPreferences: {
-      backgroundThrottling: false,
-      webviewTag: false,
-      nodeIntegration: false,
       contextIsolation: true,
+      webviewTag: false,
       sandbox: true,
+      defaultEncoding: 'utf-8',
+      nodeIntegration: false,
+      scrollBounce: true,
+      navigateOnDragDrop: false,
       disableBlinkFeatures: 'Auxclick',
-      // enableRemoteModule: false,
+      backgroundThrottling: false,
       offscreen: true
     }
   })
 
-  let view: BrowserView | null = new BrowserView({ 
-    webPreferences: Object.assign({ 
-      preload: path.resolve('./main/windows/viewPreload.js') ,
-      partition: 'persist:' + ens,
-      offscreen: true
-    }, webPreferences)
-  })
-
-  view.webContents.on('will-navigate', e => e.preventDefault())
-  view.webContents.on('will-attach-webview', e => e.preventDefault())
-  view.webContents.setWindowOpenHandler(() => ({ action: 'deny' }))
+  let view: BrowserView | null = createViewInstance(ens, { offscreen: true })
 
   view.webContents.session.webRequest.onBeforeSendHeaders((details, cb) => {
     if (!details || !details.frame) return cb({ cancel: true }) // Reject the request
 
     // Block any dapp requests to Frame during color extraction
     if (details.url.includes('127.0.0.1:1248') || details.url.includes('localhost:1248')) {
-      return cb({ cancel: true }) 
+      return cb({ cancel: true })
     }
 
     return cb({ requestHeaders: details.requestHeaders }) // Leave untouched
@@ -124,8 +117,8 @@ async function extractColors (url: string, ens: string) {
 
   try {
     await view.webContents.session.cookies.set({
-      url: url, 
-      name: '__frameSession', 
+      url: url,
+      name: '__frameSession',
       value: session
     })
 
@@ -138,7 +131,7 @@ async function extractColors (url: string, ens: string) {
     log.error(`error extracting colors for ${ens}`, e)
   } finally {
     if (view) {
-      const webcontents = (view.webContents as any)
+      const webcontents = view.webContents as any
       webcontents.destroy()
 
       view = null

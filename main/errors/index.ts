@@ -5,13 +5,16 @@ import store from '../store'
 
 const EVENT_RATE_LIMIT = 5
 
-function getCrashReportFields () {
+function getCrashReportFields() {
   const fields = ['networks', 'networksMeta', 'tokens']
 
-  return fields.reduce((extra, field) => ({ ...extra, [field]: JSON.stringify(store('main', field) || {}) }), {})
+  return fields.reduce(
+    (extra, field) => ({ ...extra, [field]: JSON.stringify(store('main', field) || {}) }),
+    {}
+  )
 }
 
-function sanitizeStackFrame ({ module = '' }) {
+function sanitizeStackFrame({ module = '' }) {
   const matches = /(.+)[\\|\/]frame[\\|\/]resources[\\|\/]app.asar[\\|\/](.+)/.exec(module)
   if (matches && matches[2]) {
     return `{asar}/${matches[2].replaceAll('\\', '/')}`
@@ -19,18 +22,18 @@ function sanitizeStackFrame ({ module = '' }) {
   return module
 }
 
-function getSentryExceptions (event: Event) {
+function getSentryExceptions(event: Event) {
   const exceptions = event?.exception?.values || []
   const safeExceptions = exceptions.map((exception) => {
     const frames = exception?.stacktrace?.frames || []
     const safeFrames = frames.map((frame) => ({ ...frame, module: sanitizeStackFrame(frame) }))
     return { ...exception, stacktrace: { frames: safeFrames } }
   })
-  
+
   return safeExceptions
 }
 
-export function init () {
+export function init() {
   let allowedEvents = EVENT_RATE_LIMIT
 
   const backOffRateLimitBy = (numEventsToAllow: number) => {
@@ -42,7 +45,7 @@ export function init () {
   }
 
   setInterval(() => backOffRateLimitBy(1), 60_000)
-  
+
   Sentry.init({
     // only use IPC from renderer process, not HTTP
     ipcMode: Sentry.IPCMode.Classic,

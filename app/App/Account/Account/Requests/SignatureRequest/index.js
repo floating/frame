@@ -1,12 +1,10 @@
 import React from 'react'
 import Restore from 'react-restore'
-import { fromWei, isHex } from 'web3-utils'
-import { stripHexPrefix } from 'ethereumjs-util'
-import svg from '../../../../../../resources/svg'
-import link from '../../../../../../resources/link'
+import { isHexString } from '@ethersproject/bytes'
+import { stripHexPrefix } from './../../../../../../resources/utils'
 
-function decodeMessage (rawMessage) {
-  if (isHex(rawMessage)) {
+function decodeMessage(rawMessage) {
+  if (isHexString(rawMessage)) {
     const buff = Buffer.from(stripHexPrefix(rawMessage), 'hex')
     return buff.length === 32 ? rawMessage : buff.toString('utf8')
   }
@@ -16,7 +14,7 @@ function decodeMessage (rawMessage) {
 }
 
 class TransactionRequest extends React.Component {
-  constructor (...args) {
+  constructor(...args) {
     super(...args)
     this.state = { allowInput: false, dataView: false }
 
@@ -29,23 +27,7 @@ class TransactionRequest extends React.Component {
     }, props.signingDelay || 1500)
   }
 
-  copyAddress (e) {
-    e.preventDefault()
-    e.target.select()
-    document.execCommand('Copy')
-    this.setState({ copied: true })
-    setTimeout(_ => this.setState({ copied: false }), 1000)
-  }
-
-  toggleDataView (id) {
-    this.setState({ dataView: !this.state.dataView })
-  }
-
-  hexToDisplayValue (hex) {
-    return (Math.round(parseFloat(fromWei(hex, 'ether')) * 1000000) / 1000000).toFixed(6)
-  }
-
-  renderMessage (message) {
+  renderMessage(message) {
     let showMore = false
     if (this.signRefs[0].current && this.signRefs[1].current) {
       const inner = this.signRefs[1].current.clientHeight
@@ -54,13 +36,15 @@ class TransactionRequest extends React.Component {
     }
     return (
       <div ref={this.signRefs[0]} className='signValue'>
-        <div ref={this.signRefs[1]} className='signValueInner'>{message}</div>
+        <div ref={this.signRefs[1]} className='signValueInner'>
+          {message}
+        </div>
         {showMore ? <div className='signValueMore'>scroll to see more</div> : null}
       </div>
     )
   }
 
-  render () {
+  render() {
     const type = this.props.req.type
     const status = this.props.req.status
     const notice = this.props.req.notice
@@ -73,16 +57,12 @@ class TransactionRequest extends React.Component {
     if (status === 'declined') requestClass += ' signerRequestDeclined'
     if (status === 'pending') requestClass += ' signerRequestPending'
     if (status === 'error') requestClass += ' signerRequestError'
-    const mode = this.props.req.mode
-    // const height = mode === 'monitor' ? '215px' : '340px'
-    // const z = mode === 'monitor' ? this.props.z + 2000 - (this.props.i * 2) : this.props.z
+
     return (
       <div key={this.props.req.id || this.props.req.handlerId} className={requestClass}>
         {type === 'sign' ? (
           <div className='approveRequest'>
-            <div className='approveTransactionPayload'>
-              {this.renderMessage(message)}
-            </div>
+            <div className='approveTransactionPayload'>{this.renderMessage(message)}</div>
           </div>
         ) : (
           <div className='unknownType'>{'Unknown: ' + this.props.req.type}</div>

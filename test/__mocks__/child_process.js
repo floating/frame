@@ -1,4 +1,4 @@
-const EventEmitter = require("events")
+const EventEmitter = require('events')
 
 const forkedChildProcess = new EventEmitter()
 forkedChildProcess.kill = jest.fn()

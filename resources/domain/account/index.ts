@@ -1,4 +1,13 @@
-export function accountSort (a: Account, b:Account) {
+import { getSignerDisplayType } from '../signer'
+
+export const accountNS = '114c39e5-cd7d-416f-ab9e-5ab6ab0218ce'
+
+export const isDefaultAccountName = ({ name, lastSignerType }: Account) =>
+  name.toLowerCase() === getDefaultAccountName(lastSignerType)
+
+export const getDefaultAccountName = (type: string) => `${getSignerDisplayType(type)} account`
+
+export function accountSort(a: Account, b: Account) {
   try {
     const [aBlockStr, aLocalStr] = a.created.split(':')
     const [bBlockStr, bLocalStr] = b.created.split(':')
@@ -13,7 +22,7 @@ export function accountSort (a: Account, b:Account) {
     const aBlock = parseInt(aBlockStr)
     const bBlock = parseInt(bBlockStr)
 
-    return bBlock-aBlock
+    return bBlock - aBlock
   } catch (e) {
     console.error(e)
     return 0

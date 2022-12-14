@@ -22,7 +22,9 @@ export default (state, cb) => {
   //   })
   // })
 
-  link.on('action', (action, ...args) => { if (store[action]) store[action](...args) })
+  link.on('action', (action, ...args) => {
+    if (store[action]) store[action](...args)
+  })
   link.send('tray:ready') // turn on api
 
   link.send('tray:refreshMain')

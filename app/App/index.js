@@ -15,7 +15,7 @@ import Footer from './Footer'
 // <DevTools />
 
 class Panel extends React.Component {
-  indicator (connection) {
+  indicator(connection) {
     const status = [connection.primary.status, connection.secondary.status]
     if (status.indexOf('connected') > -1) {
       if (this.store('selected.current')) {
@@ -27,7 +27,7 @@ class Panel extends React.Component {
       return <div className='panelDetailIndicatorInner panelDetailIndicatorBad' />
     }
   }
-  
+
   // componentDidMount () {
   //   document.addEventListener('keydown', (event) => {
   //     console.log('event ky', event.key, this.store('panel.view'))
@@ -45,27 +45,27 @@ class Panel extends React.Component {
   //   })
   // }
 
-  selectNetwork (network) {
+  selectNetwork(network) {
     const [type, id] = network.split(':')
     if (network.type !== type || network.id !== id) link.send('tray:action', 'selectNetwork', type, id)
   }
-  
-  hexToDisplayGwei (weiHex) {
+
+  hexToDisplayGwei(weiHex) {
     return parseInt(weiHex, 'hex') / 1e9 < 1 ? '‹1' : Math.round(parseInt(weiHex, 'hex') / 1e9)
   }
-  
-  render () {
+
+  render() {
     const opacity = this.store('tray.initial') ? 0 : 1
 
     const networks = this.store('main.networks')
     const networkOptions = []
-    Object.keys(networks).forEach(type => {
-      Object.keys(networks[type]).forEach(id => {
+    Object.keys(networks).forEach((type) => {
+      Object.keys(networks[type]).forEach((id) => {
         const net = networks[type][id]
         const status = [net.connection.primary.status, net.connection.secondary.status]
         if (net.on) {
-          networkOptions.push({ 
-            text: net.name, 
+          networkOptions.push({
+            text: net.name,
             value: type + ':' + id,
             indicator: net.on && status.indexOf('connected') > -1 ? 'good' : 'bad'
           })

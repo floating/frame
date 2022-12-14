@@ -10,12 +10,14 @@ const crypt = require('../../crypt')
 
 const SeedSigner = require('./SeedSigner')
 const RingSigner = require('./RingSigner')
-const { stripHexPrefix } = require('ethereumjs-util')
+const { stripHexPrefix } = require('@ethereumjs/util')
 
-const USER_DATA = app ? app.getPath('userData') : path.resolve(path.dirname(require.main.filename), '../.userData');
+const USER_DATA = app
+  ? app.getPath('userData')
+  : path.resolve(path.dirname(require.main.filename), '../.userData')
 const SIGNERS_PATH = path.resolve(USER_DATA, 'signers')
 
-const wait = async ms => new Promise(resolve => setTimeout(resolve, ms))
+const wait = async (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
 module.exports = {
   newPhrase: (cb) => {
@@ -42,7 +44,7 @@ module.exports = {
     if (password.length < 12) return cb(new Error('Hot account password is too short'))
     if (zxcvbn(password).score < 3) return cb(new Error('Hot account password is too weak'))
     const signer = new SeedSigner()
-    signer.addPhrase(phrase, password, err => {
+    signer.addPhrase(phrase, password, (err) => {
       if (err) {
         signer.close()
         return cb(err)
@@ -60,7 +62,7 @@ module.exports = {
     if (zxcvbn(password).score < 3) return cb(new Error('Hot account password is too weak'))
     const signer = new RingSigner()
 
-    signer.addPrivateKey(privateKeyHex, password, err => {
+    signer.addPrivateKey(privateKeyHex, password, (err) => {
       if (err) {
         signer.close()
         return cb(err)
@@ -76,7 +78,7 @@ module.exports = {
     if (password.length < 12) return cb(new Error('Hot account password is too short'))
     if (zxcvbn(password).score < 3) return cb(new Error('Hot account password is too weak'))
     const signer = new RingSigner()
-    signer.addKeystore(keystore, keystorePassword, password, err => {
+    signer.addKeystore(keystore, keystorePassword, password, (err) => {
       if (err) {
         signer.close()
         return cb(err)
@@ -97,7 +99,9 @@ module.exports = {
         try {
           const signer = JSON.parse(fs.readFileSync(path.resolve(SIGNERS_PATH, file), 'utf8'))
           storedSigners[signer.id] = signer
-        } catch (e) { log.error(`Corrupt signer file: ${file}`) }
+        } catch (e) {
+          log.error(`Corrupt signer file: ${file}`)
+        }
       })
 
       // Add stored signers

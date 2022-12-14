@@ -31,7 +31,7 @@ beforeEach(() => {
   socketConnection.emit('connection', mockSocket, extensionRequest)
 })
 
-it('always responds to an extension request for chain id with the requested chain id', done => {
+it('always responds to an extension request for chain id with the requested chain id', (done) => {
   const rpcRequest = { id: 9, jsonrpc: '2.0', method: 'eth_chainId', params: [] }
 
   mockSocket.send = (response) => {
@@ -46,7 +46,7 @@ it('always responds to an extension request for chain id with the requested chai
   mockSocket.emit('message', JSON.stringify(rpcRequest))
 })
 
-it('always responds to an extension request for net version with the requested chain', done => {
+it('always responds to an extension request for net version with the requested chain', (done) => {
   const rpcRequest = { id: 9, jsonrpc: '2.0', method: 'net_version', params: [] }
 
   mockSocket.send = (response) => {

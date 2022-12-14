@@ -10,26 +10,27 @@ export enum Type {
   Lattice = 'lattice'
 }
 
-export function getSignerType (typeValue: string) {
-  return Object.values(Type).find(type => type === typeValue)
+export function getSignerType(typeValue: string) {
+  return Object.values(Type).find((type) => type === typeValue)
 }
 
-export function getSignerDisplayType (signer: Signer) {
-  return ['ring', 'seed'].includes(signer.type.toLowerCase()) ? 'hot' : signer.type
+export function getSignerDisplayType(typeOrSigner: string | Signer = '') {
+  const signerType = typeof typeOrSigner === 'string' ? typeOrSigner : (typeOrSigner as Signer).type
+  return ['ring', 'seed'].includes(signerType.toLowerCase()) ? 'hot' : signerType
 }
 
-export function isHardwareSigner (typeOrSigner: string | Signer = '') {
-  const signerType = (typeof typeOrSigner === 'string') ? typeOrSigner : (typeOrSigner as Signer).type
+export function isHardwareSigner(typeOrSigner: string | Signer = '') {
+  const signerType = typeof typeOrSigner === 'string' ? typeOrSigner : (typeOrSigner as Signer).type
 
   return ['ledger', 'trezor', 'lattice'].includes(signerType.toLowerCase())
 }
 
-export function isSignerReady (signer: Signer) {
+export function isSignerReady(signer: Signer) {
   return signer.status === 'ok'
 }
 
-export function findUnavailableSigners (signerTypeValue: string, signers: Signer[]): Signer[] {
+export function findUnavailableSigners(signerTypeValue: string, signers: Signer[]): Signer[] {
   if (!isHardwareSigner(signerTypeValue)) return []
 
-  return signers.filter(signer => signer.type === signerTypeValue && !isSignerReady(signer))
+  return signers.filter((signer) => signer.type === signerTypeValue && !isSignerReady(signer))
 }

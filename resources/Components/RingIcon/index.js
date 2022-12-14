@@ -21,18 +21,18 @@ const Icon = ({ svgName, svgSize = 16, img, small }) => {
 }
 
 class RingIcon extends React.Component {
-  constructor (...args) {
+  constructor(...args) {
     super(...args)
     this.state = {}
   }
 
-  render () {
+  render() {
     const { color, svgName, svgSize, img, small, block } = this.props
     let ringIconClass = 'ringIcon'
     if (small) ringIconClass += ' ringIconSmall'
     if (block) ringIconClass += ' ringIconBlock'
     return (
-      <div 
+      <div
         className={ringIconClass}
         style={{
           borderColor: color

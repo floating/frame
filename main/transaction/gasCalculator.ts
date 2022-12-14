@@ -1,4 +1,4 @@
-import { intToHex } from 'ethereumjs-util'
+import { intToHex } from '@ethereumjs/util'
 
 interface FeeHistoryResponse {
   baseFeePerGas: string[]
@@ -23,11 +23,15 @@ interface GasPrices {
 export default class GasCalculator {
   private connection
 
-  constructor (connection: any  /* Chains */) {
+  constructor(connection: any /* Chains */) {
     this.connection = connection
   }
 
-  private async getFeeHistory(numBlocks: number, rewardPercentiles: number[], newestBlock = 'latest'): Promise<Block[]> {
+  private async getFeeHistory(
+    numBlocks: number,
+    rewardPercentiles: number[],
+    newestBlock = 'latest'
+  ): Promise<Block[]> {
     const blockCount = intToHex(numBlocks)
     const payload = { method: 'eth_feeHistory', params: [blockCount, newestBlock, rewardPercentiles] }
 
@@ -37,14 +41,14 @@ export default class GasCalculator {
       return {
         baseFee: parseInt(baseFee, 16),
         gasUsedRatio: feeHistory.gasUsedRatio[i],
-        rewards: (feeHistory.reward[i] || []).map(reward => parseInt(reward, 16))
+        rewards: (feeHistory.reward[i] || []).map((reward) => parseInt(reward, 16))
       }
     })
 
     return feeHistoryBlocks
   }
 
-  private calculateReward (blocks: Block[]) {
+  private calculateReward(blocks: Block[]) {
     const recentBlocks = 10
     const allBlocks = blocks.length
 
@@ -66,7 +70,9 @@ export default class GasCalculator {
     const eligibleRewardsBlocks = rewardCalculationStrategies.reduce((foundBlocks, strategy) => {
       if (foundBlocks.length === 0) {
         const blockSample = blocks.slice(blocks.length - Math.min(strategy.blockSampleSize, blocks.length))
-        const eligibleBlocks = blockSample.filter(block => block.gasUsedRatio > strategy.minRatio && block.gasUsedRatio <= strategy.maxRatio)
+        const eligibleBlocks = blockSample.filter(
+          (block) => block.gasUsedRatio > strategy.minRatio && block.gasUsedRatio <= strategy.maxRatio
+        )
 
         if (eligibleBlocks.length > 0) return eligibleBlocks
       }
@@ -76,10 +82,14 @@ export default class GasCalculator {
 
     // use the median reward from the block sample or use the fee from the last block as a last resort
     const lastBlockFee = blocks[blocks.length - 1].rewards[0]
-    return eligibleRewardsBlocks.map(block => block.rewards[0]).sort()[Math.floor(eligibleRewardsBlocks.length / 2)] || lastBlockFee
+    return (
+      eligibleRewardsBlocks.map((block) => block.rewards[0]).sort()[
+        Math.floor(eligibleRewardsBlocks.length / 2)
+      ] || lastBlockFee
+    )
   }
 
-  async getGasPrices (): Promise<GasPrices> {
+  async getGasPrices(): Promise<GasPrices> {
     const gasPrice = await this.connection.send({ method: 'eth_gasPrice' })
 
     // in the future we may want to have specific calculators to calculate variations
@@ -91,11 +101,11 @@ export default class GasCalculator {
       asap: gasPrice
     }
   }
-  
-  async getFeePerGas (): Promise<GasFees> {
+
+  async getFeePerGas(): Promise<GasFees> {
     // fetch the last 30 blocks and the bottom 10% of priority fees paid for each block
     const blocks = await this.getFeeHistory(30, [10])
-    
+
     // plan for max fee of 2 full blocks, each one increasing the fee by 12.5%
     const nextBlockFee = blocks[blocks.length - 1].baseFee // base fee for next block
     const calculatedFee = Math.ceil(nextBlockFee * 1.125 * 1.125)

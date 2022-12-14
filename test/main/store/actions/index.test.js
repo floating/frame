@@ -1,14 +1,16 @@
 import BigNumber from 'bignumber.js'
 import log from 'electron-log'
-import { addHexPrefix } from 'ethereumjs-util'
+import { addHexPrefix } from '@ethereumjs/util'
 
 import {
   addNetwork as addNetworkAction,
   removeBalance as removeBalanceAction,
   setBalances as setBalancesAction,
+  removeBalances as removeBalancesAction,
   addCustomTokens as addCustomTokensAction,
   removeCustomTokens as removeTokensAction,
   addKnownTokens as addKnownTokensAction,
+  removeKnownTokens as removeKnownTokensAction,
   setScanning as setScanningAction,
   initOrigin as initOriginAction,
   clearOrigins as clearOriginsAction,
@@ -18,8 +20,10 @@ import {
   removeNetwork as removeNetworkAction,
   updateNetwork as updateNetworkAction,
   activateNetwork as activateNetworkAction,
-  setBlockHeight as setBlockHeightAction
+  setBlockHeight as setBlockHeightAction,
+  updateAccount as updateAccountAction
 } from '../../../../main/store/actions'
+import { toTokenId } from '../../../../resources/domain/balance'
 
 beforeAll(() => {
   log.transports.console.level = false
@@ -63,7 +67,7 @@ describe('#addNetwork', () => {
     update({ networks, networksMeta })
   }
 
-  const addNetwork = network => addNetworkAction(updaterFn, network)
+  const addNetwork = (network) => addNetworkAction(updaterFn, network)
 
   beforeEach(() => {
     networks = { ethereum: {} }
@@ -121,7 +125,7 @@ describe('#addNetwork', () => {
     addNetwork(polygonNetwork)
 
     expect(networks.ethereum['137'].secondaryRpc).toBeUndefined()
-    expect(networks.ethereum['137'].connection.secondary.custom).toBe( 'https://rpc-mainnet.matic.network')
+    expect(networks.ethereum['137'].connection.secondary.custom).toBe('https://rpc-mainnet.matic.network')
   })
 
   it('adds a network with the correct default connection presets', () => {
@@ -133,13 +137,13 @@ describe('#addNetwork', () => {
   it('adds a network with the correct default primary connection settings', () => {
     addNetwork(polygonNetwork)
 
-    expect(networks.ethereum['137'].connection.primary).toEqual({ 
-      on: true, 
-      current: 'custom', 
-      status: 'loading', 
-      connected: false, 
-      type: '', 
-      network: '', 
+    expect(networks.ethereum['137'].connection.primary).toEqual({
+      on: true,
+      current: 'custom',
+      status: 'loading',
+      connected: false,
+      type: '',
+      network: '',
       custom: ''
     })
   })
@@ -147,13 +151,13 @@ describe('#addNetwork', () => {
   it('adds a network with the correct default secondary connection settings', () => {
     addNetwork(polygonNetwork)
 
-    expect(networks.ethereum['137'].connection.secondary).toEqual({ 
-      on: false, 
-      current: 'custom', 
-      status: 'loading', 
-      connected: false, 
-      type: '', 
-      network: '', 
+    expect(networks.ethereum['137'].connection.secondary).toEqual({
+      on: false,
+      current: 'custom',
+      status: 'loading',
+      connected: false,
+      type: '',
+      network: '',
       custom: ''
     })
   })
@@ -234,7 +238,7 @@ describe('#addNetwork', () => {
 
   it('does not add the network if the networks already exists', () => {
     networks.ethereum['137'] = { ...polygonNetwork }
-  
+
     addNetwork({
       id: 137,
       type: 'ethereum',
@@ -256,23 +260,27 @@ describe('#setBalances', () => {
     balances = update(balances)
   }
 
-  const setBalances = updatedBalances => setBalancesAction(updaterFn, owner, updatedBalances)
+  const setBalances = (updatedBalances) => setBalancesAction(updaterFn, owner, updatedBalances)
 
   let balances
 
   beforeEach(() => {
-    balances = [{
-      ...testTokens.badger,
-      balance: addHexPrefix(new BigNumber(30.5).toString(16))
-    }]
+    balances = [
+      {
+        ...testTokens.badger,
+        balance: addHexPrefix(new BigNumber(30.5).toString(16))
+      }
+    ]
   })
 
   it('adds a new balance', () => {
-    setBalances([{
-      ...testTokens.zrx,
-      balance: addHexPrefix(new BigNumber(7983.2332).toString(16))
-    }])
-    
+    setBalances([
+      {
+        ...testTokens.zrx,
+        balance: addHexPrefix(new BigNumber(7983.2332).toString(16))
+      }
+    ])
+
     expect(balances).toEqual([
       {
         ...testTokens.badger,
@@ -286,33 +294,42 @@ describe('#setBalances', () => {
   })
 
   it('updates an existing balance to a positive amount', () => {
-    setBalances([{
-      ...testTokens.badger,
-      balance: addHexPrefix(new BigNumber(41.9).toString(16))
-    }])
-    
-    expect(balances).toEqual([{
-      ...testTokens.badger,
-      balance: addHexPrefix(new BigNumber(41.9).toString(16))
-    }])
+    setBalances([
+      {
+        ...testTokens.badger,
+        balance: addHexPrefix(new BigNumber(41.9).toString(16))
+      }
+    ])
+
+    expect(balances).toEqual([
+      {
+        ...testTokens.badger,
+        balance: addHexPrefix(new BigNumber(41.9).toString(16))
+      }
+    ])
   })
 
   it('updates an existing balance to zero', () => {
-    setBalances([{
-      ...testTokens.badger,
-      balance: '0x0'
-    }])
-    
-    expect(balances).toEqual([{
-      ...testTokens.badger,
-      balance: '0x0'
-    }])
+    setBalances([
+      {
+        ...testTokens.badger,
+        balance: '0x0'
+      }
+    ])
+
+    expect(balances).toEqual([
+      {
+        ...testTokens.badger,
+        balance: '0x0'
+      }
+    ])
   })
 })
 
 describe('#removeBalance', () => {
   let balances = {
-    [owner]: [{
+    [owner]: [
+      {
         ...testTokens.zrx,
         balance: addHexPrefix(BigNumber('798.564').toString(16))
       },
@@ -321,14 +338,16 @@ describe('#removeBalance', () => {
         balance: addHexPrefix(BigNumber('15.543').toString(16))
       }
     ],
-    '0xd0e3872f5fa8ecb49f1911f605c0da90689a484e': [{
-      ...testTokens.zrx,
-      balance: addHexPrefix(BigNumber('8201.343').toString(16))
-    },
-    {
-      ...testTokens.badger,
-      balance: addHexPrefix(BigNumber('101.988').toString(16))
-    }]
+    '0xd0e3872f5fa8ecb49f1911f605c0da90689a484e': [
+      {
+        ...testTokens.zrx,
+        balance: addHexPrefix(BigNumber('8201.343').toString(16))
+      },
+      {
+        ...testTokens.badger,
+        balance: addHexPrefix(BigNumber('101.988').toString(16))
+      }
+    ]
   }
 
   const updaterFn = (node, update) => {
@@ -337,14 +356,16 @@ describe('#removeBalance', () => {
     balances = update(balances)
   }
 
-  const removeBalance = key => removeBalanceAction(updaterFn, 1, key)
+  const removeBalance = (key) => removeBalanceAction(updaterFn, 1, key)
 
   it('removes a balance from all accounts', () => {
     removeBalance(testTokens.zrx.address)
 
     expect(balances[owner]).not.toContainEqual(expect.objectContaining({ address: testTokens.zrx.address }))
     expect(balances[owner]).toHaveLength(1)
-    expect(balances['0xd0e3872f5fa8ecb49f1911f605c0da90689a484e']).not.toContainEqual(expect.objectContaining({ address: testTokens.zrx.address }))
+    expect(balances['0xd0e3872f5fa8ecb49f1911f605c0da90689a484e']).not.toContainEqual(
+      expect.objectContaining({ address: testTokens.zrx.address })
+    )
     expect(balances['0xd0e3872f5fa8ecb49f1911f605c0da90689a484e']).toHaveLength(1)
   })
 })
@@ -358,7 +379,7 @@ describe('#addCustomTokens', () => {
     tokens = update(tokens)
   }
 
-  const addTokens = tokensToAdd => addCustomTokensAction(updaterFn, tokensToAdd)
+  const addTokens = (tokensToAdd) => addCustomTokensAction(updaterFn, tokensToAdd)
 
   it('adds a token', () => {
     tokens = [testTokens.zrx]
@@ -393,11 +414,11 @@ describe('#removeCustomTokens', () => {
     tokens = update(tokens)
   }
 
-  const removeTokens = tokensToRemove => removeTokensAction(updaterFn, tokensToRemove)
+  const removeTokens = (tokensToRemove) => removeTokensAction(updaterFn, tokensToRemove)
 
   it('removes a token', () => {
     tokens = [testTokens.zrx, testTokens.badger]
-    
+
     const tokenToRemove = { ...testTokens.zrx }
 
     removeTokens([tokenToRemove])
@@ -457,7 +478,7 @@ describe('#addKnownTokens', () => {
     tokens = update(tokens)
   }
 
-  const addTokens = tokensToAdd => addKnownTokensAction(updaterFn, account, tokensToAdd)
+  const addTokens = (tokensToAdd) => addKnownTokensAction(updaterFn, account, tokensToAdd)
 
   it('adds a token', () => {
     tokens = [testTokens.zrx]
@@ -488,11 +509,6 @@ describe('#setScanning', () => {
 
   beforeAll(() => {
     isScanning = false
-    jest.useFakeTimers()
-  })
-
-  afterAll(() => {
-    jest.useRealTimers()
   })
 
   const updaterFn = (node, address, update) => {
@@ -502,7 +518,7 @@ describe('#setScanning', () => {
     isScanning = update()
   }
 
-  const setScanning = scanning => setScanningAction(updaterFn, owner, scanning)
+  const setScanning = (scanning) => setScanningAction(updaterFn, owner, scanning)
 
   it('immediately sets the state to scanning', () => {
     setScanning(true)
@@ -534,15 +550,11 @@ describe('#initOrigin', () => {
 
   beforeEach(() => {
     origins = {}
-    jest.useFakeTimers().setSystemTime(creationDate)
-  })
-
-  afterEach(() => {
-    jest.useRealTimers()
+    jest.setSystemTime(creationDate)
   })
 
   it('creates a new origin', () => {
-    const origin = { name: 'frame.test', chain: { id: 137, type: 'ethereum' }}
+    const origin = { name: 'frame.test', chain: { id: 137, type: 'ethereum' } }
 
     initOrigin('91f6971d-ba85-52d7-a27e-6af206eb2433', origin)
 
@@ -575,7 +587,7 @@ describe('#clearOrigins', () => {
     origins = {
       '91f6971d-ba85-52d7-a27e-6af206eb2433': {},
       '8073729a-5e59-53b7-9e69-5d9bcff94087': {},
-      'd7acc008-6411-5486-bb2d-0c0cfcddbb92': {},
+      'd7acc008-6411-5486-bb2d-0c0cfcddbb92': {}
     }
   })
 
@@ -599,7 +611,7 @@ describe('#removeOrigin', () => {
     origins = {
       '91f6971d-ba85-52d7-a27e-6af206eb2433': {},
       '8073729a-5e59-53b7-9e69-5d9bcff94087': {},
-      'd7acc008-6411-5486-bb2d-0c0cfcddbb92': {},
+      'd7acc008-6411-5486-bb2d-0c0cfcddbb92': {}
     }
   })
 
@@ -608,7 +620,7 @@ describe('#removeOrigin', () => {
 
     expect(origins).toEqual({
       '91f6971d-ba85-52d7-a27e-6af206eb2433': {},
-      'd7acc008-6411-5486-bb2d-0c0cfcddbb92': {},
+      'd7acc008-6411-5486-bb2d-0c0cfcddbb92': {}
     })
   })
 })
@@ -617,18 +629,18 @@ describe('#addOriginRequest', () => {
   let origins
 
   const creationTime = new Date('2022-05-24').getTime()
-  const updateTime = creationTime + (1000 * 60 * 60 * 24 * 2) // 2 days
-  const endTime = creationTime + (1000 * 60 * 60 * 24 * 1) // 1 day
+  const updateTime = creationTime + 1000 * 60 * 60 * 24 * 2 // 2 days
+  const endTime = creationTime + 1000 * 60 * 60 * 24 * 1 // 1 day
 
   const updaterFn = (node, id, update) => {
     expect(node).toBe('main.origins')
     origins[id] = update(origins[id])
   }
 
-  const addOriginRequest = id => addOriginRequestAction(updaterFn, id)
+  const addOriginRequest = (id) => addOriginRequestAction(updaterFn, id)
 
   beforeEach(() => {
-    jest.useFakeTimers().setSystemTime(updateTime)
+    jest.setSystemTime(updateTime)
 
     origins = {
       activeOrigin: {
@@ -649,10 +661,6 @@ describe('#addOriginRequest', () => {
         }
       }
     }
-  })
-
-  afterEach(() => {
-    jest.useRealTimers()
   })
 
   it('updates the timestamp for an existing session', () => {
@@ -686,7 +694,7 @@ describe('#addOriginRequest', () => {
 })
 
 describe('#switchOriginChain', () => {
-  let origins = { }
+  let origins = {}
 
   const updaterFn = (node, origin, update) => {
     const nodePath = [node, origin].join('.')
@@ -703,7 +711,8 @@ describe('#switchOriginChain', () => {
     }
   })
 
-  const switchChain = (chainId, type) => switchOriginChainAction(updaterFn, '91f6971d-ba85-52d7-a27e-6af206eb2433', chainId, type)
+  const switchChain = (chainId, type) =>
+    switchOriginChainAction(updaterFn, '91f6971d-ba85-52d7-a27e-6af206eb2433', chainId, type)
 
   it('should switch the chain for an origin', () => {
     switchChain(50, 'ethereum')
@@ -737,29 +746,30 @@ describe('#removeNetwork', () => {
         }
       },
       networks: {
-        'ethereum': {
+        ethereum: {
           1: {},
           4: {},
           137: {}
         },
-        'cosmos': {
+        cosmos: {
           50: {}
         }
       },
       networksMeta: {
-        'ethereum': {
+        ethereum: {
           1: {},
           4: {},
           137: {}
         },
-        'cosmos': {
+        cosmos: {
           50: {}
         }
       }
     }
   })
 
-  const removeNetwork = (networkId, networkType = 'ethereum') => removeNetworkAction(updaterFn, { id: networkId, type: networkType })
+  const removeNetwork = (networkId, networkType = 'ethereum') =>
+    removeNetworkAction(updaterFn, { id: networkId, type: networkType })
 
   it('should delete the network and meta', () => {
     removeNetwork(4)
@@ -790,14 +800,14 @@ describe('#removeNetwork', () => {
   describe('when passed the last network of a given type', () => {
     it('should not delete the last network of a given type', () => {
       removeNetwork(50, 'cosmos')
-  
+
       expect(main.networks.cosmos[50]).toStrictEqual({})
       expect(main.networksMeta.cosmos[50]).toStrictEqual({})
     })
 
     it('should not update its origins', () => {
       removeNetwork(50, 'cosmos')
-  
+
       expect(main.origins).toStrictEqual({
         '91f6971d-ba85-52d7-a27e-6af206eb2433': {
           chain: { id: 1, type: 'ethereum' }
@@ -841,44 +851,62 @@ describe('#updateNetwork', () => {
         }
       },
       networks: {
-        'ethereum': {
+        ethereum: {
           1: {},
           4: {},
           137: {}
         },
-        'cosmos': {
+        cosmos: {
           50: {}
         }
       },
       networksMeta: {
-        'ethereum': {
+        ethereum: {
           1: {},
           4: {},
           137: {}
         },
-        'cosmos': {
+        cosmos: {
           50: {}
         }
       }
     }
   })
 
-  const updateNetwork = (existingNetwork, newNetwork) => updateNetworkAction(updaterFn, existingNetwork, newNetwork)
+  const updateNetwork = (existingNetwork, newNetwork) =>
+    updateNetworkAction(updaterFn, existingNetwork, newNetwork)
 
   it('should update the network', () => {
-    updateNetwork({ id: '0x4', type: 'ethereum', name: '', explorer: '', symbol: '' }, { id: '0x42', type: 'ethereum', name: 'test', explorer: 'explorer.test', symbol: 'TEST' })
+    updateNetwork(
+      { id: '0x4', type: 'ethereum', name: '', explorer: '', symbol: '' },
+      { id: '0x42', type: 'ethereum', name: 'test', explorer: 'explorer.test', symbol: 'TEST' }
+    )
 
-    expect(main.networks.ethereum).toStrictEqual({ 1: {}, 66: { id: 66, type: 'ethereum', name: 'test', explorer: 'explorer.test', symbol: 'TEST' }, 137: {} })
+    expect(main.networks.ethereum).toStrictEqual({
+      1: {},
+      66: { id: 66, type: 'ethereum', name: 'test', explorer: 'explorer.test', symbol: 'TEST' },
+      137: {}
+    })
   })
 
   it('should trim string properties', () => {
-    updateNetwork({ id: '0x4', type: 'ethereum', name: '', explorer: '', symbol: '' }, { id: '0x42', type: 'ethereum', name: 'test     ', explorer: '   explorer.test    ', symbol: 'TEST  ' })
+    updateNetwork(
+      { id: '0x4', type: 'ethereum', name: '', explorer: '', symbol: '' },
+      { id: '0x42', type: 'ethereum', name: 'test     ', explorer: '   explorer.test    ', symbol: 'TEST  ' }
+    )
 
-    expect(main.networks.ethereum).toStrictEqual({ 1: {}, 66: { id: 66, type: 'ethereum', name: 'test', explorer: 'explorer.test', symbol: 'TEST' }, 137: {} })
+    expect(main.networks.ethereum).toStrictEqual({
+      1: {},
+      66: { id: 66, type: 'ethereum', name: 'test', explorer: 'explorer.test', symbol: 'TEST' },
+      137: {}
+    })
   })
 
   it('should update the chainId for origins using the updated network', () => {
-    updateNetwork({ id: '0x4', type: 'ethereum', name: '', explorer: '', symbol: '' }, { id: '0x42', type: 'ethereum', name: 'test', explorer: 'explorer.test', symbol: 'TEST' })
+    updateNetwork(
+      { id: '0x4', type: 'ethereum', name: '', explorer: '', symbol: '' },
+      { id: '0x42', type: 'ethereum', name: 'test', explorer: 'explorer.test', symbol: 'TEST' }
+    )
 
     expect(main.origins).toStrictEqual({
       '91f6971d-ba85-52d7-a27e-6af206eb2433': {
@@ -967,8 +995,8 @@ describe('#setBlockHeight', () => {
           137: {
             blockHeight: 0
           }
-        },
-      },
+        }
+      }
     }
   })
 
@@ -977,6 +1005,167 @@ describe('#setBlockHeight', () => {
   it('should update the block height for the expected chain', () => {
     setBlockHeight(4, 500)
 
-    expect(main.networksMeta.ethereum).toStrictEqual({ 1: { blockHeight: 0 }, 4: { blockHeight: 500 }, 137: { blockHeight: 0 } })
+    expect(main.networksMeta.ethereum).toStrictEqual({
+      1: { blockHeight: 0 },
+      4: { blockHeight: 500 },
+      137: { blockHeight: 0 }
+    })
+  })
+})
+
+describe('#updateAccount', () => {
+  let main
+
+  const updaterFn = (node, id, update) => {
+    if (node === 'main.accounts') {
+      main.accounts[id] = update(main.accounts[id])
+    }
+
+    if (node === 'main.accountsMeta') {
+      main.accountsMeta[id] = update(main.accountsMeta[id])
+    }
+  }
+
+  beforeEach(() => {
+    jest.setSystemTime(new Date('2022-11-17T11:01:58.135Z'))
+
+    main = {
+      accounts: {
+        1: {
+          id: '1',
+          name: 'cool account',
+          lastSignerType: 'ledger',
+          balances: {}
+        }
+      },
+      accountsMeta: {
+        'e42ee170-4601-5428-bac5-d8d92fe049e8': {
+          name: 'cool account',
+          lastUpdated: 1568682918135
+        }
+      }
+    }
+  })
+
+  const setAccount = (id, updatedAccount) => updateAccountAction(updaterFn, { ...updatedAccount, id })
+
+  it('should update the account', () => {
+    setAccount('1', { name: 'cool account', lastSignerType: 'seed', status: 'ok' })
+
+    expect(main.accounts).toStrictEqual({
+      1: { id: '1', name: 'cool account', lastSignerType: 'seed', status: 'ok', balances: {} }
+    })
+  })
+
+  it('should not update account balances', () => {
+    setAccount('1', { name: 'cool account', lastSignerType: 'seed', status: 'ok', balances: 'ignored' })
+
+    expect(main.accounts).toStrictEqual({
+      1: { id: '1', name: 'cool account', lastSignerType: 'seed', status: 'ok', balances: {} }
+    })
+  })
+
+  it('should create a new account', () => {
+    setAccount('2', { name: 'new cool account', lastSignerType: 'seed', status: 'ok' })
+
+    expect(main.accounts).toStrictEqual({
+      1: { id: '1', name: 'cool account', lastSignerType: 'ledger', balances: {} },
+      2: { id: '2', name: 'new cool account', lastSignerType: 'seed', status: 'ok', balances: {} }
+    })
+  })
+
+  it('should update existing accountMeta with the expected data', () => {
+    setAccount('1', { name: 'not so cool account', lastSignerType: 'seed', status: 'ok' })
+
+    expect(main.accountsMeta).toStrictEqual({
+      'e42ee170-4601-5428-bac5-d8d92fe049e8': { name: 'not so cool account', lastUpdated: 1668682918135 }
+    })
+  })
+
+  it('should create new accountMeta with the expected data', () => {
+    setAccount('2', { name: 'not so cool account', lastSignerType: 'seed', status: 'ok' })
+
+    expect(main.accountsMeta).toStrictEqual({
+      'e42ee170-4601-5428-bac5-d8d92fe049e8': { name: 'cool account', lastUpdated: 1568682918135 },
+      '0d6c930e-3495-56cc-993f-8da3a6150003': { name: 'not so cool account', lastUpdated: 1668682918135 }
+    })
+  })
+
+  it(`should not create a new value for a default label`, () => {
+    setAccount('2', { name: 'hot account', lastSignerType: 'seed', status: 'ok' })
+
+    expect(main.accountsMeta).toStrictEqual({
+      'e42ee170-4601-5428-bac5-d8d92fe049e8': { name: 'cool account', lastUpdated: 1568682918135 }
+    })
+  })
+
+  it(`should not update an existing value with a default label`, () => {
+    setAccount('1', { name: 'hot account', lastSignerType: 'seed', status: 'ok' })
+
+    expect(main.accountsMeta).toStrictEqual({
+      'e42ee170-4601-5428-bac5-d8d92fe049e8': { name: 'cool account', lastUpdated: 1568682918135 }
+    })
+  })
+})
+
+describe('#removeBalances', () => {
+  let balances
+
+  const updaterFn = (node, address, update) => {
+    expect(node).toBe('main.balances')
+    expect(address).toBe(owner)
+
+    balances = update(balances)
+  }
+
+  const removeBalances = (setToRemove) => removeBalancesAction(updaterFn, owner, setToRemove)
+
+  beforeEach(() => {
+    balances = Object.values(testTokens).map((token) => ({
+      ...token,
+      balance: addHexPrefix(new BigNumber(120).toString(16))
+    }))
+  })
+
+  it('should remove all tokens from the removal set from an accounts balance', () => {
+    const removalSet = new Set(Object.values(testTokens).map(toTokenId))
+    removeBalances(removalSet)
+    expect(balances.length).toBe(0)
+  })
+
+  it('should only remove tokens from the removal set from an accounts balance', () => {
+    const removalSet = new Set()
+    removalSet.add(toTokenId(testTokens.badger))
+    removeBalances(removalSet)
+    expect(balances.length).toBe(1)
+  })
+})
+
+describe('#removeKnownTokens', () => {
+  let knownTokens
+
+  const updaterFn = (node, address, update) => {
+    expect(node).toBe('main.tokens.known')
+    expect(address).toBe(owner)
+
+    knownTokens = update(knownTokens)
+  }
+
+  const removeKnownTokens = (setToRemove) => removeKnownTokensAction(updaterFn, owner, setToRemove)
+
+  beforeEach(() => {
+    knownTokens = Object.values(testTokens)
+  })
+
+  it('should remove all tokens from the removal set from an accounts known tokens', () => {
+    const removalSet = new Set(Object.values(testTokens).map(toTokenId))
+    removeKnownTokens(removalSet)
+    expect(knownTokens.length).toBe(0)
+  })
+
+  it('should only remove tokens from the removal set from an accounts known tokens', () => {
+    const removalSet = new Set([toTokenId(testTokens.badger)])
+    removeKnownTokens(removalSet)
+    expect(knownTokens.length).toBe(1)
   })
 })

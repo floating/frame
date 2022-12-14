@@ -1,11 +1,6 @@
 {
-  "roots": [
-    "test"
-  ],
-  "testPathIgnorePatterns": [
-    "/node_modules/",
-    "<rootDir>/test/main/signers/ledger/adapter"    
-  ],
+  "roots": ["test"],
+  "testPathIgnorePatterns": ["/node_modules/", "<rootDir>/test/main/signers/ledger/adapter"],
   "moduleNameMapper": {
     "\\.svg$": "<rootDir>/test/jest.svg.js"
   },

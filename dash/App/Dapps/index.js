@@ -1,4 +1,4 @@
-import React, {  createRef } from 'react'
+import React, { createRef } from 'react'
 import Restore from 'react-restore'
 import link from '../../../resources/link'
 import { isNetworkConnected, isNetworkEnabled } from '../../../resources/utils/chains'
@@ -8,36 +8,42 @@ import RingIcon from '../../../resources/Components/RingIcon'
 
 import DappDetails from './DappDetails'
 
-function bySessionStartTime (a, b) {
+function bySessionStartTime(a, b) {
   return b.session.startedAt - a.session.startedAt
 }
 
-function byLastUpdated (a, b) {
+function byLastUpdated(a, b) {
   return b.session.lastUpdatedAt - a.session.lastUpdatedAt
 }
 
 const originFilter = ['frame-internal', 'frame-extension']
 
-function getOriginsForChain (chain, origins) {
-  const { connectedOrigins, disconnectedOrigins } = Object.entries(origins).reduce((acc, [id, origin]) => {
-    if (origin.chain.id === chain.id && !originFilter.includes(origin.name)) {
-      const connected = isNetworkConnected(chain) &&
-        (!origin.session.endedAt || origin.session.startedAt > origin.session.endedAt)
+function getOriginsForChain(chain, origins) {
+  const { connectedOrigins, disconnectedOrigins } = Object.entries(origins).reduce(
+    (acc, [id, origin]) => {
+      if (origin.chain.id === chain.id && !originFilter.includes(origin.name)) {
+        const connected =
+          isNetworkConnected(chain) &&
+          (!origin.session.endedAt || origin.session.startedAt > origin.session.endedAt)
 
-      acc[connected ? 'connectedOrigins' : 'disconnectedOrigins'].push({ ...origin, id })
-    }
+        acc[connected ? 'connectedOrigins' : 'disconnectedOrigins'].push({ ...origin, id })
+      }
 
-    return acc
-  }, { connectedOrigins: [], disconnectedOrigins: [] })
+      return acc
+    },
+    { connectedOrigins: [], disconnectedOrigins: [] }
+  )
 
   return {
     connected: connectedOrigins.sort(bySessionStartTime),
-    disconnected: disconnectedOrigins.sort(byLastUpdated).filter(origin => (Date.now() - origin.session.lastUpdatedAt) < 60 * 60 * 1000)
+    disconnected: disconnectedOrigins
+      .sort(byLastUpdated)
+      .filter((origin) => Date.now() - origin.session.lastUpdatedAt < 60 * 60 * 1000)
   }
 }
 
 class Indicator extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.state = {
@@ -53,9 +59,15 @@ class Indicator extends React.Component {
     }, 200)
   }
 
-  render () {
+  render() {
     if (this.props.connected) {
-      return <div className={this.state.active ? 'sliceOriginIndicator sliceOriginIndicatorActive' : 'sliceOriginIndicator' } />
+      return (
+        <div
+          className={
+            this.state.active ? 'sliceOriginIndicator sliceOriginIndicatorActive' : 'sliceOriginIndicator'
+          }
+        />
+      )
     } else {
       return <div className='sliceOriginIndicator sliceOriginIndicatorOff' />
     }
@@ -63,7 +75,7 @@ class Indicator extends React.Component {
 }
 
 class _OriginModule extends React.Component {
-  constructor (...args) {
+  constructor(...args) {
     super(...args)
 
     this.state = {
@@ -74,7 +86,7 @@ class _OriginModule extends React.Component {
     this.ref = createRef()
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.requestUpdates = setInterval(() => {
       if (this.props.connected) {
         this.updateRequestRate()
@@ -82,11 +94,11 @@ class _OriginModule extends React.Component {
     }, 1000)
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     clearInterval(this.requestUpdates)
   }
 
-  updateRequestRate () {
+  updateRequestRate() {
     const { origin } = this.props
     const now = new Date().getTime()
     const sessionLength = now - origin.session.startedAt
@@ -94,31 +106,25 @@ class _OriginModule extends React.Component {
     this.setState({ averageRequests: (origin.session.requests / sessionLengthSeconds).toFixed(2) })
   }
 
-  render () {
+  render() {
     const { origin, connected } = this.props
 
     return (
-      <div>      
-        <div 
+      <div>
+        <div
           className='sliceOrigin'
           onClick={() => {
-            link.send('tray:action', 'navDash', { view: 'dapps', data: { dappDetails:  origin.id }})
+            link.send('tray:action', 'navDash', { view: 'dapps', data: { dappDetails: origin.id } })
           }}
         >
           <Indicator key={origin.session.lastUpdatedAt} connected={connected} />
-          <div className='sliceOriginTitle'>
-            {origin.name}
-          </div>
+          <div className='sliceOriginTitle'>{origin.name}</div>
           <div className='sliceOriginReqs'>
             <div className='sliceOriginReqsNumber'>{this.state.averageRequests}</div>
             <div className='sliceOriginReqsLabel'>{'reqs/min'}</div>
           </div>
         </div>
-        {this.state.expanded ? (
-          <div>
-            {'origin quick menu'}
-          </div>
-        ) : null}
+        {this.state.expanded ? <div>{'origin quick menu'}</div> : null}
       </div>
     )
   }
@@ -131,31 +137,29 @@ const ChainOrigins = ({ chain: { name }, origins, primaryColor, icon }) => {
     <>
       <div className='originTitle'>
         <div className='originTitleIcon'>
-          <RingIcon 
-            small={true}
-            color={`var(--${primaryColor})`}
-            img={icon}
-          />
+          <RingIcon small={true} color={`var(--${primaryColor})`} img={icon} />
         </div>
         <div className='originTitleText'>{name}</div>
       </div>
-      {origins.connected.map((origin) => <OriginModule origin={origin} connected={true} />)}
-      {origins.disconnected.map((origin) => <OriginModule origin={origin} connected={false} />)}
+      {origins.connected.map((origin) => (
+        <OriginModule origin={origin} connected={true} />
+      ))}
+      {origins.disconnected.map((origin) => (
+        <OriginModule origin={origin} connected={false} />
+      ))}
       {origins.connected.length === 0 && origins.disconnected.length === 0 ? (
-        <div className='sliceOriginNoDapp'>
-          {'No Dapp Recently Connected'}
-        </div>
+        <div className='sliceOriginNoDapp'>{'No Dapp Recently Connected'}</div>
       ) : null}
     </>
   )
 }
-  
+
 class Dapps extends React.Component {
-  getEnabledChains () {
+  getEnabledChains() {
     return Object.values(this.store('main.networks.ethereum')).filter(isNetworkEnabled)
   }
 
-  render () {
+  render() {
     const enabledChains = this.getEnabledChains()
     const origins = this.store('main.origins')
     const clearOriginsClickHandler = () => link.send('tray:clearOrigins')
@@ -167,21 +171,21 @@ class Dapps extends React.Component {
     } else {
       return (
         <div className='cardShow'>
-          {
-            enabledChains.map(chain => {
-              const chainOrigins = getOriginsForChain(chain, origins)
-              const { primaryColor, icon } = this.store('main.networksMeta.ethereum', chain.id)
-  
-              return chainOrigins.length === 0
-                ? <></>
-                : <ChainOrigins chain={chain} origins={chainOrigins} primaryColor={primaryColor} icon={icon} />
-            })
-          }
-          <div className={'clearOriginsButton'} onClick={clearOriginsClickHandler} >
+          {enabledChains.map((chain) => {
+            const chainOrigins = getOriginsForChain(chain, origins)
+            const { primaryColor, icon } = this.store('main.networksMeta.ethereum', chain.id)
+
+            return chainOrigins.length === 0 ? (
+              <></>
+            ) : (
+              <ChainOrigins chain={chain} origins={chainOrigins} primaryColor={primaryColor} icon={icon} />
+            )
+          })}
+          <div className={'clearOriginsButton'} onClick={clearOriginsClickHandler}>
             Clear All
           </div>
         </div>
-      ) 
+      )
     }
   }
 }

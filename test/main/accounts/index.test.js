@@ -1,11 +1,12 @@
 import log from 'electron-log'
-import { addHexPrefix } from 'ethereumjs-util'
+import { addHexPrefix } from '@ethereumjs/util'
+import BigNumber from 'bignumber.js'
+
 import store from '../../../main/store'
 import provider from '../../../main/provider'
 import Accounts from '../../../main/accounts'
 import signers from '../../../main/signers'
 import { signerCompatibility, maxFee } from '../../../main/transaction'
-
 import { GasFeesSource } from '../../../resources/domain/transaction'
 
 jest.mock('../../../main/provider', () => ({ send: jest.fn(), emit: jest.fn(), on: jest.fn() }))
@@ -17,10 +18,12 @@ jest.mock('../../../main/transaction')
 
 jest.mock('../../../main/store/persist')
 
-jest.mock('../../../main/nebula', () => jest.fn(() => ({ ready: () => true, ens: { lookupAddress: jest.fn() } })))
+jest.mock('../../../main/nebula', () =>
+  jest.fn(() => ({ ready: () => true, ens: { lookupAddress: jest.fn() } }))
+)
 
-const weiToHex = wei => addHexPrefix(wei.toString(16))
-const gweiToHex = gwei => weiToHex(gwei * 1e9)
+const weiToHex = (wei) => addHexPrefix(wei.toString(16))
+const gweiToHex = (gwei) => weiToHex(gwei * 1e9)
 
 const account = {
   id: '0x22dd63c3619818fdbc262c78baee43cb61e9cccf',
@@ -45,8 +48,8 @@ const account2 = {
   signer: '',
   requests: {},
   ensName: '',
-  created: '15315799:1660153882707',
-} 
+  created: '15315799:1660153882707'
+}
 
 let request
 
@@ -58,24 +61,27 @@ afterAll(() => {
   log.transports.console.level = 'debug'
 })
 
-beforeEach(done => {
+beforeEach((done) => {
+  const from = '0x22dd63c3619818fdbc262c78baee43cb61e9cccf'
+  const nonce = '0xa'
   request = {
     handlerId: 1,
     type: 'transaction',
     data: {
-      from : '0x22dd63c3619818fdbc262c78baee43cb61e9cccf',
+      from,
       chainId: '0x1',
       gasLimit: weiToHex(21000),
       gasPrice: gweiToHex(30),
       type: '0x2',
       maxPriorityFeePerGas: gweiToHex(1),
       maxFeePerGas: gweiToHex(9),
-      nonce: '0xa'
+      nonce
     },
     payload: {
       jsonrpc: '2.0',
       id: 7,
-      method: 'eth_signTransaction'
+      method: 'eth_signTransaction',
+      params: [{ from, nonce }]
     }
   }
 
@@ -86,8 +92,8 @@ beforeEach(done => {
 })
 
 afterEach(() => {
-  Object.values(Accounts.accounts).forEach(account => {
-    Object.keys(account.requests).forEach(id => {
+  Object.values(Accounts.accounts).forEach((account) => {
+    Object.keys(account.requests).forEach((id) => {
       Accounts.removeRequest(account, id)
     })
   })
@@ -141,7 +147,8 @@ describe('#setBaseFee', () => {
     Accounts.addRequest(request, jest.fn())
   })
 
-  const setBaseFee = (baseFee, requestId = 1, userUpdate = false) => Accounts.setBaseFee(baseFee, requestId, userUpdate)
+  const setBaseFee = (baseFee, requestId = 1, userUpdate = false) =>
+    Accounts.setBaseFee(baseFee, requestId, userUpdate)
 
   it('does not set an undefined base fee', () => {
     expect(() => setBaseFee(undefined)).toThrowError()
@@ -193,7 +200,7 @@ describe('#setBaseFee', () => {
 
     setBaseFee(gweiToHex(updatedBaseFee))
 
-    expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(weiToHex(2e9 + (updatedBaseFee * 1e9)))
+    expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(weiToHex(2e9 + updatedBaseFee * 1e9))
   })
 
   it('applies user-initiated base fee update', () => {
@@ -253,7 +260,8 @@ describe('#setPriorityFee', () => {
     Accounts.addRequest(request, jest.fn())
   })
 
-  const setPriorityFee = (fee, requestId = 1, userUpdate = false) => Accounts.setPriorityFee(fee, requestId, userUpdate)
+  const setPriorityFee = (fee, requestId = 1, userUpdate = false) =>
+    Accounts.setPriorityFee(fee, requestId, userUpdate)
 
   it('does not set an undefined priority fee', () => {
     expect(() => setPriorityFee(undefined)).toThrowError()
@@ -296,7 +304,6 @@ describe('#setPriorityFee', () => {
     expect(() => setPriorityFee('0x12a05f200')).toThrowError()
     expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(request.data.maxFeePerGas)
   })
-
 
   it('sets a valid priority fee', () => {
     const priorityFee = 2e9 // 2 gwei
@@ -342,7 +349,8 @@ describe('#setPriorityFee', () => {
     maxFee.mockReturnValue(maxTotal)
 
     const highPriorityFee = 60e9 // add 20 gwei to the above to exceed the maximum limit
-    const expectedPriorityFee = maxTotalFee - (parseInt(request.data.maxFeePerGas) - parseInt(request.data.maxPriorityFeePerGas))
+    const expectedPriorityFee =
+      maxTotalFee - (parseInt(request.data.maxFeePerGas) - parseInt(request.data.maxPriorityFeePerGas))
 
     setPriorityFee(highPriorityFee)
 
@@ -363,7 +371,8 @@ describe('#setGasPrice', () => {
     request.data.type = '0x0'
   })
 
-  const setGasPrice = (price, requestId = 1, userUpdate = false) => Accounts.setGasPrice(price, requestId, userUpdate)
+  const setGasPrice = (price, requestId = 1, userUpdate = false) =>
+    Accounts.setGasPrice(price, requestId, userUpdate)
 
   it('does not set an undefined gas price', () => {
     expect(() => setGasPrice(undefined)).toThrowError()
@@ -446,7 +455,7 @@ describe('#setGasPrice', () => {
 
   it('updates the feesUpdatedByUser flag', () => {
     request.data.gasPrice = gweiToHex(30)
-    
+
     setGasPrice(gweiToHex(45), 1, true)
 
     expect(Accounts.current().requests[1].feesUpdatedByUser).toBe(true)
@@ -458,7 +467,8 @@ describe('#setGasLimit', () => {
     Accounts.addRequest(request, jest.fn())
   })
 
-  const setGasLimit = (limit, requestId = 1, userUpdate = false) => Accounts.setGasLimit(limit, requestId, userUpdate)
+  const setGasLimit = (limit, requestId = 1, userUpdate = false) =>
+    Accounts.setGasLimit(limit, requestId, userUpdate)
 
   it('does not set an undefined gas limit', () => {
     expect(() => setGasLimit(undefined)).toThrowError()
@@ -559,12 +569,14 @@ describe('#adjustNonce', () => {
 
   beforeEach(() => {
     provider.send = jest.fn((payload, cb) => {
-      expect(payload).toEqual(expect.objectContaining({
-        id: 1,
-        jsonrpc: '2.0',
-        method: 'eth_getTransactionCount',
-        params: ['0x22dd63c3619818fdbc262c78baee43cb61e9cccf', 'pending']
-      }))
+      expect(payload).toEqual(
+        expect.objectContaining({
+          id: 1,
+          jsonrpc: '2.0',
+          method: 'eth_getTransactionCount',
+          params: ['0x22dd63c3619818fdbc262c78baee43cb61e9cccf', 'pending']
+        })
+      )
 
       cb({ result: onChainNonce })
     })
@@ -625,8 +637,40 @@ describe('#adjustNonce', () => {
   })
 })
 
+describe('#resetNonce', () => {
+  beforeEach(() => {
+    provider.send = jest.fn((payload, cb) => {
+      expect(payload).toEqual(
+        expect.objectContaining({
+          id: 1,
+          jsonrpc: '2.0',
+          method: 'eth_getTransactionCount',
+          params: ['0x22dd63c3619818fdbc262c78baee43cb61e9cccf', 'pending']
+        })
+      )
+      cb({ result: '0x3' })
+    })
+    request.data.nonce = '0x5'
+    Accounts.addRequest(request, jest.fn())
+  })
+
+  const resetNonce = (requestId = 1) => Accounts.resetNonce(requestId)
+
+  it('it will un-set the nonce when not present inside the tx request payload', () => {
+    delete request.payload.params[0].nonce
+    resetNonce()
+    expect(request.data.nonce).toBe(undefined)
+  })
+
+  it('it will revert to the nonce inside the tx request payload when present', () => {
+    request.payload.params[0].nonce = '0x' + BigNumber(request.data.nonce).minus(1).toString(16)
+    resetNonce()
+    expect(request.data.nonce).toBe(request.payload.params[0].nonce)
+  })
+})
+
 describe('#resolveRequest', () => {
-  it ('does nothing with an unknown request', () => {
+  it('does nothing with an unknown request', () => {
     Accounts.addRequest(request, () => {
       throw new Error('unexpected callback!')
     })
@@ -636,17 +680,19 @@ describe('#resolveRequest', () => {
     expect(Object.keys(Accounts.current().requests)).toHaveLength(1)
   })
 
-  it ('resolves a request with a callback', done => {
+  it('resolves a request with a callback', (done) => {
     Accounts.addRequest(request, () => done())
 
     Accounts.resolveRequest(request)
 
     try {
       expect(Object.keys(Accounts.current().requests)).toHaveLength(0)
-    } catch (e) { done(e) }
+    } catch (e) {
+      done(e)
+    }
   })
 
-  it ('resolves a request with no callback', () => {
+  it('resolves a request with no callback', () => {
     Accounts.addRequest(request)
 
     Accounts.resolveRequest(request)
@@ -744,7 +790,7 @@ describe('#signerCompatibility', () => {
   })
 
   const signerTypes = ['trezor', 'ledger', 'lattice']
-  
+
   signerTypes.forEach((signerType) => {
     it(`should open the signer menu when a ${signerType} signer is not available`, () => {
       const cb = jest.fn()
@@ -776,7 +822,7 @@ describe('#signerCompatibility', () => {
     signerCompatibility.mockReturnValue(compatibility)
 
     Accounts.signerCompatibility(request.handlerId, cb)
-    
+
     expect(store.navDash).not.toHaveBeenCalled()
     expect(cb).toHaveBeenCalledWith(null, compatibility)
   })
@@ -787,7 +833,7 @@ describe('#signerCompatibility', () => {
     activeSigner.status = 'locked'
 
     Accounts.signerCompatibility(request.handlerId, cb)
-    
+
     expect(store.navDash).toHaveBeenCalledWith({
       data: {
         signer: activeSigner.id
@@ -802,7 +848,7 @@ describe('#signerCompatibility', () => {
     activeSigner.status = 'locked'
 
     Accounts.signerCompatibility(request.handlerId, cb)
-    
+
     expect(cb).toHaveBeenCalledWith(new Error('Signer unavailable'))
   })
 
@@ -812,7 +858,7 @@ describe('#signerCompatibility', () => {
     Accounts.accounts[account.id].signer = undefined
 
     Accounts.signerCompatibility(request.handlerId, cb)
-    
+
     expect(store.navDash).not.toHaveBeenCalled()
     expect(cb).toHaveBeenCalledWith(new Error('No signer'))
   })

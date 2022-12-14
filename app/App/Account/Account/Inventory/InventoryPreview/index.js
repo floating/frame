@@ -2,89 +2,88 @@ import React from 'react'
 import Restore from 'react-restore'
 import link from '../../../../../../resources/link'
 import svg from '../../../../../../resources/svg'
+import { matchFilter } from '../../../../../../resources/utils'
 
 class Inventory extends React.Component {
-  constructor (...args) {
+  constructor(...args) {
     super(...args)
     this.moduleRef = React.createRef()
     this.resizeObserver = new ResizeObserver(() => {
       if (this.moduleRef && this.moduleRef.current) {
-        link.send('tray:action', 'updateAccountModule', this.props.moduleId, { height: this.moduleRef.current.clientHeight })
+        link.send('tray:action', 'updateAccountModule', this.props.moduleId, {
+          height: this.moduleRef.current.clientHeight
+        })
       }
     })
   }
 
-  componentDidMount () {
+  componentDidMount() {
     if (this.resizeObserver) this.resizeObserver.observe(this.moduleRef.current)
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     if (this.resizeObserver) this.resizeObserver.disconnect()
   }
 
-  isFilterMatch (collection) {
-    const { filter = '' } =  this.props
-
+  isFilterMatch(collection) {
+    const { filter = '' } = this.props
     const c = this.store('main.inventory', this.props.account, collection)
-    const itemMatch = Object.keys(c.items).some(item => {
-      const { name } = c.items[item] || {}
-      return (name || '').toLowerCase().indexOf(filter.toLowerCase()) !== -1
+    if (!c) return false
+    const collectionName = c.meta && c.meta.name
+    const collectionItems = c.items || {}
+    const itemNames = Object.keys(collectionItems).map((item) => {
+      const { name } = collectionItems[item] || {}
+      return name
     })
-
-    const match = (
-      !filter ||
-      c.meta.name.toLowerCase().indexOf(filter.toLowerCase()) !== -1 ||
-      itemMatch
-    )
-
-    return match
+    return matchFilter(filter, [collectionName, ...itemNames])
   }
 
-  displayCollections () {
+  displayCollections() {
     const inventory = this.store('main.inventory', this.props.account)
     const collections = Object.keys(inventory || {})
-    return collections.sort((a, b) => {
-      const assetsLengthA = Object.keys(inventory[a].items).length
-      const assetsLengthB = Object.keys(inventory[b].items).length
-      if (assetsLengthA > assetsLengthB) return -1
-      if (assetsLengthA < assetsLengthB) return 1
-      return 0
-    }).filter(c => this.isFilterMatch(c)).slice(0, 6)
+    return collections
+      .sort((a, b) => {
+        const assetsLengthA = Object.keys(inventory[a].items).length
+        const assetsLengthB = Object.keys(inventory[b].items).length
+        if (assetsLengthA > assetsLengthB) return -1
+        if (assetsLengthA < assetsLengthB) return 1
+        return 0
+      })
+      .filter((c) => this.isFilterMatch(c))
+      .slice(0, 6)
   }
 
-  renderInventoryList () {
+  renderInventoryList() {
     const inventory = this.store('main.inventory', this.props.account)
     const displayCollections = this.displayCollections()
-    return (
-      displayCollections.map(k => {
-        return (
-          <div 
-            key={k}
-            className='inventoryCollection'
-            onClick={() => {
-              const crumb = {
-                view: 'expandedModule', 
-                data: {
-                  id: this.props.moduleId,
-                  account: this.props.account,
-                  currentCollection: k
-                }
+    return displayCollections.map((k) => {
+      return (
+        <div
+          key={k}
+          className='inventoryCollection'
+          onClick={() => {
+            const crumb = {
+              view: 'expandedModule',
+              data: {
+                id: this.props.moduleId,
+                account: this.props.account,
+                currentCollection: k
               }
-              link.send('nav:forward', 'panel', crumb)
-            }}
-          >
-            <div className='inventoryCollectionTop'>
-              <div className='inventoryCollectionName'>{inventory[k].meta.name}</div>
-              <div className='inventoryCollectionCount'>{Object.keys(inventory[k].items).length}</div>
-              <div className='inventoryCollectionLine' />
-            </div>
+            }
+            link.send('nav:forward', 'panel', crumb)
+          }}
+        >
+          <div className='inventoryCollectionTop'>
+            <div className='inventoryCollectionName'>{inventory[k].meta.name}</div>
+            <div className='inventoryCollectionCount'>{Object.keys(inventory[k].items).length}</div>
+            <div className='inventoryCollectionLine' />
           </div>
-        )
-      })
-    )
+        </div>
+      )
+    })
   }
 
-  render () {
+  render() {
     const inventory = this.store('main.inventory', this.props.account)
     const collections = Object.keys(inventory || {})
     const displayCollections = this.displayCollections()
@@ -94,7 +93,7 @@ class Inventory extends React.Component {
         <div className='moduleHeader'>
           <span>{svg.inventory(12)}</span>
           <span>{'Inventory'}</span>
-        </div>  
+        </div>
         <div className='inventoryWrapper'>
           {collections.length ? (
             this.renderInventoryList()
@@ -107,16 +106,19 @@ class Inventory extends React.Component {
         {collections.length ? (
           <div className='signerBalanceTotal'>
             <div className='signerBalanceButtons'>
-              <div className='signerBalanceButton signerBalanceShowAll' onClick={() => {
-                const crumb = {
-                  view: 'expandedModule', 
-                  data: {
-                    id: this.props.moduleId,
-                    account: this.props.account
+              <div
+                className='signerBalanceButton signerBalanceShowAll'
+                onClick={() => {
+                  const crumb = {
+                    view: 'expandedModule',
+                    data: {
+                      id: this.props.moduleId,
+                      account: this.props.account
+                    }
                   }
-                }
-                link.send('nav:forward', 'panel', crumb)
-              }}>
+                  link.send('nav:forward', 'panel', crumb)
+                }}
+              >
                 {moreCollections > 0 ? `+${moreCollections} More` : 'More'}
               </div>
             </div>

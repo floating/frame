@@ -6,9 +6,10 @@ import ChainExpanded from './ChainExpanded'
 import ChainNew from './ChainNew'
 
 class Chain extends React.Component {
-  renderNew () {
-    const { id, name, type, explorer, symbol, isTestnet, filter, on, connection, primaryRpc, secondaryRpc } = this.props
-    const existingChains = Object.keys(this.store('main.networks.ethereum')).map(id => parseInt(id))
+  renderNew() {
+    const { id, name, type, explorer, symbol, isTestnet, filter, on, connection, primaryRpc, secondaryRpc } =
+      this.props
+    const existingChains = Object.keys(this.store('main.networks.ethereum')).map((id) => parseInt(id))
     return (
       <ChainNew
         id={id}
@@ -23,7 +24,7 @@ class Chain extends React.Component {
     )
   }
 
-  renderExpanded () {
+  renderExpanded() {
     const { id, name, type, explorer, symbol, isTestnet, filter, on, connection } = this.props
     const { primaryColor, icon } = this.store('main.networksMeta.ethereum', id)
     const price = this.store('main.networksMeta.ethereum', id, 'nativeCurrency.usd.price') || '?'
@@ -45,22 +46,23 @@ class Chain extends React.Component {
     )
   }
 
-  renderPreview () {
+  renderPreview() {
     const { id, name, type, explorer, symbol, isTestnet, filter, on, connection } = this.props
     const { primaryColor, icon } = this.store('main.networksMeta.ethereum', id)
     const price = this.store('main.networksMeta.ethereum', id, 'nativeCurrency.usd.price') || '?'
 
     if (
       filter &&
-      !this.state.id.toString().includes(filter) && 
-      !this.state.name.includes(filter) && 
-      !this.state.symbol.includes(filter) && 
-      !this.state.explorer.includes(filter) && 
+      !this.state.id.toString().includes(filter) &&
+      !this.state.name.includes(filter) &&
+      !this.state.symbol.includes(filter) &&
+      !this.state.explorer.includes(filter) &&
       !this.state.type.includes(filter)
-    ) return null
+    )
+      return null
 
     return (
-      <ChainPreview 
+      <ChainPreview
         type={type}
         id={id}
         primaryColor={primaryColor}
@@ -74,7 +76,7 @@ class Chain extends React.Component {
     )
   }
 
-  render () {
+  render() {
     const { view } = this.props
     if (view === 'setup') {
       return this.renderNew()

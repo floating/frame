@@ -2,19 +2,20 @@ import Ledger, { Status } from '../../../../../main/signers/ledger/Ledger'
 import Eth from '../../../../../main/signers/ledger/Ledger/eth'
 import { Derivation } from '../../../../../main/signers/Signer/derive'
 import log from 'electron-log'
+import { SignTypedDataVersion } from '@metamask/eth-sig-util'
 
 jest.mock('../../../../../main/signers/ledger/Ledger/eth')
 jest.mock('@ledgerhq/hw-transport-node-hid-noevents')
 
-function runNextRequest () {
+function runNextRequest() {
   // move forward in time to allow the queue to process one request
   jest.advanceTimersByTime(200)
 }
 
-async function connectEthApp () {
+async function connectEthApp() {
   Eth.mock.instances[0].getAppConfiguration.mockResolvedValue({ version: '2.0.1' })
 
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     ledger.on('update', () => {
       if (ledger.status === Status.OK) resolve()
     })
@@ -29,23 +30,24 @@ function verifyDone(done, expectations) {
 }
 
 function verify(done, expectations, complete = false) {
-  try { 
+  try {
     expectations()
     if (complete) done()
-  } catch (e) { done(e) }
+  } catch (e) {
+    done(e)
+  }
 }
 
 function verifyPromise(resolve, reject, expectations) {
-  try { 
+  try {
     expectations()
     resolve()
-  } catch (e) { reject(e) }
+  } catch (e) {
+    reject(e)
+  }
 }
 
-const addresses = [
-  '0xf10326c1c6884b094e03d616cc8c7b920e3f73e0',
-  '0xa16002db5438b5862270a9e404346e3c3b059eeb'
-]
+const addresses = ['0xf10326c1c6884b094e03d616cc8c7b920e3f73e0', '0xa16002db5438b5862270a9e404346e3c3b059eeb']
 
 let ledger
 
@@ -56,12 +58,12 @@ beforeAll(() => {
 
 beforeEach(async () => {
   Eth.mockClear()
-  
+
   ledger = new Ledger('usb-path')
   ledger.derivation = Derivation.legacy
 
   await ledger.open()
-  
+
   Eth.mock.instances[0].deriveAddresses.mockImplementation(() => Promise.resolve(addresses))
 })
 
@@ -83,15 +85,17 @@ describe('#connect', () => {
 
     it('sets the version', async () => {
       await ledger.connect()
-  
+
       expect(ledger.appVersion).toEqual({
-        major: 1, minor: 9, patch: 2
+        major: 1,
+        minor: 9,
+        patch: 2
       })
     })
 
-    it('detects that the app is locked', done => {
+    it('detects that the app is locked', (done) => {
       const stateFlow = []
-      
+
       Eth.mock.instances[0].getAddress.mockRejectedValue({ statusCode: 27404 })
 
       ledger.on('update', () => {
@@ -113,7 +117,7 @@ describe('#connect', () => {
       ledger.connect()
     })
 
-    it('derives addresses after connecting', done => {
+    it('derives addresses after connecting', (done) => {
       const stateFlow = []
 
       ledger.on('update', () => {
@@ -135,16 +139,16 @@ describe('#connect', () => {
     // these status codes all represent a different app or the Ledger main menu being open
     const statusCodes = [27904, 27906, 25873, 25871]
 
-    statusCodes.forEach(code => {
+    statusCodes.forEach((code) => {
       it(`sets the status to wrong application and disconnects the signer when the status code is ${code}`, async () => {
         Eth.mock.instances[0].getAppConfiguration.mockRejectedValue({ statusCode: code })
-  
+
         ledger.on('update', () => {
           expect(ledger.status).toEqual(Status.WRONG_APP)
         })
-  
+
         await ledger.connect()
-        
+
         expect(ledger.eth).not.toBeDefined()
       })
     })
@@ -156,9 +160,9 @@ describe('#deriveAddress', () => {
     await connectEthApp()
   })
 
-  it('derives hardware addresses', done => {
+  it('derives hardware addresses', (done) => {
     const stateFlow = []
-  
+
     ledger.on('update', () => {
       stateFlow.push(ledger.status)
 
@@ -179,8 +183,8 @@ describe('#deriveAddress', () => {
     runNextRequest()
   })
 
-  it('derives live addresses', done => {
-    Eth.mock.instances[0].getAddress.mockImplementation(path => {
+  it('derives live addresses', (done) => {
+    Eth.mock.instances[0].getAddress.mockImplementation((path) => {
       if (path === "44'/60'/0'/0/0") return Promise.resolve({ address: addresses[0] })
       if (path === "44'/60'/1'/0/0") return Promise.resolve({ address: addresses[1] })
 
@@ -189,14 +193,14 @@ describe('#deriveAddress', () => {
 
     const stateFlow = []
 
-    const firstUpdateDone = new Promise(resolve => {
+    const firstUpdateDone = new Promise((resolve) => {
       ledger.on('update', () => {
         stateFlow.push(ledger.status)
-  
+
         if (ledger.status === Status.DERIVING) {
           verify(done, () => expect(ledger.addresses).toHaveLength(0))
         }
-  
+
         if (ledger.status === Status.OK) {
           if (ledger.addresses.length === 2) {
             verifyDone(done, () => {
@@ -209,17 +213,20 @@ describe('#deriveAddress', () => {
           }
         }
       })
-  
+
       ledger.accountLimit = 2
       ledger.derivation = Derivation.live
       ledger.deriveAddresses()
-      
+
       runNextRequest()
     })
 
     // all this craziness is necessary to simulate the queue running multiple
     // requests, resolving their promsies, and advancing the timer to run the next request
-    firstUpdateDone.then(() => { }).then(() => { }).then(runNextRequest)
+    firstUpdateDone
+      .then(() => {})
+      .then(() => {})
+      .then(runNextRequest)
   })
 })
 
@@ -227,16 +234,20 @@ describe('#verifyAddress', () => {
   beforeEach(async () => {
     await connectEthApp()
 
-    Eth.mock.instances[0].getAddress.mockImplementation(path => new Promise(resolve => {
-      resolve({
-        address: (path === "44'/60'/0'/9")
-          ? '0xe9d6f5779cf6936de03c0bec631f3bb3e336d98d'
-          : '0xCd37a15BdfEc87D0e383E628da2399053D5948ca'
-      })
-    }))
+    Eth.mock.instances[0].getAddress.mockImplementation(
+      (path) =>
+        new Promise((resolve) => {
+          resolve({
+            address:
+              path === "44'/60'/0'/9"
+                ? '0xe9d6f5779cf6936de03c0bec631f3bb3e336d98d'
+                : '0xCd37a15BdfEc87D0e383E628da2399053D5948ca'
+          })
+        })
+    )
   })
 
-  it('verifies an address', done => {
+  it('verifies an address', (done) => {
     ledger.once('update', () => done('status updated unexpectedly!'))
 
     ledger.verifyAddress(9, '0xe9d6f5779cf6936de03c0bec631f3bb3e336d98d', false, (err, verified) => {
@@ -252,7 +263,7 @@ describe('#verifyAddress', () => {
   const errorCases = [
     {
       testCase: 'the address does not match',
-      expectedError: 'Address does not match device',
+      expectedError: 'Address does not match device'
     },
     {
       testCase: 'the verification request is rejected by the user',
@@ -265,11 +276,11 @@ describe('#verifyAddress', () => {
     },
     {
       testCase: 'the eth app is not initialized',
-      setup: () => ledger.eth = undefined
+      setup: () => (ledger.eth = undefined)
     },
     {
       testCase: 'the derivation type is not initialized',
-      setup: () => ledger.derivation = undefined
+      setup: () => (ledger.derivation = undefined)
     }
   ]
 
@@ -301,7 +312,7 @@ describe('#verifyAddress', () => {
 
 const signingMethods = ['signMessage', 'signTransaction']
 
-signingMethods.forEach(signingMethod => {
+signingMethods.forEach((signingMethod) => {
   const signType = signingMethod.substring(4).toLowerCase()
 
   describe(`#${signingMethod}`, () => {
@@ -309,13 +320,17 @@ signingMethods.forEach(signingMethod => {
       await connectEthApp()
     })
 
-    it(`signs a ${signType}`, done => {
-      Eth.mock.instances[0][signingMethod].mockImplementation(path => new Promise(resolve => {
-        resolve((path === "44'/60'/0'/3")
-          ? '0x724e7dfa6ee0fd0dd84c5d8a84eb57be29ff20ed253b3249de2e3d6b119d7b1e6a211ce0c48f93c5e399ac8cd7c6fe56e36fa960b6da92de2c435814928f2f8c1b'
-          : '0xf257b7f96ad7cbf11b80c2085dc76d10ede662fb2c77dc7fbd9f574d78d9da6d08cb1a99c7d97ac87b9d7f5a4e3ae052ba3a11888fdfeefe6a169a0547c1b2e01b'
-        )
-      }))
+    it(`signs a ${signType}`, (done) => {
+      Eth.mock.instances[0][signingMethod].mockImplementation(
+        (path) =>
+          new Promise((resolve) => {
+            resolve(
+              path === "44'/60'/0'/3"
+                ? '0x724e7dfa6ee0fd0dd84c5d8a84eb57be29ff20ed253b3249de2e3d6b119d7b1e6a211ce0c48f93c5e399ac8cd7c6fe56e36fa960b6da92de2c435814928f2f8c1b'
+                : '0xf257b7f96ad7cbf11b80c2085dc76d10ede662fb2c77dc7fbd9f574d78d9da6d08cb1a99c7d97ac87b9d7f5a4e3ae052ba3a11888fdfeefe6a169a0547c1b2e01b'
+            )
+          })
+      )
 
       ledger.once('update', () => done('Ledger unexpectedly updated!'))
 
@@ -323,14 +338,16 @@ signingMethods.forEach(signingMethod => {
         verifyDone(done, () => {
           expect(ledger.status).toBe(Status.OK)
           expect(err).toBeFalsy()
-          expect(signature).toBe('0x724e7dfa6ee0fd0dd84c5d8a84eb57be29ff20ed253b3249de2e3d6b119d7b1e6a211ce0c48f93c5e399ac8cd7c6fe56e36fa960b6da92de2c435814928f2f8c1b')
+          expect(signature).toBe(
+            '0x724e7dfa6ee0fd0dd84c5d8a84eb57be29ff20ed253b3249de2e3d6b119d7b1e6a211ce0c48f93c5e399ac8cd7c6fe56e36fa960b6da92de2c435814928f2f8c1b'
+          )
         })
       })
 
       runNextRequest()
     })
 
-    it('fails if the signing request is rejected by the user', done => {
+    it('fails if the signing request is rejected by the user', (done) => {
       Eth.mock.instances[0][signingMethod].mockRejectedValue({ statusCode: 27013 })
 
       ledger.once('update', () => done('Ledger unexpectedly updated!'))
@@ -354,11 +371,11 @@ signingMethods.forEach(signingMethod => {
       },
       {
         testCase: 'the eth app is not initialized',
-        setup: () => ledger.eth = undefined
+        setup: () => (ledger.eth = undefined)
       },
       {
         testCase: 'the derivation type is not initialized',
-        setup: () => ledger.derivation = undefined
+        setup: () => (ledger.derivation = undefined)
       }
     ]
 
@@ -394,46 +411,40 @@ describe('#signTypedData', () => {
     await connectEthApp()
   })
 
-  it('signs v4 typed data', done => {
-    Eth.mock.instances[0].signTypedData.mockImplementation(path => new Promise(resolve => {
-      resolve((path === "44'/60'/0'/5")
-        ? '0x724e7dfa6ee0fd0dd84c5d8a84eb57be29ff20ed253b3249de2e3d6b119d7b1e6a211ce0c48f93c5e399ac8cd7c6fe56e36fa960b6da92de2c435814928f2f8c1b'
-        : '0xf257b7f96ad7cbf11b80c2085dc76d10ede662fb2c77dc7fbd9f574d78d9da6d08cb1a99c7d97ac87b9d7f5a4e3ae052ba3a11888fdfeefe6a169a0547c1b2e01b'
-      )
-    }))
+  it('signs v4 typed data', (done) => {
+    Eth.mock.instances[0].signTypedData.mockImplementation(
+      (path) =>
+        new Promise((resolve) => {
+          resolve(
+            path === "44'/60'/0'/5"
+              ? '0x724e7dfa6ee0fd0dd84c5d8a84eb57be29ff20ed253b3249de2e3d6b119d7b1e6a211ce0c48f93c5e399ac8cd7c6fe56e36fa960b6da92de2c435814928f2f8c1b'
+              : '0xf257b7f96ad7cbf11b80c2085dc76d10ede662fb2c77dc7fbd9f574d78d9da6d08cb1a99c7d97ac87b9d7f5a4e3ae052ba3a11888fdfeefe6a169a0547c1b2e01b'
+          )
+        })
+    )
 
     ledger.once('update', () => done('Ledger unexpectedly updated!'))
 
-    ledger.signTypedData(5, 'V4', 'all sorts of typed data', (err, signature) => {
+    ledger.signTypedData(5, { version: SignTypedDataVersion.V4, data: 'typed data' }, (err, signature) => {
       verifyDone(done, () => {
         expect(ledger.status).toBe(Status.OK)
         expect(err).toBeFalsy()
-        expect(signature).toBe('0x724e7dfa6ee0fd0dd84c5d8a84eb57be29ff20ed253b3249de2e3d6b119d7b1e6a211ce0c48f93c5e399ac8cd7c6fe56e36fa960b6da92de2c435814928f2f8c1b')
+        expect(signature).toBe(
+          '0x724e7dfa6ee0fd0dd84c5d8a84eb57be29ff20ed253b3249de2e3d6b119d7b1e6a211ce0c48f93c5e399ac8cd7c6fe56e36fa960b6da92de2c435814928f2f8c1b'
+        )
       })
     })
 
     runNextRequest()
   })
 
-  it('fails to sign pre-v4 typed data', done => {
-    ledger.once('update', () => done('Ledger unexpectedly updated!'))
-
-    ledger.signTypedData(5, 'V3', 'all sorts of typed data', (err, signature) => {
-      verifyDone(done, () => {
-        expect(ledger.status).toBe(Status.OK)
-        expect(signature).toBeUndefined()
-        expect(err.message.toLowerCase().indexOf('invalid version')).toBeGreaterThanOrEqual(0)
-      })
-    })
-  })
-
-  it('fails if the signing request is rejected by the user', done => {
+  it('fails if the signing request is rejected by the user', (done) => {
     Eth.mock.instances[0].signTypedData.mockRejectedValue({ statusCode: 27013 })
 
     ledger.once('update', () => done('Ledger unexpectedly updated!'))
     ledger.once('close', () => done('Ledger unexpectedly closed!'))
 
-    ledger.signTypedData(5, 'V4', 'typed data', (err, signature) => {
+    ledger.signTypedData(5, { version: SignTypedDataVersion.V4, data: 'typed data' }, (err, signature) => {
       verifyDone(done, () => {
         expect(ledger.status).toBe(Status.OK)
         expect(signature).toBeUndefined()
@@ -444,13 +455,16 @@ describe('#signTypedData', () => {
     runNextRequest()
   })
 
-  it('fails if the signing request is invalid', done => {
-    Eth.mock.instances[0].signTypedData.mockRejectedValue({ statusCode: 99901, message: 'Invalid typed data' })
+  it('fails if the signing request is invalid', (done) => {
+    Eth.mock.instances[0].signTypedData.mockRejectedValue({
+      statusCode: 99901,
+      message: 'Invalid typed data'
+    })
 
     ledger.once('update', () => done('Ledger unexpectedly updated!'))
     ledger.once('close', () => done('Ledger unexpectedly closed!'))
 
-    ledger.signTypedData(5, 'V4', 'typed data', (err, signature) => {
+    ledger.signTypedData(5, { version: SignTypedDataVersion.V4, data: 'typed data' }, (err, signature) => {
       verifyDone(done, () => {
         expect(ledger.status).toBe(Status.OK)
         expect(signature).toBeUndefined()
@@ -468,11 +482,11 @@ describe('#signTypedData', () => {
     },
     {
       testCase: 'the eth app is not initialized',
-      setup: () => ledger.eth = undefined
+      setup: () => (ledger.eth = undefined)
     },
     {
       testCase: 'the derivation type is not initialized',
-      setup: () => ledger.derivation = undefined
+      setup: () => (ledger.derivation = undefined)
     }
   ]
 
@@ -487,12 +501,16 @@ describe('#signTypedData', () => {
       const callback = new Promise((resolve, reject) => {
         setup()
 
-        ledger.signTypedData(5, 'V4', 'typed data', (err, signature) => {
-          verifyPromise(resolve, reject, () => {
-            expect(signature).toBeUndefined()
-            expect(err.message).toMatch(/Sign message error/)
-          })
-        })
+        ledger.signTypedData(
+          5,
+          { version: SignTypedDataVersion.V4, data: 'typed data' },
+          (err, signature) => {
+            verifyPromise(resolve, reject, () => {
+              expect(signature).toBeUndefined()
+              expect(err.message).toMatch(/Sign message error/)
+            })
+          }
+        )
       })
 
       runNextRequest()

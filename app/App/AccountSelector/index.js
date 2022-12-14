@@ -5,30 +5,32 @@ import Restore from 'react-restore'
 import AccountController from './AccountController'
 
 import { accountSort as byCreation } from '../../../resources/domain/account'
+import { matchFilter } from '../../../resources/utils'
+
 import svg from '../../../resources/svg'
 import link from '../../../resources/link'
 
 let firstScroll = true
 
-function filterMatches (text = '', fields) {
-  const filter = text.toLowerCase()
+// function filterMatches (text = '', fields) {
+//   const filter = text.toLowerCase()
 
-  return fields.some(field => (field || '').toLowerCase().includes(filter))
-}
+//   return fields.some(field => (field || '').toLowerCase().includes(filter))
+// }
 
 class AccountSelector extends React.Component {
-  constructor (...args) {
-    super(...args)
+  constructor(props, context) {
+    super(props, context)
     this.state = {
-      accountFilter: ''
+      accountFilter: context.store('panel.accountFilter') || ''
     }
   }
 
-  reportScroll () {
+  reportScroll() {
     this.store.initialScrollPos(ReactDOM.findDOMNode(this.scroll).scrollTop)
   }
 
-  resetScroll () {
+  resetScroll() {
     setTimeout(() => {
       if (firstScroll) {
         firstScroll = false
@@ -38,17 +40,16 @@ class AccountSelector extends React.Component {
     }, 3000)
   }
 
-  renderAccountFilter () {
+  renderAccountFilter() {
     const open = this.store('selected.open')
     if (open) return null
     return (
       <div className='panelFilterMain'>
-        <div className='panelFilterIcon'>
-          {svg.search(12)}
-        </div>
+        <div className='panelFilterIcon'>{svg.search(12)}</div>
         <div className='panelFilterInput'>
-          <input 
+          <input
             tabIndex='-1'
+            spellCheck='false'
             onChange={(e) => {
               const value = e.target.value
               this.setState({ accountFilter: value })
@@ -57,8 +58,8 @@ class AccountSelector extends React.Component {
             value={this.state.accountFilter}
           />
         </div>
-        {this.state.accountFilter ? (
-          <div 
+        {this.store('panel.accountFilter') ? (
+          <div
             className='panelFilterClear'
             onClick={() => {
               this.setState({ accountFilter: '' })
@@ -72,39 +73,24 @@ class AccountSelector extends React.Component {
     )
   }
 
-  renderAccountList () {
+  renderAccountList() {
     const accounts = this.store('main.accounts')
-    const current = this.store('selected.current')
-    const scrollTop = this.store('selected.position.scrollTop')
-    const open = current && this.store('selected.open')
-
     const sortedAccounts = Object.values(accounts).sort(byCreation)
     const filter = this.store('panel.accountFilter')
 
-    const { data } = this.store('panel.nav')[0] || {}
-
-    const panelScrollStyle = current ? { pointerEvents: 'none' } : {}
-
-    // if (open) panelScrollStyle.top = '146px'
-
-    const crumb = this.store('windows.panel.nav')[0] || {}
-    // if (crumb.view === 'requestView') panelScrollStyle.bottom = '142px'
-    
-    const displayAccounts = sortedAccounts.filter(
-      ({ address, name, ensName, lastSignerType }) =>
-        !filter ||
-        filterMatches(filter, [address, name, ensName, lastSignerType])
-    )
+    const displayAccounts = sortedAccounts.filter(({ address, name, ensName, lastSignerType }) => {
+      return matchFilter(filter, [address, name, ensName, lastSignerType])
+    })
 
     return (
       <div
-        className="accountSelectorScroll"
+        className='accountSelectorScroll'
         ref={(ref) => {
-          if (ref) this.scroll = ref;
+          if (ref) this.scroll = ref
         }}
       >
         {/* <div className='accountSelectorScrollWrap' style={current && scrollTop > 0 ? { marginTop: '-' + scrollTop + 'px' } : {}}> */}
-        <div className="accountSelectorScrollWrap">
+        <div className='accountSelectorScrollWrap'>
           {displayAccounts.length ? (
             displayAccounts.map((account, i) => (
               <AccountController
@@ -116,16 +102,16 @@ class AccountSelector extends React.Component {
               />
             ))
           ) : Object.keys(accounts).length === 0 ? (
-            <div className="noSigners">{'No Accounts Added'}</div>
+            <div className='noSigners'>{'No Accounts Added'}</div>
           ) : (
-            <div className="noSigners">{'No Matching Accounts'}</div>
+            <div className='noSigners'>{'No Matching Accounts'}</div>
           )}
         </div>
       </div>
     )
   }
 
-  render () {
+  render() {
     const open = this.store('selected.open')
 
     return (

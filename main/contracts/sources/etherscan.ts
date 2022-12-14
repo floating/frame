@@ -6,15 +6,15 @@ import type { Response } from 'node-fetch'
 import type { ContractSource } from '..'
 
 interface EtherscanSourceCodeResponse {
-  status: string,
-  message: string,
+  status: string
+  message: string
   result: ContractSourceCodeResult[]
 }
 
 interface ContractSourceCodeResult {
-  SourceCode: string,
-  ABI: string,
-  ContractName: string,
+  SourceCode: string
+  ABI: string
+  ContractName: string
   Implementation: string
 }
 
@@ -25,20 +25,27 @@ const getEndpoint = (domain: string, contractAddress: string, apiKey: string) =>
 }
 
 const endpointMap = {
-  1: (contractAddress: Address) => getEndpoint('api.etherscan.io', contractAddress, '3SYU5MW5QK8RPCJV1XVICHWKT774993S24'),
-  10: (contractAddress: Address) => getEndpoint('api-optimistic.etherscan.io', contractAddress, '3SYU5MW5QK8RPCJV1XVICHWKT774993S24'),
-  137: (contractAddress: Address) => getEndpoint('api.polygonscan.com', contractAddress, '2P3U9T63MT26T1X64AAE368UNTS9RKEEBB'),
-  42161: (contractAddress: Address) => getEndpoint('api.arbiscan.io', contractAddress, 'VP126CP67QVH9ZEKAZT1UZ751VZ6ZTIZAD')
+  1: (contractAddress: Address) =>
+    getEndpoint('api.etherscan.io', contractAddress, '3SYU5MW5QK8RPCJV1XVICHWKT774993S24'),
+  10: (contractAddress: Address) =>
+    getEndpoint('api-optimistic.etherscan.io', contractAddress, '3SYU5MW5QK8RPCJV1XVICHWKT774993S24'),
+  137: (contractAddress: Address) =>
+    getEndpoint('api.polygonscan.com', contractAddress, '2P3U9T63MT26T1X64AAE368UNTS9RKEEBB'),
+  42161: (contractAddress: Address) =>
+    getEndpoint('api.arbiscan.io', contractAddress, 'VP126CP67QVH9ZEKAZT1UZ751VZ6ZTIZAD')
 }
 
-async function parseResponse <T>(response: Response): Promise<T | undefined> {
-  if (response?.status === 200 && (response?.headers.get('content-type') || '').toLowerCase().includes('json')) {
+async function parseResponse<T>(response: Response): Promise<T | undefined> {
+  if (
+    response?.status === 200 &&
+    (response?.headers.get('content-type') || '').toLowerCase().includes('json')
+  ) {
     return response.json()
   }
   return Promise.resolve(undefined)
 }
 
-async function fetchSourceCode (endpointUrl: string): Promise<ContractSourceCodeResult[] | undefined> {  
+async function fetchSourceCode(endpointUrl: string): Promise<ContractSourceCodeResult[] | undefined> {
   try {
     const res = await fetchWithTimeout(endpointUrl, {}, 4000)
     const parsedResponse = await parseResponse<EtherscanSourceCodeResponse>(res as Response)
@@ -50,11 +57,14 @@ async function fetchSourceCode (endpointUrl: string): Promise<ContractSourceCode
   }
 }
 
-export function chainSupported (chainId: string) {
+export function chainSupported(chainId: string) {
   return Object.keys(endpointMap).includes(chainId)
 }
 
-export async function fetchEtherscanContract (contractAddress: Address, chainId: number): Promise<ContractSource | undefined> {
+export async function fetchEtherscanContract(
+  contractAddress: Address,
+  chainId: number
+): Promise<ContractSource | undefined> {
   if (!(chainId in endpointMap)) {
     return
   }
@@ -70,7 +80,7 @@ export async function fetchEtherscanContract (contractAddress: Address, chainId:
       const source = result[0]
       const implementation = source.Implementation
 
-      if (implementation) {
+      if (implementation && implementation !== contractAddress) {
         // this is a proxy contract, return the ABI for the source
         return fetchEtherscanContract(implementation, chainId)
       }
@@ -80,11 +90,13 @@ export async function fetchEtherscanContract (contractAddress: Address, chainId:
         return undefined
       }
 
-      return { abi: source.ABI, name: source.ContractName, source: endpoint.match(sourceCapture)?.groups?.source || '' }
+      return {
+        abi: source.ABI,
+        name: source.ContractName,
+        source: endpoint.match(sourceCapture)?.groups?.source || ''
+      }
     }
   } catch (e) {
     log.warn(`Contract ${contractAddress} not found in Etherscan`, e)
   }
 }
-
-

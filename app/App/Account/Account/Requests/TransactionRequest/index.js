@@ -1,9 +1,5 @@
 import React from 'react'
 import Restore from 'react-restore'
-import utils from 'web3-utils'
-
-import svg from '../../../../../../resources/svg'
-import link from '../../../../../../resources/link'
 
 // New Tx
 import TxMain from './TxMain'
@@ -15,9 +11,10 @@ import AdjustFee from './AdjustFee'
 import ViewData from './ViewData'
 import TxApproval from './TxApproval'
 import TokenSpend from './TokenSpend'
+import link from '../../../../../../resources/link'
 
 class TransactionRequest extends React.Component {
-  constructor (props, context) {
+  constructor(props, context) {
     super(props, context)
     this.state = { allowInput: false, dataView: false, showHashDetails: false }
 
@@ -26,80 +23,30 @@ class TransactionRequest extends React.Component {
     }, props.signingDelay || 1500)
   }
 
-  copyAddress (data) {
-    link.send('tray:clipboardData', data)
-    this.setState({ copied: true })
-    setTimeout(_ => this.setState({ copied: false }), 1000)
-  }
-
-  // approve (reqId, req) {
-  //   link.rpc('approveRequest', req, () => {}) // Move to link.send
-  // }
-
-  // decline (req) {
-  //   link.rpc('declineRequest', req, () => {}) // Move to link.send
-  // }
-
-  toggleDataView (id) {
-    this.setState({ dataView: !this.state.dataView })
-  }
-
-  hexToDisplayValue (hex) {
-    return (Math.round(parseFloat(utils.fromWei(hex, 'ether')) * 1000000) / 1000000).toFixed(6)
-  }
-
-  txSectionStyle (index, height) {
-    if (this.state.selectedIndex === index) {
-      return {
-        transform: `translateY(${0}px)`,
-        height: `calc(${height} + 10px)`,
-        zIndex: 20,
-        borderRadius: '9px',
-        background: 'rgba(237, 242, 253, 1)',
-        left: '10px',
-        right: '10px',
-        padding: '0px 30px'
-      }
-    } else {
-      return {
-        transform: `translateY(${(index * -40) - 60}px)`,
-        zIndex: 1
-      }
-    }
-  }
-
-  copyData (data) {
-    link.send('tray:clipboardData', data)
-    this.setState({ copiedData: true })
-    setTimeout(_ => this.setState({ copiedData: false }), 1000)
-  }
-
-  overlayMode (mode) {
+  overlayMode(mode) {
     this.setState({ overlayMode: mode })
   }
 
-  allowOtherChain () {
+  allowOtherChain() {
     this.setState({ allowOtherChain: true })
   }
 
-  renderAdjustFee () {
+  renderAdjustFee() {
     const { accountId, handlerId } = this.props
     const req = this.store('main.accounts', accountId, 'requests', handlerId)
-    return (
-      <AdjustFee req={req} />
-    )
+    return <AdjustFee req={req} />
   }
 
-  renderTokenSpend () {
+  renderTokenSpend() {
     const crumb = this.store('windows.panel.nav')[0] || {}
     const { actionId, requestedAmountHex } = crumb.data
     const { accountId, handlerId } = this.props
     const req = this.store('main.accounts', accountId, 'requests', handlerId)
     if (!req) return null
-    const approval = (req.recognizedActions || []).find(action => action.id === actionId)
+    const approval = (req.recognizedActions || []).find((action) => action.id === actionId)
     if (!approval) return null
     return (
-      <TokenSpend 
+      <TokenSpend
         approval={approval}
         requestedAmountHex={requestedAmountHex}
         updateApproval={(amount) => {
@@ -109,32 +56,27 @@ class TransactionRequest extends React.Component {
     )
   }
 
-  renderViewData () {
-    return (
-      <ViewData {...this.props} />
-    )
+  renderViewData() {
+    return <ViewData {...this.props} />
   }
 
-  renderTx () {
+  renderTx() {
     const { accountId, handlerId } = this.props
     const req = this.store('main.accounts', accountId, 'requests', handlerId)
     if (!req) return null
     const originalNotice = (req.notice || '').toLowerCase()
-    let notice = req.notice
 
     const status = req.status
     const mode = req.mode
-    const toAddress = (req.data && req.data.to) || ''
     let requestClass = 'signerRequest'
-    // if (mode === 'monitor') requestClass += ' signerRequestMonitor'
-    const success = (req.status === 'confirming' || req.status === 'confirmed')
+    const success = req.status === 'confirming' || req.status === 'confirmed'
     const error = req.status === 'error' || req.status === 'declined'
     if (success) requestClass += ' signerRequestSuccess'
     if (req.status === 'confirmed') requestClass += ' signerRequestConfirmed'
     else if (error) requestClass += ' signerRequestError'
 
     const chain = {
-      type: 'ethereum', 
+      type: 'ethereum',
       id: parseInt(req.data.chainId, 'hex')
     }
 
@@ -151,10 +93,10 @@ class TransactionRequest extends React.Component {
     // }
     if (mode !== 'monitor' && req.data.nonce) {
       const r = this.store('main.accounts', this.props.accountId, 'requests')
-      const requests = Object.keys(r || {}).map(key => r[key])
-      const monitor = requests.filter(req => req.mode === 'monitor')
-      const monitorFilter = monitor.filter(r => r.status !== 'error')
-      const existingNonces = monitorFilter.map(m => m.data.nonce)
+      const requests = Object.keys(r || {}).map((key) => r[key])
+      const monitor = requests.filter((req) => req.mode === 'monitor')
+      const monitorFilter = monitor.filter((r) => r.status !== 'error')
+      const existingNonces = monitorFilter.map((m) => m.data.nonce)
       existingNonces.forEach((nonce, i) => {
         if (req.data.nonce === nonce) {
           txMeta.replacement = true
@@ -168,11 +110,13 @@ class TransactionRequest extends React.Component {
             txMeta.possible = false
             txMeta.notice = 'gas price too low'
           } else if (
-              req.data.maxPriorityFeePerGas &&
-              req.data.maxFeePerGas &&
-              Math.ceil(parseInt(monitorFilter[i].data.maxPriorityFeePerGas, 'hex') * 1.1) > parseInt(req.data.maxPriorityFeePerGas, 'hex') &&
-              Math.ceil(parseInt(monitorFilter[i].data.maxFeePerGas, 'hex') * 1.1) > parseInt(req.data.maxFeePerGas, 'hex')
-            ) {
+            req.data.maxPriorityFeePerGas &&
+            req.data.maxFeePerGas &&
+            Math.ceil(parseInt(monitorFilter[i].data.maxPriorityFeePerGas, 'hex') * 1.1) >
+              parseInt(req.data.maxPriorityFeePerGas, 'hex') &&
+            Math.ceil(parseInt(monitorFilter[i].data.maxFeePerGas, 'hex') * 1.1) >
+              parseInt(req.data.maxFeePerGas, 'hex')
+          ) {
             txMeta.possible = false
             txMeta.notice = 'gas fees too low'
           }
@@ -184,27 +128,35 @@ class TransactionRequest extends React.Component {
     if (isNaN(nonce)) nonce = 'TBD'
 
     const showWarning = !status && mode !== 'monitor'
-    const requiredApproval = showWarning && (req.approvals || []).filter(a => !a.approved)[0]
+    const requiredApproval = showWarning && (req.approvals || []).filter((a) => !a.approved)[0]
 
     const recognizedActions = req.recognizedActions || []
     return (
       <div key={req.handlerId} className={requestClass}>
-        {/* <TxOverlay {...this.props} overlay={this.state.overlayMode} overlayMode={this.overlayMode.bind(this)}/> */}
-        {/* {this.renderStep()} */}
         {req.type === 'transaction' ? (
           <div className='approveTransaction'>
             {!!requiredApproval ? (
               <TxApproval
                 req={this.props.req}
                 approval={requiredApproval}
-                allowOtherChain={this.allowOtherChain.bind(this)} />
+                allowOtherChain={this.allowOtherChain.bind(this)}
+              />
             ) : null}
             <div className='approveTransactionPayload'>
               <div className='_txBody'>
                 <TxMainNew i={0} {...this.props} req={req} chain={chain} />
                 <TxMain i={1} {...this.props} req={req} chain={chain} />
                 {recognizedActions.map((action, i) => {
-                  return <TxAction key={'action' + action.type + i} i={2 + i} {...this.props} req={req} chain={chain} action={action} />
+                  return (
+                    <TxAction
+                      key={'action' + action.type + i}
+                      i={2 + i}
+                      {...this.props}
+                      req={req}
+                      chain={chain}
+                      action={action}
+                    />
+                  )
                 })}
                 <TxRecipient i={3 + recognizedActions.length} {...this.props} req={req} />
                 <TxFeeNew i={4 + recognizedActions.length} {...this.props} req={req} />
@@ -217,9 +169,8 @@ class TransactionRequest extends React.Component {
       </div>
     )
   }
-  render () {
-    const { accountId, handlerId, step } = this.props
-    const req = this.store('main.accounts', accountId, 'requests', handlerId)
+  render() {
+    const { step } = this.props
     if (step === 'adjustFee') {
       return this.renderAdjustFee()
     } else if (step === 'adjustApproval') {

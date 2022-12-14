@@ -4,7 +4,6 @@ import { Fragment, Interface } from 'ethers/lib/utils'
 import { registrar as registrarAbi, registrarController as registrarControllerAbi } from './abi'
 import store from '../../../store'
 
-
 import type {
   ApproveAction as EnsApprovalAction,
   TransferAction as EnsTransferAction,
@@ -49,21 +48,21 @@ type DeploymentLocation = {
   chainId: number
 }
 
-function decode (abi: ReadonlyArray<Fragment | JsonFragment | string>, calldata: string) {
+function decode(abi: ReadonlyArray<Fragment | JsonFragment | string>, calldata: string) {
   const contractApi = new Interface(abi)
   return contractApi.parseTransaction({ data: calldata })
 }
 
-function getNameForTokenId (account: string, tokenId: string) {
+function getNameForTokenId(account: string, tokenId: string) {
   const ensInventory: InventoryCollection = store('main.inventory', account, 'ens') || {}
   const items = ensInventory.items || {}
 
-  const record = Object.values(items).find(ens => ens.tokenId === tokenId) || { name: '' }
+  const record = Object.values(items).find((ens) => ens.tokenId === tokenId) || { name: '' }
 
   return record.name
 }
 
-function ethName (name: string) {
+function ethName(name: string) {
   // assumes all names will be registered in the .eth domain, in the future this may not be the case
   return name.includes('.eth') ? name : `${name}.eth`
 }
@@ -84,7 +83,11 @@ const registrar = ({ name = 'ENS Registrar', address, chainId }: DeploymentLocat
         return {
           id: 'ens:transfer',
           data: {
-            name: name, from, to, tokenId: token }
+            name: name,
+            from,
+            to,
+            tokenId: token
+          }
         } as EnsTransferAction
       }
 
@@ -102,7 +105,11 @@ const registrar = ({ name = 'ENS Registrar', address, chainId }: DeploymentLocat
   }
 }
 
-const registarController = ({ name = 'ENS Registrar Controller', address, chainId }: DeploymentLocation): EnsContract => {
+const registarController = ({
+  name = 'ENS Registrar Controller',
+  address,
+  chainId
+}: DeploymentLocation): EnsContract => {
   return {
     name,
     chainId,

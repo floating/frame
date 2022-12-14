@@ -1,6 +1,6 @@
 // Translated to JavaScript from https://github.com/dicether/eip712/blob/master/src/eip712.ts
 const abi = require('ethereumjs-abi')
-const ethUtil = require('ethereumjs-util')
+const ethUtil = require('@ethereumjs/util')
 
 const PRIMITIVE_TYPES = [
   /^bytes[0-9]|[0-2][0-9]|3[0-2]$/,
@@ -12,12 +12,12 @@ const PRIMITIVE_TYPES = [
   /^string$/
 ]
 
-function isPrimitiveType (type) {
-  return PRIMITIVE_TYPES.some(regex => regex.test(type))
+function isPrimitiveType(type) {
+  return PRIMITIVE_TYPES.some((regex) => regex.test(type))
 }
 
 // Recursively finds all the dependencies of a type
-function dependencies (primaryType, types, found = []) {
+function dependencies(primaryType, types, found = []) {
   if (found.includes(primaryType)) {
     return found
   }
@@ -38,10 +38,10 @@ function dependencies (primaryType, types, found = []) {
   return found
 }
 
-function encodeType (primaryType, types) {
+function encodeType(primaryType, types) {
   // Get dependencies primary first, then alphabetical
   let deps = dependencies(primaryType, types)
-  deps = deps.filter(t => t !== primaryType)
+  deps = deps.filter((t) => t !== primaryType)
   deps = [primaryType].concat(deps.sort())
 
   // Format as a string with fields
@@ -53,11 +53,11 @@ function encodeType (primaryType, types) {
   return Buffer.from(result)
 }
 
-function typeHash (primaryType, types) {
+function typeHash(primaryType, types) {
   return ethUtil.keccak256(encodeType(primaryType, types))
 }
 
-function encodeData (primaryType, types, data) {
+function encodeData(primaryType, types, data) {
   const encTypes = []
   const encValues = []
 
@@ -95,11 +95,11 @@ function encodeData (primaryType, types, data) {
   return abi.rawEncode(encTypes, encValues)
 }
 
-function structHash (primaryType, types, data) {
+function structHash(primaryType, types, data) {
   return ethUtil.keccak256(encodeData(primaryType, types, data))
 }
 
-function hashTypedData (typedData) {
+function hashTypedData(typedData) {
   return ethUtil.keccak256(
     Buffer.concat([
       Buffer.from('1901', 'hex'),

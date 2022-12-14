@@ -6,12 +6,12 @@ export interface Breadcrumb {
 type Step = 'confirm'
 
 interface RequestData {
-  step: Step,
-  accountId: string,
+  step: Step
+  accountId: string
   requestId: string
 }
 
 export interface RequestBreadcrumb extends Omit<Breadcrumb, 'view'> {
-  view: 'requestView',
+  view: 'requestView'
   data: RequestData
 }
