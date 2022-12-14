@@ -101,11 +101,7 @@ class TxFee extends React.Component {
             <ClusterColumn grow={2}>
               <ClusterValue>
                 <div className='txSendingValue'>
-                  <DisplayCoinBalance
-                    amount={maxFee.wei().value.toString()}
-                    decimals={18}
-                    symbol={nativeCurrency.symbol}
-                  />
+                  <DisplayCoinBalance amount={maxFee.wei().value} symbol={nativeCurrency.symbol} />
                 </div>
               </ClusterValue>
               <ClusterValue>
