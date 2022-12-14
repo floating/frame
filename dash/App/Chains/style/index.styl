@@ -1,10 +1,9 @@
 .network
-  background var(--ghostA)
   margin 6px 6px 4px 6px
   position relative
   box-shadow 0px 4px 8px var(--ghostY)
   border-radius 27px
-  background var(--ghostA)
+  background var(--ghostAZ)
   box-shadow 0px 4px 6px var(--ghostY)
   border-bottom 2px solid var(--ghostZ)
 
@@ -274,21 +273,6 @@
   justify-content flex-start
   align-items center
   padding 20px
-
-.viewLicense
-  width 100%
-  text-align center
-  font-size 11px
-  text-transform uppercase
-  font-weight 400
-  letter-spacing 1px
-  margin-top 28px
-  color var(--outerspace06)
-  cursor pointer
-
-.viewLicense:hover
-  cursor pointer
-  color var(--outerspace08)
 
 .discordInvite:hover
   .discordLink
@@ -681,8 +665,8 @@
   font-weight 300
   transition var(--standard)
   transform translateZ(0)
-  padding-top 20px
   z-index 20
+  padding-bottom 50px
 
   .appInfoIcon
     transition var(--standard)
@@ -704,7 +688,6 @@
   .appInfoLine
     left 0
     right 0
-    transition var(--standard)
     display flex
     justify-content center
     align-items center
@@ -712,10 +695,24 @@
     transform translateZ(0)
     color var(--outerspace06)
 
+  .appInfoViewLicense
+    width 100%
+    text-align center
+    font-size 11px
+    text-transform uppercase
+    font-weight 400
+    letter-spacing 1px
+    margin-top 24px
+    color var(--outerspace06)
+    cursor pointer
+
+  .appInfoViewLicense:hover
+    cursor pointer
+    color var(--outerspace08)
+
   .appInfoLineReset
     margin-top 15px
     margin-left 4px
-    margin-bottom 32px
     text-align center
     font-size 11px
     text-transform uppercase
@@ -746,10 +743,14 @@
     font-size 13px
   
   .appInfoLineInstanceId
-    color var(--outerspace02)
+    color var(--outerspace06)
     cursor pointer
-    font-family 'FiraCode'
-    font-size 10px
+    font-family 'VCR'
+    font-size 12px
+    margin-top 50px
+    margin-left 0px
+    margin-bottom 52px
+    text-transform uppercase
   
   .appInfoLineInstanceId:hover
     color var(--outerspace08)

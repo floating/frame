@@ -585,6 +585,8 @@
   border-radius 26px
   cursor pointer
   overflow hidden
+  background var(--ghostAZ)
+
   *
     pointer-events none
 
@@ -595,6 +597,10 @@
     bottom 0
     left 0
     z-index 200
+    pointer-events none
+    transition var(--standardFast)
+    background linear-gradient(90deg, var(--overlayA), var(--overlayB))
+    border-radius 26px
 
   .requestPreviewContent
     position absolute
@@ -695,8 +701,8 @@
     font-size 11px
     text-transform uppercase
     letter-spacing 2px
-    padding 20px 0px 10px 20px
-    height 30px
+    padding 16px 0px 10px 20px
+    height 42px
     font-family 'MainFont'
     font-weight 500
     box-sizing border-box
@@ -837,7 +843,7 @@
 .moduleButton
   width 100%
   height 40px
-  background var(--ghostA)
+  background var(--ghostAZ)
   border-radius 12px
   color var(--outerspace)
   display flex

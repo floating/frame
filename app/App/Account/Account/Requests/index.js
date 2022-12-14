@@ -76,7 +76,7 @@ class Requests extends React.Component {
           <div className={'requestsPreviewArrow'}>
             <div className={'requestsPreviewArrow1'} />
           </div>
-          <div className={'requestsPreviewOverlay'} />
+          <div className={'requestsPreviewOverlay'} style={reqCount ? { opacity: '1' } : { opacity: '0' }} />
         </div>
       </div>
     )
@@ -84,18 +84,19 @@ class Requests extends React.Component {
 
   renderRequestGroup(origin, requests) {
     const groupName = this.store('main.origins', origin, 'name')
-    // const favicon = 'https://' + groupName + '/favicon.ico'
+    // const favicon = `https://s2.googleusercontent.com/s2/favicons?sz=256&domain_url=https://` + groupName
     // const proxyFavicon = `https://proxy.pylon.link?type=icon&target=${encodeURIComponent(favicon)}`
 
     return (
       <ClusterBox>
         <div className='requestGroup'>
-          {/* <RingIcon img={favicon} alt={'?'} small noRing /> */}
+          {/* <img src={proxyFavicon} width='24px' height='24px' />
+          <RingIcon img={favicon} alt={'?'} small noRing /> */}
           <div className='requestGroupMain'>
             <div style={{ marginRight: '8px' }}>{svg.window(12)}</div>
             <div className='requestGroupName'>{groupName}</div>
           </div>
-          <div className='requestGroupName'>{'clear all'}</div>
+          <div className='requestGroupButton'>{'clear all'}</div>
         </div>
         <Cluster>
           {!requests.length ? (
@@ -116,18 +117,7 @@ class Requests extends React.Component {
                   color={'var(--outerspace)'}
                   svgName={'accounts'}
                 >
-                  <Cluster>
-                    <ClusterRow>
-                      <ClusterValue grow={2}>
-                        <div className='requestItemTitleSub' style={{ padding: '16px' }}>
-                          <div className='requestItemTitleSubIcon'>{svg.window(10)}</div>
-                          <div className='requestItemTitleSubText'>
-                            {this.store('main.origins', req.origin, 'name')}
-                          </div>
-                        </div>
-                      </ClusterValue>
-                    </ClusterRow>
-                  </Cluster>
+                  <div style={{ height: '10px' }} />
                 </RequestItem>
               )
             } else if (req.type === 'sign') {
@@ -142,18 +132,7 @@ class Requests extends React.Component {
                   color={'var(--outerspace)'}
                   svgName={'sign'}
                 >
-                  <Cluster>
-                    <ClusterRow>
-                      <ClusterValue grow={2}>
-                        <div className='requestItemTitleSub' style={{ padding: '16px' }}>
-                          <div className='requestItemTitleSubIcon'>{svg.window(10)}</div>
-                          <div className='requestItemTitleSubText'>
-                            {this.store('main.origins', req.origin, 'name')}
-                          </div>
-                        </div>
-                      </ClusterValue>
-                    </ClusterRow>
-                  </Cluster>
+                  <div style={{ height: '10px' }} />
                 </RequestItem>
               )
             } else if (req.type === 'signTypedData') {
@@ -168,18 +147,7 @@ class Requests extends React.Component {
                   color={'var(--outerspace)'}
                   svgName={'sign'}
                 >
-                  <Cluster>
-                    <ClusterRow>
-                      <ClusterValue grow={2}>
-                        <div className='requestItemTitleSub' style={{ padding: '16px' }}>
-                          <div className='requestItemTitleSubIcon'>{svg.window(10)}</div>
-                          <div className='requestItemTitleSubText'>
-                            {this.store('main.origins', req.origin, 'name')}
-                          </div>
-                        </div>
-                      </ClusterValue>
-                    </ClusterRow>
-                  </Cluster>
+                  <div style={{ height: '10px' }} />
                 </RequestItem>
               )
             } else if (req.type === 'addChain') {
@@ -194,18 +162,7 @@ class Requests extends React.Component {
                   color={'var(--outerspace)'}
                   svgName={'chain'}
                 >
-                  <Cluster>
-                    <ClusterRow>
-                      <ClusterValue grow={2}>
-                        <div className='requestItemTitleSub' style={{ padding: '16px' }}>
-                          <div className='requestItemTitleSubIcon'>{svg.window(10)}</div>
-                          <div className='requestItemTitleSubText'>
-                            {this.store('main.origins', req.origin, 'name')}
-                          </div>
-                        </div>
-                      </ClusterValue>
-                    </ClusterRow>
-                  </Cluster>
+                  <div style={{ height: '10px' }} />
                 </RequestItem>
               )
             } else if (req.type === 'switchChain') {
@@ -220,18 +177,7 @@ class Requests extends React.Component {
                   color={'var(--outerspace)'}
                   svgName={'chain'}
                 >
-                  <Cluster>
-                    <ClusterRow>
-                      <ClusterValue grow={2}>
-                        <div className='requestItemTitleSub' style={{ padding: '16px' }}>
-                          <div className='requestItemTitleSubIcon'>{svg.window(10)}</div>
-                          <div className='requestItemTitleSubText'>
-                            {this.store('main.origins', req.origin, 'name')}
-                          </div>
-                        </div>
-                      </ClusterValue>
-                    </ClusterRow>
-                  </Cluster>
+                  <div style={{ height: '10px' }} />
                 </RequestItem>
               )
             } else if (req.type === 'addToken') {
@@ -246,18 +192,7 @@ class Requests extends React.Component {
                   color={'var(--outerspace)'}
                   svgName={'tokens'}
                 >
-                  <Cluster>
-                    <ClusterRow>
-                      <ClusterValue grow={2}>
-                        <div className='requestItemTitleSub' style={{ padding: '16px' }}>
-                          <div className='requestItemTitleSubIcon'>{svg.window(10)}</div>
-                          <div className='requestItemTitleSubText'>
-                            {this.store('main.origins', req.origin, 'name')}
-                          </div>
-                        </div>
-                      </ClusterValue>
-                    </ClusterRow>
-                  </Cluster>
+                  <div style={{ height: '10px' }} />
                 </RequestItem>
               )
             } else if (req.type === 'transaction') {
