@@ -3,7 +3,7 @@ import { v5 as uuidv5 } from 'uuid'
 import { accountNS, isDefaultAccountName } from '../../../resources/domain/account'
 import { toTokenId } from '../../../resources/domain/balance'
 
-const panelActions = require('./panel')
+const panelActions = require('../../../resources/store/actions.panel')
 const supportedNetworkTypes = ['ethereum']
 
 function switchChainForOrigins(origins, oldChainId, newChainId) {
@@ -726,9 +726,9 @@ module.exports = {
     u('main.mute.aragonAccountMigrationWarning', () => true)
     u('windows.dash.showing', () => true)
   },
-  closeDawn: (u) => {
+  closeOnboard: (u) => {
     u('main.mute.onboardingWindow', () => true)
-    u('windows.dawn.showing', () => false)
+    u('windows.onboard.showing', () => false)
   },
   // Dapp Frame
   appDapp: (u, dapp) => {

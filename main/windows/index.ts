@@ -32,7 +32,7 @@ const devHeight = 800
 
 let tray: Tray
 let dash: Dash
-let dawn: Dawn
+let onboard: Onboard
 let mouseTimeout: NodeJS.Timeout
 let glide = false
 
@@ -110,9 +110,8 @@ const detectMouse = () => {
 }
 
 function initWindow(id: string, opts: Electron.BrowserWindowConstructorOptions) {
-  const windowDir = id === 'tray' ? 'app' : id
   const url = enableHMR
-    ? `http://localhost:1234/${windowDir}/${id}.dev.html`
+    ? `http://localhost:1234/app/${id}.dev.html`
     : new URL(path.join(process.env.BUNDLE_LOCATION, `${id}.html`), 'file:')
 
   windows[id] = createWindow(id, opts)
@@ -228,9 +227,9 @@ class Tray {
           dash.show()
         }, 300)
       }
-      if (dawn) {
+      if (onboard) {
         setTimeout(() => {
-          dawn.show()
+          onboard.show()
         }, 600)
       }
     }
@@ -367,9 +366,9 @@ class Dash {
   }
 }
 
-class Dawn {
+class Onboard {
   constructor() {
-    initWindow('dawn', {
+    initWindow('onboard', {
       x: 0,
       y: 0,
       width: 0,
@@ -381,19 +380,22 @@ class Dawn {
   }
 
   public hide() {
-    if (windows.dawn && windows.dawn.isVisible()) {
-      windows.dawn.hide()
+    if (windows.onboard && windows.onboard.isVisible()) {
+      windows.onboard.hide()
     }
   }
 
   public show() {
-    log.warn('loading dawn url', tray.isReady())
     if (!tray.isReady()) {
       return
     }
     setTimeout(() => {
-      windows.dawn.on('ready-to-show', () => {
-        windows.dawn.show()
+      windows.onboard.on('ready-to-show', () => {
+        windows.onboard.show()
+      })
+
+      windows.onboard.on('close', () => {
+        delete windows.onboard
       })
 
       const area = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
@@ -401,19 +403,19 @@ class Dawn {
       const maxWidth = Math.floor(height * 1.24)
       const targetWidth = area.width - 460
       const width = targetWidth > maxWidth ? maxWidth : targetWidth
-      windows.dawn.setMinimumSize(400, 300)
-      windows.dawn.setSize(width, height)
-      const pos = topRight(windows.dawn)
-      windows.dawn.setPosition(pos.x - 440, pos.y + 80)
-      windows.dawn.setAlwaysOnTop(true)
-      windows.dawn.show()
-      windows.dawn.focus()
-      windows.dawn.setVisibleOnAllWorkspaces(false, {
+      windows.onboard.setMinimumSize(400, 300)
+      windows.onboard.setSize(width, height)
+      const pos = topRight(windows.onboard)
+      windows.onboard.setPosition(pos.x - 440, pos.y + 80)
+      windows.onboard.setAlwaysOnTop(true)
+      windows.onboard.show()
+      windows.onboard.focus()
+      windows.onboard.setVisibleOnAllWorkspaces(false, {
         visibleOnFullScreen: true,
         skipTransformProcessType: true
       })
       if (isDev) {
-        windows.dawn.webContents.openDevTools()
+        windows.onboard.webContents.openDevTools()
       }
     }, 10)
   }
@@ -469,7 +471,7 @@ const init = () => {
   tray = new Tray()
   dash = new Dash()
   if (!store('main.mute.onboardingWindow')) {
-    dawn = new Dawn()
+    onboard = new Onboard()
   }
 }
 
@@ -506,8 +508,8 @@ export default {
   showDash() {
     dash.show()
   },
-  hideDawn() {
-    dawn.hide()
+  hideOnboard() {
+    onboard.hide()
   },
   hideDash() {
     dash.hide()
