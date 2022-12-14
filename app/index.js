@@ -3,9 +3,20 @@ import React from 'react'
 import { createRoot } from 'react-dom/client'
 import Restore from 'react-restore'
 
-import App from './App'
+import store from './store'
 import link from '../resources/link'
-import _store from './store'
+
+const isTray = window.frameWindow === 'tray'
+
+// Map instead of one-liner because using vars in dynamic import urls breaks Parcel
+// https://github.com/parcel-bundler/parcel/issues/112#issuecomment-1056869249
+const importMap = {
+  tray: () => import('./Tray'),
+  dash: () => import('./Dash'),
+  dapp: () => import('./Dapp'),
+  onboard: () => import('./Onboard'),
+  flow: () => import('./Flow')
+}
 
 Sentry.init({ dsn: 'https://7b09a85b26924609bef5882387e2c4dc@o1204372.ingest.sentry.io/6331069' })
 
@@ -19,29 +30,50 @@ if (process.env.NODE_ENV !== 'development' || process.env.HMR !== 'true') {
 }
 
 link.rpc('getState', (err, state) => {
-  if (err) return console.error('Could not get initial state from main.')
-  const store = _store(state)
-  if (!store('main.mute.betaDisclosure')) store.notify('betaDisclosure')
-  store.observer(() => {
+  if (err) return console.error('Could not get initial state from main')
+  const storeInstance = store(state)
+
+  if (isTray) {
+    link.send('tray:ready') // turn on api
+    link.send('tray:refreshMain')
+    if (!storeInstance('main.mute.betaDisclosure')) storeInstance.notify('betaDisclosure')
+    if (!storeInstance('main.mute.aragonAccountMigrationWarning'))
+      storeInstance.notify('aragonAccountMigrationWarning')
+  }
+
+  window.store = storeInstance
+  storeInstance.observer(() => {
     document.body.classList.remove('dark', 'light')
-    document.body.classList.add('clip', store('main.colorway'))
+    document.body.classList.add('clip', storeInstance('main.colorway'))
     setTimeout(() => {
       document.body.classList.remove('clip')
     }, 100)
   })
-  store.observer(() => {
-    if (store('tray.open')) {
-      document.body.classList.remove('suspend')
-    } else {
-      document.body.classList.add('suspend')
-    }
+
+  if (isTray) {
+    storeInstance.observer(() => {
+      if (storeInstance('tray.open')) {
+        document.body.classList.remove('suspend')
+      } else {
+        document.body.classList.add('suspend')
+      }
+    })
+  }
+  ;(async () => {
+    const AppComponent = (await importMap[window.frameWindow]()).default
+    const RootComponent = Restore.connect(AppComponent, storeInstance)
+    const root = createRoot(document.getElementById(window.frameWindow))
+    root.render(<RootComponent />)
+  })()
+})
+
+if (isTray) {
+  document.addEventListener('mouseout', (e) => {
+    if (e.clientX < 0) link.send('tray:mouseout')
   })
-  const Frame = Restore.connect(App, store)
-  const root = createRoot(document.getElementById('frame'))
-  root.render(<Frame />)
-})
-// document.addEventListener('mouseover', e => link.send('tray:focus'))
-document.addEventListener('mouseout', (e) => {
-  if (e.clientX < 0) link.send('tray:mouseout')
-})
+}
+
 document.addEventListener('contextmenu', (e) => link.send('*:contextmenu', e.clientX, e.clientY))
+
+// document.addEventListener('mouseout', e => { if (e.clientX < 0) link.send('tray:mouseout') })
+// document.addEventListener('contextmenu', e => link.send('tray:contextmenu', e.clientX, e.clientY))
