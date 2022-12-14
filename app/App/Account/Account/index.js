@@ -43,16 +43,7 @@ class _AccountModule extends React.Component {
     return id === 'gas' ? (
       <Gas moduleId={id} id={account} expanded={expanded} filter={filter} />
     ) : id === 'requests' ? (
-      <Requests
-        _id={id}
-        id={account}
-        addresses={this.props.addresses}
-        minimized={this.props.minimized}
-        status={this.props.status}
-        signer={this.props.signer}
-        expanded={expanded}
-        filter={filter}
-      />
+      <Requests moduleId={id} account={account} expanded={expanded} filter={filter} />
     ) : id === 'activity' ? (
       <Activity moduleId={id} id={account} expanded={expanded} filter={filter} />
     ) : id === 'launcher' ? (
@@ -257,7 +248,7 @@ class _AccountView extends React.Component {
       >
         <div className='accountViewMenu cardShow'>
           <div className='accountViewBack' onClick={() => this.props.back()}>
-            {svg.chevronLeft(13)}
+            {svg.chevronLeft(16)}
           </div>
           <div className='accountViewTitle'>
             <div className='accountViewIcon'>{this.props.accountViewIcon}</div>

@@ -12,6 +12,7 @@ import Restore from 'react-restore'
 import TxOverview from './TransactionRequest/TxMainNew/overview'
 
 import RequestItem from '../../../../../resources/Components/RequestItem'
+import RingIcon from '../../../../../resources/Components/RingIcon'
 
 import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../resources/Components/Cluster'
 
@@ -23,77 +24,218 @@ class Requests extends React.Component {
     super(props, context)
     this.state = {
       minimized: false
-      // unlockInput: '',
-      // unlockHeadShake: false
     }
     this.moduleRef = React.createRef()
-    this.resizeObserver = new ResizeObserver(() => {
-      if (this.moduleRef && this.moduleRef.current) {
-        link.send('tray:action', 'updateAccountModule', props._id, {
-          height: this.moduleRef.current.clientHeight
-        })
-      }
-    })
+    if (!this.props.expanded) {
+      this.resizeObserver = new ResizeObserver(() => {
+        if (this.moduleRef && this.moduleRef.current) {
+          link.send('tray:action', 'updateAccountModule', this.props.moduleId, {
+            height: this.moduleRef.current.clientHeight
+          })
+        }
+      })
+    }
   }
-
-  // trezorPin (num) {
-  //   this.tPin = this.tPin ? this.tPin + num.toString() : num.toString()
-  //   if (this.tPin.length === 4) {
-  //     link.rpc('trezorPin', this.props.id, this.tPin, (err, status) => {
-  //       if (err) throw new Error(err)
-  //     })
-  //     this.tPin = ''
-  //   }
-  // }
 
   minimize() {
     this.setState({ minimized: true })
   }
 
-  // unlockChange (e) {
-  //   this.setState({ unlockInput: e.target.value })
-  // }
-
-  // unlockSubmit (e) {
-  //   link.rpc('unlockSigner', this.props.signer.id, this.state.unlockInput, (err, result) => {
-  //     if (err) {
-  //       this.setState({ unlockHeadShake: true })
-  //       setTimeout(() => this.setState({ unlockHeadShake: false }), 1010)
-  //     }
-  //   })
-  // }
-
-  // keyPressUnlock (e) {
-  //   if (e.key === 'Enter') {
-  //     e.preventDefault()
-  //     this.unlockSubmit()
-  //   }
-  // }
-
   componentDidMount() {
-    this.resizeObserver.observe(this.moduleRef.current)
-    if (this.moduleRef && this.moduleRef.current) {
-      link.send('tray:action', 'updateAccountModule', this.props._id, {
-        height: this.moduleRef.current.clientHeight
-      })
-    }
-    setTimeout(() => {
-      const current = this.store('selected.current') === this.props.id && this.props.status === 'ok'
-      const open = current && this.store('selected.open')
-      if (open && this.props.signer && this.unlockInput) {
-        const signer = this.store('main.signers', this.props.signer)
-        if (signer.status === 'locked') this.unlockInput.current.focus()
-      }
-    }, 100)
+    if (this.resizeObserver) this.resizeObserver.observe(this.moduleRef.current)
   }
 
-  // componentDidMount () {
+  renderPreview() {
+    const reqCount = Object.keys(this.store('main.accounts', this.props.account, 'requests') || {}).length
+    return (
+      <div ref={this.moduleRef} className='balancesBlock'>
+        <div
+          className={'requestsPreview'}
+          onClick={() => {
+            const crumb = {
+              view: 'expandedModule',
+              data: {
+                id: this.props.moduleId,
+                account: this.props.account
+              }
+            }
+            link.send('nav:forward', 'panel', crumb)
+          }}
+        >
+          <div className={'requestPreviewContent'}>
+            <div className={'requestPreviewContentTitle'}>
+              <span style={reqCount ? { color: 'var(--good)' } : {}}>{svg.inbox(13)}</span>
+              <span>{reqCount ? (reqCount === 1 ? '1 Request' : reqCount + ' Requests') : 'Requests'}</span>
+            </div>
+            <div className={'requestPreviewContentArrow'} style={reqCount ? { color: 'var(--good)' } : {}}>
+              {svg.arrowRight(14)}
+              {svg.arrowRight(14)}
+              {svg.arrowRight(14)}
+            </div>
+          </div>
+          <div className={'requestsPreviewArrow'}>
+            <div className={'requestsPreviewArrow1'} />
+          </div>
+          <div className={'requestsPreviewOverlay'} style={reqCount ? { opacity: '1' } : { opacity: '0' }} />
+        </div>
+      </div>
+    )
+  }
 
-  //   // link.send('tray:action', 'updateAccountModule', this.props.id, { height: this.moduleRef.current.clientHeight })
-  // }
+  renderRequestGroup(origin, requests) {
+    const groupName = this.store('main.origins', origin, 'name')
+    // const favicon = `https://s2.googleusercontent.com/s2/favicons?sz=256&domain_url=https://` + groupName
+    // const proxyFavicon = `https://proxy.pylon.link?type=icon&target=${encodeURIComponent(favicon)}`
 
-  render() {
-    const activeAccount = this.store('main.accounts', this.props.id)
+    return (
+      <ClusterBox>
+        <div className='requestGroup'>
+          {/* <img src={proxyFavicon} width='24px' height='24px' />
+          <RingIcon img={favicon} alt={'?'} small noRing /> */}
+          <div className='requestGroupMain'>
+            <div style={{ marginRight: '8px' }}>{svg.window(12)}</div>
+            <div className='requestGroupName'>{groupName}</div>
+          </div>
+          <div className='requestGroupButton'>{'clear all'}</div>
+        </div>
+        <Cluster>
+          {!requests.length ? (
+            <div key='noReq' className='noRequests'>
+              No Pending Requests
+            </div>
+          ) : null}
+          {requests.map((req, i) => {
+            if (req.type === 'access') {
+              return (
+                <RequestItem
+                  key={req.type + i}
+                  req={req}
+                  account={this.props.account}
+                  handlerId={req.handlerId}
+                  i={i}
+                  title={'Account Access'}
+                  color={'var(--outerspace)'}
+                  svgName={'accounts'}
+                >
+                  <div style={{ height: '10px' }} />
+                </RequestItem>
+              )
+            } else if (req.type === 'sign') {
+              return (
+                <RequestItem
+                  key={req.type + i}
+                  req={req}
+                  account={this.props.account}
+                  handlerId={req.handlerId}
+                  i={i}
+                  title={'Sign Message'}
+                  color={'var(--outerspace)'}
+                  svgName={'sign'}
+                >
+                  <div style={{ height: '10px' }} />
+                </RequestItem>
+              )
+            } else if (req.type === 'signTypedData') {
+              return (
+                <RequestItem
+                  key={req.type + i}
+                  req={req}
+                  account={this.props.account}
+                  handlerId={req.handlerId}
+                  i={i}
+                  title={'Sign Data'}
+                  color={'var(--outerspace)'}
+                  svgName={'sign'}
+                >
+                  <div style={{ height: '10px' }} />
+                </RequestItem>
+              )
+            } else if (req.type === 'addChain') {
+              return (
+                <RequestItem
+                  key={req.type + i}
+                  req={req}
+                  account={this.props.account}
+                  handlerId={req.handlerId}
+                  i={i}
+                  title={'Add Chain'}
+                  color={'var(--outerspace)'}
+                  svgName={'chain'}
+                >
+                  <div style={{ height: '10px' }} />
+                </RequestItem>
+              )
+            } else if (req.type === 'switchChain') {
+              return (
+                <RequestItem
+                  key={req.type + i}
+                  req={req}
+                  account={this.props.account}
+                  handlerId={req.handlerId}
+                  i={i}
+                  title={'Switch Chain'}
+                  color={'var(--outerspace)'}
+                  svgName={'chain'}
+                >
+                  <div style={{ height: '10px' }} />
+                </RequestItem>
+              )
+            } else if (req.type === 'addToken') {
+              return (
+                <RequestItem
+                  key={req.type + i}
+                  req={req}
+                  account={this.props.account}
+                  handlerId={req.handlerId}
+                  i={i}
+                  title={'Add Tokens'}
+                  color={'var(--outerspace)'}
+                  svgName={'tokens'}
+                >
+                  <div style={{ height: '10px' }} />
+                </RequestItem>
+              )
+            } else if (req.type === 'transaction') {
+              const chainId = parseInt(req.data.chainId, 16)
+              const chainName = this.store('main.networks.ethereum', chainId, 'name')
+              const {
+                primaryColor,
+                icon,
+                nativeCurrency: { symbol: currentSymbol = '?' }
+              } = this.store('main.networksMeta.ethereum', chainId)
+              const txMeta = { replacement: false, possible: true, notice: '' }
+              const originName = this.store('main.origins', req.origin, 'name')
+              return (
+                <RequestItem
+                  key={req.type + i}
+                  req={req}
+                  account={this.props.account}
+                  handlerId={req.handlerId}
+                  i={i}
+                  title={`${chainName} Transaction`}
+                  color={primaryColor ? `var(--${primaryColor})` : ''}
+                  img={icon}
+                >
+                  <TxOverview
+                    req={req}
+                    chainName={chainName}
+                    chainColor={primaryColor}
+                    symbol={currentSymbol}
+                    txMeta={txMeta}
+                    originName={originName}
+                    simple={true}
+                  />
+                </RequestItem>
+              )
+            }
+          })}
+        </Cluster>
+      </ClusterBox>
+    )
+  }
+
+  renderExpanded() {
+    const activeAccount = this.store('main.accounts', this.props.account)
     const requests = Object.values(activeAccount.requests || {})
       .sort((a, b) => {
         if (a.created > b.created) return -1
@@ -105,214 +247,30 @@ class Requests extends React.Component {
         return elapsed > 1000
       })
 
+    const originSortedRequests = {}
+    requests.forEach((req) => {
+      const origin = req.origin
+      originSortedRequests[origin] = originSortedRequests[origin] || []
+      originSortedRequests[origin].push(req)
+    })
+    const groups = Object.keys(originSortedRequests)
+
     return (
-      <div ref={this.moduleRef} className='balancesBlock'>
-        <div className={'moduleHeader'}>
-          <span>{svg.inbox(13)}</span>
-          <span>{'Requests'}</span>
-        </div>
-        <div className='requestContainerWrap'>
-          <div className='requestContainer'>
-            {!requests.length ? (
-              <div key='noReq' className='noRequests'>
-                No Pending Requests
-              </div>
-            ) : null}
-            {requests.map((req, i) => {
-              if (req.type === 'access') {
-                return (
-                  <RequestItem
-                    key={req.type + i}
-                    req={req}
-                    account={this.props.id}
-                    handlerId={req.handlerId}
-                    i={i}
-                    title={'Account Access'}
-                    color={'var(--outerspace)'}
-                    svgName={'accounts'}
-                  >
-                    <Cluster>
-                      <ClusterRow>
-                        <ClusterValue grow={2}>
-                          <div className='requestItemTitleSub' style={{ padding: '16px' }}>
-                            <div className='requestItemTitleSubIcon'>{svg.window(10)}</div>
-                            <div className='requestItemTitleSubText'>
-                              {this.store('main.origins', req.origin, 'name')}
-                            </div>
-                          </div>
-                        </ClusterValue>
-                      </ClusterRow>
-                    </Cluster>
-                  </RequestItem>
-                )
-              } else if (req.type === 'sign') {
-                return (
-                  <RequestItem
-                    key={req.type + i}
-                    req={req}
-                    account={this.props.id}
-                    handlerId={req.handlerId}
-                    i={i}
-                    title={'Sign Message'}
-                    color={'var(--outerspace)'}
-                    svgName={'sign'}
-                  >
-                    <Cluster>
-                      <ClusterRow>
-                        <ClusterValue grow={2}>
-                          <div className='requestItemTitleSub' style={{ padding: '16px' }}>
-                            <div className='requestItemTitleSubIcon'>{svg.window(10)}</div>
-                            <div className='requestItemTitleSubText'>
-                              {this.store('main.origins', req.origin, 'name')}
-                            </div>
-                          </div>
-                        </ClusterValue>
-                      </ClusterRow>
-                    </Cluster>
-                  </RequestItem>
-                )
-              } else if (req.type === 'signTypedData') {
-                return (
-                  <RequestItem
-                    key={req.type + i}
-                    req={req}
-                    account={this.props.id}
-                    handlerId={req.handlerId}
-                    i={i}
-                    title={'Sign Data'}
-                    color={'var(--outerspace)'}
-                    svgName={'sign'}
-                  >
-                    <Cluster>
-                      <ClusterRow>
-                        <ClusterValue grow={2}>
-                          <div className='requestItemTitleSub' style={{ padding: '16px' }}>
-                            <div className='requestItemTitleSubIcon'>{svg.window(10)}</div>
-                            <div className='requestItemTitleSubText'>
-                              {this.store('main.origins', req.origin, 'name')}
-                            </div>
-                          </div>
-                        </ClusterValue>
-                      </ClusterRow>
-                    </Cluster>
-                  </RequestItem>
-                )
-              } else if (req.type === 'addChain') {
-                return (
-                  <RequestItem
-                    key={req.type + i}
-                    req={req}
-                    account={this.props.id}
-                    handlerId={req.handlerId}
-                    i={i}
-                    title={'Add Chain'}
-                    color={'var(--outerspace)'}
-                    svgName={'chain'}
-                  >
-                    <Cluster>
-                      <ClusterRow>
-                        <ClusterValue grow={2}>
-                          <div className='requestItemTitleSub' style={{ padding: '16px' }}>
-                            <div className='requestItemTitleSubIcon'>{svg.window(10)}</div>
-                            <div className='requestItemTitleSubText'>
-                              {this.store('main.origins', req.origin, 'name')}
-                            </div>
-                          </div>
-                        </ClusterValue>
-                      </ClusterRow>
-                    </Cluster>
-                  </RequestItem>
-                )
-              } else if (req.type === 'switchChain') {
-                return (
-                  <RequestItem
-                    key={req.type + i}
-                    req={req}
-                    account={this.props.id}
-                    handlerId={req.handlerId}
-                    i={i}
-                    title={'Switch Chain'}
-                    color={'var(--outerspace)'}
-                    svgName={'chain'}
-                  >
-                    <Cluster>
-                      <ClusterRow>
-                        <ClusterValue grow={2}>
-                          <div className='requestItemTitleSub' style={{ padding: '16px' }}>
-                            <div className='requestItemTitleSubIcon'>{svg.window(10)}</div>
-                            <div className='requestItemTitleSubText'>
-                              {this.store('main.origins', req.origin, 'name')}
-                            </div>
-                          </div>
-                        </ClusterValue>
-                      </ClusterRow>
-                    </Cluster>
-                  </RequestItem>
-                )
-              } else if (req.type === 'addToken') {
-                return (
-                  <RequestItem
-                    key={req.type + i}
-                    req={req}
-                    account={this.props.id}
-                    handlerId={req.handlerId}
-                    i={i}
-                    title={'Add Tokens'}
-                    color={'var(--outerspace)'}
-                    svgName={'tokens'}
-                  >
-                    <Cluster>
-                      <ClusterRow>
-                        <ClusterValue grow={2}>
-                          <div className='requestItemTitleSub' style={{ padding: '16px' }}>
-                            <div className='requestItemTitleSubIcon'>{svg.window(10)}</div>
-                            <div className='requestItemTitleSubText'>
-                              {this.store('main.origins', req.origin, 'name')}
-                            </div>
-                          </div>
-                        </ClusterValue>
-                      </ClusterRow>
-                    </Cluster>
-                  </RequestItem>
-                )
-              } else if (req.type === 'transaction') {
-                const chainId = parseInt(req.data.chainId, 16)
-                const chainName = this.store('main.networks.ethereum', chainId, 'name')
-                const {
-                  primaryColor,
-                  icon,
-                  nativeCurrency: { symbol: currentSymbol = '?' }
-                } = this.store('main.networksMeta.ethereum', chainId)
-                const txMeta = { replacement: false, possible: true, notice: '' }
-                const originName = this.store('main.origins', req.origin, 'name')
-                return (
-                  <RequestItem
-                    key={req.type + i}
-                    req={req}
-                    account={this.props.id}
-                    handlerId={req.handlerId}
-                    i={i}
-                    title={`${chainName} Transaction`}
-                    color={primaryColor ? `var(--${primaryColor})` : ''}
-                    img={icon}
-                  >
-                    <TxOverview
-                      req={req}
-                      chainName={chainName}
-                      chainColor={primaryColor}
-                      symbol={currentSymbol}
-                      txMeta={txMeta}
-                      originName={originName}
-                      simple={true}
-                    />
-                  </RequestItem>
-                )
-              }
-            })}
+      <div className='accountViewScroll'>
+        {groups.length === 0 ? (
+          <div className='requestContainerWrap'>
+            <div className='requestContainerEmpty'>{'NO PENDING REQUESTS'}</div>
           </div>
-        </div>
+        ) : (
+          groups.map((origin) => {
+            return this.renderRequestGroup(origin, originSortedRequests[origin])
+          })
+        )}
       </div>
     )
+  }
+  render() {
+    return this.props.expanded ? this.renderExpanded() : this.renderPreview()
   }
 }
 

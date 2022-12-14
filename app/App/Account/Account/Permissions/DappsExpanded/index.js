@@ -2,27 +2,12 @@ import React from 'react'
 import Restore from 'react-restore'
 import link from '../../../../../../resources/link'
 
+import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../../resources/Components/Cluster'
+
 class Balances extends React.Component {
   constructor(...args) {
     super(...args)
     this.moduleRef = React.createRef()
-    if (!this.props.expanded) {
-      this.resizeObserver = new ResizeObserver(() => {
-        if (this.moduleRef && this.moduleRef.current) {
-          link.send('tray:action', 'updateAccountModule', this.props.moduleId, {
-            height: this.moduleRef.current.clientHeight
-          })
-        }
-      })
-    }
-  }
-
-  componentDidMount() {
-    if (this.resizeObserver) this.resizeObserver.observe(this.moduleRef.current)
-  }
-
-  componentWillUnmount() {
-    if (this.resizeObserver) this.resizeObserver.disconnect()
   }
 
   render() {
@@ -32,43 +17,55 @@ class Balances extends React.Component {
 
     return (
       <div className='accountViewScroll'>
-        <div className='moduleMainPermissions'>
-          {permissionList.length === 0 ? (
-            <div className='signerPermission'>
-              <div className='signerPermissionControls'>
-                <div className='signerPermissionNoPermissions'>No Permissions Set</div>
-              </div>
-            </div>
-          ) : (
-            permissionList.map((o) => {
-              return (
-                <div className='signerPermission' key={o}>
-                  <div className='signerPermissionControls'>
-                    <div className='signerPermissionOrigin'>{permissions[o].origin}</div>
-                    <div
-                      className={
-                        permissions[o].provider
-                          ? 'signerPermissionToggle signerPermissionToggleOn'
-                          : 'signerPermissionToggle'
-                      }
-                      onClick={(_) => link.send('tray:action', 'toggleAccess', this.props.account, o)}
-                    >
-                      <div className='signerPermissionToggleSwitch' />
+        <ClusterBox style={{ marginTop: '20px' }}>
+          <Cluster>
+            <div className='moduleMainPermissions'>
+              {permissionList.length === 0 ? (
+                <ClusterRow>
+                  <ClusterValue>
+                    <div className='signerPermission'>
+                      <div className='signerPermissionControls'>
+                        <div className='signerPermissionNoPermissions'>No Permissions Set</div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              )
-            })
-          )}
-          <div className='clearPermissionsButton'>
-            <div
-              onClick={() => {
-                link.send('tray:action', 'clearPermissions', this.props.account)
-              }}
-              className='moduleButton'
-            >
-              Clear All Permissions
+                  </ClusterValue>
+                </ClusterRow>
+              ) : (
+                permissionList.map((o) => {
+                  return (
+                    <ClusterRow>
+                      <ClusterValue pointerEvents={true}>
+                        <div className='signerPermission' key={o}>
+                          <div className='signerPermissionControls'>
+                            <div className='signerPermissionOrigin'>{permissions[o].origin}</div>
+                            <div
+                              className={
+                                permissions[o].provider
+                                  ? 'signerPermissionToggle signerPermissionToggleOn'
+                                  : 'signerPermissionToggle'
+                              }
+                              onClick={(_) => link.send('tray:action', 'toggleAccess', this.props.account, o)}
+                            >
+                              <div className='signerPermissionToggleSwitch' />
+                            </div>
+                          </div>
+                        </div>
+                      </ClusterValue>
+                    </ClusterRow>
+                  )
+                })
+              )}
             </div>
+          </Cluster>
+        </ClusterBox>
+        <div className='clearPermissionsButton'>
+          <div
+            onClick={() => {
+              link.send('tray:action', 'clearPermissions', this.props.account)
+            }}
+            className='moduleButton'
+          >
+            Clear All Permissions
           </div>
         </div>
       </div>

@@ -4,6 +4,8 @@ import link from '../../../../../../resources/link'
 import svg from '../../../../../../resources/svg'
 import { matchFilter } from '../../../../../../resources/utils'
 
+import { Cluster, ClusterRow, ClusterValue } from '../../../../../../resources/Components/Cluster'
+
 class Balances extends React.Component {
   constructor(...args) {
     super(...args)
@@ -43,35 +45,43 @@ class Balances extends React.Component {
           <span>{svg.window(14)}</span>
           <span>{'Dapps'}</span>
         </div>
-        <div className='moduleMainPermissions'>
+        <Cluster>
           {permissionList.length === 0 ? (
-            <div className='signerPermission'>
-              <div className='signerPermissionControls'>
-                <div className='signerPermissionNoPermissions'>No Permissions Set</div>
-              </div>
-            </div>
+            <ClusterRow>
+              <ClusterValue>
+                <div className='signerPermission'>
+                  <div className='signerPermissionControls'>
+                    <div className='signerPermissionNoPermissions'>No Permissions Set</div>
+                  </div>
+                </div>
+              </ClusterValue>
+            </ClusterRow>
           ) : (
             permissionList.map((o) => {
               return (
-                <div className='signerPermission' key={o}>
-                  <div className='signerPermissionControls'>
-                    <div className='signerPermissionOrigin'>{permissions[o].origin}</div>
-                    <div
-                      className={
-                        permissions[o].provider
-                          ? 'signerPermissionToggle signerPermissionToggleOn'
-                          : 'signerPermissionToggle'
-                      }
-                      onClick={(_) => link.send('tray:action', 'toggleAccess', this.props.account, o)}
-                    >
-                      <div className='signerPermissionToggleSwitch' />
+                <ClusterRow>
+                  <ClusterValue pointerEvents={true}>
+                    <div className='signerPermission' key={o}>
+                      <div className='signerPermissionControls'>
+                        <div className='signerPermissionOrigin'>{permissions[o].origin}</div>
+                        <div
+                          className={
+                            permissions[o].provider
+                              ? 'signerPermissionToggle signerPermissionToggleOn'
+                              : 'signerPermissionToggle'
+                          }
+                          onClick={(_) => link.send('tray:action', 'toggleAccess', this.props.account, o)}
+                        >
+                          <div className='signerPermissionToggleSwitch' />
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
+                  </ClusterValue>
+                </ClusterRow>
               )
             })
           )}
-        </div>
+        </Cluster>
         <div className='signerBalanceTotal'>
           <div className='signerBalanceButtons'>
             <div

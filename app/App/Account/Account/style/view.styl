@@ -4,7 +4,7 @@
   right 8px
   bottom 40px
   left 8px
-  border-radius 24px
+  border-radius 30px
   z-index 4
   display flex
   justify-content center
@@ -13,19 +13,21 @@
   display flex
   justify-content center
   align-items center
+  overflow hidden
 
   .accountViewMenu
     position absolute
     top 6px
     right 6px
     left 6px
-    height 54px
-    border-radius 20px
-    box-shadow 0px 2px 4px var(--ghostX)
+    height 53px
+    border-radius 26px
+    box-shadow 0px 2px 4px var(--ghostY)
     z-index 59999999
     background var(--ghostA)
-    box-shadow 0px 2px 4px var(--ghostY)
+
     border-bottom 2px solid var(--ghostZ)
+    box-sizing border-box
 
     .accountViewTitle
       position absolute
@@ -49,16 +51,15 @@
         top 2px
 
       .accountViewText
-        margin-left 12px
         font-size 12px
 
     .accountViewBack
       position absolute
       top 5px
       left 5px
-      height 38px
-      width 48px
-      border-radius 16px
+      height 42px
+      width 54px
+      border-radius 159px
       display flex
       justify-content center
       align-items center
@@ -69,6 +70,7 @@
       background var(--ghostB)
       cursor pointer
       border 3px solid var(--ghostZ)
+      box-sizing border-box
       *
         pointer-events none
 
@@ -84,16 +86,13 @@
     animation-delay 0.08s
     z-index 3
     padding-top 30px
-    border-radius 24px
 
 .accountView::before
   content ''
   position absolute
-  top 0
-  left 0
-  right 0
+  top 0px
+  left 0px
+  right 0px
   height 40px
-  background linear-gradient(var(--ghostZ), var(--ghostZ0))
-  z-index 4
-  border-top-left-radius 24px
-  border-top-right-radius 24px
+  background linear-gradient(var(--ghostZ) 30%, var(--ghostZ0))
+  z-index 90

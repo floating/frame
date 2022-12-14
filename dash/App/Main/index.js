@@ -26,33 +26,6 @@ class Settings extends React.Component {
     const instanceId = this.store('main.instanceId')
     return (
       <div className='appInfo'>
-        <div className='appInfoLine appInfoLineVersion'>{`v${appVersion}`}</div>
-        <div className='appInfoLine appInfoLineReset'>
-          {this.state.resetConfirm ? (
-            <>
-              <span className='appInfoLineResetConfirm'>Are you sure you want to reset everything?</span>
-              <span className='appInfoLineResetConfirmButtons'>
-                <span
-                  className='appInfoLineResetConfirmButton'
-                  onClick={() => link.send('tray:resetAllSettings')}
-                >
-                  Yes
-                </span>
-                <span> / </span>
-                <span
-                  className='appInfoLineResetConfirmButton'
-                  onClick={() => this.setState({ resetConfirm: false })}
-                >
-                  No
-                </span>
-              </span>
-            </>
-          ) : (
-            <span className='appInfoLineResetButton' onClick={() => this.setState({ resetConfirm: true })}>
-              Reset All Settings & Data
-            </span>
-          )}
-        </div>
         <div
           className='appInfoLine appInfoLineInstanceId'
           onMouseOver={(e) => {
@@ -81,6 +54,41 @@ class Settings extends React.Component {
             <span className='instanceIdCopied'>{'Instance ID Copied'}</span>
           ) : (
             instanceId
+          )}
+        </div>
+        <div className='appInfoLine appInfoLineVersion'>{`v${appVersion}`}</div>
+        <div
+          className='appInfoViewLicense'
+          onClick={() =>
+            link.send('tray:openExternal', 'https://github.com/floating/frame/blob/master/LICENSE')
+          }
+        >
+          View License
+        </div>
+        <div className='appInfoLine appInfoLineReset'>
+          {this.state.resetConfirm ? (
+            <>
+              <span className='appInfoLineResetConfirm'>Are you sure you want to reset everything?</span>
+              <span className='appInfoLineResetConfirmButtons'>
+                <span
+                  className='appInfoLineResetConfirmButton'
+                  onClick={() => link.send('tray:resetAllSettings')}
+                >
+                  Yes
+                </span>
+                <span> / </span>
+                <span
+                  className='appInfoLineResetConfirmButton'
+                  onClick={() => this.setState({ resetConfirm: false })}
+                >
+                  No
+                </span>
+              </span>
+            </>
+          ) : (
+            <span className='appInfoLineResetButton' onClick={() => this.setState({ resetConfirm: true })}>
+              Reset All Settings & Data
+            </span>
           )}
         </div>
       </div>
@@ -367,14 +375,6 @@ class Settings extends React.Component {
             >
               Quit
             </div>
-          </div>
-          <div
-            className='viewLicense'
-            onClick={() =>
-              link.send('tray:openExternal', 'https://github.com/floating/frame/blob/master/LICENSE')
-            }
-          >
-            View License
           </div>
           {this.appInfo()}
         </div>

@@ -55,22 +55,25 @@ export const ClusterBox = ({ title, subtitle, children, style = {}, animationSlo
   return (
     <div className='_txMain' style={style}>
       <div className='_txMainInner'>
-        <div className='_txLabel'>
-          <div>{title}</div>
-          {subtitle && (
-            <span
-              style={{
-                opacity: 0.9,
-                fontSize: '9px',
-                position: 'relative',
-                top: '0px',
-                left: '4px'
-              }}
-            >
-              {`(${subtitle})`}
-            </span>
-          )}
-        </div>
+        {title ? (
+          <div className='_txLabel'>
+            <div>{title}</div>
+            {subtitle && (
+              <span
+                style={{
+                  opacity: 0.9,
+                  fontSize: '9px',
+                  position: 'relative',
+                  top: '0px',
+                  left: '4px'
+                }}
+              >
+                {`(${subtitle})`}
+              </span>
+            )}
+          </div>
+        ) : null}
+
         {children}
       </div>
     </div>
