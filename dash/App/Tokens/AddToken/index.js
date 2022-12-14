@@ -20,7 +20,7 @@ const navForward = async (notifyData) =>
 const AddTokenErrorSceeen = ({ error, address, chainId }) => {
   return (
     <div className='newTokenView cardShow'>
-      <div className='newTokenChainSelectTitle'>{error}</div>
+      <div className='newTokenErrorTitle'>{error}</div>
 
       <div className='tokenSetAddress' role='button' onClick={() => link.send('nav:back', 'dash')}>
         {'BACK'}

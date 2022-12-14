@@ -154,7 +154,7 @@ class _Footer extends React.Component {
                         data: {
                           notify: 'addToken',
                           notifyData: {
-                            tokenData: { address, symbol, decimals, logoURI, name },
+                            tokenData: { symbol, decimals, logoURI, name },
                             chainId,
                             address
                           }

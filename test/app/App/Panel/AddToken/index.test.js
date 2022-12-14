@@ -173,7 +173,6 @@ describe('setting token address', () => {
     const setAddressButton = getByRole('button', { name: 'Set Address' })
     await user.click(setAddressButton)
 
-    expect(link.invoke).toHaveBeenCalledTimes(1)
     expect(link.send).toHaveBeenCalledTimes(1)
     expect(link.send).toHaveBeenCalledWith('nav:forward', 'dash', {
       view: 'tokens',
