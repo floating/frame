@@ -4,7 +4,7 @@ import Restore from 'react-restore'
 import link from '../../../../../resources/link'
 import { debounce } from '../../../../../resources/utils'
 import RingIcon from '../../../../../resources/Components/RingIcon'
-import { ethers } from 'ethers'
+import { utils } from 'ethers'
 import zxcvbn from 'zxcvbn'
 
 const removeLineBreaks = (str) => str.replace(/(\r\n|\n|\r)/gm, '')
@@ -71,7 +71,7 @@ const EnterPhrase = () => {
   const [phrase, setPhrase] = useState('')
   const [error, setError] = useState(null)
 
-  const isValidMnemonic = () => ethers.utils.isValidMnemonic(phrase)
+  const isValidMnemonic = () => utils.isValidMnemonic(phrase)
 
   const updateInput = (e) => {
     const value = removeLineBreaks(e.target.value)
@@ -212,54 +212,35 @@ function ConfirmPassword({ password, phrase }) {
   //TODO: Finish this last step...  show an overview screen like with the watch accounts (button to go back // button to view new added account)?
   const nextStep = (password) =>
     link.rpc('createFromPhrase', phrase, password, (err, signer) => {
-      return navForward({
-        error: err,
-        signerId: signer?.id
+      if (err) {
+        return navForward({
+          error: err
+        })
+      }
+
+      link.send('nav:back', 'dash', 4)
+      link.send(`nav:forward`, 'dash', {
+        view: 'expandedSigner',
+        data: { signer: signer.id }
       })
     })
 
   return <PasswordInput {...{ getError, phrase, nextStep, title, buttonText }} />
 }
 
-function Summary({ err, signerId }) {
+function Error({ err }) {
   return (
     <div style={{ textAlign: 'center', width: '100%' }} className='addAccountItemOptionSetupFrame'>
-      {err ? (
-        <>
-          <div className='addAccountItemOptionTitle'>{err}</div>
-          <div
-            role='button'
-            className='addAccountItemOptionSubmit'
-            onClick={() => link.send('nav:back', 'dash', 3)}
-          >
-            try again
-          </div>
-        </>
-      ) : (
-        <>
-          <div className='addAccountItemOptionTitle'>{'account added successfully'}</div>
-          <div
-            role='button'
-            className='addAccountItemOptionSubmit'
-            onClick={() => {
-              link.send('nav:back', 'dash', 5)
-              link.send(`nav:forward`, 'dash', {
-                view: 'expandedSigner',
-                data: { signer: signerId }
-              })
-            }}
-          >
-            open account
-          </div>
-          <div
-            role='button'
-            className='addAccountItemOptionSubmit'
-            onClick={() => link.send('nav:back', 'dash', 5)}
-          >
-            back
-          </div>
-        </>
-      )}
+      <>
+        <div className='addAccountItemOptionTitle'>{err}</div>
+        <div
+          role='button'
+          className='addAccountItemOptionSubmit'
+          onClick={() => link.send('nav:back', 'dash', 3)}
+        >
+          try again
+        </div>
+      </>
     </div>
   )
 }
@@ -269,8 +250,8 @@ class AddPhrase extends React.Component {
     super(...args)
   }
 
-  getCurrentView({ phrase, password, err, signerId }) {
-    if (err || signerId) return <Summary {...{ err, signerId }} />
+  getCurrentView({ phrase, password, err }) {
+    if (err) return <Error {...{ err }} />
     if (!phrase) return <EnterPhrase />
     if (!password) return <CreatePassword {...{ phrase }} />
     return <ConfirmPassword {...{ phrase, password }} />
