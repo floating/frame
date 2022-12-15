@@ -5,19 +5,13 @@ jest.mock('fs')
 let mockLatestVersion = 0
 
 jest.mock('../../../../main/store/migrations', () => {
-  const migrations = {
-    latest: mockLatestVersion
-  }
-
-  const apply = (state) => {
-    return migrations.latest === 2
-      ? { ...state, main: { ...state.main, _version: 2, instanceId: 'test-brand-new-frame' } }
-      : { ...state }
-  }
-
   return {
-    ...migrations,
-    apply
+    latest: mockLatestVersion,
+    apply: (state) => {
+      return mockLatestVersion === 2
+        ? { ...state, main: { ...state.main, _version: 2, instanceId: 'test-brand-new-frame' } }
+        : { ...state }
+    }
   }
 })
 
@@ -61,7 +55,7 @@ it('maintains backwards compatible access to the current version of state', asyn
 })
 
 it('loads values from the current version of the state', async () => {
-  // load state already migrated to version 2 and make sure version 1 values are available
+  // load state migrated to version 2 and make sure version 2 value is the one that's read
   mockLatestVersion = 2
 
   const { default: state } = await import('../../../../main/store/state')
