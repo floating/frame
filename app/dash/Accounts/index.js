@@ -41,10 +41,10 @@ class AddAccounts extends React.Component {
       </div>
     )
   }
-  renderAddSeed() {
+  renderAddSeed({ accountData }) {
     return (
       <div className='addAccounts cardShow'>
-        <AddPhrase close={this.props.close} />
+        <AddPhrase close={this.props.close} accountData={accountData} />
       </div>
     )
   }
@@ -117,7 +117,7 @@ class AddAccounts extends React.Component {
     )
   }
   render() {
-    const { newAccountType } = this.props.data
+    const { newAccountType, accountData = {} } = this.props.data
 
     if (newAccountType === 'ledger') {
       return this.renderAddLedger()
@@ -126,7 +126,7 @@ class AddAccounts extends React.Component {
     } else if (newAccountType === 'lattice') {
       return this.renderAddLattice()
     } else if (newAccountType === 'seed') {
-      return this.renderAddSeed()
+      return this.renderAddSeed({ accountData })
     } else if (newAccountType === 'keyring') {
       return this.renderAddKeyring()
     } else if (newAccountType === 'keystore') {

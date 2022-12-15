@@ -1,202 +1,206 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Restore from 'react-restore'
 
-import Signer from '../../../Signer'
-
 import link from '../../../../../resources/link'
-import svg from '../../../../../resources/svg'
 import RingIcon from '../../../../../resources/Components/RingIcon'
+import { ethers } from 'ethers'
+import zxcvbn from 'zxcvbn'
+
+const removeLineBreaks = (str) => str.replace(/(\r\n|\n|\r)/gm, '')
+
+const navForward = async (accountData) =>
+  link.send('nav:forward', 'dash', {
+    view: 'accounts',
+    data: {
+      showAddAccounts: true,
+      newAccountType: 'seed',
+      accountData
+    }
+  })
+
+//TODO: CSS & class names...
+function Boilerplate({ children }) {
+  let itemClass = 'addAccountItem addAccountItemSmart addAccountItemAdding'
+
+  return (
+    <div className={itemClass}>
+      <div className='addAccountItemBar addAccountItemHot' />
+      <div className='addAccountItemWrap'>
+        <div className='addAccountItemTop'>
+          <div className='addAccountItemTopType'>
+            <div className='addAccountItemIcon'>
+              <div className='addAccountItemIconType addAccountItemIconHot'>
+                <RingIcon svgName={'seedling'} />
+              </div>
+              <div className='addAccountItemIconHex addAccountItemIconHexHot' />
+            </div>
+            <div className='addAccountItemTopTitle'>Seed Phrase</div>
+          </div>
+          {/* <div className='addAccountItemClose' onMouseDown={() => this.props.close()}>{'DONE'}</div> */}
+          <div className='addAccountItemSummary'>
+            A phrase account uses a list of words to backup and restore your account
+          </div>
+        </div>
+        <div className='addAccountItemOption'>
+          <div
+            className='addAccountItemOptionIntro'
+            onMouseDown={() => {
+              this.adding()
+              setTimeout(
+                () =>
+                  link.send('tray:action', 'navDash', {
+                    view: 'notify',
+                    data: { notify: 'hotAccountWarning', notifyData: {} }
+                  }),
+                800
+              )
+            }}
+          >
+            Add Phrase Account
+          </div>
+          {children}
+        </div>
+        <div className='addAccountItemFooter' />
+      </div>
+    </div>
+  )
+}
+
+const EnterPhrase = () => {
+  const [phrase, setPhrase] = useState('')
+  const [error, setError] = useState(null)
+
+  const isValidMnemonic = () => ethers.utils.isValidMnemonic(phrase)
+
+  const updateInput = (e) => {
+    const value = removeLineBreaks(e.target.value)
+    setPhrase(value)
+  }
+
+  const handleSubmit = (e) => {
+    if (e?.type !== 'mousedown' && e?.key !== 'Enter') {
+      return
+    }
+
+    if (!isValidMnemonic()) {
+      return setError('INVALID SEED PHRASE')
+    }
+
+    return navForward({
+      phrase
+    })
+  }
+
+  return (
+    <div className='addAccountItemOptionSetupFrame'>
+      <div className='addAccountItemOptionTitle'>seed phrase</div>
+      {error && <>{error}</>}
+      <div className='addAccountItemOptionInputPhrase'>
+        <textarea tabIndex='-1' value={phrase} onChange={updateInput} onKeyDown={handleSubmit} />
+      </div>
+      <div className='addAccountItemOptionSubmit' onMouseDown={handleSubmit}>
+        Next
+      </div>
+    </div>
+  )
+}
+
+function PasswordInput({ getError, nextStep, title }) {
+  const [input, setInput] = useState('')
+  const [error, setError] = useState(null)
+
+  const updateInput = (e) => {
+    const value = e.target.value
+    setInput(value)
+  }
+
+  const resetState = () => {
+    setInput('')
+    setError('')
+  }
+
+  const handleSubmit = () => {
+    const passwordError = getError(input)
+    if (passwordError) return setError(passwordError)
+
+    const password = input
+    resetState()
+    nextStep(password)
+  }
+
+  return (
+    <div className='addAccountItemOptionSetupFrame'>
+      <div className='addAccountItemOptionTitle'>{title}</div>
+      {error && <>{error}</>}
+      <div className='addAccountItemOptionInputPhrase addAccountItemOptionInputPassword'>
+        <div className='addAccountItemOptionSubtitle'>password must be 12 characters or longer</div>
+        <form onSubmit={handleSubmit}>
+          <input autoFocus type='password' tabIndex='-1' value={input} onChange={updateInput} />
+        </form>
+      </div>
+      <div className='addAccountItemOptionSubmit' onMouseDown={handleSubmit}>
+        Create
+      </div>
+    </div>
+  )
+}
+
+function CreatePassword({ phrase }) {
+  const title = 'Create Password'
+
+  const getError = (password) => {
+    if (password.length < 12) return 'PASSWORD MUST BE AT LEAST 12 CHARACTERS LONG'
+    const {
+      feedback: { warning },
+      score
+    } = zxcvbn(password)
+    if (score > 3) return
+
+    return (warning || 'PLEASE ENTER A STRONGER PASSWORD').toUpperCase()
+  }
+
+  const nextStep = (password) =>
+    navForward({
+      phrase,
+      password
+    })
+
+  return <PasswordInput {...{ getError, phrase, nextStep, title }} />
+}
+
+function ConfirmPassword({ password, phrase }) {
+  const title = 'Confirm Password'
+
+  const getError = (confirmedPassword) => {
+    if (password !== confirmedPassword) return 'PASSWORDS DO NOT MATCH'
+  }
+
+  //TODO: Finish this last step...  show an overview screen like with the watch accounts (button to go back // button to view new added account)?
+  const nextStep = (password) =>
+    link.rpc('createFromPhrase', phrase, password, (err, signer) => {
+      return navForward({
+        error: err,
+        signerId: signer?.id
+      })
+    })
+
+  return <PasswordInput {...{ getError, phrase, nextStep, title }} />
+}
 
 class AddPhrase extends React.Component {
   constructor(...args) {
     super(...args)
-    this.state = {
-      index: 0,
-      adding: false,
-      phrase: '',
-      password: '',
-      status: '',
-      error: false
-    }
-    this.forms = [React.createRef(), React.createRef()]
   }
 
-  onChange(key, e) {
-    e.preventDefault()
-    const update = {}
-    const value = e.target.value || ''
-    // value = value === ' ' ? '' : value
-    // value = value.replace(/[ \t]+/g, '_')
-    // value = value.replace(/\W/g, '')
-    // value = value.replace(/_/g, ' ')
-    // value = value.split(' ').length > 24 ? value.substring(0, value.lastIndexOf(' ') + 1) : value // Limit to 24 words max
-    update[key] = value
-    this.setState(update)
-  }
-
-  onBlur(key, e) {
-    e.preventDefault()
-    const update = {}
-    update[key] = this.state[key] || ''
-    this.setState(update)
-  }
-
-  onFocus(key, e) {
-    e.preventDefault()
-    if (this.state[key] === '') {
-      const update = {}
-      update[key] = ''
-      this.setState(update)
-    }
-  }
-
-  next() {
-    this.setState({ index: ++this.state.index })
-    this.focusActive()
-  }
-
-  create() {
-    this.setState({ index: ++this.state.index })
-    link.rpc('createFromPhrase', this.state.phrase, this.state.password, (err, signer) => {
-      if (err) {
-        this.setState({ status: err, error: true })
-      } else {
-        // reset nav state to before the start of the flow and open the new signer
-        link.send('tray:action', 'backDash', 2)
-        const crumb = {
-          view: 'expandedSigner',
-          data: { signer: signer.id }
-        }
-        link.send('tray:action', 'navDash', crumb)
-      }
-    })
-  }
-
-  restart() {
-    this.setState({ index: 0, adding: false, phrase: '', password: '', success: false })
-    setTimeout(() => {
-      this.setState({ status: '', error: false })
-    }, 500)
-    this.focusActive()
-  }
-
-  keyPress(e) {
-    if (e.key === 'Enter') {
-      e.preventDefault()
-      const formInput = this.forms[this.state.index]
-      if (formInput) formInput.current.blur()
-      if (this.state.index === 1) return this.create()
-      this.next()
-    }
-  }
-
-  adding() {
-    this.setState({ adding: true })
-    this.focusActive()
-  }
-
-  focusActive() {
-    setTimeout(() => {
-      const formInput = this.forms[this.state.index]
-      if (formInput) formInput.current.focus()
-    }, 500)
+  getCurrentView({ phrase, password }) {
+    if (!phrase) return <EnterPhrase />
+    if (!password) return <CreatePassword {...{ phrase }} />
+    return <ConfirmPassword {...{ phrase, password }} />
   }
 
   render() {
-    let itemClass = 'addAccountItem addAccountItemSmart addAccountItemAdding'
-
-    let signer
-
-    if (this.state.createdSignerId) {
-      signer = this.store('main.signers', this.state.createdSignerId)
-    }
-
-    return (
-      <div className={itemClass} style={{ transitionDelay: (0.64 * this.props.index) / 4 + 's' }}>
-        <div className='addAccountItemBar addAccountItemHot' />
-        <div className='addAccountItemWrap'>
-          <div className='addAccountItemTop'>
-            <div className='addAccountItemTopType'>
-              <div className='addAccountItemIcon'>
-                <div className='addAccountItemIconType addAccountItemIconHot'>
-                  <RingIcon svgName={'seedling'} />
-                </div>
-                <div className='addAccountItemIconHex addAccountItemIconHexHot' />
-              </div>
-              <div className='addAccountItemTopTitle'>Seed Phrase</div>
-            </div>
-            {/* <div className='addAccountItemClose' onMouseDown={() => this.props.close()}>{'DONE'}</div> */}
-            <div className='addAccountItemSummary'>
-              A phrase account uses a list of words to backup and restore your account
-            </div>
-          </div>
-          <div className='addAccountItemOption'>
-            <div
-              className='addAccountItemOptionIntro'
-              onMouseDown={() => {
-                this.adding()
-                setTimeout(
-                  () =>
-                    link.send('tray:action', 'navDash', {
-                      view: 'notify',
-                      data: { notify: 'hotAccountWarning', notifyData: {} }
-                    }),
-                  800
-                )
-              }}
-            >
-              Add Phrase Account
-            </div>
-            <div
-              className='addAccountItemOptionSetup'
-              style={{ transform: `translateX(-${100 * this.state.index}%)` }}
-            >
-              <div className='addAccountItemOptionSetupFrames'>
-                <div className='addAccountItemOptionSetupFrame'>
-                  <div className='addAccountItemOptionTitle'>seed phrase</div>
-                  <div className='addAccountItemOptionInputPhrase'>
-                    <textarea
-                      tabIndex='-1'
-                      value={this.state.phrase}
-                      ref={this.forms[0]}
-                      onChange={(e) => this.onChange('phrase', e)}
-                      onFocus={(e) => this.onFocus('phrase', e)}
-                      onBlur={(e) => this.onBlur('phrase', e)}
-                      onKeyPress={(e) => this.keyPress(e)}
-                    />
-                  </div>
-                  <div className='addAccountItemOptionSubmit' onMouseDown={() => this.next()}>
-                    Next
-                  </div>
-                </div>
-                <div className='addAccountItemOptionSetupFrame'>
-                  <div className='addAccountItemOptionTitle'>create password</div>
-                  <div className='addAccountItemOptionInputPhrase addAccountItemOptionInputPassword'>
-                    <div className='addAccountItemOptionSubtitle'>
-                      password must be 12 characters or longer
-                    </div>
-                    <input
-                      type='password'
-                      tabIndex='-1'
-                      value={this.state.password}
-                      ref={this.forms[1]}
-                      onChange={(e) => this.onChange('password', e)}
-                      onFocus={(e) => this.onFocus('password', e)}
-                      onBlur={(e) => this.onBlur('password', e)}
-                      onKeyPress={(e) => this.keyPress(e)}
-                    />
-                  </div>
-                  <div className='addAccountItemOptionSubmit' onMouseDown={() => this.create()}>
-                    Create
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className='addAccountItemFooter' />
-        </div>
-      </div>
-    )
+    const { accountData } = this.props
+    return <Boilerplate>{this.getCurrentView(accountData)}</Boilerplate>
   }
 }
 
