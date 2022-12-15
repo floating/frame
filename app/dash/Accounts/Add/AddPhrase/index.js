@@ -1,7 +1,8 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState, useCallback } from 'react'
 import Restore from 'react-restore'
 
 import link from '../../../../../resources/link'
+import { debounce } from '../../../../../resources/utils'
 import RingIcon from '../../../../../resources/Components/RingIcon'
 import { ethers } from 'ethers'
 import zxcvbn from 'zxcvbn'
@@ -58,7 +59,7 @@ function Boilerplate({ children }) {
           >
             Add Phrase Account
           </div>
-          {children}
+          <div className='addAccountItemOptionSetupFrames'>{children}</div>
         </div>
         <div className='addAccountItemFooter' />
       </div>
@@ -105,48 +106,80 @@ const EnterPhrase = () => {
   )
 }
 
-function PasswordInput({ getError, nextStep, title }) {
-  const [input, setInput] = useState('')
+function PasswordInput({ getError, nextStep, title, buttonText }) {
   const [error, setError] = useState(null)
+  const [ready, setReady] = useState(false)
+  const inputRef = useRef(null)
 
-  const updateInput = (e) => {
-    const value = e.target.value
-    setInput(value)
-  }
+  const debounceInput = useCallback(
+    debounce(() => {
+      const {
+        current: { value }
+      } = inputRef
+      const err = getError(value)
+      if (value) {
+        setError(err)
+        setReady(!err)
+      }
+    }, 500),
+    [debounce]
+  )
+
+  useEffect(() => {
+    inputRef.current.addEventListener('input', debounceInput)
+    //TODO: Do we need to do this, does react handle it?
+    // return () => {
+    //   inputRef.current.removeEventListener('input', debounceInput)
+    // }
+  })
 
   const resetState = () => {
-    setInput('')
+    setReady(false)
     setError('')
   }
 
   const handleSubmit = () => {
-    const passwordError = getError(input)
+    const {
+      current: { value }
+    } = inputRef
+    const passwordError = getError(value)
     if (passwordError) return setError(passwordError)
-
-    const password = input
     resetState()
-    nextStep(password)
+    nextStep(value)
   }
 
   return (
-    <div className='addAccountItemOptionSetupFrame'>
+    <div style={{ textAlign: 'center', width: '100%' }} className='addAccountItemOptionSetupFrame'>
       <div className='addAccountItemOptionTitle'>{title}</div>
-      {error && <>{error}</>}
+      {error && <div style={{ color: 'red' }}>{error}</div>}
       <div className='addAccountItemOptionInputPhrase addAccountItemOptionInputPassword'>
         <div className='addAccountItemOptionSubtitle'>password must be 12 characters or longer</div>
         <form onSubmit={handleSubmit}>
-          <input autoFocus type='password' tabIndex='-1' value={input} onChange={updateInput} />
+          <input
+            autoFocus
+            type='password'
+            tabIndex='-1'
+            ref={inputRef}
+            onChange={() => {
+              setError('')
+              setReady(false)
+            }}
+          />
         </form>
       </div>
-      <div className='addAccountItemOptionSubmit' onMouseDown={handleSubmit}>
-        Create
-      </div>
+      {/* TODO: Maybe use CSS to make button clearly un-clickable rather than dissappearing? */}
+      {ready && (
+        <div className={'addAccountItemOptionSubmit'} onMouseDown={handleSubmit}>
+          {buttonText}
+        </div>
+      )}
     </div>
   )
 }
 
 function CreatePassword({ phrase }) {
   const title = 'Create Password'
+  const buttonText = 'Continue'
 
   const getError = (password) => {
     if (password.length < 12) return 'PASSWORD MUST BE AT LEAST 12 CHARACTERS LONG'
@@ -165,11 +198,12 @@ function CreatePassword({ phrase }) {
       password
     })
 
-  return <PasswordInput {...{ getError, phrase, nextStep, title }} />
+  return <PasswordInput {...{ getError, phrase, nextStep, title, buttonText }} />
 }
 
 function ConfirmPassword({ password, phrase }) {
   const title = 'Confirm Password'
+  const buttonText = 'create'
 
   const getError = (confirmedPassword) => {
     if (password !== confirmedPassword) return 'PASSWORDS DO NOT MATCH'
@@ -184,7 +218,50 @@ function ConfirmPassword({ password, phrase }) {
       })
     })
 
-  return <PasswordInput {...{ getError, phrase, nextStep, title }} />
+  return <PasswordInput {...{ getError, phrase, nextStep, title, buttonText }} />
+}
+
+function Summary({ err, signerId }) {
+  return (
+    <div style={{ textAlign: 'center', width: '100%' }} className='addAccountItemOptionSetupFrame'>
+      {err ? (
+        <>
+          <div className='addAccountItemOptionTitle'>{err}</div>
+          <div
+            role='button'
+            className='addAccountItemOptionSubmit'
+            onClick={() => link.send('nav:back', 'dash', 3)}
+          >
+            try again
+          </div>
+        </>
+      ) : (
+        <>
+          <div className='addAccountItemOptionTitle'>{'account added successfully'}</div>
+          <div
+            role='button'
+            className='addAccountItemOptionSubmit'
+            onClick={() => {
+              link.send('nav:back', 'dash', 5)
+              link.send(`nav:forward`, 'dash', {
+                view: 'expandedSigner',
+                data: { signer: signerId }
+              })
+            }}
+          >
+            open account
+          </div>
+          <div
+            role='button'
+            className='addAccountItemOptionSubmit'
+            onClick={() => link.send('nav:back', 'dash', 5)}
+          >
+            back
+          </div>
+        </>
+      )}
+    </div>
+  )
 }
 
 class AddPhrase extends React.Component {
@@ -192,7 +269,8 @@ class AddPhrase extends React.Component {
     super(...args)
   }
 
-  getCurrentView({ phrase, password }) {
+  getCurrentView({ phrase, password, err, signerId }) {
+    if (err || signerId) return <Summary {...{ err, signerId }} />
     if (!phrase) return <EnterPhrase />
     if (!password) return <CreatePassword {...{ phrase }} />
     return <ConfirmPassword {...{ phrase, password }} />
