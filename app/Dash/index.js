@@ -24,6 +24,7 @@ link.rpc('getState', (err, state) => {
   const store = appStore(state)
   window.store = store
   store.observer(() => {
+    document.body.classList.remove('dark', 'light')
     document.body.classList.add('clip', store('main.colorway'))
     setTimeout(() => {
       document.body.classList.remove('clip')
