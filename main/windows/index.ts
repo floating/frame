@@ -111,7 +111,7 @@ const detectMouse = () => {
 
 function initWindow(id: string, opts: Electron.BrowserWindowConstructorOptions) {
   const url = enableHMR
-    ? `http://localhost:1234/app/${id}.dev.html`
+    ? `http://localhost:1234/renderer/${id}/index.html`
     : new URL(path.join(process.env.BUNDLE_LOCATION, `${id}.html`), 'file:')
 
   windows[id] = createWindow(id, opts)
@@ -336,6 +336,7 @@ class Dash {
   }
 
   public show() {
+    console.log('DASH SHOW', tray.isReady())
     if (!tray.isReady()) {
       return
     }

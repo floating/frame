@@ -8,22 +8,19 @@
         base-uri 'self';
         connect-src *;
         img-src *;
-        style-src 'self';
         frame-src 'none';
+        style-src 'self';
         object-src 'none';
         require-trusted-types-for 'script';
       "
     />
-    <title>Tray</title>
-    <link rel="stylesheet" href="../resources/base.styl" type="text/css" />
-    <link rel="stylesheet" href="./Tray/index.styl" type="text/css" />
-    <script nonce="2f0d956b-0d9c-4f1e-874a-57a1ec828872">
-      window.frameWindow = 'tray'
-    </script>
+    <title>Flow</title>
+    <link rel="stylesheet" href="../../resources/base.styl" type="text/css" />
+    <link rel="stylesheet" href="../../app/Flow/index.styl" type="text/css" />
   </head>
   <body>
     <div class="frameOverlay"></div>
-    <div id="tray"></div>
+    <div id="flow"></div>
     <script type="module" src="./index.js" nonce="2f0d956b-0d9c-4f1e-874a-57a1ec828872"></script>
   </body>
 </html>
