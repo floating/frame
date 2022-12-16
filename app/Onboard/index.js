@@ -21,7 +21,7 @@ class App extends React.Component {
 
   render() {
     return (
-      <div className='dawn'>
+      <div className='onboard'>
         <div className='splash'>
           <Native />
           <div className='overlay' />
