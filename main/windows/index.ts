@@ -336,7 +336,6 @@ class Dash {
   }
 
   public show() {
-    console.log('DASH SHOW', tray.isReady())
     if (!tray.isReady()) {
       return
     }

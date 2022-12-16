@@ -31,7 +31,6 @@ link.rpc('getState', (err, state) => {
   })
   const Dash = Restore.connect(App, store)
   const root = createRoot(document.getElementById('dash'))
-  console.log('DASH RENDER')
   root.render(<Dash />)
 })
 
