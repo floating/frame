@@ -6,7 +6,7 @@ import Restore from 'react-restore'
 import App from '../../app/Dash'
 
 import link from '../../resources/link'
-import _store from '../../app/store'
+import appStore from '../../app/store'
 
 Sentry.init({ dsn: 'https://7b09a85b26924609bef5882387e2c4dc@o1204372.ingest.sentry.io/6331069' })
 
@@ -21,12 +21,12 @@ if (process.env.NODE_ENV !== 'development' || process.env.HMR !== 'true') {
 
 link.rpc('getState', (err, state) => {
   if (err) return console.error('Could not get initial state from main')
-  const store = _store(state)
+  const store = appStore(state)
   window.store = store
   store.observer(() => {
-    document.body.className = 'clip ' + store('main.colorway')
+    document.body.classList.add('clip', storeInstance('main.colorway'))
     setTimeout(() => {
-      document.body.className = store('main.colorway')
+      document.body.classList.remove('clip')
     }, 100)
   })
   const Dash = Restore.connect(App, store)

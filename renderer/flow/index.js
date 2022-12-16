@@ -5,7 +5,7 @@ import Restore from 'react-restore'
 import App from '../../app/Flow'
 
 import link from '../../resources/link'
-import _store from '../../app/store'
+import appStore from '../../app/store'
 
 document.addEventListener('dragover', (e) => e.preventDefault())
 document.addEventListener('drop', (e) => e.preventDefault())
@@ -15,7 +15,7 @@ window.eval = global.eval = () => {
 link.rpc('getState', (err, state) => {
   if (err) return console.error('Could not get initial state from main')
   console.log('initial state', state)
-  const store = _store(state)
+  const store = appStore(state)
   window.store = store
   store.observer(() => {
     console.log('run observer')
