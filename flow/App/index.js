@@ -70,10 +70,6 @@ class Flow extends React.Component {
           </div>
           <div className='dapp'>
             <div className='dappIcon'></div>
-            <div className='dappName'>Aragon</div>
-          </div>
-          <div className='dapp'>
-            <div className='dappIcon'></div>
             <div className='dappName'>Compound</div>
           </div>
           <div className='dapp'>

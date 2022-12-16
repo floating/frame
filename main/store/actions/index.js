@@ -722,10 +722,6 @@ module.exports = {
     })
     u('windows.dash.showing', () => true)
   },
-  muteAragonAccountMigrationWarning: (u) => {
-    u('main.mute.aragonAccountMigrationWarning', () => true)
-    u('windows.dash.showing', () => true)
-  },
   closeDawn: (u) => {
     u('main.mute.onboardingWindow', () => true)
     u('windows.dawn.showing', () => false)

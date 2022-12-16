@@ -59,7 +59,6 @@
   },
   "license": "GPL-3.0",
   "dependencies": {
-    "@aragon/wrapper": "5.5.3",
     "@ethereumjs/common": "3.0.1",
     "@ethereumjs/tx": "4.0.1",
     "@ethereumjs/util": "8.0.2",
@@ -145,6 +144,7 @@
     "electron": "22.0.0",
     "electron-builder": "23.6.0",
     "eslint": "8.29.0",
+    "ethereumjs-wallet": "1.0.2",
     "hardhat": "2.12.3",
     "husky": "8.0.2",
     "jest": "29.3.1",
@@ -170,6 +170,7 @@
   "alias": {
     "crypto": false,
     "path": false,
+    "process": false,
     "punycode": false,
     "querystring": false,
     "stream": false,
@@ -220,11 +221,6 @@
   "lavamoat": {
     "allowScripts": {
       "$root$": false,
-      "@aragon/wrapper>radspec>date-fns": true,
-      "@aragon/wrapper>web3": true,
-      "@aragon/wrapper>web3>web3-bzz": true,
-      "@aragon/wrapper>web3>web3-core>web3-core-requestmanager>web3-providers-ws>websocket>es5-ext": true,
-      "@aragon/wrapper>web3>web3-shh": true,
       "@babel/node>core-js": true,
       "@lavamoat/preinstall-always-fail": false,
       "@ledgerhq/hw-transport-node-hid-singleton>usb": false,

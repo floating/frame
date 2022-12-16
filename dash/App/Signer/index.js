@@ -309,8 +309,6 @@ class Signer extends React.Component {
                   return <div className='signerIconWrap signerIconHardware'>{svg.trezor(20)}</div>
                 if (type === 'seed' || type === 'ring')
                   return <div className='signerIconWrap signerIconHot'>{svg.flame(23)}</div>
-                if (type === 'aragon')
-                  return <div className='signerIconWrap signerIconSmart'>{svg.aragon(28)}</div>
                 if (type === 'lattice')
                   return <div className='signerIconWrap signerIconSmart'>{svg.lattice(22)}</div>
                 return <div className='signerIconWrap'>{svg.logo(20)}</div>
@@ -377,55 +375,11 @@ class Signer extends React.Component {
         ) : (
           <></>
         )}
-        {/* {disconnected || this.props.inSetup ? null : (
-          <div className='signerDrawer'>
-            <div className='showControls' onMouseDown={() => this.setState({ showControls: !this.state.showControls })}>
-              {this.state.showControls ? 'hide' : 'more'}
-            </div>
-            <div className='showControlsLine' />
-          </div>
-        )} */}
-        {/* {this.state.showControls || disconnected ? (
-          <div className='signerControls'>
-            {!!permissionId ? (
-              <div className='signerControlDetail'>
-                <div className='signerControlDetailKey'>
-                  {'PERMISSION ID:'}
-                </div>
-                <div className='signerControlDetailValue'>
-                  {permissionId}
-                </div>
-              </div>
-            ) : null}
-            {canReconnect ? this.reconnectButton(hwSigner) : null}
-            <div className='signerControlOption signerControlOptionImportant' onMouseDown={() => {
-              link.send('dash:removeSigner', this.props.id)
-            }}>Remove Signer</div>
-            </div>
-        ) : null} */}
       </div>
     )
   }
 
   renderSignerStatus() {
-    // const current = (this.store('selected.current') === this.props.id) && this.props.status === 'ok'
-    // const open = current && this.store('selected.open')
-
-    // const signerStatusOpen = current && this.store('selected.signerStatusOpen')
-
-    // const signer = this.store('main.signers', this.props.id)
-
-    // const account = this.store('main.accounts', this.props.id)
-    // let signer
-
-    // if (account.signer) {
-    //   signer = this.store('main.signers', account.signer)
-    // } else if (account.smart)  {
-    //   const actingSigner = this.store('main.accounts', account.smart.actor, 'signer')
-    //   if (actingSigner) signer = this.store('main.signers', actingSigner)
-    // }
-    // if (!signerStatusOpen || !open) return null
-
     const signer = this.store('main.signers', this.props.id)
 
     return <SignerStatus signer={signer} />
@@ -480,12 +434,6 @@ class Signer extends React.Component {
         ) : status === 'ok' || isLocked ? (
           <>
             {this.renderSignerStatus()}
-            {/* <div className='signerAccountsTitle'>
-              <span className={activeAccounts.length > 0 ? 'signerAccountsTitleActive signerAccountsTitleActiveOn' : 'signerAccountsTitleActive'}>
-                <span>{'active accounts'}</span> 
-                <span className='signerAccountsTitleActiveCount'>{activeAccounts.length}</span> 
-              </span>
-            </div> */}
             <div className='signerAddedAccountTitle'>{'available accounts'}</div>
             <div className='signerAccounts'>
               {signer.addresses.slice(startIndex, startIndex + addressLimit).map((address, index) => {

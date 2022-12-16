@@ -8,7 +8,6 @@ import Signer from '../Signer'
 
 import AddHardware from './Add/AddHardware'
 import AddHardwareLattice from './Add/AddHardwareLattice'
-import AddAragon from './Add/AddAragon'
 import AddPhrase from './Add/AddPhrase'
 import AddRing from './Add/AddRing'
 import AddKeystore from './Add/AddKeystore'
@@ -73,13 +72,6 @@ class AddAccounts extends React.Component {
   renderAddGnosis() {
     return <div className='addAccounts cardShow'>{'Add Gnosis'}</div>
   }
-  renderAddAragon() {
-    return (
-      <div className='addAccounts cardShow'>
-        <AddAragon close={this.props.close} />
-      </div>
-    )
-  }
   createNewAccount(type) {
     link.send('tray:action', 'navDash', {
       view: 'accounts',
@@ -105,11 +97,6 @@ class AddAccounts extends React.Component {
           <div className='accountTypeSelectIcon'>{svg.trezor(17)}</div>
           <div className='accountTypeSelectIcon'>{'Trezor Device'}</div>
         </div>
-        <div className='accountTypeSelect' onClick={() => this.createNewAccount('aragon')}>
-          <div className='accountTypeSelectIcon'>{svg.aragon(30)}</div>
-          <div className='accountTypeSelectIcon'>{'Aragon DAO'}</div>
-        </div>
-        {/* <div className='accountTypeSelect' onClick={() => this.setState({ view: 'gnosis' })}>Gnosis Safe</div> */}
         <div className='accountTypeSelect' onClick={() => this.createNewAccount('seed')}>
           <div className='accountTypeSelectIcon'>{svg.seedling(23)}</div>
           <div className='accountTypeSelectIcon'>{'Seed Phrase'}</div>
@@ -132,9 +119,7 @@ class AddAccounts extends React.Component {
   render() {
     const { newAccountType } = this.props.data
 
-    if (newAccountType === 'aragon') {
-      return this.renderAddAragon()
-    } else if (newAccountType === 'ledger') {
+    if (newAccountType === 'ledger') {
       return this.renderAddLedger()
     } else if (newAccountType === 'trezor') {
       return this.renderAddTrezor()

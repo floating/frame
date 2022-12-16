@@ -411,9 +411,6 @@ class Account extends React.Component {
 
     if (account.signer) {
       signer = this.store('main.signers', account.signer)
-    } else if (account.smart) {
-      const actingSigner = this.store('main.accounts', account.smart.actor, 'signer')
-      if (actingSigner) signer = this.store('main.signers', actingSigner)
     }
 
     return (

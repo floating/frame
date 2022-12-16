@@ -1155,3 +1155,62 @@ describe('migration 29', () => {
     })
   })
 })
+
+describe('migration 30', () => {
+  const address = '0xFeebabE6b0418eC13b30aAdF129F5DcDd4f70CeA'
+
+  const existingAccount = {
+    name: 'my test aragon dao',
+    created: 'new:1670583718135',
+    lastSignerType: 'aragon',
+    smart: {
+      type: 'aragon',
+      actor: 'my acting account',
+      dao: '0x0c188b183ff758500d1d18b432313d10e9f6b8a4',
+      agent: address
+    }
+  }
+
+  beforeEach(() => {
+    state = {
+      main: {
+        _version: 29,
+        accounts: {
+          [address]: existingAccount
+        }
+      }
+    }
+  })
+
+  it('should migrate existing aragon accounts to watch only', () => {
+    const updatedState = migrations.apply(state, 30)
+    const { accounts } = updatedState.main
+
+    expect(accounts[address]).toStrictEqual({
+      id: address,
+      name: existingAccount.name,
+      address,
+      lastSignerType: 'address',
+      created: existingAccount.created,
+      status: 'ok',
+      active: false,
+      signer: '',
+      requests: {},
+      ensName: '',
+      balances: {}
+    })
+  })
+
+  it('should not migrate non-aragon accounts', () => {
+    state.main.accounts['test dao agent address'] = {
+      name: 'not really an aragon dao'
+    }
+
+    const updatedState = migrations.apply(state, 30)
+    const { accounts } = updatedState.main
+
+    expect(accounts['test dao agent address']).toStrictEqual({
+      name: 'not really an aragon dao'
+    })
+  })
+})

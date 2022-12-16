@@ -721,6 +721,28 @@ const migrations = {
     })
 
     return initial
+  },
+  30: (initial) => {
+    // convert Aragon accounts to watch only
+    Object.entries(initial.main.accounts).forEach(([id, { smart, name, created }]) => {
+      if (smart) {
+        initial.main.accounts[id] = {
+          id,
+          name,
+          lastSignerType: 'address',
+          address: id,
+          status: 'ok',
+          active: false,
+          signer: '',
+          requests: {},
+          ensName: '',
+          created,
+          balances: {}
+        }
+      }
+    })
+
+    return initial
   }
 }
 

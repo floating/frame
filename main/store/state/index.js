@@ -167,7 +167,7 @@ const initial = {
   },
   platform: process.platform,
   main: {
-    _version: main('_version', 28),
+    _version: main('_version', 30),
     instanceId: main('instanceId', generateUuid()),
     colorway: main('colorway', 'dark'),
     colorwayPrimary: {
@@ -189,8 +189,7 @@ const initial = {
       gasFeeWarning: main('mute.gasFeeWarning', false),
       betaDisclosure: main('mute.betaDisclosure', false),
       onboardingWindow: main('mute.onboardingWindow', false),
-      signerCompatibilityWarning: main('mute.signerCompatibilityWarning', false),
-      aragonAccountMigrationWarning: main('mute.aragonAccountMigrationWarning', true)
+      signerCompatibilityWarning: main('mute.signerCompatibilityWarning', false)
     },
     shortcuts: {
       altSlash: main('shortcuts.altSlash', true)

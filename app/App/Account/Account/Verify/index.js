@@ -67,47 +67,31 @@ class Verify extends React.Component {
 
     return (
       <div ref={this.moduleRef} className='balancesBlock'>
-        {account.smart ? (
-          <>
-            <div className='moduleHeader'>{'Smart Account'}</div>
-            <div className='moduleMain moduleMainSettings'>
-              <div>{account.smart.type} Account</div>
-              <div>DAO exists on this chain: ?</div>
-              <div>Agent Address: {account.address}</div>
-              <div>Acting Account: {account.smart.actor}</div>
-              <div>DAO Address: {account.smart.dao}</div>
-              <div>IPFS Gateway: {'https://ipfs.aragon.org'}</div>
+        <div className='moduleHeader'>{'Verify Address'}</div>
+        <div className='moduleMain'>
+          <div className='signerVerifyText'>Verify that the address displayed in Frame is correct</div>
+          {this.state.verifyAddressResponse ? (
+            <div
+              className={
+                this.state.verifyAddressSuccess
+                  ? 'signerVerifyResponse signerVerifyResponseSuccess cardShow'
+                  : 'signerVerifyResponse'
+              }
+            >
+              {this.state.verifyAddressResponse}
             </div>
-          </>
-        ) : (
-          <>
-            <div className='moduleHeader'>{'Verify Address'}</div>
-            <div className='moduleMain'>
-              <div className='signerVerifyText'>Verify that the address displayed in Frame is correct</div>
-              {this.state.verifyAddressResponse ? (
-                <div
-                  className={
-                    this.state.verifyAddressSuccess
-                      ? 'signerVerifyResponse signerVerifyResponseSuccess cardShow'
-                      : 'signerVerifyResponse'
-                  }
-                >
-                  {this.state.verifyAddressResponse}
-                </div>
-              ) : null}
-              <div
-                className={buttonClasses.join(' ')}
-                onMouseDown={(evt) => {
-                  if (evt.button === 0 && !this.state.verifyInProgress) {
-                    this.verifyAddress()
-                  }
-                }}
-              >
-                {this.getText(signerType)}
-              </div>
-            </div>
-          </>
-        )}
+          ) : null}
+          <div
+            className={buttonClasses.join(' ')}
+            onMouseDown={(evt) => {
+              if (evt.button === 0 && !this.state.verifyInProgress) {
+                this.verifyAddress()
+              }
+            }}
+          >
+            {this.getText(signerType)}
+          </div>
+        </div>
       </div>
     )
   }

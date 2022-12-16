@@ -92,24 +92,6 @@ export class Accounts extends EventEmitter {
     return account.getRequest(id)
   }
 
-  // Public
-  addAragon(account: Account, cb: Callback<Account>) {
-    const existing = storeApi.getAccount(account.address)
-    if (existing.id) return cb(null, existing) // Account already exists
-
-    log.info('Aragon account not found, creating account')
-
-    const accountOpts = {
-      ...account,
-      lastSignerType: getSignerType(account.lastSignerType),
-      options: { type: 'aragon' }
-    }
-
-    this.accounts[account.address] = new FrameAccount(accountOpts, this)
-
-    cb(null, this.accounts[account.address].summary())
-  }
-
   async add(address: Address, name = '', options = {}, cb: Callback<FrameAccount> = () => {}) {
     if (!address) return cb(new Error('No address, will not add account'))
     address = address.toLowerCase()
@@ -637,11 +619,8 @@ export class Accounts extends EventEmitter {
 
     const matchSelected =
       (rawTx.from || '').toLowerCase() === currentAccount.getSelectedAddress().toLowerCase()
-    const matchActor =
-      (rawTx.from || '').toLowerCase() ===
-      (currentAccount.smart ? currentAccount.smart.actor.toLowerCase() : false)
 
-    if (matchSelected || matchActor) {
+    if (matchSelected) {
       currentAccount.signTransaction(rawTx, cb)
     } else {
       cb(new Error('signMessage: Account does not match currently selected'))
@@ -664,16 +643,6 @@ export class Accounts extends EventEmitter {
       return cb(new Error('Signer unavailable'))
     }
 
-    const getCompatibility = () => {
-      if (request.type === 'transaction') {
-        const data = this.getTransactionRequest(currentAccount, handlerId).data
-        return transactionCompatibility(data, signer.summary())
-      }
-
-      // all requests besides transactions are always compatible
-      return { signer: signer.type, tx: '', compatible: true }
-    }
-
     if (!signer) {
       // if no signer is active, check if this account was previously relying on a
       // hardware signer that is currently disconnected
@@ -693,6 +662,16 @@ export class Accounts extends EventEmitter {
       // if the signer is not ready to sign, open the signer panel so that
       // the user can unlock it or reconnect
       return signerUnavailable(signer)
+    }
+
+    const getCompatibility = () => {
+      if (request.type === 'transaction') {
+        const data = this.getTransactionRequest(currentAccount, handlerId).data
+        return transactionCompatibility(data, signer.summary())
+      }
+
+      // all requests besides transactions are always compatible
+      return { signer: signer.type, tx: '', compatible: true }
     }
 
     cb(null, getCompatibility())
