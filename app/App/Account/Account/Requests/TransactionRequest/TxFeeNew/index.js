@@ -34,29 +34,27 @@ const USDEstimateDisplay = ({ minFee, maxFee, nativeCurrency }) => {
   const { value: maxFeeValue, displayValue, approximationSymbol: maxFeeApproximation } = maxFee.fiat()
   const displayMaxFeeWarning = maxFeeValue > FEE_WARNING_THRESHOLD_USD
 
-  const maxFeeDisplay = <DisplayValue type='fiat' value={maxFee} currencySymbol='$' />
-  const feeRange = (
+  const MaxFeeDisplay = () => <DisplayValue type='fiat' value={maxFee} currencySymbol='$' />
+  const MinFeeDisplay = () => <DisplayValue type='fiat' value={minFee} currencySymbol='$' />
+  const FeeRange = () => (
     <>
-      <DisplayValue type='fiat' value={minFee} currencySymbol='$' />
+      <MinFeeDisplay />
       <span>{'-'}</span>
-      {maxFeeDisplay}
+      <MaxFeeDisplay />
     </>
   )
 
-  const feeSummary =
-    displayValue === '?' ? (
-      maxFeeDisplay
-    ) : (
-      <>
-        <span>{'≈'}</span>
-        {maxFeeApproximation === '<' ? maxFeeDisplay : feeRange}
-      </>
-    )
+  const FeeSummary = () => (
+    <>
+      <span>{'≈'}</span>
+      {maxFeeApproximation === '<' || displayValue === '?' ? <MaxFeeDisplay /> : <FeeRange />}
+    </>
+  )
 
   return (
     <div data-testid='usd-estimate-display' className='clusterTag'>
       <div className={`_txFeeValueDefault${displayMaxFeeWarning ? ' _txFeeValueDefaultWarn' : ''}`}>
-        {feeSummary}
+        <FeeSummary />
         <span>{`in ${nativeCurrency.symbol}`}</span>
       </div>
     </div>
@@ -83,6 +81,11 @@ class TxFee extends React.Component {
       currencyRate: nativeCurrency.usd,
       isTestnet
     })
+
+    // console.log(req, {
+    //   currencyRate: nativeCurrency.usd,
+    //   isTestnet
+    // })
 
     // accounts for two potential 12.5% block fee increases
     const reduceFactor = BigNumber(9).dividedBy(8)
