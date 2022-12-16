@@ -1,3 +1,4 @@
+import React from 'react'
 import { useEffect, useRef, useState, useCallback } from 'react'
 
 import RingIcon from '../../../../../resources/Components/RingIcon'
@@ -84,12 +85,22 @@ function EnterSecret({ newAccountType, isValidSecret, title }) {
 
   return (
     <div style={{ textAlign: 'center', width: '100%' }} className='addAccountItemOptionSetupFrame'>
-      <div className='addAccountItemOptionTitle'>{title}</div>
-      {error && <div style={{ color: 'red' }}>{error}</div>}
-      <div className='addAccountItemOptionInputPhrase'>
+      <div data-testid='addHotAccountSecretTitle' className='addAccountItemOptionTitle'>
+        {title}
+      </div>
+      {error && (
+        <div data-testid='addHotAccountSecretError' style={{ color: 'red' }}>
+          {error}
+        </div>
+      )}
+      <div data-testid='addHotAccountSecretTextEntry' className='addAccountItemOptionInputPhrase'>
         <textarea autoFocus tabIndex='-1' value={secret} onChange={updateInput} onKeyDown={handleSubmit} />
       </div>
-      <div className='addAccountItemOptionSubmit' onMouseDown={handleSubmit}>
+      <div
+        data-testid='addHotAccountSecretSubmitButton'
+        className='addAccountItemOptionSubmit'
+        onMouseDown={handleSubmit}
+      >
         Next
       </div>
     </div>
