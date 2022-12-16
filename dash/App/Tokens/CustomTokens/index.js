@@ -75,7 +75,7 @@ class CustomTokens extends React.Component {
                       </div>
                       <div className='customTokensListItemBottom'>
                         <div
-                          className='customTokensListItemEditButton'
+                          className='customTokensListItemButton editButton'
                           onClick={() => {
                             link.send('nav:forward', 'dash', {
                               view: 'tokens',
@@ -95,7 +95,7 @@ class CustomTokens extends React.Component {
                           {'Edit Token'}
                         </div>
                         <div
-                          className='customTokensListItemRemoveButton'
+                          className='customTokensListItemButton removeButton'
                           onClick={() => {
                             this.setState({ tokenExpanded: false })
                             setTimeout(() => {

@@ -74,7 +74,7 @@
     transition var(--standard)
     box-sizing border-box
     height 50px
-    padding 0px 4px 0px 8px
+    padding 0px 4px
     overflow hidden
     border-bottom 1px solid var(--ghostY)
 
@@ -208,58 +208,34 @@
       height 40px
       display flex
       align-items center
-      justify-content space-evenly
       padding 0px 10px
+      font-size 12px
 
-      .customTokensListItemRemoveButton
+      .customTokensListItemButton
         display flex
-        font-size 12px
-        width 50%
-        height 26px
-        margin-left 8px
         justify-content center
         align-items center
+        width 50%
+        height 26px
         box-sizing border-box
-        translate transformY(0px)
-        cursor pointer
         border-radius 10px
+        cursor pointer
         text-transform uppercase
-        padding 0px 22px
-        color var(--bad)
-        font-weight 300
         background var(--ghostB)
 
         *
           pointer-events none
 
-      .customTokensListItemRemoveButton:hover
+      .customTokensListItemButton:hover
         background var(--ghostC)
 
-
-      .customTokensListItemEditButton
-        display flex
-        font-size 12px
-        width 50%
-        height 26px
-        margin-right 8px
-        justify-content center
-        align-items center
-        box-sizing border-box
-        translate transformY(0px)
-        cursor pointer
-        border-radius 10px
-        text-transform uppercase
-        padding 0px 22px
+      .editButton
         color var(--good)
-        font-weight 300
-        background var(--ghostB)
+        margin-right 8px
 
-        *
-          pointer-events none
-
-      .customTokensListItemEditButton:hover
-        background var(--ghostC)
-
+      .removeButton
+        color var(--bad)
+        margin-left 8px
 
   .customTokensListItemExpanded
     height 122px
