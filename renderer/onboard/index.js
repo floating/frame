@@ -24,7 +24,7 @@ link.rpc('getState', (err, state) => {
   const store = appStore(state)
   window.store = store
   store.observer(() => {
-    document.body.classList.add('clip', storeInstance('main.colorway'))
+    document.body.classList.add('clip', store('main.colorway'))
     setTimeout(() => {
       document.body.classList.remove('clip')
     }, 100)
