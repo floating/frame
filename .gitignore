@@ -14,4 +14,4 @@ test/.userData
 .parcel-cache
 *.tsbuildinfo
 *.code-workspace
-renderer/*/index.html
+renderer/**/index.html
