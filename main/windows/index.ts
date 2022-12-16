@@ -10,7 +10,7 @@ import {
 import path from 'path'
 import log from 'electron-log'
 import EventEmitter from 'events'
-import { hexToInt } from '../../resources/utils'
+import { capitalize, hexToInt } from '../../resources/utils'
 
 import store from '../store'
 import FrameManager from './frames'
@@ -108,7 +108,7 @@ const detectMouse = () => {
 
 function initWindow(id: string, opts: Electron.BrowserWindowConstructorOptions) {
   const url = enableHMR
-    ? `http://localhost:1234/renderer/${id}/index.html`
+    ? `http://localhost:1234/app/${capitalize(id)}/index.dev.html`
     : new URL(path.join(process.env.BUNDLE_LOCATION, `${id}.html`), 'file:')
 
   windows[id] = createWindow(id, opts)

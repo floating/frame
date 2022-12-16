@@ -7,20 +7,20 @@
         script-src 'strict-dynamic' 'nonce-2f0d956b-0d9c-4f1e-874a-57a1ec828872';
         base-uri 'self';
         connect-src *;
-        img-src *;
+        img-src blob: http://localhost:8421;
         frame-src 'none';
         style-src 'self';
         object-src 'none';
         require-trusted-types-for 'script';
       "
     />
-    <title>Tray</title>
+    <title>Dapp</title>
     <link rel="stylesheet" href="../../resources/base.styl" type="text/css" />
-    <link rel="stylesheet" href="../../app/Tray/index.styl" type="text/css" />
+    <link rel="stylesheet" href="./index.styl" type="text/css" />
   </head>
   <body>
     <div class="frameOverlay"></div>
-    <div id="tray"></div>
+    <div id="dapp"></div>
     <script type="module" src="./index.js" nonce="2f0d956b-0d9c-4f1e-874a-57a1ec828872"></script>
   </body>
 </html>

@@ -4,19 +4,18 @@
     <meta
       http-equiv="Content-Security-Policy"
       content="
-        script-src 'strict-dynamic' 'nonce-2f0d956b-0d9c-4f1e-874a-57a1ec828872';
+        script-src 'strict-dynamic' 'nonce-2f0d956b-0d9c-4f1e-874a-57a1ec828872' http://localhost:1234 'unsafe-eval';
         base-uri 'self';
         connect-src *;
         img-src *;
         frame-src 'none';
-        style-src 'self';
+        style-src 'self' http://localhost:1234 'unsafe-inline';
         object-src 'none';
-        require-trusted-types-for 'script';
       "
     />
     <title>Dash</title>
     <link rel="stylesheet" href="../../resources/base.styl" type="text/css" />
-    <link rel="stylesheet" href="../../app/Dash/index.styl" type="text/css" />
+    <link rel="stylesheet" href="./index.styl" type="text/css" />
   </head>
   <body>
     <div class="frameOverlay"></div>
