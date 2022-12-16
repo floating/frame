@@ -45,7 +45,7 @@ const USDEstimateDisplay = ({ minFee, maxFee, nativeCurrency }) => {
   )
   const FeeSummary = () => (
     <>
-      <span>{'≈'}</span>
+      <span>{displayValue === '?' ? '=' : '≈'}</span>
       {maxFeeApproximation === '<' || displayValue === '?' ? <MaxFeeDisplay /> : <FeeRange />}
     </>
   )
