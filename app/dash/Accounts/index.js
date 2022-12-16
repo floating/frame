@@ -27,10 +27,10 @@ class AddAccounts extends React.Component {
       </div>
     )
   }
-  renderAddKeyring() {
+  renderAddKeyring({ accountData }) {
     return (
       <div className='addAccounts cardShow'>
-        <AddRing close={this.props.close} />
+        <AddRing close={this.props.close} accountData={accountData} />
       </div>
     )
   }
@@ -128,7 +128,7 @@ class AddAccounts extends React.Component {
     } else if (newAccountType === 'seed') {
       return this.renderAddSeed({ accountData })
     } else if (newAccountType === 'keyring') {
-      return this.renderAddKeyring()
+      return this.renderAddKeyring({ accountData })
     } else if (newAccountType === 'keystore') {
       return this.renderAddKeystore()
     } else if (newAccountType === 'nonsigning') {
