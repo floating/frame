@@ -496,8 +496,8 @@ const broadcast = (channel: string, ...args: string[]) => {
 // Data Change Events
 store.observer(() => broadcast('permissions', JSON.stringify(store('permissions'))))
 store.observer(() => {
+  const displaySummonShortcut = store('main.shortcuts.altSlash')
   if (tray?.isReady()) {
-    const displaySummonShortcut = store('main.shortcuts.altSlash')
     tray.electronTray.setContextMenu(contextMenu(displaySummonShortcut))
   }
 })
