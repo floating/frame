@@ -17,16 +17,25 @@ const navForward = async (notifyData) =>
     }
   })
 
+const navBack = async (steps = 1) => link.send('nav:back', 'dash', steps)
+
 const AddTokenErrorSceeen = ({ error, address, chainId }) => {
   return (
     <div className='newTokenView cardShow'>
       <div className='newTokenErrorTitle'>{error}</div>
 
-      <div className='tokenSetAddress' role='button' onClick={() => link.send('nav:back', 'dash')}>
+      <div className='tokenSetAddress' role='button' onClick={() => navBack()}>
         {'BACK'}
       </div>
       {error.includes(unableToVerifyError) && (
-        <div className='tokenSetAddress' role='button' onClick={() => navForward({ address, chainId })}>
+        <div
+          className='tokenSetAddress'
+          role='button'
+          onClick={() => {
+            navBack()
+            navForward({ address, chainId })
+          }}
+        >
           {'ADD ANYWAY'}
         </div>
       )}
@@ -272,7 +281,7 @@ class AddTokenFormScreenComponent extends Component {
 
     link.send('tray:addToken', token, req)
     setTimeout(() => {
-      link.send('nav:back', 'dash', backSteps)
+      navBack(backSteps)
     }, 400)
   }
 
