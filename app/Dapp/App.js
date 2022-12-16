@@ -56,7 +56,7 @@ class App extends React.Component {
           >
             <div className='accountIcon'></div>
           </div>
-          <div className='dappIcons'>
+          {/* <div className='dappIcons'>
             <div className='dappIconsScroll'>
               <div className='dappIconsWrap'>
                 {Object.keys(store('main.dapps')).map((id, index) => {
@@ -64,7 +64,7 @@ class App extends React.Component {
                 })}
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
         <div className='main'>
           <div className='mainTop' />
