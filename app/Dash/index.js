@@ -1,83 +1,40 @@
+import * as Sentry from '@sentry/electron'
 import React from 'react'
+import { createRoot } from 'react-dom/client'
 import Restore from 'react-restore'
 
-import Command from './Command'
-import Main from './Main'
-import Accounts from './Accounts'
-import Signer from './Signer'
-import Chains from './Chains'
-import Notify from './Notify'
-import Dapps from './Dapps'
-import Tokens from './Tokens'
-import Settings from './Settings'
-import svg from '../../resources/svg'
+import App from './App'
+
 import link from '../../resources/link'
-import { capitalize } from '../../resources/utils'
+import appStore from '../store'
 
-function itemName(view) {
-  return capitalize(view.slice(0, -1))
+Sentry.init({ dsn: 'https://7b09a85b26924609bef5882387e2c4dc@o1204372.ingest.sentry.io/6331069' })
+
+document.addEventListener('dragover', (e) => e.preventDefault())
+document.addEventListener('drop', (e) => e.preventDefault())
+
+if (process.env.NODE_ENV !== 'development' || process.env.HMR !== 'true') {
+  window.eval = global.eval = () => {
+    throw new Error(`This app does not support window.eval()`)
+  } // eslint-disable-line
 }
 
-const AddNewItemButton = ({ view, req }) => {
-  const dataMap = {
-    accounts: { showAddAccounts: true },
-    chains: { newChain: {} },
-    tokens: { notify: 'addToken', notifyData: req }
-  }
-  return (
-    <div className='dashFooter'>
-      <div
-        className='dashFooterButton'
-        onClick={() => link.send('tray:action', 'navDash', { view, data: dataMap[view] })}
-      >
-        <div className='newAccountIcon'>{svg.plus(16)}</div>
-        Add New {itemName(view)}
-      </div>
-    </div>
-  )
-}
+link.rpc('getState', (err, state) => {
+  if (err) return console.error('Could not get initial state from main')
+  const store = appStore(state)
+  window.store = store
+  store.observer(() => {
+    document.body.classList.add('clip', store('main.colorway'))
+    setTimeout(() => {
+      document.body.classList.remove('clip')
+    }, 100)
+  })
+  const Dash = Restore.connect(App, store)
+  const root = createRoot(document.getElementById('dash'))
+  root.render(<Dash />)
+})
 
-class Dash extends React.Component {
-  constructor(props, context) {
-    super(props, context)
-    this.input = React.createRef()
-    this.state = {
-      showAddAccounts: false,
-      selected: 'home'
-    }
-  }
+document.addEventListener('contextmenu', (e) => link.send('*:contextmenu', e.clientX, e.clientY))
 
-  renderPanel(view, data) {
-    if (view === 'accounts') return <Accounts data={data} />
-    if (view === 'expandedSigner' && data.signer) {
-      const signer = this.store('main.signers', data.signer)
-      if (!signer) return null
-      return <Signer expanded={true} key={signer.id + ':expanded'} {...signer} />
-    }
-    if (view === 'chains') return <Chains data={data} />
-    if (view === 'dapps') return <Dapps data={data} />
-    if (view === 'tokens') return <Tokens data={data} />
-    if (view === 'settings') return <Settings data={data} />
-    if (view === 'notify') return <Notify data={data} />
-    return <Main />
-  }
-
-  render() {
-    const { view, data } = this.store('windows.dash.nav')[0] || { view: 'default', data: {} }
-    const showAddButton =
-      ['chains', 'accounts', 'tokens'].includes(view) && (!data || Object.keys(data).length === 0)
-
-    return (
-      <div className='dash'>
-        <Command />
-        <div className='dashMain' style={{ bottom: showAddButton ? '120px' : '40px' }}>
-          <div className='dashMainOverlay' />
-          <div className='dashMainScroll'>{this.renderPanel(view, data)}</div>
-        </div>
-        {showAddButton && <AddNewItemButton view={view} req={this.props.req} />}
-      </div>
-    )
-  }
-}
-
-export default Restore.connect(Dash)
+// document.addEventListener('mouseout', e => { if (e.clientX < 0) link.send('tray:mouseout') })
+// document.addEventListener('contextmenu', e => link.send('tray:contextmenu', e.clientX, e.clientY))

@@ -1,38 +1,37 @@
+import * as Sentry from '@sentry/electron'
 import React from 'react'
+import { createRoot } from 'react-dom/client'
 import Restore from 'react-restore'
-import styled from 'styled-components'
 
-import Native from '../../resources/Native'
+import App from './App'
 
-const StyledButton = styled.button`
-  color: blue;
-  font-size: 1em;
-  margin: 1em;
-  padding: 0.25em 1em;
-  border: 2px solid palevioletred;
-  border-radius: 3px;
-`
+import link from '../../resources/link'
+import appStore from '../store'
 
-class App extends React.Component {
-  constructor(...args) {
-    super(...args)
-    this.state = {}
-  }
+Sentry.init({ dsn: 'https://7b09a85b26924609bef5882387e2c4dc@o1204372.ingest.sentry.io/6331069' })
 
-  render() {
-    return (
-      <div className='onboard'>
-        <div className='splash'>
-          <Native />
-          <div className='overlay' />
-          <div className='mainLeft'></div>
-          <div className='main'>
-            <StyledButton>{'Onboard'}</StyledButton>
-          </div>
-        </div>
-      </div>
-    )
-  }
+document.addEventListener('dragover', (e) => e.preventDefault())
+document.addEventListener('drop', (e) => e.preventDefault())
+
+if (process.env.NODE_ENV !== 'development' || process.env.HMR !== 'true') {
+  window.eval = global.eval = () => {
+    throw new Error(`This app does not support window.eval()`)
+  } // eslint-disable-line
 }
 
-export default Restore.connect(App)
+link.rpc('getState', (err, state) => {
+  if (err) return console.error('Could not get initial state from main')
+  const store = appStore(state)
+  window.store = store
+  store.observer(() => {
+    document.body.classList.add('clip', store('main.colorway'))
+    setTimeout(() => {
+      document.body.classList.remove('clip')
+    }, 100)
+  })
+  const Onboard = Restore.connect(App, store)
+  const root = createRoot(document.getElementById('onboard'))
+  root.render(<Onboard />)
+})
+
+document.addEventListener('contextmenu', (e) => link.send('*:contextmenu', e.clientX, e.clientY))

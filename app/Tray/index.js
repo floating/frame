@@ -1,89 +1,55 @@
+import * as Sentry from '@sentry/electron'
 import React from 'react'
+import { createRoot } from 'react-dom/client'
 import Restore from 'react-restore'
+
+import App from './App'
+
 import link from '../../resources/link'
+import appStore from '../store'
 
-import Account from './Account'
-import Notify from './Notify'
-import Menu from './Menu'
-import Badge from './Badge'
+Sentry.init({ dsn: 'https://7b09a85b26924609bef5882387e2c4dc@o1204372.ingest.sentry.io/6331069' })
 
-import Backdrop from './Backdrop'
-import AccountSelector from './AccountSelector'
-import Footer from './Footer'
+document.addEventListener('dragover', (e) => e.preventDefault())
+document.addEventListener('drop', (e) => e.preventDefault())
 
-// import DevTools from 'restore-devtools'
-// <DevTools />
-
-class Panel extends React.Component {
-  indicator(connection) {
-    const status = [connection.primary.status, connection.secondary.status]
-    if (status.indexOf('connected') > -1) {
-      if (this.store('selected.current')) {
-        return <div className='panelDetailIndicatorInner panelDetailIndicatorGood' />
-      } else {
-        return <div className='panelDetailIndicatorInner panelDetailIndicatorWaiting' />
-      }
-    } else {
-      return <div className='panelDetailIndicatorInner panelDetailIndicatorBad' />
-    }
-  }
-
-  // componentDidMount () {
-  //   document.addEventListener('keydown', (event) => {
-  //     console.log('event ky', event.key, this.store('panel.view'))
-  //     const view = this.store('panel.view')
-  //     if (event.key === 'ArrowRight') {
-  //       if (view === 'networks') this.store.setPanelView('settings')
-  //       if (view === 'settings') this.store.setPanelView('default')
-  //       if (view === 'default') this.store.setPanelView('networks')
-  //     } else if (event.key === 'ArrowLeft') {
-  //       if (view === 'networks') this.store.setPanelView('default')
-  //       if (view === 'settings') this.store.setPanelView('networks')
-  //       if (view === 'default') this.store.setPanelView('settings')
-  //     }
-  //     // const key = event.key; // "ArrowRight", "ArrowLeft", "ArrowUp", or "ArrowDown"
-  //   })
-  // }
-
-  selectNetwork(network) {
-    const [type, id] = network.split(':')
-    if (network.type !== type || network.id !== id) link.send('tray:action', 'selectNetwork', type, id)
-  }
-
-  hexToDisplayGwei(weiHex) {
-    return parseInt(weiHex, 'hex') / 1e9 < 1 ? '‹1' : Math.round(parseInt(weiHex, 'hex') / 1e9)
-  }
-
-  render() {
-    const opacity = this.store('tray.initial') ? 0 : 1
-
-    const networks = this.store('main.networks')
-    const networkOptions = []
-    Object.keys(networks).forEach((type) => {
-      Object.keys(networks[type]).forEach((id) => {
-        const net = networks[type][id]
-        const status = [net.connection.primary.status, net.connection.secondary.status]
-        if (net.on) {
-          networkOptions.push({
-            text: net.name,
-            value: type + ':' + id,
-            indicator: net.on && status.indexOf('connected') > -1 ? 'good' : 'bad'
-          })
-        }
-      })
-    })
-    return (
-      <div id='panel' style={{ opacity }}>
-        <Badge />
-        <Notify />
-        <Menu />
-        <AccountSelector />
-        <Account />
-        <Backdrop />
-        <Footer />
-      </div>
-    )
-  }
+if (process.env.NODE_ENV !== 'development' || process.env.HMR !== 'true') {
+  window.eval = global.eval = () => {
+    throw new Error(`This app does not support window.eval()`)
+  } // eslint-disable-line
 }
 
-export default Restore.connect(Panel)
+link.rpc('getState', (err, state) => {
+  if (err) return console.error('Could not get initial state from main.')
+  const store = appStore(state)
+  link.send('tray:ready') // turn on api
+  link.send('tray:refreshMain')
+  if (!store('main.mute.betaDisclosure')) {
+    store.notify('betaDisclosure')
+  }
+  if (!store('main.mute.aragonAccountMigrationWarning')) {
+    store.notify('aragonAccountMigrationWarning')
+  }
+  store.observer(() => {
+    document.body.classList.remove('dark', 'light')
+    document.body.classList.add('clip', store('main.colorway'))
+    setTimeout(() => {
+      document.body.classList.remove('clip')
+    }, 100)
+  })
+  store.observer(() => {
+    if (store('tray.open')) {
+      document.body.classList.remove('suspend')
+    } else {
+      document.body.classList.add('suspend')
+    }
+  })
+  const Tray = Restore.connect(App, store)
+  const root = createRoot(document.getElementById('tray'))
+  root.render(<Tray />)
+})
+// document.addEventListener('mouseover', e => link.send('tray:focus'))
+document.addEventListener('mouseout', (e) => {
+  if (e.clientX < 0) link.send('tray:mouseout')
+})
+document.addEventListener('contextmenu', (e) => link.send('*:contextmenu', e.clientX, e.clientY))
