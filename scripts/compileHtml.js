@@ -2,7 +2,7 @@ const ejs = require('ejs')
 const minimist = require('minimist')
 const { readFileSync, writeFileSync } = require('fs')
 
-const windows = ['tray', 'dash', 'dapp', 'onboard', 'flow']
+const windows = ['tray', 'dash', 'dapp', 'onboard']
 
 function capitalize(s) {
   if (!s) return s
