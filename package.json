@@ -22,7 +22,7 @@
     "bundle:dapp:inject": "parcel build main/dapps/server/inject/index.js --target inject --public-url .",
     "serve": "npm run bundle:bridge && npm run compile:dev && npm run dev-server & wait-on http://localhost:1234/renderer/tray/index.html && npm run compile:watch",
     "dev": "npm run compile:dev && npm run bundle && npm run launch:dev",
-    "dev-server": "cross-env NODE_ENV=development HMR=true parcel serve --log-level=verbose resources/bridge/index.js renderer/tray/index.html renderer/dash/index.html renderer/dapp/index.html renderer/onboard/index.html renderer/flow/index.html main/dapps/server/inject/index.js",
+    "dev-server": "cross-env NODE_ENV=development HMR=true parcel serve resources/bridge/index.js renderer/tray/index.html renderer/dash/index.html renderer/dapp/index.html renderer/onboard/index.html renderer/flow/index.html main/dapps/server/inject/index.js",
     "inspect": "npm run bundle && npm run launch:inspect",
     "launch": "cross-env NODE_ENV=production electron ./compiled/main",
     "launch:dev": "cross-env NODE_ENV=development ELECTRON_DISABLE_SECURITY_WARNINGS=true electron ./compiled/main --inspect",
