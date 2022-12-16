@@ -44,7 +44,7 @@ const USDEstimateDisplay = ({ minFee, maxFee, nativeCurrency }) => {
   )
 
   const feeSummary =
-    displayValue !== '?' ? (
+    displayValue === '?' ? (
       maxFeeDisplay
     ) : (
       <>
