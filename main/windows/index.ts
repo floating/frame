@@ -45,18 +45,14 @@ const contextMenu = (displaySummonShortcut: boolean = store('main.shortcuts.altS
     click: () => {},
     type: 'separator'
   }
-  const hideMenuItem = {
+  const hideMenuItem: Electron.MenuItemConstructorOptions = {
     label: 'Dismiss',
     click: hideFrame,
-    accelerator: 'Alt+/',
-    registerAccelerator: false,
     toolTip: 'Dismiss Frame'
   }
-  const showMenuItem = {
+  const showMenuItem: Electron.MenuItemConstructorOptions = {
     label: 'Summon',
     click: showFrame,
-    accelerator: 'Alt+/',
-    registerAccelerator: false,
     toolTip: 'Summon Frame'
   }
   const quitMenuItem = {
