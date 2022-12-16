@@ -74,10 +74,6 @@ class CustomTokens extends React.Component {
                         {this.state.copied ? 'Address Copied' : token.address}
                       </div>
                       <div className='customTokensListItemBottom'>
-                        <div className='customTokensListItemChainDecimal'>
-                          <div className='customTokensListItemChainLabel'>{'Decimals:'}</div>
-                          <div>{token.decimals}</div>
-                        </div>
                         <div
                           className='customTokensListItemEditButton'
                           onClick={() => {

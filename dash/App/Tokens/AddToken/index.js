@@ -144,7 +144,6 @@ class AddTokenAddressScreenComponent extends Component {
     if (!isValidAddress(address))
       return navForward({
         error: invalidFormatError,
-        tokenData: undefined,
         address,
         chainId
       })
@@ -442,8 +441,6 @@ class AddToken extends Component {
 
     if (!chainId) return <AddTokenChainScreen />
     if (!address) return <AddTokenAddressScreen chainId={chainId} chainName={chainName} />
-
-    //Errors can only occur after the address form has been presented
     if (error) return <AddTokenErrorSceeen error={error} address={address} chainId={chainId} />
 
     return (

@@ -99,8 +99,7 @@ describe('setting token address', () => {
         notifyData: {
           chainId: 1,
           address: 'INVALID_ADDRESS',
-          error: 'INVALID CONTRACT ADDRESS',
-          tokenData: undefined
+          error: 'INVALID CONTRACT ADDRESS'
         }
       }
     })
