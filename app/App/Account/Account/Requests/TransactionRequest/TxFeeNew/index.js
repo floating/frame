@@ -43,7 +43,6 @@ const USDEstimateDisplay = ({ minFee, maxFee, nativeCurrency }) => {
       <MaxFeeDisplay />
     </>
   )
-
   const FeeSummary = () => (
     <>
       <span>{'≈'}</span>
@@ -81,11 +80,6 @@ class TxFee extends React.Component {
       currencyRate: nativeCurrency.usd,
       isTestnet
     })
-
-    // console.log(req, {
-    //   currencyRate: nativeCurrency.usd,
-    //   isTestnet
-    // })
 
     // accounts for two potential 12.5% block fee increases
     const reduceFactor = BigNumber(9).dividedBy(8)
