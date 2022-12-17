@@ -32,12 +32,25 @@ let dash: Dash
 let dawn: Dawn
 let mouseTimeout: NodeJS.Timeout
 let glide = false
+let dashHiddenByAppHide = false
 
 const enableHMR = isDev && process.env.HMR === 'true'
 
 const menuClickHandlers = {
-  hide: () => tray.hide(),
-  show: () => tray.show()
+  hide: () => {
+    tray.hide()
+    if (dash.isVisible()) {
+      dashHiddenByAppHide = true
+      dash.hide()
+    }
+  },
+  show: () => {
+    tray.show()
+    if (dashHiddenByAppHide) {
+      dashHiddenByAppHide = false
+      dash.show()
+    }
+  }
 }
 const getDisplaySummonShortcut = () => store('main.shortcuts.altSlash')
 
@@ -320,6 +333,10 @@ class Dash {
       }
     }, 10)
   }
+
+  isVisible() {
+    return (windows.dash as BrowserWindow).isVisible()
+  }
 }
 
 class Dawn {
@@ -459,7 +476,7 @@ store.api.feed((_state, actions) => {
 })
 
 export default {
-  toggleTray: () => {
+  toggleTray() {
     tray.toggle()
   },
   showTray() {
