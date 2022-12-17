@@ -7,7 +7,13 @@ import { hexToInt } from '../../resources/utils'
 import store from '../store'
 import FrameManager from './frames'
 import { createWindow } from './window'
-import { closeContextMenu, setContextMenu } from './systemTray'
+import {
+  hasRecentClick as systemTrayHasRecentClick,
+  setTitle as setSystemTrayTitle,
+  init as initSystemTray,
+  closeContextMenu,
+  setContextMenu
+} from './systemTray'
 
 type Windows = { [key: string]: BrowserWindow }
 
@@ -148,8 +154,6 @@ function initTrayWindow() {
 }
 
 export class Tray {
-  private recentElectronTrayClick = false
-  private recentElectronTrayClickTimeout?: NodeJS.Timeout
   private recentAutohide = false
   private recentAutoHideTimeout?: NodeJS.Timeout
   private gasObserver: Observer
@@ -166,19 +170,10 @@ export class Tray {
         const gasDisplay = Math.round(hexToInt(gasPrice) / 1000000000).toString()
         title = gasDisplay // ɢ 🄶 Ⓖ ᴳᵂᴱᴵ
       }
-      this.electronTray.setTitle(title)
+      setSystemTrayTitle(title)
     })
     this.readyHandler = () => {
-      this.electronTray.on('click', () => {
-        this.recentElectronTrayClick = true
-        clearTimeout(this.recentElectronTrayClickTimeout as NodeJS.Timeout)
-        this.recentElectronTrayClickTimeout = setTimeout(() => {
-          this.recentElectronTrayClick = false
-        }, 50)
-        if (process.platform === 'win32') {
-          this.toggle()
-        }
-      })
+      initSystemTray(this.toggle)
       if (showOnReady) {
         store.trayOpen(true)
       }
@@ -208,7 +203,7 @@ export class Tray {
 
   canAutoHide() {
     return (
-      !this.recentElectronTrayClick &&
+      !systemTrayHasRecentClick() &&
       store('main.autohide') &&
       !store('windows.dash.showing') &&
       !frameManager.isFrameShowing()

@@ -5,6 +5,8 @@ import store from '../store'
 const electronTray = new ElectronTray(
   path.join(__dirname, process.platform === 'darwin' ? './IconTemplate.png' : './Icon.png')
 )
+let recentElectronTrayClick = false
+let recentElectronTrayClickTimeout: NodeJS.Timeout
 
 export const setContextMenu = (
   type: string,
@@ -41,3 +43,20 @@ export const setContextMenu = (
 }
 
 export const closeContextMenu = () => electronTray.closeContextMenu()
+
+export const setTitle = (title: string) => electronTray.setTitle(title)
+
+export const hasRecentClick = () => recentElectronTrayClick
+
+export const init = (appWindowToggle: () => void) => {
+  electronTray.on('click', () => {
+    recentElectronTrayClick = true
+    clearTimeout(recentElectronTrayClickTimeout as NodeJS.Timeout)
+    recentElectronTrayClickTimeout = setTimeout(() => {
+      recentElectronTrayClick = false
+    }, 50)
+    if (process.platform === 'win32') {
+      appWindowToggle()
+    }
+  })
+}
