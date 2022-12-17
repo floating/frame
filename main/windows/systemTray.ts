@@ -16,10 +16,9 @@ export const createContextMenu = (
     show: 'Summon'
   }
   const label = menuItemLabelMap[type as keyof typeof menuItemLabelMap]
-  const actionType = type === 'show' ? 'hide' : 'show'
   const actionMenuItem: Electron.MenuItemConstructorOptions = {
     label,
-    click: clickHandlers[actionType as keyof typeof clickHandlers],
+    click: clickHandlers[type as keyof typeof clickHandlers],
     toolTip: `${label} Frame`
   }
   const quitMenuItem = {
