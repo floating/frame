@@ -81,7 +81,14 @@ describe('rendering', () => {
   })
 
   it('renders the submit button text', () => {
-    const chainConfig = { view: 'setup', id: 137, name: 'Polygon', symbol: 'MATIC' }
+    const chainConfig = {
+      view: 'setup',
+      id: 137,
+      name: 'Polygon',
+      symbol: 'MATIC',
+      primaryRpc: 'https://rpc-mainnet.matic.network',
+      secondaryRpc: 'https://polygon-rpc.com'
+    }
     const { getByRole } = setupComponent(<Chain {...chainConfig} />)
 
     const submitButton = getByRole('button')
