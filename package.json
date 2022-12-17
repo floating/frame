@@ -33,7 +33,7 @@
     "format": "prettier --write '**/*.{yml,json,md,html,ts,js}'",
     "format:check": "prettier --check '**/*.{yml,json,md,html,ts,js}'",
     "prod": "npm run compile && npm run bundle && npm run launch",
-    "hot": "trap \"kill 0\" exit && npm run bundle:bridge && npm run compile && npm run dev-server & wait-on http://localhost:1234/app/Tray/index.dev.html && npm run launch:hot",
+    "hot": "node ./scripts/hot",
     "compile": "npm run copy-assets && tsc",
     "compile:watch": "npm run copy-assets && tsc -w",
     "build": "npm run compile && sleep 4 && npm run bundle && sleep 4 && electron-builder",
