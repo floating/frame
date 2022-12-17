@@ -1,7 +1,12 @@
-import { app, Menu } from 'electron'
+import { app, Menu, Tray as ElectronTray } from 'electron'
+import path from 'path'
 import store from '../store'
 
-export const createContextMenu = (
+const electronTray = new ElectronTray(
+  path.join(__dirname, process.platform === 'darwin' ? './IconTemplate.png' : './Icon.png')
+)
+
+export const setContextMenu = (
   type: string,
   clickHandlers: { show: () => void; hide: () => void },
   displaySummonShortcut: boolean = store('main.shortcuts.altSlash')
@@ -31,5 +36,8 @@ export const createContextMenu = (
     actionMenuItem.registerAccelerator = false
   }
 
-  return Menu.buildFromTemplate([actionMenuItem, separatorMenuItem, quitMenuItem])
+  const menu = Menu.buildFromTemplate([actionMenuItem, separatorMenuItem, quitMenuItem])
+  electronTray.setContextMenu(menu)
 }
+
+export const closeContextMenu = () => electronTray.closeContextMenu()

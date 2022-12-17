@@ -1,13 +1,4 @@
-import {
-  app,
-  BrowserWindow,
-  ipcMain,
-  screen,
-  Tray as ElectronTray,
-  globalShortcut,
-  IpcMainEvent,
-  WebContents
-} from 'electron'
+import { app, BrowserWindow, ipcMain, screen, globalShortcut, IpcMainEvent, WebContents } from 'electron'
 import path from 'path'
 import log from 'electron-log'
 import EventEmitter from 'events'
@@ -16,7 +7,7 @@ import { hexToInt } from '../../resources/utils'
 import store from '../store'
 import FrameManager from './frames'
 import { createWindow } from './window'
-import { createContextMenu } from './systemTray'
+import { closeContextMenu, setContextMenu } from './systemTray'
 
 type Windows = { [key: string]: BrowserWindow }
 
@@ -109,22 +100,18 @@ function initTrayWindow() {
 
   windows.tray.on('show', () => {
     if (process.platform === 'win32') {
-      tray.electronTray.closeContextMenu()
+      closeContextMenu()
     }
     setTimeout(() => {
-      tray.electronTray.setContextMenu(
-        createContextMenu('hide', menuClickHandlers, getDisplaySummonShortcut())
-      )
+      setContextMenu('hide', menuClickHandlers, getDisplaySummonShortcut())
     }, 100)
   })
   windows.tray.on('hide', () => {
     if (process.platform === 'win32') {
-      tray.electronTray.closeContextMenu()
+      closeContextMenu()
     }
     setTimeout(() => {
-      tray.electronTray.setContextMenu(
-        createContextMenu('show', menuClickHandlers, getDisplaySummonShortcut())
-      )
+      setContextMenu('show', menuClickHandlers, getDisplaySummonShortcut())
     }, 100)
   })
 
@@ -168,12 +155,8 @@ export class Tray {
   private gasObserver: Observer
   private ready: boolean
   private readyHandler: () => void
-  public electronTray: ElectronTray
 
   constructor() {
-    this.electronTray = new ElectronTray(
-      path.join(__dirname, process.platform === 'darwin' ? './IconTemplate.png' : './Icon.png')
-    )
     this.ready = false
     this.gasObserver = store.observer(() => {
       let title = ''
@@ -468,10 +451,7 @@ store.observer(() => broadcast('permissions', JSON.stringify(store('permissions'
 store.observer(() => {
   const displaySummonShortcut = store('main.shortcuts.altSlash')
   if (tray?.isReady()) {
-    const contextMenu = tray.isVisible()
-      ? createContextMenu('hide', menuClickHandlers, displaySummonShortcut)
-      : createContextMenu('show', menuClickHandlers, displaySummonShortcut)
-    tray.electronTray.setContextMenu(contextMenu)
+    setContextMenu(tray.isVisible() ? 'hide' : 'show', menuClickHandlers, displaySummonShortcut)
   }
 })
 
