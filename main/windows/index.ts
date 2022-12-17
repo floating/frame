@@ -4,7 +4,6 @@ import {
   ipcMain,
   screen,
   Tray as ElectronTray,
-  Menu,
   globalShortcut,
   IpcMainEvent,
   WebContents
@@ -17,6 +16,7 @@ import { hexToInt } from '../../resources/utils'
 import store from '../store'
 import FrameManager from './frames'
 import { createWindow } from './window'
+import { createContextMenu } from './systemTray'
 
 type Windows = { [key: string]: BrowserWindow }
 
@@ -37,46 +37,12 @@ let mouseTimeout: NodeJS.Timeout
 let glide = false
 
 const enableHMR = isDev && process.env.HMR === 'true'
-const contextMenu = (displaySummonShortcut: boolean = store('main.shortcuts.altSlash')) => {
-  const hideFrame = () => tray.hide()
-  const showFrame = () => tray.show()
-  const separatorMenuItem = {
-    label: 'Frame',
-    click: () => {},
-    type: 'separator'
-  }
-  const hideMenuItem: Electron.MenuItemConstructorOptions = {
-    label: 'Dismiss',
-    click: hideFrame,
-    toolTip: 'Dismiss Frame'
-  }
-  const showMenuItem: Electron.MenuItemConstructorOptions = {
-    label: 'Summon',
-    click: showFrame,
-    toolTip: 'Summon Frame'
-  }
-  const quitMenuItem = {
-    label: 'Quit',
-    click: () => app.quit()
-  }
 
-  if (displaySummonShortcut) {
-    ;[showMenuItem, hideMenuItem].forEach((menuItem) => {
-      menuItem.accelerator = 'Alt+/'
-      menuItem.registerAccelerator = false
-    })
-  }
-
-  const showMenu = [showMenuItem, separatorMenuItem, quitMenuItem]
-  const hideMenu = [hideMenuItem, separatorMenuItem, quitMenuItem]
-  const menuMap = {
-    show: Menu.buildFromTemplate(showMenu),
-    hide: Menu.buildFromTemplate(hideMenu)
-  }
-  const menuType = tray.isVisible() ? 'hide' : 'show'
-
-  return menuMap[menuType as keyof typeof menuMap]
+const menuClickHandlers = {
+  hide: () => tray.hide(),
+  show: () => tray.show()
 }
+const getDisplaySummonShortcut = () => store('main.shortcuts.altSlash')
 
 const topRight = (window: BrowserWindow) => {
   const area = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
@@ -146,7 +112,9 @@ function initTrayWindow() {
       tray.electronTray.closeContextMenu()
     }
     setTimeout(() => {
-      tray.electronTray.setContextMenu(contextMenu())
+      tray.electronTray.setContextMenu(
+        createContextMenu('hide', menuClickHandlers, getDisplaySummonShortcut())
+      )
     }, 100)
   })
   windows.tray.on('hide', () => {
@@ -154,7 +122,9 @@ function initTrayWindow() {
       tray.electronTray.closeContextMenu()
     }
     setTimeout(() => {
-      tray.electronTray.setContextMenu(contextMenu())
+      tray.electronTray.setContextMenu(
+        createContextMenu('show', menuClickHandlers, getDisplaySummonShortcut())
+      )
     }, 100)
   })
 
@@ -190,7 +160,7 @@ function initTrayWindow() {
   }, 30 * 1000)
 }
 
-class Tray {
+export class Tray {
   private recentElectronTrayClick = false
   private recentElectronTrayClickTimeout?: NodeJS.Timeout
   private recentAutohide = false
@@ -498,7 +468,10 @@ store.observer(() => broadcast('permissions', JSON.stringify(store('permissions'
 store.observer(() => {
   const displaySummonShortcut = store('main.shortcuts.altSlash')
   if (tray?.isReady()) {
-    tray.electronTray.setContextMenu(contextMenu(displaySummonShortcut))
+    const contextMenu = tray.isVisible()
+      ? createContextMenu('hide', menuClickHandlers, displaySummonShortcut)
+      : createContextMenu('show', menuClickHandlers, displaySummonShortcut)
+    tray.electronTray.setContextMenu(contextMenu)
   }
 })
 
