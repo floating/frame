@@ -1,6 +1,7 @@
 const { spawn, spawnSync } = require('child_process')
 const waitOn = require('wait-on')
 
+const cwd = process.cwd()
 let electronMainProcess
 
 function exitHandler() {
@@ -13,18 +14,18 @@ function exitHandler() {
 }
 
 spawnSync('npm', ['run', 'bundle:bridge'], {
-  cwd: process.cwd(),
+  cwd,
   detached: true,
   stdio: 'inherit'
 })
 spawnSync('npm', ['run', 'compile'], {
-  cwd: process.cwd(),
+  cwd,
   detached: true,
   stdio: 'inherit'
 })
 
 const devServerProcess = spawn('npm', ['run', 'dev-server'], {
-  cwd: process.cwd(),
+  cwd,
   detached: true,
   stdio: 'inherit'
 })
@@ -39,7 +40,7 @@ devServerProcess.on('exit', () => {
       validateStatus: (status) => status === 200
     })
     electronMainProcess = spawn('npm', ['run', 'launch:hot'], {
-      cwd: process.cwd(),
+      cwd,
       detached: true,
       stdio: 'inherit'
     })
