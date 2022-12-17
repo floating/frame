@@ -74,12 +74,28 @@ class CustomTokens extends React.Component {
                         {this.state.copied ? 'Address Copied' : token.address}
                       </div>
                       <div className='customTokensListItemBottom'>
-                        <div className='customTokensListItemChainDecimal'>
-                          <div className='customTokensListItemChainLabel'>{'Decimals:'}</div>
-                          <div>{token.decimals}</div>
+                        <div
+                          className='customTokensListItemButton editButton'
+                          onClick={() => {
+                            link.send('nav:forward', 'dash', {
+                              view: 'tokens',
+                              data: {
+                                notify: 'addToken',
+                                notifyData: {
+                                  error: null,
+                                  isEdit: true,
+                                  address: token.address,
+                                  chainId: token.chainId,
+                                  tokenData: token
+                                }
+                              }
+                            })
+                          }}
+                        >
+                          {'Edit Token'}
                         </div>
                         <div
-                          className='customTokensListItemRemoveButton'
+                          className='customTokensListItemButton removeButton'
                           onClick={() => {
                             this.setState({ tokenExpanded: false })
                             setTimeout(() => {

@@ -2,9 +2,9 @@ import { TransactionDescription } from '@ethersproject/abi'
 import { Contract } from '@ethersproject/contracts'
 import { Web3Provider } from '@ethersproject/providers'
 import { addHexPrefix } from '@ethereumjs/util'
-import log from 'electron-log'
 import erc20Abi from '../externalData/balances/erc-20-abi'
 import provider from '../provider'
+import { BigNumber } from 'ethers'
 
 function createWeb3ProviderWrapper(chainId: number) {
   const wrappedSend = (
@@ -72,25 +72,21 @@ export default class Erc20Contract {
   }
 
   async getTokenData() {
-    try {
-      const calls = await Promise.all([
-        this.contract.decimals(),
-        this.contract.name(),
-        this.contract.symbol()
-      ])
+    const calls = await Promise.all([
+      this.contract.decimals().catch(() => 0),
+      this.contract.name().catch(() => ''),
+      this.contract.symbol().catch(() => ''),
+      this.contract
+        .totalSupply()
+        .then((supply: BigNumber) => supply.toString())
+        .catch(() => '') // totalSupply is mandatory on the ERC20 interface
+    ])
 
-      return {
-        decimals: calls[0],
-        name: calls[1],
-        symbol: calls[2]
-      }
-    } catch (e) {
-      log.error(`getTokenData error: ${e}`)
-      return {
-        decimals: 0,
-        name: '',
-        symbol: ''
-      }
+    return {
+      decimals: calls[0],
+      name: calls[1],
+      symbol: calls[2],
+      totalSupply: calls[3]
     }
   }
 }

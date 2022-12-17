@@ -147,10 +147,18 @@ class _Footer extends React.Component {
                   style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none' }}
                   onClick={() => {
                     if (this.state.allowInput) {
+                      const { address, symbol, decimals, logoURI, name, chainId } = req.token
                       link.send('tray:resolveRequest', req, null)
                       link.send('tray:action', 'navDash', {
-                        view: 'notify',
-                        data: { notify: 'addToken', notifyData: { token: req.token } }
+                        view: 'tokens',
+                        data: {
+                          notify: 'addToken',
+                          notifyData: {
+                            tokenData: { symbol, decimals, logoURI, name },
+                            chainId,
+                            address
+                          }
+                        }
                       })
                     }
                   }}

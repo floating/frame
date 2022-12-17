@@ -74,6 +74,7 @@
     transition var(--standard)
     box-sizing border-box
     height 50px
+    padding 0px 4px
     overflow hidden
     border-bottom 1px solid var(--ghostY)
 
@@ -87,6 +88,7 @@
       padding 6px
 
       .customTokensListItemExpand
+        text-align center
         width 30px
         height 30px
         margin-left 10px
@@ -190,9 +192,9 @@
       justify-content center
       align-items center
       font-size 12.5px
-      height 18px
+      height 26px
+      margin 0px 10px
       border-radius 9px
-      margin 0px 0px
       font-family 'FiraCode'
       background var(--ghostB)
       // border-radius 12px
@@ -206,33 +208,37 @@
       height 40px
       display flex
       align-items center
-      justify-content space-between
       padding 0px 10px
+      font-size 12px
 
-      .customTokensListItemRemoveButton
+      .customTokensListItemButton
         display flex
-        font-size 12px
-        height 25px
         justify-content center
         align-items center
+        width 50%
+        height 26px
         box-sizing border-box
-        translate transformY(0px)
-        cursor pointer
         border-radius 10px
+        cursor pointer
         text-transform uppercase
-        padding 0px 22px
-        color var(--bad)
-        font-weight 300
         background var(--ghostB)
 
         *
           pointer-events none
 
-      .customTokensListItemRemoveButton:hover
+      .customTokensListItemButton:hover
         background var(--ghostC)
 
+      .editButton
+        color var(--good)
+        margin-right 8px
+
+      .removeButton
+        color var(--bad)
+        margin-left 8px
+
   .customTokensListItemExpanded
-    height 112px
+    height 122px
     // background var(--ghostY)
 
   .customTokensListItemChainDecimal

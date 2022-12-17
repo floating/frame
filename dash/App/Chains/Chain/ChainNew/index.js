@@ -26,6 +26,15 @@ const isChainFilled = (chain) => {
   )
 }
 
+const isValidRpc = (urlStr) => {
+  try {
+    const url = new URL(urlStr)
+    return ['http:', 'https:', 'ws:', 'wss:'].includes(url.protocol)
+  } catch (e) {
+    return false
+  }
+}
+
 export default ({
   id,
   name,
@@ -77,6 +86,10 @@ export default ({
       return { valid: false, text: 'Chain ID Already Exists' }
     } else if (!isChainFilled(chain)) {
       return { valid: false, text: 'Fill Chain Details' }
+    } else if (!isValidRpc(chain.primaryRpc)) {
+      return { valid: false, text: 'Invalid primary RPC' }
+    } else if (!isValidRpc(chain.secondaryRpc)) {
+      return { valid: false, text: 'Invalid secondary RPC' }
     } else {
       return { valid: true, text: 'Add Chain' }
     }
