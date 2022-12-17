@@ -95,7 +95,7 @@ describe('rendering', () => {
     expect(submitButton.textContent).toBe('Add Chain')
   })
 
-  it('renders the submit button text', () => {
+  it('renders the correct submit button text when the form is empty', () => {
     const chainConfig = { view: 'setup', id: 137, name: 'Polygon' }
     const { getByRole } = setupComponent(<Chain {...chainConfig} />)
 
