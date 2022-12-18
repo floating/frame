@@ -2,11 +2,9 @@ import { app, Menu, Tray as ElectronTray } from 'electron'
 import path from 'path'
 import store from '../store'
 
-const electronTray = new ElectronTray(
-  path.join(__dirname, process.platform === 'darwin' ? './IconTemplate.png' : './Icon.png')
-)
-let recentElectronTrayClick = false
+let electronTray: ElectronTray
 let recentElectronTrayClickTimeout: NodeJS.Timeout
+let recentElectronTrayClick = false
 
 export const setContextMenu = (
   type: string,
@@ -39,16 +37,19 @@ export const setContextMenu = (
   }
 
   const menu = Menu.buildFromTemplate([actionMenuItem, separatorMenuItem, quitMenuItem])
-  electronTray.setContextMenu(menu)
+  electronTray?.setContextMenu(menu)
 }
 
-export const closeContextMenu = () => electronTray.closeContextMenu()
+export const closeContextMenu = () => electronTray?.closeContextMenu()
 
-export const setTitle = (title: string) => electronTray.setTitle(title)
+export const setTitle = (title: string) => electronTray?.setTitle(title)
 
 export const hasRecentClick = () => recentElectronTrayClick
 
 export const init = (appWindowToggle: () => void) => {
+  electronTray = new ElectronTray(
+    path.join(__dirname, process.platform === 'darwin' ? './IconTemplate.png' : './Icon.png')
+  )
   electronTray.on('click', () => {
     recentElectronTrayClick = true
     clearTimeout(recentElectronTrayClickTimeout as NodeJS.Timeout)
