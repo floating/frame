@@ -8,7 +8,6 @@ import store from '../store'
 import FrameManager from './frames'
 import { createWindow } from './window'
 import {
-  hasRecentClick as systemTrayHasRecentClick,
   setTitle as setSystemTrayTitle,
   init as initSystemTray,
   closeContextMenu,
@@ -32,7 +31,6 @@ let dash: Dash
 let dawn: Dawn
 let mouseTimeout: NodeJS.Timeout
 let glide = false
-let dashHiddenByAppHide = false
 
 const enableHMR = isDev && process.env.HMR === 'true'
 
@@ -40,14 +38,12 @@ const menuClickHandlers = {
   hide: () => {
     tray.hide()
     if (dash.isVisible()) {
-      dashHiddenByAppHide = true
-      dash.hide()
+      dash.hide('app')
     }
   },
   show: () => {
     tray.show()
-    if (dashHiddenByAppHide) {
-      dashHiddenByAppHide = false
+    if (dash.hiddenByAppHide) {
       dash.show()
     }
   }
@@ -121,17 +117,13 @@ function initTrayWindow() {
     if (process.platform === 'win32') {
       closeContextMenu()
     }
-    setTimeout(() => {
-      setContextMenu('hide', menuClickHandlers, getDisplaySummonShortcut())
-    }, 100)
+    setContextMenu('hide', menuClickHandlers, getDisplaySummonShortcut())
   })
   windows.tray.on('hide', () => {
     if (process.platform === 'win32') {
       closeContextMenu()
     }
-    setTimeout(() => {
-      setContextMenu('show', menuClickHandlers, getDisplaySummonShortcut())
-    }, 100)
+    setContextMenu('show', menuClickHandlers, getDisplaySummonShortcut())
   })
 
   setTimeout(() => {
@@ -146,7 +138,7 @@ function initTrayWindow() {
     windows.tray.on('blur', () => {
       setTimeout(() => {
         if (tray.canAutoHide()) {
-          tray.hide(true)
+          tray.hide()
         }
       }, 100)
     })
@@ -167,8 +159,8 @@ function initTrayWindow() {
 }
 
 export class Tray {
-  private recentAutohide = false
-  private recentAutoHideTimeout?: NodeJS.Timeout
+  private recentDisplayEvent = false
+  private recentDisplayEventTimeout?: NodeJS.Timeout
   private gasObserver: Observer
   private ready: boolean
   private readyHandler: () => void
@@ -215,33 +207,27 @@ export class Tray {
   }
 
   canAutoHide() {
-    return (
-      !systemTrayHasRecentClick() &&
-      store('main.autohide') &&
-      !store('windows.dash.showing') &&
-      !frameManager.isFrameShowing()
-    )
+    return store('main.autohide') && !store('windows.dash.showing') && !frameManager.isFrameShowing()
   }
 
-  hide(autohide: boolean = false) {
-    store.toggleDash('hide')
-    if (autohide) {
-      this.recentAutohide = true
-      clearTimeout(this.recentAutoHideTimeout as NodeJS.Timeout)
-      this.recentAutoHideTimeout = setTimeout(() => {
-        this.recentAutohide = false
-      }, 50)
+  hide() {
+    // store.toggleDash('hide')
+    if (this.recentDisplayEvent || !windows.tray?.isVisible()) {
+      return
     }
+    clearTimeout(this.recentDisplayEventTimeout)
+    this.recentDisplayEvent = true
+    this.recentDisplayEventTimeout = setTimeout(() => {
+      this.recentDisplayEvent = false
+    }, 150)
 
-    if (windows && windows.tray) {
-      store.trayOpen(false)
-      if (store('main.reveal')) {
-        detectMouse()
-      }
-      windows.tray.emit('hide')
-      windows.tray.hide()
-      events.emit('tray:hide')
+    store.trayOpen(false)
+    if (store('main.reveal')) {
+      detectMouse()
     }
+    windows.tray.emit('hide')
+    windows.tray.hide()
+    events.emit('tray:hide')
   }
 
   public show() {
@@ -249,6 +235,15 @@ export class Tray {
     if (!windows.tray) {
       return init()
     }
+    if (this.recentDisplayEvent || windows.tray?.isVisible()) {
+      return
+    }
+    clearTimeout(this.recentDisplayEventTimeout)
+    this.recentDisplayEvent = true
+    this.recentDisplayEventTimeout = setTimeout(() => {
+      this.recentDisplayEvent = false
+    }, 150)
+
     // windows.tray.setPosition(0, 0)
     windows.tray.setAlwaysOnTop(true)
     windows.tray.setVisibleOnAllWorkspaces(true, {
@@ -280,7 +275,7 @@ export class Tray {
   }
 
   toggle() {
-    if (!this.isReady() || this.recentAutohide) return
+    if (!this.isReady()) return
 
     this.isVisible() ? this.hide() : this.show()
   }
@@ -292,22 +287,43 @@ export class Tray {
 }
 
 class Dash {
+  private recentDisplayEvent = false
+  private recentDisplayEventTimeout?: NodeJS.Timeout
+  public hiddenByAppHide = false
+
   constructor() {
     initWindow('dash', {
       width: trayWidth
     })
   }
 
-  public hide() {
-    if (windows.dash && windows.dash.isVisible()) {
-      windows.dash.hide()
+  public hide(context?: string) {
+    if (this.recentDisplayEvent || !windows.dash?.isVisible()) {
+      return
     }
+    if (context === 'app') {
+      this.hiddenByAppHide = true
+    }
+    clearTimeout(this.recentDisplayEventTimeout)
+    this.recentDisplayEvent = true
+    this.recentDisplayEventTimeout = setTimeout(() => {
+      this.recentDisplayEvent = false
+    }, 150)
+    windows.dash.hide()
   }
 
   public show() {
-    if (!tray.isReady()) {
+    if (!tray.isReady() || this.recentDisplayEvent) {
       return
     }
+    if (this.hiddenByAppHide) {
+      this.hiddenByAppHide = false
+    }
+    clearTimeout(this.recentDisplayEventTimeout)
+    this.recentDisplayEvent = true
+    this.recentDisplayEventTimeout = setTimeout(() => {
+      this.recentDisplayEvent = false
+    }, 150)
     setTimeout(() => {
       windows.dash.setAlwaysOnTop(true)
       windows.dash.setVisibleOnAllWorkspaces(true, {
@@ -443,6 +459,26 @@ const init = () => {
   if (!store('main.mute.onboardingWindow')) {
     dawn = new Dawn()
   }
+
+  // data change events
+  store.observer(() => {
+    if (store('windows.dash.showing')) {
+      dash.show()
+    } else {
+      dash.hide()
+      windows.tray.focus()
+    }
+  })
+  store.observer(() => {
+    if (store('main.shortcuts.altSlash')) {
+      globalShortcut.unregister('Alt+/')
+      globalShortcut.register('Alt+/', () => {
+        menuClickHandlers[tray.isVisible() ? 'hide' : 'show']()
+      })
+    } else {
+      globalShortcut.unregister('Alt+/')
+    }
+  })
 }
 
 const send = (id: string, channel: string, ...args: string[]) => {
