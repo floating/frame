@@ -93,8 +93,15 @@ function EnterSecret({ newAccountType, isValidSecret, title }) {
           {error}
         </div>
       )}
-      <div data-testid='addHotAccountSecretTextEntry' className='addAccountItemOptionInputPhrase'>
-        <textarea autoFocus tabIndex='-1' value={secret} onChange={updateInput} onKeyDown={handleSubmit} />
+      <div className='addAccountItemOptionInputPhrase'>
+        <textarea
+          data-testid='addHotAccountSecretTextEntry'
+          autoFocus
+          tabIndex='-1'
+          value={secret}
+          onChange={updateInput}
+          onKeyDown={handleSubmit}
+        />
       </div>
       <div
         data-testid='addHotAccountSecretSubmitButton'
@@ -151,12 +158,19 @@ function PasswordInput({ getError, nextStep, title, buttonText }) {
 
   return (
     <div style={{ textAlign: 'center', width: '100%' }} className='addAccountItemOptionSetupFrame'>
-      <div className='addAccountItemOptionTitle'>{title}</div>
-      {error && <div style={{ color: 'red' }}>{error}</div>}
+      <div data-testid='addHotAccountCreatePasswordTitle' className='addAccountItemOptionTitle'>
+        {title}
+      </div>
+      {error && (
+        <div data-testid='addHotAccountCreatePasswordError' style={{ color: 'red' }}>
+          {error}
+        </div>
+      )}
       <div className='addAccountItemOptionInputPhrase addAccountItemOptionInputPassword'>
         <div className='addAccountItemOptionSubtitle'>password must be 12 characters or longer</div>
         <form onSubmit={handleSubmit}>
           <input
+            data-testid='addHotAccountCreatePasswordInput'
             autoFocus
             type='password'
             tabIndex='-1'
@@ -170,7 +184,11 @@ function PasswordInput({ getError, nextStep, title, buttonText }) {
       </div>
       {/* TODO: Maybe use CSS to make button clearly un-clickable rather than dissappearing? */}
       {ready && (
-        <div className={'addAccountItemOptionSubmit'} onMouseDown={handleSubmit}>
+        <div
+          data-testid='addHotAccountPasswordSubmitButton'
+          className={'addAccountItemOptionSubmit'}
+          onMouseDown={handleSubmit}
+        >
           {buttonText}
         </div>
       )}

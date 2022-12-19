@@ -4,10 +4,10 @@ import { setupComponent } from '../../../../../componentSetup'
 
 import store from '../../../../../../main/store'
 import link from '../../../../../../resources/link'
-import AddPhraseAccountComponent from '../../../../../../dash/App/Accounts/Add/AddPhrase'
+import AddRingAccountComponent from '../../../../../../dash/App/Accounts/Add/AddRing'
 import { act } from 'react-dom/test-utils'
 
-const phrase = 'there lab weapon cost bounce smart trial pulse ceiling beach upset hockey illegal chef leaf'
+const privateKey = '0x01'
 const password = 'thisisagoodpassword123'
 
 jest.mock('../../../../../../main/store/persist')
@@ -18,40 +18,40 @@ jest.mock('../../../../../../resources/link', () => ({
 }))
 jest.useFakeTimers()
 
-const AddPhrase = Restore.connect(AddPhraseAccountComponent, store)
+const AddRing = Restore.connect(AddRingAccountComponent, store)
 
-describe('entering seed phrase', () => {
+describe('entering private key', () => {
   let user, getByTestId, seedPhraseTextArea, nextButton
 
   beforeEach(() => {
-    ;({ user, getByTestId } = setupComponent(<AddPhrase accountData={{}} />))
+    ;({ user, getByTestId } = setupComponent(<AddRing accountData={{}} />))
     seedPhraseTextArea = getByTestId('addHotAccountSecretTextEntry')
     nextButton = getByTestId('addHotAccountSecretSubmitButton')
   })
 
   it('should display the correct title when entering the seed phrase', () => {
     const title = getByTestId('addHotAccountSecretTitle')
-    expect(title.textContent).toBe('Seed Phrase')
+    expect(title.textContent).toBe('Private Key')
   })
 
   it('should show an error message when an incorrect seed phrase is submitted', async () => {
     await user.type(seedPhraseTextArea, 'INVALID')
     await user.click(nextButton)
     const errorMessage = getByTestId('addHotAccountSecretError')
-    expect(errorMessage.textContent).toBe('INVALID SEED PHRASE')
+    expect(errorMessage.textContent).toBe('INVALID PRIVATE KEY')
   })
 
   it('should update the navigation with the password entry screen when a seed phrase is submitted', async () => {
-    await user.type(seedPhraseTextArea, phrase)
+    await user.type(seedPhraseTextArea, privateKey)
     await user.click(nextButton)
 
     expect(link.send).toHaveBeenCalledWith('nav:forward', 'dash', {
       view: 'accounts',
       data: {
         showAddAccounts: true,
-        newAccountType: 'seed',
+        newAccountType: 'keyring',
         accountData: {
-          secret: phrase
+          secret: privateKey
         }
       }
     })
@@ -62,7 +62,7 @@ describe('entering password', () => {
   let component, passwordEntryTextArea
 
   beforeEach(() => {
-    component = setupComponent(<AddPhrase accountData={{ secret: phrase }} />)
+    component = setupComponent(<AddRing accountData={{ secret: privateKey }} />)
     passwordEntryTextArea = component.getByTestId('addHotAccountCreatePasswordInput')
   })
 
@@ -138,9 +138,9 @@ describe('entering password', () => {
       view: 'accounts',
       data: {
         showAddAccounts: true,
-        newAccountType: 'seed',
+        newAccountType: 'keyring',
         accountData: {
-          secret: phrase,
+          secret: privateKey,
           password
         }
       }
@@ -152,7 +152,7 @@ describe('confirming password', () => {
   let component, passwordEntryTextArea
 
   beforeEach(() => {
-    component = setupComponent(<AddPhrase accountData={{ secret: phrase, password }} />)
+    component = setupComponent(<AddRing accountData={{ secret: privateKey, password }} />)
     passwordEntryTextArea = component.getByTestId('addHotAccountCreatePasswordInput')
   })
 
@@ -190,13 +190,13 @@ describe('confirming password', () => {
     })
 
     await user.click(component.queryByTestId('addHotAccountPasswordSubmitButton'))
-    expect(link.rpc).toHaveBeenCalledWith('createFromPhrase', phrase, password, expect.any(Function))
+    expect(link.rpc).toHaveBeenCalledWith('createFromPrivateKey', privateKey, password, expect.any(Function))
   })
 
   it('Should remove the previous screens related to adding an account from the navigation', async () => {
     link.rpc.mockImplementationOnce((action, secret, passwd, cb) => {
-      expect(action).toBe('createFromPhrase')
-      expect(secret).toBe(phrase)
+      expect(action).toBe('createFromPrivateKey')
+      expect(secret).toBe(privateKey)
       expect(passwd).toBe(password)
       cb(null, { id: '1234' })
     })
@@ -215,8 +215,8 @@ describe('confirming password', () => {
 
   it('Should update the navigation to view the newly created account', async () => {
     link.rpc.mockImplementationOnce((action, secret, passwd, cb) => {
-      expect(action).toBe('createFromPhrase')
-      expect(secret).toBe(phrase)
+      expect(action).toBe('createFromPrivateKey')
+      expect(secret).toBe(privateKey)
       expect(passwd).toBe(password)
       cb(null, { id: '1234' })
     })
