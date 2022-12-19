@@ -469,14 +469,19 @@ const init = () => {
       windows.tray.focus()
     }
   })
+  store.observer(() => broadcast('permissions', JSON.stringify(store('permissions'))))
   store.observer(() => {
-    if (store('main.shortcuts.altSlash')) {
+    const displaySummonShortcut = store('main.shortcuts.altSlash')
+    if (displaySummonShortcut) {
       globalShortcut.unregister('Alt+/')
       globalShortcut.register('Alt+/', () => {
         menuClickHandlers[tray.isVisible() ? 'hide' : 'show']()
       })
     } else {
       globalShortcut.unregister('Alt+/')
+    }
+    if (tray?.isReady()) {
+      setContextMenu(tray.isVisible() ? 'hide' : 'show', menuClickHandlers, displaySummonShortcut)
     }
   })
 }
@@ -493,15 +498,6 @@ const broadcast = (channel: string, ...args: string[]) => {
   Object.keys(windows).forEach((id) => send(id, channel, ...args))
   frameManager.broadcast(channel, args)
 }
-
-// Data Change Events
-store.observer(() => broadcast('permissions', JSON.stringify(store('permissions'))))
-store.observer(() => {
-  const displaySummonShortcut = store('main.shortcuts.altSlash')
-  if (tray?.isReady()) {
-    setContextMenu(tray.isVisible() ? 'hide' : 'show', menuClickHandlers, displaySummonShortcut)
-  }
-})
 
 store.api.feed((_state, actions) => {
   actions.forEach((action) => {
