@@ -133,15 +133,15 @@ function initTrayWindow() {
 
   windows.tray.on('show', () => {
     if (process.platform === 'win32') {
-      systemTray?.closeContextMenu()
+      systemTray.closeContextMenu()
     }
-    systemTray?.setContextMenu('hide', getDisplaySummonShortcut())
+    systemTray.setContextMenu('hide', getDisplaySummonShortcut())
   })
   windows.tray.on('hide', () => {
     if (process.platform === 'win32') {
-      systemTray?.closeContextMenu()
+      systemTray.closeContextMenu()
     }
-    systemTray?.setContextMenu('show', getDisplaySummonShortcut())
+    systemTray.setContextMenu('show', getDisplaySummonShortcut())
   })
 
   setTimeout(() => {
