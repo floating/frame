@@ -1,55 +1,72 @@
 import { app, Menu, Tray as ElectronTray } from 'electron'
 import path from 'path'
 import store from '../store'
+import type { Tray } from '.'
 
-let electronTray: ElectronTray
+const isMacOS = process.platform === 'darwin'
+const isWindows = process.platform === 'win32'
 
-export const setContextMenu = (
-  type: string,
-  clickHandlers: { show: () => void; hide: () => void },
-  displaySummonShortcut: boolean = store('main.shortcuts.altSlash')
-) => {
-  const separatorMenuItem = {
-    label: 'Frame',
-    click: () => {},
-    type: 'separator'
-  }
-  const menuItemLabelMap = {
-    hide: 'Dismiss',
-    show: 'Summon'
-  }
-  const label = menuItemLabelMap[type as keyof typeof menuItemLabelMap]
-  const actionMenuItem: Electron.MenuItemConstructorOptions = {
-    label,
-    click: () => clickHandlers[type as keyof typeof clickHandlers](),
-    toolTip: `${label} Frame`
-  }
-  const quitMenuItem = {
-    label: 'Quit',
-    click: () => app.quit()
-  }
-
-  if (displaySummonShortcut) {
-    actionMenuItem.accelerator = 'Alt+/'
-    actionMenuItem.registerAccelerator = false
-  }
-
-  const menu = Menu.buildFromTemplate([actionMenuItem, separatorMenuItem, quitMenuItem])
-
-  setTimeout(() => electronTray?.setContextMenu(menu), process.platform === 'darwin' ? 0 : 200)
+type ClickHandlers = { 
+  show: () => void
+  hide: () => void 
 }
 
-export const closeContextMenu = () => electronTray?.closeContextMenu()
+export class SystemTray {
+  private electronTray: ElectronTray
+  private clickHandlers: { show: () => void; hide: () => void }
 
-export const setTitle = (title: string) => electronTray?.setTitle(title)
+  constructor(tray: Tray, clickHandlers: ClickHandlers) {
+    this.clickHandlers = clickHandlers
+    this.electronTray = new ElectronTray(
+      path.join(__dirname, isMacOS ? './IconTemplate.png' : './Icon.png')
+    )
+    this.electronTray.on('click', () => {
+      if (isWindows) {
+        const clickAction = tray.isVisible() ? 'hide' : 'show'
+        this.clickHandlers[clickAction as keyof typeof clickHandlers]()
+      }
+    })
+  }
 
-export const init = (appWindowToggle: () => void) => {
-  electronTray = new ElectronTray(
-    path.join(__dirname, process.platform === 'darwin' ? './IconTemplate.png' : './Icon.png')
-  )
-  electronTray.on('click', () => {
-    if (process.platform === 'win32') {
-      appWindowToggle()
+  setContextMenu(
+    type: string,
+    displaySummonShortcut: boolean = store('main.shortcuts.altSlash')
+  ) {
+    const separatorMenuItem = {
+      label: 'Frame',
+      click: () => {},
+      type: 'separator'
     }
-  })
+    const menuItemLabelMap = {
+      hide: 'Dismiss',
+      show: 'Summon'
+    }
+    const label = menuItemLabelMap[type as keyof typeof menuItemLabelMap]
+    const actionMenuItem: Electron.MenuItemConstructorOptions = {
+      label,
+      click: () => this.clickHandlers[type as keyof typeof this.clickHandlers](),
+      toolTip: `${label} Frame`
+    }
+    const quitMenuItem = {
+      label: 'Quit',
+      click: () => app.quit()  
+    }
+  
+    if (displaySummonShortcut) {
+      actionMenuItem.accelerator = 'Alt+/'
+      actionMenuItem.registerAccelerator = false
+    }
+  
+    const menu = Menu.buildFromTemplate([actionMenuItem, separatorMenuItem, quitMenuItem])
+  
+    setTimeout(() => this.electronTray?.setContextMenu(menu), isMacOS ? 0 : 200)
+  }
+
+  closeContextMenu() {
+    this.electronTray?.closeContextMenu()
+  }
+
+  setTitle(title: string) {
+    this.electronTray?.setTitle(title)
+  }
 }

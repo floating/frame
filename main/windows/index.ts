@@ -8,10 +8,7 @@ import store from '../store'
 import FrameManager from './frames'
 import { createWindow } from './window'
 import {
-  setTitle as setSystemTrayTitle,
-  init as initSystemTray,
-  closeContextMenu,
-  setContextMenu
+  SystemTray
 } from './systemTray'
 
 type Windows = { [key: string]: BrowserWindow }
@@ -29,6 +26,7 @@ const devHeight = 800
 let tray: Tray
 let dash: Dash
 let dawn: Dawn
+let systemTray: SystemTray
 let mouseTimeout: NodeJS.Timeout
 let glide = false
 
@@ -115,15 +113,15 @@ function initTrayWindow() {
 
   windows.tray.on('show', () => {
     if (process.platform === 'win32') {
-      closeContextMenu()
+      systemTray?.closeContextMenu()
     }
-    setContextMenu('hide', menuClickHandlers, getDisplaySummonShortcut())
+    systemTray?.setContextMenu('hide', getDisplaySummonShortcut())
   })
   windows.tray.on('hide', () => {
     if (process.platform === 'win32') {
-      closeContextMenu()
+      systemTray?.closeContextMenu()
     }
-    setContextMenu('show', menuClickHandlers, getDisplaySummonShortcut())
+    systemTray?.setContextMenu('show', getDisplaySummonShortcut())
   })
 
   setTimeout(() => {
@@ -162,11 +160,10 @@ export class Tray {
   private recentDisplayEvent = false
   private recentDisplayEventTimeout?: NodeJS.Timeout
   private gasObserver: Observer
-  private ready: boolean
+  private ready = false
   private readyHandler: () => void
 
   constructor() {
-    this.ready = false
     this.gasObserver = store.observer(() => {
       let title = ''
       if (store('platform') === 'darwin' && store('main.menubarGasPrice')) {
@@ -175,15 +172,15 @@ export class Tray {
         const gasDisplay = Math.round(hexToInt(gasPrice) / 1000000000).toString()
         title = gasDisplay // ɢ 🄶 Ⓖ ᴳᵂᴱᴵ
       }
-      setSystemTrayTitle(title)
+      systemTray?.setTitle(title)
     })
     this.readyHandler = () => {
-      initSystemTray(this.toggle)
-      setContextMenu('hide', menuClickHandlers, getDisplaySummonShortcut())
+      this.ready = true
+      systemTray = new SystemTray(this, menuClickHandlers)
+      systemTray.setContextMenu('hide', getDisplaySummonShortcut())
       if (showOnReady) {
         store.trayOpen(true)
       }
-      this.ready = true
       if (store('windows.dash.showing')) {
         setTimeout(() => {
           dash.show()
@@ -376,7 +373,6 @@ class Dawn {
   }
 
   public show() {
-    log.warn('loading dawn url', tray.isReady())
     if (!tray.isReady()) {
       return
     }
@@ -482,7 +478,7 @@ const init = () => {
       globalShortcut.unregister('Alt+/')
     }
     if (tray?.isReady()) {
-      setContextMenu(tray.isVisible() ? 'hide' : 'show', menuClickHandlers, displaySummonShortcut)
+      systemTray.setContextMenu(tray.isVisible() ? 'hide' : 'show', displaySummonShortcut)
     }
   })
 }
