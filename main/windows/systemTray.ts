@@ -36,9 +36,7 @@ export const setContextMenu = (
 
   const menu = Menu.buildFromTemplate([actionMenuItem, separatorMenuItem, quitMenuItem])
 
-  setTimeout(() => {
-    electronTray?.setContextMenu(menu)
-  }, 200)
+  setTimeout(() => electronTray?.setContextMenu(menu), process.platform === 'darwin' ? 0 : 200)
 }
 
 export const closeContextMenu = () => electronTray?.closeContextMenu()

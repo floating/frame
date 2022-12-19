@@ -179,6 +179,7 @@ export class Tray {
     })
     this.readyHandler = () => {
       initSystemTray(this.toggle)
+      setContextMenu('hide', menuClickHandlers, getDisplaySummonShortcut())
       if (showOnReady) {
         store.trayOpen(true)
       }
@@ -211,7 +212,6 @@ export class Tray {
   }
 
   hide() {
-    // store.toggleDash('hide')
     if (this.recentDisplayEvent || !windows.tray?.isVisible()) {
       return
     }
@@ -221,6 +221,7 @@ export class Tray {
       this.recentDisplayEvent = false
     }, 150)
 
+    store.toggleDash('hide')
     store.trayOpen(false)
     if (store('main.reveal')) {
       detectMouse()
