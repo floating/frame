@@ -20,6 +20,7 @@ export class SystemTray {
   }
 
   init() {
+    // Electron Tray can only be instantiated when the app is ready
     this.electronTray = new ElectronTray(path.join(__dirname, isMacOS ? './IconTemplate.png' : './Icon.png'))
     this.electronTray.on('click', this.clickHandlers.click)
   }
