@@ -1,4 +1,12 @@
-import { app, BrowserWindow, ipcMain, screen, globalShortcut, IpcMainEvent, WebContents } from 'electron'
+import {
+  app as electronApp,
+  BrowserWindow,
+  ipcMain,
+  screen,
+  globalShortcut,
+  IpcMainEvent,
+  WebContents
+} from 'electron'
 import path from 'path'
 import log from 'electron-log'
 import EventEmitter from 'events'
@@ -7,9 +15,7 @@ import { hexToInt } from '../../resources/utils'
 import store from '../store'
 import FrameManager from './frames'
 import { createWindow } from './window'
-import {
-  SystemTray
-} from './systemTray'
+import { SystemTray } from './systemTray'
 
 type Windows = { [key: string]: BrowserWindow }
 
@@ -17,22 +23,22 @@ const events = new EventEmitter()
 const frameManager = new FrameManager()
 const isDev = process.env.NODE_ENV === 'development'
 const fullheight = !!process.env.FULL_HEIGHT
-const openedAtLogin = app && app.getLoginItemSettings() && app.getLoginItemSettings().wasOpenedAtLogin
+const openedAtLogin =
+  electronApp?.getLoginItemSettings() && electronApp.getLoginItemSettings().wasOpenedAtLogin
 const windows: Windows = {}
 const showOnReady = true
 const trayWidth = 400
 const devHeight = 800
+const isWindows = process.platform === 'win32'
 
 let tray: Tray
 let dash: Dash
 let dawn: Dawn
-let systemTray: SystemTray
 let mouseTimeout: NodeJS.Timeout
 let glide = false
 
 const enableHMR = isDev && process.env.HMR === 'true'
-
-const menuClickHandlers = {
+const app = {
   hide: () => {
     tray.hide()
     if (dash.isVisible()) {
@@ -44,8 +50,22 @@ const menuClickHandlers = {
     if (dash.hiddenByAppHide) {
       dash.show()
     }
+  },
+  toggle: () => {
+    const eventName = tray.isVisible() ? 'hide' : 'show'
+    app[eventName as keyof typeof app]()
   }
 }
+const systemTrayEventHandlers = {
+  click: () => {
+    if (isWindows) {
+      app.toggle()
+    }
+  },
+  clickHide: () => app.hide(),
+  clickShow: () => app.show()
+}
+const systemTray = new SystemTray(systemTrayEventHandlers)
 const getDisplaySummonShortcut = () => store('main.shortcuts.altSlash')
 
 const topRight = (window: BrowserWindow) => {
@@ -172,11 +192,11 @@ export class Tray {
         const gasDisplay = Math.round(hexToInt(gasPrice) / 1000000000).toString()
         title = gasDisplay // ɢ 🄶 Ⓖ ᴳᵂᴱᴵ
       }
-      systemTray?.setTitle(title)
+      systemTray.setTitle(title)
     })
     this.readyHandler = () => {
       this.ready = true
-      systemTray = new SystemTray(this, menuClickHandlers)
+      systemTray.init()
       systemTray.setContextMenu('hide', getDisplaySummonShortcut())
       if (showOnReady) {
         store.trayOpen(true)
@@ -404,7 +424,7 @@ class Dawn {
   }
 }
 
-ipcMain.on('tray:quit', () => app.quit())
+ipcMain.on('tray:quit', () => electronApp.quit())
 ipcMain.on('tray:mouseout', () => {
   if (glide && !store('windows.dash.showing')) {
     glide = false
@@ -416,18 +436,18 @@ ipcMain.on('tray:mouseout', () => {
 // also set elsewhere but enforced globally here to minimize possible vectors of attack
 // - in the case of e.g. dependency injection
 // - as a 'to be sure' against possibility of misconfiguration in the future
-app.on('web-contents-created', (_e, contents) => {
+electronApp.on('web-contents-created', (_e, contents) => {
   contents.on('will-navigate', (e) => e.preventDefault())
   contents.on('will-attach-webview', (e) => e.preventDefault())
   contents.setWindowOpenHandler(() => ({ action: 'deny' }))
 })
 
-app.on('ready', () => {
+electronApp.on('ready', () => {
   frameManager.start()
 })
 
 if (isDev) {
-  app.on('ready', () => {
+  electronApp.on('ready', () => {
     globalShortcut.register('CommandOrControl+R', () => {
       Object.keys(windows).forEach((win) => {
         windows[win].reload()
@@ -471,9 +491,7 @@ const init = () => {
     const displaySummonShortcut = store('main.shortcuts.altSlash')
     if (displaySummonShortcut) {
       globalShortcut.unregister('Alt+/')
-      globalShortcut.register('Alt+/', () => {
-        menuClickHandlers[tray.isVisible() ? 'hide' : 'show']()
-      })
+      globalShortcut.register('Alt+/', () => app.toggle())
     } else {
       globalShortcut.unregister('Alt+/')
     }

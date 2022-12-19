@@ -1,37 +1,30 @@
 import { app, Menu, Tray as ElectronTray } from 'electron'
 import path from 'path'
+import { capitalize } from '../../resources/utils'
 import store from '../store'
-import type { Tray } from '.'
 
 const isMacOS = process.platform === 'darwin'
-const isWindows = process.platform === 'win32'
 
-type ClickHandlers = { 
-  show: () => void
-  hide: () => void 
+type SystemTrayEventHandlers = {
+  click: () => void
+  clickShow: () => void
+  clickHide: () => void
 }
 
 export class SystemTray {
-  private electronTray: ElectronTray
-  private clickHandlers: { show: () => void; hide: () => void }
+  private clickHandlers: SystemTrayEventHandlers
+  private electronTray?: ElectronTray
 
-  constructor(tray: Tray, clickHandlers: ClickHandlers) {
+  constructor(clickHandlers: SystemTrayEventHandlers) {
     this.clickHandlers = clickHandlers
-    this.electronTray = new ElectronTray(
-      path.join(__dirname, isMacOS ? './IconTemplate.png' : './Icon.png')
-    )
-    this.electronTray.on('click', () => {
-      if (isWindows) {
-        const clickAction = tray.isVisible() ? 'hide' : 'show'
-        this.clickHandlers[clickAction as keyof typeof clickHandlers]()
-      }
-    })
   }
 
-  setContextMenu(
-    type: string,
-    displaySummonShortcut: boolean = store('main.shortcuts.altSlash')
-  ) {
+  init() {
+    this.electronTray = new ElectronTray(path.join(__dirname, isMacOS ? './IconTemplate.png' : './Icon.png'))
+    this.electronTray.on('click', this.clickHandlers.click)
+  }
+
+  setContextMenu(type: string, displaySummonShortcut: boolean = store('main.shortcuts.altSlash')) {
     const separatorMenuItem = {
       label: 'Frame',
       click: () => {},
@@ -42,23 +35,24 @@ export class SystemTray {
       show: 'Summon'
     }
     const label = menuItemLabelMap[type as keyof typeof menuItemLabelMap]
+    const eventName = `click${capitalize(type)}`
     const actionMenuItem: Electron.MenuItemConstructorOptions = {
       label,
-      click: () => this.clickHandlers[type as keyof typeof this.clickHandlers](),
+      click: () => this.clickHandlers[eventName as keyof typeof this.clickHandlers](),
       toolTip: `${label} Frame`
     }
     const quitMenuItem = {
       label: 'Quit',
-      click: () => app.quit()  
+      click: () => app.quit()
     }
-  
+
     if (displaySummonShortcut) {
       actionMenuItem.accelerator = 'Alt+/'
       actionMenuItem.registerAccelerator = false
     }
-  
+
     const menu = Menu.buildFromTemplate([actionMenuItem, separatorMenuItem, quitMenuItem])
-  
+
     setTimeout(() => this.electronTray?.setContextMenu(menu), isMacOS ? 0 : 200)
   }
 
