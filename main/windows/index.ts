@@ -227,13 +227,11 @@ class Tray {
           dash.show()
         }, 300)
       }
-      if (onboard) {
-        setTimeout(() => {
-          onboard.show()
-        }, 600)
-      }
     }
     ipcMain.on('tray:ready', this.readyHandler)
+    setTimeout(() => {
+      onboard.show()
+    }, 600)
     initTrayWindow()
   }
 
@@ -399,15 +397,16 @@ class Onboard {
       })
 
       const area = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
-      const height = area.height - 160
+      const height = (isDev && !fullheight ? devHeight : area.height) - 160
       const maxWidth = Math.floor(height * 1.24)
-      const targetWidth = area.width - 460
+      const targetWidth = 600 // area.width - 460
       const width = targetWidth > maxWidth ? maxWidth : targetWidth
-      windows.onboard.setMinimumSize(400, 300)
+      windows.onboard.setMinimumSize(600, 300)
       windows.onboard.setSize(width, height)
       const pos = topRight(windows.onboard)
-      windows.onboard.setPosition(pos.x - 440, pos.y + 80)
-      windows.onboard.setAlwaysOnTop(true)
+      const x = pos.x - 810 + (pos.x - 810 - width) / 2
+      windows.onboard.setPosition(x, pos.y + 80)
+      // windows.onboard.setAlwaysOnTop(true)
       windows.onboard.show()
       windows.onboard.focus()
       windows.onboard.setVisibleOnAllWorkspaces(false, {
@@ -450,7 +449,7 @@ if (isDev) {
         windows[win].reload()
       })
 
-      frameManager.reloadFrames()
+      // frameManager.reloadFrames()
     })
   })
 }
