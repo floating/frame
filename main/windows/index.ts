@@ -1,10 +1,8 @@
 import {
-  app,
+  app as electronApp,
   BrowserWindow,
   ipcMain,
   screen,
-  Tray as ElectronTray,
-  Menu,
   globalShortcut,
   IpcMainEvent,
   WebContents
@@ -17,6 +15,7 @@ import { hexToInt } from '../../resources/utils'
 import store from '../store'
 import FrameManager from './frames'
 import { createWindow } from './window'
+import { SystemTray } from './systemTray'
 
 type Windows = { [key: string]: BrowserWindow }
 
@@ -24,11 +23,13 @@ const events = new EventEmitter()
 const frameManager = new FrameManager()
 const isDev = process.env.NODE_ENV === 'development'
 const fullheight = !!process.env.FULL_HEIGHT
-const openedAtLogin = app && app.getLoginItemSettings() && app.getLoginItemSettings().wasOpenedAtLogin
+const openedAtLogin =
+  electronApp?.getLoginItemSettings() && electronApp.getLoginItemSettings().wasOpenedAtLogin
 const windows: Windows = {}
 const showOnReady = true
 const trayWidth = 400
 const devHeight = 800
+const isWindows = process.platform === 'win32'
 
 let tray: Tray
 let dash: Dash
@@ -36,40 +37,36 @@ let dawn: Dawn
 let mouseTimeout: NodeJS.Timeout
 let glide = false
 
-const enableHMR = process.env.NODE_ENV === 'development' && process.env.HMR === 'true'
-const hideFrame = () => tray.hide()
-const showFrame = () => tray.show()
-
-const separatorMenuItem = {
-  label: 'Frame',
-  click: () => {},
-  type: 'separator'
+const enableHMR = isDev && process.env.HMR === 'true'
+const app = {
+  hide: () => {
+    tray.hide()
+    if (dash.isVisible()) {
+      dash.hide('app')
+    }
+  },
+  show: () => {
+    tray.show()
+    if (dash.hiddenByAppHide) {
+      dash.show()
+    }
+  },
+  toggle: () => {
+    const eventName = tray.isVisible() ? 'hide' : 'show'
+    app[eventName as keyof typeof app]()
+  }
 }
-
-const hideMenuItem = {
-  label: 'Dismiss',
-  click: hideFrame,
-  accelerator: 'Alt+/',
-  registerAccelerator: false,
-  toolTip: 'Dismiss Frame'
+const systemTrayEventHandlers = {
+  click: () => {
+    if (isWindows) {
+      app.toggle()
+    }
+  },
+  clickHide: () => app.hide(),
+  clickShow: () => app.show()
 }
-
-const showMenuItem = {
-  label: 'Summon',
-  click: showFrame,
-  accelerator: 'Alt+/',
-  registerAccelerator: false,
-  toolTip: 'Summon Frame'
-}
-
-const quitMenuItem = {
-  label: 'Quit',
-  click: () => app.quit()
-}
-
-const hideMenu = Menu.buildFromTemplate([hideMenuItem, separatorMenuItem, quitMenuItem])
-
-const showMenu = Menu.buildFromTemplate([showMenuItem, separatorMenuItem, quitMenuItem])
+const systemTray = new SystemTray(systemTrayEventHandlers)
+const getDisplaySummonShortcut = () => store('main.shortcuts.altSlash')
 
 const topRight = (window: BrowserWindow) => {
   const area = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
@@ -136,19 +133,15 @@ function initTrayWindow() {
 
   windows.tray.on('show', () => {
     if (process.platform === 'win32') {
-      tray.electronTray.closeContextMenu()
+      systemTray.closeContextMenu()
     }
-    setTimeout(() => {
-      tray.electronTray.setContextMenu(hideMenu)
-    }, 100)
+    systemTray.setContextMenu('hide', getDisplaySummonShortcut())
   })
   windows.tray.on('hide', () => {
     if (process.platform === 'win32') {
-      tray.electronTray.closeContextMenu()
+      systemTray.closeContextMenu()
     }
-    setTimeout(() => {
-      tray.electronTray.setContextMenu(showMenu)
-    }, 100)
+    systemTray.setContextMenu('show', getDisplaySummonShortcut())
   })
 
   setTimeout(() => {
@@ -163,7 +156,7 @@ function initTrayWindow() {
     windows.tray.on('blur', () => {
       setTimeout(() => {
         if (tray.canAutoHide()) {
-          tray.hide(true)
+          tray.hide()
         }
       }, 100)
     })
@@ -183,21 +176,14 @@ function initTrayWindow() {
   }, 30 * 1000)
 }
 
-class Tray {
-  private recentElectronTrayClick = false
-  private recentElectronTrayClickTimeout?: NodeJS.Timeout
-  private recentAutohide = false
-  private recentAutoHideTimeout?: NodeJS.Timeout
+export class Tray {
+  private recentDisplayEvent = false
+  private recentDisplayEventTimeout?: NodeJS.Timeout
   private gasObserver: Observer
-  private ready: boolean
+  private ready = false
   private readyHandler: () => void
-  public electronTray: ElectronTray
 
   constructor() {
-    this.electronTray = new ElectronTray(
-      path.join(__dirname, process.platform === 'darwin' ? './IconTemplate.png' : './Icon.png')
-    )
-    this.ready = false
     this.gasObserver = store.observer(() => {
       let title = ''
       if (store('platform') === 'darwin' && store('main.menubarGasPrice')) {
@@ -206,23 +192,15 @@ class Tray {
         const gasDisplay = Math.round(hexToInt(gasPrice) / 1000000000).toString()
         title = gasDisplay // ɢ 🄶 Ⓖ ᴳᵂᴱᴵ
       }
-      this.electronTray.setTitle(title)
+      systemTray.setTitle(title)
     })
     this.readyHandler = () => {
-      this.electronTray.on('click', () => {
-        this.recentElectronTrayClick = true
-        clearTimeout(this.recentElectronTrayClickTimeout as NodeJS.Timeout)
-        this.recentElectronTrayClickTimeout = setTimeout(() => {
-          this.recentElectronTrayClick = false
-        }, 50)
-        if (process.platform === 'win32') {
-          this.toggle()
-        }
-      })
+      this.ready = true
+      systemTray.init()
+      systemTray.setContextMenu('hide', getDisplaySummonShortcut())
       if (showOnReady) {
         store.trayOpen(true)
       }
-      this.ready = true
       if (store('windows.dash.showing')) {
         setTimeout(() => {
           dash.show()
@@ -247,33 +225,27 @@ class Tray {
   }
 
   canAutoHide() {
-    return (
-      !this.recentElectronTrayClick &&
-      store('main.autohide') &&
-      !store('windows.dash.showing') &&
-      !frameManager.isFrameShowing()
-    )
+    return store('main.autohide') && !store('windows.dash.showing') && !frameManager.isFrameShowing()
   }
 
-  hide(autohide: boolean = false) {
-    store.toggleDash('hide')
-    if (autohide) {
-      this.recentAutohide = true
-      clearTimeout(this.recentAutoHideTimeout as NodeJS.Timeout)
-      this.recentAutoHideTimeout = setTimeout(() => {
-        this.recentAutohide = false
-      }, 50)
+  hide() {
+    if (this.recentDisplayEvent || !windows.tray?.isVisible()) {
+      return
     }
+    clearTimeout(this.recentDisplayEventTimeout)
+    this.recentDisplayEvent = true
+    this.recentDisplayEventTimeout = setTimeout(() => {
+      this.recentDisplayEvent = false
+    }, 150)
 
-    if (windows && windows.tray) {
-      store.trayOpen(false)
-      if (store('main.reveal')) {
-        detectMouse()
-      }
-      windows.tray.emit('hide')
-      windows.tray.hide()
-      events.emit('tray:hide')
+    store.toggleDash('hide')
+    store.trayOpen(false)
+    if (store('main.reveal')) {
+      detectMouse()
     }
+    windows.tray.emit('hide')
+    windows.tray.hide()
+    events.emit('tray:hide')
   }
 
   public show() {
@@ -281,6 +253,15 @@ class Tray {
     if (!windows.tray) {
       return init()
     }
+    if (this.recentDisplayEvent || windows.tray?.isVisible()) {
+      return
+    }
+    clearTimeout(this.recentDisplayEventTimeout)
+    this.recentDisplayEvent = true
+    this.recentDisplayEventTimeout = setTimeout(() => {
+      this.recentDisplayEvent = false
+    }, 150)
+
     // windows.tray.setPosition(0, 0)
     windows.tray.setAlwaysOnTop(true)
     windows.tray.setVisibleOnAllWorkspaces(true, {
@@ -312,7 +293,7 @@ class Tray {
   }
 
   toggle() {
-    if (!this.isReady() || this.recentAutohide) return
+    if (!this.isReady()) return
 
     this.isVisible() ? this.hide() : this.show()
   }
@@ -324,22 +305,43 @@ class Tray {
 }
 
 class Dash {
+  private recentDisplayEvent = false
+  private recentDisplayEventTimeout?: NodeJS.Timeout
+  public hiddenByAppHide = false
+
   constructor() {
     initWindow('dash', {
       width: trayWidth
     })
   }
 
-  public hide() {
-    if (windows.dash && windows.dash.isVisible()) {
-      windows.dash.hide()
+  public hide(context?: string) {
+    if (this.recentDisplayEvent || !windows.dash?.isVisible()) {
+      return
     }
+    if (context === 'app') {
+      this.hiddenByAppHide = true
+    }
+    clearTimeout(this.recentDisplayEventTimeout)
+    this.recentDisplayEvent = true
+    this.recentDisplayEventTimeout = setTimeout(() => {
+      this.recentDisplayEvent = false
+    }, 150)
+    windows.dash.hide()
   }
 
   public show() {
-    if (!tray.isReady()) {
+    if (!tray.isReady() || this.recentDisplayEvent) {
       return
     }
+    if (this.hiddenByAppHide) {
+      this.hiddenByAppHide = false
+    }
+    clearTimeout(this.recentDisplayEventTimeout)
+    this.recentDisplayEvent = true
+    this.recentDisplayEventTimeout = setTimeout(() => {
+      this.recentDisplayEvent = false
+    }, 150)
     setTimeout(() => {
       windows.dash.setAlwaysOnTop(true)
       windows.dash.setVisibleOnAllWorkspaces(true, {
@@ -365,6 +367,10 @@ class Dash {
       }
     }, 10)
   }
+
+  isVisible() {
+    return (windows.dash as BrowserWindow).isVisible()
+  }
 }
 
 class Dawn {
@@ -387,7 +393,6 @@ class Dawn {
   }
 
   public show() {
-    log.warn('loading dawn url', tray.isReady())
     if (!tray.isReady()) {
       return
     }
@@ -419,7 +424,7 @@ class Dawn {
   }
 }
 
-ipcMain.on('tray:quit', () => app.quit())
+ipcMain.on('tray:quit', () => electronApp.quit())
 ipcMain.on('tray:mouseout', () => {
   if (glide && !store('windows.dash.showing')) {
     glide = false
@@ -431,18 +436,18 @@ ipcMain.on('tray:mouseout', () => {
 // also set elsewhere but enforced globally here to minimize possible vectors of attack
 // - in the case of e.g. dependency injection
 // - as a 'to be sure' against possibility of misconfiguration in the future
-app.on('web-contents-created', (_e, contents) => {
+electronApp.on('web-contents-created', (_e, contents) => {
   contents.on('will-navigate', (e) => e.preventDefault())
   contents.on('will-attach-webview', (e) => e.preventDefault())
   contents.setWindowOpenHandler(() => ({ action: 'deny' }))
 })
 
-app.on('ready', () => {
+electronApp.on('ready', () => {
   frameManager.start()
 })
 
 if (isDev) {
-  app.on('ready', () => {
+  electronApp.on('ready', () => {
     globalShortcut.register('CommandOrControl+R', () => {
       Object.keys(windows).forEach((win) => {
         windows[win].reload()
@@ -471,6 +476,29 @@ const init = () => {
   if (!store('main.mute.onboardingWindow')) {
     dawn = new Dawn()
   }
+
+  // data change events
+  store.observer(() => {
+    if (store('windows.dash.showing')) {
+      dash.show()
+    } else {
+      dash.hide()
+      windows.tray.focus()
+    }
+  })
+  store.observer(() => broadcast('permissions', JSON.stringify(store('permissions'))))
+  store.observer(() => {
+    const displaySummonShortcut = store('main.shortcuts.altSlash')
+    if (displaySummonShortcut) {
+      globalShortcut.unregister('Alt+/')
+      globalShortcut.register('Alt+/', () => app.toggle())
+    } else {
+      globalShortcut.unregister('Alt+/')
+    }
+    if (tray?.isReady()) {
+      systemTray.setContextMenu(tray.isVisible() ? 'hide' : 'show', displaySummonShortcut)
+    }
+  })
 }
 
 const send = (id: string, channel: string, ...args: string[]) => {
@@ -486,8 +514,6 @@ const broadcast = (channel: string, ...args: string[]) => {
   frameManager.broadcast(channel, args)
 }
 
-// Data Change Events
-store.observer(() => broadcast('permissions', JSON.stringify(store('permissions'))))
 store.api.feed((_state, actions) => {
   actions.forEach((action) => {
     action.updates.forEach((update) => {
@@ -497,7 +523,7 @@ store.api.feed((_state, actions) => {
 })
 
 export default {
-  toggleTray: () => {
+  toggleTray() {
     tray.toggle()
   },
   showTray() {

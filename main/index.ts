@@ -320,30 +320,6 @@ app.on('ready', () => {
 
     if (filePath.startsWith(appOrigin)) cb({ path: filePath }) // eslint-disable-line
   })
-
-  store.observer(() => {
-    if (store('windows.dash.showing')) {
-      windows.showDash()
-    } else {
-      windows.hideDash()
-      windows.focusTray()
-    }
-  })
-  store.observer(() => {
-    if (!store('windows.dawn.showing')) {
-      windows.hideDawn()
-      windows.focusTray()
-    }
-  })
-  store.observer(() => {
-    const altSlash = store('main.shortcuts.altSlash')
-    if (altSlash) {
-      globalShortcut.unregister('Alt+/')
-      globalShortcut.register('Alt+/', () => windows.toggleTray())
-    } else {
-      globalShortcut.unregister('Alt+/')
-    }
-  })
 })
 
 ipcMain.on('tray:action', (e, action, ...args) => {
