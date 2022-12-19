@@ -30,22 +30,28 @@ const GasDisplay = ({ maxFeePerGas }) => {
   )
 }
 
+const FeeDisplay = ({ fee }) => <DisplayValue type='fiat' value={fee} currencySymbol='$' />
+const FeeRange = ({ max, min }) => (
+  <>
+    <FeeDisplay fee={min} />
+    <span>{'-'}</span>
+    <FeeDisplay fee={max} />
+  </>
+)
+
 const USDEstimateDisplay = ({ minFee, maxFee, nativeCurrency }) => {
-  const { value: maxFeeValue, approximationSymbol: maxFeeApproximation } = maxFee.fiat()
+  const { value: maxFeeValue, displayValue, approximationSymbol: maxFeeApproximation } = maxFee.fiat()
   const displayMaxFeeWarning = maxFeeValue > FEE_WARNING_THRESHOLD_USD
+  const maxFeeIsUnknownValue = displayValue === '?'
 
   return (
     <div data-testid='usd-estimate-display' className='clusterTag'>
       <div className={`_txFeeValueDefault${displayMaxFeeWarning ? ' _txFeeValueDefaultWarn' : ''}`}>
-        <span>{'≈'}</span>
-        {maxFeeApproximation === '<' ? (
-          <DisplayValue type='fiat' value={maxFee} currencySymbol='$' />
+        <span>{maxFeeIsUnknownValue ? '=' : '≈'}</span>
+        {maxFeeApproximation === '<' || maxFeeIsUnknownValue ? (
+          <FeeDisplay fee={maxFee} />
         ) : (
-          <>
-            <DisplayValue type='fiat' value={minFee} currencySymbol='$' />
-            <span>{'-'}</span>
-            <DisplayValue type='fiat' value={maxFee} currencySymbol='$' />
-          </>
+          <FeeRange max={maxFee} min={minFee} />
         )}
         <span>{`in ${nativeCurrency.symbol}`}</span>
       </div>

@@ -69,7 +69,7 @@ class TxSending extends React.Component {
                   </div>
                 </ClusterValue>
                 <ClusterValue>
-                  <span className='_txMainTransferringEq'>{'≈'}</span>
+                  <span className='_txMainTransferringEq'>{isTestnet ? '=' : '≈'}</span>
                   <DisplayValue
                     type='fiat'
                     value={amount}

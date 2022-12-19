@@ -102,4 +102,18 @@ describe('usd estimate display', () => {
 
     expect(baseFeeInput.textContent).toBe('≈$5.88-$11.18in MATIC')
   })
+
+  it('renders an unknown value for a testnet', () => {
+    store.updateNetwork(
+      { id: 137, type: 'ethereum', explorer: '', symbol: 'MATIC', name: '' },
+      { id: 137, type: 'ethereum', explorer: '', symbol: 'MATIC', name: '', isTestnet: true }
+    )
+    req.data.type = '0x0'
+    req.data.gasPrice = addHexPrefix((5e14).toString(16))
+
+    const { getByTestId } = setupComponent(<TxFee req={req} />)
+    const baseFeeInput = getByTestId('usd-estimate-display')
+
+    expect(baseFeeInput.textContent).toBe('=$?in MATIC')
+  })
 })
