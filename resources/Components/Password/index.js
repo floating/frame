@@ -4,9 +4,15 @@ import zxcvbn from 'zxcvbn'
 
 import { debounce } from '../../utils'
 
+const NO_PASSWORD_ENTERED = 'Enter password'
+
 const PasswordInput = ({ getError, next, title, buttonText }) => {
-  const [error, setError] = useState('Enter password')
+  const [error, setError] = useState(NO_PASSWORD_ENTERED)
   const inputRef = useRef(null)
+
+  const resetState = () => setError(NO_PASSWORD_ENTERED)
+
+  const handleSubmit = (e) => next(e.target.value)
 
   const validateInput = debounce((e) => {
     const value = e.target.value
@@ -14,20 +20,6 @@ const PasswordInput = ({ getError, next, title, buttonText }) => {
     const err = getError(value)
     setError(err || '')
   }, 300)
-
-  const resetState = () => {
-    setError('Enter password')
-  }
-
-  const handleSubmit = () => {
-    const {
-      current: { value }
-    } = inputRef
-    const passwordError = getError(value)
-    if (passwordError) return setError(passwordError)
-    resetState()
-    next(value)
-  }
 
   const buttonClasses = ['addAccountItemOptionSubmit'].concat(error ? ['error'] : []).join(' ')
 
@@ -38,15 +30,16 @@ const PasswordInput = ({ getError, next, title, buttonText }) => {
       </div>
       <div className='addAccountItemOptionInputPhrase addAccountItemOptionInputPassword'>
         <div className='addAccountItemOptionSubtitle'>password must be 12 characters or longer</div>
-        <form onSubmit={handleSubmit}>
-          <input
-            data-testid='createPasswordInput'
-            type='password'
-            tabIndex='-1'
-            ref={inputRef}
-            onChange={validateInput}
-          />
-        </form>
+        <input
+          data-testid='createPasswordInput'
+          type='password'
+          tabIndex='-1'
+          ref={inputRef}
+          onChange={validateInput}
+          onKeyDown={(e) => {
+            if (!error && e.key === 'Enter') handleSubmit(e)
+          }}
+        />
       </div>
 
       <div
