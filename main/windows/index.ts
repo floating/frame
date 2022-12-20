@@ -205,11 +205,11 @@ export class Tray {
           dash.show()
         }, 300)
       }
+      setTimeout(() => {
+        onboard.show()
+      }, 600)
     }
     ipcMain.on('tray:ready', this.readyHandler)
-    setTimeout(() => {
-      onboard.show()
-    }, 600)
     initTrayWindow()
   }
 
