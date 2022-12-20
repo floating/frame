@@ -128,13 +128,14 @@ export function AddHotAccount({
   const { secret, password, err } = accountData
   const viewIndex = err ? 3 : !secret ? 0 : !password ? 1 : 2
 
-  const onCreate = (secret) => (password) =>
+  const onCreate = (password) => {
     navForward(newAccountType, {
       secret,
       password
     })
+  }
 
-  const onConfirm = (secret) => (password) =>
+  const onConfirm = (password) =>
     link.rpc(createSignerMethod, secret, password, (err, signer) => {
       if (err) {
         return navForward(newAccountType, {
@@ -151,8 +152,8 @@ export function AddHotAccount({
 
   const steps = [
     <EnterSecret key={0} {...{ isValidSecret, title, newAccountType }} />,
-    <CreatePassword key={1} onCreate={onCreate(secret)} />,
-    <ConfirmPassword key={2} password={password} onConfirm={onConfirm(secret)} />,
+    <CreatePassword key={1} onCreate={onCreate} />,
+    <ConfirmPassword key={2} password={password} onConfirm={onConfirm} />,
     <Error key={3} {...{ err }} />
   ]
 

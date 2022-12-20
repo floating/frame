@@ -10,13 +10,21 @@ const PasswordInput = ({ getError, next, title, buttonText }) => {
   const [error, setError] = useState(NO_PASSWORD_ENTERED)
   const inputRef = useRef(null)
 
-  const resetState = () => setError(NO_PASSWORD_ENTERED)
+  const resetError = () => setError(NO_PASSWORD_ENTERED)
 
-  const handleSubmit = (e) => next(e.target.value)
+  const clear = () => {
+    resetError()
+    inputRef.current.value = ''
+  }
+
+  const handleSubmit = () => {
+    next(inputRef.current.value)
+    setTimeout(clear, 200)
+  }
 
   const validateInput = debounce((e) => {
     const value = e.target.value
-    if (!value) return resetState()
+    if (!value) return resetError()
     const err = getError(value)
     setError(err || '')
   }, 300)
@@ -37,7 +45,7 @@ const PasswordInput = ({ getError, next, title, buttonText }) => {
           ref={inputRef}
           onChange={validateInput}
           onKeyDown={(e) => {
-            if (!error && e.key === 'Enter') handleSubmit(e)
+            if (!error && e.key === 'Enter') handleSubmit()
           }}
         />
       </div>
@@ -45,7 +53,7 @@ const PasswordInput = ({ getError, next, title, buttonText }) => {
       <div
         data-testid='createPasswordButton'
         className={buttonClasses}
-        onMouseDown={(e) => !error && handleSubmit(e)}
+        onMouseDown={(e) => !error && handleSubmit()}
       >
         {error || buttonText}
       </div>
