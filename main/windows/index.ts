@@ -110,8 +110,9 @@ const detectMouse = () => {
 }
 
 function initWindow(id: string, opts: Electron.BrowserWindowConstructorOptions) {
+  const urlId = id === 'onboard' ? 'onboard' : capitalize(id)
   const url = enableHMR
-    ? `http://localhost:1234/app/${capitalize(id)}/index.dev.html`
+    ? `http://localhost:1234/app/${urlId}/index.dev.html`
     : new URL(path.join(process.env.BUNDLE_LOCATION, `${id}.html`), 'file:')
 
   windows[id] = createWindow(id, opts)
@@ -443,7 +444,7 @@ app.on('ready', () => {
 })
 
 if (isDev) {
-  app.on('ready', () => {
+  app.once('ready', () => {
     globalShortcut.register('CommandOrControl+R', () => {
       Object.keys(windows).forEach((win) => {
         windows[win].reload()

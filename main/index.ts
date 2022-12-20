@@ -339,7 +339,10 @@ app.on('ready', () => {
     const altSlash = store('main.shortcuts.altSlash')
     if (altSlash) {
       globalShortcut.unregister('Alt+/')
-      globalShortcut.register('Alt+/', () => windows.toggleTray())
+      globalShortcut.register('Alt+/', () => {
+        windows.toggleTray()
+        windows.send('onboard', 'main:flex', 'shortcutActivated')
+      })
     } else {
       globalShortcut.unregister('Alt+/')
     }
