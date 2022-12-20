@@ -7,6 +7,7 @@ const Chains = ({ nextSlide, prevSlide }) => {
   useEffect(() => {
     link.send('tray:action', 'navDash', { view: 'accounts', data: {} })
   })
+
   return (
     <Slide>
       <SlideTitle>Accounts</SlideTitle>
