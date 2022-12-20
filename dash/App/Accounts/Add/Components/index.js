@@ -17,7 +17,7 @@ const navForward = async (newAccountType, accountData) =>
 
 const removeLineBreaks = (str) => str.replace(/(\r\n|\n|\r)/gm, '')
 
-function AddHotAccountWrapper({ children, title, svgName, summary, intro }) {
+function AddHotAccountWrapper({ children, title, svgName, summary, intro, index }) {
   return (
     <div className={'addAccountItem addAccountItemSmart addAccountItemAdding'}>
       <div className='addAccountItemBar addAccountItemHot' />
@@ -35,23 +35,9 @@ function AddHotAccountWrapper({ children, title, svgName, summary, intro }) {
           <div className='addAccountItemSummary'>{summary}</div>
         </div>
         <div className='addAccountItemOption'>
-          <div
-            className='addAccountItemOptionIntro'
-            onMouseDown={() => {
-              this.adding()
-              setTimeout(
-                () =>
-                  link.send('tray:action', 'navDash', {
-                    view: 'notify',
-                    data: { notify: 'hotAccountWarning', notifyData: {} }
-                  }),
-                800
-              )
-            }}
-          >
-            {intro}
+          <div className='addAccountItemOptionSetup' style={{ transform: `translateX(-${100 * index}%)` }}>
+            <div className='addAccountItemOptionSetupFrames'>{children}</div>
           </div>
-          <div className='addAccountItemOptionSetupFrames'>{children}</div>
         </div>
         <div className='addAccountItemFooter' />
       </div>
@@ -83,7 +69,7 @@ function EnterSecret({ newAccountType, isValidSecret, title }) {
   }
 
   return (
-    <div style={{ textAlign: 'center', width: '100%' }} className='addAccountItemOptionSetupFrame'>
+    <div className='addAccountItemOptionSetupFrame'>
       <div data-testid='addHotAccountSecretTitle' className='addAccountItemOptionTitle'>
         {title}
       </div>
@@ -140,11 +126,14 @@ export function AddHotAccount({
   newAccountType,
   isValidSecret
 }) {
+  const { secret, password } = accountData
   const onCreate = (secret) => (password) =>
     navForward(newAccountType, {
       secret,
       password
     })
+
+  const [index, setIndex] = useState(0)
 
   const onConfirm = (secret) => (password) =>
     link.rpc(createSignerMethod, secret, password, (err, signer) => {
@@ -161,12 +150,29 @@ export function AddHotAccount({
       })
     })
 
+  // const steps = [
+  //   <EnterSecret key={0} {...{ isValidSecret, title, newAccountType }} />,
+  //   <CreatePassword key={1} onCreate={onCreate(secret)} />,
+  //   <ConfirmPassword key={2} password={password} onConfirm={onConfirm(secret)} />
+  // ]
+
+  const steps = [
+    <div onClick={() => setIndex(1)} className='addAccountItemOptionSetupFrame'>
+      <div className='addAccountItemOptionTitle'>Device Name</div>
+    </div>,
+    <div className='addAccountItemOptionSetupFrame'>
+      <div className='addAccountItemOptionTitle'>Slide Two</div>
+    </div>
+  ]
+
   const getCurrentView = ({ secret, password, err }) => {
-    if (err) return <Error {...{ err }} />
-    if (!secret) return <EnterSecret {...{ isValidSecret, title, newAccountType }} />
-    if (!password) return <CreatePassword onCreate={onCreate(secret)} />
-    return <ConfirmPassword password={password} onConfirm={onConfirm(secret)} />
+    if (err) return [3, <Error {...{ err }} />]
+    if (!secret) return [0, <EnterSecret {...{ isValidSecret, title, newAccountType }} />]
+    if (!password) return [1, <CreatePassword onCreate={onCreate(secret)} />]
+    return [2, <ConfirmPassword password={password} onConfirm={onConfirm(secret)} />]
   }
+
+  //const index = !secret ? 0 : !password ? 1 : 2
 
   return (
     <AddHotAccountWrapper
@@ -174,10 +180,11 @@ export function AddHotAccount({
         title,
         intro,
         summary,
-        svgName
+        svgName,
+        index
       }}
     >
-      {getCurrentView({ ...accountData, createSignerMethod, newAccountType })}
+      {steps}
     </AddHotAccountWrapper>
   )
 }
