@@ -4,9 +4,8 @@ import zxcvbn from 'zxcvbn'
 
 import { debounce } from '../../utils'
 
-function PasswordInput({ getError, next, title, buttonText }) {
-  const [error, setError] = useState(null)
-  const [ready, setReady] = useState(false)
+const PasswordInput = ({ getError, next, title, buttonText }) => {
+  const [error, setError] = useState('Enter password')
   const inputRef = useRef(null)
 
   const debounceInput = useCallback(
@@ -14,12 +13,12 @@ function PasswordInput({ getError, next, title, buttonText }) {
       const {
         current: { value }
       } = inputRef
+      if (!value) return resetState()
       const err = getError(value)
       if (value) {
         setError(err)
-        setReady(!err)
       }
-    }, 300),
+    }, 500),
     [debounce]
   )
 
@@ -32,8 +31,7 @@ function PasswordInput({ getError, next, title, buttonText }) {
   }, [])
 
   const resetState = () => {
-    setReady(false)
-    setError('')
+    setError('Enter password')
   }
 
   const handleSubmit = () => {
@@ -46,47 +44,40 @@ function PasswordInput({ getError, next, title, buttonText }) {
     next(value)
   }
 
+  const buttonClasses = ['addAccountItemOptionSubmit'].concat(error ? ['error'] : []).join(' ')
+
   return (
-    <div style={{ textAlign: 'center', width: '100%' }} className='addAccountItemOptionSetupFrame'>
+    <div className='addAccountItemOptionSetupFrame'>
       <div data-testid='createPasswordTitle' className='addAccountItemOptionTitle'>
         {title}
       </div>
-      {error && (
-        <div data-testid='createPasswordErrorMessage' style={{ color: 'red' }}>
-          {error}
-        </div>
-      )}
       <div className='addAccountItemOptionInputPhrase addAccountItemOptionInputPassword'>
         <div className='addAccountItemOptionSubtitle'>password must be 12 characters or longer</div>
         <form onSubmit={handleSubmit}>
           <input
             data-testid='createPasswordInput'
-            autoFocus
             type='password'
             tabIndex='-1'
             ref={inputRef}
             onChange={() => {
               setError('')
-              setReady(false)
             }}
           />
         </form>
       </div>
-      {/* TODO: Maybe use CSS to make button clearly un-clickable rather than dissappearing? */}
-      {ready && (
-        <div
-          data-testid='createPasswordButton'
-          className={'addAccountItemOptionSubmit'}
-          onMouseDown={handleSubmit}
-        >
-          {buttonText}
-        </div>
-      )}
+
+      <div
+        data-testid='createPasswordButton'
+        className={buttonClasses}
+        onMouseDown={(e) => !error && handleSubmit(e)}
+      >
+        {error || buttonText}
+      </div>
     </div>
   )
 }
 
-export function CreatePassword({ onCreate }) {
+export const CreatePassword = ({ onCreate }) => {
   const title = 'Create Password'
   const buttonText = 'Continue'
 
@@ -104,7 +95,7 @@ export function CreatePassword({ onCreate }) {
   return <PasswordInput {...{ getError, next: onCreate, title, buttonText }} />
 }
 
-export function ConfirmPassword({ password, onConfirm }) {
+export const ConfirmPassword = ({ password, onConfirm }) => {
   const title = 'Confirm Password'
   const buttonText = 'create'
 

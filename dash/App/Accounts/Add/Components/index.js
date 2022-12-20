@@ -17,7 +17,7 @@ const navForward = async (newAccountType, accountData) =>
 
 const removeLineBreaks = (str) => str.replace(/(\r\n|\n|\r)/gm, '')
 
-function AddHotAccountWrapper({ children, title, svgName, summary, intro, index }) {
+const AddHotAccountWrapper = ({ children, title, svgName, summary, intro, index }) => {
   return (
     <div className={'addAccountItem addAccountItemSmart addAccountItemAdding'}>
       <div className='addAccountItemBar addAccountItemHot' />
@@ -45,7 +45,7 @@ function AddHotAccountWrapper({ children, title, svgName, summary, intro, index 
   )
 }
 
-function EnterSecret({ newAccountType, isValidSecret, title }) {
+const EnterSecret = ({ newAccountType, isValidSecret, title }) => {
   const [secret, setSecret] = useState('')
   const [error, setError] = useState(null)
 
@@ -81,7 +81,6 @@ function EnterSecret({ newAccountType, isValidSecret, title }) {
       <div className='addAccountItemOptionInputPhrase'>
         <textarea
           data-testid='addHotAccountSecretTextEntry'
-          autoFocus
           tabIndex='-1'
           value={secret}
           onChange={updateInput}
@@ -99,9 +98,9 @@ function EnterSecret({ newAccountType, isValidSecret, title }) {
   )
 }
 
-function Error({ err }) {
+const Error = ({ err }) => {
   return (
-    <div style={{ textAlign: 'center', width: '100%' }} className='addAccountItemOptionSetupFrame'>
+    <div className='addAccountItemOptionSetupFrame'>
       <>
         <div className='addAccountItemOptionTitle'>{err}</div>
         <div
@@ -126,14 +125,14 @@ export function AddHotAccount({
   newAccountType,
   isValidSecret
 }) {
-  const { secret, password } = accountData
+  const { secret, password, err } = accountData
+  const viewIndex = err ? 3 : !secret ? 0 : !password ? 1 : 2
+
   const onCreate = (secret) => (password) =>
     navForward(newAccountType, {
       secret,
       password
     })
-
-  const [index, setIndex] = useState(0)
 
   const onConfirm = (secret) => (password) =>
     link.rpc(createSignerMethod, secret, password, (err, signer) => {
@@ -150,29 +149,12 @@ export function AddHotAccount({
       })
     })
 
-  // const steps = [
-  //   <EnterSecret key={0} {...{ isValidSecret, title, newAccountType }} />,
-  //   <CreatePassword key={1} onCreate={onCreate(secret)} />,
-  //   <ConfirmPassword key={2} password={password} onConfirm={onConfirm(secret)} />
-  // ]
-
   const steps = [
-    <div onClick={() => setIndex(1)} className='addAccountItemOptionSetupFrame'>
-      <div className='addAccountItemOptionTitle'>Device Name</div>
-    </div>,
-    <div className='addAccountItemOptionSetupFrame'>
-      <div className='addAccountItemOptionTitle'>Slide Two</div>
-    </div>
+    <EnterSecret key={0} {...{ isValidSecret, title, newAccountType }} />,
+    <CreatePassword key={1} onCreate={onCreate(secret)} />,
+    <ConfirmPassword key={2} password={password} onConfirm={onConfirm(secret)} />,
+    <Error key={3} {...{ err }} />
   ]
-
-  const getCurrentView = ({ secret, password, err }) => {
-    if (err) return [3, <Error {...{ err }} />]
-    if (!secret) return [0, <EnterSecret {...{ isValidSecret, title, newAccountType }} />]
-    if (!password) return [1, <CreatePassword onCreate={onCreate(secret)} />]
-    return [2, <ConfirmPassword password={password} onConfirm={onConfirm(secret)} />]
-  }
-
-  //const index = !secret ? 0 : !password ? 1 : 2
 
   return (
     <AddHotAccountWrapper
@@ -181,7 +163,7 @@ export function AddHotAccount({
         intro,
         summary,
         svgName,
-        index
+        index: viewIndex
       }}
     >
       {steps}
