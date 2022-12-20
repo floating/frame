@@ -48,27 +48,27 @@ describe('gas display', () => {
     const { getByTestId } = setupComponent(<TxFee req={req} />)
     const baseFeeInput = getByTestId('gas-display')
 
-    expect(baseFeeInput.textContent).toBe('12.369Gwei')
+    expect(baseFeeInput.textContent).toBe('12.36Gwei')
   })
 
-  it('renders a total gas price of more than 1 thousand wei in gwei', () => {
+  it('renders a total gas price of more than 10 million wei in gwei', () => {
     req.data.type = '0x0'
-    req.data.gasPrice = addHexPrefix((945e3).toString(16))
+    req.data.gasPrice = addHexPrefix((10e6).toString(16))
 
     const { getByTestId } = setupComponent(<TxFee req={req} />)
     const baseFeeInput = getByTestId('gas-display')
 
-    expect(baseFeeInput.textContent).toBe('0.000945Gwei')
+    expect(baseFeeInput.textContent).toBe('0.01Gwei')
   })
 
-  it('renders a total gas price of less than 1 thousand wei', () => {
+  it('renders a total gas price of less than 10 million wei in wei', () => {
     req.data.type = '0x0'
-    req.data.gasPrice = addHexPrefix((945).toString(16))
+    req.data.gasPrice = addHexPrefix((9999999).toString(16))
 
     const { getByTestId } = setupComponent(<TxFee req={req} />)
     const baseFeeInput = getByTestId('gas-display')
 
-    expect(baseFeeInput.textContent).toBe('945Wei')
+    expect(baseFeeInput.textContent).toBe('9,999,999Wei')
   })
 })
 
