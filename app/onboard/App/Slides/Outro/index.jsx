@@ -8,7 +8,7 @@ const Outro = ({ nextSlide, prevSlide }) => {
       <SlideBody>
         <div>
           We're dedicated to pushing the boundaries of web3. We encourage you to continue exploring the
-          endless possibilities of dapps and the web3 ecosyste -- Frame will be here to assist you along the
+          endless possibilities of dapps and the web3 ecosystem -- Frame will be here to assist you along the
           way.
         </div>
       </SlideBody>
