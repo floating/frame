@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Menu, KeyboardEvent, Rectangle, Tray as ElectronTray } from 'electron'
+import { app, screen, BrowserWindow, Menu, KeyboardEvent, Rectangle, Tray as ElectronTray } from 'electron'
 import path from 'path'
 import { capitalize } from '../../resources/utils'
 import store from '../store'
@@ -20,23 +20,17 @@ export class SystemTray {
   }
 
   init(mainWindow: BrowserWindow) {
-    // Screen can only be imported once the app is ready
-    ;(async () => {
-      const { screen } = await import('electron')
-      // Electron Tray can only be instantiated when the app is ready
-      this.electronTray = new ElectronTray(
-        path.join(__dirname, isMacOS ? './IconTemplate.png' : './Icon.png')
-      )
-      this.electronTray.on('click', (_event: KeyboardEvent, bounds: Rectangle) => {
-        const mainWindowBounds = mainWindow.getBounds()
-        const currentDisplay = screen.getDisplayMatching(bounds)
-        const trayClickDisplay = screen.getDisplayMatching(mainWindowBounds)
-        if (trayClickDisplay.id !== currentDisplay.id) {
-          this.setContextMenu('show', { switchScreen: true })
-        }
-        this.clickHandlers.click()
-      })
-    })()
+    // Electron Tray can only be instantiated when the app is ready
+    this.electronTray = new ElectronTray(path.join(__dirname, isMacOS ? './IconTemplate.png' : './Icon.png'))
+    this.electronTray.on('click', (_event: KeyboardEvent, bounds: Rectangle) => {
+      const mainWindowBounds = mainWindow.getBounds()
+      const currentDisplay = screen.getDisplayMatching(bounds)
+      const trayClickDisplay = screen.getDisplayMatching(mainWindowBounds)
+      if (trayClickDisplay.id !== currentDisplay.id) {
+        this.setContextMenu('show', { switchScreen: true })
+      }
+      this.clickHandlers.click()
+    })
   }
 
   setContextMenu(
