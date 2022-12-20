@@ -61,6 +61,7 @@ class Requests extends React.Component {
             }
             link.send('nav:forward', 'panel', crumb)
           }}
+          style={reqCount ? { background: 'var(--ghostA)' } : {}}
         >
           <div className={'requestPreviewContent'}>
             <div className={'requestPreviewContentTitle'}>
@@ -74,7 +75,10 @@ class Requests extends React.Component {
             </div>
           </div>
           <div className={'requestsPreviewArrow'}>
-            <div className={'requestsPreviewArrow1'} />
+            <div
+              className={'requestsPreviewArrow1'}
+              style={reqCount ? { background: 'var(--ghostB)' } : {}}
+            />
           </div>
           <div className={'requestsPreviewOverlay'} style={reqCount ? { opacity: '1' } : { opacity: '0' }} />
         </div>
