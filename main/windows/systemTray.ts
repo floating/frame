@@ -1,13 +1,13 @@
-import { app, Menu, Tray as ElectronTray } from 'electron'
+import { app, BrowserWindow, Menu, KeyboardEvent, Rectangle, Point, Tray as ElectronTray } from 'electron'
 import path from 'path'
 import { capitalize } from '../../resources/utils'
 import store from '../store'
 
 const isMacOS = process.platform === 'darwin'
 
-type SystemTrayEventHandlers = {
+export type SystemTrayEventHandlers = {
   click: () => void
-  clickShow: () => void
+  clickShow: (switchScreen?: boolean) => void
   clickHide: () => void
 }
 
@@ -19,13 +19,30 @@ export class SystemTray {
     this.clickHandlers = clickHandlers
   }
 
-  init() {
-    // Electron Tray can only be instantiated when the app is ready
-    this.electronTray = new ElectronTray(path.join(__dirname, isMacOS ? './IconTemplate.png' : './Icon.png'))
-    this.electronTray.on('click', this.clickHandlers.click)
+  init(mainWindow: BrowserWindow) {
+    // Screen can only be imported once the app is ready
+    ;(async () => {
+      const { screen } = await import('electron')
+      // Electron Tray can only be instantiated when the app is ready
+      this.electronTray = new ElectronTray(
+        path.join(__dirname, isMacOS ? './IconTemplate.png' : './Icon.png')
+      )
+      this.electronTray.on('click', (_event: KeyboardEvent, bounds: Rectangle, position: Point) => {
+        const mainWindowBounds = mainWindow.getBounds()
+        const currentDisplay = screen.getDisplayMatching(bounds)
+        const trayClickDisplay = screen.getDisplayMatching(mainWindowBounds)
+        if (trayClickDisplay.id !== currentDisplay.id) {
+          this.setContextMenu('show', { switchScreen: true })
+        }
+        this.clickHandlers.click()
+      })
+    })()
   }
 
-  setContextMenu(type: string, displaySummonShortcut: boolean = store('main.shortcuts.altSlash')) {
+  setContextMenu(
+    type: string,
+    { displaySummonShortcut = store('main.shortcuts.altSlash'), switchScreen = false }
+  ) {
     const separatorMenuItem = {
       label: 'Frame',
       click: () => {},
@@ -39,7 +56,9 @@ export class SystemTray {
     const eventName = `click${capitalize(type)}`
     const actionMenuItem: Electron.MenuItemConstructorOptions = {
       label,
-      click: () => this.clickHandlers[eventName as keyof typeof this.clickHandlers](),
+      click: () => {
+        this.clickHandlers[eventName as keyof typeof this.clickHandlers](switchScreen)
+      },
       toolTip: `${label} Frame`
     }
     const quitMenuItem = {
@@ -54,7 +73,11 @@ export class SystemTray {
 
     const menu = Menu.buildFromTemplate([actionMenuItem, separatorMenuItem, quitMenuItem])
 
-    setTimeout(() => this.electronTray?.setContextMenu(menu), isMacOS ? 0 : 200)
+    if (switchScreen) {
+      this.electronTray?.setContextMenu(menu)
+    } else {
+      setTimeout(() => this.electronTray?.setContextMenu(menu), isMacOS ? 0 : 200)
+    }
   }
 
   closeContextMenu() {

@@ -15,7 +15,7 @@ import { hexToInt } from '../../resources/utils'
 import store from '../store'
 import FrameManager from './frames'
 import { createWindow } from './window'
-import { SystemTray } from './systemTray'
+import { SystemTray, SystemTrayEventHandlers } from './systemTray'
 
 type Windows = { [key: string]: BrowserWindow }
 
@@ -45,9 +45,9 @@ const app = {
       dash.hide('app')
     }
   },
-  show: () => {
+  show: (switchScreen?: boolean) => {
     tray.show()
-    if (dash.hiddenByAppHide) {
+    if (dash.hiddenByAppHide || switchScreen) {
       dash.show()
     }
   },
@@ -56,14 +56,14 @@ const app = {
     app[eventName as keyof typeof app]()
   }
 }
-const systemTrayEventHandlers = {
+const systemTrayEventHandlers: SystemTrayEventHandlers = {
   click: () => {
     if (isWindows) {
       app.toggle()
     }
   },
   clickHide: () => app.hide(),
-  clickShow: () => app.show()
+  clickShow: (switchScreen = false) => app.show(switchScreen)
 }
 const systemTray = new SystemTray(systemTrayEventHandlers)
 const getDisplaySummonShortcut = () => store('main.shortcuts.altSlash')
@@ -135,13 +135,13 @@ function initTrayWindow() {
     if (process.platform === 'win32') {
       systemTray.closeContextMenu()
     }
-    systemTray.setContextMenu('hide', getDisplaySummonShortcut())
+    systemTray.setContextMenu('hide', { displaySummonShortcut: getDisplaySummonShortcut() })
   })
   windows.tray.on('hide', () => {
     if (process.platform === 'win32') {
       systemTray.closeContextMenu()
     }
-    systemTray.setContextMenu('show', getDisplaySummonShortcut())
+    systemTray.setContextMenu('show', { displaySummonShortcut: getDisplaySummonShortcut() })
   })
 
   setTimeout(() => {
@@ -196,8 +196,8 @@ export class Tray {
     })
     this.readyHandler = () => {
       this.ready = true
-      systemTray.init()
-      systemTray.setContextMenu('hide', getDisplaySummonShortcut())
+      systemTray.init(windows.tray)
+      systemTray.setContextMenu('hide', { displaySummonShortcut: getDisplaySummonShortcut() })
       if (showOnReady) {
         store.trayOpen(true)
       }
@@ -253,7 +253,7 @@ export class Tray {
     if (!windows.tray) {
       return init()
     }
-    if (this.recentDisplayEvent || windows.tray?.isVisible()) {
+    if (this.recentDisplayEvent) {
       return
     }
     clearTimeout(this.recentDisplayEventTimeout)
@@ -496,7 +496,7 @@ const init = () => {
       globalShortcut.unregister('Alt+/')
     }
     if (tray?.isReady()) {
-      systemTray.setContextMenu(tray.isVisible() ? 'hide' : 'show', displaySummonShortcut)
+      systemTray.setContextMenu(tray.isVisible() ? 'hide' : 'show', { displaySummonShortcut })
     }
   })
 }
