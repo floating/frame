@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Menu, KeyboardEvent, Rectangle, Point, Tray as ElectronTray } from 'electron'
+import { app, BrowserWindow, Menu, KeyboardEvent, Rectangle, Tray as ElectronTray } from 'electron'
 import path from 'path'
 import { capitalize } from '../../resources/utils'
 import store from '../store'
@@ -27,7 +27,7 @@ export class SystemTray {
       this.electronTray = new ElectronTray(
         path.join(__dirname, isMacOS ? './IconTemplate.png' : './Icon.png')
       )
-      this.electronTray.on('click', (_event: KeyboardEvent, bounds: Rectangle, position: Point) => {
+      this.electronTray.on('click', (_event: KeyboardEvent, bounds: Rectangle) => {
         const mainWindowBounds = mainWindow.getBounds()
         const currentDisplay = screen.getDisplayMatching(bounds)
         const trayClickDisplay = screen.getDisplayMatching(mainWindowBounds)
@@ -56,9 +56,7 @@ export class SystemTray {
     const eventName = `click${capitalize(type)}`
     const actionMenuItem: Electron.MenuItemConstructorOptions = {
       label,
-      click: () => {
-        this.clickHandlers[eventName as keyof typeof this.clickHandlers](switchScreen)
-      },
+      click: () => this.clickHandlers[eventName as keyof typeof this.clickHandlers](switchScreen),
       toolTip: `${label} Frame`
     }
     const quitMenuItem = {
