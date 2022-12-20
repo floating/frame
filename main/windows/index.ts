@@ -489,6 +489,12 @@ const init = () => {
       windows.tray.focus()
     }
   })
+  store.observer(() => {
+    if (!store('windows.onboard.showing')) {
+      onboard.hide()
+      windows.tray.focus()
+    }
+  })
   store.observer(() => broadcast('permissions', JSON.stringify(store('permissions'))))
   store.observer(() => {
     const displaySummonShortcut = store('main.shortcuts.altSlash')
@@ -532,18 +538,6 @@ export default {
   showTray() {
     tray.show()
   },
-  showDash() {
-    dash.show()
-  },
-  hideOnboard() {
-    onboard.hide()
-  },
-  hideDash() {
-    dash.hide()
-  },
-  focusTray() {
-    windows.tray.focus()
-  },
   refocusFrame(frameId: string) {
     frameManager.refocus(frameId)
   },
@@ -559,7 +553,5 @@ export default {
   min(e: IpcMainEvent) {
     windowFromWebContents(e.sender).minimize()
   },
-  send,
-  broadcast,
   init
 }
