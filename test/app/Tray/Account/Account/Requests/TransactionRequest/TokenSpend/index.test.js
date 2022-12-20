@@ -4,7 +4,7 @@ import { addHexPrefix } from '@ethereumjs/util'
 
 import Restore from 'react-restore'
 import store from '../../../../../../../../main/store'
-import ApproveTokenSpendComponent from '../../../../../../../../app/Tray/Account/Account/Requests/TransactionRequest/TokenSpend'
+import ApproveTokenSpendComponent from '../../../../../../../../app/tray/Account/Account/Requests/TransactionRequest/TokenSpend'
 
 jest.mock('../../../../../../../../main/store/persist')
 

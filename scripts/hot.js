@@ -36,7 +36,7 @@ devServerProcess.on('exit', () => {
 ;(async () => {
   try {
     await waitOn({
-      resources: ['http://localhost:1234/app/Tray/index.dev.html'],
+      resources: ['http://localhost:1234/app/tray/index.dev.html'],
       validateStatus: (status) => status === 200
     })
     electronMainProcess = spawn('npm', ['run', 'launch:hot'], {

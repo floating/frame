@@ -6,7 +6,7 @@ import BigNumber from 'bignumber.js'
 import store from '../../../../../../../../main/store'
 import link from '../../../../../../../../resources/link'
 import { advanceTimers, setupComponent } from '../../../../../../../componentSetup'
-import AdjustFeeComponent from '../../../../../../../../app/Tray/Account/Account/Requests/TransactionRequest/AdjustFee'
+import AdjustFeeComponent from '../../../../../../../../app/tray/Account/Account/Requests/TransactionRequest/AdjustFee'
 
 jest.mock('../../../../../../../../main/store/persist')
 jest.mock('../../../../../../../../resources/link', () => ({ rpc: jest.fn() }))

@@ -4,7 +4,7 @@ import Restore from 'react-restore'
 import store from '../../../../../../main/store'
 import link from '../../../../../../resources/link'
 import { setupComponent } from '../../../../../componentSetup'
-import AddAdressComponent from '../../../../../../app/Dash/Accounts/Add/AddAddress'
+import AddAdressComponent from '../../../../../../app/dash/Accounts/Add/AddAddress'
 
 jest.mock('../../../../../../main/store/persist')
 jest.mock('../../../../../../resources/link', () => ({ rpc: jest.fn() }))

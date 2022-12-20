@@ -5,7 +5,7 @@ import { render, waitFor } from '@testing-library/react'
 import { setupComponent, advanceTimers } from '../../../../componentSetup'
 import store from '../../../../../main/store'
 import link from '../../../../../resources/link'
-import AddTokenComponent from '../../../../../app/Dash/Tokens/AddToken'
+import AddTokenComponent from '../../../../../app/dash/Tokens/AddToken'
 
 jest.mock('../../../../../main/store/persist')
 jest.mock('../../../../../resources/link', () => ({
