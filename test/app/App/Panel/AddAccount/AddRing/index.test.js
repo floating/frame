@@ -21,28 +21,35 @@ jest.useFakeTimers()
 const AddRing = Restore.connect(AddRingAccountComponent, store)
 
 describe('entering private key', () => {
-  let user, getByTestId, seedPhraseTextArea, nextButton
+  let user, getByTestId, privateKeyTextArea, nextButton
 
   beforeEach(() => {
     ;({ user, getByTestId } = setupComponent(<AddRing accountData={{}} />))
-    seedPhraseTextArea = getByTestId('addHotAccountSecretTextEntry')
+    privateKeyTextArea = getByTestId('addHotAccountSecretTextEntry')
     nextButton = getByTestId('addHotAccountSecretSubmitButton')
   })
 
-  it('should display the correct title when entering the seed phrase', () => {
+  it('should display the correct title when entering the private key', () => {
     const title = getByTestId('addHotAccountSecretTitle')
     expect(title.textContent).toBe('Private Key')
   })
 
-  it('should show an error message when an incorrect seed phrase is submitted', async () => {
-    await user.type(seedPhraseTextArea, 'INVALID')
+  it('should show an error message when private key is an invalid hex string', async () => {
+    await user.type(privateKeyTextArea, 'INVALID')
     await user.click(nextButton)
     const errorMessage = getByTestId('addHotAccountSecretError')
     expect(errorMessage.textContent).toBe('INVALID PRIVATE KEY')
   })
 
-  it('should update the navigation with the password entry screen when a seed phrase is submitted', async () => {
-    await user.type(seedPhraseTextArea, privateKey)
+  it('should show an error message when private key is invalid', async () => {
+    await user.type(privateKeyTextArea, '0xffffffffffffffffffffffffffffffffbaaedce6af48a03bbfd25e8cd0364148')
+    await user.click(nextButton)
+    const errorMessage = getByTestId('addHotAccountSecretError')
+    expect(errorMessage.textContent).toBe('INVALID PRIVATE KEY')
+  })
+
+  it('should update the navigation with the password entry screen when a private key is submitted', async () => {
+    await user.type(privateKeyTextArea, privateKey)
     await user.click(nextButton)
 
     expect(link.send).toHaveBeenCalledWith('nav:forward', 'dash', {
@@ -59,81 +66,18 @@ describe('entering private key', () => {
 })
 
 describe('entering password', () => {
-  let component, passwordEntryTextArea
-
-  beforeEach(() => {
-    component = setupComponent(<AddRing accountData={{ secret: privateKey }} />)
-    passwordEntryTextArea = component.getByTestId('addHotAccountCreatePasswordInput')
-  })
-
-  it('Should display the correct title when entering the password', () => {
-    expect(component.getByTestId('addHotAccountCreatePasswordTitle').textContent).toBe('Create Password')
-  })
-
-  it('Should not show the `next` button until a valid password is entered', () => {
-    expect(component.queryByTestId('addHotAccountPasswordSubmitButton')).toBeFalsy()
-  })
-
-  it('Should debounce password feedback', async () => {
-    const { user } = component
-    await user.type(passwordEntryTextArea, 'INVALID')
-    expect(component.queryByTestId('addHotAccountCreatePasswordError')).toBeFalsy()
-
-    act(() => {
-      jest.runAllTimers()
-    })
-
-    expect(component.queryByTestId('addHotAccountCreatePasswordError').textContent).toBeTruthy()
-  })
-
-  it('Should show an error when the password is too short', async () => {
-    const { user } = component
-    await user.type(passwordEntryTextArea, 'INVALID')
-
-    act(() => {
-      jest.runAllTimers()
-    })
-
-    expect(component.getByTestId('addHotAccountCreatePasswordError').textContent).toBe(
-      'PASSWORD MUST BE AT LEAST 12 CHARACTERS LONG'
-    )
-  })
-
-  it('Should show the warning when the password is too weak', async () => {
-    const { user } = component
-    await user.type(passwordEntryTextArea, 'aaaaaaaaaaaa')
-
-    act(() => {
-      jest.runAllTimers()
-    })
-
-    expect(component.getByTestId('addHotAccountCreatePasswordError').textContent).toBe(
-      'REPEATS LIKE "AAA" ARE EASY TO GUESS'
-    )
-  })
-
-  it('Should show the continue button when a valid password is entered', async () => {
-    const { user } = component
-    await user.type(passwordEntryTextArea, password)
-
-    act(() => {
-      jest.runAllTimers()
-    })
-
-    expect(component.queryByTestId('addHotAccountCreatePasswordError')).toBeFalsy()
-    expect(component.getByTestId('addHotAccountPasswordSubmitButton').textContent).toBe('Continue')
-  })
-
   it('Should update the navigation to the confirmation screen when a password is submitted', async () => {
-    const { user } = component
-
+    const { user, getByTestId, queryByTestId } = setupComponent(
+      <AddRing accountData={{ secret: privateKey }} />
+    )
+    const passwordEntryTextArea = getByTestId('createPasswordInput')
     await user.type(passwordEntryTextArea, password)
 
     act(() => {
       jest.runAllTimers()
     })
 
-    await user.click(component.queryByTestId('addHotAccountPasswordSubmitButton'))
+    await user.click(queryByTestId('createPasswordButton'))
     expect(link.send).toHaveBeenCalledWith('nav:forward', 'dash', {
       view: 'accounts',
       data: {
@@ -149,47 +93,23 @@ describe('entering password', () => {
 })
 
 describe('confirming password', () => {
-  let component, passwordEntryTextArea
+  let user, getByTestId, queryByTestId, passwordEntryTextArea
 
   beforeEach(() => {
-    component = setupComponent(<AddRing accountData={{ secret: privateKey, password }} />)
-    passwordEntryTextArea = component.getByTestId('addHotAccountCreatePasswordInput')
+    ;({ user, getByTestId, queryByTestId } = setupComponent(
+      <AddRing accountData={{ secret: privateKey, password }} />
+    ))
+    passwordEntryTextArea = getByTestId('createPasswordInput')
   })
 
-  it('Should show an error when the password does not match previously entered password', async () => {
-    const { user } = component
-    await user.type(passwordEntryTextArea, 'DOES_NOT_MATCH')
-    expect(component.queryByTestId('addHotAccountCreatePasswordError')).toBeFalsy()
-
-    act(() => {
-      jest.runAllTimers()
-    })
-
-    expect(component.queryByTestId('addHotAccountCreatePasswordError').textContent).toBeTruthy()
-  })
-
-  it('Should show the create button when a valid password is entered', async () => {
-    const { user } = component
+  it('Should try to create a private key account when a matching password is submitted', async () => {
     await user.type(passwordEntryTextArea, password)
 
     act(() => {
       jest.runAllTimers()
     })
 
-    expect(component.queryByTestId('addHotAccountCreatePasswordError')).toBeFalsy()
-    expect(component.getByTestId('addHotAccountPasswordSubmitButton').textContent).toBe('create')
-  })
-
-  it('Should try to create an account when a matching password is submitted', async () => {
-    const { user } = component
-
-    await user.type(passwordEntryTextArea, password)
-
-    act(() => {
-      jest.runAllTimers()
-    })
-
-    await user.click(component.queryByTestId('addHotAccountPasswordSubmitButton'))
+    await user.click(queryByTestId('createPasswordButton'))
     expect(link.rpc).toHaveBeenCalledWith('createFromPrivateKey', privateKey, password, expect.any(Function))
   })
 
@@ -201,15 +121,13 @@ describe('confirming password', () => {
       cb(null, { id: '1234' })
     })
 
-    const { user } = component
-
     await user.type(passwordEntryTextArea, password)
 
     act(() => {
       jest.runAllTimers()
     })
 
-    await user.click(component.queryByTestId('addHotAccountPasswordSubmitButton'))
+    await user.click(queryByTestId('createPasswordButton'))
     expect(link.send).toHaveBeenCalledWith('nav:back', 'dash', 4)
   })
 
@@ -221,15 +139,13 @@ describe('confirming password', () => {
       cb(null, { id: '1234' })
     })
 
-    const { user } = component
-
     await user.type(passwordEntryTextArea, password)
 
     act(() => {
       jest.runAllTimers()
     })
 
-    await user.click(component.queryByTestId('addHotAccountPasswordSubmitButton'))
+    await user.click(queryByTestId('createPasswordButton'))
     expect(link.send).toHaveBeenCalledWith('nav:forward', 'dash', {
       view: 'expandedSigner',
       data: { signer: '1234' }

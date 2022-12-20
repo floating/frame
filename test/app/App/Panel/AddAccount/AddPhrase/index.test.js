@@ -59,73 +59,11 @@ describe('entering seed phrase', () => {
 })
 
 describe('entering password', () => {
-  let component, passwordEntryTextArea
-
-  beforeEach(() => {
-    component = setupComponent(<AddPhrase accountData={{ secret: phrase }} />)
-    passwordEntryTextArea = component.getByTestId('addHotAccountCreatePasswordInput')
-  })
-
-  it('Should display the correct title when entering the password', () => {
-    expect(component.getByTestId('addHotAccountCreatePasswordTitle').textContent).toBe('Create Password')
-  })
-
-  it('Should not show the `next` button until a valid password is entered', () => {
-    expect(component.queryByTestId('addHotAccountPasswordSubmitButton')).toBeFalsy()
-  })
-
-  it('Should debounce password feedback', async () => {
-    const { user } = component
-    await user.type(passwordEntryTextArea, 'INVALID')
-    expect(component.queryByTestId('addHotAccountCreatePasswordError')).toBeFalsy()
-
-    act(() => {
-      jest.runAllTimers()
-    })
-
-    expect(component.queryByTestId('addHotAccountCreatePasswordError').textContent).toBeTruthy()
-  })
-
-  it('Should show an error when the password is too short', async () => {
-    const { user } = component
-    await user.type(passwordEntryTextArea, 'INVALID')
-
-    act(() => {
-      jest.runAllTimers()
-    })
-
-    expect(component.getByTestId('addHotAccountCreatePasswordError').textContent).toBe(
-      'PASSWORD MUST BE AT LEAST 12 CHARACTERS LONG'
-    )
-  })
-
-  it('Should show the warning when the password is too weak', async () => {
-    const { user } = component
-    await user.type(passwordEntryTextArea, 'aaaaaaaaaaaa')
-
-    act(() => {
-      jest.runAllTimers()
-    })
-
-    expect(component.getByTestId('addHotAccountCreatePasswordError').textContent).toBe(
-      'REPEATS LIKE "AAA" ARE EASY TO GUESS'
-    )
-  })
-
-  it('Should show the continue button when a valid password is entered', async () => {
-    const { user } = component
-    await user.type(passwordEntryTextArea, password)
-
-    act(() => {
-      jest.runAllTimers()
-    })
-
-    expect(component.queryByTestId('addHotAccountCreatePasswordError')).toBeFalsy()
-    expect(component.getByTestId('addHotAccountPasswordSubmitButton').textContent).toBe('Continue')
-  })
-
   it('Should update the navigation to the confirmation screen when a password is submitted', async () => {
-    const { user } = component
+    const { user, getByTestId, queryByTestId } = setupComponent(
+      <AddPhrase accountData={{ secret: phrase }} />
+    )
+    const passwordEntryTextArea = getByTestId('createPasswordInput')
 
     await user.type(passwordEntryTextArea, password)
 
@@ -133,7 +71,7 @@ describe('entering password', () => {
       jest.runAllTimers()
     })
 
-    await user.click(component.queryByTestId('addHotAccountPasswordSubmitButton'))
+    await user.click(queryByTestId('createPasswordButton'))
     expect(link.send).toHaveBeenCalledWith('nav:forward', 'dash', {
       view: 'accounts',
       data: {
@@ -153,34 +91,10 @@ describe('confirming password', () => {
 
   beforeEach(() => {
     component = setupComponent(<AddPhrase accountData={{ secret: phrase, password }} />)
-    passwordEntryTextArea = component.getByTestId('addHotAccountCreatePasswordInput')
+    passwordEntryTextArea = component.getByTestId('createPasswordInput')
   })
 
-  it('Should show an error when the password does not match previously entered password', async () => {
-    const { user } = component
-    await user.type(passwordEntryTextArea, 'DOES_NOT_MATCH')
-    expect(component.queryByTestId('addHotAccountCreatePasswordError')).toBeFalsy()
-
-    act(() => {
-      jest.runAllTimers()
-    })
-
-    expect(component.queryByTestId('addHotAccountCreatePasswordError').textContent).toBeTruthy()
-  })
-
-  it('Should show the create button when a valid password is entered', async () => {
-    const { user } = component
-    await user.type(passwordEntryTextArea, password)
-
-    act(() => {
-      jest.runAllTimers()
-    })
-
-    expect(component.queryByTestId('addHotAccountCreatePasswordError')).toBeFalsy()
-    expect(component.getByTestId('addHotAccountPasswordSubmitButton').textContent).toBe('create')
-  })
-
-  it('Should try to create an account when a matching password is submitted', async () => {
+  it('Should try to create seed phrase account when a matching password is submitted', async () => {
     const { user } = component
 
     await user.type(passwordEntryTextArea, password)
@@ -189,7 +103,7 @@ describe('confirming password', () => {
       jest.runAllTimers()
     })
 
-    await user.click(component.queryByTestId('addHotAccountPasswordSubmitButton'))
+    await user.click(component.queryByTestId('createPasswordButton'))
     expect(link.rpc).toHaveBeenCalledWith('createFromPhrase', phrase, password, expect.any(Function))
   })
 
@@ -209,7 +123,7 @@ describe('confirming password', () => {
       jest.runAllTimers()
     })
 
-    await user.click(component.queryByTestId('addHotAccountPasswordSubmitButton'))
+    await user.click(component.queryByTestId('createPasswordButton'))
     expect(link.send).toHaveBeenCalledWith('nav:back', 'dash', 4)
   })
 
@@ -229,7 +143,7 @@ describe('confirming password', () => {
       jest.runAllTimers()
     })
 
-    await user.click(component.queryByTestId('addHotAccountPasswordSubmitButton'))
+    await user.click(component.queryByTestId('createPasswordButton'))
     expect(link.send).toHaveBeenCalledWith('nav:forward', 'dash', {
       view: 'expandedSigner',
       data: { signer: '1234' }
