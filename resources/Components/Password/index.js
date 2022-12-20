@@ -1,5 +1,5 @@
 import React from 'react'
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useRef, useState } from 'react'
 import zxcvbn from 'zxcvbn'
 
 import { debounce } from '../../utils'
@@ -8,27 +8,12 @@ const PasswordInput = ({ getError, next, title, buttonText }) => {
   const [error, setError] = useState('Enter password')
   const inputRef = useRef(null)
 
-  const debounceInput = useCallback(
-    debounce(() => {
-      const {
-        current: { value }
-      } = inputRef
-      if (!value) return resetState()
-      const err = getError(value)
-      if (value) {
-        setError(err)
-      }
-    }, 500),
-    [debounce]
-  )
-
-  useEffect(() => {
-    const element = inputRef.current
-    element.addEventListener('input', debounceInput)
-    return () => {
-      element.removeEventListener('input', debounceInput)
-    }
-  }, [])
+  const validateInput = debounce((e) => {
+    const value = e.target.value
+    if (!value) return resetState()
+    const err = getError(value)
+    setError(err || '')
+  }, 300)
 
   const resetState = () => {
     setError('Enter password')
@@ -59,9 +44,7 @@ const PasswordInput = ({ getError, next, title, buttonText }) => {
             type='password'
             tabIndex='-1'
             ref={inputRef}
-            onChange={() => {
-              setError('')
-            }}
+            onChange={validateInput}
           />
         </form>
       </div>
