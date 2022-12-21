@@ -45,23 +45,10 @@ const app = {
       dash.hide('app')
     }
   },
-  show: (switchScreen?: boolean) => {
-    const dashVisible = dash.isVisible()
-    const forceShowDash = dashVisible && !switchScreen
+  show: () => {
     tray.show()
-    // workaround for lack of workspaces support in Electron
-    // https://github.com/electron/electron/issues/5362
-    windows.tray.setVisibleOnAllWorkspaces(true)
-    windows.tray.focus()
-    windows.tray.setVisibleOnAllWorkspaces(false)
-
-    if (dash.hiddenByAppHide || dashVisible) {
+    if (dash.hiddenByAppHide || dash.isVisible()) {
       dash.show()
-      if (forceShowDash) {
-        windows.dash.setVisibleOnAllWorkspaces(true)
-        windows.dash.focus()
-        windows.dash.setVisibleOnAllWorkspaces(false)
-      }
     }
   },
   toggle: () => {
@@ -76,7 +63,7 @@ const systemTrayEventHandlers: SystemTrayEventHandlers = {
     }
   },
   clickHide: () => app.hide(),
-  clickShow: (switchScreen) => app.show(switchScreen)
+  clickShow: () => app.show()
 }
 const systemTray = new SystemTray(systemTrayEventHandlers)
 const getDisplaySummonShortcut = () => store('main.shortcuts.altSlash')
@@ -276,7 +263,7 @@ export class Tray {
     windows.tray.setAlwaysOnTop(true)
     windows.tray.setVisibleOnAllWorkspaces(true, {
       visibleOnFullScreen: true,
-      skipTransformProcessType: true
+      skipTransformProcessType: false
     })
     windows.tray.setResizable(false) // Keeps height consistent
     const area = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
@@ -298,7 +285,7 @@ export class Tray {
     }
     windows.tray.setVisibleOnAllWorkspaces(false, {
       visibleOnFullScreen: true,
-      skipTransformProcessType: true
+      skipTransformProcessType: false
     })
   }
 
@@ -356,7 +343,7 @@ class Dash {
       windows.dash.setAlwaysOnTop(true)
       windows.dash.setVisibleOnAllWorkspaces(true, {
         visibleOnFullScreen: true,
-        skipTransformProcessType: true
+        skipTransformProcessType: false
       })
       windows.dash.setResizable(false) // Keeps height consistent
       const area = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
@@ -370,7 +357,7 @@ class Dash {
       windows.dash.focus()
       windows.dash.setVisibleOnAllWorkspaces(false, {
         visibleOnFullScreen: true,
-        skipTransformProcessType: true
+        skipTransformProcessType: false
       })
       if (isDev) {
         windows.dash.webContents.openDevTools()

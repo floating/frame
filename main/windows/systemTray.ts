@@ -7,7 +7,7 @@ const isMacOS = process.platform === 'darwin'
 
 export type SystemTrayEventHandlers = {
   click: () => void
-  clickShow: (switchScreen?: boolean) => void
+  clickShow: () => void
   clickHide: () => void
 }
 
@@ -50,7 +50,7 @@ export class SystemTray {
     const eventName = `click${capitalize(type)}`
     const actionMenuItem: Electron.MenuItemConstructorOptions = {
       label,
-      click: () => this.clickHandlers[eventName as keyof typeof this.clickHandlers](switchScreen),
+      click: () => this.clickHandlers[eventName as keyof typeof this.clickHandlers](),
       toolTip: `${label} Frame`
     }
     const quitMenuItem = {
