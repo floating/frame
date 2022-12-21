@@ -1,9 +1,10 @@
 import React from 'react'
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 
 import RingIcon from '../../../../../resources/Components/RingIcon'
 import { ConfirmPassword, CreatePassword } from '../../../../../resources/Components/Password'
 import link from '../../../../../resources/link'
+import { debounce } from '../../../../../resources/utils'
 
 const navForward = async (newAccountType, accountData) =>
   link.send('nav:forward', 'dash', {
@@ -46,25 +47,29 @@ const AddHotAccountWrapper = ({ children, title, svgName, summary, intro, index 
 }
 
 const EnterSecret = ({ newAccountType, isValidSecret, title }) => {
-  const [secret, setSecret] = useState('')
-  const [error, setError] = useState(null)
+  const EMPTY_STATE = `Enter ${title}`
+  const inputRef = useRef(null)
+  const [error, setError] = useState(EMPTY_STATE)
 
-  const updateInput = (e) => {
-    const value = removeLineBreaks(e.target.value)
-    setSecret(value)
+  const resetError = () => setError(EMPTY_STATE)
+
+  const clear = () => {
+    resetError()
+    inputRef.current && (inputRef.current.value = '')
   }
 
-  const handleSubmit = (e) => {
-    if (e.type !== 'mousedown' && e.key !== 'Enter') {
-      return
-    }
+  const validateInput = debounce((e) => {
+    const value = removeLineBreaks(e.target.value)
+    if (!value) return resetError()
+    setError(isValidSecret(value) ? '' : `INVALID ${title.toUpperCase()}`)
+  }, 300)
 
-    if (!isValidSecret(secret)) {
-      return setError(`INVALID ${title.toUpperCase()}`)
-    }
+  const buttonClasses = ['addAccountItemOptionSubmit'].concat(error ? ['error'] : []).join(' ')
 
+  const handleSubmit = () => {
+    setTimeout(clear, 600)
     return navForward(newAccountType, {
-      secret
+      secret: inputRef.current.value
     })
   }
 
@@ -73,22 +78,22 @@ const EnterSecret = ({ newAccountType, isValidSecret, title }) => {
       <div role={'heading'} className='addAccountItemOptionTitle'>
         {title}
       </div>
-      {error && (
-        <div role={'alert'} style={{ color: 'red' }}>
-          {error}
-        </div>
-      )}
       <div className='addAccountItemOptionInputPhrase'>
         <textarea
           role={'textbox'}
+          ref={inputRef}
           tabIndex='-1'
-          value={secret}
-          onChange={updateInput}
-          onKeyDown={handleSubmit}
+          onChange={(e) => {
+            inputRef.current.value = removeLineBreaks(e.target.value)
+            validateInput(e)
+          }}
+          onKeyDown={(e) => {
+            if (!error && e.key === 'Enter') handleSubmit()
+          }}
         />
       </div>
-      <div role='button' className='addAccountItemOptionSubmit' onMouseDown={handleSubmit}>
-        Next
+      <div role='button' className={buttonClasses} onMouseDown={() => !error && handleSubmit()}>
+        {error || 'Next'}
       </div>
     </div>
   )

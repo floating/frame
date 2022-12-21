@@ -22,12 +22,13 @@ const AddRing = Restore.connect(AddRingAccountComponent, store)
 
 describe('entering private key', () => {
   const index = 0
-  let user, getByRole, privateKeyTextArea, nextButton, getAllByRole
+  let user, privateKeyTextArea, nextButton, getAllByRole
 
   beforeEach(() => {
-    ;({ user, getByRole, getAllByRole } = setupComponent(<AddRing accountData={{}} />))
-    privateKeyTextArea = getAllByRole('textbox')[index]
-    nextButton = getAllByRole('button')[index]
+    const component = setupComponent(<AddRing accountData={{}} />)
+    ;({ user, getAllByRole } = component)
+    privateKeyTextArea = component.getAllByRole('textbox')[index]
+    nextButton = component.getAllByRole('button')[index]
   })
 
   it('should display the correct title when entering the private key', () => {
@@ -37,20 +38,31 @@ describe('entering private key', () => {
 
   it('should show an error message when private key is an invalid hex string', async () => {
     await user.type(privateKeyTextArea, 'INVALID')
-    await user.click(nextButton)
-    const errorMessage = getByRole('alert')
-    expect(errorMessage.textContent).toBe('INVALID PRIVATE KEY')
+
+    act(() => {
+      jest.runAllTimers()
+    })
+
+    expect(nextButton.textContent).toBe('INVALID PRIVATE KEY')
   })
 
   it('should show an error message when private key is invalid', async () => {
     await user.type(privateKeyTextArea, '0xffffffffffffffffffffffffffffffffbaaedce6af48a03bbfd25e8cd0364148')
-    await user.click(nextButton)
-    const errorMessage = getByRole('alert')
-    expect(errorMessage.textContent).toBe('INVALID PRIVATE KEY')
+
+    act(() => {
+      jest.runAllTimers()
+    })
+
+    expect(nextButton.textContent).toBe('INVALID PRIVATE KEY')
   })
 
   it('should update the navigation with the password entry screen when a private key is submitted', async () => {
     await user.type(privateKeyTextArea, privateKey)
+
+    act(() => {
+      jest.runAllTimers()
+    })
+
     await user.click(nextButton)
 
     expect(link.send).toHaveBeenCalledWith('nav:forward', 'dash', {

@@ -22,12 +22,13 @@ const AddPhrase = Restore.connect(AddPhraseAccountComponent, store)
 
 describe('entering seed phrase', () => {
   const index = 0
-  let user, getByRole, seedPhraseTextArea, nextButton, getAllByRole
+  let user, seedPhraseTextArea, nextButton, getAllByRole
 
   beforeEach(() => {
-    ;({ user, getByRole, getAllByRole } = setupComponent(<AddPhrase accountData={{}} />))
-    seedPhraseTextArea = getAllByRole('textbox')[index]
-    nextButton = getAllByRole('button')[index]
+    const component = setupComponent(<AddPhrase accountData={{}} />)
+    ;({ user, getAllByRole } = component)
+    seedPhraseTextArea = component.getAllByRole('textbox')[index]
+    nextButton = component.getAllByRole('button')[index]
   })
 
   it('should display the correct title when entering the seed phrase', () => {
@@ -37,13 +38,21 @@ describe('entering seed phrase', () => {
 
   it('should show an error message when an incorrect seed phrase is submitted', async () => {
     await user.type(seedPhraseTextArea, 'INVALID')
-    await user.click(nextButton)
-    const errorMessage = getByRole('alert')
-    expect(errorMessage.textContent).toBe('INVALID SEED PHRASE')
+
+    act(() => {
+      jest.runAllTimers()
+    })
+
+    expect(nextButton.textContent).toBe('INVALID SEED PHRASE')
   })
 
   it('should update the navigation with the password entry screen when a seed phrase is submitted', async () => {
     await user.type(seedPhraseTextArea, phrase)
+
+    act(() => {
+      jest.runAllTimers()
+    })
+
     await user.click(nextButton)
 
     expect(link.send).toHaveBeenCalledWith('nav:forward', 'dash', {
