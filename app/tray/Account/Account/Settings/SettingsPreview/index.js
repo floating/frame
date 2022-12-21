@@ -3,6 +3,8 @@ import Restore from 'react-restore'
 import link from '../../../../../../resources/link'
 import svg from '../../../../../../resources/svg'
 
+import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../../resources/Components/Cluster'
+
 // import Verify from '../Verify'
 
 class Settings extends React.Component {
@@ -41,89 +43,82 @@ class Settings extends React.Component {
   }
 
   render() {
+    //Cluster, ClusterRow, ClusterValue
     const account = this.store('main.accounts', this.props.account)
     return (
       <div ref={this.moduleRef}>
         <div className='balancesBlock'>
-          <div className='moduleHeaderBlank'></div>
-          <div className='moduleMainPermissions'>
-            <div
-              className='moduleItem moduleItemButton'
-              onClick={() => {
-                // const crumb = {
-                //   view: 'expandedModule',
-                //   data: {
-                //     id: this.props.moduleId,
-                //     account: this.props.account
-                //   }
-                // }
-                // link.send('nav:forward', 'panel', crumb)
-                this.setState({ showMore: !this.state.showMore, editName: false })
-              }}
-            >
-              {this.state.showMore ? 'less' : 'more'}
-            </div>
+          <Cluster>
+            <ClusterRow>
+              <ClusterValue
+                onClick={() => {
+                  this.setState({ showMore: !this.state.showMore, editName: false })
+                }}
+              >
+                <div className='moduleItem'>{this.state.showMore ? 'less' : 'more'}</div>
+              </ClusterValue>
+            </ClusterRow>
             {this.state.showMore ? (
               <>
                 {this.state.editName ? (
-                  <div key={'input'} className='moduleItem cardShow moduleItemInput'>
-                    {/* <div className='moduleItemEditNameTitle'>
-                      {'Update Account Name'}
-                    </div> */}
-                    <div className='moduleItemEditName'>
-                      <input
-                        autoFocus
-                        type='text'
-                        tabIndex='-1'
-                        value={this.state.name}
-                        onChange={(e) => {
-                          this.setState({ name: e.target.value })
-                          link.send('tray:renameAccount', this.props.account, e.target.value)
-                        }}
-                        onKeyPress={(e) => {
-                          if (e.key === 'Enter') {
-                            this.setState({ editName: false })
-                          }
-                        }}
-                      />
-                      {/* <div className='moduleItemInputSubmit'>
-                        {svg.check(18)}
-                      </div> */}
-                    </div>
-                  </div>
+                  <ClusterRow>
+                    <ClusterValue pointerEvents={true}>
+                      <div key={'input'} className='moduleItem cardShow moduleItemInput'>
+                        <div className='moduleItemEditName'>
+                          <input
+                            autoFocus
+                            type='text'
+                            tabIndex='-1'
+                            value={this.state.name}
+                            onChange={(e) => {
+                              this.setState({ name: e.target.value })
+                              link.send('tray:renameAccount', this.props.account, e.target.value)
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                this.setState({ editName: false })
+                              }
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </ClusterValue>
+                  </ClusterRow>
                 ) : (
-                  <div
-                    className='moduleItem moduleItemButton'
-                    onClick={() => {
-                      this.setState({ editName: true })
-                    }}
-                  >
-                    {'Update Name'}
-                  </div>
+                  <ClusterRow>
+                    <ClusterValue
+                      onClick={() => {
+                        this.setState({ editName: true })
+                      }}
+                    >
+                      <div className='moduleItem cardShow'>{'Update Name'}</div>
+                    </ClusterValue>
+                  </ClusterRow>
                 )}
-                <div
-                  className='moduleItem moduleItemButton'
-                  style={
-                    this.state.editName
-                      ? {
-                          opacity: 0.3,
-                          pointerEvents: 'none',
-                          color: 'var(--bad)'
-                        }
-                      : {
-                          opacity: 1,
-                          color: 'var(--bad)'
-                        }
-                  }
-                  onClick={() => {
-                    link.rpc('removeAccount', this.props.account, {}, () => {})
-                  }}
-                >
-                  {'Remove Account'}
-                </div>
+                <ClusterRow>
+                  <ClusterValue
+                    onClick={() => {
+                      link.rpc('removeAccount', this.props.account, {}, () => {})
+                    }}
+                    style={
+                      this.state.editName
+                        ? {
+                            opacity: 0.3,
+                            pointerEvents: 'none',
+                            color: 'var(--bad)'
+                          }
+                        : {
+                            opacity: 1,
+                            color: 'var(--bad)'
+                          }
+                    }
+                  >
+                    <div className='moduleItem cardShow'>{'Remove Account'}</div>
+                  </ClusterValue>
+                </ClusterRow>
               </>
             ) : null}
-          </div>
+          </Cluster>
         </div>
       </div>
     )

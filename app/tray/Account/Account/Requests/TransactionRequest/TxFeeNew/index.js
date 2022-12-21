@@ -53,7 +53,7 @@ const USDEstimateDisplay = ({ minFee, maxFee, nativeCurrency }) => {
         ) : (
           <FeeRange max={maxFee} min={minFee} />
         )}
-        <span>{`in ${nativeCurrency.symbol}`}</span>
+        <span className='_txFeeValueCurrency'>{`in ${nativeCurrency.symbol}`}</span>
       </div>
     </div>
   )

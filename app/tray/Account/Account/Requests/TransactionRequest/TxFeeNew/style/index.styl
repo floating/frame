@@ -92,61 +92,72 @@
   margin-left 10px
   font-size 18px
 
-  ._txFeeValueDefault
-    opacity 1
-    display flex
-    align-items center
-    justify-content center
+._txFeeValueDefault
+  opacity 1
+  display flex
+  align-items center
+  justify-content center
+  font-size 14px
+  font-weight 400
+  span
+    padding 4px
 
-  ._txFeeValueDefaultWarn
-    color var(--bad)
+  .displayValueFiat, .displayValueMain
+    padding 1px
+    
+  ._txFeeValueCurrency
+    color var(--mint)
+    font-size 10px
+    font-weight 600
 
-  ._txFeeValueHover
-    position absolute
-    opacity 0
-    top 0
-    left 0
-    bottom 0
-    right 0
-    display flex
-    align-items center
-    justify-content center
+._txFeeValueDefaultWarn
+  color var(--bad)
 
-  ._txFeeETH
-    padding-right 6px
-    opacity 1
-    font-family 'MainFont'
+._txFeeValueHover
+  position absolute
+  opacity 0
+  top 0
+  left 0
+  bottom 0
+  right 0
+  display flex
+  align-items center
+  justify-content center
 
-  ._txFeeETHValue
-    padding-right 0px
-    font-size 18px
+._txFeeETH
+  padding-right 6px
+  opacity 1
+  font-family 'MainFont'
 
-  ._txFeeUSD
-    font-weight 300
-    position relative
-    font-size 13px
+._txFeeETHValue
+  padding-right 0px
+  font-size 18px
 
-  ._txFeeUSDSymbol
-    font-size 11px
+._txFeeUSD
+  font-weight 300
+  position relative
+  font-size 13px
 
-  ._txFeeUSDDescription
-    position relative
-    font-size 11px
-    font-family 'MainFont'
-    padding-left 2px
+._txFeeUSDSymbol
+  font-size 11px
 
-  ._txFeeEq
-    font-size 15px
-    padding 0px 8px 0px 0px
-    display none
+._txFeeUSDDescription
+  position relative
+  font-size 11px
+  font-family 'MainFont'
+  padding-left 2px
+
+._txFeeEq
+  font-size 15px
+  padding 0px 8px 0px 0px
+  display none
 
 
-._txFeeValue:hover
-  ._txFeeValueDefault
-    opacity 0
+._txFeeValueDefault:hover
+  opacity 0
 
-  ._txFeeValueHover
-    opacity 1
+// ._txFeeValueHover:hover
+//   opacity 1
 
 ._txFeeBar:hover
   background var(--ghostB)      

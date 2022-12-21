@@ -169,7 +169,7 @@ export function displayValueData(sourceValue: SourceValue, params: DisplayValueD
       }
     },
     gwei: () => {
-      const value = bn.shiftedBy(-9).decimalPlaces(6, BigNumber.ROUND_FLOOR)
+      const value = bn.shiftedBy(-9).decimalPlaces(2, BigNumber.ROUND_FLOOR)
 
       return {
         value,
