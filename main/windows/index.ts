@@ -45,9 +45,9 @@ const app = {
       dash.hide('app')
     }
   },
-  show: (switchScreen?: boolean) => {
+  show: () => {
     tray.show()
-    if (dash.hiddenByAppHide || (switchScreen && dash.isVisible())) {
+    if (dash.hiddenByAppHide || dash.isVisible()) {
       dash.show()
     }
   },
@@ -63,7 +63,7 @@ const systemTrayEventHandlers: SystemTrayEventHandlers = {
     }
   },
   clickHide: () => app.hide(),
-  clickShow: (switchScreen) => app.show(switchScreen)
+  clickShow: () => app.show()
 }
 const systemTray = new SystemTray(systemTrayEventHandlers)
 const getDisplaySummonShortcut = () => store('main.shortcuts.altSlash')
