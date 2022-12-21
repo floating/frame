@@ -410,7 +410,8 @@ class Onboard {
       windows.onboard.setMinimumSize(600, 300)
       windows.onboard.setSize(width, height)
       const pos = topRight(windows.onboard)
-      const x = pos.x - 810 + (pos.x - 810 - width) / 2
+
+      const x = (pos.x * 2 - width * 2 - 810) / 2
       windows.onboard.setPosition(x, pos.y + 80)
       // windows.onboard.setAlwaysOnTop(true)
       windows.onboard.show()
