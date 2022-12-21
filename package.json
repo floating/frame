@@ -12,20 +12,19 @@
     "setup:scripts": "allow-scripts",
     "setup": "npm run setup:deps && husky install",
     "start": "npm run launch",
-    "bundle": "npm run bundle:bridge && npm run bundle:tray && npm run bundle:dash && npm run bundle:dapp && npm run bundle:dawn && npm run bundle:dapp:inject",
+    "bundle": "npm run bundle:bridge && npm run bundle:tray && npm run bundle:dash && npm run bundle:dapp && npm run bundle:onboard && npm run bundle:dapp:inject",
     "bundle:bridge": "parcel build resources/bridge/index.js --target bridge --public-url .",
-    "bundle:tray": "parcel build app/tray.html --target tray --public-url .",
-    "bundle:flow": "parcel build flow/flow.html --target flow --public-url .",
-    "bundle:dash": "parcel build dash/dash.html --target dash --public-url .",
-    "bundle:dapp": "parcel build dapp/dapp.html --target dapp --public-url .",
-    "bundle:dawn": "parcel build dawn/dawn.html --target dawn --public-url .",
+    "bundle:tray": "parcel build app/tray/index.html --target tray --public-url .",
+    "bundle:dash": "parcel build app/dash/index.html --target dash --public-url .",
+    "bundle:dapp": "parcel build app/dapp/index.html --target dapp --public-url .",
+    "bundle:onboard": "parcel build app/onboard/index.html --target onboard --public-url .",
     "bundle:dapp:inject": "parcel build main/dapps/server/inject/index.js --target inject --public-url .",
-    "serve": "npm run bundle:bridge && npm run dev-server & wait-on http://localhost:1234/app/tray.dev.html && npm run compile:watch",
+    "serve": "npm run bundle:bridge && npm run dev-server & wait-on http://localhost:1234/app/tray/index.dev.html && npm run compile:watch",
     "dev": "npm run compile && npm run bundle && npm run launch:dev",
-    "dev-server": "cross-env NODE_ENV=development HMR=true parcel serve resources/bridge/index.js app/tray.dev.html flow/flow.dev.html dash/dash.dev.html dapp/dapp.dev.html dawn/dawn.dev.html main/dapps/server/inject/index.js",
+    "dev-server": "cross-env NODE_ENV=development HMR=true parcel serve resources/bridge/index.js app/tray/index.dev.html app/dash/index.dev.html app/dapp/index.dev.html app/onboard/index.dev.html main/dapps/server/inject/index.js",
     "inspect": "npm run bundle && npm run launch:inspect",
     "launch": "cross-env NODE_ENV=production electron ./compiled/main",
-    "launch:dev": "cross-env NODE_ENV=development electron ./compiled/main --inspect",
+    "launch:dev": "cross-env NODE_ENV=development ELECTRON_DISABLE_SECURITY_WARNINGS=true electron ./compiled/main --inspect",
     "launch:hot": "cross-env NODE_ENV=development HMR=true ELECTRON_DISABLE_SECURITY_WARNINGS=true electron ./compiled/main --inspect",
     "launch:dev:traffic": "cross-env NODE_ENV=development LOG_TRAFFIC=true electron ./compiled/main",
     "launch:dev:fullheight": "cross-env NODE_ENV=development FULL_HEIGHT=true electron ./compiled/main",
@@ -34,7 +33,7 @@
     "format": "prettier --write '**/*.{yml,json,md,html,ts,js}'",
     "format:check": "prettier --check '**/*.{yml,json,md,html,ts,js}'",
     "prod": "npm run compile && npm run bundle && npm run launch",
-    "hot": "trap \"kill 0\" exit && npm run bundle:bridge && npm run compile && npm run dev-server & wait-on http://localhost:1234/app/tray.dev.html && npm run launch:hot",
+    "hot": "node ./scripts/hot",
     "compile": "npm run copy-assets && tsc",
     "compile:watch": "npm run copy-assets && tsc -w",
     "build": "npm run compile && sleep 4 && npm run bundle && sleep 4 && electron-builder",
@@ -188,7 +187,7 @@
   "tray": "./bundle/tray.html",
   "dash": "./bundle/dash.html",
   "dapp": "./bundle/dapp.html",
-  "dawn": "./bundle/dawn.html",
+  "onboard": "./bundle/onboard.html",
   "targets": {
     "main": false,
     "bridge": {
@@ -204,7 +203,7 @@
     "dapp": {
       "context": "browser"
     },
-    "dawn": {
+    "onboard": {
       "context": "browser"
     },
     "inject": {

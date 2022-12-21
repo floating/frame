@@ -42,7 +42,7 @@ export default {
 
     frameInstance.loadURL(
       enableHMR
-        ? 'http://localhost:1234/dapp/dapp.dev.html'
+        ? 'http://localhost:1234/app/Dapp/index.dev.html'
         : `file://${process.env.BUNDLE_LOCATION}/dapp.html`
     )
 

@@ -33,7 +33,7 @@ const isWindows = process.platform === 'win32'
 
 let tray: Tray
 let dash: Dash
-let dawn: Dawn
+let onboard: Onboard
 let mouseTimeout: NodeJS.Timeout
 let glide = false
 
@@ -107,9 +107,8 @@ const detectMouse = () => {
 }
 
 function initWindow(id: string, opts: Electron.BrowserWindowConstructorOptions) {
-  const windowDir = id === 'tray' ? 'app' : id
   const url = enableHMR
-    ? `http://localhost:1234/${windowDir}/${id}.dev.html`
+    ? `http://localhost:1234/app/${id}/index.dev.html`
     : new URL(path.join(process.env.BUNDLE_LOCATION, `${id}.html`), 'file:')
 
   windows[id] = createWindow(id, opts)
@@ -206,11 +205,9 @@ export class Tray {
           dash.show()
         }, 300)
       }
-      if (dawn) {
-        setTimeout(() => {
-          dawn.show()
-        }, 600)
-      }
+      setTimeout(() => {
+        onboard.show()
+      }, 600)
     }
     ipcMain.on('tray:ready', this.readyHandler)
     initTrayWindow()
@@ -373,9 +370,9 @@ class Dash {
   }
 }
 
-class Dawn {
+class Onboard {
   constructor() {
-    initWindow('dawn', {
+    initWindow('onboard', {
       x: 0,
       y: 0,
       width: 0,
@@ -387,8 +384,8 @@ class Dawn {
   }
 
   public hide() {
-    if (windows.dawn && windows.dawn.isVisible()) {
-      windows.dawn.hide()
+    if (windows.onboard && windows.onboard.isVisible()) {
+      windows.onboard.hide()
     }
   }
 
@@ -397,28 +394,34 @@ class Dawn {
       return
     }
     setTimeout(() => {
-      windows.dawn.on('ready-to-show', () => {
-        windows.dawn.show()
+      windows.onboard.on('ready-to-show', () => {
+        windows.onboard.show()
+      })
+
+      windows.onboard.on('close', () => {
+        delete windows.onboard
       })
 
       const area = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
-      const height = area.height - 160
+      const height = (isDev && !fullheight ? devHeight : area.height) - 160
       const maxWidth = Math.floor(height * 1.24)
-      const targetWidth = area.width - 460
+      const targetWidth = 600 // area.width - 460
       const width = targetWidth > maxWidth ? maxWidth : targetWidth
-      windows.dawn.setMinimumSize(400, 300)
-      windows.dawn.setSize(width, height)
-      const pos = topRight(windows.dawn)
-      windows.dawn.setPosition(pos.x - 440, pos.y + 80)
-      windows.dawn.setAlwaysOnTop(true)
-      windows.dawn.show()
-      windows.dawn.focus()
-      windows.dawn.setVisibleOnAllWorkspaces(false, {
+      windows.onboard.setMinimumSize(600, 300)
+      windows.onboard.setSize(width, height)
+      const pos = topRight(windows.onboard)
+
+      const x = (pos.x * 2 - width * 2 - 810) / 2
+      windows.onboard.setPosition(x, pos.y + 80)
+      // windows.onboard.setAlwaysOnTop(true)
+      windows.onboard.show()
+      windows.onboard.focus()
+      windows.onboard.setVisibleOnAllWorkspaces(false, {
         visibleOnFullScreen: true,
         skipTransformProcessType: true
       })
       if (isDev) {
-        windows.dawn.webContents.openDevTools()
+        windows.onboard.webContents.openDevTools()
       }
     }, 10)
   }
@@ -447,13 +450,13 @@ electronApp.on('ready', () => {
 })
 
 if (isDev) {
-  electronApp.on('ready', () => {
+  electronApp.once('ready', () => {
     globalShortcut.register('CommandOrControl+R', () => {
       Object.keys(windows).forEach((win) => {
         windows[win].reload()
       })
 
-      frameManager.reloadFrames()
+      // frameManager.reloadFrames()
     })
   })
 }
@@ -474,7 +477,7 @@ const init = () => {
   tray = new Tray()
   dash = new Dash()
   if (!store('main.mute.onboardingWindow')) {
-    dawn = new Dawn()
+    onboard = new Onboard()
   }
 
   // data change events
@@ -486,12 +489,21 @@ const init = () => {
       windows.tray.focus()
     }
   })
+  store.observer(() => {
+    if (!store('windows.onboard.showing')) {
+      onboard.hide()
+      windows.tray.focus()
+    }
+  })
   store.observer(() => broadcast('permissions', JSON.stringify(store('permissions'))))
   store.observer(() => {
     const displaySummonShortcut = store('main.shortcuts.altSlash')
     if (displaySummonShortcut) {
       globalShortcut.unregister('Alt+/')
-      globalShortcut.register('Alt+/', () => app.toggle())
+      globalShortcut.register('Alt+/', () => {
+        app.toggle()
+        send('onboard', 'main:flex', 'shortcutActivated')
+      })
     } else {
       globalShortcut.unregister('Alt+/')
     }
@@ -529,18 +541,6 @@ export default {
   showTray() {
     tray.show()
   },
-  showDash() {
-    dash.show()
-  },
-  hideDawn() {
-    dawn.hide()
-  },
-  hideDash() {
-    dash.hide()
-  },
-  focusTray() {
-    windows.tray.focus()
-  },
   refocusFrame(frameId: string) {
     frameManager.refocus(frameId)
   },
@@ -556,7 +556,5 @@ export default {
   min(e: IpcMainEvent) {
     windowFromWebContents(e.sender).minimize()
   },
-  send,
-  broadcast,
   init
 }
