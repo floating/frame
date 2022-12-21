@@ -14,12 +14,12 @@ const PasswordInput = ({ getError, next, title, buttonText }) => {
 
   const clear = () => {
     resetError()
-    inputRef.current.value = ''
+    inputRef.current && (inputRef.current.value = '')
   }
 
   const handleSubmit = () => {
     next(inputRef.current.value)
-    setTimeout(clear, 200)
+    setTimeout(clear, 600)
   }
 
   const validateInput = debounce((e) => {
@@ -33,13 +33,13 @@ const PasswordInput = ({ getError, next, title, buttonText }) => {
 
   return (
     <div className='addAccountItemOptionSetupFrame'>
-      <div data-testid='createPasswordTitle' className='addAccountItemOptionTitle'>
+      <div role='heading' className='addAccountItemOptionTitle'>
         {title}
       </div>
       <div className='addAccountItemOptionInputPhrase addAccountItemOptionInputPassword'>
         <div className='addAccountItemOptionSubtitle'>password must be 12 characters or longer</div>
         <input
-          data-testid='createPasswordInput'
+          role='textbox'
           type='password'
           tabIndex='-1'
           ref={inputRef}
@@ -50,11 +50,7 @@ const PasswordInput = ({ getError, next, title, buttonText }) => {
         />
       </div>
 
-      <div
-        data-testid='createPasswordButton'
-        className={buttonClasses}
-        onMouseDown={(e) => !error && handleSubmit()}
-      >
+      <div className={buttonClasses} onMouseDown={(e) => !error && handleSubmit()} role='button'>
         {error || buttonText}
       </div>
     </div>

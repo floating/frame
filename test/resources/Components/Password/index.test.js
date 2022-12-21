@@ -7,31 +7,17 @@ import { CreatePassword, ConfirmPassword } from '../../../../resources/Component
 const password = 'thisisagoodpassword123'
 
 describe('creating password', () => {
-  let user, getByTestId, queryByTestId, passwordEntryTextArea
+  let submitButton, passwordEntryTextArea, user, getByRole
   const onCreate = jest.fn()
 
   beforeEach(() => {
-    ;({ user, getByTestId, queryByTestId } = setupComponent(<CreatePassword {...{ password, onCreate }} />))
-    passwordEntryTextArea = getByTestId('createPasswordInput')
+    ;({ user, getByRole } = setupComponent(<CreatePassword {...{ password, onCreate }} />))
+    passwordEntryTextArea = getByRole('textbox')
+    submitButton = getByRole('button')
   })
 
   it('Should display the correct title when entering the password', () => {
-    expect(getByTestId('createPasswordTitle').textContent).toBe('Create Password')
-  })
-
-  it('Should not show the `next` button until a valid password is entered', () => {
-    expect(queryByTestId('createPasswordButton')).toBeFalsy()
-  })
-
-  it('Should debounce password feedback', async () => {
-    await user.type(passwordEntryTextArea, 'INVALID')
-    expect(queryByTestId('createPasswordErrorMessage')).toBeFalsy()
-
-    act(() => {
-      jest.runAllTimers()
-    })
-
-    expect(queryByTestId('createPasswordErrorMessage').textContent).toBeTruthy()
+    expect(getByRole('heading').textContent).toBe('Create Password')
   })
 
   it('Should show an error when the password is too short', async () => {
@@ -41,9 +27,7 @@ describe('creating password', () => {
       jest.runAllTimers()
     })
 
-    expect(getByTestId('createPasswordErrorMessage').textContent).toBe(
-      'PASSWORD MUST BE AT LEAST 12 CHARACTERS LONG'
-    )
+    expect(submitButton.textContent).toBe('PASSWORD MUST BE AT LEAST 12 CHARACTERS LONG')
   })
 
   it('Should show the warning when the password is too weak', async () => {
@@ -53,7 +37,7 @@ describe('creating password', () => {
       jest.runAllTimers()
     })
 
-    expect(getByTestId('createPasswordErrorMessage').textContent).toBe('REPEATS LIKE "AAA" ARE EASY TO GUESS')
+    expect(submitButton.textContent).toBe('REPEATS LIKE "AAA" ARE EASY TO GUESS')
   })
 
   it('Should show the continue button when a valid password is entered', async () => {
@@ -63,8 +47,7 @@ describe('creating password', () => {
       jest.runAllTimers()
     })
 
-    expect(queryByTestId('createPasswordErrorMessage')).toBeFalsy()
-    expect(getByTestId('createPasswordButton').textContent).toBe('Continue')
+    expect(submitButton.textContent).toBe('Continue')
   })
 
   it('Should call the onCreate function when a password is submitted', async () => {
@@ -74,29 +57,29 @@ describe('creating password', () => {
       jest.runAllTimers()
     })
 
-    await user.click(queryByTestId('createPasswordButton'))
+    await user.click(submitButton)
     expect(onCreate).toHaveBeenCalledWith(password)
   })
 })
 
 describe('confirming password', () => {
-  let user, getByTestId, queryByTestId, passwordEntryTextArea
+  let passwordEntryTextArea, confirmButton, user
   const onConfirm = jest.fn()
 
   beforeEach(() => {
-    ;({ user, getByTestId, queryByTestId } = setupComponent(<ConfirmPassword {...{ password, onConfirm }} />))
-    passwordEntryTextArea = getByTestId('createPasswordInput')
+    const component = setupComponent(<ConfirmPassword {...{ password, onConfirm }} />)
+    user = component.user
+    passwordEntryTextArea = component.getByRole('textbox')
+    confirmButton = component.getByRole('button')
   })
 
   it('Should show an error when the password does not match previously entered password', async () => {
     await user.type(passwordEntryTextArea, 'DOES_NOT_MATCH')
-    expect(queryByTestId('createPasswordErrorMessage')).toBeFalsy()
-
     act(() => {
       jest.runAllTimers()
     })
 
-    expect(queryByTestId('createPasswordErrorMessage').textContent).toBeTruthy()
+    expect(confirmButton.textContent).toBe('PASSWORDS DO NOT MATCH')
   })
 
   it('Should show the create button when a valid password is entered', async () => {
@@ -106,8 +89,7 @@ describe('confirming password', () => {
       jest.runAllTimers()
     })
 
-    expect(queryByTestId('createPasswordErrorMessage')).toBeFalsy()
-    expect(getByTestId('createPasswordButton').textContent).toBe('create')
+    expect(confirmButton.textContent).toBe('create')
   })
 
   it('Should call the onConfirm function when the password is confirmed', async () => {
@@ -117,7 +99,7 @@ describe('confirming password', () => {
       jest.runAllTimers()
     })
 
-    await user.click(queryByTestId('createPasswordButton'))
+    await user.click(confirmButton)
     expect(onConfirm).toHaveBeenCalledWith(password)
   })
 })

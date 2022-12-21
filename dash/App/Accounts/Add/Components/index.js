@@ -70,39 +70,35 @@ const EnterSecret = ({ newAccountType, isValidSecret, title }) => {
 
   return (
     <div className='addAccountItemOptionSetupFrame'>
-      <div data-testid='addHotAccountSecretTitle' className='addAccountItemOptionTitle'>
+      <div role={'heading'} className='addAccountItemOptionTitle'>
         {title}
       </div>
       {error && (
-        <div data-testid='addHotAccountSecretError' style={{ color: 'red' }}>
+        <div role={'alert'} style={{ color: 'red' }}>
           {error}
         </div>
       )}
       <div className='addAccountItemOptionInputPhrase'>
         <textarea
-          data-testid='addHotAccountSecretTextEntry'
+          role={'textbox'}
           tabIndex='-1'
           value={secret}
           onChange={updateInput}
           onKeyDown={handleSubmit}
         />
       </div>
-      <div
-        data-testid='addHotAccountSecretSubmitButton'
-        className='addAccountItemOptionSubmit'
-        onMouseDown={handleSubmit}
-      >
+      <div role='button' className='addAccountItemOptionSubmit' onMouseDown={handleSubmit}>
         Next
       </div>
     </div>
   )
 }
 
-const Error = ({ err }) => {
+const Error = ({ error }) => {
   return (
     <div className='addAccountItemOptionSetupFrame'>
       <>
-        <div className='addAccountItemOptionTitle'>{err}</div>
+        <div className='addAccountItemOptionTitle'>{error}</div>
         <div
           role='button'
           className='addAccountItemOptionSubmit'
@@ -125,8 +121,8 @@ export function AddHotAccount({
   newAccountType,
   isValidSecret
 }) {
-  const { secret, password, err } = accountData
-  const viewIndex = err ? 3 : !secret ? 0 : !password ? 1 : 2
+  const { secret, password, error } = accountData
+  const viewIndex = error ? 3 : !secret ? 0 : !password ? 1 : 2
 
   const onCreate = (password) => {
     navForward(newAccountType, {
@@ -154,7 +150,7 @@ export function AddHotAccount({
     <EnterSecret key={0} {...{ isValidSecret, title, newAccountType }} />,
     <CreatePassword key={1} onCreate={onCreate} />,
     <ConfirmPassword key={2} password={password} onConfirm={onConfirm} />,
-    <Error key={3} {...{ err }} />
+    <Error key={3} {...{ error }} />
   ]
 
   return (

@@ -1,14 +1,11 @@
 import React from 'react'
 
 import { AddHotAccount } from '../Components'
-import { BigNumber } from 'ethers'
-import { addHexPrefix, isHexString } from '@ethereumjs/util'
-
-const orderOfSecp256k1 = '0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141'
+import { addHexPrefix, isHexString, isValidPrivate } from '@ethereumjs/util'
 
 const isValidSecret = (privateKeyStr) => {
-  const formatted = addHexPrefix(privateKeyStr)
-  return isHexString(formatted) && BigNumber.from(formatted).lt(orderOfSecp256k1)
+  const prefixed = addHexPrefix(privateKeyStr)
+  return isHexString(prefixed) && isValidPrivate(prefixed.slice(2))
 }
 
 export default function AddRing({ accountData }) {

@@ -7,7 +7,7 @@ import link from '../../../../../../resources/link'
 import AddRingAccountComponent from '../../../../../../dash/App/Accounts/Add/AddRing'
 import { act } from 'react-dom/test-utils'
 
-const privateKey = '0x01'
+const privateKey = '4001069d4fe9b22dc767dfa7767e72f151e00dafa05d9ef0b89069a4f04820cb'
 const password = 'thisisagoodpassword123'
 
 jest.mock('../../../../../../main/store/persist')
@@ -21,30 +21,31 @@ jest.useFakeTimers()
 const AddRing = Restore.connect(AddRingAccountComponent, store)
 
 describe('entering private key', () => {
-  let user, getByTestId, privateKeyTextArea, nextButton
+  const index = 0
+  let user, getByRole, privateKeyTextArea, nextButton, getAllByRole
 
   beforeEach(() => {
-    ;({ user, getByTestId } = setupComponent(<AddRing accountData={{}} />))
-    privateKeyTextArea = getByTestId('addHotAccountSecretTextEntry')
-    nextButton = getByTestId('addHotAccountSecretSubmitButton')
+    ;({ user, getByRole, getAllByRole } = setupComponent(<AddRing accountData={{}} />))
+    privateKeyTextArea = getAllByRole('textbox')[index]
+    nextButton = getAllByRole('button')[index]
   })
 
   it('should display the correct title when entering the private key', () => {
-    const title = getByTestId('addHotAccountSecretTitle')
+    const title = getAllByRole('heading')[index]
     expect(title.textContent).toBe('Private Key')
   })
 
   it('should show an error message when private key is an invalid hex string', async () => {
     await user.type(privateKeyTextArea, 'INVALID')
     await user.click(nextButton)
-    const errorMessage = getByTestId('addHotAccountSecretError')
+    const errorMessage = getByRole('alert')
     expect(errorMessage.textContent).toBe('INVALID PRIVATE KEY')
   })
 
   it('should show an error message when private key is invalid', async () => {
     await user.type(privateKeyTextArea, '0xffffffffffffffffffffffffffffffffbaaedce6af48a03bbfd25e8cd0364148')
     await user.click(nextButton)
-    const errorMessage = getByTestId('addHotAccountSecretError')
+    const errorMessage = getByRole('alert')
     expect(errorMessage.textContent).toBe('INVALID PRIVATE KEY')
   })
 
@@ -67,17 +68,15 @@ describe('entering private key', () => {
 
 describe('entering password', () => {
   it('Should update the navigation to the confirmation screen when a password is submitted', async () => {
-    const { user, getByTestId, queryByTestId } = setupComponent(
-      <AddRing accountData={{ secret: privateKey }} />
-    )
-    const passwordEntryTextArea = getByTestId('createPasswordInput')
+    const { user, getAllByRole } = setupComponent(<AddRing accountData={{ secret: privateKey }} />)
+    const passwordEntryTextArea = getAllByRole('textbox')[1]
     await user.type(passwordEntryTextArea, password)
 
     act(() => {
       jest.runAllTimers()
     })
-
-    await user.click(queryByTestId('createPasswordButton'))
+    const confirmButton = getAllByRole('button')[1]
+    await user.click(confirmButton)
     expect(link.send).toHaveBeenCalledWith('nav:forward', 'dash', {
       view: 'accounts',
       data: {
@@ -93,13 +92,13 @@ describe('entering password', () => {
 })
 
 describe('confirming password', () => {
-  let user, getByTestId, queryByTestId, passwordEntryTextArea
+  let user, passwordEntryTextArea, confirmButton
 
   beforeEach(() => {
-    ;({ user, getByTestId, queryByTestId } = setupComponent(
-      <AddRing accountData={{ secret: privateKey, password }} />
-    ))
-    passwordEntryTextArea = getByTestId('createPasswordInput')
+    const component = setupComponent(<AddRing accountData={{ secret: privateKey, password }} />)
+    user = component.user
+    passwordEntryTextArea = component.getAllByRole('textbox')[2]
+    confirmButton = component.getAllByRole('button')[2]
   })
 
   it('Should try to create a private key account when a matching password is submitted', async () => {
@@ -109,7 +108,7 @@ describe('confirming password', () => {
       jest.runAllTimers()
     })
 
-    await user.click(queryByTestId('createPasswordButton'))
+    await user.click(confirmButton)
     expect(link.rpc).toHaveBeenCalledWith('createFromPrivateKey', privateKey, password, expect.any(Function))
   })
 
@@ -127,7 +126,7 @@ describe('confirming password', () => {
       jest.runAllTimers()
     })
 
-    await user.click(queryByTestId('createPasswordButton'))
+    await user.click(confirmButton)
     expect(link.send).toHaveBeenCalledWith('nav:back', 'dash', 4)
   })
 
@@ -145,7 +144,7 @@ describe('confirming password', () => {
       jest.runAllTimers()
     })
 
-    await user.click(queryByTestId('createPasswordButton'))
+    await user.click(confirmButton)
     expect(link.send).toHaveBeenCalledWith('nav:forward', 'dash', {
       view: 'expandedSigner',
       data: { signer: '1234' }

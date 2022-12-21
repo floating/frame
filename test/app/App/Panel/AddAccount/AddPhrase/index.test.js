@@ -21,23 +21,24 @@ jest.useFakeTimers()
 const AddPhrase = Restore.connect(AddPhraseAccountComponent, store)
 
 describe('entering seed phrase', () => {
-  let user, getByTestId, seedPhraseTextArea, nextButton
+  const index = 0
+  let user, getByRole, seedPhraseTextArea, nextButton, getAllByRole
 
   beforeEach(() => {
-    ;({ user, getByTestId } = setupComponent(<AddPhrase accountData={{}} />))
-    seedPhraseTextArea = getByTestId('addHotAccountSecretTextEntry')
-    nextButton = getByTestId('addHotAccountSecretSubmitButton')
+    ;({ user, getByRole, getAllByRole } = setupComponent(<AddPhrase accountData={{}} />))
+    seedPhraseTextArea = getAllByRole('textbox')[index]
+    nextButton = getAllByRole('button')[index]
   })
 
   it('should display the correct title when entering the seed phrase', () => {
-    const title = getByTestId('addHotAccountSecretTitle')
+    const title = getAllByRole('heading')[index]
     expect(title.textContent).toBe('Seed Phrase')
   })
 
   it('should show an error message when an incorrect seed phrase is submitted', async () => {
     await user.type(seedPhraseTextArea, 'INVALID')
     await user.click(nextButton)
-    const errorMessage = getByTestId('addHotAccountSecretError')
+    const errorMessage = getByRole('alert')
     expect(errorMessage.textContent).toBe('INVALID SEED PHRASE')
   })
 
@@ -60,18 +61,16 @@ describe('entering seed phrase', () => {
 
 describe('entering password', () => {
   it('Should update the navigation to the confirmation screen when a password is submitted', async () => {
-    const { user, getByTestId, queryByTestId } = setupComponent(
-      <AddPhrase accountData={{ secret: phrase }} />
-    )
-    const passwordEntryTextArea = getByTestId('createPasswordInput')
+    const { user, getAllByRole } = setupComponent(<AddPhrase accountData={{ secret: phrase }} />)
+    const passwordEntryTextArea = getAllByRole('textbox')[1]
 
     await user.type(passwordEntryTextArea, password)
 
     act(() => {
       jest.runAllTimers()
     })
-
-    await user.click(queryByTestId('createPasswordButton'))
+    const createButton = getAllByRole('button')[1]
+    await user.click(createButton)
     expect(link.send).toHaveBeenCalledWith('nav:forward', 'dash', {
       view: 'accounts',
       data: {
@@ -87,23 +86,23 @@ describe('entering password', () => {
 })
 
 describe('confirming password', () => {
-  let component, passwordEntryTextArea
+  let user, passwordEntryTextArea, confirmButton
 
   beforeEach(() => {
-    component = setupComponent(<AddPhrase accountData={{ secret: phrase, password }} />)
-    passwordEntryTextArea = component.getByTestId('createPasswordInput')
+    const component = setupComponent(<AddPhrase accountData={{ secret: phrase, password }} />)
+    user = component.user
+    passwordEntryTextArea = component.getAllByRole('textbox')[2]
+    confirmButton = component.getAllByRole('button')[2]
   })
 
   it('Should try to create seed phrase account when a matching password is submitted', async () => {
-    const { user } = component
-
     await user.type(passwordEntryTextArea, password)
 
     act(() => {
       jest.runAllTimers()
     })
 
-    await user.click(component.queryByTestId('createPasswordButton'))
+    await user.click(confirmButton)
     expect(link.rpc).toHaveBeenCalledWith('createFromPhrase', phrase, password, expect.any(Function))
   })
 
@@ -115,15 +114,12 @@ describe('confirming password', () => {
       cb(null, { id: '1234' })
     })
 
-    const { user } = component
-
     await user.type(passwordEntryTextArea, password)
 
     act(() => {
       jest.runAllTimers()
     })
-
-    await user.click(component.queryByTestId('createPasswordButton'))
+    await user.click(confirmButton)
     expect(link.send).toHaveBeenCalledWith('nav:back', 'dash', 4)
   })
 
@@ -135,15 +131,13 @@ describe('confirming password', () => {
       cb(null, { id: '1234' })
     })
 
-    const { user } = component
-
     await user.type(passwordEntryTextArea, password)
 
     act(() => {
       jest.runAllTimers()
     })
 
-    await user.click(component.queryByTestId('createPasswordButton'))
+    await user.click(confirmButton)
     expect(link.send).toHaveBeenCalledWith('nav:forward', 'dash', {
       view: 'expandedSigner',
       data: { signer: '1234' }
