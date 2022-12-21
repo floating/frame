@@ -58,14 +58,13 @@ function getErrorCode(e: Error) {
 
 const matchFilter = (filter: string = '', properties: string[] = []) => {
   if (!filter) return true
-  if (typeof filter !== 'string' || !Array.isArray(properties)) return false
+
   const filterItems = filter.split(' ')
+  const matchableProperties = properties.filter((prop) => !!prop).map((prop) => prop.toLowerCase())
+
   return filterItems.every((item = '') => {
-    item = item.toLowerCase()
-    return properties.some((prop) => {
-      prop = (prop || '').toLowerCase()
-      return prop.indexOf(item) !== -1
-    })
+    const matchCriteria = item.toLowerCase()
+    return matchableProperties.some((prop) => prop.includes(matchCriteria))
   })
 }
 

@@ -1,81 +1,67 @@
 import { matchFilter, getAddress } from '../../../resources/utils'
 
-describe('matchFilter', () => {
-  it('passes single filter match of properties', () => {
-    const filter = 'one'
-    const properties = ['one', 'b', 'c', 'd']
-    const matched = matchFilter(filter, properties)
-    expect(matched).toStrictEqual(true)
-  })
-
-  it('fails single filter match of properties', () => {
-    const filter = 'one'
-    const properties = ['a', 'b', 'c', 'd']
-    const matched = matchFilter(filter, properties)
-    expect(matched).toStrictEqual(false)
-  })
-
-  it('passes multi-part filter match of properties', () => {
-    const filter = 'one two'
-    const properties = ['one', 'two', 'c', 'd']
-    const matched = matchFilter(filter, properties)
-    expect(matched).toStrictEqual(true)
-  })
-
-  it('fails multi-part filter match of properties', () => {
-    const filter = 'one two'
-    const properties = ['a', 'b', 'c', 'd']
-    const matched = matchFilter(filter, properties)
-    expect(matched).toStrictEqual(false)
-  })
-
-  it('fails multi-part filter partial match of properties', () => {
-    const filter = 'one two'
-    const properties = ['one', 'b', 'c', 'd']
-    const matched = matchFilter(filter, properties)
-    expect(matched).toStrictEqual(false)
-  })
-
-  it('passes multi-part filter match to multi-part propery', () => {
+describe('#matchFilter', () => {
+  it('matches if the entire filter matches a single property', () => {
     const filter = 'one two'
     const properties = ['one two', 'a', 'b']
     const matched = matchFilter(filter, properties)
-    expect(matched).toStrictEqual(true)
+    expect(matched).toBe(true)
   })
 
-  it('passes multi-part filter match to multiple multi-part properties', () => {
+  it('splits the filter and matches if every individual string matches any property', () => {
+    const filter = 'one two'
+    const properties = ['one', 'two', 'c', 'd']
+    const matched = matchFilter(filter, properties)
+    expect(matched).toBe(true)
+  })
+
+  it('splits the filter and does not match if only one string matches', () => {
+    const filter = 'one two'
+    const properties = ['one', 'b', 'c', 'd']
+    const matched = matchFilter(filter, properties)
+    expect(matched).toBe(false)
+  })
+
+  it('splits the filter and matches if every individual string partially matches any property', () => {
     const filter = 'one two three'
     const properties = ['zero one', 'two', 'three four five']
     const matched = matchFilter(filter, properties)
-    expect(matched).toStrictEqual(true)
+    expect(matched).toBe(true)
   })
 
-  it('passes when filter is undefined', () => {
+  it('does not match when no properties match the filter', () => {
+    const filter = 'one'
+    const properties = ['a', 'b', 'c', 'd']
+    const matched = matchFilter(filter, properties)
+    expect(matched).toBe(false)
+  })
+
+  it('matches when the filter is an empty string', () => {
+    const filter = ''
+    const properties = ['zero one', 'two', 'three four five']
+    const matched = matchFilter(filter, properties)
+    expect(matched).toBe(true)
+  })
+
+  it('matches when the filter is falsy', () => {
     const filter = undefined
     const properties = ['zero one', 'two', 'three four five']
     const matched = matchFilter(filter, properties)
-    expect(matched).toStrictEqual(true)
+    expect(matched).toBe(true)
   })
 
-  it('fails when properties is undefined', () => {
-    const filter = 'one'
-    const properties = undefined
+  it('does not match on falsy properties', () => {
+    const filter = 'zero'
+    const properties = [undefined]
     const matched = matchFilter(filter, properties)
-    expect(matched).toStrictEqual(false)
+    expect(matched).toBe(false)
   })
 
-  it('fails when properties is not an array', () => {
-    const filter = 'one'
-    const properties = 'hello'
+  it('matches when some properties are falsy', () => {
+    const filter = 'zero'
+    const properties = [undefined, 'zeroth']
     const matched = matchFilter(filter, properties)
-    expect(matched).toStrictEqual(false)
-  })
-
-  it('fails when filter is not a string', () => {
-    const filter = ['one']
-    const properties = ['one']
-    const matched = matchFilter(filter, properties)
-    expect(matched).toStrictEqual(false)
+    expect(matched).toBe(true)
   })
 })
 
