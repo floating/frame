@@ -263,7 +263,7 @@ export class Tray {
     windows.tray.setAlwaysOnTop(true)
     windows.tray.setVisibleOnAllWorkspaces(true, {
       visibleOnFullScreen: true,
-      skipTransformProcessType: false
+      skipTransformProcessType: true
     })
     windows.tray.setResizable(false) // Keeps height consistent
     const area = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
@@ -285,7 +285,7 @@ export class Tray {
     }
     windows.tray.setVisibleOnAllWorkspaces(false, {
       visibleOnFullScreen: true,
-      skipTransformProcessType: false
+      skipTransformProcessType: true
     })
   }
 
@@ -343,7 +343,7 @@ class Dash {
       windows.dash.setAlwaysOnTop(true)
       windows.dash.setVisibleOnAllWorkspaces(true, {
         visibleOnFullScreen: true,
-        skipTransformProcessType: false
+        skipTransformProcessType: true
       })
       windows.dash.setResizable(false) // Keeps height consistent
       const area = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
@@ -357,7 +357,7 @@ class Dash {
       windows.dash.focus()
       windows.dash.setVisibleOnAllWorkspaces(false, {
         visibleOnFullScreen: true,
-        skipTransformProcessType: false
+        skipTransformProcessType: true
       })
       if (isDev) {
         windows.dash.webContents.openDevTools()
