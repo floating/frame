@@ -89,7 +89,7 @@ describe('confirming password', () => {
       jest.runAllTimers()
     })
 
-    expect(confirmButton.textContent).toBe('create')
+    expect(confirmButton.textContent).toBe('Create')
   })
 
   it('Should call the onConfirm function when the password is confirmed', async () => {

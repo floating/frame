@@ -80,7 +80,6 @@ const EnterSecret = ({ newAccountType, isValidSecret, title }) => {
       </div>
       <div className='addAccountItemOptionInputPhrase'>
         <textarea
-          role={'textbox'}
           ref={inputRef}
           tabIndex='-1'
           onChange={(e) => {

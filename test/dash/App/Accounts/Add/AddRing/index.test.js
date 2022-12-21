@@ -16,7 +16,6 @@ jest.mock('../../../../../../resources/link', () => ({
   send: jest.fn(),
   rpc: jest.fn()
 }))
-jest.useFakeTimers()
 
 const AddRing = Restore.connect(AddRingAccountComponent, store)
 

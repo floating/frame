@@ -58,9 +58,6 @@ const PasswordInput = ({ getError, next, title, buttonText }) => {
 }
 
 export const CreatePassword = ({ onCreate }) => {
-  const title = 'Create Password'
-  const buttonText = 'Continue'
-
   const getError = (password) => {
     if (password.length < 12) return 'PASSWORD MUST BE AT LEAST 12 CHARACTERS LONG'
     const {
@@ -72,16 +69,13 @@ export const CreatePassword = ({ onCreate }) => {
     return (warning || 'PLEASE ENTER A STRONGER PASSWORD').toUpperCase()
   }
 
-  return <PasswordInput {...{ getError, next: onCreate, title, buttonText }} />
+  return <PasswordInput getError={getError} next={onCreate} title='Create Password' buttonText='Continue' />
 }
 
 export const ConfirmPassword = ({ password, onConfirm }) => {
-  const title = 'Confirm Password'
-  const buttonText = 'create'
-
   const getError = (confirmedPassword) => {
     if (password !== confirmedPassword) return 'PASSWORDS DO NOT MATCH'
   }
 
-  return <PasswordInput {...{ getError, next: onConfirm, title, buttonText }} />
+  return <PasswordInput getError={getError} next={onConfirm} title='Confirm Password' buttonText='Create' />
 }
