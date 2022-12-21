@@ -1,32 +1,22 @@
 const { spawn } = require('child_process')
 const waitOn = require('wait-on')
 
-const cwd = process.cwd()
+async function waitForTask(taskName) {
+  return new Promise((resolve, reject) => {
+    const ps = spawn('npm', ['run', taskName], {
+      detached: true,
+      stdio: 'inherit'
+    })
+
+    ps.once('close', (exitCode) =>
+      exitCode === 0 ? resolve() : reject(`${taskName} failed with exit code: ${exitCode}`)
+    )
+  })
+}
 
 async function prepareEnvironment() {
-  const bundle = new Promise((resolve, reject) => {
-    const ps = spawn('npm', ['run', 'bundle:bridge'], {
-      cwd,
-      detached: true,
-      stdio: 'inherit'
-    })
-
-    ps.once('close', (exitCode) =>
-      exitCode === 0 ? resolve() : reject(`bundle failed with exit code: ${exitCode}`)
-    )
-  })
-
-  const compile = new Promise((resolve, reject) => {
-    const ps = spawn('npm', ['run', 'compile'], {
-      cwd,
-      detached: true,
-      stdio: 'inherit'
-    })
-
-    ps.once('close', (exitCode) =>
-      exitCode === 0 ? resolve() : reject(`compile failed with exit code: ${exitCode}`)
-    )
-  })
+  const bundle = waitForTask('bundle:bridge')
+  const compile = waitForTask('compile')
 
   return Promise.all([bundle, compile])
 }
@@ -35,19 +25,16 @@ async function launchServer() {
   let electronMainProcess
 
   const exitHandler = () => {
-    console.log('exit handler!')
     if (!devServerProcess.killed) {
-      console.log('killing dev process')
       devServerProcess.kill()
     }
+
     if (!electronMainProcess?.killed) {
-      console.log('killing electron process')
       electronMainProcess.kill()
     }
   }
 
   const devServerProcess = spawn('npm', ['run', 'dev-server'], {
-    cwd,
     detached: true,
     stdio: 'inherit'
   })
@@ -64,7 +51,6 @@ async function launchServer() {
     })
 
     electronMainProcess = spawn('npm', ['run', 'launch:dev'], {
-      cwd,
       detached: true,
       stdio: 'inherit'
     })
