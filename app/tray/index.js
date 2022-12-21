@@ -24,12 +24,6 @@ link.rpc('getState', (err, state) => {
   const store = appStore(state)
   link.send('tray:ready') // turn on api
   link.send('tray:refreshMain')
-  if (!store('main.mute.betaDisclosure')) {
-    store.notify('betaDisclosure')
-  }
-  if (!store('main.mute.aragonAccountMigrationWarning')) {
-    store.notify('aragonAccountMigrationWarning')
-  }
   store.observer(() => {
     document.body.classList.remove('dark', 'light')
     document.body.classList.add('clip', store('main.colorway'))
