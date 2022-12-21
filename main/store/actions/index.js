@@ -722,7 +722,7 @@ module.exports = {
     })
     u('windows.dash.showing', () => true)
   },
-  closeOnboard: (u) => {
+  completeOnboarding: (u) => {
     u('main.mute.onboardingWindow', () => true)
     u('windows.onboard.showing', () => false)
   },

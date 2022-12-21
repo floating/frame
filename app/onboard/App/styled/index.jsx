@@ -72,7 +72,7 @@ export const SlideBody = styled.div`
   }
 `
 
-export const SlideProceed = styled.div`
+export const Proceed = styled.div`
   width: 200px;
   height: 60px;
   border-radius: 20px;

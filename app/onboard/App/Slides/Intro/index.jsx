@@ -1,5 +1,7 @@
 import React from 'react'
-import { Slide, SlideTitle, SlideBody, SlideProceed } from '../../styled'
+
+import { SlideProceed } from '../../Components'
+import { Slide, SlideTitle, SlideBody } from '../../styled'
 
 const Intro = ({ nextSlide }) => {
   return (

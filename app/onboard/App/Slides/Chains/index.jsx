@@ -1,18 +1,20 @@
 import React, { useEffect } from 'react'
-import { Slide, SlideTitle, SlideBody, SlideProceed } from '../../styled'
+
+import { SlideProceed } from '../../Components'
+import { Slide, SlideTitle, SlideBody } from '../../styled'
 
 import link from '../../../../../resources/link'
 
-const Chains = ({ nextSlide, prevSlide }) => {
+const Chains = ({ nextSlide }) => {
   useEffect(() => {
     link.send('tray:action', 'navDash', { view: 'chains', data: {} })
-  })
+  }, [])
 
   return (
     <Slide>
       <SlideTitle>Chains</SlideTitle>
       <SlideBody>
-        <div>Now let's set up the chains you want to use.</div>
+        <div>Next let's set up the chains you want to use.</div>
         <div>
           Frame comes with presets for a few of the most popular chains. Turn them on and off or update the
           RPC you want to use for each in the Chains panel.{' '}

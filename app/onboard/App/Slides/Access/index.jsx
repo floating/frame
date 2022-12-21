@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react'
-import { Slide, SlideTitle, SlideBody, SlideProceed } from '../../styled'
+
+import { SlideProceed } from '../../Components'
+import { Slide, SlideTitle, SlideBody } from '../../styled'
 
 import link from '../../../../../resources/link'
 
-const Access = ({ nextSlide, prevSlide, platform }) => {
+const Access = ({ nextSlide, platform }) => {
   const keyboardShortcut = platform === 'darwin' ? 'Option + /' : 'Alt + /'
   const [shortcutActivated, setShortcutActivated] = useState(false)
   link.send('tray:action', 'navDash', { view: 'settings', data: {} })
@@ -13,6 +15,7 @@ const Access = ({ nextSlide, prevSlide, platform }) => {
       if (event === 'shortcutActivated') setShortcutActivated(true)
     }
 
+    link.send('tray:action', 'closeDash')
     link.on('flex', handler)
 
     return () => link.off('flex', handler)

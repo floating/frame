@@ -6,6 +6,7 @@ import Native from '../../../resources/Native'
 import { Onboard, DevControls, DevControlButton } from './styled'
 
 import Slides from './Slides'
+import link from '../../../resources/link'
 
 class App extends React.Component {
   constructor(...args) {
@@ -31,6 +32,9 @@ class App extends React.Component {
           nextSlide={() => {
             const nextSlide = ++this.state.slide
             this.setState({ slide: nextSlide > 6 ? 6 : nextSlide })
+          }}
+          onComplete={() => {
+            link.send('tray:action', 'completeOnboarding')
           }}
         />
         <DevControls>

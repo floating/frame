@@ -1,7 +1,9 @@
 import React from 'react'
-import { Slide, SlideTitle, SlideBody, SlideProceed } from '../../styled'
 
-const Outro = ({ nextSlide, prevSlide }) => {
+import { SlideProceed } from '../../Components'
+import { Slide, SlideTitle, SlideBody } from '../../styled'
+
+const Outro = ({ onComplete }) => {
   return (
     <Slide>
       <SlideTitle>You're ready to go!</SlideTitle>
@@ -12,7 +14,7 @@ const Outro = ({ nextSlide, prevSlide }) => {
           way.
         </div>
       </SlideBody>
-      <SlideProceed onClick={nextSlide}>Close</SlideProceed>
+      <SlideProceed onClick={onComplete}>Close</SlideProceed>
     </Slide>
   )
 }
