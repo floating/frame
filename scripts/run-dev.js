@@ -3,10 +3,7 @@ const waitOn = require('wait-on')
 
 async function waitForTask(taskName) {
   return new Promise((resolve, reject) => {
-    const ps = spawn('npm', ['run', taskName], {
-      detached: true,
-      stdio: 'inherit'
-    })
+    const ps = spawn('npm', ['run', taskName], { stdio: 'inherit' })
 
     ps.once('close', (exitCode) =>
       exitCode === 0 ? resolve() : reject(`${taskName} failed with exit code: ${exitCode}`)
@@ -22,27 +19,7 @@ async function prepareEnvironment() {
 }
 
 async function launchServer() {
-  let electronMainProcess
-
-  const exitHandler = () => {
-    if (!devServerProcess.killed) {
-      devServerProcess.kill()
-    }
-
-    if (!electronMainProcess?.killed) {
-      electronMainProcess.kill()
-    }
-  }
-
-  const devServerProcess = spawn('npm', ['run', 'dev-server'], {
-    detached: true,
-    stdio: 'inherit'
-  })
-
-  devServerProcess.once('exit', () => {
-    console.log('Dev Server Process exited.')
-    exitHandler()
-  })
+  const devServerProcess = spawn('npm', ['run', 'dev-server'])
 
   try {
     await waitOn({
@@ -50,18 +27,15 @@ async function launchServer() {
       validateStatus: (status) => status === 200
     })
 
-    electronMainProcess = spawn('npm', ['run', 'launch:dev'], {
-      detached: true,
-      stdio: 'inherit'
-    })
+    const npmProcess = spawn('npm', ['run', 'launch:dev'], { stdio: 'inherit' })
 
-    electronMainProcess.once('exit', () => {
-      console.log('Electron Main Process exited.')
-      exitHandler()
+    npmProcess.once('exit', () => {
+      console.log('Frame exited')
+      devServerProcess.kill()
     })
   } catch (err) {
     console.log('Error running Electron', err)
-    exitHandler()
+    devServerProcess.kill()
   }
 }
 
