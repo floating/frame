@@ -275,6 +275,7 @@
     height 30px
     padding 0px 40px
     display flex
+    text-align center
     justify-content center
     align-items center
     border-radius 8px
@@ -282,6 +283,16 @@
 
   .addAccountItemOptionSubmit:hover
     background var(--ghostC)
+
+  .addAccountItemOptionSubmit.error
+    color var(--moon)
+    font-size 10px
+    background var(--ghostD)
+    opacity 0.7
+
+  .addAccountItemOptionSubmit.error:hover
+    cursor default
+    background var(--ghostD)
 
   .addAccountResolvingEns
 
