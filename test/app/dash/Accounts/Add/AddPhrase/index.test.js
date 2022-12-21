@@ -4,7 +4,7 @@ import { setupComponent } from '../../../../../componentSetup'
 
 import store from '../../../../../../main/store'
 import link from '../../../../../../resources/link'
-import AddPhraseAccountComponent from '../../../../../../dash/App/Accounts/Add/AddPhrase'
+import AddPhraseAccountComponent from '../../../../../../app/dash/Accounts/Add/AddPhrase'
 import { act } from 'react-dom/test-utils'
 
 const phrase = 'there lab weapon cost bounce smart trial pulse ceiling beach upset hockey illegal chef leaf'
