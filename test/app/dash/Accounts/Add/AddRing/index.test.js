@@ -4,7 +4,7 @@ import { setupComponent } from '../../../../../componentSetup'
 
 import store from '../../../../../../main/store'
 import link from '../../../../../../resources/link'
-import AddRingAccountComponent from '../../../../../../dash/App/Accounts/Add/AddRing'
+import AddRingAccountComponent from '../../../../../../app/dash/Accounts/Add/AddRing'
 import { act } from 'react-dom/test-utils'
 
 const privateKey = '4001069d4fe9b22dc767dfa7767e72f151e00dafa05d9ef0b89069a4f04820cb'
