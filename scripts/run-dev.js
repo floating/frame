@@ -1,4 +1,5 @@
 const { spawn } = require('child_process')
+const kill = require('tree-kill')
 const waitOn = require('wait-on')
 
 async function waitForTask(taskName) {
@@ -19,30 +20,37 @@ async function prepareEnvironment() {
 }
 
 async function launchServer() {
-  const devServerProcess = spawn('npm', ['run', 'dev-server'])
+  const server = spawn('npm', ['run', 'dev-server'])
 
-  try {
-    await waitOn({
-      resources: ['http://localhost:1234/app/tray/index.dev.html'],
-      validateStatus: (status) => status === 200
-    })
+  server.once('exit', () => {
+    console.log('Dev server exited')
+    process.exit(0)
+  })
 
-    const npmProcess = spawn('npm', ['run', 'launch:dev'], { stdio: 'inherit' })
+  await waitOn({
+    resources: ['http://localhost:1234/app/tray/index.dev.html'],
+    validateStatus: (status) => status === 200
+  })
 
-    npmProcess.once('exit', () => {
-      console.log('Frame exited')
-      devServerProcess.kill()
-    })
-  } catch (err) {
-    console.log('Error running Electron', err)
-    devServerProcess.kill()
-  }
+  return { shutDown: () => kill(server.pid) }
 }
 
 async function run() {
   await prepareEnvironment()
 
-  launchServer()
+  const { shutDown } = await launchServer()
+
+  try {
+    const npmProcess = spawn('npm', ['run', 'launch:dev'], { stdio: 'inherit' })
+
+    npmProcess.once('exit', () => {
+      console.log('Frame exited')
+      shutDown()
+    })
+  } catch (err) {
+    console.log('Error running Electron', err)
+    shutDown()
+  }
 }
 
 run()
