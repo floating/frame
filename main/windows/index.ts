@@ -46,9 +46,18 @@ const app = {
     }
   },
   show: (switchScreen?: boolean) => {
+    const dashVisible = dash.isVisible()
+    const forceShowDash = dashVisible && !switchScreen
     tray.show()
-    if (dash.hiddenByAppHide || (switchScreen && dash.isVisible())) {
+    if (dash.hiddenByAppHide || dashVisible) {
       dash.show()
+      // workaround for lack of workspaces support in Electron
+      // https://github.com/electron/electron/issues/5362
+      if (forceShowDash) {
+        windows.dash.setVisibleOnAllWorkspaces(true)
+        windows.dash.focus()
+        windows.dash.setVisibleOnAllWorkspaces(false)
+      }
     }
   },
   toggle: () => {
