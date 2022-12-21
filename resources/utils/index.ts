@@ -63,7 +63,7 @@ const matchFilter = (filter: string = '', properties: string[] = []) => {
   return filterItems.every((item = '') => {
     item = item.toLowerCase()
     return properties.some((prop) => {
-      prop = prop.toLowerCase()
+      prop = (prop || '').toLowerCase()
       return prop.indexOf(item) !== -1
     })
   })
