@@ -11,10 +11,11 @@ const Access = ({ nextSlide, platform }) => {
   const [trayOpen, setTrayOpen] = useState(store('tray.open'))
 
   useEffect(() => {
-    link.send('tray:action', 'navDash', { view: 'settings', data: {} })
     const handler = (event) => {
       if (event === 'shortcutActivated') setShortcutActivated(true)
     }
+
+    link.send('tray:action', 'navDash', { view: 'settings', data: {} })
     link.on('flex', handler)
 
     const obs = store.observer(() => {

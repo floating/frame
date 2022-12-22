@@ -428,6 +428,10 @@ class Onboard {
   }
 }
 
+ipcMain.on('tray:hide', () => {
+  app.hide()
+})
+
 ipcMain.on('tray:quit', () => electronApp.quit())
 ipcMain.on('tray:mouseout', () => {
   if (glide && !store('windows.dash.showing')) {

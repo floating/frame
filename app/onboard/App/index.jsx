@@ -35,6 +35,7 @@ class App extends React.Component {
           }}
           onComplete={() => {
             link.send('tray:action', 'completeOnboarding')
+            link.send('tray:action', 'navReplace', 'dash')
           }}
         />
         {/* <DevControls>
