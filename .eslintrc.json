@@ -11,17 +11,30 @@
   ],
   "plugins": ["import", "promise", "react", "jsx-a11y"],
   "rules": {
-    "multiline-ternary": 0,
-    "react/no-direct-mutation-state": 0,
-    "react/no-find-dom-node": 0
+    "n/no-missing-import": "off",
+    "n/no-unpublished-import": "off",
+    "n/no-unpublished-require": "off",
+    "import/no-unresolved": "off",
+    "import/extensions": [
+      "error",
+      {
+        "js": "never",
+        "ts": "never"
+      }
+    ],
+    "react/prop-types": "off"
   },
   "parserOptions": {
+    "sourceType": "module",
     "ecmaVersion": 2020,
     "ecmaFeatures": {
       "jsx": true
     }
   },
   "settings": {
+    "import/resolver": {
+      "node": true
+    },
     "react": {
       "version": "detect"
     }
@@ -43,7 +56,13 @@
         "plugin:react-hooks/recommended",
         "prettier"
       ],
-      "plugins": ["@typescript-eslint", "import", "promise", "react", "jsx-a11y"],
+      "plugins": [
+        "@typescript-eslint",
+        "import",
+        "promise",
+        "react",
+        "jsx-a11y"
+      ],
       "parserOptions": {
         "ecmaVersion": 2020,
         "ecmaFeatures": {
@@ -61,9 +80,8 @@
         }
       },
       "rules": {
-        "multiline-ternary": 0,
-        "react/no-direct-mutation-state": 0,
-        "react/no-find-dom-node": 0
+        "n/no-missing-import": "off",
+        "n/no-unpublished-import": "off"
       }
     },
     {
@@ -73,8 +91,12 @@
       "env": {
         "jest/globals": true
       },
-      "rules": {
-
+      "rules": {}
+    },
+    {
+      "files": ["resources/**", "app/**"],
+      "globals": {
+        "window": true
       }
     }
   ]
