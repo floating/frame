@@ -16,7 +16,7 @@ const Chains = ({ nextSlide }) => {
       <SlideBody>
         <div>Frame makes it easy to manage many accounts and signers all in one place.</div>
         <div>
-          To add your first account, simply click the "Add Account" button at the bottom of the Accounts
+          To add your first account, simply click the "Add New Account" button at the bottom of the Accounts
           panel.
         </div>
       </SlideBody>

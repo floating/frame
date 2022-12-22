@@ -200,14 +200,19 @@ export class Tray {
       if (showOnReady) {
         store.trayOpen(true)
       }
-      if (store('windows.dash.showing') || !store('main.mute.onboardingWindow')) {
+
+      const showOnboardingWindow = !store('main.mute.onboardingWindow')
+      if (store('windows.dash.showing') || showOnboardingWindow) {
         setTimeout(() => {
           dash.show()
         }, 300)
       }
-      setTimeout(() => {
-        onboard.show()
-      }, 600)
+
+      if (showOnboardingWindow) {
+        setTimeout(() => {
+          onboard.show()
+        }, 600)
+      }
     }
     ipcMain.on('tray:ready', this.readyHandler)
     initTrayWindow()
@@ -477,8 +482,16 @@ const init = () => {
   }
   tray = new Tray()
   dash = new Dash()
+
   if (!store('main.mute.onboardingWindow')) {
     onboard = new Onboard()
+
+    store.observer(() => {
+      if (!store('windows.onboard.showing')) {
+        onboard.hide()
+        windows.tray.focus()
+      }
+    })
   }
 
   // data change events
@@ -490,12 +503,7 @@ const init = () => {
       windows.tray.focus()
     }
   })
-  store.observer(() => {
-    if (!store('windows.onboard.showing')) {
-      onboard.hide()
-      windows.tray.focus()
-    }
-  })
+
   store.observer(() => broadcast('permissions', JSON.stringify(store('permissions'))))
   store.observer(() => {
     const displaySummonShortcut = store('main.shortcuts.altSlash')
