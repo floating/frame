@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import { SlideProceed } from '../../Components'
 import { Slide, SlideTitle, SlideBody } from '../../styled'
@@ -6,6 +6,8 @@ import { Slide, SlideTitle, SlideBody } from '../../styled'
 import link from '../../../../../resources/link'
 
 const Chains = ({ nextSlide }) => {
+  const [stage, setStage] = useState(0)
+
   useEffect(() => {
     link.send('tray:action', 'navDash', { view: 'chains', data: {} })
   }, [])
@@ -13,22 +15,30 @@ const Chains = ({ nextSlide }) => {
   return (
     <Slide>
       <SlideTitle>Chains</SlideTitle>
-      <SlideBody>
-        <div>Next let's set up the chains you want to use.</div>
-        <div>
-          Frame comes with presets for a few of the most popular chains. Turn them on and off or update the
-          RPC you want to use for each in the Chains panel.{' '}
-        </div>
-        <div>
-          Add new chains with the button at the bottom of the panel or by using a dapp that adds chains for
-          you such as chainlist.org.{' '}
-        </div>
-        <div>
-          With Frame's Omnichain routing, you can seamlessly use multiple chains at the same time, creating
-          truly multichain experiences by allowing dapps to operate across multiple chains simultaneously.
-        </div>
-      </SlideBody>
-      <SlideProceed onClick={nextSlide}>Done</SlideProceed>
+      {stage === 0 ? (
+        <SlideBody>
+          <div>Next let's setup the chains you want to use.</div>
+          <div>
+            Frame includes many popular chains out of the box, to start using them all you need to do is turn
+            them on!
+          </div>
+        </SlideBody>
+      ) : stage === 1 ? (
+        <SlideBody>
+          <div>
+            You can also add new chains with the button at the bottom of the panel or by using a dapp that
+            adds chains for you such as chainlist.org.
+          </div>
+        </SlideBody>
+      ) : stage === 2 ? (
+        <SlideBody>
+          <div>
+            With Frame's Omnichain routing, dapps can seamlessly use multiple chains at the same time,
+            creating truly multichain experiences.
+          </div>
+        </SlideBody>
+      ) : null}
+      <SlideProceed onClick={stage === 2 ? nextSlide : () => setStage(stage + 1)}>Next</SlideProceed>
     </Slide>
   )
 }

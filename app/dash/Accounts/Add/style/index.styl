@@ -63,7 +63,7 @@
     font-family 'MainFont'
     font-weight 300
     width 100%
-    margin 12px 0px
+    margin 16px 0px
 
     .addAccountItemIconLedger
       position relative
@@ -116,7 +116,7 @@
     box-sizing border-box
     position absolute
     font-weight 400
-    top 67px
+    top 80px
     left 50px
     right 50px
     padding 16px
@@ -265,34 +265,34 @@
 
         .addAccountItemOptionTitle
           text-align center
-          font-size 14px
-          font-weight 300
+          font-size 15px
+          font-weight 400
           box-sizing border-box
-          margin-bottom 20px
+
+  .addAccountItemOptionError
+    height 34px
+    padding 0px 20px
+    font-size 12px
+    color var(--moon)
+    text-align center
 
   .addAccountItemOptionSubmit
     background var(--ghostB)
-    height 30px
+    height 32px
+    border-radius 16px
     padding 0px 40px
     display flex
     text-align center
     justify-content center
     align-items center
-    border-radius 8px
     cursor pointer
+    background var(--ghostA)
+    border-bottom 2px solid var(--ghostZ)
+    transform translate3d(0, 0, 0)
+    box-shadow 0px 1px 6px var(--ghostY)
 
   .addAccountItemOptionSubmit:hover
     background var(--ghostC)
-
-  .addAccountItemOptionSubmit.error
-    color var(--moon)
-    font-size 10px
-    background var(--ghostD)
-    opacity 0.7
-
-  .addAccountItemOptionSubmit.error:hover
-    cursor default
-    background var(--ghostD)
 
   .addAccountResolvingEns
 
@@ -377,14 +377,15 @@
   .addAccountItemOptionInputPhrase
     width 100%
     border-radius 16px
-    height 72px
+    height 122px
     padding 0px 0px
     margin 10px 0px 20px 0px
     position relative
     overflow hidden
     background var(--ghostA)
+    border-bottom 2px solid var(--ghostZ)
     transform translate3d(0, 0, 0)
-    box-shadow 0px 4px 8px var(--ghostY)
+    box-shadow 0px 2px 8px var(--ghostY)
     color var(--outerspace)
 
     // display flex
@@ -451,8 +452,7 @@
       background var(--moon)
 
   .addAccountItemOptionInputPassword
-    input
-      margin-top -7px
+    height 72px
 
   .addAccountItemColorBar
     position absolute

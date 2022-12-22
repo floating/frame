@@ -20,6 +20,7 @@ export const DevControls = styled.div`
   color: var(--outerspace);
   display: flex;
   font-size: 12px;
+  z-index: 20000;
   &:after {
     content: 'developer nav';
     position: absolute;
@@ -39,10 +40,11 @@ export const DevControlButton = styled.div`
 
 export const SlideContainer = styled.div`
   position: absolute;
-  top: 32px;
+  top: 0;
   right: 0;
-  bottom: 52px;
+  bottom: 0;
   left: 0;
+  padding: 64px 0px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -50,40 +52,85 @@ export const SlideContainer = styled.div`
 
 export const Slide = styled.div`
   position: relative;
-  width: 500px;
-  display: flex;
-  justify-content: flex-start;
-  flex-direction: column;
+  width: 100%;
+  padding: 64px 96px;
+  max-width: 408px;
   z-index: 700;
+  max-height: 100%;
+  overflow-y: scroll;
+  overflow-x: hidden;
 `
 
 export const SlideTitle = styled.div`
-  font-size: 30px;
-  font-weight: 400;
+  font-size: 32px;
+  font-weight: 500;
   animation: cardShow 400ms linear both;
   animation-delay: 0s;
+  margin-bottom: 20px;
 `
 
 export const SlideBody = styled.div`
   animation: cardShow 400ms linear both;
   animation-delay: 200ms;
+  font-weight: 300;
+  font-size: 18px;
   div {
-    padding-top: 30px;
+    padding-top: 40px;
+    line-height: 40px;
   }
 `
 
+export const Shortcut = styled.span`
+  animation: cardShow 400ms linear both;
+  animation-delay: 200ms;
+  padding: 4px 19px 5px 19px;
+  height: 42px;
+  border-radius: 21px;
+  font-weight: 400;
+  font-size: 14px;
+  border: 2px solid var(--moon);
+  margin: 6px;
+`
+
 export const Proceed = styled.div`
-  width: 200px;
-  height: 60px;
-  border-radius: 20px;
-  background: var(--ghostB);
+  width: 180px;
+  height: 48px;
+  border-radius: 24px;
+  background: var(--ghostA);
+  border-bottom: 2px solid var(--ghostZ);
+  box-shadow: 0px 2px 6px var(--ghostY);
   display: flex;
   justify-content: center;
   align-items: center;
+  box-sizing: border-box;
   animation: cardShow 400ms linear both;
   animation-delay: 400ms;
-  margin-top: 30px;
+  margin-top: 60px;
+  font-weight: 500;
   cursor: pointer;
+  &:hover {
+    background: var(--ghostB);
+  }
+`
+
+export const Skip = styled.span`
+  display: inline-block;
+  height: 32px;
+  font-size: 10px;
+  border-radius: 16px;
+  border: 2px solid var(--ghostX);
+  padding: 8px 16px;
+  box-sizing: border-box;
+  animation: cardShow 400ms linear both;
+  animation-delay: 400ms;
+  margin-top: 60px;
+  font-weight: 500;
+  cursor: pointer;
+  text-transform: uppercase;
+  color: var(--outerspace08);
+  &:hover {
+    color: var(--outerspace);
+  }
 `
 
 // const cardShow = keyframes`

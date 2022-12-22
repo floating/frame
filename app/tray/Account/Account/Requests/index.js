@@ -260,7 +260,7 @@ class Requests extends React.Component {
     const groups = Object.keys(originSortedRequests)
 
     return (
-      <div className='accountViewScroll'>
+      <div className='accountViewScroll' style={{ paddingTop: '40px' }}>
         {groups.length === 0 ? (
           <div className='requestContainerWrap'>
             <div className='requestContainerEmpty'>{'NO PENDING REQUESTS'}</div>

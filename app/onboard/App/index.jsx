@@ -37,7 +37,7 @@ class App extends React.Component {
             link.send('tray:action', 'completeOnboarding')
           }}
         />
-        <DevControls>
+        {/* <DevControls>
           <DevControlButton
             onClick={() => {
               const prevSlide = --this.state.slide
@@ -54,7 +54,7 @@ class App extends React.Component {
           >
             next
           </DevControlButton>
-        </DevControls>
+        </DevControls> */}
       </Onboard>
     )
   }

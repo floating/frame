@@ -64,8 +64,6 @@ const EnterSecret = ({ newAccountType, isValidSecret, title }) => {
     setError(isValidSecret(value) ? '' : `INVALID ${title.toUpperCase()}`)
   }, 300)
 
-  const buttonClasses = ['addAccountItemOptionSubmit'].concat(error ? ['error'] : []).join(' ')
-
   const handleSubmit = () => {
     setTimeout(clear, 600)
     return navForward(newAccountType, {
@@ -91,9 +89,15 @@ const EnterSecret = ({ newAccountType, isValidSecret, title }) => {
           }}
         />
       </div>
-      <div role='button' className={buttonClasses} onMouseDown={() => !error && handleSubmit()}>
-        {error || 'Next'}
-      </div>
+      {error ? (
+        <div role='button' className='addAccountItemOptionError'>
+          {error}
+        </div>
+      ) : (
+        <div role='button' className='addAccountItemOptionSubmit' onClick={() => handleSubmit()}>
+          {'Next'}
+        </div>
+      )}
     </div>
   )
 }
