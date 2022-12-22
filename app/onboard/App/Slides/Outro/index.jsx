@@ -9,9 +9,8 @@ const Outro = ({ onComplete }) => {
       <SlideTitle>You're ready to go!</SlideTitle>
       <SlideBody>
         <div>
-          We're dedicated to pushing the boundaries of web3. We encourage you to continue exploring the
-          endless possibilities of dapps and the web3 ecosystem -- Frame will be here to assist you along the
-          way.
+          Frame is here to help you push the boundaries of web3. We can't wait to embark on your next
+          adventure with you!
         </div>
       </SlideBody>
       <SlideProceed onClick={onComplete}>Close</SlideProceed>

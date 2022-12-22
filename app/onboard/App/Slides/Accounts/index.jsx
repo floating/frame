@@ -14,13 +14,13 @@ const Chains = ({ nextSlide }) => {
     <Slide>
       <SlideTitle>Accounts</SlideTitle>
       <SlideBody>
-        <div>Frame makes it easy to manage many accounts and signers at the same time all in one place.</div>
+        <div>Frame makes it easy to manage many accounts and signers all in one place.</div>
         <div>
-          To add and set up your first account, simply click the "Add Account" button at the bottom of the
-          Accounts panel.
+          To add your first account, simply click the "Add Account" button at the bottom of the Accounts
+          panel.
         </div>
       </SlideBody>
-      <SlideProceed onClick={nextSlide}>Done</SlideProceed>
+      <SlideProceed onClick={nextSlide}>Next</SlideProceed>
     </Slide>
   )
 }
