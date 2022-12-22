@@ -19,6 +19,10 @@ if (process.env.NODE_ENV !== 'development' || process.env.HMR !== 'true') {
   } // eslint-disable-line
 }
 
+function AppComponent() {
+  return <App />
+}
+
 link.rpc('getState', (err, state) => {
   if (err) return console.error('Could not get initial state from main.')
   const store = appStore(state)
@@ -38,8 +42,8 @@ link.rpc('getState', (err, state) => {
       document.body.classList.add('suspend')
     }
   })
-  const Tray = Restore.connect(App, store)
   const root = createRoot(document.getElementById('tray'))
+  const Tray = Restore.connect(AppComponent, store)
   root.render(<Tray />)
 })
 // document.addEventListener('mouseover', e => link.send('tray:focus'))
