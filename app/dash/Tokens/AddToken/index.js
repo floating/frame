@@ -277,11 +277,15 @@ class AddTokenFormScreenComponent extends Component {
       decimals,
       logoURI: this.isDefault('logoURI') ? '' : logoURI
     }
-    const backSteps = isEdit ? 1 : 3
+    const backSteps = isEdit ? 2 : 4
 
     link.send('tray:addToken', token, req)
     setTimeout(() => {
       navBack(backSteps)
+      link.send('nav:forward', 'dash', {
+        view: 'tokens',
+        data: {}
+      })
     }, 400)
   }
 
