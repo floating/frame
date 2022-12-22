@@ -29,15 +29,12 @@ const PasswordInput = ({ getError, next, title, buttonText }) => {
     setError(err || '')
   }, 300)
 
-  const buttonClasses = ['addAccountItemOptionSubmit'].concat(error ? ['error'] : []).join(' ')
-
   return (
     <div className='addAccountItemOptionSetupFrame'>
       <div role='heading' className='addAccountItemOptionTitle'>
         {title}
       </div>
       <div className='addAccountItemOptionInputPhrase addAccountItemOptionInputPassword'>
-        <div className='addAccountItemOptionSubtitle'>password must be 12 characters or longer</div>
         <input
           role='textbox'
           type='password'
@@ -50,16 +47,22 @@ const PasswordInput = ({ getError, next, title, buttonText }) => {
         />
       </div>
 
-      <div className={buttonClasses} onMouseDown={(e) => !error && handleSubmit()} role='button'>
-        {error || buttonText}
-      </div>
+      {error ? (
+        <div role='button' className='addAccountItemOptionError'>
+          {error}
+        </div>
+      ) : (
+        <div role='button' className='addAccountItemOptionSubmit' onClick={() => handleSubmit()}>
+          {buttonText}
+        </div>
+      )}
     </div>
   )
 }
 
 export const CreatePassword = ({ onCreate }) => {
   const getError = (password) => {
-    if (password.length < 12) return 'PASSWORD MUST BE AT LEAST 12 CHARACTERS LONG'
+    if (password.length < 12) return 'PASSWORD MUST BE 12 OR MORE CHARACTERS'
     const {
       feedback: { warning },
       score

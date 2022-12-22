@@ -27,7 +27,7 @@ describe('creating password', () => {
       jest.runAllTimers()
     })
 
-    expect(submitButton.textContent).toBe('PASSWORD MUST BE AT LEAST 12 CHARACTERS LONG')
+    expect(submitButton.textContent).toBe('PASSWORD MUST BE 12 OR MORE CHARACTERS')
   })
 
   it('Should show the warning when the password is too weak', async () => {

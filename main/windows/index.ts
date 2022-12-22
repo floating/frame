@@ -200,7 +200,7 @@ export class Tray {
       if (showOnReady) {
         store.trayOpen(true)
       }
-      if (store('windows.dash.showing')) {
+      if (store('windows.dash.showing') || !store('main.mute.onboardingWindow')) {
         setTimeout(() => {
           dash.show()
         }, 300)
@@ -411,7 +411,8 @@ class Onboard {
       windows.onboard.setSize(width, height)
       const pos = topRight(windows.onboard)
 
-      const x = (pos.x * 2 - width * 2 - 810) / 2
+      // const x = (pos.x * 2 - width * 2 - 810) / 2
+      const x = pos.x - 880
       windows.onboard.setPosition(x, pos.y + 80)
       // windows.onboard.setAlwaysOnTop(true)
       windows.onboard.show()

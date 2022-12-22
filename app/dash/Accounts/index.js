@@ -86,32 +86,32 @@ class AddAccounts extends React.Component {
           {/* <div className='addAccountsHeaderClose' onClick={() => this.props.close()}>{'done'}</div> */}
         </div>
         <div className='accountTypeSelect' onClick={() => this.createNewAccount('lattice')}>
-          <div className='accountTypeSelectIcon'>{svg.lattice(22)}</div>
-          <div className='accountTypeSelectIcon'>{'GridPlus Lattice1'}</div>
+          <div className='accountTypeSelectIcon'>{svg.lattice(24)}</div>
+          <div>{'GridPlus Lattice1'}</div>
         </div>
         <div className='accountTypeSelect' onClick={() => this.createNewAccount('ledger')}>
-          <div className='accountTypeSelectIcon'>{svg.ledger(19)}</div>
-          <div className='accountTypeSelectIcon'>{'Ledger Device'}</div>
+          <div className='accountTypeSelectIcon'>{svg.ledger(22)}</div>
+          <div>{'Ledger Device'}</div>
         </div>
         <div className='accountTypeSelect' onClick={() => this.createNewAccount('trezor')}>
-          <div className='accountTypeSelectIcon'>{svg.trezor(17)}</div>
-          <div className='accountTypeSelectIcon'>{'Trezor Device'}</div>
+          <div className='accountTypeSelectIcon'>{svg.trezor(20)}</div>
+          <div>{'Trezor Device'}</div>
         </div>
         <div className='accountTypeSelect' onClick={() => this.createNewAccount('seed')}>
-          <div className='accountTypeSelectIcon'>{svg.seedling(23)}</div>
-          <div className='accountTypeSelectIcon'>{'Seed Phrase'}</div>
+          <div className='accountTypeSelectIcon'>{svg.seedling(25)}</div>
+          <div>{'Seed Phrase'}</div>
         </div>
         <div className='accountTypeSelect' onClick={() => this.createNewAccount('keyring')}>
-          <div className='accountTypeSelectIcon'>{svg.key(20)}</div>
-          <div className='accountTypeSelectIcon'>{'Private Key'}</div>
+          <div className='accountTypeSelectIcon'>{svg.key(23)}</div>
+          <div>{'Private Key'}</div>
         </div>
         <div className='accountTypeSelect' onClick={() => this.createNewAccount('keystore')}>
-          <div className='accountTypeSelectIcon'>{svg.file(20)}</div>
-          <div className='accountTypeSelectIcon'>{'Keystore File (json)'}</div>
+          <div className='accountTypeSelectIcon'>{svg.file(22)}</div>
+          <div>{'Keystore File (json)'}</div>
         </div>
         <div className='accountTypeSelect' onClick={() => this.createNewAccount('nonsigning')}>
-          <div className='accountTypeSelectIcon'>{svg.mask(24)}</div>
-          <div className='accountTypeSelectIcon'>{'Watch Account'}</div>
+          <div className='accountTypeSelectIcon'>{svg.mask(26)}</div>
+          <div>{'Watch Account'}</div>
         </div>
       </div>
     )
