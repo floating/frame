@@ -19,6 +19,10 @@ if (process.env.NODE_ENV !== 'development' || process.env.HMR !== 'true') {
   } // eslint-disable-line
 }
 
+function AppComponent() {
+  return <App />
+}
+
 link.rpc('getFrameId', (err, frameId) => {
   if (err) return console.error('Could not get frameId from main', err)
   window.frameId = frameId
@@ -33,8 +37,8 @@ link.rpc('getFrameId', (err, frameId) => {
         document.body.classList.remove('clip')
       }, 100)
     })
-    const Dapp = Restore.connect(App, store)
     const root = createRoot(document.getElementById('dapp'))
+    const Dapp = Restore.connect(AppComponent, store)
     root.render(<Dapp />)
   })
 })
