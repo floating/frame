@@ -1,12 +1,14 @@
 import React, { useEffect } from 'react'
-import { Slide, SlideTitle, SlideBody, SlideProceed } from '../../styled'
+
+import { SlideProceed } from '../../Components'
+import { Slide, SlideTitle, SlideBody } from '../../styled'
 
 import link from '../../../../../resources/link'
 
-const Chains = ({ nextSlide, prevSlide }) => {
+const Chains = ({ nextSlide }) => {
   useEffect(() => {
     link.send('tray:action', 'navDash', { view: 'accounts', data: {} })
-  })
+  }, [])
 
   return (
     <Slide>
