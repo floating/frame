@@ -225,6 +225,7 @@ const rpc = {
   },
   async resolveEnsName(name, cb) {
     log.debug('Resolving ENS name', { name })
+
     const nebula = nebulaApi()
 
     try {
@@ -235,8 +236,6 @@ const rpc = {
     } catch (err) {
       log.warn(`Could not resolve ENS name ${name}:`, err)
       return cb(err)
-    } finally {
-      nebula.close()
     }
   },
   verifyAddress(cb) {
