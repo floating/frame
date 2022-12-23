@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react'
 
-import { SlideProceed } from '../../Components'
-import { Slide, SlideTitle, SlideBody, Shortcut, Skip } from '../../styled'
+import { Slide, SlideBody, SlideItem, Shortcut } from '../../styled'
 
 import link from '../../../../../resources/link'
 
-const Access = ({ nextSlide, platform }) => {
+const Access = ({ setTitle, setProceed, platform }) => {
   const keyboardShortcut = platform === 'darwin' ? 'Option + /' : 'Alt + /'
   const [shortcutActivated, setShortcutActivated] = useState(false)
   const [trayOpen, setTrayOpen] = useState(store('tray.open'))
@@ -28,44 +27,43 @@ const Access = ({ nextSlide, platform }) => {
     }
   }, [])
 
+  useEffect(() => {
+    if (trayOpen && !shortcutActivated) {
+      setTitle(`Let's get started...`)
+      setProceed({ action: 'skip', text: 'skip this step' })
+    } else if (!trayOpen) {
+      setTitle('Summon Frame')
+      setProceed({ action: 'skip', text: 'skip this step' })
+    } else {
+      setTitle('Auto hide')
+      setProceed({ action: 'next', text: 'Next' })
+    }
+  }, [trayOpen, shortcutActivated])
+
   return (
     <Slide>
       {trayOpen && !shortcutActivated ? (
-        <>
-          <SlideTitle>Let's get started...</SlideTitle>
-          <SlideBody>
-            <div>{`You can quickly summon and dismiss Frame using the keyboard shortcut.`}</div>
-            <div>
-              <span>{'Dismiss Frame now using '}</span>
-              <Shortcut>{keyboardShortcut}</Shortcut>
-            </div>
-          </SlideBody>
-        </>
+        <SlideBody>
+          <SlideItem>{`You can quickly summon and dismiss Frame using the keyboard shortcut.`}</SlideItem>
+          <SlideItem>
+            <span>{'Dismiss Frame now using '}</span>
+            <Shortcut>{keyboardShortcut}</Shortcut>
+          </SlideItem>
+        </SlideBody>
       ) : !trayOpen ? (
-        <>
-          <SlideTitle>Summon Frame</SlideTitle>
-          <SlideBody>
-            <div>
-              <span>{'You can summon the same way '}</span>
-              <Shortcut>{keyboardShortcut}</Shortcut>
-            </div>
-          </SlideBody>
-        </>
+        <SlideBody>
+          <SlideItem>
+            <span>{'You can summon Frame the same way '}</span>
+            <Shortcut>{keyboardShortcut}</Shortcut>
+          </SlideItem>
+        </SlideBody>
       ) : (
-        <>
-          <SlideTitle>Auto hide</SlideTitle>
-          <SlideBody>
-            <div>
-              You can also set Frame to automatically hide when not in use, so it's out of the way but still
-              easily accessible when you need it.
-            </div>
-          </SlideBody>
-        </>
-      )}
-      {trayOpen && shortcutActivated ? (
-        <SlideProceed onClick={nextSlide}>Next</SlideProceed>
-      ) : (
-        <Skip onClick={nextSlide}>Skip This Step</Skip>
+        <SlideBody>
+          <SlideItem>
+            You can also set Frame to automatically hide when not in use, so it's out of the way but still
+            easily accessible when you need it.
+          </SlideItem>
+        </SlideBody>
       )}
     </Slide>
   )

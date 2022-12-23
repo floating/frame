@@ -1,19 +1,18 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 
-import { SlideProceed } from '../../Components'
-import { Slide, SlideTitle, SlideBody } from '../../styled'
+import { Slide, SlideBody, SlideItem } from '../../styled'
 
-const Outro = ({ onComplete }) => {
+const Outro = ({ setTitle, setProceed }) => {
+  useEffect(() => {
+    setTitle(`You're ready to go!`)
+    setProceed({ action: 'complete', text: 'Done' })
+  }, [])
   return (
     <Slide>
-      <SlideTitle>You're ready to go!</SlideTitle>
       <SlideBody>
-        <div>
-          Frame is here to help you push the boundaries of web3. We can't wait to embark on your next
-          adventure with you!
-        </div>
+        <SlideItem>Frame is here to help you push the boundaries of web3.</SlideItem>
+        <SlideItem>We can't wait to embark on your next adventure with you!</SlideItem>
       </SlideBody>
-      <SlideProceed onClick={onComplete}>Close</SlideProceed>
     </Slide>
   )
 }
