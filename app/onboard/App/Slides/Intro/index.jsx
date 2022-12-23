@@ -9,8 +9,9 @@ const Intro = ({ nextSlide }) => {
       <SlideTitle>Welcome to Frame!</SlideTitle>
       <SlideBody>
         <div>
-          Frame is an always-on, system-wide platform making it easy for any browser, native, or command line
-          application to access web3 protocols and accounts.
+          Frame is an always-on, system-wide wallet platform that directly integrates with any browser,
+          command line interface, or native application to provide secure and convenient access to web3
+          protocols and accounts.
         </div>
       </SlideBody>
       <SlideProceed onClick={nextSlide}>Let's go!</SlideProceed>
