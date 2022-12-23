@@ -12,8 +12,9 @@ const Chains = ({ setTitle, setProceed }) => {
     <Slide>
       <SlideBody>
         <SlideItem>
-          With Frame's Omnichain routing dapps can seamlessly use multiple chains at the same time, enabling
-          truly multichain experiences.
+          <div>With Frame's Omnichain routing dapps can</div>
+          <div>seamlessly use multiple chains at the same time,</div>
+          <div>enabling truly multichain experiences.</div>
         </SlideItem>
       </SlideBody>
     </Slide>

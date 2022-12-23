@@ -43,25 +43,29 @@ const Access = ({ setTitle, setProceed, platform }) => {
   return (
     <Slide>
       {trayOpen && !shortcutActivated ? (
-        <SlideBody>
-          <SlideItem>{`You can quickly summon and dismiss Frame using the keyboard shortcut.`}</SlideItem>
+        <SlideBody key={1}>
+          <SlideItem>
+            <div>You can quickly summon and dismiss</div>
+            <div>Frame using the keyboard shortcut.</div>
+          </SlideItem>
           <SlideItem>
             <span>{'Dismiss Frame now using '}</span>
             <Shortcut>{keyboardShortcut}</Shortcut>
           </SlideItem>
         </SlideBody>
       ) : !trayOpen ? (
-        <SlideBody>
+        <SlideBody key={2}>
           <SlideItem>
             <span>{'You can summon Frame the same way '}</span>
             <Shortcut>{keyboardShortcut}</Shortcut>
           </SlideItem>
         </SlideBody>
       ) : (
-        <SlideBody>
+        <SlideBody key={3}>
           <SlideItem>
-            You can also set Frame to automatically hide when not in use, so it's out of the way but still
-            easily accessible when you need it.
+            <div>You can also set Frame to automatically hide</div>
+            <div>when not in use, so it's out of the way</div>
+            <div>but still easily accessible when you need it.</div>
           </SlideItem>
         </SlideBody>
       )}

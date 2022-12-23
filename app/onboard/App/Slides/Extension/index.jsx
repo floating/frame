@@ -13,10 +13,16 @@ const Extension = ({ setTitle, setProceed }) => {
     <Slide>
       <SlideBody>
         <SlideItem>
-          If you're using a dapp that doesn't natively connect to Frame, you can inject a connection with our
-          <Tag>Frame Companion</Tag> browser extension.
+          <div>If you're using a dapp that doesn't natively</div>
+          <div>connect to Frame, you can inject a connection with</div>
+          <div>
+            our <Tag>Frame Companion</Tag> browser extension.
+          </div>
         </SlideItem>
-        <SlideItem>Click the links below to visit the extension store for your preferred browser:</SlideItem>
+        <SlideItem>
+          <div>Click the links below to visit the extension</div>
+          <div>store for your preferred browser:</div>
+        </SlideItem>
         <div
           style={{
             display: 'flex',

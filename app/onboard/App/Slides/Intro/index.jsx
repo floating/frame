@@ -11,10 +11,12 @@ const Intro = ({ setTitle, setProceed }) => {
     <Slide>
       <SlideBody>
         <SlideItem>
-          Frame is a web3 platform that creates a secure system-wide interface to your chains and accounts.
+          <div>Frame is a web3 platform that creates a secure</div>
+          <div>system-wide interface to your chains and accounts.</div>
         </SlideItem>
         <SlideItem>
-          Now any browser, command-line, or native application has the ability to access to web3.
+          <div>Now any browser, command-line, or native</div>
+          <div>application has the ability to access to web3.</div>
         </SlideItem>
       </SlideBody>
     </Slide>

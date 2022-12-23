@@ -10,8 +10,14 @@ const Outro = ({ setTitle, setProceed }) => {
   return (
     <Slide>
       <SlideBody>
-        <SlideItem>Frame is here to help you push the boundaries of web3.</SlideItem>
-        <SlideItem>We can't wait to embark on your next adventure with you!</SlideItem>
+        <SlideItem>
+          <div>Frame is here to help you</div>
+          <div>push the boundaries of web3.</div>
+        </SlideItem>
+        <SlideItem>
+          <div>We can't wait to embark on your</div>
+          <div>next adventure with you!</div>
+        </SlideItem>
       </SlideBody>
     </Slide>
   )

@@ -1,6 +1,5 @@
 import React from 'react'
 import styled from 'styled-components'
-import Balancer from 'react-wrap-balancer'
 
 export const Onboard = styled.div`
   position: absolute;
@@ -77,8 +76,6 @@ export const SlideProceed = styled.div`
 `
 
 export const Shortcut = styled.span`
-  animation: cardShow 400ms linear both;
-  animation-delay: 200ms;
   padding: 4px 19px 5px 19px;
   height: 42px;
   border-radius: 21px;
@@ -97,13 +94,13 @@ export const Tag = styled.span`
   margin: 4px;
 `
 
-export const SlideItem = ({ children }) => {
-  return (
-    <div>
-      <Balancer>{children}</Balancer>
-    </div>
-  )
-}
+export const SlideItem = styled.div`
+  display: 'flex';
+  flex-direction: column;
+  div {
+    padding-bottom: 0px;
+  }
+`
 
 // const cardShow = keyframes`
 //   0% { opacity: 0; }
