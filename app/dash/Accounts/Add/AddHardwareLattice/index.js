@@ -134,7 +134,7 @@ class AddHardwareLattice extends React.Component {
               <div className='addAccountItemOptionSetupFrames'>
                 <div className='addAccountItemOptionSetupFrame'>
                   <div className='addAccountItemOptionTitle'>Device Name</div>
-                  <div className='addAccountItemOptionInputPhrase'>
+                  <div className='addAccountItemOptionInput'>
                     <input
                       tabIndex='-1'
                       ref={this.forms[0]}
@@ -160,7 +160,7 @@ class AddHardwareLattice extends React.Component {
                 </div>
                 <div className='addAccountItemOptionSetupFrame'>
                   <div className='addAccountItemOptionTitle'>Enter device id</div>
-                  <div className='addAccountItemOptionInputPhrase'>
+                  <div className='addAccountItemOptionInput'>
                     <input
                       tabIndex='-1'
                       ref={this.forms[1]}

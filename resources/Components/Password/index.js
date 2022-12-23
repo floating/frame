@@ -34,7 +34,7 @@ const PasswordInput = ({ getError, next, title, buttonText }) => {
       <div role='heading' className='addAccountItemOptionTitle'>
         {title}
       </div>
-      <div className='addAccountItemOptionInputPhrase addAccountItemOptionInputPassword'>
+      <div className='addAccountItemOptionInput addAccountItemOptionInputPassword'>
         <input
           role='textbox'
           type='password'
