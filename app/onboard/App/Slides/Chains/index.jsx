@@ -14,13 +14,13 @@ const Chains = ({ setTitle, setProceed }) => {
   return (
     <Slide>
       <SlideBody>
-        <SlideItem>Next let's set up the chains you want to use.</SlideItem>
+        <SlideItem>Next, let's set up the chains you want to use.</SlideItem>
         <SlideItem>
           Frame includes many popular chains out of the box -- just turn them on to start using them!
         </SlideItem>
         <SlideItem>
           You can also add new chains with the button at the bottom of the panel or by using a dapp that adds
-          chains for you such as chainlist.org.
+          chains for you, such as chainlist.org.
         </SlideItem>
       </SlideBody>
     </Slide>
