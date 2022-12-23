@@ -219,19 +219,7 @@ class FrameAccount {
     log.info(`clearRequest(${handlerId}) for account ${this.id}`)
 
     delete this.requests[handlerId]
-    store.navClearReq(handlerId)
-
-    // if no requests remaining, remove request inbox from the nav
-    if (Object.keys(this.requests).length === 0) {
-      const nav = store('windows.panel.nav') as Breadcrumb[]
-      const updatedNav = nav.filter(
-        (navItem) => navItem?.data?.id !== 'requests' || navItem?.view !== 'expandedModule'
-      )
-
-      if (updatedNav.length !== nav.length) {
-        store.navReplace('panel', updatedNav)
-      }
-    }
+    store.navClearReq(handlerId, Object.keys(this.requests).length > 0)
 
     this.update()
   }
