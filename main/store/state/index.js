@@ -70,7 +70,6 @@ const initial = {
     viewData: '',
     account: {
       moduleOrder: [
-        // 'launcher',
         'requests',
         // 'activity',
         // 'gas',
@@ -98,9 +97,6 @@ const initial = {
           height: 0
         },
         verify: {
-          height: 0
-        },
-        launcher: {
           height: 0
         },
         gas: {
