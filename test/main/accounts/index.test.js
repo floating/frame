@@ -703,51 +703,14 @@ describe('#resolveRequest', () => {
 
 describe('#removeRequest', () => {
   beforeEach(() => {
-    store.navClearReq = jest.fn()
-    account.update = jest.fn()
+    account.clearRequest = jest.fn()
     Accounts.addRequest(request)
   })
 
-  it('should remove a request for the provided handlerId from the account object', () => {
+  it('should remove a request for the provided handlerId from the account', () => {
     Accounts.removeRequest(account, request.handlerId)
 
-    expect(Object.keys(account.requests)).toHaveLength(0)
-  })
-
-  it('should clear a request for the provided handlerId from the nav', () => {
-    Accounts.removeRequest(account, request.handlerId)
-
-    expect(store.navClearReq).toHaveBeenCalledWith(request.handlerId)
-  })
-
-  it('should update the account', () => {
-    Accounts.removeRequest(account, request.handlerId)
-
-    expect(account.update).toHaveBeenCalled()
-  })
-})
-
-describe('#removeRequests', () => {
-  beforeEach(() => {
-    store.setGasFees('ethereum', '1', { maxBaseFeePerGas: '', maxPriorityFeePerGas: '' })
-    Accounts.removeRequest = jest.fn()
-    Accounts.addRequest(request)
-    Accounts.setSigner(account2.address, () => {
-      Accounts.addRequest({ ...request, data: { ...request.data, type: '0x1' } })
-    })
-  })
-
-  it('should remove the requests for a given handlerId across accounts', () => {
-    Accounts.removeRequests(request.handlerId)
-
-    expect(Object.keys(account.requests)).toHaveLength(0)
-    expect(Object.keys(account2.requests)).toHaveLength(0)
-  })
-
-  it('should not remove requests when there are none matching the given handlerId', () => {
-    Accounts.removeRequests('4')
-
-    expect(Accounts.removeRequest).not.toHaveBeenCalled()
+    expect(account.clearRequest).toHaveBeenCalledWith(request.handlerId)
   })
 })
 
