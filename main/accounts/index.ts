@@ -723,10 +723,7 @@ export class Accounts extends EventEmitter {
   removeRequest(account: FrameAccount, handlerId: string) {
     log.info(`removeRequest(${account.id}, ${handlerId})`)
 
-    store.navClearReq(handlerId)
-
-    delete account.requests[handlerId]
-    account.update()
+    account.clearRequest(handlerId)
   }
 
   declineRequest(handlerId: string) {

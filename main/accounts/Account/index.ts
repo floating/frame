@@ -1,5 +1,5 @@
 import log from 'electron-log'
-import { isValidAddress, addHexPrefix } from '@ethereumjs/util'
+import { isValidAddress } from '@ethereumjs/util'
 
 import { AccessRequest, AccountRequest, Accounts, RequestMode, TransactionRequest } from '..'
 import nebulaApi from '../../nebula'
@@ -14,6 +14,7 @@ import provider from '../../provider'
 import { ApprovalType } from '../../../resources/constants'
 
 import reveal from '../../reveal'
+import type { Breadcrumb } from '../../windows/nav/breadcrumb'
 import type { TypedMessage } from '../types'
 
 const nebula = nebulaApi()
@@ -197,7 +198,7 @@ class FrameAccount {
         knownRequest.res({ id, jsonrpc, result })
       }
 
-      this.clearRequest(knownRequest)
+      this.clearRequest(knownRequest.handlerId)
     }
   }
 
@@ -210,13 +211,28 @@ class FrameAccount {
         knownRequest.res({ id, jsonrpc, error })
       }
 
-      this.clearRequest(knownRequest)
+      this.clearRequest(knownRequest.handlerId)
     }
   }
 
-  private clearRequest({ handlerId }: AccountRequest) {
-    store.navClearReq(handlerId)
+  clearRequest(handlerId: string) {
+    log.info(`clearRequest(${handlerId}) for account ${this.id}`)
+
     delete this.requests[handlerId]
+    store.navClearReq(handlerId)
+
+    // if no requests remaining, remove request inbox from the nav
+    if (Object.keys(this.requests).length === 0) {
+      const nav = store('windows.panel.nav') as Breadcrumb[]
+      const updatedNav = nav.filter(
+        (navItem) => navItem?.data?.id !== 'requests' || navItem?.view !== 'expandedModule'
+      )
+
+      if (updatedNav.length !== nav.length) {
+        store.navReplace('panel', updatedNav)
+      }
+    }
+
     this.update()
   }
 
