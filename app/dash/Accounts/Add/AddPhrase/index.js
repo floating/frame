@@ -3,6 +3,11 @@ import React from 'react'
 import { AddHotAccount } from '../Components'
 import { utils } from 'ethers'
 
+const isValidMnemonic = (mnemonic) => {
+  if (!utils.isValidMnemonic) return false
+  return mnemonic.split(' ').length > 11
+}
+
 export default function AddPhrase({ accountData }) {
   return (
     <AddHotAccount
@@ -14,7 +19,7 @@ export default function AddPhrase({ accountData }) {
         accountData,
         createSignerMethod: 'createFromPhrase',
         newAccountType: 'seed',
-        isValidSecret: utils.isValidMnemonic
+        isValidSecret: isValidMnemonic
       }}
     />
   )
