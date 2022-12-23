@@ -32,8 +32,8 @@ const Chains = ({ nextSlide }) => {
       ) : stage === 2 ? (
         <SlideBody>
           <div>
-            With Frame's Omnichain routing dapps can seamlessly use multiple chains at the same time, creating
-            truly multichain experiences.
+            With Frame's Omnichain routing, dapps can seamlessly use multiple chains at the same time,
+            creating truly multichain experiences.
           </div>
         </SlideBody>
       ) : null}

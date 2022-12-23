@@ -14,10 +14,7 @@ const Extension = ({ nextSlide }) => {
           If you're using a dapp that doesn't natively integrate with Frame, you can still connect using our
           `Frame Companion` browser extension.
         </div>
-        <div>
-          To install the extension, simply click the links below to visit the extension store for your
-          preferred browser:
-        </div>
+        <div>Click the links below to visit the extension store for your preferred browser:</div>
         <div
           style={{
             display: 'flex',

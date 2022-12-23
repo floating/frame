@@ -19,7 +19,7 @@ const Chains = ({ nextSlide }) => {
           To set up your first account, simply click "Add New Account" at the bottom of the Accounts panel.
         </div>
       </SlideBody>
-      <SlideProceed onClick={nextSlide}>Done</SlideProceed>
+      <SlideProceed onClick={nextSlide}>Next</SlideProceed>
     </Slide>
   )
 }
