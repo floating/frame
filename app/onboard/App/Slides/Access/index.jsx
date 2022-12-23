@@ -35,7 +35,7 @@ const Access = ({ setTitle, setProceed, platform }) => {
       setTitle('Summon Frame')
       setProceed({ action: 'skip', text: 'skip this step' })
     } else {
-      setTitle('Auto hide')
+      setTitle('Auto-hide')
       setProceed({ action: 'next', text: 'Next' })
     }
   }, [trayOpen, shortcutActivated])
