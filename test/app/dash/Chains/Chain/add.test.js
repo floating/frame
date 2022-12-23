@@ -95,6 +95,42 @@ describe('rendering', () => {
     expect(submitButton.textContent).toBe('Add Chain')
   })
 
+  it('allows adding a chain with no primary RPC', async () => {
+    const chainConfig = {
+      id: 42162,
+      name: 'Arbitrum Rinkeby',
+      symbol: 'arETH',
+      primaryRpc: 'https://arbitrum-rinkeby.infura.com',
+      secondaryRpc: 'https://myrpc.arbrink.net'
+    }
+
+    const { user, getByRole, getByLabelText } = setupComponent(<Chain view='setup' {...chainConfig} />)
+
+    const primaryRpcInput = getByLabelText('Primary RPC')
+    await user.clear(primaryRpcInput)
+
+    const submitButton = getByRole('button')
+    expect(submitButton.textContent).toBe('Add Chain')
+  })
+
+  it('allows adding a chain with no secondary RPC', async () => {
+    const chainConfig = {
+      id: 42162,
+      name: 'Arbitrum Rinkeby',
+      symbol: 'arETH',
+      primaryRpc: 'https://arbitrum-rinkeby.infura.com',
+      secondaryRpc: 'https://myrpc.arbrink.net'
+    }
+
+    const { user, getByRole, getByLabelText } = setupComponent(<Chain view='setup' {...chainConfig} />)
+
+    const primaryRpcInput = getByLabelText('Secondary RPC')
+    await user.clear(primaryRpcInput)
+
+    const submitButton = getByRole('button')
+    expect(submitButton.textContent).toBe('Add Chain')
+  })
+
   it('renders the correct submit button text when the form is empty', () => {
     const chainConfig = { view: 'setup', id: 137, name: 'Polygon' }
     const { getByRole } = setupComponent(<Chain {...chainConfig} />)
