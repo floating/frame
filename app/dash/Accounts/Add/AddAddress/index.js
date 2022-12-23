@@ -187,8 +187,8 @@ class AddAddress extends React.Component {
                       <label htmlFor='addressInput' role='label' className='addAccountItemOptionTitle'>
                         input address or ENS name
                       </label>
-                      <div className='addAccountItemOptionInputPhrase'>
-                        <textarea
+                      <div className='addAccountItemOptionInput address'>
+                        <input
                           autoFocus
                           id='addressInput'
                           tabIndex='-1'

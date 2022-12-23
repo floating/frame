@@ -76,7 +76,7 @@ const EnterSecret = ({ newAccountType, isValidSecret, title }) => {
       <div role={'heading'} className='addAccountItemOptionTitle'>
         {title}
       </div>
-      <div className='addAccountItemOptionInputPhrase'>
+      <div className='addAccountItemOptionInput phrase'>
         <textarea
           ref={inputRef}
           tabIndex='-1'

@@ -193,7 +193,7 @@ class AddRing extends React.Component {
                 </div>
                 <div className='addAccountItemOptionSetupFrame'>
                   <div className='addAccountItemOptionTitle'>Enter Keystore Password</div>
-                  <div className='addAccountItemOptionInputPhrase'>
+                  <div className='addAccountItemOptionInput'>
                     <input
                       type='password'
                       tabIndex='-1'
@@ -211,7 +211,7 @@ class AddRing extends React.Component {
                 </div>
                 <div className='addAccountItemOptionSetupFrame'>
                   <div className='addAccountItemOptionTitle'>Create Account Password</div>
-                  <div className='addAccountItemOptionInputPhrase addAccountItemOptionInputPassword'>
+                  <div className='addAccountItemOptionInput addAccountItemOptionInputPassword'>
                     <div className='addAccountItemOptionSubtitle'>
                       password must be 12 characters or longer
                     </div>
