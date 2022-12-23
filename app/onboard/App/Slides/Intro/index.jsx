@@ -9,14 +9,9 @@ const Intro = ({ nextSlide }) => {
       <SlideTitle>Welcome to Frame!</SlideTitle>
       <SlideBody>
         <div>
-          Frame is an always-on, system-wide wallet platform that directly integrates with any browser, native
-          application, or command line interface to provide secure and convenient access to web3 protocols and
-          accounts.
-        </div>
-        <div>
-          With a focus on privacy, security, decentralization, and user experience, Frame empowers users to
-          interact with dapps in a secure, intuitive way. Whether you're a developer building a dapp or a user
-          seeking to get started with web3, Frame has you covered.
+          Frame is an always-on, system-wide wallet platform that directly integrates with any browser,
+          command line interface, or native application to provide secure and convenient access to web3
+          protocols and accounts.
         </div>
       </SlideBody>
       <SlideProceed onClick={nextSlide}>Let's go!</SlideProceed>
