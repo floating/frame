@@ -22,7 +22,7 @@ const Chains = ({ setTitle, setProceed }) => {
           <div>box -- to start using a chain just toggle it on!</div>
         </SlideItem>
         <SlideItem>
-          <div>You can also add new chains with the button</div>
+          <div>You can also add new chains by clicking the button</div>
           <div>at the bottom of the panel or by using a dapp</div>
           <div>that adds chains for you, such as chainlist.org.</div>
         </SlideItem>
