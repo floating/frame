@@ -678,12 +678,18 @@ module.exports = {
       return win
     })
   },
-  navClearReq: (u, handlerId) => {
+  navClearReq: (u, handlerId, showRequestInbox = true) => {
     u('windows.panel.nav', (nav) => {
       const newNav = nav.filter((navItem) => {
-        const item = navItem || {}
-        return item?.data?.requestId !== handlerId
+        // remove the filtered request
+        const isClearedRequest = navItem?.data?.requestId === handlerId
+
+        // remove the request inbox from the nav if not requested
+        const isRequestInbox = navItem?.data?.id === 'requests' && navItem?.view === 'expandedModule'
+
+        return !isClearedRequest && (showRequestInbox || !isRequestInbox)
       })
+
       return newNav
     })
   },
