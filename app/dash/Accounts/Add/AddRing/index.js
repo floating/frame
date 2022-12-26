@@ -3,9 +3,11 @@ import React from 'react'
 import { AddHotAccount } from '../Components'
 import { addHexPrefix, isHexString, isValidPrivate } from '@ethereumjs/util'
 
-const isValidSecret = (privateKeyStr) => {
+const validatePrivateKey = (privateKeyStr) => {
   const prefixed = addHexPrefix(privateKeyStr)
-  return isHexString(prefixed) && isValidPrivate(prefixed.slice(2))
+  if (!isHexString(prefixed) || !isValidPrivate(prefixed.slice(2))) {
+    return 'INVALID PRIVATE KEY'
+  }
 }
 
 export default function AddRing({ accountData }) {
@@ -19,7 +21,7 @@ export default function AddRing({ accountData }) {
         accountData,
         createSignerMethod: 'createFromPrivateKey',
         newAccountType: 'keyring',
-        isValidSecret
+        validateSecret: validatePrivateKey
       }}
     />
   )

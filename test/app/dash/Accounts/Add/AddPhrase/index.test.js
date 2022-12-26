@@ -35,7 +35,7 @@ describe('entering seed phrase', () => {
     expect(title.textContent).toBe('Seed Phrase')
   })
 
-  it('should show an error message when an incorrect seed phrase is submitted', async () => {
+  it('should show an error message when a cryptographically invalid seed phrase is submitted', async () => {
     await user.type(seedPhraseTextArea, 'INVALID')
 
     act(() => {
@@ -43,6 +43,16 @@ describe('entering seed phrase', () => {
     })
 
     expect(nextButton.textContent).toBe('INVALID SEED PHRASE')
+  })
+
+  it('should show an error message when a seed phrase with length < 12 is submitted', async () => {
+    await user.type(seedPhraseTextArea, 'summer cigar web grocery kitten pattern elite bag hurdle')
+
+    act(() => {
+      jest.runAllTimers()
+    })
+
+    expect(nextButton.textContent).toBe('SEED PHRASE TOO SHORT')
   })
 
   it('should update the navigation with the password entry screen when a seed phrase is submitted', async () => {
