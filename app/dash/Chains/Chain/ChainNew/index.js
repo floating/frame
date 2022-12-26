@@ -84,15 +84,21 @@ export default ({
   const validateChain = (chain) => {
     if (existingChains.includes(parseInt(chain.id))) {
       return { valid: false, text: 'Chain ID Already Exists' }
-    } else if (!isChainFilled(chain)) {
-      return { valid: false, text: 'Fill Chain Details' }
-    } else if (!!chain.primaryRpc && !isValidRpc(chain.primaryRpc)) {
-      return { valid: false, text: 'Invalid primary RPC' }
-    } else if (!!chain.secondaryRpc && !isValidRpc(chain.secondaryRpc)) {
-      return { valid: false, text: 'Invalid secondary RPC' }
-    } else {
-      return { valid: true, text: 'Add Chain' }
     }
+
+    if (!isChainFilled(chain)) {
+      return { valid: false, text: 'Fill Chain Details' }
+    }
+
+    if (chain.primaryRpc && !isValidRpc(chain.primaryRpc)) {
+      return { valid: false, text: 'Invalid primary RPC' }
+    }
+
+    if (chain.secondaryRpc && !isValidRpc(chain.secondaryRpc)) {
+      return { valid: false, text: 'Invalid secondary RPC' }
+    }
+
+    return { valid: true, text: 'Add Chain' }
   }
 
   const chainValidation = validateChain(updatedChain)
