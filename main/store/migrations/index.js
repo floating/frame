@@ -746,7 +746,7 @@ const migrations = {
   },
   31: (initial) => {
     const dodgyAddress = '0xdeaddeaddeaddeaddeaddeaddeaddeaddead0000'
-    // convert Aragon accounts to watch only
+
     Object.entries(initial.main.balances).forEach(([address, balances]) => {
       initial.main.balances[address] = balances.filter(({ address }) => address !== dodgyAddress)
     })

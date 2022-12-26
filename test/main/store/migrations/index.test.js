@@ -1268,7 +1268,7 @@ describe('migration 31', () => {
     ).toBeFalsy()
   })
 
-  it('should remove any other balances', () => {
+  it('should not remove any other balances', () => {
     const updatedState = migrations.apply(state, 31)
     const { balances } = updatedState.main
 
