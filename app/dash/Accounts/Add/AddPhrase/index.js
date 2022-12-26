@@ -5,7 +5,7 @@ import { utils } from 'ethers'
 
 const validateMnemonic = (mnemonic) => {
   if (!utils.isValidMnemonic(mnemonic)) return 'INVALID SEED PHRASE'
-  if (mnemonic.split(' ').length < 12) return 'INSECURE SEED PHRASE'
+  if (mnemonic.split(' ').length < 12) return 'SEED PHRASE TOO SHORT'
 }
 
 export default function AddPhrase({ accountData }) {

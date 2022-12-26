@@ -52,7 +52,7 @@ describe('entering seed phrase', () => {
       jest.runAllTimers()
     })
 
-    expect(nextButton.textContent).toBe('INSECURE SEED PHRASE')
+    expect(nextButton.textContent).toBe('SEED PHRASE TOO SHORT')
   })
 
   it('should update the navigation with the password entry screen when a seed phrase is submitted', async () => {
