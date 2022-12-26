@@ -1214,3 +1214,82 @@ describe('migration 30', () => {
     })
   })
 })
+
+describe('migration 31', () => {
+  const address = '0xFeebabE6b0418eC13b30aAdF129F5DcDd4f70CeA'
+
+  const existingBalances = [
+    {
+      chainId: 10,
+      address: '0xdeaddeaddeaddeaddeaddeaddeaddeaddead0000',
+      name: 'Ether',
+      symbol: 'ETH',
+      decimals: 18,
+      logoURI: 'https://ethereum-optimism.github.io/data/ETH/logo.svg',
+      balance: '0x02ab5fa692c56d4000',
+      displayBalance: '49.24226'
+    },
+    {
+      balance: '0x0',
+      displayBalance: '0',
+      chainId: 80001,
+      symbol: 'MATIC',
+      address: '0x0000000000000000000000000000000000000000'
+    },
+    {
+      chainId: 1,
+      address: '0xc5102fe9359fd9a28f877a67e36b0f050d81a3cc',
+      name: 'Hop Protocol',
+      symbol: 'HOP',
+      decimals: 18,
+      logoURI: 'https://assets.coingecko.com/coins/images/25445/thumb/hop.png?1665541677',
+      balance: '0x0e0cd1012ac685f714',
+      displayBalance: '259.177937713752307476'
+    }
+  ]
+
+  beforeEach(() => {
+    state = {
+      main: {
+        _version: 30,
+        balances: {
+          [address]: existingBalances
+        }
+      }
+    }
+  })
+
+  it('remove any balances which have the address `0xdeaddeaddeaddeaddeaddeaddeaddeaddead0000`', () => {
+    const updatedState = migrations.apply(state, 31)
+    const { balances } = updatedState.main
+
+    expect(
+      balances[address].find((balance) => balance.address === '0xdeaddeaddeaddeaddeaddeaddeaddeaddead0000')
+    ).toBeFalsy()
+  })
+
+  it('should remove any other balances', () => {
+    const updatedState = migrations.apply(state, 31)
+    const { balances } = updatedState.main
+
+    expect(balances[address]).toStrictEqual([
+      {
+        balance: '0x0',
+        displayBalance: '0',
+        chainId: 80001,
+        symbol: 'MATIC',
+        address: '0x0000000000000000000000000000000000000000'
+      },
+      {
+        chainId: 1,
+        address: '0xc5102fe9359fd9a28f877a67e36b0f050d81a3cc',
+        name: 'Hop Protocol',
+        symbol: 'HOP',
+        decimals: 18,
+        logoURI: 'https://assets.coingecko.com/coins/images/25445/thumb/hop.png?1665541677',
+        balance: '0x0e0cd1012ac685f714',
+        displayBalance: '259.177937713752307476'
+      }
+    ])
+  })
+})
