@@ -46,7 +46,7 @@ const AddHotAccountWrapper = ({ children, title, svgName, summary, intro, index 
   )
 }
 
-const EnterSecret = ({ newAccountType, isValidSecret, title }) => {
+const EnterSecret = ({ newAccountType, validateSecret, title }) => {
   const EMPTY_STATE = `Enter ${title}`
   const inputRef = useRef(null)
   const [error, setError] = useState(EMPTY_STATE)
@@ -61,7 +61,8 @@ const EnterSecret = ({ newAccountType, isValidSecret, title }) => {
   const validateInput = debounce((e) => {
     const value = removeLineBreaks(e.target.value)
     if (!value) return resetError()
-    setError(isValidSecret(value) ? '' : `INVALID ${title.toUpperCase()}`)
+    const validationErr = validateSecret(value)
+    setError(validationErr || '')
   }, 300)
 
   const handleSubmit = () => {
@@ -127,7 +128,7 @@ export function AddHotAccount({
   accountData,
   createSignerMethod,
   newAccountType,
-  isValidSecret
+  validateSecret
 }) {
   const { secret, password, error } = accountData
   const viewIndex = error ? 3 : !secret ? 0 : !password ? 1 : 2
@@ -155,7 +156,7 @@ export function AddHotAccount({
     })
 
   const steps = [
-    <EnterSecret key={0} {...{ isValidSecret, title, newAccountType }} />,
+    <EnterSecret key={0} {...{ validateSecret, title, newAccountType }} />,
     <CreatePassword key={1} onCreate={onCreate} />,
     <ConfirmPassword key={2} password={password} onConfirm={onConfirm} />,
     <Error key={3} {...{ error }} />

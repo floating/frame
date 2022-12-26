@@ -3,9 +3,9 @@ import React from 'react'
 import { AddHotAccount } from '../Components'
 import { utils } from 'ethers'
 
-const isValidMnemonic = (mnemonic) => {
-  if (!utils.isValidMnemonic) return false
-  return mnemonic.split(' ').length > 11
+const validateMnemonic = (mnemonic) => {
+  if (!utils.isValidMnemonic(mnemonic)) return 'INVALID SEED PHRASE'
+  if (mnemonic.split(' ').length < 12) return 'INSECURE SEED PHRASE'
 }
 
 export default function AddPhrase({ accountData }) {
@@ -19,7 +19,7 @@ export default function AddPhrase({ accountData }) {
         accountData,
         createSignerMethod: 'createFromPhrase',
         newAccountType: 'seed',
-        isValidSecret: isValidMnemonic
+        validateSecret: validateMnemonic
       }}
     />
   )
