@@ -51340,33 +51340,6 @@
       "extensions": { "optimismBridgeAddress": "0x4200000000000000000000000000000000000010" }
     },
     {
-      "chainId": 10,
-      "address": "0xdeaddeaddeaddeaddeaddeaddeaddeaddead0000",
-      "name": "Ether",
-      "symbol": "ETH",
-      "decimals": 18,
-      "logoURI": "https://ethereum-optimism.github.io/data/ETH/logo.svg",
-      "extensions": { "optimismBridgeAddress": "0x4200000000000000000000000000000000000010" }
-    },
-    {
-      "chainId": 69,
-      "address": "0xdeaddeaddeaddeaddeaddeaddeaddeaddead0000",
-      "name": "Ether",
-      "symbol": "ETH",
-      "decimals": 18,
-      "logoURI": "https://ethereum-optimism.github.io/data/ETH/logo.svg",
-      "extensions": { "optimismBridgeAddress": "0x4200000000000000000000000000000000000010" }
-    },
-    {
-      "chainId": 420,
-      "address": "0xdeaddeaddeaddeaddeaddeaddeaddeaddead0000",
-      "name": "Ether",
-      "symbol": "ETH",
-      "decimals": 18,
-      "logoURI": "https://ethereum-optimism.github.io/data/ETH/logo.svg",
-      "extensions": { "optimismBridgeAddress": "0x4200000000000000000000000000000000000010" }
-    },
-    {
       "chainId": 42,
       "address": "0x50eb44e3a68f1963278b4c74c6c343508d31704c",
       "name": "Tether EUR",
