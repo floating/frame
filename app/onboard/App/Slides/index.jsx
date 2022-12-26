@@ -1,29 +1,62 @@
-import React from 'react'
-import { SlideContainer, Slide } from '../styled'
+import React, { useState } from 'react'
+import { SlideContainer, Slide, SlideTitle, SlideScroller } from '../styled'
+import link from '../../../../resources/link'
+
+import Proceed from './Proceed'
 
 import Intro from './Intro'
 import Access from './Access'
-import Extension from './Extension'
 import Chains from './Chains'
+import Omnichain from './Omnichain'
 import Accounts from './Accounts'
+import Extension from './Extension'
 import Outro from './Outro'
 
-const CurrentSlide = ({ slide, platform, nextSlide, onComplete }) => {
+const CurrentSlide = ({ slide, platform, setTitle, setProceed }) => {
   if (slide === 0) return null
-  else if (slide === 1) return <Intro nextSlide={nextSlide} />
-  else if (slide === 2) {
-    return <Access nextSlide={nextSlide} platform={platform} />
-  } else if (slide === 3) return <Chains nextSlide={nextSlide} />
-  else if (slide === 4) return <Accounts nextSlide={nextSlide} />
-  else if (slide === 5) return <Extension nextSlide={nextSlide} />
-  else if (slide === 6) return <Outro onComplete={onComplete} />
+  else if (slide === 1) return <Intro setTitle={setTitle} setProceed={setProceed} />
+  else if (slide === 2) return <Access platform={platform} setTitle={setTitle} setProceed={setProceed} />
+  else if (slide === 3) return <Chains setTitle={setTitle} setProceed={setProceed} />
+  else if (slide === 4) return <Omnichain setTitle={setTitle} setProceed={setProceed} />
+  else if (slide === 5) return <Accounts setTitle={setTitle} setProceed={setProceed} />
+  else if (slide === 6) return <Extension setTitle={setTitle} setProceed={setProceed} />
+  else if (slide === 7) return <Outro setTitle={setTitle} setProceed={setProceed} />
   else return <Slide>{'Cannot find slide'}</Slide>
 }
 
-const Slides = (props) => {
+const onComplete = () => {
+  link.send('tray:action', 'completeOnboarding')
+  link.send('tray:action', 'navReplace', 'dash')
+}
+
+const prevSlide = (currentSlide, setSlide) => {
+  const prevSlide = --currentSlide
+  setSlide(prevSlide < 1 ? 1 : prevSlide)
+}
+
+const nextSlide = (currentSlide, setSlide) => {
+  const nextSlide = ++currentSlide
+  setSlide(nextSlide > 7 ? 7 : nextSlide)
+}
+
+const Slides = ({ platform }) => {
+  const [title, setTitle] = useState()
+  const [proceed, setProceed] = useState({})
+  const [slide, setSlide] = useState(1)
+
   return (
     <SlideContainer>
-      <CurrentSlide {...props} />
+      <SlideTitle key={title}>{title}</SlideTitle>
+      <SlideScroller>
+        <CurrentSlide slide={slide} platform={platform} setTitle={setTitle} setProceed={setProceed} />
+      </SlideScroller>
+      <Proceed
+        slide={slide}
+        proceed={proceed}
+        nextSlide={() => nextSlide(slide, setSlide)}
+        prevSlide={() => prevSlide(slide, setSlide)}
+        onComplete={onComplete}
+      />
     </SlideContainer>
   )
 }

@@ -1,29 +1,36 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import link from '../../../../../resources/link'
 import svg from '../../../../../resources/svg'
 
-import { SlideProceed } from '../../Components'
-import { Slide, SlideTitle, SlideBody } from '../../styled'
+import { Slide, SlideBody, SlideItem, Tag } from '../../styled'
 
-const Extension = ({ nextSlide }) => {
+const Extension = ({ setTitle, setProceed }) => {
+  useEffect(() => {
+    setTitle('Browser Extension')
+    setProceed({ action: 'next', text: 'Next' })
+  }, [])
   return (
     <Slide>
-      <SlideTitle>Browser Extension</SlideTitle>
       <SlideBody>
-        <div>
-          If you're using a dapp that doesn't natively integrate with Frame, you can still connect using our
-          `Frame Companion` browser extension.
-        </div>
-        <div>Click the links below to visit the extension store for your preferred browser:</div>
+        <SlideItem>
+          <div>If you're using a dapp that doesn't natively</div>
+          <div>connect to Frame, you can inject a connection with</div>
+          <div>
+            our <Tag>Frame Companion</Tag> browser extension.
+          </div>
+        </SlideItem>
+        <SlideItem>
+          <div>Click the links below to visit the extension</div>
+          <div>store for your preferred browser:</div>
+        </SlideItem>
         <div
           style={{
             display: 'flex',
-            paddingTop: '10px',
-            alignItems: 'center'
+            justifyContent: 'center'
           }}
         >
           <div
-            style={{ padding: '0px', marginRight: '20px', cursor: 'pointer' }}
+            style={{ padding: '10px', cursor: 'pointer' }}
             onClick={() =>
               link.send(
                 'tray:openExternal',
@@ -34,7 +41,7 @@ const Extension = ({ nextSlide }) => {
             {svg.chrome(48)}
           </div>
           <div
-            style={{ padding: '0px', cursor: 'pointer' }}
+            style={{ padding: '10px', cursor: 'pointer' }}
             onClick={() =>
               link.send('tray:openExternal', 'https://addons.mozilla.org/en-US/firefox/addon/frame-extension')
             }
@@ -43,7 +50,6 @@ const Extension = ({ nextSlide }) => {
           </div>
         </div>
       </SlideBody>
-      <SlideProceed onClick={nextSlide}>Next</SlideProceed>
     </Slide>
   )
 }
