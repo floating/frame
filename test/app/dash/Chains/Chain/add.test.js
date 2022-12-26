@@ -15,6 +15,15 @@ beforeAll(() => {
   store.removeNetwork({ type: 'ethereum', id: 137 })
 })
 
+const chainConfig = {
+  view: 'setup',
+  id: 137,
+  name: 'Polygon',
+  symbol: 'MATIC',
+  primaryRpc: 'https://rpc-mainnet.matic.network',
+  secondaryRpc: 'https://polygon-rpc.com'
+}
+
 describe('rendering', () => {
   it('renders the first provided RPC as the primary RPC', () => {
     const chainConfig = { view: 'setup', primaryRpc: 'https://myrpc.polygon.net' }
@@ -81,31 +90,41 @@ describe('rendering', () => {
   })
 
   it('renders the submit button text', () => {
-    const chainConfig = {
-      view: 'setup',
-      id: 137,
-      name: 'Polygon',
-      symbol: 'MATIC',
-      primaryRpc: 'https://rpc-mainnet.matic.network',
-      secondaryRpc: 'https://polygon-rpc.com'
-    }
     const { getByRole } = setupComponent(<Chain {...chainConfig} />)
 
     const submitButton = getByRole('button')
     expect(submitButton.textContent).toBe('Add Chain')
   })
 
+  it('allows adding a chain with no primary RPC', async () => {
+    const { user, getByRole, getByLabelText } = setupComponent(<Chain view='setup' {...chainConfig} />)
+
+    const primaryRpcInput = getByLabelText('Primary RPC')
+    await user.clear(primaryRpcInput)
+
+    const submitButton = getByRole('button')
+    expect(submitButton.textContent).toBe('Add Chain')
+  })
+
+  it('allows adding a chain with no secondary RPC', async () => {
+    const { user, getByRole, getByLabelText } = setupComponent(<Chain view='setup' {...chainConfig} />)
+
+    const primaryRpcInput = getByLabelText('Secondary RPC')
+    await user.clear(primaryRpcInput)
+
+    const submitButton = getByRole('button')
+    expect(submitButton.textContent).toBe('Add Chain')
+  })
+
   it('renders the correct submit button text when the form is empty', () => {
-    const chainConfig = { view: 'setup', id: 137, name: 'Polygon' }
-    const { getByRole } = setupComponent(<Chain {...chainConfig} />)
+    const { getByRole } = setupComponent(<Chain {...{ view: 'setup', id: 137, name: 'Polygon' }} />)
 
     const submitButton = getByRole('button')
     expect(submitButton.textContent).toBe('Fill Chain Details')
   })
 
   it('renders a warning if the entered chain id already exists', () => {
-    const chainConfig = { view: 'setup', id: 1, name: 'Mainnet' }
-    const { getByRole } = setupComponent(<Chain {...chainConfig} />)
+    const { getByRole } = setupComponent(<Chain {...{ view: 'setup', id: 1, name: 'Mainnet' }} />)
 
     const submitButton = getByRole('button')
     expect(submitButton.textContent).toBe('Chain ID Already Exists')

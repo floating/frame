@@ -234,7 +234,8 @@ class Account extends React.Component {
   }
 
   renderDetails() {
-    const { address, ensName, active } = this.store('main.accounts', this.props.id)
+    const { address, ensName } = this.store('main.accounts', this.props.id)
+    const showLocal = this.store('main.showLocalNameWithENS')
     const formattedAddress = getAddress(address)
 
     let requests = this.store('main.accounts', this.props.id, 'requests') || {}
@@ -261,7 +262,7 @@ class Account extends React.Component {
         </div>
       )
     } else {
-      if (ensName && !this.store('main.showLocalNameWithENS')) {
+      if (ensName && !showLocal) {
         return (
           <div className='signerDetails'>
             <div
@@ -419,6 +420,12 @@ class Account extends React.Component {
     const initialIndex = this.store('selected.position.initial.index')
     const account = this.store('main.accounts', id)
     const isAddAccountView = this.store('view.addAccount')
+
+    if (!account) {
+      // TODO: why is this rendering if the account is gone?
+      console.warn('no account!')
+      return
+    }
 
     const current = selectedAccountId === id && status === 'ok'
     const selectedAccountOpen = current && open

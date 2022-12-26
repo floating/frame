@@ -10,7 +10,6 @@ import Activity from './Activity'
 import Balances from './Balances'
 import Gas from '../../../../resources/Components/Gas'
 import Inventory from './Inventory'
-import Launcher from './Launcher'
 import Permissions from './Permissions'
 import Requests from './Requests'
 import Settings from './Settings'
@@ -46,8 +45,6 @@ class _AccountModule extends React.Component {
       <Requests moduleId={id} account={account} expanded={expanded} filter={filter} />
     ) : id === 'activity' ? (
       <Activity moduleId={id} id={account} expanded={expanded} filter={filter} />
-    ) : id === 'launcher' ? (
-      <Launcher moduleId={id} id={account} expanded={expanded} filter={filter} />
     ) : id === 'inventory' ? (
       <Inventory
         moduleId={id}

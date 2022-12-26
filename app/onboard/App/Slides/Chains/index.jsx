@@ -1,43 +1,32 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 
-import { SlideProceed } from '../../Components'
-import { Slide, SlideTitle, SlideBody } from '../../styled'
+import { Slide, SlideBody, SlideItem } from '../../styled'
 
 import link from '../../../../../resources/link'
 
-const Chains = ({ nextSlide }) => {
-  const [stage, setStage] = useState(0)
-
+const Chains = ({ setTitle, setProceed }) => {
   useEffect(() => {
+    setTitle('Chains')
+    setProceed({ action: 'next', text: 'Next' })
     link.send('tray:action', 'navDash', { view: 'chains', data: {} })
   }, [])
 
   return (
     <Slide>
-      <SlideTitle>Chains</SlideTitle>
-      {stage === 0 ? (
-        <SlideBody>
-          <div>Next let's set up the chains you want to use.</div>
-          <div>
-            Frame includes many popular chains out of the box -- just turn them on to start using them!
-          </div>
-        </SlideBody>
-      ) : stage === 1 ? (
-        <SlideBody>
-          <div>
-            You can also add new chains with the button at the bottom of the panel or by using a dapp that
-            adds chains for you such as chainlist.org.
-          </div>
-        </SlideBody>
-      ) : stage === 2 ? (
-        <SlideBody>
-          <div>
-            With Frame's Omnichain routing, dapps can seamlessly use multiple chains at the same time,
-            creating truly multichain experiences.
-          </div>
-        </SlideBody>
-      ) : null}
-      <SlideProceed onClick={stage === 2 ? nextSlide : () => setStage(stage + 1)}>Next</SlideProceed>
+      <SlideBody>
+        <SlideItem>
+          <div>Next, let's set up the chains you want to use.</div>
+        </SlideItem>
+        <SlideItem>
+          <div>Frame includes many popular chains out of the</div>
+          <div>box -- to start using a chain just toggle it on!</div>
+        </SlideItem>
+        <SlideItem>
+          <div>You can also add new chains by clicking the button</div>
+          <div>at the bottom of the panel or by using a dapp</div>
+          <div>that adds chains for you, such as chainlist.org.</div>
+        </SlideItem>
+      </SlideBody>
     </Slide>
   )
 }

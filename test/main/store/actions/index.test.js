@@ -21,7 +21,8 @@ import {
   updateNetwork as updateNetworkAction,
   activateNetwork as activateNetworkAction,
   setBlockHeight as setBlockHeightAction,
-  updateAccount as updateAccountAction
+  updateAccount as updateAccountAction,
+  navClearReq as clearNavRequestAction
 } from '../../../../main/store/actions'
 import { toTokenId } from '../../../../resources/domain/balance'
 
@@ -1167,5 +1168,71 @@ describe('#removeKnownTokens', () => {
     const removalSet = new Set([toTokenId(testTokens.badger)])
     removeKnownTokens(removalSet)
     expect(knownTokens.length).toBe(1)
+  })
+})
+
+describe('#navClearReq', () => {
+  let nav
+
+  const updaterFn = (node, update) => {
+    expect(node).toBe('windows.panel.nav')
+
+    nav = update(nav)
+  }
+
+  const clearRequest = clearNavRequestAction.bind(null, updaterFn)
+
+  beforeEach(() => {
+    nav = []
+  })
+
+  it('should remove a specific request from the nav', () => {
+    nav = [
+      {
+        view: 'requestView',
+        data: {
+          requestId: '1a'
+        }
+      },
+      {
+        view: 'requestView',
+        data: {
+          requestId: '2b'
+        }
+      },
+      {
+        view: 'expandedModule',
+        data: {
+          id: 'requests'
+        }
+      }
+    ]
+
+    const [req1, req2, inbox] = nav
+
+    clearRequest('2b')
+
+    expect(nav).toStrictEqual([req1, inbox])
+  })
+
+  it('should remove the request inbox when not requested', () => {
+    nav = [
+      {
+        view: 'requestView',
+        data: {
+          requestId: '1c'
+        }
+      },
+      {
+        view: 'expandedModule',
+        data: {
+          id: 'requests'
+        }
+      }
+    ]
+
+    clearRequest('1c', false)
+
+    expect(nav).toStrictEqual([])
   })
 })
