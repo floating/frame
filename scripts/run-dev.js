@@ -30,7 +30,7 @@ async function launchServer() {
     const msg = data.toString()
 
     if (msg.toLowerCase().includes('build failed')) {
-      setTimeout(() => server.kill(), 1000)
+      setTimeout(() => kill(server.pid), 1000)
     }
 
     console.log(msg)
