@@ -2,6 +2,8 @@ const { spawn } = require('child_process')
 const kill = require('tree-kill')
 const waitOn = require('wait-on')
 
+const devHost = 'http://localhost:1234'
+
 async function waitForTask(taskName) {
   return new Promise((resolve, reject) => {
     const ps = spawn('npm', ['run', taskName], { stdio: 'inherit' })
@@ -9,6 +11,8 @@ async function waitForTask(taskName) {
     ps.once('close', (exitCode) =>
       exitCode === 0 ? resolve() : reject(`${taskName} failed with exit code: ${exitCode}`)
     )
+
+    ps.once('error', (err) => console.error(`Error executing task ${taskName}`, err))
   })
 }
 
@@ -20,17 +24,35 @@ async function prepareEnvironment() {
 }
 
 async function launchServer() {
-  const server = spawn('npm', ['run', 'dev-server'])
+  const server = spawn('npm', ['run', 'dev-server'], { stdio: ['ignore', 'pipe', 'inherit'] })
+
+  server.stdout.on('data', (data) => {
+    const msg = data.toString()
+
+    if (msg.toLowerCase().includes('build failed')) {
+      setTimeout(() => kill(server.pid), 1000)
+    }
+
+    console.log(msg)
+  })
 
   server.once('exit', () => {
     console.log('Dev server exited')
     process.exit(0)
   })
 
+  server.on('error', (err) => {
+    console.error('Dev server error', err)
+  })
+
+  console.log(`Launched dev server, waiting for connection on ${devHost}`)
+
   await waitOn({
-    resources: ['http://localhost:1234/app/tray/index.dev.html'],
+    resources: [`${devHost}/app/tray/index.dev.html`],
     validateStatus: (status) => status === 200
   })
+
+  console.log('Dev session connected!')
 
   return { shutDown: () => kill(server.pid) }
 }
