@@ -153,7 +153,7 @@
     "node-gyp": "9.3.0",
     "node-watch": "0.7.3",
     "parcel": "2.8.0",
-    "parcel-resolver-react-profiling": "file:../parcel-resolver-react-profiling",
+    "parcel-resolver-react-profiling": "1.0.0",
     "prebuild-install": "7.1.1",
     "prettier": "2.8.0",
     "rimraf": "3.0.2",
