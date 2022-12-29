@@ -15,14 +15,11 @@
     "n/no-unpublished-import": "off",
     "n/no-unpublished-require": "off",
     "import/no-unresolved": "off",
-    "import/extensions": [
-      "error",
-      {
-        "js": "never",
-        "ts": "never"
-      }
-    ],
-    "react/prop-types": "off"
+    "import/extensions": ["error", { "js": "never", "ts": "never", "json": "always" }],
+    "react/prop-types": "off",
+    "promise/catch-or-return": ["error", { "allowFinally": true }],
+    "no-unused-vars": ["error", { "ignoreRestSiblings": true, "destructuredArrayIgnorePattern": "^_" }],
+    "jsx-a11y/click-events-have-key-events": "off"
   },
   "parserOptions": {
     "sourceType": "module",
@@ -37,6 +34,9 @@
     },
     "react": {
       "version": "detect"
+    },
+    "node": {
+      "tryExtensions": [".js", ".ts"]
     }
   },
   "overrides": [
@@ -75,7 +75,14 @@
       },
       "rules": {
         "n/no-missing-import": "off",
-        "n/no-unpublished-import": "off"
+        "n/no-unpublished-import": "off",
+        "n/no-deprecated-api": ["error", { "ignoreModuleItems": ["domain"] }],
+        "no-empty-function": "off",
+        "@typescript-eslint/no-explicit-any": ["error", { "ignoreRestArgs": true }],
+        "@typescript-eslint/no-unused-vars": [
+          "error",
+          { "ignoreRestSiblings": true, "destructuredArrayIgnorePattern": "^_" }
+        ]
       }
     },
     {
@@ -88,9 +95,10 @@
       "rules": {}
     },
     {
-      "files": ["resources/**", "app/**"],
+      "files": ["**/resources/**", "**/app/**"],
       "globals": {
-        "window": true
+        "window": true,
+        "document": true
       }
     }
   ]
