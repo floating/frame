@@ -4,6 +4,7 @@ const log = require('electron-log')
 const { randomBytes } = require('crypto')
 import { isAddress } from '@ethersproject/address'
 
+import Erc20Contract from '../contracts/erc20'
 const accounts = require('../accounts').default
 const signers = require('../signers').default
 const launch = require('../launch')
@@ -239,6 +240,15 @@ const rpc = {
     } catch (err) {
       log.warn(`Could not resolve ENS name ${name}:`, err)
       return cb(err)
+    }
+  },
+  async getErc20Data(address, chainId, cb) {
+    try {
+      const contract = new Erc20Contract(address, chainId)
+      const tokenData = await contract.getTokenData()
+      return cb(null, tokenData)
+    } catch (err) {
+      return cb(err, null)
     }
   },
   verifyAddress(cb) {

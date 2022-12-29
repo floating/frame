@@ -23,6 +23,7 @@ import ChainRequest from './Requests/ChainRequest'
 import AddTokenRequest from './Requests/AddTokenRequest'
 import SignTypedDataRequest from './Requests/SignTypedDataRequest'
 import { isHardwareSigner } from '../../../resources/domain/signer'
+import PermitSignatureRequest from './Requests/PermitSignatureRequest'
 
 class _AccountModule extends React.Component {
   // constructor (props, context) {
@@ -301,6 +302,7 @@ class _AccountBody extends React.Component {
         <SignTypedDataRequest
           key={req.handlerId}
           req={req}
+          step={data.step || ''}
           handlerId={req.handlerId}
           accountId={this.props.id}
           signingDelay={signingDelay}

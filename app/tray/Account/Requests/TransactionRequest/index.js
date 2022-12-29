@@ -111,16 +111,17 @@ class TransactionRequest extends React.Component {
   }
   render() {
     const { step } = this.props
-    if (step === 'adjustFee') {
-      return this.renderAdjustFee()
-    } else if (step === 'adjustApproval') {
-      return this.renderTokenSpend()
-    } else if (step === 'viewData') {
-      return this.renderViewData()
-    } else if (step === 'confirm') {
-      return this.renderTx()
-    } else {
-      return step
+    switch (step) {
+      case 'adjustFee':
+        return this.renderAdjustFee()
+      case 'adjustApproval':
+        return this.renderTokenSpend()
+      case 'viewData':
+        return this.renderViewData()
+      case 'confirm':
+        return this.renderTx()
+      default:
+        return step
     }
   }
 }

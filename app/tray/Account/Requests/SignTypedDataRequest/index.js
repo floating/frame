@@ -1,20 +1,31 @@
 import React from 'react'
 import Restore from 'react-restore'
 
-const SimpleJSON = ({ json }) => {
-  return (
-    <div className='simpleJson'>
-      {Object.keys(json).map((key, o) => (
-        <div key={key + o} className='simpleJsonChild'>
-          <div className='simpleJsonKey'>{key}:</div>
-          <div className='simpleJsonValue'>
-            {typeof json[key] === 'object' ? <SimpleJSON json={json[key]} key={key} /> : json[key]}
-          </div>
-        </div>
-      ))}
-    </div>
+import TokenPermit from './TokenPermit'
+import DefaultSignature from './Default'
+
+const permitTypes = [
+  { name: 'owner', type: 'address' },
+  { name: 'spender', type: 'address' },
+  { name: 'value', type: 'uint256' },
+  { name: 'nonce', type: 'uint256' },
+  { name: 'deadline', type: 'uint256' }
+]
+
+const isEip2612Permit = ({
+  typedMessage: {
+    data: {
+      types: { Permit }
+    }
+  }
+}) =>
+  Permit?.length === permitTypes.length &&
+  permitTypes.every(({ name, type }) =>
+    Boolean(Permit.find((item) => item.name === name && item.type === type))
   )
-}
+
+const getRequestClass = ({ status = '' }) =>
+  `signerRequest ${status.charAt(0).toUpperCase() + status.slice(1)}`
 
 class TransactionRequest extends React.Component {
   constructor(...args) {
@@ -28,63 +39,25 @@ class TransactionRequest extends React.Component {
     }, props.signingDelay || 1500)
   }
 
-  render() {
-    const { req } = this.props
-    const type = req.type
-    const status = req.status
-    const payload = req.payload
-    const typedData = payload.params[1] || {}
+  getDecodedView(req) {
     const originName = this.store('main.origins', req.origin, 'name')
 
-    let requestClass = 'signerRequest'
-    if (status === 'success') requestClass += ' signerRequestSuccess'
-    if (status === 'declined') requestClass += ' signerRequestDeclined'
-    if (status === 'pending') requestClass += ' signerRequestPending'
-    if (status === 'error') requestClass += ' signerRequestError'
+    if (isEip2612Permit(req)) {
+      const chainId = req.typedMessage.data.domain.chainId
+      const chainName = this.store('main.networks.ethereum', chainId, 'name')
+      const { primaryColor, icon } = this.store('main.networksMeta.ethereum', chainId)
+      return <TokenPermit {...{ originName, chainName, chainColor: primaryColor, icon, ...this.props }} />
+    }
 
-    const messageToSign = typedData.domain ? (
-      <div className='signTypedData'>
-        <div className='signTypedDataInner'>
-          <div className='signTypedDataSection'>
-            <div className='signTypedDataTitle'>Domain</div>
-            <SimpleJSON json={typedData.domain} />
-          </div>
-          <div className='signTypedDataSection'>
-            <div className='signTypedDataTitle'>Message</div>
-            <SimpleJSON json={typedData.message} />
-          </div>
-        </div>
-      </div>
-    ) : (
-      <div className='signTypedData'>
-        <div className='signTypedDataInner'>
-          <div className='signTypedDataSection'>
-            <SimpleJSON
-              json={typedData.reduce((data, elem) => {
-                data[elem.name] = elem.value
-                return data
-              }, {})}
-            />
-          </div>
-        </div>
-      </div>
-    )
+    return <DefaultSignature {...{ originName, req }} />
+  }
+
+  render() {
+    const { req } = this.props
+    const requestClass = getRequestClass(req)
     return (
-      <div key={this.props.req.id || this.props.req.handlerId} className={requestClass}>
-        {type === 'signTypedData' ? (
-          <div className='approveRequest'>
-            <div className='approveTransactionPayload'>
-              <>
-                <div className='requestMeta'>
-                  <div className='requestMetaOrigin'>{originName}</div>
-                </div>
-                {messageToSign}
-              </>
-            </div>
-          </div>
-        ) : (
-          <div className='unknownType'>{'Unknown: ' + this.props.req.type}</div>
-        )}
+      <div key={req.id || req.handlerId} className={requestClass}>
+        {this.getDecodedView(req)}
       </div>
     )
   }
