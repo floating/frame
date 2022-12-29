@@ -1,8 +1,7 @@
-import { app, ipcMain, protocol, clipboard, globalShortcut, powerMonitor, BrowserWindow } from 'electron'
+import { app, ipcMain, protocol, clipboard, powerMonitor, BrowserWindow } from 'electron'
 import path from 'path'
 import log from 'electron-log'
 import url from 'url'
-import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer'
 
 // DO NOT MOVE - env var below is required for app init and must be set before all local imports
 process.env.BUNDLE_LOCATION = process.env.BUNDLE_LOCATION || path.resolve(__dirname, './../..', 'bundle')
@@ -22,6 +21,7 @@ import { openBlockExplorer, openExternal } from './windows/window'
 import { FrameInstance } from './windows/frames/frameInstances'
 import Erc20Contract from './contracts/erc20'
 import { getErrorCode } from '../resources/utils'
+import { installElectronDevToolExtensions, setupCpuMonitoring } from './dev'
 
 app.commandLine.appendSwitch('enable-accelerated-2d-canvas', 'true')
 app.commandLine.appendSwitch('enable-gpu-rasterization', 'true')
@@ -43,23 +43,7 @@ if (!hasInstanceLock) {
 }
 
 if (isDev) {
-  const cpuMonitoringInterval = 10 // seconds
-  const cpuThreshold = 30 // percent
-
-  setTimeout(() => {
-    app.getAppMetrics()
-
-    setInterval(() => {
-      const cpuUsers = app.getAppMetrics().filter((metric) => metric.cpu.percentCPUUsage > cpuThreshold)
-
-      if (cpuUsers.length > 0) {
-        log.verbose(
-          `Following processes used more than ${cpuThreshold}% CPU over the last ${cpuMonitoringInterval} seconds`
-        )
-        log.verbose(JSON.stringify(cpuUsers, undefined, 2))
-      }
-    }, cpuMonitoringInterval * 1000)
-  }, 10_000)
+  setupCpuMonitoring()
 }
 
 require('./rpc')
@@ -68,18 +52,6 @@ errors.init()
 log.info(`Chrome: v${process.versions.chrome}`)
 log.info(`Electron: v${process.versions.electron}`)
 log.info(`Node: v${process.versions.node}`)
-
-async function installElectronDevToolExtensions(): Promise<void> {
-  try {
-    await installExtension([REACT_DEVELOPER_TOOLS], {
-      forceDownload: false,
-      loadExtensionOptions: { allowFileAccess: true }
-    })
-    console.info(`[INFO] Successfully added devtools extensions`)
-  } catch (err) {
-    console.warn('[WARN] An error occurred while trying to add devtools extensions:\n', err)
-  }
-}
 
 // prevent showing the exit dialog more than once
 let closing = false
@@ -327,9 +299,7 @@ app.on('ready', () => {
   windows.init()
   if (app.dock) app.dock.hide()
   if (isDev) {
-    (async () => {
-      await installElectronDevToolExtensions()
-    })()
+    void installElectronDevToolExtensions()
   }
 
   protocol.interceptFileProtocol('file', (req, cb) => {
