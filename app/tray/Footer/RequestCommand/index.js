@@ -1,6 +1,6 @@
 import React from 'react'
 import Restore from 'react-restore'
-import BigNumber from 'bignumber.js'
+import { BigNumber } from 'bignumber.js'
 
 import TxBar from './TxBar'
 import TxConfirmations from './TxConfirmations'

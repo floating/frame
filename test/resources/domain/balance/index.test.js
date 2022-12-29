@@ -1,4 +1,4 @@
-import BigNumber from 'bignumber.js'
+import { BigNumber } from 'bignumber.js'
 import { sortByTotalValue as byTotalValue, createBalance } from '../../../../resources/domain/balance'
 
 describe('#createBalance', () => {

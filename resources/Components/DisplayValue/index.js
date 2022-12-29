@@ -1,6 +1,6 @@
 import React from 'react'
 import { displayValueData } from '../../utils/displayValue'
-import BigNumber from 'bignumber.js'
+import { BigNumber } from 'bignumber.js'
 
 function isDisplayValueData(obj) {
   return obj?.fiat && obj?.ether && obj?.gwei && obj?.wei && BigNumber.isBigNumber(obj.bn)

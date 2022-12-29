@@ -1,4 +1,4 @@
-import BigNumber from 'bignumber.js'
+import { BigNumber } from 'bignumber.js'
 import { isHexString } from 'ethers/lib/utils'
 
 const displayUnitMapping = {

@@ -1,6 +1,6 @@
 import React, { Component, useState } from 'react'
 import Restore from 'react-restore'
-import BigNumber from 'bignumber.js'
+import { BigNumber } from 'bignumber.js'
 
 import svg from '../../svg'
 import { weiToGwei, hexToInt } from '../../utils'

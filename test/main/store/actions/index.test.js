@@ -1,4 +1,4 @@
-import BigNumber from 'bignumber.js'
+import { BigNumber } from 'bignumber.js'
 import log from 'electron-log'
 import { addHexPrefix } from '@ethereumjs/util'
 

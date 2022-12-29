@@ -5,7 +5,7 @@ import log from 'electron-log'
 import { ethers } from 'ethers'
 import { addHexPrefix, padToEven } from '@ethereumjs/util'
 import ethProvider from 'eth-provider'
-import BigNumber from 'bignumber.js'
+import { BigNumber } from 'bignumber.js'
 
 jest.mock('../../../../main/multicall')
 jest.mock('eth-provider', () =>

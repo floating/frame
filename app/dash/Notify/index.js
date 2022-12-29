@@ -3,7 +3,7 @@ import Restore from 'react-restore'
 import svg from '../../../resources/svg'
 import link from '../../../resources/link'
 
-import BigNumber from 'bignumber.js'
+import { BigNumber } from 'bignumber.js'
 import { usesBaseFee } from '../../../resources/domain/transaction'
 
 import Confirm from '../../../resources/Components/Confirm'
