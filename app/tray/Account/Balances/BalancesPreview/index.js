@@ -114,7 +114,7 @@ class BalancesPreview extends React.Component {
         <Cluster>
           {balances.map(({ chainId, symbol, ...balance }, i) => {
             return (
-              <ClusterRow key={chainId + symbol}>
+              <ClusterRow key={`${i}_${chainId}_${symbol}`}>
                 <ClusterValue>
                   <Balance chainId={chainId} symbol={symbol} balance={balance} i={i} scanning={scanning} />
                 </ClusterValue>
