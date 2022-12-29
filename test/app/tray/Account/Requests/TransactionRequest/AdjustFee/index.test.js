@@ -8,8 +8,8 @@ import link from '../../../../../../../resources/link'
 import { advanceTimers, setupComponent } from '../../../../../../componentSetup'
 import AdjustFeeComponent from '../../../../../../../app/tray/Account/Requests/TransactionRequest/AdjustFee'
 
-jest.mock('../../../../../../../../main/store/persist')
-jest.mock('../../../../../../../../resources/link', () => ({ rpc: jest.fn() }))
+jest.mock('../../../../../../../main/store/persist')
+jest.mock('../../../../../../../resources/link', () => ({ rpc: jest.fn() }))
 
 const hexStr = (val) => `0x${BigNumber(val).times(1e9).toString(16)}`
 
