@@ -31,14 +31,9 @@ export enum RequestStatus {
   Success = 'success'
 }
 
-type RequestType =
-  | 'sign'
-  | 'signTypedData'
-  | 'transaction'
-  | 'access'
-  | 'addChain'
-  | 'switchChain'
-  | 'addToken'
+export type SignatureRequestType = 'sign' | 'signTypedData' | 'signErc20Permit'
+
+type RequestType = SignatureRequestType | 'transaction' | 'access' | 'addChain' | 'switchChain' | 'addToken'
 
 interface Request {
   type: RequestType
@@ -49,6 +44,7 @@ export interface AccountRequest extends Request {
   origin: string
   payload: JSONRPCRequestPayload
   account: string
+  typedMessage?: TypedMessage<SignTypedDataVersion>
   status?: RequestStatus
   mode?: RequestMode
   notice?: string
@@ -103,6 +99,10 @@ export interface TypedMessage<V extends SignTypedDataVersion = SignTypedDataVers
 export interface SignTypedDataRequest extends Omit<AccountRequest, 'type'> {
   type: 'signTypedData'
   typedMessage: TypedMessage
+}
+
+export interface PermitSignatureRequest extends Omit<SignTypedDataRequest, 'type'> {
+  type: 'signErc20Permit'
 }
 
 export interface AccessRequest extends Omit<AccountRequest, 'type'> {

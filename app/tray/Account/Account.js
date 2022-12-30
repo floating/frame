@@ -24,6 +24,7 @@ import AddTokenRequest from './Requests/AddTokenRequest'
 import SignTypedDataRequest from './Requests/SignTypedDataRequest'
 import { isHardwareSigner } from '../../../resources/domain/signer'
 import PermitSignatureRequest from './Requests/PermitSignatureRequest'
+import SignPermitRequest from './Requests/SignPermitRequest'
 
 class _AccountModule extends React.Component {
   // constructor (props, context) {
@@ -308,6 +309,18 @@ class _AccountBody extends React.Component {
           signingDelay={signingDelay}
         />
       )
+    } else if (req.type === 'signErc20Permit') {
+      console.log({ data })
+      return (
+        <SignPermitRequest
+          key={req.handlerId}
+          req={req}
+          step={data.step || ''}
+          handlerId={req.handlerId}
+          accountId={this.props.id}
+          signingDelay={signingDelay}
+        />
+      )
     } else if (req.type === 'addChain' || req.type === 'switchChain') {
       return (
         <ChainRequest key={req.handlerId} req={req} handlerId={req.handlerId} accountId={this.props.id} />
@@ -335,6 +348,9 @@ class _AccountBody extends React.Component {
         // accountViewIcon = svg.sign(17)
       } else if (req.type === 'signTypedData') {
         accountViewTitle = 'Sign Data'
+        // accountViewIcon = svg.sign(17)
+      } else if (req.type === 'signErc20Permit') {
+        accountViewTitle = 'Sign Token Spend Permit'
         // accountViewIcon = svg.sign(17)
       } else if (req.type === 'addChain') {
         accountViewTitle = 'Add Chain'

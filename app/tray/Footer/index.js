@@ -3,6 +3,7 @@ import Restore from 'react-restore'
 
 import link from '../../../resources/link'
 import { isHardwareSigner } from '../../../resources/domain/signer'
+import { isSignatureRequest } from '../../../resources/domain/request'
 
 import RequestCommand from './RequestCommand'
 
@@ -86,7 +87,7 @@ class Footer extends React.Component {
               </div>
             </div>
           )
-        } else if (req.type === 'sign' || req.type === 'signTypedData') {
+        } else if (isSignatureRequest(req.type)) {
           return (
             <RequestCommand req={req} signingDelay={isHardwareSigner(account.lastSignerType) ? 0 : 1500} />
           )

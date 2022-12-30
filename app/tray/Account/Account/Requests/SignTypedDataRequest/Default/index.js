@@ -47,7 +47,7 @@ export default DefaultTypedSignature = ({ req, originName }) => {
       </div>
     </div>
   )
-  return type === 'signTypedData' ? (
+  return type === 'signTypedData' || 'signErc20Permit' ? (
     <div className='approveRequest'>
       <div className='approveTransactionPayload'>
         <>

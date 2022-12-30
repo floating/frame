@@ -162,6 +162,21 @@ class Requests extends React.Component {
                   <div style={{ height: '10px' }} />
                 </RequestItem>
               )
+            } else if (req.type === 'signErc20Permit') {
+              return (
+                <RequestItem
+                  key={req.type + i}
+                  req={req}
+                  account={this.props.account}
+                  handlerId={req.handlerId}
+                  i={i}
+                  title={'Token Spend Permit'}
+                  color={'var(--outerspace)'}
+                  svgName={'sign'}
+                >
+                  <div style={{ height: '10px' }} />
+                </RequestItem>
+              )
             } else if (req.type === 'addChain') {
               return (
                 <RequestItem

@@ -47,6 +47,7 @@ import {
   getActiveChains
 } from './chains'
 import type { LegacyTypedData, TypedData, TypedMessage } from '../accounts/types'
+import { isEip2612Permit } from '../../resources/domain/request'
 
 type Subscription = {
   id: string
@@ -70,6 +71,11 @@ const storeApi = {
 }
 
 const getPayloadOrigin = ({ _origin }: RPCRequestPayload) => storeApi.getOrigin(_origin)
+
+const signatureRequestRecognition = (typedMessage: TypedMessage<SignTypedDataVersion>) => {
+  if (isEip2612Permit(typedMessage)) return 'signErc20Permit'
+  return 'signTypedData'
+}
 
 export class Provider extends EventEmitter {
   connected = false
@@ -646,14 +652,18 @@ export class Provider extends EventEmitter {
       version
     }
 
+    const type = signatureRequestRecognition(typedMessage)
+
+    console.log({ recognisedType: type })
+
     accounts.addRequest({
       handlerId,
-      type: 'signTypedData',
+      type,
       typedMessage,
       payload,
       account: targetAccount.address,
       origin: payload._origin
-    } as SignTypedDataRequest)
+    })
   }
 
   subscribe(payload: RPC.Subscribe.Request, res: RPCSuccessCallback) {

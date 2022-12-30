@@ -14,6 +14,7 @@ const dapps = require('../dapps')
 const nebulaApi = require('../nebula').default
 
 const { arraysEqual, randomLetters } = require('../../resources/utils')
+const { isSignatureRequest } = require('../../resources/domain/request')
 const { default: TrezorBridge } = require('../../main/signers/trezor/bridge')
 
 const callbackWhenDone = (fn, cb) => {
@@ -153,7 +154,7 @@ const rpc = {
         if (err) return accounts.setRequestError(req.handlerId, err)
         accounts.setRequestSuccess(req.handlerId, res)
       })
-    } else if (req.type === 'signTypedData') {
+    } else if (req.type === 'signTypedData' || req.type === 'signErc20Permit') {
       provider.approveSignTypedData(req, (err, res) => {
         if (err) return accounts.setRequestError(req.handlerId, err)
         accounts.setRequestSuccess(req.handlerId, res)
@@ -161,7 +162,7 @@ const rpc = {
     }
   },
   declineRequest(req, cb) {
-    if (req.type === 'transaction' || req.type === 'sign' || req.type === 'signTypedData') {
+    if (req.type === 'transaction' || isSignatureRequest(req.type)) {
       accounts.declineRequest(req.handlerId)
       provider.declineRequest(req)
     }
