@@ -1,8 +1,8 @@
 import React from 'react'
 import Restore from 'react-restore'
-import { render, waitFor } from '@testing-library/react'
+import { screen, render, waitFor } from '@testing-library/react'
 
-import { setupComponent, advanceTimers } from '../../../../componentSetup'
+import { user, setupComponent, advanceTimers, setupUser } from '../../../../componentSetup'
 import store from '../../../../../main/store'
 import link from '../../../../../resources/link'
 import AddTokenComponent from '../../../../../app/dash/Tokens/AddToken'
@@ -49,18 +49,19 @@ beforeAll(() => {
 
 describe('selecting token chain', () => {
   it('should display the expected chain IDs', () => {
-    const { getAllByRole } = render(<AddToken />)
+    render(<AddToken />)
 
-    const tokenChainNames = getAllByRole('button').map((el) => el.textContent)
+    const tokenChainNames = screen.getAllByRole('button').map((el) => el.textContent)
     expect(tokenChainNames).toEqual(['Mainnet', 'Polygon'])
   })
 
   it('should update add token navigation when a chain is selected', async () => {
     // 200 ms UI delay after clicking the button to select a chain
-    const { user, getByRole } = setupComponent(<AddToken />, { advanceTimers: () => advanceTimers(200) })
+    setupComponent(<AddToken />)
+    const userWithDelay = setupUser(() => advanceTimers(200))
 
-    const polygonButton = getByRole('button', { name: 'Polygon' })
-    await user.click(polygonButton)
+    const polygonButton = screen.getByRole('button', { name: 'Polygon' })
+    await userWithDelay.click(polygonButton)
 
     expect(link.send).toHaveBeenCalledWith('tray:action', 'navDash', {
       view: 'tokens',
@@ -76,19 +77,17 @@ describe('selecting token chain', () => {
 
 describe('setting token address', () => {
   it('should prompt for a contract address if a chain has been selected', () => {
-    const { getByLabelText } = render(<AddToken data={{ notifyData: { chainId: 137 } }} />)
+    render(<AddToken data={{ notifyData: { chainId: 137 } }} />)
 
-    const contractAddressInput = getByLabelText(`Enter token's address`)
+    const contractAddressInput = screen.getByLabelText(`Enter token's address`)
     expect(contractAddressInput.textContent).toBe('')
   })
 
   it('should update add token navigation with an error when a user submits an invalid contract address', async () => {
-    const { user, getByLabelText, getByRole } = setupComponent(
-      <AddToken data={{ notifyData: { chainId: 1 } }} />
-    )
-    const contractAddressInput = getByLabelText(`Enter token's address`)
+    setupComponent(<AddToken data={{ notifyData: { chainId: 1 } }} />)
+    const contractAddressInput = screen.getByLabelText(`Enter token's address`)
     await user.type(contractAddressInput, 'INVALID_ADDRESS')
-    const setAddressButton = getByRole('button', { name: 'Set Address' })
+    const setAddressButton = screen.getByRole('button', { name: 'Set Address' })
     await user.click(setAddressButton)
 
     expect(link.send).toHaveBeenCalledTimes(1)
@@ -119,12 +118,10 @@ describe('setting token address', () => {
       }
     })
 
-    const { user, getByLabelText, getByRole } = setupComponent(
-      <AddToken data={{ notifyData: { chainId: 1 } }} />
-    )
-    const contractAddressLabel = getByLabelText(`Enter token's address`)
+    setupComponent(<AddToken data={{ notifyData: { chainId: 1 } }} />)
+    const contractAddressLabel = screen.getByLabelText(`Enter token's address`)
     await user.type(contractAddressLabel, '0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0')
-    const setAddressButton = getByRole('button', { name: 'Set Address' })
+    const setAddressButton = screen.getByRole('button', { name: 'Set Address' })
     await user.click(setAddressButton)
 
     expect(link.send).toHaveBeenCalledTimes(1)
@@ -162,13 +159,11 @@ describe('setting token address', () => {
       return mockTokenData
     })
 
-    const { user, getByLabelText, getByRole } = setupComponent(
-      <AddToken data={{ notifyData: { chainId: 1 } }} />
-    )
+    setupComponent(<AddToken data={{ notifyData: { chainId: 1 } }} />)
 
-    const contractAddressLabel = getByLabelText(`Enter token's address`)
+    const contractAddressLabel = screen.getByLabelText(`Enter token's address`)
     await user.type(contractAddressLabel, '0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0')
-    const setAddressButton = getByRole('button', { name: 'Set Address' })
+    const setAddressButton = screen.getByRole('button', { name: 'Set Address' })
     await user.click(setAddressButton)
 
     expect(link.send).toHaveBeenCalledTimes(1)
@@ -189,19 +184,19 @@ describe('setting token address', () => {
 
 describe('displaying errors', () => {
   it('should allow the user to navigate back when displaying an error', () => {
-    const { getAllByRole } = render(
+    render(
       <AddToken
         data={{ notifyData: { chainId: 137, error: 'INVALID CONTRACT ADDRESS', address: '0xabc' } }}
       />
     )
 
-    const buttons = getAllByRole('button')
+    const buttons = screen.getAllByRole('button')
     expect(buttons.length).toBe(1)
     expect(buttons[0].textContent).toBe('BACK')
   })
 
   it(`should allow the user to proceed if we are unable to verify the token data`, () => {
-    const { getAllByRole } = render(
+    render(
       <AddToken
         data={{
           notifyData: { chainId: 137, error: `COULD NOT FIND TOKEN WITH ADDRESS BLAH BLAH`, address: '0xabc' }
@@ -209,7 +204,7 @@ describe('displaying errors', () => {
       />
     )
 
-    const buttons = getAllByRole('button')
+    const buttons = screen.getAllByRole('button')
     expect(buttons.length).toBe(2)
     expect(buttons[0].textContent).toBe('BACK')
     expect(buttons[1].textContent).toBe('ADD ANYWAY')
@@ -218,7 +213,7 @@ describe('displaying errors', () => {
 
 describe('setting token details', () => {
   it('should display the correct copy when editing a token', () => {
-    const { getByTestId, getByRole } = render(
+    render(
       <AddToken
         data={{
           notifyData: {
@@ -236,37 +231,37 @@ describe('setting token details', () => {
         }}
       />
     )
-    const heading = getByTestId('addTokenFormTitle')
-    const button = getByRole('button')
+    const heading = screen.getByTestId('addTokenFormTitle')
+    const button = screen.getByRole('button')
     expect(heading.textContent).toBe('Edit Token')
     expect(button.textContent).toBe('Save')
   })
 
   it('should display the correct copy when adding a new token', () => {
-    const { getByTestId, getByRole } = render(
+    render(
       <AddToken
         data={{
           notifyData: { chainId: 1, address: '0x64aa3364F17a4D01c6f1751Fd97C2BD3D7e7f1D4' }
         }}
       />
     )
-    const heading = getByTestId('addTokenFormTitle')
-    const button = getByRole('button')
+    const heading = screen.getByTestId('addTokenFormTitle')
+    const button = screen.getByRole('button')
     expect(heading.textContent).toBe('Add New Token')
     expect(button.textContent).toBe('Fill in Token Details')
   })
 
   it('should prompt for default token details', () => {
-    const { getByLabelText, getByRole } = render(
+    render(
       <AddToken
         data={{ notifyData: { chainId: 137, address: '0x64aa3364F17a4D01c6f1751Fd97C2BD3D7e7f1D4' } }}
       />
     )
 
-    const contractAddressInput = getByRole('heading')
-    const tokenNameInput = getByLabelText('Token Name')
-    const tokenSymbolInput = getByLabelText('Symbol')
-    const tokenDecimalsInput = getByLabelText('Decimals')
+    const contractAddressInput = screen.getByRole('heading')
+    const tokenNameInput = screen.getByLabelText('Token Name')
+    const tokenSymbolInput = screen.getByLabelText('Symbol')
+    const tokenDecimalsInput = screen.getByLabelText('Decimals')
 
     expect(contractAddressInput.textContent).toEqual('0x64aa3364D7e7f1D4')
     expect(tokenNameInput.value).toEqual('Token Name')
@@ -279,7 +274,7 @@ describe('setting token details', () => {
 
     const mockToken = { name: 'Frame Test on Polygon', symbol: 'mFRT', decimals: 18, totalSupply: '1066' }
 
-    const { getByLabelText, getByRole } = render(
+    render(
       <AddToken
         data={{
           notifyData: {
@@ -291,10 +286,10 @@ describe('setting token details', () => {
       />
     )
 
-    const contractAddressInput = getByRole('heading')
-    const tokenNameInput = getByLabelText('Token Name')
-    const tokenSymbolInput = getByLabelText('Symbol')
-    const tokenDecimalsInput = getByLabelText('Decimals')
+    const contractAddressInput = screen.getByRole('heading')
+    const tokenNameInput = screen.getByLabelText('Token Name')
+    const tokenSymbolInput = screen.getByLabelText('Symbol')
+    const tokenDecimalsInput = screen.getByLabelText('Decimals')
 
     expect(contractAddressInput.textContent).toEqual('0x64aa3364D7e7f1D4')
     await waitFor(() => expect(tokenNameInput.value).toEqual('Frame Test on Polygon'), { timeout: 200 })

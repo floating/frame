@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { setupComponent } from '../../../componentSetup'
+import { setupComponent, screen, user } from '../../../componentSetup'
 import Confirm from '../../../../resources/Components/Confirm'
 
 beforeAll(() => {
@@ -12,40 +12,40 @@ afterAll(() => {
 })
 
 it('renders the confirmation prompt', () => {
-  const { getByRole } = setupComponent(<Confirm prompt='you sure you wanna do that?' />)
+  setupComponent(<Confirm prompt='you sure you wanna do that?' />)
 
-  const titleSection = getByRole('heading')
+  const titleSection = screen.getByRole('heading')
   expect(titleSection.textContent).toBe('you sure you wanna do that?')
 })
 
 it('renders the decline button with provided text', () => {
-  const { getByRole } = setupComponent(<Confirm declineText='no way' />)
+  setupComponent(<Confirm declineText='no way' />)
 
-  const declineButton = getByRole('button', { name: 'no way' })
+  const declineButton = screen.getByRole('button', { name: 'no way' })
   expect(declineButton).toBeDefined()
 })
 
 it('handles a declined confirmation', async () => {
   const onDecline = jest.fn()
-  const { user, getByRole } = setupComponent(<Confirm onDecline={onDecline} />)
+  setupComponent(<Confirm onDecline={onDecline} />)
 
-  await user.click(getByRole('button', { name: 'Decline' }))
+  await user.click(screen.getByRole('button', { name: 'Decline' }))
 
   expect(onDecline).toHaveBeenCalled()
 })
 
 it('renders the accept button with provided text', () => {
-  const { getByRole } = setupComponent(<Confirm acceptText='lets gooooo' />)
+  setupComponent(<Confirm acceptText='lets gooooo' />)
 
-  const acceptButton = getByRole('button', { name: 'lets gooooo' })
+  const acceptButton = screen.getByRole('button', { name: 'lets gooooo' })
   expect(acceptButton).toBeDefined()
 })
 
 it('handles an accepted confirmation', async () => {
   const onAccept = jest.fn()
-  const { user, getByRole } = setupComponent(<Confirm onAccept={onAccept} />)
+  setupComponent(<Confirm onAccept={onAccept} />)
 
-  await user.click(getByRole('button', { name: 'OK' }))
+  await user.click(screen.getByRole('button', { name: 'OK' }))
 
   expect(onAccept).toHaveBeenCalled()
 })

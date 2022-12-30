@@ -1,7 +1,8 @@
 import React from 'react'
 import Restore from 'react-restore'
-import { setupComponent } from '../../../../../componentSetup'
+import { screen } from '@testing-library/react'
 
+import { user, setupComponent } from '../../../../../componentSetup'
 import store from '../../../../../../main/store'
 import link from '../../../../../../resources/link'
 import AddPhraseAccountComponent from '../../../../../../app/dash/Accounts/Add/AddPhrase'
@@ -21,17 +22,16 @@ const AddPhrase = Restore.connect(AddPhraseAccountComponent, store)
 
 describe('entering seed phrase', () => {
   const index = 0
-  let user, seedPhraseTextArea, nextButton, getAllByRole
+  let seedPhraseTextArea, nextButton
 
   beforeEach(() => {
-    const component = setupComponent(<AddPhrase accountData={{}} />)
-    ;({ user, getAllByRole } = component)
-    seedPhraseTextArea = component.getAllByRole('textbox')[index]
-    nextButton = component.getAllByRole('button')[index]
+    setupComponent(<AddPhrase accountData={{}} />)
+    seedPhraseTextArea = screen.getAllByRole('textbox')[index]
+    nextButton = screen.getAllByRole('button')[index]
   })
 
   it('should display the correct title when entering the seed phrase', () => {
-    const title = getAllByRole('heading')[index]
+    const title = screen.getAllByRole('heading')[index]
     expect(title.textContent).toBe('Seed Phrase')
   })
 
@@ -69,15 +69,15 @@ describe('entering seed phrase', () => {
 
 describe('entering password', () => {
   it('Should update the navigation to the confirmation screen when a password is submitted', async () => {
-    const { user, getAllByRole } = setupComponent(<AddPhrase accountData={{ secret: phrase }} />)
-    const passwordEntryTextArea = getAllByRole('textbox')[1]
+    setupComponent(<AddPhrase accountData={{ secret: phrase }} />)
+    const passwordEntryTextArea = screen.getAllByRole('textbox')[1]
 
     await user.type(passwordEntryTextArea, password)
 
     act(() => {
       jest.runAllTimers()
     })
-    const createButton = getAllByRole('button')[1]
+    const createButton = screen.getAllByRole('button')[1]
     await user.click(createButton)
     expect(link.send).toHaveBeenCalledWith('nav:forward', 'dash', {
       view: 'accounts',
@@ -94,13 +94,12 @@ describe('entering password', () => {
 })
 
 describe('confirming password', () => {
-  let user, passwordEntryTextArea, confirmButton
+  let passwordEntryTextArea, confirmButton
 
   beforeEach(() => {
-    const component = setupComponent(<AddPhrase accountData={{ secret: phrase, password }} />)
-    user = component.user
-    passwordEntryTextArea = component.getAllByRole('textbox')[2]
-    confirmButton = component.getAllByRole('button')[2]
+    setupComponent(<AddPhrase accountData={{ secret: phrase, password }} />)
+    passwordEntryTextArea = screen.getAllByRole('textbox')[2]
+    confirmButton = screen.getAllByRole('button')[2]
   })
 
   it('Should try to create seed phrase account when a matching password is submitted', async () => {

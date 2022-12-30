@@ -1,9 +1,10 @@
 import React from 'react'
 import Restore from 'react-restore'
+import { screen } from '@testing-library/react'
 
 import store from '../../../../../../main/store'
 import link from '../../../../../../resources/link'
-import { setupComponent } from '../../../../../componentSetup'
+import { user, setupComponent } from '../../../../../componentSetup'
 import AddAdressComponent from '../../../../../../app/dash/Accounts/Add/AddAddress'
 
 jest.mock('../../../../../../main/store/persist')
@@ -14,10 +15,10 @@ const address = '0x690B9A9E9aa1C9dB991C7721a92d351Db4FaC990'
 const ensName = 'vitalik.eth'
 
 it('allows a user to enter an address or ENS name', async () => {
-  const { getByText, getByRole } = setupComponent(<AddAddress />)
+  setupComponent(<AddAddress />)
 
-  expect(getByText('input address or ENS name')).toBeTruthy()
-  expect(getByRole('textbox')).toBeTruthy()
+  expect(screen.getByText('input address or ENS name')).toBeTruthy()
+  expect(screen.getByRole('textbox')).toBeTruthy()
 })
 
 it('adds an account by address', async () => {
@@ -30,11 +31,10 @@ it('adds an account by address', async () => {
 
 it('shows the resolving screen when resolving an ENS name', async () => {
   const component = setupComponent(<AddAddress />)
-  const { getByText } = component
 
   await addByEnsName(component)
 
-  expect(getByText('Resolving ENS Name')).toBeTruthy()
+  expect(screen.getByText('Resolving ENS Name')).toBeTruthy()
   expect(link.rpc).toHaveBeenCalledWith('resolveEnsName', ensName, expect.any(Function))
 })
 
@@ -46,22 +46,20 @@ it('shows an error screen when ENS name resolution fails', async () => {
   })
 
   const component = setupComponent(<AddAddress />)
-  const { getByText, getByRole } = component
 
   await addByEnsName(component)
 
-  expect(getByText(`Unable to resolve Ethereum address for ${ensName}`)).toBeTruthy()
-  expect(getByRole('button', { name: 'try again' })).toBeTruthy()
+  expect(screen.getByText(`Unable to resolve Ethereum address for ${ensName}`)).toBeTruthy()
+  expect(screen.getByRole('button', { name: 'try again' })).toBeTruthy()
 })
 
 it('shows a success screen after adding an account by address', async () => {
   const component = setupComponent(<AddAddress />)
-  const { getByText, getByRole } = component
 
   await addByAccount(component)
 
-  expect(getByText('account added successfully')).toBeTruthy()
-  expect(getByRole('button', { name: 'back' })).toBeTruthy()
+  expect(screen.getByText('account added successfully')).toBeTruthy()
+  expect(screen.getByRole('button', { name: 'back' })).toBeTruthy()
 })
 
 it('shows a success screen after adding an account by ENS name', async () => {
@@ -71,41 +69,35 @@ it('shows a success screen after adding an account by ENS name', async () => {
     cb(null, '0xd8da6bf26964af9d7eed9e03e53415d37aa96045')
   })
 
-  const component = setupComponent(<AddAddress />)
-  const { getByText, getByRole } = component
+  setupComponent(<AddAddress />)
 
-  await addByEnsName(component)
+  await addByEnsName()
 
-  expect(getByText('account added successfully')).toBeTruthy()
-  expect(getByRole('button', { name: 'back' })).toBeTruthy()
+  expect(screen.getByText('account added successfully')).toBeTruthy()
+  expect(screen.getByRole('button', { name: 'back' })).toBeTruthy()
 })
 
 it('restarts when a users cancels an ENS lookup', async () => {
-  const component = setupComponent(<AddAddress />)
-  const { user, getByText, getByRole } = component
+  setupComponent(<AddAddress />)
 
-  await addByEnsName(component)
-  await user.click(getByRole('button', { name: 'cancel' }))
+  await addByEnsName()
+  await user.click(screen.getByRole('button', { name: 'cancel' }))
 
-  expect(getByText('input address or ENS name')).toBeTruthy()
-  expect(getByRole('textbox')).toBeTruthy()
+  expect(screen.getByText('input address or ENS name')).toBeTruthy()
+  expect(screen.getByRole('textbox')).toBeTruthy()
 })
 
-async function addByAccount(component) {
-  const { user, getByRole, getByLabelText } = component
-
-  const inputField = getByLabelText('input address or ENS name')
-  const createButton = getByRole('button', { name: 'Create' })
+async function addByAccount() {
+  const inputField = screen.getByLabelText('input address or ENS name')
+  const createButton = screen.getByRole('button', { name: 'Create' })
 
   await user.type(inputField, address)
   await user.click(createButton)
 }
 
-async function addByEnsName(component) {
-  const { user, getByRole, getByLabelText } = component
-
-  const inputField = getByLabelText('input address or ENS name')
-  const createButton = getByRole('button', { name: 'Create' })
+async function addByEnsName() {
+  const inputField = screen.getByLabelText('input address or ENS name')
+  const createButton = screen.getByRole('button', { name: 'Create' })
 
   await user.type(inputField, ensName)
   await user.click(createButton)

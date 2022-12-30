@@ -1,23 +1,23 @@
 import React from 'react'
 import { act } from 'react-dom/test-utils'
 
-import { setupComponent } from '../../../componentSetup'
+import { setupComponent, user, screen } from '../../../componentSetup'
 import { CreatePassword, ConfirmPassword } from '../../../../resources/Components/Password'
 
 const password = 'thisisagoodpassword123'
 
 describe('creating password', () => {
-  let submitButton, passwordEntryTextArea, user, getByRole
+  let submitButton, passwordEntryTextArea
   const onCreate = jest.fn()
 
   beforeEach(() => {
-    ;({ user, getByRole } = setupComponent(<CreatePassword {...{ password, onCreate }} />))
-    passwordEntryTextArea = getByRole('textbox')
-    submitButton = getByRole('button')
+    setupComponent(<CreatePassword {...{ password, onCreate }} />)
+    passwordEntryTextArea = screen.getByRole('textbox')
+    submitButton = screen.getByRole('button')
   })
 
   it('Should display the correct title when entering the password', () => {
-    expect(getByRole('heading').textContent).toBe('Create Password')
+    expect(screen.getByRole('heading').textContent).toBe('Create Password')
   })
 
   it('Should show an error when the password is too short', async () => {
@@ -63,14 +63,13 @@ describe('creating password', () => {
 })
 
 describe('confirming password', () => {
-  let passwordEntryTextArea, confirmButton, user
+  let passwordEntryTextArea, confirmButton
   const onConfirm = jest.fn()
 
   beforeEach(() => {
-    const component = setupComponent(<ConfirmPassword {...{ password, onConfirm }} />)
-    user = component.user
-    passwordEntryTextArea = component.getByRole('textbox')
-    confirmButton = component.getByRole('button')
+    setupComponent(<ConfirmPassword {...{ password, onConfirm }} />)
+    passwordEntryTextArea = screen.getByRole('textbox')
+    confirmButton = screen.getByRole('button')
   })
 
   it('Should show an error when the password does not match previously entered password', async () => {

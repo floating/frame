@@ -1,11 +1,12 @@
 import React from 'react'
 import Restore from 'react-restore'
-import { setupComponent } from '../../../../../componentSetup'
+import { act } from 'react-dom/test-utils'
+import { screen } from '@testing-library/react'
 
+import { user, setupComponent } from '../../../../../componentSetup'
 import store from '../../../../../../main/store'
 import link from '../../../../../../resources/link'
 import AddRingAccountComponent from '../../../../../../app/dash/Accounts/Add/AddRing'
-import { act } from 'react-dom/test-utils'
 
 const privateKey = '4001069d4fe9b22dc767dfa7767e72f151e00dafa05d9ef0b89069a4f04820cb'
 const password = 'thisisagoodpassword123'
@@ -21,17 +22,16 @@ const AddRing = Restore.connect(AddRingAccountComponent, store)
 
 describe('entering private key', () => {
   const index = 0
-  let user, privateKeyTextArea, nextButton, getAllByRole
+  let privateKeyTextArea, nextButton
 
   beforeEach(() => {
-    const component = setupComponent(<AddRing accountData={{}} />)
-    ;({ user, getAllByRole } = component)
-    privateKeyTextArea = component.getAllByRole('textbox')[index]
-    nextButton = component.getAllByRole('button')[index]
+    setupComponent(<AddRing accountData={{}} />)
+    privateKeyTextArea = screen.getAllByRole('textbox')[index]
+    nextButton = screen.getAllByRole('button')[index]
   })
 
   it('should display the correct title when entering the private key', () => {
-    const title = getAllByRole('heading')[index]
+    const title = screen.getAllByRole('heading')[index]
     expect(title.textContent).toBe('Private Key')
   })
 
@@ -79,14 +79,14 @@ describe('entering private key', () => {
 
 describe('entering password', () => {
   it('Should update the navigation to the confirmation screen when a password is submitted', async () => {
-    const { user, getAllByRole } = setupComponent(<AddRing accountData={{ secret: privateKey }} />)
-    const passwordEntryTextArea = getAllByRole('textbox')[1]
+    setupComponent(<AddRing accountData={{ secret: privateKey }} />)
+    const passwordEntryTextArea = screen.getAllByRole('textbox')[1]
     await user.type(passwordEntryTextArea, password)
 
     act(() => {
       jest.runAllTimers()
     })
-    const confirmButton = getAllByRole('button')[1]
+    const confirmButton = screen.getAllByRole('button')[1]
     await user.click(confirmButton)
     expect(link.send).toHaveBeenCalledWith('nav:forward', 'dash', {
       view: 'accounts',
@@ -103,13 +103,12 @@ describe('entering password', () => {
 })
 
 describe('confirming password', () => {
-  let user, passwordEntryTextArea, confirmButton
+  let passwordEntryTextArea, confirmButton
 
   beforeEach(() => {
-    const component = setupComponent(<AddRing accountData={{ secret: privateKey, password }} />)
-    user = component.user
-    passwordEntryTextArea = component.getAllByRole('textbox')[2]
-    confirmButton = component.getAllByRole('button')[2]
+    setupComponent(<AddRing accountData={{ secret: privateKey, password }} />)
+    passwordEntryTextArea = screen.getAllByRole('textbox')[2]
+    confirmButton = screen.getAllByRole('button')[2]
   })
 
   it('Should try to create a private key account when a matching password is submitted', async () => {
