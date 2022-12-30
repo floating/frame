@@ -61,7 +61,9 @@
     "@ethereumjs/common": "3.0.1",
     "@ethereumjs/tx": "4.0.1",
     "@ethereumjs/util": "8.0.2",
+    "@ethersproject/abi": "5.7.0",
     "@ethersproject/address": "5.7.0",
+    "@ethersproject/bytes": "5.7.0",
     "@ethersproject/contracts": "5.7.0",
     "@ethersproject/providers": "5.7.2",
     "@framelabs/pylon-client": "0.0.10",
@@ -259,6 +261,10 @@
       "trezor-connect>@trezor/transport>protobufjs": false,
       "trezor-connect>@trezor/utxo-lib>blake-hash": false,
       "trezor-connect>@trezor/utxo-lib>tiny-secp256k1": false,
+      "web3": false,
+      "web3>web3-bzz": false,
+      "web3>web3-core>web3-core-requestmanager>web3-providers-ws>websocket>es5-ext": false,
+      "web3>web3-shh": false,
       "ws>bufferutil": false,
       "ws>utf-8-validate": false
     }
