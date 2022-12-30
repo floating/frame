@@ -1,10 +1,9 @@
 import React from 'react'
 import Restore from 'react-restore'
-import { screen } from '@testing-library/react'
 
 import store from '../../../../../main/store'
 import link from '../../../../../resources/link'
-import { user, setupComponent } from '../../../../componentSetup'
+import { screen, render } from '../../../../componentSetup'
 import ChainComponent from '../../../../../app/dash/Chains/Chain'
 
 jest.mock('../../../../../main/store/persist')
@@ -19,7 +18,7 @@ beforeAll(() => {
 describe('rendering', () => {
   it('renders the first provided RPC as the primary RPC', () => {
     const chainConfig = { view: 'setup', primaryRpc: 'https://myrpc.polygon.net' }
-    setupComponent(<Chain {...chainConfig} />)
+    render(<Chain {...chainConfig} />)
 
     const primaryRpcInput = screen.getByLabelText('Primary RPC')
     expect(primaryRpcInput.value).toEqual('https://myrpc.polygon.net')
@@ -27,7 +26,7 @@ describe('rendering', () => {
 
   it('renders the default primary RPC text', () => {
     const chainConfig = { view: 'setup' }
-    setupComponent(<Chain {...chainConfig} />)
+    render(<Chain {...chainConfig} />)
 
     const primaryRpcInput = screen.getByLabelText('Primary RPC')
     expect(primaryRpcInput.value).toEqual('Primary Endpoint')
@@ -35,7 +34,7 @@ describe('rendering', () => {
 
   it('renders the second provided RPC as the secondary RPC', () => {
     const chainConfig = { view: 'setup', secondaryRpc: 'https://my-backup-rpc.polygon.net' }
-    setupComponent(<Chain {...chainConfig} />)
+    render(<Chain {...chainConfig} />)
 
     const secondaryRpcInput = screen.getByLabelText('Secondary RPC')
     expect(secondaryRpcInput.value).toEqual('https://my-backup-rpc.polygon.net')
@@ -43,7 +42,7 @@ describe('rendering', () => {
 
   it('renders the default secondary RPC text', () => {
     const chainConfig = { view: 'setup' }
-    setupComponent(<Chain {...chainConfig} />)
+    render(<Chain {...chainConfig} />)
 
     const secondaryRpcInput = screen.getByLabelText('Secondary RPC')
     expect(secondaryRpcInput.value).toEqual('Secondary Endpoint')
@@ -51,7 +50,7 @@ describe('rendering', () => {
 
   it('renders the default chain name', () => {
     const chainConfig = { view: 'setup' }
-    setupComponent(<Chain {...chainConfig} />)
+    render(<Chain {...chainConfig} />)
 
     const titleSection = screen.getByRole('chainName')
     expect(titleSection.textContent).toBe('Chain Name')
@@ -59,7 +58,7 @@ describe('rendering', () => {
 
   it('renders the correct chain name', () => {
     const chainConfig = { view: 'setup', name: 'Polygon' }
-    setupComponent(<Chain {...chainConfig} />)
+    render(<Chain {...chainConfig} />)
 
     const titleSection = screen.getByRole('chainName')
     expect(titleSection.textContent).toBe('Polygon')
@@ -67,7 +66,7 @@ describe('rendering', () => {
 
   it('renders the correct chain id', () => {
     const chainConfig = { view: 'setup', name: 'Polygon', id: 137 }
-    setupComponent(<Chain {...chainConfig} />)
+    render(<Chain {...chainConfig} />)
 
     const chainIdInput = screen.getByLabelText('Chain ID')
     expect(chainIdInput.value).toEqual('137')
@@ -75,7 +74,7 @@ describe('rendering', () => {
 
   it('renders the correct native symbol', () => {
     const chainConfig = { view: 'setup', name: 'Polygon', id: 137, symbol: 'MATIC' }
-    setupComponent(<Chain {...chainConfig} />)
+    render(<Chain {...chainConfig} />)
 
     const chainIdInput = screen.getByLabelText('Native Symbol')
     expect(chainIdInput.value).toEqual('MATIC')
@@ -90,7 +89,8 @@ describe('rendering', () => {
       primaryRpc: 'https://rpc-mainnet.matic.network',
       secondaryRpc: 'https://polygon-rpc.com'
     }
-    setupComponent(<Chain {...chainConfig} />)
+
+    render(<Chain {...chainConfig} />)
 
     const submitButton = screen.getByRole('button')
     expect(submitButton.textContent).toBe('Add Chain')
@@ -98,7 +98,7 @@ describe('rendering', () => {
 
   it('renders the correct submit button text when the form is empty', () => {
     const chainConfig = { view: 'setup', id: 137, name: 'Polygon' }
-    setupComponent(<Chain {...chainConfig} />)
+    render(<Chain {...chainConfig} />)
 
     const submitButton = screen.getByRole('button')
     expect(submitButton.textContent).toBe('Fill Chain Details')
@@ -106,7 +106,7 @@ describe('rendering', () => {
 
   it('renders a warning if the entered chain id already exists', () => {
     const chainConfig = { view: 'setup', id: 1, name: 'Mainnet' }
-    setupComponent(<Chain {...chainConfig} />)
+    render(<Chain {...chainConfig} />)
 
     const submitButton = screen.getByRole('button')
     expect(submitButton.textContent).toBe('Chain ID Already Exists')
@@ -114,7 +114,7 @@ describe('rendering', () => {
 
   it('renders the testnet toggle as off by default', () => {
     const chainConfig = { view: 'setup' }
-    setupComponent(<Chain {...chainConfig} />)
+    render(<Chain {...chainConfig} />)
 
     const testnetToggle = screen.getByRole('chainTestnet')
     expect(testnetToggle.getAttribute('aria-checked')).toBe('false')
@@ -136,7 +136,7 @@ describe('submitting', () => {
     })
 
     const chainConfig = { id: 1, name: 'Mainnet' }
-    setupComponent(<Chain view='setup' {...chainConfig} />)
+    const { user } = render(<Chain view='setup' {...chainConfig} />)
 
     await user.click(screen.getByRole('button'))
     expect(link.send).not.toHaveBeenCalled()
@@ -154,7 +154,7 @@ describe('submitting', () => {
       isTestnet: false
     }
 
-    setupComponent(<Chain view='setup' {...chainConfig} />)
+    const { user } = render(<Chain view='setup' {...chainConfig} />)
 
     await user.click(screen.getByRole('button'))
 
@@ -180,7 +180,7 @@ describe('submitting', () => {
       secondaryRpc: 'https://myrpc.arbrink.net'
     }
 
-    setupComponent(<Chain view='setup' {...chainConfig} />)
+    const { user } = render(<Chain view='setup' {...chainConfig} />)
 
     const primaryRpcInput = screen.getByLabelText('Primary RPC')
     await user.clear(primaryRpcInput)
@@ -206,7 +206,7 @@ describe('submitting', () => {
 describe('updating fields', () => {
   it('allows the user to mark a chain as a testnet', async () => {
     const chainConfig = { view: 'setup' }
-    setupComponent(<Chain {...chainConfig} />)
+    const { user } = render(<Chain {...chainConfig} />)
 
     const testnetToggle = screen.getByRole('chainTestnet')
     await user.click(testnetToggle)

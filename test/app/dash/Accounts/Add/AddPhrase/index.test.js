@@ -1,7 +1,7 @@
 import React from 'react'
 import Restore from 'react-restore'
 
-import { act, screen, setupComponent as render } from '../../../../../componentSetup'
+import { act, screen, render } from '../../../../../componentSetup'
 import store from '../../../../../../main/store'
 import link from '../../../../../../resources/link'
 import AddPhraseAccountComponent from '../../../../../../app/dash/Accounts/Add/AddPhrase'

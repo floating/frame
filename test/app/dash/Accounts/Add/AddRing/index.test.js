@@ -1,9 +1,7 @@
 import React from 'react'
 import Restore from 'react-restore'
-import { act } from 'react-dom/test-utils'
-import { screen } from '@testing-library/react'
 
-import { user, setupComponent } from '../../../../../componentSetup'
+import { render, act, screen } from '../../../../../componentSetup'
 import store from '../../../../../../main/store'
 import link from '../../../../../../resources/link'
 import AddRingAccountComponent from '../../../../../../app/dash/Accounts/Add/AddRing'
@@ -21,48 +19,52 @@ jest.mock('../../../../../../resources/link', () => ({
 const AddRing = Restore.connect(AddRingAccountComponent, store)
 
 describe('entering private key', () => {
-  const index = 0
-  let privateKeyTextArea, nextButton
+  const setupComponent = () => {
+    const { user } = render(<AddRing accountData={{}} />)
+    const getTitle = () => screen.getAllByRole('heading')[0]
+    const getNextButton = () => screen.getAllByRole('button')[0]
 
-  beforeEach(() => {
-    setupComponent(<AddRing accountData={{}} />)
-    privateKeyTextArea = screen.getAllByRole('textbox')[index]
-    nextButton = screen.getAllByRole('button')[index]
-  })
+    return {
+      user,
+      getTitle,
+      getNextButton,
+      enterPrivateKey: async (text) => {
+        await user.type(screen.getAllByRole('textbox')[0], text)
+
+        act(() => {
+          jest.runAllTimers()
+        })
+      }
+    }
+  }
 
   it('should display the correct title when entering the private key', () => {
-    const title = screen.getAllByRole('heading')[index]
-    expect(title.textContent).toBe('Private Key')
+    const { getTitle } = setupComponent()
+
+    expect(getTitle().textContent).toBe('Private Key')
   })
 
   it('should show an error message when private key is an invalid hex string', async () => {
-    await user.type(privateKeyTextArea, 'INVALID')
+    const { enterPrivateKey, getNextButton } = setupComponent()
 
-    act(() => {
-      jest.runAllTimers()
-    })
+    await enterPrivateKey('INVALID')
 
-    expect(nextButton.textContent).toBe('INVALID PRIVATE KEY')
+    expect(getNextButton().textContent).toBe('INVALID PRIVATE KEY')
   })
 
   it('should show an error message when private key is invalid', async () => {
-    await user.type(privateKeyTextArea, '0xffffffffffffffffffffffffffffffffbaaedce6af48a03bbfd25e8cd0364148')
+    const { enterPrivateKey, getNextButton } = setupComponent()
 
-    act(() => {
-      jest.runAllTimers()
-    })
+    await enterPrivateKey('0xffffffffffffffffffffffffffffffffbaaedce6af48a03bbfd25e8cd0364148')
 
-    expect(nextButton.textContent).toBe('INVALID PRIVATE KEY')
+    expect(getNextButton().textContent).toBe('INVALID PRIVATE KEY')
   })
 
   it('should update the navigation with the password entry screen when a private key is submitted', async () => {
-    await user.type(privateKeyTextArea, privateKey)
+    const { user, enterPrivateKey, getNextButton } = setupComponent()
 
-    act(() => {
-      jest.runAllTimers()
-    })
-
-    await user.click(nextButton)
+    await enterPrivateKey(privateKey)
+    await user.click(getNextButton())
 
     expect(link.send).toHaveBeenCalledWith('nav:forward', 'dash', {
       view: 'accounts',
@@ -78,16 +80,19 @@ describe('entering private key', () => {
 })
 
 describe('entering password', () => {
-  it('Should update the navigation to the confirmation screen when a password is submitted', async () => {
-    setupComponent(<AddRing accountData={{ secret: privateKey }} />)
+  it('should update the navigation to the confirmation screen when a password is submitted', async () => {
+    const { user } = render(<AddRing accountData={{ secret: privateKey }} />)
+
     const passwordEntryTextArea = screen.getAllByRole('textbox')[1]
     await user.type(passwordEntryTextArea, password)
 
     act(() => {
       jest.runAllTimers()
     })
+
     const confirmButton = screen.getAllByRole('button')[1]
     await user.click(confirmButton)
+
     expect(link.send).toHaveBeenCalledWith('nav:forward', 'dash', {
       view: 'accounts',
       data: {
@@ -103,26 +108,33 @@ describe('entering password', () => {
 })
 
 describe('confirming password', () => {
-  let passwordEntryTextArea, confirmButton
+  const setupComponent = () => {
+    const { user } = render(<AddRing accountData={{ secret: privateKey, password }} />)
+    const getConfirmButton = () => screen.getAllByRole('button')[2]
 
-  beforeEach(() => {
-    setupComponent(<AddRing accountData={{ secret: privateKey, password }} />)
-    passwordEntryTextArea = screen.getAllByRole('textbox')[2]
-    confirmButton = screen.getAllByRole('button')[2]
-  })
+    return {
+      user,
+      getConfirmButton,
+      enterPasswordConfirmation: async (text) => {
+        await user.type(screen.getAllByRole('textbox')[2], text)
 
-  it('Should try to create a private key account when a matching password is submitted', async () => {
-    await user.type(passwordEntryTextArea, password)
+        act(() => {
+          jest.runAllTimers()
+        })
+      }
+    }
+  }
 
-    act(() => {
-      jest.runAllTimers()
-    })
+  it('should try to create a private key account when a matching password is submitted', async () => {
+    const { user, enterPasswordConfirmation, getConfirmButton } = setupComponent()
 
-    await user.click(confirmButton)
+    await enterPasswordConfirmation(password)
+    await user.click(getConfirmButton())
+
     expect(link.rpc).toHaveBeenCalledWith('createFromPrivateKey', privateKey, password, expect.any(Function))
   })
 
-  it('Should remove the previous screens related to adding an account from the navigation', async () => {
+  it('should remove the previous screens related to adding an account from the navigation', async () => {
     link.rpc.mockImplementationOnce((action, secret, passwd, cb) => {
       expect(action).toBe('createFromPrivateKey')
       expect(secret).toBe(privateKey)
@@ -130,17 +142,15 @@ describe('confirming password', () => {
       cb(null, { id: '1234' })
     })
 
-    await user.type(passwordEntryTextArea, password)
+    const { user, enterPasswordConfirmation, getConfirmButton } = setupComponent()
 
-    act(() => {
-      jest.runAllTimers()
-    })
+    await enterPasswordConfirmation(password)
+    await user.click(getConfirmButton())
 
-    await user.click(confirmButton)
     expect(link.send).toHaveBeenCalledWith('nav:back', 'dash', 4)
   })
 
-  it('Should update the navigation to view the newly created account', async () => {
+  it('should update the navigation to view the newly created account', async () => {
     link.rpc.mockImplementationOnce((action, secret, passwd, cb) => {
       expect(action).toBe('createFromPrivateKey')
       expect(secret).toBe(privateKey)
@@ -148,13 +158,11 @@ describe('confirming password', () => {
       cb(null, { id: '1234' })
     })
 
-    await user.type(passwordEntryTextArea, password)
+    const { user, enterPasswordConfirmation, getConfirmButton } = setupComponent()
 
-    act(() => {
-      jest.runAllTimers()
-    })
+    await enterPasswordConfirmation(password)
+    await user.click(getConfirmButton())
 
-    await user.click(confirmButton)
     expect(link.send).toHaveBeenCalledWith('nav:forward', 'dash', {
       view: 'expandedSigner',
       data: { signer: '1234' }

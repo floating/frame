@@ -20,3 +20,5 @@ export function setupComponent(jsx, options = {}) {
 }
 
 export * from '@testing-library/react'
+
+export { setupComponent as render }

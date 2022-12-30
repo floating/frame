@@ -2,7 +2,7 @@ import React from 'react'
 import { addHexPrefix } from '@ethereumjs/util'
 import Restore from 'react-restore'
 
-import { setupComponent, screen, user } from '../../../../../../../componentSetup'
+import { render, screen } from '../../../../../../../componentSetup'
 import store from '../../../../../../../../main/store'
 import ApproveTokenSpendComponent from '../../../../../../../../app/tray/Account/Account/Requests/TransactionRequest/TokenSpend'
 
@@ -28,7 +28,7 @@ describe('changing approval amounts', () => {
         }
       }
 
-      setupComponent(
+      const { user } = render(
         <TokenSpend
           approval={approval}
           requestedAmountHex={requestedAmountHex}
@@ -70,7 +70,7 @@ describe('changing approval amounts', () => {
       }
     }
 
-    setupComponent(
+    render(
       <TokenSpend approval={approval} requestedAmountHex={requestedAmountHex} updateApproval={() => {}} />
     )
 
@@ -96,7 +96,7 @@ describe('changing approval amounts', () => {
         }
       }
 
-      setupComponent(
+      const { user } = render(
         <TokenSpend
           approval={approval}
           requestedAmountHex={requestedAmountHex}
@@ -138,7 +138,7 @@ describe('changing approval amounts', () => {
       }
       let firstCall = true
 
-      setupComponent(
+      const { user } = render(
         <TokenSpend
           approval={approval}
           requestedAmountHex={requestedAmountHex}
@@ -184,7 +184,7 @@ describe('changing approval amounts', () => {
       }
       let firstCall = true
 
-      setupComponent(
+      const { user } = render(
         <TokenSpend
           approval={approval}
           requestedAmountHex={requestedAmountHex}
@@ -234,7 +234,7 @@ describe('changing approval amounts', () => {
 
       delete approval.data[field]
 
-      setupComponent(
+      const { user } = render(
         <TokenSpend approval={approval} requestedAmountHex={requestedAmountHex} updateApproval={() => {}} />
       )
 
@@ -279,7 +279,7 @@ describe('formatting amounts', () => {
         }
       }
 
-      setupComponent(
+      render(
         <TokenSpend approval={approval} requestedAmountHex={requestedAmountHex} updateApproval={() => {}} />
       )
 

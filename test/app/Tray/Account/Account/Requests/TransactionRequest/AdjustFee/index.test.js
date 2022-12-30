@@ -5,7 +5,7 @@ import BigNumber from 'bignumber.js'
 
 import store from '../../../../../../../../main/store'
 import link from '../../../../../../../../resources/link'
-import { user, screen, advanceTimers, setupComponent } from '../../../../../../../componentSetup'
+import { screen, render, advanceTimers } from '../../../../../../../componentSetup'
 import AdjustFeeComponent from '../../../../../../../../app/tray/Account/Account/Requests/TransactionRequest/AdjustFee'
 
 jest.mock('../../../../../../../../main/store/persist')
@@ -29,20 +29,20 @@ beforeEach(() => {
 })
 
 it('renders the base fee input', () => {
-  setupComponent(<AdjustFee req={req} />)
+  render(<AdjustFee req={req} />)
   const baseFeeInput = screen.getByLabelText('Base Fee (GWEI)')
   expect(baseFeeInput.value).toBe('4')
 })
 
 it('renders the priority fee input', () => {
-  setupComponent(<AdjustFee req={req} />)
+  render(<AdjustFee req={req} />)
 
   const priorityFeeInput = screen.getByLabelText('Max Priority Fee (GWEI)')
   expect(priorityFeeInput.value).toBe('3')
 })
 
 it('renders the gas limit input', () => {
-  setupComponent(<AdjustFee req={req} />)
+  render(<AdjustFee req={req} />)
 
   const gasLimitInput = screen.getByLabelText('Gas Limit (UNITS)')
   expect(gasLimitInput.value).toBe('25000')
@@ -60,7 +60,7 @@ describe('base fee input', () => {
 
   submittedAmounts.forEach((spec) => {
     it(`submits a requested amount of ${spec.amount} as ${spec.submitted}`, async () => {
-      setupComponent(<AdjustFee req={req} />)
+      const { user } = render(<AdjustFee req={req} />)
       const baseFeeInput = screen.getByLabelText('Base Fee (GWEI)')
 
       await user.clear(baseFeeInput)
@@ -74,7 +74,7 @@ describe('base fee input', () => {
   })
 
   it('does not submit values when the user is in the middle of typing a float', async () => {
-    setupComponent(<AdjustFee req={req} />)
+    const { user } = render(<AdjustFee req={req} />)
     const baseFeeInput = screen.getByLabelText('Base Fee (GWEI)')
 
     await user.clear(baseFeeInput)
@@ -87,7 +87,7 @@ describe('base fee input', () => {
   })
 
   it('does not submit empty values', async () => {
-    setupComponent(<AdjustFee req={req} />)
+    const { user } = render(<AdjustFee req={req} />)
     const baseFeeInput = screen.getByLabelText('Base Fee (GWEI)')
 
     await user.clear(baseFeeInput)
@@ -99,7 +99,7 @@ describe('base fee input', () => {
   })
 
   it('renders a small fraction of a gwei', async () => {
-    setupComponent(<AdjustFee req={req} />)
+    const { user } = render(<AdjustFee req={req} />)
     const baseFeeInput = screen.getByLabelText('Base Fee (GWEI)')
 
     await user.clear(baseFeeInput)
@@ -111,7 +111,7 @@ describe('base fee input', () => {
   })
 
   it('renders a decimal point', async () => {
-    setupComponent(<AdjustFee req={req} />)
+    const { user } = render(<AdjustFee req={req} />)
     const baseFeeInput = screen.getByLabelText('Base Fee (GWEI)')
 
     await user.clear(baseFeeInput)
@@ -123,7 +123,7 @@ describe('base fee input', () => {
   })
 
   it('increments integer values when the up arrow key is pressed', async () => {
-    setupComponent(<AdjustFee req={req} />)
+    const { user } = render(<AdjustFee req={req} />)
     const baseFeeInput = screen.getByLabelText('Base Fee (GWEI)')
 
     await user.type(baseFeeInput, '{ArrowUp}')
@@ -135,7 +135,7 @@ describe('base fee input', () => {
   })
 
   it('increments float values when the up arrow key is pressed', async () => {
-    setupComponent(<AdjustFee req={req} />)
+    const { user } = render(<AdjustFee req={req} />)
     const baseFeeInput = screen.getByLabelText('Base Fee (GWEI)')
 
     await user.clear(baseFeeInput)
@@ -148,7 +148,7 @@ describe('base fee input', () => {
   })
 
   it('does not increment values above the upper limit', async () => {
-    setupComponent(<AdjustFee req={req} />)
+    const { user } = render(<AdjustFee req={req} />)
     const baseFeeInput = screen.getByLabelText('Base Fee (GWEI)')
 
     await user.clear(baseFeeInput)
@@ -161,7 +161,7 @@ describe('base fee input', () => {
   })
 
   it('decrements integer values when the down arrow key is pressed', async () => {
-    setupComponent(<AdjustFee req={req} />)
+    const { user } = render(<AdjustFee req={req} />)
     const baseFeeInput = screen.getByLabelText('Base Fee (GWEI)')
 
     await user.type(baseFeeInput, '{ArrowDown}')
@@ -173,7 +173,7 @@ describe('base fee input', () => {
   })
 
   it('decrements float values when the down arrow key is pressed', async () => {
-    setupComponent(<AdjustFee req={req} />)
+    const { user } = render(<AdjustFee req={req} />)
     const baseFeeInput = screen.getByLabelText('Base Fee (GWEI)')
 
     await user.clear(baseFeeInput)
@@ -186,7 +186,7 @@ describe('base fee input', () => {
   })
 
   it('does not decrement values below the lower limit', async () => {
-    setupComponent(<AdjustFee req={req} />)
+    const { user } = render(<AdjustFee req={req} />)
     const baseFeeInput = screen.getByLabelText('Base Fee (GWEI)')
 
     await user.clear(baseFeeInput)
@@ -199,7 +199,7 @@ describe('base fee input', () => {
   })
 
   it('blurs the input when the enter key is pressed', async () => {
-    setupComponent(<AdjustFee req={req} />)
+    const { user } = render(<AdjustFee req={req} />)
     const baseFeeInput = screen.getByLabelText('Base Fee (GWEI)')
 
     await user.clear(baseFeeInput)
@@ -213,7 +213,8 @@ describe('base fee input', () => {
     req.data.maxFeePerGas = addHexPrefix((600e9).toString(16))
     req.data.gasLimit = addHexPrefix((250000).toString(16))
     req.data.chainId = '1'
-    setupComponent(<AdjustFee req={req} />)
+
+    const { user } = render(<AdjustFee req={req} />)
     const baseFeeInput = screen.getByLabelText('Base Fee (GWEI)')
 
     await user.clear(baseFeeInput)
@@ -230,7 +231,8 @@ describe('base fee input', () => {
     req.data.maxFeePerGas = addHexPrefix((6000e9).toString(16))
     req.data.gasLimit = addHexPrefix((30000000).toString(16))
     req.data.chainId = '250'
-    setupComponent(<AdjustFee req={req} />)
+
+    const { user } = render(<AdjustFee req={req} />)
     const baseFeeInput = screen.getByLabelText('Base Fee (GWEI)')
 
     await user.clear(baseFeeInput)
@@ -247,7 +249,8 @@ describe('base fee input', () => {
     req.data.maxFeePerGas = addHexPrefix((6000e9).toString(16))
     req.data.gasLimit = addHexPrefix((10000000).toString(16))
     req.data.chainId = '6746754'
-    setupComponent(<AdjustFee req={req} />)
+
+    const { user } = render(<AdjustFee req={req} />)
     const baseFeeInput = screen.getByLabelText('Base Fee (GWEI)')
 
     await user.clear(baseFeeInput)
@@ -272,7 +275,7 @@ describe('priority fee input', () => {
 
   submittedAmounts.forEach((spec) => {
     it(`submits a requested amount of ${spec.amount} as ${spec.submitted}`, async () => {
-      setupComponent(<AdjustFee req={req} />)
+      const { user } = render(<AdjustFee req={req} />)
       const priorityFeeInput = screen.getByLabelText('Max Priority Fee (GWEI)')
 
       await user.clear(priorityFeeInput)
@@ -291,7 +294,7 @@ describe('priority fee input', () => {
   })
 
   it('does not submit values when the user is in the middle of typing a float', async () => {
-    setupComponent(<AdjustFee req={req} />)
+    const { user } = render(<AdjustFee req={req} />)
     const priorityFeeInput = screen.getByLabelText('Max Priority Fee (GWEI)')
 
     await user.clear(priorityFeeInput)
@@ -304,7 +307,7 @@ describe('priority fee input', () => {
   })
 
   it('does not submit empty values', async () => {
-    setupComponent(<AdjustFee req={req} />)
+    const { user } = render(<AdjustFee req={req} />)
     const priorityFeeInput = screen.getByLabelText('Max Priority Fee (GWEI)')
 
     await user.clear(priorityFeeInput)
@@ -316,7 +319,7 @@ describe('priority fee input', () => {
   })
 
   it('increments integer values when the up arrow key is pressed', async () => {
-    setupComponent(<AdjustFee req={req} />)
+    const { user } = render(<AdjustFee req={req} />)
     const priorityFeeInput = screen.getByLabelText('Max Priority Fee (GWEI)')
 
     await user.type(priorityFeeInput, '{ArrowUp}')
@@ -328,7 +331,7 @@ describe('priority fee input', () => {
   })
 
   it('increments float values when the up arrow key is pressed', async () => {
-    setupComponent(<AdjustFee req={req} />)
+    const { user } = render(<AdjustFee req={req} />)
     const priorityFeeInput = screen.getByLabelText('Max Priority Fee (GWEI)')
 
     await user.clear(priorityFeeInput)
@@ -341,7 +344,7 @@ describe('priority fee input', () => {
   })
 
   it('does not increment values above the upper limit', async () => {
-    setupComponent(<AdjustFee req={req} />)
+    const { user } = render(<AdjustFee req={req} />)
     const priorityFeeInput = screen.getByLabelText('Max Priority Fee (GWEI)')
 
     await user.clear(priorityFeeInput)
@@ -354,7 +357,7 @@ describe('priority fee input', () => {
   })
 
   it('decrements integer values when the down arrow key is pressed', async () => {
-    setupComponent(<AdjustFee req={req} />)
+    const { user } = render(<AdjustFee req={req} />)
     const priorityFeeInput = screen.getByLabelText('Max Priority Fee (GWEI)')
 
     await user.type(priorityFeeInput, '{ArrowDown}')
@@ -366,7 +369,7 @@ describe('priority fee input', () => {
   })
 
   it('decrements float values when the down arrow key is pressed', async () => {
-    setupComponent(<AdjustFee req={req} />)
+    const { user } = render(<AdjustFee req={req} />)
     const priorityFeeInput = screen.getByLabelText('Max Priority Fee (GWEI)')
 
     await user.clear(priorityFeeInput)
@@ -379,7 +382,7 @@ describe('priority fee input', () => {
   })
 
   it('does not decrement values below the lower limit', async () => {
-    setupComponent(<AdjustFee req={req} />)
+    const { user } = render(<AdjustFee req={req} />)
     const priorityFeeInput = screen.getByLabelText('Max Priority Fee (GWEI)')
 
     await user.clear(priorityFeeInput)
@@ -392,7 +395,7 @@ describe('priority fee input', () => {
   })
 
   it('blurs the input when the enter key is pressed', async () => {
-    setupComponent(<AdjustFee req={req} />)
+    const { user } = render(<AdjustFee req={req} />)
     const priorityFeeInput = screen.getByLabelText('Max Priority Fee (GWEI)')
 
     await user.clear(priorityFeeInput)
@@ -406,7 +409,8 @@ describe('priority fee input', () => {
     req.data.maxFeePerGas = addHexPrefix((600e9).toString(16))
     req.data.gasLimit = addHexPrefix((250000).toString(16))
     req.data.chainId = '1'
-    setupComponent(<AdjustFee req={req} />)
+
+    const { user } = render(<AdjustFee req={req} />)
     const priorityFeeInput = screen.getByLabelText('Max Priority Fee (GWEI)')
 
     await user.clear(priorityFeeInput)
@@ -423,7 +427,8 @@ describe('priority fee input', () => {
     req.data.maxFeePerGas = addHexPrefix((6000e9).toString(16))
     req.data.gasLimit = addHexPrefix((30000000).toString(16))
     req.data.chainId = '250'
-    setupComponent(<AdjustFee req={req} />)
+
+    const { user } = render(<AdjustFee req={req} />)
     const priorityFeeInput = screen.getByLabelText('Max Priority Fee (GWEI)')
 
     await user.clear(priorityFeeInput)
@@ -440,7 +445,8 @@ describe('priority fee input', () => {
     req.data.maxFeePerGas = addHexPrefix((6000e9).toString(16))
     req.data.gasLimit = addHexPrefix((10000000).toString(16))
     req.data.chainId = '6746754'
-    setupComponent(<AdjustFee req={req} />)
+
+    const { user } = render(<AdjustFee req={req} />)
     const priorityFeeInput = screen.getByLabelText('Max Priority Fee (GWEI)')
 
     await user.clear(priorityFeeInput)
@@ -463,7 +469,7 @@ describe('gas limit input', () => {
 
   submittedAmounts.forEach((spec) => {
     it(`submits a requested amount of ${spec.amount} as ${spec.submitted}`, async () => {
-      setupComponent(<AdjustFee req={req} />)
+      const { user } = render(<AdjustFee req={req} />)
       const gasLimitInput = screen.getByLabelText('Gas Limit (UNITS)')
 
       await user.clear(gasLimitInput)
@@ -477,7 +483,7 @@ describe('gas limit input', () => {
   })
 
   it('does not submit empty values', async () => {
-    setupComponent(<AdjustFee req={req} />)
+    const { user } = render(<AdjustFee req={req} />)
     const gasLimitInput = screen.getByLabelText('Gas Limit (UNITS)')
 
     await user.clear(gasLimitInput)
@@ -489,7 +495,7 @@ describe('gas limit input', () => {
   })
 
   it('increments values when the up arrow key is pressed', async () => {
-    setupComponent(<AdjustFee req={req} />)
+    const { user } = render(<AdjustFee req={req} />)
     const gasLimitInput = screen.getByLabelText('Gas Limit (UNITS)')
 
     await user.type(gasLimitInput, '{ArrowUp}')
@@ -501,7 +507,7 @@ describe('gas limit input', () => {
   })
 
   it('does not increment values above the upper limit', async () => {
-    setupComponent(<AdjustFee req={req} />)
+    const { user } = render(<AdjustFee req={req} />)
     const gasLimitInput = screen.getByLabelText('Gas Limit (UNITS)')
 
     await user.clear(gasLimitInput)
@@ -514,7 +520,7 @@ describe('gas limit input', () => {
   })
 
   it('decrements values when the down arrow key is pressed', async () => {
-    setupComponent(<AdjustFee req={req} />)
+    const { user } = render(<AdjustFee req={req} />)
     const gasLimitInput = screen.getByLabelText('Gas Limit (UNITS)')
 
     await user.type(gasLimitInput, '{ArrowDown}')
@@ -526,7 +532,7 @@ describe('gas limit input', () => {
   })
 
   it('does not decrement values below the lower limit', async () => {
-    setupComponent(<AdjustFee req={req} />)
+    const { user } = render(<AdjustFee req={req} />)
     const gasLimitInput = screen.getByLabelText('Gas Limit (UNITS)')
 
     await user.clear(gasLimitInput)
@@ -539,7 +545,7 @@ describe('gas limit input', () => {
   })
 
   it('blurs the input when the enter key is pressed', async () => {
-    setupComponent(<AdjustFee req={req} />)
+    const { user } = render(<AdjustFee req={req} />)
     const gasLimitInput = screen.getByLabelText('Gas Limit (UNITS)')
 
     await user.clear(gasLimitInput)
@@ -552,7 +558,8 @@ describe('gas limit input', () => {
     req.data.maxPriorityFeePerGas = addHexPrefix((3000e9).toString(16))
     req.data.maxFeePerGas = addHexPrefix((6000e9).toString(16))
     req.data.chainId = '1'
-    setupComponent(<AdjustFee req={req} />)
+
+    const { user } = render(<AdjustFee req={req} />)
     const gasLimitInput = screen.getByLabelText('Gas Limit (UNITS)')
 
     await user.clear(gasLimitInput)
@@ -568,7 +575,8 @@ describe('gas limit input', () => {
     req.data.maxPriorityFeePerGas = addHexPrefix((3000e9).toString(16))
     req.data.maxFeePerGas = addHexPrefix((22000e9).toString(16))
     req.data.chainId = '250'
-    setupComponent(<AdjustFee req={req} />)
+
+    const { user } = render(<AdjustFee req={req} />)
     const gasLimitInput = screen.getByLabelText('Gas Limit (UNITS)')
 
     await user.clear(gasLimitInput)
@@ -584,7 +592,8 @@ describe('gas limit input', () => {
     req.data.maxPriorityFeePerGas = addHexPrefix((3000e9).toString(16))
     req.data.maxFeePerGas = addHexPrefix((9000e9).toString(16))
     req.data.chainId = '6746754'
-    setupComponent(<AdjustFee req={req} />)
+
+    const { user } = render(<AdjustFee req={req} />)
     const gasLimitInput = screen.getByLabelText('Gas Limit (UNITS)')
 
     await user.clear(gasLimitInput)
@@ -610,14 +619,14 @@ describe('legacy transactions', () => {
   })
 
   it('renders the gas price input', () => {
-    setupComponent(<AdjustFee req={req} />)
+    render(<AdjustFee req={req} />)
 
     const gasPriceInput = screen.getByLabelText('Gas Price (GWEI)')
     expect(gasPriceInput.value).toBe('7')
   })
 
   it('renders the gas limit input', () => {
-    setupComponent(<AdjustFee req={req} />)
+    render(<AdjustFee req={req} />)
 
     const gasLimitInput = screen.getByLabelText('Gas Limit (UNITS)')
     expect(gasLimitInput.value).toBe('25000')
@@ -635,7 +644,7 @@ describe('legacy transactions', () => {
 
     submittedAmounts.forEach((spec) => {
       it(`submits a requested amount of ${spec.amount} as ${spec.submitted}`, async () => {
-        setupComponent(<AdjustFee req={req} />)
+        const { user } = render(<AdjustFee req={req} />)
         const gasPriceInput = screen.getByLabelText('Gas Price (GWEI)')
 
         await user.clear(gasPriceInput)
@@ -654,7 +663,7 @@ describe('legacy transactions', () => {
     })
 
     it('does not submit values when the user is in the middle of typing a float', async () => {
-      setupComponent(<AdjustFee req={req} />)
+      const { user } = render(<AdjustFee req={req} />)
       const gasPriceInput = screen.getByLabelText('Gas Price (GWEI)')
 
       await user.clear(gasPriceInput)
@@ -667,7 +676,7 @@ describe('legacy transactions', () => {
     })
 
     it('does not submit empty values', async () => {
-      setupComponent(<AdjustFee req={req} />)
+      const { user } = render(<AdjustFee req={req} />)
       const gasPriceInput = screen.getByLabelText('Gas Price (GWEI)')
 
       await user.clear(gasPriceInput)
@@ -679,7 +688,7 @@ describe('legacy transactions', () => {
     })
 
     it('increments integer values when the up arrow key is pressed', async () => {
-      setupComponent(<AdjustFee req={req} />)
+      const { user } = render(<AdjustFee req={req} />)
       const gasPriceInput = screen.getByLabelText('Gas Price (GWEI)')
 
       await user.type(gasPriceInput, '{ArrowUp}')
@@ -691,7 +700,7 @@ describe('legacy transactions', () => {
     })
 
     it('increments float values when the up arrow key is pressed', async () => {
-      setupComponent(<AdjustFee req={req} />)
+      const { user } = render(<AdjustFee req={req} />)
       const gasPriceInput = screen.getByLabelText('Gas Price (GWEI)')
 
       await user.clear(gasPriceInput)
@@ -704,7 +713,7 @@ describe('legacy transactions', () => {
     })
 
     it('does not increment values above the upper limit', async () => {
-      setupComponent(<AdjustFee req={req} />)
+      const { user } = render(<AdjustFee req={req} />)
       const gasPriceInput = screen.getByLabelText('Gas Price (GWEI)')
 
       await user.clear(gasPriceInput)
@@ -717,7 +726,7 @@ describe('legacy transactions', () => {
     })
 
     it('decrements integer values when the down arrow key is pressed', async () => {
-      setupComponent(<AdjustFee req={req} />)
+      const { user } = render(<AdjustFee req={req} />)
       const gasPriceInput = screen.getByLabelText('Gas Price (GWEI)')
 
       await user.type(gasPriceInput, '{ArrowDown}')
@@ -729,7 +738,7 @@ describe('legacy transactions', () => {
     })
 
     it('decrements float values when the down arrow key is pressed', async () => {
-      setupComponent(<AdjustFee req={req} />)
+      const { user } = render(<AdjustFee req={req} />)
       const gasPriceInput = screen.getByLabelText('Gas Price (GWEI)')
 
       await user.clear(gasPriceInput)
@@ -742,7 +751,7 @@ describe('legacy transactions', () => {
     })
 
     it('does not decrement values below the lower limit', async () => {
-      setupComponent(<AdjustFee req={req} />)
+      const { user } = render(<AdjustFee req={req} />)
       const gasPriceInput = screen.getByLabelText('Gas Price (GWEI)')
 
       await user.clear(gasPriceInput)
@@ -755,7 +764,7 @@ describe('legacy transactions', () => {
     })
 
     it('blurs the input when the enter key is pressed', async () => {
-      setupComponent(<AdjustFee req={req} />)
+      const { user } = render(<AdjustFee req={req} />)
       const gasPriceInput = screen.getByLabelText('Gas Price (GWEI)')
 
       await user.clear(gasPriceInput)
@@ -767,7 +776,8 @@ describe('legacy transactions', () => {
     it('recalculates the gas price when the total fee exceeds the maximum allowed (ETH-based chains)', async () => {
       req.data.gasLimit = addHexPrefix((250000000).toString(16))
       req.data.chainId = '1'
-      setupComponent(<AdjustFee req={req} />)
+
+      const { user } = render(<AdjustFee req={req} />)
       const gasPriceInput = screen.getByLabelText('Gas Price (GWEI)')
 
       await user.clear(gasPriceInput)
@@ -782,7 +792,8 @@ describe('legacy transactions', () => {
     it('recalculates the gas price when the total fee exceeds the maximum allowed (FTM)', async () => {
       req.data.gasLimit = addHexPrefix((3000000000).toString(16))
       req.data.chainId = '250'
-      setupComponent(<AdjustFee req={req} />)
+
+      const { user } = render(<AdjustFee req={req} />)
       const gasPriceInput = screen.getByLabelText('Gas Price (GWEI)')
 
       await user.clear(gasPriceInput)
@@ -797,7 +808,8 @@ describe('legacy transactions', () => {
     it('recalculates the gas price when the total fee exceeds the maximum allowed (other chains)', async () => {
       req.data.gasLimit = addHexPrefix((1000000000).toString(16))
       req.data.chainId = '6746754'
-      setupComponent(<AdjustFee req={req} />)
+
+      const { user } = render(<AdjustFee req={req} />)
       const gasPriceInput = screen.getByLabelText('Gas Price (GWEI)')
 
       await user.clear(gasPriceInput)
@@ -814,7 +826,8 @@ describe('legacy transactions', () => {
     it('recalculates the gas limit when the total fee exceeds the maximum allowed (ETH-based chains)', async () => {
       req.data.gasPrice = addHexPrefix((250e9).toString(16))
       req.data.chainId = '1'
-      setupComponent(<AdjustFee req={req} />)
+
+      const { user } = render(<AdjustFee req={req} />)
       const gasLimitInput = screen.getByLabelText('Gas Limit (UNITS)')
 
       await user.clear(gasLimitInput)
@@ -829,7 +842,8 @@ describe('legacy transactions', () => {
     it('recalculates the gas limit when the total fee exceeds the maximum allowed (FTM)', async () => {
       req.data.gasPrice = addHexPrefix((87000e9).toString(16))
       req.data.chainId = '250'
-      setupComponent(<AdjustFee req={req} />)
+
+      const { user } = render(<AdjustFee req={req} />)
       const gasLimitInput = screen.getByLabelText('Gas Limit (UNITS)')
 
       await user.clear(gasLimitInput)
@@ -844,7 +858,8 @@ describe('legacy transactions', () => {
     it('recalculates the gas limit when the total fee exceeds the maximum allowed (other chains)', async () => {
       req.data.gasPrice = addHexPrefix((27000e9).toString(16))
       req.data.chainId = '6746754'
-      setupComponent(<AdjustFee req={req} />)
+
+      const { user } = render(<AdjustFee req={req} />)
       const gasLimitInput = screen.getByLabelText('Gas Limit (UNITS)')
 
       await user.clear(gasLimitInput)

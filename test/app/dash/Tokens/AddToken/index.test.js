@@ -1,8 +1,7 @@
 import React from 'react'
 import Restore from 'react-restore'
-import { screen, render, waitFor } from '@testing-library/react'
 
-import { user, setupComponent, advanceTimers, setupUser } from '../../../../componentSetup'
+import { screen, render, waitFor, advanceTimers } from '../../../../componentSetup'
 import store from '../../../../../main/store'
 import link from '../../../../../resources/link'
 import AddTokenComponent from '../../../../../app/dash/Tokens/AddToken'
@@ -57,11 +56,10 @@ describe('selecting token chain', () => {
 
   it('should update add token navigation when a chain is selected', async () => {
     // 200 ms UI delay after clicking the button to select a chain
-    setupComponent(<AddToken />)
-    const userWithDelay = setupUser(() => advanceTimers(200))
+    const { user } = render(<AddToken />, { advanceTimers: () => advanceTimers(200) })
 
     const polygonButton = screen.getByRole('button', { name: 'Polygon' })
-    await userWithDelay.click(polygonButton)
+    await user.click(polygonButton)
 
     expect(link.send).toHaveBeenCalledWith('tray:action', 'navDash', {
       view: 'tokens',
@@ -84,7 +82,8 @@ describe('setting token address', () => {
   })
 
   it('should update add token navigation with an error when a user submits an invalid contract address', async () => {
-    setupComponent(<AddToken data={{ notifyData: { chainId: 1 } }} />)
+    const { user } = render(<AddToken data={{ notifyData: { chainId: 1 } }} />)
+
     const contractAddressInput = screen.getByLabelText(`Enter token's address`)
     await user.type(contractAddressInput, 'INVALID_ADDRESS')
     const setAddressButton = screen.getByRole('button', { name: 'Set Address' })
@@ -118,7 +117,8 @@ describe('setting token address', () => {
       }
     })
 
-    setupComponent(<AddToken data={{ notifyData: { chainId: 1 } }} />)
+    const { user } = render(<AddToken data={{ notifyData: { chainId: 1 } }} />)
+
     const contractAddressLabel = screen.getByLabelText(`Enter token's address`)
     await user.type(contractAddressLabel, '0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0')
     const setAddressButton = screen.getByRole('button', { name: 'Set Address' })
@@ -159,7 +159,7 @@ describe('setting token address', () => {
       return mockTokenData
     })
 
-    setupComponent(<AddToken data={{ notifyData: { chainId: 1 } }} />)
+    const { user } = render(<AddToken data={{ notifyData: { chainId: 1 } }} />)
 
     const contractAddressLabel = screen.getByLabelText(`Enter token's address`)
     await user.type(contractAddressLabel, '0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0')
