@@ -1,10 +1,9 @@
 import React from 'react'
 import Restore from 'react-restore'
-import { screen } from '@testing-library/react'
 
 import store from '../../../../../../main/store'
 import link from '../../../../../../resources/link'
-import { user, setupComponent } from '../../../../../componentSetup'
+import { screen, setupComponent } from '../../../../../componentSetup'
 import AddAdressComponent from '../../../../../../app/dash/Accounts/Add/AddAddress'
 
 jest.mock('../../../../../../main/store/persist')
@@ -69,25 +68,26 @@ it('shows a success screen after adding an account by ENS name', async () => {
     cb(null, '0xd8da6bf26964af9d7eed9e03e53415d37aa96045')
   })
 
-  setupComponent(<AddAddress />)
+  const component = setupComponent(<AddAddress />)
 
-  await addByEnsName()
+  await addByEnsName(component)
 
   expect(screen.getByText('account added successfully')).toBeTruthy()
   expect(screen.getByRole('button', { name: 'back' })).toBeTruthy()
 })
 
 it('restarts when a users cancels an ENS lookup', async () => {
-  setupComponent(<AddAddress />)
+  const component = setupComponent(<AddAddress />)
 
-  await addByEnsName()
-  await user.click(screen.getByRole('button', { name: 'cancel' }))
+  await addByEnsName(component)
+  await component.user.click(screen.getByRole('button', { name: 'cancel' }))
 
   expect(screen.getByText('input address or ENS name')).toBeTruthy()
   expect(screen.getByRole('textbox')).toBeTruthy()
 })
 
-async function addByAccount() {
+async function addByAccount(component) {
+  const { user } = component
   const inputField = screen.getByLabelText('input address or ENS name')
   const createButton = screen.getByRole('button', { name: 'Create' })
 
@@ -95,7 +95,8 @@ async function addByAccount() {
   await user.click(createButton)
 }
 
-async function addByEnsName() {
+async function addByEnsName(component) {
+  const { user } = component
   const inputField = screen.getByLabelText('input address or ENS name')
   const createButton = screen.getByRole('button', { name: 'Create' })
 
