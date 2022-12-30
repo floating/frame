@@ -147,7 +147,6 @@
     "husky": "8.0.2",
     "jest": "29.3.1",
     "jest-environment-jsdom": "29.3.1",
-    "lightningcss": "1.17.1",
     "lint-staged": "13.1.0",
     "nock": "13.2.9",
     "node-abi": "3.30.0",
