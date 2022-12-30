@@ -142,6 +142,14 @@ const rpc = {
   updateRequest(reqId, actionId, data, cb = () => {}) {
     accounts.updateRequest(reqId, actionId, data)
   },
+  updateTypedSignatureRequest(id, data, cb = () => {}) {
+    try {
+      accounts.updateTypedSignatureRequest(id, data)
+    } catch (e) {
+      log.error('tray:updateTypedSignatureRequest Error', e)
+    }
+  },
+
   approveRequest(req, cb) {
     accounts.setRequestPending(req)
     if (req.type === 'transaction') {

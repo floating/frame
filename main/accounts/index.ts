@@ -176,6 +176,14 @@ export class Accounts extends EventEmitter {
     }
   }
 
+  updateTypedSignatureRequest(reqId: string, data: { [key: string]: unknown }) {
+    const currentAccount = this.current()
+    if (!currentAccount || !currentAccount.requests[reqId]) return
+
+    store.updateTypedDataRequest(currentAccount.id, reqId, data)
+    currentAccount.update()
+  }
+
   async replaceTx(id: string, type: ReplacementType) {
     const currentAccount = this.current()
 

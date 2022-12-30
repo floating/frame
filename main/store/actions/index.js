@@ -849,6 +849,11 @@ module.exports = {
   },
   setFooterHeight: (u, win, height) => {
     u('windows', win, 'footer.height', () => (height < 40 ? 40 : height))
+  },
+  updateTypedDataRequest: (u, account, reqId, data) => {
+    u('main.accounts', account, 'requests', reqId, (request) => {
+      request.typedMessage.data = data
+    })
   }
   // toggleUSDValue: (u) => {
   //   u('main.showUSDValue', show => !show)

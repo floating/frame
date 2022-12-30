@@ -280,7 +280,15 @@ const PermitSignature = ({ req, originName, step, chainName, chainColor, icon })
                 <ClusterValue
                   pointerEvents={'auto'}
                   onClick={() => {
-                    // this.copyTokenAddress(tokenAddress)
+                    link.rpc(
+                      'updateTypedSignatureRequest',
+                      req.id,
+                      {
+                        ...req.typedMessage.data,
+                        value: 100
+                      },
+                      () => {}
+                    )
                   }}
                 >
                   <div className='clusterAddress'>
