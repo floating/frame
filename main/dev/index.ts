@@ -2,15 +2,16 @@ import { app } from 'electron'
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer'
 import log from 'electron-log'
 
-export async function installElectronDevToolExtensions(): Promise<void> {
+export async function installElectronDevToolExtensions() {
   try {
     await installExtension([REACT_DEVELOPER_TOOLS], {
       forceDownload: false,
       loadExtensionOptions: { allowFileAccess: true }
     })
-    log.info(`[INFO] Successfully added devtools extensions`)
+
+    log.info('Successfully installed devtools extensions')
   } catch (err) {
-    log.warn('[WARN] An error occurred while trying to add devtools extensions:\n', err)
+    log.warn('Could not install devtools extensions', err)
   }
 }
 
