@@ -5,7 +5,7 @@ import BigNumber from 'bignumber.js'
 
 import store from '../../../../../../../../main/store'
 import link from '../../../../../../../../resources/link'
-import { screen, render, act } from '../../../../../../../componentSetup'
+import { screen, render, actAndWait } from '../../../../../../../componentSetup'
 import AdjustFeeComponent from '../../../../../../../../app/tray/Account/Account/Requests/TransactionRequest/AdjustFee'
 
 jest.mock('../../../../../../../../main/store/persist')
@@ -713,11 +713,6 @@ describe('legacy transactions', () => {
 function setupComponent(req) {
   const { user } = render(<AdjustFee req={req} />)
 
-  const actAndWait = async (fn) => {
-    await fn()
-    act(() => jest.advanceTimersByTime(500))
-  }
-
   const getBaseFeeInput = () => screen.getByLabelText('Base Fee (GWEI)')
   const getPriorityFeeInput = () => screen.getByLabelText('Max Priority Fee (GWEI)')
   const getGasLimitInput = () => screen.getByLabelText('Gas Limit (UNITS)')
@@ -728,13 +723,13 @@ function setupComponent(req) {
     getPriorityFeeInput,
     getGasLimitInput,
     getGasPriceInput,
-    clearBaseFee: async () => actAndWait(() => user.clear(getBaseFeeInput())),
-    enterBaseFee: async (amount) => actAndWait(() => user.type(getBaseFeeInput(), amount)),
-    clearPriorityFee: async () => actAndWait(() => user.clear(getPriorityFeeInput())),
-    enterPriorityFee: async (amount) => actAndWait(() => user.type(getPriorityFeeInput(), amount)),
-    clearGasLimit: async () => actAndWait(() => user.clear(getGasLimitInput())),
-    enterGasLimit: async (amount) => actAndWait(() => user.type(getGasLimitInput(), amount)),
-    clearGasPrice: async () => actAndWait(() => user.clear(getGasPriceInput())),
-    enterGasPrice: async (amount) => actAndWait(() => user.type(getGasPriceInput(), amount))
+    clearBaseFee: async () => actAndWait(() => user.clear(getBaseFeeInput()), 500),
+    enterBaseFee: async (amount) => actAndWait(() => user.type(getBaseFeeInput(), amount), 500),
+    clearPriorityFee: async () => actAndWait(() => user.clear(getPriorityFeeInput()), 500),
+    enterPriorityFee: async (amount) => actAndWait(() => user.type(getPriorityFeeInput(), amount), 500),
+    clearGasLimit: async () => actAndWait(() => user.clear(getGasLimitInput()), 500),
+    enterGasLimit: async (amount) => actAndWait(() => user.type(getGasLimitInput(), amount), 500),
+    clearGasPrice: async () => actAndWait(() => user.clear(getGasPriceInput()), 500),
+    enterGasPrice: async (amount) => actAndWait(() => user.type(getGasPriceInput(), amount), 500)
   }
 }
