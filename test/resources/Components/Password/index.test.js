@@ -1,23 +1,21 @@
 import React from 'react'
 
-import { screen, render, act } from '../../../componentSetup'
+import { screen, render } from '../../../componentSetup'
 import { CreatePassword, ConfirmPassword } from '../../../../resources/Components/Password'
 
 const validPassword = 'thisisagoodpassword123'
 
 describe('creating password', () => {
   const setupComponent = ({ onCreate = jest.fn() } = {}) => {
-    const { user } = render(<CreatePassword {...{ password: validPassword, onCreate }} />)
-    const getSubmitButton = () => screen.getByRole('button')
-    const enterPassword = async (text) => {
-      await user.type(screen.getByRole('textbox'), text)
+    const { user } = render(<CreatePassword {...{ password: validPassword, onCreate }} />, {
+      advanceTimersAfterInput: true
+    })
 
-      act(() => {
-        jest.runAllTimers()
-      })
+    return {
+      user,
+      getSubmitButton: () => screen.getByRole('button'),
+      enterPassword: async (text) => user.type(screen.getByRole('textbox'), text)
     }
-
-    return { user, getSubmitButton, enterPassword }
   }
 
   it('should display the correct title when entering the password', () => {
@@ -63,17 +61,15 @@ describe('creating password', () => {
 
 describe('confirming password', () => {
   const setupComponent = ({ onConfirm = jest.fn() } = {}) => {
-    const { user } = render(<ConfirmPassword {...{ password: validPassword, onConfirm }} />)
-    const getConfirmButton = () => screen.getByRole('button')
-    const enterPassword = async (text) => {
-      await user.type(screen.getByRole('textbox'), text)
+    const { user } = render(<ConfirmPassword {...{ password: validPassword, onConfirm }} />, {
+      advanceTimersAfterInput: true
+    })
 
-      act(() => {
-        jest.runAllTimers()
-      })
+    return {
+      user,
+      getConfirmButton: () => screen.getByRole('button'),
+      enterPassword: async (text) => user.type(screen.getByRole('textbox'), text)
     }
-
-    return { user, getConfirmButton, enterPassword }
   }
   it('should show an error when the password does not match previously entered password', async () => {
     const { enterPassword, getConfirmButton } = setupComponent()

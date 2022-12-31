@@ -1,7 +1,7 @@
 import React from 'react'
 import Restore from 'react-restore'
 
-import { screen, render, waitFor, advanceTimers } from '../../../../componentSetup'
+import { screen, render, waitFor } from '../../../../componentSetup'
 import store from '../../../../../main/store'
 import link from '../../../../../resources/link'
 import AddTokenComponent from '../../../../../app/dash/Tokens/AddToken'
@@ -56,7 +56,7 @@ describe('selecting token chain', () => {
 
   it('should update add token navigation when a chain is selected', async () => {
     // 200 ms UI delay after clicking the button to select a chain
-    const { user } = render(<AddToken />, { advanceTimers: () => advanceTimers(200) })
+    const { user } = render(<AddToken />, { advanceTimersAfterInput: true })
 
     const polygonButton = screen.getByRole('button', { name: 'Polygon' })
     await user.click(polygonButton)

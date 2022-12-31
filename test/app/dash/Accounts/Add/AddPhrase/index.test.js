@@ -1,7 +1,7 @@
 import React from 'react'
 import Restore from 'react-restore'
 
-import { act, screen, render } from '../../../../../componentSetup'
+import { screen, render } from '../../../../../componentSetup'
 import store from '../../../../../../main/store'
 import link from '../../../../../../resources/link'
 import AddPhraseAccountComponent from '../../../../../../app/dash/Accounts/Add/AddPhrase'
@@ -20,11 +20,11 @@ const AddPhrase = Restore.connect(AddPhraseAccountComponent, store)
 
 describe('entering seed phrase', () => {
   const setupComponent = () => {
-    const { user } = render(<AddPhrase accountData={{}} />)
+    const { user } = render(<AddPhrase accountData={{}} />, { advanceTimersAfterInput: true })
 
     return {
-      enterSeedPhrase: async (text) => user.type(screen.getAllByRole('textbox')[0], text),
-      clickNext: async () => user.click(screen.getAllByRole('button')[0])
+      clickNext: async () => user.click(screen.getAllByRole('button')[0]),
+      enterSeedPhrase: async (text) => await user.type(screen.getAllByRole('textbox')[0], text)
     }
   }
 
@@ -40,10 +40,6 @@ describe('entering seed phrase', () => {
 
     await enterSeedPhrase('INVALID')
 
-    act(() => {
-      jest.runAllTimers()
-    })
-
     const nextButton = screen.getAllByRole('button')[0]
     expect(nextButton.textContent).toBe('INVALID SEED PHRASE')
   })
@@ -52,11 +48,6 @@ describe('entering seed phrase', () => {
     const { enterSeedPhrase, clickNext } = setupComponent()
 
     await enterSeedPhrase(phrase)
-
-    act(() => {
-      jest.runAllTimers()
-    })
-
     await clickNext()
 
     expect(link.send).toHaveBeenCalledWith('nav:forward', 'dash', {
@@ -74,16 +65,12 @@ describe('entering seed phrase', () => {
 
 describe('entering password', () => {
   it('should update the navigation to the confirmation screen when a password is submitted', async () => {
-    const { user } = render(<AddPhrase accountData={{ secret: phrase }} />)
+    const { user } = render(<AddPhrase accountData={{ secret: phrase }} />, { advanceTimersAfterInput: true })
+
     const passwordEntryTextArea = screen.getAllByRole('textbox')[1]
     const createButton = screen.getAllByRole('button')[1]
 
     await user.type(passwordEntryTextArea, password)
-
-    act(() => {
-      jest.runAllTimers()
-    })
-
     await user.click(createButton)
 
     expect(link.send).toHaveBeenCalledWith('nav:forward', 'dash', {
@@ -102,7 +89,9 @@ describe('entering password', () => {
 
 describe('confirming password', () => {
   const setupComponent = () => {
-    const { user } = render(<AddPhrase accountData={{ secret: phrase, password }} />)
+    const { user } = render(<AddPhrase accountData={{ secret: phrase, password }} />, {
+      advanceTimersAfterInput: true
+    })
 
     return {
       enterPassword: async (text) => user.type(screen.getAllByRole('textbox')[2], text),
@@ -114,11 +103,6 @@ describe('confirming password', () => {
     const { enterPassword, clickConfirm } = setupComponent()
 
     await enterPassword(password)
-
-    act(() => {
-      jest.runAllTimers()
-    })
-
     await clickConfirm()
 
     expect(link.rpc).toHaveBeenCalledWith('createFromPhrase', phrase, password, expect.any(Function))
@@ -135,11 +119,6 @@ describe('confirming password', () => {
     })
 
     await enterPassword(password)
-
-    act(() => {
-      jest.runAllTimers()
-    })
-
     await clickConfirm()
 
     expect(link.send).toHaveBeenCalledWith('nav:back', 'dash', 4)
@@ -156,11 +135,6 @@ describe('confirming password', () => {
     })
 
     await enterPassword(password)
-
-    act(() => {
-      jest.runAllTimers()
-    })
-
     await clickConfirm()
 
     expect(link.send).toHaveBeenCalledWith('nav:forward', 'dash', {

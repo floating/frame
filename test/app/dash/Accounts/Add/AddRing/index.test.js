@@ -1,7 +1,7 @@
 import React from 'react'
 import Restore from 'react-restore'
 
-import { render, act, screen } from '../../../../../componentSetup'
+import { render, screen } from '../../../../../componentSetup'
 import store from '../../../../../../main/store'
 import link from '../../../../../../resources/link'
 import AddRingAccountComponent from '../../../../../../app/dash/Accounts/Add/AddRing'
@@ -20,21 +20,13 @@ const AddRing = Restore.connect(AddRingAccountComponent, store)
 
 describe('entering private key', () => {
   const setupComponent = () => {
-    const { user } = render(<AddRing accountData={{}} />)
-    const getTitle = () => screen.getAllByRole('heading')[0]
-    const getNextButton = () => screen.getAllByRole('button')[0]
+    const { user } = render(<AddRing accountData={{}} />, { advanceTimersAfterInput: true })
 
     return {
       user,
-      getTitle,
-      getNextButton,
-      enterPrivateKey: async (text) => {
-        await user.type(screen.getAllByRole('textbox')[0], text)
-
-        act(() => {
-          jest.runAllTimers()
-        })
-      }
+      getTitle: () => screen.getAllByRole('heading')[0],
+      getNextButton: () => screen.getAllByRole('button')[0],
+      enterPrivateKey: async (text) => user.type(screen.getAllByRole('textbox')[0], text)
     }
   }
 
@@ -81,14 +73,12 @@ describe('entering private key', () => {
 
 describe('entering password', () => {
   it('should update the navigation to the confirmation screen when a password is submitted', async () => {
-    const { user } = render(<AddRing accountData={{ secret: privateKey }} />)
+    const { user } = render(<AddRing accountData={{ secret: privateKey }} />, {
+      advanceTimersAfterInput: true
+    })
 
     const passwordEntryTextArea = screen.getAllByRole('textbox')[1]
     await user.type(passwordEntryTextArea, password)
-
-    act(() => {
-      jest.runAllTimers()
-    })
 
     const confirmButton = screen.getAllByRole('button')[1]
     await user.click(confirmButton)
@@ -109,19 +99,14 @@ describe('entering password', () => {
 
 describe('confirming password', () => {
   const setupComponent = () => {
-    const { user } = render(<AddRing accountData={{ secret: privateKey, password }} />)
-    const getConfirmButton = () => screen.getAllByRole('button')[2]
+    const { user } = render(<AddRing accountData={{ secret: privateKey, password }} />, {
+      advanceTimersAfterInput: true
+    })
 
     return {
       user,
-      getConfirmButton,
-      enterPasswordConfirmation: async (text) => {
-        await user.type(screen.getAllByRole('textbox')[2], text)
-
-        act(() => {
-          jest.runAllTimers()
-        })
-      }
+      getConfirmButton: () => screen.getAllByRole('button')[2],
+      enterPasswordConfirmation: async (text) => user.type(screen.getAllByRole('textbox')[2], text)
     }
   }
 

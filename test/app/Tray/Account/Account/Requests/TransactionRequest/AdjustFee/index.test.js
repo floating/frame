@@ -5,7 +5,7 @@ import BigNumber from 'bignumber.js'
 
 import store from '../../../../../../../../main/store'
 import link from '../../../../../../../../resources/link'
-import { screen, render, advanceTimers } from '../../../../../../../componentSetup'
+import { screen, render, act } from '../../../../../../../componentSetup'
 import AdjustFeeComponent from '../../../../../../../../app/tray/Account/Account/Requests/TransactionRequest/AdjustFee'
 
 jest.mock('../../../../../../../../main/store/persist')
@@ -29,23 +29,18 @@ beforeEach(() => {
 })
 
 it('renders the base fee input', () => {
-  render(<AdjustFee req={req} />)
-  const baseFeeInput = screen.getByLabelText('Base Fee (GWEI)')
-  expect(baseFeeInput.value).toBe('4')
+  const { getBaseFeeInput } = setupComponent(req)
+  expect(getBaseFeeInput().value).toBe('4')
 })
 
 it('renders the priority fee input', () => {
-  render(<AdjustFee req={req} />)
-
-  const priorityFeeInput = screen.getByLabelText('Max Priority Fee (GWEI)')
-  expect(priorityFeeInput.value).toBe('3')
+  const { getPriorityFeeInput } = setupComponent(req)
+  expect(getPriorityFeeInput().value).toBe('3')
 })
 
 it('renders the gas limit input', () => {
-  render(<AdjustFee req={req} />)
-
-  const gasLimitInput = screen.getByLabelText('Gas Limit (UNITS)')
-  expect(gasLimitInput.value).toBe('25000')
+  const { getGasLimitInput } = setupComponent(req)
+  expect(getGasLimitInput().value).toBe('25000')
 })
 
 describe('base fee input', () => {
@@ -60,152 +55,118 @@ describe('base fee input', () => {
 
   submittedAmounts.forEach((spec) => {
     it(`submits a requested amount of ${spec.amount} as ${spec.submitted}`, async () => {
-      const { user } = render(<AdjustFee req={req} />)
-      const baseFeeInput = screen.getByLabelText('Base Fee (GWEI)')
+      const { getBaseFeeInput, clearBaseFee, enterBaseFee } = setupComponent(req)
 
-      await user.clear(baseFeeInput)
-      await user.type(baseFeeInput, spec.amount)
+      await clearBaseFee()
+      await enterBaseFee(spec.amount)
 
-      advanceTimers(500)
-
-      expect(baseFeeInput.value).toBe(spec.submitted)
+      expect(getBaseFeeInput().value).toBe(spec.submitted)
       expect(link.rpc).toHaveBeenCalledWith('setBaseFee', hexStr(spec.submitted), '1', expect.any(Function))
     })
   })
 
   it('does not submit values when the user is in the middle of typing a float', async () => {
-    const { user } = render(<AdjustFee req={req} />)
-    const baseFeeInput = screen.getByLabelText('Base Fee (GWEI)')
+    const { getBaseFeeInput, clearBaseFee, enterBaseFee } = setupComponent(req)
 
-    await user.clear(baseFeeInput)
-    await user.type(baseFeeInput, '20.')
+    await clearBaseFee()
+    await enterBaseFee('20.')
 
-    advanceTimers(500)
-
-    expect(baseFeeInput.value).toBe('20.')
+    expect(getBaseFeeInput().value).toBe('20.')
     expect(link.rpc).not.toHaveBeenCalled()
   })
 
   it('does not submit empty values', async () => {
-    const { user } = render(<AdjustFee req={req} />)
-    const baseFeeInput = screen.getByLabelText('Base Fee (GWEI)')
+    const { getBaseFeeInput, clearBaseFee } = setupComponent(req)
 
-    await user.clear(baseFeeInput)
+    await clearBaseFee()
 
-    advanceTimers(500)
-
-    expect(baseFeeInput.value).toBe('')
+    expect(getBaseFeeInput().value).toBe('')
     expect(link.rpc).not.toHaveBeenCalled()
   })
 
   it('renders a small fraction of a gwei', async () => {
-    const { user } = render(<AdjustFee req={req} />)
-    const baseFeeInput = screen.getByLabelText('Base Fee (GWEI)')
+    const { getBaseFeeInput, clearBaseFee, enterBaseFee } = setupComponent(req)
 
-    await user.clear(baseFeeInput)
-    await user.type(baseFeeInput, '0.00000001')
+    await clearBaseFee()
+    await enterBaseFee('0.00000001')
 
-    advanceTimers(500)
-
-    expect(baseFeeInput.value).toBe('0.00000001')
+    expect(getBaseFeeInput().value).toBe('0.00000001')
   })
 
   it('renders a decimal point', async () => {
-    const { user } = render(<AdjustFee req={req} />)
-    const baseFeeInput = screen.getByLabelText('Base Fee (GWEI)')
+    const { getBaseFeeInput, clearBaseFee, enterBaseFee } = setupComponent(req)
 
-    await user.clear(baseFeeInput)
-    await user.type(baseFeeInput, '.')
+    await clearBaseFee()
+    await enterBaseFee('.')
 
-    advanceTimers(500)
-
-    expect(baseFeeInput.value).toBe('.')
+    expect(getBaseFeeInput().value).toBe('.')
   })
 
   it('increments integer values when the up arrow key is pressed', async () => {
-    const { user } = render(<AdjustFee req={req} />)
-    const baseFeeInput = screen.getByLabelText('Base Fee (GWEI)')
+    const { getBaseFeeInput, enterBaseFee } = setupComponent(req)
 
-    await user.type(baseFeeInput, '{ArrowUp}')
+    await enterBaseFee('{ArrowUp}')
 
-    advanceTimers(500)
-
-    expect(baseFeeInput.value).toBe('5')
+    expect(getBaseFeeInput().value).toBe('5')
     expect(link.rpc).toHaveBeenCalledWith('setBaseFee', hexStr(5), '1', expect.any(Function))
   })
 
   it('increments float values when the up arrow key is pressed', async () => {
-    const { user } = render(<AdjustFee req={req} />)
-    const baseFeeInput = screen.getByLabelText('Base Fee (GWEI)')
+    const { getBaseFeeInput, clearBaseFee, enterBaseFee } = setupComponent(req)
 
-    await user.clear(baseFeeInput)
-    await user.type(baseFeeInput, '1.5{ArrowUp}')
+    await clearBaseFee()
+    await enterBaseFee('1.5{ArrowUp}')
 
-    advanceTimers(500)
-
-    expect(baseFeeInput.value).toBe('2.5')
+    expect(getBaseFeeInput().value).toBe('2.5')
     expect(link.rpc).toHaveBeenCalledWith('setBaseFee', hexStr(2.5), '1', expect.any(Function))
   })
 
   it('does not increment values above the upper limit', async () => {
-    const { user } = render(<AdjustFee req={req} />)
-    const baseFeeInput = screen.getByLabelText('Base Fee (GWEI)')
+    const { getBaseFeeInput, clearBaseFee, enterBaseFee } = setupComponent(req)
 
-    await user.clear(baseFeeInput)
-    await user.type(baseFeeInput, '9998{ArrowUp}{ArrowUp}{ArrowUp}')
+    await clearBaseFee()
+    await enterBaseFee('9998{ArrowUp}{ArrowUp}{ArrowUp}')
 
-    advanceTimers(500)
-
-    expect(baseFeeInput.value).toBe('9999')
+    expect(getBaseFeeInput().value).toBe('9999')
     expect(link.rpc).toHaveBeenCalledWith('setBaseFee', hexStr(9999), '1', expect.any(Function))
   })
 
   it('decrements integer values when the down arrow key is pressed', async () => {
-    const { user } = render(<AdjustFee req={req} />)
-    const baseFeeInput = screen.getByLabelText('Base Fee (GWEI)')
+    const { getBaseFeeInput, enterBaseFee } = setupComponent(req)
 
-    await user.type(baseFeeInput, '{ArrowDown}')
+    await enterBaseFee('{ArrowDown}')
 
-    advanceTimers(500)
-
-    expect(baseFeeInput.value).toBe('3')
+    expect(getBaseFeeInput().value).toBe('3')
     expect(link.rpc).toHaveBeenCalledWith('setBaseFee', hexStr(3), '1', expect.any(Function))
   })
 
   it('decrements float values when the down arrow key is pressed', async () => {
-    const { user } = render(<AdjustFee req={req} />)
-    const baseFeeInput = screen.getByLabelText('Base Fee (GWEI)')
+    const { getBaseFeeInput, clearBaseFee, enterBaseFee } = setupComponent(req)
 
-    await user.clear(baseFeeInput)
-    await user.type(baseFeeInput, '2.5{ArrowDown}')
+    await clearBaseFee()
+    await enterBaseFee('2.5{ArrowDown}')
 
-    advanceTimers(500)
-
-    expect(baseFeeInput.value).toBe('1.5')
+    expect(getBaseFeeInput().value).toBe('1.5')
     expect(link.rpc).toHaveBeenCalledWith('setBaseFee', hexStr(1.5), '1', expect.any(Function))
   })
 
   it('does not decrement values below the lower limit', async () => {
-    const { user } = render(<AdjustFee req={req} />)
-    const baseFeeInput = screen.getByLabelText('Base Fee (GWEI)')
+    const { getBaseFeeInput, clearBaseFee, enterBaseFee } = setupComponent(req)
 
-    await user.clear(baseFeeInput)
-    await user.type(baseFeeInput, '1{ArrowDown}{ArrowDown}{ArrowDown}')
+    await clearBaseFee()
+    await enterBaseFee('1{ArrowDown}{ArrowDown}{ArrowDown}')
 
-    advanceTimers(500)
-
-    expect(baseFeeInput.value).toBe('0')
+    expect(getBaseFeeInput().value).toBe('0')
     expect(link.rpc).toHaveBeenCalledWith('setBaseFee', hexStr(0), '1', expect.any(Function))
   })
 
   it('blurs the input when the enter key is pressed', async () => {
-    const { user } = render(<AdjustFee req={req} />)
-    const baseFeeInput = screen.getByLabelText('Base Fee (GWEI)')
+    const { getBaseFeeInput, clearBaseFee, enterBaseFee } = setupComponent(req)
 
-    await user.clear(baseFeeInput)
-    await user.type(baseFeeInput, '5{Enter}')
+    await clearBaseFee()
+    await enterBaseFee('5{Enter}')
 
-    expect(document.activeElement).not.toEqual(baseFeeInput)
+    expect(document.activeElement).not.toEqual(getBaseFeeInput())
   })
 
   it('recalculates the base fee when the total fee exceeds the maximum allowed (ETH-based chains)', async () => {
@@ -214,15 +175,12 @@ describe('base fee input', () => {
     req.data.gasLimit = addHexPrefix((250000).toString(16))
     req.data.chainId = '1'
 
-    const { user } = render(<AdjustFee req={req} />)
-    const baseFeeInput = screen.getByLabelText('Base Fee (GWEI)')
+    const { getBaseFeeInput, clearBaseFee, enterBaseFee } = setupComponent(req)
 
-    await user.clear(baseFeeInput)
-    await user.type(baseFeeInput, '7800')
+    await clearBaseFee()
+    await enterBaseFee('7800')
 
-    advanceTimers(500)
-
-    expect(baseFeeInput.value).toBe('7700')
+    expect(getBaseFeeInput().value).toBe('7700')
     expect(link.rpc).toHaveBeenCalledWith('setBaseFee', hexStr(7700), '1', expect.any(Function))
   })
 
@@ -232,15 +190,12 @@ describe('base fee input', () => {
     req.data.gasLimit = addHexPrefix((30000000).toString(16))
     req.data.chainId = '250'
 
-    const { user } = render(<AdjustFee req={req} />)
-    const baseFeeInput = screen.getByLabelText('Base Fee (GWEI)')
+    const { getBaseFeeInput, clearBaseFee, enterBaseFee } = setupComponent(req)
 
-    await user.clear(baseFeeInput)
-    await user.type(baseFeeInput, '5600')
+    await clearBaseFee()
+    await enterBaseFee('5600')
 
-    advanceTimers(500)
-
-    expect(baseFeeInput.value).toBe('5333.333333333')
+    expect(getBaseFeeInput().value).toBe('5333.333333333')
     expect(link.rpc).toHaveBeenCalledWith('setBaseFee', hexStr(5333.333333333), '1', expect.any(Function))
   })
 
@@ -250,15 +205,12 @@ describe('base fee input', () => {
     req.data.gasLimit = addHexPrefix((10000000).toString(16))
     req.data.chainId = '6746754'
 
-    const { user } = render(<AdjustFee req={req} />)
-    const baseFeeInput = screen.getByLabelText('Base Fee (GWEI)')
+    const { getBaseFeeInput, clearBaseFee, enterBaseFee } = setupComponent(req)
 
-    await user.clear(baseFeeInput)
-    await user.type(baseFeeInput, '2100')
+    await clearBaseFee()
+    await enterBaseFee('2100')
 
-    advanceTimers(500)
-
-    expect(baseFeeInput.value).toBe('2000')
+    expect(getBaseFeeInput().value).toBe('2000')
     expect(link.rpc).toHaveBeenCalledWith('setBaseFee', hexStr(2000), '1', expect.any(Function))
   })
 })
@@ -275,15 +227,12 @@ describe('priority fee input', () => {
 
   submittedAmounts.forEach((spec) => {
     it(`submits a requested amount of ${spec.amount} as ${spec.submitted}`, async () => {
-      const { user } = render(<AdjustFee req={req} />)
-      const priorityFeeInput = screen.getByLabelText('Max Priority Fee (GWEI)')
+      const { getPriorityFeeInput, clearPriorityFee, enterPriorityFee } = setupComponent(req)
 
-      await user.clear(priorityFeeInput)
-      await user.type(priorityFeeInput, spec.amount)
+      await clearPriorityFee()
+      await enterPriorityFee(spec.amount)
 
-      advanceTimers(500)
-
-      expect(priorityFeeInput.value).toBe(spec.submitted)
+      expect(getPriorityFeeInput().value).toBe(spec.submitted)
       expect(link.rpc).toHaveBeenCalledWith(
         'setPriorityFee',
         hexStr(spec.submitted),
@@ -294,114 +243,89 @@ describe('priority fee input', () => {
   })
 
   it('does not submit values when the user is in the middle of typing a float', async () => {
-    const { user } = render(<AdjustFee req={req} />)
-    const priorityFeeInput = screen.getByLabelText('Max Priority Fee (GWEI)')
+    const { getPriorityFeeInput, clearPriorityFee, enterPriorityFee } = setupComponent(req)
 
-    await user.clear(priorityFeeInput)
-    await user.type(priorityFeeInput, '20.')
+    await clearPriorityFee()
+    await enterPriorityFee('20.')
 
-    advanceTimers(500)
-
-    expect(priorityFeeInput.value).toBe('20.')
+    expect(getPriorityFeeInput().value).toBe('20.')
     expect(link.rpc).not.toHaveBeenCalled()
   })
 
   it('does not submit empty values', async () => {
-    const { user } = render(<AdjustFee req={req} />)
-    const priorityFeeInput = screen.getByLabelText('Max Priority Fee (GWEI)')
+    const { getPriorityFeeInput, clearPriorityFee } = setupComponent(req)
 
-    await user.clear(priorityFeeInput)
+    await clearPriorityFee()
 
-    advanceTimers(500)
-
-    expect(priorityFeeInput.value).toBe('')
+    expect(getPriorityFeeInput().value).toBe('')
     expect(link.rpc).not.toHaveBeenCalled()
   })
 
   it('increments integer values when the up arrow key is pressed', async () => {
-    const { user } = render(<AdjustFee req={req} />)
-    const priorityFeeInput = screen.getByLabelText('Max Priority Fee (GWEI)')
+    const { getPriorityFeeInput, enterPriorityFee } = setupComponent(req)
 
-    await user.type(priorityFeeInput, '{ArrowUp}')
+    await enterPriorityFee('{ArrowUp}')
 
-    advanceTimers(500)
-
-    expect(priorityFeeInput.value).toBe('4')
+    expect(getPriorityFeeInput().value).toBe('4')
     expect(link.rpc).toHaveBeenCalledWith('setPriorityFee', hexStr(4), '1', expect.any(Function))
   })
 
   it('increments float values when the up arrow key is pressed', async () => {
-    const { user } = render(<AdjustFee req={req} />)
-    const priorityFeeInput = screen.getByLabelText('Max Priority Fee (GWEI)')
+    const { getPriorityFeeInput, clearPriorityFee, enterPriorityFee } = setupComponent(req)
 
-    await user.clear(priorityFeeInput)
-    await user.type(priorityFeeInput, '1.5{ArrowUp}')
+    await clearPriorityFee()
+    await enterPriorityFee('1.5{ArrowUp}')
 
-    advanceTimers(500)
-
-    expect(priorityFeeInput.value).toBe('2.5')
+    expect(getPriorityFeeInput().value).toBe('2.5')
     expect(link.rpc).toHaveBeenCalledWith('setPriorityFee', hexStr(2.5), '1', expect.any(Function))
   })
 
   it('does not increment values above the upper limit', async () => {
-    const { user } = render(<AdjustFee req={req} />)
-    const priorityFeeInput = screen.getByLabelText('Max Priority Fee (GWEI)')
+    const { getPriorityFeeInput, clearPriorityFee, enterPriorityFee } = setupComponent(req)
 
-    await user.clear(priorityFeeInput)
-    await user.type(priorityFeeInput, '9998{ArrowUp}{ArrowUp}{ArrowUp}')
+    await clearPriorityFee()
+    await enterPriorityFee('9998{ArrowUp}{ArrowUp}{ArrowUp}')
 
-    advanceTimers(500)
-
-    expect(priorityFeeInput.value).toBe('9999')
+    expect(getPriorityFeeInput().value).toBe('9999')
     expect(link.rpc).toHaveBeenCalledWith('setPriorityFee', hexStr(9999), '1', expect.any(Function))
   })
 
   it('decrements integer values when the down arrow key is pressed', async () => {
-    const { user } = render(<AdjustFee req={req} />)
-    const priorityFeeInput = screen.getByLabelText('Max Priority Fee (GWEI)')
+    const { getPriorityFeeInput, enterPriorityFee } = setupComponent(req)
 
-    await user.type(priorityFeeInput, '{ArrowDown}')
+    await enterPriorityFee('{ArrowDown}')
 
-    advanceTimers(500)
-
-    expect(priorityFeeInput.value).toBe('2')
+    expect(getPriorityFeeInput().value).toBe('2')
     expect(link.rpc).toHaveBeenCalledWith('setPriorityFee', hexStr(2), '1', expect.any(Function))
   })
 
   it('decrements float values when the down arrow key is pressed', async () => {
-    const { user } = render(<AdjustFee req={req} />)
-    const priorityFeeInput = screen.getByLabelText('Max Priority Fee (GWEI)')
+    const { getPriorityFeeInput, clearPriorityFee, enterPriorityFee } = setupComponent(req)
 
-    await user.clear(priorityFeeInput)
-    await user.type(priorityFeeInput, '2.5{ArrowDown}')
+    await clearPriorityFee()
+    await enterPriorityFee('2.5{ArrowDown}')
 
-    advanceTimers(500)
-
-    expect(priorityFeeInput.value).toBe('1.5')
+    expect(getPriorityFeeInput().value).toBe('1.5')
     expect(link.rpc).toHaveBeenCalledWith('setPriorityFee', hexStr(1.5), '1', expect.any(Function))
   })
 
   it('does not decrement values below the lower limit', async () => {
-    const { user } = render(<AdjustFee req={req} />)
-    const priorityFeeInput = screen.getByLabelText('Max Priority Fee (GWEI)')
+    const { getPriorityFeeInput, clearPriorityFee, enterPriorityFee } = setupComponent(req)
 
-    await user.clear(priorityFeeInput)
-    await user.type(priorityFeeInput, '1{ArrowDown}{ArrowDown}{ArrowDown}')
+    await clearPriorityFee()
+    await enterPriorityFee('1{ArrowDown}{ArrowDown}{ArrowDown}')
 
-    advanceTimers(500)
-
-    expect(priorityFeeInput.value).toBe('0')
+    expect(getPriorityFeeInput().value).toBe('0')
     expect(link.rpc).toHaveBeenCalledWith('setPriorityFee', hexStr(0), '1', expect.any(Function))
   })
 
   it('blurs the input when the enter key is pressed', async () => {
-    const { user } = render(<AdjustFee req={req} />)
-    const priorityFeeInput = screen.getByLabelText('Max Priority Fee (GWEI)')
+    const { getPriorityFeeInput, clearPriorityFee, enterPriorityFee } = setupComponent(req)
 
-    await user.clear(priorityFeeInput)
-    await user.type(priorityFeeInput, '5{Enter}')
+    await clearPriorityFee()
+    await enterPriorityFee('5{Enter}')
 
-    expect(document.activeElement).not.toEqual(priorityFeeInput)
+    expect(document.activeElement).not.toEqual(getPriorityFeeInput())
   })
 
   it('recalculates the priority fee when the total fee exceeds the maximum allowed (ETH-based chains)', async () => {
@@ -410,15 +334,12 @@ describe('priority fee input', () => {
     req.data.gasLimit = addHexPrefix((250000).toString(16))
     req.data.chainId = '1'
 
-    const { user } = render(<AdjustFee req={req} />)
-    const priorityFeeInput = screen.getByLabelText('Max Priority Fee (GWEI)')
+    const { getPriorityFeeInput, clearPriorityFee, enterPriorityFee } = setupComponent(req)
 
-    await user.clear(priorityFeeInput)
-    await user.type(priorityFeeInput, '7800')
+    await clearPriorityFee()
+    await enterPriorityFee('7800')
 
-    advanceTimers(500)
-
-    expect(priorityFeeInput.value).toBe('7700')
+    expect(getPriorityFeeInput().value).toBe('7700')
     expect(link.rpc).toHaveBeenCalledWith('setPriorityFee', hexStr(7700), '1', expect.any(Function))
   })
 
@@ -428,15 +349,12 @@ describe('priority fee input', () => {
     req.data.gasLimit = addHexPrefix((30000000).toString(16))
     req.data.chainId = '250'
 
-    const { user } = render(<AdjustFee req={req} />)
-    const priorityFeeInput = screen.getByLabelText('Max Priority Fee (GWEI)')
+    const { getPriorityFeeInput, clearPriorityFee, enterPriorityFee } = setupComponent(req)
 
-    await user.clear(priorityFeeInput)
-    await user.type(priorityFeeInput, '5600')
+    await clearPriorityFee()
+    await enterPriorityFee('5600')
 
-    advanceTimers(500)
-
-    expect(priorityFeeInput.value).toBe('5333.333333333')
+    expect(getPriorityFeeInput().value).toBe('5333.333333333')
     expect(link.rpc).toHaveBeenCalledWith('setPriorityFee', hexStr(5333.333333333), '1', expect.any(Function))
   })
 
@@ -446,15 +364,12 @@ describe('priority fee input', () => {
     req.data.gasLimit = addHexPrefix((10000000).toString(16))
     req.data.chainId = '6746754'
 
-    const { user } = render(<AdjustFee req={req} />)
-    const priorityFeeInput = screen.getByLabelText('Max Priority Fee (GWEI)')
+    const { getPriorityFeeInput, clearPriorityFee, enterPriorityFee } = setupComponent(req)
 
-    await user.clear(priorityFeeInput)
-    await user.type(priorityFeeInput, '2100')
+    await clearPriorityFee()
+    await enterPriorityFee('2100')
 
-    advanceTimers(500)
-
-    expect(priorityFeeInput.value).toBe('2000')
+    expect(getPriorityFeeInput().value).toBe('2000')
     expect(link.rpc).toHaveBeenCalledWith('setPriorityFee', hexStr(2000), '1', expect.any(Function))
   })
 })
@@ -469,89 +384,70 @@ describe('gas limit input', () => {
 
   submittedAmounts.forEach((spec) => {
     it(`submits a requested amount of ${spec.amount} as ${spec.submitted}`, async () => {
-      const { user } = render(<AdjustFee req={req} />)
-      const gasLimitInput = screen.getByLabelText('Gas Limit (UNITS)')
+      const { getGasLimitInput, clearGasLimit, enterGasLimit } = setupComponent(req)
 
-      await user.clear(gasLimitInput)
-      await user.type(gasLimitInput, spec.amount)
+      await clearGasLimit()
+      await enterGasLimit(spec.amount)
 
-      advanceTimers(500)
-
-      expect(gasLimitInput.value).toBe(spec.submitted)
+      expect(getGasLimitInput().value).toBe(spec.submitted)
       expect(link.rpc).toHaveBeenCalledWith('setGasLimit', spec.submitted, '1', expect.any(Function))
     })
   })
 
   it('does not submit empty values', async () => {
-    const { user } = render(<AdjustFee req={req} />)
-    const gasLimitInput = screen.getByLabelText('Gas Limit (UNITS)')
+    const { getGasLimitInput, clearGasLimit } = setupComponent(req)
 
-    await user.clear(gasLimitInput)
+    await clearGasLimit()
 
-    advanceTimers(500)
-
-    expect(gasLimitInput.value).toBe('')
+    expect(getGasLimitInput().value).toBe('')
     expect(link.rpc).not.toHaveBeenCalled()
   })
 
   it('increments values when the up arrow key is pressed', async () => {
-    const { user } = render(<AdjustFee req={req} />)
-    const gasLimitInput = screen.getByLabelText('Gas Limit (UNITS)')
+    const { getGasLimitInput, enterGasLimit } = setupComponent(req)
 
-    await user.type(gasLimitInput, '{ArrowUp}')
+    await enterGasLimit('{ArrowUp}')
 
-    advanceTimers(500)
-
-    expect(gasLimitInput.value).toBe('26000')
+    expect(getGasLimitInput().value).toBe('26000')
     expect(link.rpc).toHaveBeenCalledWith('setGasLimit', '26000', '1', expect.any(Function))
   })
 
   it('does not increment values above the upper limit', async () => {
-    const { user } = render(<AdjustFee req={req} />)
-    const gasLimitInput = screen.getByLabelText('Gas Limit (UNITS)')
+    const { getGasLimitInput, clearGasLimit, enterGasLimit } = setupComponent(req)
 
-    await user.clear(gasLimitInput)
-    await user.type(gasLimitInput, '12499000{ArrowUp}{ArrowUp}{ArrowUp}')
+    await clearGasLimit()
+    await enterGasLimit('12499000{ArrowUp}{ArrowUp}{ArrowUp}')
 
-    advanceTimers(500)
-
-    expect(gasLimitInput.value).toBe('12500000')
+    expect(getGasLimitInput().value).toBe('12500000')
     expect(link.rpc).toHaveBeenCalledWith('setGasLimit', '12500000', '1', expect.any(Function))
   })
 
   it('decrements values when the down arrow key is pressed', async () => {
-    const { user } = render(<AdjustFee req={req} />)
-    const gasLimitInput = screen.getByLabelText('Gas Limit (UNITS)')
+    const { getGasLimitInput, enterGasLimit } = setupComponent(req)
 
-    await user.type(gasLimitInput, '{ArrowDown}')
+    await enterGasLimit('{ArrowDown}')
 
-    advanceTimers(500)
-
-    expect(gasLimitInput.value).toBe('24000')
+    expect(getGasLimitInput().value).toBe('24000')
     expect(link.rpc).toHaveBeenCalledWith('setGasLimit', '24000', '1', expect.any(Function))
   })
 
   it('does not decrement values below the lower limit', async () => {
-    const { user } = render(<AdjustFee req={req} />)
-    const gasLimitInput = screen.getByLabelText('Gas Limit (UNITS)')
+    const { getGasLimitInput, clearGasLimit, enterGasLimit } = setupComponent(req)
 
-    await user.clear(gasLimitInput)
-    await user.type(gasLimitInput, '1000{ArrowDown}{ArrowDown}{ArrowDown}')
+    await clearGasLimit()
+    await enterGasLimit('1000{ArrowDown}{ArrowDown}{ArrowDown}')
 
-    advanceTimers(500)
-
-    expect(gasLimitInput.value).toBe('0')
+    expect(getGasLimitInput().value).toBe('0')
     expect(link.rpc).toHaveBeenCalledWith('setGasLimit', '0', '1', expect.any(Function))
   })
 
   it('blurs the input when the enter key is pressed', async () => {
-    const { user } = render(<AdjustFee req={req} />)
-    const gasLimitInput = screen.getByLabelText('Gas Limit (UNITS)')
+    const { getGasLimitInput, clearGasLimit, enterGasLimit } = setupComponent(req)
 
-    await user.clear(gasLimitInput)
-    await user.type(gasLimitInput, '45000{Enter}')
+    await clearGasLimit()
+    await enterGasLimit('45000{Enter}')
 
-    expect(document.activeElement).not.toEqual(gasLimitInput)
+    expect(document.activeElement).not.toEqual(getGasLimitInput())
   })
 
   it('recalculates the gas limit when the total fee exceeds the maximum allowed (ETH-based chains)', async () => {
@@ -559,15 +455,12 @@ describe('gas limit input', () => {
     req.data.maxFeePerGas = addHexPrefix((6000e9).toString(16))
     req.data.chainId = '1'
 
-    const { user } = render(<AdjustFee req={req} />)
-    const gasLimitInput = screen.getByLabelText('Gas Limit (UNITS)')
+    const { getGasLimitInput, clearGasLimit, enterGasLimit } = setupComponent(req)
 
-    await user.clear(gasLimitInput)
-    await user.type(gasLimitInput, '334000')
+    await clearGasLimit()
+    await enterGasLimit('334000')
 
-    advanceTimers(500)
-
-    expect(gasLimitInput.value).toBe('333333')
+    expect(getGasLimitInput().value).toBe('333333')
     expect(link.rpc).toHaveBeenCalledWith('setGasLimit', '333333', '1', expect.any(Function))
   })
 
@@ -576,15 +469,12 @@ describe('gas limit input', () => {
     req.data.maxFeePerGas = addHexPrefix((22000e9).toString(16))
     req.data.chainId = '250'
 
-    const { user } = render(<AdjustFee req={req} />)
-    const gasLimitInput = screen.getByLabelText('Gas Limit (UNITS)')
+    const { getGasLimitInput, clearGasLimit, enterGasLimit } = setupComponent(req)
 
-    await user.clear(gasLimitInput)
-    await user.type(gasLimitInput, '11364000')
+    await clearGasLimit()
+    await enterGasLimit('11364000')
 
-    advanceTimers(500)
-
-    expect(gasLimitInput.value).toBe('11363636')
+    expect(getGasLimitInput().value).toBe('11363636')
     expect(link.rpc).toHaveBeenCalledWith('setGasLimit', '11363636', '1', expect.any(Function))
   })
 
@@ -593,15 +483,12 @@ describe('gas limit input', () => {
     req.data.maxFeePerGas = addHexPrefix((9000e9).toString(16))
     req.data.chainId = '6746754'
 
-    const { user } = render(<AdjustFee req={req} />)
-    const gasLimitInput = screen.getByLabelText('Gas Limit (UNITS)')
+    const { getGasLimitInput, clearGasLimit, enterGasLimit } = setupComponent(req)
 
-    await user.clear(gasLimitInput)
-    await user.type(gasLimitInput, '5556000')
+    await clearGasLimit()
+    await enterGasLimit('5556000')
 
-    advanceTimers(500)
-
-    expect(gasLimitInput.value).toBe('5555555')
+    expect(getGasLimitInput().value).toBe('5555555')
     expect(link.rpc).toHaveBeenCalledWith('setGasLimit', '5555555', '1', expect.any(Function))
   })
 })
@@ -619,17 +506,13 @@ describe('legacy transactions', () => {
   })
 
   it('renders the gas price input', () => {
-    render(<AdjustFee req={req} />)
-
-    const gasPriceInput = screen.getByLabelText('Gas Price (GWEI)')
-    expect(gasPriceInput.value).toBe('7')
+    const { getGasPriceInput } = setupComponent(req)
+    expect(getGasPriceInput().value).toBe('7')
   })
 
   it('renders the gas limit input', () => {
-    render(<AdjustFee req={req} />)
-
-    const gasLimitInput = screen.getByLabelText('Gas Limit (UNITS)')
-    expect(gasLimitInput.value).toBe('25000')
+    const { getGasLimitInput } = setupComponent(req)
+    expect(getGasLimitInput().value).toBe('25000')
   })
 
   describe('gas price input', () => {
@@ -644,15 +527,12 @@ describe('legacy transactions', () => {
 
     submittedAmounts.forEach((spec) => {
       it(`submits a requested amount of ${spec.amount} as ${spec.submitted}`, async () => {
-        const { user } = render(<AdjustFee req={req} />)
-        const gasPriceInput = screen.getByLabelText('Gas Price (GWEI)')
+        const { getGasPriceInput, clearGasPrice, enterGasPrice } = setupComponent(req)
 
-        await user.clear(gasPriceInput)
-        await user.type(gasPriceInput, spec.amount)
+        await clearGasPrice()
+        await enterGasPrice(spec.amount)
 
-        advanceTimers(500)
-
-        expect(gasPriceInput.value).toBe(spec.submitted)
+        expect(getGasPriceInput().value).toBe(spec.submitted)
         expect(link.rpc).toHaveBeenCalledWith(
           'setGasPrice',
           hexStr(spec.submitted),
@@ -663,129 +543,101 @@ describe('legacy transactions', () => {
     })
 
     it('does not submit values when the user is in the middle of typing a float', async () => {
-      const { user } = render(<AdjustFee req={req} />)
-      const gasPriceInput = screen.getByLabelText('Gas Price (GWEI)')
+      const { getGasPriceInput, clearGasPrice, enterGasPrice } = setupComponent(req)
 
-      await user.clear(gasPriceInput)
-      await user.type(gasPriceInput, '20.')
+      await clearGasPrice()
+      await enterGasPrice('20.')
 
-      advanceTimers(500)
-
-      expect(gasPriceInput.value).toBe('20.')
+      expect(getGasPriceInput().value).toBe('20.')
       expect(link.rpc).not.toHaveBeenCalled()
     })
 
     it('does not submit empty values', async () => {
-      const { user } = render(<AdjustFee req={req} />)
-      const gasPriceInput = screen.getByLabelText('Gas Price (GWEI)')
+      const { getGasPriceInput, clearGasPrice } = setupComponent(req)
 
-      await user.clear(gasPriceInput)
+      await clearGasPrice()
 
-      advanceTimers(500)
-
-      expect(gasPriceInput.value).toBe('')
+      expect(getGasPriceInput().value).toBe('')
       expect(link.rpc).not.toHaveBeenCalled()
     })
 
     it('increments integer values when the up arrow key is pressed', async () => {
-      const { user } = render(<AdjustFee req={req} />)
-      const gasPriceInput = screen.getByLabelText('Gas Price (GWEI)')
+      const { getGasPriceInput, enterGasPrice } = setupComponent(req)
 
-      await user.type(gasPriceInput, '{ArrowUp}')
+      await enterGasPrice('{ArrowUp}')
 
-      advanceTimers(500)
-
-      expect(gasPriceInput.value).toBe('8')
+      expect(getGasPriceInput().value).toBe('8')
       expect(link.rpc).toHaveBeenCalledWith('setGasPrice', hexStr(8), '1', expect.any(Function))
     })
 
     it('increments float values when the up arrow key is pressed', async () => {
-      const { user } = render(<AdjustFee req={req} />)
-      const gasPriceInput = screen.getByLabelText('Gas Price (GWEI)')
+      const { getGasPriceInput, clearGasPrice, enterGasPrice } = setupComponent(req)
 
-      await user.clear(gasPriceInput)
-      await user.type(gasPriceInput, '1.5{ArrowUp}')
+      await clearGasPrice()
+      await enterGasPrice('1.5{ArrowUp}')
 
-      advanceTimers(500)
-
-      expect(gasPriceInput.value).toBe('2.5')
+      expect(getGasPriceInput().value).toBe('2.5')
       expect(link.rpc).toHaveBeenCalledWith('setGasPrice', hexStr(2.5), '1', expect.any(Function))
     })
 
     it('does not increment values above the upper limit', async () => {
-      const { user } = render(<AdjustFee req={req} />)
-      const gasPriceInput = screen.getByLabelText('Gas Price (GWEI)')
+      const { getGasPriceInput, clearGasPrice, enterGasPrice } = setupComponent(req)
 
-      await user.clear(gasPriceInput)
-      await user.type(gasPriceInput, '9998{ArrowUp}{ArrowUp}{ArrowUp}')
+      await clearGasPrice()
+      await enterGasPrice('9998{ArrowUp}{ArrowUp}{ArrowUp}')
 
-      advanceTimers(500)
-
-      expect(gasPriceInput.value).toBe('9999')
+      expect(getGasPriceInput().value).toBe('9999')
       expect(link.rpc).toHaveBeenCalledWith('setGasPrice', hexStr(9999), '1', expect.any(Function))
     })
 
     it('decrements integer values when the down arrow key is pressed', async () => {
-      const { user } = render(<AdjustFee req={req} />)
-      const gasPriceInput = screen.getByLabelText('Gas Price (GWEI)')
+      const { getGasPriceInput, enterGasPrice } = setupComponent(req)
 
-      await user.type(gasPriceInput, '{ArrowDown}')
+      await enterGasPrice('{ArrowDown}')
 
-      advanceTimers(500)
-
-      expect(gasPriceInput.value).toBe('6')
+      expect(getGasPriceInput().value).toBe('6')
       expect(link.rpc).toHaveBeenCalledWith('setGasPrice', hexStr(6), '1', expect.any(Function))
     })
 
     it('decrements float values when the down arrow key is pressed', async () => {
-      const { user } = render(<AdjustFee req={req} />)
-      const gasPriceInput = screen.getByLabelText('Gas Price (GWEI)')
+      const { getGasPriceInput, clearGasPrice, enterGasPrice } = setupComponent(req)
 
-      await user.clear(gasPriceInput)
-      await user.type(gasPriceInput, '2.5{ArrowDown}')
+      await clearGasPrice()
+      await enterGasPrice('2.5{ArrowDown}')
 
-      advanceTimers(500)
-
-      expect(gasPriceInput.value).toBe('1.5')
+      expect(getGasPriceInput().value).toBe('1.5')
       expect(link.rpc).toHaveBeenCalledWith('setGasPrice', hexStr(1.5), '1', expect.any(Function))
     })
 
     it('does not decrement values below the lower limit', async () => {
-      const { user } = render(<AdjustFee req={req} />)
-      const gasPriceInput = screen.getByLabelText('Gas Price (GWEI)')
+      const { getGasPriceInput, clearGasPrice, enterGasPrice } = setupComponent(req)
 
-      await user.clear(gasPriceInput)
-      await user.type(gasPriceInput, '1{ArrowDown}{ArrowDown}{ArrowDown}')
+      await clearGasPrice()
+      await enterGasPrice('1{ArrowDown}{ArrowDown}{ArrowDown}')
 
-      advanceTimers(500)
-
-      expect(gasPriceInput.value).toBe('0')
+      expect(getGasPriceInput().value).toBe('0')
       expect(link.rpc).toHaveBeenCalledWith('setGasPrice', hexStr(0), '1', expect.any(Function))
     })
 
     it('blurs the input when the enter key is pressed', async () => {
-      const { user } = render(<AdjustFee req={req} />)
-      const gasPriceInput = screen.getByLabelText('Gas Price (GWEI)')
+      const { getGasPriceInput, clearGasPrice, enterGasPrice } = setupComponent(req)
 
-      await user.clear(gasPriceInput)
-      await user.type(gasPriceInput, '5{Enter}')
+      await clearGasPrice()
+      await enterGasPrice('5{Enter}')
 
-      expect(document.activeElement).not.toEqual(gasPriceInput)
+      expect(document.activeElement).not.toEqual(getGasPriceInput())
     })
 
     it('recalculates the gas price when the total fee exceeds the maximum allowed (ETH-based chains)', async () => {
       req.data.gasLimit = addHexPrefix((250000000).toString(16))
       req.data.chainId = '1'
 
-      const { user } = render(<AdjustFee req={req} />)
-      const gasPriceInput = screen.getByLabelText('Gas Price (GWEI)')
+      const { getGasPriceInput, clearGasPrice, enterGasPrice } = setupComponent(req)
 
-      await user.clear(gasPriceInput)
-      await user.type(gasPriceInput, '9')
+      await clearGasPrice()
+      await enterGasPrice('9')
 
-      advanceTimers(500)
-
-      expect(gasPriceInput.value).toBe('8')
+      expect(getGasPriceInput().value).toBe('8')
       expect(link.rpc).toHaveBeenCalledWith('setGasPrice', hexStr(8), '1', expect.any(Function))
     })
 
@@ -793,15 +645,12 @@ describe('legacy transactions', () => {
       req.data.gasLimit = addHexPrefix((3000000000).toString(16))
       req.data.chainId = '250'
 
-      const { user } = render(<AdjustFee req={req} />)
-      const gasPriceInput = screen.getByLabelText('Gas Price (GWEI)')
+      const { getGasPriceInput, clearGasPrice, enterGasPrice } = setupComponent(req)
 
-      await user.clear(gasPriceInput)
-      await user.type(gasPriceInput, '85')
+      await clearGasPrice()
+      await enterGasPrice('85')
 
-      advanceTimers(500)
-
-      expect(gasPriceInput.value).toBe('83.333333333')
+      expect(getGasPriceInput().value).toBe('83.333333333')
       expect(link.rpc).toHaveBeenCalledWith('setGasPrice', hexStr(83.333333333), '1', expect.any(Function))
     })
 
@@ -809,15 +658,12 @@ describe('legacy transactions', () => {
       req.data.gasLimit = addHexPrefix((1000000000).toString(16))
       req.data.chainId = '6746754'
 
-      const { user } = render(<AdjustFee req={req} />)
-      const gasPriceInput = screen.getByLabelText('Gas Price (GWEI)')
+      const { getGasPriceInput, clearGasPrice, enterGasPrice } = setupComponent(req)
 
-      await user.clear(gasPriceInput)
-      await user.type(gasPriceInput, '51')
+      await clearGasPrice()
+      await enterGasPrice('51')
 
-      advanceTimers(500)
-
-      expect(gasPriceInput.value).toBe('50')
+      expect(getGasPriceInput().value).toBe('50')
       expect(link.rpc).toHaveBeenCalledWith('setGasPrice', hexStr(50), '1', expect.any(Function))
     })
   })
@@ -827,15 +673,12 @@ describe('legacy transactions', () => {
       req.data.gasPrice = addHexPrefix((250e9).toString(16))
       req.data.chainId = '1'
 
-      const { user } = render(<AdjustFee req={req} />)
-      const gasLimitInput = screen.getByLabelText('Gas Limit (UNITS)')
+      const { getGasLimitInput, clearGasLimit, enterGasLimit } = setupComponent(req)
 
-      await user.clear(gasLimitInput)
-      await user.type(gasLimitInput, '8001000')
+      await clearGasLimit()
+      await enterGasLimit('8001000')
 
-      advanceTimers(500)
-
-      expect(gasLimitInput.value).toBe('8000000')
+      expect(getGasLimitInput().value).toBe('8000000')
       expect(link.rpc).toHaveBeenCalledWith('setGasLimit', '8000000', '1', expect.any(Function))
     })
 
@@ -843,15 +686,12 @@ describe('legacy transactions', () => {
       req.data.gasPrice = addHexPrefix((87000e9).toString(16))
       req.data.chainId = '250'
 
-      const { user } = render(<AdjustFee req={req} />)
-      const gasLimitInput = screen.getByLabelText('Gas Limit (UNITS)')
+      const { getGasLimitInput, clearGasLimit, enterGasLimit } = setupComponent(req)
 
-      await user.clear(gasLimitInput)
-      await user.type(gasLimitInput, '2874000')
+      await clearGasLimit()
+      await enterGasLimit('2874000')
 
-      advanceTimers(500)
-
-      expect(gasLimitInput.value).toBe('2873563')
+      expect(getGasLimitInput().value).toBe('2873563')
       expect(link.rpc).toHaveBeenCalledWith('setGasLimit', '2873563', '1', expect.any(Function))
     })
 
@@ -859,16 +699,42 @@ describe('legacy transactions', () => {
       req.data.gasPrice = addHexPrefix((27000e9).toString(16))
       req.data.chainId = '6746754'
 
-      const { user } = render(<AdjustFee req={req} />)
-      const gasLimitInput = screen.getByLabelText('Gas Limit (UNITS)')
+      const { getGasLimitInput, clearGasLimit, enterGasLimit } = setupComponent(req)
 
-      await user.clear(gasLimitInput)
-      await user.type(gasLimitInput, '1852000')
+      await clearGasLimit()
+      await enterGasLimit('1852000')
 
-      advanceTimers(500)
-
-      expect(gasLimitInput.value).toBe('1851851')
+      expect(getGasLimitInput().value).toBe('1851851')
       expect(link.rpc).toHaveBeenCalledWith('setGasLimit', '1851851', '1', expect.any(Function))
     })
   })
 })
+
+function setupComponent(req) {
+  const { user } = render(<AdjustFee req={req} />)
+
+  const actAndWait = async (fn) => {
+    await fn()
+    act(() => jest.advanceTimersByTime(500))
+  }
+
+  const getBaseFeeInput = () => screen.getByLabelText('Base Fee (GWEI)')
+  const getPriorityFeeInput = () => screen.getByLabelText('Max Priority Fee (GWEI)')
+  const getGasLimitInput = () => screen.getByLabelText('Gas Limit (UNITS)')
+  const getGasPriceInput = () => screen.getByLabelText('Gas Price (GWEI)')
+
+  return {
+    getBaseFeeInput,
+    getPriorityFeeInput,
+    getGasLimitInput,
+    getGasPriceInput,
+    clearBaseFee: async () => actAndWait(() => user.clear(getBaseFeeInput())),
+    enterBaseFee: async (amount) => actAndWait(() => user.type(getBaseFeeInput(), amount)),
+    clearPriorityFee: async () => actAndWait(() => user.clear(getPriorityFeeInput())),
+    enterPriorityFee: async (amount) => actAndWait(() => user.type(getPriorityFeeInput(), amount)),
+    clearGasLimit: async () => actAndWait(() => user.clear(getGasLimitInput())),
+    enterGasLimit: async (amount) => actAndWait(() => user.type(getGasLimitInput(), amount)),
+    clearGasPrice: async () => actAndWait(() => user.clear(getGasPriceInput())),
+    enterGasPrice: async (amount) => actAndWait(() => user.type(getGasPriceInput(), amount))
+  }
+}
