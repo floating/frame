@@ -1,4 +1,4 @@
-import { app, ipcMain, protocol, clipboard, globalShortcut, powerMonitor, BrowserWindow } from 'electron'
+import { app, ipcMain, protocol, clipboard, powerMonitor, BrowserWindow } from 'electron'
 import path from 'path'
 import log from 'electron-log'
 import url from 'url'
@@ -30,7 +30,6 @@ app.commandLine.appendSwitch('enable-native-gpu-memory-buffers', 'true')
 app.commandLine.appendSwitch('force-color-profile', 'srgb')
 
 const isDev = process.env.NODE_ENV === 'development'
-
 log.transports.console.level = process.env.LOG_LEVEL || (isDev ? 'verbose' : 'info')
 log.transports.file.level = ['development', 'test'].includes(process.env.NODE_ENV) ? false : 'verbose'
 
@@ -39,26 +38,6 @@ const hasInstanceLock = app.requestSingleInstanceLock()
 if (!hasInstanceLock) {
   log.info('another instance of Frame is running - exiting...')
   app.exit(1)
-}
-
-if (isDev) {
-  const cpuMonitoringInterval = 10 // seconds
-  const cpuThreshold = 30 // percent
-
-  setTimeout(() => {
-    app.getAppMetrics()
-
-    setInterval(() => {
-      const cpuUsers = app.getAppMetrics().filter((metric) => metric.cpu.percentCPUUsage > cpuThreshold)
-
-      if (cpuUsers.length > 0) {
-        log.verbose(
-          `Following processes used more than ${cpuThreshold}% CPU over the last ${cpuMonitoringInterval} seconds`
-        )
-        log.verbose(JSON.stringify(cpuUsers, undefined, 2))
-      }
-    }, cpuMonitoringInterval * 1000)
-  }, 10_000)
 }
 
 require('./rpc')
@@ -313,6 +292,15 @@ app.on('ready', () => {
   menu()
   windows.init()
   if (app.dock) app.dock.hide()
+  if (isDev) {
+    const loadDev = async () => {
+      const { installDevTools, startCpuMonitoring } = await import('./dev')
+      installDevTools()
+      startCpuMonitoring()
+    }
+
+    void loadDev()
+  }
 
   protocol.interceptFileProtocol('file', (req, cb) => {
     const appOrigin = path.resolve(__dirname, '../../')
