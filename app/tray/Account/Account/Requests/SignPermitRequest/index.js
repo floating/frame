@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from 'react'
+import Restore from 'react-restore'
+
+import DefaultSignature from '../SignTypedDataRequest/Default'
 import { formatDisplayInteger, isUnlimited } from '../../../../../../resources/utils/numbers'
 import svg from '../../../../../../resources/svg'
 import link from '../../../../../../resources/link'
@@ -6,90 +9,30 @@ import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../..
 import Countdown from '../../../../../../resources/Components/Countdown'
 import ChainHeader from '../../../../../../resources/Components/RequestChainHeader'
 import RequestItem from '../../../../../../resources/Components/RequestItem'
+import CustomAmountInput from '../../../../../../resources/Components/CustomAmountInput'
 
-import TokenSpend from '../TransactionRequest/TokenSpend'
-import DefaultSignature from '../SignTypedDataRequest/Default'
+const getPermit = (req) => {
+  const {
+    typedMessage: {
+      data: {
+        message: { deadline, spender, value, owner },
+        domain: { verifyingContract, chainId, name }
+      }
+    }
+  } = req
 
-// class TokenPermit extends React.Component {
-//   constructor(...args) {
-//     super(...args)
-//     this.state = {
-//       inPreview: false,
-//       inEditApproval: false,
-//       mode: 'requested',
-//       customInput: ''
-//     }
-//   }
+  return {
+    deadline,
+    spender,
+    value,
+    owner,
+    verifyingContract,
+    chainId,
+    name
+  }
+}
 
-//   setAmount(amount) {
-//     this.setState({ amount })
-//   }
-
-//   setCustomAmount(value, decimals) {
-//     if (value === '') {
-//       this.setState({ mode: 'custom', amount: '0x0', customInput: value })
-//     } else {
-//       // only allow ints
-//       if (!/^\d+$/.test(value)) return
-
-//       const max = new BigNumber(MAX_HEX)
-//       const custom = new BigNumber(value).shiftedBy(decimals)
-
-//       let amount
-//       if (max.comparedTo(custom) === -1) {
-//         amount = MAX_HEX
-//       } else {
-//         amount = '0x' + custom.integerValue().toString(16)
-//       }
-
-//       this.setState({ mode: 'custom', amount, customInput: value })
-//     }
-//   }
-
-//   startEditing() {
-//     this.setState({ inEditApproval: true })
-//   }
-
-//   copySpenderAddress(data) {
-//     link.send('tray:clipboardData', data)
-//     this.setState({ copiedSpenderAddress: true })
-//     setTimeout(() => this.setState({ copiedSpenderAddress: false }), 1000)
-//   }
-
-//   copyTokenAddress(data) {
-//     link.send('tray:clipboardData', data)
-//     this.setState({ copiedTokenAddress: true })
-//     setTimeout(() => this.setState({ copiedTokenAddress: false }), 1000)
-//   }
-
-//   render() {
-//     const { req, updateApproval, tokenData } = this.props
-
-//     const {
-//       typedMessage: {
-//         data: {
-//           message: { deadline, spender, value: requestedAmount },
-//           domain: { verifyingContract, chainId }
-//         }
-//       }
-//     } = req
-
-//     const { name, decimals, symbol } = tokenData ||
-
-//     const customInput =
-//       '0x' + new BigNumber(this.state.customInput).shiftedBy(decimals).integerValue().toString(16)
-//     const value = new BigNumber(amount)
-//     const revoke = value.eq(0)
-
-//     const displayAmount = isUnlimited(data.amount) ? 'unlimited' : formatDisplayInteger(data.amount, decimals)
-
-//     const inputLock = !name || !symbol || !decimals
-
-//     const tokenAddress = verifyingContrac
-//   }
-// }
-
-const PermitSignature = ({ req, originName, step, chainName, chainColor, icon }) => {
+const PermitSignature = ({ req, originName, step, chainData }) => {
   const [tokenData, setTokenData] = useState(null)
   const [copied, setCopied] = useState(false)
   useEffect(() => {
@@ -100,14 +43,9 @@ const PermitSignature = ({ req, originName, step, chainName, chainColor, icon })
     })
   }, [])
 
-  const {
-    typedMessage: {
-      data: {
-        message: { deadline, spender, value, owner },
-        domain: { verifyingContract, chainId, name }
-      }
-    }
-  } = req
+  const { deadline, spender, value, owner, verifyingContract, chainId, name } = getPermit(req)
+  const { chainColor, chainName, icon } = chainData
+  const requestClass = getRequestClass(req)
 
   const copyAddress = (data) => {
     link.send('tray:clipboardData', data)
@@ -121,10 +59,8 @@ const PermitSignature = ({ req, originName, step, chainName, chainColor, icon })
       <div className='approveRequest'>
         <div className='approveTransactionPayload'>
           {/* //TODO: loading state when getting token data */}
-          {/* <div className='signTypedDataSection'>
-          </div> */}
           <RequestItem
-            key={req.type}
+            key={req.type + req.handlerId}
             req={req}
             account={owner}
             handlerId={req.handlerId}
@@ -186,16 +122,12 @@ const PermitSignature = ({ req, originName, step, chainName, chainColor, icon })
                           }}
                         >
                           <div className='clusterAddress'>
-                            {/* {ensName ? (
-                          <span className='clusterAddressRecipient'>{ensName}</span>
-                        ) : ( */}
                             <div style={{ textAlign: 'center' }}>{`TO`}</div>
                             <span className='clusterAddressRecipient'>
                               {spender.substring(0, 8)}
                               {svg.octicon('kebab-horizontal', { height: 15 })}
                               {spender.substring(spender.length - 6)}
                             </span>
-                            {/* )} */}
                             <div className='clusterAddressRecipientFull'>
                               {copied ? (
                                 <span>{'Address Copied'}</span>
@@ -235,125 +167,40 @@ const PermitSignature = ({ req, originName, step, chainName, chainColor, icon })
     )
   }
 
-  const Edit = () => {
-    const [customValue, setCustomValue] = useState('')
-    const [mode, setMode] = useState('requested')
-
-    return (
-      <div className='signTypedData'>
-        <div className='signTypedDataInner'>
-          <ClusterBox title={'Edit Token Spend Permit'} style={{ marginTop: '64px' }}>
-            <Cluster>
-              <ClusterRow>
-                <ClusterValue
-                  pointerEvents={'auto'}
-                  onClick={() => {
-                    // this.copySpenderAddress(spender)
-                  }}
-                >
-                  <div className='clusterAddress'>
-                    <span className='clusterAddressRecipient'>
-                      {spender.substring(0, 8)}
-                      {svg.octicon('kebab-horizontal', { height: 15 })}
-                      {spender.substring(spender.length - 6)}
-                    </span>
-                    <div className='clusterAddressRecipientFull'>
-                      {/* {this.state.copiedSpenderAddress ? (
-                      <span>{'Address Copied'}</span>
-                    ) : ( */}
-                      <span className='clusterFira'>{spender}</span>
-                      {/* )} */}
-                    </div>
-                  </div>
-                </ClusterValue>
-              </ClusterRow>
-
-              <ClusterRow>
-                <ClusterValue>
-                  <div className='clusterTag' style={{ color: 'var(--moon)' }}>
-                    <span>{'grant approval to spend'}</span>
-                  </div>
-                </ClusterValue>
-              </ClusterRow>
-
-              <ClusterRow>
-                <ClusterValue
-                  pointerEvents={'auto'}
-                  onClick={() => {
-                    link.rpc(
-                      'updateTypedSignatureRequest',
-                      req.id,
-                      {
-                        ...req.typedMessage.data,
-                        value: 100
-                      },
-                      () => {}
-                    )
-                  }}
-                >
-                  <div className='clusterAddress'>
-                    <span className='clusterAddressRecipient'>{name}</span>
-                    <div className='clusterAddressRecipientFull'>
-                      {/* {this.state.copiedTokenAddress ? ( */}
-                      {/* <span>{'Address Copied'}</span> */}
-                      {/* ) : ( */}
-                      <span className='clusterFira'>{verifyingContract}</span>
-                      {/* )} */}
-                    </div>
-                  </div>
-                </ClusterValue>
-              </ClusterRow>
-            </Cluster>
-          </ClusterBox>
-        </div>
-      </div>
+  //TODO: Allow the deadline to be changed too...
+  const Edit = () =>
+    tokenData && (
+      <CustomAmountInput
+        data={{
+          ...tokenData,
+          contract: verifyingContract,
+          spender,
+          amount: value
+        }}
+        requestedAmountHex={value}
+        //TODO: Hook up this to the function which updates the sign typed data request...
+        updateRequest={(...args) => console.log(args)}
+      />
     )
+  const renderStep = () => {
+    switch (step) {
+      case 'adjustPermit':
+        return <Edit />
+      case 'viewRaw':
+        return <DefaultSignature {...{ originName, req }} />
+      default:
+        return <Overview />
+    }
   }
 
-  switch (step) {
-    case 'adjustPermit':
-      return <Edit />
-    case 'viewRaw':
-      return <DefaultSignature {...{ originName, req }} />
-    default:
-      return <Overview />
-  }
+  return (
+    <div key={req.id || req.handlerId} className={requestClass}>
+      {renderStep()}
+    </div>
+  )
 }
-
-import React from 'react'
-import Restore from 'react-restore'
-import DefaultSignature from '../SignTypedDataRequest/Default'
-import { data } from 'cheerio/lib/api/attributes'
 
 const getRequestClass = ({ status = '' }) =>
   `signerRequest ${status.charAt(0).toUpperCase() + status.slice(1)}`
 
-class TransactionRequest extends React.Component {
-  constructor(...args) {
-    super(...args)
-    this.state = { allowInput: false, dataView: false }
-
-    const props = args[0] || {}
-
-    setTimeout(() => {
-      this.setState({ allowInput: true })
-    }, props.signingDelay || 1500)
-  }
-
-  render() {
-    const { req } = this.props
-    const requestClass = getRequestClass(req)
-    const originName = this.store('main.origins', req.origin, 'name')
-    const chainId = req.typedMessage.data.domain.chainId
-    const chainName = this.store('main.networks.ethereum', chainId, 'name')
-    const { primaryColor, icon } = this.store('main.networksMeta.ethereum', chainId)
-
-    return (
-      <div key={req.id || req.handlerId} className={requestClass}>
-        <PermitSignature {...{ originName, chainName, chainColor: primaryColor, icon, ...this.props }} />
-      </div>
-    )
-  }
-}
-
-export default Restore.connect(TransactionRequest)
+export default PermitSignature

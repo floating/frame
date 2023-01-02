@@ -310,15 +310,23 @@ class _AccountBody extends React.Component {
         />
       )
     } else if (req.type === 'signErc20Permit') {
-      console.log({ data })
+      const originName = this.store('main.origins', req.origin, 'name')
+      const chainId = req.typedMessage.data.domain.chainId
+      const chainName = this.store('main.networks.ethereum', chainId, 'name')
+      const { primaryColor: chainColor, icon } = this.store('main.networksMeta.ethereum', chainId)
+      const chainData = { chainName, chainColor, icon }
       return (
         <SignPermitRequest
           key={req.handlerId}
-          req={req}
+          {...{
+            req,
+            signingDelay,
+            chainId,
+            originName,
+            chainData
+          }}
           step={data.step || ''}
-          handlerId={req.handlerId}
           accountId={this.props.id}
-          signingDelay={signingDelay}
         />
       )
     } else if (req.type === 'addChain' || req.type === 'switchChain') {
