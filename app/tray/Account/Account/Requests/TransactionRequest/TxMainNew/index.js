@@ -16,7 +16,7 @@ class TxMain extends React.Component {
     const replacementStatus = { replacement: false, possible: true, notice: '' }
     if (req.mode !== 'monitor' && req.data.nonce) {
       const requests = Object.keys(r || {}).map((key) => r[key])
-      const monitor = requests.filter((_req) => _req.handlerId !== req.handlerId) // .filter((req) => req.mode === 'monitor')
+      const monitor = requests.filter((req) => req.mode === 'monitor')
       const monitorFilter = monitor.filter((r) => r.status !== 'error')
       const existingNonces = monitorFilter.map((m) => m.data.nonce)
       existingNonces.forEach((nonce, i) => {
