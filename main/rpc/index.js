@@ -142,7 +142,7 @@ const rpc = {
   updateRequest(reqId, actionId, data, cb = () => {}) {
     accounts.updateRequest(reqId, actionId, data)
   },
-  updateTypedSignatureRequest(id, data, cb = () => {}) {
+  updateTypedSignatureRequest(id, data) {
     try {
       accounts.updateTypedSignatureRequest(id, data)
     } catch (e) {

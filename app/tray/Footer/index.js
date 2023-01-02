@@ -87,7 +87,7 @@ class Footer extends React.Component {
               </div>
             </div>
           )
-        } else if (isSignatureRequest(req.type)) {
+        } else if (isSignatureRequest(req.type) && crumb.data.step === 'confirm') {
           return (
             <RequestCommand req={req} signingDelay={isHardwareSigner(account.lastSignerType) ? 0 : 1500} />
           )

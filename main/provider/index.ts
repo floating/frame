@@ -72,6 +72,7 @@ const storeApi = {
 
 const getPayloadOrigin = ({ _origin }: RPCRequestPayload) => storeApi.getOrigin(_origin)
 
+//TODO: should we handle non-EIP2612 e.g. DAI on mainnet?
 const signatureRequestRecognition = (typedMessage: TypedMessage<SignTypedDataVersion>) => {
   if (isEip2612Permit(typedMessage)) return 'signErc20Permit'
   return 'signTypedData'
@@ -653,8 +654,6 @@ export class Provider extends EventEmitter {
     }
 
     const type = signatureRequestRecognition(typedMessage)
-
-    console.log({ recognisedType: type })
 
     accounts.addRequest({
       handlerId,

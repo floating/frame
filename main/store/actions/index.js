@@ -852,7 +852,10 @@ module.exports = {
   },
   updateTypedDataRequest: (u, account, reqId, data) => {
     u('main.accounts', account, 'requests', reqId, (request) => {
+      if (!request) throw new Error(`Unable to locate request`, { reqId })
+      if (!request.typedMessage?.data) throw new Error(`This is not a typed data request`, { request })
       request.typedMessage.data = data
+      return request
     })
   }
   // toggleUSDValue: (u) => {

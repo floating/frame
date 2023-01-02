@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import Restore from 'react-restore'
 
 import DefaultSignature from '../SignTypedDataRequest/Default'
 import { formatDisplayInteger, isUnlimited } from '../../../../../../resources/utils/numbers'
@@ -15,8 +14,9 @@ const getPermit = (req) => {
   const {
     typedMessage: {
       data: {
-        message: { deadline, spender, value, owner },
-        domain: { verifyingContract, chainId, name }
+        message: { deadline, spender, value, owner, nonce },
+        domain: { verifyingContract, chainId, name, version },
+        types
       }
     }
   } = req
@@ -28,13 +28,15 @@ const getPermit = (req) => {
     owner,
     verifyingContract,
     chainId,
-    name
+    name,
+    nonce,
+    version,
+    types
   }
 }
 
 const PermitSignature = ({ req, originName, step, chainData }) => {
   const [tokenData, setTokenData] = useState(null)
-  const [copied, setCopied] = useState(false)
   useEffect(() => {
     link.rpc('getErc20Data', verifyingContract, chainId, (err, tokenData) => {
       //TODO: handle error state here
@@ -43,17 +45,18 @@ const PermitSignature = ({ req, originName, step, chainData }) => {
     })
   }, [])
 
-  const { deadline, spender, value, owner, verifyingContract, chainId, name } = getPermit(req)
+  const { deadline, spender, value, owner, verifyingContract, chainId, name, nonce, version, types } =
+    getPermit(req)
   const { chainColor, chainName, icon } = chainData
   const requestClass = getRequestClass(req)
 
-  const copyAddress = (data) => {
-    link.send('tray:clipboardData', data)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 1000)
-  }
-
   const Overview = () => {
+    const [copied, setCopied] = useState(false)
+    const copyAddress = (data) => {
+      link.send('tray:clipboardData', data)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1000)
+    }
     //TODO: allow time limit & value to be edited...
     return (
       <div className='approveRequest'>
@@ -179,7 +182,21 @@ const PermitSignature = ({ req, originName, step, chainData }) => {
         }}
         requestedAmountHex={value}
         //TODO: Hook up this to the function which updates the sign typed data request...
-        updateRequest={(...args) => console.log(args)}
+        updateRequest={(newAmt) => {
+          console.log('updating ammount to', { newAmmount: newAmt })
+          link.rpc(
+            'updateTypedSignatureRequest',
+            req.handlerId,
+            {
+              message: { deadline, spender, value: newAmt, owner, nonce },
+              domain: { verifyingContract, chainId, name, version },
+              types,
+              primaryType: 'Permit'
+            },
+            () => {}
+          )
+        }}
+        deadline={deadline * 1000}
       />
     )
   const renderStep = () => {

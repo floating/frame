@@ -5,7 +5,7 @@ export const isCancelableRequest = (status: string): Boolean => {
   return !['sent', 'sending', 'verifying', 'confirming', 'confirmed', 'error', 'declined'].includes(status)
 }
 
-const permitTypes = [
+const eip2612PermitTypes = [
   { name: 'owner', type: 'address' },
   { name: 'spender', type: 'address' },
   { name: 'value', type: 'uint256' },
@@ -19,8 +19,8 @@ export const isEip2612Permit = ({ data }: TypedMessage<SignTypedDataVersion>) =>
   const { Permit } = data.types
 
   return (
-    Permit.length === permitTypes.length &&
-    permitTypes.every(({ name, type }) =>
+    Permit.length === eip2612PermitTypes.length &&
+    eip2612PermitTypes.every(({ name, type }) =>
       Boolean(Permit.find((item) => item.name === name && item.type === type))
     )
   )

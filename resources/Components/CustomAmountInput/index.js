@@ -12,7 +12,7 @@ import { formatDisplayInteger, isUnlimited } from '../../utils/numbers'
 const max = new BigNumber(MAX_HEX)
 
 const CustomAmountInput = ({ data, updateRequest, requestedAmountHex, deadline }) => {
-  const [mode, setMode] = useState('requested')
+  const [mode, setMode] = useState(isUnlimited(data.amount) ? 'unlimited' : 'requested')
   const [customInput, setCustomInput] = useState('')
   const [amount, setAmount] = useState(data.amount)
 
@@ -129,6 +129,7 @@ const CustomAmountInput = ({ data, updateRequest, requestedAmountHex, deadline }
               </div>
             </ClusterValue>
           </ClusterRow>
+          {deadline && <Countdown end={deadline} handleClick={() => {}} title={'Permission Expires in'} />}
         </Cluster>
 
         <Cluster style={{ marginTop: '16px' }}>
@@ -208,23 +209,6 @@ const CustomAmountInput = ({ data, updateRequest, requestedAmountHex, deadline }
           <ClusterRow>
             <ClusterValue
               onClick={() => {
-                setMode('requested')
-                setAmount(requestedAmount)
-                updateRequest(requestedAmount)
-              }}
-            >
-              <div
-                className='clusterTag'
-                style={mode === 'requested' ? { color: 'var(--good)' } : {}}
-                role='button'
-              >
-                {'Requested'}
-              </div>
-            </ClusterValue>
-          </ClusterRow>
-          <ClusterRow>
-            <ClusterValue
-              onClick={() => {
                 const amount = MAX_HEX
                 setMode('unlimited')
                 setAmount(MAX_HEX)
@@ -249,7 +233,7 @@ const CustomAmountInput = ({ data, updateRequest, requestedAmountHex, deadline }
               >
                 <div
                   className={'clusterTag'}
-                  style={mode === 'custom' ? { color: 'var(--good)' } : {}}
+                  style={mode === 'custom' || mode === 'requested' ? { color: 'var(--good)' } : {}}
                   role='button'
                 >
                   Custom
