@@ -764,13 +764,18 @@ export class Accounts extends EventEmitter {
 
     if (currentAccount && currentAccount.requests[handlerId]) {
       currentAccount.requests[handlerId].status = RequestStatus.Error
+      const errorMessage = (err.message || '').toLowerCase()
 
-      if (err.message === 'Ledger device: Invalid data received (0x6a80)') {
+      if (errorMessage === 'ledger device: invalid data received (0x6a80)') {
         currentAccount.requests[handlerId].notice = 'Ledger Contract Data = No'
       } else if (
-        err.message === 'Ledger device: Condition of use not satisfied (denied by the user?) (0x6985)'
+        err.message === 'ledger device: condition of use not satisfied (denied by the user?) (0x6985)'
       ) {
         currentAccount.requests[handlerId].notice = 'Ledger Signature Declined'
+      } else if (errorMessage.includes('insufficient funds')) {
+        currentAccount.requests[handlerId].notice = errorMessage.includes('for gas')
+          ? 'insufficient funds for gas'
+          : 'insufficient funds'
       } else {
         const notice =
           err && typeof err === 'string'
@@ -780,6 +785,7 @@ export class Accounts extends EventEmitter {
             : 'Unknown Error' // TODO: Update to normalize input type
         currentAccount.requests[handlerId].notice = notice
       }
+
       if (currentAccount.requests[handlerId].type === 'transaction') {
         setTimeout(() => {
           const activeAccount = this.current()

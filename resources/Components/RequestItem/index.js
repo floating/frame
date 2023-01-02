@@ -101,7 +101,7 @@ class _RequestItem extends React.Component {
                     >
                       <div className='requestItemDetailsIndicatorMarker' />
                     </div>
-                    <span>{status}</span>
+                    <span role='status'>{status}</span>
                     {/* <div className='requestItemDetailsIndicator' /> */}
                   </div>
                 </div>
@@ -124,7 +124,7 @@ class _RequestItem extends React.Component {
             </div>
             <div style={headerMode ? { pointerEvents: 'auto' } : { pointerEvents: 'none' }}>{children}</div>
             {notice && notice !== status && (
-              <div role='notice' className={requestItemNoticeClass}>
+              <div role='alert' className={requestItemNoticeClass}>
                 {notice}
               </div>
             )}

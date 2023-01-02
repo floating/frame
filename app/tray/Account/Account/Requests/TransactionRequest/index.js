@@ -83,6 +83,7 @@ class TransactionRequest extends React.Component {
     const requiredApproval = showWarning && (req.approvals || []).filter((a) => !a.approved)[0]
 
     const recognizedActions = req.recognizedActions || []
+
     return (
       <div key={req.handlerId} className={requestClass}>
         {req.type === 'transaction' ? (
