@@ -170,7 +170,7 @@ const PermitSignature = ({ req, originName, step, chainData }) => {
     )
   }
 
-  //TODO: Allow the deadline to be changed too...
+  //TODO: Expand existing cluster, and allow token address to be copied there - dont need a second screen
   const Edit = () =>
     tokenData && (
       <CustomAmountInput

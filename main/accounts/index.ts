@@ -179,7 +179,6 @@ export class Accounts extends EventEmitter {
   updateTypedSignatureRequest(reqId: string, data: { [key: string]: unknown }) {
     const currentAccount = this.current()
     if (!currentAccount || !currentAccount.requests[reqId]) return
-    console.log('calling action')
     store.updateTypedDataRequest(currentAccount.id, reqId, data)
   }
 
