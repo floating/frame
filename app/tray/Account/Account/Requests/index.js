@@ -207,7 +207,6 @@ class Requests extends React.Component {
                 icon,
                 nativeCurrency: { symbol: currentSymbol = '?' }
               } = this.store('main.networksMeta.ethereum', chainId)
-              const txMeta = { replacement: false, possible: true, notice: '' }
               const originName = this.store('main.origins', req.origin, 'name')
               return (
                 <RequestItem
@@ -225,7 +224,6 @@ class Requests extends React.Component {
                     chainName={chainName}
                     chainColor={primaryColor}
                     symbol={currentSymbol}
-                    txMeta={txMeta}
                     originName={originName}
                     simple={true}
                   />

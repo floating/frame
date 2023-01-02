@@ -47,7 +47,6 @@ class TransactionRequest extends React.Component {
   render() {
     const type = this.props.req.type
     const status = this.props.req.status
-    const notice = this.props.req.notice
     const payload = this.props.req.payload
 
     const message = decodeMessage(payload.params[1])
