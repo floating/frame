@@ -12,40 +12,25 @@ class TxMain extends React.Component {
     }
   }
 
-  render() {
-    const req = this.props.req
-    const chainId = parseInt(req.data.chainId, 16)
-
-    const chainName = this.store('main.networks.ethereum', chainId, 'name')
-    const currentSymbol = this.store('main.networksMeta.ethereum', chainId, 'nativeCurrency.symbol') || '?'
-
-    const txMeta = { replacement: false, possible: true, notice: '' }
-
-    const { accountId } = this.props
-
-    // TODO
-    // if (signer locked) {
-    //   txMeta.possible = false
-    //   txMeta.notice = 'signer is locked'
-    // }
+  getReplacementStatus(req, r) {
+    const replacementStatus = { replacement: false, possible: true, notice: '' }
     if (req.mode !== 'monitor' && req.data.nonce) {
-      const r = this.store('main.accounts', this.props.accountId, 'requests')
       const requests = Object.keys(r || {}).map((key) => r[key])
-      const monitor = requests.filter((req) => req.mode === 'monitor')
+      const monitor = requests.filter((_req) => _req.handlerId !== req.handlerId) // .filter((req) => req.mode === 'monitor')
       const monitorFilter = monitor.filter((r) => r.status !== 'error')
       const existingNonces = monitorFilter.map((m) => m.data.nonce)
       existingNonces.forEach((nonce, i) => {
         if (req.data.nonce === nonce) {
-          txMeta.replacement = true
+          replacementStatus.replacement = true
           if (monitorFilter[i].status === 'confirming' || monitorFilter[i].status === 'confirmed') {
-            txMeta.possible = false
-            txMeta.notice = 'nonce used'
+            replacementStatus.possible = false
+            replacementStatus.notice = 'nonce used'
           } else if (
             req.data.gasPrice &&
             parseInt(monitorFilter[i].data.gasPrice, 'hex') >= parseInt(req.data.gasPrice, 'hex')
           ) {
-            txMeta.possible = false
-            txMeta.notice = 'gas price too low'
+            replacementStatus.possible = false
+            replacementStatus.notice = 'gas price too low'
           } else if (
             req.data.maxPriorityFeePerGas &&
             req.data.maxFeePerGas &&
@@ -54,12 +39,23 @@ class TxMain extends React.Component {
             Math.ceil(parseInt(monitorFilter[i].data.maxFeePerGas, 'hex') * 1.1) >
               parseInt(req.data.maxFeePerGas, 'hex')
           ) {
-            txMeta.possible = false
-            txMeta.notice = 'gas fees too low'
+            replacementStatus.possible = false
+            replacementStatus.notice = 'gas fees too low'
           }
         }
       })
     }
+    return replacementStatus
+  }
+
+  render() {
+    const req = this.props.req
+    const chainId = parseInt(req.data.chainId, 16)
+    const chainName = this.store('main.networks.ethereum', chainId, 'name')
+    const currentSymbol = this.store('main.networksMeta.ethereum', chainId, 'nativeCurrency.symbol') || '?'
+    const { accountId } = this.props
+    const reqs = this.store('main.accounts', accountId, 'requests')
+    const replacementStatus = this.getReplacementStatus(req, reqs)
 
     const { primaryColor, icon } = this.store('main.networksMeta.ethereum', chainId)
     const originName = this.store('main.origins', req.origin, 'name')
@@ -84,7 +80,7 @@ class TxMain extends React.Component {
               chainName={chainName}
               chainColor={primaryColor}
               symbol={currentSymbol}
-              txMeta={txMeta}
+              replacementStatus={replacementStatus}
               originName={originName}
             />
           </RequestItem>

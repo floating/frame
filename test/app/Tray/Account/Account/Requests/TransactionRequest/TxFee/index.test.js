@@ -4,7 +4,7 @@ import { addHexPrefix } from '@ethereumjs/util'
 
 import store from '../../../../../../../../main/store'
 import { setupComponent } from '../../../../../../../componentSetup'
-import TxFeeComponent from '../../../../../../../../app/tray/Account/Account/Requests/TransactionRequest/TxFeeNew'
+import TxFeeComponent from '../../../../../../../../app/tray/Account/Account/Requests/TransactionRequest/TxFee'
 import { GasFeesSource } from '../../../../../../../../resources/domain/transaction'
 
 jest.mock('../../../../../../../../main/store/persist')

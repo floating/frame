@@ -63,7 +63,16 @@ const GenericContractOverview = ({ method }) => <div>{`Calling Contract Method $
 const DataOverview = () => <div>Sending data</div>
 const EmptyTransactionOverview = () => <div>Empty Transaction</div>
 
-const TxOverview = ({ req, chainName, chainColor, symbol, originName, txMeta, simple, valueColor }) => {
+const TxOverview = ({
+  req,
+  chainName,
+  chainColor,
+  symbol,
+  originName,
+  replacementStatus,
+  simple,
+  valueColor
+}) => {
   const { recipientType, decodedData: { method } = {}, data: tx = {} } = req
   const { to, value, data: calldata } = tx
 
@@ -115,17 +124,19 @@ const TxOverview = ({ req, chainName, chainColor, symbol, originName, txMeta, si
             </div>
           </ClusterValue>
         </ClusterRow>
-        {txMeta.replacement &&
-          (txMeta.possible ? (
+        {replacementStatus.replacement &&
+          (replacementStatus.possible ? (
             <ClusterRow>
               <ClusterValue>
-                <div className='_txMainTag _txMainTagWarning'>valid replacement</div>
+                <div className='_txMainTag _txMainTagGood'>valid replacement</div>
               </ClusterValue>
             </ClusterRow>
           ) : (
             <ClusterRow>
               <ClusterValue>
-                <div className='_txMainTag _txMainTagWarning'>{txMeta.notice || 'invalid duplicate'}</div>
+                <div className='_txMainTag _txMainTagBad'>
+                  {replacementStatus.notice || 'invalid duplicate'}
+                </div>
               </ClusterValue>
             </ClusterRow>
           ))}

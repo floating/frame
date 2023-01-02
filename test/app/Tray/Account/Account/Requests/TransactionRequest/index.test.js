@@ -18,7 +18,7 @@ function addRequest(req) {
     id: account,
     name: 'Test Account',
     requests: {
-      [req.id]: req
+      [req.handlerId]: req
     }
   })
 }
@@ -40,7 +40,7 @@ describe('confirm', () => {
 
   it.only('renders a transaction with insufficient funds for gas', () => {
     const req = {
-      id: 'test-req',
+      handlerId: 'test-req',
       type: 'transaction',
       status: 'confirming',
       notice: 'insufficient funds for gas',
@@ -52,9 +52,17 @@ describe('confirm', () => {
 
     addRequest(req)
 
-    setupComponent(<TxRequest step='confirm' handlerId={req.id} accountId={account} />)
+    const { getByRole } = setupComponent(
+      <TxRequest
+        key={req.handlerId}
+        req={req}
+        step={'confirm'}
+        handlerId={req.handlerId}
+        accountId={account}
+      />
+    )
 
-    const warning = screen.getByRole('alert')
-    expect(warning.textContent).toMatch(/insufficient funds for gas/i)
+    const notice = getByRole('notice')
+    expect(notice.textContent).toMatch(/insufficient funds for gas/i)
   })
 })
