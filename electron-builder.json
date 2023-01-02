@@ -20,5 +20,5 @@
     "signAndEditExecutable": true,
     "icon": "build/icons/icon.png"
   },
-  "files": ["compiled", "bundle"]
+  "files": ["compiled", "bundle", "!compiled/main/dev"]
 }
