@@ -1,6 +1,8 @@
 import { app } from 'electron'
-import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer'
 import log from 'electron-log'
+import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer'
+
+export const IS_DEV_MODE = process.env.NODE_ENV === 'development'
 
 export async function installElectronDevToolExtensions() {
   try {

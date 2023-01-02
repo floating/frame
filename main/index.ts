@@ -21,7 +21,7 @@ import { openBlockExplorer, openExternal } from './windows/window'
 import { FrameInstance } from './windows/frames/frameInstances'
 import Erc20Contract from './contracts/erc20'
 import { getErrorCode } from '../resources/utils'
-import { installElectronDevToolExtensions, setupCpuMonitoring } from './dev'
+import { installElectronDevToolExtensions, IS_DEV_MODE, setupCpuMonitoring } from './dev'
 
 app.commandLine.appendSwitch('enable-accelerated-2d-canvas', 'true')
 app.commandLine.appendSwitch('enable-gpu-rasterization', 'true')
@@ -30,9 +30,7 @@ app.commandLine.appendSwitch('ignore-gpu-blacklist', 'true')
 app.commandLine.appendSwitch('enable-native-gpu-memory-buffers', 'true')
 app.commandLine.appendSwitch('force-color-profile', 'srgb')
 
-const isDev = process.env.NODE_ENV === 'development'
-
-log.transports.console.level = process.env.LOG_LEVEL || (isDev ? 'verbose' : 'info')
+log.transports.console.level = process.env.LOG_LEVEL || (IS_DEV_MODE ? 'verbose' : 'info')
 log.transports.file.level = ['development', 'test'].includes(process.env.NODE_ENV) ? false : 'verbose'
 
 const hasInstanceLock = app.requestSingleInstanceLock()
@@ -42,7 +40,7 @@ if (!hasInstanceLock) {
   app.exit(1)
 }
 
-if (isDev) {
+if (IS_DEV_MODE) {
   setupCpuMonitoring()
 }
 
@@ -240,7 +238,7 @@ ipcMain.on('tray:syncPath', (e, path, value) => {
 ipcMain.on('tray:ready', () => {
   require('./api')
 
-  if (!isDev) {
+  if (!IS_DEV_MODE) {
     startUpdater()
   }
 })
@@ -298,7 +296,7 @@ app.on('ready', () => {
   menu()
   windows.init()
   if (app.dock) app.dock.hide()
-  if (isDev) {
+  if (IS_DEV_MODE) {
     void installElectronDevToolExtensions()
   }
 
