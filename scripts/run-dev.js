@@ -24,17 +24,7 @@ async function prepareEnvironment() {
 }
 
 async function launchServer() {
-  const server = spawn('npm', ['run', 'dev-server'], { stdio: ['ignore', 'pipe', 'inherit'] })
-
-  server.stdout.on('data', (data) => {
-    const msg = data.toString()
-
-    if (msg.toLowerCase().includes('build failed')) {
-      setTimeout(() => kill(server.pid), 1000)
-    }
-
-    console.log(msg)
-  })
+  const server = spawn('npm', ['run', 'dev-server'], { stdio: ['ignore', 'inherit', 'inherit'] })
 
   server.once('exit', () => {
     console.log('Dev server exited')
