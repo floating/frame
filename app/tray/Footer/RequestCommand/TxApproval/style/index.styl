@@ -1,0 +1,46 @@
+.approveTransactionWarning
+  position absolute
+  top 0px
+  right 0px
+  bottom 0px
+  left 0px
+  z-index 9999999
+  background-position 0px 0px
+  overflow hidden
+  opacity 1
+
+  .approveTransactionWarningBody
+    position absolute
+    inset 0px
+    overflow-x hidden
+    overflow-y scroll
+    word-wrap break-word
+    word-break break-all
+
+    .approveTransactionWarningTitle
+      text-align center
+      font-size 18px
+      letter-spacing 1px
+      text-transform uppercase
+      font-weight 300
+      font-family 'VCR'
+      display flex
+      justify-content space-between
+      align-items center
+      transition var(--standard)
+      height 50px
+      padding 20px 40px
+
+      .approveTransactionWarningIcon
+        color var(--moon)
+      
+    .approveTransactionWarningMessage
+      display flex
+      align-items center
+      justify-content center
+      padding 0px 32px 32px 32px
+      min-height 64px
+      text-align justify
+      text-align-last center
+      font-family 'FiraCode'
+      font-weight 200
