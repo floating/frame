@@ -122,11 +122,7 @@ class ChainConnection extends EventEmitter {
 
         this.emit('update', { type: 'fees' })
       } catch (e) {
-        log.error(
-          `could not update gas prices for chain ${this.chainId}`,
-          { feeMarket, chainConfig: this.chainConfig },
-          e
-        )
+        log.error(`could not update gas prices for chain ${this.chainId}`, { feeMarket }, e)
       }
     })
 
