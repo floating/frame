@@ -5,7 +5,7 @@ import link from '../../../../../resources/link'
 
 import { Cluster, ClusterValue, ClusterRow } from '../../../../../resources/Components/Cluster'
 
-export default TxApproval = ({ req, approval }) => (
+export default ({ req, approval }) => (
   <div className='approveTransactionWarning'>
     <div className='approveTransactionWarningBody'>
       <Cluster>
