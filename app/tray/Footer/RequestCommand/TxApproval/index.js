@@ -1,18 +1,59 @@
 import React from 'react'
 import Restore from 'react-restore'
 
-import { ApprovalType } from '../../../../../resources/constants'
-import { BasicApproval } from './approvals'
+import svg from '../../../../../resources/svg'
+import link from '../../../../../resources/link'
 
-class TxApproval extends React.Component {
+import { Cluster, ClusterValue, ClusterRow } from '../../../../../resources/Components/Cluster'
+
+class BasicApproval extends React.Component {
   render() {
     const { req, approval } = this.props
-    if (approval.type === ApprovalType.GasLimitApproval) {
-      return <BasicApproval req={req} approval={approval} />
-    } else {
-      throw new Error(`attempted to create unsupported approval: ${JSON.stringify(approval)}`)
-    }
+    return (
+      <div className='approveTransactionWarning'>
+        <div className='approveTransactionWarningBody'>
+          <Cluster>
+            <ClusterRow>
+              <ClusterValue>
+                <div className='approveTransactionWarningTitle'>
+                  <div className='approveTransactionWarningIcon approveTransactionWarningIconLeft'>
+                    {svg.alert(32)}
+                  </div>
+                  {'estimated to fail'}
+                  <div className='approveTransactionWarningIcon approveTransactionWarningIconRight'>
+                    {svg.alert(32)}
+                  </div>
+                </div>
+              </ClusterValue>
+            </ClusterRow>
+            <ClusterRow>
+              <ClusterValue
+                onClick={() => {
+                  link.rpc('declineRequest', req, () => {})
+                }}
+              >
+                <div className='_txActionButton _txActionButtonBad'>{'Reject'}</div>
+              </ClusterValue>
+              <ClusterValue
+                onClick={() => {
+                  link.rpc('confirmRequestApproval', req, approval.type, {}, () => {})
+                }}
+              >
+                <div className='_txActionButton _txActionButtonGood'>{'Proceed'}</div>
+              </ClusterValue>
+            </ClusterRow>
+            <ClusterRow>
+              <ClusterValue>
+                <div className='approveTransactionWarningMessage'>
+                  {approval && approval.data && approval.data.message}
+                </div>
+              </ClusterValue>
+            </ClusterRow>
+          </Cluster>
+        </div>
+      </div>
+    )
   }
 }
 
-export default Restore.connect(TxApproval)
+export default Restore.connect(BasicApproval)
