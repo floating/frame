@@ -1,19 +1,15 @@
+.requestNoticeApproval
+  height auto
+
+.requestNoticeInnerApproval
+  display block
+  padding 8px 2px
+  box-sizing border-box
+
 .approveTransactionWarning
-  position absolute
-  top 0px
-  right 0px
-  bottom 0px
-  left 0px
-  z-index 9999999
-  background-position 0px 0px
   overflow hidden
-  opacity 1
 
   .approveTransactionWarningBody
-    position absolute
-    inset 0px
-    overflow-x hidden
-    overflow-y scroll
     word-wrap break-word
     word-break break-all
 
@@ -28,8 +24,9 @@
       justify-content space-between
       align-items center
       transition var(--standard)
-      height 50px
-      padding 20px 40px
+      height 52px
+      width 100%
+      padding 10px 20px
 
       .approveTransactionWarningIcon
         color var(--moon)
@@ -38,9 +35,96 @@
       display flex
       align-items center
       justify-content center
-      padding 0px 32px 32px 32px
-      min-height 64px
+      padding 30px
       text-align justify
       text-align-last center
       font-family 'FiraCode'
       font-weight 200
+      height 83px
+      font-size 14px
+
+._txApproval
+  font-size 12px
+  transition var(--standard)
+  font-family 'MainFont'
+  transform translateY(0px) 
+  text-transform uppercase
+  font-weight 300
+  border-radius 24px
+  border-top-right-radius 0px
+  border-top-left-radius 0px
+  z-index 99999999
+  height 45px
+  padding-bottom 8px
+  pointer-events auto
+  
+  .requestApproveFee
+    .requestApproveFeeButton 
+      pointer-events auto
+
+  // ._txActionButtons
+  //   position relative
+  //   z-index 999999999
+  //   font-weight 400
+
+  //   .txActionButtonsRow
+  //     display flex
+  //     align-items center
+  //     // background var(--ghostZ)
+  //     height 45px
+  //     border-radius 26px
+
+  //     *
+  //       border-radius 6px
+
+  //     .txActionText:first-child, .txActionButton:first-child
+  //       border-radius 18px
+  //       border-bottom-right-radius 6px
+  //       border-top-right-radius 6px
+
+  //     .txActionText:last-child, .txActionButton:last-child
+  //       border-radius 18px
+  //       border-bottom-left-radius 6px
+  //       border-top-left-radius 6px
+
+  //     .txActionText:first-child:last-child, .txActionButton:first-child:last-child
+  //       border-radius 18px
+
+._txActionButton
+  background var(--ghostA)
+  box-sizing border-box
+  height 60px
+  margin 1px
+  flex 1
+  cursor pointer
+  display flex
+  justify-content center
+  align-items center
+  padding-top 3px
+  box-sizing border-box
+  // font-size 12px
+  transition var(--standard)
+  font-family 'MainFont'
+  transform translateY(0px) 
+  text-transform uppercase
+  // background var(--ghostA)
+  // box-shadow 0px 1px 2px var(--ghostY)
+  // border-bottom 1px solid var(--ghostZ)
+  flex-grow 1
+
+._txActionButton:hover
+  background var(--ghostB)
+  transform translateY(-1px)
+  box-shadow 0px 3px 4px var(--ghostY)
+
+._txActionButton:active
+  background var(--ghostA)
+  transform translateY(1px)
+  box-shadow 0px 1px 0px var(--ghostY)
+
+._txActionButtonGood
+  color var(--good)
+
+._txActionButtonBad
+  color var(--bad)
+

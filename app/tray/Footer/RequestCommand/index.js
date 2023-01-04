@@ -330,30 +330,8 @@ class RequestCommand extends React.Component {
 
     if (!!requiredApproval) {
       return (
-        <div className='requestNotice'>
-          <div className='requestNoticeInner'>
-            <div className={'automaticFeeUpdate automaticFeeUpdateActive'}>
-              <div className='txActionButtons'>
-                <div className='txActionButtonsRow' style={{ padding: '0px 60px' }}>
-                  <div
-                    className='txActionButton txActionButtonBad'
-                    onClick={() => {
-                      link.rpc('declineRequest', req, () => {})
-                    }}
-                  >
-                    {'Reject'}
-                  </div>
-                  <div
-                    className='txActionButton txActionButtonGood'
-                    onClick={() => {
-                      link.rpc('confirmRequestApproval', req, requiredApproval.type, {}, () => {})
-                    }}
-                  >
-                    {'Proceed'}
-                  </div>
-                </div>
-              </div>
-            </div>
+        <div className='requestNotice requestNoticeApproval'>
+          <div className='requestNoticeInner requestNoticeInnerApproval'>
             <TxApproval req={this.props.req} approval={requiredApproval} />
           </div>
         </div>
