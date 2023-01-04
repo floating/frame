@@ -120,7 +120,9 @@ export class Accounts extends EventEmitter {
   }
 
   update(account: Account) {
-    store.updateAccount(account)
+    if (!this.accounts || this.accounts[account.id]) {
+      store.updateAccount(account)
+    }
   }
 
   current() {
