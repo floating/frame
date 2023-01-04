@@ -9,7 +9,6 @@ import TxAction from './TxAction'
 import TxRecipient from './TxRecipient'
 import AdjustFee from './AdjustFee'
 import ViewData from './ViewData'
-import TxApproval from './TxApproval'
 import TokenSpend from './TokenSpend'
 import link from '../../../../../../resources/link'
 
@@ -65,8 +64,6 @@ class TransactionRequest extends React.Component {
     const req = this.store('main.accounts', accountId, 'requests', handlerId)
     if (!req) return null
 
-    const status = req.status
-    const mode = req.mode
     let requestClass = 'signerRequest cardShow'
     const success = req.status === 'confirming' || req.status === 'confirmed'
     const error = req.status === 'error' || req.status === 'declined'
@@ -79,22 +76,12 @@ class TransactionRequest extends React.Component {
       id: parseInt(req.data.chainId, 'hex')
     }
 
-    const showWarning = !status && mode !== 'monitor'
-    const requiredApproval = showWarning && (req.approvals || []).filter((a) => !a.approved)[0]
-
     const recognizedActions = req.recognizedActions || []
 
     return (
       <div key={req.handlerId} className={requestClass}>
         {req.type === 'transaction' ? (
           <div className='approveTransaction'>
-            {!!requiredApproval ? (
-              <TxApproval
-                req={this.props.req}
-                approval={requiredApproval}
-                allowOtherChain={this.allowOtherChain.bind(this)}
-              />
-            ) : null}
             <div className='approveTransactionPayload'>
               <div className='_txBody'>
                 <TxMain i={0} {...this.props} req={req} chain={chain} />

@@ -4,6 +4,7 @@ import BigNumber from 'bignumber.js'
 
 import TxBar from './TxBar'
 import TxConfirmations from './TxConfirmations'
+import TxApproval from './TxApproval'
 import Time from '../Time'
 
 import svg from '../../../../resources/svg'
@@ -322,17 +323,30 @@ class RequestCommand extends React.Component {
 
   renderTxCommand() {
     const { req } = this.props
-    const { notice } = req
+    const { notice, status, mode } = req
 
-    return (
-      <div className='requestNotice'>
-        <div className='requestNoticeInner'>
-          <TxBar req={req} />
-          {notice ? this.sentStatus() : this.signOrDecline()}
-          <TxConfirmations req={req} />
+    const showWarning = !status && mode !== 'monitor'
+    const requiredApproval = showWarning && (req.approvals || []).filter((a) => !a.approved)[0]
+
+    if (!!requiredApproval) {
+      return (
+        <div className='requestNotice requestNoticeApproval'>
+          <div className='requestNoticeInner requestNoticeInnerApproval'>
+            <TxApproval req={this.props.req} approval={requiredApproval} />
+          </div>
         </div>
-      </div>
-    )
+      )
+    } else {
+      return (
+        <div className='requestNotice'>
+          <div className='requestNoticeInner'>
+            <TxBar req={req} />
+            {notice ? this.sentStatus() : this.signOrDecline()}
+            <TxConfirmations req={req} />
+          </div>
+        </div>
+      )
+    }
   }
 
   renderSignDataCommand() {
