@@ -1,5 +1,4 @@
-import React, { useState } from 'react'
-import Restore from 'react-restore'
+import React, { useState, useEffect } from 'react'
 import BigNumber from 'bignumber.js'
 
 import svg from '../../svg'
@@ -7,33 +6,45 @@ import link from '../../link'
 import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../Cluster'
 
 import { MAX_HEX } from '../../constants'
-import { formatDisplayInteger, isUnlimited } from '../../utils/numbers'
+import { formatDisplayInteger } from '../../utils/numbers'
 
 const max = new BigNumber(MAX_HEX)
 
-const CustomAmountInput = ({ data, updateRequest, requestedAmountHex, deadline }) => {
-  const [mode, setMode] = useState(isUnlimited(data.amount) ? 'unlimited' : 'requested')
-  const [customInput, setCustomInput] = useState('')
-  const [amount, setAmount] = useState(data.amount)
+const isMax = (value) => max.isEqualTo(value)
 
-  //TODO: useCopied hook
+const getMode = (requestedAmount, amount) => {
+  if (requestedAmount === amount) return 'requested'
+  return isMax(amount) ? 'unlimited' : 'custom'
+}
+
+const CustomAmountInput = ({ data, updateRequest, requestedAmount, deadline }) => {
+  const decimals = data.decimals || 0
+
+  const toDecimalString = (valueStr) => new BigNumber(valueStr).shiftedBy(-1 * decimals).toString()
+
+  const [mode, setMode] = useState(getMode(requestedAmount, data.amount))
+  const [custom, setCustom] = useState(toDecimalString(data.amount))
+  const [amount, setAmount] = useState(data.amount)
   const [copiedSpender, setCopiedSpender] = useState(false)
   const [copiedToken, setCopiedToken] = useState(false)
 
-  const formatAndSetCustomInput = (value, decimals) => {
+  const isCustom = mode === 'custom' && custom
+  const value = new BigNumber(amount)
+
+  const setInputAndAmount = (value) => {
     if (!value) {
-      setCustomInput('')
-      setAmount('0x0')
+      setAmount('0')
+      setCustom('0')
       return setMode('custom')
     }
 
     if (!/^\d+$/.test(value)) return
 
     const custom = new BigNumber(value).shiftedBy(decimals)
-    const amount = max.comparedTo(custom) === -1 ? MAX_HEX : '0x' + custom.toString(16)
+    const amount = max.comparedTo(custom) === -1 ? max.toString() : custom.toString()
     setMode('custom')
     setAmount(amount)
-    setCustomInput(value)
+    setCustom(value)
   }
 
   const copySpenderAddress = () => {
@@ -48,13 +59,9 @@ const CustomAmountInput = ({ data, updateRequest, requestedAmountHex, deadline }
     setTimeout(() => setCopiedToken(false), 1000)
   }
 
-  const decimals = data.decimals || 0
-  const requestedAmount = requestedAmountHex
-
-  const value = new BigNumber(amount)
   const revoke = value.eq(0)
 
-  const displayAmount = isUnlimited(data.amount) ? 'unlimited' : formatDisplayInteger(data.amount, decimals)
+  const displayAmount = isMax(data.amount) ? 'unlimited' : formatDisplayInteger(data.amount, decimals)
 
   const symbol = data.symbol || '???'
   const name = data.name || 'Unknown Token'
@@ -100,7 +107,7 @@ const CustomAmountInput = ({ data, updateRequest, requestedAmountHex, deadline }
           <ClusterRow>
             <ClusterValue>
               <div className='clusterTag' style={{ color: 'var(--moon)' }}>
-                {mode === 'custom' && !customInput ? (
+                {mode === 'custom' && !custom ? (
                   <span>{'set approval to spend'}</span>
                 ) : revoke ? (
                   <span>{'revoke approval to spend'}</span>
@@ -137,14 +144,12 @@ const CustomAmountInput = ({ data, updateRequest, requestedAmountHex, deadline }
             <ClusterValue transparent={true} pointerEvents={'auto'}>
               <div className='approveTokenSpendAmount'>
                 <div className='approveTokenSpendAmountLabel'>{symbol}</div>
-                {mode === 'custom' && data.amount !== customInput ? (
+                {isCustom && data.amount !== amount ? (
                   <div
                     className='approveTokenSpendAmountSubmit'
                     role='button'
                     onClick={() => {
-                      if (customInput === '') {
-                        setMode('requested')
-                        setAmount(requestedAmount)
+                      if (custom === '') {
                         updateRequest(requestedAmount)
                       } else {
                         updateRequest(amount)
@@ -167,18 +172,17 @@ const CustomAmountInput = ({ data, updateRequest, requestedAmountHex, deadline }
                     autoFocus
                     type='text'
                     aria-label='Custom Amount'
-                    value={customInput}
+                    value={custom}
                     onChange={(e) => {
                       e.preventDefault()
                       e.stopPropagation()
-                      formatAndSetCustomInput(e.target.value, decimals)
+                      setInputAndAmount(e.target.value)
                     }}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
+                        console.log({ customInput: custom, amount })
                         e.target.blur()
-                        if (customInput === '') {
-                          setMode('requested')
-                          setAmount(requestedAmount)
+                        if (custom === '') {
                           updateRequest(requestedAmount)
                         } else {
                           updateRequest(amount)
@@ -195,7 +199,8 @@ const CustomAmountInput = ({ data, updateRequest, requestedAmountHex, deadline }
                       inputLock
                         ? null
                         : () => {
-                            formatAndSetCustomInput(customInput, decimals)
+                            setCustom('')
+                            setMode('custom')
                           }
                     }
                   >
@@ -203,6 +208,21 @@ const CustomAmountInput = ({ data, updateRequest, requestedAmountHex, deadline }
                   </div>
                 )}
                 <div className='approveTokenSpendAmountSubtitle'>Set Token Approval Spend Limit</div>
+              </div>
+            </ClusterValue>
+          </ClusterRow>
+          <ClusterRow>
+            <ClusterValue
+              onClick={() => {
+                updateRequest(requestedAmount)
+              }}
+            >
+              <div
+                className='clusterTag'
+                style={mode === 'requested' ? { color: 'var(--good)' } : {}}
+                role='button'
+              >
+                {'Requested'}
               </div>
             </ClusterValue>
           </ClusterRow>
@@ -228,14 +248,11 @@ const CustomAmountInput = ({ data, updateRequest, requestedAmountHex, deadline }
             <ClusterRow>
               <ClusterValue
                 onClick={() => {
-                  formatAndSetCustomInput(customInput, decimals)
+                  setMode('custom')
+                  setCustom('')
                 }}
               >
-                <div
-                  className={'clusterTag'}
-                  style={mode === 'custom' || mode === 'requested' ? { color: 'var(--good)' } : {}}
-                  role='button'
-                >
+                <div className={'clusterTag'} style={isCustom ? { color: 'var(--good)' } : {}} role='button'>
                   Custom
                 </div>
               </ClusterValue>
