@@ -865,6 +865,20 @@ describe('#send', () => {
       })
     })
 
+    it('uses gasPrice from input params for legacy transactions', (done) => {
+      tx.gasPrice = '0x00'
+
+      sendTransaction(() => {
+        try {
+          const initialRequest = accountRequests[0]
+          expect(initialRequest.data.gasPrice).toBe('0x00')
+          done()
+        } catch (e) {
+          done(e)
+        }
+      })
+    })
+
     describe('replacing gas fees', () => {
       beforeEach(() => {
         const chainIds = [1, 137]
