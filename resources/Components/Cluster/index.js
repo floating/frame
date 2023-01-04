@@ -73,7 +73,6 @@ export const ClusterBox = ({ title, subtitle, children, style = {}, animationSlo
             )}
           </div>
         ) : null}
-
         {children}
       </div>
     </div>
