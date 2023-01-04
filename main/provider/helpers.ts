@@ -78,7 +78,7 @@ export function getRawTx(
   newTx: RPC.SendTransaction.TxParams,
   accountId: string | undefined
 ): TransactionData {
-  const { gas, gasLimit, gasPrice, data, value, type, to, ...rawTx } = newTx
+  const { gas, gasLimit, data, value, type, to, ...rawTx } = newTx
   const getNonce = () => {
     // pass through hex string or undefined
     if (rawTx.nonce === undefined || isHexString(rawTx.nonce)) {
