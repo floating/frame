@@ -60,7 +60,7 @@ class Inventory extends React.Component {
     const displayCollections = this.displayCollections()
     return displayCollections.map((k) => {
       return (
-        <ClusterRow>
+        <ClusterRow key={k}>
           <ClusterValue
             onClick={() => {
               const crumb = {
