@@ -76,6 +76,7 @@ export class Provider extends EventEmitter {
   connected = false
   connection = Chains
 
+  handlers: { [id: string]: any } = {}
   subscriptions: Subscriptions = {
     accountsChanged: [],
     assetsChanged: [],
