@@ -69,43 +69,37 @@ const Description = ({ mode, custom, isRevoke }) => (
   </ClusterRow>
 )
 
-const CustomAmountInput = ({ data, updateRequest: updateHandlerRequest, requestedAmount, deadline }) => {
+const CustomAmountInput = ({
+  data,
+  updateRequest: updateHandlerRequest,
+  requestedAmount,
+  deadline,
+  canRevoke = false
+}) => {
   const {
     decimals = 0,
     symbol = '???',
     name = 'Unknown Token',
     spenderEns,
     spender,
-    contract: tokenAddress
+    contract: tokenAddress,
+    amount
   } = data
 
   const toDecimal = (baseAmount) => new BigNumber(baseAmount).shiftedBy(-1 * decimals).toString()
+  const fromDecimal = (decimalAmount) => new BigNumber(decimalAmount).shiftedBy(decimals).toString()
 
-  const [mode, setMode] = useState(getMode(requestedAmount, data.amount))
-  const [custom, setCustom] = useState('0')
-  const [amount, setAmount] = useState('0')
-
-  const updateRequest = () => {
-    console.log({ requestedAmount, amount })
-    updateHandlerRequest(amount)
-  }
+  const [mode, setMode] = useState(getMode(requestedAmount, amount))
+  const [custom, setCustom] = useState('')
 
   useEffect(() => {
-    console.log('setting amount to amount inside data...')
-    setAmount(data.amount)
-    setCustom(toDecimal(data.amount))
+    setCustom(toDecimal(amount))
   }, [])
-
-  // useEffect(() => {
-  //   console.log('updating modeeee')
-  //   setMode(getMode(requestedAmount, data.amount))
-  // }, [amount])
 
   const value = new BigNumber(amount)
 
   const updateCustomAmount = (value) => {
     if (!value) {
-      setAmount('0')
       setCustom('0')
       return setMode('custom')
     }
@@ -115,30 +109,27 @@ const CustomAmountInput = ({ data, updateRequest: updateHandlerRequest, requeste
     const custom = new BigNumber(value).shiftedBy(decimals)
     const amount = max.comparedTo(custom) === -1 ? max.toString() : custom.toString()
     setMode('custom')
-    setAmount(amount)
     setCustom(value)
   }
 
   const resetToRequestAmount = () => {
     setCustom(toDecimal(requestedAmount))
-    setAmount(requestedAmount)
     setMode('requested')
-    updateRequest()
+    updateHandlerRequest(requestedAmount)
   }
 
   const setToMax = () => {
     console.log('setting to max')
     setMode('unlimited')
-    setAmount(max.toString())
-    updateRequest()
+    updateHandlerRequest(max.toString())
   }
 
-  const isRevoke = value.eq(0)
+  const isRevoke = canRevoke && value.eq(0)
   const isCustom = mode === 'custom'
 
-  const displayAmount = isMax(data.amount) ? 'unlimited' : formatDisplayInteger(data.amount, decimals)
+  const displayAmount = isMax(amount) ? 'unlimited' : formatDisplayInteger(amount, decimals)
 
-  const inputLock = !data.symbol || !data.name || !decimals
+  const inputLock = !symbol || !name || !decimals
 
   return (
     <div className='updateTokenApproval'>
@@ -171,20 +162,19 @@ const CustomAmountInput = ({ data, updateRequest: updateHandlerRequest, requeste
             <ClusterValue transparent={true} pointerEvents={'auto'}>
               <div className='approveTokenSpendAmount'>
                 <div className='approveTokenSpendAmountLabel'>{symbol}</div>
-                {isCustom && data.amount !== amount ? (
+                {isCustom && amount !== fromDecimal(custom) ? (
                   <div
                     className='approveTokenSpendAmountSubmit'
                     role='button'
-                    onClick={() => {
-                      if (custom === '') setAmount(requestedAmount)
-                      updateRequest()
-                    }}
+                    onClick={() =>
+                      custom === '' ? resetToRequestAmount() : updateHandlerRequest(fromDecimal(custom))
+                    }
                   >
                     {'update'}
                   </div>
                 ) : (
                   <div
-                    key={mode + data.amount}
+                    key={mode + amount}
                     className='approveTokenSpendAmountSubmit'
                     style={{ color: 'var(--good)' }}
                   >
@@ -204,10 +194,10 @@ const CustomAmountInput = ({ data, updateRequest: updateHandlerRequest, requeste
                     }}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
-                        console.log({ customInput: custom, amount })
+                        console.log({ customInput: custom })
                         e.target.blur()
-                        if (custom === '') resetToRequestAmount()
-                        updateRequest(amount)
+                        if (custom === '') return resetToRequestAmount()
+                        updateHandlerRequest(fromDecimal(custom))
                       }
                     }}
                   />
