@@ -17,21 +17,93 @@ const getMode = (requestedAmount, amount) => {
   return isMax(amount) ? 'unlimited' : 'custom'
 }
 
-const CustomAmountInput = ({ data, updateRequest, requestedAmount, deadline }) => {
-  const decimals = data.decimals || 0
+const Details = ({ address, name }) => {
+  const [isCopied, setCopied] = useState(false)
 
-  const toDecimalString = (valueStr) => new BigNumber(valueStr).shiftedBy(-1 * decimals).toString()
+  const copyAddress = () => {
+    link.send('tray:clipboardData', address)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 1000)
+  }
+
+  return (
+    <ClusterRow>
+      <ClusterValue
+        pointerEvents={'auto'}
+        onClick={() => {
+          copyAddress()
+        }}
+      >
+        <div className='clusterAddress'>
+          <span className='clusterAddressRecipient'>
+            {name || (
+              <>
+                {address.substring(0, 8)}
+                {svg.octicon('kebab-horizontal', { height: 15 })}
+                {address.substring(address.length - 6)}
+              </>
+            )}
+          </span>
+          <div className='clusterAddressRecipientFull'>
+            {isCopied ? <span>{'Address Copied'}</span> : <span className='clusterFira'>{address}</span>}
+          </div>
+        </div>
+      </ClusterValue>
+    </ClusterRow>
+  )
+}
+
+const Description = ({ mode, custom, isRevoke }) => (
+  <ClusterRow>
+    <ClusterValue>
+      <div className='clusterTag' style={{ color: 'var(--moon)' }}>
+        {mode === 'custom' && !custom ? (
+          <span>{'set approval to spend'}</span>
+        ) : isRevoke ? (
+          <span>{'revoke approval to spend'}</span>
+        ) : (
+          <span>{'grant approval to spend'}</span>
+        )}
+      </div>
+    </ClusterValue>
+  </ClusterRow>
+)
+
+const CustomAmountInput = ({ data, updateRequest: updateHandlerRequest, requestedAmount, deadline }) => {
+  const {
+    decimals = 0,
+    symbol = '???',
+    name = 'Unknown Token',
+    spenderEns,
+    spender,
+    contract: tokenAddress
+  } = data
+
+  const toDecimal = (baseAmount) => new BigNumber(baseAmount).shiftedBy(-1 * decimals).toString()
 
   const [mode, setMode] = useState(getMode(requestedAmount, data.amount))
-  const [custom, setCustom] = useState(toDecimalString(data.amount))
-  const [amount, setAmount] = useState(data.amount)
-  const [copiedSpender, setCopiedSpender] = useState(false)
-  const [copiedToken, setCopiedToken] = useState(false)
+  const [custom, setCustom] = useState('0')
+  const [amount, setAmount] = useState('0')
 
-  const isCustom = mode === 'custom' && custom
+  const updateRequest = () => {
+    console.log({ requestedAmount, amount })
+    updateHandlerRequest(amount)
+  }
+
+  useEffect(() => {
+    console.log('setting amount to amount inside data...')
+    setAmount(data.amount)
+    setCustom(toDecimal(data.amount))
+  }, [])
+
+  // useEffect(() => {
+  //   console.log('updating modeeee')
+  //   setMode(getMode(requestedAmount, data.amount))
+  // }, [amount])
+
   const value = new BigNumber(amount)
 
-  const setInputAndAmount = (value) => {
+  const updateCustomAmount = (value) => {
     if (!value) {
       setAmount('0')
       setCustom('0')
@@ -47,96 +119,51 @@ const CustomAmountInput = ({ data, updateRequest, requestedAmount, deadline }) =
     setCustom(value)
   }
 
-  const copySpenderAddress = () => {
-    link.send('tray:clipboardData', data.spender)
-    setCopiedSpender(true)
-    setTimeout(() => setCopiedSpender(false), 1000)
+  const resetToRequestAmount = () => {
+    setCustom(toDecimal(requestedAmount))
+    setAmount(requestedAmount)
+    setMode('requested')
+    updateRequest()
   }
 
-  const copyTokenAddress = () => {
-    link.send('tray:clipboardData', data.contract)
-    setCopiedToken(true)
-    setTimeout(() => setCopiedToken(false), 1000)
+  const setToMax = () => {
+    console.log('setting to max')
+    setMode('unlimited')
+    setAmount(max.toString())
+    updateRequest()
   }
 
-  const revoke = value.eq(0)
+  const isRevoke = value.eq(0)
+  const isCustom = mode === 'custom'
 
   const displayAmount = isMax(data.amount) ? 'unlimited' : formatDisplayInteger(data.amount, decimals)
 
-  const symbol = data.symbol || '???'
-  const name = data.name || 'Unknown Token'
-
   const inputLock = !data.symbol || !data.name || !decimals
-
-  const spenderEns = data.spenderEns
-  const spender = data.spender
-
-  const tokenAddress = data.contract
 
   return (
     <div className='updateTokenApproval'>
       <ClusterBox title={'token approval details'} style={{ marginTop: '64px' }}>
         <Cluster>
-          <ClusterRow>
-            <ClusterValue
-              pointerEvents={'auto'}
-              onClick={() => {
-                copySpenderAddress()
-              }}
-            >
-              <div className='clusterAddress'>
-                {spenderEns ? (
-                  <span className='clusterAddressRecipient'>{spenderEns}</span>
-                ) : (
-                  <span className='clusterAddressRecipient'>
-                    {spender.substring(0, 8)}
-                    {svg.octicon('kebab-horizontal', { height: 15 })}
-                    {spender.substring(spender.length - 6)}
-                  </span>
-                )}
-                <div className='clusterAddressRecipientFull'>
-                  {copiedSpender ? (
-                    <span>{'Address Copied'}</span>
-                  ) : (
-                    <span className='clusterFira'>{spender}</span>
-                  )}
-                </div>
-              </div>
-            </ClusterValue>
-          </ClusterRow>
-          <ClusterRow>
-            <ClusterValue>
-              <div className='clusterTag' style={{ color: 'var(--moon)' }}>
-                {mode === 'custom' && !custom ? (
-                  <span>{'set approval to spend'}</span>
-                ) : revoke ? (
-                  <span>{'revoke approval to spend'}</span>
-                ) : (
-                  <span>{'grant approval to spend'}</span>
-                )}
-              </div>
-            </ClusterValue>
-          </ClusterRow>
-          <ClusterRow>
-            <ClusterValue
-              pointerEvents={'auto'}
-              onClick={() => {
-                copyTokenAddress()
-              }}
-            >
-              <div className='clusterAddress'>
-                <span className='clusterAddressRecipient'>{name}</span>
-                <div className='clusterAddressRecipientFull'>
-                  {copiedToken ? (
-                    <span>{'Address Copied'}</span>
-                  ) : (
-                    <span className='clusterFira'>{tokenAddress}</span>
-                  )}
-                </div>
-              </div>
-            </ClusterValue>
-          </ClusterRow>
-          {deadline && <Countdown end={deadline} handleClick={() => {}} title={'Permission Expires in'} />}
+          <Details
+            {...{
+              address: spender,
+              name: spenderEns
+            }}
+          />
+          <Description
+            {...{
+              isRevoke,
+              mode,
+              custom
+            }}
+          />
+          <Details
+            {...{
+              address: tokenAddress,
+              name
+            }}
+          />
+          {deadline && <Countdown end={deadline} title={'Permission Expires in'} />}
         </Cluster>
 
         <Cluster style={{ marginTop: '16px' }}>
@@ -149,11 +176,8 @@ const CustomAmountInput = ({ data, updateRequest, requestedAmount, deadline }) =
                     className='approveTokenSpendAmountSubmit'
                     role='button'
                     onClick={() => {
-                      if (custom === '') {
-                        updateRequest(requestedAmount)
-                      } else {
-                        updateRequest(amount)
-                      }
+                      if (custom === '') setAmount(requestedAmount)
+                      updateRequest()
                     }}
                   >
                     {'update'}
@@ -176,17 +200,14 @@ const CustomAmountInput = ({ data, updateRequest, requestedAmount, deadline }) =
                     onChange={(e) => {
                       e.preventDefault()
                       e.stopPropagation()
-                      setInputAndAmount(e.target.value)
+                      updateCustomAmount(e.target.value)
                     }}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
                         console.log({ customInput: custom, amount })
                         e.target.blur()
-                        if (custom === '') {
-                          updateRequest(requestedAmount)
-                        } else {
-                          updateRequest(amount)
-                        }
+                        if (custom === '') resetToRequestAmount()
+                        updateRequest(amount)
                       }
                     }}
                   />
@@ -212,11 +233,7 @@ const CustomAmountInput = ({ data, updateRequest, requestedAmount, deadline }) =
             </ClusterValue>
           </ClusterRow>
           <ClusterRow>
-            <ClusterValue
-              onClick={() => {
-                updateRequest(requestedAmount)
-              }}
-            >
+            <ClusterValue onClick={() => resetToRequestAmount()}>
               <div
                 className='clusterTag'
                 style={mode === 'requested' ? { color: 'var(--good)' } : {}}
@@ -229,10 +246,7 @@ const CustomAmountInput = ({ data, updateRequest, requestedAmount, deadline }) =
           <ClusterRow>
             <ClusterValue
               onClick={() => {
-                const amount = MAX_HEX
-                setMode('unlimited')
-                setAmount(MAX_HEX)
-                updateRequest(amount)
+                setToMax()
               }}
             >
               <div

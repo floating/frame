@@ -10,6 +10,10 @@ import RequestHeader from '../../../../../../resources/Components/RequestHeader'
 import RequestItem from '../../../../../../resources/Components/RequestItem'
 import CustomAmountInput from '../../../../../../resources/Components/CustomAmountInput'
 import TypedSignatureOverview from '../../../../../../resources/Components/SimpleTypedData'
+
+const getRequestClass = ({ status = '' }) =>
+  `signerRequest ${status.charAt(0).toUpperCase() + status.slice(1)}`
+
 const getPermit = (req) => {
   const {
     typedMessage: {
@@ -165,7 +169,7 @@ const EditPermit = ({ permit, tokenData, req }) => {
   } = permit
 
   const updateRequest = (newAmt) => {
-    console.log('updating ammount to', { newAmmount: newAmt })
+    console.log({ newAmt })
     link.rpc(
       'updateTypedSignatureRequest',
       req.handlerId,
@@ -201,10 +205,9 @@ const EditPermit = ({ permit, tokenData, req }) => {
   )
 }
 
-const PermitSignature = ({ req, originName, step, chainData }) => {
+const PermitRequest = ({ req, originName, step, chainData }) => {
   const [tokenData, setTokenData] = useState({})
   const permit = getPermit(req)
-  console.log({ permit })
   useEffect(() => {
     link.rpc('getErc20Data', permit.verifyingContract, permit.chainId, (err, tokenData) => {
       //TODO: handle error state here
@@ -252,7 +255,4 @@ const PermitSignature = ({ req, originName, step, chainData }) => {
   )
 }
 
-const getRequestClass = ({ status = '' }) =>
-  `signerRequest ${status.charAt(0).toUpperCase() + status.slice(1)}`
-
-export default PermitSignature
+export default PermitRequest
