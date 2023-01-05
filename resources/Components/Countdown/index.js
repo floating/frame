@@ -1,14 +1,10 @@
 import useCountdown from '../../Hooks/useCountdown'
 import { ClusterRow, ClusterValue } from '../Cluster'
-export default Countdown = ({ end, handleClick, title }) => {
+export default Countdown = ({ end, title }) => {
   const ttl = useCountdown(end)
   return (
     <ClusterRow>
-      <ClusterValue
-        onClick={() => {
-          handleClick()
-        }}
-      >
+      <ClusterValue>
         <div className='clusterFocus'>
           <div>{title}</div>
           <div className='clusterFocusHighlight'>{ttl}</div>

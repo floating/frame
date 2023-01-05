@@ -14,7 +14,7 @@ const dapps = require('../dapps')
 const nebulaApi = require('../nebula').default
 
 const { arraysEqual, randomLetters } = require('../../resources/utils')
-const { isSignatureRequest } = require('../../resources/domain/request')
+const { isSignatureRequest } = require('../signatures')
 const { default: TrezorBridge } = require('../../main/signers/trezor/bridge')
 
 const callbackWhenDone = (fn, cb) => {

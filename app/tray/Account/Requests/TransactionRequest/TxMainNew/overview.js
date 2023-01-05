@@ -7,7 +7,7 @@ import svg from '../../../../../../resources/svg'
 
 import { Cluster, ClusterRow, ClusterValue } from '../../../../../../resources/Components/Cluster'
 import { DisplayValue } from '../../../../../../resources/Components/DisplayValue'
-import RequestChainHeader from '../../../../../../../resources/Components/RequestChainHeader'
+import RequestHeader from '../../../../../../../resources/Components/RequestHeader'
 
 const isNonZeroHex = (hex) => !!hex && !['0x', '0x0'].includes(hex)
 
@@ -111,13 +111,13 @@ const TxOverview = ({
             style={{ background: valueColor }}
           >
             <div className='_txDescription'>
-              <RequestChainHeader chain={chainName} chainColor={chainColor}>
+              <RequestHeader chain={chainName} chainColor={chainColor}>
                 <div className='requestItemTitleSub'>
                   <div className='requestItemTitleSubIcon'>{svg.window(10)}</div>
                   <div className='requestItemTitleSubText'>{originName}</div>
                 </div>
                 <div className='_txDescriptionSummaryMain'>{description}</div>
-              </RequestChainHeader>
+              </RequestHeader>
             </div>
           </ClusterValue>
         </ClusterRow>

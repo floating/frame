@@ -31,7 +31,9 @@ export enum RequestStatus {
   Success = 'success'
 }
 
-export type SignatureRequestType = 'sign' | 'signTypedData' | 'signErc20Permit'
+export type TypedSignatureRequestType = 'signTypedData' | 'signErc20Permit'
+
+export type SignatureRequestType = 'sign' | TypedSignatureRequestType
 
 type RequestType = SignatureRequestType | 'transaction' | 'access' | 'addChain' | 'switchChain' | 'addToken'
 
@@ -40,7 +42,8 @@ interface Request {
   handlerId: string
 }
 
-export interface AccountRequest extends Request {
+export interface AccountRequest<T extends RequestType = RequestType> extends Request {
+  type: T
   origin: string
   payload: JSONRPCRequestPayload
   account: string
@@ -64,8 +67,7 @@ export interface Approval {
   approve: (data: any) => void
 }
 
-export interface TransactionRequest extends Omit<AccountRequest, 'type'> {
-  type: 'transaction'
+export interface TransactionRequest extends AccountRequest<'transaction'> {
   payload: RPC.SendTransaction.Request
   data: TransactionData
   decodedData?: DecodedCallData
@@ -96,25 +98,20 @@ export interface TypedMessage<V extends SignTypedDataVersion = SignTypedDataVers
   version: V
 }
 
-export interface SignTypedDataRequest extends Omit<AccountRequest, 'type'> {
-  type: 'signTypedData'
+export interface SignTypedDataRequest extends AccountRequest<'signTypedData'> {
   typedMessage: TypedMessage
 }
 
-export interface PermitSignatureRequest extends Omit<SignTypedDataRequest, 'type'> {
-  type: 'signErc20Permit'
+export interface PermitSignatureRequest extends AccountRequest<'signErc20Permit'> {
+  typedMessage: TypedMessage
 }
 
-export interface AccessRequest extends Omit<AccountRequest, 'type'> {
-  type: 'access'
-}
+export interface AccessRequest extends AccountRequest<'access'> {}
 
-export interface AddChainRequest extends Omit<AccountRequest, 'type'> {
-  type: 'addChain'
+export interface AddChainRequest extends AccountRequest<'addChain'> {
   chain: Chain
 }
 
-export interface AddTokenRequest extends Omit<AccountRequest, 'type'> {
-  type: 'addToken'
+export interface AddTokenRequest extends AccountRequest<'addToken'> {
   token: Token
 }

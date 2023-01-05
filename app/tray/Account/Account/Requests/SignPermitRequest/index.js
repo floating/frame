@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react'
 import BigNumber from 'bignumber.js'
-import DefaultSignature from '../SignTypedDataRequest/Default'
+
 import { formatDisplayInteger, isUnlimited } from '../../../../../../resources/utils/numbers'
 import svg from '../../../../../../resources/svg'
 import link from '../../../../../../resources/link'
 import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../../resources/Components/Cluster'
 import Countdown from '../../../../../../resources/Components/Countdown'
-import ChainHeader from '../../../../../../resources/Components/RequestChainHeader'
+import RequestHeader from '../../../../../../resources/Components/RequestHeader'
 import RequestItem from '../../../../../../resources/Components/RequestItem'
 import CustomAmountInput from '../../../../../../resources/Components/CustomAmountInput'
-
+import TypedSignatureOverview from '../../../../../../resources/Components/SimpleTypedData'
 const getPermit = (req) => {
   const {
     typedMessage: {
@@ -65,18 +65,14 @@ const PermitOverview = ({ permit, req, chainData, originName, tokenData }) => {
             <ClusterBox animationSlot={1}>
               <Cluster>
                 <ClusterRow>
-                  <ClusterValue
-                    onClick={() => {
-                      link.send('nav:update', 'panel', { data: { step: 'viewData' } })
-                    }}
-                  >
+                  <ClusterValue>
                     <div className='_txDescription'>
-                      <ChainHeader chain={chainName} chainColor={chainColor}>
+                      <RequestHeader chain={chainName} chainColor={chainColor}>
                         <div className='requestItemTitleSub'>
                           <div className='requestItemTitleSubIcon'>{svg.window(10)}</div>
                           <div className='requestItemTitleSubText'>{originName}</div>
                         </div>
-                      </ChainHeader>
+                      </RequestHeader>
                     </div>
                   </ClusterValue>
                 </ClusterRow>
@@ -130,7 +126,7 @@ const PermitOverview = ({ permit, req, chainData, originName, tokenData }) => {
                       </ClusterValue>
                     </ClusterRow>
 
-                    <Countdown end={deadline * 1000} handleClick={() => {}} title={'Permission Expires in'} />
+                    <Countdown end={deadline * 1000} title={'Permission Expires in'} />
                   </>
                 )}
 
@@ -154,15 +150,65 @@ const PermitOverview = ({ permit, req, chainData, originName, tokenData }) => {
   )
 }
 
+const EditPermit = ({ permit, tokenData, req }) => {
+  const {
+    verifyingContract: contract,
+    spender,
+    value: amount,
+    deadline: deadlineInSeconds,
+    chainId,
+    nonce,
+    name,
+    types,
+    owner,
+    version
+  } = permit
+
+  const updateRequest = (newAmt) => {
+    console.log('updating ammount to', { newAmmount: newAmt })
+    link.rpc(
+      'updateTypedSignatureRequest',
+      req.handlerId,
+      {
+        message: { deadline: deadlineInSeconds, spender, value: newAmt, owner, nonce },
+        domain: { verifyingContract: contract, chainId, name, version },
+        types,
+        primaryType: 'Permit'
+      },
+      () => {}
+    )
+  }
+  const deadline = deadlineInSeconds * 1000
+
+  const requestedAmount = new BigNumber(req.payload.params[1].message.value).toString()
+
+  const data = {
+    ...tokenData,
+    contract,
+    spender,
+    amount
+  }
+
+  return (
+    <CustomAmountInput
+      {...{
+        data,
+        requestedAmount,
+        updateRequest,
+        deadline
+      }}
+    />
+  )
+}
+
 const PermitSignature = ({ req, originName, step, chainData }) => {
   const [tokenData, setTokenData] = useState({})
   const permit = getPermit(req)
   console.log({ permit })
   useEffect(() => {
-    link.rpc('getErc20Data', permit.verifyingContract, chainData.chainId, (err, tokenData) => {
+    link.rpc('getErc20Data', permit.verifyingContract, permit.chainId, (err, tokenData) => {
       //TODO: handle error state here
       if (err) return console.error(err)
-      console.log({ tokenData })
       setTokenData(tokenData)
     })
   }, [])
@@ -170,41 +216,20 @@ const PermitSignature = ({ req, originName, step, chainData }) => {
   const requestClass = getRequestClass(req)
 
   //TODO: Expand existing cluster, and allow token address to be copied there - dont need a second screen
-  const requestedAmount = new BigNumber(req.payload.params[1].message.value).toString()
-  // const Edit = () =>
-  //   tokenData && (
-  //     <CustomAmountInput
-  //       data={{
-  //         ...tokenData,
-  //         contract: verifyingContract,
-  //         spender,
-  //         amount: value
-  //       }}
-  //       requestedAmount={requestedAmount}
-  //       //TODO: Hook up this to the function which updates the sign typed data request...
-  //       updateRequest={(newAmt) => {
-  //         console.log('updating ammount to', { newAmmount: newAmt })
-  //         link.rpc(
-  //           'updateTypedSignatureRequest',
-  //           req.handlerId,
-  //           {
-  //             message: { deadline, spender, value: newAmt, owner, nonce },
-  //             domain: { verifyingContract, chainId, name, version },
-  //             types,
-  //             primaryType: 'Permit'
-  //           },
-  //           () => {}
-  //         )
-  //       }}
-  //       deadline={deadline * 1000}
-  //     />
-  //   )
   const renderStep = () => {
     switch (step) {
-      // case 'adjustPermit':
-      //   return <Edit />
-      // case 'viewRaw':
-      //   return <DefaultSignature {...{ originName, req }} />
+      case 'adjustPermit':
+        return (
+          <EditPermit
+            {...{
+              tokenData,
+              permit,
+              req
+            }}
+          />
+        )
+      case 'viewRaw':
+        return <TypedSignatureOverview {...{ originName, req }} />
       default:
         return (
           <PermitOverview

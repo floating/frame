@@ -15,7 +15,7 @@ const SimpleJSON = ({ json }) => {
   )
 }
 
-export default DefaultTypedSignature = ({ req, originName }) => {
+export default SimpleTypedData = ({ req, originName }) => {
   const type = req.type
   const payload = req.payload
   const typedData = payload.params[1] || {}

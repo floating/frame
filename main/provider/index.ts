@@ -47,7 +47,7 @@ import {
   getActiveChains
 } from './chains'
 import type { LegacyTypedData, TypedData, TypedMessage } from '../accounts/types'
-import { isEip2612Permit } from '../../resources/domain/request'
+import * as sigParser from '../signatures'
 
 type Subscription = {
   id: string
@@ -72,17 +72,10 @@ const storeApi = {
 
 const getPayloadOrigin = ({ _origin }: RPCRequestPayload) => storeApi.getOrigin(_origin)
 
-//TODO: should we handle non-EIP2612 e.g. DAI on mainnet?
-const signatureRequestRecognition = (typedMessage: TypedMessage<SignTypedDataVersion>) => {
-  if (isEip2612Permit(typedMessage)) return 'signErc20Permit'
-  return 'signTypedData'
-}
-
 export class Provider extends EventEmitter {
   connected = false
   connection = Chains
 
-  handlers: { [id: string]: any } = {}
   subscriptions: Subscriptions = {
     accountsChanged: [],
     assetsChanged: [],
@@ -653,7 +646,7 @@ export class Provider extends EventEmitter {
       version
     }
 
-    const type = signatureRequestRecognition(typedMessage)
+    const type = sigParser.identify(typedMessage)
 
     accounts.addRequest({
       handlerId,

@@ -17,6 +17,7 @@ const useCountdown = (targetDate) => {
 }
 
 const toString = (countdown) => {
+  if (countdown === 0) return 'EXPIRED'
   const portions = []
 
   const msInHour = 1000 * 60 * 60
