@@ -1,6 +1,6 @@
 import { spawn } from 'child_process'
 import waitOn from 'wait-on'
-import parcel from './parcel.mjs'
+import runBundler from './bundler.mjs'
 
 async function waitForTask(taskName) {
   return new Promise((resolve, reject) => {
@@ -22,7 +22,7 @@ async function prepareEnvironment() {
 }
 
 async function launchDevServer() {
-  const { server, host } = await parcel()
+  const { server, host } = await runBundler()
 
   await waitOn({
     resources: [`${host}/tray/index.dev.html`],
