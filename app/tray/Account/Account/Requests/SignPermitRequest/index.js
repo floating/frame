@@ -12,9 +12,7 @@ import CustomAmountInput from '../../../../../../resources/Components/CustomAmou
 import TypedSignatureOverview from '../../../../../../resources/Components/SimpleTypedData'
 import useCopiedMessage from '../../../../../../resources/Hooks/useCopiedMessage'
 
-const getRequestClass = ({ status = '' }) =>
-  `signerRequest ${status.charAt(0).toUpperCase() + status.slice(1)}`
-
+import { getSignatureRequestClass } from '../../../../../../resources/domain/request'
 const getPermit = (req) => {
   const {
     typedMessage: {
@@ -221,7 +219,7 @@ const PermitRequest = ({ req, originName, step, chainData }) => {
     })
   }, [])
 
-  const requestClass = getRequestClass(req)
+  const requestClass = getSignatureRequestClass(req)
 
   //TODO: Expand existing cluster, and allow token address to be copied there - dont need a second screen
   const renderStep = () => {

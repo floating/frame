@@ -1,10 +1,7 @@
 import React from 'react'
 import Restore from 'react-restore'
 import TypedSignatureOverview from '../../../../../../resources/Components/SimpleTypedData'
-
-const getRequestClass = ({ status = '' }) =>
-  `signerRequest ${status.charAt(0).toUpperCase() + status.slice(1)}`
-
+import { getSignatureRequestClass } from '../../../../../../resources/domain/request'
 class TransactionRequest extends React.Component {
   constructor(...args) {
     super(...args)
@@ -20,7 +17,7 @@ class TransactionRequest extends React.Component {
   render() {
     const { req } = this.props
     const originName = this.store('main.origins', req.origin, 'name')
-    const requestClass = getRequestClass(req)
+    const requestClass = getSignatureRequestClass(req)
     return (
       <div key={req.id || req.handlerId} className={requestClass}>
         <TypedSignatureOverview {...{ originName, req }} />
