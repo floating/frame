@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react'
 
 const useCountdown = (targetDate) => {
-  const countDownDate = new Date(targetDate).getTime()
+  const countDownDate = new Date(targetDate)
+  const [countDown, setCountDown] = useState(countDownDate.getTime() - new Date().getTime())
 
-  const [countDown, setCountDown] = useState(countDownDate - new Date().getTime())
+  const isValidDate = countDownDate instanceof Date && isFinite(countDownDate)
 
   useEffect(() => {
+    if (!isValidDate) throw new Error('Invalid targetDate passed into useCountdown', { targetDate })
     const interval = setInterval(() => {
-      setCountDown(countDownDate - new Date().getTime())
+      setCountDown(countDownDate.getTime() - new Date().getTime())
     }, 1000)
 
     return () => clearInterval(interval)
