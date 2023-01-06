@@ -27,6 +27,7 @@ export default async function () {
   const events = new EventEmitter()
 
   await bundler.run()
+
   const watcher = await bundler.watch((err, event) => {
     if (err) {
       events.emit('error', err)
@@ -34,9 +35,10 @@ export default async function () {
 
     if (event.type === 'buildSuccess') {
       const bundles = event.bundleGraph.getBundles()
-      console.log(`✨ Built ${bundles.length} bundles in ${event.buildTime}ms!`)
+      console.log(`\x1b[32m✨ Built ${bundles.length} bundles in ${event.buildTime}ms!`)
     } else if (event.type === 'buildFailure') {
-      console.log(event.diagnostics)
+      console.error('\x1b[31m🚨 Build failed!')
+      console.error('\x1b[31m', event.diagnostics)
     }
   })
 
