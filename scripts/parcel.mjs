@@ -27,7 +27,7 @@ export default async function () {
   const events = new EventEmitter()
 
   await bundler.run()
-  const server = await bundler.watch((err, event) => {
+  const watcher = await bundler.watch((err, event) => {
     if (err) {
       events.emit('error', err)
     }
@@ -40,5 +40,5 @@ export default async function () {
     }
   })
 
-  return { server, host }
+  return { server: { ...watcher, on: events.emit.bind(events) }, host }
 }
