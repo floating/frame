@@ -8,6 +8,7 @@ const useCountdown = (targetDate) => {
 
   useEffect(() => {
     if (!isValidDate) throw new Error('Invalid targetDate passed into useCountdown', { targetDate })
+    if (countDown <= 0) return
     const interval = setInterval(() => {
       setCountDown(countDownDate.getTime() - new Date().getTime())
     }, 1000)
@@ -19,7 +20,7 @@ const useCountdown = (targetDate) => {
 }
 
 const toString = (countdown) => {
-  if (countdown === 0) return 'EXPIRED'
+  if (countdown < 1) return 'EXPIRED'
   const portions = []
 
   const msInHour = 1000 * 60 * 60

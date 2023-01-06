@@ -40,7 +40,19 @@ describe('#useCountdown', () => {
     setupCountdown(startDate.getTime() + 1000 * 60 * 60)
     expect(getValue()).toBe('1h')
   })
-  it('sets the value correctly when the countdown has been completed', () => {})
-  it('sets the value to the completed state when a past date in passed in', () => {})
-  it('throws an error when an invalid date is passed in', () => {})
+  it('sets the value correctly when the countdown has been completed', () => {
+    act(() => {
+      jest.advanceTimersByTime(1000 * 60 * 60 * 24)
+    })
+    expect(getValue()).toBe('EXPIRED')
+  })
+  it('sets the value to the completed state when a past date in passed in', () => {
+    setupCountdown(startDate.getTime() - 1000)
+    expect(getValue()).toBe('EXPIRED')
+  })
+  it('throws an error when an invalid date is passed in', () => {
+    expect(() => {
+      renderHook(() => useCountdown('INVALID_DATE_CONSTRUCTOR VALUE'))
+    }).toThrow()
+  })
 })
