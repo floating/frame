@@ -2,6 +2,16 @@
 import { renderHook, act } from '@testing-library/react'
 import useCountdown from '../../../../resources/Hooks/useCountdown'
 
+const renderHookWithCount = (hook, ...args) => {
+  let count = 0
+  const renderCount = () => count
+  const result = renderHook(() => {
+    count++
+    return hook(args)
+  })
+  return { renderCount, ...result }
+}
+
 describe('#useCountdown', () => {
   const startDate = new Date('2023-01-01')
   const nextDay = new Date('2023-01-02')
@@ -26,6 +36,18 @@ describe('#useCountdown', () => {
       jest.advanceTimersByTime(1000)
     })
     expect(getValue()).toBe('23h 59m 59s')
+  })
+
+  it('updates the countdown time every second', () => {
+    let renderCount
+    const secondsPassed = 12
+    ;({ result, renderCount } = renderHookWithCount(useCountdown, '2023-01-02'))
+    for (let i = 0; i < secondsPassed; i++) {
+      act(() => {
+        jest.advanceTimersByTime(secondsPassed * 1000 + 500)
+      })
+    }
+    expect(renderCount()).toBe(secondsPassed + 1)
   })
 
   it('uses the correct extension for seconds', () => {
