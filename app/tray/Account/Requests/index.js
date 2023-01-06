@@ -14,7 +14,7 @@ import TxOverview from './TransactionRequest/TxMainNew/overview'
 import RequestItem from '../../../../resources/Components/RequestItem'
 import RingIcon from '../../../../resources/Components/RingIcon'
 
-import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../resources/Components/Cluster'
+import { ClusterBox, Cluster } from '../../../../resources/Components/Cluster'
 
 import link from '../../../../resources/link'
 import svg from '../../../../resources/svg'

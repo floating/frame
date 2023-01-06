@@ -47,7 +47,6 @@ export interface AccountRequest<T extends RequestType = RequestType> extends Req
   origin: string
   payload: JSONRPCRequestPayload
   account: string
-  typedMessage?: TypedMessage<SignTypedDataVersion>
   status?: RequestStatus
   mode?: RequestMode
   notice?: string
@@ -98,7 +97,9 @@ export interface TypedMessage<V extends SignTypedDataVersion = SignTypedDataVers
   version: V
 }
 
-export interface SignTypedDataRequest extends AccountRequest<'signTypedData'> {
+export type SignTypedDataRequest = DefaultSignTypedDataRequest | PermitSignatureRequest
+
+export interface DefaultSignTypedDataRequest extends AccountRequest<'signTypedData'> {
   typedMessage: TypedMessage
 }
 

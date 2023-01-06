@@ -656,7 +656,7 @@ export class Provider extends EventEmitter {
       payload,
       account: targetAccount.address,
       origin: payload._origin
-    })
+    } as SignTypedDataRequest)
   }
 
   subscribe(payload: RPC.Subscribe.Request, res: RPCSuccessCallback) {

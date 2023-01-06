@@ -1336,7 +1336,7 @@ describe('#updateTypedDataRequest', () => {
     }
   })
 
-  it('should update a typed data request ', () => {
+  it('should completely replace the old typed message data with the new data', () => {
     expect(requests[request].typedMessage.data.oldAttribute).toBeTruthy()
     updateSignatureMessage(request, {
       newAttribute: true

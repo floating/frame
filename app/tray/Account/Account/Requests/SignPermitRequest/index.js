@@ -10,6 +10,7 @@ import RequestHeader from '../../../../../../resources/Components/RequestHeader'
 import RequestItem from '../../../../../../resources/Components/RequestItem'
 import CustomAmountInput from '../../../../../../resources/Components/CustomAmountInput'
 import TypedSignatureOverview from '../../../../../../resources/Components/SimpleTypedData'
+import useCopiedMessage from '../../../../../../resources/Hooks/useCopiedMessage'
 
 const getRequestClass = ({ status = '' }) =>
   `signerRequest ${status.charAt(0).toUpperCase() + status.slice(1)}`
@@ -42,12 +43,7 @@ const getPermit = (req) => {
 const PermitOverview = ({ permit, req, chainData, originName, tokenData }) => {
   const { owner, deadline, spender, value } = permit
   const { chainColor, chainName, icon } = chainData
-  const [copied, setCopied] = useState(false)
-  const copyAddress = (data) => {
-    link.send('tray:clipboardData', data)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 1000)
-  }
+  const [showCopiedMessage, copySpender] = useCopiedMessage(spender)
 
   //TODO: allow time limit & value to be edited...
   return (
@@ -109,7 +105,7 @@ const PermitOverview = ({ permit, req, chainData, originName, tokenData }) => {
                       <ClusterValue
                         pointerEvents={true}
                         onClick={() => {
-                          copyAddress(spender)
+                          copySpender(spender)
                         }}
                       >
                         <div className='clusterAddress'>
@@ -120,7 +116,7 @@ const PermitOverview = ({ permit, req, chainData, originName, tokenData }) => {
                             {spender.substring(spender.length - 6)}
                           </span>
                           <div className='clusterAddressRecipientFull'>
-                            {copied ? (
+                            {showCopiedMessage ? (
                               <span>{'Address Copied'}</span>
                             ) : (
                               <span className='clusterFira'>{spender}</span>
@@ -130,7 +126,16 @@ const PermitOverview = ({ permit, req, chainData, originName, tokenData }) => {
                       </ClusterValue>
                     </ClusterRow>
 
-                    <Countdown end={deadline * 1000} title={'Permission Expires in'} />
+                    <ClusterRow>
+                      <ClusterValue>
+                        <Countdown
+                          end={deadline * 1000}
+                          title={'Permission Expires in'}
+                          innerClass='clusterFocusHighlight'
+                          titleClass='clusterFocus'
+                        />
+                      </ClusterValue>
+                    </ClusterRow>
                   </>
                 )}
 

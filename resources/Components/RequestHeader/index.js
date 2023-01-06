@@ -1,6 +1,6 @@
 import React from 'react'
 
-const ChainHeader = ({ chain, children, chainColor }) => (
+const RequestHeader = ({ chain, children, chainColor }) => (
   <div className='_txDescriptionSummary'>
     {children}
     <div className='_txDescriptionSummaryTag' style={{ color: `var(--${chainColor})` }}>
@@ -9,4 +9,4 @@ const ChainHeader = ({ chain, children, chainColor }) => (
   </div>
 )
 
-export default ChainHeader
+export default RequestHeader

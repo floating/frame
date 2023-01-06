@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react'
 import BigNumber from 'bignumber.js'
 
 import svg from '../../svg'
-import link from '../../link'
 import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../Cluster'
 
 import { MAX_HEX } from '../../constants'
 import { formatDisplayInteger } from '../../utils/numbers'
+import useCopiedMessage from '../../Hooks/useCopiedMessage'
 
 const max = new BigNumber(MAX_HEX)
 
@@ -18,13 +18,7 @@ const getMode = (requestedAmount, amount) => {
 }
 
 const Details = ({ address, name }) => {
-  const [isCopied, setCopied] = useState(false)
-
-  const copyAddress = () => {
-    link.send('tray:clipboardData', address)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 1000)
-  }
+  const [showCopiedMessage, copyAddress] = useCopiedMessage(address)
 
   return (
     <ClusterRow>
@@ -45,7 +39,11 @@ const Details = ({ address, name }) => {
             )}
           </span>
           <div className='clusterAddressRecipientFull'>
-            {isCopied ? <span>{'Address Copied'}</span> : <span className='clusterFira'>{address}</span>}
+            {showCopiedMessage ? (
+              <span>{'Address Copied'}</span>
+            ) : (
+              <span className='clusterFira'>{address}</span>
+            )}
           </div>
         </div>
       </ClusterValue>
@@ -154,7 +152,18 @@ const CustomAmountInput = ({
               name
             }}
           />
-          {deadline && <Countdown end={deadline} title={'Permission Expires in'} />}
+          {deadline && (
+            <ClusterRow>
+              <ClusterValue>
+                <Countdown
+                  end={deadline}
+                  title={'Permission Expires in'}
+                  innerClass='clusterFocusHighlight'
+                  titleClass='clusterFocus'
+                />
+              </ClusterValue>
+            </ClusterRow>
+          )}
         </Cluster>
 
         <Cluster style={{ marginTop: '16px' }}>

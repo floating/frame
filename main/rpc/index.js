@@ -145,8 +145,8 @@ const rpc = {
   updateTypedSignatureRequest(id, data) {
     try {
       accounts.updateTypedSignatureRequest(id, data)
-    } catch (e) {
-      log.error('tray:updateTypedSignatureRequest Error', e)
+    } catch (error) {
+      log.error('failed to update typed signature request', { error })
     }
   },
 
