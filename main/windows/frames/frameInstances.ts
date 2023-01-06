@@ -5,7 +5,6 @@ import { createWindow } from '../window'
 import topRight from './topRight'
 
 const isDev = process.env.NODE_ENV === 'development'
-const enableHMR = isDev && process.env.HMR === 'true'
 
 export interface FrameInstance extends BrowserWindow {
   frameId?: string
@@ -41,9 +40,7 @@ export default {
     })
 
     frameInstance.loadURL(
-      enableHMR
-        ? 'http://localhost:1234/app/Dapp/index.dev.html'
-        : `file://${process.env.BUNDLE_LOCATION}/dapp.html`
+      isDev ? 'http://localhost:1234/Dapp/index.dev.html' : `file://${process.env.BUNDLE_LOCATION}/dapp.html`
     )
 
     frameInstance.on('ready-to-show', () => {

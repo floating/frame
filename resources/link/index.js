@@ -26,11 +26,10 @@ link.invoke = (...args) => {
     window.postMessage(wrap({ id, args, source, method: 'invoke' }), '*')
   })
 }
-const safeOrigins = ['file://']
 
-if (process.env.NODE_ENV === 'development' && process.env.HMR === 'true') {
-  safeOrigins.push('http://localhost:1234')
-}
+const safeOrigins = ['file://'].concat(
+  process.env.NODE_ENV === 'development' ? ['http://localhost:1234'] : []
+)
 
 window.addEventListener(
   'message',
