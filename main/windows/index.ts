@@ -22,6 +22,7 @@ type Windows = { [key: string]: BrowserWindow }
 const events = new EventEmitter()
 const frameManager = new FrameManager()
 const isDev = process.env.NODE_ENV === 'development'
+const devToolsEnabled = isDev || process.env.ENABLE_DEV_TOOLS === 'true'
 const fullheight = !!process.env.FULL_HEIGHT
 const openedAtLogin =
   electronApp?.getLoginItemSettings() && electronApp.getLoginItemSettings().wasOpenedAtLogin
@@ -147,7 +148,7 @@ function initTrayWindow() {
     windows.tray.on('focus', () => tray.show())
   }, 2000)
 
-  if (isDev) {
+  if (devToolsEnabled) {
     windows.tray.webContents.openDevTools()
   }
 
@@ -364,7 +365,7 @@ class Dash {
         visibleOnFullScreen: true,
         skipTransformProcessType: true
       })
-      if (isDev) {
+      if (devToolsEnabled) {
         windows.dash.webContents.openDevTools()
       }
     }, 10)
@@ -426,7 +427,7 @@ class Onboard {
         visibleOnFullScreen: true,
         skipTransformProcessType: true
       })
-      if (isDev) {
+      if (devToolsEnabled) {
         windows.onboard.webContents.openDevTools()
       }
     }, 10)
