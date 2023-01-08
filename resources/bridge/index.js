@@ -4,11 +4,9 @@ import rpc from './rpc'
 const unwrap = (v) => (v !== undefined || v !== null ? JSON.parse(v) : v)
 const wrap = (v) => (v !== undefined || v !== null ? JSON.stringify(v) : v)
 const source = 'bridge:link'
-const safeOrigins = ['file://']
-
-if (process.env.NODE_ENV === 'development' && process.env.HMR === 'true') {
-  safeOrigins.push('http://localhost:1234')
-}
+const safeOrigins = ['file://'].concat(
+  process.env.NODE_ENV === 'development' ? ['http://localhost:1234'] : []
+)
 
 window.addEventListener(
   'message',
