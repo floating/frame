@@ -27,8 +27,6 @@ const bundler = new Parcel({
 const launchServer = async function () {
   const events = new EventEmitter()
 
-  await bundler.run()
-
   const watcher = await bundler.watch((err, event) => {
     if (err) {
       events.emit('error', err)
