@@ -2,7 +2,7 @@ import React from 'react'
 import Restore from 'react-restore'
 import link from '../../../../../resources/link'
 
-class Balances extends React.Component {
+class Activity extends React.Component {
   constructor(...args) {
     super(...args)
     this.moduleRef = React.createRef()
@@ -33,4 +33,4 @@ class Balances extends React.Component {
   }
 }
 
-export default Restore.connect(Balances)
+export default Restore.connect(Activity)

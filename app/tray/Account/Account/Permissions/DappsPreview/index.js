@@ -6,7 +6,7 @@ import { matchFilter } from '../../../../../../resources/utils'
 
 import { Cluster, ClusterRow, ClusterValue } from '../../../../../../resources/Components/Cluster'
 
-class Balances extends React.Component {
+class DappsPermissionsPreview extends React.Component {
   constructor(...args) {
     super(...args)
     this.moduleRef = React.createRef()
@@ -59,9 +59,9 @@ class Balances extends React.Component {
           ) : (
             permissionList.map((o) => {
               return (
-                <ClusterRow>
+                <ClusterRow key={o}>
                   <ClusterValue pointerEvents={true}>
-                    <div className='signerPermission' key={o}>
+                    <div className='signerPermission'>
                       <div className='signerPermissionControls'>
                         <div className='signerPermissionOrigin'>{permissions[o].origin}</div>
                         <div
@@ -106,4 +106,4 @@ class Balances extends React.Component {
   }
 }
 
-export default Restore.connect(Balances)
+export default Restore.connect(DappsPermissionsPreview)
