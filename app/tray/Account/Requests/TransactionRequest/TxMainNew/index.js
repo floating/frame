@@ -1,7 +1,7 @@
 import React from 'react'
 import Restore from 'react-restore'
 
-import RequestItem from '../../../../../../../resources/Components/RequestItem'
+import RequestItem from '../../../../../../resources/Components/RequestItem'
 import TxOverview from './overview'
 
 class TxMain extends React.Component {

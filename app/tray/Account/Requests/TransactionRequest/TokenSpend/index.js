@@ -2,17 +2,12 @@ import React from 'react'
 import Restore from 'react-restore'
 import BigNumber from 'bignumber.js'
 
-import svg from '../../../../../../../resources/svg'
-import link from '../../../../../../../resources/link'
-import {
-  ClusterBox,
-  Cluster,
-  ClusterRow,
-  ClusterValue
-} from '../../../../../../../resources/Components/Cluster'
+import svg from '../../../../../../resources/svg'
+import link from '../../../../../../resources/link'
+import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../../resources/Components/Cluster'
 
-import { MAX_HEX } from '../../../../../../../resources/constants'
-import { formatDisplayInteger, isUnlimited } from '../../../../../../../resources/utils/numbers'
+import { MAX_HEX } from '../../../../../../resources/constants'
+import { formatDisplayInteger, isUnlimited } from '../../../../../../resources/utils/numbers'
 
 class TokenSpend extends React.Component {
   constructor(...args) {

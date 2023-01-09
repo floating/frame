@@ -2,8 +2,8 @@ import React, { Component, useState } from 'react'
 import Restore from 'react-restore'
 import BigNumber from 'bignumber.js'
 
-import link from '../../../../../../../resources/link'
-import { usesBaseFee } from '../../../../../../../resources/domain/transaction'
+import link from '../../../../../../resources/link'
+import { usesBaseFee } from '../../../../../../resources/domain/transaction'
 
 const numberFormat = { groupSeparator: '', decimalSeparator: '.' }
 

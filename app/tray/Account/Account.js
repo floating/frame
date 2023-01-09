@@ -1,14 +1,14 @@
 import React from 'react'
 import Restore from 'react-restore'
 
-import svg from '../../../../resources/svg'
-import link from '../../../../resources/link'
+import svg from '../../../resources/svg'
+import link from '../../../resources/link'
 
 import Default from './Default'
 
 import Activity from './Activity'
 import Balances from './Balances'
-import Gas from '../../../../resources/Components/Gas'
+import Gas from '../../../resources/Components/Gas'
 import Inventory from './Inventory'
 import Permissions from './Permissions'
 import Requests from './Requests'
@@ -22,7 +22,7 @@ import SignatureRequest from './Requests/SignatureRequest'
 import ChainRequest from './Requests/ChainRequest'
 import AddTokenRequest from './Requests/AddTokenRequest'
 import SignTypedDataRequest from './Requests/SignTypedDataRequest'
-import { isHardwareSigner } from '../../../../resources/domain/signer'
+import { isHardwareSigner } from '../../../resources/domain/signer'
 
 class _AccountModule extends React.Component {
   // constructor (props, context) {

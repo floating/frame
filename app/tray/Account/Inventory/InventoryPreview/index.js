@@ -1,10 +1,10 @@
 import React from 'react'
 import Restore from 'react-restore'
-import link from '../../../../../../resources/link'
-import svg from '../../../../../../resources/svg'
-import { matchFilter } from '../../../../../../resources/utils'
+import link from '../../../../../resources/link'
+import svg from '../../../../../resources/svg'
+import { matchFilter } from '../../../../../resources/utils'
 
-import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../../resources/Components/Cluster'
+import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../resources/Components/Cluster'
 
 class Inventory extends React.Component {
   constructor(...args) {

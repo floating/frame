@@ -1,17 +1,12 @@
 import React from 'react'
 import Restore from 'react-restore'
 
-import link from '../../../../../../resources/link'
-import svg from '../../../../../../resources/svg'
-import { findUnavailableSigners, isHardwareSigner } from '../../../../../../resources/domain/signer'
-import { accountPanelCrumb, signerPanelCrumb } from '../../../../../../resources/domain/nav'
+import link from '../../../../../resources/link'
+import svg from '../../../../../resources/svg'
+import { findUnavailableSigners, isHardwareSigner } from '../../../../../resources/domain/signer'
+import { accountPanelCrumb, signerPanelCrumb } from '../../../../../resources/domain/nav'
 
-import {
-  Cluster,
-  ClusterRow,
-  ClusterColumn,
-  ClusterValue
-} from '../../../../../../resources/Components/Cluster'
+import { Cluster, ClusterRow, ClusterColumn, ClusterValue } from '../../../../../resources/Components/Cluster'
 
 const isWatchOnly = (account = {}) => {
   return ['address'].includes(account.lastSignerType.toLowerCase())

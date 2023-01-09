@@ -2,17 +2,12 @@ import React from 'react'
 import Restore from 'react-restore'
 import BigNumber from 'bignumber.js'
 
-import svg from '../../../../../../../resources/svg'
-import link from '../../../../../../../resources/link'
-import {
-  ClusterBox,
-  Cluster,
-  ClusterRow,
-  ClusterValue
-} from '../../../../../../../resources/Components/Cluster'
-import { formatDisplayInteger, isUnlimited } from '../../../../../../../resources/utils/numbers'
-import { DisplayValue, DisplayCoinBalance } from '../../../../../../../resources/Components/DisplayValue'
-import { getAddress } from '../../../../../../../resources/utils'
+import svg from '../../../../../../resources/svg'
+import link from '../../../../../../resources/link'
+import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../../resources/Components/Cluster'
+import { formatDisplayInteger, isUnlimited } from '../../../../../../resources/utils/numbers'
+import { DisplayValue, DisplayCoinBalance } from '../../../../../../resources/Components/DisplayValue'
+import { getAddress } from '../../../../../../resources/utils'
 
 class TxSending extends React.Component {
   constructor(...args) {

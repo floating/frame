@@ -2,18 +2,18 @@ import React from 'react'
 import Restore from 'react-restore'
 import BigNumber from 'bignumber.js'
 
-import link from '../../../../../../resources/link'
-import svg from '../../../../../../resources/svg'
-import { isNetworkConnected } from '../../../../../../resources/utils/chains'
+import link from '../../../../../resources/link'
+import svg from '../../../../../resources/svg'
+import { isNetworkConnected } from '../../../../../resources/utils/chains'
 import {
   formatUsdRate,
   createBalance,
   sortByTotalValue as byTotalValue,
   isNativeCurrency
-} from '../../../../../../resources/domain/balance'
-import { matchFilter } from '../../../../../../resources/utils'
+} from '../../../../../resources/domain/balance'
+import { matchFilter } from '../../../../../resources/utils'
 
-import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../../resources/Components/Cluster'
+import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../resources/Components/Cluster'
 
 import Balance from '../Balance'
 

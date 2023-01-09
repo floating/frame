@@ -1,7 +1,7 @@
 import React from 'react'
 import Restore from 'react-restore'
 import { isHexString } from '@ethersproject/bytes'
-import { stripHexPrefix } from './../../../../../../resources/utils'
+import { stripHexPrefix } from './../../../../../resources/utils'
 
 function decodeMessage(rawMessage) {
   if (isHexString(rawMessage)) {

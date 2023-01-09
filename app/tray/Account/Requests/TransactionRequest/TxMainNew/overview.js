@@ -1,12 +1,12 @@
 import React from 'react'
 
-import link from '../../../../../../../resources/link'
+import link from '../../../../../../resources/link'
 import EnsOverview from '../../Ens'
 
-import svg from '../../../../../../../resources/svg'
+import svg from '../../../../../../resources/svg'
 
-import { Cluster, ClusterRow, ClusterValue } from '../../../../../../../resources/Components/Cluster'
-import { DisplayValue } from '../../../../../../../resources/Components/DisplayValue'
+import { Cluster, ClusterRow, ClusterValue } from '../../../../../../resources/Components/Cluster'
+import { DisplayValue } from '../../../../../../resources/Components/DisplayValue'
 
 const isNonZeroHex = (hex) => !!hex && !['0x', '0x0'].includes(hex)
 

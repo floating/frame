@@ -10,7 +10,7 @@ import TxRecipient from './TxRecipient'
 import AdjustFee from './AdjustFee'
 import ViewData from './ViewData'
 import TokenSpend from './TokenSpend'
-import link from '../../../../../../resources/link'
+import link from '../../../../../resources/link'
 
 class TransactionRequest extends React.Component {
   constructor(props, context) {

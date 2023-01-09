@@ -2,17 +2,17 @@ import React from 'react'
 import Restore from 'react-restore'
 import BigNumber from 'bignumber.js'
 
-import { DisplayCoinBalance, DisplayValue } from '../../../../../../../resources/Components/DisplayValue'
-import { GasFeesSource, usesBaseFee } from '../../../../../../../resources/domain/transaction'
-import { displayValueData } from '../../../../../../../resources/utils/displayValue'
-import link from '../../../../../../../resources/link'
+import { DisplayCoinBalance, DisplayValue } from '../../../../../../resources/Components/DisplayValue'
+import { GasFeesSource, usesBaseFee } from '../../../../../../resources/domain/transaction'
+import { displayValueData } from '../../../../../../resources/utils/displayValue'
+import link from '../../../../../../resources/link'
 import {
   ClusterBox,
   Cluster,
   ClusterRow,
   ClusterColumn,
   ClusterValue
-} from '../../../../../../../resources/Components/Cluster'
+} from '../../../../../../resources/Components/Cluster'
 
 const FEE_WARNING_THRESHOLD_USD = 50
 

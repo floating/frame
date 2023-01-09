@@ -1,8 +1,8 @@
 import React from 'react'
 import Restore from 'react-restore'
 
-import { DisplayFiatPrice, DisplayValue } from '../../../../../../resources/Components/DisplayValue'
-import RingIcon from '../../../../../../resources/Components/RingIcon'
+import { DisplayFiatPrice, DisplayValue } from '../../../../../resources/Components/DisplayValue'
+import RingIcon from '../../../../../resources/Components/RingIcon'
 
 class Balance extends React.Component {
   render() {

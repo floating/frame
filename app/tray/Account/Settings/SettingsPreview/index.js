@@ -1,9 +1,9 @@
 import React from 'react'
 import Restore from 'react-restore'
-import link from '../../../../../../resources/link'
-import svg from '../../../../../../resources/svg'
+import link from '../../../../../resources/link'
+import svg from '../../../../../resources/svg'
 
-import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../../resources/Components/Cluster'
+import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../resources/Components/Cluster'
 
 // import Verify from '../Verify'
 
