@@ -4,7 +4,7 @@ import { screen } from '@testing-library/dom'
 
 import store from '../../../../../../../main/store'
 import { setupComponent } from '../../../../../../componentSetup'
-import TxRequestComponent from '../../../../../../../app/tray/Account/Account/Requests/TransactionRequest'
+import TxRequestComponent from '../../../../../../../app/tray/Account/Requests/TransactionRequest'
 
 jest.mock('../../../../../../../main/store/persist')
 jest.mock('../../../../../../../resources/link', () => ({ rpc: jest.fn() }))
