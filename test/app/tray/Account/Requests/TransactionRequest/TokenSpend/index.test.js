@@ -3,10 +3,10 @@ import { fireEvent, render } from '@testing-library/react'
 import { addHexPrefix } from '@ethereumjs/util'
 
 import Restore from 'react-restore'
-import store from '../../../../../../../../main/store'
-import ApproveTokenSpendComponent from '../../../../../../../../app/tray/Account/Requests/TransactionRequest/TokenSpend'
+import store from '../../../../../../../main/store'
+import ApproveTokenSpendComponent from '../../../../../../../app/tray/Account/Requests/TransactionRequest/TokenSpend'
 
-jest.mock('../../../../../../../../main/store/persist')
+jest.mock('../../../../../../../main/store/persist')
 
 const TokenSpend = Restore.connect(ApproveTokenSpendComponent, store)
 

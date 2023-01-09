@@ -2,12 +2,12 @@ import React from 'react'
 import Restore from 'react-restore'
 import { screen } from '@testing-library/dom'
 
-import store from '../../../../../../../main/store'
-import { setupComponent } from '../../../../../../componentSetup'
-import TxRequestComponent from '../../../../../../../app/tray/Account/Requests/TransactionRequest'
+import store from '../../../../../../main/store'
+import { setupComponent } from '../../../../../componentSetup'
+import TxRequestComponent from '../../../../../../app/tray/Account/Requests/TransactionRequest'
 
-jest.mock('../../../../../../../main/store/persist')
-jest.mock('../../../../../../../resources/link', () => ({ rpc: jest.fn() }))
+jest.mock('../../../../../../main/store/persist')
+jest.mock('../../../../../../resources/link', () => ({ rpc: jest.fn() }))
 
 const TxRequest = Restore.connect(TxRequestComponent, store)
 

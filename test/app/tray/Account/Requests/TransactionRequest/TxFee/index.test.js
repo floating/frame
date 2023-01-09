@@ -2,13 +2,13 @@ import React from 'react'
 import Restore from 'react-restore'
 import { addHexPrefix } from '@ethereumjs/util'
 
-import store from '../../../../../../../../main/store'
-import { setupComponent } from '../../../../../../../componentSetup'
-import TxFeeComponent from '../../../../../../../../app/tray/Account/Requests/TransactionRequest/TxFee'
-import { GasFeesSource } from '../../../../../../../../resources/domain/transaction'
+import store from '../../../../../../../main/store'
+import { setupComponent } from '../../../../../../componentSetup'
+import TxFeeComponent from '../../../../../../../app/tray/Account/Requests/TransactionRequest/TxFee'
+import { GasFeesSource } from '../../../../../../../resources/domain/transaction'
 
-jest.mock('../../../../../../../../main/store/persist')
-jest.mock('../../../../../../../../resources/link', () => ({ rpc: jest.fn() }))
+jest.mock('../../../../../../../main/store/persist')
+jest.mock('../../../../../../../resources/link', () => ({ rpc: jest.fn() }))
 
 const TxFee = Restore.connect(TxFeeComponent, store)
 let req
