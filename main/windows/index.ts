@@ -399,12 +399,11 @@ class Onboard {
     if (!tray.isReady()) {
       return
     }
-    setTimeout(() => {
-      windows.onboard.on('ready-to-show', () => {
-        windows.onboard.show()
-      })
 
-      windows.onboard.on('close', () => {
+    setTimeout(() => {
+      windows.onboard.once('close', () => {
+        store.completeOnboarding()
+        windows.tray.focus()
         delete windows.onboard
       })
 
@@ -481,18 +480,12 @@ const init = () => {
   if (tray) {
     tray.destroy()
   }
+
   tray = new Tray()
   dash = new Dash()
 
   if (!store('main.mute.onboardingWindow')) {
     onboard = new Onboard()
-
-    store.observer(() => {
-      if (!store('windows.onboard.showing')) {
-        onboard.hide()
-        windows.tray.focus()
-      }
-    })
   }
 
   // data change events
