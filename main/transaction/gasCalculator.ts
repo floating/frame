@@ -86,11 +86,11 @@ export default class GasCalculator {
 
     // use the median reward from the block sample or use the fee from the last block as a last resort
     const lastBlockFee = blocks[blocks.length - 1].rewards[0]
-    const reward =
+    return (
       eligibleRewardsBlocks.map((block) => block.rewards[0]).sort()[
         Math.floor(eligibleRewardsBlocks.length / 2)
       ] || lastBlockFee
-    return reward
+    )
   }
 
   async getGasPrices(): Promise<GasPrices> {
