@@ -730,7 +730,6 @@ module.exports = {
   },
   completeOnboarding: (u) => {
     u('main.mute.onboardingWindow', () => true)
-    u('windows.onboard.showing', () => false)
   },
   // Dapp Frame
   appDapp: (u, dapp) => {

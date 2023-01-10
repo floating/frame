@@ -25,8 +25,8 @@ const CurrentSlide = ({ slide, platform, setTitle, setProceed }) => {
 }
 
 const onComplete = () => {
-  link.send('tray:action', 'completeOnboarding')
   link.send('tray:action', 'navReplace', 'dash')
+  link.send('frame:close')
 }
 
 const prevSlide = (currentSlide, setSlide) => {
