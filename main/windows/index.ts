@@ -532,11 +532,7 @@ const broadcast = (channel: string, ...args: string[]) => {
 }
 
 store.api.feed((_state, actions) => {
-  actions.forEach((action) => {
-    action.updates.forEach((update) => {
-      broadcast('main:action', 'pathSync', update.path, update.value)
-    })
-  })
+  broadcast('main:action', 'stateSync', JSON.stringify(actions))
 })
 
 export default {

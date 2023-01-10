@@ -11,7 +11,18 @@ module.exports = {
       return Object.assign(module, update)
     })
   },
-  pathSync: (u, path, value) => u(path, () => value),
+  stateSync: (u, _actions) => {
+    try {
+      const actions = JSON.parse(_actions)
+      actions.forEach((action) => {
+        action.updates.forEach((update) => {
+          u(update.path, () => update.value)
+        })
+      })
+    } catch (e) {
+      console.error('State Syncing Error', e)
+    }
+  },
   syncPanel: (u, panel) => u('panel', () => panel),
   setSigner: (u, signer) => {
     u('selected.current', () => signer.id)

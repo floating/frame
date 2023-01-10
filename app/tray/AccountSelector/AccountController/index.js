@@ -421,12 +421,6 @@ class Account extends React.Component {
     const account = this.store('main.accounts', id)
     const isAddAccountView = this.store('view.addAccount')
 
-    if (!account) {
-      // TODO: why is this rendering if the account is gone?
-      console.warn('no account!')
-      return
-    }
-
     const current = selectedAccountId === id && status === 'ok'
     const selectedAccountOpen = current && open
 
