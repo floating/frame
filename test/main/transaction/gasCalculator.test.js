@@ -1,4 +1,8 @@
 import GasCalculator from '../../../main/transaction/gasCalculator'
+import feeTransformers from '../../../main/chains/feeTransformers'
+import { intToHex } from '@ethereumjs/util'
+import { gweiToWei } from '../../../resources/utils'
+import { gweiToHex } from '../../util'
 
 let requestHandlers
 let testConnection = {
@@ -193,6 +197,36 @@ describe('#getFeePerGas', () => {
 
       expect(fees.maxBaseFeePerGas).toBe('0xe7')
       expect(fees.maxPriorityFeePerGas).toBe('0x0')
+    })
+
+    it('uses a feeTransformer when one is provided', async () => {
+      const mockTransformer = jest.fn()
+      const gas = new GasCalculator(testConnection, mockTransformer)
+
+      const fees = await gas.getFeePerGas()
+      expect(mockTransformer).toHaveBeenCalled()
+    })
+
+    describe('polygon fee transformer', () => {
+      it('should update polygon maxPriorityFee below 30 gwei to 30 gwei', async () => {
+        gasUsedRatios = [0.99024061496050893, 0.07942918604838942]
+        blockRewards = [['0x3b9aca00'], ['0x3b9aca00']]
+
+        const gas = new GasCalculator(testConnection, feeTransformers[137])
+
+        const fees = await gas.getFeePerGas()
+        expect(fees.maxPriorityFeePerGas).toBe(gweiToHex(30))
+      })
+
+      it('does not change any maxPriorityFeePerGas that is over 30 gwei', async () => {
+        gasUsedRatios = [0.99024061496050893, 0.07942918604838942]
+        blockRewards = [[gweiToHex(45)], [gweiToHex(45)]]
+
+        const gas = new GasCalculator(testConnection, feeTransformers[137])
+
+        const fees = await gas.getFeePerGas()
+        expect(fees.maxPriorityFeePerGas).toBe(gweiToHex(45))
+      })
     })
   })
 })

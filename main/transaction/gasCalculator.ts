@@ -20,11 +20,15 @@ interface GasPrices {
   asap: string
 }
 
+export type FeeTransformer = (gasFees: GasFees) => GasFees
+
 export default class GasCalculator {
   private connection
+  private feeTransformer
 
-  constructor(connection: any /* Chains */) {
+  constructor(connection: any /* Chains */, feeTransformer?: FeeTransformer) {
     this.connection = connection
+    this.feeTransformer = feeTransformer
   }
 
   private async getFeeHistory(
@@ -82,11 +86,11 @@ export default class GasCalculator {
 
     // use the median reward from the block sample or use the fee from the last block as a last resort
     const lastBlockFee = blocks[blocks.length - 1].rewards[0]
-    return (
+    const reward =
       eligibleRewardsBlocks.map((block) => block.rewards[0]).sort()[
         Math.floor(eligibleRewardsBlocks.length / 2)
       ] || lastBlockFee
-    )
+    return reward
   }
 
   async getGasPrices(): Promise<GasPrices> {
@@ -114,11 +118,13 @@ export default class GasCalculator {
     // don't use it in the block reward calculation
     const medianBlockReward = this.calculateReward(blocks.slice(0, blocks.length - 1))
 
-    return {
+    const estimatedGasFees = {
       nextBaseFee: intToHex(nextBlockFee),
       maxBaseFeePerGas: intToHex(calculatedFee),
       maxPriorityFeePerGas: intToHex(medianBlockReward),
       maxFeePerGas: intToHex(calculatedFee + medianBlockReward)
     }
+
+    return this.feeTransformer ? this.feeTransformer(estimatedGasFees) : estimatedGasFees
   }
 }

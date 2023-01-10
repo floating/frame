@@ -6,6 +6,7 @@ const { Hardfork } = require('@ethereumjs/common')
 const provider = require('eth-provider')
 const log = require('electron-log')
 
+const feeTransformers = require('./feeTransformers')
 const store = require('../store').default
 const { default: BlockMonitor } = require('./blocks')
 const { default: chainConfig } = require('./config')
@@ -81,13 +82,12 @@ class ChainConnection extends EventEmitter {
     monitor.on('data', async (block) => {
       let feeMarket = null
 
-      const gasCalculator = new GasCalculator(provider)
+      const gasCalculator = new GasCalculator(provider, feeTransformers[this.chainId])
 
       if (allowEip1559 && 'baseFeePerGas' in block) {
         try {
           // only consider this an EIP-1559 block if fee market can be loaded
           feeMarket = await gasCalculator.getFeePerGas()
-
           this.chainConfig.setHardforkByBlockNumber(block.number)
 
           if (!this.chainConfig.gteHardfork(Hardfork.London)) {
