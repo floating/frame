@@ -1,10 +1,18 @@
 {
-  "extends": ["eslint:recommended", "plugin:import/recommended", "prettier"],
-  "plugins": ["import"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:import/recommended",
+    "plugin:react/recommended",
+    "plugin:react/jsx-runtime",
+    "plugin:react-hooks/recommended",
+    "prettier"
+  ],
+  "plugins": ["import", "react"],
   "rules": {
     "import/no-unresolved": "off",
-    "import/extensions": ["error", { "js": "never", "ts": "never", "json": "always" }],
-    "no-unused-vars": ["error", { "ignoreRestSiblings": true, "destructuredArrayIgnorePattern": "^_" }]
+    "import/extensions": ["error", { "js": "never", "ts": "never", "mjs": "always", "json": "always" }],
+    "no-unused-vars": ["error", { "ignoreRestSiblings": true, "destructuredArrayIgnorePattern": "^_" }],
+    "react/prop-types": "off"
   },
   "parserOptions": {
     "sourceType": "module",
@@ -16,6 +24,9 @@
   "settings": {
     "import/resolver": {
       "node": true
+    },
+    "react": {
+      "version": "detect"
     }
   },
   "env": {
@@ -26,7 +37,13 @@
     {
       "files": ["**/*.ts", "**/*.tsx"],
       "parser": "@typescript-eslint/parser",
-      "extends": ["eslint:recommended", "plugin:import/recommended", "plugin:import/typescript", "prettier"],
+      "extends": [
+        "eslint:recommended",
+        "plugin:import/recommended",
+        "plugin:import/typescript",
+        "plugin:@typescript-eslint/recommended",
+        "prettier"
+      ],
       "plugins": ["@typescript-eslint", "import"],
       "parserOptions": {
         "ecmaVersion": 2020,
@@ -39,6 +56,9 @@
         "import/resolver": {
           "typescript": true,
           "node": true
+        },
+        "react": {
+          "version": "detect"
         }
       },
       "rules": {
@@ -48,8 +68,8 @@
     },
     {
       "files": ["test/**", "**/__mocks__/**"],
-      "plugins": ["jest", "testing-library"],
-      "extends": [],
+      "plugins": ["react", "jest", "testing-library"],
+      "extends": ["plugin:react/recommended", "plugin:react/jsx-runtime", "plugin:testing-library/react"],
       "env": {
         "jest/globals": true
       },

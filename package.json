@@ -173,10 +173,7 @@
     "eslint-import-resolver-typescript": "3.5.2",
     "eslint-plugin-import": "2.26.0",
     "eslint-plugin-jest": "27.1.6",
-    "eslint-plugin-jsx-a11y": "6.6.1",
-    "eslint-plugin-n": "15.5.1",
-    "eslint-plugin-promise": "6.1.1",
-    "eslint-plugin-react": "7.31.11",
+    "eslint-plugin-react": "7.32.0",
     "eslint-plugin-react-hooks": "4.6.0",
     "eslint-plugin-testing-library": "5.9.1",
 >>>>>>> e7431409 (add linting config)
@@ -283,6 +280,16 @@
       "react-restore>babel-core>babel-register>core-js": true,
       "react-restore>babel-core>babel-runtime>core-js": true,
       "styled-components": false,
+<<<<<<< HEAD
+=======
+      "trezor-connect>@trezor/transport>protobufjs": false,
+      "trezor-connect>@trezor/utxo-lib>blake-hash": false,
+      "trezor-connect>@trezor/utxo-lib>tiny-secp256k1": false,
+      "web3": false,
+      "web3>web3-bzz": false,
+      "web3>web3-core>web3-core-requestmanager>web3-providers-ws>websocket>es5-ext": false,
+      "web3>web3-shh": false,
+>>>>>>> 454bee34 (update conf)
       "ws>bufferutil": false,
       "ws>utf-8-validate": false
     }
