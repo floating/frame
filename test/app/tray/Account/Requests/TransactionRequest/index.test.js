@@ -1,9 +1,8 @@
 import React from 'react'
 import Restore from 'react-restore'
-import { screen } from '@testing-library/dom'
 
 import store from '../../../../../../main/store'
-import { setupComponent } from '../../../../../componentSetup'
+import { screen, render } from '../../../../../componentSetup'
 import TxRequestComponent from '../../../../../../app/tray/Account/Requests/TransactionRequest'
 
 jest.mock('../../../../../../main/store/persist')
@@ -36,7 +35,7 @@ describe('confirm', () => {
 
     addRequest(req)
 
-    setupComponent(<TxRequest step='confirm' handlerId={req.handlerId} accountId={account} />)
+    render(<TxRequest step='confirm' handlerId={req.handlerId} accountId={account} />)
 
     const notice = screen.getByRole('status')
     expect(notice.textContent).toBe('confirming')
@@ -56,7 +55,7 @@ describe('confirm', () => {
 
     addRequest(req)
 
-    setupComponent(<TxRequest step='confirm' handlerId={req.handlerId} accountId={account} />)
+    render(<TxRequest step='confirm' handlerId={req.handlerId} accountId={account} />)
 
     const notice = screen.getByRole('alert')
     expect(notice.textContent).toMatch(/insufficient funds for gas/i)
