@@ -1,25 +1,10 @@
 {
-  "extends": [
-    "eslint:recommended",
-    "plugin:import/recommended",
-    "plugin:jsx-a11y/recommended",
-    "plugin:n/recommended",
-    "plugin:promise/recommended",
-    "plugin:react/recommended",
-    "plugin:react-hooks/recommended",
-    "prettier"
-  ],
-  "plugins": ["import", "promise", "react", "jsx-a11y"],
+  "extends": ["eslint:recommended", "plugin:import/recommended", "prettier"],
+  "plugins": ["import"],
   "rules": {
-    "n/no-missing-import": "off",
-    "n/no-unpublished-import": "off",
-    "n/no-unpublished-require": "off",
     "import/no-unresolved": "off",
     "import/extensions": ["error", { "js": "never", "ts": "never", "json": "always" }],
-    "react/prop-types": "off",
-    "promise/catch-or-return": ["error", { "allowFinally": true }],
-    "no-unused-vars": ["error", { "ignoreRestSiblings": true, "destructuredArrayIgnorePattern": "^_" }],
-    "jsx-a11y/click-events-have-key-events": "off"
+    "no-unused-vars": ["error", { "ignoreRestSiblings": true, "destructuredArrayIgnorePattern": "^_" }]
   },
   "parserOptions": {
     "sourceType": "module",
@@ -31,32 +16,18 @@
   "settings": {
     "import/resolver": {
       "node": true
-    },
-    "react": {
-      "version": "detect"
-    },
-    "node": {
-      "tryExtensions": [".js", ".ts"]
     }
+  },
+  "env": {
+    "node": true,
+    "es6": true
   },
   "overrides": [
     {
       "files": ["**/*.ts", "**/*.tsx"],
       "parser": "@typescript-eslint/parser",
-      "extends": [
-        "eslint:recommended",
-        "plugin:@typescript-eslint/recommended",
-        "plugin:@typescript-eslint/recommended-requiring-type-checking",
-        "plugin:import/recommended",
-        "plugin:import/typescript",
-        "plugin:jsx-a11y/recommended",
-        "plugin:n/recommended",
-        "plugin:promise/recommended",
-        "plugin:react/recommended",
-        "plugin:react-hooks/recommended",
-        "prettier"
-      ],
-      "plugins": ["@typescript-eslint", "import", "promise", "react", "jsx-a11y"],
+      "extends": ["eslint:recommended", "plugin:import/recommended", "plugin:import/typescript", "prettier"],
+      "plugins": ["@typescript-eslint", "import"],
       "parserOptions": {
         "ecmaVersion": 2020,
         "ecmaFeatures": {
@@ -68,27 +39,17 @@
         "import/resolver": {
           "typescript": true,
           "node": true
-        },
-        "react": {
-          "version": "detect"
         }
       },
       "rules": {
-        "n/no-missing-import": "off",
-        "n/no-unpublished-import": "off",
-        "n/no-deprecated-api": ["error", { "ignoreModuleItems": ["domain"] }],
         "no-empty-function": "off",
-        "@typescript-eslint/no-explicit-any": ["error", { "ignoreRestArgs": true }],
-        "@typescript-eslint/no-unused-vars": [
-          "error",
-          { "ignoreRestSiblings": true, "destructuredArrayIgnorePattern": "^_" }
-        ]
+        "no-undef": "off"
       }
     },
     {
       "files": ["test/**", "**/__mocks__/**"],
       "plugins": ["jest", "testing-library"],
-      "extends": ["plugin:jest/recommended", "plugin:testing-library/react"],
+      "extends": [],
       "env": {
         "jest/globals": true
       },
@@ -99,6 +60,10 @@
       "globals": {
         "window": true,
         "document": true
+      },
+      "env": {
+        "browser": true,
+        "es6": true
       }
     }
   ]
