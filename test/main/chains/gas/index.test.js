@@ -17,17 +17,8 @@ describe('#gasCalculator', () => {
     feeHistory = []
   })
 
-  it('calculates the base fee for the next couple blocks', async () => {
+  it('calculates the base fee for the next block', async () => {
     feeHistory = [
-      { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
-      { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
-      { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
-      { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
-      { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
-      { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
-      { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
-      { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
-      { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
       { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
       { baseFee: 182, rewards: [] }
     ]
@@ -40,11 +31,6 @@ describe('#gasCalculator', () => {
       // all blocks with gas ratios between 0.1 and 0.9 will be considered for calculating the median priority fee
       feeHistory = [
         { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
-        { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
-        { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
-        { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
-        { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
-        { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
         { baseFee: 8, gasUsedRatio: 0.1801134637893198, rewards: [1000000000] },
         { baseFee: 8, gasUsedRatio: 0.23114498292513627, rewards: [2000000000] },
         { baseFee: 8, gasUsedRatio: 0.17942918604838942, rewards: [1000000000] },
@@ -56,10 +42,6 @@ describe('#gasCalculator', () => {
     it('excludes full blocks from the priority fee calculation', async () => {
       // all full blocks (gas ratios above 0.9) will be excluded from calculating the median priority fee
       feeHistory = [
-        { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
-        { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
-        { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
-        { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
         { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
         { baseFee: 8, gasUsedRatio: 0.1801134637893198, rewards: [1000000000] },
         { baseFee: 8, gasUsedRatio: 1, rewards: [2000000000] },
@@ -74,11 +56,6 @@ describe('#gasCalculator', () => {
     it('excludes "empty" blocks from the priority fee calculation', async () => {
       // all empty blocks (gas ratios below 0.1) will be excluded from calculating the median priority fee
       feeHistory = [
-        { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
-        { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
-        { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
-        { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
-        { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
         { baseFee: 8, gasUsedRatio: 0.1801134637893198, rewards: [1000000000] },
         { baseFee: 8, gasUsedRatio: 0.0801134637893198, rewards: [2000000000] },
         { baseFee: 8, gasUsedRatio: 0.23114498292513627, rewards: [2000000000] },
@@ -92,11 +69,6 @@ describe('#gasCalculator', () => {
     it('considers full blocks if no partial blocks are eligible', async () => {
       // full blocks (gas ratios above 0.9) will be considered only if no blocks with a ratio between 0.1 and 0.9 are available
       feeHistory = [
-        { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
-        { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
-        { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
-        { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
-        { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
         { baseFee: 8, gasUsedRatio: 0.9801134637893198, rewards: [1000000000] },
         { baseFee: 8, gasUsedRatio: 1, rewards: [2000000000] },
         { baseFee: 8, gasUsedRatio: 0.03114498292513627, rewards: [1000000000] },
@@ -112,14 +84,6 @@ describe('#gasCalculator', () => {
       // index in array represents distance away from current block
       feeHistory = [
         { baseFee: 8, gasUsedRatio: 0.73, rewards: [2587202560] },
-        { baseFee: 8, rewards: [] },
-        { baseFee: 8, rewards: [] },
-        { baseFee: 8, rewards: [] },
-        { baseFee: 8, rewards: [] },
-        { baseFee: 8, rewards: [] },
-        { baseFee: 8, rewards: [] },
-        { baseFee: 8, rewards: [] },
-        { baseFee: 8, rewards: [] },
         { baseFee: 8, gasUsedRatio: 0.02, rewards: [2000000000] },
         { baseFee: 182, rewards: [] }
       ]
@@ -127,11 +91,6 @@ describe('#gasCalculator', () => {
     })
     it('uses any recent blocks if no blocks in the sample have the qualifying gas ratios', async () => {
       feeHistory = [
-        { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
-        { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
-        { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
-        { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
-        { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
         { baseFee: 8, gasUsedRatio: 0.0801134637893198, rewards: [1000000000] },
         { baseFee: 8, gasUsedRatio: 1.1, rewards: [2000000000] },
         { baseFee: 8, gasUsedRatio: 0.03114498292513627, rewards: [1000000000] },
@@ -148,12 +107,6 @@ describe('#gasCalculator', () => {
         { baseFee: 8, gasUsedRatio: 0.073, rewards: [2587202560] },
         { baseFee: 8, rewards: [] },
         { baseFee: 8, gasUsedRatio: 1.122, rewards: [2000000000] },
-        { baseFee: 8, rewards: [] },
-        { baseFee: 8, rewards: [] },
-        { baseFee: 8, rewards: [] },
-        { baseFee: 8, rewards: [] },
-        { baseFee: 8, rewards: [] },
-        { baseFee: 8, rewards: [] },
         { baseFee: 8, gasUsedRatio: 1.2239, rewards: [1000000000] },
         { baseFee: 182, rewards: [] }
       ]
@@ -169,15 +122,6 @@ describe('#gasCalculator', () => {
     it('uses the priority fee from the latest block when no eligible blocks are available', async () => {
       feeHistory = [
         { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
-        { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
-        { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
-        { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
-        { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
-        { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
-        { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
-        { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
-        { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
-        { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
         { baseFee: 182, rewards: [] }
       ]
 
@@ -192,14 +136,6 @@ describe('#gasCalculator', () => {
       })
       it('should update polygon maxPriorityFee below 30 gwei to 30 gwei', async () => {
         feeHistory = [
-          { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
-          { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
-          { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
-          { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
-          { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
-          { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
-          { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
-          { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
           { baseFee: 8, gasUsedRatio: 0.07942918604838942, rewards: [1000000000] },
           { baseFee: 8, gasUsedRatio: 0.990240614960509, rewards: [1000000000] },
           { baseFee: 182, rewards: [] }
@@ -208,14 +144,6 @@ describe('#gasCalculator', () => {
       })
       it('does not change any maxPriorityFeePerGas that is over 30 gwei', async () => {
         feeHistory = [
-          { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
-          { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
-          { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
-          { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
-          { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
-          { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
-          { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
-          { baseFee: 8, gasUsedRatio: 0, rewards: [0] },
           { baseFee: 8, gasUsedRatio: 0.07942918604838942, rewards: [45000000000] },
           { baseFee: 8, gasUsedRatio: 0.990240614960509, rewards: [45000000000] },
           { baseFee: 182, rewards: [] }
