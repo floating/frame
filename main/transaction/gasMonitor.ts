@@ -16,8 +16,6 @@ interface GasPrices {
   asap: string
 }
 
-export type FeeTransformer = (gasFees: GasFees) => GasFees
-
 export default class GasMonitor {
   private connection
 
