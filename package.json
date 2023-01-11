@@ -160,10 +160,18 @@
     "electron": "22.0.0",
     "electron-builder": "23.6.0",
     "electron-devtools-installer": "3.2.0",
+<<<<<<< HEAD
     "eslint": "8.31.0",
     "eslint-config-prettier": "8.6.0",
 <<<<<<< HEAD
     "eslint-plugin-jest": "27.2.1",
+=======
+    "eslint": "8.29.0",
+    "eslint-config-prettier": "8.5.0",
+    "eslint-import-resolver-typescript": "3.5.2",
+    "eslint-plugin-import": "2.26.0",
+    "eslint-plugin-jest": "27.1.6",
+>>>>>>> 454bee34 (update conf)
     "eslint-plugin-react": "7.32.0",
     "eslint-plugin-react-hooks": "4.6.0",
     "eslint-plugin-testing-library": "5.9.1",
@@ -293,6 +301,12 @@
       "react-restore>babel-core>babel-register>core-js": true,
       "react-restore>babel-core>babel-runtime>core-js": true,
       "styled-components": false,
+<<<<<<< HEAD
+=======
+      "trezor-connect>@trezor/transport>protobufjs": false,
+      "trezor-connect>@trezor/utxo-lib>blake-hash": false,
+      "trezor-connect>@trezor/utxo-lib>tiny-secp256k1": false,
+>>>>>>> 454bee34 (update conf)
       "web3": false,
       "web3>web3-bzz": false,
       "web3>web3-core>web3-core-requestmanager>web3-providers-ws>websocket>es5-ext": false,
