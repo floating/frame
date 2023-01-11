@@ -37,7 +37,7 @@ describe('#gasCalculator', () => {
         { baseFee: 8, gasUsedRatio: 0.12024061496050893, rewards: [4000000000] },
         { baseFee: 182, rewards: [] }
       ]
-      expect(await calculateMaxPriority()).toBe('0x77359400')
+      return expect(calculateMaxPriority()).resolves.toBe('0x77359400')
     })
     it('excludes full blocks from the priority fee calculation', async () => {
       // all full blocks (gas ratios above 0.9) will be excluded from calculating the median priority fee
@@ -51,7 +51,7 @@ describe('#gasCalculator', () => {
         { baseFee: 182, rewards: [] }
       ]
 
-      expect(await calculateMaxPriority()).toBe('0x3b9aca00')
+      return expect(calculateMaxPriority()).resolves.toBe('0x3b9aca00')
     })
     it('excludes "empty" blocks from the priority fee calculation', async () => {
       // all empty blocks (gas ratios below 0.1) will be excluded from calculating the median priority fee
@@ -64,7 +64,7 @@ describe('#gasCalculator', () => {
         { baseFee: 182, rewards: [] }
       ]
 
-      expect(await calculateMaxPriority()).toBe('0x3b9aca00')
+      return expect(calculateMaxPriority()).resolves.toBe('0x3b9aca00')
     })
     it('considers full blocks if no partial blocks are eligible', async () => {
       // full blocks (gas ratios above 0.9) will be considered only if no blocks with a ratio between 0.1 and 0.9 are available
@@ -77,7 +77,7 @@ describe('#gasCalculator', () => {
         { baseFee: 182, rewards: [] }
       ]
 
-      expect(await calculateMaxPriority()).toBe('0x77359400')
+      return expect(calculateMaxPriority()).resolves.toBe('0x77359400')
     })
 
     it('considers blocks from the entire sample if none of the last 10 blocks are eligible', async () => {
@@ -87,7 +87,7 @@ describe('#gasCalculator', () => {
         { baseFee: 8, gasUsedRatio: 0.02, rewards: [2000000000] },
         { baseFee: 182, rewards: [] }
       ]
-      expect(await calculateMaxPriority()).toBe('0x9a359400')
+      return expect(calculateMaxPriority()).resolves.toBe('0x9a359400')
     })
     it('uses any recent blocks if no blocks in the sample have the qualifying gas ratios', async () => {
       feeHistory = [
@@ -99,7 +99,7 @@ describe('#gasCalculator', () => {
         { baseFee: 182, rewards: [] }
       ]
 
-      expect(await calculateMaxPriority()).toBe('0x3b9aca01')
+      return expect(calculateMaxPriority()).resolves.toBe('0x3b9aca01')
     })
     it('uses any block in the sample if no other blocks are eligible', async () => {
       // index in array represents distance away from current block
@@ -140,7 +140,7 @@ describe('#gasCalculator', () => {
           { baseFee: 8, gasUsedRatio: 0.990240614960509, rewards: [1000000000] },
           { baseFee: 182, rewards: [] }
         ]
-        expect(await calculateMaxPriority()).toBe(gweiToHex(30))
+        return expect(calculateMaxPriority()).resolves.toBe(gweiToHex(30))
       })
       it('does not change any maxPriorityFeePerGas that is over 30 gwei', async () => {
         feeHistory = [
@@ -148,7 +148,7 @@ describe('#gasCalculator', () => {
           { baseFee: 8, gasUsedRatio: 0.990240614960509, rewards: [45000000000] },
           { baseFee: 182, rewards: [] }
         ]
-        expect(await calculateMaxPriority()).toBe(gweiToHex(45))
+        return expect(calculateMaxPriority()).resolves.toBe(gweiToHex(45))
       })
     })
   })
