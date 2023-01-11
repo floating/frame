@@ -5,7 +5,6 @@ import BigNumber from 'bignumber.js'
 import svg from '../../../../../../resources/svg'
 import link from '../../../../../../resources/link'
 import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../../resources/Components/Cluster'
-
 import { MAX_HEX } from '../../../../../../resources/constants'
 import { formatDisplayInteger, isUnlimited } from '../../../../../../resources/utils/numbers'
 
@@ -226,11 +225,11 @@ class TokenSpend extends React.Component {
                   this.setState({ mode: 'requested', amount: requestedAmount })
                   updateApproval(requestedAmount)
                 }}
+                role='button'
               >
                 <div
                   className='clusterTag'
                   style={this.state.mode === 'requested' ? { color: 'var(--good)' } : {}}
-                  role='button'
                 >
                   {'Requested'}
                 </div>
@@ -243,11 +242,11 @@ class TokenSpend extends React.Component {
                   this.setState({ mode: 'unlimited', amount })
                   updateApproval(amount)
                 }}
+                role='button'
               >
                 <div
                   className='clusterTag'
                   style={this.state.mode === 'unlimited' ? { color: 'var(--good)' } : {}}
-                  role='button'
                 >
                   {'Unlimited'}
                 </div>
@@ -259,11 +258,11 @@ class TokenSpend extends React.Component {
                   onClick={() => {
                     this.setCustomAmount(this.state.customInput, decimals)
                   }}
+                  role='button'
                 >
                   <div
                     className={'clusterTag'}
                     style={this.state.mode === 'custom' ? { color: 'var(--good)' } : {}}
-                    role='button'
                   >
                     Custom
                   </div>

@@ -1,21 +1,13 @@
 import React from 'react'
 
-import { setupComponent } from '../../../../componentSetup'
-import Proceed from '../../../../../app/onboard/App/Slides/Proceed'
+import { render, screen } from '../../../../componentSetup'
+import Slides from '../../../../../app/onboard/App/Slides'
 
 it('completes when the user clicks close', async () => {
   const onComplete = jest.fn()
-  const { user, getByRole } = setupComponent(
-    <Proceed
-      slide={7}
-      proceed={{ action: 'complete', text: 'Done' }}
-      nextSlide={() => {}}
-      prevSlide={() => {}}
-      onComplete={onComplete}
-    />
-  )
+  const { user } = render(<Slides slide={6} onComplete={onComplete} />)
 
-  await user.click(getByRole('button', { name: 'Done' }))
+  await user.click(screen.getByRole('button', { name: 'Close' }))
 
   expect(onComplete).toHaveBeenCalled()
 })

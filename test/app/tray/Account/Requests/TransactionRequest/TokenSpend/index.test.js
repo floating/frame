@@ -1,8 +1,8 @@
 import React from 'react'
-import { fireEvent, render } from '@testing-library/react'
+import Restore from 'react-restore'
 import { addHexPrefix } from '@ethereumjs/util'
 
-import Restore from 'react-restore'
+import { render, screen } from '../../../../../../componentSetup'
 import store from '../../../../../../../main/store'
 import ApproveTokenSpendComponent from '../../../../../../../app/tray/Account/Requests/TransactionRequest/TokenSpend'
 
@@ -12,51 +12,40 @@ const TokenSpend = Restore.connect(ApproveTokenSpendComponent, store)
 
 describe('changing approval amounts', () => {
   it('allows the user to set the token approval to a custom amount', async () => {
-    return new Promise(async (resolve, reject) => {
-      const requestedAmountHex = '0x011170'
-      const approval = {
-        id: 'erc20:approve',
-        data: {
-          spender: '0x9bc5baf874d2da8d216ae9f137804184ee5afef4',
-          amount: requestedAmountHex,
-          decimals: 4,
-          name: 'TST',
-          symbol: 'TST',
-          spenderEns: '',
-          spenderType: 'external',
-          contract: '0x1eba19f260421142AD9Bf5ba193f6d4A0825e698'
-        }
+    const onUpdate = jest.fn()
+    const requestedAmountHex = '0x011170'
+    const approval = {
+      id: 'erc20:approve',
+      data: {
+        spender: '0x9bc5baf874d2da8d216ae9f137804184ee5afef4',
+        amount: requestedAmountHex,
+        decimals: 4,
+        name: 'TST',
+        symbol: 'TST',
+        spenderEns: '',
+        spenderType: 'external',
+        contract: '0x1eba19f260421142AD9Bf5ba193f6d4A0825e698'
       }
+    }
 
-      const { queryByRole, getByText } = render(
-        <TokenSpend
-          approval={approval}
-          requestedAmountHex={requestedAmountHex}
-          updateApproval={(amount) => {
-            try {
-              expect(amount).toBe('0x7a120')
-              resolve()
-            } catch (e) {
-              reject(e)
-            }
-          }}
-        />
-      )
+    const { user } = render(
+      <TokenSpend approval={approval} requestedAmountHex={requestedAmountHex} updateApproval={onUpdate} />
+    )
 
-      const custom = queryByRole('button', { name: 'Custom' })
-      fireEvent.click(custom)
+    const custom = screen.queryByRole('button', { name: 'Custom' })
+    await user.click(custom)
 
-      const enterAmount = queryByRole('textbox', { name: 'Custom Amount' })
-      fireEvent.change(enterAmount, { target: { value: '50' } })
+    const enterAmount = screen.queryByRole('textbox', { label: 'Custom Amount' })
+    await user.type(enterAmount, '50')
 
-      const updateCustom = getByText('update')
-      fireEvent.click(updateCustom)
-    })
+    const updateCustom = screen.getByText('update')
+    await user.click(updateCustom)
+
+    expect(onUpdate).toHaveBeenCalledWith('0x7a120')
   })
 
   it('does not allows the user to set the token approval to a custom amount for an unknown token', () => {
     const requestedAmountHex = addHexPrefix((100e6).toString(16))
-
     const approval = {
       id: 'erc20:approve',
       data: {
@@ -70,138 +59,118 @@ describe('changing approval amounts', () => {
       }
     }
 
-    const { queryByRole, getByText } = render(
+    render(
       <TokenSpend approval={approval} requestedAmountHex={requestedAmountHex} updateApproval={() => {}} />
     )
 
-    const custom = queryByRole('button', { name: 'Custom' })
+    const custom = screen.queryByRole('button', { name: 'Custom' })
     expect(custom).toBe(null)
   })
 
   it('allows the user to set the token approval to unlimited', async () => {
-    return new Promise(async (resolve, reject) => {
-      const requestedAmountHex = '0x011170'
+    const onUpdate = jest.fn()
+    const requestedAmountHex = '0x011170'
 
-      const approval = {
-        id: 'erc20:approve',
-        data: {
-          spender: '0x9bc5baf874d2da8d216ae9f137804184ee5afef4',
-          amount: requestedAmountHex,
-          decimals: 4,
-          name: 'TST',
-          symbol: 'TST',
-          spenderEns: '',
-          spenderType: 'external',
-          contract: '0x1eba19f260421142AD9Bf5ba193f6d4A0825e698'
-        }
+    const approval = {
+      id: 'erc20:approve',
+      data: {
+        spender: '0x9bc5baf874d2da8d216ae9f137804184ee5afef4',
+        amount: requestedAmountHex,
+        decimals: 4,
+        name: 'TST',
+        symbol: 'TST',
+        spenderEns: '',
+        spenderType: 'external',
+        contract: '0x1eba19f260421142AD9Bf5ba193f6d4A0825e698'
       }
+    }
 
-      const { queryByRole, getByText } = render(
-        <TokenSpend
-          approval={approval}
-          requestedAmountHex={requestedAmountHex}
-          updateApproval={(amount) => {
-            try {
-              expect(amount).toBe('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff')
-              resolve()
-            } catch (e) {
-              reject(e)
-            }
-          }}
-        />
-      )
+    const { user } = render(
+      <TokenSpend approval={approval} requestedAmountHex={requestedAmountHex} updateApproval={onUpdate} />
+    )
 
-      const custom = queryByRole('button', { name: 'Custom' })
-      fireEvent.click(custom)
+    const custom = screen.queryByRole('button', { name: 'Custom' })
+    await user.click(custom)
 
-      const setUnlimited = queryByRole('button', { name: 'Unlimited' })
-      fireEvent.click(setUnlimited)
-    })
-  })
+    const setUnlimited = screen.queryByRole('button', { name: 'Unlimited' })
+    await user.click(setUnlimited)
 
-  it('allows the user to revert the token approval back to the original amount when no decimal data is present', async () => {
-    return new Promise(async (resolve, reject) => {
-      const requestedAmountHex = '0x011170'
-
-      const approval = {
-        id: 'erc20:approve',
-        data: {
-          spender: '0x9bc5baf874d2da8d216ae9f137804184ee5afef4',
-          amount: requestedAmountHex,
-          name: 'TST',
-          symbol: 'TST',
-          spenderEns: '',
-          spenderType: 'external',
-          contract: '0x1eba19f260421142AD9Bf5ba193f6d4A0825e698'
-        }
-      }
-
-      const { queryByRole, getByText } = render(
-        <TokenSpend
-          approval={approval}
-          requestedAmountHex={requestedAmountHex}
-          updateApproval={(amount) => {
-            try {
-              if (amount === '0x011170') resolve()
-            } catch (e) {
-              reject(e)
-            }
-          }}
-        />
-      )
-
-      const setUnlimited = queryByRole('button', { name: 'Unlimited' })
-      fireEvent.click(setUnlimited)
-
-      const setRequested = queryByRole('button', { name: 'Requested' })
-      fireEvent.click(setRequested)
-    })
+    expect(onUpdate).toHaveBeenCalledWith(
+      '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
+    )
   })
 
   it('allows the user to revert the token approval back to the original request', async () => {
-    return new Promise(async (resolve, reject) => {
-      const requestedAmountHex = '0x011170'
-
-      const approval = {
-        id: 'erc20:approve',
-        data: {
-          spender: '0x9bc5baf874d2da8d216ae9f137804184ee5afef4',
-          amount: requestedAmountHex,
-          decimals: 4,
-          name: 'TST',
-          symbol: 'TST',
-          spenderEns: '',
-          spenderType: 'external',
-          contract: '0x1eba19f260421142AD9Bf5ba193f6d4A0825e698'
-        }
+    const onUpdate = jest.fn()
+    const requestedAmountHex = '0x011170'
+    const approval = {
+      id: 'erc20:approve',
+      data: {
+        spender: '0x9bc5baf874d2da8d216ae9f137804184ee5afef4',
+        amount: requestedAmountHex,
+        decimals: 4,
+        name: 'TST',
+        symbol: 'TST',
+        spenderEns: '',
+        spenderType: 'external',
+        contract: '0x1eba19f260421142AD9Bf5ba193f6d4A0825e698'
       }
+    }
 
-      const { queryByRole, getByText } = render(
-        <TokenSpend
-          approval={approval}
-          requestedAmountHex={requestedAmountHex}
-          updateApproval={(amount) => {
-            try {
-              if (amount === '0x011170') resolve()
-            } catch (e) {
-              reject(e)
-            }
-          }}
-        />
-      )
+    const { user } = render(
+      <TokenSpend approval={approval} requestedAmountHex={requestedAmountHex} updateApproval={onUpdate} />
+    )
 
-      const setUnlimited = queryByRole('button', { name: 'Unlimited' })
-      fireEvent.click(setUnlimited)
+    const setUnlimited = screen.queryByRole('button', { name: 'Unlimited' })
+    await user.click(setUnlimited)
 
-      const setRequested = queryByRole('button', { name: 'Requested' })
-      fireEvent.click(setRequested)
-    })
+    const setRequested = screen.queryByRole('button', { name: 'Requested' })
+    await user.click(setRequested)
+
+    expect(onUpdate).toHaveBeenNthCalledWith(
+      1,
+      '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
+    )
+    expect(onUpdate).toHaveBeenNthCalledWith(2, '0x011170')
+  })
+
+  it('allows the user to revert the token approval back to the original amount when no decimal data is present', async () => {
+    const onUpdate = jest.fn()
+    const requestedAmountHex = '0x011170'
+    const approval = {
+      id: 'erc20:approve',
+      data: {
+        spender: '0x9bc5baf874d2da8d216ae9f137804184ee5afef4',
+        amount: requestedAmountHex,
+        name: 'TST',
+        symbol: 'TST',
+        spenderEns: '',
+        spenderType: 'external',
+        contract: '0x1eba19f260421142AD9Bf5ba193f6d4A0825e698'
+      }
+    }
+
+    const { user } = render(
+      <TokenSpend approval={approval} requestedAmountHex={requestedAmountHex} updateApproval={onUpdate} />
+    )
+
+    const setUnlimited = screen.queryByRole('button', { name: 'Unlimited' })
+    await user.click(setUnlimited)
+
+    const setRequested = screen.queryByRole('button', { name: 'Requested' })
+    await user.click(setRequested)
+
+    expect(onUpdate).toHaveBeenNthCalledWith(
+      1,
+      '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
+    )
+    expect(onUpdate).toHaveBeenNthCalledWith(2, '0x011170')
   })
 
   const requiredApprovalData = ['decimals', 'symbol', 'name']
 
   requiredApprovalData.forEach((field) => {
-    it(`does not allow the user to edit the amount if ${field} is not present in approval data`, () => {
+    it(`does not allow the user to edit the amount if ${field} is not present in approval data`, async () => {
       const requestedAmountHex = addHexPrefix((100e6).toString(16))
       const approval = {
         id: 'erc20:approve',
@@ -219,20 +188,20 @@ describe('changing approval amounts', () => {
 
       delete approval.data[field]
 
-      const { queryByRole } = render(
+      const { user } = render(
         <TokenSpend approval={approval} requestedAmountHex={requestedAmountHex} updateApproval={() => {}} />
       )
 
-      const custom = queryByRole('button', { name: 'Custom' })
+      const custom = screen.queryByRole('button', { name: 'Custom' })
       expect(custom).toBeNull()
 
-      const requestedAmount = queryByRole('textbox')
+      const requestedAmount = screen.queryByRole('textbox')
       const displayedContent = requestedAmount.textContent.trim()
       expect(displayedContent).toBe(approval.data.decimals ? '100' : '100 million')
 
       // ensure click on requested amount textbox doesn't allow user to enter a custom amount
-      fireEvent.click(requestedAmount)
-      expect(queryByRole('textbox', { name: 'Custom Amount' })).toBeNull()
+      await user.click(requestedAmount)
+      expect(screen.queryByRole('textbox', { name: 'Custom Amount' })).toBeNull()
     })
   })
 })
@@ -250,7 +219,6 @@ describe('formatting amounts', () => {
     it(`formats a requested amount of ${spec.amount} as ${spec.formatted}`, () => {
       const amount = addHexPrefix((spec.amount * 1e6).toString(16))
       const requestedAmountHex = amount
-
       const approval = {
         id: 'erc20:approve',
         data: {
@@ -265,11 +233,11 @@ describe('formatting amounts', () => {
         }
       }
 
-      const { queryByRole, getByText } = render(
+      render(
         <TokenSpend approval={approval} requestedAmountHex={requestedAmountHex} updateApproval={() => {}} />
       )
 
-      const requestedAmount = queryByRole('textbox')
+      const requestedAmount = screen.queryByRole('textbox')
       const displayedContent = requestedAmount.textContent.trim()
       expect(displayedContent).toBe(spec.formatted)
     })

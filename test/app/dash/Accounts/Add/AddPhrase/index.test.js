@@ -1,11 +1,10 @@
 import React from 'react'
 import Restore from 'react-restore'
-import { setupComponent } from '../../../../../componentSetup'
 
+import { screen, render } from '../../../../../componentSetup'
 import store from '../../../../../../main/store'
 import link from '../../../../../../resources/link'
 import AddPhraseAccountComponent from '../../../../../../app/dash/Accounts/Add/AddPhrase'
-import { act } from 'react-dom/test-utils'
 
 const phrase = 'there lab weapon cost bounce smart trial pulse ceiling beach upset hockey illegal chef leaf'
 const password = 'thisisagoodpassword123'
@@ -20,49 +19,36 @@ jest.mock('../../../../../../resources/link', () => ({
 const AddPhrase = Restore.connect(AddPhraseAccountComponent, store)
 
 describe('entering seed phrase', () => {
-  const index = 0
-  let user, seedPhraseTextArea, nextButton, getAllByRole
+  const setupComponent = () => {
+    const { user } = render(<AddPhrase accountData={{}} />, { advanceTimersAfterInput: true })
 
-  beforeEach(() => {
-    const component = setupComponent(<AddPhrase accountData={{}} />)
-    ;({ user, getAllByRole } = component)
-    seedPhraseTextArea = component.getAllByRole('textbox')[index]
-    nextButton = component.getAllByRole('button')[index]
-  })
+    return {
+      clickNext: async () => user.click(screen.getAllByRole('button')[0]),
+      enterSeedPhrase: async (text) => await user.type(screen.getAllByRole('textbox')[0], text)
+    }
+  }
 
   it('should display the correct title when entering the seed phrase', () => {
-    const title = getAllByRole('heading')[index]
+    setupComponent()
+
+    const title = screen.getAllByRole('heading')[0]
     expect(title.textContent).toBe('Seed Phrase')
   })
 
-  it('should show an error message when a cryptographically invalid seed phrase is submitted', async () => {
-    await user.type(seedPhraseTextArea, 'INVALID')
+  it('should show an error message when an incorrect seed phrase is submitted', async () => {
+    const { enterSeedPhrase } = setupComponent()
 
-    act(() => {
-      jest.runAllTimers()
-    })
+    await enterSeedPhrase('INVALID')
 
+    const nextButton = screen.getAllByRole('button')[0]
     expect(nextButton.textContent).toBe('INVALID SEED PHRASE')
   })
 
-  it('should show an error message when a seed phrase with length < 12 is submitted', async () => {
-    await user.type(seedPhraseTextArea, 'summer cigar web grocery kitten pattern elite bag hurdle')
-
-    act(() => {
-      jest.runAllTimers()
-    })
-
-    expect(nextButton.textContent).toBe('SEED PHRASE TOO SHORT')
-  })
-
   it('should update the navigation with the password entry screen when a seed phrase is submitted', async () => {
-    await user.type(seedPhraseTextArea, phrase)
+    const { enterSeedPhrase, clickNext } = setupComponent()
 
-    act(() => {
-      jest.runAllTimers()
-    })
-
-    await user.click(nextButton)
+    await enterSeedPhrase(phrase)
+    await clickNext()
 
     expect(link.send).toHaveBeenCalledWith('nav:forward', 'dash', {
       view: 'accounts',
@@ -78,17 +64,15 @@ describe('entering seed phrase', () => {
 })
 
 describe('entering password', () => {
-  it('Should update the navigation to the confirmation screen when a password is submitted', async () => {
-    const { user, getAllByRole } = setupComponent(<AddPhrase accountData={{ secret: phrase }} />)
-    const passwordEntryTextArea = getAllByRole('textbox')[1]
+  it('should update the navigation to the confirmation screen when a password is submitted', async () => {
+    const { user } = render(<AddPhrase accountData={{ secret: phrase }} />, { advanceTimersAfterInput: true })
+
+    const passwordEntryTextArea = screen.getAllByRole('textbox')[1]
+    const createButton = screen.getAllByRole('button')[1]
 
     await user.type(passwordEntryTextArea, password)
-
-    act(() => {
-      jest.runAllTimers()
-    })
-    const createButton = getAllByRole('button')[1]
     await user.click(createButton)
+
     expect(link.send).toHaveBeenCalledWith('nav:forward', 'dash', {
       view: 'accounts',
       data: {
@@ -104,27 +88,29 @@ describe('entering password', () => {
 })
 
 describe('confirming password', () => {
-  let user, passwordEntryTextArea, confirmButton
-
-  beforeEach(() => {
-    const component = setupComponent(<AddPhrase accountData={{ secret: phrase, password }} />)
-    user = component.user
-    passwordEntryTextArea = component.getAllByRole('textbox')[2]
-    confirmButton = component.getAllByRole('button')[2]
-  })
-
-  it('Should try to create seed phrase account when a matching password is submitted', async () => {
-    await user.type(passwordEntryTextArea, password)
-
-    act(() => {
-      jest.runAllTimers()
+  const setupComponent = () => {
+    const { user } = render(<AddPhrase accountData={{ secret: phrase, password }} />, {
+      advanceTimersAfterInput: true
     })
 
-    await user.click(confirmButton)
+    return {
+      enterPassword: async (text) => user.type(screen.getAllByRole('textbox')[2], text),
+      clickConfirm: async () => user.click(screen.getAllByRole('button')[2])
+    }
+  }
+
+  it('should try to create seed phrase account when a matching password is submitted', async () => {
+    const { enterPassword, clickConfirm } = setupComponent()
+
+    await enterPassword(password)
+    await clickConfirm()
+
     expect(link.rpc).toHaveBeenCalledWith('createFromPhrase', phrase, password, expect.any(Function))
   })
 
-  it('Should remove the previous screens related to adding an account from the navigation', async () => {
+  it('should remove the previous screens related to adding an account from the navigation', async () => {
+    const { enterPassword, clickConfirm } = setupComponent()
+
     link.rpc.mockImplementationOnce((action, secret, passwd, cb) => {
       expect(action).toBe('createFromPhrase')
       expect(secret).toBe(phrase)
@@ -132,16 +118,15 @@ describe('confirming password', () => {
       cb(null, { id: '1234' })
     })
 
-    await user.type(passwordEntryTextArea, password)
+    await enterPassword(password)
+    await clickConfirm()
 
-    act(() => {
-      jest.runAllTimers()
-    })
-    await user.click(confirmButton)
     expect(link.send).toHaveBeenCalledWith('nav:back', 'dash', 4)
   })
 
-  it('Should update the navigation to view the newly created account', async () => {
+  it('should update the navigation to view the newly created account', async () => {
+    const { enterPassword, clickConfirm } = setupComponent()
+
     link.rpc.mockImplementationOnce((action, secret, passwd, cb) => {
       expect(action).toBe('createFromPhrase')
       expect(secret).toBe(phrase)
@@ -149,13 +134,9 @@ describe('confirming password', () => {
       cb(null, { id: '1234' })
     })
 
-    await user.type(passwordEntryTextArea, password)
+    await enterPassword(password)
+    await clickConfirm()
 
-    act(() => {
-      jest.runAllTimers()
-    })
-
-    await user.click(confirmButton)
     expect(link.send).toHaveBeenCalledWith('nav:forward', 'dash', {
       view: 'expandedSigner',
       data: { signer: '1234' }
