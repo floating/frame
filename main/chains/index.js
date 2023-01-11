@@ -84,6 +84,7 @@ class ChainConnection extends EventEmitter {
     const allowEip1559 = !legacyChains.includes(parseInt(this.chainId))
 
     monitor.on('data', async (block) => {
+      log.debug(`%cReceived block ${parseInt(block.number)} for chain ${this.chainId}`, 'color: yellow')
       let feeMarket = null
 
       const gasMonitor = new GasMonitor(provider)

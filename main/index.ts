@@ -31,7 +31,13 @@ app.commandLine.appendSwitch('force-color-profile', 'srgb')
 
 const isDev = process.env.NODE_ENV === 'development'
 log.transports.console.level = process.env.LOG_LEVEL || (isDev ? 'verbose' : 'info')
-log.transports.file.level = ['development', 'test'].includes(process.env.NODE_ENV) ? false : 'verbose'
+
+if (process.env.LOG_LEVEL === 'debug') {
+  log.transports.file.level = 'debug'
+  log.transports.file.resolvePath = () => path.join(app.getPath('userData'), 'logs/test.log')
+} else {
+  log.transports.file.level = ['development', 'test'].includes(process.env.NODE_ENV) ? false : 'verbose'
+}
 
 const hasInstanceLock = app.requestSingleInstanceLock()
 

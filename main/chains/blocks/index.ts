@@ -62,6 +62,8 @@ class BlockMonitor extends EventEmitter {
   }
 
   start() {
+    log.verbose(`Starting block updates for chain ${parseInt(this.connection.chainId)}`)
+
     this.connection.on('message', this.handleMessage)
 
     // load the latest block first on connect, then start checking for new blocks
@@ -79,6 +81,8 @@ class BlockMonitor extends EventEmitter {
   }
 
   stop() {
+    log.verbose(`Stopping block updates for chain ${parseInt(this.connection.chainId)}`)
+
     this.removeAllListeners()
     this.connection.off('connect', this.start)
     this.connection.off('close', this.stop)
