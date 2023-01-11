@@ -263,7 +263,6 @@
       "@trezor/connect>@trezor/utxo-lib>blake-hash": false,
       "@trezor/connect>@trezor/utxo-lib>tiny-secp256k1": false,
       "electron": true,
-      "eslint-plugin-jsx-a11y>aria-query>@babel/runtime-corejs3>core-js-pure": false,
       "gridplus-sdk": false,
       "hardhat>@nomicfoundation/ethereumjs-blockchain>level>classic-level": false,
       "hardhat>keccak": true,
