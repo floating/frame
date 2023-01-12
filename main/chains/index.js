@@ -304,6 +304,11 @@ class ChainConnection extends EventEmitter {
           this.emit('close')
         })
         this.secondary.provider.on('status', (status) => {
+          log.debug(
+            `%cUpdated status from secondary provider for chain ${this.chainId}: ${status}`,
+            'color: red'
+          )
+
           if (status === 'connected' && this.secondary.network && this.secondary.network !== this.chainId) {
             this.secondary.connected = false
             this.secondary.type = ''
@@ -371,6 +376,11 @@ class ChainConnection extends EventEmitter {
           this.emit('close')
         })
         this.primary.provider.on('status', (status) => {
+          log.debug(
+            `%cUpdated status from primary provider for chain ${this.chainId}: ${status}`,
+            'color: red'
+          )
+
           if (status === 'connected' && this.primary.network && this.primary.network !== this.chainId) {
             this.primary.connected = false
             this.primary.type = ''
