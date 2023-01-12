@@ -1295,7 +1295,7 @@ describe('migration 31', () => {
 })
 
 describe('migration 32', () => {
-  const getNetworkMeta = (state, chainId) => state.main.networksMeta.ethereum[chainId]
+  const getNativeCurrency = (state, chainId) => state.main.networksMeta.ethereum[chainId].nativeCurrency
   const getKnownTokens = (state) => state.main.tokens.known[account]
 
   const account = '0xd8da6bf26964af9d7eed9e03e53415d37aa96045'
@@ -1351,10 +1351,10 @@ describe('migration 32', () => {
 
   it('should add the the native currency name for Gnosis mainnet', () => {
     const updatedState = migrations.apply(state, 32)
-    expect(getNetworkMeta(updatedState, 100).name).toBe('xDAI')
+    expect(getNativeCurrency(updatedState, 100).name).toBe('xDAI')
   })
   it('should add the the native currency name for Polygon mainnet', () => {
     const updatedState = migrations.apply(state, 32)
-    expect(getNetworkMeta(updatedState, 137).name).toBe('Matic')
+    expect(getNativeCurrency(updatedState, 137).name).toBe('Matic')
   })
 })

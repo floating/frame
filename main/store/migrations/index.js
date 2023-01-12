@@ -760,8 +760,8 @@ const migrations = {
       initial.main.tokens.known[address] = knownTokens.filter(({ address }) => address !== dodgyAddress)
     })
 
-    initial.main.networksMeta.ethereum[100].name = 'xDAI'
-    initial.main.networksMeta.ethereum[137].name = 'Matic'
+    initial.main.networksMeta.ethereum[100].nativeCurrency.name = 'xDAI'
+    initial.main.networksMeta.ethereum[137].nativeCurrency.name = 'Matic'
 
     return initial
   }
