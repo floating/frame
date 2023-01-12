@@ -37,7 +37,7 @@ class MockConnection extends EventEmitter {
           return resolve({
             baseFeePerGas: [gweiToHex(15), gweiToHex(8), gweiToHex(9), gweiToHex(8), gweiToHex(7)],
             gasUsedRatio: [0.11, 0.8, 0.2, 0.5],
-            reward: [[gweiToHex(1)], [gweiToHex(1)], [gweiToHex(1)], [gweiToHex(1)]]
+            reward: [[gweiToHex(32)], [gweiToHex(32)], [gweiToHex(32)], [gweiToHex(32)]]
           })
         }
 
@@ -246,7 +246,7 @@ Object.values(mockConnections).forEach((chain) => {
     }
 
     const expectedBaseFee = 7e9 * 1.125 * 1.125
-    const expectedPriorityFee = 1e9
+    const expectedPriorityFee = 32e9
 
     observer = store.observer(() => {
       const gas = store(`main.networksMeta.ethereum.${chain.id}.gas.price`)

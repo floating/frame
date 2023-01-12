@@ -9,7 +9,8 @@ const log = require('electron-log')
 const store = require('../store').default
 const { default: BlockMonitor } = require('./blocks')
 const { default: chainConfig } = require('./config')
-const { default: GasCalculator } = require('../transaction/gasCalculator')
+const { default: GasMonitor } = require('../transaction/gasMonitor')
+const { createGasCalculator } = require('./gas')
 
 // These chain IDs are known to not support EIP-1559 and will be forced
 // not to use that mechanism
@@ -35,6 +36,9 @@ class ChainConnection extends EventEmitter {
     // default chain config to istanbul hardfork until a block is received
     // to update it to london
     this.chainConfig = chainConfig(parseInt(this.chainId), 'istanbul')
+
+    // TODO: maybe this can be tied into chain config somehow
+    this.gasCalculator = createGasCalculator(this.chainId)
 
     this.primary = {
       status: 'off',
@@ -81,12 +85,13 @@ class ChainConnection extends EventEmitter {
     monitor.on('data', async (block) => {
       let feeMarket = null
 
-      const gasCalculator = new GasCalculator(provider)
+      const gasMonitor = new GasMonitor(provider)
 
       if (allowEip1559 && 'baseFeePerGas' in block) {
         try {
           // only consider this an EIP-1559 block if fee market can be loaded
-          feeMarket = await gasCalculator.getFeePerGas()
+          const feeHistory = await gasMonitor.getFeeHistory(10, [10])
+          feeMarket = this.gasCalculator.calculateGas(feeHistory)
 
           this.chainConfig.setHardforkByBlockNumber(block.number)
 
@@ -108,7 +113,7 @@ class ChainConnection extends EventEmitter {
           store.setGasPrices(this.type, this.chainId, { fast: addHexPrefix(gasPrice.toString(16)) })
           store.setGasDefault(this.type, this.chainId, 'fast')
         } else {
-          const gas = await gasCalculator.getGasPrices()
+          const gas = await gasMonitor.getGasPrices()
           const customLevel = store('main.networksMeta', this.type, this.chainId, 'gas.price.levels.custom')
 
           store.setGasPrices(this.type, this.chainId, {
