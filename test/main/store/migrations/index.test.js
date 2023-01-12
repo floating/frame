@@ -1293,3 +1293,68 @@ describe('migration 31', () => {
     ])
   })
 })
+
+describe('migration 32', () => {
+  const getNetworkMeta = (state, chainId) => state.main.networksMeta.ethereum[chainId]
+  const getKnownTokens = (state) => state.main.tokens.known[account]
+
+  const account = '0xd8da6bf26964af9d7eed9e03e53415d37aa96045'
+  beforeEach(() => {
+    state = {
+      main: {
+        _version: 31,
+        networksMeta: {
+          ethereum: {
+            100: {
+              nativeCurrency: {
+                symbol: 'ETH',
+                decimals: 0
+              }
+            },
+            137: {
+              nativeCurrency: {
+                symbol: 'ETH',
+                decimals: 18
+              }
+            }
+          }
+        },
+        tokens: {
+          known: {
+            [account]: [
+              {
+                address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48'
+              },
+              {
+                address: '0xdeaddeaddeaddeaddeaddeaddeaddeaddead0000'
+              }
+            ]
+          }
+        }
+      }
+    }
+  })
+
+  it('should remove any known tokens with the address `0xdeaddeaddeaddeaddeaddeaddeaddeaddead0000`', () => {
+    const updatedState = migrations.apply(state, 32)
+    const known = getKnownTokens(updatedState)
+    expect(known.find(({ address }) => address === '0xdeaddeaddeaddeaddeaddeaddeaddeaddead0000')).toBeFalsy()
+  })
+
+  it('should not remove any other known tokens', () => {
+    const oldKnown = getKnownTokens(state)
+    const updatedState = migrations.apply(state, 32)
+    const updatedKnown = getKnownTokens(updatedState)
+
+    expect(updatedKnown.length).toBe(oldKnown.length - 1)
+  })
+
+  it('should add the the native currency name for Gnosis mainnet', () => {
+    const updatedState = migrations.apply(state, 32)
+    expect(getNetworkMeta(updatedState, 100).name).toBe('xDAI')
+  })
+  it('should add the the native currency name for Polygon mainnet', () => {
+    const updatedState = migrations.apply(state, 32)
+    expect(getNetworkMeta(updatedState, 137).name).toBe('Matic')
+  })
+})

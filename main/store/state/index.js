@@ -163,7 +163,7 @@ const initial = {
   },
   platform: process.platform,
   main: {
-    _version: main('_version', 31),
+    _version: main('_version', 32),
     instanceId: main('instanceId', generateUuid()),
     colorway: main('colorway', 'dark'),
     colorwayPrimary: {
