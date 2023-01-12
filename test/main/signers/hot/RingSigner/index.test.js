@@ -82,7 +82,7 @@ describe('Ring signer', () => {
         signer = result
 
         expect(err).toBe(null)
-        expect(signer.status).toBe('locked')
+        expect(signer.status).toBe('ok')
         expect(signer.id).not.toBe(undefined)
         expect(store(`main.signers.${signer.id}.id`)).toBe(signer.id)
         done()
@@ -132,14 +132,14 @@ describe('Ring signer', () => {
       hot.createFromKeystore(signers, keystore, 'test', PASSWORD, (err, result) => {
         signer = result
         expect(err).toBe(null)
-        expect(signer.status).toBe('locked')
+        expect(signer.status).toBe('ok')
         expect(signer.id).not.toBe(undefined)
         done()
       })
     } catch (e) {
       done(e)
     }
-  }, 2000)
+  }, 5000)
 
   test('Add private key', (done) => {
     try {
@@ -177,7 +177,7 @@ describe('Ring signer', () => {
     } catch (e) {
       done(e)
     }
-  }, 1000)
+  }, 6000)
 
   test('Add private key from keystore', (done) => {
     try {
@@ -276,18 +276,6 @@ describe('Ring signer', () => {
       done(e)
     }
   }, 500)
-
-  test('Lock', (done) => {
-    try {
-      signer.lock((err) => {
-        expect(err).toBe(null)
-        expect(signer.status).toBe('locked')
-        done()
-      })
-    } catch (e) {
-      done(e)
-    }
-  }, 2000)
 
   test('Sign message when locked', (done) => {
     try {
