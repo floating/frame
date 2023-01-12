@@ -2,10 +2,13 @@ import ts from '@typescript-eslint/eslint-plugin'
 import tsParser from '@typescript-eslint/parser'
 import prettier from 'eslint-config-prettier'
 <<<<<<< HEAD
+<<<<<<< HEAD
 import react from 'eslint-plugin-react'
 import reactHooks from 'eslint-plugin-react-hooks'
 =======
 import importPlugin from 'eslint-plugin-import'
+=======
+>>>>>>> a89d5963 (remove eslint-plugin-import)
 import react from 'eslint-plugin-react'
 import reactHooks from 'eslint-plugin-react-hooks'
 import testingLibraryReact from 'eslint-plugin-testing-library/configs/react.js'
@@ -23,16 +26,20 @@ export default [
 =======
   {
     files: ['**/*.{js,mjs,ts,tsx}'],
+<<<<<<< HEAD
     plugins: {
       import: importPlugin
     },
 >>>>>>> ba76bb9b (move to flat config)
+=======
+>>>>>>> a89d5963 (remove eslint-plugin-import)
     languageOptions: {
       ecmaVersion: 'latest',
       globals: {
         ...globals.es6
       }
     },
+<<<<<<< HEAD
 <<<<<<< HEAD
     rules: {
       ...prettier.rules,
@@ -49,11 +56,10 @@ export default [
         '@typescript-eslint/parser': ['.ts', '.tsx']
       }
     },
+=======
+>>>>>>> a89d5963 (remove eslint-plugin-import)
     rules: {
       ...prettier.rules,
-      ...importPlugin.configs.recommended.rules,
-      'import/no-unresolved': 'off',
-      'import/extensions': ['error', { js: 'never', ts: 'never', mjs: 'always', json: 'always' }],
       'no-unused-vars': ['error', { ignoreRestSiblings: true, destructuredArrayIgnorePattern: '^_' }]
     }
   },
@@ -85,6 +91,7 @@ export default [
       '@typescript-eslint': ts
     },
 <<<<<<< HEAD
+<<<<<<< HEAD
     rules: {
       ...ts.configs['eslint-recommended'].rules,
       ...ts.configs.recommended.rules,
@@ -98,10 +105,11 @@ export default [
         typescript: true
       }
     },
+=======
+>>>>>>> a89d5963 (remove eslint-plugin-import)
     rules: {
       ...ts.configs['eslint-recommended'].rules,
       ...ts.configs['recommended'].rules,
-      ...importPlugin.configs.typescript.rules,
       'no-undef': 'off' // redundant rule - TS will fail to compile with undefined vars
     }
   },
