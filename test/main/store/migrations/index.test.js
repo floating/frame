@@ -1136,7 +1136,7 @@ describe('migration 29', () => {
     })
   })
 
-  const accountTypes = ['ring', 'seed', 'ledger', 'trezor', 'lattice', 'aragon']
+  const accountTypes = ['ring', 'seed', 'ledger', 'trezor', 'lattice']
   accountTypes.forEach((type) => {
     it(`does not add ${type} accounts with a default name`, () => {
       state.main.accounts.test = {
