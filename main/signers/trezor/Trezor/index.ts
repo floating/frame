@@ -2,7 +2,7 @@ import log from 'electron-log'
 import { hexToInt } from '../../../../resources/utils'
 import { padToEven, stripHexPrefix, addHexPrefix } from '@ethereumjs/util'
 import { SignTypedDataVersion, TypedDataUtils } from '@metamask/eth-sig-util'
-import type { Device as TrezorDevice } from 'trezor-connect'
+import type { Device as TrezorDevice } from '@trezor/connect'
 import { TypedTransaction } from '@ethereumjs/tx'
 
 import { v5 as uuid } from 'uuid'

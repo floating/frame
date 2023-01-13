@@ -1,10 +1,10 @@
-import TrezorConnect, { DEVICE_EVENT, DEVICE, UI_EVENT, UI } from 'trezor-connect'
+import TrezorConnect, { DEVICE_EVENT, DEVICE, UI_EVENT, UI } from '@trezor/connect'
 import { EventEmitter } from 'stream'
 import log from 'electron-log'
 
 import TrezorBridge from '../../../../main/signers/trezor/bridge'
 
-jest.mock('trezor-connect')
+jest.mock('@trezor/connect')
 
 const events = new EventEmitter()
 

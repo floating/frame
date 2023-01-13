@@ -10,7 +10,7 @@ import TrezorConnect, {
   DEVICE_EVENT,
   UI,
   UI_EVENT
-} from 'trezor-connect'
+} from '@trezor/connect'
 
 export class DeviceError extends Error {
   readonly code

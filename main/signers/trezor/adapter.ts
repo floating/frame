@@ -1,6 +1,6 @@
 import log from 'electron-log'
 
-import type { Device as TrezorDevice } from 'trezor-connect'
+import type { Device as TrezorDevice } from '@trezor/connect'
 
 import { SignerAdapter } from '../adapters'
 import Trezor, { Status } from './Trezor'
