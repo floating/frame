@@ -7,7 +7,7 @@ import svg from '../../../../../../resources/svg'
 
 import { Cluster, ClusterRow, ClusterValue } from '../../../../../../resources/Components/Cluster'
 import { DisplayValue } from '../../../../../../resources/Components/DisplayValue'
-import RequestHeader from '../../../../../../../resources/Components/RequestHeader'
+import RequestHeader from '../../../../../../resources/Components/RequestHeader'
 
 const isNonZeroHex = (hex) => !!hex && !['0x', '0x0'].includes(hex)
 

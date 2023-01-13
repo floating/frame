@@ -22,9 +22,8 @@ import SignatureRequest from './Requests/SignatureRequest'
 import ChainRequest from './Requests/ChainRequest'
 import AddTokenRequest from './Requests/AddTokenRequest'
 import SignTypedDataRequest from './Requests/SignTypedDataRequest'
-import { isHardwareSigner } from '../../../resources/domain/signer'
-import PermitSignatureRequest from './Requests/PermitSignatureRequest'
 import SignPermitRequest from './Requests/SignPermitRequest'
+import { isHardwareSigner } from '../../../resources/domain/signer'
 
 class _AccountModule extends React.Component {
   // constructor (props, context) {

@@ -12,7 +12,6 @@ import Restore from 'react-restore'
 import TxOverview from './TransactionRequest/TxMainNew/overview'
 
 import RequestItem from '../../../../resources/Components/RequestItem'
-import RingIcon from '../../../../resources/Components/RingIcon'
 
 import { ClusterBox, Cluster } from '../../../../resources/Components/Cluster'
 

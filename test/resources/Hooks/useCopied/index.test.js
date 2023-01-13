@@ -1,53 +1,55 @@
 /** @jest-environment jsdom */
-import { renderHook, act } from '@testing-library/react'
+import React from 'react'
+
+import { render, screen } from '../../../componentSetup'
 import useCopiedMessage from '../../../../resources/Hooks/useCopiedMessage'
 import link from '../../../../resources/link'
+
+const TestComponent = () => {
+  const [showCopiedMessage, copyText] = useCopiedMessage('use frame!')
+
+  return (
+    <>
+      <button onClick={copyText}>Copy</button>
+      <div data-testid='iscopied'>{showCopiedMessage ? 'message copied!' : 'waiting for click'}</div>
+    </>
+  )
+}
 
 jest.mock('../../../../resources/link', () => ({
   send: jest.fn()
 }))
 
-describe('#useCopied', () => {
-  jest.useFakeTimers()
+it('should not display the copied text by default', () => {
+  render(<TestComponent />)
 
-  let result
+  expect(screen.getByTestId('iscopied').textContent).toBe('waiting for click')
+})
 
-  const getBool = () => result.current[0]
-  const copyFn = () => result.current[1]()
+it('should let the component know to display the copied text after the copy function is invoked', async () => {
+  const { user } = render(<TestComponent />)
 
-  beforeEach(() => {
-    ;({ result } = renderHook(() => useCopiedMessage('VALUE')))
-    jest.clearAllMocks()
-  })
+  const clickToCopyButton = screen.getByRole('button')
+  await user.click(clickToCopyButton)
 
-  it('should correctly initialise a boolean to check if the copiedMessage should be shown', () => {
-    expect(result.current[0]).toBe(false)
-  })
+  expect(screen.getByTestId('iscopied').textContent).toBe('message copied!')
+})
 
-  it('should expose a function to copy to clipboard', () => {
-    expect(typeof result.current[1]).toBe('function')
-  })
+it('should reset the copied text after one second', async () => {
+  const { user } = render(<TestComponent />, { advanceTimersAfterInput: true })
 
-  it('should set the boolean value as true when the copy function is called', () => {
-    act(() => {
-      copyFn()
-    })
-    expect(getBool()).toBe(true)
-  })
+  const clickToCopyButton = screen.getByRole('button')
+  await user.click(clickToCopyButton)
 
-  it('should reset the boolean value after 1 second', () => {
-    act(() => {
-      copyFn()
-      jest.advanceTimersByTime(1000)
-    })
-    expect(getBool()).toBe(false)
-  })
+  expect(screen.getByTestId('iscopied').textContent).toBe('waiting for click')
+})
 
-  it('should call the clipboardData function inside link when the copy function is called', () => {
-    act(() => {
-      copyFn()
-    })
-    expect(link.send).toHaveBeenCalledWith('tray:clipboardData', 'VALUE')
-    expect(link.send).toHaveBeenCalledTimes(1)
-  })
+it('send the copied data to the clipboard', async () => {
+  const { user } = render(<TestComponent />)
+
+  const clickToCopyButton = screen.getByRole('button')
+  await user.click(clickToCopyButton)
+
+  expect(link.send).toHaveBeenCalledTimes(1)
+  expect(link.send).toHaveBeenCalledWith('tray:clipboardData', 'use frame!')
 })
