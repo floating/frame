@@ -84,8 +84,6 @@ class BlockMonitor extends EventEmitter {
     log.verbose(`Stopping block updates for chain ${parseInt(this.connection.chainId)}`)
 
     this.removeAllListeners()
-    this.connection.off('connect', this.start)
-    this.connection.off('close', this.stop)
 
     if (this.subscriptionId) {
       this.clearSubscription()

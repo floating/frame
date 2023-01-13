@@ -34,7 +34,7 @@ log.transports.console.level = process.env.LOG_LEVEL || (isDev ? 'verbose' : 'in
 
 if (process.env.LOG_LEVEL === 'debug') {
   log.transports.file.level = 'debug'
-  log.transports.file.resolvePath = () => path.join(app.getPath('userData'), 'logs/test.log')
+  log.transports.file.resolvePath = () => path.join(app.getPath('userData'), 'logs/debug.log')
 } else {
   log.transports.file.level = ['development', 'test'].includes(process.env.NODE_ENV) ? false : 'verbose'
 }
