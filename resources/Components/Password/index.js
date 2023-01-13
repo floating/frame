@@ -1,4 +1,3 @@
-import React, { useRef } from 'react'
 import { useState } from 'react'
 import zxcvbn from 'zxcvbn'
 import useFocusableRef from '../../Hooks/useFocusableRef'
