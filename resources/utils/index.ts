@@ -56,7 +56,7 @@ function getErrorCode(e: Error) {
   return e.code
 }
 
-const matchFilter = (filter: string = '', properties: string[] = []) => {
+const matchFilter = (filter = '', properties: string[] = []) => {
   if (!filter) return true
 
   const filterItems = filter.split(' ')
