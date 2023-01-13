@@ -23,6 +23,9 @@ import globals from 'globals'
 export default [
   'eslint:recommended',
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> bf9d16c6 (add comments)
   // All files
   {
     files: ['**/*.{js,mjs,ts,tsx}'],
@@ -50,6 +53,7 @@ export default [
     }
   },
   // Main process files and scripts
+<<<<<<< HEAD
 =======
     settings: {
       'import/resolver': {
@@ -67,6 +71,8 @@ export default [
     }
   },
 >>>>>>> ba76bb9b (move to flat config)
+=======
+>>>>>>> bf9d16c6 (add comments)
   {
     files: ['**/*.{js,mjs,ts}'],
     ignores: ['app/**/*', 'resources/Components/**/*'],
@@ -77,9 +83,13 @@ export default [
     }
   },
 <<<<<<< HEAD
+<<<<<<< HEAD
   // TS files
 =======
 >>>>>>> ba76bb9b (move to flat config)
+=======
+  // TS files
+>>>>>>> bf9d16c6 (add comments)
   {
     files: ['**/*.{ts,tsx}'],
     languageOptions: {
@@ -112,11 +122,15 @@ export default [
 >>>>>>> a89d5963 (remove eslint-plugin-import)
     rules: {
       ...ts.configs['eslint-recommended'].rules,
-      ...ts.configs['recommended'].rules,
-      'no-undef': 'off' // redundant rule - TS will fail to compile with undefined vars
+      ...ts.configs.recommended.rules,
+      'no-undef': 'off' // redundant - TS will fail to compile with undefined vars
     }
   },
+<<<<<<< HEAD
 >>>>>>> ba76bb9b (move to flat config)
+=======
+  // React / JSX files
+>>>>>>> bf9d16c6 (add comments)
   {
     files: [
       'app/**/*.js',
@@ -150,9 +164,13 @@ export default [
     }
   },
 <<<<<<< HEAD
+<<<<<<< HEAD
   // Renderer process files
 =======
 >>>>>>> ba76bb9b (move to flat config)
+=======
+  // Renderer process files
+>>>>>>> bf9d16c6 (add comments)
   {
     files: [
       'app/**/*.js',
@@ -167,9 +185,13 @@ export default [
     }
   },
 <<<<<<< HEAD
+<<<<<<< HEAD
   // Test files
 =======
 >>>>>>> ba76bb9b (move to flat config)
+=======
+  // Test files
+>>>>>>> bf9d16c6 (add comments)
   {
     files: ['test/**/*', '**/__mocks__/**/*'],
     plugins: {
@@ -186,9 +208,13 @@ export default [
     // }
   },
 <<<<<<< HEAD
+<<<<<<< HEAD
   // Components test files
 =======
 >>>>>>> ba76bb9b (move to flat config)
+=======
+  // Components test files
+>>>>>>> bf9d16c6 (add comments)
   {
     files: ['test/app/**/*.js', 'test/resources/Components/**/*.js', 'app/**/__mocks__/**'],
     plugins: {
