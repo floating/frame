@@ -71,6 +71,7 @@ class ChainConnection extends EventEmitter {
       infuraId: '786ade30f36244469480aa5c2bf0743b',
       alchemyId: 'NBms1eV9i16RFHpFqQxod56OLdlucIq0'
     })
+
     this[priority].blockMonitor = this._createBlockMonitor(this[priority].provider, priority)
   }
 
@@ -84,7 +85,6 @@ class ChainConnection extends EventEmitter {
     const allowEip1559 = !legacyChains.includes(parseInt(this.chainId))
 
     monitor.on('data', async (block) => {
-      log.debug(`%cReceived block ${parseInt(block.number)} for chain ${this.chainId}`, 'color: yellow')
       let feeMarket = null
 
       const gasMonitor = new GasMonitor(provider)
@@ -304,11 +304,6 @@ class ChainConnection extends EventEmitter {
           this.emit('close')
         })
         this.secondary.provider.on('status', (status) => {
-          log.debug(
-            `%cUpdated status from secondary provider for chain ${this.chainId}: ${status}`,
-            'color: red'
-          )
-
           if (status === 'connected' && this.secondary.network && this.secondary.network !== this.chainId) {
             this.secondary.connected = false
             this.secondary.type = ''
@@ -376,11 +371,6 @@ class ChainConnection extends EventEmitter {
           this.emit('close')
         })
         this.primary.provider.on('status', (status) => {
-          log.debug(
-            `%cUpdated status from primary provider for chain ${this.chainId}: ${status}`,
-            'color: red'
-          )
-
           if (status === 'connected' && this.primary.network && this.primary.network !== this.chainId) {
             this.primary.connected = false
             this.primary.type = ''

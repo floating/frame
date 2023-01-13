@@ -57,8 +57,8 @@ class BlockMonitor extends EventEmitter {
 
     this.latestBlock = '0x0'
 
-    this.connection.once('connect', this.start)
-    this.connection.once('close', this.stop)
+    this.connection.on('connect', this.start)
+    this.connection.on('close', this.stop)
   }
 
   start() {
@@ -120,6 +120,10 @@ class BlockMonitor extends EventEmitter {
   }
 
   private handleBlock(block: Block) {
+    log.debug(`Handling block ${parseInt(block.number)} for chain ${parseInt(this.connection.chainId)}`, {
+      latestBlock: this.latestBlock
+    })
+
     if (!block) return this.handleError('handleBlock received undefined block')
 
     if (block.number !== this.latestBlock) {
