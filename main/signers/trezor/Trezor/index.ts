@@ -32,11 +32,11 @@ export const Status = {
   ENTERING_PASSPHRASE: 'waiting for input on device'
 }
 
-function createErrorMessage(message: string, cause: string = '') {
+function createError(message: string, code: string, cause: string = '') {
   // the cause may need to be transformed into a more informative message
   return cause.toLowerCase().match(/forbidden key path/)
-    ? 'derivation path failed strict safety checks on trezor device'
-    : message
+    ? new DeviceError('derivation path failed strict safety checks on trezor device', 'SAFETY_CHECKS')
+    : new DeviceError(message, code)
 }
 
 export default class Trezor extends Signer {
@@ -82,10 +82,12 @@ export default class Trezor extends Signer {
       // this prompts a login of pin and/or passphrase
       await TrezorBridge.getAccountInfo(device, this.getPath(0))
     } catch (e) {
-      const err = e as DeviceError
-      this.handleError(
-        new DeviceError(createErrorMessage(Status.NEEDS_RECONNECTION, err.message), 'ACCOUNT_ACCESS_FAILURE')
+      const deviceError = createError(
+        Status.NEEDS_RECONNECTION,
+        'ACCOUNT_ACCESS_FAILURE',
+        (e as DeviceError).message
       )
+      this.handleError(deviceError)
 
       throw e
     }
@@ -130,8 +132,10 @@ export default class Trezor extends Signer {
       ADDRESS_NO_MATCH_DEVICE: Status.NEEDS_RECONNECTION,
       UNRECOVERABLE: Status.NEEDS_RECONNECTION,
       ADDRESS_VERIFICATION_FAILURE: Status.NEEDS_RECONNECTION,
-      ACCOUNT_ACCESS_FAILURE: Status.NEEDS_RECONNECTION
+      ACCOUNT_ACCESS_FAILURE: Status.NEEDS_RECONNECTION,
+      SAFETY_CHECKS: 'derivation path failed strict safety checks on trezor device'
     }
+
     const newStatus = errorStatusMap[error.code as keyof typeof errorStatusMap]
     if (newStatus) {
       this.status = newStatus
@@ -177,12 +181,13 @@ export default class Trezor extends Signer {
       const err = e as DeviceError
 
       log.error('error verifying Trezor address', err)
-      this.handleError(
-        new DeviceError(
-          createErrorMessage('could not verify address, reconnect your Trezor', err.message),
-          'ADDRESS_VERIFICATION_FAILURE'
-        )
+
+      const deviceError = createError(
+        'could not verify address, reconnect your Trezor',
+        'ADDRESS_VERIFICATION_FAILURE',
+        err.message
       )
+      this.handleError(deviceError)
 
       cb(new Error(err.message))
     }
