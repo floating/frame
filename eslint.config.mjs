@@ -108,7 +108,11 @@ export default [
     rules: {
       ...ts.configs['eslint-recommended'].rules,
       ...ts.configs.recommended.rules,
-      'no-undef': 'off' // redundant - TS will fail to compile with undefined vars
+      'no-undef': 'off', // redundant - TS will fail to compile with undefined vars
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { ignoreRestSiblings: true, destructuredArrayIgnorePattern: '^_' }
+      ]
     }
   },
   // React / JSX files
