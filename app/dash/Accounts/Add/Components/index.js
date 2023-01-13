@@ -136,7 +136,6 @@ export function AddHotAccount({
 }) {
   const { secret, password, error, creationArgs = [] } = accountData
   const viewIndex = error ? 3 : !secret ? 0 : !password ? 1 : 2
-  console.log({ viewIndex })
 
   const onCreate = (password) => {
     navForward(newAccountType, {

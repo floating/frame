@@ -88,20 +88,20 @@ const LoadKeystore = ({ accountData }) => {
   return <>{steps[viewIndex]}</>
 }
 
-export default function AddKeystore({ accountData }) {
-  return (
-    <AddHotAccount
-      {...{
-        title: 'Key Store',
-        summary: 'A keystore account lets you add accounts from your keystore.json file',
-        svgName: 'file',
-        intro: 'Add KeyStore Account',
-        accountData,
-        createSignerMethod: 'createFromKeystore',
-        firstStep: <LoadKeystore key={0} accountData={accountData} />,
-        newAccountType: 'keystore',
-        validateSecret: () => {}
-      }}
-    />
-  )
-}
+const AddKeystore = ({ accountData }) => (
+  <AddHotAccount
+    {...{
+      title: 'Key Store',
+      summary: 'A keystore account lets you add accounts from your keystore.json file',
+      svgName: 'file',
+      intro: 'Add KeyStore Account',
+      accountData,
+      createSignerMethod: 'createFromKeystore',
+      firstStep: <LoadKeystore key={0} accountData={accountData} />,
+      newAccountType: 'keystore',
+      validateSecret: () => {}
+    }}
+  />
+)
+
+export default AddKeystore
