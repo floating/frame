@@ -11,8 +11,11 @@ import importPlugin from 'eslint-plugin-import'
 >>>>>>> a89d5963 (remove eslint-plugin-import)
 import react from 'eslint-plugin-react'
 import reactHooks from 'eslint-plugin-react-hooks'
+<<<<<<< HEAD
 import testingLibraryReact from 'eslint-plugin-testing-library/configs/react.js'
 >>>>>>> ba76bb9b (move to flat config)
+=======
+>>>>>>> e14013c9 (standardise config import)
 import testingLibrary from 'eslint-plugin-testing-library'
 import jest from 'eslint-plugin-jest'
 import globals from 'globals'
@@ -193,10 +196,14 @@ export default [
     },
     rules: {
 <<<<<<< HEAD
+<<<<<<< HEAD
       ...testingLibrary.configs.react.rules
 =======
       ...testingLibraryReact.rules
 >>>>>>> ba76bb9b (move to flat config)
+=======
+      ...testingLibrary.configs.react.rules
+>>>>>>> e14013c9 (standardise config import)
     }
   }
 ]
