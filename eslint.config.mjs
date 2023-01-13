@@ -30,7 +30,11 @@ export default [
 =======
   // Ignored dirs
   {
-    ignores: ['dist/*', 'compiled/*', 'bundle/*']
+    ignores: ['dist/**/*', 'compiled/**/*', 'bundle/**/*']
+  },
+  // Temporary ignored dirs - remove on rewrite
+  {
+    ignores: ['main/signers/**/*']
   },
 >>>>>>> 2d671087 (add ignore dirs)
   // All files
