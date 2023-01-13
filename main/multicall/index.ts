@@ -145,7 +145,7 @@ export default function (chainId: number, eth: EthereumProvider) {
             )}`,
             e
           )
-          return [...Array(batchCalls.length).keys()].map((n) => ({ success: false, returnValues: [] }))
+          return [...Array(batchCalls.length).keys()].map(() => ({ success: false, returnValues: [] }))
         }
       })
 

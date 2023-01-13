@@ -1,7 +1,5 @@
 // Frames are the windows that run dapps and other functionality
 // They are rendered based on the state of `main.frames`
-
-import { screen } from 'electron'
 import log from 'electron-log'
 import store from '../../store'
 

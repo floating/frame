@@ -150,7 +150,7 @@ const handler = (socket: FrameWebSocket, req: IncomingMessage) => {
     }
   })
   socket.on('error', (err) => log.error(err))
-  socket.on('close', (_) => {
+  socket.on('close', () => {
     Object.keys(subs).forEach((sub) => {
       if (subs[sub].socket.id === socket.id) {
         provider.send({
