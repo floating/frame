@@ -34,10 +34,10 @@ class AddAccounts extends React.Component {
       </div>
     )
   }
-  renderAddKeystore() {
+  renderAddKeystore({ accountData }) {
     return (
       <div className='addAccounts cardShow'>
-        <AddKeystore close={this.props.close} />
+        <AddKeystore close={this.props.close} {...{ accountData }} />
       </div>
     )
   }
@@ -130,7 +130,7 @@ class AddAccounts extends React.Component {
     } else if (newAccountType === 'keyring') {
       return this.renderAddKeyring({ accountData })
     } else if (newAccountType === 'keystore') {
-      return this.renderAddKeystore()
+      return this.renderAddKeystore({ accountData })
     } else if (newAccountType === 'nonsigning') {
       return this.renderAddNonsigning()
     } else {

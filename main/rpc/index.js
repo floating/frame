@@ -204,7 +204,7 @@ const rpc = {
       })
       .catch(cb)
   },
-  createFromKeystore(keystore, keystorePassword, password, cb) {
+  createFromKeystore(keystore, password, keystorePassword, cb) {
     signers.createFromKeystore(keystore, keystorePassword, password, cb)
   },
   createFromPrivateKey(privateKey, password, cb) {
