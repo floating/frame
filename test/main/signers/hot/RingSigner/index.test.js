@@ -139,7 +139,7 @@ describe('Ring signer', () => {
     } catch (e) {
       done(e)
     }
-  }, 5000)
+  }, 2000)
 
   test('Add private key', (done) => {
     try {
@@ -177,7 +177,7 @@ describe('Ring signer', () => {
     } catch (e) {
       done(e)
     }
-  }, 6000)
+  }, 2000)
 
   test('Add private key from keystore', (done) => {
     try {
