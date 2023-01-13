@@ -1136,7 +1136,7 @@ describe('migration 29', () => {
     })
   })
 
-  it(`does not add an account with a default name`, () => {
+  it('does not add an account with a default name', () => {
     state.main.accounts.test = {
       name: getDefaultAccountName('ledger'),
       lastSignerType: 'ledger'
@@ -1152,7 +1152,7 @@ describe('migration 29', () => {
     })
   })
 
-  it(`does not add a watch account with the previous default name`, () => {
+  it('does not add a watch account with the previous default name', () => {
     state.main.accounts.test = {
       name: 'Address Account',
       lastSignerType: 'address'
