@@ -752,6 +752,18 @@ const migrations = {
     })
 
     return initial
+  },
+  32: (initial) => {
+    const dodgyAddress = '0xdeaddeaddeaddeaddeaddeaddeaddeaddead0000'
+
+    Object.entries(initial.main.tokens.known).forEach(([address, knownTokens]) => {
+      initial.main.tokens.known[address] = knownTokens.filter(({ address }) => address !== dodgyAddress)
+    })
+
+    initial.main.networksMeta.ethereum[100].nativeCurrency.name = 'xDAI'
+    initial.main.networksMeta.ethereum[137].nativeCurrency.name = 'Matic'
+
+    return initial
   }
 }
 

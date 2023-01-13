@@ -163,7 +163,7 @@ const initial = {
   },
   platform: process.platform,
   main: {
-    _version: main('_version', 31),
+    _version: main('_version', 32),
     instanceId: main('instanceId', generateUuid()),
     colorway: main('colorway', 'dark'),
     colorwayPrimary: {
@@ -605,8 +605,7 @@ const initial = {
               change24hr: 0
             },
             icon: '',
-            name: '',
-            symbol: '',
+            name: 'xDAI',
             decimals: 18
           },
           icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/gnosis.svg',
@@ -628,7 +627,7 @@ const initial = {
               change24hr: 0
             },
             icon: '',
-            name: '',
+            name: 'Matic',
             decimals: 18
           },
           icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/polygon.svg',
