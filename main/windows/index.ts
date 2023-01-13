@@ -271,6 +271,7 @@ export class Tray {
       visibleOnFullScreen: true,
       skipTransformProcessType: true
     })
+    windows.tray.setSkipTaskbar(false)
     windows.tray.setResizable(false) // Keeps height consistent
     const area = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
     const height = isDev && !fullheight ? devHeight : area.height
@@ -351,6 +352,7 @@ class Dash {
         visibleOnFullScreen: true,
         skipTransformProcessType: true
       })
+      windows.dash.setSkipTaskbar(false)
       windows.dash.setResizable(false) // Keeps height consistent
       const area = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
       const height = isDev && !fullheight ? devHeight : area.height
