@@ -206,6 +206,18 @@ describe('Ring signer', () => {
     }
   }, 600)
 
+  test('Lock', (done) => {
+    try {
+      signer.lock((err) => {
+        expect(err).toBe(null)
+        expect(signer.status).toBe('locked')
+        done()
+      })
+    } catch (e) {
+      done(e)
+    }
+  }, 2000)
+
   test('Unlock', (done) => {
     try {
       signer.unlock(PASSWORD, (err) => {

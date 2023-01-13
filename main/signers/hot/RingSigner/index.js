@@ -55,8 +55,7 @@ class RingSigner extends HotSigner {
       this.update()
 
       // If signer was unlock -> update keys in worker
-      if (this.status === 'locked') this.unlock(password, cb)
-      else cb(null)
+      this.unlock(password, cb)
     })
   }
 
