@@ -3,7 +3,24 @@
   "afterSign": "./build/notarize.js",
   "productName": "Frame Canary",
   "linux": {
-    "target": ["AppImage", "deb", "snap", "tar.gz"]
+    "target": [
+      {
+        "target": "AppImage",
+        "arch": ["x64", "arm64"]
+      },
+      {
+        "target": "deb",
+        "arch": ["x64", "arm64"]
+      },
+      {
+        "target": "snap",
+        "arch": ["x64"]
+      },
+      {
+        "target": "tar.gz",
+        "arch": ["x64", "arm64"]
+      }
+    ]
   },
   "mac": {
     "target": {
