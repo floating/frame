@@ -43,7 +43,7 @@ const EnterKeystorePassword = ({ keystore }) => {
   const getError = () => {}
   const title = 'Enter Keystore Password'
   const buttonText = 'Continue'
-  return <PasswordInput {...{ next, getError, title, buttonText, debounceTime: 750 }} />
+  return <PasswordInput {...{ next, getError, title, buttonText }} />
 }
 const KeystoreError = ({ keystoreError }) => (
   <div className='addAccountItemOptionSetupFrame'>
@@ -64,7 +64,7 @@ const LoadKeystore = ({ accountData }) => {
   const { keystoreError, keystore } = accountData
 
   const addKeystore = () => {
-    navForward({ keystore: 'SELECTING' })
+    navForward({ keystore: '' })
     setTimeout(() => {
       link.rpc('locateKeystore', (err, locatedKeystore) => {
         if (err) {
@@ -77,7 +77,7 @@ const LoadKeystore = ({ accountData }) => {
     }, 640)
   }
 
-  const viewIndex = keystoreError ? 3 : keystore ? (keystore !== 'SELECTING' ? 2 : 1) : 0
+  const viewIndex = keystoreError ? 3 : !keystore ? (keystore !== '' ? 2 : 1) : 0
 
   const steps = [
     <LocateKeystore key={0} {...{ addKeystore }} />,
