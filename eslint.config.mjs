@@ -24,8 +24,15 @@ export default [
   'eslint:recommended',
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> bf9d16c6 (add comments)
+=======
+  // Ignored dirs
+  {
+    ignores: ['dist/*', 'compiled/*', 'bundle/*']
+  },
+>>>>>>> 2d671087 (add ignore dirs)
   // All files
   {
     files: ['**/*.{js,mjs,ts,tsx}'],
