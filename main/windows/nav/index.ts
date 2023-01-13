@@ -14,7 +14,7 @@ const nav = {
     // Removes last crumb from nav array
     store.navBack(windowId, steps)
   },
-  update: (windowId: string, crumb: Breadcrumb, navigate: boolean = true) => {
+  update: (windowId: string, crumb: Breadcrumb, navigate = true) => {
     // Updated last crumb in nav array with new data
     // Replaces last crumb when navigate is false
     // Adds new crumb to nav array when navigate is true

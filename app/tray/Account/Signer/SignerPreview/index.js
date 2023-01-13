@@ -168,7 +168,7 @@ class Signer extends React.Component {
                       this.setState({ notifySuccess: false, notifyText: '' })
                     }, 5000)
                   }
-                  const crumb = !!signer ? signerPanelCrumb(signer) : accountPanelCrumb()
+                  const crumb = signer ? signerPanelCrumb(signer) : accountPanelCrumb()
                   link.send('tray:action', 'navDash', crumb)
                 }}
               >
