@@ -1151,6 +1151,22 @@ describe('migration 29', () => {
       }
     })
   })
+
+  it(`does not add a watch account with the previous default name`, () => {
+    state.main.accounts.test = {
+      name: 'Address Account',
+      lastSignerType: 'address'
+    }
+    const updatedState = migrations.apply(state, 29)
+    const { accountsMeta } = updatedState.main
+
+    expect(accountsMeta).toStrictEqual({
+      '6ae9081b-ba1c-54a5-a985-20e180d6fa9f': {
+        name: 'such a cool account',
+        lastUpdated: 1668682918135
+      }
+    })
+  })
 })
 
 describe('migration 30', () => {
