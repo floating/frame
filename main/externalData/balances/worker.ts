@@ -8,7 +8,7 @@ log.transports.file.level = ['development', 'test'].includes(process.env.NODE_EN
   : 'verbose'
 
 import { supportsChain as chainSupportsScan } from '../../multicall'
-import balancesLoader, { BalanceLoader, TokenBalance } from './scan'
+import balancesLoader, { BalanceLoader } from './scan'
 import TokenLoader from '../inventory/tokens'
 import { toTokenId } from '../../../resources/domain/balance'
 

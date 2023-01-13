@@ -14,7 +14,6 @@ import provider from '../../provider'
 import { ApprovalType } from '../../../resources/constants'
 
 import reveal from '../../reveal'
-import type { Breadcrumb } from '../../windows/nav/breadcrumb'
 import type { TypedMessage } from '../types'
 
 const nebula = nebulaApi()

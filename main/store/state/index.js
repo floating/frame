@@ -26,7 +26,7 @@ const latestStateVersion = () => {
 }
 
 const get = (path, obj = latestStateVersion()) => {
-  path.split('.').some((key, i) => {
+  path.split('.').some((key) => {
     if (typeof obj !== 'object') {
       obj = undefined
     } else {
@@ -576,7 +576,6 @@ const initial = {
             }
           },
           nativeCurrency: {
-            symbol: 'ETH',
             usd: {
               price: 0,
               change24hr: 0
@@ -643,7 +642,6 @@ const initial = {
             }
           },
           nativeCurrency: {
-            symbol: 'ETH',
             usd: {
               price: 0,
               change24hr: 0

@@ -6,12 +6,12 @@ import store from '../../store'
 import server from '../../dapps/server'
 import { createViewInstance } from '../window'
 
-interface extract {
+interface Extract {
   session: string
   ens: string
 }
 
-const extract = (l: string): extract => {
+const extract = (l: string): Extract => {
   const url = new URL(l)
   const session = url.searchParams.get('session') || ''
   const ens = url.port === '8421' ? url.hostname.replace('.localhost', '') || '' : ''

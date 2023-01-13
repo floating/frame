@@ -80,7 +80,7 @@ module.exports = {
       return Object.assign({}, secondary, status)
     })
   },
-  setLaunch: (u, launch) => u('main.launch', (_) => launch),
+  setLaunch: (u, launch) => u('main.launch', () => launch),
   toggleLaunch: (u) => u('main.launch', (launch) => !launch),
   toggleReveal: (u) => u('main.reveal', (reveal) => !reveal),
   toggleNonceAdjust: (u) => u('main.nonceAdjust', (nonceAdjust) => !nonceAdjust),
@@ -120,9 +120,9 @@ module.exports = {
     })
   },
   setAccount: (u, account) => {
-    u('selected.current', (_) => account.id)
-    u('selected.minimized', (_) => false)
-    u('selected.open', (_) => true)
+    u('selected.current', () => account.id)
+    u('selected.minimized', () => false)
+    u('selected.open', () => true)
   },
   setAccountSignerStatusOpen: (u, value) => {
     u('selected.signerStatusOpen', () => Boolean(value))
@@ -522,7 +522,7 @@ module.exports = {
     })
   },
   expandDock: (u, expand) => {
-    u('dock.expand', (s) => expand)
+    u('dock.expand', () => expand)
   },
   pin: (u) => {
     u('main.pin', (pin) => !pin)
@@ -812,12 +812,12 @@ module.exports = {
     })
   },
   unsetAccount: (u) => {
-    u('selected.open', (_) => false)
-    u('selected.minimized', (_) => true)
-    u('selected.view', (_) => 'default')
-    u('selected.showAccounts', (_) => false)
+    u('selected.open', () => false)
+    u('selected.minimized', () => true)
+    u('selected.view', () => 'default')
+    u('selected.showAccounts', () => false)
     u('windows.panel.nav', () => [])
-    setTimeout((_) => {
+    setTimeout(() => {
       u('selected', (signer) => {
         signer.last = signer.current
         signer.current = ''

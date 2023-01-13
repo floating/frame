@@ -18,7 +18,7 @@ interface ContractSourceCodeResult {
   Implementation: string
 }
 
-const sourceCapture = /^https?:\/\/(?:api[\.-]?)?(?<source>.*)\//
+const sourceCapture = /^https?:\/\/(?:api[.-]?)?(?<source>.*)\//
 
 const getEndpoint = (domain: string, contractAddress: string, apiKey: string) => {
   return `https://${domain}/api?module=contract&action=getsourcecode&address=${contractAddress}&apikey=${apiKey}`
