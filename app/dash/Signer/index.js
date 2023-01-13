@@ -495,7 +495,7 @@ class Signer extends React.Component {
           <></>
         )}
         <div className='signerControls'>
-          {!!permissionId ? (
+          {permissionId ? (
             <div className='signerControlDetail'>
               <div className='signerControlDetailKey'>{'PERMISSION ID:'}</div>
               <div className='signerControlDetailValue'>{permissionId}</div>

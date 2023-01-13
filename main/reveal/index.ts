@@ -151,7 +151,7 @@ function identifyKnownContractActions(
 }
 
 const surface = {
-  identity: async (address: string = '', chainId: number) => {
+  identity: async (address = '', chainId: number) => {
     // Resolve ens, type and other data about address entities
     const [type, ens] = await Promise.all([resolveEntityType(address, chainId), resolveEnsName(address)])
     // TODO: Check the address against various scam dbs
@@ -159,7 +159,7 @@ const surface = {
     // TODO: Check the address against previously verified contracts
     return { type, ens }
   },
-  decode: async (contractAddress: string = '', chainId: number, calldata: string) => {
+  decode: async (contractAddress = '', chainId: number, calldata: string) => {
     // Decode calldata
     const contractSources: ContractSource[] = [{ name: 'ERC-20', source: 'Generic ERC-20', abi: erc20Abi }]
     const contractSource = await fetchContract(contractAddress, chainId)

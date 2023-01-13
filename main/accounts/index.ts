@@ -1164,7 +1164,7 @@ export class Accounts extends EventEmitter {
     // When a request is approved, lock it so that no automatic updates such as fee changes can happen
     const currentAccount = this.current()
     if (currentAccount && currentAccount.requests[handlerId]) {
-      ;(currentAccount.requests[handlerId] as TransactionRequest).locked = true
+      (currentAccount.requests[handlerId] as TransactionRequest).locked = true
     } else {
       log.error('Trying to lock request ' + handlerId + ' but there is no current account')
     }

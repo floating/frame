@@ -179,7 +179,7 @@ class Signers extends EventEmitter {
     }
 
     // Add private key
-    ;(signer as RingSigner).addPrivateKey(privateKey, password, cb)
+    (signer as RingSigner).addPrivateKey(privateKey, password, cb)
   }
 
   removePrivateKey(id: string, index: number, password: string, cb: Callback<Signer>) {
@@ -191,7 +191,7 @@ class Signers extends EventEmitter {
     }
 
     // Add keystore
-    ;(signer as RingSigner).removePrivateKey(index, password, cb)
+    (signer as RingSigner).removePrivateKey(index, password, cb)
   }
 
   addKeystore(
@@ -208,7 +208,7 @@ class Signers extends EventEmitter {
       return cb(new Error('Keystores can only be used with ring signers'), undefined)
     }
 
-    ;(signer as RingSigner).addKeystore(keystore, keystorePassword, password, cb)
+    (signer as RingSigner).addKeystore(keystore, keystorePassword, password, cb)
   }
 
   lock(id: string, cb: Callback<Signer>) {
@@ -216,7 +216,7 @@ class Signers extends EventEmitter {
 
     // @ts-ignore
     if (signer && signer.lock) {
-      ;(signer as HotSigner).lock(cb)
+      (signer as HotSigner).lock(cb)
     }
   }
 
@@ -225,7 +225,7 @@ class Signers extends EventEmitter {
 
     // @ts-ignore
     if (signer && signer.unlock) {
-      ;(signer as HotSigner).unlock(password, cb)
+      (signer as HotSigner).unlock(password, cb)
     } else {
       log.error('Signer not unlockable via password, no unlock method')
     }

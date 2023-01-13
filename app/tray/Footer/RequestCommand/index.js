@@ -328,7 +328,7 @@ class RequestCommand extends React.Component {
     const showWarning = !status && mode !== 'monitor'
     const requiredApproval = showWarning && (req.approvals || []).filter((a) => !a.approved)[0]
 
-    if (!!requiredApproval) {
+    if (requiredApproval) {
       return (
         <div className='requestNotice requestNoticeApproval'>
           <div className='requestNoticeInner requestNoticeInnerApproval'>
