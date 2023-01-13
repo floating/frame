@@ -1,4 +1,3 @@
-import React from 'react'
 import Octicon, { getIconByName } from '@githubprimer/octicons-react'
 
 export default {
@@ -63,7 +62,7 @@ export default {
       </div>
     )
   },
-  txSection: (size) => {
+  txSection: () => {
     return (
       <div style={{ width: '410px', height: '50px' }}>
         <svg viewBox='0 0 445.47 54.55'>
@@ -71,18 +70,6 @@ export default {
             className='a'
             d='M328.82,353.55H762.58a3.85,3.85,0,0,1,3.57,2.41l6.47,16.18a23.36,23.36,0,0,1,0,17.36l-6.47,16.18a3.86,3.86,0,0,1-3.57,2.41H328.82Z'
             transform='translate(-328.82 -353.55)'
-          />
-        </svg>
-      </div>
-    )
-  },
-  seedling: (size) => {
-    return (
-      <div style={{ width: size + 'px', height: size + 'px' }}>
-        <svg viewBox='0 0 512 512'>
-          <path
-            fill='currentColor'
-            d='M64 96H0c0 123.7 100.3 224 224 224v144c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16V320C288 196.3 187.7 96 64 96zm384-64c-84.2 0-157.4 46.5-195.7 115.2 27.7 30.2 48.2 66.9 59 107.6C424 243.1 512 147.9 512 32h-64z'
           />
         </svg>
       </div>
@@ -100,7 +87,7 @@ export default {
       </div>
     )
   },
-  swoop: (size) => {
+  swoop: () => {
     return (
       <div style={{ width: '120%', height: '1200px' }}>
         <svg viewBox='0 0 121.89 524.31'>
@@ -686,18 +673,6 @@ export default {
       </div>
     )
   },
-  window: (size) => {
-    return (
-      <div style={{ width: size + 'px', height: size + 'px' }}>
-        <svg viewBox='0 0 512 512' width={size + 'px'} height={size + 'px'}>
-          <path
-            fill='currentColor'
-            d='M464 32H48C21.5 32 0 53.5 0 80v352c0 26.5 21.5 48 48 48h416c26.5 0 48-21.5 48-48V80c0-26.5-21.5-48-48-48zm0 394c0 3.3-2.7 6-6 6H54c-3.3 0-6-2.7-6-6V192h416v234z'
-          />
-        </svg>
-      </div>
-    )
-  },
   select: (size) => {
     return (
       <div style={{ width: size + 'px', height: size + 'px' }}>
@@ -1102,7 +1077,7 @@ export default {
       </div>
     )
   },
-  sine: (size) => {
+  sine: () => {
     return (
       <div style={{ width: '100%' }}>
         <svg viewBox='0 0 2500 100'>
