@@ -32,6 +32,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
     "lint": "ESLINT_USE_FLAT_CONFIG=true eslint -c eslint.config.mjs .",
+<<<<<<< HEAD
 =======
     "lint": "eslint .",
 >>>>>>> e7431409 (add linting config)
@@ -39,6 +40,9 @@
     "lint": "ESLINT_USE_FLAT_CONFIG=true eslint -c eslint.config.mjs .",
 >>>>>>> ba76bb9b (move to flat config)
     "lint:fix": "eslint --fix .",
+=======
+    "lint:fix": "npm run lint -- --fix",
+>>>>>>> 7e01594e (update scripts)
     "format": "prettier --write '**/*.{yml,json,md,html,ts,js}'",
     "format:check": "prettier --check '**/*.{yml,json,md,html,ts,js}'",
     "prod": "npm run compile && npm run bundle && npm run launch",
