@@ -71,6 +71,7 @@ class ChainConnection extends EventEmitter {
       infuraId: '786ade30f36244469480aa5c2bf0743b',
       alchemyId: 'NBms1eV9i16RFHpFqQxod56OLdlucIq0'
     })
+
     this[priority].blockMonitor = this._createBlockMonitor(this[priority].provider, priority)
   }
 

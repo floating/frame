@@ -57,11 +57,13 @@ class BlockMonitor extends EventEmitter {
 
     this.latestBlock = '0x0'
 
-    this.connection.once('connect', this.start)
-    this.connection.once('close', this.stop)
+    this.connection.on('connect', this.start)
+    this.connection.on('close', this.stop)
   }
 
   start() {
+    log.verbose(`Starting block updates for chain ${parseInt(this.connection.chainId)}`)
+
     this.connection.on('message', this.handleMessage)
 
     // load the latest block first on connect, then start checking for new blocks
@@ -79,9 +81,9 @@ class BlockMonitor extends EventEmitter {
   }
 
   stop() {
+    log.verbose(`Stopping block updates for chain ${parseInt(this.connection.chainId)}`)
+
     this.removeAllListeners()
-    this.connection.off('connect', this.start)
-    this.connection.off('close', this.stop)
 
     if (this.subscriptionId) {
       this.clearSubscription()
@@ -116,6 +118,10 @@ class BlockMonitor extends EventEmitter {
   }
 
   private handleBlock(block: Block) {
+    log.debug(`Handling block ${parseInt(block.number)} for chain ${parseInt(this.connection.chainId)}`, {
+      latestBlock: this.latestBlock
+    })
+
     if (!block) return this.handleError('handleBlock received undefined block')
 
     if (block.number !== this.latestBlock) {
