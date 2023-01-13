@@ -1,6 +1,5 @@
 import { intToHex } from '@ethereumjs/util'
 import GasMonitor from '../../../main/transaction/gasMonitor'
-import { gweiToHex } from '../../util'
 
 let requestHandlers
 let testConnection = {

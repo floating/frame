@@ -1,4 +1,3 @@
-import React from 'react'
 import Restore from 'react-restore'
 
 import { render, screen } from '../../../../../componentSetup'

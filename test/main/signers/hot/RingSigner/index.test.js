@@ -1,4 +1,3 @@
-/* globals test, expect, beforeAll, afterAll, describe */
 import fs from 'fs'
 import path from 'path'
 import crypto from 'crypto'
