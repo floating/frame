@@ -6,7 +6,8 @@ export const ClusterValue = ({
   onClick,
   grow = 1,
   pointerEvents = false,
-  transparent = false
+  transparent = false,
+  role
 }) => {
   let valueClass = 'clusterValue'
   if (onClick) valueClass += ' clusterValueClickable'
@@ -14,7 +15,7 @@ export const ClusterValue = ({
   if (transparent) valueClass += ' clusterValueTransparent'
   style.flexGrow = grow
   return (
-    <div className={valueClass} style={style} onClick={onClick}>
+    <div className={valueClass} style={style} onClick={onClick} role={role}>
       {children}
     </div>
   )

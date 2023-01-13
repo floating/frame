@@ -1,105 +1,99 @@
 import React from 'react'
-import { act } from 'react-dom/test-utils'
 
-import { setupComponent } from '../../../componentSetup'
+import { screen, render } from '../../../componentSetup'
 import { CreatePassword, ConfirmPassword } from '../../../../resources/Components/Password'
 
-const password = 'thisisagoodpassword123'
+const validPassword = 'thisisagoodpassword123'
 
 describe('creating password', () => {
-  let submitButton, passwordEntryTextArea, user, getByRole
-  const onCreate = jest.fn()
-
-  beforeEach(() => {
-    ;({ user, getByRole } = setupComponent(<CreatePassword {...{ password, onCreate }} />))
-    passwordEntryTextArea = getByRole('textbox')
-    submitButton = getByRole('button')
-  })
-
-  it('Should display the correct title when entering the password', () => {
-    expect(getByRole('heading').textContent).toBe('Create Password')
-  })
-
-  it('Should show an error when the password is too short', async () => {
-    await user.type(passwordEntryTextArea, 'INVALID')
-
-    act(() => {
-      jest.runAllTimers()
+  const setupComponent = ({ onCreate = jest.fn() } = {}) => {
+    const { user } = render(<CreatePassword {...{ password: validPassword, onCreate }} />, {
+      advanceTimersAfterInput: true
     })
 
-    expect(submitButton.textContent).toBe('PASSWORD MUST BE 12 OR MORE CHARACTERS')
+    return {
+      user,
+      getSubmitButton: () => screen.getByRole('button'),
+      enterPassword: async (text) => user.type(screen.getByRole('textbox'), text)
+    }
+  }
+
+  it('should display the correct title when entering the password', () => {
+    setupComponent()
+
+    expect(screen.getByRole('heading').textContent).toBe('Create Password')
   })
 
-  it('Should show the warning when the password is too weak', async () => {
-    await user.type(passwordEntryTextArea, 'aaaaaaaaaaaa')
+  it('should show an error when the password is too short', async () => {
+    const { enterPassword, getSubmitButton } = setupComponent()
 
-    act(() => {
-      jest.runAllTimers()
-    })
+    await enterPassword('INVALID')
 
-    expect(submitButton.textContent).toBe('REPEATS LIKE "AAA" ARE EASY TO GUESS')
+    expect(getSubmitButton().textContent).toBe('PASSWORD MUST BE 12 OR MORE CHARACTERS')
   })
 
-  it('Should show the continue button when a valid password is entered', async () => {
-    await user.type(passwordEntryTextArea, password)
+  it('should show the warning when the password is too weak', async () => {
+    const { enterPassword, getSubmitButton } = setupComponent()
 
-    act(() => {
-      jest.runAllTimers()
-    })
+    await enterPassword('aaaaaaaaaaaa')
 
-    expect(submitButton.textContent).toBe('Continue')
+    expect(getSubmitButton().textContent).toBe('REPEATS LIKE "AAA" ARE EASY TO GUESS')
   })
 
-  it('Should call the onCreate function when a password is submitted', async () => {
-    await user.type(passwordEntryTextArea, password)
+  it('should show the continue button when a valid password is entered', async () => {
+    const { enterPassword, getSubmitButton } = setupComponent()
 
-    act(() => {
-      jest.runAllTimers()
-    })
+    await enterPassword(validPassword)
 
-    await user.click(submitButton)
-    expect(onCreate).toHaveBeenCalledWith(password)
+    expect(getSubmitButton().textContent).toBe('Continue')
+  })
+
+  it('should call the onCreate function when a password is submitted', async () => {
+    const onCreate = jest.fn()
+    const { user, enterPassword, getSubmitButton } = setupComponent({ onCreate })
+
+    await enterPassword(validPassword)
+    await user.click(getSubmitButton())
+
+    expect(onCreate).toHaveBeenCalledWith(validPassword)
   })
 })
 
 describe('confirming password', () => {
-  let passwordEntryTextArea, confirmButton, user
-  const onConfirm = jest.fn()
-
-  beforeEach(() => {
-    const component = setupComponent(<ConfirmPassword {...{ password, onConfirm }} />)
-    user = component.user
-    passwordEntryTextArea = component.getByRole('textbox')
-    confirmButton = component.getByRole('button')
-  })
-
-  it('Should show an error when the password does not match previously entered password', async () => {
-    await user.type(passwordEntryTextArea, 'DOES_NOT_MATCH')
-    act(() => {
-      jest.runAllTimers()
+  const setupComponent = ({ onConfirm = jest.fn() } = {}) => {
+    const { user } = render(<ConfirmPassword {...{ password: validPassword, onConfirm }} />, {
+      advanceTimersAfterInput: true
     })
 
-    expect(confirmButton.textContent).toBe('PASSWORDS DO NOT MATCH')
+    return {
+      user,
+      getConfirmButton: () => screen.getByRole('button'),
+      enterPassword: async (text) => user.type(screen.getByRole('textbox'), text)
+    }
+  }
+  it('should show an error when the password does not match previously entered password', async () => {
+    const { enterPassword, getConfirmButton } = setupComponent()
+
+    await enterPassword('DOES_NOT_MATCH')
+
+    expect(getConfirmButton().textContent).toBe('PASSWORDS DO NOT MATCH')
   })
 
-  it('Should show the create button when a valid password is entered', async () => {
-    await user.type(passwordEntryTextArea, password)
+  it('should show the create button when a valid password is entered', async () => {
+    const { enterPassword, getConfirmButton } = setupComponent()
 
-    act(() => {
-      jest.runAllTimers()
-    })
+    await enterPassword(validPassword)
 
-    expect(confirmButton.textContent).toBe('Create')
+    expect(getConfirmButton().textContent).toBe('Create')
   })
 
-  it('Should call the onConfirm function when the password is confirmed', async () => {
-    await user.type(passwordEntryTextArea, password)
+  it('should call the onConfirm function when the password is confirmed', async () => {
+    const onConfirm = jest.fn()
+    const { user, enterPassword, getConfirmButton } = setupComponent({ onConfirm })
 
-    act(() => {
-      jest.runAllTimers()
-    })
+    await enterPassword(validPassword)
+    await user.click(getConfirmButton())
 
-    await user.click(confirmButton)
-    expect(onConfirm).toHaveBeenCalledWith(password)
+    expect(onConfirm).toHaveBeenCalledWith(validPassword)
   })
 })

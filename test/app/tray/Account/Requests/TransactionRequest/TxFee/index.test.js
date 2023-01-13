@@ -3,7 +3,7 @@ import Restore from 'react-restore'
 import { addHexPrefix } from '@ethereumjs/util'
 
 import store from '../../../../../../../main/store'
-import { setupComponent } from '../../../../../../componentSetup'
+import { screen, render } from '../../../../../../componentSetup'
 import TxFeeComponent from '../../../../../../../app/tray/Account/Requests/TransactionRequest/TxFee'
 import { GasFeesSource } from '../../../../../../../resources/domain/transaction'
 
@@ -35,8 +35,8 @@ describe('gas display', () => {
     req.data.type = '0x0'
     req.data.gasPrice = addHexPrefix((1e10).toString(16))
 
-    const { getByTestId } = setupComponent(<TxFee req={req} />)
-    const baseFeeInput = getByTestId('gas-display')
+    render(<TxFee req={req} />)
+    const baseFeeInput = screen.getByTestId('gas-display')
 
     expect(baseFeeInput.textContent).toBe('10Gwei')
   })
@@ -45,8 +45,8 @@ describe('gas display', () => {
     req.data.type = '0x0'
     req.data.gasPrice = addHexPrefix((12369e6).toString(16))
 
-    const { getByTestId } = setupComponent(<TxFee req={req} />)
-    const baseFeeInput = getByTestId('gas-display')
+    render(<TxFee req={req} />)
+    const baseFeeInput = screen.getByTestId('gas-display')
 
     expect(baseFeeInput.textContent).toBe('12.36Gwei')
   })
@@ -55,8 +55,8 @@ describe('gas display', () => {
     req.data.type = '0x0'
     req.data.gasPrice = addHexPrefix((10e6).toString(16))
 
-    const { getByTestId } = setupComponent(<TxFee req={req} />)
-    const baseFeeInput = getByTestId('gas-display')
+    render(<TxFee req={req} />)
+    const baseFeeInput = screen.getByTestId('gas-display')
 
     expect(baseFeeInput.textContent).toBe('0.01Gwei')
   })
@@ -65,8 +65,8 @@ describe('gas display', () => {
     req.data.type = '0x0'
     req.data.gasPrice = addHexPrefix((9999999).toString(16))
 
-    const { getByTestId } = setupComponent(<TxFee req={req} />)
-    const baseFeeInput = getByTestId('gas-display')
+    render(<TxFee req={req} />)
+    const baseFeeInput = screen.getByTestId('gas-display')
 
     expect(baseFeeInput.textContent).toBe('9,999,999Wei')
   })
@@ -77,8 +77,8 @@ describe('usd estimate display', () => {
     req.data.type = '0x0'
     req.data.gasPrice = addHexPrefix((1e10).toString(16))
 
-    const { getByTestId } = setupComponent(<TxFee req={req} />)
-    const baseFeeInput = getByTestId('usd-estimate-display')
+    render(<TxFee req={req} />)
+    const baseFeeInput = screen.getByTestId('usd-estimate-display')
 
     expect(baseFeeInput.textContent).toBe('≈<$0.01in MATIC')
   })
@@ -87,8 +87,8 @@ describe('usd estimate display', () => {
     req.data.type = '0x0'
     req.data.gasPrice = addHexPrefix((5e11).toString(16))
 
-    const { getByTestId } = setupComponent(<TxFee req={req} />)
-    const baseFeeInput = getByTestId('usd-estimate-display')
+    render(<TxFee req={req} />)
+    const baseFeeInput = screen.getByTestId('usd-estimate-display')
 
     expect(baseFeeInput.textContent).toBe('≈<$0.01-$0.01in MATIC')
   })
@@ -97,8 +97,8 @@ describe('usd estimate display', () => {
     req.data.type = '0x0'
     req.data.gasPrice = addHexPrefix((5e14).toString(16))
 
-    const { getByTestId } = setupComponent(<TxFee req={req} />)
-    const baseFeeInput = getByTestId('usd-estimate-display')
+    render(<TxFee req={req} />)
+    const baseFeeInput = screen.getByTestId('usd-estimate-display')
 
     expect(baseFeeInput.textContent).toBe('≈$5.88-$11.18in MATIC')
   })
@@ -111,8 +111,8 @@ describe('usd estimate display', () => {
     req.data.type = '0x0'
     req.data.gasPrice = addHexPrefix((5e14).toString(16))
 
-    const { getByTestId } = setupComponent(<TxFee req={req} />)
-    const baseFeeInput = getByTestId('usd-estimate-display')
+    render(<TxFee req={req} />)
+    const baseFeeInput = screen.getByTestId('usd-estimate-display')
 
     expect(baseFeeInput.textContent).toBe('=$?in MATIC')
   })
