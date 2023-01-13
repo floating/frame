@@ -72,7 +72,7 @@ class BlockMonitor extends EventEmitter {
     this.connection
       .send({ id: 1, jsonrpc: '2.0', method: 'eth_subscribe', params: ['newHeads'] })
       .then((subId) => (this.subscriptionId = subId))
-      .catch((err) => {
+      .catch(() => {
         // subscriptions are not supported, poll for block changes instead
         this.clearSubscription()
 
