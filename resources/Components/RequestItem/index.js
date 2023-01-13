@@ -36,7 +36,7 @@ class _RequestItem extends React.Component {
     clearInterval(this.timer)
   }
   render() {
-    const { account, handlerId, i, title, svgName, img, color, headerMode, txNonce, children } = this.props
+    const { account, handlerId, title, svgName, img, color, headerMode, children } = this.props
     const req = this.store('main.accounts', account, 'requests', handlerId)
 
     let requestItemDetailsClass = 'requestItemDetails'
