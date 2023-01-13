@@ -1208,7 +1208,7 @@ describe('#navClearReq', () => {
       }
     ]
 
-    const [req1, req2, inbox] = nav
+    const [req1, , inbox] = nav
 
     clearRequest('2b')
 

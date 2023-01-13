@@ -376,7 +376,7 @@ describe('#deriveAddresses', () => {
   it('retries on failure', (done) => {
     let requestNum = 0
 
-    lattice.connection.getAddresses.mockImplementation(async (opts) => {
+    lattice.connection.getAddresses.mockImplementation(async () => {
       if ((requestNum += 1) === 1) {
         throw new Error('Error from device: Getting addresses failed')
       }

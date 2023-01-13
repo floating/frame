@@ -1,4 +1,3 @@
-import React from 'react'
 import Restore from 'react-restore'
 import { addHexPrefix } from '@ethereumjs/util'
 import BigNumber from 'bignumber.js'
