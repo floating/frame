@@ -1109,10 +1109,12 @@ describe('migration 29', () => {
         _version: 28,
         accounts: {
           test: {
-            name: 'my test account'
+            name: 'my test account',
+            lastSignerType: 'ledger'
           },
           look: {
-            name: 'such a cool account'
+            name: 'such a cool account',
+            lastSignerType: 'ledger'
           }
         }
       }
