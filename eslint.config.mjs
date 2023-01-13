@@ -135,6 +135,7 @@ export default [
     files: [
       'app/**/*.js',
       'resources/Components/**/*.js',
+      'resources/Native/**/*.js',
       'resources/svg/index.js',
       'test/app/**/*.js',
       'test/resources/Components/**/*.js',
