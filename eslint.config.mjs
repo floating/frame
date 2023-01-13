@@ -118,8 +118,9 @@ export default [
       'no-undef': 'off', // redundant - TS will fail to compile with undefined vars
       '@typescript-eslint/no-unused-vars': [
         'error',
-        { ignoreRestSiblings: true, destructuredArrayIgnorePattern: '^_' }
-      ]
+        { ignoreRestSiblings: true, argsIgnorePattern: '^_', destructuredArrayIgnorePattern: '^_' }
+      ],
+      '@typescript-eslint/no-empty-function': 'off' // allow noop functions
     }
   },
   // React / JSX files
