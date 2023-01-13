@@ -258,28 +258,30 @@ export default class Trezor extends Signer {
       if (this.isTrezorOne()) {
         // Trezor One requires hashed input
         const { types, primaryType, domain, message } = TypedDataUtils.sanitizeData(typedMessage.data)
+
         const domainSeparatorHash = TypedDataUtils.hashStruct(
           'EIP712Domain',
           domain,
           types,
           SignTypedDataVersion.V4
-        ).toString('hex')
+        )
+
         const messageHash = TypedDataUtils.hashStruct(
           primaryType as any,
           message,
           types,
           SignTypedDataVersion.V4
-        ).toString('hex')
+        )
 
         signature = await TrezorBridge.signTypedHash(
           this.device,
           path,
-          typedMessage,
-          domainSeparatorHash,
-          messageHash
+          typedMessage.data,
+          domainSeparatorHash.toString('hex'),
+          messageHash.toString('hex')
         )
       } else {
-        signature = await TrezorBridge.signTypedData(this.device, path, typedMessage)
+        signature = await TrezorBridge.signTypedData(this.device, path, typedMessage.data)
       }
 
       cb(null, addHexPrefix(signature))
