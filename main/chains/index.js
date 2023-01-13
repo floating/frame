@@ -67,6 +67,7 @@ class ChainConnection extends EventEmitter {
 
     this[priority].provider = provider(target, {
       name: priority,
+      origin: 'frame',
       infuraId: '786ade30f36244469480aa5c2bf0743b',
       alchemyId: 'NBms1eV9i16RFHpFqQxod56OLdlucIq0'
     })
