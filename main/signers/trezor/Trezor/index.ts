@@ -279,7 +279,7 @@ export default class Trezor extends Signer {
           messageHash
         )
       } else {
-        signature = await TrezorBridge.signTypedData(this.device, path, typedMessage)
+        signature = await TrezorBridge.signTypedData(this.device, path, typedMessage.data)
       }
 
       cb(null, addHexPrefix(signature))
