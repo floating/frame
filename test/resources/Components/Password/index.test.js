@@ -1,5 +1,3 @@
-import React from 'react'
-
 import { screen, render } from '../../../componentSetup'
 import { CreatePassword, ConfirmPassword } from '../../../../resources/Components/Password'
 

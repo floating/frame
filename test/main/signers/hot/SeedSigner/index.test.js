@@ -1,4 +1,3 @@
-/* globals test, expect, beforeAll, afterAll, describe */
 import path from 'path'
 import { remove } from 'fs-extra'
 import { generateMnemonic } from 'bip39'
