@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/triple-slash-reference */
 /// <reference path="./environment.d.ts" />
 /// <reference path="./rpc.d.ts" />
 /// <reference path="./restore.d.ts" />
