@@ -16,7 +16,7 @@ document.addEventListener('drop', (e) => e.preventDefault())
 if (process.env.NODE_ENV !== 'development') {
   window.eval = global.eval = () => {
     throw new Error(`This app does not support window.eval()`)
-  } // eslint-disable-line
+  }
 }
 
 function AppComponent() {

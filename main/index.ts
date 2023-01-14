@@ -95,7 +95,7 @@ function startUpdater() {
 
 global.eval = () => {
   throw new Error(`This app does not support global.eval()`)
-} // eslint-disable-line
+}
 
 ipcMain.on('tray:resetAllSettings', () => {
   persist.clear()
@@ -312,7 +312,7 @@ app.on('ready', () => {
     const appOrigin = path.resolve(__dirname, '../../')
     const filePath = url.fileURLToPath(req.url)
 
-    if (filePath.startsWith(appOrigin)) cb({ path: filePath }) // eslint-disable-line
+    if (filePath.startsWith(appOrigin)) cb({ path: filePath })
   })
 })
 
