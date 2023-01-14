@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 interface Connection {
   on: boolean
   connected: boolean
@@ -85,6 +87,11 @@ interface GasLevels {
 }
 
 type HexAmount = string
+
+enum Colorway {
+  light = 'light',
+  dark = 'dark'
+}
 
 type Color = { r: number; g: number; b: number }
 type ColorwayPalette = {
