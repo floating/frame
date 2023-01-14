@@ -1,4 +1,3 @@
-// @ts-ignore
 import deepEqual from 'deep-equal'
 
 import { getColor } from '../../../resources/colors'
