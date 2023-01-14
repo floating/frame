@@ -71,6 +71,7 @@
     "@ledgerhq/hw-transport-web-ble": "6.27.8",
     "@metamask/eth-sig-util": "5.0.2",
     "@sentry/electron": "4.1.2",
+    "@trezor/connect": "9.0.5",
     "auto-launch": "5.0.5",
     "bip39": "3.0.4",
     "cheerio": "1.0.0-rc.12",
@@ -101,7 +102,6 @@
     "rlp": "3.0.0",
     "semver": "7.3.8",
     "styled-components": "5.3.6",
-    "@trezor/connect": "9.0.5",
     "uuid": "9.0.0",
     "ws": "8.11.0",
     "zxcvbn": "4.4.2"
@@ -133,6 +133,7 @@
     "@testing-library/react": "13.4.0",
     "@testing-library/user-event": "14.4.3",
     "@types/cookie": "0.5.1",
+    "@types/deep-equal": "1.0.1",
     "@types/get-pixels": "3.3.2",
     "@types/hdkey": "2.0.1",
     "@types/jest": "29.2.4",
