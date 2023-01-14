@@ -32,7 +32,7 @@ export default [
   {
     ignores: ['dist/**/*', 'compiled/**/*', 'bundle/**/*']
   },
-  // Temporary ignored dirs - remove on rewrite
+  // Temporary ignored dirs - TODO: remove on rewrite
   {
     ignores: ['main/signers/**/*']
   },
@@ -130,6 +130,7 @@ export default [
     }
   },
   // React / JSX files
+<<<<<<< HEAD
 =======
     settings: {
       'import/resolver': {
@@ -149,6 +150,9 @@ export default [
 =======
   // React / JSX files
 >>>>>>> bf9d16c6 (add comments)
+=======
+  // TODO: simplify as '**/*.{jsx,tsx}'
+>>>>>>> 0eeca1b8 (standardise config, update comments)
   {
     files: [
       'app/**/*.js',
@@ -213,7 +217,7 @@ export default [
   // Test files
 >>>>>>> bf9d16c6 (add comments)
   {
-    files: ['test/**/*', '**/__mocks__/**/*'],
+    files: ['test/**/*.js', '**/__mocks__/**/*.js'],
     plugins: {
       jest
     },
@@ -236,7 +240,7 @@ export default [
   // Components test files
 >>>>>>> bf9d16c6 (add comments)
   {
-    files: ['test/app/**/*.js', 'test/resources/Components/**/*.js', 'app/**/__mocks__/**'],
+    files: ['test/app/**/*.js', 'test/resources/Components/**/*.js', 'app/**/__mocks__/**/*.js'],
     plugins: {
       'testing-library': testingLibrary
     },
