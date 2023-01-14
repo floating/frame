@@ -1,3 +1,4 @@
 {
-  "**/*.{yml,json,md,html,ts,js}": "prettier --check"
+  "**/*.{yml,json,md,html,ts,js}": "prettier --check",
+  "**/*.{ts,tsx,js,jsx}": "eslint --quiet --fix"
 }
