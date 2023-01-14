@@ -1,33 +1,14 @@
 import ts from '@typescript-eslint/eslint-plugin'
 import tsParser from '@typescript-eslint/parser'
 import prettier from 'eslint-config-prettier'
-<<<<<<< HEAD
-<<<<<<< HEAD
 import react from 'eslint-plugin-react'
 import reactHooks from 'eslint-plugin-react-hooks'
-=======
-import importPlugin from 'eslint-plugin-import'
-=======
->>>>>>> a89d5963 (remove eslint-plugin-import)
-import react from 'eslint-plugin-react'
-import reactHooks from 'eslint-plugin-react-hooks'
-<<<<<<< HEAD
-import testingLibraryReact from 'eslint-plugin-testing-library/configs/react.js'
->>>>>>> ba76bb9b (move to flat config)
-=======
->>>>>>> e14013c9 (standardise config import)
 import testingLibrary from 'eslint-plugin-testing-library'
 import jest from 'eslint-plugin-jest'
 import globals from 'globals'
 
 export default [
   'eslint:recommended',
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> bf9d16c6 (add comments)
-=======
   // Ignored dirs
   {
     ignores: ['dist/**/*', 'compiled/**/*', 'bundle/**/*']
@@ -36,54 +17,21 @@ export default [
   {
     ignores: ['main/signers/**/*']
   },
->>>>>>> 2d671087 (add ignore dirs)
   // All files
   {
     files: ['**/*.{js,mjs,ts,tsx}'],
-=======
-  {
-    files: ['**/*.{js,mjs,ts,tsx}'],
-<<<<<<< HEAD
-    plugins: {
-      import: importPlugin
-    },
->>>>>>> ba76bb9b (move to flat config)
-=======
->>>>>>> a89d5963 (remove eslint-plugin-import)
     languageOptions: {
       ecmaVersion: 'latest',
       globals: {
         ...globals.es6
       }
     },
-<<<<<<< HEAD
-<<<<<<< HEAD
     rules: {
       ...prettier.rules,
       'no-unused-vars': ['error', { ignoreRestSiblings: true, destructuredArrayIgnorePattern: '^_' }]
     }
   },
   // Main process files and scripts
-<<<<<<< HEAD
-=======
-    settings: {
-      'import/resolver': {
-        node: true
-      },
-      'import/parsers': {
-        '@typescript-eslint/parser': ['.ts', '.tsx']
-      }
-    },
-=======
->>>>>>> a89d5963 (remove eslint-plugin-import)
-    rules: {
-      ...prettier.rules,
-      'no-unused-vars': ['error', { ignoreRestSiblings: true, destructuredArrayIgnorePattern: '^_' }]
-    }
-  },
->>>>>>> ba76bb9b (move to flat config)
-=======
->>>>>>> bf9d16c6 (add comments)
   {
     files: ['**/*.{js,mjs,ts}'],
     ignores: ['app/**/*', 'resources/Components/**/*'],
@@ -93,14 +41,7 @@ export default [
       }
     }
   },
-<<<<<<< HEAD
-<<<<<<< HEAD
   // TS files
-=======
->>>>>>> ba76bb9b (move to flat config)
-=======
-  // TS files
->>>>>>> bf9d16c6 (add comments)
   {
     files: ['**/*.{ts,tsx}'],
     languageOptions: {
@@ -114,8 +55,6 @@ export default [
     plugins: {
       '@typescript-eslint': ts
     },
-<<<<<<< HEAD
-<<<<<<< HEAD
     rules: {
       ...ts.configs['eslint-recommended'].rules,
       ...ts.configs.recommended.rules,
@@ -130,29 +69,7 @@ export default [
     }
   },
   // React / JSX files
-<<<<<<< HEAD
-=======
-    settings: {
-      'import/resolver': {
-        typescript: true
-      }
-    },
-=======
->>>>>>> a89d5963 (remove eslint-plugin-import)
-    rules: {
-      ...ts.configs['eslint-recommended'].rules,
-      ...ts.configs.recommended.rules,
-      'no-undef': 'off' // redundant - TS will fail to compile with undefined vars
-    }
-  },
-<<<<<<< HEAD
->>>>>>> ba76bb9b (move to flat config)
-=======
-  // React / JSX files
->>>>>>> bf9d16c6 (add comments)
-=======
   // TODO: simplify as '**/*.{jsx,tsx}'
->>>>>>> 0eeca1b8 (standardise config, update comments)
   {
     files: [
       'app/**/*.js',
@@ -186,14 +103,7 @@ export default [
       'react/prop-types': 'off' // all type checking to be done in TS
     }
   },
-<<<<<<< HEAD
-<<<<<<< HEAD
   // Renderer process files
-=======
->>>>>>> ba76bb9b (move to flat config)
-=======
-  // Renderer process files
->>>>>>> bf9d16c6 (add comments)
   {
     files: [
       'app/**/*.js',
@@ -208,14 +118,7 @@ export default [
       }
     }
   },
-<<<<<<< HEAD
-<<<<<<< HEAD
   // Test files
-=======
->>>>>>> ba76bb9b (move to flat config)
-=======
-  // Test files
->>>>>>> bf9d16c6 (add comments)
   {
     files: ['test/**/*.js', '**/__mocks__/**/*.js'],
     plugins: {
@@ -231,29 +134,14 @@ export default [
     //   ...jest.configs.recommended.rules
     // }
   },
-<<<<<<< HEAD
-<<<<<<< HEAD
   // Components test files
-=======
->>>>>>> ba76bb9b (move to flat config)
-=======
-  // Components test files
->>>>>>> bf9d16c6 (add comments)
   {
     files: ['test/app/**/*.js', 'test/resources/Components/**/*.js', 'app/**/__mocks__/**/*.js'],
     plugins: {
       'testing-library': testingLibrary
     },
     rules: {
-<<<<<<< HEAD
-<<<<<<< HEAD
       ...testingLibrary.configs.react.rules
-=======
-      ...testingLibraryReact.rules
->>>>>>> ba76bb9b (move to flat config)
-=======
-      ...testingLibrary.configs.react.rules
->>>>>>> e14013c9 (standardise config import)
     }
   }
 ]
