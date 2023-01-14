@@ -124,7 +124,9 @@ export default [
         'error',
         { ignoreRestSiblings: true, argsIgnorePattern: '^_', destructuredArrayIgnorePattern: '^_' }
       ],
-      '@typescript-eslint/no-empty-function': 'off' // allow noop functions
+      '@typescript-eslint/no-empty-function': 'off', // allow noop functions
+      '@typescript-eslint/prefer-namespace-keyword': 'off', // use ES module syntax instead of namespace
+      '@typescript-eslint/no-namespace': ['error', { allowDeclarations: true }]
     }
   },
   // React / JSX files
@@ -191,6 +193,7 @@ export default [
   {
     files: [
       'app/**/*.js',
+      'main/dapps/server/inject/*.js',
       'resources/**/*.{js,ts,tsx}',
       'test/app/**/*.js',
       'test/resources/Components/**/*.js'
