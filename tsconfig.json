@@ -21,7 +21,6 @@
     "./resources/**/*.ts",
     "./resources/**/*.js"
   ],
-  "exclude": ["**/__mocks__/*"],
   "watchOptions": {
     "excludeFiles": ["./node_modules/**/*", "./package.json"]
   }
