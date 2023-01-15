@@ -1,6 +1,6 @@
 import deepEqual from 'deep-equal'
 
-import { getColor } from '../../../resources/colors'
+import { Colorway, getColor } from '../../../resources/colors'
 import store from '../../store'
 
 // typed access to state

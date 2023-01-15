@@ -22,6 +22,11 @@ const dark: ColorwayPalette = {
   accent8: { r: 60, g: 40, b: 234 }
 }
 
+export enum Colorway {
+  light = 'light',
+  dark = 'dark'
+}
+
 const colorways: Record<Colorway, ColorwayPalette> = { light, dark }
 
 function toHex(color: number) {
