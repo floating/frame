@@ -23,7 +23,7 @@ export default [
     languageOptions: {
       ecmaVersion: 'latest',
       globals: {
-        ...globals.es6
+        ...globals.es2021
       }
     },
     rules: {
@@ -60,7 +60,9 @@ export default [
     ],
     languageOptions: {
       globals: {
-        ...globals.browser
+        ...globals.browser,
+        process: true,
+        global: true
       }
     }
   },
