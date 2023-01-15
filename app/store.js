@@ -1,5 +1,3 @@
-/* globals */
-
 import EventEmitter from 'events'
 import Restore from 'react-restore'
 

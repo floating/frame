@@ -1,4 +1,3 @@
-/* globals global, process */
 import * as Sentry from '@sentry/electron'
 import { createRoot } from 'react-dom/client'
 import Restore from 'react-restore'
