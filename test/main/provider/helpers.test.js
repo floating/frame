@@ -2,6 +2,8 @@ import log from 'electron-log'
 import { fromUtf8 } from '@ethereumjs/util'
 import { getRawTx, getSignedAddress } from '../../../main/provider/helpers'
 
+jest.mock('../../../main/store/persist')
+
 beforeAll(async () => {
   log.transports.console.level = false
 })
