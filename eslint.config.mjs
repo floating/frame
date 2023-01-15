@@ -41,6 +41,21 @@ export default [
       }
     }
   },
+  // Renderer process files
+  {
+    files: [
+      'app/**/*.js',
+      'main/dapps/server/inject/*.js',
+      'resources/**/*.{js,ts,tsx}',
+      'test/app/**/*.js',
+      'test/resources/Components/**/*.js'
+    ],
+    languageOptions: {
+      globals: {
+        ...globals.browser
+      }
+    }
+  },
   // TS files
   {
     files: ['**/*.{ts,tsx}'],
@@ -101,21 +116,6 @@ export default [
       ...react.configs['jsx-runtime'].rules,
       ...reactHooks.configs.recommended.rules,
       'react/prop-types': 'off' // all type checking to be done in TS
-    }
-  },
-  // Renderer process files
-  {
-    files: [
-      'app/**/*.js',
-      'main/dapps/server/inject/*.js',
-      'resources/**/*.{js,ts,tsx}',
-      'test/app/**/*.js',
-      'test/resources/Components/**/*.js'
-    ],
-    languageOptions: {
-      globals: {
-        ...globals.browser
-      }
     }
   },
   // Test files
