@@ -28,7 +28,15 @@ export default [
     },
     rules: {
       ...prettier.rules,
-      'no-unused-vars': ['error', { ignoreRestSiblings: true, destructuredArrayIgnorePattern: '^_' }]
+      'no-unused-vars': [
+        'error',
+        {
+          args: 'after-used',
+          ignoreRestSiblings: true,
+          argsIgnorePattern: '^_',
+          destructuredArrayIgnorePattern: '^_'
+        }
+      ]
     }
   },
   // Main process files and scripts
@@ -76,7 +84,12 @@ export default [
       'no-undef': 'off', // redundant - TS will fail to compile with undefined vars
       '@typescript-eslint/no-unused-vars': [
         'error',
-        { ignoreRestSiblings: true, argsIgnorePattern: '^_', destructuredArrayIgnorePattern: '^_' }
+        {
+          args: 'after-used',
+          ignoreRestSiblings: true,
+          argsIgnorePattern: '^_',
+          destructuredArrayIgnorePattern: '^_'
+        }
       ],
       '@typescript-eslint/no-empty-function': 'off', // allow noop functions
       '@typescript-eslint/prefer-namespace-keyword': 'off', // use ES module syntax instead of namespace
