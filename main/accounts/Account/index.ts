@@ -224,6 +224,14 @@ class FrameAccount {
     this.update()
   }
 
+  clearRequestsByOrigin(origin: string) {
+    Object.entries(this.requests).forEach(([handlerId, req]) => {
+      if (req.origin === origin) {
+        this.clearRequest(handlerId)
+      }
+    })
+  }
+
   addRequiredApproval(
     req: TransactionRequest,
     type: ApprovalType,

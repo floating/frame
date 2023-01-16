@@ -869,6 +869,13 @@ export class Accounts extends EventEmitter {
     }
   }
 
+  clearRequestsByOrigin(address: string, origin: string) {
+    if (address && origin) {
+      const account = this.accounts[address]
+      if (account) account.clearRequestsByOrigin(origin)
+    }
+  }
+
   remove(address = '') {
     address = address.toLowerCase()
 
