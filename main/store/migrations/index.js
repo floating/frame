@@ -711,7 +711,10 @@ const migrations = {
     // add accountsMeta
     initial.main.accountsMeta = {}
     Object.entries(initial.main.accounts).forEach(([id, account]) => {
-      if (!isDefaultAccountName(account)) {
+      // Watch accounts, having a signer type of "address", used to have a default label of "Address Account"
+      const isPreviousDefaultWatchAccountName =
+        account.lastSignerType.toLowerCase() === 'address' && account.name.toLowerCase() === 'address account'
+      if (!isPreviousDefaultWatchAccountName && !isDefaultAccountName(account)) {
         const accountMetaId = uuidv5(id, accountNS)
         initial.main.accountsMeta[accountMetaId] = {
           name: account.name,

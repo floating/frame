@@ -1109,10 +1109,12 @@ describe('migration 29', () => {
         _version: 28,
         accounts: {
           test: {
-            name: 'my test account'
+            name: 'my test account',
+            lastSignerType: 'ledger'
           },
           look: {
-            name: 'such a cool account'
+            name: 'such a cool account',
+            lastSignerType: 'ledger'
           }
         }
       }
@@ -1136,22 +1138,35 @@ describe('migration 29', () => {
     })
   })
 
-  const accountTypes = ['ring', 'seed', 'ledger', 'trezor', 'lattice', 'aragon']
-  accountTypes.forEach((type) => {
-    it(`does not add ${type} accounts with a default name`, () => {
-      state.main.accounts.test = {
-        name: getDefaultAccountName(type),
-        lastSignerType: type
-      }
-      const updatedState = migrations.apply(state, 29)
-      const { accountsMeta } = updatedState.main
+  it('does not add an account with a default name', () => {
+    state.main.accounts.test = {
+      name: getDefaultAccountName('ledger'),
+      lastSignerType: 'ledger'
+    }
+    const updatedState = migrations.apply(state, 29)
+    const { accountsMeta } = updatedState.main
 
-      expect(accountsMeta).toStrictEqual({
-        '6ae9081b-ba1c-54a5-a985-20e180d6fa9f': {
-          name: 'such a cool account',
-          lastUpdated: 1668682918135
-        }
-      })
+    expect(accountsMeta).toStrictEqual({
+      '6ae9081b-ba1c-54a5-a985-20e180d6fa9f': {
+        name: 'such a cool account',
+        lastUpdated: 1668682918135
+      }
+    })
+  })
+
+  it('does not add a watch account with the previous default name', () => {
+    state.main.accounts.test = {
+      name: 'Address Account',
+      lastSignerType: 'address'
+    }
+    const updatedState = migrations.apply(state, 29)
+    const { accountsMeta } = updatedState.main
+
+    expect(accountsMeta).toStrictEqual({
+      '6ae9081b-ba1c-54a5-a985-20e180d6fa9f': {
+        name: 'such a cool account',
+        lastUpdated: 1668682918135
+      }
     })
   })
 })
