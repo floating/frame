@@ -26,6 +26,16 @@ import SignPermitRequest from './Requests/SignPermitRequest'
 import { isHardwareSigner } from '../../../resources/domain/signer'
 import { accountViewTitles } from '../../../resources/domain/request'
 
+const requestComponents = {
+  sign: SignatureRequest,
+  signTypedData: SignTypedDataRequest,
+  signErc20Permit: SignPermitRequest,
+  transaction: TransactionRequest,
+  access: ProviderRequest,
+  addChain: ChainRequest,
+  addToken: AddTokenRequest
+}
+
 class _AccountModule extends React.Component {
   getModule(id, account, expanded, expandedData, filter) {
     return id === 'gas' ? (
@@ -208,24 +218,7 @@ class _AccountBody extends React.Component {
   }
 
   getRequestComponent({ type }) {
-    switch (type) {
-      case 'transaction':
-        return TransactionRequest
-      case 'access':
-        return ProviderRequest
-      case 'sign':
-        return SignatureRequest
-      case 'signTypedData':
-        return SignTypedDataRequest
-      case 'signErc20Permit':
-        return SignPermitRequest
-      case 'addChain':
-        return ChainRequest
-      case 'addToken':
-        return AddTokenRequest
-      default:
-        return null
-    }
+    return requestComponents[type]
   }
 
   getChainData(req) {
