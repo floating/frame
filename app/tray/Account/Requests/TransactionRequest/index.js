@@ -31,16 +31,15 @@ class TransactionRequest extends React.Component {
   }
 
   renderAdjustFee() {
-    const { accountId, handlerId } = this.props
-    const req = this.store('main.accounts', accountId, 'requests', handlerId)
+    const { req } = this.props
     return <AdjustFee req={req} />
   }
 
   renderTokenSpend() {
     const crumb = this.store('windows.panel.nav')[0] || {}
     const { actionId, requestedAmountHex } = crumb.data
-    const { accountId, handlerId } = this.props
-    const req = this.store('main.accounts', accountId, 'requests', handlerId)
+    const { req } = this.props
+    const { handlerId } = req
     if (!req) return null
     const approval = (req.recognizedActions || []).find((action) => action.id === actionId)
     if (!approval) return null
@@ -49,7 +48,7 @@ class TransactionRequest extends React.Component {
         approval={approval}
         requestedAmountHex={requestedAmountHex}
         updateApproval={(amount) => {
-          link.rpc('updateRequest', handlerId, actionId, { amount }, () => {})
+          link.rpc('updateRequest', handlerId, { amount }, actionId, () => {})
         }}
       />
     )
@@ -60,8 +59,7 @@ class TransactionRequest extends React.Component {
   }
 
   renderTx() {
-    const { accountId, handlerId } = this.props
-    const req = this.store('main.accounts', accountId, 'requests', handlerId)
+    const { req } = this.props
     if (!req) return null
 
     let requestClass = 'signerRequest cardShow'

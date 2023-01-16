@@ -15,38 +15,40 @@ const SimpleJSON = ({ json }) => {
   )
 }
 
+export const SimpleTypedDataInner = ({ typedData }) =>
+  typedData.domain ? (
+    <>
+      <div className='signTypedDataSection'>
+        <div className='signTypedDataTitle'>Domain</div>
+        <SimpleJSON json={typedData.domain} />
+      </div>
+      <div className='signTypedDataSection'>
+        <div className='signTypedDataTitle'>Message</div>
+        <SimpleJSON json={typedData.message} />
+      </div>
+    </>
+  ) : (
+    <div className='signTypedDataSection'>
+      <SimpleJSON
+        json={typedData.reduce((data, elem) => {
+          data[elem.name] = elem.value
+          return data
+        }, {})}
+      />
+    </div>
+  )
+
 export default SimpleTypedData = ({ req, originName }) => {
   const type = req.type
   const payload = req.payload
   const typedData = payload.params[1] || {}
 
-  const messageToSign = typedData.domain ? (
+  const messageToSign = (
     <div className='signTypedData'>
-      <div className='signTypedDataInner'>
-        <div className='signTypedDataSection'>
-          <div className='signTypedDataTitle'>Domain</div>
-          <SimpleJSON json={typedData.domain} />
-        </div>
-        <div className='signTypedDataSection'>
-          <div className='signTypedDataTitle'>Message</div>
-          <SimpleJSON json={typedData.message} />
-        </div>
-      </div>
-    </div>
-  ) : (
-    <div className='signTypedData'>
-      <div className='signTypedDataInner'>
-        <div className='signTypedDataSection'>
-          <SimpleJSON
-            json={typedData.reduce((data, elem) => {
-              data[elem.name] = elem.value
-              return data
-            }, {})}
-          />
-        </div>
-      </div>
+      <SimpleTypedDataInner {...{ typedData }} />
     </div>
   )
+
   return type === 'signTypedData' || 'signErc20Permit' ? (
     <div className='approveRequest'>
       <div className='approveTransactionPayload'>

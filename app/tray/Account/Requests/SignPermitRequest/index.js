@@ -43,11 +43,9 @@ const PermitOverview = ({ permit, req, chainData, originName, tokenData }) => {
   const { chainColor, chainName, icon } = chainData
   const [showCopiedMessage, copySpender] = useCopiedMessage(spender)
 
-  //TODO: allow time limit & value to be edited...
   return (
     <div className='approveRequest'>
       <div className='approveTransactionPayload'>
-        {/* //TODO: loading state when getting token data */}
         <RequestItem
           key={`signErc20Permit:${req.handlerId}`}
           req={req}
@@ -74,8 +72,7 @@ const PermitOverview = ({ permit, req, chainData, originName, tokenData }) => {
                     </div>
                   </ClusterValue>
                 </ClusterRow>
-
-                {tokenData.decimals && (
+                {Boolean(tokenData.decimals) && (
                   <>
                     <ClusterRow>
                       <ClusterValue
@@ -174,7 +171,7 @@ const EditPermit = ({ permit, tokenData, req }) => {
   const updateRequest = (newAmt) => {
     console.log({ newAmt })
     link.rpc(
-      'updateTypedSignatureRequest',
+      'updateRequest',
       req.handlerId,
       {
         message: { deadline: deadlineInSeconds, spender, value: newAmt, owner, nonce },
@@ -182,6 +179,7 @@ const EditPermit = ({ permit, tokenData, req }) => {
         types,
         primaryType: 'Permit'
       },
+      null,
       () => {}
     )
   }
@@ -213,7 +211,6 @@ const PermitRequest = ({ req, originName, step, chainData }) => {
   const permit = getPermit(req)
   useEffect(() => {
     link.rpc('getErc20Data', permit.verifyingContract, permit.chainId, (err, tokenData) => {
-      //TODO: handle error state here
       if (err) return console.error(err)
       setTokenData(tokenData)
     })
@@ -221,7 +218,6 @@ const PermitRequest = ({ req, originName, step, chainData }) => {
 
   const requestClass = getSignatureRequestClass(req)
 
-  //TODO: Expand existing cluster, and allow token address to be copied there - dont need a second screen
   const renderStep = () => {
     switch (step) {
       case 'adjustPermit':

@@ -24,21 +24,9 @@ import AddTokenRequest from './Requests/AddTokenRequest'
 import SignTypedDataRequest from './Requests/SignTypedDataRequest'
 import SignPermitRequest from './Requests/SignPermitRequest'
 import { isHardwareSigner } from '../../../resources/domain/signer'
+import { accountViewTitles } from '../../../resources/domain/request'
 
 class _AccountModule extends React.Component {
-  // constructor (props, context) {
-  //   super(props, context)
-  //   this.moduleRef = React.createRef()
-  //   this.state = {
-  //     transform: '',
-  //     transition: ''
-  //   }
-  //   this.xOffset = 2
-  //   this.yOffset = 2
-  //   this.attack = 0
-  //   this.release = 1
-  //   this.perspective = 500
-  // }
   getModule(id, account, expanded, expandedData, filter) {
     return id === 'gas' ? (
       <Gas moduleId={id} id={account} expanded={expanded} filter={filter} />
@@ -72,28 +60,6 @@ class _AccountModule extends React.Component {
       <Default moduleId={id} expanded={expanded} filter={filter} />
     )
   }
-  // map (value, istart, istop, ostart, ostop) {
-  //   console.log(value, istart, istop, ostart, ostop)
-  //   return ostart + (ostop - ostart) * ((value - istart) / (istop - istart))
-  // }
-
-  // set3d (e) {
-  //   if (this.moduleRef.current) {
-  //     const rectTransform = this.moduleRef.current
-  //     const perspective = 'perspective(' + this.perspective + 'px) '
-
-  //     let dy = 0 // e.clientY - rectTransform.offsetTop
-  //     let dx = e.clientX - rectTransform.offsetLeft
-  //     let xRot = this.map(dx, 0, rectTransform.clientWidth, - this.xOffset, this.xOffset)
-  //     let yRot = 0 // this.map(dy, 0, rectTransform.clientHeight, this.yOffset, - this.yOffset)
-  //     let propXRot = 'rotateX(' + yRot + 'deg) '
-  //     let propYRot = 'rotateY(' + xRot + 'deg)'
-
-  //     console.log({ transform: perspective + propXRot + propYRot })
-
-  //     this.setState({ transform: perspective + propXRot + propYRot })
-  //   }
-  // }
 
   render() {
     const { id, module, top, index, expanded, expandedData, account, filter } = this.props
@@ -104,7 +70,7 @@ class _AccountModule extends React.Component {
       height: module.height,
       opacity: 1
     }
-    //  && !this.props.signer) hidden = true
+
     if (hidden) {
       style = {
         transform: `translateY(${top}px)`,
@@ -119,37 +85,9 @@ class _AccountModule extends React.Component {
       return this.getModule(id, account, expanded, expandedData, filter)
     } else {
       return (
-        <div
-          className={'accountModule'}
-          ref={this.moduleRef}
-          style={style}
-          // onMouseEnter={() => {
-          //   this.setState({
-          //     transition: 'transform ' + this.attack + 's'
-          //   })
-          // }}
-          // onMouseMove={(e) => {
-          //   e.persist()
-          //   this.set3d(e)
-          // }}
-          // onMouseLeave={() => {
-          //   const perspective = 'perspective(' + this.perspective + 'px) '
-          //   this.setState({
-          //     transition: 'transform ' + this.release + 's',
-          //     transform: perspective + 'rotateX(0deg) rotateY(0deg)'
-          //   })
-          // }}
-        >
+        <div className={'accountModule'} ref={this.moduleRef} style={style}>
           <div className='accountModuleInner cardShow'>
-            <div
-              className='accountModuleCard'
-              // style={{
-              //   animationDelay: (index * 0.1) + 's',
-              //   transformStyle: 'preserve-3d',
-              //   transform: this.state.transform,
-              //   transition: this.state.transition
-              // }}
-            >
+            <div className='accountModuleCard'>
               {this.getModule(id, account, expanded, expandedData, filter)}
             </div>
           </div>
@@ -268,110 +206,77 @@ class _AccountBody extends React.Component {
       view: 'request'
     }
   }
-  renderRequest(req, data) {
-    const activeAccount = this.store('main.accounts', this.props.id)
-    const signingDelay = isHardwareSigner(activeAccount.lastSignerType) ? 200 : 1500
 
-    if (req.type === 'transaction') {
-      return (
-        <TransactionRequest
-          key={req.handlerId}
-          req={req}
-          step={data.step}
-          handlerId={req.handlerId}
-          accountId={this.props.id}
-          signingDelay={signingDelay}
-        />
-      )
-    } else if (req.type === 'access') {
-      return (
-        <ProviderRequest key={req.handlerId} handlerId={req.handlerId} accountId={this.props.id} req={req} />
-      )
-    } else if (req.type === 'sign') {
-      return (
-        <SignatureRequest
-          key={req.handlerId}
-          req={req}
-          handlerId={req.handlerId}
-          accountId={this.props.id}
-          signingDelay={signingDelay}
-        />
-      )
-    } else if (req.type === 'signTypedData') {
-      return (
-        <SignTypedDataRequest
-          key={req.handlerId}
-          req={req}
-          step={data.step || ''}
-          handlerId={req.handlerId}
-          accountId={this.props.id}
-          signingDelay={signingDelay}
-        />
-      )
-    } else if (req.type === 'signErc20Permit') {
-      const originName = this.store('main.origins', req.origin, 'name')
-      const chainId = req.typedMessage.data.domain.chainId
-      const chainName = this.store('main.networks.ethereum', chainId, 'name')
-      const { primaryColor: chainColor, icon } = this.store('main.networksMeta.ethereum', chainId)
-      const chainData = { chainName, chainColor, icon }
-      return (
-        <SignPermitRequest
-          key={req.handlerId}
-          {...{
-            req,
-            signingDelay,
-            chainId,
-            originName,
-            chainData
-          }}
-          step={data.step || ''}
-          accountId={this.props.id}
-        />
-      )
-    } else if (req.type === 'addChain' || req.type === 'switchChain') {
-      return (
-        <ChainRequest key={req.handlerId} req={req} handlerId={req.handlerId} accountId={this.props.id} />
-      )
-    } else if (req.type === 'addToken') {
-      return (
-        <AddTokenRequest key={req.handlerId} req={req} handlerId={req.handlerId} accountId={this.props.id} />
-      )
-    } else {
-      return null
+  getRequestComponent({ type }) {
+    switch (type) {
+      case 'transaction':
+        return TransactionRequest
+      case 'access':
+        return ProviderRequest
+      case 'sign':
+        return SignatureRequest
+      case 'signTypedData':
+        return SignTypedDataRequest
+      case 'signErc20Permit':
+        return SignPermitRequest
+      case 'addChain':
+        return ChainRequest
+      case 'addToken':
+        return AddTokenRequest
+      default:
+        return null
     }
   }
+
+  getChainData(req) {
+    if (req.type !== 'signErc20Permit') return {}
+    const chainId = req.typedMessage.data.domain.chainId
+    const chainName = this.store('main.networks.ethereum', chainId, 'name')
+    const { primaryColor: chainColor, icon } = this.store('main.networksMeta.ethereum', chainId)
+
+    return { chainId, chainName, chainColor, icon }
+  }
+
+  renderRequest(req, data = {}) {
+    const RequestComponent = this.getRequestComponent(req)
+    if (!RequestComponent) return null
+
+    const { handlerId } = req
+    const { step } = data
+
+    const activeAccount = this.store('main.accounts', this.props.id)
+    const originName = this.store('main.origins', req.origin, 'name')
+    const chainData = this.getChainData(req)
+
+    const signingDelay = isHardwareSigner(activeAccount.lastSignerType) ? 200 : 1500
+
+    return (
+      <RequestComponent
+        {...{
+          key: handlerId,
+          req,
+          step,
+          signingDelay,
+          chainId: chainData.chainId,
+          originName,
+          chainData
+        }}
+      />
+    )
+  }
+
+  getAccountViewTitle({ type }) {
+    return accountViewTitles[type]
+  }
+
   render() {
     const crumb = this.store('windows.panel.nav')[0] || {}
 
     if (crumb.view === 'requestView') {
       const { accountId, requestId } = crumb.data
       const req = this.store('main.accounts', accountId, 'requests', requestId)
-      let accountViewTitle, accountViewIcon
-      if (req.type === 'access') {
-        accountViewTitle = 'Account Access'
-        // accountViewIcon = svg.accounts(17)
-      } else if (req.type === 'sign') {
-        accountViewTitle = 'Sign Message'
-        // accountViewIcon = svg.sign(17)
-      } else if (req.type === 'signTypedData') {
-        accountViewTitle = 'Sign Data'
-        // accountViewIcon = svg.sign(17)
-      } else if (req.type === 'signErc20Permit') {
-        accountViewTitle = 'Sign Token Spend Permit'
-        // accountViewIcon = svg.sign(17)
-      } else if (req.type === 'addChain') {
-        accountViewTitle = 'Add Chain'
-        // accountViewIcon = svg.chain(17)
-      } else if (req.type === 'switchChain') {
-        accountViewTitle = 'Switch Chain'
-        // accountViewIcon = svg.chain(17)
-      } else if (req.type === 'addToken') {
-        accountViewTitle = 'Add Token'
-        // accountViewIcon = svg.tokens(17)
-      } else if (req.type === 'transaction') {
-        accountViewTitle = 'Sign Transaction'
-        // accountViewIcon = svg.broadcast(17)
-      }
+      const accountViewTitle = this.getAccountViewTitle(req)
+
       return (
         <AccountView
           back={() => {
@@ -379,7 +284,6 @@ class _AccountBody extends React.Component {
           }}
           {...this.props}
           accountViewTitle={accountViewTitle}
-          accountViewIcon={accountViewIcon}
         >
           {this.renderRequest(req, crumb.data)}
         </AccountView>

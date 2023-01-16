@@ -35,7 +35,13 @@ export type TypedSignatureRequestType = 'signTypedData' | 'signErc20Permit'
 
 export type SignatureRequestType = 'sign' | TypedSignatureRequestType
 
-type RequestType = SignatureRequestType | 'transaction' | 'access' | 'addChain' | 'switchChain' | 'addToken'
+export type RequestType =
+  | SignatureRequestType
+  | 'transaction'
+  | 'access'
+  | 'addChain'
+  | 'switchChain'
+  | 'addToken'
 
 interface Request {
   type: RequestType

@@ -139,17 +139,9 @@ const rpc = {
   respondToExtensionRequest(id, approved, cb) {
     callbackWhenDone(() => store.trustExtension(id, approved), cb)
   },
-  updateRequest(reqId, actionId, data, cb = () => {}) {
-    accounts.updateRequest(reqId, actionId, data)
+  updateRequest(reqId, data, actionId) {
+    accounts.updateRequest(reqId, data, actionId)
   },
-  updateTypedSignatureRequest(id, data) {
-    try {
-      accounts.updateTypedSignatureRequest(id, data)
-    } catch (error) {
-      log.error('failed to update typed signature request', { error })
-    }
-  },
-
   approveRequest(req, cb) {
     accounts.setRequestPending(req)
     if (req.type === 'transaction') {
