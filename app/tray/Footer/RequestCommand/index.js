@@ -18,7 +18,7 @@ const FEE_WARNING_THRESHOLD_USD = 50
 class RequestCommand extends React.Component {
   constructor(props, context) {
     super(props, context)
-    this.state = { allowInput: false, dataView: false }
+    this.state = { allowInput: false, dataView: false, signerLocked: false }
 
     setTimeout(() => {
       this.setState({ allowInput: true })
@@ -282,14 +282,17 @@ class RequestCommand extends React.Component {
             </div>
           </div>
           <div
-            className='requestSign'
+            className={this.state.signerLocked ? 'requestSign headShake' : 'requestSign'}
             onClick={() => {
               if (this.state.allowInput) {
                 link.rpc('signerCompatibility', req.handlerId, (e, compatibility) => {
                   if (e === 'No signer') {
                     this.store.notify('noSignerWarning', { req })
                   } else if (e === 'Signer unavailable') {
-                    this.store.notify('signerUnavailableWarning', { req })
+                    this.setState({ signerLocked: true })
+                    setTimeout(() => {
+                      this.setState({ signerLocked: false })
+                    }, 3000)
                   } else if (
                     !compatibility.compatible &&
                     !this.store('main.mute.signerCompatibilityWarning')
@@ -313,7 +316,14 @@ class RequestCommand extends React.Component {
             }}
           >
             <div className='requestSignButton _txButton'>
-              <span>Sign</span>
+              {this.state.signerLocked ? (
+                <span style={{ display: 'flex' }}>
+                  <span>{svg.sign(19)}</span>
+                  <span>{svg.lock(13)}</span>
+                </span>
+              ) : (
+                <span>Sign</span>
+              )}
             </div>
           </div>
         </div>
@@ -415,7 +425,10 @@ class RequestCommand extends React.Component {
                     if (e === 'No signer') {
                       this.store.notify('noSignerWarning', { req })
                     } else if (e === 'Signer unavailable') {
-                      this.store.notify('signerUnavailableWarning', { req })
+                      this.setState({ signerLocked: true })
+                      setTimeout(() => {
+                        this.setState({ signerLocked: false })
+                      }, 3000)
                     } else {
                       this.approve(req.handlerId, req)
                     }
