@@ -4,6 +4,8 @@ export default {
   name: 'Chain Name',
   explorer: 'Block Explorer',
   symbol: 'Native Symbol',
+  nativeCurrency: 'Native Currency Name',
+  icon: '',
   isTestnet: false,
   primaryColor: 'accent2',
   primaryRpc: 'Primary Endpoint',

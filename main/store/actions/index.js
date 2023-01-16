@@ -301,8 +301,8 @@ module.exports = {
         primaryColor: net.primaryColor,
         nativeCurrency: {
           symbol: net.symbol,
-          icon: '',
-          name: '',
+          icon: net.icon,
+          name: net.nativeCurrency,
           decimals: 18
         },
         gas: {
