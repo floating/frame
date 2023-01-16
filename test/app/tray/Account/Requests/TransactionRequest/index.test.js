@@ -35,7 +35,7 @@ describe('confirm', () => {
 
     addRequest(req)
 
-    render(<TxRequest step='confirm' handlerId={req.handlerId} accountId={account} />)
+    render(<TxRequest req={req} step='confirm' handlerId={req.handlerId} accountId={account} />)
 
     const notice = screen.getByRole('status')
     expect(notice.textContent).toBe('confirming')
@@ -55,7 +55,7 @@ describe('confirm', () => {
 
     addRequest(req)
 
-    render(<TxRequest step='confirm' handlerId={req.handlerId} accountId={account} />)
+    render(<TxRequest req={req} step='confirm' handlerId={req.handlerId} accountId={account} />)
 
     const notice = screen.getByRole('alert')
     expect(notice.textContent).toMatch(/insufficient funds for gas/i)
