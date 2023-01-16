@@ -678,6 +678,9 @@ module.exports = {
       return win
     })
   },
+  navClearSigner: (u, signerId) => {
+    u('windows.dash.nav', (nav) => nav.filter((navItem) => navItem?.data?.signer !== signerId))
+  },
   navClearReq: (u, handlerId, showRequestInbox = true) => {
     u('windows.panel.nav', (nav) => {
       const newNav = nav.filter((navItem) => {

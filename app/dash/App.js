@@ -52,7 +52,7 @@ class Dash extends React.Component {
     if (view === 'expandedSigner' && data.signer) {
       const signer = this.store('main.signers', data.signer)
       if (!signer) {
-        link.send('tray:action', 'navDash', { view: 'accounts' })
+        link.send('tray:action', 'navClearSigner', data.signer)
         return null
       }
       return <Signer expanded={true} key={signer.id + ':expanded'} {...signer} />
