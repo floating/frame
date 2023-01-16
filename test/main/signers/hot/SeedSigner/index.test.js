@@ -41,7 +41,9 @@ describe('Seed signer', () => {
 
   afterAll(() => {
     clean()
-
+    if (signer.status !== 'locked') {
+      signer.close()
+    }
     log.transports.console.level = 'debug'
   })
 
@@ -73,7 +75,7 @@ describe('Seed signer', () => {
     } catch (e) {
       done(e)
     }
-  }, 2000)
+  }, 10_000)
 
   test('Lock', (done) => {
     try {

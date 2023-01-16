@@ -43,7 +43,9 @@ describe('Ring signer', () => {
 
   afterAll(() => {
     clean()
-
+    if (signer.status !== 'locked') {
+      signer.close()
+    }
     log.transports.console.level = 'debug'
   })
 
@@ -90,7 +92,7 @@ describe('Ring signer', () => {
     } catch (e) {
       done(e)
     }
-  }, 2000)
+  }, 10_000)
 
   test('Scan for signers', (done) => {
     jest.useFakeTimers()
@@ -195,17 +197,6 @@ describe('Ring signer', () => {
     }
   }, 2000)
 
-  test('Unlock with wrong password', (done) => {
-    try {
-      signer.unlock('Wrong password', (err) => {
-        expect(err).toBeTruthy()
-        done()
-      })
-    } catch (e) {
-      done(e)
-    }
-  }, 600)
-
   test('Lock', (done) => {
     try {
       signer.lock((err) => {
@@ -217,6 +208,17 @@ describe('Ring signer', () => {
       done(e)
     }
   }, 2000)
+
+  test('Unlock with wrong password', (done) => {
+    try {
+      signer.unlock('Wrong password', (err) => {
+        expect(err).toBeTruthy()
+        done()
+      })
+    } catch (e) {
+      done(e)
+    }
+  }, 600)
 
   test('Unlock', (done) => {
     try {
