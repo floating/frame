@@ -92,7 +92,7 @@ describe('Ring signer', () => {
     } catch (e) {
       done(e)
     }
-  }, 10_000)
+  }, 7_500)
 
   test('Scan for signers', (done) => {
     jest.useFakeTimers()

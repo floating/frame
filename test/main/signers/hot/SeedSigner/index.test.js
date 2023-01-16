@@ -75,7 +75,7 @@ describe('Seed signer', () => {
     } catch (e) {
       done(e)
     }
-  }, 10_000)
+  }, 7_500)
 
   test('Lock', (done) => {
     try {
