@@ -36,38 +36,31 @@ const requestComponents = {
   addToken: AddTokenRequest
 }
 
+const modules = {
+  gas: Gas,
+  requests: Requests,
+  activity: Activity,
+  inventory: Inventory,
+  permissions: Permissions,
+  balances: Balances,
+  signer: Signer,
+  settings: Settings
+}
+
 class _AccountModule extends React.Component {
-  getModule(id, account, expanded, expandedData, filter) {
-    return id === 'gas' ? (
-      <Gas moduleId={id} id={account} expanded={expanded} filter={filter} />
-    ) : id === 'requests' ? (
-      <Requests moduleId={id} account={account} expanded={expanded} filter={filter} />
-    ) : id === 'activity' ? (
-      <Activity moduleId={id} id={account} expanded={expanded} filter={filter} />
-    ) : id === 'inventory' ? (
-      <Inventory
-        moduleId={id}
-        account={account}
-        expanded={expanded}
-        expandedData={expandedData}
-        filter={filter}
+  getModule(moduleId, account, expanded, expandedData, filter) {
+    const Module = modules[moduleId] || Default
+
+    return (
+      <Module
+        {...{
+          account,
+          expanded,
+          expandedData,
+          filter,
+          moduleId
+        }}
       />
-    ) : id === 'permissions' ? (
-      <Permissions moduleId={id} account={account} expanded={expanded} filter={filter} />
-    ) : id === 'balances' ? (
-      <Balances moduleId={id} account={account} expanded={expanded} filter={filter} />
-    ) : id === 'signer' ? (
-      <Signer
-        moduleId={id}
-        account={account}
-        expanded={expanded}
-        filter={filter}
-        signer={this.props.signer}
-      />
-    ) : id === 'settings' ? (
-      <Settings moduleId={id} account={account} expanded={expanded} filter={filter} />
-    ) : (
-      <Default moduleId={id} expanded={expanded} filter={filter} />
     )
   }
 
@@ -231,8 +224,8 @@ class _AccountBody extends React.Component {
   }
 
   renderRequest(req, data = {}) {
-    const RequestComponent = this.getRequestComponent(req)
-    if (!RequestComponent) return null
+    const Request = this.getRequestComponent(req)
+    if (!Request) return null
 
     const { handlerId } = req
     const { step } = data
@@ -244,7 +237,7 @@ class _AccountBody extends React.Component {
     const signingDelay = isHardwareSigner(activeAccount.lastSignerType) ? 200 : 1500
 
     return (
-      <RequestComponent
+      <Request
         {...{
           key: handlerId,
           req,
