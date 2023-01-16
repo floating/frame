@@ -66,6 +66,7 @@ beforeEach((done) => {
   const nonce = '0xa'
   request = {
     handlerId: 1,
+    origin: '0r161n',
     type: 'transaction',
     data: {
       from,
@@ -711,6 +712,19 @@ describe('#removeRequest', () => {
     Accounts.removeRequest(account, request.handlerId)
 
     expect(account.clearRequest).toHaveBeenCalledWith(request.handlerId)
+  })
+})
+
+describe('#clearRequestsByOrigin', () => {
+  beforeEach(() => {
+    Accounts.addRequest(request)
+    Accounts.addRequest({ ...request, handlerId: '2' })
+    Accounts.addRequest({ ...request, handlerId: '3', origin: '07h3r' })
+  })
+
+  it('should remove any request from a given origin', () => {
+    Accounts.clearRequestsByOrigin(account.id, request.origin)
+    expect(Object.keys(Accounts.accounts[account.id].requests)).toHaveLength(1)
   })
 })
 
