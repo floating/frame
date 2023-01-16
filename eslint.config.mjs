@@ -93,7 +93,7 @@ export default [
           destructuredArrayIgnorePattern: '^_'
         }
       ],
-      '@typescript-eslint/no-empty-function': 'off', // allow noop functions
+      '@typescript-eslint/no-empty-function': ['error', { allow: ['arrowFunctions'] }], // allow noop arrow functions, e.g. in a method signature for ensuring a parameter defaults to a function
       '@typescript-eslint/prefer-namespace-keyword': 'off', // use ES module syntax instead of namespace
       '@typescript-eslint/no-namespace': ['error', { allowDeclarations: true }]
     }
