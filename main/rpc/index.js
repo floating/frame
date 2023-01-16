@@ -193,7 +193,10 @@ const rpc = {
           fs.readFile(keystore.filePaths[0], 'utf8', (err, data) => {
             if (err) return cb(err)
             try {
-              cb(null, JSON.parse(data))
+              const parsed = JSON.parse(data)
+              if (typeof parsed.version !== 'number') cb('Invalid keystore file')
+              if (![1, 3].includes(parsed.version)) cb('Invalid keystore version')
+              cb(null, parsed)
             } catch (err) {
               cb(err)
             }

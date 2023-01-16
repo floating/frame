@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { AddHotAccount } from '../Components'
 import link from '../../../../../resources/link'
 import { PasswordInput } from '../../../../../resources/Components/Password'
@@ -13,77 +13,81 @@ const navForward = (accountData) =>
     }
   })
 
-const LocateKeystore = ({ addKeystore }) => (
-  <div className='addAccountItemOptionSetupFrame'>
-    <div
-      className='addAccountItemOptionSubmit'
-      style={{ marginTop: '10px' }}
-      onMouseDown={() => addKeystore()}
-    >
-      Locate Keystore File (json)
+const LocateKeystore = ({ addKeystore, error, setError }) => {
+  useEffect(() => {
+    if (!error) return
+    setTimeout(() => {
+      setError('')
+    }, 3_500)
+  }, [error])
+  return (
+    <div className='addAccountItemOptionSetupFrame'>
+      {error ? (
+        <div role='button' className='addAccountItemOptionError'>
+          {error}
+        </div>
+      ) : (
+        <div
+          role='button'
+          className='addAccountItemOptionSubmit'
+          style={{ marginTop: '10px' }}
+          onClick={() => addKeystore()}
+        >
+          Locate Keystore File (json)
+        </div>
+      )}
     </div>
-  </div>
-)
+  )
+}
 
 const Loading = () => (
   <div className='addAccountItemOptionSetupFrame'>
-    <div className='addAccountItemOptionTitle' style={{ marginTop: '15px' }}>
+    <div role={'status'} className='addAccountItemOptionTitle' style={{ marginTop: '15px' }}>
       Locating Keystore file
     </div>
   </div>
 )
 
 const EnterKeystorePassword = ({ keystore }) => {
-  const next = (keystorePassword) =>
+  const next = (keystorePassword) => {
     navForward({
       secret: keystore,
       creationArgs: [keystorePassword]
     })
+  }
   //TODO: validate keystore password here?
   const getError = () => {}
   const title = 'Enter Keystore Password'
   const buttonText = 'Continue'
   return <PasswordInput {...{ next, getError, title, buttonText }} />
 }
-const KeystoreError = ({ keystoreError }) => (
-  <div className='addAccountItemOptionSetupFrame'>
-    <>
-      <div className='addAccountItemOptionTitle'>{keystoreError}</div>
-      <div
-        role='button'
-        className='addAccountItemOptionSubmit'
-        onClick={() => link.send('nav:back', 'dash', 2)}
-      >
-        back
-      </div>
-    </>
-  </div>
-)
 
 const LoadKeystore = ({ accountData }) => {
-  const { keystoreError, keystore } = accountData
+  const { keystore } = accountData
+
+  const [error, setError] = useState('')
+  const [selecting, setSelecting] = useState(false)
 
   const addKeystore = () => {
-    navForward({ keystore: '' })
+    setSelecting(true)
     setTimeout(() => {
       link.rpc('locateKeystore', (err, locatedKeystore) => {
+        setSelecting(false)
         if (err) {
-          navForward({ keystoreError: err })
+          setError(err)
         } else {
-          link.send('nav:back', 'dash')
           navForward({ keystore: locatedKeystore })
         }
       })
     }, 640)
   }
 
-  const viewIndex = keystoreError ? 3 : !keystore ? (keystore !== '' ? 2 : 1) : 0
+  const viewIndex = keystore ? 2 : selecting ? 1 : 0
 
   const steps = [
-    <LocateKeystore key={0} {...{ addKeystore }} />,
+    <LocateKeystore key={0} {...{ addKeystore, error, setError }} />,
     <Loading key={1} />,
-    <EnterKeystorePassword key={2} keystore={accountData.keystore} />,
-    <KeystoreError keystoreError={keystoreError} />
+    <EnterKeystorePassword key={2} keystore={accountData.keystore} />
   ]
   return <>{steps[viewIndex]}</>
 }
