@@ -26,7 +26,7 @@ import SignPermitRequest from './Requests/SignPermitRequest'
 import { isHardwareSigner } from '../../../resources/domain/signer'
 import { accountViewTitles } from '../../../resources/domain/request'
 
-const requestComponents = {
+const requests = {
   sign: SignatureRequest,
   signTypedData: SignTypedDataRequest,
   signErc20Permit: SignPermitRequest,
@@ -211,7 +211,7 @@ class _AccountBody extends React.Component {
   }
 
   getRequestComponent({ type }) {
-    return requestComponents[type]
+    return requests[type]
   }
 
   getChainData(req) {
