@@ -141,11 +141,11 @@ const ChainOrigins = ({ chain: { name }, origins, primaryColor, icon }) => {
         </div>
         <div className='originTitleText'>{name}</div>
       </div>
-      {origins.connected.map((origin) => (
-        <OriginModule origin={origin} connected={true} />
+      {origins.connected.map((origin, index) => (
+        <OriginModule key={index + origin} origin={origin} connected={true} />
       ))}
-      {origins.disconnected.map((origin) => (
-        <OriginModule origin={origin} connected={false} />
+      {origins.disconnected.map((origin, index) => (
+        <OriginModule key={index + origin} origin={origin} connected={false} />
       ))}
       {origins.connected.length === 0 && origins.disconnected.length === 0 ? (
         <div className='sliceOriginNoDapp'>{'No Dapp Recently Connected'}</div>
@@ -162,7 +162,6 @@ class Dapps extends React.Component {
   render() {
     const enabledChains = this.getEnabledChains()
     const origins = this.store('main.origins')
-    const clearOriginsClickHandler = () => link.send('tray:clearOrigins')
 
     const { dappDetails } = this.props.data
 
@@ -171,14 +170,20 @@ class Dapps extends React.Component {
     } else {
       return (
         <div className='cardShow' style={{ padding: '0px 0px 64px 0px' }}>
-          {enabledChains.map((chain) => {
+          {enabledChains.map((chain, index) => {
             const chainOrigins = getOriginsForChain(chain, origins)
             const { primaryColor, icon } = this.store('main.networksMeta.ethereum', chain.id)
 
             return chainOrigins.length === 0 ? (
               <></>
             ) : (
-              <ChainOrigins chain={chain} origins={chainOrigins} primaryColor={primaryColor} icon={icon} />
+              <ChainOrigins
+                key={index + chain.id}
+                chain={chain}
+                origins={chainOrigins}
+                primaryColor={primaryColor}
+                icon={icon}
+              />
             )
           })}
         </div>

@@ -2,7 +2,6 @@ import React from 'react'
 import Restore from 'react-restore'
 
 import link from '../../../../../resources/link'
-import svg from '../../../../../resources/svg'
 import RingIcon from '../../../../../resources/Components/RingIcon'
 
 import Signer from '../../../Signer'
@@ -43,9 +42,9 @@ class AddHardware extends React.Component {
             {tethered.length ? (
               tethered.map((signer, i) => {
                 return (
-                  <div className='addAccountItemOptionSetupFrame'>
+                  <div key={i + signer.id} className='addAccountItemOptionSetupFrame'>
                     {signer ? (
-                      <Signer key={signer.id} {...signer} inSetup={true} />
+                      <Signer {...signer} inSetup={true} />
                     ) : (
                       <>
                         <div className='addAccountItemOptionTitle'>{this.state.status}</div>
@@ -66,9 +65,9 @@ class AddHardware extends React.Component {
                 </div>
                 {this.deviceName === 'trezor' ? (
                   <div className='addAccountItemTrezorBridgeWarning'>
-                    <div>Don't see your Trezor?</div>
+                    <div>Don&apos;t see your Trezor?</div>
                     <div>
-                      <span>Make sure you've installed </span>
+                      <span>Make sure you&apos;ve installed </span>
                       <span
                         className='openBridgeUrl'
                         onClick={() => link.send('tray:openExternal', 'https://wiki.trezor.io/Trezor_Bridge')}
