@@ -1,6 +1,9 @@
 /** @jest-environment jsdom */
+import React from 'react'
 import { renderHook, act } from '@testing-library/react'
+import { render, screen } from '../../../componentSetup'
 import useCountdown from '../../../../resources/Hooks/useCountdown'
+import CountdownComponent from '../../../../resources/Components/Countdown'
 
 const startDate = new Date('2023-01-01')
 const nextDay = new Date('2023-01-02')
@@ -17,7 +20,14 @@ const renderHookWithCount = (hook, ...args) => {
   return { renderCount, ...result }
 }
 
-const setupCountdown = (date) => renderHook(() => useCountdown(date))
+const TestComponent = ({ end }) => (
+  <CountdownComponent
+    {...{
+      end,
+      title: test
+    }}
+  />
+)
 
 describe('#useCountdown', () => {
   beforeEach(() => {
@@ -29,18 +39,16 @@ describe('#useCountdown', () => {
   })
 
   it('correctly sets the initial countdown time', () => {
-    const {
-      result: { current }
-    } = setupCountdown(nextDay.getTime())
-    expect(current).toBe('24h')
+    render(<TestComponent end={nextDay.getTime()} />)
+    expect(screen.getByRole('timer').textContent).toBe('24h')
   })
 
   it('updates the countdown time after a second', () => {
-    const { result } = setupCountdown(nextDay.getTime())
+    render(<TestComponent end={nextDay.getTime()} />)
     act(() => {
-      jest.advanceTimersByTime(1000)
+      jest.advanceTimersByTime(1_000)
     })
-    expect(result.current).toBe('23h 59m 59s')
+    expect(screen.getByRole('timer').textContent).toBe('23h 59m 59s')
   })
 
   it('updates the countdown time every second', () => {
@@ -48,34 +56,37 @@ describe('#useCountdown', () => {
     const { renderCount } = renderHookWithCount(useCountdown, '2023-01-02')
     for (let i = 0; i < secondsPassed; i++) {
       act(() => {
-        jest.advanceTimersByTime(secondsPassed * 1000 + 500)
+        jest.advanceTimersByTime(secondsPassed * 1000)
       })
     }
     expect(renderCount()).toBe(secondsPassed + 1)
   })
 
   it('uses the correct extension for seconds', () => {
-    const { result } = setupCountdown(startDate.getTime() + 1000)
-    expect(result.current).toBe('1s')
+    render(<TestComponent end={startDate.getTime() + 1_000} />)
+    expect(screen.getByRole('timer').textContent).toBe('1s')
   })
+
   it('uses the correct extension for minutes', () => {
-    const { result } = setupCountdown(startDate.getTime() + 1000 * 60)
-    expect(result.current).toBe('1m')
+    render(<TestComponent end={startDate.getTime() + 1_000 * 60} />)
+    expect(screen.getByRole('timer').textContent).toBe('1m')
   })
+
   it('uses the correct extension for hours', () => {
-    const { result } = setupCountdown(startDate.getTime() + 1000 * 60 * 60)
-    expect(result.current).toBe('1h')
+    render(<TestComponent end={startDate.getTime() + 1_000 * 60 * 60} />)
+    expect(screen.getByRole('timer').textContent).toBe('1h')
   })
+
   it('sets the value correctly when the countdown has been completed', () => {
-    const { result } = setupCountdown(nextDay.getTime())
+    render(<TestComponent end={nextDay.getTime()} />)
     act(() => {
-      jest.advanceTimersByTime(1000 * 60 * 60 * 24)
+      jest.advanceTimersByTime(1_000 * 60 * 60 * 24)
     })
-    expect(result.current).toBe('EXPIRED')
+    expect(screen.getByRole('timer').textContent).toBe('EXPIRED')
   })
   it('sets the value to the completed state when a past date in passed in', () => {
-    const { result } = setupCountdown(startDate.getTime() - 1000)
-    expect(result.current).toBe('EXPIRED')
+    render(<TestComponent end={startDate.getDate() - 1} />)
+    expect(screen.getByRole('timer').textContent).toBe('EXPIRED')
   })
 
   it('throws an error when an invalid date is passed in', () => {
