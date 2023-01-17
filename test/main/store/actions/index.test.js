@@ -1176,7 +1176,7 @@ describe('#navClearSigner', () => {
   let nav
 
   const updaterFn = (node, update) => {
-    expect(node).toBe('windows.panel.nav')
+    expect(node).toBe('windows.dash.nav')
 
     nav = update(nav)
   }
