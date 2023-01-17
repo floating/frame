@@ -169,7 +169,6 @@ const EditPermit = ({ permit, tokenData, req }) => {
   } = permit
 
   const updateRequest = (newAmt) => {
-    console.log({ newAmt })
     link.rpc(
       'updateRequest',
       req.handlerId,

@@ -176,7 +176,6 @@ export class Accounts extends EventEmitter {
       action.update(request, data)
       currentAccount.update()
     } else if (request.type === 'signErc20Permit') {
-      console.log('')
       store.updateTypedDataRequest(currentAccount.id, reqId, data)
     }
   }

@@ -851,11 +851,14 @@ module.exports = {
     u('windows', win, 'footer.height', () => (height < 40 ? 40 : height))
   },
   updateTypedDataRequest: (u, account, reqId, data) => {
-    u('main.accounts', account, 'requests', reqId, (request) => {
-      if (!request) throw new Error(`Unable to locate request`, { reqId })
-      if (!request.typedMessage?.data) throw new Error(`This is not a typed data request`, { request })
-      request.typedMessage.data = data
-      return request
+    u('main.accounts', account, 'requests', (requests) => {
+      if (!requests[reqId]?.typedMessage?.data) {
+        log.error('No typed data request found for ', { reqId })
+        return requests
+      }
+
+      requests[reqId].typedMessage.data = data
+      return requests
     })
   }
   // toggleUSDValue: (u) => {
