@@ -23,7 +23,6 @@ export class SystemTray {
     // Electron Tray can only be instantiated when the app is ready
     this.electronTray = new ElectronTray(path.join(__dirname, isMacOS ? './IconTemplate.png' : './Icon.png'))
     this.electronTray.on('click', (_event: KeyboardEvent, bounds: Rectangle) => {
-      console.log('click systray', _event, bounds)
       const mainWindowBounds = mainWindow.getBounds()
       const currentDisplay = screen.getDisplayMatching(bounds)
       const trayClickDisplay = screen.getDisplayMatching(mainWindowBounds)
