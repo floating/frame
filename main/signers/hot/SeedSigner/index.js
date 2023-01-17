@@ -35,8 +35,7 @@ class SeedSigner extends HotSigner {
       this.encryptedSeed = encryptedSeed
       this.addresses = addresses
       this.update()
-
-      cb(null)
+      this.unlock(password, cb)
     })
   }
 
