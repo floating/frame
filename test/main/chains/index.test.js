@@ -1,9 +1,9 @@
 import EventEmitter from 'events'
-import { addHexPrefix } from '@ethereumjs/util'
+import { addHexPrefix, intToHex } from '@ethereumjs/util'
 import log from 'electron-log'
 
 import store from '../../../main/store'
-import { gweiToHex, weiToHex } from '../../util'
+import { gweiToHex } from '../../util'
 
 log.transports.console.level = false
 
@@ -252,12 +252,12 @@ Object.values(mockConnections).forEach((chain) => {
       const gas = store(`main.networksMeta.ethereum.${chain.id}.gas.price`)
 
       if (gas.fees.maxBaseFeePerGas) {
-        expect(gas.fees.maxBaseFeePerGas).toBe(weiToHex(expectedBaseFee))
-        expect(gas.fees.maxPriorityFeePerGas).toBe(weiToHex(expectedPriorityFee))
-        expect(gas.fees.maxFeePerGas).toBe(weiToHex(expectedBaseFee + expectedPriorityFee))
+        expect(gas.fees.maxBaseFeePerGas).toBe(intToHex(expectedBaseFee))
+        expect(gas.fees.maxPriorityFeePerGas).toBe(intToHex(expectedPriorityFee))
+        expect(gas.fees.maxFeePerGas).toBe(intToHex(expectedBaseFee + expectedPriorityFee))
 
         expect(gas.selected).toBe('fast')
-        expect(gas.levels.fast).toBe(weiToHex(expectedBaseFee + expectedPriorityFee))
+        expect(gas.levels.fast).toBe(intToHex(expectedBaseFee + expectedPriorityFee))
 
         done()
       }
