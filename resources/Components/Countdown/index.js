@@ -7,7 +7,7 @@ export default ({ end, title, titleClass, innerClass }) => {
   return (
     <div className={titleClass}>
       <div>{title}</div>
-      <div className={innerClass} role={'timer'}>
+      <div className={innerClass} role='timer'>
         {ttl}
       </div>
     </div>
