@@ -1309,12 +1309,12 @@ describe('#updateTypedDataRequest', () => {
   let requests
   const request = '79928538-c971-4cf0-8498-fa4e8017398b'
 
-  const updaterFn = (node, account, leaf, reqId, update) => {
+  const updaterFn = (node, account, leaf, update) => {
     expect(node).toBe('main.accounts')
     expect(account).toBe(owner)
     expect(leaf).toBe('requests')
 
-    requests[reqId] = update(requests[reqId])
+    requests = update(requests)
   }
 
   const updateSignatureMessage = (reqId, newData) => updateTypedDataAction(updaterFn, owner, reqId, newData)
