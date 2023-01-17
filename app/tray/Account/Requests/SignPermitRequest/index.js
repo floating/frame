@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import BigNumber from 'bignumber.js'
 
-import { formatDisplayInteger, isUnlimited } from '../../../../../resources/utils/numbers'
+import { isUnlimited } from '../../../../../resources/utils/numbers'
 import svg from '../../../../../resources/svg'
 import link from '../../../../../resources/link'
 import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../resources/Components/Cluster'
@@ -90,7 +90,7 @@ const PermitOverview = ({ permit, req, chainData, originName, tokenData }) => {
                           <div className='clusterFocusHighlight'>{`${
                             isUnlimited(value)
                               ? '~UNLIMITED'
-                              : formatDisplayInteger(value, tokenData.decimals)
+                              : new BigNumber(value).shiftedBy(-tokenData.decimals)
                           } ${tokenData.symbol || '??'}`}</div>
                         </div>
                       </ClusterValue>

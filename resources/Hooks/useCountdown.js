@@ -4,10 +4,7 @@ const useCountdown = (targetDate) => {
   const countDownDate = new Date(targetDate)
   const [countDown, setCountDown] = useState(countDownDate.getTime() - new Date().getTime())
 
-  const isValidDate = countDownDate instanceof Date && isFinite(countDownDate)
-
   useEffect(() => {
-    if (!isValidDate) throw new Error('Invalid targetDate passed into useCountdown', { targetDate })
     if (countDown <= 0) return
     const interval = setInterval(() => {
       setCountDown(countDownDate.getTime() - new Date().getTime())

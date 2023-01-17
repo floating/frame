@@ -3,6 +3,7 @@ import BigNumber from 'bignumber.js'
 
 import svg from '../../svg'
 import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../Cluster'
+import Countdown from '../Countdown'
 
 import { MAX_HEX } from '../../constants'
 import { formatDisplayInteger } from '../../utils/numbers'
