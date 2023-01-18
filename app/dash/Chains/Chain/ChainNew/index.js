@@ -132,15 +132,14 @@ export const Chain = ({
           onClick={() => {
             if (chainValidation.valid) {
               const nav = store('windows.dash.nav')
-              const chainsView = { view: 'chains', data: {} }
               link.send('tray:addChain', updatedChain)
 
               // if previous navItem is the chains panel, go back
-              if (JSON.stringify(nav[1]) === JSON.stringify(chainsView)) {
+              if (nav[1].view === 'chains') {
                 link.send('tray:action', 'backDash')
               } else {
                 // otherwise update the current navItem to show the chains panel
-                link.send('nav:update', 'dash', chainsView, false)
+                link.send('nav:update', 'dash', { view: 'chains', data: {} }, false)
               }
             }
           }}
