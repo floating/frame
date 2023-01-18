@@ -112,6 +112,7 @@ class Signers extends EventEmitter {
     if (signer) {
       delete this.signers[id]
       store.removeSigner(id)
+      store.navClearSigner(id)
 
       const type = signer.type === 'ring' || signer.type === 'seed' ? 'hot' : signer.type
 

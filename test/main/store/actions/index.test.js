@@ -22,7 +22,8 @@ import {
   activateNetwork as activateNetworkAction,
   setBlockHeight as setBlockHeightAction,
   updateAccount as updateAccountAction,
-  navClearReq as clearNavRequestAction
+  navClearReq as clearNavRequestAction,
+  navClearSigner as clearNavSignerAction
 } from '../../../../main/store/actions'
 import { toTokenId } from '../../../../resources/domain/balance'
 
@@ -1171,6 +1172,45 @@ describe('#removeKnownTokens', () => {
   })
 })
 
+describe('#navClearSigner', () => {
+  let nav
+
+  const updaterFn = (node, update) => {
+    expect(node).toBe('windows.dash.nav')
+
+    nav = update(nav)
+  }
+
+  const clearSigner = clearNavSignerAction.bind(null, updaterFn)
+
+  beforeEach(() => {
+    nav = []
+  })
+
+  it('should remove a specific signer from the nav', () => {
+    nav = [
+      {
+        view: 'expandedSigner',
+        data: {
+          signer: '1a'
+        }
+      },
+      {
+        view: 'expandedSigner',
+        data: {
+          signer: '2b'
+        }
+      }
+    ]
+
+    const [req1, req2] = nav
+
+    clearSigner('2b')
+
+    expect(nav).toStrictEqual([req1])
+  })
+})
+
 describe('#navClearReq', () => {
   let nav
 
@@ -1236,3 +1276,4 @@ describe('#navClearReq', () => {
     expect(nav).toStrictEqual([])
   })
 })
+clearNavSignerAction
