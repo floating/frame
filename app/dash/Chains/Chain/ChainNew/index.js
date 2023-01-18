@@ -1,8 +1,7 @@
 import React, { useState } from 'react'
-import link from '../../../../../resources/link'
 
 import chainDefault from '../chainDefault'
-
+import link from '../../../../../resources/link'
 import {
   ChainHeader,
   EditChainColor,
@@ -35,7 +34,7 @@ const isValidRpc = (urlStr) => {
   }
 }
 
-export default ({
+export const Chain = ({
   id,
   name,
   type,
@@ -45,7 +44,8 @@ export default ({
   primaryColor,
   primaryRpc,
   secondaryRpc,
-  existingChains
+  existingChains,
+  store
 }) => {
   const newChain = {
     id: id || chainDefault.id,

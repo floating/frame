@@ -1,17 +1,16 @@
-import React, { useState } from 'react'
+import React from 'react'
 import Restore from 'react-restore'
 
 import ChainPreview from './ChainPreview'
 import ChainExpanded from './ChainExpanded'
-import ChainNew from './ChainNew'
+import { Chain } from './ChainNew'
 
-class Chain extends React.Component {
+class ChainWrapper extends React.Component {
   renderNew() {
-    const { id, name, type, explorer, symbol, isTestnet, filter, on, connection, primaryRpc, secondaryRpc } =
-      this.props
+    const { id, name, type, explorer, symbol, primaryRpc, secondaryRpc } = this.props
     const existingChains = Object.keys(this.store('main.networks.ethereum')).map((id) => parseInt(id))
     return (
-      <ChainNew
+      <Chain
         id={id}
         name={name}
         type={type}
@@ -20,6 +19,7 @@ class Chain extends React.Component {
         primaryRpc={primaryRpc}
         secondaryRpc={secondaryRpc}
         existingChains={existingChains}
+        store={this.store}
       />
     )
   }
@@ -47,7 +47,7 @@ class Chain extends React.Component {
   }
 
   renderPreview() {
-    const { id, name, type, explorer, symbol, isTestnet, filter, on, connection } = this.props
+    const { id, name, type, symbol, filter, on, connection } = this.props
     const { primaryColor, icon } = this.store('main.networksMeta.ethereum', id)
     const price = this.store('main.networksMeta.ethereum', id, 'nativeCurrency.usd.price') || '?'
 
@@ -88,4 +88,4 @@ class Chain extends React.Component {
   }
 }
 
-export default Restore.connect(Chain)
+export default Restore.connect(ChainWrapper)
