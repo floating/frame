@@ -630,15 +630,7 @@ class Notify extends React.Component {
     } else if (notify === 'extensionConnect') {
       const { browser, id } = this.store('view.notifyData')
 
-      return (
-        <div className='notify cardShow'>
-          <div className='notifyBoxWrap' onMouseDown={(e) => e.stopPropagation()}>
-            <div className='notifyBoxSlide'>
-              <ExtensionConnectNotification browser={browser} id={id} onClose={() => this.store.notify()} />
-            </div>
-          </div>
-        </div>
-      )
+      return <ExtensionConnectNotification browser={browser} id={id} onClose={() => this.store.notify()} />
     } else {
       return null
     }
