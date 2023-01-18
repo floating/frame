@@ -7,6 +7,12 @@ import store from '../store'
 import { ExtensionAccessRequest } from '../accounts/types'
 
 const dev = process.env.NODE_ENV === 'development'
+
+const extensionPrefixes = {
+  firefox: 'moz-extension',
+  safari: 'safari-web-extension'
+}
+
 const protocolRegex = /^(?:ws|http)s?:\/\//
 
 interface OriginUpdateResult {
@@ -133,11 +139,11 @@ export function parseFrameExtension(req: IncomingMessage): FrameExtension | unde
   if (origin === 'chrome-extension://ldcoohedfbjoobcadoglnnmmfbdlmmhf') {
     // Match production chrome
     return { browser: 'chrome', id: 'ldcoohedfbjoobcadoglnnmmfbdlmmhf' }
-  } else if (origin.startsWith('moz-extension://') && hasExtensionIdentity) {
+  } else if (origin.startsWith(`${extensionPrefixes.firefox}://`) && hasExtensionIdentity) {
     // Match production Firefox
-    const extensionId = origin.substring(origin.indexOf('://') + 3)
+    const extensionId = origin.substring(extensionPrefixes.firefox.length + 3)
     return { browser: 'firefox', id: extensionId }
-  } else if (origin.startsWith('safari-web-extension://') && dev && hasExtensionIdentity) {
+  } else if (origin.startsWith(`${extensionPrefixes.safari}://`) && dev && hasExtensionIdentity) {
     // Match Safari in dev only
     return { browser: 'safari', id: 'frame-dev' }
   }
