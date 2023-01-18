@@ -660,16 +660,17 @@ module.exports = {
         view: nav[0].view || crumb.view,
         data: Object.keys(crumb.data).length === 0 ? {} : Object.assign({}, nav[0].data, crumb.data)
       }
-      log.warn('existing nav', nav)
       if (JSON.stringify(nav[0]) !== JSON.stringify(updatedNavItem)) {
-        log.warn('replacing', navigate)
         if (navigate) {
           nav.unshift(updatedNavItem)
         } else {
           nav[0] = updatedNavItem
         }
       }
-      log.warn('updated nav', nav)
+      // remove the previous nav item if it is the same as the updated current item
+      if (JSON.stringify(nav[0]) === JSON.stringify(nav[1])) {
+        nav.pop()
+      }
       return nav
     })
     if (navigate) u('windows', windowId, 'showing', () => true)
