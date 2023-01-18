@@ -132,7 +132,10 @@ export default ({
           onClick={() => {
             if (chainValidation.valid) {
               link.send('tray:addChain', updatedChain)
-              link.send('tray:action', 'backDash')
+
+              // TODO: delete previous dash nav entry only when it is { view: 'chains', data: {} }
+              // update nav
+              link.send('nav:update', 'dash', { view: 'chains', data: {} }, false)
             }
           }}
         />
