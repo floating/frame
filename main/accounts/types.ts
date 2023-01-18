@@ -106,11 +106,6 @@ export interface SignTypedDataRequest extends Omit<AccountRequest, 'type'> {
   typedMessage: TypedMessage
 }
 
-export interface ExtensionAccessRequest extends Omit<Request, 'type'> {
-  type: 'extensionAccess'
-  id: string
-}
-
 export interface AccessRequest extends Omit<AccountRequest, 'type'> {
   type: 'access'
 }

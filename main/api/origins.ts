@@ -4,7 +4,6 @@ import queryString from 'query-string'
 
 import accounts, { AccessRequest } from '../accounts'
 import store from '../store'
-import { ExtensionAccessRequest } from '../accounts/types'
 
 const dev = process.env.NODE_ENV === 'development'
 
@@ -55,19 +54,21 @@ async function getPermission(address: Address, origin: string, payload: RPCReque
 }
 
 async function requestExtensionPermission(extension: FrameExtension) {
-  return new Promise<boolean>((resolve) => {
-    const request: ExtensionAccessRequest = {
-      handlerId: extension.id,
-      type: 'extensionAccess',
-      id: extension.id
-    }
-
-    // TODO: how/where to handle requests without an account
-    accounts.addRequest(request, () => {
+  const result = new Promise<boolean>((resolve) => {
+    const obs = store.observer(() => {
       const isAllowed = store('main.knownExtensions', extension.id)
-      resolve(isAllowed)
+
+      // wait for a response
+      if (typeof isAllowed !== 'undefined') {
+        obs.remove()
+        resolve(isAllowed)
+      }
     })
   })
+
+  store.notify('extensionConnect', extension)
+
+  return result
 }
 
 async function requestPermission(address: Address, fullPayload: RPCRequestPayload) {
@@ -152,9 +153,9 @@ export function parseFrameExtension(req: IncomingMessage): FrameExtension | unde
 export async function isKnownExtension(extension: FrameExtension) {
   if (extension.browser === 'chrome' || extension.browser === 'safari') return true
 
-  const knownExtension = storeApi.getKnownExtension(extension.id)
+  const extensionPermission = storeApi.getKnownExtension(extension.id)
 
-  return knownExtension || requestExtensionPermission(extension)
+  return extensionPermission ?? requestExtensionPermission(extension)
 }
 
 export async function isTrusted(payload: RPCRequestPayload) {
