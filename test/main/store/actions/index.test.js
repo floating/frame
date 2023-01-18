@@ -924,6 +924,52 @@ describe('#updateNetwork', () => {
       }
     })
   })
+
+  it('should correctly update the networksMeta', () => {
+    const icon = 'http://icon.com'
+    const nativeCurrencyName = 'TEST_NAME'
+    const symbol = 'TEST'
+    updateNetwork(
+      { id: '0x4', type: 'ethereum', name: '', explorer: '', symbol: '' },
+      {
+        id: '0x4',
+        type: 'ethereum',
+        name: 'test',
+        explorer: 'explorer.test',
+        symbol,
+        nativeCurrencyName,
+        icon
+      }
+    )
+
+    expect(main.networksMeta.ethereum[4]).toStrictEqual({
+      icon,
+      nativeCurrency: { symbol, name: nativeCurrencyName },
+      symbol
+    })
+  })
+
+  it('should not save network metadata inside the main network state', () => {
+    const newMetadata = {
+      nativeCurrencyName: 'TEST_NAME',
+      icon: 'http://icon.com'
+    }
+    updateNetwork(
+      { id: '0x4', type: 'ethereum', name: '', explorer: '', symbol: '' },
+      {
+        id: '0x4',
+        type: 'ethereum',
+        name: 'test',
+        explorer: 'explorer.test',
+        symbol: 'TEST',
+        ...newMetadata
+      }
+    )
+
+    Object.keys(newMetadata).forEach((property) => {
+      expect(main.networks.ethereum[4][property]).toBeUndefined()
+    })
+  })
 })
 
 describe('#activateNetwork', () => {

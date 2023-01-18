@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import link from '../../../../../resources/link'
 import svg from '../../../../../resources/svg'
 import RingIcon from '../../../../../resources/Components/RingIcon'
+import { capitalize } from '../../../../../resources/utils'
 
 import chainDefault from '../chainDefault'
 
@@ -86,81 +87,68 @@ export const EditChainColor = ({ currentColor, onChange }) => {
   )
 }
 
-export const EditChainName = ({ currentName, onChange }) => {
+const EditChainProperty = ({ currentValue, onChange, valueName, title }) => {
+  const id = `chain${capitalize(valueName)}`
   return (
     <div className='chainRow'>
-      <label htmlFor='chainName' className='chainInputLabel'>
-        Chain Name
+      <label htmlFor={id} className='chainInputLabel'>
+        {title}
       </label>
       <input
-        id='chainName'
-        className={currentName === chainDefault.name ? 'chainInput chainInputDim' : 'chainInput'}
-        value={currentName}
+        id={id}
+        className={currentValue === chainDefault[valueName] ? 'chainInput chainInputDim' : 'chainInput'}
+        value={currentValue}
         spellCheck='false'
         onChange={(e) => onChange(e.target.value)}
         onFocus={(e) => {
-          if (e.target.value === chainDefault.name) onChange('')
+          if (e.target.value === chainDefault[valueName]) onChange('')
         }}
         onBlur={(e) => {
-          if (e.target.value === '') onChange(chainDefault.name)
+          if (e.target.value === '') onChange(chainDefault[valueName])
         }}
       />
     </div>
   )
 }
 
-export const EditChainSymbol = ({ currentSymbol, onChange }) => {
-  return (
-    <div className='chainRow'>
-      <label htmlFor='chainSymbol' className='chainInputLabel'>
-        Native Symbol
-      </label>
-      <input
-        id='chainSymbol'
-        className={currentSymbol === chainDefault.symbol ? 'chainInput chainInputDim' : 'chainInput'}
-        value={currentSymbol}
-        spellCheck='false'
-        onChange={(e) => {
-          if (e.target.value.length > 8) return e.preventDefault()
-          onChange(e.target.value)
-        }}
-        onFocus={(e) => {
-          if (e.target.value === chainDefault.symbol) onChange('')
-        }}
-        onBlur={(e) => {
-          if (e.target.value === '') onChange(chainDefault.symbol)
-        }}
-      />
-    </div>
-  )
-}
+export const EditChainName = ({ currentName, onChange }) => (
+  <EditChainProperty currentValue={currentName} onChange={onChange} title={'Chain Name'} valueName={'name'} />
+)
 
-export const EditChainId = ({ chainId, onChange }) => {
-  return (
-    <div className='chainRow'>
-      <label htmlFor='chainId' className='chainInputLabel'>
-        Chain ID
-      </label>
-      <input
-        id='chainId'
-        className={chainId === chainDefault.id ? 'chainInput chainInputDim' : 'chainInput'}
-        value={chainId}
-        spellCheck='false'
-        onChange={(e) => {
-          if (Number(parseInt(e.target.value)) || e.target.value === '') {
-            onChange(e.target.value)
-          }
-        }}
-        onFocus={(e) => {
-          if (e.target.value === chainDefault.id) onChange('')
-        }}
-        onBlur={(e) => {
-          if (e.target.value === '') onChange(chainDefault.id)
-        }}
-      />
-    </div>
-  )
-}
+export const EditChainSymbol = ({ currentSymbol, onChange }) => (
+  <EditChainProperty
+    currentValue={currentSymbol}
+    onChange={onChange}
+    title={'Native Symbol'}
+    valueName={'symbol'}
+  />
+)
+
+export const EditChainId = ({ chainId, onChange }) => (
+  <EditChainProperty currentValue={chainId} onChange={onChange} title={'Chain ID'} valueName={'id'} />
+)
+
+export const EditChainExplorer = ({ currentExplorer, onChange }) => (
+  <EditChainProperty
+    currentValue={currentExplorer}
+    onChange={onChange}
+    title={'Block Explorer'}
+    valueName={'explorer'}
+  />
+)
+//TODO: needs to show an error when not a valid URL...
+export const EditChainIcon = ({ currentIcon, onChange }) => (
+  <EditChainProperty currentValue={currentIcon} onChange={onChange} title={'Chain Icon'} valueName={'icon'} />
+)
+
+export const EditNativeCurrencyName = ({ currentNativeCurrency, onChange }) => (
+  <EditChainProperty
+    currentValue={currentNativeCurrency}
+    onChange={onChange}
+    title={'Native Currency Name'}
+    valueName={'nativeCurrencyName'}
+  />
+)
 
 export const EditTestnet = ({ testnet, onChange }) => {
   return (
@@ -174,31 +162,6 @@ export const EditTestnet = ({ testnet, onChange }) => {
       >
         <div className='signerPermissionToggleSwitch' />
       </div>
-    </div>
-  )
-}
-
-export const EditChainExplorer = ({ currentExplorer, onChange }) => {
-  return (
-    <div className='chainRow'>
-      <label htmlFor='chainExplorer' className='chainInputLabel'>
-        Block Explorer
-      </label>
-      <input
-        id='chainExplorer'
-        className={currentExplorer === chainDefault.explorer ? 'chainInput chainInputDim' : 'chainInput'}
-        value={currentExplorer}
-        spellCheck='false'
-        onChange={(e) => {
-          onChange(e.target.value)
-        }}
-        onFocus={(e) => {
-          if (e.target.value === chainDefault.explorer) onChange('')
-        }}
-        onBlur={(e) => {
-          if (e.target.value === '') onChange(chainDefault.explorer)
-        }}
-      />
     </div>
   )
 }

@@ -3,8 +3,6 @@ import link from '../../../../../resources/link'
 
 import chainDefault from '../chainDefault'
 
-//TODO: Can these be abstracted into a common ChainInput component?
-//TODO: Add inputs for Icon & Native Currency name
 //TODO: Make sure that works for editing also...
 import {
   ChainHeader,
@@ -12,6 +10,8 @@ import {
   EditChainName,
   EditChainSymbol,
   EditChainId,
+  EditChainIcon,
+  EditNativeCurrencyName,
   EditTestnet,
   EditChainExplorer,
   EditRPC,
@@ -26,8 +26,8 @@ const isChainFilled = (chain) => {
     chain.name !== chainDefault.name &&
     chain.symbol &&
     chain.symbol !== chainDefault.symbol &&
-    chain.nativeCurrency &&
-    chain.nativeCurrency !== chainDefault.nativeCurrency
+    chain.nativeCurrencyName &&
+    chain.nativeCurrencyName !== chainDefault.nativeCurrencyName
   )
 }
 
@@ -46,7 +46,7 @@ export default ({
   type,
   explorer,
   symbol,
-  nativeCurrency,
+  nativeCurrencyName,
   icon,
   isTestnet,
   primaryColor,
@@ -60,7 +60,7 @@ export default ({
     type: type || chainDefault.type,
     explorer: explorer || chainDefault.explorer,
     symbol: symbol || chainDefault.symbol,
-    nativeCurrency: nativeCurrency || chainDefault.nativeCurrency,
+    nativeCurrencyName: nativeCurrencyName || chainDefault.nativeCurrencyName,
     icon: icon || chainDefault.icon,
     isTestnet: isTestnet || chainDefault.isTestnet,
     primaryColor: primaryColor || chainDefault.primaryColor,
@@ -72,7 +72,7 @@ export default ({
   const [currentColor, setPrimaryColor] = useState(newChain.primaryColor)
   const [currentName, setName] = useState(newChain.name)
   const [currentSymbol, setSymbol] = useState(newChain.symbol)
-  const [currentNativeCurrency, setNativeCurrency] = useState(newChain.nativeCurrency)
+  const [currentNativeCurrencyName, setNativeCurrencyName] = useState(newChain.nativeCurrencyName)
   const [currentChainIcon, setChainIcon] = useState(newChain.icon)
   const [currentChainId, setChainId] = useState(newChain.id)
   const [currentExplorer, setExplorer] = useState(newChain.explorer)
@@ -85,7 +85,8 @@ export default ({
     id: currentChainId,
     name: currentName,
     explorer: currentExplorer,
-    nativeCurrency: currentNativeCurrency,
+    nativeCurrencyName: currentNativeCurrencyName,
+    ...(currentChainIcon !== chainDefault.icon && { icon: currentChainIcon }),
     symbol: currentSymbol,
     isTestnet: currentTestnet,
     primaryColor: currentColor,
@@ -123,7 +124,12 @@ export default ({
       <EditChainId chainId={currentChainId} onChange={setChainId} />
       <EditChainExplorer currentExplorer={currentExplorer} onChange={setExplorer} />
       <EditChainSymbol currentSymbol={currentSymbol} onChange={setSymbol} />
-      {/* TODO: hook in native currency here... */}
+      {/* TODO: change order? */}
+      <EditNativeCurrencyName
+        currentNativeCurrency={currentNativeCurrencyName}
+        onChange={setNativeCurrencyName}
+      />
+      <EditChainIcon currentIcon={currentChainIcon} onChange={setChainIcon} />
       <EditRPC
         currentRPC={currentPrimaryRPC}
         label={'Primary RPC'}

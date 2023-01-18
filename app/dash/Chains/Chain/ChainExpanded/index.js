@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import link from '../../../../../resources/link'
 
+import link from '../../../../../resources/link'
+import chainDefault from '../chainDefault'
 import Connection from '../Connection'
 
 import {
@@ -9,7 +10,8 @@ import {
   EditChainColor,
   EditChainName,
   EditChainSymbol,
-  EditChainId,
+  EditNativeCurrencyName,
+  EditChainIcon,
   EditTestnet,
   EditChainExplorer,
   ChainFooter
@@ -17,9 +19,21 @@ import {
 
 export default (props) => {
   // props
-  const { id, name, type, explorer, symbol, isTestnet, filter, on, connection, primaryColor, icon, price } =
-    props
-  const chain = { id, type, name, isTestnet, symbol, explorer, primaryColor }
+  const {
+    id,
+    name,
+    type,
+    explorer,
+    symbol,
+    isTestnet,
+    on,
+    connection,
+    primaryColor,
+    icon,
+    price,
+    nativeCurrencyName
+  } = props
+  const chain = { id, type, name, isTestnet, symbol, explorer, primaryColor, icon, nativeCurrencyName }
 
   // state
   const [currentColor, setPrimaryColor] = useState(primaryColor)
@@ -27,6 +41,10 @@ export default (props) => {
   const [currentSymbol, setSymbol] = useState(symbol)
   const [currentExplorer, setExplorer] = useState(explorer)
   const [currentTestnet, setTestnet] = useState(isTestnet)
+  const [currentNativeCurrencyName, setNativeCurrencyName] = useState(
+    nativeCurrencyName || chainDefault.nativeCurrencyName
+  )
+  const [currentIcon, setIcon] = useState(icon || chainDefault.icon)
 
   // effects
   useEffect(() => {
@@ -37,10 +55,20 @@ export default (props) => {
       primaryColor: currentColor,
       isTestnet: currentTestnet,
       symbol: currentSymbol,
-      explorer: currentExplorer
+      explorer: currentExplorer,
+      ...(currentIcon !== chainDefault.icon && { icon: currentIcon }),
+      nativeCurrencyName: currentNativeCurrencyName
     }
     link.send('tray:action', 'updateNetwork', chain, updatedChain)
-  }, [currentColor, currentName, currentSymbol, currentExplorer, currentTestnet])
+  }, [
+    currentColor,
+    currentName,
+    currentSymbol,
+    currentExplorer,
+    currentTestnet,
+    currentIcon,
+    currentNativeCurrencyName
+  ])
 
   useEffect(() => {
     link.send('tray:action', 'setChainColor', chain.id, currentColor)
@@ -63,6 +91,11 @@ export default (props) => {
       <EditChainName currentName={currentName} onChange={setName} />
       <EditChainExplorer currentExplorer={currentExplorer} onChange={setExplorer} />
       <EditChainSymbol currentSymbol={currentSymbol} onChange={setSymbol} />
+      <EditNativeCurrencyName
+        currentNativeCurrency={currentNativeCurrencyName}
+        onChange={setNativeCurrencyName}
+      />
+      <EditChainIcon currentIcon={currentIcon} onChange={setIcon} />
       <div className='chainRow'>
         <ChainFooter symbol={symbol} price={price} />
       </div>

@@ -301,8 +301,8 @@ module.exports = {
         primaryColor: net.primaryColor,
         nativeCurrency: {
           symbol: net.symbol,
-          icon: net.icon,
-          name: net.nativeCurrency,
+          icon: net.icon || '',
+          name: net.nativeCurrencyName || '',
           decimals: 18
         },
         gas: {
@@ -326,19 +326,22 @@ module.exports = {
       log.error(e)
     }
   },
+  //TODO: check if this is polluting the config... can we deconstruct and then not pollute?
   updateNetwork: (u, net, newNet) => {
     try {
       net.id = validateNetworkSettings(net)
       newNet.id = validateNetworkSettings(newNet)
 
       u('main', (main) => {
-        const updatedNetwork = Object.assign({}, main.networks[net.type][net.id], newNet)
+        const update = Object.assign({}, main.networks[net.type][net.id], newNet)
 
-        Object.keys(updatedNetwork).forEach((k) => {
-          if (typeof updatedNetwork[k] === 'string') {
-            updatedNetwork[k] = updatedNetwork[k].trim()
+        Object.keys(update).forEach((k) => {
+          if (typeof update[k] === 'string') {
+            update[k] = update[k].trim()
           }
         })
+
+        const { nativeCurrencyName, icon, ...updatedNetwork } = update
 
         delete main.networks[net.type][net.id]
         main.networks[updatedNetwork.type][updatedNetwork.id] = updatedNetwork
@@ -351,11 +354,13 @@ module.exports = {
 
         main.networksMeta[updatedNetwork.type][updatedNetwork.id] =
           main.networksMeta[updatedNetwork.type][updatedNetwork.id] || {}
-        main.networksMeta[updatedNetwork.type][updatedNetwork.id].symbol = newNet.symbol
+        main.networksMeta[updatedNetwork.type][updatedNetwork.id].symbol = update.symbol
 
         main.networksMeta[updatedNetwork.type][updatedNetwork.id].nativeCurrency =
           main.networksMeta[updatedNetwork.type][updatedNetwork.id].nativeCurrency || {}
-        main.networksMeta[updatedNetwork.type][updatedNetwork.id].nativeCurrency.symbol = newNet.symbol
+        main.networksMeta[updatedNetwork.type][updatedNetwork.id].nativeCurrency.symbol = update.symbol
+        main.networksMeta[updatedNetwork.type][updatedNetwork.id].icon = icon
+        main.networksMeta[updatedNetwork.type][updatedNetwork.id].nativeCurrency.name = nativeCurrencyName
 
         return main
       })

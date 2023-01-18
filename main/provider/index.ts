@@ -741,7 +741,8 @@ export class Provider extends EventEmitter {
             symbol: nativeCurrency.symbol,
             primaryRpc: rpcUrls[0],
             secondaryRpc: rpcUrls[1],
-            explorer: blockExplorerUrls[0]
+            explorer: blockExplorerUrls[0],
+            nativeCurrencyName: nativeCurrency.name
           },
           account: (accounts.getAccounts() || [])[0],
           origin: payload._origin,
