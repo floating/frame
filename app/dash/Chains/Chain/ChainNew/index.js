@@ -3,7 +3,6 @@ import link from '../../../../../resources/link'
 
 import chainDefault from '../chainDefault'
 
-//TODO: Make sure that works for editing also...
 import {
   ChainHeader,
   EditChainColor,
@@ -31,14 +30,18 @@ const isChainFilled = (chain) => {
   )
 }
 
-const isValidRpc = (urlStr) => {
+const getUrl = (urlStr) => {
   try {
-    const url = new URL(urlStr)
-    return ['http:', 'https:', 'ws:', 'wss:'].includes(url.protocol)
-  } catch (e) {
-    return false
-  }
+    return new URL(urlStr)
+  } catch (e) {}
 }
+
+const isValidRpc = (urlStr) => {
+  const url = getUrl(urlStr)
+  return ['http:', 'https:', 'ws:', 'wss:'].includes(url?.protocol)
+}
+
+const isValidIcon = (urlStr) => Boolean(getUrl(urlStr))
 
 export default ({
   id,
@@ -101,6 +104,10 @@ export default ({
 
     if (!isChainFilled(chain)) {
       return { valid: false, text: 'Fill Chain Details' }
+    }
+
+    if (chain.icon && !isValidIcon(chain.icon)) {
+      return { valid: false, text: 'Invalid Chain Icon' }
     }
 
     if (chain.primaryRpc && !isValidRpc(chain.primaryRpc)) {

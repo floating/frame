@@ -326,7 +326,7 @@ module.exports = {
       log.error(e)
     }
   },
-  //TODO: check if this is polluting the config... can we deconstruct and then not pollute?
+
   updateNetwork: (u, net, newNet) => {
     try {
       net.id = validateNetworkSettings(net)
