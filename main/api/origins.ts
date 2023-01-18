@@ -56,6 +56,7 @@ async function requestExtensionPermission(extension: FrameExtension) {
       id: extension.id
     }
 
+    // TODO: how/where to handle requests without an account
     accounts.addRequest(request, () => {
       const isAllowed = store('main.knownExtensions', extension.id)
       resolve(isAllowed)
@@ -123,7 +124,7 @@ export function updateOrigin(
   }
 }
 
-export function parseFrameExtension(req: IncomingMessage): FrameExtension | false {
+export function parseFrameExtension(req: IncomingMessage): FrameExtension | undefined {
   const origin = req.headers.origin || ''
 
   const query = queryString.parse((req.url || '').replace('/', ''))
@@ -140,8 +141,6 @@ export function parseFrameExtension(req: IncomingMessage): FrameExtension | fals
     // Match Safari in dev only
     return { browser: 'safari', id: 'frame-dev' }
   }
-
-  return false
 }
 
 export async function isKnownExtension(extension: FrameExtension) {
