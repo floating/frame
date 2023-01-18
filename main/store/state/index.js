@@ -214,7 +214,7 @@ const initial = {
       derivation: main('trezor.derivation', 'standard')
     },
     origins: main('origins', {}),
-    knownExtensions: main('knownExtensions', []),
+    knownExtensions: main('knownExtensions', {}),
     privacy: {
       errorReporting: main('privacy.errorReporting', true)
     },
