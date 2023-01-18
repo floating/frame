@@ -34,7 +34,7 @@ const storeApi = {
     const permissions: Record<string, Permission> = store('main.permissions', address) || {}
     return Object.values(permissions).find((p) => p.origin === origin)
   },
-  getKnownExtension: (id: string) => store('main.knownExtensions', id)
+  getKnownExtension: (id: string) => store('main.knownExtensions', id) as boolean
 }
 
 export function parseOrigin(origin?: string) {
@@ -63,7 +63,7 @@ async function requestExtensionPermission(extension: FrameExtension) {
         obs.remove()
         resolve(isAllowed)
       }
-    })
+    }, 'origins:requestExtension')
   })
 
   store.notify('extensionConnect', extension)
