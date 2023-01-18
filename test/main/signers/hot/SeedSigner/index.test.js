@@ -2,18 +2,12 @@
 import path from 'path'
 import { remove } from 'fs-extra'
 import { generateMnemonic } from 'bip39'
-
 import log from 'electron-log'
 
 const PASSWORD = 'fr@///3_password'
 const SIGNER_PATH = path.resolve(__dirname, '../.userData/signers')
 
 jest.mock('electron')
-jest.mock('../../../../../compiled/main/store/persist', () => ({
-  get: jest.fn(),
-  set: jest.fn(),
-  queue: jest.fn()
-}))
 jest.mock('../../../../../main/store/persist')
 
 // Stubs
@@ -31,8 +25,8 @@ describe('Seed signer', () => {
 
     clean()
 
-    hot = await import('../../../../../compiled/main/signers/hot')
-    store = require('../../../../../compiled/main/store').default
+    hot = await import('../../../../../main/signers/hot')
+    store = require('../../../../../main/store').default
   })
 
   afterEach(() => {
