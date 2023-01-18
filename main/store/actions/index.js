@@ -667,10 +667,6 @@ module.exports = {
           nav[0] = updatedNavItem
         }
       }
-      // remove the previous nav item if it is the same as the updated current item
-      if (JSON.stringify(nav[0]) === JSON.stringify(nav[1])) {
-        nav.pop()
-      }
       return nav
     })
     if (navigate) u('windows', windowId, 'showing', () => true)
