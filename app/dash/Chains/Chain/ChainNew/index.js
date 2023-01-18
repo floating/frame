@@ -135,7 +135,7 @@ export const Chain = ({
               link.send('tray:addChain', updatedChain)
 
               // if previous navItem is the chains panel, go back
-              if (nav[1].view === 'chains') {
+              if (nav[1]?.view === 'chains') {
                 link.send('tray:action', 'backDash')
               } else {
                 // otherwise update the current navItem to show the chains panel
