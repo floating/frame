@@ -35,16 +35,20 @@ type RequestType =
   | 'sign'
   | 'signTypedData'
   | 'transaction'
+  | 'extensionAccess'
   | 'access'
   | 'addChain'
   | 'switchChain'
   | 'addToken'
 
-export interface AccountRequest {
+interface Request {
   type: RequestType
+  handlerId: string
+}
+
+export interface AccountRequest extends Request {
   origin: string
   payload: JSONRPCRequestPayload
-  handlerId: string
   account: string
   status?: RequestStatus
   mode?: RequestMode
@@ -100,6 +104,11 @@ export interface TypedMessage<V extends SignTypedDataVersion = SignTypedDataVers
 export interface SignTypedDataRequest extends Omit<AccountRequest, 'type'> {
   type: 'signTypedData'
   typedMessage: TypedMessage
+}
+
+export interface ExtensionAccessRequest extends Omit<Request, 'type'> {
+  type: 'extensionAccess'
+  id: string
 }
 
 export interface AccessRequest extends Omit<AccountRequest, 'type'> {

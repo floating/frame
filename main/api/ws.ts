@@ -7,7 +7,14 @@ import provider from '../provider'
 import accounts from '../accounts'
 import windows from '../windows'
 
-import { updateOrigin, isTrusted, isFrameExtension, parseOrigin } from './origins'
+import {
+  updateOrigin,
+  isTrusted,
+  isFrameExtension,
+  parseOrigin,
+  isKnownExtension,
+  FrameExtension
+} from './origins'
 import validPayload from './validPayload'
 import protectedMethods from './protectedMethods'
 import { IncomingMessage, Server } from 'http'
@@ -25,7 +32,7 @@ interface Subscription {
 interface FrameWebSocket extends WebSocket {
   id: string
   origin?: string
-  isFrameExtension: boolean
+  frameExtension?: FrameExtension
 }
 
 interface ExtensionPayload extends JSONRPCRequestPayload {
@@ -62,6 +69,8 @@ const handler = (socket: FrameWebSocket, req: IncomingMessage) => {
 
     let requestOrigin = socket.origin
     if (socket.isFrameExtension) {
+      if (!(await isKnownExtension(req.headers.origin))) {
+      }
       // Request from extension, swap origin
       if (rawPayload.__frameOrigin) {
         requestOrigin = rawPayload.__frameOrigin

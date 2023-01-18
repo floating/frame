@@ -4,6 +4,7 @@ import queryString from 'query-string'
 
 import accounts, { AccessRequest } from '../accounts'
 import store from '../store'
+import { ExtensionAccessRequest } from '../accounts/types'
 
 const dev = process.env.NODE_ENV === 'development'
 const protocolRegex = /^(?:ws|http)s?:\/\//
@@ -13,6 +14,13 @@ interface OriginUpdateResult {
   hasSession: boolean
 }
 
+type Browser = 'chrome' | 'firefox' | 'safari'
+
+export interface FrameExtension {
+  browser: Browser
+  id: string
+}
+
 // allows the Frame extension to request specific methods
 const trustedExtensionMethods = ['wallet_getEthereumChains']
 
@@ -20,7 +28,8 @@ const storeApi = {
   getPermission: (address: Address, origin: string) => {
     const permissions: Record<string, Permission> = store('main.permissions', address) || {}
     return Object.values(permissions).find((p) => p.origin === origin)
-  }
+  },
+  getKnownExtension: (id: string) => store('main.knownExtensions', id)
 }
 
 export function parseOrigin(origin?: string) {
@@ -37,6 +46,21 @@ async function getPermission(address: Address, origin: string, payload: RPCReque
   const permission = storeApi.getPermission(address, origin)
 
   return permission || requestPermission(address, payload)
+}
+
+async function requestExtensionPermission(extension: FrameExtension) {
+  return new Promise<boolean>((resolve) => {
+    const request: ExtensionAccessRequest = {
+      handlerId: extension.id,
+      type: 'extensionAccess',
+      id: extension.id
+    }
+
+    accounts.addRequest(request, () => {
+      const isAllowed = store('main.knownExtensions', extension.id)
+      resolve(isAllowed)
+    })
+  })
 }
 
 async function requestPermission(address: Address, fullPayload: RPCRequestPayload) {
@@ -99,27 +123,33 @@ export function updateOrigin(
   }
 }
 
-export function isFrameExtension(req: IncomingMessage) {
-  const origin = req.headers.origin
-  if (!origin) return false
+export function parseFrameExtension(req: IncomingMessage): FrameExtension | false {
+  const origin = req.headers.origin || ''
 
   const query = queryString.parse((req.url || '').replace('/', ''))
-  const mozOrigin = origin.startsWith('moz-extension://')
-  const extOrigin =
-    origin.startsWith('chrome-extension://') ||
-    origin.startsWith('moz-extension://') ||
-    origin.startsWith('safari-web-extension://')
+  const hasExtensionIdentity = query.identity === 'frame-extension'
 
   if (origin === 'chrome-extension://ldcoohedfbjoobcadoglnnmmfbdlmmhf') {
     // Match production chrome
-    return true
-  } else if (mozOrigin || (dev && extOrigin)) {
-    // In production, match any Firefox extension origin where query.identity === 'frame-extension'
-    // In dev, match any extension where query.identity === 'frame-extension'
-    return query.identity === 'frame-extension'
-  } else {
-    return false
+    return { browser: 'chrome', id: 'ldcoohedfbjoobcadoglnnmmfbdlmmhf' }
+  } else if (origin.startsWith('moz-extension://') && hasExtensionIdentity) {
+    // Match production Firefox
+    const extensionId = origin.substring(origin.indexOf('://') + 3)
+    return { browser: 'firefox', id: extensionId }
+  } else if (origin.startsWith('safari-web-extension://') && dev && hasExtensionIdentity) {
+    // Match Safari in dev only
+    return { browser: 'safari', id: 'frame-dev' }
   }
+
+  return false
+}
+
+export async function isKnownExtension(extension: FrameExtension) {
+  if (extension.browser === 'chrome' || extension.browser === 'safari') return true
+
+  const knownExtension = storeApi.getKnownExtension(extension.id)
+
+  return knownExtension || requestExtensionPermission(extension)
 }
 
 export async function isTrusted(payload: RPCRequestPayload) {
