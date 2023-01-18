@@ -278,7 +278,7 @@ describe('#isKnownExtension', () => {
   })
 
   it('allows a user to trust a Firefox extension', async () => {
-    const extension = { browser: 'firefox', id: '4be0643f-1d98-573b-97cd-ca98a65347dd' }
+    const extension = { browser: 'firefox', id: '4ae0643f-1d98-573b-97cd-ca98a65347dd' }
 
     store.notify.mockImplementationOnce(() => {
       // simulate user accepting the request
@@ -290,7 +290,7 @@ describe('#isKnownExtension', () => {
   })
 
   it('allows a user to reject a connection from a Firefox extension', async () => {
-    const extension = { browser: 'firefox', id: '4be0643f-1d98-573b-97cd-ca98a65347dd' }
+    const extension = { browser: 'firefox', id: '4ce0643f-1d98-573b-97cd-ca98a65347dd' }
 
     store.notify.mockImplementationOnce(() => {
       // simulate user accepting the request

@@ -7,6 +7,7 @@ import store from '../store'
 
 const dev = process.env.NODE_ENV === 'development'
 
+const activeExtensionChecks: Record<string, Promise<boolean>> = {}
 const extensionPrefixes = {
   firefox: 'moz-extension',
   safari: 'safari-web-extension'
@@ -54,18 +55,25 @@ async function getPermission(address: Address, origin: string, payload: RPCReque
 }
 
 async function requestExtensionPermission(extension: FrameExtension) {
+  if (extension.id in activeExtensionChecks) {
+    return activeExtensionChecks[extension.id]
+  }
+
   const result = new Promise<boolean>((resolve) => {
     const obs = store.observer(() => {
+      const isActive = extension.id in activeExtensionChecks
       const isAllowed = store('main.knownExtensions', extension.id)
 
       // wait for a response
-      if (typeof isAllowed !== 'undefined') {
+      if (isActive && typeof isAllowed !== 'undefined') {
+        delete activeExtensionChecks[extension.id]
         obs.remove()
         resolve(isAllowed)
       }
     }, 'origins:requestExtension')
   })
 
+  activeExtensionChecks[extension.id] = result
   store.notify('extensionConnect', extension)
 
   return result
