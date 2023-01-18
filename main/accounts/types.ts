@@ -35,7 +35,6 @@ type RequestType =
   | 'sign'
   | 'signTypedData'
   | 'transaction'
-  | 'extensionAccess'
   | 'access'
   | 'addChain'
   | 'switchChain'
