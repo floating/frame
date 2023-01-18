@@ -16,19 +16,25 @@ function renderRecognizedAction(req) {
   return !actions.length ? (
     <div className='_txDescriptionSummaryLine'>Calling Contract</div>
   ) : (
-    actions.map((action) => {
+    actions.map((action, index) => {
       const { id = '', data } = action
-
+      const key = id + index
       const [actionClass, actionType] = id.split(':')
 
       if (actionClass === 'erc20') {
         if (actionType === 'transfer') {
-          return <SendOverview amountHex={data.amount} decimals={data.decimals} symbol={data.symbol} />
+          return (
+            <SendOverview key={key} amountHex={data.amount} decimals={data.decimals} symbol={data.symbol} />
+          )
         }
       } else if (actionClass === 'ens') {
-        return <EnsOverview type={actionType} data={data} />
+        return <EnsOverview key={key} type={actionType} data={data} />
       } else {
-        return <div className='_txDescriptionSummaryLine'>Calling Contract</div>
+        return (
+          <div key={key} className='_txDescriptionSummaryLine'>
+            Calling Contract
+          </div>
+        )
       }
     })
   )
@@ -61,7 +67,6 @@ const SendOverview = ({ amountHex, decimals, symbol }) => {
 const DeployContractOverview = () => <div>Deploying Contract</div>
 const GenericContractOverview = ({ method }) => <div>{`Calling Contract Method ${method}`}</div>
 const DataOverview = () => <div>Sending data</div>
-const EmptyTransactionOverview = () => <div>Empty Transaction</div>
 
 const TxOverview = ({
   req,

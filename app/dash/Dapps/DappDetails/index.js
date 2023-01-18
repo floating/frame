@@ -1,4 +1,4 @@
-import React, { createRef } from 'react'
+import React from 'react'
 import Restore from 'react-restore'
 import link from '../../../../resources/link'
 import RingIcon from '../../../../resources/Components/RingIcon'
@@ -19,6 +19,7 @@ class DappDetails extends React.Component {
             const { primaryColor, icon } = this.store('main.networksMeta.ethereum', id)
             return (
               <div
+                key={id}
                 className={'originChainItem'}
                 onClick={() => {
                   link.send('tray:action', 'switchOriginChain', this.props.originId, parseInt(id), 'ethereum')

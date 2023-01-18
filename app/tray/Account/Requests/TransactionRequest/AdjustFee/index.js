@@ -266,10 +266,11 @@ class TxFeeOverlay extends Component {
       return limitGasUnits(rawGasLimit)
     }
 
-    const receiveValueHandler = (value, name, setAsHex = true) => {
+    const receiveValueHandler = (value, name) => {
+      // FIXME: should not set state directly
       this.state[name] = value
-      const valueToSet = setAsHex ? bnToHex(this.state[name]) : this.state[name].toString()
-      link.rpc(`set${name.charAt(0).toUpperCase() + name.slice(1)}`, valueToSet, handlerId, (e) => {
+
+      link.rpc(`set${name.charAt(0).toUpperCase() + name.slice(1)}`, bnToHex(value), handlerId, (e) => {
         if (e) console.error(e)
       })
     }
@@ -301,7 +302,7 @@ class TxFeeOverlay extends Component {
         )}
         <GasLimitInput
           initialValue={displayGasLimit}
-          onReceiveValue={(value) => receiveValueHandler(value, 'gasLimit', false)}
+          onReceiveValue={(value) => receiveValueHandler(value, 'gasLimit')}
           limiter={gasLimitLimiter}
           tabIndex={2}
         />

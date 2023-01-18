@@ -128,6 +128,7 @@ class TxSending extends React.Component {
         const displayAmount = isUnlimited(this.state.amount)
           ? 'unlimited'
           : formatDisplayInteger(amount, decimals)
+        const isSubmitted = req.status !== undefined
 
         return (
           <ClusterBox title={'Token Approval'} animationSlot={this.props.i}>
@@ -136,10 +137,13 @@ class TxSending extends React.Component {
                 <ClusterRow>
                   <ClusterValue
                     onClick={() => {
-                      link.send('nav:update', 'panel', {
-                        data: { step: 'adjustApproval', actionId: action.id, requestedAmountHex: amount }
-                      })
+                      if (!isSubmitted) {
+                        link.send('nav:update', 'panel', {
+                          data: { step: 'adjustApproval', actionId: action.id, requestedAmountHex: amount }
+                        })
+                      }
                     }}
+                    style={isSubmitted ? { cursor: 'auto' } : {}}
                   >
                     <div className='clusterFocus'>
                       <div>{`Revoking Approval To Spend `}</div>
@@ -151,10 +155,13 @@ class TxSending extends React.Component {
                 <ClusterRow>
                   <ClusterValue
                     onClick={() => {
-                      link.send('nav:update', 'panel', {
-                        data: { step: 'adjustApproval', actionId: action.id, requestedAmountHex: amount }
-                      })
+                      if (!isSubmitted) {
+                        link.send('nav:update', 'panel', {
+                          data: { step: 'adjustApproval', actionId: action.id, requestedAmountHex: amount }
+                        })
+                      }
                     }}
+                    style={isSubmitted ? { cursor: 'auto' } : {}}
                   >
                     <div className='clusterFocus'>
                       <div>{`Granting Approval To Spend`}</div>

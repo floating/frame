@@ -136,7 +136,7 @@ export const EditChainExplorer = ({ currentExplorer, onChange }) => (
     valueName={'explorer'}
   />
 )
-//TODO: needs to show an error when not a valid URL...
+
 export const EditChainIcon = ({ currentIcon, onChange }) => (
   <EditChainProperty currentValue={currentIcon} onChange={onChange} title={'Chain Icon'} valueName={'icon'} />
 )

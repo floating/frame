@@ -142,10 +142,10 @@ const ChainOrigins = ({ chain: { name }, origins, primaryColor, icon }) => {
         <div className='originTitleText'>{name}</div>
       </div>
       {origins.connected.map((origin) => (
-        <OriginModule origin={origin} connected={true} />
+        <OriginModule key={origin} origin={origin} connected={true} />
       ))}
       {origins.disconnected.map((origin) => (
-        <OriginModule origin={origin} connected={false} />
+        <OriginModule key={origin} origin={origin} connected={false} />
       ))}
       {origins.connected.length === 0 && origins.disconnected.length === 0 ? (
         <div className='sliceOriginNoDapp'>{'No Dapp Recently Connected'}</div>
@@ -162,7 +162,6 @@ class Dapps extends React.Component {
   render() {
     const enabledChains = this.getEnabledChains()
     const origins = this.store('main.origins')
-    const clearOriginsClickHandler = () => link.send('tray:clearOrigins')
 
     const { dappDetails } = this.props.data
 
@@ -178,7 +177,13 @@ class Dapps extends React.Component {
             return chainOrigins.length === 0 ? (
               <></>
             ) : (
-              <ChainOrigins chain={chain} origins={chainOrigins} primaryColor={primaryColor} icon={icon} />
+              <ChainOrigins
+                key={chain.id}
+                chain={chain}
+                origins={chainOrigins}
+                primaryColor={primaryColor}
+                icon={icon}
+              />
             )
           })}
         </div>

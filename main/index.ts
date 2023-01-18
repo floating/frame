@@ -165,6 +165,10 @@ ipcMain.on('tray:rejectRequest', (e, req) => {
   accounts.rejectRequest(req, err)
 })
 
+ipcMain.on('tray:clearRequestsByOrigin', (e, account, origin) => {
+  accounts.clearRequestsByOrigin(account, origin)
+})
+
 ipcMain.on('tray:openExternal', (e, url) => {
   openExternal(url)
   store.setDash({ showing: false })

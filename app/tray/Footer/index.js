@@ -41,6 +41,12 @@ class Footer extends React.Component {
   decline(reqId, req) {
     link.rpc('declineRequest', req, () => {}) // Move to link.send
   }
+
+  rejectRequest() {
+    if (this.state.allowInput) {
+      link.send('tray:rejectRequest', this.props.req)
+    }
+  }
   renderFooter() {
     const crumb = this.store('windows.panel.nav')[0] || {}
 
@@ -117,9 +123,7 @@ class Footer extends React.Component {
                 className='requestDecline'
                 style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none' }}
                 onClick={() => {
-                  if (this.state.allowInput) {
-                    link.send('tray:rejectRequest', req)
-                  }
+                  this.rejectRequest()
                 }}
               >
                 <div className='requestDeclineButton _txButton _txButtonBad'>
@@ -152,7 +156,12 @@ class Footer extends React.Component {
                   if (this.state.allowInput) link.send('tray:addToken', false, this.props.req)
                 }}
               >
-                <div className='requestDeclineButton _txButton _txButtonBad'>
+                <div
+                  className='requestDeclineButton _txButton _txButtonBad'
+                  onClick={() => {
+                    this.rejectRequest()
+                  }}
+                >
                   <span>Decline</span>
                 </div>
               </div>

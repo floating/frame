@@ -41,7 +41,9 @@ describe('Seed signer', () => {
 
   afterAll(() => {
     clean()
-
+    if (signer.status !== 'locked') {
+      signer.close()
+    }
     log.transports.console.level = 'debug'
   })
 
@@ -65,9 +67,21 @@ describe('Seed signer', () => {
       hot.createFromPhrase(signers, mnemonic, PASSWORD, (err, result) => {
         signer = result
         expect(err).toBe(null)
-        expect(signer.status).toBe('locked')
+        expect(signer.status).toBe('ok')
         expect(signer.addresses.length).toBe(100)
         expect(store(`main.signers.${signer.id}.id`)).toBe(signer.id)
+        done()
+      })
+    } catch (e) {
+      done(e)
+    }
+  }, 7_500)
+
+  test('Lock', (done) => {
+    try {
+      signer.lock((err) => {
+        expect(err).toBe(null)
+        expect(signer.status).toBe('locked')
         done()
       })
     } catch (e) {
@@ -176,18 +190,6 @@ describe('Seed signer', () => {
       done(e)
     }
   }, 500)
-
-  test('Lock', (done) => {
-    try {
-      signer.lock((err) => {
-        expect(err).toBe(null)
-        expect(signer.status).toBe('locked')
-        done()
-      })
-    } catch (e) {
-      done(e)
-    }
-  }, 2000)
 
   test('Sign message when locked', (done) => {
     try {

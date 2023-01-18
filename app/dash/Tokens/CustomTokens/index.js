@@ -25,6 +25,7 @@ class CustomTokens extends React.Component {
                 .map((token, i) => {
                   return (
                     <div
+                      key={i}
                       className={
                         this.state.tokenExpanded === i
                           ? 'customTokensListItem customTokensListItemExpanded'

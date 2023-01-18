@@ -1,5 +1,5 @@
 import log from 'electron-log'
-import { addHexPrefix } from '@ethereumjs/util'
+import { addHexPrefix, intToHex } from '@ethereumjs/util'
 import BigNumber from 'bignumber.js'
 
 import store from '../../../main/store'
@@ -8,6 +8,7 @@ import Accounts from '../../../main/accounts'
 import signers from '../../../main/signers'
 import { signerCompatibility, maxFee } from '../../../main/transaction'
 import { GasFeesSource } from '../../../resources/domain/transaction'
+import { gweiToHex } from '../../util'
 
 jest.mock('../../../main/provider', () => ({ send: jest.fn(), emit: jest.fn(), on: jest.fn() }))
 jest.mock('../../../main/signers', () => ({ get: jest.fn() }))
@@ -21,9 +22,6 @@ jest.mock('../../../main/store/persist')
 jest.mock('../../../main/nebula', () =>
   jest.fn(() => ({ ready: () => true, ens: { lookupAddress: jest.fn() } }))
 )
-
-const weiToHex = (wei) => addHexPrefix(wei.toString(16))
-const gweiToHex = (gwei) => weiToHex(gwei * 1e9)
 
 const account = {
   id: '0x22dd63c3619818fdbc262c78baee43cb61e9cccf',
@@ -66,11 +64,12 @@ beforeEach((done) => {
   const nonce = '0xa'
   request = {
     handlerId: 1,
+    origin: '0r161n',
     type: 'transaction',
     data: {
       from,
       chainId: '0x1',
-      gasLimit: weiToHex(21000),
+      gasLimit: intToHex(21000),
       gasPrice: gweiToHex(30),
       type: '0x2',
       maxPriorityFeePerGas: gweiToHex(1),
@@ -200,7 +199,7 @@ describe('#setBaseFee', () => {
 
     setBaseFee(gweiToHex(updatedBaseFee))
 
-    expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(weiToHex(2e9 + updatedBaseFee * 1e9))
+    expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(intToHex(2e9 + updatedBaseFee * 1e9))
   })
 
   it('applies user-initiated base fee update', () => {
@@ -224,7 +223,7 @@ describe('#setBaseFee', () => {
   it('caps the base fee at 9999 gwei', () => {
     const highBaseFee = gweiToHex(10200)
     const maxBaseFee = 9999e9
-    const expectedMaxFee = weiToHex(maxBaseFee + parseInt(request.data.maxPriorityFeePerGas))
+    const expectedMaxFee = intToHex(maxBaseFee + parseInt(request.data.maxPriorityFeePerGas))
 
     setBaseFee(highBaseFee)
 
@@ -235,14 +234,14 @@ describe('#setBaseFee', () => {
     const maxTotal = 2e18 // 2 ETH
     const gasLimit = 1e7
     const maxTotalFee = maxTotal / gasLimit
-    const highBaseFee = weiToHex(maxTotalFee + 10e9) // add 10 gwei to exceed the maximum limit
+    const highBaseFee = intToHex(maxTotalFee + 10e9) // add 10 gwei to exceed the maximum limit
 
-    request.data.gasLimit = weiToHex(gasLimit)
+    request.data.gasLimit = intToHex(gasLimit)
     maxFee.mockReturnValue(maxTotal)
 
     setBaseFee(highBaseFee)
 
-    expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(weiToHex(maxTotalFee))
+    expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(intToHex(maxTotalFee))
   })
 
   it('updates the feesUpdatedByUser flag', () => {
@@ -308,11 +307,11 @@ describe('#setPriorityFee', () => {
   it('sets a valid priority fee', () => {
     const priorityFee = 2e9 // 2 gwei
     const priorityFeeChange = priorityFee - parseInt(request.data.maxPriorityFeePerGas)
-    const expectedMaxFee = weiToHex(priorityFeeChange + parseInt(request.data.maxFeePerGas))
+    const expectedMaxFee = intToHex(priorityFeeChange + parseInt(request.data.maxFeePerGas))
 
-    setPriorityFee(weiToHex(priorityFee))
+    setPriorityFee(intToHex(priorityFee))
 
-    expect(Accounts.current().requests[1].data.maxPriorityFeePerGas).toBe(weiToHex(priorityFee))
+    expect(Accounts.current().requests[1].data.maxPriorityFeePerGas).toBe(intToHex(priorityFee))
     expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(expectedMaxFee)
   })
 
@@ -330,11 +329,11 @@ describe('#setPriorityFee', () => {
     const highPriorityFee = gweiToHex(10200)
     const maxPriorityFee = 9999e9
     const priorityFeeChange = maxPriorityFee - parseInt(request.data.maxPriorityFeePerGas)
-    const expectedMaxFee = weiToHex(priorityFeeChange + parseInt(request.data.maxFeePerGas))
+    const expectedMaxFee = intToHex(priorityFeeChange + parseInt(request.data.maxFeePerGas))
 
     setPriorityFee(highPriorityFee)
 
-    expect(Accounts.current().requests[1].data.maxPriorityFeePerGas).toBe(weiToHex(maxPriorityFee))
+    expect(Accounts.current().requests[1].data.maxPriorityFeePerGas).toBe(intToHex(maxPriorityFee))
     expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(expectedMaxFee)
   })
 
@@ -343,7 +342,7 @@ describe('#setPriorityFee', () => {
     const gasLimit = 1e7
     const maxTotalFee = maxTotal / gasLimit
 
-    request.data.gasLimit = weiToHex(gasLimit)
+    request.data.gasLimit = intToHex(gasLimit)
     request.data.maxFeePerGas = gweiToHex(190)
     request.data.maxPriorityFeePerGas = gweiToHex(40)
     maxFee.mockReturnValue(maxTotal)
@@ -354,8 +353,8 @@ describe('#setPriorityFee', () => {
 
     setPriorityFee(highPriorityFee)
 
-    expect(Accounts.current().requests[1].data.maxPriorityFeePerGas).toBe(weiToHex(expectedPriorityFee))
-    expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(weiToHex(maxTotalFee))
+    expect(Accounts.current().requests[1].data.maxPriorityFeePerGas).toBe(intToHex(expectedPriorityFee))
+    expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(intToHex(maxTotalFee))
   })
 
   it('updates the feesUpdatedByUser flag', () => {
@@ -434,14 +433,14 @@ describe('#setGasPrice', () => {
     const maxTotal = 2e18 // 2 ETH
     const gasLimit = 1e7
     const maxTotalFee = maxTotal / gasLimit
-    const highPrice = weiToHex(maxTotalFee + 10e9) // 250 gwei
+    const highPrice = intToHex(maxTotalFee + 10e9) // 250 gwei
 
-    request.data.gasLimit = weiToHex(gasLimit)
+    request.data.gasLimit = intToHex(gasLimit)
     maxFee.mockReturnValue(maxTotal)
 
     setGasPrice(highPrice)
 
-    expect(Accounts.current().requests[1].data.gasPrice).toBe(weiToHex(maxTotalFee))
+    expect(Accounts.current().requests[1].data.gasPrice).toBe(intToHex(maxTotalFee))
   })
 
   it('caps the gas price at 9999 gwei', () => {
@@ -522,35 +521,35 @@ describe('#setGasLimit', () => {
     const maxTotalFee = 2e18 // 2 ETH
     const gasPrice = 400e9 // 400 gwei
     const maxLimit = maxTotalFee / gasPrice
-    const gasLimit = weiToHex(maxLimit + 1e5) // add 10000 to exceed the maximum limit
+    const gasLimit = intToHex(maxLimit + 1e5) // add 10000 to exceed the maximum limit
 
     request.data.type = '0x0'
-    request.data.gasPrice = weiToHex(gasPrice)
+    request.data.gasPrice = intToHex(gasPrice)
     maxFee.mockReturnValue(maxTotalFee)
 
     setGasLimit(gasLimit)
 
-    expect(Accounts.current().requests[1].data.gasLimit).toBe(weiToHex(maxLimit))
+    expect(Accounts.current().requests[1].data.gasLimit).toBe(intToHex(maxLimit))
   })
 
   it('does not exceed the max fee for post-EIP-1559 transactions', () => {
     const maxTotalFee = 2e18 // 2 ETH
     const maxFeePerGas = 400e9 // 400 gwei
     const maxLimit = maxTotalFee / maxFeePerGas
-    const gasLimit = weiToHex(maxLimit + 1e5) // add 10000 to exceed the maximum limit
+    const gasLimit = intToHex(maxLimit + 1e5) // add 10000 to exceed the maximum limit
 
     request.data.type = '0x2'
-    request.data.maxFeePerGas = weiToHex(maxFeePerGas)
+    request.data.maxFeePerGas = intToHex(maxFeePerGas)
     maxFee.mockReturnValue(maxTotalFee)
 
     setGasLimit(gasLimit)
 
-    expect(Accounts.current().requests[1].data.gasLimit).toBe(weiToHex(maxLimit))
+    expect(Accounts.current().requests[1].data.gasLimit).toBe(intToHex(maxLimit))
   })
 
   it('caps the gas limit at 12.5e6', () => {
-    const maxLimit = weiToHex(12.5e6)
-    const highLimit = weiToHex(13e6)
+    const maxLimit = intToHex(12.5e6)
+    const highLimit = intToHex(13e6)
 
     setGasLimit(highLimit)
 
@@ -711,6 +710,19 @@ describe('#removeRequest', () => {
     Accounts.removeRequest(account, request.handlerId)
 
     expect(account.clearRequest).toHaveBeenCalledWith(request.handlerId)
+  })
+})
+
+describe('#clearRequestsByOrigin', () => {
+  beforeEach(() => {
+    Accounts.addRequest(request)
+    Accounts.addRequest({ ...request, handlerId: '2' })
+    Accounts.addRequest({ ...request, handlerId: '3', origin: '07h3r' })
+  })
+
+  it('should remove any request from a given origin', () => {
+    Accounts.clearRequestsByOrigin(account.id, request.origin)
+    expect(Object.keys(Accounts.accounts[account.id].requests)).toHaveLength(1)
   })
 })
 

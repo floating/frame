@@ -4,12 +4,12 @@ import connection from '../../../main/chains'
 import { hasPermission } from '../../../main/provider/helpers'
 import store from '../../../main/store'
 import chainConfig from '../../../main/chains/config'
-import { weiToHex, gweiToHex } from '../../../resources/utils'
+import { gweiToHex } from '../../../resources/utils'
 import { Type as SignerType } from '../../../resources/domain/signer'
 
 import { validate as validateUUID } from 'uuid'
 import { utils } from 'ethers'
-import { addHexPrefix } from '@ethereumjs/util'
+import { addHexPrefix, intToHex } from '@ethereumjs/util'
 import log from 'electron-log'
 import { SignTypedDataVersion } from '@metamask/eth-sig-util'
 
@@ -782,7 +782,7 @@ describe('#send', () => {
         from: '0x22dd63c3619818fdbc262c78baee43cb61e9cccf',
         to: '0x22dd63c3619818fdbc262c78baee43cb61e9cccf',
         chainId: '0x1',
-        gasLimit: weiToHex(21000),
+        gasLimit: intToHex(21000),
         type: '0x1',
         nonce: '0xa'
       }
@@ -919,7 +919,7 @@ describe('#send', () => {
             sendTransaction(() => {
               const replacementRequest = accountRequests[1]
               const bumpedPrice = Math.ceil(initialPrice * 1.1)
-              expect(replacementRequest.data.gasPrice).toBe(weiToHex(bumpedPrice))
+              expect(replacementRequest.data.gasPrice).toBe(intToHex(bumpedPrice))
               expect(replacementRequest.feesUpdatedByUser).toBe(true)
               done()
             })
@@ -988,8 +988,8 @@ describe('#send', () => {
               const bumpedBase = Math.ceil((initialMax - initialTip) * 1.1)
               const bumpedMax = bumpedFee + bumpedBase
 
-              expect(replacementRequest.data.maxPriorityFeePerGas).toBe(weiToHex(bumpedFee))
-              expect(replacementRequest.data.maxFeePerGas).toBe(weiToHex(bumpedMax))
+              expect(replacementRequest.data.maxPriorityFeePerGas).toBe(intToHex(bumpedFee))
+              expect(replacementRequest.data.maxFeePerGas).toBe(intToHex(bumpedMax))
               expect(replacementRequest.feesUpdatedByUser).toBe(true)
               done()
             })
@@ -1029,8 +1029,8 @@ describe('#send', () => {
             sendTransaction(() => {
               const replacementRequest = accountRequests[1]
               const bumpedFee = Math.ceil(initialTip * 1.1)
-              expect(replacementRequest.data.maxPriorityFeePerGas).toBe(weiToHex(bumpedFee))
-              expect(replacementRequest.data.maxFeePerGas).toBe(weiToHex(20 * 1e9 + bumpedFee))
+              expect(replacementRequest.data.maxPriorityFeePerGas).toBe(intToHex(bumpedFee))
+              expect(replacementRequest.data.maxFeePerGas).toBe(intToHex(20 * 1e9 + bumpedFee))
               expect(replacementRequest.feesUpdatedByUser).toBe(true)
               done()
             })

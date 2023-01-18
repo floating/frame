@@ -100,7 +100,15 @@ class Requests extends React.Component {
             <div style={{ marginRight: '8px' }}>{svg.window(12)}</div>
             <div className='requestGroupName'>{groupName}</div>
           </div>
-          {/* <div className='requestGroupButton'>{'clear all'}</div> */}
+          <div
+            className='requestGroupButton'
+            onClick={() => {
+              link.send('tray:clearRequestsByOrigin', this.props.account, origin)
+            }}
+          >
+            {svg.x(14)}
+            <div className='requestGroupButtonLabel'>{'clear all'}</div>
+          </div>
         </div>
         <Cluster>
           {!requests.length ? (
