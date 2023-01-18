@@ -1,4 +1,4 @@
-import React, { createRef } from 'react'
+import React from 'react'
 import Restore from 'react-restore'
 import link from '../../../resources/link'
 
@@ -89,8 +89,8 @@ class Settings extends React.Component {
               const {
                 nativeCurrency: { symbol = '?' }
               } = metadata[type][id]
-              const chain = { key, id, type, symbol, explorer, isTestnet, connection, on, filter, name }
-              return <Chain {...chain} view={'preview'} />
+              const chain = { id, type, symbol, explorer, isTestnet, connection, on, filter, name }
+              return <Chain key={key} {...chain} view={'preview'} />
             })}
         </div>
       )
