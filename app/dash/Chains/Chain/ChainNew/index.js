@@ -13,9 +13,10 @@ import {
   EditNativeCurrencyName,
   EditTestnet,
   EditChainExplorer,
-  EditRPC,
   SubmitChainButton,
-  EditNativeCurrencyIcon
+  EditNativeCurrencyIcon,
+  EditSecondaryRPC,
+  EditPrimaryRPC
 } from '../Components'
 
 const isChainFilled = (chain) => {
@@ -147,18 +148,8 @@ export default ({
         currentNativeCurrency={currentNativeCurrencyName}
         onChange={setNativeCurrencyName}
       />
-      <EditRPC
-        currentRPC={currentPrimaryRPC}
-        label={'Primary RPC'}
-        rpcDefault={chainDefault.primaryRpc}
-        onChange={setPrimaryRPC}
-      />
-      <EditRPC
-        currentRPC={currentSecondaryRPC}
-        label={'Secondary RPC'}
-        rpcDefault={chainDefault.secondaryRpc}
-        onChange={setSecondaryRPC}
-      />
+      <EditPrimaryRPC currentPrimaryRPC={currentPrimaryRPC} onChange={setPrimaryRPC} />
+      <EditSecondaryRPC currentSecondaryRpc={currentSecondaryRPC} onChange={setSecondaryRPC} />
       <EditChainIcon currentIcon={currentChainIcon} onChange={setChainIcon} />
       <EditNativeCurrencyIcon currentCurrencyIcon={currentCurrencyIcon} onChange={setCurrencyIcon} />
       <EditTestnet testnet={currentTestnet} onChange={setTestnet} />

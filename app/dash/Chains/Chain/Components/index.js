@@ -3,8 +3,6 @@ import React, { useState } from 'react'
 import link from '../../../../../resources/link'
 import svg from '../../../../../resources/svg'
 import RingIcon from '../../../../../resources/Components/RingIcon'
-import { capitalize } from '../../../../../resources/utils'
-
 import chainDefault from '../chainDefault'
 
 export const SubmitChainButton = ({ text, enabled, textColor, onClick }) => {
@@ -87,24 +85,31 @@ export const EditChainColor = ({ currentColor, onChange }) => {
   )
 }
 
-const EditChainProperty = ({ currentValue, onChange, valueName, title }) => {
-  const id = `chain${capitalize(valueName)}`
+export const EditChainField = ({ currentValue, defaultValue, label, onChange }) => {
+  const [editing, setEditing] = useState(false)
+  const id = label
+    .split(' ')
+    .map((s) => s.toLowerCase())
+    .join('-')
+
   return (
     <div className='chainRow'>
       <label htmlFor={id} className='chainInputLabel'>
-        {title}
+        {label}
       </label>
       <input
         id={id}
-        className={currentValue === chainDefault[valueName] ? 'chainInput chainInputDim' : 'chainInput'}
-        value={currentValue}
+        className={!currentValue ? 'chainInput chainInputDim' : 'chainInput'}
+        value={currentValue || (!editing && defaultValue) || ''}
         spellCheck='false'
-        onChange={(e) => onChange(e.target.value)}
-        onFocus={(e) => {
-          if (e.target.value === chainDefault[valueName]) onChange('')
+        onChange={(e) => {
+          onChange(e.target.value)
         }}
-        onBlur={(e) => {
-          if (e.target.value === '') onChange(chainDefault[valueName])
+        onFocus={() => {
+          setEditing(true)
+        }}
+        onBlur={() => {
+          setEditing(false)
         }}
       />
     </div>
@@ -112,50 +117,83 @@ const EditChainProperty = ({ currentValue, onChange, valueName, title }) => {
 }
 
 export const EditChainName = ({ currentName, onChange }) => (
-  <EditChainProperty currentValue={currentName} onChange={onChange} title={'Chain Name'} valueName={'name'} />
+  <EditChainField
+    currentValue={currentName}
+    onChange={onChange}
+    label={'Chain Name'}
+    defaultValue={chainDefault.name}
+  />
 )
 
 export const EditChainSymbol = ({ currentSymbol, onChange }) => (
-  <EditChainProperty
+  <EditChainField
     currentValue={currentSymbol}
     onChange={onChange}
-    title={'Native Symbol'}
-    valueName={'symbol'}
+    label={'Native Symbol'}
+    defaultValue={chainDefault.symbol}
   />
 )
 
 export const EditChainId = ({ chainId, onChange }) => (
-  <EditChainProperty currentValue={chainId} onChange={onChange} title={'Chain ID'} valueName={'id'} />
+  <EditChainField
+    currentValue={chainId}
+    onChange={onChange}
+    label={'Chain ID'}
+    defaultValue={chainDefault.id}
+  />
 )
 
 export const EditChainExplorer = ({ currentExplorer, onChange }) => (
-  <EditChainProperty
+  <EditChainField
     currentValue={currentExplorer}
     onChange={onChange}
-    title={'Block Explorer'}
-    valueName={'explorer'}
+    label={'Block Explorer'}
+    defaultValue={chainDefault.explorer}
   />
 )
 
 export const EditChainIcon = ({ currentIcon, onChange }) => (
-  <EditChainProperty currentValue={currentIcon} onChange={onChange} title={'Chain Icon'} valueName={'icon'} />
+  <EditChainField
+    currentValue={currentIcon}
+    onChange={onChange}
+    label={'Chain Icon'}
+    defaultValue={chainDefault.icon}
+  />
 )
 
 export const EditNativeCurrencyIcon = ({ currentCurrencyIcon, onChange }) => (
-  <EditChainProperty
+  <EditChainField
     currentValue={currentCurrencyIcon}
     onChange={onChange}
-    title={'Native Currency Icon'}
-    valueName={'nativeCurrencyIcon'}
+    label={'Native Currency Icon'}
+    defaultValue={chainDefault.nativeCurrencyIcon}
   />
 )
 
 export const EditNativeCurrencyName = ({ currentNativeCurrency, onChange }) => (
-  <EditChainProperty
+  <EditChainField
     currentValue={currentNativeCurrency}
+    label='Native Currency Name'
+    defaultValue={chainDefault.nativeCurrencyName}
     onChange={onChange}
-    title={'Native Currency Name'}
-    valueName={'nativeCurrencyName'}
+  />
+)
+
+export const EditPrimaryRPC = ({ currentPrimaryRPC, onChange }) => (
+  <EditChainField
+    currentValue={currentPrimaryRPC}
+    label={'Primary RPC'}
+    defaultValue={chainDefault.primaryRpc}
+    onChange={onChange}
+  />
+)
+
+export const EditSecondaryRPC = ({ currentSecondaryRpc, onChange }) => (
+  <EditChainField
+    currentValue={currentSecondaryRpc}
+    label={'Secondary RPC'}
+    defaultValue={chainDefault.secondaryRpc}
+    onChange={onChange}
   />
 )
 
@@ -171,37 +209,6 @@ export const EditTestnet = ({ testnet, onChange }) => {
       >
         <div className='signerPermissionToggleSwitch' />
       </div>
-    </div>
-  )
-}
-
-export const EditRPC = ({ currentRPC, label, rpcDefault = 'RPC Endpoint', onChange }) => {
-  const [editing, setEditing] = useState(false)
-  const id = label
-    .split(' ')
-    .map((s) => s.toLowerCase())
-    .join('-')
-
-  return (
-    <div className='chainRow'>
-      <label htmlFor={id} className='chainInputLabel'>
-        {label}
-      </label>
-      <input
-        id={id}
-        className={!currentRPC ? 'chainInput chainInputDim' : 'chainInput'}
-        value={currentRPC || (!editing && rpcDefault) || ''}
-        spellCheck='false'
-        onChange={(e) => {
-          onChange(e.target.value)
-        }}
-        onFocus={() => {
-          setEditing(true)
-        }}
-        onBlur={() => {
-          setEditing(false)
-        }}
-      />
     </div>
   )
 }

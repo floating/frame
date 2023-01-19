@@ -35,7 +35,7 @@ export default (props) => {
     price,
     nativeCurrencyName
   } = props
-  const chain = { id, type, name, isTestnet, symbol, explorer, primaryColor, icon, nativeCurrencyName }
+  const chain = { id, type, name, isTestnet, symbol, explorer, primaryColor }
 
   // state
   const [currentColor, setPrimaryColor] = useState(primaryColor)
@@ -43,31 +43,25 @@ export default (props) => {
   const [currentSymbol, setSymbol] = useState(symbol)
   const [currentExplorer, setExplorer] = useState(explorer)
   const [currentTestnet, setTestnet] = useState(isTestnet)
-  const [currentNativeCurrencyName, setNativeCurrencyName] = useState(
-    nativeCurrencyName || chainDefault.nativeCurrencyName
-  )
-  const [currentIcon, setIcon] = useState(icon || chainDefault.icon)
-  const [currentCurrencyIcon, setCurrencyIcon] = useState(
-    nativeCurrencyIcon || chainDefault.nativeCurrencyIcon
-  )
+  const [currentNativeCurrencyName, setNativeCurrencyName] = useState(nativeCurrencyName)
+  const [currentIcon, setIcon] = useState(icon)
+  const [currentCurrencyIcon, setCurrencyIcon] = useState(nativeCurrencyIcon)
 
   // effects
   useEffect(() => {
-    const nativeCurrencyIcon =
-      currentCurrencyIcon === chainDefault.nativeCurrencyIcon ? '' : currentCurrencyIcon
-    const icon = currentIcon === chainDefault.icon ? '' : currentIcon
     const updatedChain = {
       id,
       type,
-      name: currentName,
       primaryColor: currentColor,
       isTestnet: currentTestnet,
-      symbol: currentSymbol,
       explorer: currentExplorer,
-      icon,
-      nativeCurrencyIcon,
+      icon: currentIcon,
+      nativeCurrencyIcon: currentCurrencyIcon,
+      name: currentName,
+      symbol: currentSymbol,
       nativeCurrencyName: currentNativeCurrencyName
     }
+
     link.send('tray:action', 'updateNetwork', chain, updatedChain)
   }, [
     currentColor,
