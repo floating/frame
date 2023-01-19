@@ -23,7 +23,7 @@ import {
   setBlockHeight as setBlockHeightAction,
   updateAccount as updateAccountAction,
   navClearReq as clearNavRequestAction,
-  navClearSigner as clearNavSignerAction
+  navClearSigner as clearNavSignerAction,
   updateTypedDataRequest as updateTypedDataAction
 } from '../../../../main/store/actions'
 import { toTokenId } from '../../../../resources/domain/balance'

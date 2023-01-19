@@ -35,7 +35,7 @@ describe('confirm', () => {
 
     addRequest(req)
 
-    render(<TxRequest req={req} step='confirm' handlerId={req.handlerId} accountId={account} />)
+    render(<TxRequest req={req} step='confirm' />)
 
     const notice = screen.getByRole('status')
     expect(notice.textContent).toBe('confirming')
