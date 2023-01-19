@@ -225,7 +225,7 @@ export const ChainFooter = ({ id, type, symbol, price }) => {
         <div
           role='link'
           onClick={(e) => {
-            link.send('tray:openExplorer', { id, type })
+            link.rpc('openExplorer', { id, type }, () => {})
           }}
         >
           Open Block Explorer

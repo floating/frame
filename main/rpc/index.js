@@ -3,6 +3,7 @@ const { ipcMain, dialog } = require('electron')
 const log = require('electron-log')
 const { randomBytes } = require('crypto')
 import { isAddress } from '@ethersproject/address'
+import { openBlockExplorer } from '../windows/window'
 
 const accounts = require('../accounts').default
 const signers = require('../signers').default
@@ -290,6 +291,13 @@ const rpc = {
       dapps.add(domain, options, cb)
     } else {
       console.log('input needs to be ens name')
+    }
+  },
+  openExplorer(chain) {
+    if (store('main.mute.explorerWarning')) {
+      openBlockExplorer(chain)
+    } else {
+      store.notify('openExplorer', { chain })
     }
   }
 }
