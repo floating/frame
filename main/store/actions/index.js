@@ -362,7 +362,7 @@ module.exports = {
           icon,
           nativeCurrency: {
             ...networkCurrency,
-            symbol,
+            symbol: update.symbol,
             name: nativeCurrencyName,
             icon: nativeCurrencyIcon
           }
