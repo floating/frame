@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 
 import link from '../../../../../resources/link'
-import chainDefault from '../chainDefault'
 import Connection from '../Connection'
 
 import {
@@ -10,6 +9,8 @@ import {
   EditChainColor,
   EditChainName,
   EditChainSymbol,
+  EditNativeCurrencyName,
+  EditChainIcon,
   EditTestnet,
   EditChainExplorer,
   ChainFooter,
