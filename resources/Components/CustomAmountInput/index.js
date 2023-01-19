@@ -6,7 +6,6 @@ import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../Cluster'
 import Countdown from '../Countdown'
 
 import { MAX_HEX } from '../../constants'
-import { formatDisplayInteger } from '../../utils/numbers'
 import useCopiedMessage from '../../Hooks/useCopiedMessage'
 
 const max = new BigNumber(MAX_HEX)
@@ -14,7 +13,7 @@ const max = new BigNumber(MAX_HEX)
 const isMax = (value) => max.isEqualTo(value)
 
 const getMode = (requestedAmount, amount) => {
-  if (requestedAmount === amount) return 'requested'
+  if (requestedAmount.eq(amount)) return 'requested'
   return isMax(amount) ? 'unlimited' : 'custom'
 }
 
@@ -103,10 +102,7 @@ const CustomAmountInput = ({
       return setMode('custom')
     }
 
-    if (!/^\d+$/.test(value)) return
-
-    const custom = new BigNumber(value).shiftedBy(decimals)
-    const amount = max.comparedTo(custom) === -1 ? max.toString() : custom.toString()
+    if (isNaN(value) || value < 0) return
     setMode('custom')
     setCustom(value)
   }
@@ -126,7 +122,7 @@ const CustomAmountInput = ({
   const isRevoke = canRevoke && value.eq(0)
   const isCustom = mode === 'custom'
 
-  const displayAmount = isMax(amount) ? 'unlimited' : formatDisplayInteger(amount, decimals)
+  const displayAmount = isMax(amount) ? 'unlimited' : toDecimal(amount)
 
   const inputLock = !symbol || !name || !decimals
 

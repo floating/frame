@@ -184,7 +184,7 @@ const EditPermit = ({ permit, tokenData, req }) => {
   }
   const deadline = deadlineInSeconds * 1000
 
-  const requestedAmount = new BigNumber(req.payload.params[1].message.value).toString()
+  const requestedAmount = BigNumber(req.payload.params[1].message.value)
 
   const data = {
     ...tokenData,
@@ -208,6 +208,7 @@ const EditPermit = ({ permit, tokenData, req }) => {
 const PermitRequest = ({ req, originName, step, chainData }) => {
   const [tokenData, setTokenData] = useState({})
   const permit = getPermit(req)
+
   useEffect(() => {
     link.rpc('getErc20Data', permit.verifyingContract, permit.chainId, (err, tokenData) => {
       if (err) return console.error(err)

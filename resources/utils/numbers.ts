@@ -2,6 +2,8 @@ import BigNumber from 'bignumber.js'
 
 import { MAX_HEX } from '../constants'
 
+const max = BigNumber(MAX_HEX, 16)
+
 const numberRegex = /\.0+$|(\.[0-9]*[1-9])0+$/
 
 const digitsLookup = [
@@ -25,7 +27,7 @@ export function formatNumber(n: number, digits = 2) {
 }
 
 export function isUnlimited(amount: string) {
-  return amount === MAX_HEX
+  return max.eq(amount)
 }
 
 export function formatDisplayInteger(amount: number, decimals: number) {
