@@ -67,7 +67,6 @@ class ChainModule extends React.Component {
 
   renderConnection(id, { primary, secondary }, blockHeight) {
     const connection = getActiveConnection(primary, secondary)
-    console.log({ id, primary })
 
     return (
       <div
@@ -171,7 +170,6 @@ class ChainModule extends React.Component {
       }
     }
 
-    console.log({ networkMeta })
     return (
       <div className='sliceContainer' ref={this.ref}>
         {this.renderConnection(id, connection, networkMeta.blockHeight)}
