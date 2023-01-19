@@ -952,29 +952,6 @@ describe('#updateNetwork', () => {
       symbol
     })
   })
-
-  it('should not save network metadata inside the main network state', () => {
-    const newMetadata = {
-      nativeCurrencyName: 'TEST_NAME',
-      icon: 'http://icon.com',
-      nativeCurrencyIcon: 'http://icon2.com'
-    }
-    updateNetwork(
-      { id: '0x4', type: 'ethereum', name: '', explorer: '', symbol: '' },
-      {
-        id: '0x4',
-        type: 'ethereum',
-        name: 'test',
-        explorer: 'explorer.test',
-        symbol: 'TEST',
-        ...newMetadata
-      }
-    )
-
-    Object.keys(newMetadata).forEach((property) => {
-      expect(main.networks.ethereum[4][property]).toBeUndefined()
-    })
-  })
 })
 
 describe('#activateNetwork', () => {

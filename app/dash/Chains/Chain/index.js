@@ -21,7 +21,6 @@ class Chain extends React.Component {
     } = this.props
     const existingChains = Object.keys(this.store('main.networks.ethereum')).map((id) => parseInt(id))
     return (
-      //TODO: cleanup
       <ChainNew
         id={id}
         name={name}
@@ -56,7 +55,6 @@ class Chain extends React.Component {
     const { primaryColor } = this.store('main.networksMeta.ethereum', id)
     const price = this.store('main.networksMeta.ethereum', id, 'nativeCurrency.usd.price') || '?'
     return (
-      //TODO: cleanup
       <ChainExpanded
         id={id}
         name={name}

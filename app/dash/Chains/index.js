@@ -91,7 +91,6 @@ class Settings extends React.Component {
                 icon
               } = metadata[type][id]
               const chain = {
-                key,
                 id,
                 type,
                 symbol,
@@ -105,7 +104,7 @@ class Settings extends React.Component {
                 nativeCurrencyIcon,
                 icon
               }
-              return <Chain {...chain} view={'preview'} />
+              return <Chain key={key} {...chain} view={'preview'} />
             })}
         </div>
       )
