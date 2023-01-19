@@ -8,9 +8,9 @@ import { usesBaseFee } from '../../../resources/domain/transaction'
 
 import Confirm from '../../../resources/Components/Confirm'
 import AddToken from './AddToken'
+import frameIcon from '../../../asset/FrameIcon.png'
 
 const FEE_WARNING_THRESHOLD_USD = 50
-
 const capitalize = (s) => s[0].toUpperCase() + s.slice(1)
 
 class Notify extends React.Component {
@@ -28,7 +28,8 @@ class Notify extends React.Component {
                 We are excited to welcome you to the next iteration of Frame!
               </div>
               <div className='notifyBodyBlock'>
-                Be advised, this version of Frame is currently in "beta" and will update on a beta track
+                Be advised, this version of Frame is currently in &quot;beta&quot; and will update on a beta
+                track
               </div>
               <div className='notifyBodyBlock'>
                 Use hardware signers for high value accounts and verify all transaction and account details on
@@ -67,7 +68,7 @@ class Notify extends React.Component {
                   link.send('tray:action', 'backDash')
                 }}
               >
-                <div className='notifyInputOptionText notifyBetaGo'>Let's go!</div>
+                <div className='notifyInputOptionText notifyBetaGo'>Let&apos;s go!</div>
               </div>
             </div>
           </div>
@@ -116,7 +117,9 @@ class Notify extends React.Component {
                 <div className='notifyBodyLine notifyBodyPrice'>{`≈ $${feeUSD} in ${currentSymbol}`}</div>
               </>
             ) : (
-              <div className='notifyBodyLine'>We were unable to determine this transaction's fee in USD.</div>
+              <div className='notifyBodyLine'>
+                We were unable to determine this transaction&apos;s fee in USD.
+              </div>
             )}
             <div className='notifyBodyQuestion'>Are you sure you want to proceed?</div>
           </div>
@@ -150,7 +153,7 @@ class Notify extends React.Component {
     )
   }
 
-  signerUnavailableWarning({ req = {} }) {
+  signerUnavailableWarning() {
     return (
       <div className='notifyBoxWrap' onMouseDown={(e) => e.stopPropagation()}>
         <div className='notifyBox'>
@@ -173,7 +176,7 @@ class Notify extends React.Component {
     )
   }
 
-  noSignerWarning({ req = {} }) {
+  noSignerWarning() {
     return (
       <div className='notifyBoxWrap' onMouseDown={(e) => e.stopPropagation()}>
         <div className='notifyBox'>
@@ -202,7 +205,7 @@ class Notify extends React.Component {
   }
 
   signerCompatibilityWarning({ req = {}, compatibility = {}, chain = {} }) {
-    const { signer, tx, compatible } = compatibility
+    const { signer, tx } = compatibility
     return (
       <div className='notifyBoxWrap' onMouseDown={(e) => e.stopPropagation()}>
         <div className='notifyBox'>
@@ -308,7 +311,7 @@ class Notify extends React.Component {
           </div>
           <div className='notifyBody'>
             <div className='notifyBodyLine'>
-              Your Ledger currently doesn't allow signing of contract data.
+              Your Ledger currently doesn&apos;t allow signing of contract data.
             </div>
             <div className='notifyBodyLine'>
               <span>To change this settings go to</span>

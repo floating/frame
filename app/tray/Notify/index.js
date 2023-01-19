@@ -1,13 +1,12 @@
 import React from 'react'
 import Restore from 'react-restore'
+import BigNumber from 'bignumber.js'
+
 import svg from '../../../resources/svg'
 import link from '../../../resources/link'
-
-import BigNumber from 'bignumber.js'
 import { usesBaseFee } from '../../../resources/domain/transaction'
 import { capitalize } from '../../../resources/utils'
-
-import frameIcon from './FrameIcon.png'
+import frameIcon from '../../../asset/FrameIcon.png'
 
 const FEE_WARNING_THRESHOLD_USD = 50
 
