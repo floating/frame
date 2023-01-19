@@ -342,7 +342,7 @@ module.exports = {
           }
         })
 
-        const { nativeCurrencyName, nativeCurrencyIcon, icon, symbol, ...updatedNetwork } = update
+        const { nativeCurrencyName, nativeCurrencyIcon, icon, ...updatedNetwork } = update
 
         delete main.networks[net.type][net.id]
         main.networks[updatedNetwork.type][updatedNetwork.id] = updatedNetwork
@@ -358,7 +358,7 @@ module.exports = {
 
         main.networksMeta[updatedNetwork.type][updatedNetwork.id] = {
           ...existingNetworkMeta,
-          symbol,
+          symbol: update.symbol,
           icon,
           nativeCurrency: {
             ...networkCurrency,
