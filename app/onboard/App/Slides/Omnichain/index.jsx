@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react'
 
-import extensionScreenshot from './extension.png'
 import { Slide, SlideBody, SlideItem, Tag } from '../../styled'
 
 const OmnichainSlide = ({ setTitle, setProceed }) => {
