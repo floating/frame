@@ -299,9 +299,10 @@ module.exports = {
         blockHeight: 0,
         name: net.name,
         primaryColor: net.primaryColor,
+        icon: net.icon || '',
         nativeCurrency: {
           symbol: net.symbol,
-          icon: net.icon || '',
+          icon: net.nativeCurrencyIcon || '',
           name: net.nativeCurrencyName || '',
           decimals: 18
         },
@@ -341,7 +342,7 @@ module.exports = {
           }
         })
 
-        const { nativeCurrencyName, icon, ...updatedNetwork } = update
+        const { nativeCurrencyName, nativeCurrencyIcon, icon, ...updatedNetwork } = update
 
         delete main.networks[net.type][net.id]
         main.networks[updatedNetwork.type][updatedNetwork.id] = updatedNetwork
@@ -361,6 +362,7 @@ module.exports = {
         main.networksMeta[updatedNetwork.type][updatedNetwork.id].nativeCurrency.symbol = update.symbol
         main.networksMeta[updatedNetwork.type][updatedNetwork.id].icon = icon
         main.networksMeta[updatedNetwork.type][updatedNetwork.id].nativeCurrency.name = nativeCurrencyName
+        main.networksMeta[updatedNetwork.type][updatedNetwork.id].nativeCurrency.icon = nativeCurrencyIcon
 
         return main
       })

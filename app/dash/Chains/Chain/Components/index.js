@@ -141,6 +141,15 @@ export const EditChainIcon = ({ currentIcon, onChange }) => (
   <EditChainProperty currentValue={currentIcon} onChange={onChange} title={'Chain Icon'} valueName={'icon'} />
 )
 
+export const EditNativeCurrencyIcon = ({ currentCurrencyIcon, onChange }) => (
+  <EditChainProperty
+    currentValue={currentCurrencyIcon}
+    onChange={onChange}
+    title={'Native Currency Icon'}
+    valueName={'nativeCurrencyIcon'}
+  />
+)
+
 export const EditNativeCurrencyName = ({ currentNativeCurrency, onChange }) => (
   <EditChainProperty
     currentValue={currentNativeCurrency}

@@ -170,7 +170,9 @@ describe('submitting', () => {
       isTestnet: false,
       primaryRpc: 'https://arbitrum-rinkeby.infura.com',
       secondaryRpc: 'https://myrpc.arbrink.net',
-      nativeCurrencyName: 'Ether'
+      nativeCurrencyName: 'Ether',
+      nativeCurrencyIcon: '',
+      icon: ''
     })
   })
 

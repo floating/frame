@@ -181,6 +181,7 @@ describe('#addNetwork', () => {
     expect(networksMeta.ethereum['137']).toEqual({
       blockHeight: 0,
       name: 'Polygon',
+      icon: '',
       nativeCurrency: {
         symbol: 'MATIC',
         name: '',
@@ -928,6 +929,7 @@ describe('#updateNetwork', () => {
 
   it('should correctly update the networksMeta', () => {
     const icon = 'http://icon.com'
+    const nativeCurrencyIcon = 'http://icon2.com'
     const nativeCurrencyName = 'TEST_NAME'
     const symbol = 'TEST'
     updateNetwork(
@@ -939,13 +941,14 @@ describe('#updateNetwork', () => {
         explorer: 'explorer.test',
         symbol,
         nativeCurrencyName,
+        nativeCurrencyIcon,
         icon
       }
     )
 
     expect(main.networksMeta.ethereum[4]).toStrictEqual({
       icon,
-      nativeCurrency: { symbol, name: nativeCurrencyName },
+      nativeCurrency: { symbol, name: nativeCurrencyName, icon: nativeCurrencyIcon },
       symbol
     })
   })
@@ -953,7 +956,8 @@ describe('#updateNetwork', () => {
   it('should not save network metadata inside the main network state', () => {
     const newMetadata = {
       nativeCurrencyName: 'TEST_NAME',
-      icon: 'http://icon.com'
+      icon: 'http://icon.com',
+      nativeCurrencyIcon: 'http://icon2.com'
     }
     updateNetwork(
       { id: '0x4', type: 'ethereum', name: '', explorer: '', symbol: '' },

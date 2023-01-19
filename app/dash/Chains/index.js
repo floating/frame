@@ -87,7 +87,8 @@ class Settings extends React.Component {
               const key = type + id
               const { explorer, isTestnet, connection, on, name } = networks[type][id]
               const {
-                nativeCurrency: { symbol = '?', name: nativeCurrencyName, icon }
+                nativeCurrency: { symbol = '?', name: nativeCurrencyName, icon: nativeCurrencyIcon },
+                icon
               } = metadata[type][id]
               const chain = {
                 key,
@@ -101,6 +102,7 @@ class Settings extends React.Component {
                 filter,
                 name,
                 nativeCurrencyName,
+                nativeCurrencyIcon,
                 icon
               }
               return <Chain {...chain} view={'preview'} />
@@ -160,7 +162,8 @@ class Settings extends React.Component {
             connection={networks[type][id].connection}
             on={networks[type][id].on}
             nativeCurrencyName={metadata[type][id].nativeCurrency.name}
-            icon={metadata[type][id].nativeCurrency.icon}
+            nativeCurrencyIcon={metadata[type][id].nativeCurrency.icon}
+            icon={metadata[type][id].icon}
             view={'expanded'}
           />
         </div>
@@ -183,6 +186,7 @@ class Settings extends React.Component {
             primaryRpc={newChain.primaryRpc}
             secondaryRpc={newChain.secondaryRpc}
             nativeCurrencyName={newChain.nativeCurrencyName}
+            nativeCurrencyIcon={newChain.nativeCurrencyIcon}
             icon={newChain.icon}
             view={'setup'}
           />

@@ -14,7 +14,8 @@ import {
   EditChainIcon,
   EditTestnet,
   EditChainExplorer,
-  ChainFooter
+  ChainFooter,
+  EditNativeCurrencyIcon
 } from '../Components'
 
 export default (props) => {
@@ -30,6 +31,7 @@ export default (props) => {
     connection,
     primaryColor,
     icon,
+    nativeCurrencyIcon,
     price,
     nativeCurrencyName
   } = props
@@ -45,9 +47,15 @@ export default (props) => {
     nativeCurrencyName || chainDefault.nativeCurrencyName
   )
   const [currentIcon, setIcon] = useState(icon || chainDefault.icon)
+  const [currentCurrencyIcon, setCurrencyIcon] = useState(
+    nativeCurrencyIcon || chainDefault.nativeCurrencyIcon
+  )
 
   // effects
   useEffect(() => {
+    const nativeCurrencyIcon =
+      currentCurrencyIcon === chainDefault.nativeCurrencyIcon ? '' : currentCurrencyIcon
+    const icon = currentIcon === chainDefault.icon ? '' : currentIcon
     const updatedChain = {
       id,
       type,
@@ -56,7 +64,8 @@ export default (props) => {
       isTestnet: currentTestnet,
       symbol: currentSymbol,
       explorer: currentExplorer,
-      ...(currentIcon !== chainDefault.icon && { icon: currentIcon }),
+      icon,
+      nativeCurrencyIcon,
       nativeCurrencyName: currentNativeCurrencyName
     }
     link.send('tray:action', 'updateNetwork', chain, updatedChain)
@@ -67,7 +76,8 @@ export default (props) => {
     currentExplorer,
     currentTestnet,
     currentIcon,
-    currentNativeCurrencyName
+    currentNativeCurrencyName,
+    currentCurrencyIcon
   ])
 
   useEffect(() => {
@@ -96,6 +106,7 @@ export default (props) => {
         onChange={setNativeCurrencyName}
       />
       <EditChainIcon currentIcon={currentIcon} onChange={setIcon} />
+      <EditNativeCurrencyIcon currentCurrencyIcon={currentCurrencyIcon} onChange={setCurrencyIcon} />
       <div className='chainRow'>
         <ChainFooter symbol={symbol} price={price} />
       </div>

@@ -5,6 +5,7 @@ export default {
   explorer: 'Block Explorer',
   symbol: 'Native Symbol',
   nativeCurrencyName: 'Native Currency Name',
+  nativeCurrencyIcon: 'Native Currency Icon',
   icon: 'Chain Icon',
   isTestnet: false,
   primaryColor: 'accent2',

@@ -14,7 +14,8 @@ import {
   EditTestnet,
   EditChainExplorer,
   EditRPC,
-  SubmitChainButton
+  SubmitChainButton,
+  EditNativeCurrencyIcon
 } from '../Components'
 
 const isChainFilled = (chain) => {
@@ -50,6 +51,7 @@ export default ({
   explorer,
   symbol,
   nativeCurrencyName,
+  nativeCurrencyIcon,
   icon,
   isTestnet,
   primaryColor,
@@ -64,6 +66,7 @@ export default ({
     explorer: explorer || chainDefault.explorer,
     symbol: symbol || chainDefault.symbol,
     nativeCurrencyName: nativeCurrencyName || chainDefault.nativeCurrencyName,
+    nativeCurrencyIcon: nativeCurrencyIcon || chainDefault.nativeCurrencyIcon,
     icon: icon || chainDefault.icon,
     isTestnet: isTestnet || chainDefault.isTestnet,
     primaryColor: primaryColor || chainDefault.primaryColor,
@@ -77,19 +80,23 @@ export default ({
   const [currentSymbol, setSymbol] = useState(newChain.symbol)
   const [currentNativeCurrencyName, setNativeCurrencyName] = useState(newChain.nativeCurrencyName)
   const [currentChainIcon, setChainIcon] = useState(newChain.icon)
+  const [currentCurrencyIcon, setCurrencyIcon] = useState(newChain.nativeCurrencyIcon)
   const [currentChainId, setChainId] = useState(newChain.id)
   const [currentExplorer, setExplorer] = useState(newChain.explorer)
   const [currentTestnet, setTestnet] = useState(newChain.isTestnet)
   const [currentPrimaryRPC, setPrimaryRPC] = useState(newChain.primaryRpc)
   const [currentSecondaryRPC, setSecondaryRPC] = useState(newChain.secondaryRpc)
 
+  const currencyIcon = currentCurrencyIcon === chainDefault.nativeCurrencyIcon ? '' : currentCurrencyIcon
+  const chainIcon = currentChainIcon === chainDefault.icon ? '' : currentChainIcon
   const updatedChain = {
     type: 'ethereum',
     id: currentChainId,
     name: currentName,
     explorer: currentExplorer,
     nativeCurrencyName: currentNativeCurrencyName,
-    ...(currentChainIcon !== chainDefault.icon && { icon: currentChainIcon }),
+    nativeCurrencyIcon: currencyIcon,
+    icon: chainIcon,
     symbol: currentSymbol,
     isTestnet: currentTestnet,
     primaryColor: currentColor,
@@ -108,6 +115,10 @@ export default ({
 
     if (chain.icon && !isValidIcon(chain.icon)) {
       return { valid: false, text: 'Invalid Chain Icon' }
+    }
+
+    if (chain.nativeCurrencyIcon && !isValidIcon(chain.nativeCurrencyIcon)) {
+      return { valid: false, text: 'Invalid Currency Icon' }
     }
 
     if (chain.primaryRpc && !isValidRpc(chain.primaryRpc)) {
@@ -136,7 +147,6 @@ export default ({
         currentNativeCurrency={currentNativeCurrencyName}
         onChange={setNativeCurrencyName}
       />
-      <EditChainIcon currentIcon={currentChainIcon} onChange={setChainIcon} />
       <EditRPC
         currentRPC={currentPrimaryRPC}
         label={'Primary RPC'}
@@ -149,6 +159,8 @@ export default ({
         rpcDefault={chainDefault.secondaryRpc}
         onChange={setSecondaryRPC}
       />
+      <EditChainIcon currentIcon={currentChainIcon} onChange={setChainIcon} />
+      <EditNativeCurrencyIcon currentCurrencyIcon={currentCurrencyIcon} onChange={setCurrencyIcon} />
       <EditTestnet testnet={currentTestnet} onChange={setTestnet} />
       <div className='chainRow chainRowRemove'>
         <SubmitChainButton
