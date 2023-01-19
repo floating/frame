@@ -215,7 +215,7 @@ export class Tray {
         }, 600)
       }
     }
-    ipcMain.on('tray:ready', this.readyHandler)
+    ipcMain.once('tray:ready', this.readyHandler)
     initTrayWindow()
   }
 
