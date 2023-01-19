@@ -314,7 +314,7 @@ class Settings extends React.Component {
             </div>
           </div>
           <div className='snipIt'>
-            <div>Using a dapp that doesn't support Frame natively?</div>
+            <div>Using a dapp that doesn&apos;t support Frame natively?</div>
             <div className='snipItBrowserExtensionIcons'>
               <div
                 className='snipItBrowserExtensionIcon snipItBrowserExtensionIconChrome'

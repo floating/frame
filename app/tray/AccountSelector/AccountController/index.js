@@ -42,7 +42,7 @@ class Account extends React.Component {
     this.setState({ unlockInput: e.target.value })
   }
 
-  unlockSubmit(e) {
+  unlockSubmit() {
     link.rpc('unlockSigner', this.props.id, this.state.unlockInput, () => {})
   }
 
@@ -62,11 +62,11 @@ class Account extends React.Component {
 
   select() {
     if (this.store('selected.current') === this.props.id) {
-      link.rpc('unsetSigner', this.props.id, (err, status) => {
+      link.rpc('unsetSigner', this.props.id, (err) => {
         if (err) return console.log(err)
       })
       if (this.props.signer && this.store('main.accountCloseLock'))
-        link.rpc('lockSigner', this.props.signer, (err, status) => {
+        link.rpc('lockSigner', this.props.signer, (err) => {
           if (err) return console.log(err)
         })
     } else {
@@ -78,7 +78,7 @@ class Account extends React.Component {
         height: this.signer.clientHeight + 6,
         index: this.props.index
       })
-      link.rpc('setSigner', this.props.id, (err, status) => {
+      link.rpc('setSigner', this.props.id, (err) => {
         if (err) return console.log(err)
       })
     }
@@ -133,17 +133,9 @@ class Account extends React.Component {
   }
 
   renderType() {
-    // let innerClass = 'signerInner'
-    // if (this.state.typeActive) innerClass += ' signerInnerActive'
     const current = this.store('selected.current') === this.props.id && this.props.status === 'ok'
     const open = current && this.store('selected.open')
     const signerStatusOpen = current && this.store('selected.signerStatusOpen')
-
-    if (this.state.typeShake) innerClass += ' headShake'
-    if (this.store('selected.view') === 'settings') innerClass += ' signerTypeSettings'
-    // if (!this.props.signer || (this.props.signer && this.props.signer.status === 'initial')) innerClass += ' signerInnerDisconnected'
-    // const inSettings = this.store('selected.view') === 'settings'
-
     const isHotSigner = this.isHotSigner(this.props.lastSignerType)
 
     return (
@@ -208,7 +200,7 @@ class Account extends React.Component {
 
   setSignerIndex(index) {
     this.locked = true
-    link.rpc('setSignerIndex', index, (err, summary) => {
+    link.rpc('setSignerIndex', index, (err) => {
       this.setState({ accountHighlight: 'inactive', highlightIndex: 0 })
       this.store.toggleShowAccounts(false)
       setTimeout(() => {
@@ -418,7 +410,6 @@ class Account extends React.Component {
     const showAccounts = this.store('selected.showAccounts')
     const initialPosition = this.store('selected.position.initial')
     const initialIndex = this.store('selected.position.initial.index')
-    const account = this.store('main.accounts', id)
     const isAddAccountView = this.store('view.addAccount')
 
     const current = selectedAccountId === id && status === 'ok'
@@ -469,12 +460,6 @@ class Account extends React.Component {
         style.transition = '1.48s cubic-bezier(.82,0,.12,1) all'
         style.transitionDelay = '0s'
       }
-    }
-
-    let signer
-
-    if (account.signer) {
-      signer = this.store('main.signers', account.signer)
     }
 
     let requests = this.store('main.accounts', id, 'requests') || {}
