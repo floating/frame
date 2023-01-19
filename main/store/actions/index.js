@@ -667,15 +667,15 @@ module.exports = {
   navUpdate: (u, windowId, crumb, navigate) => {
     if (!windowId || !crumb) return log.warn('Invalid nav forward', windowId, crumb)
     u('windows', windowId, 'nav', (nav) => {
-      const updatedNav = {
+      const updatedNavItem = {
         view: nav[0].view || crumb.view,
-        data: Object.assign({}, nav[0].data, crumb.data)
+        data: Object.keys(crumb.data).length === 0 ? {} : Object.assign({}, nav[0].data, crumb.data)
       }
-      if (JSON.stringify(nav[0]) !== JSON.stringify(updatedNav)) {
+      if (JSON.stringify(nav[0]) !== JSON.stringify(updatedNavItem)) {
         if (navigate) {
-          nav.unshift(updatedNav)
+          nav.unshift(updatedNavItem)
         } else {
-          nav[0] = updatedNav
+          nav[0] = updatedNavItem
         }
       }
       return nav

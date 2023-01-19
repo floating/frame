@@ -3,9 +3,9 @@ import Restore from 'react-restore'
 
 import ChainPreview from './ChainPreview'
 import ChainExpanded from './ChainExpanded'
-import ChainNew from './ChainNew'
+import { Chain } from './ChainNew'
 
-class Chain extends React.Component {
+class ChainWrapper extends React.Component {
   renderNew() {
     const {
       id,
@@ -21,7 +21,7 @@ class Chain extends React.Component {
     } = this.props
     const existingChains = Object.keys(this.store('main.networks.ethereum')).map((id) => parseInt(id))
     return (
-      <ChainNew
+      <Chain
         id={id}
         name={name}
         type={type}
@@ -33,6 +33,7 @@ class Chain extends React.Component {
         icon={icon}
         nativeCurrencyName={nativeCurrencyName}
         nativeCurrencyIcon={nativeCurrencyIcon}
+        store={this.store}
       />
     )
   }
@@ -116,4 +117,4 @@ class Chain extends React.Component {
   }
 }
 
-export default Restore.connect(Chain)
+export default Restore.connect(ChainWrapper)

@@ -1,8 +1,7 @@
 import React, { useState } from 'react'
-import link from '../../../../../resources/link'
 
 import chainDefault from '../chainDefault'
-
+import link from '../../../../../resources/link'
 import {
   ChainHeader,
   EditChainColor,
@@ -45,7 +44,7 @@ const isValidRpc = (urlStr) => {
 
 const isValidIcon = (urlStr) => Boolean(getUrl(urlStr))
 
-export default ({
+export const Chain = ({
   id,
   name,
   type,
@@ -58,7 +57,8 @@ export default ({
   primaryColor,
   primaryRpc,
   secondaryRpc,
-  existingChains
+  existingChains,
+  store
 }) => {
   const newChain = {
     id: id || chainDefault.id,
@@ -160,8 +160,16 @@ export default ({
           enabled={chainValidation.valid}
           onClick={() => {
             if (chainValidation.valid) {
+              const nav = store('windows.dash.nav')
               link.send('tray:addChain', updatedChain)
-              link.send('tray:action', 'backDash')
+
+              // if previous navItem is the chains panel, go back
+              if (nav[1]?.view === 'chains') {
+                link.send('tray:action', 'backDash')
+              } else {
+                // otherwise update the current navItem to show the chains panel
+                link.send('nav:update', 'dash', { view: 'chains', data: {} }, false)
+              }
             }
           }}
         />
