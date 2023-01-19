@@ -342,7 +342,7 @@ module.exports = {
           }
         })
 
-        const { nativeCurrencyName, nativeCurrencyIcon, icon, ...updatedNetwork } = update
+        const { nativeCurrencyName, nativeCurrencyIcon, icon, symbol, ...updatedNetwork } = update
 
         delete main.networks[net.type][net.id]
         main.networks[updatedNetwork.type][updatedNetwork.id] = updatedNetwork
@@ -353,16 +353,20 @@ module.exports = {
           }
         })
 
-        main.networksMeta[updatedNetwork.type][updatedNetwork.id] =
-          main.networksMeta[updatedNetwork.type][updatedNetwork.id] || {}
-        main.networksMeta[updatedNetwork.type][updatedNetwork.id].symbol = update.symbol
+        const existingNetworkMeta = main.networksMeta[updatedNetwork.type][updatedNetwork.id] || {}
+        const networkCurrency = existingNetworkMeta.nativeCurrency || {}
 
-        main.networksMeta[updatedNetwork.type][updatedNetwork.id].nativeCurrency =
-          main.networksMeta[updatedNetwork.type][updatedNetwork.id].nativeCurrency || {}
-        main.networksMeta[updatedNetwork.type][updatedNetwork.id].nativeCurrency.symbol = update.symbol
-        main.networksMeta[updatedNetwork.type][updatedNetwork.id].icon = icon
-        main.networksMeta[updatedNetwork.type][updatedNetwork.id].nativeCurrency.name = nativeCurrencyName
-        main.networksMeta[updatedNetwork.type][updatedNetwork.id].nativeCurrency.icon = nativeCurrencyIcon
+        main.networksMeta[updatedNetwork.type][updatedNetwork.id] = {
+          ...existingNetworkMeta,
+          symbol,
+          icon,
+          nativeCurrency: {
+            ...networkCurrency,
+            symbol,
+            name: nativeCurrencyName,
+            icon: nativeCurrencyIcon
+          }
+        }
 
         return main
       })
