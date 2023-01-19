@@ -87,7 +87,8 @@ describe('rendering', () => {
       name: 'Polygon',
       symbol: 'MATIC',
       primaryRpc: 'https://rpc-mainnet.matic.network',
-      secondaryRpc: 'https://polygon-rpc.com'
+      secondaryRpc: 'https://polygon-rpc.com',
+      nativeCurrencyName: 'Ether'
     }
 
     render(<Chain {...chainConfig} />)
@@ -151,7 +152,8 @@ describe('submitting', () => {
       explorer: 'https://rinkeby.arbiscan.io',
       primaryRpc: 'https://arbitrum-rinkeby.infura.com',
       secondaryRpc: 'https://myrpc.arbrink.net',
-      isTestnet: false
+      isTestnet: false,
+      nativeCurrencyName: 'Ether'
     }
 
     const { user } = render(<Chain view='setup' {...chainConfig} />)
@@ -167,7 +169,10 @@ describe('submitting', () => {
       type: 'ethereum',
       isTestnet: false,
       primaryRpc: 'https://arbitrum-rinkeby.infura.com',
-      secondaryRpc: 'https://myrpc.arbrink.net'
+      secondaryRpc: 'https://myrpc.arbrink.net',
+      nativeCurrencyName: 'Ether',
+      nativeCurrencyIcon: '',
+      icon: ''
     })
   })
 
@@ -177,7 +182,8 @@ describe('submitting', () => {
       name: 'Arbitrum Rinkeby',
       symbol: 'arETH',
       primaryRpc: 'https://arbitrum-rinkeby.infura.com',
-      secondaryRpc: 'https://myrpc.arbrink.net'
+      secondaryRpc: 'https://myrpc.arbrink.net',
+      nativeCurrencyName: 'Ether'
     }
 
     const { user } = render(<Chain view='setup' {...chainConfig} />)

@@ -3,7 +3,6 @@ import React, { useState } from 'react'
 import link from '../../../../../resources/link'
 import svg from '../../../../../resources/svg'
 import RingIcon from '../../../../../resources/Components/RingIcon'
-
 import chainDefault from '../chainDefault'
 
 export const SubmitChainButton = ({ text, enabled, textColor, onClick }) => {
@@ -86,124 +85,7 @@ export const EditChainColor = ({ currentColor, onChange }) => {
   )
 }
 
-export const EditChainName = ({ currentName, onChange }) => {
-  return (
-    <div className='chainRow'>
-      <label htmlFor='chainName' className='chainInputLabel'>
-        Chain Name
-      </label>
-      <input
-        id='chainName'
-        className={currentName === chainDefault.name ? 'chainInput chainInputDim' : 'chainInput'}
-        value={currentName}
-        spellCheck='false'
-        onChange={(e) => onChange(e.target.value)}
-        onFocus={(e) => {
-          if (e.target.value === chainDefault.name) onChange('')
-        }}
-        onBlur={(e) => {
-          if (e.target.value === '') onChange(chainDefault.name)
-        }}
-      />
-    </div>
-  )
-}
-
-export const EditChainSymbol = ({ currentSymbol, onChange }) => {
-  return (
-    <div className='chainRow'>
-      <label htmlFor='chainSymbol' className='chainInputLabel'>
-        Native Symbol
-      </label>
-      <input
-        id='chainSymbol'
-        className={currentSymbol === chainDefault.symbol ? 'chainInput chainInputDim' : 'chainInput'}
-        value={currentSymbol}
-        spellCheck='false'
-        onChange={(e) => {
-          if (e.target.value.length > 8) return e.preventDefault()
-          onChange(e.target.value)
-        }}
-        onFocus={(e) => {
-          if (e.target.value === chainDefault.symbol) onChange('')
-        }}
-        onBlur={(e) => {
-          if (e.target.value === '') onChange(chainDefault.symbol)
-        }}
-      />
-    </div>
-  )
-}
-
-export const EditChainId = ({ chainId, onChange }) => {
-  return (
-    <div className='chainRow'>
-      <label htmlFor='chainId' className='chainInputLabel'>
-        Chain ID
-      </label>
-      <input
-        id='chainId'
-        className={chainId === chainDefault.id ? 'chainInput chainInputDim' : 'chainInput'}
-        value={chainId}
-        spellCheck='false'
-        onChange={(e) => {
-          if (Number(parseInt(e.target.value)) || e.target.value === '') {
-            onChange(e.target.value)
-          }
-        }}
-        onFocus={(e) => {
-          if (e.target.value === chainDefault.id) onChange('')
-        }}
-        onBlur={(e) => {
-          if (e.target.value === '') onChange(chainDefault.id)
-        }}
-      />
-    </div>
-  )
-}
-
-export const EditTestnet = ({ testnet, onChange }) => {
-  return (
-    <div className='chainRowTestnet'>
-      <label>Testnet</label>
-      <div
-        role='chainTestnet'
-        aria-checked={testnet}
-        className={testnet ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'}
-        onClick={() => onChange(!testnet)}
-      >
-        <div className='signerPermissionToggleSwitch' />
-      </div>
-    </div>
-  )
-}
-
-export const EditChainExplorer = ({ currentExplorer, onChange }) => {
-  return (
-    <div className='chainRow'>
-      <label htmlFor='chainExplorer' className='chainInputLabel'>
-        Block Explorer
-      </label>
-      <input
-        id='chainExplorer'
-        className={currentExplorer === chainDefault.explorer ? 'chainInput chainInputDim' : 'chainInput'}
-        value={currentExplorer}
-        spellCheck='false'
-        onChange={(e) => {
-          onChange(e.target.value)
-        }}
-        onFocus={(e) => {
-          if (e.target.value === chainDefault.explorer) onChange('')
-        }}
-        onBlur={(e) => {
-          if (e.target.value === '') onChange(chainDefault.explorer)
-        }}
-      />
-    </div>
-  )
-}
-
-export const EditRPC = ({ currentRPC, label, rpcDefault = 'RPC Endpoint', onChange }) => {
+export const EditChainField = ({ currentValue, defaultValue, label, onChange }) => {
   const [editing, setEditing] = useState(false)
   const id = label
     .split(' ')
@@ -217,8 +99,8 @@ export const EditRPC = ({ currentRPC, label, rpcDefault = 'RPC Endpoint', onChan
       </label>
       <input
         id={id}
-        className={!currentRPC ? 'chainInput chainInputDim' : 'chainInput'}
-        value={currentRPC || (!editing && rpcDefault) || ''}
+        className={!currentValue ? 'chainInput chainInputDim' : 'chainInput'}
+        value={currentValue || (!editing && defaultValue) || ''}
         spellCheck='false'
         onChange={(e) => {
           onChange(e.target.value)
@@ -230,6 +112,103 @@ export const EditRPC = ({ currentRPC, label, rpcDefault = 'RPC Endpoint', onChan
           setEditing(false)
         }}
       />
+    </div>
+  )
+}
+
+export const EditChainName = ({ currentName, onChange }) => (
+  <EditChainField
+    currentValue={currentName}
+    onChange={onChange}
+    label={'Chain Name'}
+    defaultValue={chainDefault.name}
+  />
+)
+
+export const EditChainSymbol = ({ currentSymbol, onChange }) => (
+  <EditChainField
+    currentValue={currentSymbol}
+    onChange={onChange}
+    label={'Native Symbol'}
+    defaultValue={chainDefault.symbol}
+  />
+)
+
+export const EditChainId = ({ chainId, onChange }) => (
+  <EditChainField
+    currentValue={chainId}
+    onChange={onChange}
+    label={'Chain ID'}
+    defaultValue={chainDefault.id}
+  />
+)
+
+export const EditChainExplorer = ({ currentExplorer, onChange }) => (
+  <EditChainField
+    currentValue={currentExplorer}
+    onChange={onChange}
+    label={'Block Explorer'}
+    defaultValue={chainDefault.explorer}
+  />
+)
+
+export const EditChainIcon = ({ currentIcon, onChange }) => (
+  <EditChainField
+    currentValue={currentIcon}
+    onChange={onChange}
+    label={'Chain Icon'}
+    defaultValue={chainDefault.icon}
+  />
+)
+
+export const EditNativeCurrencyIcon = ({ currentCurrencyIcon, onChange }) => (
+  <EditChainField
+    currentValue={currentCurrencyIcon}
+    onChange={onChange}
+    label={'Native Currency Icon'}
+    defaultValue={chainDefault.nativeCurrencyIcon}
+  />
+)
+
+export const EditNativeCurrencyName = ({ currentNativeCurrency, onChange }) => (
+  <EditChainField
+    currentValue={currentNativeCurrency}
+    label='Native Currency Name'
+    defaultValue={chainDefault.nativeCurrencyName}
+    onChange={onChange}
+  />
+)
+
+export const EditPrimaryRPC = ({ currentPrimaryRPC, onChange }) => (
+  <EditChainField
+    currentValue={currentPrimaryRPC}
+    label={'Primary RPC'}
+    defaultValue={chainDefault.primaryRpc}
+    onChange={onChange}
+  />
+)
+
+export const EditSecondaryRPC = ({ currentSecondaryRpc, onChange }) => (
+  <EditChainField
+    currentValue={currentSecondaryRpc}
+    label={'Secondary RPC'}
+    defaultValue={chainDefault.secondaryRpc}
+    onChange={onChange}
+  />
+)
+
+export const EditTestnet = ({ testnet, onChange }) => {
+  return (
+    <div className='chainRowTestnet'>
+      <label>Testnet</label>
+      <div
+        role='chainTestnet'
+        aria-checked={testnet}
+        className={testnet ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'}
+        onClick={() => onChange(!testnet)}
+      >
+        <div className='signerPermissionToggleSwitch' />
+      </div>
     </div>
   )
 }
