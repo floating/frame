@@ -8,6 +8,7 @@ import { usesBaseFee } from '../../../resources/domain/transaction'
 import { capitalize } from '../../../resources/utils'
 
 import frameIcon from './FrameIcon.png'
+import ExtensionConnectNotification from './ExtensionConnect'
 
 const FEE_WARNING_THRESHOLD_USD = 50
 
@@ -515,6 +516,7 @@ class Notify extends React.Component {
 
   render() {
     const notify = this.store('view.notify')
+
     if (notify === 'mainnet') {
       return (
         <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
@@ -625,6 +627,10 @@ class Notify extends React.Component {
           {this.openExplorer(this.store('view.notifyData'))}
         </div>
       )
+    } else if (notify === 'extensionConnect') {
+      const { browser, id } = this.store('view.notifyData')
+
+      return <ExtensionConnectNotification browser={browser} id={id} onClose={() => this.store.notify()} />
     } else {
       return null
     }

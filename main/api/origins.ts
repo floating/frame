@@ -6,11 +6,25 @@ import accounts, { AccessRequest } from '../accounts'
 import store from '../store'
 
 const dev = process.env.NODE_ENV === 'development'
+
+const activeExtensionChecks: Record<string, Promise<boolean>> = {}
+const extensionPrefixes = {
+  firefox: 'moz-extension',
+  safari: 'safari-web-extension'
+}
+
 const protocolRegex = /^(?:ws|http)s?:\/\//
 
 interface OriginUpdateResult {
   payload: RPCRequestPayload
   hasSession: boolean
+}
+
+type Browser = 'chrome' | 'firefox' | 'safari'
+
+export interface FrameExtension {
+  browser: Browser
+  id: string
 }
 
 // allows the Frame extension to request specific methods
@@ -20,7 +34,8 @@ const storeApi = {
   getPermission: (address: Address, origin: string) => {
     const permissions: Record<string, Permission> = store('main.permissions', address) || {}
     return Object.values(permissions).find((p) => p.origin === origin)
-  }
+  },
+  getKnownExtension: (id: string) => store('main.knownExtensions', id) as boolean
 }
 
 export function parseOrigin(origin?: string) {
@@ -37,6 +52,31 @@ async function getPermission(address: Address, origin: string, payload: RPCReque
   const permission = storeApi.getPermission(address, origin)
 
   return permission || requestPermission(address, payload)
+}
+
+async function requestExtensionPermission(extension: FrameExtension) {
+  if (extension.id in activeExtensionChecks) {
+    return activeExtensionChecks[extension.id]
+  }
+
+  const result = new Promise<boolean>((resolve) => {
+    const obs = store.observer(() => {
+      const isActive = extension.id in activeExtensionChecks
+      const isAllowed = store('main.knownExtensions', extension.id)
+
+      // wait for a response
+      if (isActive && typeof isAllowed !== 'undefined') {
+        delete activeExtensionChecks[extension.id]
+        obs.remove()
+        resolve(isAllowed)
+      }
+    }, 'origins:requestExtension')
+  })
+
+  activeExtensionChecks[extension.id] = result
+  store.notify('extensionConnect', extension)
+
+  return result
 }
 
 async function requestPermission(address: Address, fullPayload: RPCRequestPayload) {
@@ -99,27 +139,31 @@ export function updateOrigin(
   }
 }
 
-export function isFrameExtension(req: IncomingMessage) {
-  const origin = req.headers.origin
-  if (!origin) return false
+export function parseFrameExtension(req: IncomingMessage): FrameExtension | undefined {
+  const origin = req.headers.origin || ''
 
   const query = queryString.parse((req.url || '').replace('/', ''))
-  const mozOrigin = origin.startsWith('moz-extension://')
-  const extOrigin =
-    origin.startsWith('chrome-extension://') ||
-    origin.startsWith('moz-extension://') ||
-    origin.startsWith('safari-web-extension://')
+  const hasExtensionIdentity = query.identity === 'frame-extension'
 
   if (origin === 'chrome-extension://ldcoohedfbjoobcadoglnnmmfbdlmmhf') {
     // Match production chrome
-    return true
-  } else if (mozOrigin || (dev && extOrigin)) {
-    // In production, match any Firefox extension origin where query.identity === 'frame-extension'
-    // In dev, match any extension where query.identity === 'frame-extension'
-    return query.identity === 'frame-extension'
-  } else {
-    return false
+    return { browser: 'chrome', id: 'ldcoohedfbjoobcadoglnnmmfbdlmmhf' }
+  } else if (origin.startsWith(`${extensionPrefixes.firefox}://`) && hasExtensionIdentity) {
+    // Match production Firefox
+    const extensionId = origin.substring(extensionPrefixes.firefox.length + 3)
+    return { browser: 'firefox', id: extensionId }
+  } else if (origin.startsWith(`${extensionPrefixes.safari}://`) && dev && hasExtensionIdentity) {
+    // Match Safari in dev only
+    return { browser: 'safari', id: 'frame-dev' }
   }
+}
+
+export async function isKnownExtension(extension: FrameExtension) {
+  if (extension.browser === 'chrome' || extension.browser === 'safari') return true
+
+  const extensionPermission = storeApi.getKnownExtension(extension.id)
+
+  return extensionPermission ?? requestExtensionPermission(extension)
 }
 
 export async function isTrusted(payload: RPCRequestPayload) {

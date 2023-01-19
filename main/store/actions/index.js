@@ -512,6 +512,9 @@ module.exports = {
       return origins
     })
   },
+  trustExtension: (u, extensionId, trusted) => {
+    u('main.knownExtensions', (extensions = {}) => ({ ...extensions, [extensionId]: trusted }))
+  },
   setBlockHeight: (u, chainId, blockHeight) => {
     u('main.networksMeta.ethereum', (chainsMeta) => {
       if (chainsMeta[chainId]) {

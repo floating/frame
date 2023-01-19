@@ -40,11 +40,14 @@ type RequestType =
   | 'switchChain'
   | 'addToken'
 
-export interface AccountRequest {
+interface Request {
   type: RequestType
+  handlerId: string
+}
+
+export interface AccountRequest extends Request {
   origin: string
   payload: JSONRPCRequestPayload
-  handlerId: string
   account: string
   status?: RequestStatus
   mode?: RequestMode
