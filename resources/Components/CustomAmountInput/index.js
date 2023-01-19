@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import BigNumber from 'bignumber.js'
 
+import { max } from '../../utils/numbers'
 import svg from '../../svg'
 import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../Cluster'
 import Countdown from '../Countdown'
 
 import { MAX_HEX } from '../../constants'
 import useCopiedMessage from '../../Hooks/useCopiedMessage'
-
-const max = new BigNumber(MAX_HEX)
 
 const isMax = (value) => max.isEqualTo(value)
 

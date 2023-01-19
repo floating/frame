@@ -2,7 +2,7 @@ import BigNumber from 'bignumber.js'
 
 import { MAX_HEX } from '../constants'
 
-const max = BigNumber(MAX_HEX, 16)
+export const max = BigNumber(MAX_HEX, 16)
 
 const numberRegex = /\.0+$|(\.[0-9]*[1-9])0+$/
 
