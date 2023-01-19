@@ -213,13 +213,23 @@ export const EditTestnet = ({ testnet, onChange }) => {
   )
 }
 
-export const ChainFooter = ({ symbol, price }) => {
+export const ChainFooter = ({ id, type, symbol, price }) => {
   return (
     <div className='chainFooter'>
       <div className='chainCurrencyItem'>
         <div className='chainCurrencyItemSymbol'>{symbol}</div>
         <div className='chainCurrencyItemAt'>{'@'}</div>
         <div className='sliceChainIdNumber'>{'$' + price.toLocaleString() + ''}</div>
+      </div>
+      <div className='chainExplorer'>
+        <div
+          role='link'
+          onClick={(e) => {
+            link.send('tray:openExplorer', { id, type })
+          }}
+        >
+          Open Block Explorer
+        </div>
       </div>
     </div>
   )

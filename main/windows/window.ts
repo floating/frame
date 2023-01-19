@@ -98,11 +98,12 @@ export function openExternal(url = '') {
   }
 }
 
-export function openBlockExplorer(hash: string, { id, type }: Chain) {
+export function openBlockExplorer({ id, type }: Chain, hash?: string) {
   // remove trailing slashes from the base url
   const explorer = (store('main.networks', type, id, 'explorer') || '').replace(/\/+$/, '')
 
   if (explorer) {
-    shell.openExternal(`${explorer}/tx/${hash}`)
+    const hashPath = hash ? `/tx/${hash}` : ''
+    shell.openExternal(`${explorer}${hashPath}`)
   }
 }

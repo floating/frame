@@ -10,8 +10,6 @@ import {
   EditChainColor,
   EditChainName,
   EditChainSymbol,
-  EditNativeCurrencyName,
-  EditChainIcon,
   EditTestnet,
   EditChainExplorer,
   ChainFooter,
@@ -102,7 +100,7 @@ export default (props) => {
       <EditChainIcon currentIcon={currentIcon} onChange={setIcon} />
       <EditNativeCurrencyIcon currentCurrencyIcon={currentCurrencyIcon} onChange={setCurrencyIcon} />
       <div className='chainRow'>
-        <ChainFooter symbol={symbol} price={price} />
+        <ChainFooter id={id} type={type} symbol={symbol} price={price} />
       </div>
       {!isMainnet && <EditTestnet testnet={currentTestnet} onChange={setTestnet} />}
       <div className='chainModules'>
