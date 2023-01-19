@@ -12,9 +12,8 @@ import Restore from 'react-restore'
 import TxOverview from './TransactionRequest/TxMainNew/overview'
 
 import RequestItem from '../../../../resources/Components/RequestItem'
-import RingIcon from '../../../../resources/Components/RingIcon'
 
-import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../resources/Components/Cluster'
+import { ClusterBox, Cluster } from '../../../../resources/Components/Cluster'
 
 import link from '../../../../resources/link'
 import svg from '../../../../resources/svg'
@@ -156,6 +155,21 @@ class Requests extends React.Component {
                   handlerId={req.handlerId}
                   i={i}
                   title={'Sign Data'}
+                  color={'var(--outerspace)'}
+                  svgName={'sign'}
+                >
+                  <div style={{ height: '10px' }} />
+                </RequestItem>
+              )
+            } else if (req.type === 'signErc20Permit') {
+              return (
+                <RequestItem
+                  key={req.type + i}
+                  req={req}
+                  account={this.props.account}
+                  handlerId={req.handlerId}
+                  i={i}
+                  title={'Token Spend Permit'}
                   color={'var(--outerspace)'}
                   svgName={'sign'}
                 >

@@ -11,7 +11,7 @@ import svg from '../../../../resources/svg'
 import link from '../../../../resources/link'
 
 import { usesBaseFee } from '../../../../resources/domain/transaction'
-import { isCancelableRequest } from '../../../../resources/domain/request'
+import { isCancelableRequest, isSignatureRequest } from '../../../../resources/domain/request'
 
 const FEE_WARNING_THRESHOLD_USD = 50
 
@@ -453,7 +453,7 @@ class RequestCommand extends React.Component {
 
     if (req.type === 'transaction' && crumb.data.step === 'confirm') {
       return this.renderTxCommand()
-    } else if (req.type === 'sign' || req.type === 'signTypedData') {
+    } else if (isSignatureRequest(req.type)) {
       return this.renderSignDataCommand()
     } else {
       return null

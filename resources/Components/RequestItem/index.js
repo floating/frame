@@ -1,5 +1,4 @@
 import React from 'react'
-import Restore from 'react-restore'
 
 import RingIcon from '../../../resources/Components/RingIcon'
 
@@ -36,8 +35,7 @@ class _RequestItem extends React.Component {
     clearInterval(this.timer)
   }
   render() {
-    const { account, handlerId, i, title, svgName, img, color, headerMode, txNonce, children } = this.props
-    const req = this.store('main.accounts', account, 'requests', handlerId)
+    const { account, title, svgName, img, color, headerMode, req, children } = this.props
 
     let requestItemDetailsClass = 'requestItemDetails'
     let requestItemNoticeClass = 'requestItemNotice'
@@ -102,7 +100,6 @@ class _RequestItem extends React.Component {
                       <div className='requestItemDetailsIndicatorMarker' />
                     </div>
                     <span role='status'>{status}</span>
-                    {/* <div className='requestItemDetailsIndicator' /> */}
                   </div>
                 </div>
               </div>
@@ -135,4 +132,4 @@ class _RequestItem extends React.Component {
   }
 }
 
-export default Restore.connect(_RequestItem)
+export default _RequestItem

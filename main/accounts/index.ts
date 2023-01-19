@@ -24,7 +24,8 @@ import {
   ReplacementType,
   RequestStatus,
   RequestMode,
-  TypedMessage
+  TypedMessage,
+  PermitSignatureRequest
 } from './types'
 
 import type { Chain } from '../chains'
@@ -160,19 +161,22 @@ export class Accounts extends EventEmitter {
   }
 
   // TODO: can we make this typed for the action type?
-  updateRequest(reqId: string, actionId: ActionType, data: any) {
-    log.verbose('updateRequest', reqId, actionId, data)
+  updateRequest(reqId: string, data: any, actionId: ActionType) {
+    log.verbose('updateRequest', { reqId, actionId, data })
 
     const currentAccount = this.current()
-    if (currentAccount && currentAccount.requests[reqId]) {
-      const request = this.getTransactionRequest(currentAccount, reqId)
+    const request = currentAccount?.getRequest<TransactionRequest | PermitSignatureRequest>(reqId)
+    if (!currentAccount || !request) return
 
+    if (request.type === 'transaction') {
+      if (!actionId) return
       const action = (request.recognizedActions || []).find((a) => a.id === actionId)
+      if (!action?.update) return
 
-      if (action && action.update) {
-        action.update(request, data)
-        currentAccount.update()
-      }
+      action.update(request, data)
+      currentAccount.update()
+    } else if (request.type === 'signErc20Permit') {
+      store.updateTypedDataRequest(currentAccount.id, reqId, data)
     }
   }
 

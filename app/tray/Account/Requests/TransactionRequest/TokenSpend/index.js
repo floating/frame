@@ -2,6 +2,7 @@ import React from 'react'
 import Restore from 'react-restore'
 import BigNumber from 'bignumber.js'
 
+import { max } from '../../../../../../resources/utils/numbers'
 import svg from '../../../../../../resources/svg'
 import link from '../../../../../../resources/link'
 import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../../resources/Components/Cluster'
@@ -30,7 +31,6 @@ class TokenSpend extends React.Component {
       // only allow ints
       if (!/^\d+$/.test(value)) return
 
-      const max = new BigNumber(MAX_HEX)
       const custom = new BigNumber(value).shiftedBy(decimals)
 
       let amount

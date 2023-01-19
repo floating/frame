@@ -7,6 +7,7 @@ import svg from '../../../../../../resources/svg'
 
 import { Cluster, ClusterRow, ClusterValue } from '../../../../../../resources/Components/Cluster'
 import { DisplayValue } from '../../../../../../resources/Components/DisplayValue'
+import RequestHeader from '../../../../../../resources/Components/RequestHeader'
 
 const isNonZeroHex = (hex) => !!hex && !['0x', '0x0'].includes(hex)
 
@@ -39,15 +40,6 @@ function renderRecognizedAction(req) {
     })
   )
 }
-
-const TxDescription = ({ chain, children, chainColor }) => (
-  <div className='_txDescriptionSummary'>
-    {children}
-    <div className='_txDescriptionSummaryTag' style={{ color: `var(--${chainColor})` }}>
-      {`on ${chain}`}
-    </div>
-  </div>
-)
 
 const SendOverview = ({ amountHex, decimals, symbol }) => {
   return (
@@ -119,13 +111,13 @@ const TxOverview = ({
             style={{ background: valueColor }}
           >
             <div className='_txDescription'>
-              <TxDescription chain={chainName} chainColor={chainColor}>
+              <RequestHeader chain={chainName} chainColor={chainColor}>
                 <div className='requestItemTitleSub'>
                   <div className='requestItemTitleSubIcon'>{svg.window(10)}</div>
                   <div className='requestItemTitleSubText'>{originName}</div>
                 </div>
                 <div className='_txDescriptionSummaryMain'>{description}</div>
-              </TxDescription>
+              </RequestHeader>
             </div>
           </ClusterValue>
         </ClusterRow>

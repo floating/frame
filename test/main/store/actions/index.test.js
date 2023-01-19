@@ -23,7 +23,8 @@ import {
   setBlockHeight as setBlockHeightAction,
   updateAccount as updateAccountAction,
   navClearReq as clearNavRequestAction,
-  navClearSigner as clearNavSignerAction
+  navClearSigner as clearNavSignerAction,
+  updateTypedDataRequest as updateTypedDataAction
 } from '../../../../main/store/actions'
 import { toTokenId } from '../../../../resources/domain/balance'
 
@@ -1303,4 +1304,45 @@ describe('#navClearReq', () => {
     expect(nav).toStrictEqual([])
   })
 })
-clearNavSignerAction
+
+describe('#updateTypedDataRequest', () => {
+  let requests
+  const request = '79928538-c971-4cf0-8498-fa4e8017398b'
+
+  const updaterFn = (node, account, leaf, update) => {
+    expect(node).toBe('main.accounts')
+    expect(account).toBe(owner)
+    expect(leaf).toBe('requests')
+
+    requests = update(requests)
+  }
+
+  const updateSignatureMessage = (reqId, newData) => updateTypedDataAction(updaterFn, owner, reqId, newData)
+
+  beforeEach(() => {
+    requests = {
+      [request]: {
+        handlerId: '79928538-c971-4cf0-8498-fa4e8017398b',
+        type: 'signTypedData',
+        typedMessage: {
+          data: {
+            oldAttribute: true
+          }
+        }
+      },
+      some_other_id: {
+        handlerId: 'wow_such_valid_handerId'
+      }
+    }
+  })
+
+  it('should completely replace the old typed message data with the new data', () => {
+    expect(requests[request].typedMessage.data.oldAttribute).toBeTruthy()
+    updateSignatureMessage(request, {
+      newAttribute: true
+    })
+
+    expect(requests[request].typedMessage.data.oldAttribute).toBeFalsy()
+    expect(requests[request].typedMessage.data.newAttribute).toBeTruthy()
+  })
+})

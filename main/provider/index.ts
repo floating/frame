@@ -47,6 +47,7 @@ import {
   getActiveChains
 } from './chains'
 import type { LegacyTypedData, TypedData, TypedMessage } from '../accounts/types'
+import * as sigParser from '../signatures'
 
 type Subscription = {
   id: string
@@ -646,9 +647,11 @@ export class Provider extends EventEmitter {
       version
     }
 
+    const type = sigParser.identify(typedMessage)
+
     accounts.addRequest({
       handlerId,
-      type: 'signTypedData',
+      type,
       typedMessage,
       payload,
       account: targetAccount.address,

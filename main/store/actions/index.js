@@ -849,6 +849,17 @@ module.exports = {
   },
   setFooterHeight: (u, win, height) => {
     u('windows', win, 'footer.height', () => (height < 40 ? 40 : height))
+  },
+  updateTypedDataRequest: (u, account, reqId, data) => {
+    u('main.accounts', account, 'requests', (requests) => {
+      if (!requests[reqId]?.typedMessage?.data) {
+        log.error('No typed data request found for ', { reqId })
+        return requests
+      }
+
+      requests[reqId].typedMessage.data = data
+      return requests
+    })
   }
   // toggleUSDValue: (u) => {
   //   u('main.showUSDValue', show => !show)
