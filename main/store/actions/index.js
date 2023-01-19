@@ -299,10 +299,11 @@ module.exports = {
         blockHeight: 0,
         name: net.name,
         primaryColor: net.primaryColor,
+        icon: net.icon || '',
         nativeCurrency: {
           symbol: net.symbol,
-          icon: '',
-          name: '',
+          icon: net.nativeCurrencyIcon || '',
+          name: net.nativeCurrencyName || '',
           decimals: 18
         },
         gas: {
@@ -326,19 +327,22 @@ module.exports = {
       log.error(e)
     }
   },
+
   updateNetwork: (u, net, newNet) => {
     try {
       net.id = validateNetworkSettings(net)
       newNet.id = validateNetworkSettings(newNet)
 
       u('main', (main) => {
-        const updatedNetwork = Object.assign({}, main.networks[net.type][net.id], newNet)
+        const update = Object.assign({}, main.networks[net.type][net.id], newNet)
 
-        Object.keys(updatedNetwork).forEach((k) => {
-          if (typeof updatedNetwork[k] === 'string') {
-            updatedNetwork[k] = updatedNetwork[k].trim()
+        Object.keys(update).forEach((k) => {
+          if (typeof update[k] === 'string') {
+            update[k] = update[k].trim()
           }
         })
+
+        const { nativeCurrencyName, nativeCurrencyIcon, icon, ...updatedNetwork } = update
 
         delete main.networks[net.type][net.id]
         main.networks[updatedNetwork.type][updatedNetwork.id] = updatedNetwork
@@ -349,13 +353,20 @@ module.exports = {
           }
         })
 
-        main.networksMeta[updatedNetwork.type][updatedNetwork.id] =
-          main.networksMeta[updatedNetwork.type][updatedNetwork.id] || {}
-        main.networksMeta[updatedNetwork.type][updatedNetwork.id].symbol = newNet.symbol
+        const existingNetworkMeta = main.networksMeta[updatedNetwork.type][updatedNetwork.id] || {}
+        const networkCurrency = existingNetworkMeta.nativeCurrency || {}
 
-        main.networksMeta[updatedNetwork.type][updatedNetwork.id].nativeCurrency =
-          main.networksMeta[updatedNetwork.type][updatedNetwork.id].nativeCurrency || {}
-        main.networksMeta[updatedNetwork.type][updatedNetwork.id].nativeCurrency.symbol = newNet.symbol
+        main.networksMeta[updatedNetwork.type][updatedNetwork.id] = {
+          ...existingNetworkMeta,
+          symbol: update.symbol,
+          icon,
+          nativeCurrency: {
+            ...networkCurrency,
+            symbol: update.symbol,
+            name: nativeCurrencyName,
+            icon: nativeCurrencyIcon
+          }
+        }
 
         return main
       })
@@ -500,6 +511,9 @@ module.exports = {
       delete origins[originId]
       return origins
     })
+  },
+  trustExtension: (u, extensionId, trusted) => {
+    u('main.knownExtensions', (extensions = {}) => ({ ...extensions, [extensionId]: trusted }))
   },
   setBlockHeight: (u, chainId, blockHeight) => {
     u('main.networksMeta.ethereum', (chainsMeta) => {
@@ -656,15 +670,15 @@ module.exports = {
   navUpdate: (u, windowId, crumb, navigate) => {
     if (!windowId || !crumb) return log.warn('Invalid nav forward', windowId, crumb)
     u('windows', windowId, 'nav', (nav) => {
-      const updatedNav = {
+      const updatedNavItem = {
         view: nav[0].view || crumb.view,
-        data: Object.assign({}, nav[0].data, crumb.data)
+        data: Object.keys(crumb.data).length === 0 ? {} : Object.assign({}, nav[0].data, crumb.data)
       }
-      if (JSON.stringify(nav[0]) !== JSON.stringify(updatedNav)) {
+      if (JSON.stringify(nav[0]) !== JSON.stringify(updatedNavItem)) {
         if (navigate) {
-          nav.unshift(updatedNav)
+          nav.unshift(updatedNavItem)
         } else {
-          nav[0] = updatedNav
+          nav[0] = updatedNavItem
         }
       }
       return nav

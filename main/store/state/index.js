@@ -214,6 +214,7 @@ const initial = {
       derivation: main('trezor.derivation', 'standard')
     },
     origins: main('origins', {}),
+    knownExtensions: main('knownExtensions', {}),
     privacy: {
       errorReporting: main('privacy.errorReporting', true)
     },
@@ -728,6 +729,10 @@ initial.main.origins = Object.entries(initial.main.origins).reduce((origins, [id
 
   return origins
 }, {})
+
+initial.main.knownExtensions = Object.fromEntries(
+  Object.entries(initial.main.knownExtensions).filter(([id, allowed]) => allowed)
+)
 
 // ---
 

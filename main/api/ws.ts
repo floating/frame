@@ -7,7 +7,14 @@ import provider from '../provider'
 import accounts from '../accounts'
 import windows from '../windows'
 
-import { updateOrigin, isTrusted, isFrameExtension, parseOrigin } from './origins'
+import {
+  updateOrigin,
+  isTrusted,
+  parseOrigin,
+  isKnownExtension,
+  FrameExtension,
+  parseFrameExtension
+} from './origins'
 import validPayload from './validPayload'
 import protectedMethods from './protectedMethods'
 import { IncomingMessage, Server } from 'http'
@@ -25,7 +32,7 @@ interface Subscription {
 interface FrameWebSocket extends WebSocket {
   id: string
   origin?: string
-  isFrameExtension: boolean
+  frameExtension?: FrameExtension
 }
 
 interface ExtensionPayload extends JSONRPCRequestPayload {
@@ -46,7 +53,7 @@ function extendSession(originId: string) {
 const handler = (socket: FrameWebSocket, req: IncomingMessage) => {
   socket.id = uuid()
   socket.origin = req.headers.origin
-  socket.isFrameExtension = isFrameExtension(req)
+  socket.frameExtension = parseFrameExtension(req)
 
   const res = (payload: RPCResponsePayload) => {
     if (socket.readyState === WebSocket.OPEN) {
@@ -61,7 +68,16 @@ const handler = (socket: FrameWebSocket, req: IncomingMessage) => {
     if (!rawPayload) return console.warn('Invalid Payload', data)
 
     let requestOrigin = socket.origin
-    if (socket.isFrameExtension) {
+    if (socket.frameExtension) {
+      if (!(await isKnownExtension(socket.frameExtension))) {
+        const error = {
+          message: `Permission denied, approve connection from Frame Companion with id ${socket.frameExtension.id} in Frame to continue`,
+          code: 4001
+        }
+
+        return res({ id: rawPayload.id, jsonrpc: rawPayload.jsonrpc, error })
+      }
+
       // Request from extension, swap origin
       if (rawPayload.__frameOrigin) {
         requestOrigin = rawPayload.__frameOrigin
@@ -75,7 +91,7 @@ const handler = (socket: FrameWebSocket, req: IncomingMessage) => {
 
     if (logTraffic)
       log.info(
-        `req -> | ${socket.isFrameExtension ? 'ext' : 'ws'} | ${origin} | ${rawPayload.method} | -> | ${
+        `req -> | ${socket.frameExtension ? 'ext' : 'ws'} | ${origin} | ${rawPayload.method} | -> | ${
           rawPayload.params
         }`
       )
@@ -114,7 +130,7 @@ const handler = (socket: FrameWebSocket, req: IncomingMessage) => {
         }
         if (logTraffic)
           log.info(
-            `<- res | ${socket.isFrameExtension ? 'ext' : 'ws'} | ${origin} | ${
+            `<- res | ${socket.frameExtension ? 'ext' : 'ws'} | ${origin} | ${
               payload.method
             } | <- | ${JSON.stringify(response.result || response.error)}`
           )

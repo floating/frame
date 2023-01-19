@@ -1,7 +1,13 @@
 import { v5 as uuidv5 } from 'uuid'
 import log from 'electron-log'
 
-import { parseOrigin, updateOrigin, isTrusted } from '../../../main/api/origins'
+import {
+  parseOrigin,
+  updateOrigin,
+  isTrusted,
+  parseFrameExtension,
+  isKnownExtension
+} from '../../../main/api/origins'
 import accounts from '../../../main/accounts'
 import store from '../../../main/store'
 
@@ -152,6 +158,150 @@ describe('#updateOrigin', () => {
   })
 })
 
+describe('#parseFrameExtension', () => {
+  it('correctly identifies the Chrome extension', () => {
+    const origin = 'chrome-extension://ldcoohedfbjoobcadoglnnmmfbdlmmhf'
+    const req = { headers: { origin } }
+
+    expect(parseFrameExtension(req)).toStrictEqual({
+      browser: 'chrome',
+      id: 'ldcoohedfbjoobcadoglnnmmfbdlmmhf'
+    })
+  })
+
+  it('does not recognize a Chrome extension with the wrong id', () => {
+    const origin = 'chrome-extension://somebogusid'
+    const req = { headers: { origin } }
+
+    expect(parseFrameExtension(req)).toBeUndefined()
+  })
+
+  it('correctly identifies the Firefox extension', () => {
+    const origin = 'moz-extension://4be0643f-1d98-573b-97cd-ca98a65347dd'
+    const req = { headers: { origin }, url: '/?identity=frame-extension' }
+
+    expect(parseFrameExtension(req)).toStrictEqual({
+      browser: 'firefox',
+      id: '4be0643f-1d98-573b-97cd-ca98a65347dd'
+    })
+  })
+
+  it('does not recognize the Firefox extension without the identity query parameter', () => {
+    const origin = 'moz-extension://4be0643f-1d98-573b-97cd-ca98a65347dd'
+    const req = { headers: { origin }, url: '/' }
+
+    expect(parseFrameExtension(req)).toBeUndefined()
+  })
+
+  it('correctly identifies the Safari extension', async () => {
+    return withEnvironment({ NODE_ENV: 'development' }, async () => {
+      const origin = 'safari-web-extension://4be0643f-1d98-573b-97cd-ca98a65347dd'
+      const req = { headers: { origin }, url: '/?identity=frame-extension' }
+
+      const { parseFrameExtension } = await import('../../../main/api/origins')
+
+      expect(parseFrameExtension(req)).toStrictEqual({
+        browser: 'safari',
+        id: expect.any(String)
+      })
+    })
+  })
+
+  it('does not recognize a Safari extension in production', () => {
+    return withEnvironment({ NODE_ENV: 'production' }, async () => {
+      const origin = 'safari-web-extension://4be0643f-1d98-573b-97cd-ca98a65347dd'
+      const req = { headers: { origin }, url: '/?identity=frame-extension' }
+
+      const { parseFrameExtension } = await import('../../../main/api/origins')
+
+      expect(parseFrameExtension(req)).toBeUndefined()
+    })
+  })
+
+  it('does not recognize the Safari extension without the identity query parameter', () => {
+    return withEnvironment({ NODE_ENV: 'development' }, async () => {
+      const origin = 'safari-web-extension://4be0643f-1d98-573b-97cd-ca98a65347dd'
+      const req = { headers: { origin }, url: '/' }
+
+      const { parseFrameExtension } = await import('../../../main/api/origins')
+
+      expect(parseFrameExtension(req)).toBeUndefined()
+    })
+  })
+
+  it('does not recognize an extension from an unsupported browser', () => {
+    const origin = 'brave-extension://4be0643f-1d98-573b-97cd-ca98a65347dd'
+    const req = { headers: { origin } }
+
+    expect(parseFrameExtension(req)).toBeUndefined()
+  })
+})
+
+describe('#isKnownExtension', () => {
+  beforeEach(() => {
+    store.set('main.knownExtensions', {})
+    store.notify = jest.fn()
+  })
+
+  it('always knows the single Chrome extension', async () => {
+    const extension = { browser: 'chrome', id: 'ldcoohedfbjoobcadoglnnmmfbdlmmhf' }
+    return expect(isKnownExtension(extension)).resolves.toBe(true)
+  })
+
+  it('always knows the single Safari extension', async () => {
+    const extension = { browser: 'safari', id: 'test-frame' }
+    return expect(isKnownExtension(extension)).resolves.toBe(true)
+  })
+
+  it('knows a previously trusted Firefox extension', async () => {
+    const extension = { browser: 'firefox', id: '4be0643f-1d98-573b-97cd-ca98a65347dd' }
+
+    store.set('main.knownExtensions', { [extension.id]: true })
+
+    return expect(isKnownExtension(extension)).resolves.toBe(true)
+  })
+
+  it('rejects a previously rejected Firefox extension', async () => {
+    const extension = { browser: 'firefox', id: '4be0643f-1d98-573b-97cd-ca98a65347dd' }
+
+    store.set('main.knownExtensions', { [extension.id]: false })
+
+    return expect(isKnownExtension(extension)).resolves.toBe(false)
+  })
+
+  it('prompts the user to trust a Firefox extension', async () => {
+    const extension = { browser: 'firefox', id: '4be0643f-1d98-573b-97cd-ca98a65347dd' }
+
+    isKnownExtension(extension)
+
+    expect(store.notify).toHaveBeenCalledWith('extensionConnect', extension)
+  })
+
+  it('allows a user to trust a Firefox extension', async () => {
+    const extension = { browser: 'firefox', id: '4ae0643f-1d98-573b-97cd-ca98a65347dd' }
+
+    store.notify.mockImplementationOnce(() => {
+      // simulate user accepting the request
+      store.set('main.knownExtensions', { [extension.id]: true })
+      store.getObserver('origins:requestExtension').fire()
+    })
+
+    return expect(isKnownExtension(extension)).resolves.toBe(true)
+  })
+
+  it('allows a user to reject a connection from a Firefox extension', async () => {
+    const extension = { browser: 'firefox', id: '4ce0643f-1d98-573b-97cd-ca98a65347dd' }
+
+    store.notify.mockImplementationOnce(() => {
+      // simulate user accepting the request
+      store.set('main.knownExtensions', { [extension.id]: false })
+      store.getObserver('origins:requestExtension').fire()
+    })
+
+    return expect(isKnownExtension(extension)).resolves.toBe(false)
+  })
+})
+
 describe('#isTrusted', () => {
   const frameTestOriginId = 'bf93061b-3575-40c5-b526-4932b02e1f3f'
 
@@ -262,3 +412,16 @@ describe('#isTrusted', () => {
     })
   })
 })
+
+// helper functions
+async function withEnvironment(env, test) {
+  const oldEnv = { ...process.env }
+
+  jest.resetModules()
+  process.env = env
+
+  await test()
+
+  process.env = oldEnv
+  jest.resetModules()
+}

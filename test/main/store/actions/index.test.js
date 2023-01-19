@@ -181,6 +181,7 @@ describe('#addNetwork', () => {
     expect(networksMeta.ethereum['137']).toEqual({
       blockHeight: 0,
       name: 'Polygon',
+      icon: '',
       nativeCurrency: {
         symbol: 'MATIC',
         name: '',
@@ -923,6 +924,32 @@ describe('#updateNetwork', () => {
       '695112ec-43e2-52a8-8f69-5c36837d6d13': {
         chain: expect.objectContaining({ id: 66, type: 'ethereum' })
       }
+    })
+  })
+
+  it('should correctly update the networksMeta', () => {
+    const icon = 'http://icon.com'
+    const nativeCurrencyIcon = 'http://icon2.com'
+    const nativeCurrencyName = 'TEST_NAME'
+    const symbol = 'TEST'
+    updateNetwork(
+      { id: '0x4', type: 'ethereum', name: '', explorer: '', symbol: '' },
+      {
+        id: '0x4',
+        type: 'ethereum',
+        name: 'test',
+        explorer: 'explorer.test',
+        symbol,
+        nativeCurrencyName,
+        nativeCurrencyIcon,
+        icon
+      }
+    )
+
+    expect(main.networksMeta.ethereum[4]).toStrictEqual({
+      icon,
+      nativeCurrency: { symbol, name: nativeCurrencyName, icon: nativeCurrencyIcon },
+      symbol
     })
   })
 })

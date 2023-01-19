@@ -1,18 +1,21 @@
 import React, { useState } from 'react'
-import link from '../../../../../resources/link'
 
 import chainDefault from '../chainDefault'
-
+import link from '../../../../../resources/link'
 import {
   ChainHeader,
   EditChainColor,
   EditChainName,
   EditChainSymbol,
   EditChainId,
+  EditChainIcon,
+  EditNativeCurrencyName,
   EditTestnet,
   EditChainExplorer,
-  EditRPC,
-  SubmitChainButton
+  SubmitChainButton,
+  EditNativeCurrencyIcon,
+  EditSecondaryRPC,
+  EditPrimaryRPC
 } from '../Components'
 
 const isChainFilled = (chain) => {
@@ -22,30 +25,40 @@ const isChainFilled = (chain) => {
     chain.name &&
     chain.name !== chainDefault.name &&
     chain.symbol &&
-    chain.symbol !== chainDefault.symbol
+    chain.symbol !== chainDefault.symbol &&
+    chain.nativeCurrencyName &&
+    chain.nativeCurrencyName !== chainDefault.nativeCurrencyName
   )
 }
 
-const isValidRpc = (urlStr) => {
+const getUrl = (urlStr) => {
   try {
-    const url = new URL(urlStr)
-    return ['http:', 'https:', 'ws:', 'wss:'].includes(url.protocol)
-  } catch (e) {
-    return false
-  }
+    return new URL(urlStr)
+  } catch (e) {}
 }
 
-export default ({
+const isValidRpc = (urlStr) => {
+  const url = getUrl(urlStr)
+  return ['http:', 'https:', 'ws:', 'wss:'].includes(url?.protocol)
+}
+
+const isValidIcon = (urlStr) => Boolean(getUrl(urlStr))
+
+export const Chain = ({
   id,
   name,
   type,
   explorer,
   symbol,
+  nativeCurrencyName,
+  nativeCurrencyIcon,
+  icon,
   isTestnet,
   primaryColor,
   primaryRpc,
   secondaryRpc,
-  existingChains
+  existingChains,
+  store
 }) => {
   const newChain = {
     id: id || chainDefault.id,
@@ -53,6 +66,9 @@ export default ({
     type: type || chainDefault.type,
     explorer: explorer || chainDefault.explorer,
     symbol: symbol || chainDefault.symbol,
+    nativeCurrencyName: nativeCurrencyName || chainDefault.nativeCurrencyName,
+    nativeCurrencyIcon: nativeCurrencyIcon || chainDefault.nativeCurrencyIcon,
+    icon: icon || chainDefault.icon,
     isTestnet: isTestnet || chainDefault.isTestnet,
     primaryColor: primaryColor || chainDefault.primaryColor,
     primaryRpc: primaryRpc || '',
@@ -63,17 +79,25 @@ export default ({
   const [currentColor, setPrimaryColor] = useState(newChain.primaryColor)
   const [currentName, setName] = useState(newChain.name)
   const [currentSymbol, setSymbol] = useState(newChain.symbol)
+  const [currentNativeCurrencyName, setNativeCurrencyName] = useState(newChain.nativeCurrencyName)
+  const [currentChainIcon, setChainIcon] = useState(newChain.icon)
+  const [currentCurrencyIcon, setCurrencyIcon] = useState(newChain.nativeCurrencyIcon)
   const [currentChainId, setChainId] = useState(newChain.id)
   const [currentExplorer, setExplorer] = useState(newChain.explorer)
   const [currentTestnet, setTestnet] = useState(newChain.isTestnet)
   const [currentPrimaryRPC, setPrimaryRPC] = useState(newChain.primaryRpc)
   const [currentSecondaryRPC, setSecondaryRPC] = useState(newChain.secondaryRpc)
 
+  const currencyIcon = currentCurrencyIcon === chainDefault.nativeCurrencyIcon ? '' : currentCurrencyIcon
+  const chainIcon = currentChainIcon === chainDefault.icon ? '' : currentChainIcon
   const updatedChain = {
     type: 'ethereum',
     id: currentChainId,
     name: currentName,
     explorer: currentExplorer,
+    nativeCurrencyName: currentNativeCurrencyName,
+    nativeCurrencyIcon: currencyIcon,
+    icon: chainIcon,
     symbol: currentSymbol,
     isTestnet: currentTestnet,
     primaryColor: currentColor,
@@ -88,6 +112,14 @@ export default ({
 
     if (!isChainFilled(chain)) {
       return { valid: false, text: 'Fill Chain Details' }
+    }
+
+    if (chain.icon && !isValidIcon(chain.icon)) {
+      return { valid: false, text: 'Invalid Chain Icon' }
+    }
+
+    if (chain.nativeCurrencyIcon && !isValidIcon(chain.nativeCurrencyIcon)) {
+      return { valid: false, text: 'Invalid Currency Icon' }
     }
 
     if (chain.primaryRpc && !isValidRpc(chain.primaryRpc)) {
@@ -111,18 +143,15 @@ export default ({
       <EditChainId chainId={currentChainId} onChange={setChainId} />
       <EditChainExplorer currentExplorer={currentExplorer} onChange={setExplorer} />
       <EditChainSymbol currentSymbol={currentSymbol} onChange={setSymbol} />
-      <EditRPC
-        currentRPC={currentPrimaryRPC}
-        label={'Primary RPC'}
-        rpcDefault={chainDefault.primaryRpc}
-        onChange={setPrimaryRPC}
+      {/* TODO: change order? */}
+      <EditNativeCurrencyName
+        currentNativeCurrency={currentNativeCurrencyName}
+        onChange={setNativeCurrencyName}
       />
-      <EditRPC
-        currentRPC={currentSecondaryRPC}
-        label={'Secondary RPC'}
-        rpcDefault={chainDefault.secondaryRpc}
-        onChange={setSecondaryRPC}
-      />
+      <EditPrimaryRPC currentPrimaryRPC={currentPrimaryRPC} onChange={setPrimaryRPC} />
+      <EditSecondaryRPC currentSecondaryRpc={currentSecondaryRPC} onChange={setSecondaryRPC} />
+      <EditChainIcon currentIcon={currentChainIcon} onChange={setChainIcon} />
+      <EditNativeCurrencyIcon currentCurrencyIcon={currentCurrencyIcon} onChange={setCurrencyIcon} />
       <EditTestnet testnet={currentTestnet} onChange={setTestnet} />
       <div className='chainRow chainRowRemove'>
         <SubmitChainButton
@@ -131,8 +160,16 @@ export default ({
           enabled={chainValidation.valid}
           onClick={() => {
             if (chainValidation.valid) {
+              const nav = store('windows.dash.nav')
               link.send('tray:addChain', updatedChain)
-              link.send('tray:action', 'backDash')
+
+              // if previous navItem is the chains panel, go back
+              if (nav[1]?.view === 'chains') {
+                link.send('tray:action', 'backDash')
+              } else {
+                // otherwise update the current navItem to show the chains panel
+                link.send('nav:update', 'dash', { view: 'chains', data: {} }, false)
+              }
             }
           }}
         />

@@ -208,6 +208,7 @@ describe('#send', () => {
               id: 4660,
               name: 'Bizarro Polygon',
               symbol: 'NEW',
+              nativeCurrencyName: 'New',
               primaryRpc: 'https://pylon.link',
               secondaryRpc: undefined,
               explorer: 'https://explorer.pylon.link'

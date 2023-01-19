@@ -134,6 +134,9 @@ const rpc = {
   confirmRequestApproval(req, approvalType, approvalData, cb) {
     accounts.confirmRequestApproval(req.handlerId, approvalType, approvalData)
   },
+  respondToExtensionRequest(id, approved, cb) {
+    callbackWhenDone(() => store.trustExtension(id, approved), cb)
+  },
   updateRequest(reqId, actionId, data, cb = () => {}) {
     accounts.updateRequest(reqId, actionId, data)
   },
