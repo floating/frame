@@ -170,27 +170,37 @@
     letter-spacing 2px
     color var(--good)
 
+.approveTokenSpendAmountLabel
+  display flex
+  justify-content center
+  align-items center
+  padding 8px
+  font-size 15px
+  color var(--good)
+  font-weight 600
+
+.approveTokenSpendAmountSubtitle
+  font-size 8px
+  display flex
+  justify-content center
+  align-items center
+  text-transform uppercase
+  margin-top 4px
+  font-weight 500
+  z-index 40000
+  letter-spacing 1px
+  margin-left -1px
+
 .approveTokenSpendAmount
-  // background blue // var(--ghostB)
-  height 80px
-  padding-bottom 10px
+  height 60px
   width 100%
-  // border-radius 20px
-  // padding-top 2px
-  // padding-right 100px
-  // padding-left 10px
   box-sizing border-box
   position relative
   overflow hidden
+  display flex
+  justify-content center
+  align-items center
   font-weight 400
-
-  .approveTokenSpendAmountLabel
-    display flex
-    justify-content center
-    align-items center
-    padding-top 10px
-    font-size 16px
-    color var(--good)
 
   @keyframes land
     0%
@@ -220,22 +230,6 @@
 
   .approveTokenSpendAmountSubmit:hover
     color var(--good)
-
-  .approveTokenSpendAmountSubtitle
-    position absolute
-    bottom 4px
-    left 0
-    right 0
-    font-size 8px
-    display flex
-    justify-content center
-    align-items center
-    text-transform uppercase
-    margin-top 4px
-    font-weight 500
-    z-index 40000
-    letter-spacing 1px
-    margin-left -1px
 
   input
     background transparent
