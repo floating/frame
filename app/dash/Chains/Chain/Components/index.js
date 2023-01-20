@@ -5,6 +5,8 @@ import svg from '../../../../../resources/svg'
 import RingIcon from '../../../../../resources/Components/RingIcon'
 import chainDefault from '../chainDefault'
 
+import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../resources/Components/Cluster'
+
 export const SubmitChainButton = ({ text, enabled, textColor, onClick }) => {
   return (
     <div
@@ -215,22 +217,25 @@ export const EditTestnet = ({ testnet, onChange }) => {
 
 export const ChainFooter = ({ id, type, symbol, price }) => {
   return (
-    <div className='chainFooter'>
-      <div className='chainCurrencyItem'>
-        <div className='chainCurrencyItemSymbol'>{symbol}</div>
-        <div className='chainCurrencyItemAt'>{'@'}</div>
-        <div className='sliceChainIdNumber'>{'$' + price.toLocaleString() + ''}</div>
-      </div>
-      <div className='chainExplorer'>
-        <div
-          role='link'
-          onClick={(e) => {
-            link.rpc('openExplorer', { id, type }, () => {})
-          }}
-        >
-          Open Block Explorer
-        </div>
-      </div>
-    </div>
+    <ClusterBox>
+      <Cluster>
+        <ClusterRow>
+          <ClusterValue
+            onClick={(e) => {
+              link.rpc('openExplorer', { id, type }, () => {})
+            }}
+          >
+            <div role='link' style={{ padding: '8px' }}>
+              {svg.telescope(18)}
+            </div>
+          </ClusterValue>
+          <ClusterValue grow={6}>
+            <div className='chainCurrencyItemSymbol'>{symbol}</div>
+            <div className='chainCurrencyItemAt'>{'@'}</div>
+            <div className='sliceChainIdNumber'>{'$' + price.toLocaleString() + ''}</div>
+          </ClusterValue>
+        </ClusterRow>
+      </Cluster>
+    </ClusterBox>
   )
 }

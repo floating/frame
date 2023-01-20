@@ -100,9 +100,6 @@ export default (props) => {
       />
       <EditChainIcon currentIcon={currentIcon} onChange={setIcon} />
       <EditNativeCurrencyIcon currentCurrencyIcon={currentCurrencyIcon} onChange={setCurrencyIcon} />
-      <div className='chainRow'>
-        <ChainFooter id={id} type={type} symbol={symbol} price={price} />
-      </div>
       {!isMainnet && <EditTestnet testnet={currentTestnet} onChange={setTestnet} />}
       <div className='chainModules'>
         <Connection expanded={true} connection={connection} {...chain} />

@@ -330,7 +330,7 @@
 
 .chainFooter
   display flex
-  justify-content center
+  justify-content space-between
   align-items center
   position relative
   padding 10px 15px 10px 13px
@@ -338,29 +338,22 @@
   font-size 12px
   font-weight 300
 
-  .chainCurrencyItem
-    display flex
-    justify-content center
-    align-items center
-    position relative
-    border-radius 12px
+.chainCurrencyItem
+  display flex
+  justify-content center
+  align-items center
+  position relative
+  border-radius 12px
 
-    .chainCurrencyItemIcon
-      color var(--good)
-      position relative
-      top 0px
-      margin-right 8px
-      
-    .chainCurrencyItemSymbol
-      margin-right 8px
+.chainCurrencyItemSymbol, .sliceChainIdNumber
+  font-size 13px
+  font-weight 400
 
-    .chainCurrencyItemAt
-      margin-right 8px
-      color var(--good)
-
-  .chainExplorer:hover div
-    cursor pointer
-    text-decoration underline
+.chainCurrencyItemAt
+  margin -2px 8px 0px 8px
+  color var(--good)
+  font-size 12px
+  font-weight 400
 
 .sliceContainer
   background var(--ghostZ)

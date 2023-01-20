@@ -468,21 +468,25 @@ class Notify extends React.Component {
   }
 
   openExplorer({ hash, chain }) {
-    const heading = hash
-      ? 'Frame will open a block explorer in your browser for transaction:'
-      : 'Frame will open the block explorer in your browser for'
-
     const chainName = this.store('main.networks', chain.type, chain.id, 'name')
-    const body = hash || chainName
-
     return (
       <div className='notifyBoxWrap' onMouseDown={(e) => e.stopPropagation()}>
         <div className='notifyBox'>
           <div className='notifyTitle'>Open Block Explorer</div>
-          <div className='notifyBody'>
-            <div className='notifyBodyLine'>{heading}</div>
-            <div className='notifyBodyHash'>{body}</div>
-          </div>
+          {hash ? (
+            <div className='notifyBody'>
+              <div className='notifyBodyLine'>
+                {'Frame will open a block explorer in your browser for transaction:'}
+              </div>
+              <div className='notifyBodyHash'>{hash}</div>
+            </div>
+          ) : (
+            <div className='notifyBody'>
+              <div className='notifyBodyLine'>{`Frame will now open the ${chainName}`}</div>
+              <div className='notifyBodyLine'>{`block explorer in your browser`}</div>
+            </div>
+          )}
+
           <div className='notifyInput'>
             <div
               className='notifyInputOption notifyInputDeny'
