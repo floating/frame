@@ -135,7 +135,12 @@ class TokenSpend extends React.Component {
                 }}
               >
                 <div className='clusterAddress'>
-                  <span className='clusterAddressRecipient'>{name}</span>
+                  <span
+                    className='clusterAddressRecipient'
+                    style={{ fontFamily: 'MainFont', fontWeight: '400' }}
+                  >
+                    {name}
+                  </span>
                   <div className='clusterAddressRecipientFull'>
                     {this.state.copiedTokenAddress ? (
                       <span>{'Address Copied'}</span>
@@ -149,9 +154,13 @@ class TokenSpend extends React.Component {
           </Cluster>
           <Cluster style={{ marginTop: '16px' }}>
             <ClusterRow>
+              <ClusterValue>
+                <div className='approveTokenSpendAmountLabel'>{symbol}</div>
+              </ClusterValue>
+            </ClusterRow>
+            <ClusterRow>
               <ClusterValue transparent={true} pointerEvents={'auto'}>
                 <div className='approveTokenSpendAmount'>
-                  <div className='approveTokenSpendAmountLabel'>{symbol}</div>
                   {this.state.mode === 'custom' && data.amount !== customInput ? (
                     <div
                       className='approveTokenSpendAmountSubmit'
@@ -215,10 +224,15 @@ class TokenSpend extends React.Component {
                       {displayAmount}
                     </div>
                   )}
-                  <div className='approveTokenSpendAmountSubtitle'>Set Token Approval Spend Limit</div>
                 </div>
               </ClusterValue>
             </ClusterRow>
+            <ClusterRow>
+              <ClusterValue transparent={true}>
+                <div className='approveTokenSpendAmountSubtitle'>Set Token Approval Spend Limit</div>
+              </ClusterValue>
+            </ClusterRow>
+
             <ClusterRow>
               <ClusterValue
                 onClick={() => {
