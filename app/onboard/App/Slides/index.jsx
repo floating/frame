@@ -8,6 +8,7 @@ import Intro from './Intro'
 import Access from './Access'
 import Chains from './Chains'
 import Omnichain from './Omnichain'
+import SwitchChains from './SwitchChains'
 import Accounts from './Accounts'
 import Extension from './Extension'
 import Outro from './Outro'
@@ -20,7 +21,8 @@ const CurrentSlide = ({ slide, platform, setTitle, setProceed }) => {
   else if (slide === 4) return <Omnichain setTitle={setTitle} setProceed={setProceed} />
   else if (slide === 5) return <Accounts setTitle={setTitle} setProceed={setProceed} />
   else if (slide === 6) return <Extension setTitle={setTitle} setProceed={setProceed} />
-  else if (slide === 7) return <Outro setTitle={setTitle} setProceed={setProceed} />
+  else if (slide === 7) return <SwitchChains setTitle={setTitle} setProceed={setProceed} />
+  else if (slide === 8) return <Outro setTitle={setTitle} setProceed={setProceed} />
   else return <Slide>{'Cannot find slide'}</Slide>
 }
 
@@ -36,7 +38,7 @@ const prevSlide = (currentSlide, setSlide) => {
 
 const nextSlide = (currentSlide, setSlide) => {
   const nextSlide = ++currentSlide
-  setSlide(nextSlide > 7 ? 7 : nextSlide)
+  setSlide(nextSlide > 8 ? 8 : nextSlide)
 }
 
 const Slides = ({ platform }) => {
