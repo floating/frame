@@ -240,11 +240,13 @@ const LaunchExplorerButton = ({ id, type, explorer }) => {
 }
 
 const CurrentPrice = ({ symbol, price }) => {
+  const localPrice = `$${price.toLocaleString()}`
+
   return (
     <ClusterValue grow={6}>
       <div className='chainCurrencyItemSymbol'>{symbol}</div>
       <div className='chainCurrencyItemAt'>{'@'}</div>
-      <div className='sliceChainIdNumber'>{'$' + price.toLocaleString() + ''}</div>
+      <div className='sliceChainIdNumber'>{localPrice}</div>
     </ClusterValue>
   )
 }
