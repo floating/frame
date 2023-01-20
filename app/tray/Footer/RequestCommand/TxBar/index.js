@@ -31,7 +31,12 @@ class TxBar extends React.Component {
             <div className='txProgressLine' />
             <div className='txProgressSteps'>
               <div className='txProgressStep'>
-                <div className={progressIconClass} style={{ padding: '10px 11px' }}>
+                <div
+                  className={progressIconClass}
+                  style={{ padding: '10px 11px' }}
+                  onClick={() => this.props.infoPane('sign')}
+                  onMouseLeave={() => this.props.infoPane('')}
+                >
                   {svg.sign(22)}
                 </div>
                 <div className='txProgressStepMarker' />
@@ -42,7 +47,12 @@ class TxBar extends React.Component {
                 />
               </div>
               <div className='txProgressStep'>
-                <div className={progressIconClass} style={{ padding: '11px 12px' }}>
+                <div
+                  className={progressIconClass}
+                  style={{ padding: '11px 12px' }}
+                  onClick={() => this.props.infoPane('send')}
+                  onMouseLeave={() => this.props.infoPane('')}
+                >
                   {svg.send(15)}
                 </div>
                 <div className='txProgressStepMarker' />
@@ -53,7 +63,12 @@ class TxBar extends React.Component {
                 />
               </div>
               <div className='txProgressStep'>
-                <div className={progressIconClass} style={{ padding: '11px 12px' }}>
+                <div
+                  className={progressIconClass}
+                  style={{ padding: '11px 12px' }}
+                  onClick={() => this.props.infoPane('block')}
+                  onMouseLeave={() => this.props.infoPane('')}
+                >
                   {svg.cube(16)}
                 </div>
                 <div className='txProgressStepMarker' />
