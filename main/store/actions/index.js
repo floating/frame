@@ -210,9 +210,6 @@ module.exports = {
   setMenubarGasPrice: (u, value) => {
     u('main.menubarGasPrice', () => value)
   },
-  muteAlphaWarning: (u) => {
-    u('main.mute.alphaWarning', () => true)
-  },
   muteWelcomeWarning: (u) => {
     u('main.mute.welcomeWarning', () => true)
   },
@@ -735,15 +732,6 @@ module.exports = {
       }
       return nav
     })
-  },
-  muteBetaDisclosure: (u) => {
-    u('main.mute.betaDisclosure', () => true)
-    const navItem = { view: 'accounts', data: {} }
-    u('windows.dash.nav', (nav) => {
-      if (JSON.stringify(nav[0]) !== JSON.stringify(navItem)) nav.unshift(navItem)
-      return nav
-    })
-    u('windows.dash.showing', () => true)
   },
   completeOnboarding: (u) => {
     u('main.mute.onboardingWindow', () => true)

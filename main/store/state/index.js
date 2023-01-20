@@ -177,13 +177,11 @@ const initial = {
       }
     },
     mute: {
-      alphaWarning: main('mute.alphaWarning', false),
       welcomeWarning: main('mute.welcomeWarning', false),
       externalLinkWarning: main('mute.externalLinkWarning', false),
       explorerWarning: main('mute.explorerWarning', false),
       signerRelockChange: main('mute.signerRelockChange', false),
       gasFeeWarning: main('mute.gasFeeWarning', false),
-      betaDisclosure: main('mute.betaDisclosure', false),
       onboardingWindow: main('mute.onboardingWindow', false),
       signerCompatibilityWarning: main('mute.signerCompatibilityWarning', false)
     },
