@@ -432,8 +432,6 @@ class Notify extends React.Component {
           {this.mainnet()}
         </div>
       )
-    } else if (notify === 'betaDisclosure') {
-      return <div className='notify cardShow'>{this.betaDisclosure()}</div>
     } else if (notify === 'nonceWarning') {
       return (
         <div className='notify cardShow' onMouseDown={() => link.send('tray:action', 'backDash')}>
