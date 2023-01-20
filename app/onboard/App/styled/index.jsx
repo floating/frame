@@ -56,6 +56,21 @@ export const SlideBody = styled.div`
     padding-bottom: 0px;
   }
 `
+export const SlideVideo = styled.div`
+  font-size: 32px;
+  font-weight: 500;
+  animation: cardShow 400ms linear both;
+  overflow: hidden;
+  margin: 25px auto;
+  border-radius: 6px;
+  height: 240px;
+  width: 390px;
+  box-shadow: 0px 8px 24px var(--ghostX), 0px -4px 8px var(--ghostY);
+
+  video {
+    height: 100%;
+  }
+`
 
 export const SlideTitle = styled.div`
   font-size: 32px;

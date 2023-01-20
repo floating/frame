@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react'
 
-import extensionScreenshot from './extension.png'
-import { Slide, SlideBody, SlideItem, Tag } from '../../styled'
+import chainSwitch from 'url:./chainswitch.mp4'
+import { Slide, SlideBody, SlideItem, SlideVideo } from '../../styled'
 
 const SwitchChainsSlide = ({ setTitle, setProceed }) => {
   useEffect(() => {
-    setTitle('Omnichain')
+    setTitle('Extension Chain Selector')
     setProceed({ action: 'next', text: 'Next' })
   }, [])
 
@@ -13,14 +13,17 @@ const SwitchChainsSlide = ({ setTitle, setProceed }) => {
     <Slide>
       <SlideBody>
         <SlideItem>
-          <div>Dapp not switching chains automatically? You can still</div>
-          <div>manually switch chains for any dapp using the</div>
-          <div>
-            <Tag>Frame Companion</Tag> extension.
+          <SlideVideo>
+            <video loop autoPlay>
+              <source src={chainSwitch} type='video/mp4' />
+            </video>
+          </SlideVideo>
+          <div style={{ fontSize: '13px', lineHeight: '20px' }}>
+            Legacy dapp not switching chains automatically?
           </div>
-        </SlideItem>
-        <SlideItem>
-          <img src={extensionScreenshot} />
+          <div style={{ fontSize: '13px', lineHeight: '20px', paddingBottom: '15px' }}>
+            Switch chains for any dapp via the browser extension.
+          </div>
         </SlideItem>
       </SlideBody>
     </Slide>
