@@ -5,6 +5,8 @@ import svg from '../../../../../resources/svg'
 import RingIcon from '../../../../../resources/Components/RingIcon'
 import chainDefault from '../chainDefault'
 
+import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../resources/Components/Cluster'
+
 export const SubmitChainButton = ({ text, enabled, textColor, onClick }) => {
   return (
     <div
@@ -213,14 +215,51 @@ export const EditTestnet = ({ testnet, onChange }) => {
   )
 }
 
-export const ChainFooter = ({ symbol, price }) => {
+const EnabledLaunchExplorerButton = ({ id, type }) => {
+  const openExplorer = () => {
+    link.rpc('openExplorer', { id, type }, () => {})
+  }
+
   return (
-    <div className='chainFooter'>
-      <div className='chainCurrencyItem'>
-        <div className='chainCurrencyItemSymbol'>{symbol}</div>
-        <div className='chainCurrencyItemAt'>{'@'}</div>
-        <div className='sliceChainIdNumber'>{'$' + price.toLocaleString() + ''}</div>
-      </div>
-    </div>
+    <ClusterValue role='button' onClick={openExplorer}>
+      <div style={{ padding: '8px' }}>{svg.telescope(18)}</div>
+    </ClusterValue>
+  )
+}
+
+const DisabledLaunchExplorerButton = () => {
+  return (
+    <ClusterValue>
+      <div style={{ color: 'var(--ghostD)', padding: '8px' }}>{svg.telescope(18)}</div>
+    </ClusterValue>
+  )
+}
+
+const LaunchExplorerButton = ({ id, type, explorer }) => {
+  return explorer ? <EnabledLaunchExplorerButton id={id} type={type} /> : <DisabledLaunchExplorerButton />
+}
+
+const CurrentPrice = ({ symbol, price }) => {
+  const localPrice = `$${price.toLocaleString()}`
+
+  return (
+    <ClusterValue grow={6}>
+      <div className='chainCurrencyItemSymbol'>{symbol}</div>
+      <div className='chainCurrencyItemAt'>{'@'}</div>
+      <div className='sliceChainIdNumber'>{localPrice}</div>
+    </ClusterValue>
+  )
+}
+
+export const ChainFooter = ({ id, type, symbol, price, explorer }) => {
+  return (
+    <ClusterBox>
+      <Cluster>
+        <ClusterRow>
+          <LaunchExplorerButton id={id} type={type} explorer={explorer} />
+          <CurrentPrice symbol={symbol} price={price} />
+        </ClusterRow>
+      </Cluster>
+    </ClusterBox>
   )
 }

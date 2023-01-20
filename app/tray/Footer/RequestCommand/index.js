@@ -101,7 +101,7 @@ class RequestCommand extends React.Component {
                     onClick={() => {
                       if (req && req.tx && req.tx.hash) {
                         if (this.store('main.mute.explorerWarning')) {
-                          link.send('tray:openExplorer', req.tx.hash, chain)
+                          link.send('tray:openExplorer', chain, req.tx.hash)
                         } else {
                           this.store.notify('openExplorer', { hash: req.tx.hash, chain: chain })
                         }

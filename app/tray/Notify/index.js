@@ -468,16 +468,26 @@ class Notify extends React.Component {
   }
 
   openExplorer({ hash, chain }) {
+    const { name: chainName, explorer: explorerUrl } = this.store('main.networks', chain.type, chain.id)
     return (
       <div className='notifyBoxWrap' onMouseDown={(e) => e.stopPropagation()}>
         <div className='notifyBox'>
           <div className='notifyTitle'>Open Block Explorer</div>
-          <div className='notifyBody'>
-            <div className='notifyBodyLine'>
-              Frame will open a block explorer in your browser for transaction:
+          {hash ? (
+            <div className='notifyBody'>
+              <div className='notifyBodyLine'>
+                {'Frame will open a block explorer in your browser for transaction:'}
+              </div>
+              <div className='notifyBodyHash'>{hash}</div>
             </div>
-            <div className='notifyBodyHash'>{hash}</div>
-          </div>
+          ) : (
+            <div className='notifyBody'>
+              <div className='notifyBodyLine'>{`Frame will open the ${chainName}`}</div>
+              <div className='notifyBodyLine'>{`block explorer in your browser:`}</div>
+              <div className='notifyBodyHash'>{explorerUrl}</div>
+            </div>
+          )}
+
           <div className='notifyInput'>
             <div
               className='notifyInputOption notifyInputDeny'
@@ -490,7 +500,7 @@ class Notify extends React.Component {
             <div
               className='notifyInputOption notifyInputProceed'
               onMouseDown={() => {
-                link.send('tray:openExplorer', hash, chain)
+                link.send('tray:openExplorer', chain, hash)
                 this.store.notify()
               }}
             >

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 
 import link from '../../../../../resources/link'
-import chainDefault from '../chainDefault'
 import Connection from '../Connection'
 
 import {
@@ -101,9 +100,6 @@ export default (props) => {
       />
       <EditChainIcon currentIcon={currentIcon} onChange={setIcon} />
       <EditNativeCurrencyIcon currentCurrencyIcon={currentCurrencyIcon} onChange={setCurrencyIcon} />
-      <div className='chainRow'>
-        <ChainFooter symbol={symbol} price={price} />
-      </div>
       {!isMainnet && <EditTestnet testnet={currentTestnet} onChange={setTestnet} />}
       <div className='chainModules'>
         <Connection expanded={true} connection={connection} {...chain} />
