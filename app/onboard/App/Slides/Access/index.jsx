@@ -5,9 +5,19 @@ import { Slide, SlideBody, SlideItem, Shortcut } from '../../styled'
 import link from '../../../../../resources/link'
 
 const Access = ({ setTitle, setProceed, platform }) => {
-  const keyboardShortcut = platform === 'darwin' ? 'Option + /' : 'Alt + /'
   const [shortcutActivated, setShortcutActivated] = useState(false)
   const [trayOpen, setTrayOpen] = useState(store('tray.open'))
+  const [summonKey, setSummonKey] = useState('/')
+
+  useEffect(() => {
+    ;(async () => {
+      const keyboardLayoutMap = await navigator.keyboard.getLayoutMap()
+      setSummonKey(keyboardLayoutMap.get('Slash'))
+    })()
+  }, [])
+
+  const modifierKey = platform === 'darwin' ? 'Option' : 'Alt'
+  const keyboardShortcut = `${modifierKey} + ${summonKey}`
 
   useEffect(() => {
     const handler = (event) => {
