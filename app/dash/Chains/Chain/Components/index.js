@@ -216,7 +216,7 @@ export const EditTestnet = ({ testnet, onChange }) => {
 }
 
 const EnabledLaunchExplorerButton = ({ id, type }) => {
-  const openExplorer = (e) => {
+  const openExplorer = () => {
     link.rpc('openExplorer', { id, type }, () => {})
   }
 
