@@ -363,42 +363,6 @@ class Notify extends React.Component {
     )
   }
 
-  hotAccountWarning() {
-    return (
-      <div
-        className='notifyBoxWrap'
-        onMouseDown={(e) => e.stopPropagation()}
-        style={
-          this.store('view.notify') === 'hotAccountWarning'
-            ? { transform: 'translateX(calc(-100% - 100px))' }
-            : {}
-        }
-      >
-        <div className='notifyBox'>
-          <div className='notifyTitle'>
-            <div>Hot Signer Alpha</div>
-          </div>
-          <div className='notifyBody'>
-            <div className='notifyBodyLine'>
-              Frame hot signers are in alpha! Do not use them with high value accounts and verify your backups
-              are valid. Only proceed if you understand and accept these risks.
-            </div>
-          </div>
-          <div className='notifyInput'>
-            <div
-              className='notifyInputOption notifyInputSingleButton'
-              onMouseDown={() => {
-                this.store.notify()
-              }}
-            >
-              <div className='notifyInputOptionText'>OK</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
   hotSignerMismatch() {
     return (
       <div
@@ -590,15 +554,6 @@ class Notify extends React.Component {
           {this.contractData()}
         </div>
       )
-    } else if (notify === 'hotAccountWarning') {
-      return (
-        <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
-          {/* <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
-            {'close'}
-          </div> */}
-          {this.hotAccountWarning()}
-        </div>
-      )
     } else if (notify === 'hotSignerMismatch') {
       return (
         <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
@@ -635,104 +590,5 @@ class Notify extends React.Component {
     }
   }
 }
-
-// Notification Cycle for Testing
-
-// intro
-// contractData
-// mainnet
-// rinkeby
-// ipfsAlreadyRunning
-// parityAlreadyRunning
-// gasFeeWarning
-// contractData
-// hotAccountWarning
-
-// let notifications = [
-//   {
-//     name: 'intro',
-//     data: {}
-//   },
-//   {
-//     name: 'mainnet',
-//     data: {}
-//   },
-//
-//   {
-//     name: 'rinkeby',
-//     data: {}
-//   },
-//   {
-//     name: 'ipfsAlreadyRunning',
-//     data: {}
-//   },
-//   {
-//     name: 'parityAlreadyRunning',
-//     data: {}
-//   },
-//   {
-//     name: 'gasFeeWarning',
-//     data: {
-//       req: {
-//         handlerId: 'c9a46b23-dced-45a3-a961-cbc5b7873de5',
-//         type: 'transaction',
-//         data: {
-//           value: '0x11e42f05714a67',
-//           to: '0x355587247da36c3130da888d9f608ccf0d2351ce',
-//           from: '0x355587247da36c3130da888d9f608ccf0d2351ce',
-//           gasPrice: '0x3b9aca00',
-//           gas: '0x5208',
-//           chainId: '0x4'
-//         },
-//         payload: {
-//           jsonrpc: '2.0',
-//           id: 3416,
-//           method: 'eth_sendTransaction',
-//           params: [],
-//           account: '0x355587247DA36C3130dA888d9F608ccF0D2351ce'
-//         }
-//       },
-//       feeUSD: 200
-//     }
-//   },
-//   {
-//     name: 'contractData',
-//     data: {}
-//   },
-//   {
-//     name: 'openExternal',
-//     data: {
-//       url: 'https://frame.sh'
-//     }
-//   },
-//   {
-//     name: 'openExplorer',
-//     data: {
-//       hash: '0x1234'
-//     }
-//   },
-//   {
-//     name: 'hotAccountWarning',
-//     data: {}
-//   }
-// ]
-//
-//
-// let i = -1
-// const checkKey = (e) => {
-//   if ((e || window.event).key === 'ArrowRight') {
-//     i++
-//     if (!notifications[i]) i = 0
-//     console.log(notifications[i].name, notifications[i].data)
-//     store.notify(notifications[i].name, notifications[i].data)
-//   } else if ((e || window.event).key === 'ArrowLeft') {
-//     i--
-//     if (!notifications[i]) i = notifications.length - 1
-//     console.log(notifications[i].name, notifications[i].data)
-//     store.notify(notifications[i].name, notifications[i].data)
-//   }
-// }
-
-// window.addEventListener('keyup', checkKey, true)
 
 export default Restore.connect(Notify)

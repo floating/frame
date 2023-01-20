@@ -287,12 +287,12 @@ class Notify extends React.Component {
       >
         <div className='notifyBox'>
           <div className='notifyTitle'>
-            <div>Hot Signer Alpha</div>
+            <div>Hot Signer Warning</div>
           </div>
           <div className='notifyBody'>
             <div className='notifyBodyLine'>
-              Frame hot signers are in alpha! Do not use them with high value accounts and verify your backups
-              are valid. Only proceed if you understand and accept these risks.
+              Do not use hot signers with high value accounts and verify your backups are valid. Only proceed
+              if you understand and accept these risks.
             </div>
           </div>
           <div className='notifyInput'>
