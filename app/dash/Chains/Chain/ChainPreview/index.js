@@ -4,7 +4,7 @@ import Connection from '../Connection'
 import Gas from '../../../../../resources/Components/Gas'
 
 export default (props) => {
-  const { type, id, primaryColor, icon, name, on, symbol, price } = props
+  const { type, id, primaryColor, icon, name, on, explorer, symbol, price } = props
   return (
     <div className='network'>
       <ChainHeader
@@ -21,7 +21,7 @@ export default (props) => {
         <div className='chainModules'>
           <Connection {...props} />
           <Gas chainId={id} />
-          <ChainFooter id={id} type={type} symbol={symbol} price={price} />
+          <ChainFooter id={id} type={type} explorer={explorer} symbol={symbol} price={price} />
           <div style={{ height: '14px' }} />
         </div>
       )}

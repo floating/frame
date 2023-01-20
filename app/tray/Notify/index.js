@@ -468,7 +468,7 @@ class Notify extends React.Component {
   }
 
   openExplorer({ hash, chain }) {
-    const chainName = this.store('main.networks', chain.type, chain.id, 'name')
+    const { name: chainName, explorer: explorerUrl } = this.store('main.networks', chain.type, chain.id)
     return (
       <div className='notifyBoxWrap' onMouseDown={(e) => e.stopPropagation()}>
         <div className='notifyBox'>
@@ -482,8 +482,9 @@ class Notify extends React.Component {
             </div>
           ) : (
             <div className='notifyBody'>
-              <div className='notifyBodyLine'>{`Frame will now open the ${chainName}`}</div>
-              <div className='notifyBodyLine'>{`block explorer in your browser`}</div>
+              <div className='notifyBodyLine'>{`Frame will open the ${chainName}`}</div>
+              <div className='notifyBodyLine'>{`block explorer in your browser:`}</div>
+              <div className='notifyBodyHash'>{explorerUrl}</div>
             </div>
           )}
 

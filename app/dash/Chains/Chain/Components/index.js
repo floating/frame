@@ -215,25 +215,47 @@ export const EditTestnet = ({ testnet, onChange }) => {
   )
 }
 
-export const ChainFooter = ({ id, type, symbol, price }) => {
+const EnabledLaunchExplorerButton = ({ id, type }) => {
+  const openExplorer = (e) => {
+    link.rpc('openExplorer', { id, type }, () => {})
+  }
+
+  return (
+    <ClusterValue role='button' onClick={openExplorer}>
+      <div style={{ padding: '8px' }}>{svg.telescope(18)}</div>
+    </ClusterValue>
+  )
+}
+
+const DisabledLaunchExplorerButton = () => {
+  return (
+    <ClusterValue>
+      <div style={{ color: 'var(--ghostD)', padding: '8px' }}>{svg.telescope(18)}</div>
+    </ClusterValue>
+  )
+}
+
+const LaunchExplorerButton = ({ id, type, explorer }) => {
+  return explorer ? <EnabledLaunchExplorerButton id={id} type={type} /> : <DisabledLaunchExplorerButton />
+}
+
+const CurrentPrice = ({ symbol, price }) => {
+  return (
+    <ClusterValue grow={6}>
+      <div className='chainCurrencyItemSymbol'>{symbol}</div>
+      <div className='chainCurrencyItemAt'>{'@'}</div>
+      <div className='sliceChainIdNumber'>{'$' + price.toLocaleString() + ''}</div>
+    </ClusterValue>
+  )
+}
+
+export const ChainFooter = ({ id, type, symbol, price, explorer }) => {
   return (
     <ClusterBox>
       <Cluster>
         <ClusterRow>
-          <ClusterValue
-            onClick={(e) => {
-              link.rpc('openExplorer', { id, type }, () => {})
-            }}
-          >
-            <div role='link' style={{ padding: '8px' }}>
-              {svg.telescope(18)}
-            </div>
-          </ClusterValue>
-          <ClusterValue grow={6}>
-            <div className='chainCurrencyItemSymbol'>{symbol}</div>
-            <div className='chainCurrencyItemAt'>{'@'}</div>
-            <div className='sliceChainIdNumber'>{'$' + price.toLocaleString() + ''}</div>
-          </ClusterValue>
+          <LaunchExplorerButton id={id} type={type} explorer={explorer} />
+          <CurrentPrice symbol={symbol} price={price} />
         </ClusterRow>
       </Cluster>
     </ClusterBox>
