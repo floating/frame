@@ -729,7 +729,7 @@
   right 0
   bottom 0px
   left 0
-  padding 64px 0px 128px 0px
+  padding-top 64px
   border-radius 24px
   overflow-y scroll
 
@@ -899,9 +899,12 @@
     .signTypedDataTitle
       display block
       font-size 20px
-      margin-bottom 18px
+      margin-top 4px
       font-weight 400
       font-family 'MainFont'
+
+    .signTypedDataTitle:not(:first-child)
+      margin-top 24px
 
 .transactionValue
   position absolute
