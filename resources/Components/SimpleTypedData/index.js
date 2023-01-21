@@ -5,7 +5,7 @@ const SimpleJSON = ({ json }) => {
     <div className='simpleJson'>
       {Object.keys(json).map((key, o) => (
         <div key={key + o} className='simpleJsonChild'>
-          <div className='simpleJsonKey'>{key}:</div>
+          <div className='simpleJsonKey'>{key}</div>
           <div className='simpleJsonValue'>
             {typeof json[key] === 'object' ? <SimpleJSON json={json[key]} key={key} /> : json[key]}
           </div>
@@ -17,16 +17,12 @@ const SimpleJSON = ({ json }) => {
 
 export const SimpleTypedDataInner = ({ typedData }) =>
   typedData.domain ? (
-    <>
-      <div className='signTypedDataSection'>
-        <div className='signTypedDataTitle'>Domain</div>
-        <SimpleJSON json={typedData.domain} />
-      </div>
-      <div className='signTypedDataSection'>
-        <div className='signTypedDataTitle'>Message</div>
-        <SimpleJSON json={typedData.message} />
-      </div>
-    </>
+    <div className='signTypedDataInner'>
+      <div className='signTypedDataTitle'>Domain</div>
+      <SimpleJSON json={typedData.domain} />
+      <div className='signTypedDataTitle'>Message</div>
+      <SimpleJSON json={typedData.message} />
+    </div>
   ) : (
     <div className='signTypedDataSection'>
       <SimpleJSON
