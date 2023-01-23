@@ -1,23 +1,24 @@
-import { TypedSignatureRequestType } from '../../accounts/types'
 import { MessageTypeProperty } from '@metamask/eth-sig-util'
 
-interface LabelledMessageType {
-  name: string
-  properties: MessageTypeProperty[]
+interface LabelledSignatureType {
+  domainFilter: string[]
+  types: { [key: string]: MessageTypeProperty[] }
 }
 
-const eip612Permit: LabelledMessageType = {
-  name: 'Permit',
-  properties: [
-    { name: 'owner', type: 'address' },
-    { name: 'spender', type: 'address' },
-    { name: 'value', type: 'uint256' },
-    { name: 'nonce', type: 'uint256' },
-    { name: 'deadline', type: 'uint256' }
-  ]
+const eip612Permit: LabelledSignatureType = {
+  types: {
+    Permit: [
+      { name: 'owner', type: 'address' },
+      { name: 'spender', type: 'address' },
+      { name: 'value', type: 'uint256' },
+      { name: 'nonce', type: 'uint256' },
+      { name: 'deadline', type: 'uint256' }
+    ]
+  },
+  domainFilter: ['chainId']
 }
 
-const signatureTypes: { [key: string]: LabelledMessageType } = {
+const signatureTypes: { [key: string]: LabelledSignatureType } = {
   signErc20Permit: eip612Permit
 }
 
