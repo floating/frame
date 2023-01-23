@@ -5,7 +5,7 @@ const SimpleJSON = ({ json }) => {
     <div className='simpleJson'>
       {Object.keys(json).map((key, o) => (
         <div key={key + o} className='simpleJsonChild'>
-          <div className='simpleJsonKey'>{key}</div>
+          <div className='simpleJsonKey simpleJsonKeyTx'>{key.replace(/([A-Z])/g, ' $1').trim()}</div>
           <div className='simpleJsonValue'>
             {typeof json[key] === 'object' ? <SimpleJSON json={json[key]} key={key} /> : json[key]}
           </div>
@@ -18,9 +18,9 @@ const SimpleJSON = ({ json }) => {
 export const SimpleTypedDataInner = ({ typedData }) =>
   typedData.domain ? (
     <div className='signTypedDataInner'>
-      <div className='signTypedDataTitle'>Domain</div>
+      <div className='simpleJsonHeader'>Domain</div>
       <SimpleJSON json={typedData.domain} />
-      <div className='signTypedDataTitle'>Message</div>
+      <div className='simpleJsonHeader'>Message</div>
       <SimpleJSON json={typedData.message} />
     </div>
   ) : (
@@ -39,21 +39,11 @@ export default SimpleTypedData = ({ req, originName }) => {
   const payload = req.payload
   const typedData = payload.params[1] || {}
 
-  const messageToSign = (
-    <div className='signTypedData'>
-      <SimpleTypedDataInner {...{ typedData }} />
-    </div>
-  )
-
   return type === 'signTypedData' || 'signErc20Permit' ? (
-    <div className='approveRequest'>
-      <div className='approveTransactionPayload'>
-        <>
-          <div className='requestMeta'>
-            <div className='requestMetaOrigin'>{originName}</div>
-          </div>
-          {messageToSign}
-        </>
+    <div className='accountViewScroll cardShow'>
+      <div className='txViewData'>
+        <div className='txViewDataHeader'>{'Raw Typed Data'}</div>
+        <SimpleTypedDataInner {...{ typedData }} />
       </div>
     </div>
   ) : (
