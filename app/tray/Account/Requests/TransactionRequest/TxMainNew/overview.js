@@ -11,11 +11,11 @@ import RequestHeader from '../../../../../../resources/Components/RequestHeader'
 
 const isNonZeroHex = (hex) => !!hex && !['0x', '0x0'].includes(hex)
 
-const GenericOverview = () => (
-  <div key={key} className='_txDescriptionSummaryLine'>
-    Calling Contract
-  </div>
-)
+const ContractCallOverview = ({ method }) => {
+  const body = method ? `Calling Contract Method ${method}` : 'Calling Contract'
+
+  return <div className='_txDescriptionSummaryLine'>{body}</div>
+}
 
 const ApproveOverview = ({ amount, decimals, symbol }) => {
   return (
@@ -48,7 +48,6 @@ const SendOverview = ({ amount, decimals, symbol }) => {
 }
 
 const DeployContractOverview = () => <div>Deploying Contract</div>
-const GenericContractOverview = ({ method }) => <div>{`Calling Contract Method ${method}`}</div>
 const DataOverview = () => <div>Sending data</div>
 
 const actionOverviews = {
@@ -61,7 +60,7 @@ const renderActionOverview = (action, index) => {
   const { id = '', data } = action
   const key = id + index
   const [, actionType] = id.split(':')
-  const ActionOverview = actionOverviews[id] || GenericOverview
+  const ActionOverview = actionOverviews[id] || ContractCallOverview
 
   return <ActionOverview key={key} type={actionType} {...{ ...data }} />
 }
@@ -103,7 +102,7 @@ const TxOverview = ({
     description = renderRecognizedAction(req)
 
     if (!description && !!method) {
-      description = <GenericContractOverview method={method} />
+      description = <ContractCallOverview method={method} />
     }
   } else if (isSend) {
     description = <SendOverview amountHex={value} decimals={18} symbol={symbol} />
