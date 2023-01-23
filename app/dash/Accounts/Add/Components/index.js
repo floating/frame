@@ -132,7 +132,8 @@ export function AddHotAccount({
   validateSecret,
   firstStep = (
     <EnterSecret key={0} {...{ validateSecret, title, newAccountType, autofocus: viewIndex === 0 }} />
-  )
+  ),
+  backSteps = 4
 }) {
   const { secret, password, error, creationArgs = [] } = accountData
   const viewIndex = error ? 3 : !secret ? 0 : !password ? 1 : 2
@@ -153,7 +154,7 @@ export function AddHotAccount({
         })
       }
 
-      link.send('nav:back', 'dash', 4)
+      link.send('nav:back', 'dash', backSteps)
       link.send(`nav:forward`, 'dash', {
         view: 'expandedSigner',
         data: { signer: signer.id }

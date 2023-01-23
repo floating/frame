@@ -94,17 +94,16 @@ const LoadKeystore = ({ accountData }) => {
 
 const AddKeystore = ({ accountData }) => (
   <AddHotAccount
-    {...{
-      title: 'Key Store',
-      summary: 'A keystore account lets you add accounts from your keystore.json file',
-      svgName: 'file',
-      intro: 'Add KeyStore Account',
-      accountData,
-      createSignerMethod: 'createFromKeystore',
-      firstStep: <LoadKeystore key={0} accountData={accountData} />,
-      newAccountType: 'keystore',
-      validateSecret: () => {}
-    }}
+    title='Key Store'
+    summary='A keystore account lets you add accounts from your keystore.json file'
+    svgName='file'
+    intro='Add KeyStore Account'
+    createSignerMethod='createFromKeystore'
+    newAccountType='keystore'
+    backSteps={6}
+    accountData={accountData}
+    firstStep={<LoadKeystore key={0} accountData={accountData} />}
+    validateSecret={() => {}}
   />
 )
 
