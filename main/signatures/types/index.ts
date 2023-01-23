@@ -5,7 +5,7 @@ interface LabelledSignatureType {
   types: { [key: string]: MessageTypeProperty[] }
 }
 
-const eip612Permit: LabelledSignatureType = {
+const eip2612Permit: LabelledSignatureType = {
   types: {
     Permit: [
       { name: 'owner', type: 'address' },
@@ -19,7 +19,7 @@ const eip612Permit: LabelledSignatureType = {
 }
 
 const signatureTypes: { [key: string]: LabelledSignatureType } = {
-  signErc20Permit: eip612Permit
+  signErc20Permit: eip2612Permit
 }
 
 export default signatureTypes
