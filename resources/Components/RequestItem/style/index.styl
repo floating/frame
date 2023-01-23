@@ -71,376 +71,376 @@
   cursor pointer
   transition all linear 0.1s
 
-  .requestItemBackground
-    position absolute
-    top 0px
-    left 0px
-    right 0px
-    bottom 0
-    border-radius 1.5px
-    background linear-gradient(90deg, transparent 0%, transparent 100%)
-    opacity 0.05
-    z-index 200
-    border-radius 18px
-    display none
+.requestItemBackground
+  position absolute
+  top 0px
+  left 0px
+  right 0px
+  bottom 0
+  border-radius 1.5px
+  background linear-gradient(90deg, transparent 0%, transparent 100%)
+  opacity 0.05
+  z-index 200
+  border-radius 18px
+  display none
 
-  .requestItemCorner
-    position absolute
-    top -420px
-    left -120px
-    width 460px
-    height 460px
-    transform rotate(65deg)
-    border-radius 6px
-    opacity 0
+.requestItemCorner
+  position absolute
+  top -420px
+  left -120px
+  width 460px
+  height 460px
+  transform rotate(65deg)
+  border-radius 6px
+  opacity 0
 
-  .requestItemNotice
-    position relative
-    display flex
-    align-items center
-    justify-content center
-    text-transform uppercase
-    font-weight 400
-    font-size 11px
-    margin 14px
+.requestItemNotice
+  position relative
+  display flex
+  align-items center
+  justify-content center
+  text-transform uppercase
+  font-weight 400
+  font-size 11px
+  margin 14px
+  letter-spacing 1px
+  border-top 2px solid var(--ghostZ)
+  padding 12px 12px 0px 12px
+
+.requestItemNoticeGood
+  color var(--good)
+
+.requestItemNoticeBad
+  color var(--bad)
+
+.requestItemDetails
+  position relative
+  display flex
+  align-items center
+  justify-content space-between
+  font-weight 400
+  font-size 11px
+  letter-spacing 1px
+  width 100px
+  height 30px
+
+  span
     letter-spacing 1px
-    border-top 2px solid var(--ghostZ)
-    padding 12px 12px 0px 12px
-
-  .requestItemNoticeGood
-    color var(--good)
-
-  .requestItemNoticeBad
-    color var(--bad)
-
-  .requestItemDetails
+    padding-left 8px
+    top -1px
     position relative
-    display flex
-    align-items center
-    justify-content space-between
+
+.requestItemDetailsIndicatorStill
+  .requestItemDetailsIndicatorMarker
+    animation none
+
+.requestItemDetailsView
+  display flex
+  justify-content center
+  align-items center
+  margin-right 2px
+  .requestItemDetailsViewText
     font-weight 400
-    font-size 11px
-    letter-spacing 1px
-    width 100px
-    height 30px
-
-    span
-      letter-spacing 1px
-      padding-left 8px
-      top -1px
-      position relative
-
-  .requestItemDetailsIndicatorStill
-    .requestItemDetailsIndicatorMarker
-      animation none
-
-  .requestItemDetailsView
+    margin-right 0px
+  .requestItemDetailsViewArrow
     display flex
     justify-content center
     align-items center
-    margin-right 2px
-    .requestItemDetailsViewText
-      font-weight 400
-      margin-right 0px
-    .requestItemDetailsViewArrow
-      display flex
-      justify-content center
-      align-items center
-      div 
-        width 8px
-      svg
-        transform rotate(90deg)
+    div 
+      width 8px
+    svg
+      transform rotate(90deg)
 
-  .requestItemDetailsGood
-    .requestItemLine
-      color var(--good)
-    .requestItemLineShadow
-      color var(--ghostX)
-    .requestItemDetailsIndicator
-      .requestItemDetailsIndicatorMarker
-        background var(--good)
-
-  .requestItemDetailsBad
-    .requestItemLine
-      color var(--bad)
-    .requestItemLineShadow
-      color var(--ghostX)
-    .requestItemDetailsIndicator
-      .requestItemDetailsIndicatorMarker
-        background var(--bad)
-
-  .requestItemRow
-    position relative
-    z-index 3
-    width 100%
-    display flex
-    align-items center
-    margin-bottom 10px
-    box-sizing border-box
-
-    .requestItemRowIcon
-      width 40px
-      height 20px
-      display flex
-      justify-content center
-      align-items center
-      position relative
-      // color var(--good)
-      
-    .requestItemRowIconLarge
-      width 40px
-      height 20px
-      display flex
-      justify-content center
-      align-items center
-      //color var(--moon)
-
-    .requestItemRowChainIcon
-      position absolute
-      top 0px  
-      right 20px
-      bottom 0px
-      display flex
-      justify-content center
-      align-items center
-      width 20px
-      border-radius 10px
-
-    .requestItemRowTitle
-      position relative
-      margin-left 9px
-      font-size 12px
-      font-weight 400
-
-    .requestItemRowTitleLarge
-      position relative
-      font-weight 300
-      display flex
-      justify-content center
-      align-items center
-
-
-  @keyframes wave
-    0%
-      transform translateX(0)
-    100%
-      transform translateX(16px)
-
+.requestItemDetailsGood
   .requestItemLine
-    position absolute
-    top 0px
-    right 0px
-    bottom 0px 
-    left 0px
-    margin 0px
-    box-sizing border-box
-    display flex
-    overflow hidden
-    opacity 1
-    padding 10.5px 0px
-    border-radius 20px
-    background var(--ghostZ)
-    box-shadow inset 0px 0px 4px var(--ghostY)
-    color var(--moon)
-    display none
-    
-    svg
-      width 200%
-      position relative
-      left -100%
-      stroke-width 20px
-      animation wave 1.4s linear infinite
-      will-change transform
-
+    color var(--good)
   .requestItemLineShadow
-    background none
     color var(--ghostX)
-    box-shadow none
-    display none
-    svg
-      bottom -2px
-      filter blur(1px)
-      
-  .requestItemIcon
-    width 32px
-    height 32px
-    overflow hidden
+  .requestItemDetailsIndicator
+    .requestItemDetailsIndicatorMarker
+      background var(--good)
+
+.requestItemDetailsBad
+  .requestItemLine
+    color var(--bad)
+  .requestItemLineShadow
+    color var(--ghostX)
+  .requestItemDetailsIndicator
+    .requestItemDetailsIndicatorMarker
+      background var(--bad)
+
+.requestItemRow
+  position relative
+  z-index 3
+  width 100%
+  display flex
+  align-items center
+  margin-bottom 10px
+  box-sizing border-box
+
+  .requestItemRowIcon
+    width 40px
+    height 20px
     display flex
     justify-content center
     align-items center
-    border-radius 12px
-    z-index 2
-    -webkit-app-region no-drag
-    transition none
-    pointer-events auto
-    transform translate3d(0, 0, 0)
-
-  .requestItemTitle
     position relative
-    font-family 'MainFont'
-    font-weight 400
-    display flex
-    justify-content space-between
-    align-items center
-    font-size 16px
-    font-weight 300
-    padding 15px 12px 6px 12px
-    overflow hidden
-
-    .requestItemTitleTime
-      position absolute
-      top 12px
-      right 18px
-      bottom 3px
-      display flex
-      justify-content center
-      align-items center
-      z-index 3000
-
-      .requestItemTitleTimeItem
-        height 26px
-        display flex
-        justify-content center
-        align-items center
-        font-size 13px
-        font-weight 400
-        color var(--mint)
-
-    .requestItemMain
-      margin-top 1px
-      display flex
-      justify-content flex-start
-      flex-direction column
-      box-sizing border-box
-
-      .requestItemTitleMain
-        white-space nowrap
-        overflow hidden
-        text-overflow ellipsis
-
-    .requestItemTitleLeft
-      display flex
-      justify-content flex-start
-      align-items center
-      box-sizing border-box
-      margin-left 0px
-
-    .requestItemTitleMain
-      font-weight 400
-      margin-left 8px
-
-  .requestItemTitleSub
-    display flex
-    justify-content flex-start
-    align-items center
-    font-size 11px
-    font-weight 300
-
-    .requestItemTitleSubIcon
-      margin 1px 9px 0px -5px
-      color var(--outerspace)
-
-    .requestItemTitleSubText
-      font-weight 400
-      margin 0px 0px 0px 0px
-
-
-  .requestItemSource
-    position absolute
-    top 0px  
-    right 20px
-    bottom 0px
-    font-size 12px
-    font-weight 400
+    // color var(--good)
+    
+  .requestItemRowIconLarge
+    width 40px
+    height 20px
     display flex
     justify-content center
     align-items center
     //color var(--moon)
-    margin-top -2px
 
-    div
-      margin-right 5px
-    svg
-      position relative
-      top 1px
-
-  .requestItemOrigin
-    top 16px
-    right 16px
+  .requestItemRowChainIcon
     position absolute
-    font-weight 300
-    margin-left 2px
+    top 0px  
+    right 20px
+    bottom 0px
     display flex
+    justify-content center
     align-items center
-    font-size 10px
-    margin-top 3px
+    width 20px
+    border-radius 10px
 
-    .requestItemOriginIcon
-      position relative
-      top -1px
+  .requestItemRowTitle
+    position relative
+    margin-left 9px
+    font-size 12px
+    font-weight 400
+
+  .requestItemRowTitleLarge
+    position relative
+    font-weight 300
+    display flex
+    justify-content center
+    align-items center
+
+
+@keyframes wave
+  0%
+    transform translateX(0)
+  100%
+    transform translateX(16px)
+
+.requestItemLine
+  position absolute
+  top 0px
+  right 0px
+  bottom 0px 
+  left 0px
+  margin 0px
+  box-sizing border-box
+  display flex
+  overflow hidden
+  opacity 1
+  padding 10.5px 0px
+  border-radius 20px
+  background var(--ghostZ)
+  box-shadow inset 0px 0px 4px var(--ghostY)
+  color var(--moon)
+  display none
+  
+  svg
+    width 200%
+    position relative
+    left -100%
+    stroke-width 20px
+    animation wave 1.4s linear infinite
+    will-change transform
+
+.requestItemLineShadow
+  background none
+  color var(--ghostX)
+  box-shadow none
+  display none
+  svg
+    bottom -2px
+    filter blur(1px)
+    
+.requestItemIcon
+  width 32px
+  height 32px
+  overflow hidden
+  display flex
+  justify-content center
+  align-items center
+  border-radius 12px
+  z-index 2
+  -webkit-app-region no-drag
+  transition none
+  pointer-events auto
+  transform translate3d(0, 0, 0)
+
+.requestItemTitle
+  position relative
+  font-family 'MainFont'
+  font-weight 400
+  display flex
+  justify-content space-between
+  align-items center
+  font-size 16px
+  font-weight 300
+  padding 15px 12px 6px 12px
+  overflow hidden
+
+  .requestItemTitleTime
+    position absolute
+    top 12px
+    right 18px
+    bottom 3px
+    display flex
+    justify-content center
+    align-items center
+    z-index 3000
+
+    .requestItemTitleTimeItem
+      height 26px
       display flex
       justify-content center
       align-items center
+      font-size 13px
+      font-weight 400
+      color var(--mint)
 
-  .requestItemStatus
-    font-size 10px
-    bottom 16px
-    left 64px
-    position absolute
-    font-weight 300
-    margin-left 2px
-
-  .requestItemRight
-    width 64px
+  .requestItemMain
+    margin-top 1px
     display flex
-    justify-content center
+    justify-content flex-start
+    flex-direction column
+    box-sizing border-box
+
+    .requestItemTitleMain
+      white-space nowrap
+      overflow hidden
+      text-overflow ellipsis
+
+  .requestItemTitleLeft
+    display flex
+    justify-content flex-start
     align-items center
-    transform scaleX(-1)
+    box-sizing border-box
+    margin-left 0px
+
+  .requestItemTitleMain
+    font-weight 400
+    margin-left 8px
+
+.requestItemTitleSub
+  display flex
+  justify-content flex-start
+  align-items center
+  font-size 11px
+  font-weight 300
+
+  .requestItemTitleSubIcon
+    margin 1px 9px 0px -5px
+    color var(--outerspace)
+
+  .requestItemTitleSubText
+    font-weight 400
+    margin 0px 0px 0px 0px
+
+
+.requestItemSource
+  position absolute
+  top 0px  
+  right 20px
+  bottom 0px
+  font-size 12px
+  font-weight 400
+  display flex
+  justify-content center
+  align-items center
+  //color var(--moon)
+  margin-top -2px
+
+  div
+    margin-right 5px
+  svg
     position relative
-    left 1px
+    top 1px
 
-  .requestItemDetailsSlide
-    display flex
-    align-items center
-    text-transform uppercase
-    font-size 10px
-    font-weight 500
-    padding-left 6px
-    letter-spacing 1px
-    padding-top 4px
- 
-  .requestItemWave
-    display absolute
-    top 0
-    left 0
-    bottom 0
-    left 0
-    
-  .requestItemWaveDisabled
-    .requestItemLine
-      svg
-        animation-play-state paused
+.requestItemOrigin
+  top 16px
+  right 16px
+  position absolute
+  font-weight 300
+  margin-left 2px
+  display flex
+  align-items center
+  font-size 10px
+  margin-top 3px
 
-  .requestItemDetailsIndicator
-    height 12px
-    width 12px
+  .requestItemOriginIcon
+    position relative
+    top -1px
     display flex
     justify-content center
     align-items center
-    border-radius 6px
-    box-shadow inset 0px 0px 3px var(--ghostX)
-    margin-right 4px
 
-    .requestItemDetailsIndicatorMarker
-      height 6px
-      width 6px
-      border-radius 3px
-      background var(--moon)
-      z-index 4
-      position relative
-      top 0px
-      animation lit infinite ease-in-out alternate 1s
-      will-change opacity
+.requestItemStatus
+  font-size 10px
+  bottom 16px
+  left 64px
+  position absolute
+  font-weight 300
+  margin-left 2px
+
+.requestItemRight
+  width 64px
+  display flex
+  justify-content center
+  align-items center
+  transform scaleX(-1)
+  position relative
+  left 1px
+
+.requestItemDetailsSlide
+  display flex
+  align-items center
+  text-transform uppercase
+  font-size 10px
+  font-weight 500
+  padding-left 6px
+  letter-spacing 1px
+  padding-top 4px
+
+.requestItemWave
+  display absolute
+  top 0
+  left 0
+  bottom 0
+  left 0
+  
+.requestItemWaveDisabled
+  .requestItemLine
+    svg
+      animation-play-state paused
+
+.requestItemDetailsIndicator
+  height 12px
+  width 12px
+  display flex
+  justify-content center
+  align-items center
+  border-radius 6px
+  box-shadow inset 0px 0px 3px var(--ghostX)
+  margin-right 4px
+
+  .requestItemDetailsIndicatorMarker
+    height 6px
+    width 6px
+    border-radius 3px
+    background var(--moon)
+    z-index 4
+    position relative
+    top 0px
+    animation lit infinite ease-in-out alternate 1s
+    will-change opacity
 
 .requestItemSummary
   display flex

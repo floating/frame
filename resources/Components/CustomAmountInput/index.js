@@ -29,7 +29,11 @@ const Details = ({ address, name }) => {
       >
         <div className='clusterAddress'>
           <span className='clusterAddressRecipient'>
-            {name || (
+            {name ? (
+              <span className='clusterAddressRecipient' style={{ fontFamily: 'MainFont', fontWeight: '400' }}>
+                {name}
+              </span>
+            ) : (
               <>
                 {address.substring(0, 8)}
                 {svg.octicon('kebab-horizontal', { height: 15 })}
@@ -164,9 +168,13 @@ const CustomAmountInput = ({
 
         <Cluster style={{ marginTop: '16px' }}>
           <ClusterRow>
+            <ClusterValue>
+              <div className='approveTokenSpendAmountLabel'>{symbol}</div>
+            </ClusterValue>
+          </ClusterRow>
+          <ClusterRow>
             <ClusterValue transparent={true} pointerEvents={'auto'}>
               <div className='approveTokenSpendAmount'>
-                <div className='approveTokenSpendAmountLabel'>{symbol}</div>
                 {isCustom && amount !== fromDecimal(custom) ? (
                   <div
                     className='approveTokenSpendAmountSubmit'
@@ -223,8 +231,12 @@ const CustomAmountInput = ({
                     {displayAmount}
                   </div>
                 )}
-                <div className='approveTokenSpendAmountSubtitle'>Set Token Approval Spend Limit</div>
               </div>
+            </ClusterValue>
+          </ClusterRow>
+          <ClusterRow>
+            <ClusterValue transparent={true}>
+              <div className='approveTokenSpendAmountSubtitle'>Set Token Approval Spend Limit</div>
             </ClusterValue>
           </ClusterRow>
           <ClusterRow>

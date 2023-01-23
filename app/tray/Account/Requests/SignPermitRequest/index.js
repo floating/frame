@@ -47,109 +47,106 @@ const PermitOverview = ({ permit, req, chainData, originName, tokenData }) => {
     <div className='approveRequest'>
       <div className='approveTransactionPayload'>
         <div className='_txBody'>
-          <RequestItem
-            key={`signErc20Permit:${req.handlerId}`}
-            req={req}
-            account={owner}
-            handlerId={req.handlerId}
-            i={0}
-            title={`Token Spend Permit`}
-            color={chainColor ? `var(--${chainColor})` : ''}
-            img={icon}
-            headerMode={true}
-          >
-            <div>
-              <ClusterBox animationSlot={1}>
-                <Cluster>
-                  <ClusterRow>
-                    <ClusterValue>
-                      <div className='_txDescription'>
-                        <RequestHeader chain={chainName} chainColor={chainColor}>
-                          <div className='requestItemTitleSub'>
-                            <div className='requestItemTitleSubIcon'>{svg.window(10)}</div>
-                            <div className='requestItemTitleSubText'>{originName}</div>
-                          </div>
-                        </RequestHeader>
+          <ClusterBox animationSlot={1}>
+            <RequestItem
+              key={`signErc20Permit:${req.handlerId}`}
+              req={req}
+              account={owner}
+              handlerId={req.handlerId}
+              i={0}
+              title={`Mainnet Token Permit`}
+              color={chainColor ? `var(--${chainColor})` : ''}
+              img={icon}
+              headerMode={true}
+            />
+            <Cluster>
+              <ClusterRow>
+                <ClusterValue
+                  onClick={() => {
+                    link.send('nav:update', 'panel', {
+                      data: { step: 'viewRaw' }
+                    })
+                  }}
+                >
+                  <div className='_txDescription'>
+                    <RequestHeader chain={chainName} chainColor={chainColor}>
+                      <div className='requestItemTitleSub'>
+                        <div className='requestItemTitleSubIcon'>{svg.window(10)}</div>
+                        <div className='requestItemTitleSubText'>{originName}</div>
                       </div>
-                    </ClusterValue>
-                  </ClusterRow>
-                  {Boolean(tokenData.decimals) && (
-                    <>
-                      <ClusterRow>
-                        <ClusterValue
-                          onClick={() => {
-                            link.send('nav:update', 'panel', {
-                              data: {
-                                step: 'adjustPermit',
-                                tokenData
-                              }
-                            })
-                          }}
-                        >
-                          <div className='clusterFocus'>
-                            <div>{`Granting Permission To Spend`}</div>
-                            <div className='clusterFocusHighlight'>{`${
-                              isUnlimited(value)
-                                ? '~UNLIMITED'
-                                : new BigNumber(value).shiftedBy(-tokenData.decimals)
-                            } ${tokenData.symbol || '??'}`}</div>
-                          </div>
-                        </ClusterValue>
-                      </ClusterRow>
-
-                      <ClusterRow>
-                        <ClusterValue
-                          pointerEvents={true}
-                          onClick={() => {
-                            copySpender(spender)
-                          }}
-                        >
-                          <div className='clusterAddress'>
-                            <div style={{ textAlign: 'center' }}>{`TO`}</div>
-                            <span className='clusterAddressRecipient'>
-                              {spender.substring(0, 8)}
-                              {svg.octicon('kebab-horizontal', { height: 15 })}
-                              {spender.substring(spender.length - 6)}
-                            </span>
-                            <div className='clusterAddressRecipientFull'>
-                              {showCopiedMessage ? (
-                                <span>{'Address Copied'}</span>
-                              ) : (
-                                <span className='clusterFira'>{spender}</span>
-                              )}
-                            </div>
-                          </div>
-                        </ClusterValue>
-                      </ClusterRow>
-
-                      <ClusterRow>
-                        <ClusterValue>
-                          <Countdown
-                            end={deadline * 1000}
-                            title={'Permission Expires in'}
-                            innerClass='clusterFocusHighlight'
-                            titleClass='clusterFocus'
-                          />
-                        </ClusterValue>
-                      </ClusterRow>
-                    </>
-                  )}
-
+                      <div className='_txDescriptionSummaryMain'>{`Requesting permit to spend ${
+                        tokenData.symbol || '??'
+                      }`}</div>
+                    </RequestHeader>
+                  </div>
+                </ClusterValue>
+              </ClusterRow>
+            </Cluster>
+          </ClusterBox>
+          <ClusterBox title={'Token Permit'} animationSlot={1}>
+            <Cluster>
+              {Boolean(tokenData.decimals) && (
+                <>
                   <ClusterRow>
                     <ClusterValue
                       onClick={() => {
                         link.send('nav:update', 'panel', {
-                          data: { step: 'viewRaw' }
+                          data: {
+                            step: 'adjustPermit',
+                            tokenData
+                          }
                         })
                       }}
                     >
-                      <div className='_txMainTag _txMainTagWarning'>{'View Raw Signature Data'}</div>
+                      <div className='clusterFocus'>
+                        <div>{`Granting Permission To Spend`}</div>
+                        <div className='clusterFocusHighlight'>{`${
+                          isUnlimited(value)
+                            ? '~UNLIMITED'
+                            : new BigNumber(value).shiftedBy(-tokenData.decimals)
+                        } ${tokenData.symbol || '??'}`}</div>
+                      </div>
                     </ClusterValue>
                   </ClusterRow>
-                </Cluster>
-              </ClusterBox>
-            </div>
-          </RequestItem>
+
+                  <ClusterRow>
+                    <ClusterValue
+                      pointerEvents={true}
+                      onClick={() => {
+                        copySpender(spender)
+                      }}
+                    >
+                      <div className='clusterAddress'>
+                        <span className='clusterAddressRecipient'>
+                          {spender.substring(0, 8)}
+                          {svg.octicon('kebab-horizontal', { height: 15 })}
+                          {spender.substring(spender.length - 6)}
+                        </span>
+                        <div className='clusterAddressRecipientFull'>
+                          {showCopiedMessage ? (
+                            <span>{'Address Copied'}</span>
+                          ) : (
+                            <span className='clusterFira'>{spender}</span>
+                          )}
+                        </div>
+                      </div>
+                    </ClusterValue>
+                  </ClusterRow>
+
+                  <ClusterRow>
+                    <ClusterValue>
+                      <Countdown
+                        end={deadline * 1000}
+                        title={'Permission Expires in'}
+                        innerClass='clusterFocusHighlight'
+                        titleClass='clusterFocus'
+                      />
+                    </ClusterValue>
+                  </ClusterRow>
+                </>
+              )}
+            </Cluster>
+          </ClusterBox>
         </div>
       </div>
     </div>
