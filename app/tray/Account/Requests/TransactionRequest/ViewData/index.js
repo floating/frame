@@ -111,8 +111,7 @@ class ViewData extends React.Component {
   }
 
   renderDecodedData() {
-    const { accountId, handlerId, step } = this.props
-    const req = this.store('main.accounts', accountId, 'requests', handlerId)
+    const { req } = this.props
     return req.decodedData ? (
       <div className='decodedDataContract'>
         <div className='decodedDataContractArgHeader'>Contract Method</div>
@@ -169,8 +168,7 @@ class ViewData extends React.Component {
   }
 
   render() {
-    const { accountId, handlerId, step } = this.props
-    const req = this.store('main.accounts', accountId, 'requests', handlerId)
+    const { req } = this.props
     const { data } = req
     const tx = { nonce: 'TBD', ...data }
     return (
