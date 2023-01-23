@@ -37,7 +37,7 @@ class AddAccounts extends React.Component {
   renderAddKeystore({ accountData }) {
     return (
       <div className='addAccounts cardShow'>
-        <AddKeystore close={this.props.close} {...{ accountData }} />
+        <AddKeystore close={this.props.close} accountData={accountData} />
       </div>
     )
   }
