@@ -1,6 +1,6 @@
 import React from 'react'
 import Restore from 'react-restore'
-import { setupComponent } from '../../../../../componentSetup'
+import { render } from '../../../../../componentSetup'
 
 import store from '../../../../../../main/store'
 import link from '../../../../../../resources/link'
@@ -31,9 +31,7 @@ describe('selecting a keystore', () => {
       cb('ERROR HERE')
     })
 
-    const { user, getAllByRole } = setupComponent(<AddKeystore accountData={{}} />, {
-      advanceTimersAfterInput: true
-    })
+    const { user, getAllByRole } = render(<AddKeystore accountData={{}} />)
     const selectKeystoreButton = getAllByRole('button')[index]
 
     await user.click(selectKeystoreButton)
@@ -51,14 +49,10 @@ describe('selecting a keystore', () => {
       cb(null, keystore)
     })
 
-    const { user, getAllByRole } = setupComponent(<AddKeystore accountData={{}} />)
+    const { user, getAllByRole } = render(<AddKeystore accountData={{}} />, { advanceTimersAfterInput: true })
     const selectKeystoreButton = getAllByRole('button')[index]
 
     await user.click(selectKeystoreButton)
-
-    act(() => {
-      jest.runAllTimers()
-    })
 
     expect(link.send).toHaveBeenCalledWith('nav:forward', 'dash', {
       view: 'accounts',
@@ -75,14 +69,12 @@ describe('selecting a keystore', () => {
 
 describe('entering keystore password', () => {
   it('Should update the navigation to the confirmation screen when a password is submitted', async () => {
-    const { user, getAllByRole } = setupComponent(<AddKeystore accountData={{ keystore }} />)
+    const { user, getAllByRole } = render(<AddKeystore accountData={{ keystore }} />, {
+      advanceTimersAfterInput: true
+    })
     const passwordEntryTextArea = getAllByRole('textbox')[0]
 
     await user.type(passwordEntryTextArea, keystorePassword)
-
-    act(() => {
-      jest.runAllTimers()
-    })
 
     const continueButton = getAllByRole('button')[0]
     await user.click(continueButton)
@@ -103,14 +95,13 @@ describe('entering keystore password', () => {
 
 describe('entering signer password', () => {
   it('Should update the navigation to the confirmation screen when a password is submitted', async () => {
-    const { user, getAllByRole } = setupComponent(<AddKeystore accountData={{ secret: keystore }} />)
+    const { user, getAllByRole } = render(<AddKeystore accountData={{ secret: keystore }} />, {
+      advanceTimersAfterInput: true
+    })
     const passwordEntryTextArea = getAllByRole('textbox')[0]
 
     await user.type(passwordEntryTextArea, signerPassword)
 
-    act(() => {
-      jest.runAllTimers()
-    })
     const createButton = getAllByRole('button')[1]
     await user.click(createButton)
     expect(link.send).toHaveBeenCalledWith('nav:forward', 'dash', {
@@ -129,28 +120,16 @@ describe('entering signer password', () => {
 })
 
 describe('confirming signer password', () => {
-  // beforeEach(() => {
-  //   const component = setupComponent(
-  //     <AddKeystore accountData={{ secret: keystore, password: signerPassword }} />
-  //   )
-  //   user = component.user
-  //   passwordEntryTextArea = component.getAllByRole('textbox')[2]
-  // confirmButton = component.getAllByRole('button')[2]
-  // })
-
   it('Should try to create keystore account when a matching password is submitted', async () => {
-    const { user, getAllByRole } = setupComponent(
+    const { user, getAllByRole } = render(
       <AddKeystore
         accountData={{ secret: keystore, password: signerPassword, creationArgs: [keystorePassword] }}
-      />
+      />,
+      { advanceTimersAfterInput: true }
     )
     const confirmInput = getAllByRole('textbox')[1]
     const confirmButton = getAllByRole('button')[2]
     await user.type(confirmInput, signerPassword)
-
-    act(() => {
-      jest.runAllTimers()
-    })
 
     await user.click(confirmButton)
     expect(link.rpc).toHaveBeenCalledWith(
@@ -163,10 +142,11 @@ describe('confirming signer password', () => {
   })
 
   it('Should remove the previous screens related to adding an account from the navigation', async () => {
-    const { user, getAllByRole } = setupComponent(
+    const { user, getAllByRole } = render(
       <AddKeystore
         accountData={{ secret: keystore, password: signerPassword, creationArgs: [keystorePassword] }}
-      />
+      />,
+      { advanceTimersAfterInput: true }
     )
     const confirmInput = getAllByRole('textbox')[1]
     const confirmButton = getAllByRole('button')[2]
@@ -176,18 +156,16 @@ describe('confirming signer password', () => {
 
     await user.type(confirmInput, signerPassword)
 
-    act(() => {
-      jest.runAllTimers()
-    })
     await user.click(confirmButton)
     expect(link.send).toHaveBeenCalledWith('nav:back', 'dash', 6)
   })
 
   it('Should update the navigation to view the newly created account', async () => {
-    const { user, getAllByRole } = setupComponent(
+    const { user, getAllByRole } = render(
       <AddKeystore
         accountData={{ secret: keystore, password: signerPassword, creationArgs: [keystorePassword] }}
-      />
+      />,
+      { advanceTimersAfterInput: true }
     )
     const confirmInput = getAllByRole('textbox')[1]
     const confirmButton = getAllByRole('button')[2]
@@ -197,9 +175,6 @@ describe('confirming signer password', () => {
 
     await user.type(confirmInput, signerPassword)
 
-    act(() => {
-      jest.runAllTimers()
-    })
     await user.click(confirmButton)
     expect(link.send).toHaveBeenCalledWith('nav:forward', 'dash', {
       view: 'expandedSigner',
