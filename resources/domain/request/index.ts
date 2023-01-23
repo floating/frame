@@ -14,7 +14,7 @@ export const isSignatureRequest = (requestType: string): requestType is Signatur
 export const accountViewTitles: Record<RequestType, string> = {
   sign: 'Sign Mesage',
   signTypedData: 'Sign Data',
-  signErc20Permit: 'Sign Token Spend Permit',
+  signErc20Permit: 'Sign Token Permit',
   transaction: 'Sign Transaction',
   access: 'Account Access',
   addChain: 'Add Chain',
