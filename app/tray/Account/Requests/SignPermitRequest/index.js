@@ -54,61 +54,40 @@ const PermitOverview = ({ permit, req, chainData, originName, tokenData }) => {
               account={owner}
               handlerId={req.handlerId}
               i={0}
-              title={`Mainnet Token Permit`}
+              title={`${chainName} Token Permit`}
               color={chainColor ? `var(--${chainColor})` : ''}
               img={icon}
               headerMode={true}
-            />
-            <Cluster>
-              <ClusterRow>
-                <ClusterValue
-                  onClick={() => {
-                    link.send('nav:update', 'panel', {
-                      data: { step: 'viewRaw' }
-                    })
-                  }}
-                >
-                  <div className='_txDescription'>
-                    <RequestHeader chain={chainName} chainColor={chainColor}>
-                      <div className='requestItemTitleSub'>
-                        <div className='requestItemTitleSubIcon'>{svg.window(10)}</div>
-                        <div className='requestItemTitleSubText'>{originName}</div>
-                      </div>
-                      <div className='_txDescriptionSummaryMain'>{`Requesting permit to spend ${
-                        tokenData.symbol || '??'
-                      }`}</div>
-                    </RequestHeader>
-                  </div>
-                </ClusterValue>
-              </ClusterRow>
-            </Cluster>
+            >
+              <Cluster>
+                <ClusterRow>
+                  <ClusterValue
+                    onClick={() => {
+                      link.send('nav:update', 'panel', {
+                        data: { step: 'viewRaw' }
+                      })
+                    }}
+                  >
+                    <div className='_txDescription'>
+                      <RequestHeader chain={chainName} chainColor={chainColor}>
+                        <div className='requestItemTitleSub'>
+                          <div className='requestItemTitleSubIcon'>{svg.window(10)}</div>
+                          <div className='requestItemTitleSubText'>{originName}</div>
+                        </div>
+                        <div className='_txDescriptionSummaryMain'>{`Token Permit to Spend ${
+                          tokenData.symbol || '??'
+                        }`}</div>
+                      </RequestHeader>
+                    </div>
+                  </ClusterValue>
+                </ClusterRow>
+              </Cluster>
+            </RequestItem>
           </ClusterBox>
-          <ClusterBox title={'Token Permit'} animationSlot={1}>
+          <ClusterBox title={'Token Permit'} animationSlot={2}>
             <Cluster>
               {Boolean(tokenData.decimals) && (
                 <>
-                  <ClusterRow>
-                    <ClusterValue
-                      onClick={() => {
-                        link.send('nav:update', 'panel', {
-                          data: {
-                            step: 'adjustPermit',
-                            tokenData
-                          }
-                        })
-                      }}
-                    >
-                      <div className='clusterFocus'>
-                        <div>{`Granting Permission To Spend`}</div>
-                        <div className='clusterFocusHighlight'>{`${
-                          isUnlimited(value)
-                            ? '~UNLIMITED'
-                            : new BigNumber(value).shiftedBy(-tokenData.decimals)
-                        } ${tokenData.symbol || '??'}`}</div>
-                      </div>
-                    </ClusterValue>
-                  </ClusterRow>
-
                   <ClusterRow>
                     <ClusterValue
                       pointerEvents={true}
@@ -132,12 +111,45 @@ const PermitOverview = ({ permit, req, chainData, originName, tokenData }) => {
                       </div>
                     </ClusterValue>
                   </ClusterRow>
+                  <ClusterRow>
+                    <ClusterValue>
+                      <div
+                        className='clusterTag'
+                        style={{ color: 'var(--moon)' }}
+                      >{`is requesting permission to spend`}</div>
+                    </ClusterValue>
+                  </ClusterRow>
+                  <ClusterRow>
+                    <ClusterValue
+                      onClick={() => {
+                        link.send('nav:update', 'panel', {
+                          data: {
+                            step: 'adjustPermit',
+                            tokenData
+                          }
+                        })
+                      }}
+                    >
+                      <div className='clusterFocus'>
+                        <div className='clusterFocusHighlight'>{`${
+                          isUnlimited(value)
+                            ? '~UNLIMITED'
+                            : new BigNumber(value).shiftedBy(-tokenData.decimals)
+                        } ${tokenData.symbol || '??'}`}</div>
+                      </div>
+                    </ClusterValue>
+                  </ClusterRow>
+
+                  <ClusterRow>
+                    <ClusterValue>
+                      <div className='clusterTag'>Permit Expires In</div>
+                    </ClusterValue>
+                  </ClusterRow>
 
                   <ClusterRow>
                     <ClusterValue>
                       <Countdown
                         end={deadline * 1000}
-                        title={'Permission Expires in'}
                         innerClass='clusterFocusHighlight'
                         titleClass='clusterFocus'
                       />
