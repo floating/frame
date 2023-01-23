@@ -4,7 +4,9 @@ import path from 'path'
 
 import store from '../store'
 
-export function createWindow(
+const isDev = process.env.NODE_ENV === 'development'
+
+function createWindow(
   name: string,
   opts?: BrowserWindowConstructorOptions,
   webPreferences: BrowserWindowConstructorOptions['webPreferences'] = {}
@@ -41,6 +43,18 @@ export function createWindow(
   browserWindow.webContents.setWindowOpenHandler(() => ({ action: 'deny' })) // Prevent new windows
 
   return browserWindow
+}
+
+export function initWindow(id: string, opts: Electron.BrowserWindowConstructorOptions) {
+  // in development, serve files from local filesystem instead of the created bundle
+  const url = isDev
+    ? `http://localhost:1234/${id}/index.dev.html`
+    : new URL(path.join(process.env.BUNDLE_LOCATION, `${id}.html`), 'file:')
+
+  const window = createWindow(id, opts)
+  window.loadURL(url.toString())
+
+  return window
 }
 
 export function createViewInstance(

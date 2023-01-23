@@ -2,188 +2,37 @@ import {
   app as electronApp,
   BrowserWindow,
   ipcMain,
-  screen,
   globalShortcut,
   IpcMainEvent,
   WebContents
 } from 'electron'
-import path from 'path'
-import log from 'electron-log'
-import EventEmitter from 'events'
-import { hexToInt } from '../../resources/utils'
 
 import store from '../store'
 import FrameManager from './frames'
-import { createWindow } from './window'
 import { SystemTray, SystemTrayEventHandlers } from './systemTray'
+import { Tray } from './tray'
+import { Dash } from './dash'
+import { Onboard } from './onboard'
+import { hexToInt } from '../../resources/utils'
+import { detectMouse, glideIsTriggered, resetGlide } from './screen'
 
-type Windows = { [key: string]: BrowserWindow }
-
-const events = new EventEmitter()
 const frameManager = new FrameManager()
 const isDev = process.env.NODE_ENV === 'development'
-const devToolsEnabled = isDev || process.env.ENABLE_DEV_TOOLS === 'true'
-const fullheight = !!process.env.FULL_HEIGHT
-const openedAtLogin =
-  electronApp?.getLoginItemSettings() && electronApp.getLoginItemSettings().wasOpenedAtLogin
-const windows: Windows = {}
-const showOnReady = true
-const trayWidth = 400
-const devHeight = 800
 const isWindows = process.platform === 'win32'
+const showOnReady = true
+let manager: WindowManager
 
-let tray: Tray
-let dash: Dash
-let onboard: Onboard
-let mouseTimeout: NodeJS.Timeout
-let glide = false
-
-const app = {
-  hide: () => {
-    tray.hide()
-    if (dash.isVisible()) {
-      dash.hide('app')
-    }
-  },
-  show: () => {
-    tray.show()
-    if (dash.hiddenByAppHide || dash.isVisible()) {
-      dash.show()
-    }
-  },
-  toggle: () => {
-    const eventName = tray.isVisible() ? 'hide' : 'show'
-    app[eventName as keyof typeof app]()
-  }
-}
-const systemTrayEventHandlers: SystemTrayEventHandlers = {
-  click: () => {
-    if (isWindows) {
-      app.toggle()
-    }
-  },
-  clickHide: () => app.hide(),
-  clickShow: () => app.show()
-}
-const systemTray = new SystemTray(systemTrayEventHandlers)
-const getDisplaySummonShortcut = () => store('main.shortcuts.altSlash')
-
-const topRight = (window: BrowserWindow) => {
-  const area = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
-  const screenSize = area
-  const windowSize = window.getSize()
-  return {
-    x: Math.floor(screenSize.x + screenSize.width - windowSize[0]),
-    y: screenSize.y
-  }
-}
-
-const detectMouse = () => {
-  const m1 = screen.getCursorScreenPoint()
-  const display = screen.getDisplayNearestPoint(m1)
-  const area = display.workArea
-  const bounds = display.bounds
-  const minX = area.width + area.x - 2
-  const center = (area.height + (area.y - bounds.y)) / 2
-  const margin = (area.height + (area.y - bounds.y)) / 2 - 5
-  m1.y = m1.y - area.y
-  const minY = center - margin
-  const maxY = center + margin
-  mouseTimeout = setTimeout(() => {
-    if (m1.x >= minX && m1.y >= minY && m1.y <= maxY) {
-      const m2 = screen.getCursorScreenPoint()
-      const area = screen.getDisplayNearestPoint(m2).workArea
-      m2.y = m2.y - area.y
-      if (m2.x >= minX && m2.y === m1.y) {
-        glide = true
-        tray.show()
-      } else {
-        detectMouse()
-      }
-    } else {
-      detectMouse()
-    }
-  }, 50)
-}
-
-function initWindow(id: string, opts: Electron.BrowserWindowConstructorOptions) {
-  // in development, serve files from local filesystem instead of the created bundle
-  const url = isDev
-    ? `http://localhost:1234/${id}/index.dev.html`
-    : new URL(path.join(process.env.BUNDLE_LOCATION, `${id}.html`), 'file:')
-
-  windows[id] = createWindow(id, opts)
-  windows[id].loadURL(url.toString())
-}
-
-function initTrayWindow() {
-  initWindow('tray', {
-    width: trayWidth,
-    icon: path.join(__dirname, './AppIcon.png')
-  })
-
-  windows.tray.on('closed', () => delete windows.tray)
-  windows.tray.webContents.session.setPermissionRequestHandler((webContents, permission, res) => res(false))
-  windows.tray.setResizable(false)
-  windows.tray.setMovable(false)
-  windows.tray.setSize(0, 0)
-
-  const { width, height, x, y } = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
-  windows.tray.setPosition(width + x, height + y)
-
-  windows.tray.on('show', () => {
-    if (process.platform === 'win32') {
-      systemTray.closeContextMenu()
-    }
-    systemTray.setContextMenu('hide', { displaySummonShortcut: getDisplaySummonShortcut() })
-  })
-  windows.tray.on('hide', () => {
-    if (process.platform === 'win32') {
-      systemTray.closeContextMenu()
-    }
-    systemTray.setContextMenu('show', { displaySummonShortcut: getDisplaySummonShortcut() })
-  })
-
-  setTimeout(() => {
-    windows.tray.on('focus', () => tray.show())
-  }, 2000)
-
-  if (devToolsEnabled) {
-    windows.tray.webContents.openDevTools()
-  }
-
-  setTimeout(() => {
-    windows.tray.on('blur', () => {
-      setTimeout(() => {
-        if (tray.canAutoHide()) {
-          tray.hide()
-        }
-      }, 100)
-    })
-    windows.tray.focus()
-  }, 1260)
-
-  windows.tray.once('ready-to-show', () => {
-    if (!openedAtLogin) {
-      tray.show()
-    }
-  })
-
-  setTimeout(() => {
-    screen.on('display-added', () => tray.hide())
-    screen.on('display-removed', () => tray.hide())
-    screen.on('display-metrics-changed', () => tray.hide())
-  }, 30 * 1000)
-}
-
-export class Tray {
-  private recentDisplayEvent = false
-  private recentDisplayEventTimeout?: NodeJS.Timeout
+class WindowManager {
+  private tray: Tray
+  private dash: Dash
+  private onboard?: Onboard
   private gasObserver: Observer
-  private ready = false
-  private readyHandler: () => void
 
   constructor() {
+    // if (this.tray) {
+    //   this.tray.destroy()
+    // }
+
     this.gasObserver = store.observer(() => {
       let title = ''
       if (store('platform') === 'darwin' && store('main.menubarGasPrice')) {
@@ -194,9 +43,20 @@ export class Tray {
       }
       systemTray.setTitle(title)
     })
-    this.readyHandler = () => {
-      this.ready = true
-      systemTray.init(windows.tray)
+
+    this.tray = new Tray()
+    this.dash = new Dash()
+
+    if (!store('main.mute.onboardingWindow')) {
+      this.onboard = new Onboard()
+      this.onboard.on('close', () => {
+        store.completeOnboarding()
+        this.tray.focus()
+      })
+    }
+
+    this.tray.once('ready', () => {
+      systemTray.init(this.tray)
       systemTray.setContextMenu('hide', { displaySummonShortcut: getDisplaySummonShortcut() })
       if (showOnReady) {
         store.trayOpen(true)
@@ -205,239 +65,119 @@ export class Tray {
       const showOnboardingWindow = !store('main.mute.onboardingWindow')
       if (store('windows.dash.showing') || showOnboardingWindow) {
         setTimeout(() => {
-          dash.show()
+          this.dash.show()
         }, 300)
       }
 
       if (showOnboardingWindow) {
         setTimeout(() => {
-          onboard.show()
+          this.onboard?.show()
         }, 600)
       }
-    }
-    ipcMain.once('tray:ready', this.readyHandler)
-    initTrayWindow()
-  }
+    })
 
-  isReady() {
-    return this.ready
-  }
+    this.tray.once('destroy', () => this.gasObserver.remove())
+    this.tray.on('show', () => {
+      if (process.platform === 'win32') {
+        systemTray.closeContextMenu()
+      }
+      systemTray.setContextMenu('hide', { displaySummonShortcut: getDisplaySummonShortcut() })
+    })
+    this.tray.on('hide', () => {
+      if (process.platform === 'win32') {
+        systemTray.closeContextMenu()
+      }
+      systemTray.setContextMenu('show', { displaySummonShortcut: getDisplaySummonShortcut() })
 
-  isVisible() {
-    return (windows.tray as BrowserWindow).isVisible()
-  }
+      store.toggleDash('hide')
+      store.trayOpen(false)
+      if (store('main.reveal')) {
+        detectMouse(() => this.tray.show())
+      }
+    })
 
-  canAutoHide() {
-    return store('main.autohide') && !store('windows.dash.showing') && !frameManager.isFrameShowing()
+    // data change events
+    store.observer(() => {
+      if (store('windows.dash.showing')) {
+        this.dash.show()
+      } else {
+        this.dash.hide()
+        this.tray.focus()
+      }
+    })
+
+    store.observer(() => broadcast('permissions', JSON.stringify(store('permissions'))))
+    store.observer(() => {
+      const displaySummonShortcut = store('main.shortcuts.altSlash')
+      if (displaySummonShortcut) {
+        globalShortcut.unregister('Alt+/')
+        globalShortcut.register('Alt+/', () => {
+          manager.toggle()
+          if (!store('main.mute.onboardingWindow')) {
+            this.onboard?.send('main:flex', 'shortcutActivated')
+          }
+        })
+      } else {
+        globalShortcut.unregister('Alt+/')
+      }
+      if (this.tray?.isReady()) {
+        systemTray.setContextMenu(this.tray.isVisible() ? 'hide' : 'show', { displaySummonShortcut })
+      }
+    })
   }
 
   hide() {
-    if (this.recentDisplayEvent || !windows.tray?.isVisible()) {
-      return
+    this.tray.hide()
+    if (this.dash.isVisible()) {
+      this.dash.hide('app')
     }
-    clearTimeout(this.recentDisplayEventTimeout)
-    this.recentDisplayEvent = true
-    this.recentDisplayEventTimeout = setTimeout(() => {
-      this.recentDisplayEvent = false
-    }, 150)
-
-    store.toggleDash('hide')
-    store.trayOpen(false)
-    if (store('main.reveal')) {
-      detectMouse()
-    }
-    windows.tray.emit('hide')
-    windows.tray.hide()
-    events.emit('tray:hide')
   }
 
-  public show() {
-    clearTimeout(mouseTimeout)
-    if (!windows.tray) {
-      return init()
+  show() {
+    // if (!this.window) {
+    //   return init()
+    // }
+    this.tray.show()
+    if (this.dash.hiddenByAppHide || this.dash.isVisible()) {
+      this.dash.show()
     }
-    if (this.recentDisplayEvent) {
-      return
-    }
-    clearTimeout(this.recentDisplayEventTimeout)
-    this.recentDisplayEvent = true
-    this.recentDisplayEventTimeout = setTimeout(() => {
-      this.recentDisplayEvent = false
-    }, 150)
-
-    // windows.tray.setPosition(0, 0)
-    windows.tray.setAlwaysOnTop(true)
-    windows.tray.setVisibleOnAllWorkspaces(true, {
-      visibleOnFullScreen: true,
-      skipTransformProcessType: true
-    })
-    windows.tray.setResizable(false) // Keeps height consistent
-    const area = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
-    const height = isDev && !fullheight ? devHeight : area.height
-    windows.tray.setMinimumSize(trayWidth, height)
-    windows.tray.setSize(trayWidth, height)
-    windows.tray.setMaximumSize(trayWidth, height)
-    const pos = topRight(windows.tray)
-    windows.tray.setPosition(pos.x, pos.y)
-    if (!glide) {
-      windows.tray.focus()
-    }
-    store.trayOpen(true)
-    windows.tray.emit('show')
-    windows.tray.show()
-    events.emit('tray:show')
-    if (windows && windows.tray && windows.tray.focus && !glide) {
-      windows.tray.focus()
-    }
-    windows.tray.setVisibleOnAllWorkspaces(false, {
-      visibleOnFullScreen: true,
-      skipTransformProcessType: true
-    })
   }
 
   toggle() {
-    if (!this.isReady()) return
-
-    this.isVisible() ? this.hide() : this.show()
+    const eventName = this.tray.isVisible() ? 'hide' : 'show'
+    this[eventName]()
   }
 
-  destroy() {
-    this.gasObserver.remove()
-    ipcMain.off('tray:ready', this.readyHandler)
-  }
-}
-
-class Dash {
-  private recentDisplayEvent = false
-  private recentDisplayEventTimeout?: NodeJS.Timeout
-  public hiddenByAppHide = false
-
-  constructor() {
-    initWindow('dash', {
-      width: trayWidth
-    })
+  reload() {
+    this.tray.reload()
+    this.dash.reload()
+    this.onboard?.reload()
   }
 
-  public hide(context?: string) {
-    if (this.recentDisplayEvent || !windows.dash?.isVisible()) {
-      return
-    }
-    if (context === 'app') {
-      this.hiddenByAppHide = true
-    }
-    clearTimeout(this.recentDisplayEventTimeout)
-    this.recentDisplayEvent = true
-    this.recentDisplayEventTimeout = setTimeout(() => {
-      this.recentDisplayEvent = false
-    }, 150)
-    windows.dash.hide()
-  }
-
-  public show() {
-    if (!tray.isReady() || this.recentDisplayEvent) {
-      return
-    }
-    if (this.hiddenByAppHide) {
-      this.hiddenByAppHide = false
-    }
-    clearTimeout(this.recentDisplayEventTimeout)
-    this.recentDisplayEvent = true
-    this.recentDisplayEventTimeout = setTimeout(() => {
-      this.recentDisplayEvent = false
-    }, 150)
-    setTimeout(() => {
-      windows.dash.setAlwaysOnTop(true)
-      windows.dash.setVisibleOnAllWorkspaces(true, {
-        visibleOnFullScreen: true,
-        skipTransformProcessType: true
-      })
-      windows.dash.setResizable(false) // Keeps height consistent
-      const area = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
-      const height = isDev && !fullheight ? devHeight : area.height
-      windows.dash.setMinimumSize(trayWidth, height)
-      windows.dash.setSize(trayWidth, height)
-      windows.dash.setMaximumSize(trayWidth, height)
-      const { x, y } = topRight(windows.dash)
-      windows.dash.setPosition(x - trayWidth - 5, y)
-      windows.dash.show()
-      windows.dash.focus()
-      windows.dash.setVisibleOnAllWorkspaces(false, {
-        visibleOnFullScreen: true,
-        skipTransformProcessType: true
-      })
-      if (devToolsEnabled) {
-        windows.dash.webContents.openDevTools()
-      }
-    }, 10)
-  }
-
-  isVisible() {
-    return (windows.dash as BrowserWindow).isVisible()
+  broadcast(channel: string, ...args: string[]) {
+    this.tray.send(channel, ...args)
+    this.dash.send(channel, ...args)
+    this.onboard?.send(channel, ...args)
   }
 }
 
-class Onboard {
-  constructor() {
-    initWindow('onboard', {
-      x: 0,
-      y: 0,
-      width: 0,
-      height: 0,
-      titleBarStyle: 'hidden',
-      trafficLightPosition: { x: 10, y: 9 },
-      icon: path.join(__dirname, './AppIcon.png')
-    })
-  }
-
-  public hide() {
-    if (windows.onboard && windows.onboard.isVisible()) {
-      windows.onboard.hide()
+const systemTrayEventHandlers: SystemTrayEventHandlers = {
+  click: () => {
+    if (isWindows) {
+      manager.toggle()
     }
-  }
-
-  public show() {
-    if (!tray.isReady()) {
-      return
-    }
-
-    setTimeout(() => {
-      windows.onboard.once('close', () => {
-        store.completeOnboarding()
-        windows.tray.focus()
-        delete windows.onboard
-      })
-
-      const area = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
-      const height = (isDev && !fullheight ? devHeight : area.height) - 160
-      const maxWidth = Math.floor(height * 1.24)
-      const targetWidth = 600 // area.width - 460
-      const width = targetWidth > maxWidth ? maxWidth : targetWidth
-      windows.onboard.setMinimumSize(600, 300)
-      windows.onboard.setSize(width, height)
-      const pos = topRight(windows.onboard)
-
-      // const x = (pos.x * 2 - width * 2 - 810) / 2
-      const x = pos.x - 880
-      windows.onboard.setPosition(x, pos.y + 80)
-      // windows.onboard.setAlwaysOnTop(true)
-      windows.onboard.show()
-      windows.onboard.focus()
-      windows.onboard.setVisibleOnAllWorkspaces(false, {
-        visibleOnFullScreen: true,
-        skipTransformProcessType: true
-      })
-      if (devToolsEnabled) {
-        windows.onboard.webContents.openDevTools()
-      }
-    }, 10)
-  }
+  },
+  clickHide: () => manager.hide(),
+  clickShow: () => manager.show()
 }
+const systemTray = new SystemTray(systemTrayEventHandlers)
+const getDisplaySummonShortcut = () => store('main.shortcuts.altSlash')
 
 ipcMain.on('tray:quit', () => electronApp.quit())
 ipcMain.on('tray:mouseout', () => {
-  if (glide && !store('windows.dash.showing')) {
-    glide = false
-    tray.hide()
+  if (glideIsTriggered() && !store('windows.dash.showing')) {
+    resetGlide()
+    manager.hide()
   }
 })
 
@@ -457,13 +197,7 @@ electronApp.on('ready', () => {
 
 if (isDev) {
   electronApp.once('ready', () => {
-    globalShortcut.register('CommandOrControl+R', () => {
-      Object.keys(windows).forEach((win) => {
-        windows[win].reload()
-      })
-
-      // frameManager.reloadFrames()
-    })
+    globalShortcut.register('CommandOrControl+R', () => manager.reload())
   })
 }
 
@@ -476,58 +210,8 @@ ipcMain.on('*:contextmenu', (e, x, y) => {
 const windowFromWebContents = (webContents: WebContents) =>
   BrowserWindow.fromWebContents(webContents) as BrowserWindow
 
-const init = () => {
-  if (tray) {
-    tray.destroy()
-  }
-
-  tray = new Tray()
-  dash = new Dash()
-
-  if (!store('main.mute.onboardingWindow')) {
-    onboard = new Onboard()
-  }
-
-  // data change events
-  store.observer(() => {
-    if (store('windows.dash.showing')) {
-      dash.show()
-    } else {
-      dash.hide()
-      windows.tray.focus()
-    }
-  })
-
-  store.observer(() => broadcast('permissions', JSON.stringify(store('permissions'))))
-  store.observer(() => {
-    const displaySummonShortcut = store('main.shortcuts.altSlash')
-    if (displaySummonShortcut) {
-      globalShortcut.unregister('Alt+/')
-      globalShortcut.register('Alt+/', () => {
-        app.toggle()
-        if (!store('main.mute.onboardingWindow')) {
-          send('onboard', 'main:flex', 'shortcutActivated')
-        }
-      })
-    } else {
-      globalShortcut.unregister('Alt+/')
-    }
-    if (tray?.isReady()) {
-      systemTray.setContextMenu(tray.isVisible() ? 'hide' : 'show', { displaySummonShortcut })
-    }
-  })
-}
-
-const send = (id: string, channel: string, ...args: string[]) => {
-  if (windows[id] && !windows[id].isDestroyed()) {
-    windows[id].webContents.send(channel, ...args)
-  } else {
-    log.error(new Error(`A window with id "${id}" does not exist (windows.send)`))
-  }
-}
-
 const broadcast = (channel: string, ...args: string[]) => {
-  Object.keys(windows).forEach((id) => send(id, channel, ...args))
+  manager?.broadcast(channel, ...args)
   frameManager.broadcast(channel, args)
 }
 
@@ -536,11 +220,12 @@ store.api.feed((_state, actions) => {
 })
 
 export default {
+  // TODO: rename to toggleApp / showApp?
   toggleTray() {
-    tray.toggle()
+    manager.toggle()
   },
   showTray() {
-    tray.show()
+    manager.show()
   },
   refocusFrame(frameId: string) {
     frameManager.refocus(frameId)
@@ -557,5 +242,7 @@ export default {
   min(e: IpcMainEvent) {
     windowFromWebContents(e.sender).minimize()
   },
-  init
+  init() {
+    manager = new WindowManager()
+  }
 }

@@ -1,7 +1,8 @@
-import { app, screen, BrowserWindow, Menu, KeyboardEvent, Rectangle, Tray as ElectronTray } from 'electron'
+import { app, screen, Menu, KeyboardEvent, Rectangle, Tray as ElectronTray } from 'electron'
 import path from 'path'
 import { capitalize } from '../../resources/utils'
 import store from '../store'
+import { Tray } from './tray'
 
 const isMacOS = process.platform === 'darwin'
 
@@ -19,11 +20,13 @@ export class SystemTray {
     this.clickHandlers = clickHandlers
   }
 
-  init(mainWindow: BrowserWindow) {
+  init(frameTray: Tray) {
     // Electron Tray can only be instantiated when the app is ready
-    this.electronTray = new ElectronTray(path.join(__dirname, isMacOS ? './IconTemplate.png' : './Icon.png'))
+    this.electronTray = new ElectronTray(
+      path.join(__dirname, isMacOS ? './icons/IconTemplate.png' : './icons/Icon.png')
+    )
     this.electronTray.on('click', (_event: KeyboardEvent, bounds: Rectangle) => {
-      const mainWindowBounds = mainWindow.getBounds()
+      const mainWindowBounds = frameTray.getBounds()
       const currentDisplay = screen.getDisplayMatching(bounds)
       const trayClickDisplay = screen.getDisplayMatching(mainWindowBounds)
       if (trayClickDisplay.id !== currentDisplay.id) {

@@ -1,11 +1,10 @@
 // Frames are the windows that run dapps and other functionality
 // They are rendered based on the state of `main.frames`
 
-import { screen } from 'electron'
 import log from 'electron-log'
 import store from '../../store'
 
-import frameInstances, { FrameInstance } from './frameInstances.js'
+import { FrameInstance, create as createFrameInstance } from './frameInstances.js'
 import viewInstances from './viewInstances'
 
 function getFrames(): Record<string, Frame> {
@@ -35,7 +34,7 @@ export default class FrameManager {
     frameIds
       .filter((frameId) => !instanceIds.includes(frameId))
       .forEach((frameId) => {
-        const frameInstance = frameInstances.create(frames[frameId])
+        const frameInstance = createFrameInstance(frames[frameId])
 
         this.frameInstances[frameId] = frameInstance
 

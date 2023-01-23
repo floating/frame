@@ -35,7 +35,7 @@
     "compile": "npm run copy-assets && tsc",
     "compile:watch": "npm run copy-assets && tsc -w",
     "build": "npm run compile && sleep 4 && npm run bundle && sleep 4 && electron-builder",
-    "copy-assets": "shx mkdir -p ./compiled/main/windows && shx cp ./main/windows/*.png ./compiled/main/windows",
+    "copy-assets": "shx mkdir -p ./compiled/main/windows/icons && shx cp ./main/windows/icons/*.png ./compiled/main/windows/icons",
     "publish": "electron-builder -c.snap.publish=github",
     "release": "npm run compile && sleep 4 && npm run bundle && sleep 4 && npm run publish",
     "postinstall": "electron-builder install-app-deps",

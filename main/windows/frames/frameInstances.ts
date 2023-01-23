@@ -1,10 +1,8 @@
-import electron, { BrowserView, BrowserWindow } from 'electron'
+import { screen, BrowserView, BrowserWindow } from 'electron'
 import path from 'path'
 
-import { createWindow } from '../window'
-import topRight from './topRight'
-
-const isDev = process.env.NODE_ENV === 'development'
+import { initWindow } from '../window'
+import { topRight } from '../screen'
 
 export interface FrameInstance extends BrowserWindow {
   frameId?: string
@@ -12,8 +10,9 @@ export interface FrameInstance extends BrowserWindow {
   showingView?: string
 }
 
+// TODO: move this to screen
 const place = (frameInstance: FrameInstance) => {
-  const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
+  const area = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
   const height = area.height - 160
   const maxWidth = Math.floor(height * 1.24)
   const targetWidth = area.width - 460
@@ -24,35 +23,30 @@ const place = (frameInstance: FrameInstance) => {
   frameInstance.setPosition(pos.x - 440, pos.y + 80)
 }
 
-export default {
-  reposition: (frameInstance: FrameInstance) => {
-    place(frameInstance)
-  },
-  create: (frame: Frame) => {
-    const frameInstance: FrameInstance = createWindow('frameInstance', {
-      x: 0,
-      y: 0,
-      width: 0,
-      height: 0,
-      titleBarStyle: 'hidden',
-      trafficLightPosition: { x: 10, y: 9 },
-      icon: path.join(__dirname, './AppIcon.png')
-    })
+export const reposition = (frameInstance: FrameInstance) => {
+  place(frameInstance)
+}
 
-    frameInstance.loadURL(
-      isDev ? 'http://localhost:1234/Dapp/index.dev.html' : `file://${process.env.BUNDLE_LOCATION}/dapp.html`
-    )
+export const create = (frame: Frame) => {
+  const frameInstance: FrameInstance = initWindow('dapp', {
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0,
+    titleBarStyle: 'hidden',
+    trafficLightPosition: { x: 10, y: 9 },
+    icon: path.join(__dirname, './icons/AppIcon.png')
+  })
 
-    frameInstance.on('ready-to-show', () => {
-      frameInstance.show()
-    })
+  frameInstance.on('ready-to-show', () => {
+    frameInstance.show()
+  })
 
-    frameInstance.showingView = ''
-    frameInstance.frameId = frame.id
-    frameInstance.views = {}
+  frameInstance.showingView = ''
+  frameInstance.frameId = frame.id
+  frameInstance.views = {}
 
-    place(frameInstance)
+  place(frameInstance)
 
-    return frameInstance
-  }
+  return frameInstance
 }
