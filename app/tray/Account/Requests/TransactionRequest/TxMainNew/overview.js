@@ -11,43 +11,34 @@ import RequestHeader from '../../../../../../resources/Components/RequestHeader'
 
 const isNonZeroHex = (hex) => !!hex && !['0x', '0x0'].includes(hex)
 
-function renderRecognizedAction(req) {
-  const { recognizedActions: actions = [] } = req
+const ContractCallOverview = ({ method }) => {
+  const body = method ? `Calling Contract Method ${method}` : 'Calling Contract'
 
-  return !actions.length ? (
-    <div className='_txDescriptionSummaryLine'>Calling Contract</div>
-  ) : (
-    actions.map((action, index) => {
-      const { id = '', data } = action
-      const key = id + index
-      const [actionClass, actionType] = id.split(':')
+  return <div className='_txDescriptionSummaryLine'>{body}</div>
+}
 
-      if (actionClass === 'erc20') {
-        if (actionType === 'transfer') {
-          return (
-            <SendOverview key={key} amountHex={data.amount} decimals={data.decimals} symbol={data.symbol} />
-          )
-        }
-      } else if (actionClass === 'ens') {
-        return <EnsOverview key={key} type={actionType} data={data} />
-      } else {
-        return (
-          <div key={key} className='_txDescriptionSummaryLine'>
-            Calling Contract
-          </div>
-        )
-      }
-    })
+const ApproveOverview = ({ amount, decimals, symbol }) => {
+  return (
+    <div>
+      <span>{'Approve Spending '}</span>
+      <DisplayValue
+        type='ether'
+        value={amount}
+        valueDataParams={{ decimals }}
+        currencySymbol={symbol}
+        currencySymbolPosition='last'
+      />
+    </div>
   )
 }
 
-const SendOverview = ({ amountHex, decimals, symbol }) => {
+const SendOverview = ({ amount, decimals, symbol }) => {
   return (
     <div>
       <span>{'Send'}</span>
       <DisplayValue
         type='ether'
-        value={amountHex}
+        value={amount}
         valueDataParams={{ decimals }}
         currencySymbol={symbol}
         currencySymbolPosition='last'
@@ -57,8 +48,32 @@ const SendOverview = ({ amountHex, decimals, symbol }) => {
 }
 
 const DeployContractOverview = () => <div>Deploying Contract</div>
-const GenericContractOverview = ({ method }) => <div>{`Calling Contract Method ${method}`}</div>
 const DataOverview = () => <div>Sending data</div>
+
+const actionOverviews = {
+  'erc20:transfer': SendOverview,
+  'erc20:approve': ApproveOverview,
+  ens: EnsOverview
+}
+
+const renderActionOverview = (action, index) => {
+  const { id = '', data } = action
+  const key = id + index
+  const [actionClass, actionType] = id.split(':')
+  const ActionOverview = actionOverviews[id] || ContractCallOverview
+
+  return <ActionOverview key={key} type={actionType} {...{ ...data }} />
+}
+
+function renderRecognizedAction(req) {
+  const { recognizedActions: actions = [] } = req
+
+  return !actions.length ? (
+    <div className='_txDescriptionSummaryLine'>Calling Contract</div>
+  ) : (
+    actions.map(renderActionOverview)
+  )
+}
 
 const TxOverview = ({
   req,
@@ -87,7 +102,7 @@ const TxOverview = ({
     description = renderRecognizedAction(req)
 
     if (!description && !!method) {
-      description = <GenericContractOverview method={method} />
+      description = <ContractCallOverview method={method} />
     }
   } else if (isSend) {
     description = <SendOverview amountHex={value} decimals={18} symbol={symbol} />

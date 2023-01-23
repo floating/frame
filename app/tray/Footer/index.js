@@ -43,9 +43,9 @@ class Footer extends React.Component {
     link.rpc('declineRequest', req, () => {}) // Move to link.send
   }
 
-  rejectRequest() {
+  rejectRequest(req) {
     if (this.state.allowInput) {
-      link.send('tray:rejectRequest', this.props.req)
+      link.send('tray:rejectRequest', req)
     }
   }
   renderFooter() {
@@ -124,7 +124,7 @@ class Footer extends React.Component {
                 className='requestDecline'
                 style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none' }}
                 onClick={() => {
-                  this.rejectRequest()
+                  this.rejectRequest(req)
                 }}
               >
                 <div className='requestDeclineButton _txButton _txButtonBad'>
@@ -160,7 +160,7 @@ class Footer extends React.Component {
                 <div
                   className='requestDeclineButton _txButton _txButtonBad'
                   onClick={() => {
-                    this.rejectRequest()
+                    this.rejectRequest(req)
                   }}
                 >
                   <span>Decline</span>
