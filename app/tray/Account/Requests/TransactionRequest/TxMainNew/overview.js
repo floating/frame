@@ -17,9 +17,7 @@ const GenericOverview = () => (
   </div>
 )
 
-const ApproveOverview = (data) => {
-  const { amount, decimals, symbol } = data
-
+const ApproveOverview = ({ amount, decimals, symbol }) => {
   return (
     <div>
       <span>{'Approve Spending '}</span>
