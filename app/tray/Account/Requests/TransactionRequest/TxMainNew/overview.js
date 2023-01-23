@@ -59,7 +59,7 @@ const actionOverviews = {
 const renderActionOverview = (action, index) => {
   const { id = '', data } = action
   const key = id + index
-  const [, actionType] = id.split(':')
+  const [actionClass, actionType] = id.split(':')
   const ActionOverview = actionOverviews[id] || ContractCallOverview
 
   return <ActionOverview key={key} type={actionType} {...{ ...data }} />
