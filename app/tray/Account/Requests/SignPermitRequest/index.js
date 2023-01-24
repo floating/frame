@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import BigNumber from 'bignumber.js'
 
 import { isUnlimited } from '../../../../../resources/utils/numbers'
@@ -142,10 +142,12 @@ const PermitOverview = ({ req, chainData, originName }) => {
 const EditPermit = ({ req }) => {
   const {
     typedMessage: { data: typedMessageData },
-    permit: { verifyingContract: contract, spender, value: amount, deadline: deadlineInSeconds },
+    permit,
     tokenData,
     ensDomains
   } = req
+
+  const { verifyingContract: contract, spender, value: amount, deadline: deadlineInSeconds } = permit
 
   const updateRequest = (newAmt) => {
     typedMessageData.message.value = newAmt

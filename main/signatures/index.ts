@@ -28,15 +28,11 @@ export const identify = ({ data }: TypedMessage<SignTypedDataVersion>): TypedSig
 }
 
 export const parsePermit = (req: PermitSignatureRequest): Permit => {
-  //TODO: fix types here...
   const {
     typedMessage: {
       data: {
-        // @ts-ignore
         message: { deadline, spender, value, owner, nonce },
-        // @ts-ignore
-        domain: { verifyingContract, chainId, name, version }
-        // @ts-ignore
+        domain: { verifyingContract, chainId }
       }
     }
   } = req
@@ -48,9 +44,7 @@ export const parsePermit = (req: PermitSignatureRequest): Permit => {
     owner,
     verifyingContract,
     chainId,
-    name,
-    nonce,
-    version
+    nonce
   }
 }
 
