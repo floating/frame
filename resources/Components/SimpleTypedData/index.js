@@ -15,7 +15,7 @@ const SimpleJSON = ({ json }) => {
   )
 }
 
-export const SimpleTypedDataInner = ({ typedData }) =>
+const SimpleTypedDataInner = ({ typedData }) =>
   typedData.domain ? (
     <div className='signTypedDataInner'>
       <div className='simpleJsonHeader'>Domain</div>
@@ -34,7 +34,7 @@ export const SimpleTypedDataInner = ({ typedData }) =>
     </div>
   )
 
-export default SimpleTypedData = ({ req, originName }) => {
+export const SimpleTypedData = ({ req, originName }) => {
   const type = req.type
   const payload = req.payload
   const typedData = payload.params[1] || {}

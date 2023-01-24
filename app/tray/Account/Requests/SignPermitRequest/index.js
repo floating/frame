@@ -9,7 +9,7 @@ import Countdown from '../../../../../resources/Components/Countdown'
 import RequestHeader from '../../../../../resources/Components/RequestHeader'
 import RequestItem from '../../../../../resources/Components/RequestItem'
 import CustomAmountInput from '../../../../../resources/Components/CustomAmountInput'
-import TypedSignatureOverview from '../../../../../resources/Components/SimpleTypedData'
+import { SimpleTypedData as TypedSignatureOverview } from '../../../../../resources/Components/SimpleTypedData'
 import { getSignatureRequestClass } from '../../../../../resources/domain/request'
 import useCopiedMessage from '../../../../../resources/Hooks/useCopiedMessage'
 
