@@ -162,6 +162,10 @@ class Requests extends React.Component {
                 </RequestItem>
               )
             } else if (req.type === 'signErc20Permit') {
+              const chainId = req.typedMessage.data.domain.chainId
+              const chainName = this.store('main.networks.ethereum', chainId, 'name')
+              const { primaryColor, icon } = this.store('main.networksMeta.ethereum', chainId)
+
               return (
                 <RequestItem
                   key={req.type + i}
@@ -169,9 +173,9 @@ class Requests extends React.Component {
                   account={this.props.account}
                   handlerId={req.handlerId}
                   i={i}
-                  title={'Token Spend Permit'}
-                  color={'var(--outerspace)'}
-                  svgName={'sign'}
+                  title={`${chainName} Token Permit`}
+                  color={primaryColor ? `var(--${primaryColor})` : ''}
+                  img={icon}
                 >
                   <div style={{ height: '10px' }} />
                 </RequestItem>

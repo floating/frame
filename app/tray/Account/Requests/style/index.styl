@@ -729,7 +729,7 @@
   right 0
   bottom 0px
   left 0
-  padding 64px 0px 128px 0px
+  padding 64px 0px
   border-radius 24px
   overflow-y scroll
 
@@ -868,40 +868,6 @@
     user-select all
     font-family 'FiraCode'
     font-weight 400
-
-.signTypedData
-  width calc(100% - 12px)
-  margin 6px
-  font-size 20px
-  font-weight 300
-  overflow-y scroll
-  overflow-x hidden
-  background var(--ghostZ)
-  border-radius 12px
-  div
-    user-select all
-
-  .signTypedDataInner
-    width 100%
-    font-size 20px
-    padding 8px
-    min-height 100%
-    box-sizing border-box
-
-    .signTypedDataSection
-      margin-bottom 40px
-      div
-        user-select none
-
-    .signTypedDataSection:last-child
-      margin-bottom 0px
-
-    .signTypedDataTitle
-      display block
-      font-size 20px
-      margin-bottom 18px
-      font-weight 400
-      font-family 'MainFont'
 
 .transactionValue
   position absolute
@@ -2204,7 +2170,17 @@ span
   text-transform uppercase
   letter-spacing 3px
   height 100px
-  
+
+.simpleJsonHeader
+  font-size 13px
+  padding 8px 2px
+  font-weight 400
+  margin-top 40px
+  border-bottom 2px solid var(--ghostZ)
+  text-transform uppercase
+  color var(--good)
+  letter-spacing 1px
+
 .simpleJson
   font-size 14px
 
