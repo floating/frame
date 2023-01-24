@@ -60,7 +60,7 @@ const PermitOverview = ({ req, chainData, originName }) => {
           </ClusterBox>
           <ClusterBox title={'Token Permit'} animationSlot={2}>
             <Cluster>
-              {Boolean(tokenData.decimals) && (
+              {tokenData && (
                 <>
                   <ClusterRow>
                     <ClusterValue
@@ -71,9 +71,13 @@ const PermitOverview = ({ req, chainData, originName }) => {
                     >
                       <div className='clusterAddress'>
                         <span className='clusterAddressRecipient'>
-                          {spender.substring(0, 8)}
-                          {svg.octicon('kebab-horizontal', { height: 15 })}
-                          {spender.substring(spender.length - 6)}
+                          {ensDomains[spender] || (
+                            <>
+                              {spender.substring(0, 8)}
+                              {svg.octicon('kebab-horizontal', { height: 15 })}
+                              {spender.substring(spender.length - 6)}
+                            </>
+                          )}
                         </span>
                         <div className='clusterAddressRecipientFull'>
                           {showCopiedMessage ? (
