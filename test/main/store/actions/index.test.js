@@ -1336,13 +1336,20 @@ describe('#updateTypedDataRequest', () => {
     }
   })
 
-  it('should completely replace the old typed message data with the new data', () => {
-    expect(requests[request].typedMessage.data.oldAttribute).toBeTruthy()
+  it('should add a new property to a request ', () => {
+    expect(requests[request].doesNotExistYet).toBeUndefined()
     updateSignatureMessage(request, {
-      newAttribute: true
+      doesNotExistYet: true
     })
 
-    expect(requests[request].typedMessage.data.oldAttribute).toBeFalsy()
-    expect(requests[request].typedMessage.data.newAttribute).toBeTruthy()
+    expect(requests[request].doesNotExistYet).toBeTruthy()
+  })
+
+  it('should not change properties which are not altered in update', () => {
+    updateSignatureMessage(request, {
+      doesNotExistYet: true
+    })
+
+    expect(requests[request].typedMessage.data.oldAttribute).toBeTruthy()
   })
 })

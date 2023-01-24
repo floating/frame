@@ -244,15 +244,6 @@ const rpc = {
       return cb(err)
     }
   },
-  async getErc20Data(address, chainId, cb) {
-    try {
-      const contract = new Erc20Contract(address, chainId)
-      const tokenData = await contract.getTokenData()
-      return cb(null, tokenData)
-    } catch (err) {
-      return cb(err, null)
-    }
-  },
   verifyAddress(cb) {
     const res = (err, data) => cb(err, data || false)
     accounts.verifyAddress(true, res)

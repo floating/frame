@@ -13,33 +13,9 @@ import { SimpleTypedData as TypedSignatureOverview } from '../../../../../resour
 import { getSignatureRequestClass } from '../../../../../resources/domain/request'
 import useCopiedMessage from '../../../../../resources/Hooks/useCopiedMessage'
 
-const getPermit = (req) => {
-  const {
-    typedMessage: {
-      data: {
-        message: { deadline, spender, value, owner, nonce },
-        domain: { verifyingContract, chainId, name, version },
-        types
-      }
-    }
-  } = req
-
-  return {
-    deadline,
-    spender,
-    value,
-    owner,
-    verifyingContract,
-    chainId,
-    name,
-    nonce,
-    version,
-    types
-  }
-}
-
-const PermitOverview = ({ permit, req, chainData, originName, tokenData }) => {
-  const { owner, deadline, spender, value } = permit
+const PermitOverview = ({ req, chainData, originName }) => {
+  const { permit, tokenData, handlerId, ensDomains = {} } = req
+  const { deadline, spender, value } = permit || {}
   const { chainColor, chainName, icon } = chainData
   const [showCopiedMessage, copySpender] = useCopiedMessage(spender)
 
@@ -49,10 +25,8 @@ const PermitOverview = ({ permit, req, chainData, originName, tokenData }) => {
         <div className='_txBody'>
           <ClusterBox animationSlot={1}>
             <RequestItem
-              key={`signErc20Permit:${req.handlerId}`}
+              key={`signErc20Permit:${handlerId}`}
               req={req}
-              account={owner}
-              handlerId={req.handlerId}
               i={0}
               title={`${chainName} Token Permit`}
               color={chainColor ? `var(--${chainColor})` : ''}
@@ -165,29 +139,28 @@ const PermitOverview = ({ permit, req, chainData, originName, tokenData }) => {
   )
 }
 
-const EditPermit = ({ permit, tokenData, req }) => {
+const EditPermit = ({ req }) => {
   const {
-    verifyingContract: contract,
-    spender,
-    value: amount,
-    deadline: deadlineInSeconds,
-    chainId,
-    nonce,
-    name,
-    types,
-    owner,
-    version
-  } = permit
+    typedMessage: { data: typedMessageData },
+    permit: { verifyingContract: contract, spender, value: amount, deadline: deadlineInSeconds },
+    tokenData,
+    ensDomains
+  } = req
 
   const updateRequest = (newAmt) => {
+    typedMessageData.message.value = newAmt
     link.rpc(
       'updateRequest',
       req.handlerId,
       {
-        message: { deadline: deadlineInSeconds, spender, value: newAmt, owner, nonce },
-        domain: { verifyingContract: contract, chainId, name, version },
-        types,
-        primaryType: 'Permit'
+        typedMessage: {
+          data: typedMessageData
+        },
+        permit: {
+          ...permit,
+          value: newAmt
+        },
+        tokenData
       },
       null,
       () => {}
@@ -201,7 +174,8 @@ const EditPermit = ({ permit, tokenData, req }) => {
     ...tokenData,
     contract,
     spender,
-    amount
+    amount,
+    spenderEns: ensDomains[spender]
   }
 
   return (
@@ -217,44 +191,16 @@ const EditPermit = ({ permit, tokenData, req }) => {
 }
 
 const PermitRequest = ({ req, originName, step, chainData }) => {
-  const [tokenData, setTokenData] = useState({})
-  const permit = getPermit(req)
-
-  useEffect(() => {
-    link.rpc('getErc20Data', permit.verifyingContract, permit.chainId, (err, tokenData) => {
-      if (err) return console.error(err)
-      setTokenData(tokenData)
-    })
-  }, [])
-
   const requestClass = getSignatureRequestClass(req)
 
   const renderStep = () => {
     switch (step) {
       case 'adjustPermit':
-        return (
-          <EditPermit
-            {...{
-              tokenData,
-              permit,
-              req
-            }}
-          />
-        )
+        return <EditPermit req={req} />
       case 'viewRaw':
-        return <TypedSignatureOverview {...{ originName, req }} />
+        return <TypedSignatureOverview originName={originName} req={req} />
       default:
-        return (
-          <PermitOverview
-            {...{
-              originName,
-              tokenData,
-              permit,
-              req,
-              chainData
-            }}
-          />
-        )
+        return <PermitOverview originName={originName} req={req} chainData={chainData} />
     }
   }
 

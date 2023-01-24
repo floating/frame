@@ -3,7 +3,7 @@ import Restore from 'react-restore'
 
 import link from '../../../resources/link'
 import { isHardwareSigner } from '../../../resources/domain/signer'
-import { isSignatureRequest } from '../../../resources/domain/request'
+import { isSignatureRequestType } from '../../../resources/domain/request'
 
 import RequestCommand from './RequestCommand'
 
@@ -87,7 +87,7 @@ class Footer extends React.Component {
               </div>
             </div>
           )
-        } else if (isSignatureRequest(req.type) && crumb.data.step === 'confirm') {
+        } else if (isSignatureRequestType(req.type) && crumb.data.step === 'confirm') {
           return (
             <RequestCommand req={req} signingDelay={isHardwareSigner(account.lastSignerType) ? 0 : 1500} />
           )

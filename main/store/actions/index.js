@@ -857,7 +857,7 @@ module.exports = {
         return requests
       }
 
-      requests[reqId].typedMessage.data = data
+      Object.assign(requests[reqId], data)
       return requests
     })
   }

@@ -68,6 +68,16 @@ async function resolveEnsName(address: string): Promise<string> {
   }
 }
 
+async function getEnsNameDictionary(addresses: string[]) {
+  const domains = await Promise.all(addresses.map(resolveEnsName))
+  const dict: Record<string, string> = {}
+  addresses.forEach((address, idx) => {
+    dict[address] = domains[idx]
+  })
+
+  return dict
+}
+
 async function recogErc20(
   contractAddress: string,
   chainId: number,
@@ -159,6 +169,7 @@ const surface = {
     // TODO: Check the address against previously verified contracts
     return { type, ens }
   },
+  getEnsNameDictionary,
   decode: async (contractAddress: string = '', chainId: number, calldata: string) => {
     // Decode calldata
     const contractSources: ContractSource[] = [{ name: 'ERC-20', source: 'Generic ERC-20', abi: erc20Abi }]

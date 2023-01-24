@@ -72,6 +72,18 @@ export interface Approval {
   approve: (data: any) => void
 }
 
+export interface Permit {
+  deadline: string | number
+  spender: string
+  value: string | number
+  owner: string
+  verifyingContract: string
+  chainId: string | number
+  name: string
+  nonce: string | number
+  version: string
+}
+
 export interface TransactionRequest extends AccountRequest<'transaction'> {
   payload: RPC.SendTransaction.Request
   data: TransactionData
@@ -111,6 +123,13 @@ export interface DefaultSignTypedDataRequest extends AccountRequest<'signTypedDa
 
 export interface PermitSignatureRequest extends AccountRequest<'signErc20Permit'> {
   typedMessage: TypedMessage
+  permit?: Permit
+  tokenData?: {
+    decimals: number
+    name: string
+    symbol: string
+    totalSupply: string
+  }
 }
 
 export interface AccessRequest extends AccountRequest<'access'> {}

@@ -1,7 +1,14 @@
 import log from 'electron-log'
 import { isValidAddress } from '@ethereumjs/util'
 
-import { AccessRequest, AccountRequest, Accounts, RequestMode, TransactionRequest } from '..'
+import {
+  AccessRequest,
+  AccountRequest,
+  Accounts,
+  RequestMode,
+  SignTypedDataRequest,
+  TransactionRequest
+} from '..'
 import nebulaApi from '../../nebula'
 import signers from '../../signers'
 import windows from '../../windows'
@@ -14,8 +21,10 @@ import provider from '../../provider'
 import { ApprovalType } from '../../../resources/constants'
 
 import reveal from '../../reveal'
-import type { Breadcrumb } from '../../windows/nav/breadcrumb'
 import type { TypedMessage } from '../types'
+import { isTransactionRequest, isTypedMessageSignatureReqest } from '../../../resources/domain/request'
+import Erc20Contract from '../../contracts/erc20'
+import { parsePermit } from '../../signatures'
 
 const nebula = nebulaApi()
 
@@ -333,10 +342,44 @@ class FrameAccount {
     }
   }
 
-  private async revealDetails(req: TransactionRequest) {
-    this.recipientIdentity(req)
-    this.decodeCalldata(req)
-    this.recognizeActions(req)
+  private async decodeTypedMessage(req: SignTypedDataRequest) {
+    if (req.type === 'signTypedData') return
+    const permit = parsePermit(req)
+    try {
+      const contract = new Erc20Contract(permit.verifyingContract, Number(permit.chainId))
+      const [tokenData, ensDomains] = await Promise.all([
+        contract.getTokenData(),
+        reveal.getEnsNameDictionary([permit.verifyingContract, permit.spender])
+      ])
+      const knownRequest = this.requests[req.handlerId] as SignTypedDataRequest
+      if (!knownRequest) return
+
+      Object.assign(knownRequest, {
+        tokenData,
+        permit,
+        ensDomains
+      })
+
+      this.update()
+    } catch (error) {
+      log.warn('unable to decode typed message', { error, handlerId: req.handlerId })
+    }
+  }
+
+  private async revealDetails(req?: AccountRequest) {
+    if (!req) return
+
+    if (isTransactionRequest(req)) {
+      this.recipientIdentity(req)
+      this.decodeCalldata(req)
+      this.recognizeActions(req)
+      return
+    }
+
+    if (isTypedMessageSignatureReqest(req)) {
+      console.log('decoding typed message!!')
+      this.decodeTypedMessage(req)
+    }
   }
 
   addRequest(req: any, res: RPCCallback<any> = () => {}) {
@@ -346,9 +389,7 @@ class FrameAccount {
       this.requests[r.handlerId].created = Date.now()
       this.requests[r.handlerId].res = res
 
-      if ((req || {}).type === 'transaction') {
-        this.revealDetails(req)
-      }
+      this.revealDetails(req)
 
       this.update()
       store.setSignerView('default')
