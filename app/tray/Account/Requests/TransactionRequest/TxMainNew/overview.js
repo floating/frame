@@ -105,7 +105,7 @@ const TxOverview = ({
       description = <ContractCallOverview method={method} />
     }
   } else if (isSend) {
-    description = <SendOverview amountHex={value} decimals={18} symbol={symbol} />
+    description = <SendOverview amount={value} decimals={18} symbol={symbol} />
   } else if (isNonZeroHex(calldata)) {
     description = <DataOverview />
   }
