@@ -1,7 +1,13 @@
-import { Permit, PermitSignatureRequest, TypedMessage, TypedSignatureRequestType } from '../accounts/types'
 import signatureTypes from './types'
 import { SignTypedDataVersion, MessageTypeProperty } from '@metamask/eth-sig-util'
-import { EIP712MessageDomain } from '@ledgerhq/hw-app-eth/lib/modules/EIP712/EIP712.types'
+
+import type {
+  Permit,
+  PermitSignatureRequest,
+  TypedMessage,
+  TypedSignatureRequestType
+} from '../accounts/types'
+import type { EIP712MessageDomain } from '@ledgerhq/hw-app-eth/lib/modules/EIP712/EIP712.types'
 
 const matchesMsgType = (properties: MessageTypeProperty[], required: MessageTypeProperty[]) =>
   properties.length === required.length &&

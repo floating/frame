@@ -21,7 +21,7 @@ import provider from '../../provider'
 import { ApprovalType } from '../../../resources/constants'
 
 import reveal from '../../reveal'
-import type { TypedMessage } from '../types'
+import type { PermitSignatureRequest, TypedMessage } from '../types'
 import { isTransactionRequest, isTypedMessageSignatureRequest } from '../../../resources/domain/request'
 import Erc20Contract from '../../contracts/erc20'
 import { parsePermit } from '../../signatures'
@@ -344,20 +344,28 @@ class FrameAccount {
 
   private async decodeTypedMessage(req: SignTypedDataRequest) {
     if (req.type === 'signTypedData') return
-    const permit = parsePermit(req)
-    try {
-      const contract = new Erc20Contract(permit.verifyingContract, Number(permit.chainId))
-      const [tokenData, ensDomains] = await Promise.all([
-        contract.getTokenData(),
-        reveal.getEnsNameDictionary([permit.verifyingContract, permit.spender])
-      ])
-      const knownRequest = this.requests[req.handlerId] as SignTypedDataRequest
-      if (!knownRequest) return
 
-      Object.assign(knownRequest, {
+    const knownRequest = this.requests[req.handlerId]
+    if (!knownRequest) return
+
+    try {
+      const permit = parsePermit(req)
+      const permitRequest = knownRequest as PermitSignatureRequest
+
+      const contract = new Erc20Contract(permit.verifyingContract, Number(permit.chainId))
+      const [tokenData, contractIdentity, spenderIdentity] = await Promise.all([
+        contract.getTokenData(),
+        reveal.identity(permit.verifyingContract),
+        reveal.identity(permit.spender)
+      ])
+
+      Object.assign(permitRequest, {
         tokenData,
-        permit,
-        ensDomains
+        permit: {
+          ...permit,
+          verifyingContract: contractIdentity,
+          spender: spenderIdentity
+        }
       })
 
       this.update()

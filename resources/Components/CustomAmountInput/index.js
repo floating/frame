@@ -77,15 +77,7 @@ const CustomAmountInput = ({
   deadline,
   canRevoke = false
 }) => {
-  const {
-    decimals = 0,
-    symbol = '???',
-    name = 'Unknown Token',
-    spenderEns,
-    spender,
-    contract: tokenAddress,
-    amount
-  } = data
+  const { decimals = 0, symbol = '???', name = 'Unknown Token', spenderEns, spender, contract, amount } = data
 
   const toDecimal = (baseAmount) => new BigNumber(baseAmount).shiftedBy(-1 * decimals).toString()
   const fromDecimal = (decimalAmount) => new BigNumber(decimalAmount).shiftedBy(decimals).toString()
@@ -148,7 +140,7 @@ const CustomAmountInput = ({
           />
           <Details
             {...{
-              address: tokenAddress,
+              address: contract.address,
               name
             }}
           />

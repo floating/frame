@@ -68,16 +68,6 @@ async function resolveEnsName(address: string): Promise<string> {
   }
 }
 
-async function getEnsNameDictionary(addresses: string[]) {
-  const domains = await Promise.all(addresses.map(resolveEnsName))
-  const dict: Record<string, string> = {}
-  addresses.forEach((address, idx) => {
-    dict[address] = domains[idx]
-  })
-
-  return dict
-}
-
 async function recogErc20(
   contractAddress: string,
   chainId: number,
@@ -161,15 +151,22 @@ function identifyKnownContractActions(
 }
 
 const surface = {
-  identity: async (address: string = '', chainId: number) => {
+  identity: async (address: string = '', chainId?: number) => {
     // Resolve ens, type and other data about address entities
-    const [type, ens] = await Promise.all([resolveEntityType(address, chainId), resolveEnsName(address)])
+
+    const results = await Promise.allSettled([
+      chainId ? resolveEntityType(address, chainId) : Promise.resolve(''),
+      resolveEnsName(address)
+    ])
+
+    const type = results[0].status === 'fulfilled' ? results[0].value : ''
+    const ens = results[1].status === 'fulfilled' ? results[1].value : ''
+
     // TODO: Check the address against various scam dbs
     // TODO: Check the address against user's contact list
     // TODO: Check the address against previously verified contracts
     return { type, ens }
   },
-  getEnsNameDictionary,
   decode: async (contractAddress: string = '', chainId: number, calldata: string) => {
     // Decode calldata
     const contractSources: ContractSource[] = [{ name: 'ERC-20', source: 'Generic ERC-20', abi: erc20Abi }]

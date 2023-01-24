@@ -49,6 +49,11 @@ interface Request {
   handlerId: string
 }
 
+type Identity = {
+  address: Address
+  ens: string
+}
+
 export interface AccountRequest<T extends RequestType = RequestType> extends Request {
   type: T
   origin: string
@@ -134,12 +139,17 @@ interface EIP2612TypedData {
   message: Omit<Permit, 'chainId' | 'verifyingContract'>
 }
 
+interface PermitData extends Omit<Permit, 'spender' | 'verifyingContract'> {
+  spender: Identity
+  verifyingContract: Identity
+}
+
 export interface PermitSignatureRequest extends AccountRequest<'signErc20Permit'> {
   typedMessage: {
     data: EIP2612TypedData
     version: SignTypedDataVersion
   }
-  permit?: Permit
+  permit?: PermitData
   tokenData?: TokenData
   ensDomains?: Record<string, string>
 }

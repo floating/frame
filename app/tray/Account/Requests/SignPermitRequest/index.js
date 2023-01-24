@@ -14,10 +14,11 @@ import { getSignatureRequestClass } from '../../../../../resources/domain/reques
 import useCopiedMessage from '../../../../../resources/Hooks/useCopiedMessage'
 
 const PermitOverview = ({ req, chainData, originName }) => {
-  const { permit, tokenData, handlerId, ensDomains = {} } = req
+  const { permit, tokenData, handlerId } = req
   const { deadline, spender, value } = permit || {}
   const { chainColor, chainName, icon } = chainData
-  const [showCopiedMessage, copySpender] = useCopiedMessage(spender)
+
+  const [showCopiedMessage, copySpender] = useCopiedMessage(spender.address)
 
   return (
     <div className='approveRequest'>
@@ -66,16 +67,16 @@ const PermitOverview = ({ req, chainData, originName }) => {
                     <ClusterValue
                       pointerEvents={true}
                       onClick={() => {
-                        copySpender(spender)
+                        copySpender(spender.address)
                       }}
                     >
                       <div className='clusterAddress'>
                         <span className='clusterAddressRecipient'>
-                          {ensDomains[spender] || (
+                          {spender.ens || (
                             <>
-                              {spender.substring(0, 8)}
+                              {spender.address.substring(0, 8)}
                               {svg.octicon('kebab-horizontal', { height: 15 })}
-                              {spender.substring(spender.length - 6)}
+                              {spender.address.substring(spender.address.length - 6)}
                             </>
                           )}
                         </span>
@@ -83,7 +84,7 @@ const PermitOverview = ({ req, chainData, originName }) => {
                           {showCopiedMessage ? (
                             <span>{'Address Copied'}</span>
                           ) : (
-                            <span className='clusterFira'>{spender}</span>
+                            <span className='clusterFira'>{spender.address}</span>
                           )}
                         </div>
                       </div>
@@ -180,8 +181,7 @@ const EditPermit = ({ req }) => {
     ...tokenData,
     contract,
     spender,
-    amount,
-    spenderEns: ensDomains[spender]
+    amount
   }
 
   return (
