@@ -166,6 +166,7 @@
     "wait-on": "7.0.1"
   },
   "alias": {
+    "@ledgerhq/devices": "@ledgerhq/devices/lib-es",
     "crypto": false,
     "path": false,
     "process": false,
