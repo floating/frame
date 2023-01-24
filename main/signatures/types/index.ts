@@ -15,7 +15,7 @@ const eip2612Permit: LabelledSignatureType = {
       { name: 'deadline', type: 'uint256' }
     ]
   },
-  domainFilter: ['chainId']
+  domainFilter: ['chainId', 'verifyingContract']
 }
 
 const signatureTypes: { [key: string]: LabelledSignatureType } = {

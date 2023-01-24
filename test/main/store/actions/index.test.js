@@ -1345,7 +1345,7 @@ describe('#updateTypedDataRequest', () => {
     expect(requests[request].doesNotExistYet).toBeTruthy()
   })
 
-  it('should not change properties which are not altered in update', () => {
+  it('should not change any properties which are not altered in an update', () => {
     updateSignatureMessage(request, {
       doesNotExistYet: true
     })

@@ -207,7 +207,6 @@ const CustomAmountInput = ({
                     }}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
-                        console.log({ customInput: custom })
                         e.target.blur()
                         if (custom === '') return resetToRequestAmount()
                         updateHandlerRequest(fromDecimal(custom))
