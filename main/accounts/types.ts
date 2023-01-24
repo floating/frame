@@ -8,7 +8,7 @@ import type { DecodedCallData } from '../contracts'
 import type { Chain } from '../chains'
 import type { TransactionData } from '../../resources/domain/transaction'
 import type { Action } from '../transaction/actions'
-import { EIP712MessageDomain } from '@ledgerhq/hw-app-eth/lib/modules/EIP712/EIP712.types'
+import { TokenData } from '../contracts/erc20'
 
 export enum ReplacementType {
   Speed = 'speed',
@@ -79,7 +79,7 @@ export interface Permit {
   value: string | number
   owner: string
   verifyingContract: string
-  chainId: string | number
+  chainId: number
   nonce: string | number
 }
 
@@ -116,6 +116,8 @@ export interface TypedMessage<V extends SignTypedDataVersion = SignTypedDataVers
 
 export type SignTypedDataRequest = DefaultSignTypedDataRequest | PermitSignatureRequest
 
+export type SignatureRequest = SignTypedDataRequest | AccountRequest<'sign'>
+
 export interface DefaultSignTypedDataRequest extends AccountRequest<'signTypedData'> {
   typedMessage: TypedMessage
 }
@@ -125,23 +127,21 @@ interface EIP2612PermitDomain {
   verifyingContract: string
 }
 
+interface EIP2612TypedData {
+  types: MessageTypes
+  primaryType: 'Permit'
+  domain: EIP2612PermitDomain
+  message: Omit<Permit, 'chainId' | 'verifyingContract'>
+}
+
 export interface PermitSignatureRequest extends AccountRequest<'signErc20Permit'> {
   typedMessage: {
-    data: {
-      types: MessageTypes
-      primaryType: 'Permit'
-      domain: EIP2612PermitDomain
-      message: Omit<Permit, 'chainId' | 'verifyingContract'>
-    }
+    data: EIP2612TypedData
     version: SignTypedDataVersion
   }
   permit?: Permit
-  tokenData?: {
-    decimals: number
-    name: string
-    symbol: string
-    totalSupply: string
-  }
+  tokenData?: TokenData
+  ensDomains?: Record<string, string>
 }
 
 export interface AccessRequest extends AccountRequest<'access'> {}

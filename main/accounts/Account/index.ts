@@ -22,7 +22,7 @@ import { ApprovalType } from '../../../resources/constants'
 
 import reveal from '../../reveal'
 import type { TypedMessage } from '../types'
-import { isTransactionRequest, isTypedMessageSignatureReqest } from '../../../resources/domain/request'
+import { isTransactionRequest, isTypedMessageSignatureRequest } from '../../../resources/domain/request'
 import Erc20Contract from '../../contracts/erc20'
 import { parsePermit } from '../../signatures'
 
@@ -376,8 +376,7 @@ class FrameAccount {
       return
     }
 
-    if (isTypedMessageSignatureReqest(req)) {
-      console.log('decoding typed message!!')
+    if (isTypedMessageSignatureRequest(req)) {
       this.decodeTypedMessage(req)
     }
   }

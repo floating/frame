@@ -163,7 +163,7 @@ const rpc = {
     }
   },
   declineRequest(req, cb) {
-    if (req.type === 'transaction' || isSignatureRequest(req.type)) {
+    if (req.type === 'transaction' || isSignatureRequest(req)) {
       accounts.declineRequest(req.handlerId)
       provider.declineRequest(req)
     }

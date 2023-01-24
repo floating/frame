@@ -1,7 +1,7 @@
 import type {
   AccountRequest,
   RequestType,
-  SignatureRequestType,
+  SignatureRequest,
   SignTypedDataRequest,
   TransactionRequest
 } from '../../../main/accounts/types'
@@ -13,14 +13,14 @@ export const isCancelableRequest = (status: string): Boolean => {
 
 export const getSignatureRequestClass = ({ status = '' }) => `signerRequest ${capitalize(status)}`
 
-export const isSignatureRequestType = (requestType: string): requestType is SignatureRequestType => {
-  return ['sign', 'signTypedData', 'signErc20Permit'].includes(requestType)
+export const isSignatureRequest = (request: AccountRequest): request is SignatureRequest => {
+  return ['sign', 'signTypedData', 'signErc20Permit'].includes(request.type)
 }
 
 export const isTransactionRequest = (request: AccountRequest): request is TransactionRequest =>
   request.type === 'transaction'
 
-export const isTypedMessageSignatureReqest = (request: AccountRequest): request is SignTypedDataRequest =>
+export const isTypedMessageSignatureRequest = (request: AccountRequest): request is SignTypedDataRequest =>
   ['signTypedData', 'signErc20Permit'].includes(request.type)
 
 export const accountViewTitles: Record<RequestType, string> = {

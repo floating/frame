@@ -48,4 +48,4 @@ export const parsePermit = (req: PermitSignatureRequest): Permit => {
   }
 }
 
-export { isSignatureRequestType as isSignatureRequest } from '../../resources/domain/request'
+export { isSignatureRequest } from '../../resources/domain/request'
