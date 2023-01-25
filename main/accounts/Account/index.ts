@@ -24,7 +24,6 @@ import reveal from '../../reveal'
 import type { PermitSignatureRequest, TypedMessage } from '../types'
 import { isTransactionRequest, isTypedMessageSignatureRequest } from '../../../resources/domain/request'
 import Erc20Contract from '../../contracts/erc20'
-import { parsePermit } from '../../signatures'
 
 const nebula = nebulaApi()
 
@@ -395,30 +394,6 @@ class FrameAccount {
       this.requests[r.handlerId].mode = RequestMode.Normal
       this.requests[r.handlerId].created = Date.now()
       this.requests[r.handlerId].res = res
-
-      if (req.type === 'signErc20Permit') {
-        const permit = parsePermit(req)
-
-        const permitRequest = req as PermitSignatureRequest
-        permitRequest.permit = {
-          ...permit,
-          spender: {
-            address: permit.spender,
-            ens: '',
-            type: ''
-          },
-          verifyingContract: {
-            address: permit.verifyingContract,
-            ens: '',
-            type: ''
-          }
-        }
-
-        permitRequest.tokenData = {
-          name: '',
-          symbol: ''
-        }
-      }
 
       this.revealDetails(req)
 

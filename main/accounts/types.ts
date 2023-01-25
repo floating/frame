@@ -133,7 +133,7 @@ interface EIP2612PermitDomain {
   verifyingContract: string
 }
 
-interface EIP2612TypedData {
+export interface EIP2612TypedData {
   types: MessageTypes
   primaryType: 'Permit'
   domain: EIP2612PermitDomain

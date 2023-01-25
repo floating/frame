@@ -33,6 +33,7 @@ import { ActionType } from '../transaction/actions'
 import { openBlockExplorer } from '../windows/window'
 import { ApprovalType } from '../../resources/constants'
 import { accountNS } from '../../resources/domain/account'
+import { TokenData } from '../contracts/erc20'
 
 function notify(title: string, body: string, action: (event: Electron.Event) => void) {
   const notification = new Notification({ title, body })
@@ -165,19 +166,26 @@ export class Accounts extends EventEmitter {
     log.verbose('updateRequest', { reqId, actionId, data })
 
     const currentAccount = this.current()
-    const request = currentAccount?.getRequest<TransactionRequest | PermitSignatureRequest>(reqId)
+    const request = currentAccount?.getRequest(reqId)
     if (!currentAccount || !request) return
 
     if (request.type === 'transaction') {
       if (!actionId) return
-      const action = (request.recognizedActions || []).find((a) => a.id === actionId)
+
+      const transactionReq = request as TransactionRequest
+      const action = (transactionReq.recognizedActions || []).find((a) => a.id === actionId)
       if (!action?.update) return
 
-      action.update(request, data)
+      action?.update(transactionReq, data)
     }
+
     if (request.type === 'signErc20Permit') {
-      Object.assign(currentAccount.requests[reqId], data)
+      const permitReq = request as PermitSignatureRequest
+      const reqData = data as PermitSignatureRequest
+
+      Object.assign(permitReq, reqData)
     }
+
     currentAccount.update()
   }
 
