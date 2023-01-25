@@ -246,7 +246,6 @@ export class Tray {
       this.recentDisplayEvent = false
     }, 150)
 
-    log.warn('tray hide')
     store.toggleDash('hide')
     store.trayOpen(false)
     if (store('main.reveal')) {
@@ -272,7 +271,7 @@ export class Tray {
     }, 150)
 
     // windows.tray.setPosition(0, 0)
-    windows.tray.setAlwaysOnTop(false)
+    windows.tray.setAlwaysOnTop(true)
     windows.tray.setVisibleOnAllWorkspaces(true, {
       visibleOnFullScreen: true,
       skipTransformProcessType: true
@@ -285,16 +284,15 @@ export class Tray {
     windows.tray.setMaximumSize(trayWidth, height)
     const pos = topRight(windows.tray)
 
-    log.warn('tray show @', pos)
     windows.tray.setPosition(pos.x, pos.y)
-    // if (!glide) {
-    //   windows.tray.focus()
-    // }
+    if (!glide) {
+      windows.tray.focus()
+    }
     store.trayOpen(true)
     windows.tray.emit('show')
     windows.tray.show()
     events.emit('tray:show')
-    if (windows?.tray?.focus && !glide) {
+    if (windows && windows.tray && windows.tray.focus && !glide) {
       windows.tray.focus()
     }
     windows.tray.setAlwaysOnTop(true)
