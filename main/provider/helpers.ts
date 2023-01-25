@@ -116,11 +116,6 @@ export function gasFees(rawTx: TransactionData) {
   return store('main.networksMeta', 'ethereum', parseInt(rawTx.chainId, 16), 'gas')
 }
 
-export function isCurrentAccount(address: string, account: FrameAccount | null) {
-  const accountToCheck = account || { id: '' }
-  return address && accountToCheck.id.toLowerCase() === address.toLowerCase()
-}
-
 export function resError(errorData: string | EVMError, request: RPCId, res: RPCErrorCallback) {
   const error =
     typeof errorData === 'string'

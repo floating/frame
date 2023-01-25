@@ -1,4 +1,4 @@
-import { accountSort as byCreation } from '../../../../resources/domain/account'
+import { accountSort as byCreation, hasAddress } from '../../../../resources/domain/account'
 
 const makeMockAccount = (address, timestamp = Date.now(), block = 0, name = address) => ({
   address,
@@ -21,7 +21,35 @@ beforeEach(() => {
   now = Date.now()
 })
 
-describe('accountSort', () => {
+describe('#hasAddress', () => {
+  it('matches an address with different casing', () => {
+    const address = '0xa7888f85bd76deef3bd03d4dbcf57765a49883b3'
+    const account = { id: '0xa7888F85BD76deeF3Bd03d4DbCF57765a49883b3' }
+
+    expect(hasAddress(account, address)).toBe(true)
+  })
+
+  it('does not match a different address', () => {
+    const address = '0xa7888f85bd76deef3bd03d4dbcf57765a49883b3'
+    const account = { id: '0x66b870ddf78c975af5cd8edc6de25eca81791de1' }
+
+    expect(hasAddress(account, address)).toBe(false)
+  })
+
+  it('does not match an undefined address', () => {
+    const account = { id: '0xa7888F85BD76deeF3Bd03d4DbCF57765a49883b3' }
+
+    expect(hasAddress(account, undefined)).toBe(false)
+  })
+
+  it('does not match an empty address', () => {
+    const account = { id: '0xa7888F85BD76deeF3Bd03d4DbCF57765a49883b3' }
+
+    expect(hasAddress(account, '')).toBe(false)
+  })
+})
+
+describe('#accountSort', () => {
   it('should correctly sort a set of accounts in descending order by creation time according to timestamp', () => {
     const acc1 = makeMockAccount(addresses[0])
     const acc2 = makeMockAccount(addresses[1], now + 500)

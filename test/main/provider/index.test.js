@@ -67,7 +67,9 @@ beforeEach(() => {
   }
 
   accounts.current = jest.fn(() => ({ id: address, getAccounts: () => [address] }))
-  accounts.get = jest.fn((addr) => (addr === address ? { address, lastSignerType: 'ring' } : undefined))
+  accounts.get = jest.fn((addr) =>
+    addr === address ? { id: address, address, lastSignerType: 'ring' } : undefined
+  )
   accounts.signTransaction = jest.fn()
   accounts.setTxSigned = jest.fn()
 })
@@ -1183,6 +1185,7 @@ describe('#send', () => {
         contents: 'Hello!'
       }
     }
+
     const typedDataLegacy = [
       {
         type: 'string',
@@ -1195,6 +1198,7 @@ describe('#send', () => {
         value: '1212'
       }
     ]
+
     const typedDataInvalid = {
       ...typedData,
       primaryType: 'b0rk'
@@ -1288,6 +1292,10 @@ describe('#send', () => {
       })
     })
 
+    beforeEach(() => {
+      accounts.current.mockReturnValue({ id: address })
+    })
+
     it('handles typed data as a stringified json param', () => {
       const params = [JSON.stringify(typedData), address]
 
@@ -1324,6 +1332,17 @@ describe('#send', () => {
       })
     })
 
+    it('does not submit a request to the wrong account', (done) => {
+      accounts.current.mockReturnValueOnce({ id: '0xa4581bfe76201f3aa147cce8e360140582260441' })
+      const params = [address, typedData]
+
+      send({ method: 'eth_signTypedData_v3', params }, (err) => {
+        expect(err.error.message).toBe('Sign request is not from currently selected account')
+        expect(err.error.code).toBe(-1)
+        done()
+      })
+    })
+
     it('does not submit a request with malformed type data', (done) => {
       const params = [address, 'test']
 
@@ -1340,7 +1359,7 @@ describe('#send', () => {
     hardwareSigners.forEach((signerType) => {
       it(`does not submit a V3 request to a ${signerType}`, (done) => {
         accounts.get.mockImplementationOnce((addr) => {
-          return addr === address ? { address, lastSignerType: signerType } : {}
+          return addr === address ? { id: address, address, lastSignerType: signerType } : {}
         })
 
         const params = [address, typedData]
