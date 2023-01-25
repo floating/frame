@@ -569,7 +569,7 @@ export class Provider extends EventEmitter {
     const currentAccount = accounts.current()
 
     if (!currentAccount || !hasAddress(currentAccount, from)) {
-      return resError('Sign request is not from currently selected account.', payload, res)
+      return resError('Sign request is not from currently selected account', payload, res)
     }
 
     const handlerId = this.addRequestHandler(res)
@@ -612,17 +612,6 @@ export class Provider extends EventEmitter {
       return resError(`Missing typed data`, payload, res)
     }
 
-    const targetAccount = accounts.get(from.toLowerCase())
-
-    if (!targetAccount) {
-      return resError(`Unknown account: ${from}`, payload, res)
-    }
-
-    const currentAccount = accounts.current()
-    if (!currentAccount || !hasAddress(currentAccount, targetAccount.id)) {
-      return resError('Sign request is not from currently selected account.', payload, res)
-    }
-
     // HACK: Standards clearly say, that second param is an object but it seems like in the wild it can be a JSON-string.
     if (typeof typedData === 'string') {
       try {
@@ -640,6 +629,17 @@ export class Provider extends EventEmitter {
     // no explicit version called so we choose one which best fits the data
     if (!version) {
       version = getVersionFromTypedData(typedData)
+    }
+
+    const targetAccount = accounts.get(from.toLowerCase())
+
+    if (!targetAccount) {
+      return resError(`Unknown account: ${from}`, payload, res)
+    }
+
+    const currentAccount = accounts.current()
+    if (!currentAccount || !hasAddress(currentAccount, targetAccount.id)) {
+      return resError('Sign request is not from currently selected account', payload, res)
     }
 
     const signerType = getSignerType(targetAccount.lastSignerType)
