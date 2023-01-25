@@ -35,7 +35,6 @@ import {
   getPermissions,
   getRawTx,
   getSignedAddress,
-  isCurrentAccount,
   requestPermissions,
   resError,
   hasPermission
@@ -54,6 +53,7 @@ import type {
   TypedMessage
 } from '../accounts/types'
 import * as sigParser from '../signatures'
+import { hasAddress } from '../../resources/domain/account'
 
 type Subscription = {
   id: string
@@ -509,8 +509,9 @@ export class Provider extends EventEmitter {
         const txMetadata = transactionMetadata as TransactionMetadata
         const from = txMetadata.tx.from
 
-        if (from && !isCurrentAccount(from, currentAccount))
+        if (!currentAccount || !hasAddress(currentAccount, from)) {
           return resError('Transaction is not from currently selected account', payload, res)
+        }
 
         const handlerId = this.addRequestHandler(res)
         const { feesUpdated, ...data } = txMetadata.tx
@@ -567,8 +568,9 @@ export class Provider extends EventEmitter {
     const from = (payload.params || [])[0]
     const currentAccount = accounts.current()
 
-    if (!isCurrentAccount(from, currentAccount))
-      return resError('sign request is not from currently selected account.', payload, res)
+    if (!currentAccount || !hasAddress(currentAccount, from)) {
+      return resError('Sign request is not from currently selected account.', payload, res)
+    }
 
     const handlerId = this.addRequestHandler(res)
 
@@ -614,6 +616,11 @@ export class Provider extends EventEmitter {
 
     if (!targetAccount) {
       return resError(`Unknown account: ${from}`, payload, res)
+    }
+
+    const currentAccount = accounts.current()
+    if (!currentAccount || !hasAddress(currentAccount, targetAccount.id)) {
+      return resError('Sign request is not from currently selected account.', payload, res)
     }
 
     // HACK: Standards clearly say, that second param is an object but it seems like in the wild it can be a JSON-string.

@@ -1,6 +1,11 @@
+import FrameAccount from '../../../main/accounts/Account'
 import { getSignerDisplayType } from '../signer'
 
 export const accountNS = '114c39e5-cd7d-416f-ab9e-5ab6ab0218ce'
+
+export function hasAddress(account: FrameAccount, address = '') {
+  return account.id.toLowerCase() === address.toLowerCase()
+}
 
 export const isDefaultAccountName = ({ name, lastSignerType }: Account) =>
   name.toLowerCase() === getDefaultAccountName(lastSignerType)
