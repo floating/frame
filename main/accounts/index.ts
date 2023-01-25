@@ -174,10 +174,11 @@ export class Accounts extends EventEmitter {
       if (!action?.update) return
 
       action.update(request, data)
-      currentAccount.update()
-    } else if (request.type === 'signErc20Permit') {
-      store.updateTypedDataRequest(currentAccount.id, reqId, data)
     }
+    if (request.type === 'signErc20Permit') {
+      Object.assign(currentAccount.requests[reqId], data)
+    }
+    currentAccount.update()
   }
 
   async replaceTx(id: string, type: ReplacementType) {

@@ -37,7 +37,7 @@ const SimpleTypedDataInner = ({ typedData }) =>
 export const SimpleTypedData = ({ req, originName }) => {
   const type = req.type
   const payload = req.payload
-  const typedData = payload.params[1] || {}
+  const typedData = req.typedMessage.data || {}
 
   return type === 'signTypedData' || 'signErc20Permit' ? (
     <div className='accountViewScroll cardShow'>
