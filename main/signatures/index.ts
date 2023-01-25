@@ -1,12 +1,7 @@
 import signatureTypes from './types'
 import { SignTypedDataVersion, MessageTypeProperty } from '@metamask/eth-sig-util'
 
-import type {
-  Permit,
-  PermitSignatureRequest,
-  TypedMessage,
-  TypedSignatureRequestType
-} from '../accounts/types'
+import type { TypedMessage, TypedSignatureRequestType } from '../accounts/types'
 import type { EIP712MessageDomain } from '@ledgerhq/hw-app-eth/lib/modules/EIP712/EIP712.types'
 
 const matchesMsgType = (properties: MessageTypeProperty[], required: MessageTypeProperty[]) =>
@@ -31,27 +26,6 @@ export const identify = ({ data }: TypedMessage<SignTypedDataVersion>): TypedSig
   })
 
   return identified ? (identified[0] as TypedSignatureRequestType) : 'signTypedData'
-}
-
-export const parsePermit = (req: PermitSignatureRequest): Permit => {
-  const {
-    typedMessage: {
-      data: {
-        message: { deadline, spender, value, owner, nonce },
-        domain: { verifyingContract, chainId }
-      }
-    }
-  } = req
-
-  return {
-    deadline,
-    spender,
-    value,
-    owner,
-    verifyingContract,
-    chainId,
-    nonce
-  }
 }
 
 export { isSignatureRequest } from '../../resources/domain/request'
