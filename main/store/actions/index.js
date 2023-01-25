@@ -858,6 +858,7 @@ module.exports = {
       }
 
       Object.assign(requests[reqId], data)
+
       return requests
     })
   }

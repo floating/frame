@@ -14,11 +14,22 @@ import { getSignatureRequestClass } from '../../../../../resources/domain/reques
 import useCopiedMessage from '../../../../../resources/Hooks/useCopiedMessage'
 
 const PermitOverview = ({ req, chainData, originName }) => {
-  const { permit, tokenData, handlerId } = req
-  const { deadline, spender, value } = permit || {}
   const { chainColor, chainName, icon } = chainData
+  const {
+    permit: { spender, value, deadline },
+    tokenData,
+    handlerId
+  } = req
 
   const [showCopiedMessage, copySpender] = useCopiedMessage(spender.address)
+
+  const amountDisplay = isUnlimited(value)
+    ? '~UNLIMITED'
+    : tokenData.decimals
+    ? new BigNumber(value).shiftedBy(-tokenData.decimals)
+    : 'UNKNOWN AMOUNT'
+
+  const amountSuffix = tokenData.symbol || 'UNKNOWN TOKEN'
 
   return (
     <div className='approveRequest'>
@@ -49,8 +60,8 @@ const PermitOverview = ({ req, chainData, originName }) => {
                           <div className='requestItemTitleSubIcon'>{svg.window(10)}</div>
                           <div className='requestItemTitleSubText'>{originName}</div>
                         </div>
-                        <div className='_txDescriptionSummaryMain'>{`Token Permit to Spend ${
-                          tokenData.symbol || '??'
+                        <div className='_txDescriptionSummaryMain'>{`Permit to Spend ${
+                          tokenData.symbol || 'Unknown Token'
                         }`}</div>
                       </RequestHeader>
                     </div>
@@ -64,12 +75,7 @@ const PermitOverview = ({ req, chainData, originName }) => {
               {tokenData && (
                 <>
                   <ClusterRow>
-                    <ClusterValue
-                      pointerEvents={true}
-                      onClick={() => {
-                        copySpender(spender.address)
-                      }}
-                    >
+                    <ClusterValue pointerEvents={true} onClick={() => copySpender()}>
                       <div className='clusterAddress'>
                         <span className='clusterAddressRecipient'>
                           {spender.ens || (
@@ -100,21 +106,20 @@ const PermitOverview = ({ req, chainData, originName }) => {
                   </ClusterRow>
                   <ClusterRow>
                     <ClusterValue
-                      onClick={() => {
-                        link.send('nav:update', 'panel', {
-                          data: {
-                            step: 'adjustPermit',
-                            tokenData
-                          }
+                      onClick={
+                        tokenData.decimals &&
+                        (() => {
+                          link.send('nav:update', 'panel', {
+                            data: {
+                              step: 'adjustPermit',
+                              tokenData
+                            }
+                          })
                         })
-                      }}
+                      }
                     >
                       <div className='clusterFocus'>
-                        <div className='clusterFocusHighlight'>{`${
-                          isUnlimited(value)
-                            ? '~UNLIMITED'
-                            : new BigNumber(value).shiftedBy(-tokenData.decimals)
-                        } ${tokenData.symbol || '??'}`}</div>
+                        <div className='clusterFocusHighlight'>{`${amountDisplay} ${amountSuffix}`}</div>
                       </div>
                     </ClusterValue>
                   </ClusterRow>
@@ -145,24 +150,27 @@ const PermitOverview = ({ req, chainData, originName }) => {
 }
 
 const EditPermit = ({ req }) => {
-  const {
-    typedMessage: { data: typedMessageData },
-    permit,
-    tokenData,
-    ensDomains
-  } = req
+  const { typedMessage, permit, tokenData } = req
 
   const { verifyingContract: contract, spender, value: amount, deadline: deadlineInSeconds } = permit
 
   const updateRequest = (newAmt) => {
-    typedMessageData.message.value = newAmt
+    const updated = {
+      ...typedMessage,
+      data: {
+        ...typedMessage.data,
+        message: {
+          ...typedMessage.data.message,
+          value: newAmt
+        }
+      }
+    }
+
     link.rpc(
       'updateRequest',
       req.handlerId,
       {
-        typedMessage: {
-          data: typedMessageData
-        },
+        typedMessage: updated,
         permit: {
           ...permit,
           value: newAmt

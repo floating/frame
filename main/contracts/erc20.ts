@@ -7,10 +7,10 @@ import provider from '../provider'
 import { BigNumber } from 'ethers'
 
 export interface TokenData {
-  decimals: number
+  decimals?: number
   name: string
   symbol: string
-  totalSupply: string
+  totalSupply?: string
 }
 
 function createWeb3ProviderWrapper(chainId: number) {

@@ -349,22 +349,22 @@ class FrameAccount {
     if (!knownRequest) return
 
     try {
-      const permit = parsePermit(req)
       const permitRequest = knownRequest as PermitSignatureRequest
+      const { permit } = permitRequest
 
-      const contract = new Erc20Contract(permit.verifyingContract, Number(permit.chainId))
+      const contract = new Erc20Contract(permit.verifyingContract.address, Number(permit.chainId))
       const [tokenData, contractIdentity, spenderIdentity] = await Promise.all([
         contract.getTokenData(),
-        reveal.identity(permit.verifyingContract),
-        reveal.identity(permit.spender)
+        reveal.identity(permit.verifyingContract.address),
+        reveal.identity(permit.spender.address)
       ])
 
       Object.assign(permitRequest, {
         tokenData,
         permit: {
           ...permit,
-          verifyingContract: contractIdentity,
-          spender: spenderIdentity
+          verifyingContract: { ...permit.verifyingContract, ...contractIdentity },
+          spender: { ...permit.spender, ...spenderIdentity }
         }
       })
 
@@ -395,6 +395,30 @@ class FrameAccount {
       this.requests[r.handlerId].mode = RequestMode.Normal
       this.requests[r.handlerId].created = Date.now()
       this.requests[r.handlerId].res = res
+
+      if (req.type === 'signErc20Permit') {
+        const permit = parsePermit(req)
+
+        const permitRequest = req as PermitSignatureRequest
+        permitRequest.permit = {
+          ...permit,
+          spender: {
+            address: permit.spender,
+            ens: '',
+            type: ''
+          },
+          verifyingContract: {
+            address: permit.verifyingContract,
+            ens: '',
+            type: ''
+          }
+        }
+
+        permitRequest.tokenData = {
+          name: '',
+          symbol: ''
+        }
+      }
 
       this.revealDetails(req)
 

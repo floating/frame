@@ -5,7 +5,6 @@ const { randomBytes } = require('crypto')
 import { isAddress } from '@ethersproject/address'
 import { openBlockExplorer } from '../windows/window'
 
-import Erc20Contract from '../contracts/erc20'
 const accounts = require('../accounts').default
 const signers = require('../signers').default
 const launch = require('../launch')

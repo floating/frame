@@ -52,6 +52,7 @@ interface Request {
 type Identity = {
   address: Address
   ens: string
+  type: string
 }
 
 export interface AccountRequest<T extends RequestType = RequestType> extends Request {
@@ -149,9 +150,8 @@ export interface PermitSignatureRequest extends AccountRequest<'signErc20Permit'
     data: EIP2612TypedData
     version: SignTypedDataVersion
   }
-  permit?: PermitData
-  tokenData?: TokenData
-  ensDomains?: Record<string, string>
+  permit: PermitData
+  tokenData: TokenData
 }
 
 export interface AccessRequest extends AccountRequest<'access'> {}
