@@ -283,7 +283,6 @@ export class Tray {
     windows.tray.setSize(trayWidth, height)
     windows.tray.setMaximumSize(trayWidth, height)
     const pos = topRight(windows.tray)
-
     windows.tray.setPosition(pos.x, pos.y)
     if (!glide) {
       windows.tray.focus()
@@ -295,7 +294,6 @@ export class Tray {
     if (windows && windows.tray && windows.tray.focus && !glide) {
       windows.tray.focus()
     }
-    windows.tray.setAlwaysOnTop(true)
     windows.tray.setVisibleOnAllWorkspaces(false, {
       visibleOnFullScreen: true,
       skipTransformProcessType: true
