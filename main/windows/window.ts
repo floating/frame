@@ -14,7 +14,6 @@ export function createWindow(
   const browserWindow = new BrowserWindow({
     ...opts,
     frame: false,
-    type: 'panel',
     acceptFirstMouse: true,
     transparent: process.platform === 'darwin',
     show: false,

@@ -118,6 +118,7 @@ function initWindow(id: string, opts: Electron.BrowserWindowConstructorOptions) 
 
 function initTrayWindow() {
   initWindow('tray', {
+    type: 'panel',
     width: trayWidth,
     icon: path.join(__dirname, './AppIcon.png')
   })
@@ -241,6 +242,7 @@ export class Tray {
       this.recentDisplayEvent = false
     }, 150)
 
+    log.warn('tray hide')
     store.toggleDash('hide')
     store.trayOpen(false)
     if (store('main.reveal')) {
@@ -266,11 +268,11 @@ export class Tray {
     }, 150)
 
     // windows.tray.setPosition(0, 0)
-    windows.tray.setAlwaysOnTop(true)
-    windows.tray.setVisibleOnAllWorkspaces(true, {
-      visibleOnFullScreen: true,
-      skipTransformProcessType: true
-    })
+    windows.tray.setAlwaysOnTop(false)
+    // windows.tray.setVisibleOnAllWorkspaces(true, {
+    //   visibleOnFullScreen: true,
+    //   skipTransformProcessType: true
+    // })
     windows.tray.setResizable(false) // Keeps height consistent
     const area = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
     const height = isDev && !fullheight ? devHeight : area.height
@@ -278,21 +280,23 @@ export class Tray {
     windows.tray.setSize(trayWidth, height)
     windows.tray.setMaximumSize(trayWidth, height)
     const pos = topRight(windows.tray)
+
     windows.tray.setPosition(pos.x, pos.y)
-    if (!glide) {
-      windows.tray.focus()
-    }
+    // if (!glide) {
+    //   windows.tray.focus()
+    // }
     store.trayOpen(true)
     windows.tray.emit('show')
     windows.tray.show()
     events.emit('tray:show')
-    if (windows && windows.tray && windows.tray.focus && !glide) {
+    if (windows?.tray?.focus && !glide) {
       windows.tray.focus()
     }
-    windows.tray.setVisibleOnAllWorkspaces(false, {
-      visibleOnFullScreen: true,
-      skipTransformProcessType: true
-    })
+    windows.tray.setAlwaysOnTop(true)
+    // windows.tray.setVisibleOnAllWorkspaces(false, {
+    //   visibleOnFullScreen: true,
+    //   skipTransformProcessType: true
+    // })
   }
 
   toggle() {
@@ -314,6 +318,7 @@ class Dash {
 
   constructor() {
     initWindow('dash', {
+      type: 'panel',
       width: trayWidth
     })
   }
