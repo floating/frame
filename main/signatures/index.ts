@@ -10,17 +10,21 @@ const matchesMsgType = (properties: MessageTypeProperty[], required: MessageType
     Boolean(properties.find((item) => item.name === name && item.type === type))
   )
 
+const matchesMessage = (message: Record<string, unknown>, required: MessageTypeProperty[]) =>
+  required.every(({ name }) => message[name] !== undefined)
+
 const matchesDomainFilter = (domain: EIP712MessageDomain, domainFilter: string[]) =>
   domainFilter.every((property) => property in domain)
 
 export const identify = ({ data }: TypedMessage<SignTypedDataVersion>): TypedSignatureRequestType => {
   const identified = Object.entries(signatureTypes).find(([, { domainFilter, types: requiredTypes }]) => {
-    if (!('types' in data)) return
+    if (!('types' in data && 'message' in data)) return
 
     return Object.entries(requiredTypes).every(
       ([name, properties]) =>
         data.types[name] &&
-        matchesMsgType(properties, data.types[name]) &&
+        matchesMsgType(data.types[name], properties) &&
+        matchesMessage(data.message, properties) &&
         matchesDomainFilter(data.domain as EIP712MessageDomain, domainFilter)
     )
   })
