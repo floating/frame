@@ -31,6 +31,7 @@ const showOnReady = true
 const trayWidth = 400
 const devHeight = 800
 const isWindows = process.platform === 'win32'
+const isMacOS = process.platform === 'darwin'
 
 let tray: Tray
 let dash: Dash
@@ -117,10 +118,14 @@ function initWindow(id: string, opts: Electron.BrowserWindowConstructorOptions) 
 }
 
 function initTrayWindow() {
-  initWindow('tray', {
+  const trayOpts: Electron.BrowserWindowConstructorOptions = {
     width: trayWidth,
     icon: path.join(__dirname, './AppIcon.png')
-  })
+  }
+  if (isMacOS) {
+    trayOpts.type = 'panel'
+  }
+  initWindow('tray', trayOpts)
 
   windows.tray.on('closed', () => delete windows.tray)
   windows.tray.webContents.session.setPermissionRequestHandler((webContents, permission, res) => res(false))
@@ -313,9 +318,13 @@ class Dash {
   public hiddenByAppHide = false
 
   constructor() {
-    initWindow('dash', {
+    const dashOpts: Electron.BrowserWindowConstructorOptions = {
       width: trayWidth
-    })
+    }
+    if (isMacOS) {
+      dashOpts.type = 'panel'
+    }
+    initWindow('dash', dashOpts)
   }
 
   public hide(context?: string) {

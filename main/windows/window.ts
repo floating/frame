@@ -14,6 +14,7 @@ export function createWindow(
   const browserWindow = new BrowserWindow({
     ...opts,
     frame: false,
+    acceptFirstMouse: true,
     transparent: process.platform === 'darwin',
     show: false,
     backgroundColor: store('main.colorwayPrimary', store('main.colorway'), 'background'),
