@@ -269,10 +269,10 @@ export class Tray {
 
     // windows.tray.setPosition(0, 0)
     windows.tray.setAlwaysOnTop(false)
-    // windows.tray.setVisibleOnAllWorkspaces(true, {
-    //   visibleOnFullScreen: true,
-    //   skipTransformProcessType: true
-    // })
+    windows.tray.setVisibleOnAllWorkspaces(true, {
+      visibleOnFullScreen: true,
+      skipTransformProcessType: true
+    })
     windows.tray.setResizable(false) // Keeps height consistent
     const area = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
     const height = isDev && !fullheight ? devHeight : area.height
@@ -281,6 +281,7 @@ export class Tray {
     windows.tray.setMaximumSize(trayWidth, height)
     const pos = topRight(windows.tray)
 
+    log.warn('tray show @', pos)
     windows.tray.setPosition(pos.x, pos.y)
     // if (!glide) {
     //   windows.tray.focus()
@@ -293,10 +294,10 @@ export class Tray {
       windows.tray.focus()
     }
     windows.tray.setAlwaysOnTop(true)
-    // windows.tray.setVisibleOnAllWorkspaces(false, {
-    //   visibleOnFullScreen: true,
-    //   skipTransformProcessType: true
-    // })
+    windows.tray.setVisibleOnAllWorkspaces(false, {
+      visibleOnFullScreen: true,
+      skipTransformProcessType: true
+    })
   }
 
   toggle() {
