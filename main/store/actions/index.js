@@ -21,7 +21,7 @@ function validateNetworkSettings(network) {
     !Number.isInteger(networkId) ||
     typeof network.type !== 'string' ||
     typeof network.name !== 'string' ||
-    typeof network.explorer !== 'string' ||
+    (network.explorer && typeof network.explorer !== 'string') ||
     typeof network.symbol !== 'string' ||
     !supportedNetworkTypes.includes(network.type)
   ) {
@@ -262,6 +262,7 @@ module.exports = {
 
       const defaultNetwork = {
         id: 0,
+        isTestnet: false,
         type: '',
         name: '',
         explorer: '',

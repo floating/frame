@@ -52,8 +52,8 @@ describe('rendering', () => {
     const chainConfig = { view: 'setup' }
     render(<Chain {...chainConfig} />)
 
-    const titleSection = screen.getByRole('chainName')
-    expect(titleSection.textContent).toBe('Chain Name')
+    const chainName = screen.getByLabelText('Chain Name')
+    expect(chainName.value).toBe('Chain Name')
   })
 
   it('renders the correct chain name', () => {
