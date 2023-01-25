@@ -1,6 +1,6 @@
 import React from 'react'
 import Restore from 'react-restore'
-import TypedSignatureOverview from '../../../../../resources/Components/SimpleTypedData'
+import { SimpleTypedData as TypedSignatureOverview } from '../../../../../resources/Components/SimpleTypedData'
 import { getSignatureRequestClass } from '../../../../../resources/domain/request'
 class TransactionRequest extends React.Component {
   constructor(...args) {
