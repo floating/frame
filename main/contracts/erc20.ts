@@ -6,6 +6,13 @@ import erc20Abi from '../externalData/balances/erc-20-abi'
 import provider from '../provider'
 import { BigNumber } from 'ethers'
 
+export interface TokenData {
+  decimals?: number
+  name: string
+  symbol: string
+  totalSupply?: string
+}
+
 function createWeb3ProviderWrapper(chainId: number) {
   const wrappedSend = (
     request: { method: string; params?: any[] },
@@ -71,7 +78,7 @@ export default class Erc20Contract {
     return this.contract.interface.encodeFunctionData(fn, params)
   }
 
-  async getTokenData() {
+  async getTokenData(): Promise<TokenData> {
     const calls = await Promise.all([
       this.contract.decimals().catch(() => 0),
       this.contract.name().catch(() => ''),

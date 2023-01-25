@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import BigNumber from 'bignumber.js'
 
 import { isUnlimited } from '../../../../../resources/utils/numbers'
@@ -13,35 +13,23 @@ import { SimpleTypedData as TypedSignatureOverview } from '../../../../../resour
 import { getSignatureRequestClass } from '../../../../../resources/domain/request'
 import useCopiedMessage from '../../../../../resources/Hooks/useCopiedMessage'
 
-const getPermit = (req) => {
+const PermitOverview = ({ req, chainData, originName }) => {
+  const { chainColor, chainName, icon } = chainData
   const {
-    typedMessage: {
-      data: {
-        message: { deadline, spender, value, owner, nonce },
-        domain: { verifyingContract, chainId, name, version },
-        types
-      }
-    }
+    permit: { spender, value, deadline },
+    tokenData,
+    handlerId
   } = req
 
-  return {
-    deadline,
-    spender,
-    value,
-    owner,
-    verifyingContract,
-    chainId,
-    name,
-    nonce,
-    version,
-    types
-  }
-}
+  const [showCopiedMessage, copySpender] = useCopiedMessage(spender.address)
 
-const PermitOverview = ({ permit, req, chainData, originName, tokenData }) => {
-  const { owner, deadline, spender, value } = permit
-  const { chainColor, chainName, icon } = chainData
-  const [showCopiedMessage, copySpender] = useCopiedMessage(spender)
+  const amountDisplay = isUnlimited(value)
+    ? '~UNLIMITED'
+    : tokenData.decimals
+    ? new BigNumber(value).shiftedBy(-tokenData.decimals)
+    : 'UNKNOWN AMOUNT'
+
+  const amountSuffix = tokenData.symbol || 'UNKNOWN TOKEN'
 
   return (
     <div className='approveRequest'>
@@ -49,10 +37,8 @@ const PermitOverview = ({ permit, req, chainData, originName, tokenData }) => {
         <div className='_txBody'>
           <ClusterBox animationSlot={1}>
             <RequestItem
-              key={`signErc20Permit:${req.handlerId}`}
+              key={`signErc20Permit:${handlerId}`}
               req={req}
-              account={owner}
-              handlerId={req.handlerId}
               i={0}
               title={`${chainName} Token Permit`}
               color={chainColor ? `var(--${chainColor})` : ''}
@@ -74,8 +60,8 @@ const PermitOverview = ({ permit, req, chainData, originName, tokenData }) => {
                           <div className='requestItemTitleSubIcon'>{svg.window(10)}</div>
                           <div className='requestItemTitleSubText'>{originName}</div>
                         </div>
-                        <div className='_txDescriptionSummaryMain'>{`Token Permit to Spend ${
-                          tokenData.symbol || '??'
+                        <div className='_txDescriptionSummaryMain'>{`Permit to Spend ${
+                          tokenData.symbol || 'Unknown Token'
                         }`}</div>
                       </RequestHeader>
                     </div>
@@ -86,26 +72,25 @@ const PermitOverview = ({ permit, req, chainData, originName, tokenData }) => {
           </ClusterBox>
           <ClusterBox title={'Token Permit'} animationSlot={2}>
             <Cluster>
-              {Boolean(tokenData.decimals) && (
+              {tokenData && (
                 <>
                   <ClusterRow>
-                    <ClusterValue
-                      pointerEvents={true}
-                      onClick={() => {
-                        copySpender(spender)
-                      }}
-                    >
+                    <ClusterValue pointerEvents={true} onClick={() => copySpender()}>
                       <div className='clusterAddress'>
                         <span className='clusterAddressRecipient'>
-                          {spender.substring(0, 8)}
-                          {svg.octicon('kebab-horizontal', { height: 15 })}
-                          {spender.substring(spender.length - 6)}
+                          {spender.ens || (
+                            <>
+                              {spender.address.substring(0, 8)}
+                              {svg.octicon('kebab-horizontal', { height: 15 })}
+                              {spender.address.substring(spender.address.length - 6)}
+                            </>
+                          )}
                         </span>
                         <div className='clusterAddressRecipientFull'>
                           {showCopiedMessage ? (
                             <span>{'Address Copied'}</span>
                           ) : (
-                            <span className='clusterFira'>{spender}</span>
+                            <span className='clusterFira'>{spender.address}</span>
                           )}
                         </div>
                       </div>
@@ -121,21 +106,20 @@ const PermitOverview = ({ permit, req, chainData, originName, tokenData }) => {
                   </ClusterRow>
                   <ClusterRow>
                     <ClusterValue
-                      onClick={() => {
-                        link.send('nav:update', 'panel', {
-                          data: {
-                            step: 'adjustPermit',
-                            tokenData
-                          }
+                      onClick={
+                        tokenData.decimals &&
+                        (() => {
+                          link.send('nav:update', 'panel', {
+                            data: {
+                              step: 'adjustPermit',
+                              tokenData
+                            }
+                          })
                         })
-                      }}
+                      }
                     >
                       <div className='clusterFocus'>
-                        <div className='clusterFocusHighlight'>{`${
-                          isUnlimited(value)
-                            ? '~UNLIMITED'
-                            : new BigNumber(value).shiftedBy(-tokenData.decimals)
-                        } ${tokenData.symbol || '??'}`}</div>
+                        <div className='clusterFocusHighlight'>{`${amountDisplay} ${amountSuffix}`}</div>
                       </div>
                     </ClusterValue>
                   </ClusterRow>
@@ -165,29 +149,33 @@ const PermitOverview = ({ permit, req, chainData, originName, tokenData }) => {
   )
 }
 
-const EditPermit = ({ permit, tokenData, req }) => {
-  const {
-    verifyingContract: contract,
-    spender,
-    value: amount,
-    deadline: deadlineInSeconds,
-    chainId,
-    nonce,
-    name,
-    types,
-    owner,
-    version
-  } = permit
+const EditPermit = ({ req }) => {
+  const { typedMessage, permit, tokenData } = req
+
+  const { verifyingContract: contract, spender, value: amount, deadline: deadlineInSeconds } = permit
 
   const updateRequest = (newAmt) => {
+    const updated = {
+      ...typedMessage,
+      data: {
+        ...typedMessage.data,
+        message: {
+          ...typedMessage.data.message,
+          value: newAmt
+        }
+      }
+    }
+
     link.rpc(
       'updateRequest',
       req.handlerId,
       {
-        message: { deadline: deadlineInSeconds, spender, value: newAmt, owner, nonce },
-        domain: { verifyingContract: contract, chainId, name, version },
-        types,
-        primaryType: 'Permit'
+        typedMessage: updated,
+        permit: {
+          ...permit,
+          value: newAmt
+        },
+        tokenData
       },
       null,
       () => {}
@@ -217,44 +205,16 @@ const EditPermit = ({ permit, tokenData, req }) => {
 }
 
 const PermitRequest = ({ req, originName, step, chainData }) => {
-  const [tokenData, setTokenData] = useState({})
-  const permit = getPermit(req)
-
-  useEffect(() => {
-    link.rpc('getErc20Data', permit.verifyingContract, permit.chainId, (err, tokenData) => {
-      if (err) return console.error(err)
-      setTokenData(tokenData)
-    })
-  }, [])
-
   const requestClass = getSignatureRequestClass(req)
 
   const renderStep = () => {
     switch (step) {
       case 'adjustPermit':
-        return (
-          <EditPermit
-            {...{
-              tokenData,
-              permit,
-              req
-            }}
-          />
-        )
+        return <EditPermit req={req} />
       case 'viewRaw':
-        return <TypedSignatureOverview {...{ originName, req }} />
+        return <TypedSignatureOverview originName={originName} req={req} />
       default:
-        return (
-          <PermitOverview
-            {...{
-              originName,
-              tokenData,
-              permit,
-              req,
-              chainData
-            }}
-          />
-        )
+        return <PermitOverview originName={originName} req={req} chainData={chainData} />
     }
   }
 

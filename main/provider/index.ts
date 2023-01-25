@@ -46,7 +46,13 @@ import {
   createOriginChainObserver as OriginChainObserver,
   getActiveChains
 } from './chains'
-import type { LegacyTypedData, TypedData, TypedMessage } from '../accounts/types'
+import type {
+  EIP2612TypedData,
+  LegacyTypedData,
+  PermitSignatureRequest,
+  TypedData,
+  TypedMessage
+} from '../accounts/types'
 import * as sigParser from '../signatures'
 
 type Subscription = {
@@ -649,14 +655,57 @@ export class Provider extends EventEmitter {
 
     const type = sigParser.identify(typedMessage)
 
-    accounts.addRequest({
+    const req: SignTypedDataRequest = {
       handlerId,
-      type,
+      type: 'signTypedData',
       typedMessage,
       payload,
       account: targetAccount.address,
       origin: payload._origin
-    } as SignTypedDataRequest)
+    }
+
+    // TODO: all of this below code to construct the original request can be added to
+    // a module like the above sigparser which, instead of identifying the request, creates it
+    if (type === 'signErc20Permit') {
+      const {
+        message: { deadline, spender: spenderAddress, value, owner, nonce },
+        domain: { verifyingContract: contractAddress, chainId }
+      } = typedMessage.data as EIP2612TypedData
+
+      const permitRequest: PermitSignatureRequest = {
+        ...req,
+        type: 'signErc20Permit',
+        typedMessage: {
+          data: typedMessage.data as EIP2612TypedData,
+          version: SignTypedDataVersion.V4
+        },
+        permit: {
+          deadline,
+          value,
+          owner,
+          chainId,
+          nonce,
+          spender: {
+            address: spenderAddress,
+            ens: '',
+            type: ''
+          },
+          verifyingContract: {
+            address: contractAddress,
+            ens: '',
+            type: ''
+          }
+        },
+        tokenData: {
+          name: '',
+          symbol: ''
+        }
+      }
+
+      accounts.addRequest(permitRequest)
+    } else {
+      accounts.addRequest(req)
+    }
   }
 
   subscribe(payload: RPC.Subscribe.Request, res: RPCSuccessCallback) {

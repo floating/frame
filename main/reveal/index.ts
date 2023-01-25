@@ -151,9 +151,17 @@ function identifyKnownContractActions(
 }
 
 const surface = {
-  identity: async (address: string = '', chainId: number) => {
+  identity: async (address: string = '', chainId?: number) => {
     // Resolve ens, type and other data about address entities
-    const [type, ens] = await Promise.all([resolveEntityType(address, chainId), resolveEnsName(address)])
+
+    const results = await Promise.allSettled([
+      chainId ? resolveEntityType(address, chainId) : Promise.resolve(''),
+      resolveEnsName(address)
+    ])
+
+    const type = results[0].status === 'fulfilled' ? results[0].value : ''
+    const ens = results[1].status === 'fulfilled' ? results[1].value : ''
+
     // TODO: Check the address against various scam dbs
     // TODO: Check the address against user's contact list
     // TODO: Check the address against previously verified contracts

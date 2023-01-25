@@ -479,7 +479,7 @@ class RequestCommand extends React.Component {
 
     if (req.type === 'transaction' && crumb.data.step === 'confirm') {
       return this.renderTxCommand()
-    } else if (isSignatureRequest(req.type)) {
+    } else if (isSignatureRequest(req)) {
       return this.renderSignDataCommand()
     } else {
       return null
