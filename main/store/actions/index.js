@@ -262,6 +262,7 @@ module.exports = {
 
       const defaultNetwork = {
         id: 0,
+        isTestnet: false,
         type: '',
         name: '',
         explorer: '',
