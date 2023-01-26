@@ -21,7 +21,7 @@ function validateNetworkSettings(network) {
     !Number.isInteger(networkId) ||
     typeof network.type !== 'string' ||
     typeof network.name !== 'string' ||
-    (network.explorer && typeof network.explorer !== 'string') ||
+    typeof network.explorer !== 'string' ||
     typeof network.symbol !== 'string' ||
     !supportedNetworkTypes.includes(network.type)
   ) {

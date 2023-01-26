@@ -212,6 +212,13 @@ describe('#addNetwork', () => {
     expect(Object.keys(networksMeta.ethereum)).toHaveLength(0)
   })
 
+  it('does not add the network if explorer is not defined', () => {
+    addNetwork({ ...polygonNetwork, explorer: undefined })
+
+    expect(Object.keys(networks.ethereum)).toHaveLength(0)
+    expect(Object.keys(networksMeta.ethereum)).toHaveLength(0)
+  })
+
   it('does not add the network if symbol is not defined', () => {
     addNetwork({ ...polygonNetwork, symbol: undefined })
 
