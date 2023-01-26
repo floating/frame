@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 env:
-  GH_TOKEN: ${{ secrets.GH_RELEASE_DEPLOYMENT_TOKEN }}
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   create_canary_release:
@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: read version from package.json
         id: package-version
         uses: martinbeentjes/npm-get-version-action@master
@@ -26,7 +26,7 @@ jobs:
       - name: create new draft release
         uses: marvinpinto/action-automatic-releases@latest
         with:
-          repo_token: ${{ secrets.GH_RELEASE_DEPLOYMENT_TOKEN }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
           automatic_release_tag: v${{ steps.package-version.outputs.current-version }}
           prerelease: true
           draft: true
@@ -58,8 +58,8 @@ jobs:
       APPLE_ID_PASSWORD: ${{ secrets[matrix.apple_id_password_key] }}
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: 16.15.0
           cache: 'npm'
