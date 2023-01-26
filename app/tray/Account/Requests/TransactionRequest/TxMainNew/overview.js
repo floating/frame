@@ -89,7 +89,7 @@ const TxOverview = ({
   const { to, value, data: calldata } = tx
 
   const isContractDeploy = !to && isNonZeroHex(calldata)
-  const isSend = isNonZeroHex(value)
+  const isSend = recipientType === 'external' || isNonZeroHex(value)
   const isContractCall = recipientType !== 'external' && isNonZeroHex(calldata)
 
   let description
@@ -109,6 +109,7 @@ const TxOverview = ({
   } else if (isNonZeroHex(calldata)) {
     description = <DataOverview />
   }
+
   if (simple) {
     return (
       <div className='txDescriptionSummaryStandalone'>
