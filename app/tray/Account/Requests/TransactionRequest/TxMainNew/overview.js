@@ -90,7 +90,7 @@ const TxOverview = ({
 
   const isContractDeploy = !to && isNonZeroHex(calldata)
   const isSend = isNonZeroHex(value)
-  const isContractCall = recipientType !== 'external'
+  const isContractCall = recipientType !== 'external' && isNonZeroHex(calldata)
 
   let description
 
