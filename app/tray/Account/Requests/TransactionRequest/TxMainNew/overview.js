@@ -85,12 +85,12 @@ const TxOverview = ({
   simple,
   valueColor
 }) => {
-  const { recipientType, decodedData: { method } = {}, data: tx = {} } = req
+  const { decodedData: { method } = {}, data: tx = {} } = req
   const { to, value, data: calldata } = tx
 
   const isContractDeploy = !to && isNonZeroHex(calldata)
   const isSend = isNonZeroHex(value)
-  const isContractCall = recipientType !== 'external'
+  const isContractCall = calldata !== '0x'
 
   let description
 
