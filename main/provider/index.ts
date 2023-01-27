@@ -54,6 +54,7 @@ import type {
 } from '../accounts/types'
 import * as sigParser from '../signatures'
 import { hasAddress } from '../../resources/domain/account'
+import { isCaip27Request, mapCaip27Request } from '../requests'
 
 type Subscription = {
   id: string
@@ -921,6 +922,13 @@ export class Provider extends EventEmitter {
   }
 
   send(payload: RPCRequestPayload, res: RPCRequestCallback = () => {}) {
+    // TODO: in the future this mapping will happen in the requests module so that the handler only ever
+    // has to worry about one shape of request
+    if (isCaip27Request(payload)) {
+      this.send(mapCaip27Request(payload as unknown as Caip27JsonRpcRequest), res)
+      return
+    }
+
     const method = payload.method || ''
 
     // method handlers that are not chain-specific can go here, before parsing the target chain
