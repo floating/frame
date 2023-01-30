@@ -33,7 +33,7 @@ describe('#mapCaip27Request', () => {
     })
   })
 
-  it('identifies a CAIP-27 request using the caip_request method', () => {
+  it('identifies a request using the caip_request method', () => {
     const req = {
       ...request,
       method: 'caip_request'
@@ -42,7 +42,7 @@ describe('#mapCaip27Request', () => {
     expect(mapCaip27Request(req)).toBeTruthy()
   })
 
-  it('identifies a CAIP-27 request using the wallet_request method', () => {
+  it('identifies a request using the wallet_request method', () => {
     const req = {
       ...request,
       method: 'wallet_request'
@@ -51,7 +51,7 @@ describe('#mapCaip27Request', () => {
     expect(mapCaip27Request(req)).toBeTruthy()
   })
 
-  it('does not identify a CAIP-27 using an unsupported method', () => {
+  it('does not identify a request using an unsupported method', () => {
     const req = {
       ...request,
       method: 'eth_sendTransaction'
