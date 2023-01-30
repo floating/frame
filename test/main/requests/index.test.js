@@ -33,13 +33,76 @@ describe('#mapCaip27Request', () => {
     })
   })
 
-  it('does not identify a CAIP-27 request with the wrong method', () => {
+  it('identifies a CAIP-27 request using the caip_request method', () => {
+    const req = {
+      ...request,
+      method: 'caip_request'
+    }
+
+    expect(mapCaip27Request(req)).toBeTruthy()
+  })
+
+  it('identifies a CAIP-27 request using the wallet_request method', () => {
+    const req = {
+      ...request,
+      method: 'wallet_request'
+    }
+
+    expect(mapCaip27Request(req)).toBeTruthy()
+  })
+
+  it('does not identify a CAIP-27 using an unsupported method', () => {
     const req = {
       ...request,
       method: 'eth_sendTransaction'
     }
 
-    expect(mapCaip27Request(req)).toBeUndefined()
+    expect(() => mapCaip27Request(req)).toThrowError(/invalid method for caip-27 request/i)
+  })
+
+  it('identifies a request with a CAIP-2 compliant chain param', () => {
+    const { session, request: payload } = request.params
+
+    const req = {
+      ...request,
+      params: {
+        chainId: 'eip155:10',
+        session,
+        request: payload
+      }
+    }
+
+    expect(mapCaip27Request(req).chainId).toBe('0xa')
+  })
+
+  it('identifies a request with a hex chain param', () => {
+    const { session, request: payload } = request.params
+
+    const req = {
+      ...request,
+      params: {
+        chainId: '0x5',
+        session,
+        request: payload
+      }
+    }
+
+    expect(mapCaip27Request(req).chainId).toBe('0x5')
+  })
+
+  it('identifies a request with a numeric chain param', () => {
+    const { session, request: payload } = request.params
+
+    const req = {
+      ...request,
+      params: {
+        chainId: '137',
+        session,
+        request: payload
+      }
+    }
+
+    expect(mapCaip27Request(req).chainId).toBe('0x89')
   })
 
   it('does not identify a CAIP-27 request with an incorrect chain id param', () => {
@@ -48,13 +111,13 @@ describe('#mapCaip27Request', () => {
     const req = {
       ...request,
       params: {
-        chainId: '0x1',
+        chainId: 'achain',
         session,
         request: payload
       }
     }
 
-    expect(mapCaip27Request(req)).toBeUndefined()
+    expect(() => mapCaip27Request(req)).toThrowError()
   })
 
   it('does not identify a CAIP-27 request with no chain id param', () => {
@@ -68,6 +131,6 @@ describe('#mapCaip27Request', () => {
       }
     }
 
-    expect(mapCaip27Request(req)).toBeUndefined()
+    expect(() => mapCaip27Request(req)).toThrowError()
   })
 })
