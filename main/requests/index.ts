@@ -7,7 +7,12 @@ const Caip27Request = z.object({
   jsonrpc: z.literal('2.0'),
   method: z.literal('caip_request'),
   params: z.object({
-    chainId: z.string(),
+    chainId: z
+      .string()
+      .startsWith('eip155:', {
+        message: 'Chain ID must be CAIP-2 chain representation and start with "eip155"'
+      })
+      .transform((id) => addHexPrefix(BigNumber(id.split(':')[1]).toString(16))),
     session: z.string(),
     request: z.object({
       method: z.string(),
@@ -16,24 +21,23 @@ const Caip27Request = z.object({
   })
 })
 
-function fromCaip2ChainId(id: Caip2ChainId) {
-  const chainId = BigNumber(id.split(':')[1])
-  return addHexPrefix(chainId.toString(16))
-}
+export function mapCaip27Request(rpcRequest: RPCRequestPayload): RPCRequestPayload | undefined {
+  const result = Caip27Request.safeParse(rpcRequest)
 
-export function isCaip27Request(payload: RPCRequestPayload) {
-  return Caip27Request.safeParse(payload).success
-}
+  if (result.success) {
+    const caip27Request = result.data
 
-export function mapCaip27Request(request: Caip27JsonRpcRequest): RPCRequestPayload {
-  const { jsonrpc, id, _origin } = request
+    const { jsonrpc, id, _origin } = rpcRequest
+    const { chainId, request } = caip27Request.params
+    const { method, params } = request
 
-  return {
-    jsonrpc,
-    id,
-    method: request.params.request.method,
-    params: request.params.request.params,
-    chainId: fromCaip2ChainId(request.params.chainId),
-    _origin
+    return {
+      jsonrpc,
+      id,
+      method,
+      params,
+      chainId,
+      _origin
+    }
   }
 }
