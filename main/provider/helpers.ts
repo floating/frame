@@ -18,7 +18,6 @@ import store from '../store'
 import protectedMethods from '../api/protectedMethods'
 import { usesBaseFee, TransactionData, GasFeesSource } from '../../resources/domain/transaction'
 import { getAddress } from '../../resources/utils'
-import FrameAccount from '../accounts/Account'
 
 const permission = (date: number, method: string) => ({ parentCapability: method, date })
 
