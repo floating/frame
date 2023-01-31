@@ -105,7 +105,7 @@ describe('#mapCaip27Request', () => {
     expect(mapCaip27Request(req).chainId).toBe('0x89')
   })
 
-  it('does not identify a CAIP-27 request with an incorrect chain id param', () => {
+  it('does not identify a request with an incorrect chain id param', () => {
     const { session, request: payload } = request.params
 
     const req = {
@@ -120,7 +120,7 @@ describe('#mapCaip27Request', () => {
     expect(() => mapCaip27Request(req)).toThrowError()
   })
 
-  it('does not identify a CAIP-27 request with no chain id param', () => {
+  it('does not identify a request with no chain id param', () => {
     const { session, request: payload } = request.params
 
     const req = {
