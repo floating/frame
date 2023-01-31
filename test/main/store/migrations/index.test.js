@@ -1323,13 +1323,15 @@ describe('migration 32', () => {
             100: {
               nativeCurrency: {
                 symbol: 'ETH',
-                decimals: 0
+                decimals: 0,
+                name: ''
               }
             },
             137: {
               nativeCurrency: {
                 symbol: 'ETH',
-                decimals: 18
+                decimals: 18,
+                name: ''
               }
             }
           }
@@ -1364,12 +1366,37 @@ describe('migration 32', () => {
     expect(updatedKnown.length).toBe(oldKnown.length - 1)
   })
 
-  it('should add the the native currency name for Gnosis mainnet', () => {
+  it('should add the the native currency name for Gnosis mainnet if currently an empty string', () => {
     const updatedState = migrations.apply(state, 32)
     expect(getNativeCurrency(updatedState, 100).name).toBe('xDAI')
   })
-  it('should add the the native currency name for Polygon mainnet', () => {
+
+  it('should add the the native currency name for Polygon mainnet if currently an empty string', () => {
     const updatedState = migrations.apply(state, 32)
     expect(getNativeCurrency(updatedState, 137).name).toBe('Matic')
+  })
+
+  it('should add the the native currency name for Gnosis mainnet if currently undefined', () => {
+    delete state.main.networksMeta.ethereum[100].nativeCurrency.name
+    const updatedState = migrations.apply(state, 32)
+    expect(getNativeCurrency(updatedState, 100).name).toBe('xDAI')
+  })
+
+  it('should add the the native currency name for Polygon mainnet if currently undefined', () => {
+    delete state.main.networksMeta.ethereum[137].nativeCurrency.name
+    const updatedState = migrations.apply(state, 32)
+    expect(getNativeCurrency(updatedState, 137).name).toBe('Matic')
+  })
+
+  it('should not overwrite a native currency name which is not set', () => {
+    state.main.networksMeta.ethereum[100].nativeCurrency.name = 'CUSTOM_NAME'
+    const updatedState = migrations.apply(state, 32)
+    expect(getNativeCurrency(updatedState, 100).name).toBe('CUSTOM_NAME')
+  })
+
+  it('should not try to set the native currency name for a network not contained in networksMeta ', () => {
+    delete state.main.networksMeta.ethereum[100]
+    const updatedState = migrations.apply(state, 32)
+    expect(updatedState.main.networksMeta.ethereum[100]).toBeUndefined()
   })
 })
