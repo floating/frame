@@ -54,6 +54,7 @@ import type {
 } from '../accounts/types'
 import * as sigParser from '../signatures'
 import { hasAddress } from '../../resources/domain/account'
+import { mapCaip27Request } from '../requests'
 
 type Subscription = {
   id: string
@@ -920,7 +921,22 @@ export class Provider extends EventEmitter {
     })
   }
 
-  send(payload: RPCRequestPayload, res: RPCRequestCallback = () => {}) {
+  send(requestPayload: RPCRequestPayload, res: RPCRequestCallback = () => {}) {
+    // TODO: in the future this mapping will happen in the requests module so that the handler only ever
+    // has to worry about one shape of request, error handling for each request type will happen
+    // in the request handler for each type of request
+    let payload: RPCRequestPayload
+
+    if (requestPayload.method === 'caip_request' || requestPayload.method === 'wallet_request') {
+      try {
+        payload = mapCaip27Request(requestPayload)
+      } catch (e) {
+        return resError({ message: (e as Error).message }, requestPayload, res)
+      }
+    } else {
+      payload = requestPayload
+    }
+
     const method = payload.method || ''
 
     // method handlers that are not chain-specific can go here, before parsing the target chain

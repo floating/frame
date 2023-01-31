@@ -69,6 +69,7 @@
     "@ledgerhq/hw-transport-web-ble": "6.27.8",
     "@metamask/eth-sig-util": "5.0.2",
     "@sentry/electron": "4.1.2",
+    "@trezor/connect": "9.0.5",
     "auto-launch": "5.0.5",
     "bip39": "3.0.4",
     "cheerio": "1.0.0-rc.12",
@@ -99,9 +100,9 @@
     "rlp": "3.0.0",
     "semver": "7.3.8",
     "styled-components": "5.3.6",
-    "@trezor/connect": "9.0.5",
     "uuid": "9.0.0",
     "ws": "8.11.0",
+    "zod": "3.20.2",
     "zxcvbn": "4.4.2"
   },
   "devDependencies": {
