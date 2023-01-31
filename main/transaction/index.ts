@@ -4,8 +4,14 @@ import { TransactionFactory, TypedTransaction } from '@ethereumjs/tx'
 import { Common } from '@ethereumjs/common'
 
 import { AppVersion, SignerSummary } from '../signers/Signer'
-import { GasFeesSource, TransactionData, typeSupportsBaseFee } from '../../resources/domain/transaction'
+import {
+  GasFeesSource,
+  isNonZeroHex,
+  TransactionData,
+  typeSupportsBaseFee
+} from '../../resources/domain/transaction'
 import chainConfig from '../chains/config'
+import { TxClassification } from '../accounts/types'
 
 const londonHardforkSigners: SignerCompatibilityByVersion = {
   seed: () => true,
@@ -173,4 +179,16 @@ async function sign(rawTx: TransactionData, signingFn: (tx: TypedTransaction) =>
   })
 }
 
-export { maxFee, populate, sign, signerCompatibility, londonToLegacy }
+function classifyTransaction(
+  { params }: RPC.SendTransaction.Request,
+  recipientType?: string
+): TxClassification {
+  const { to, data = '0x' } = params[0]
+
+  if (!to) return TxClassification.CONTRACT_DEPLOY
+  if (recipientType === 'external' && data.length > 2) return TxClassification.SEND_DATA
+  if (isNonZeroHex(data) && recipientType !== 'external') return TxClassification.CONTRACT_CALL
+  return TxClassification.NATIVE_TRANSFER
+}
+
+export { maxFee, populate, sign, signerCompatibility, londonToLegacy, classifyTransaction }

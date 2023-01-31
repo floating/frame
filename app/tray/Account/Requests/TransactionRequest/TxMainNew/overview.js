@@ -4,14 +4,13 @@ import link from '../../../../../../resources/link'
 import EnsOverview from '../../Ens'
 
 import svg from '../../../../../../resources/svg'
+import { isNonZeroHex } from '../../../../../../resources/domain/transaction'
 
 import { Cluster, ClusterRow, ClusterValue } from '../../../../../../resources/Components/Cluster'
 import { DisplayValue } from '../../../../../../resources/Components/DisplayValue'
 import RequestHeader from '../../../../../../resources/Components/RequestHeader'
 
-const isNonZeroHex = (hex) => !!hex && !['0x', '0x0'].includes(hex)
-
-const ContractCallOverview = ({ method }) => {
+const SimpleContractCallOverview = ({ method }) => {
   const body = method ? `Calling Contract Method ${method}` : 'Calling Contract'
 
   return <div className='_txDescriptionSummaryLine'>{body}</div>
@@ -32,7 +31,8 @@ const ApproveOverview = ({ amount, decimals, symbol }) => {
   )
 }
 
-const SendOverview = ({ amount, decimals, symbol }) => {
+const SendOverview = ({ req, symbol, decimals, amount: ammt }) => {
+  const amount = ammt || req.data.value
   return (
     <div>
       <span>{'Send'}</span>
@@ -50,6 +50,11 @@ const SendOverview = ({ amount, decimals, symbol }) => {
 const DeployContractOverview = () => <div>Deploying Contract</div>
 const DataOverview = () => <div>Sending data</div>
 
+const ContractCallOverview = ({ req }) => {
+  const { decodedData: { method } = {} } = req
+  return renderRecognizedActions(req) || <SimpleContractCallOverview method={method} />
+}
+
 const actionOverviews = {
   'erc20:transfer': SendOverview,
   'erc20:approve': ApproveOverview,
@@ -60,12 +65,12 @@ const renderActionOverview = (action, index) => {
   const { id = '', data } = action
   const key = id + index
   const [actionClass, actionType] = id.split(':')
-  const ActionOverview = actionOverviews[id] || ContractCallOverview
+  const ActionOverview = actionOverviews[id] || SimpleContractCallOverview
 
   return <ActionOverview key={key} type={actionType} {...{ ...data }} />
 }
 
-function renderRecognizedAction(req) {
+function renderRecognizedActions(req) {
   const { recognizedActions: actions = [] } = req
 
   return !actions.length ? (
@@ -73,6 +78,13 @@ function renderRecognizedAction(req) {
   ) : (
     actions.map(renderActionOverview)
   )
+}
+
+const BaseOverviews = {
+  CONTRACT_DEPLOY: DeployContractOverview,
+  CONTRACT_CALL: ContractCallOverview,
+  SEND_DATA: DataOverview,
+  NATIVE_TRANSFER: SendOverview
 }
 
 const TxOverview = ({
@@ -85,35 +97,17 @@ const TxOverview = ({
   simple,
   valueColor
 }) => {
-  const { recipientType, decodedData: { method } = {}, data: tx = {} } = req
-  const { to, value, data: calldata } = tx
+  const { data: tx = {}, classification } = req
+  const { data: calldata } = tx
 
-  const isContractDeploy = !to && isNonZeroHex(calldata)
-  const isSend = recipientType === 'external' || isNonZeroHex(value)
-  const isContractCall = recipientType !== 'external' && isNonZeroHex(calldata)
-
-  let description
-
-  // TODO: empty vs unknown transactions
-
-  if (isContractDeploy) {
-    description = <DeployContractOverview />
-  } else if (isContractCall) {
-    description = renderRecognizedAction(req)
-
-    if (!description && !!method) {
-      description = <ContractCallOverview method={method} />
-    }
-  } else if (isSend) {
-    description = <SendOverview amount={value} decimals={18} symbol={symbol} />
-  } else if (isNonZeroHex(calldata)) {
-    description = <DataOverview />
-  }
+  const Description = BaseOverviews[classification]
 
   if (simple) {
     return (
       <div className='txDescriptionSummaryStandalone'>
-        <span className='txDescriptionSummaryStandaloneWrap'>{description}</span>
+        <span className='txDescriptionSummaryStandaloneWrap'>
+          <Description req={req} decimals={18} symbol={symbol} />
+        </span>
       </div>
     )
   } else {
@@ -132,7 +126,9 @@ const TxOverview = ({
                   <div className='requestItemTitleSubIcon'>{svg.window(10)}</div>
                   <div className='requestItemTitleSubText'>{originName}</div>
                 </div>
-                <div className='_txDescriptionSummaryMain'>{description}</div>
+                <div className='_txDescriptionSummaryMain'>
+                  <Description req={req} decimals={18} symbol={symbol} />
+                </div>
               </RequestHeader>
             </div>
           </ClusterValue>

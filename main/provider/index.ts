@@ -20,7 +20,7 @@ import accounts, {
 import Chains, { Chain } from '../chains'
 import { getSignerType, Type as SignerType } from '../../resources/domain/signer'
 import { TransactionData } from '../../resources/domain/transaction'
-import { populate as populateTransaction, maxFee } from '../transaction'
+import { populate as populateTransaction, maxFee, classifyTransaction } from '../transaction'
 import FrameAccount from '../accounts/Account'
 import { capitalize } from '../../resources/utils'
 import { ApprovalType } from '../../resources/constants'
@@ -45,10 +45,11 @@ import {
   createOriginChainObserver as OriginChainObserver,
   getActiveChains
 } from './chains'
-import type {
+import {
   EIP2612TypedData,
   LegacyTypedData,
   PermitSignatureRequest,
+  TxClassification,
   TypedData,
   TypedMessage
 } from '../accounts/types'
@@ -517,6 +518,8 @@ export class Provider extends EventEmitter {
         const handlerId = this.addRequestHandler(res)
         const { feesUpdated, ...data } = txMetadata.tx
 
+        const initalClassification = classifyTransaction(payload) //TODO: put into seperate module... module can also return the warning...
+
         const req = {
           handlerId,
           type: 'transaction',
@@ -527,7 +530,8 @@ export class Provider extends EventEmitter {
           approvals: [],
           feesUpdatedByUser: feesUpdated || false,
           recipientType: '',
-          recognizedActions: []
+          recognizedActions: [],
+          classification: initalClassification
         } as TransactionRequest
 
         accounts.addRequest(req, res)
