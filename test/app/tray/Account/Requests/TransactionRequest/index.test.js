@@ -4,6 +4,7 @@ import Restore from 'react-restore'
 import store from '../../../../../../main/store'
 import { screen, render } from '../../../../../componentSetup'
 import TxRequestComponent from '../../../../../../app/tray/Account/Requests/TransactionRequest'
+import { TxClassification } from '../../../../../../main/accounts/types'
 
 jest.mock('../../../../../../main/store/persist')
 jest.mock('../../../../../../resources/link', () => ({ rpc: jest.fn() }))
@@ -30,7 +31,8 @@ describe('confirm', () => {
       status: 'confirming',
       data: {
         chainId: '0x89'
-      }
+      },
+      classification: TxClassification.NATIVE_TRANSFER
     }
 
     addRequest(req)
@@ -50,7 +52,8 @@ describe('confirm', () => {
       recipientType: 'external',
       data: {
         chainId: '0x89'
-      }
+      },
+      classification: TxClassification.NATIVE_TRANSFER
     }
 
     addRequest(req)
