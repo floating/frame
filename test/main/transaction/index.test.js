@@ -1,8 +1,16 @@
 import { addHexPrefix, stripHexPrefix } from '@ethereumjs/util'
 import { Common } from '@ethereumjs/common'
 
-import { maxFee, londonToLegacy, signerCompatibility, populate, sign } from '../../../main/transaction'
+import {
+  maxFee,
+  londonToLegacy,
+  signerCompatibility,
+  populate,
+  sign,
+  classifyTransaction
+} from '../../../main/transaction'
 import { GasFeesSource } from '../../../resources/domain/transaction'
+import { TxClassification } from '../../../main/accounts/types'
 
 describe('#signerCompatibility', () => {
   it('is always compatible with legacy transactions', () => {
@@ -483,5 +491,151 @@ describe('#sign', () => {
       ...signature,
       v: '0x1b'
     })
+  })
+})
+
+describe('#classifyTransaction', () => {
+  const method = 'eth_sendTransaction'
+  const from = '0xd8da6bf26964af9d7eed9e03e53415d37aa96045'
+  const to = '0x2f3a40a3db8a7e3d09b0adfefbce4f6f81927557'
+  const Request = (param) => ({
+    method,
+    params: [param]
+  })
+
+  // Contract deployments
+  it('Correctly classifies standard contract deployments', () => {
+    const request = Request({
+      from,
+      data: '0x6080604052'
+    })
+
+    expect(classifyTransaction(request)).toBe(TxClassification.CONTRACT_DEPLOY)
+  })
+  it('Correctly classifies contract deployments with a value', () => {
+    const request = Request({
+      from,
+      data: '0x6080604052',
+      value: '0x01'
+    })
+
+    expect(classifyTransaction(request)).toBe(TxClassification.CONTRACT_DEPLOY)
+  })
+  it('Correctly classifies contract deployments with no data', () => {
+    const request = Request({
+      from,
+      data: '0x',
+      value: '0x01'
+    })
+
+    expect(classifyTransaction(request)).toBe(TxClassification.CONTRACT_DEPLOY)
+  })
+  it('Correctly classifies contract deployments with no data or value', () => {
+    const request = Request({
+      from,
+      data: '0x',
+      value: '0x'
+    })
+
+    expect(classifyTransaction(request)).toBe(TxClassification.CONTRACT_DEPLOY)
+  })
+
+  // Sending Data
+  it('Correctly classifies sending data to an EOA', () => {
+    const request = Request({
+      from,
+      to,
+      data: '0x6080604052'
+    })
+
+    expect(classifyTransaction(request, 'external')).toBe(TxClassification.SEND_DATA)
+  })
+  it('Correctly classifies sending data to an EOA with value', () => {
+    const request = Request({
+      from,
+      to,
+      data: '0x6080604052',
+      value: '0x01'
+    })
+
+    expect(classifyTransaction(request, 'external')).toBe(TxClassification.SEND_DATA)
+  })
+
+  it('Correctly classifies sending data to an unknown recipientType', () => {
+    const request = Request({
+      from,
+      to,
+      data: '0x6080604052'
+    })
+
+    expect(classifyTransaction(request)).toBe(TxClassification.CONTRACT_CALL)
+  })
+  it('Correctly classifies sending data to an unknown recipientType and a value', () => {
+    const request = Request({
+      from,
+      to,
+      data: '0x6080604052',
+      value: '0x01'
+    })
+
+    expect(classifyTransaction(request)).toBe(TxClassification.CONTRACT_CALL)
+  })
+
+  //Contract Calls
+  it('Correctly classifies calling a contract function', () => {
+    const request = Request({
+      from,
+      to,
+      data: '0x6080604052'
+    })
+
+    expect(classifyTransaction(request, 'contract')).toBe(TxClassification.CONTRACT_CALL)
+  })
+  it('Correctly classifies calling a contract function with a value', () => {
+    const request = Request({
+      from,
+      to,
+      data: '0x6080604052',
+      value: '0x01'
+    })
+
+    expect(classifyTransaction(request, 'contract')).toBe(TxClassification.CONTRACT_CALL)
+  })
+
+  it('Correctly classifies a native transfer to an EOA', () => {
+    const request = Request({
+      from,
+      to,
+      value: '0x01'
+    })
+
+    expect(classifyTransaction(request, 'external')).toBe(TxClassification.NATIVE_TRANSFER)
+  })
+  it('Correctly classifies a native transfer to an EOA with no value', () => {
+    const request = Request({
+      from,
+      to,
+      value: '0x0'
+    })
+
+    expect(classifyTransaction(request, 'external')).toBe(TxClassification.NATIVE_TRANSFER)
+  })
+  it('Correctly classifies sending a native transfer to a contract', () => {
+    const request = Request({
+      from,
+      to,
+      value: '0x01'
+    })
+
+    expect(classifyTransaction(request, 'contract')).toBe(TxClassification.NATIVE_TRANSFER)
+  })
+  it('Correctly classifies sending a native transfer to a contract with no value', () => {
+    const request = Request({
+      from,
+      to,
+      value: '0x0'
+    })
+
+    expect(classifyTransaction(request, 'contract')).toBe(TxClassification.NATIVE_TRANSFER)
   })
 })
