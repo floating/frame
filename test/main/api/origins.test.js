@@ -361,7 +361,7 @@ describe('#isTrusted', () => {
     return expect(isTrusted(payload)).resolves.toBe(true)
   })
 
-  it('xxxsends a request to grant permission to the user', async () => {
+  it('sends a request to grant permission to the user', async () => {
     const address = '0xDAFEA492D9c6733ae3d56b7Ed1ADB60692c98Bc5'
     const payload = { method: 'eth_accounts', _origin: frameTestOriginId }
 
@@ -388,7 +388,7 @@ describe('#isTrusted', () => {
     return expect(runTest).resolves
   })
 
-  it('xxxsends a response to all permission requests once the user trusts the origin', async () => {
+  it('sends a response to all permission requests once the user trusts the origin', async () => {
     const address = '0xDAFEA492D9c6733ae3d56b7Ed1ADB60692c98Bc5'
     const payload1 = { method: 'wallet_getEthereumAccounts', _origin: frameTestOriginId }
     const payload2 = { method: 'eth_accounts', _origin: frameTestOriginId }
