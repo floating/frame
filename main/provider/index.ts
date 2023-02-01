@@ -26,6 +26,7 @@ import { capitalize } from '../../resources/utils'
 import { ApprovalType } from '../../resources/constants'
 import { createObserver as AssetsObserver, loadAssets } from './assets'
 import { getVersionFromTypedData } from './typedData'
+import reveal from '../reveal'
 
 import {
   checkExistingNonceGas,
@@ -449,33 +450,36 @@ export class Provider extends EventEmitter {
       const gas = gasFees(rawTx)
       const chainConfig = this.connection.connections['ethereum'][parseInt(rawTx.chainId)].chainConfig
 
-      const estimateGas = rawTx.gasLimit
-        ? Promise.resolve(rawTx)
-        : this.getGasEstimate(rawTx)
-            .then((gasLimit) => ({ ...rawTx, gasLimit }))
-            .catch((err) => {
-              approvals.push({
-                type: ApprovalType.GasLimitApproval,
-                data: {
-                  message: err.message,
-                  gasLimit: '0x00'
-                }
-              })
-
-              return { ...rawTx, gasLimit: '0x00' }
+      const estimateGasLimit = async () => {
+        if (rawTx.gasLimit) return rawTx.gasLimit
+        try {
+          return await this.getGasEstimate(rawTx)
+        } catch (error) {
+          if (error instanceof Error)
+            approvals.push({
+              type: ApprovalType.GasLimitApproval,
+              data: {
+                message: error.message,
+                gasLimit: '0x00'
+              }
             })
+          return '0x00'
+        }
+      }
 
-      estimateGas
-        .then((tx) => {
-          const populatedTransaction = populateTransaction(tx, chainConfig, gas)
+      const [gasLimit, recipientType] = await Promise.all([
+        estimateGasLimit(),
+        rawTx.to ? reveal.resolveEntityType(rawTx.to, parseInt(rawTx.chainId, 16)) : ''
+      ])
 
-          log.info({ populatedTransaction })
+      const tx = { ...rawTx, gasLimit, recipientType }
 
-          return populatedTransaction
-        })
-        .then((tx) => checkExistingNonceGas(tx))
-        .then((tx) => cb(null, { tx, approvals }))
-        .catch(cb)
+      try {
+        const populatedTransaction = populateTransaction(tx, chainConfig, gas)
+        cb(null, { tx: checkExistingNonceGas(populatedTransaction), approvals })
+      } catch (error) {
+        if (error instanceof Error) return cb(error)
+      }
     } catch (e) {
       log.error('error creating transaction', e)
       cb(e as Error)
@@ -516,9 +520,10 @@ export class Provider extends EventEmitter {
         }
 
         const handlerId = this.addRequestHandler(res)
-        const { feesUpdated, ...data } = txMetadata.tx
 
-        const initalClassification = classifyTransaction(payload) //TODO: put into seperate module... module can also return the warning...
+        const { feesUpdated, recipientType, ...data } = txMetadata.tx
+
+        const classification = classifyTransaction(payload, recipientType) //TODO: module can also return the warnings...
 
         const req = {
           handlerId,
@@ -529,9 +534,9 @@ export class Provider extends EventEmitter {
           origin: payload._origin,
           approvals: [],
           feesUpdatedByUser: feesUpdated || false,
-          recipientType: '',
+          recipientType,
           recognizedActions: [],
-          classification: initalClassification
+          classification
         } as TransactionRequest
 
         accounts.addRequest(req, res)
