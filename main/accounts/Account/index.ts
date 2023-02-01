@@ -235,7 +235,8 @@ class FrameAccount {
   clearRequestsByOrigin(origin: string) {
     Object.entries(this.requests).forEach(([handlerId, req]) => {
       if (req.origin === origin) {
-        this.clearRequest(handlerId)
+        const err = { code: 4001, message: 'User rejected the request' }
+        this.rejectRequest(req, err)
       }
     })
   }
