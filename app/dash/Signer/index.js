@@ -7,22 +7,11 @@ import { capitalize, getAddress } from '../../../resources/utils'
 import { isHardwareSigner, getSignerDisplayType } from '../../../resources/domain/signer'
 
 import SignerStatus from './SignerStatus'
+import ReloadSignerButton from './ReloadSignerButton'
 
 function isLoading(status = '') {
   const statusToCheck = status.toLowerCase()
   return ['loading', 'connecting', 'addresses', 'input', 'pairing'].some((s) => statusToCheck.includes(s))
-}
-
-function isDisconnected(type, status, isLoading) {
-  if (type === 'lattice') {
-    return status !== 'ok' && !isLoading
-  }
-
-  if (type === 'trezor') {
-    return (status === 'disconnected' || status.includes('reconnect')) && !isLoading
-  }
-
-  return false
 }
 
 class Signer extends React.Component {
@@ -251,40 +240,19 @@ class Signer extends React.Component {
     link.send('tray:action', 'navDash', crumb)
   }
 
-  reconnectButton(hwSigner) {
-    return (
-      <div
-        className='signerControlOption'
-        onMouseDown={() => {
-          link.send('dash:reloadSigner', this.props.id)
-        }}
-      >
-        {hwSigner ? 'Reconnect' : 'Reload Signer'}
-      </div>
-    )
-  }
-
   renderPreview() {
     const signer = this.store('main.signers', this.props.id)
-    const { page, addressLimit } = this.state
-    const startIndex = page * addressLimit
-
     const status = this.getStatus()
 
     const hwSigner = isHardwareSigner(this.props.type)
     const loading = isLoading(status)
-    const disconnected = isDisconnected(this.props.type, status, loading)
 
     // TODO: create well-defined signer states that drive these UI features
-    const canReconnect =
-      this.props.type !== 'trezor' || status === 'disconnected' || status.includes('reconnect')
+    // const canReconnect =
+    //   this.props.type !== 'trezor' || status === 'disconnected' || status.includes('reconnect')
 
     // UI changes for this status only apply to hot signers
     const isLocked = !hwSigner && status === 'locked'
-    const permissionId =
-      this.props.tag || this.props.tag === ''
-        ? 'Frame' + (this.props.tag ? `-${this.props.tag}` : '')
-        : undefined
 
     let signerClass = 'signer'
     if (status === 'ok') signerClass += ' signerOk'
@@ -397,7 +365,8 @@ class Signer extends React.Component {
     const loading = isLoading(status)
 
     // TODO: create well-defined signer states that drive these UI features
-    const canReconnect = type !== 'trezor' || status === 'disconnected' || status.includes('reconnect')
+    const canReconnect =
+      hwSigner && (type !== 'trezor' || status === 'disconnected' || status.includes('reconnect'))
 
     // UI changes for this status only apply to hot signers
     const isLocked = !hwSigner && status === 'locked'
@@ -501,7 +470,7 @@ class Signer extends React.Component {
               <div className='signerControlDetailValue'>{permissionId}</div>
             </div>
           ) : null}
-          {canReconnect ? this.reconnectButton(hwSigner) : null}
+          {canReconnect && <ReloadSignerButton id={id} />}
           <div
             className='signerControlOption signerControlOptionImportant'
             onClick={() => {
