@@ -451,24 +451,22 @@ export class Provider extends EventEmitter {
       const chainConfig = this.connection.connections['ethereum'][parseInt(rawTx.chainId)].chainConfig
 
       const estimateGasLimit = async () => {
-        if (rawTx.gasLimit) return rawTx.gasLimit
         try {
           return await this.getGasEstimate(rawTx)
         } catch (error) {
-          if (error instanceof Error)
-            approvals.push({
-              type: ApprovalType.GasLimitApproval,
-              data: {
-                message: error.message,
-                gasLimit: '0x00'
-              }
-            })
+          approvals.push({
+            type: ApprovalType.GasLimitApproval,
+            data: {
+              message: (error as Error).message,
+              gasLimit: '0x00'
+            }
+          })
           return '0x00'
         }
       }
 
       const [gasLimit, recipientType] = await Promise.all([
-        estimateGasLimit(),
+        rawTx.gasLimit ?? estimateGasLimit(),
         rawTx.to ? reveal.resolveEntityType(rawTx.to, parseInt(rawTx.chainId, 16)) : ''
       ])
 
@@ -476,9 +474,12 @@ export class Provider extends EventEmitter {
 
       try {
         const populatedTransaction = populateTransaction(tx, chainConfig, gas)
-        cb(null, { tx: checkExistingNonceGas(populatedTransaction), approvals })
+        const checkedTransaction = checkExistingNonceGas(populatedTransaction)
+
+        log.verbose({ populatedTransaction })
+        cb(null, { tx: checkedTransaction, approvals })
       } catch (error) {
-        if (error instanceof Error) return cb(error)
+        return cb(error as Error)
       }
     } catch (e) {
       log.error('error creating transaction', e)
@@ -523,9 +524,7 @@ export class Provider extends EventEmitter {
 
         const { feesUpdated, recipientType, ...data } = txMetadata.tx
 
-        const classification = classifyTransaction(payload, recipientType) //TODO: module can also return the warnings...
-
-        const req = {
+        const unclassifiedReq = {
           handlerId,
           type: 'transaction',
           data,
@@ -535,9 +534,15 @@ export class Provider extends EventEmitter {
           approvals: [],
           feesUpdatedByUser: feesUpdated || false,
           recipientType,
-          recognizedActions: [],
+          recognizedActions: []
+        } as Omit<TransactionRequest, 'classification'>
+
+        const classification = classifyTransaction(unclassifiedReq) //TODO: module can also return the warnings...
+
+        const req = {
+          ...unclassifiedReq,
           classification
-        } as TransactionRequest
+        }
 
         accounts.addRequest(req, res)
 

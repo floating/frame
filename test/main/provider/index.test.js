@@ -21,9 +21,7 @@ jest.mock('../../../main/store')
 jest.mock('../../../main/chains', () => ({ send: jest.fn(), syncDataEmit: jest.fn(), on: jest.fn() }))
 jest.mock('../../../main/accounts', () => ({}))
 jest.mock('../../../main/reveal', () => ({
-  resolveEntityType: jest.fn(async () => {
-    return 'NATIVE_TRANSFER'
-  })
+  resolveEntityType: jest.fn().mockResolvedValue('external')
 }))
 jest.mock('../../../main/provider/helpers', () => {
   const helpers = jest.requireActual('../../../main/provider/helpers')

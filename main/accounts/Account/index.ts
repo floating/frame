@@ -24,7 +24,6 @@ import reveal from '../../reveal'
 import type { PermitSignatureRequest, TypedMessage } from '../types'
 import { isTransactionRequest, isTypedMessageSignatureRequest } from '../../../resources/domain/request'
 import Erc20Contract from '../../contracts/erc20'
-import { classifyTransaction } from '../../transaction'
 
 const nebula = nebulaApi()
 

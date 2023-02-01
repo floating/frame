@@ -79,6 +79,9 @@ function getAddress(address: Address) {
     return lowerCaseAddress
   }
 }
+function isNonZeroHex(hex: string) {
+  return !!hex && !['0x', '0x0'].includes(hex)
+}
 
 export {
   getErrorCode,
@@ -98,5 +101,6 @@ export {
   gweiToWeiHex,
   getAddress,
   stripHexPrefix,
-  matchFilter
+  matchFilter,
+  isNonZeroHex
 }

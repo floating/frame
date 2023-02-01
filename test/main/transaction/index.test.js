@@ -498,144 +498,190 @@ describe('#classifyTransaction', () => {
   const method = 'eth_sendTransaction'
   const from = '0xd8da6bf26964af9d7eed9e03e53415d37aa96045'
   const to = '0x2f3a40a3db8a7e3d09b0adfefbce4f6f81927557'
-  const Request = (param) => ({
-    method,
-    params: [param]
+  const Request = (param, recipientType) => ({
+    payload: {
+      method,
+      params: [param]
+    },
+    recipientType
   })
 
   // Contract deployments
-  it('should correctly classify standard contract deployments', () => {
-    const request = Request({
-      from,
-      data: '0x6080604052'
-    })
+  it('should classify transactions with data, and no recipient as contract deployments', () => {
+    const request = Request(
+      {
+        from,
+        data: '0x6080604052'
+      },
+      'unknown'
+    )
 
     expect(classifyTransaction(request)).toBe(TxClassification.CONTRACT_DEPLOY)
   })
-  it('should correctly classify contract deployments with a value', () => {
-    const request = Request({
-      from,
-      data: '0x6080604052',
-      value: '0x01'
-    })
+  it('should classify transactions with data, a value, and no recipient as contract deployments', () => {
+    const request = Request(
+      {
+        from,
+        data: '0x6080604052',
+        value: '0x01'
+      },
+      'unknown'
+    )
 
     expect(classifyTransaction(request)).toBe(TxClassification.CONTRACT_DEPLOY)
   })
-  it('should correctly classify contract deployments with no data', () => {
-    const request = Request({
-      from,
-      data: '0x',
-      value: '0x01'
-    })
+  it('should classify transactions with a value, and no recipient or data as contract deployments', () => {
+    const request = Request(
+      {
+        from,
+        data: '0x',
+        value: '0x01'
+      },
+      'unknown'
+    )
 
     expect(classifyTransaction(request)).toBe(TxClassification.CONTRACT_DEPLOY)
   })
-  it('should correctly classify contract deployments with no data or value', () => {
-    const request = Request({
-      from,
-      data: '0x',
-      value: '0x'
-    })
+
+  it('should classify transactions with no recipient, data, or value as contract deployments', () => {
+    const request = Request(
+      {
+        from,
+        data: '0x',
+        value: '0x'
+      },
+      'unknown'
+    )
 
     expect(classifyTransaction(request)).toBe(TxClassification.CONTRACT_DEPLOY)
   })
 
   // Sending Data
-  it('should correctly classify sending data to an EOA', () => {
-    const request = Request({
-      from,
-      to,
-      data: '0x6080604052'
-    })
+  it('should classify transactions which contain data, and have EOA recipient as sending data', () => {
+    const request = Request(
+      {
+        from,
+        to,
+        data: '0x6080604052'
+      },
+      'external'
+    )
 
-    expect(classifyTransaction(request, 'external')).toBe(TxClassification.SEND_DATA)
+    expect(classifyTransaction(request)).toBe(TxClassification.SEND_DATA)
   })
-  it('should correctly classify sending data to an EOA with value', () => {
-    const request = Request({
-      from,
-      to,
-      data: '0x6080604052',
-      value: '0x01'
-    })
+  it('should classify transactions which contain data, have a non-zero value, and have EOA recipient as sending data', () => {
+    const request = Request(
+      {
+        from,
+        to,
+        data: '0x6080604052',
+        value: '0x01'
+      },
+      'external'
+    )
 
-    expect(classifyTransaction(request, 'external')).toBe(TxClassification.SEND_DATA)
+    expect(classifyTransaction(request)).toBe(TxClassification.SEND_DATA)
   })
 
-  it('should correctly classify sending data to an unknown recipientType', () => {
-    const request = Request({
-      from,
-      to,
-      data: '0x6080604052'
-    })
+  it('should classify transactions which contain data, and have an unknown recipient type as contract calls', () => {
+    const request = Request(
+      {
+        from,
+        to,
+        data: '0x6080604052'
+      },
+      'unknown'
+    )
 
     expect(classifyTransaction(request)).toBe(TxClassification.CONTRACT_CALL)
   })
-  it('should correctly classify sending data to an unknown recipientType and a value', () => {
-    const request = Request({
-      from,
-      to,
-      data: '0x6080604052',
-      value: '0x01'
-    })
+  it('should classify transactions which contain data, have a non-zero value, and have unknown recipient type as contract calls', () => {
+    const request = Request(
+      {
+        from,
+        to,
+        data: '0x6080604052',
+        value: '0x01'
+      },
+      'unknown'
+    )
 
     expect(classifyTransaction(request)).toBe(TxClassification.CONTRACT_CALL)
   })
 
   //Contract Calls
-  it('should correctly classify calling a contract function', () => {
-    const request = Request({
-      from,
-      to,
-      data: '0x6080604052'
-    })
+  it('should classify transactions with data and a contract recipient as contract calls', () => {
+    const request = Request(
+      {
+        from,
+        to,
+        data: '0x6080604052'
+      },
+      'contract'
+    )
 
-    expect(classifyTransaction(request, 'contract')).toBe(TxClassification.CONTRACT_CALL)
+    expect(classifyTransaction(request)).toBe(TxClassification.CONTRACT_CALL)
   })
-  it('should correctly classify calling a contract function with a value', () => {
-    const request = Request({
-      from,
-      to,
-      data: '0x6080604052',
-      value: '0x01'
-    })
+  it('should classify transactions with data, a value, and a contract recipient as contract calls', () => {
+    const request = Request(
+      {
+        from,
+        to,
+        data: '0x6080604052',
+        value: '0x01'
+      },
+      'contract'
+    )
 
-    expect(classifyTransaction(request, 'contract')).toBe(TxClassification.CONTRACT_CALL)
+    expect(classifyTransaction(request)).toBe(TxClassification.CONTRACT_CALL)
   })
-  // Native transfers
-  it('should correctly classify a native transfer to an EOA', () => {
-    const request = Request({
-      from,
-      to,
-      value: '0x01'
-    })
+  // // Native transfers
+  it('should classify transactions with no data, and an EOA recipient as native transfers', () => {
+    const request = Request(
+      {
+        from,
+        to,
+        value: '0x01'
+      },
+      'external'
+    )
 
-    expect(classifyTransaction(request, 'external')).toBe(TxClassification.NATIVE_TRANSFER)
+    expect(classifyTransaction(request)).toBe(TxClassification.NATIVE_TRANSFER)
   })
-  it('should correctly classify a native transfer to an EOA with no value', () => {
-    const request = Request({
-      from,
-      to,
-      value: '0x0'
-    })
+  it('should classify transactions with no data or value, and an EOA recipient as native transfers', () => {
+    const request = Request(
+      {
+        from,
+        to,
+        value: '0x0'
+      },
+      'external'
+    )
 
-    expect(classifyTransaction(request, 'external')).toBe(TxClassification.NATIVE_TRANSFER)
+    expect(classifyTransaction(request)).toBe(TxClassification.NATIVE_TRANSFER)
   })
-  it('should correctly classify sending a native transfer to a contract', () => {
-    const request = Request({
-      from,
-      to,
-      value: '0x01'
-    })
+  it('should classify transactions with no data, and a contract recipient as native transfers', () => {
+    const request = Request(
+      {
+        from,
+        to,
+        value: '0x01'
+      },
+      'contract'
+    )
 
-    expect(classifyTransaction(request, 'contract')).toBe(TxClassification.NATIVE_TRANSFER)
+    expect(classifyTransaction(request)).toBe(TxClassification.NATIVE_TRANSFER)
   })
-  it('should correctly classify sending a native transfer to a contract with no value', () => {
-    const request = Request({
-      from,
-      to,
-      value: '0x0'
-    })
+  it('should classify transactions with no data or value, and a contract recipient as native transfers', () => {
+    const request = Request(
+      {
+        from,
+        to,
+        value: '0x0'
+      },
+      'contract'
+    )
 
-    expect(classifyTransaction(request, 'contract')).toBe(TxClassification.NATIVE_TRANSFER)
+    expect(classifyTransaction(request)).toBe(TxClassification.NATIVE_TRANSFER)
   })
 })

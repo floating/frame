@@ -4,7 +4,7 @@ import link from '../../../../../../resources/link'
 import EnsOverview from '../../Ens'
 
 import svg from '../../../../../../resources/svg'
-import { isNonZeroHex } from '../../../../../../resources/domain/transaction'
+import { isNonZeroHex } from '../../../../../../resources/utils'
 
 import { Cluster, ClusterRow, ClusterValue } from '../../../../../../resources/Components/Cluster'
 import { DisplayValue } from '../../../../../../resources/Components/DisplayValue'

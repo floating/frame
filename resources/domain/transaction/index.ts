@@ -16,9 +16,6 @@ export interface TransactionData extends Omit<JsonTx, 'chainId' | 'type'> {
   recipientType?: string
 }
 
-export function isNonZeroHex(hex: string) {
-  return !!hex && !['0x', '0x0'].includes(hex)
-}
 export function typeSupportsBaseFee(type: string) {
   return parseInt(type || '0') === 2
 }
