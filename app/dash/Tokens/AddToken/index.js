@@ -241,6 +241,7 @@ class AddTokenFormScreenComponent extends Component {
     this.logoURIDefault = 'Logo URI'
 
     this.state = this.stateFromTokenData(props.tokenData)
+    this.saveAndClose = this.saveAndClose.bind(this)
   }
 
   stateFromTokenData(tokenData) {
@@ -251,6 +252,14 @@ class AddTokenFormScreenComponent extends Component {
       decimals: tokenData.decimals || this.decimalsDefault,
       logoURI: tokenData.logoURI || this.logoURIDefault
     }
+  }
+
+  componentDidMount() {
+    document.addEventListener('keydown', this.saveAndClose)
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('keydown', this.saveAndClose)
   }
 
   componentDidUpdate(prevProps) {
@@ -267,8 +276,9 @@ class AddTokenFormScreenComponent extends Component {
     return this.state[statePropName] === this[`${statePropName}Default`]
   }
 
-  saveToken({ chainId, req, isEdit }) {
+  saveAndClose() {
     const { name, symbol, address, decimals, logoURI } = this.state
+    const { req, chainId, isEdit } = this.props
     const token = {
       name,
       symbol,
@@ -277,9 +287,11 @@ class AddTokenFormScreenComponent extends Component {
       decimals,
       logoURI: this.isDefault('logoURI') ? '' : logoURI
     }
+
     const backSteps = isEdit ? 2 : 4
 
     link.send('tray:addToken', token, req)
+
     setTimeout(() => {
       navBack(backSteps)
       link.send('nav:forward', 'dash', {
@@ -293,7 +305,6 @@ class AddTokenFormScreenComponent extends Component {
     const {
       chainId,
       chainName,
-      req,
       tokenData: { address },
       isEdit
     } = this.props
@@ -429,7 +440,11 @@ class AddTokenFormScreenComponent extends Component {
               {newTokenReady ? (
                 <div
                   className='addTokenSubmit addTokenSubmitEnabled'
-                  onMouseDown={() => this.saveToken({ chainId, isEdit })}
+                  onMouseUp={(e) => {
+                    if (e.button === 0) {
+                      this.saveAndClose()
+                    }
+                  }}
                 >
                   {isEdit ? 'Save' : 'Add Token'}
                 </div>
