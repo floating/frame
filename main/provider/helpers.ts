@@ -42,6 +42,7 @@ export function checkExistingNonceGas(tx: TransactionData) {
         const bumpedBase = Math.max(Math.ceil((existingMax - existingFee) * 1.1), Math.ceil(maxInt - feeInt))
         tx.maxFeePerGas = '0x' + (bumpedBase + bumpedFee).toString(16)
         tx.maxPriorityFeePerGas = '0x' + bumpedFee.toString(16)
+        tx.gasFeesSource = GasFeesSource.Frame
         tx.feesUpdated = true
       }
     } else if (tx.gasPrice) {
@@ -51,6 +52,7 @@ export function checkExistingNonceGas(tx: TransactionData) {
         // Bump price by 10%
         const bumpedPrice = Math.ceil(existingPrice * 1.1)
         tx.gasPrice = '0x' + bumpedPrice.toString(16)
+        tx.gasFeesSource = GasFeesSource.Frame
         tx.feesUpdated = true
       }
     }

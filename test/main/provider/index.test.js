@@ -922,7 +922,7 @@ describe('#send', () => {
               const replacementRequest = accountRequests[1]
               const bumpedPrice = Math.ceil(initialPrice * 1.1)
               expect(replacementRequest.data.gasPrice).toBe(intToHex(bumpedPrice))
-              expect(replacementRequest.feesUpdatedByUser).toBe(true)
+              expect(replacementRequest.feesUpdatedByUser).toBe(false)
               done()
             })
           })
@@ -992,7 +992,7 @@ describe('#send', () => {
 
               expect(replacementRequest.data.maxPriorityFeePerGas).toBe(intToHex(bumpedFee))
               expect(replacementRequest.data.maxFeePerGas).toBe(intToHex(bumpedMax))
-              expect(replacementRequest.feesUpdatedByUser).toBe(true)
+              expect(replacementRequest.feesUpdatedByUser).toBe(false)
               done()
             })
           })
@@ -1033,7 +1033,7 @@ describe('#send', () => {
               const bumpedFee = Math.ceil(initialTip * 1.1)
               expect(replacementRequest.data.maxPriorityFeePerGas).toBe(intToHex(bumpedFee))
               expect(replacementRequest.data.maxFeePerGas).toBe(intToHex(20 * 1e9 + bumpedFee))
-              expect(replacementRequest.feesUpdatedByUser).toBe(true)
+              expect(replacementRequest.feesUpdatedByUser).toBe(false)
               done()
             })
           })
