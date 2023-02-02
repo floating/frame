@@ -356,10 +356,18 @@ export class Provider extends EventEmitter {
   }
 
   approveTransactionRequest(req: TransactionRequest, cb: Callback<string>) {
-    log.info('approveRequest', req)
+    const signAndSend = (requestToSign: TransactionRequest) => {
+      // remove callback from logging
+      const { res, ...txToLog } = requestToSign
+      log.info('approveRequest', txToLog)
+
+      this.signAndSend(requestToSign, cb)
+    }
 
     accounts.lockRequest(req.handlerId)
-    if (req.data.nonce) return this.signAndSend(req, cb)
+
+    if (req.data.nonce) return signAndSend(req)
+
     this.getNonce(req.data, (response) => {
       if (response.error) {
         if (this.handlers[req.handlerId]) {
@@ -373,7 +381,7 @@ export class Provider extends EventEmitter {
       const updatedReq = accounts.updateNonce(req.handlerId, response.result)
 
       if (updatedReq) {
-        this.signAndSend(updatedReq, cb)
+        signAndSend(updatedReq)
       } else {
         log.error(`could not find request with handlerId="${req.handlerId}"`)
         cb(new Error('could not find request'))
