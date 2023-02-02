@@ -242,6 +242,13 @@ class AddTokenFormScreenComponent extends Component {
 
     this.state = this.stateFromTokenData(props.tokenData)
     this.saveAndClose = this.saveAndClose.bind(this)
+
+    this.enterKeyHandler = (ev) => {
+      if (ev.key === 'Enter') {
+        ev.stopPropagation()
+        this.saveAndClose()
+      }
+    }
   }
 
   stateFromTokenData(tokenData) {
@@ -255,11 +262,11 @@ class AddTokenFormScreenComponent extends Component {
   }
 
   componentDidMount() {
-    document.addEventListener('keydown', this.saveAndClose)
+    document.addEventListener('keydown', this.enterKeyHandler.bind(this))
   }
 
   componentWillUnmount() {
-    document.removeEventListener('keydown', this.saveAndClose)
+    document.removeEventListener('keydown', this.enterKeyHandler.bind(this))
   }
 
   componentDidUpdate(prevProps) {
