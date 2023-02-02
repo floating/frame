@@ -13,6 +13,7 @@ export interface TransactionData extends Omit<JsonTx, 'chainId' | 'type'> {
   chainId: string
   type: string
   gasFeesSource: GasFeesSource
+  recipientType?: string
 }
 
 export function typeSupportsBaseFee(type: string) {

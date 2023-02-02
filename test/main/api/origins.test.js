@@ -307,6 +307,7 @@ describe('#isTrusted', () => {
 
   beforeEach(() => {
     store.set('main.origins', frameTestOriginId, { name: 'test.frame.eth' })
+    store.set('main.permissions', {})
   })
 
   describe('extension requests', () => {
@@ -377,10 +378,48 @@ describe('#isTrusted', () => {
         }
       })
 
-      cb()
+      setTimeout(cb, 1000)
     })
 
-    return expect(isTrusted(payload)).resolves
+    const runTest = isTrusted(payload)
+
+    jest.runAllTimers()
+
+    return expect(runTest).resolves
+  })
+
+  it('sends a response to all permission requests once the user trusts the origin', async () => {
+    const address = '0xDAFEA492D9c6733ae3d56b7Ed1ADB60692c98Bc5'
+    const payload1 = { method: 'wallet_getEthereumAccounts', _origin: frameTestOriginId }
+    const payload2 = { method: 'eth_accounts', _origin: frameTestOriginId }
+
+    accounts.current.mockReturnValue({ address })
+
+    accounts.addRequest.mockImplementationOnce((request, cb) => {
+      setTimeout(() => {
+        // simulate user accepting the request after both RPC requests are received
+        store.set('main.permissions', address, {
+          [frameTestOriginId]: {
+            origin: 'test.frame.eth',
+            provider: true
+          }
+        })
+
+        cb()
+      }, 1000)
+    })
+
+    const runTest = Promise.all([isTrusted(payload1), isTrusted(payload2)]).then(
+      ([isPayload1Trusted, isPayload2Trusted]) => {
+        expect(accounts.addRequest).toHaveBeenCalledTimes(1)
+        expect(isPayload1Trusted).toBe(true)
+        expect(isPayload2Trusted).toBe(true)
+      }
+    )
+
+    jest.runAllTimers()
+
+    return runTest
   })
 
   const userActions = [
@@ -398,17 +437,23 @@ describe('#isTrusted', () => {
 
       // simulate user acting on request
       accounts.addRequest.mockImplementationOnce((request, cb) => {
-        store.set('main.permissions', address, {
-          'c004cc87-bfa3-50f5-812f-3d70dd8f82c6': {
-            origin: 'test.frame.eth',
-            provider: permissionGranted
-          }
-        })
+        setTimeout(() => {
+          store.set('main.permissions', address, {
+            'c004cc87-bfa3-50f5-812f-3d70dd8f82c6': {
+              origin: 'test.frame.eth',
+              provider: permissionGranted
+            }
+          })
 
-        cb()
+          cb()
+        }, 1000)
       })
 
-      return expect(isTrusted(payload)).resolves.toBe(permissionGranted)
+      const runTest = isTrusted(payload)
+
+      jest.runAllTimers()
+
+      return expect(runTest).resolves.toBe(permissionGranted)
     })
   })
 })
