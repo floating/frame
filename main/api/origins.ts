@@ -8,6 +8,7 @@ import store from '../store'
 const dev = process.env.NODE_ENV === 'development'
 
 const activeExtensionChecks: Record<string, Promise<boolean>> = {}
+const activePermissionChecks: Record<string, Promise<Permission | undefined>> = {}
 const extensionPrefixes = {
   firefox: 'moz-extension',
   safari: 'safari-web-extension'
@@ -82,7 +83,11 @@ async function requestExtensionPermission(extension: FrameExtension) {
 async function requestPermission(address: Address, fullPayload: RPCRequestPayload) {
   const { _origin: originId, ...payload } = fullPayload
 
-  return new Promise<Permission | undefined>((resolve) => {
+  if (originId in activePermissionChecks) {
+    return activePermissionChecks[originId]
+  }
+
+  const result = new Promise<Permission | undefined>((resolve) => {
     const request: AccessRequest = {
       payload,
       handlerId: originId,
@@ -95,9 +100,14 @@ async function requestPermission(address: Address, fullPayload: RPCRequestPayloa
       const { name: originName } = store('main.origins', originId)
       const permission = storeApi.getPermission(address, originName)
 
+      delete activePermissionChecks[originId]
       resolve(permission)
     })
   })
+
+  activePermissionChecks[originId] = result
+
+  return result
 }
 
 export function updateOrigin(
