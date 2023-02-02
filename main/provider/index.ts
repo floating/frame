@@ -476,7 +476,8 @@ export class Provider extends EventEmitter {
         const populatedTransaction = populateTransaction(tx, chainConfig, gas)
         const checkedTransaction = checkExistingNonceGas(populatedTransaction)
 
-        log.verbose({ populatedTransaction })
+        log.verbose('Succesfully populated transaction', checkedTransaction)
+
         cb(null, { tx: checkedTransaction, approvals })
       } catch (error) {
         return cb(error as Error)
@@ -537,7 +538,7 @@ export class Provider extends EventEmitter {
           recognizedActions: []
         } as Omit<TransactionRequest, 'classification'>
 
-        const classification = classifyTransaction(unclassifiedReq) //TODO: module can also return the warnings...
+        const classification = classifyTransaction(unclassifiedReq)
 
         const req = {
           ...unclassifiedReq,
