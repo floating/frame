@@ -19,7 +19,7 @@ const SimpleContractCallOverview = ({ method }) => {
 const ApproveOverview = ({ amount, decimals, symbol }) => {
   return (
     <div>
-      <span>{'Approve Spending '}</span>
+      <span>{'Approve Spending'}</span>
       <DisplayValue
         type='ether'
         value={amount}
