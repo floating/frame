@@ -284,12 +284,11 @@ class FrameAccount {
     if (to) {
       // Get recipient identity
       try {
-        const recipient = await reveal.identity(to, parseInt(chainId, 16))
+        const recipient = await reveal.identity(to)
         const knownTxRequest = this.requests[req.handlerId] as TransactionRequest
 
         if (recipient && knownTxRequest) {
           knownTxRequest.recipient = recipient.ens
-          knownTxRequest.recipientType = recipient.type
           this.update()
         }
       } catch (e) {

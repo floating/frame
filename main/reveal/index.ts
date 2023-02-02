@@ -167,6 +167,7 @@ const surface = {
     // TODO: Check the address against previously verified contracts
     return { type, ens }
   },
+  resolveEntityType,
   decode: async (contractAddress: string = '', chainId: number, calldata: string) => {
     // Decode calldata
     const contractSources: ContractSource[] = [{ name: 'ERC-20', source: 'Generic ERC-20', abi: erc20Abi }]

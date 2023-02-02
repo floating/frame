@@ -20,12 +20,13 @@ import accounts, {
 import Chains, { Chain } from '../chains'
 import { getSignerType, Type as SignerType } from '../../resources/domain/signer'
 import { TransactionData } from '../../resources/domain/transaction'
-import { populate as populateTransaction, maxFee } from '../transaction'
+import { populate as populateTransaction, maxFee, classifyTransaction } from '../transaction'
 import FrameAccount from '../accounts/Account'
 import { capitalize } from '../../resources/utils'
 import { ApprovalType } from '../../resources/constants'
 import { createObserver as AssetsObserver, loadAssets } from './assets'
 import { getVersionFromTypedData } from './typedData'
+import reveal from '../reveal'
 
 import {
   checkExistingNonceGas,
@@ -45,10 +46,11 @@ import {
   createOriginChainObserver as OriginChainObserver,
   getActiveChains
 } from './chains'
-import type {
+import {
   EIP2612TypedData,
   LegacyTypedData,
   PermitSignatureRequest,
+  TxClassification,
   TypedData,
   TypedMessage
 } from '../accounts/types'
@@ -448,33 +450,38 @@ export class Provider extends EventEmitter {
       const gas = gasFees(rawTx)
       const chainConfig = this.connection.connections['ethereum'][parseInt(rawTx.chainId)].chainConfig
 
-      const estimateGas = rawTx.gasLimit
-        ? Promise.resolve(rawTx)
-        : this.getGasEstimate(rawTx)
-            .then((gasLimit) => ({ ...rawTx, gasLimit }))
-            .catch((err) => {
-              approvals.push({
-                type: ApprovalType.GasLimitApproval,
-                data: {
-                  message: err.message,
-                  gasLimit: '0x00'
-                }
-              })
+      const estimateGasLimit = async () => {
+        try {
+          return await this.getGasEstimate(rawTx)
+        } catch (error) {
+          approvals.push({
+            type: ApprovalType.GasLimitApproval,
+            data: {
+              message: (error as Error).message,
+              gasLimit: '0x00'
+            }
+          })
+          return '0x00'
+        }
+      }
 
-              return { ...rawTx, gasLimit: '0x00' }
-            })
+      const [gasLimit, recipientType] = await Promise.all([
+        rawTx.gasLimit ?? estimateGasLimit(),
+        rawTx.to ? reveal.resolveEntityType(rawTx.to, parseInt(rawTx.chainId, 16)) : ''
+      ])
 
-      estimateGas
-        .then((tx) => {
-          const populatedTransaction = populateTransaction(tx, chainConfig, gas)
+      const tx = { ...rawTx, gasLimit, recipientType }
 
-          log.info({ populatedTransaction })
+      try {
+        const populatedTransaction = populateTransaction(tx, chainConfig, gas)
+        const checkedTransaction = checkExistingNonceGas(populatedTransaction)
 
-          return populatedTransaction
-        })
-        .then((tx) => checkExistingNonceGas(tx))
-        .then((tx) => cb(null, { tx, approvals }))
-        .catch(cb)
+        log.verbose('Succesfully populated transaction', checkedTransaction)
+
+        cb(null, { tx: checkedTransaction, approvals })
+      } catch (error) {
+        return cb(error as Error)
+      }
     } catch (e) {
       log.error('error creating transaction', e)
       cb(e as Error)
@@ -515,9 +522,10 @@ export class Provider extends EventEmitter {
         }
 
         const handlerId = this.addRequestHandler(res)
-        const { feesUpdated, ...data } = txMetadata.tx
 
-        const req = {
+        const { feesUpdated, recipientType, ...data } = txMetadata.tx
+
+        const unclassifiedReq = {
           handlerId,
           type: 'transaction',
           data,
@@ -526,9 +534,16 @@ export class Provider extends EventEmitter {
           origin: payload._origin,
           approvals: [],
           feesUpdatedByUser: feesUpdated || false,
-          recipientType: '',
+          recipientType,
           recognizedActions: []
-        } as TransactionRequest
+        } as Omit<TransactionRequest, 'classification'>
+
+        const classification = classifyTransaction(unclassifiedReq)
+
+        const req = {
+          ...unclassifiedReq,
+          classification
+        }
 
         accounts.addRequest(req, res)
 

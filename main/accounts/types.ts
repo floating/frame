@@ -89,6 +89,13 @@ export interface Permit {
   nonce: string | number
 }
 
+export enum TxClassification {
+  CONTRACT_DEPLOY = 'CONTRACT_DEPLOY',
+  CONTRACT_CALL = 'CONTRACT_CALL',
+  SEND_DATA = 'SEND_DATA',
+  NATIVE_TRANSFER = 'NATIVE_TRANSFER'
+}
+
 export interface TransactionRequest extends AccountRequest<'transaction'> {
   payload: RPC.SendTransaction.Request
   data: TransactionData
@@ -110,6 +117,7 @@ export interface TransactionRequest extends AccountRequest<'transaction'> {
   feesUpdatedByUser: boolean
   recipientType: string
   recognizedActions: Action<unknown>[]
+  classification: TxClassification
 }
 
 export type TypedData<T extends MessageTypes = MessageTypes> = BaseTypedMessage<T>
