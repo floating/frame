@@ -78,32 +78,32 @@ describe('#updateOrigin', () => {
       expect(hasSession).toBe(false)
     })
 
-    it('sets the chainId to mainnet for a new origin', () => {
-      const { payload } = updateOrigin({}, 'frame.test')
+    it('sets the chain id to mainnet for a new origin', () => {
+      const { chainId } = updateOrigin({}, 'frame.test')
 
-      expect(payload.chainId).toBe('0x1')
+      expect(chainId).toBe('0x1')
     })
 
-    it('sets the chainId to mainnet for an unknown origin', () => {
-      const { payload } = updateOrigin({}, 'Unknown')
+    it('sets the chain id to mainnet for an unknown origin', () => {
+      const { chainId } = updateOrigin({}, 'Unknown')
 
-      expect(payload.chainId).toBe('0x1')
+      expect(chainId).toBe('0x1')
     })
 
-    it('adds the configured chain for an existing origin to the payload', () => {
+    it('sets the chain id for an existing origin', () => {
       store.set('main.origins', uuidv5('frame.test', uuidv5.DNS), { chain: { id: 137 } })
 
-      const { payload } = updateOrigin({}, 'frame.test')
+      const { chainId } = updateOrigin({}, 'frame.test')
 
-      expect(payload.chainId).toBe('0x89')
+      expect(chainId).toBe('0x89')
     })
 
-    it('does not override chainId in the payload with one from a configured origin', () => {
+    it('does not override the chain id in the payload with one from a configured origin', () => {
       store.set('main.origins', uuidv5('frame.test', uuidv5.DNS), { chain: { id: 137 } })
 
-      const { payload } = updateOrigin({ chainId: '0x1' }, 'frame.test')
+      const { chainId } = updateOrigin({ chainId: '0x1' }, 'frame.test')
 
-      expect(payload.chainId).toBe('0x1')
+      expect(chainId).toBe('0x1')
     })
   })
 
