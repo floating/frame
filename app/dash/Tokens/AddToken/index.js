@@ -208,6 +208,14 @@ const TokenDetailsForm = ({ req, chain, tokenData, isEdit }) => {
   const { address } = tokenData
   const { name: chainName, color } = chain
 
+  const newTokenReady =
+    name &&
+    name !== tokenDetailsDefaults.name &&
+    symbol &&
+    symbol !== tokenDetailsDefaults.symbol &&
+    Number.isInteger(chain.id) &&
+    Number.isInteger(decimals)
+
   const saveAndClose = () => {
     const token = {
       name,
@@ -237,6 +245,13 @@ const TokenDetailsForm = ({ req, chain, tokenData, isEdit }) => {
     }
   }
 
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && newTokenReady) {
+      e.stopPropagation()
+      saveAndClose()
+    }
+  }
+
   // handle asynchronous loading of token data
   useEffect(() => {
     const { name, symbol, decimals, logoURI } = tokenData
@@ -250,14 +265,6 @@ const TokenDetailsForm = ({ req, chain, tokenData, isEdit }) => {
   useEffect(() => {
     focusSubmitButton()
   }, [])
-
-  const newTokenReady =
-    name &&
-    name !== tokenDetailsDefaults.name &&
-    symbol &&
-    symbol !== tokenDetailsDefaults.symbol &&
-    Number.isInteger(chain.id) &&
-    Number.isInteger(decimals)
 
   return (
     <div className='notifyBoxWrap cardShow' onMouseDown={(e) => e.stopPropagation()}>
@@ -302,6 +309,7 @@ const TokenDetailsForm = ({ req, chain, tokenData, isEdit }) => {
                     if (e.target.value === '') setName(tokenDetailsDefaults.name)
                     focusSubmitButton()
                   }}
+                  onKeyDown={handleKeyPress}
                 />
                 Token Name
               </label>
@@ -326,6 +334,7 @@ const TokenDetailsForm = ({ req, chain, tokenData, isEdit }) => {
                     if (e.target.value === '') setSymbol(tokenDetailsDefaults.symbol)
                     focusSubmitButton()
                   }}
+                  onKeyDown={handleKeyPress}
                 />
                 Symbol
               </label>
@@ -355,6 +364,7 @@ const TokenDetailsForm = ({ req, chain, tokenData, isEdit }) => {
                     if (e.target.value === '') setDecimals(tokenDetailsDefaults.decimals)
                     focusSubmitButton()
                   }}
+                  onKeyDown={handleKeyPress}
                 />
                 Decimals
               </label>
@@ -378,6 +388,7 @@ const TokenDetailsForm = ({ req, chain, tokenData, isEdit }) => {
                     if (e.target.value === '') setLogoUri(tokenDetailsDefaults.logoURI)
                     focusSubmitButton()
                   }}
+                  onKeyDown={handleKeyPress}
                 />
                 Logo URI
               </label>
@@ -395,12 +406,7 @@ const TokenDetailsForm = ({ req, chain, tokenData, isEdit }) => {
                     saveAndClose()
                   }
                 }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.stopPropagation()
-                    saveAndClose()
-                  }
-                }}
+                onKeyDown={handleKeyPress}
               >
                 {isEdit ? 'Save' : 'Add Token'}
               </div>
