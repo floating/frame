@@ -493,7 +493,7 @@ export class Provider extends EventEmitter {
     const targetChain = payload.chainId
     const txChain = txParams.chainId
 
-    if (targetChain && txChain && targetChain !== txChain) {
+    if (targetChain && txChain && parseInt(targetChain, 16) !== parseInt(txChain, 16)) {
       return resError(
         `Chain for transaction (${txChain}) does not match request target chain (${targetChain})`,
         payload,

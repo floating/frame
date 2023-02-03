@@ -19,6 +19,7 @@ const protocolRegex = /^(?:ws|http)s?:\/\//
 interface OriginUpdateResult {
   payload: RPCRequestPayload
   hasSession: boolean
+  chainId: string
 }
 
 type Browser = 'chrome' | 'firefox' | 'safari'
@@ -143,9 +144,9 @@ export function updateOrigin(
     hasSession,
     payload: {
       ...payload,
-      chainId: payload.chainId || `0x${(existingOrigin?.chain.id || 1).toString(16)}`,
       _origin: originId
-    }
+    },
+    chainId: payload.chainId || `0x${(existingOrigin?.chain.id || 1).toString(16)}`
   }
 }
 

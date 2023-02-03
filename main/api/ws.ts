@@ -96,7 +96,11 @@ const handler = (socket: FrameWebSocket, req: IncomingMessage) => {
         }`
       )
 
-    const { payload, hasSession } = updateOrigin(rawPayload, origin, rawPayload.__extensionConnecting)
+    const { payload, chainId, hasSession } = updateOrigin(
+      rawPayload,
+      origin,
+      rawPayload.__extensionConnecting
+    )
 
     if (hasSession) {
       extendSession(payload._origin)
@@ -107,7 +111,6 @@ const handler = (socket: FrameWebSocket, req: IncomingMessage) => {
       if (rawPayload.method === 'frame_summon') return windows.toggleTray()
 
       const { id, jsonrpc } = rawPayload
-      const chainId = payload.chainId as string
       if (rawPayload.method === 'eth_chainId') return res({ id, jsonrpc, result: chainId })
       if (rawPayload.method === 'net_version') return res({ id, jsonrpc, result: parseInt(chainId, 16) })
     }
