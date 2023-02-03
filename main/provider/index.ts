@@ -488,14 +488,14 @@ export class Provider extends EventEmitter {
     }
   }
 
-  sendTransaction(payload: RPC.SendTransaction.Request, res: RPCRequestCallback) {
+  sendTransaction(payload: RPC.SendTransaction.Request, res: RPCRequestCallback, targetChain: Chain) {
     const txParams = payload.params[0]
-    const targetChain = payload.chainId
+    const payloadChain = payload.chainId
     const txChain = txParams.chainId
 
-    if (targetChain && txChain && parseInt(targetChain, 16) !== parseInt(txChain, 16)) {
+    if (payloadChain && txChain && parseInt(payloadChain, 16) !== parseInt(txChain, 16)) {
       return resError(
-        `Chain for transaction (${txChain}) does not match request target chain (${targetChain})`,
+        `Chain for transaction (${txChain}) does not match request target chain (${payloadChain})`,
         payload,
         res
       )
@@ -503,7 +503,7 @@ export class Provider extends EventEmitter {
 
     const newTx = {
       ...txParams,
-      chainId: txChain || (targetChain as string)
+      chainId: txChain || payloadChain || addHexPrefix(targetChain.id.toString(16))
     }
 
     const currentAccount = accounts.current()
@@ -984,7 +984,7 @@ export class Provider extends EventEmitter {
     if (method === 'eth_accounts') return getAccounts(payload, res)
     if (method === 'eth_requestAccounts') return getAccounts(payload, res)
     if (method === 'eth_sendTransaction')
-      return this.sendTransaction(payload as RPC.SendTransaction.Request, res)
+      return this.sendTransaction(payload as RPC.SendTransaction.Request, res, targetChain)
     if (method === 'eth_getTransactionByHash') return this.getTransactionByHash(payload, res, targetChain)
     if (method === 'personal_ecRecover') return ecRecover(payload, res)
     if (method === 'web3_clientVersion') return this.clientVersion(payload, res)
