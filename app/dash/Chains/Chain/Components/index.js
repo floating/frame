@@ -222,7 +222,7 @@ const EnabledLaunchExplorerButton = ({ id, type }) => {
 
   return (
     <ClusterValue role='button' onClick={openExplorer}>
-      <div style={{ padding: '8px' }}>{svg.telescope(18)}</div>
+      <div style={{ padding: '10px' }}>{svg.telescope(18)}</div>
     </ClusterValue>
   )
 }
@@ -230,7 +230,7 @@ const EnabledLaunchExplorerButton = ({ id, type }) => {
 const DisabledLaunchExplorerButton = () => {
   return (
     <ClusterValue>
-      <div style={{ color: 'var(--ghostD)', padding: '8px' }}>{svg.telescope(18)}</div>
+      <div style={{ color: 'var(--ghostD)', padding: '1-px' }}>{svg.telescope(18)}</div>
     </ClusterValue>
   )
 }
@@ -253,13 +253,9 @@ const CurrentPrice = ({ symbol, price }) => {
 
 export const ChainFooter = ({ id, type, symbol, price, explorer }) => {
   return (
-    <ClusterBox>
-      <Cluster>
-        <ClusterRow>
-          <LaunchExplorerButton id={id} type={type} explorer={explorer} />
-          <CurrentPrice symbol={symbol} price={price} />
-        </ClusterRow>
-      </Cluster>
-    </ClusterBox>
+    <ClusterRow>
+      <LaunchExplorerButton id={id} type={type} explorer={explorer} />
+      <CurrentPrice symbol={symbol} price={price} />
+    </ClusterRow>
   )
 }

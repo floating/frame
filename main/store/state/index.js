@@ -73,6 +73,7 @@ const initial = {
         'requests',
         // 'activity',
         // 'gas',
+        'chains',
         'balances',
         'inventory',
         'permissions',

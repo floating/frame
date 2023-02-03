@@ -26,27 +26,28 @@
   border-radius 8px
   padding 24px 0px 20px 0px
   justify-content center
+  width 100%
 
   .feeToolTip
     background var(--ghostB)
     position absolute 
-    left 125px
-    bottom 0
-    top 0px
-    right 0px
+    left 130px
+    bottom 4px
+    top 4px
+    right 4px
     z-index 220
-    border-radius 8px
-    padding 10px
-    font-size 10px
+    border-radius 6px
+    padding 16px
+    font-size 11px
     font-weight 400
     pointer-events none
     display flex
     justify-content center
     align-items center
     text-align center
-    line-height 13px
-    box-shadow 0px 20px 10px -10px var(--ghostZ)
-    animation 8s shake ease-in-out infinite alternate
+    line-height 17px
+    box-shadow 0px 4px 4px var(--ghostZ)
+    // animation 8s shake ease-in-out infinite alternate
     will-change transform
 
   .feeToolTipPriority
@@ -94,44 +95,6 @@
       box-sizing border-box
       font-family 'FiraCode'
       display none
-
-    .gasArrow
-      position absolute
-      top 5px
-      left -14px
-      height 30px
-      width 30px
-      z-index 200
-      border-radius 8px
-      cursor pointer
-      color var(--ghostD)
-
-      *
-        pointer-events none
-
-      .gasArrowInner
-        position relative 
-        top 1px
-        left 4px
-        z-index 2
-        height 26px
-        width 26px
-        border-radius 13px
-        padding 1px 1px
-        box-sizing border-box
-        transform rotate(90deg)
-      
-    .gasArrowRight
-      left auto
-      right -14px
-      transform scaleX(-1)
-      cursor pointer
-
-      *
-        pointer-events none
-
-    .gasArrow:hover
-      background var(--ghostB)
 
     .gasLevelLabel
       font-size 10px
@@ -204,6 +167,46 @@
     .gasGweiLabel
       font-size 10px
       padding 3px 0px 1px 0px 
+
+.gasArrow
+  position absolute
+  top 5px
+  left -14px
+  height 30px
+  width 30px
+  z-index 200
+  border-radius 8px
+  cursor pointer
+  color var(--outerspace)
+
+  *
+    pointer-events none
+
+  .gasArrowInner
+    position relative 
+    top 1px
+    left 4px
+    z-index 2
+    height 26px
+    width 26px
+    border-radius 13px
+    padding 1px 1px
+    box-sizing border-box
+    transform rotate(90deg)
+  
+.gasArrowRight
+  left auto
+  right -14px
+  transform scaleX(-1)
+  cursor pointer
+
+  *
+    pointer-events none
+
+.gasArrow:hover
+  background var(--ghostB)
+  box-shadow 0px 1px 1px 0px var(--ghostY)
+
 
 .sliceGasEstimateBlock
   position relative
