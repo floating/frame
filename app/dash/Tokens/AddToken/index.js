@@ -1,5 +1,5 @@
 import { isValidAddress } from '@ethereumjs/util'
-import React, { Component, useEffect, useState } from 'react'
+import React, { Component, useEffect, useRef, useState } from 'react'
 import Restore from 'react-restore'
 import RingIcon from '../../../../resources/Components/RingIcon'
 import link from '../../../../resources/link'
@@ -203,6 +203,8 @@ const TokenDetailsForm = ({ req, chain, tokenData, isEdit }) => {
   const [decimals, setDecimals] = useState(tokenData.decimals || tokenDetailsDefaults.decimals)
   const [logoUri, setLogoUri] = useState(tokenData.logoURI || tokenDetailsDefaults.logoURI)
 
+  const submitRef = useRef(null)
+
   const { address } = tokenData
   const { name: chainName, color } = chain
 
@@ -229,10 +231,9 @@ const TokenDetailsForm = ({ req, chain, tokenData, isEdit }) => {
     }, 250)
   }
 
-  const enterKeyHandler = (ev) => {
-    if (ev.key === 'Enter') {
-      ev.stopPropagation()
-      saveAndClose()
+  const focusSubmitButton = () => {
+    if (submitRef.current) {
+      submitRef.current.focus()
     }
   }
 
@@ -247,11 +248,7 @@ const TokenDetailsForm = ({ req, chain, tokenData, isEdit }) => {
   }, [tokenData])
 
   useEffect(() => {
-    document.addEventListener('keydown', enterKeyHandler)
-
-    return () => {
-      document.removeEventListener('keydown', enterKeyHandler)
-    }
+    focusSubmitButton()
   }, [])
 
   const newTokenReady =
@@ -303,6 +300,7 @@ const TokenDetailsForm = ({ req, chain, tokenData, isEdit }) => {
                   }}
                   onBlur={(e) => {
                     if (e.target.value === '') setName(tokenDetailsDefaults.name)
+                    focusSubmitButton()
                   }}
                 />
                 Token Name
@@ -326,6 +324,7 @@ const TokenDetailsForm = ({ req, chain, tokenData, isEdit }) => {
                   }}
                   onBlur={(e) => {
                     if (e.target.value === '') setSymbol(tokenDetailsDefaults.symbol)
+                    focusSubmitButton()
                   }}
                 />
                 Symbol
@@ -354,6 +353,7 @@ const TokenDetailsForm = ({ req, chain, tokenData, isEdit }) => {
                   }}
                   onBlur={(e) => {
                     if (e.target.value === '') setDecimals(tokenDetailsDefaults.decimals)
+                    focusSubmitButton()
                   }}
                 />
                 Decimals
@@ -365,23 +365,39 @@ const TokenDetailsForm = ({ req, chain, tokenData, isEdit }) => {
             <div className='tokenLogoUri'>
               <label className='tokenInputLabel'>
                 <input
+                  className={`tokenInput ${logoUri === tokenDetailsDefaults.logoURI ? 'tokenInputDim' : ''}`}
+                  value={logoUri}
+                  spellCheck={false}
+                  onChange={(e) => {
+                    setLogoUri(e.target.value)
+                  }}
                   onFocus={(e) => {
                     if (e.target.value === tokenDetailsDefaults.logoURI) setLogoUri('')
                   }}
                   onBlur={(e) => {
                     if (e.target.value === '') setLogoUri(tokenDetailsDefaults.logoURI)
+                    focusSubmitButton()
                   }}
                 />
                 Logo URI
               </label>
             </div>
           </div>
-          <div role='button' className='tokenRow'>
+          <div className='tokenRow'>
             {newTokenReady ? (
               <div
+                role='button'
+                tabIndex={0}
+                ref={submitRef}
                 className='addTokenSubmit addTokenSubmitEnabled'
-                onMouseUp={(e) => {
+                onMouseDown={(e) => {
                   if (e.button === 0) {
+                    saveAndClose()
+                  }
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.stopPropagation()
                     saveAndClose()
                   }
                 }}
@@ -389,7 +405,9 @@ const TokenDetailsForm = ({ req, chain, tokenData, isEdit }) => {
                 {isEdit ? 'Save' : 'Add Token'}
               </div>
             ) : (
-              <div className='addTokenSubmit'>Fill in Token Details</div>
+              <div role='button' className='addTokenSubmit'>
+                Fill in Token Details
+              </div>
             )}
           </div>
         </div>
