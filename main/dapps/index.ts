@@ -1,6 +1,10 @@
+import { app } from 'electron'
+import path from 'path'
+import { Readable } from 'stream'
 import { hash } from 'eth-ens-namehash'
 import log from 'electron-log'
 import crypto from 'crypto'
+import tar from 'tar-fs'
 
 import store from '../store'
 import nebulaApi from '../nebula'
@@ -8,6 +12,20 @@ import server from './server'
 import extractColors from '../windows/extractColors'
 
 const nebula = nebulaApi()
+
+class DappStream extends Readable {
+  constructor(hash: string) {
+    super()
+    this.start(hash)
+  }
+  async start(hash: string) {
+    for await (const buf of nebula.ipfs.get(hash, { archive: true })) {
+      this.push(buf)
+    }
+    this.push(null)
+  }
+  _read() {}
+}
 
 function getDapp(dappId: string): Dapp {
   return store('main.dapps', dappId)
@@ -28,8 +46,24 @@ async function getDappColors(dappId: string) {
   }
 }
 
+const cacheDapp = (dappName: string, hash: string) => {
+  const dir = path.join(app.getPath('userData'), 'dappCache')
+  const dapp = new DappStream(hash)
+  dapp.pipe(
+    tar.extract(dir, {
+      map: (header) => {
+        header.name = path.join(dappName, ...header.name.split('/').slice(1))
+        return header
+      }
+    })
+  )
+}
+
 // TODO: change to correct manifest type one Nebula version with types are published
 async function updateDappContent(dappId: string, contentURI: string, manifest: any) {
+  // Create a local cache of the content
+  await cacheDapp(dappId, contentURI)
+
   // TODO: Make sure content is pinned before proceeding
   store.updateDapp(dappId, { content: contentURI, manifest })
 }
