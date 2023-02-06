@@ -1,14 +1,15 @@
 import React from 'react'
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import zxcvbn from 'zxcvbn'
+import useConditionalAutofocus from '../../Hooks/useConditionalAutofocus'
 
 import { debounce } from '../../utils'
 
 const NO_PASSWORD_ENTERED = 'Enter password'
 
-const PasswordInput = ({ getError, next, title, buttonText }) => {
+const PasswordInput = ({ getError, next, title, buttonText, autofocus }) => {
   const [error, setError] = useState(NO_PASSWORD_ENTERED)
-  const inputRef = useRef(null)
+  const [inputRef] = useConditionalAutofocus(null, autofocus)
 
   const resetError = () => setError(NO_PASSWORD_ENTERED)
 
@@ -60,7 +61,7 @@ const PasswordInput = ({ getError, next, title, buttonText }) => {
   )
 }
 
-export const CreatePassword = ({ onCreate }) => {
+export const CreatePassword = ({ onCreate, autofocus }) => {
   const getError = (password) => {
     if (password.length < 12) return 'PASSWORD MUST BE 12 OR MORE CHARACTERS'
     const {
@@ -72,13 +73,29 @@ export const CreatePassword = ({ onCreate }) => {
     return (warning || 'PLEASE ENTER A STRONGER PASSWORD').toUpperCase()
   }
 
-  return <PasswordInput getError={getError} next={onCreate} title='Create Password' buttonText='Continue' />
+  return (
+    <PasswordInput
+      getError={getError}
+      next={onCreate}
+      title='Create Password'
+      buttonText='Continue'
+      autofocus={autofocus}
+    />
+  )
 }
 
-export const ConfirmPassword = ({ password, onConfirm }) => {
+export const ConfirmPassword = ({ password, onConfirm, autofocus }) => {
   const getError = (confirmedPassword) => {
     if (password !== confirmedPassword) return 'PASSWORDS DO NOT MATCH'
   }
 
-  return <PasswordInput getError={getError} next={onConfirm} title='Confirm Password' buttonText='Create' />
+  return (
+    <PasswordInput
+      getError={getError}
+      next={onConfirm}
+      title='Confirm Password'
+      buttonText='Create'
+      autofocus={autofocus}
+    />
+  )
 }

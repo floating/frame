@@ -1,6 +1,7 @@
 import React from 'react'
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 
+import useConditionalAutofocus from '../../../../../resources/Hooks/useConditionalAutofocus'
 import RingIcon from '../../../../../resources/Components/RingIcon'
 import { ConfirmPassword, CreatePassword } from '../../../../../resources/Components/Password'
 import link from '../../../../../resources/link'
@@ -18,7 +19,7 @@ const navForward = async (newAccountType, accountData) =>
 
 const removeLineBreaks = (str) => str.replace(/(\r\n|\n|\r)/gm, '')
 
-const AddHotAccountWrapper = ({ children, title, svgName, summary, intro, index }) => {
+const AddHotAccountWrapper = ({ children, title, svgName, summary, index }) => {
   return (
     <div className={'addAccountItem addAccountItemSmart addAccountItemAdding'}>
       <div className='addAccountItemBar addAccountItemHot' />
@@ -46,9 +47,9 @@ const AddHotAccountWrapper = ({ children, title, svgName, summary, intro, index 
   )
 }
 
-const EnterSecret = ({ newAccountType, validateSecret, title }) => {
+const EnterSecret = ({ newAccountType, validateSecret, title, autofocus }) => {
   const EMPTY_STATE = `Enter ${title}`
-  const inputRef = useRef(null)
+  const [inputRef] = useConditionalAutofocus(null, autofocus)
   const [error, setError] = useState(EMPTY_STATE)
 
   const resetError = () => setError(EMPTY_STATE)
@@ -156,10 +157,10 @@ export function AddHotAccount({
     })
 
   const steps = [
-    <EnterSecret key={0} {...{ validateSecret, title, newAccountType }} />,
-    <CreatePassword key={1} onCreate={onCreate} />,
-    <ConfirmPassword key={2} password={password} onConfirm={onConfirm} />,
-    <Error key={3} {...{ error }} />
+    <EnterSecret key={0} {...{ validateSecret, title, newAccountType, autofocus: viewIndex === 0 }} />,
+    <CreatePassword key={1} onCreate={onCreate} autofocus={viewIndex === 1} />,
+    <ConfirmPassword key={2} password={password} onConfirm={onConfirm} autofocus={viewIndex === 2} />,
+    <Error key={3} error={error} />
   ]
 
   return (
