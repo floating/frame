@@ -112,7 +112,7 @@ async function requestPermission(address: Address, fullPayload: RPCRequestPayloa
 }
 
 export function updateOrigin(
-  payload: JSONRPCRequestPayload,
+  requestPayload: JSONRPCRequestPayload,
   origin: string,
   connectionMessage = false
 ): OriginUpdateResult {
@@ -140,13 +140,19 @@ export function updateOrigin(
     }
   }
 
+  const payload = {
+    ...requestPayload,
+    _origin: originId
+  }
+
+  if (connectionMessage) {
+    payload.chainId = payload.chainId || '0x1'
+  }
+
   return {
     hasSession,
-    payload: {
-      ...payload,
-      _origin: originId
-    },
-    chainId: payload.chainId || `0x${(existingOrigin?.chain.id || 1).toString(16)}`
+    payload,
+    chainId: requestPayload.chainId || `0x${(existingOrigin?.chain.id || 1).toString(16)}`
   }
 }
 

@@ -78,6 +78,14 @@ describe('#updateOrigin', () => {
       expect(hasSession).toBe(false)
     })
 
+    it('sets the payload chain id to mainnet for all connection messages', () => {
+      const originalPayload = {}
+      const { payload, chainId } = updateOrigin(originalPayload, 'frame.test', true)
+
+      expect(chainId).toBe('0x1')
+      expect(payload.chainId).toBe('0x1')
+    })
+
     it('sets the chain id to mainnet for a new origin', () => {
       const { chainId } = updateOrigin({}, 'frame.test')
 
