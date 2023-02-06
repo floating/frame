@@ -86,11 +86,9 @@ const handler = (req: IncomingMessage, res: ServerResponse) => {
           )
 
         const origin = parseOrigin(req.headers.origin)
-        const { payload, hasSession } = updateOrigin(rawPayload, origin)
+        const { payload } = updateOrigin(rawPayload, origin)
 
-        if (hasSession) {
-          extendSession(payload._origin)
-        }
+        extendSession(payload._origin)
 
         if (protectedMethods.indexOf(payload.method) > -1 && !(await isTrusted(payload))) {
           let error = { message: `Permission denied, approve ${origin} in Frame to continue`, code: 4001 }

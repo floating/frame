@@ -18,7 +18,6 @@ const protocolRegex = /^(?:ws|http)s?:\/\//
 
 interface OriginUpdateResult {
   payload: RPCRequestPayload
-  hasSession: boolean
   chainId: string
 }
 
@@ -112,17 +111,14 @@ async function requestPermission(address: Address, fullPayload: RPCRequestPayloa
 }
 
 export function updateOrigin(
-  payload: JSONRPCRequestPayload,
+  requestPayload: JSONRPCRequestPayload,
   origin: string,
   connectionMessage = false
 ): OriginUpdateResult {
-  let hasSession = false
-
   const originId = uuidv5(origin, uuidv5.DNS)
   const existingOrigin = store('main.origins', originId)
-  if (!connectionMessage) {
-    hasSession = true
 
+  if (!connectionMessage) {
     // the extension will attempt to send messages (eth_chainId and net_version) in order
     // to connect. we don't want to store these origins as they'll come from every site
     // the user visits in their browser
@@ -140,13 +136,20 @@ export function updateOrigin(
     }
   }
 
+  const chainId = requestPayload.chainId || `0x${(existingOrigin?.chain.id || 1).toString(16)}`
+
+  const payload = {
+    ...requestPayload,
+    _origin: originId
+  }
+
+  if (connectionMessage) {
+    payload.chainId = chainId
+  }
+
   return {
-    hasSession,
-    payload: {
-      ...payload,
-      _origin: originId
-    },
-    chainId: payload.chainId || `0x${(existingOrigin?.chain.id || 1).toString(16)}`
+    payload,
+    chainId
   }
 }
 

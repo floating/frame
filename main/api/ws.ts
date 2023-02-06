@@ -96,13 +96,9 @@ const handler = (socket: FrameWebSocket, req: IncomingMessage) => {
         }`
       )
 
-    const { payload, chainId, hasSession } = updateOrigin(
-      rawPayload,
-      origin,
-      rawPayload.__extensionConnecting
-    )
+    const { payload, chainId } = updateOrigin(rawPayload, origin, rawPayload.__extensionConnecting)
 
-    if (hasSession) {
+    if (!rawPayload.__extensionConnecting) {
       extendSession(payload._origin)
     }
 

@@ -44,12 +44,6 @@ describe('#updateOrigin', () => {
       })
     })
 
-    it('assigns a session to a new origin', () => {
-      const { hasSession } = updateOrigin({}, 'frame.test')
-
-      expect(hasSession).toBe(true)
-    })
-
     it('does not overwrite an existing origin', () => {
       store.set('main.origins', uuidv5('frame.test', uuidv5.DNS), { chain: { id: 1 } })
 
@@ -58,24 +52,25 @@ describe('#updateOrigin', () => {
       expect(store.initOrigin).not.toHaveBeenCalled()
     })
 
-    it('maintains a session for an existing origin', () => {
-      store.set('main.origins', uuidv5('frame.test', uuidv5.DNS), { chain: { id: 1 } })
-
-      const { hasSession } = updateOrigin({}, 'frame.test')
-
-      expect(hasSession).toBe(true)
-    })
-
     it('does not initialize a new origin on a connection message', () => {
       updateOrigin({}, 'frame.test', true)
 
       expect(store.initOrigin).not.toHaveBeenCalled()
     })
+    it('sets the payload chain id to mainnet for connection messages with no known origin', () => {
+      const originalPayload = {}
+      const { payload, chainId } = updateOrigin(originalPayload, 'frame.test', true)
 
-    it('does not assign a session on a connection message', () => {
-      const { hasSession } = updateOrigin({}, 'frame.test', true)
+      expect(chainId).toBe('0x1')
+      expect(payload.chainId).toBe('0x1')
+    })
 
-      expect(hasSession).toBe(false)
+    it('sets the payload chain id to the origin default for connection messages with a known origin', () => {
+      const originalPayload = {}
+      const { payload, chainId } = updateOrigin(originalPayload, 'frame.test', true)
+
+      expect(chainId).toBe('0x1')
+      expect(payload.chainId).toBe('0x1')
     })
 
     it('sets the chain id to mainnet for a new origin', () => {
