@@ -1112,36 +1112,37 @@ describe('#send', () => {
   describe('#personal_sign', () => {
     const message = 'hello, Ethereum!'
     const password = 'supersecret'
+    const hexMessage = addHexPrefix(Buffer.from(message, 'utf-8').toString('hex'))
 
     it('submits a request to sign a personal message with the address first', () => {
-      send({ method: 'personal_sign', params: [address, message, password] })
+      send({ method: 'personal_sign', params: [address, hexMessage, password] })
 
       expect(accountRequests).toHaveLength(1)
       expect(accountRequests[0].handlerId).toBeTruthy()
       expect(accountRequests[0].payload.params[0]).toBe(address)
-      expect(accountRequests[0].payload.params[1]).toEqual(message)
+      expect(accountRequests[0].payload.params[1]).toEqual(hexMessage)
       expect(accountRequests[0].payload.params[2]).toEqual(password)
     })
 
     it('submits a request to sign a personal message with the message first', () => {
-      send({ method: 'personal_sign', params: [message, address, password] })
-
-      expect(accountRequests).toHaveLength(1)
-      expect(accountRequests[0].handlerId).toBeTruthy()
-      expect(accountRequests[0].payload.params[0]).toBe(address)
-      expect(accountRequests[0].payload.params[1]).toEqual(message)
-      expect(accountRequests[0].payload.params[2]).toEqual(password)
-    })
-
-    it('submits a request to sign a personal message with a 20-byte message first', () => {
-      const hexMessage = '0x6672616d652e7368206973206772656174212121'
-
       send({ method: 'personal_sign', params: [hexMessage, address, password] })
 
       expect(accountRequests).toHaveLength(1)
       expect(accountRequests[0].handlerId).toBeTruthy()
       expect(accountRequests[0].payload.params[0]).toBe(address)
       expect(accountRequests[0].payload.params[1]).toEqual(hexMessage)
+      expect(accountRequests[0].payload.params[2]).toEqual(password)
+    })
+
+    it('submits a request to sign a personal message with a 20-byte message first', () => {
+      const addressSizedMessage = '0x6672616d652e7368206973206772656174212121'
+
+      send({ method: 'personal_sign', params: [addressSizedMessage, address, password] })
+
+      expect(accountRequests).toHaveLength(1)
+      expect(accountRequests[0].handlerId).toBeTruthy()
+      expect(accountRequests[0].payload.params[0]).toBe(address)
+      expect(accountRequests[0].payload.params[1]).toEqual(addressSizedMessage)
       expect(accountRequests[0].payload.params[2]).toEqual(password)
     })
 
@@ -1152,7 +1153,16 @@ describe('#send', () => {
         expect(err.error).toBeTruthy()
         done()
       })
-    }, 100)
+    })
+
+    it('does not submit a request for a message that is not hex-encoded utf-8', (done) => {
+      const params = [message, address]
+
+      send({ method: 'personal_sign', params }, (err) => {
+        expect(err.error.message).toMatch(/hex-encoded utf-8 string/i)
+        done()
+      })
+    })
   })
 
   describe('#eth_signTypedData', () => {
