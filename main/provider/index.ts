@@ -19,7 +19,7 @@ import accounts, {
 } from '../accounts'
 import Chains, { Chain } from '../chains'
 import { getSignerType, Type as SignerType } from '../../resources/domain/signer'
-import { TransactionData } from '../../resources/domain/transaction'
+import { normalizeChainId, TransactionData } from '../../resources/domain/transaction'
 import { populate as populateTransaction, maxFee, classifyTransaction } from '../transaction'
 import FrameAccount from '../accounts/Account'
 import { capitalize } from '../../resources/utils'
@@ -441,14 +441,23 @@ export class Provider extends EventEmitter {
   }
 
   async fillTransaction(newTx: RPC.SendTransaction.TxParams, cb: Callback<TransactionMetadata>) {
-    if (!newTx) return cb(new Error('No transaction data'))
+    if (!newTx) {
+      return cb(new Error('No transaction data'))
+    }
+
+    const connection = this.connection.connections['ethereum'][parseInt(newTx.chainId, 16)]
+    const chainConnected = connection && (connection.primary?.connected || connection.secondary?.connected)
+
+    if (!chainConnected) {
+      return cb(new Error(`Chain ${newTx.chainId} not connected`))
+    }
 
     try {
       const approvals: RequiredApproval[] = []
       const accountId = (accounts.current() || {}).id
       const rawTx = getRawTx(newTx, accountId)
       const gas = gasFees(rawTx)
-      const chainConfig = this.connection.connections['ethereum'][parseInt(rawTx.chainId)].chainConfig
+      const { chainConfig } = connection
 
       const estimateGasLimit = async () => {
         try {
@@ -489,69 +498,65 @@ export class Provider extends EventEmitter {
   }
 
   sendTransaction(payload: RPC.SendTransaction.Request, res: RPCRequestCallback, targetChain: Chain) {
-    const txParams = payload.params[0]
-    const payloadChain = payload.chainId
-    const txChain = txParams.chainId
+    try {
+      const txParams = payload.params[0]
+      const payloadChain = payload.chainId
 
-    if (payloadChain && txChain && parseInt(payloadChain, 16) !== parseInt(txChain, 16)) {
-      return resError(
-        `Chain for transaction (${txChain}) does not match request target chain (${payloadChain})`,
-        payload,
-        res
-      )
-    }
-
-    const newTx = {
-      ...txParams,
-      chainId: txChain || payloadChain || addHexPrefix(targetChain.id.toString(16))
-    }
-
-    const currentAccount = accounts.current()
-
-    log.verbose(`sendTransaction(${JSON.stringify(newTx)}`)
-
-    this.fillTransaction(newTx, (err, transactionMetadata) => {
-      if (err) {
-        resError(err, payload, res)
-      } else {
-        const txMetadata = transactionMetadata as TransactionMetadata
-        const from = txMetadata.tx.from
-
-        if (!currentAccount || !hasAddress(currentAccount, from)) {
-          return resError('Transaction is not from currently selected account', payload, res)
-        }
-
-        const handlerId = this.addRequestHandler(res)
-
-        const { feesUpdated, recipientType, ...data } = txMetadata.tx
-
-        const unclassifiedReq = {
-          handlerId,
-          type: 'transaction',
-          data,
-          payload,
-          account: (currentAccount as FrameAccount).id,
-          origin: payload._origin,
-          approvals: [],
-          feesUpdatedByUser: false,
-          recipientType,
-          recognizedActions: []
-        } as Omit<TransactionRequest, 'classification'>
-
-        const classification = classifyTransaction(unclassifiedReq)
-
-        const req = {
-          ...unclassifiedReq,
-          classification
-        }
-
-        accounts.addRequest(req, res)
-
-        txMetadata.approvals.forEach((approval) => {
-          currentAccount?.addRequiredApproval(req, approval.type, approval.data)
-        })
+      const normalizedTx = normalizeChainId(txParams, payloadChain ? parseInt(payloadChain, 16) : undefined)
+      const tx = {
+        ...normalizedTx,
+        chainId: normalizedTx.chainId || payloadChain || addHexPrefix(targetChain.id.toString(16))
       }
-    })
+
+      const currentAccount = accounts.current()
+
+      log.verbose(`sendTransaction(${JSON.stringify(tx)}`)
+
+      this.fillTransaction(tx, (err, transactionMetadata) => {
+        if (err) {
+          resError(err, payload, res)
+        } else {
+          const txMetadata = transactionMetadata as TransactionMetadata
+          const from = txMetadata.tx.from
+
+          if (!currentAccount || !hasAddress(currentAccount, from)) {
+            return resError('Transaction is not from currently selected account', payload, res)
+          }
+
+          const handlerId = this.addRequestHandler(res)
+
+          const { feesUpdated, recipientType, ...data } = txMetadata.tx
+
+          const unclassifiedReq = {
+            handlerId,
+            type: 'transaction',
+            data,
+            payload,
+            account: (currentAccount as FrameAccount).id,
+            origin: payload._origin,
+            approvals: [],
+            feesUpdatedByUser: false,
+            recipientType,
+            recognizedActions: []
+          } as Omit<TransactionRequest, 'classification'>
+
+          const classification = classifyTransaction(unclassifiedReq)
+
+          const req = {
+            ...unclassifiedReq,
+            classification
+          }
+
+          accounts.addRequest(req, res)
+
+          txMetadata.approvals.forEach((approval) => {
+            currentAccount?.addRequiredApproval(req, approval.type, approval.data)
+          })
+        }
+      })
+    } catch (e) {
+      resError((e as Error).message, payload, res)
+    }
   }
 
   getTransactionByHash(payload: RPCRequestPayload, cb: RPCRequestCallback, targetChain: Chain) {

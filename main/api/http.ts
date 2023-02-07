@@ -8,6 +8,7 @@ import store from '../store'
 import { updateOrigin, isTrusted, parseOrigin } from './origins'
 import validPayload from './validPayload'
 import protectedMethods from './protectedMethods'
+import { isHexString } from '@ethereumjs/util'
 
 const logTraffic = process.env.LOG_TRAFFIC
 
@@ -86,9 +87,19 @@ const handler = (req: IncomingMessage, res: ServerResponse) => {
           )
 
         const origin = parseOrigin(req.headers.origin)
-        const { payload } = updateOrigin(rawPayload, origin)
+        const { payload, chainId } = updateOrigin(rawPayload, origin)
 
         extendSession(payload._origin)
+
+        if (!isHexString(chainId)) {
+          const error = {
+            message: `Invalid chain id (${rawPayload.chainId}), chain id must be hex-prefixed string`,
+            code: -1
+          }
+
+          res.writeHead(401, { 'Content-Type': 'application/json' })
+          return res.end(JSON.stringify({ id: payload.id, jsonrpc: payload.jsonrpc, error }))
+        }
 
         if (protectedMethods.indexOf(payload.method) > -1 && !(await isTrusted(payload))) {
           let error = { message: `Permission denied, approve ${origin} in Frame to continue`, code: 4001 }

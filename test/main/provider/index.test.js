@@ -807,6 +807,9 @@ describe('#send', () => {
         })
 
         connection.connections.ethereum[chainId] = {
+          primary: {
+            connected: true
+          },
           chainConfig: chainConfig(chainId, chainId === 1 ? 'london' : 'istanbul')
         }
       })
@@ -886,27 +889,6 @@ describe('#send', () => {
     })
 
     describe('replacing gas fees', () => {
-      beforeEach(() => {
-        const chainIds = [1, 137]
-
-        chainIds.forEach((chainId) => {
-          store.set('main.networksMeta.ethereum', chainId, 'gas', {
-            price: {
-              selected: 'standard',
-              levels: { slow: '', standard: '', fast: gweiToHex(30), asap: '', custom: '' },
-              fees: {
-                maxPriorityFeePerGas: gweiToHex(1),
-                maxBaseFeePerGas: gweiToHex(8)
-              }
-            }
-          })
-
-          connection.connections.ethereum[chainId] = {
-            chainConfig: chainConfig(chainId, chainId === 1 ? 'london' : 'istanbul')
-          }
-        })
-      })
-
       it('adds a 10% gas buffer when replacing a legacy transaction', (done) => {
         tx.type = '0x0'
         tx.chainId = addHexPrefix((137).toString(16))

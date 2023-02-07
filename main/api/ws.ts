@@ -18,6 +18,7 @@ import {
 import validPayload from './validPayload'
 import protectedMethods from './protectedMethods'
 import { IncomingMessage, Server } from 'http'
+import { isHexString } from '@ethereumjs/util'
 
 const logTraffic = process.env.LOG_TRAFFIC
 
@@ -97,6 +98,14 @@ const handler = (socket: FrameWebSocket, req: IncomingMessage) => {
       )
 
     const { payload, chainId } = updateOrigin(rawPayload, origin, rawPayload.__extensionConnecting)
+
+    if (!isHexString(chainId)) {
+      const error = {
+        message: `Invalid chain id (${rawPayload.chainId}), chain id must be hex-prefixed string`,
+        code: -1
+      }
+      return res({ id: rawPayload.id, jsonrpc: rawPayload.jsonrpc, error })
+    }
 
     if (!rawPayload.__extensionConnecting) {
       extendSession(payload._origin)
