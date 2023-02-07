@@ -36,7 +36,7 @@ const SimpleTxJSON = ({ json, req }) => {
           <div key={key + o} className='simpleJsonChild'>
             <div className=' simpleJsonKey simpleJsonKeyTx'>{key.replace(/([A-Z])/g, ' $1').trim()}</div>
             <div className='simpleJsonValue'>
-              {typeof json[key] === 'object' ? <SimpleJSON json={json[key]} key={key} /> : json[key]}
+              {json[key]}
               {key === 'nonce' ? (
                 <div className='txNonceControl'>
                   <div
@@ -69,16 +69,6 @@ const SimpleTxJSON = ({ json, req }) => {
     </div>
   )
 }
-
-//  <div className='txModuleTop'>
-// <div className={'txModuleTopData txModuleTopDataExpanded'}>
-// <div className='transactionDataNotice'>{svg.octicon('issue-opened', { height: 26 })}</div>
-// <div className='transactionDataLabel'>View Data</div>
-// <div className='transactionDataIndicator' onMouseDown={() => this.copyData(req.data.data)}>
-// {svg.octicon('clippy', { height: 20 })}
-// </div>
-// </div>
-// <div className='txModuleBody'>
 
 class ViewData extends React.Component {
   constructor(props, context) {
@@ -152,7 +142,15 @@ class ViewData extends React.Component {
       if (tx[key] && !tx[key].startsWith('0x')) {
         decodeTx[key] = tx[key]
       } else if (
-        ['chainId', 'nonce', 'gasLimit', 'gasPrice', 'maxFeePerGas', 'maxPriorityFeePerGas'].includes(key)
+        [
+          'chainId',
+          'value',
+          'nonce',
+          'gasLimit',
+          'gasPrice',
+          'maxFeePerGas',
+          'maxPriorityFeePerGas'
+        ].includes(key)
       ) {
         try {
           // convert these keys to ints
