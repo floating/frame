@@ -246,7 +246,8 @@
       "react-restore>babel-core>babel-runtime>core-js": true,
       "styled-components": false,
       "ws>bufferutil": false,
-      "ws>utf-8-validate": false
+      "ws>utf-8-validate": false,
+      "ipfs-unixfs-importer>ipfs-unixfs>protobufjs": false
     }
   }
 }
