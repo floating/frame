@@ -77,11 +77,6 @@ class App extends React.Component {
                 }}
               >
                 <div className='mainDappBackgroundTop' />
-                {!currentView.ready ? (
-                  <div className='mainDappLoading'>
-                    <div className='loader' style={loaderStyle} />
-                  </div>
-                ) : null}
               </div>
             </>
           ) : !currentView.ready ? (
@@ -89,11 +84,7 @@ class App extends React.Component {
               <div className='mainDappLoading'>
                 <div className='mainDappLoadingText'>{'Send dapp failed to load'}</div>
               </div>
-            ) : (
-              <div className='mainDappLoading'>
-                <div className='loader' />
-              </div>
-            )
+            ) : null
           ) : null}
         </div>
       </div>

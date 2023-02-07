@@ -176,8 +176,9 @@ const surface = {
       }
 
       server.sessions.add(ens, session)
-
-      store.addFrameView(frameId, view)
+      setTimeout(() => {
+        store.addFrameView(frameId, view)
+      }, 350) // TODO: remove this timeout once we redisign initial fetches from dapp window
     } else {
       store.updateDapp(dappId, { ens, status: 'initial', openWhenReady: true })
     }
