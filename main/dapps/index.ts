@@ -47,7 +47,7 @@ async function getDappColors(dappId: string) {
 }
 
 const cacheDapp = (dappName: string, hash: string) => {
-  const dir = path.join(app.getPath('userData'), 'dappCache')
+  const dir = path.join(app.getPath('userData'), 'DappCache')
   const dapp = new DappStream(hash)
   dapp.pipe(
     tar.extract(dir, {
@@ -176,9 +176,7 @@ const surface = {
       }
 
       server.sessions.add(ens, session)
-      setTimeout(() => {
-        store.addFrameView(frameId, view)
-      }, 350) // TODO: remove this timeout once we redisign initial fetches from dapp window
+      store.addFrameView(frameId, view)
     } else {
       store.updateDapp(dappId, { ens, status: 'initial', openWhenReady: true })
     }

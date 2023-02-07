@@ -23,10 +23,17 @@ const hashFiles = async (path: string, options: UserImporterOptions) => {
   return await hash(files, options)
 }
 
-export const cidToHex = (cid: CID) => {
-  return `0x${Buffer.from(cid.bytes.slice(2)).toString('hex')}`
+// const cidToHex = (cid: CID) => {
+//   return `0x${Buffer.from(cid.bytes.slice(2)).toString('hex')}`
+// }
+
+const getCID = async (path: string, isDirectory: boolean) => {
+  return await hashFiles(path, { cidVersion: 0, hidden: true, wrapWithDirectory: isDirectory })
 }
 
-export const getCID = async (path: string, dir: boolean) => {
-  return await hashFiles(path, { cidVersion: 0, hidden: true, wrapWithDirectory: dir })
+export default {
+  async verifyDapp(path: string, manifestCID: string) {
+    const cid = await getCID(path, true)
+    return cid?.toString() === manifestCID
+  }
 }

@@ -46,8 +46,8 @@ class App extends React.Component {
     return (
       <div className='splash'>
         <Native />
-        <div className='overlay' />
-        <div className='mainLeft'>
+        {/* <div className='overlay' /> */}
+        {/* <div className='mainLeft'>
           <div
             className='accountTile'
             onClick={() => {
@@ -64,20 +64,20 @@ class App extends React.Component {
                 })}
               </div>
             </div>
-          </div> */}
-        </div>
+          </div>
+        </div> */}
         <div className='main'>
           <div className='mainTop' />
           {currentDapp ? (
             <>
-              <div
+              {/* <div
                 className='mainDappBackground'
                 style={{
                   background: currentDapp.colors ? currentDapp.colors.background : 'none'
                 }}
               >
                 <div className='mainDappBackgroundTop' />
-              </div>
+              </div> */}
             </>
           ) : !currentView.ready ? (
             sendDapp.status === 'failed' ? (
