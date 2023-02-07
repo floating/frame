@@ -7,9 +7,10 @@ import { debounce } from '../../utils'
 
 const NO_PASSWORD_ENTERED = 'Enter password'
 
-const PasswordInput = ({ getError, next, title, buttonText, autofocus }) => {
+const PasswordInput = ({ getError: getInputError, next, title, buttonText, autofocus }) => {
   const [error, setError] = useState(NO_PASSWORD_ENTERED)
   const [inputRef] = useConditionalAutofocus(null, autofocus)
+  const [disabled, setDisabled] = useState(false)
 
   const resetError = () => setError(NO_PASSWORD_ENTERED)
 
@@ -23,12 +24,20 @@ const PasswordInput = ({ getError, next, title, buttonText, autofocus }) => {
     setTimeout(clear, 600)
   }
 
-  const validateInput = debounce((e) => {
-    const value = e.target.value
-    if (!value) return resetError()
-    const err = getError(value)
-    setError(err || '')
-  }, 300)
+  const getError = () =>
+    inputRef.current.value ? getInputError(inputRef.current.value) || '' : NO_PASSWORD_ENTERED
+
+  const validateInput = (e) => {
+    const err = getError()
+    if (err) {
+      setDisabled(true)
+      return debounce(() => {
+        setDisabled(false)
+        setError(getError())
+      }, 300)()
+    }
+    return setError(err)
+  }
 
   return (
     <div className='addAccountItemOptionSetupFrame'>
@@ -43,7 +52,7 @@ const PasswordInput = ({ getError, next, title, buttonText, autofocus }) => {
           ref={inputRef}
           onChange={validateInput}
           onKeyDown={(e) => {
-            if (!error && e.key === 'Enter') handleSubmit()
+            if (!error && e.key === 'Enter' && !disabled) handleSubmit()
           }}
         />
       </div>
@@ -53,7 +62,7 @@ const PasswordInput = ({ getError, next, title, buttonText, autofocus }) => {
           {error}
         </div>
       ) : (
-        <div role='button' className='addAccountItemOptionSubmit' onClick={() => handleSubmit()}>
+        <div role='button' className='addAccountItemOptionSubmit' onClick={() => !disabled && handleSubmit()}>
           {buttonText}
         </div>
       )}
