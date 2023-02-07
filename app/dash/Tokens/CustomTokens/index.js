@@ -86,7 +86,7 @@ class CustomTokens extends React.Component {
                                   error: null,
                                   isEdit: true,
                                   address: token.address,
-                                  chainId: token.chainId,
+                                  chain: { id: token.chainId },
                                   tokenData: token
                                 }
                               }

@@ -30,6 +30,7 @@ beforeAll(() => {
   store.setPrimary('ethereum', 1, { connected: false })
   store.activateNetwork('ethereum', 1, true)
 
+  store.removeNetwork({ type: 'ethereum', id: 137 })
   store.addNetwork({
     id: 137,
     type: 'ethereum',
@@ -39,7 +40,8 @@ beforeAll(() => {
     on: true,
     connection: {
       primary: { connected: true }
-    }
+    },
+    primaryColor: 'accent7'
   })
 
   store.setPrimary('ethereum', 137, { connected: false })
@@ -66,7 +68,11 @@ describe('selecting token chain', () => {
       data: {
         notify: 'addToken',
         notifyData: {
-          chainId: 137
+          chain: {
+            id: 137,
+            name: 'Polygon',
+            color: 'accent7'
+          }
         }
       }
     })
@@ -75,14 +81,14 @@ describe('selecting token chain', () => {
 
 describe('setting token address', () => {
   it('should prompt for a contract address if a chain has been selected', () => {
-    render(<AddToken data={{ notifyData: { chainId: 137 } }} />)
+    render(<AddToken data={{ notifyData: { chain: { id: 137 } } }} />)
 
     const contractAddressInput = screen.getByLabelText(`Enter token's address`)
     expect(contractAddressInput.textContent).toBe('')
   })
 
   it('should update add token navigation with an error when a user submits an invalid contract address', async () => {
-    const { user } = render(<AddToken data={{ notifyData: { chainId: 1 } }} />)
+    const { user } = render(<AddToken data={{ notifyData: { chain: { id: 1 } } }} />)
 
     const contractAddressInput = screen.getByLabelText(`Enter token's address`)
     await user.type(contractAddressInput, 'INVALID_ADDRESS')
@@ -95,7 +101,7 @@ describe('setting token address', () => {
       data: {
         notify: 'addToken',
         notifyData: {
-          chainId: 1,
+          chain: { id: 1 },
           address: 'INVALID_ADDRESS',
           error: 'INVALID CONTRACT ADDRESS'
         }
@@ -117,7 +123,7 @@ describe('setting token address', () => {
       }
     })
 
-    const { user } = render(<AddToken data={{ notifyData: { chainId: 1 } }} />)
+    const { user } = render(<AddToken data={{ notifyData: { chain: { id: 1 } } }} />)
 
     const contractAddressLabel = screen.getByLabelText(`Enter token's address`)
     await user.type(contractAddressLabel, '0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0')
@@ -130,7 +136,7 @@ describe('setting token address', () => {
       data: {
         notify: 'addToken',
         notifyData: {
-          chainId: 1,
+          chain: { id: 1 },
           address: '0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0',
           error: `COULD NOT FIND TOKEN WITH ADDRESS 0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0`,
           tokenData: {
@@ -159,7 +165,7 @@ describe('setting token address', () => {
       return mockTokenData
     })
 
-    const { user } = render(<AddToken data={{ notifyData: { chainId: 1 } }} />)
+    const { user } = render(<AddToken data={{ notifyData: { chain: { id: 1 } } }} />)
 
     const contractAddressLabel = screen.getByLabelText(`Enter token's address`)
     await user.type(contractAddressLabel, '0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0')
@@ -173,7 +179,7 @@ describe('setting token address', () => {
         notify: 'addToken',
         notifyData: {
           error: null,
-          chainId: 1,
+          chain: { id: 1 },
           address: '0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0',
           tokenData: mockTokenData
         }
@@ -186,7 +192,7 @@ describe('displaying errors', () => {
   it('should allow the user to navigate back when displaying an error', () => {
     render(
       <AddToken
-        data={{ notifyData: { chainId: 137, error: 'INVALID CONTRACT ADDRESS', address: '0xabc' } }}
+        data={{ notifyData: { chain: { id: 137 }, error: 'INVALID CONTRACT ADDRESS', address: '0xabc' } }}
       />
     )
 
@@ -199,7 +205,11 @@ describe('displaying errors', () => {
     render(
       <AddToken
         data={{
-          notifyData: { chainId: 137, error: `COULD NOT FIND TOKEN WITH ADDRESS BLAH BLAH`, address: '0xabc' }
+          notifyData: {
+            chain: { id: 137 },
+            error: `COULD NOT FIND TOKEN WITH ADDRESS BLAH BLAH`,
+            address: '0xabc'
+          }
         }}
       />
     )
@@ -212,12 +222,12 @@ describe('displaying errors', () => {
 })
 
 describe('setting token details', () => {
-  it('should display the correct copy when editing a token', () => {
+  it('should show the user that they are editing a token', () => {
     render(
       <AddToken
         data={{
           notifyData: {
-            chainId: 1,
+            chain: { id: 1 },
             address: '0x64aa3364F17a4D01c6f1751Fd97C2BD3D7e7f1D4',
             isEdit: true,
             tokenData: {
@@ -231,30 +241,43 @@ describe('setting token details', () => {
         }}
       />
     )
+
     const heading = screen.getByTestId('addTokenFormTitle')
     const button = screen.getByRole('button')
     expect(heading.textContent).toBe('Edit Token')
     expect(button.textContent).toBe('Save')
   })
 
-  it('should display the correct copy when adding a new token', () => {
+  it('should show the user that they are adding a token', () => {
     render(
       <AddToken
         data={{
-          notifyData: { chainId: 1, address: '0x64aa3364F17a4D01c6f1751Fd97C2BD3D7e7f1D4' }
+          notifyData: { chain: { id: 1 }, address: '0x64aa3364F17a4D01c6f1751Fd97C2BD3D7e7f1D4' }
         }}
       />
     )
+
     const heading = screen.getByTestId('addTokenFormTitle')
-    const button = screen.getByRole('button')
     expect(heading.textContent).toBe('Add New Token')
+  })
+
+  it('should prompt to fill in missing token data', () => {
+    render(
+      <AddToken
+        data={{
+          notifyData: { chain: { id: 1 }, address: '0x64aa3364F17a4D01c6f1751Fd97C2BD3D7e7f1D4' }
+        }}
+      />
+    )
+
+    const button = screen.getByRole('button')
     expect(button.textContent).toBe('Fill in Token Details')
   })
 
-  it('should prompt for default token details', () => {
+  it('should show defaults in fields where token data is missing', () => {
     render(
       <AddToken
-        data={{ notifyData: { chainId: 137, address: '0x64aa3364F17a4D01c6f1751Fd97C2BD3D7e7f1D4' } }}
+        data={{ notifyData: { chain: { id: 137 }, address: '0x64aa3364F17a4D01c6f1751Fd97C2BD3D7e7f1D4' } }}
       />
     )
 
@@ -265,11 +288,11 @@ describe('setting token details', () => {
 
     expect(contractAddressInput.textContent).toEqual('0x64aa3364D7e7f1D4')
     expect(tokenNameInput.value).toEqual('Token Name')
-    expect(tokenSymbolInput.value).toEqual('SYMBOL')
+    expect(tokenSymbolInput.value).toEqual('Symbol')
     expect(tokenDecimalsInput.value).toEqual('?')
   })
 
-  it('should populate fields with token data where available', async () => {
+  it('should populate fields with token data', async () => {
     store.setPrimary('ethereum', 137, { connected: true })
 
     const mockToken = { name: 'Frame Test on Polygon', symbol: 'mFRT', decimals: 18, totalSupply: '1066' }
@@ -278,7 +301,7 @@ describe('setting token details', () => {
       <AddToken
         data={{
           notifyData: {
-            chainId: 1,
+            chain: { id: 1 },
             address: '0x64aa3364F17a4D01c6f1751Fd97C2BD3D7e7f1D4',
             tokenData: mockToken
           }

@@ -24,6 +24,7 @@ const AddNewItemButton = ({ view, req }) => {
     chains: { newChain: {} },
     tokens: { notify: 'addToken', notifyData: req }
   }
+
   return (
     <div className='dashFooter'>
       <div
