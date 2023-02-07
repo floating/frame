@@ -18,7 +18,7 @@ const LocateKeystore = ({ addKeystore, error, setError }) => {
     if (!error) return
     setTimeout(() => {
       setError('')
-    }, 3_500)
+    }, 1_500)
   }, [error])
   return (
     <div className='addAccountItemOptionSetupFrame'>
@@ -40,7 +40,7 @@ const LocateKeystore = ({ addKeystore, error, setError }) => {
   )
 }
 
-const Loading = () => (
+const Locating = () => (
   <div className='addAccountItemOptionSetupFrame'>
     <div role={'status'} className='addAccountItemOptionTitle' style={{ marginTop: '15px' }}>
       Locating Keystore file
@@ -63,16 +63,15 @@ const EnterKeystorePassword = ({ keystore }) => {
 }
 
 const LoadKeystore = ({ accountData }) => {
-  const { keystore } = accountData
+  const { keystore, selecting, secret } = accountData
 
   const [error, setError] = useState('')
-  const [selecting, setSelecting] = useState(false)
 
   const addKeystore = () => {
-    setSelecting(true)
+    navForward({ selecting: true })
     setTimeout(() => {
       link.rpc('locateKeystore', (err, locatedKeystore) => {
-        setSelecting(false)
+        link.send('nav:back', 'dash')
         if (err) {
           setError(err)
         } else {
@@ -82,11 +81,11 @@ const LoadKeystore = ({ accountData }) => {
     }, 640)
   }
 
-  const viewIndex = keystore ? 2 : selecting ? 1 : 0
+  const viewIndex = secret || keystore ? 2 : selecting ? 1 : 0
 
   const steps = [
     <LocateKeystore key={0} {...{ addKeystore, error, setError }} />,
-    <Loading key={1} />,
+    <Locating key={1} />,
     <EnterKeystorePassword key={2} keystore={accountData.keystore} />
   ]
   return <>{steps[viewIndex]}</>
