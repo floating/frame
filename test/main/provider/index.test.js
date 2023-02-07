@@ -1089,14 +1089,15 @@ describe('#send', () => {
 
   describe('#eth_sign', () => {
     const message = 'hello, Ethereum!'
+    const hexMessage = addHexPrefix(Buffer.from(message, 'utf-8').toString('hex'))
 
     it('submits a request to sign a message', () => {
-      send({ method: 'eth_sign', params: [address, message] })
+      send({ method: 'eth_sign', params: [address, hexMessage] })
 
       expect(accountRequests).toHaveLength(1)
       expect(accountRequests[0].handlerId).toBeTruthy()
       expect(accountRequests[0].payload.params[0]).toBe(address)
-      expect(accountRequests[0].payload.params[1]).toEqual(message)
+      expect(accountRequests[0].payload.params[1]).toEqual(hexMessage)
     })
 
     it('does not submit a request from an account other than the current one', (done) => {
@@ -1106,7 +1107,16 @@ describe('#send', () => {
         expect(err.error).toBeTruthy()
         done()
       })
-    }, 100)
+    })
+
+    it('does not submit a request for a message that is not hex-encoded utf-8', (done) => {
+      const params = [message, address]
+
+      send({ method: 'personal_sign', params }, (err) => {
+        expect(err.error.message).toMatch(/hex-encoded utf-8 string/i)
+        done()
+      })
+    })
   })
 
   describe('#personal_sign', () => {
