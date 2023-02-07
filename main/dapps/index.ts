@@ -46,26 +46,43 @@ async function getDappColors(dappId: string) {
   }
 }
 
-const cacheDapp = (dappName: string, hash: string) => {
-  const dir = path.join(app.getPath('userData'), 'DappCache')
-  const dapp = new DappStream(hash)
-  dapp.pipe(
-    tar.extract(dir, {
-      map: (header) => {
-        header.name = path.join(dappName, ...header.name.split('/').slice(1))
-        return header
-      }
-    })
-  )
+const cacheDapp = async (dappId: string, hash: string) => {
+  return new Promise((resolve, reject) => {
+    try {
+      const dir = path.join(app.getPath('userData'), 'DappCache')
+      const dapp = new DappStream(hash)
+      dapp.pipe(
+        tar
+          .extract(dir, {
+            map: (header) => {
+              header.name = path.join(dappId, ...header.name.split('/').slice(1))
+              return header
+            }
+          })
+          .on('finish', async () => {
+            try {
+              await getDappColors(dappId)
+              resolve(dappId)
+            } catch (e) {
+              reject(e)
+            }
+          })
+      )
+    } catch (e) {
+      reject(e)
+    }
+  })
 }
 
 // TODO: change to correct manifest type one Nebula version with types are published
 async function updateDappContent(dappId: string, contentURI: string, manifest: any) {
-  // Create a local cache of the content
-  await cacheDapp(dappId, contentURI)
-
-  // TODO: Make sure content is pinned before proceeding
-  store.updateDapp(dappId, { content: contentURI, manifest })
+  try {
+    // Create a local cache of the content
+    await cacheDapp(dappId, contentURI)
+    store.updateDapp(dappId, { content: contentURI, manifest })
+  } catch (e) {
+    log.error('error updating dapp cache', e)
+  }
 }
 
 let retryTimer: NodeJS.Timeout
@@ -80,11 +97,11 @@ async function checkStatus(dappId: string) {
     log.info(`resolved content for ${dapp.ens}, version: ${version}`)
 
     store.updateDapp(dappId, { record: resolved.record })
+
+    // TODO: Add case here to also run an update if the maifest doesn't match the local dir
     if (dapp.content !== resolved.record.content) {
       updateDappContent(dappId, resolved.record.content, resolved.manifest)
     }
-
-    if (!dapp.colors) getDappColors(dappId)
 
     store.updateDapp(dappId, { status: 'ready' })
 
@@ -130,6 +147,20 @@ store.observer(() => {
       }
     })
 })
+
+const refreshDapps = () => {
+  const dapps = store('main.dapps')
+  Object.keys(dapps || {}).forEach((id) => {
+    store.updateDapp(id, { status: 'loading' })
+    if (nebula.ready()) {
+      checkStatus(id)
+    } else {
+      nebula.once('ready', () => checkStatus(id))
+    }
+  })
+}
+
+setInterval(() => refreshDapps(), 1000 * 60 * 60)
 
 let nextId = 0
 const getId = () => (++nextId).toString()

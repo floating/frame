@@ -29,7 +29,7 @@ export default {
         error(res, 404, (e as NodeJS.ErrnoException).message)
       }
     } else {
-      error(res, 404, asset === '/' ? 'Dapp not found' : 'Asset not found')
+      error(res, 404, asset === '/index.html' ? 'Dapp not found' : 'Asset not found')
     }
   }
 }
