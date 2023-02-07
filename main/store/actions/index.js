@@ -623,6 +623,26 @@ module.exports = {
 
       return [...existingTokens, ...tokensToAdd]
     })
+
+    u('main.balances', (balances) => {
+      // update the balances for any custom tokens that changed
+      Object.values(balances).forEach((accountBalances) => {
+        tokens.forEach((token) => {
+          const tokenAddress = token.address.toLowerCase()
+          const matchingBalance = accountBalances.find(
+            (b) => b.address.toLowerCase() === tokenAddress && b.chainId === token.chainId
+          )
+
+          if (matchingBalance) {
+            matchingBalance.logoURI = token.logoURI || matchingBalance.logoURI
+            matchingBalance.symbol = token.symbol || matchingBalance.symbol
+            matchingBalance.name = token.name || matchingBalance.symbol
+          }
+        })
+      })
+
+      return balances
+    })
   },
   removeCustomTokens: (u, tokens) => {
     u('main.tokens.custom', (existing) => {
