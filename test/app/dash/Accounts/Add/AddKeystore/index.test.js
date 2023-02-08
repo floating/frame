@@ -5,12 +5,10 @@ import { render } from '../../../../../componentSetup'
 import store from '../../../../../../main/store'
 import link from '../../../../../../resources/link'
 import AddKeystoreAccountComponent from '../../../../../../app/dash/Accounts/Add/AddKeystore'
-import { act } from 'react-dom/test-utils'
 
 const keystore =
   '{"address":"0x91248de71222f40fa27f66f42ea07a6e58a259ed","crypto":{"kdf":"pbkdf2","kdfparams":{"c":262144,"dklen":32,"prf":"hmac-sha256","salt":"633bd27a4b2a8103cb7e88159bc4d97eb7a31a9a9ad2823f4365519932b63db1"},"cipher":"aes-128-ctr","ciphertext":"7cf2eda36f15bb033df75c4313a0d780ae7f80a6fb2ff0483113b1dd3b6d293e","cipherparams":{"iv":"6eccc2fcb8f5a85eb8383a71c00c889d"},"mac":"4cfdb4463acdd990d372fc68e87a3f2a393783ce92c0201d547eda17955c533b"},"id":"ce6f4a5f-0257-458b-b640-3ff5eebe5da2","version":3}'
 const keystorePassword = 'keystorepassword123'
-
 const signerPassword = 'thisisagoodpassword123'
 
 jest.mock('../../../../../../main/store/persist')
@@ -31,14 +29,10 @@ describe('selecting a keystore', () => {
       cb('ERROR HERE')
     })
 
-    const { user, getAllByRole } = render(<AddKeystore accountData={{}} />)
+    const { user, getAllByRole } = render(<AddKeystore accountData={{}} />, { advanceTimersAfterInput: 650 })
     const selectKeystoreButton = getAllByRole('button')[index]
 
     await user.click(selectKeystoreButton)
-
-    act(() => {
-      jest.advanceTimersByTime(650)
-    })
 
     expect(getAllByRole('button')[index].textContent).toBe('ERROR HERE')
   })
