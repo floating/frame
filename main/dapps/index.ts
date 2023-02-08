@@ -145,10 +145,11 @@ async function checkStatus(dappId: string) {
   }
 }
 
-const refreshDapps = ({ initialOnly = false } = {}) => {
+const refreshDapps = ({ statusFilter = '' } = {}) => {
   const dapps = store('main.dapps')
+
   Object.keys(dapps || {})
-    .filter((id) => (initialOnly ? dapps[id].status === 'initial' : true))
+    .filter((id) => !statusFilter || dapps[id].status === statusFilter)
     .forEach((id) => {
       store.updateDapp(id, { status: 'loading' })
       if (nebula.ready()) {
@@ -159,6 +160,8 @@ const refreshDapps = ({ initialOnly = false } = {}) => {
     })
 }
 
+const checkNewDapps = () => refreshDapps({ statusFilter: 'initial' })
+
 // Check all dapps on startup
 refreshDapps()
 
@@ -166,7 +169,7 @@ refreshDapps()
 setInterval(() => refreshDapps(), 1000 * 60 * 60)
 
 // Check any new dapps that are added
-store.observer(() => refreshDapps({ initialOnly: true }))
+store.observer(checkNewDapps)
 
 let nextId = 0
 const getId = () => (++nextId).toString()
