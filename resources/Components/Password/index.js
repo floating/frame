@@ -1,7 +1,7 @@
 import React from 'react'
 import { useState } from 'react'
 import zxcvbn from 'zxcvbn'
-import useConditionalAutofocus from '../../Hooks/useConditionalAutofocus'
+import useAutofocus from '../../Hooks/useAutofocus'
 
 import { debounce } from '../../utils'
 
@@ -9,7 +9,7 @@ const NO_PASSWORD_ENTERED = 'Enter password'
 
 const PasswordInput = ({ getError: getInputError, next, title, buttonText, autofocus }) => {
   const [error, setError] = useState(NO_PASSWORD_ENTERED)
-  const [inputRef] = useConditionalAutofocus(null, autofocus)
+  const [inputRef] = useAutofocus(autofocus)
   const [disabled, setDisabled] = useState(false)
 
   const resetError = () => setError(NO_PASSWORD_ENTERED)
