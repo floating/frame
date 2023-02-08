@@ -1,15 +1,17 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import { useState } from 'react'
 import zxcvbn from 'zxcvbn'
-import useAutofocus from '../../Hooks/useAutofocus'
+import useFocusableRef from '../../Hooks/useFocusableRef'
 
 import { debounce } from '../../utils'
 
 const NO_PASSWORD_ENTERED = 'Enter password'
 
 const PasswordInput = ({ getError: getInputError, next, title, buttonText, autofocus }) => {
+  console.log({ autofocus })
   const [error, setError] = useState(NO_PASSWORD_ENTERED)
-  const [inputRef] = useAutofocus(autofocus)
+  const inputRef = useFocusableRef(autofocus)
+  // const inputRef = useRef(null)
   const [disabled, setDisabled] = useState(false)
 
   const resetError = () => setError(NO_PASSWORD_ENTERED)
