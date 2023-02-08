@@ -68,7 +68,7 @@ describe('selecting a keystore', () => {
 })
 
 describe('entering keystore password', () => {
-  it('Should update the navigation to the confirmation screen when a password is submitted', async () => {
+  it('should update the navigation to the confirmation screen when a password is submitted', async () => {
     const { user, getAllByRole } = render(<AddKeystore accountData={{ keystore }} />, {
       advanceTimersAfterInput: true
     })
@@ -94,7 +94,7 @@ describe('entering keystore password', () => {
 })
 
 describe('entering signer password', () => {
-  it('Should update the navigation to the confirmation screen when a password is submitted', async () => {
+  it('should update the navigation to the confirmation screen when a password is submitted', async () => {
     const { user, getAllByRole } = render(<AddKeystore accountData={{ secret: keystore }} />, {
       advanceTimersAfterInput: true
     })
@@ -120,7 +120,7 @@ describe('entering signer password', () => {
 })
 
 describe('confirming signer password', () => {
-  it('Should try to create keystore account when a matching password is submitted', async () => {
+  it('should try to create keystore account when a matching password is submitted', async () => {
     const { user, getAllByRole } = render(
       <AddKeystore
         accountData={{ secret: keystore, password: signerPassword, creationArgs: [keystorePassword] }}
@@ -141,7 +141,7 @@ describe('confirming signer password', () => {
     )
   })
 
-  it('Should remove the previous screens related to adding an account from the navigation', async () => {
+  it('should remove the previous screens related to adding an account from the navigation', async () => {
     const { user, getAllByRole } = render(
       <AddKeystore
         accountData={{ secret: keystore, password: signerPassword, creationArgs: [keystorePassword] }}
@@ -160,7 +160,7 @@ describe('confirming signer password', () => {
     expect(link.send).toHaveBeenCalledWith('nav:back', 'dash', 6)
   })
 
-  it('Should update the navigation to view the newly created account', async () => {
+  it('should update the navigation to view the newly created account', async () => {
     const { user, getAllByRole } = render(
       <AddKeystore
         accountData={{ secret: keystore, password: signerPassword, creationArgs: [keystorePassword] }}
