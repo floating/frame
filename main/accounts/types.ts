@@ -49,7 +49,7 @@ interface Request {
   handlerId: string
 }
 
-type Identity = {
+export type Identity = {
   address: Address
   ens: string
   type: string

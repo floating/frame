@@ -9,6 +9,7 @@ import { isNonZeroHex } from '../../../../../../resources/utils'
 import { Cluster, ClusterRow, ClusterValue } from '../../../../../../resources/Components/Cluster'
 import { DisplayValue } from '../../../../../../resources/Components/DisplayValue'
 import RequestHeader from '../../../../../../resources/Components/RequestHeader'
+import BigNumber from 'bignumber.js'
 
 const SimpleContractCallOverview = ({ method }) => {
   const body = method ? `Calling Contract Method ${method}` : 'Calling Contract'
@@ -17,16 +18,23 @@ const SimpleContractCallOverview = ({ method }) => {
 }
 
 const ApproveOverview = ({ amount, decimals, symbol }) => {
+  const isRevoke = BigNumber(amount).isZero()
   return (
     <div>
-      <span>{'Approve Spending '}</span>
-      <DisplayValue
-        type='ether'
-        value={amount}
-        valueDataParams={{ decimals }}
-        currencySymbol={symbol}
-        currencySymbolPosition='last'
-      />
+      {isRevoke ? (
+        <span>{`Revoke Approval for ${symbol} `}</span>
+      ) : (
+        <>
+          <span>{'Approve Spending'}</span>
+          <DisplayValue
+            type='ether'
+            value={amount}
+            valueDataParams={{ decimals }}
+            currencySymbol={symbol}
+            currencySymbolPosition='last'
+          />
+        </>
+      )}
     </div>
   )
 }

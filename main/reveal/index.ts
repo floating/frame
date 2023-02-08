@@ -76,22 +76,31 @@ async function recogErc20(
   if (contractAddress) {
     try {
       const contract = new Erc20Contract(contractAddress, chainId)
-      const decoded = contract.decodeCallData(calldata)
+      const decoded = Erc20Contract.decodeCallData(calldata)
       if (decoded) {
         const { decimals, name, symbol } = await contract.getTokenData()
         if (Erc20Contract.isApproval(decoded)) {
-          const spender = decoded.args[0].toLowerCase()
+          const spenderAddress = decoded.args[0].toLowerCase()
           const amount = decoded.args[1].toHexString()
-          const { ens, type } = await surface.identity(spender, chainId)
+
+          const [spenderIdentity, contractIdentity] = await Promise.all([
+            surface.identity(spenderAddress, chainId),
+            surface.identity(contractAddress, chainId)
+          ])
+
           const data = {
-            spender,
             amount,
             decimals,
             name,
             symbol,
-            spenderEns: ens,
-            spenderType: type,
-            contract: contractAddress
+            spender: {
+              ...spenderIdentity,
+              address: spenderAddress
+            },
+            contract: {
+              address: contractAddress,
+              ...contractIdentity
+            }
           }
 
           return {
@@ -102,13 +111,13 @@ async function recogErc20(
               const approvedAmount = new BigNumber(amount || '').toString()
 
               log.verbose(
-                `Updating Erc20 approve amount to ${approvedAmount} for contract ${contractAddress} and spender ${spender}`
+                `Updating Erc20 approve amount to ${approvedAmount} for contract ${contractAddress} and spender ${spenderAddress}`
               )
 
               const txRequest = request as TransactionRequest
 
               data.amount = amount
-              txRequest.data.data = contract.encodeCallData('approve', [spender, amount])
+              txRequest.data.data = Erc20Contract.encodeCallData('approve', [spenderAddress, amount])
 
               if (txRequest.decodedData) {
                 txRequest.decodedData.args[1].value = amount === MAX_HEX ? 'unlimited' : approvedAmount
@@ -118,10 +127,10 @@ async function recogErc20(
         } else if (Erc20Contract.isTransfer(decoded)) {
           const recipient = decoded.args[0].toLowerCase()
           const amount = decoded.args[1].toHexString()
-          const { ens, type } = await surface.identity(recipient, chainId)
+          const identity = await surface.identity(recipient, chainId)
           return {
             id: 'erc20:transfer',
-            data: { recipient, amount, decimals, name, symbol, recipientEns: ens, recipientType: type }
+            data: { recipient: { address: recipient, ...identity }, amount, decimals, name, symbol }
           } as Erc20Transfer
         }
       }

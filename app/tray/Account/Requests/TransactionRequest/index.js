@@ -1,5 +1,7 @@
 import React from 'react'
 import Restore from 'react-restore'
+import BigNumber from 'bignumber.js'
+import { utils } from 'ethers'
 
 // New Tx
 import TxMain from './TxMainNew'
@@ -9,8 +11,9 @@ import TxAction from './TxAction'
 import TxRecipient from './TxRecipient'
 import AdjustFee from './AdjustFee'
 import ViewData from './ViewData'
-import TokenSpend from './TokenSpend'
+import CustomAmountInput from '../../../../../resources/Components/CustomAmountInput'
 import link from '../../../../../resources/link'
+import { erc20Interface } from '../../../../../resources/contracts'
 
 class TransactionRequest extends React.Component {
   constructor(props, context) {
@@ -35,21 +38,32 @@ class TransactionRequest extends React.Component {
     return <AdjustFee req={req} />
   }
 
+  decodeRequested(req) {
+    const calldata = req.payload.params[0].data
+    const [spender, amount] = erc20Interface.decodeFunctionData('approve', calldata)
+    return { spender, amount: BigNumber(amount.toString()) }
+  }
+
   renderTokenSpend() {
     const crumb = this.store('windows.panel.nav')[0] || {}
-    const { actionId, requestedAmountHex } = crumb.data
+    const { actionId } = crumb.data
     const { req } = this.props
-    const { handlerId } = req
     if (!req) return null
+
+    const { handlerId } = req
     const approval = (req.recognizedActions || []).find((action) => action.id === actionId)
     if (!approval) return null
+
+    const { data } = approval
+
+    const { amount: requestedAmount } = this.decodeRequested(req)
+
     return (
-      <TokenSpend
-        approval={approval}
-        requestedAmountHex={requestedAmountHex}
-        updateApproval={(amount) => {
-          link.rpc('updateRequest', handlerId, { amount }, actionId, () => {})
-        }}
+      <CustomAmountInput
+        data={data}
+        requestedAmount={requestedAmount}
+        updateRequest={(amount) => link.rpc('updateRequest', handlerId, { amount }, actionId, () => {})}
+        canRevoke={true}
       />
     )
   }
