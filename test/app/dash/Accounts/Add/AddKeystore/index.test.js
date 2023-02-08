@@ -98,7 +98,7 @@ describe('entering signer password', () => {
     const { user, getAllByRole } = render(<AddKeystore accountData={{ secret: keystore }} />, {
       advanceTimersAfterInput: true
     })
-    const passwordEntryTextArea = getAllByRole('textbox')[0]
+    const passwordEntryTextArea = getAllByRole('textbox')[1]
 
     await user.type(passwordEntryTextArea, signerPassword)
 
@@ -127,7 +127,7 @@ describe('confirming signer password', () => {
       />,
       { advanceTimersAfterInput: true }
     )
-    const confirmInput = getAllByRole('textbox')[1]
+    const confirmInput = getAllByRole('textbox')[2]
     const confirmButton = getAllByRole('button')[2]
     await user.type(confirmInput, signerPassword)
 
@@ -148,7 +148,7 @@ describe('confirming signer password', () => {
       />,
       { advanceTimersAfterInput: true }
     )
-    const confirmInput = getAllByRole('textbox')[1]
+    const confirmInput = getAllByRole('textbox')[2]
     const confirmButton = getAllByRole('button')[2]
     link.rpc.mockImplementationOnce((action, secret, passwd, keystorePsswd, cb) => {
       cb(null, { id: '1234' })
@@ -167,7 +167,7 @@ describe('confirming signer password', () => {
       />,
       { advanceTimersAfterInput: true }
     )
-    const confirmInput = getAllByRole('textbox')[1]
+    const confirmInput = getAllByRole('textbox')[2]
     const confirmButton = getAllByRole('button')[2]
     link.rpc.mockImplementationOnce((action, secret, passwd, keystorePsswd, cb) => {
       cb(null, { id: '1234' })

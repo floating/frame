@@ -21,7 +21,7 @@ const PasswordInput = ({ getError: getInputError, next, title, buttonText, autof
 
   const handleSubmit = () => {
     next(inputRef.current.value)
-    setTimeout(clear, 600)
+    setTimeout(clear, 1_000)
   }
 
   const getError = () =>
