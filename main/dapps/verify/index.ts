@@ -22,12 +22,6 @@ const hash = async (content: any, opts: UserImporterOptions = {}) => {
     hidden: true
   } as const
 
-  if (typeof content === 'string') {
-    content = [{ content: new TextEncoder().encode(content) }]
-  } else if (content instanceof Object.getPrototypeOf(Uint8Array)) {
-    content = [{ content }]
-  }
-
   let lastCID
 
   for await (const c of importer(content, blockstore as any, options)) {
@@ -45,9 +39,6 @@ export async function verifyDapp(path: string, manifestCID: string) {
   const v1 = cid?.toV1().toString()
   const match = cid?.toV1().toString() === manifestCID
   console.log({
-    pathExpected:
-      path ===
-      '/home/matt/.config/Electron/DappCache/0xe8d705c28f65bc3fe10df8b22f9daa265b99d0e1893b2df49fd38120f0410bca',
     path,
     v1,
     manifestCID,
