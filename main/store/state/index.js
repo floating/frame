@@ -681,8 +681,8 @@ const initial = {
         }
       }
     }),
+    dapps: main('dapps', {}),
     ipfs: {},
-    dapps: {},
     frames: {},
     openDapps: [],
     dapp: {

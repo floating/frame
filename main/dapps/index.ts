@@ -1,5 +1,6 @@
 import { app } from 'electron'
 import path from 'path'
+import fs from 'fs/promises'
 import { Readable } from 'stream'
 import { hash } from 'eth-ens-namehash'
 import log from 'electron-log'
@@ -88,6 +89,8 @@ async function updateDappContent(dappId: string, manifest: any) {
 }
 
 let retryTimer: NodeJS.Timeout
+
+// Takes dappId and checks if the dapp is up to date
 async function checkStatus(dappId: string) {
   clearTimeout(retryTimer)
   const dapp = store('main.dapps', dappId) as Dapp
@@ -101,15 +104,30 @@ async function checkStatus(dappId: string) {
 
     store.updateDapp(dappId, { record })
 
-    const dappVerified = async () =>
-      manifest.content && verifyDapp(`${dappCacheDir}/${dappId}`, manifest.content)
-
-    // TODO: Add case here to also run an update if the maifest doesn't match the local dir
-    if (dapp.content !== manifest.content || !(await dappVerified())) {
-      log.info(`Updating content for dapp ${dappId} from hash ${manifest.content}`)
-      updateDappContent(dappId, manifest)
+    const dappVerified = async () => {
+      try {
+        const cachedDappPath = `${dappCacheDir}/${dappId}`
+        // Ensure the directory exists
+        await fs.access(cachedDappPath)
+        // Check that the directory matches the manifest
+        return manifest.content && (await verifyDapp(cachedDappPath, manifest.content))
+      } catch (e) {
+        return false
+      }
     }
 
+    // Checks if all assets are up to date with current manifest
+    if (dapp.content !== manifest.content || !(await dappVerified())) {
+      log.info(`Updating content for dapp ${dappId} from hash ${manifest.content}`)
+      // Sets status to 'updating' when updating the bundle
+      store.updateDapp(dappId, { status: 'updating' })
+      // Installs new assets if changed and config is set to sync
+      await updateDappContent(dappId, manifest)
+    } else {
+      log.info(`Dapp ${dapp.ens} already up to date: ${manifest.content}`)
+    }
+
+    // Sets status to 'ready' when done
     store.updateDapp(dappId, { status: 'ready' })
 
     // The frame id 'dappLauncher' needs to refrence target frame
@@ -125,49 +143,30 @@ async function checkStatus(dappId: string) {
       store.updateDapp(dappId, { status: 'failed', checkStatusRetryCount: 0 })
     }
   }
-
-  // Takes dapp entry and config
-  // Checks if assets are correctly synced
-  // Checks if all assets are up to date with current manifest
-  // Installs new assets if changed and config is set to sync
-  // Sets status to 'updating' when updating the bundle
-  // Sets status to 'ready' when done
-
-  // dapp.config // the user's prefrences for installing assets from the manifest
-  // dapp.manifest // a copy of the latest manifest we have resolved for the dapp
-  // dapp.meta // meta info about the dapp including name, colors, icons, descriptions,
-  // dapp.ens // ens name for this dapp
-  // dapp.storage // local storage values for dapp
 }
 
-store.observer(() => {
+const refreshDapps = ({ initialOnly = false } = {}) => {
   const dapps = store('main.dapps')
   Object.keys(dapps || {})
-    .filter((id) => dapps[id].status === 'initial')
+    .filter((id) => (initialOnly ? dapps[id].status === 'initial' : true))
     .forEach((id) => {
       store.updateDapp(id, { status: 'loading' })
-
       if (nebula.ready()) {
         checkStatus(id)
       } else {
         nebula.once('ready', () => checkStatus(id))
       }
     })
-})
-
-const refreshDapps = () => {
-  const dapps = store('main.dapps')
-  Object.keys(dapps || {}).forEach((id) => {
-    store.updateDapp(id, { status: 'loading' })
-    if (nebula.ready()) {
-      checkStatus(id)
-    } else {
-      nebula.once('ready', () => checkStatus(id))
-    }
-  })
 }
 
+// Check all dapps on startup
+refreshDapps()
+
+// Check all dapps every hour
 setInterval(() => refreshDapps(), 1000 * 60 * 60)
+
+// Check any new dapps that are added
+store.observer(() => refreshDapps({ initialOnly: true }))
 
 let nextId = 0
 const getId = () => (++nextId).toString()
@@ -182,14 +181,10 @@ const surface = {
     const id = hash(ens)
     const status = 'initial'
 
-    // Validate ens name and config
-
-    // Check that dapp has not been added already
-    // If ens name has been installed
-    // return error
+    const existingDapp = store('main.dapps', id)
 
     // If ens name has not been installed, start install
-    store.appDapp({ id, ens, status, config, manifest: {}, current: {} })
+    if (!existingDapp) store.appDapp({ id, ens, status, config, manifest: {}, current: {} })
   },
   addServerSession(namehash: string /* , session */) {
     // server.sessions.add(namehash, session)
