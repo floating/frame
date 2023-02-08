@@ -13,6 +13,7 @@ import extractColors from '../windows/extractColors'
 import { verifyDapp } from './verify'
 
 const nebula = nebulaApi()
+const dappCacheDir = path.join(app.getPath('userData'), 'DappCache')
 
 class DappStream extends Readable {
   constructor(hash: string) {
@@ -50,15 +51,11 @@ async function getDappColors(dappId: string) {
 const cacheDapp = async (dappId: string, hash: string) => {
   return new Promise((resolve, reject) => {
     try {
-      const dir = path.join(app.getPath('userData'), 'DappCache')
       const dapp = new DappStream(hash)
 
-      console.log({ dappId, hash, dir })
-
-      verifyDapp(`${dir}/${dappId}`, hash)
       dapp.pipe(
         tar
-          .extract(dir, {
+          .extract(dappCacheDir, {
             map: (header) => {
               header.name = path.join(dappId, ...header.name.split('/').slice(1))
               return header
@@ -93,7 +90,8 @@ async function updateDappContent(dappId: string, manifest: any) {
 let retryTimer: NodeJS.Timeout
 async function checkStatus(dappId: string) {
   clearTimeout(retryTimer)
-  const dapp = store('main.dapps', dappId)
+  const dapp = store('main.dapps', dappId) as Dapp
+
   try {
     const { record, manifest } = await nebula.resolve(dapp.ens)
 
@@ -103,8 +101,12 @@ async function checkStatus(dappId: string) {
 
     store.updateDapp(dappId, { record })
 
+    const dappVerified = async () =>
+      manifest.content && verifyDapp(`${dappCacheDir}/${dappId}`, manifest.content)
+
     // TODO: Add case here to also run an update if the maifest doesn't match the local dir
-    if (dapp.content !== manifest.content) {
+    if (dapp.content !== manifest.content || !(await dappVerified())) {
+      log.info(`Updating content for dapp ${dappId} from hash ${manifest.content}`)
       updateDappContent(dappId, manifest)
     }
 

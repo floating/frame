@@ -159,8 +159,11 @@ interface Dapp {
   ens: string
   status?: string
   config: Record<string, string>
+  content?: string // IPFS hash
   manifest?: any
   current?: any
+  openWhenReady: boolean
+  checkStatusRetryCount: number
 }
 
 type SignerType = 'ring' | 'seed' | 'trezor' | 'ledger' | 'lattice'

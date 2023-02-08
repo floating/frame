@@ -36,14 +36,6 @@ const getCID = async (path: string, isDirectory = true) => hashFiles(path, { wra
 
 export async function verifyDapp(path: string, manifestCID: string) {
   const cid = await getCID(path)
-  const v1 = cid?.toV1().toString()
-  const match = cid?.toV1().toString() === manifestCID
-  console.log({
-    path,
-    v1,
-    manifestCID,
-    cid,
-    match
-  })
-  return match
+
+  return cid?.toV1().toString() === manifestCID
 }
