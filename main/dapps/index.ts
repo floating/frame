@@ -10,6 +10,7 @@ import store from '../store'
 import nebulaApi from '../nebula'
 import server from './server'
 import extractColors from '../windows/extractColors'
+import { verifyDapp } from './verify'
 
 const nebula = nebulaApi()
 
@@ -51,6 +52,10 @@ const cacheDapp = async (dappId: string, hash: string) => {
     try {
       const dir = path.join(app.getPath('userData'), 'DappCache')
       const dapp = new DappStream(hash)
+
+      console.log({ dappId, hash, dir })
+
+      verifyDapp(`${dir}/${dappId}`, hash)
       dapp.pipe(
         tar
           .extract(dir, {
@@ -75,11 +80,11 @@ const cacheDapp = async (dappId: string, hash: string) => {
 }
 
 // TODO: change to correct manifest type one Nebula version with types are published
-async function updateDappContent(dappId: string, contentURI: string, manifest: any) {
+async function updateDappContent(dappId: string, manifest: any) {
   try {
     // Create a local cache of the content
-    await cacheDapp(dappId, contentURI)
-    store.updateDapp(dappId, { content: contentURI, manifest })
+    await cacheDapp(dappId, manifest.content)
+    store.updateDapp(dappId, { content: manifest.content, manifest })
   } catch (e) {
     log.error('error updating dapp cache', e)
   }
@@ -90,17 +95,17 @@ async function checkStatus(dappId: string) {
   clearTimeout(retryTimer)
   const dapp = store('main.dapps', dappId)
   try {
-    const resolved = await nebula.resolve(dapp.ens)
+    const { record, manifest } = await nebula.resolve(dapp.ens)
 
-    const version = (resolved.manifest || {}).version || 'unknown'
+    const version = (manifest || {}).version || 'unknown'
 
     log.info(`resolved content for ${dapp.ens}, version: ${version}`)
 
-    store.updateDapp(dappId, { record: resolved.record })
+    store.updateDapp(dappId, { record })
 
     // TODO: Add case here to also run an update if the maifest doesn't match the local dir
-    if (dapp.content !== resolved.record.content) {
-      updateDappContent(dappId, resolved.record.content, resolved.manifest)
+    if (dapp.content !== manifest.content) {
+      updateDappContent(dappId, manifest)
     }
 
     store.updateDapp(dappId, { status: 'ready' })
