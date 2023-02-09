@@ -1,12 +1,12 @@
 import { useEffect, useRef } from 'react'
 
-const useFocusableRef = (focus) => {
+const useFocusableRef = (focus, delay = 900) => {
   const ref = useRef(null)
 
   useEffect(() => {
-    const timeout = focus && setTimeout(() => ref.current && ref.current.focus(), 1000)
-    return () => {
-      timeout && clearTimeout(timeout)
+    if (focus) {
+      const timeout = setTimeout(() => ref.current && ref.current.focus(), delay)
+      return () => clearTimeout(timeout)
     }
   })
 

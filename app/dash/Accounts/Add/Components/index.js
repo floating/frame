@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React from 'react'
 import { useState } from 'react'
 
 import useFocusableRef from '../../../../../resources/Hooks/useFocusableRef'
@@ -48,9 +48,8 @@ const AddHotAccountWrapper = ({ children, title, svgName, summary, index }) => {
 }
 
 const EnterSecret = ({ newAccountType, validateSecret, title, autofocus }) => {
-  console.log({ autofocus })
   const EMPTY_STATE = `Enter ${title}`
-  const inputRef = useFocusableRef(autofocus)
+  const inputRef = useFocusableRef(autofocus, 100)
   const [error, setError] = useState(EMPTY_STATE)
 
   const resetError = () => setError(EMPTY_STATE)
