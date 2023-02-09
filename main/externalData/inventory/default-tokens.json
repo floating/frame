@@ -4334,7 +4334,7 @@
       "name": "ARTH",
       "symbol": "ARTH",
       "decimals": 18,
-      "logoURI": "https://assets.coingecko.com/coins/images/16876/thumb/ARTH_Token.png?1625651538"
+      "logoURI": "https://assets.coingecko.com/coins/images/16876/thumb/Ik5dhOq.png?1674126397"
     },
     {
       "chainId": 137,
@@ -4342,7 +4342,7 @@
       "name": "ARTH",
       "symbol": "ARTH",
       "decimals": 18,
-      "logoURI": "https://assets.coingecko.com/coins/images/16876/thumb/ARTH_Token.png?1625651538"
+      "logoURI": "https://assets.coingecko.com/coins/images/16876/thumb/Ik5dhOq.png?1674126397"
     },
     {
       "chainId": 1,
@@ -24607,7 +24607,7 @@
     },
     {
       "chainId": 1,
-      "address": "0xb4d930279552397bba2ee473229f89ec245bc365",
+      "address": "0x745407c86df8db893011912d3ab28e68b62e49b0",
       "name": "MahaDAO",
       "symbol": "MAHA",
       "decimals": 18,
