@@ -130,9 +130,7 @@ export function AddHotAccount({
   createSignerMethod,
   newAccountType,
   validateSecret,
-  firstStep = (
-    <EnterSecret key={0} {...{ validateSecret, title, newAccountType, autofocus: viewIndex === 0 }} />
-  ),
+  firstStep,
   backSteps = 4
 }) {
   const { secret, password, error, creationArgs = [] } = accountData
@@ -161,8 +159,12 @@ export function AddHotAccount({
       })
     })
 
+  const firstFlowStep = firstStep || (
+    <EnterSecret key={0} {...{ validateSecret, title, newAccountType, autofocus: viewIndex === 0 }} />
+  )
+
   const steps = [
-    firstStep,
+    firstFlowStep,
     <CreatePassword key={1} onCreate={onCreate} autofocus={viewIndex === 1} />,
     <ConfirmPassword key={2} password={password} onConfirm={onConfirm} autofocus={viewIndex === 2} />,
     <Error key={3} error={error} />
