@@ -90,7 +90,8 @@ describe('entering password', () => {
         newAccountType: 'keyring',
         accountData: {
           secret: privateKey,
-          password
+          password,
+          creationArgs: []
         }
       }
     })

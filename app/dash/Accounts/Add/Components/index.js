@@ -129,35 +129,42 @@ export function AddHotAccount({
   accountData,
   createSignerMethod,
   newAccountType,
-  validateSecret
+  validateSecret,
+  firstStep,
+  backSteps = 4
 }) {
-  const { secret, password, error } = accountData
+  const { secret, password, error, creationArgs = [] } = accountData
   const viewIndex = error ? 3 : !secret ? 0 : !password ? 1 : 2
 
   const onCreate = (password) => {
     navForward(newAccountType, {
       secret,
-      password
+      password,
+      creationArgs
     })
   }
 
-  const onConfirm = (password) =>
-    link.rpc(createSignerMethod, secret, password, (err, signer) => {
+  const onConfirm = () =>
+    link.rpc(createSignerMethod, secret, password, ...creationArgs, (err, signer) => {
       if (err) {
         return navForward(newAccountType, {
           error: err
         })
       }
 
-      link.send('nav:back', 'dash', 4)
+      link.send('nav:back', 'dash', backSteps)
       link.send(`nav:forward`, 'dash', {
         view: 'expandedSigner',
         data: { signer: signer.id }
       })
     })
 
+  const firstFlowStep = firstStep || (
+    <EnterSecret key={0} {...{ validateSecret, title, newAccountType, autofocus: viewIndex === 0 }} />
+  )
+
   const steps = [
-    <EnterSecret key={0} {...{ validateSecret, title, newAccountType, autofocus: viewIndex === 0 }} />,
+    firstFlowStep,
     <CreatePassword key={1} onCreate={onCreate} autofocus={viewIndex === 1} />,
     <ConfirmPassword key={2} password={password} onConfirm={onConfirm} autofocus={viewIndex === 2} />,
     <Error key={3} error={error} />

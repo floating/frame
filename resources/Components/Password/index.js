@@ -7,7 +7,7 @@ import { debounce } from '../../utils'
 
 const NO_PASSWORD_ENTERED = 'Enter password'
 
-const PasswordInput = ({ getError: getInputError, next, title, buttonText, autofocus }) => {
+export const PasswordInput = ({ getError: getInputError, next, title, buttonText, autofocus }) => {
   const [error, setError] = useState(NO_PASSWORD_ENTERED)
   const inputRef = useFocusableRef(autofocus)
   const [disabled, setDisabled] = useState(false)
@@ -21,7 +21,7 @@ const PasswordInput = ({ getError: getInputError, next, title, buttonText, autof
 
   const handleSubmit = () => {
     next(inputRef.current.value)
-    setTimeout(clear, 600)
+    setTimeout(clear, 1_000)
   }
 
   const getError = () =>

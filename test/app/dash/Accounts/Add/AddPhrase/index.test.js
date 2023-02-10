@@ -80,7 +80,8 @@ describe('entering password', () => {
         newAccountType: 'seed',
         accountData: {
           secret: phrase,
-          password
+          password,
+          creationArgs: []
         }
       }
     })
