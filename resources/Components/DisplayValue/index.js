@@ -1,5 +1,7 @@
 import React from 'react'
 import { displayValueData } from '../../utils/displayValue'
+import { MAX_HEX } from '../../constants'
+
 import BigNumber from 'bignumber.js'
 
 function isDisplayValueData(obj) {
@@ -51,7 +53,11 @@ export const DisplayValue = (props) => {
 
   const data = isDisplayValueData(value) ? value : displayValueData(value, valueDataParams)
 
-  const { approximationSymbol = '', displayValue, displayUnit } = data[type]({ displayDecimals })
+  const {
+    approximationSymbol = '',
+    displayValue,
+    displayUnit = ''
+  } = value === MAX_HEX ? { displayValue: 'Unlimited' } : data[type]({ displayDecimals })
 
   return (
     <div className='displayValue' data-testid='display-value'>
