@@ -55,29 +55,29 @@ class BalancesPreview extends React.Component {
     const networks = this.store('main.networks.ethereum')
     const networksMeta = this.store('main.networksMeta.ethereum')
 
-    const balances = rawBalances
-      // only show balances from connected networks
-      .filter((rawBalance) => isNetworkConnected(networks[rawBalance.chainId]))
-      .map((rawBalance) => {
-        const isNative = isNativeCurrency(rawBalance.address)
-        const nativeCurrencyInfo = networksMeta[rawBalance.chainId].nativeCurrency || {}
+    return (
+      rawBalances
+        // only show balances from connected networks
+        .filter((rawBalance) => isNetworkConnected(networks[rawBalance.chainId]))
+        .map((rawBalance) => {
+          const isNative = isNativeCurrency(rawBalance.address)
+          const nativeCurrencyInfo = networksMeta[rawBalance.chainId].nativeCurrency || {}
 
-        const rate = isNative ? nativeCurrencyInfo : rates[rawBalance.address || rawBalance.symbol] || {}
-        const logoURI = (isNative && nativeCurrencyInfo.icon) || rawBalance.logoURI
-        const name = isNative ? nativeCurrencyInfo.name || networks[rawBalance.chainId].name : rawBalance.name
-        const decimals = isNative ? nativeCurrencyInfo.decimals || 18 : rawBalance.decimals
-        const symbol = (isNative && nativeCurrencyInfo.symbol) || rawBalance.symbol
+          const rate = isNative ? nativeCurrencyInfo : rates[rawBalance.address || rawBalance.symbol] || {}
+          const logoURI = (isNative && nativeCurrencyInfo.icon) || rawBalance.logoURI
+          const name = isNative
+            ? nativeCurrencyInfo.name || networks[rawBalance.chainId].name
+            : rawBalance.name
+          const decimals = isNative ? nativeCurrencyInfo.decimals || 18 : rawBalance.decimals
+          const symbol = (isNative && nativeCurrencyInfo.symbol) || rawBalance.symbol
 
-        return createBalance(
-          { ...rawBalance, logoURI, name, decimals, symbol },
-          networks[rawBalance.chainId].isTestnet ? { price: 0 } : rate.usd
-        )
-      })
-      .sort(byTotalValue)
-
-    const totalValue = balances.reduce((a, b) => a.plus(b.totalValue), BigNumber(0))
-
-    return { balances, totalDisplayValue: formatUsdRate(totalValue, 0), totalValue }
+          return createBalance(
+            { ...rawBalance, logoURI, name, decimals, symbol },
+            networks[rawBalance.chainId].isTestnet ? { price: 0 } : rate.usd
+          )
+        })
+        .sort(byTotalValue)
+    )
   }
 
   render() {
@@ -85,7 +85,7 @@ class BalancesPreview extends React.Component {
     const storedBalances = this.store('main.balances', address) || []
     const rates = this.store('main.rates')
 
-    const { balances: allBalances, totalDisplayValue, totalValue } = this.getBalances(storedBalances, rates)
+    const allBalances = this.getBalances(storedBalances, rates)
 
     // if filter only show balances that match filter
     const filteredBalances = allBalances.filter((balance) => {
@@ -94,9 +94,11 @@ class BalancesPreview extends React.Component {
       return matchFilter(filter, [chainName, balance.name, balance.symbol])
     })
 
-    const balances = filteredBalances.slice(0, 4)
-
+    const totalValue = filteredBalances.reduce((a, b) => a.plus(b.totalValue), BigNumber(0))
+    const totalDisplayValue = formatUsdRate(totalValue, 0)
     const lastBalanceUpdate = this.store('main.accounts', address, 'balances.lastUpdated')
+
+    const balances = filteredBalances.slice(0, 4)
 
     // scan if balances are more than a minute old
     const scanning = !lastBalanceUpdate || new Date() - new Date(lastBalanceUpdate) > 1000 * 60
@@ -140,8 +142,8 @@ class BalancesPreview extends React.Component {
                   link.send('nav:forward', 'panel', crumb)
                 }}
               >
-                {allBalances.length - balances.length > 0
-                  ? `+${allBalances.length - balances.length} More`
+                {filteredBalances.length - balances.length > 0
+                  ? `+${filteredBalances.length - balances.length} More`
                   : 'More'}
               </div>
             </div>
