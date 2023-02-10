@@ -373,7 +373,7 @@ class Settings extends React.Component {
                 link.send('tray:action', 'setOnboard', { showing: true })
               }}
             >
-              Open Frame tutorial
+              Open Frame Tutorial
             </div>
           </div>
           <div className='requestFeature'>
