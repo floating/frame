@@ -68,7 +68,7 @@ class TxSending extends React.Component {
                   <DisplayValue
                     type='fiat'
                     value={amount}
-                    valueDataParams={{ currencyRate: rate && rate.usd, isTestnet }}
+                    valueDataParams={{ currencyRate: rate && rate.usd, isTestnet, decimals }}
                     currencySymbol='$'
                   />
                 </ClusterValue>
