@@ -375,12 +375,17 @@ describe('#removeBalance', () => {
 })
 
 describe('#addCustomTokens', () => {
-  let tokens = []
+  let tokens = [],
+    balances = {}
 
   const updaterFn = (node, update) => {
-    expect(node).toBe('main.tokens.custom')
+    if (node === 'main.tokens.custom') {
+      tokens = update(tokens)
+    }
 
-    tokens = update(tokens)
+    if (node === 'main.balances') {
+      balances = update(balances)
+    }
   }
 
   const addTokens = (tokensToAdd) => addCustomTokensAction(updaterFn, tokensToAdd)
@@ -406,6 +411,40 @@ describe('#addCustomTokens', () => {
     expect(tokens).toHaveLength(2)
     expect(tokens[0]).toEqual(testTokens.zrx)
     expect(tokens[1].symbol).toBe('BAD')
+  })
+
+  it('updates an existing balance for a custom token', () => {
+    const account = '0xd0e3872f5fa8ecb49f1911f605c0da90689a484e'
+
+    balances = {
+      [account]: [
+        {
+          address: testTokens.badger.address,
+          chainId: testTokens.badger.chainId,
+          symbol: 'BDG',
+          name: 'Old Badger',
+          logoURI: 'http://logo.io'
+        }
+      ]
+    }
+
+    const updatedBadgerToken = {
+      ...testTokens.badger,
+      symbol: 'BADGER',
+      name: 'Badger Token'
+    }
+
+    addTokens([updatedBadgerToken])
+
+    expect(balances[account]).toStrictEqual([
+      {
+        address: testTokens.badger.address,
+        chainId: testTokens.badger.chainId,
+        symbol: 'BADGER',
+        name: 'Badger Token',
+        logoURI: 'http://logo.io'
+      }
+    ])
   })
 })
 
