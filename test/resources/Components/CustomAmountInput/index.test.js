@@ -1,6 +1,6 @@
 import React from 'react'
 import { render, screen } from '../../../componentSetup'
-import CusomAmountInput from '../../../../resources/Components/CustomAmountInput'
+import EditTokenSpend from '../../../../resources/Components/EditTokenSpend'
 import BigNumber from 'bignumber.js'
 import { max } from '../../../../resources/utils/numbers'
 
@@ -31,7 +31,7 @@ describe('changing approval amounts', () => {
     }
 
     const { user } = render(
-      <CusomAmountInput data={approval.data} requestedAmount={requestedAmount} updateRequest={onUpdate} />
+      <EditTokenSpend data={approval.data} requestedAmount={requestedAmount} updateRequest={onUpdate} />
     )
 
     const custom = screen.queryByRole('button', { name: 'Custom' })
@@ -70,7 +70,7 @@ describe('changing approval amounts', () => {
     }
 
     const { user } = render(
-      <CusomAmountInput data={approval.data} requestedAmount={requestedAmount} updateRequest={onUpdate} />
+      <EditTokenSpend data={approval.data} requestedAmount={requestedAmount} updateRequest={onUpdate} />
     )
 
     const custom = screen.queryByRole('button', { name: 'Custom' })
@@ -109,7 +109,7 @@ describe('changing approval amounts', () => {
     }
 
     const { user } = render(
-      <CusomAmountInput data={approval.data} requestedAmount={requestedAmount} updateRequest={onUpdate} />
+      <EditTokenSpend data={approval.data} requestedAmount={requestedAmount} updateRequest={onUpdate} />
     )
 
     const custom = screen.queryByRole('button', { name: 'Custom' })
@@ -145,9 +145,7 @@ describe('changing approval amounts', () => {
       }
     }
 
-    render(
-      <CusomAmountInput data={approval.data} requestedAmount={requestedAmount} updateRequest={() => {}} />
-    )
+    render(<EditTokenSpend data={approval.data} requestedAmount={requestedAmount} updateRequest={() => {}} />)
 
     const custom = screen.queryByRole('button', { name: 'Custom' })
     expect(custom).toBe(null)
@@ -170,7 +168,7 @@ describe('changing approval amounts', () => {
     }
 
     const { user } = render(
-      <CusomAmountInput data={approval.data} requestedAmount={requestedAmount} updateRequest={onUpdate} />
+      <EditTokenSpend data={approval.data} requestedAmount={requestedAmount} updateRequest={onUpdate} />
     )
 
     const custom = screen.queryByRole('button', { name: 'Custom' })
@@ -203,7 +201,7 @@ describe('changing approval amounts', () => {
     }
 
     const { user } = render(
-      <CusomAmountInput data={approval.data} requestedAmount={requestedAmount} updateRequest={onUpdate} />
+      <EditTokenSpend data={approval.data} requestedAmount={requestedAmount} updateRequest={onUpdate} />
     )
 
     const setUnlimited = screen.queryByRole('button', { name: 'Unlimited' })
@@ -240,7 +238,7 @@ describe('changing approval amounts', () => {
     }
 
     const { user } = render(
-      <CusomAmountInput data={approval.data} requestedAmount={requestedAmount} updateRequest={onUpdate} />
+      <EditTokenSpend data={approval.data} requestedAmount={requestedAmount} updateRequest={onUpdate} />
     )
 
     const setUnlimited = screen.queryByRole('button', { name: 'Unlimited' })
@@ -281,7 +279,7 @@ describe('changing approval amounts', () => {
       delete approval.data[field]
 
       const { user } = render(
-        <CusomAmountInput
+        <EditTokenSpend
           data={approval.data}
           requestedAmount={BigNumber(requestedAmountHex)}
           updateRequest={() => {}}

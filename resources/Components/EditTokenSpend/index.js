@@ -75,7 +75,7 @@ const Description = ({ mode, custom, isRevoke }) => (
   </ClusterRow>
 )
 
-const CustomAmountInput = ({
+const EditTokenSpend = ({
   data,
   updateRequest: updateHandlerRequest,
   requestedAmount,
@@ -280,4 +280,4 @@ const CustomAmountInput = ({
   )
 }
 
-export default CustomAmountInput
+export default EditTokenSpend

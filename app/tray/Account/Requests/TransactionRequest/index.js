@@ -1,7 +1,6 @@
 import React from 'react'
 import Restore from 'react-restore'
 import BigNumber from 'bignumber.js'
-import { utils } from 'ethers'
 
 // New Tx
 import TxMain from './TxMainNew'
@@ -11,7 +10,7 @@ import TxAction from './TxAction'
 import TxRecipient from './TxRecipient'
 import AdjustFee from './AdjustFee'
 import ViewData from './ViewData'
-import CustomAmountInput from '../../../../../resources/Components/CustomAmountInput'
+import EditTokenSpend from '../../../../../resources/Components/EditTokenSpend'
 import link from '../../../../../resources/link'
 import { erc20Interface } from '../../../../../resources/contracts'
 
@@ -59,7 +58,7 @@ class TransactionRequest extends React.Component {
     const { amount: requestedAmount } = this.decodeRequested(req)
 
     return (
-      <CustomAmountInput
+      <EditTokenSpend
         data={data}
         requestedAmount={requestedAmount}
         updateRequest={(amount) => link.rpc('updateRequest', handlerId, { amount }, actionId, () => {})}

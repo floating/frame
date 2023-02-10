@@ -35,16 +35,6 @@ export function isUnlimited(amount: string) {
   return max.eq(amount)
 }
 
-export function formatDisplayInteger(amount: number, decimals: number) {
-  const displayInt = BigNumber(amount).shiftedBy(-decimals).integerValue().toNumber()
-
-  if (displayInt > 9e12) {
-    return decimals ? '~unlimited' : 'unknown'
-  }
-
-  return formatNumber(displayInt)
-}
-
 export function formatDisplayDecimal(amount: string | number, decimals: number) {
   const bn = BigNumber(amount).shiftedBy(-decimals)
 
