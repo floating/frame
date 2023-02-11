@@ -26,7 +26,7 @@ describe('#dappPathExists', () => {
   })
 
   it('determines that a dapp exists in the dapp cache', async () => {
-    fs.access.mockReturnValueOnce()
+    fs.access.mockResolvedValue()
 
     const exists = dappPathExists('0xmydapp')
 
@@ -35,9 +35,7 @@ describe('#dappPathExists', () => {
   })
 
   it('determines that a dapp does not exist in the dapp cache', async () => {
-    fs.access.mockImplementation(() => {
-      throw new Error('directory does not exist')
-    })
+    fs.access.mockRejectedValue(new Error('directory does not exist'))
 
     const exists = dappPathExists('0xmydapp')
 

@@ -45,7 +45,7 @@ export async function dappPathExists(dappId: string) {
   const cachedDappPath = `${getDappCacheDir()}/${dappId}`
 
   try {
-    fs.access(cachedDappPath)
+    await fs.access(cachedDappPath)
     return true
   } catch (e) {
     return false
