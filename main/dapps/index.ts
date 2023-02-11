@@ -120,7 +120,7 @@ async function checkStatus(dappId: string) {
       log.info(`Updating content for dapp ${dappId} from hash ${content}`)
       // Sets status to 'updating' when updating the bundle
       store.updateDapp(dappId, { status: 'updating' })
-      // Installs new assets if changed and config is set to sync
+      // Update dapp assets
       await updateDappContent(dappId, manifest)
     } else {
       log.info(`Dapp ${dapp.ens} already up to date: ${content}`)
