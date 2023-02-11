@@ -1,6 +1,4 @@
-import { app } from 'electron'
 import path from 'path'
-import fs from 'fs/promises'
 import { Readable } from 'stream'
 import { hash } from 'eth-ens-namehash'
 import log from 'electron-log'
@@ -11,10 +9,9 @@ import store from '../store'
 import nebulaApi from '../nebula'
 import server from './server'
 import extractColors from '../windows/extractColors'
-import { verifyDapp } from './verify'
+import { dappPathExists, getDappCacheDir, isDappVerified } from './verify'
 
 const nebula = nebulaApi()
-const dappCacheDir = path.join(app.getPath('userData'), 'DappCache')
 
 class DappStream extends Readable {
   constructor(hash: string) {
@@ -56,7 +53,7 @@ const cacheDapp = async (dappId: string, hash: string) => {
 
       dapp.pipe(
         tar
-          .extract(dappCacheDir, {
+          .extract(getDappCacheDir(), {
             map: (header) => {
               header.name = path.join(dappId, ...header.name.split('/').slice(1))
               return header
@@ -97,34 +94,35 @@ async function checkStatus(dappId: string) {
 
   try {
     const { record, manifest } = await nebula.resolve(dapp.ens)
+    const { version, content } = manifest || {}
 
-    const version = (manifest || {}).version || 'unknown'
+    if (!content) {
+      log.error(
+        `Attempted load dapp with id ${dappId} (${dapp.ens}) but manifest contained no content`,
+        manifest
+      )
+      return
+    }
 
-    log.info(`resolved content for ${dapp.ens}, version: ${version}`)
+    log.info(`Resolved content for ${dapp.ens}, version: ${version || 'unknown'}`)
 
     store.updateDapp(dappId, { record })
 
-    const dappVerified = async () => {
-      try {
-        const cachedDappPath = `${dappCacheDir}/${dappId}`
-        // Ensure the directory exists
-        await fs.access(cachedDappPath)
-        // Check that the directory matches the manifest
-        return manifest.content && (await verifyDapp(cachedDappPath, manifest.content))
-      } catch (e) {
-        return false
-      }
+    const isDappCurrent = async () => {
+      return (
+        dapp.content === content && (await dappPathExists(dappId)) && (await isDappVerified(dappId, content))
+      )
     }
 
     // Checks if all assets are up to date with current manifest
-    if (dapp.content !== manifest.content || !(await dappVerified())) {
-      log.info(`Updating content for dapp ${dappId} from hash ${manifest.content}`)
+    if (!(await isDappCurrent())) {
+      log.info(`Updating content for dapp ${dappId} from hash ${content}`)
       // Sets status to 'updating' when updating the bundle
       store.updateDapp(dappId, { status: 'updating' })
       // Installs new assets if changed and config is set to sync
       await updateDappContent(dappId, manifest)
     } else {
-      log.info(`Dapp ${dapp.ens} already up to date: ${manifest.content}`)
+      log.info(`Dapp ${dapp.ens} already up to date: ${content}`)
     }
 
     // Sets status to 'ready' when done
