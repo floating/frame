@@ -276,6 +276,8 @@ ipcMain.on('frame:unmax', (e) => {
 
 dapps.add({
   ens: 'send.frame.eth',
+  checkStatusRetryCount: 0,
+  openWhenReady: false,
   config: {
     key: 'value'
   }
