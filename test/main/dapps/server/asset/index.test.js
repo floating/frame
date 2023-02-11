@@ -37,7 +37,6 @@ it('returns a stream with the asset contents', async () => {
   asset.stream(res, '0xhash', '/some/asset.js')
 
   expect(res.writeHead).toHaveBeenCalledWith(200)
-  expect(res.setHeader).toHaveBeenCalledWith('content-type', 'application/javascript')
   expect(res.setHeader).toHaveBeenCalledWith('Access-Control-Allow-Origin', '*')
   expect(res.setHeader).toHaveBeenCalledWith(
     'Access-Control-Allow-Headers',
@@ -58,11 +57,27 @@ it('streams a dapp from its root path', () => {
   expect(fs.createReadStream).toHaveBeenCalledWith('/home/user/.config/DappCache/0xhash/index.html')
 })
 
+it('streams a dapp with the correct content type', () => {
+  const res = createMockResponse()
+
+  asset.stream(res, '0xhash', '/')
+
+  expect(res.setHeader).toHaveBeenCalledWith('content-type', 'text/html')
+})
+
 it('streams an asset from disk', () => {
   asset.stream(createMockResponse(), '0xhash', '/some/asset.js')
 
   expect(fs.existsSync).toHaveBeenCalledWith('/home/user/.config/DappCache/0xhash/some/asset.js')
   expect(fs.createReadStream).toHaveBeenCalledWith('/home/user/.config/DappCache/0xhash/some/asset.js')
+})
+
+it('streams an asset with the correct content type', () => {
+  const res = createMockResponse()
+
+  asset.stream(res, '0xhash', '/some/asset.js')
+
+  expect(res.setHeader).toHaveBeenCalledWith('content-type', 'application/javascript')
 })
 
 it('returns a 404 when a dapp is not found', () => {

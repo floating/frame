@@ -8,7 +8,7 @@ import type { ServerResponse } from 'http'
 
 function getAssetPath(asset: string, namehash: string) {
   const rootPath = asset === '/' ? '/index.html' : asset
-  return path.join(getDappCacheDir(), namehash, rootPath)
+  return { rootPath, assetPath: path.join(getDappCacheDir(), namehash, rootPath) }
 }
 
 function error(res: ServerResponse, message: string, code = 404) {
@@ -18,7 +18,7 @@ function error(res: ServerResponse, message: string, code = 404) {
 
 export default {
   stream: (res: ServerResponse, namehash: string, asset: string) => {
-    const assetPath = getAssetPath(asset, namehash)
+    const { rootPath, assetPath } = getAssetPath(asset, namehash)
 
     const handleError = (err: Error) => {
       console.error(`Could not stream asset: ${asset}`, err)
@@ -28,7 +28,7 @@ export default {
     if (fs.existsSync(assetPath)) {
       try {
         const stream = fs.createReadStream(assetPath)
-        res.setHeader('content-type', getType(asset))
+        res.setHeader('content-type', getType(rootPath))
         res.setHeader('Access-Control-Allow-Origin', '*')
         res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
         res.writeHead(200)
