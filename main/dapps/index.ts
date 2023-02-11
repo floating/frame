@@ -46,32 +46,33 @@ async function getDappColors(dappId: string) {
   }
 }
 
-const cacheDapp = async (dappId: string, hash: string) => {
-  return new Promise((resolve, reject) => {
+const createTarStream = (dappId: string) => {
+  return tar.extract(getDappCacheDir(), {
+    map: (header) => ({ ...header, name: path.join(dappId, ...header.name.split('/').slice(1)) })
+  })
+}
+
+const writeDapp = async (dappId: string, hash: string) => {
+  return new Promise<void>((resolve, reject) => {
     try {
       const dapp = new DappStream(hash)
+      const tarStream = createTarStream(dappId)
 
-      dapp.pipe(
-        tar
-          .extract(getDappCacheDir(), {
-            map: (header) => {
-              header.name = path.join(dappId, ...header.name.split('/').slice(1))
-              return header
-            }
-          })
-          .on('finish', async () => {
-            try {
-              await getDappColors(dappId)
-              resolve(dappId)
-            } catch (e) {
-              reject(e)
-            }
-          })
-      )
+      tarStream.on('error', reject)
+      tarStream.on('finish', resolve)
+
+      dapp.pipe(tarStream)
     } catch (e) {
       reject(e)
     }
   })
+}
+
+const cacheDapp = async (dappId: string, hash: string) => {
+  await writeDapp(dappId, hash)
+  await getDappColors(dappId)
+
+  return dappId
 }
 
 // TODO: change to correct manifest type one Nebula version with types are published

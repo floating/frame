@@ -33,9 +33,8 @@ export default {
         res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
         res.writeHead(200)
 
-        stream.pipe(res)
-
         stream.once('error', handleError)
+        stream.pipe(res)
       } catch (e) {
         handleError(e as Error)
       }
