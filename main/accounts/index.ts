@@ -766,7 +766,11 @@ export class Accounts extends EventEmitter {
 
     if (currentAccount && currentAccount.requests[handlerId]) {
       currentAccount.requests[handlerId].status = RequestStatus.Pending
-      currentAccount.requests[handlerId].notice = 'See Signer'
+
+      const signerType = currentAccount.lastSignerType
+      const hwSigner = signerType !== 'seed' && signerType !== 'ring'
+
+      currentAccount.requests[handlerId].notice = hwSigner ? 'See Signer' : ''
       currentAccount.update()
     }
   }
