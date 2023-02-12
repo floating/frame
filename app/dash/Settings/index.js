@@ -3,38 +3,7 @@ import Restore from 'react-restore'
 
 import link from '../../../resources/link'
 import Dropdown from '../../../resources/Components/Dropdown'
-
-const SummonKeySetting = ({ value, platform }) => {
-  const [summonKey, setSummonKey] = useState('/')
-
-  useEffect(() => {
-    ;(async () => {
-      const keyboardLayoutMap = await navigator.keyboard.getLayoutMap()
-      setSummonKey(keyboardLayoutMap.get('Slash'))
-    })()
-  }, [])
-
-  const modifierKey = platform === 'darwin' ? 'Option' : 'Alt'
-  const keyboardShortcut = `${modifierKey} + ${summonKey}`
-  return (
-    <div className='signerPermission localSetting' style={{ zIndex: 214 }}>
-      <div className='signerPermissionControls'>
-        <div className='signerPermissionSetting'>Summon Shortcut</div>
-        <div
-          className={value ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'}
-          onClick={() => link.send('tray:action', 'setAltSpace', !value)}
-        >
-          <div className='signerPermissionToggleSwitch' />
-        </div>
-      </div>
-      <div className='signerPermissionDetails'>
-        <span>
-          Summon Frame by pressing <span className='keyCommand'>{keyboardShortcut}</span>
-        </span>
-      </div>
-    </div>
-  )
-}
+import { getSummonShortcut } from '../../../resources/app'
 
 class Settings extends React.Component {
   constructor(props, context) {
@@ -61,10 +30,37 @@ class Settings extends React.Component {
   }
 
   render() {
+    const { modifierKey, summonKey } = getSummonShortcut(this.store('platform'))
     return (
       <div className={'localSettings cardShow'}>
         <div className='localSettingsWrap'>
-          <SummonKeySetting value={this.store('main.shortcuts.altSlash')} platform={this.store('platform')} />
+          <div className='signerPermission localSetting' style={{ zIndex: 214 }}>
+            <div className='signerPermissionControls'>
+              <div className='signerPermissionSetting'>Summon Shortcut</div>
+              <div
+                className={
+                  this.store('main.shortcuts.altSlash')
+                    ? 'signerPermissionToggle signerPermissionToggleOn'
+                    : 'signerPermissionToggle'
+                }
+                onClick={(_) =>
+                  link.send('tray:action', 'setAltSpace', !this.store('main.shortcuts.altSlash'))
+                }
+              >
+                <div className='signerPermissionToggleSwitch' />
+              </div>
+            </div>
+            <div className='signerPermissionDetails'>
+              <span>
+                Summon Frame by pressing{' '}
+                <span className='keyCommand'>
+                  {modifierKey}
+                  <span style={{ padding: '0px 3px' }}>+</span>
+                  {summonKey}
+                </span>
+              </span>
+            </div>
+          </div>
           <div className='signerPermission localSetting' style={{ zIndex: 213 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Auto-hide</div>
