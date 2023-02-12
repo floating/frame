@@ -276,6 +276,7 @@ class Gas extends Component {
             onClick={() => {
               this.setState({ expanded: !this.state.expanded })
             }}
+            style={{ padding: '8px 0px' }}
           >
             <GasSummary
               chainId={chainId}
