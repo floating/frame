@@ -99,12 +99,19 @@ export function openExternal(url = '') {
   }
 }
 
-export function openBlockExplorer({ id, type }: Chain, hash?: string) {
+export function openBlockExplorer({ id, type }: Chain, hash?: string, account?: string) {
   // remove trailing slashes from the base url
   const explorer = (store('main.networks', type, id, 'explorer') || '').replace(/\/+$/, '')
 
   if (explorer) {
-    const hashPath = hash ? `/tx/${hash}` : ''
-    shell.openExternal(`${explorer}${hashPath}`)
+    if (hash) {
+      const hashPath = hash && `/tx/${hash}`
+      shell.openExternal(`${explorer}${hashPath}`)
+    } else if (account) {
+      const accountPath = account && `/address/${account}`
+      shell.openExternal(`${explorer}${accountPath}`)
+    } else {
+      shell.openExternal(`${explorer}`)
+    }
   }
 }

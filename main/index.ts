@@ -174,8 +174,8 @@ ipcMain.on('tray:openExternal', (e, url) => {
   store.setDash({ showing: false })
 })
 
-ipcMain.on('tray:openExplorer', (e, chain, hash) => {
-  openBlockExplorer(chain, hash)
+ipcMain.on('tray:openExplorer', (e, chain, hash, account) => {
+  openBlockExplorer(chain, hash, account)
 })
 
 ipcMain.on('tray:copyTxHash', (e, hash) => {

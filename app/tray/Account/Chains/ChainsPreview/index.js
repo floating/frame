@@ -48,6 +48,7 @@ class ChainsPreview extends React.Component {
   }
 
   render() {
+    const { address } = this.store('main.accounts', this.props.account)
     const permissions = this.store('main.permissions', this.props.account) || {}
     let permissionList = Object.keys(permissions)
       .filter((o) => {
@@ -77,17 +78,16 @@ class ChainsPreview extends React.Component {
         <Cluster>
           <Gas chainId={existingChainsIds[this.state.index] || 1} color={`var(--${primaryColor})`} />
           <ClusterRow>
-            <ClusterValue onClick={() => alert('open account in explorer')}>
-              <div style={{ padding: '8px' }}>
-                <div>{svg.user(16)}</div>
-              </div>
-            </ClusterValue>
             <ClusterValue onClick={() => this.setIndex(this.state.index + 1)}>
               <div style={{ padding: '8px' }}>
                 <div style={{ transform: 'rotate(-90deg)' }}>{svg.chevron(26)}</div>
               </div>
             </ClusterValue>
-
+            <ClusterValue onClick={() => link.send('tray:openExplorer', currentChain, null, address)}>
+              <div style={{ padding: '8px', color: `var(--${primaryColor})` }}>
+                <div>{svg.user(16)}</div>
+              </div>
+            </ClusterValue>
             <ClusterValue onClick={() => this.setIndex(this.state.index - 1)}>
               <div style={{ padding: '8px' }}>
                 <div style={{ transform: 'rotate(90deg)' }}>{svg.chevron(26)}</div>
