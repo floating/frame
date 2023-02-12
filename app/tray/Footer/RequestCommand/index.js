@@ -84,9 +84,12 @@ class RequestCommand extends React.Component {
 
     const displayNotice = (notice || '').toLowerCase()
     let displayStatus = (req.status || 'pending').toLowerCase()
-    if (displayStatus === 'pending' && displayNotice === 'see signer')
+
+    if (displayStatus === 'pending' && displayNotice === 'see signer') {
       displayStatus = 'waiting for device signature'
-    if (displayStatus === 'verifying') displayStatus = 'waiting for block'
+    } else if (displayStatus === 'verifying') {
+      displayStatus = 'waiting for block'
+    }
 
     return (
       <div>
