@@ -195,9 +195,14 @@ ipcMain.on('tray:switchChain', (e, type, id, req) => {
   accounts.resolveRequest(req)
 })
 
-ipcMain.handle('tray:getTokenDetails', (e, contractAddress, chainId) => {
-  const contract = new Erc20Contract(contractAddress, chainId)
-  return contract.getTokenData()
+ipcMain.handle('tray:getTokenDetails', async (e, contractAddress, chainId) => {
+  try {
+    const contract = new Erc20Contract(contractAddress, chainId)
+    return await contract.getTokenData()
+  } catch (e) {
+    log.warn('Could not load token data for contract', { contractAddress, chainId })
+    return {}
+  }
 })
 
 ipcMain.on('tray:addToken', (e, token, req) => {
@@ -271,6 +276,8 @@ ipcMain.on('frame:unmax', (e) => {
 
 dapps.add({
   ens: 'send.frame.eth',
+  checkStatusRetryCount: 0,
+  openWhenReady: false,
   config: {
     key: 'value'
   }

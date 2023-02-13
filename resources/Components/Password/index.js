@@ -1,14 +1,16 @@
-import React from 'react'
-import { useRef, useState } from 'react'
+import React, { useRef } from 'react'
+import { useState } from 'react'
 import zxcvbn from 'zxcvbn'
+import useFocusableRef from '../../Hooks/useFocusableRef'
 
 import { debounce } from '../../utils'
 
 const NO_PASSWORD_ENTERED = 'Enter password'
 
-const PasswordInput = ({ getError, next, title, buttonText }) => {
+export const PasswordInput = ({ getError: getInputError, next, title, buttonText, autofocus }) => {
   const [error, setError] = useState(NO_PASSWORD_ENTERED)
-  const inputRef = useRef(null)
+  const inputRef = useFocusableRef(autofocus)
+  const [disabled, setDisabled] = useState(false)
 
   const resetError = () => setError(NO_PASSWORD_ENTERED)
 
@@ -19,15 +21,23 @@ const PasswordInput = ({ getError, next, title, buttonText }) => {
 
   const handleSubmit = () => {
     next(inputRef.current.value)
-    setTimeout(clear, 600)
+    setTimeout(clear, 1_000)
   }
 
-  const validateInput = debounce((e) => {
-    const value = e.target.value
-    if (!value) return resetError()
-    const err = getError(value)
-    setError(err || '')
-  }, 300)
+  const getError = () =>
+    inputRef.current.value ? getInputError(inputRef.current.value) || '' : NO_PASSWORD_ENTERED
+
+  const validateInput = (e) => {
+    const err = getError()
+    if (err) {
+      setDisabled(true)
+      return debounce(() => {
+        setDisabled(false)
+        setError(getError())
+      }, 300)()
+    }
+    return setError(err)
+  }
 
   return (
     <div className='addAccountItemOptionSetupFrame'>
@@ -42,7 +52,7 @@ const PasswordInput = ({ getError, next, title, buttonText }) => {
           ref={inputRef}
           onChange={validateInput}
           onKeyDown={(e) => {
-            if (!error && e.key === 'Enter') handleSubmit()
+            if (!error && e.key === 'Enter' && !disabled) handleSubmit()
           }}
         />
       </div>
@@ -52,7 +62,7 @@ const PasswordInput = ({ getError, next, title, buttonText }) => {
           {error}
         </div>
       ) : (
-        <div role='button' className='addAccountItemOptionSubmit' onClick={() => handleSubmit()}>
+        <div role='button' className='addAccountItemOptionSubmit' onClick={() => !disabled && handleSubmit()}>
           {buttonText}
         </div>
       )}
@@ -60,7 +70,7 @@ const PasswordInput = ({ getError, next, title, buttonText }) => {
   )
 }
 
-export const CreatePassword = ({ onCreate }) => {
+export const CreatePassword = ({ onCreate, autofocus }) => {
   const getError = (password) => {
     if (password.length < 12) return 'PASSWORD MUST BE 12 OR MORE CHARACTERS'
     const {
@@ -72,13 +82,29 @@ export const CreatePassword = ({ onCreate }) => {
     return (warning || 'PLEASE ENTER A STRONGER PASSWORD').toUpperCase()
   }
 
-  return <PasswordInput getError={getError} next={onCreate} title='Create Password' buttonText='Continue' />
+  return (
+    <PasswordInput
+      getError={getError}
+      next={onCreate}
+      title='Create Password'
+      buttonText='Continue'
+      autofocus={autofocus}
+    />
+  )
 }
 
-export const ConfirmPassword = ({ password, onConfirm }) => {
+export const ConfirmPassword = ({ password, onConfirm, autofocus }) => {
   const getError = (confirmedPassword) => {
     if (password !== confirmedPassword) return 'PASSWORDS DO NOT MATCH'
   }
 
-  return <PasswordInput getError={getError} next={onConfirm} title='Confirm Password' buttonText='Create' />
+  return (
+    <PasswordInput
+      getError={getError}
+      next={onConfirm}
+      title='Confirm Password'
+      buttonText='Create'
+      autofocus={autofocus}
+    />
+  )
 }

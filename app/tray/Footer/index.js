@@ -179,7 +179,7 @@ class Footer extends React.Component {
                         notify: 'addToken',
                         notifyData: {
                           tokenData: { symbol, decimals, logoURI, name },
-                          chainId,
+                          chain: { id: chainId },
                           address
                         }
                       }

@@ -1,6 +1,7 @@
 import React from 'react'
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 
+import useFocusableRef from '../../../../../resources/Hooks/useFocusableRef'
 import RingIcon from '../../../../../resources/Components/RingIcon'
 import { ConfirmPassword, CreatePassword } from '../../../../../resources/Components/Password'
 import link from '../../../../../resources/link'
@@ -18,7 +19,7 @@ const navForward = async (newAccountType, accountData) =>
 
 const removeLineBreaks = (str) => str.replace(/(\r\n|\n|\r)/gm, '')
 
-const AddHotAccountWrapper = ({ children, title, svgName, summary, intro, index }) => {
+const AddHotAccountWrapper = ({ children, title, svgName, summary, index }) => {
   return (
     <div className={'addAccountItem addAccountItemSmart addAccountItemAdding'}>
       <div className='addAccountItemBar addAccountItemHot' />
@@ -46,9 +47,9 @@ const AddHotAccountWrapper = ({ children, title, svgName, summary, intro, index 
   )
 }
 
-const EnterSecret = ({ newAccountType, validateSecret, title }) => {
+const EnterSecret = ({ newAccountType, validateSecret, title, autofocus }) => {
   const EMPTY_STATE = `Enter ${title}`
-  const inputRef = useRef(null)
+  const inputRef = useFocusableRef(autofocus, 100)
   const [error, setError] = useState(EMPTY_STATE)
 
   const resetError = () => setError(EMPTY_STATE)
@@ -128,38 +129,45 @@ export function AddHotAccount({
   accountData,
   createSignerMethod,
   newAccountType,
-  validateSecret
+  validateSecret,
+  firstStep,
+  backSteps = 4
 }) {
-  const { secret, password, error } = accountData
+  const { secret, password, error, creationArgs = [] } = accountData
   const viewIndex = error ? 3 : !secret ? 0 : !password ? 1 : 2
 
   const onCreate = (password) => {
     navForward(newAccountType, {
       secret,
-      password
+      password,
+      creationArgs
     })
   }
 
-  const onConfirm = (password) =>
-    link.rpc(createSignerMethod, secret, password, (err, signer) => {
+  const onConfirm = () =>
+    link.rpc(createSignerMethod, secret, password, ...creationArgs, (err, signer) => {
       if (err) {
         return navForward(newAccountType, {
           error: err
         })
       }
 
-      link.send('nav:back', 'dash', 4)
+      link.send('nav:back', 'dash', backSteps)
       link.send(`nav:forward`, 'dash', {
         view: 'expandedSigner',
         data: { signer: signer.id }
       })
     })
 
+  const firstFlowStep = firstStep || (
+    <EnterSecret key={0} {...{ validateSecret, title, newAccountType, autofocus: viewIndex === 0 }} />
+  )
+
   const steps = [
-    <EnterSecret key={0} {...{ validateSecret, title, newAccountType }} />,
-    <CreatePassword key={1} onCreate={onCreate} />,
-    <ConfirmPassword key={2} password={password} onConfirm={onConfirm} />,
-    <Error key={3} {...{ error }} />
+    firstFlowStep,
+    <CreatePassword key={1} onCreate={onCreate} autofocus={viewIndex === 1} />,
+    <ConfirmPassword key={2} password={password} onConfirm={onConfirm} autofocus={viewIndex === 2} />,
+    <Error key={3} error={error} />
   ]
 
   return (

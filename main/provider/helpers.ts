@@ -18,7 +18,6 @@ import store from '../store'
 import protectedMethods from '../api/protectedMethods'
 import { usesBaseFee, TransactionData, GasFeesSource } from '../../resources/domain/transaction'
 import { getAddress } from '../../resources/utils'
-import FrameAccount from '../accounts/Account'
 
 const permission = (date: number, method: string) => ({ parentCapability: method, date })
 
@@ -43,6 +42,7 @@ export function checkExistingNonceGas(tx: TransactionData) {
         const bumpedBase = Math.max(Math.ceil((existingMax - existingFee) * 1.1), Math.ceil(maxInt - feeInt))
         tx.maxFeePerGas = '0x' + (bumpedBase + bumpedFee).toString(16)
         tx.maxPriorityFeePerGas = '0x' + bumpedFee.toString(16)
+        tx.gasFeesSource = GasFeesSource.Frame
         tx.feesUpdated = true
       }
     } else if (tx.gasPrice) {
@@ -52,6 +52,7 @@ export function checkExistingNonceGas(tx: TransactionData) {
         // Bump price by 10%
         const bumpedPrice = Math.ceil(existingPrice * 1.1)
         tx.gasPrice = '0x' + bumpedPrice.toString(16)
+        tx.gasFeesSource = GasFeesSource.Frame
         tx.feesUpdated = true
       }
     }

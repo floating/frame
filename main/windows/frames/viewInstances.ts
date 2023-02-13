@@ -63,6 +63,9 @@ export default {
 
     frameInstance.addBrowserView(viewInstance)
 
+    const dappBackground = store('main.dapps', view.dappId, 'colors', 'background')
+    if (dappBackground) frameInstance.setBackgroundColor(dappBackground)
+
     viewInstance.setBounds({
       x: 0,
       y: fullscreen ? 0 : 32,

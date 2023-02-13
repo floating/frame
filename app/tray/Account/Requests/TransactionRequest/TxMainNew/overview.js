@@ -22,7 +22,7 @@ const ApproveOverview = ({ amount, decimals, symbol }) => {
   return (
     <div>
       {isRevoke ? (
-        <span>{`Revoke Approval for ${symbol} `}</span>
+        <span>{`Revoke Approval for ${symbol}`}</span>
       ) : (
         <>
           <span>{'Approve Spending'}</span>

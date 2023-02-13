@@ -168,11 +168,11 @@ const initial = {
     colorway: main('colorway', 'dark'),
     colorwayPrimary: {
       dark: {
-        background: 'rgb(21, 17, 23)',
+        background: 'rgb(26, 22, 28)',
         text: 'rgb(241, 241, 255)'
       },
       light: {
-        background: 'rgb(224, 217, 233)',
+        background: 'rgb(240, 230, 243)',
         text: 'rgb(20, 40, 60)'
       }
     },
@@ -681,8 +681,8 @@ const initial = {
         }
       }
     }),
+    dapps: main('dapps', {}),
     ipfs: {},
-    dapps: {},
     frames: {},
     openDapps: [],
     dapp: {
