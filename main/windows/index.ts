@@ -505,6 +505,17 @@ const init = () => {
       dash.hide()
       windows.tray.focus()
     }
+
+    if (store('windows.onboard.showing')) {
+      if (!windows.onboard) {
+        onboard = new Onboard()
+      }
+
+      onboard.show()
+    } else if (onboard) {
+      onboard.hide()
+      windows.tray.focus()
+    }
   })
 
   store.observer(() => broadcast('permissions', JSON.stringify(store('permissions'))))

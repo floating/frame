@@ -680,6 +680,9 @@ module.exports = {
     }
     u('windows.dash', (dash) => Object.assign(dash, update))
   },
+  setOnboard: (u, update) => {
+    u('windows.onboard.showing', () => update.showing)
+  },
   navForward: (u, windowId, crumb) => {
     if (!windowId || !crumb) return log.warn('Invalid nav forward', windowId, crumb)
     u('windows', windowId, 'nav', (nav) => {
@@ -768,6 +771,7 @@ module.exports = {
   },
   completeOnboarding: (u) => {
     u('main.mute.onboardingWindow', () => true)
+    u('windows.onboard.showing', () => false)
   },
   // Dapp Frame
   appDapp: (u, dapp) => {

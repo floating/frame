@@ -370,6 +370,16 @@ class Settings extends React.Component {
             <div
               className='requestFeatureButton'
               onClick={() => {
+                link.send('tray:action', 'setOnboard', { showing: true })
+              }}
+            >
+              Open Frame Tutorial
+            </div>
+          </div>
+          <div className='requestFeature'>
+            <div
+              className='requestFeatureButton'
+              onClick={() => {
                 link.send('tray:quit')
               }}
             >
