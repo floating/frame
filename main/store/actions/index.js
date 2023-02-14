@@ -645,8 +645,19 @@ module.exports = {
     })
   },
   removeCustomTokens: (u, tokens) => {
+    const tokenIds = new Set(tokens.map(toTokenId))
+    const needsRemoval = (token) => tokenIds.has(toTokenId(token))
+
     u('main.tokens.custom', (existing) => {
-      return existing.filter((token) => !includesToken(tokens, token))
+      return existing.filter((token) => !needsRemoval(token))
+    })
+
+    u('main.tokens.known', (knownTokens) => {
+      for (const address in knownTokens) {
+        knownTokens[address] = knownTokens[address].filter((token) => !needsRemoval(token))
+      }
+
+      return knownTokens
     })
   },
   addKnownTokens: (u, address, tokens) => {
