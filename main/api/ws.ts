@@ -1,6 +1,7 @@
 import WebSocket from 'ws'
 import { v4 as uuid } from 'uuid'
 import log from 'electron-log'
+import { isHexString } from '@ethereumjs/util'
 
 import store from '../store'
 import provider from '../provider'
@@ -18,7 +19,6 @@ import {
 import validPayload from './validPayload'
 import protectedMethods from './protectedMethods'
 import { IncomingMessage, Server } from 'http'
-import { isHexString } from '@ethereumjs/util'
 
 const logTraffic = process.env.LOG_TRAFFIC
 

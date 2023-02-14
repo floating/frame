@@ -1,5 +1,6 @@
 import http, { IncomingMessage, ServerResponse } from 'http'
 import log from 'electron-log'
+import { isHexString } from '@ethereumjs/util'
 
 import provider from '../provider'
 import accounts from '../accounts'
@@ -8,7 +9,6 @@ import store from '../store'
 import { updateOrigin, isTrusted, parseOrigin } from './origins'
 import validPayload from './validPayload'
 import protectedMethods from './protectedMethods'
-import { isHexString } from '@ethereumjs/util'
 
 const logTraffic = process.env.LOG_TRAFFIC
 
