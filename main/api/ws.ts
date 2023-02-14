@@ -1,3 +1,4 @@
+import { IncomingMessage, Server } from 'http'
 import WebSocket from 'ws'
 import { v4 as uuid } from 'uuid'
 import log from 'electron-log'
@@ -18,7 +19,7 @@ import {
 } from './origins'
 import validPayload from './validPayload'
 import protectedMethods from './protectedMethods'
-import { IncomingMessage, Server } from 'http'
+
 
 const logTraffic = process.env.LOG_TRAFFIC
 
