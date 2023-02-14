@@ -20,7 +20,6 @@ import {
 import validPayload from './validPayload'
 import protectedMethods from './protectedMethods'
 
-
 const logTraffic = process.env.LOG_TRAFFIC
 
 const subs: Record<string, Subscription> = {}
