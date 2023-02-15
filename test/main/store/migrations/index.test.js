@@ -1358,6 +1358,12 @@ describe('migration 32', () => {
     expect(known.find(({ address }) => address === '0xdeaddeaddeaddeaddeaddeaddeaddeaddead0000')).toBeFalsy()
   })
 
+  it('should set known tokens as an empty object if currently undefined', () => {
+    delete state.main.tokens.known
+    const newState = migrations.apply(state, 32)
+    expect(newState.main.tokens.known).toEqual({})
+  })
+
   it('should not remove any other known tokens', () => {
     const oldKnown = getKnownTokens(state)
     const updatedState = migrations.apply(state, 32)

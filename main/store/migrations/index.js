@@ -758,10 +758,12 @@ const migrations = {
   },
   32: (initial) => {
     const dodgyAddress = '0xdeaddeaddeaddeaddeaddeaddeaddeaddead0000'
-
-    Object.entries(initial.main.tokens.known).forEach(([address, knownTokens]) => {
-      initial.main.tokens.known[address] = knownTokens.filter(({ address }) => address !== dodgyAddress)
+    const knownTokens = initial.main.tokens.known || {}
+    Object.entries(knownTokens).forEach(([address, tokens]) => {
+      knownTokens[address] = tokens.filter(({ address }) => address !== dodgyAddress)
     })
+
+    initial.main.tokens.known = knownTokens
 
     const nameNotSet = (chainId) => {
       const meta = initial.main.networksMeta.ethereum[chainId]
