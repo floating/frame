@@ -97,7 +97,7 @@ const detectMouse = () => {
       m2.y = m2.y - area.y
       if (m2.x >= minX && m2.y === m1.y) {
         glide = true
-        tray.show()
+        app.show()
       } else {
         detectMouse()
       }
@@ -131,7 +131,6 @@ function initTrayWindow() {
   windows.tray.webContents.session.setPermissionRequestHandler((webContents, permission, res) => res(false))
   windows.tray.setResizable(false)
   windows.tray.setMovable(false)
-  windows.tray.setSize(0, 0)
 
   const { width, height, x, y } = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
   windows.tray.setPosition(width + x, height + y)
@@ -150,7 +149,10 @@ function initTrayWindow() {
   })
 
   setTimeout(() => {
-    windows.tray.on('focus', () => tray.show())
+    windows.tray.on('focus', () => {
+      glide = false
+      tray.show()
+    })
   }, 2000)
 
   if (devToolsEnabled) {
@@ -270,7 +272,8 @@ export class Tray {
       this.recentDisplayEvent = false
     }, 150)
 
-    // windows.tray.setPosition(0, 0)
+    if (isMacOS) windows.tray.setPosition(0, 0)
+
     windows.tray.setAlwaysOnTop(true)
     windows.tray.setVisibleOnAllWorkspaces(true, {
       visibleOnFullScreen: true,
@@ -284,12 +287,13 @@ export class Tray {
     windows.tray.setMaximumSize(trayWidth, height)
     const pos = topRight(windows.tray)
     windows.tray.setPosition(pos.x, pos.y)
-    if (!glide) {
-      windows.tray.focus()
-    }
     store.trayOpen(true)
     windows.tray.emit('show')
-    windows.tray.show()
+    if (glide && isMacOS) {
+      windows.tray.showInactive()
+    } else {
+      windows.tray.show()
+    }
     events.emit('tray:show')
     if (windows && windows.tray && windows.tray.focus && !glide) {
       windows.tray.focus()
@@ -369,6 +373,7 @@ class Dash {
       const { x, y } = topRight(windows.dash)
       windows.dash.setPosition(x - trayWidth - 5, y)
       windows.dash.show()
+      if (!windows.tray.isVisible()) windows.tray.show()
       windows.dash.focus()
       windows.dash.setVisibleOnAllWorkspaces(false, {
         visibleOnFullScreen: true,
@@ -444,9 +449,9 @@ class Onboard {
 
 ipcMain.on('tray:quit', () => electronApp.quit())
 ipcMain.on('tray:mouseout', () => {
-  if (glide && !store('windows.dash.showing')) {
+  if (glide && !(windows.dash && windows.dash.isVisible())) {
     glide = false
-    tray.hide()
+    app.hide()
   }
 })
 
