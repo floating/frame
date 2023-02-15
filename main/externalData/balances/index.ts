@@ -232,11 +232,10 @@ export default function (store: Store) {
       )
 
       // do not add newly found tokens with a zero balance
-      const isNewBalance =
-        (!currentBalance && parseInt(newBalance.balance) !== 0) || isCustomToken(newBalance)
+      const isNewBalance = !currentBalance && parseInt(newBalance.balance) !== 0
       const isChangedBalance = !!currentBalance && currentBalance.balance !== newBalance.balance
 
-      return isNewBalance || isChangedBalance
+      return isNewBalance || isChangedBalance || isCustomToken(newBalance)
     })
 
     if (changedBalances.length > 0) {
