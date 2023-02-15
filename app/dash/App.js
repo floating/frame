@@ -51,8 +51,10 @@ class Dash extends React.Component {
   renderPanel(view, data) {
     if (view === 'accounts') return <Accounts data={data} />
     if (view === 'expandedSigner' && data.signer) {
-      const signer = this.store('main.signers', data.signer)
-      return <Signer expanded={true} {...signer} />
+      const signerId = data.signer
+      const signer = this.store('main.signers', signerId)
+
+      return <Signer key={signerId} expanded={true} {...signer} />
     }
     if (view === 'chains') return <Chains data={data} />
     if (view === 'dapps') return <Dapps data={data} />
