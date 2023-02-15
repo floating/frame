@@ -63,13 +63,7 @@ const Description = ({ mode, custom, isRevoke }) => (
   <ClusterRow>
     <ClusterValue>
       <div className='clusterTag' style={{ color: 'var(--moon)' }}>
-        {mode === 'custom' && !custom ? (
-          <span>{'set approval to spend'}</span>
-        ) : isRevoke ? (
-          <span>{'revoke approval to spend'}</span>
-        ) : (
-          <span>{'grant approval to spend'}</span>
-        )}
+        {isRevoke ? <span>{'revoke approval to spend'}</span> : <span>{'grant approval to spend'}</span>}
       </div>
     </ClusterValue>
   </ClusterRow>
