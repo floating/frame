@@ -6,14 +6,19 @@ import svg from '../../svg'
 import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../Cluster'
 import Countdown from '../Countdown'
 
-import { MAX_HEX } from '../../constants'
 import useCopiedMessage from '../../Hooks/useCopiedMessage'
+import { DisplayValue } from '../DisplayValue'
 
 const isMax = (value) => max.isEqualTo(value)
 
 const getMode = (requestedAmount, amount) => {
   if (requestedAmount.eq(amount)) return 'requested'
   return isMax(amount) ? 'unlimited' : 'custom'
+}
+
+const isValidInput = (value, decimals) => {
+  const strValue = value.toString()
+  return !isNaN(value) && value > 0 && (!strValue.includes('.') || strValue.split('.')[1].length <= decimals)
 }
 
 const Details = ({ address, name }) => {
@@ -70,7 +75,7 @@ const Description = ({ mode, custom, isRevoke }) => (
   </ClusterRow>
 )
 
-const CustomAmountInput = ({
+const EditTokenSpend = ({
   data,
   updateRequest: updateHandlerRequest,
   requestedAmount,
@@ -79,8 +84,8 @@ const CustomAmountInput = ({
 }) => {
   const { decimals = 0, symbol = '???', name = 'Unknown Token', spender, contract, amount } = data
 
-  const toDecimal = (baseAmount) => new BigNumber(baseAmount).shiftedBy(-1 * decimals).toString()
-  const fromDecimal = (decimalAmount) => new BigNumber(decimalAmount).shiftedBy(decimals).toString()
+  const toDecimal = (baseAmount) => new BigNumber(baseAmount).shiftedBy(-1 * decimals).toString(10)
+  const fromDecimal = (decimalAmount) => new BigNumber(decimalAmount).shiftedBy(decimals).toString(10)
 
   const [mode, setMode] = useState(getMode(requestedAmount, amount))
   const [custom, setCustom] = useState('')
@@ -91,13 +96,13 @@ const CustomAmountInput = ({
 
   const value = new BigNumber(amount)
 
-  const updateCustomAmount = (value) => {
+  const updateCustomAmount = (value, decimals) => {
     if (!value) {
       setCustom('0')
       return setMode('custom')
     }
 
-    if (isNaN(value) || value < 0) return
+    if (!isValidInput(value, decimals)) return
     setMode('custom')
     setCustom(value)
   }
@@ -105,13 +110,12 @@ const CustomAmountInput = ({
   const resetToRequestAmount = () => {
     setCustom(toDecimal(requestedAmount))
     setMode('requested')
-    updateHandlerRequest(requestedAmount)
+    updateHandlerRequest(requestedAmount.toString(10))
   }
 
   const setToMax = () => {
-    console.log('setting to max')
     setMode('unlimited')
-    updateHandlerRequest(max.toString())
+    updateHandlerRequest(max.toString(10))
   }
 
   const isRevoke = canRevoke && value.eq(0)
@@ -119,7 +123,7 @@ const CustomAmountInput = ({
 
   const displayAmount = isMax(amount) ? 'unlimited' : toDecimal(amount)
 
-  const inputLock = !symbol || !name || !decimals
+  const inputLock = !data.symbol || !data.name || !data.decimals
 
   return (
     <div className='updateTokenApproval'>
@@ -195,7 +199,7 @@ const CustomAmountInput = ({
                     onChange={(e) => {
                       e.preventDefault()
                       e.stopPropagation()
-                      updateCustomAmount(e.target.value)
+                      updateCustomAmount(e.target.value, decimals)
                     }}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
@@ -276,4 +280,4 @@ const CustomAmountInput = ({
   )
 }
 
-export default CustomAmountInput
+export default EditTokenSpend
