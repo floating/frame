@@ -92,6 +92,7 @@ let retryTimer: NodeJS.Timeout
 async function checkStatus(dappId: string) {
   clearTimeout(retryTimer)
   const dapp = store('main.dapps', dappId) as Dapp
+  const { checkStatusRetryCount, openWhenReady } = dapp
 
   try {
     const { record, manifest } = await nebula.resolve(dapp.ens)
@@ -125,15 +126,14 @@ async function checkStatus(dappId: string) {
     } else {
       log.info(`Dapp ${dapp.ens} already up to date: ${content}`)
     }
-
     // Sets status to 'ready' when done
-    store.updateDapp(dappId, { status: 'ready' })
+    store.updateDapp(dappId, { status: 'ready', openWhenReady: false })
 
     // The frame id 'dappLauncher' needs to refrence target frame
-    if (dapp.openWhenReady) surface.open('dappLauncher', dapp.ens)
+    if (openWhenReady) surface.open('dappLauncher', dapp.ens)
   } catch (e) {
     log.error('Check status error', e)
-    const retry = dapp.checkStatusRetryCount || 0
+    const retry = checkStatusRetryCount || 0
     if (retry < 4) {
       retryTimer = setTimeout(() => {
         store.updateDapp(dappId, { status: 'initial', checkStatusRetryCount: retry + 1 })
@@ -211,7 +211,12 @@ const surface = {
       }
 
       server.sessions.add(ens, session)
-      store.addFrameView(frameId, view)
+
+      if (store('main.frames', frameId)) {
+        store.addFrameView(frameId, view)
+      } else {
+        log.warn(`Attempted to open frame "${frameId}" for ${ens} but frame does not exist`)
+      }
     } else {
       store.updateDapp(dappId, { ens, status: 'initial', openWhenReady: true })
     }
