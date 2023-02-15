@@ -44,7 +44,7 @@ class RequestCommand extends React.Component {
 
   sentStatus() {
     const { req } = this.props
-    const { notice, status, mode } = req
+    const { notice, status } = req
 
     const toAddress = (req.data && req.data.to) || ''
     let requestClass = 'signerRequest'
@@ -82,8 +82,14 @@ class RequestCommand extends React.Component {
       }
     }
 
+    const displayNotice = (notice || '').toLowerCase()
     let displayStatus = (req.status || 'pending').toLowerCase()
-    if (displayStatus === 'verifying') displayStatus = 'waiting for block'
+
+    if (displayStatus === 'pending' && displayNotice === 'see signer') {
+      displayStatus = 'waiting for device signature'
+    } else if (displayStatus === 'verifying') {
+      displayStatus = 'waiting for block'
+    }
 
     return (
       <div>
