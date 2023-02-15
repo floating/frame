@@ -223,13 +223,17 @@ export default function (store: Store) {
   function handleTokenBalanceUpdate(balances: TokenBalance[], address: Address) {
     // only update balances if any have changed
     const currentTokenBalances = storeApi.getTokenBalances(address)
+    const customTokens = new Set(storeApi.getCustomTokens().map(toTokenId))
+    const isCustomToken = (balance: Balance) => customTokens.has(toTokenId(balance))
+
     const changedBalances = balances.filter((newBalance) => {
       const currentBalance = currentTokenBalances.find(
         (b) => b.address === newBalance.address && b.chainId === newBalance.chainId
       )
 
       // do not add newly found tokens with a zero balance
-      const isNewBalance = !currentBalance && parseInt(newBalance.balance) !== 0
+      const isNewBalance =
+        (!currentBalance && parseInt(newBalance.balance) !== 0) || isCustomToken(newBalance)
       const isChangedBalance = !!currentBalance && currentBalance.balance !== newBalance.balance
 
       return isNewBalance || isChangedBalance
