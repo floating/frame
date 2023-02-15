@@ -414,12 +414,18 @@ class Onboard {
       return
     }
 
+    const closeHandler = () => {
+      store.completeOnboarding()
+      windows.tray.focus()
+      delete windows.onboard
+    }
+
     setTimeout(() => {
-      windows.onboard.once('close', () => {
-        store.completeOnboarding()
-        windows.tray.focus()
-        delete windows.onboard
+      electronApp.on('before-quit', () => {
+        windows.onboard.off('close', closeHandler)
       })
+
+      windows.onboard.once('close', closeHandler)
 
       const area = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
       const height = (isDev && !fullheight ? devHeight : area.height) - 160
@@ -510,7 +516,9 @@ const init = () => {
       dash.hide()
       windows.tray.focus()
     }
+  }, 'windows:dash')
 
+  store.observer(() => {
     if (store('windows.onboard.showing')) {
       if (!windows.onboard) {
         onboard = new Onboard()
@@ -521,7 +529,7 @@ const init = () => {
       onboard.hide()
       windows.tray.focus()
     }
-  })
+  }, 'windows:onboard')
 
   store.observer(() => broadcast('permissions', JSON.stringify(store('permissions'))))
   store.observer(() => {
