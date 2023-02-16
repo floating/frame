@@ -13,7 +13,7 @@ import {
 } from '../../../../../resources/domain/balance'
 import { matchFilter } from '../../../../../resources/utils'
 
-import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../resources/Components/Cluster'
+import { Cluster, ClusterRow, ClusterValue } from '../../../../../resources/Components/Cluster'
 
 import Balance from '../Balance'
 
