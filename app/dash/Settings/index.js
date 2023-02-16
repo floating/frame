@@ -1,103 +1,20 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import Restore from 'react-restore'
-import link from '../../../resources/link'
 
+import link from '../../../resources/link'
 import Dropdown from '../../../resources/Components/Dropdown'
-import { okPort, okProtocol } from '../../../resources/connections'
+import { getSummonShortcut } from '../../../resources/app'
 
 class Settings extends React.Component {
   constructor(props, context) {
     super(props, context)
-    // this.customMessage = 'Custom Endpoint'
-    // this.network = context.store('main.currentNetwork.id')
-    // this.networkType = context.store('main.currentNetwork.type')
-    // const primaryCustom = context.store('main.networks', this.networkType, this.network, 'connection.primary.custom') || this.customMessage
-    // const secondaryCustom = context.store('main.networks', this.networkType, this.network, 'connection.secondary.custom') || this.customMessage
     const latticeEndpoint = context.store('main.latticeSettings.endpointCustom')
     const latticeEndpointMode = context.store('main.latticeSettings.endpointMode')
     this.state = {
-      localShake: {},
       latticeEndpoint,
       latticeEndpointMode,
-      resetConfirm: false,
-      expandNetwork: false
+      resetConfirm: false
     }
-    // context.store.observer(() => {
-    //   const { type, id } = context.store('main.currentNetwork')
-    //   if (this.network !== id || this.networkType !== type) {
-    //     this.networkType = type
-    //     this.network = id
-    //     const primaryCustom = context.store('main.networks', type, id, 'connection.primary.custom') || this.customMessage
-    //     const secondaryCustom = context.store('main.networks', type, id, 'connection.secondary.custom') || this.customMessage
-    //     this.setState({ primaryCustom, secondaryCustom })
-    //   }
-    // })
-  }
-
-  // appInfo () {
-  //   return (
-  //     <div className='appInfo'>
-  //       <div className='appInfoLine appInfoLineVersion'>{'v' + require('../../../package.json').version}</div>
-  //       <div className='appInfoLine appInfoLineReset'>
-  //         {this.state.resetConfirm ? (
-  //           <span className='appInfoLineResetConfirm'>
-  //             Are you sure you want to reset everything? <span className='pointer' onClick={() => link.send('tray:resetAllSettings')}>Yes</span> <span>/</span> <span className='pointer' onClick={() => this.setState({ resetConfirm: false })}>No</span>
-  //           </span>
-  //         ) : (
-  //           <span className='pointer' onClick={() => this.setState({ resetConfirm: true })}>Reset All Settings & Data</span>
-  //         )}
-  //       </div>
-  //     </div>
-  //   )
-  // }
-
-  //
-  // latticeFocus () {
-  //   if (this.state.latticeEndpoint === this.customMessage) this.setState({ secondaryCustom: '' })
-  // }
-  //
-  // latticeBlur () {
-  //   if (this.state.secondaryCustom === '') this.setState({ secondaryCustom: this.customMessage })
-  // }
-
-  // customSecondaryFocus () {
-  //   if (this.state.secondaryCustom === this.customMessage) this.setState({ secondaryCustom: '' })
-  // }
-
-  // customSecondaryBlur () {
-  //   if (this.state.secondaryCustom === '') this.setState({ secondaryCustom: this.customMessage })
-  // }
-
-  customPrimaryFocus() {
-    if (this.state.primaryCustom === this.customMessage) this.setState({ primaryCustom: '' })
-  }
-
-  customPrimaryBlur() {
-    if (this.state.primaryCustom === '') this.setState({ primaryCustom: this.customMessage })
-  }
-
-  inputPrimaryCustom(e) {
-    e.preventDefault()
-    clearTimeout(this.customPrimaryInputTimeout)
-    const value = e.target.value.replace(/\s+/g, '')
-    this.setState({ primaryCustom: value })
-    const { type, id } = this.store('main.currentNetwork')
-    this.customPrimaryInputTimeout = setTimeout(
-      () => link.send('tray:action', 'setPrimaryCustom', type, id, this.state.primaryCustom),
-      1000
-    )
-  }
-
-  inputSecondaryCustom(e) {
-    e.preventDefault()
-    clearTimeout(this.customSecondaryInputTimeout)
-    const value = e.target.value.replace(/\s+/g, '')
-    this.setState({ secondaryCustom: value })
-    const { type, id } = this.store('main.currentNetwork')
-    this.customSecondaryInputTimeout = setTimeout(
-      () => link.send('tray:action', 'setSecondaryCustom', type, id, this.state.secondaryCustom),
-      1000
-    )
   }
 
   inputLatticeEndpoint(e) {
@@ -112,115 +29,11 @@ class Settings extends React.Component {
     )
   }
 
-  localShake(key) {
-    const localShake = Object.assign({}, this.state.localShake)
-    localShake[key] = true
-    this.setState({ localShake })
-    setTimeout(() => {
-      const localShake = Object.assign({}, this.state.localShake)
-      localShake[key] = false
-      this.setState({ localShake })
-    }, 1010)
-  }
-
-  status(layer) {
-    const { type, id } = this.store('main.currentNetwork')
-    const connection = this.store('main.networks', type, id, 'connection', layer)
-    let status = connection.status
-    const current = connection.current
-
-    if (current === 'custom') {
-      if (
-        layer === 'primary' &&
-        this.state.primaryCustom !== '' &&
-        this.state.primaryCustom !== this.customMessage
-      ) {
-        if (!okProtocol(this.state.primaryCustom)) status = 'invalid target'
-        else if (!okPort(this.state.primaryCustom)) status = 'invalid port'
-      }
-
-      if (
-        layer === 'secondary' &&
-        this.state.secondaryCustom !== '' &&
-        this.state.secondaryCustom !== this.customMessage
-      ) {
-        if (!okProtocol(this.state.secondaryCustom)) status = 'invalid target'
-        else if (!okPort(this.state.secondaryCustom)) status = 'invalid port'
-      }
-    }
-    if (status === 'connected' && !connection.network) status = 'loading'
-    return (
-      <div className='connectionOptionStatus'>
-        {this.indicator(status)}
-        <div className='connectionOptionStatusText'>{status}</div>
-      </div>
-    )
-  }
-
-  discord() {
-    return (
-      <div
-        className='discordInvite'
-        onClick={() => link.send('tray:openExternal', 'https://discord.gg/UH7NGqY')}
-      >
-        <div>Need help?</div>
-        <div className='discordLink'>Join our Discord!</div>
-      </div>
-    )
-  }
-
-  quit() {
-    return (
-      <div className='addCustomTokenButtonWrap quitFrame' style={{ zIndex: 215 }}>
-        <div className='addCustomTokenButton' onClick={() => link.send('tray:quit')}>
-          Quit
-        </div>
-      </div>
-    )
-  }
-
-  indicator(status) {
-    if (status === 'connected') {
-      return (
-        <div className='connectionOptionStatusIndicator'>
-          <div className='connectionOptionStatusIndicatorGood' />
-        </div>
-      )
-    } else if (status === 'loading' || status === 'syncing' || status === 'pending' || status === 'standby') {
-      return (
-        <div className='connectionOptionStatusIndicator'>
-          <div className='connectionOptionStatusIndicatorPending' />
-        </div>
-      )
-    } else {
-      return (
-        <div className='connectionOptionStatusIndicator'>
-          <div className='connectionOptionStatusIndicatorBad' />
-        </div>
-      )
-    }
-  }
-
-  selectNetwork(network) {
-    const [type, id] = network.split(':')
-    if (network.type !== type || network.id !== id) link.send('tray:action', 'selectNetwork', type, id)
-  }
-
-  expandNetwork(e, expand) {
-    e.stopPropagation()
-    this.setState({ expandNetwork: expand !== undefined ? expand : !this.state.expandNetwork })
-  }
-
   render() {
+    const { modifierKey, summonKey } = getSummonShortcut(this.store('platform'))
     return (
       <div className={'localSettings cardShow'}>
         <div className='localSettingsWrap'>
-          {/* <Filter />    */}
-          {/* <div className='requestFeature'>
-            <div className='requestFeatureButton' onClick={() => link.send('tray:openExternal', 'https://feedback.frame.sh') }>
-              Request a Feature 
-            </div>
-          </div> */}
           <div className='signerPermission localSetting' style={{ zIndex: 214 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Summon Shortcut</div>
@@ -241,8 +54,9 @@ class Settings extends React.Component {
               <span>
                 Summon Frame by pressing{' '}
                 <span className='keyCommand'>
-                  {this.store('platform') === 'darwin' ? 'Option' : 'Alt'}
-                  <span style={{ padding: '0px 3px' }}>+</span>/
+                  {modifierKey}
+                  <span style={{ padding: '0px 3px' }}>+</span>
+                  {summonKey}
                 </span>
               </span>
             </div>
@@ -256,7 +70,7 @@ class Settings extends React.Component {
                     ? 'signerPermissionToggle signerPermissionToggleOn'
                     : 'signerPermissionToggle'
                 }
-                onClick={(_) => link.send('tray:action', 'setAutohide', !this.store('main.autohide'))}
+                onClick={() => link.send('tray:action', 'setAutohide', !this.store('main.autohide'))}
               >
                 <div className='signerPermissionToggleSwitch' />
               </div>
@@ -274,7 +88,7 @@ class Settings extends React.Component {
                     ? 'signerPermissionToggle signerPermissionToggleOn'
                     : 'signerPermissionToggle'
                 }
-                onClick={(_) => link.send('tray:action', 'toggleLaunch')}
+                onClick={() => link.send('tray:action', 'toggleLaunch')}
               >
                 <div className='signerPermissionToggleSwitch' />
               </div>
@@ -290,24 +104,14 @@ class Settings extends React.Component {
                     ? 'signerPermissionToggle signerPermissionToggleOn'
                     : 'signerPermissionToggle'
                 }
-                onClick={(_) => link.send('tray:action', 'toggleReveal')}
+                onClick={() => link.send('tray:action', 'toggleReveal')}
               >
                 <div className='signerPermissionToggleSwitch' />
               </div>
             </div>
             <div className='signerPermissionDetails'>{"Mouse to display's right edge to summon Frame"}</div>
           </div>
-          {/* <div className='signerPermission localSetting' style={{ zIndex: 6 }}>
-            <div className='signerPermissionControls'>
-              <div className='signerPermissionSetting'>Show USD Value</div>
-              <div className={this.store('main.showUSDValue') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onClick={_ => link.send('tray:action', 'toggleUSDValue')}>
-                <div className='signerPermissionToggleSwitch' />
-              </div>
-            </div>
-            <div className='signerPermissionDetails'>
-              Show USD value of Ether and token balances
-            </div>
-          </div> */}
+
           {this.store('platform') === 'darwin' ? (
             <div className='signerPermission localSetting' style={{ zIndex: 210 }}>
               <div className='signerPermissionControls'>
@@ -318,7 +122,7 @@ class Settings extends React.Component {
                       ? 'signerPermissionToggle signerPermissionToggleOn'
                       : 'signerPermissionToggle'
                   }
-                  onClick={(_) =>
+                  onClick={() =>
                     link.send('tray:action', 'setMenubarGasPrice', !this.store('main.menubarGasPrice'))
                   }
                 >
@@ -338,7 +142,7 @@ class Settings extends React.Component {
                     ? 'signerPermissionToggle signerPermissionToggleOn'
                     : 'signerPermissionToggle'
                 }
-                onClick={(_) =>
+                onClick={() =>
                   link.send('tray:action', 'setErrorReporting', !this.store('main.privacy.errorReporting'))
                 }
               >
@@ -359,7 +163,7 @@ class Settings extends React.Component {
                     ? 'signerPermissionToggle signerPermissionToggleOn'
                     : 'signerPermissionToggle'
                 }
-                onClick={(_) => {
+                onClick={() => {
                   link.send('tray:action', 'toggleNonceAdjust')
                   if (!this.store('main.nonceAdjust')) {
                     link.send('tray:action', 'navDash', {
