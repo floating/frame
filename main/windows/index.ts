@@ -414,17 +414,18 @@ class Onboard {
       return
     }
 
+    const cleanupHandler = () => windows.onboard?.off('close', closeHandler)
+
     const closeHandler = () => {
       store.completeOnboarding()
       windows.tray.focus()
+
+      electronApp.off('before-quit', cleanupHandler)
       delete windows.onboard
     }
 
     setTimeout(() => {
-      electronApp.on('before-quit', () => {
-        windows.onboard.off('close', closeHandler)
-      })
-
+      electronApp.on('before-quit', cleanupHandler)
       windows.onboard.once('close', closeHandler)
 
       const area = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
