@@ -234,7 +234,7 @@ const migrations = {
     // Add on/off value to chains
     Object.keys(initial.main.networks.ethereum).forEach((chainId) => {
       initial.main.networks.ethereum[chainId].on =
-        chainId === '1' || chainId === initial.main.currentNetwork.id ? true : false
+        chainId === '1' || chainId === initial.main.currentNetwork?.id ? true : false
     })
 
     return initial
