@@ -91,7 +91,7 @@ class Requests extends React.Component {
     // const proxyFavicon = `https://proxy.pylon.link?type=icon&target=${encodeURIComponent(favicon)}`
 
     return (
-      <ClusterBox>
+      <ClusterBox key={origin}>
         <div className='requestGroup'>
           {/* <img src={proxyFavicon} width='24px' height='24px' />
           <RingIcon img={favicon} alt={'?'} small noRing /> */}
