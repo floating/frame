@@ -102,7 +102,18 @@ class AccountSelector extends React.Component {
               />
             ))
           ) : Object.keys(accounts).length === 0 ? (
-            <div className='noSigners'>{'No Accounts Added'}</div>
+            <div>
+              <div className='noSigners'>{'No Accounts Added'}</div>
+              <div
+                role='button'
+                onClick={() =>
+                  link.send('tray:action', 'navDash', { view: 'accounts', data: { showAddAccounts: true } })
+                }
+              >
+                <div className='newAccountIcon'>{svg.plus(16)}</div>
+                Add New Account
+              </div>
+            </div>
           ) : (
             <div className='noSigners'>{'No Matching Accounts'}</div>
           )}
