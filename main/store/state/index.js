@@ -734,6 +734,10 @@ initial.main.knownExtensions = Object.fromEntries(
   Object.entries(initial.main.knownExtensions).filter(([id, allowed]) => allowed)
 )
 
+initial.main.dapps = Object.fromEntries(
+  Object.entries(initial.main.dapps).map(([id, dapp]) => [id, { ...dapp, openWhenReady: false }])
+)
+
 // ---
 
 module.exports = () => migrations.apply(initial)
