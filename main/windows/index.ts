@@ -218,7 +218,7 @@ export class Tray {
 
       if (showOnboardingWindow) {
         setTimeout(() => {
-          onboard.show()
+          store.setOnboard({ showing: true })
         }, 600)
       }
     }
@@ -235,12 +235,17 @@ export class Tray {
   }
 
   canAutoHide() {
-    return (
-      store('main.autohide') &&
-      !store('windows.dash.showing') &&
-      !store('windows.onboard.showing') &&
-      !frameManager.isFrameShowing()
+    const autoHideOn = !!store('main.autohide')
+    const dashShowing = !!store('windows.dash.showing')
+    const onboardShowing = !!store('windows.onboard.showing')
+    const isFrameShowing = frameManager.isFrameShowing()
+
+    log.debug(
+      `%ccanAutoHide ${JSON.stringify({ autoHideOn, dashShowing, onboardShowing, isFrameShowing })}`,
+      'color: blue'
     )
+
+    return autoHideOn && !dashShowing && !onboardShowing && !isFrameShowing
   }
 
   hide() {
