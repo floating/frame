@@ -49,7 +49,7 @@ const app = {
   show: () => {
     tray.show()
     if (dash.hiddenByAppHide || dash.isVisible()) {
-      dash.show()
+      store.setDash({ showing: true })
     }
   },
   toggle: () => {
@@ -212,7 +212,7 @@ export class Tray {
       const showOnboardingWindow = !store('main.mute.onboardingWindow')
       if (store('windows.dash.showing') || showOnboardingWindow) {
         setTimeout(() => {
-          dash.show()
+          store.setDash({ showing: true })
         }, 300)
       }
 
@@ -235,7 +235,12 @@ export class Tray {
   }
 
   canAutoHide() {
-    return store('main.autohide') && !store('windows.dash.showing') && !frameManager.isFrameShowing()
+    return (
+      store('main.autohide') &&
+      !store('windows.dash.showing') &&
+      !store('windows.onboard.showing') &&
+      !frameManager.isFrameShowing()
+    )
   }
 
   hide() {
