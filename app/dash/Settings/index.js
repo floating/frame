@@ -154,31 +154,6 @@ class Settings extends React.Component {
             </div>
           </div>
 
-          <div className='signerPermission localSetting' style={{ zIndex: 208 }}>
-            <div className='signerPermissionControls'>
-              <div className='signerPermissionSetting'>Adjustable Nonce</div>
-              <div
-                className={
-                  this.store('main.nonceAdjust')
-                    ? 'signerPermissionToggle signerPermissionToggleOn'
-                    : 'signerPermissionToggle'
-                }
-                onClick={() => {
-                  link.send('tray:action', 'toggleNonceAdjust')
-                  if (!this.store('main.nonceAdjust')) {
-                    link.send('tray:action', 'navDash', {
-                      view: 'notify',
-                      data: { notify: 'nonceWarning', notifyData: {} }
-                    })
-                  }
-                }}
-              >
-                <div className='signerPermissionToggleSwitch' />
-              </div>
-            </div>
-            <div className='signerPermissionDetails'>{"Adds the ability to edit a transaction's nonce"}</div>
-          </div>
-
           <div className='signerPermission localSetting' style={{ zIndex: 207 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Show Account Name with ENS</div>

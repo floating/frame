@@ -20,6 +20,40 @@ const nonceHasBeenChanged = (req) => {
   return req.data.nonce && req.payload.nonce !== req.data.nonce
 }
 
+const NonceValue = ({ req, nonce }) => {
+  return (
+    <>
+      <div style={{ width: '24px' }}>{nonce}</div>
+      <div className='txNonceControl'>
+        <div
+          className='txNonceButton txNonceButtonLower'
+          onMouseDown={() => {
+            link.send('tray:adjustNonce', req.handlerId, -1)
+          }}
+        >
+          {svg.octicon('chevron-down', { height: 14 })}
+        </div>
+        <div
+          className='txNonceButton txNonceButtonRaise'
+          onMouseDown={() => link.send('tray:adjustNonce', req.handlerId, 1)}
+        >
+          {svg.octicon('chevron-up', { height: 14 })}
+        </div>
+        {nonceHasBeenChanged(req) && (
+          <div
+            className='txNonceButton txNonceButtonReset'
+            onMouseDown={() => link.send('tray:resetNonce', req.handlerId)}
+          >
+            {svg.octicon('sync', { height: 14 })}
+          </div>
+        )}
+      </div>
+    </>
+  )
+}
+
+const TextValue = ({ value }) => <span>{value}</span>
+
 const SimpleTxJSON = ({ json, req }) => {
   return (
     <div className='simpleJson'>
@@ -32,40 +66,17 @@ const SimpleTxJSON = ({ json, req }) => {
           const bIndex = txFieldPriority.indexOf(b)
           return aIndex > bIndex ? 1 : aIndex < bIndex ? -1 : 0
         })
-        .map((key, o) => (
-          <div key={key + o} className='simpleJsonChild'>
-            <div className=' simpleJsonKey simpleJsonKeyTx'>{key.replace(/([A-Z])/g, ' $1').trim()}</div>
-            <div className='simpleJsonValue'>
-              {json[key]}
-              {key === 'nonce' ? (
-                <div className='txNonceControl'>
-                  <div
-                    className='txNonceButton txNonceButtonLower'
-                    onMouseDown={() => {
-                      link.send('tray:adjustNonce', req.handlerId, -1)
-                    }}
-                  >
-                    {svg.octicon('chevron-down', { height: 14 })}
-                  </div>
-                  <div
-                    className='txNonceButton txNonceButtonRaise'
-                    onMouseDown={() => link.send('tray:adjustNonce', req.handlerId, 1)}
-                  >
-                    {svg.octicon('chevron-up', { height: 14 })}
-                  </div>
-                  {nonceHasBeenChanged(req) && (
-                    <div
-                      className='txNonceButton txNonceButtonReset'
-                      onMouseDown={() => link.send('tray:resetNonce', req.handlerId)}
-                    >
-                      {svg.octicon('sync', { height: 14 })}
-                    </div>
-                  )}
-                </div>
-              ) : null}
+        .map((key, o) => {
+          const value =
+            key === 'nonce' ? <NonceValue nonce={json[key]} req={req} /> : <TextValue value={json[key]} />
+
+          return (
+            <div key={key + o} className='simpleJsonChild'>
+              <div className=' simpleJsonKey simpleJsonKeyTx'>{key.replace(/([A-Z])/g, ' $1').trim()}</div>
+              <div className='simpleJsonValue'>{value}</div>
             </div>
-          </div>
-        ))}
+          )
+        })}
     </div>
   )
 }
@@ -84,20 +95,6 @@ class ViewData extends React.Component {
       this.setState({ copiedData: true })
       setTimeout((_) => this.setState({ copiedData: false }), 1000)
     }
-  }
-
-  renderNonce() {
-    const { accountId, handlerId, step } = this.props
-    const req = this.store('main.accounts', accountId, 'requests', handlerId)
-    const { data } = req
-    const tx = { nonce: 'TBD', ...data }
-    const nonce = tx.nonce
-    return (
-      <div className='requestMetaNonce'>
-        <div className='txNonceLabel'>Nonce</div>
-        <div className={'txNonceNumber'}>{nonce}</div>
-      </div>
-    )
   }
 
   renderDecodedData() {
@@ -169,6 +166,7 @@ class ViewData extends React.Component {
     const { req } = this.props
     const { data } = req
     const tx = { nonce: 'TBD', ...data }
+
     return (
       <div className='accountViewScroll cardShow'>
         {/* <div className='txViewData'>
