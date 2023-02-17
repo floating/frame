@@ -462,8 +462,7 @@ export class Provider extends EventEmitter {
 
     try {
       const approvals: RequiredApproval[] = []
-      const accountId = (accounts.current() || {}).id
-      const rawTx = getRawTx(newTx, accountId)
+      const rawTx = getRawTx(newTx)
       const gas = gasFees(rawTx)
       const { chainConfig } = connection
 
@@ -520,19 +519,18 @@ export class Provider extends EventEmitter {
 
       log.verbose(`sendTransaction(${JSON.stringify(tx)}`)
 
-      this.fillTransaction(tx, (err, transactionMetadata) => {
+      const from = tx.from || (currentAccount && currentAccount.id)
+
+      if (!currentAccount || !from || !hasAddress(currentAccount, from)) {
+        return resError('Transaction is not from currently selected account', payload, res)
+      }
+
+      this.fillTransaction({ ...tx, from }, (err, transactionMetadata) => {
         if (err) {
           resError(err, payload, res)
         } else {
-          const txMetadata = transactionMetadata as TransactionMetadata
-          const from = txMetadata.tx.from
-
-          if (!currentAccount || !hasAddress(currentAccount, from)) {
-            return resError('Transaction is not from currently selected account', payload, res)
-          }
-
           const handlerId = this.addRequestHandler(res)
-
+          const txMetadata = transactionMetadata as TransactionMetadata
           const { feesUpdated, recipientType, ...data } = txMetadata.tx
 
           const unclassifiedReq = {

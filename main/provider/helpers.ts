@@ -24,7 +24,8 @@ const permission = (date: number, method: string) => ({ parentCapability: method
 export function checkExistingNonceGas(tx: TransactionData) {
   const { from, nonce } = tx
 
-  const reqs = store('main.accounts', from, 'requests')
+  const reqs = store('main.accounts', (from || '').toLowerCase(), 'requests')
+
   const requests = Object.keys(reqs || {}).map((key) => reqs[key])
   const existing = requests.filter(
     (r) => r.mode === 'monitor' && r.status !== 'error' && r.data.nonce === nonce
@@ -75,11 +76,8 @@ function parseValue(value = '') {
   return (!!parsedHex && addHexPrefix(unpadHexString(value))) || '0x0'
 }
 
-export function getRawTx(
-  newTx: RPC.SendTransaction.TxParams,
-  accountId: string | undefined
-): TransactionData {
-  const { gas, gasLimit, data, value, type, to, ...rawTx } = newTx
+export function getRawTx(newTx: RPC.SendTransaction.TxParams): TransactionData {
+  const { gas, gasLimit, data, value, type, from, to, ...rawTx } = newTx
   const getNonce = () => {
     // pass through hex string or undefined
     if (rawTx.nonce === undefined || isHexString(rawTx.nonce)) {
@@ -96,7 +94,8 @@ export function getRawTx(
 
   const tx: TransactionData = {
     ...rawTx,
-    from: rawTx.from || accountId,
+    ...(from && { from: getAddress(from) }),
+    ...(to && { to: getAddress(to) }),
     type: '0x0',
     value: parseValue(value),
     data: addHexPrefix(padToEven(stripHexPrefix(data || '0x'))),
@@ -104,10 +103,6 @@ export function getRawTx(
     chainId: rawTx.chainId,
     nonce: getNonce(),
     gasFeesSource: GasFeesSource.Dapp
-  }
-
-  if (to) {
-    tx.to = getAddress(to)
   }
 
   return tx
