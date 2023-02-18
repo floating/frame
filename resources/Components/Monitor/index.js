@@ -212,6 +212,8 @@ class ChainSummaryComponent extends Component {
     const levels = this.store('main.networksMeta', type, chainId, 'gas.price.levels')
     const gasPrice = levelDisplay(levels.fast)
 
+    const explorer = this.store('main.networks', type, chainId, 'explorer')
+
     // fees is either a populated object (EIP-1559 compatible) or falsy
     const displayFeeMarket = !!fees
 
@@ -233,15 +235,19 @@ class ChainSummaryComponent extends Component {
           </ClusterValue>
           <ClusterValue
             style={{ minWidth: '70px', maxWidth: '70px' }}
-            onClick={() => {
-              if (address) {
-                link.send('tray:openExplorer', currentChain, null, address)
-              } else {
-                link.rpc('openExplorer', currentChain, () => {})
-              }
-            }}
+            onClick={
+              explorer
+                ? () => {
+                    if (address) {
+                      link.send('tray:openExplorer', currentChain, null, address)
+                    } else {
+                      link.rpc('openExplorer', currentChain, () => {})
+                    }
+                  }
+                : undefined
+            }
           >
-            <div style={{ padding: '6px' }}>
+            <div style={{ padding: '6px', color: !explorer && 'var(--outerspace05)' }}>
               <div>{address ? svg.user(16) : svg.telescope(18)}</div>
             </div>
           </ClusterValue>
