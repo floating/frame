@@ -120,6 +120,9 @@ const GasFeesMarket = ({ gasPrice, fees: { nextBaseFee, maxPriorityFeePerGas }, 
 class GasSummaryComponent extends Component {
   constructor(...args) {
     super(...args)
+    this.state = {
+      expand: false
+    }
   }
 
   txEstimates(type, id, gasPrice, calculatedFees, currentSymbol) {
@@ -177,8 +180,7 @@ class GasSummaryComponent extends Component {
     }))
   }
 
-  feeEstimatesUSD() {
-    const { chainId, displayFeeMarket, gasPrice } = this.props
+  feeEstimatesUSD({ chainId, displayFeeMarket, gasPrice }) {
     const type = 'ethereum'
     const currentSymbol = this.store('main.networksMeta', type, chainId, 'nativeCurrency', 'symbol') || 'ETH'
 
@@ -201,65 +203,6 @@ class GasSummaryComponent extends Component {
   }
 
   render() {
-    const { gasPrice } = this.props
-
-    return (
-      <div
-        style={{
-          display: 'flex',
-          padding: '16px 0px',
-          width: '100%',
-          justifyContent: 'space-between'
-        }}
-      >
-        <div className='sliceTileGasPrice'>
-          <div className='sliceTileGasPriceIcon' style={{ color: this.props.color }}>
-            {svg.gas(12)}
-          </div>
-          <div className='sliceTileGasPriceNumber'>{gasPrice || '‹0.001'}</div>
-          <div className='sliceTileGasPriceUnit'>{'gwei'}</div>
-        </div>
-        <div className='sliceGasEstimateBlock'>
-          {this.feeEstimatesUSD().map((estimate, i) => {
-            return (
-              <div className='gasEstimate' key={i}>
-                <div className='gasEstimateRange'>
-                  <span className='gasEstimateSymbol'>
-                    {!estimate.low || estimate.low >= 0.01 ? `$` : '<$'}
-                  </span>
-                  <span className='gasEstimateRangeLow'>{`${
-                    !estimate.low
-                      ? 0
-                      : estimate.low < 0.01
-                      ? 0.01
-                      : estimate.low < 1
-                      ? estimate.low.toFixed(2)
-                      : estimate.low
-                  }`}</span>
-                </div>
-                <div className='gasEstimateLabel' style={{ color: this.props.color }}>
-                  {estimate.label}
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      </div>
-    )
-  }
-}
-
-const GasSummary = Restore.connect(GasSummaryComponent)
-
-class Gas extends Component {
-  constructor(...args) {
-    super(...args)
-    this.state = {
-      expand: false
-    }
-  }
-
-  render() {
     const { chainId } = this.props
     const type = 'ethereum'
     const fees = this.store('main.networksMeta', type, chainId, 'gas.price.fees')
@@ -273,17 +216,18 @@ class Gas extends Component {
       <>
         <ClusterRow>
           <ClusterValue
+            grow={3}
             onClick={() => {
               this.setState({ expanded: !this.state.expanded })
             }}
-            style={{ padding: '8px 0px' }}
           >
-            <GasSummary
-              chainId={chainId}
-              displayFeeMarket={displayFeeMarket}
-              gasPrice={gasPrice}
-              color={this.props.color}
-            />
+            <div className='sliceTileGasPrice'>
+              <div className='sliceTileGasPriceIcon' style={{ color: this.props.color }}>
+                {svg.gas(12)}
+              </div>
+              <div className='sliceTileGasPriceNumber'>{gasPrice || '‹0.001'}</div>
+              <div className='sliceTileGasPriceUnit'>{'gwei'}</div>
+            </div>
           </ClusterValue>
         </ClusterRow>
         {this.state.expanded ? (
@@ -299,9 +243,38 @@ class Gas extends Component {
             </ClusterValue>
           </ClusterRow>
         ) : null}
+        <ClusterRow>
+          {this.feeEstimatesUSD({ chainId, displayFeeMarket, gasPrice }).map((estimate, i) => {
+            return (
+              <ClusterValue key={i}>
+                <div className='gasEstimate'>
+                  <div className='gasEstimateRange'>
+                    <span className='gasEstimateSymbol'>
+                      {!estimate.low || estimate.low >= 0.01 ? `$` : '<$'}
+                    </span>
+                    <span className='gasEstimateRangeLow'>{`${
+                      !estimate.low
+                        ? 0
+                        : estimate.low < 0.01
+                        ? 0.01
+                        : estimate.low < 1
+                        ? estimate.low.toFixed(2)
+                        : estimate.low
+                    }`}</span>
+                  </div>
+                  <div className='gasEstimateLabel' style={{ color: this.props.color }}>
+                    {estimate.label}
+                  </div>
+                </div>
+              </ClusterValue>
+            )
+          })}
+        </ClusterRow>
       </>
     )
   }
 }
 
-export default Restore.connect(Gas)
+const GasSummary = Restore.connect(GasSummaryComponent)
+
+export default Restore.connect(GasSummary)

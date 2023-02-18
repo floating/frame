@@ -3,9 +3,10 @@
   justify-content center
   align-items center
   justify-content center
+  padding 16px
 
   .sliceTileGasPriceIcon
-    margin 0px 13px 0px 15px
+    margin-right 13px
     color var(--good)
 
   .sliceTileGasPriceNumber
@@ -207,53 +208,46 @@
   background var(--ghostB)
   box-shadow 0px 1px 1px 0px var(--ghostY)
 
-
-.sliceGasEstimateBlock
-  position relative
-  color var(--outerspace)
+.gasEstimate
   display flex
-  padding-right 16px
+  flex-direction column
+  justify-content flex-end
+  align-items center
+  box-sizing border-box
+  padding 8px
 
-  .gasEstimate
+  .gasEstimateRange
     display flex
-    flex-direction column
-    justify-content flex-end
+    justify-content center
     align-items center
-    box-sizing border-box
-    margin-left 20px
+    font-size 15px
+    text-transform uppercase
+    font-family 'FiraCode'
+    margin-bottom 2px
 
-    .gasEstimateRange
-      display flex
-      justify-content center
-      align-items center
-      font-size 15px
-      text-transform uppercase
-      font-family 'FiraCode'
-      margin-bottom 2px
-
-      .gasEstimateRangeCurrency
-        font-size 10px
-        color var(--good)
-        font-weight 300
-
-      .gasEstimateRangeDash
-        font-size 10px
-        padding 0px 6px 0px 3px
-        letter-spacing 0px
-
-    .gasEstimateLabel
-      display flex
-      justify-content center
-      align-items center
-      font-size 8px
-      text-transform uppercase
-      font-weight 500
-      white-space nowrap
+    .gasEstimateRangeCurrency
+      font-size 10px
       color var(--good)
+      font-weight 300
 
-  .gasEstimateSymbol
-    font-size 9px
-    font-weight 300
+    .gasEstimateRangeDash
+      font-size 10px
+      padding 0px 6px 0px 3px
+      letter-spacing 0px
 
-  .gasEstimate:last-child
-    border-bottom none
+  .gasEstimateLabel
+    display flex
+    justify-content center
+    align-items center
+    font-size 8px
+    text-transform uppercase
+    font-weight 500
+    white-space nowrap
+    color var(--good)
+
+.gasEstimateSymbol
+  font-size 9px
+  font-weight 300
+
+.gasEstimate:last-child
+  border-bottom none

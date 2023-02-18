@@ -29,7 +29,9 @@ class ChainsPreview extends React.Component {
 
   setIndex(newIndex) {
     if (this.state.lockedOn) return
-    const existingChains = Object.keys(this.store('main.networks.ethereum')) || []
+    const existingChains = Object.keys(this.store('main.networks.ethereum') || []).filter((chain) => {
+      return chain && this.store('main.networks.ethereum', chain, 'on')
+    })
     if (newIndex > existingChains.length - 1) {
       this.setState({ index: 0 })
     } else if (newIndex < 0) {
@@ -76,16 +78,15 @@ class ChainsPreview extends React.Component {
           <span>{`${name} Monitor`}</span>
         </div>
         <Cluster>
-          <Gas chainId={existingChainsIds[this.state.index] || 1} color={`var(--${primaryColor})`} />
           <ClusterRow>
-            <ClusterValue grow={3} onClick={() => this.setIndex(this.state.index + 1)}>
-              <div style={{ padding: '6px' }}>
-                <div style={{ transform: 'rotate(-90deg)' }}>{svg.chevron(26)}</div>
-              </div>
-            </ClusterValue>
             <ClusterValue onClick={() => link.send('tray:openExplorer', currentChain, null, address)}>
               <div style={{ padding: '6px', color: `var(--${primaryColor})` }}>
                 <div>{svg.user(16)}</div>
+              </div>
+            </ClusterValue>
+            <ClusterValue grow={3} onClick={() => this.setIndex(this.state.index + 1)}>
+              <div style={{ padding: '6px' }}>
+                <div style={{ transform: 'rotate(-90deg)' }}>{svg.chevron(26)}</div>
               </div>
             </ClusterValue>
             <ClusterValue grow={3} onClick={() => this.setIndex(this.state.index - 1)}>
@@ -94,6 +95,7 @@ class ChainsPreview extends React.Component {
               </div>
             </ClusterValue>
           </ClusterRow>
+          <Gas chainId={existingChainsIds[this.state.index] || 1} color={`var(--${primaryColor})`} />
         </Cluster>
       </div>
     )
