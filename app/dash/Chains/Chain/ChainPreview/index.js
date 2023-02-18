@@ -1,7 +1,7 @@
 import React from 'react'
 import { ChainHeader, ChainFooter } from '../Components'
 import Connection from '../Connection'
-import Gas from '../../../../../resources/Components/Gas'
+import Gas from '../../../../../resources/Components/Monitor'
 import { ClusterBox, Cluster } from '../../../../../resources/Components/Cluster'
 
 export default (props) => {
@@ -24,7 +24,6 @@ export default (props) => {
             <Cluster>
               <Connection {...props} />
               <Gas chainId={id} />
-              <ChainFooter id={id} type={type} explorer={explorer} symbol={symbol} price={price} />
             </Cluster>
           </ClusterBox>
           <div style={{ height: '14px' }} />

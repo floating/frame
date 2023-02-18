@@ -2,7 +2,9 @@ import React, { Component, useState } from 'react'
 import Restore from 'react-restore'
 import BigNumber from 'bignumber.js'
 
-import { ClusterRow, ClusterValue } from '../../Components/Cluster'
+import link from '../../link'
+
+import { ClusterRow, ClusterValue } from '../Cluster'
 
 import svg from '../../svg'
 import { weiToGwei, hexToInt } from '../../utils'
@@ -117,7 +119,7 @@ const GasFeesMarket = ({ gasPrice, fees: { nextBaseFee, maxPriorityFeePerGas }, 
   )
 }
 
-class GasSummaryComponent extends Component {
+class ChainSummaryComponent extends Component {
   constructor(...args) {
     super(...args)
     this.state = {
@@ -203,8 +205,9 @@ class GasSummaryComponent extends Component {
   }
 
   render() {
-    const { chainId } = this.props
+    const { address, chainId, color } = this.props
     const type = 'ethereum'
+    const currentChain = { type, id: chainId }
     const fees = this.store('main.networksMeta', type, chainId, 'gas.price.fees')
     const levels = this.store('main.networksMeta', type, chainId, 'gas.price.levels')
     const gasPrice = levelDisplay(levels.fast)
@@ -216,7 +219,6 @@ class GasSummaryComponent extends Component {
       <>
         <ClusterRow>
           <ClusterValue
-            grow={3}
             onClick={() => {
               this.setState({ expanded: !this.state.expanded })
             }}
@@ -229,8 +231,23 @@ class GasSummaryComponent extends Component {
               <div className='sliceTileGasPriceUnit'>{'gwei'}</div>
             </div>
           </ClusterValue>
+          <ClusterValue
+            style={{ minWidth: '70px', maxWidth: '70px' }}
+            onClick={() => {
+              if (address) {
+                console.log('tray:openExplorer', currentChain, null, address)
+                link.send('tray:openExplorer', currentChain, null, address)
+              } else {
+                link.rpc('openExplorer', currentChain, () => {})
+              }
+            }}
+          >
+            <div style={{ padding: '6px' }}>
+              <div>{address ? svg.user(16) : svg.telescope(18)}</div>
+            </div>
+          </ClusterValue>
         </ClusterRow>
-        {this.state.expanded ? (
+        {this.state.expanded && (
           <ClusterRow>
             <ClusterValue pointerEvents={true}>
               <div className='sliceGasBlock'>
@@ -242,7 +259,7 @@ class GasSummaryComponent extends Component {
               </div>
             </ClusterValue>
           </ClusterRow>
-        ) : null}
+        )}
         <ClusterRow>
           {this.feeEstimatesUSD({ chainId, displayFeeMarket, gasPrice }).map((estimate, i) => {
             return (
@@ -275,6 +292,6 @@ class GasSummaryComponent extends Component {
   }
 }
 
-const GasSummary = Restore.connect(GasSummaryComponent)
+const Monior = Restore.connect(ChainSummaryComponent)
 
-export default Restore.connect(GasSummary)
+export default Restore.connect(Monior)

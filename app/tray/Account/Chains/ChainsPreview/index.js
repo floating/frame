@@ -2,9 +2,7 @@ import React from 'react'
 import Restore from 'react-restore'
 import link from '../../../../../resources/link'
 import svg from '../../../../../resources/svg'
-import { matchFilter } from '../../../../../resources/utils'
-import Gas from '../../../../../resources/Components/Gas'
-import RingIcon from '../../../../../resources/Components/RingIcon'
+import Monitor from '../../../../../resources/Components/Monitor'
 
 import { Cluster, ClusterRow, ClusterValue } from '../../../../../resources/Components/Cluster'
 
@@ -51,51 +49,45 @@ class ChainsPreview extends React.Component {
 
   render() {
     const { address } = this.store('main.accounts', this.props.account)
-    const permissions = this.store('main.permissions', this.props.account) || {}
-    let permissionList = Object.keys(permissions)
-      .filter((o) => {
-        const { filter = '' } = this.props
-        return matchFilter(filter, [permissions[o].origin])
-      })
-      .sort((a, b) => (a.origin < b.origin ? -1 : 1))
-    if (!this.props.expanded) permissionList = permissionList.slice(0, 4)
 
     const existingChainsIds =
       Object.keys(this.store('main.networks.ethereum')).map((id) => parseInt(id)) || []
 
-    const existingChains = Object.keys(this.store('main.networks.ethereum')) || []
+    const existingChains = Object.keys(this.store('main.networks.ethereum') || []).filter((chain) => {
+      return chain && this.store('main.networks.ethereum', chain, 'on')
+    })
     const currentChainId = existingChains[this.state.index] || '1'
     const currentChain = this.store('main.networks.ethereum', currentChainId)
     const currentChainMeta = this.store('main.networksMeta.ethereum', currentChainId)
     if (!currentChain || !currentChainMeta) return null
     const { name } = currentChain
     const { icon, primaryColor } = currentChainMeta
-
     return (
       <div className='balancesBlock' ref={this.moduleRef}>
         <div className='moduleHeader'>
           <span style={{ marginLeft: '-2px' }}>{svg.chain(16)}</span>
           <span>{`${name} Monitor`}</span>
+          {existingChains.length > 1 && (
+            <div className='chainMonitorSwitch'>
+              <div className='chainMonitorSwitchButton' onClick={() => this.setIndex(this.state.index - 1)}>
+                <div style={{ padding: '0px' }}>
+                  <div style={{ transform: 'rotate(-90deg)' }}>{svg.chevron(22)}</div>
+                </div>
+              </div>
+              <div className='chainMonitorSwitchButton' onClick={() => this.setIndex(this.state.index + 1)}>
+                <div style={{ padding: '0px' }}>
+                  <div style={{ transform: 'rotate(90deg)' }}>{svg.chevron(22)}</div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
         <Cluster>
-          <ClusterRow>
-            <ClusterValue onClick={() => link.send('tray:openExplorer', currentChain, null, address)}>
-              <div style={{ padding: '6px', color: `var(--${primaryColor})` }}>
-                <div>{svg.user(16)}</div>
-              </div>
-            </ClusterValue>
-            <ClusterValue grow={3} onClick={() => this.setIndex(this.state.index + 1)}>
-              <div style={{ padding: '6px' }}>
-                <div style={{ transform: 'rotate(-90deg)' }}>{svg.chevron(26)}</div>
-              </div>
-            </ClusterValue>
-            <ClusterValue grow={3} onClick={() => this.setIndex(this.state.index - 1)}>
-              <div style={{ padding: '6px' }}>
-                <div style={{ transform: 'rotate(90deg)' }}>{svg.chevron(26)}</div>
-              </div>
-            </ClusterValue>
-          </ClusterRow>
-          <Gas chainId={existingChainsIds[this.state.index] || 1} color={`var(--${primaryColor})`} />
+          <Monitor
+            address={address}
+            chainId={existingChainsIds[this.state.index] || 1}
+            color={`var(--${primaryColor})`}
+          />
         </Cluster>
       </div>
     )

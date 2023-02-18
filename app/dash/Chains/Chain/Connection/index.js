@@ -177,7 +177,7 @@ class ChainModule extends React.Component {
     return (
       <>
         {this.renderConnection(id, connection, networkMeta.blockHeight)}
-        {this.state.expanded ? (
+        {this.state.expanded && (
           <div className='connectionLevels'>
             <div className='connectionLevel' style={{ zIndex: 2 }}>
               <div
@@ -285,7 +285,7 @@ class ChainModule extends React.Component {
               </div>
             </div>
           </div>
-        ) : null}
+        )}
       </>
     )
   }
