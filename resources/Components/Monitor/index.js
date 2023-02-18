@@ -235,7 +235,6 @@ class ChainSummaryComponent extends Component {
             style={{ minWidth: '70px', maxWidth: '70px' }}
             onClick={() => {
               if (address) {
-                console.log('tray:openExplorer', currentChain, null, address)
                 link.send('tray:openExplorer', currentChain, null, address)
               } else {
                 link.rpc('openExplorer', currentChain, () => {})

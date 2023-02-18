@@ -1,5 +1,5 @@
 import React from 'react'
-import { ChainHeader, ChainFooter } from '../Components'
+import { ChainHeader } from '../Components'
 import Connection from '../Connection'
 import Gas from '../../../../../resources/Components/Monitor'
 import { ClusterBox, Cluster } from '../../../../../resources/Components/Cluster'
