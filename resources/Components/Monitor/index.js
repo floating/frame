@@ -248,7 +248,7 @@ class ChainSummaryComponent extends Component {
             }
           >
             <div style={{ padding: '6px', color: !explorer && 'var(--outerspace05)' }}>
-              <div>{address ? svg.user(16) : svg.telescope(18)}</div>
+              <div>{address ? svg.accounts(16) : svg.telescope(18)}</div>
             </div>
           </ClusterValue>
         </ClusterRow>
