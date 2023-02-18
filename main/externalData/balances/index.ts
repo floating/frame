@@ -105,13 +105,15 @@ export default function (store: Store) {
 
       const address = storeApi.getActiveAddress()
 
-      // even when paused ensure data is updated every 10 minutes
-      resetScan(address, scanInterval.inactive)
+      if (address) {
+        // even when paused ensure data is updated every 10 minutes
+        resetScan(address, scanInterval.inactive)
 
-      onResume = () => {
-        log.debug(`Resuming balances scan for address ${address}`)
+        onResume = () => {
+          log.verbose(`Resuming balances scan for address ${address}`)
 
-        startScan(address)
+          startScan(address)
+        }
       }
     }
   }
