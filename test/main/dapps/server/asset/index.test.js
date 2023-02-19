@@ -2,6 +2,8 @@ import fs from 'fs'
 import { PassThrough, Readable } from 'stream'
 import asset from '../../../../../main/dapps/server/asset'
 
+import '../../../../toMatchPath.js'
+
 jest.mock('fs', () => ({
   existsSync: jest.fn(),
   createReadStream: jest.fn()
@@ -53,8 +55,12 @@ it('returns a stream with the asset contents', async () => {
 it('streams a dapp from its root path', () => {
   asset.stream(createMockResponse(), '0xhash', '/')
 
-  expect(fs.existsSync).toHaveBeenCalledWith('/home/user/.config/DappCache/0xhash/index.html')
-  expect(fs.createReadStream).toHaveBeenCalledWith('/home/user/.config/DappCache/0xhash/index.html')
+  expect(fs.existsSync).toHaveBeenCalledWith(
+    expect.toMatchPath('/home/user/.config/DappCache/0xhash/index.html')
+  )
+  expect(fs.createReadStream).toHaveBeenCalledWith(
+    expect.toMatchPath('/home/user/.config/DappCache/0xhash/index.html')
+  )
 })
 
 it('streams a dapp with the correct content type', () => {
@@ -68,8 +74,12 @@ it('streams a dapp with the correct content type', () => {
 it('streams an asset from disk', () => {
   asset.stream(createMockResponse(), '0xhash', '/some/asset.js')
 
-  expect(fs.existsSync).toHaveBeenCalledWith('/home/user/.config/DappCache/0xhash/some/asset.js')
-  expect(fs.createReadStream).toHaveBeenCalledWith('/home/user/.config/DappCache/0xhash/some/asset.js')
+  expect(fs.existsSync).toHaveBeenCalledWith(
+    expect.toMatchPath('/home/user/.config/DappCache/0xhash/some/asset.js')
+  )
+  expect(fs.createReadStream).toHaveBeenCalledWith(
+    expect.toMatchPath('/home/user/.config/DappCache/0xhash/some/asset.js')
+  )
 })
 
 it('streams an asset with the correct content type', () => {
