@@ -2,8 +2,6 @@ import fs from 'fs'
 import { PassThrough, Readable } from 'stream'
 import asset from '../../../../../main/dapps/server/asset'
 
-import '../../../../toMatchPath.js'
-
 jest.mock('fs', () => ({
   existsSync: jest.fn(),
   createReadStream: jest.fn()

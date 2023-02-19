@@ -10,5 +10,6 @@
   "fakeTimers": {
     "enableGlobally": true
   },
-  "clearMocks": true
+  "clearMocks": true,
+  "setupFilesAfterEnv": ["<rootDir>/test/toMatchPath.js"]
 }

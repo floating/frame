@@ -4,8 +4,6 @@ import { CID } from 'multiformats'
 
 import { dappPathExists, isDappVerified } from '../../../../main/dapps/verify'
 
-import '../../../toMatchPath.js'
-
 jest.mock('fs', () => ({
   access: jest.fn()
 }))
