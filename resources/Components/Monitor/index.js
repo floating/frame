@@ -297,6 +297,6 @@ class ChainSummaryComponent extends Component {
   }
 }
 
-const Monior = Restore.connect(ChainSummaryComponent)
+const Monitor = Restore.connect(ChainSummaryComponent)
 
-export default Restore.connect(Monior)
+export default Restore.connect(Monitor)
