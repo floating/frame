@@ -30,7 +30,7 @@ describe('#dappPathExists', () => {
 
     const exists = dappPathExists('0xmydapp')
 
-    expect(fs.access).toHaveBeenCalledWith('/home/user/.config/DappCache/0xmydapp')
+    expect(fs.access).toHaveBeenCalledWith(expect.toMatchPath('/home/user/.config/DappCache/0xmydapp'))
     return expect(exists).resolves.toBe(true)
   })
 
@@ -39,7 +39,7 @@ describe('#dappPathExists', () => {
 
     const exists = dappPathExists('0xmydapp')
 
-    expect(fs.access).toHaveBeenCalledWith('/home/user/.config/DappCache/0xmydapp')
+    expect(fs.access).toHaveBeenCalledWith(expect.toMatchPath('/home/user/.config/DappCache/0xmydapp'))
     return expect(exists).resolves.toBe(false)
   })
 })
@@ -66,7 +66,7 @@ describe('#isDappVerified', () => {
     await isDappVerified('0xdapp', dappRootCid)
 
     const contentSourceGlob = importer.mock.calls[0][0].getArgs()
-    expect(contentSourceGlob).toStrictEqual(['/home/user/.config/DappCache/0xdapp', '**'])
+    expect(contentSourceGlob).toStrictEqual([expect.toMatchPath('/home/user/.config/DappCache/0xdapp'), '**'])
   })
 })
 
