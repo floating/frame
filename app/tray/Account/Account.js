@@ -7,8 +7,9 @@ import link from '../../../resources/link'
 import Default from './Default'
 
 import Activity from './Activity'
+import Chains from './Chains'
 import Balances from './Balances'
-import Gas from '../../../resources/Components/Gas'
+import Gas from '../../../resources/Components/Monitor'
 import Inventory from './Inventory'
 import Permissions from './Permissions'
 import Requests from './Requests'
@@ -39,6 +40,7 @@ const requests = {
 const modules = {
   gas: Gas,
   requests: Requests,
+  chains: Chains,
   activity: Activity,
   inventory: Inventory,
   permissions: Permissions,

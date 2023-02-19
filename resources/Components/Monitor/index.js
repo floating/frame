@@ -2,6 +2,10 @@ import React, { Component, useState } from 'react'
 import Restore from 'react-restore'
 import BigNumber from 'bignumber.js'
 
+import link from '../../link'
+
+import { ClusterRow, ClusterValue } from '../Cluster'
+
 import svg from '../../svg'
 import { weiToGwei, hexToInt } from '../../utils'
 
@@ -43,15 +47,17 @@ function txEstimate(value, gasLimit, nativeUSD) {
   )
 }
 
-const GasFees = ({ gasPrice }) => (
+const GasFees = ({ gasPrice, color }) => (
   <div className='gasItem gasItemLarge'>
     <div className='gasGweiNum'>{gasPrice}</div>
-    <span className='gasGweiLabel'>{'GWEI'}</span>
+    <span className='gasGweiLabel' style={{ color }}>
+      {'GWEI'}
+    </span>
     <span className='gasLevelLabel'>{'Recommended'}</span>
   </div>
 )
 
-const GasFeesMarket = ({ gasPrice, fees: { nextBaseFee, maxPriorityFeePerGas } }) => {
+const GasFeesMarket = ({ gasPrice, fees: { nextBaseFee, maxPriorityFeePerGas }, color }) => {
   const [displayBaseHint, setDisplayBaseHint] = useState(false)
   const [displayPriorityHint, setDisplayPriorityHint] = useState(false)
   const calculatedFees = {
@@ -75,7 +81,9 @@ const GasFeesMarket = ({ gasPrice, fees: { nextBaseFee, maxPriorityFeePerGas } }
       )}
       <div className='gasItem gasItemSmall'>
         <div className='gasGweiNum'>{calculatedFees.actualBaseFee || '‹0.001'}</div>
-        <span className='gasGweiLabel'>{'GWEI'}</span>
+        <span className='gasGweiLabel' style={{ color }}>
+          {'GWEI'}
+        </span>
         <span className='gasLevelLabel'>{'Current Base'}</span>
       </div>
       <div className='gasItem gasItemLarge'>
@@ -88,7 +96,9 @@ const GasFeesMarket = ({ gasPrice, fees: { nextBaseFee, maxPriorityFeePerGas } }
           <div className='gasArrowInner'>{svg.chevron(27)}</div>
         </div>
         <div className='gasGweiNum'>{gasPrice || '‹0.001'}</div>
-        <span className='gasGweiLabel'>{'GWEI'}</span>
+        <span className='gasGweiLabel' style={{ color }}>
+          {'GWEI'}
+        </span>
         <span className='gasLevelLabel'>{'Recommended'}</span>
         <div
           className='gasArrow gasArrowRight'
@@ -100,16 +110,21 @@ const GasFeesMarket = ({ gasPrice, fees: { nextBaseFee, maxPriorityFeePerGas } }
       </div>
       <div className='gasItem gasItemSmall'>
         <div className='gasGweiNum'>{calculatedFees.priorityFee || '‹0.001'}</div>
-        <span className='gasGweiLabel'>{'GWEI'}</span>
+        <span className='gasGweiLabel' style={{ color }}>
+          {'GWEI'}
+        </span>
         <span className='gasLevelLabel'>{'Priority Tip'}</span>
       </div>
     </>
   )
 }
 
-class GasSummaryComponent extends Component {
+class ChainSummaryComponent extends Component {
   constructor(...args) {
     super(...args)
+    this.state = {
+      expand: false
+    }
   }
 
   txEstimates(type, id, gasPrice, calculatedFees, currentSymbol) {
@@ -167,8 +182,7 @@ class GasSummaryComponent extends Component {
     }))
   }
 
-  feeEstimatesUSD() {
-    const { chainId, displayFeeMarket, gasPrice } = this.props
+  feeEstimatesUSD({ chainId, displayFeeMarket, gasPrice }) {
     const type = 'ethereum'
     const currentSymbol = this.store('main.networksMeta', type, chainId, 'nativeCurrency', 'symbol') || 'ETH'
 
@@ -191,85 +205,98 @@ class GasSummaryComponent extends Component {
   }
 
   render() {
-    const { gasPrice } = this.props
-
-    return (
-      <>
-        <div className='sliceTileGasPrice'>
-          <div className='sliceTileGasPriceIcon'>{svg.gas(9)}</div>
-          <div className='sliceTileGasPriceNumber'>{gasPrice || '‹0.001'}</div>
-          <div className='sliceTileGasPriceUnit'>{'gwei'}</div>
-        </div>
-        <div className='sliceGasEstimateBlock'>
-          {this.feeEstimatesUSD().map((estimate, i) => {
-            return (
-              <div className='gasEstimate' key={i}>
-                <div className='gasEstimateRange'>
-                  <span className='gasEstimateSymbol'>
-                    {!estimate.low || estimate.low >= 0.01 ? `$` : '<$'}
-                  </span>
-                  <span className='gasEstimateRangeLow'>{`${
-                    !estimate.low
-                      ? 0
-                      : estimate.low < 0.01
-                      ? 0.01
-                      : estimate.low < 1
-                      ? estimate.low.toFixed(2)
-                      : estimate.low
-                  }`}</span>
-                </div>
-                <div className='gasEstimateLabel'>{estimate.label}</div>
-              </div>
-            )
-          })}
-        </div>
-      </>
-    )
-  }
-}
-
-const GasSummary = Restore.connect(GasSummaryComponent)
-
-class Gas extends Component {
-  constructor(...args) {
-    super(...args)
-    this.state = {
-      expand: false
-    }
-  }
-
-  render() {
-    const { chainId } = this.props
+    const { address, chainId, color } = this.props
     const type = 'ethereum'
+    const currentChain = { type, id: chainId }
     const fees = this.store('main.networksMeta', type, chainId, 'gas.price.fees')
     const levels = this.store('main.networksMeta', type, chainId, 'gas.price.levels')
     const gasPrice = levelDisplay(levels.fast)
+
+    const explorer = this.store('main.networks', type, chainId, 'explorer')
 
     // fees is either a populated object (EIP-1559 compatible) or falsy
     const displayFeeMarket = !!fees
 
     return (
-      <div className='sliceContainer' ref={this.ref}>
-        <div
-          className='sliceTile sliceTileClickable'
-          onClick={() => {
-            this.setState({ expanded: !this.state.expanded })
-          }}
-        >
-          <GasSummary chainId={chainId} displayFeeMarket={displayFeeMarket} gasPrice={gasPrice} />
-        </div>
-        {this.state.expanded ? (
-          <div className='sliceGasBlock'>
-            {displayFeeMarket ? (
-              <GasFeesMarket gasPrice={gasPrice} fees={fees} />
-            ) : (
-              <GasFees gasPrice={gasPrice} />
-            )}
-          </div>
-        ) : null}
-      </div>
+      <>
+        <ClusterRow>
+          <ClusterValue
+            onClick={() => {
+              this.setState({ expanded: !this.state.expanded })
+            }}
+          >
+            <div className='sliceTileGasPrice'>
+              <div className='sliceTileGasPriceIcon' style={{ color: this.props.color }}>
+                {svg.gas(12)}
+              </div>
+              <div className='sliceTileGasPriceNumber'>{gasPrice || '‹0.001'}</div>
+              <div className='sliceTileGasPriceUnit'>{'gwei'}</div>
+            </div>
+          </ClusterValue>
+          <ClusterValue
+            style={{ minWidth: '70px', maxWidth: '70px' }}
+            onClick={
+              explorer
+                ? () => {
+                    if (address) {
+                      link.send('tray:openExplorer', currentChain, null, address)
+                    } else {
+                      link.rpc('openExplorer', currentChain, () => {})
+                    }
+                  }
+                : undefined
+            }
+          >
+            <div style={{ padding: '6px', color: !explorer && 'var(--outerspace05)' }}>
+              <div>{address ? svg.accounts(16) : svg.telescope(18)}</div>
+            </div>
+          </ClusterValue>
+        </ClusterRow>
+        {this.state.expanded && (
+          <ClusterRow>
+            <ClusterValue pointerEvents={true}>
+              <div className='sliceGasBlock'>
+                {displayFeeMarket ? (
+                  <GasFeesMarket gasPrice={gasPrice} fees={fees} color={this.props.color} />
+                ) : (
+                  <GasFees gasPrice={gasPrice} color={this.props.color} />
+                )}
+              </div>
+            </ClusterValue>
+          </ClusterRow>
+        )}
+        <ClusterRow>
+          {this.feeEstimatesUSD({ chainId, displayFeeMarket, gasPrice }).map((estimate, i) => {
+            return (
+              <ClusterValue key={i}>
+                <div className='gasEstimate'>
+                  <div className='gasEstimateRange'>
+                    <span className='gasEstimateSymbol'>
+                      {!estimate.low || estimate.low >= 0.01 ? `$` : '<$'}
+                    </span>
+                    <span className='gasEstimateRangeLow'>{`${
+                      !estimate.low
+                        ? 0
+                        : estimate.low < 0.01
+                        ? 0.01
+                        : estimate.low < 1
+                        ? estimate.low.toFixed(2)
+                        : estimate.low
+                    }`}</span>
+                  </div>
+                  <div className='gasEstimateLabel' style={{ color: this.props.color }}>
+                    {estimate.label}
+                  </div>
+                </div>
+              </ClusterValue>
+            )
+          })}
+        </ClusterRow>
+      </>
     )
   }
 }
 
-export default Restore.connect(Gas)
+const Monitor = Restore.connect(ChainSummaryComponent)
+
+export default Restore.connect(Monitor)

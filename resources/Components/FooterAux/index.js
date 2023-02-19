@@ -1,7 +1,7 @@
 import React from 'react'
 import Restore from 'react-restore'
 
-import Gas from '../Gas'
+import Gas from '../Monitor'
 
 class _Aux extends React.Component {
   render() {

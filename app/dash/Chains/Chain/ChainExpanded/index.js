@@ -13,7 +13,6 @@ import {
   EditChainIcon,
   EditTestnet,
   EditChainExplorer,
-  ChainFooter,
   EditNativeCurrencyIcon
 } from '../Components'
 

@@ -304,6 +304,8 @@
 .connectionLevels
   position relative
   z-index 999999999
+  width 100%
+  min-width 100%
 
   .connectionLevel
     position relative
@@ -328,15 +330,6 @@
   font-size 14px
   font-weight 300
 
-.chainFooter
-  display flex
-  justify-content space-between
-  align-items center
-  position relative
-  padding 10px 15px 10px 13px
-  font-family 'FiraCode'
-  font-size 12px
-  font-weight 300
 
 .chainCurrencyItem
   display flex
@@ -402,123 +395,6 @@
     *
       pointer-events none
 
-    .sliceTileConnectionName
-      padding 0px 39px
-      color var(--outerspace)
-      text-transform uppercase
-      font-size 13px
-      font-weight 400
-      letter-spacing 1px
-
-    .sliceTileBlock
-      display flex
-      align-items center
-      padding-right 11px
-      font-family 'FiraCode'
-      font-size 14px
-      font-weight 300
-      position relative
-      top 1px
-      bottom 0px
-
-      .sliceTileBlockIcon
-        color var(--good)
-        padding-right 5px
-
-      .sliceTileChainId
-        padding-right 15px
-
-    .sliceTileIndicator
-      color var(--outerspace)
-      cursor pointer
-      position absolute 
-      top 50%
-      margin-top -2px
-      left 13px
-      bottom 0px
-      width 5px
-      height 5px
-      border-radius 3px
-      display flex
-      justify-content center
-      align-items center
-      border-radius 12px
-      background var(--good)
-      *
-        pointer-events none
-
-
-    .sliceTileIndicatorLarge
-      color var(--outerspace)
-      cursor pointer
-      position absolute 
-      top 50%
-      margin-top -5px
-      left 14px
-      bottom 0px
-      width 10px
-      height 10px
-      border-radius 4px
-      display flex
-      justify-content center
-      align-items center
-      border-radius 12px
-      background var(--good)
-      *
-        pointer-events none
-
-    .sliceTileIndicatorActive
-      background var(--goodHighlight)
-      box-shadow 0px 0px 4px var(--goodHighlight)
-
-    .sliceTileIndicatorGood
-      background var(--good)
-      box-shadow 0px 0px 4px var(--good)
-
-    .sliceTileIndicatorPending
-      background var(--pending)
-      box-shadow 0px 0px 4px var(--pending)
-
-    .sliceTileIndicatorWarning
-      background var(--warning)
-      box-shadow 0px 0px 4px var(--warning)
-
-    .sliceTileIndicatorBad
-      background var(--bad)
-      box-shadow 0px 0px 4px var(--bad)
-
-    .sliceTileChangeChain
-      color var(--outerspace)
-      cursor pointer
-      position absolute 
-      top 0px
-      right 0px
-      bottom 0px
-      width 41px
-      display flex
-      justify-content center
-      align-items center
-      border-radius 12px
-      *
-        pointer-events none
-
-    .sliceTileChangeChain:hover
-      background var(--ghostB)
-
-    .sliceTileChangeConnected
-      background var(--good)
-
-    .sliceChainId
-      display flex
-      justify-content center
-      align-items center
-      font-family 'FiraCode'
-      font-size 12px
-      margin 10px
-
-      .sliceChainIdIcon
-        margin-right 6px
-
   .sliceTile:first-child
     margin 0px 3px 0px 3px
 
@@ -537,6 +413,123 @@
     // animation-timing-function: ease-in-out
     // animation-iteration-count: infinite
     // box-shadow 0px 1px 1px var(--ghostZ)
+
+.sliceTileConnectionName
+  padding 1px 20px 0px 20px
+  color var(--outerspace)
+  text-transform uppercase
+  font-size 14px
+  font-weight 400
+  letter-spacing 1px
+
+.sliceTileBlock
+  display flex
+  align-items center
+  padding-right 11px
+  font-family 'FiraCode'
+  font-size 14px
+  font-weight 300
+  position relative
+  top 1px
+  bottom 0px
+
+  .sliceTileBlockIcon
+    color var(--good)
+    padding-right 5px
+
+  .sliceTileChainId
+    padding-right 15px
+
+.sliceTileIndicator
+  color var(--outerspace)
+  cursor pointer
+  position absolute 
+  top 50%
+  margin-top -2px
+  left 13px
+  bottom 0px
+  width 5px
+  height 5px
+  border-radius 3px
+  display flex
+  justify-content center
+  align-items center
+  border-radius 12px
+  background var(--good)
+  *
+    pointer-events none
+
+
+.sliceTileIndicatorLarge
+  color var(--outerspace)
+  cursor pointer
+  position absolute 
+  top 50%
+  margin-top -5px
+  left 14px
+  bottom 0px
+  width 10px
+  height 10px
+  border-radius 4px
+  display flex
+  justify-content center
+  align-items center
+  border-radius 12px
+  background var(--good)
+  *
+    pointer-events none
+
+.sliceTileIndicatorActive
+  background var(--goodHighlight)
+  box-shadow 0px 0px 4px var(--goodHighlight)
+
+.sliceTileIndicatorGood
+  background var(--good)
+  box-shadow 0px 0px 4px var(--good)
+
+.sliceTileIndicatorPending
+  background var(--pending)
+  box-shadow 0px 0px 4px var(--pending)
+
+.sliceTileIndicatorWarning
+  background var(--warning)
+  box-shadow 0px 0px 4px var(--warning)
+
+.sliceTileIndicatorBad
+  background var(--bad)
+  box-shadow 0px 0px 4px var(--bad)
+
+.sliceTileChangeChain
+  color var(--outerspace)
+  cursor pointer
+  position absolute 
+  top 0px
+  right 0px
+  bottom 0px
+  width 41px
+  display flex
+  justify-content center
+  align-items center
+  border-radius 12px
+  *
+    pointer-events none
+
+.sliceTileChangeChain:hover
+  background var(--ghostB)
+
+.sliceTileChangeConnected
+  background var(--good)
+
+.sliceChainId
+  display flex
+  justify-content center
+  align-items center
+  font-family 'FiraCode'
+  font-size 12px
+  margin 10px
+
+  .sliceChainIdIcon
+    margin-right 6px
 
 .sliceContainer:last-child
   margin 0px 6px 0px 6px

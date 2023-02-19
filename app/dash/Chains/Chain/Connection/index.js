@@ -2,6 +2,7 @@ import React, { createRef } from 'react'
 import Restore from 'react-restore'
 
 import Dropdown from '../../../../../resources/Components/Dropdown'
+import { ClusterRow, ClusterValue } from '../../../../../resources/Components/Cluster'
 import { isInvalidCustomTarget } from '../../../../../resources/connections'
 import { capitalize } from '../../../../../resources/utils'
 
@@ -69,20 +70,23 @@ class ChainModule extends React.Component {
     const connection = getActiveConnection(primary, secondary)
 
     return (
-      <div
-        className='sliceTile sliceTileClickable'
-        onClick={() => {
-          this.setState({ expanded: !this.state.expanded })
-        }}
-      >
-        <ConnectionStatus connection={connection} />
-        <div className='sliceTileBlock'>
-          <div className='sliceTileBlockIcon'>{svg.chain(14)}</div>
-          <div className='sliceTileChainId'>{id}</div>
-          <div className='sliceTileBlockIcon'>{svg.cube(14)}</div>
-          <div>{blockHeight}</div>
-        </div>
-      </div>
+      <ClusterRow>
+        <ClusterValue
+          onClick={() => {
+            this.setState({ expanded: !this.state.expanded })
+          }}
+        >
+          <div style={{ padding: '20px', display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+            <ConnectionStatus connection={connection} />
+            <div className='sliceTileBlock'>
+              <div className='sliceTileBlockIcon'>{svg.chain(14)}</div>
+              <div className='sliceTileChainId'>{id}</div>
+              <div className='sliceTileBlockIcon'>{svg.cube(14)}</div>
+              <div>{blockHeight}</div>
+            </div>
+          </div>
+        </ClusterValue>
+      </ClusterRow>
     )
   }
 
@@ -171,9 +175,9 @@ class ChainModule extends React.Component {
     }
 
     return (
-      <div className='sliceContainer' ref={this.ref}>
+      <>
         {this.renderConnection(id, connection, networkMeta.blockHeight)}
-        {this.state.expanded ? (
+        {this.state.expanded && (
           <div className='connectionLevels'>
             <div className='connectionLevel' style={{ zIndex: 2 }}>
               <div
@@ -281,8 +285,8 @@ class ChainModule extends React.Component {
               </div>
             </div>
           </div>
-        ) : null}
-      </div>
+        )}
+      </>
     )
   }
 }
