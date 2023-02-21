@@ -774,6 +774,73 @@ const migrations = {
     if (nameNotSet(137)) initial.main.networksMeta.ethereum[137].nativeCurrency.name = 'Matic'
 
     return initial
+  },
+  33: (initial) => {
+    // add Base testnet network information
+    if (!initial.main.networks.ethereum[84531]) {
+      initial.main.networks.ethereum[84531] = {
+        id: 84531,
+        type: 'ethereum',
+        layer: 'testnet',
+        isTestnet: true,
+        name: 'Base Görli',
+        explorer: 'ttps://goerli-explorer.base.org',
+        gas: {
+          price: {
+            selected: 'standard',
+            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+          }
+        },
+        connection: {
+          primary: {
+            on: true,
+            current: 'custom',
+            status: 'loading',
+            connected: false,
+            type: '',
+            network: '',
+            custom: 'https://goerli.base.org'
+          },
+          secondary: {
+            on: false,
+            current: 'custom',
+            status: 'loading',
+            connected: false,
+            type: '',
+            network: '',
+            custom: ''
+          }
+        },
+        on: false
+      }
+    }
+
+    if (!initial.main.networksMeta.ethereum[84531]) {
+      initial.main.networksMeta.ethereum[84531] = {
+        blockHeight: 0,
+        gas: {
+          fees: {},
+          price: {
+            selected: 'standard',
+            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+          }
+        },
+        nativeCurrency: {
+          symbol: 'görETH',
+          usd: {
+            price: 0,
+            change24hr: 0
+          },
+          icon: '',
+          name: 'Görli Ether',
+          decimals: 18
+        },
+        icon: '',
+        primaryColor: 'accent2' // Testnet
+      }
+    }
+
+    return initial
   }
 }
 
