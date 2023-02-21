@@ -1,5 +1,5 @@
 {
-  "name": "frame-canary",
+  "name": "frame",
   "version": "0.6.0",
   "description": "System-wide web3",
   "main": "compiled/main",
@@ -219,7 +219,7 @@
       "distDir": "./bundle"
     }
   },
-  "repository": "github:frame-labs/frame-canary",
+  "repository": "github:floating/frame",
   "lavamoat": {
     "allowScripts": {
       "$root$": false,

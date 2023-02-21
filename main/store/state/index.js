@@ -185,7 +185,7 @@ const initial = {
       signerRelockChange: main('mute.signerRelockChange', false),
       gasFeeWarning: main('mute.gasFeeWarning', false),
       betaDisclosure: main('mute.betaDisclosure', false),
-      onboardingWindow: main('mute.onboardingWindow', false),
+      onboardingWindow: false, // main('mute.onboardingWindow', false),
       signerCompatibilityWarning: main('mute.signerCompatibilityWarning', false)
     },
     shortcuts: {
