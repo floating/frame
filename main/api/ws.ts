@@ -20,7 +20,8 @@ import {
 import validPayload from './validPayload'
 import protectedMethods from './protectedMethods'
 
-const logTraffic = process.env.LOG_TRAFFIC
+const logTraffic = (origin: string) =>
+  process.env.LOG_TRAFFIC === 'true' || process.env.LOG_TRAFFIC === origin
 
 const subs: Record<string, Subscription> = {}
 const connectionMonitors: Record<string, NodeJS.Timeout> = {}
@@ -90,7 +91,7 @@ const handler = (socket: FrameWebSocket, req: IncomingMessage) => {
 
     const origin = parseOrigin(requestOrigin)
 
-    if (logTraffic)
+    if (logTraffic(origin))
       log.info(
         `req -> | ${socket.frameExtension ? 'ext' : 'ws'} | ${origin} | ${rawPayload.method} | -> | ${
           rawPayload.params
@@ -136,7 +137,8 @@ const handler = (socket: FrameWebSocket, req: IncomingMessage) => {
             })
           }
         }
-        if (logTraffic)
+
+        if (logTraffic(origin))
           log.info(
             `<- res | ${socket.frameExtension ? 'ext' : 'ws'} | ${origin} | ${
               payload.method
