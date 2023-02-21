@@ -82,9 +82,10 @@ async function requestExtensionPermission(extension: FrameExtension) {
 
 async function requestPermission(address: Address, fullPayload: RPCRequestPayload) {
   const { _origin: originId, ...payload } = fullPayload
+  const permissionCheckId = `${address}:${originId}`
 
-  if (originId in activePermissionChecks) {
-    return activePermissionChecks[originId]
+  if (permissionCheckId in activePermissionChecks) {
+    return activePermissionChecks[permissionCheckId]
   }
 
   const result = new Promise<Permission | undefined>((resolve) => {
@@ -100,12 +101,12 @@ async function requestPermission(address: Address, fullPayload: RPCRequestPayloa
       const { name: originName } = store('main.origins', originId)
       const permission = storeApi.getPermission(address, originName)
 
-      delete activePermissionChecks[originId]
+      delete activePermissionChecks[permissionCheckId]
       resolve(permission)
     })
   })
 
-  activePermissionChecks[originId] = result
+  activePermissionChecks[permissionCheckId] = result
 
   return result
 }
