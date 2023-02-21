@@ -57,7 +57,6 @@ import {
 import * as sigParser from '../signatures'
 import { hasAddress } from '../../resources/domain/account'
 import { mapCaip27Request } from '../requests'
-import { legacyToBuffer } from '@metamask/eth-sig-util/dist/utils'
 
 type Subscription = {
   id: string
