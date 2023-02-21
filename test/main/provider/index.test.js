@@ -1090,15 +1090,6 @@ describe('#send', () => {
         done()
       })
     })
-
-    it('does not submit a request for a message that is not hex-encoded utf-8', (done) => {
-      const params = [message, address]
-
-      send({ method: 'personal_sign', params }, (err) => {
-        expect(err.error.message).toMatch(/hex-encoded utf-8 string/i)
-        done()
-      })
-    })
   })
 
   describe('#personal_sign', () => {
@@ -1143,15 +1134,6 @@ describe('#send', () => {
 
       send({ method: 'personal_sign', params }, (err) => {
         expect(err.error).toBeTruthy()
-        done()
-      })
-    })
-
-    it('does not submit a request for a message that is not hex-encoded utf-8', (done) => {
-      const params = [message, address]
-
-      send({ method: 'personal_sign', params }, (err) => {
-        expect(err.error.message).toMatch(/hex-encoded utf-8 string/i)
         done()
       })
     })

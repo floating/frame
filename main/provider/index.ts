@@ -57,6 +57,7 @@ import {
 import * as sigParser from '../signatures'
 import { hasAddress } from '../../resources/domain/account'
 import { mapCaip27Request } from '../requests'
+import { legacyToBuffer } from '@metamask/eth-sig-util/dist/utils'
 
 type Subscription = {
   id: string
@@ -592,15 +593,11 @@ export class Provider extends EventEmitter {
   }
 
   sign(payload: RPCRequestPayload, res: RPCRequestCallback) {
-    const [from, message] = payload.params || []
+    const [from] = payload.params || []
     const currentAccount = accounts.current()
 
     if (!currentAccount || !hasAddress(currentAccount, from)) {
       return resError('Sign request is not from currently selected account', payload, res)
-    }
-
-    if (!isHexString(message)) {
-      return resError('Sign request must be hex-encoded UTF-8 string', payload, res)
     }
 
     const handlerId = this.addRequestHandler(res)
