@@ -282,9 +282,11 @@ export class Tray {
       this.recentDisplayEvent = false
     }, 150)
 
-    if (isMacOS) windows.tray.setPosition(0, 0)
-
-    windows.tray.setAlwaysOnTop(true)
+    if (isMacOS) {
+      windows.tray.setPosition(0, 0)
+    } else {
+      windows.tray.setAlwaysOnTop(true)
+    }
     windows.tray.setVisibleOnAllWorkspaces(true, {
       visibleOnFullScreen: true,
       skipTransformProcessType: true
@@ -369,7 +371,11 @@ class Dash {
       this.recentDisplayEvent = false
     }, 150)
     setTimeout(() => {
-      windows.dash.setAlwaysOnTop(true)
+      if (isMacOS) {
+        windows.dash.setPosition(0, 0)
+      } else {
+        windows.dash.setAlwaysOnTop(true)
+      }
       windows.dash.setVisibleOnAllWorkspaces(true, {
         visibleOnFullScreen: true,
         skipTransformProcessType: true
