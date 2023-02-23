@@ -711,7 +711,7 @@ const initial = {
             name: 'Görli Ether',
             decimals: 18
           },
-          icon: '',
+          icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/baseiconcolor.png',
           primaryColor: 'accent2' // Testnet
         },
         11155111: {
