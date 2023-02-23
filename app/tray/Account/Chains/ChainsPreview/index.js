@@ -49,10 +49,6 @@ class ChainsPreview extends React.Component {
 
   render() {
     const { address } = this.store('main.accounts', this.props.account)
-
-    const existingChainsIds =
-      Object.keys(this.store('main.networks.ethereum')).map((id) => parseInt(id)) || []
-
     const existingChains = Object.keys(this.store('main.networks.ethereum') || []).filter((chain) => {
       return chain && this.store('main.networks.ethereum', chain, 'on')
     })
@@ -83,11 +79,7 @@ class ChainsPreview extends React.Component {
           )}
         </div>
         <Cluster>
-          <Monitor
-            address={address}
-            chainId={existingChainsIds[this.state.index] || 1}
-            color={`var(--${primaryColor})`}
-          />
+          <Monitor address={address} chainId={currentChain.id} color={`var(--${primaryColor})`} />
         </Cluster>
       </div>
     )
