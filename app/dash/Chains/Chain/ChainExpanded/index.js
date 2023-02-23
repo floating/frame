@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 
 import link from '../../../../../resources/link'
+import { Cluster } from '../../../../../resources/Components/Cluster'
 import Connection from '../Connection'
 
 import {
@@ -100,9 +101,9 @@ export default (props) => {
       <EditChainIcon currentIcon={currentIcon} onChange={setIcon} />
       <EditNativeCurrencyIcon currentCurrencyIcon={currentCurrencyIcon} onChange={setCurrencyIcon} />
       {!isMainnet && <EditTestnet testnet={currentTestnet} onChange={setTestnet} />}
-      <div className='chainModules'>
+      <Cluster style={{ marginBottom: '30px' }}>
         <Connection expanded={true} connection={connection} {...chain} />
-      </div>
+      </Cluster>
       {!isMainnet ? (
         <div className='chainRow chainRowRemove'>
           <SubmitChainButton

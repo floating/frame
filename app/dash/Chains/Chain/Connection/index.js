@@ -31,10 +31,10 @@ const ConnectionIndicator = ({ className, connection }) => {
 }
 
 const ConnectionStatus = ({ connection }) => (
-  <>
+  <div style={{ display: 'flex' }}>
     <ConnectionIndicator className='sliceTileIndicatorLarge sliceTileIndicator' connection={connection} />
     <div className='sliceTileConnectionName'>{connection.current}</div>
-  </>
+  </div>
 )
 
 function getActiveConnection(primary, secondary) {
