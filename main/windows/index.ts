@@ -555,7 +555,7 @@ const init = () => {
       globalShortcut.unregister('Alt+/')
       globalShortcut.register('Alt+/', () => {
         app.toggle()
-        if (!store('main.mute.onboardingWindow')) {
+        if (store('windows.onboard.showing')) {
           send('onboard', 'main:flex', 'shortcutActivated')
         }
       })
