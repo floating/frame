@@ -124,7 +124,6 @@ ipcMain.on('tray:clipboardData', (e, data) => {
 })
 
 ipcMain.on('tray:installAvailableUpdate', (e, version) => {
-  store.dontRemind(version)
   store.updateBadge('')
 
   updater.fetchUpdate()
