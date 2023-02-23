@@ -490,7 +490,7 @@ const initial = {
           layer: 'testnet',
           isTestnet: true,
           name: 'Base Görli',
-          explorer: 'ttps://goerli-explorer.base.org',
+          explorer: 'https://goerli-explorer.base.org',
           gas: {
             price: {
               selected: 'standard',
