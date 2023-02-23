@@ -1,7 +1,7 @@
 {
-  "appId": "sh.frame.canary",
+  "appId": "sh.frame",
   "afterSign": "./build/notarize.js",
-  "productName": "Frame Canary",
+  "productName": "Frame",
   "linux": {
     "target": [
       {
