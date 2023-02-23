@@ -1,5 +1,5 @@
 {
-  "appId": "sh.frame",
+  "appId": "sh.frame.app",
   "afterSign": "./build/notarize.js",
   "productName": "Frame",
   "linux": {
