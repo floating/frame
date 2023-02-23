@@ -4,7 +4,7 @@ import link from '../../../../../resources/link'
 import svg from '../../../../../resources/svg'
 import Monitor from '../../../../../resources/Components/Monitor'
 
-import { Cluster, ClusterRow, ClusterValue } from '../../../../../resources/Components/Cluster'
+import { Cluster } from '../../../../../resources/Components/Cluster'
 
 class ChainsPreview extends React.Component {
   constructor(...args) {
@@ -50,9 +50,6 @@ class ChainsPreview extends React.Component {
   render() {
     const { address } = this.store('main.accounts', this.props.account)
 
-    const existingChainsIds =
-      Object.keys(this.store('main.networks.ethereum')).map((id) => parseInt(id)) || []
-
     const existingChains = Object.keys(this.store('main.networks.ethereum') || []).filter((chain) => {
       return chain && this.store('main.networks.ethereum', chain, 'on')
     })
@@ -61,7 +58,8 @@ class ChainsPreview extends React.Component {
     const currentChainMeta = this.store('main.networksMeta.ethereum', currentChainId)
     if (!currentChain || !currentChainMeta) return null
     const { name } = currentChain
-    const { icon, primaryColor } = currentChainMeta
+    const { primaryColor } = currentChainMeta
+
     return (
       <div className='balancesBlock' ref={this.moduleRef}>
         <div className='moduleHeader'>
@@ -83,11 +81,7 @@ class ChainsPreview extends React.Component {
           )}
         </div>
         <Cluster>
-          <Monitor
-            address={address}
-            chainId={existingChainsIds[this.state.index] || 1}
-            color={`var(--${primaryColor})`}
-          />
+          <Monitor address={address} chainId={currentChainId} color={`var(--${primaryColor})`} />
         </Cluster>
       </div>
     )
