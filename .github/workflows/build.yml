@@ -3,7 +3,7 @@ name: Build and publish installer artifacts for all platforms
 on:
   push:
     branches:
-      - '0.5'
+      - '0.6'
 
 env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
