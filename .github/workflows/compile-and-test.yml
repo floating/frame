@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - 'beta.*'
+      - 'canary'
       - 'develop'
   pull_request:
 
