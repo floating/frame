@@ -548,51 +548,54 @@ const migrations = {
       }
     }
 
-    // we removed support for the following goerli RPCs so reset the connections
-    // to defaults when the user was previously connecting to them
-    const removedGoerliRPCs = ['mudit', 'slockit', 'prylabs']
-    const goerli = initial.main.networks.ethereum[5]
-    const goerliPrimaryConnection = goerli.connection.primary.current
-    const goerliSecondaryConnection = goerli.connection.secondary.current
+    if ('5' in initial.main.networks.ethereum) {
+      // we removed support for the following goerli RPCs so reset the connections
+      // to defaults when the user was previously connecting to them
+      const removedGoerliRPCs = ['mudit', 'slockit', 'prylabs']
+      const goerli = initial.main.networks.ethereum[5]
+      const goerliPrimaryConnection = goerli.connection.primary.current
+      const goerliSecondaryConnection = goerli.connection.secondary.current
 
-    if (removedGoerliRPCs.includes(goerliPrimaryConnection)) {
-      initial.main.networks.ethereum[5] = {
-        ...goerli,
-        connection: {
-          ...goerli.connection,
-          primary: {
-            on: false,
-            current: 'custom',
-            status: 'loading',
-            connected: false,
-            type: '',
-            network: '',
-            custom: ''
+      if (removedGoerliRPCs.includes(goerliPrimaryConnection)) {
+        initial.main.networks.ethereum[5] = {
+          ...goerli,
+          connection: {
+            ...goerli.connection,
+            primary: {
+              on: false,
+              current: 'custom',
+              status: 'loading',
+              connected: false,
+              type: '',
+              network: '',
+              custom: ''
+            }
           }
         }
       }
-    }
-    if (removedGoerliRPCs.includes(goerliSecondaryConnection)) {
-      initial.main.networks.ethereum[5] = {
-        ...goerli,
-        connection: {
-          ...goerli.connection,
-          secondary: {
-            on: false,
-            current: 'custom',
-            status: 'loading',
-            connected: false,
-            type: '',
-            network: '',
-            custom: ''
+
+      if (removedGoerliRPCs.includes(goerliSecondaryConnection)) {
+        initial.main.networks.ethereum[5] = {
+          ...goerli,
+          connection: {
+            ...goerli.connection,
+            secondary: {
+              on: false,
+              current: 'custom',
+              status: 'loading',
+              connected: false,
+              type: '',
+              network: '',
+              custom: ''
+            }
           }
         }
       }
-    }
 
-    // if neither primary nor secondary is enabled then we switch the overall connection off
-    initial.main.networks.ethereum[5].connection.on =
-      goerli.connection.primary.on || goerli.connection.secondary.on
+      // if neither primary nor secondary is enabled then we switch the overall connection off
+      initial.main.networks.ethereum[5].connection.on =
+        goerli.connection.primary.on || goerli.connection.secondary.on
+    }
 
     return initial
   },
@@ -650,19 +653,24 @@ const migrations = {
     return initial
   },
   25: (initial) => {
-    const optimism = initial.main.networks.ethereum[10]
-    const removeOptimismConnection = (connection) => ({
-      ...connection,
-      current: connection.current === 'optimism' ? 'infura' : connection.current
-    })
+    // remove Optimism RPC connection presets and use Infura instead
+    if ('10' in initial.main.networks.ethereum) {
+      const removeOptimismConnection = (connection) => ({
+        ...connection,
+        current: connection.current === 'optimism' ? 'infura' : connection.current
+      })
 
-    initial.main.networks.ethereum[10] = {
-      ...optimism,
-      connection: {
-        primary: removeOptimismConnection(optimism.connection.primary),
-        secondary: removeOptimismConnection(optimism.connection.secondary)
+      const optimism = initial.main.networks.ethereum[10]
+
+      initial.main.networks.ethereum[10] = {
+        ...optimism,
+        connection: {
+          primary: removeOptimismConnection(optimism.connection.primary),
+          secondary: removeOptimismConnection(optimism.connection.secondary)
+        }
       }
     }
+
     return initial
   },
   26: (initial) => {
@@ -691,20 +699,28 @@ const migrations = {
     return initial
   },
   28: (initial) => {
-    const networkMeta = initial.main.networksMeta.ethereum
-    const {
-      5: {
-        nativeCurrency: { symbol: goerliSymbol }
-      },
-      11155111: {
-        nativeCurrency: { symbol: sepoliaSymbol }
+    const getUpdatedSymbol = (symbol, chainId) => {
+      return parseInt(chainId) === 5 ? 'görETH' : parseInt(chainId) === 11155111 ? 'sepETH' : symbol
+    }
+
+    const updatedMeta = Object.entries(initial.main.networksMeta.ethereum).map(([id, chainMeta]) => {
+      const { symbol, decimals } = chainMeta.nativeCurrency
+      const updatedSymbol = (symbol || '').toLowerCase() !== 'eth' ? symbol : getUpdatedSymbol(symbol, id)
+
+      const updatedChainMeta = {
+        ...chainMeta,
+        nativeCurrency: {
+          ...chainMeta.nativeCurrency,
+          symbol: updatedSymbol,
+          decimals: decimals || 18
+        }
       }
-    } = networkMeta
-    goerliSymbol === 'ETH' && (initial.main.networksMeta.ethereum[5].nativeCurrency.symbol = 'görETH')
-    sepoliaSymbol === 'ETH' && (initial.main.networksMeta.ethereum[11155111].nativeCurrency.symbol = 'sepETH')
-    Object.values(initial.main.networksMeta.ethereum).forEach((metadata) => {
-      metadata.nativeCurrency.decimals = metadata.nativeCurrency.decimals || 18
+
+      return [id, updatedChainMeta]
     })
+
+    initial.main.networksMeta.ethereum = Object.fromEntries(updatedMeta)
+
     return initial
   },
   29: (initial) => {
