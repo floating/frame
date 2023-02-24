@@ -2,9 +2,9 @@ import React, { useEffect } from 'react'
 
 import { Slide, SlideBody, SlideItem } from '../../styled'
 
-const Intro = ({ setTitle, setProceed, version }) => {
+const Intro = ({ setTitle, setProceed }) => {
   useEffect(() => {
-    setTitle(`Welcome to Frame v${version}!`)
+    setTitle(`Welcome to Frame Canary!`)
     setProceed({ action: 'next', text: "Let's go!" })
   }, [])
   return (
