@@ -235,7 +235,7 @@
       "distDir": "./bundle"
     }
   },
-  "repository": "github:floating/frame",
+  "repository": "github:frame-labs/frame-canary",
   "lavamoat": {
     "allowScripts": {
       "$root$": false,
