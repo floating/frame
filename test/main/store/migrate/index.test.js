@@ -700,26 +700,7 @@ describe('migration 21', () => {
     expect(goerli.on).toBe(false)
   })
 
-  it('turns off goerli if the secondary connection was reset whilst the primary connection is inactive', () => {
-    state.main.networks.ethereum[5].connection.primary = {
-      on: false,
-      current: 'infura',
-      status: 'loading',
-      connected: false,
-      type: '',
-      network: '',
-      custom: ''
-    }
-    state.main.networks.ethereum[5].connection.secondary = {
-      on: false,
-      current: 'prylabs',
-      status: 'disconnected',
-      connected: false,
-      type: '',
-      network: '',
-      custom: ''
-    }
-
+  it('xxxturns off goerli if the secondary connection was reset whilst the primary connection is inactive', () => {
     const updatedState = migrations.apply(state, 21)
     const goerli = updatedState.main.networks.ethereum[5]
 

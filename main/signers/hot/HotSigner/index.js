@@ -29,6 +29,7 @@ class HotSigner extends Signer {
   save(data) {
     // Construct signer
     const { id, addresses, type, network } = this
+    console.log({ id, addresses, type, network })
     const signer = { id, addresses, type, network, ...data }
 
     // Ensure signers directory exists

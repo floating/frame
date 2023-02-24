@@ -1,25 +1,35 @@
-const path = require('path')
-const fs = require('fs')
-const { ensureDirSync } = require('fs-extra')
-const { app } = require('electron')
-const log = require('electron-log')
-const bip39 = require('bip39')
-const zxcvbn = require('zxcvbn')
+// @ts-nocheck
 
-const crypt = require('../../crypt')
+import path from 'path'
+import fs from 'fs'
+import log from 'electron-log'
+import bip39 from 'bip39'
+import zxcvbn from 'zxcvbn'
+import { ensureDirSync } from 'fs-extra'
+import { app } from 'electron'
+import { stripHexPrefix } from '@ethereumjs/util'
 
-const SeedSigner = require('./SeedSigner')
-const RingSigner = require('./RingSigner')
-const { stripHexPrefix } = require('@ethereumjs/util')
+import crypt from '../../crypt'
+import { wait } from '../../../resources/utils'
+
+import SeedSigner from './SeedSigner'
+import RingSigner from './RingSigner'
+
+type HotSignerType = 'seed' | 'ring'
+
+interface HotSigner {
+  type: HotSignerType
+  addresses: Address[]
+  encryptedKeys: string[]
+  encryptedSeed: string
+}
 
 const USER_DATA = app
   ? app.getPath('userData')
   : path.resolve(path.dirname(require.main.filename), '../.userData')
 const SIGNERS_PATH = path.resolve(USER_DATA, 'signers')
 
-const wait = async (ms) => new Promise((resolve) => setTimeout(resolve, ms))
-
-module.exports = {
+export default {
   newPhrase: (cb) => {
     cb(null, bip39.generateMnemonic())
   },
@@ -88,7 +98,7 @@ module.exports = {
     })
   },
   scan: (signers) => {
-    const storedSigners = {}
+    const storedSigners: Record<string, HotSigner> = {}
 
     const scan = async () => {
       // Ensure signer directory exists
