@@ -785,6 +785,14 @@ describe('migration 21', () => {
 
     expect(goerli.on).toBe(false)
   })
+
+  it('takes no action on goerli if the chain is not present', () => {
+    delete state.main.networks.ethereum[5]
+
+    const updatedState = migrations.apply(state, 21)
+
+    expect(Object.keys(updatedState.main.networks.ethereum)).toEqual(['11155111'])
+  })
 })
 
 describe('migration 22', () => {
@@ -967,6 +975,14 @@ describe('migration 25', () => {
 
       expect(optimism.connection[priority].current).toBe('custom')
     })
+
+    it('takes no action if no Optimism chain is present', () => {
+      delete state.main.networks.ethereum[10]
+
+      const updatedState = migrations.apply(state, 25)
+
+      expect(updatedState.main.networks).toStrictEqual({ ethereum: {} })
+    })
   })
 })
 
@@ -1099,6 +1115,22 @@ describe('migration 28', () => {
     const updatedState = migrations.apply(state, 28)
     const metadata = updatedState.main.networksMeta.ethereum
     expect(metadata[5].nativeCurrency.decimals).toBe(18)
+  })
+
+  it('takes no action on Goerli if the chain is not present', () => {
+    delete state.main.networksMeta.ethereum[5]
+
+    const updatedState = migrations.apply(state, 28)
+
+    expect(Object.keys(updatedState.main.networksMeta.ethereum)).toEqual(['11155111'])
+  })
+
+  it('takes no action on Sepolia if the chain is not present', () => {
+    delete state.main.networksMeta.ethereum[11155111]
+
+    const updatedState = migrations.apply(state, 28)
+
+    expect(Object.keys(updatedState.main.networksMeta.ethereum)).toEqual(['5'])
   })
 })
 
