@@ -3,7 +3,7 @@ name: Build and publish canary release
 on:
   push:
     branches:
-      - 'develop'
+      - 'canary'
   workflow_dispatch:
 
 env:
