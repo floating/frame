@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import path from 'path'
 import fs from 'fs'
 import log from 'electron-log'
@@ -9,50 +7,38 @@ import { ensureDirSync } from 'fs-extra'
 import { app } from 'electron'
 import { stripHexPrefix } from '@ethereumjs/util'
 
-import crypt from '../../crypt'
+import { stringToKey } from '../../crypt'
 import { wait } from '../../../resources/utils'
 
-import SeedSigner from './SeedSigner'
-import RingSigner from './RingSigner'
+import SeedSigner, { SeedSignerData } from './SeedSigner'
+import RingSigner, { RingSignerData } from './RingSigner'
 
-type HotSignerType = 'seed' | 'ring'
+import type { Signers } from '..'
+import type Signer from '../Signer'
 
-interface HotSigner {
+export interface HotSignerData {
   type: HotSignerType
   addresses: Address[]
-  encryptedKeys: string[]
-  encryptedSeed: string
 }
 
+// TODO: remove this when updating tests
 const USER_DATA = app
   ? app.getPath('userData')
-  : path.resolve(path.dirname(require.main.filename), '../.userData')
+  : // @ts-ignore
+    path.resolve(path.dirname(require.main.filename), '../.userData')
 const SIGNERS_PATH = path.resolve(USER_DATA, 'signers')
 
 export default {
-  newPhrase: (cb) => {
+  newPhrase: (cb: Callback<string>) => {
     cb(null, bip39.generateMnemonic())
   },
-  createFromSeed: (signers, seed, password, cb) => {
-    if (!seed) return cb(new Error('Seed required to create hot signer'))
-    if (!password) return cb(new Error('Password required to create hot signer'))
-    if (password.length < 12) return cb(new Error('Hot account password is too short'))
-    if (zxcvbn(password).score < 3) return cb(new Error('Hot account password is too weak'))
-    const signer = new SeedSigner()
-    signer.addSeed(seed, password, (err, result) => {
-      if (err) {
-        signer.close()
-        return cb(err)
-      }
-      signers.add(signer)
-      cb(null, signer)
-    })
-  },
-  createFromPhrase: (signers, phrase, password, cb) => {
+  createFromPhrase: (signers: Signers, phrase: string, password: string, cb: Callback<Signer>) => {
+    console.log('CREATING FROM PHRASE', { phrase, password })
     if (!phrase) return cb(new Error('Phrase required to create hot signer'))
     if (!password) return cb(new Error('Password required to create hot signer'))
     if (password.length < 12) return cb(new Error('Hot account password is too short'))
     if (zxcvbn(password).score < 3) return cb(new Error('Hot account password is too weak'))
+
     const signer = new SeedSigner()
     signer.addPhrase(phrase, password, (err) => {
       if (err) {
@@ -63,15 +49,15 @@ export default {
       cb(null, signer)
     })
   },
-  createFromPrivateKey: (signers, privateKey, password, cb) => {
+  createFromPrivateKey: (signers: Signers, privateKey: string, password: string, cb: Callback<Signer>) => {
     const privateKeyHex = stripHexPrefix(privateKey)
 
     if (!privateKeyHex) return cb(new Error('Private key required to create hot signer'))
     if (!password) return cb(new Error('Password required to create hot signer'))
     if (password.length < 12) return cb(new Error('Hot account password is too short'))
     if (zxcvbn(password).score < 3) return cb(new Error('Hot account password is too weak'))
-    const signer = new RingSigner()
 
+    const signer = new RingSigner()
     signer.addPrivateKey(privateKeyHex, password, (err) => {
       if (err) {
         signer.close()
@@ -81,7 +67,13 @@ export default {
       cb(null, signer)
     })
   },
-  createFromKeystore: (signers, keystore, keystorePassword, password, cb) => {
+  createFromKeystore: (
+    signers: Signers,
+    keystore: any,
+    keystorePassword: string,
+    password: string,
+    cb: Callback<Signer>
+  ) => {
     if (!keystore) return cb(new Error('Keystore required'))
     if (!keystorePassword) return cb(new Error('Keystore password required'))
     if (!password) return cb(new Error('Password required to create hot signer'))
@@ -97,8 +89,8 @@ export default {
       cb(null, signer)
     })
   },
-  scan: (signers) => {
-    const storedSigners: Record<string, HotSigner> = {}
+  scan: (signers: Signers) => {
+    const storedSigners: Record<string, HotSignerData> = {}
 
     const scan = async () => {
       // Ensure signer directory exists
@@ -117,14 +109,21 @@ export default {
       // Add stored signers
       for (const id of Object.keys(storedSigners)) {
         await wait(100)
-        const { addresses, encryptedKeys, encryptedSeed, type, network } = storedSigners[id]
+        const signerData = storedSigners[id]
+        const { addresses, type } = signerData
+
         if (addresses && addresses.length) {
-          const id = crypt.stringToKey(addresses.join()).toString('hex')
+          const id = stringToKey(addresses.join()).toString('hex')
           if (!signers.exists(id)) {
             if (type === 'seed') {
-              signers.add(new SeedSigner({ network, addresses, encryptedSeed }))
+              const { encryptedSeed } = signerData as SeedSignerData
+              const signer = SeedSigner.fromStoredData({ addresses, encryptedSeed })
+              signers.add(signer)
             } else if (type === 'ring') {
-              signers.add(new RingSigner({ network, addresses, encryptedKeys }))
+              const { encryptedKeys } = signerData as RingSignerData
+              const signer = RingSigner.fromStoredData({ addresses, encryptedKeys })
+
+              signers.add(signer)
             }
           }
         }
