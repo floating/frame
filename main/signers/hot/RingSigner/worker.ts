@@ -18,7 +18,6 @@ import type {
   SignTypedDataParams,
   TransactionParams,
   UnlockParams,
-  WorkerMessageHandler,
   WorkerMethod
 } from '../HotSigner/types'
 

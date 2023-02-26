@@ -19,7 +19,6 @@ import type {
   SignTypedDataParams,
   TransactionParams,
   UnlockParams,
-  WorkerMessageHandler,
   WorkerMethod
 } from '../HotSigner/types'
 
@@ -33,7 +32,7 @@ function isSeedSignerMethod(method: string): method is CoreWorkerMethod | SeedSi
   return isHotSignerMethod(method) || ['encryptSeed'].includes(method)
 }
 
-export default class SeedSignerWorker implements HotSignerWorker, WorkerMessageHandler {
+export default class SeedSignerWorker implements HotSignerWorker {
   private seed: string | null = null
 
   handleMessage(cb: PseudoCallback<unknown>, method: WorkerMethod, params: any) {
