@@ -55,7 +55,6 @@ export default class HotSigner extends Signer {
     // TODO: remove stdio inherit after done debugging
     this.worker = fork(WORKER_PATH, [type], { stdio: 'inherit' })
     this.getToken()
-    this.ready = false
   }
 
   // TODO: determine type of data
