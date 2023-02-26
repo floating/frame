@@ -146,7 +146,7 @@ export class HotSignerWorkerController {
 
     const workerMethod = this.worker[method]
     if (workerMethod) {
-      // @ts-ignore TODO
+      // @ts-ignore TODO: how to make the types work here
       return workerMethod.call(this.worker, pseudoCallback, params)
     }
 
