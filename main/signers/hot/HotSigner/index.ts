@@ -12,7 +12,7 @@ import store from '../../../store'
 
 import type { TransactionData } from '../../../../resources/domain/transaction'
 import type { TypedMessage } from '../../../accounts/types'
-import { RPCMessage, RPCMethod, WorkerMessage, WorkerRPCMessage, WorkerTokenMessage } from './types'
+import type { RPCMessage, RPCMethod, WorkerMessage, WorkerRPCMessage, WorkerTokenMessage } from './types'
 
 // TODO: remove these when updating tests
 const windows = app ? require('../../../windows') : { broadcast: () => {} }
@@ -44,6 +44,11 @@ export default class HotSigner extends Signer {
 
     // TODO: remove stdio inherit after done debugging
     this.worker = fork(WORKER_PATH, [type], { stdio: 'inherit' })
+
+    this.worker.on('exit', (code) => {
+      log.error('Hot signer worker exited with code:', code)
+    })
+
     this.getToken()
   }
 

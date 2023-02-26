@@ -5,7 +5,7 @@ import {
   signMessage,
   signTransaction,
   signTypedData
-} from '../HotSigner/worker'
+} from '../HotSigner/controller'
 
 import type {
   AddKeyParams,
