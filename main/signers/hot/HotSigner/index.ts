@@ -42,12 +42,12 @@ export default class HotSigner extends Signer {
     this.type = type
     this.status = 'locked'
 
-    // TODO: remove stdio inherit after done debugging
-    this.worker = fork(WORKER_PATH, [type], { stdio: 'inherit' })
+    this.worker = fork(WORKER_PATH, [type])
 
-    this.worker.on('exit', (code) => {
-      log.error('Hot signer worker exited with code:', code)
-    })
+    // TODO: add when worker is mocked in tests
+    // this.worker.on('exit', (code) => {
+    //   log.error('Hot signer worker exited with code:', code)
+    // })
 
     this.getToken()
   }
