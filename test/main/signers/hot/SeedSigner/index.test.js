@@ -3,18 +3,36 @@ import { remove } from 'fs-extra'
 import { generateMnemonic } from 'bip39'
 import log from 'electron-log'
 
+import hot from '../../../../../main/signers/hot'
+
 const PASSWORD = 'fr@///3_password'
 const SIGNER_PATH = path.resolve(__dirname, '../.userData/signers')
 
 jest.mock('electron')
 jest.mock('../../../../../main/store/persist')
 
+jest.mock('path', () => {
+  const original = jest.requireActual('path')
+
+  return {
+    ...original,
+    resolve: (...args) => {
+      // TODO: this can be cleaned up once tests are re-worked
+      if (args.includes('worker.js')) {
+        return original.resolve(__dirname, '../../../../../compiled/main/signers/hot/HotSigner/worker.js')
+      }
+
+      return original.resolve(...args)
+    }
+  }
+})
+
 // Stubs
 const signers = { add: () => {} }
 // Util
 const clean = () => remove(SIGNER_PATH)
 
-let hot, store
+let store
 
 describe('Seed signer', () => {
   let signer
@@ -24,7 +42,6 @@ describe('Seed signer', () => {
 
     clean()
 
-    hot = await import('../../../../../main/signers/hot')
     store = require('../../../../../main/store').default
   })
 

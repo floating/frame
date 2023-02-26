@@ -205,7 +205,7 @@ export default class HotSigner extends Signer {
       if (msg.type === 'rpc') {
         const message = msg as WorkerRPCMessage
 
-        if (message.id) {
+        if (message.id === id) {
           const response = message as WorkerRPCMessage
           const error = response.error ? new Error(response.error) : null
           cb(error, response.result)

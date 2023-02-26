@@ -33,7 +33,6 @@ export default {
     cb(null, bip39.generateMnemonic())
   },
   createFromPhrase: (signers: Signers, phrase: string, password: string, cb: Callback<Signer>) => {
-    console.log('CREATING FROM PHRASE', { phrase, password })
     if (!phrase) return cb(new Error('Phrase required to create hot signer'))
     if (!password) return cb(new Error('Password required to create hot signer'))
     if (password.length < 12) return cb(new Error('Hot account password is too short'))

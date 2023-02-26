@@ -145,8 +145,9 @@ export class HotSignerWorkerController {
     }
 
     // Verify token
-    if (!crypto.timingSafeEqual(Buffer.from(token), Buffer.from(this.token)))
+    if (!crypto.timingSafeEqual(Buffer.from(token), Buffer.from(this.token))) {
       return pseudoCallback('Invalid token')
+    }
 
     if (method === 'verifyAddress') {
       return this.verifyAddress(params, pseudoCallback)
@@ -185,4 +186,6 @@ export class HotSignerWorkerController {
   }
 }
 
-const worker = new HotSignerWorkerController(process.argv[2] as HotSignerType)
+if (process.argv[1].endsWith('HotSigner/worker.js')) {
+  new HotSignerWorkerController(process.argv[2] as HotSignerType)
+}
