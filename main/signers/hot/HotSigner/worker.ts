@@ -14,10 +14,15 @@ import {
 import RingSignerWorker from '../RingSigner/worker'
 import SeedSignerWorker from '../SeedSigner/worker'
 
-import type { WorkerTokenMessage, WorkerRPCMessage } from '.'
 import type { TypedMessage } from '../../../accounts/types'
 import type { TransactionData } from '../../../../resources/domain/transaction'
-import type { HotSignerWorker, PseudoCallback, RPCMessage } from './types'
+import type {
+  HotSignerWorker,
+  PseudoCallback,
+  RPCMessage,
+  WorkerRPCMessage,
+  WorkerTokenMessage
+} from './types'
 
 function chainConfig(chain: number, hardfork: string) {
   const chainId = BigInt(chain)
@@ -35,6 +40,10 @@ function sendToMainProcess(message: WorkerTokenMessage | WorkerRPCMessage) {
 
 function sendToken(token: string) {
   sendToMainProcess({ type: 'token', token })
+}
+
+export function isHotSignerMethod(method: string) {
+  return ['lock', 'unlock', 'signMessage', 'signTypedData', 'signTransaction'].includes(method)
 }
 
 export function signMessage(key: Buffer, message: string, cb: PseudoCallback<string>) {
@@ -138,20 +147,12 @@ export class HotSignerWorkerController {
     // Verify token
     if (!crypto.timingSafeEqual(Buffer.from(token), Buffer.from(this.token)))
       return pseudoCallback('Invalid token')
-    // If method exists -> execute
 
     if (method === 'verifyAddress') {
       return this.verifyAddress(params, pseudoCallback)
     }
 
-    const workerMethod = this.worker[method]
-    if (workerMethod) {
-      // @ts-ignore TODO: how to make the types work here
-      return workerMethod.call(this.worker, pseudoCallback, params)
-    }
-
-    // return error if worker doesn't support method
-    pseudoCallback(`Invalid method: '${method}'`)
+    this.worker.handleMessage(pseudoCallback, method, params)
   }
 
   verifyAddress(
@@ -169,11 +170,13 @@ export class HotSignerWorkerController {
       if (signature.length !== 65) return pseudoCallback('Frame verifyAddress signature has incorrect length')
       // Verify address
       const vNum = signature[64]
+
       const v = BigInt(vNum === 0 || vNum === 1 ? vNum + 27 : vNum)
       const r = toBuffer(signature.slice(0, 32))
       const s = toBuffer(signature.slice(32, 64))
       const hash = hashPersonalMessage(toBuffer(message))
       const verifiedAddress = '0x' + pubToAddress(ecrecover(hash, v, r, s)).toString('hex')
+
       // Return result
       pseudoCallback(null, verifiedAddress.toLowerCase() === address.toLowerCase())
     }
@@ -182,4 +185,4 @@ export class HotSignerWorkerController {
   }
 }
 
-const worker = new HotSignerWorkerController(process.argv[2] as any)
+const worker = new HotSignerWorkerController(process.argv[2] as HotSignerType)

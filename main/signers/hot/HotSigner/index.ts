@@ -12,6 +12,7 @@ import store from '../../../store'
 
 import type { TransactionData } from '../../../../resources/domain/transaction'
 import type { TypedMessage } from '../../../accounts/types'
+import { RPCMessage, RPCMethod, WorkerMessage, WorkerRPCMessage, WorkerTokenMessage } from './types'
 
 // TODO: remove these when updating tests
 const windows = app ? require('../../../windows') : { broadcast: () => {} }
@@ -24,20 +25,9 @@ const USER_DATA = app
 const SIGNERS_PATH = path.resolve(USER_DATA, 'signers')
 const WORKER_PATH = path.resolve(__dirname, 'worker.js')
 
-type WorkerMessageType = 'rpc' | 'token'
-
-type WorkerMessage = {
-  type: WorkerMessageType
-}
-
-export type WorkerTokenMessage = WorkerMessage & {
-  token: string
-}
-
-export type WorkerRPCMessage = WorkerMessage & {
-  id: string
-  error?: string
-  result?: unknown
+type RPCMessagePayload = {
+  method: RPCMethod
+  params?: any
 }
 
 export default class HotSigner extends Signer {
@@ -57,7 +47,6 @@ export default class HotSigner extends Signer {
     this.getToken()
   }
 
-  // TODO: determine type of data
   protected save(data?: any) {
     // Construct signer
     const { id, addresses, type } = this
@@ -97,7 +86,6 @@ export default class HotSigner extends Signer {
     })
   }
 
-  // TODO: determine type of data
   unlock(password: string, data: any, cb: ErrorOnlyCallback) {
     const params = { password, ...data }
 
@@ -144,22 +132,23 @@ export default class HotSigner extends Signer {
   }
 
   signMessage(index: number, message: string, cb: Callback<string>) {
-    const payload = { method: 'signMessage', params: { index, message } }
+    const payload = { method: 'signMessage', params: { index, message } } as const
     this.callWorker(payload, cb as Callback<unknown>)
   }
 
   signTypedData(index: number, typedMessage: TypedMessage, cb: Callback<string>) {
-    const payload = { method: 'signTypedData', params: { index, typedMessage } }
+    const payload = { method: 'signTypedData', params: { index, typedMessage } } as const
     this.callWorker(payload, cb as Callback<unknown>)
   }
 
   signTransaction(index: number, rawTx: TransactionData, cb: Callback<string>) {
-    const payload = { method: 'signTransaction', params: { index, rawTx } }
+    const payload = { method: 'signTransaction', params: { index, rawTx } } as const
     this.callWorker(payload, cb as Callback<unknown>)
   }
 
   verifyAddress(index: number, address: string, display: boolean, cb: Callback<boolean>) {
-    const payload = { method: 'verifyAddress', params: { index, address } }
+    const payload = { method: 'verifyAddress', params: { index, address } } as const
+
     this.callWorker(payload, (err, isVerified) => {
       const verified = isVerified as boolean
 
@@ -205,7 +194,7 @@ export default class HotSigner extends Signer {
     this.worker.addListener('message', listener)
   }
 
-  protected callWorker(payload: any, cb: Callback<unknown>): void {
+  protected callWorker(payload: RPCMessagePayload, cb: Callback<unknown>): void {
     if (!this.worker) throw Error('Worker not running')
     // If token not yet received -> retry in 100 ms
     if (!this.token) return void setTimeout(() => this.callWorker(payload, cb), 100)
@@ -226,7 +215,10 @@ export default class HotSigner extends Signer {
     }
 
     this.worker.addListener('message', listener)
+
     // Make RPC call
-    this.worker.send({ id, token: this.token, ...payload })
+    const { method, params } = payload
+    const message: RPCMessage = { id, token: this.token, method, params }
+    this.worker.send(message)
   }
 }

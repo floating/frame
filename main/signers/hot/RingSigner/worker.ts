@@ -1,14 +1,25 @@
-import { decrypt, encrypt, signMessage, signTransaction, signTypedData } from '../HotSigner/worker'
+import {
+  decrypt,
+  encrypt,
+  isHotSignerMethod,
+  signMessage,
+  signTransaction,
+  signTypedData
+} from '../HotSigner/worker'
 
 import type {
   AddKeyParams,
+  CoreWorkerMethod,
   HotSignerWorker,
   PseudoCallback,
   RemoveKeyParams,
+  RingSignerMethod,
   SignMessageParams,
   SignTypedDataParams,
   TransactionParams,
-  UnlockParams
+  UnlockParams,
+  WorkerMessageHandler,
+  WorkerMethod
 } from '../HotSigner/types'
 
 function decryptKeys(encryptedKeys: string, password: string) {
@@ -21,8 +32,20 @@ function encryptKeys(keys: string[], password: string) {
   return encrypt(keyString, password)
 }
 
+function isRingSignerMethod(method: string): method is RingSignerMethod | CoreWorkerMethod {
+  return isHotSignerMethod(method) || ['addKey', 'removeKey'].includes(method)
+}
+
 export default class RingSignerWorker implements HotSignerWorker {
   private keys: Buffer[] | null = null
+
+  handleMessage(cb: PseudoCallback<unknown>, method: WorkerMethod, params: any) {
+    if (isRingSignerMethod(method)) {
+      return this[method](cb, params)
+    }
+
+    cb(`Invalid method: '${method}'`)
+  }
 
   unlock(cb: PseudoCallback<never>, { encryptedSecret: encryptedKeys, password }: UnlockParams) {
     try {

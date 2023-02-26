@@ -1,15 +1,26 @@
 import hdKey from 'hdkey'
 
-import { decrypt, encrypt, signMessage, signTransaction, signTypedData } from '../HotSigner/worker'
+import {
+  decrypt,
+  encrypt,
+  isHotSignerMethod,
+  signMessage,
+  signTransaction,
+  signTypedData
+} from '../HotSigner/worker'
 
 import type {
+  CoreWorkerMethod,
   EncryptSeedParams,
   HotSignerWorker,
   PseudoCallback,
+  SeedSignerMethod,
   SignMessageParams,
   SignTypedDataParams,
   TransactionParams,
-  UnlockParams
+  UnlockParams,
+  WorkerMessageHandler,
+  WorkerMethod
 } from '../HotSigner/types'
 
 function derivePrivateKey(index: number, seed: string) {
@@ -18,8 +29,20 @@ function derivePrivateKey(index: number, seed: string) {
   return key.privateKey
 }
 
-export default class SeedSignerWorker implements HotSignerWorker {
+function isSeedSignerMethod(method: string): method is CoreWorkerMethod | SeedSignerMethod {
+  return isHotSignerMethod(method) || ['encryptSeed'].includes(method)
+}
+
+export default class SeedSignerWorker implements HotSignerWorker, WorkerMessageHandler {
   private seed: string | null = null
+
+  handleMessage(cb: PseudoCallback<unknown>, method: WorkerMethod, params: any) {
+    if (isSeedSignerMethod(method)) {
+      return this[method](cb, params)
+    }
+
+    cb(`Invalid method: '${method}'`)
+  }
 
   unlock(cb: PseudoCallback<never>, { encryptedSecret: encryptedSeed, password }: UnlockParams) {
     try {
