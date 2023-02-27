@@ -206,14 +206,13 @@ export default class HotSigner extends Signer {
     // Generate message id
     const id = uuid()
     // Handle response
-    const listener = (msg: WorkerMessage) => {
-      if (msg.type === 'rpc') {
-        const message = msg as WorkerRPCMessage
+    const listener = (message: WorkerMessage) => {
+      if (message.type === 'rpc') {
+        const rpcMessage = message as WorkerRPCMessage
 
-        if (message.id === id) {
-          const response = message as WorkerRPCMessage
-          const error = response.error ? new Error(response.error) : null
-          cb(error, response.result)
+        if (rpcMessage.id === id) {
+          const error = rpcMessage.error ? new Error(rpcMessage.error) : null
+          cb(error, rpcMessage.result)
           this.worker.removeListener('message', listener)
         }
       }
