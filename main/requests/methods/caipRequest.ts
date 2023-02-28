@@ -52,6 +52,7 @@ export default function (rpcRequest: RPCRequestPayload) {
   }
 
   const errorMessage = result.error.issues[0].message
+  const field = result.error.issues[0].path.pop()
 
-  throw new Error(errorMessage)
+  throw new Error(`${errorMessage}: ${field}`)
 }
