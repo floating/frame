@@ -1,7 +1,7 @@
 import { mapRequest } from '../../../main/requests'
 
 describe('#mapRequest', () => {
-  it('passes through a request that does require mapping', () => {
+  it('passes through a request that does not require mapping', () => {
     const request = {
       jsonrpc: '2.0',
       id: 4,
