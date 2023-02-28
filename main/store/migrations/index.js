@@ -857,6 +857,23 @@ const migrations = {
     }
 
     return initial
+  },
+  34: (initial) => {
+    const nativeCurrencyNameMap = {
+      5: 'Görli Ether',
+      10: 'Ether',
+      42161: 'Ether'
+    }
+
+    Object.values(initial.main.networks.ethereum).forEach((network) => {
+      const { id } = network
+      if (initial.main.networksMeta.ethereum[id]) {
+        initial.main.networksMeta.ethereum[id].nativeCurrency.name =
+          initial.main.networksMeta.ethereum[id].nativeCurrency.name || nativeCurrencyNameMap[id] || ''
+      }
+    })
+
+    return initial
   }
 }
 
