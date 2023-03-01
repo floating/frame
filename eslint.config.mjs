@@ -107,6 +107,7 @@ export default [
       'resources/svg/index.js',
       'test/app/**/*.js',
       'test/resources/Components/**/*.js',
+      'test/resources/Hooks/**/*.js',
       'test/jest.svg.js'
     ],
     plugins: {
