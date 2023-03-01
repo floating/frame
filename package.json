@@ -30,7 +30,7 @@
     "launch:dev:worker": "cross-env NODE_ENV=development LOG_WORKER=true electron ./compiled/main",
     "launch:inspect": "cross-env NODE_ENV=production electron --inspect ./compiled/main",
     "lint": "ESLINT_USE_FLAT_CONFIG=true eslint -c eslint.config.mjs .",
-    "lint:fix": "eslint --fix .",
+    "lint:fix": "ESLINT_USE_FLAT_CONFIG=true eslint -c eslint.config.mjs --fix .",
     "format": "prettier --write '**/*.{yml,json,md,html,ts,js}'",
     "format:check": "prettier --check '**/*.{yml,json,md,html,ts,js}'",
     "prod": "npm run compile && npm run bundle && npm run launch",
