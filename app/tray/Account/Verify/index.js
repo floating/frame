@@ -58,7 +58,6 @@ class Verify extends React.Component {
 
   render() {
     const signerType = this.store('main.accounts', this.props.id, 'lastSignerType')
-    const account = this.store('main.accounts', this.props.id)
     const buttonClasses = ['moduleButton']
 
     if (this.state.verifyInProgress) {

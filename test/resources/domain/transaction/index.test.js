@@ -1,9 +1,4 @@
-import {
-  normalizeChainId,
-  parseChainId,
-  typeSupportsBaseFee,
-  usesBaseFee
-} from '../../../../resources/domain/transaction'
+import { normalizeChainId, typeSupportsBaseFee, usesBaseFee } from '../../../../resources/domain/transaction'
 
 describe('#typeSupportsBaseFee', () => {
   it('does not support a base fee for type 0', () => {

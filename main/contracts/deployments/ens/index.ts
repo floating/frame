@@ -17,7 +17,7 @@ import type { DecodableContract } from '../../../transaction/actions'
 // TODO: fix typing on contract types
 type EnsContract = DecodableContract<unknown>
 
-namespace ENS {
+declare module ENS {
   export type Register = {
     name: string
     owner: string

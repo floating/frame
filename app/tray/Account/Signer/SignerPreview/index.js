@@ -138,9 +138,6 @@ class Signer extends React.Component {
 
     const hardwareSigner = isHardwareSigner(activeAccount.lastSignerType)
     const watchOnly = isWatchOnly(activeAccount)
-    const status = this.getCurrentStatus(activeSigner, hardwareSigner)
-
-    const account = this.store('main.accounts', this.props.id)
 
     return (
       <div className='balancesBlock' ref={this.moduleRef}>

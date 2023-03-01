@@ -786,7 +786,7 @@ initial.main.origins = Object.entries(initial.main.origins).reduce((origins, [id
 }, {})
 
 initial.main.knownExtensions = Object.fromEntries(
-  Object.entries(initial.main.knownExtensions).filter(([id, allowed]) => allowed)
+  Object.entries(initial.main.knownExtensions).filter(([_id, allowed]) => allowed)
 )
 
 initial.main.dapps = Object.fromEntries(

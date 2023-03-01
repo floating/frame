@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 
 import link from '../../../../../resources/link'
 import { Cluster } from '../../../../../resources/Components/Cluster'
@@ -17,7 +17,7 @@ import {
   EditNativeCurrencyIcon
 } from '../Components'
 
-export default (props) => {
+const ChainExpanded = (props) => {
   // props
   const {
     id,
@@ -31,7 +31,6 @@ export default (props) => {
     primaryColor,
     icon,
     nativeCurrencyIcon,
-    price,
     nativeCurrencyName
   } = props
   const chain = { id, type, name, isTestnet, symbol, explorer, primaryColor }
@@ -125,3 +124,5 @@ export default (props) => {
     </div>
   )
 }
+
+export default ChainExpanded

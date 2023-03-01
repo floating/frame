@@ -12,7 +12,7 @@ import link from '../resources/link'
 
 import * as actions from '../resources/store/actions.panel'
 
-export default (state, cb) => {
+export default (state, _cb) => {
   const store = Restore.create(state, actions)
   store.events = new EventEmitter()
 

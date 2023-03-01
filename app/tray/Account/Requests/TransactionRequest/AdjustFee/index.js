@@ -89,7 +89,7 @@ const FeeOverlayInput = ({ initialValue, labelText, tabIndex, decimals, onReceiv
           className='txFeeOverlayInput'
           aria-labelledby={labelId}
           onChange={(e) => {
-            const parsedInput = (decimals ? /[0-9\.]*/ : /[0-9]*/).exec(e.target.value)
+            const parsedInput = (decimals ? /[0-9.]*/ : /[0-9]*/).exec(e.target.value)
             const enteredValue = parsedInput[0] || ''
 
             if (enteredValue === '.' || enteredValue === '') return setValue(enteredValue)

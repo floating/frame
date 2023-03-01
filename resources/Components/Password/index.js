@@ -26,7 +26,7 @@ export const PasswordInput = ({ getError: getInputError, next, title, buttonText
   const getError = () =>
     inputRef.current.value ? getInputError(inputRef.current.value) || '' : NO_PASSWORD_ENTERED
 
-  const validateInput = (e) => {
+  const validateInput = () => {
     const err = getError()
     if (err) {
       setDisabled(true)

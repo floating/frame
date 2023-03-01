@@ -1,6 +1,5 @@
-import React from 'react'
 import Restore from 'react-restore'
-import { render } from '../../../../../componentSetup'
+import { screen, render } from '../../../../../componentSetup'
 
 import store from '../../../../../../main/store'
 import link from '../../../../../../resources/link'
@@ -29,12 +28,12 @@ describe('selecting a keystore', () => {
       cb('ERROR HERE')
     })
 
-    const { user, getAllByRole } = render(<AddKeystore accountData={{}} />, { advanceTimersAfterInput: 650 })
-    const selectKeystoreButton = getAllByRole('button')[index]
+    const { user } = render(<AddKeystore accountData={{}} />, { advanceTimersAfterInput: 650 })
+    const selectKeystoreButton = screen.getAllByRole('button')[index]
 
     await user.click(selectKeystoreButton)
 
-    expect(getAllByRole('button')[index].textContent).toBe('ERROR HERE')
+    expect(screen.getAllByRole('button')[index].textContent).toBe('ERROR HERE')
   })
 
   it('should update the navigation with the keystore password entry screen when a keystore file is located', async () => {
@@ -43,8 +42,8 @@ describe('selecting a keystore', () => {
       cb(null, keystore)
     })
 
-    const { user, getAllByRole } = render(<AddKeystore accountData={{}} />, { advanceTimersAfterInput: true })
-    const selectKeystoreButton = getAllByRole('button')[index]
+    const { user } = render(<AddKeystore accountData={{}} />, { advanceTimersAfterInput: true })
+    const selectKeystoreButton = screen.getAllByRole('button')[index]
 
     await user.click(selectKeystoreButton)
 
@@ -63,14 +62,14 @@ describe('selecting a keystore', () => {
 
 describe('entering keystore password', () => {
   it('should update the navigation to the confirmation screen when a password is submitted', async () => {
-    const { user, getAllByRole } = render(<AddKeystore accountData={{ keystore }} />, {
+    const { user } = render(<AddKeystore accountData={{ keystore }} />, {
       advanceTimersAfterInput: true
     })
-    const passwordEntryTextArea = getAllByRole('textbox')[0]
+    const passwordEntryTextArea = screen.getAllByRole('textbox')[0]
 
     await user.type(passwordEntryTextArea, keystorePassword)
 
-    const continueButton = getAllByRole('button')[0]
+    const continueButton = screen.getAllByRole('button')[0]
     await user.click(continueButton)
 
     expect(link.send).toHaveBeenCalledWith('nav:forward', 'dash', {
@@ -89,14 +88,14 @@ describe('entering keystore password', () => {
 
 describe('entering signer password', () => {
   it('should update the navigation to the confirmation screen when a password is submitted', async () => {
-    const { user, getAllByRole } = render(<AddKeystore accountData={{ secret: keystore }} />, {
+    const { user } = render(<AddKeystore accountData={{ secret: keystore }} />, {
       advanceTimersAfterInput: true
     })
-    const passwordEntryTextArea = getAllByRole('textbox')[1]
+    const passwordEntryTextArea = screen.getAllByRole('textbox')[1]
 
     await user.type(passwordEntryTextArea, signerPassword)
 
-    const createButton = getAllByRole('button')[1]
+    const createButton = screen.getAllByRole('button')[1]
     await user.click(createButton)
     expect(link.send).toHaveBeenCalledWith('nav:forward', 'dash', {
       view: 'accounts',
@@ -115,14 +114,14 @@ describe('entering signer password', () => {
 
 describe('confirming signer password', () => {
   it('should try to create keystore account when a matching password is submitted', async () => {
-    const { user, getAllByRole } = render(
+    const { user } = render(
       <AddKeystore
         accountData={{ secret: keystore, password: signerPassword, creationArgs: [keystorePassword] }}
       />,
       { advanceTimersAfterInput: true }
     )
-    const confirmInput = getAllByRole('textbox')[2]
-    const confirmButton = getAllByRole('button')[2]
+    const confirmInput = screen.getAllByRole('textbox')[2]
+    const confirmButton = screen.getAllByRole('button')[2]
     await user.type(confirmInput, signerPassword)
 
     await user.click(confirmButton)
@@ -136,14 +135,14 @@ describe('confirming signer password', () => {
   })
 
   it('should remove the previous screens related to adding an account from the navigation', async () => {
-    const { user, getAllByRole } = render(
+    const { user } = render(
       <AddKeystore
         accountData={{ secret: keystore, password: signerPassword, creationArgs: [keystorePassword] }}
       />,
       { advanceTimersAfterInput: true }
     )
-    const confirmInput = getAllByRole('textbox')[2]
-    const confirmButton = getAllByRole('button')[2]
+    const confirmInput = screen.getAllByRole('textbox')[2]
+    const confirmButton = screen.getAllByRole('button')[2]
     link.rpc.mockImplementationOnce((action, secret, passwd, keystorePsswd, cb) => {
       cb(null, { id: '1234' })
     })
@@ -155,14 +154,14 @@ describe('confirming signer password', () => {
   })
 
   it('should update the navigation to view the newly created account', async () => {
-    const { user, getAllByRole } = render(
+    const { user } = render(
       <AddKeystore
         accountData={{ secret: keystore, password: signerPassword, creationArgs: [keystorePassword] }}
       />,
       { advanceTimersAfterInput: true }
     )
-    const confirmInput = getAllByRole('textbox')[2]
-    const confirmButton = getAllByRole('button')[2]
+    const confirmInput = screen.getAllByRole('textbox')[2]
+    const confirmButton = screen.getAllByRole('button')[2]
     link.rpc.mockImplementationOnce((action, secret, passwd, keystorePsswd, cb) => {
       cb(null, { id: '1234' })
     })

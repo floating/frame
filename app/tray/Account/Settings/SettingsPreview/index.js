@@ -1,11 +1,8 @@
 import React from 'react'
 import Restore from 'react-restore'
 import link from '../../../../../resources/link'
-import svg from '../../../../../resources/svg'
 
-import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../resources/Components/Cluster'
-
-// import Verify from '../Verify'
+import { Cluster, ClusterRow, ClusterValue } from '../../../../../resources/Components/Cluster'
 
 class Settings extends React.Component {
   constructor(...args) {
@@ -43,8 +40,6 @@ class Settings extends React.Component {
   }
 
   render() {
-    //Cluster, ClusterRow, ClusterValue
-    const account = this.store('main.accounts', this.props.account)
     return (
       <div ref={this.moduleRef}>
         <div className='balancesBlock'>

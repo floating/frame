@@ -1,5 +1,3 @@
-import React from 'react'
-
 import link from '../../../../../../resources/link'
 import EnsOverview from '../../Ens'
 
@@ -72,7 +70,7 @@ const actionOverviews = {
 const renderActionOverview = (action, index) => {
   const { id = '', data } = action
   const key = id + index
-  const [actionClass, actionType] = id.split(':')
+  const [_actionClass, actionType] = id.split(':')
   const ActionOverview = actionOverviews[id] || SimpleContractCallOverview
 
   return <ActionOverview key={key} type={actionType} {...{ ...data }} />

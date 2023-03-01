@@ -44,28 +44,28 @@
 // https://api.etherscan.io/api?module=account&action=tokennfttx&contractaddress=0x06012c8cf97bead5deae237070f9587f8e7a266d&address=0x6975be450864c02b4613023c2152ee0743572325&page=1&offset=100&sort=asc&apikey=YourApiKeyToken
 // (To get transfer events for a specific token contract, include the contractaddress parameter)
 
-const apiKey = ''
+// const apiKey = ''
 
-const getNormalTransactions = (address) => {
-  fetch(
-    `https://api.etherscan.io/api?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&sort=asc&apikey=${apiKey}`
-  )
-}
+// const getNormalTransactions = (address) => {
+//   fetch(
+//     `https://api.etherscan.io/api?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&sort=asc&apikey=${apiKey}`
+//   )
+// }
 
-const getInternalTransactions = (address) => {
-  fetch(
-    `https://api.etherscan.io/api?module=account&action=txlistinternal&address=${address}&startblock=0&endblock=99999999&sort=asc&apikey=${apiKey}`
-  )
-}
+// const getInternalTransactions = (address) => {
+//   fetch(
+//     `https://api.etherscan.io/api?module=account&action=txlistinternal&address=${address}&startblock=0&endblock=99999999&sort=asc&apikey=${apiKey}`
+//   )
+// }
 
-const getERC20TransferEvents = (address) => {
-  fetch(
-    `https://api.etherscan.io/api?module=account&action=tokentx&address=${address}&startblock=0&endblock=999999999&sort=asc&apikey=${apiKey}`
-  )
-}
+// const getERC20TransferEvents = (address) => {
+//   fetch(
+//     `https://api.etherscan.io/api?module=account&action=tokentx&address=${address}&startblock=0&endblock=999999999&sort=asc&apikey=${apiKey}`
+//   )
+// }
 
-const getERC721TransferEvents = (address) => {
-  fetch(
-    `https://api.etherscan.io/api?module=account&action=tokennfttx&address=${address}&startblock=0&endblock=999999999&sort=asc&apikey=${apiKey}`
-  )
-}
+// const getERC721TransferEvents = (address) => {
+//   fetch(
+//     `https://api.etherscan.io/api?module=account&action=tokennfttx&address=${address}&startblock=0&endblock=999999999&sort=asc&apikey=${apiKey}`
+//   )
+// }
