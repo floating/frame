@@ -27,7 +27,6 @@ export default [
       }
     },
     rules: {
-      ...prettier.rules,
       'no-unused-vars': [
         'error',
         {
@@ -158,5 +157,7 @@ export default [
     rules: {
       ...testingLibrary.configs.react.rules
     }
-  }
+  },
+  // ensure all rules work with prettier 
+  prettier
 ]
