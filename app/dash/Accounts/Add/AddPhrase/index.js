@@ -1,5 +1,3 @@
-import React from 'react'
-
 import { AddHotAccount } from '../Components'
 import { utils } from 'ethers'
 
