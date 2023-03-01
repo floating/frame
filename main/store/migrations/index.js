@@ -871,7 +871,9 @@ module.exports = {
       .sort((a, b) => a - b)
       .forEach((version) => {
         if (parseInt(state.main._version) < version && version <= migrateToVersion) {
-          log.info(`Applying state migration: ${version}`)
+          if (process.env.NODE_ENV !== 'test') {
+            log.info(`Applying state migration: ${version}`)
+          }
           state = migrations[version](state)
           state.main._version = version
         }
