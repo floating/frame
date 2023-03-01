@@ -42,9 +42,6 @@ export class LogProcessor {
   private balances: AccountBalances = {}
   private ownerPadded
 
-  // Map of chainId => last processed
-  public lastProcessed: Record<number, number> = {}
-
   private handlers: Record<LogTopic, (log: Log, tokensDict: TokensDict) => void> = {
     [LogTopic.TRANSFER]: this.handleTransfer.bind(this),
     [LogTopic.WITHDRAWAL]: this.handleWithdrawal.bind(this),
