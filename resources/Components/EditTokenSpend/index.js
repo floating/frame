@@ -1,13 +1,12 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import BigNumber from 'bignumber.js'
 
 import { max } from '../../utils/numbers'
 import svg from '../../svg'
 import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../Cluster'
-import Countdown from '../Countdown'
+import { Countdown } from '../Countdown'
 
 import useCopiedMessage from '../../Hooks/useCopiedMessage'
-import { DisplayValue } from '../DisplayValue'
 
 const isMax = (value) => max.isEqualTo(value)
 
@@ -59,7 +58,7 @@ const Details = ({ address, name }) => {
   )
 }
 
-const Description = ({ mode, custom, isRevoke }) => (
+const Description = ({ isRevoke }) => (
   <ClusterRow>
     <ClusterValue>
       <div className='clusterTag' style={{ color: 'var(--moon)' }}>

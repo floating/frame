@@ -1,5 +1,3 @@
-import React from 'react'
-
 const SimpleJSON = ({ json }) => {
   return (
     <div className='simpleJson'>
@@ -34,12 +32,11 @@ const SimpleTypedDataInner = ({ typedData }) =>
     </div>
   )
 
-export const SimpleTypedData = ({ req, originName }) => {
+export const SimpleTypedData = ({ req }) => {
   const type = req.type
-  const payload = req.payload
   const typedData = req.typedMessage.data || {}
 
-  return type === 'signTypedData' || 'signErc20Permit' ? (
+  return type === 'signTypedData' || type === 'signErc20Permit' ? (
     <div className='accountViewScroll cardShow'>
       <div className='txViewData'>
         <div className='txViewDataHeader'>{'Raw Typed Data'}</div>

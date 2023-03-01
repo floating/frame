@@ -1,11 +1,10 @@
-import React from 'react'
 import BigNumber from 'bignumber.js'
 
 import { isUnlimited } from '../../../../../resources/utils/numbers'
 import svg from '../../../../../resources/svg'
 import link from '../../../../../resources/link'
 import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../resources/Components/Cluster'
-import Countdown from '../../../../../resources/Components/Countdown'
+import { Countdown } from '../../../../../resources/Components/Countdown'
 import RequestHeader from '../../../../../resources/Components/RequestHeader'
 import RequestItem from '../../../../../resources/Components/RequestItem'
 import EditTokenSpend from '../../../../../resources/Components/EditTokenSpend'

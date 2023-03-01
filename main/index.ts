@@ -123,7 +123,7 @@ ipcMain.on('tray:clipboardData', (e, data) => {
   if (data) clipboard.writeText(data)
 })
 
-ipcMain.on('tray:installAvailableUpdate', (e, version) => {
+ipcMain.on('tray:installAvailableUpdate', () => {
   store.updateBadge('')
 
   updater.fetchUpdate()

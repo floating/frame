@@ -1,4 +1,3 @@
-import React from 'react'
 import Recipient from '../recipient'
 
 const Register = ({ address, domain, copyAddress }) => (

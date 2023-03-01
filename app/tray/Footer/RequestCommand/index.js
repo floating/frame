@@ -45,18 +45,7 @@ class RequestCommand extends React.Component {
   sentStatus() {
     const { req } = this.props
     const { notice, status } = req
-
-    const toAddress = (req.data && req.data.to) || ''
-    let requestClass = 'signerRequest'
-
-    // if (mode === 'monitor') requestClass += ' signerRequestMonitor'
-
     const success = req.status === 'confirming' || req.status === 'confirmed'
-    const error = req.status === 'error' || req.status === 'declined'
-    if (success) requestClass += ' signerRequestSuccess'
-    if (req.status === 'confirmed') requestClass += ' signerRequestConfirmed'
-    else if (error) requestClass += ' signerRequestError'
-
     const chain = {
       type: 'ethereum',
       id: parseInt(req.data.chainId, 'hex')
@@ -211,24 +200,10 @@ class RequestCommand extends React.Component {
 
   signOrDecline() {
     const { req } = this.props
-    const { notice, status, mode } = req
-
-    const toAddress = (req.data && req.data.to) || ''
-    let requestClass = 'signerRequest'
-
-    // if (mode === 'monitor') requestClass += ' signerRequestMonitor'
-
-    const success = req.status === 'confirming' || req.status === 'confirmed'
-    const error = req.status === 'error' || req.status === 'declined'
-    if (success) requestClass += ' signerRequestSuccess'
-    if (req.status === 'confirmed') requestClass += ' signerRequestConfirmed'
-    else if (error) requestClass += ' signerRequestError'
-
     const chain = {
       type: 'ethereum',
       id: parseInt(req.data.chainId, 'hex')
     }
-
     const isTestnet = this.store('main.networks', chain.type, chain.id, 'isTestnet')
     const {
       nativeCurrency,
@@ -240,22 +215,6 @@ class RequestCommand extends React.Component {
     const maxFeePerGas = BigNumber(usesBaseFee(req.data) ? req.data.maxFeePerGas : req.data.gasPrice, 16)
     const maxFee = maxFeePerGas.multipliedBy(gasLimit)
     const maxFeeUSD = maxFee.shiftedBy(-18).multipliedBy(nativeUSD)
-
-    let feeAtTime = '?.??'
-
-    if (req && req.tx && req.tx.receipt && nativeUSD) {
-      const { gasUsed, effectiveGasPrice } = req.tx.receipt
-      const { type, gasPrice } = req.data
-
-      const paidGas = effectiveGasPrice || (parseInt(type) < 2 ? gasPrice : null)
-
-      if (paidGas) {
-        const feeInWei = parseInt(gasUsed, 'hex') * parseInt(paidGas, 'hex')
-        const feeInEth = feeInWei / 1e18
-        const feeInUsd = feeInEth * nativeUSD
-        feeAtTime = (Math.round(feeInUsd * 100) / 100).toFixed(2)
-      }
-    }
 
     let displayStatus = req.status
     if (displayStatus === 'verifying') displayStatus = 'waiting for block'
@@ -453,7 +412,7 @@ class RequestCommand extends React.Component {
               style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none' }}
               onClick={() => {
                 if (this.state.allowInput) {
-                  link.rpc('signerCompatibility', req.handlerId, (e, compatibility) => {
+                  link.rpc('signerCompatibility', req.handlerId, (e) => {
                     if (e === 'No signer') {
                       this.store.notify('noSignerWarning', { req })
                     } else if (e === 'Signer unavailable') {

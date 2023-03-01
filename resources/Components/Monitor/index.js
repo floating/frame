@@ -205,7 +205,7 @@ class ChainSummaryComponent extends Component {
   }
 
   render() {
-    const { address, chainId, color } = this.props
+    const { address, chainId } = this.props
     const type = 'ethereum'
     const currentChain = { type, id: chainId }
     const fees = this.store('main.networksMeta', type, chainId, 'gas.price.fees')

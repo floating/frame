@@ -1285,7 +1285,7 @@ describe('#navClearSigner', () => {
       }
     ]
 
-    const [req1, req2] = nav
+    const [req1, _req2] = nav
 
     clearSigner('2b')
 

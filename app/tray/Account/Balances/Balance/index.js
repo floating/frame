@@ -7,15 +7,7 @@ import RingIcon from '../../../../../resources/Components/RingIcon'
 class Balance extends React.Component {
   render() {
     const { symbol, balance, i, scanning, chainId } = this.props
-    const {
-      priceChange,
-      decimals,
-      balance: balanceValue,
-      usdRate: currencyRate,
-      logoURI,
-      price,
-      displayBalance = '0'
-    } = balance
+    const { priceChange, decimals, balance: balanceValue, usdRate: currencyRate, logoURI } = balance
     const change = parseFloat(priceChange)
     const direction = change < 0 ? -1 : change > 0 ? 1 : 0
     let priceChangeClass = 'signerBalanceCurrentPriceChange'

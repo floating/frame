@@ -50,7 +50,6 @@ import {
   EIP2612TypedData,
   LegacyTypedData,
   PermitSignatureRequest,
-  TxClassification,
   TypedData,
   TypedMessage
 } from '../accounts/types'

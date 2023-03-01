@@ -4,7 +4,7 @@ import link from '../../../../../resources/link'
 import svg from '../../../../../resources/svg'
 import Monitor from '../../../../../resources/Components/Monitor'
 
-import { Cluster, ClusterRow, ClusterValue } from '../../../../../resources/Components/Cluster'
+import { Cluster } from '../../../../../resources/Components/Cluster'
 
 class ChainsPreview extends React.Component {
   constructor(...args) {
@@ -57,7 +57,7 @@ class ChainsPreview extends React.Component {
     const currentChainMeta = this.store('main.networksMeta.ethereum', currentChainId)
     if (!currentChain || !currentChainMeta) return null
     const { name } = currentChain
-    const { icon, primaryColor } = currentChainMeta
+    const { primaryColor } = currentChainMeta
     return (
       <div className='balancesBlock' ref={this.moduleRef}>
         <div className='moduleHeader'>
