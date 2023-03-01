@@ -9,18 +9,34 @@ import globals from 'globals'
 
 export default [
   'eslint:recommended',
+  // Ignored dirs
+  {
+    ignores: ['dist/**/*', 'compiled/**/*', 'bundle/**/*']
+  },
+  // Temporary ignored dirs - TODO: remove on rewrite
+  {
+    ignores: ['main/signers/**/*']
+  },
   // All files
   {
     files: ['**/*.{js,mjs,ts,tsx}'],
     languageOptions: {
       ecmaVersion: 'latest',
       globals: {
-        ...globals.es6
+        ...globals.es2021
       }
     },
     rules: {
       ...prettier.rules,
-      'no-unused-vars': ['error', { ignoreRestSiblings: true, destructuredArrayIgnorePattern: '^_' }]
+      'no-unused-vars': [
+        'error',
+        {
+          args: 'after-used',
+          ignoreRestSiblings: true,
+          argsIgnorePattern: '^_',
+          destructuredArrayIgnorePattern: '^_'
+        }
+      ]
     }
   },
   // Main process files and scripts
@@ -30,6 +46,23 @@ export default [
     languageOptions: {
       globals: {
         ...globals.node
+      }
+    }
+  },
+  // Renderer process files
+  {
+    files: [
+      'app/**/*.js',
+      'main/dapps/server/inject/*.js',
+      'resources/**/*.{js,ts,tsx}',
+      'test/app/**/*.js',
+      'test/resources/Components/**/*.js'
+    ],
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+        process: true,
+        global: true
       }
     }
   },
@@ -50,14 +83,28 @@ export default [
     rules: {
       ...ts.configs['eslint-recommended'].rules,
       ...ts.configs.recommended.rules,
-      'no-undef': 'off' // redundant - TS will fail to compile with undefined vars
+      'no-undef': 'off', // redundant - TS will fail to compile with undefined vars
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          args: 'after-used',
+          ignoreRestSiblings: true,
+          argsIgnorePattern: '^_',
+          destructuredArrayIgnorePattern: '^_'
+        }
+      ],
+      '@typescript-eslint/no-empty-function': ['error', { allow: ['arrowFunctions'] }], // allow noop arrow functions, e.g. in a method signature for ensuring a parameter defaults to a function
+      '@typescript-eslint/prefer-namespace-keyword': 'off', // use ES module syntax instead of namespace
+      '@typescript-eslint/no-namespace': ['error', { allowDeclarations: true }]
     }
   },
   // React / JSX files
+  // TODO: simplify as '**/*.{jsx,tsx}'
   {
     files: [
       'app/**/*.js',
       'resources/Components/**/*.js',
+      'resources/Native/**/*.js',
       'resources/svg/index.js',
       'test/app/**/*.js',
       'test/resources/Components/**/*.js',
@@ -86,23 +133,9 @@ export default [
       'react/prop-types': 'off' // all type checking to be done in TS
     }
   },
-  // Renderer process files
-  {
-    files: [
-      'app/**/*.js',
-      'resources/**/*.{js,ts,tsx}',
-      'test/app/**/*.js',
-      'test/resources/Components/**/*.js'
-    ],
-    languageOptions: {
-      globals: {
-        ...globals.browser
-      }
-    }
-  },
   // Test files
   {
-    files: ['test/**/*', '**/__mocks__/**/*'],
+    files: ['test/**/*.js', '**/__mocks__/**/*.js'],
     plugins: {
       jest
     },
@@ -118,7 +151,7 @@ export default [
   },
   // Components test files
   {
-    files: ['test/app/**/*.js', 'test/resources/Components/**/*.js', 'app/**/__mocks__/**'],
+    files: ['test/app/**/*.js', 'test/resources/Components/**/*.js', 'app/**/__mocks__/**/*.js'],
     plugins: {
       'testing-library': testingLibrary
     },
