@@ -29,6 +29,7 @@ const AddNewItemButton = ({ view, req }) => {
     <div className='dashFooter'>
       <div
         className='dashFooterButton'
+        data-testid='new-item-btn'
         onClick={() => link.send('tray:action', 'navDash', { view, data: dataMap[view] })}
       >
         <div className='newAccountIcon'>{svg.plus(16)}</div>

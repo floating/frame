@@ -115,6 +115,7 @@ class AccountSelector extends React.Component {
                 </ClusterRow>
                 <ClusterRow>
                   <ClusterValue
+                    testId='new-account-btn'
                     onClick={() => {
                       link.send('tray:action', 'navDash', {
                         view: 'accounts',

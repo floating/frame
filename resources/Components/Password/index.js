@@ -50,6 +50,7 @@ export const PasswordInput = ({ getError: getInputError, next, title, buttonText
           type='password'
           tabIndex='-1'
           ref={inputRef}
+          data-testid={`${buttonText.toLowerCase()}-password-input`}
           onChange={validateInput}
           onKeyDown={(e) => {
             if (!error && e.key === 'Enter' && !disabled) handleSubmit()
@@ -62,7 +63,12 @@ export const PasswordInput = ({ getError: getInputError, next, title, buttonText
           {error}
         </div>
       ) : (
-        <div role='button' className='addAccountItemOptionSubmit' onClick={() => !disabled && handleSubmit()}>
+        <div
+          role='button'
+          data-testid={`${buttonText.toLowerCase()}-btn`}
+          className='addAccountItemOptionSubmit'
+          onClick={() => !disabled && handleSubmit()}
+        >
           {buttonText}
         </div>
       )}

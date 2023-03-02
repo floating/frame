@@ -113,6 +113,7 @@ function initWindow(id: string, opts: Electron.BrowserWindowConstructorOptions) 
     ? `http://localhost:1234/${id}/index.dev.html`
     : new URL(path.join(process.env.BUNDLE_LOCATION, `${id}.html`), 'file:')
 
+  opts.title = id
   windows[id] = createWindow(id, opts)
   windows[id].loadURL(url.toString())
 }

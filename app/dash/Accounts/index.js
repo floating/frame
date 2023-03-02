@@ -97,7 +97,11 @@ class AddAccounts extends React.Component {
           <div className='accountTypeSelectIcon'>{svg.trezor(20)}</div>
           <div>{'Trezor Device'}</div>
         </div>
-        <div className='accountTypeSelect' onClick={() => this.createNewAccount('seed')}>
+        <div
+          className='accountTypeSelect'
+          data-testid='seedphrase-btn'
+          onClick={() => this.createNewAccount('seed')}
+        >
           <div className='accountTypeSelectIcon'>{svg.seedling(25)}</div>
           <div>{'Seed Phrase'}</div>
         </div>

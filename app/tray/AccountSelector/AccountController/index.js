@@ -486,6 +486,7 @@ class Account extends React.Component {
             style={selectedAccountOpen ? { boxShadow: '0px 4px 8px rgba(0, 0, 0, 0)' } : {}}
             // onMouseEnter={() => this.setState({ openHover: true })}
             // onMouseLeave={() => this.setState({ openHover: false })}
+            data-testid='account-btn'
             onClick={() => {
               if (!selectedAccountOpen) this.typeClick()
             }}

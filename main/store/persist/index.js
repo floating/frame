@@ -9,6 +9,17 @@ class PersistStore extends Conf {
     options = { configFileMode: 0o600, configName: 'config', ...options }
     let defaultCwd = __dirname
     if (electron && electron.app) defaultCwd = electron.app.getPath('userData')
+
+    if (process) {
+      const { argv } = process
+      const configRootArg = argv.filter((arg) => arg.startsWith('--config-root'))[0]
+      if (configRootArg) {
+        const configRoot = configRootArg.split('=')[1]
+        defaultCwd = configRoot
+        console.log('setting config root', configRoot)
+      }
+    }
+
     if (options.cwd) {
       options.cwd = path.isAbsolute(options.cwd) ? options.cwd : path.join(defaultCwd, options.cwd)
     } else {

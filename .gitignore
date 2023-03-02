@@ -9,6 +9,7 @@ config.json
 dist
 compiled
 release
+wdio-logs
 test/.userData
 .vscode
 .parcel-cache

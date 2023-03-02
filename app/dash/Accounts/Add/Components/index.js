@@ -96,7 +96,12 @@ const EnterSecret = ({ newAccountType, validateSecret, title, autofocus }) => {
           {error}
         </div>
       ) : (
-        <div role='button' className='addAccountItemOptionSubmit' onClick={() => handleSubmit()}>
+        <div
+          role='button'
+          className='addAccountItemOptionSubmit'
+          data-testid='next-btn'
+          onClick={() => handleSubmit()}
+        >
           {'Next'}
         </div>
       )}
