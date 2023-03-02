@@ -1,8 +1,9 @@
 const fs = require('fs')
-const { ipcMain, dialog } = require('electron')
+const { ipcMain } = require('electron')
 const log = require('electron-log')
 const { randomBytes } = require('crypto')
 import { isAddress } from '@ethersproject/address'
+import { openFileDialog } from '../windows/dialog'
 import { openBlockExplorer } from '../windows/window'
 
 const accounts = require('../accounts').default
@@ -184,28 +185,28 @@ const rpc = {
   createFromPhrase(phrase, password, cb) {
     signers.createFromPhrase(phrase, password, cb)
   },
-  locateKeystore(cb) {
-    dialog
-      .showOpenDialog({ properties: ['openFile'] })
-      .then((file) => {
-        const keystore = file || { filePaths: [] }
-        if ((keystore.filePaths || []).length > 0) {
-          fs.readFile(keystore.filePaths[0], 'utf8', (err, data) => {
-            if (err) return cb(err)
-            try {
-              const parsed = JSON.parse(data)
-              if (typeof parsed.version !== 'number') cb('Invalid keystore file')
-              if (![1, 3].includes(parsed.version)) cb('Invalid keystore version')
-              cb(null, parsed)
-            } catch (err) {
-              cb(err)
-            }
-          })
-        } else {
-          cb(new Error('No Keystore Found'))
-        }
-      })
-      .catch(cb)
+  async locateKeystore(cb) {
+    try {
+      const file = await openFileDialog()
+      const keystore = file || { filePaths: [] }
+      if ((keystore.filePaths || []).length > 0) {
+        fs.readFile(keystore.filePaths[0], 'utf8', (err, data) => {
+          if (err) return cb(err)
+          try {
+            const parsed = JSON.parse(data)
+            if (typeof parsed.version !== 'number') cb('Invalid keystore file')
+            if (![1, 3].includes(parsed.version)) cb('Invalid keystore version')
+            cb(null, parsed)
+          } catch (err) {
+            cb(err)
+          }
+        })
+      } else {
+        cb(new Error('No Keystore Found'))
+      }
+    } catch (e) {
+      cb(e)
+    }
   },
   createFromKeystore(keystore, password, keystorePassword, cb) {
     signers.createFromKeystore(keystore, keystorePassword, password, cb)

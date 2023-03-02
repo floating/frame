@@ -607,5 +607,8 @@ export default {
   min(e: IpcMainEvent) {
     windowFromWebContents(e.sender).minimize()
   },
+  browserWindows() {
+    return windows
+  },
   init
 }
