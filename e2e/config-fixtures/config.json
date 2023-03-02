@@ -1,0 +1,1056 @@
+{
+  "main": {
+    "__": {
+      "32": {
+        "main": {
+          "_version": 32,
+          "instanceId": "d60cbd09-ed28-40f8-927b-7e9187ad95a3",
+          "colorway": "dark",
+          "colorwayPrimary": {
+            "dark": {
+              "background": "rgb(26, 22, 28)",
+              "text": "rgb(241, 241, 255)"
+            },
+            "light": {
+              "background": "rgb(240, 230, 243)",
+              "text": "rgb(20, 40, 60)"
+            }
+          },
+          "mute": {
+            "alphaWarning": false,
+            "welcomeWarning": false,
+            "externalLinkWarning": false,
+            "explorerWarning": false,
+            "signerRelockChange": false,
+            "gasFeeWarning": false,
+            "betaDisclosure": false,
+            "onboardingWindow": false,
+            "signerCompatibilityWarning": false
+          },
+          "shortcuts": {
+            "altSlash": true
+          },
+          "launch": false,
+          "reveal": false,
+          "showLocalNameWithENS": false,
+          "autohide": false,
+          "accountCloseLock": false,
+          "hardwareDerivation": "mainnet",
+          "menubarGasPrice": false,
+          "lattice": {},
+          "latticeSettings": {
+            "accountLimit": 5,
+            "derivation": "standard",
+            "endpointMode": "default",
+            "endpointCustom": ""
+          },
+          "ledger": {
+            "derivation": "live",
+            "liveAccountLimit": 5
+          },
+          "trezor": {
+            "derivation": "standard"
+          },
+          "origins": {
+            "e601ae9b-957d-53ef-81a3-7f5df0ddd290": {
+              "name": "frame-extension",
+              "chain": {
+                "id": 1,
+                "type": "ethereum"
+              },
+              "session": {
+                "requests": 12,
+                "startedAt": 1677770687620,
+                "lastUpdatedAt": 1677770688232,
+                "endedAt": 1677770688232
+              }
+            },
+            "414d270a-fd68-5d92-b288-04582a243f1e": {
+              "name": "app.timeswap.io",
+              "chain": {
+                "id": 1,
+                "type": "ethereum"
+              },
+              "session": {
+                "requests": 2,
+                "startedAt": 1677095454500,
+                "lastUpdatedAt": 1677095454501,
+                "endedAt": 1677095454501
+              }
+            },
+            "d8ee8bbb-f8b8-5be1-99aa-f6fe7fb80dac": {
+              "name": "www.matcha.xyz",
+              "chain": {
+                "id": 1,
+                "type": "ethereum"
+              },
+              "session": {
+                "requests": 2,
+                "startedAt": 1677095459265,
+                "lastUpdatedAt": 1677095459265,
+                "endedAt": 1677095459265
+              }
+            },
+            "c004cc87-bfa3-50f5-812f-3d70dd8f82c6": {
+              "name": "metamask.github.io",
+              "chain": {
+                "id": 1,
+                "type": "ethereum"
+              },
+              "session": {
+                "requests": 2,
+                "startedAt": 1677770687692,
+                "lastUpdatedAt": 1677770687694,
+                "endedAt": 1677770687694
+              }
+            },
+            "d1aa651d-35d0-5777-9153-5931489213fd": {
+              "name": "frame-internal",
+              "chain": {
+                "id": 1,
+                "type": "ethereum"
+              },
+              "session": {
+                "requests": 47,
+                "startedAt": 1677770686183,
+                "lastUpdatedAt": 1677770691093,
+                "endedAt": 1677770691093
+              }
+            },
+            "14fe171b-730d-5a16-8d75-fccfea2e4267": {
+              "name": "null",
+              "chain": {
+                "id": 1,
+                "type": "ethereum"
+              },
+              "session": {
+                "requests": 116,
+                "startedAt": 1677095473954,
+                "lastUpdatedAt": 1677095475170,
+                "endedAt": 1677095475170
+              }
+            },
+            "426c92f6-255f-5028-96e0-97c071b79b3c": {
+              "name": "ipfs.io",
+              "chain": {
+                "id": 1,
+                "type": "ethereum"
+              },
+              "session": {
+                "requests": 4,
+                "startedAt": 1677015793961,
+                "lastUpdatedAt": 1677015795292,
+                "endedAt": 1677015795292
+              }
+            },
+            "87605b88-96c2-57dc-b3dc-10b538ae53b6": {
+              "name": "app.zyberswap.io",
+              "chain": {
+                "id": 1,
+                "type": "ethereum"
+              },
+              "session": {
+                "requests": 4,
+                "startedAt": 1677095386218,
+                "lastUpdatedAt": 1677095459288,
+                "endedAt": 1677095459288
+              }
+            },
+            "f428fc95-ac01-549b-aa1f-97b6e90d86ea": {
+              "name": "app.uniswap.org",
+              "chain": {
+                "id": 1,
+                "type": "ethereum"
+              },
+              "session": {
+                "requests": 2,
+                "startedAt": 1677770687693,
+                "lastUpdatedAt": 1677770687696,
+                "endedAt": 1677770687696
+              }
+            },
+            "8d646949-deaa-513c-a9ec-fc195d7e877b": {
+              "name": "v2-app.jarvis.exchange",
+              "chain": {
+                "id": 1,
+                "type": "ethereum"
+              },
+              "session": {
+                "requests": 2,
+                "startedAt": 1677770687709,
+                "lastUpdatedAt": 1677770687709,
+                "endedAt": 1677770687709
+              }
+            },
+            "ea0b917d-842c-555d-875b-6888eaf3f355": {
+              "name": "www.opyn.co",
+              "chain": {
+                "id": 1,
+                "type": "ethereum"
+              },
+              "session": {
+                "requests": 5,
+                "startedAt": 1677770687709,
+                "lastUpdatedAt": 1677770697535,
+                "endedAt": 1677770697535
+              }
+            }
+          },
+          "knownExtensions": {
+            "6085dfad-d58f-4be4-8aba-0dbebecc31bd": true
+          },
+          "privacy": {
+            "errorReporting": true
+          },
+          "accounts": {
+            "0xbfa427fb6f7ea52209ed20637d68f1b1f718cddc": {
+              "id": "0xbfa427fb6f7ea52209ed20637d68f1b1f718cddc",
+              "name": "Hot Account",
+              "lastSignerType": "seed",
+              "address": "0xbfa427fb6f7ea52209ed20637d68f1b1f718cddc",
+              "status": "ok",
+              "active": true,
+              "signer": "",
+              "requests": {
+                "8f0cfbfa-6c04-416a-b55e-57b87ab3b912": {
+                  "handlerId": "8f0cfbfa-6c04-416a-b55e-57b87ab3b912",
+                  "type": "sign",
+                  "payload": {
+                    "id": 8,
+                    "method": "personal_sign",
+                    "params": ["0xbfa427fb6f7ea52209ed20637d68f1b1f718cddc", "0x4672616d652054657374"],
+                    "jsonrpc": "2.0",
+                    "_origin": "332ad0bf-a0f2-5e61-aaea-8cb024e574a3"
+                  },
+                  "account": "0xbfa427fb6f7ea52209ed20637d68f1b1f718cddc",
+                  "origin": "332ad0bf-a0f2-5e61-aaea-8cb024e574a3",
+                  "mode": "normal",
+                  "created": 1677770701855
+                }
+              },
+              "ensName": "",
+              "created": "16679620:1677015474670",
+              "balances": {}
+            },
+            "0xaf7c91bf7d9f571d971ff5aaef41205912b47293": {
+              "id": "0xaf7c91bf7d9f571d971ff5aaef41205912b47293",
+              "name": "Hot Account",
+              "lastSignerType": "seed",
+              "address": "0xaf7c91bf7d9f571d971ff5aaef41205912b47293",
+              "status": "ok",
+              "active": false,
+              "signer": "",
+              "requests": {},
+              "ensName": "",
+              "created": "16679620:1677015475178",
+              "balances": {}
+            },
+            "0x04551dfd74763ef5ffb2964b9362f56a62e167c2": {
+              "id": "0x04551dfd74763ef5ffb2964b9362f56a62e167c2",
+              "name": "Hot Account",
+              "lastSignerType": "seed",
+              "address": "0x04551dfd74763ef5ffb2964b9362f56a62e167c2",
+              "status": "ok",
+              "active": false,
+              "signer": "",
+              "requests": {},
+              "ensName": "",
+              "created": "16679620:1677015475730",
+              "balances": {}
+            },
+            "0x4d10f1af7903155ae20e8a49bbcf6ff313d67654": {
+              "id": "0x4d10f1af7903155ae20e8a49bbcf6ff313d67654",
+              "name": "Hot Account",
+              "lastSignerType": "seed",
+              "address": "0x4d10f1af7903155ae20e8a49bbcf6ff313d67654",
+              "status": "ok",
+              "active": false,
+              "signer": "",
+              "requests": {},
+              "ensName": "",
+              "created": "16679620:1677015476535",
+              "balances": {}
+            },
+            "0x257da2fe77da34ee7c10c687db77c77a1677de03": {
+              "id": "0x257da2fe77da34ee7c10c687db77c77a1677de03",
+              "name": "Hot Account",
+              "lastSignerType": "seed",
+              "address": "0x257da2fe77da34ee7c10c687db77c77a1677de03",
+              "status": "ok",
+              "active": false,
+              "signer": "",
+              "requests": {},
+              "ensName": "",
+              "created": "16679620:1677015477159",
+              "balances": {}
+            }
+          },
+          "accountsMeta": {},
+          "addresses": {},
+          "permissions": {
+            "0xbfa427fb6f7ea52209ed20637d68f1b1f718cddc": {
+              "send-dapp-native": {
+                "handlerId": "send-dapp-native",
+                "origin": "send.frame.eth",
+                "provider": true
+              }
+            },
+            "0xaf7c91bf7d9f571d971ff5aaef41205912b47293": {
+              "send-dapp-native": {
+                "handlerId": "send-dapp-native",
+                "origin": "send.frame.eth",
+                "provider": true
+              }
+            },
+            "0x04551dfd74763ef5ffb2964b9362f56a62e167c2": {
+              "send-dapp-native": {
+                "handlerId": "send-dapp-native",
+                "origin": "send.frame.eth",
+                "provider": true
+              }
+            },
+            "0x4d10f1af7903155ae20e8a49bbcf6ff313d67654": {
+              "send-dapp-native": {
+                "handlerId": "send-dapp-native",
+                "origin": "send.frame.eth",
+                "provider": true
+              }
+            },
+            "0x257da2fe77da34ee7c10c687db77c77a1677de03": {
+              "send-dapp-native": {
+                "handlerId": "send-dapp-native",
+                "origin": "send.frame.eth",
+                "provider": true
+              }
+            }
+          },
+          "balances": {},
+          "tokens": {
+            "custom": [],
+            "known": {}
+          },
+          "rates": {},
+          "inventory": {},
+          "signers": {},
+          "savedSigners": {},
+          "updater": {
+            "dontRemind": []
+          },
+          "networkPresets": {
+            "ethereum": {
+              "1": {
+                "alchemy": "alchemy",
+                "infura": "infura"
+              },
+              "3": {
+                "alchemy": "alchemyRopsten",
+                "infura": "infuraRopsten"
+              },
+              "4": {
+                "alchemy": "alchemyRinkeby",
+                "infura": "infuraRinkeby"
+              },
+              "5": {
+                "infura": "infuraGoerli"
+              },
+              "10": {
+                "infura": "infuraOptimism"
+              },
+              "42": {
+                "alchemy": "alchemyKovan",
+                "infura": "infuraKovan"
+              },
+              "100": {
+                "poa": "gnosis"
+              },
+              "137": {
+                "infura": "infuraPolygon"
+              },
+              "42161": {
+                "infura": "infuraArbitrum"
+              },
+              "11155111": {
+                "infura": "infuraSepolia"
+              },
+              "default": {
+                "local": "direct"
+              }
+            }
+          },
+          "networks": {
+            "ethereum": {
+              "1": {
+                "id": 1,
+                "type": "ethereum",
+                "layer": "mainnet",
+                "name": "Mainnet",
+                "isTestnet": false,
+                "explorer": "https://etherscan.io",
+                "gas": {
+                  "price": {
+                    "selected": "standard",
+                    "levels": {
+                      "slow": "",
+                      "standard": "",
+                      "fast": "",
+                      "asap": "",
+                      "custom": ""
+                    }
+                  }
+                },
+                "connection": {
+                  "primary": {
+                    "on": true,
+                    "current": "infura",
+                    "status": "connected",
+                    "connected": true,
+                    "type": "",
+                    "network": "1",
+                    "custom": ""
+                  },
+                  "secondary": {
+                    "on": false,
+                    "current": "custom",
+                    "status": "loading",
+                    "connected": false,
+                    "type": "",
+                    "network": "",
+                    "custom": ""
+                  }
+                },
+                "on": true
+              },
+              "5": {
+                "id": 5,
+                "type": "ethereum",
+                "layer": "testnet",
+                "isTestnet": true,
+                "name": "Görli",
+                "explorer": "https://goerli.etherscan.io",
+                "gas": {
+                  "price": {
+                    "selected": "standard",
+                    "levels": {
+                      "slow": "",
+                      "standard": "",
+                      "fast": "",
+                      "asap": "",
+                      "custom": ""
+                    }
+                  }
+                },
+                "connection": {
+                  "primary": {
+                    "on": true,
+                    "current": "infura",
+                    "status": "connected",
+                    "connected": true,
+                    "type": "",
+                    "network": "5",
+                    "custom": ""
+                  },
+                  "secondary": {
+                    "on": false,
+                    "current": "custom",
+                    "status": "loading",
+                    "connected": false,
+                    "type": "",
+                    "network": "",
+                    "custom": ""
+                  }
+                },
+                "on": true
+              },
+              "10": {
+                "id": 10,
+                "type": "ethereum",
+                "layer": "rollup",
+                "isTestnet": false,
+                "name": "Optimism",
+                "explorer": "https://optimistic.etherscan.io",
+                "gas": {
+                  "price": {
+                    "selected": "standard",
+                    "levels": {
+                      "slow": "",
+                      "standard": "",
+                      "fast": "",
+                      "asap": "",
+                      "custom": ""
+                    }
+                  }
+                },
+                "connection": {
+                  "primary": {
+                    "on": true,
+                    "current": "infura",
+                    "status": "loading",
+                    "connected": false,
+                    "type": "",
+                    "network": "",
+                    "custom": ""
+                  },
+                  "secondary": {
+                    "on": false,
+                    "current": "custom",
+                    "status": "loading",
+                    "connected": false,
+                    "type": "",
+                    "network": "",
+                    "custom": ""
+                  }
+                },
+                "on": false
+              },
+              "100": {
+                "id": 100,
+                "type": "ethereum",
+                "layer": "sidechain",
+                "isTestnet": false,
+                "name": "Gnosis",
+                "explorer": "https://blockscout.com/xdai/mainnet",
+                "gas": {
+                  "price": {
+                    "selected": "standard",
+                    "levels": {
+                      "slow": "",
+                      "standard": "",
+                      "fast": "",
+                      "asap": "",
+                      "custom": ""
+                    }
+                  }
+                },
+                "connection": {
+                  "primary": {
+                    "on": true,
+                    "current": "poa",
+                    "status": "loading",
+                    "connected": false,
+                    "type": "",
+                    "network": "",
+                    "custom": ""
+                  },
+                  "secondary": {
+                    "on": false,
+                    "current": "custom",
+                    "status": "loading",
+                    "connected": false,
+                    "type": "",
+                    "network": "",
+                    "custom": ""
+                  }
+                },
+                "on": false
+              },
+              "137": {
+                "id": 137,
+                "type": "ethereum",
+                "layer": "sidechain",
+                "isTestnet": false,
+                "name": "Polygon",
+                "explorer": "https://polygonscan.com",
+                "gas": {
+                  "price": {
+                    "selected": "standard",
+                    "levels": {
+                      "slow": "",
+                      "standard": "",
+                      "fast": "",
+                      "asap": "",
+                      "custom": ""
+                    }
+                  }
+                },
+                "connection": {
+                  "primary": {
+                    "on": true,
+                    "current": "infura",
+                    "status": "loading",
+                    "connected": false,
+                    "type": "",
+                    "network": "",
+                    "custom": ""
+                  },
+                  "secondary": {
+                    "on": false,
+                    "current": "custom",
+                    "status": "loading",
+                    "connected": false,
+                    "type": "",
+                    "network": "",
+                    "custom": ""
+                  }
+                },
+                "on": false
+              },
+              "42161": {
+                "id": 42161,
+                "type": "ethereum",
+                "layer": "rollup",
+                "isTestnet": false,
+                "name": "Arbitrum",
+                "explorer": "https://arbiscan.io",
+                "gas": {
+                  "price": {
+                    "selected": "standard",
+                    "levels": {
+                      "slow": "",
+                      "standard": "",
+                      "fast": "",
+                      "asap": "",
+                      "custom": ""
+                    }
+                  }
+                },
+                "connection": {
+                  "primary": {
+                    "on": true,
+                    "current": "infura",
+                    "status": "loading",
+                    "connected": false,
+                    "type": "",
+                    "network": "",
+                    "custom": ""
+                  },
+                  "secondary": {
+                    "on": false,
+                    "current": "custom",
+                    "status": "loading",
+                    "connected": false,
+                    "type": "",
+                    "network": "",
+                    "custom": ""
+                  }
+                },
+                "on": false
+              },
+              "11155111": {
+                "id": 11155111,
+                "type": "ethereum",
+                "layer": "testnet",
+                "isTestnet": true,
+                "name": "Sepolia",
+                "explorer": "https://sepolia.etherscan.io",
+                "gas": {
+                  "price": {
+                    "selected": "standard",
+                    "levels": {
+                      "slow": "",
+                      "standard": "",
+                      "fast": "",
+                      "asap": "",
+                      "custom": ""
+                    }
+                  }
+                },
+                "connection": {
+                  "primary": {
+                    "on": true,
+                    "current": "infura",
+                    "status": "loading",
+                    "connected": false,
+                    "type": "",
+                    "network": "",
+                    "custom": ""
+                  },
+                  "secondary": {
+                    "on": false,
+                    "current": "custom",
+                    "status": "loading",
+                    "connected": false,
+                    "type": "",
+                    "network": "",
+                    "custom": ""
+                  }
+                },
+                "on": false
+              }
+            }
+          },
+          "networksMeta": {
+            "ethereum": {
+              "1": {
+                "blockHeight": 16741748,
+                "gas": {
+                  "fees": {},
+                  "price": {
+                    "selected": "fast",
+                    "levels": {
+                      "fast": "0x96de4eb5b"
+                    },
+                    "lastLevel": "fast",
+                    "fees": {
+                      "nextBaseFee": "0x75d23c893",
+                      "maxBaseFeePerGas": "0x951e149db",
+                      "maxPriorityFeePerGas": "0x1c03a180",
+                      "maxFeePerGas": "0x96de4eb5b"
+                    }
+                  }
+                },
+                "nativeCurrency": {
+                  "symbol": "ETH",
+                  "usd": {
+                    "price": 0,
+                    "change24hr": 0
+                  },
+                  "icon": "https://assets.coingecko.com/coins/images/279/large/ethereum.png?1595348880",
+                  "name": "Ether",
+                  "decimals": 18
+                },
+                "icon": "",
+                "primaryColor": "accent1"
+              },
+              "5": {
+                "blockHeight": 8584416,
+                "gas": {
+                  "fees": {},
+                  "price": {
+                    "selected": "fast",
+                    "levels": {
+                      "fast": "0x2f5da8c470"
+                    },
+                    "lastLevel": "fast",
+                    "fees": {
+                      "nextBaseFee": "0x253dac3ad0",
+                      "maxBaseFeePerGas": "0x2f220dfa70",
+                      "maxPriorityFeePerGas": "0x3b9aca00",
+                      "maxFeePerGas": "0x2f5da8c470"
+                    }
+                  }
+                },
+                "nativeCurrency": {
+                  "symbol": "görETH",
+                  "usd": {
+                    "price": 0,
+                    "change24hr": 0
+                  },
+                  "icon": "",
+                  "name": "Görli Ether",
+                  "decimals": 18
+                },
+                "icon": "",
+                "primaryColor": "accent2"
+              },
+              "10": {
+                "blockHeight": 0,
+                "gas": {
+                  "fees": {},
+                  "price": {
+                    "selected": "standard",
+                    "levels": {
+                      "slow": "",
+                      "standard": "",
+                      "fast": "",
+                      "asap": "",
+                      "custom": ""
+                    }
+                  }
+                },
+                "nativeCurrency": {
+                  "symbol": "ETH",
+                  "usd": {
+                    "price": 0,
+                    "change24hr": 0
+                  },
+                  "icon": "",
+                  "name": "Ether",
+                  "decimals": 18
+                },
+                "icon": "https://frame.nyc3.cdn.digitaloceanspaces.com/icons/optimism.svg",
+                "primaryColor": "accent4"
+              },
+              "100": {
+                "blockHeight": 0,
+                "gas": {
+                  "fees": {},
+                  "price": {
+                    "selected": "standard",
+                    "levels": {
+                      "slow": "",
+                      "standard": "",
+                      "fast": "",
+                      "asap": "",
+                      "custom": ""
+                    }
+                  }
+                },
+                "nativeCurrency": {
+                  "symbol": "xDAI",
+                  "usd": {
+                    "price": 0,
+                    "change24hr": 0
+                  },
+                  "icon": "",
+                  "name": "xDAI",
+                  "decimals": 18
+                },
+                "icon": "https://frame.nyc3.cdn.digitaloceanspaces.com/icons/gnosis.svg",
+                "primaryColor": "accent5"
+              },
+              "137": {
+                "blockHeight": 0,
+                "gas": {
+                  "fees": {},
+                  "price": {
+                    "selected": "standard",
+                    "levels": {
+                      "slow": "",
+                      "standard": "",
+                      "fast": "",
+                      "asap": "",
+                      "custom": ""
+                    }
+                  }
+                },
+                "nativeCurrency": {
+                  "symbol": "MATIC",
+                  "usd": {
+                    "price": 0,
+                    "change24hr": 0
+                  },
+                  "icon": "",
+                  "name": "Matic",
+                  "decimals": 18
+                },
+                "icon": "https://frame.nyc3.cdn.digitaloceanspaces.com/icons/polygon.svg",
+                "primaryColor": "accent6"
+              },
+              "42161": {
+                "blockHeight": 0,
+                "gas": {
+                  "fees": {},
+                  "price": {
+                    "selected": "standard",
+                    "levels": {
+                      "slow": "",
+                      "standard": "",
+                      "fast": "",
+                      "asap": "",
+                      "custom": ""
+                    }
+                  }
+                },
+                "nativeCurrency": {
+                  "symbol": "ETH",
+                  "usd": {
+                    "price": 0,
+                    "change24hr": 0
+                  },
+                  "icon": "",
+                  "name": "Ether",
+                  "decimals": 18
+                },
+                "icon": "https://frame.nyc3.cdn.digitaloceanspaces.com/icons/arbitrum.svg",
+                "primaryColor": "accent7"
+              },
+              "11155111": {
+                "blockHeight": 0,
+                "gas": {
+                  "fees": {},
+                  "price": {
+                    "selected": "standard",
+                    "levels": {
+                      "slow": "",
+                      "standard": "",
+                      "fast": "",
+                      "asap": "",
+                      "custom": ""
+                    }
+                  }
+                },
+                "nativeCurrency": {
+                  "symbol": "sepETH",
+                  "usd": {
+                    "price": 0,
+                    "change24hr": 0
+                  },
+                  "icon": "",
+                  "name": "Sepolia Ether",
+                  "decimals": 18
+                },
+                "icon": "",
+                "primaryColor": "accent2"
+              }
+            }
+          },
+          "dapps": {
+            "0xe8d705c28f65bc3fe10df8b22f9daa265b99d0e1893b2df49fd38120f0410bca": {
+              "id": "0xe8d705c28f65bc3fe10df8b22f9daa265b99d0e1893b2df49fd38120f0410bca",
+              "ens": "send.frame.eth",
+              "status": "ready",
+              "config": {
+                "key": "value"
+              },
+              "manifest": {
+                "name": "send.frame.eth",
+                "updated": "2023-02-20T22:42:49.699Z",
+                "version": "0.2-e37d2f3",
+                "content": "bafybeiag6x7b2xh3c23fochm565boiuygmomi3vqjxjad4wax5oldwh6bi"
+              },
+              "current": {},
+              "record": {
+                "name": "send.frame.eth",
+                "chain": "0x1",
+                "content": "/ipfs/bafybeiag6x7b2xh3c23fochm565boiuygmomi3vqjxjad4wax5oldwh6bi",
+                "addresses": {
+                  "eth": "",
+                  "btc": ""
+                },
+                "text": {
+                  "manifest": "/ipfs/bafybeihidb6fhk2sgtwjrn3g2tgo3mvahtjpjxyu3llfgg2ho3ttnuljsy",
+                  "avatar": "",
+                  "com.twitter": "",
+                  "com.github": ""
+                }
+              },
+              "openWhenReady": false,
+              "colors": {
+                "background": "rgb(26, 25, 31)",
+                "backgroundShade": "rgb(21, 20, 26)",
+                "backgroundLight": "rgb(76, 75, 81)",
+                "text": "white"
+              },
+              "content": "bafybeiag6x7b2xh3c23fochm565boiuygmomi3vqjxjad4wax5oldwh6bi"
+            }
+          },
+          "ipfs": {},
+          "frames": {},
+          "openDapps": [],
+          "dapp": {
+            "details": {},
+            "map": {
+              "added": [],
+              "docked": []
+            },
+            "storage": {},
+            "removed": []
+          }
+        },
+        "tray": {
+          "initial": false,
+          "open": true
+        },
+        "windows": {
+          "panel": {
+            "footer": {
+              "height": 138
+            },
+            "showing": true,
+            "nav": [
+              {
+                "view": "requestView",
+                "data": {
+                  "step": "confirm",
+                  "accountId": "0xbfa427fb6f7ea52209ed20637d68f1b1f718cddc",
+                  "requestId": "8f0cfbfa-6c04-416a-b55e-57b87ab3b912"
+                }
+              },
+              {
+                "view": "expandedModule",
+                "data": {
+                  "id": "requests",
+                  "account": "0xbfa427fb6f7ea52209ed20637d68f1b1f718cddc"
+                }
+              }
+            ]
+          },
+          "dash": {
+            "show": false,
+            "nav": [
+              {
+                "view": "accounts",
+                "data": {
+                  "showAddAccounts": true,
+                  "newAccountType": "seed",
+                  "accountData": {
+                    "secret": "resist stand betray width wave actual drum merry street sentence cream law",
+                    "password": "FrameE2ETesting",
+                    "creationArgs": []
+                  }
+                }
+              },
+              {
+                "view": "accounts",
+                "data": {
+                  "showAddAccounts": true,
+                  "newAccountType": "seed",
+                  "accountData": {
+                    "secret": "resist stand betray width wave actual drum merry street sentence cream law"
+                  }
+                }
+              },
+              {
+                "view": "accounts",
+                "data": {
+                  "showAddAccounts": true,
+                  "newAccountType": "seed"
+                }
+              },
+              {
+                "view": "accounts",
+                "data": {
+                  "showAddAccounts": true
+                }
+              },
+              {
+                "view": "accounts",
+                "data": {}
+              }
+            ],
+            "footer": {
+              "height": 40
+            },
+            "showing": true
+          },
+          "onboard": {
+            "showing": true
+          }
+        },
+        "view": {
+          "notify": "extensionConnect",
+          "notifyData": {
+            "browser": "firefox",
+            "id": "6085dfad-d58f-4be4-8aba-0dbebecc31bd"
+          }
+        },
+        "selected": {
+          "current": "0xbfa427fb6f7ea52209ed20637d68f1b1f718cddc",
+          "minimized": false,
+          "open": true,
+          "signerStatusOpen": true,
+          "showAccounts": false,
+          "view": "default"
+        },
+        "panel": {
+          "view": "default",
+          "account": {
+            "modules": {
+              "requests": {
+                "height": 52
+              },
+              "chains": {
+                "height": 157
+              },
+              "inventory": {
+                "height": 111
+              },
+              "permissions": {
+                "height": 217
+              },
+              "settings": {
+                "height": 64
+              },
+              "balances": {
+                "height": 261
+              },
+              "signer": {
+                "height": 159
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
