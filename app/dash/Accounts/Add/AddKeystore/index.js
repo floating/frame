@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { AddHotAccount } from '../Components'
 import link from '../../../../../resources/link'
 import { PasswordInput } from '../../../../../resources/Components/Password'
@@ -20,6 +20,7 @@ const LocateKeystore = ({ addKeystore, error, setError }) => {
       setError('')
     }, 1_500)
   }, [error])
+
   return (
     <div className='addAccountItemOptionSetupFrame'>
       {error ? (
@@ -43,7 +44,7 @@ const LocateKeystore = ({ addKeystore, error, setError }) => {
 const Locating = () => (
   <div className='addAccountItemOptionSetupFrame'>
     <div role={'status'} className='addAccountItemOptionTitle' style={{ marginTop: '15px' }}>
-      Locating Keystore file
+      Locating Keystore file...
     </div>
   </div>
 )
@@ -56,17 +57,15 @@ const EnterKeystorePassword = ({ keystore }) => {
     })
   }
   //TODO: validate keystore password here?
-  const getError = () => {}
-  const title = 'Enter Keystore Password'
-  const buttonText = 'Continue'
-  return <PasswordInput {...{ next, getError, title, buttonText }} />
+
+  return (
+    <PasswordInput next={next} getError={() => {}} title='Enter Keystore Password' buttonText='Continue' />
+  )
 }
 
 const LoadKeystore = ({ accountData }) => {
   const { keystore, selecting, secret } = accountData
-
   const [error, setError] = useState('')
-
   const addKeystore = () => {
     navForward({ selecting: true })
     setTimeout(() => {
@@ -80,14 +79,13 @@ const LoadKeystore = ({ accountData }) => {
       })
     }, 640)
   }
-
   const viewIndex = secret || keystore ? 2 : selecting ? 1 : 0
-
   const steps = [
-    <LocateKeystore key={0} {...{ addKeystore, error, setError }} />,
+    <LocateKeystore key={0} addKeystore={addKeystore} error={error} setError={setError} />,
     <Locating key={1} />,
     <EnterKeystorePassword key={2} keystore={accountData.keystore} />
   ]
+
   return <>{steps[viewIndex]}</>
 }
 

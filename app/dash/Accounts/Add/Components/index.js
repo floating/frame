@@ -1,4 +1,3 @@
-import React from 'react'
 import { useState } from 'react'
 
 import useFocusableRef from '../../../../../resources/Hooks/useFocusableRef'
@@ -28,7 +27,7 @@ const AddHotAccountWrapper = ({ children, title, svgName, summary, index }) => {
           <div className='addAccountItemTopType'>
             <div className='addAccountItemIcon'>
               <div className='addAccountItemIconType addAccountItemIconHot'>
-                <RingIcon {...{ svgName }} />
+                <RingIcon svgName={svgName} />
               </div>
               <div className='addAccountItemIconHex addAccountItemIconHexHot' />
             </div>
@@ -160,7 +159,13 @@ export function AddHotAccount({
     })
 
   const firstFlowStep = firstStep || (
-    <EnterSecret key={0} {...{ validateSecret, title, newAccountType, autofocus: viewIndex === 0 }} />
+    <EnterSecret
+      key={0}
+      validateSecret={validateSecret}
+      title={title}
+      newAccountType={newAccountType}
+      autofocus={viewIndex === 0}
+    />
   )
 
   const steps = [
@@ -171,15 +176,7 @@ export function AddHotAccount({
   ]
 
   return (
-    <AddHotAccountWrapper
-      {...{
-        title,
-        intro,
-        summary,
-        svgName,
-        index: viewIndex
-      }}
-    >
+    <AddHotAccountWrapper title={title} intro={intro} summary={summary} svgName={svgName} index={viewIndex}>
       {steps}
     </AddHotAccountWrapper>
   )
