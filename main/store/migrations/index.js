@@ -853,20 +853,47 @@ const migrations = {
   34: (initial) => {
     // Add any missing nativeCurrency name values
     // Base Görli (84531) value added in #33
-    const nativeCurrencyNameMap = {
-      1: 'Ether',
-      5: 'Görli Ether',
-      10: 'Ether',
-      100: 'xDai',
-      137: 'Matic',
-      42161: 'Ether',
-      11155111: 'Sepolia Ether'
+    const nativeCurrencyMap = {
+      1: {
+        name: 'Ether',
+        symbol: 'ETH'
+      },
+      5: {
+        name: 'Görli Ether',
+        symbol: 'görETH'
+      },
+      10: {
+        name: 'Ether',
+        symbol: 'ETH'
+      },
+      100: {
+        name: 'xDAI',
+        symbol: 'xDAI'
+      },
+      137: {
+        name: 'Matic',
+        symbol: 'MATIC'
+      },
+      42161: {
+        name: 'Ether',
+        symbol: 'ETH'
+      },
+      11155111: {
+        name: 'Sepolia Ether',
+        symbol: 'sepETH'
+      }
     }
 
     Object.values(initial.main.networks.ethereum).forEach((network) => {
       const { id } = network
-      initial.main.networksMeta.ethereum[id].nativeCurrency.name =
-        initial.main.networksMeta.ethereum[id].nativeCurrency.name || nativeCurrencyNameMap[id] || ''
+      const { name = '', symbol = '' } = nativeCurrencyMap[id] || {}
+      const nativeCurrency = initial.main.networksMeta.ethereum[id].nativeCurrency
+
+      initial.main.networksMeta.ethereum[id].nativeCurrency = {
+        ...nativeCurrency,
+        name: nativeCurrency.name || name,
+        symbol: nativeCurrency.symbol || symbol
+      }
     })
 
     return initial

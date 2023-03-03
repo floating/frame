@@ -1,4 +1,5 @@
 import log from 'electron-log'
+
 import migrations from '../../../../main/store/migrations'
 import { getDefaultAccountName } from '../../../../resources/domain/account'
 import { capitalize } from '../../../../resources/utils'
@@ -11,6 +12,16 @@ beforeAll(() => {
 
 afterAll(() => {
   log.transports.console.level = 'debug'
+})
+
+beforeEach(() => {
+  state = {
+    main: {
+      _version: 0,
+      networks: { ethereum: {} },
+      networksMeta: { ethereum: {} }
+    }
+  }
 })
 
 describe('migration 13', () => {
@@ -1406,140 +1417,93 @@ describe('migration 32', () => {
 
 describe('migration 34', () => {
   const getNativeCurrency = (state, chainId) => state.main.networksMeta.ethereum[chainId].nativeCurrency
+  const createChainState = (chainId) => {
+    state.main.networks.ethereum[chainId] = { id: chainId }
+    state.main.networksMeta.ethereum[chainId] = { nativeCurrency: {} }
+  }
+
+  const expectedData = {
+    1: {
+      chainName: 'Mainnet',
+      currencyName: 'Ether',
+      currencySymbol: 'ETH'
+    },
+    5: {
+      chainName: 'Görli',
+      currencyName: 'Görli Ether',
+      currencySymbol: 'görETH'
+    },
+    10: {
+      chainName: 'Optimism',
+      currencyName: 'Ether',
+      currencySymbol: 'ETH'
+    },
+    100: {
+      chainName: 'Gnosis',
+      currencyName: 'xDAI',
+      currencySymbol: 'xDAI'
+    },
+    137: {
+      chainName: 'Polyon',
+      currencyName: 'Matic',
+      currencySymbol: 'MATIC'
+    },
+    42161: {
+      chainName: 'Arbitrum',
+      currencyName: 'Ether',
+      currencySymbol: 'ETH'
+    },
+    11155111: {
+      chainName: 'Sepolia',
+      currencyName: 'Sepolia Ether',
+      currencySymbol: 'sepETH'
+    }
+  }
 
   beforeEach(() => {
-    state = {
-      main: {
-        _version: 33,
-        networks: {
-          ethereum: {
-            1: { id: 1 },
-            5: { id: 5 },
-            10: { id: 10 },
-            56: { id: 56 },
-            100: { id: 100 },
-            137: { id: 137 },
-            42161: { id: 42161 },
-            11155111: { id: 11155111 }
-          }
-        },
-        networksMeta: {
-          ethereum: {
-            1: {
-              nativeCurrency: { name: '' }
-            },
-            5: {
-              nativeCurrency: { name: '' }
-            },
-            10: {
-              nativeCurrency: { name: '' }
-            },
-            56: {
-              nativeCurrency: { name: '' }
-            },
-            100: {
-              nativeCurrency: { name: '' }
-            },
-            137: {
-              nativeCurrency: { name: '' }
-            },
-            42161: {
-              nativeCurrency: { name: '' }
-            },
-            11155111: {
-              nativeCurrency: { name: '' }
-            }
-          }
-        }
-      }
-    }
+    state.main._version = 33
   })
 
-  it('should add the native currency name for Mainnet if currently an empty string', () => {
-    const updatedState = migrations.apply(state, 34)
-    expect(getNativeCurrency(updatedState, 1).name).toBe('Ether')
+  Object.entries(expectedData).forEach(([chainId, { chainName, currencyName, currencySymbol }]) => {
+    it(`should set the native currency name for ${chainName} to ${currencyName} if currently undefined`, () => {
+      createChainState(chainId)
+
+      const updatedState = migrations.apply(state, 34)
+      expect(getNativeCurrency(updatedState, chainId).name).toBe(currencyName)
+    })
+
+    it(`should set the native currency name for ${chainName} to ${currencyName} if currently an empty string'`, () => {
+      createChainState(chainId)
+      state.main.networksMeta.ethereum[chainId].nativeCurrency.name = ''
+
+      const updatedState = migrations.apply(state, 34)
+      expect(getNativeCurrency(updatedState, chainId).name).toBe(currencyName)
+    })
+
+    it(`should set the native currency symbol for ${chainName} to ${currencySymbol} if currently not set`, () => {
+      createChainState(chainId)
+
+      const updatedState = migrations.apply(state, 34)
+      expect(getNativeCurrency(updatedState, chainId).symbol).toBe(currencySymbol)
+    })
   })
 
-  it('should add the native currency name for Görli if currently an empty string', () => {
-    const updatedState = migrations.apply(state, 34)
-    expect(getNativeCurrency(updatedState, 5).name).toBe('Görli Ether')
-  })
+  const fields = ['name', 'symbol']
 
-  it('should add the native currency name for Optimism if currently an empty string', () => {
-    const updatedState = migrations.apply(state, 34)
-    expect(getNativeCurrency(updatedState, 10).name).toBe('Ether')
-  })
+  fields.forEach((field) => {
+    it(`should not overwrite an existing native currency ${field}`, () => {
+      createChainState(10)
+      state.main.networksMeta.ethereum[10].nativeCurrency[field] = 'CUSTOM'
 
-  it('should add the native currency name for Gnosis if currently an empty string', () => {
-    const updatedState = migrations.apply(state, 34)
-    expect(getNativeCurrency(updatedState, 100).name).toBe('xDai')
-  })
+      const updatedState = migrations.apply(state, 34)
+      expect(getNativeCurrency(updatedState, 10)[field]).toBe('CUSTOM')
+    })
 
-  it('should add the native currency name for Polygon if currently an empty string', () => {
-    const updatedState = migrations.apply(state, 34)
-    expect(getNativeCurrency(updatedState, 137).name).toBe('Matic')
-  })
+    it(`should set a missing custom chain native currency ${field} to an empty string`, () => {
+      createChainState(56)
 
-  it('should add the native currency name for Arbitrum if currently an empty string', () => {
-    const updatedState = migrations.apply(state, 34)
-    expect(getNativeCurrency(updatedState, 42161).name).toBe('Ether')
-  })
-
-  it('should add the native currency name for Sepolia if currently an empty string', () => {
-    const updatedState = migrations.apply(state, 34)
-    expect(getNativeCurrency(updatedState, 11155111).name).toBe('Sepolia Ether')
-  })
-
-  it('should add the native currency name for Mainnet if currently undefined', () => {
-    delete state.main.networksMeta.ethereum[1].nativeCurrency.name
-    const updatedState = migrations.apply(state, 34)
-    expect(getNativeCurrency(updatedState, 1).name).toBe('Ether')
-  })
-
-  it('should add the native currency name for Görli if currently undefined', () => {
-    delete state.main.networksMeta.ethereum[5].nativeCurrency.name
-    const updatedState = migrations.apply(state, 34)
-    expect(getNativeCurrency(updatedState, 5).name).toBe('Görli Ether')
-  })
-
-  it('should add the native currency name for Optimism if currently undefined', () => {
-    delete state.main.networksMeta.ethereum[10].nativeCurrency.name
-    const updatedState = migrations.apply(state, 34)
-    expect(getNativeCurrency(updatedState, 10).name).toBe('Ether')
-  })
-
-  it('should add the native currency name for Gnosis if currently undefined', () => {
-    delete state.main.networksMeta.ethereum[100].nativeCurrency.name
-    const updatedState = migrations.apply(state, 34)
-    expect(getNativeCurrency(updatedState, 100).name).toBe('xDai')
-  })
-
-  it('should add the native currency name for Polygon if currently undefined', () => {
-    delete state.main.networksMeta.ethereum[137].nativeCurrency.name
-    const updatedState = migrations.apply(state, 34)
-    expect(getNativeCurrency(updatedState, 137).name).toBe('Matic')
-  })
-
-  it('should add the native currency name for Arbitrum if currently undefined', () => {
-    delete state.main.networksMeta.ethereum[42161].nativeCurrency.name
-    const updatedState = migrations.apply(state, 34)
-    expect(getNativeCurrency(updatedState, 42161).name).toBe('Ether')
-  })
-
-  it('should add the native currency name for Sepolia if currently an empty string', () => {
-    delete state.main.networksMeta.ethereum[11155111].nativeCurrency.name
-    const updatedState = migrations.apply(state, 34)
-    expect(getNativeCurrency(updatedState, 11155111).name).toBe('Sepolia Ether')
-  })
-
-  it('should not overwrite an existing native currency name', () => {
-    state.main.networksMeta.ethereum[10].nativeCurrency.name = 'CUSTOM_NAME'
-    const updatedState = migrations.apply(state, 34)
-    expect(getNativeCurrency(updatedState, 10).name).toBe('CUSTOM_NAME')
-  })
-
-  it('should set a missing custom chain native currency name to an empty string', () => {
-    const updatedState = migrations.apply(state, 34)
-    expect(getNativeCurrency(updatedState, 56).name).toBe('')
+      const updatedState = migrations.apply(state, 34)
+      expect(getNativeCurrency(updatedState, 56)[field]).toBe('')
+    })
   })
 })
