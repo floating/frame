@@ -9,7 +9,7 @@ export function createRequestMatcher(method: string, params: ZodObject<any>) {
 }
 
 export function generateError(err: ZodError<any>) {
-  const errorMessage = err.issues[0].message || ''
+  const { message: errorMessage = '' } = err.issues[0] || {}
 
   if (errorMessage.toLowerCase() === 'required') {
     const field = err.issues[0].path.pop()
