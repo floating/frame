@@ -150,7 +150,7 @@ function initTrayWindow() {
 
   setTimeout(() => {
     windows.tray.on('focus', () => {
-      if (!isWindows) {
+      if (isMacOS) {
         glide = false
       }
       tray.show()
