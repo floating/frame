@@ -50,13 +50,12 @@ import {
   EIP2612TypedData,
   LegacyTypedData,
   PermitSignatureRequest,
-  TxClassification,
   TypedData,
   TypedMessage
 } from '../accounts/types'
 import * as sigParser from '../signatures'
 import { hasAddress } from '../../resources/domain/account'
-import { mapCaip27Request } from '../requests'
+import { mapRequest } from '../requests'
 
 type Subscription = {
   id: string
@@ -953,14 +952,10 @@ export class Provider extends EventEmitter {
     // in the request handler for each type of request
     let payload: RPCRequestPayload
 
-    if (requestPayload.method === 'caip_request' || requestPayload.method === 'wallet_request') {
-      try {
-        payload = mapCaip27Request(requestPayload)
-      } catch (e) {
-        return resError({ message: (e as Error).message }, requestPayload, res)
-      }
-    } else {
-      payload = requestPayload
+    try {
+      payload = mapRequest(requestPayload)
+    } catch (e) {
+      return resError({ message: (e as Error).message }, requestPayload, res)
     }
 
     const method = payload.method || ''
