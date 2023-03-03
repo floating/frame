@@ -1,4 +1,5 @@
 import log from 'electron-log'
+
 import migrations from '../../../../main/store/migrations'
 import { getDefaultAccountName } from '../../../../resources/domain/account'
 import { capitalize } from '../../../../resources/utils'
@@ -13,41 +14,46 @@ afterAll(() => {
   log.transports.console.level = 'debug'
 })
 
+beforeEach(() => {
+  state = {
+    main: {
+      _version: 0,
+      networks: { ethereum: {} },
+      networksMeta: { ethereum: {} },
+      accounts: {},
+      balances: {},
+      tokens: { known: {} }
+    }
+  }
+})
+
 describe('migration 13', () => {
   beforeEach(() => {
-    state = {
-      main: {
-        _version: 12,
-        networks: {
-          ethereum: {
-            1: {
-              id: 1,
-              type: 'ethereum',
-              layer: 'mainnet',
-              symbol: 'ETH',
-              name: 'Mainnet'
-            },
-            137: {
-              id: 1,
-              type: 'ethereum',
-              layer: 'sidechain',
-              symbol: 'MATIC',
-              name: 'Polygon',
-              connection: {
-                primary: {
-                  on: true,
-                  current: 'matic'
-                },
-                secondary: {
-                  on: false,
-                  current: 'local'
-                }
-              }
-            }
+    state.main._version = 12
+
+    state.main.networks.ethereum = {
+      1: {
+        id: 1,
+        type: 'ethereum',
+        layer: 'mainnet',
+        symbol: 'ETH',
+        name: 'Mainnet'
+      },
+      137: {
+        id: 1,
+        type: 'ethereum',
+        layer: 'sidechain',
+        symbol: 'MATIC',
+        name: 'Polygon',
+        connection: {
+          primary: {
+            on: true,
+            current: 'matic'
+          },
+          secondary: {
+            on: false,
+            current: 'local'
           }
-        },
-        networksMeta: {
-          ethereum: {}
         }
       }
     }
@@ -128,32 +134,24 @@ describe('migration 13', () => {
 
 describe('migration 14', () => {
   beforeEach(() => {
-    state = {
-      main: {
-        _version: 13,
-        networks: {
-          ethereum: {
-            137: {
-              id: 1,
-              type: 'ethereum',
-              layer: 'sidechain',
-              symbol: 'MATIC',
-              name: 'Polygon',
-              connection: {
-                primary: {
-                  on: true,
-                  current: 'matic'
-                },
-                secondary: {
-                  on: false,
-                  current: 'local'
-                }
-              }
-            }
+    state.main._version = 13
+
+    state.main.networks.ethereum = {
+      137: {
+        id: 1,
+        type: 'ethereum',
+        layer: 'sidechain',
+        symbol: 'MATIC',
+        name: 'Polygon',
+        connection: {
+          primary: {
+            on: true,
+            current: 'matic'
+          },
+          secondary: {
+            on: false,
+            current: 'local'
           }
-        },
-        networksMeta: {
-          ethereum: {}
         }
       }
     }
@@ -262,33 +260,25 @@ describe('migration 14', () => {
 
 describe('migration 15', () => {
   beforeEach(() => {
-    state = {
-      main: {
-        _version: 14,
-        networks: {
-          ethereum: {
-            137: {
-              id: 1,
-              type: 'ethereum',
-              layer: 'sidechain',
-              symbol: 'MATIC',
-              name: 'Polygon',
-              explorer: 'https://explorer.matic.network',
-              connection: {
-                primary: {
-                  on: true,
-                  current: 'matic'
-                },
-                secondary: {
-                  on: false,
-                  current: 'local'
-                }
-              }
-            }
+    state.main._version = 14
+
+    state.main.networks.ethereum = {
+      137: {
+        id: 1,
+        type: 'ethereum',
+        layer: 'sidechain',
+        symbol: 'MATIC',
+        name: 'Polygon',
+        explorer: 'https://explorer.matic.network',
+        connection: {
+          primary: {
+            on: true,
+            current: 'matic'
+          },
+          secondary: {
+            on: false,
+            current: 'local'
           }
-        },
-        networksMeta: {
-          ethereum: {}
         }
       }
     }
@@ -322,37 +312,30 @@ describe('migration 15', () => {
 
 describe('migration 16', () => {
   beforeEach(() => {
-    state = {
-      main: {
-        _version: 15,
-        currentNetwork: {
-          type: 'ethereum',
-          id: '1'
-        },
-        networks: {
-          ethereum: {
-            137: {
-              id: '137',
-              type: 'ethereum',
-              layer: 'sidechain',
-              symbol: 'MATIC',
-              name: 'Polygon',
-              explorer: 'https://explorer.matic.network',
-              connection: {
-                primary: {
-                  on: true,
-                  current: 'matic'
-                },
-                secondary: {
-                  on: false,
-                  current: 'local'
-                }
-              }
-            }
+    state.main._version = 15
+
+    state.main.currentNetwork = {
+      type: 'ethereum',
+      id: '1'
+    }
+
+    state.main.networks.ethereum = {
+      137: {
+        id: '137',
+        type: 'ethereum',
+        layer: 'sidechain',
+        symbol: 'MATIC',
+        name: 'Polygon',
+        explorer: 'https://explorer.matic.network',
+        connection: {
+          primary: {
+            on: true,
+            current: 'matic'
+          },
+          secondary: {
+            on: false,
+            current: 'local'
           }
-        },
-        networksMeta: {
-          ethereum: {}
         }
       }
     }
@@ -535,54 +518,45 @@ describe('migration 20', () => {
 
 describe('migration 21', () => {
   beforeEach(() => {
-    state = {
-      main: {
-        _version: 20,
-        networks: {
-          ethereum: {
-            5: {
-              id: 5,
-              type: 'ethereum',
-              layer: 'testnet',
-              symbol: 'ETH',
-              name: 'Görli',
-              explorer: 'https://goerli.etherscan.io',
-              gas: {
-                price: {
-                  selected: 'standard',
-                  levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-                }
-              },
-              connection: {
-                primary: {
-                  on: true,
-                  current: 'infura',
-                  status: 'loading',
-                  connected: false,
-                  type: '',
-                  network: '',
-                  custom: ''
-                },
-                secondary: {
-                  on: false,
-                  current: 'custom',
-                  status: 'loading',
-                  connected: false,
-                  type: '',
-                  network: '',
-                  custom: ''
-                }
-              },
-              on: false
-            }
+    state.main._version = 20
+
+    state.main.networkPresets = { ethereum: {} }
+
+    state.main.networks.ethereum = {
+      5: {
+        id: 5,
+        type: 'ethereum',
+        layer: 'testnet',
+        symbol: 'ETH',
+        name: 'Görli',
+        explorer: 'https://goerli.etherscan.io',
+        gas: {
+          price: {
+            selected: 'standard',
+            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
           }
         },
-        networksMeta: {
-          ethereum: {}
+        connection: {
+          primary: {
+            on: true,
+            current: 'infura',
+            status: 'loading',
+            connected: false,
+            type: '',
+            network: '',
+            custom: ''
+          },
+          secondary: {
+            on: false,
+            current: 'custom',
+            status: 'loading',
+            connected: false,
+            type: '',
+            network: '',
+            custom: ''
+          }
         },
-        networkPresets: {
-          ethereum: {}
-        }
+        on: false
       }
     }
   })
@@ -797,19 +771,14 @@ describe('migration 21', () => {
 
 describe('migration 22', () => {
   beforeEach(() => {
-    state = {
-      main: {
-        _version: 21,
-        networks: {
-          ethereum: {
-            1: {
-              layer: 'mainnet'
-            },
-            5: {
-              layer: 'testnet'
-            }
-          }
-        }
+    state.main._version = 21
+
+    state.main.networks.ethereum = {
+      1: {
+        layer: 'mainnet'
+      },
+      5: {
+        layer: 'testnet'
       }
     }
   })
@@ -829,25 +798,20 @@ describe('migration 22', () => {
 
 describe('migration 23', () => {
   beforeEach(() => {
-    state = {
-      main: {
-        _version: 22,
-        networksMeta: {
-          ethereum: {
-            1: {}, // Mainnet
-            3: {}, // Known Testnet
-            4: {}, // Known Testnet
-            5: {}, // Known Testnet
-            10: {}, // Optimism
-            42: {}, // Known Testnet
-            100: {}, // Gnosis
-            137: {}, // Polygon
-            8888: {}, // Unknown Chain
-            42161: {}, // Arbitrum
-            11155111: {} // Known Testnet
-          }
-        }
-      }
+    state.main._version = 22
+
+    state.main.networksMeta.ethereum = {
+      1: {}, // Mainnet
+      3: {}, // Known Testnet
+      4: {}, // Known Testnet
+      5: {}, // Known Testnet
+      10: {}, // Optimism
+      42: {}, // Known Testnet
+      100: {}, // Gnosis
+      137: {}, // Polygon
+      8888: {}, // Unknown Chain
+      42161: {}, // Arbitrum
+      11155111: {} // Known Testnet
     }
   })
 
@@ -886,16 +850,9 @@ describe('migration 23', () => {
 
 describe('migration 24', () => {
   beforeEach(() => {
-    state = {
-      main: {
-        _version: 23,
-        networksMeta: {
-          ethereum: {
-            1: {}
-          }
-        }
-      }
-    }
+    state.main._version = 23
+
+    state.main.networksMeta.ethereum = { 1: {} }
   })
 
   it('sets the nativeCurrency value on a chain', () => {
@@ -938,18 +895,13 @@ describe('migration 24', () => {
 
 describe('migration 25', () => {
   beforeEach(() => {
-    state = {
-      main: {
-        _version: 24,
-        networks: {
-          ethereum: {
-            10: {
-              connection: {
-                primary: { current: 'custom' },
-                secondary: { current: 'local' }
-              }
-            }
-          }
+    state.main._version = 24
+
+    state.main.networks.ethereum = {
+      10: {
+        connection: {
+          primary: { current: 'custom' },
+          secondary: { current: 'local' }
         }
       }
     }
@@ -988,28 +940,22 @@ describe('migration 25', () => {
 
 describe('migration 26', () => {
   beforeEach(() => {
-    state = {
-      main: {
-        _version: 25,
-        networks: {
-          ethereum: {
-            5: {
-              id: 5,
-              type: 'ethereum',
-              layer: 'testnet',
-              symbol: 'ETH',
-              name: 'Görli'
-            }
-          }
-        },
-        networksMeta: {
-          ethereum: {
-            5: {
-              nativeCurrency: {
-                symbol: 'ETH'
-              }
-            }
-          }
+    state.main._version = 25
+
+    state.main.networks.ethereum = {
+      5: {
+        id: 5,
+        type: 'ethereum',
+        layer: 'testnet',
+        symbol: 'ETH',
+        name: 'Görli'
+      }
+    }
+
+    state.main.networksMeta.ethereum = {
+      5: {
+        nativeCurrency: {
+          symbol: 'ETH'
         }
       }
     }
@@ -1026,12 +972,7 @@ describe('migration 26', () => {
 
 describe('migration 27', () => {
   beforeEach(() => {
-    state = {
-      main: {
-        _version: 26,
-        accounts: {}
-      }
-    }
+    state.main._version = 26
   })
 
   const address = '0x87c6418C2A3D6d502C85ed4454cAaDA0BD664AbA'
@@ -1062,24 +1003,19 @@ describe('migration 27', () => {
 
 describe('migration 28', () => {
   beforeEach(() => {
-    state = {
-      main: {
-        _version: 27,
-        networksMeta: {
-          ethereum: {
-            5: {
-              nativeCurrency: {
-                symbol: 'ETH',
-                decimals: 0
-              }
-            },
-            11155111: {
-              nativeCurrency: {
-                symbol: 'ETH',
-                decimals: 18
-              }
-            }
-          }
+    state.main._version = 27
+
+    state.main.networksMeta.ethereum = {
+      5: {
+        nativeCurrency: {
+          symbol: 'ETH',
+          decimals: 0
+        }
+      },
+      11155111: {
+        nativeCurrency: {
+          symbol: 'ETH',
+          decimals: 18
         }
       }
     }
@@ -1136,21 +1072,19 @@ describe('migration 28', () => {
 
 describe('migration 29', () => {
   beforeEach(() => {
-    state = {
-      main: {
-        _version: 28,
-        accounts: {
-          test: {
-            name: 'my test account',
-            lastSignerType: 'ledger'
-          },
-          look: {
-            name: 'such a cool account',
-            lastSignerType: 'ledger'
-          }
-        }
+    state.main._version = 28
+
+    state.main.accounts = {
+      test: {
+        name: 'my test account',
+        lastSignerType: 'ledger'
+      },
+      look: {
+        name: 'such a cool account',
+        lastSignerType: 'ledger'
       }
     }
+
     jest.setSystemTime(new Date('2022-11-17T11:01:58.135Z'))
   })
 
@@ -1342,46 +1276,37 @@ describe('migration 31', () => {
 })
 
 describe('migration 32', () => {
-  const getNativeCurrency = (state, chainId) => state.main.networksMeta.ethereum[chainId].nativeCurrency
   const getKnownTokens = (state) => state.main.tokens.known[account]
-
   const account = '0xd8da6bf26964af9d7eed9e03e53415d37aa96045'
+
   beforeEach(() => {
-    state = {
-      main: {
-        _version: 31,
-        networksMeta: {
-          ethereum: {
-            100: {
-              nativeCurrency: {
-                symbol: 'ETH',
-                decimals: 0,
-                name: ''
-              }
-            },
-            137: {
-              nativeCurrency: {
-                symbol: 'ETH',
-                decimals: 18,
-                name: ''
-              }
-            }
-          }
-        },
-        tokens: {
-          known: {
-            [account]: [
-              {
-                address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48'
-              },
-              {
-                address: '0xdeaddeaddeaddeaddeaddeaddeaddeaddead0000'
-              }
-            ]
-          }
+    state.main._version = 31
+
+    state.main.networksMeta.ethereum = {
+      100: {
+        nativeCurrency: {
+          symbol: 'ETH',
+          decimals: 0,
+          name: ''
+        }
+      },
+      137: {
+        nativeCurrency: {
+          symbol: 'ETH',
+          decimals: 18,
+          name: ''
         }
       }
     }
+
+    state.main.tokens.known[account] = [
+      {
+        address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48'
+      },
+      {
+        address: '0xdeaddeaddeaddeaddeaddeaddeaddeaddead0000'
+      }
+    ]
   })
 
   it('should remove any known tokens with the address `0xdeaddeaddeaddeaddeaddeaddeaddeaddead0000`', () => {
@@ -1403,38 +1328,97 @@ describe('migration 32', () => {
 
     expect(updatedKnown.length).toBe(oldKnown.length - 1)
   })
+})
 
-  it('should add the the native currency name for Gnosis mainnet if currently an empty string', () => {
-    const updatedState = migrations.apply(state, 32)
-    expect(getNativeCurrency(updatedState, 100).name).toBe('xDAI')
+describe('migration 34', () => {
+  const getNativeCurrency = (state, chainId) => state.main.networksMeta.ethereum[chainId].nativeCurrency
+  const createChainState = (chainId) => {
+    state.main.networks.ethereum[chainId] = { id: chainId }
+    state.main.networksMeta.ethereum[chainId] = { nativeCurrency: {} }
+  }
+
+  const expectedData = {
+    1: {
+      chainName: 'Mainnet',
+      currencyName: 'Ether',
+      currencySymbol: 'ETH'
+    },
+    5: {
+      chainName: 'Görli',
+      currencyName: 'Görli Ether',
+      currencySymbol: 'görETH'
+    },
+    10: {
+      chainName: 'Optimism',
+      currencyName: 'Ether',
+      currencySymbol: 'ETH'
+    },
+    100: {
+      chainName: 'Gnosis',
+      currencyName: 'xDAI',
+      currencySymbol: 'xDAI'
+    },
+    137: {
+      chainName: 'Polyon',
+      currencyName: 'Matic',
+      currencySymbol: 'MATIC'
+    },
+    42161: {
+      chainName: 'Arbitrum',
+      currencyName: 'Ether',
+      currencySymbol: 'ETH'
+    },
+    11155111: {
+      chainName: 'Sepolia',
+      currencyName: 'Sepolia Ether',
+      currencySymbol: 'sepETH'
+    }
+  }
+
+  beforeEach(() => {
+    state.main._version = 33
   })
 
-  it('should add the the native currency name for Polygon mainnet if currently an empty string', () => {
-    const updatedState = migrations.apply(state, 32)
-    expect(getNativeCurrency(updatedState, 137).name).toBe('Matic')
+  Object.entries(expectedData).forEach(([chainId, { chainName, currencyName, currencySymbol }]) => {
+    it(`should set the native currency name for ${chainName} to ${currencyName} if currently undefined`, () => {
+      createChainState(chainId)
+
+      const updatedState = migrations.apply(state, 34)
+      expect(getNativeCurrency(updatedState, chainId).name).toBe(currencyName)
+    })
+
+    it(`should set the native currency name for ${chainName} to ${currencyName} if currently an empty string'`, () => {
+      createChainState(chainId)
+      state.main.networksMeta.ethereum[chainId].nativeCurrency.name = ''
+
+      const updatedState = migrations.apply(state, 34)
+      expect(getNativeCurrency(updatedState, chainId).name).toBe(currencyName)
+    })
+
+    it(`should set the native currency symbol for ${chainName} to ${currencySymbol} if currently not set`, () => {
+      createChainState(chainId)
+
+      const updatedState = migrations.apply(state, 34)
+      expect(getNativeCurrency(updatedState, chainId).symbol).toBe(currencySymbol)
+    })
   })
 
-  it('should add the the native currency name for Gnosis mainnet if currently undefined', () => {
-    delete state.main.networksMeta.ethereum[100].nativeCurrency.name
-    const updatedState = migrations.apply(state, 32)
-    expect(getNativeCurrency(updatedState, 100).name).toBe('xDAI')
-  })
+  const fields = ['name', 'symbol']
 
-  it('should add the the native currency name for Polygon mainnet if currently undefined', () => {
-    delete state.main.networksMeta.ethereum[137].nativeCurrency.name
-    const updatedState = migrations.apply(state, 32)
-    expect(getNativeCurrency(updatedState, 137).name).toBe('Matic')
-  })
+  fields.forEach((field) => {
+    it(`should not overwrite an existing native currency ${field}`, () => {
+      createChainState(10)
+      state.main.networksMeta.ethereum[10].nativeCurrency[field] = 'CUSTOM'
 
-  it('should not overwrite a native currency name which is not set', () => {
-    state.main.networksMeta.ethereum[100].nativeCurrency.name = 'CUSTOM_NAME'
-    const updatedState = migrations.apply(state, 32)
-    expect(getNativeCurrency(updatedState, 100).name).toBe('CUSTOM_NAME')
-  })
+      const updatedState = migrations.apply(state, 34)
+      expect(getNativeCurrency(updatedState, 10)[field]).toBe('CUSTOM')
+    })
 
-  it('should not try to set the native currency name for a network not contained in networksMeta ', () => {
-    delete state.main.networksMeta.ethereum[100]
-    const updatedState = migrations.apply(state, 32)
-    expect(updatedState.main.networksMeta.ethereum[100]).toBeUndefined()
+    it(`should set a missing custom chain native currency ${field} to an empty string`, () => {
+      createChainState(56)
+
+      const updatedState = migrations.apply(state, 34)
+      expect(getNativeCurrency(updatedState, 56)[field]).toBe('')
+    })
   })
 })

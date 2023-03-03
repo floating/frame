@@ -781,14 +781,6 @@ const migrations = {
 
     initial.main.tokens.known = knownTokens
 
-    const nameNotSet = (chainId) => {
-      const meta = initial.main.networksMeta.ethereum[chainId]
-      return meta && !meta.nativeCurrency.name
-    }
-
-    if (nameNotSet(100)) initial.main.networksMeta.ethereum[100].nativeCurrency.name = 'xDAI'
-    if (nameNotSet(137)) initial.main.networksMeta.ethereum[137].nativeCurrency.name = 'Matic'
-
     return initial
   },
   33: (initial) => {
@@ -855,6 +847,54 @@ const migrations = {
         primaryColor: 'accent2' // Testnet
       }
     }
+
+    return initial
+  },
+  34: (initial) => {
+    // Add any missing nativeCurrency name values
+    // Base Görli (84531) value added in #33
+    const nativeCurrencyMap = {
+      1: {
+        name: 'Ether',
+        symbol: 'ETH'
+      },
+      5: {
+        name: 'Görli Ether',
+        symbol: 'görETH'
+      },
+      10: {
+        name: 'Ether',
+        symbol: 'ETH'
+      },
+      100: {
+        name: 'xDAI',
+        symbol: 'xDAI'
+      },
+      137: {
+        name: 'Matic',
+        symbol: 'MATIC'
+      },
+      42161: {
+        name: 'Ether',
+        symbol: 'ETH'
+      },
+      11155111: {
+        name: 'Sepolia Ether',
+        symbol: 'sepETH'
+      }
+    }
+
+    Object.values(initial.main.networks.ethereum).forEach((network) => {
+      const { id } = network
+      const { name = '', symbol = '' } = nativeCurrencyMap[id] || {}
+      const nativeCurrency = initial.main.networksMeta.ethereum[id].nativeCurrency
+
+      initial.main.networksMeta.ethereum[id].nativeCurrency = {
+        ...nativeCurrency,
+        name: nativeCurrency.name || name,
+        symbol: nativeCurrency.symbol || symbol
+      }
+    })
 
     return initial
   }
