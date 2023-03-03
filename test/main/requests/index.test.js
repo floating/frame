@@ -60,7 +60,7 @@ describe('#mapRequest', () => {
       expect(mapRequest(req).chainId).toBe('0xa')
     })
 
-    it('maps a request with a hex chain param', () => {
+    it('does not map a request with a non-CAIP-2 compliant chain param', () => {
       const { session, request: payload } = request.params
 
       const req = {
@@ -72,22 +72,7 @@ describe('#mapRequest', () => {
         }
       }
 
-      expect(mapRequest(req).chainId).toBe('0x5')
-    })
-
-    it('maps a request with a numeric chain param', () => {
-      const { session, request: payload } = request.params
-
-      const req = {
-        ...request,
-        params: {
-          chainId: '137',
-          session,
-          request: payload
-        }
-      }
-
-      expect(mapRequest(req).chainId).toBe('0x89')
+      expect(() => mapRequest(req)).toThrowError()
     })
 
     it('does not map a request with an incorrect chain id param', () => {

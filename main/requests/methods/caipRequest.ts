@@ -2,21 +2,14 @@ import { addHexPrefix } from '@ethereumjs/util'
 import { BigNumber } from 'bignumber.js'
 import { z } from 'zod'
 
-import { createRequestMatcher } from '../matchers'
+import { createRequestMatcher, generateError } from '../matchers'
 
-export const chainIdMatcher = z.union([
-  z
-    .string()
-    .startsWith('eip155:', {
-      message: 'Chain ID must be CAIP-2 chain representation and start with "eip155"'
-    })
-    .transform((id) => addHexPrefix(BigNumber(id.split(':')[1]).toString(16))),
-  z.string().regex(/0x[\da-f]/i),
-  z
-    .string()
-    .regex(/^\d+$/)
-    .transform((id) => addHexPrefix(parseInt(id).toString(16)))
-])
+export const chainIdMatcher = z
+  .string()
+  .startsWith('eip155:', {
+    message: 'Chain ID must be CAIP-2 chain representation and start with "eip155"'
+  })
+  .transform((id) => addHexPrefix(BigNumber(id.split(':')[1]).toString(16)))
 
 export const sessionMatcher = z.string()
 
@@ -51,8 +44,5 @@ export default function (rpcRequest: RPCRequestPayload) {
     }
   }
 
-  const errorMessage = result.error.issues[0].message
-  const field = result.error.issues[0].path.pop()
-
-  throw new Error(`${errorMessage}: ${field}`)
+  throw generateError(result.error)
 }
