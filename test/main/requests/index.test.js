@@ -72,22 +72,9 @@ describe('#mapRequest', () => {
         }
       }
 
-      expect(() => mapRequest(req)).toThrowError()
-    })
-
-    it('does not map a request with an incorrect chain id param', () => {
-      const { session, request: payload } = request.params
-
-      const req = {
-        ...request,
-        params: {
-          chainId: 'achain',
-          session,
-          request: payload
-        }
-      }
-
-      expect(() => mapRequest(req)).toThrowError()
+      expect(() => mapRequest(req)).toThrow(
+        new Error('Chain ID must be CAIP-2 chain representation and start with "eip155"')
+      )
     })
 
     it('does not map a request with no chain id param', () => {
@@ -101,7 +88,7 @@ describe('#mapRequest', () => {
         }
       }
 
-      expect(() => mapRequest(req)).toThrowError()
+      expect(() => mapRequest(req)).toThrow(new Error('chainId parameter is required'))
     })
 
     it('does not map a request with no session param', () => {
@@ -115,7 +102,7 @@ describe('#mapRequest', () => {
         }
       }
 
-      expect(() => mapRequest(req)).toThrowError()
+      expect(() => mapRequest(req)).toThrowError(new Error('session parameter is required'))
     })
   })
 
