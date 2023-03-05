@@ -1,5 +1,6 @@
 import log from 'electron-log'
 import { isValidAddress } from '@ethereumjs/util'
+import { v5 as uuidv5 } from 'uuid'
 
 import {
   AccessRequest,
@@ -24,6 +25,7 @@ import reveal from '../../reveal'
 import type { PermitSignatureRequest, TypedMessage } from '../types'
 import { isTransactionRequest, isTypedMessageSignatureRequest } from '../../../resources/domain/request'
 import Erc20Contract from '../../contracts/erc20'
+import { accountNS } from '../../../resources/domain/account'
 
 const nebula = nebulaApi()
 
@@ -268,6 +270,14 @@ class FrameAccount {
         approve
       }
     ]
+  }
+
+  lastSelected() {
+    const accountMetaId = uuidv5(this.address, accountNS)
+    console.log('looking for accountsMeta', this.address, accountMetaId)
+    console.log(store('main.accountsMeta'))
+    const accountMeta = store('main.accountsMeta', accountMetaId)
+    return accountMeta?.lastSelected || 0
   }
 
   resError(err: string | Error, payload: RPCResponsePayload, res: RPCErrorCallback) {

@@ -75,7 +75,11 @@ export interface TransactionMetadata {
 }
 
 const storeApi = {
-  getOrigin: (id: string) => store('main.origins', id) as Origin
+  getOrigin: (id: string) => store('main.origins', id) as Origin,
+  checkPermission: (address: Address, origin: string) => {
+    const permissions: Record<string, Permission> = store('main.permissions', address) || {}
+    return Object.values(permissions).find((p) => p.origin === origin)
+  }
 }
 
 const getPayloadOrigin = ({ _origin }: RPCRequestPayload) => storeApi.getOrigin(_origin)
@@ -960,6 +964,8 @@ export class Provider extends EventEmitter {
 
     const method = payload.method || ''
 
+    console.log('provider send', method)
+
     // method handlers that are not chain-specific can go here, before parsing the target chain
     if (method === 'eth_unsubscribe' && this.ifSubRemove(payload.params[0]))
       return res({ id: payload.id, jsonrpc: '2.0', result: true }) // Subscription was ours
@@ -971,11 +977,53 @@ export class Provider extends EventEmitter {
       return resError({ message: `unknown chain: ${payload.chainId}`, code: 4901 }, payload, res)
     }
 
-    function getAccounts(payload: JSONRPCRequestPayload, res: RPCRequestCallback) {
+    function getAccounts(payload: RPCRequestPayload, res: RPCRequestCallback) {
+      console.log('getAccounts payload', payload)
+      const currentAccount = accounts.current()
+      const accountsList = Object.entries(accounts.accounts).sort(
+        ([_idA, accountA], [_idB, accountB]) => accountB.lastSelected() - accountA.lastSelected()
+      )
+      // move currently selected account to top of the list
+      if (currentAccount) {
+        accountsList.filter(([_id, account]) => account.id !== currentAccount.id)
+        console.log('setting currentAccount', accountsList)
+      }
+      const origin = storeApi.getOrigin(payload._origin)
+      const existingPermissions = accountsList
+        .map(([_id, account]) => ({
+          account,
+          permission: storeApi.checkPermission(account.address, origin.name)
+        }))
+        .filter(({ permission }) => !!permission?.provider)
+
+      // handle fallback case - selected account without permission should still result in connection to another account
+
+      let permission
+      let result
+
+      // get permission for the current account, otherwise use existing perm
+      if (currentAccount) {
+        console.log('current account', currentAccount)
+        permission = storeApi.checkPermission(currentAccount.address, origin.name)
+
+        // no permission for current account => fall back to checking other accounts
+        if (!permission?.provider) {
+          console.log('no perm')
+          result = existingPermissions.map(({ account }) => account.address.toLowerCase())
+        } else {
+          console.log('perm')
+          result = accounts.getSelectedAddresses().map((a) => a.toLowerCase())
+        }
+      } else {
+        console.log('no current account')
+        result = existingPermissions.map(({ account }) => account.address.toLowerCase())
+      }
+
+      console.log('res', result)
       res({
         id: payload.id,
         jsonrpc: payload.jsonrpc,
-        result: accounts.getSelectedAddresses().map((a) => a.toLowerCase())
+        result
       })
     }
 

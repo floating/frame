@@ -32,7 +32,7 @@ export interface FrameExtension {
 const trustedExtensionMethods = ['wallet_getEthereumChains']
 
 const storeApi = {
-  getPermission: (address: Address, origin: string) => {
+  checkPermission: (address: Address, origin: string) => {
     const permissions: Record<string, Permission> = store('main.permissions', address) || {}
     return Object.values(permissions).find((p) => p.origin === origin)
   },
@@ -50,7 +50,11 @@ function invalidOrigin(origin: string) {
 }
 
 async function getPermission(address: Address, origin: string, payload: RPCRequestPayload) {
-  const permission = storeApi.getPermission(address, origin)
+  const permission = storeApi.checkPermission(address, origin)
+
+  if (!permission) {
+    console.log('requesting perm for ' + address)
+  }
 
   return permission || requestPermission(address, payload)
 }
@@ -99,7 +103,7 @@ async function requestPermission(address: Address, fullPayload: RPCRequestPayloa
 
     accounts.addRequest(request, () => {
       const { name: originName } = store('main.origins', originId)
-      const permission = storeApi.getPermission(address, originName)
+      const permission = storeApi.checkPermission(address, originName)
 
       delete activePermissionChecks[permissionCheckId]
       resolve(permission)
@@ -185,6 +189,11 @@ export async function isTrusted(payload: RPCRequestPayload) {
   // Permission granted to unknown origins only persist until the Frame is closed, they are not permanent
   const { name: originName } = store('main.origins', payload._origin) as { name: string }
   const currentAccount = accounts.current()
+  const accountsList = Object.entries(accounts.accounts)
+  // remove currently selected account from the list
+  if (currentAccount) {
+    accountsList.filter(([_id, account]) => account.id !== currentAccount.id)
+  }
 
   if (originName === 'frame-extension' && trustedExtensionMethods.includes(payload.method)) {
     return true
@@ -194,7 +203,27 @@ export async function isTrusted(payload: RPCRequestPayload) {
     return false
   }
 
-  const permission = await getPermission(currentAccount.address, originName, payload)
+  const existingPermissions = accountsList
+    .sort(([_idA, accountA], [_idB, accountB]) => accountB.lastSelected() - accountA.lastSelected())
+    .map(([_id, account]) => ({ account, permission: storeApi.checkPermission(account.address, originName) }))
+    .filter(({ permission }) => !!permission?.provider)
+
+  console.log('checking perms for ' + originName)
+  console.log(existingPermissions)
+  let permission
+
+  // get permission for the current account, otherwise use existing perm
+  if (currentAccount) {
+    permission = await getPermission(currentAccount.address, originName, payload)
+    // no permission for current account => fall back to checking other accounts
+    if (!permission?.provider) {
+      return !!existingPermissions[0]?.permission?.provider
+    }
+
+    return !!permission?.provider
+  }
+
+  permission = existingPermissions[0]?.permission
 
   return !!permission?.provider
 }
