@@ -13,7 +13,7 @@ export function generateError(err: ZodError<any>) {
 
   if (errorMessage.toLowerCase() === 'required') {
     const field = err.issues[0].path.pop()
-    return `${field} parameter is required`
+    return new Error(`${field} parameter is required`)
   }
 
   return new Error(errorMessage)
