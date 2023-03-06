@@ -40,8 +40,14 @@ export default [
   },
   // Main process files and scripts
   {
-    files: ['**/*.{js,mjs,ts}'],
-    ignores: ['app/**/*', 'resources/Components/**/*'],
+    files: [
+      '*.{js,mjs,ts}',
+      'scripts/**/*.mjs',
+      'main/**/*.{js,ts}',
+      'build/**/*.js',
+      'resources/**/*.{js,ts}'
+    ],
+    ignores: ['resources/Components/**/*', 'resources/Hooks/**/*', 'resources/Native/**/*'],
     languageOptions: {
       globals: {
         ...globals.node
@@ -53,9 +59,10 @@ export default [
     files: [
       'app/**/*.js',
       'main/dapps/server/inject/*.js',
-      'resources/**/*.{js,ts,tsx}',
       'test/app/**/*.js',
-      'test/resources/Components/**/*.js'
+      'test/resources/Components/**/*.js',
+      'test/resources/Hooks/**/*.js',
+      'test/resources/Native/**/*.js'
     ],
     languageOptions: {
       globals: {
@@ -103,6 +110,7 @@ export default [
     files: [
       'app/**/*.js',
       'resources/Components/**/*.js',
+      'resources/Hooks/**/*.js',
       'resources/Native/**/*.js',
       'resources/svg/index.js',
       'test/app/**/*.js',
@@ -159,6 +167,6 @@ export default [
       ...testingLibrary.configs.react.rules
     }
   },
-  // ensure all rules work with prettier 
+  // ensure all rules work with prettier
   prettier
 ]
