@@ -237,7 +237,7 @@
       "hardhat>@nomicfoundation/ethereumjs-blockchain>level>classic-level": false,
       "hardhat>keccak": true,
       "hdkey>secp256k1": true,
-      "ipfs-unixfs-importer>ipfs-unixfs>protons-runtime>protobufjs": false,
+      "ipfs-unixfs-importer>ipfs-unixfs>protobufjs": false,
       "nebula>ipfs-http-client>ipfs-core-utils>ipfs-unixfs>protobufjs": false,
       "nebula>ipfs-http-client>ipfs-core-types>ipfs-unixfs>protobufjs": false,
       "node-hid": false,
