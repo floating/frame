@@ -2,29 +2,11 @@ import crypto from 'crypto'
 import { signTypedData as signEthTypedData } from '@metamask/eth-sig-util'
 import { TransactionFactory } from '@ethereumjs/tx'
 import { Common } from '@ethereumjs/common'
-import {
-  hashPersonalMessage,
-  toBuffer,
-  ecsign,
-  addHexPrefix,
-  pubToAddress,
-  ecrecover
-} from '@ethereumjs/util'
+import { hashPersonalMessage, toBuffer, ecsign, addHexPrefix } from '@ethereumjs/util'
 
-import type { TypedMessage } from '../../../accounts/types'
-import type { TransactionData } from '../../../../resources/domain/transaction'
-import type {
-  HotSignerWorker,
-  PseudoCallback,
-  RPCMessage,
-  WorkerRPCMessage,
-  WorkerTokenMessage
-} from './types'
-
-interface IPC {
-  send: (message: WorkerTokenMessage | WorkerRPCMessage) => void
-  on: (msgType: 'message', handler: (message: RPCMessage) => void) => void
-}
+import type { TypedMessage } from '../../../../accounts/types'
+import type { TransactionData } from '../../../../../resources/domain/transaction'
+import type { PseudoCallback } from '../types'
 
 function chainConfig(chain: number, hardfork: string) {
   const chainId = BigInt(chain)
@@ -105,71 +87,5 @@ export function hashPassword(password: string, salt: Buffer) {
     return crypto.scryptSync(password, salt, 32, { N: 32768, r: 8, p: 1, maxmem: 36000000 })
   } catch (e) {
     console.error('Error during hashPassword', e) // TODO: Handle Error
-  }
-}
-
-export class HotSignerWorkerController {
-  private readonly token: string
-  private readonly worker: HotSignerWorker
-  private readonly ipc: IPC
-
-  constructor(worker: HotSignerWorker, ipc: IPC) {
-    this.worker = worker
-    this.ipc = ipc
-
-    ipc.on('message', (message: RPCMessage) => this.handleMessage(message))
-
-    this.token = crypto.randomBytes(32).toString('hex')
-    this.ipc.send({ type: 'token', token: this.token })
-  }
-
-  private handleMessage({ id, method, params, token }: RPCMessage) {
-    // Define (pseudo) callback
-    const pseudoCallback: PseudoCallback<unknown> = (error, result) => {
-      // Add correlation id to response
-      const response = { id, error: error || undefined, result, type: 'rpc' } as const
-      // Send response to parent process
-      this.ipc.send(response)
-    }
-
-    // Verify token
-    if (!crypto.timingSafeEqual(Buffer.from(token), Buffer.from(this.token))) {
-      return pseudoCallback('Invalid token')
-    }
-
-    if (method === 'verifyAddress') {
-      return this.verifyAddress(params, pseudoCallback)
-    }
-
-    this.worker.handleMessage(pseudoCallback, method, params)
-  }
-
-  verifyAddress(
-    { index, address }: { index: number; address: string },
-    pseudoCallback: PseudoCallback<boolean>
-  ) {
-    const message = '0x' + crypto.randomBytes(32).toString('hex')
-    const cb: PseudoCallback<string> = (err, msg) => {
-      // Handle signing errors
-      if (err) return pseudoCallback(err)
-      // Signature -> buffer
-      const signedMessage = msg as string
-      const signature = Buffer.from(signedMessage.replace('0x', ''), 'hex')
-      // Ensure correct length
-      if (signature.length !== 65) return pseudoCallback('Frame verifyAddress signature has incorrect length')
-      // Verify address
-      const vNum = signature[64]
-
-      const v = BigInt(vNum === 0 || vNum === 1 ? vNum + 27 : vNum)
-      const r = toBuffer(signature.slice(0, 32))
-      const s = toBuffer(signature.slice(32, 64))
-      const hash = hashPersonalMessage(toBuffer(message))
-      const verifiedAddress = '0x' + pubToAddress(ecrecover(hash, v, r, s)).toString('hex')
-
-      // Return result
-      pseudoCallback(null, verifiedAddress.toLowerCase() === address.toLowerCase())
-    }
-
-    this.worker.signMessage(cb, { index, message })
   }
 }

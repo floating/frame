@@ -1,8 +1,8 @@
-import RingSignerWorker from '../RingSigner/worker'
-import SeedSignerWorker from '../SeedSigner/worker'
+import RingSignerWorker from '../../RingSigner/worker'
+import SeedSignerWorker from '../../SeedSigner/worker'
+import launchController from './controller'
 
-import { HotSignerWorkerController } from './controller'
-import type { WorkerRPCMessage, WorkerTokenMessage } from './types'
+import type { WorkerRPCMessage, WorkerTokenMessage } from '../types'
 
 const signerType = process.argv[2] as HotSignerType
 let worker
@@ -26,4 +26,4 @@ const ipc = {
   on: process.on.bind(process)
 }
 
-new HotSignerWorkerController(worker, ipc)
+launchController(worker, ipc)

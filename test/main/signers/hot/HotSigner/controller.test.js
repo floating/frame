@@ -1,7 +1,7 @@
 import EventEmitter from 'events'
 import crypto from 'crypto'
 
-import { HotSignerWorkerController } from '../../../../../main/signers/hot/HotSigner/controller'
+import createController from '../../../../../main/signers/hot/HotSigner/worker/controller'
 
 let ipc, worker, token
 
@@ -14,7 +14,7 @@ beforeEach(() => {
     handleMessage: jest.fn()
   }
 
-  new HotSignerWorkerController(worker, ipc)
+  createController(worker, ipc)
 
   token = ipc.send.mock.calls[0][0].token
   expect(token).toMatch(/^[A-Za-z0-9]{64}$/)

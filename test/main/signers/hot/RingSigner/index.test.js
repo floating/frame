@@ -17,8 +17,11 @@ jest.mock('path', () => {
     ...original,
     resolve: (...args) => {
       // TODO: this can be cleaned up once tests are re-worked
-      if (args.includes('worker.js')) {
-        return original.resolve(__dirname, '../../../../../compiled/main/signers/hot/HotSigner/worker.js')
+      if (args.includes('worker/launch.js')) {
+        return original.resolve(
+          __dirname,
+          '../../../../../compiled/main/signers/hot/HotSigner/worker/launch.js'
+        )
       }
 
       return original.resolve(...args)

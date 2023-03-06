@@ -23,7 +23,7 @@ const USER_DATA = app
     path.resolve(path.dirname(require.main.filename), '../.userData')
 
 const SIGNERS_PATH = path.resolve(USER_DATA, 'signers')
-const WORKER_PATH = path.resolve(__dirname, 'worker.js')
+const WORKER_PATH = path.resolve(__dirname, 'worker/launch.js')
 
 type RPCMessagePayload = {
   method: RPCMethod
