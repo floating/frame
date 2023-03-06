@@ -2,7 +2,6 @@ import path from 'path'
 import fs from 'fs'
 import log from 'electron-log'
 import bip39 from 'bip39'
-// @ts-ignore
 import zxcvbn from 'zxcvbn'
 import { ensureDirSync } from 'fs-extra'
 import { app } from 'electron'
