@@ -12,7 +12,17 @@ import store from '../../../store'
 
 import type { TransactionData } from '../../../../resources/domain/transaction'
 import type { TypedMessage } from '../../../accounts/types'
-import type { RPCMessage, RPCMethod, WorkerMessage, WorkerRPCMessage, WorkerTokenMessage } from './types'
+import type {
+  RPCMessage,
+  RPCMethod,
+  SignMessageParams,
+  SignTypedDataParams,
+  TransactionParams,
+  VerifyAddressParams,
+  WorkerMessage,
+  WorkerRPCMessage,
+  WorkerTokenMessage
+} from './types'
 
 // TODO: remove these when updating tests
 const windows = app ? require('../../../windows') : { broadcast: () => {} }
@@ -137,22 +147,28 @@ export default class HotSigner extends Signer {
   }
 
   signMessage(index: number, message: string, cb: Callback<string>) {
-    const payload = { method: 'signMessage', params: { index, message } } as const
+    const params: SignMessageParams = { index, message }
+    const payload = { method: 'signMessage', params } as const
+
     this.callWorker(payload, cb as Callback<unknown>)
   }
 
   signTypedData(index: number, typedMessage: TypedMessage, cb: Callback<string>) {
-    const payload = { method: 'signTypedData', params: { index, message: typedMessage } } as const
+    const params: SignTypedDataParams = { index, message: typedMessage }
+    const payload = { method: 'signTypedData', params } as const
+
     this.callWorker(payload, cb as Callback<unknown>)
   }
 
   signTransaction(index: number, rawTx: TransactionData, cb: Callback<string>) {
-    const payload = { method: 'signTransaction', params: { index, rawTx } } as const
+    const params: TransactionParams = { index, rawTx }
+    const payload = { method: 'signTransaction', params } as const
     this.callWorker(payload, cb as Callback<unknown>)
   }
 
   verifyAddress(index: number, address: string, display: boolean, cb: Callback<boolean>) {
-    const payload = { method: 'verifyAddress', params: { index, address } } as const
+    const params: VerifyAddressParams = { index, address }
+    const payload = { method: 'verifyAddress', params } as const
 
     this.callWorker(payload, (err, isVerified) => {
       const verified = isVerified as boolean

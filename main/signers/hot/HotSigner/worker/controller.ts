@@ -7,6 +7,7 @@ import type {
   PseudoCallback,
   RPCMessage,
   RPCMethod,
+  VerifyAddressParams,
   WorkerRPCMessage,
   WorkerTokenMessage
 } from '../types'
@@ -18,7 +19,7 @@ interface IPC {
 
 function processMessage(method: RPCMethod, params: any, cb: PseudoCallback<unknown>) {
   if (method === 'verifyAddress') {
-    const { index, address } = params
+    const { index, address } = params as VerifyAddressParams
     const message = '0x' + crypto.randomBytes(32).toString('hex')
 
     const callback: PseudoCallback<unknown> = (err, msg) => {

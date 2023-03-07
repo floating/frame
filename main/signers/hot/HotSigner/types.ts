@@ -27,6 +27,11 @@ export type TransactionParams = {
   rawTx: TransactionData
 }
 
+export type VerifyAddressParams = {
+  index: number
+  address: Address
+}
+
 export type EncryptSeedParams = {
   seed: string
   password: string
