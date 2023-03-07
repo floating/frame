@@ -142,7 +142,7 @@ export default class HotSigner extends Signer {
   }
 
   signTypedData(index: number, typedMessage: TypedMessage, cb: Callback<string>) {
-    const payload = { method: 'signTypedData', params: { index, typedMessage } } as const
+    const payload = { method: 'signTypedData', params: { index, message: typedMessage } } as const
     this.callWorker(payload, cb as Callback<unknown>)
   }
 
