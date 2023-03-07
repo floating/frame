@@ -100,7 +100,6 @@ const AddKeystore = ({ accountData }) => (
     backSteps={6}
     accountData={accountData}
     firstStep={<LoadKeystore key={0} accountData={accountData} />}
-    validateSecret={() => {}}
   />
 )
 

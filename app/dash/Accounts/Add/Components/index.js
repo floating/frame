@@ -5,6 +5,7 @@ import RingIcon from '../../../../../resources/Components/RingIcon'
 import { ConfirmPassword, CreatePassword } from '../../../../../resources/Components/Password'
 import link from '../../../../../resources/link'
 import { debounce } from '../../../../../resources/utils'
+import { SimpleFlowScreen } from '../../../../../resources/Components/SimpleFlowScreen'
 
 const navForward = async (newAccountType, accountData) =>
   link.send('nav:forward', 'dash', {
@@ -15,8 +16,6 @@ const navForward = async (newAccountType, accountData) =>
       accountData
     }
   })
-
-const removeLineBreaks = (str) => str.replace(/(\r\n|\n|\r)/gm, '')
 
 const AddHotAccountWrapper = ({ children, title, svgName, summary, index }) => {
   return (
@@ -50,7 +49,6 @@ const EnterSecret = ({ newAccountType, validateSecret, title, autofocus }) => {
   const EMPTY_STATE = `Enter ${title}`
   const inputRef = useFocusableRef(autofocus, 100)
   const [error, setError] = useState(EMPTY_STATE)
-
   const resetError = () => setError(EMPTY_STATE)
 
   const clear = () => {
@@ -66,7 +64,7 @@ const EnterSecret = ({ newAccountType, validateSecret, title, autofocus }) => {
   }, 300)
 
   const handleSubmit = () => {
-    setTimeout(clear, 600)
+    setTimeout(clear, 2000)
     return navForward(newAccountType, {
       secret: inputRef.current.value
     })
@@ -120,6 +118,10 @@ const Error = ({ error }) => {
   )
 }
 
+const SeedPhraseTextarea = ({ onChange, onKeyDown }) => (
+  <textarea tabIndex='-1' ref={ref} onChange={onChange} onKeyDown={onKeyDown} />
+)
+
 export function AddHotAccount({
   title,
   summary,
@@ -128,7 +130,7 @@ export function AddHotAccount({
   accountData,
   createSignerMethod,
   newAccountType,
-  validateSecret,
+  validateSecret = () => {},
   firstStep,
   backSteps = 4
 }) {
@@ -150,7 +152,6 @@ export function AddHotAccount({
           error: err
         })
       }
-
       link.send('nav:back', 'dash', backSteps)
       link.send(`nav:forward`, 'dash', {
         view: 'expandedSigner',
@@ -158,20 +159,36 @@ export function AddHotAccount({
       })
     })
 
-  const firstFlowStep = firstStep || (
-    <EnterSecret
-      key={0}
-      validateSecret={validateSecret}
-      title={title}
-      newAccountType={newAccountType}
-      autofocus={viewIndex === 0}
-    />
-  )
+  // TODO: autofocus (on step 1 and also back steps)
+  // abstract
+  // get rid of nested ternaries
+  // ensure 'error' message on first render / back steps
+  // check keystore password on first step
+  // Don’t require re-entry of seed phrase after invalid password entered
+  // Able to unhide values by clicking a button
 
   const steps = [
-    firstFlowStep,
+    firstStep || (
+      <SimpleFlowScreen
+        autofocus={viewIndex === 0}
+        inputField={SeedPhraseTextarea}
+        valueParser={removeLineBreaks}
+        next={(value) => {
+          setTimeout(clear, 2000)
+          return navForward(newAccountType, {
+            secret: value
+          })
+        }}
+      />
+    ),
     <CreatePassword key={1} onCreate={onCreate} autofocus={viewIndex === 1} />,
-    <ConfirmPassword key={2} password={password} onConfirm={onConfirm} autofocus={viewIndex === 2} />,
+    <ConfirmPassword
+      key={2}
+      password={password}
+      onConfirm={onConfirm}
+      autofocus={viewIndex === 2}
+      submittedMessage='processing...'
+    />,
     <Error key={3} error={error} />
   ]
 
