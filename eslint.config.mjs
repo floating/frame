@@ -13,9 +13,11 @@ export default [
   {
     ignores: ['dist/**/*', 'compiled/**/*', 'bundle/**/*']
   },
-  // Temporary ignored dirs - TODO: remove on rewrite
+  // Temporary ignored dirs
+  // TODO: remove signers on rewrite
+  // TODO: remove e2e on rewrite
   {
-    ignores: ['main/signers/**/*']
+    ignores: ['test/e2e/**/*', 'main/signers/**/*']
   },
   // All files
   {
@@ -45,7 +47,10 @@ export default [
       'scripts/**/*.mjs',
       'main/**/*.{js,ts}',
       'build/**/*.js',
-      'resources/**/*.{js,ts}'
+      'resources/**/*.{js,ts}',
+      'test/*.js',
+      'test/__mocks__/*.js',
+      'test/main/**/*.{js,ts}'
     ],
     ignores: ['resources/Components/**/*', 'resources/Hooks/**/*', 'resources/Native/**/*'],
     languageOptions: {
@@ -59,6 +64,12 @@ export default [
     files: [
       'app/**/*.js',
       'main/dapps/server/inject/*.js',
+      'resources/app/**/*.js',
+      'resources/Components/**/*.js',
+      'resources/Hooks/**/*.js',
+      'resources/Native/**/*.js',
+      'resources/bridge/index.js',
+      'resources/link/index.js',
       'test/app/**/*.js',
       'test/resources/Components/**/*.js',
       'test/resources/Hooks/**/*.js',
@@ -116,6 +127,7 @@ export default [
       'test/app/**/*.js',
       'test/resources/Components/**/*.js',
       'test/resources/Hooks/**/*.js',
+      'test/resources/Native/**/*.js',
       'test/jest.svg.js'
     ],
     plugins: {
