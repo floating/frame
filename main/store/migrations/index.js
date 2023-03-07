@@ -887,9 +887,11 @@ const migrations = {
     Object.values(initial.main.networks.ethereum).forEach((network) => {
       const { id } = network
       const { name = '', symbol = '' } = nativeCurrencyMap[id] || {}
-      const nativeCurrency = (initial.main.networksMeta.ethereum[id] || {}).nativeCurrency || {}
+      const existingMeta = initial.main.networksMeta.ethereum[id] || {}
+      const { nativeCurrency = {} } = existingMeta
 
       initial.main.networksMeta.ethereum[id] = {
+        ...existingMeta,
         nativeCurrency: {
           ...nativeCurrency,
           name: nativeCurrency.name || name,
