@@ -1421,4 +1421,19 @@ describe('migration 34', () => {
       expect(getNativeCurrency(updatedState, 56)[field]).toBe('')
     })
   })
+
+  it('should set native currency data when no chain metadata previously existed', () => {
+    state.main.networks.ethereum[10] = { id: 10 }
+
+    const updatedState = migrations.apply(state, 34)
+    expect(getNativeCurrency(updatedState, 10)).toStrictEqual({ name: 'Ether', symbol: 'ETH' })
+  })
+
+  it('should set native currency data when none previously existed', () => {
+    createChainState(137)
+    delete state.main.networksMeta.ethereum[137].nativeCurrency
+
+    const updatedState = migrations.apply(state, 34)
+    expect(getNativeCurrency(updatedState, 137)).toStrictEqual({ name: 'Matic', symbol: 'MATIC' })
+  })
 })
