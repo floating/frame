@@ -891,7 +891,7 @@ const migrations = {
       // ensure chain exists in networksMeta
       initial.main.networksMeta.ethereum[id] = initial.main.networksMeta.ethereum[id] || {}
 
-      const nativeCurrency = initial.main.networksMeta.ethereum[id].nativeCurrency
+      const { nativeCurrency } = initial.main.networksMeta.ethereum[id]
 
       initial.main.networksMeta.ethereum[id].nativeCurrency = {
         ...nativeCurrency,
