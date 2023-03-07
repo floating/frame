@@ -2,7 +2,14 @@ import crypto from 'crypto'
 import { signTypedData as signEthTypedData } from '@metamask/eth-sig-util'
 import { TransactionFactory } from '@ethereumjs/tx'
 import { Common } from '@ethereumjs/common'
-import { hashPersonalMessage, toBuffer, ecsign, addHexPrefix } from '@ethereumjs/util'
+import {
+  hashPersonalMessage,
+  toBuffer,
+  ecsign,
+  addHexPrefix,
+  pubToAddress,
+  ecrecover
+} from '@ethereumjs/util'
 
 import type { TypedMessage } from '../../../../accounts/types'
 import type { TransactionData } from '../../../../../resources/domain/transaction'
@@ -62,6 +69,18 @@ export function signTransaction(key: Buffer, rawTx: TransactionData, pseudoCallb
   const serialized = signedTx.serialize().toString('hex')
 
   pseudoCallback(null, addHexPrefix(serialized))
+}
+
+export function verifySignedMessage(address: Address, message: string, signature: Buffer) {
+  const vNum = signature[64]
+
+  const v = BigInt(vNum === 0 || vNum === 1 ? vNum + 27 : vNum)
+  const r = toBuffer(signature.slice(0, 32))
+  const s = toBuffer(signature.slice(32, 64))
+  const hash = hashPersonalMessage(toBuffer(message))
+  const verifiedAddress = '0x' + pubToAddress(ecrecover(hash, v, r, s)).toString('hex')
+
+  return verifiedAddress.toLowerCase() === address.toLowerCase()
 }
 
 export function encrypt(s: string, password: string) {

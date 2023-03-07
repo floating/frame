@@ -45,7 +45,7 @@ it('verifies an address on the signer worker', () => {
     token
   })
 
-  expect(worker.signMessage).toHaveBeenCalledWith(expect.any(Function), {
+  expect(worker.handleMessage).toHaveBeenCalledWith(expect.any(Function), 'signMessage', {
     index: 0,
     message: expect.stringMatching(/^0x[A-Za-z0-9]{64}$/)
   })

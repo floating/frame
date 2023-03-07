@@ -1,8 +1,9 @@
 import crypto from 'crypto'
-import { hashPersonalMessage, toBuffer, pubToAddress, ecrecover } from '@ethereumjs/util'
+
+import { verifySignedMessage } from '.'
 
 import type {
-  HotSignerWorker,
+  HotSignerMessageHandler,
   PseudoCallback,
   RPCMessage,
   WorkerRPCMessage,
@@ -14,7 +15,7 @@ interface IPC {
   on: (msgType: 'message', handler: (message: RPCMessage) => void) => void
 }
 
-export default function (worker: HotSignerWorker, ipc: IPC) {
+export default function (worker: HotSignerMessageHandler, ipc: IPC) {
   const workerToken = crypto.randomBytes(32).toString('hex')
 
   const handleMessage = ({ id, method, params, token }: RPCMessage) => {
@@ -40,31 +41,23 @@ export default function (worker: HotSignerWorker, ipc: IPC) {
 
   const verifyAddress = (
     { index, address }: { index: number; address: string },
-    pseudoCallback: PseudoCallback<boolean>
+    pseudoCallback: PseudoCallback<unknown>
   ) => {
     const message = '0x' + crypto.randomBytes(32).toString('hex')
-    const cb: PseudoCallback<string> = (err, msg) => {
+    const cb: PseudoCallback<unknown> = (err, msg) => {
       // Handle signing errors
       if (err) return pseudoCallback(err)
-      // Signature -> buffer
+
       const signedMessage = msg as string
       const signature = Buffer.from(signedMessage.replace('0x', ''), 'hex')
-      // Ensure correct length
       if (signature.length !== 65) return pseudoCallback('Frame verifyAddress signature has incorrect length')
-      // Verify address
-      const vNum = signature[64]
 
-      const v = BigInt(vNum === 0 || vNum === 1 ? vNum + 27 : vNum)
-      const r = toBuffer(signature.slice(0, 32))
-      const s = toBuffer(signature.slice(32, 64))
-      const hash = hashPersonalMessage(toBuffer(message))
-      const verifiedAddress = '0x' + pubToAddress(ecrecover(hash, v, r, s)).toString('hex')
+      const verified = verifySignedMessage(address, message, signature)
 
-      // Return result
-      pseudoCallback(null, verifiedAddress.toLowerCase() === address.toLowerCase())
+      pseudoCallback(null, verified)
     }
 
-    worker.signMessage(cb, { index, message })
+    worker.handleMessage(cb, 'signMessage', { index, message })
   }
 
   ipc.on('message', handleMessage)

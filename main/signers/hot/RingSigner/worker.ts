@@ -10,7 +10,7 @@ import {
 import type {
   AddKeyParams,
   CoreWorkerMethod,
-  HotSignerWorker,
+  HotSignerMessageHandler,
   PseudoCallback,
   RemoveKeyParams,
   RingSignerMethod,
@@ -35,7 +35,7 @@ function isRingSignerMethod(method: string): method is RingSignerMethod | CoreWo
   return isHotSignerMethod(method) || ['addKey', 'removeKey'].includes(method)
 }
 
-export default class RingSignerWorker implements HotSignerWorker {
+export default class RingSignerWorker implements HotSignerMessageHandler {
   private keys: Buffer[] | null = null
 
   handleMessage(cb: PseudoCallback<unknown>, method: WorkerMethod, params: any) {

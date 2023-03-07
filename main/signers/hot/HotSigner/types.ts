@@ -1,13 +1,8 @@
 import type { TransactionData } from '../../../../resources/domain/transaction'
 import type { TypedMessage } from '../../../accounts/types'
 
-export interface HotSignerWorker {
+export interface HotSignerMessageHandler {
   handleMessage: (cb: PseudoCallback<unknown>, method: WorkerMethod, params: any) => void
-  lock: (cb: PseudoCallback<never>, params: unknown) => void
-  unlock: (cb: PseudoCallback<never>, params: UnlockParams) => void
-  signMessage: (cb: PseudoCallback<string>, params: SignMessageParams) => void
-  signTypedData: (cb: PseudoCallback<string>, params: SignTypedDataParams) => void
-  signTransaction: (cb: PseudoCallback<string>, params: TransactionParams) => void
 }
 
 export type PseudoCallback<T> = (errorMessage: string | null, result?: T) => void
@@ -49,7 +44,7 @@ export type RemoveKeyParams = {
   password: string
 }
 
-export type CoreWorkerMethod = keyof Omit<HotSignerWorker, 'handleMessage'>
+export type CoreWorkerMethod = 'lock' | 'unlock' | 'signMessage' | 'signTypedData' | 'signTransaction'
 export type SeedSignerMethod = 'encryptSeed'
 export type RingSignerMethod = 'addKey' | 'removeKey'
 export type WorkerMethod = CoreWorkerMethod | SeedSignerMethod | RingSignerMethod
