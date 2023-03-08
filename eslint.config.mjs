@@ -82,6 +82,15 @@ export default [
       }
     }
   },
+  // Renderer entry points
+  {
+    files: ['app/*/index.js'],
+    languageOptions: {
+      globals: {
+        process: true
+      }
+    }
+  },
   // TS files
   {
     files: ['**/*.{ts,tsx}'],
