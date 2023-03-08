@@ -164,7 +164,7 @@ const initial = {
   },
   platform: process.platform,
   main: {
-    _version: main('_version', 32),
+    _version: main('_version', 36),
     instanceId: main('instanceId', generateUuid()),
     colorway: main('colorway', 'dark'),
     colorwayPrimary: {
@@ -384,7 +384,7 @@ const initial = {
               connected: false,
               type: '',
               network: '',
-              custom: 'https://gnosis.blockpi.network/v1/rpc/public'
+              custom: 'https://rpc.gnosischain.com'
             },
             secondary: {
               on: false,

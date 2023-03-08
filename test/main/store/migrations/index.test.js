@@ -1562,3 +1562,51 @@ describe('migration 35', () => {
     expect(secondary.current).toBe('custom')
   })
 })
+
+describe('migration 36', () => {
+  beforeEach(() => {
+    state.main._version = 35
+
+    state.main.networks.ethereum = {
+      100: {
+        connection: {
+          primary: { current: 'custom' },
+          secondary: { current: 'local' }
+        }
+      }
+    }
+  })
+
+  const connectionPriorities = ['primary', 'secondary']
+
+  connectionPriorities.forEach((priority) => {
+    it(`updates a ${priority} Gnosis connection`, () => {
+      state.main.networks.ethereum[100].connection[priority].current = 'poa'
+
+      const updatedState = migrations.apply(state, 36)
+      const gnosis = updatedState.main.networks.ethereum[100]
+
+      expect(gnosis.connection[priority].current).toBe('custom')
+      expect(gnosis.connection[priority].custom).toBe('https://rpc.gnosischain.com')
+    })
+
+    it(`does not update an existing custom ${priority} Gnosis connection`, () => {
+      state.main.networks.ethereum[100].connection[priority].current = 'custom'
+      state.main.networks.ethereum[100].connection[priority].custom = 'https://myconnection.io'
+
+      const updatedState = migrations.apply(state, 36)
+      const optimism = updatedState.main.networks.ethereum[100]
+
+      expect(optimism.connection[priority].current).toBe('custom')
+      expect(optimism.connection[priority].custom).toBe('https://myconnection.io')
+    })
+  })
+
+  it('takes no action if no Gnosis chain is present', () => {
+    delete state.main.networks.ethereum[100]
+
+    const updatedState = migrations.apply(state, 36)
+
+    expect(updatedState.main.networks).toStrictEqual({ ethereum: {} })
+  })
+})
