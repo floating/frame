@@ -964,8 +964,6 @@ export class Provider extends EventEmitter {
 
     const method = payload.method || ''
 
-    console.log('provider send', method)
-
     // method handlers that are not chain-specific can go here, before parsing the target chain
     if (method === 'eth_unsubscribe' && this.ifSubRemove(payload.params[0]))
       return res({ id: payload.id, jsonrpc: '2.0', result: true }) // Subscription was ours
@@ -978,7 +976,6 @@ export class Provider extends EventEmitter {
     }
 
     function getAccounts(payload: RPCRequestPayload, res: RPCRequestCallback) {
-      console.log('getAccounts payload', payload)
       const currentAccount = accounts.current()
       const accountsList = Object.entries(accounts.accounts).sort(
         ([_idA, accountA], [_idB, accountB]) => accountB.lastSelected() - accountA.lastSelected()
@@ -986,7 +983,6 @@ export class Provider extends EventEmitter {
       // move currently selected account to top of the list
       if (currentAccount) {
         accountsList.filter(([_id, account]) => account.id !== currentAccount.id)
-        console.log('setting currentAccount', accountsList)
       }
       const origin = storeApi.getOrigin(payload._origin)
       const existingPermissions = accountsList
@@ -996,30 +992,23 @@ export class Provider extends EventEmitter {
         }))
         .filter(({ permission }) => !!permission?.provider)
 
-      // handle fallback case - selected account without permission should still result in connection to another account
-
       let permission
       let result
 
       // get permission for the current account, otherwise use existing perm
       if (currentAccount) {
-        console.log('current account', currentAccount)
         permission = storeApi.checkPermission(currentAccount.address, origin.name)
 
         // no permission for current account => fall back to checking other accounts
         if (!permission?.provider) {
-          console.log('no perm')
           result = existingPermissions.map(({ account }) => account.address.toLowerCase())
         } else {
-          console.log('perm')
           result = accounts.getSelectedAddresses().map((a) => a.toLowerCase())
         }
       } else {
-        console.log('no current account')
         result = existingPermissions.map(({ account }) => account.address.toLowerCase())
       }
 
-      console.log('res', result)
       res({
         id: payload.id,
         jsonrpc: payload.jsonrpc,

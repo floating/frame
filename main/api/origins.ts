@@ -52,10 +52,6 @@ function invalidOrigin(origin: string) {
 async function getPermission(address: Address, origin: string, payload: RPCRequestPayload) {
   const permission = storeApi.checkPermission(address, origin)
 
-  if (!permission) {
-    console.log('requesting perm for ' + address)
-  }
-
   return permission || requestPermission(address, payload)
 }
 
@@ -208,8 +204,6 @@ export async function isTrusted(payload: RPCRequestPayload) {
     .map(([_id, account]) => ({ account, permission: storeApi.checkPermission(account.address, originName) }))
     .filter(({ permission }) => !!permission?.provider)
 
-  console.log('checking perms for ' + originName)
-  console.log(existingPermissions)
   let permission
 
   // get permission for the current account, otherwise use existing perm
