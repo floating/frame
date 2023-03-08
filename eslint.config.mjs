@@ -78,7 +78,6 @@ export default [
     languageOptions: {
       globals: {
         ...globals.browser,
-        process: true,
         global: true
       }
     }
