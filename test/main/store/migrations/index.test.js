@@ -1595,10 +1595,10 @@ describe('migration 36', () => {
       state.main.networks.ethereum[100].connection[priority].custom = 'https://myconnection.io'
 
       const updatedState = migrations.apply(state, 36)
-      const optimism = updatedState.main.networks.ethereum[100]
+      const gnosis = updatedState.main.networks.ethereum[100]
 
-      expect(optimism.connection[priority].current).toBe('custom')
-      expect(optimism.connection[priority].custom).toBe('https://myconnection.io')
+      expect(gnosis.connection[priority].current).toBe('custom')
+      expect(gnosis.connection[priority].custom).toBe('https://myconnection.io')
     })
   })
 
