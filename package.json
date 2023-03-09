@@ -190,7 +190,7 @@
     "url": false
   },
   "engines": {
-    "electron": "22",
+    "electron": "23",
     "node": ">= 18.12.1"
   },
   "browserslist": [
