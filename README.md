@@ -58,8 +58,8 @@ If you use an arch-based distro, you can use an AUR Helper like [yay](https://gi
 › git clone https://github.com/floating/frame
 
 # Use node v16
-› nvm install 16.15.0
-› nvm use 16.15.0
+› nvm install 18.12.1
+› nvm use 18.12.1
 
 
 # Install

@@ -191,7 +191,7 @@
   },
   "engines": {
     "electron": "22",
-    "node": ">= 16.15.0"
+    "node": ">= 18.12.1"
   },
   "browserslist": [
     "last 1 Electron major version"
