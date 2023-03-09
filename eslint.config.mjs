@@ -13,9 +13,11 @@ export default [
   {
     ignores: ['dist/**/*', 'compiled/**/*', 'bundle/**/*']
   },
-  // Temporary ignored dirs - TODO: remove on rewrite
+  // Temporary ignored dirs
+  // TODO: remove signers on rewrite
+  // TODO: remove e2e on rewrite
   {
-    ignores: ['main/signers/**/*']
+    ignores: ['test/e2e/**/*', 'main/signers/**/*']
   },
   // All files
   {
@@ -40,8 +42,17 @@ export default [
   },
   // Main process files and scripts
   {
-    files: ['**/*.{js,mjs,ts}'],
-    ignores: ['app/**/*', 'resources/Components/**/*'],
+    files: [
+      '*.{js,mjs,ts}',
+      'scripts/**/*.mjs',
+      'main/**/*.{js,ts}',
+      'build/**/*.js',
+      'resources/**/*.{js,ts}',
+      'test/*.js',
+      'test/__mocks__/*.js',
+      'test/main/**/*.{js,ts}'
+    ],
+    ignores: ['resources/Components/**/*', 'resources/Hooks/**/*', 'resources/Native/**/*'],
     languageOptions: {
       globals: {
         ...globals.node
@@ -53,15 +64,30 @@ export default [
     files: [
       'app/**/*.js',
       'main/dapps/server/inject/*.js',
-      'resources/**/*.{js,ts,tsx}',
+      'resources/app/**/*.js',
+      'resources/Components/**/*.js',
+      'resources/Hooks/**/*.js',
+      'resources/Native/**/*.js',
+      'resources/bridge/index.js',
+      'resources/link/index.js',
       'test/app/**/*.js',
-      'test/resources/Components/**/*.js'
+      'test/resources/Components/**/*.js',
+      'test/resources/Hooks/**/*.js',
+      'test/resources/Native/**/*.js'
     ],
     languageOptions: {
       globals: {
         ...globals.browser,
-        process: true,
         global: true
+      }
+    }
+  },
+  // Renderer entry points
+  {
+    files: ['app/*/index.js'],
+    languageOptions: {
+      globals: {
+        process: true
       }
     }
   },
@@ -103,11 +129,13 @@ export default [
     files: [
       'app/**/*.js',
       'resources/Components/**/*.js',
+      'resources/Hooks/**/*.js',
       'resources/Native/**/*.js',
       'resources/svg/index.js',
       'test/app/**/*.js',
       'test/resources/Components/**/*.js',
       'test/resources/Hooks/**/*.js',
+      'test/resources/Native/**/*.js',
       'test/jest.svg.js'
     ],
     plugins: {
@@ -159,6 +187,6 @@ export default [
       ...testingLibrary.configs.react.rules
     }
   },
-  // ensure all rules work with prettier 
+  // ensure all rules work with prettier
   prettier
 ]

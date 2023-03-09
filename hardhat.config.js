@@ -12,30 +12,49 @@ taskWithDefaultParams('send-tx', 'send a test transaction')
   .addOptionalParam('amount', 'amount to send, in eth')
   .setAction(
     async ({ amount, chain = 4, to = '0xf2C1E45B6611bC4378c3502789957A57e0390B79', provider = 'frame' }) => {
-      return new Promise((resolve, reject) => {
+      const requestTimeout = new Promise((resolve, reject) =>
         setTimeout(() => reject(new Error('request timed out!')), 60 * 1000)
+      )
 
+      const sendRequest = async () => {
         const chainId = '0x' + parseInt(chain).toString(16)
         const eth = ethProvider(provider === 'hardhat' ? 'http://127.0.0.1:8545' : provider, {
           origin: 'frame-hardhat-worker'
         })
 
-        eth
-          .request({ method: 'eth_accounts', params: [], id: 2, chainId, jsonrpc: '2.0' })
-          .then((accounts) => ({
-            value: utils.parseEther(amount || '.0002').toHexString(),
-            from: accounts[0],
-            to,
-            data: '0x'
-          }))
-          .then((tx) => eth.request({ method: 'eth_sendTransaction', params: [tx], id: 2, chainId }))
-          .then((txHash) => {
-            console.log(`success! tx hash: ${txHash}`)
-            return txHash
-          })
-          .then(resolve)
-          .catch(reject)
-      })
+        const accounts = await eth.request({
+          method: 'eth_accounts',
+          params: [],
+          id: 2,
+          jsonrpc: '2.0'
+        })
+
+        const tx = {
+          value: utils.parseEther(amount || '.0002').toHexString(),
+          from: accounts[0],
+          to,
+          data: '0x'
+        }
+
+        const req = {
+          id: 2,
+          jsonrpc: '2.0',
+          method: 'wallet_request',
+          params: {
+            chainId: `eip155:${parseInt(chainId, 16)}`,
+            request: {
+              method: 'eth_sendTransaction',
+              params: [tx]
+            }
+          }
+        }
+
+        const txHash = await eth.request(req)
+
+        console.log(`success! tx hash: ${txHash}`)
+      }
+
+      return Promise.race([requestTimeout, sendRequest()])
     }
   )
 
