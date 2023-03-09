@@ -19,9 +19,9 @@
     "./main/**/*.ts",
     "./main/**/*.js",
     "./resources/**/*.ts",
-    "./resources/**/*.js"
+    "./resources/**/*.js",
+    "./test/**/*.ts"
   ],
-  "exclude": ["**/__mocks__/*"],
   "watchOptions": {
     "excludeFiles": ["./node_modules/**/*", "./package.json"]
   }
