@@ -167,7 +167,7 @@ const initial = {
     isUS: true
   },
   main: {
-    _version: main('_version', 32),
+    _version: main('_version', 36),
     instanceId: main('instanceId', generateUuid()),
     colorway: main('colorway', 'dark'),
     colorwayPrimary: {
@@ -246,38 +246,22 @@ const initial = {
           local: 'direct'
         },
         1: {
-          alchemy: 'alchemy',
-          infura: 'infura'
-        },
-        3: {
-          alchemy: 'alchemyRopsten',
-          infura: 'infuraRopsten'
-        },
-        4: {
-          alchemy: 'alchemyRinkeby',
-          infura: 'infuraRinkeby'
+          pylon: 'wss://evm.pylon.link/mainnet'
         },
         5: {
-          infura: 'infuraGoerli'
+          pylon: 'wss://evm.pylon.link/goerli'
         },
         10: {
-          infura: 'infuraOptimism'
-        },
-        42: {
-          alchemy: 'alchemyKovan',
-          infura: 'infuraKovan'
-        },
-        100: {
-          poa: 'gnosis'
+          pylon: 'wss://evm.pylon.link/optimism'
         },
         137: {
-          infura: 'infuraPolygon'
+          pylon: 'wss://evm.pylon.link/polygon'
         },
         42161: {
-          infura: 'infuraArbitrum'
+          pylon: 'wss://evm.pylon.link/arbitrum'
         },
         11155111: {
-          infura: 'infuraSepolia'
+          pylon: 'wss://evm.pylon.link/sepolia'
         }
       }
     },
@@ -299,7 +283,7 @@ const initial = {
           connection: {
             primary: {
               on: true,
-              current: 'infura',
+              current: 'pylon',
               status: 'loading',
               connected: false,
               type: '',
@@ -334,7 +318,7 @@ const initial = {
           connection: {
             primary: {
               on: true,
-              current: 'infura',
+              current: 'pylon',
               status: 'loading',
               connected: false,
               type: '',
@@ -369,7 +353,7 @@ const initial = {
           connection: {
             primary: {
               on: true,
-              current: 'infura',
+              current: 'pylon',
               status: 'loading',
               connected: false,
               type: '',
@@ -403,13 +387,13 @@ const initial = {
           },
           connection: {
             primary: {
-              on: true,
-              current: 'poa',
+              on: false,
+              current: 'custom',
               status: 'loading',
               connected: false,
               type: '',
               network: '',
-              custom: ''
+              custom: 'https://rpc.gnosischain.com'
             },
             secondary: {
               on: false,
@@ -439,7 +423,7 @@ const initial = {
           connection: {
             primary: {
               on: true,
-              current: 'infura',
+              current: 'pylon',
               status: 'loading',
               connected: false,
               type: '',
@@ -474,7 +458,7 @@ const initial = {
           connection: {
             primary: {
               on: true,
-              current: 'infura',
+              current: 'pylon',
               status: 'loading',
               connected: false,
               type: '',
@@ -544,7 +528,7 @@ const initial = {
           connection: {
             primary: {
               on: true,
-              current: 'infura',
+              current: 'pylon',
               status: 'loading',
               connected: false,
               type: '',

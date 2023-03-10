@@ -17,6 +17,11 @@ afterAll(() => {
   log.transports.console.level = 'debug'
 })
 
+const createChainState = (chainId) => {
+  state.main.networks.ethereum[chainId] = { id: chainId }
+  state.main.networksMeta.ethereum[chainId] = { nativeCurrency: {} }
+}
+
 beforeEach(() => {
   state = {
     main: {
@@ -1335,10 +1340,6 @@ describe('migration 32', () => {
 
 describe('migration 34', () => {
   const getNativeCurrency = (state, chainId) => state.main.networksMeta.ethereum[chainId].nativeCurrency
-  const createChainState = (chainId) => {
-    state.main.networks.ethereum[chainId] = { id: chainId }
-    state.main.networksMeta.ethereum[chainId] = { nativeCurrency: {} }
-  }
 
   const expectedData = {
     1: {
