@@ -13,34 +13,6 @@ const FEE_WARNING_THRESHOLD_USD = 50
 const capitalize = (s) => s[0].toUpperCase() + s.slice(1)
 
 class Notify extends React.Component {
-  nonceWarning() {
-    return (
-      <div className='notifyBoxWrap' onMouseDown={(e) => e.stopPropagation()}>
-        <div className='notifyBoxSlide'>
-          <div className='notifyBox'>
-            <div className='notifyTitle'>Adjustable Nonce</div>
-            <div className='notifyBody'>
-              <div className='notifyBodyBlock notifyBodyBlockBig'>
-                <div>
-                  Adjusting the nonce of a replacement transaction will cause it to become a new transaction
-                  rather than a replacement, use with caution
-                </div>
-              </div>
-            </div>
-            <div className='notifyInput'>
-              <div
-                className='notifyInputOption notifyInputSingleButton'
-                onMouseDown={() => link.send('tray:action', 'backDash')}
-              >
-                <div className='notifyInputOptionText'>Got it!</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
   gasFeeWarning({ req = {}, feeUSD = '0.00', currentSymbol = 'ETH' }) {
     return (
       <div className='notifyBoxWrap' onMouseDown={(e) => e.stopPropagation()}>
@@ -430,12 +402,6 @@ class Notify extends React.Component {
       return (
         <div className='notify cardShow' onMouseDown={() => link.send('tray:action', 'backDash')}>
           {this.mainnet()}
-        </div>
-      )
-    } else if (notify === 'nonceWarning') {
-      return (
-        <div className='notify cardShow' onMouseDown={() => link.send('tray:action', 'backDash')}>
-          {this.nonceWarning()}
         </div>
       )
     } else if (notify === 'gasFeeWarning') {
