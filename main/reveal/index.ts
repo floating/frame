@@ -73,57 +73,65 @@ async function recogErc20(
   chainId: number,
   calldata: string
 ): Promise<Action<unknown> | undefined> {
-  if (contractAddress) {
+  const decoded = Erc20Contract.decodeCallData(calldata)
+  if (contractAddress && decoded) {
     try {
       const contract = new Erc20Contract(contractAddress, chainId)
-      const decoded = contract.decodeCallData(calldata)
-      if (decoded) {
-        const { decimals, name, symbol } = await contract.getTokenData()
-        if (Erc20Contract.isApproval(decoded)) {
-          const spender = decoded.args[0].toLowerCase()
-          const amount = decoded.args[1].toHexString()
-          const { ens, type } = await surface.identity(spender, chainId)
-          const data = {
-            spender,
-            amount,
-            decimals,
-            name,
-            symbol,
-            spenderEns: ens,
-            spenderType: type,
-            contract: contractAddress
+
+      const { decimals, name, symbol } = await contract.getTokenData()
+      if (Erc20Contract.isApproval(decoded)) {
+        const spenderAddress = decoded.args[0].toLowerCase()
+        const amount = decoded.args[1].toHexString()
+
+        const [spenderIdentity, contractIdentity] = await Promise.all([
+          surface.identity(spenderAddress, chainId),
+          surface.identity(contractAddress, chainId)
+        ])
+
+        const data = {
+          amount,
+          decimals,
+          name,
+          symbol,
+          spender: {
+            ...spenderIdentity,
+            address: spenderAddress
+          },
+          contract: {
+            address: contractAddress,
+            ...contractIdentity
           }
-
-          return {
-            id: 'erc20:approve',
-            data,
-            update: (request, { amount }) => {
-              // amount is a hex string
-              const approvedAmount = new BigNumber(amount || '').toString()
-
-              log.verbose(
-                `Updating Erc20 approve amount to ${approvedAmount} for contract ${contractAddress} and spender ${spender}`
-              )
-
-              const txRequest = request as TransactionRequest
-
-              data.amount = amount
-              txRequest.data.data = contract.encodeCallData('approve', [spender, amount])
-
-              if (txRequest.decodedData) {
-                txRequest.decodedData.args[1].value = amount === MAX_HEX ? 'unlimited' : approvedAmount
-              }
-            }
-          } as Erc20Approval
-        } else if (Erc20Contract.isTransfer(decoded)) {
-          const recipient = decoded.args[0].toLowerCase()
-          const amount = decoded.args[1].toHexString()
-          const { ens, type } = await surface.identity(recipient, chainId)
-          return {
-            id: 'erc20:transfer',
-            data: { recipient, amount, decimals, name, symbol, recipientEns: ens, recipientType: type }
-          } as Erc20Transfer
         }
+
+        return {
+          id: 'erc20:approve',
+          data,
+          update: (request, { amount }) => {
+            // amount is a hex string
+            const approvedAmount = new BigNumber(amount || '').toString()
+
+            log.verbose(
+              `Updating Erc20 approve amount to ${approvedAmount} for contract ${contractAddress} and spender ${spenderAddress}`
+            )
+
+            const txRequest = request as TransactionRequest
+
+            data.amount = amount
+            txRequest.data.data = Erc20Contract.encodeCallData('approve', [spenderAddress, amount])
+
+            if (txRequest.decodedData) {
+              txRequest.decodedData.args[1].value = amount === MAX_HEX ? 'unlimited' : approvedAmount
+            }
+          }
+        } as Erc20Approval
+      } else if (Erc20Contract.isTransfer(decoded)) {
+        const recipient = decoded.args[0].toLowerCase()
+        const amount = decoded.args[1].toHexString()
+        const identity = await surface.identity(recipient, chainId)
+        return {
+          id: 'erc20:transfer',
+          data: { recipient: { address: recipient, ...identity }, amount, decimals, name, symbol }
+        } as Erc20Transfer
       }
     } catch (e) {
       log.warn(e)
@@ -151,14 +159,23 @@ function identifyKnownContractActions(
 }
 
 const surface = {
-  identity: async (address: string = '', chainId: number) => {
+  identity: async (address: string = '', chainId?: number) => {
     // Resolve ens, type and other data about address entities
-    const [type, ens] = await Promise.all([resolveEntityType(address, chainId), resolveEnsName(address)])
+
+    const results = await Promise.allSettled([
+      chainId ? resolveEntityType(address, chainId) : Promise.resolve(''),
+      resolveEnsName(address)
+    ])
+
+    const type = results[0].status === 'fulfilled' ? results[0].value : ''
+    const ens = results[1].status === 'fulfilled' ? results[1].value : ''
+
     // TODO: Check the address against various scam dbs
     // TODO: Check the address against user's contact list
     // TODO: Check the address against previously verified contracts
     return { type, ens }
   },
+  resolveEntityType,
   decode: async (contractAddress: string = '', chainId: number, calldata: string) => {
     // Decode calldata
     const contractSources: ContractSource[] = [{ name: 'ERC-20', source: 'Generic ERC-20', abi: erc20Abi }]

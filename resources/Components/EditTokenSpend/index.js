@@ -6,14 +6,19 @@ import svg from '../../svg'
 import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../Cluster'
 import Countdown from '../Countdown'
 
-import { MAX_HEX } from '../../constants'
 import useCopiedMessage from '../../Hooks/useCopiedMessage'
+import { DisplayValue } from '../DisplayValue'
 
 const isMax = (value) => max.isEqualTo(value)
 
 const getMode = (requestedAmount, amount) => {
   if (requestedAmount.eq(amount)) return 'requested'
   return isMax(amount) ? 'unlimited' : 'custom'
+}
+
+const isValidInput = (value, decimals) => {
+  const strValue = value.toString()
+  return !isNaN(value) && value > 0 && (!strValue.includes('.') || strValue.split('.')[1].length <= decimals)
 }
 
 const Details = ({ address, name }) => {
@@ -29,7 +34,11 @@ const Details = ({ address, name }) => {
       >
         <div className='clusterAddress'>
           <span className='clusterAddressRecipient'>
-            {name || (
+            {name ? (
+              <span className='clusterAddressRecipient' style={{ fontFamily: 'MainFont', fontWeight: '400' }}>
+                {name}
+              </span>
+            ) : (
               <>
                 {address.substring(0, 8)}
                 {svg.octicon('kebab-horizontal', { height: 15 })}
@@ -54,37 +63,23 @@ const Description = ({ mode, custom, isRevoke }) => (
   <ClusterRow>
     <ClusterValue>
       <div className='clusterTag' style={{ color: 'var(--moon)' }}>
-        {mode === 'custom' && !custom ? (
-          <span>{'set approval to spend'}</span>
-        ) : isRevoke ? (
-          <span>{'revoke approval to spend'}</span>
-        ) : (
-          <span>{'grant approval to spend'}</span>
-        )}
+        {isRevoke ? <span>{'revoke approval to spend'}</span> : <span>{'grant approval to spend'}</span>}
       </div>
     </ClusterValue>
   </ClusterRow>
 )
 
-const CustomAmountInput = ({
+const EditTokenSpend = ({
   data,
   updateRequest: updateHandlerRequest,
   requestedAmount,
   deadline,
   canRevoke = false
 }) => {
-  const {
-    decimals = 0,
-    symbol = '???',
-    name = 'Unknown Token',
-    spenderEns,
-    spender,
-    contract: tokenAddress,
-    amount
-  } = data
+  const { decimals = 0, symbol = '???', name = 'Unknown Token', spender, contract, amount } = data
 
-  const toDecimal = (baseAmount) => new BigNumber(baseAmount).shiftedBy(-1 * decimals).toString()
-  const fromDecimal = (decimalAmount) => new BigNumber(decimalAmount).shiftedBy(decimals).toString()
+  const toDecimal = (baseAmount) => new BigNumber(baseAmount).shiftedBy(-1 * decimals).toString(10)
+  const fromDecimal = (decimalAmount) => new BigNumber(decimalAmount).shiftedBy(decimals).toString(10)
 
   const [mode, setMode] = useState(getMode(requestedAmount, amount))
   const [custom, setCustom] = useState('')
@@ -95,13 +90,13 @@ const CustomAmountInput = ({
 
   const value = new BigNumber(amount)
 
-  const updateCustomAmount = (value) => {
+  const updateCustomAmount = (value, decimals) => {
     if (!value) {
       setCustom('0')
       return setMode('custom')
     }
 
-    if (isNaN(value) || value < 0) return
+    if (!isValidInput(value, decimals)) return
     setMode('custom')
     setCustom(value)
   }
@@ -109,13 +104,12 @@ const CustomAmountInput = ({
   const resetToRequestAmount = () => {
     setCustom(toDecimal(requestedAmount))
     setMode('requested')
-    updateHandlerRequest(requestedAmount)
+    updateHandlerRequest(requestedAmount.toString(10))
   }
 
   const setToMax = () => {
-    console.log('setting to max')
     setMode('unlimited')
-    updateHandlerRequest(max.toString())
+    updateHandlerRequest(max.toString(10))
   }
 
   const isRevoke = canRevoke && value.eq(0)
@@ -123,7 +117,7 @@ const CustomAmountInput = ({
 
   const displayAmount = isMax(amount) ? 'unlimited' : toDecimal(amount)
 
-  const inputLock = !symbol || !name || !decimals
+  const inputLock = !data.symbol || !data.name || !data.decimals
 
   return (
     <div className='updateTokenApproval'>
@@ -131,8 +125,8 @@ const CustomAmountInput = ({
         <Cluster>
           <Details
             {...{
-              address: spender,
-              name: spenderEns
+              address: spender.address,
+              name: spender.ens
             }}
           />
           <Description
@@ -144,7 +138,7 @@ const CustomAmountInput = ({
           />
           <Details
             {...{
-              address: tokenAddress,
+              address: contract.address,
               name
             }}
           />
@@ -164,9 +158,13 @@ const CustomAmountInput = ({
 
         <Cluster style={{ marginTop: '16px' }}>
           <ClusterRow>
+            <ClusterValue>
+              <div className='approveTokenSpendAmountLabel'>{symbol}</div>
+            </ClusterValue>
+          </ClusterRow>
+          <ClusterRow>
             <ClusterValue transparent={true} pointerEvents={'auto'}>
               <div className='approveTokenSpendAmount'>
-                <div className='approveTokenSpendAmountLabel'>{symbol}</div>
                 {isCustom && amount !== fromDecimal(custom) ? (
                   <div
                     className='approveTokenSpendAmountSubmit'
@@ -195,11 +193,10 @@ const CustomAmountInput = ({
                     onChange={(e) => {
                       e.preventDefault()
                       e.stopPropagation()
-                      updateCustomAmount(e.target.value)
+                      updateCustomAmount(e.target.value, decimals)
                     }}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
-                        console.log({ customInput: custom })
                         e.target.blur()
                         if (custom === '') return resetToRequestAmount()
                         updateHandlerRequest(fromDecimal(custom))
@@ -223,8 +220,12 @@ const CustomAmountInput = ({
                     {displayAmount}
                   </div>
                 )}
-                <div className='approveTokenSpendAmountSubtitle'>Set Token Approval Spend Limit</div>
               </div>
+            </ClusterValue>
+          </ClusterRow>
+          <ClusterRow>
+            <ClusterValue transparent={true}>
+              <div className='approveTokenSpendAmountSubtitle'>Set Token Approval Spend Limit</div>
             </ClusterValue>
           </ClusterRow>
           <ClusterRow>
@@ -273,4 +274,4 @@ const CustomAmountInput = ({
   )
 }
 
-export default CustomAmountInput
+export default EditTokenSpend

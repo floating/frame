@@ -21,11 +21,7 @@ const server = http.createServer((req, res) => {
   }
 
   if (sessions.verify(ens, session)) {
-    if (url.pathname === '/') {
-      return asset.dapp(res, namehash)
-    } else {
-      return asset.stream(res, namehash, url.pathname)
-    }
+    return asset.stream(res, namehash, url.pathname)
   } else {
     res.writeHead(403)
     return res.end('No dapp session, launch this dapp from Frame')

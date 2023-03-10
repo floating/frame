@@ -63,6 +63,8 @@ class ChainConnection extends EventEmitter {
   }
 
   _createProvider(target, priority) {
+    log.debug('createProvider', { chainId: this.chainId, priority })
+
     this.update(priority)
 
     this[priority].provider = provider(target, {
@@ -85,6 +87,8 @@ class ChainConnection extends EventEmitter {
     const allowEip1559 = !legacyChains.includes(parseInt(this.chainId))
 
     monitor.on('data', async (block) => {
+      log.debug(`Updating to block ${parseInt(block.number)} for chain ${parseInt(this.chainId)}`)
+
       let feeMarket = null
 
       const gasMonitor = new GasMonitor(provider)
@@ -223,6 +227,8 @@ class ChainConnection extends EventEmitter {
 
     if (this[priority].blockMonitor) {
       this[priority].blockMonitor.stop()
+      this[priority].blockMonitor.removeAllListeners()
+      this[priority].blockMonitor = null
     }
   }
 

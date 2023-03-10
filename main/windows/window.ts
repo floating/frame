@@ -14,6 +14,7 @@ export function createWindow(
   const browserWindow = new BrowserWindow({
     ...opts,
     frame: false,
+    acceptFirstMouse: true,
     transparent: process.platform === 'darwin',
     show: false,
     backgroundColor: store('main.colorwayPrimary', store('main.colorway'), 'background'),
@@ -86,9 +87,7 @@ const externalWhitelist = [
   'https://opensea.io'
 ]
 
-const isValidReleasePage = (url: string) =>
-  url.startsWith('https://github.com/floating/frame/releases/tag') ||
-  url.startsWith('https://github.com/frame-labs/frame-canary/releases/tag')
+const isValidReleasePage = (url: string) => url.startsWith('https://github.com/floating/frame/releases/tag')
 const isWhitelistedHost = (url: string) =>
   externalWhitelist.some((entry) => url === entry || url.startsWith(entry + '/'))
 
@@ -98,11 +97,19 @@ export function openExternal(url = '') {
   }
 }
 
-export function openBlockExplorer(hash: string, { id, type }: Chain) {
+export function openBlockExplorer({ id, type }: Chain, hash?: string, account?: string) {
   // remove trailing slashes from the base url
   const explorer = (store('main.networks', type, id, 'explorer') || '').replace(/\/+$/, '')
 
   if (explorer) {
-    shell.openExternal(`${explorer}/tx/${hash}`)
+    if (hash) {
+      const hashPath = hash && `/tx/${hash}`
+      shell.openExternal(`${explorer}${hashPath}`)
+    } else if (account) {
+      const accountPath = account && `/address/${account}`
+      shell.openExternal(`${explorer}${accountPath}`)
+    } else {
+      shell.openExternal(`${explorer}`)
+    }
   }
 }

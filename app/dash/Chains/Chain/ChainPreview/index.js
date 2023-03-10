@@ -1,10 +1,11 @@
 import React from 'react'
-import { ChainHeader, ChainFooter } from '../Components'
+import { ChainHeader } from '../Components'
 import Connection from '../Connection'
-import Gas from '../../../../../resources/Components/Gas'
+import Gas from '../../../../../resources/Components/Monitor'
+import { ClusterBox, Cluster } from '../../../../../resources/Components/Cluster'
 
 export default (props) => {
-  const { type, id, primaryColor, icon, name, on, connection, symbol, price } = props
+  const { type, id, primaryColor, icon, name, on, explorer, symbol, price } = props
   return (
     <div className='network'>
       <ChainHeader
@@ -19,9 +20,12 @@ export default (props) => {
       />
       {on && (
         <div className='chainModules'>
-          <Connection {...props} />
-          <Gas chainId={id} />
-          <ChainFooter symbol={symbol} price={price} />
+          <ClusterBox>
+            <Cluster>
+              <Connection {...props} />
+              <Gas chainId={id} />
+            </Cluster>
+          </ClusterBox>
           <div style={{ height: '14px' }} />
         </div>
       )}

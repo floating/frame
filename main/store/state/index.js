@@ -73,6 +73,7 @@ const initial = {
         'requests',
         // 'activity',
         // 'gas',
+        'chains',
         'balances',
         'inventory',
         'permissions',
@@ -168,11 +169,11 @@ const initial = {
     colorway: main('colorway', 'dark'),
     colorwayPrimary: {
       dark: {
-        background: 'rgb(21, 17, 23)',
+        background: 'rgb(26, 22, 28)',
         text: 'rgb(241, 241, 255)'
       },
       light: {
-        background: 'rgb(224, 217, 233)',
+        background: 'rgb(240, 230, 243)',
         text: 'rgb(20, 40, 60)'
       }
     },
@@ -191,7 +192,6 @@ const initial = {
     // showUSDValue: main('showUSDValue', true),
     launch: main('launch', false),
     reveal: main('reveal', false),
-    nonceAdjust: main('nonceAdjust', false),
     showLocalNameWithENS: main('showLocalNameWithENS', false),
     autohide: main('autohide', false),
     accountCloseLock: main('accountCloseLock', false),
@@ -482,6 +482,41 @@ const initial = {
           },
           on: false
         },
+        84531: {
+          id: 84531,
+          type: 'ethereum',
+          layer: 'testnet',
+          isTestnet: true,
+          name: 'Base Görli',
+          explorer: 'https://goerli-explorer.base.org',
+          gas: {
+            price: {
+              selected: 'standard',
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+            }
+          },
+          connection: {
+            primary: {
+              on: true,
+              current: 'custom',
+              status: 'loading',
+              connected: false,
+              type: '',
+              network: '',
+              custom: 'https://goerli.base.org'
+            },
+            secondary: {
+              on: false,
+              current: 'custom',
+              status: 'loading',
+              connected: false,
+              type: '',
+              network: '',
+              custom: ''
+            }
+          },
+          on: false
+        },
         11155111: {
           id: 11155111,
           type: 'ethereum',
@@ -655,6 +690,28 @@ const initial = {
           icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/arbitrum.svg',
           primaryColor: 'accent7' // Arbitrum
         },
+        84531: {
+          blockHeight: 0,
+          gas: {
+            fees: {},
+            price: {
+              selected: 'standard',
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+            }
+          },
+          nativeCurrency: {
+            symbol: 'görETH',
+            usd: {
+              price: 0,
+              change24hr: 0
+            },
+            icon: '',
+            name: 'Görli Ether',
+            decimals: 18
+          },
+          icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/baseiconcolor.png',
+          primaryColor: 'accent2' // Testnet
+        },
         11155111: {
           blockHeight: 0,
           gas: {
@@ -679,8 +736,8 @@ const initial = {
         }
       }
     }),
+    dapps: main('dapps', {}),
     ipfs: {},
-    dapps: {},
     frames: {},
     openDapps: [],
     dapp: {
@@ -730,6 +787,10 @@ initial.main.origins = Object.entries(initial.main.origins).reduce((origins, [id
 
 initial.main.knownExtensions = Object.fromEntries(
   Object.entries(initial.main.knownExtensions).filter(([id, allowed]) => allowed)
+)
+
+initial.main.dapps = Object.fromEntries(
+  Object.entries(initial.main.dapps).map(([id, dapp]) => [id, { ...dapp, openWhenReady: false }])
 )
 
 // ---

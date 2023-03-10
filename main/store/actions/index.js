@@ -83,7 +83,6 @@ module.exports = {
   setLaunch: (u, launch) => u('main.launch', (_) => launch),
   toggleLaunch: (u) => u('main.launch', (launch) => !launch),
   toggleReveal: (u) => u('main.reveal', (reveal) => !reveal),
-  toggleNonceAdjust: (u) => u('main.nonceAdjust', (nonceAdjust) => !nonceAdjust),
   toggleShowLocalNameWithENS: (u) =>
     u('main.showLocalNameWithENS', (showLocalNameWithENS) => !showLocalNameWithENS),
   setPermission: (u, address, permission) => {
@@ -259,6 +258,7 @@ module.exports = {
 
       const defaultNetwork = {
         id: 0,
+        isTestnet: false,
         type: '',
         name: '',
         explorer: '',
@@ -619,10 +619,41 @@ module.exports = {
 
       return [...existingTokens, ...tokensToAdd]
     })
+
+    u('main.balances', (balances) => {
+      // update the balances for any custom tokens that changed
+      Object.values(balances).forEach((accountBalances) => {
+        tokens.forEach((token) => {
+          const tokenAddress = token.address.toLowerCase()
+          const matchingBalance = accountBalances.find(
+            (b) => b.address.toLowerCase() === tokenAddress && b.chainId === token.chainId
+          )
+
+          if (matchingBalance) {
+            matchingBalance.logoURI = token.logoURI || matchingBalance.logoURI
+            matchingBalance.symbol = token.symbol || matchingBalance.symbol
+            matchingBalance.name = token.name || matchingBalance.symbol
+          }
+        })
+      })
+
+      return balances
+    })
   },
   removeCustomTokens: (u, tokens) => {
+    const tokenIds = new Set(tokens.map(toTokenId))
+    const needsRemoval = (token) => tokenIds.has(toTokenId(token))
+
     u('main.tokens.custom', (existing) => {
-      return existing.filter((token) => !includesToken(tokens, token))
+      return existing.filter((token) => !needsRemoval(token))
+    })
+
+    u('main.tokens.known', (knownTokens) => {
+      for (const address in knownTokens) {
+        knownTokens[address] = knownTokens[address].filter((token) => !needsRemoval(token))
+      }
+
+      return knownTokens
     })
   },
   addKnownTokens: (u, address, tokens) => {
@@ -655,6 +686,9 @@ module.exports = {
       u('windows.dash.nav', () => []) // Reset nav
     }
     u('windows.dash', (dash) => Object.assign(dash, update))
+  },
+  setOnboard: (u, update) => {
+    u('windows.onboard.showing', () => update.showing)
   },
   navForward: (u, windowId, crumb) => {
     if (!windowId || !crumb) return log.warn('Invalid nav forward', windowId, crumb)
@@ -735,6 +769,7 @@ module.exports = {
   },
   completeOnboarding: (u) => {
     u('main.mute.onboardingWindow', () => true)
+    u('windows.onboard.showing', () => false)
   },
   // Dapp Frame
   appDapp: (u, dapp) => {
@@ -845,7 +880,8 @@ module.exports = {
         return requests
       }
 
-      requests[reqId].typedMessage.data = data
+      Object.assign(requests[reqId], data)
+
       return requests
     })
   }

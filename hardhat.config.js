@@ -12,30 +12,49 @@ taskWithDefaultParams('send-tx', 'send a test transaction')
   .addOptionalParam('amount', 'amount to send, in eth')
   .setAction(
     async ({ amount, chain = 4, to = '0xf2C1E45B6611bC4378c3502789957A57e0390B79', provider = 'frame' }) => {
-      return new Promise((resolve, reject) => {
+      const requestTimeout = new Promise((resolve, reject) =>
         setTimeout(() => reject(new Error('request timed out!')), 60 * 1000)
+      )
 
+      const sendRequest = async () => {
         const chainId = '0x' + parseInt(chain).toString(16)
         const eth = ethProvider(provider === 'hardhat' ? 'http://127.0.0.1:8545' : provider, {
           origin: 'frame-hardhat-worker'
         })
 
-        eth
-          .request({ method: 'eth_accounts', params: [], id: 2, chainId, jsonrpc: '2.0' })
-          .then((accounts) => ({
-            value: utils.parseEther(amount || '.0002').toHexString(),
-            from: accounts[0],
-            to,
-            data: '0x'
-          }))
-          .then((tx) => eth.request({ method: 'eth_sendTransaction', params: [tx], id: 2, chainId }))
-          .then((txHash) => {
-            console.log(`success! tx hash: ${txHash}`)
-            return txHash
-          })
-          .then(resolve)
-          .catch(reject)
-      })
+        const accounts = await eth.request({
+          method: 'eth_accounts',
+          params: [],
+          id: 2,
+          jsonrpc: '2.0'
+        })
+
+        const tx = {
+          value: utils.parseEther(amount || '.0002').toHexString(),
+          from: accounts[0],
+          to,
+          data: '0x'
+        }
+
+        const req = {
+          id: 2,
+          jsonrpc: '2.0',
+          method: 'wallet_request',
+          params: {
+            chainId: `eip155:${parseInt(chainId, 16)}`,
+            request: {
+              method: 'eth_sendTransaction',
+              params: [tx]
+            }
+          }
+        }
+
+        const txHash = await eth.request(req)
+
+        console.log(`success! tx hash: ${txHash}`)
+      }
+
+      return Promise.race([requestTimeout, sendRequest()])
     }
   )
 
@@ -43,38 +62,46 @@ taskWithDefaultParams('send-token-approval', 'approve token contract for spendin
   .addOptionalParam('contract', 'address of token contract')
   .addOptionalParam('amount', 'amount to approve')
   .addOptionalParam('decimals', 'number of decimals to pad amount (default 18)')
-  .setAction(async ({ provider = 'frame', chain = 1, amount = 1000, decimals = 18, contract }) => {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => reject(new Error('request timed out!')), 60 * 1000)
+  .setAction(
+    async ({
+      provider = 'frame',
+      chain = 1,
+      amount = 1000,
+      decimals = 6,
+      contract = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
+    }) => {
+      return new Promise((resolve, reject) => {
+        setTimeout(() => reject(new Error('request timed out!')), 60 * 1000)
 
-      const chainId = '0x' + parseInt(chain).toString(16)
-      const eth = ethProvider(provider === 'hardhat' ? 'http://127.0.0.1:8545' : provider, {
-        origin: 'frame-hardhat-worker'
+        const chainId = '0x' + parseInt(chain).toString(16)
+        const eth = ethProvider(provider === 'hardhat' ? 'http://127.0.0.1:8545' : provider, {
+          origin: 'frame-hardhat-worker'
+        })
+        const abi = new utils.Interface(['function approve(address spender, uint256 value)'])
+
+        const bnAmount = ethers.BigNumber.from(amount).mul(ethers.BigNumber.from(10).pow(parseInt(decimals)))
+
+        eth
+          .request({ method: 'eth_accounts', params: [], id: 2, chainId, jsonrpc: '2.0' })
+          .then((accounts) => {
+            const data = abi.encodeFunctionData('approve', [accounts[0], bnAmount])
+
+            return {
+              value: '0x0',
+              from: accounts[0],
+              to: contract,
+              data
+            }
+          })
+          .then((tx) => {
+            console.log({ tx })
+            return eth.request({ method: 'eth_sendTransaction', params: [tx], id: 2, chainId })
+          })
+          .then(resolve)
+          .catch(reject)
       })
-      const abi = new utils.Interface(['function approve(address spender, uint256 value)'])
-
-      const bnAmount = ethers.BigNumber.from(amount).mul(ethers.BigNumber.from(10).pow(parseInt(decimals)))
-
-      eth
-        .request({ method: 'eth_accounts', params: [], id: 2, chainId, jsonrpc: '2.0' })
-        .then((accounts) => {
-          const data = abi.encodeFunctionData('approve', [accounts[0], bnAmount])
-
-          return {
-            value: '0x0',
-            from: accounts[0],
-            to: contract,
-            data
-          }
-        })
-        .then((tx) => {
-          console.log({ tx })
-          return eth.request({ method: 'eth_sendTransaction', params: [tx], id: 2, chainId })
-        })
-        .then(resolve)
-        .catch(reject)
-    })
-  })
+    }
+  )
 
 const ensAbis = require('./compiled/main/contracts/deployments/ens/abi.js')
 const registrarContract = new utils.Interface(ensAbis.registrar)

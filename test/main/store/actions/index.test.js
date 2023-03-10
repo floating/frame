@@ -375,12 +375,17 @@ describe('#removeBalance', () => {
 })
 
 describe('#addCustomTokens', () => {
-  let tokens = []
+  let tokens = [],
+    balances = {}
 
   const updaterFn = (node, update) => {
-    expect(node).toBe('main.tokens.custom')
+    if (node === 'main.tokens.custom') {
+      tokens = update(tokens)
+    }
 
-    tokens = update(tokens)
+    if (node === 'main.balances') {
+      balances = update(balances)
+    }
   }
 
   const addTokens = (tokensToAdd) => addCustomTokensAction(updaterFn, tokensToAdd)
@@ -407,31 +412,68 @@ describe('#addCustomTokens', () => {
     expect(tokens[0]).toEqual(testTokens.zrx)
     expect(tokens[1].symbol).toBe('BAD')
   })
+
+  it('updates an existing balance for a custom token', () => {
+    const account = '0xd0e3872f5fa8ecb49f1911f605c0da90689a484e'
+
+    balances = {
+      [account]: [
+        {
+          address: testTokens.badger.address,
+          chainId: testTokens.badger.chainId,
+          symbol: 'BDG',
+          name: 'Old Badger',
+          logoURI: 'http://logo.io'
+        }
+      ]
+    }
+
+    const updatedBadgerToken = {
+      ...testTokens.badger,
+      symbol: 'BADGER',
+      name: 'Badger Token'
+    }
+
+    addTokens([updatedBadgerToken])
+
+    expect(balances[account]).toStrictEqual([
+      {
+        address: testTokens.badger.address,
+        chainId: testTokens.badger.chainId,
+        symbol: 'BADGER',
+        name: 'Badger Token',
+        logoURI: 'http://logo.io'
+      }
+    ])
+  })
 })
 
 describe('#removeCustomTokens', () => {
-  let tokens = []
+  let customTokens = [],
+    knownTokens = {}
 
   const updaterFn = (node, update) => {
-    expect(node).toBe('main.tokens.custom')
-
-    tokens = update(tokens)
+    if (node === 'main.tokens.custom') {
+      customTokens = update(customTokens)
+    } else if (node === 'main.tokens.known') {
+      knownTokens = update(knownTokens)
+    }
   }
 
   const removeTokens = (tokensToRemove) => removeTokensAction(updaterFn, tokensToRemove)
 
   it('removes a token', () => {
-    tokens = [testTokens.zrx, testTokens.badger]
+    customTokens = [testTokens.zrx, testTokens.badger]
 
     const tokenToRemove = { ...testTokens.zrx }
 
     removeTokens([tokenToRemove])
 
-    expect(tokens).toStrictEqual([testTokens.badger])
+    expect(customTokens).toStrictEqual([testTokens.badger])
   })
 
   it('does not modify tokens if they cannot be found', () => {
-    tokens = [testTokens.zrx, testTokens.badger]
+    customTokens = [testTokens.zrx, testTokens.badger]
 
     const tokenToRemove = {
       chainId: 1,
@@ -441,7 +483,7 @@ describe('#removeCustomTokens', () => {
 
     removeTokens([tokenToRemove])
 
-    expect(tokens).toStrictEqual([testTokens.zrx, testTokens.badger])
+    expect(customTokens).toStrictEqual([testTokens.zrx, testTokens.badger])
   })
 
   it('does not remove a token with the same address but different chain id', () => {
@@ -450,11 +492,11 @@ describe('#removeCustomTokens', () => {
       chainId: 1
     }
 
-    tokens = [testTokens.zrx, testTokens.badger, tokenToRemove]
+    customTokens = [testTokens.zrx, testTokens.badger, tokenToRemove]
 
     removeTokens([tokenToRemove])
 
-    expect(tokens).toStrictEqual([testTokens.zrx, testTokens.badger])
+    expect(customTokens).toStrictEqual([testTokens.zrx, testTokens.badger])
   })
 
   it('does not remove a token with the same chain id but different address', () => {
@@ -463,11 +505,23 @@ describe('#removeCustomTokens', () => {
       address: '0xa7a82dd06901f29ab14af63faf3358ad101724a8'
     }
 
-    tokens = [testTokens.zrx, testTokens.badger, tokenToRemove]
+    customTokens = [testTokens.zrx, testTokens.badger, tokenToRemove]
 
     removeTokens([tokenToRemove])
 
-    expect(tokens).toStrictEqual([testTokens.zrx, testTokens.badger])
+    expect(customTokens).toStrictEqual([testTokens.zrx, testTokens.badger])
+  })
+
+  it('removes the token from the list of known tokens for an address', () => {
+    const address = '0xa7a82dd06901f29ab14af63faf3358ad101724a8'
+
+    knownTokens = {
+      [address]: [{ ...testTokens.zrx }]
+    }
+
+    removeTokens([{ ...testTokens.zrx }])
+
+    expect(knownTokens).toStrictEqual({ [address]: [] })
   })
 })
 
@@ -1336,13 +1390,20 @@ describe('#updateTypedDataRequest', () => {
     }
   })
 
-  it('should completely replace the old typed message data with the new data', () => {
-    expect(requests[request].typedMessage.data.oldAttribute).toBeTruthy()
+  it('should add a new property to a request ', () => {
+    expect(requests[request].doesNotExistYet).toBeUndefined()
     updateSignatureMessage(request, {
-      newAttribute: true
+      doesNotExistYet: true
     })
 
-    expect(requests[request].typedMessage.data.oldAttribute).toBeFalsy()
-    expect(requests[request].typedMessage.data.newAttribute).toBeTruthy()
+    expect(requests[request].doesNotExistYet).toBeTruthy()
+  })
+
+  it('should not change any properties which are not altered in an update', () => {
+    updateSignatureMessage(request, {
+      doesNotExistYet: true
+    })
+
+    expect(requests[request].typedMessage.data.oldAttribute).toBeTruthy()
   })
 })

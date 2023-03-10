@@ -105,34 +105,6 @@ class Notify extends React.Component {
     )
   }
 
-  nonceWarning() {
-    return (
-      <div className='notifyBoxWrap' onMouseDown={(e) => e.stopPropagation()}>
-        <div className='notifyBoxSlide'>
-          <div className='notifyBox'>
-            <div className='notifyTitle'>Adjustable Nonce</div>
-            <div className='notifyBody'>
-              <div className='notifyBodyBlock notifyBodyBlockBig'>
-                <div>
-                  Adjusting the nonce of a replacement transaction will cause it to become a new transaction
-                  rather than a replacement, use with caution
-                </div>
-              </div>
-            </div>
-            <div className='notifyInput'>
-              <div
-                className='notifyInputOption notifyInputSingleButton'
-                onMouseDown={() => this.store.notify()}
-              >
-                <div className='notifyInputOptionText'>Got it!</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
   gasFeeWarning({ req = {}, feeUSD = '0.00', currentSymbol = 'ETH' }) {
     return (
       <div className='notifyBoxWrap' onMouseDown={(e) => e.stopPropagation()}>
@@ -432,16 +404,26 @@ class Notify extends React.Component {
   }
 
   openExplorer({ hash, chain }) {
+    const { name: chainName, explorer: explorerUrl } = this.store('main.networks', chain.type, chain.id)
     return (
       <div className='notifyBoxWrap' onMouseDown={(e) => e.stopPropagation()}>
         <div className='notifyBox'>
           <div className='notifyTitle'>Open Block Explorer</div>
-          <div className='notifyBody'>
-            <div className='notifyBodyLine'>
-              Frame will open a block explorer in your browser for transaction:
+          {hash ? (
+            <div className='notifyBody'>
+              <div className='notifyBodyLine'>
+                {'Frame will open a block explorer in your browser for transaction:'}
+              </div>
+              <div className='notifyBodyHash'>{hash}</div>
             </div>
-            <div className='notifyBodyHash'>{hash}</div>
-          </div>
+          ) : (
+            <div className='notifyBody'>
+              <div className='notifyBodyLine'>{`Frame will open the ${chainName}`}</div>
+              <div className='notifyBodyLine'>{`block explorer in your browser:`}</div>
+              <div className='notifyBodyHash'>{explorerUrl}</div>
+            </div>
+          )}
+
           <div className='notifyInput'>
             <div
               className='notifyInputOption notifyInputDeny'
@@ -454,7 +436,7 @@ class Notify extends React.Component {
             <div
               className='notifyInputOption notifyInputProceed'
               onMouseDown={() => {
-                link.send('tray:openExplorer', hash, chain)
+                link.send('tray:openExplorer', chain, hash)
                 this.store.notify()
               }}
             >
@@ -491,15 +473,6 @@ class Notify extends React.Component {
       )
     } else if (notify === 'betaDisclosure') {
       return <div className='notify cardShow'>{this.betaDisclosure()}</div>
-    } else if (notify === 'nonceWarning') {
-      return (
-        <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
-          {/* <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
-            {'close'}
-          </div> */}
-          {this.nonceWarning()}
-        </div>
-      )
     } else if (notify === 'updateOriginChain') {
       return (
         <div className='notify cardShow' onMouseDown={() => this.store.notify()}>

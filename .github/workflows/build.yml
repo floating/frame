@@ -3,28 +3,28 @@ name: Build and publish installer artifacts for all platforms
 on:
   push:
     branches:
-      - '0.5'
+      - 'develop'
 
 env:
-  GH_TOKEN: ${{ secrets.GH_RELEASE_DEPLOYMENT_TOKEN }}
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   create_draft_release:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: read version from package.json
         id: package-version
         uses: martinbeentjes/npm-get-version-action@master
       - name: check for existing release
-        run: gh release list --exclude-drafts | grep -e ".*v${{ steps.package-version.outputs.current-version }}" || exit 1
+        run: gh release list --exclude-drafts | grep -q ".*v${{ steps.package-version.outputs.current-version }}" && exit 1 || true
       - name: remove old draft releases
         run: gh release list | grep -e "Draft.*v${{ steps.package-version.outputs.current-version }}" | awk '{print $3}' | xargs -r gh release delete
       - name: create new draft release
         uses: marvinpinto/action-automatic-releases@latest
         with:
-          repo_token: ${{ secrets.GH_RELEASE_DEPLOYMENT_TOKEN }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
           automatic_release_tag: v${{ steps.package-version.outputs.current-version }}
           prerelease: false
           draft: true
@@ -56,8 +56,8 @@ jobs:
       APPLE_ID_PASSWORD: ${{ secrets[matrix.apple_id_password_key] }}
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: 16.15.0
           cache: 'npm'
@@ -70,7 +70,7 @@ jobs:
         run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_AUTH_TOKEN }}" > ./.npmrc
       - run: npm run setup:ci
       - run: npm run compile
-      - run: npm run test:unit:main -- --testTimeout=500 --verbose
+      - run: npm run test:unit:main -- --testTimeout=5000 --verbose --detectOpenHandles --forceExit
       - run: npm run test:unit:components
       - run: npm run bundle
       - name: Sleep for 4 seconds

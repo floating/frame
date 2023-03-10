@@ -2,9 +2,15 @@ import { TransactionDescription } from '@ethersproject/abi'
 import { Contract } from '@ethersproject/contracts'
 import { Web3Provider } from '@ethersproject/providers'
 import { addHexPrefix } from '@ethereumjs/util'
-import erc20Abi from '../externalData/balances/erc-20-abi'
 import provider from '../provider'
 import { BigNumber } from 'ethers'
+import { erc20Interface } from '../../resources/contracts'
+export interface TokenData {
+  decimals?: number
+  name: string
+  symbol: string
+  totalSupply?: string
+}
 
 function createWeb3ProviderWrapper(chainId: number) {
   const wrappedSend = (
@@ -34,7 +40,7 @@ export default class Erc20Contract {
 
   constructor(address: Address, chainId: number) {
     const web3Provider = new Web3Provider(createWeb3ProviderWrapper(chainId))
-    this.contract = new Contract(address, erc20Abi, web3Provider)
+    this.contract = new Contract(address, erc20Interface, web3Provider)
   }
 
   static isApproval(data: TransactionDescription) {
@@ -59,19 +65,19 @@ export default class Erc20Contract {
     )
   }
 
-  decodeCallData(calldata: string) {
+  static decodeCallData(calldata: string) {
     try {
-      return this.contract.interface.parseTransaction({ data: calldata })
+      return erc20Interface.parseTransaction({ data: calldata })
     } catch (e) {
       // call does not match ERC-20 interface
     }
   }
 
-  encodeCallData(fn: string, params: any[]) {
-    return this.contract.interface.encodeFunctionData(fn, params)
+  static encodeCallData(fn: string, params: any[]) {
+    return erc20Interface.encodeFunctionData(fn, params)
   }
 
-  async getTokenData() {
+  async getTokenData(): Promise<TokenData> {
     const calls = await Promise.all([
       this.contract.decimals().catch(() => 0),
       this.contract.name().catch(() => ''),

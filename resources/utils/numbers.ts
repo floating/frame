@@ -15,13 +15,18 @@ const digitsLookup = [
   { value: 1e18, symbol: 'quintillion' }
 ]
 
-export function formatNumber(n: number, digits = 2) {
+export function formatNumber(n: number, digits = 4) {
   const num = Number(n)
   const item = digitsLookup
     .slice()
     .reverse()
     .find((item) => num >= item.value) || { value: 0, symbol: '?' }
-  const formatted = (value: number) => `${value.toFixed(digits).replace(numberRegex, '$1')} ${item.symbol}`
+
+  const formatted = (value: number) => {
+    const isAproximate = value.toFixed(digits) !== value.toString(10)
+    const prefix = isAproximate ? '~' : ''
+    return `${prefix}${value.toFixed(digits).replace(numberRegex, '$1')} ${item.symbol}`
+  }
 
   return item ? formatted(num / item.value) : '0'
 }
@@ -30,12 +35,10 @@ export function isUnlimited(amount: string) {
   return max.eq(amount)
 }
 
-export function formatDisplayInteger(amount: number, decimals: number) {
-  const displayInt = new BigNumber(amount).shiftedBy(-decimals).integerValue().toNumber()
+export function formatDisplayDecimal(amount: string | number, decimals: number) {
+  const bn = BigNumber(amount).shiftedBy(-decimals)
 
-  if (displayInt > 9e12) {
-    return decimals ? '~unlimited' : 'unknown'
-  }
+  if (bn.gt(9e12)) return decimals ? '~unlimited' : 'unknown'
 
-  return formatNumber(displayInt)
+  return formatNumber(bn.toNumber())
 }

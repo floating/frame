@@ -4,50 +4,49 @@ import link from '../../../../../../resources/link'
 import EnsOverview from '../../Ens'
 
 import svg from '../../../../../../resources/svg'
+import { isNonZeroHex } from '../../../../../../resources/utils'
 
 import { Cluster, ClusterRow, ClusterValue } from '../../../../../../resources/Components/Cluster'
 import { DisplayValue } from '../../../../../../resources/Components/DisplayValue'
 import RequestHeader from '../../../../../../resources/Components/RequestHeader'
+import BigNumber from 'bignumber.js'
 
-const isNonZeroHex = (hex) => !!hex && !['0x', '0x0'].includes(hex)
+const SimpleContractCallOverview = ({ method }) => {
+  const body = method ? `Calling Contract Method ${method}` : 'Calling Contract'
 
-function renderRecognizedAction(req) {
-  const { recognizedActions: actions = [] } = req
+  return <div className='_txDescriptionSummaryLine'>{body}</div>
+}
 
-  return !actions.length ? (
-    <div className='_txDescriptionSummaryLine'>Calling Contract</div>
-  ) : (
-    actions.map((action, index) => {
-      const { id = '', data } = action
-      const key = id + index
-      const [actionClass, actionType] = id.split(':')
-
-      if (actionClass === 'erc20') {
-        if (actionType === 'transfer') {
-          return (
-            <SendOverview key={key} amountHex={data.amount} decimals={data.decimals} symbol={data.symbol} />
-          )
-        }
-      } else if (actionClass === 'ens') {
-        return <EnsOverview key={key} type={actionType} data={data} />
-      } else {
-        return (
-          <div key={key} className='_txDescriptionSummaryLine'>
-            Calling Contract
-          </div>
-        )
-      }
-    })
+const ApproveOverview = ({ amount, decimals, symbol }) => {
+  const isRevoke = BigNumber(amount).isZero()
+  return (
+    <div>
+      {isRevoke ? (
+        <span>{`Revoke Approval for ${symbol}`}</span>
+      ) : (
+        <>
+          <span>{'Approve Spending'}</span>
+          <DisplayValue
+            type='ether'
+            value={amount}
+            valueDataParams={{ decimals }}
+            currencySymbol={symbol}
+            currencySymbolPosition='last'
+          />
+        </>
+      )}
+    </div>
   )
 }
 
-const SendOverview = ({ amountHex, decimals, symbol }) => {
+const SendOverview = ({ req, symbol, decimals, amount: ammt }) => {
+  const amount = ammt || req.data.value
   return (
     <div>
       <span>{'Send'}</span>
       <DisplayValue
         type='ether'
-        value={amountHex}
+        value={amount}
         valueDataParams={{ decimals }}
         currencySymbol={symbol}
         currencySymbolPosition='last'
@@ -57,8 +56,44 @@ const SendOverview = ({ amountHex, decimals, symbol }) => {
 }
 
 const DeployContractOverview = () => <div>Deploying Contract</div>
-const GenericContractOverview = ({ method }) => <div>{`Calling Contract Method ${method}`}</div>
 const DataOverview = () => <div>Sending data</div>
+
+const ContractCallOverview = ({ req }) => {
+  const { decodedData: { method } = {} } = req
+  return renderRecognizedActions(req) || <SimpleContractCallOverview method={method} />
+}
+
+const actionOverviews = {
+  'erc20:transfer': SendOverview,
+  'erc20:approve': ApproveOverview,
+  ens: EnsOverview
+}
+
+const renderActionOverview = (action, index) => {
+  const { id = '', data } = action
+  const key = id + index
+  const [actionClass, actionType] = id.split(':')
+  const ActionOverview = actionOverviews[id] || SimpleContractCallOverview
+
+  return <ActionOverview key={key} type={actionType} {...{ ...data }} />
+}
+
+function renderRecognizedActions(req) {
+  const { recognizedActions: actions = [] } = req
+
+  return !actions.length ? (
+    <div className='_txDescriptionSummaryLine'>Calling Contract</div>
+  ) : (
+    actions.map(renderActionOverview)
+  )
+}
+
+const BaseOverviews = {
+  CONTRACT_DEPLOY: DeployContractOverview,
+  CONTRACT_CALL: ContractCallOverview,
+  SEND_DATA: DataOverview,
+  NATIVE_TRANSFER: SendOverview
+}
 
 const TxOverview = ({
   req,
@@ -70,34 +105,17 @@ const TxOverview = ({
   simple,
   valueColor
 }) => {
-  const { recipientType, decodedData: { method } = {}, data: tx = {} } = req
-  const { to, value, data: calldata } = tx
+  const { data: tx = {}, classification } = req
+  const { data: calldata } = tx
 
-  const isContractDeploy = !to && isNonZeroHex(calldata)
-  const isSend = isNonZeroHex(value)
-  const isContractCall = recipientType !== 'external'
+  const Description = BaseOverviews[classification]
 
-  let description
-
-  // TODO: empty vs unknown transactions
-
-  if (isContractDeploy) {
-    description = <DeployContractOverview />
-  } else if (isContractCall) {
-    description = renderRecognizedAction(req)
-
-    if (!description && !!method) {
-      description = <GenericContractOverview method={method} />
-    }
-  } else if (isSend) {
-    description = <SendOverview amountHex={value} decimals={18} symbol={symbol} />
-  } else if (isNonZeroHex(calldata)) {
-    description = <DataOverview />
-  }
   if (simple) {
     return (
       <div className='txDescriptionSummaryStandalone'>
-        <span className='txDescriptionSummaryStandaloneWrap'>{description}</span>
+        <span className='txDescriptionSummaryStandaloneWrap'>
+          <Description req={req} decimals={18} symbol={symbol} />
+        </span>
       </div>
     )
   } else {
@@ -116,7 +134,9 @@ const TxOverview = ({
                   <div className='requestItemTitleSubIcon'>{svg.window(10)}</div>
                   <div className='requestItemTitleSubText'>{originName}</div>
                 </div>
-                <div className='_txDescriptionSummaryMain'>{description}</div>
+                <div className='_txDescriptionSummaryMain'>
+                  <Description req={req} decimals={18} symbol={symbol} />
+                </div>
               </RequestHeader>
             </div>
           </ClusterValue>

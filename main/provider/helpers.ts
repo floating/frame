@@ -18,14 +18,14 @@ import store from '../store'
 import protectedMethods from '../api/protectedMethods'
 import { usesBaseFee, TransactionData, GasFeesSource } from '../../resources/domain/transaction'
 import { getAddress } from '../../resources/utils'
-import FrameAccount from '../accounts/Account'
 
 const permission = (date: number, method: string) => ({ parentCapability: method, date })
 
 export function checkExistingNonceGas(tx: TransactionData) {
   const { from, nonce } = tx
 
-  const reqs = store('main.accounts', from, 'requests')
+  const reqs = store('main.accounts', (from || '').toLowerCase(), 'requests')
+
   const requests = Object.keys(reqs || {}).map((key) => reqs[key])
   const existing = requests.filter(
     (r) => r.mode === 'monitor' && r.status !== 'error' && r.data.nonce === nonce
@@ -43,6 +43,7 @@ export function checkExistingNonceGas(tx: TransactionData) {
         const bumpedBase = Math.max(Math.ceil((existingMax - existingFee) * 1.1), Math.ceil(maxInt - feeInt))
         tx.maxFeePerGas = '0x' + (bumpedBase + bumpedFee).toString(16)
         tx.maxPriorityFeePerGas = '0x' + bumpedFee.toString(16)
+        tx.gasFeesSource = GasFeesSource.Frame
         tx.feesUpdated = true
       }
     } else if (tx.gasPrice) {
@@ -52,6 +53,7 @@ export function checkExistingNonceGas(tx: TransactionData) {
         // Bump price by 10%
         const bumpedPrice = Math.ceil(existingPrice * 1.1)
         tx.gasPrice = '0x' + bumpedPrice.toString(16)
+        tx.gasFeesSource = GasFeesSource.Frame
         tx.feesUpdated = true
       }
     }
@@ -74,11 +76,8 @@ function parseValue(value = '') {
   return (!!parsedHex && addHexPrefix(unpadHexString(value))) || '0x0'
 }
 
-export function getRawTx(
-  newTx: RPC.SendTransaction.TxParams,
-  accountId: string | undefined
-): TransactionData {
-  const { gas, gasLimit, data, value, type, to, ...rawTx } = newTx
+export function getRawTx(newTx: RPC.SendTransaction.TxParams): TransactionData {
+  const { gas, gasLimit, data, value, type, from, to, ...rawTx } = newTx
   const getNonce = () => {
     // pass through hex string or undefined
     if (rawTx.nonce === undefined || isHexString(rawTx.nonce)) {
@@ -95,7 +94,8 @@ export function getRawTx(
 
   const tx: TransactionData = {
     ...rawTx,
-    from: rawTx.from || accountId,
+    ...(from && { from: getAddress(from) }),
+    ...(to && { to: getAddress(to) }),
     type: '0x0',
     value: parseValue(value),
     data: addHexPrefix(padToEven(stripHexPrefix(data || '0x'))),
@@ -105,20 +105,11 @@ export function getRawTx(
     gasFeesSource: GasFeesSource.Dapp
   }
 
-  if (to) {
-    tx.to = getAddress(to)
-  }
-
   return tx
 }
 
 export function gasFees(rawTx: TransactionData) {
   return store('main.networksMeta', 'ethereum', parseInt(rawTx.chainId, 16), 'gas')
-}
-
-export function isCurrentAccount(address: string, account: FrameAccount | null) {
-  const accountToCheck = account || { id: '' }
-  return address && accountToCheck.id.toLowerCase() === address.toLowerCase()
 }
 
 export function resError(errorData: string | EVMError, request: RPCId, res: RPCErrorCallback) {

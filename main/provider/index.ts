@@ -19,13 +19,14 @@ import accounts, {
 } from '../accounts'
 import Chains, { Chain } from '../chains'
 import { getSignerType, Type as SignerType } from '../../resources/domain/signer'
-import { TransactionData } from '../../resources/domain/transaction'
-import { populate as populateTransaction, maxFee } from '../transaction'
+import { normalizeChainId, TransactionData } from '../../resources/domain/transaction'
+import { populate as populateTransaction, maxFee, classifyTransaction } from '../transaction'
 import FrameAccount from '../accounts/Account'
 import { capitalize } from '../../resources/utils'
 import { ApprovalType } from '../../resources/constants'
 import { createObserver as AssetsObserver, loadAssets } from './assets'
 import { getVersionFromTypedData } from './typedData'
+import reveal from '../reveal'
 
 import {
   checkExistingNonceGas,
@@ -35,7 +36,6 @@ import {
   getPermissions,
   getRawTx,
   getSignedAddress,
-  isCurrentAccount,
   requestPermissions,
   resError,
   hasPermission
@@ -46,8 +46,16 @@ import {
   createOriginChainObserver as OriginChainObserver,
   getActiveChains
 } from './chains'
-import type { LegacyTypedData, TypedData, TypedMessage } from '../accounts/types'
+import {
+  EIP2612TypedData,
+  LegacyTypedData,
+  PermitSignatureRequest,
+  TypedData,
+  TypedMessage
+} from '../accounts/types'
 import * as sigParser from '../signatures'
+import { hasAddress } from '../../resources/domain/account'
+import { mapRequest } from '../requests'
 
 type Subscription = {
   id: string
@@ -349,10 +357,18 @@ export class Provider extends EventEmitter {
   }
 
   approveTransactionRequest(req: TransactionRequest, cb: Callback<string>) {
-    log.info('approveRequest', req)
+    const signAndSend = (requestToSign: TransactionRequest) => {
+      // remove callback from logging
+      const { res, ...txToLog } = requestToSign
+      log.info('approveRequest', txToLog)
+
+      this.signAndSend(requestToSign, cb)
+    }
 
     accounts.lockRequest(req.handlerId)
-    if (req.data.nonce) return this.signAndSend(req, cb)
+
+    if (req.data.nonce) return signAndSend(req)
+
     this.getNonce(req.data, (response) => {
       if (response.error) {
         if (this.handlers[req.handlerId]) {
@@ -366,7 +382,7 @@ export class Provider extends EventEmitter {
       const updatedReq = accounts.updateNonce(req.handlerId, response.result)
 
       if (updatedReq) {
-        this.signAndSend(updatedReq, cb)
+        signAndSend(updatedReq)
       } else {
         log.error(`could not find request with handlerId="${req.handlerId}"`)
         cb(new Error('could not find request'))
@@ -432,103 +448,120 @@ export class Provider extends EventEmitter {
   }
 
   async fillTransaction(newTx: RPC.SendTransaction.TxParams, cb: Callback<TransactionMetadata>) {
-    if (!newTx) return cb(new Error('No transaction data'))
+    if (!newTx) {
+      return cb(new Error('No transaction data'))
+    }
+
+    const connection = this.connection.connections['ethereum'][parseInt(newTx.chainId, 16)]
+    const chainConnected = connection && (connection.primary?.connected || connection.secondary?.connected)
+
+    if (!chainConnected) {
+      return cb(new Error(`Chain ${newTx.chainId} not connected`))
+    }
 
     try {
       const approvals: RequiredApproval[] = []
-      const accountId = (accounts.current() || {}).id
-      const rawTx = getRawTx(newTx, accountId)
+      const rawTx = getRawTx(newTx)
       const gas = gasFees(rawTx)
-      const chainConfig = this.connection.connections['ethereum'][parseInt(rawTx.chainId)].chainConfig
+      const { chainConfig } = connection
 
-      const estimateGas = rawTx.gasLimit
-        ? Promise.resolve(rawTx)
-        : this.getGasEstimate(rawTx)
-            .then((gasLimit) => ({ ...rawTx, gasLimit }))
-            .catch((err) => {
-              approvals.push({
-                type: ApprovalType.GasLimitApproval,
-                data: {
-                  message: err.message,
-                  gasLimit: '0x00'
-                }
-              })
+      const estimateGasLimit = async () => {
+        try {
+          return await this.getGasEstimate(rawTx)
+        } catch (error) {
+          approvals.push({
+            type: ApprovalType.GasLimitApproval,
+            data: {
+              message: (error as Error).message,
+              gasLimit: '0x00'
+            }
+          })
+          return '0x00'
+        }
+      }
 
-              return { ...rawTx, gasLimit: '0x00' }
-            })
+      const [gasLimit, recipientType] = await Promise.all([
+        rawTx.gasLimit ?? estimateGasLimit(),
+        rawTx.to ? reveal.resolveEntityType(rawTx.to, parseInt(rawTx.chainId, 16)) : ''
+      ])
 
-      estimateGas
-        .then((tx) => {
-          const populatedTransaction = populateTransaction(tx, chainConfig, gas)
+      const tx = { ...rawTx, gasLimit, recipientType }
 
-          log.info({ populatedTransaction })
+      try {
+        const populatedTransaction = populateTransaction(tx, chainConfig, gas)
+        const checkedTransaction = checkExistingNonceGas(populatedTransaction)
 
-          return populatedTransaction
-        })
-        .then((tx) => checkExistingNonceGas(tx))
-        .then((tx) => cb(null, { tx, approvals }))
-        .catch(cb)
+        log.verbose('Succesfully populated transaction', checkedTransaction)
+
+        cb(null, { tx: checkedTransaction, approvals })
+      } catch (error) {
+        return cb(error as Error)
+      }
     } catch (e) {
       log.error('error creating transaction', e)
       cb(e as Error)
     }
   }
 
-  sendTransaction(payload: RPC.SendTransaction.Request, res: RPCRequestCallback) {
-    const txParams = payload.params[0]
-    const targetChain = payload.chainId
-    const txChain = txParams.chainId
+  sendTransaction(payload: RPC.SendTransaction.Request, res: RPCRequestCallback, targetChain: Chain) {
+    try {
+      const txParams = payload.params[0]
+      const payloadChain = payload.chainId
 
-    if (targetChain && txChain && targetChain !== txChain) {
-      return resError(
-        `Chain for transaction (${txChain}) does not match request target chain (${targetChain})`,
-        payload,
-        res
-      )
-    }
-
-    const newTx = {
-      ...txParams,
-      chainId: txChain || (targetChain as string)
-    }
-
-    const currentAccount = accounts.current()
-
-    log.verbose(`sendTransaction(${JSON.stringify(newTx)}`)
-
-    this.fillTransaction(newTx, (err, transactionMetadata) => {
-      if (err) {
-        resError(err, payload, res)
-      } else {
-        const txMetadata = transactionMetadata as TransactionMetadata
-        const from = txMetadata.tx.from
-
-        if (from && !isCurrentAccount(from, currentAccount))
-          return resError('Transaction is not from currently selected account', payload, res)
-
-        const handlerId = this.addRequestHandler(res)
-        const { feesUpdated, ...data } = txMetadata.tx
-
-        const req = {
-          handlerId,
-          type: 'transaction',
-          data,
-          payload,
-          account: (currentAccount as FrameAccount).id,
-          origin: payload._origin,
-          approvals: [],
-          feesUpdatedByUser: feesUpdated || false,
-          recipientType: '',
-          recognizedActions: []
-        } as TransactionRequest
-
-        accounts.addRequest(req, res)
-
-        txMetadata.approvals.forEach((approval) => {
-          currentAccount?.addRequiredApproval(req, approval.type, approval.data)
-        })
+      const normalizedTx = normalizeChainId(txParams, payloadChain ? parseInt(payloadChain, 16) : undefined)
+      const tx = {
+        ...normalizedTx,
+        chainId: normalizedTx.chainId || payloadChain || addHexPrefix(targetChain.id.toString(16))
       }
-    })
+
+      const currentAccount = accounts.current()
+
+      log.verbose(`sendTransaction(${JSON.stringify(tx)}`)
+
+      const from = tx.from || (currentAccount && currentAccount.id)
+
+      if (!currentAccount || !from || !hasAddress(currentAccount, from)) {
+        return resError('Transaction is not from currently selected account', payload, res)
+      }
+
+      this.fillTransaction({ ...tx, from }, (err, transactionMetadata) => {
+        if (err) {
+          resError(err, payload, res)
+        } else {
+          const handlerId = this.addRequestHandler(res)
+          const txMetadata = transactionMetadata as TransactionMetadata
+          const { feesUpdated, recipientType, ...data } = txMetadata.tx
+
+          const unclassifiedReq = {
+            handlerId,
+            type: 'transaction',
+            data,
+            payload,
+            account: (currentAccount as FrameAccount).id,
+            origin: payload._origin,
+            approvals: [],
+            feesUpdatedByUser: false,
+            recipientType,
+            recognizedActions: []
+          } as Omit<TransactionRequest, 'classification'>
+
+          const classification = classifyTransaction(unclassifiedReq)
+
+          const req = {
+            ...unclassifiedReq,
+            classification
+          }
+
+          accounts.addRequest(req, res)
+
+          txMetadata.approvals.forEach((approval) => {
+            currentAccount?.addRequiredApproval(req, approval.type, approval.data)
+          })
+        }
+      })
+    } catch (e) {
+      resError((e as Error).message, payload, res)
+    }
   }
 
   getTransactionByHash(payload: RPCRequestPayload, cb: RPCRequestCallback, targetChain: Chain) {
@@ -558,11 +591,12 @@ export class Provider extends EventEmitter {
   }
 
   sign(payload: RPCRequestPayload, res: RPCRequestCallback) {
-    const from = (payload.params || [])[0]
+    const [from] = payload.params || []
     const currentAccount = accounts.current()
 
-    if (!isCurrentAccount(from, currentAccount))
-      return resError('sign request is not from currently selected account.', payload, res)
+    if (!currentAccount || !hasAddress(currentAccount, from)) {
+      return resError('Sign request is not from currently selected account', payload, res)
+    }
 
     const handlerId = this.addRequestHandler(res)
 
@@ -604,12 +638,6 @@ export class Provider extends EventEmitter {
       return resError(`Missing typed data`, payload, res)
     }
 
-    const targetAccount = accounts.get(from.toLowerCase())
-
-    if (!targetAccount) {
-      return resError(`Unknown account: ${from}`, payload, res)
-    }
-
     // HACK: Standards clearly say, that second param is an object but it seems like in the wild it can be a JSON-string.
     if (typeof typedData === 'string') {
       try {
@@ -627,6 +655,17 @@ export class Provider extends EventEmitter {
     // no explicit version called so we choose one which best fits the data
     if (!version) {
       version = getVersionFromTypedData(typedData)
+    }
+
+    const targetAccount = accounts.get(from.toLowerCase())
+
+    if (!targetAccount) {
+      return resError(`Unknown account: ${from}`, payload, res)
+    }
+
+    const currentAccount = accounts.current()
+    if (!currentAccount || !hasAddress(currentAccount, targetAccount.id)) {
+      return resError('Sign request is not from currently selected account', payload, res)
     }
 
     const signerType = getSignerType(targetAccount.lastSignerType)
@@ -649,14 +688,57 @@ export class Provider extends EventEmitter {
 
     const type = sigParser.identify(typedMessage)
 
-    accounts.addRequest({
+    const req: SignTypedDataRequest = {
       handlerId,
-      type,
+      type: 'signTypedData',
       typedMessage,
       payload,
       account: targetAccount.address,
       origin: payload._origin
-    } as SignTypedDataRequest)
+    }
+
+    // TODO: all of this below code to construct the original request can be added to
+    // a module like the above sigparser which, instead of identifying the request, creates it
+    if (type === 'signErc20Permit') {
+      const {
+        message: { deadline, spender: spenderAddress, value, owner, nonce },
+        domain: { verifyingContract: contractAddress, chainId }
+      } = typedMessage.data as EIP2612TypedData
+
+      const permitRequest: PermitSignatureRequest = {
+        ...req,
+        type: 'signErc20Permit',
+        typedMessage: {
+          data: typedMessage.data as EIP2612TypedData,
+          version: SignTypedDataVersion.V4
+        },
+        permit: {
+          deadline,
+          value,
+          owner,
+          chainId,
+          nonce,
+          spender: {
+            address: spenderAddress,
+            ens: '',
+            type: ''
+          },
+          verifyingContract: {
+            address: contractAddress,
+            ens: '',
+            type: ''
+          }
+        },
+        tokenData: {
+          name: '',
+          symbol: ''
+        }
+      }
+
+      accounts.addRequest(permitRequest)
+    } else {
+      accounts.addRequest(req)
+    }
   }
 
   subscribe(payload: RPC.Subscribe.Request, res: RPCSuccessCallback) {
@@ -864,7 +946,18 @@ export class Provider extends EventEmitter {
     })
   }
 
-  send(payload: RPCRequestPayload, res: RPCRequestCallback = () => {}) {
+  send(requestPayload: RPCRequestPayload, res: RPCRequestCallback = () => {}) {
+    // TODO: in the future this mapping will happen in the requests module so that the handler only ever
+    // has to worry about one shape of request, error handling for each request type will happen
+    // in the request handler for each type of request
+    let payload: RPCRequestPayload
+
+    try {
+      payload = mapRequest(requestPayload)
+    } catch (e) {
+      return resError({ message: (e as Error).message }, requestPayload, res)
+    }
+
     const method = payload.method || ''
 
     // method handlers that are not chain-specific can go here, before parsing the target chain
@@ -897,7 +990,7 @@ export class Provider extends EventEmitter {
     if (method === 'eth_accounts') return getAccounts(payload, res)
     if (method === 'eth_requestAccounts') return getAccounts(payload, res)
     if (method === 'eth_sendTransaction')
-      return this.sendTransaction(payload as RPC.SendTransaction.Request, res)
+      return this.sendTransaction(payload as RPC.SendTransaction.Request, res, targetChain)
     if (method === 'eth_getTransactionByHash') return this.getTransactionByHash(payload, res, targetChain)
     if (method === 'personal_ecRecover') return ecRecover(payload, res)
     if (method === 'web3_clientVersion') return this.clientVersion(payload, res)

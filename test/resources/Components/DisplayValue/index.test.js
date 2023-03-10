@@ -3,6 +3,7 @@ import React from 'react'
 import { render, screen } from '../../../componentSetup'
 import { DisplayValue } from '../../../../resources/Components/DisplayValue'
 import { displayValueData } from '../../../../resources/utils/displayValue'
+import { MAX_HEX } from '../../../../resources/constants'
 
 it('should render the expected content when provided with valueData', () => {
   const valueData = new displayValueData(356e28)
@@ -102,4 +103,11 @@ it('should not render a shorthand unit when displayFullValue is specified on an 
 
   const displayValue = screen.getByTestId('display-value')
   expect(displayValue.textContent).toBe('ETH3,560,000,000,000')
+})
+
+it('should render an unlimited value', () => {
+  render(<DisplayValue value={MAX_HEX} currencySymbol='ETH' currencySymbolPosition='last' />)
+
+  const displayValue = screen.getByTestId('display-value')
+  expect(displayValue.textContent).toBe('UnlimitedETH')
 })

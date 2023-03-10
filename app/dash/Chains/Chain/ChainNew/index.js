@@ -46,33 +46,33 @@ const isValidIcon = (urlStr) => Boolean(getUrl(urlStr))
 
 export const Chain = ({
   id,
-  name,
+  name = '',
   type,
-  explorer,
-  symbol,
-  nativeCurrencyName,
-  nativeCurrencyIcon,
-  icon,
-  isTestnet,
-  primaryColor,
-  primaryRpc,
-  secondaryRpc,
+  explorer = '',
+  symbol = '',
+  nativeCurrencyName = '',
+  nativeCurrencyIcon = '',
+  icon = '',
+  isTestnet = false,
+  primaryColor = chainDefault.primaryColor,
+  primaryRpc = '',
+  secondaryRpc = '',
   existingChains,
   store
 }) => {
   const newChain = {
-    id: id || chainDefault.id,
-    name: name || chainDefault.name,
-    type: type || chainDefault.type,
-    explorer: explorer || chainDefault.explorer,
-    symbol: symbol || chainDefault.symbol,
-    nativeCurrencyName: nativeCurrencyName || chainDefault.nativeCurrencyName,
-    nativeCurrencyIcon: nativeCurrencyIcon || chainDefault.nativeCurrencyIcon,
-    icon: icon || chainDefault.icon,
-    isTestnet: isTestnet || chainDefault.isTestnet,
-    primaryColor: primaryColor || chainDefault.primaryColor,
-    primaryRpc: primaryRpc || '',
-    secondaryRpc: secondaryRpc || ''
+    id,
+    name,
+    type,
+    explorer,
+    symbol,
+    nativeCurrencyName,
+    nativeCurrencyIcon,
+    icon,
+    isTestnet,
+    primaryColor,
+    primaryRpc,
+    secondaryRpc
   }
 
   // state

@@ -234,7 +234,7 @@ const migrations = {
     // Add on/off value to chains
     Object.keys(initial.main.networks.ethereum).forEach((chainId) => {
       initial.main.networks.ethereum[chainId].on =
-        chainId === '1' || chainId === initial.main.currentNetwork.id ? true : false
+        chainId === '1' || chainId === initial.main.currentNetwork?.id
     })
 
     return initial
@@ -548,51 +548,54 @@ const migrations = {
       }
     }
 
-    // we removed support for the following goerli RPCs so reset the connections
-    // to defaults when the user was previously connecting to them
-    const removedGoerliRPCs = ['mudit', 'slockit', 'prylabs']
-    const goerli = initial.main.networks.ethereum[5]
-    const goerliPrimaryConnection = goerli.connection.primary.current
-    const goerliSecondaryConnection = goerli.connection.secondary.current
+    if ('5' in initial.main.networks.ethereum) {
+      // we removed support for the following goerli RPCs so reset the connections
+      // to defaults when the user was previously connecting to them
+      const removedGoerliRPCs = ['mudit', 'slockit', 'prylabs']
+      const goerli = initial.main.networks.ethereum[5]
+      const goerliPrimaryConnection = goerli.connection.primary.current
+      const goerliSecondaryConnection = goerli.connection.secondary.current
 
-    if (removedGoerliRPCs.includes(goerliPrimaryConnection)) {
-      initial.main.networks.ethereum[5] = {
-        ...goerli,
-        connection: {
-          ...goerli.connection,
-          primary: {
-            on: false,
-            current: 'custom',
-            status: 'loading',
-            connected: false,
-            type: '',
-            network: '',
-            custom: ''
+      if (removedGoerliRPCs.includes(goerliPrimaryConnection)) {
+        initial.main.networks.ethereum[5] = {
+          ...goerli,
+          connection: {
+            ...goerli.connection,
+            primary: {
+              on: false,
+              current: 'custom',
+              status: 'loading',
+              connected: false,
+              type: '',
+              network: '',
+              custom: ''
+            }
           }
         }
       }
-    }
-    if (removedGoerliRPCs.includes(goerliSecondaryConnection)) {
-      initial.main.networks.ethereum[5] = {
-        ...goerli,
-        connection: {
-          ...goerli.connection,
-          secondary: {
-            on: false,
-            current: 'custom',
-            status: 'loading',
-            connected: false,
-            type: '',
-            network: '',
-            custom: ''
+
+      if (removedGoerliRPCs.includes(goerliSecondaryConnection)) {
+        initial.main.networks.ethereum[5] = {
+          ...goerli,
+          connection: {
+            ...goerli.connection,
+            secondary: {
+              on: false,
+              current: 'custom',
+              status: 'loading',
+              connected: false,
+              type: '',
+              network: '',
+              custom: ''
+            }
           }
         }
       }
-    }
 
-    // if neither primary nor secondary is enabled then we switch the overall connection off
-    initial.main.networks.ethereum[5].connection.on =
-      goerli.connection.primary.on || goerli.connection.secondary.on
+      // if neither primary nor secondary is enabled then we switch the overall connection off
+      initial.main.networks.ethereum[5].connection.on =
+        goerli.connection.primary.on || goerli.connection.secondary.on
+    }
 
     return initial
   },
@@ -650,19 +653,24 @@ const migrations = {
     return initial
   },
   25: (initial) => {
-    const optimism = initial.main.networks.ethereum[10]
-    const removeOptimismConnection = (connection) => ({
-      ...connection,
-      current: connection.current === 'optimism' ? 'infura' : connection.current
-    })
+    // remove Optimism RPC connection presets and use Infura instead
+    if ('10' in initial.main.networks.ethereum) {
+      const removeOptimismConnection = (connection) => ({
+        ...connection,
+        current: connection.current === 'optimism' ? 'infura' : connection.current
+      })
 
-    initial.main.networks.ethereum[10] = {
-      ...optimism,
-      connection: {
-        primary: removeOptimismConnection(optimism.connection.primary),
-        secondary: removeOptimismConnection(optimism.connection.secondary)
+      const optimism = initial.main.networks.ethereum[10]
+
+      initial.main.networks.ethereum[10] = {
+        ...optimism,
+        connection: {
+          primary: removeOptimismConnection(optimism.connection.primary),
+          secondary: removeOptimismConnection(optimism.connection.secondary)
+        }
       }
     }
+
     return initial
   },
   26: (initial) => {
@@ -691,20 +699,28 @@ const migrations = {
     return initial
   },
   28: (initial) => {
-    const networkMeta = initial.main.networksMeta.ethereum
-    const {
-      5: {
-        nativeCurrency: { symbol: goerliSymbol }
-      },
-      11155111: {
-        nativeCurrency: { symbol: sepoliaSymbol }
+    const getUpdatedSymbol = (symbol, chainId) => {
+      return parseInt(chainId) === 5 ? 'görETH' : parseInt(chainId) === 11155111 ? 'sepETH' : symbol
+    }
+
+    const updatedMeta = Object.entries(initial.main.networksMeta.ethereum).map(([id, chainMeta]) => {
+      const { symbol, decimals } = chainMeta.nativeCurrency
+      const updatedSymbol = (symbol || '').toLowerCase() !== 'eth' ? symbol : getUpdatedSymbol(symbol, id)
+
+      const updatedChainMeta = {
+        ...chainMeta,
+        nativeCurrency: {
+          ...chainMeta.nativeCurrency,
+          symbol: updatedSymbol,
+          decimals: decimals || 18
+        }
       }
-    } = networkMeta
-    goerliSymbol === 'ETH' && (initial.main.networksMeta.ethereum[5].nativeCurrency.symbol = 'görETH')
-    sepoliaSymbol === 'ETH' && (initial.main.networksMeta.ethereum[11155111].nativeCurrency.symbol = 'sepETH')
-    Object.values(initial.main.networksMeta.ethereum).forEach((metadata) => {
-      metadata.nativeCurrency.decimals = metadata.nativeCurrency.decimals || 18
+
+      return [id, updatedChainMeta]
     })
+
+    initial.main.networksMeta.ethereum = Object.fromEntries(updatedMeta)
+
     return initial
   },
   29: (initial) => {
@@ -758,13 +774,131 @@ const migrations = {
   },
   32: (initial) => {
     const dodgyAddress = '0xdeaddeaddeaddeaddeaddeaddeaddeaddead0000'
-
-    Object.entries(initial.main.tokens.known).forEach(([address, knownTokens]) => {
-      initial.main.tokens.known[address] = knownTokens.filter(({ address }) => address !== dodgyAddress)
+    const knownTokens = initial.main.tokens.known || {}
+    Object.entries(knownTokens).forEach(([address, tokens]) => {
+      knownTokens[address] = tokens.filter(({ address }) => address !== dodgyAddress)
     })
 
-    initial.main.networksMeta.ethereum[100].nativeCurrency.name = 'xDAI'
-    initial.main.networksMeta.ethereum[137].nativeCurrency.name = 'Matic'
+    initial.main.tokens.known = knownTokens
+
+    return initial
+  },
+  33: (initial) => {
+    // add Base testnet network information
+    if (!initial.main.networks.ethereum[84531]) {
+      initial.main.networks.ethereum[84531] = {
+        id: 84531,
+        type: 'ethereum',
+        layer: 'testnet',
+        isTestnet: true,
+        name: 'Base Görli',
+        explorer: 'https://goerli-explorer.base.org',
+        gas: {
+          price: {
+            selected: 'standard',
+            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+          }
+        },
+        connection: {
+          primary: {
+            on: true,
+            current: 'custom',
+            status: 'loading',
+            connected: false,
+            type: '',
+            network: '',
+            custom: 'https://goerli.base.org'
+          },
+          secondary: {
+            on: false,
+            current: 'custom',
+            status: 'loading',
+            connected: false,
+            type: '',
+            network: '',
+            custom: ''
+          }
+        },
+        on: false
+      }
+    }
+
+    if (!initial.main.networksMeta.ethereum[84531]) {
+      initial.main.networksMeta.ethereum[84531] = {
+        blockHeight: 0,
+        gas: {
+          fees: {},
+          price: {
+            selected: 'standard',
+            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+          }
+        },
+        nativeCurrency: {
+          symbol: 'görETH',
+          usd: {
+            price: 0,
+            change24hr: 0
+          },
+          icon: '',
+          name: 'Görli Ether',
+          decimals: 18
+        },
+        icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/baseiconcolor.png',
+        primaryColor: 'accent2' // Testnet
+      }
+    }
+
+    return initial
+  },
+  34: (initial) => {
+    // Add any missing nativeCurrency name values
+    // Base Görli (84531) value added in #33
+    const nativeCurrencyMap = {
+      1: {
+        name: 'Ether',
+        symbol: 'ETH'
+      },
+      5: {
+        name: 'Görli Ether',
+        symbol: 'görETH'
+      },
+      10: {
+        name: 'Ether',
+        symbol: 'ETH'
+      },
+      100: {
+        name: 'xDAI',
+        symbol: 'xDAI'
+      },
+      137: {
+        name: 'Matic',
+        symbol: 'MATIC'
+      },
+      42161: {
+        name: 'Ether',
+        symbol: 'ETH'
+      },
+      11155111: {
+        name: 'Sepolia Ether',
+        symbol: 'sepETH'
+      }
+    }
+
+    Object.values(initial.main.networks.ethereum).forEach((network) => {
+      const { id } = network
+      const { name = '', symbol = '' } = nativeCurrencyMap[id] || {}
+      const existingMeta = initial.main.networksMeta.ethereum[id] || {}
+      const { nativeCurrency = {} } = existingMeta
+
+      initial.main.networksMeta.ethereum[id] = {
+        ...existingMeta,
+        nativeCurrency: {
+          ...nativeCurrency,
+          name: nativeCurrency.name || name,
+          symbol: nativeCurrency.symbol || symbol
+        }
+      }
+    })
 
     return initial
   }

@@ -52,8 +52,8 @@ describe('rendering', () => {
     const chainConfig = { view: 'setup' }
     render(<Chain {...chainConfig} />)
 
-    const titleSection = screen.getByRole('chainName')
-    expect(titleSection.textContent).toBe('Chain Name')
+    const chainName = screen.getByLabelText('Chain Name')
+    expect(chainName.value).toBe('Chain Name')
   })
 
   it('renders the correct chain name', () => {
@@ -206,6 +206,36 @@ describe('submitting', () => {
         secondaryRpc: 'https://myrpc-rinkeby.arbitrum.io'
       })
     )
+  })
+
+  it('does not submit empty input fields as undefined', async () => {
+    const chainConfig = {
+      id: 42162,
+      type: 'ethereum',
+      name: 'Arbitrum Rinkeby',
+      symbol: 'ETH',
+      isTestnet: false,
+      nativeCurrencyName: 'Ether'
+    }
+
+    const { user } = render(<Chain view='setup' {...chainConfig} />)
+
+    await user.click(screen.getByRole('button'))
+
+    expect(link.send).toHaveBeenNthCalledWith(1, 'tray:addChain', {
+      id: 42162,
+      name: 'Arbitrum Rinkeby',
+      symbol: 'ETH',
+      primaryColor: 'accent2',
+      explorer: '',
+      type: 'ethereum',
+      isTestnet: false,
+      primaryRpc: '',
+      secondaryRpc: '',
+      nativeCurrencyName: 'Ether',
+      nativeCurrencyIcon: '',
+      icon: ''
+    })
   })
 })
 

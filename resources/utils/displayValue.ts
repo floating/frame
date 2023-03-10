@@ -77,6 +77,7 @@ function getDisplay(bn: BigNumber, type: string, decimals: number, displayFullVa
   const displayUnitKeys = Object.keys(displayUnitMapping)
   const lastDisplayUnitKey = displayUnitKeys[displayUnitKeys.length - 1]
   const lastDisplayUnitValue = displayUnitMapping[lastDisplayUnitKey as keyof typeof displayUnitMapping]
+
   return {
     approximationSymbol: '>',
     displayValue: '999,999',

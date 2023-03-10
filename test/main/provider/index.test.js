@@ -20,6 +20,9 @@ let accountRequests = []
 jest.mock('../../../main/store')
 jest.mock('../../../main/chains', () => ({ send: jest.fn(), syncDataEmit: jest.fn(), on: jest.fn() }))
 jest.mock('../../../main/accounts', () => ({}))
+jest.mock('../../../main/reveal', () => ({
+  resolveEntityType: jest.fn().mockResolvedValue('external')
+}))
 jest.mock('../../../main/provider/helpers', () => {
   const helpers = jest.requireActual('../../../main/provider/helpers')
 
@@ -67,7 +70,9 @@ beforeEach(() => {
   }
 
   accounts.current = jest.fn(() => ({ id: address, getAccounts: () => [address] }))
-  accounts.get = jest.fn((addr) => (addr === address ? { address, lastSignerType: 'ring' } : undefined))
+  accounts.get = jest.fn((addr) =>
+    addr === address ? { id: address, address, lastSignerType: 'ring' } : undefined
+  )
   accounts.signTransaction = jest.fn()
   accounts.setTxSigned = jest.fn()
 })
@@ -802,6 +807,9 @@ describe('#send', () => {
         })
 
         connection.connections.ethereum[chainId] = {
+          primary: {
+            connected: true
+          },
           chainConfig: chainConfig(chainId, chainId === 1 ? 'london' : 'istanbul')
         }
       })
@@ -881,27 +889,6 @@ describe('#send', () => {
     })
 
     describe('replacing gas fees', () => {
-      beforeEach(() => {
-        const chainIds = [1, 137]
-
-        chainIds.forEach((chainId) => {
-          store.set('main.networksMeta.ethereum', chainId, 'gas', {
-            price: {
-              selected: 'standard',
-              levels: { slow: '', standard: '', fast: gweiToHex(30), asap: '', custom: '' },
-              fees: {
-                maxPriorityFeePerGas: gweiToHex(1),
-                maxBaseFeePerGas: gweiToHex(8)
-              }
-            }
-          })
-
-          connection.connections.ethereum[chainId] = {
-            chainConfig: chainConfig(chainId, chainId === 1 ? 'london' : 'istanbul')
-          }
-        })
-      })
-
       it('adds a 10% gas buffer when replacing a legacy transaction', (done) => {
         tx.type = '0x0'
         tx.chainId = addHexPrefix((137).toString(16))
@@ -920,7 +907,7 @@ describe('#send', () => {
               const replacementRequest = accountRequests[1]
               const bumpedPrice = Math.ceil(initialPrice * 1.1)
               expect(replacementRequest.data.gasPrice).toBe(intToHex(bumpedPrice))
-              expect(replacementRequest.feesUpdatedByUser).toBe(true)
+              expect(replacementRequest.feesUpdatedByUser).toBe(false)
               done()
             })
           })
@@ -990,7 +977,7 @@ describe('#send', () => {
 
               expect(replacementRequest.data.maxPriorityFeePerGas).toBe(intToHex(bumpedFee))
               expect(replacementRequest.data.maxFeePerGas).toBe(intToHex(bumpedMax))
-              expect(replacementRequest.feesUpdatedByUser).toBe(true)
+              expect(replacementRequest.feesUpdatedByUser).toBe(false)
               done()
             })
           })
@@ -1031,7 +1018,7 @@ describe('#send', () => {
               const bumpedFee = Math.ceil(initialTip * 1.1)
               expect(replacementRequest.data.maxPriorityFeePerGas).toBe(intToHex(bumpedFee))
               expect(replacementRequest.data.maxFeePerGas).toBe(intToHex(20 * 1e9 + bumpedFee))
-              expect(replacementRequest.feesUpdatedByUser).toBe(true)
+              expect(replacementRequest.feesUpdatedByUser).toBe(false)
               done()
             })
           })
@@ -1084,14 +1071,15 @@ describe('#send', () => {
 
   describe('#eth_sign', () => {
     const message = 'hello, Ethereum!'
+    const hexMessage = addHexPrefix(Buffer.from(message, 'utf-8').toString('hex'))
 
     it('submits a request to sign a message', () => {
-      send({ method: 'eth_sign', params: [address, message] })
+      send({ method: 'eth_sign', params: [address, hexMessage] })
 
       expect(accountRequests).toHaveLength(1)
       expect(accountRequests[0].handlerId).toBeTruthy()
       expect(accountRequests[0].payload.params[0]).toBe(address)
-      expect(accountRequests[0].payload.params[1]).toEqual(message)
+      expect(accountRequests[0].payload.params[1]).toEqual(hexMessage)
     })
 
     it('does not submit a request from an account other than the current one', (done) => {
@@ -1101,42 +1089,43 @@ describe('#send', () => {
         expect(err.error).toBeTruthy()
         done()
       })
-    }, 100)
+    })
   })
 
   describe('#personal_sign', () => {
     const message = 'hello, Ethereum!'
     const password = 'supersecret'
+    const hexMessage = addHexPrefix(Buffer.from(message, 'utf-8').toString('hex'))
 
     it('submits a request to sign a personal message with the address first', () => {
-      send({ method: 'personal_sign', params: [address, message, password] })
+      send({ method: 'personal_sign', params: [address, hexMessage, password] })
 
       expect(accountRequests).toHaveLength(1)
       expect(accountRequests[0].handlerId).toBeTruthy()
       expect(accountRequests[0].payload.params[0]).toBe(address)
-      expect(accountRequests[0].payload.params[1]).toEqual(message)
+      expect(accountRequests[0].payload.params[1]).toEqual(hexMessage)
       expect(accountRequests[0].payload.params[2]).toEqual(password)
     })
 
     it('submits a request to sign a personal message with the message first', () => {
-      send({ method: 'personal_sign', params: [message, address, password] })
-
-      expect(accountRequests).toHaveLength(1)
-      expect(accountRequests[0].handlerId).toBeTruthy()
-      expect(accountRequests[0].payload.params[0]).toBe(address)
-      expect(accountRequests[0].payload.params[1]).toEqual(message)
-      expect(accountRequests[0].payload.params[2]).toEqual(password)
-    })
-
-    it('submits a request to sign a personal message with a 20-byte message first', () => {
-      const hexMessage = '0x6672616d652e7368206973206772656174212121'
-
       send({ method: 'personal_sign', params: [hexMessage, address, password] })
 
       expect(accountRequests).toHaveLength(1)
       expect(accountRequests[0].handlerId).toBeTruthy()
       expect(accountRequests[0].payload.params[0]).toBe(address)
       expect(accountRequests[0].payload.params[1]).toEqual(hexMessage)
+      expect(accountRequests[0].payload.params[2]).toEqual(password)
+    })
+
+    it('submits a request to sign a personal message with a 20-byte message first', () => {
+      const addressSizedMessage = '0x6672616d652e7368206973206772656174212121'
+
+      send({ method: 'personal_sign', params: [addressSizedMessage, address, password] })
+
+      expect(accountRequests).toHaveLength(1)
+      expect(accountRequests[0].handlerId).toBeTruthy()
+      expect(accountRequests[0].payload.params[0]).toBe(address)
+      expect(accountRequests[0].payload.params[1]).toEqual(addressSizedMessage)
       expect(accountRequests[0].payload.params[2]).toEqual(password)
     })
 
@@ -1147,7 +1136,7 @@ describe('#send', () => {
         expect(err.error).toBeTruthy()
         done()
       })
-    }, 100)
+    })
   })
 
   describe('#eth_signTypedData', () => {
@@ -1183,6 +1172,7 @@ describe('#send', () => {
         contents: 'Hello!'
       }
     }
+
     const typedDataLegacy = [
       {
         type: 'string',
@@ -1195,6 +1185,7 @@ describe('#send', () => {
         value: '1212'
       }
     ]
+
     const typedDataInvalid = {
       ...typedData,
       primaryType: 'b0rk'
@@ -1288,6 +1279,10 @@ describe('#send', () => {
       })
     })
 
+    beforeEach(() => {
+      accounts.current.mockReturnValue({ id: address })
+    })
+
     it('handles typed data as a stringified json param', () => {
       const params = [JSON.stringify(typedData), address]
 
@@ -1324,6 +1319,17 @@ describe('#send', () => {
       })
     })
 
+    it('does not submit a request to the wrong account', (done) => {
+      accounts.current.mockReturnValueOnce({ id: '0xa4581bfe76201f3aa147cce8e360140582260441' })
+      const params = [address, typedData]
+
+      send({ method: 'eth_signTypedData_v3', params }, (err) => {
+        expect(err.error.message).toBe('Sign request is not from currently selected account')
+        expect(err.error.code).toBe(-1)
+        done()
+      })
+    })
+
     it('does not submit a request with malformed type data', (done) => {
       const params = [address, 'test']
 
@@ -1340,7 +1346,7 @@ describe('#send', () => {
     hardwareSigners.forEach((signerType) => {
       it(`does not submit a V3 request to a ${signerType}`, (done) => {
         accounts.get.mockImplementationOnce((addr) => {
-          return addr === address ? { address, lastSignerType: signerType } : {}
+          return addr === address ? { id: address, address, lastSignerType: signerType } : {}
         })
 
         const params = [address, typedData]

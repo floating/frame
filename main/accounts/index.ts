@@ -165,19 +165,27 @@ export class Accounts extends EventEmitter {
     log.verbose('updateRequest', { reqId, actionId, data })
 
     const currentAccount = this.current()
-    const request = currentAccount?.getRequest<TransactionRequest | PermitSignatureRequest>(reqId)
+    const request = currentAccount?.getRequest(reqId)
     if (!currentAccount || !request) return
 
     if (request.type === 'transaction') {
       if (!actionId) return
-      const action = (request.recognizedActions || []).find((a) => a.id === actionId)
+
+      const transactionReq = request as TransactionRequest
+      const action = (transactionReq.recognizedActions || []).find((a) => a.id === actionId)
       if (!action?.update) return
 
-      action.update(request, data)
-      currentAccount.update()
-    } else if (request.type === 'signErc20Permit') {
-      store.updateTypedDataRequest(currentAccount.id, reqId, data)
+      action?.update(transactionReq, data)
     }
+
+    if (request.type === 'signErc20Permit') {
+      const permitReq = request as PermitSignatureRequest
+      const reqData = data as PermitSignatureRequest
+
+      Object.assign(permitReq, reqData)
+    }
+
+    currentAccount.update()
   }
 
   async replaceTx(id: string, type: ReplacementType) {
@@ -316,7 +324,7 @@ export class Accounts extends EventEmitter {
 
                   // If Frame is hidden, trigger native notification
                   notify('Transaction Successful', body, () => {
-                    openBlockExplorer(hash, targetChain)
+                    openBlockExplorer(targetChain, hash)
                   })
                 }
                 const blockHeight = parseInt(res.result, 16)
@@ -758,7 +766,11 @@ export class Accounts extends EventEmitter {
 
     if (currentAccount && currentAccount.requests[handlerId]) {
       currentAccount.requests[handlerId].status = RequestStatus.Pending
-      currentAccount.requests[handlerId].notice = 'See Signer'
+
+      const signerType = currentAccount.lastSignerType
+      const hwSigner = signerType !== 'seed' && signerType !== 'ring'
+
+      currentAccount.requests[handlerId].notice = hwSigner ? 'See Signer' : ''
       currentAccount.update()
     }
   }

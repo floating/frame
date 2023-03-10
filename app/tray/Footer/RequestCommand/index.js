@@ -18,7 +18,12 @@ const FEE_WARNING_THRESHOLD_USD = 50
 class RequestCommand extends React.Component {
   constructor(props, context) {
     super(props, context)
-    this.state = { allowInput: false, dataView: false, signerLocked: false }
+    this.state = {
+      allowInput: false,
+      dataView: false,
+      signerLocked: false,
+      infoPane: ''
+    }
 
     setTimeout(() => {
       this.setState({ allowInput: true })
@@ -39,7 +44,7 @@ class RequestCommand extends React.Component {
 
   sentStatus() {
     const { req } = this.props
-    const { notice, status, mode } = req
+    const { notice, status } = req
 
     const toAddress = (req.data && req.data.to) || ''
     let requestClass = 'signerRequest'
@@ -57,7 +62,7 @@ class RequestCommand extends React.Component {
       id: parseInt(req.data.chainId, 'hex')
     }
 
-    const isTestnet = this.store('main.networks', chain.type, chain.id, 'isTestnet')
+    const { isTestnet, explorer } = this.store('main.networks', chain.type, chain.id)
     const nativeCurrency = this.store('main.networksMeta', chain.type, chain.id, 'nativeCurrency')
     const nativeUSD = nativeCurrency && nativeCurrency.usd && !isTestnet ? nativeCurrency.usd.price : 0
 
@@ -77,8 +82,14 @@ class RequestCommand extends React.Component {
       }
     }
 
+    const displayNotice = (notice || '').toLowerCase()
     let displayStatus = (req.status || 'pending').toLowerCase()
-    if (displayStatus === 'verifying') displayStatus = 'waiting for block'
+
+    if (displayStatus === 'pending' && displayNotice === 'see signer') {
+      displayStatus = 'waiting for device signature'
+    } else if (displayStatus === 'verifying') {
+      displayStatus = 'waiting for block'
+    }
 
     return (
       <div>
@@ -97,11 +108,11 @@ class RequestCommand extends React.Component {
               ) : this.state.showHashDetails || status === 'confirming' ? (
                 <div className='txActionButtonsRow'>
                   <div
-                    className={'txActionButton'}
+                    className={`txActionButton${explorer ? '' : ' txActionButtonDisabled'}`}
                     onClick={() => {
-                      if (req && req.tx && req.tx.hash) {
+                      if (explorer && req && req.tx && req.tx.hash) {
                         if (this.store('main.mute.explorerWarning')) {
-                          link.send('tray:openExplorer', req.tx.hash, chain)
+                          link.send('tray:openExplorer', chain, req.tx.hash)
                         } else {
                           this.store.notify('openExplorer', { hash: req.tx.hash, chain: chain })
                         }
@@ -176,7 +187,9 @@ class RequestCommand extends React.Component {
             </>
           ) : null}
         </div>
-        <div className={'requestNoticeInnerText'}>{displayStatus}</div>
+        <div className={'requestNoticeInnerText'} style={{ marginTop: '-30px' }}>
+          {displayStatus}
+        </div>
         {isCancelableRequest(status) && (
           <div className='cancelRequest' onClick={() => this.decline(req)}>
             Cancel
@@ -184,6 +197,16 @@ class RequestCommand extends React.Component {
         )}
       </div>
     )
+  }
+
+  infoPane() {
+    const { infoPane } = this.state
+    const info = {
+      sign: 'When Frame is waiting for your signer to sign this transaction',
+      send: 'When Frame is broadcasting this transaction to your selected endpoint',
+      block: 'When Frame is waiting for this transaction to be included into a block'
+    }
+    return <div className='infoPane'>{info[infoPane]}</div>
   }
 
   signOrDecline() {
@@ -239,29 +262,6 @@ class RequestCommand extends React.Component {
 
     return (
       <>
-        <div
-          className={
-            req.automaticFeeUpdateNotice
-              ? 'automaticFeeUpdate automaticFeeUpdateActive'
-              : 'automaticFeeUpdate'
-          }
-        >
-          <div className='txActionButtons'>
-            <div className='txActionButtonsRow' style={{ padding: '0px 60px' }}>
-              <div className='txActionText'>{'Fee Updated'}</div>
-              <div
-                className='txActionButton txActionButtonGood'
-                onClick={() => {
-                  link.rpc('removeFeeUpdateNotice', req.handlerId, (e) => {
-                    if (e) console.error(e)
-                  })
-                }}
-              >
-                {'Ok'}
-              </div>
-            </div>
-          </div>
-        </div>
         <div
           className='requestApprove'
           style={{
@@ -331,9 +331,38 @@ class RequestCommand extends React.Component {
     )
   }
 
+  renderPopBar() {
+    const { req } = this.props
+    return (
+      <div
+        className={
+          req.automaticFeeUpdateNotice ? 'automaticFeeUpdate automaticFeeUpdateActive' : 'automaticFeeUpdate'
+        }
+      >
+        <div className='txActionButtons'>
+          <div className='txActionButtonsRow' style={{ padding: '0px 60px' }}>
+            <div className='txActionText'>{'Fee Updated'}</div>
+            <div
+              className='txActionButton txActionButtonGood'
+              onClick={() => {
+                link.rpc('removeFeeUpdateNotice', req.handlerId, (e) => {
+                  if (e) console.error(e)
+                })
+              }}
+            >
+              {'Ok'}
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   renderTxCommand() {
     const { req } = this.props
     const { notice, status, mode } = req
+
+    const { infoPane } = this.state
 
     const showWarning = !status && mode !== 'monitor'
     const requiredApproval = showWarning && (req.approvals || []).filter((a) => !a.approved)[0]
@@ -350,8 +379,9 @@ class RequestCommand extends React.Component {
       return (
         <div className='requestNotice'>
           <div className='requestNoticeInner'>
-            <TxBar req={req} />
-            {notice ? this.sentStatus() : this.signOrDecline()}
+            <TxBar req={req} infoPane={(type) => this.setState({ infoPane: type })} />
+            {!notice && this.renderPopBar()}
+            {infoPane ? this.infoPane() : notice ? this.sentStatus() : this.signOrDecline()}
             <TxConfirmations req={req} />
           </div>
         </div>
@@ -366,11 +396,11 @@ class RequestCommand extends React.Component {
     return (
       <div>
         {notice ? (
-          <div className='requestNotice'>
+          <div key={notice + status} className='requestNotice'>
             {(() => {
               if (status === 'pending') {
                 return (
-                  <div key={status} className='requestNoticeInner cardShow'>
+                  <div key={status} className='requestNoticeInner'>
                     <div style={{ paddingBottom: 20 }}>
                       <div className='loader' />
                     </div>
@@ -382,22 +412,24 @@ class RequestCommand extends React.Component {
                 )
               } else if (status === 'success') {
                 return (
-                  <div key={status} className='requestNoticeInner cardShow requestNoticeSuccess'>
-                    <div>{svg.octicon('check', { height: 40 })}</div>
+                  <div key={status} className='requestNoticeInner requestNoticeSuccess'>
+                    <div className='requestNoticeInnerSymbol'>{svg.octicon('check', { height: 40 })}</div>
                     <div className='requestNoticeInnerText'>{notice}</div>
                   </div>
                 )
               } else if (status === 'error' || status === 'declined') {
                 return (
-                  <div key={status} className='requestNoticeInner cardShow requestNoticeError'>
-                    <div>{svg.octicon('circle-slash', { height: 40 })}</div>
+                  <div key={status} className='requestNoticeInner requestNoticeError'>
+                    <div className='requestNoticeInnerSymbol'>
+                      {svg.octicon('circle-slash', { height: 40 })}
+                    </div>
                     <div className='requestNoticeInnerText'>{notice}</div>
                   </div>
                 )
               } else {
                 return (
-                  <div key={notice} className='requestNoticeInner cardShow'>
-                    {notice}
+                  <div key={notice} className='requestNoticeInner'>
+                    <div className='requestNoticeInnerText'>{notice}</div>
                   </div>
                 )
               }
@@ -453,7 +485,7 @@ class RequestCommand extends React.Component {
 
     if (req.type === 'transaction' && crumb.data.step === 'confirm') {
       return this.renderTxCommand()
-    } else if (isSignatureRequest(req.type)) {
+    } else if (isSignatureRequest(req)) {
       return this.renderSignDataCommand()
     } else {
       return null

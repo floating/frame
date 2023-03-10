@@ -31,6 +31,7 @@ const showOnReady = true
 const trayWidth = 400
 const devHeight = 800
 const isWindows = process.platform === 'win32'
+const isMacOS = process.platform === 'darwin'
 
 let tray: Tray
 let dash: Dash
@@ -48,7 +49,7 @@ const app = {
   show: () => {
     tray.show()
     if (dash.hiddenByAppHide || dash.isVisible()) {
-      dash.show()
+      store.setDash({ showing: true })
     }
   },
   toggle: () => {
@@ -96,7 +97,7 @@ const detectMouse = () => {
       m2.y = m2.y - area.y
       if (m2.x >= minX && m2.y === m1.y) {
         glide = true
-        tray.show()
+        app.show()
       } else {
         detectMouse()
       }
@@ -117,16 +118,19 @@ function initWindow(id: string, opts: Electron.BrowserWindowConstructorOptions) 
 }
 
 function initTrayWindow() {
-  initWindow('tray', {
+  const trayOpts: Electron.BrowserWindowConstructorOptions = {
     width: trayWidth,
     icon: path.join(__dirname, './AppIcon.png')
-  })
+  }
+  if (isMacOS) {
+    trayOpts.type = 'panel'
+  }
+  initWindow('tray', trayOpts)
 
   windows.tray.on('closed', () => delete windows.tray)
   windows.tray.webContents.session.setPermissionRequestHandler((webContents, permission, res) => res(false))
   windows.tray.setResizable(false)
   windows.tray.setMovable(false)
-  windows.tray.setSize(0, 0)
 
   const { width, height, x, y } = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
   windows.tray.setPosition(width + x, height + y)
@@ -145,7 +149,12 @@ function initTrayWindow() {
   })
 
   setTimeout(() => {
-    windows.tray.on('focus', () => tray.show())
+    windows.tray.on('focus', () => {
+      if (isMacOS) {
+        glide = false
+      }
+      tray.show()
+    })
   }, 2000)
 
   if (devToolsEnabled) {
@@ -205,13 +214,13 @@ export class Tray {
       const showOnboardingWindow = !store('main.mute.onboardingWindow')
       if (store('windows.dash.showing') || showOnboardingWindow) {
         setTimeout(() => {
-          dash.show()
+          store.setDash({ showing: true })
         }, 300)
       }
 
       if (showOnboardingWindow) {
         setTimeout(() => {
-          onboard.show()
+          store.setOnboard({ showing: true })
         }, 600)
       }
     }
@@ -228,7 +237,17 @@ export class Tray {
   }
 
   canAutoHide() {
-    return store('main.autohide') && !store('windows.dash.showing') && !frameManager.isFrameShowing()
+    const autoHideOn = !!store('main.autohide')
+    const dashShowing = !!store('windows.dash.showing')
+    const onboardShowing = !!store('windows.onboard.showing')
+    const isFrameShowing = frameManager.isFrameShowing()
+
+    log.debug(
+      `%ccanAutoHide ${JSON.stringify({ autoHideOn, dashShowing, onboardShowing, isFrameShowing })}`,
+      'color: blue'
+    )
+
+    return autoHideOn && !dashShowing && !onboardShowing && !isFrameShowing
   }
 
   hide() {
@@ -265,8 +284,11 @@ export class Tray {
       this.recentDisplayEvent = false
     }, 150)
 
-    // windows.tray.setPosition(0, 0)
-    windows.tray.setAlwaysOnTop(true)
+    if (isMacOS) {
+      windows.tray.setPosition(0, 0)
+    } else {
+      windows.tray.setAlwaysOnTop(true)
+    }
     windows.tray.setVisibleOnAllWorkspaces(true, {
       visibleOnFullScreen: true,
       skipTransformProcessType: true
@@ -279,12 +301,13 @@ export class Tray {
     windows.tray.setMaximumSize(trayWidth, height)
     const pos = topRight(windows.tray)
     windows.tray.setPosition(pos.x, pos.y)
-    if (!glide) {
-      windows.tray.focus()
-    }
     store.trayOpen(true)
     windows.tray.emit('show')
-    windows.tray.show()
+    if (glide && isMacOS) {
+      windows.tray.showInactive()
+    } else {
+      windows.tray.show()
+    }
     events.emit('tray:show')
     if (windows && windows.tray && windows.tray.focus && !glide) {
       windows.tray.focus()
@@ -313,9 +336,13 @@ class Dash {
   public hiddenByAppHide = false
 
   constructor() {
-    initWindow('dash', {
+    const dashOpts: Electron.BrowserWindowConstructorOptions = {
       width: trayWidth
-    })
+    }
+    if (isMacOS) {
+      dashOpts.type = 'panel'
+    }
+    initWindow('dash', dashOpts)
   }
 
   public hide(context?: string) {
@@ -346,7 +373,11 @@ class Dash {
       this.recentDisplayEvent = false
     }, 150)
     setTimeout(() => {
-      windows.dash.setAlwaysOnTop(true)
+      if (isMacOS) {
+        windows.dash.setPosition(0, 0)
+      } else {
+        windows.dash.setAlwaysOnTop(true)
+      }
       windows.dash.setVisibleOnAllWorkspaces(true, {
         visibleOnFullScreen: true,
         skipTransformProcessType: true
@@ -360,6 +391,7 @@ class Dash {
       const { x, y } = topRight(windows.dash)
       windows.dash.setPosition(x - trayWidth - 5, y)
       windows.dash.show()
+      if (!windows.tray.isVisible()) windows.tray.show()
       windows.dash.focus()
       windows.dash.setVisibleOnAllWorkspaces(false, {
         visibleOnFullScreen: true,
@@ -400,12 +432,19 @@ class Onboard {
       return
     }
 
+    const cleanupHandler = () => windows.onboard?.off('close', closeHandler)
+
+    const closeHandler = () => {
+      store.completeOnboarding()
+      windows.tray.focus()
+
+      electronApp.off('before-quit', cleanupHandler)
+      delete windows.onboard
+    }
+
     setTimeout(() => {
-      windows.onboard.once('close', () => {
-        store.completeOnboarding()
-        windows.tray.focus()
-        delete windows.onboard
-      })
+      electronApp.on('before-quit', cleanupHandler)
+      windows.onboard.once('close', closeHandler)
 
       const area = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
       const height = (isDev && !fullheight ? devHeight : area.height) - 160
@@ -435,9 +474,9 @@ class Onboard {
 
 ipcMain.on('tray:quit', () => electronApp.quit())
 ipcMain.on('tray:mouseout', () => {
-  if (glide && !store('windows.dash.showing')) {
+  if (glide && !(windows.dash && windows.dash.isVisible())) {
     glide = false
-    tray.hide()
+    app.hide()
   }
 })
 
@@ -496,7 +535,20 @@ const init = () => {
       dash.hide()
       windows.tray.focus()
     }
-  })
+  }, 'windows:dash')
+
+  store.observer(() => {
+    if (store('windows.onboard.showing')) {
+      if (!windows.onboard) {
+        onboard = new Onboard()
+      }
+
+      onboard.show()
+    } else if (onboard) {
+      onboard.hide()
+      windows.tray.focus()
+    }
+  }, 'windows:onboard')
 
   store.observer(() => broadcast('permissions', JSON.stringify(store('permissions'))))
   store.observer(() => {
@@ -505,7 +557,7 @@ const init = () => {
       globalShortcut.unregister('Alt+/')
       globalShortcut.register('Alt+/', () => {
         app.toggle()
-        if (!store('main.mute.onboardingWindow')) {
+        if (store('windows.onboard.showing')) {
           send('onboard', 'main:flex', 'shortcutActivated')
         }
       })

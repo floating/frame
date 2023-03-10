@@ -7,6 +7,8 @@ import AccountController from './AccountController'
 import { accountSort as byCreation } from '../../../resources/domain/account'
 import { matchFilter } from '../../../resources/utils'
 
+import { Cluster, ClusterBox, ClusterValue, ClusterRow } from '../../../resources/Components/Cluster'
+
 import svg from '../../../resources/svg'
 import link from '../../../resources/link'
 
@@ -41,8 +43,10 @@ class AccountSelector extends React.Component {
   }
 
   renderAccountFilter() {
+    const accounts = this.store('main.accounts')
     const open = this.store('selected.open')
-    if (open) return null
+    if (Object.keys(accounts).length === 0 || open) return null
+
     return (
       <div className='panelFilterMain'>
         <div className='panelFilterIcon'>{svg.search(12)}</div>
@@ -102,7 +106,30 @@ class AccountSelector extends React.Component {
               />
             ))
           ) : Object.keys(accounts).length === 0 ? (
-            <div className='noSigners'>{'No Accounts Added'}</div>
+            <ClusterBox style={{ pointerEvents: 'auto' }}>
+              <Cluster>
+                <ClusterRow>
+                  <ClusterValue>
+                    <div className='noSigners'>{'No Accounts Added'}</div>
+                  </ClusterValue>
+                </ClusterRow>
+                <ClusterRow>
+                  <ClusterValue
+                    onClick={() => {
+                      link.send('tray:action', 'navDash', {
+                        view: 'accounts',
+                        data: { showAddAccounts: true }
+                      })
+                    }}
+                  >
+                    <div className='newAccountButton'>
+                      <div className='newAccountIcon'>{svg.accounts(16)}</div>
+                      <div className='newAccountText'>{'Add New Account'}</div>
+                    </div>
+                  </ClusterValue>
+                </ClusterRow>
+              </Cluster>
+            </ClusterBox>
           ) : (
             <div className='noSigners'>{'No Matching Accounts'}</div>
           )}

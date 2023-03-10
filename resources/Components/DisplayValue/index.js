@@ -1,5 +1,7 @@
 import React from 'react'
 import { displayValueData } from '../../utils/displayValue'
+import { MAX_HEX } from '../../constants'
+
 import BigNumber from 'bignumber.js'
 
 function isDisplayValueData(obj) {
@@ -20,8 +22,14 @@ const Main = ({ displayValue }) => <span className='displayValueMain'>{displayVa
 
 const Unit = ({ displayUnit }) => <span className='displayValueUnit'>{displayUnit.shortName}</span>
 
-export const DisplayCoinBalance = ({ amount, symbol }) => (
-  <DisplayValue type='ether' value={amount} currencySymbol={symbol} currencySymbolPosition='last' />
+export const DisplayCoinBalance = ({ amount, symbol, decimals }) => (
+  <DisplayValue
+    type='ether'
+    value={amount}
+    currencySymbol={symbol}
+    currencySymbolPosition='last'
+    valueDataParams={{ decimals }}
+  />
 )
 
 export const DisplayFiatPrice = ({ decimals, currencyRate, isTestnet }) => (
@@ -45,7 +53,11 @@ export const DisplayValue = (props) => {
 
   const data = isDisplayValueData(value) ? value : displayValueData(value, valueDataParams)
 
-  const { approximationSymbol = '', displayValue, displayUnit } = data[type]({ displayDecimals })
+  const {
+    approximationSymbol = '',
+    displayValue,
+    displayUnit = ''
+  } = value === MAX_HEX ? { displayValue: 'Unlimited' } : data[type]({ displayDecimals })
 
   return (
     <div className='displayValue' data-testid='display-value'>

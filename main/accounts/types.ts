@@ -8,6 +8,7 @@ import type { DecodedCallData } from '../contracts'
 import type { Chain } from '../chains'
 import type { TransactionData } from '../../resources/domain/transaction'
 import type { Action } from '../transaction/actions'
+import { TokenData } from '../contracts/erc20'
 
 export enum ReplacementType {
   Speed = 'speed',
@@ -48,6 +49,12 @@ interface Request {
   handlerId: string
 }
 
+export type Identity = {
+  address: Address
+  ens: string
+  type: string
+}
+
 export interface AccountRequest<T extends RequestType = RequestType> extends Request {
   type: T
   origin: string
@@ -72,6 +79,23 @@ export interface Approval {
   approve: (data: any) => void
 }
 
+export interface Permit {
+  deadline: string | number
+  spender: string
+  value: string | number
+  owner: string
+  verifyingContract: string
+  chainId: number
+  nonce: string | number
+}
+
+export enum TxClassification {
+  CONTRACT_DEPLOY = 'CONTRACT_DEPLOY',
+  CONTRACT_CALL = 'CONTRACT_CALL',
+  SEND_DATA = 'SEND_DATA',
+  NATIVE_TRANSFER = 'NATIVE_TRANSFER'
+}
+
 export interface TransactionRequest extends AccountRequest<'transaction'> {
   payload: RPC.SendTransaction.Request
   data: TransactionData
@@ -93,6 +117,7 @@ export interface TransactionRequest extends AccountRequest<'transaction'> {
   feesUpdatedByUser: boolean
   recipientType: string
   recognizedActions: Action<unknown>[]
+  classification: TxClassification
 }
 
 export type TypedData<T extends MessageTypes = MessageTypes> = BaseTypedMessage<T>
@@ -105,12 +130,36 @@ export interface TypedMessage<V extends SignTypedDataVersion = SignTypedDataVers
 
 export type SignTypedDataRequest = DefaultSignTypedDataRequest | PermitSignatureRequest
 
+export type SignatureRequest = SignTypedDataRequest | AccountRequest<'sign'>
+
 export interface DefaultSignTypedDataRequest extends AccountRequest<'signTypedData'> {
   typedMessage: TypedMessage
 }
 
+interface EIP2612PermitDomain {
+  chainId: number
+  verifyingContract: string
+}
+
+export interface EIP2612TypedData {
+  types: MessageTypes
+  primaryType: 'Permit'
+  domain: EIP2612PermitDomain
+  message: Omit<Permit, 'chainId' | 'verifyingContract'>
+}
+
+interface PermitData extends Omit<Permit, 'spender' | 'verifyingContract'> {
+  spender: Identity
+  verifyingContract: Identity
+}
+
 export interface PermitSignatureRequest extends AccountRequest<'signErc20Permit'> {
-  typedMessage: TypedMessage
+  typedMessage: {
+    data: EIP2612TypedData
+    version: SignTypedDataVersion
+  }
+  permit: PermitData
+  tokenData: TokenData
 }
 
 export interface AccessRequest extends AccountRequest<'access'> {}

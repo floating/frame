@@ -91,7 +91,7 @@ class Requests extends React.Component {
     // const proxyFavicon = `https://proxy.pylon.link?type=icon&target=${encodeURIComponent(favicon)}`
 
     return (
-      <ClusterBox>
+      <ClusterBox key={origin}>
         <div className='requestGroup'>
           {/* <img src={proxyFavicon} width='24px' height='24px' />
           <RingIcon img={favicon} alt={'?'} small noRing /> */}
@@ -162,6 +162,10 @@ class Requests extends React.Component {
                 </RequestItem>
               )
             } else if (req.type === 'signErc20Permit') {
+              const chainId = req.typedMessage.data.domain.chainId
+              const chainName = this.store('main.networks.ethereum', chainId, 'name')
+              const { primaryColor, icon } = this.store('main.networksMeta.ethereum', chainId)
+
               return (
                 <RequestItem
                   key={req.type + i}
@@ -169,9 +173,9 @@ class Requests extends React.Component {
                   account={this.props.account}
                   handlerId={req.handlerId}
                   i={i}
-                  title={'Token Spend Permit'}
-                  color={'var(--outerspace)'}
-                  svgName={'sign'}
+                  title={`${chainName} Token Permit`}
+                  color={primaryColor ? `var(--${primaryColor})` : ''}
+                  img={icon}
                 >
                   <div style={{ height: '10px' }} />
                 </RequestItem>
@@ -260,16 +264,11 @@ class Requests extends React.Component {
 
   renderExpanded() {
     const activeAccount = this.store('main.accounts', this.props.account)
-    const requests = Object.values(activeAccount.requests || {})
-      .sort((a, b) => {
-        if (a.created > b.created) return -1
-        if (a.created < b.created) return 1
-        return 0
-      })
-      .filter((req) => {
-        const elapsed = Date.now() - ((req && req.created) || 0)
-        return elapsed > 1000
-      })
+    const requests = Object.values(activeAccount.requests || {}).sort((a, b) => {
+      if (a.created > b.created) return -1
+      if (a.created < b.created) return 1
+      return 0
+    })
 
     const originSortedRequests = {}
     requests.forEach((req) => {

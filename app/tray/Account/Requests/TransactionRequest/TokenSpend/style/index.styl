@@ -170,31 +170,37 @@
     letter-spacing 2px
     color var(--good)
 
+.approveTokenSpendAmountLabel
+  display flex
+  justify-content center
+  align-items center
+  padding 8px
+  font-size 15px
+  color var(--good)
+  font-weight 600
+
+.approveTokenSpendAmountSubtitle
+  font-size 8px
+  display flex
+  justify-content center
+  align-items center
+  text-transform uppercase
+  margin-top 4px
+  font-weight 500
+  z-index 40000
+  letter-spacing 1px
+  margin-left -1px
+
 .approveTokenSpendAmount
-  // background blue // var(--ghostB)
-  height 80px
-  padding-bottom 10px
+  height 60px
   width 100%
-  // border-radius 20px
-  // padding-top 2px
-  // padding-right 100px
-  // padding-left 10px
   box-sizing border-box
   position relative
   overflow hidden
+  display flex
+  justify-content center
+  align-items center
   font-weight 400
-
-  .approveTokenSpendAmountLabel
-    position absolute
-    left 0
-    top 0
-    bottom 12px
-    display flex
-    justify-content center
-    align-items center
-    padding-left 20px
-    font-size 16px
-    color var(--good)
 
   @keyframes land
     0%
@@ -206,7 +212,7 @@
     position absolute
     right 0
     top 0
-    bottom 10px
+    bottom 0px
     display flex
     justify-content center
     align-items center
@@ -225,29 +231,13 @@
   .approveTokenSpendAmountSubmit:hover
     color var(--good)
 
-  .approveTokenSpendAmountSubtitle
-    position absolute
-    bottom 4px
-    left 0
-    right 0
-    font-size 8px
-    display flex
-    justify-content center
-    align-items center
-    text-transform uppercase
-    margin-top 4px
-    font-weight 500
-    z-index 40000
-    letter-spacing 1px
-    margin-left -1px
-
   input
     background transparent
     outline 0
     border 0
     text-align center
     width 100%
-    height 100%
+    height 35px
     color var(--outerspace)
     font-size 20px
     font-family 'FiraCode'
@@ -263,7 +253,7 @@
     outline 0
     border 0
     width 100%
-    height 100%
+    height 35px
     color var(--outerspace)
     font-size 20px
     font-family 'FiraCode'

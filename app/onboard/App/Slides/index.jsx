@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
 import { SlideContainer, Slide, SlideTitle, SlideScroller } from '../styled'
+
+import appInfo from '../../../../package.json'
 import link from '../../../../resources/link'
 
 import Proceed from './Proceed'
@@ -8,19 +10,21 @@ import Intro from './Intro'
 import Access from './Access'
 import Chains from './Chains'
 import Omnichain from './Omnichain'
+import SwitchChains from './SwitchChains'
 import Accounts from './Accounts'
 import Extension from './Extension'
 import Outro from './Outro'
 
 const CurrentSlide = ({ slide, platform, setTitle, setProceed }) => {
   if (slide === 0) return null
-  else if (slide === 1) return <Intro setTitle={setTitle} setProceed={setProceed} />
+  else if (slide === 1) return <Intro setTitle={setTitle} setProceed={setProceed} version={appInfo.version} />
   else if (slide === 2) return <Access platform={platform} setTitle={setTitle} setProceed={setProceed} />
   else if (slide === 3) return <Chains setTitle={setTitle} setProceed={setProceed} />
   else if (slide === 4) return <Omnichain setTitle={setTitle} setProceed={setProceed} />
   else if (slide === 5) return <Accounts setTitle={setTitle} setProceed={setProceed} />
   else if (slide === 6) return <Extension setTitle={setTitle} setProceed={setProceed} />
-  else if (slide === 7) return <Outro setTitle={setTitle} setProceed={setProceed} />
+  else if (slide === 7) return <SwitchChains setTitle={setTitle} setProceed={setProceed} />
+  else if (slide === 8) return <Outro setTitle={setTitle} setProceed={setProceed} />
   else return <Slide>{'Cannot find slide'}</Slide>
 }
 
@@ -36,7 +40,7 @@ const prevSlide = (currentSlide, setSlide) => {
 
 const nextSlide = (currentSlide, setSlide) => {
   const nextSlide = ++currentSlide
-  setSlide(nextSlide > 7 ? 7 : nextSlide)
+  setSlide(nextSlide > 8 ? 8 : nextSlide)
 }
 
 const Slides = ({ platform }) => {

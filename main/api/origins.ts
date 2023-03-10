@@ -8,6 +8,7 @@ import store from '../store'
 const dev = process.env.NODE_ENV === 'development'
 
 const activeExtensionChecks: Record<string, Promise<boolean>> = {}
+const activePermissionChecks: Record<string, Promise<Permission | undefined>> = {}
 const extensionPrefixes = {
   firefox: 'moz-extension',
   safari: 'safari-web-extension'
@@ -17,7 +18,7 @@ const protocolRegex = /^(?:ws|http)s?:\/\//
 
 interface OriginUpdateResult {
   payload: RPCRequestPayload
-  hasSession: boolean
+  chainId: string
 }
 
 type Browser = 'chrome' | 'firefox' | 'safari'
@@ -81,8 +82,13 @@ async function requestExtensionPermission(extension: FrameExtension) {
 
 async function requestPermission(address: Address, fullPayload: RPCRequestPayload) {
   const { _origin: originId, ...payload } = fullPayload
+  const permissionCheckId = `${address}:${originId}`
 
-  return new Promise<Permission | undefined>((resolve) => {
+  if (permissionCheckId in activePermissionChecks) {
+    return activePermissionChecks[permissionCheckId]
+  }
+
+  const result = new Promise<Permission | undefined>((resolve) => {
     const request: AccessRequest = {
       payload,
       handlerId: originId,
@@ -95,23 +101,25 @@ async function requestPermission(address: Address, fullPayload: RPCRequestPayloa
       const { name: originName } = store('main.origins', originId)
       const permission = storeApi.getPermission(address, originName)
 
+      delete activePermissionChecks[permissionCheckId]
       resolve(permission)
     })
   })
+
+  activePermissionChecks[permissionCheckId] = result
+
+  return result
 }
 
 export function updateOrigin(
-  payload: JSONRPCRequestPayload,
+  requestPayload: JSONRPCRequestPayload,
   origin: string,
   connectionMessage = false
 ): OriginUpdateResult {
-  let hasSession = false
-
   const originId = uuidv5(origin, uuidv5.DNS)
   const existingOrigin = store('main.origins', originId)
-  if (!connectionMessage) {
-    hasSession = true
 
+  if (!connectionMessage) {
     // the extension will attempt to send messages (eth_chainId and net_version) in order
     // to connect. we don't want to store these origins as they'll come from every site
     // the user visits in their browser
@@ -129,13 +137,20 @@ export function updateOrigin(
     }
   }
 
+  const chainId = requestPayload.chainId || `0x${(existingOrigin?.chain.id || 1).toString(16)}`
+
+  const payload = {
+    ...requestPayload,
+    _origin: originId
+  }
+
+  if (connectionMessage) {
+    payload.chainId = chainId
+  }
+
   return {
-    hasSession,
-    payload: {
-      ...payload,
-      chainId: payload.chainId || `0x${(existingOrigin?.chain.id || 1).toString(16)}`,
-      _origin: originId
-    }
+    payload,
+    chainId
   }
 }
 

@@ -212,15 +212,3 @@ export const EditTestnet = ({ testnet, onChange }) => {
     </div>
   )
 }
-
-export const ChainFooter = ({ symbol, price }) => {
-  return (
-    <div className='chainFooter'>
-      <div className='chainCurrencyItem'>
-        <div className='chainCurrencyItemSymbol'>{symbol}</div>
-        <div className='chainCurrencyItemAt'>{'@'}</div>
-        <div className='sliceChainIdNumber'>{'$' + price.toLocaleString() + ''}</div>
-      </div>
-    </div>
-  )
-}

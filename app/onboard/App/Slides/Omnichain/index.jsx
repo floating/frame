@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react'
 
-import { Slide, SlideBody, SlideItem } from '../../styled'
+import { Slide, SlideBody, SlideItem, Tag } from '../../styled'
 
-const Chains = ({ setTitle, setProceed }) => {
+const OmnichainSlide = ({ setTitle, setProceed }) => {
   useEffect(() => {
     setTitle('Omnichain')
     setProceed({ action: 'next', text: 'Next' })
@@ -21,4 +21,4 @@ const Chains = ({ setTitle, setProceed }) => {
   )
 }
 
-export default Chains
+export default OmnichainSlide

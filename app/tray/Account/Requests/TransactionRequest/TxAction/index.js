@@ -5,7 +5,7 @@ import BigNumber from 'bignumber.js'
 import svg from '../../../../../../resources/svg'
 import link from '../../../../../../resources/link'
 import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../../resources/Components/Cluster'
-import { formatDisplayInteger, isUnlimited } from '../../../../../../resources/utils/numbers'
+import { formatDisplayDecimal, isUnlimited } from '../../../../../../resources/utils/numbers'
 import { DisplayValue, DisplayCoinBalance } from '../../../../../../resources/Components/DisplayValue'
 import { getAddress } from '../../../../../../resources/utils'
 
@@ -36,20 +36,11 @@ class TxSending extends React.Component {
           amount,
           decimals,
           name,
-          recipient: recipientAddress,
-          symbol,
-          recipientType,
-          recipientEns
+          recipient: { address: recipientAddress, type: recipientType, ens: recipientEns },
+          symbol
         } = action.data || {}
         const address = getAddress(recipientAddress)
         const ensName = recipientEns
-
-        // const ensName = (recipientEns && recipientEns.length < 25) ? recipientEns : ''
-        const value = new BigNumber(amount)
-        const displayValue = value
-          .dividedBy('1e' + decimals)
-          .decimalPlaces(6)
-          .toFormat()
 
         const isTestnet = this.store('main.networks', this.props.chain.type, this.props.chain.id, 'isTestnet')
         const rate = this.store('main.rates', contract)
@@ -68,7 +59,7 @@ class TxSending extends React.Component {
                   <DisplayValue
                     type='fiat'
                     value={amount}
-                    valueDataParams={{ currencyRate: rate && rate.usd, isTestnet }}
+                    valueDataParams={{ currencyRate: rate && rate.usd, isTestnet, decimals }}
                     currencySymbol='$'
                   />
                 </ClusterValue>
@@ -120,14 +111,19 @@ class TxSending extends React.Component {
           </ClusterBox>
         )
       } else if (actionType === 'approve') {
-        const { amount, decimals, spender: recipientAddress, symbol, spenderEns } = action.data || {}
+        const {
+          amount,
+          decimals,
+          spender: { address: recipientAddress, ens: spenderEns },
+          symbol
+        } = action.data || {}
         const address = recipientAddress
         const ensName = spenderEns
         const value = new BigNumber(amount)
         const revoke = value.eq(0)
         const displayAmount = isUnlimited(this.state.amount)
           ? 'unlimited'
-          : formatDisplayInteger(amount, decimals)
+          : formatDisplayDecimal(amount, decimals)
         const isSubmitted = req.status !== undefined
 
         return (

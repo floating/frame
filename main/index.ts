@@ -124,7 +124,6 @@ ipcMain.on('tray:clipboardData', (e, data) => {
 })
 
 ipcMain.on('tray:installAvailableUpdate', (e, version) => {
-  store.dontRemind(version)
   store.updateBadge('')
 
   updater.fetchUpdate()
@@ -174,8 +173,8 @@ ipcMain.on('tray:openExternal', (e, url) => {
   store.setDash({ showing: false })
 })
 
-ipcMain.on('tray:openExplorer', (e, hash, chain) => {
-  openBlockExplorer(hash, chain)
+ipcMain.on('tray:openExplorer', (e, chain, hash, account) => {
+  openBlockExplorer(chain, hash, account)
 })
 
 ipcMain.on('tray:copyTxHash', (e, hash) => {
@@ -195,9 +194,14 @@ ipcMain.on('tray:switchChain', (e, type, id, req) => {
   accounts.resolveRequest(req)
 })
 
-ipcMain.handle('tray:getTokenDetails', (e, contractAddress, chainId) => {
-  const contract = new Erc20Contract(contractAddress, chainId)
-  return contract.getTokenData()
+ipcMain.handle('tray:getTokenDetails', async (e, contractAddress, chainId) => {
+  try {
+    const contract = new Erc20Contract(contractAddress, chainId)
+    return await contract.getTokenData()
+  } catch (e) {
+    log.warn('Could not load token data for contract', { contractAddress, chainId })
+    return {}
+  }
 })
 
 ipcMain.on('tray:addToken', (e, token, req) => {
@@ -271,6 +275,8 @@ ipcMain.on('frame:unmax', (e) => {
 
 dapps.add({
   ens: 'send.frame.eth',
+  checkStatusRetryCount: 0,
+  openWhenReady: false,
   config: {
     key: 'value'
   }
@@ -282,20 +288,18 @@ ipcMain.on('unsetCurrentView', async (e, ens) => {
 })
 
 ipcMain.on('*:addFrame', (e, id) => {
-  setTimeout(() => {
-    const existingFrame = store('main.frames', id)
+  const existingFrame = store('main.frames', id)
 
-    if (existingFrame) {
-      windows.refocusFrame(id)
-    } else {
-      store.addFrame({
-        id,
-        currentView: '',
-        views: {}
-      })
-      dapps.open(id, 'send.frame.eth')
-    }
-  }, 50)
+  if (existingFrame) {
+    windows.refocusFrame(id)
+  } else {
+    store.addFrame({
+      id,
+      currentView: '',
+      views: {}
+    })
+    dapps.open(id, 'send.frame.eth')
+  }
 })
 
 app.on('ready', () => {

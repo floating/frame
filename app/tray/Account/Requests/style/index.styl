@@ -208,7 +208,7 @@
     height 22px
     width 22px
     border-radius 11px
-    background var(--ghostC)
+    background var(--ghostB)
     position relative
     display flex
     justify-content center
@@ -232,7 +232,7 @@
       border-radius 9px
       opacity 0
       pointer-events none
-      background var(--ghostC)
+      background var(--ghostB)
       letter-spacing 1px
       padding-left 2px
 
@@ -488,20 +488,24 @@
   align-items center
   flex-direction column
 
+  .requestNoticeInnerSymbol
+    padding-bottom 20px
+
   .requestNoticeInnerText
     font-size 12px
     font-weight 400
     text-transform uppercase
     letter-spacing 2px
     white-space normal
-    padding-bottom 48px
+    padding 0px 40px
+    text-align center
 
   .cancelRequest
-    margin-top 16px
     font-size 10px
     background var(--thin)
     height 20px
-    padding 0px 20px 0px 22px
+    width  100px
+    margin 16px auto 0px auto
     border-radius 8px
     letter-spacing 2px
     font-weight 400
@@ -583,7 +587,6 @@
   text-transform uppercase
   font-weight 300
   transform scale(0.8)
-  background linear-gradient(to top, var(--ghostZ) 25%, var(--ghostZ0) 100%)
   position absolute
   bottom 50px
   left 16px
@@ -686,7 +689,6 @@
       box-sizing border-box
       background var(--ghostA)
       box-shadow 0px 1px 2px var(--ghostZ)
-      border-bottom 2px solid var(--ghostZ)
     
     .txActionButton:hover
       background var(--ghostB)
@@ -696,6 +698,13 @@
 
     .txActionButtonBad
       color var(--bad)
+    
+    .txActionButtonDisabled
+      color var(--outerspace05)
+      cursor default
+    
+    .txActionButtonDisabled:hover
+      background var(--ghostA)
 
   .requestApproveFeeReject
     color var(--moon)
@@ -727,7 +736,7 @@
   right 0
   bottom 0px
   left 0
-  padding 64px 0px 128px 0px
+  padding 64px 0px
   border-radius 24px
   overflow-y scroll
 
@@ -866,40 +875,6 @@
     user-select all
     font-family 'FiraCode'
     font-weight 400
-
-.signTypedData
-  width calc(100% - 12px)
-  margin 6px
-  font-size 20px
-  font-weight 300
-  overflow-y scroll
-  overflow-x hidden
-  background var(--ghostZ)
-  border-radius 12px
-  div
-    user-select all
-
-  .signTypedDataInner
-    width 100%
-    font-size 20px
-    padding 8px
-    min-height 100%
-    box-sizing border-box
-
-    .signTypedDataSection
-      margin-bottom 40px
-      div
-        user-select none
-
-    .signTypedDataSection:last-child
-      margin-bottom 0px
-
-    .signTypedDataTitle
-      display block
-      font-size 20px
-      margin-bottom 18px
-      font-weight 400
-      font-family 'MainFont'
 
 .transactionValue
   position absolute
@@ -1875,6 +1850,12 @@ span
 .txStatusCompact
   bottom 60px
 
+.infoPane
+  padding 0px 60px
+  text-align center
+  line-height 20px
+  font-weight 400
+
 .txBar
   position absolute
   z-index 1001
@@ -1928,6 +1909,14 @@ span
             box-sizing border-box
             transition var(--standard)
             transform translateZ(0px)
+            cursor help
+            *
+              pointer-events none
+
+          .txProgressStepIcon:hover
+            svg
+              color var(--good)
+
           .txProgressStepIconHidden
             transform translateY(-50px)
             opacity 0
@@ -1969,6 +1958,7 @@ span
       left 0
       z-index 1001
       transition var(--standard)
+      pointer-events none
 
       .txProgressSlide
         position absolute
@@ -2187,7 +2177,17 @@ span
   text-transform uppercase
   letter-spacing 3px
   height 100px
-  
+
+.simpleJsonHeader
+  font-size 13px
+  padding 8px 2px
+  font-weight 400
+  margin-top 40px
+  border-bottom 2px solid var(--ghostZ)
+  text-transform uppercase
+  color var(--good)
+  letter-spacing 1px
+
 .simpleJson
   font-size 14px
 

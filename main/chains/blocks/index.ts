@@ -62,7 +62,7 @@ class BlockMonitor extends EventEmitter {
   }
 
   start() {
-    log.verbose(`Starting block updates for chain ${parseInt(this.connection.chainId)}`)
+    log.verbose(`%cStarting block updates for chain ${parseInt(this.connection.chainId)}`, 'color: green')
 
     this.connection.on('message', this.handleMessage)
 
@@ -81,9 +81,7 @@ class BlockMonitor extends EventEmitter {
   }
 
   stop() {
-    log.verbose(`Stopping block updates for chain ${parseInt(this.connection.chainId)}`)
-
-    this.removeAllListeners()
+    log.verbose(`%cStopping block updates for chain ${parseInt(this.connection.chainId)}`, 'color: red')
 
     if (this.subscriptionId) {
       this.clearSubscription()
@@ -118,9 +116,13 @@ class BlockMonitor extends EventEmitter {
   }
 
   private handleBlock(block: Block) {
-    log.debug(`Handling block ${parseInt(block.number)} for chain ${parseInt(this.connection.chainId)}`, {
-      latestBlock: this.latestBlock
-    })
+    log.debug(
+      `%cReceived block ${parseInt(block.number)} for chain ${parseInt(this.connection.chainId)}`,
+      'color: yellow',
+      {
+        latestBlock: parseInt(this.latestBlock)
+      }
+    )
 
     if (!block) return this.handleError('handleBlock received undefined block')
 

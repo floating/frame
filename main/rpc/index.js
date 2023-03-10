@@ -3,8 +3,8 @@ const { ipcMain, dialog } = require('electron')
 const log = require('electron-log')
 const { randomBytes } = require('crypto')
 import { isAddress } from '@ethersproject/address'
+import { openBlockExplorer } from '../windows/window'
 
-import Erc20Contract from '../contracts/erc20'
 const accounts = require('../accounts').default
 const signers = require('../signers').default
 const launch = require('../launch')
@@ -162,7 +162,7 @@ const rpc = {
     }
   },
   declineRequest(req, cb) {
-    if (req.type === 'transaction' || isSignatureRequest(req.type)) {
+    if (req.type === 'transaction' || isSignatureRequest(req)) {
       accounts.declineRequest(req.handlerId)
       provider.declineRequest(req)
     }
@@ -193,7 +193,10 @@ const rpc = {
           fs.readFile(keystore.filePaths[0], 'utf8', (err, data) => {
             if (err) return cb(err)
             try {
-              cb(null, JSON.parse(data))
+              const parsed = JSON.parse(data)
+              if (typeof parsed.version !== 'number') cb('Invalid keystore file')
+              if (![1, 3].includes(parsed.version)) cb('Invalid keystore version')
+              cb(null, parsed)
             } catch (err) {
               cb(err)
             }
@@ -204,7 +207,7 @@ const rpc = {
       })
       .catch(cb)
   },
-  createFromKeystore(keystore, keystorePassword, password, cb) {
+  createFromKeystore(keystore, password, keystorePassword, cb) {
     signers.createFromKeystore(keystore, keystorePassword, password, cb)
   },
   createFromPrivateKey(privateKey, password, cb) {
@@ -241,15 +244,6 @@ const rpc = {
     } catch (err) {
       log.warn(`Could not resolve ENS name ${name}:`, err)
       return cb(err)
-    }
-  },
-  async getErc20Data(address, chainId, cb) {
-    try {
-      const contract = new Erc20Contract(address, chainId)
-      const tokenData = await contract.getTokenData()
-      return cb(null, tokenData)
-    } catch (err) {
-      return cb(err, null)
     }
   },
   verifyAddress(cb) {
@@ -304,6 +298,13 @@ const rpc = {
       dapps.add(domain, options, cb)
     } else {
       console.log('input needs to be ens name')
+    }
+  },
+  openExplorer(chain) {
+    if (store('main.mute.explorerWarning')) {
+      openBlockExplorer(chain)
+    } else {
+      store.notify('openExplorer', { chain })
     }
   }
 }
