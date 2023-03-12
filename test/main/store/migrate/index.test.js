@@ -15,11 +15,6 @@ afterAll(() => {
   log.transports.console.level = 'debug'
 })
 
-const createChainState = (chainId) => {
-  state.main.networks.ethereum[chainId] = { id: chainId }
-  state.main.networksMeta.ethereum[chainId] = { nativeCurrency: {} }
-}
-
 beforeEach(() => {
   state = createState()
 })
