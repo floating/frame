@@ -1,11 +1,13 @@
-import log from 'electron-log'
+// legacy migrations that were written in JS and have not been ported
+// to Typescript
+
 import { v5 as uuidv5 } from 'uuid'
 import { z } from 'zod'
 
 import { accountNS, isDefaultAccountName } from '../../../resources/domain/account'
 import { isWindows } from '../../../resources/platform'
 
-const migrations = {
+export default {
   4: (initial) => {
     // If persisted state still has main.gasPrice, move gas settings into networks
     const gasPrice = initial.main.gasPrice // ('gasPrice', false)
@@ -976,26 +978,4 @@ const migrations = {
 
     return initial
   }
-}
-
-// Version number of latest known migration
-const latest = Math.max(...Object.keys(migrations))
-
-module.exports = {
-  // Apply migrations to current state
-  apply: (state, migrateToVersion = latest) => {
-    state.main._version = state.main._version || 0
-    Object.keys(migrations)
-      .sort((a, b) => a - b)
-      .forEach((version) => {
-        if (parseInt(state.main._version) < version && version <= migrateToVersion) {
-          log.info(`Applying state migration: ${version}`)
-          state = migrations[version](state)
-          state.main._version = version
-        }
-      })
-
-    return state
-  },
-  latest
 }
