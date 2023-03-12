@@ -3,10 +3,13 @@ import { createState, initChainState } from '../setup'
 
 const providers = ['infura', 'alchemy']
 
-const pylonChains = [
+const migratedChains = [
   [1, 'Mainnet'],
+  [3, 'Ropsten'],
+  [4, 'Rinkeby'],
   [5, 'Goerli'],
   [10, 'Optimism'],
+  [42, 'Kovan'],
   [137, 'Polygon'],
   [42161, 'Arbitrum'],
   [11155111, 'Sepolia']
@@ -18,13 +21,14 @@ beforeEach(() => {
   state = createState()
 })
 
-pylonChains.forEach(([id, chainName]) => {
+migratedChains.forEach(([id, chainName]) => {
   providers.forEach((provider) => {
-    it(`should migrate a primary ${chainName} ${provider} connection to use Pylon`, () => {
+    it(`should remove the RPC for a primary ${chainName} ${provider} connection`, () => {
       initChainState(state, id)
+
       state.main.networks.ethereum[id].connection = {
         primary: { current: provider, on: true, connected: false },
-        secondary: { current: 'custom', on: false, connected: false }
+        secondary: { current: 'custom', custom: 'myrpc', on: false, connected: false }
       }
 
       const updatedState = migrate(state)
@@ -33,12 +37,15 @@ pylonChains.forEach(([id, chainName]) => {
         connection: { primary, secondary }
       } = updatedState.main.networks.ethereum[id]
 
-      expect(primary.current).toBe('pylon')
+      expect(primary.current).toBe('custom')
+      expect(primary.custom).toBe('')
       expect(secondary.current).toBe('custom')
+      expect(secondary.custom).toBe('myrpc')
     })
 
-    it(`should migrate a secondary ${chainName} ${provider} connection to use Pylon`, () => {
+    it(`should remove the RPC for a secondary ${chainName} ${provider} connection`, () => {
       initChainState(state, id)
+
       state.main.networks.ethereum[id].connection = {
         primary: { current: 'local', on: true, connected: false },
         secondary: { current: provider, on: false, connected: false }
@@ -51,58 +58,15 @@ pylonChains.forEach(([id, chainName]) => {
       } = updatedState.main.networks.ethereum[id]
 
       expect(primary.current).toBe('local')
-      expect(secondary.current).toBe('pylon')
-    })
-  })
-})
-
-// these chains will not be supported by Pylon
-const retiredChains = [
-  [3, 'Ropsten'],
-  [4, 'Rinkeby'],
-  [42, 'Kovan']
-]
-
-retiredChains.forEach(([id, chainName]) => {
-  providers.forEach((provider) => {
-    it(`should remove a primary ${chainName} ${provider} connection`, () => {
-      initChainState(state, id)
-      state.main.networks.ethereum[id].connection = {
-        primary: { current: provider, on: true, connected: false },
-        secondary: { current: 'custom', on: false, connected: false }
-      }
-
-      const updatedState = migrate(state)
-
-      const {
-        connection: { primary }
-      } = updatedState.main.networks.ethereum[id]
-
-      expect(primary.current).toBe('custom')
-      expect(primary.on).toBe(false)
-    })
-
-    it(`should remove a secondary ${chainName} ${provider} connection`, () => {
-      initChainState(state, id)
-      state.main.networks.ethereum[id].connection = {
-        primary: { current: 'local', on: true, connected: false },
-        secondary: { current: provider, on: false, connected: false }
-      }
-
-      const updatedState = migrate(state)
-
-      const {
-        connection: { secondary }
-      } = updatedState.main.networks.ethereum[id]
-
       expect(secondary.current).toBe('custom')
-      expect(secondary.on).toBe(false)
+      expect(secondary.custom).toBe('')
     })
   })
 })
 
 it('should not migrate an existing custom infura connection on a Pylon chain', () => {
   initChainState(state, 10)
+
   state.main.networks.ethereum[10].connection = {
     primary: {
       current: 'custom',
