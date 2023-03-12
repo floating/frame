@@ -1,8 +1,9 @@
 import log from 'electron-log'
 
-import migrations from '../../../../main/store/migrations'
+import migrations from '../../../../main/store/migrate'
 import { getDefaultAccountName } from '../../../../resources/domain/account'
 import { capitalize } from '../../../../resources/utils'
+import { createState, initChainState } from './setup'
 
 let state
 
@@ -14,22 +15,8 @@ afterAll(() => {
   log.transports.console.level = 'debug'
 })
 
-const createChainState = (chainId) => {
-  state.main.networks.ethereum[chainId] = { id: chainId }
-  state.main.networksMeta.ethereum[chainId] = { nativeCurrency: {} }
-}
-
 beforeEach(() => {
-  state = {
-    main: {
-      _version: 0,
-      networks: { ethereum: {} },
-      networksMeta: { ethereum: {} },
-      accounts: {},
-      balances: {},
-      tokens: { known: {} }
-    }
-  }
+  state = createState()
 })
 
 describe('migration 13', () => {
@@ -1382,14 +1369,14 @@ describe('migration 34', () => {
 
   Object.entries(expectedData).forEach(([chainId, { chainName, currencyName, currencySymbol }]) => {
     it(`should set the native currency name for ${chainName} to ${currencyName} if currently undefined`, () => {
-      createChainState(chainId)
+      initChainState(state, chainId)
 
       const updatedState = migrations.apply(state, 34)
       expect(getNativeCurrency(updatedState, chainId).name).toBe(currencyName)
     })
 
     it(`should set the native currency name for ${chainName} to ${currencyName} if currently an empty string'`, () => {
-      createChainState(chainId)
+      initChainState(state, chainId)
       state.main.networksMeta.ethereum[chainId].nativeCurrency.name = ''
 
       const updatedState = migrations.apply(state, 34)
@@ -1397,7 +1384,7 @@ describe('migration 34', () => {
     })
 
     it(`should set the native currency symbol for ${chainName} to ${currencySymbol} if currently not set`, () => {
-      createChainState(chainId)
+      initChainState(state, chainId)
 
       const updatedState = migrations.apply(state, 34)
       expect(getNativeCurrency(updatedState, chainId).symbol).toBe(currencySymbol)
@@ -1408,7 +1395,7 @@ describe('migration 34', () => {
 
   fields.forEach((field) => {
     it(`should not overwrite an existing native currency ${field}`, () => {
-      createChainState(10)
+      initChainState(state, 10)
       state.main.networksMeta.ethereum[10].nativeCurrency[field] = 'CUSTOM'
 
       const updatedState = migrations.apply(state, 34)
@@ -1416,7 +1403,7 @@ describe('migration 34', () => {
     })
 
     it(`should set a missing custom chain native currency ${field} to an empty string`, () => {
-      createChainState(56)
+      initChainState(state, 56)
 
       const updatedState = migrations.apply(state, 34)
       expect(getNativeCurrency(updatedState, 56)[field]).toBe('')
@@ -1431,182 +1418,10 @@ describe('migration 34', () => {
   })
 
   it('should set native currency data when none previously existed', () => {
-    createChainState(137)
+    initChainState(state, 137)
     delete state.main.networksMeta.ethereum[137].nativeCurrency
 
     const updatedState = migrations.apply(state, 34)
     expect(getNativeCurrency(updatedState, 137)).toStrictEqual({ name: 'Matic', symbol: 'MATIC' })
-  })
-})
-
-describe('migration 35', () => {
-  beforeEach(() => {
-    state.main._version = 34
-  })
-
-  const providers = ['infura', 'alchemy']
-
-  const pylonChains = [
-    [1, 'Mainnet'],
-    [5, 'Goerli'],
-    [10, 'Optimism'],
-    [137, 'Polygon'],
-    [42161, 'Arbitrum'],
-    [11155111, 'Sepolia']
-  ]
-
-  pylonChains.forEach(([id, chainName]) => {
-    providers.forEach((provider) => {
-      it(`should migrate a primary ${chainName} ${provider} connection to use Pylon`, () => {
-        createChainState(id)
-        state.main.networks.ethereum[id].connection = {
-          primary: { current: provider, on: true, connected: false },
-          secondary: { current: 'custom', on: false, connected: false }
-        }
-
-        const updatedState = migrations.apply(state, 35)
-
-        const {
-          connection: { primary, secondary }
-        } = updatedState.main.networks.ethereum[id]
-
-        expect(primary.current).toBe('pylon')
-        expect(secondary.current).toBe('custom')
-      })
-
-      it(`should migrate a secondary ${chainName} ${provider} connection to use Pylon`, () => {
-        createChainState(id)
-        state.main.networks.ethereum[id].connection = {
-          primary: { current: 'local', on: true, connected: false },
-          secondary: { current: provider, on: false, connected: false }
-        }
-
-        const updatedState = migrations.apply(state, 35)
-
-        const {
-          connection: { primary, secondary }
-        } = updatedState.main.networks.ethereum[id]
-
-        expect(primary.current).toBe('local')
-        expect(secondary.current).toBe('pylon')
-      })
-    })
-  })
-
-  // these chains will not be supported by Pylon
-  const retiredChains = [
-    [3, 'Ropsten'],
-    [4, 'Rinkeby'],
-    [42, 'Kovan']
-  ]
-
-  retiredChains.forEach(([id, chainName]) => {
-    providers.forEach((provider) => {
-      it(`should remove a primary ${chainName} ${provider} connection`, () => {
-        createChainState(id)
-        state.main.networks.ethereum[id].connection = {
-          primary: { current: provider, on: true, connected: false },
-          secondary: { current: 'custom', on: false, connected: false }
-        }
-
-        const updatedState = migrations.apply(state, 35)
-
-        const {
-          connection: { primary }
-        } = updatedState.main.networks.ethereum[id]
-
-        expect(primary.current).toBe('custom')
-        expect(primary.on).toBe(false)
-      })
-
-      it(`should remove a secondary ${chainName} ${provider} connection`, () => {
-        createChainState(id)
-        state.main.networks.ethereum[id].connection = {
-          primary: { current: 'local', on: true, connected: false },
-          secondary: { current: provider, on: false, connected: false }
-        }
-
-        const updatedState = migrations.apply(state, 35)
-
-        const {
-          connection: { secondary }
-        } = updatedState.main.networks.ethereum[id]
-
-        expect(secondary.current).toBe('custom')
-        expect(secondary.on).toBe(false)
-      })
-    })
-  })
-
-  it('should not migrate an existing custom infura connection on a Pylon chain', () => {
-    createChainState(10)
-    state.main.networks.ethereum[10].connection = {
-      primary: {
-        current: 'custom',
-        custom: 'https://optimism-mainnet.infura.io/v3/myapikey',
-        on: true,
-        connected: false
-      },
-      secondary: { current: 'custom', on: false, connected: false }
-    }
-
-    const updatedState = migrations.apply(state, 35)
-
-    const {
-      connection: { primary, secondary }
-    } = updatedState.main.networks.ethereum[10]
-
-    expect(primary.current).toBe('custom')
-    expect(primary.on).toBe(true)
-    expect(primary.custom).toBe('https://optimism-mainnet.infura.io/v3/myapikey')
-    expect(secondary.current).toBe('custom')
-  })
-})
-
-describe('migration 36', () => {
-  beforeEach(() => {
-    state.main._version = 35
-
-    state.main.networks.ethereum = {
-      100: {
-        connection: {
-          primary: { current: 'custom' },
-          secondary: { current: 'local' }
-        }
-      }
-    }
-  })
-
-  const connectionPriorities = ['primary', 'secondary']
-
-  connectionPriorities.forEach((priority) => {
-    it(`updates a ${priority} Gnosis connection`, () => {
-      state.main.networks.ethereum[100].connection[priority].current = 'poa'
-
-      const updatedState = migrations.apply(state, 36)
-      const gnosis = updatedState.main.networks.ethereum[100]
-
-      expect(gnosis.connection[priority].current).toBe('custom')
-      expect(gnosis.connection[priority].custom).toBe('https://rpc.gnosischain.com')
-    })
-
-    it(`does not update an existing custom ${priority} Gnosis connection`, () => {
-      state.main.networks.ethereum[100].connection[priority].current = 'custom'
-      state.main.networks.ethereum[100].connection[priority].custom = 'https://myconnection.io'
-
-      const updatedState = migrations.apply(state, 36)
-      const gnosis = updatedState.main.networks.ethereum[100]
-
-      expect(gnosis.connection[priority].current).toBe('custom')
-      expect(gnosis.connection[priority].custom).toBe('https://myconnection.io')
-    })
-  })
-
-  it('takes no action if no Gnosis chain is present', () => {
-    delete state.main.networks.ethereum[100]
-
-    const updatedState = migrations.apply(state, 36)
-
-    expect(updatedState.main.networks).toStrictEqual({ ethereum: {} })
   })
 })
