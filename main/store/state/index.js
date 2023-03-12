@@ -1,7 +1,7 @@
 const { v4: generateUuid, v5: uuidv5 } = require('uuid')
 
 const persist = require('../persist')
-const migrations = require('../migrations')
+const migrations = require('../migrate')
 
 const latestStateVersion = () => {
   const state = persist.get('main')
