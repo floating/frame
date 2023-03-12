@@ -2,7 +2,7 @@ const path = require('path')
 const electron = require('electron')
 const Conf = require('conf')
 
-const migrations = require('../migrations')
+const migrations = require('../migrate')
 
 class PersistStore extends Conf {
   constructor(options) {
