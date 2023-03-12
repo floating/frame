@@ -27,8 +27,8 @@ migratedChains.forEach(([id, chainName]) => {
       initChainState(state, id)
 
       state.main.networks.ethereum[id].connection = {
-        primary: { current: provider, on: true, connected: false },
-        secondary: { current: 'custom', custom: 'myrpc', on: false, connected: false }
+        primary: { current: provider },
+        secondary: { current: 'custom', custom: 'myrpc' }
       }
 
       const updatedState = migrate(state)
@@ -47,8 +47,8 @@ migratedChains.forEach(([id, chainName]) => {
       initChainState(state, id)
 
       state.main.networks.ethereum[id].connection = {
-        primary: { current: 'local', on: true, connected: false },
-        secondary: { current: provider, on: false, connected: false }
+        primary: { current: 'local', on: true },
+        secondary: { current: provider, on: false }
       }
 
       const updatedState = migrate(state)
@@ -70,11 +70,9 @@ it('should not migrate an existing custom infura connection on a Pylon chain', (
   state.main.networks.ethereum[10].connection = {
     primary: {
       current: 'custom',
-      custom: 'https://optimism-mainnet.infura.io/v3/myapikey',
-      on: true,
-      connected: false
+      custom: 'https://optimism-mainnet.infura.io/v3/myapikey'
     },
-    secondary: { current: 'custom', on: false, connected: false }
+    secondary: { current: 'custom' }
   }
 
   const updatedState = migrate(state)
@@ -84,7 +82,32 @@ it('should not migrate an existing custom infura connection on a Pylon chain', (
   } = updatedState.main.networks.ethereum[10]
 
   expect(primary.current).toBe('custom')
-  expect(primary.on).toBe(true)
   expect(primary.custom).toBe('https://optimism-mainnet.infura.io/v3/myapikey')
   expect(secondary.current).toBe('custom')
+})
+
+it('should show the migration warning if any Infura or Alchemy connections were updated', () => {
+  initChainState(state, 1)
+
+  state.main.networks.ethereum[1].connection = {
+    primary: { current: 'infura', on: true },
+    secondary: { current: 'custom', custom: 'myrpc', on: false }
+  }
+
+  const updatedState = migrate(state)
+
+  expect(updatedState.main.mute.migrateToPylon).toBe(false)
+})
+
+it('should not show the migration warning if the user has no Infura or Alchemy connections', () => {
+  initChainState(state, 1)
+
+  state.main.networks.ethereum[1].connection = {
+    primary: { current: 'local', on: true },
+    secondary: { current: 'custom', custom: 'myrpc', on: false }
+  }
+
+  const updatedState = migrate(state)
+
+  expect(updatedState.main.mute.migrateToPylon).toBe(true)
 })

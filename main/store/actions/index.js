@@ -779,6 +779,9 @@ module.exports = {
     })
     u('windows.dash.showing', () => true)
   },
+  mutePylonMigrationNotice: (u) => {
+    u('main.mute.migrateToPylon', () => true)
+  },
   completeOnboarding: (u) => {
     u('main.mute.onboardingWindow', () => true)
     u('windows.onboard.showing', () => false)
