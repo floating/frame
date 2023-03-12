@@ -1,12 +1,20 @@
+<<<<<<< HEAD:main/store/migrate/migrations/legacy/index.ts
 // @ts-nocheck
+=======
+>>>>>>> move migrations to separate files, use TS (#1482):main/store/migrate/migrations/legacy.js
 // legacy migrations that were written in JS and have not been ported
 // to Typescript
 
 import { v5 as uuidv5 } from 'uuid'
+<<<<<<< HEAD:main/store/migrate/migrations/legacy/index.ts
 
 import { accountNS, isDefaultAccountName } from '../../../../../resources/domain/account'
+=======
+>>>>>>> move migrations to separate files, use TS (#1482):main/store/migrate/migrations/legacy.js
 
-const migrations = {
+import { accountNS, isDefaultAccountName } from '../../../../resources/domain/account'
+
+export default {
   4: (initial) => {
     // If persisted state still has main.gasPrice, move gas settings into networks
     const gasPrice = initial.main.gasPrice // ('gasPrice', false)
@@ -905,6 +913,7 @@ const migrations = {
     })
 
     return initial
+<<<<<<< HEAD:main/store/migrate/migrations/legacy/index.ts
   },
   35: (initial) => {
     const { shortcuts } = initial.main || {}
@@ -931,3 +940,7 @@ const legacyMigrations = Object.entries(migrations).map(([version, legacyMigrati
 }))
 
 export default legacyMigrations
+=======
+  }
+}
+>>>>>>> move migrations to separate files, use TS (#1482):main/store/migrate/migrations/legacy.js
