@@ -1,8 +1,11 @@
-import log from 'electron-log'
-import { v5 as uuidv5 } from 'uuid'
-import { accountNS, isDefaultAccountName } from '../../../resources/domain/account'
+// legacy migrations that were written in JS and have not been ported
+// to Typescript
 
-const migrations = {
+import { v5 as uuidv5 } from 'uuid'
+
+import { accountNS, isDefaultAccountName } from '../../../../resources/domain/account'
+
+export default {
   4: (initial) => {
     // If persisted state still has main.gasPrice, move gas settings into networks
     const gasPrice = initial.main.gasPrice // ('gasPrice', false)
@@ -901,96 +904,5 @@ const migrations = {
     })
 
     return initial
-  },
-  35: (initial) => {
-    const removeRpcConnection = (connection, replaceWithPylon = true) => {
-      const isServiceRpc = connection.current === 'infura' || connection.current === 'alchemy'
-
-      return {
-        ...connection,
-        // turn off existing connections to Infura or Alchemy if they're not being replaced by Pylon
-        on: connection.on && (!isServiceRpc || replaceWithPylon),
-        current: isServiceRpc ? (replaceWithPylon ? 'pylon' : 'custom') : connection.current
-      }
-    }
-
-    const updateChain = (chain, replaceWithPylon = true) => {
-      const { primary = {}, secondary = {} } = chain.connection
-
-      const updatedChain = {
-        ...chain,
-        connection: {
-          ...chain.connection,
-          primary: removeRpcConnection(primary, replaceWithPylon),
-          secondary: removeRpcConnection(secondary, replaceWithPylon)
-        }
-      }
-
-      return updatedChain
-    }
-
-    const chains = Object.entries(initial.main.networks.ethereum)
-
-    // migrate existing Infura and Alchemy connections to use Pylon where applicable
-    const pylonChains = chains
-      .filter(([id]) => ['1', '5', '10', '137', '42161', '11155111'].includes(id))
-      .map(([id, chain]) => [id, updateChain(chain)])
-
-    // these connections previously used Infura and Alchemy and are not supported by Pylon
-    const retiredChains = chains
-      .filter(([id]) => ['3', '4', '42'].includes(id))
-      .map(([id, chain]) => [id, updateChain(chain, false)])
-
-    initial.main.networks.ethereum = Object.fromEntries([...chains, ...pylonChains, ...retiredChains])
-
-    return initial
-  },
-  36: (initial) => {
-    // remove Gnosis chain preset
-    const removePoaConnection = (connection) => {
-      const isPoa = connection.current === 'poa'
-
-      return {
-        ...connection,
-        current: isPoa ? 'custom' : connection.current,
-        custom: isPoa ? 'https://rpc.gnosischain.com' : connection.custom
-      }
-    }
-
-    const gnosis = initial.main.networks.ethereum[100]
-
-    if (gnosis) {
-      initial.main.networks.ethereum[100] = {
-        ...gnosis,
-        connection: {
-          primary: removePoaConnection(gnosis.connection.primary),
-          secondary: removePoaConnection(gnosis.connection.secondary)
-        }
-      }
-    }
-
-    return initial
   }
-}
-
-// Version number of latest known migration
-const latest = Math.max(...Object.keys(migrations))
-
-module.exports = {
-  // Apply migrations to current state
-  apply: (state, migrateToVersion = latest) => {
-    state.main._version = state.main._version || 0
-    Object.keys(migrations)
-      .sort((a, b) => a - b)
-      .forEach((version) => {
-        if (parseInt(state.main._version) < version && version <= migrateToVersion) {
-          log.info(`Applying state migration: ${version}`)
-          state = migrations[version](state)
-          state.main._version = version
-        }
-      })
-
-    return state
-  },
-  latest
 }

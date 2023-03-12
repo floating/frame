@@ -1,3 +1,15 @@
+type State = {
+  main: {
+    _version: number
+    networks: {
+      ethereum: Record<number, Network>
+    }
+    networksMeta: {
+      ethereum: Record<number, NetworkMetadata>
+    }
+  }
+}
+
 interface Connection {
   on: boolean
   connected: boolean
