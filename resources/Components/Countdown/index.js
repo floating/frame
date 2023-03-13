@@ -1,6 +1,6 @@
 import useCountdown from '../../Hooks/useCountdown'
 
-export const Countdown = ({ end, title, titleClass, innerClass }) => {
+const Countdown = ({ end, title, titleClass, innerClass }) => {
   const ttl = isFinite(new Date(end)) ? useCountdown(end) : 'INVALID DATE'
 
   return (
@@ -12,3 +12,5 @@ export const Countdown = ({ end, title, titleClass, innerClass }) => {
     </div>
   )
 }
+
+export default Countdown

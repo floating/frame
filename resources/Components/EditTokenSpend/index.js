@@ -4,7 +4,7 @@ import BigNumber from 'bignumber.js'
 import { max } from '../../utils/numbers'
 import svg from '../../svg'
 import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../Cluster'
-import { Countdown } from '../Countdown'
+import Countdown from '../Countdown'
 
 import useCopiedMessage from '../../Hooks/useCopiedMessage'
 
