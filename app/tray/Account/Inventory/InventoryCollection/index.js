@@ -1,7 +1,5 @@
 import React from 'react'
 import Restore from 'react-restore'
-import frameIcon from '../../../../../asset/FrameIcon.png'
-import { LazyLoadImage } from '../../../../../resources/Components/LazyLoadImage'
 
 class Inventory extends React.Component {
   constructor(...args) {
@@ -21,12 +19,12 @@ class Inventory extends React.Component {
           {this.state.hoverAsset ? (
             <div className='inventoryPreviewMedia'>
               {this.state.hoverAsset.img ? (
-                <LazyLoadImage
+                <img
                   src={`https://proxy.pylon.link?type=nft&target=${encodeURIComponent(
                     this.state.hoverAsset.img
                   )}`}
-                  placeholder={frameIcon}
-                  width={94}
+                  loading='lazy'
+                  alt={this.state.hoverAsset.name.toUpperCase()}
                 />
               ) : null}
             </div>
@@ -80,11 +78,13 @@ class Inventory extends React.Component {
                   }}
                 >
                   {img ? (
-                    <LazyLoadImage
-                      src={`https://proxy.pylon.link?type=nft&target=${encodeURIComponent(img)}`}
-                      placeholder={frameIcon}
-                      width={94}
-                    />
+                    <div className='inventoryItemImage'>
+                      <img
+                        src={`https://proxy.pylon.link?type=nft&target=${encodeURIComponent(img)}`}
+                        loading='lazy'
+                        alt={name.toUpperCase()}
+                      />
+                    </div>
                   ) : null}
                 </div>
               )
