@@ -1,4 +1,4 @@
-import { Countdown } from '../../../../resources/Components/Countdown'
+import Countdown from '../../../../resources/Components/Countdown'
 import { render, screen } from '../../../componentSetup'
 
 it('shows the time remaining until a valid date', () => {
