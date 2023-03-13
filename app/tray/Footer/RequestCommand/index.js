@@ -51,7 +51,7 @@ class RequestCommand extends React.Component {
       id: parseInt(req.data.chainId, 'hex')
     }
 
-    const isTestnet = this.store('main.networks', chain.type, chain.id, 'isTestnet')
+    const { isTestnet, explorer } = this.store('main.networks', chain.type, chain.id)
     const nativeCurrency = this.store('main.networksMeta', chain.type, chain.id, 'nativeCurrency')
     const nativeUSD = nativeCurrency && nativeCurrency.usd && !isTestnet ? nativeCurrency.usd.price : 0
 
@@ -97,9 +97,9 @@ class RequestCommand extends React.Component {
               ) : this.state.showHashDetails || status === 'confirming' ? (
                 <div className='txActionButtonsRow'>
                   <div
-                    className={'txActionButton'}
+                    className={`txActionButton${explorer ? '' : ' txActionButtonDisabled'}`}
                     onClick={() => {
-                      if (req && req.tx && req.tx.hash) {
+                      if (explorer && req && req.tx && req.tx.hash) {
                         if (this.store('main.mute.explorerWarning')) {
                           link.send('tray:openExplorer', chain, req.tx.hash)
                         } else {
