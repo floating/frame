@@ -2,11 +2,12 @@ import React from 'react'
 import Restore from 'react-restore'
 import { isHexString } from '@ethersproject/bytes'
 import { stripHexPrefix } from './../../../../../resources/utils'
+import isUtf8 from 'isutf8'
 
 function decodeMessage(rawMessage) {
   if (isHexString(rawMessage)) {
     const buff = Buffer.from(stripHexPrefix(rawMessage), 'hex')
-    return buff.length === 32 ? rawMessage : buff.toString('utf8')
+    return buff.length === 32 || !isUtf8(buff) ? rawMessage : buff.toString('utf8')
   }
 
   // replace all multiple line returns with just one to prevent excess space in message
