@@ -99,7 +99,7 @@ export function openExternal(url = '') {
   }
 }
 
-export function openBlockExplorer({ id, type }: Chain, hash?: string, account?: string) {
+export function openBlockExplorer({ id, type }: ChainId, hash?: string, account?: string) {
   // remove trailing slashes from the base url
   const explorer = (store('main.networks', type, id, 'explorer') || '').replace(/\/+$/, '')
 

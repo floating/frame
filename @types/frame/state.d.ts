@@ -20,22 +20,9 @@ interface Connection {
   custom: string
 }
 
-interface Chain {
+interface ChainId {
   id: number
   type: 'ethereum'
-}
-
-interface Network {
-  id: number
-  name: string
-  layer: string
-  isTestnet: boolean
-  explorer: string
-  on: boolean
-  connection: {
-    primary: Connection
-    secondary: Connection
-  }
 }
 
 interface NetworkMetadata {
@@ -54,7 +41,7 @@ interface Session {
 }
 
 interface Origin {
-  chain: Chain
+  chain: ChainId
   name: string
   session: Session
 }

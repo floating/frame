@@ -7,6 +7,8 @@ import Rates from './assets'
 import Balances from './balances'
 import { arraysMatch, debounce } from '../../resources/utils'
 
+import type { Chain } from '../store/state/types'
+
 export interface DataScanner {
   close: () => void
 }
@@ -16,7 +18,7 @@ const storeApi = {
   getCustomTokens: () => (store('main.tokens.custom') || []) as Token[],
   getKnownTokens: (address?: Address) => ((address && store('main.tokens.known', address)) || []) as Token[],
   getConnectedNetworks: () => {
-    const networks = Object.values(store('main.networks.ethereum') || {}) as Network[]
+    const networks = Object.values(store('main.networks.ethereum') || {}) as Chain[]
     return networks.filter(
       (n) => (n.connection.primary || {}).connected || (n.connection.secondary || {}).connected
     )

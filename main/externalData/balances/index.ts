@@ -5,6 +5,8 @@ import { toTokenId } from '../../../resources/domain/balance'
 import BalancesWorkerController from './controller'
 import { CurrencyBalance, TokenBalance } from './scan'
 
+import type { Chain } from '../../store/state/types'
+
 const RESTART_WAIT = 5 // seconds
 
 // time to wait in between scans, in seconds
@@ -16,11 +18,11 @@ const scanInterval = {
 export default function (store: Store) {
   const storeApi = {
     getActiveAddress: () => (store('selected.current') || '') as Address,
-    getNetwork: (id: number) => (store('main.networks.ethereum', id) || {}) as Network,
+    getNetwork: (id: number) => (store('main.networks.ethereum', id) || {}) as Chain,
     getNativeCurrencySymbol: (id: number) =>
       store('main.networksMeta.ethereum', id, 'nativeCurrency', 'symbol') as string,
     getConnectedNetworks: () => {
-      const networks = Object.values(store('main.networks.ethereum') || {}) as Network[]
+      const networks = Object.values(store('main.networks.ethereum') || {}) as Chain[]
       return networks.filter(
         (n) => (n.connection.primary || {}).connected || (n.connection.secondary || {}).connected
       )

@@ -1,4 +1,6 @@
-export function isNetworkConnected(network: Network) {
+import type { Chain } from '../../main/store/state/types'
+
+export function isNetworkConnected(network: Chain) {
   return (
     network &&
     ((network.connection.primary && network.connection.primary.connected) ||
@@ -6,6 +8,6 @@ export function isNetworkConnected(network: Network) {
   )
 }
 
-export function isNetworkEnabled(network: Network) {
+export function isNetworkEnabled(network: Chain) {
   return network.on
 }
