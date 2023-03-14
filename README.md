@@ -17,9 +17,9 @@
 </h5>
 <br>
 
-<img src="/asset/png/FrameExample0-3-4.png?raw=true" />
+<img src="/asset/png/FrameExample0-6-3.png?raw=true" />
 
-Frame is a native web3 interface that lets you sign data, securely manage accounts and transparently interact with dapps via web3 protocols like Ethereum and IPFS!
+Frame is a web3 platform that creates a secure system-wide interface to your chains and accounts. Now any browser, command-line, or native application has the ability to access to web3.
 
 ### Features
 
@@ -29,6 +29,10 @@ Frame is a native web3 interface that lets you sign data, securely manage accoun
   - Use a mnemonic phrase, keystore.json or standalone private keys to create and backup accounts!
 - **Permissions**
   - You'll always have full control of which dapps have permission to access Frame and can monitor with full transparency what requests are being made to the network.
+- **Omnichain Routing**
+  - With Frame's Omnichain routing dapps can seamlessly use multiple chains at the same time, enabling truly multichain experiences.
+- **Transaction Decoding**
+  - By utilizing verified contract ABIs, transaction calldata can be decoded into concise and informative summaries, allowing you to sign transactions with confidence.
 - **Set your own connections to Ethereum and IPFS**
   - Never be locked into using a centralized gateway
 - **Menu Bar Support**
@@ -57,9 +61,9 @@ If you use an arch-based distro, you can use an AUR Helper like [yay](https://gi
 # Clone
 › git clone https://github.com/floating/frame
 
-# Use node v16
-› nvm install 16.15.0
-› nvm use 16.15.0
+# Use node v18
+› nvm install 18.15.0
+› nvm use 18.15.0
 
 
 # Install
