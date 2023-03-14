@@ -1,11 +1,16 @@
-const path = require('path')
-const electron = require('electron')
-const Conf = require('conf')
+import path from 'path'
+import electron from 'electron'
+import Conf, { Options } from 'conf'
 
-const migrations = require('../migrate')
+import migrations from '../migrate'
+
+type PersistOpts<T extends Record<string, any>> = Options<T>
 
 class PersistStore extends Conf {
-  constructor(options) {
+  private blockUpdates = false
+  private updates: Record<string, any> | null = {}
+
+  constructor(options?: PersistOpts<any>) {
     options = { configFileMode: 0o600, configName: 'config', ...options }
     let defaultCwd = __dirname
     if (electron && electron.app) defaultCwd = electron.app.getPath('userData')
@@ -27,14 +32,14 @@ class PersistStore extends Conf {
     if (Object.keys(updates || {}).length > 0) super.set(updates)
   }
 
-  queue(path, value) {
+  queue(path: string, value: any) {
     path = `main.__.${migrations.latest}.${path}`
     this.updates = this.updates || {}
     delete this.updates[path] // maintain entry order
     this.updates[path] = JSON.parse(JSON.stringify(value))
   }
 
-  set(path, value) {
+  set(path: any, value?: unknown) {
     if (this.blockUpdates) return
     path = `main.__.${migrations.latest}.${path}`
     super.set(path, value)
@@ -46,4 +51,4 @@ class PersistStore extends Conf {
   }
 }
 
-module.exports = new PersistStore()
+export default new PersistStore()

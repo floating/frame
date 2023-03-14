@@ -9,6 +9,8 @@ import { isNonZeroHex } from '../../resources/utils'
 import chainConfig from '../chains/config'
 import { TransactionRequest, TxClassification } from '../accounts/types'
 
+import type { Gas } from '../store/state/types'
+
 const londonHardforkSigners: SignerCompatibilityByVersion = {
   seed: () => true,
   ring: () => true,
@@ -94,7 +96,7 @@ function calculateMaxFeePerGas(maxBaseFee: string, maxPriorityFee: string) {
   return addHexPrefix(maxFeePerGas)
 }
 
-function populate(rawTx: TransactionData, chainConfig: Common, gas: GasData): TransactionData {
+function populate(rawTx: TransactionData, chainConfig: Common, gas: Gas): TransactionData {
   const txData: TransactionData = { ...rawTx }
 
   // non-EIP-1559 case

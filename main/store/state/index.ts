@@ -1,10 +1,11 @@
-const { v4: generateUuid, v5: uuidv5 } = require('uuid')
+import { v4 as generateUuid, v5 as uuidv5 } from 'uuid'
 
-const persist = require('../persist')
-const migrations = require('../migrate')
+import persist from '../persist'
+import migrations from '../migrate'
+import { StateSchema } from './types/index'
 
 const latestStateVersion = () => {
-  const state = persist.get('main')
+  const state = persist.get('main') as any
   if (!state || !state.__) {
     // log.info('Persisted state: returning base state')
     return state
@@ -12,8 +13,8 @@ const latestStateVersion = () => {
 
   // valid states are less than or equal to the latest migration we know about
   const versions = Object.keys(state.__)
-    .filter((v) => v <= migrations.latest)
-    .sort((a, b) => a - b)
+    .filter((v) => parseInt(v) <= migrations.latest)
+    .sort((a, b) => parseInt(a) - parseInt(b))
 
   if (versions.length === 0) {
     // log.info('Persisted state: returning base state')
@@ -25,8 +26,8 @@ const latestStateVersion = () => {
   return state.__[latest].main
 }
 
-const get = (path, obj = latestStateVersion()) => {
-  path.split('.').some((key, i) => {
+const get = (path: string, obj = latestStateVersion()) => {
+  path.split('.').some((key) => {
     if (typeof obj !== 'object') {
       obj = undefined
     } else {
@@ -37,7 +38,7 @@ const get = (path, obj = latestStateVersion()) => {
   return obj
 }
 
-const main = (path, def) => {
+const main = (path: string, def: any) => {
   const found = get(path)
   if (found === undefined) return def
   return found
@@ -597,7 +598,6 @@ const initial = {
             }
           },
           nativeCurrency: {
-            symbol: 'ETH',
             usd: {
               price: 0,
               change24hr: 0
@@ -664,7 +664,6 @@ const initial = {
             }
           },
           nativeCurrency: {
-            symbol: 'ETH',
             usd: {
               price: 0,
               change24hr: 0
@@ -750,16 +749,22 @@ Object.keys(initial.main.accounts).forEach((id) => {
   initial.main.accounts[id].balances = { lastUpdated: undefined }
 })
 
+// TODO
 Object.values(initial.main.networksMeta).forEach((chains) => {
+  // @ts-ignore
   Object.values(chains).forEach((chainMeta) => {
     // remove stale price data
+    // @ts-ignore
     chainMeta.nativeCurrency = { ...chainMeta.nativeCurrency, usd: { price: 0, change24hr: 0 } }
   })
 })
 
-initial.main.origins = Object.entries(initial.main.origins).reduce((origins, [id, origin]) => {
+initial.main.origins = Object.entries(initial.main.origins).reduce((origins, [id, o]) => {
+  const origin = o as any
+
   if (id !== uuidv5('Unknown', uuidv5.DNS)) {
     // don't persist unknown origin
+    // @ts-ignore
     origins[id] = {
       ...origin,
       session: {
@@ -777,9 +782,24 @@ initial.main.knownExtensions = Object.fromEntries(
 )
 
 initial.main.dapps = Object.fromEntries(
+  // @ts-ignore
   Object.entries(initial.main.dapps).map(([id, dapp]) => [id, { ...dapp, openWhenReady: false }])
 )
 
 // ---
 
-module.exports = () => migrations.apply(initial)
+export default function () {
+  const migratedState = migrations.apply(initial)
+
+  try {
+    // TODO: where should we actually parse this state and should we parse
+    // different versions for different migrations?
+
+    StateSchema.parse(migratedState)
+  } catch (e) {
+    console.error('could not parse state', { e })
+    process.exit(1)
+  }
+
+  return migratedState
+}

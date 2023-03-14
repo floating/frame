@@ -1,6 +1,8 @@
 import BigNumber from 'bignumber.js'
 import { NATIVE_CURRENCY } from '../../constants'
 
+import type { Rate } from '../../../main/store/state/types'
+
 interface DisplayedBalance extends Balance {
   displayBalance: string
   price: string

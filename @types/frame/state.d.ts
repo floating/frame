@@ -1,36 +1,6 @@
-type State = {
-  main: {
-    _version: number
-    networks: {
-      ethereum: Record<number, Network>
-    }
-    networksMeta: {
-      ethereum: Record<number, NetworkMetadata>
-    }
-    mute: Record<MutableNotificationType, boolean>
-  }
-}
-
-interface Connection {
-  on: boolean
-  connected: boolean
-  current: string
-  status: string
-  network: string
-  custom: string
-}
-
 interface ChainId {
   id: number
   type: 'ethereum'
-}
-
-interface NetworkMetadata {
-  blockHeight: number
-  gas: GasData
-  icon: string
-  primaryColor: keyof ColorwayPalette
-  nativeCurrency: NativeCurrency
 }
 
 interface Session {
@@ -52,67 +22,11 @@ interface Permission {
   handlerId?: string
 }
 
-interface NativeCurrency {
-  symbol: string
-  icon: string
-  name: string
-  decimals: number
-  usd?: Rate
-}
-
-type MutableNotificationType =
-  | 'alphaWarning'
-  | 'welcomeWarning'
-  | 'externalLinkWarning'
-  | 'explorerWarning'
-  | 'signerRelockChange'
-  | 'gasFeeWarning'
-  | 'betaDisclosure'
-  | 'onboardingWindow'
-  | 'migrateToPylon'
-  | 'signerCompatibilityWarning'
-
-interface GasData {
-  fees: GasFees
-  price: {
-    selected: string
-    levels: GasLevels
-    fees: GasFees | null
-  }
-}
-
-interface GasFees {
-  nextBaseFee: string
-  maxBaseFeePerGas: string
-  maxPriorityFeePerGas: string
-  maxFeePerGas: string
-}
-
-interface GasLevels {
-  slow?: string
-  standard: string
-  fast?: string
-  asap?: string
-  custom?: string
-}
-
 type HexAmount = string
 
 enum Colorway {
   light = 'light',
   dark = 'dark'
-}
-
-type Color = { r: number; g: number; b: number }
-type ColorwayPalette = {
-  accent1: Color
-  accent2: Color
-  accent3: Color
-  accent4: Color
-  accent5: Color
-  accent6: Color
-  accent7: Color
-  accent8: Color
 }
 
 interface WithTokenId {
@@ -126,11 +40,6 @@ interface Balance extends WithTokenId {
   balance: HexAmount
   decimals: number
   displayBalance: string
-}
-
-interface Rate {
-  price: number
-  change24hr: number
 }
 
 interface Token extends WithTokenId {

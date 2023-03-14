@@ -4,7 +4,7 @@ import deepEqual from 'deep-equal'
 import { getColor } from '../../../resources/colors'
 import store from '../../store'
 
-import type { Chain } from '../../store/state/types'
+import type { Chain, ChainMetadata } from '../../store/state/types'
 
 // typed access to state
 const storeApi = {
@@ -14,7 +14,7 @@ const storeApi = {
   getChains: (): Record<string, Chain> => {
     return store('main.networks.ethereum') || {}
   },
-  getChainsMeta: (): Record<string, NetworkMetadata> => {
+  getChainsMeta: (): Record<string, ChainMetadata> => {
     return store('main.networksMeta.ethereum') || {}
   },
   getColorway: (): Colorway => {

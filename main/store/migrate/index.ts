@@ -5,6 +5,7 @@ import migration35 from './migrations/35'
 import migration36 from './migrations/36'
 
 import type { Migration } from './types'
+import type { State } from '../state/types'
 
 const migrations: Record<number, Migration> = {
   ...legacyMigrations,
@@ -17,7 +18,7 @@ const migrations: Record<number, Migration> = {
 // Version number of latest known migration
 const latest = Math.max(...Object.keys(migrations).map((n) => parseInt(n)))
 
-module.exports = {
+export default {
   // Apply migrations to current state
   apply: (state: State, migrateToVersion = latest) => {
     state.main._version = state.main._version || 0
