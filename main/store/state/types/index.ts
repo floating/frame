@@ -1,7 +1,7 @@
 import { z } from 'zod'
+
 import { AccountMetadataSchema, AccountSchema } from './account'
 import { BalanceSchema } from './balance'
-
 import { ChainMetadataSchema, ChainSchema } from './chain'
 import { ColorwayPrimarySchema } from './colors'
 import { DappSchema } from './dapp'
