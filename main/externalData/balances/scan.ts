@@ -10,6 +10,7 @@ import { groupByChain, TokensByChain } from './reducers'
 
 import type { BytesLike } from '@ethersproject/bytes'
 import type EthereumProvider from 'ethereum-provider'
+import type { Balance, Token } from '../../store/state/types'
 
 const erc20Interface = new Interface(erc20TokenAbi)
 

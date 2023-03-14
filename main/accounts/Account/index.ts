@@ -21,9 +21,11 @@ import provider from '../../provider'
 import { ApprovalType } from '../../../resources/constants'
 
 import reveal from '../../reveal'
-import type { PermitSignatureRequest, TypedMessage } from '../types'
 import { isTransactionRequest, isTypedMessageSignatureRequest } from '../../../resources/domain/request'
 import Erc20Contract from '../../contracts/erc20'
+
+import type { PermitSignatureRequest, TypedMessage } from '../types'
+import type { Permission } from '../../store/state/types'
 
 const nebula = nebulaApi()
 

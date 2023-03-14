@@ -4,6 +4,8 @@ import path from 'path'
 
 import store from '../store'
 
+import type { ChainId } from '../store/state/types'
+
 export function createWindow(
   name: string,
   opts?: BrowserWindowConstructorOptions,

@@ -5,6 +5,8 @@ import queryString from 'query-string'
 import accounts, { AccessRequest } from '../accounts'
 import store from '../store'
 
+import type { Permission } from '../store/state/types'
+
 const dev = process.env.NODE_ENV === 'development'
 
 const activeExtensionChecks: Record<string, Promise<boolean>> = {}

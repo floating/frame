@@ -3,8 +3,10 @@ import path from 'path'
 import { ChildProcess, fork } from 'child_process'
 import { EventEmitter } from 'stream'
 
-import { CurrencyBalance, TokenBalance } from './scan'
 import { toTokenId } from '../../../resources/domain/balance'
+
+import type { CurrencyBalance, TokenBalance } from './scan'
+import type { Token } from '../../store/state/types'
 
 const BOOTSTRAP_TIMEOUT_SECONDS = 20
 

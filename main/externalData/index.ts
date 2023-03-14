@@ -7,7 +7,7 @@ import Rates from './assets'
 import Balances from './balances'
 import { arraysMatch, debounce } from '../../resources/utils'
 
-import type { Chain } from '../store/state/types'
+import type { Chain, Token } from '../store/state/types'
 
 export interface DataScanner {
   close: () => void

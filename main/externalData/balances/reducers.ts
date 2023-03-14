@@ -1,3 +1,5 @@
+import type { Token } from '../../store/state/types'
+
 export interface TokensByChain {
   [chainId: number]: Token[]
 }

@@ -6,6 +6,11 @@ import { NativeCurrencySchema } from './nativeCurrency'
 
 const layerValues = ['mainnet', 'rollup', 'sidechain', 'testnet'] as const
 
+export const ChainIdSchema = z.object({
+  id: z.coerce.number(),
+  type: z.literal('ethereum')
+})
+
 export const ChainSchema = z.object({
   id: z.coerce.number(),
   name: z.string(),
@@ -27,5 +32,6 @@ export const ChainMetadataSchema = z.object({
   nativeCurrency: NativeCurrencySchema
 })
 
+export type ChainId = z.infer<typeof ChainIdSchema>
 export type Chain = z.infer<typeof ChainSchema>
 export type ChainMetadata = z.infer<typeof ChainMetadataSchema>

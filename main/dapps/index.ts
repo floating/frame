@@ -11,6 +11,8 @@ import server from './server'
 import extractColors from '../windows/extractColors'
 import { dappPathExists, getDappCacheDir, isDappVerified } from './verify'
 
+import type { Dapp } from '../store/state/types'
+
 const nebula = nebulaApi()
 
 class DappStream extends Readable {
