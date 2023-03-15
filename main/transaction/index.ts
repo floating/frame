@@ -131,14 +131,16 @@ function populate(rawTx: TransactionData, chainConfig: Common, gas: Gas): Transa
     txData.gasFeesSource = GasFeesSource.Frame
   }
 
-  const maxPriorityFee = useFrameMaxPriorityFeePerGas
-    ? gas.price.fees.maxPriorityFeePerGas
-    : (rawTx.maxPriorityFeePerGas as string)
+  const maxPriorityFee =
+    useFrameMaxPriorityFeePerGas && gas.price.fees.maxPriorityFeePerGas
+      ? gas.price.fees.maxPriorityFeePerGas
+      : (rawTx.maxPriorityFeePerGas as string)
 
   // if no valid dapp-supplied value for maxFeePerGas we calculate it
-  txData.maxFeePerGas = useFrameMaxFeePerGas
-    ? calculateMaxFeePerGas(gas.price.fees.maxBaseFeePerGas, maxPriorityFee)
-    : txData.maxFeePerGas
+  txData.maxFeePerGas =
+    useFrameMaxFeePerGas && gas.price.fees.maxBaseFeePerGas
+      ? calculateMaxFeePerGas(gas.price.fees.maxBaseFeePerGas, maxPriorityFee)
+      : txData.maxFeePerGas
 
   // if no valid dapp-supplied value for maxPriorityFeePerGas we use the Frame-supplied value
   txData.maxPriorityFeePerGas = useFrameMaxPriorityFeePerGas
