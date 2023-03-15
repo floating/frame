@@ -6,7 +6,7 @@ import { v5 as uuidv5 } from 'uuid'
 
 import { accountNS, isDefaultAccountName } from '../../../../resources/domain/account'
 
-export default {
+const migrations = {
   4: (initial) => {
     // If persisted state still has main.gasPrice, move gas settings into networks
     const gasPrice = initial.main.gasPrice // ('gasPrice', false)
@@ -907,3 +907,15 @@ export default {
     return initial
   }
 }
+
+// retrofit legacy migrations
+const legacyMigrations = Object.entries(migrations).map(([version, legacyMigration]) => {
+  const generateMigration = (initial: any) => ({
+    validate: () => initial,
+    migrate: (initial: any) => legacyMigration(initial)
+  })
+
+  return { version: parseInt(version), generateMigration }
+})
+
+export default legacyMigrations

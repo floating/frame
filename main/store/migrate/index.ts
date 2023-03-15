@@ -1,20 +1,10 @@
 import log from 'electron-log'
 
-import legacy from './migrations/legacy'
+import legacyMigrations from './migrations/legacy'
 import migration35 from './migrations/35'
 import migration36 from './migrations/36'
 
 import type { Migration, State } from '../state'
-
-// retrofit legacy migrations
-const legacyMigrations = Object.entries(legacy).map(([version, legacyMigration]) => {
-  const generateMigration = (initial: any) => ({
-    validate: () => initial,
-    migrate: (initial: any) => legacyMigration(initial)
-  })
-
-  return { version: parseInt(version), generateMigration }
-})
 
 const migrations: Migration<any>[] = [...legacyMigrations, migration35, migration36].sort(
   (m1, m2) => m1.version - m2.version
