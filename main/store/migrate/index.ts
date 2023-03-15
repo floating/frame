@@ -1,20 +1,24 @@
 import log from 'electron-log'
 
-import legacyMigrations from './migrations/legacy'
+import legacy from './migrations/legacy'
 import migration35 from './migrations/35'
 import migration36 from './migrations/36'
 
 import type { Migration, State } from '../state'
 
-// const migrations: Record<number, Migration> = {
-//   ...legacyMigrations,
-//   ...Object.fromEntries([
-//     [35, migration35],
-//     [36, migration36]
-//   ])
-// }
+// retrofit legacy migrations
+const legacyMigrations = Object.entries(legacy).map(([version, legacyMigration]) => {
+  const generateMigration = (initial: any) => ({
+    validate: () => initial,
+    migrate: (initial: any) => legacyMigration(initial)
+  })
 
-const migrations = [migration35].sort((m1: Migration<any>, m2: Migration<any>) => m1.version - m2.version)
+  return { version: parseInt(version), generateMigration }
+})
+
+const migrations: Migration<any>[] = [...legacyMigrations, migration35, migration36].sort(
+  (m1, m2) => m1.version - m2.version
+)
 
 // Version number of latest known migration
 const latest = migrations[migrations.length - 1].version
@@ -30,8 +34,13 @@ export default {
 
         const { validate, migrate } = generateMigration(state)
 
+        // stateToMigrate can be undefined if there is no valid piece of the state to migrate
         const stateToMigrate = validate()
-        state = migrate(stateToMigrate)
+
+        if (stateToMigrate) {
+          state = migrate(stateToMigrate)
+        }
+
         state.main._version = version
       }
     })

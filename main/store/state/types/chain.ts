@@ -25,7 +25,7 @@ export const ChainSchema = z.object({
 })
 
 export const ChainMetadataSchema = z.object({
-  blockHeight: z.number(),
+  blockHeight: z.number().optional(),
   gas: GasSchema,
   icon: z.string().optional(),
   primaryColor: ColorwayPaletteSchema.keyof(),
