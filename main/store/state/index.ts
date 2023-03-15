@@ -1,4 +1,5 @@
 import { v4 as generateUuid, v5 as uuidv5 } from 'uuid'
+import log from 'electron-log'
 
 import persist from '../persist'
 import migrations from '../migrate'
@@ -25,7 +26,17 @@ const StateSchema = z.object({
 })
 
 export type State = z.infer<typeof StateSchema>
-export type Migration = (initialState: State) => State
+
+export type Migration<T> = {
+  version: number
+  generateMigration: (initial: any) => {
+    // this function must return the relevant portion of the state to be migrated
+    validate: () => T
+    // this function must take the validated portion of the state and return the entire new
+    // state object with migrations applied to the passed in portion
+    migrate: (section: T) => any
+  }
+}
 
 const latestStateVersion = () => {
   // TODO: validate state and type it here?
@@ -806,15 +817,11 @@ initial.main.dapps = Object.fromEntries(
 
 export default function () {
   const migratedState = migrations.apply(initial)
+  const result = StateSchema.safeParse(migratedState)
 
-  try {
-    // TODO: where should we actually parse this state and should we parse
-    // different versions for different migrations?
-
-    StateSchema.parse(migratedState)
-  } catch (e) {
-    console.error('could not parse state', { e })
-    process.exit(1)
+  if (!result.success) {
+    const issues = result.error.issues
+    log.warn(`Found ${issues.length} issues while parsing saved state`, issues)
   }
 
   return migratedState
