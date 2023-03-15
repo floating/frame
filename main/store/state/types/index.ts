@@ -25,6 +25,7 @@ const UpdaterPreferencesSchema = z.object({
   dontRemind: z.array(z.string())
 })
 
+// these are individual keys on the main state object
 const PreferencesSchema = {
   launch: z.boolean().default(false).describe('Launch Frame on system start'),
   reveal: z.boolean().default(false).describe('Show Frame when user glides mouse to edge of screen'),
@@ -37,6 +38,18 @@ const PreferencesSchema = {
   menubarGasPrice: z.boolean().default(false).describe('Show gas price in menu bar'),
   hardwareDerivation: z.string()
 }
+
+const notificationTypes = z.enum([
+  'alphaWarning',
+  'welcomeWarning',
+  'externalLinkWarning',
+  'explorerWarning',
+  'signerRelockChange',
+  'gasFeeWarning',
+  'betaDisclosure',
+  'onboardingWindow',
+  'signerCompatibilityWarning'
+])
 
 const MainSchema = z.object({
   _version: z.coerce.number(),
@@ -57,6 +70,7 @@ const MainSchema = z.object({
   accountsMeta: z.record(z.string(), AccountMetadataSchema),
   balances: z.record(z.string().describe('Address'), z.array(BalanceSchema)),
   dapps: z.record(z.string(), DappSchema),
+  mute: z.record(notificationTypes, z.boolean()),
   colorway: z.enum(['light', 'dark']),
   colorwayPrimary: ColorwayPrimarySchema,
   updater: UpdaterPreferencesSchema,

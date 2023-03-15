@@ -3,7 +3,7 @@ export enum ApprovalType {
   GasLimitApproval = 'approveGasLimit'
 }
 
-export const NETWORK_PRESETS = {
+const NETWORK_PRESETS = {
   ethereum: {
     default: {
       local: 'direct'
@@ -33,4 +33,4 @@ const ADDRESS_DISPLAY_CHARS = 8
 const NATIVE_CURRENCY = '0x0000000000000000000000000000000000000000'
 const MAX_HEX = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
 
-export { ADDRESS_DISPLAY_CHARS, NATIVE_CURRENCY, MAX_HEX }
+export { NETWORK_PRESETS, ADDRESS_DISPLAY_CHARS, NATIVE_CURRENCY, MAX_HEX }

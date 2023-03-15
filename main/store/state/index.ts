@@ -6,6 +6,7 @@ import { Main, Origin, StateSchema } from './types/index'
 
 const latestStateVersion = () => {
   // TODO: validate state and type it here?
+  // TODO: what does this top-level state object look like?
   const state = persist.get('main') as any
   if (!state || !state.__) {
     // log.info('Persisted state: returning base state')
@@ -47,7 +48,6 @@ const main = (path: string, def: any) => {
 
 // TODO: remove pieces of this as they're added to the main state definition
 type M = Main & {
-  mute: any
   shortcuts: any
   lattice: any
   latticeSettings: any
