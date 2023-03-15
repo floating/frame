@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import Restore from 'react-restore'
+import hotkeys from 'hotkeys-js'
 
 import link from '../../../resources/link'
 import Dropdown from '../../../resources/Components/Dropdown'
-import { getSummonShortcut } from '../../../resources/app'
+import { getShortcutFromKeyEvent, getDisplayShortcut } from '../../../resources/app'
+import { debounce } from '../../../resources/utils'
 
 class Settings extends React.Component {
   constructor(props, context) {
@@ -11,6 +13,7 @@ class Settings extends React.Component {
     const latticeEndpoint = context.store('main.latticeSettings.endpointCustom')
     const latticeEndpointMode = context.store('main.latticeSettings.endpointMode')
     this.state = {
+      configureShortcut: false,
       latticeEndpoint,
       latticeEndpointMode,
       resetConfirm: false
@@ -30,7 +33,35 @@ class Settings extends React.Component {
   }
 
   render() {
-    const { modifierKey, summonKey } = getSummonShortcut(this.store('platform'))
+    const summonShortcut = this.store('main.shortcuts.summon')
+    const platform = this.store('platform')
+    const isMacOS = platform === 'darwin'
+    const { modifierKeys: summonModifierKeys, shortcutKey: summonShortcutKey } = getDisplayShortcut(
+      platform,
+      summonShortcut
+    )
+    hotkeys.unbind()
+    if (this.state.configureShortcut) {
+      hotkeys('*', { capture: true }, (event) => {
+        event.preventDefault()
+        const modifierKeys = ['Meta', 'Alt', 'Shift', 'Control', 'Command']
+        const isModifierKey = modifierKeys.includes(event.key)
+        const nonfunctionalShortcut = isMacOS && ['IntlBackslash'].includes(event.code)
+
+        // ignore modifier key solo keypresses and presses of keys which have no corresponding accelerator
+        if (!isModifierKey && !nonfunctionalShortcut) {
+          debounce(() => {
+            this.setState({
+              configureShortcut: false
+            })
+            const shortcut = getShortcutFromKeyEvent(event)
+            link.send('tray:action', 'setShortcut', 'summon', shortcut)
+          }, 50)()
+        }
+
+        return false
+      })
+    }
     return (
       <div className={'localSettings cardShow'}>
         <div className='localSettingsWrap'>
@@ -39,25 +70,46 @@ class Settings extends React.Component {
               <div className='signerPermissionSetting'>Summon Shortcut</div>
               <div
                 className={
-                  this.store('main.shortcuts.altSlash')
+                  summonShortcut.enabled
                     ? 'signerPermissionToggle signerPermissionToggleOn'
                     : 'signerPermissionToggle'
                 }
-                onClick={(_) =>
-                  link.send('tray:action', 'setAltSpace', !this.store('main.shortcuts.altSlash'))
-                }
+                onClick={() => {
+                  link.send('tray:action', 'setShortcut', 'summon', {
+                    ...summonShortcut,
+                    enabled: !summonShortcut.enabled
+                  })
+                }}
               >
                 <div className='signerPermissionToggleSwitch' />
               </div>
             </div>
             <div className='signerPermissionDetails'>
               <span>
-                Summon Frame by pressing{' '}
-                <span className='keyCommand'>
-                  {modifierKey}
-                  <span style={{ padding: '0px 3px' }}>+</span>
-                  {summonKey}
-                </span>
+                Summon Frame by pressing
+                {this.state.configureShortcut ? (
+                  <></>
+                ) : (
+                  <span
+                    className='keyCommand'
+                    onClick={() => {
+                      this.setState({
+                        configureShortcut: true
+                      })
+                    }}
+                  >
+                    {[...summonModifierKeys, summonShortcutKey].map((displayKey, index, displayKeys) =>
+                      index === displayKeys.length - 1 ? (
+                        displayKey
+                      ) : (
+                        <span key={index}>
+                          {displayKey}
+                          <span style={{ padding: '0px 3px' }}>+</span>
+                        </span>
+                      )
+                    )}
+                  </span>
+                )}
               </span>
             </div>
           </div>
