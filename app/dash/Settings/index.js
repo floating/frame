@@ -5,7 +5,6 @@ import hotkeys from 'hotkeys-js'
 import link from '../../../resources/link'
 import Dropdown from '../../../resources/Components/Dropdown'
 import { getShortcutFromKeyEvent, getDisplayShortcut } from '../../../resources/app'
-import { debounce } from '../../../resources/utils'
 
 class Settings extends React.Component {
   constructor(props, context) {
@@ -35,7 +34,6 @@ class Settings extends React.Component {
   render() {
     const summonShortcut = this.store('main.shortcuts.summon')
     const platform = this.store('platform')
-    const isMacOS = platform === 'darwin'
     const { modifierKeys: summonModifierKeys, shortcutKey: summonShortcutKey } = getDisplayShortcut(
       platform,
       summonShortcut
@@ -46,17 +44,14 @@ class Settings extends React.Component {
         event.preventDefault()
         const modifierKeys = ['Meta', 'Alt', 'Shift', 'Control', 'Command']
         const isModifierKey = modifierKeys.includes(event.key)
-        const nonfunctionalShortcut = isMacOS && ['IntlBackslash'].includes(event.code)
 
-        // ignore modifier key solo keypresses and presses of keys which have no corresponding accelerator
-        if (!isModifierKey && !nonfunctionalShortcut) {
-          debounce(() => {
-            this.setState({
-              configureShortcut: false
-            })
-            const shortcut = getShortcutFromKeyEvent(event)
-            link.send('tray:action', 'setShortcut', 'summon', shortcut)
-          }, 50)()
+        // ignore modifier key solo keypresses
+        if (!isModifierKey) {
+          this.setState({
+            configureShortcut: false
+          })
+          const shortcut = getShortcutFromKeyEvent(event)
+          link.send('tray:action', 'setShortcut', 'summon', shortcut)
         }
 
         return false
