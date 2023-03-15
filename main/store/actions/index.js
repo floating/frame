@@ -785,7 +785,7 @@ module.exports = {
   migrateToPylonConnections: (u) => {
     const pylonChains = ['1', '5', '10', '137', '42161', '11155111']
 
-    const switchToPylon = (connection) => {
+    const switchToPylon = (connection = {}) => {
       if (connection.current === 'custom' && connection.custom === '') {
         connection.current = 'pylon'
       }
