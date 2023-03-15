@@ -1,7 +1,7 @@
 import path from 'path'
 import fs from 'fs'
 import log from 'electron-log'
-import bip39 from 'bip39'
+import { generateMnemonic } from 'bip39'
 import zxcvbn from 'zxcvbn'
 import { ensureDirSync } from 'fs-extra'
 import { app } from 'electron'
@@ -30,7 +30,7 @@ const SIGNERS_PATH = path.resolve(USER_DATA, 'signers')
 
 export default {
   newPhrase: (cb: Callback<string>) => {
-    cb(null, bip39.generateMnemonic())
+    cb(null, generateMnemonic())
   },
   createFromPhrase: (signers: Signers, phrase: string, password: string, cb: Callback<Signer>) => {
     if (!phrase) return cb(new Error('Phrase required to create hot signer'))
