@@ -1,3 +1,4 @@
+// @ts-nocheck
 // legacy migrations that were written in JS and have not been ported
 // to Typescript
 
