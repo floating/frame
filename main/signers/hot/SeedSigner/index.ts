@@ -67,6 +67,6 @@ export default class SeedSigner extends HotSigner {
   }
 
   unlock(password: string, cb: ErrorOnlyCallback) {
-    super.unlock(password, { encryptedSecret: this.encryptedSeed }, cb)
+    super.unlockWorker(password, { encryptedSecret: this.encryptedSeed }, cb)
   }
 }

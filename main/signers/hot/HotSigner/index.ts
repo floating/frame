@@ -101,7 +101,11 @@ export default class HotSigner extends Signer {
     })
   }
 
-  unlock(password: string, data: any, cb: ErrorOnlyCallback) {
+  unlock(password: string, cb: ErrorOnlyCallback) {
+    this.unlockWorker(password, {}, cb)
+  }
+
+  protected unlockWorker(password: string, data: any, cb: ErrorOnlyCallback) {
     const params = { password, ...data }
 
     this.callWorker({ method: 'unlock', params }, (err, result) => {

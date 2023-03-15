@@ -33,7 +33,7 @@ export default class RingSigner extends HotSigner {
   }
 
   unlock(password: string, cb: ErrorOnlyCallback) {
-    super.unlock(password, { encryptedSecret: this.encryptedKeys }, cb)
+    super.unlockWorker(password, { encryptedSecret: this.encryptedKeys }, cb)
   }
 
   addPrivateKey(key: string, password: string, cb: ErrorOnlyCallback) {
@@ -44,6 +44,7 @@ export default class RingSigner extends HotSigner {
     } catch (e) {
       return cb(new Error('Invalid private key'))
     }
+
     const address = wallet.getAddressString()
 
     // Ensure private key hasn't already been added

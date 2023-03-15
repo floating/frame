@@ -220,8 +220,8 @@ class Signers extends EventEmitter {
   lock(id: string, cb: ErrorOnlyCallback) {
     const signer = this.get(id)
 
-    // @ts-ignore
-    if (signer && signer.lock) {
+    // only hot signers have a lock method
+    if (signer && (signer as any).lock) {
       const hotSigner = signer as HotSigner
       hotSigner.lock(cb)
     }
@@ -230,12 +230,9 @@ class Signers extends EventEmitter {
   unlock(id: string, password: string, cb: ErrorOnlyCallback) {
     const signer = this.signers[id]
 
-    // @ts-ignore
-    if (signer && signer.unlock) {
+    // only hot signers have an unlock method
+    if (signer && (signer as any).unlock) {
       const hotSigner = signer as HotSigner
-      // TODO: how does this work?
-
-      // @ts-ignore
       hotSigner.unlock(password, cb)
     } else {
       log.error('Signer not unlockable via password, no unlock method')
