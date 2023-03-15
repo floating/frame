@@ -5,7 +5,7 @@ import { toTokenId } from '../../../resources/domain/balance'
 import BalancesWorkerController from './controller'
 import { CurrencyBalance, TokenBalance } from './scan'
 
-import type { Balance, Chain, Token, WithTokenId } from '../../store/state/types'
+import type { Balance, Chain, Token, WithTokenId } from '../../store/state'
 
 const RESTART_WAIT = 5 // seconds
 

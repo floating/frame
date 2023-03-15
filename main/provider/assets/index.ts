@@ -2,7 +2,7 @@ import store from '../../store'
 
 import { NATIVE_CURRENCY } from '../../../resources/constants'
 
-import type { Balance, NativeCurrency, Rate } from '../../store/state/types'
+import type { Balance, NativeCurrency, Rate } from '../../store/state'
 
 export type UsdRate = { usd: Rate }
 

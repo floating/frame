@@ -9,7 +9,7 @@ import { isNonZeroHex } from '../../resources/utils'
 import chainConfig from '../chains/config'
 import { TransactionRequest, TxClassification } from '../accounts/types'
 
-import type { Gas } from '../store/state/types'
+import type { Gas } from '../store/state'
 
 const londonHardforkSigners: SignerCompatibilityByVersion = {
   seed: () => true,

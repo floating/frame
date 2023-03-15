@@ -4,7 +4,7 @@ import Pylon, { AssetType } from '@framelabs/pylon-client'
 
 import type { AssetId } from '@framelabs/pylon-client/dist/assetId'
 import type { UsdRate } from '../../provider/assets'
-import type { NativeCurrency, Rate, Token } from '../../store/state/types'
+import type { NativeCurrency, Rate, Token } from '../../store/state'
 
 interface RateUpdate {
   id: AssetId

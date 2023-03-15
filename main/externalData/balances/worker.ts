@@ -12,7 +12,7 @@ import balancesLoader, { BalanceLoader } from './scan'
 import TokenLoader from '../inventory/tokens'
 import { toTokenId } from '../../../resources/domain/balance'
 
-import type { Token } from '../../store/state/types'
+import type { Token } from '../../store/state'
 
 interface ExternalDataWorkerMessage {
   command: string

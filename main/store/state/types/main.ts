@@ -8,19 +8,6 @@ import { DappSchema } from './dapp'
 import { OriginSchema } from './origin'
 import { PermissionSchema } from './permission'
 
-export type { ChainId, Chain, ChainMetadata } from './chain'
-export type { Connection } from './connection'
-export type { Origin } from './origin'
-export type { Permission } from './permission'
-export type { Account, AccountMetadata } from './account'
-export type { Balance } from './balance'
-export type { WithTokenId, Token } from './token'
-export type { Dapp } from './dapp'
-export type { NativeCurrency } from './nativeCurrency'
-export type { Gas, GasFees } from './gas'
-export type { Rate } from './rate'
-export type { ColorwayPalette } from './colors'
-
 const UpdaterPreferencesSchema = z.object({
   dontRemind: z.array(z.string())
 })
@@ -51,7 +38,7 @@ const notificationTypes = z.enum([
   'signerCompatibilityWarning'
 ])
 
-const MainSchema = z.object({
+export const MainSchema = z.object({
   _version: z.coerce.number(),
   instanceId: z.string(), // TODO: uuid
   networks: z.object({
@@ -77,9 +64,4 @@ const MainSchema = z.object({
   ...PreferencesSchema
 })
 
-export const StateSchema = z.object({
-  main: MainSchema
-})
-
 export type Main = z.infer<typeof MainSchema>
-export type State = z.infer<typeof StateSchema>

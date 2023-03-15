@@ -9,7 +9,7 @@ import type { Chain } from '../chains'
 import type { TransactionData } from '../../resources/domain/transaction'
 import type { Action } from '../transaction/actions'
 import type { TokenData } from '../contracts/erc20'
-import type { Token } from '../store/state/types'
+import type { Token } from '../store/state'
 
 export enum ReplacementType {
   Speed = 'speed',

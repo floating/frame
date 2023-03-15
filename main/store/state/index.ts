@@ -2,7 +2,30 @@ import { v4 as generateUuid, v5 as uuidv5 } from 'uuid'
 
 import persist from '../persist'
 import migrations from '../migrate'
-import { Main, Origin, StateSchema } from './types/index'
+import { z } from 'zod'
+
+import { MainSchema, Main } from './types/main'
+import type { Origin } from './types/origin'
+
+export type { ChainId, Chain, ChainMetadata } from './types/chain'
+export type { Connection } from './types/connection'
+export type { Origin } from './types/origin'
+export type { Permission } from './types/permission'
+export type { Account, AccountMetadata } from './types/account'
+export type { Balance } from './types/balance'
+export type { WithTokenId, Token } from './types/token'
+export type { Dapp } from './types/dapp'
+export type { NativeCurrency } from './types/nativeCurrency'
+export type { Gas, GasFees } from './types/gas'
+export type { Rate } from './types/rate'
+export type { ColorwayPalette } from './types/colors'
+
+const StateSchema = z.object({
+  main: MainSchema
+})
+
+export type State = z.infer<typeof StateSchema>
+export type Migration = (initialState: State) => State
 
 const latestStateVersion = () => {
   // TODO: validate state and type it here?

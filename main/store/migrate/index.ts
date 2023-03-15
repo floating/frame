@@ -4,8 +4,7 @@ import legacyMigrations from './migrations/legacy'
 import migration35 from './migrations/35'
 import migration36 from './migrations/36'
 
-import type { Migration } from './types'
-import type { State } from '../state/types'
+import type { Migration, State } from '../state'
 
 const migrations: Record<number, Migration> = {
   ...legacyMigrations,

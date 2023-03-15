@@ -1,4 +1,4 @@
-import type { Connection, State } from '../../state/types'
+import type { Connection, State } from '../../state'
 
 type LegacyConnection = Omit<Connection, 'current'> & {
   current: Connection['current'] | 'poa'

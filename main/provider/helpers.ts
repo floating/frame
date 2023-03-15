@@ -19,7 +19,7 @@ import protectedMethods from '../api/protectedMethods'
 import { usesBaseFee, TransactionData, GasFeesSource } from '../../resources/domain/transaction'
 import { getAddress } from '../../resources/utils'
 
-import type { Chain, Permission } from '../store/state/types'
+import type { Chain, Permission } from '../store/state'
 
 const permission = (date: number, method: string) => ({ parentCapability: method, date })
 

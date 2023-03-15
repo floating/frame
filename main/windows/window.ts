@@ -4,7 +4,7 @@ import path from 'path'
 
 import store from '../store'
 
-import type { ChainId } from '../store/state/types'
+import type { ChainId } from '../store/state'
 
 export function createWindow(
   name: string,

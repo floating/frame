@@ -4,7 +4,7 @@ import deepEqual from 'deep-equal'
 import { getColor } from '../../../resources/colors'
 import store from '../../store'
 
-import type { Chain, ChainMetadata, Origin } from '../../store/state/types'
+import type { Chain, ChainMetadata, Origin } from '../../store/state'
 
 // typed access to state
 const storeApi = {

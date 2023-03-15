@@ -11,7 +11,7 @@ import server from './server'
 import extractColors from '../windows/extractColors'
 import { dappPathExists, getDappCacheDir, isDappVerified } from './verify'
 
-import type { Dapp } from '../store/state/types'
+import type { Dapp } from '../store/state'
 
 const nebula = nebulaApi()
 
