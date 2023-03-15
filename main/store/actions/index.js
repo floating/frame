@@ -221,8 +221,12 @@ module.exports = {
   toggleSignerCompatibilityWarning: (u) => {
     u('main.mute.signerCompatibilityWarning', (v) => !v)
   },
-  setAltSpace: (u, v) => {
-    u('main.shortcuts.altSlash', () => v)
+  setShortcut: (u, name, shortcut) => {
+    u('main.shortcuts', name, (existingShortcut = {}) => ({
+      modifierKeys: shortcut.modifierKeys ?? existingShortcut.modifierKeys,
+      shortcutKey: shortcut.shortcutKey ?? existingShortcut.shortcutKey,
+      enabled: shortcut.enabled ?? existingShortcut.enabled ?? false
+    }))
   },
   setAutohide: (u, v) => {
     u('main.autohide', () => v)

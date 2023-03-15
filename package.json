@@ -89,6 +89,7 @@
     "get-pixels": "3.3.3",
     "gridplus-sdk": "2.4.3",
     "hdkey": "2.1.0",
+    "hotkeys-js": "^3.10.1",
     "ipfs-unixfs-importer": "9.0.9",
     "nebula": "0.1.5",
     "node-fetch": "2.6.7",
