@@ -1,5 +1,3 @@
-/* globals Worker */
-
 import React from 'react'
 import Restore from 'react-restore'
 import { Transition } from 'react-transition-group'

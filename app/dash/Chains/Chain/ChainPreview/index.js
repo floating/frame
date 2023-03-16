@@ -1,11 +1,10 @@
-import React from 'react'
 import { ChainHeader } from '../Components'
 import Connection from '../Connection'
 import Gas from '../../../../../resources/Components/Monitor'
 import { ClusterBox, Cluster } from '../../../../../resources/Components/Cluster'
 
-export default (props) => {
-  const { type, id, primaryColor, icon, name, on, explorer, symbol, price } = props
+const ChainPreview = (props) => {
+  const { type, id, primaryColor, icon, name, on } = props
   return (
     <div className='network'>
       <ChainHeader
@@ -32,3 +31,5 @@ export default (props) => {
     </div>
   )
 }
+
+export default ChainPreview

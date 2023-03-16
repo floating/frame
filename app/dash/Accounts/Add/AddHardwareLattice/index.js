@@ -4,7 +4,6 @@ import Restore from 'react-restore'
 import Signer from '../../../Signer'
 
 import link from '../../../../../resources/link'
-import svg from '../../../../../resources/svg'
 import RingIcon from '../../../../../resources/Components/RingIcon'
 
 function parseDeviceName(name) {

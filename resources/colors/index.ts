@@ -36,4 +36,9 @@ export function getColor(key: keyof ColorwayPalette, colorway: Colorway) {
   return { ...color, hex: `#${toHex(color.r)}${toHex(color.g)}${toHex(color.b)}` }
 }
 
+export enum Colorway {
+  light = 'light',
+  dark = 'dark'
+}
+
 export { light as LIGHT, dark as DARK }

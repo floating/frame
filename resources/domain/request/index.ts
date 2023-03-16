@@ -7,7 +7,7 @@ import type {
 } from '../../../main/accounts/types'
 import { capitalize } from '../../utils'
 
-export const isCancelableRequest = (status: string): Boolean => {
+export const isCancelableRequest = (status: string): boolean => {
   return !['sent', 'sending', 'verifying', 'confirming', 'confirmed', 'error', 'declined'].includes(status)
 }
 

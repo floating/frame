@@ -1,5 +1,4 @@
 import * as Sentry from '@sentry/electron'
-import React from 'react'
 import { createRoot } from 'react-dom/client'
 import Restore from 'react-restore'
 

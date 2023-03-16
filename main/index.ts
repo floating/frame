@@ -123,7 +123,7 @@ ipcMain.on('tray:clipboardData', (e, data) => {
   if (data) clipboard.writeText(data)
 })
 
-ipcMain.on('tray:installAvailableUpdate', (e, version) => {
+ipcMain.on('tray:installAvailableUpdate', () => {
   store.updateBadge('')
 
   updater.fetchUpdate()
@@ -234,7 +234,7 @@ ipcMain.on('tray:removeOrigin', (e, handlerId) => {
   store.removeOrigin(handlerId)
 })
 
-ipcMain.on('tray:clearOrigins', (e) => {
+ipcMain.on('tray:clearOrigins', () => {
   Object.keys(store('main.origins')).forEach((handlerId) => {
     accounts.removeRequests(handlerId)
   })
@@ -283,7 +283,7 @@ dapps.add({
   status: 'initial'
 })
 
-ipcMain.on('unsetCurrentView', async (e, ens) => {
+ipcMain.on('unsetCurrentView', async (e) => {
   const win = BrowserWindow.fromWebContents(e.sender) as FrameInstance
   dapps.unsetCurrentView(win.frameId as string)
 })
@@ -336,7 +336,7 @@ app.on('second-instance', (event, argv, workingDirectory) => {
 })
 app.on('activate', () => windows.showTray())
 
-app.on('before-quit', (evt) => {
+app.on('before-quit', () => {
   if (!updater.updateReady) {
     updater.stop()
   }

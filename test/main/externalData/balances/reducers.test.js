@@ -1,4 +1,4 @@
-import { groupByChain, mergeLists } from '../../../../main/externalData/balances/reducers'
+import { groupByChain } from '../../../../main/externalData/balances/reducers'
 
 describe('#groupByChain', () => {
   it('groups tokens by chain', () => {

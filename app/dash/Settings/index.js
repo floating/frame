@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Component } from 'react'
 import Restore from 'react-restore'
 import hotkeys from 'hotkeys-js'
 
@@ -6,7 +6,7 @@ import link from '../../../resources/link'
 import Dropdown from '../../../resources/Components/Dropdown'
 import { getShortcutFromKeyEvent, getDisplayShortcut } from '../../../resources/app'
 
-class Settings extends React.Component {
+class Settings extends Component {
   constructor(props, context) {
     super(props, context)
     const latticeEndpoint = context.store('main.latticeSettings.endpointCustom')
@@ -233,7 +233,7 @@ class Settings extends React.Component {
               />
             </div>
             <div className='signerPermissionDetails'>
-              <span>Set Frame's visual theme</span>
+              <span>Set Frame&apos;s visual theme</span>
             </div>
           </div>
 

@@ -1,4 +1,3 @@
-import React from 'react'
 import Octicon, { getIconByName } from '@githubprimer/octicons-react'
 
 export default {
@@ -63,26 +62,14 @@ export default {
       </div>
     )
   },
-  txSection: (size) => {
+  txSection: () => {
     return (
       <div style={{ width: '410px', height: '50px' }}>
         <svg viewBox='0 0 445.47 54.55'>
           <path
-            class='a'
+            className='a'
             d='M328.82,353.55H762.58a3.85,3.85,0,0,1,3.57,2.41l6.47,16.18a23.36,23.36,0,0,1,0,17.36l-6.47,16.18a3.86,3.86,0,0,1-3.57,2.41H328.82Z'
             transform='translate(-328.82 -353.55)'
-          />
-        </svg>
-      </div>
-    )
-  },
-  seedling: (size) => {
-    return (
-      <div style={{ width: size + 'px', height: size + 'px' }}>
-        <svg viewBox='0 0 512 512'>
-          <path
-            fill='currentColor'
-            d='M64 96H0c0 123.7 100.3 224 224 224v144c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16V320C288 196.3 187.7 96 64 96zm384-64c-84.2 0-157.4 46.5-195.7 115.2 27.7 30.2 48.2 66.9 59 107.6C424 243.1 512 147.9 512 32h-64z'
           />
         </svg>
       </div>
@@ -100,7 +87,7 @@ export default {
       </div>
     )
   },
-  swoop: (size) => {
+  swoop: () => {
     return (
       <div style={{ width: '120%', height: '1200px' }}>
         <svg viewBox='0 0 121.89 524.31'>
@@ -665,35 +652,23 @@ export default {
       <div style={{ width: size + 'px', height: size + 'px' }}>
         <svg viewBox='0 0 170 170' width={size + 'px'} height={size + 'px'}>
           <polygon
-            class='cls-1'
+            className='cls-1'
             points='148.36 68.2 140.59 68.2 140.59 60.57 140.46 60.57 134.7 60.57 134.11 60.57 134.11 68.2 126.35 68.2 126.35 74.31 134.11 74.31 134.11 81.95 140.59 81.95 140.59 74.31 148.36 74.31 148.36 68.2'
           />
           <path
-            class='cls-1'
+            className='cls-1'
             d='M47.47,96a14.52,14.52,0,0,1-6.32,1.31c-6.46,0-11.7-4.66-11.7-11.46s5-11.27,11.75-11.27a15.07,15.07,0,0,1,8.45,2.33l3-5.34c-1.27-.83-4.86-3.25-11.71-3.25C30.13,68.32,22.5,76,22.5,85.85s7.63,17.48,18.26,17.48c7.14,0,11.17-2.57,13-4V85.9H47.47Z'
           />
           <path
-            class='cls-1'
+            className='cls-1'
             d='M87.41,80.89c0-7.84-5.69-12.69-14.24-12.69H60.63v35.13h6.89v-10h6l6.85,10h8.14l-8-11.59A11.48,11.48,0,0,0,87.41,80.89ZM72.57,87.24h-5v-13h5.1c4.55,0,7.65,2.44,7.65,6.64C80.27,84.74,77.22,87.24,72.57,87.24Z'
           />
-          <rect class='cls-1' x='94.59' y='68.2' width='6.9' height='35.13' />
+          <rect className='cls-1' x='94.59' y='68.2' width='6.9' height='35.13' />
           <path
-            class='cls-1'
+            className='cls-1'
             d='M140.56,86.06h0V85h-6.43v1.06s-.07,2.56-.18,3.4c-.66,4.91-5.33,7.78-11.29,7.78h-6.34V74.3h6.38V68.2H109.42v35.13H123c9.74,0,16.83-5.32,17.6-13.87C140.64,88.61,140.56,86.06,140.56,86.06Z'
           />
-          <circle class='cls-2' cx='85' cy='85' r='82.81' />
-        </svg>
-      </div>
-    )
-  },
-  window: (size) => {
-    return (
-      <div style={{ width: size + 'px', height: size + 'px' }}>
-        <svg viewBox='0 0 512 512' width={size + 'px'} height={size + 'px'}>
-          <path
-            fill='currentColor'
-            d='M464 32H48C21.5 32 0 53.5 0 80v352c0 26.5 21.5 48 48 48h416c26.5 0 48-21.5 48-48V80c0-26.5-21.5-48-48-48zm0 394c0 3.3-2.7 6-6 6H54c-3.3 0-6-2.7-6-6V192h416v234z'
-          />
+          <circle className='cls-2' cx='85' cy='85' r='82.81' />
         </svg>
       </div>
     )
@@ -1102,7 +1077,7 @@ export default {
       </div>
     )
   },
-  sine: (size) => {
+  sine: () => {
     return (
       <div style={{ width: '100%' }}>
         <svg viewBox='0 0 2500 100'>

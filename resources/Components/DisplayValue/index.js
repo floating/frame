@@ -1,4 +1,3 @@
-import React from 'react'
 import { displayValueData } from '../../utils/displayValue'
 import { MAX_HEX } from '../../constants'
 

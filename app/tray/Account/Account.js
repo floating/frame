@@ -320,13 +320,6 @@ class Account extends React.Component {
   render() {
     const minimized = this.store('selected.minimized')
 
-    const account = this.store('main.accounts', this.props.id)
-    let signer
-
-    if (account.signer) {
-      signer = this.store('main.signers', account.signer)
-    }
-
     return (
       <AccountBody
         id={this.props.id}

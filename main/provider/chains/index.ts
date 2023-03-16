@@ -1,7 +1,6 @@
-// @ts-ignore
 import deepEqual from 'deep-equal'
 
-import { getColor } from '../../../resources/colors'
+import { Colorway, getColor } from '../../../resources/colors'
 import store from '../../store'
 
 import type { Chain, ChainMetadata, Origin } from '../../store/state'

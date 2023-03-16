@@ -1,4 +1,4 @@
-import React, { useState, useEffect, createRef } from 'react'
+import { useState, useEffect, createRef } from 'react'
 
 function findIndex(options, value) {
   const index = options.findIndex((option) => option.value === value)
@@ -55,7 +55,7 @@ const Dropdown = ({ options, syncValue, initialValue, style, className = '', onC
       <div
         className={expanded ? `dropdown dropdownExpanded ${className}` : `dropdown ${className}`}
         style={expanded ? { ...style, height } : { ...style }}
-        onClick={(e) => setExpanded(!expanded)}
+        onClick={() => setExpanded(!expanded)}
       >
         <div className='dropdownItems' role='listbox' style={expanded ? {} : { marginTop }}>
           {options.map((option, index) => {
