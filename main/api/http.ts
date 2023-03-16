@@ -42,12 +42,6 @@ function extendSession(originId: string) {
   }
 }
 
-const storeApi = {
-  getPermissions: (address: Address) => {
-    return store('main.permissions', address) as Record<string, Permission>
-  }
-}
-
 const cleanup = (id: string) => {
   delete polls[id]
   delete pending[id]

@@ -1,4 +1,3 @@
-import React from 'react'
 import { render, screen } from '../../../componentSetup'
 import EditTokenSpend from '../../../../resources/Components/EditTokenSpend'
 import BigNumber from 'bignumber.js'

@@ -16,9 +16,6 @@ class Inventory extends React.Component {
     const inventory = this.store('main.inventory', this.props.account)
     const collections = Object.keys(inventory || {})
     return collections
-      .filter((k) => {
-        return true
-      })
       .sort((a, b) => {
         const assetsLengthA = Object.keys(inventory[a].items).length
         const assetsLengthB = Object.keys(inventory[b].items).length

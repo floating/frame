@@ -1,5 +1,3 @@
-/* globals self */
-
 let canvas, ctx, looper
 const particles = []
 const particleCount = 56

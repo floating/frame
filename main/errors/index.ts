@@ -15,7 +15,7 @@ function getCrashReportFields() {
 }
 
 function sanitizeStackFrame({ module = '' }) {
-  const matches = /(.+)[\\|\/]frame[\\|\/]resources[\\|\/]app.asar[\\|\/](.+)/.exec(module)
+  const matches = /(.+)[\\|/]frame[\\|/]resources[\\|/]app.asar[\\|/](.+)/.exec(module)
   if (matches && matches[2]) {
     return `{asar}/${matches[2].replaceAll('\\', '/')}`
   }

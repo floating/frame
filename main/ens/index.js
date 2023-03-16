@@ -122,7 +122,7 @@ const getResolverAddress = async (name) => {
 }
 
 const makeCall = (method, params) => {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     // Construct JSON RPC payload
     const payload = { jsonrpc: '2.0', id: 1, method: method, params: [params, 'latest'] }
 

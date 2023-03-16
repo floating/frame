@@ -233,7 +233,7 @@ class FrameAccount {
   }
 
   clearRequestsByOrigin(origin: string) {
-    Object.entries(this.requests).forEach(([handlerId, req]) => {
+    Object.entries(this.requests).forEach(([_handlerId, req]) => {
       if (req.origin === origin) {
         const err = { code: 4001, message: 'User rejected the request' }
         this.rejectRequest(req, err)
@@ -279,7 +279,7 @@ class FrameAccount {
   }
 
   private async recipientIdentity(req: TransactionRequest) {
-    const { to, chainId } = req.data
+    const { to } = req.data
 
     if (to) {
       // Get recipient identity

@@ -18,7 +18,7 @@ class Command extends React.Component {
     }
   }
   renderSignerTitle() {
-    const { view, data = {} } = this.store('windows.dash.nav')[0] || { view: '', data: {} }
+    const { data = {} } = this.store('windows.dash.nav')[0] || { view: '', data: {} }
     const signer = data.signer ? this.store('main.signers', data.signer) : {}
     if (!signer) return null
     return (
@@ -30,7 +30,7 @@ class Command extends React.Component {
     )
   }
   render() {
-    const { view, data } = this.store('windows.dash.nav')[0] || { view: '', data: {} }
+    const { view } = this.store('windows.dash.nav')[0] || { view: '', data: {} }
     return (
       <div className='command'>
         {this.store('windows.dash.nav').length ? (

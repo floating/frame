@@ -20,7 +20,7 @@ link.send = (...args) => {
   window.postMessage(wrap({ args, source, method: 'event' }), '*')
 }
 link.invoke = (...args) => {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const id = v4()
     handlers[id] = resolve
     window.postMessage(wrap({ id, args, source, method: 'invoke' }), '*')

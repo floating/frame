@@ -1,5 +1,3 @@
-import React from 'react'
-
 import Countdown from '../../../../resources/Components/Countdown'
 import { render, screen } from '../../../componentSetup'
 

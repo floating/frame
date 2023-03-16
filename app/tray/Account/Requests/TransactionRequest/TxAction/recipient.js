@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import svg from '../../../../../../resources/svg'
 import { getAddress } from '../../../../../../resources/utils'

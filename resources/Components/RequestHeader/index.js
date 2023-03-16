@@ -1,5 +1,3 @@
-import React from 'react'
-
 const RequestHeader = ({ chain, children, chainColor }) => (
   <div className='_txDescriptionSummary'>
     {children}

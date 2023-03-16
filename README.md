@@ -38,7 +38,7 @@ Frame is a web3 platform that creates a secure system-wide interface to your cha
 - **Menu Bar Support**
   - Frame stays out of the way and sits quietly in your menu bar until it's needed
 - **Cross Platform**
-  - macOS, Windows and Linux!
+  - MacOS, Windows and Linux!
 
 ### Talks
 
@@ -62,8 +62,8 @@ If you use an arch-based distro, you can use an AUR Helper like [yay](https://gi
 › git clone https://github.com/floating/frame
 
 # Use node v18
-› nvm install 18.15.0
-› nvm use 18.15.0
+› nvm install 18.12.1
+› nvm use 18.12.1
 
 
 # Install

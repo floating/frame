@@ -162,7 +162,7 @@ export interface PermitSignatureRequest extends AccountRequest<'signErc20Permit'
   tokenData: TokenData
 }
 
-export interface AccessRequest extends AccountRequest<'access'> {}
+export type AccessRequest = AccountRequest<'access'>
 
 export interface AddChainRequest extends AccountRequest<'addChain'> {
   chain: Chain

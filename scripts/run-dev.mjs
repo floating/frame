@@ -42,7 +42,7 @@ function launchFrame({ shutdown }) {
 }
 
 async function run() {
-  const [env, server] = await Promise.all([prepareEnvironment(), launchDevServer()])
+  const [, server] = await Promise.all([prepareEnvironment(), launchDevServer()])
 
   launchFrame(server)
 }
