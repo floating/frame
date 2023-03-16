@@ -1,7 +1,11 @@
 import { z } from 'zod'
 import log from 'electron-log'
 
-import type { Migration } from '../../state'
+const pylonChainIds = ['1', '5', '10', '137', '42161', '11155111']
+const retiredChainIds = ['3', '4', '42']
+const chainsToMigrate = [...pylonChainIds, ...retiredChainIds]
+
+let showMigrationWarning = false
 
 const ConnectionSchema = z
   .object({
@@ -20,17 +24,44 @@ const ChainSchema = z
   })
   .passthrough()
 
-const ChainEntrySchema = z.tuple([z.coerce.number(), ChainSchema])
+const ParsedChainSchema = z.union([ChainSchema, z.boolean()]).catch(false)
+
+const EthereumChainsSchema = z.record(z.coerce.number(), ParsedChainSchema).transform((chains) => {
+  // remove any chains that failed to parse, which will now be set to "false"
+  // TODO: we can insert default chain data here from the state defaults in the future
+  return Object.fromEntries(
+    Object.entries(chains).filter(([id, chain]) => {
+      if (chain === false) {
+        log.info(`Migration 35: removing invalid chain ${id} from state`)
+        return false
+      }
+
+      return true
+    })
+  )
+})
+
+const LegacyStateSchema = z.object({
+  main: z
+    .object({
+      networks: z.object({
+        ethereum: EthereumChainsSchema
+      }),
+      mute: z.object({}).passthrough().default({})
+    })
+    .passthrough()
+})
 
 type LegacyChain = z.infer<typeof ChainSchema>
 type LegacyConnection = z.infer<typeof ConnectionSchema>
 
-function updateChain(chain: LegacyChain, replaceWithPylon = true) {
-  const removeRpcConnection = (connection: LegacyConnection, replaceWithPylon = true) => {
+function updateChain(chain: LegacyChain) {
+  const removeRpcConnection = (connection: LegacyConnection) => {
     const isServiceRpc = connection.current === 'infura' || connection.current === 'alchemy'
 
     if (isServiceRpc) {
       log.info(`Migration 35: removing ${connection.current} preset from chain ${chain.id}`)
+      showMigrationWarning = true
     }
 
     return {
@@ -40,64 +71,40 @@ function updateChain(chain: LegacyChain, replaceWithPylon = true) {
     }
   }
 
-  const updateChain = (chain: Network) => {
-    const { primary, secondary } = chain.connection
+  const { primary, secondary } = chain.connection
 
-    const updatedChain = {
-      ...chain,
-      connection: {
-        ...chain.connection,
-        primary: removeRpcConnection(primary),
-        secondary: removeRpcConnection(secondary)
-      }
+  const updatedChain = {
+    ...chain,
+    connection: {
+      ...chain.connection,
+      primary: removeRpcConnection(primary),
+      secondary: removeRpcConnection(secondary)
     }
-
-    return updatedChain
   }
 
-const generateMigration = (initial: any) => {
-  const validate = () => {
-    const chains = Object.entries(initial.main.networks.ethereum)
+  return updatedChain
+}
 
-    // remove any chains that don't match the type expected by the migration
-    const validChains = chains
-      .filter((entry) => {
-        const parsed = ChainEntrySchema.safeParse(entry)
+const migrate = (initial: any) => {
+  try {
+    const state = LegacyStateSchema.parse(initial)
 
-        if (!parsed.success) {
-          log.info(`Migration 35: removing invalid chain ${entry[0]} from state`)
-          return false
-        }
+    const chainEntries = Object.entries(state.main.networks.ethereum)
 
-        return true
-      })
-      .map((entry) => ChainEntrySchema.parse(entry))
+    const migratedChains = chainEntries
+      .filter(([id]) => chainsToMigrate.includes(id))
+      .map(([id, chain]) => [id, updateChain(chain as LegacyChain)])
 
-    return Object.fromEntries(validChains)
+    initial.main.networks.ethereum = Object.fromEntries([...chainEntries, ...migratedChains])
+    initial.main.mute.migrateToPylon = !showMigrationWarning
+  } catch (e) {
+    log.error('Migration 35: could not parse state', e)
   }
 
-  const migrate = (chainObjects: Record<number, LegacyChain>) => {
-    const chains = Object.entries(chainObjects)
-
-    // migrate existing Infura and Alchemy connections to use Pylon where applicable
-    const pylonChains = chains
-      .filter(([id]) => ['1', '5', '10', '137', '42161', '11155111'].includes(id))
-      .map(([id, chain]) => [id, updateChain(chain)])
-
-    // these connections previously used Infura and Alchemy and are not supported by Pylon
-    const retiredChains = chains
-      .filter(([id]) => ['3', '4', '42'].includes(id))
-      .map(([id, chain]) => [id, updateChain(chain)])
-
-    initial.main.networks.ethereum = Object.fromEntries([...chains, ...pylonChains, ...retiredChains])
-
-    return initial
-  }
-
-  return { validate, migrate }
+  return initial
 }
 
 export default {
   version: 35,
-  generateMigration
-} as Migration<Record<string, LegacyChain>>
+  migrate
+}
