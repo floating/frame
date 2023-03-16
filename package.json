@@ -92,7 +92,7 @@
     "gridplus-sdk": "2.5.1",
     "hdkey": "2.1.0",
     "ipfs-unixfs-importer": "9.0.9",
-    "isutf8": "^4.0.0",
+    "isutf8": "4.0.0",
     "nebula": "0.1.5",
     "node-fetch": "2.6.7",
     "node-hid": "2.1.2",
