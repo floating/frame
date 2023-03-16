@@ -1,6 +1,6 @@
-export const createState = () => ({
+export const createState = (version = 0) => ({
   main: {
-    _version: 0,
+    _version: version,
     networks: { ethereum: {} },
     networksMeta: { ethereum: {} },
     accounts: {},
@@ -13,10 +13,4 @@ export const createState = () => ({
 export const initChainState = (state, chainId) => {
   state.main.networks.ethereum[chainId] = { id: chainId }
   state.main.networksMeta.ethereum[chainId] = { nativeCurrency: {} }
-}
-
-export const runMigration = (migration, state) => {
-  const { validate, migrate } = migration.generateMigration(state)
-  const initial = validate()
-  return initial ? migrate(initial) : state
 }
