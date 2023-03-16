@@ -4,7 +4,7 @@ import { createState } from '../setup'
 let state
 
 beforeEach(() => {
-  state = createState()
+  state = createState(migration.version - 1)
 
   state.main.networks.ethereum = {
     100: {
