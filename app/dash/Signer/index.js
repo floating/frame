@@ -372,10 +372,6 @@ class Signer extends React.Component {
     const isLocked = !hwSigner && status === 'locked'
     const permissionId = tag || tag === '' ? 'Frame' + (tag ? `-${tag}` : '') : undefined
 
-    let signerClass = 'signer'
-    if (status === 'ok') signerClass += ' signerOk'
-    if (isLocked) signerClass += ' signerLocked'
-
     const zIndex = 1000 - index
 
     return (
@@ -384,7 +380,7 @@ class Signer extends React.Component {
         {this.statusText()}
         {type === 'lattice' && status === 'pair' ? (
           <div className='signerLatticePair'>
-            <div className='signerLatticePairTitle'>Please input your Lattice's pairing code</div>
+            <div className='signerLatticePairTitle'>Please input your Lattice&apos;s pairing code</div>
             <div className='signerLatticePairInput'>
               <input
                 autoFocus
@@ -464,7 +460,7 @@ class Signer extends React.Component {
           <></>
         )}
         <div className='signerControls'>
-          {!!permissionId ? (
+          {permissionId ? (
             <div className='signerControlDetail'>
               <div className='signerControlDetailKey'>{'PERMISSION ID:'}</div>
               <div className='signerControlDetailValue'>{permissionId}</div>

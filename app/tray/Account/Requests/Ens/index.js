@@ -1,5 +1,3 @@
-import React from 'react'
-
 const timeFormat = new Intl.DateTimeFormat('en', { dateStyle: 'medium' })
 
 function formatTime(amount, unit) {

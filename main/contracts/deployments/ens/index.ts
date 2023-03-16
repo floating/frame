@@ -17,7 +17,7 @@ import type { DecodableContract } from '../../../transaction/actions'
 // TODO: fix typing on contract types
 type EnsContract = DecodableContract<unknown>
 
-namespace ENS {
+declare module ENS {
   export type Register = {
     name: string
     owner: string
@@ -124,7 +124,7 @@ const registarController = ({
       }
 
       if (['register', 'registerwithconfig'].includes(name.toLowerCase())) {
-        const { owner, name, duration, resolver } = args as unknown as ENS.Register
+        const { owner, name, duration } = args as unknown as ENS.Register
 
         return {
           id: 'ens:register',

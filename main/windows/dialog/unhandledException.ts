@@ -1,4 +1,4 @@
-const { app, dialog } = require('electron')
+import { app, dialog } from 'electron'
 
 enum ExitAction {
   OK,
