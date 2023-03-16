@@ -117,32 +117,6 @@ it('should not show the migration warning if the user has no Infura or Alchemy c
   expect(updatedState.main.mute.migrateToPylon).toBe(true)
 })
 
-/*
-{
-    main: {
-      networks: {
-        ethereum: {
-          1: {
-            name: 'Mainnet',
-            id: 1,
-            connection: {
-              primary: {
-                current: 'local',
-                on: true
-              },
-              secondary: {
-                current: 'custom',
-                custom: '',
-                on: false
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  */
-
 it('should remove an invalid chain from the state', () => {
   initChainState(state, 1)
   initChainState(state, 5)

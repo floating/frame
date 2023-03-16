@@ -1,29 +1,13 @@
 import { z } from 'zod'
 import log from 'electron-log'
+import { v35Chain, v35ChainSchema, v35Connection, v35StateSchema } from './schema'
 
 const pylonChainIds = ['1', '5', '10', '137', '42161', '11155111']
 const retiredChainIds = ['3', '4', '42']
 const chainsToMigrate = [...pylonChainIds, ...retiredChainIds]
 
-const ConnectionSchema = z
-  .object({
-    current: z.enum(['local', 'custom', 'infura', 'alchemy', 'poa']),
-    custom: z.string().default('')
-  })
-  .passthrough()
-
-const ChainSchema = z
-  .object({
-    parse: z.boolean().optional(),
-    id: z.coerce.number(),
-    connection: z.object({
-      primary: ConnectionSchema,
-      secondary: ConnectionSchema
-    })
-  })
-  .passthrough()
-
-const ParsedChainSchema = z.union([ChainSchema, z.boolean()]).catch(false)
+// this schema reflects chains after they've been parsed and validated
+const ParsedChainSchema = z.union([v35ChainSchema, z.boolean()]).catch(false)
 
 const EthereumChainsSchema = z.record(z.coerce.number(), ParsedChainSchema).transform((chains) => {
   // remove any chains that failed to parse, which will now be set to "false"
@@ -40,25 +24,22 @@ const EthereumChainsSchema = z.record(z.coerce.number(), ParsedChainSchema).tran
   )
 })
 
-const LegacyStateSchema = z.object({
+const StateSchema = z.object({
   main: z
     .object({
       networks: z.object({
         ethereum: EthereumChainsSchema
       }),
-      mute: z.object({}).passthrough().default({})
+      mute: v35StateSchema.shape.main.shape.mute
     })
     .passthrough()
 })
 
-type LegacyChain = z.infer<typeof ChainSchema>
-type LegacyConnection = z.infer<typeof ConnectionSchema>
-
 const migrate = (initial: unknown) => {
   let showMigrationWarning = false
 
-  const updateChain = (chain: LegacyChain) => {
-    const removeRpcConnection = (connection: LegacyConnection) => {
+  const updateChain = (chain: v35Chain) => {
+    const removeRpcConnection = (connection: v35Connection) => {
       const isServiceRpc = connection.current === 'infura' || connection.current === 'alchemy'
 
       if (isServiceRpc) {
@@ -88,13 +69,13 @@ const migrate = (initial: unknown) => {
   }
 
   try {
-    const state = LegacyStateSchema.parse(initial)
+    const state = StateSchema.parse(initial)
 
     const chainEntries = Object.entries(state.main.networks.ethereum)
 
     const migratedChains = chainEntries
       .filter(([id]) => chainsToMigrate.includes(id))
-      .map(([id, chain]) => [id, updateChain(chain as LegacyChain)])
+      .map(([id, chain]) => [id, updateChain(chain as v35Chain)])
 
     state.main.networks.ethereum = Object.fromEntries([...chainEntries, ...migratedChains])
     state.main.mute.migrateToPylon = !showMigrationWarning

@@ -1,7 +1,5 @@
 import migration from '../../../../../main/store/migrate/migrations/36'
-import { createState, runMigration as run } from '../setup'
-
-const runMigration = (state) => run(migration, state)
+import { createState } from '../setup'
 
 let state
 
@@ -30,7 +28,7 @@ connectionPriorities.forEach((priority) => {
   it(`updates a ${priority} Gnosis connection`, () => {
     state.main.networks.ethereum[100].connection[priority].current = 'poa'
 
-    const updatedState = runMigration(state)
+    const updatedState = migration.migrate(state)
     const gnosis = updatedState.main.networks.ethereum[100]
 
     expect(gnosis.connection[priority].current).toBe('custom')
@@ -41,7 +39,7 @@ connectionPriorities.forEach((priority) => {
     state.main.networks.ethereum[100].connection[priority].current = 'custom'
     state.main.networks.ethereum[100].connection[priority].custom = 'https://myconnection.io'
 
-    const updatedState = runMigration(state)
+    const updatedState = migration.migrate(state)
     const gnosis = updatedState.main.networks.ethereum[100]
 
     expect(gnosis.connection[priority].current).toBe('custom')
@@ -52,7 +50,7 @@ connectionPriorities.forEach((priority) => {
 it('takes no action if no Gnosis chain is present', () => {
   delete state.main.networks.ethereum[100]
 
-  const updatedState = runMigration(state)
+  const updatedState = migration.migrate(state)
 
   expect(updatedState.main.networks).toStrictEqual({ ethereum: {} })
 })

@@ -4,7 +4,7 @@
 
 import { v5 as uuidv5 } from 'uuid'
 
-import { accountNS, isDefaultAccountName } from '../../../../resources/domain/account'
+import { accountNS, isDefaultAccountName } from '../../../../../resources/domain/account'
 
 const migrations = {
   4: (initial) => {
@@ -909,13 +909,9 @@ const migrations = {
 }
 
 // retrofit legacy migrations
-const legacyMigrations = Object.entries(migrations).map(([version, legacyMigration]) => {
-  const generateMigration = (initial: any) => ({
-    validate: () => initial,
-    migrate: (initial: any) => legacyMigration(initial)
-  })
-
-  return { version: parseInt(version), generateMigration }
-})
+const legacyMigrations = Object.entries(migrations).map(([version, legacyMigration]) => ({
+  version: parseInt(version),
+  migrate: (initial: unknown) => legacyMigration(initial)
+}))
 
 export default legacyMigrations

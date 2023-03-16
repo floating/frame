@@ -1,11 +1,12 @@
 import { v4 as generateUuid, v5 as uuidv5 } from 'uuid'
+import { z } from 'zod'
 import log from 'electron-log'
 
 import persist from '../persist'
 import migrations from '../migrate'
-import { z } from 'zod'
 
 import { MainSchema, Main } from './types/main'
+
 import type { Origin } from './types/origin'
 
 export type { ChainId, Chain, ChainMetadata } from './types/chain'
@@ -25,17 +26,9 @@ const StateSchema = z.object({
   main: MainSchema
 })
 
-export type State = z.infer<typeof StateSchema>
-
-export type Migration<T> = {
+export type Migration = {
   version: number
-  generateMigration: (initial: any) => {
-    // this function must return the relevant portion of the state to be migrated
-    validate: () => T
-    // this function must take the validated portion of the state and return the entire new
-    // state object with migrations applied to the passed in portion
-    migrate: (section: T) => any
-  }
+  migrate: (initial: unknown) => any
 }
 
 const latestStateVersion = () => {
