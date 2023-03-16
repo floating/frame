@@ -2,9 +2,9 @@ import React from 'react'
 import Restore from 'react-restore'
 import svg from '../../../resources/svg'
 
-const Icon = ({ svgName, svgSize = 16, img, small }) => {
+const Icon = ({ svgName, alt = '', svgSize = 16, img, small }) => {
   if (img) {
-    return <img src={`https://proxy.pylon.link?type=icon&target=${encodeURIComponent(img)}`} />
+    return <img src={`https://proxy.pylon.link?type=icon&target=${encodeURIComponent(img)}`} alt={alt} />
   }
   if (svgName) {
     const iconName = svgName.toLowerCase()
@@ -27,7 +27,7 @@ class RingIcon extends React.Component {
   }
 
   render() {
-    const { color, svgName, svgSize, img, small, block, noRing } = this.props
+    const { color, svgName, svgSize, img, small, block, noRing, alt } = this.props
     let ringIconClass = 'ringIcon'
     if (small) ringIconClass += ' ringIconSmall'
     if (block) ringIconClass += ' ringIconBlock'
@@ -40,7 +40,7 @@ class RingIcon extends React.Component {
         }}
       >
         <div className='ringIconInner' style={block ? { color } : { background: color }}>
-          <Icon svgName={svgName} svgSize={svgSize} img={img} small={small} />
+          <Icon svgName={svgName} svgSize={svgSize} img={img} alt={alt} small={small} />
         </div>
       </div>
     )
