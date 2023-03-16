@@ -1,5 +1,12 @@
 import { z } from 'zod'
 
+const v35MuteSchema = z
+  .object({
+    migrateToPylon: z.boolean().default(false)
+  })
+  .passthrough()
+  .default({})
+
 const v35ConnectionSchema = z
   .object({
     current: z.enum(['local', 'custom', 'infura', 'alchemy', 'poa']),
@@ -25,7 +32,7 @@ export const v35StateSchema = z.object({
       networks: z.object({
         ethereum: EthereumChainsSchema
       }),
-      mute: z.object({}).passthrough().default({})
+      mute: v35MuteSchema
     })
     .passthrough()
 })
