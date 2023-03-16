@@ -186,6 +186,7 @@ const initial = {
       gasFeeWarning: main('mute.gasFeeWarning', false),
       betaDisclosure: main('mute.betaDisclosure', false),
       onboardingWindow: main('mute.onboardingWindow', false),
+      migrateToPylon: main('mute.migrateToPylon', false),
       signerCompatibilityWarning: main('mute.signerCompatibilityWarning', false)
     },
     shortcuts: {
