@@ -7,6 +7,7 @@ type State = {
     networksMeta: {
       ethereum: Record<number, NetworkMetadata>
     }
+    mute: Record<MutableNotificationType, boolean>
   }
 }
 
@@ -71,6 +72,18 @@ interface NativeCurrency {
   decimals: number
   usd?: Rate
 }
+
+type MutableNotificationType =
+  | 'alphaWarning'
+  | 'welcomeWarning'
+  | 'externalLinkWarning'
+  | 'explorerWarning'
+  | 'signerRelockChange'
+  | 'gasFeeWarning'
+  | 'betaDisclosure'
+  | 'onboardingWindow'
+  | 'migrateToPylon'
+  | 'signerCompatibilityWarning'
 
 interface GasData {
   fees: GasFees

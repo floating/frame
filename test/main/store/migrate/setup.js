@@ -5,6 +5,7 @@ export const createState = () => ({
     networksMeta: { ethereum: {} },
     accounts: {},
     balances: {},
+    mute: {},
     tokens: { known: {} }
   }
 })
