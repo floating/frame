@@ -26,16 +26,22 @@ export const v35ChainSchema = z
 
 const EthereumChainsSchema = z.record(z.coerce.number(), v35ChainSchema)
 
-export const v35StateSchema = z.object({
-  main: z
-    .object({
-      networks: z.object({
-        ethereum: EthereumChainsSchema
-      }),
-      mute: v35MuteSchema
-    })
-    .passthrough()
+export const v35ChainsSchema = z.object({
+  ethereum: EthereumChainsSchema
 })
+
+export const v35MainSchema = z
+  .object({
+    networks: v35ChainsSchema,
+    mute: v35MuteSchema
+  })
+  .passthrough()
+
+export const v35StateSchema = z
+  .object({
+    main: v35MainSchema
+  })
+  .passthrough()
 
 export type v35Connection = z.infer<typeof v35ConnectionSchema>
 export type v35Chain = z.infer<typeof v35ChainSchema>

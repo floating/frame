@@ -1,12 +1,23 @@
 import { z } from 'zod'
 import log from 'electron-log'
-import { v35Chain, v35ChainSchema, v35Connection, v35StateSchema } from './schema'
+
+import {
+  v35Chain,
+  v35ChainSchema,
+  v35ChainsSchema,
+  v35Connection,
+  v35MainSchema,
+  v35StateSchema
+} from './schema'
 
 const pylonChainIds = ['1', '5', '10', '137', '42161', '11155111']
 const retiredChainIds = ['3', '4', '42']
 const chainsToMigrate = [...pylonChainIds, ...retiredChainIds]
 
-// this schema reflects chains after they've been parsed and validated
+// because this is the first migration that uses Zod parsing and validation,
+// create a version of the schema that removes invalid chains, allowing them to
+// also be "false" so that we can filter them out later in a transform. future migrations
+// that use this schema can be sure that the chains are all valid afterwards
 const ParsedChainSchema = z.union([v35ChainSchema, z.boolean()]).catch(false)
 
 const EthereumChainsSchema = z.record(z.coerce.number(), ParsedChainSchema).transform((chains) => {
@@ -24,16 +35,21 @@ const EthereumChainsSchema = z.record(z.coerce.number(), ParsedChainSchema).tran
   )
 })
 
-const StateSchema = z.object({
-  main: z
-    .object({
-      networks: z.object({
-        ethereum: EthereumChainsSchema
-      }),
-      mute: v35StateSchema.shape.main.shape.mute
+const ChainsSchema = v35ChainsSchema.merge(
+  z.object({
+    ethereum: EthereumChainsSchema
+  })
+)
+
+const MainSchema = v35MainSchema
+  .merge(
+    z.object({
+      networks: ChainsSchema
     })
-    .passthrough()
-})
+  )
+  .passthrough()
+
+const StateSchema = v35StateSchema.merge(z.object({ main: MainSchema }))
 
 const migrate = (initial: unknown) => {
   let showMigrationWarning = false

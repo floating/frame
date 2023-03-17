@@ -35,7 +35,8 @@ const notificationTypes = z.enum([
   'gasFeeWarning',
   'betaDisclosure',
   'onboardingWindow',
-  'signerCompatibilityWarning'
+  'signerCompatibilityWarning',
+  'migrateToPylon'
 ])
 
 export const MainSchema = z.object({
