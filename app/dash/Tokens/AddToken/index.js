@@ -1,5 +1,5 @@
 import { isValidAddress } from '@ethereumjs/util'
-import React, { Component, useEffect, useRef, useState } from 'react'
+import { Component, useEffect, useRef, useState } from 'react'
 import Restore from 'react-restore'
 import RingIcon from '../../../../resources/Components/RingIcon'
 import link from '../../../../resources/link'

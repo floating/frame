@@ -32,7 +32,7 @@ class SignerStatus extends React.Component {
     this.setState({ unlockInput: e.target.value })
   }
 
-  unlockSubmit(e) {
+  unlockSubmit() {
     link.rpc('unlockSigner', this.props.signer.id, this.state.unlockInput, (err) => {
       if (err) this.shake()
     })

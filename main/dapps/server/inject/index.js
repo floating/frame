@@ -1,5 +1,3 @@
-/* globals WebSocket, initial */
-
 window.ethereum = require('eth-provider')('frame')
 
 // let storage = initial

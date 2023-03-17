@@ -133,7 +133,7 @@ const rpc = {
       }
     })
   },
-  confirmRequestApproval(req, approvalType, approvalData, cb) {
+  confirmRequestApproval(req, approvalType, approvalData) {
     accounts.confirmRequestApproval(req.handlerId, approvalType, approvalData)
   },
   respondToExtensionRequest(id, approved, cb) {
@@ -142,7 +142,7 @@ const rpc = {
   updateRequest(reqId, data, actionId) {
     accounts.updateRequest(reqId, data, actionId)
   },
-  approveRequest(req, cb) {
+  approveRequest(req) {
     accounts.setRequestPending(req)
     if (req.type === 'transaction') {
       provider.approveTransactionRequest(req, (err, res) => {
@@ -161,7 +161,7 @@ const rpc = {
       })
     }
   },
-  declineRequest(req, cb) {
+  declineRequest(req) {
     if (req.type === 'transaction' || isSignatureRequest(req)) {
       accounts.declineRequest(req.handlerId)
       provider.declineRequest(req)
@@ -177,7 +177,7 @@ const rpc = {
     accounts.add(address, name, options)
     cb()
   },
-  removeAccount(address, options, cb) {
+  removeAccount(address, _options, cb) {
     accounts.remove(address)
     cb()
   },
@@ -269,7 +269,7 @@ const rpc = {
     accounts.signerCompatibility(handlerId, cb)
   },
   // flow
-  async flowCommand(command, cb) {
+  async flowCommand(command) {
     // console.log('flowCommand', command, cb)
     await dapps.add(command.input, {}, (err, res) => {
       if (err || res) console.log(err, res)

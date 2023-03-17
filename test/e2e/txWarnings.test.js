@@ -1,5 +1,3 @@
-/* global test */
-
 const provider = require('eth-provider')
 const frame = provider('frame')
 

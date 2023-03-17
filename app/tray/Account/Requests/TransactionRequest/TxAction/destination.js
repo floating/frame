@@ -1,5 +1,3 @@
-import React from 'react'
-
 const Destination = ({ chain, recipientType }) => {
   const formattedRecipient = recipientType === 'contract' ? 'contract' : 'account'
 

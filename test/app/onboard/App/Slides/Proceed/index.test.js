@@ -1,5 +1,3 @@
-import React from 'react'
-
 import { render, screen } from '../../../../../componentSetup'
 import Proceed from '../../../../../../app/onboard/App/Slides/Proceed'
 

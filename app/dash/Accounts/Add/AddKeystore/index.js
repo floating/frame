@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { AddHotAccount } from '../Components'
 import link from '../../../../../resources/link'
 import { PasswordInput } from '../../../../../resources/Components/Password'

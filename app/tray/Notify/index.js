@@ -43,7 +43,7 @@ class Notify extends React.Component {
                 this.store.notify()
               }}
             >
-              <div className='notifyInputOptionText'>Let's go!</div>
+              <div className='notifyInputOptionText'>Let&apos;s go!</div>
             </div>
           </div>
         </div>
@@ -96,7 +96,7 @@ class Notify extends React.Component {
                   this.store.notify()
                 }}
               >
-                <div className='notifyInputOptionText notifyBetaGo'>Let's go!</div>
+                <div className='notifyInputOptionText notifyBetaGo'>Let&apos;s go!</div>
               </div>
             </div>
           </div>
@@ -117,7 +117,9 @@ class Notify extends React.Component {
                 <div className='notifyBodyLine notifyBodyPrice'>{`≈ $${feeUSD} in ${currentSymbol}`}</div>
               </>
             ) : (
-              <div className='notifyBodyLine'>We were unable to determine this transaction's fee in USD.</div>
+              <div className='notifyBodyLine'>
+                We were unable to determine this transaction&apos;s fee in USD.
+              </div>
             )}
             <div className='notifyBodyQuestion'>Are you sure you want to proceed?</div>
           </div>
@@ -151,7 +153,7 @@ class Notify extends React.Component {
     )
   }
 
-  signerUnavailableWarning({ req = {} }) {
+  signerUnavailableWarning() {
     return (
       <div className='notifyBoxWrap' onMouseDown={(e) => e.stopPropagation()}>
         <div className='notifyBox'>
@@ -174,7 +176,7 @@ class Notify extends React.Component {
     )
   }
 
-  noSignerWarning({ req = {} }) {
+  noSignerWarning() {
     return (
       <div className='notifyBoxWrap' onMouseDown={(e) => e.stopPropagation()}>
         <div className='notifyBox'>
@@ -308,7 +310,7 @@ class Notify extends React.Component {
           </div>
           <div className='notifyBody'>
             <div className='notifyBodyLine'>
-              Your Ledger currently doesn't allow signing of contract data.
+              Your Ledger currently doesn&apos;t allow signing of contract data.
             </div>
             <div className='notifyBodyLine'>
               <span>To change this settings go to</span>

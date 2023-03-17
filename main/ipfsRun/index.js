@@ -1,11 +1,6 @@
 const ipfs = require('ipfs-core')
 const peers = require('./peers.json')
 
-const store = require('../store').default
-
-// const peers = require('./peers.json')
-const ens = require('../ens')
-
 let node
 
 const api = {
@@ -66,7 +61,7 @@ const start = async () => {
       }
     }
     await connectPeers()
-    const id = await node.id()
+    await node.id()
   } catch (e) {
     // destryo ipfs instance...
 

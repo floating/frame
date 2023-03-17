@@ -19,12 +19,13 @@ function setupComponent(jsx, opts = {}) {
       ? () => jest.runAllTimers()
       : () => advanceTimersByTime(advanceTimersAfterInput || 0))
 
+  render(jsx)
+
   return {
     user: userEvent.setup({
       ...options,
       advanceTimers
-    }),
-    ...render(jsx)
+    })
   }
 }
 

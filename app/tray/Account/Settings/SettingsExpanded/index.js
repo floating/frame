@@ -35,7 +35,6 @@ class Settings extends React.Component {
   }
 
   render() {
-    const account = this.store('main.accounts', this.props.account)
     return (
       <div className='accountViewScroll'>
         <div className='expandedModule'>

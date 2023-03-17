@@ -1,4 +1,4 @@
-import React, { Component, useState } from 'react'
+import { Component, useState } from 'react'
 import Restore from 'react-restore'
 import BigNumber from 'bignumber.js'
 
@@ -70,7 +70,7 @@ const GasFeesMarket = ({ gasPrice, fees: { nextBaseFee, maxPriorityFeePerGas }, 
       {displayBaseHint && (
         <div className='feeToolTip feeToolTipBase cardShow'>
           The current base fee is added with a buffer to cover the next 3 blocks, any amount greater than your
-          block's base fee is refunded
+          block&apos;s base fee is refunded
         </div>
       )}
       {displayPriorityHint && (
@@ -205,7 +205,7 @@ class ChainSummaryComponent extends Component {
   }
 
   render() {
-    const { address, chainId, color } = this.props
+    const { address, chainId } = this.props
     const type = 'ethereum'
     const currentChain = { type, id: chainId }
     const fees = this.store('main.networksMeta', type, chainId, 'gas.price.fees')

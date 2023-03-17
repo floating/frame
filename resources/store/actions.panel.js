@@ -37,10 +37,10 @@ module.exports = {
   togglePanel: (u) => u('panel.show', (show) => !show),
   panelRequest: (u, request) => {
     request.host = request.host || new URL(request.url).host
-    u('panel.request', (v) => request)
-    u('panel.show', (v) => true)
+    u('panel.request', () => request)
+    u('panel.show', () => true)
   },
-  setBalance: (u, account, balance) => u('balances', account, (b) => balance),
+  setBalance: (u, account, balance) => u('balances', account, () => balance),
   notify: (u, type, data = {}) => {
     u('view.notify', () => type)
     u('view.notifyData', () => data)
@@ -88,7 +88,7 @@ module.exports = {
   unsetSigner: (u) => {
     u('selected.minimized', () => true)
     u('selected.open', () => false)
-    resetSigner(u)
+    this.resetSigner(u)
     setTimeout(() => {
       u('selected', (signer) => {
         signer.last = signer.current
@@ -118,7 +118,7 @@ module.exports = {
       list.push(id)
       return list
     })
-    u('view.data', id, (view) => ({ url: 'https://www.google.com/', title: 'New Tab' }))
+    u('view.data', id, () => ({ url: 'https://www.google.com/', title: 'New Tab' }))
   },
   removeView: (u, id, isCurrent) => {
     u('view', (view) => {

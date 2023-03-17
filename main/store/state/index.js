@@ -26,7 +26,7 @@ const latestStateVersion = () => {
 }
 
 const get = (path, obj = latestStateVersion()) => {
-  path.split('.').some((key, i) => {
+  path.split('.').some((key) => {
     if (typeof obj !== 'object') {
       obj = undefined
     } else {
@@ -616,7 +616,6 @@ const initial = {
             }
           },
           nativeCurrency: {
-            symbol: 'ETH',
             usd: {
               price: 0,
               change24hr: 0
@@ -683,7 +682,6 @@ const initial = {
             }
           },
           nativeCurrency: {
-            symbol: 'ETH',
             usd: {
               price: 0,
               change24hr: 0
@@ -792,7 +790,7 @@ initial.main.origins = Object.entries(initial.main.origins).reduce((origins, [id
 }, {})
 
 initial.main.knownExtensions = Object.fromEntries(
-  Object.entries(initial.main.knownExtensions).filter(([id, allowed]) => allowed)
+  Object.entries(initial.main.knownExtensions).filter(([_id, allowed]) => allowed)
 )
 
 initial.main.dapps = Object.fromEntries(

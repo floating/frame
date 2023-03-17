@@ -1,4 +1,3 @@
-import React from 'react'
 import Restore from 'react-restore'
 import { addHexPrefix, intToHex } from '@ethereumjs/util'
 

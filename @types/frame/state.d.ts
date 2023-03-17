@@ -86,11 +86,6 @@ interface GasLevels {
 
 type HexAmount = string
 
-enum Colorway {
-  light = 'light',
-  dark = 'dark'
-}
-
 type Color = { r: number; g: number; b: number }
 type ColorwayPalette = {
   accent1: Color

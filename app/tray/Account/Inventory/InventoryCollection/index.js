@@ -24,6 +24,7 @@ class Inventory extends React.Component {
                     this.state.hoverAsset.img
                   )}`}
                   loading='lazy'
+                  alt={this.state.hoverAsset.name.toUpperCase()}
                 />
               ) : null}
             </div>
@@ -77,10 +78,13 @@ class Inventory extends React.Component {
                   }}
                 >
                   {img ? (
-                    <img
-                      src={`https://proxy.pylon.link?type=nft&target=${encodeURIComponent(img)}`}
-                      loading='lazy'
-                    />
+                    <div className='inventoryItemImage'>
+                      <img
+                        src={`https://proxy.pylon.link?type=nft&target=${encodeURIComponent(img)}`}
+                        loading='lazy'
+                        alt={name.toUpperCase()}
+                      />
+                    </div>
                   ) : null}
                 </div>
               )

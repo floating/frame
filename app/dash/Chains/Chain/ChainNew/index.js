@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 
 import chainDefault from '../chainDefault'
 import link from '../../../../../resources/link'
