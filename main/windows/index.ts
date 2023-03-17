@@ -36,6 +36,7 @@ const isMacOS = process.platform === 'darwin'
 let tray: Tray
 let dash: Dash
 let onboard: Onboard
+let notify: Notify
 let mouseTimeout: NodeJS.Timeout
 let glide = false
 
@@ -109,6 +110,7 @@ const detectMouse = () => {
 
 function initWindow(id: string, opts: Electron.BrowserWindowConstructorOptions) {
   // in development, serve files from local filesystem instead of the created bundle
+  console.log('init ', id, opts)
   const url = isDev
     ? `http://localhost:1234/${id}/index.dev.html`
     : new URL(path.join(process.env.BUNDLE_LOCATION, `${id}.html`), 'file:')
@@ -221,6 +223,13 @@ export class Tray {
       if (showOnboardingWindow) {
         setTimeout(() => {
           store.setOnboard({ showing: true })
+        }, 600)
+      }
+
+      const showNotifyWindow = !store('main.mute.migrateToPylon')
+      if (showNotifyWindow) {
+        setTimeout(() => {
+          store.setNotify({ showing: true })
         }, 600)
       }
     }
@@ -472,6 +481,70 @@ class Onboard {
   }
 }
 
+class Notify {
+  constructor() {
+    initWindow('notify', {
+      x: 0,
+      y: 0,
+      width: 0,
+      height: 0,
+      titleBarStyle: 'hidden',
+      trafficLightPosition: { x: 10, y: 9 },
+      icon: path.join(__dirname, './AppIcon.png')
+    })
+  }
+
+  public hide() {
+    if (windows.notify && windows.notify.isVisible()) {
+      windows.notify.hide()
+    }
+  }
+
+  public show() {
+    if (!tray.isReady()) {
+      return
+    }
+
+    const cleanupHandler = () => windows.notify?.off('close', closeHandler)
+
+    const closeHandler = () => {
+      // store.completeOnboarding()
+      windows.tray.focus()
+
+      electronApp.off('before-quit', cleanupHandler)
+      delete windows.notify
+    }
+
+    setTimeout(() => {
+      electronApp.on('before-quit', cleanupHandler)
+      windows.notify.once('close', closeHandler)
+
+      const area = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
+      const height = (isDev && !fullheight ? devHeight : area.height) - 160
+      const maxWidth = Math.floor(height * 1.24)
+      const targetWidth = 600 // area.width - 460
+      const width = targetWidth > maxWidth ? maxWidth : targetWidth
+      windows.notify.setMinimumSize(600, 300)
+      windows.notify.setSize(width, height)
+      const pos = topRight(windows.notify)
+
+      // const x = (pos.x * 2 - width * 2 - 810) / 2
+      const x = pos.x - 880
+      windows.notify.setPosition(x, pos.y + 80)
+      // windows.onboard.setAlwaysOnTop(true)
+      windows.notify.show()
+      windows.notify.focus()
+      windows.notify.setVisibleOnAllWorkspaces(false, {
+        visibleOnFullScreen: true,
+        skipTransformProcessType: true
+      })
+      if (devToolsEnabled) {
+        windows.notify.webContents.openDevTools()
+      }
+    }, 10)
+  }
+}
+
 ipcMain.on('tray:quit', () => electronApp.quit())
 ipcMain.on('tray:mouseout', () => {
   if (glide && !(windows.dash && windows.dash.isVisible())) {
@@ -527,6 +600,10 @@ const init = () => {
     onboard = new Onboard()
   }
 
+  if (!store('main.mute.migrateToPylon')) {
+    onboard = new Notify()
+  }
+
   // data change events
   store.observer(() => {
     if (store('windows.dash.showing')) {
@@ -549,6 +626,19 @@ const init = () => {
       windows.tray.focus()
     }
   }, 'windows:onboard')
+
+  store.observer(() => {
+    if (store('windows.notify.showing')) {
+      if (!windows.notify) {
+        notify = new Notify()
+      }
+
+      notify.show()
+    } else if (onboard) {
+      notify.hide()
+      windows.tray.focus()
+    }
+  }, 'windows:notify')
 
   store.observer(() => broadcast('permissions', JSON.stringify(store('permissions'))))
   store.observer(() => {

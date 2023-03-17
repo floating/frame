@@ -11,52 +11,6 @@ import ExtensionConnectNotification from './ExtensionConnect'
 
 const FEE_WARNING_THRESHOLD_USD = 50
 
-const MigrateToPylon = ({ store }) => {
-  return (
-    <div className='notifyBoxWrap' onMouseDown={(e) => e.stopPropagation()}>
-      <div className='notifyBoxSlide'>
-        <div className='notifyBox'>
-          <div className='notifyFrameIcon'>
-            <img src={frameIcon} />
-          </div>
-          <div className='notifyTitle'>New RPCs</div>
-          <div className='notifyBody'>
-            <div className='notifyBodyBlock'>
-              <div className='notifySection'>
-                We're migrating our built-in Infura and Alchemy connection presets to our internal RPC
-                infrastructure called Pylon. If you'd prefer not to have your existing Infura and Alchemy
-                connections migrated to use Pylon, you will need to obtain an API key from these providers and
-                set the corresponding URL using the "custom" preset for these connections.
-              </div>
-            </div>
-          </div>
-          <div className='notifyInput'>
-            <div
-              className='notifyInputOption notifyInputSingleButton'
-              onMouseDown={() => {
-                link.send('tray:action', 'migrateToPylonConnections')
-                link.send('tray:action', 'mutePylonMigrationNotice')
-                store.notify()
-              }}
-            >
-              <div className='notifyInputOptionText notifyBetaGo'>Enable Pylon</div>
-            </div>
-            <div
-              className='notifyInputOption notifyInputSingleButton'
-              onMouseDown={() => {
-                link.send('tray:action', 'mutePylonMigrationNotice')
-                store.notify()
-              }}
-            >
-              <div className='notifyInputOptionText notifyBetaGo'>Use custom connections</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
 class Notify extends React.Component {
   mainnet() {
     return (
@@ -555,12 +509,6 @@ class Notify extends React.Component {
       )
     } else if (notify === 'betaDisclosure') {
       return <div className='notify cardShow'>{this.betaDisclosure()}</div>
-    } else if (notify === 'migrateToPylon') {
-      return (
-        <div className='notify cardShow'>
-          <MigrateToPylon store={this.store} />
-        </div>
-      )
     } else if (notify === 'updateOriginChain') {
       return (
         <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
