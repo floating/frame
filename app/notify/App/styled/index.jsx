@@ -53,16 +53,16 @@ export const SlideItem = styled.div`
 
 export const SlideBody = styled.div`
   max-width: 500px;
-  // padding: 32px;
   animation: cardShow 400ms linear both;
   animation-delay: 200ms;
   font-weight: 300;
   font-size: 16px;
+  padding: 8px;
   margin: auto;
   text-align: center;
   ${SlideItem} {
     padding-bottom: 20px;
-    line-height: 28px;
+    line-height: 24px;
   }
   ${SlideItem}:last-child {
     padding-bottom: 0px;
@@ -78,7 +78,6 @@ export const SlideTitle = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  color: var(--good);
 `
 
 export const PylonConfirm = styled.div`
@@ -100,15 +99,13 @@ export const PylonConfirmButton = styled.div`
   height: 40px;
   cursor: pointer;
   border-radius: 20px;
-  border: 2px solid var(--ghostY);
   box-sizing: border-box;
   text-transform: uppercase;
-  background: var(--ghostAZ);
+  background: var(--ghostA);
   font-size: 16px;
   font-weight: 400;
   transform: translateY(0px);
-
-  box-shadow: 0px 3px 6px var(--ghostX);
+  box-shadow: 0px 4px 4px -2px var(--ghostX);
   transition: var(--standardFast);
   * {
     pointer-events: none;
@@ -118,17 +115,17 @@ export const PylonConfirmButton = styled.div`
   }
 
   &:hover {
-    background: var(--ghostA);
+    background: var(--ghostB);
     transform: translateY(-1px);
     color: var(--mint);
-    box-shadow: 0px 4px 12px var(--ghostX);
+    box-shadow: 0px 6px 6px -3px var(--ghostX);
   }
 
   &:active {
-    background: var(--ghostA);
+    background: var(--ghostB);
     transform: translateY(1px);
     color: var(--mint);
-    box-shadow: 0px 1px 2px var(--ghostX);
+    box-shadow: 0px 2px 2px -1px var(--ghostX);
   }
 `
 

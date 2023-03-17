@@ -518,7 +518,8 @@ class Notify {
     const cleanupHandler = () => windows.notify?.off('close', closeHandler)
 
     const closeHandler = () => {
-      // store.completeOnboarding()
+      store.mutePylonMigrationNotice()
+      store.migrateToPylonConnections()
       windows.tray.focus()
 
       electronApp.off('before-quit', cleanupHandler)

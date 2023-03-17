@@ -361,16 +361,6 @@ class Settings extends React.Component {
             <div
               className='requestFeatureButton'
               onClick={() => {
-                link.send('tray:action', 'setNotify', { showing: true })
-              }}
-            >
-              Open Pylon Notify
-            </div>
-          </div>
-          <div className='requestFeature'>
-            <div
-              className='requestFeatureButton'
-              onClick={() => {
                 link.send('tray:action', 'setOnboard', { showing: true })
               }}
             >
