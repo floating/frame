@@ -3,7 +3,7 @@ import Restore from 'react-restore'
 
 import Native from '../../../resources/Native'
 
-import { Onboard } from './styled'
+import { Onboard, Container } from './styled'
 
 import Slides from './Slides'
 
@@ -13,7 +13,9 @@ class App extends React.Component {
       <Onboard>
         <Native />
         <div className='frameOverlay' />
-        <Slides platform={this.store('platform')} />
+        <Container>
+          <Slides platform={this.store('platform')} />
+        </Container>
       </Onboard>
     )
   }

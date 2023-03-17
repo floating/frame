@@ -35,9 +35,9 @@ link.rpc('getState', (err, state) => {
     }, 100)
   })
 
-  const root = createRoot(document.getElementById('onboard'))
-  const Onboard = Restore.connect(AppComponent, store)
-  root.render(<Onboard />)
+  const root = createRoot(document.getElementById('notify'))
+  const Notify = Restore.connect(AppComponent, store)
+  root.render(<Notify />)
 })
 
 document.addEventListener('contextmenu', (e) => link.send('*:contextmenu', e.clientX, e.clientY))

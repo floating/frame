@@ -29,8 +29,6 @@ link.rpc('getState', (err, state) => {
   link.send('tray:ready') // turn on api
   link.send('tray:refreshMain')
 
-  if (!store('main.mute.migrateToPylon')) store.notify('migrateToPylon')
-
   store.observer(() => {
     document.body.classList.remove('dark', 'light')
     document.body.classList.add('clip', store('main.colorway'))

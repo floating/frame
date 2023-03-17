@@ -18,7 +18,7 @@
     "bundle:dash": "parcel build app/dash/index.html --target dash --public-url .",
     "bundle:dapp": "parcel build app/dapp/index.html --target dapp --public-url .",
     "bundle:onboard": "parcel build app/onboard/index.html --target onboard --public-url .",
-    "bundle:notify": "parcel build app/notify/index.html --target onboard --public-url .",
+    "bundle:notify": "parcel build app/notify/index.html --target notify --public-url .",
     "bundle:dapp:inject": "parcel build main/dapps/server/inject/index.js --target inject --public-url .",
     "serve": "npm run bundle:bridge && npm run dev:server & wait-on http://localhost:1234/tray/index.dev.html && npm run compile:watch",
     "dev": "node ./scripts/run-dev.mjs",
@@ -146,6 +146,7 @@
     "@types/tar-fs": "2.0.1",
     "@types/uuid": "9.0.0",
     "@types/ws": "8.5.4",
+    "buffer": "^5.7.1",
     "electron": "22.0.3",
     "electron-builder": "23.6.0",
     "electron-devtools-installer": "3.2.0",
@@ -192,6 +193,7 @@
   "dash": "./bundle/dash.html",
   "dapp": "./bundle/dapp.html",
   "onboard": "./bundle/onboard.html",
+  "notify": "./bundle/notify.html",
   "targets": {
     "main": false,
     "bridge": {
@@ -208,6 +210,9 @@
       "context": "browser"
     },
     "onboard": {
+      "context": "browser"
+    },
+    "notify": {
       "context": "browser"
     },
     "inject": {

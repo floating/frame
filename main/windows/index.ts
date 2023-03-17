@@ -80,6 +80,16 @@ const topRight = (window: BrowserWindow) => {
   }
 }
 
+const center = (window: BrowserWindow) => {
+  const area = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
+  const screenSize = area
+  const windowSize = window.getSize()
+  return {
+    x: Math.floor(screenSize.x + screenSize.width / 2 - windowSize[0] / 2),
+    y: Math.floor(screenSize.y + screenSize.height / 2 - windowSize[1] / 2)
+  }
+}
+
 const detectMouse = () => {
   const m1 = screen.getCursorScreenPoint()
   const display = screen.getDisplayNearestPoint(m1)
@@ -519,18 +529,18 @@ class Notify {
       electronApp.on('before-quit', cleanupHandler)
       windows.notify.once('close', closeHandler)
 
-      const area = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
-      const height = (isDev && !fullheight ? devHeight : area.height) - 160
+      // const area = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
+      const height = 500
       const maxWidth = Math.floor(height * 1.24)
       const targetWidth = 600 // area.width - 460
       const width = targetWidth > maxWidth ? maxWidth : targetWidth
       windows.notify.setMinimumSize(600, 300)
       windows.notify.setSize(width, height)
-      const pos = topRight(windows.notify)
+      const pos = center(windows.notify)
 
       // const x = (pos.x * 2 - width * 2 - 810) / 2
-      const x = pos.x - 880
-      windows.notify.setPosition(x, pos.y + 80)
+      const x = pos.x - trayWidth / 2
+      windows.notify.setPosition(x, pos.y)
       // windows.onboard.setAlwaysOnTop(true)
       windows.notify.show()
       windows.notify.focus()
@@ -601,7 +611,7 @@ const init = () => {
   }
 
   if (!store('main.mute.migrateToPylon')) {
-    onboard = new Notify()
+    notify = new Notify()
   }
 
   // data change events
@@ -634,7 +644,7 @@ const init = () => {
       }
 
       notify.show()
-    } else if (onboard) {
+    } else if (notify) {
       notify.hide()
       windows.tray.focus()
     }
