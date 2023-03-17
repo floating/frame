@@ -36,7 +36,7 @@ Frame is a web3 platform that creates a secure system-wide interface to your cha
 - **Set your own connections to Ethereum and IPFS**
   - Never be locked into using a centralized gateway
 - **Menu Bar Support**
-  - Frame stays out of the way and sits quietly in your menu bar until it's needed
+  - Frame stays out of the way and sits quietly in your menu bar until needed
 - **Cross Platform**
   - MacOS, Windows and Linux!
 
@@ -57,6 +57,8 @@ If you use an arch-based distro, you can use an AUR Helper like [yay](https://gi
 
 #### Run Source
 
+**On Ubuntu:** Run `sudo apt-get install build-essential libudev-dev`.
+
 ```bash
 # Clone
 › git clone https://github.com/floating/frame
@@ -73,15 +75,11 @@ If you use an arch-based distro, you can use an AUR Helper like [yay](https://gi
 › npm run prod
 ```
 
-**On Windows:** Run `npm install --global --production windows-build-tools` as administrator **before** running the demo. You can find more info about this here: https://github.com/felixrieseberg/windows-build-tools.
-
-**On Ubuntu:** Run `sudo apt-get install build-essential libudev-dev` **before** running the demo.
-
-#### Build Apps
+#### Build
 
 ```bash
-› npm run bundle # Create app bundle
-› npm run build # Build apps for current platform
+› npm run bundle # Create bundle
+› npm run build # Build Frame for current platform
 ```
 
 ### Usage
@@ -97,7 +95,7 @@ Frame also has a browser extension for injecting a Frame-connected [EIP-1193](ht
 ### Related
 
 - [Frame Chat](https://discord.gg/UH7NGqY) - Feel free to drop in and ask questions!
-- [Frame Browser Extension](https://github.com/floating/frame-extension) - Use Frame with any web dapp
+- [Frame Browser Extension](https://github.com/frame-labs/frame-extension) - Use Frame with any web dapp
 - [eth-provider](https://github.com/floating/eth-provider) - A universal Ethereum provider
 - [Restore](https://github.com/floating/restore) - A predictable and observable state container for React apps
 
