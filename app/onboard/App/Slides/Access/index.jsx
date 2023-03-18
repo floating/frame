@@ -4,10 +4,10 @@ import { Slide, SlideBody, SlideItem, Shortcut } from '../../styled'
 
 import link from '../../../../../resources/link'
 
-import { getSummonShortcut } from '../../../../../resources/app'
+import { getDisplayShortcut } from '../../../../../resources/app'
 
 const Access = ({ setTitle, setProceed, platform }) => {
-  const { modifierKey, summonKey } = getSummonShortcut(platform)
+  const { modifierKey, summonKey } = getDisplayShortcut(platform, store('main.shortcuts.summon'))
   const keyboardShortcut = `${modifierKey} + ${summonKey}`
   const [shortcutActivated, setShortcutActivated] = useState(false)
   const [trayOpen, setTrayOpen] = useState(store('tray.open'))
