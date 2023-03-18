@@ -1,5 +1,5 @@
 import { app, dialog } from 'electron'
-import { showUnhandledExceptionDialog } from '../../../../main/windows/dialog/unhandledException'
+import { showUnhandledExceptionDialog } from '../../../../main/windows/dialog'
 
 jest.mock('electron', () => ({
   dialog: {
