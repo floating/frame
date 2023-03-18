@@ -30,45 +30,78 @@ export const getDisplayShortcut = (platform, shortcut) => {
   return { modifierKeys, shortcutKey }
 }
 
-export const getAcceleratorFromShortcut = ({ modifierKeys, shortcutKey: unmappedShortcutKey }) => {
+export const getAcceleratorFromShortcut = ({ modifierKeys, shortcutKey }) => {
   const keyMap = {
     Backquote: '`',
     Comma: ',',
     BracketLeft: '[',
     BracketRight: ']',
     Equal: '=',
+    Backslash: '\\',
     Forwardslash: '/',
     Minus: '-',
     Plus: '+',
     Period: '.',
     Semicolon: ';',
     Slash: '/',
-    Quote: "'"
+    Quote: "'",
+    ArrowUp: 'up',
+    ArrowDown: 'down',
+    ArrowLeft: 'left',
+    ArrowRight: 'right',
+    Digit9: '9',
+    Digit8: '8',
+    Digit7: '7',
+    Digit6: '6',
+    Digit5: '5',
+    Digit4: '4',
+    Digit3: '3',
+    Digit2: '2',
+    Digit1: '1',
+    Digit0: '0',
+    KeyA: 'a',
+    KeyB: 'b',
+    KeyC: 'c',
+    KeyD: 'd',
+    KeyE: 'e',
+    KeyF: 'f',
+    KeyG: 'g',
+    KeyH: 'h',
+    KeyI: 'i',
+    KeyJ: 'j',
+    KeyK: 'k',
+    KeyL: 'l',
+    KeyM: 'm',
+    KeyN: 'n',
+    KeyO: 'o',
+    KeyP: 'p',
+    KeyQ: 'q',
+    KeyR: 'r',
+    KeyS: 's',
+    KeyT: 't',
+    KeyU: 'u',
+    KeyV: 'v',
+    KeyW: 'w',
+    KeyX: 'x',
+    KeyY: 'y',
+    KeyZ: 'z',
+    NumpadDivide: 'numdiv',
+    NumpadMultiply: 'nummult',
+    NumpadSubtract: 'numsub',
+    NumpadAdd: 'numadd',
+    NumpadDecimal: 'numdec',
+    Numpad9: 'num9',
+    Numpad8: 'num8',
+    Numpad7: 'num7',
+    Numpad6: 'num6',
+    Numpad5: 'num5',
+    Numpad4: 'num4',
+    Numpad3: 'num3',
+    Numpad2: 'num2',
+    Numpad1: 'num1',
+    Numpad0: 'num0'
   }
-  //   F1 to F24
-  // Punctuation like ~, !, @, #, $, etc.
-  // Capslock
-  // Numlock
-  // Scrolllock
-  // Backspace
-  // Delete
-  // Insert
-  // Return (or Enter as alias)
-  // Home and End
-  // PageUp and PageDown
-  // Escape (or Esc for short)
-  // VolumeUp, VolumeDown and VolumeMute
-  // MediaNextTrack, MediaPreviousTrack, MediaStop and MediaPlayPause
-  // PrintScreen
-  // NumPad Keys
 
-  //     num0 - num9
-  //     numdec - decimal key
-  //     numadd - numpad + key
-  //     numsub - numpad - key
-  //     nummult - numpad * key
-  //     numdiv - numpad ÷ key
-  const shortcutKey = unmappedShortcutKey.replace('Key', '').replace('Digit', '').replace('Arrow', '')
   const acceleratorBits = [...modifierKeys, keyMap[shortcutKey] || shortcutKey]
 
   return acceleratorBits.join('+')
