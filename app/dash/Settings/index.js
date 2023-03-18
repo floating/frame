@@ -40,6 +40,11 @@ class Settings extends React.Component {
     )
     hotkeys.unbind()
     if (this.state.configureShortcut) {
+      // disable existing shortcut whilst we configure
+      link.send('tray:action', 'setShortcut', 'summon', {
+        ...summonShortcut,
+        enabled: false
+      })
       hotkeys('*', { capture: true }, (event) => {
         event.preventDefault()
         const modifierKeys = ['Meta', 'Alt', 'Shift', 'Control', 'Command']
@@ -51,7 +56,8 @@ class Settings extends React.Component {
             configureShortcut: false
           })
           const shortcut = getShortcutFromKeyEvent(event)
-          link.send('tray:action', 'setShortcut', 'summon', shortcut)
+          // enable new shortcut
+          link.send('tray:action', 'setShortcut', 'summon', { ...shortcut, enabled: true })
         }
 
         return false
