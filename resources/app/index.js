@@ -19,7 +19,11 @@ export const getDisplayShortcut = (platform, shortcut) => {
         return isMacOS ? 'Option' : 'Alt'
       }
       if (modifierKey === 'Meta' || modifierKey === 'Super') {
-        return isMacOS ? 'Command' : 'Windows'
+        const keyMap = {
+          darwin: 'Command',
+          win32: 'Win'
+        }
+        return keyMap[platform] || 'Meta'
       }
       if (modifierKey === 'CommandOrCtrl') {
         return isMacOS ? 'Command' : 'Ctrl'
