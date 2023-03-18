@@ -113,6 +113,7 @@ export const getAcceleratorFromShortcut = ({ modifierKeys, shortcutKey }) => {
 
 export const getShortcutFromKeyEvent = (e) => {
   const modifierKeys = []
+  console.log(e)
   if (e.altKey) {
     modifierKeys.push('Alt')
   }
