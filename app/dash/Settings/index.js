@@ -4,34 +4,7 @@ import hotkeys from 'hotkeys-js'
 
 import link from '../../../resources/link'
 import Dropdown from '../../../resources/Components/Dropdown'
-import { getShortcutFromKeyEvent, getDisplayShortcut } from '../../../resources/app'
-
-function getDisabledKeys(platform) {
-  const disabledKeys = ['IntlBackslash', 'IntlRo', 'IntlYen', 'Pause', 'NumpadEnter', 'AltGr']
-
-  // TODO: test AZERTY (Fr), QWERTZ (De)
-  if (platform === 'darwin') {
-    disabledKeys.push('NumLock')
-  } else {
-    disabledKeys.push('PrintScreen')
-    // - Linux
-    //   - Quote - accelerator nonfunctional on EN-GB
-    //   - Backslash - works if devtools / Frame is focussed, otherwise not
-
-    // - Windows
-    // 	- Quote - nonfunctional on EN-GB
-    // 	- Backslash - nonfunctional on EN-GB (registers as `#`)
-  }
-  if (platform === 'win32') {
-    disabledKeys.push('F12')
-    // 	- Backquote - nonfunctional on EN-GB
-  }
-  if (platform === 'linux') {
-    disabledKeys.push('BracketLeft', 'BracketRight')
-  }
-
-  return disabledKeys
-}
+import { getShortcutFromKeyEvent, getDisplayShortcut, getDisabledKeys } from '../../../resources/app'
 
 class Settings extends React.Component {
   constructor(props, context) {
