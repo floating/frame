@@ -23,7 +23,7 @@ export function getDisabledKeys(platform) {
     }
   }
   if (platform === 'linux') {
-    disabledKeys.push('BracketLeft', 'BracketRight', 'Quote')
+    disabledKeys.push('BracketLeft', 'BracketRight', 'Quote', 'Backslash')
   }
 
   return disabledKeys
