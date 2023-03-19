@@ -12,26 +12,18 @@ if (global?.navigator) {
 export function getDisabledKeys(platform) {
   const disabledKeys = ['IntlBackslash', 'IntlRo', 'IntlYen', 'Pause', 'NumpadEnter', 'AltRight']
 
-  // TODO: test AZERTY (Fr), QWERTZ (De)
   if (platform === 'darwin') {
     disabledKeys.push('NumLock')
-  } else {
-    disabledKeys.push('PrintScreen', 'Backslash', 'Quote', 'Backquote')
-    console.log(keyboardLayout.has('Backslash'))
-    // - Linux
-    //   - Quote - accelerator nonfunctional
-    //   - Backslash - works if devtools / Frame is focussed, otherwise not
-
-    // - Windows
-    // 	- Quote - nonfunctional on EN-GB
-    // 	- Backslash - nonfunctional on EN-GB (registers as `#`)
   }
   if (platform === 'win32') {
     disabledKeys.push('F12')
-    // 	- Backquote - nonfunctional on EN-GB
+    const disableBackslash = ['#', 'ç'].includes(keyboardLayout?.get('Backslash'))
+    if (disableBackslash) {
+      disabledKeys.push('Backslash')
+    }
   }
   if (platform === 'linux') {
-    disabledKeys.push('BracketLeft', 'BracketRight')
+    disabledKeys.push('BracketLeft', 'BracketRight', 'Quote')
   }
 
   return disabledKeys
