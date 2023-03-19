@@ -9,6 +9,34 @@ if (global?.navigator) {
   // navigator.keyboard.addEventListener('layoutchange', () => { keyboardLayout = layout })
 }
 
+export function getDisabledKeys(platform) {
+  const disabledKeys = ['IntlBackslash', 'IntlRo', 'IntlYen', 'Pause', 'NumpadEnter', 'AltRight']
+
+  // TODO: test AZERTY (Fr), QWERTZ (De)
+  if (platform === 'darwin') {
+    disabledKeys.push('NumLock')
+  } else {
+    disabledKeys.push('PrintScreen', 'Backslash', 'Quote', 'Backquote')
+    console.log(keyboardLayout.has('Backslash'))
+    // - Linux
+    //   - Quote - accelerator nonfunctional
+    //   - Backslash - works if devtools / Frame is focussed, otherwise not
+
+    // - Windows
+    // 	- Quote - nonfunctional on EN-GB
+    // 	- Backslash - nonfunctional on EN-GB (registers as `#`)
+  }
+  if (platform === 'win32') {
+    disabledKeys.push('F12')
+    // 	- Backquote - nonfunctional on EN-GB
+  }
+  if (platform === 'linux') {
+    disabledKeys.push('BracketLeft', 'BracketRight')
+  }
+
+  return disabledKeys
+}
+
 export const getDisplayShortcut = (platform, shortcut) => {
   const isMacOS = platform === 'darwin'
   const shortcutKey = (keyboardLayout?.get(shortcut.shortcutKey) || shortcut.shortcutKey).toUpperCase()
