@@ -6,6 +6,33 @@ import link from '../../../resources/link'
 import Dropdown from '../../../resources/Components/Dropdown'
 import { getShortcutFromKeyEvent, getDisplayShortcut } from '../../../resources/app'
 
+function getDisabledKeys(platform) {
+  const disabledKeys = ['IntlBackslash', 'IntlRo', 'IntlYen', 'Pause', 'NumpadEnter', 'AltGr']
+
+  // TODO: test AZERTY (Fr), QWERTZ (De)
+  if (platform === 'darwin') {
+    disabledKeys.push('NumLock')
+  } else {
+    disabledKeys.push('PrintScreen')
+    // - Linux
+    //   - Quote - accelerator nonfunctional on EN-GB
+    //   - Backslash - works if devtools / Frame is focussed, otherwise not
+
+    // - Windows
+    // 	- Quote - nonfunctional on EN-GB
+    // 	- Backslash - nonfunctional on EN-GB (registers as `#`)
+  }
+  if (platform === 'win32') {
+    disabledKeys.push('F12')
+    // 	- Backquote - nonfunctional on EN-GB
+  }
+  if (platform === 'linux') {
+    disabledKeys.push('BracketLeft', 'BracketRight')
+  }
+
+  return disabledKeys
+}
+
 class Settings extends React.Component {
   constructor(props, context) {
     super(props, context)
@@ -40,7 +67,7 @@ class Settings extends React.Component {
     )
     hotkeys.unbind()
     if (this.state.configureShortcut) {
-      // disable existing shortcut whilst we configure
+      // disable existing shortcut whilst configuring a new one
       link.send('tray:action', 'setShortcut', 'summon', {
         ...summonShortcut,
         enabled: false
@@ -49,9 +76,14 @@ class Settings extends React.Component {
         event.preventDefault()
         const modifierKeys = ['Meta', 'Alt', 'Shift', 'Control', 'Command']
         const isModifierKey = modifierKeys.includes(event.key)
+        const disabledKeys = getDisabledKeys(platform)
+        const isDisabledKey = disabledKeys.includes(event.code)
 
-        // ignore modifier key solo keypresses
-        if (!isModifierKey) {
+        console.log(disabledKeys, event.code)
+
+        // ignore modifier key solo keypresses and disabled keys
+        if (!isModifierKey && !isDisabledKey) {
+          console.log('registering keypress', event)
           this.setState({
             configureShortcut: false
           })
