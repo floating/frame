@@ -11,6 +11,7 @@ const { default: BlockMonitor } = require('./blocks')
 const { default: chainConfig } = require('./config')
 const { default: GasMonitor } = require('../transaction/gasMonitor')
 const { createGasCalculator } = require('./gas')
+const { NETWORK_PRESETS } = require('../../resources/constants')
 
 // These chain IDs are known to not support EIP-1559 and will be forced
 // not to use that mechanism
@@ -248,8 +249,7 @@ class ChainConnection extends EventEmitter {
       this.network = connection.network
     }
 
-    const presets = store('main.networkPresets', this.type)
-    const currentPresets = Object.assign({}, presets.default, presets[this.chainId])
+    const currentPresets = { ...NETWORK_PRESETS.ethereum.default, ...NETWORK_PRESETS.ethereum[this.chainId] }
 
     const { primary, secondary } = store('main.networks', this.type, this.chainId, 'connection')
     const secondaryTarget =
