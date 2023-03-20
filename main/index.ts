@@ -279,7 +279,8 @@ dapps.add({
   openWhenReady: false,
   config: {
     key: 'value'
-  }
+  },
+  status: 'initial'
 })
 
 ipcMain.on('unsetCurrentView', async (e) => {
