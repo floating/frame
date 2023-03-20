@@ -4,7 +4,7 @@ import hotkeys from 'hotkeys-js'
 
 import link from '../../../resources/link'
 import Dropdown from '../../../resources/Components/Dropdown'
-import { getShortcutFromKeyEvent, getDisplayShortcut, getDisabledKeys } from '../../../resources/app'
+import { getShortcutFromKeyEvent, getDisplayShortcut, isDisabledKey } from '../../../resources/app'
 
 class Settings extends React.Component {
   constructor(props, context) {
@@ -49,13 +49,11 @@ class Settings extends React.Component {
         event.preventDefault()
         const modifierKeys = ['Meta', 'Alt', 'Shift', 'Control', 'Command']
         const isModifierKey = modifierKeys.includes(event.key)
-        const disabledKeys = getDisabledKeys(platform)
-        const isDisabledKey = disabledKeys.includes(event.code)
 
-        console.log(disabledKeys, event.code)
+        console.log(event.code)
 
         // ignore modifier key solo keypresses and disabled keys
-        if (!isModifierKey && !isDisabledKey) {
+        if (!isModifierKey && !isDisabledKey(event, platform)) {
           console.log('registering keypress', event)
           this.setState({
             configureShortcut: false
