@@ -5,6 +5,7 @@ import { addHexPrefix } from '@ethereumjs/util'
 import provider from '../provider'
 import { BigNumber } from 'ethers'
 import { erc20Interface } from '../../resources/contracts'
+
 export interface TokenData {
   decimals?: number
   name: string

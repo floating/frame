@@ -241,18 +241,9 @@ class Settings extends React.Component {
   }
 
   render() {
-    const { type, id } = { type: 'ethereum', id: 1 } // TODO
     const networks = this.store('main.networks')
-    // const connection = networks[type][id].connection
-    const networkPresets = this.store('main.networkPresets', type)
-    let presets = networkPresets[id] || {}
-    presets = Object.keys(presets).map((i) => ({ text: i, value: type + ':' + id + ':' + i }))
-    presets = presets.concat(
-      Object.keys(networkPresets.default).map((i) => ({ text: i, value: type + ':' + id + ':' + i }))
-    )
-    presets.push({ text: 'Custom', value: type + ':' + id + ':' + 'custom' })
-
     const networkOptions = []
+
     Object.keys(networks).forEach((type) => {
       Object.keys(networks[type]).forEach((id) => {
         networkOptions.push({ text: networks[type][id].name, value: type + ':' + id })

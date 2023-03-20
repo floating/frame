@@ -58,31 +58,18 @@ const state = {
   main: {
     currentNetwork: {
       type: 'ethereum',
-      id: '4'
-    },
-    networkPresets: {
-      ethereum: {
-        default: {
-          local: 'direct'
-        },
-        4: {
-          infura: 'infuraRinkeby'
-        },
-        137: {
-          infura: 'infuraPolygon'
-        }
-      }
+      id: '5'
     },
     networks: {
       ethereum: {
-        4: {
-          id: 4,
+        5: {
+          id: 5,
           type: 'ethereum',
-          name: 'Rinkeby',
+          name: 'Goerli',
           connection: {
             primary: {
               on: false,
-              current: 'infura',
+              current: 'pylon',
               status: 'loading',
               connected: false,
               type: '',
@@ -108,7 +95,7 @@ const state = {
           connection: {
             primary: {
               on: false,
-              current: 'infura',
+              current: 'pylon',
               status: 'loading',
               connected: false,
               type: '',
@@ -131,7 +118,7 @@ const state = {
     },
     networksMeta: {
       ethereum: {
-        4: {
+        5: {
           gas: {
             price: {
               selected: 'standard',
@@ -158,12 +145,12 @@ jest.mock('../../../main/accounts', () => ({ updatePendingFees: jest.fn() }))
 jest.mock('../../../main/store/persist')
 
 const mockConnections = {
-  infuraRinkeby: {
-    id: '4',
-    name: 'rinkeby',
-    connection: new MockConnection(4)
+  'wss://evm.pylon.link/goerli': {
+    id: '5',
+    name: 'goerli',
+    connection: new MockConnection(5)
   },
-  infuraPolygon: {
+  'wss://evm.pylon.link/polygon': {
     id: '137',
     name: 'polygon',
     connection: new MockConnection(137)
@@ -216,6 +203,7 @@ afterEach((done) => {
       done.fail('connection error')
     }
   })
+
   store.toggleConnection('ethereum', activeConnection.id, 'primary', false)
 })
 

@@ -1,6 +1,8 @@
 import BigNumber from 'bignumber.js'
 import { isHexString } from 'ethers/lib/utils'
 
+import type { Rate } from '../../main/store/state'
+
 const displayUnitMapping = {
   million: {
     lowerBound: BigNumber('1000000'),

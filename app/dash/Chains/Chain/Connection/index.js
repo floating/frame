@@ -8,6 +8,11 @@ import { capitalize } from '../../../../../resources/utils'
 
 import link from '../../../../../resources/link'
 import svg from '../../../../../resources/svg'
+import { NETWORK_PRESETS } from '../../../../../resources/constants'
+
+function mapToPreset(chainId, key) {
+  return { text: key, value: `ethereum:${chainId}:${key}` }
+}
 
 const ConnectionIndicator = ({ className, connection }) => {
   const isConnected = connection.status === 'connected'
@@ -122,20 +127,22 @@ class ChainModule extends React.Component {
 
   render() {
     const { id, type } = this.props
+    const toPreset = (key) => mapToPreset(id, key)
 
     const connection = this.store('main.networks', type, id, 'connection')
     if (!connection) return null
 
     const networkMeta = this.store('main.networksMeta.ethereum', id)
-    const networkPresets = this.store('main.networkPresets', type)
     const renderStatus = this.renderConnectionStatus.bind(this, type, id)
 
-    let presets = networkPresets[id] || {}
-    presets = Object.keys(presets).map((i) => ({ text: i, value: `${type}:${id}:${i}` }))
-    presets = presets.concat(
-      Object.keys(networkPresets.default).map((i) => ({ text: i, value: `${type}:${id}:${i}` }))
-    )
-    presets.push({ text: 'Custom', value: `${type}:${id}:custom` })
+    const networkPresets = NETWORK_PRESETS.ethereum[id] || {}
+    const defaultPresets = NETWORK_PRESETS.ethereum.default
+
+    const presets = [
+      ...Object.keys(networkPresets).map(toPreset),
+      ...Object.keys(defaultPresets).map(toPreset),
+      toPreset('custom')
+    ]
 
     const customFocusHandler = (inputName) => {
       const stateKey = `${inputName}Custom`
