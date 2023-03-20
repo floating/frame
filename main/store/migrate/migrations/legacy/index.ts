@@ -1,3 +1,4 @@
+// @ts-nocheck
 // legacy migrations that were written in JS and have not been ported
 // to Typescript
 
@@ -7,7 +8,7 @@ import { z } from 'zod'
 import { accountNS, isDefaultAccountName } from '../../../resources/domain/account'
 import { isWindows } from '../../../resources/platform'
 
-export default {
+const migrations = {
   4: (initial) => {
     // If persisted state still has main.gasPrice, move gas settings into networks
     const gasPrice = initial.main.gasPrice // ('gasPrice', false)
@@ -979,3 +980,11 @@ export default {
     return initial
   }
 }
+
+// retrofit legacy migrations
+const legacyMigrations = Object.entries(migrations).map(([version, legacyMigration]) => ({
+  version: parseInt(version),
+  migrate: (initial: unknown) => legacyMigration(initial)
+}))
+
+export default legacyMigrations

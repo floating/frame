@@ -203,9 +203,6 @@ module.exports = {
   setLiveAccountLimit: (u, value) => {
     u('main.ledger.liveAccountLimit', () => value)
   },
-  setHardwareDerivation: (u, value) => {
-    u('main.hardwareDerivation', () => value)
-  },
   setMenubarGasPrice: (u, value) => {
     u('main.menubarGasPrice', () => value)
   },
