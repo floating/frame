@@ -9,11 +9,13 @@ if (global?.navigator) {
   // navigator.keyboard.addEventListener('layoutchange', () => { keyboardLayout = layout })
 }
 
-export function getDisabledKeys(platform) {
+export function isDisabledKey(keyEvent, platform) {
   const disabledKeys = ['IntlBackslash', 'IntlRo', 'IntlYen', 'Pause', 'NumpadEnter', 'AltRight']
-
+  
   if (platform === 'darwin') {
     disabledKeys.push('NumLock')
+  } else {
+
   }
   if (platform === 'win32') {
     disabledKeys.push('F12')
@@ -23,10 +25,16 @@ export function getDisabledKeys(platform) {
     }
   }
   if (platform === 'linux') {
-    disabledKeys.push('BracketLeft', 'BracketRight', 'Quote', 'Backslash')
+    disabledKeys.push('BracketLeft', 'BracketRight', 'Quote', 'Backslash', 'Minus', 'Backquote', 'Slash', 'Period', 'Comma')
+    const disableSemicolon = keyEvent.key !== ';' && keyEvent.code === 'Semicolon'
+    if (disableSemicolon) {
+      disabledKeys.push('Semicolon')
+    }
   }
 
-  return disabledKeys
+  console.log(disabledKeys, disabledKeys.includes(keyEvent.code), keyEvent.code)
+  
+  return disabledKeys.includes(keyEvent.code)
 }
 
 export const getDisplayShortcut = (platform, shortcut) => {
