@@ -1,8 +1,8 @@
 import React from 'react'
 import Restore from 'react-restore'
-import link from '../../../resources/link'
 
 import Chain from './Chain'
+import link from '../../../resources/link'
 
 class Settings extends React.Component {
   constructor(props, context) {
@@ -113,15 +113,7 @@ class Settings extends React.Component {
   }
 
   renderChains() {
-    const { type, id } = { type: 'ethereum', id: 1 } // TODO: this.store('main.currentNetwork')
     const networks = this.store('main.networks')
-    const networkPresets = this.store('main.networkPresets', type)
-    let presets = networkPresets[id] || {}
-    presets = Object.keys(presets).map((i) => ({ text: i, value: type + ':' + id + ':' + i }))
-    presets = presets.concat(
-      Object.keys(networkPresets.default).map((i) => ({ text: i, value: type + ':' + id + ':' + i }))
-    )
-    presets.push({ text: 'Custom', value: type + ':' + id + ':' + 'custom' })
     const networkOptions = []
     Object.keys(networks).forEach((type) => {
       Object.keys(networks[type]).forEach((id) => {

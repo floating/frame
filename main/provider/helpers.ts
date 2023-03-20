@@ -19,6 +19,8 @@ import protectedMethods from '../api/protectedMethods'
 import { usesBaseFee, TransactionData, GasFeesSource } from '../../resources/domain/transaction'
 import { getAddress } from '../../resources/utils'
 
+import type { Chain, Permission } from '../store/state'
+
 const permission = (date: number, method: string) => ({ parentCapability: method, date })
 
 export function checkExistingNonceGas(tx: TransactionData) {
@@ -161,7 +163,7 @@ export function hasPermission(address: string, originId: string) {
 }
 
 export function getActiveChainsFull() {
-  const chains: Record<string, Network> = store('main.networks.ethereum') || {}
+  const chains: Record<string, Chain> = store('main.networks.ethereum') || {}
 
   // TODO: Finalize this spec
 
@@ -185,7 +187,7 @@ export function getActiveChainsFull() {
 }
 
 export function getActiveChainDetails() {
-  const chains: Record<string, Network> = store('main.networks.ethereum') || {}
+  const chains: Record<string, Chain> = store('main.networks.ethereum') || {}
 
   return Object.values(chains)
     .filter((chain) => chain.on)

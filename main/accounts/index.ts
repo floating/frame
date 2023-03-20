@@ -14,7 +14,7 @@ import { signerCompatibility as transactionCompatibility, maxFee, SignerCompatib
 import { weiIntToEthInt, hexToInt } from '../../resources/utils'
 import { accountPanelCrumb, signerPanelCrumb } from '../../resources/domain/nav'
 import { usesBaseFee, TransactionData, GasFeesSource } from '../../resources/domain/transaction'
-import { findUnavailableSigners, getSignerType, isSignerReady } from '../../resources/domain/signer'
+import { findUnavailableSigners, isSignerReady } from '../../resources/domain/signer'
 
 import {
   AccountRequest,
