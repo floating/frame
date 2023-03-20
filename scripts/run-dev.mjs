@@ -2,9 +2,11 @@ import { spawn } from 'child_process'
 import waitOn from 'wait-on'
 import runBundler from './bundler.mjs'
 
+const isWindows = process.platform === 'win32'
+
 async function waitForTask(taskName) {
   return new Promise((resolve, reject) => {
-    const ps = spawn('npm', ['run', taskName], { stdio: 'inherit' })
+    const ps = spawn('npm', ['run', taskName], { stdio: 'inherit', shell: isWindows })
 
     ps.once('close', (exitCode) =>
       exitCode === 0 ? resolve() : reject(`${taskName} failed with exit code: ${exitCode}`)
@@ -33,7 +35,7 @@ async function launchDevServer() {
 }
 
 function launchFrame({ shutdown }) {
-  const npmProcess = spawn('npm', ['run', 'launch:dev'], { stdio: 'inherit' })
+  const npmProcess = spawn('npm', ['run', 'launch:dev'], { stdio: 'inherit', shell: isWindows })
 
   npmProcess.once('exit', () => {
     console.log('Frame exited')
