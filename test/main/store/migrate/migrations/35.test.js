@@ -1,4 +1,4 @@
-import migrate from '../../../../../main/store/migrate/migrations/35'
+import migration from '../../../../../main/store/migrate/migrations/35'
 import { createState, initChainState } from '../setup'
 
 const providers = ['infura', 'alchemy']
@@ -18,7 +18,12 @@ const migratedChains = [
 let state
 
 beforeEach(() => {
-  state = createState()
+  state = createState(migration.version - 1)
+})
+
+it('should have migration version 35', () => {
+  const { version } = migration
+  expect(version).toBe(35)
 })
 
 migratedChains.forEach(([id, chainName]) => {
@@ -31,7 +36,7 @@ migratedChains.forEach(([id, chainName]) => {
         secondary: { current: 'custom', custom: 'myrpc' }
       }
 
-      const updatedState = migrate(state)
+      const updatedState = migration.migrate(state)
 
       const {
         connection: { primary, secondary }
@@ -51,7 +56,7 @@ migratedChains.forEach(([id, chainName]) => {
         secondary: { current: provider, on: false }
       }
 
-      const updatedState = migrate(state)
+      const updatedState = migration.migrate(state)
 
       const {
         connection: { primary, secondary }
@@ -75,7 +80,7 @@ it('should not migrate an existing custom infura connection on a Pylon chain', (
     secondary: { current: 'custom' }
   }
 
-  const updatedState = migrate(state)
+  const updatedState = migration.migrate(state)
 
   const {
     connection: { primary, secondary }
@@ -94,7 +99,7 @@ it('should show the migration warning if any Infura or Alchemy connections were 
     secondary: { current: 'custom', custom: 'myrpc', on: false }
   }
 
-  const updatedState = migrate(state)
+  const updatedState = migration.migrate(state)
 
   expect(updatedState.main.mute.migrateToPylon).toBe(false)
 })
@@ -107,7 +112,56 @@ it('should not show the migration warning if the user has no Infura or Alchemy c
     secondary: { current: 'custom', custom: 'myrpc', on: false }
   }
 
-  const updatedState = migrate(state)
+  const updatedState = migration.migrate(state)
 
   expect(updatedState.main.mute.migrateToPylon).toBe(true)
+})
+
+it('should remove an invalid chain from the state', () => {
+  initChainState(state, 1)
+  initChainState(state, 5)
+
+  state.main.networks.ethereum[1].connection = {
+    primary: { current: 'local', on: true },
+    secondary: { current: 'custom', custom: 'myrpc', on: false }
+  }
+
+  // this chain has no connection information so it's invalid
+  state.main.networks.ethereum[5].name = 'Goerli'
+
+  const updatedState = migration.migrate(state)
+
+  expect(Object.keys(updatedState.main.networks.ethereum)).toStrictEqual(['1'])
+})
+
+it('should keep a valid non-migrated chain in the state', () => {
+  initChainState(state, 1)
+
+  state.main.networks.ethereum[1].name = 'Mainnet'
+
+  // this chain won't be migrated as there are no Infura or Alchemy connections
+  state.main.networks.ethereum[1].connection = {
+    primary: { current: 'local', on: true },
+    secondary: { current: 'custom', custom: 'myrpc', on: false }
+  }
+
+  const updatedState = migration.migrate(state)
+
+  const mainnet = updatedState.main.networks.ethereum['1']
+  expect(mainnet).toStrictEqual({
+    name: 'Mainnet', // ensure this key, which is not relevant to the migration, is retained after parsing
+    id: 1,
+    connection: {
+      primary: {
+        current: 'local',
+        custom: '',
+        on: true
+      },
+      secondary: {
+        current: 'custom',
+        custom: 'myrpc',
+        on: false
+      }
+    }
+  })
 })

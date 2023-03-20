@@ -1,6 +1,6 @@
-export const createState = () => ({
+export const createState = (version = 0) => ({
   main: {
-    _version: 0,
+    _version: version,
     networks: { ethereum: {} },
     networksMeta: { ethereum: {} },
     accounts: {},
