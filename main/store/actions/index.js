@@ -697,6 +697,9 @@ module.exports = {
     }
     u('windows.dash', (dash) => Object.assign(dash, update))
   },
+  setNotify: (u, update) => {
+    u('windows.notify.showing', () => update.showing)
+  },
   setOnboard: (u, update) => {
     u('windows.onboard.showing', () => update.showing)
   },

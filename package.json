@@ -12,12 +12,13 @@
     "setup:scripts": "allow-scripts",
     "setup": "npm run setup:deps && husky install",
     "start": "npm run launch",
-    "bundle": "npm run bundle:bridge && npm run bundle:tray && npm run bundle:dash && npm run bundle:dapp && npm run bundle:onboard && npm run bundle:dapp:inject",
+    "bundle": "npm run bundle:bridge && npm run bundle:tray && npm run bundle:dash && npm run bundle:dapp && npm run bundle:onboard && npm run bundle:notify && npm run bundle:dapp:inject",
     "bundle:bridge": "parcel build resources/bridge/index.js --target bridge --public-url .",
     "bundle:tray": "parcel build app/tray/index.html --target tray --public-url .",
     "bundle:dash": "parcel build app/dash/index.html --target dash --public-url .",
     "bundle:dapp": "parcel build app/dapp/index.html --target dapp --public-url .",
     "bundle:onboard": "parcel build app/onboard/index.html --target onboard --public-url .",
+    "bundle:notify": "parcel build app/notify/index.html --target notify --public-url .",
     "bundle:dapp:inject": "parcel build main/dapps/server/inject/index.js --target inject --public-url .",
     "serve": "npm run bundle:bridge && npm run dev:server & wait-on http://localhost:1234/tray/index.dev.html && npm run compile:watch",
     "dev": "node ./scripts/run-dev.mjs",
@@ -207,6 +208,7 @@
   "dash": "./bundle/dash.html",
   "dapp": "./bundle/dapp.html",
   "onboard": "./bundle/onboard.html",
+  "notify": "./bundle/notify.html",
   "targets": {
     "main": false,
     "bridge": {
@@ -223,6 +225,9 @@
       "context": "browser"
     },
     "onboard": {
+      "context": "browser"
+    },
+    "notify": {
       "context": "browser"
     },
     "inject": {
