@@ -1,10 +1,85 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import Restore from 'react-restore'
 import hotkeys from 'hotkeys-js'
 
 import link from '../../../resources/link'
 import Dropdown from '../../../resources/Components/Dropdown'
 import { getShortcutFromKeyEvent, getDisplayShortcut, isShortcutKey } from '../../../resources/app'
+
+const KeyboardShortcutConfigurator = ({ actionText = '', platform, shortcut, shortcutName }) => {
+  const [configuring, setConfiguring] = useState(false)
+  const [shortcutEnabled, setShortcutEnabled] = useState(shortcut.enabled)
+
+  useEffect(() => {
+    hotkeys.unbind()
+    if (configuring) {
+      // disable existing shortcut whilst configuring a new one
+      link.send('tray:action', 'setShortcut', shortcutName, {
+        ...shortcut,
+        enabled: false
+      })
+      hotkeys('*', { capture: true }, (event) => {
+        event.preventDefault()
+        const allowedModifierKeys = ['Meta', 'Alt', 'Control', 'Command']
+        const isModifierKey = allowedModifierKeys.includes(event.key)
+
+        // ignore modifier key solo keypresses and disabled keys
+        if (!isModifierKey && isShortcutKey(event, platform)) {
+          setConfiguring(false)
+          const newShortcut = getShortcutFromKeyEvent(event)
+          // enable new shortcut
+          link.send('tray:action', 'setShortcut', shortcutName, { ...newShortcut, enabled: true })
+          setShortcutEnabled(true)
+        }
+
+        return false
+      })
+    }
+  }, [configuring])
+
+  const { modifierKeys, shortcutKey } = getDisplayShortcut(platform, shortcut)
+
+  return (
+    <span>
+      {configuring ? (
+        <>
+          Enter keyboard shortcut:
+          <span
+            className='keyCommand keyCommandCancel'
+            onClick={() => {
+              setConfiguring(false)
+              // revert shortcut enabled state
+              link.send('tray:action', 'setShortcut', shortcutName, { ...shortcut, enabled: shortcutEnabled })
+            }}
+          >
+            Cancel
+          </span>
+        </>
+      ) : (
+        <>
+          {actionText} by pressing
+          <span
+            className='keyCommand'
+            onClick={() => {
+              setConfiguring(true)
+            }}
+          >
+            {[...modifierKeys, shortcutKey].map((displayKey, index, displayKeys) =>
+              index === displayKeys.length - 1 ? (
+                displayKey
+              ) : (
+                <span key={index}>
+                  {displayKey}
+                  <span style={{ padding: '0px 3px' }}>+</span>
+                </span>
+              )
+            )}
+          </span>
+        </>
+      )}
+    </span>
+  )
+}
 
 class Settings extends React.Component {
   constructor(props, context) {
@@ -34,35 +109,7 @@ class Settings extends React.Component {
   render() {
     const summonShortcut = this.store('main.shortcuts.summon')
     const platform = this.store('platform')
-    const { modifierKeys: summonModifierKeys, shortcutKey: summonShortcutKey } = getDisplayShortcut(
-      platform,
-      summonShortcut
-    )
-    hotkeys.unbind()
-    if (this.state.configureShortcut) {
-      // disable existing shortcut whilst configuring a new one
-      link.send('tray:action', 'setShortcut', 'summon', {
-        ...summonShortcut,
-        enabled: false
-      })
-      hotkeys('*', { capture: true }, (event) => {
-        event.preventDefault()
-        const modifierKeys = ['Meta', 'Alt', 'Control', 'Command']
-        const isModifierKey = modifierKeys.includes(event.key)
 
-        // ignore modifier key solo keypresses and disabled keys
-        if (!isModifierKey && isShortcutKey(event, platform)) {
-          this.setState({
-            configureShortcut: false
-          })
-          const shortcut = getShortcutFromKeyEvent(event)
-          // enable new shortcut
-          link.send('tray:action', 'setShortcut', 'summon', { ...shortcut, enabled: true })
-        }
-
-        return false
-      })
-    }
     return (
       <div className={'localSettings cardShow'}>
         <div className='localSettingsWrap'>
@@ -86,46 +133,12 @@ class Settings extends React.Component {
               </div>
             </div>
             <div className='signerPermissionDetails'>
-              <span>
-                {this.state.configureShortcut ? (
-                  <>
-                    Enter keyboard shortcut:
-                    <span
-                      className='keyCommand keyCommandCancel'
-                      onClick={() => {
-                        this.setState({
-                          configureShortcut: false
-                        })
-                      }}
-                    >
-                      Cancel
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    Summon Frame by pressing
-                    <span
-                      className='keyCommand'
-                      onClick={() => {
-                        this.setState({
-                          configureShortcut: true
-                        })
-                      }}
-                    >
-                      {[...summonModifierKeys, summonShortcutKey].map((displayKey, index, displayKeys) =>
-                        index === displayKeys.length - 1 ? (
-                          displayKey
-                        ) : (
-                          <span key={index}>
-                            {displayKey}
-                            <span style={{ padding: '0px 3px' }}>+</span>
-                          </span>
-                        )
-                      )}
-                    </span>
-                  </>
-                )}
-              </span>
+              <KeyboardShortcutConfigurator
+                actionText='Summon Frame'
+                shortcut={summonShortcut}
+                shortcutName='summon'
+                platform={platform}
+              />
             </div>
           </div>
           <div className='signerPermission localSetting' style={{ zIndex: 213 }}>
