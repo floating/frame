@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/electron'
+import React from 'react'
 import { createRoot } from 'react-dom/client'
 import Restore from 'react-restore'
 
@@ -15,7 +16,7 @@ document.addEventListener('drop', (e) => e.preventDefault())
 if (process.env.NODE_ENV !== 'development') {
   window.eval = global.eval = () => {
     throw new Error(`This app does not support window.eval()`)
-  }
+  } // eslint-disable-line
 }
 
 function AppComponent() {
@@ -23,11 +24,9 @@ function AppComponent() {
 }
 
 link.rpc('getState', (err, state) => {
-  if (err) return console.error('Could not get initial state from main.')
+  if (err) return console.error('Could not get initial state from main')
   const store = appStore(state)
-  link.send('tray:ready') // turn on api
-  link.send('tray:refreshMain')
-
+  window.store = store
   store.observer(() => {
     document.body.classList.remove('dark', 'light')
     document.body.classList.add('clip', store('main.colorway'))
@@ -35,19 +34,10 @@ link.rpc('getState', (err, state) => {
       document.body.classList.remove('clip')
     }, 100)
   })
-  store.observer(() => {
-    if (store('tray.open')) {
-      document.body.classList.remove('suspend')
-    } else {
-      document.body.classList.add('suspend')
-    }
-  })
-  const root = createRoot(document.getElementById('tray'))
-  const Tray = Restore.connect(AppComponent, store)
-  root.render(<Tray />)
+
+  const root = createRoot(document.getElementById('notify'))
+  const Notify = Restore.connect(AppComponent, store)
+  root.render(<Notify />)
 })
-// document.addEventListener('mouseover', e => link.send('tray:focus'))
-document.addEventListener('mouseout', (e) => {
-  if (e.clientX < 0) link.send('tray:mouseout')
-})
+
 document.addEventListener('contextmenu', (e) => link.send('*:contextmenu', e.clientX, e.clientY))
