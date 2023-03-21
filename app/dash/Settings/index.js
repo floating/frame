@@ -50,11 +50,8 @@ class Settings extends Component {
         const modifierKeys = ['Meta', 'Alt', 'Shift', 'Control', 'Command']
         const isModifierKey = modifierKeys.includes(event.key)
 
-        console.log(event.code)
-
         // ignore modifier key solo keypresses and disabled keys
         if (!isModifierKey && !isDisabledKey(event, platform)) {
-          console.log('registering keypress', event)
           this.setState({
             configureShortcut: false
           })
