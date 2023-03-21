@@ -11,7 +11,6 @@ class Settings extends React.Component {
     const latticeEndpoint = context.store('main.latticeSettings.endpointCustom')
     const latticeEndpointMode = context.store('main.latticeSettings.endpointMode')
     this.state = {
-      configureShortcut: false,
       latticeEndpoint,
       latticeEndpointMode,
       resetConfirm: false
