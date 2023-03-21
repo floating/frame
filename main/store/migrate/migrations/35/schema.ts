@@ -10,8 +10,10 @@ const muteUpdates = z.object({ migrateToPylon: z.boolean().default(false) })
 
 export const v35MuteSchema = LegacyMuteSchema.merge(muteUpdates).passthrough()
 
+export const v35PresetSchema = z.enum(['local', 'custom', 'poa'])
+
 const connectionUpdates = z.object({
-  current: z.enum(['local', 'custom', 'poa'])
+  current: v35PresetSchema
 })
 
 export const v35ConnectionSchema = LegacyConnectionSchema.merge(connectionUpdates).passthrough()
@@ -44,6 +46,7 @@ export const v35StateSchema = z
   })
   .passthrough()
 
+export type v35Preset = z.infer<typeof v35PresetSchema>
 export type v35Connection = z.infer<typeof v35ConnectionSchema>
 export type v35Chain = z.infer<typeof v35ChainSchema>
 export type v35State = z.infer<typeof v35StateSchema>

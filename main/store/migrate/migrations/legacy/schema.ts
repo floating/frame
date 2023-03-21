@@ -13,9 +13,11 @@ const ShortcutsSchema = z
   .passthrough()
   .default({})
 
+const LegacyPresetSchema = z.enum(['local', 'custom', 'infura', 'alchemy', 'poa'])
+
 export const LegacyConnectionSchema = z
   .object({
-    current: z.enum(['local', 'custom', 'infura', 'alchemy', 'poa']),
+    current: LegacyPresetSchema,
     custom: z.string().default('')
   })
   .passthrough()
@@ -69,5 +71,6 @@ export const LegacyStateSchema = z
   })
   .passthrough()
 
+export type LegacyPreset = z.infer<typeof LegacyPresetSchema>
 export type LegacyConnection = z.infer<typeof LegacyConnectionSchema>
 export type LegacyChain = z.infer<typeof LegacyChainSchema>

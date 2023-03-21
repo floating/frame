@@ -1,14 +1,7 @@
-import { z } from 'zod'
 import log from 'electron-log'
 
-import {
-  v35Chain,
-  v35ChainSchema,
-  v35ChainsSchema,
-  v35Connection,
-  v35MainSchema,
-  v35StateSchema
-} from './schema'
+import { v35Chain, v35Connection, v35Preset, v35State } from './schema'
+import { LegacyChain, LegacyConnection, LegacyPreset, LegacyStateSchema } from '../legacy/schema'
 
 const pylonChainIds = ['1', '5', '10', '137', '42161', '11155111']
 const retiredChainIds = ['3', '4', '42']
@@ -54,18 +47,23 @@ const StateSchema = v35StateSchema.merge(z.object({ main: MainSchema }))
 const migrate = (initial: unknown) => {
   let showMigrationWarning = false
 
-  const updateChain = (chain: v35Chain) => {
-    const removeRpcConnection = (connection: v35Connection) => {
-      const isServiceRpc = connection.current === 'infura' || connection.current === 'alchemy'
+  const updateChain = (chain: LegacyChain): v35Chain => {
+    const removeRpcConnection = (connection: LegacyConnection): v35Connection => {
+      const { current: currentPreset } = connection
+      const isValidPreset = (current: LegacyPreset): current is v35Preset => {
+        return current !== 'infura' && current !== 'alchemy'
+      }
+
+      const isServiceRpc = !isValidPreset(currentPreset)
 
       if (isServiceRpc) {
-        log.info(`Migration 35: removing ${connection.current} preset from chain ${chain.id}`)
+        log.info(`Migration 35: removing ${currentPreset} preset from chain ${chain.id}`)
         showMigrationWarning = true
       }
 
       return {
         ...connection,
-        current: isServiceRpc ? 'custom' : connection.current,
+        current: isServiceRpc ? 'custom' : currentPreset,
         custom: isServiceRpc ? '' : connection.custom
       }
     }
