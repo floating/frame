@@ -85,9 +85,7 @@ if (global?.navigator) {
   // navigator.keyboard.addEventListener('layoutchange', () => { keyboardLayout = layout })
 }
 
-export function isShortcutKey(keyEvent, platform) {
-  return keyEvent.code in shortcutKeyMap
-}
+export const isShortcutKey = (keyEvent) => keyEvent.code in shortcutKeyMap
 
 export const getDisplayShortcut = (platform, shortcut) => {
   const isMacOS = platform === 'darwin'

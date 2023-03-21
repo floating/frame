@@ -22,7 +22,7 @@ const KeyboardShortcutConfigurator = ({ actionText = '', platform, shortcut, sho
         const isModifierKey = allowedModifierKeys.includes(event.key)
 
         // ignore modifier key solo keypresses and disabled keys
-        if (!isModifierKey && isShortcutKey(event, platform)) {
+        if (!isModifierKey && isShortcutKey(event)) {
           setConfiguring(false)
           const newShortcut = getShortcutFromKeyEvent(event)
           // enable new shortcut
