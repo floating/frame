@@ -1,28 +1,29 @@
 import { z } from 'zod'
+import {
+  LegacyChainSchema,
+  LegacyConnectionSchema,
+  LegacyMainSchema,
+  LegacyMuteSchema
+} from '../legacy/schema'
 
-const v35MuteSchema = z
-  .object({
-    migrateToPylon: z.boolean().default(false)
-  })
-  .passthrough()
-  .default({})
+const muteUpdates = z.object({ migrateToPylon: z.boolean().default(false) })
 
-const v35ConnectionSchema = z
-  .object({
-    current: z.enum(['local', 'custom', 'infura', 'alchemy', 'poa']),
-    custom: z.string().default('')
-  })
-  .passthrough()
+export const v35MuteSchema = LegacyMuteSchema.merge(muteUpdates).passthrough()
 
-export const v35ChainSchema = z
-  .object({
-    id: z.coerce.number(),
-    connection: z.object({
-      primary: v35ConnectionSchema,
-      secondary: v35ConnectionSchema
-    })
+const connectionUpdates = z.object({
+  current: z.enum(['local', 'custom', 'poa'])
+})
+
+export const v35ConnectionSchema = LegacyConnectionSchema.merge(connectionUpdates).passthrough()
+
+const chainUpdates = z.object({
+  connection: z.object({
+    primary: v35ConnectionSchema,
+    secondary: v35ConnectionSchema
   })
-  .passthrough()
+})
+
+export const v35ChainSchema = LegacyChainSchema.merge(chainUpdates).passthrough()
 
 const EthereumChainsSchema = z.record(z.coerce.number(), v35ChainSchema)
 
@@ -30,12 +31,12 @@ export const v35ChainsSchema = z.object({
   ethereum: EthereumChainsSchema
 })
 
-export const v35MainSchema = z
-  .object({
-    networks: v35ChainsSchema,
-    mute: v35MuteSchema
-  })
-  .passthrough()
+const mainUpdates = z.object({
+  networks: v35ChainsSchema,
+  mute: v35MuteSchema
+})
+
+export const v35MainSchema = LegacyMainSchema.merge(mainUpdates).passthrough()
 
 export const v35StateSchema = z
   .object({
@@ -45,3 +46,4 @@ export const v35StateSchema = z
 
 export type v35Connection = z.infer<typeof v35ConnectionSchema>
 export type v35Chain = z.infer<typeof v35ChainSchema>
+export type v35State = z.infer<typeof v35StateSchema>
