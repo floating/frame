@@ -10,14 +10,14 @@ const MoveToPylon = () => {
       <Title>{'Chain preset updates'}</Title>
       <Body>
         <Item>
-          <div>We're retiring open access to our Infura & Alchemy endpoints.</div>
+          <div>We are retiring our open Infura and Alchemy endpoints.</div>
         </Item>
         <Item>
-          <div>Chains using our built-in Infura & Alchemy presets will be</div>
-          <div>migrated to our new JSON-RPC proxy called Pylon.</div>
+          <div>Chains that use our built-in Infura and Alchemy presets will</div>
+          <div>be migrated to our new JSON-RPC proxy called Pylon.</div>
         </Item>
         <Item>
-          <div>Pylon allows us to have more control over the quality and</div>
+          <div>Pylon gives us greater control over the quality and </div>
           <div>privacy of the default connections we offer in Frame.</div>
         </Item>
         <Item>
