@@ -905,19 +905,6 @@ const migrations = {
     })
 
     return initial
-  },
-  35: (initial) => {
-    const summonShortcutEnabled = initial.main.shortcuts.altSlash
-
-    initial.main.shortcuts = {
-      summon: {
-        modifierKeys: ['Alt'],
-        shortcutKey: '/',
-        enabled: summonShortcutEnabled
-      }
-    }
-
-    return initial
   }
 }
 
