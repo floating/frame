@@ -11,29 +11,49 @@ if (global?.navigator) {
 
 export function isDisabledKey(keyEvent, platform) {
   const disabledKeys = ['IntlBackslash', 'IntlRo', 'IntlYen', 'Pause', 'NumpadEnter', 'AltRight']
-  
+
   if (platform === 'darwin') {
     disabledKeys.push('NumLock')
-  } else {
-
   }
   if (platform === 'win32') {
     disabledKeys.push('F12')
-    const disableBackslash = ['#', 'ç'].includes(keyboardLayout?.get('Backslash'))
-    if (disableBackslash) {
-      disabledKeys.push('Backslash')
-    }
+    const punctuationKeys = [
+      { code: 'Backslash', key: '\\' },
+      { code: 'Backquote', key: '`' },
+      { code: 'Minus', key: '-' },
+      { code: 'Equal', key: '=' },
+      { code: 'BracketLeft', key: '[' },
+      { code: 'BracketRight', key: ']' },
+      { code: 'Semicolon', key: ';' },
+      { code: 'Quote', key: "'" },
+      { code: 'Comma', key: ',' },
+      { code: 'Period', key: '.' },
+      { code: 'Slash', key: '/' }
+    ]
+    punctuationKeys.forEach(({ code, key }) => {
+      if (keyEvent.key !== key && keyEvent.code === code) {
+        disabledKeys.push(code)
+      }
+    })
   }
   if (platform === 'linux') {
-    disabledKeys.push('BracketLeft', 'BracketRight', 'Quote', 'Backslash', 'Minus', 'Backquote', 'Slash', 'Period', 'Comma')
+    disabledKeys.push(
+      'BracketLeft',
+      'BracketRight',
+      'Quote',
+      'Backslash',
+      'Minus',
+      'Backquote',
+      'Slash',
+      'Period',
+      'Comma'
+    )
     const disableSemicolon = keyEvent.key !== ';' && keyEvent.code === 'Semicolon'
     if (disableSemicolon) {
       disabledKeys.push('Semicolon')
     }
   }
 
-  console.log(disabledKeys, disabledKeys.includes(keyEvent.code), keyEvent.code)
-  
   return disabledKeys.includes(keyEvent.code)
 }
 
