@@ -36,6 +36,7 @@ const isMacOS = process.platform === 'darwin'
 let tray: Tray
 let dash: Dash
 let onboard: Onboard
+let notify: Notify
 let mouseTimeout: NodeJS.Timeout
 let glide = false
 
@@ -76,6 +77,16 @@ const topRight = (window: BrowserWindow) => {
   return {
     x: Math.floor(screenSize.x + screenSize.width - windowSize[0]),
     y: screenSize.y
+  }
+}
+
+const center = (window: BrowserWindow) => {
+  const area = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
+  const screenSize = area
+  const windowSize = window.getSize()
+  return {
+    x: Math.floor(screenSize.x + screenSize.width / 2 - windowSize[0] / 2),
+    y: Math.floor(screenSize.y + screenSize.height / 2 - windowSize[1] / 2)
   }
 }
 
@@ -212,15 +223,23 @@ export class Tray {
       }
 
       const showOnboardingWindow = !store('main.mute.onboardingWindow')
+      const showNotifyWindow = !store('main.mute.migrateToPylon')
+
       if (store('windows.dash.showing') || showOnboardingWindow) {
         setTimeout(() => {
           store.setDash({ showing: true })
         }, 300)
       }
 
-      if (showOnboardingWindow) {
+      if (showOnboardingWindow && !showNotifyWindow) {
         setTimeout(() => {
           store.setOnboard({ showing: true })
+        }, 600)
+      }
+
+      if (showNotifyWindow) {
+        setTimeout(() => {
+          store.setNotify({ showing: true })
         }, 600)
       }
     }
@@ -472,6 +491,84 @@ class Onboard {
   }
 }
 
+class Notify {
+  constructor() {
+    const notifyOpts: Electron.BrowserWindowConstructorOptions = {
+      x: 0,
+      y: 0,
+      width: 0,
+      height: 0,
+      titleBarStyle: 'hidden',
+      trafficLightPosition: { x: 10, y: 9 },
+      icon: path.join(__dirname, './AppIcon.png')
+    }
+
+    if (isMacOS) {
+      notifyOpts.type = 'panel'
+    }
+
+    initWindow('notify', notifyOpts)
+  }
+
+  public hide() {
+    if (windows.notify && windows.notify.isVisible()) {
+      windows.notify.hide()
+    }
+  }
+
+  public show() {
+    if (!tray.isReady()) {
+      return
+    }
+
+    const cleanupHandler = () => windows.notify?.off('close', closeHandler)
+
+    const closeHandler = () => {
+      store.mutePylonMigrationNotice()
+      store.migrateToPylonConnections()
+      if (!store('main.mute.onboardingWindow')) {
+        store.setNotify({ showing: false })
+        store.setOnboard({ showing: true })
+      }
+      windows.tray.focus()
+
+      electronApp.off('before-quit', cleanupHandler)
+      delete windows.notify
+    }
+
+    setTimeout(() => {
+      electronApp.on('before-quit', cleanupHandler)
+      windows.notify.once('close', closeHandler)
+
+      // const area = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
+      const height = 512
+      const maxWidth = Math.floor(height * 1.24)
+      const targetWidth = 600 // area.width - 460
+      const width = targetWidth > maxWidth ? maxWidth : targetWidth
+      windows.notify.setMinimumSize(600, 300)
+      windows.notify.setSize(width, height)
+      const pos = center(windows.notify)
+      let x = pos.x - (trayWidth - 10) / 2
+      if (store('windows.dash.showing')) {
+        const pos = topRight(windows.notify)
+        x = pos.x - 880
+      }
+
+      windows.notify.setPosition(x, pos.y)
+      // windows.onboard.setAlwaysOnTop(true)
+      windows.notify.show()
+      windows.notify.focus()
+      windows.notify.setVisibleOnAllWorkspaces(false, {
+        visibleOnFullScreen: true,
+        skipTransformProcessType: true
+      })
+      if (devToolsEnabled) {
+        windows.notify.webContents.openDevTools()
+      }
+    }, 10)
+  }
+}
+
 ipcMain.on('tray:quit', () => electronApp.quit())
 ipcMain.on('tray:mouseout', () => {
   if (glide && !(windows.dash && windows.dash.isVisible())) {
@@ -527,6 +624,10 @@ const init = () => {
     onboard = new Onboard()
   }
 
+  if (!store('main.mute.migrateToPylon')) {
+    notify = new Notify()
+  }
+
   // data change events
   store.observer(() => {
     if (store('windows.dash.showing')) {
@@ -549,6 +650,19 @@ const init = () => {
       windows.tray.focus()
     }
   }, 'windows:onboard')
+
+  store.observer(() => {
+    if (store('windows.notify.showing')) {
+      if (!windows.notify) {
+        notify = new Notify()
+      }
+
+      notify.show()
+    } else if (notify) {
+      notify.hide()
+      windows.tray.focus()
+    }
+  }, 'windows:notify')
 
   store.observer(() => broadcast('permissions', JSON.stringify(store('permissions'))))
   store.observer(() => {

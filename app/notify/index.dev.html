@@ -1,0 +1,25 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="
+        script-src 'strict-dynamic' 'nonce-6dd477b2-5b83-4ca7-ace0-b1a397fb1612' http://localhost:1234 'unsafe-eval';
+        base-uri 'self';
+        connect-src *;
+        img-src *;
+        frame-src 'none';
+        style-src 'self' http://localhost:1234 'unsafe-inline';
+        object-src 'none';
+      "
+    />
+    <title>Notify</title>
+    <link rel="stylesheet" href="../../resources/base.styl" type="text/css" />
+    <link rel="stylesheet" href="./App/index.styl" type="text/css" />
+  </head>
+  <body>
+    <div class="frameOverlay"></div>
+    <div id="notify"></div>
+    <script type="module" src="./index.js" nonce="6dd477b2-5b83-4ca7-ace0-b1a397fb1612"></script>
+  </body>
+</html>
