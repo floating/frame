@@ -13,7 +13,7 @@ const migrate = (initial: unknown) => {
     state.main.shortcuts = {
       summon: {
         modifierKeys: ['Alt'],
-        shortcutKey: '/',
+        shortcutKey: 'Slash',
         enabled: summonShortcutEnabled
       }
     }
