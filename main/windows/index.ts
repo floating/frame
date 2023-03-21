@@ -541,7 +541,7 @@ class Notify {
       windows.notify.once('close', closeHandler)
 
       // const area = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
-      const height = 500
+      const height = 512
       const maxWidth = Math.floor(height * 1.24)
       const targetWidth = 600 // area.width - 460
       const width = targetWidth > maxWidth ? maxWidth : targetWidth

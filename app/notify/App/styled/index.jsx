@@ -20,7 +20,7 @@ export const Container = styled.div`
   bottom: 0;
   left: 0;
   border-top: 1px solid var(--ghostX);
-  overflow: scroll;
+  overflow-y: scroll;
 `
 
 export const Item = styled.div`
@@ -36,13 +36,13 @@ export const Body = styled.div`
   animation: cardShow 400ms linear both;
   animation-delay: 200ms;
   font-weight: 300;
-  font-size: 16px;
+  font-size: 15px;
   padding: 8px;
   margin: auto;
   text-align: center;
   ${Item} {
     padding-bottom: 20px;
-    line-height: 24px;
+    line-height: 20px;
   }
   ${Item}:last-child {
     padding-bottom: 0px;
