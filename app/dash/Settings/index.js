@@ -87,29 +87,43 @@ class Settings extends Component {
             </div>
             <div className='signerPermissionDetails'>
               <span>
-                Summon Frame by pressing
                 {this.state.configureShortcut ? (
-                  <></>
+                  <>
+                    Enter keyboard shortcut:
+                    <span
+                      className='keyCommand keyCommandCancel'
+                      onClick={() => {
+                        this.setState({
+                          configureShortcut: false
+                        })
+                      }}
+                    >
+                      Cancel
+                    </span>
+                  </>
                 ) : (
-                  <span
-                    className='keyCommand'
-                    onClick={() => {
-                      this.setState({
-                        configureShortcut: true
-                      })
-                    }}
-                  >
-                    {[...summonModifierKeys, summonShortcutKey].map((displayKey, index, displayKeys) =>
-                      index === displayKeys.length - 1 ? (
-                        displayKey
-                      ) : (
-                        <span key={index}>
-                          {displayKey}
-                          <span style={{ padding: '0px 3px' }}>+</span>
-                        </span>
-                      )
-                    )}
-                  </span>
+                  <>
+                    Summon Frame by pressing
+                    <span
+                      className='keyCommand'
+                      onClick={() => {
+                        this.setState({
+                          configureShortcut: true
+                        })
+                      }}
+                    >
+                      {[...summonModifierKeys, summonShortcutKey].map((displayKey, index, displayKeys) =>
+                        index === displayKeys.length - 1 ? (
+                          displayKey
+                        ) : (
+                          <span key={index}>
+                            {displayKey}
+                            <span style={{ padding: '0px 3px' }}>+</span>
+                          </span>
+                        )
+                      )}
+                    </span>
+                  </>
                 )}
               </span>
             </div>
