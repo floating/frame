@@ -23,27 +23,7 @@ export const Container = styled.div`
   overflow: scroll;
 `
 
-export const SlideScroller = styled.div`
-  position: relative;
-  height: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 16px 0px 16px 0px;
-  box-sizing: border-box;
-`
-
-export const Slide = styled.div`
-  position: relative;
-  width: 100%;
-  z-index: 700;
-  max-height: 100%;
-  box-sizing: border-box;
-  overflow-y: scroll;
-  overflow-x: hidden;
-`
-
-export const SlideItem = styled.div`
+export const Item = styled.div`
   display: 'flex';
   flex-direction: column;
   div {
@@ -51,7 +31,7 @@ export const SlideItem = styled.div`
   }
 `
 
-export const SlideBody = styled.div`
+export const Body = styled.div`
   max-width: 500px;
   animation: cardShow 400ms linear both;
   animation-delay: 200ms;
@@ -60,16 +40,16 @@ export const SlideBody = styled.div`
   padding: 8px;
   margin: auto;
   text-align: center;
-  ${SlideItem} {
+  ${Item} {
     padding-bottom: 20px;
     line-height: 24px;
   }
-  ${SlideItem}:last-child {
+  ${Item}:last-child {
     padding-bottom: 0px;
   }
 `
 
-export const SlideTitle = styled.div`
+export const Title = styled.div`
   font-size: 24px;
   font-weight: 400;
   animation: cardShow 400ms linear both;
@@ -136,27 +116,3 @@ export const PylonConfirmButtonSub = styled(PylonConfirmButton)`
   border-radius: 52px;
   box-shadow: 0px 1px 2px var(--ghostX);
 `
-
-// const cardShow = keyframes`
-//   0% { opacity: 0; }
-//   15.82% {
-//     opacity: 0;
-//     transform: matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -9.026, 0, 0, 1);
-//   }
-//   21.02% {
-//     transform: matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -19.292, 0, 0, 1);
-//   }
-//   35.34% {
-//     transform: matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -3.681, 0, 0, 1);
-//   }
-//   49.55% {
-//     opacity: 1;
-//     transform: matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 2.594, 0, 0, 1);
-//   }
-//   78.18% {
-//     transform: matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -0.018, 0, 0, 1);
-//   }
-//   100% {
-//     transform: matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-//   }
-// `

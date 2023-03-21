@@ -2,33 +2,26 @@ import React, { useEffect } from 'react'
 
 import link from '../../../../../resources/link'
 
-import {
-  SlideBody,
-  SlideItem,
-  SlideTitle,
-  PylonConfirm,
-  PylonConfirmButton,
-  PylonConfirmButtonSub
-} from '../../styled'
+import { Body, Item, Title, PylonConfirm, PylonConfirmButton, PylonConfirmButtonSub } from '../../styled'
 
 const MoveToPylon = () => {
   return (
     <>
-      <SlideTitle>{'Chain preset updates'}</SlideTitle>
-      <SlideBody>
-        <SlideItem>
+      <Title>{'Chain preset updates'}</Title>
+      <Body>
+        <Item>
           <div>Chains using our built-in Infura & Alchemy presets will</div>
           <div>be migrated to our JSON-RPC proxy called Pylon.</div>
-        </SlideItem>
-        <SlideItem>
+        </Item>
+        <Item>
           <div>Pylon allows us to have more control over the quality and</div>
           <div>privacy of the default connections we offer in Frame.</div>
-        </SlideItem>
-        <SlideItem>
+        </Item>
+        <Item>
           <div>To continue using Infura or Alchemy directly, visit them</div>
           <div>to create an account and use the "custom" preset.</div>
-        </SlideItem>
-      </SlideBody>
+        </Item>
+      </Body>
       <PylonConfirm>
         <PylonConfirmButton
           onClick={() => {

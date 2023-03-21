@@ -2,8 +2,8 @@ import React, { useState } from 'react'
 
 import MoveToPylon from './MoveToPylon'
 
-const Modules = ({ platform }) => {
+const Notification = ({ platform }) => {
   return <MoveToPylon />
 }
 
-export default Modules
+export default Notification

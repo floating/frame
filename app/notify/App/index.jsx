@@ -5,7 +5,7 @@ import Native from '../../../resources/Native'
 
 import { Onboard, Container } from './styled'
 
-import Slides from './Slides'
+import Notification from './Notification'
 
 class App extends React.Component {
   render() {
@@ -14,7 +14,7 @@ class App extends React.Component {
         <Native />
         <div className='frameOverlay' />
         <Container>
-          <Slides platform={this.store('platform')} />
+          <Notification platform={this.store('platform')} />
         </Container>
       </Onboard>
     )

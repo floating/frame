@@ -223,19 +223,20 @@ export class Tray {
       }
 
       const showOnboardingWindow = !store('main.mute.onboardingWindow')
+      const showNotifyWindow = !store('main.mute.migrateToPylon')
+
       if (store('windows.dash.showing') || showOnboardingWindow) {
         setTimeout(() => {
           store.setDash({ showing: true })
         }, 300)
       }
 
-      if (showOnboardingWindow) {
+      if (showOnboardingWindow && !showNotifyWindow) {
         setTimeout(() => {
           store.setOnboard({ showing: true })
         }, 600)
       }
 
-      const showNotifyWindow = !store('main.mute.migrateToPylon')
       if (showNotifyWindow) {
         setTimeout(() => {
           store.setNotify({ showing: true })
@@ -492,7 +493,7 @@ class Onboard {
 
 class Notify {
   constructor() {
-    initWindow('notify', {
+    const notifyOpts: Electron.BrowserWindowConstructorOptions = {
       x: 0,
       y: 0,
       width: 0,
@@ -500,7 +501,13 @@ class Notify {
       titleBarStyle: 'hidden',
       trafficLightPosition: { x: 10, y: 9 },
       icon: path.join(__dirname, './AppIcon.png')
-    })
+    }
+
+    if (isMacOS) {
+      notifyOpts.type = 'panel'
+    }
+
+    initWindow('notify', notifyOpts)
   }
 
   public hide() {
@@ -519,6 +526,10 @@ class Notify {
     const closeHandler = () => {
       store.mutePylonMigrationNotice()
       store.migrateToPylonConnections()
+      if (!store('main.mute.onboardingWindow')) {
+        store.setNotify({ showing: false })
+        store.setOnboard({ showing: true })
+      }
       windows.tray.focus()
 
       electronApp.off('before-quit', cleanupHandler)
@@ -537,9 +548,12 @@ class Notify {
       windows.notify.setMinimumSize(600, 300)
       windows.notify.setSize(width, height)
       const pos = center(windows.notify)
+      let x = pos.x - (trayWidth - 10) / 2
+      if (store('windows.dash.showing')) {
+        const pos = topRight(windows.notify)
+        x = pos.x - 880
+      }
 
-      // const x = (pos.x * 2 - width * 2 - 810) / 2
-      const x = pos.x - trayWidth / 2
       windows.notify.setPosition(x, pos.y)
       // windows.onboard.setAlwaysOnTop(true)
       windows.notify.show()
