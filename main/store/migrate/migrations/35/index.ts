@@ -49,7 +49,7 @@ const MainSchema = v35MainSchema
   )
   .passthrough()
 
-const StateSchema = v35StateSchema.merge(z.object({ main: MainSchema }))
+const StateSchema = v35StateSchema.merge(z.object({ main: MainSchema })).passthrough()
 
 const migrate = (initial: unknown) => {
   let showMigrationWarning = false
