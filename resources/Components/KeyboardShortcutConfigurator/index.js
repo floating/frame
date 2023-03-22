@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import hotkeys from 'hotkeys-js'
 
 import link from '../../../resources/link'
@@ -25,7 +25,7 @@ const KeyboardShortcutConfigurator = ({ actionText = '', platform, shortcut, sho
         if (!isModifierKey && isShortcutKey(event)) {
           setConfiguring(false)
           const newShortcut = getShortcutFromKeyEvent(event)
-          // enable new shortcut
+          // enable the new shortcut
           link.send('tray:action', 'setShortcut', shortcutName, { ...newShortcut, enabled: true })
           setShortcutEnabled(true)
         }
@@ -37,46 +37,54 @@ const KeyboardShortcutConfigurator = ({ actionText = '', platform, shortcut, sho
 
   const { modifierKeys, shortcutKey } = getDisplayShortcut(platform, shortcut)
 
-  return (
-    <span>
-      {configuring ? (
-        <>
-          Enter keyboard shortcut:
-          <span
-            className='keyCommand keyCommandCancel'
-            onClick={() => {
-              setConfiguring(false)
-              // revert shortcut enabled state
-              link.send('tray:action', 'setShortcut', shortcutName, { ...shortcut, enabled: shortcutEnabled })
-            }}
-          >
-            Cancel
-          </span>
-        </>
-      ) : (
-        <>
-          {actionText} by pressing
-          <span
-            className='keyCommand'
-            onClick={() => {
-              setConfiguring(true)
-            }}
-          >
-            {[...modifierKeys, shortcutKey].map((displayKey, index, displayKeys) =>
-              index === displayKeys.length - 1 ? (
-                displayKey
-              ) : (
-                <span key={index}>
-                  {displayKey}
-                  <span style={{ padding: '0px 3px' }}>+</span>
-                </span>
-              )
-            )}
-          </span>
-        </>
-      )}
-    </span>
-  )
+  const EnterShortcut = () => {
+    const labelId = `shortcut-${shortcutName.toLowerCase()}-configure`
+    return (
+      <>
+        <label id={labelId}>Enter keyboard shortcut:</label>
+        <span
+          className='keyCommand keyCommandCancel'
+          aria-labelledby={labelId}
+          onClick={() => {
+            setConfiguring(false)
+            // revert shortcut enabled state
+            link.send('tray:action', 'setShortcut', shortcutName, { ...shortcut, enabled: shortcutEnabled })
+          }}
+        >
+          Cancel
+        </span>
+      </>
+    )
+  }
+
+  const DisplayShortcut = () => {
+    const labelId = `shortcut-${shortcutName.toLowerCase()}-display`
+    return (
+      <>
+        <label id={labelId}>{actionText} by pressing</label>
+        <span
+          className='keyCommand'
+          aria-labelledby={labelId}
+          onClick={() => {
+            setConfiguring(true)
+          }}
+        >
+          {[...modifierKeys, shortcutKey].map((displayKey, index, displayKeys) =>
+            index === displayKeys.length - 1 ? (
+              displayKey
+            ) : (
+              <span key={index}>
+                {displayKey}
+                <span style={{ padding: '0px 3px' }}>+</span>
+              </span>
+            )
+          )}
+        </span>
+      </>
+    )
+  }
+
+  return <span>{configuring ? <EnterShortcut /> : <DisplayShortcut />}</span>
 }
 
 export default KeyboardShortcutConfigurator
