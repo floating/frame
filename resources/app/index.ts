@@ -107,16 +107,12 @@ function getModifierKey(key: ModifierKey, platform: Platform) {
     return isMacOS ? 'Option' : 'Alt'
   }
 
-  if (key === 'Control') {
+  if (key === 'Control' || key === 'CommandOrCtrl') {
     return isMacOS ? 'Control' : 'Ctrl'
   }
 
   if (key === 'Meta' || key === 'Super') {
     return metaKeyMap[platform]
-  }
-
-  if (key === 'CommandOrCtrl') {
-    return isMacOS ? 'Command' : 'Ctrl'
   }
 
   return key
