@@ -7,6 +7,10 @@ const v35MuteSchema = z
   .passthrough()
   .default({})
 
+export const v35ShortcutsSchema = z.object({
+  altSlash: z.boolean().default(false)
+})
+
 const v35ConnectionSchema = z
   .object({
     current: z.enum(['local', 'custom', 'infura', 'alchemy', 'poa']),
@@ -33,7 +37,8 @@ export const v35ChainsSchema = z.object({
 export const v35MainSchema = z
   .object({
     networks: v35ChainsSchema,
-    mute: v35MuteSchema
+    mute: v35MuteSchema,
+    shortcuts: v35ShortcutsSchema
   })
   .passthrough()
 
