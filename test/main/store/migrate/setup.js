@@ -6,6 +6,7 @@ export const createState = (version = 0) => ({
     accounts: {},
     balances: {},
     mute: {},
+    shortcuts: {},
     tokens: { known: {} }
   }
 })
