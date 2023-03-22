@@ -94,7 +94,7 @@ type M = Main & {
 }
 
 const mainState: M = {
-  _version: main('_version', 36),
+  _version: main('_version', 37),
   instanceId: main('instanceId', generateUuid()),
   colorway: main('colorway', 'dark'),
   colorwayPrimary: {
@@ -119,7 +119,12 @@ const mainState: M = {
     signerCompatibilityWarning: main('mute.signerCompatibilityWarning', false)
   },
   shortcuts: {
-    altSlash: main('shortcuts.altSlash', true)
+    summon: main('shortcuts.summon', {
+      modifierKeys: ['Alt'],
+      shortcutKey: 'Slash',
+      enabled: true,
+      configuring: false
+    })
   },
   // showUSDValue: main('showUSDValue', true),
   launch: main('launch', false),
