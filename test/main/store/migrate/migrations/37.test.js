@@ -22,7 +22,8 @@ it('should update the summon shortcut when enabled', () => {
     summon: {
       modifierKeys: ['Alt'],
       shortcutKey: 'Slash',
-      enabled: true
+      enabled: true,
+      configuring: false
     }
   })
 })
@@ -36,7 +37,8 @@ it('should update the summon shortcut when disabled', () => {
     summon: {
       modifierKeys: ['Alt'],
       shortcutKey: 'Slash',
-      enabled: false
+      enabled: false,
+      configuring: false
     }
   })
 })

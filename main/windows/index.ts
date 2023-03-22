@@ -561,7 +561,7 @@ const init = () => {
       if (summonShortcutAccelerator) {
         globalShortcut.unregister(summonShortcutAccelerator)
       }
-      if (summonShortcut.enabled) {
+      if (summonShortcut.enabled && !summonShortcut.configuring) {
         globalShortcut.register(accelerator, () => {
           app.toggle()
           if (store('windows.onboard.showing')) {

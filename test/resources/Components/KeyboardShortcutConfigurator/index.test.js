@@ -34,7 +34,8 @@ it('should render an existing shortcut', () => {
       shortcut={{
         modifierKeys: ['Alt'],
         shortcutKey: 'Slash',
-        enabled: true
+        enabled: true,
+        configuring: false
       }}
     />
   )
@@ -52,7 +53,8 @@ it('should render an existing Meta key shortcut on MacOS', () => {
       shortcut={{
         modifierKeys: ['Meta'],
         shortcutKey: 'Slash',
-        enabled: true
+        enabled: true,
+        configuring: false
       }}
     />
   )
@@ -88,7 +90,8 @@ it('should render an existing Meta key shortcut on Windows', () => {
       shortcut={{
         modifierKeys: ['Meta'],
         shortcutKey: 'Slash',
-        enabled: true
+        enabled: true,
+        configuring: false
       }}
     />
   )
@@ -107,7 +110,8 @@ describe('when configuring', () => {
         shortcut={{
           modifierKeys: ['Meta'],
           shortcutKey: 'Slash',
-          enabled: true
+          enabled: true,
+          configuring: false
         }}
       />
     )
@@ -118,7 +122,7 @@ describe('when configuring', () => {
     expect(enterShortcutPrompt).toBeDefined()
   })
 
-  it('should disable the existing shortcut', async () => {
+  it('should set configuring on the existing shortcut', async () => {
     const { user } = render(
       <KeyboardShortcutConfigurator
         actionText='Test this component'
@@ -127,7 +131,8 @@ describe('when configuring', () => {
         shortcut={{
           modifierKeys: ['Meta'],
           shortcutKey: 'Slash',
-          enabled: true
+          enabled: true,
+          configuring: false
         }}
       />
     )
@@ -135,7 +140,8 @@ describe('when configuring', () => {
     const displayedShortcut = screen.getByLabelText('Test this component by pressing')
     await user.click(displayedShortcut)
     expect(link.send).toHaveBeenCalledWith('tray:action', 'setShortcut', 'Test', {
-      enabled: false,
+      enabled: true,
+      configuring: true,
       modifierKeys: ['Meta'],
       shortcutKey: 'Slash'
     })
@@ -151,7 +157,8 @@ describe('when configuring', () => {
           shortcut={{
             modifierKeys: ['Meta'],
             shortcutKey: 'Slash',
-            enabled: true
+            enabled: true,
+            configuring: false
           }}
         />
       )
@@ -165,6 +172,7 @@ describe('when configuring', () => {
 
       expect(link.send).toHaveBeenLastCalledWith('tray:action', 'setShortcut', 'Test', {
         enabled: true,
+        configuring: false,
         modifierKeys: ['Alt'],
         shortcutKey: 'KeyT'
       })
@@ -179,7 +187,8 @@ describe('when configuring', () => {
           shortcut={{
             modifierKeys: ['Meta'],
             shortcutKey: 'Slash',
-            enabled: false
+            enabled: false,
+            configuring: false
           }}
         />
       )
@@ -193,6 +202,7 @@ describe('when configuring', () => {
 
       expect(link.send).toHaveBeenLastCalledWith('tray:action', 'setShortcut', 'Test', {
         enabled: true,
+        configuring: false,
         modifierKeys: ['Alt'],
         shortcutKey: 'KeyT'
       })
@@ -209,7 +219,8 @@ describe('when configuring', () => {
           shortcut={{
             modifierKeys: ['Meta'],
             shortcutKey: 'Slash',
-            enabled: true
+            enabled: true,
+            configuring: false
           }}
         />
       )
@@ -223,7 +234,8 @@ describe('when configuring', () => {
 
       expect(link.send).toHaveBeenCalledTimes(1)
       expect(link.send).toHaveBeenLastCalledWith('tray:action', 'setShortcut', 'Test', {
-        enabled: false,
+        enabled: true,
+        configuring: true,
         modifierKeys: ['Meta'],
         shortcutKey: 'Slash'
       })
@@ -240,7 +252,8 @@ describe('when configuring', () => {
           shortcut={{
             modifierKeys: ['Meta'],
             shortcutKey: 'Slash',
-            enabled: true
+            enabled: true,
+            configuring: false
           }}
         />
       )
@@ -253,7 +266,7 @@ describe('when configuring', () => {
       expect(displayedShortcut.textContent).toBe('Meta+/')
     })
 
-    it('should re-enable the existing shortcut', async () => {
+    it('should unset configuring on the existing shortcut', async () => {
       const { user } = render(
         <KeyboardShortcutConfigurator
           actionText='Test this component'
@@ -262,7 +275,8 @@ describe('when configuring', () => {
           shortcut={{
             modifierKeys: ['Meta'],
             shortcutKey: 'Slash',
-            enabled: true
+            enabled: true,
+            configuring: false
           }}
         />
       )
@@ -274,32 +288,7 @@ describe('when configuring', () => {
       expect(link.send).toBeCalledTimes(2)
       expect(link.send).toHaveBeenLastCalledWith('tray:action', 'setShortcut', 'Test', {
         enabled: true,
-        modifierKeys: ['Meta'],
-        shortcutKey: 'Slash'
-      })
-    })
-
-    it('should not re-enable the existing shortcut if the shortcut was previously disabled', async () => {
-      const { user } = render(
-        <KeyboardShortcutConfigurator
-          actionText='Test this component'
-          platform='linux'
-          shortcutName='Test'
-          shortcut={{
-            modifierKeys: ['Meta'],
-            shortcutKey: 'Slash',
-            enabled: false
-          }}
-        />
-      )
-
-      let displayedShortcut = screen.getByLabelText('Test this component by pressing')
-      await user.click(displayedShortcut)
-      const cancelButton = screen.getByText('Cancel')
-      await user.click(cancelButton)
-      expect(link.send).toBeCalledTimes(2)
-      expect(link.send).toHaveBeenLastCalledWith('tray:action', 'setShortcut', 'Test', {
-        enabled: false,
+        configuring: false,
         modifierKeys: ['Meta'],
         shortcutKey: 'Slash'
       })

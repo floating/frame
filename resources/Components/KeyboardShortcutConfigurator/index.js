@@ -6,15 +6,14 @@ import { getShortcutFromKeyEvent, getDisplayShortcut, isShortcutKey } from '../.
 
 const KeyboardShortcutConfigurator = ({ actionText = '', platform, shortcut, shortcutName }) => {
   const [configuring, setConfiguring] = useState(false)
-  const [shortcutEnabled, setShortcutEnabled] = useState(shortcut.enabled)
 
   useEffect(() => {
     hotkeys.unbind()
     if (configuring) {
-      // disable existing shortcut whilst configuring a new one
+      // set configuring so existing shortcut keypresses can be temporarily ignored
       link.send('tray:action', 'setShortcut', shortcutName, {
         ...shortcut,
-        enabled: false
+        configuring: true
       })
       hotkeys('*', { capture: true }, (event) => {
         event.preventDefault()
@@ -26,8 +25,11 @@ const KeyboardShortcutConfigurator = ({ actionText = '', platform, shortcut, sho
           setConfiguring(false)
           const newShortcut = getShortcutFromKeyEvent(event)
           // enable the new shortcut
-          link.send('tray:action', 'setShortcut', shortcutName, { ...newShortcut, enabled: true })
-          setShortcutEnabled(true)
+          link.send('tray:action', 'setShortcut', shortcutName, {
+            ...newShortcut,
+            configuring: false,
+            enabled: true
+          })
         }
 
         return false
@@ -48,7 +50,10 @@ const KeyboardShortcutConfigurator = ({ actionText = '', platform, shortcut, sho
           onClick={() => {
             setConfiguring(false)
             // revert shortcut enabled state
-            link.send('tray:action', 'setShortcut', shortcutName, { ...shortcut, enabled: shortcutEnabled })
+            link.send('tray:action', 'setShortcut', shortcutName, {
+              ...shortcut,
+              configuring: false
+            })
           }}
         >
           Cancel

@@ -5,7 +5,8 @@ const v37ShortcutsSchema = z.object({
   summon: z.object({
     modifierKeys: z.array(z.enum(['Alt', 'Ctrl', 'Meta', 'Cmd'])),
     shortcutKey: z.string(),
-    enabled: z.boolean()
+    enabled: z.boolean(),
+    configuring: z.boolean()
   })
 })
 

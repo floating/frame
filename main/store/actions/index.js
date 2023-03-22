@@ -223,9 +223,10 @@ module.exports = {
   },
   setShortcut: (u, name, shortcut) => {
     u('main.shortcuts', name, (existingShortcut = {}) => ({
-      modifierKeys: shortcut.modifierKeys ?? existingShortcut.modifierKeys,
-      shortcutKey: shortcut.shortcutKey ?? existingShortcut.shortcutKey,
-      enabled: shortcut.enabled ?? existingShortcut.enabled ?? false
+      modifierKeys: shortcut.modifierKeys || existingShortcut.modifierKeys,
+      shortcutKey: shortcut.shortcutKey || existingShortcut.shortcutKey,
+      configuring: shortcut.configuring ?? existingShortcut.configuring,
+      enabled: shortcut.enabled ?? existingShortcut.enabled
     }))
   },
   setAutohide: (u, v) => {

@@ -122,7 +122,8 @@ const mainState: M = {
     summon: main('shortcuts.summon', {
       modifierKeys: ['Alt'],
       shortcutKey: 'Slash',
-      enabled: true
+      enabled: true,
+      configuring: false
     })
   },
   // showUSDValue: main('showUSDValue', true),
