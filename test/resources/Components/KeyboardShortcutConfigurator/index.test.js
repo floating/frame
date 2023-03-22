@@ -102,7 +102,7 @@ it('should render an existing Meta key shortcut on Windows', () => {
 
 describe('when configuring', () => {
   it('should prompt to enter a shortcut', async () => {
-    const { user } = render(
+    render(
       <KeyboardShortcutConfigurator
         actionText='Test this component'
         platform='linux'
@@ -111,13 +111,11 @@ describe('when configuring', () => {
           modifierKeys: ['Meta'],
           shortcutKey: 'Slash',
           enabled: true,
-          configuring: false
+          configuring: true
         }}
       />
     )
 
-    const displayedShortcut = screen.getByLabelText('Test this component by pressing')
-    await user.click(displayedShortcut)
     const enterShortcutPrompt = screen.getByText('Enter keyboard shortcut:')
     expect(enterShortcutPrompt).toBeDefined()
   })
@@ -158,13 +156,10 @@ describe('when configuring', () => {
             modifierKeys: ['Meta'],
             shortcutKey: 'Slash',
             enabled: true,
-            configuring: false
+            configuring: true
           }}
         />
       )
-
-      let displayedShortcut = screen.getByLabelText('Test this component by pressing')
-      await user.click(displayedShortcut)
 
       const enterShortcutPrompt = screen.getByText('Enter keyboard shortcut:')
       expect(enterShortcutPrompt).toBeDefined()
@@ -188,13 +183,10 @@ describe('when configuring', () => {
             modifierKeys: ['Meta'],
             shortcutKey: 'Slash',
             enabled: false,
-            configuring: false
+            configuring: true
           }}
         />
       )
-
-      let displayedShortcut = screen.getByLabelText('Test this component by pressing')
-      await user.click(displayedShortcut)
 
       const enterShortcutPrompt = screen.getByText('Enter keyboard shortcut:')
       expect(enterShortcutPrompt).toBeDefined()
@@ -220,25 +212,16 @@ describe('when configuring', () => {
             modifierKeys: ['Meta'],
             shortcutKey: 'Slash',
             enabled: true,
-            configuring: false
+            configuring: true
           }}
         />
       )
-
-      let displayedShortcut = screen.getByLabelText('Test this component by pressing')
-      await user.click(displayedShortcut)
 
       const enterShortcutPrompt = screen.getByText('Enter keyboard shortcut:')
       expect(enterShortcutPrompt).toBeDefined()
       await user.keyboard('{Shift>};{/Shift}')
 
-      expect(link.send).toHaveBeenCalledTimes(1)
-      expect(link.send).toHaveBeenLastCalledWith('tray:action', 'setShortcut', 'Test', {
-        enabled: true,
-        configuring: true,
-        modifierKeys: ['Meta'],
-        shortcutKey: 'Slash'
-      })
+      expect(link.send).not.toHaveBeenCalled()
     })
   })
 
@@ -253,17 +236,20 @@ describe('when configuring', () => {
             modifierKeys: ['Meta'],
             shortcutKey: 'Slash',
             enabled: true,
-            configuring: false
+            configuring: true
           }}
         />
       )
 
-      let displayedShortcut = screen.getByLabelText('Test this component by pressing')
-      await user.click(displayedShortcut)
       const cancelButton = screen.getByText('Cancel')
       await user.click(cancelButton)
-      displayedShortcut = screen.getByLabelText('Test this component by pressing')
-      expect(displayedShortcut.textContent).toBe('Meta+/')
+      expect(link.send).toHaveBeenCalledTimes(1)
+      expect(link.send).toHaveBeenLastCalledWith('tray:action', 'setShortcut', 'Test', {
+        enabled: true,
+        configuring: false,
+        modifierKeys: ['Meta'],
+        shortcutKey: 'Slash'
+      })
     })
 
     it('should unset configuring on the existing shortcut', async () => {
@@ -276,16 +262,14 @@ describe('when configuring', () => {
             modifierKeys: ['Meta'],
             shortcutKey: 'Slash',
             enabled: true,
-            configuring: false
+            configuring: true
           }}
         />
       )
 
-      let displayedShortcut = screen.getByLabelText('Test this component by pressing')
-      await user.click(displayedShortcut)
       const cancelButton = screen.getByText('Cancel')
       await user.click(cancelButton)
-      expect(link.send).toBeCalledTimes(2)
+      expect(link.send).toBeCalledTimes(1)
       expect(link.send).toHaveBeenLastCalledWith('tray:action', 'setShortcut', 'Test', {
         enabled: true,
         configuring: false,

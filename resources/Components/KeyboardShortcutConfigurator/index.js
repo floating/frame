@@ -1,20 +1,15 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import hotkeys from 'hotkeys-js'
 
 import link from '../../../resources/link'
 import { getShortcutFromKeyEvent, getDisplayShortcut, isShortcutKey } from '../../../resources/app'
 
 const KeyboardShortcutConfigurator = ({ actionText = '', platform, shortcut, shortcutName }) => {
-  const [configuring, setConfiguring] = useState(false)
+  const { modifierKeys, shortcutKey } = getDisplayShortcut(platform, shortcut)
 
-  useEffect(() => {
-    hotkeys.unbind()
-    if (configuring) {
-      // set configuring so existing shortcut keypresses can be temporarily ignored
-      link.send('tray:action', 'setShortcut', shortcutName, {
-        ...shortcut,
-        configuring: true
-      })
+  const EnterShortcut = () => {
+    useEffect(() => {
+      hotkeys.unbind()
       hotkeys('*', { capture: true }, (event) => {
         event.preventDefault()
         const allowedModifierKeys = ['Meta', 'Alt', 'Control', 'Command']
@@ -22,7 +17,6 @@ const KeyboardShortcutConfigurator = ({ actionText = '', platform, shortcut, sho
 
         // ignore modifier key solo keypresses and disabled keys
         if (!isModifierKey && isShortcutKey(event)) {
-          setConfiguring(false)
           const newShortcut = getShortcutFromKeyEvent(event)
           // enable the new shortcut
           link.send('tray:action', 'setShortcut', shortcutName, {
@@ -34,12 +28,8 @@ const KeyboardShortcutConfigurator = ({ actionText = '', platform, shortcut, sho
 
         return false
       })
-    }
-  }, [configuring])
+    })
 
-  const { modifierKeys, shortcutKey } = getDisplayShortcut(platform, shortcut)
-
-  const EnterShortcut = () => {
     const labelId = `shortcut-${shortcutName.toLowerCase()}-configure`
     return (
       <>
@@ -48,7 +38,6 @@ const KeyboardShortcutConfigurator = ({ actionText = '', platform, shortcut, sho
           className='keyCommand keyCommandCancel'
           aria-labelledby={labelId}
           onClick={() => {
-            setConfiguring(false)
             // revert shortcut enabled state
             link.send('tray:action', 'setShortcut', shortcutName, {
               ...shortcut,
@@ -64,6 +53,7 @@ const KeyboardShortcutConfigurator = ({ actionText = '', platform, shortcut, sho
 
   const DisplayShortcut = () => {
     const labelId = `shortcut-${shortcutName.toLowerCase()}-display`
+    hotkeys.unbind()
     return (
       <>
         <label id={labelId}>{actionText} by pressing</label>
@@ -71,7 +61,10 @@ const KeyboardShortcutConfigurator = ({ actionText = '', platform, shortcut, sho
           className='keyCommand'
           aria-labelledby={labelId}
           onClick={() => {
-            setConfiguring(true)
+            link.send('tray:action', 'setShortcut', shortcutName, {
+              ...shortcut,
+              configuring: true
+            })
           }}
         >
           {[...modifierKeys, shortcutKey].map((displayKey, index, displayKeys) =>
@@ -89,7 +82,7 @@ const KeyboardShortcutConfigurator = ({ actionText = '', platform, shortcut, sho
     )
   }
 
-  return <span>{configuring ? <EnterShortcut /> : <DisplayShortcut />}</span>
+  return <span>{shortcut.configuring ? <EnterShortcut /> : <DisplayShortcut />}</span>
 }
 
 export default KeyboardShortcutConfigurator
