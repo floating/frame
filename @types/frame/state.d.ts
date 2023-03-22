@@ -1,10 +1,5 @@
 type HexAmount = string
 
-enum Colorway {
-  light = 'light',
-  dark = 'dark'
-}
-
 type InventoryAsset = {
   name: string
   [field: string]: any
