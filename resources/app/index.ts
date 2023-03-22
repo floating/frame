@@ -1,4 +1,4 @@
-import type { Shortcut } from '../../main/store/state/types/shortcuts'
+import type { Shortcut, ShortcutKey } from '../../main/store/state/types/shortcuts'
 
 type Platform = 'darwin' | 'win32' | 'linux'
 
@@ -8,7 +8,7 @@ const metaKeyMap: Record<Platform, string> = {
   linux: 'Meta'
 }
 
-const shortcutKeyMap: Record<string, string> = {
+const shortcutKeyMap: Record<ShortcutKey, string> = {
   Comma: ',',
   Period: '.',
   Forwardslash: '/',
