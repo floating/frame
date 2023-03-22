@@ -141,6 +141,95 @@ describe('when configuring', () => {
     })
   })
 
+  describe('and a valid shortcut is entered', () => {
+    it('should set the new shortcut', async () => {
+      const { user } = render(
+        <KeyboardShortcutConfigurator
+          actionText='Test this component'
+          platform='linux'
+          shortcutName='Test'
+          shortcut={{
+            modifierKeys: ['Meta'],
+            shortcutKey: 'Slash',
+            enabled: true
+          }}
+        />
+      )
+
+      let displayedShortcut = screen.getByLabelText('Test this component by pressing')
+      await user.click(displayedShortcut)
+
+      const enterShortcutPrompt = screen.getByText('Enter keyboard shortcut:')
+      expect(enterShortcutPrompt).toBeDefined()
+      await user.keyboard('{Alt>}T{/Alt}')
+
+      expect(link.send).toHaveBeenLastCalledWith('tray:action', 'setShortcut', 'Test', {
+        enabled: true,
+        modifierKeys: ['Alt'],
+        shortcutKey: 'KeyT'
+      })
+    })
+
+    it('should enable a new shortcut when the previous one was disabled', async () => {
+      const { user } = render(
+        <KeyboardShortcutConfigurator
+          actionText='Test this component'
+          platform='linux'
+          shortcutName='Test'
+          shortcut={{
+            modifierKeys: ['Meta'],
+            shortcutKey: 'Slash',
+            enabled: false
+          }}
+        />
+      )
+
+      let displayedShortcut = screen.getByLabelText('Test this component by pressing')
+      await user.click(displayedShortcut)
+
+      const enterShortcutPrompt = screen.getByText('Enter keyboard shortcut:')
+      expect(enterShortcutPrompt).toBeDefined()
+      await user.keyboard('{Alt>}T{/Alt}')
+
+      expect(link.send).toHaveBeenLastCalledWith('tray:action', 'setShortcut', 'Test', {
+        enabled: true,
+        modifierKeys: ['Alt'],
+        shortcutKey: 'KeyT'
+      })
+    })
+  })
+
+  describe('and an invalid shortcut is entered', () => {
+    it('should not set a new shortcut', async () => {
+      const { user } = render(
+        <KeyboardShortcutConfigurator
+          actionText='Test this component'
+          platform='linux'
+          shortcutName='Test'
+          shortcut={{
+            modifierKeys: ['Meta'],
+            shortcutKey: 'Slash',
+            enabled: true
+          }}
+        />
+      )
+
+      let displayedShortcut = screen.getByLabelText('Test this component by pressing')
+      await user.click(displayedShortcut)
+
+      const enterShortcutPrompt = screen.getByText('Enter keyboard shortcut:')
+      expect(enterShortcutPrompt).toBeDefined()
+      await user.keyboard('{Shift>};{/Shift}')
+
+      expect(link.send).toHaveBeenCalledTimes(1)
+      expect(link.send).toHaveBeenLastCalledWith('tray:action', 'setShortcut', 'Test', {
+        enabled: false,
+        modifierKeys: ['Meta'],
+        shortcutKey: 'Slash'
+      })
+    })
+  })
+
   describe('and the cancel button is clicked', () => {
     it('should revert to displaying the existing shortcut', async () => {
       const { user } = render(
