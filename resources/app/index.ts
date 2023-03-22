@@ -85,10 +85,10 @@ const shortcutKeyMap: Record<ShortcutKey, string> = {
   Numpad0: 'num0'
 }
 
+// TODO: use correct navigator and keyboard layout type here
 let keyboardLayout: any
 
 if (global?.navigator) {
-  // TODO: use correct navigator type here
   // @ts-ignore
   navigator.keyboard.getLayoutMap().then((layout: any) => {
     keyboardLayout = layout
@@ -119,9 +119,12 @@ function getModifierKey(key: ModifierKey, platform: Platform) {
 }
 
 export const getDisplayShortcut = (platform: Platform, shortcut: Shortcut) => {
-  const shortcutKey = (keyboardLayout?.get(shortcut.shortcutKey) || shortcut.shortcutKey).toUpperCase()
+  const key = (keyboardLayout?.get(shortcut.shortcutKey) as ShortcutKey) || shortcut.shortcutKey
+
+  const shortcutKey =
+    key.length === 1 && key.charCodeAt(0) >= 65 && key.charCodeAt(0) <= 122 ? key.toLocaleUpperCase() : key
   const modifierKeys = shortcut.modifierKeys.map((key) =>
-    getModifierKey(keyboardLayout?.get(key) || key, platform)
+    getModifierKey((keyboardLayout?.get(key) as ModifierKey) || key, platform)
   )
 
   return { modifierKeys, shortcutKey }
