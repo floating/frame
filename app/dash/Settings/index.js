@@ -3,7 +3,7 @@ import Restore from 'react-restore'
 
 import link from '../../../resources/link'
 import Dropdown from '../../../resources/Components/Dropdown'
-import { getSummonShortcut } from '../../../resources/app'
+import KeyboardShortcutConfigurator from '../../../resources/Components/KeyboardShortcutConfigurator'
 
 class Settings extends Component {
   constructor(props, context) {
@@ -30,7 +30,9 @@ class Settings extends Component {
   }
 
   render() {
-    const { modifierKey, summonKey } = getSummonShortcut(this.store('platform'))
+    const summonShortcut = this.store('main.shortcuts.summon')
+    const platform = this.store('platform')
+
     return (
       <div className={'localSettings cardShow'}>
         <div className='localSettingsWrap'>
@@ -39,26 +41,27 @@ class Settings extends Component {
               <div className='signerPermissionSetting'>Summon Shortcut</div>
               <div
                 className={
-                  this.store('main.shortcuts.altSlash')
+                  summonShortcut.enabled
                     ? 'signerPermissionToggle signerPermissionToggleOn'
                     : 'signerPermissionToggle'
                 }
-                onClick={(_) =>
-                  link.send('tray:action', 'setAltSpace', !this.store('main.shortcuts.altSlash'))
-                }
+                onClick={() => {
+                  link.send('tray:action', 'setShortcut', 'summon', {
+                    ...summonShortcut,
+                    enabled: !summonShortcut.enabled
+                  })
+                }}
               >
                 <div className='signerPermissionToggleSwitch' />
               </div>
             </div>
             <div className='signerPermissionDetails'>
-              <span>
-                Summon Frame by pressing{' '}
-                <span className='keyCommand'>
-                  {modifierKey}
-                  <span style={{ padding: '0px 3px' }}>+</span>
-                  {summonKey}
-                </span>
-              </span>
+              <KeyboardShortcutConfigurator
+                actionText='Summon Frame'
+                shortcut={summonShortcut}
+                shortcutName='summon'
+                platform={platform}
+              />
             </div>
           </div>
           <div className='signerPermission localSetting' style={{ zIndex: 213 }}>
