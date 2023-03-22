@@ -1,4 +1,4 @@
-import type { Shortcut, ShortcutKey } from '../../main/store/state/types/shortcuts'
+import type { Shortcut, ShortcutKey, ModifierKey } from '../../main/store/state/types/shortcuts'
 
 type Platform = 'darwin' | 'win32' | 'linux'
 
@@ -100,26 +100,33 @@ if (global?.navigator) {
 
 export const isShortcutKey = (keyEvent: KeyboardEvent) => keyEvent.code in shortcutKeyMap
 
-export const getDisplayShortcut = (platform: Platform, shortcut: Shortcut) => {
+function getModifierKey(key: ModifierKey, platform: Platform) {
   const isMacOS = platform === 'darwin'
+
+  if (key === 'Alt') {
+    return isMacOS ? 'Option' : 'Alt'
+  }
+
+  if (key === 'Control') {
+    return isMacOS ? 'Control' : 'Ctrl'
+  }
+
+  if (key === 'Meta' || key === 'Super') {
+    return metaKeyMap[platform]
+  }
+
+  if (key === 'CommandOrCtrl') {
+    return isMacOS ? 'Command' : 'Ctrl'
+  }
+
+  return key
+}
+
+export const getDisplayShortcut = (platform: Platform, shortcut: Shortcut) => {
   const shortcutKey = (keyboardLayout?.get(shortcut.shortcutKey) || shortcut.shortcutKey).toUpperCase()
-  const modifierKeys = shortcut.modifierKeys.map((key) => {
-    const modifierKey = keyboardLayout?.get(key) || key
-
-    if (modifierKey === 'Alt') {
-      return isMacOS ? 'Option' : 'Alt'
-    }
-
-    if (modifierKey === 'Meta' || modifierKey === 'Super') {
-      return metaKeyMap[platform]
-    }
-
-    if (modifierKey === 'CommandOrCtrl') {
-      return isMacOS ? 'Command' : 'Ctrl'
-    }
-
-    return modifierKey
-  })
+  const modifierKeys = shortcut.modifierKeys.map((key) =>
+    getModifierKey(keyboardLayout?.get(key) || key, platform)
+  )
 
   return { modifierKeys, shortcutKey }
 }
