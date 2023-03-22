@@ -1,4 +1,14 @@
-const shortcutKeyMap = {
+import type { Shortcut } from '../../main/store/state/types/shortcuts'
+
+type Platform = 'darwin' | 'win32' | 'linux'
+
+const metaKeyMap: Record<Platform, string> = {
+  darwin: 'Command',
+  win32: 'Win',
+  linux: 'Meta'
+}
+
+const shortcutKeyMap: Record<string, string> = {
   Comma: ',',
   Period: '.',
   Forwardslash: '/',
@@ -74,10 +84,13 @@ const shortcutKeyMap = {
   Numpad1: 'num1',
   Numpad0: 'num0'
 }
-let keyboardLayout
+
+let keyboardLayout: any
 
 if (global?.navigator) {
-  navigator.keyboard.getLayoutMap().then((layout) => {
+  // TODO: use correct navigator type here
+  // @ts-ignore
+  navigator.keyboard.getLayoutMap().then((layout: any) => {
     keyboardLayout = layout
   })
 
@@ -85,40 +98,39 @@ if (global?.navigator) {
   // navigator.keyboard.addEventListener('layoutchange', () => { keyboardLayout = layout })
 }
 
-export const isShortcutKey = (keyEvent) => keyEvent.code in shortcutKeyMap
+export const isShortcutKey = (keyEvent: KeyboardEvent) => keyEvent.code in shortcutKeyMap
 
-export const getDisplayShortcut = (platform, shortcut) => {
+export const getDisplayShortcut = (platform: Platform, shortcut: Shortcut) => {
   const isMacOS = platform === 'darwin'
   const shortcutKey = (keyboardLayout?.get(shortcut.shortcutKey) || shortcut.shortcutKey).toUpperCase()
-  const modifierKeys = shortcut.modifierKeys
-    .map((modifierKey) => keyboardLayout?.get(modifierKey) || modifierKey)
-    .map((modifierKey) => {
-      if (modifierKey === 'Alt') {
-        return isMacOS ? 'Option' : 'Alt'
-      }
-      if (modifierKey === 'Meta' || modifierKey === 'Super') {
-        const keyMap = {
-          darwin: 'Command',
-          win32: 'Win'
-        }
-        return keyMap[platform] || 'Meta'
-      }
-      if (modifierKey === 'CommandOrCtrl') {
-        return isMacOS ? 'Command' : 'Ctrl'
-      }
-      return modifierKey
-    })
+  const modifierKeys = shortcut.modifierKeys.map((key) => {
+    const modifierKey = keyboardLayout?.get(key) || key
+
+    if (modifierKey === 'Alt') {
+      return isMacOS ? 'Option' : 'Alt'
+    }
+
+    if (modifierKey === 'Meta' || modifierKey === 'Super') {
+      return metaKeyMap[platform]
+    }
+
+    if (modifierKey === 'CommandOrCtrl') {
+      return isMacOS ? 'Command' : 'Ctrl'
+    }
+
+    return modifierKey
+  })
 
   return { modifierKeys, shortcutKey }
 }
 
-export const getAcceleratorFromShortcut = ({ modifierKeys, shortcutKey }) => {
+export const getAcceleratorFromShortcut = ({ modifierKeys, shortcutKey }: Shortcut) => {
   const acceleratorBits = [...modifierKeys, shortcutKeyMap[shortcutKey] || shortcutKey]
 
   return acceleratorBits.join('+')
 }
 
-export const getShortcutFromKeyEvent = (e) => {
+export const getShortcutFromKeyEvent = (e: KeyboardEvent) => {
   const modifierKeys = []
   if (e.altKey) {
     modifierKeys.push('Alt')

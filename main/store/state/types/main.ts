@@ -7,6 +7,11 @@ import { ColorwayPrimarySchema } from './colors'
 import { DappSchema } from './dapp'
 import { OriginSchema } from './origin'
 import { PermissionSchema } from './permission'
+import { ShortcutSchema } from './shortcuts'
+
+const ShortcutsSchema = z.object({
+  summon: ShortcutSchema
+})
 
 const UpdaterPreferencesSchema = z.object({
   dontRemind: z.array(z.string())
@@ -61,6 +66,7 @@ export const MainSchema = z.object({
   mute: z.record(notificationTypes, z.boolean()),
   colorway: z.enum(['light', 'dark']),
   colorwayPrimary: ColorwayPrimarySchema,
+  shortcuts: ShortcutsSchema,
   updater: UpdaterPreferencesSchema,
   ...PreferencesSchema
 })
