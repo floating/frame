@@ -6,10 +6,10 @@ import { getShortcutFromKeyEvent, getDisplayShortcut, isShortcutKey } from '../.
 
 const KeyboardShortcutConfigurator = ({ actionText = '', platform, shortcut, shortcutName }) => {
   const { modifierKeys, shortcutKey } = getDisplayShortcut(platform, shortcut)
+  hotkeys.unbind()
 
   const EnterShortcut = () => {
     useEffect(() => {
-      hotkeys.unbind()
       hotkeys('*', { capture: true }, (event) => {
         event.preventDefault()
         const allowedModifierKeys = ['Meta', 'Alt', 'Control', 'Command']
@@ -53,7 +53,6 @@ const KeyboardShortcutConfigurator = ({ actionText = '', platform, shortcut, sho
 
   const DisplayShortcut = () => {
     const labelId = `shortcut-${shortcutName.toLowerCase()}-display`
-    hotkeys.unbind()
     return (
       <>
         <label id={labelId}>{actionText} by pressing</label>
