@@ -11,6 +11,7 @@ import {
 } from '@ethereumjs/util'
 import log from 'electron-log'
 import BN from 'bignumber.js'
+import isUtf8 from 'isutf8'
 import { v5 as uuidv5 } from 'uuid'
 import { isHexString } from 'ethers/lib/utils'
 
@@ -20,6 +21,16 @@ import { usesBaseFee, TransactionData, GasFeesSource } from '../../resources/dom
 import { getAddress } from '../../resources/utils'
 
 const permission = (date: number, method: string) => ({ parentCapability: method, date })
+
+export function decodeMessage(rawMessage: string) {
+  if (isHexString(rawMessage)) {
+    const buff = Buffer.from(stripHexPrefix(rawMessage), 'hex')
+    return buff.length === 32 || !isUtf8(buff) ? rawMessage : buff.toString('utf8')
+  }
+
+  // replace all multiple line returns with just one to prevent excess space in message
+  return rawMessage.replaceAll(/[\n\r]+/g, '\n')
+}
 
 export function checkExistingNonceGas(tx: TransactionData) {
   const { from, nonce } = tx

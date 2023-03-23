@@ -38,7 +38,8 @@ import {
   getSignedAddress,
   requestPermissions,
   resError,
-  hasPermission
+  hasPermission,
+  decodeMessage
 } from './helpers'
 
 import {
@@ -50,6 +51,7 @@ import {
   EIP2612TypedData,
   LegacyTypedData,
   PermitSignatureRequest,
+  SignatureRequest,
   TypedData,
   TypedMessage
 } from '../accounts/types'
@@ -591,8 +593,12 @@ export class Provider extends EventEmitter {
   }
 
   sign(payload: RPCRequestPayload, res: RPCRequestCallback) {
-    const [from] = payload.params || []
+    const [from, message] = payload.params || []
     const currentAccount = accounts.current()
+
+    if (!message) {
+      return resError('Sign request requires a message param', payload, res)
+    }
 
     if (!currentAccount || !hasAddress(currentAccount, from)) {
       return resError('Sign request is not from currently selected account', payload, res)
@@ -605,8 +611,11 @@ export class Provider extends EventEmitter {
       type: 'sign',
       payload,
       account: (currentAccount as FrameAccount).getAccounts()[0],
-      origin: payload._origin
-    } as const
+      origin: payload._origin,
+      data: {
+        decodedMessage: decodeMessage(message)
+      }
+    } as SignatureRequest
 
     const _res = (data: any) => {
       if (this.handlers[req.handlerId]) this.handlers[req.handlerId](data)

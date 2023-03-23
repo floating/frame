@@ -24,7 +24,7 @@ export const isTypedMessageSignatureRequest = (request: AccountRequest): request
   ['signTypedData', 'signErc20Permit'].includes(request.type)
 
 export const accountViewTitles: Record<RequestType, string> = {
-  sign: 'Sign Mesage',
+  sign: 'Sign Message',
   signTypedData: 'Sign Data',
   signErc20Permit: 'Sign Token Permit',
   transaction: 'Sign Transaction',
