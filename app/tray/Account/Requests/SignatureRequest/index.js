@@ -1,8 +1,8 @@
-import React from 'react'
-import Restore from 'react-restore'
-import { isHexString } from '@ethersproject/bytes'
-import { stripHexPrefix } from './../../../../../resources/utils'
+import React, { useRef } from 'react'
 import isUtf8 from 'isutf8'
+import { isHexString } from '@ethersproject/bytes'
+
+import { stripHexPrefix } from './../../../../../resources/utils'
 
 function decodeMessage(rawMessage) {
   if (isHexString(rawMessage)) {
@@ -14,62 +14,56 @@ function decodeMessage(rawMessage) {
   return rawMessage.replaceAll(/[\n\r]+/g, '\n')
 }
 
-class TransactionRequest extends React.Component {
-  constructor(...args) {
-    super(...args)
-    this.state = { allowInput: false, dataView: false }
+function getRequestClass(status) {
+  let requestClass = 'signerRequest'
+  if (status === 'success') requestClass += ' signerRequestSuccess'
+  if (status === 'declined') requestClass += ' signerRequestDeclined'
+  if (status === 'pending') requestClass += ' signerRequestPending'
+  if (status === 'error') requestClass += ' signerRequestError'
 
-    const props = args[0] || {}
-
-    this.signRefs = [React.createRef(), React.createRef()]
-
-    setTimeout(() => {
-      this.setState({ allowInput: true })
-    }, props.signingDelay || 1500)
-  }
-
-  renderMessage(message) {
-    let showMore = false
-    if (this.signRefs[0].current && this.signRefs[1].current) {
-      const inner = this.signRefs[1].current.clientHeight
-      const wrap = this.signRefs[0].current.clientHeight + this.signRefs[0].current.scrollTop
-      if (inner > wrap) showMore = true
-    }
-    return (
-      <div ref={this.signRefs[0]} className='signValue'>
-        <div ref={this.signRefs[1]} className='signValueInner'>
-          {message}
-        </div>
-        {showMore ? <div className='signValueMore'>scroll to see more</div> : null}
-      </div>
-    )
-  }
-
-  render() {
-    const type = this.props.req.type
-    const status = this.props.req.status
-    const payload = this.props.req.payload
-
-    const message = decodeMessage(payload.params[1])
-
-    let requestClass = 'signerRequest'
-    if (status === 'success') requestClass += ' signerRequestSuccess'
-    if (status === 'declined') requestClass += ' signerRequestDeclined'
-    if (status === 'pending') requestClass += ' signerRequestPending'
-    if (status === 'error') requestClass += ' signerRequestError'
-
-    return (
-      <div key={this.props.req.id || this.props.req.handlerId} className={requestClass}>
-        {type === 'sign' ? (
-          <div className='approveRequest'>
-            <div className='approveTransactionPayload'>{this.renderMessage(message)}</div>
-          </div>
-        ) : (
-          <div className='unknownType'>{'Unknown: ' + this.props.req.type}</div>
-        )}
-      </div>
-    )
-  }
+  return requestClass
 }
 
-export default Restore.connect(TransactionRequest)
+const Message = ({ text }) => {
+  const outerRef = useRef(null)
+  const innerRef = useRef(null)
+
+  let showMore = false
+  if (outerRef.current && this.innerRef.current) {
+    const inner = innerRef.current.clientHeight
+    const wrap = outerRef.current.clientHeight + outerRef.current.scrollTop
+    if (inner > wrap) showMore = true
+  }
+
+  return (
+    <div ref={outerRef} className='signValue'>
+      <div ref={innerRef} className='signValueInner'>
+        {text}
+      </div>
+      {showMore ? <div className='signValueMore'>scroll to see more</div> : null}
+    </div>
+  )
+}
+
+const MessageToSign = ({ req }) => {
+  const { id, handlerId, type, status, payload } = req
+
+  const message = decodeMessage(payload.params[1])
+  const requestClass = getRequestClass(status)
+
+  return (
+    <div key={id || handlerId} className={requestClass}>
+      {type === 'sign' ? (
+        <div className='approveRequest'>
+          <div className='approveTransactionPayload'>
+            <Message text={message} />
+          </div>
+        </div>
+      ) : (
+        <div className='unknownType'>{'Unknown: ' + type}</div>
+      )}
+    </div>
+  )
+}
+
+export default MessageToSign
