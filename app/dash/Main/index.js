@@ -22,6 +22,8 @@ class Settings extends React.Component {
   }
 
   appInfo() {
+    // TODO: move this to global passed over IPC
+    // eslint-disable-next-line
     const appVersion = require('../../../package.json').version
     const instanceId = this.store('main.instanceId')
     return (
@@ -94,23 +96,6 @@ class Settings extends React.Component {
       </div>
     )
   }
-
-  //
-  // latticeFocus () {
-  //   if (this.state.latticeEndpoint === this.customMessage) this.setState({ secondaryCustom: '' })
-  // }
-  //
-  // latticeBlur () {
-  //   if (this.state.secondaryCustom === '') this.setState({ secondaryCustom: this.customMessage })
-  // }
-
-  // customSecondaryFocus () {
-  //   if (this.state.secondaryCustom === this.customMessage) this.setState({ secondaryCustom: '' })
-  // }
-
-  // customSecondaryBlur () {
-  //   if (this.state.secondaryCustom === '') this.setState({ secondaryCustom: this.customMessage })
-  // }
 
   customPrimaryFocus() {
     if (this.state.primaryCustom === this.customMessage) this.setState({ primaryCustom: '' })
@@ -394,46 +379,3 @@ class Settings extends React.Component {
 }
 
 export default Restore.connect(Settings)
-
-// <div className='signerPermission localSetting'>
-//   <div>{provider.url}</div>
-//   <div className={this.store('node.provider') ? 'nodeProviderStatus nodeProviderConnected' : 'nodeProviderStatus'}>
-//     {this.store('node.provider') ? 'connected' : 'disconnected'}
-//   </div>
-// </div>
-
-// <div className='signerPermission localSetting' onClick={_ => this.store.runLocalNode()}>
-//   <div className='signerPermissionSetting'>{'Run Local Node'}</div>
-//   <div className={this.store('local.node.run') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'}>
-//     <div className='signerPermissionToggleSwitch' />
-//   </div>
-// </div>
-
-/* <div className='signerPermission localSetting'>
-  <div className={this.store('main..connection.local.on') ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
-    <div className='connectionOptionToggle'>
-      <div className='signerPermissionSetting'>Local</div>
-      <div className={this.store('main..connection.local.on') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onClick={_ => link.send('tray:action', 'toggleConnection', 'primary')}>
-        <div className='signerPermissionToggleSwitch' />
-      </div>
-    </div>
-    <div className='connectionOptionDetails'>
-      <div className='connectionOptionDetailsInset'>
-        {this.status(this.store('main..connection.local'))}
-        <div className='signerOptionSetWrap'>
-          <div className={this.state.localShake.custom ? 'signerOptionSet headShake' : 'signerOptionSet'} onClick={() => this.localShake('custom')}>
-            <div className='signerOptionSetButton' />
-            {this.store('main..connection.local.type') ? (
-              <div className='signerOptionSetText'>{this.store('main..connection.local.type')}</div>
-            ) : (_ => {
-              const status = this.store('main..connection.local.status')
-              if (status === 'not found' || status === 'loading' || status === 'disconnected') return <div>scanning...</div>
-              return ''
-            })()}
-            <div className='signerOptionSetButton' />
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div> */
