@@ -2,13 +2,16 @@
 // node-fetch instead of electron-fetch
 const electron = process.versions.electron
 
-// @ts-ignore
-delete process.versions.electron
+type Mutable<T> = {
+  -readonly [key in keyof T]?: T[key]
+}
+
+const versions = process.versions as Mutable<NodeJS.ProcessVersions>
+delete versions.electron
 
 import nebula from 'nebula'
 
-// @ts-ignore
-process.versions.electron = electron
+versions.electron = electron
 
 import EthereumProvider from 'ethereum-provider'
 import proxyConnection from '../provider/proxy'
