@@ -22,7 +22,7 @@ export interface Coin {
   symbol: string
   name: string
   asset_platform_id: string
-  platforms?: {}
+  platforms?: Record<string, never> | { [platformId: string]: string }
 }
 
 export type PlatformId = string
