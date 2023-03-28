@@ -1,6 +1,4 @@
-/* eslint-disable react/no-find-dom-node */
 import React from 'react'
-import ReactDOM from 'react-dom'
 import Restore from 'react-restore'
 
 import AccountController from './AccountController'
@@ -15,12 +13,6 @@ import link from '../../../resources/link'
 
 let firstScroll = true
 
-// function filterMatches (text = '', fields) {
-//   const filter = text.toLowerCase()
-
-//   return fields.some(field => (field || '').toLowerCase().includes(filter))
-// }
-
 class AccountSelector extends React.Component {
   constructor(props, context) {
     super(props, context)
@@ -30,7 +22,8 @@ class AccountSelector extends React.Component {
   }
 
   reportScroll() {
-    this.store.initialScrollPos(ReactDOM.findDOMNode(this.scroll).scrollTop)
+    const ref = this.scroll.current
+    this.store.initialScrollPos(ref?.scrollTop)
   }
 
   resetScroll() {
