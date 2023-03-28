@@ -3,8 +3,8 @@ name: Compile and run unit tests
 on:
   push:
     branches:
-      - 'beta.*'
       - 'develop'
+  pull_request:
 
 jobs:
   build:
