@@ -5,14 +5,18 @@ import checkForUpdates from '../../../main/updater/manualCheck'
 import packageInfo from '../../../package.json'
 
 // response for current release
-const githubReleasesResponse = [{
-  html_url: 'https://frame.sh/the-next-great-release',
-  prerelease: false,
-  tag_name: packageInfo.version
-}]
+const githubReleasesResponse = [
+  {
+    html_url: 'https://frame.sh/the-next-great-release',
+    prerelease: false,
+    tag_name: packageInfo.version
+  }
+]
 
 const currentVersion = packageInfo.version
-const nextVersion = currentVersion.slice(0, currentVersion.length - 1) + (parseInt(currentVersion[currentVersion.length -1]) + 1)
+const nextVersion =
+  currentVersion.slice(0, currentVersion.length - 1) +
+  (parseInt(currentVersion[currentVersion.length - 1]) + 1)
 
 beforeAll(() => {
   jest.useRealTimers()
@@ -84,8 +88,6 @@ it('handles an error parsing the JSON response', async () => {
   return expect(checkForUpdates()).rejects.toBeDefined()
 })
 
-function mockApiResponse (status, body, headers = { 'content-type': 'application/json' }) {
-  nock('https://api.github.com')
-    .get('/repos/frame-labs/frame-canary/releases')
-    .reply(status, body, headers)
+function mockApiResponse(status, body, headers = { 'content-type': 'application/json' }) {
+  nock('https://api.github.com').get('/repos/floating/frame/releases').reply(status, body, headers)
 }

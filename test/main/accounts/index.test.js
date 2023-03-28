@@ -1,22 +1,27 @@
 import log from 'electron-log'
-import { addHexPrefix } from 'ethereumjs-util'
+import { addHexPrefix, intToHex } from '@ethereumjs/util'
+import BigNumber from 'bignumber.js'
+
 import store from '../../../main/store'
 import provider from '../../../main/provider'
 import Accounts from '../../../main/accounts'
+import signers from '../../../main/signers'
+import { signerCompatibility, maxFee } from '../../../main/transaction'
 import { GasFeesSource } from '../../../resources/domain/transaction'
+import { gweiToHex } from '../../util'
 
 jest.mock('../../../main/provider', () => ({ send: jest.fn(), emit: jest.fn(), on: jest.fn() }))
 jest.mock('../../../main/signers', () => ({ get: jest.fn() }))
 jest.mock('../../../main/windows', () => ({ broadcast: jest.fn(), showTray: jest.fn() }))
 jest.mock('../../../main/windows/nav', () => ({ on: jest.fn(), forward: jest.fn() }))
 jest.mock('../../../main/externalData')
+jest.mock('../../../main/transaction')
 
 jest.mock('../../../main/store/persist')
 
-jest.mock('../../../main/nebula', () => jest.fn(() => ({ ready: () => true, ens: { lookupAddress: jest.fn() } })))
-
-const weiToHex = wei => addHexPrefix(wei.toString(16))
-const gweiToHex = gwei => weiToHex(gwei * 1e9)
+jest.mock('../../../main/nebula', () =>
+  jest.fn(() => ({ ready: () => true, ens: { lookupAddress: jest.fn() } }))
+)
 
 const account = {
   id: '0x22dd63c3619818fdbc262c78baee43cb61e9cccf',
@@ -41,8 +46,8 @@ const account2 = {
   signer: '',
   requests: {},
   ensName: '',
-  created: '15315799:1660153882707',
-} 
+  created: '15315799:1660153882707'
+}
 
 let request
 
@@ -54,36 +59,40 @@ afterAll(() => {
   log.transports.console.level = 'debug'
 })
 
-beforeEach(done => {
+beforeEach((done) => {
+  const from = '0x22dd63c3619818fdbc262c78baee43cb61e9cccf'
+  const nonce = '0xa'
   request = {
     handlerId: 1,
+    origin: '0r161n',
     type: 'transaction',
     data: {
-      from : '0x22dd63c3619818fdbc262c78baee43cb61e9cccf',
+      from,
       chainId: '0x1',
-      gasLimit: weiToHex(21000),
+      gasLimit: intToHex(21000),
       gasPrice: gweiToHex(30),
       type: '0x2',
       maxPriorityFeePerGas: gweiToHex(1),
       maxFeePerGas: gweiToHex(9),
-      nonce: '0xa'
+      nonce
     },
     payload: {
       jsonrpc: '2.0',
       id: 7,
-      method: 'eth_signTransaction'
+      method: 'eth_signTransaction',
+      params: [{ from, nonce }]
     }
   }
 
-  Accounts.add(account2.address)
-  Accounts.add(account.address, account, (err, account) => {
+  Accounts.add(account2.address, 'Test Account 2')
+  Accounts.add(account.address, 'Test Account 1', account, (err, account) => {
     Accounts.setSigner(account.address, done)
   })
 })
 
 afterEach(() => {
-  Object.values(Accounts.accounts).forEach(account => {
-    Object.keys(account.requests).forEach(id => {
+  Object.values(Accounts.accounts).forEach((account) => {
+    Object.keys(account.requests).forEach((id) => {
       Accounts.removeRequest(account, id)
     })
   })
@@ -137,7 +146,8 @@ describe('#setBaseFee', () => {
     Accounts.addRequest(request, jest.fn())
   })
 
-  const setBaseFee = (baseFee, requestId = 1, userUpdate = false) => Accounts.setBaseFee(baseFee, requestId, userUpdate)
+  const setBaseFee = (baseFee, requestId = 1, userUpdate = false) =>
+    Accounts.setBaseFee(baseFee, requestId, userUpdate)
 
   it('does not set an undefined base fee', () => {
     expect(() => setBaseFee(undefined)).toThrowError()
@@ -189,7 +199,7 @@ describe('#setBaseFee', () => {
 
     setBaseFee(gweiToHex(updatedBaseFee))
 
-    expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(weiToHex(2e9 + (updatedBaseFee * 1e9)))
+    expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(intToHex(2e9 + updatedBaseFee * 1e9))
   })
 
   it('applies user-initiated base fee update', () => {
@@ -213,7 +223,7 @@ describe('#setBaseFee', () => {
   it('caps the base fee at 9999 gwei', () => {
     const highBaseFee = gweiToHex(10200)
     const maxBaseFee = 9999e9
-    const expectedMaxFee = weiToHex(maxBaseFee + parseInt(request.data.maxPriorityFeePerGas))
+    const expectedMaxFee = intToHex(maxBaseFee + parseInt(request.data.maxPriorityFeePerGas))
 
     setBaseFee(highBaseFee)
 
@@ -223,14 +233,15 @@ describe('#setBaseFee', () => {
   it('does not exceed the max allowable fee', () => {
     const maxTotal = 2e18 // 2 ETH
     const gasLimit = 1e7
-    const maxFee = maxTotal / gasLimit
-    const highBaseFee = weiToHex(maxFee + 10e9) // add 10 gwei to exceed the maximum limit
+    const maxTotalFee = maxTotal / gasLimit
+    const highBaseFee = intToHex(maxTotalFee + 10e9) // add 10 gwei to exceed the maximum limit
 
-    request.data.gasLimit = weiToHex(gasLimit)
+    request.data.gasLimit = intToHex(gasLimit)
+    maxFee.mockReturnValue(maxTotal)
 
     setBaseFee(highBaseFee)
 
-    expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(weiToHex(maxFee))
+    expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(intToHex(maxTotalFee))
   })
 
   it('updates the feesUpdatedByUser flag', () => {
@@ -248,7 +259,8 @@ describe('#setPriorityFee', () => {
     Accounts.addRequest(request, jest.fn())
   })
 
-  const setPriorityFee = (fee, requestId = 1, userUpdate = false) => Accounts.setPriorityFee(fee, requestId, userUpdate)
+  const setPriorityFee = (fee, requestId = 1, userUpdate = false) =>
+    Accounts.setPriorityFee(fee, requestId, userUpdate)
 
   it('does not set an undefined priority fee', () => {
     expect(() => setPriorityFee(undefined)).toThrowError()
@@ -292,15 +304,14 @@ describe('#setPriorityFee', () => {
     expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(request.data.maxFeePerGas)
   })
 
-
   it('sets a valid priority fee', () => {
     const priorityFee = 2e9 // 2 gwei
     const priorityFeeChange = priorityFee - parseInt(request.data.maxPriorityFeePerGas)
-    const expectedMaxFee = weiToHex(priorityFeeChange + parseInt(request.data.maxFeePerGas))
+    const expectedMaxFee = intToHex(priorityFeeChange + parseInt(request.data.maxFeePerGas))
 
-    setPriorityFee(weiToHex(priorityFee))
+    setPriorityFee(intToHex(priorityFee))
 
-    expect(Accounts.current().requests[1].data.maxPriorityFeePerGas).toBe(weiToHex(priorityFee))
+    expect(Accounts.current().requests[1].data.maxPriorityFeePerGas).toBe(intToHex(priorityFee))
     expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(expectedMaxFee)
   })
 
@@ -318,30 +329,32 @@ describe('#setPriorityFee', () => {
     const highPriorityFee = gweiToHex(10200)
     const maxPriorityFee = 9999e9
     const priorityFeeChange = maxPriorityFee - parseInt(request.data.maxPriorityFeePerGas)
-    const expectedMaxFee = weiToHex(priorityFeeChange + parseInt(request.data.maxFeePerGas))
+    const expectedMaxFee = intToHex(priorityFeeChange + parseInt(request.data.maxFeePerGas))
 
     setPriorityFee(highPriorityFee)
 
-    expect(Accounts.current().requests[1].data.maxPriorityFeePerGas).toBe(weiToHex(maxPriorityFee))
+    expect(Accounts.current().requests[1].data.maxPriorityFeePerGas).toBe(intToHex(maxPriorityFee))
     expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(expectedMaxFee)
   })
 
   it('does not exceed the max allowable fee', () => {
     const maxTotal = 2e18 // 2 ETH
     const gasLimit = 1e7
-    const maxFee = maxTotal / gasLimit
+    const maxTotalFee = maxTotal / gasLimit
 
-    request.data.gasLimit = weiToHex(gasLimit)
+    request.data.gasLimit = intToHex(gasLimit)
     request.data.maxFeePerGas = gweiToHex(190)
     request.data.maxPriorityFeePerGas = gweiToHex(40)
+    maxFee.mockReturnValue(maxTotal)
 
     const highPriorityFee = 60e9 // add 20 gwei to the above to exceed the maximum limit
-    const expectedPriorityFee = maxFee - (parseInt(request.data.maxFeePerGas) - parseInt(request.data.maxPriorityFeePerGas))
+    const expectedPriorityFee =
+      maxTotalFee - (parseInt(request.data.maxFeePerGas) - parseInt(request.data.maxPriorityFeePerGas))
 
     setPriorityFee(highPriorityFee)
 
-    expect(Accounts.current().requests[1].data.maxPriorityFeePerGas).toBe(weiToHex(expectedPriorityFee))
-    expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(weiToHex(maxFee))
+    expect(Accounts.current().requests[1].data.maxPriorityFeePerGas).toBe(intToHex(expectedPriorityFee))
+    expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(intToHex(maxTotalFee))
   })
 
   it('updates the feesUpdatedByUser flag', () => {
@@ -357,7 +370,8 @@ describe('#setGasPrice', () => {
     request.data.type = '0x0'
   })
 
-  const setGasPrice = (price, requestId = 1, userUpdate = false) => Accounts.setGasPrice(price, requestId, userUpdate)
+  const setGasPrice = (price, requestId = 1, userUpdate = false) =>
+    Accounts.setGasPrice(price, requestId, userUpdate)
 
   it('does not set an undefined gas price', () => {
     expect(() => setGasPrice(undefined)).toThrowError()
@@ -418,14 +432,15 @@ describe('#setGasPrice', () => {
   it('does not exceed the max gas price', () => {
     const maxTotal = 2e18 // 2 ETH
     const gasLimit = 1e7
-    const maxFee = maxTotal / gasLimit
-    const highPrice = weiToHex(maxFee + 10e9) // 250 gwei
+    const maxTotalFee = maxTotal / gasLimit
+    const highPrice = intToHex(maxTotalFee + 10e9) // 250 gwei
 
-    request.data.gasLimit = weiToHex(gasLimit)
+    request.data.gasLimit = intToHex(gasLimit)
+    maxFee.mockReturnValue(maxTotal)
 
     setGasPrice(highPrice)
 
-    expect(Accounts.current().requests[1].data.gasPrice).toBe(weiToHex(maxFee))
+    expect(Accounts.current().requests[1].data.gasPrice).toBe(intToHex(maxTotalFee))
   })
 
   it('caps the gas price at 9999 gwei', () => {
@@ -439,7 +454,7 @@ describe('#setGasPrice', () => {
 
   it('updates the feesUpdatedByUser flag', () => {
     request.data.gasPrice = gweiToHex(30)
-    
+
     setGasPrice(gweiToHex(45), 1, true)
 
     expect(Accounts.current().requests[1].feesUpdatedByUser).toBe(true)
@@ -451,7 +466,8 @@ describe('#setGasLimit', () => {
     Accounts.addRequest(request, jest.fn())
   })
 
-  const setGasLimit = (limit, requestId = 1, userUpdate = false) => Accounts.setGasLimit(limit, requestId, userUpdate)
+  const setGasLimit = (limit, requestId = 1, userUpdate = false) =>
+    Accounts.setGasLimit(limit, requestId, userUpdate)
 
   it('does not set an undefined gas limit', () => {
     expect(() => setGasLimit(undefined)).toThrowError()
@@ -502,36 +518,38 @@ describe('#setGasLimit', () => {
   })
 
   it('does not exceed the max fee for pre-EIP-1559 transactions', () => {
-    const maxFee = 2e18 // 2 ETH
+    const maxTotalFee = 2e18 // 2 ETH
     const gasPrice = 400e9 // 400 gwei
-    const maxLimit = maxFee / gasPrice
-    const gasLimit = weiToHex(maxLimit + 1e5) // add 10000 to exceed the maximum limit
+    const maxLimit = maxTotalFee / gasPrice
+    const gasLimit = intToHex(maxLimit + 1e5) // add 10000 to exceed the maximum limit
 
     request.data.type = '0x0'
-    request.data.gasPrice = weiToHex(gasPrice)
+    request.data.gasPrice = intToHex(gasPrice)
+    maxFee.mockReturnValue(maxTotalFee)
 
     setGasLimit(gasLimit)
 
-    expect(Accounts.current().requests[1].data.gasLimit).toBe(weiToHex(maxLimit))
+    expect(Accounts.current().requests[1].data.gasLimit).toBe(intToHex(maxLimit))
   })
 
   it('does not exceed the max fee for post-EIP-1559 transactions', () => {
-    const maxFee = 2e18 // 2 ETH
+    const maxTotalFee = 2e18 // 2 ETH
     const maxFeePerGas = 400e9 // 400 gwei
-    const maxLimit = maxFee / maxFeePerGas
-    const gasLimit = weiToHex(maxLimit + 1e5) // add 10000 to exceed the maximum limit
+    const maxLimit = maxTotalFee / maxFeePerGas
+    const gasLimit = intToHex(maxLimit + 1e5) // add 10000 to exceed the maximum limit
 
     request.data.type = '0x2'
-    request.data.maxFeePerGas = weiToHex(maxFeePerGas)
+    request.data.maxFeePerGas = intToHex(maxFeePerGas)
+    maxFee.mockReturnValue(maxTotalFee)
 
     setGasLimit(gasLimit)
 
-    expect(Accounts.current().requests[1].data.gasLimit).toBe(weiToHex(maxLimit))
+    expect(Accounts.current().requests[1].data.gasLimit).toBe(intToHex(maxLimit))
   })
 
   it('caps the gas limit at 12.5e6', () => {
-    const maxLimit = weiToHex(12.5e6)
-    const highLimit = weiToHex(13e6)
+    const maxLimit = intToHex(12.5e6)
+    const highLimit = intToHex(13e6)
 
     setGasLimit(highLimit)
 
@@ -550,12 +568,14 @@ describe('#adjustNonce', () => {
 
   beforeEach(() => {
     provider.send = jest.fn((payload, cb) => {
-      expect(payload).toEqual(expect.objectContaining({
-        id: 1,
-        jsonrpc: '2.0',
-        method: 'eth_getTransactionCount',
-        params: ['0x22dd63c3619818fdbc262c78baee43cb61e9cccf', 'pending']
-      }))
+      expect(payload).toEqual(
+        expect.objectContaining({
+          id: 1,
+          jsonrpc: '2.0',
+          method: 'eth_getTransactionCount',
+          params: ['0x22dd63c3619818fdbc262c78baee43cb61e9cccf', 'pending']
+        })
+      )
 
       cb({ result: onChainNonce })
     })
@@ -616,8 +636,40 @@ describe('#adjustNonce', () => {
   })
 })
 
+describe('#resetNonce', () => {
+  beforeEach(() => {
+    provider.send = jest.fn((payload, cb) => {
+      expect(payload).toEqual(
+        expect.objectContaining({
+          id: 1,
+          jsonrpc: '2.0',
+          method: 'eth_getTransactionCount',
+          params: ['0x22dd63c3619818fdbc262c78baee43cb61e9cccf', 'pending']
+        })
+      )
+      cb({ result: '0x3' })
+    })
+    request.data.nonce = '0x5'
+    Accounts.addRequest(request, jest.fn())
+  })
+
+  const resetNonce = (requestId = 1) => Accounts.resetNonce(requestId)
+
+  it('it will un-set the nonce when not present inside the tx request payload', () => {
+    delete request.payload.params[0].nonce
+    resetNonce()
+    expect(request.data.nonce).toBe(undefined)
+  })
+
+  it('it will revert to the nonce inside the tx request payload when present', () => {
+    request.payload.params[0].nonce = '0x' + BigNumber(request.data.nonce).minus(1).toString(16)
+    resetNonce()
+    expect(request.data.nonce).toBe(request.payload.params[0].nonce)
+  })
+})
+
 describe('#resolveRequest', () => {
-  it ('does nothing with an unknown request', () => {
+  it('does nothing with an unknown request', () => {
     Accounts.addRequest(request, () => {
       throw new Error('unexpected callback!')
     })
@@ -627,17 +679,19 @@ describe('#resolveRequest', () => {
     expect(Object.keys(Accounts.current().requests)).toHaveLength(1)
   })
 
-  it ('resolves a request with a callback', done => {
+  it('resolves a request with a callback', (done) => {
     Accounts.addRequest(request, () => done())
 
     Accounts.resolveRequest(request)
 
     try {
       expect(Object.keys(Accounts.current().requests)).toHaveLength(0)
-    } catch (e) { done(e) }
+    } catch (e) {
+      done(e)
+    }
   })
 
-  it ('resolves a request with no callback', () => {
+  it('resolves a request with no callback', () => {
     Accounts.addRequest(request)
 
     Accounts.resolveRequest(request)
@@ -648,50 +702,139 @@ describe('#resolveRequest', () => {
 
 describe('#removeRequest', () => {
   beforeEach(() => {
-    store.navClearReq = jest.fn()
-    account.update = jest.fn()
+    account.clearRequest = jest.fn()
     Accounts.addRequest(request)
   })
 
-  it('should remove a request for the provided handlerId from the account object', () => {
+  it('should remove a request for the provided handlerId from the account', () => {
     Accounts.removeRequest(account, request.handlerId)
 
-    expect(Object.keys(account.requests)).toHaveLength(0)
-  })
-
-  it('should clear a request for the provided handlerId from the nav', () => {
-    Accounts.removeRequest(account, request.handlerId)
-
-    expect(store.navClearReq).toHaveBeenCalledWith(request.handlerId)
-  })
-
-  it('should update the account', () => {
-    Accounts.removeRequest(account, request.handlerId)
-
-    expect(account.update).toHaveBeenCalled()
+    expect(account.clearRequest).toHaveBeenCalledWith(request.handlerId)
   })
 })
 
-describe('#removeRequests', () => {
+describe('#clearRequestsByOrigin', () => {
   beforeEach(() => {
-    store.setGasFees('ethereum', '1', { maxBaseFeePerGas: '', maxPriorityFeePerGas: '' })
-    Accounts.removeRequest = jest.fn()
     Accounts.addRequest(request)
-    Accounts.setSigner(account2.address, () => {
-      Accounts.addRequest({ ...request, data: { ...request.data, type: '0x1' } })
+    Accounts.addRequest({ ...request, handlerId: '2' })
+    Accounts.addRequest({ ...request, handlerId: '3', origin: '07h3r' })
+  })
+
+  it('should remove any request from a given origin', () => {
+    Accounts.clearRequestsByOrigin(account.id, request.origin)
+    expect(Object.keys(Accounts.accounts[account.id].requests)).toHaveLength(1)
+  })
+})
+
+describe('#signerCompatibility', () => {
+  let activeSigner
+
+  const lockedSeedSigner = {
+    id: '13',
+    type: 'seed',
+    addresses: [account.id],
+    status: 'locked'
+  }
+
+  beforeEach(() => {
+    store.navDash = jest.fn()
+
+    activeSigner = {
+      id: '12',
+      addresses: [account.id],
+      summary: jest.fn()
+    }
+
+    store.newSigner(lockedSeedSigner)
+
+    signers.get.mockImplementation((id) => {
+      if (id === activeSigner.id) return activeSigner
+      if (id === lockedSeedSigner.id) return lockedSeedSigner
+    })
+
+    Accounts.accounts[account.id].lastSignerType = 'seed'
+    Accounts.accounts[account.id].signer = activeSigner.id
+    Accounts.addRequest(request)
+  })
+
+  afterEach(() => {
+    store.removeSigner(activeSigner.id)
+    store.removeSigner(lockedSeedSigner.id)
+
+    Accounts.removeRequests([request.handlerId])
+  })
+
+  const signerTypes = ['trezor', 'ledger', 'lattice']
+
+  signerTypes.forEach((signerType) => {
+    it(`should open the signer menu when a ${signerType} signer is not available`, () => {
+      const cb = jest.fn()
+
+      activeSigner.status = 'disconnected'
+      activeSigner.type = signerType
+      store.newSigner(activeSigner)
+
+      Accounts.accounts[account.id].signer = undefined
+      Accounts.accounts[account.id].lastSignerType = signerType
+
+      Accounts.signerCompatibility(request.handlerId, cb)
+
+      expect(cb).toHaveBeenCalledWith(new Error('Signer unavailable'))
+      expect(store.navDash).toHaveBeenCalledWith({
+        data: {
+          signer: activeSigner.id
+        },
+        view: 'expandedSigner'
+      })
     })
   })
 
-  it('should remove the requests for a given handlerId across accounts', () => {
-    Accounts.removeRequests(request.handlerId)
+  it('should not open the signer menu if the current signer is ready', () => {
+    const cb = jest.fn()
+    const compatibility = { signer: activeSigner.id, tx: 'sometx', compatible: true }
 
-    expect(Object.keys(account.requests)).toHaveLength(0)
-    expect(Object.keys(account2.requests)).toHaveLength(0)
+    activeSigner.status = 'ok'
+    signerCompatibility.mockReturnValue(compatibility)
+
+    Accounts.signerCompatibility(request.handlerId, cb)
+
+    expect(store.navDash).not.toHaveBeenCalled()
+    expect(cb).toHaveBeenCalledWith(null, compatibility)
   })
 
-  it('should not remove requests when there are none matching the given handlerId', () => {
-    Accounts.removeRequests('4')
+  it('should open the signer panel for a signer that is not ready', () => {
+    const cb = jest.fn()
 
-    expect(Accounts.removeRequest).not.toHaveBeenCalled()
+    activeSigner.status = 'locked'
+
+    Accounts.signerCompatibility(request.handlerId, cb)
+
+    expect(store.navDash).toHaveBeenCalledWith({
+      data: {
+        signer: activeSigner.id
+      },
+      view: 'expandedSigner'
+    })
+  })
+
+  it('should return an error when the signer is not ready', () => {
+    const cb = jest.fn()
+
+    activeSigner.status = 'locked'
+
+    Accounts.signerCompatibility(request.handlerId, cb)
+
+    expect(cb).toHaveBeenCalledWith(new Error('Signer unavailable'))
+  })
+
+  it('should return an error when there is no signer', () => {
+    const cb = jest.fn()
+
+    Accounts.accounts[account.id].signer = undefined
+
+    Accounts.signerCompatibility(request.handlerId, cb)
+
+    expect(store.navDash).not.toHaveBeenCalled()
+    expect(cb).toHaveBeenCalledWith(new Error('No signer'))
   })
 })

@@ -1,0 +1,245 @@
+@keyframes shake 
+  0% 
+    transform translate3d(0px, 0px, 0) rotate(-0.4deg) scale(1)
+  25% 
+    transform translate3d(-0.7px, -1px, 0) rotate(0.4deg) scale(1.01)
+  50% 
+    transform translate3d(0.7px, 1px, 0) rotate(-0.4deg) scale(1.02)
+  75% 
+    transform translate3d(-0.7px, 0.3px, 0) rotate(0.2deg) scale(1.01)
+  100% 
+    transform translate3d(0.7px, 0.7px, 0) rotate(-0.4deg) scale(1)
+
+.txSendingValue
+  min-height 50px
+  display flex
+  justify-content center
+  align-items center
+  font-size 18px
+  font-weight 300
+
+.txSendingValueSymbol
+  font-size 14px
+  margin-right 5px
+  position relative
+  top -1px
+  font-weight 600
+
+.txSendingValueAmount
+  font-size 20px
+  position relative
+  top -1px    
+
+._txMain
+  position relative
+  z-index 100001
+  background var(--ghostAZ)
+  margin 0px 6px 16px 6px
+  border-radius 26px
+  overflow hidden
+  box-shadow 0px 4px 8px var(--ghostY), 0px 2px 8px var(--ghostY)
+  border-bottom 2px solid var(--ghostZ)
+  padding 0
+
+  ._txMainInner
+    position relative
+    margin 0px 0px
+    overflow hidden
+
+    ._txMainBackground
+      position absolute
+      top 0
+      right 0
+      bottom 0
+      left 0
+      opacity 0.05
+      display none
+    
+    ._txMainValues
+      font-size 17px
+      font-weight 400
+      border-radius 20px
+      -webkit-app-region no-drag
+      transition none
+      transform translate3d(0, 0, 0)
+      font-family 'MainFont'
+      display flow-root
+      padding 3px 3px 1px 3px
+      background var(--ghostZ)
+      margin 6px
+
+      svg
+        position relative
+        top -0px
+        padding 0px 3px 0px 4px
+
+      ._txMainValuesRow
+        display flex
+        height 70px
+
+      ._txMainValuesColumn
+        display flex
+        flex-direction column
+        height 100%
+        margin-right 5px
+      
+      ._txMainValuesColumn:last-child
+        margin-right 0px
+
+      ._txMainTransferring
+        margin-top 0px
+        display flex
+        justify-content center
+        align-items stretch
+        border-radius 12px
+        overflow hidden
+        font-weight 300
+
+        ._txMainTransferringPart
+          flex-grow 1
+          display flex
+          justify-content center
+          align-items center
+          border-radius 12px
+          background var(--ghostA)
+          margin-right 5px
+
+        ._txMainTransferringPart:last-child
+          margin-right 0px
+          
+      ._txMainTransferringSymbol
+        font-size 14px
+        font-weight 300
+        margin-right 5px
+        position relative
+        top -1px
+
+      ._txMainTransferringAmount
+        font-size 20px
+        position relative
+        top -1px
+
+      ._txMainTransferringEq
+        font-size 15px
+        margin-left 4px
+
+      ._txMainTransferringEqSymbol
+        font-size 12px
+
+      ._txMainTransferringEqAmount
+        font-size 14px
+
+      ._txMainValue
+        font-size 14px
+        line-height 22px
+        display flex
+        justify-content center
+        align-items center
+        border-radius 17px
+        -webkit-app-region no-drag
+        transition none
+        transform translate3d(0, 0, 0)
+        font-family 'MainFont'
+        padding 12px
+        margin-top 1px
+        background var(--ghostA)
+        box-shadow 0px 1px 2px var(--ghostX)
+        border-bottom 2px solid var(--ghostZ)
+        
+        svg
+          position relative
+          top -0px
+          padding 0px 3px 0px 4px
+
+      ._txMainValueClickable
+        transition all linear 0.1s
+        cursor pointer
+        margin-bottom 0px
+        position relative
+        z-index 3
+
+        *
+          position relative
+          z-index 2
+          pointer-events none
+
+      ._txMainValueClickable:hover
+        background var(--ghostB)
+        transform translateY(-1px)
+        border-bottom 2px solid var(--ghostZ)
+        box-shadow 0px 8px 30px -12px var(--ghostX)
+        position relative
+        z-index 300000
+
+        
+      ._txMainValueClickable:active
+        background var(--ghostB)
+        transform translateY(0px)
+        box-shadow 0px 2px 4px var(--ghostX)
+
+  ._txMainTagFee
+    position relative
+    z-index 100001
+    overflow hidden
+    font-size 11px
+    font-weight 400
+    text-transform uppercase
+    letter-spacing 1px
+    text-align center
+    display flex
+    align-items center
+    justify-content center
+    height 52px
+    margin-top 1px
+    border-radius 16px
+    background var(--ghostA)
+    box-shadow 0px 1px 2px var(--ghostX)
+    border-bottom 2px solid var(--ghostZ)
+
+  ._txMainTag
+    position relative
+    z-index 100001
+    // animation-name cardShow
+    // animation-duration 0.2s
+    // animation-fill-mode both
+    overflow hidden
+    font-size 11px
+    font-weight 400
+    text-transform uppercase
+    letter-spacing 1px
+    text-align center
+    padding 8px 0px 8px 0px
+    margin-top 1px
+
+  ._txMainTagWarning
+    color var(--moon)
+
+  ._txMainTagBad
+    color var(--bad)
+  
+  ._txMainTagGood
+    color var(--good)
+
+._txContinueButton
+  margin-top 64px
+  background var(--ghostA)
+  border-radius 14px
+  height 60px
+  cursor pointer
+  display flex
+  justify-content center
+  align-items center
+  text-transform uppercase
+  font-family 'MainFont'
+  letter-spacing 2px
+  font-weight 300
+  font-size 14px
+
+._txContinueButton:hover
+  background var(--ghostB)
+
+// ._txMain:hover
+//   animation shake 8s ease-in-out infinite alternate
+
+// ._txMain:active
+//   animation shake-little 2s ease-in-out infinite

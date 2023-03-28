@@ -1,18 +1,37 @@
+import path from 'path'
+import { Readable } from 'stream'
 import { hash } from 'eth-ens-namehash'
 import log from 'electron-log'
 import crypto from 'crypto'
+import tar from 'tar-fs'
+
 import store from '../store'
 import nebulaApi from '../nebula'
 import server from './server'
 import extractColors from '../windows/extractColors'
+import { dappPathExists, getDappCacheDir, isDappVerified } from './verify'
 
 const nebula = nebulaApi()
 
-function getDapp (dappId: string): Dapp {
+class DappStream extends Readable {
+  constructor(hash: string) {
+    super()
+    this.start(hash)
+  }
+  async start(hash: string) {
+    for await (const buf of nebula.ipfs.get(hash, { archive: true })) {
+      this.push(buf)
+    }
+    this.push(null)
+  }
+  _read() {}
+}
+
+function getDapp(dappId: string): Dapp {
   return store('main.dapps', dappId)
 }
 
-async function getDappColors (dappId: string) {
+async function getDappColors(dappId: string) {
   const dapp = getDapp(dappId)
   const session = crypto.randomBytes(6).toString('hex')
   server.sessions.add(dapp.ens, session)
@@ -27,38 +46,94 @@ async function getDappColors (dappId: string) {
   }
 }
 
+const createTarStream = (dappId: string) => {
+  return tar.extract(getDappCacheDir(), {
+    map: (header) => ({ ...header, name: path.join(dappId, ...header.name.split('/').slice(1)) })
+  })
+}
+
+const writeDapp = async (dappId: string, hash: string) => {
+  return new Promise<void>((resolve, reject) => {
+    try {
+      const dapp = new DappStream(hash)
+      const tarStream = createTarStream(dappId)
+
+      tarStream.on('error', reject)
+      tarStream.on('finish', resolve)
+
+      dapp.pipe(tarStream)
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
+const cacheDapp = async (dappId: string, hash: string) => {
+  await writeDapp(dappId, hash)
+  await getDappColors(dappId)
+
+  return dappId
+}
+
 // TODO: change to correct manifest type one Nebula version with types are published
-async function updateDappContent (dappId: string, contentURI: string, manifest: any) {
-  // TODO: Make sure content is pinned before proceeding
-  store.updateDapp(dappId, { content: contentURI, manifest })
+async function updateDappContent(dappId: string, manifest: any) {
+  try {
+    // Create a local cache of the content
+    await cacheDapp(dappId, manifest.content)
+    store.updateDapp(dappId, { content: manifest.content, manifest })
+  } catch (e) {
+    log.error('error updating dapp cache', e)
+  }
 }
 
 let retryTimer: NodeJS.Timeout
-async function checkStatus (dappId: string) {
+
+// Takes dappId and checks if the dapp is up to date
+async function checkStatus(dappId: string) {
   clearTimeout(retryTimer)
-  const dapp = store('main.dapps', dappId)
-  try { 
-    const resolved = await nebula.resolve(dapp.ens)
+  const dapp = store('main.dapps', dappId) as Dapp
+  const { checkStatusRetryCount, openWhenReady } = dapp
 
-    const version = ((resolved.manifest || {}).version) || 'unknown'
+  try {
+    const { record, manifest } = await nebula.resolve(dapp.ens)
+    const { version, content } = manifest || {}
 
-    log.info(`resolved content for ${dapp.ens}, version: ${version}`)
-
-    store.updateDapp(dappId, { record: resolved.record })
-    if (dapp.content !== resolved.record.content) {
-      updateDappContent(dappId, resolved.record.content, resolved.manifest)
+    if (!content) {
+      log.error(
+        `Attempted load dapp with id ${dappId} (${dapp.ens}) but manifest contained no content`,
+        manifest
+      )
+      return
     }
 
-    if (!dapp.colors) getDappColors(dappId)
+    log.info(`Resolved content for ${dapp.ens}, version: ${version || 'unknown'}`)
 
-    store.updateDapp(dappId, { status: 'ready' })
+    store.updateDapp(dappId, { record })
+
+    const isDappCurrent = async () => {
+      return (
+        dapp.content === content && (await dappPathExists(dappId)) && (await isDappVerified(dappId, content))
+      )
+    }
+
+    // Checks if all assets are up to date with current manifest
+    if (!(await isDappCurrent())) {
+      log.info(`Updating content for dapp ${dappId} from hash ${content}`)
+      // Sets status to 'updating' when updating the bundle
+      store.updateDapp(dappId, { status: 'updating' })
+      // Update dapp assets
+      await updateDappContent(dappId, manifest)
+    } else {
+      log.info(`Dapp ${dapp.ens} already up to date: ${content}`)
+    }
+    // Sets status to 'ready' when done
+    store.updateDapp(dappId, { status: 'ready', openWhenReady: false })
 
     // The frame id 'dappLauncher' needs to refrence target frame
-    if (dapp.openWhenReady) surface.open('dappLauncher', dapp.ens)
-
+    if (openWhenReady) surface.open('dappLauncher', dapp.ens)
   } catch (e) {
     log.error('Check status error', e)
-    const retry = dapp.checkStatusRetryCount || 0
+    const retry = checkStatusRetryCount || 0
     if (retry < 4) {
       retryTimer = setTimeout(() => {
         store.updateDapp(dappId, { status: 'initial', checkStatusRetryCount: retry + 1 })
@@ -67,39 +142,39 @@ async function checkStatus (dappId: string) {
       store.updateDapp(dappId, { status: 'failed', checkStatusRetryCount: 0 })
     }
   }
-
-  // Takes dapp entry and config
-  // Checks if assets are correctly synced
-  // Checks if all assets are up to date with current manifest 
-  // Installs new assets if changed and config is set to sync
-  // Sets status to 'updating' when updating the bundle
-  // Sets status to 'ready' when done
-
-  // dapp.config // the user's prefrences for installing assets from the manifest
-  // dapp.manifest // a copy of the latest manifest we have resolved for the dapp
-  // dapp.meta // meta info about the dapp including name, colors, icons, descriptions, 
-  // dapp.ens // ens name for this dapp
-  // dapp.storage // local storage values for dapp
 }
 
-store.observer(() => {
+const refreshDapps = ({ statusFilter = '' } = {}) => {
   const dapps = store('main.dapps')
-  Object.keys(dapps || {}).filter(id => dapps[id].status === 'initial').forEach(id => {
-    store.updateDapp(id, { status: 'loading' })
 
-    if (nebula.ready()) {
-      checkStatus(id)
-    } else {
-      nebula.once('ready', () => checkStatus(id))
-    }
-  })
-})
+  Object.keys(dapps || {})
+    .filter((id) => !statusFilter || dapps[id].status === statusFilter)
+    .forEach((id) => {
+      store.updateDapp(id, { status: 'loading' })
+      if (nebula.ready()) {
+        checkStatus(id)
+      } else {
+        nebula.once('ready', () => checkStatus(id))
+      }
+    })
+}
+
+const checkNewDapps = () => refreshDapps({ statusFilter: 'initial' })
+
+// Check all dapps on startup
+refreshDapps()
+
+// Check all dapps every hour
+setInterval(() => refreshDapps(), 1000 * 60 * 60)
+
+// Check any new dapps that are added
+store.observer(checkNewDapps)
 
 let nextId = 0
 const getId = () => (++nextId).toString()
 
 const surface = {
-  manifest: (ens: string) => {
+  manifest: (_ens: string) => {
     // gets the dapp manifest and returns all options and details for user to confirm before installing
   },
   add: (dapp: Dapp) => {
@@ -108,22 +183,18 @@ const surface = {
     const id = hash(ens)
     const status = 'initial'
 
-    // Validate ens name and config
-
-    // Check that dapp has not been added already
-    // If ens name has been installed
-    // return error
+    const existingDapp = store('main.dapps', id)
 
     // If ens name has not been installed, start install
-    store.appDapp({ id, ens, status, config, manifest: {}, current: {} })
+    if (!existingDapp) store.appDapp({ id, ens, status, config, manifest: {}, current: {} })
   },
-  addServerSession (namehash: string /* , session */) {
+  addServerSession(_namehash: string /* , session */) {
     // server.sessions.add(namehash, session)
   },
-  unsetCurrentView (frameId: string) {
+  unsetCurrentView(frameId: string) {
     store.setCurrentFrameView(frameId, '')
   },
-  open (frameId: string, ens: string) {
+  open(frameId: string, ens: string) {
     const session = crypto.randomBytes(6).toString('hex')
     const dappId = hash(ens)
 
@@ -141,7 +212,11 @@ const surface = {
 
       server.sessions.add(ens, session)
 
-      store.addFrameView(frameId, view)
+      if (store('main.frames', frameId)) {
+        store.addFrameView(frameId, view)
+      } else {
+        log.warn(`Attempted to open frame "${frameId}" for ${ens} but frame does not exist`)
+      }
     } else {
       store.updateDapp(dappId, { ens, status: 'initial', openWhenReady: true })
     }
@@ -149,199 +224,3 @@ const surface = {
 }
 
 export default surface
-
-/// Old Dapp Class
-
-// class Dapps {
-//   constructor () {
-//     // setInterval(() => {
-//     //   this._updateHashes()
-//     // }, 60000)
-//     // setInterval(() => {
-//     //   this._updatePins()
-//     // }, 15000)
-//     this.defaults = [
-//       {
-//         name: 'wallet.frame.eth',
-//         options: { docked: true }
-//       },
-//       {
-//         name: 'aragon.frame.eth',
-//         options: { docked: true }
-//       },
-//       {
-//         name: 'uniswap.frame.eth',
-//         options: { docked: false }
-//       },
-//       {
-//         name: 'matoken.eth',
-//         options: { docked: false }
-//       },
-//       {
-//         name: 'matt.eth'
-//       },
-//       {
-//         name: 'sushi.frame.eth',
-//         options: { docked: true }
-//       },
-//     ]
-//     // this.observer = store.observer(() => {
-//     //   const ipfs = store('main.ipfs')
-//     //   if (ipfs.id) {
-//     //     console.log('Got IPFS update')
-//     //     this._updatePins()
-//     //     const ethCon = store.observer(() => {
-//     //       const connection = store('main.connection')
-//     //       const status = [connection.local.status, connection.secondary.status]
-//     //       const connected = status.indexOf('connected') > -1
-//     //       if (connected) {
-//     //         this._addDefaults()
-//     //         setTimeout(() => ethCon.remove(), 0)
-//     //       }
-//     //     })
-//     //   }
-//     // })
-
-//     // ipfs.on('state', state => {
-//     //   if (state === 'ready') {
-//     //     this._updatePins()
-//     //     const ethCon = store.observer(() => {
-//     //       const connection = store('main.connection')
-//     //       const status = [connection.local.status, connection.secondary.status]
-//     //       const connected = status.indexOf('connected') > -1
-//     //       if (connected) {
-//     //         this._addDefaults()
-//     //         setTimeout(() => ethCon.remove(), 0)
-//     //       }
-//     //     })
-//     //   }
-//     // })
-//   }
-
-//   async _addDefaults () {
-//     this.defaults.forEach(async dapp => {
-//       if (store('main.dapp.removed').indexOf(dapp.name) === -1) {
-//         await this.add(dapp.name, dapp.options, err => {
-//           if (err) log.error('Error adding default dapp', dapp.name, err)
-//         })
-//       }
-//     })
-//   }
-
-//   async add (domain, options, cb = () => {}) {
-//     // console.log('dapps.add', domain, options, cb)
-//     // Resolve ENS name
-//     let namehash
-//     try {
-//       namehash = hash(domain)
-//     } catch (e) {
-//       return cb(e)
-//     }
-//     // Check if already added
-//     if (store(`main.dapp.details.${namehash}`)) {
-//       // store.removeDapp(namehash)
-//       // store.addDapp()
-//       // store.addDapp(namehash, { domain, type, hash, pinned: false })
-//       return cb(new Error('Dapp already added'))
-//     }
-
-//     // Resolve content
-//     const contentCid = await resolve.rootCid(domain)
-
-//     // If content available -> store dapp
-//     if (contentCid) {
-//       store.addDapp(namehash, { domain, cid: contentCid, pinned: false }, options)
-//       // Get Dapp Icon
-//       try {
-//         // const index = await ipfs.getFile(`${contentCid}/index.html`)
-
-//         // const $ = cheerio.load(index.content.toString('utf8'))
-//         // let favicon = ''
-//         // $('link').each((i, link) => {
-//         //   if ($(link).attr('rel') === 'icon' || $(link).attr('rel') === 'shortcut icon') {
-//         //     favicon = favicon || $(link).attr('href')
-//         //   }
-//         // })
-//         // if (favicon.startsWith('./')) favicon = favicon.substring(2)
-//         // let icon
-//         // const file = await ipfs.getFile(`${contentCid}/${favicon || 'favicon.ico'}`)
-//         // if (file) {
-//         //   icon = {
-//         //     cid: file.cid.toString(),
-//         //     path: file.path,
-//         //     name: file.name,
-//         //     content: Buffer.from(file.content).toString('base64')
-//         //   }
-//         // }
-//         // store.updateDapp(namehash, { icon })
-//         this._pin(contentCid)
-//         cb(null)
-//       } catch (e) {
-//         log.error(e)
-//         store.removeDapp(namehash)
-//         cb(new Error('Could not resolve dapp: ' + e.message))
-//       }
-//     // Else -> throw
-//     } else {
-//       cb(new Error('Could not resolve ENS name to content hash'))
-//     }
-//   }
-
-//   remove (domain, cb) {
-//     const namehash = hash(domain)
-
-//     // Check if exists
-//     if (!store(`main.dapp.details.${namehash}`)) return cb(new Error('Dapp doesn\'t exist'))
-
-//     // Remove dapp
-//     store.removeDapp(namehash)
-//     cb(null)
-//   }
-
-//   move (fromArea, fromIndex, toArea, toIndex, cb) {
-//     store.moveDapp(fromArea, fromIndex, toArea, toIndex)
-//     cb(null)
-//   }
-
-//   async launch (domain, cb) {
-//     const dapp = store(`main.dapp.details.${hash(domain)}`)
-//     if (!dapp) return cb(new Error('Could not find dapp'))
-//     // if (!dapp.pinned) return cb(new Error('Dapp not pinned'))
-//     // if (!ipfs return cb(new Error('IPFS client not running'))
-//     const session = crypto.randomBytes(6).toString('hex')
-//     server.sessions.add(domain, session)
-//     windows.openView(domain, session)
-//     // shell.openExternal(`http://localhost:8421/?dapp=${domain}:${session}`)
-//     if (cb) cb(null)
-//   }
-
-//   async _pin (cid) {
-//     // await ipfs.pin(cid)
-
-//     // const dapp = Object.entries(store('main.dapp.details')).find(([namehash, dapp]) => dapp.cid === cid)
-
-//     // return dapp && !!store.updateDapp(dapp[0], { pinned: true })
-//   }
-
-//   _updateHashes () {
-//     // For each registered dapp ->
-//     Object.entries(store('main.dapp.details')).forEach(async ([namehash, dapp]) => {
-//       // 1) resolve content
-//       const result = await ens.resolveContent(dapp.domain)
-//       // 2) if new content hash -> update dapp and pin content
-//       if (result && result.hash !== dapp.cid) {
-//         store.updateDapp(namehash, { cid: result.hash, pinned: false })
-//         this._pin(result.hash)
-//       }
-//     })
-//   }
-
-//   _updatePins () {
-//     Object.entries(store('main.dapp.details')).forEach(async ([namehash, dapp]) => {
-//       const ipfsState = store('main.clients.ipfs.state')
-//       if (ipfsState === 'ready' && !dapp.pinned) {
-//         this._pin(dapp.cid)
-//       }
-//     })
-//   }
-// }

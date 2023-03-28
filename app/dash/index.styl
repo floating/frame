@@ -1,0 +1,321 @@
+html, body
+  margin 0
+  border 0
+  font-family 'MainFont'
+  font-weight 300
+  -webkit-app-region no-drag
+  overflow hidden
+  color var(--outerspace)
+  background var(--ghostY)
+
+div
+  user-select none
+  cursor default
+
+::-webkit-scrollbar
+  width 0px
+  background transparent
+
+@keyframes showFooter
+  0%
+    opacity 0
+    transform translateY(4px)
+  60%
+    opacity 0
+    transform translateY(4px)
+  100%
+    opacity 1
+    transform translateY(0px)
+
+.dash
+  width 100%
+  height 100%
+  overflow-y scroll
+  overflow-x hidden
+  background var(--ghostA)
+  position relative
+
+  .dashMain
+    position absolute 
+    top 80px
+    right 8px
+    bottom 40px
+    left 8px
+    z-index 1000
+    background var(--ghostZ)
+    border-radius 32px
+    padding-bottom 20px
+    transition var(--standard)
+
+    .dashMainScroll
+      position absolute 
+      top 0px
+      right 0px
+      bottom 0px
+      left 0px
+      z-index 2000
+      border-radius 32px
+      overflow-y scroll
+      overflow-x hidden
+
+    .dashMainOverlay
+      position absolute
+      top 0px
+      right 0px
+      bottom 0px
+      left 0px
+      border-radius 32px
+      z-index 40000000
+      box-shadow inset 0px 0px 6px var(--ghostY)
+      pointer-events none
+
+    .originTitle
+      margin 30px 8px 5px 0px
+      font-size 18px
+      display flex
+      align-items center
+      font-weight 400
+
+      .originTitleIcon
+        margin 9px 16px
+
+      .originTitleText
+        margin-top -2px
+
+    .clearOriginsButton
+      background var(--ghostA)
+      margin 74px 6px 7px 6px
+      height 38px
+      border-radius 20px
+      font-weight 500
+      box-sizing border-box
+      padding 18px 16px 16px 17px
+      text-align center
+      margin-bottom 5px
+      display flex
+      justify-content center
+      align-items center
+      font-size 13px
+      text-transform uppercase
+      cursor pointer
+      border-bottom 2px solid var(--ghostZ)
+      box-shadow 0px 2px 4px var(--ghostY)
+      letter-spacing 1px
+      transform translateY(0px)
+      *
+        pointer-events none
+
+    .clearOriginsButton:hover
+      background var(--ghostB)
+      box-shadow 0px 4px 8px var(--ghostY)
+      transform translateY(-1px)
+
+    .clearOriginsButton:active
+      background var(--ghostB)
+      box-shadow 0px 1px 2px var(--ghostY)
+      transform translateY(0px)
+
+  .dashFooter
+    background var(--ghostZ)
+    position absolute
+    bottom 40px
+    height 60px
+    left 8px
+    right 8px
+    border-radius 30px
+    padding 3px 3px 1px 3px
+    animation showFooter 0.64s ease-in-out
+    box-sizing border-box
+
+    .dashFooterButton
+      height 56px
+      position relative
+      background var(--ghostA)
+      border-radius 28px
+      display flex
+      justify-content center
+      align-items center
+      cursor pointer
+      font-size 16px
+      box-shadow 0px 2px 4px var(--ghostY)
+      border-bottom 2px solid var(--ghostZ)
+      box-sizing border-box
+      box-sizing border-box
+      letter-spacing 1px
+      color var(--outerspace)
+      font-family 'MainFont'
+      font-weight 400
+      z-index 5
+      transform translateY(0px)
+
+      *
+        pointer-events none
+
+      .newAccountIcon
+        position absolute
+        top 0
+        left 0
+        bottom 0px
+        width 64px
+        font-size 28px
+        display flex
+        justify-content center
+        align-items center
+        font-weight 300
+      
+    .newAccount:hover
+      background var(--ghostB)
+
+  .dashFooterButton:hover
+    transform translateY(-1px)
+    box-shadow 0px 4px 8px var(--ghostY)
+    background var(--ghostB)
+
+  .dashFooterButton:active
+    transform translateY(0px)
+    box-shadow 0px 1px 2px var(--ghostY)
+    background var(--ghostB)
+
+  .panelScrollOverlay
+    position absolute
+    top 0px
+    right 0px
+    bottom 0px
+    left 0px
+    border-radius 16px
+    z-index 40000000
+    box-shadow inset 0px 0px 6px var(--ghostX)
+    pointer-events none
+
+  .addAccounts
+    position absolute
+    top 0px
+    left 0
+    right 0
+    bottom 0
+    background var(--ghostZ)
+    z-index 4000
+    overflow-y scroll
+    overflow-x hidden
+    padding-bottom 60px
+
+    .addAccountsHeader
+      .addAccountsHeaderTitle
+        margin-top 20px
+        margin-bottom 20px
+        font-size 14px
+        font-weight 400
+        height 50px
+        display flex
+        justify-content center
+        align-items center
+
+      .addAccountsHeaderClose
+        position absolute
+        top 18px
+        right 10px
+        border-radius 8px
+        cursor pointer
+        background var(--ghostB)
+        width 90px
+        height 30px
+        display flex
+        justify-content center
+        align-items center
+        text-transform uppercase
+        font-size 11px
+        letter-spacing 1px
+        font-weight 300
+        padding-bottom 1px
+        padding-left 1px
+        display none
+
+        *
+          pointer-events none
+
+      .addAccountsHeaderClose:hover
+        background var(--ghostC)
+
+    .accountTypeSelect
+      height 100px
+      font-weight 400
+      border-radius 27px
+      margin 6px 6px 8px 6px
+      display flex
+      justify-content center
+      align-items center
+      cursor pointer
+      background var(--ghostA)
+      box-shadow 0px 4px 8px var(--ghostY)
+      font-size 16px
+      border-bottom 2px solid var(--ghostZ)
+      transform translateY(0px)
+      position relative
+      *
+        pointer-event none
+
+      .accountTypeSelectIcon
+        margin-right 16px
+
+    .accountTypeSelect:hover
+      transform translateY(-1px)
+      box-shadow 0px 4px 12px var(--ghostY)
+      background var(--ghostB)
+      z-index 200
+
+    .accountTypeSelect:active
+      transform translateY(0px)
+      box-shadow 0px 2px 4px var(--ghostY)
+      z-index 201
+
+  .signers
+    width 100%
+
+    .signersHeader
+      width calc(100% - 32px)
+      display flex
+      justify-content center
+      align-items center
+      position relative
+      height 32px
+      margin 0px 16px 12px 16px
+      box-sizing border-box
+      font-size 12px
+      text-transform uppercase
+      letter-spacing 1px
+      font-weight 400
+
+    .noSigners
+      position relative
+      width 100%
+      height 48px
+      overflow hidden
+      background var(--ghostA)
+      box-sizing border-box
+      margin 0px 0px 40px 0px
+      border-radius 12px
+      display flex
+      justify-content center
+      align-items center
+      font-size 11px
+      font-weight 400
+      letter-spacing 2px
+      text-transform uppercase
+      box-shadow 0px 4px 8px var(--ghostY)
+
+    .signersMid
+      padding 0px 6px 64px 6px
+
+    .signersList
+      display flex
+      flex-wrap wrap
+
+@import './Chains/style'
+@import './Dapps/style'
+@import './Command/style'
+@import './Main/style'
+@import './Accounts/Add/style'
+@import './Signer/style'
+@import './Notify/style'
+@import './Tokens/style'
+@import './card.styl'

@@ -1,12 +1,15 @@
 import HDKey from 'hdkey'
 
-import { publicToAddress, toChecksumAddress } from 'ethereumjs-util'
+import { publicToAddress, toChecksumAddress } from '@ethereumjs/util'
 
 export enum Derivation {
-  live = 'live', legacy = 'legacy', standard = 'standard', testnet = 'testnet'
+  live = 'live',
+  legacy = 'legacy',
+  standard = 'standard',
+  testnet = 'testnet'
 }
 
-export function deriveHDAccounts (publicKey: string, chainCode: string, cb: Callback<string[]>) {
+export function deriveHDAccounts(publicKey: string, chainCode: string, cb: Callback<string[]>) {
   try {
     const hdk = new HDKey()
     hdk.publicKey = Buffer.from(publicKey, 'hex')
@@ -17,7 +20,9 @@ export function deriveHDAccounts (publicKey: string, chainCode: string, cb: Call
       return toChecksumAddress(`0x${address.toString('hex')}`)
     }
     const accounts = []
-    for (let i = 0; i < 100; i++) { accounts[i] = derive(i) }
+    for (let i = 0; i < 100; i++) {
+      accounts[i] = derive(i)
+    }
 
     cb(null, accounts)
   } catch (e) {
@@ -32,7 +37,7 @@ const derivationPaths: { [key: string]: string } = {
   [Derivation.live.valueOf()]: "44'/60'/<index>'/0/0"
 }
 
-export function getDerivationPath (derivation: Derivation, index = -1) {
+export function getDerivationPath(derivation: Derivation, index = -1) {
   const path = derivationPaths[derivation.valueOf()]
 
   return path.replace('<index>', (index > -1 ? index : '').toString())

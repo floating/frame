@@ -1,0 +1,157 @@
+.addChainTitle
+  padding 42px
+  font-size 24px
+  font-weight 300
+
+.addChain
+  font-size 16px
+  position relative
+  z-index 3
+  word-break break-word
+  width 100%
+  box-sizing border-box
+  padding-bottom 32px
+
+.chainColorSwatches
+  display flex
+  margin-top 4px
+  margin-bottom 4px
+  background var(--ghostZ)
+  border-radius 16px
+  padding 3px
+
+  .chainColorSwatch
+    height 16px
+    width calc(100% / 8)
+    margin-left 3px
+    border-radius 3px
+    cursor pointer
+    // box-shadow 0px 2px 4px var(--ghostX)
+    box-sizing border-box
+    position relative
+
+  .chainColorSwatch:hover
+    transform translateY(-1px)
+    box-shadow 0px 4px 8px var(--ghostX)
+    position relative
+    z-index 100
+    margin-bottom -1px
+  
+  // .chainColorSwatch:active
+  //   transform translateY(0px)
+  //   box-shadow 0px 1px 2px var(--ghostX)
+
+  .chainColorSwatch:first-child
+    border-top-left-radius 12px
+    border-bottom-left-radius 12px
+    margin-left 0px
+
+  .chainColorSwatch:last-child
+    border-top-right-radius 12px
+    border-bottom-right-radius 12px
+
+  .chainColorSwatchSelected::before
+    content ''
+    position absolute
+    width 5px 
+    height 5px
+    border-radius 2.5px
+    top 50%
+    left 50%
+    margin-top -2.5px
+    margin-left -2.5px
+    background var(--ghostZ)
+    z-index 3000000
+
+.chainId
+  width calc(50% - 5px)
+
+.chainSymbol
+  width calc(50% - 5px)
+
+.chainRpc
+  width 100%  
+
+.chainInput
+  background transparent
+  outline none
+  border none
+  text-align center
+  font-size 18px
+  width 100%
+  background var(--ghostZ)
+  border-radius 20px
+  font-family 'MainFont'
+  padding 16px
+  font-weight 300
+  color var(--outerspace)
+  margin-top 5px
+
+.chainInputDim
+  color var(--outerspace03)
+
+.chainInputLabel
+  font-size 10px
+  text-transform uppercase
+  font-weight 500
+  padding 8px 0px 4px 16px
+  letter-spacing 1px
+
+.chainFieldDisplay
+  padding 10px
+  margin-top 5px
+  text-align center
+
+.addChainSubmit
+  background var(--ghostC)
+  width 100%
+  margin-top 25px
+  margin-bottom 25px
+  height 48px
+  border-radius 8px
+  box-sizing border-box
+  padding 13px
+  text-align center
+  margin-bottom 5px
+  display flex
+  justify-content center
+  align-items center
+  font-size 15px
+  text-transform uppercase
+  opacity 0.5
+
+  svg
+    margin-right 10px
+
+.addChainSubmitEnabled
+  background var(--ghostD)
+  color var(--good)
+  opacity 1
+  cursor pointer
+  * 
+    pointer-events none
+    
+.chainRow
+  width 100%
+  display flex
+  justify-content space-between
+  padding 0px 16px 16px 16px
+  box-sizing border-box
+  flex-direction column
+
+.chainRowTestnet
+  padding 8px 3px 8px 17px
+  margin 8px auto 16px auto
+  font-size 11px
+  font-weight 500
+  display flex
+  align-items center
+  justify-content space-between
+  border 3px solid var(--ghostZ)
+  border-radius 26px
+  text-transform uppercase
+  letter-spacing 1px
+  width 140px
+
+.chainRowRemove
+  padding 8px 0px 8px 0px

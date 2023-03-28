@@ -1,5 +1,8 @@
 import log from 'electron-log'
+
 import migrations from '../../../../main/store/migrations'
+import { getDefaultAccountName } from '../../../../resources/domain/account'
+import { capitalize } from '../../../../resources/utils'
 
 let state
 
@@ -11,41 +14,46 @@ afterAll(() => {
   log.transports.console.level = 'debug'
 })
 
+beforeEach(() => {
+  state = {
+    main: {
+      _version: 0,
+      networks: { ethereum: {} },
+      networksMeta: { ethereum: {} },
+      accounts: {},
+      balances: {},
+      tokens: { known: {} }
+    }
+  }
+})
+
 describe('migration 13', () => {
   beforeEach(() => {
-    state = {
-      main: {
-        _version: 12,
-        networks: {
-          ethereum: {
-            1: {
-              id: 1,
-              type: 'ethereum',
-              layer: 'mainnet',
-              symbol: 'ETH',
-              name: 'Mainnet'
-            },
-            137: {
-              id: 1,
-              type: 'ethereum',
-              layer: 'sidechain',
-              symbol: 'MATIC',
-              name: 'Polygon',
-              connection: {
-                primary: {
-                  on: true,
-                  current: 'matic'
-                },
-                secondary: {
-                  on: false,
-                  current: 'local'
-                }
-              }
-            }
+    state.main._version = 12
+
+    state.main.networks.ethereum = {
+      1: {
+        id: 1,
+        type: 'ethereum',
+        layer: 'mainnet',
+        symbol: 'ETH',
+        name: 'Mainnet'
+      },
+      137: {
+        id: 1,
+        type: 'ethereum',
+        layer: 'sidechain',
+        symbol: 'MATIC',
+        name: 'Polygon',
+        connection: {
+          primary: {
+            on: true,
+            current: 'matic'
+          },
+          secondary: {
+            on: false,
+            current: 'local'
           }
-        },
-        networksMeta: {
-          ethereum: { }
         }
       }
     }
@@ -60,7 +68,7 @@ describe('migration 13', () => {
 
   it('adds default gas price info', () => {
     state.main.networksMeta.ethereum = {
-      1: { }
+      1: {}
     }
 
     const updatedState = migrations.apply(state, 13)
@@ -96,9 +104,9 @@ describe('migration 13', () => {
       }
     }
 
-    const updatedState = migrations.apply(state, 13);
+    const updatedState = migrations.apply(state, 13)
 
-    ['slow', 'standard', 'fast', 'asap', 'custom'].forEach(level => {
+    ;['slow', 'standard', 'fast', 'asap', 'custom'].forEach((level) => {
       expect(updatedState.main.networksMeta.ethereum[1].gas.price).toHaveProperty(`levels.${level}`)
     })
   })
@@ -126,32 +134,24 @@ describe('migration 13', () => {
 
 describe('migration 14', () => {
   beforeEach(() => {
-    state = {
-      main: {
-        _version: 13,
-        networks: {
-          ethereum: {
-            137: {
-              id: 1,
-              type: 'ethereum',
-              layer: 'sidechain',
-              symbol: 'MATIC',
-              name: 'Polygon',
-              connection: {
-                primary: {
-                  on: true,
-                  current: 'matic'
-                },
-                secondary: {
-                  on: false,
-                  current: 'local'
-                }
-              }
-            }
+    state.main._version = 13
+
+    state.main.networks.ethereum = {
+      137: {
+        id: 1,
+        type: 'ethereum',
+        layer: 'sidechain',
+        symbol: 'MATIC',
+        name: 'Polygon',
+        connection: {
+          primary: {
+            on: true,
+            current: 'matic'
+          },
+          secondary: {
+            on: false,
+            current: 'local'
           }
-        },
-        networksMeta: {
-          ethereum: { }
         }
       }
     }
@@ -159,29 +159,31 @@ describe('migration 14', () => {
 
   const connectionPriorities = ['primary', 'secondary']
 
-  connectionPriorities.forEach(priority => {
+  connectionPriorities.forEach((priority) => {
     it(`updates the ${priority} polygon connection from matic to infura`, () => {
       state.main.networks.ethereum[137].connection[priority].current = 'matic'
-  
+
       const updatedState = migrations.apply(state, 14)
-  
+
       expect(updatedState.main.networks.ethereum[137].connection[priority].current).toBe('infura')
 
       // ensure other settings weren't changed
-      expect(updatedState.main.networks.ethereum[137].connection[priority].on)
-        .toBe(state.main.networks.ethereum[137].connection[priority].on)
+      expect(updatedState.main.networks.ethereum[137].connection[priority].on).toBe(
+        state.main.networks.ethereum[137].connection[priority].on
+      )
     })
-  
+
     it(`does not update the ${priority} polygon connection if not matic`, () => {
       state.main.networks.ethereum[137].connection[priority].current = 'local'
-  
+
       const updatedState = migrations.apply(state, 14)
-  
+
       expect(updatedState.main.networks.ethereum[137].connection[priority].current).toBe('local')
 
       // ensure other settings weren't changed
-      expect(updatedState.main.networks.ethereum[137].connection[priority].on)
-        .toBe(state.main.networks.ethereum[137].connection[priority].on)
+      expect(updatedState.main.networks.ethereum[137].connection[priority].on).toBe(
+        state.main.networks.ethereum[137].connection[priority].on
+      )
     })
   })
 
@@ -235,7 +237,7 @@ describe('migration 14', () => {
 
     expect(arbitrum.gas.fees.maxFeePerGas).toBe(undefined)
     expect(arbitrum).toMatchObject({
-      gas: { fees: {} , price: { selected: 'standard', levels: {} } }
+      gas: { fees: {}, price: { selected: 'standard', levels: {} } }
     })
   })
 
@@ -258,33 +260,25 @@ describe('migration 14', () => {
 
 describe('migration 15', () => {
   beforeEach(() => {
-    state = {
-      main: {
-        _version: 14,
-        networks: {
-          ethereum: {
-            137: {
-              id: 1,
-              type: 'ethereum',
-              layer: 'sidechain',
-              symbol: 'MATIC',
-              name: 'Polygon',
-              explorer: 'https://explorer.matic.network',
-              connection: {
-                primary: {
-                  on: true,
-                  current: 'matic'
-                },
-                secondary: {
-                  on: false,
-                  current: 'local'
-                }
-              }
-            }
+    state.main._version = 14
+
+    state.main.networks.ethereum = {
+      137: {
+        id: 1,
+        type: 'ethereum',
+        layer: 'sidechain',
+        symbol: 'MATIC',
+        name: 'Polygon',
+        explorer: 'https://explorer.matic.network',
+        connection: {
+          primary: {
+            on: true,
+            current: 'matic'
+          },
+          secondary: {
+            on: false,
+            current: 'local'
           }
-        },
-        networksMeta: {
-          ethereum: { }
         }
       }
     }
@@ -299,7 +293,7 @@ describe('migration 15', () => {
 
   it('adds the Polygon explorer if one does not exist', () => {
     delete state.main.networks.ethereum['137'].explorer
-    
+
     const updatedState = migrations.apply(state, 15)
     const polygon = updatedState.main.networks.ethereum['137']
 
@@ -318,37 +312,30 @@ describe('migration 15', () => {
 
 describe('migration 16', () => {
   beforeEach(() => {
-    state = {
-      main: {
-        _version: 15,
-        currentNetwork: {
-          type: 'ethereum', 
-          id: '1'
-        },
-        networks: {
-          ethereum: {
-            137: {
-              id: '137',
-              type: 'ethereum',
-              layer: 'sidechain',
-              symbol: 'MATIC',
-              name: 'Polygon',
-              explorer: 'https://explorer.matic.network',
-              connection: {
-                primary: {
-                  on: true,
-                  current: 'matic'
-                },
-                secondary: {
-                  on: false,
-                  current: 'local'
-                }
-              }
-            }
+    state.main._version = 15
+
+    state.main.currentNetwork = {
+      type: 'ethereum',
+      id: '1'
+    }
+
+    state.main.networks.ethereum = {
+      137: {
+        id: '137',
+        type: 'ethereum',
+        layer: 'sidechain',
+        symbol: 'MATIC',
+        name: 'Polygon',
+        explorer: 'https://explorer.matic.network',
+        connection: {
+          primary: {
+            on: true,
+            current: 'matic'
+          },
+          secondary: {
+            on: false,
+            current: 'local'
           }
-        },
-        networksMeta: {
-          ethereum: {}
         }
       }
     }
@@ -444,7 +431,7 @@ describe('migration 18', () => {
 
     const updatedState = migrations.apply(state, 18)
 
-    expect(updatedState.main.tokens).toEqual({ custom: []})
+    expect(updatedState.main.tokens).toEqual({ custom: [] })
   })
 
   it('migrates missing custom tokens to an empty array', () => {
@@ -452,7 +439,7 @@ describe('migration 18', () => {
 
     const updatedState = migrations.apply(state, 18)
 
-    expect(updatedState.main.tokens).toEqual({ custom: []})
+    expect(updatedState.main.tokens).toEqual({ custom: [] })
   })
 })
 
@@ -494,7 +481,7 @@ describe('migration 20', () => {
           aragonAccountMigrationWarning: true
         },
         accounts: {
-          'test': {
+          test: {
             smart: {
               type: 'aragon'
             }
@@ -531,38 +518,45 @@ describe('migration 20', () => {
 
 describe('migration 21', () => {
   beforeEach(() => {
-    state = {
-      main: {
-        _version: 20,
-        networks: {
-          ethereum: { 
-            5: {
-              id: 5,
-              type: 'ethereum',
-              layer: 'testnet',
-              symbol: 'ETH',
-              name: 'Görli',
-              explorer: 'https://goerli.etherscan.io',
-              gas: {
-                price: {
-                  selected: 'standard',
-                  levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-                }
-              },
-              connection: {
-                primary: { on: true, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
-                secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
-              },
-              on: false
-            }
+    state.main._version = 20
+
+    state.main.networkPresets = { ethereum: {} }
+
+    state.main.networks.ethereum = {
+      5: {
+        id: 5,
+        type: 'ethereum',
+        layer: 'testnet',
+        symbol: 'ETH',
+        name: 'Görli',
+        explorer: 'https://goerli.etherscan.io',
+        gas: {
+          price: {
+            selected: 'standard',
+            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
           }
         },
-        networksMeta: {
-          ethereum: { }
+        connection: {
+          primary: {
+            on: true,
+            current: 'infura',
+            status: 'loading',
+            connected: false,
+            type: '',
+            network: '',
+            custom: ''
+          },
+          secondary: {
+            on: false,
+            current: 'custom',
+            status: 'loading',
+            connected: false,
+            type: '',
+            network: '',
+            custom: ''
+          }
         },
-        networkPresets: {
-          ethereum: { }
-        }
+        on: false
       }
     }
   })
@@ -615,7 +609,7 @@ describe('migration 21', () => {
 
     expect(sepolia.gas.fees.maxFeePerGas).toBe(undefined)
     expect(sepolia).toMatchObject({
-      gas: { fees: {} , price: { selected: 'standard', levels: {} } }
+      gas: { fees: {}, price: { selected: 'standard', levels: {} } }
     })
   })
 
@@ -638,62 +632,74 @@ describe('migration 21', () => {
 
   removedGoerliRPCs.forEach((removedRPCName) => {
     it(`resets the primary connection when the ${removedRPCName} RPC is selected`, () => {
-      state.main.networks.ethereum[5].connection.primary = { 
-        on: true, 
-        current: removedRPCName, 
-        status: 'disconnected', 
-        connected: false, 
-        type: '', 
-        network: '', 
-        custom: '' 
+      state.main.networks.ethereum[5].connection.primary = {
+        on: true,
+        current: removedRPCName,
+        status: 'disconnected',
+        connected: false,
+        type: '',
+        network: '',
+        custom: ''
       }
 
       const updatedState = migrations.apply(state, 21)
       const goerli = updatedState.main.networks.ethereum[5]
 
       expect(goerli.connection.primary).toMatchObject({
-        on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: ''
+        on: false,
+        current: 'custom',
+        status: 'loading',
+        connected: false,
+        type: '',
+        network: '',
+        custom: ''
       })
     })
 
     it(`resets the secondary connection when the ${removedRPCName} RPC is selected`, () => {
-      state.main.networks.ethereum[5].connection.primary = { 
-        on: true, 
-        current: removedRPCName, 
-        status: 'disconnected', 
-        connected: false, 
-        type: '', 
-        network: '', 
-        custom: '' 
+      state.main.networks.ethereum[5].connection.primary = {
+        on: true,
+        current: removedRPCName,
+        status: 'disconnected',
+        connected: false,
+        type: '',
+        network: '',
+        custom: ''
       }
 
       const updatedState = migrations.apply(state, 21)
       const goerli = updatedState.main.networks.ethereum[5]
 
       expect(goerli.connection.secondary).toMatchObject({
-        on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: ''
+        on: false,
+        current: 'custom',
+        status: 'loading',
+        connected: false,
+        type: '',
+        network: '',
+        custom: ''
       })
     })
   })
 
   it('turns off goerli if the primary connection was reset whilst the secondary connection is inactive', () => {
-    state.main.networks.ethereum[5].connection.primary = { 
-      on: false, 
-      current: 'prylabs', 
-      status: 'disconnected', 
-      connected: false, 
-      type: '', 
-      network: '', 
-      custom: '' 
+    state.main.networks.ethereum[5].connection.primary = {
+      on: false,
+      current: 'prylabs',
+      status: 'disconnected',
+      connected: false,
+      type: '',
+      network: '',
+      custom: ''
     }
-    state.main.networks.ethereum[5].connection.secondary = { 
-      on: false, 
-      current: 'infura', 
-      status: 'loading', 
-      connected: false, 
-      type: '', 
-      network: '', 
-      custom: '' 
+    state.main.networks.ethereum[5].connection.secondary = {
+      on: false,
+      current: 'infura',
+      status: 'loading',
+      connected: false,
+      type: '',
+      network: '',
+      custom: ''
     }
 
     const updatedState = migrations.apply(state, 21)
@@ -703,23 +709,23 @@ describe('migration 21', () => {
   })
 
   it('turns off goerli if the secondary connection was reset whilst the primary connection is inactive', () => {
-    state.main.networks.ethereum[5].connection.primary = { 
-      on: false, 
-      current: 'infura', 
-      status: 'loading', 
-      connected: false, 
-      type: '', 
-      network: '', 
-      custom: '' 
+    state.main.networks.ethereum[5].connection.primary = {
+      on: false,
+      current: 'infura',
+      status: 'loading',
+      connected: false,
+      type: '',
+      network: '',
+      custom: ''
     }
-    state.main.networks.ethereum[5].connection.secondary = { 
-      on: false, 
-      current: 'prylabs', 
-      status: 'disconnected', 
-      connected: false, 
-      type: '', 
-      network: '', 
-      custom: '' 
+    state.main.networks.ethereum[5].connection.secondary = {
+      on: false,
+      current: 'prylabs',
+      status: 'disconnected',
+      connected: false,
+      type: '',
+      network: '',
+      custom: ''
     }
 
     const updatedState = migrations.apply(state, 21)
@@ -729,23 +735,23 @@ describe('migration 21', () => {
   })
 
   it('turns off goerli if both connections were reset', () => {
-    state.main.networks.ethereum[5].connection.primary = { 
-      on: true, 
-      current: 'mudit', 
-      status: 'connected', 
-      connected: true, 
-      type: '', 
-      network: '', 
-      custom: '' 
+    state.main.networks.ethereum[5].connection.primary = {
+      on: true,
+      current: 'mudit',
+      status: 'connected',
+      connected: true,
+      type: '',
+      network: '',
+      custom: ''
     }
-    state.main.networks.ethereum[5].connection.secondary = { 
-      on: false, 
-      current: 'prylabs', 
-      status: 'disconnected', 
-      connected: false, 
-      type: '', 
-      network: '', 
-      custom: '' 
+    state.main.networks.ethereum[5].connection.secondary = {
+      on: false,
+      current: 'prylabs',
+      status: 'disconnected',
+      connected: false,
+      type: '',
+      network: '',
+      custom: ''
     }
 
     const updatedState = migrations.apply(state, 21)
@@ -753,23 +759,26 @@ describe('migration 21', () => {
 
     expect(goerli.on).toBe(false)
   })
+
+  it('takes no action on goerli if the chain is not present', () => {
+    delete state.main.networks.ethereum[5]
+
+    const updatedState = migrations.apply(state, 21)
+
+    expect(Object.keys(updatedState.main.networks.ethereum)).toEqual(['11155111'])
+  })
 })
 
 describe('migration 22', () => {
   beforeEach(() => {
-    state = {
-      main: {
-        _version: 21,
-        networks: {
-          ethereum: {
-            1: {
-              layer: 'mainnet'
-            },
-            5: {
-              layer: 'testnet'
-            }
-          }
-        }
+    state.main._version = 21
+
+    state.main.networks.ethereum = {
+      1: {
+        layer: 'mainnet'
+      },
+      5: {
+        layer: 'testnet'
       }
     }
   })
@@ -789,25 +798,20 @@ describe('migration 22', () => {
 
 describe('migration 23', () => {
   beforeEach(() => {
-    state = {
-      main: {
-        _version: 22,
-        networksMeta: {
-          ethereum: {
-            1: {}, // Mainnet
-            3: {}, // Known Testnet
-            4: {}, // Known Testnet
-            5: {}, // Known Testnet
-            10: {}, // Optimism
-            42: {}, // Known Testnet
-            100: {}, // Gnosis
-            137: {}, // Polygon
-            8888: {}, // Unknown Chain
-            42161: {}, // Arbitrum
-            11155111: {}, // Known Testnet
-          }
-        }
-      }
+    state.main._version = 22
+
+    state.main.networksMeta.ethereum = {
+      1: {}, // Mainnet
+      3: {}, // Known Testnet
+      4: {}, // Known Testnet
+      5: {}, // Known Testnet
+      10: {}, // Optimism
+      42: {}, // Known Testnet
+      100: {}, // Gnosis
+      137: {}, // Polygon
+      8888: {}, // Unknown Chain
+      42161: {}, // Arbitrum
+      11155111: {} // Known Testnet
     }
   })
 
@@ -846,23 +850,22 @@ describe('migration 23', () => {
 
 describe('migration 24', () => {
   beforeEach(() => {
-    state = {
-      main: {
-        _version: 23,
-        networksMeta: {
-          ethereum: {
-            1: {}
-          }
-        }
-      }
-    }
+    state.main._version = 23
+
+    state.main.networksMeta.ethereum = { 1: {} }
   })
 
   it('sets the nativeCurrency value on a chain', () => {
     const updatedState = migrations.apply(state, 24)
     const chains = updatedState.main.networksMeta.ethereum
-    
-    expect(chains[1].nativeCurrency).toStrictEqual({ usd: { price: 0, change24hr: 0 }, icon: '', name: '', symbol: '', decimals: 0 })
+
+    expect(chains[1].nativeCurrency).toStrictEqual({
+      usd: { price: 0, change24hr: 0 },
+      icon: '',
+      name: '',
+      symbol: '',
+      decimals: 0
+    })
   })
 
   it('does not set the nativeCurrency value on a chain when it already exists', () => {
@@ -878,7 +881,7 @@ describe('migration 24', () => {
     }
     const updatedState = migrations.apply(state, 24)
     const chains = updatedState.main.networksMeta.ethereum
-    
+
     expect(chains[1].nativeCurrency).toStrictEqual({
       usd: {
         price: 1324.43,
@@ -887,5 +890,550 @@ describe('migration 24', () => {
       icon: 'https://assets.coingecko.com/coins/images/279/large/ethereum.png?1595348880',
       name: 'Ether'
     })
+  })
+})
+
+describe('migration 25', () => {
+  beforeEach(() => {
+    state.main._version = 24
+
+    state.main.networks.ethereum = {
+      10: {
+        connection: {
+          primary: { current: 'custom' },
+          secondary: { current: 'local' }
+        }
+      }
+    }
+  })
+
+  const connectionPriorities = ['primary', 'secondary']
+
+  connectionPriorities.forEach((priority) => {
+    it(`updates a ${priority} optimism connection to Infura`, () => {
+      state.main.networks.ethereum[10].connection[priority].current = 'optimism'
+
+      const updatedState = migrations.apply(state, 25)
+      const optimism = updatedState.main.networks.ethereum[10]
+
+      expect(optimism.connection[priority].current).toBe('infura')
+    })
+
+    it(`does not update an existing custom ${priority} optimism connection`, () => {
+      state.main.networks.ethereum[10].connection[priority].current = 'custom'
+
+      const updatedState = migrations.apply(state, 25)
+      const optimism = updatedState.main.networks.ethereum[10]
+
+      expect(optimism.connection[priority].current).toBe('custom')
+    })
+
+    it('takes no action if no Optimism chain is present', () => {
+      delete state.main.networks.ethereum[10]
+
+      const updatedState = migrations.apply(state, 25)
+
+      expect(updatedState.main.networks).toStrictEqual({ ethereum: {} })
+    })
+  })
+})
+
+describe('migration 26', () => {
+  beforeEach(() => {
+    state.main._version = 25
+
+    state.main.networks.ethereum = {
+      5: {
+        id: 5,
+        type: 'ethereum',
+        layer: 'testnet',
+        symbol: 'ETH',
+        name: 'Görli'
+      }
+    }
+
+    state.main.networksMeta.ethereum = {
+      5: {
+        nativeCurrency: {
+          symbol: 'ETH'
+        }
+      }
+    }
+  })
+
+  it('removes the symbol property on a network', () => {
+    const updatedState = migrations.apply(state, 26)
+    const networks = updatedState.main.networks.ethereum
+    const metadata = updatedState.main.networksMeta.ethereum
+    expect(networks[5].symbol).toBeFalsy()
+    expect(metadata[5].nativeCurrency.symbol).toBe('ETH')
+  })
+})
+
+describe('migration 27', () => {
+  beforeEach(() => {
+    state.main._version = 26
+  })
+
+  const address = '0x87c6418C2A3D6d502C85ed4454cAaDA0BD664AbA'
+  const accountTypes = ['seed', 'ring']
+
+  accountTypes.forEach((type) => {
+    it(`migrates a ${type} account to be called a hot account`, () => {
+      state.main.accounts[address] = {
+        name: `${capitalize(type)} Account`
+      }
+
+      const updatedState = migrations.apply(state, 27)
+
+      expect(updatedState.main.accounts[address].name).toBe('Hot Account')
+    })
+  })
+
+  it('does not migrate an account with a changed name', () => {
+    state.main.accounts[address] = {
+      name: `My Kewl Account`
+    }
+
+    const updatedState = migrations.apply(state, 27)
+
+    expect(updatedState.main.accounts[address].name).toBe('My Kewl Account')
+  })
+})
+
+describe('migration 28', () => {
+  beforeEach(() => {
+    state.main._version = 27
+
+    state.main.networksMeta.ethereum = {
+      5: {
+        nativeCurrency: {
+          symbol: 'ETH',
+          decimals: 0
+        }
+      },
+      11155111: {
+        nativeCurrency: {
+          symbol: 'ETH',
+          decimals: 18
+        }
+      }
+    }
+  })
+
+  it('updates the symbol for Sepolia testnet if it is currently ETH', () => {
+    const updatedState = migrations.apply(state, 28)
+    const metadata = updatedState.main.networksMeta.ethereum
+    expect(metadata[11155111].nativeCurrency.symbol).toBe('sepETH')
+  })
+
+  it('updates the symbol for Gorli testnet if it is currently ETH', () => {
+    const updatedState = migrations.apply(state, 28)
+    const metadata = updatedState.main.networksMeta.ethereum
+    expect(metadata[5].nativeCurrency.symbol).toBe('görETH')
+  })
+
+  it('does not update the symbol for Gorli testnet if it is not ETH', () => {
+    state.main.networksMeta.ethereum[5].nativeCurrency.symbol = 'CUSTOM'
+    const updatedState = migrations.apply(state, 28)
+    const metadata = updatedState.main.networksMeta.ethereum
+    expect(metadata[5].nativeCurrency.symbol).toBe('CUSTOM')
+  })
+
+  it('does not update the symbol for Sepolia testnet if it is not ETH', () => {
+    state.main.networksMeta.ethereum[11155111].nativeCurrency.symbol = 'CUSTOM'
+    const updatedState = migrations.apply(state, 28)
+    const metadata = updatedState.main.networksMeta.ethereum
+    expect(metadata[11155111].nativeCurrency.symbol).toBe('CUSTOM')
+  })
+
+  it('updates decimals to 18 if they are currently 0', () => {
+    const updatedState = migrations.apply(state, 28)
+    const metadata = updatedState.main.networksMeta.ethereum
+    expect(metadata[5].nativeCurrency.decimals).toBe(18)
+  })
+
+  it('takes no action on Goerli if the chain is not present', () => {
+    delete state.main.networksMeta.ethereum[5]
+
+    const updatedState = migrations.apply(state, 28)
+
+    expect(Object.keys(updatedState.main.networksMeta.ethereum)).toEqual(['11155111'])
+  })
+
+  it('takes no action on Sepolia if the chain is not present', () => {
+    delete state.main.networksMeta.ethereum[11155111]
+
+    const updatedState = migrations.apply(state, 28)
+
+    expect(Object.keys(updatedState.main.networksMeta.ethereum)).toEqual(['5'])
+  })
+})
+
+describe('migration 29', () => {
+  beforeEach(() => {
+    state.main._version = 28
+
+    state.main.accounts = {
+      test: {
+        name: 'my test account',
+        lastSignerType: 'ledger'
+      },
+      look: {
+        name: 'such a cool account',
+        lastSignerType: 'ledger'
+      }
+    }
+
+    jest.setSystemTime(new Date('2022-11-17T11:01:58.135Z'))
+  })
+
+  it('adds the existing account names to accountsMeta under hashed keys with a timestamp', () => {
+    const updatedState = migrations.apply(state, 29)
+    const { accountsMeta } = updatedState.main
+
+    expect(accountsMeta).toStrictEqual({
+      '6ae9081b-ba1c-54a5-a985-20e180d6fa9f': {
+        name: 'such a cool account',
+        lastUpdated: 1668682918135
+      },
+      'c7b2d7b1-b0cc-5706-b708-cbc09b0bb7bf': {
+        name: 'my test account',
+        lastUpdated: 1668682918135
+      }
+    })
+  })
+
+  it('does not add an account with a default name', () => {
+    state.main.accounts.test = {
+      name: getDefaultAccountName('ledger'),
+      lastSignerType: 'ledger'
+    }
+    const updatedState = migrations.apply(state, 29)
+    const { accountsMeta } = updatedState.main
+
+    expect(accountsMeta).toStrictEqual({
+      '6ae9081b-ba1c-54a5-a985-20e180d6fa9f': {
+        name: 'such a cool account',
+        lastUpdated: 1668682918135
+      }
+    })
+  })
+
+  it('does not add a watch account with the previous default name', () => {
+    state.main.accounts.test = {
+      name: 'Address Account',
+      lastSignerType: 'address'
+    }
+    const updatedState = migrations.apply(state, 29)
+    const { accountsMeta } = updatedState.main
+
+    expect(accountsMeta).toStrictEqual({
+      '6ae9081b-ba1c-54a5-a985-20e180d6fa9f': {
+        name: 'such a cool account',
+        lastUpdated: 1668682918135
+      }
+    })
+  })
+})
+
+describe('migration 30', () => {
+  const address = '0xFeebabE6b0418eC13b30aAdF129F5DcDd4f70CeA'
+
+  const existingAccount = {
+    name: 'my test aragon dao',
+    created: 'new:1670583718135',
+    lastSignerType: 'aragon',
+    smart: {
+      type: 'aragon',
+      actor: 'my acting account',
+      dao: '0x0c188b183ff758500d1d18b432313d10e9f6b8a4',
+      agent: address
+    }
+  }
+
+  beforeEach(() => {
+    state = {
+      main: {
+        _version: 29,
+        accounts: {
+          [address]: existingAccount
+        }
+      }
+    }
+  })
+
+  it('should migrate existing aragon accounts to watch only', () => {
+    const updatedState = migrations.apply(state, 30)
+    const { accounts } = updatedState.main
+
+    expect(accounts[address]).toStrictEqual({
+      id: address,
+      name: existingAccount.name,
+      address,
+      lastSignerType: 'address',
+      created: existingAccount.created,
+      status: 'ok',
+      active: false,
+      signer: '',
+      requests: {},
+      ensName: '',
+      balances: {}
+    })
+  })
+
+  it('should not migrate non-aragon accounts', () => {
+    state.main.accounts['test dao agent address'] = {
+      name: 'not really an aragon dao'
+    }
+
+    const updatedState = migrations.apply(state, 30)
+    const { accounts } = updatedState.main
+
+    expect(accounts['test dao agent address']).toStrictEqual({
+      name: 'not really an aragon dao'
+    })
+  })
+})
+
+describe('migration 31', () => {
+  const address = '0xFeebabE6b0418eC13b30aAdF129F5DcDd4f70CeA'
+
+  const existingBalances = [
+    {
+      chainId: 10,
+      address: '0xdeaddeaddeaddeaddeaddeaddeaddeaddead0000',
+      name: 'Ether',
+      symbol: 'ETH',
+      decimals: 18,
+      logoURI: 'https://ethereum-optimism.github.io/data/ETH/logo.svg',
+      balance: '0x02ab5fa692c56d4000',
+      displayBalance: '49.24226'
+    },
+    {
+      balance: '0x0',
+      displayBalance: '0',
+      chainId: 80001,
+      symbol: 'MATIC',
+      address: '0x0000000000000000000000000000000000000000'
+    },
+    {
+      chainId: 1,
+      address: '0xc5102fe9359fd9a28f877a67e36b0f050d81a3cc',
+      name: 'Hop Protocol',
+      symbol: 'HOP',
+      decimals: 18,
+      logoURI: 'https://assets.coingecko.com/coins/images/25445/thumb/hop.png?1665541677',
+      balance: '0x0e0cd1012ac685f714',
+      displayBalance: '259.177937713752307476'
+    }
+  ]
+
+  beforeEach(() => {
+    state = {
+      main: {
+        _version: 30,
+        balances: {
+          [address]: existingBalances
+        }
+      }
+    }
+  })
+
+  it('remove any balances which have the address `0xdeaddeaddeaddeaddeaddeaddeaddeaddead0000`', () => {
+    const updatedState = migrations.apply(state, 31)
+    const { balances } = updatedState.main
+
+    expect(
+      balances[address].find((balance) => balance.address === '0xdeaddeaddeaddeaddeaddeaddeaddeaddead0000')
+    ).toBeFalsy()
+  })
+
+  it('should not remove any other balances', () => {
+    const updatedState = migrations.apply(state, 31)
+    const { balances } = updatedState.main
+
+    expect(balances[address]).toStrictEqual([
+      {
+        balance: '0x0',
+        displayBalance: '0',
+        chainId: 80001,
+        symbol: 'MATIC',
+        address: '0x0000000000000000000000000000000000000000'
+      },
+      {
+        chainId: 1,
+        address: '0xc5102fe9359fd9a28f877a67e36b0f050d81a3cc',
+        name: 'Hop Protocol',
+        symbol: 'HOP',
+        decimals: 18,
+        logoURI: 'https://assets.coingecko.com/coins/images/25445/thumb/hop.png?1665541677',
+        balance: '0x0e0cd1012ac685f714',
+        displayBalance: '259.177937713752307476'
+      }
+    ])
+  })
+})
+
+describe('migration 32', () => {
+  const getKnownTokens = (state) => state.main.tokens.known[account]
+  const account = '0xd8da6bf26964af9d7eed9e03e53415d37aa96045'
+
+  beforeEach(() => {
+    state.main._version = 31
+
+    state.main.networksMeta.ethereum = {
+      100: {
+        nativeCurrency: {
+          symbol: 'ETH',
+          decimals: 0,
+          name: ''
+        }
+      },
+      137: {
+        nativeCurrency: {
+          symbol: 'ETH',
+          decimals: 18,
+          name: ''
+        }
+      }
+    }
+
+    state.main.tokens.known[account] = [
+      {
+        address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48'
+      },
+      {
+        address: '0xdeaddeaddeaddeaddeaddeaddeaddeaddead0000'
+      }
+    ]
+  })
+
+  it('should remove any known tokens with the address `0xdeaddeaddeaddeaddeaddeaddeaddeaddead0000`', () => {
+    const updatedState = migrations.apply(state, 32)
+    const known = getKnownTokens(updatedState)
+    expect(known.find(({ address }) => address === '0xdeaddeaddeaddeaddeaddeaddeaddeaddead0000')).toBeFalsy()
+  })
+
+  it('should set known tokens as an empty object if currently undefined', () => {
+    delete state.main.tokens.known
+    const newState = migrations.apply(state, 32)
+    expect(newState.main.tokens.known).toEqual({})
+  })
+
+  it('should not remove any other known tokens', () => {
+    const oldKnown = getKnownTokens(state)
+    const updatedState = migrations.apply(state, 32)
+    const updatedKnown = getKnownTokens(updatedState)
+
+    expect(updatedKnown.length).toBe(oldKnown.length - 1)
+  })
+})
+
+describe('migration 34', () => {
+  const getNativeCurrency = (state, chainId) => state.main.networksMeta.ethereum[chainId].nativeCurrency
+  const createChainState = (chainId) => {
+    state.main.networks.ethereum[chainId] = { id: chainId }
+    state.main.networksMeta.ethereum[chainId] = { nativeCurrency: {} }
+  }
+
+  const expectedData = {
+    1: {
+      chainName: 'Mainnet',
+      currencyName: 'Ether',
+      currencySymbol: 'ETH'
+    },
+    5: {
+      chainName: 'Görli',
+      currencyName: 'Görli Ether',
+      currencySymbol: 'görETH'
+    },
+    10: {
+      chainName: 'Optimism',
+      currencyName: 'Ether',
+      currencySymbol: 'ETH'
+    },
+    100: {
+      chainName: 'Gnosis',
+      currencyName: 'xDAI',
+      currencySymbol: 'xDAI'
+    },
+    137: {
+      chainName: 'Polyon',
+      currencyName: 'Matic',
+      currencySymbol: 'MATIC'
+    },
+    42161: {
+      chainName: 'Arbitrum',
+      currencyName: 'Ether',
+      currencySymbol: 'ETH'
+    },
+    11155111: {
+      chainName: 'Sepolia',
+      currencyName: 'Sepolia Ether',
+      currencySymbol: 'sepETH'
+    }
+  }
+
+  beforeEach(() => {
+    state.main._version = 33
+  })
+
+  Object.entries(expectedData).forEach(([chainId, { chainName, currencyName, currencySymbol }]) => {
+    it(`should set the native currency name for ${chainName} to ${currencyName} if currently undefined`, () => {
+      createChainState(chainId)
+
+      const updatedState = migrations.apply(state, 34)
+      expect(getNativeCurrency(updatedState, chainId).name).toBe(currencyName)
+    })
+
+    it(`should set the native currency name for ${chainName} to ${currencyName} if currently an empty string'`, () => {
+      createChainState(chainId)
+      state.main.networksMeta.ethereum[chainId].nativeCurrency.name = ''
+
+      const updatedState = migrations.apply(state, 34)
+      expect(getNativeCurrency(updatedState, chainId).name).toBe(currencyName)
+    })
+
+    it(`should set the native currency symbol for ${chainName} to ${currencySymbol} if currently not set`, () => {
+      createChainState(chainId)
+
+      const updatedState = migrations.apply(state, 34)
+      expect(getNativeCurrency(updatedState, chainId).symbol).toBe(currencySymbol)
+    })
+  })
+
+  const fields = ['name', 'symbol']
+
+  fields.forEach((field) => {
+    it(`should not overwrite an existing native currency ${field}`, () => {
+      createChainState(10)
+      state.main.networksMeta.ethereum[10].nativeCurrency[field] = 'CUSTOM'
+
+      const updatedState = migrations.apply(state, 34)
+      expect(getNativeCurrency(updatedState, 10)[field]).toBe('CUSTOM')
+    })
+
+    it(`should set a missing custom chain native currency ${field} to an empty string`, () => {
+      createChainState(56)
+
+      const updatedState = migrations.apply(state, 34)
+      expect(getNativeCurrency(updatedState, 56)[field]).toBe('')
+    })
+  })
+
+  it('should set native currency data when no chain metadata previously existed', () => {
+    state.main.networks.ethereum[10] = { id: 10 }
+
+    const updatedState = migrations.apply(state, 34)
+    expect(getNativeCurrency(updatedState, 10)).toStrictEqual({ name: 'Ether', symbol: 'ETH' })
+  })
+
+  it('should set native currency data when none previously existed', () => {
+    createChainState(137)
+    delete state.main.networksMeta.ethereum[137].nativeCurrency
+
+    const updatedState = migrations.apply(state, 34)
+    expect(getNativeCurrency(updatedState, 137)).toStrictEqual({ name: 'Matic', symbol: 'MATIC' })
   })
 })

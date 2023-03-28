@@ -60,21 +60,23 @@ const customCoins = []
 
 const __clearCustomCoins = () => customCoins.splice(0, customCoins.length)
 
-const __addCoin = coin => {
+const __addCoin = (coin) => {
   customCoins.push(coin)
 }
 
 const listAssetPlatforms = async () => platforms
 const listCoins = async () => {
-  return markets.concat(customCoins).map(mkt => ({
-    id: mkt.id, symbol: mkt.symbol, name: mkt.name
+  return markets.concat(customCoins).map((mkt) => ({
+    id: mkt.id,
+    symbol: mkt.symbol,
+    name: mkt.name
   }))
 }
 
 const listMarkets = async (ids) => {
   if (!ids) return markets
 
-  return markets.concat(customCoins).filter(mkt => ids.includes(mkt.id))
+  return markets.concat(customCoins).filter((mkt) => ids.includes(mkt.id))
 }
 
 const coinPrices = async () => []

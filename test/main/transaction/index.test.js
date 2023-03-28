@@ -1,8 +1,16 @@
-import { addHexPrefix, stripHexPrefix } from 'ethereumjs-util'
-import Common from '@ethereumjs/common'
+import { addHexPrefix, stripHexPrefix } from '@ethereumjs/util'
+import { Common } from '@ethereumjs/common'
 
-import { maxFee, londonToLegacy, signerCompatibility, populate, sign } from '../../../main/transaction'
+import {
+  maxFee,
+  londonToLegacy,
+  signerCompatibility,
+  populate,
+  sign,
+  classifyTransaction
+} from '../../../main/transaction'
 import { GasFeesSource } from '../../../resources/domain/transaction'
+import { TxClassification } from '../../../main/accounts/types'
 
 describe('#signerCompatibility', () => {
   it('is always compatible with legacy transactions', () => {
@@ -211,8 +219,8 @@ describe('#londonToLegacy', () => {
   it('converts a London transaction to a legacy transaction', () => {
     const rawTx = {
       type: '0x2',
-      maxFeePerGas: addHexPrefix(7e9.toString(16)),
-      maxPriorityFeePerGas: addHexPrefix(2e9.toString(16)),
+      maxFeePerGas: addHexPrefix((7e9).toString(16)),
+      maxPriorityFeePerGas: addHexPrefix((2e9).toString(16)),
       gasLimit: '0x61a8',
       value: '0x6f05b59d3b20000',
       to: '0x6635f83421bf059cd8111f180f0727128685bae4',
@@ -222,7 +230,7 @@ describe('#londonToLegacy', () => {
     const tx = londonToLegacy(rawTx)
 
     expect(parseInt(tx.type)).toBe(0)
-    expect(tx.gasPrice).toBe(addHexPrefix(7e9.toString(16)))
+    expect(tx.gasPrice).toBe(addHexPrefix((7e9).toString(16)))
     expect(tx.gasLimit).toBe(rawTx.gasLimit)
     expect(tx.maxFeePerGas).toBe(undefined)
     expect(tx.maxPriorityFeePerGas).toBe(undefined)
@@ -289,7 +297,7 @@ describe('#populate', () => {
     })
 
     it('uses Frame-supplied gasPrice when the dapp did not specify a value', () => {
-      gas.price.levels.fast = addHexPrefix(7e9.toString(16))
+      gas.price.levels.fast = addHexPrefix((7e9).toString(16))
       const tx = populate(rawTx, chainConfig, gas)
 
       expect(tx.gasPrice).toBe(gas.price.levels.fast)
@@ -297,7 +305,7 @@ describe('#populate', () => {
     })
 
     it('uses Frame-supplied gasPrice when the dapp specified an invalid value', () => {
-      gas.price.levels.fast = addHexPrefix(7e9.toString(16))
+      gas.price.levels.fast = addHexPrefix((7e9).toString(16))
       rawTx.gasPrice = ''
       const tx = populate(rawTx, chainConfig, gas)
 
@@ -306,8 +314,8 @@ describe('#populate', () => {
     })
 
     it('uses dapp-supplied gasPrice when the dapp specified a valid value', () => {
-      gas.price.levels.fast = addHexPrefix(7e9.toString(16))
-      rawTx.gasPrice = 6e9.toString(16)
+      gas.price.levels.fast = addHexPrefix((7e9).toString(16))
+      rawTx.gasPrice = (6e9).toString(16)
       const tx = populate(rawTx, chainConfig, gas)
 
       expect(tx.gasPrice).toBe(rawTx.gasPrice)
@@ -336,8 +344,8 @@ describe('#populate', () => {
     })
 
     it('calculates maxFeePerGas when the dapp did not specify a value', () => {
-      gas.price.fees.maxBaseFeePerGas = addHexPrefix(7e9.toString(16))
-      gas.price.fees.maxPriorityFeePerGas = addHexPrefix(3e9.toString(16))
+      gas.price.fees.maxBaseFeePerGas = addHexPrefix((7e9).toString(16))
+      gas.price.fees.maxPriorityFeePerGas = addHexPrefix((3e9).toString(16))
       const tx = populate(rawTx, chainConfig, gas)
 
       expect(tx.maxFeePerGas).toBe(addHexPrefix((7e9 + 3e9).toString(16)))
@@ -345,8 +353,8 @@ describe('#populate', () => {
     })
 
     it('calculates maxFeePerGas when the dapp specified an invalid value', () => {
-      gas.price.fees.maxBaseFeePerGas = addHexPrefix(7e9.toString(16))
-      gas.price.fees.maxPriorityFeePerGas = addHexPrefix(3e9.toString(16))
+      gas.price.fees.maxBaseFeePerGas = addHexPrefix((7e9).toString(16))
+      gas.price.fees.maxPriorityFeePerGas = addHexPrefix((3e9).toString(16))
       rawTx.maxFeePerGas = ''
       const tx = populate(rawTx, chainConfig, gas)
 
@@ -355,9 +363,9 @@ describe('#populate', () => {
     })
 
     it('calculates maxFeePerGas using a dapp-supplied value of maxPriorityFeePerGas', () => {
-      gas.price.fees.maxBaseFeePerGas = addHexPrefix(7e9.toString(16))
-      gas.price.fees.maxPriorityFeePerGas = addHexPrefix(3e9.toString(16))
-      rawTx.maxPriorityFeePerGas = addHexPrefix(4e9.toString(16))
+      gas.price.fees.maxBaseFeePerGas = addHexPrefix((7e9).toString(16))
+      gas.price.fees.maxPriorityFeePerGas = addHexPrefix((3e9).toString(16))
+      rawTx.maxPriorityFeePerGas = addHexPrefix((4e9).toString(16))
       const tx = populate(rawTx, chainConfig, gas)
 
       expect(tx.maxFeePerGas).toBe(addHexPrefix((7e9 + 4e9).toString(16)))
@@ -365,9 +373,9 @@ describe('#populate', () => {
     })
 
     it('uses dapp-supplied maxFeePerGas when the dapp specified a valid value', () => {
-      gas.price.fees.maxBaseFeePerGas = addHexPrefix(7e9.toString(16))
-      gas.price.fees.maxPriorityFeePerGas = addHexPrefix(3e9.toString(16))
-      rawTx.maxFeePerGas = 6e9.toString(16)
+      gas.price.fees.maxBaseFeePerGas = addHexPrefix((7e9).toString(16))
+      gas.price.fees.maxPriorityFeePerGas = addHexPrefix((3e9).toString(16))
+      rawTx.maxFeePerGas = (6e9).toString(16)
       const tx = populate(rawTx, chainConfig, gas)
 
       expect(tx.maxFeePerGas).toBe(rawTx.maxFeePerGas)
@@ -375,7 +383,7 @@ describe('#populate', () => {
     })
 
     it('uses Frame-supplied maxPriorityFeePerGas when the dapp did not specify a value', () => {
-      gas.price.fees.maxPriorityFeePerGas = addHexPrefix(3e9.toString(16))
+      gas.price.fees.maxPriorityFeePerGas = addHexPrefix((3e9).toString(16))
       const tx = populate(rawTx, chainConfig, gas)
 
       expect(tx.maxPriorityFeePerGas).toBe(gas.price.fees.maxPriorityFeePerGas)
@@ -383,7 +391,7 @@ describe('#populate', () => {
     })
 
     it('uses Frame-supplied maxPriorityFeePerGas when the dapp specified an invalid value', () => {
-      gas.price.fees.maxPriorityFeePerGas = addHexPrefix(3e9.toString(16))
+      gas.price.fees.maxPriorityFeePerGas = addHexPrefix((3e9).toString(16))
       rawTx.maxFeePerGas = ''
       const tx = populate(rawTx, chainConfig, gas)
 
@@ -392,9 +400,9 @@ describe('#populate', () => {
     })
 
     it('uses dapp-supplied maxPriorityFeePerGas when the dapp specified a valid value', () => {
-      gas.price.fees.maxBaseFeePerGas = addHexPrefix(7e9.toString(16))
-      gas.price.fees.maxPriorityFeePerGas = addHexPrefix(3e9.toString(16))
-      rawTx.maxPriorityFeePerGas = 6e9.toString(16)
+      gas.price.fees.maxBaseFeePerGas = addHexPrefix((7e9).toString(16))
+      gas.price.fees.maxPriorityFeePerGas = addHexPrefix((3e9).toString(16))
+      rawTx.maxPriorityFeePerGas = (6e9).toString(16)
       const tx = populate(rawTx, chainConfig, gas)
 
       expect(tx.maxPriorityFeePerGas).toBe(rawTx.maxPriorityFeePerGas)
@@ -415,6 +423,7 @@ describe('#populate', () => {
 
 describe('#sign', () => {
   const baseTx = {
+    chainId: '0x1',
     nonce: '0x33',
     gasLimit: '0x61a8',
     value: '0x6f05b59d3b20000',
@@ -429,24 +438,29 @@ describe('#sign', () => {
   }
 
   it('generates a signed legacy transaction', async () => {
-    const rawTx = { 
+    const rawTx = {
       ...baseTx,
       type: '0x0',
       gasPrice: '0x737be7600'
     }
 
-    const { type, ...expectedFields } = rawTx
-    const signedTx = await sign(rawTx, jest.fn().mockResolvedValueOnce(signature))
+    const sig = {
+      ...signature,
+      v: addHexPrefix((27).toString(16))
+    }
 
-    expect(signedTx.toJSON()).toMatchObject({
+    const { type, chainId, ...expectedFields } = rawTx
+    const signedTx = await sign(rawTx, jest.fn().mockResolvedValueOnce(sig))
+
+    expect(signedTx.toJSON()).toStrictEqual({
       ...expectedFields,
       ...signature,
-      v: '0x0' // additional zeroes are stripped
+      v: '0x1b'
     })
   })
 
   it('generates a signed eip-1559 transaction', async () => {
-    const rawTx = { 
+    const rawTx = {
       ...baseTx,
       type: '0x2',
       maxFeePerGas: '0x737be7600',
@@ -464,15 +478,221 @@ describe('#sign', () => {
   })
 
   it('adds hex prefixes to the signature', async () => {
-    const signedTx = await sign(baseTx, jest.fn().mockResolvedValueOnce({
-      v: stripHexPrefix(signature.v),
-      r: stripHexPrefix(signature.r),
-      s: stripHexPrefix(signature.s)
-    }))
-    
+    const signedTx = await sign(
+      baseTx,
+      jest.fn().mockResolvedValueOnce({
+        v: stripHexPrefix('0x1b'),
+        r: stripHexPrefix(signature.r),
+        s: stripHexPrefix(signature.s)
+      })
+    )
+
     expect(signedTx.toJSON()).toMatchObject({
       ...signature,
-      v: '0x0' // additional zeroes are stripped
+      v: '0x1b'
+    })
+  })
+})
+
+describe('#classifyTransaction', () => {
+  const method = 'eth_sendTransaction'
+  const from = '0xd8da6bf26964af9d7eed9e03e53415d37aa96045'
+  const to = '0x2f3a40a3db8a7e3d09b0adfefbce4f6f81927557'
+  const Request = (param, recipientType) => ({
+    payload: {
+      method,
+      params: [param]
+    },
+    recipientType
+  })
+
+  describe('contract deployments', () => {
+    it('should classify transactions with data and no recipient as contract deployments', () => {
+      const request = Request(
+        {
+          from,
+          data: '0x6080604052'
+        },
+        'unknown'
+      )
+
+      expect(classifyTransaction(request)).toBe(TxClassification.CONTRACT_DEPLOY)
+    })
+
+    it('should classify transactions with data, a value, and no recipient as contract deployments', () => {
+      const request = Request(
+        {
+          from,
+          data: '0x6080604052',
+          value: '0x01'
+        },
+        'unknown'
+      )
+
+      expect(classifyTransaction(request)).toBe(TxClassification.CONTRACT_DEPLOY)
+    })
+
+    it('should classify transactions with a value, and no recipient or data as contract deployments', () => {
+      const request = Request(
+        {
+          from,
+          data: '0x',
+          value: '0x01'
+        },
+        'unknown'
+      )
+
+      expect(classifyTransaction(request)).toBe(TxClassification.CONTRACT_DEPLOY)
+    })
+
+    it('should classify transactions with no recipient, data, or value as contract deployments', () => {
+      const request = Request(
+        {
+          from,
+          data: '0x',
+          value: '0x'
+        },
+        'unknown'
+      )
+
+      expect(classifyTransaction(request)).toBe(TxClassification.CONTRACT_DEPLOY)
+    })
+  })
+
+  describe('sending data', () => {
+    it('should classify transactions which contain data, with an external recipeient, as sending data', () => {
+      const request = Request(
+        {
+          from,
+          to,
+          data: '0x6080604052'
+        },
+        'external'
+      )
+
+      expect(classifyTransaction(request)).toBe(TxClassification.SEND_DATA)
+    })
+
+    it('should classify transactions which contain data, with an external recipient and a non-zero value, as sending data', () => {
+      const request = Request(
+        {
+          from,
+          to,
+          data: '0x6080604052',
+          value: '0x01'
+        },
+        'external'
+      )
+
+      expect(classifyTransaction(request)).toBe(TxClassification.SEND_DATA)
+    })
+
+    it('should classify transactions which contain data, with an unknown recipient, as contract calls', () => {
+      const request = Request(
+        {
+          from,
+          to,
+          data: '0x6080604052'
+        },
+        'unknown'
+      )
+
+      expect(classifyTransaction(request)).toBe(TxClassification.CONTRACT_CALL)
+    })
+    it('should classify transactions which contain data, with an unknown recipient and a non-zero value, as contract calls', () => {
+      const request = Request(
+        {
+          from,
+          to,
+          data: '0x6080604052',
+          value: '0x01'
+        },
+        'unknown'
+      )
+
+      expect(classifyTransaction(request)).toBe(TxClassification.CONTRACT_CALL)
+    })
+  })
+
+  describe('contract calls', () => {
+    it('should classify transactions with data and a contract recipient as contract calls', () => {
+      const request = Request(
+        {
+          from,
+          to,
+          data: '0x6080604052'
+        },
+        'contract'
+      )
+
+      expect(classifyTransaction(request)).toBe(TxClassification.CONTRACT_CALL)
+    })
+
+    it('should classify transactions with data, a value, and a contract recipient as contract calls', () => {
+      const request = Request(
+        {
+          from,
+          to,
+          data: '0x6080604052',
+          value: '0x01'
+        },
+        'contract'
+      )
+
+      expect(classifyTransaction(request)).toBe(TxClassification.CONTRACT_CALL)
+    })
+  })
+
+  describe('native transfers', () => {
+    it('should classify transactions with an external recipient and no data as native transfers', () => {
+      const request = Request(
+        {
+          from,
+          to,
+          value: '0x01'
+        },
+        'external'
+      )
+
+      expect(classifyTransaction(request)).toBe(TxClassification.NATIVE_TRANSFER)
+    })
+
+    it('should classify transactions with an external recipient and no data or value as native transfers', () => {
+      const request = Request(
+        {
+          from,
+          to,
+          value: '0x0'
+        },
+        'external'
+      )
+
+      expect(classifyTransaction(request)).toBe(TxClassification.NATIVE_TRANSFER)
+    })
+
+    it('should classify transactions with a contract recipient and no data as native transfers', () => {
+      const request = Request(
+        {
+          from,
+          to,
+          value: '0x01'
+        },
+        'contract'
+      )
+
+      expect(classifyTransaction(request)).toBe(TxClassification.NATIVE_TRANSFER)
+    })
+    it('should classify transactions with a contract recipient and no data or value as native transfers', () => {
+      const request = Request(
+        {
+          from,
+          to,
+          value: '0x0'
+        },
+        'contract'
+      )
+
+      expect(classifyTransaction(request)).toBe(TxClassification.NATIVE_TRANSFER)
     })
   })
 })

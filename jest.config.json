@@ -1,17 +1,15 @@
 {
-  "roots": [
-    "test"
-  ],
-  "testPathIgnorePatterns": [
-    "/node_modules/",
-    "<rootDir>/test/main/signers/ledger/adapter"    
-  ],
+  "roots": ["test"],
+  "testPathIgnorePatterns": ["/node_modules/", "<rootDir>/test/main/signers/ledger/adapter"],
   "moduleNameMapper": {
+    "@ledgerhq/cryptoassets/data/eip712": "@ledgerhq/cryptoassets/lib/data/eip712.js",
+    "@ledgerhq/cryptoassets/data/erc20-signatures": "@ledgerhq/cryptoassets/lib/data/erc20-signatures.js",
     "\\.svg$": "<rootDir>/test/jest.svg.js"
   },
   "testTimeout": 100,
   "fakeTimers": {
     "enableGlobally": true
   },
-  "clearMocks": true
+  "clearMocks": true,
+  "setupFilesAfterEnv": ["<rootDir>/test/toMatchPath.js"]
 }

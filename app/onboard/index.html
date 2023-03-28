@@ -1,0 +1,26 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="
+        script-src 'strict-dynamic' 'nonce-5cf424b8-b272-4a67-a8c8-ca66eea8ca62';
+        base-uri 'self';
+        connect-src *;
+        img-src *;
+        frame-src 'none';
+        style-src 'self' 'unsafe-inline';
+        object-src 'none';
+        require-trusted-types-for 'script';
+      "
+    />
+    <title>Onboard</title>
+    <link rel="stylesheet" href="../../resources/base.styl" type="text/css" />
+    <link rel="stylesheet" href="./App/index.styl" type="text/css" />
+  </head>
+  <body>
+    <div class="frameOverlay"></div>
+    <div id="onboard"></div>
+    <script type="module" src="./index.js" nonce="5cf424b8-b272-4a67-a8c8-ca66eea8ca62"></script>
+  </body>
+</html>

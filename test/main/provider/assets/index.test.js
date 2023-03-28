@@ -36,7 +36,7 @@ describe('#loadAssets', () => {
       balance: '0x606401fc9',
       address: '0x383518188c0c6d7730d91b2c03a03c837814a899'
     }
-  
+
     store.set('main.rates', balance.address, priceData)
     store.set('main.balances', account, [balance])
 
@@ -120,7 +120,7 @@ describe('#createObserver', () => {
 
     expect(handler.assetsChanged).not.toHaveBeenCalled()
   })
-  
+
   it('does not invoke the handler when no assets are present', () => {
     store.set('main.balances', account, [])
 

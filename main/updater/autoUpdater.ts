@@ -8,13 +8,13 @@ interface VersionInfo {
   version: string
 }
 
-function createAppUpdater () {
-  if (process.platform === "win32") {
+function createAppUpdater() {
+  if (process.platform === 'win32') {
     return new NsisUpdater()
   }
 
-  if (process.platform === "darwin") {
-     return new MacUpdater()
+  if (process.platform === 'darwin') {
+    return new MacUpdater()
   }
 
   return new AppImageUpdater()
@@ -26,14 +26,14 @@ export default class AutoUpdater extends EventEmitter {
 
   private downloadCancellationToken?: CancellationToken
 
-  constructor () {
+  constructor() {
     super()
 
     // due to some bugs in the library, electron-updater can sometimes throw uncaught exceptions, so wrap these calls in a domain
     // in order to not interrupt the application execution and have Frame crash
     this.domain = createDomain()
 
-    this.domain.on('error', err => {
+    this.domain.on('error', (err) => {
       log.error('Unhandled auto updater error', err)
 
       this.emit('error', err)
@@ -41,30 +41,32 @@ export default class AutoUpdater extends EventEmitter {
     })
 
     this.electronAutoUpdater = createAppUpdater()
-  
+
     this.electronAutoUpdater.logger = log
     this.electronAutoUpdater.allowPrerelease = false
     this.electronAutoUpdater.autoDownload = false
-  
+
     this.electronAutoUpdater.on('error', (err: Error, message?: string) => {
       this.emit('error', new Error(message || err.message || ''))
     })
-  
+
     this.electronAutoUpdater.on('checking-for-update', () => {
-      log.verbose('Performing automatic check for updates', { allowPrerelease: this.electronAutoUpdater.allowPrerelease })
+      log.verbose('Performing automatic check for updates', {
+        allowPrerelease: this.electronAutoUpdater.allowPrerelease
+      })
     })
-  
+
     this.electronAutoUpdater.on('update-available', (res: VersionInfo) => {
       log.debug('Auto updater detected update available', { res })
       this.emit('update-available', { version: res.version, location: 'auto' })
     })
-  
-    this.electronAutoUpdater.on('update-not-available', res => {
+
+    this.electronAutoUpdater.on('update-not-available', (res) => {
       log.debug('Auto updater detected update not available', { res })
       this.emit('update-not-available', res)
     })
-  
-    this.electronAutoUpdater.on('update-downloaded', res => {
+
+    this.electronAutoUpdater.on('update-downloaded', (res) => {
       this.downloadCancellationToken?.dispose()
       this.downloadCancellationToken = undefined
 
@@ -73,7 +75,7 @@ export default class AutoUpdater extends EventEmitter {
     })
   }
 
-  close () {
+  close() {
     this.electronAutoUpdater.logger = null
     this.electronAutoUpdater.removeAllListeners()
     this.cancelDownload()
@@ -84,13 +86,19 @@ export default class AutoUpdater extends EventEmitter {
     this.removeAllListeners()
   }
 
-  async checkForUpdates () {
+  async checkForUpdates() {
     this.domain.run(async () => {
       try {
         const result = await this.electronAutoUpdater.checkForUpdates()
 
         if (!result) {
-          this.electronAutoUpdater.emit('update-not-available', { version: '', files: [], sha512: '', path: '', releaseDate: '' })
+          this.electronAutoUpdater.emit('update-not-available', {
+            version: '',
+            files: [],
+            sha512: '',
+            path: '',
+            releaseDate: ''
+          })
         }
       } catch (e) {
         // in case of failure an error is emitted, but for some reason an exception is also thrown
@@ -100,7 +108,7 @@ export default class AutoUpdater extends EventEmitter {
     })
   }
 
-  async downloadUpdate () {
+  async downloadUpdate() {
     this.domain.run(async () => {
       try {
         this.downloadCancellationToken = new CancellationToken()
@@ -113,11 +121,11 @@ export default class AutoUpdater extends EventEmitter {
     })
   }
 
-  async quitAndInstall () {
+  async quitAndInstall() {
     this.electronAutoUpdater.quitAndInstall()
   }
 
-  private cancelDownload () {
+  private cancelDownload() {
     log.debug('Auto update download cancel')
 
     if (this.downloadCancellationToken) {

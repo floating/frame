@@ -2,6 +2,7 @@ import Lattice from '../../../../../main/signers/lattice/Lattice'
 import { Client } from 'gridplus-sdk'
 import log from 'electron-log'
 import { Derivation } from '../../../../../main/signers/Signer/derive'
+import { SignTypedDataVersion } from '@metamask/eth-sig-util'
 
 jest.mock('gridplus-sdk')
 
@@ -23,7 +24,7 @@ beforeEach(() => {
   lattice.on('error', jest.fn())
 })
 
-async function waitForNextPromise (fn, numPromisesInQueue = 1) {
+async function waitForNextPromise(fn, numPromisesInQueue = 1) {
   while (numPromisesInQueue > 0) {
     await Promise.resolve()
     numPromisesInQueue -= 1
@@ -35,7 +36,8 @@ async function waitForNextPromise (fn, numPromisesInQueue = 1) {
 }
 
 describe('#connect', () => {
-  const baseUrl = 'https://gridplus.io', privateKey = 'supersecretkey'
+  const baseUrl = 'https://gridplus.io',
+    privateKey = 'supersecretkey'
 
   let connectFn, pairingStatus
 
@@ -43,7 +45,7 @@ describe('#connect', () => {
     pairingStatus = false
     connectFn = jest.fn()
 
-    Client.mockImplementation(opts => {
+    Client.mockImplementation((opts) => {
       expect(opts.name).toBe('Frame-ABCXYZ')
       expect(opts.baseUrl).toBe('https://gridplus.io')
       expect(opts.privKey).toBe('supersecretkey')
@@ -55,7 +57,7 @@ describe('#connect', () => {
       }
     })
 
-    connectFn.mockImplementation(async deviceId => {
+    connectFn.mockImplementation(async (deviceId) => {
       if (deviceId === 'L8geF2') {
         return pairingStatus
       }
@@ -64,12 +66,14 @@ describe('#connect', () => {
     })
   })
 
-  it('emits an update with connecting status', done => {
+  it('emits an update with connecting status', (done) => {
     lattice.once('update', () => {
       try {
         expect(lattice.status).toBe('connecting')
         done()
-      } catch (e) { done(e) }
+      } catch (e) {
+        done(e)
+      }
     })
 
     lattice.connect(baseUrl, privateKey)
@@ -83,7 +87,7 @@ describe('#connect', () => {
     expect(paired).toBe(false)
   })
 
-  it('emits an update if not yet paired', done => {
+  it('emits an update if not yet paired', (done) => {
     pairingStatus = false
 
     const stateFlow = []
@@ -95,26 +99,30 @@ describe('#connect', () => {
           expect(stateFlow[0]).toBe('connecting')
           expect(stateFlow[1]).toBe('pair')
           done()
-        } catch (e) { done(e) }
+        } catch (e) {
+          done(e)
+        }
       }
     })
 
     lattice.connect(baseUrl, privateKey)
   })
 
-  it('emits a connect event', done => {
+  it('emits a connect event', (done) => {
     pairingStatus = true
 
-    lattice.once('connect', paired => {
+    lattice.once('connect', (paired) => {
       try {
         expect(paired).toBe(true)
         done()
-      } catch (e) { done(e) }
+      } catch (e) {
+        done(e)
+      }
     })
 
     lattice.connect(baseUrl, privateKey)
   })
-  
+
   it('emits an error event when device is locked', async () => {
     connectFn.mockRejectedValue(new Error('Error from device: Device Locked'))
 
@@ -125,10 +133,12 @@ describe('#connect', () => {
         try {
           expect(lattice.status).toBe('locked')
           resolve()
-        } catch (e) { reject(e) }
+        } catch (e) {
+          reject(e)
+        }
       })
     })
-    
+
     try {
       await lattice.connect(baseUrl, privateKey)
       throw new Error('should have failed to connect!')
@@ -138,7 +148,7 @@ describe('#connect', () => {
 
     return handler
   })
-  
+
   it('emits an error event when device returns invalid request', async () => {
     connectFn.mockRejectedValue(new Error('Error from device: Invalid Request'))
 
@@ -149,10 +159,12 @@ describe('#connect', () => {
         try {
           expect(lattice.status.toLowerCase()).toMatch(/unknown device error/)
           resolve()
-        } catch (e) { reject(e) }
+        } catch (e) {
+          reject(e)
+        }
       })
     })
-      
+
     try {
       await lattice.connect(baseUrl, privateKey)
       throw new Error('should have failed to connect!')
@@ -179,30 +191,34 @@ describe('#pair', () => {
 
   beforeEach(() => {
     lattice.connection = {
-      pair: jest.fn(async code => {
+      pair: jest.fn(async (code) => {
         if (code === pairingCode) return true
         throw new Error('Error from device: Pairing failed')
       })
     }
   })
 
-  it('emits an update with pairing status', done => {
+  it('emits an update with pairing status', (done) => {
     lattice.once('update', () => {
       try {
         expect(lattice.status).toBe('Pairing')
         done()
-      } catch (e) { done(e) }
+      } catch (e) {
+        done(e)
+      }
     })
 
     lattice.pair(pairingCode)
   })
 
-  it('emits a paired event', done => {
-    lattice.once('paired', hasActiveWallet => {
+  it('emits a paired event', (done) => {
+    lattice.once('paired', (hasActiveWallet) => {
       try {
         expect(hasActiveWallet).toBe(true)
         done()
-      } catch (e) { done(e) }
+      } catch (e) {
+        done(e)
+      }
     })
 
     lattice.pair(pairingCode)
@@ -215,7 +231,7 @@ describe('#pair', () => {
 
     expect(hasActiveWallet).toBe(false)
   })
-  
+
   it('emits an error event on failure', async () => {
     const handler = new Promise((resolve, reject) => {
       lattice.once('paired', () => reject('should not be paired!'))
@@ -224,10 +240,12 @@ describe('#pair', () => {
         try {
           expect(lattice.status.toLowerCase()).toBe('pairing failed')
           resolve()
-        } catch (e) { reject(e) }
+        } catch (e) {
+          reject(e)
+        }
       })
     })
-      
+
     try {
       await lattice.pair('SDFJOSJD')
       throw new Error('should have failed to connect!')
@@ -246,8 +264,10 @@ describe('#deriveAddresses', () => {
 
     lattice.connection = {
       getAppName: () => 'frame-test',
-      getAddresses: jest.fn(async opts => {
-        return Array(opts.n).fill().map((_, i) => `addr${opts.startPath[4] + i}`)
+      getAddresses: jest.fn(async (opts) => {
+        return Array(opts.n)
+          .fill()
+          .map((_, i) => `addr${opts.startPath[4] + i}`)
       })
     }
   })
@@ -290,8 +310,9 @@ describe('#deriveAddresses', () => {
 
     expect(lattice.connection.getAddresses).toHaveBeenCalledTimes(expectedIndexes.length)
 
-    expectedIndexes.forEach(n => {
-      expect(lattice.connection.getAddresses).toHaveBeenNthCalledWith(n + 1,
+    expectedIndexes.forEach((n) => {
+      expect(lattice.connection.getAddresses).toHaveBeenNthCalledWith(
+        n + 1,
         expect.objectContaining({
           startPath: [0x80000000 + 44, 0x80000000 + 60, 0x80000000 + n, 0, 0]
         })
@@ -299,12 +320,14 @@ describe('#deriveAddresses', () => {
     })
   })
 
-  it('emits an update with deriving status', done => {
+  it('emits an update with deriving status', (done) => {
     lattice.once('update', () => {
       try {
         expect(lattice.status).toBe('addresses')
         done()
-      } catch (e) { done(e) }
+      } catch (e) {
+        done(e)
+      }
     })
 
     lattice.deriveAddresses()
@@ -314,25 +337,34 @@ describe('#deriveAddresses', () => {
     await lattice.deriveAddresses()
 
     expect(lattice.status).toBe('ok')
-    expect(lattice.addresses).toStrictEqual(
-      ['0xaddr0', '0xaddr1', '0xaddr2', '0xaddr3', '0xaddr4']
-    )
+    expect(lattice.addresses).toStrictEqual(['0xaddr0', '0xaddr1', '0xaddr2', '0xaddr3', '0xaddr4'])
   })
 
   it('derives addresses when the limit has increased', async () => {
-    lattice.addresses = [0, 1, 2, 3, 4].map(l => `addr${l}`)
+    lattice.addresses = [0, 1, 2, 3, 4].map((l) => `addr${l}`)
     lattice.accountLimit = 10
 
     await lattice.deriveAddresses()
 
     expect(lattice.status).toBe('ok')
-    expect(lattice.addresses).toStrictEqual(
-      ['0xaddr0', '0xaddr1', '0xaddr2', '0xaddr3', '0xaddr4', '0xaddr5', '0xaddr6', '0xaddr7', '0xaddr8', '0xaddr9']
-    )
+    expect(lattice.addresses).toStrictEqual([
+      '0xaddr0',
+      '0xaddr1',
+      '0xaddr2',
+      '0xaddr3',
+      '0xaddr4',
+      '0xaddr5',
+      '0xaddr6',
+      '0xaddr7',
+      '0xaddr8',
+      '0xaddr9'
+    ])
   })
 
   it('derives no addresses when enough have already been derived', async () => {
-    lattice.addresses = Array(10).fill().map((_, i) => `addr${i + 10}`)
+    lattice.addresses = Array(10)
+      .fill()
+      .map((_, i) => `addr${i + 10}`)
     lattice.accountLimit = 5
 
     await lattice.deriveAddresses()
@@ -340,11 +372,11 @@ describe('#deriveAddresses', () => {
     expect(lattice.connection.getAddresses).not.toHaveBeenCalled()
     expect(lattice.addresses.length).toBe(10)
   })
-  
-  it('retries on failure', done => {
+
+  it('retries on failure', (done) => {
     let requestNum = 0
 
-    lattice.connection.getAddresses.mockImplementation(async opts => {
+    lattice.connection.getAddresses.mockImplementation(async () => {
       if ((requestNum += 1) === 1) {
         throw new Error('Error from device: Getting addresses failed')
       }
@@ -357,16 +389,18 @@ describe('#deriveAddresses', () => {
         try {
           expect(lattice.addresses).toHaveLength(5)
           done()
-        } catch (e) { done(e) }
+        } catch (e) {
+          done(e)
+        }
       }
     })
-      
+
     lattice.deriveAddresses()
 
     waitForNextPromise(() => jest.advanceTimersByTime(3000), 3)
   })
-  
-  it('emits an error event on failure', done => {
+
+  it('emits an error event on failure', (done) => {
     lattice.connection.getAddresses.mockImplementation(async () => {
       throw new Error('Error from device: Getting addresses failed')
     })
@@ -380,9 +414,11 @@ describe('#deriveAddresses', () => {
         expect(lattice.addresses).toHaveLength(0)
         expect(lattice.status.toLowerCase()).toMatch(/error/)
         done()
-      } catch (e) { done(e) }
+      } catch (e) {
+        done(e)
+      }
     })
-      
+
     lattice.deriveAddresses(Derivation.standard, 0)
   })
 })
@@ -394,36 +430,44 @@ describe('#verifyAddress', () => {
     lattice.connection = { getAddresses: jest.fn(), getAppName: () => 'frame-test' }
   })
 
-  it('verifies a matching address', done => {
+  it('verifies a matching address', (done) => {
     lattice.verifyAddress(2, 'addr3', false, (err, result) => {
       try {
         expect(err).toBe(null)
         expect(result).toBe(true)
         done()
-      } catch (e) { done(e) }
+      } catch (e) {
+        done(e)
+      }
     })
   })
 
-  it('identifies a non-matching address', done => {
+  it('identifies a non-matching address', (done) => {
     lattice.verifyAddress(2, 'addrX', false, (err, result) => {
       try {
         expect(err.message.toLowerCase()).toBe('address does not match device')
         expect(result).toBe(undefined)
         done()
-      } catch (e) { done(e) }
+      } catch (e) {
+        done(e)
+      }
     })
   })
 
-  it('fails if deriving addresses fails', done => {
+  it('fails if deriving addresses fails', (done) => {
     lattice.addresses = []
-    lattice.connection.getAddresses = async () => { throw new Error('error!') }
+    lattice.connection.getAddresses = async () => {
+      throw new Error('error!')
+    }
 
     lattice.verifyAddress(2, 'addr3', false, (err, result) => {
       try {
         expect(err.message.toLowerCase()).toBe('verify address error')
         expect(result).toBe(undefined)
         done()
-      } catch (e) { done(e) }
+      } catch (e) {
+        done(e)
+      }
     })
   })
 })
@@ -431,12 +475,13 @@ describe('#verifyAddress', () => {
 describe('#signMessage', () => {
   beforeEach(() => {
     lattice.connection = {
-      sign: jest.fn(async opts => {
+      sign: jest.fn(async (opts) => {
         if (
           opts.currency === 'ETH_MSG' &&
           opts.data.protocol === 'signPersonal' &&
           opts.data.payload &&
-          opts.data.signerPath[4] === 4) {
+          opts.data.signerPath[4] === 4
+        ) {
           return {
             sig: {
               r: '9af6cb',
@@ -451,24 +496,28 @@ describe('#signMessage', () => {
     }
   })
 
-  it('signs a valid message', done => {
+  it('signs a valid message', (done) => {
     lattice.signMessage(4, 'sign this please', (err, res) => {
       try {
         expect(err).toBe(null)
         expect(res).toBe('0x9af6cbabcd0401')
         done()
-      } catch (e) { done(e) }
+      } catch (e) {
+        done(e)
+      }
     })
   })
 
-  it('returns an error on failure', done => {
+  it('returns an error on failure', (done) => {
     // wrong index, mock function expects 4, not 3
     lattice.signMessage(3, 'sign this please', (err, res) => {
       try {
         expect(err).toBeTruthy()
         expect(res).toBe(undefined)
         done()
-      } catch (e) { done(e) }
+      } catch (e) {
+        done(e)
+      }
     })
   })
 })
@@ -476,12 +525,13 @@ describe('#signMessage', () => {
 describe('#signTypedData', () => {
   beforeEach(() => {
     lattice.connection = {
-      sign: jest.fn(async opts => {
+      sign: jest.fn(async (opts) => {
         if (
           opts.currency === 'ETH_MSG' &&
           opts.data.protocol === 'eip712' &&
           opts.data.payload &&
-          opts.data.signerPath[4] === 2) {
+          opts.data.signerPath[4] === 2
+        ) {
           return {
             sig: {
               r: '3ea8cd',
@@ -496,34 +546,28 @@ describe('#signTypedData', () => {
     }
   })
 
-  it('signs a valid typed data message', done => {
-    lattice.signTypedData(2, 'V4', 'sign this please', (err, res) => {
+  it('signs a valid typed data message', (done) => {
+    lattice.signTypedData(2, { version: SignTypedDataVersion.V4, data: 'typed data' }, (err, res) => {
       try {
         expect(err).toBe(null)
         expect(res).toBe('0x3ea8cdabcd0401')
         done()
-      } catch (e) { done(e) }
+      } catch (e) {
+        done(e)
+      }
     })
   })
 
-  it('is not able to sign typed data less than V4', done => {
-    lattice.signTypedData(2, 'V3', 'sign this please', (err, res) => {
-      try {
-        expect(err.message.toLowerCase()).toMatch(/invalid version/)
-        expect(res).toBe(undefined)
-        done()
-      } catch (e) { done(e) }
-    })
-  })
-
-  it('returns an error on failure', done => {
+  it('returns an error on failure', (done) => {
     // wrong index, mock function expects 2, not 3
-    lattice.signTypedData(3, 'V4', 'sign this please', (err, res) => {
+    lattice.signTypedData(3, { version: SignTypedDataVersion.V4, data: 'typed data' }, (err, res) => {
       try {
         expect(err).toBeTruthy()
         expect(res).toBe(undefined)
         done()
-      } catch (e) { done(e) }
+      } catch (e) {
+        done(e)
+      }
     })
   })
 })
@@ -546,35 +590,44 @@ describe('#signTransaction', () => {
     lattice.connection = { sign: jest.fn(), getFwVersion: async () => ({ major: 1, minor: 3, fix: 5 }) }
   })
 
-  it('signs a legacy transaction', done => {
+  it('signs a legacy transaction', (done) => {
     // Lattice expects the type to be undefined for legacy transactions,
     // sending a type of zero if EIP-1559 is enabled will cause an error
     const txToSign = { ...tx, type: '0x0' }
 
-    lattice.connection.sign.mockImplementation(async opts => {
+    lattice.connection.sign.mockImplementation(async (opts) => {
       try {
         expect(opts.currency).toBe('ETH')
         expect(opts.data.type).toBe(undefined)
         expect(opts.data.signerPath[4]).toBe(4)
         expect(parseInt(opts.data.chainId)).toBe(137)
 
-        return expectedSignature
-      } catch (e) { done(e) }
+        return {
+          sig: {
+            ...expectedSignature.sig,
+            v: Buffer.from('1b', 'hex')
+          }
+        }
+      } catch (e) {
+        done(e)
+      }
     })
 
     lattice.signTransaction(4, txToSign, (err, res) => {
       try {
         expect(err).toBe(null)
-        expect(res).toBe('0xcf80808080808080833ea8cd8396f7a0')
+        expect(res).toBe('0xcf8080808080801b833ea8cd8396f7a0')
         done()
-      } catch (e) { done(e) }
+      } catch (e) {
+        done(e)
+      }
     })
   })
 
-  it('signs a post eip-1559 transaction', done => {
+  it('signs a post eip-1559 transaction', (done) => {
     const txToSign = { ...tx, type: '0x2' }
 
-    lattice.connection.sign.mockImplementation(async opts => {
+    lattice.connection.sign.mockImplementation(async (opts) => {
       try {
         expect(opts.currency).toBe('ETH')
         expect(opts.data.type).toBe(2)
@@ -582,7 +635,9 @@ describe('#signTransaction', () => {
         expect(parseInt(opts.data.chainId)).toBe(137)
 
         return expectedSignature
-      } catch (e) { done(e) }
+      } catch (e) {
+        done(e)
+      }
     })
 
     lattice.signTransaction(4, txToSign, (err, res) => {
@@ -590,7 +645,9 @@ describe('#signTransaction', () => {
         expect(err).toBe(null)
         expect(res).toBe('0x02d3818980808080808080c080833ea8cd8396f7a0')
         done()
-      } catch (e) { done(e) }
+      } catch (e) {
+        done(e)
+      }
     })
   })
 })
@@ -659,7 +716,7 @@ describe('#close', () => {
     lattice.connection = 'a connection'
 
     lattice.close()
-    
+
     expect(lattice.connection).toBeFalsy()
   })
 })

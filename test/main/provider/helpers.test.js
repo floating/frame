@@ -1,15 +1,13 @@
 import log from 'electron-log'
-import { fromUtf8 } from 'ethereumjs-util'
-import { getRawTx, getSignedAddress, processTxForGasFees } from '../../../main/provider/helpers'
-import store from '../../../main/store'
-import { GasFeesSource } from '../../../resources/domain/transaction'
+import { fromUtf8 } from '@ethereumjs/util'
+import { getRawTx, getSignedAddress } from '../../../main/provider/helpers'
 
 jest.mock('../../../main/store')
 
 beforeAll(async () => {
   log.transports.console.level = false
 })
-  
+
 afterAll(() => {
   log.transports.console.level = 'debug'
 })
@@ -50,11 +48,41 @@ describe('#getRawTx', () => {
 
     expect(tx.value).toBe('0x0')
   })
+
+  it('should pass through a hex nonce', () => {
+    const tx = getRawTx({ nonce: '0x168' })
+
+    expect(tx.nonce).toBe('0x168')
+  })
+
+  it('should convert a valid integer nonce into hex', () => {
+    const tx = getRawTx({ nonce: '360' })
+
+    expect(tx.nonce).toBe('0x168')
+  })
+
+  it('should pass through an undefined nonce', () => {
+    const tx = getRawTx({ nonce: undefined })
+
+    expect(tx.nonce).toBeUndefined()
+  })
+
+  const invalidNonces = [
+    { description: 'non-numeric', nonce: 'invalid' },
+    { description: 'negative integer', nonce: '-360' },
+    { description: 'non-integer numeric', nonce: '3.60' }
+  ]
+  invalidNonces.forEach(({ description, nonce }) => {
+    it(`should reject a ${description} nonce`, () => {
+      expect(() => getRawTx({ nonce })).toThrowError('Invalid nonce')
+    })
+  })
 })
 
 describe('#getSignedAddress', () => {
   it('returns a verified address for a valid signature', () => {
-    const signature = '0xa4ba512820eab7022d0c88b9335425b6235c184565c84fb9e451965844a185030baec17ac9565c666675525cae41e367c458c1fdf575a80f6a44197d3b48c0ba1c'
+    const signature =
+      '0xa4ba512820eab7022d0c88b9335425b6235c184565c84fb9e451965844a185030baec17ac9565c666675525cae41e367c458c1fdf575a80f6a44197d3b48c0ba1c'
     const message = fromUtf8('Example `personal_sign` message')
 
     getSignedAddress(signature, message, (err, verifiedAddress) => {
@@ -64,7 +92,7 @@ describe('#getSignedAddress', () => {
   })
 
   it('returns an error if no signature is provided', () => {
-    getSignedAddress(null, 'some message', err => {
+    getSignedAddress(null, 'some message', (err) => {
       expect(err).toBeTruthy()
     })
   })

@@ -18,98 +18,127 @@
     font-weight 300
     margin-left 3px
 
-    .clusterValue
-      flex-grow 1
+  .clusterValue
+    flex-grow 1
+    display flex
+    justify-content center
+    align-items center
+    border-radius 12px
+    margin-right 3px
+    font-size 14px
+    display flex
+    justify-content center
+    align-items center
+    border-radius 8px
+    -webkit-app-region no-drag
+    transition all linear 0.1s
+    transform translate3d(0, 0, 0)
+    font-family 'MainFont'
+    background var(--ghostA)
+    box-shadow 0px 1px 2px var(--ghostX)
+    border-bottom 2px solid var(--ghostZ)
+    overflow hidden
+    margin-top 1px
+
+    *
+      pointer-events none
+
+    .clusterInputLabel
+      position absolute
+      top 0
+      left 0
+      right 0
+      width 60px
       display flex
       justify-content center
       align-items center
-      border-radius 12px
-      background var(--ghostA)
-      margin-right 3px
-      font-size 14px
-      display flex
-      justify-content center
-      align-items center
-      border-radius 8px
-      -webkit-app-region no-drag
-      transition none
-      transform translate3d(0, 0, 0)
-      font-family 'MainFont'
-      background var(--ghostA)
-      box-shadow 0px 1px 2px var(--ghostX)
-      border-bottom 2px solid var(--ghostZ)
-      overflow hidden
-      margin-top 1px
-      
-      svg
-        position relative
-        top -0px
-        padding 0px 3px 0px 4px
 
-      *
-        pointer-events none
+  .clusterValueClickable
+    cursor pointer
+    margin-bottom 0px
+    position relative
 
-    .clusterValueClickable
-      transition all linear 0.1s
-      cursor pointer
-      margin-bottom 0px
-      position relative
-      z-index 3
+  .clusterValueInteractable
+    *
+      pointer-events auto
 
-    .clusterValueInteractable
-      *
-        pointer-events auto
+  .clusterValueClickable:hover
+    background var(--ghostB)
+    transform translateY(-1px)
+    border-bottom 2px solid var(--ghostZ)
+    box-shadow 0px 4px 30px -8px var(--ghostX)
+    position relative
+    z-index 300000
+  
+  .clusterValueClickable:active
+    background var(--ghostB)
+    transform translateY(0px)
+    box-shadow 0px 2px 4px var(--ghostX)
 
-    .clusterValueClickable:hover
-      background var(--ghostB)
-      transform translateY(-1px)
-      border-bottom 2px solid var(--ghostZ)
-      box-shadow 0px 4px 30px -8px var(--ghostX)
-      position relative
-      z-index 300000
-    
-    .clusterValueClickable:active
-      background var(--ghostB)
-      transform translateY(0px)
-      box-shadow 0px 2px 4px var(--ghostX)
+  .clusterValueTransparent
+    background transparent
+    box-shadow none
+    border-bottom 2px solid transparent
 
   .clusterRow:first-child
-    .clusterValue
+    > .clusterValue
       border-radius 8px
-    .clusterValue:first-child
+    > .clusterValue:first-child
       border-top-left-radius 18px
-    .clusterValue:last-child
+    > .clusterValue:last-child
       border-top-right-radius 18px
 
   .clusterRow:last-child
-    .clusterValue
+    > .clusterValue
       border-radius 8px
-    .clusterValue:first-child
+    > .clusterValue:first-child
       border-bottom-left-radius 18px
-    .clusterValue:last-child
+    > .clusterValue:last-child
       border-bottom-right-radius 18px
 
-    .clusterColumn
-      display flex
-      flex-direction column
-      flex-grow 1
-      font-size 14px
-      align-items stretch
+  .clusterColumn
+    display flex
+    flex-direction column
+    flex-grow 1
+    font-size 14px
+    align-items stretch
 
+    .clusterValue
+      border-radius 8px
+
+  .clusterColumn:first-child
+    > .clusterValue
+      border-radius 8px
+    > .clusterValue:first-child
+      border-top-left-radius 18px
+      
+  .clusterColumn:last-child
+    > .clusterValue
+      border-radius 8px
+    > .clusterValue:first-child
+      border-top-right-radius 18px
+
+  .clusterRow:last-child
     .clusterColumn:first-child
-      .clusterValue
+      > .clusterValue
         border-radius 8px
-      .clusterValue:first-child
+      > .clusterValue:first-child
         border-top-left-radius 18px
-      .clusterValue:last-child
+      > .clusterValue:last-child
+        border-bottom-left-radius 18px
+      > .clusterValue:first-child:last-child
+        border-top-left-radius 18px
         border-bottom-left-radius 18px
         
     .clusterColumn:last-child
-      .clusterValue
+      > .clusterValue
         border-radius 8px
-      .clusterValue:first-child
+      > .clusterValue:first-child
         border-top-right-radius 18px
-      .clusterValue:last-child
+      > .clusterValue:last-child
+        border-bottom-right-radius 18px
+      > .clusterValue:first-child:last-child
+        border-top-right-radius 18px
         border-bottom-right-radius 18px
 
 .clusterTag
@@ -117,6 +146,19 @@
   font-size 11px
   font-weight 500
   padding 8px
+  text-align center
+
+.clusterFocus
+  text-transform uppercase
+  font-size 13px
+  line-height 20px
+  font-weight 500
+  padding 16px 8px
+  text-align center
+
+  .clusterFocusHighlight
+    font-size 16px
+    color var(--good)
 
 .clusterAddress
   padding 12px

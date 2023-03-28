@@ -14,6 +14,15 @@
     "outDir": "./compiled",
     "typeRoots": ["./node_modules/@types", "./@types"]
   },
-  "include": ["package.json", "./main/**/*.ts", "./main/**/*.js", "./resources/**/*.ts", "./resources/**/*.js"],
-  "exclude": ["**/__mocks__/*"]
+  "include": [
+    "package.json",
+    "./main/**/*.ts",
+    "./main/**/*.js",
+    "./resources/**/*.ts",
+    "./resources/**/*.js",
+    "./test/**/*.ts"
+  ],
+  "watchOptions": {
+    "excludeFiles": ["./node_modules/**/*", "./package.json"]
+  }
 }

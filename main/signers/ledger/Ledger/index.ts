@@ -1,7 +1,7 @@
 import log from 'electron-log'
 import { v5 as uuid } from 'uuid'
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-noevents'
-import { TypedData } from 'eth-sig-util'
+import { SignTypedDataVersion } from '@metamask/eth-sig-util'
 
 import { Request, RequestQueue } from './requestQueue'
 import Signer from '../../Signer'
@@ -9,6 +9,7 @@ import LedgerEthereumApp from './eth'
 import { Derivation, getDerivationPath } from '../../Signer/derive'
 import { TransactionData } from '../../../../resources/domain/transaction'
 import { signerCompatibility, londonToLegacy } from '../../../transaction'
+import type { TypedMessage } from '../../../accounts/types'
 
 const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
 
@@ -24,8 +25,8 @@ export const Status = {
 }
 
 interface Address {
-  address: string,
-  publicKey: string,
+  address: string
+  publicKey: string
   chainCode?: string | undefined
 }
 
@@ -37,22 +38,22 @@ function isInvalidRequest(err: DeviceError) {
   return [99901].includes(err.statusCode)
 }
 
-function isDeviceAsleep (err: DeviceError) {
+function isDeviceAsleep(err: DeviceError) {
   return [27404, 26628].includes(err.statusCode)
 }
 
-function needToOpenEthApp (err: DeviceError) {
+function needToOpenEthApp(err: DeviceError) {
   return [27904, 27906, 25873, 25871].includes(err.statusCode)
 }
 
 // additional status codes
 //   27264: 'INCORRECT_DATA'
 
-function getStatusForError (err: DeviceError) {
+function getStatusForError(err: DeviceError) {
   if (needToOpenEthApp(err)) {
     return Status.WRONG_APP
   }
-  
+
   if (isDeviceAsleep(err)) {
     return Status.LOCKED
   }
@@ -67,9 +68,9 @@ function getStatusForError (err: DeviceError) {
 export class DeviceError extends Error {
   readonly statusCode
 
-  constructor (msg: string, code = -1) {
+  constructor(msg: string, code = -1) {
     super(msg)
-    this.statusCode = code    
+    this.statusCode = code
   }
 }
 
@@ -87,7 +88,7 @@ export default class Ledger extends Signer {
   private requestQueue = new RequestQueue()
   private statusPoller = setTimeout(() => {})
 
-  constructor (devicePath: string, model: string) {
+  constructor(devicePath: string, model: string) {
     super()
 
     this.devicePath = devicePath
@@ -98,7 +99,7 @@ export default class Ledger extends Signer {
     this.status = Status.INITIAL
   }
 
-  async open () {
+  async open() {
     const transport = await TransportNodeHid.open(this.devicePath)
 
     this.eth = new LedgerEthereumApp(transport)
@@ -106,14 +107,14 @@ export default class Ledger extends Signer {
     this.requestQueue.start()
   }
 
-  close () {
+  close() {
     this.emit('close')
     this.removeAllListeners()
-    
+
     super.close()
   }
 
-  async connect () {
+  async connect() {
     try {
       // since the Ledger doesn't provide information about whether the eth app is open or if
       // the device is locked, the order of these checks is important in order to correctly determine
@@ -133,9 +134,9 @@ export default class Ledger extends Signer {
       await this.checkDeviceStatus()
 
       if (this.isReady()) {
-        const [major, minor, patch] = (config.version || '1.6.1').split('.').map(n => parseInt(n))
+        const [major, minor, patch] = (config.version || '1.6.1').split('.').map((n) => parseInt(n))
         const version = { major, minor, patch }
-        
+
         this.appVersion = version
 
         this.deriveAddresses()
@@ -149,7 +150,7 @@ export default class Ledger extends Signer {
     }
   }
 
-  async disconnect () {
+  async disconnect() {
     if (this.status === Status.OK) {
       this.updateStatus(Status.DISCONNECTED)
       this.emit('update')
@@ -165,13 +166,13 @@ export default class Ledger extends Signer {
     }
   }
 
-  private isReady () {
+  private isReady() {
     const readyStatuses = [Status.INITIAL, Status.OK]
 
     return readyStatuses.includes(this.status)
   }
 
-  private handleError (err: DeviceError) {
+  private handleError(err: DeviceError) {
     const errorStatus = getStatusForError(err)
 
     if (errorStatus === Status.LOCKED && this.status !== Status.LOCKED) {
@@ -190,7 +191,7 @@ export default class Ledger extends Signer {
     }
   }
 
-  private isValidStatusTransition (status: string) {
+  private isValidStatusTransition(status: string) {
     // TODO: outline all valid state transitions
     if (status === Status.DERIVING) {
       return [Status.OK, Status.INITIAL].includes(this.status)
@@ -199,7 +200,7 @@ export default class Ledger extends Signer {
     return true
   }
 
-  updateStatus (status: string) {
+  updateStatus(status: string) {
     if (this.isValidStatusTransition(status)) {
       this.status = status
     }
@@ -215,7 +216,7 @@ export default class Ledger extends Signer {
     }
   }
 
-  private async checkDeviceStatus () {
+  private async checkDeviceStatus() {
     const check = new Promise(async (resolve: (err: DeviceError | undefined) => void) => {
       setTimeout(() => {
         resolve(new DeviceError('status check timed out'))
@@ -229,7 +230,7 @@ export default class Ledger extends Signer {
       }
     })
 
-    return check.then(err => {
+    return check.then((err) => {
       if (!err) {
         // success, handle different status state transitions
 
@@ -248,7 +249,7 @@ export default class Ledger extends Signer {
     })
   }
 
-  private async pollDeviceStatus (frequency: number) {
+  private async pollDeviceStatus(frequency: number) {
     const lastStatus = this.status
 
     this.statusPoller = setTimeout(() => {
@@ -274,21 +275,21 @@ export default class Ledger extends Signer {
     }, frequency)
   }
 
-  private enqueueRequests (...requests: Request[]) {
-    requests.forEach(req => this.requestQueue.add(req))
+  private enqueueRequests(...requests: Request[]) {
+    requests.forEach((req) => this.requestQueue.add(req))
   }
 
-  private getPath (index: number) {
+  private getPath(index: number) {
     if (!this.derivation) {
       throw new Error('attempted to get path with unknown derivation!')
     }
-  
+
     return getDerivationPath(this.derivation, index)
   }
 
   // *** request enqueuing methods *** //
 
-  deriveAddresses () {
+  deriveAddresses() {
     this.requestQueue.clear()
     this.addresses = []
 
@@ -302,7 +303,7 @@ export default class Ledger extends Signer {
     }
   }
 
-  private deriveLiveAddresses () {
+  private deriveLiveAddresses() {
     const requests = []
 
     for (let i = 0; i < this.accountLimit; i++) {
@@ -310,7 +311,7 @@ export default class Ledger extends Signer {
         type: 'deriveAddresses',
         execute: async () => {
           try {
-            if (!this.eth)  throw new Error('attempted to derive Live addresses but Eth app is not connected!')
+            if (!this.eth) throw new Error('attempted to derive Live addresses but Eth app is not connected!')
 
             const path = this.getPath(i)
             const { address } = await this.eth.getAddress(path, false, false)
@@ -337,15 +338,17 @@ export default class Ledger extends Signer {
     this.enqueueRequests(...requests)
   }
 
-  private deriveHardwareAddresses () {
+  private deriveHardwareAddresses() {
     const targetDerivation = this.derivation
 
     this.enqueueRequests({
       type: 'deriveAddresses',
       execute: async () => {
         try {
-          if (!this.eth)  throw new Error('attempted to derive hardware addresses but Eth app is not connected!')
-          if (!this.derivation) throw new Error('attempted to derive hardware addresses for unknown derivation!')
+          if (!this.eth)
+            throw new Error('attempted to derive hardware addresses but Eth app is not connected!')
+          if (!this.derivation)
+            throw new Error('attempted to derive hardware addresses for unknown derivation!')
 
           const addresses = await this.eth.deriveAddresses(this.derivation)
 
@@ -366,12 +369,12 @@ export default class Ledger extends Signer {
     })
   }
 
-  verifyAddress (index: number, currentAddress: string, display = false, cb: Callback<boolean>) {
+  verifyAddress(index: number, currentAddress: string, display = false, cb: Callback<boolean>) {
     this.enqueueRequests({
       type: 'verifyAddress',
       execute: async () => {
         try {
-          if (!this.eth)  throw new Error('attempted to verify address but Eth app is not connected!')
+          if (!this.eth) throw new Error('attempted to verify address but Eth app is not connected!')
           if (!this.derivation) throw new Error('attempted to verify address with unknown derivation!')
 
           const path = this.getPath(index)
@@ -405,12 +408,12 @@ export default class Ledger extends Signer {
     })
   }
 
-  signMessage (index: number, message: string, cb: Callback<string>) {
+  signMessage(index: number, message: string, cb: Callback<string>) {
     this.enqueueRequests({
       type: 'signMessage',
       execute: async () => {
         try {
-          if (!this.eth)  throw new Error('attempted to sign message but Eth app is not connected!')
+          if (!this.eth) throw new Error('attempted to sign message but Eth app is not connected!')
           if (!this.derivation) throw new Error('attempted to sign message with unknown derivation!')
 
           const path = this.getPath(index)
@@ -432,29 +435,25 @@ export default class Ledger extends Signer {
     })
   }
 
-  signTypedData (index: number, version: string, typedData: TypedData, cb: Callback<string>) {
-    const versionNum = (version.match(/[Vv](\d+)/) || [])[1]
-
-    if ((parseInt(versionNum) || 0) < 4) {
-      return cb(new Error(`Invalid version (${version}), Ledger only supports eth_signTypedData version 4+`), undefined)
-    }
-
+  signTypedData(index: number, typedMessage: TypedMessage<SignTypedDataVersion.V4>, cb: Callback<string>) {
     this.enqueueRequests({
       type: 'signTypedData',
       execute: async () => {
         try {
-          if (!this.eth)  throw new Error('attempted to sign typed data but Eth app is not connected!')
+          if (!this.eth) throw new Error('attempted to sign typed data but Eth app is not connected!')
           if (!this.derivation) throw new Error('attempted to sign typed data with unknown derivation!')
 
           const path = this.getPath(index)
-          const signedData = await this.eth.signTypedData(path, typedData)
+          const signedData = await this.eth.signTypedData(path, typedMessage.data)
 
-          log.info('successfully signed typed data on Ledger: ', typedData)
+          log.info('successfully signed typed data on Ledger: ', typedMessage.data)
 
           cb(null, signedData)
         } catch (e) {
           const err = e as DeviceError
-          const message = wasRequestRejected(err) ? 'Sign request rejected by user' : `Sign message error: ${err.message}`
+          const message = wasRequestRejected(err)
+            ? 'Sign request rejected by user'
+            : `Sign message error: ${err.message}`
 
           this.handleError(err)
           log.error('error signing typed data on Ledger', message)
@@ -465,7 +464,7 @@ export default class Ledger extends Signer {
     })
   }
 
-  signTransaction (index: number, rawTx: TransactionData, cb: Callback<string>) {
+  signTransaction(index: number, rawTx: TransactionData, cb: Callback<string>) {
     const compatibility = signerCompatibility(rawTx, this.summary())
     const ledgerTx = compatibility.compatible ? { ...rawTx } : londonToLegacy(rawTx)
 
@@ -473,7 +472,7 @@ export default class Ledger extends Signer {
       type: 'signTransaction',
       execute: async () => {
         try {
-          if (!this.eth)  throw new Error('attempted to sign transaction but Eth app is not connected!')
+          if (!this.eth) throw new Error('attempted to sign transaction but Eth app is not connected!')
           if (!this.derivation) throw new Error('attempted to sign transaction with unknown derivation!')
 
           const path = this.getPath(index)
@@ -497,7 +496,7 @@ export default class Ledger extends Signer {
 
   // *** direct device access methods *** //
 
-  private async getAddress (path: string, display = false, chainCode = false) {
+  private async getAddress(path: string, display = false, chainCode = false) {
     return new Promise((resolve: (address: Address) => void, reject) => {
       if (!this.eth) {
         return reject(new Error('tried to get address but Eth app is not connected!'))
@@ -510,12 +509,16 @@ export default class Ledger extends Signer {
         fallback = setTimeout(() => reject({ message: 'getAddress timed out', statusCode: -1 }), 3000)
       }
 
-      this.eth.getAddress(path, display, chainCode).then(resolve).catch(reject).finally(() => clearTimeout(fallback))
+      this.eth
+        .getAddress(path, display, chainCode)
+        .then(resolve)
+        .catch(reject)
+        .finally(() => clearTimeout(fallback))
     })
   }
 
-  private async getAppConfiguration () {
-    // if this call blocks and we are not yet connected it means that the Ledger is locked and 
+  private async getAppConfiguration() {
+    // if this call blocks and we are not yet connected it means that the Ledger is locked and
     // the eth app is not open; if the Ledger is locked and eth app IS open, this should return successfully
 
     return new Promise((resolve: (config: { version: string }) => void, reject) => {
@@ -524,11 +527,15 @@ export default class Ledger extends Signer {
       }
 
       const fallback = setTimeout(() => {
-        const statusCode = (this.status === Status.INITIAL) ? 27904 : -1
+        const statusCode = this.status === Status.INITIAL ? 27904 : -1
         reject({ message: 'getAppConfiguration timed out', statusCode })
       }, 1000)
 
-      this.eth.getAppConfiguration().then(resolve).catch(reject).finally(() => clearTimeout(fallback))
+      this.eth
+        .getAppConfiguration()
+        .then(resolve)
+        .catch(reject)
+        .finally(() => clearTimeout(fallback))
     })
   }
 }

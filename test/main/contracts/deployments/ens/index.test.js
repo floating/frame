@@ -15,7 +15,7 @@ beforeEach(() => {
 })
 
 describe('registrar', () => {
-  const registrar = ensContracts.find(c => c.name.toLowerCase().includes('permanent registrar'))
+  const registrar = ensContracts.find((c) => c.name.toLowerCase().includes('permanent registrar'))
 
   const registrarInterface = new Interface([
     'function transferFrom(address from, address to, uint256 tokenId)',
@@ -26,28 +26,28 @@ describe('registrar', () => {
   describe('transfers', () => {
     const supportedFunctions = ['transferFrom', 'safeTransferFrom']
 
-    supportedFunctions.forEach(fn => {
+    supportedFunctions.forEach((fn) => {
       it(`recognizes a call to ${fn} for a name with an unknown token id`, () => {
         const calldata = registrarInterface.encodeFunctionData(fn, [from, to, BigNumber.from(tokenId)])
         const action = registrar.decode(calldata)
-    
+
         expect(action).toStrictEqual({
           id: 'ens:transfer',
           data: { name: '', from, to, tokenId }
         })
       })
-    
+
       it(`resolves the ENS name for a ${fn} call from the user's asset collection`, () => {
         const asset = {
           name: 'frame.eth',
           tokenId
         }
-    
+
         store.set('main.inventory', from, 'ens.items', { someId: asset })
-    
+
         const calldata = registrarInterface.encodeFunctionData(fn, [from, to, BigNumber.from(tokenId)])
         const action = registrar.decode(calldata, { account: from })
-    
+
         expect(action).toStrictEqual({
           id: 'ens:transfer',
           data: { name: 'frame.eth', from, to, tokenId }
@@ -60,7 +60,7 @@ describe('registrar', () => {
     it('recognizes a call to approve for a name with an unknown token id', () => {
       const calldata = registrarInterface.encodeFunctionData('approve', [to, BigNumber.from(tokenId)])
       const action = registrar.decode(calldata)
-  
+
       expect(action).toStrictEqual({
         id: 'ens:approve',
         data: { name: '', operator: to, tokenId }
@@ -72,12 +72,12 @@ describe('registrar', () => {
         name: 'frame.eth',
         tokenId
       }
-  
+
       store.set('main.inventory', from, 'ens.items', { someId: asset })
-  
+
       const calldata = registrarInterface.encodeFunctionData('approve', [to, BigNumber.from(tokenId)])
       const action = registrar.decode(calldata, { account: from })
-  
+
       expect(action).toStrictEqual({
         id: 'ens:approve',
         data: { name: 'frame.eth', operator: to, tokenId }
@@ -87,8 +87,8 @@ describe('registrar', () => {
 })
 
 describe('registrar controller', () => {
-  const registrarController = ensContracts.find(c => c.name.toLowerCase().includes('controller'))
-  
+  const registrarController = ensContracts.find((c) => c.name.toLowerCase().includes('controller'))
+
   const registrarControllerInterface = new Interface([
     'function commit(bytes32 commitment)',
     'function register(string name, address owner, uint256 duration, bytes32 secret) payable',
@@ -97,7 +97,9 @@ describe('registrar controller', () => {
   ])
 
   it('recognizes a call for a pre-commitment to registering an ENS name', () => {
-    const calldata = registrarControllerInterface.encodeFunctionData('commit', [utils.formatBytes32String('asecretphrase')])
+    const calldata = registrarControllerInterface.encodeFunctionData('commit', [
+      utils.formatBytes32String('asecretphrase')
+    ])
     const action = registrarController.decode(calldata)
 
     expect(action).toStrictEqual({
@@ -108,12 +110,13 @@ describe('registrar controller', () => {
   describe('registrations', () => {
     const supportedFunctions = ['register', 'registerWithConfig']
 
-    supportedFunctions.forEach(fn => {
+    supportedFunctions.forEach((fn) => {
       it(`recognizes a call to ${fn} in order to register an ENS name`, () => {
         const duration = 60 * 60 * 24 * 365 // 1 year, in seconds
 
-        const functionParams = ['frame.eth', to, duration, utils.formatBytes32String('asecretphrase')]
-          .concat(fn.toLowerCase().includes('config') ? [from, from] : [])
+        const functionParams = ['frame.eth', to, duration, utils.formatBytes32String('asecretphrase')].concat(
+          fn.toLowerCase().includes('config') ? [from, from] : []
+        )
         const calldata = registrarControllerInterface.encodeFunctionData(fn, functionParams)
         const action = registrarController.decode(calldata)
 
@@ -125,7 +128,12 @@ describe('registrar controller', () => {
     })
 
     it('adds a .eth extension to a name to be registered', () => {
-      const calldata = registrarControllerInterface.encodeFunctionData('register', ['frame', to, 31536000, utils.formatBytes32String('asecretphrase')])
+      const calldata = registrarControllerInterface.encodeFunctionData('register', [
+        'frame',
+        to,
+        31536000,
+        utils.formatBytes32String('asecretphrase')
+      ])
       const action = registrarController.decode(calldata)
 
       expect(action.data.name).toBe('frame.eth')

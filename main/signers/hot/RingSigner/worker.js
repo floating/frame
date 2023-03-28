@@ -1,13 +1,13 @@
 const HotSignerWorker = require('../HotSigner/worker')
 
 class RingSignerWorker extends HotSignerWorker {
-  constructor () {
+  constructor() {
     super()
     this.keys = null
     process.on('message', (message) => this.handleMessage(message))
   }
 
-  unlock ({ encryptedKeys, password }, pseudoCallback) {
+  unlock({ encryptedKeys, password }, pseudoCallback) {
     try {
       this.keys = this._decrypt(encryptedKeys, password)
         .split(':')
@@ -18,12 +18,12 @@ class RingSignerWorker extends HotSignerWorker {
     }
   }
 
-  lock (_, pseudoCallback) {
+  lock(_, pseudoCallback) {
     this.keys = null
     pseudoCallback(null)
   }
 
-  addKey ({ encryptedKeys, key, password }, pseudoCallback) {
+  addKey({ encryptedKeys, key, password }, pseudoCallback) {
     let keys
     // If signer already has encrypted keys -> decrypt them and add new key
     if (encryptedKeys) keys = [...this._decryptKeys(encryptedKeys, password), key]
@@ -34,7 +34,7 @@ class RingSignerWorker extends HotSignerWorker {
     pseudoCallback(null, encryptedKeys)
   }
 
-  removeKey ({ encryptedKeys, index, password }, pseudoCallback) {
+  removeKey({ encryptedKeys, index, password }, pseudoCallback) {
     if (!encryptedKeys) return pseudoCallback('Signer does not have any keys')
     // Get list of decrypted keys
     let keys = this._decryptKeys(encryptedKeys, password)
@@ -45,34 +45,34 @@ class RingSignerWorker extends HotSignerWorker {
     pseudoCallback(null, result)
   }
 
-  signMessage ({ index, message }, pseudoCallback) {
+  signMessage({ index, message }, pseudoCallback) {
     // Make sure signer is unlocked
     if (!this.keys) return pseudoCallback('Signer locked')
     // Sign message
     super.signMessage(this.keys[index], message, pseudoCallback)
   }
 
-  signTypedData (params, pseudoCallback) {
+  signTypedData({ index, typedMessage }, pseudoCallback) {
     // Make sure signer is unlocked
     if (!this.keys) return pseudoCallback('Signer locked')
     // Sign Typed Data
-    super.signTypedData(this.keys[params.index], params, pseudoCallback)
+    super.signTypedData(this.keys[index], typedMessage, pseudoCallback)
   }
 
-  signTransaction ({ index, rawTx }, pseudoCallback) {
+  signTransaction({ index, rawTx }, pseudoCallback) {
     // Make sure signer is unlocked
     if (!this.keys) return pseudoCallback('Signer locked')
     // Sign transaction
     super.signTransaction(this.keys[index], rawTx, pseudoCallback)
   }
 
-  _decryptKeys (encryptedKeys, password) {
+  _decryptKeys(encryptedKeys, password) {
     if (!encryptedKeys) return null
     const keyString = this._decrypt(encryptedKeys, password)
     return keyString.split(':')
   }
 
-  _encryptKeys (keys, password) {
+  _encryptKeys(keys, password) {
     const keyString = keys.join(':')
     return this._encrypt(keyString, password)
   }

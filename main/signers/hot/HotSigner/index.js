@@ -11,11 +11,13 @@ const store = require('../../../store').default
 // Mock windows module during tests
 const windows = app ? require('../../../windows') : { broadcast: () => {} }
 // Mock user data dir during tests
-const USER_DATA = app ? app.getPath('userData') : path.resolve(path.dirname(require.main.filename), '../.userData')
+const USER_DATA = app
+  ? app.getPath('userData')
+  : path.resolve(path.dirname(require.main.filename), '../.userData')
 const SIGNERS_PATH = path.resolve(USER_DATA, 'signers')
 
 class HotSigner extends Signer {
-  constructor (signer, workerPath) {
+  constructor(signer, workerPath) {
     super()
     this.status = 'locked'
     this.addresses = signer ? signer.addresses : []
@@ -24,7 +26,7 @@ class HotSigner extends Signer {
     this.ready = false
   }
 
-  save (data) {
+  save(data) {
     // Construct signer
     const { id, addresses, type, network } = this
     const signer = { id, addresses, type, network, ...data }
@@ -39,11 +41,13 @@ class HotSigner extends Signer {
     log.debug('Signer saved to disk')
   }
 
-  delete () {
+  delete() {
     const signerPath = path.resolve(SIGNERS_PATH, `${this.id}.json`)
 
     // Overwrite file
-    fs.writeFileSync(signerPath, '00000000000000000000000000000000000000000000000000000000000000000000', { mode: 0o600 })
+    fs.writeFileSync(signerPath, '00000000000000000000000000000000000000000000000000000000000000000000', {
+      mode: 0o600
+    })
 
     // Remove file
     removeSync(signerPath)
@@ -52,7 +56,7 @@ class HotSigner extends Signer {
     log.info('Signer erased from disk')
   }
 
-  lock (cb) {
+  lock(cb) {
     this._callWorker({ method: 'lock' }, () => {
       this.status = 'locked'
       this.update()
@@ -61,7 +65,7 @@ class HotSigner extends Signer {
     })
   }
 
-  unlock (password, data, cb) {
+  unlock(password, data, cb) {
     const params = { password, ...data }
     this._callWorker({ method: 'unlock', params }, (err, result) => {
       if (err) return cb(err)
@@ -72,14 +76,14 @@ class HotSigner extends Signer {
     })
   }
 
-  close () {
+  close() {
     if (this.ready) this._worker.disconnect()
     else this.once('ready', () => this._worker.disconnect())
     store.removeSigner(this.id)
     log.info('Signer closed')
   }
 
-  update () {
+  update() {
     // Get derived ID
     const derivedId = this.fingerprint()
 
@@ -89,7 +93,8 @@ class HotSigner extends Signer {
       this.id = derivedId
       // Write to disk
       this.save({ encryptedKeys: this.encryptedKeys, encryptedSeed: this.encryptedSeed })
-    } else if (this.id !== derivedId) { // On changed ID
+    } else if (this.id !== derivedId) {
+      // On changed ID
       // Erase from disk
       this.delete(this.id)
       // Remove from store
@@ -104,22 +109,22 @@ class HotSigner extends Signer {
     log.info('Signer updated')
   }
 
-  signMessage (index, message, cb) {
+  signMessage(index, message, cb) {
     const payload = { method: 'signMessage', params: { index, message } }
     this._callWorker(payload, cb)
   }
 
-  signTypedData (index, version, typedData, cb) {
-    const payload = { method: 'signTypedData', params: { index, typedData, version } }
+  signTypedData(index, typedMessage, cb) {
+    const payload = { method: 'signTypedData', params: { index, typedMessage } }
     this._callWorker(payload, cb)
   }
 
-  signTransaction (index, rawTx, cb) {
+  signTransaction(index, rawTx, cb) {
     const payload = { method: 'signTransaction', params: { index, rawTx } }
     this._callWorker(payload, cb)
   }
 
-  verifyAddress (index, address, display, cb = () => {}) {
+  verifyAddress(index, address, display, cb = () => {}) {
     const payload = { method: 'verifyAddress', params: { index, address } }
     this._callWorker(payload, (err, verified) => {
       if (err || !verified) {
@@ -143,7 +148,7 @@ class HotSigner extends Signer {
     })
   }
 
-  _getToken () {
+  _getToken() {
     const listener = ({ type, token }) => {
       if (type === 'token') {
         this._token = token
@@ -155,7 +160,7 @@ class HotSigner extends Signer {
     this._worker.addListener('message', listener)
   }
 
-  _callWorker (payload, cb) {
+  _callWorker(payload, cb) {
     if (!this._worker) throw Error('Worker not running')
     // If token not yet received -> retry in 100 ms
     if (!this._token) return setTimeout(() => this._callWorker(payload, cb), 100)

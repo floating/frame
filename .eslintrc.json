@@ -1,7 +1,0 @@
-{
-  "rules": {
-    "multiline-ternary": 0,
-    "react/no-direct-mutation-state": 0,
-    "react/no-find-dom-node": 0
-  }
-}

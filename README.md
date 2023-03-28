@@ -44,7 +44,8 @@ Frame is a native web3 interface that lets you sign data, securely manage accoun
 
 #### Downloads
 
-- [All Releases](https://github.com/floating/frame/releases)
+- [Production Releases](https://github.com/floating/frame/releases)
+- [Canary Releases](https://github.com/frame-labs/frame-canary/releases)
 
 #### Arch Linux
 
@@ -56,9 +57,9 @@ If you use an arch-based distro, you can use an AUR Helper like [yay](https://gi
 # Clone
 › git clone https://github.com/floating/frame
 
-# Use node v16
-› nvm install 16.15.0
-› nvm use 16.15.0
+# Use node v18
+› nvm install 18.12.1
+› nvm use 18.12.1
 
 
 # Install

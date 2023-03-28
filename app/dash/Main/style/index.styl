@@ -1,0 +1,432 @@
+.requestFeature
+  padding 0px 0px 0px 0px
+  display flex
+  justify-content center
+  align-items center
+
+  .requestFeatureButton:active
+    transform translateY(0px)
+    box-shadow 0px 1px 2px var(--ghostY)
+    background var(--ghostAZ)
+
+  .requestFeatureButton:hover
+    transform translateY(-1px)
+    box-shadow 0px 4px 8px var(--ghostY)
+    background var(--ghostA)
+
+  .requestFeatureButton
+    padding 0px 30px
+    border-radius 26px
+    height 74px
+    font-size 14px
+    display flex
+    justify-content center
+    align-items center
+    width 294px
+    margin-bottom 8px
+    font-weight 400
+    cursor pointer
+    box-sizing border-box
+    background var(--ghostAZ)
+    border-bottom 2px solid var(--ghostZ)
+    box-shadow 0px 2px 4px var(--ghostY)
+    *
+      pointer-events none
+
+  .requestFeatureButtonMoon
+    color var(--moon)
+
+  .requestFeatureButtonGood
+    color var(--good)
+
+.snipIt
+  display flex
+  flex-direction column
+  justify-content center
+  align-items center
+  transform translateZ(0)
+  padding 0px 10px
+  font-size 13px
+  font-weight 400
+  font-family 'MainFont'
+  position relative
+  z-index 1
+  line-height 22px
+  margin-bottom 32px
+  margin-top 32px
+
+  @keyframes spin
+    0% 
+      transform rotate(0deg)
+    100%
+      transform rotate(360deg)
+
+  @keyframes spinReverse
+    0% 
+      transform rotate(0deg)
+    100%
+      transform rotate(-360deg)
+
+  .snipItBrowserExtensionIcons
+    display flex
+    justify-content center
+    align-items center
+    padding 10px
+    width 100%
+    
+    .snipItBrowserExtensionIcon:active
+      transform translateY(0px)
+      box-shadow 0px 1px 2px var(--ghostY)
+      background var(--ghostA)
+
+    .snipItBrowserExtensionIcon:hover
+      transform translateY(-1px)
+      box-shadow 0px 4px 8px var(--ghostY)
+      background var(--ghostA)
+
+    .snipItBrowserExtensionIcon
+      display flex
+      justify-content center
+      align-items center
+      height 74px
+      width 74px
+      border-radius 26px
+      margin 8px
+      cursor pointer
+      background var(--ghostAZ)
+      border-bottom 2px solid var(--ghostZ)
+      box-shadow 0px 2px 4px var(--ghostY)
+
+      *
+        pointer-events none
+
+// .dashModules
+//   .dashModule:first-child
+//     border-top-left-radius 26px
+//     border-top-right-radius 26px
+//   .dashModule:last-child
+//     border-bottom-left-radius 26px
+//     border-bottom-right-radius 26px
+//   .dashModule:first-child:last-child
+//     border-radius 26px
+
+.dashModule
+  height 120px
+  margin-bottom 8px
+  border-radius 26px
+  cursor pointer
+  display flex
+  justify-content center
+  align-items center
+  margin 6px
+  font-size 18px
+  font-weight 300
+  border-radius 26px
+  background var(--ghostAZ)
+  box-shadow 0px 2px 4px var(--ghostY)
+  border-bottom 2px solid var(--ghostZ)
+
+  *
+    pointer-events none
+
+  .dashModuleIcon
+    margin-right 20px
+
+.dashModule:hover
+  transform translateY(-1px)
+  box-shadow 0px 4px 8px var(--ghostY)
+  background var(--ghostA)
+  z-index 200
+  position relative
+
+.dashModule:active
+  transform translateY(0px)
+  box-shadow 0px 1px 2px var(--ghostY)
+  background var(--ghostB)
+
+.signerSettings
+  position absolute
+  top 10px
+  right 0
+  bottom 0
+  left 0
+  transition var(--standard)
+  transform translateZ(0)
+  overflow hidden
+
+  .signerSlide
+    position absolute
+    top 50px
+    right 0
+    left 0
+    bottom 0
+    transition var(--standard)
+    padding-bottom 50px
+    overflow-y scroll
+    overflow-x hidden
+    .signerSubslider
+      width 1000%
+      display flex
+    .signerSubsliderSlide
+      width 10%
+    .signerSubsliderSlideMessage
+      padding 20px
+      display flex
+      flex-direction column
+      justify-content flex-start
+      align-items center
+      text-align center
+    .renameAccountButtonWrap
+      padding 10px
+      display flex
+      justify-content center
+      align-items center
+      text-align center
+
+  .signerSettingsTitle:before
+    content ''
+    position absolute
+    bottom -2px
+    right 10px
+    left 10px
+    height 4px
+    border-radius 2px
+    background var(--thin)
+
+  .signerSettingsTitle
+    position relative
+    display flex
+    align-items flex-end
+    justify-content space-between
+    height 40px
+    font-size 22px
+    padding 0px 10px 10px 10px
+
+.signerSettingsHidden
+  left 100%
+  right -100%
+
+.signerPermission
+  position relative
+  justify-content space-between
+  padding 12px 0px 0px 0px 
+  font-size 15px
+  font-weight 300
+  transform translateZ(0)
+  z-index 2000
+  border-radius 26px
+  background var(--ghostA)
+  box-shadow 0px 4px 6px var(--ghostY)
+  border-bottom 2px solid var(--ghostZ)
+
+  .signerPermissionControls
+    display flex
+    position relative
+    justify-content space-between
+    transform translateZ(0)
+    z-index 40
+
+  .signerPermissionDetails
+    display flex
+    position relative
+    justify-content space-between
+    transform translateZ(0)
+    font-size 13px
+    padding 12px 0px 0px 1px
+    z-index 20
+    font-weight 300
+    font-family 'MainFont'
+    line-height 18px
+
+  .keyCommand
+    margin-left 2px
+    padding 1px 6px 2px 6px
+    font-weight 400
+    border-radius 5px
+    font-size 12px
+    border 1px solid var(--outerspace05)
+    color var(--outerspace)
+    height 30px
+
+  .nodeProviderStatus
+    display flex
+    justify-content center
+    align-items center
+    height 18px
+    border-radius 10px
+    font-size 10px
+    text-transform uppercase
+    padding-left 8px
+    padding-right 8px
+    background var(--bad)
+    padding-bottom 1px
+    font-weight 400
+    color #f3f6fd
+    text-shadow 0px 1px 2px rgba(100, 0, 0, 0.2), 0px 1px 0px rgba(100, 0, 0, 0.2)
+    transform translateZ(0)
+
+  .nodeProviderConnected
+    background var(--good)
+    text-shadow 0px 1px 2px rgba(0, 50, 50, 0.2), 0px 1px 0px rgba(0, 50, 50, 0.2)
+
+  .signerPermissionOrigin
+    background transparent
+    width 250px
+    direction rtl
+    text-overflow ellipsis
+    overflow hidden
+    text-align left
+    white-space nowrap
+    font-weight 300
+    margin-top 2px
+
+  .signerPermissionNoPermissions
+    font-weight 300
+    text-align center
+    width 100%
+    font-size 14px
+
+  .signerPermissionSetting
+    background transparent
+    width 250px
+    direction rtl
+    text-overflow ellipsis
+    overflow hidden
+    text-align left
+    white-space nowrap
+    font-family 'MainFont'
+    font-weight 300
+    font-size 18px
+    position relative
+    padding-top 4px
+
+.localSetting
+  background var(--ghostAZ)
+  border-radius 27px
+  margin 6px
+  padding 20px
+  box-shadow 0px 4px 8px var(--ghostY)
+
+.addCustomTokenButton
+  padding 0px
+  margin-bottom 6px
+  border-radius 12px
+  height 46px
+  font-size 13px
+  text-transform uppercase
+  font-weight 400
+  letter-spacing 1px
+  display flex
+  justify-content center
+  align-items center
+  background var(--ghostA)
+  transition var(--standardFast)
+  cursor pointer
+  box-sizing border-box
+  box-shadow 0px 4px 8px var(--ghostY)
+  * 
+    pointer-events none
+
+.addCustomTokenButton:hover
+  background var(--ghostB)
+
+.signerPermissionToggle
+  position relative
+  background var(--bad)
+  height 20px
+  width 40px
+  margin-right 6px
+  margin-left 12px
+  border-radius 10px
+  transition var(--standard)
+  transform translateZ(0)
+  cursor pointer
+
+  .signerPermissionToggleSwitch
+    position absolute
+    top 2px
+    left 2px
+    bottom 2px
+    width 16px
+    border-radius 10px
+    transition var(--standard)
+    background var(--ghostC)
+    transform translateZ(0)
+    pointer-events none
+    border-bottom 2px solid var(--ghostZ)
+
+  .signerPermissionToggleSwitchLocked
+    position absolute
+    top 0px
+    left 0px
+    bottom 0px
+    right 0px
+    border-radius 10px
+    display flex
+    align-items center
+    justify-content center
+    cursor pointer
+    *
+      pointer-events none
+
+    .signerPermissionToggleSwitch
+      opacity 1
+      transition var(--standard)
+
+    svg
+      transition var(--standard)
+      opacity 0
+      color var(--ghostC)
+
+  .signerPermissionToggleSwitchLocked:hover
+    .signerPermissionToggleSwitch
+      opacity 0
+
+    svg
+      opacity 1
+
+.signerPermissionToggleOn
+  background var(--good)
+  .signerPermissionToggleSwitch
+    position absolute
+    transform translateX(20px)
+
+.signerPermissionToggle:hover
+  .signerPermissionToggleSwitch
+    background var(--ghostD)
+
+.signerPermissionToggleSmall
+  position relative
+  background var(--bad)
+  height 14px
+  width 30px
+  border-radius 10px
+  transition var(--standard)
+  transform translateZ(0)
+  margin-top 2px
+  margin-right 4px
+  cursor pointer
+
+  .signerPermissionToggleSwitch
+    position absolute
+    top 2px
+    left 2px
+    bottom 2px
+    width 10px
+    border-radius 10px
+    transition var(--standard)
+    background var(--ghostC)
+    transform translateZ(0)
+    box-shadow 0px 3px 3px 0px var(--tripleThick) 
+    pointer-events none
+
+.signerPermissionToggleSmallOn
+  background var(--good)
+
+  .signerPermissionToggleSwitch
+    position absolute
+    transform translateX(16px)
+
+.signerPermissionToggleSmall:hover
+  .signerPermissionToggleSwitch
+    background var(--ghostD)

@@ -1,7 +1,6 @@
-// @ts-ignore
 import deepEqual from 'deep-equal'
 
-import { getColor } from '../../../resources/colors'
+import { Colorway, getColor } from '../../../resources/colors'
 import store from '../../store'
 
 // typed access to state
@@ -32,7 +31,7 @@ interface NetworkChangedHandler {
   networkChanged: (networkId: number, originId: string) => void
 }
 
-function createChainsObserver (handler: ChainsChangedHandler) {
+function createChainsObserver(handler: ChainsChangedHandler) {
   let availableChains = getActiveChains()
 
   return function () {
@@ -45,7 +44,7 @@ function createChainsObserver (handler: ChainsChangedHandler) {
   }
 }
 
-function createOriginChainObserver (handler: ChainChangedHandler & NetworkChangedHandler) {
+function createOriginChainObserver(handler: ChainChangedHandler & NetworkChangedHandler) {
   let knownOrigins: Record<string, Origin> = {}
 
   return function () {
@@ -65,15 +64,17 @@ function createOriginChainObserver (handler: ChainChangedHandler & NetworkChange
   }
 }
 
-function getActiveChains (): RPC.GetEthereumChains.Chain[] {
+function getActiveChains(): RPC.GetEthereumChains.Chain[] {
   const chains = storeApi.getChains()
   const meta = storeApi.getChainsMeta()
   const colorway = storeApi.getColorway()
-  
+
   return Object.values(chains)
-    .filter(chain => chain.on && (chain.connection.primary.connected || chain.connection.secondary.connected))
+    .filter(
+      (chain) => chain.on && (chain.connection.primary.connected || chain.connection.secondary.connected)
+    )
     .sort((a, b) => a.id - b.id)
-    .map(chain => {
+    .map((chain) => {
       const { id, explorer, name } = chain
       const { nativeCurrency, primaryColor } = meta[id]
       const { icon: currencyIcon, name: currencyName, symbol, decimals } = nativeCurrency
@@ -81,19 +82,21 @@ function getActiveChains (): RPC.GetEthereumChains.Chain[] {
       const icons = currencyIcon ? [{ url: currencyIcon }] : []
       const colors = primaryColor ? [getColor(primaryColor, colorway)] : []
 
-      return ({
+      return {
         chainId: id,
         networkId: id,
         name,
         nativeCurrency: {
-          name: currencyName, symbol, decimals
+          name: currencyName,
+          symbol,
+          decimals
         },
         icon: icons,
         explorers: [{ url: explorer }],
         external: {
           wallet: { colors }
         }
-      })
+      }
     })
 }
 

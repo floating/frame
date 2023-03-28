@@ -3,7 +3,7 @@ import multicall, { supportsChain } from '../../../../main/multicall'
 
 import log from 'electron-log'
 import { ethers } from 'ethers'
-import { addHexPrefix, padToEven } from 'ethereumjs-util'
+import { addHexPrefix, padToEven } from '@ethereumjs/util'
 import ethProvider from 'eth-provider'
 import BigNumber from 'bignumber.js'
 
@@ -12,7 +12,8 @@ jest.mock('eth-provider', () =>
   jest.fn(() => ({
     request: jest.fn(),
     setChain: jest.fn()
-  })))
+  }))
+)
 
 const callResponse = '0x0000000000000000000000000000000000000000000000000000000000000000'
 const ownerAddress = '0xbfa641051ba0a0ad1b0acf549a89536a0d76472e'
@@ -73,15 +74,15 @@ describe('#getTokenBalances', () => {
     beforeEach(() => {
       supportsChain.mockReturnValue(true)
 
-      multicall.mockImplementation(chainId => {
+      multicall.mockImplementation((chainId) => {
         return {
           batchCall: async function (tokenCalls) {
-            return tokenCalls.map(tc => {
+            return tokenCalls.map((tc) => {
               expect(tc.call[0]).toBe('function balanceOf(address address) returns (uint256 value)')
               expect(tc.call[1]).toBe(ownerAddress)
 
               const token = knownTokens.find(
-                token => token.address === tc.target && token.chainId === parseInt(chainId)
+                (token) => token.address === tc.target && token.chainId === parseInt(chainId)
               )
 
               if (token) {
@@ -92,7 +93,7 @@ describe('#getTokenBalances', () => {
                   ]
                 }
               }
-              
+
               return '0x0'
             })
           }
@@ -103,7 +104,7 @@ describe('#getTokenBalances', () => {
     afterEach(() => {
       multicall.mockReset()
     })
-    
+
     it('loads token balances for multiple chains', async () => {
       const tokenBalances = await balancesLoader.getTokenBalances(ownerAddress, knownTokens)
 
@@ -133,7 +134,7 @@ describe('#getTokenBalances', () => {
     beforeEach(() => {
       supportsChain.mockReturnValue(false)
 
-      eth.request.mockImplementation(async payload => {
+      eth.request.mockImplementation(async (payload) => {
         expect(payload.method).toBe('eth_call')
         return callHandler(payload)
       })
@@ -142,7 +143,7 @@ describe('#getTokenBalances', () => {
     afterEach(() => {
       expect(multicall).not.toHaveBeenCalled()
     })
-    
+
     it('loads token balances for multiple chains', async () => {
       const tokenBalances = await balancesLoader.getTokenBalances(ownerAddress, knownTokens)
 
@@ -164,16 +165,16 @@ describe('#getTokenBalances', () => {
         }
       ])
     })
-    
+
     it('handles an error retrieving one balance', async () => {
-      callHandler.mockImplementation(payload => {
+      callHandler.mockImplementation((payload) => {
         if (payload.params[0].to === zrxToken.address) {
           throw new Error('invalid token contract!')
         }
 
         return respondToTokenCall(payload)
       })
-  
+
       const tokenBalances = await balancesLoader.getTokenBalances(ownerAddress, knownTokens)
 
       expect(tokenBalances).toEqual([
@@ -194,13 +195,15 @@ describe('#getTokenBalances', () => {
 
 // helper functions //
 
-function respondToTokenCall (payload) {
+function respondToTokenCall(payload) {
   expect(payload.params[0].value).toBe('0x0')
-  expect(payload.params[0].data).toBe('0x70a08231000000000000000000000000bfa641051ba0a0ad1b0acf549a89536a0d76472e')
+  expect(payload.params[0].data).toBe(
+    '0x70a08231000000000000000000000000bfa641051ba0a0ad1b0acf549a89536a0d76472e'
+  )
   expect(payload.params[1]).toBe('latest')
 
   const token = knownTokens.find(
-    token => token.address === payload.params[0].to && token.chainId === parseInt(payload.chainId)
+    (token) => token.address === payload.params[0].to && token.chainId === parseInt(payload.chainId)
   )
 
   const balance = onChainBalances[token.address]

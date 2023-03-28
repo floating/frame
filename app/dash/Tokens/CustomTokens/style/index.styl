@@ -1,0 +1,249 @@
+.customTokens
+
+  .customTokensTitle
+    font-size 16px
+    font-weight 300
+    height 47px
+    display flex
+    justify-content space-between
+    padding 0px 10px
+    align-items center
+    border-radius 6px
+    box-shadow 0px 5px 7px -3px var(--ghostZ)
+
+    .customTokensAddToken
+      background var(--ghostC)
+      height 30px
+      border-radius 12px
+      display flex
+      justify-content center
+      align-items center
+      font-size 11px
+      padding 0px 12px
+      letter-spacing 1px
+      font-weight 300
+      text-transform uppercase
+      cursor pointer
+      *
+        pointer-events none
+
+    .customTokensAddToken:hover
+      background var(--ghostD)
+
+  .customTokensFooter
+    position absolute
+    bottom 0
+    left 0
+    right 0
+    height 64px
+    font-family 'MainFont'
+    font-size 20px
+    font-weight 400
+    display flex
+    justify-content center
+    align-items center
+
+  .customTokensList
+    // position absolute
+    // top 40px
+    // left 5px
+    // bottom 0px
+    // right 5px
+    // overflow-y scroll
+    padding-top 20px
+    padding-bottom 20px
+    z-index 2
+
+  .customTokensListNoTokens
+    position absolute
+    top 140px
+    left 5px
+    right 5px
+    bottom 0px
+    display flex
+    font-size 16px
+    font-weight 300
+    justify-content center
+    align-items center
+    text-transform uppercase
+    font-family 'MainFont'
+    color var(--outerspace05)
+
+  .customTokensListItem
+    position relative
+    transition var(--standard)
+    box-sizing border-box
+    height 50px
+    padding 0px 4px
+    overflow hidden
+    border-bottom 1px solid var(--ghostY)
+
+    .customTokensListItemTitle
+      display flex
+      justify-content space-between
+      align-items center
+      font-size 16px
+      height 50px
+      box-sizing border-box
+      padding 6px
+
+      .customTokensListItemExpand
+        text-align center
+        width 30px
+        height 30px
+        margin-left 10px
+        border-radius 12px
+        cursor pointer
+        padding 7px
+        box-sizing border-box
+        background var(--ghostB)
+        transition var(--standardFast)
+        transform rotate(-180deg)
+        
+        *
+          pointer-events none
+
+      .customTokensListItemExpand:hover
+        background var(--ghostC)
+
+      .customTokensListItemExpandActive
+        transform rotate(0deg)
+
+      .customTokensListItemName
+        display flex
+        justify-content center
+        align-items center
+        font-family 'MainFont'
+        font-weight 300
+
+        img:before
+          content attr(alt)
+          top 0
+          bottom 0
+          left 0
+          right 0
+          border-radius 13px
+          position absolute
+          background var(--outerspace)
+          color var(--ghostD)
+          display flex
+          justify-content center
+          align-items center
+          font-size 11px
+          font-weight 300
+          letter-spacing -0.5px
+          margin-left -0.5px
+          top -0.5px
+
+        img
+          position relative
+          height 28px
+          width 28px
+          border-radius 20px
+          margin-right 12px
+          border 2px solid var(--ghostC)
+          background var(--ghostC)
+          overflow hidden
+
+        .customTokensListItemText
+          display flex
+          flex-direction column
+          align-items flex-start
+          justify-content flex-start
+
+        .customTokensListItemSymbol
+          font-weight 300
+          margin-bottom 1px
+          margin-top 2px
+          font-size 16px
+          font-family 'MainFont'
+          line-height 13px
+          letter-spacing 1px
+
+        .customTokensListItemSub
+          // margin-left 5px
+          font-weight 300
+          margin-top 4px
+          margin-bottom 1px
+          margin-left 0px
+          font-size 12px
+          font-weight 300
+          font-family 'MainFont'
+          color var(--outerspace05)
+          line-height 12px
+
+      .customTokensListItemChain
+        display flex
+        justify-content center
+        align-items center
+        font-size 18px
+        font-weight 400
+
+    .customTokensListItemChainLabel
+      font-size 10px
+      text-transform uppercase
+      margin 0px 5px 0px 1px
+      font-weight 300
+      margin-top 1px
+      font-weight 300
+
+    .customTokensListItemAddress
+      display flex
+      justify-content center
+      align-items center
+      font-size 12.5px
+      height 26px
+      margin 0px 10px
+      border-radius 9px
+      font-family 'FiraCode'
+      background var(--ghostB)
+      // border-radius 12px
+      // margin 0px 3px 0px 3px
+      padding-top 1px
+      cursor pointer
+      *
+        pointer-events none
+
+    .customTokensListItemBottom
+      height 40px
+      display flex
+      align-items center
+      padding 0px 10px
+      font-size 12px
+
+      .customTokensListItemButton
+        display flex
+        justify-content center
+        align-items center
+        width 50%
+        height 26px
+        box-sizing border-box
+        border-radius 10px
+        cursor pointer
+        text-transform uppercase
+        background var(--ghostB)
+
+        *
+          pointer-events none
+
+      .customTokensListItemButton:hover
+        background var(--ghostC)
+
+      .editButton
+        color var(--good)
+        margin-right 8px
+
+      .removeButton
+        color var(--bad)
+        margin-left 8px
+
+  .customTokensListItemExpanded
+    height 122px
+    // background var(--ghostY)
+
+  .customTokensListItemChainDecimal
+    display flex
+    justify-content center
+    align-items center
+    font-size 18px
+    font-weight 400

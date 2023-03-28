@@ -1,27 +1,29 @@
-import { rlp, addHexPrefix, stripHexPrefix, padToEven } from 'ethereumjs-util'
-import { TypedData, TypedDataUtils, TypedMessage } from 'eth-sig-util'
 import log from 'electron-log'
-
+import { encode } from 'rlp'
+import { addHexPrefix, stripHexPrefix, padToEven } from '@ethereumjs/util'
+import { SignTypedDataVersion, TypedDataUtils } from '@metamask/eth-sig-util'
 import Transport from '@ledgerhq/hw-transport'
 import Eth from '@ledgerhq/hw-app-eth'
 
 import { Derivation, getDerivationPath, deriveHDAccounts } from '../../Signer/derive'
-import { TransactionData } from '../../../../resources/domain/transaction'
 import { sign } from '../../../transaction'
 import { DeviceError } from '.'
 
-export default class LedgerEthereumApp {
-  private eth: Eth;
+import type { TypedData } from '../../../accounts/types'
+import type { TransactionData } from '../../../../resources/domain/transaction'
 
-  constructor (transport: Transport) {
+export default class LedgerEthereumApp {
+  private eth: Eth
+
+  constructor(transport: Transport) {
     this.eth = new Eth(transport)
   }
 
-  async close () {
+  async close() {
     return this.eth.transport.close()
   }
 
-  async deriveAddresses (derivation: Derivation) {
+  async deriveAddresses(derivation: Derivation) {
     log.info(`deriving ${derivation} Ledger addresses`)
 
     const path = getDerivationPath(derivation)
@@ -41,22 +43,32 @@ export default class LedgerEthereumApp {
     return new Promise(executor)
   }
 
-  async signMessage (path: string, message: string) {
+  async signMessage(path: string, message: string) {
     const rawMessage = stripHexPrefix(message)
-    
+
     const signature = await this.eth.signPersonalMessage(path, rawMessage)
     const hashedSignature = signature.r + signature.s + padToEven((signature.v - 27).toString(16))
 
     return addHexPrefix(hashedSignature)
   }
 
-  async signTypedData (path: string, typedData: TypedData) {
+  async signTypedData(path: string, typedData: TypedData) {
     let domainSeparatorHex, hashStructMessageHex
 
     try {
       const { domain, types, primaryType, message } = TypedDataUtils.sanitizeData(typedData)
-      domainSeparatorHex = TypedDataUtils.hashStruct('EIP712Domain', domain, types).toString('hex')
-      hashStructMessageHex = TypedDataUtils.hashStruct(primaryType as string, message, types).toString('hex')
+      domainSeparatorHex = TypedDataUtils.hashStruct(
+        'EIP712Domain',
+        domain,
+        types,
+        SignTypedDataVersion.V4
+      ).toString('hex')
+      hashStructMessageHex = TypedDataUtils.hashStruct(
+        primaryType as string,
+        message,
+        types,
+        SignTypedDataVersion.V4
+      ).toString('hex')
     } catch (e) {
       throw new DeviceError('Invalid typed data', 99901)
     }
@@ -67,12 +79,12 @@ export default class LedgerEthereumApp {
     return addHexPrefix(hashedSignature)
   }
 
-  async signTransaction (path: string, ledgerTx: TransactionData) {
-    const signedTx = await sign(ledgerTx, tx => {
+  async signTransaction(path: string, ledgerTx: TransactionData) {
+    const signedTx = await sign(ledgerTx, (tx) => {
       // legacy transactions aren't RLP encoded before they're returned
       const message = tx.getMessageToSign(false)
       const legacyMessage = message[0] !== tx.type
-      const rawTxHex = legacyMessage ? rlp.encode(message).toString('hex') : message.toString('hex')
+      const rawTxHex = legacyMessage ? Buffer.from(encode(message)).toString('hex') : message.toString('hex')
 
       return this.eth.signTransaction(path, rawTxHex, null)
     })
@@ -80,11 +92,11 @@ export default class LedgerEthereumApp {
     return addHexPrefix(signedTx.serialize().toString('hex'))
   }
 
-  async getAddress (path: string, display: boolean, chainCode: boolean) {
+  async getAddress(path: string, display: boolean, chainCode: boolean) {
     return this.eth.getAddress(path, display, chainCode)
   }
 
-  async getAppConfiguration () {
+  async getAppConfiguration() {
     return this.eth.getAppConfiguration()
   }
 }

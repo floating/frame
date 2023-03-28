@@ -45,7 +45,10 @@ const main = async () => {
     const accounts = await ethereum.send('eth_accounts')
     console.log({ accounts })
 
-    const signedTypedDataStringified = await ethereum.send('eth_signTypedData_v3', [accounts[0], JSON.stringify(TYPED_DATA)])
+    const signedTypedDataStringified = await ethereum.send('eth_signTypedData_v3', [
+      accounts[0],
+      JSON.stringify(TYPED_DATA)
+    ])
     console.log({ signedTypedDataStringified })
 
     const signedTypedDataAsObject = await ethereum.send('eth_signTypedData', [accounts[0], TYPED_DATA])
@@ -59,4 +62,6 @@ const main = async () => {
   }
 }
 
-main().catch(error => console.error(error)).finally(() => process.exit())
+main()
+  .catch((error) => console.error(error))
+  .finally(() => process.exit())

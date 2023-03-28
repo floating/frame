@@ -1,11 +1,6 @@
 const ipfs = require('ipfs-core')
 const peers = require('./peers.json')
 
-const store = require('../store').default
-
-// const peers = require('./peers.json')
-const ens = require('../ens')
-
 let node
 
 const api = {
@@ -34,7 +29,7 @@ const api = {
   //   return files
 
   // },
-  get: async path => {
+  get: async (path) => {
     if (!node) throw new Error('IPFS is not running')
     const files = []
     for await (const file of node.get(path)) {
@@ -48,7 +43,7 @@ const api = {
     }
     return files
   },
-  getFile: async path => {
+  getFile: async (path) => {
     const files = await api.get(path)
     if (files.length > 1) throw new Error(`Path ${path} is a directory, use .get() to return all files`)
     if (files[0].path !== path || files.length !== 1) throw new Error(`Path ${path} could not be found`)
@@ -66,10 +61,10 @@ const start = async () => {
       }
     }
     await connectPeers()
-    const id = await node.id()
+    await node.id()
   } catch (e) {
-    // destryo ipfs instance... 
-    
+    // destryo ipfs instance...
+
     console.error(e)
     // ipfs.destroy()
     setTimeout(() => start(), 15 * 1000)

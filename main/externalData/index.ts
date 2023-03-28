@@ -4,8 +4,8 @@ import Pylon from '@framelabs/pylon-client'
 import store from '../store'
 import Inventory from './inventory'
 import Rates from './assets'
-import { arraysMatch, debounce } from '../../resources/utils'
 import Balances from './balances'
+import { arraysMatch, debounce } from '../../resources/utils'
 
 export interface DataScanner {
   close: () => void
@@ -16,9 +16,10 @@ const storeApi = {
   getCustomTokens: () => (store('main.tokens.custom') || []) as Token[],
   getKnownTokens: (address?: Address) => ((address && store('main.tokens.known', address)) || []) as Token[],
   getConnectedNetworks: () => {
-    const networks = (Object.values(store('main.networks.ethereum') || {})) as Network[]
-    return networks
-      .filter(n => (n.connection.primary || {}).connected || (n.connection.secondary || {}).connected)
+    const networks = Object.values(store('main.networks.ethereum') || {}) as Network[]
+    return networks.filter(
+      (n) => (n.connection.primary || {}).connected || (n.connection.secondary || {}).connected
+    )
   }
 }
 
@@ -29,7 +30,9 @@ export default function () {
   const rates = Rates(pylon, store)
   const balances = Balances(store)
 
-  let connectedChains: number[] = [], activeAccount: Address = ''
+  let connectedChains: number[] = [],
+    activeAccount: Address = ''
+  let pauseScanningDelay: NodeJS.Timeout | undefined
 
   inventory.start()
   rates.start()
@@ -64,10 +67,13 @@ export default function () {
   })
 
   const allNetworksObserver = store.observer(() => {
-    const connectedNetworkIds = storeApi.getConnectedNetworks().map(n => n.id).sort()
+    const connectedNetworkIds = storeApi
+      .getConnectedNetworks()
+      .map((n) => n.id)
+      .sort()
 
     if (!arraysMatch(connectedChains, connectedNetworkIds)) {
-      const newlyConnectedNetworks = connectedNetworkIds.filter(c => !connectedChains.includes(c))
+      const newlyConnectedNetworks = connectedNetworkIds.filter((c) => !connectedChains.includes(c))
       connectedChains = connectedNetworkIds
 
       handleNetworkUpdate(newlyConnectedNetworks)
@@ -91,15 +97,38 @@ export default function () {
     handleTokensUpdate(customTokens)
   }, 'externalData:customTokens')
 
+  const trayObserver = store.observer(() => {
+    const open = store('tray.open')
+
+    if (!open) {
+      // pause balance scanning after the tray is out of view for one minute
+      if (!pauseScanningDelay) {
+        pauseScanningDelay = setTimeout(balances.pause, 1000)
+      }
+    } else {
+      if (pauseScanningDelay) {
+        clearTimeout(pauseScanningDelay)
+        pauseScanningDelay = undefined
+
+        balances.resume()
+      }
+    }
+  }, 'externalData:tray')
+
   return {
     close: () => {
       allNetworksObserver.remove()
       activeAddressObserver.remove()
       customTokensObserver.remove()
+      trayObserver.remove()
 
       inventory.stop()
       rates.stop()
       balances.stop()
+
+      if (pauseScanningDelay) {
+        clearTimeout(pauseScanningDelay)
+      }
     }
   } as DataScanner
 }

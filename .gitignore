@@ -13,5 +13,4 @@ test/.userData
 .vscode
 .parcel-cache
 *.tsbuildinfo
-scripts
 *.code-workspace

@@ -1,0 +1,163 @@
+.signersSlide
+  position absolute
+  top 0
+  right 0
+  bottom 0
+  left 0
+  z-index 6000
+  pointer-events none
+
+.panelHeader
+  position relative
+  height 64px
+  z-index 20000000000
+  transition var(--standardFast)
+  box-sizing border-box
+  margin 4px
+
+  .panelHeaderTitle
+    position absolute 
+    left 0
+    top 0
+    bottom 0
+    font-size 20px
+    padding 18px
+
+  .panelHeaderAddChain
+    position absolute 
+    right 12px
+    top 16px 
+    bottom 0
+    cursor pointer
+    height 32px
+    width 106px
+    border-radius 8px
+    background var(--ghostB)
+    display flex
+    justify-content center
+    align-items center
+    font-size 11px
+    font-weight 300
+    overflow hidden
+    background-position 0 100%
+    text-transform uppercase
+    letter-spacing 1px
+    font-weight 300
+    cursor pointer
+
+    .panelHeaderAddChainInner
+      pointer-events none
+      margin-left 4px
+      margin-top -1px
+
+  .panelHeaderAddChain:hover
+    color var(--good)
+
+  .panelHeaderUpdate
+    position absolute 
+    right 12px
+    top 16px 
+    bottom 0
+    // background red
+    // padding 18px
+    cursor pointer
+    height 32px
+    width 66px
+    border-radius 16px
+    background var(--ghostX)
+    display flex
+    justify-content center
+    align-items center
+    font-family 'FiraCode'
+    font-size 26px
+    font-weight 300
+    overflow hidden
+    background-position 0 100%
+    
+    .panelHeaderUpdateInner
+      position absolute 
+      top 2px
+      right 2px
+      bottom 2px
+      left 2px
+      background var(--ghostX)
+      border-radius 14px
+
+    .panelHeaderUpdateToggle
+      position absolute 
+      height 28px
+      width 55px
+      border-radius 14px
+      left 0px
+      background var(--ghostD)
+      // box-shadow 0px 3px 3px var(--ghostY)
+      z-index 10
+      transition var(--standardFast)
+      cursor pointer
+      display flex
+      justify-content center
+      align-items center
+      color var(--outerspace05)
+
+      *
+        pointer-events none
+
+      svg
+        position relative
+        top 0px
+        left 0px
+
+    .panelHeaderUpdateToggle:hover
+      color var(--good)
+
+    .panelHeaderUpdateToggleOn
+      color var(--good)
+      transform translateX(7px)
+
+  .panelHeaderUpdateOn
+    background var(--good)
+
+.chainMonitorSwitch
+  position absolute
+  top 9px
+  right 9px
+  display flex
+  background var(--ghostZ)
+  padding 2px 2px 1px 2px
+  border-radius 16px
+
+  .chainMonitorSwitchButton
+    padding 2px 6px
+    border-radius 16px
+    background var(--ghostA)
+    box-shadow 0px 1px 2px var(--ghostX)
+    border-bottom 2px solid var(--ghostZ)
+    cursor pointer
+    *
+      pointer-events none
+
+  .chainMonitorSwitchButton:first-child
+    margin-right 3px
+    border-top-right-radius 4px
+    border-bottom-right-radius 4px
+
+  .chainMonitorSwitchButton:last-child
+    border-top-left-radius 4px
+    border-bottom-left-radius 4px
+
+
+  .chainMonitorSwitchButton:hover
+    background var(--ghostB)
+    transform translateY(-1px)
+    border-bottom 2px solid var(--ghostZ)
+    box-shadow 0px 4px 30px -8px var(--ghostX)
+    position relative
+    z-index 300000
+
+  .chainMonitorSwitchButton:active
+    background var(--ghostB)
+    transform translateY(0px)
+    box-shadow 0px 2px 4px var(--ghostX)
+
+@import './account.styl'
+

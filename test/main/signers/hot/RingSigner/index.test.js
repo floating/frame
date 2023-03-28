@@ -1,9 +1,7 @@
-/* globals test, expect, beforeAll, afterAll, describe */
 import fs from 'fs'
 import path from 'path'
 import crypto from 'crypto'
 import { remove } from 'fs-extra'
-
 import log from 'electron-log'
 
 const PASSWORD = 'fr@///3_password'
@@ -11,7 +9,6 @@ const SIGNER_PATH = path.resolve(__dirname, '../.userData/signers')
 const FILE_PATH = path.resolve(__dirname, 'keystore.json')
 
 jest.mock('electron')
-jest.mock('../../../../../compiled/main/store/persist', () => ({ get: jest.fn(), set: jest.fn(), queue: jest.fn() }))
 jest.mock('../../../../../main/store/persist')
 
 // Stubs
@@ -29,8 +26,8 @@ describe('Ring signer', () => {
 
     clean()
 
-    hot = await import('../../../../../compiled/main/signers/hot')
-    store = require('../../../../../compiled/main/store').default
+    hot = await import('../../../../../main/signers/hot')
+    store = require('../../../../../main/store').default
   })
 
   afterEach(() => {
@@ -39,50 +36,58 @@ describe('Ring signer', () => {
 
   afterAll(() => {
     clean()
-
+    if (signer.status !== 'locked') {
+      signer.close()
+    }
     log.transports.console.level = 'debug'
   })
 
-  test('Create from invalid private key', done => {
+  test('Create from invalid private key', (done) => {
     const privateKey = 'invalid key'
 
     try {
-      hot.createFromPrivateKey(signers, privateKey, PASSWORD, err => {
+      hot.createFromPrivateKey(signers, privateKey, PASSWORD, (err) => {
         expect(err).toBeTruthy()
         expect(store('main.signers')).toEqual({})
         done()
       })
-    } catch (e) { done(e) }
+    } catch (e) {
+      done(e)
+    }
   }, 1000)
 
-  test('Create from invalid keystore key', done => {
+  test('Create from invalid keystore key', (done) => {
     const keystore = { invalid: 'keystore' }
 
     try {
-      hot.createFromKeystore(signers, keystore, 'test', PASSWORD, err => {
+      hot.createFromKeystore(signers, keystore, 'test', PASSWORD, (err) => {
         expect(err).toBeTruthy()
         expect(store('main.signers')).toEqual({})
         done()
       })
-    } catch (e) { done(e) }
+    } catch (e) {
+      done(e)
+    }
   }, 2000)
 
-  test('Create from private key', done => {
+  test('Create from private key', (done) => {
     try {
       const privateKey = '0x' + crypto.randomBytes(32).toString('hex')
       hot.createFromPrivateKey(signers, privateKey, PASSWORD, (err, result) => {
         signer = result
 
         expect(err).toBe(null)
-        expect(signer.status).toBe('locked')
+        expect(signer.status).toBe('ok')
         expect(signer.id).not.toBe(undefined)
         expect(store(`main.signers.${signer.id}.id`)).toBe(signer.id)
         done()
       })
-    } catch (e) { done(e) }
-  }, 2000)
+    } catch (e) {
+      done(e)
+    }
+  }, 7_500)
 
-  test('Scan for signers', done => {
+  test('Scan for signers', (done) => {
     jest.useFakeTimers()
 
     let count = 0
@@ -93,7 +98,9 @@ describe('Ring signer', () => {
           if (signer.type === 'ring') count++
           expect(count).toBe(1)
           done()
-        } catch (e) { done(e) }
+        } catch (e) {
+          done(e)
+        }
       },
       exists: () => false
     }
@@ -103,22 +110,24 @@ describe('Ring signer', () => {
     jest.runAllTimers()
   }, 800)
 
-  test('Close signer', done => {
+  test('Close signer', (done) => {
     try {
       signer.close()
       expect(store(`main.signers.${signer.id}`)).toBe(undefined)
       done()
-    } catch (e) { done(e) }
+    } catch (e) {
+      done(e)
+    }
   })
 
-  test('Create from keystore', done => {
+  test('Create from keystore', (done) => {
     try {
       const file = fs.readFileSync(FILE_PATH, 'utf8')
       const keystore = JSON.parse(file)
       hot.createFromKeystore(signers, keystore, 'test', PASSWORD, (err, result) => {
         signer = result
         expect(err).toBe(null)
-        expect(signer.status).toBe('locked')
+        expect(signer.status).toBe('ok')
         expect(signer.id).not.toBe(undefined)
         done()
       })
@@ -127,71 +136,95 @@ describe('Ring signer', () => {
     }
   }, 2000)
 
-  test('Add private key', done => {
+  test('Add private key', (done) => {
     try {
       const privateKey = crypto.randomBytes(32).toString('hex')
-      signer.addPrivateKey(privateKey, PASSWORD, err => {
+      signer.addPrivateKey(privateKey, PASSWORD, (err) => {
         expect(err).toBe(null)
         expect(signer.addresses.length).toBe(2)
         done()
       })
-    } catch (e) { done(e) }
+    } catch (e) {
+      done(e)
+    }
   }, 2000)
 
-  test('Remove private key', done => {
+  test('Remove private key', (done) => {
     try {
       const secondAddress = signer.addresses[1]
-      signer.removePrivateKey(0, PASSWORD, err => {
+      signer.removePrivateKey(0, PASSWORD, (err) => {
         expect(err).toBe(null)
         expect(signer.addresses.length).toBe(1)
         expect(signer.addresses[0]).toEqual(secondAddress)
         done()
       })
-    } catch (e) { done(e) }
+    } catch (e) {
+      done(e)
+    }
   }, 2000)
 
-  test('Remove last private key', done => {
+  test('Remove last private key', (done) => {
     try {
-      signer.removePrivateKey(0, PASSWORD, err => {
+      signer.removePrivateKey(0, PASSWORD, (err) => {
         expect(err).toBe(null)
         done()
       })
-    } catch (e) { done(e) }
-  }, 1000)
+    } catch (e) {
+      done(e)
+    }
+  }, 2000)
 
-  test('Add private key from keystore', done => {
+  test('Add private key from keystore', (done) => {
     try {
       const file = fs.readFileSync(FILE_PATH, 'utf8')
       const keystore = JSON.parse(file)
       const previousLength = signer.addresses.length
 
-      signer.addKeystore(keystore, 'test', PASSWORD, err => {
+      signer.addKeystore(keystore, 'test', PASSWORD, (err) => {
         expect(err).toBe(null)
         expect(signer.addresses.length).toBe(previousLength + 1)
         done()
       })
-    } catch (e) { done(e) }
+    } catch (e) {
+      done(e)
+    }
   }, 2000)
 
-  test('Unlock with wrong password', done => {
+  test('Lock', (done) => {
     try {
-      signer.unlock('Wrong password', err => {
+      signer.lock((err) => {
+        expect(err).toBe(null)
+        expect(signer.status).toBe('locked')
+        done()
+      })
+    } catch (e) {
+      done(e)
+    }
+  }, 2000)
+
+  test('Unlock with wrong password', (done) => {
+    try {
+      signer.unlock('Wrong password', (err) => {
         expect(err).toBeTruthy()
         done()
       })
-    } catch (e) { done(e) }
-  }, 500)
+    } catch (e) {
+      done(e)
+    }
+  }, 600)
 
-  test('Unlock', done => {
+  test('Unlock', (done) => {
     try {
-      signer.unlock(PASSWORD, err => {
+      signer.unlock(PASSWORD, (err) => {
         expect(err).toBe(null)
         done()
       })
-    } catch (e) { done(e) }
+    } catch (e) {
+      done(e)
+    }
   }, 500)
 
-  test('Sign message', done => {
+  test('Sign message', (done) => {
     try {
       const message = '0x' + Buffer.from('test').toString('hex')
 
@@ -200,10 +233,12 @@ describe('Ring signer', () => {
         expect(result.length).toBe(132)
         done()
       })
-    } catch (e) { done(e) }
+    } catch (e) {
+      done(e)
+    }
   }, 500)
 
-  test('Sign transaction', done => {
+  test('Sign transaction', (done) => {
     const rawTx = {
       nonce: '0x6',
       gasPrice: '0x09184e72a000',
@@ -220,52 +255,52 @@ describe('Ring signer', () => {
         expect(result.slice(0, 2)).toBe('0x')
         done()
       })
-    } catch (e) { done(e) }
+    } catch (e) {
+      done(e)
+    }
   }, 500)
 
-  test('Verify address', done => {
+  test('Verify address', (done) => {
     try {
       signer.verifyAddress(0, signer.addresses[0], false, (err, result) => {
         expect(err).toBe(null)
         expect(result).toBe(true)
         done()
       })
-    } catch (e) { done(e) }
+    } catch (e) {
+      done(e)
+    }
   }, 500)
 
-  test('Verify wrong address', done => {
+  test('Verify wrong address', (done) => {
     try {
       signer.verifyAddress(0, '0xabcdef', false, (err, result) => {
         expect(err.message).toBe('Unable to verify address')
         expect(result).toBe(undefined)
         done()
       })
-    } catch (e) { done(e) }
+    } catch (e) {
+      done(e)
+    }
   }, 500)
 
-  test('Lock', done => {
+  test('Sign message when locked', (done) => {
     try {
-      signer.lock(err => {
-        expect(err).toBe(null)
-        expect(signer.status).toBe('locked')
-        done()
-      })
-    } catch (e) { done(e) }
-  }, 2000)
-
-  test('Sign message when locked', done => {
-    try {
-      signer.signMessage(0, 'test', err => {
+      signer.signMessage(0, 'test', (err) => {
         expect(err.message).toBe('Signer locked')
         done()
       })
-    } catch (e) { done(e) }
+    } catch (e) {
+      done(e)
+    }
   })
 
-  test('Close signer', done => {
+  test('Close signer', (done) => {
     try {
       signer.close()
       done()
-    } catch (e) { done(e) }
+    } catch (e) {
+      done(e)
+    }
   })
 })

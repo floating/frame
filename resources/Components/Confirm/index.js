@@ -1,6 +1,12 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 
-export default function ConfirmDialog ({ prompt, acceptText = 'OK', declineText = 'Decline', onAccept, onDecline }) {
+export default function ConfirmDialog({
+  prompt,
+  acceptText = 'OK',
+  declineText = 'Decline',
+  onAccept,
+  onDecline
+}) {
   const [submitted, setSubmitted] = useState(false)
 
   const clickHandler = (evt, onClick) => {
@@ -20,7 +26,9 @@ export default function ConfirmDialog ({ prompt, acceptText = 'OK', declineText 
 
   return (
     <div id='confirmationDialog' className='confirmDialog'>
-      <div role='heading' className='confirmText'>{prompt}</div>
+      <div role='heading' className='confirmText'>
+        {prompt}
+      </div>
 
       <div className='confirmButtonOptions'>
         <ResponseButton text={declineText} onClick={onDecline} />

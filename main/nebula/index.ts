@@ -22,13 +22,15 @@ const mainnetProvider = new EthereumProvider(proxyConnection)
 mainnetProvider.setChain(1)
 
 export default function (provider = mainnetProvider) {
-  let ready = false
+  let ready = provider.isConnected()
   const events = new EventEmitter()
 
-  provider.on('connect', () => {
-    ready = true
-    events.emit('ready')
-  })
+  if (!ready) {
+    provider.once('connect', () => {
+      ready = true
+      events.emit('ready')
+    })
+  }
 
   return {
     once: events.once.bind(events),

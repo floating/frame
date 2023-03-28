@@ -1,9 +1,8 @@
-import Common from '@ethereumjs/common'
-import { chainsType } from '@ethereumjs/common/dist/types'
+import { Common } from '@ethereumjs/common'
 import { EventEmitter } from 'stream'
 
 export interface Chain {
-  id: number,
+  id: number
   type: 'ethereum'
 }
 
@@ -24,8 +23,8 @@ declare class Chains extends EventEmitter {
     }
   }
 
-  syncDataEmit (data: any): void;
-  send (payload: JSONRPCRequestPayload, cb: RPCRequestCallback, targetChain?: Chain): void;
+  syncDataEmit(data: any): void
+  send(payload: JSONRPCRequestPayload, cb: RPCRequestCallback, targetChain?: Chain): void
 }
 
 declare const chainConnection: Chains

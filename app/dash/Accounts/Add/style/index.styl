@@ -1,0 +1,502 @@
+.addAccountItem
+  display flex
+  justify-content center
+  align-items center
+  flex-direction column
+  transition var(--standardSlowest)
+  transition-delay 0.32s
+  position relative
+  overflow hidden
+  position relative
+  position absolute
+  top 0
+  left 0
+  bottom 0
+  right 0
+
+  .addAccountItemWrap
+    width 100%
+    height 100%
+    background var(--ghostZ)
+    border-radius 4px
+    z-index 2
+    display flex
+    justify-content center
+    align-items center
+    flex-direction column
+    position relative
+
+  .addAccountItemClose
+    position absolute
+    top 18px
+    right 10px
+    border-radius 8px
+    cursor pointer
+    background var(--ghostB)
+    width 90px
+    height 30px
+    display flex
+    justify-content center
+    align-items center
+    font-size 11px
+    letter-spacing 1px
+    font-weight 300
+    padding-bottom 1px
+    padding-left 1px
+    text-transform uppercase
+
+    *
+      pointer-events none
+
+  .addAccountItemClose:hover
+    background var(--ghostC)
+  
+  .addAccountItemTopType
+    position absolute
+    top 0
+    left 0
+    right 0
+    display flex
+    justify-content center
+    align-items center
+    font-size 22px
+    font-family 'MainFont'
+    font-weight 300
+    width 100%
+    margin 16px 0px
+
+    .addAccountItemIconLedger
+      position relative
+      top -2px
+
+    .addAccountItemIconTrezor
+      position relative
+      top -2px
+
+    // .addAccountItemIconHot
+    //   color var(--hot)
+
+    // .addAccountItemIconMock
+    //   color rgb(205, 170, 255)
+
+    .addAccountItemTopTitle
+      margin-top 0px
+      margin-left 0px
+      margin-bottom 2px
+      text-transform capitalize
+      text-shadow 0px 4px 8px var(--ghostX)
+
+    .addAccountItemIcon
+      position relative
+      height 40px
+      width 40px
+      display flex
+      justify-content center
+      align-items center
+      color var(--outerspace)
+      margin 2px 9px 2px 0px
+      border-radius 12px
+      transform scale(1)
+
+    .addAccountItemIconHex
+      width 45px
+      height 45px
+      opacity 1
+      position absolute
+      border-radius 8px
+      display none
+      
+  .addAccountItemSummary
+    display flex
+    align-items center
+    justify-content center
+    z-index 9999
+    font-size 13px
+    text-align center
+    box-sizing border-box
+    position absolute
+    font-weight 400
+    top 80px
+    left 50px
+    right 50px
+    padding 16px
+    border 1px solid var(--outerspace)
+    border-radius 12px
+
+  .addAccountItemTrezorBridgeWarning
+    display flex
+    align-items center
+    justify-content space-between
+    flex-direction column
+    z-index 9999999
+    text-transform uppercase
+    letter-spacing 0px
+    text-align center
+    min-height 22px
+    box-sizing border-box
+    position absolute
+    font-weight 400
+    bottom 20px
+    left 20px
+    right 20px
+
+    .openBridgeUrl
+      color var(--good)
+      cursor pointer
+
+    .openBridgeUrl:hover
+      text-decoration underline
+      transform translateY(0)
+      transition var(--standardFast)
+
+  .addAccountItemFooter:before
+    content ''
+    position absolute
+    top 0px
+    left 8px
+    right 8px
+    height 4px
+    border-radius 2px
+    background var(--ghostA)
+
+  .addAccountItemFooter
+    display flex
+    align-items center
+    justify-content center
+    z-index 9999999
+    line-height 22px
+    font-size 11px
+    text-transform uppercase
+    letter-spacing 1px
+    text-align justify
+    text-align-last center-justify
+    min-height 50px
+    box-sizing border-box
+    position absolute
+    bottom 8px
+    left 8px
+    right 8px
+    display none
+  
+  .addAccountItemDevices
+    position absolute
+    top 120px
+    left 0px
+    bottom 0px
+    right 0px
+    padding 10px
+    font-size 12px
+    text-transform uppercase
+    letter-spacing 2px
+    margin-top 12px
+    transition var(--standardSlow)
+    overflow hidden
+    font-weight 400
+    flex-direction column
+    overflow-y scroll
+
+    .addAccountItemDevice
+      margin-top 10px
+      display flex
+      justify-content center
+      align-items center
+      flex-direction column
+      padding 0px 7px
+
+    .addAccountItemDevice:hover
+      background rgba(5, 25, 35, 0.1)
+
+    .addAccountItemDeviceTitle
+      font-weight 300
+      text-align center
+
+    .addAccountItemDeviceStatus
+      font-size 10px
+      display flex
+      justify-content center
+      align-items center
+      text-align center
+
+  .addAccountItemOption
+    position absolute 
+    top 150px
+    left 0
+    right 0
+    bottom 60px
+    line-height 22px
+    font-size 14px
+    text-transform uppercase
+    transition var(--standardSlow)
+    overflow hidden
+    font-weight 400
+
+  .addAccountItemOptionSetup
+    position absolute
+    top 0px
+    right 0
+    bottom 0
+    left 0
+    opacity 0
+    pointer-events none
+    transition var(--standardSlow)
+    transform translateX(0%)
+
+    .addAccountItemOptionSetupFrames
+      display flex
+      width 1000%
+      height 100%
+
+      .addAccountItemOptionSetupFrame
+        display flex
+        align-items center
+        flex-direction column
+        transition var(--standardSlow)
+        width 10%
+        overflow-y scroll
+        height 100%
+        display flex
+        justify-content center
+        align-items center
+        padding 0px 10px
+        box-sizing border-box
+
+        .signerAddressAdded
+          color var(--good)
+
+        .addAccountItemOptionTitle
+          margin-bottom 12px
+          text-align center
+          font-size 15px
+          font-weight 400
+          box-sizing border-box
+
+  .addAccountItemOptionError
+    height 34px
+    padding 0px 20px
+    margin-top 12px
+    font-size 12px
+    color var(--moon)
+    text-align center
+
+  .addAccountItemOptionSubmit
+    background var(--ghostB)
+    height 32px
+    border-radius 16px
+    padding 0px 40px
+    margin-top 12px
+    display flex
+    text-align center
+    justify-content center
+    align-items center
+    cursor pointer
+    background var(--ghostA)
+    border-bottom 2px solid var(--ghostZ)
+    transform translate3d(0, 0, 0)
+    box-shadow 0px 1px 6px var(--ghostY)
+
+  .addAccountItemOptionSubmit:hover
+    background var(--ghostC)
+
+  .addAccountResolvingEns
+
+    .addAccountItemOptionSubmit
+      margin-top 28px
+
+  .addAccountItemOptionList
+    width calc(100% - 0px)
+    border-radius 4px
+    padding 50px 0px
+    height calc(100% - 60px)
+    top 20px
+    position relative
+    overflow hidden
+    box-sizing border-box
+    overflow-x hidden
+    overflow-y scroll
+
+  .fira
+    font-family 'FiraCode'
+    text-transform none
+
+  .addAccountItemOptionListItem
+    text-align center
+    padding 16px 8px 16px 8px
+    margin-left -3px
+    margin 10px
+    font-weight 300
+    cursor pointer
+    border-radius 8px
+    background var(--ghostB)
+    *
+      cursor pointer
+
+    .actingAccountAddress
+      font-family 'FiraCode'
+      font-size 20px
+      display flex
+      justify-content center
+      align-items center
+      text-transform none
+
+      svg
+        padding 2px 3px 0px 3px
+
+    .actingAccountTag
+      font-weight 400
+      font-size 12px
+      text-transform none
+      color var(--outerspace08)
+
+  .addAccountItemOptionListItem:hover
+    background var(--ghostC)
+
+  .addAccountItemOptionInput
+    width calc(100% - 40px)
+    border-radius 6px
+    height 50px
+    padding 10px
+    position relative
+    overflow hidden
+    background var(--ghostA)
+
+    textarea
+      width calc(100%)
+      background transparent
+      border none
+      outline none
+      color var(--foreverwhite)
+      text-align center
+      font-size 13px
+      line-height 20px
+      font-family 'FiraCode'
+      padding-bottom 100px
+      overflow hidden
+      margin 4px 0px 0px 3px
+
+    textarea::selection
+      background rgba(5, 25, 35, 1)
+
+  .addAccountItemOptionInput
+    width 100%
+    border-radius 16px
+    padding 0px 0px
+    position relative
+    overflow hidden
+    background var(--ghostA)
+    border-bottom 2px solid var(--ghostZ)
+    transform translate3d(0, 0, 0)
+    box-shadow 0px 2px 8px var(--ghostY)
+    color var(--outerspace)
+
+    input
+      width 100%
+      height 100%
+      padding 10px 20px 13px 21px
+      background transparent
+      border none
+      outline none
+      color var(--outerspace)
+      text-align center
+      font-size 22px
+      line-height 20px
+      font-weight 400
+      display flex
+      justify-content center
+      align-items center
+      letter-spacing 1px
+      resize none
+      transform translate3d(0, 0, 0)
+      font-family 'MainFont'
+
+    input::selection
+      background var(--moon)
+
+  .addAccountItemOptionInput.phrase
+    height 122px
+
+    // display flex
+    // justify-content center
+    // align-items center
+    // text-align center
+
+    .addAccountItemOptionSubtitle
+      position absolute
+      bottom 0
+      display flex
+      justify-content center
+      align-items center
+      text-align center
+      font-size 8px
+      width 100%
+      font-weight 300
+      letter-spacing 1px
+      box-sizing border-box
+
+    textarea
+      width 100%
+      height 100%
+      padding 10px 20px
+      background transparent
+      border none
+      outline none
+      color var(--outerspace)
+      text-align center
+      font-size 15px
+      line-height 20px
+      font-family 'FiraCode'
+      display flex
+      justify-content center
+      align-items center
+      overflow-x hidden
+      overflow-y scroll
+      resize none
+
+    textarea::selection
+      background var(--moon)
+
+  .addAccountItemOptionInput.address
+
+    input
+      font-size 12px
+      padding 10px 10px
+
+  .addAccountItemOptionInputPassword
+    height 72px
+
+  .addAccountItemColorBar
+    position absolute
+    top 0px
+    left -40px
+    right -40px
+    height 4px
+    background var(--outerspace)
+    border-radius 6px
+
+  // .addAccountItemHardware
+  //   background var(--hardware)
+
+  // .addAccountItemHot
+  //   background rgb(255, 150, 150)
+
+  // .addAccountItemMock
+  //   background rgb(205, 170, 255)
+
+.addAccountItemAdding
+  .addAccountItemOptionIntro
+    opacity 0
+    pointer-events none
+  .addAccountItemOptionSetup
+    opacity 1
+    pointer-events auto
+
+.addAccountMainActive
+  .addAccountMainInner
+    .addAccountItem
+      opacity 1
+      transform translateY(0) scale(1)
+
+.addAccountMainActive
+  pointer-events auto
+  opacity 1
+  transform translateY(0px) scale(1) rotateY(0deg)
+  transition-delay 0.00s

@@ -7,23 +7,23 @@ const HotSigner = require('../HotSigner')
 const WORKER_PATH = path.resolve(__dirname, 'worker.js')
 
 class RingSigner extends HotSigner {
-  constructor (signer) {
+  constructor(signer) {
     super(signer, WORKER_PATH)
     this.type = 'ring'
     this.model = 'keyring'
-    this.encryptedKeys = (signer && signer.encryptedKeys)
+    this.encryptedKeys = signer && signer.encryptedKeys
     if (this.encryptedKeys) this.update()
   }
 
-  save () {
+  save() {
     super.save({ encryptedKeys: this.encryptedKeys })
   }
 
-  unlock (password, cb) {
+  unlock(password, cb) {
     super.unlock(password, { encryptedKeys: this.encryptedKeys }, cb)
   }
 
-  addPrivateKey (key, password, cb) {
+  addPrivateKey(key, password, cb) {
     // Validate private key
     let wallet
     try {
@@ -55,12 +55,11 @@ class RingSigner extends HotSigner {
       this.update()
 
       // If signer was unlock -> update keys in worker
-      if (this.status === 'ok') this.unlock(password, cb)
-      else cb(null)
+      this.unlock(password, cb)
     })
   }
 
-  removePrivateKey (index, password, cb) {
+  removePrivateKey(index, password, cb) {
     // Call worker
     const params = { encryptedKeys: this.encryptedKeys, index, password }
     this._callWorker({ method: 'removeKey', params }, (err, encryptedKeys) => {
@@ -78,20 +77,22 @@ class RingSigner extends HotSigner {
       this.update()
 
       // If signer was unlock -> update keys in worker
-      if (this.status === 'ok') this.unlock(password, cb)
+      if (this.status === 'ok') this.lock(cb)
       else cb(null)
     })
   }
 
   // TODO: Encrypt all keys together so that they all get the same password
-  async addKeystore (keystore, keystorePassword, password, cb) {
+  async addKeystore(keystore, keystorePassword, password, cb) {
     let wallet
     // Try to generate wallet from keystore
     try {
       if (keystore.version === 1) wallet = await fromV1(keystore, keystorePassword)
       else if (keystore.version === 3) wallet = await fromV3(keystore, keystorePassword)
       else return cb(new Error('Invalid keystore version'))
-    } catch (e) { return cb(e) }
+    } catch (e) {
+      return cb(e)
+    }
     // Add private key
     this.addPrivateKey(wallet.privateKey.toString('hex'), password, cb)
   }

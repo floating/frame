@@ -194,10 +194,11 @@ body
   left 0
   background linear-gradient(-35deg, var(--overlayA) 0%, var(--overlayB) 100%)
   z-index 9999999999999999
-  // background-blend-mode screen
   pointer-events none
-  // opacity 0.01
-  // pointer-events none
+
+.suspend
+  *
+    animation-play-state paused !important
 
 .clip
   *
@@ -263,6 +264,8 @@ body
   --pendingShade2 rgb(104, 80, 225)
   --pendingOver rgb(240, 240, 255)
 
+  --warning rgb(230, 184, 0)
+
   --foreverwhite rgba(242, 242, 255, 1)
 
   // --moon rgba(242, 168, 59, 1)
@@ -273,7 +276,7 @@ body
   --moon06 rgba(255, 145, 105, 0.6)
   --moonLight rgba(255, 190, 190, 1)
 
-  --mint rgba(215, 255, 255, 1)
+  --mint rgba(210, 255, 250, 1)
   --mintOver rgba(15, 55, 55, 1)
 
   // Accents
@@ -305,15 +308,15 @@ body
   // --bg rgba(228, 232, 248, 1) // #dadfea // #dce1e8
   // --bg0 rgba(228, 232, 248, 0)
   --v #4e5758
-  --outerspace01 rgba(4, 8, 28, 0.1)
-  --outerspace02 rgba(6, 12, 32, 0.2)
-  --outerspace03 rgba(8, 16, 36, 0.3)
-  --outerspace05 rgba(10, 20, 40, 0.5)
-  --outerspace06 rgba(12, 24, 44, 0.6)
-  --outerspace07 rgba(14, 28, 48, 0.7)
-  --outerspace08 rgba(16, 32, 52, 0.8)
-  --outerspace09 rgba(18, 36, 56, 0.9)
-  --outerspace rgba(20, 40, 60, 1)
+  --outerspace01 rgba(14, 18, 38, 0.1)
+  --outerspace02 rgba(16, 12, 42, 0.2)
+  --outerspace03 rgba(18, 26, 46, 0.3)
+  --outerspace05 rgba(20, 30, 50, 0.5)
+  --outerspace06 rgba(22, 34, 54, 0.6)
+  --outerspace07 rgba(24, 38, 58, 0.7)
+  --outerspace08 rgba(26, 42, 62, 0.8)
+  --outerspace09 rgba(28, 46, 66, 0.9)
+  --outerspace rgba(30, 50, 70, 1)
 
   // --outerspace01 rgba(1, 21, 44, 0.1)
   // --outerspace02 rgba(4, 24, 48, 0.2)
@@ -344,13 +347,17 @@ body
   --ghostZ08 rgba(224, 217, 233, 0.8)
   --ghostZ rgba(224, 217, 233, 1)
 
+  --ghostAZ rgba(232, 223, 238, 1)
+
+  --ghostA05 rgba(240, 230, 243, 0.5)
   --ghostA rgba(240, 230, 243, 1)
 
   --ghostB0 rgba(244, 238, 246, 0)
+  --ghostB05 rgba(244, 238, 246, 0.5)
   --ghostB rgba(244, 238, 246, 1)
   --ghostC0 rgba(248, 246, 249, 0)
   --ghostC rgba(248, 246, 249, 1)
-  --ghostD rgba(252, 254, 252, 1)
+  --ghostD rgba(252, 250, 252, 1)
 
 
   // --ghostE04 rgba(255, 253, 254, 0.4)
@@ -376,8 +383,8 @@ body
   ::selection 
     background-color var(--outerspace02)
 
-  --overlayA rgba(200, 255, 255, 0.2) 
-  --overlayB rgba(191, 255, 240, 0.2)
+  --overlayA rgba(200, 255, 255, 0.04)
+  --overlayB rgba(50, 255, 225, 0.04) 
 
   --thinner rgba(16, 44, 180, .02)
   --thin rgba(16, 44, 180, .04)
@@ -386,9 +393,12 @@ body
   --tripleThick rgba(16, 44, 180, .21)
   --thick0 rgba(16, 44, 180, 0)
 
-
   // Accent Overrides
   --accent1 rgb(0, 170, 120) // Main
+  --accent2 rgb(255, 120, 0) // Testnets
+
+  --mint rgb(70, 85, 100)
+  --mintOver rgba(15, 55, 55, 1)
 
 .dark
   --v #4e5758
@@ -401,7 +411,7 @@ body
   --outerspace07 rgba(232, 232, 246, 0.7)
   --outerspace08 rgba(235, 235, 249, 0.8)
   --outerspace09 rgba(238, 238, 252, 0.9)
-  --outerspace rgba(241, 241, 255, 1)
+  --outerspace rgba(248, 255, 255, 1)
   --nebula #3a4547
   
   // --outerspaceShade #1c2526
@@ -412,19 +422,24 @@ body
   --outerspaceDark #0b1819
   --spacewhite rgba(38, 42, 50, 1) 
 
-  --ghostX09 rgba(11, 7, 13, 0.9)
-  --ghostX04 rgba(11, 7, 13, 0.4)
-  --ghostX rgba(11, 7, 13, 1)
+  --ghostX09 rgba(8, 4, 10, 0.9)
+  --ghostX04 rgba(8, 4, 10, 0.4)
+  --ghostX rgba(8, 4, 10, 1)
 
-  --ghostY rgba(16, 12, 18, 1)
+  --ghostY rgba(13, 9, 15, 1)
 
-  --ghostZ0 rgba(21, 17, 23, 0)
-  --ghostZ05 rgba(21, 17, 23, 0.5)
-  --ghostZ08 rgba(21, 17, 23, 0.8)
-  --ghostZ rgba(21, 17, 23, 1) 
+  --ghostZ0 rgba(18, 14, 20, 0)
+  --ghostZ05 rgba(18, 14, 20, 0.5)
+  --ghostZ08 rgba(18, 14, 20, 0.8)
+  --ghostZ rgba(18, 14, 20, 1) 
 
+  --ghostAZ rgba(22, 18, 24, 1)
+
+  --ghostA05 rgba(26, 22, 28, 0.5)
   --ghostA rgba(26, 22, 28, 1)
+
   --ghostB0 rgba(29, 25, 33, 0)
+  --ghostB05 rgba(29, 25, 33, 0.2)
   --ghostB rgba(29, 25, 33, 1)
   --ghostC0 rgba(33, 29, 38, 0)
   --ghostC rgba(33, 29, 38, 1)
@@ -436,8 +451,8 @@ body
   ::selection 
     background-color var(--outerspace02)
 
-  --overlayA rgba(130, 0, 100, 0.024) 
-  --overlayB rgba(30, 190, 180, 0.024)
+  --overlayA rgba(80, 0, 100, 0.03) 
+  --overlayB rgba(30, 180, 180, 0.03)
 
   --thinner rgba(0, 0, 10, .1)
   --thin rgba(0, 0, 10, .2)
@@ -514,6 +529,7 @@ body
 .glitchOn
   .line
     display block
+    will-change clip-path
 
   .line:not(:first-child)
     position absolute
@@ -695,16 +711,16 @@ body
   80%
 	  transform translateX(0)
 	  color var(--outerspace)
-	85%
+  85%
 	  transform translateX(-3px)
 	  color var(--good)
-	90%
+  90%
 	  transform translateX(-1px)
 	  color var(--bad)
-	95%
+  95%
 	  transform translateX(-4px)
 	  color var(--outerspace)
-	100%
+  100%
 	  transform translateX(0)
 
 .line:nth-child(10)
@@ -736,4 +752,3 @@ body
 
 @import './Native/style'
 @import './Components'
-

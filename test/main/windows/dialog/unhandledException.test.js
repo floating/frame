@@ -15,7 +15,8 @@ jest.mock('electron', () => ({
 it('displays the error message to the user', () => {
   showUnhandledExceptionDialog('something bad happened')
 
-  expect(dialog.showMessageBoxSync).toHaveBeenCalledWith(undefined,
+  expect(dialog.showMessageBoxSync).toHaveBeenCalledWith(
+    undefined,
     expect.objectContaining({
       detail: 'something bad happened'
     })
@@ -25,7 +26,8 @@ it('displays the error message to the user', () => {
 it('gives the user an option to accept the error or quit Frame', () => {
   showUnhandledExceptionDialog('something bad happened')
 
-  expect(dialog.showMessageBoxSync).toHaveBeenCalledWith(undefined,
+  expect(dialog.showMessageBoxSync).toHaveBeenCalledWith(
+    undefined,
     expect.objectContaining({
       buttons: ['OK', 'Quit']
     })
@@ -34,7 +36,7 @@ it('gives the user an option to accept the error or quit Frame', () => {
 
 it('will relaunch the app when the user clicks OK', () => {
   dialog.showMessageBoxSync.mockImplementation(() => 0)
-  
+
   showUnhandledExceptionDialog('something bad happened')
 
   expect(app.relaunch).toHaveBeenCalled()
@@ -43,7 +45,7 @@ it('will relaunch the app when the user clicks OK', () => {
 
 it('will not relaunch the app when the user clicks quit', () => {
   dialog.showMessageBoxSync.mockImplementation(() => 1)
-  
+
   showUnhandledExceptionDialog('something bad happened')
 
   expect(app.relaunch).not.toHaveBeenCalled()
@@ -52,7 +54,7 @@ it('will not relaunch the app when the user clicks quit', () => {
 
 it('shows a simple error box and quits for an EADDRINUSE error', () => {
   showUnhandledExceptionDialog('Frame is already running', 'EADDRINUSE')
-  
+
   expect(dialog.showErrorBox).toHaveBeenCalled()
   expect(dialog.showMessageBoxSync).not.toHaveBeenCalled()
   expect(app.relaunch).not.toHaveBeenCalled()
