@@ -267,8 +267,9 @@ class TxFeeOverlay extends Component {
     }
 
     const receiveValueHandler = (value, name) => {
-      // FIXME: should not set state directly
-      this.state[name] = value
+      this.setState({
+        [name]: value
+      })
 
       link.rpc(`set${name.charAt(0).toUpperCase() + name.slice(1)}`, bnToHex(value), handlerId, (e) => {
         if (e) console.error(e)
