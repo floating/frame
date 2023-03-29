@@ -5,9 +5,6 @@ on:
     branches:
       - 'update-ga'
 
-env:
-  GH_TOKEN: ${{ secrets.GH_RELEASE_DEPLOYMENT_TOKEN }}
-
 jobs:
   bump_release:
     runs-on: ubuntu-latest
