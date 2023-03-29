@@ -5,9 +5,6 @@ on:
     workflows: [Build and publish installer artifacts for all platforms, Build and publish canary builds]
     types:
       - completed
-    branches:
-      - 'develop'
-      - 'canary'
 
 jobs:
   bump_release:
