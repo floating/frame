@@ -70,9 +70,7 @@ function getActiveChains(): RPC.GetEthereumChains.Chain[] {
   const colorway = storeApi.getColorway()
 
   return Object.values(chains)
-    .filter(
-      (chain) => chain.on && (chain.connection.primary.connected || chain.connection.secondary.connected)
-    )
+    .filter((chain) => chain.on)
     .sort((a, b) => a.id - b.id)
     .map((chain) => {
       const { id, explorer, name } = chain
@@ -86,6 +84,7 @@ function getActiveChains(): RPC.GetEthereumChains.Chain[] {
         chainId: id,
         networkId: id,
         name,
+        connected: chain.connection.primary.connected || chain.connection.secondary.connected,
         nativeCurrency: {
           name: currencyName,
           symbol,
