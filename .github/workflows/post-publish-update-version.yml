@@ -1,9 +1,13 @@
 name: Update application version after release has been published
 
 on:
-  push:
+  workflow_run:
+    workflows: [Build and publish installer artifacts for all platforms, Build and publish canary builds]
+    types:
+      - completed
     branches:
-      - 'update-ga'
+      - 'develop'
+      - 'canary'
 
 jobs:
   bump_release:
