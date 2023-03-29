@@ -186,18 +186,22 @@ export class Provider extends EventEmitter {
 
   getNetVersion(payload: RPCRequestPayload, res: RPCRequestCallback, targetChain: Chain) {
     const chain = store('main.networks.ethereum', targetChain.id)
-    const response = chain?.enabled
+    const response = chain?.on
       ? { result: targetChain.id }
       : { error: { message: !chain ? 'chain not present' : 'chain not enabled', code: 1 } }
+
+    console.log('netVersion response', response)
 
     res({ id: payload.id, jsonrpc: payload.jsonrpc, ...response })
   }
 
   getChainId(payload: RPCRequestPayload, res: RPCSuccessCallback, targetChain: Chain) {
     const chain = store('main.networks.ethereum', targetChain.id)
-    const response = chain?.enabled
+    const response = chain?.on
       ? { result: intToHex(targetChain.id) }
       : { error: { message: !chain ? 'chain not present' : 'chain not enabled', code: 1 } }
+
+    console.log('chainId response', response)
 
     res({ id: payload.id, jsonrpc: payload.jsonrpc, ...response })
   }
@@ -964,6 +968,8 @@ export class Provider extends EventEmitter {
     }
 
     const method = payload.method || ''
+
+    console.log('payload yo', payload)
 
     // method handlers that are not chain-specific can go here, before parsing the target chain
     if (method === 'eth_unsubscribe' && this.ifSubRemove(payload.params[0]))
