@@ -45,27 +45,25 @@ export default class TokenLoader {
   private async fetchTokenList(timeout: number) {
     log.verbose(`Fetching tokens from ${TOKENS_ENS_DOMAIN}`)
 
-    return new Promise<TokenSpec[]>((resolve, reject) => {
-      const requestTimeout = setTimeout(() => {
+    let timeoutHandle: NodeJS.Timeout | undefined
+    const requestTimeout = new Promise<TokenSpec[]>((resolve, reject) => {
+      timeoutHandle = setTimeout(() => {
         reject(`Timeout fetching token list from ${TOKENS_ENS_DOMAIN}`)
       }, timeout)
-
-      try {
-        ;(async () => {
-          const tokenListRecord = await this.nebula.resolve(TOKENS_ENS_DOMAIN)
-          const tokenManifest: { tokens: TokenSpec[] } = await this.nebula.ipfs.getJson(
-            tokenListRecord.record.content
-          )
-          const tokens = tokenManifest.tokens
-
-          resolve(tokens)
-        })()
-      } catch (e) {
-        reject(e)
-      } finally {
-        clearTimeout(requestTimeout)
-      }
     })
+
+    const cancelTimeout = () => clearTimeout(timeoutHandle)
+
+    return Promise.race([requestTimeout, this.resolveTokens()]).finally(cancelTimeout)
+  }
+
+  private async resolveTokens() {
+    const tokenListRecord = await this.nebula.resolve(TOKENS_ENS_DOMAIN)
+    const tokenManifest: { tokens: TokenSpec[] } = await this.nebula.ipfs.getJson(
+      tokenListRecord.record.content
+    )
+
+    return tokenManifest.tokens
   }
 
   async start() {
