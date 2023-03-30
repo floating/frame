@@ -12,5 +12,5 @@ if [[ "$GITHUB_REF" =~ ^v[0-9]\.[0-9]\.[0-9](-canary\.[0-9])?$ ]]; then
     sed -i "s/\"version\": \"[[:digit:]].[[:digit:]].[[:digit:]]\"/\"version\": \"$NEW_VERSION\"/" package.json
   fi
 else
-  echo "Could not update for release tag $GITHUB_REF"
+  echo "Could not update version for release tag $GITHUB_REF"
 fi
