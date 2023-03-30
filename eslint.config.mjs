@@ -1,3 +1,4 @@
+import eslint from '@eslint/js'
 import ts from '@typescript-eslint/eslint-plugin'
 import tsParser from '@typescript-eslint/parser'
 import prettier from 'eslint-config-prettier'
@@ -8,7 +9,6 @@ import jest from 'eslint-plugin-jest'
 import globals from 'globals'
 
 export default [
-  'eslint:recommended',
   // Ignored dirs
   {
     ignores: ['dist/**/*', 'compiled/**/*', 'bundle/**/*']
@@ -29,6 +29,7 @@ export default [
       }
     },
     rules: {
+      ...eslint.configs.recommended.rules,
       'no-unused-vars': [
         'error',
         {

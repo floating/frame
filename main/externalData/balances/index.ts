@@ -41,7 +41,7 @@ export default function (store: Store) {
 
   let scan: NodeJS.Timeout | null
   let workerController: BalancesWorkerController | null
-  let onResume: Function | null
+  let onResume: (() => void) | null
 
   function attemptRestart() {
     log.warn(`balances controller stopped, restarting in ${RESTART_WAIT} seconds`)

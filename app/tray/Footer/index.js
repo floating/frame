@@ -110,7 +110,7 @@ class Footer extends React.Component {
                 style={{ pointerEvents: this.state.allowInput ? 'auto' : 'none' }}
                 onClick={() => {
                   if (this.state.allowInput)
-                    link.send('tray:switchChain', chain.type, parseInt(chain.id), req)
+                    link.send('tray:switchChain', req.chain.type, parseInt(req.chain.id), req)
                 }}
               >
                 <div className='requestSignButton _txButton'>

@@ -8,7 +8,7 @@ export type ActionType = Erc20Actions | EnsActions
 export type Action<T> = {
   id: ActionType
   data?: T
-  update?: (request: AccountRequest, params: Partial<T>) => {}
+  update?: (request: AccountRequest, params: Partial<T>) => void
 }
 
 type DecodeContext = {
