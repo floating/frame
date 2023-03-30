@@ -9,14 +9,9 @@ jobs:
     runs-on: ubuntu-latest
 
   steps:
-    - run: |
-        release="$(gh release view $GITHUB_REF --json tag_name)"
-        echo 'RELEASE_VERSION='$release.tag_name >> $GITHUB_ENV
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - uses: actions/checkout@v3
     - name: Update version
       id: update-version
-      run: sh scripts/update-version.sh
+      run: GITHUB_REF=$GITHUB_REF sh scripts/update-version.sh
     - name: Test output
       run: cat package.json
