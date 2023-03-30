@@ -2,7 +2,7 @@ name: Update application version after release has been published
 
 on:
   release:
-    types: [published]
+    types: [edited]
 
 jobs:
   bump_release:
