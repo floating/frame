@@ -8,10 +8,13 @@ jobs:
   bump_release:
     runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@v3
-      - name: Generate next version
-        id: update-version
-        run: sh scripts/update-version.sh
-      - name: Test output
-        run: cat package.json
+  steps:
+    - run: gh release view $GITHUB_REF
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - uses: actions/checkout@v3
+    - name: Generate next version
+      id: update-version
+      run: sh scripts/update-version.sh
+    - name: Test output
+      run: cat package.json
