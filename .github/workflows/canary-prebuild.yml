@@ -1,4 +1,4 @@
-name: Build and publish canary builds
+name: Build and publish canary installer artifacts for all platforms
 
 on:
   push:
