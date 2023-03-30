@@ -188,9 +188,7 @@ export class Provider extends EventEmitter {
     const chain = store('main.networks.ethereum', targetChain.id)
     const response = chain?.on
       ? { result: targetChain.id }
-      : { error: { message: !chain ? 'chain not present' : 'chain not enabled', code: 1 } }
-
-    console.log('netVersion response', response)
+      : { error: { message: !chain ? 'chain does not exist' : 'chain not enabled', code: -1 } }
 
     res({ id: payload.id, jsonrpc: payload.jsonrpc, ...response })
   }
@@ -199,9 +197,7 @@ export class Provider extends EventEmitter {
     const chain = store('main.networks.ethereum', targetChain.id)
     const response = chain?.on
       ? { result: intToHex(targetChain.id) }
-      : { error: { message: !chain ? 'chain not present' : 'chain not enabled', code: 1 } }
-
-    console.log('chainId response', response)
+      : { error: { message: !chain ? 'chain does not exist' : 'chain not enabled', code: -1 } }
 
     res({ id: payload.id, jsonrpc: payload.jsonrpc, ...response })
   }
@@ -856,13 +852,19 @@ export class Provider extends EventEmitter {
 
     this.getChainId(
       payload,
-      (resp) => {
-        const chainId = parseInt(resp.result)
+      (resp: RPCResponsePayload) => {
+        if (resp.error) {
+          return resError(resp.error, payload, cb)
+        }
 
+        const chainId = parseInt(resp.result)
         const address = (tokenData.address || '').toLowerCase()
         const symbol = (tokenData.symbol || '').toUpperCase()
         const decimals = parseInt(tokenData.decimals || '1')
 
+        if (isNaN(chainId)) {
+          return resError('token chain is disabled', payload, cb)
+        }
         if (!address) {
           return resError('tokens must define an address', payload, cb)
         }
@@ -968,8 +970,6 @@ export class Provider extends EventEmitter {
     }
 
     const method = payload.method || ''
-
-    console.log('payload yo', payload)
 
     // method handlers that are not chain-specific can go here, before parsing the target chain
     if (method === 'eth_unsubscribe' && this.ifSubRemove(payload.params[0]))

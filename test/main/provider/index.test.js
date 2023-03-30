@@ -65,7 +65,7 @@ beforeEach(() => {
   connection.connections = {
     ethereum: {
       1: { chainConfig: chainConfig(1, 'london'), primary: { connected: true } },
-      4: { chainConfig: chainConfig(4, 'london'), primary: { connected: true } }
+      5: { chainConfig: chainConfig(5, 'london'), primary: { connected: true } }
     }
   }
 
@@ -79,7 +79,9 @@ beforeEach(() => {
 
 describe('#send', () => {
   beforeEach(() => {
-    store.set('main.origins', '8073729a-5e59-53b7-9e69-5d9bcff94087', { chain: { id: 1, type: 'ethereum' } })
+    store.set('main.origins', '8073729a-5e59-53b7-9e69-5d9bcff94087', {
+      chain: { id: 1, type: 'ethereum', on: true }
+    })
   })
 
   const send = (request, cb = jest.fn()) =>
@@ -103,7 +105,11 @@ describe('#send', () => {
 
     send(request)
 
-    expect(connection.send).toHaveBeenCalledWith(request, expect.any(Function), { type: 'ethereum', id: 1 })
+    expect(connection.send).toHaveBeenCalledWith(request, expect.any(Function), {
+      type: 'ethereum',
+      id: 1,
+      on: true
+    })
   })
 
   it('returns an error when an unknown chain is given', (done) => {
@@ -130,7 +136,7 @@ describe('#send', () => {
 
   describe('#eth_chainId', () => {
     it('returns the current chain id from the store', () => {
-      store.set('main.networks.ethereum', 1, { id: 1 })
+      store.set('main.networks.ethereum', 1, { id: 1, on: true })
 
       send({ method: 'eth_chainId', chainId: '0x1' }, (response) => {
         expect(response.result).toBe('0x1')
@@ -138,21 +144,18 @@ describe('#send', () => {
     })
 
     it('returns a chain id from the target chain', () => {
-      store.set('main.networks.ethereum', 4, { id: 4 })
+      store.set('main.networks.ethereum', 5, { id: 5, on: true })
 
-      send({ method: 'eth_chainId', chainId: '0x4' }, (response) => {
-        expect(response.result).toBe('0x4')
+      send({ method: 'eth_chainId', chainId: '0x5' }, (response) => {
+        expect(response.result).toBe('0x5')
       })
     })
 
-    it('returns an error for a disconnected chain', () => {
-      connection.connections.ethereum[11] = {
-        chainConfig: chainConfig(11, 'london'),
-        primary: { connected: false }
-      }
+    it('returns an error for a disabled chain', () => {
+      store.set('main.networks.ethereum', 5, { id: 5, on: false })
 
-      send({ method: 'eth_chainId', chainId: '0xb' }, (response) => {
-        expect(response.error.message).toBe('not connected')
+      send({ method: 'eth_chainId', chainId: '0x5' }, (response) => {
+        expect(response.error.message).toBe('chain not enabled')
         expect(response.result).toBeUndefined()
       })
     })
@@ -188,7 +191,7 @@ describe('#send', () => {
         done()
       }
 
-      sendRequest({ chainId: '0x4', nativeCurrency: { symbol: 'rETH' } }, cb)
+      sendRequest({ chainId: '0x5', nativeCurrency: { symbol: 'gETH' } }, cb)
     })
 
     it('rejects a request with no native currency', (done) => {
@@ -198,7 +201,7 @@ describe('#send', () => {
         done()
       }
 
-      sendRequest({ chainId: '0x4', chainName: 'Rinkeby' }, cb)
+      sendRequest({ chainId: '0x5', chainName: 'Goerli' }, cb)
     })
 
     it('should create a request to add the chain', (done) => {
@@ -398,6 +401,7 @@ describe('#send', () => {
     let request
 
     beforeEach(() => {
+      store.set('main.networks.ethereum.1', { id: 1, on: true })
       store.set('main.tokens.custom', [])
 
       request = {
@@ -444,6 +448,26 @@ describe('#send', () => {
 
       send(request, ({ result }) => {
         expect(result).toBe(true)
+        expect(accountRequests).toHaveLength(0)
+      })
+    })
+
+    it('rejects a request when the chain does not exist', () => {
+      store.set('main.networks.ethereum.1', undefined)
+
+      send(request, ({ error }) => {
+        expect(error.code).toBe(-1)
+        expect(error.message).toMatch('chain does not exist')
+        expect(accountRequests).toHaveLength(0)
+      })
+    })
+
+    it('rejects a request when the chain is disabled', () => {
+      store.set('main.networks.ethereum.1', { id: 1, on: false })
+
+      send(request, ({ error }) => {
+        expect(error.code).toBe(-1)
+        expect(error.message).toMatch('chain not enabled')
         expect(accountRequests).toHaveLength(0)
       })
     })
@@ -503,7 +527,7 @@ describe('#send', () => {
       })
     })
 
-    it('returns a list of active chains', () => {
+    it('returns a list of enabled chains', () => {
       store.set('main.networks.ethereum', {
         137: {
           name: 'polygon',
@@ -541,7 +565,8 @@ describe('#send', () => {
               name: 'Ether',
               symbol: 'ETH',
               decimals: 18
-            }
+            },
+            connected: true
           },
           {
             name: 'polygon',
@@ -558,20 +583,21 @@ describe('#send', () => {
               name: 'Matic',
               symbol: 'MATIC',
               decimals: 18
-            }
+            },
+            connected: true
           }
         ])
       })
     })
 
-    it('does not return disconnected chains', () => {
+    it('does not return disabled chains', () => {
       store.set('main.networks.ethereum', {
         137: {
           name: 'polygon',
           id: 137,
           explorer: 'https://polygonscan.com',
           connection: { primary: { connected: false }, secondary: { connected: false } },
-          on: true
+          on: false
         },
         1: {
           name: 'mainnet',
@@ -597,7 +623,8 @@ describe('#send', () => {
               name: 'Ether',
               symbol: 'ETH',
               decimals: 18
-            }
+            },
+            connected: true
           }
         ])
       })
@@ -692,7 +719,7 @@ describe('#send', () => {
   })
 
   describe('#eth_getTransactionByHash', () => {
-    const chain = 4
+    const chain = 5
     const txHash = '0x06c1c968d4bd20c0ebfed34f6f34d8a5d189d9d2ce801f2ee8dd45dac32628d5'
     const request = {
       method: 'eth_getTransactionByHash',
@@ -824,7 +851,7 @@ describe('#send', () => {
         } catch (e) {
           done(e)
         }
-      }, '0x4')
+      }, '0x5')
     })
 
     it('populates the transaction with the request chain id if not provided in the transaction', (done) => {
@@ -1751,7 +1778,8 @@ describe('state change events', () => {
             name: 'Ether',
             symbol: 'ETH',
             decimals: 18
-          }
+          },
+          connected: true
         },
         {
           name: 'Polygon',
@@ -1768,7 +1796,8 @@ describe('state change events', () => {
             name: 'Matic',
             symbol: 'MATIC',
             decimals: 18
-          }
+          },
+          connected: true
         }
       ])
 
