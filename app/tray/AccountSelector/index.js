@@ -11,6 +11,46 @@ import link from '../../../resources/link'
 
 let firstScroll = true
 
+const AccountsGrid = ({ accounts, reportScroll, resetScroll, accountOpen }) => {
+  const layout = accounts.map((account, i) => ({ i: account.id, x: 0, y: i, w: 1, h: 1 }))
+  return (
+    <GridLayout
+      className='layout'
+      layout={layout}
+      cols={1}
+      rowHeight={70}
+      width={400}
+      draggableHandle='.accountGrabber'
+      style={accountOpen ? {} : { marginTop: '40px' }}
+      onDragStart={() => {
+        link.send('tray:action', 'setReorderingAccounts', true)
+      }}
+      onDragStop={(layout, oldItem, newItem) => {
+        link.send('tray:action', 'setReorderingAccounts', false)
+        const orderedAccounts = layout.map(({ i }) => i)
+
+        // remove dragged item from old position
+        orderedAccounts.splice(oldItem.y, 1)
+
+        // add dragged item in new position
+        orderedAccounts.splice(newItem.y, 0, newItem.i)
+        link.send('tray:action', 'setAccountsOrder', orderedAccounts)
+      }}
+    >
+      {accounts.map((account, i) => (
+        <AccountController
+          key={account.id}
+          {...account}
+          index={i}
+          reportScroll={reportScroll}
+          resetScroll={resetScroll}
+          accountOpen={accountOpen}
+        />
+      ))}
+    </GridLayout>
+  )
+}
+
 class AccountSelector extends React.Component {
   constructor(props, context) {
     super(props, context)
