@@ -24,7 +24,9 @@ class DappStream extends Readable {
     }
     this.push(null)
   }
-  _read() {}
+  _read() {
+    // empty
+  }
 }
 
 function getDapp(dappId: string): Dapp {

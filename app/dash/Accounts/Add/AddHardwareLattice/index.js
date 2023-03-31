@@ -67,7 +67,7 @@ class AddHardwareLattice extends React.Component {
 
   next() {
     this.blurActive()
-    this.setState({ index: ++this.state.index })
+    this.setState({ index: this.state.index + 1 })
     this.focusActive()
   }
 

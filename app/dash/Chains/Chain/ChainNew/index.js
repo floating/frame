@@ -34,7 +34,9 @@ const isChainFilled = (chain) => {
 const getUrl = (urlStr) => {
   try {
     return new URL(urlStr)
-  } catch (e) {}
+  } catch (e) {
+    // ignore errors
+  }
 }
 
 const isValidRpc = (urlStr) => {
