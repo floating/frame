@@ -25,9 +25,14 @@ const AccountsGrid = ({ accounts, reportScroll, resetScroll, accountOpen }) => {
       onDragStart={() => {
         link.send('tray:action', 'setReorderingAccounts', true)
       }}
-      onDragStop={(layout, _oldItem, newItem) => {
+      onDragStop={(layout, oldItem, newItem) => {
         link.send('tray:action', 'setReorderingAccounts', false)
         const orderedAccounts = layout.map(({ i }) => i)
+
+        // remove dragged item from old position
+        orderedAccounts.splice(oldItem.y, 1)
+
+        // add dragged item in new position
         orderedAccounts.splice(newItem.y, 0, newItem.i)
         link.send('tray:action', 'setAccountsOrder', orderedAccounts)
       }}
