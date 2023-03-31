@@ -43,7 +43,9 @@ class App extends React.Component {
           {!currentView.ready && sendDapp.status === 'failed' ? (
             <div className='mainDappLoading'>
               <div className='mainDappLoadingText'>
-                {isMainnetConnected() ? 'Send dapp failed to load' : 'No connection to Mainnet found'}
+                {isMainnetConnected()
+                  ? 'Send dapp failed to load'
+                  : 'Mainnet connection required to resolve ENS'}
               </div>
             </div>
           ) : null}
