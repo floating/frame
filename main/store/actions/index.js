@@ -896,9 +896,12 @@ module.exports = {
 
       return requests
     })
+  },
+  setReorderingAccounts: (u, reordering) => {
+    u('view.reorderingAccounts', () => reordering)
+  },
+  setAccountsOrder: (u, accountsOrder) => {
+    console.log('setting accountsOrder', accountsOrder)
+    u('view.accountsOrder', () => accountsOrder)
   }
-  // toggleUSDValue: (u) => {
-  //   u('main.showUSDValue', show => !show)
-  // }
-  // __overwrite: (path, value) => u(path, () => value)
 }

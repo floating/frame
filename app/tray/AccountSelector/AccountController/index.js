@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Restore from 'react-restore'
 
 import svg from '../../../../resources/svg'
@@ -20,7 +20,7 @@ class Account extends React.Component {
   }
 
   componentDidMount() {
-    if (this.props.index === 0) this.props.resetScroll()
+    // this.wrapperRef = this.props.wrapperRef
     window.addEventListener('scroll', this.onScroll.bind(this), true)
   }
 
@@ -46,20 +46,6 @@ class Account extends React.Component {
     link.rpc('unlockSigner', this.props.id, this.state.unlockInput, () => {})
   }
 
-  trezorPin(num) {
-    this.setState({ tPin: this.state.tPin + num.toString() })
-  }
-
-  submitPin() {
-    link.rpc('trezorPin', this.props.id, this.state.tPin, () => {})
-    this.setState({ tPin: '' })
-  }
-
-  backspacePin(e) {
-    e.stopPropagation()
-    this.setState({ tPin: this.state.tPin ? this.state.tPin.slice(0, -1) : '' })
-  }
-
   select() {
     if (this.store('selected.current') === this.props.id) {
       link.rpc('unsetSigner', this.props.id, (err) => {
@@ -70,6 +56,7 @@ class Account extends React.Component {
           if (err) return console.log(err)
         })
     } else {
+      // this.props.onOpen()
       const bounds = this.signer.getBoundingClientRect()
       this.props.reportScroll()
       this.store.initialSignerPos({
@@ -82,20 +69,6 @@ class Account extends React.Component {
         if (err) return console.log(err)
       })
     }
-  }
-
-  renderTrezorPin(active) {
-    return (
-      <div className='trezorPinWrap' style={active ? {} : { height: '0px', padding: '0px 0px 0px 0px' }}>
-        <div className='trezorPinInput'>
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => (
-            <div key={i} className='trezorPinInputButton' onMouseDown={this.trezorPin.bind(this, i)}>
-              {svg.octicon('primitive-dot', { height: 20 })}
-            </div>
-          ))}
-        </div>
-      </div>
-    )
   }
 
   setSignerStatusOpen(value) {
@@ -145,7 +118,7 @@ class Account extends React.Component {
           if (open) this.setSignerStatusOpen(!signerStatusOpen)
         }}
       >
-        {((_) => {
+        {(() => {
           const type = this.props.lastSignerType
           if (type === 'ledger')
             return <div className='signerSelectIconWrap signerIconLedger'>{svg.ledger(24)}</div>
@@ -401,7 +374,7 @@ class Account extends React.Component {
   }
 
   render() {
-    const { id, status, active, index } = this.props
+    const { id, status, active, index, children } = this.props
 
     const selectedAccountId = this.store('selected.current')
     const open = this.store('selected.open')
@@ -462,6 +435,7 @@ class Account extends React.Component {
       }
     }
 
+    const reorderingAccounts = this.store('view.reorderingAccounts')
     let requests = this.store('main.accounts', id, 'requests') || {}
     requests = Object.keys(requests).filter((r) => requests[r].mode === 'normal')
 
@@ -484,19 +458,18 @@ class Account extends React.Component {
           <div
             className={signerTopClass}
             style={selectedAccountOpen ? { boxShadow: '0px 4px 8px rgba(0, 0, 0, 0)' } : {}}
-            // onMouseEnter={() => this.setState({ openHover: true })}
-            // onMouseLeave={() => this.setState({ openHover: false })}
             onClick={() => {
-              if (!selectedAccountOpen) this.typeClick()
+              // disable click when store reordering flag is set
+              if (!reorderingAccounts && !selectedAccountOpen) this.typeClick()
             }}
           >
             {!this.state.addressHover ? (
               <>
                 {this.renderSignerIndicator()}
                 {this.renderType()}
-                {/* <div className='accountGrabber' style={open ? { opacity: 0, pointerEvents: 'none' } : {}}>
+                <div className='accountGrabber' style={open ? { opacity: 0, pointerEvents: 'none' } : {}}>
                   {svg.grab(35)}
-                </div> */}
+                </div>
                 {(() => {
                   if (this.state.addressHover) return null
                   let requestBadgeClass = 'accountNotificationBadge'
@@ -522,8 +495,8 @@ class Account extends React.Component {
                 </div>
               </>
             ) : null}
-            {/* {this.renderStatus()} */}
             {this.renderDetails()}
+            {children}
           </div>
         </div>
       </div>
@@ -531,4 +504,71 @@ class Account extends React.Component {
   }
 }
 
-export default Restore.connect(Account)
+const ConnectedAccount = Restore.connect(Account)
+const AccountController = React.forwardRef(function _AccountController(
+  {
+    style,
+    className,
+    key,
+    children,
+    lastSignerType,
+    status,
+    id,
+    signer,
+    name,
+    index,
+    reportScroll,
+    resetScroll,
+    ensName,
+    active,
+    address,
+    requests,
+    created,
+    balances,
+    accountOpen,
+    ...restOfProps
+  },
+  ref
+) {
+  if (accountOpen) {
+    style.transform = ''
+  }
+  return (
+    <div
+      key={key}
+      className={['accountWrapper', className].join(' ')}
+      ref={ref}
+      style={style}
+      // onClick={() => {
+      //   ref.style.transform = ''
+      //   // setLocalStyle({ ...localStyle, transform: '' })
+      // }}
+      {...restOfProps}
+    >
+      <ConnectedAccount
+        id={id}
+        name={name}
+        signer={signer}
+        index={index}
+        status={status}
+        lastSignerType={lastSignerType}
+        wrapperRef={ref}
+        reportScroll={reportScroll}
+        resetScroll={resetScroll}
+        ensName={ensName}
+        active={active}
+        address={address}
+        requests={requests}
+        created={created}
+        balances={balances}
+        // onOpen={() => {
+        //   setLocalStyle({ ...localStyle, transform: '' })
+        // }}
+      >
+        {children}
+      </ConnectedAccount>
+    </div>
+  )
+})
+
+export default AccountController

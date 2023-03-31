@@ -117,7 +117,9 @@ const initial = {
     badge: '',
     addAccount: '', // Add view (needs to be merged into Phase)
     addNetwork: false, // Phase view (needs to be merged with Add)
-    clickGuard: false
+    clickGuard: false,
+    reorderingAccounts: false,
+    accountsOrder: []
   },
   signers: {},
   tray: {

@@ -1,24 +1,50 @@
 import React from 'react'
-import ReactDOM from 'react-dom'
 import Restore from 'react-restore'
+import GridLayout from 'react-grid-layout'
 
 import AccountController from './AccountController'
-
 import { accountSort as byCreation } from '../../../resources/domain/account'
 import { matchFilter } from '../../../resources/utils'
-
 import { Cluster, ClusterBox, ClusterValue, ClusterRow } from '../../../resources/Components/Cluster'
-
 import svg from '../../../resources/svg'
 import link from '../../../resources/link'
 
 let firstScroll = true
 
-// function filterMatches (text = '', fields) {
-//   const filter = text.toLowerCase()
-
-//   return fields.some(field => (field || '').toLowerCase().includes(filter))
-// }
+const AccountsGrid = ({ accounts, reportScroll, resetScroll, accountOpen }) => {
+  const layout = accounts.map((account, i) => ({ i: account.id, x: 0, y: i, w: 1, h: 1 }))
+  return (
+    <GridLayout
+      className='layout'
+      layout={layout}
+      cols={1}
+      rowHeight={70}
+      width={400}
+      draggableHandle='.accountGrabber'
+      style={accountOpen ? {} : { marginTop: '40px' }}
+      onDragStart={() => {
+        link.send('tray:action', 'setReorderingAccounts', true)
+      }}
+      onDragStop={(layout, _oldItem, newItem) => {
+        link.send('tray:action', 'setReorderingAccounts', false)
+        const orderedAccounts = layout.map(({ i }) => i)
+        orderedAccounts.splice(newItem.y, 0, newItem.i)
+        link.send('tray:action', 'setAccountsOrder', orderedAccounts)
+      }}
+    >
+      {accounts.map((account, i) => (
+        <AccountController
+          key={account.id}
+          {...account}
+          index={i}
+          reportScroll={reportScroll}
+          resetScroll={resetScroll}
+          accountOpen={accountOpen}
+        />
+      ))}
+    </GridLayout>
+  )
+}
 
 class AccountSelector extends React.Component {
   constructor(props, context) {
@@ -29,7 +55,8 @@ class AccountSelector extends React.Component {
   }
 
   reportScroll() {
-    this.store.initialScrollPos(ReactDOM.findDOMNode(this.scroll).scrollTop)
+    const ref = this.scroll.current
+    this.store.initialScrollPos(ref?.scrollTop)
   }
 
   resetScroll() {
@@ -77,9 +104,15 @@ class AccountSelector extends React.Component {
     )
   }
 
-  renderAccountList() {
+  renderAccountList(accountOpen) {
     const accounts = this.store('main.accounts')
-    const sortedAccounts = Object.values(accounts).sort(byCreation)
+    const sortedAccountIds = this.store('view.accountsOrder')
+    console.log('sorted account Ids', sortedAccountIds)
+    const sortedAccounts = sortedAccountIds.length
+      ? sortedAccountIds.map((accountId) => accounts[accountId])
+      : Object.values(accounts).sort(byCreation)
+
+    console.log('sorted accounts', sortedAccounts)
     const filter = this.store('panel.accountFilter')
 
     const displayAccounts = sortedAccounts.filter(({ address, name, ensName, lastSignerType }) => {
@@ -93,18 +126,14 @@ class AccountSelector extends React.Component {
           if (ref) this.scroll = ref
         }}
       >
-        {/* <div className='accountSelectorScrollWrap' style={current && scrollTop > 0 ? { marginTop: '-' + scrollTop + 'px' } : {}}> */}
         <div className='accountSelectorScrollWrap'>
           {displayAccounts.length ? (
-            displayAccounts.map((account, i) => (
-              <AccountController
-                key={account.id}
-                {...account}
-                index={i}
-                reportScroll={() => this.reportScroll()}
-                resetScroll={() => this.resetScroll()}
-              />
-            ))
+            <AccountsGrid
+              accounts={displayAccounts}
+              reportScroll={() => this.reportScroll()}
+              resetScroll={() => this.resetScroll()}
+              accountOpen={accountOpen}
+            />
           ) : Object.keys(accounts).length === 0 ? (
             <ClusterBox style={{ pointerEvents: 'auto' }}>
               <Cluster>
@@ -144,7 +173,7 @@ class AccountSelector extends React.Component {
     return (
       <div className={open ? 'accountSelector accountSelectorOpen' : 'accountSelector'}>
         {this.renderAccountFilter()}
-        {this.renderAccountList()}
+        {this.renderAccountList(open)}
       </div>
     )
   }
