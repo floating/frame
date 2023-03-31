@@ -246,6 +246,7 @@
       "@trezor/connect>@trezor/utxo-lib>blake-hash": false,
       "@trezor/connect>@trezor/utxo-lib>tiny-secp256k1": false,
       "electron": true,
+      "electron-builder>app-builder-lib>@electron/rebuild>lzma-native": false,
       "gridplus-sdk": false,
       "hardhat>@nomicfoundation/ethereumjs-blockchain>level>classic-level": false,
       "hardhat>keccak": true,
