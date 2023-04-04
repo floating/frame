@@ -188,7 +188,7 @@ export class Provider extends EventEmitter {
     const chain = store('main.networks.ethereum', targetChain.id)
     const response = chain?.on
       ? { result: targetChain.id }
-      : { error: { message: !chain ? 'chain does not exist' : 'chain not enabled', code: -1 } }
+      : { error: { message: 'not connected', code: -1 } }
 
     res({ id: payload.id, jsonrpc: payload.jsonrpc, ...response })
   }
