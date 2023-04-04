@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 
 import { Slide, SlideBody, SlideItem } from '../../styled'
 
@@ -19,7 +19,7 @@ const Chains = ({ setTitle, setProceed }) => {
           <div>accounts and signers in a single location.</div>
         </SlideItem>
         <SlideItem>
-          <div>To set up your first account, click "Add New Account"</div>
+          <div>To set up your first account, click &quot;Add New Account&quot;</div>
           <div>at the bottom of the Accounts panel.</div>
         </SlideItem>
       </SlideBody>

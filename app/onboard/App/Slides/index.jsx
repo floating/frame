@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { SlideContainer, Slide, SlideTitle, SlideScroller } from '../styled'
 
 import appInfo from '../../../../package.json'

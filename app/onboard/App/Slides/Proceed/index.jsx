@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import styled from 'styled-components'
 
 import { SlideProceed } from '../../styled'
@@ -52,7 +52,7 @@ const clickThrottle = (fn, [block, setBlock]) => {
   }
 }
 
-export const Proceed = ({ slide, proceed = {}, nextSlide, prevSlide, onComplete }) => {
+export const Proceed = ({ slide, proceed = {}, nextSlide, _prevSlide, onComplete }) => {
   const blockState = useState(false)
   if (proceed.action === 'next') {
     return (

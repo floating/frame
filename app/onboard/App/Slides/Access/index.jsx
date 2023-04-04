@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 
 import { Slide, SlideBody, SlideItem, Shortcut } from '../../styled'
 
@@ -67,7 +67,7 @@ const Access = ({ setTitle, setProceed, platform }) => {
         <SlideBody key={3}>
           <SlideItem>
             <div>You can also set Frame to automatically hide</div>
-            <div>when not in use, so it's out of the way</div>
+            <div>when not in use, so it&apos;s out of the way</div>
             <div>but still easily accessible when you need it.</div>
           </SlideItem>
         </SlideBody>

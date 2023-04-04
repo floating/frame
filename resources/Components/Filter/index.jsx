@@ -1,6 +1,6 @@
 import React from 'react'
 import Restore from 'react-restore'
-import svg from '../../../resources/svg'
+import svg from '../../svg'
 
 class Filter extends React.Component {
   constructor(...args) {

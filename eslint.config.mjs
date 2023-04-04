@@ -9,6 +9,10 @@ import jest from 'eslint-plugin-jest'
 import globals from 'globals'
 
 export default [
+  // Ignored file extensions
+  {
+    ignores: ['**/*/*.{html,styl}']
+  },
   // Ignored dirs
   {
     ignores: ['dist/**/*', 'compiled/**/*', 'bundle/**/*']
@@ -19,9 +23,9 @@ export default [
   {
     ignores: ['test/e2e/**/*', 'main/signers/**/*']
   },
-  // All files
+  // All JS / TS files
   {
-    files: ['**/*.{js,mjs,ts,tsx}'],
+    files: ['**/*.{js,mjs,jsx,ts,tsx}'],
     languageOptions: {
       ecmaVersion: 'latest',
       globals: {
@@ -47,10 +51,10 @@ export default [
       '*.{js,mjs,ts}',
       'scripts/**/*.mjs',
       'main/**/*.{js,ts}',
-      'build/**/*.js',
+      'build/**/*.{js,ts}',
       'resources/**/*.{js,ts}',
-      'test/*.js',
-      'test/__mocks__/*.js',
+      'test/*.{js,ts}',
+      'test/__mocks__/*.{js,ts}',
       'test/main/**/*.{js,ts}'
     ],
     ignores: ['resources/Components/**/*', 'resources/Hooks/**/*', 'resources/Native/**/*'],
@@ -63,18 +67,18 @@ export default [
   // Renderer process files
   {
     files: [
-      'app/**/*.js',
-      'main/dapps/server/inject/*.js',
-      'resources/app/**/*.js',
-      'resources/Components/**/*.js',
-      'resources/Hooks/**/*.js',
-      'resources/Native/**/*.js',
-      'resources/bridge/index.js',
-      'resources/link/index.js',
-      'test/app/**/*.js',
-      'test/resources/Components/**/*.js',
-      'test/resources/Hooks/**/*.js',
-      'test/resources/Native/**/*.js'
+      'app/**/*',
+      'main/dapps/server/inject/**/*',
+      'resources/app/**/*',
+      'resources/Components/**/*',
+      'resources/Hooks/**/*',
+      'resources/Native/**/*',
+      'resources/bridge/**/*',
+      'resources/link/**/*',
+      'test/app/**/*',
+      'test/resources/Components/**/*',
+      'test/resources/Hooks/**/*',
+      'test/resources/Native/**/*'
     ],
     languageOptions: {
       globals: {
@@ -85,7 +89,7 @@ export default [
   },
   // Renderer entry points
   {
-    files: ['app/*/index.js'],
+    files: ['app/*/index.*'],
     languageOptions: {
       globals: {
         process: true
@@ -125,20 +129,8 @@ export default [
     }
   },
   // React / JSX files
-  // TODO: simplify as '**/*.{jsx,tsx}'
   {
-    files: [
-      'app/**/*.js',
-      'resources/Components/**/*.js',
-      'resources/Hooks/**/*.js',
-      'resources/Native/**/*.js',
-      'resources/svg/index.js',
-      'test/app/**/*.js',
-      'test/resources/Components/**/*.js',
-      'test/resources/Hooks/**/*.js',
-      'test/resources/Native/**/*.js',
-      'test/jest.svg.js'
-    ],
+    files: ['**/*.{jsx,tsx}'],
     plugins: {
       react,
       'react-hooks': reactHooks
@@ -159,12 +151,40 @@ export default [
       ...react.configs.recommended.rules,
       ...react.configs['jsx-runtime'].rules,
       ...reactHooks.configs.recommended.rules,
+      'react/prop-types': 'off', // all type checking to be done in TS
+      'react/jsx-filename-extension': ['error', { extensions: ['.jsx', '.tsx'], allow: 'as-needed' }] // restrict jsx to jsx/tsx files
+    }
+  },
+  // React Custom Hooks files
+  {
+    files: ['resources/Hooks/**/*'],
+    plugins: {
+      react,
+      'react-hooks': reactHooks
+    },
+    settings: {
+      react: {
+        version: 'detect'
+      }
+    },
+    rules: {
+      ...react.configs.recommended.rules,
+      ...reactHooks.configs.recommended.rules,
       'react/prop-types': 'off' // all type checking to be done in TS
+    }
+  },
+  // Onboard
+  {
+    files: ['app/onboard/**/*'],
+    languageOptions: {
+      globals: {
+        store: true
+      }
     }
   },
   // Test files
   {
-    files: ['test/**/*.js', '**/__mocks__/**/*.js'],
+    files: ['test/*.js', 'test/**/*.test.*', '**/__mocks__/**/*'],
     plugins: {
       jest
     },
@@ -180,7 +200,7 @@ export default [
   },
   // Components test files
   {
-    files: ['test/app/**/*.js', 'test/resources/Components/**/*.js', 'app/**/__mocks__/**/*.js'],
+    files: ['test/app/**/*.test.*', 'test/resources/Components/**/*.test.*', 'app/**/__mocks__/**/*'],
     plugins: {
       'testing-library': testingLibrary
     },

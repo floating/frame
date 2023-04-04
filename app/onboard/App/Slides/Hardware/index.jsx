@@ -1,8 +1,8 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import link from '../../../../../resources/link'
 import svg from '../../../../../resources/svg'
 
-import { Slide, SlideBody, SlideItem, Tag } from '../../styled'
+import { Slide, SlideBody, SlideItem } from '../../styled'
 
 const Extension = ({ setTitle, setProceed }) => {
   useEffect(() => {

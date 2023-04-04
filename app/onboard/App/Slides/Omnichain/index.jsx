@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 
-import { Slide, SlideBody, SlideItem, Tag } from '../../styled'
+import { Slide, SlideBody, SlideItem } from '../../styled'
 
 const OmnichainSlide = ({ setTitle, setProceed }) => {
   useEffect(() => {
@@ -12,7 +12,7 @@ const OmnichainSlide = ({ setTitle, setProceed }) => {
     <Slide>
       <SlideBody>
         <SlideItem>
-          <div>With Frame's Omnichain routing dapps can</div>
+          <div>With Frame&apos;s Omnichain routing dapps can</div>
           <div>seamlessly use multiple chains at the same time,</div>
           <div>enabling truly multichain experiences.</div>
         </SlideItem>

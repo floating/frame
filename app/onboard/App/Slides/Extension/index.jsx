@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import link from '../../../../../resources/link'
 import svg from '../../../../../resources/svg'
 
@@ -13,7 +13,7 @@ const Extension = ({ setTitle, setProceed }) => {
     <Slide>
       <SlideBody>
         <SlideItem>
-          <div>If you're using a dapp that doesn't natively</div>
+          <div>If you&apos;re using a dapp that doesn&apos;t natively</div>
           <div>connect to Frame, you can inject a connection with</div>
           <div>
             our <Tag>Frame Companion</Tag> browser extension.

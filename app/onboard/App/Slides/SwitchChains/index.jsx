@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 
 import chainSwitch from 'url:./chainswitch.mp4'
 import { Slide, SlideBody, SlideItem, SlideVideo } from '../../styled'

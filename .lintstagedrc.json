@@ -1,3 +1,4 @@
 {
-  "**/*.{yml,json,md,html,ts,js}": "prettier --check"
+  "**/*.{yml,json,md,html,ts,js,jsx,tsx}": "prettier --check",
+  "**/*.{ts,js,jsx,tsx}": "npm run lint"
 }

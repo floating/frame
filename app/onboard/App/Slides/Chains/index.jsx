@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 
 import { Slide, SlideBody, SlideItem } from '../../styled'
 
@@ -15,7 +15,7 @@ const Chains = ({ setTitle, setProceed }) => {
     <Slide>
       <SlideBody>
         <SlideItem>
-          <div>Next, let's set up the chains you want to use.</div>
+          <div>Next, let&apos;s set up the chains you want to use.</div>
         </SlideItem>
         <SlideItem>
           <div>Frame includes many popular chains out of the</div>

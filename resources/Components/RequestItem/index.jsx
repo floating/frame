@@ -1,11 +1,11 @@
 import React from 'react'
 
-import RingIcon from '../../../resources/Components/RingIcon'
+import RingIcon from '../RingIcon'
 
-import { ClusterRow, ClusterValue } from '../../../resources/Components/Cluster'
+import { ClusterRow, ClusterValue } from '../Cluster'
 
-import link from '../../../resources/link'
-import svg from '../../../resources/svg'
+import link from '../../link'
+import svg from '../../svg'
 
 class _RequestItem extends React.Component {
   constructor(props, context) {
