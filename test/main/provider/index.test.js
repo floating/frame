@@ -155,7 +155,7 @@ describe('#send', () => {
       store.set('main.networks.ethereum', 5, { id: 5, on: false })
 
       send({ method: 'eth_chainId', chainId: '0x5' }, (response) => {
-        expect(response.error.message).toBe('chain not enabled')
+        expect(response.error.message).toBe('not connected')
         expect(response.result).toBeUndefined()
       })
     })
@@ -457,7 +457,7 @@ describe('#send', () => {
 
       send(request, ({ error }) => {
         expect(error.code).toBe(-1)
-        expect(error.message).toMatch('chain does not exist')
+        expect(error.message).toMatch('not connected')
         expect(accountRequests).toHaveLength(0)
       })
     })
@@ -467,7 +467,7 @@ describe('#send', () => {
 
       send(request, ({ error }) => {
         expect(error.code).toBe(-1)
-        expect(error.message).toMatch('chain not enabled')
+        expect(error.message).toMatch('not connected')
         expect(accountRequests).toHaveLength(0)
       })
     })

@@ -197,7 +197,7 @@ export class Provider extends EventEmitter {
     const chain = store('main.networks.ethereum', targetChain.id)
     const response = chain?.on
       ? { result: intToHex(targetChain.id) }
-      : { error: { message: !chain ? 'chain does not exist' : 'chain not enabled', code: -1 } }
+      : { error: { message: 'not connected', code: -1 } }
 
     res({ id: payload.id, jsonrpc: payload.jsonrpc, ...response })
   }
@@ -862,9 +862,6 @@ export class Provider extends EventEmitter {
         const symbol = (tokenData.symbol || '').toUpperCase()
         const decimals = parseInt(tokenData.decimals || '1')
 
-        if (isNaN(chainId)) {
-          return resError('token chain is disabled', payload, cb)
-        }
         if (!address) {
           return resError('tokens must define an address', payload, cb)
         }
@@ -889,12 +886,6 @@ export class Provider extends EventEmitter {
           decimals,
           logoURI: tokenData.image || tokenData.logoURI || ''
         }
-
-        // const result = {
-        //   suggestedAssetMeta: {
-        //     asset: { token }
-        //   }
-        // }
 
         const handlerId = this.addRequestHandler(res)
 
