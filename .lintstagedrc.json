@@ -1,4 +1,4 @@
 {
   "**/*.{yml,json,md,html,ts,js,jsx,tsx}": "prettier --check",
-  "**/*.{ts,js,jsx,tsx}": "npm run lint"
+  "**/*.{ts,js,jsx,tsx}": "ESLINT_USE_FLAT_CONFIG=true eslint -c eslint.config.mjs"
 }
