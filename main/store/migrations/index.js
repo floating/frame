@@ -901,6 +901,22 @@ const migrations = {
     })
 
     return initial
+  },
+  35: (initial) => {
+    const { shortcuts } = initial.main || {}
+    const { altSlash: summonShortcutEnabled, ...otherShortcuts } = shortcuts
+
+    initial.main.shortcuts = {
+      ...otherShortcuts,
+      summon: {
+        modifierKeys: ['Alt'],
+        shortcutKey: 'Slash',
+        enabled: summonShortcutEnabled,
+        configuring: false
+      }
+    }
+
+    return initial
   }
 }
 
