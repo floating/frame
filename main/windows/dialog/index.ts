@@ -1,11 +1,12 @@
 import { app, dialog } from 'electron'
+import windows from '../'
 
 enum ExitAction {
   OK,
   Quit
 }
 
-export default function (message: string, code?: string) {
+export const showUnhandledExceptionDialog = (message: string, code?: string) => {
   let exitAction = ExitAction.Quit
 
   if (code === 'EADDRINUSE') {
@@ -30,4 +31,13 @@ export default function (message: string, code?: string) {
   }
 
   app.quit()
+}
+
+export const openFileDialog = async () => {
+  try {
+    const file = await dialog.showOpenDialog(windows.browserWindows().dash, { properties: ['openFile'] })
+    return file
+  } catch (e) {
+    throw new Error((e as Error).message)
+  }
 }
