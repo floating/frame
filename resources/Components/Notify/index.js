@@ -11,7 +11,35 @@ import { capitalize } from '../../utils'
 
 const FEE_WARNING_THRESHOLD_USD = 50
 
-class Notify extends React.Component {
+const Notification = ({
+  title,
+  children,
+  buttons = [
+    {
+      text: 'OK',
+      className: 'notifyInputOption notifyInputSingleButton',
+      clickHandler: () => link.send('tray:action', 'backDash')
+    }
+  ]
+}) => {
+  return (
+    <div className='notifyBoxWrap' onMouseDown={(e) => e.stopPropagation()}>
+      <div className='notifyBox'>
+        <div className='notifyTitle'>{title}</div>
+        <div className='notifyBody'>{children}</div>
+        <div className='notifyInput'>
+          {buttons.map(({ text, className, clickHandler }, i) => (
+            <div key={i} className={className} onMouseDown={clickHandler}>
+              <div className='notifyInputOptionText'>{text}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+class NotificationController extends React.Component {
   gasFeeWarning({ req = {}, feeUSD = '0.00', currentSymbol = 'ETH' }) {
     return (
       <div className='notifyBoxWrap' onMouseDown={(e) => e.stopPropagation()}>
@@ -85,25 +113,10 @@ class Notify extends React.Component {
 
   noSignerWarning() {
     return (
-      <div className='notifyBoxWrap' onMouseDown={(e) => e.stopPropagation()}>
-        <div className='notifyBox'>
-          <div className='notifyTitle'>No Signer Attached!</div>
-          <div className='notifyBody'>
-            <div className='notifyBodyLine'>No signer attached for this account</div>
-            <div className='notifyBodyQuestion'>Please attach a signer that can sign for this account</div>
-          </div>
-          <div className='notifyInput'>
-            <div
-              className='notifyInputOption notifyInputSingleButton'
-              onMouseDown={() => {
-                link.send('tray:action', 'backDash')
-              }}
-            >
-              <div className='notifyInputOptionText'>OK</div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <Notification title='No Signer Attached!'>
+        <div className='notifyBodyLine'>No signer attached for this account</div>
+        <div className='notifyBodyQuestion'>Please attach a signer that can sign for this account</div>
+      </Notification>
     )
   }
 
@@ -464,4 +477,4 @@ class Notify extends React.Component {
   }
 }
 
-export default Restore.connect(Notify)
+export default Restore.connect(NotificationController)
