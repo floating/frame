@@ -22,16 +22,6 @@ const chains = {
     connection: { primary: { connected: true }, secondary: { connected: false } },
     on: true
   },
-  4: {
-    name: 'Ethereum Testnet Rinkeby',
-    id: 4,
-    explorer: 'https://rinkeby.etherscan.io',
-    connection: {
-      primary: { status: 'connected', connected: true, on: true },
-      secondary: { status: 'standby', connected: false, on: true }
-    },
-    on: true
-  },
   5: {
     name: 'Ethereum Testnet Görli',
     id: 5,
@@ -55,13 +45,6 @@ const chainMeta = {
     nativeCurrency: ether,
     primaryColor: 'accent1'
   },
-  4: {
-    nativeCurrency: {
-      ...ether,
-      name: 'Rinkeby Ether'
-    },
-    primaryColor: 'accent2'
-  },
   5: {
     nativeCurrency: {
       ...ether,
@@ -78,7 +61,7 @@ beforeEach(() => {
 
 describe('#getActiveChains', () => {
   it('returns all chains that are active', () => {
-    expect(getActiveChains().map((chain) => chain.chainId)).toEqual([1, 4])
+    expect(getActiveChains().map((chain) => chain.chainId)).toEqual([1, 5])
   })
 
   it('returns an EVM chain object', () => {
@@ -103,7 +86,8 @@ describe('#getActiveChains', () => {
         wallet: {
           colors: [{ r: 0, g: 210, b: 190, hex: '#00d2be' }]
         }
-      }
+      },
+      connected: true
     })
   })
 })
@@ -154,28 +138,30 @@ describe('#createChainsObserver', () => {
           wallet: {
             colors: [{ r: 0, g: 210, b: 190, hex: '#00d2be' }]
           }
-        }
+        },
+        connected: true
       },
       {
-        chainId: 4,
-        networkId: 4,
-        name: 'Ethereum Testnet Rinkeby',
+        chainId: 5,
+        networkId: 5,
+        name: 'Ethereum Testnet Görli',
         icon: [{ url: 'https://assets.coingecko.com/coins/images/ethereum.png' }],
         nativeCurrency: {
-          name: 'Rinkeby Ether',
+          name: 'Görli Ether',
           symbol: 'ETH',
           decimals: 18
         },
         explorers: [
           {
-            url: 'https://rinkeby.etherscan.io'
+            url: 'https://goerli.etherscan.io'
           }
         ],
         external: {
           wallet: {
             colors: [{ r: 255, g: 153, b: 51, hex: '#ff9933' }]
           }
-        }
+        },
+        connected: false
       },
       {
         chainId: 10,
@@ -196,7 +182,8 @@ describe('#createChainsObserver', () => {
           wallet: {
             colors: [{ r: 246, g: 36, b: 35, hex: '#f62423' }]
           }
-        }
+        },
+        connected: true
       }
     ])
   })
@@ -215,11 +202,11 @@ describe('#createChainsObserver', () => {
     observer()
 
     const changedChains = handler.chainsChanged.mock.calls[0][0]
-    expect(changedChains.map((c) => c.chainId)).toEqual([1, 4, 10])
+    expect(changedChains.map((c) => c.chainId)).toEqual([1, 5, 10])
   })
 
   it('invokes the handler when a chain is removed', () => {
-    const { 4: rinkeby, ...remaining } = chains
+    const { 5: goerli, ...remaining } = chains
     setChains(remaining)
 
     observer()
@@ -239,16 +226,16 @@ describe('#createChainsObserver', () => {
     observer()
 
     const changedChains = handler.chainsChanged.mock.calls[0][0]
-    expect(changedChains.map((c) => c.chainId)).toEqual([1, 4, 137])
+    expect(changedChains.map((c) => c.chainId)).toEqual([1, 5, 137])
   })
 
   it('invokes the handler when a chain is deactivated', () => {
     const {
-      4: { ...rinkeby }
+      5: { ...goerli }
     } = chains
-    rinkeby.on = false
+    goerli.on = false
 
-    setChains({ ...chains, 4: rinkeby })
+    setChains({ ...chains, 5: goerli })
 
     observer()
 
@@ -258,37 +245,9 @@ describe('#createChainsObserver', () => {
 
   it('invokes the handler when a chain name changes', () => {
     const {
-      4: { ...rinkeby }
-    } = chains
-    rinkeby.name = 'Rink-a-Bee'
-
-    setChains({ ...chains, 4: rinkeby })
-
-    observer()
-
-    const changedChains = handler.chainsChanged.mock.calls[0][0]
-    expect(changedChains.map((c) => c.chainId)).toEqual([1, 4])
-  })
-
-  it('invokes the handler when a connected chain is disconnected', () => {
-    const {
-      4: { ...rinkeby }
-    } = chains
-    rinkeby.connection.primary.connected = false
-
-    setChains({ ...chains, 4: rinkeby })
-
-    observer()
-
-    const changedChains = handler.chainsChanged.mock.calls[0][0]
-    expect(changedChains.map((c) => c.chainId)).toEqual([1])
-  })
-
-  it('invokes the handler when a disconnected chain is connected', () => {
-    const {
       5: { ...goerli }
     } = chains
-    goerli.connection.primary.connected = true
+    goerli.name = 'Girly'
 
     setChains({ ...chains, 5: goerli })
 
