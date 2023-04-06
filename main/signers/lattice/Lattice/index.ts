@@ -259,7 +259,8 @@ export default class Lattice extends Signer {
       return cb(null, signature)
     } catch (err) {
       log.error('failed to sign message with Lattice', err)
-      return cb(new Error(err as string))
+      const latticeErrorMessage = (err as { errorMessage: string }).errorMessage
+      return cb(new Error(latticeErrorMessage))
     }
   }
 
@@ -274,7 +275,8 @@ export default class Lattice extends Signer {
       return cb(null, signature)
     } catch (err) {
       log.error('failed to sign typed data with Lattice', err)
-      return cb(new Error(err as string))
+      const latticeErrorMessage = (err as { errorMessage: string }).errorMessage
+      return cb(new Error(latticeErrorMessage))
     }
   }
 
@@ -301,7 +303,8 @@ export default class Lattice extends Signer {
       cb(null, addHexPrefix(signedTx.serialize().toString('hex')))
     } catch (err) {
       log.error('error signing transaction with Lattice', err)
-      return cb(new Error(err as string))
+      const latticeErrorMessage = (err as { errorMessage: string }).errorMessage
+      return cb(new Error(latticeErrorMessage))
     }
   }
 
