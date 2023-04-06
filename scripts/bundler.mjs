@@ -11,7 +11,8 @@ const bundler = new Parcel({
     'app/tray/index.dev.html',
     'app/dash/index.dev.html',
     'app/dapp/index.dev.html',
-    'app/onboard/index.dev.html'
+    'app/onboard/index.dev.html',
+    'app/notify/index.dev.html'
   ],
   env: {
     NODE_ENV: 'development'

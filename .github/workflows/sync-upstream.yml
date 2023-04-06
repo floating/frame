@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: git remote add upstream https://github.com/floating/frame.git
-      - run: git fetch upstream
-      - run: git checkout develop
-      - run: git merge upstream/develop
-      - run: git push origin develop
+      - run: git fetch upstream canary
+      - run: git checkout canary
+      - run: git reset --hard upstream/canary
+      - run: git push -f origin canary

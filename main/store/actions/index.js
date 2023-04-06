@@ -203,9 +203,6 @@ module.exports = {
   setLiveAccountLimit: (u, value) => {
     u('main.ledger.liveAccountLimit', () => value)
   },
-  setHardwareDerivation: (u, value) => {
-    u('main.hardwareDerivation', () => value)
-  },
   setMenubarGasPrice: (u, value) => {
     u('main.menubarGasPrice', () => value)
   },
@@ -224,8 +221,13 @@ module.exports = {
   toggleSignerCompatibilityWarning: (u) => {
     u('main.mute.signerCompatibilityWarning', (v) => !v)
   },
-  setAltSpace: (u, v) => {
-    u('main.shortcuts.altSlash', () => v)
+  setShortcut: (u, name, shortcut) => {
+    u('main.shortcuts', name, (existingShortcut = {}) => ({
+      modifierKeys: shortcut.modifierKeys || existingShortcut.modifierKeys,
+      shortcutKey: shortcut.shortcutKey || existingShortcut.shortcutKey,
+      configuring: shortcut.configuring ?? existingShortcut.configuring,
+      enabled: shortcut.enabled ?? existingShortcut.enabled
+    }))
   },
   setAutohide: (u, v) => {
     u('main.autohide', () => v)
@@ -690,6 +692,9 @@ module.exports = {
     }
     u('windows.dash', (dash) => Object.assign(dash, update))
   },
+  setNotify: (u, update) => {
+    u('windows.notify.showing', () => update.showing)
+  },
   setOnboard: (u, update) => {
     u('windows.onboard.showing', () => update.showing)
   },
@@ -778,6 +783,31 @@ module.exports = {
       return nav
     })
     u('windows.dash.showing', () => true)
+  },
+  mutePylonMigrationNotice: (u) => {
+    u('main.mute.migrateToPylon', () => true)
+  },
+  migrateToPylonConnections: (u) => {
+    const pylonChains = ['1', '5', '10', '137', '42161', '11155111']
+
+    const switchToPylon = (connection = {}) => {
+      if (connection.current === 'custom' && connection.custom === '') {
+        connection.current = 'pylon'
+      }
+    }
+
+    u('main.networks.ethereum', (chains) => {
+      Object.entries(chains).forEach(([id, chain]) => {
+        if (pylonChains.includes(id)) {
+          const { primary, secondary } = chain.connection
+
+          switchToPylon(primary)
+          switchToPylon(secondary)
+        }
+      })
+
+      return chains
+    })
   },
   completeOnboarding: (u) => {
     u('main.mute.onboardingWindow', () => true)

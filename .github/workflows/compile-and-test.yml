@@ -3,6 +3,7 @@ name: Compile and run unit tests
 on:
   push:
     branches:
+      - 'canary'
       - 'develop'
   pull_request:
 

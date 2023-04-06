@@ -1,6 +1,10 @@
-import log from 'electron-log'
+// @ts-nocheck
+// legacy migrations that were written in JS and have not been ported
+// to Typescript
+
 import { v5 as uuidv5 } from 'uuid'
-import { accountNS, isDefaultAccountName } from '../../../resources/domain/account'
+
+import { accountNS, isDefaultAccountName } from '../../../../../resources/domain/account'
 
 const migrations = {
   4: (initial) => {
@@ -904,24 +908,10 @@ const migrations = {
   }
 }
 
-// Version number of latest known migration
-const latest = Math.max(...Object.keys(migrations))
+// retrofit legacy migrations
+const legacyMigrations = Object.entries(migrations).map(([version, legacyMigration]) => ({
+  version: parseInt(version),
+  migrate: (initial: unknown) => legacyMigration(initial)
+}))
 
-module.exports = {
-  // Apply migrations to current state
-  apply: (state, migrateToVersion = latest) => {
-    state.main._version = state.main._version || 0
-    Object.keys(migrations)
-      .sort((a, b) => a - b)
-      .forEach((version) => {
-        if (parseInt(state.main._version) < version && version <= migrateToVersion) {
-          log.info(`Applying state migration: ${version}`)
-          state = migrations[version](state)
-          state.main._version = version
-        }
-      })
-
-    return state
-  },
-  latest
-}
+export default legacyMigrations
