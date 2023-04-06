@@ -40,7 +40,7 @@ export default {
     })
 
     frameInstance.loadURL(
-      isDev ? 'http://localhost:1234/Dapp/index.dev.html' : `file://${process.env.BUNDLE_LOCATION}/dapp.html`
+      isDev ? 'http://localhost:1234/dapp/index.dev.html' : `file://${process.env.BUNDLE_LOCATION}/dapp.html`
     )
 
     frameInstance.on('ready-to-show', () => {
