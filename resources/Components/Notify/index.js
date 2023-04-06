@@ -1,16 +1,15 @@
 import React from 'react'
 import Restore from 'react-restore'
+import BigNumber from 'bignumber.js'
+
+import AddToken from './AddToken'
+import Confirm from '../../../resources/Components/Confirm'
+import { usesBaseFee } from '../../../resources/domain/transaction'
 import svg from '../../../resources/svg'
 import link from '../../../resources/link'
-
-import BigNumber from 'bignumber.js'
-import { usesBaseFee } from '../../../resources/domain/transaction'
-
-import Confirm from '../../../resources/Components/Confirm'
-import AddToken from './AddToken'
+import { capitalize } from '../../utils'
 
 const FEE_WARNING_THRESHOLD_USD = 50
-const capitalize = (s) => s[0].toUpperCase() + s.slice(1)
 
 class Notify extends React.Component {
   gasFeeWarning({ req = {}, feeUSD = '0.00', currentSymbol = 'ETH' }) {
@@ -143,7 +142,7 @@ class Notify extends React.Component {
             <div
               className='notifyInputOption notifyInputProceed'
               onMouseDown={() => {
-                // TODO: Transacionns need a better flow to respond to mutiple notifications after hitting sign
+                // TODO: Transactions need a better flow to respond to mutiple notifications after hitting sign
                 const isTestnet = this.store('main.networks', chain.type, chain.id, 'isTestnet')
                 const {
                   nativeCurrency,
@@ -222,7 +221,7 @@ class Notify extends React.Component {
               Your Ledger currently doesn&apos;t allow signing of contract data.
             </div>
             <div className='notifyBodyLine'>
-              <span>To change this settings go to</span>
+              <span>To change this setting go to</span>
               <br />
               <span style={{ fontWeight: 'bold' }}>{'Settings > Contract Data'}</span>
               <br />

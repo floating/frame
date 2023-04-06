@@ -1,10 +1,10 @@
 import styled from 'styled-components'
 import { useState } from 'react'
 
-import link from '../../../../resources/link'
-import { capitalize } from '../../../../resources/utils'
-import svg from '../../../../resources/svg'
-import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../resources/Components/Cluster'
+import link from '../../../link'
+import { capitalize } from '../../../utils'
+import svg from '../../../svg'
+import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../Cluster'
 
 const NotifyTop = styled.div`
   padding: 24px 0px 16px 0px;
