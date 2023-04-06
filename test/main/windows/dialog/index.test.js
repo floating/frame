@@ -11,6 +11,7 @@ jest.mock('electron', () => ({
     relaunch: jest.fn()
   }
 }))
+jest.mock('../../../../main/windows', () => ({ browserWindows: () => ({ dash: 'mock dash browserwindow' }) }))
 
 describe('#showUnhandledExceptionDialog', () => {
   it('displays the error message to the user', () => {
