@@ -1,4 +1,4 @@
-import { app, dialog } from 'electron'
+import { BrowserWindow, app, dialog } from 'electron'
 import windows from '../'
 
 enum ExitAction {
@@ -15,7 +15,7 @@ export const showUnhandledExceptionDialog = (message: string, code?: string) => 
       'Frame is already running or another application is using port 1248.'
     )
   } else {
-    exitAction = dialog.showMessageBoxSync(undefined as any, {
+    exitAction = dialog.showMessageBoxSync(undefined as unknown as BrowserWindow, {
       title: 'Unhandled Exception',
       message: 'An unexpected error occured',
       detail: message,
