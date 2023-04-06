@@ -45,7 +45,7 @@ class App extends React.Component {
               <div className='mainDappLoadingText'>
                 {isMainnetConnected
                   ? 'Send dapp failed to load'
-                  : 'Mainnet connection required to resolve ENS'}
+                  : 'Mainnet connection required to resolve ENS for Send dapp'}
               </div>
               {!isMainnetConnected && (
                 <div
