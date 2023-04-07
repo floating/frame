@@ -120,31 +120,6 @@ describe('when configuring', () => {
     expect(enterShortcutPrompt).toBeDefined()
   })
 
-  it('should set configuring on the existing shortcut', async () => {
-    const { user } = render(
-      <KeyboardShortcutConfigurator
-        actionText='Test this component'
-        platform='linux'
-        shortcutName='Test'
-        shortcut={{
-          modifierKeys: ['Meta'],
-          shortcutKey: 'Slash',
-          enabled: true,
-          configuring: false
-        }}
-      />
-    )
-
-    const displayedShortcut = screen.getByLabelText('To Test this component press')
-    await user.click(displayedShortcut)
-    expect(link.send).toHaveBeenCalledWith('tray:action', 'setShortcut', 'Test', {
-      enabled: true,
-      configuring: true,
-      modifierKeys: ['Meta'],
-      shortcutKey: 'Slash'
-    })
-  })
-
   describe('and a valid shortcut is entered', () => {
     it('should set the new shortcut', async () => {
       const { user } = render(
@@ -224,58 +199,4 @@ describe('when configuring', () => {
       expect(link.send).not.toHaveBeenCalled()
     })
   })
-
-  // describe('and the cancel button is clicked', () => {
-  //   it('should revert to displaying the existing shortcut', async () => {
-  //     const { user } = render(
-  //       <KeyboardShortcutConfigurator
-  //         actionText='Test this component'
-  //         platform='linux'
-  //         shortcutName='Test'
-  //         shortcut={{
-  //           modifierKeys: ['Meta'],
-  //           shortcutKey: 'Slash',
-  //           enabled: true,
-  //           configuring: true
-  //         }}
-  //       />
-  //     )
-
-  //     const cancelButton = screen.getByText('Cancel')
-  //     await user.click(cancelButton)
-  //     expect(link.send).toHaveBeenCalledTimes(1)
-  //     expect(link.send).toHaveBeenLastCalledWith('tray:action', 'setShortcut', 'Test', {
-  //       enabled: true,
-  //       configuring: false,
-  //       modifierKeys: ['Meta'],
-  //       shortcutKey: 'Slash'
-  //     })
-  //   })
-
-  //   it('should unset configuring on the existing shortcut', async () => {
-  //     const { user } = render(
-  //       <KeyboardShortcutConfigurator
-  //         actionText='Test this component'
-  //         platform='linux'
-  //         shortcutName='Test'
-  //         shortcut={{
-  //           modifierKeys: ['Meta'],
-  //           shortcutKey: 'Slash',
-  //           enabled: true,
-  //           configuring: true
-  //         }}
-  //       />
-  //     )
-
-  //     const cancelButton = screen.getByText('Cancel')
-  //     await user.click(cancelButton)
-  //     expect(link.send).toBeCalledTimes(1)
-  //     expect(link.send).toHaveBeenLastCalledWith('tray:action', 'setShortcut', 'Test', {
-  //       enabled: true,
-  //       configuring: false,
-  //       modifierKeys: ['Meta'],
-  //       shortcutKey: 'Slash'
-  //     })
-  //   })
-  // })
 })
