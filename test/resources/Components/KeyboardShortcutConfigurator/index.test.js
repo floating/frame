@@ -135,7 +135,7 @@ describe('when configuring', () => {
       />
     )
 
-    const displayedShortcut = screen.getByLabelText('Test this component by pressing')
+    const displayedShortcut = screen.getByLabelText('To Test this component press')
     await user.click(displayedShortcut)
     expect(link.send).toHaveBeenCalledWith('tray:action', 'setShortcut', 'Test', {
       enabled: true,
