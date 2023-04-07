@@ -72,13 +72,11 @@ export default [
       'resources/app/**/*',
       'resources/Components/**/*',
       'resources/Hooks/**/*',
-      'resources/Native/**/*',
       'resources/bridge/**/*',
       'resources/link/**/*',
       'test/app/**/*',
       'test/resources/Components/**/*',
-      'test/resources/Hooks/**/*',
-      'test/resources/Native/**/*'
+      'test/resources/Hooks/**/*'
     ],
     languageOptions: {
       globals: {

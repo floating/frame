@@ -1,7 +1,7 @@
 import React from 'react'
 import Restore from 'react-restore'
 
-import Native from '../../../resources/Native'
+import Native from '../../../resources/Components/Native'
 
 import { Onboard } from './styled'
 

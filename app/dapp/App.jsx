@@ -2,7 +2,7 @@ import React from 'react'
 import Restore from 'react-restore'
 
 import link from '../../resources/link'
-import Native from '../../resources/Native'
+import Native from '../../resources/Components/Native'
 
 class App extends React.Component {
   constructor(...args) {

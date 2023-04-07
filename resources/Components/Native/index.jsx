@@ -1,6 +1,6 @@
 import React from 'react'
 import Restore from 'react-restore'
-import link from '../link'
+import link from '../../link'
 
 class Title extends React.Component {
   handleClose() {
