@@ -5,6 +5,29 @@ import link from '../../../resources/link'
 import Dropdown from '../../../resources/Components/Dropdown'
 import KeyboardShortcutConfigurator from '../../../resources/Components/KeyboardShortcutConfigurator'
 
+import styled from 'styled-components'
+
+const EditShortcut = styled.div`
+  position: absolute;
+  top: 1px;
+  bottom: 0px;
+  left: calc(100% + 10px);
+  background: var(--ghostC);
+  height: 20px;
+  width: 60px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: uppercase;
+  font-size: 10px;
+  font-weight: 500;
+  * {
+    pointer-events: none;
+  }
+`
+
 class Settings extends Component {
   constructor(props, context) {
     super(props, context)
@@ -38,7 +61,37 @@ class Settings extends Component {
         <div className='localSettingsWrap'>
           <div className='signerPermission localSetting' style={{ zIndex: 214 }}>
             <div className='signerPermissionControls'>
-              <div className='signerPermissionSetting'>Summon Shortcut</div>
+              <div className='signerPermissionSetting'>
+                <span style={{ position: 'relative' }}>
+                  Summon Shortcut
+                  <div>
+                    {summonShortcut.configuring ? (
+                      <EditShortcut
+                        onClick={() => {
+                          link.send('tray:action', 'setShortcut', 'summon', {
+                            ...summonShortcut,
+                            configuring: false
+                          })
+                        }}
+                      >
+                        cancel
+                      </EditShortcut>
+                    ) : (
+                      <EditShortcut
+                        onClick={() => {
+                          link.send('tray:action', 'setShortcut', 'summon', {
+                            ...summonShortcut,
+                            configuring: true
+                          })
+                        }}
+                      >
+                        edit
+                      </EditShortcut>
+                    )}
+                  </div>
+                </span>
+              </div>
+
               <div
                 className={
                   summonShortcut.enabled
@@ -57,7 +110,7 @@ class Settings extends Component {
             </div>
             <div className='signerPermissionDetails'>
               <KeyboardShortcutConfigurator
-                actionText='Summon Frame'
+                actionText='summon Frame'
                 shortcut={summonShortcut}
                 shortcutName='summon'
                 platform={platform}
