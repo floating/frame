@@ -34,22 +34,12 @@ const KeyboardShortcutConfigurator = ({ actionText = '', platform, shortcut, sho
 
     const labelId = `shortcut-${shortcutName.toLowerCase()}-configure`
     return (
-      <>
-        <label id={labelId}>Enter keyboard shortcut:</label>
-        <span
-          className='keyCommand keyCommandCancel'
-          aria-labelledby={labelId}
-          onClick={() => {
-            // revert shortcut enabled state
-            link.send('tray:action', 'setShortcut', shortcutName, {
-              ...shortcut,
-              configuring: false
-            })
-          }}
-        >
-          Cancel
-        </span>
-      </>
+      <div style={{ display: 'flex' }}>
+        <label id={labelId}>Enter new keyboard shortcut!</label>
+        <div className='loaderWrap'>
+          <div className='loader' />
+        </div>
+      </div>
     )
   }
 
@@ -57,17 +47,9 @@ const KeyboardShortcutConfigurator = ({ actionText = '', platform, shortcut, sho
     const labelId = `shortcut-${shortcutName.toLowerCase()}-display`
     return (
       <>
-        <label id={labelId}>{actionText} by pressing</label>
-        <span
-          className='keyCommand'
-          aria-labelledby={labelId}
-          onClick={() => {
-            link.send('tray:action', 'setShortcut', shortcutName, {
-              ...shortcut,
-              configuring: true
-            })
-          }}
-        >
+        <label id={labelId}>To {actionText} press</label>
+
+        <span className='keyCommand' aria-labelledby={labelId}>
           {[...modifierKeys, shortcutKey].map((displayKey, index, displayKeys) =>
             index === displayKeys.length - 1 ? (
               displayKey
