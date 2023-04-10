@@ -679,10 +679,16 @@ export class Provider extends EventEmitter {
     if (
       version !== SignTypedDataVersion.V4 &&
       signerType &&
-      [SignerType.Ledger, SignerType.Lattice, SignerType.Trezor].includes(signerType)
+      [SignerType.Ledger, SignerType.Trezor].includes(signerType)
     ) {
       const signerName = capitalize(signerType)
       return resError(`${signerName} only supports eth_signTypedData_v4+`, payload, res)
+    }
+    if (
+      [SignTypedDataVersion.V3, SignTypedDataVersion.V4].includes(version) &&
+      signerType === SignerType.Lattice
+    ) {
+      return resError('Lattice only supports eth_signTypedData_v3+', payload, res)
     }
 
     const handlerId = this.addRequestHandler(res)
