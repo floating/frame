@@ -34,10 +34,7 @@ export const showUnhandledExceptionDialog = (message: string, code?: string) => 
 }
 
 export const openFileDialog = async () => {
-  try {
-    const file = await dialog.showOpenDialog(windows.browserWindows().dash, { properties: ['openFile'] })
-    return file
-  } catch (e) {
-    throw new Error((e as Error).message)
-  }
+  const browserWindow = BrowserWindow.getFocusedWindow() as BrowserWindow
+  const file = await dialog.showOpenDialog(browserWindow, { properties: ['openFile'] })
+  return file
 }
