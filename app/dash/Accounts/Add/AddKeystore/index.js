@@ -43,7 +43,7 @@ const LocateKeystore = ({ addKeystore, error, setError }) => {
 const Locating = () => (
   <div className='addAccountItemOptionSetupFrame'>
     <div role={'status'} className='addAccountItemOptionTitle' style={{ marginTop: '15px' }}>
-      Locating Keystore file
+      Locating Keystore file...
     </div>
   </div>
 )

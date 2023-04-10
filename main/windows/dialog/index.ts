@@ -1,11 +1,12 @@
-import { app, dialog } from 'electron'
+import { BrowserWindow, app, dialog } from 'electron'
+import windows from '../'
 
 enum ExitAction {
   OK,
   Quit
 }
 
-export default function (message: string, code?: string) {
+export const showUnhandledExceptionDialog = (message: string, code?: string) => {
   let exitAction = ExitAction.Quit
 
   if (code === 'EADDRINUSE') {
@@ -14,7 +15,7 @@ export default function (message: string, code?: string) {
       'Frame is already running or another application is using port 1248.'
     )
   } else {
-    exitAction = dialog.showMessageBoxSync(undefined as any, {
+    exitAction = dialog.showMessageBoxSync(undefined as unknown as BrowserWindow, {
       title: 'Unhandled Exception',
       message: 'An unexpected error occured',
       detail: message,
@@ -30,4 +31,10 @@ export default function (message: string, code?: string) {
   }
 
   app.quit()
+}
+
+export const openFileDialog = async () => {
+  const browserWindow = BrowserWindow.getFocusedWindow() as BrowserWindow
+  const file = await dialog.showOpenDialog(browserWindow, { properties: ['openFile'] })
+  return file
 }
