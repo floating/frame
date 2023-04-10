@@ -27,6 +27,12 @@ interface Signature {
   v: Buffer
 }
 
+type LatticeResponseError = {
+  name: 'LatticeResponseError'
+  responseCode: number
+  errorMessage: string
+}
+
 export const Status = {
   OK: 'ok',
   CONNECTING: 'connecting',
@@ -259,7 +265,8 @@ export default class Lattice extends Signer {
       return cb(null, signature)
     } catch (err) {
       log.error('failed to sign message with Lattice', err)
-      return cb(new Error(err as string))
+      const latticeErrorMessage = (err as LatticeResponseError).errorMessage
+      return cb(new Error(latticeErrorMessage))
     }
   }
 
@@ -274,7 +281,8 @@ export default class Lattice extends Signer {
       return cb(null, signature)
     } catch (err) {
       log.error('failed to sign typed data with Lattice', err)
-      return cb(new Error(err as string))
+      const latticeErrorMessage = (err as LatticeResponseError).errorMessage
+      return cb(new Error(latticeErrorMessage))
     }
   }
 
@@ -301,7 +309,8 @@ export default class Lattice extends Signer {
       cb(null, addHexPrefix(signedTx.serialize().toString('hex')))
     } catch (err) {
       log.error('error signing transaction with Lattice', err)
-      return cb(new Error(err as string))
+      const latticeErrorMessage = (err as LatticeResponseError).errorMessage
+      return cb(new Error(latticeErrorMessage))
     }
   }
 
