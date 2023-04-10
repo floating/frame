@@ -265,7 +265,7 @@ export default class Lattice extends Signer {
       return cb(null, signature)
     } catch (err) {
       log.error('failed to sign message with Lattice', err)
-      const latticeErrorMessage = (err as { errorMessage: string }).errorMessage
+      const latticeErrorMessage = (err as LatticeResponseError).errorMessage
       return cb(new Error(latticeErrorMessage))
     }
   }
@@ -281,7 +281,7 @@ export default class Lattice extends Signer {
       return cb(null, signature)
     } catch (err) {
       log.error('failed to sign typed data with Lattice', err)
-      const latticeErrorMessage = (err as { errorMessage: string }).errorMessage
+      const latticeErrorMessage = (err as LatticeResponseError).errorMessage
       return cb(new Error(latticeErrorMessage))
     }
   }
