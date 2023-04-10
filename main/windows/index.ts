@@ -16,6 +16,7 @@ import store from '../store'
 import FrameManager from './frames'
 import { createWindow } from './window'
 import { SystemTray, SystemTrayEventHandlers } from './systemTray'
+import { getAcceleratorFromShortcut } from '../../resources/app'
 
 type Windows = { [key: string]: BrowserWindow }
 
@@ -38,6 +39,7 @@ let dash: Dash
 let onboard: Onboard
 let mouseTimeout: NodeJS.Timeout
 let glide = false
+let summonShortcutAccelerator = 'Alt+/'
 
 const app = {
   hide: () => {
@@ -552,20 +554,34 @@ const init = () => {
 
   store.observer(() => broadcast('permissions', JSON.stringify(store('permissions'))))
   store.observer(() => {
-    const displaySummonShortcut = store('main.shortcuts.altSlash')
-    if (displaySummonShortcut) {
-      globalShortcut.unregister('Alt+/')
-      globalShortcut.register('Alt+/', () => {
-        app.toggle()
-        if (store('windows.onboard.showing')) {
-          send('onboard', 'main:flex', 'shortcutActivated')
-        }
-      })
-    } else {
-      globalShortcut.unregister('Alt+/')
+    const summonShortcut = store('main.shortcuts.summon')
+    const accelerator = getAcceleratorFromShortcut(summonShortcut)
+    try {
+      globalShortcut.unregister(accelerator)
+      if (summonShortcutAccelerator) {
+        globalShortcut.unregister(summonShortcutAccelerator)
+      }
+      if (summonShortcut.enabled && !summonShortcut.configuring) {
+        globalShortcut.register(accelerator, () => {
+          app.toggle()
+          if (store('windows.onboard.showing')) {
+            send('onboard', 'main:flex', 'shortcutActivated')
+          }
+        })
+        summonShortcutAccelerator = accelerator
+      }
+    } catch (e) {
+      const summonShortcutStr = [...summonShortcut.modifierKeys, summonShortcut.shortcutKey].join('+')
+      log.error(
+        new Error(`Could not set accelerator "${accelerator}" for summon shortcut: ${summonShortcutStr}`)
+      )
     }
+
     if (tray?.isReady()) {
-      systemTray.setContextMenu(tray.isVisible() ? 'hide' : 'show', { displaySummonShortcut })
+      systemTray.setContextMenu(tray.isVisible() ? 'hide' : 'show', {
+        displaySummonShortcut: summonShortcut.enabled,
+        accelerator
+      })
     }
   })
 }

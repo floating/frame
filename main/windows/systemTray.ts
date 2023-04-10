@@ -1,7 +1,6 @@
 import { app, screen, BrowserWindow, Menu, KeyboardEvent, Rectangle, Tray as ElectronTray } from 'electron'
 import path from 'path'
 import { capitalize } from '../../resources/utils'
-import store from '../store'
 
 const isMacOS = process.platform === 'darwin'
 
@@ -35,7 +34,7 @@ export class SystemTray {
 
   setContextMenu(
     type: string,
-    { displaySummonShortcut = store('main.shortcuts.altSlash'), switchScreen = false }
+    { displaySummonShortcut = false, accelerator = 'Alt+/', switchScreen = false }
   ) {
     const separatorMenuItem = {
       label: 'Frame',
@@ -59,7 +58,7 @@ export class SystemTray {
     }
 
     if (displaySummonShortcut) {
-      actionMenuItem.accelerator = 'Alt+/'
+      actionMenuItem.accelerator = accelerator
       actionMenuItem.registerAccelerator = false
     }
 

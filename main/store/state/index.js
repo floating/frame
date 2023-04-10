@@ -189,7 +189,12 @@ const initial = {
       signerCompatibilityWarning: main('mute.signerCompatibilityWarning', false)
     },
     shortcuts: {
-      altSlash: main('shortcuts.altSlash', true)
+      summon: main('shortcuts.summon', {
+        modifierKeys: ['Alt'],
+        shortcutKey: 'Slash',
+        enabled: true,
+        configuring: false
+      })
     },
     // showUSDValue: main('showUSDValue', true),
     launch: main('launch', false),
