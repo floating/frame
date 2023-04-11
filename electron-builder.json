@@ -1,6 +1,5 @@
 {
   "appId": "sh.frame.app",
-  "afterSign": "./build/notarize.js",
   "productName": "Frame",
   "linux": {
     "target": [
@@ -30,7 +29,10 @@
     "hardenedRuntime": true,
     "gatekeeperAssess": false,
     "entitlements": "build/entitlements.mac.plist",
-    "requirements": "build/electron-builder-requirements.txt"
+    "requirements": "build/electron-builder-requirements.txt",
+    "notarize": {
+      "teamId": "2NVQ8CKLY6"
+    }
   },
   "win": {
     "publisherName": "Frame Labs, Inc.",

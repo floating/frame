@@ -42,7 +42,7 @@ jobs:
             cert_key: APPLE_DEVELOPER_SIGNING_CERTIFICATE
             cert_password_key: APPLE_CERTIFICATE_PASSWORD
             apple_id_key: APPLE_ID
-            apple_id_password_key: APPLE_ID_PASSWORD
+            apple_app_specific_password_key: APPLE_ID_PASSWORD
           - os: windows-latest
             cert_key: WINDOWS_CSC_CERTIFICATE
             cert_password_key: WINDOWS_CSC_PASSWORD
@@ -53,7 +53,7 @@ jobs:
       CSC_LINK: ${{ secrets[matrix.cert_key] }}
       CSC_KEY_PASSWORD: ${{ secrets[matrix.cert_password_key] }}
       APPLE_ID: ${{ secrets[matrix.apple_id_key] }}
-      APPLE_ID_PASSWORD: ${{ secrets[matrix.apple_id_password_key] }}
+      APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets[matrix.apple_app_specific_password_key] }}
 
     steps:
       - uses: actions/checkout@v3
