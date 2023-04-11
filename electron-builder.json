@@ -31,7 +31,6 @@
     "entitlements": "build/entitlements.mac.plist",
     "requirements": "build/electron-builder-requirements.txt",
     "notarize": {
-      "tool": "notarytool",
       "teamId": "frame-labs"
     }
   },
