@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - 'develop'
+      - '0.6.3-build'
 
 env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -37,15 +38,6 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
-        include:
-          - os: macos-11
-            cert_key: APPLE_DEVELOPER_SIGNING_CERTIFICATE
-            cert_password_key: APPLE_CERTIFICATE_PASSWORD
-            apple_id_key: APPLE_ID
-            apple_app_specific_password_key: APPLE_ID_PASSWORD
-          - os: windows-latest
-            cert_key: WINDOWS_CSC_CERTIFICATE
-            cert_password_key: WINDOWS_CSC_PASSWORD
 
     runs-on: ${{ matrix.os }}
 
