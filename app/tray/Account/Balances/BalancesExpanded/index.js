@@ -107,6 +107,7 @@ class BalancesExpanded extends React.Component {
 
     // scan if balances are more than a minute old
     const scanning = !lastBalanceUpdate || new Date() - new Date(lastBalanceUpdate) > 1000 * 60
+    console.log({ scanning, balances, address })
     const hotSigner = ['ring', 'seed'].includes(lastSignerType)
 
     return (
@@ -121,7 +122,7 @@ class BalancesExpanded extends React.Component {
           <Cluster>
             {balances.map(({ chainId, symbol, ...balance }, i) => {
               return (
-                <ClusterRow key={chainId + symbol}>
+                <ClusterRow key={chainId + symbol + balance.address}>
                   <ClusterValue>
                     <Balance chainId={chainId} symbol={symbol} balance={balance} i={i} scanning={scanning} />
                   </ClusterValue>

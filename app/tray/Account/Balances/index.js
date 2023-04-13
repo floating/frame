@@ -1,6 +1,11 @@
 import React from 'react'
 import Restore from 'react-restore'
 
+// ipcRenderer.on('getSharedObject', (event) => {
+//   const sharedObject = ipcRenderer.sendSync('getSharedObject')
+//   console.log(sharedObject.someValue) // "Hello World!"
+// })
+
 import BalancesPreview from './BalancesPreview'
 import BalancesExpanded from './BalancesExpanded'
 
