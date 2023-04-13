@@ -184,6 +184,7 @@
     "wait-on": "7.0.1"
   },
   "alias": {
+    "buffer": "buffer",
     "crypto": false,
     "path": false,
     "process": false,
