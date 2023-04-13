@@ -1368,9 +1368,9 @@ describe('#send', () => {
     })
 
     // these signers only support V4+
-    const HardwareSignersSupportingV4 = [SignerType.Ledger, SignerType.Trezor]
+    const HardwareSignersSupportingV4Only = [SignerType.Ledger, SignerType.Trezor]
 
-    HardwareSignersSupportingV4.forEach((signerType) => {
+    HardwareSignersSupportingV4Only.forEach((signerType) => {
       it(`does not submit a V3 request to a ${signerType}`, (done) => {
         accounts.get.mockImplementationOnce((addr) => {
           return addr === address ? { id: address, address, lastSignerType: signerType } : {}
@@ -1386,7 +1386,7 @@ describe('#send', () => {
       })
     })
 
-    it('should send a V3 request to a lattice', () => {
+    it('should submit a V3 request to a Lattice', () => {
       accounts.get.mockImplementationOnce((addr) => {
         return addr === address ? { id: address, address, lastSignerType: SignerType.Lattice } : {}
       })
