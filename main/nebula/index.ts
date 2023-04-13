@@ -32,7 +32,7 @@ const isMainnetConnected = (chains: RPC.GetEthereumChains.Chain[]) =>
   !!chains.find((chain) => chain.chainId === 1)?.connected
 
 export default function (provider = mainnetProvider) {
-  let ready = provider.isConnected()
+  let ready = false
   const events = new EventEmitter()
 
   const readyHandler = (chains: RPC.GetEthereumChains.Chain[]) => {
@@ -46,15 +46,13 @@ export default function (provider = mainnetProvider) {
 
   provider.on('chainsChanged', readyHandler)
 
-  if (!ready) {
-    provider.once('connect', async () => {
-      const activeChains = await provider.request<RPC.GetEthereumChains.Chain[]>({
-        method: 'wallet_getEthereumChains'
-      })
-
-      readyHandler(activeChains)
+  provider.once('connect', async () => {
+    const activeChains = await provider.request<RPC.GetEthereumChains.Chain[]>({
+      method: 'wallet_getEthereumChains'
     })
-  }
+
+    readyHandler(activeChains)
+  })
 
   return {
     once: events.once.bind(events),
