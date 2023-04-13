@@ -4,8 +4,9 @@ import Pylon from '@framelabs/pylon-client'
 import store from '../store'
 import Inventory from './inventory'
 import Rates from './assets'
-import Balances from './balances'
+import { BalancesStoreApi } from './balances'
 import { arraysMatch, debounce } from '../../resources/utils'
+import BalanceProvider from './balances'
 
 import type { Chain, Token } from '../store/state'
 
@@ -13,32 +14,26 @@ export interface DataScanner {
   close: () => void
 }
 
-const storeApi = {
-  getActiveAddress: () => (store('selected.current') || '') as Address,
-  getCustomTokens: () => (store('main.tokens.custom') || []) as Token[],
-  getKnownTokens: (address?: Address) => ((address && store('main.tokens.known', address)) || []) as Token[],
-  getConnectedNetworks: () => {
-    const networks = Object.values(store('main.networks.ethereum') || {}) as Chain[]
-    return networks.filter(
-      (n) => (n.connection.primary || {}).connected || (n.connection.secondary || {}).connected
-    )
-  }
-}
-
+//TODO: move obserserver into the BalanceProvider // integrate into a single handler...
 export default function () {
   const pylon = new Pylon('wss://data.pylon.link')
-
-  const inventory = Inventory(pylon, store)
+  // const inventory = Inventory(pylon, store)
   const rates = Rates(pylon, store)
-  const balances = Balances(store)
+  const storeApi = BalancesStoreApi(store)
+  const balances = BalanceProvider(store, storeApi)
+  balances.start()
 
   let connectedChains: number[] = [],
     activeAccount: Address = ''
   let pauseScanningDelay: NodeJS.Timeout | undefined
 
-  inventory.start()
+  setTimeout(() => {
+    console.log('SWITCHCHING TO PYLON...')
+    store.setBalanceMode('pylon')
+  }, 15_000)
+
+  // inventory.start()
   rates.start()
-  balances.start()
 
   const handleNetworkUpdate = debounce((newlyConnected: number[]) => {
     log.verbose('updating external data due to network update(s)', { connectedChains, newlyConnected })
@@ -46,26 +41,30 @@ export default function () {
     rates.updateSubscription(connectedChains, activeAccount)
 
     if (newlyConnected.length > 0 && activeAccount) {
-      balances.addNetworks(activeAccount, newlyConnected)
+      balances.handleNewChains(newlyConnected)
     }
   }, 500)
 
   const handleAddressUpdate = debounce(() => {
     log.verbose('updating external data due to address update(s)', { activeAccount })
 
-    balances.setAddress(activeAccount)
-    inventory.setAddresses([activeAccount])
+    balances.handleActiveAccountChanged(activeAccount)
+    // inventory.setAddresses([activeAccount])
     rates.updateSubscription(connectedChains, activeAccount)
   }, 800)
 
   const handleTokensUpdate = debounce((tokens: Token[]) => {
     log.verbose('updating external data due to token update(s)', { activeAccount })
 
-    if (activeAccount) {
-      balances.addTokens(activeAccount, tokens)
-    }
+    // if (activeAccount) {
+    //   balances.addTokens(activeAccount, tokens)
+    // }
 
     rates.updateSubscription(connectedChains, activeAccount)
+  })
+
+  const balancesObserver = store.observer(() => {
+    //TODO: Handle new accounts here?...
   })
 
   const allNetworksObserver = store.observer(() => {
@@ -105,14 +104,16 @@ export default function () {
     if (!open) {
       // pause balance scanning after the tray is out of view for one minute
       if (!pauseScanningDelay) {
-        pauseScanningDelay = setTimeout(balances.pause, 1000)
+        pauseScanningDelay = setTimeout(() => {
+          balances.pauseScanner()
+        }, 1000)
       }
     } else {
       if (pauseScanningDelay) {
         clearTimeout(pauseScanningDelay)
         pauseScanningDelay = undefined
 
-        balances.resume()
+        balances.resumeScanner()
       }
     }
   }, 'externalData:tray')
@@ -122,11 +123,11 @@ export default function () {
       allNetworksObserver.remove()
       activeAddressObserver.remove()
       customTokensObserver.remove()
-      trayObserver.remove()
-
-      inventory.stop()
-      rates.stop()
+      balancesObserver.remove()
       balances.stop()
+
+      rates.stop()
+      trayObserver.remove()
 
       if (pauseScanningDelay) {
         clearTimeout(pauseScanningDelay)

@@ -926,6 +926,12 @@ module.exports = {
 
       return requests
     })
+  },
+  setBalanceMode(u, newMode) {
+    u('main', (main) => {
+      main.balanceFetchMode = newMode
+      return main
+    })
   }
   // toggleUSDValue: (u) => {
   //   u('main.showUSDValue', show => !show)
