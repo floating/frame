@@ -5,6 +5,8 @@ const { addHexPrefix } = require('@ethereumjs/util')
 const { Hardfork } = require('@ethereumjs/common')
 const provider = require('eth-provider')
 const log = require('electron-log')
+const { RPChEthereumProvider } = require('@rpch/ethers')
+const RPChCrypto = require('@rpch/crypto-for-nodejs')
 
 const store = require('../store').default
 const { default: BlockMonitor } = require('./blocks')
@@ -67,14 +69,40 @@ class ChainConnection extends EventEmitter {
 
     this.update(priority)
 
-    this[priority].provider = provider(target, {
-      name: priority,
-      origin: 'frame',
-      infuraId: '786ade30f36244469480aa5c2bf0743b',
-      alchemyId: 'NBms1eV9i16RFHpFqQxod56OLdlucIq0'
-    })
+    console.log({ target, priority, chainId: this.chainId })
 
-    this[priority].blockMonitor = this._createBlockMonitor(this[priority].provider, priority)
+    if (target === 'rpch') {
+      // create rpch provider
+      this[priority].provider = new RPChEthereumProvider(
+        'https://primary.gnosis-chain.rpc.hoprtech.net',
+        {
+          timeout: 100000,
+          discoveryPlatformApiEndpoint: 'https://staging.discovery.rpch.tech',
+          client: 'blockwallet',
+          crypto: RPChCrypto
+        },
+        (k, v) => {
+          return new Promise((resolve) => {
+            rpchStore.set(k, v, resolve)
+          })
+        },
+        (k) => {
+          return new Promise((resolve) => {
+            rpchStore.get(k, resolve)
+          })
+        }
+      )
+      this[priority].blockMonitor = this._createBlockMonitor(this[priority].provider, priority)
+    } else {
+      this[priority].provider = provider(target, {
+        name: priority,
+        origin: 'frame',
+        infuraId: '786ade30f36244469480aa5c2bf0743b',
+        alchemyId: 'NBms1eV9i16RFHpFqQxod56OLdlucIq0'
+      })
+
+      this[priority].blockMonitor = this._createBlockMonitor(this[priority].provider, priority)
+    }
   }
 
   _handleConnection(priority) {

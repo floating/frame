@@ -259,7 +259,7 @@ const initial = {
           infura: 'infuraKovan'
         },
         100: {
-          poa: 'gnosis'
+          rpch: 'rpch'
         },
         137: {
           infura: 'infuraPolygon'
@@ -384,7 +384,7 @@ const initial = {
           type: 'ethereum',
           layer: 'sidechain',
           isTestnet: false,
-          name: 'Gnosis',
+          name: 'Gnosis on RPCh',
           explorer: 'https://blockscout.com/xdai/mainnet',
           gas: {
             price: {
@@ -395,7 +395,7 @@ const initial = {
           connection: {
             primary: {
               on: true,
-              current: 'poa',
+              current: 'RPCh',
               status: 'loading',
               connected: false,
               type: '',
