@@ -1368,9 +1368,9 @@ describe('#send', () => {
     })
 
     // these signers only support V4+
-    const hardwareSigners = [SignerType.Ledger, SignerType.Lattice, SignerType.Trezor]
+    const HardwareSignersSupportingV4 = [SignerType.Ledger, SignerType.Trezor]
 
-    hardwareSigners.forEach((signerType) => {
+    HardwareSignersSupportingV4.forEach((signerType) => {
       it(`does not submit a V3 request to a ${signerType}`, (done) => {
         accounts.get.mockImplementationOnce((addr) => {
           return addr === address ? { id: address, address, lastSignerType: signerType } : {}
@@ -1384,6 +1384,17 @@ describe('#send', () => {
           done()
         })
       })
+    })
+
+    it('should send a V3 request to a lattice', () => {
+      accounts.get.mockImplementationOnce((addr) => {
+        return addr === address ? { id: address, address, lastSignerType: SignerType.Lattice } : {}
+      })
+      const params = [address, typedData]
+
+      send({ method: 'eth_signTypedData_v3', params })
+
+      verifyRequest(SignTypedDataVersion.V3, typedData)
     })
 
     const unknownVersions = ['_v5', '_v1.1', 'v3']
