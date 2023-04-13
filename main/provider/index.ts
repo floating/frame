@@ -163,6 +163,8 @@ export class Provider extends EventEmitter {
 
   // fires when the list of available chains changes
   chainsChanged(chains: RPC.GetEthereumChains.Chain[]) {
+    proxyConnection.chainsChanged(chains)
+
     this.subscriptions.chainsChanged.forEach((subscription) =>
       this.sendSubscriptionData(subscription.id, chains)
     )

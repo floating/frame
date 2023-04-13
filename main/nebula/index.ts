@@ -28,14 +28,29 @@ const pylonUrl = `https://${authToken}@ipfs.nebula.land`
 const mainnetProvider = new EthereumProvider(proxyConnection)
 mainnetProvider.setChain(1)
 
+const isMainnetConnected = (chains: RPC.GetEthereumChains.Chain[]) =>
+  !!chains.find((chain) => chain.chainId === 1)?.connected
+
 export default function (provider = mainnetProvider) {
   let ready = provider.isConnected()
   const events = new EventEmitter()
 
-  if (!ready) {
-    provider.once('connect', () => {
+  const readyHandler = (chains: RPC.GetEthereumChains.Chain[]) => {
+    if (isMainnetConnected(chains)) {
       ready = true
       events.emit('ready')
+    }
+  }
+
+  provider.on('chainsChanged', readyHandler)
+
+  if (!ready) {
+    provider.once('connect', async () => {
+      const activeChains = await provider.request<RPC.GetEthereumChains.Chain[]>({
+        method: 'wallet_getEthereumChains'
+      })
+
+      readyHandler(activeChains)
     })
   }
 

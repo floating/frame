@@ -141,6 +141,7 @@ declare namespace RPC {
       networkId: number
       name: string
       icon: Icon[]
+      connected: boolean
       nativeCurrency: NativeCurrency
       explorers: Explorer[]
       external: {
