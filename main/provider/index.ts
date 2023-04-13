@@ -136,6 +136,13 @@ export class Provider extends EventEmitter {
       })
     })
 
+    proxyConnection.on('provider:subscribe', (payload: RPC.Subscribe.Request) => {
+      const subId = this.createSubscription(payload)
+      const { id, jsonrpc } = payload
+
+      proxyConnection.emit('payload', { id, jsonrpc, result: subId })
+    })
+
     this.getNonce = this.getNonce.bind(this)
   }
 
@@ -163,8 +170,6 @@ export class Provider extends EventEmitter {
 
   // fires when the list of available chains changes
   chainsChanged(chains: RPC.GetEthereumChains.Chain[]) {
-    proxyConnection.chainsChanged(chains)
-
     this.subscriptions.chainsChanged.forEach((subscription) =>
       this.sendSubscriptionData(subscription.id, chains)
     )
@@ -183,6 +188,7 @@ export class Provider extends EventEmitter {
       params: { subscription, result }
     }
 
+    proxyConnection.emit('payload', payload)
     this.emit('data:subscription', payload)
   }
 
@@ -757,13 +763,19 @@ export class Provider extends EventEmitter {
   subscribe(payload: RPC.Subscribe.Request, res: RPCSuccessCallback) {
     log.debug('provider subscribe', { payload })
 
+    const subId = this.createSubscription(payload)
+
+    res({ id: payload.id, jsonrpc: '2.0', result: subId })
+  }
+
+  private createSubscription(payload: RPC.Subscribe.Request) {
     const subId = addHexPrefix(crypto.randomBytes(16).toString('hex'))
     const subscriptionType = payload.params[0]
 
     this.subscriptions[subscriptionType] = this.subscriptions[subscriptionType] || []
     this.subscriptions[subscriptionType].push({ id: subId, originId: payload._origin })
 
-    res({ id: payload.id, jsonrpc: '2.0', result: subId })
+    return subId
   }
 
   ifSubRemove(id: string) {
