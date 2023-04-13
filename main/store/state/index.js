@@ -768,6 +768,11 @@ Object.keys(initial.main.accounts).forEach((id) => {
   initial.main.accounts[id].balances = { lastUpdated: undefined }
 })
 
+Object.values(initial.main.networks.ethereum).forEach((chain) => {
+  chain.connection.primary = { ...chain.connection.primary, connected: false }
+  chain.connection.secondary = { ...chain.connection.secondary, connected: false }
+})
+
 Object.values(initial.main.networksMeta).forEach((chains) => {
   Object.values(chains).forEach((chainMeta) => {
     // remove stale price data
