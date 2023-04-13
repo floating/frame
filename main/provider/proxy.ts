@@ -9,10 +9,7 @@ class ProviderProxyConnection extends EventEmitter {
 
   async send(payload: JSONRPCRequestPayload) {
     if (payload.method === 'eth_subscribe') {
-      const { id, jsonrpc, params } = payload
-      const subType = params[0] as string
-
-      this.emit('provider:subscribe', { id, jsonrpc, params: [subType] })
+      this.emit('provider:subscribe', payload)
     } else {
       this.emit('provider:send', payload)
     }
