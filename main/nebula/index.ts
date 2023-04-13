@@ -37,6 +37,8 @@ export default function (provider = mainnetProvider) {
 
   const readyHandler = (chains: RPC.GetEthereumChains.Chain[]) => {
     if (isMainnetConnected(chains)) {
+      provider.off('chainsChanged', readyHandler)
+
       ready = true
       events.emit('ready')
     }
