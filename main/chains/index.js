@@ -22,6 +22,21 @@ const { createGasCalculator } = require('./gas')
 // https://support.arbitrum.io/hc/en-us/articles/4415963644955-How-the-fees-are-calculated-on-Arbitrum
 const legacyChains = [250, 4002, 42161]
 
+export const createAsyncKeyValStore = () => {
+  const store = new Map()
+
+  return {
+    async set(k, v) {
+      return store.set(k, v)
+    },
+    async get(k) {
+      return store.get(k)
+    }
+  }
+}
+
+const { set, get } = createAsyncKeyValStore()
+
 const resError = (error, payload, res) =>
   res({
     id: payload.id,
@@ -76,19 +91,19 @@ class ChainConnection extends EventEmitter {
       this[priority].provider = new RPChEthereumProvider(
         'https://primary.gnosis-chain.rpc.hoprtech.net',
         {
-          timeout: 100000,
+          timeout: 10000,
           discoveryPlatformApiEndpoint: 'https://staging.discovery.rpch.tech',
           client: 'blockwallet',
           crypto: RPChCrypto
         },
         (k, v) => {
           return new Promise((resolve) => {
-            rpchStore.set(k, v, resolve)
+            set(k, v, resolve)
           })
         },
         (k) => {
           return new Promise((resolve) => {
-            rpchStore.get(k, resolve)
+            get(k, resolve)
           })
         }
       )
