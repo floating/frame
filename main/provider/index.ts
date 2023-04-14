@@ -38,7 +38,7 @@ import {
   getSignedAddress,
   requestPermissions,
   resError,
-  hasPermission,
+  hasSubscriptionPermission,
   decodeMessage
 } from './helpers'
 
@@ -150,13 +150,17 @@ export class Provider extends EventEmitter {
     const address = accounts[0]
 
     this.subscriptions.accountsChanged
-      .filter((subscription) => hasPermission(address, subscription.originId))
+      .filter((subscription) =>
+        hasSubscriptionPermission(SubscriptionType.ACCOUNTS, address, subscription.originId)
+      )
       .forEach((subscription) => this.sendSubscriptionData(subscription.id, accounts))
   }
 
   assetsChanged(address: string, assets: RPC.GetAssets.Assets) {
     this.subscriptions.assetsChanged
-      .filter((subscription) => hasPermission(address, subscription.originId))
+      .filter((subscription) =>
+        hasSubscriptionPermission(SubscriptionType.ASSETS, address, subscription.originId)
+      )
       .forEach((subscription) => this.sendSubscriptionData(subscription.id, { ...assets, account: address }))
   }
 
@@ -169,10 +173,12 @@ export class Provider extends EventEmitter {
   }
 
   // fires when the list of available chains changes
-  chainsChanged(chains: RPC.GetEthereumChains.Chain[]) {
-    this.subscriptions.chainsChanged.forEach((subscription) =>
-      this.sendSubscriptionData(subscription.id, chains)
-    )
+  chainsChanged(address: string, chains: RPC.GetEthereumChains.Chain[]) {
+    this.subscriptions.chainsChanged
+      .filter((subscription) =>
+        hasSubscriptionPermission(SubscriptionType.CHAINS, address, subscription.originId)
+      )
+      .forEach((subscription) => this.sendSubscriptionData(subscription.id, chains))
   }
 
   networkChanged(netId: number | string, originId: string) {

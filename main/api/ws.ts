@@ -121,6 +121,10 @@ const handler = (socket: FrameWebSocket, req: IncomingMessage) => {
       if (rawPayload.method === 'net_version') return res({ id, jsonrpc, result: parseInt(chainId, 16) })
     }
 
+    if (protectedMethods.indexOf(payload.method) > -1) {
+      console.log('------------------>', { origin, method: payload.method })
+    }
+
     if (protectedMethods.indexOf(payload.method) > -1 && !(await isTrusted(payload))) {
       let error = { message: 'Permission denied, approve ' + origin + ' in Frame to continue', code: 4001 }
       // review

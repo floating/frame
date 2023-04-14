@@ -29,7 +29,10 @@ export interface FrameExtension {
 }
 
 // allows the Frame extension to request specific methods
-const trustedExtensionMethods = ['wallet_getEthereumChains']
+const trustedInternalMethods = ['wallet_getEthereumChains']
+
+const isTrustedOrigin = (origin: string) => origin === 'frame-extension' || origin === 'frame-internal'
+const isInternalMethod = (method: string) => trustedInternalMethods.includes(method)
 
 const storeApi = {
   getPermission: (address: Address, origin: string) => {
@@ -186,7 +189,7 @@ export async function isTrusted(payload: RPCRequestPayload) {
   const { name: originName } = store('main.origins', payload._origin) as { name: string }
   const currentAccount = accounts.current()
 
-  if (originName === 'frame-extension' && trustedExtensionMethods.includes(payload.method)) {
+  if (isTrustedOrigin(originName) && isInternalMethod(payload.method)) {
     return true
   }
 
