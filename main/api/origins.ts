@@ -10,6 +10,7 @@ const dev = process.env.NODE_ENV === 'development'
 const activeExtensionChecks: Record<string, Promise<boolean>> = {}
 const activePermissionChecks: Record<string, Promise<Permission | undefined>> = {}
 const extensionPrefixes = {
+  chrome: 'chrome-extension',
   firefox: 'moz-extension',
   safari: 'safari-web-extension'
 }
@@ -166,6 +167,10 @@ export function parseFrameExtension(req: IncomingMessage): FrameExtension | unde
   if (origin === 'chrome-extension://ldcoohedfbjoobcadoglnnmmfbdlmmhf') {
     // Match production chrome
     return { browser: 'chrome', id: 'ldcoohedfbjoobcadoglnnmmfbdlmmhf' }
+  } else if (origin.startsWith(`${extensionPrefixes.chrome}://`) && dev && hasExtensionIdentity) {
+    // Match Chrome in dev
+    const extensionId = origin.substring(extensionPrefixes.chrome.length + 3)
+    return { browser: 'chrome', id: extensionId }
   } else if (origin.startsWith(`${extensionPrefixes.firefox}://`) && hasExtensionIdentity) {
     // Match production Firefox
     const extensionId = origin.substring(extensionPrefixes.firefox.length + 3)
