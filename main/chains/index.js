@@ -5,7 +5,7 @@ const { addHexPrefix } = require('@ethereumjs/util')
 const { Hardfork } = require('@ethereumjs/common')
 const provider = require('eth-provider')
 const log = require('electron-log')
-const { RPChEthereumProvider } = require('@rpch/ethers')
+const { RPChEthereumProvider } = require('@rpch/ethereum-provider')
 const RPChCrypto = require('@rpch/crypto-for-nodejs')
 
 const store = require('../store').default
