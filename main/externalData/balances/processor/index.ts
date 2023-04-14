@@ -5,7 +5,7 @@ import { Account } from '../../surface'
 import { formatUnits } from 'ethers/lib/utils'
 import { toTokenId } from '../../../../resources/domain/balance'
 
-export type BalanceProcessor = ReturnType<typeof Processor>
+export type BalanceProcessor = ReturnType<typeof BalanceProcessor>
 
 const getBalances = (account: Account): TokenBalance[] => {
   return Object.values(account.balances).map((b) => ({
@@ -66,7 +66,7 @@ const getTokenChanges = (
   return { unknownBalances, zeroBalances }
 }
 
-function Processor(store: Store, api: ReturnType<typeof BalancesStoreApi>) {
+function BalanceProcessor(store: Store, api: ReturnType<typeof BalancesStoreApi>) {
   function updateTokens(address: string, zeroBalances: Set<string>, unknownBalances: TokenBalance[]) {
     if (zeroBalances.size) {
       store.removeKnownTokens(address, zeroBalances)
@@ -87,14 +87,14 @@ function Processor(store: Store, api: ReturnType<typeof BalancesStoreApi>) {
     store.accountTokensUpdated(address)
   }
 
-  function handleAccountUpdate(account: Account) {
+  function updateAccount(account: Account) {
     const balances = getBalances(account)
     const address = account.address.toLowerCase()
     const changedBalances = getChangedBalances(address, balances, api)
     handleBalanceUpdate(address, changedBalances)
   }
 
-  return { handleBalanceUpdate, handleAccountUpdate }
+  return { handleBalanceUpdate, updateAccount }
 }
 
-export default Processor
+export default BalanceProcessor
