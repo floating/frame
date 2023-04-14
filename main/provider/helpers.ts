@@ -20,6 +20,8 @@ import protectedMethods from '../api/protectedMethods'
 import { usesBaseFee, TransactionData, GasFeesSource } from '../../resources/domain/transaction'
 import { getAddress } from '../../resources/utils'
 
+const trustedOriginIds = ['frame-extension', 'frame-internal'].map((origin) => uuidv5(origin, uuidv5.DNS))
+const isTrustedOrigin = (originId: string) => trustedOriginIds.includes(originId)
 const permission = (date: number, method: string) => ({ parentCapability: method, date })
 
 export function decodeMessage(rawMessage: string) {
@@ -162,13 +164,22 @@ export function requestPermissions(payload: JSONRPCRequestPayload, res: RPCReque
   res({ id: payload.id, jsonrpc: '2.0', result: requestedOperations })
 }
 
-export function hasPermission(address: string, originId: string) {
-  const permissions = store('main.permissions', address) as Record<string, Permission>
+export function hasSubscriptionPermission(subType: string, address: string, originId: string) {
+  if (subType === 'chainsChanged' && isTrustedOrigin(originId)) {
+    // internal trusted origins are allowed to subscribe to chain changes without approval
+    return true
+  }
+
+  if (!address) {
+    return false
+  }
+
+  const permissions = (store('main.permissions', address) || {}) as Record<string, Permission>
   const permission = Object.values(permissions).find(({ origin }) => {
     return uuidv5(origin, uuidv5.DNS) === originId
   })
 
-  return permission?.provider
+  return !!permission?.provider
 }
 
 export function getActiveChainsFull() {

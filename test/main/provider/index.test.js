@@ -1,7 +1,7 @@
 import provider from '../../../main/provider'
 import accounts from '../../../main/accounts'
 import connection from '../../../main/chains'
-import { hasPermission } from '../../../main/provider/helpers'
+import { hasSubscriptionPermission } from '../../../main/provider/helpers'
 import store from '../../../main/store'
 import chainConfig from '../../../main/chains/config'
 import { gweiToHex } from '../../../resources/utils'
@@ -30,7 +30,7 @@ jest.mock('../../../main/provider/helpers', () => {
   // written relying on the real implementation so they need to be migrated individually
   return {
     ...helpers,
-    hasPermission: jest.fn()
+    hasSubscriptionPermission: jest.fn()
   }
 })
 
@@ -1677,7 +1677,7 @@ describe('#assetsChanged', () => {
   })
 
   it('fires an assetsChanged event when an account has permission', (done) => {
-    hasPermission.mockReturnValueOnce(true)
+    hasSubscriptionPermission.mockReturnValueOnce(true)
 
     const assets = { account: address, nativeCurrency: [], erc20: ['tokens'] }
 
@@ -1687,7 +1687,7 @@ describe('#assetsChanged', () => {
       expect(payload.params.subscription).toBe(subscription.id)
       expect(payload.params.result).toEqual(assets)
 
-      expect(hasPermission).toHaveBeenCalledWith(address, subscription.originId)
+      expect(hasSubscriptionPermission).toHaveBeenCalledWith('assetsChanged', address, subscription.originId)
 
       done()
     })
@@ -1696,7 +1696,7 @@ describe('#assetsChanged', () => {
   })
 
   it('does not fire an assetsChanged event when an account does not have permission', () => {
-    hasPermission.mockReturnValueOnce(false)
+    hasSubscriptionPermission.mockReturnValueOnce(false)
 
     const assets = { account: address, nativeCurrency: [], erc20: ['tokens'] }
 
@@ -1829,7 +1829,9 @@ describe('state change events', () => {
       137: { primaryColor: 'accent8', nativeCurrency: { symbol: 'MATIC', name: 'Matic', decimals: 18 } }
     })
 
+    hasSubscriptionPermission.mockReturnValueOnce(true)
     store.getObserver('provider:chains').fire()
+    jest.runAllTimers()
   })
 
   it('fires an assetsChanged event to subscribers', (done) => {
@@ -1862,7 +1864,7 @@ describe('state change events', () => {
     store.set('main.balances', address, [ethBalance, tokenBalance])
     store.set('selected.current', address)
 
-    hasPermission.mockReturnValueOnce(true)
+    hasSubscriptionPermission.mockReturnValueOnce(true)
     accounts.current = () => ({ id: address })
     provider.subscriptions.assetsChanged = [subscription]
 
