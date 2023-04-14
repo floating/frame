@@ -1,9 +1,10 @@
 import createPylon from '@framelabs/pylon-api-client'
 import { BalanceProcessor } from '../balances/processor'
+import { InventoryProcessor } from '../inventory/processor'
 
-type Subscription = ReturnType<ReturnType<typeof createPylon>['accounts']['subscribe']>
+type Subscription = ReturnType<ReturnType<typeof createPylon>['client']['accounts']['subscribe']>
 
-//TODO export these from surface...
+//TODO: do we need to export these from surface?...
 type ItemCollectionId = {
   contract: string
   chainId: number
@@ -36,83 +37,87 @@ export type Account = {
 }
 
 export type AccountResponse = Parameters<
-  Exclude<Parameters<(typeof pylon)['accounts']['subscribe']>['1']['onData'], undefined>
+  Exclude<
+    Parameters<ReturnType<typeof createPylon>['client']['accounts']['subscribe']>['1']['onData'],
+    undefined
+  >
 >[0][0]
 
-const pylon = createPylon('ws://localhost:9000')
-const subscriptions: Record<string, Subscription> = {}
+const Surface = () => {
+  const pylon = createPylon('ws://localhost:9000')
+  const subscriptions: Record<string, Subscription> = {}
+  const networks = new Set<number>([1, 137, 80001]) //TODO: populate from updates...
 
-const subscribe = async (address: string, processor: BalanceProcessor) => {
-  const sub = pylon.accounts.subscribe(address, {
-    onStarted() {
-      console.log('subscribed to account')
-    },
-    onData: (data) => {
-      console.log('got update for account', { data })
-      if (!data.length || !data[0]) return
-      const [{ address, ...chains }] = data
-      const account: Account = {
-        address: address as unknown as string,
-        inventory: {},
-        balances: {}
+  const subscribe = async (address: string, bProcessor: BalanceProcessor, iProcessor: InventoryProcessor) => {
+    const sub = pylon.client.accounts.subscribe(address, {
+      onStarted() {
+        console.log('subscribed to account')
+      },
+      onData: (data) => {
+        console.log('got update for account', { data })
+        if (!data.length || !data[0]) return
+        const [{ address, ...chains }] = data
+        const account: Account = {
+          address: address as unknown as string,
+          inventory: {},
+          balances: {}
+        }
+
+        console.log('chains received...', { chains })
+
+        Object.values(chains).forEach((chain) => {
+          if (!chain) return
+          const { inventory, balances } = chain as unknown as AccountResponse[0]
+          account.balances = { ...account.balances, ...balances }
+          account.inventory = { ...account.inventory, ...inventory }
+        })
+
+        console.log('account subscribed...', { account })
+        bProcessor.updateAccount(account)
+        iProcessor.updateAccount(account)
+      },
+      onError: (err: unknown) => {
+        console.error({ err })
       }
+    })
 
-      console.log('chains received...', { chains })
+    subscriptions[address.toLowerCase()] = Object.assign(sub, { address })
+  }
 
-      Object.values(chains).forEach((chain) => {
-        if (!chain) return
-        const { inventory, balances } = chain as unknown as AccountResponse[0]
-        account.balances = { ...account.balances, ...balances }
-        account.inventory = { ...account.inventory, ...inventory }
-      })
+  const unsubscribe = async (address: string) => {
+    subscriptions[address]?.unsubscribe()
+    delete subscriptions[address]
+  }
 
-      console.log('account subscribed...', { account })
-      processor.handleAccountUpdate(account)
-    },
-    onError: (err: unknown) => {
-      console.error({ err })
-    }
-  })
-
-  subscriptions[address.toLowerCase()] = Object.assign(sub, { address })
-}
-
-const unsubscribe = async (address: string) => {
-  subscriptions[address]?.unsubscribe()
-  delete subscriptions[address]
-}
-
-const stop = () => {
-  Object.keys(subscriptions).forEach((address) => {
-    unsubscribe(address)
-  })
-}
-
-const updateSubscribers = (store: Store, processor: BalanceProcessor) => {
-  // const observer = store.observer(() => {
-  const accounts = store('main.accounts')
-  Object.keys(subscriptions).forEach((address) => {
-    if (!accounts[address]) {
+  const stop = () => {
+    Object.keys(subscriptions).forEach((address) => {
       unsubscribe(address)
-    }
-  })
+    })
+  }
 
-  Object.keys(accounts).forEach((address) => {
-    if (!subscriptions[address]) {
-      subscribe(address, processor)
-    }
-  })
-  // })
+  const close = () => pylon.wsClient.close()
 
-  // return observer
+  const updateSubscribers = (store: Store, bProcessor: BalanceProcessor, iProcessor: InventoryProcessor) => {
+    const accounts = store('main.accounts')
+    Object.keys(subscriptions).forEach((address) => {
+      if (!accounts[address]) {
+        unsubscribe(address)
+      }
+    })
+
+    Object.keys(accounts).forEach((address) => {
+      if (!subscriptions[address]) {
+        subscribe(address, bProcessor, iProcessor)
+      }
+    })
+  }
+
+  return {
+    stop,
+    updateSubscribers,
+    networks,
+    close
+  }
 }
 
-const isMonitoring = () => Object.keys(subscriptions).length > 0
-const getChains = () => [1, 137, 80001] //TODO: assign this from the subscriptions somehow...
-
-export default {
-  stop,
-  isMonitoring,
-  updateSubscribers,
-  getChains
-}
+export default Surface

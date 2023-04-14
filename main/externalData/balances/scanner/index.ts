@@ -14,7 +14,7 @@ const scanInterval = {
   inactive: 60 * 10
 }
 
-function Scanner(store: Store, api: ReturnType<typeof BalancesStoreApi>, processor: BalanceProcessor) {
+function BalanceScanner(store: Store, api: ReturnType<typeof BalancesStoreApi>, processor: BalanceProcessor) {
   let scan: NodeJS.Timeout | null
   let workerController: BalancesWorkerController | null
   let onResume: (() => void) | null
@@ -272,4 +272,4 @@ function Scanner(store: Store, api: ReturnType<typeof BalancesStoreApi>, process
   return { start, stop, resume, pause, setAddress, addNetworks, removeNetworks, addTokens }
 }
 
-export default Scanner
+export default BalanceScanner
