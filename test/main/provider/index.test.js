@@ -1687,7 +1687,7 @@ describe('#assetsChanged', () => {
       expect(payload.params.subscription).toBe(subscription.id)
       expect(payload.params.result).toEqual(assets)
 
-      expect(hasSubscriptionPermission).toHaveBeenCalledWith(address, subscription.originId)
+      expect(hasSubscriptionPermission).toHaveBeenCalledWith('assetsChanged', address, subscription.originId)
 
       done()
     })
@@ -1829,7 +1829,9 @@ describe('state change events', () => {
       137: { primaryColor: 'accent8', nativeCurrency: { symbol: 'MATIC', name: 'Matic', decimals: 18 } }
     })
 
+    hasSubscriptionPermission.mockReturnValueOnce(true)
     store.getObserver('provider:chains').fire()
+    jest.runAllTimers()
   })
 
   it('fires an assetsChanged event to subscribers', (done) => {

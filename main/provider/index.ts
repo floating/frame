@@ -17,16 +17,17 @@ import accounts, {
   AddChainRequest,
   AddTokenRequest
 } from '../accounts'
+
+import FrameAccount from '../accounts/Account'
 import Chains, { Chain } from '../chains'
+import reveal from '../reveal'
 import { getSignerType, Type as SignerType } from '../../resources/domain/signer'
 import { normalizeChainId, TransactionData } from '../../resources/domain/transaction'
 import { populate as populateTransaction, maxFee, classifyTransaction } from '../transaction'
-import FrameAccount from '../accounts/Account'
 import { capitalize } from '../../resources/utils'
 import { ApprovalType } from '../../resources/constants'
 import { createObserver as AssetsObserver, loadAssets } from './assets'
 import { getVersionFromTypedData } from './typedData'
-import reveal from '../reveal'
 
 import {
   checkExistingNonceGas,
@@ -158,9 +159,7 @@ export class Provider extends EventEmitter {
 
   assetsChanged(address: string, assets: RPC.GetAssets.Assets) {
     this.subscriptions.assetsChanged
-      .filter((subscription) =>
-        hasSubscriptionPermission(SubscriptionType.ASSETS, address, subscription.originId)
-      )
+      .filter((subscription) => hasSubscriptionPermission('assetsChanged', address, subscription.originId))
       .forEach((subscription) => this.sendSubscriptionData(subscription.id, { ...assets, account: address }))
   }
 
@@ -175,9 +174,7 @@ export class Provider extends EventEmitter {
   // fires when the list of available chains changes
   chainsChanged(address: string, chains: RPC.GetEthereumChains.Chain[]) {
     this.subscriptions.chainsChanged
-      .filter((subscription) =>
-        hasSubscriptionPermission(SubscriptionType.CHAINS, address, subscription.originId)
-      )
+      .filter((subscription) => hasSubscriptionPermission('chainsChanged', address, subscription.originId))
       .forEach((subscription) => this.sendSubscriptionData(subscription.id, chains))
   }
 
