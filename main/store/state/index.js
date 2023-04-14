@@ -259,6 +259,7 @@ const initial = {
           infura: 'infuraKovan'
         },
         100: {
+          poa: 'gnosis',
           rpch: 'rpch'
         },
         137: {
@@ -395,7 +396,7 @@ const initial = {
           connection: {
             primary: {
               on: true,
-              current: 'RPCh',
+              current: 'gnosis',
               status: 'loading',
               connected: false,
               type: '',

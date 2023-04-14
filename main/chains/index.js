@@ -84,8 +84,6 @@ class ChainConnection extends EventEmitter {
 
     this.update(priority)
 
-    console.log({ target, priority, chainId: this.chainId })
-
     if (target === 'rpch') {
       // create rpch provider
       this[priority].provider = new RPChEthereumProvider(
@@ -96,16 +94,8 @@ class ChainConnection extends EventEmitter {
           client: 'blockwallet',
           crypto: RPChCrypto
         },
-        (k, v) => {
-          return new Promise((resolve) => {
-            set(k, v, resolve)
-          })
-        },
-        (k) => {
-          return new Promise((resolve) => {
-            get(k, resolve)
-          })
-        }
+        (k, v) => set(k, v),
+        (k) => get(k)
       )
       this[priority].blockMonitor = this._createBlockMonitor(this[priority].provider, priority)
     } else {
