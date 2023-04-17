@@ -67,6 +67,7 @@ class App extends React.Component {
     const isMainnetConnected =
       mainnet.on && (mainnet.connection.primary.connected || mainnet.connection.secondary.connected)
 
+<<<<<<< HEAD
     const ErrorComponent = () => {
       if (!isMainnetConnected) {
         return <MainnetDisconnected />
@@ -75,6 +76,15 @@ class App extends React.Component {
       return <FailedToLoad />
     }
     const shouldDisplayError = ready === undefined || sendDapp.status === 'failed'
+=======
+    const errorComponent =
+      !ready &&
+      (sendDapp.status !== 'ready' && !isMainnetConnected ? (
+        <MainnetDisconnected />
+      ) : sendDapp.status === 'failed' ? (
+        <FailedToLoad />
+      ) : null)
+>>>>>>> c6122d84 (fix typo)
 
     return (
       <div className='splash'>
