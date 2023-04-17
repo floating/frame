@@ -69,7 +69,11 @@ class App extends React.Component {
 
     const errorComponent =
       !ready &&
-      (!isMainnetConnected ? <MainnetDisconnected /> : sendDapp.status === 'failed' ? <FailedToLoad /> : null)
+      (sendDapp.status !== 'ready' && !isMainnetConnected ? (
+        <MainnetDisconnected />
+      ) : sendDapp.status === 'failed' ? (
+        <FailedToLoad />
+      ) : null)
 
     return (
       <div className='splash'>
