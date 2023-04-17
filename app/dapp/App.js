@@ -69,7 +69,7 @@ class App extends React.Component {
 
     const errorComponent =
       !ready &&
-      (!sendDapp.status === 'ready' && !isMainnetConnected ? (
+      (sendDapp.status !== 'ready' && !isMainnetConnected ? (
         <MainnetDisconnected />
       ) : sendDapp.status === 'failed' ? (
         <FailedToLoad />
