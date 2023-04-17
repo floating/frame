@@ -36,6 +36,14 @@ const MainnetDisconnected = () => {
   )
 }
 
+const Error = ({ isMainnetConnected }) => {
+  if (!isMainnetConnected) {
+    return <MainnetDisconnected />
+  }
+
+  return <FailedToLoad />
+}
+
 class App extends React.Component {
   constructor(...args) {
     super(...args)
@@ -67,13 +75,6 @@ class App extends React.Component {
     const isMainnetConnected =
       mainnet.on && (mainnet.connection.primary.connected || mainnet.connection.secondary.connected)
 
-    const Error = () => {
-      if (!isMainnetConnected) {
-        return <MainnetDisconnected />
-      }
-
-      return <FailedToLoad />
-    }
     const shouldDisplayError = ready === undefined || sendDapp.status === 'failed'
 
     return (
@@ -81,7 +82,7 @@ class App extends React.Component {
         <Native />
         <div className='main'>
           <div className='mainTop' />
-          {shouldDisplayError && <Error />}
+          {shouldDisplayError && <Error isMainnetConnected={isMainnetConnected} />}
         </div>
       </div>
     )
