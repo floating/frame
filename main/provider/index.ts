@@ -29,6 +29,7 @@ import { ApprovalType } from '../../resources/constants'
 import { createObserver as AssetsObserver, loadAssets } from './assets'
 import { getVersionFromTypedData } from './typedData'
 
+import { Subscription, SubscriptionType } from './subscriptions'
 import {
   checkExistingNonceGas,
   ecRecover,
@@ -60,13 +61,6 @@ import * as sigParser from '../signatures'
 import { hasAddress } from '../../resources/domain/account'
 import { mapRequest } from '../requests'
 
-type Subscription = {
-  id: string
-  originId: string
-}
-
-type Subscriptions = { [key in SubscriptionType]: Subscription[] }
-
 interface RequiredApproval {
   type: ApprovalType
   data: any
@@ -88,7 +82,7 @@ export class Provider extends EventEmitter {
   connection = Chains
 
   handlers: { [id: string]: any } = {}
-  subscriptions: Subscriptions = {
+  subscriptions: { [key in SubscriptionType]: Subscription[] } = {
     accountsChanged: [],
     assetsChanged: [],
     chainChanged: [],
@@ -159,7 +153,9 @@ export class Provider extends EventEmitter {
 
   assetsChanged(address: string, assets: RPC.GetAssets.Assets) {
     this.subscriptions.assetsChanged
-      .filter((subscription) => hasSubscriptionPermission('assetsChanged', address, subscription.originId))
+      .filter((subscription) =>
+        hasSubscriptionPermission(SubscriptionType.ASSETS, address, subscription.originId)
+      )
       .forEach((subscription) => this.sendSubscriptionData(subscription.id, { ...assets, account: address }))
   }
 
@@ -773,7 +769,7 @@ export class Provider extends EventEmitter {
 
   private createSubscription(payload: RPC.Subscribe.Request) {
     const subId = addHexPrefix(crypto.randomBytes(16).toString('hex'))
-    const subscriptionType = payload.params[0]
+    const subscriptionType = payload.params[0] as SubscriptionType
 
     this.subscriptions[subscriptionType] = this.subscriptions[subscriptionType] || []
     this.subscriptions[subscriptionType].push({ id: subId, originId: payload._origin })

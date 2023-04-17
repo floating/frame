@@ -8,14 +8,6 @@ type RPCRequestCallback = RPCCallback<RPCResponsePayload>
 type Address = string // 20 hex bytes, 0x-prefixed
 type Caip2ChainId = string // format: "<namespace>:<chainId>", ex: "eip155:1"
 
-enum SubscriptionType {
-  ACCOUNTS = 'accountsChanged',
-  ASSETS = 'assetsChanged',
-  CHAIN = 'chainChanged',
-  CHAINS = 'chainsChanged',
-  NETWORK = 'networkChanged'
-}
-
 interface RPCId {
   id: number
   jsonrpc: '2.0'
