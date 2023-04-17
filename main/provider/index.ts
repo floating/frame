@@ -29,7 +29,7 @@ import { ApprovalType } from '../../resources/constants'
 import { createObserver as AssetsObserver, loadAssets } from './assets'
 import { getVersionFromTypedData } from './typedData'
 
-import { Subscription, SubscriptionType } from './subscriptions'
+import { Subscription, SubscriptionType, hasSubscriptionPermission } from './subscriptions'
 import {
   checkExistingNonceGas,
   ecRecover,
@@ -40,7 +40,6 @@ import {
   getSignedAddress,
   requestPermissions,
   resError,
-  hasSubscriptionPermission,
   decodeMessage
 } from './helpers'
 

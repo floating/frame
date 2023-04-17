@@ -1,17 +1,17 @@
+import log from 'electron-log'
+import { utils } from 'ethers'
+import { validate as validateUUID } from 'uuid'
+import { addHexPrefix, intToHex } from '@ethereumjs/util'
+import { SignTypedDataVersion } from '@metamask/eth-sig-util'
+
 import provider from '../../../main/provider'
 import accounts from '../../../main/accounts'
 import connection from '../../../main/chains'
-import { hasSubscriptionPermission } from '../../../main/provider/helpers'
 import store from '../../../main/store'
 import chainConfig from '../../../main/chains/config'
+import { hasSubscriptionPermission } from '../../../main/provider/subscriptions'
 import { gweiToHex } from '../../../resources/utils'
 import { Type as SignerType } from '../../../resources/domain/signer'
-
-import { validate as validateUUID } from 'uuid'
-import { utils } from 'ethers'
-import { addHexPrefix, intToHex } from '@ethereumjs/util'
-import log from 'electron-log'
-import { SignTypedDataVersion } from '@metamask/eth-sig-util'
 
 const address = '0x22dd63c3619818fdbc262c78baee43cb61e9cccf'
 
@@ -23,13 +23,11 @@ jest.mock('../../../main/accounts', () => ({}))
 jest.mock('../../../main/reveal', () => ({
   resolveEntityType: jest.fn().mockResolvedValue('external')
 }))
-jest.mock('../../../main/provider/helpers', () => {
-  const helpers = jest.requireActual('../../../main/provider/helpers')
 
-  // this entire module should be mocked for unit tests but many of the tests below were
-  // written relying on the real implementation so they need to be migrated individually
+jest.mock('../../../main/provider/subscriptions', () => {
+  const { SubscriptionType } = jest.requireActual('../../../main/provider/subscriptions')
   return {
-    ...helpers,
+    SubscriptionType,
     hasSubscriptionPermission: jest.fn()
   }
 })
