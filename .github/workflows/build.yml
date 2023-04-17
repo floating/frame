@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - 'develop'
+      - '0.6.3-build'
 
 env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -53,7 +54,7 @@ jobs:
       CSC_LINK: ${{ secrets[matrix.cert_key] }}
       CSC_KEY_PASSWORD: ${{ secrets[matrix.cert_password_key] }}
       APPLE_ID: ${{ secrets[matrix.apple_id_key] }}
-      APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets[matrix.apple_app_specific_password_key] }}
+      APPLE_ID_PASSWORD: ${{ secrets[matrix.apple_app_specific_password_key] }}
 
     steps:
       - uses: actions/checkout@v3

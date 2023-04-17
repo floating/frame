@@ -4,6 +4,38 @@ import Restore from 'react-restore'
 import link from '../../resources/link'
 import Native from '../../resources/Native'
 
+const FailedToLoad = () => {
+  return (
+    <div className='mainDappLoading'>
+      <div className='mainDappLoadingText'>
+        <div>{'Send dapp failed to load'}</div>
+      </div>
+    </div>
+  )
+}
+
+const MainnetDisconnected = () => {
+  return (
+    <div className='mainDappLoading'>
+      <div className='mainDappLoadingText'>
+        <div>{'Mainnet connection required'}</div>
+        <div>{'to resolve ENS for Send dapp'}</div>
+      </div>
+      <div
+        className='mainDappEnableChains'
+        onClick={() => {
+          link.send('tray:action', 'navDash', { view: 'chains', data: {} })
+          setTimeout(() => {
+            link.send('frame:close')
+          }, 100)
+        }}
+      >
+        View Chains
+      </div>
+    </div>
+  )
+}
+
 class App extends React.Component {
   constructor(...args) {
     super(...args)
@@ -25,7 +57,7 @@ class App extends React.Component {
     }
 
     const frame = this.store('main.frames', window.frameId)
-    const currentView = frame.views[frame.currentView] || {}
+    const { ready } = frame.views[frame.currentView] || {}
 
     // Hard code send dapp status for now
     const sendDapp =
@@ -35,38 +67,16 @@ class App extends React.Component {
     const isMainnetConnected =
       mainnet.on && (mainnet.connection.primary.connected || mainnet.connection.secondary.connected)
 
+    const errorComponent =
+      !ready &&
+      (!isMainnetConnected ? <MainnetDisconnected /> : sendDapp.status === 'failed' ? <FailedToLoad /> : null)
+
     return (
       <div className='splash'>
         <Native />
         <div className='main'>
           <div className='mainTop' />
-          {!currentView.ready && sendDapp.status === 'failed' ? (
-            <div className='mainDappLoading'>
-              <div className='mainDappLoadingText'>
-                {isMainnetConnected ? (
-                  <div>{'Send dapp failed to load'}</div>
-                ) : (
-                  <>
-                    <div>{'Mainnet connection required'}</div>
-                    <div>{'to resolve ENS for Send dapp'}</div>
-                  </>
-                )}
-              </div>
-              {!isMainnetConnected && (
-                <div
-                  className='mainDappEnableChains'
-                  onClick={() => {
-                    link.send('tray:action', 'navDash', { view: 'chains', data: {} })
-                    setTimeout(() => {
-                      link.send('frame:close')
-                    }, 100)
-                  }}
-                >
-                  View Chains
-                </div>
-              )}
-            </div>
-          ) : null}
+          {errorComponent}
         </div>
       </div>
     )

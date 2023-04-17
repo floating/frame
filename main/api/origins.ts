@@ -10,6 +10,7 @@ const dev = process.env.NODE_ENV === 'development'
 const activeExtensionChecks: Record<string, Promise<boolean>> = {}
 const activePermissionChecks: Record<string, Promise<Permission | undefined>> = {}
 const extensionPrefixes = {
+  chrome: 'chrome-extension',
   firefox: 'moz-extension',
   safari: 'safari-web-extension'
 }
@@ -29,7 +30,10 @@ export interface FrameExtension {
 }
 
 // allows the Frame extension to request specific methods
-const trustedExtensionMethods = ['wallet_getEthereumChains']
+const trustedInternalMethods = ['wallet_getEthereumChains']
+
+const isTrustedOrigin = (origin: string) => origin === 'frame-extension' || origin === 'frame-internal'
+const isInternalMethod = (method: string) => trustedInternalMethods.includes(method)
 
 const storeApi = {
   getPermission: (address: Address, origin: string) => {
@@ -163,6 +167,10 @@ export function parseFrameExtension(req: IncomingMessage): FrameExtension | unde
   if (origin === 'chrome-extension://ldcoohedfbjoobcadoglnnmmfbdlmmhf') {
     // Match production chrome
     return { browser: 'chrome', id: 'ldcoohedfbjoobcadoglnnmmfbdlmmhf' }
+  } else if (origin.startsWith(`${extensionPrefixes.chrome}://`) && dev && hasExtensionIdentity) {
+    // Match Chrome in dev
+    const extensionId = origin.substring(extensionPrefixes.chrome.length + 3)
+    return { browser: 'chrome', id: extensionId }
   } else if (origin.startsWith(`${extensionPrefixes.firefox}://`) && hasExtensionIdentity) {
     // Match production Firefox
     const extensionId = origin.substring(extensionPrefixes.firefox.length + 3)
@@ -186,7 +194,7 @@ export async function isTrusted(payload: RPCRequestPayload) {
   const { name: originName } = store('main.origins', payload._origin) as { name: string }
   const currentAccount = accounts.current()
 
-  if (originName === 'frame-extension' && trustedExtensionMethods.includes(payload.method)) {
+  if (isTrustedOrigin(originName) && isInternalMethod(payload.method)) {
     return true
   }
 

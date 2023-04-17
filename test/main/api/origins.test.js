@@ -306,22 +306,26 @@ describe('#isTrusted', () => {
   })
 
   describe('extension requests', () => {
+    // these origins are "trusted" internally and thus have access to specific methods without approval
+    const trustedOrigins = ['frame-extension', 'frame-internal']
     const trustedExtensionMethods = ['wallet_getEthereumChains']
 
-    trustedExtensionMethods.forEach((method) => {
-      it(`trusts all requests for ${method} from the frame extension`, async () => {
-        const payload = { method, _origin: 'ac93061b-3575-40c5-b526-4932b02e1f3f' }
-        store.set('main.origins', payload._origin, { name: 'frame-extension' })
+    trustedOrigins.forEach((origin) => {
+      it(`does not trust requests from the ${origin} origin by default`, async () => {
+        const payload = { method: 'eth_accounts', _origin: 'ac93061b-3575-40c5-b526-4932b02e1f3f' }
+        store.set('main.origins', payload._origin, { name: origin })
 
-        return expect(isTrusted(payload)).resolves.toBe(true)
+        return expect(isTrusted(payload)).resolves.toBe(false)
       })
-    })
 
-    it('does not trust requests from the frame extension by default', async () => {
-      const payload = { method: 'eth_accounts', _origin: 'ac93061b-3575-40c5-b526-4932b02e1f3f' }
-      store.set('main.origins', payload._origin, { name: 'frame-extension' })
+      trustedExtensionMethods.forEach((method) => {
+        it(`trusts all requests for ${method} from the ${origin} origin`, async () => {
+          const payload = { method, _origin: 'ac93061b-3575-40c5-b526-4932b02e1f3f' }
+          store.set('main.origins', payload._origin, { name: origin })
 
-      return expect(isTrusted(payload)).resolves.toBe(false)
+          return expect(isTrusted(payload)).resolves.toBe(true)
+        })
+      })
     })
   })
 
