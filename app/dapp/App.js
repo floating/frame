@@ -6,17 +6,15 @@ import Native from '../../resources/Native'
 
 const FailedToLoad = () => {
   return (
-    <div className='mainDappLoading'>
-      <div className='mainDappLoadingText'>
-        <div>{'Send dapp failed to load'}</div>
-      </div>
+    <div className='mainDappLoadingText'>
+      <div>{'Send dapp failed to load'}</div>
     </div>
   )
 }
 
 const MainnetDisconnected = () => {
   return (
-    <div className='mainDappLoading'>
+    <>
       <div className='mainDappLoadingText'>
         <div>{'Mainnet connection required'}</div>
         <div>{'to resolve ENS for Send dapp'}</div>
@@ -32,7 +30,7 @@ const MainnetDisconnected = () => {
       >
         View Chains
       </div>
-    </div>
+    </>
   )
 }
 
@@ -52,7 +50,7 @@ class App extends React.Component {
 
   render() {
     const dapp = this.store(`main.dapp.details.${this.props.id}`)
-    console.log('dapp info is ', dapp)
+    console.log('dapp info: ', dapp)
     let name = dapp ? dapp.domain : null
     if (name) {
       name = name.split('.')
@@ -75,14 +73,18 @@ class App extends React.Component {
     const isMainnetConnected =
       mainnet.on && (mainnet.connection.primary.connected || mainnet.connection.secondary.connected)
 
-    const shouldDisplayError = ready === undefined || sendDapp.status === 'failed'
+    const shouldDisplayError = !isMainnetConnected || sendDapp.status === 'failed'
+    const shouldDisplaySpinner = !ready && isMainnetConnected
 
     return (
       <div className='splash'>
         <Native />
         <div className='main'>
           <div className='mainTop' />
-          {shouldDisplayError && <Error isMainnetConnected={isMainnetConnected} />}
+          <div className='mainDappLoading'>
+            {shouldDisplaySpinner && <div className='loader' />}
+            {shouldDisplayError && <Error isMainnetConnected={isMainnetConnected} />}
+          </div>
         </div>
       </div>
     )
