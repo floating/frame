@@ -50,7 +50,6 @@ class App extends React.Component {
 
   render() {
     const dapp = this.store(`main.dapp.details.${this.props.id}`)
-    console.log('dapp info: ', dapp)
     let name = dapp ? dapp.domain : null
     if (name) {
       name = name.split('.')
