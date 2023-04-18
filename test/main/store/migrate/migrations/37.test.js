@@ -6,7 +6,15 @@ let state
 beforeEach(() => {
   state = createState(migration.version - 1)
 
-  state.main.shortcuts.altSlash = true
+  state.main.networks.ethereum = {
+    100: {
+      id: 100,
+      connection: {
+        primary: { current: 'custom', custom: 'myrpc' },
+        secondary: { current: 'local', custom: '' }
+      }
+    }
+  }
 })
 
 it('should have migration version 37', () => {
@@ -14,31 +22,35 @@ it('should have migration version 37', () => {
   expect(version).toBe(37)
 })
 
-it('should update the summon shortcut when enabled', () => {
-  const updatedState = migration.migrate(state)
-  const { shortcuts } = updatedState.main
+const connectionPriorities = ['primary', 'secondary']
 
-  expect(shortcuts).toStrictEqual({
-    summon: {
-      modifierKeys: ['Alt'],
-      shortcutKey: 'Slash',
-      enabled: true,
-      configuring: false
-    }
+connectionPriorities.forEach((priority) => {
+  it(`updates a ${priority} Gnosis connection`, () => {
+    state.main.networks.ethereum[100].connection[priority].current = 'poa'
+
+    const updatedState = migration.migrate(state)
+    const gnosis = updatedState.main.networks.ethereum[100]
+
+    expect(gnosis.connection[priority].current).toBe('custom')
+    expect(gnosis.connection[priority].custom).toBe('https://rpc.gnosischain.com')
+  })
+
+  it(`does not update an existing custom ${priority} Gnosis connection`, () => {
+    state.main.networks.ethereum[100].connection[priority].current = 'custom'
+    state.main.networks.ethereum[100].connection[priority].custom = 'https://myconnection.io'
+
+    const updatedState = migration.migrate(state)
+    const gnosis = updatedState.main.networks.ethereum[100]
+
+    expect(gnosis.connection[priority].current).toBe('custom')
+    expect(gnosis.connection[priority].custom).toBe('https://myconnection.io')
   })
 })
 
-it('should update the summon shortcut when disabled', () => {
-  state.main.shortcuts.altSlash = false
-  const updatedState = migration.migrate(state)
-  const { shortcuts } = updatedState.main
+it('takes no action if no Gnosis chain is present', () => {
+  delete state.main.networks.ethereum[100]
 
-  expect(shortcuts).toStrictEqual({
-    summon: {
-      modifierKeys: ['Alt'],
-      shortcutKey: 'Slash',
-      enabled: false,
-      configuring: false
-    }
-  })
+  const updatedState = migration.migrate(state)
+
+  expect(updatedState.main.networks).toStrictEqual({ ethereum: {} })
 })
