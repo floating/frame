@@ -1,10 +1,16 @@
 import log from 'electron-log'
 
-import { v36Connection, v36StateSchema } from '../36/schema'
+import { v36Connection, v36Preset, v36StateSchema } from '../36/schema'
+import { v37Connection, v37Preset, v37State } from './schema'
 
-function removePoaConnection(connection: v36Connection) {
+function removePoaConnection(connection: v36Connection): v37Connection {
   // remove Gnosis chain preset
-  const isPoa = connection.current === 'poa'
+  const { current: currentPreset } = connection
+  const isValidPreset = (current: v36Preset): current is v37Preset => {
+    return current !== 'poa'
+  }
+
+  const isPoa = !isValidPreset(currentPreset)
 
   if (isPoa) {
     log.info('Migration 37: removing POA presets from Gnosis chain')
@@ -12,7 +18,7 @@ function removePoaConnection(connection: v36Connection) {
 
   return {
     ...connection,
-    current: isPoa ? 'custom' : connection.current,
+    current: isPoa ? 'custom' : currentPreset,
     custom: isPoa ? 'https://rpc.gnosischain.com' : connection.custom
   }
 }
@@ -25,13 +31,25 @@ const migrate = (initial: unknown) => {
     if (gnosisChainPresent) {
       const gnosisChain = state.main.networks.ethereum[100]
 
-      state.main.networks.ethereum[100] = {
-        ...gnosisChain,
-        connection: {
-          primary: removePoaConnection(gnosisChain.connection.primary),
-          secondary: removePoaConnection(gnosisChain.connection.secondary)
+      const migratedState: v37State = {
+        ...state,
+        main: {
+          ...state.main,
+          networks: {
+            ethereum: {
+              100: {
+                ...gnosisChain,
+                connection: {
+                  primary: removePoaConnection(gnosisChain.connection.primary),
+                  secondary: removePoaConnection(gnosisChain.connection.secondary)
+                }
+              }
+            }
+          }
         }
       }
+
+      return migratedState
     }
 
     return state

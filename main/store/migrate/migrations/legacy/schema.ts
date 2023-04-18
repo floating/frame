@@ -2,7 +2,7 @@ import { z } from 'zod'
 import log from 'electron-log'
 
 // this schema represents the version of the state when we started using Zod, prior
-// to state version 35
+// to state version 36
 
 export const LegacyMuteSchema = z.object({}).passthrough()
 

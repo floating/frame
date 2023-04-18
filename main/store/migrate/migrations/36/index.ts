@@ -1,76 +1,68 @@
-import { z } from 'zod'
 import log from 'electron-log'
 
-import { v35Connection, v35Preset, v35StateSchema } from '../35/schema'
-import { v36Connection, v36Preset, v36State } from './schema'
+import { v36Chain, v36State } from './schema'
+import { LegacyChain, LegacyConnection, LegacyStateSchema } from '../legacy/schema'
 
-function removePoaConnection(connection: v35Connection): v36Connection {
-  // remove Gnosis chain preset
-  const { current: currentPreset } = connection
-  const isValidPreset = (current: v35Preset): current is v36Preset => {
-    return current !== 'poa'
-  }
-
-  const isPoa = !isValidPreset(currentPreset)
-
-// because this is the first migration that uses Zod parsing and validation,
-// create a version of the schema that removes invalid chains, allowing them to
-// also be "false" so that we can filter them out later in a transform. future migrations
-// that use this schema can be sure that the chains are all valid afterwards
-const ParsedChainSchema = z.union([v36ChainSchema, z.boolean()]).catch(false)
-
-  return {
-    ...connection,
-    current: isPoa ? 'custom' : currentPreset,
-    custom: isPoa ? 'https://rpc.gnosischain.com' : connection.custom
-  }
-}
+const pylonChainIds = ['1', '5', '10', '137', '42161', '11155111']
+const retiredChainIds = ['3', '4', '42']
+const chainsToMigrate = [...pylonChainIds, ...retiredChainIds]
 
 const migrate = (initial: unknown) => {
-  try {
-    const state = v35StateSchema.parse(initial)
-    const gnosisChainPresent = '100' in state.main.networks.ethereum
+  let showMigrationWarning = false
 
-    if (gnosisChainPresent) {
-      const gnosisChain = state.main.networks.ethereum[100]
+  const updateChain = (chain: LegacyChain) => {
+    const removeRpcConnection = (connection: LegacyConnection) => {
+      const isServiceRpc = connection.current === 'infura' || connection.current === 'alchemy'
 
-      const migratedState: v36State = {
-        ...state,
-        main: {
-          ...state.main,
-          networks: {
-            ethereum: {
-              100: {
-                ...gnosisChain,
-                connection: {
-                  primary: removePoaConnection(gnosisChain.connection.primary),
-                  secondary: removePoaConnection(gnosisChain.connection.secondary)
-                }
-              }
-            }
-          }
-        }
+      if (isServiceRpc) {
+        log.info(`Migration 36: removing ${connection.current} preset from chain ${chain.id}`)
+        showMigrationWarning = true
       }
 
-      return migratedState
+      return {
+        ...connection,
+        current: isServiceRpc ? 'custom' : connection.current,
+        custom: isServiceRpc ? '' : connection.custom
+      }
+    }
+
+    const { primary, secondary } = chain.connection
+
+    const updatedChain = {
+      ...chain,
+      connection: {
+        ...chain.connection,
+        primary: removeRpcConnection(primary),
+        secondary: removeRpcConnection(secondary)
+      }
     }
 
     return updatedChain
   }
 
   try {
-    const state = StateSchema.parse(initial)
+    const state = LegacyStateSchema.parse(initial)
 
     const chainEntries = Object.entries(state.main.networks.ethereum)
 
     const migratedChains = chainEntries
       .filter(([id]) => chainsToMigrate.includes(id))
-      .map(([id, chain]) => [id, updateChain(chain as v36Chain)])
+      .map(([id, chain]) => [id, updateChain(chain as LegacyChain)])
 
-    state.main.networks.ethereum = Object.fromEntries([...chainEntries, ...migratedChains])
-    state.main.mute.migrateToPylon = !showMigrationWarning
+    const migratedState: v36State = {
+      ...state,
+      main: {
+        ...state.main,
+        networks: {
+          ethereum: Object.fromEntries([...chainEntries, ...migratedChains])
+        },
+        mute: {
+          migrateToPylon: !showMigrationWarning
+        }
+      }
+    }
 
-    return state
+    return migratedState
   } catch (e) {
     log.error('Migration 36: could not parse state', e)
   }
