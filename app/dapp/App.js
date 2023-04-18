@@ -72,8 +72,8 @@ class App extends React.Component {
     const isMainnetConnected =
       mainnet.on && (mainnet.connection.primary.connected || mainnet.connection.secondary.connected)
 
-    const shouldDisplayError = !isMainnetConnected || sendDapp.status === 'failed'
-    const shouldDisplaySpinner = !ready && isMainnetConnected
+    const shouldDisplayError =
+      (sendDapp.status !== 'ready' && !isMainnetConnected) || sendDapp.status === 'failed'
 
     return (
       <div className='splash'>
@@ -81,8 +81,11 @@ class App extends React.Component {
         <div className='main'>
           <div className='mainTop' />
           <div className='mainDappLoading'>
-            {shouldDisplaySpinner && <div className='loader' />}
-            {shouldDisplayError && <Error isMainnetConnected={isMainnetConnected} />}
+            {shouldDisplayError ? (
+              <Error isMainnetConnected={isMainnetConnected} />
+            ) : (
+              !ready && <div className='loader' />
+            )}
           </div>
         </div>
       </div>
