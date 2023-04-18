@@ -26,18 +26,6 @@ interface Frame {
   views: Record<string, ViewMetadata>
 }
 
-interface Dapp {
-  id?: string
-  ens: string
-  status?: string
-  config: Record<string, string>
-  content?: string // IPFS hash
-  manifest?: any
-  current?: any
-  openWhenReady: boolean
-  checkStatusRetryCount: number
-}
-
 type HotSignerType = 'ring' | 'seed'
 type HardwareSignerType = 'trezor' | 'ledger' | 'lattice'
 type SignerType = HotSignerType | HardwareSignerType
