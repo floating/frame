@@ -6,17 +6,15 @@ import Native from '../../resources/Native'
 
 const FailedToLoad = () => {
   return (
-    <div className='mainDappLoading'>
-      <div className='mainDappLoadingText'>
-        <div>{'Send dapp failed to load'}</div>
-      </div>
+    <div className='mainDappLoadingText'>
+      <div>{'Send dapp failed to load'}</div>
     </div>
   )
 }
 
 const MainnetDisconnected = () => {
   return (
-    <div className='mainDappLoading'>
+    <>
       <div className='mainDappLoadingText'>
         <div>{'Mainnet connection required'}</div>
         <div>{'to resolve ENS for Send dapp'}</div>
@@ -32,8 +30,16 @@ const MainnetDisconnected = () => {
       >
         View Chains
       </div>
-    </div>
+    </>
   )
+}
+
+const Error = ({ isMainnetConnected }) => {
+  if (!isMainnetConnected) {
+    return <MainnetDisconnected />
+  }
+
+  return <FailedToLoad />
 }
 
 class App extends React.Component {
@@ -44,7 +50,6 @@ class App extends React.Component {
 
   render() {
     const dapp = this.store(`main.dapp.details.${this.props.id}`)
-    console.log('dapp info is ', dapp)
     let name = dapp ? dapp.domain : null
     if (name) {
       name = name.split('.')
@@ -67,20 +72,21 @@ class App extends React.Component {
     const isMainnetConnected =
       mainnet.on && (mainnet.connection.primary.connected || mainnet.connection.secondary.connected)
 
-    const errorComponent =
-      !ready &&
-      (sendDapp.status !== 'ready' && !isMainnetConnected ? (
-        <MainnetDisconnected />
-      ) : sendDapp.status === 'failed' ? (
-        <FailedToLoad />
-      ) : null)
+    const shouldDisplayError =
+      (sendDapp.status !== 'ready' && !isMainnetConnected) || sendDapp.status === 'failed'
 
     return (
       <div className='splash'>
         <Native />
         <div className='main'>
           <div className='mainTop' />
-          {errorComponent}
+          <div className='mainDappLoading'>
+            {shouldDisplayError ? (
+              <Error isMainnetConnected={isMainnetConnected} />
+            ) : (
+              !ready && <div className='loader' />
+            )}
+          </div>
         </div>
       </div>
     )
