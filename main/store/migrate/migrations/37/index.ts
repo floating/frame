@@ -1,30 +1,40 @@
 import log from 'electron-log'
 
-import { v35StateSchema } from '../35/schema'
+import { v36Connection, v36StateSchema } from '../36/schema'
 
-import type { v37State } from './schema'
+function removePoaConnection(connection: v36Connection) {
+  // remove Gnosis chain preset
+  const isPoa = connection.current === 'poa'
+
+  if (isPoa) {
+    log.info('Migration 37: removing POA presets from Gnosis chain')
+  }
+
+  return {
+    ...connection,
+    current: isPoa ? 'custom' : connection.current,
+    custom: isPoa ? 'https://rpc.gnosischain.com' : connection.custom
+  }
+}
 
 const migrate = (initial: unknown) => {
   try {
-    const state = v35StateSchema.parse(initial)
-    const summonShortcutEnabled = state.main.shortcuts.altSlash
+    const state = v36StateSchema.parse(initial)
+    const gnosisChainPresent = '100' in state.main.networks.ethereum
 
-    const migratedState: v37State = {
-      ...state,
-      main: {
-        ...state.main,
-        shortcuts: {
-          summon: {
-            modifierKeys: ['Alt'],
-            shortcutKey: 'Slash',
-            enabled: summonShortcutEnabled,
-            configuring: false
-          }
+    if (gnosisChainPresent) {
+      const gnosisChain = state.main.networks.ethereum[100]
+
+      state.main.networks.ethereum[100] = {
+        ...gnosisChain,
+        connection: {
+          primary: removePoaConnection(gnosisChain.connection.primary),
+          secondary: removePoaConnection(gnosisChain.connection.secondary)
         }
       }
     }
 
-    return migratedState
+    return state
   } catch (e) {
     log.error('Migration 37: could not parse state', e)
   }
