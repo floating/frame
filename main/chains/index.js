@@ -22,6 +22,94 @@ const { createGasCalculator } = require('./gas')
 // https://support.arbitrum.io/hc/en-us/articles/4415963644955-How-the-fees-are-calculated-on-Arbitrum
 const legacyChains = [250, 4002, 42161]
 
+class FrameRpchProvider extends RPChEthereumProvider {
+  constructor(url, hoprSdkOps, setKeyVal, getKeyVal) {
+    super(url, hoprSdkOps, setKeyVal, getKeyVal)
+    this.connected = false
+    this.subscriptions = false
+    this.status = 'loading'
+    this.url = url
+    setTimeout(() => this.create(), 0)
+    this.sdk.debug('rpch*')
+  }
+
+  onError(err) {
+    if (!this.closed && this.listenerCount('error')) this.emit('error', err)
+  }
+
+  create() {
+    this.on('error', () => {
+      if (this.connected) this.close()
+    })
+    this.sdk.start().then(() => {
+      this.init()
+    })
+  }
+
+  init() {
+    this.send({ method: 'net_version', params: [], id: this._nextId++, jsonrpc: '2.0' }, (err, res) => {
+      console.log({ res })
+      if (err) return this.onError(err)
+      this.connected = true
+      this.emit('connect')
+    })
+  }
+
+  pollSubscriptions() {
+    log.error('subscriptions are not supported')
+  }
+
+  close() {
+    this.emit('close')
+    this.closed = true
+    this.sdk.stop()
+    this.removeAllListeners()
+  }
+
+  filterStatus(res) {
+    if (res.status >= 200 && res.status < 300) return res
+    const error = new Error(res.statusText)
+    throw error.message
+  }
+
+  error(payload, message, code = -1) {
+    this.emit('payload', {
+      id: payload.id,
+      jsonrpc: payload.jsonrpc,
+      error: { message, code }
+    })
+  }
+
+  send(payload, callback) {
+    if (!this.sdk.isReady) return this.error(payload, 'Not connected')
+    if (this.closed) return this.error(payload, 'Not connected')
+
+    return this.sdk
+      .createRequest(this.url, JSON.stringify(payload))
+      .then((request) => {
+        return this.sdk.sendRequest(request).then((response) => {
+          return callback(null, JSON.parse(response.body))
+        })
+      })
+      .catch((e) => {
+        callback(e, null)
+      })
+  }
+
+  async sendAsync(payload, callback) {
+    if (!this.sdk.isReady) return
+    if (this.closed) return this.error(payload, 'Not connected')
+
+    const request = await this.sdk.createRequest(this.url, JSON.stringify(payload))
+    try {
+      const response = await this.sdk.sendRequest(request)
+      callback(null, JSON.parse(response.body))
+    } catch (e) {
+      callback(e, null)
+    }
+  }
+}
+
 export const createAsyncKeyValStore = () => {
   const store = new Map()
 
@@ -86,7 +174,7 @@ class ChainConnection extends EventEmitter {
 
     if (target === 'rpch') {
       // create rpch provider
-      this[priority].provider = new RPChEthereumProvider(
+      this[priority].provider = new FrameRpchProvider(
         'https://primary.gnosis-chain.rpc.hoprtech.net',
         {
           timeout: 10000,
