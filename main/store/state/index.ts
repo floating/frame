@@ -120,6 +120,7 @@ const mainState: M = {
     signerCompatibilityWarning: main('mute.signerCompatibilityWarning', false)
   },
   shortcuts: {
+    altSlash: main('shortcuts.altSlash', true),
     summon: main('shortcuts.summon', {
       modifierKeys: ['Alt'],
       shortcutKey: 'Slash',
