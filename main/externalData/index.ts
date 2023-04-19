@@ -17,7 +17,7 @@ let activeAccount = ''
 const activeUpdated = (current: string) => current !== activeAccount
 const usePylonUpdated = (newMode: boolean) => newMode !== pylonActive
 
-import type { Chain, Token } from '../store/state'
+import type { Token } from '../store/state'
 
 export interface DataScanner {
   close: () => void
