@@ -5,6 +5,8 @@ const { randomBytes } = require('crypto')
 import { isAddress } from '@ethersproject/address'
 import { openFileDialog } from '../windows/dialog'
 import { openBlockExplorer } from '../windows/window'
+import surface from '../externalData/surface'
+import InventoryProcessor from '../externalData/inventory/processor'
 
 const accounts = require('../accounts').default
 const signers = require('../signers').default
@@ -307,6 +309,10 @@ const rpc = {
     } else {
       store.notify('openExplorer', { chain })
     }
+  },
+  subscribeToItems(account, items, cb) {
+    log.verbose('Subscribing to items', { account, items })
+    surface.subscribeToItems(account, items, InventoryProcessor(store))
   }
 }
 

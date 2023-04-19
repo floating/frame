@@ -1,99 +1,96 @@
-import React from 'react'
-import Restore from 'react-restore'
+import React, { useState, useEffect } from 'react'
+import link from '../../../../../resources/link'
 
-class Inventory extends React.Component {
-  constructor(...args) {
-    super(...args)
-    this.state = {
-      hoverAsset: false
+const toItems = (contract, collection) =>
+  Object.keys(collection.items).map((tokenId) => ({
+    contract,
+    chainId: collection.meta.chainId,
+    tokenId
+  }))
+
+const InventoryCollection = ({ expandedData = {}, inventory, onAssetClick, account }) => {
+  const [hoverAsset, setHoverAsset] = useState(false)
+  const k = expandedData.currentCollection
+  if (!k || !account || !inventory) return
+
+  useEffect(() => {
+    if (k) {
+      const collection = inventory[k]
+      const items = toItems(k, collection)
+      link.rpc('subscribeToItems', account, items, () => {})
     }
-  }
+  }, [])
 
-  render() {
-    const inventory = this.store('main.inventory', this.props.account)
-    const expandedData = this.props.expandedData || {}
-    const k = expandedData.currentCollection
-    return (
-      <div className='inventoryDisplay'>
-        <div className='inventoryPreview'>
-          {this.state.hoverAsset ? (
-            <div className='inventoryPreviewMedia'>
-              {this.state.hoverAsset.img ? (
-                <img
-                  src={`https://proxy.pylon.link?type=nft&target=${encodeURIComponent(
-                    this.state.hoverAsset.img
-                  )}`}
-                  loading='lazy'
-                  alt={this.state.hoverAsset.name.toUpperCase()}
-                />
-              ) : null}
-            </div>
-          ) : (
-            <div
-              className='inventoryPreviewCollection'
-              style={
-                inventory[k].meta.image
-                  ? {
-                      backgroundImage: `url(https://proxy.pylon.link?type=nft&target=${encodeURIComponent(
-                        inventory[k].meta.image
-                      )})`
-                    }
-                  : {}
-              }
-            />
-          )}
-        </div>
-        <div className='inventoryPreviewTitle'>
-          {this.state.hoverAsset ? this.state.hoverAsset.name : inventory[k].meta.name}
-        </div>
-        <div className='inventoryCollectionItems'>
-          {Object.keys(inventory[k].items || {})
-            .sort((a, b) => {
-              a = inventory[k].items[a].tokenId
-              b = inventory[k].items[b].tokenId
-              return a < b ? -1 : b > a ? 1 : 0
-            })
-            .map((id) => {
-              const { tokenId, name, img, openSeaLink } = inventory[k].items[id]
-              return (
-                <div
-                  key={id}
-                  className='inventoryCollectionItem'
-                  onClick={() => {
-                    this.store.notify('openExternal', { url: openSeaLink })
-                  }}
-                  onMouseEnter={() => {
-                    this.setState({
-                      hoverAsset: {
-                        name,
-                        tokenId,
-                        img
-                      }
-                    })
-                  }}
-                  onMouseLeave={() => {
-                    this.setState({
-                      hoverAsset: false
-                    })
-                  }}
-                >
-                  {img ? (
-                    <div className='inventoryItemImage'>
-                      <img
-                        src={`https://proxy.pylon.link?type=nft&target=${encodeURIComponent(img)}`}
-                        loading='lazy'
-                        alt={name.toUpperCase()}
-                      />
-                    </div>
-                  ) : null}
-                </div>
-              )
-            })}
-          <div className='inventoryCollectionLine' />
-        </div>
+  return (
+    <div className='inventoryDisplay'>
+      <div className='inventoryPreview'>
+        {hoverAsset ? (
+          <div className='inventoryPreviewMedia'>
+            {hoverAsset.img ? (
+              <img
+                src={`https://proxy.pylon.link?type=nft&target=${encodeURIComponent(hoverAsset.img)}`}
+                loading='lazy'
+                alt={hoverAsset.name.toUpperCase()}
+              />
+            ) : null}
+          </div>
+        ) : (
+          <div
+            className='inventoryPreviewCollection'
+            style={
+              inventory[k].meta.image
+                ? {
+                    backgroundImage: `url(https://proxy.pylon.link?type=nft&target=${encodeURIComponent(
+                      inventory[k].meta.image
+                    )})`
+                  }
+                : {}
+            }
+          />
+        )}
       </div>
-    )
-  }
+      <div className='inventoryPreviewTitle'>{hoverAsset ? hoverAsset.name : inventory[k].meta.name}</div>
+      <div className='inventoryCollectionItems'>
+        {Object.keys(inventory[k].items || {})
+          .sort((a, b) => {
+            a = inventory[k].items[a].tokenId
+            b = inventory[k].items[b].tokenId
+            return a < b ? -1 : b > a ? 1 : 0
+          })
+          .map((id) => {
+            const { tokenId, name, img, externalLink } = inventory[k].items[id]
+            return (
+              <div
+                key={id}
+                className='inventoryCollectionItem'
+                onClick={externalLink && onAssetClick(externalLink)}
+                onMouseEnter={() => {
+                  setHoverAsset({
+                    name,
+                    tokenId,
+                    img
+                  })
+                }}
+                onMouseLeave={() => {
+                  setHoverAsset(false)
+                }}
+              >
+                {img ? (
+                  <div className='inventoryItemImage'>
+                    <img
+                      src={`https://proxy.pylon.link?type=nft&target=${encodeURIComponent(img)}`}
+                      loading='lazy'
+                      alt={name.toUpperCase()}
+                    />
+                  </div>
+                ) : null}
+              </div>
+            )
+          })}
+        <div className='inventoryCollectionLine' />
+      </div>
+    </div>
+  )
 }
 
-export default Restore.connect(Inventory)
+export default InventoryCollection

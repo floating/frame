@@ -1,8 +1,11 @@
+import log from 'electron-log'
 import createPylon from '@framelabs/pylon-api-client'
 import { BalanceProcessor } from '../balances/processor'
 import { InventoryProcessor } from '../inventory/processor'
-
-type Subscription = ReturnType<ReturnType<typeof createPylon>['client']['accounts']['subscribe']>
+import Networks from './networks'
+type Subscription = ReturnType<ReturnType<typeof createPylon>['client']['accounts']['subscribe']> & {
+  items: ReturnType<ReturnType<typeof createPylon>['client']['items']['subscribe']>[]
+}
 
 //TODO: do we need to export these from surface?...
 type ItemCollectionId = {
@@ -43,18 +46,35 @@ export type AccountResponse = Parameters<
   >
 >[0][0]
 
+export interface CollectionItem {
+  link: string
+  chainId: number
+  contract: string
+  tokenId: string
+  name: string
+  image: string
+  description: string
+}
+
+export interface CollectionItem {
+  contract: string
+  chainId: number
+  tokenId: string
+}
+
+const pylon = createPylon('ws://localhost:9000')
+
 const Surface = () => {
-  const pylon = createPylon('ws://localhost:9000')
   const subscriptions: Record<string, Subscription> = {}
-  const networks = new Set<number>([1, 137, 80001]) //TODO: populate from updates...
+  const networks = Networks()
 
   const subscribe = async (address: string, bProcessor: BalanceProcessor, iProcessor: InventoryProcessor) => {
     const sub = pylon.client.accounts.subscribe(address, {
       onStarted() {
-        console.log('subscribed to account')
+        log.verbose('subscribed to account')
       },
       onData: (data) => {
-        console.log('got update for account', { data })
+        log.verbose('got update for account', { data })
         if (!data.length || !data[0]) return
         const [{ address, ...chains }] = data
         const account: Account = {
@@ -63,29 +83,38 @@ const Surface = () => {
           balances: {}
         }
 
-        console.log('chains received...', { chains })
+        log.verbose('chains received...', { chains })
 
-        Object.values(chains).forEach((chain) => {
+        const chainIds: number[] = []
+        Object.entries(chains).forEach(([chainId, chain]) => {
+          chainIds.push(Number(chainId))
           if (!chain) return
           const { inventory, balances } = chain as unknown as AccountResponse[0]
           account.balances = { ...account.balances, ...balances }
           account.inventory = { ...account.inventory, ...inventory }
         })
 
-        console.log('account subscribed...', { account })
         bProcessor.updateAccount(account)
         iProcessor.updateAccount(account)
+        networks.update(chainIds)
       },
       onError: (err: unknown) => {
         console.error({ err })
+      },
+      onStopped() {
+        delete subscriptions[address.toLowerCase()]
       }
     })
 
-    subscriptions[address.toLowerCase()] = Object.assign(sub, { address })
+    subscriptions[address.toLowerCase()] = Object.assign(sub, { items: [] })
   }
 
   const unsubscribe = async (address: string) => {
-    subscriptions[address]?.unsubscribe()
+    const subscription = subscriptions[address]
+    if (!subscription) return
+    subscription.items.forEach((sub) => sub.unsubscribe())
+    subscription.unsubscribe()
+
     delete subscriptions[address]
   }
 
@@ -95,7 +124,10 @@ const Surface = () => {
     })
   }
 
-  const close = () => pylon.wsClient.close()
+  const close = () => {
+    pylon.wsClient.close()
+    networks.close()
+  }
 
   const updateSubscribers = (store: Store, bProcessor: BalanceProcessor, iProcessor: InventoryProcessor) => {
     const accounts = store('main.accounts')
@@ -112,12 +144,29 @@ const Surface = () => {
     })
   }
 
+  const subscribeToItems = (account: string, items: CollectionItem[], iProcessor: InventoryProcessor) => {
+    const sub = pylon.client.items.subscribe(items, {
+      onStarted() {},
+      onData: (data) => {
+        log.verbose('got update for items', { data })
+        if (!data.length) return
+        const items = data.filter(Boolean) as CollectionItem[]
+        iProcessor.updateItems(account, items)
+      },
+      onError: (err: unknown) => {}
+    })
+    subscriptions[account.toLowerCase()].items.push(sub)
+  }
+
   return {
     stop,
     updateSubscribers,
     networks,
-    close
+    close,
+    subscribeToItems
   }
 }
 
-export default Surface
+const surface = Surface()
+
+export default surface
