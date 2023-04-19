@@ -8,10 +8,14 @@ import { debounce } from '../../resources/utils'
 import BalanceProcessor from './balances/processor'
 import BalanceScanner from './balances/scanner'
 import InventoryProcessor from './inventory/processor'
-import Surface from './surface'
+import surface from './surface'
 import { TokenBalance } from './balances/scan'
 
 let pylonActive = false
+let activeAccount = ''
+
+const activeUpdated = (current: string) => current !== activeAccount
+const usePylonUpdated = (newMode: boolean) => newMode !== pylonActive
 
 import type { Chain, Token } from '../store/state'
 
@@ -19,17 +23,18 @@ export interface DataScanner {
   close: () => void
 }
 
-const ConnectedChains = (scanner: ReturnType<typeof BalanceScanner>, surface: ReturnType<typeof Surface>) => {
-  const chains = new Set<number>()
+const ConnectedChains = (scanner: ReturnType<typeof BalanceScanner>) => {
+  const connected = new Set<number>()
+
   const notPylon = (chainId: number) => !pylonActive || !surface.networks.has(chainId)
 
-  const connect = (chainIds: number[], activeAccount: string) => {
-    log.verbose('connecting to chains...', { chainIds })
+  const update = (chainIds: number[]) => {
+    log.verbose('updating connection to chains...', { chainIds })
     const scanned = chainIds.filter(notPylon)
-    scanned.length && scanner.addNetworks(activeAccount, chainIds)
+    activeAccount && scanned.length && scanner.addNetworks(activeAccount, chainIds)
 
     log.verbose('Added networks to Scanner: ', { networks: scanned })
-    chainIds.forEach(chains.add.bind(chains))
+    chainIds.forEach(connected.add.bind(connected))
   }
 
   const disconnect = (chainIds: number[]) => {
@@ -38,78 +43,71 @@ const ConnectedChains = (scanner: ReturnType<typeof BalanceScanner>, surface: Re
     const scanned = chainIds.filter(notPylon)
     scanned.length && scanner.removeNetworks(scanned)
 
-    chainIds.forEach(chains.delete.bind(chains))
+    chainIds.forEach(connected.delete.bind(connected))
   }
 
-  const has = chains.has.bind(chains)
+  const has = connected.has.bind(connected)
 
-  const get = () => Array.from(chains)
+  const get = () => Array.from(connected)
 
   return {
     has,
     disconnect,
-    connect,
+    update,
     get
   }
 }
 
 const externalData = function () {
-  const pylon = new Pylon('wss://data.pylon.link')
   const storeApi = BalancesStoreApi(store)
-  const surface = Surface()
-
   const balanceProcessor = BalanceProcessor(store, storeApi)
-  const inventoryProcessor = InventoryProcessor(store)
   const scanner = BalanceScanner(store, storeApi, balanceProcessor)
-  const connectedChains = ConnectedChains(scanner, surface)
+  scanner.start()
 
-  const notPylon = (chainId: number) => !pylonActive || !surface.networks.has(chainId)
+  const pylon = new Pylon('wss://data.pylon.link')
+  const rates = Rates(pylon, store)
 
-  let activeAccount = ''
+  const inventoryProcessor = InventoryProcessor(store)
+  const connectedChains = ConnectedChains(scanner)
+
   pylonActive = storeApi.getPylonEnabled()
-  let pauseScanningDelay: NodeJS.Timeout | undefined
+  rates.start()
 
-  const activeUpdated = (current: string) => current !== activeAccount
-  const toggled = (newMode: boolean) => newMode !== pylonActive
+  if (pylonActive) {
+    console.log('PYLON ENABLED... SETTING UP SUBSCRIPTIONS...')
+    surface.updateSubscribers(store, balanceProcessor, inventoryProcessor)
+  }
+
+  surface.networks.on('updated', (chains: number[]) => {
+    log.verbose('Surface networks updated...', { chains })
+    connectedChains.update(chains)
+  })
+
+  let pauseScanningDelay: NodeJS.Timeout | undefined
 
   const togglePylon = (currentMode: boolean) => {
     console.log('RUN MODE CHANGED', { newMode: currentMode, usePylon: pylonActive })
     pylonActive = currentMode
+
     if (!pylonActive) {
       surface.stop()
-      scanner.addNetworks(activeAccount, connectedChains.get())
     } else {
-      scanner.removeNetworks(Array.from(surface.networks))
       surface.updateSubscribers(store, balanceProcessor, inventoryProcessor)
     }
+    // Switch all surface networks to use the scanner...
+    connectedChains.update(surface.networks.get())
   }
 
   const updateActiveAccount = (currentAccount: string) =>
     debounce(() => {
-      log.verbose('updating external data due to address update(s)', { activeAccount })
       if (!currentAccount) return
       rates.updateSubscription(connectedChains.get(), activeAccount)
-      if (!activeAccount) {
-        scanner.start() //TODO: could conditionally start?....
-        activeAccount = currentAccount
-        pylonActive = storeApi.getPylonEnabled()
-        scanner.setAddress(currentAccount)
-        const currentNetworks = storeApi.getConnectedNetworks().map((network) => network.id)
-        const toScan = currentNetworks.filter(notPylon)
-        console.log('hadling setup for networks...', { networks: toScan, account: currentAccount })
-        if (toScan.length > 0) {
-          scanner.addNetworks(currentAccount, toScan)
-        }
-
-        return
-      }
-
       console.log('Active account has switched... updating to new account', {
         newActiveAccount: currentAccount
       })
-
-      scanner.setAddress(currentAccount)
       activeAccount = currentAccount
+      scanner.setAddress(currentAccount)
+      connectedChains.update(storeApi.getConnectedNetworks().map((network) => network.id))
     }, 800)()
 
   const handleAccountChanges = () =>
@@ -131,7 +129,7 @@ const externalData = function () {
       [[] as Token[], [] as Token[]]
     )
 
-    scanner.addTokens(activeAccount, forScanner)
+    activeAccount && scanner.addTokens(activeAccount, forScanner)
     //TODO: Map into balances
     const balances: TokenBalance[] = []
     //TODO: use processor to update these balances directly...
@@ -142,13 +140,6 @@ const externalData = function () {
     )
   })
 
-  const rates = Rates(pylon, store)
-  console.log('starting balance provider...', { runMode: pylonActive })
-  if (pylonActive) {
-    console.log('PYLON SELECTED... SETTING UP SUBSCRIPTIONS...')
-    surface.updateSubscribers(store, balanceProcessor, inventoryProcessor)
-  }
-
   const handleNetworkChanges = (networks: number[]) =>
     debounce(() => {
       console.log('handling network changes...', {
@@ -157,83 +148,69 @@ const externalData = function () {
         connectedChains: connectedChains.get()
       })
       const set = new Set(networks)
-
       const added = networks.filter((id) => !connectedChains.has(id))
       const removed = connectedChains.get().filter((id) => !set.has(id))
-      connectedChains.disconnect(removed)
-      connectedChains.connect(added, activeAccount)
+      removed.length && connectedChains.disconnect(removed)
+      added.length && connectedChains.update(added)
       if (added.length || removed.length) rates.updateSubscription(connectedChains.get(), activeAccount)
     }, 800)()
 
-  //TODO: remove...
-  setTimeout(() => {
-    console.log('SWITCHCHING TO PYLON...')
-    store.setBalanceMode('pylon')
-  }, 15_000)
-
-  rates.start()
-
-  const activeAddressObserver = store.observer(() => {
-    const currentActive = storeApi.getActiveAddress()
-    if (activeUpdated(currentActive)) {
-      updateActiveAccount(currentActive)
-    }
-  }, 'externalData:activeAccount')
-
-  const accountsObserver = store.observer(() => {
-    handleAccountChanges()
-  }, 'externalData:accounts')
-
-  const tokensObserver = store.observer(() => {
-    const customTokens = storeApi.getCustomTokens()
-    //TODO: handle known tokens...
-    const knownTokens = storeApi.getKnownTokens(activeAccount)
-    handleTokensUpdate(customTokens)
-  }, 'externalData:tokens')
-
-  const usePylonObserver = store.observer(() => {
-    const currentMode = storeApi.getPylonEnabled()
-
-    if (toggled(currentMode)) {
-      togglePylon(currentMode)
-    }
-  }, 'externalData:usePylon')
-
-  const networksObserver = store.observer(() => {
-    const currentNetworks = storeApi.getConnectedNetworks().map(({ id }) => id)
-    log.verbose({ currentNetworks })
-    handleNetworkChanges(currentNetworks)
-  }, 'externalData:networks')
-
-  const trayObserver = store.observer(() => {
-    const open = store('tray.open')
-
-    if (!open) {
-      // pause balance scanning after the tray is out of view for one minute
-      if (!pauseScanningDelay) {
-        pauseScanningDelay = setTimeout(() => {
-          scanner.pause()
-        }, 1000)
+  const observers: Record<string, Observer> = {
+    activeAccount: store.observer(() => {
+      const currentActive = storeApi.getActiveAddress()
+      if (activeUpdated(currentActive)) {
+        updateActiveAccount(currentActive)
       }
-    } else {
-      if (pauseScanningDelay) {
-        clearTimeout(pauseScanningDelay)
-        pauseScanningDelay = undefined
+    }, 'externalData:activeAccount'),
+    accounts: store.observer(() => {
+      handleAccountChanges()
+    }, 'externalData:accounts'),
+    tokens: store.observer(() => {
+      const customTokens = storeApi.getCustomTokens()
+      //TODO: handle known tokens...
+      const knownTokens = storeApi.getKnownTokens(activeAccount)
+      handleTokensUpdate(customTokens)
+    }, 'externalData:tokens'),
+    usePylon: store.observer(() => {
+      const currentMode = storeApi.getPylonEnabled()
 
-        scanner.resume()
+      if (usePylonUpdated(currentMode)) {
+        togglePylon(currentMode)
       }
-    }
-  }, 'externalData:tray')
+    }, 'externalData:usePylon'),
+    networks: store.observer(() => {
+      const currentNetworks = storeApi.getConnectedNetworks().map(({ id }) => id)
+      log.verbose({ currentNetworks })
+      handleNetworkChanges(currentNetworks)
+    }, 'externalData:networks'),
+    tray: store.observer(() => {
+      const open = store('tray.open')
+
+      if (!open) {
+        // pause balance scanning after the tray is out of view for one minute
+        if (!pauseScanningDelay) {
+          pauseScanningDelay = setTimeout(() => {
+            scanner.pause()
+          }, 1000)
+        }
+      } else {
+        if (pauseScanningDelay) {
+          clearTimeout(pauseScanningDelay)
+          pauseScanningDelay = undefined
+
+          scanner.resume()
+        }
+      }
+    }, 'externalData:tray')
+  }
+
+  const removeObservers = () => {
+    Object.values(observers).forEach((observer) => observer.remove())
+  }
 
   return {
     close: () => {
-      activeAddressObserver.remove()
-      tokensObserver.remove()
-      accountsObserver.remove()
-      usePylonObserver.remove()
-      trayObserver.remove()
-      networksObserver.remove()
-
+      removeObservers()
       scanner.stop()
       surface.close()
       rates.stop()

@@ -556,6 +556,9 @@ module.exports = {
   setInventory: (u, address, inventory) => {
     u('main.inventory', address, () => inventory)
   },
+  setInventoryAsset: (u, address, collection, tokenId, asset) => {
+    u('main.inventory', address, collection, 'items', tokenId, () => asset)
+  },
   setBalance: (u, address, balance) => {
     u('main.balances', address, (balances = []) => {
       const existingBalances = balances.filter(
