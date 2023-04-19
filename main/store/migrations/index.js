@@ -917,6 +917,17 @@ const migrations = {
     }
 
     return initial
+  },
+  36: (initial) => {
+    if (
+      initial?.main?.shortcuts?.summon &&
+      typeof initial.main.shortcuts.summon === 'object' &&
+      initial.main.shortcuts.summon.enabled === undefined
+    ) {
+      initial.main.shortcuts.summon.enabled = true
+    }
+
+    return initial
   }
 }
 
