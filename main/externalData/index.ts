@@ -1,5 +1,5 @@
 import log from 'electron-log'
-import Pylon from '@framelabs/pylon-client'
+import Pylon from '@framelabs/pylon-api-client'
 
 import store from '../store'
 import Rates from './assets'
