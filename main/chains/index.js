@@ -88,11 +88,19 @@ class FrameRpchProvider extends RPChEthereumProvider {
       .createRequest(this.url, JSON.stringify(payload))
       .then((request) => {
         return this.sdk.sendRequest(request).then((response) => {
-          return callback(null, JSON.parse(response.body))
+          if (callback) {
+            return callback(null, JSON.parse(response.body))
+          } else {
+            return JSON.parse(response.body)
+          }
         })
       })
       .catch((e) => {
-        callback(e, null)
+        if (callback) {
+          return callback(e, null)
+        } else {
+          throw e
+        }
       })
   }
 
@@ -103,9 +111,17 @@ class FrameRpchProvider extends RPChEthereumProvider {
     const request = await this.sdk.createRequest(this.url, JSON.stringify(payload))
     try {
       const response = await this.sdk.sendRequest(request)
-      callback(null, JSON.parse(response.body))
+      if (callback) {
+        return callback(null, JSON.parse(response.body))
+      } else {
+        return JSON.parse(response.body)
+      }
     } catch (e) {
-      callback(e, null)
+      if (callback) {
+        return callback(e, null)
+      } else {
+        throw e
+      }
     }
   }
 }
