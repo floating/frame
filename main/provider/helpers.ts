@@ -12,7 +12,6 @@ import {
 import log from 'electron-log'
 import BN from 'bignumber.js'
 import isUtf8 from 'isutf8'
-import { v5 as uuidv5 } from 'uuid'
 import { isHexString } from 'ethers/lib/utils'
 
 import store from '../store'
@@ -160,15 +159,6 @@ export function requestPermissions(payload: JSONRPCRequestPayload, res: RPCReque
   const requestedOperations = (payload.params || []).map((param) => permission(now, Object.keys(param)[0]))
 
   res({ id: payload.id, jsonrpc: '2.0', result: requestedOperations })
-}
-
-export function hasPermission(address: string, originId: string) {
-  const permissions = store('main.permissions', address) as Record<string, Permission>
-  const permission = Object.values(permissions).find(({ origin }) => {
-    return uuidv5(origin, uuidv5.DNS) === originId
-  })
-
-  return permission?.provider
 }
 
 export function getActiveChainsFull() {

@@ -1,17 +1,17 @@
+import log from 'electron-log'
+import { utils } from 'ethers'
+import { validate as validateUUID } from 'uuid'
+import { addHexPrefix, intToHex } from '@ethereumjs/util'
+import { SignTypedDataVersion } from '@metamask/eth-sig-util'
+
 import provider from '../../../main/provider'
 import accounts from '../../../main/accounts'
 import connection from '../../../main/chains'
-import { hasPermission } from '../../../main/provider/helpers'
 import store from '../../../main/store'
 import chainConfig from '../../../main/chains/config'
+import { hasSubscriptionPermission } from '../../../main/provider/subscriptions'
 import { gweiToHex } from '../../../resources/utils'
 import { Type as SignerType } from '../../../resources/domain/signer'
-
-import { validate as validateUUID } from 'uuid'
-import { utils } from 'ethers'
-import { addHexPrefix, intToHex } from '@ethereumjs/util'
-import log from 'electron-log'
-import { SignTypedDataVersion } from '@metamask/eth-sig-util'
 
 const address = '0x22dd63c3619818fdbc262c78baee43cb61e9cccf'
 
@@ -23,14 +23,12 @@ jest.mock('../../../main/accounts', () => ({}))
 jest.mock('../../../main/reveal', () => ({
   resolveEntityType: jest.fn().mockResolvedValue('external')
 }))
-jest.mock('../../../main/provider/helpers', () => {
-  const helpers = jest.requireActual('../../../main/provider/helpers')
 
-  // this entire module should be mocked for unit tests but many of the tests below were
-  // written relying on the real implementation so they need to be migrated individually
+jest.mock('../../../main/provider/subscriptions', () => {
+  const { SubscriptionType } = jest.requireActual('../../../main/provider/subscriptions')
   return {
-    ...helpers,
-    hasPermission: jest.fn()
+    SubscriptionType,
+    hasSubscriptionPermission: jest.fn()
   }
 })
 
@@ -1368,9 +1366,9 @@ describe('#send', () => {
     })
 
     // these signers only support V4+
-    const hardwareSigners = [SignerType.Ledger, SignerType.Lattice, SignerType.Trezor]
+    const HardwareSignersSupportingV4Only = [SignerType.Ledger, SignerType.Trezor]
 
-    hardwareSigners.forEach((signerType) => {
+    HardwareSignersSupportingV4Only.forEach((signerType) => {
       it(`does not submit a V3 request to a ${signerType}`, (done) => {
         accounts.get.mockImplementationOnce((addr) => {
           return addr === address ? { id: address, address, lastSignerType: signerType } : {}
@@ -1384,6 +1382,17 @@ describe('#send', () => {
           done()
         })
       })
+    })
+
+    it('should submit a V3 request to a Lattice', () => {
+      accounts.get.mockImplementationOnce((addr) => {
+        return addr === address ? { id: address, address, lastSignerType: SignerType.Lattice } : {}
+      })
+      const params = [address, typedData]
+
+      send({ method: 'eth_signTypedData_v3', params })
+
+      verifyRequest(SignTypedDataVersion.V3, typedData)
     })
 
     const unknownVersions = ['_v5', '_v1.1', 'v3']
@@ -1666,7 +1675,7 @@ describe('#assetsChanged', () => {
   })
 
   it('fires an assetsChanged event when an account has permission', (done) => {
-    hasPermission.mockReturnValueOnce(true)
+    hasSubscriptionPermission.mockReturnValueOnce(true)
 
     const assets = { account: address, nativeCurrency: [], erc20: ['tokens'] }
 
@@ -1676,7 +1685,7 @@ describe('#assetsChanged', () => {
       expect(payload.params.subscription).toBe(subscription.id)
       expect(payload.params.result).toEqual(assets)
 
-      expect(hasPermission).toHaveBeenCalledWith(address, subscription.originId)
+      expect(hasSubscriptionPermission).toHaveBeenCalledWith('assetsChanged', address, subscription.originId)
 
       done()
     })
@@ -1685,7 +1694,7 @@ describe('#assetsChanged', () => {
   })
 
   it('does not fire an assetsChanged event when an account does not have permission', () => {
-    hasPermission.mockReturnValueOnce(false)
+    hasSubscriptionPermission.mockReturnValueOnce(false)
 
     const assets = { account: address, nativeCurrency: [], erc20: ['tokens'] }
 
@@ -1818,7 +1827,9 @@ describe('state change events', () => {
       137: { primaryColor: 'accent8', nativeCurrency: { symbol: 'MATIC', name: 'Matic', decimals: 18 } }
     })
 
+    hasSubscriptionPermission.mockReturnValueOnce(true)
     store.getObserver('provider:chains').fire()
+    jest.runAllTimers()
   })
 
   it('fires an assetsChanged event to subscribers', (done) => {
@@ -1851,7 +1862,7 @@ describe('state change events', () => {
     store.set('main.balances', address, [ethBalance, tokenBalance])
     store.set('selected.current', address)
 
-    hasPermission.mockReturnValueOnce(true)
+    hasSubscriptionPermission.mockReturnValueOnce(true)
     accounts.current = () => ({ id: address })
     provider.subscriptions.assetsChanged = [subscription]
 

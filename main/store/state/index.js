@@ -189,7 +189,13 @@ const initial = {
       signerCompatibilityWarning: main('mute.signerCompatibilityWarning', false)
     },
     shortcuts: {
-      altSlash: main('shortcuts.altSlash', true)
+      altSlash: main('shortcuts.altSlash', true),
+      summon: main('shortcuts.summon', {
+        modifierKeys: ['Alt'],
+        shortcutKey: 'Slash',
+        enabled: true,
+        configuring: false
+      })
     },
     // showUSDValue: main('showUSDValue', true),
     launch: main('launch', false),
@@ -762,6 +768,11 @@ Object.keys(initial.main.accounts).forEach((id) => {
 
   // remote lastUpdated timestamp from balances
   initial.main.accounts[id].balances = { lastUpdated: undefined }
+})
+
+Object.values(initial.main.networks.ethereum).forEach((chain) => {
+  chain.connection.primary = { ...chain.connection.primary, connected: false }
+  chain.connection.secondary = { ...chain.connection.secondary, connected: false }
 })
 
 Object.values(initial.main.networksMeta).forEach((chains) => {

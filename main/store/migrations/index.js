@@ -901,6 +901,33 @@ const migrations = {
     })
 
     return initial
+  },
+  35: (initial) => {
+    const { shortcuts } = initial.main || {}
+    const { altSlash: summonShortcutEnabled, ...otherShortcuts } = shortcuts
+
+    initial.main.shortcuts = {
+      ...otherShortcuts,
+      summon: {
+        modifierKeys: ['Alt'],
+        shortcutKey: 'Slash',
+        enabled: summonShortcutEnabled,
+        configuring: false
+      }
+    }
+
+    return initial
+  },
+  36: (initial) => {
+    if (
+      initial?.main?.shortcuts?.summon &&
+      typeof initial.main.shortcuts.summon === 'object' &&
+      initial.main.shortcuts.summon.enabled === undefined
+    ) {
+      initial.main.shortcuts.summon.enabled = true
+    }
+
+    return initial
   }
 }
 

@@ -17,17 +17,19 @@ import accounts, {
   AddChainRequest,
   AddTokenRequest
 } from '../accounts'
+
+import FrameAccount from '../accounts/Account'
 import Chains, { Chain } from '../chains'
+import reveal from '../reveal'
 import { getSignerType, Type as SignerType } from '../../resources/domain/signer'
 import { normalizeChainId, TransactionData } from '../../resources/domain/transaction'
 import { populate as populateTransaction, maxFee, classifyTransaction } from '../transaction'
-import FrameAccount from '../accounts/Account'
 import { capitalize } from '../../resources/utils'
 import { ApprovalType } from '../../resources/constants'
 import { createObserver as AssetsObserver, loadAssets } from './assets'
 import { getVersionFromTypedData } from './typedData'
-import reveal from '../reveal'
 
+import { Subscription, SubscriptionType, hasSubscriptionPermission } from './subscriptions'
 import {
   checkExistingNonceGas,
   ecRecover,
@@ -38,7 +40,6 @@ import {
   getSignedAddress,
   requestPermissions,
   resError,
-  hasPermission,
   decodeMessage
 } from './helpers'
 
@@ -58,13 +59,6 @@ import {
 import * as sigParser from '../signatures'
 import { hasAddress } from '../../resources/domain/account'
 import { mapRequest } from '../requests'
-
-type Subscription = {
-  id: string
-  originId: string
-}
-
-type Subscriptions = { [key in SubscriptionType]: Subscription[] }
 
 interface RequiredApproval {
   type: ApprovalType
@@ -87,7 +81,7 @@ export class Provider extends EventEmitter {
   connection = Chains
 
   handlers: { [id: string]: any } = {}
-  subscriptions: Subscriptions = {
+  subscriptions: { [key in SubscriptionType]: Subscription[] } = {
     accountsChanged: [],
     assetsChanged: [],
     chainChanged: [],
@@ -136,6 +130,13 @@ export class Provider extends EventEmitter {
       })
     })
 
+    proxyConnection.on('provider:subscribe', (payload: RPC.Subscribe.Request) => {
+      const subId = this.createSubscription(payload)
+      const { id, jsonrpc } = payload
+
+      proxyConnection.emit('payload', { id, jsonrpc, result: subId })
+    })
+
     this.getNonce = this.getNonce.bind(this)
   }
 
@@ -143,13 +144,17 @@ export class Provider extends EventEmitter {
     const address = accounts[0]
 
     this.subscriptions.accountsChanged
-      .filter((subscription) => hasPermission(address, subscription.originId))
+      .filter((subscription) =>
+        hasSubscriptionPermission(SubscriptionType.ACCOUNTS, address, subscription.originId)
+      )
       .forEach((subscription) => this.sendSubscriptionData(subscription.id, accounts))
   }
 
   assetsChanged(address: string, assets: RPC.GetAssets.Assets) {
     this.subscriptions.assetsChanged
-      .filter((subscription) => hasPermission(address, subscription.originId))
+      .filter((subscription) =>
+        hasSubscriptionPermission(SubscriptionType.ASSETS, address, subscription.originId)
+      )
       .forEach((subscription) => this.sendSubscriptionData(subscription.id, { ...assets, account: address }))
   }
 
@@ -162,10 +167,10 @@ export class Provider extends EventEmitter {
   }
 
   // fires when the list of available chains changes
-  chainsChanged(chains: RPC.GetEthereumChains.Chain[]) {
-    this.subscriptions.chainsChanged.forEach((subscription) =>
-      this.sendSubscriptionData(subscription.id, chains)
-    )
+  chainsChanged(address: string, chains: RPC.GetEthereumChains.Chain[]) {
+    this.subscriptions.chainsChanged
+      .filter((subscription) => hasSubscriptionPermission('chainsChanged', address, subscription.originId))
+      .forEach((subscription) => this.sendSubscriptionData(subscription.id, chains))
   }
 
   networkChanged(netId: number | string, originId: string) {
@@ -181,6 +186,7 @@ export class Provider extends EventEmitter {
       params: { subscription, result }
     }
 
+    proxyConnection.emit('payload', payload)
     this.emit('data:subscription', payload)
   }
 
@@ -679,10 +685,16 @@ export class Provider extends EventEmitter {
     if (
       version !== SignTypedDataVersion.V4 &&
       signerType &&
-      [SignerType.Ledger, SignerType.Lattice, SignerType.Trezor].includes(signerType)
+      [SignerType.Ledger, SignerType.Trezor].includes(signerType)
     ) {
       const signerName = capitalize(signerType)
       return resError(`${signerName} only supports eth_signTypedData_v4+`, payload, res)
+    }
+    if (
+      ![SignTypedDataVersion.V3, SignTypedDataVersion.V4].includes(version) &&
+      signerType === SignerType.Lattice
+    ) {
+      return resError('Lattice only supports eth_signTypedData_v3+', payload, res)
     }
 
     const handlerId = this.addRequestHandler(res)
@@ -749,13 +761,19 @@ export class Provider extends EventEmitter {
   subscribe(payload: RPC.Subscribe.Request, res: RPCSuccessCallback) {
     log.debug('provider subscribe', { payload })
 
+    const subId = this.createSubscription(payload)
+
+    res({ id: payload.id, jsonrpc: '2.0', result: subId })
+  }
+
+  private createSubscription(payload: RPC.Subscribe.Request) {
     const subId = addHexPrefix(crypto.randomBytes(16).toString('hex'))
-    const subscriptionType = payload.params[0]
+    const subscriptionType = payload.params[0] as SubscriptionType
 
     this.subscriptions[subscriptionType] = this.subscriptions[subscriptionType] || []
     this.subscriptions[subscriptionType].push({ id: subId, originId: payload._origin })
 
-    res({ id: payload.id, jsonrpc: '2.0', result: subId })
+    return subId
   }
 
   ifSubRemove(id: string) {

@@ -1,3 +1,31 @@
+.loaderWrap
+  width: 18.5px;
+  height: 18.5px;
+  margin-left 10px
+
+@keyframes load
+  0%
+    transform rotate(0deg)
+  100%
+    transform rotate(360deg)
+
+.loader,
+.loader:after
+  border-radius 100%
+  width 7em
+  height 7em
+
+.loader 
+  font-size 2px
+  position relative
+  text-indent -9999em
+  border-top 2px solid var(--outerspace01)
+  border-right 2px solid var(--outerspace01)
+  border-bottom 2px solid var(--outerspace01)
+  border-left 2px solid var(--outerspace08)
+  transform translateZ(0)
+  animation load 1.1s infinite linear !important
+
 .requestFeature
   padding 0px 0px 0px 0px
   display flex
@@ -239,7 +267,7 @@
     line-height 18px
 
   .keyCommand
-    margin-left 2px
+    margin-left 5px
     padding 1px 6px 2px 6px
     font-weight 400
     border-radius 5px
@@ -247,6 +275,17 @@
     border 1px solid var(--outerspace05)
     color var(--outerspace)
     height 30px
+
+  .keyCommandLoading
+    margin-left 5px
+    padding 1px 6px 2px 6px
+    font-weight 400
+    border-radius 5px
+    font-size 12px
+    border 1px solid var(--outerspace05)
+    color var(--outerspace)
+    height 30px
+  
 
   .nodeProviderStatus
     display flex
@@ -337,6 +376,7 @@
   width 40px
   margin-right 6px
   margin-left 12px
+  margin-top 4px
   border-radius 10px
   transition var(--standard)
   transform translateZ(0)

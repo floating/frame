@@ -55,6 +55,8 @@ const chainMeta = {
   137: { nativeCurrency: {}, primaryColor: 'accent6' }
 }
 
+const selectedAddress = '0x2796317b0ff8538f253012862c06787adfb8ceb6'
+
 beforeEach(() => {
   setChains(chains, chainMeta)
 })
@@ -94,10 +96,15 @@ describe('#getActiveChains', () => {
 
 describe('#createChainsObserver', () => {
   const handler = { chainsChanged: jest.fn() }
-  let observer
+  let fireObserver
 
   beforeEach(() => {
-    observer = createChainsObserver(handler)
+    const observer = createChainsObserver(handler)
+
+    fireObserver = () => {
+      observer()
+      jest.runAllTimers()
+    }
 
     handler.chainsChanged = jest.fn()
   })
@@ -116,9 +123,9 @@ describe('#createChainsObserver', () => {
       { ...chainMeta, 10: { nativeCurrency: ether, primaryColor: 'accent4' } }
     )
 
-    observer()
+    fireObserver()
 
-    expect(handler.chainsChanged).toHaveBeenCalledWith([
+    expect(handler.chainsChanged).toHaveBeenCalledWith(selectedAddress, [
       {
         chainId: 1,
         networkId: 1,
@@ -199,9 +206,9 @@ describe('#createChainsObserver', () => {
 
     setChains({ ...chains, 10: optimism }, { ...chainMeta, 10: { nativeCurrency: ether } })
 
-    observer()
+    fireObserver()
 
-    const changedChains = handler.chainsChanged.mock.calls[0][0]
+    const changedChains = handler.chainsChanged.mock.calls[0][1]
     expect(changedChains.map((c) => c.chainId)).toEqual([1, 5, 10])
   })
 
@@ -209,9 +216,9 @@ describe('#createChainsObserver', () => {
     const { 5: goerli, ...remaining } = chains
     setChains(remaining)
 
-    observer()
+    fireObserver()
 
-    const changedChains = handler.chainsChanged.mock.calls[0][0]
+    const changedChains = handler.chainsChanged.mock.calls[0][1]
     expect(changedChains.map((c) => c.chainId)).toEqual([1])
   })
 
@@ -223,9 +230,9 @@ describe('#createChainsObserver', () => {
 
     setChains({ ...chains, 137: polygon })
 
-    observer()
+    fireObserver()
 
-    const changedChains = handler.chainsChanged.mock.calls[0][0]
+    const changedChains = handler.chainsChanged.mock.calls[0][1]
     expect(changedChains.map((c) => c.chainId)).toEqual([1, 5, 137])
   })
 
@@ -237,9 +244,9 @@ describe('#createChainsObserver', () => {
 
     setChains({ ...chains, 5: goerli })
 
-    observer()
+    fireObserver()
 
-    const changedChains = handler.chainsChanged.mock.calls[0][0]
+    const changedChains = handler.chainsChanged.mock.calls[0][1]
     expect(changedChains.map((c) => c.chainId)).toEqual([1])
   })
 
@@ -251,14 +258,14 @@ describe('#createChainsObserver', () => {
 
     setChains({ ...chains, 5: goerli })
 
-    observer()
+    fireObserver()
 
-    const changedChains = handler.chainsChanged.mock.calls[0][0]
+    const changedChains = handler.chainsChanged.mock.calls[0][1]
     expect(changedChains.map((c) => c.chainId)).toEqual([1, 5])
   })
 
   it('does not invoke the handler when no chains have changed', () => {
-    observer()
+    fireObserver()
 
     expect(handler.chainsChanged).not.toHaveBeenCalled()
   })
@@ -311,6 +318,10 @@ describe('#createOriginChainObserver', () => {
 
 function setChains(chainState, chainMetaState = chainMeta) {
   store.mockImplementation((node) => {
+    if (node === 'selected.current') {
+      return selectedAddress
+    }
+
     if (node === 'main.networks.ethereum') {
       return chainState
     }

@@ -1437,3 +1437,41 @@ describe('migration 34', () => {
     expect(getNativeCurrency(updatedState, 137)).toStrictEqual({ name: 'Matic', symbol: 'MATIC' })
   })
 })
+
+describe('migration 35', () => {
+  beforeEach(() => {
+    state.main._version = 34
+    state.main.shortcuts = { altSlash: true, custom: false }
+  })
+
+  it('should update the summon shortcut when enabled', () => {
+    const updatedState = migrations.apply(state, 35)
+    const { shortcuts } = updatedState.main
+
+    expect(shortcuts).toStrictEqual({
+      summon: {
+        modifierKeys: ['Alt'],
+        shortcutKey: 'Slash',
+        enabled: true,
+        configuring: false
+      },
+      custom: false
+    })
+  })
+
+  it('should update the summon shortcut when disabled', () => {
+    state.main.shortcuts.altSlash = false
+    const updatedState = migrations.apply(state, 35)
+    const { shortcuts } = updatedState.main
+
+    expect(shortcuts).toStrictEqual({
+      summon: {
+        modifierKeys: ['Alt'],
+        shortcutKey: 'Slash',
+        enabled: false,
+        configuring: false
+      },
+      custom: false
+    })
+  })
+})

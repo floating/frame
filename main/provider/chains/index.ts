@@ -20,7 +20,7 @@ const storeApi = {
 }
 
 interface ChainsChangedHandler {
-  chainsChanged: (chains: RPC.GetEthereumChains.Chain[]) => void
+  chainsChanged: (address: Address, chains: RPC.GetEthereumChains.Chain[]) => void
 }
 
 interface ChainChangedHandler {
@@ -39,7 +39,11 @@ function createChainsObserver(handler: ChainsChangedHandler) {
 
     if (!deepEqual(currentChains, availableChains)) {
       availableChains = currentChains
-      handler.chainsChanged(availableChains)
+
+      setTimeout(() => {
+        const currentAccount = store('selected.current') as string
+        handler.chainsChanged(currentAccount, availableChains)
+      }, 0)
     }
   }
 }
