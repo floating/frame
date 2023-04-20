@@ -26,7 +26,10 @@ interface Frame {
   views: Record<string, ViewMetadata>
 }
 
-type SignerType = 'ring' | 'seed' | 'trezor' | 'ledger' | 'lattice'
+type HotSignerType = 'ring' | 'seed'
+type HardwareSignerType = 'trezor' | 'ledger' | 'lattice'
+type SignerType = HotSignerType | HardwareSignerType
+
 type AccountStatus = 'ok'
 
 interface Signer {

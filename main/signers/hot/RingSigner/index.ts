@@ -1,36 +1,50 @@
-const path = require('path')
-const log = require('electron-log')
-const { fromPrivateKey, fromV1, fromV3 } = require('ethereumjs-wallet').default
+import log from 'electron-log'
+import Wallet from 'ethereumjs-wallet'
 
-const HotSigner = require('../HotSigner')
+import HotSigner from '../HotSigner'
 
-const WORKER_PATH = path.resolve(__dirname, 'worker.js')
+import type { HotSignerData } from '..'
 
-class RingSigner extends HotSigner {
-  constructor(signer) {
-    super(signer, WORKER_PATH)
-    this.type = 'ring'
-    this.model = 'keyring'
-    this.encryptedKeys = signer && signer.encryptedKeys
-    if (this.encryptedKeys) this.update()
+export interface RingSignerData extends HotSignerData {
+  encryptedKeys: string
+}
+
+export default class RingSigner extends HotSigner {
+  private encryptedKeys = ''
+
+  static fromStoredData(data: Omit<RingSignerData, 'type'>) {
+    const signer = new RingSigner()
+
+    signer.encryptedKeys = data.encryptedKeys
+    signer.addresses = data.addresses
+    signer.update()
+
+    return signer
   }
 
-  save() {
+  constructor() {
+    super('ring')
+
+    this.model = 'keyring'
+  }
+
+  protected save() {
     super.save({ encryptedKeys: this.encryptedKeys })
   }
 
-  unlock(password, cb) {
-    super.unlock(password, { encryptedKeys: this.encryptedKeys }, cb)
+  unlock(password: string, cb: ErrorOnlyCallback) {
+    super.unlockWorker(password, { encryptedSecret: this.encryptedKeys }, cb)
   }
 
-  addPrivateKey(key, password, cb) {
+  addPrivateKey(key: string, password: string, cb: ErrorOnlyCallback) {
     // Validate private key
     let wallet
     try {
-      wallet = fromPrivateKey(Buffer.from(key, 'hex'))
+      wallet = Wallet.fromPrivateKey(Buffer.from(key, 'hex'))
     } catch (e) {
       return cb(new Error('Invalid private key'))
     }
+
     const address = wallet.getAddressString()
 
     // Ensure private key hasn't already been added
@@ -40,7 +54,7 @@ class RingSigner extends HotSigner {
 
     // Call worker
     const params = { encryptedKeys: this.encryptedKeys, key, password }
-    this._callWorker({ method: 'addKey', params }, (err, encryptedKeys) => {
+    this.callWorker({ method: 'addKey', params }, (err, encryptedKeys) => {
       // Handle errors
       if (err) return cb(err)
 
@@ -48,7 +62,7 @@ class RingSigner extends HotSigner {
       this.addresses = [...this.addresses, address]
 
       // Update encrypted keys
-      this.encryptedKeys = encryptedKeys
+      this.encryptedKeys = encryptedKeys as string
 
       // Log and update signer
       log.info('Private key added to signer', this.id)
@@ -59,10 +73,10 @@ class RingSigner extends HotSigner {
     })
   }
 
-  removePrivateKey(index, password, cb) {
+  removePrivateKey(index: number, password: string, cb: ErrorOnlyCallback) {
     // Call worker
     const params = { encryptedKeys: this.encryptedKeys, index, password }
-    this._callWorker({ method: 'removeKey', params }, (err, encryptedKeys) => {
+    this.callWorker({ method: 'removeKey', params }, (err, encryptedKeys) => {
       // Handle errors
       if (err) return cb(err)
 
@@ -70,7 +84,7 @@ class RingSigner extends HotSigner {
       this.addresses = this.addresses.filter((address) => address !== this.addresses[index])
 
       // Update encrypted keys
-      this.encryptedKeys = encryptedKeys
+      this.encryptedKeys = encryptedKeys as string
 
       // Log and update signer
       log.info('Private key removed from signer', this.id)
@@ -83,19 +97,17 @@ class RingSigner extends HotSigner {
   }
 
   // TODO: Encrypt all keys together so that they all get the same password
-  async addKeystore(keystore, keystorePassword, password, cb) {
+  async addKeystore(keystore: any, keystorePassword: string, password: string, cb: ErrorOnlyCallback) {
     let wallet
     // Try to generate wallet from keystore
     try {
-      if (keystore.version === 1) wallet = await fromV1(keystore, keystorePassword)
-      else if (keystore.version === 3) wallet = await fromV3(keystore, keystorePassword)
+      if (keystore.version === 1) wallet = await Wallet.fromV1(keystore, keystorePassword)
+      else if (keystore.version === 3) wallet = await Wallet.fromV3(keystore, keystorePassword)
       else return cb(new Error('Invalid keystore version'))
     } catch (e) {
-      return cb(e)
+      return cb(e as Error)
     }
     // Add private key
-    this.addPrivateKey(wallet.privateKey.toString('hex'), password, cb)
+    this.addPrivateKey(wallet.getPrivateKey().toString('hex'), password, cb)
   }
 }
-
-module.exports = RingSigner
