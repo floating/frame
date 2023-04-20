@@ -3,13 +3,18 @@ import { BigNumber as EthersBigNumber } from '@ethersproject/bignumber'
 import { Interface } from '@ethersproject/abi'
 import { addHexPrefix } from '@ethereumjs/util'
 import log from 'electron-log'
+import { hexZeroPad, BytesLike } from '@ethersproject/bytes'
 
 import multicall, { Call, supportsChain as multicallSupportsChain } from '../../multicall'
 import erc20TokenAbi from './erc-20-abi'
 import { groupByChain, TokensByChain } from './reducers'
-
-import type { BytesLike } from '@ethersproject/bytes'
 import type EthereumProvider from 'ethereum-provider'
+import { Log, LogProcessor, LogTopic } from './logs'
+
+//TODO: move the log processing outside of the scanning system - on startup seed the balances and then get logs for each block // at a polling interval
+const toLogProcessorKey = (owner: Address, chainId: number) => `${chainId}:${owner}`
+
+const logProcessors: Record<string, LogProcessor> = {}
 
 const erc20Interface = new Interface(erc20TokenAbi)
 
@@ -41,6 +46,43 @@ function createBalance(rawBalance: string, decimals: number): ExternalBalance {
 }
 
 export default function (eth: EthereumProvider) {
+  async function getLatestBlock(chainId: number) {
+    const blockNumber: string = await eth.request({
+      method: 'eth_blockNumber',
+      params: [],
+      chainId: addHexPrefix(chainId.toString(16))
+    })
+    return parseInt(blockNumber)
+  }
+
+  async function getTransferLogs(address: string, chainId: number, fromBlock: number): Promise<Log[]> {
+    const logs = (await Promise.all([
+      eth.request({
+        method: 'eth_getLogs',
+        params: [
+          {
+            fromBlock: '0x' + fromBlock.toString(16),
+            toBlock: 'latest',
+            topics: [[LogTopic.TRANSFER, LogTopic.DEPOSIT, LogTopic.WITHDRAWAL], [hexZeroPad(address, 32)]]
+          }
+        ],
+        chainId: addHexPrefix(chainId.toString(16))
+      }),
+      eth.request({
+        method: 'eth_getLogs',
+        params: [
+          {
+            fromBlock: '0x' + fromBlock.toString(16),
+            toBlock: 'latest',
+            topics: [[LogTopic.TRANSFER], [], [hexZeroPad(address, 32)]]
+          }
+        ],
+        chainId: addHexPrefix(chainId.toString(16))
+      })
+    ])) as [Log[], Log[]]
+    return logs.flat()
+  }
+
   function balanceCalls(owner: string, tokens: TokenDefinition[]): Call<EthersBigNumber, ExternalBalance>[] {
     return tokens.map((token) => ({
       target: token.address,
@@ -89,10 +131,11 @@ export default function (eth: EthereumProvider) {
       try {
         const rawBalance = await getTokenBalance(token, owner)
 
-        return {
+        const balance = {
           ...token,
           ...createBalance(rawBalance, token.decimals)
         }
+        return balance
       } catch (e) {
         log.warn(`could not load balance for token with address ${token.address}`, e)
         return undefined
@@ -109,16 +152,18 @@ export default function (eth: EthereumProvider) {
 
     const results = await multicall(chainId, eth).batchCall(calls)
 
-    return results.reduce((acc, result, i) => {
+    const balances = results.reduce((acc, result, i) => {
       if (result.success) {
-        acc.push({
+        const balance = {
           ...tokens[i],
           ...result.returnValues[0]
-        })
+        }
+        acc.push(balance)
       }
 
       return acc
     }, [] as Balance[])
+    return balances
   }
 
   return {
@@ -131,12 +176,27 @@ export default function (eth: EthereumProvider) {
       const tokensByChain = tokens.reduce(groupByChain, {} as TokensByChain)
 
       const tokenBalances = await Promise.all(
-        Object.entries(tokensByChain).map(([chain, tokens]) => {
+        Object.entries(tokensByChain).map(async ([chain, tokens]) => {
           const chainId = parseInt(chain)
+          const latestBlock = await getLatestBlock(chainId)
+          const logProcessorKey = toLogProcessorKey(owner, chainId)
+          const logProcessor = logProcessors[logProcessorKey]
+          if (logProcessor) {
+            try {
+              const logs = await getTransferLogs(owner, chainId, logProcessor.lastProcessedBlock)
+              return logProcessor.process(logs, latestBlock, tokens)
+            } catch (error) {
+              log.warn('Unable to update balances using eth_getLogs', { chainId })
+            }
+          }
 
-          return multicallSupportsChain(chainId)
-            ? getTokenBalancesFromMulticall(owner, tokens, chainId)
-            : getTokenBalancesFromContracts(owner, tokens)
+          const balances = multicallSupportsChain(chainId)
+            ? await getTokenBalancesFromMulticall(owner, tokens, chainId)
+            : await getTokenBalancesFromContracts(owner, tokens)
+
+          logProcessors[logProcessorKey] = new LogProcessor(owner, balances, latestBlock, chainId, eth)
+
+          return balances
         })
       )
 
