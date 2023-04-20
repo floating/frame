@@ -9,7 +9,8 @@ import BalanceProcessor from './balances/processor'
 import BalanceScanner from './balances/scanner'
 import InventoryProcessor from './inventory/processor'
 import surface from './surface'
-import { TokenBalance } from './balances/scan'
+
+import type { TokenBalance } from './balances/scan'
 
 let pylonActive = false
 let activeAccount = ''
