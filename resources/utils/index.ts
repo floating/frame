@@ -41,6 +41,10 @@ function debounce(func: (...args: any) => any, timeout = 300) {
   }
 }
 
+async function wait(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
 function instanceOfNodeError<T extends ErrorConstructor>(
   value: Error,
   errorType: T
@@ -90,6 +94,7 @@ export {
   arraysEqual,
   arraysMatch,
   debounce,
+  wait,
   weiToGwei,
   weiToHex,
   gweiToWei,

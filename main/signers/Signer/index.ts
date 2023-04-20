@@ -3,7 +3,6 @@ import EventEmitter from 'stream'
 import { addHexPrefix } from '@ethereumjs/util'
 
 import { deriveHDAccounts } from './derive'
-import crypt from '../../crypt'
 import { TransactionData } from '../../../resources/domain/transaction'
 import { getSignerDisplayType } from '../../../resources/domain/signer'
 import type { TypedMessage } from '../../accounts/types'
@@ -43,11 +42,6 @@ export default class Signer extends EventEmitter {
 
   deriveHDAccounts(publicKey: string, chainCode: string, cb: Callback<string[]>) {
     deriveHDAccounts(publicKey, chainCode, cb)
-  }
-
-  fingerprint() {
-    if (this.addresses && this.addresses.length)
-      return crypt.stringToKey(this.addresses.join()).toString('hex')
   }
 
   getCoinbase(cb: Callback<string>) {

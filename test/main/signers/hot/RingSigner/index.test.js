@@ -4,9 +4,30 @@ import crypto from 'crypto'
 import { remove } from 'fs-extra'
 import log from 'electron-log'
 
+import hot from '../../../../../main/signers/hot'
+
 const PASSWORD = 'fr@///3_password'
 const SIGNER_PATH = path.resolve(__dirname, '../.userData/signers')
 const FILE_PATH = path.resolve(__dirname, 'keystore.json')
+
+jest.mock('path', () => {
+  const original = jest.requireActual('path')
+
+  return {
+    ...original,
+    resolve: (...args) => {
+      // TODO: this can be cleaned up once tests are re-worked
+      if (args.includes('worker/launch.js')) {
+        return original.resolve(
+          __dirname,
+          '../../../../../compiled/main/signers/hot/HotSigner/worker/launch.js'
+        )
+      }
+
+      return original.resolve(...args)
+    }
+  }
+})
 
 jest.mock('electron')
 jest.mock('../../../../../main/store/persist')
@@ -16,7 +37,7 @@ const signers = { add: () => {} }
 // Util
 const clean = () => remove(SIGNER_PATH)
 
-let hot, store
+let store
 
 describe('Ring signer', () => {
   let signer
@@ -26,7 +47,6 @@ describe('Ring signer', () => {
 
     clean()
 
-    hot = await import('../../../../../main/signers/hot')
     store = require('../../../../../main/store').default
   })
 

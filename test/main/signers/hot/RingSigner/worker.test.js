@@ -1,9 +1,11 @@
-import HotSignerWorker from '../../../../../main/signers/hot/HotSigner/worker'
+import RingSignerWorker from '../../../../../main/signers/hot/RingSigner/worker'
 
 let worker
 
 // mnemonic: test test test test test test test test test test test junk
-const key = Buffer.from('4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356', 'hex')
+const key = '4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356'
+const password = 'afr@metest!'
+
 let errorOutput = console.error
 
 beforeAll(() => {
@@ -15,8 +17,14 @@ afterAll(() => {
   console.error = errorOutput
 })
 
-beforeEach(() => {
-  worker = new HotSignerWorker()
+beforeEach((done) => {
+  worker = new RingSignerWorker()
+
+  const unlockCb = (err, encryptedKeys) => {
+    worker.unlock(done, { encryptedSecret: encryptedKeys, password })
+  }
+
+  worker.addKey(unlockCb, { key, password })
 })
 
 describe('#signTransaction', () => {
@@ -91,7 +99,7 @@ describe('#signTransaction', () => {
     it(`signs a transaction on ${chain.name}`, (done) => {
       const tx = { ...rawTx, chainId: chain.chainId.toString(16) }
 
-      worker.signTransaction(key, tx, (err, signature) => {
+      const cb = (err, signature) => {
         try {
           expect(err).toBe(null)
           expect(signature).toBe(chain.expectedSignature)
@@ -99,20 +107,24 @@ describe('#signTransaction', () => {
         } catch (e) {
           done(e)
         }
-      })
+      }
+
+      worker.signTransaction(cb, { index: 0, rawTx: tx })
     }, 200)
   })
 
   it('rejects a transaction with an unknown chain id', (done) => {
     const { chainId, ...tx } = rawTx
 
-    worker.signTransaction(key, tx, (err) => {
+    const cb = (err) => {
       try {
         expect(err).toBe('could not determine chain id for transaction')
         done()
       } catch (e) {
         done(e)
       }
-    })
+    }
+
+    worker.signTransaction(cb, { index: 0, rawTx: tx })
   }, 200)
 })

@@ -152,6 +152,7 @@
     "@types/tar-fs": "2.0.1",
     "@types/uuid": "9.0.1",
     "@types/ws": "8.5.4",
+    "@types/zxcvbn": "4.4.1",
     "@typescript-eslint/eslint-plugin": "5.54.1",
     "@typescript-eslint/parser": "5.54.1",
     "electron": "23.1.3",
