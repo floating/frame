@@ -1,10 +1,12 @@
 import log from 'electron-log'
-import createPylon from '@framelabs/pylon-api-client'
+import createPylon, { Unsubscribable } from '@framelabs/pylon-api-client'
+
+import Networks from './networks'
 import { BalanceProcessor } from '../balances/processor'
 import { InventoryProcessor } from '../inventory/processor'
-import Networks from './networks'
-type Subscription = ReturnType<ReturnType<typeof createPylon>['client']['accounts']['subscribe']> & {
-  items: ReturnType<ReturnType<typeof createPylon>['client']['items']['subscribe']>[]
+
+type Subscription = Unsubscribable & {
+  items: Unsubscribable[]
 }
 
 //TODO: do we need to export these from surface?...
@@ -39,13 +41,6 @@ export type Account = {
   balances: Record<string, BalanceItem>
 }
 
-export type AccountResponse = Parameters<
-  Exclude<
-    Parameters<ReturnType<typeof createPylon>['client']['accounts']['subscribe']>['1']['onData'],
-    undefined
-  >
->[0][0]
-
 export interface CollectionItem {
   link: string
   chainId: number
@@ -62,14 +57,14 @@ export interface CollectionItem {
   tokenId: string
 }
 
-const pylon = createPylon('ws://localhost:9000')
+const Pylon = createPylon('ws://localhost:9000')
 
 const Surface = () => {
   const subscriptions: Record<string, Subscription> = {}
   const networks = Networks()
 
   const subscribe = async (address: string, bProcessor: BalanceProcessor, iProcessor: InventoryProcessor) => {
-    const sub = pylon.client.accounts.subscribe(address, {
+    const sub = Pylon.accounts.subscribe(address, {
       onStarted() {
         log.verbose('subscribed to account')
       },
@@ -78,7 +73,7 @@ const Surface = () => {
         if (!data.length || !data[0]) return
         const [{ address, ...chains }] = data
         const account: Account = {
-          address: address as unknown as string,
+          address,
           inventory: {},
           balances: {}
         }
@@ -89,7 +84,7 @@ const Surface = () => {
         Object.entries(chains).forEach(([chainId, chain]) => {
           chainIds.push(Number(chainId))
           if (!chain) return
-          const { inventory, balances } = chain as unknown as AccountResponse[0]
+          const { inventory, balances } = chain as unknown as Account
           account.balances = { ...account.balances, ...balances }
           account.inventory = { ...account.inventory, ...inventory }
         })
@@ -125,7 +120,6 @@ const Surface = () => {
   }
 
   const close = () => {
-    pylon.wsClient.close()
     networks.close()
   }
 
@@ -145,16 +139,22 @@ const Surface = () => {
   }
 
   const subscribeToItems = (account: string, items: CollectionItem[], iProcessor: InventoryProcessor) => {
-    const sub = pylon.client.items.subscribe(items, {
-      onStarted() {},
+    const sub = Pylon.items.subscribe(items, {
+      onStarted() {
+        log.verbose(`Created subscription to items`, { account, items })
+      },
       onData: (data) => {
-        log.verbose('got update for items', { data })
+        log.debug('Received update for items', { account, items: data })
+
         if (!data.length) return
         const items = data.filter(Boolean) as CollectionItem[]
         iProcessor.updateItems(account, items)
       },
-      onError: (err: unknown) => {}
+      onError: (err) => {
+        log.error('Error subscribing to items', { account, items, err })
+      }
     })
+
     subscriptions[account.toLowerCase()].items.push(sub)
   }
 
