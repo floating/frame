@@ -1,8 +1,8 @@
 import log from 'electron-log'
 
-import Pylon, { AssetType } from '@framelabs/pylon-client'
+import Pylon, { AssetType } from '@framelabs/pylon-api-client'
 
-import type { AssetId } from '@framelabs/pylon-client/dist/assetId'
+import type { AssetId } from '@framelabs/pylon-api-client/dist/assetId'
 import type { UsdRate } from '../../provider/assets'
 import type { NativeCurrency, Rate, Token } from '../../store/state'
 

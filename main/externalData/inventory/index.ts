@@ -1,5 +1,5 @@
 import log from 'electron-log'
-import Pylon from '@framelabs/pylon-client'
+import Pylon from '@framelabs/pylon-api-client'
 
 export default function inventory(pylon: Pylon, store: Store) {
   function handleUpdates(updates: any[]) {
