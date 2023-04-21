@@ -5,7 +5,8 @@ const { addHexPrefix } = require('@ethereumjs/util')
 const { Hardfork } = require('@ethereumjs/common')
 const provider = require('eth-provider')
 const log = require('electron-log')
-const { RPChEthereumProvider } = require('@rpch/ethereum-provider')
+// const { RPChEthereumProvider } = require('@rpch/ethereum-provider')
+const { RPChEthereumProvider } = require('../../../RPCh/packages/ethereum-provider/build/index.js')
 const RPChCrypto = require('@rpch/crypto-for-nodejs')
 
 const store = require('../store').default
@@ -41,9 +42,7 @@ class FrameRpchProvider extends RPChEthereumProvider {
     this.on('error', () => {
       if (this.connected) this.close()
     })
-    this.sdk.start().then(() => {
-      this.init()
-    })
+    this.init()
   }
 
   init() {
