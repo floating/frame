@@ -103,11 +103,13 @@ class BalancesExpanded extends React.Component {
     const { balances: allBalances, totalDisplayValue, totalValue } = this.getBalances(storedBalances, rates)
     const balances = allBalances.slice(0, this.props.expanded ? allBalances.length : 4)
 
-    const lastBalanceUpdate = this.store('main.accounts', address, 'balances.lastUpdated')
+    const lastBalanceUpdate = this.store('main.accounts', this.props.account, 'balances.lastUpdated')
+    const usingSurface = true //TODO: use the value in store...
 
     // scan if balances are more than a minute old
-    const scanning = !lastBalanceUpdate || new Date() - new Date(lastBalanceUpdate) > 1000 * 60
-    console.log({ scanning, balances, address })
+    const scanning = !lastBalanceUpdate || new Date() - new Date(lastBalanceUpdate) > 1000 * 60 * 5
+    // console.log({ scanning, balances, address })
+    console.log({ scanning, lastBalanceUpdate })
     const hotSigner = ['ring', 'seed'].includes(lastSignerType)
 
     return (

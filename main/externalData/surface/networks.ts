@@ -1,7 +1,7 @@
 import EventEmitter from 'events'
 
 export interface NetworksEvents {
-  updated: (chainIds: number[]) => void
+  updated: (event: { account: string; chains: number[] }) => void
 }
 
 type TypedEventEmitter<T extends Record<keyof T, (...args: any[]) => void>> = {
@@ -36,21 +36,28 @@ class NetworksEmitter implements TypedEventEmitter<NetworksEvents> {
 
 const Networks = () => {
   const emitter = new NetworksEmitter()
-  const networks = new Set<number>()
+  //TODO: can change to be a record to different services...
+  const networks: Record<Address, Record<number, boolean>> = {}
 
-  const update = (chainIds: number[]) => {
-    const currentNetworks = Array.from(networks)
-    const toRemove = currentNetworks.filter((chainId) => !chainIds.includes(chainId))
-    const toAdd = chainIds.filter((chainId) => !networks.has(chainId))
-    toRemove.forEach(networks.delete.bind(networks))
-    toAdd.forEach(networks.add.bind(networks))
-
-    emitter.emit('updated', [...toAdd, ...toRemove])
-  }
-
-  const has = networks.has.bind(networks)
+  const has = (account: string, chainId: number) => Boolean(networks[account]?.[chainId])
   const on = emitter.on.bind(emitter)
-  const get = () => Array.from(networks)
+  const get = (account: string) => Object.keys(networks[account] || {}).map(Number)
+
+  const update = (account: string, chainIds: number[]) => {
+    const currentNetworks = get(account)
+    if (!networks[account]) networks[account] = {}
+    const toRemove = currentNetworks.filter((chainId) => !chainIds.includes(chainId))
+    const toAdd = chainIds.filter((chainId) => !networks[account][chainId])
+    toRemove.forEach((id) => (networks[account][id] = false))
+    toAdd.forEach((id) => (networks[account][id] = true))
+
+    const event = {
+      account,
+      chains: chainIds
+    }
+
+    emitter.emit('updated', event)
+  }
 
   const close = () => {
     emitter.removeListeners()

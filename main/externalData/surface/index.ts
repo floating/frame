@@ -2,8 +2,10 @@ import log from 'electron-log'
 import createPylon, { Unsubscribable } from '@framelabs/pylon-api-client'
 
 import Networks from './networks'
-import { BalanceProcessor } from '../balances/processor'
-import { InventoryProcessor } from '../inventory/processor'
+import bProcessor from '../balances/processor'
+import iProcessor from '../inventory/processor'
+import { TokenBalance } from '../balances/scan'
+import { formatUnits } from 'ethers/lib/utils'
 
 type Subscription = Unsubscribable & {
   items: Unsubscribable[]
@@ -35,13 +37,7 @@ type BalanceItem = {
   amount: string
 }
 
-export type Account = {
-  address: string
-  inventory: Record<string, CollectionMetdata>
-  balances: Record<string, BalanceItem>
-}
-
-export interface CollectionItem {
+interface CollectionItem {
   link: string
   chainId: number
   contract: string
@@ -50,12 +46,51 @@ export interface CollectionItem {
   image: string
   description: string
 }
-
-export interface CollectionItem {
+interface CollectionItem {
   contract: string
   chainId: number
   tokenId: string
 }
+
+const toMeta = (collection: CollectionMetdata): InventoryCollection['meta'] => {
+  return {
+    name: collection.name,
+    description: collection.description,
+    image: collection.image,
+    chainId: collection.chainId,
+    external_url: ''
+  }
+}
+
+const toItems = (collection: CollectionMetdata): InventoryCollection['items'] => {
+  return collection.ownedItems.reduce((items, item) => {
+    return {
+      ...items,
+      [item]: {}
+    }
+  }, {})
+}
+
+const toInventoryCollection = (collection: CollectionMetdata): InventoryCollection => {
+  const meta = toMeta(collection)
+  const items = toItems(collection)
+
+  return {
+    meta,
+    items
+  }
+}
+
+const toTokenBalance = (b: BalanceItem) => ({
+  address: b.contract.toLowerCase(),
+  chainId: b.chainId,
+  name: b.name || '',
+  symbol: b.symbol,
+  balance: b.amount,
+  decimals: b.decimals || 18,
+  displayBalance: formatUnits(b.amount, b.decimals),
+  logoUri: b.image || ''
+})
 
 const Pylon = createPylon('ws://localhost:9000')
 
@@ -63,7 +98,9 @@ const Surface = () => {
   const subscriptions: Record<string, Subscription> = {}
   const networks = Networks()
 
-  const subscribe = async (address: string, bProcessor: BalanceProcessor, iProcessor: InventoryProcessor) => {
+  const subscribe = async (addr: string) => {
+    log.verbose('Surface subscribing to account...', { addr })
+    const address = addr.toLowerCase()
     const sub = Pylon.accounts.subscribe(address, {
       onStarted() {
         log.verbose('subscribed to account')
@@ -71,40 +108,52 @@ const Surface = () => {
       onData: (data) => {
         log.verbose('got update for account', { data })
         if (!data.length || !data[0]) return
-        const [{ address, ...chains }] = data
-        const account: Account = {
-          address,
-          inventory: {},
-          balances: {}
-        }
+        const [{ address: addr, ...chains }] = data
 
         log.verbose('chains received...', { chains })
 
-        const chainIds: number[] = []
-        Object.entries(chains).forEach(([chainId, chain]) => {
-          chainIds.push(Number(chainId))
-          if (!chain) return
-          const { inventory, balances } = chain as unknown as Account
-          account.balances = { ...account.balances, ...balances }
-          account.inventory = { ...account.inventory, ...inventory }
-        })
+        const [chainIds, balances, inventory] = Object.entries(chains).reduce(
+          (acc, [chainId, chain]) => {
+            if (!chain || typeof chain === 'string' || !chain.balances || !chain.inventory) return acc
+            acc[0].push(Number(chainId))
+            acc[1].push(...Object.values(chain.balances).map(toTokenBalance))
 
-        bProcessor.updateAccount(account)
-        iProcessor.updateAccount(account)
-        networks.update(chainIds)
+            const chainInventory = Object.keys(chain.inventory).reduce((inventory, collection) => {
+              return {
+                ...inventory,
+                ...(chain.inventory?.[collection] && {
+                  [collection.toLowerCase()]: toInventoryCollection(chain.inventory[collection])
+                })
+              }
+            }, {} as Inventory)
+
+            acc[2] = {
+              ...acc[2],
+              ...chainInventory
+            }
+
+            return acc
+          },
+          [[] as number[], [] as TokenBalance[], {} as Inventory]
+        )
+
+        bProcessor.handleBalanceUpdate(address, balances)
+        iProcessor.setInventory(address, inventory)
+        networks.update(address, chainIds)
       },
       onError: (err: unknown) => {
         console.error({ err })
       },
       onStopped() {
-        delete subscriptions[address.toLowerCase()]
+        delete subscriptions[address]
       }
     })
 
-    subscriptions[address.toLowerCase()] = Object.assign(sub, { items: [] })
+    subscriptions[address] = Object.assign(sub, { items: [] })
   }
 
   const unsubscribe = async (address: string) => {
+    log.verbose('Surface unsubscribing to account...', { address })
     const subscription = subscriptions[address]
     if (!subscription) return
     subscription.items.forEach((sub) => sub.unsubscribe())
@@ -123,22 +172,25 @@ const Surface = () => {
     networks.close()
   }
 
-  const updateSubscribers = (store: Store, bProcessor: BalanceProcessor, iProcessor: InventoryProcessor) => {
-    const accounts = store('main.accounts')
+  const updateSubscribers = (addresses: string[]) => {
+    const removed = Object.keys(subscriptions).filter((address) => !addresses.includes(address))
+    const addedA = addresses.filter((address) => !subscriptions[address])
     Object.keys(subscriptions).forEach((address) => {
-      if (!accounts[address]) {
+      if (!addresses.includes(address)) {
         unsubscribe(address)
       }
     })
 
-    Object.keys(accounts).forEach((address) => {
+    addresses.forEach((address) => {
       if (!subscriptions[address]) {
-        subscribe(address, bProcessor, iProcessor)
+        subscribe(address)
       }
     })
+    log.verbose('updating surface subscribers', { addresses, addedA, removed })
   }
 
-  const subscribeToItems = (account: string, items: CollectionItem[], iProcessor: InventoryProcessor) => {
+  const subscribeToItems = (addr: string, items: CollectionItem[]) => {
+    const account = addr.toLowerCase()
     const sub = Pylon.items.subscribe(items, {
       onStarted() {
         log.verbose(`Created subscription to items`, { account, items })
@@ -147,15 +199,21 @@ const Surface = () => {
         log.debug('Received update for items', { account, items: data })
 
         if (!data.length) return
-        const items = data.filter(Boolean) as CollectionItem[]
-        iProcessor.updateItems(account, items)
+        const assets = data.map((item) => ({
+          name: item.name,
+          tokenId: item.tokenId,
+          img: item.image,
+          contract: item.contract,
+          ...(item.link && { externalLink: item.link })
+        }))
+        iProcessor.updateItems(account, assets)
       },
       onError: (err) => {
         log.error('Error subscribing to items', { account, items, err })
       }
     })
 
-    subscriptions[account.toLowerCase()].items.push(sub)
+    subscriptions[account].items.push(sub)
   }
 
   return {

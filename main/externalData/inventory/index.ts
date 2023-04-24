@@ -1,39 +1,39 @@
-import log from 'electron-log'
-import Pylon from '@framelabs/pylon-api-client'
+// import log from 'electron-log'
+// import Pylon from '@framelabs/pylon-api-client'
 
-export default function inventory(pylon: Pylon, store: Store) {
-  function handleUpdates(updates: any[]) {
-    if (updates.length === 0) return
+// export default function inventory(pylon: ReturnType<typeof Pylon>, store: Store) {
+//   function handleUpdates(updates: any[]) {
+//     if (updates.length === 0) return
 
-    log.debug(`got inventory updates for ${updates.map((u) => u.id)}`)
+//     log.debug(`got inventory updates for ${updates.map((u) => u.id)}`)
 
-    updates.forEach((update) => {
-      store.setInventory(update.id, update.data.inventory)
-    })
-  }
+//     updates.forEach((update) => {
+//       store.setInventory(update.id, update.data.inventory)
+//     })
+//   }
 
-  function start() {
-    log.verbose('starting inventory updates')
+//   function start() {
+//     log.verbose('starting inventory updates')
 
-    pylon.on('inventories', handleUpdates)
-  }
+//     pylon.on('inventories', handleUpdates)
+//   }
 
-  function stop() {
-    log.verbose('stopping inventory updates')
+//   function stop() {
+//     log.verbose('stopping inventory updates')
 
-    pylon.inventories([])
-    pylon.off('inventories', handleUpdates)
-  }
+//     pylon.inventories([])
+//     pylon.off('inventories', handleUpdates)
+//   }
 
-  function setAddresses(addresses: Address[]) {
-    log.verbose('setting addresses for inventory updates', addresses)
+//   function setAddresses(addresses: Address[]) {
+//     log.verbose('setting addresses for inventory updates', addresses)
 
-    pylon.inventories(addresses)
-  }
+//     pylon.inventories(addresses)
+//   }
 
-  return {
-    start,
-    stop,
-    setAddresses
-  }
-}
+//   return {
+//     start,
+//     stop,
+//     setAddresses
+//   }
+// }

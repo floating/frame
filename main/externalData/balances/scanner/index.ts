@@ -3,8 +3,9 @@ import { BalancesStoreApi } from '..'
 import { NATIVE_CURRENCY } from '../../../../resources/constants'
 import { toTokenId } from '../../../../resources/domain/balance'
 import BalancesWorkerController from '../controller'
-import { BalanceProcessor } from '../processor'
+import processor from '../processor'
 import { CurrencyBalance, TokenBalance } from '../scan'
+import { Balance, Token, WithTokenId } from '../../../store/state'
 
 const RESTART_WAIT = 5 // seconds
 
@@ -14,11 +15,11 @@ const scanInterval = {
   inactive: 60 * 10
 }
 
-function BalanceScanner(store: Store, api: ReturnType<typeof BalancesStoreApi>, processor: BalanceProcessor) {
+function BalanceScanner(store: Store, api: ReturnType<typeof BalancesStoreApi>) {
   let scan: NodeJS.Timeout | null
   let workerController: BalancesWorkerController | null
   let onResume: (() => void) | null
-  const enabledNetworks = new Set<number>()
+  let enabledNetworks = new Set<number>()
   function attemptRestart() {
     log.warn(`balances controller stopped, restarting in ${RESTART_WAIT} seconds`)
     stop()
@@ -255,6 +256,10 @@ function BalanceScanner(store: Store, api: ReturnType<typeof BalancesStoreApi>, 
     chains.forEach((chainId) => enabledNetworks.delete(chainId))
   }
 
+  function setNetworks(chains: number[]) {
+    enabledNetworks = new Set(chains)
+  }
+
   function getNetworks() {
     return Array.from(enabledNetworks)
   }
@@ -269,7 +274,7 @@ function BalanceScanner(store: Store, api: ReturnType<typeof BalancesStoreApi>, 
     runWhenReady(() => workerController?.updateKnownTokenBalances(address, tokens))
   }
 
-  return { start, stop, resume, pause, setAddress, addNetworks, removeNetworks, addTokens }
+  return { start, stop, resume, pause, setAddress, addNetworks, removeNetworks, addTokens, setNetworks }
 }
 
 export default BalanceScanner
