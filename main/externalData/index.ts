@@ -1,19 +1,19 @@
 import log from 'electron-log'
-import Pylon from '@framelabs/pylon-api-client'
+import Pylon from '@framelabs/pylon-client'
 
 import store from '../store'
 import Rates from './assets'
 import { BalancesStoreApi } from './balances'
 import { debounce } from '../../resources/utils'
-import BalanceProcessor from './balances/processor'
 import BalanceScanner from './balances/scanner'
-import InventoryProcessor from './inventory/processor'
+import balanceProcessor from './balances/processor'
 import surface from './surface'
 
 import type { TokenBalance } from './balances/scan'
 
 let pylonActive = false
 let activeAccount = ''
+const activeChains = new Set<number>()
 
 const activeUpdated = (current: string) => current !== activeAccount
 const usePylonUpdated = (newMode: boolean) => newMode !== pylonActive
@@ -24,64 +24,37 @@ export interface DataScanner {
   close: () => void
 }
 
-const ConnectedChains = (scanner: ReturnType<typeof BalanceScanner>) => {
-  const connected = new Set<number>()
-
-  const notPylon = (chainId: number) => !pylonActive || !surface.networks.has(chainId)
-
-  const update = (chainIds: number[]) => {
-    log.verbose('updating connection to chains...', { chainIds })
-    const scanned = chainIds.filter(notPylon)
-    activeAccount && scanned.length && scanner.addNetworks(activeAccount, chainIds)
-
-    log.verbose('Added networks to Scanner: ', { networks: scanned })
-    chainIds.forEach(connected.add.bind(connected))
-  }
-
-  const disconnect = (chainIds: number[]) => {
-    log.verbose('disconnecting from chains...', { chainIds })
-
-    const scanned = chainIds.filter(notPylon)
-    scanned.length && scanner.removeNetworks(scanned)
-
-    chainIds.forEach(connected.delete.bind(connected))
-  }
-
-  const has = connected.has.bind(connected)
-
-  const get = () => Array.from(connected)
-
-  return {
-    has,
-    disconnect,
-    update,
-    get
-  }
-}
-
 const externalData = function () {
   const storeApi = BalancesStoreApi(store)
-  const balanceProcessor = BalanceProcessor(store, storeApi)
-  const scanner = BalanceScanner(store, storeApi, balanceProcessor)
+  const scanner = BalanceScanner(store, storeApi)
   scanner.start()
+
+  const updateNetworks = () => {
+    const connnected = Array.from(activeChains)
+    const usingSurface = surface.networks.get(activeAccount)
+
+    const chainsToScan = connnected.filter((chainId) => !pylonActive || !usingSurface.includes(chainId))
+    scanner.setNetworks(chainsToScan)
+  }
+
+  const updateAccount = () => {
+    activeAccount && scanner.setAddress(activeAccount)
+  }
 
   const pylon = new Pylon('wss://data.pylon.link')
   const rates = Rates(pylon, store)
-
-  const inventoryProcessor = InventoryProcessor(store)
-  const connectedChains = ConnectedChains(scanner)
 
   pylonActive = storeApi.getPylonEnabled()
   rates.start()
 
   if (pylonActive) {
     console.log('PYLON ENABLED... SETTING UP SUBSCRIPTIONS...')
-    surface.updateSubscribers(store, balanceProcessor, inventoryProcessor)
+    surface.updateSubscribers(Object.keys(store('main.accounts')))
   }
 
-  surface.networks.on('updated', (chains: number[]) => {
+  surface.networks.on('updated', ({ account, chains }) => {
     log.verbose('Surface networks updated...', { chains })
-    connectedChains.update(chains)
+    updateNetworks()
   })
 
   let pauseScanningDelay: NodeJS.Timeout | undefined
@@ -93,29 +66,23 @@ const externalData = function () {
     if (!pylonActive) {
       surface.stop()
     } else {
-      surface.updateSubscribers(store, balanceProcessor, inventoryProcessor)
+      surface.updateSubscribers(Object.keys(store('main.accounts')))
     }
     // Switch all surface networks to use the scanner...
-    connectedChains.update(surface.networks.get())
+    updateNetworks()
   }
 
   const updateActiveAccount = (currentAccount: string) =>
     debounce(() => {
       if (!currentAccount) return
-      rates.updateSubscription(connectedChains.get(), activeAccount)
+      const connected = storeApi.getConnectedNetworkIds()
+      rates.updateSubscription(connected, activeAccount)
       console.log('Active account has switched... updating to new account', {
         newActiveAccount: currentAccount
       })
       activeAccount = currentAccount
-      scanner.setAddress(currentAccount)
-      connectedChains.update(storeApi.getConnectedNetworks().map((network) => network.id))
-    }, 800)()
-
-  const handleAccountChanges = () =>
-    debounce(() => {
-      if (pylonActive) {
-        surface.updateSubscribers(store, balanceProcessor, inventoryProcessor)
-      }
+      updateNetworks()
+      updateAccount()
     }, 800)()
 
   const handleTokensUpdate = debounce((tokens: Token[]) => {
@@ -123,18 +90,21 @@ const externalData = function () {
 
     const [forProcessor, forScanner] = tokens.reduce(
       ([forProcessor, forScanner], token) => {
-        return pylonActive && surface.networks.has(token.chainId)
-          ? [forProcessor.concat(token), forScanner]
+        return pylonActive && surface.networks.has(activeAccount, token.chainId)
+          ? [
+              forProcessor.concat({
+                ...token,
+                balance: '0x00',
+                displayBalance: '0'
+              }),
+              forScanner
+            ]
           : [forProcessor, forScanner.concat(token)]
       },
-      [[] as Token[], [] as Token[]]
+      [[] as TokenBalance[], [] as Token[]]
     )
 
     activeAccount && scanner.addTokens(activeAccount, forScanner)
-    //TODO: Map into balances
-    const balances: TokenBalance[] = []
-    //TODO: use processor to update these balances directly...
-
     rates.updateSubscription(
       storeApi.getConnectedNetworks().map((network) => network.id),
       activeAccount
@@ -145,15 +115,18 @@ const externalData = function () {
     debounce(() => {
       console.log('handling network changes...', {
         networks,
-        activeAccount,
-        connectedChains: connectedChains.get()
+        activeAccount
       })
       const set = new Set(networks)
-      const added = networks.filter((id) => !connectedChains.has(id))
-      const removed = connectedChains.get().filter((id) => !set.has(id))
-      removed.length && connectedChains.disconnect(removed)
-      added.length && connectedChains.update(added)
-      if (added.length || removed.length) rates.updateSubscription(connectedChains.get(), activeAccount)
+      const added = networks.filter((id) => !activeChains.has(id))
+      const removed = Array.from(activeChains).filter((id) => !set.has(id))
+      if (added.length || removed.length) {
+        log.verbose('Networks have changed...', { added, removed })
+        removed.forEach(activeChains.delete.bind(activeChains))
+        added.forEach(activeChains.add.bind(activeChains))
+        updateNetworks()
+        rates.updateSubscription(Array.from(activeChains), activeAccount)
+      }
     }, 800)()
 
   const observers: Record<string, Observer> = {
@@ -164,7 +137,11 @@ const externalData = function () {
       }
     }, 'externalData:activeAccount'),
     accounts: store.observer(() => {
-      handleAccountChanges()
+      if (!pylonActive) return
+      const accounts = Object.keys(store('main.accounts'))
+      if (accounts.length) {
+        surface.updateSubscribers(accounts)
+      }
     }, 'externalData:accounts'),
     tokens: store.observer(() => {
       const customTokens = storeApi.getCustomTokens()

@@ -1,3 +1,4 @@
+import log from 'electron-log'
 import { NATIVE_CURRENCY } from '../../../resources/constants'
 
 import type { Chain, Balance, Token } from '../../store/state'
@@ -13,6 +14,15 @@ export const BalancesStoreApi = (store: Store) => ({
       (n) => (n.connection.primary || {}).connected || (n.connection.secondary || {}).connected
     )
   },
+  getConnectedNetworkIds: () => {
+    const networks = Object.values(store('main.networks.ethereum') || {}) as Chain[]
+    return networks.reduce((acc, n) => {
+      if ((n.connection.primary || {}).connected || (n.connection.secondary || {}).connected) {
+        acc.push(n.id)
+      }
+      return acc
+    }, [] as number[])
+  },
   getCustomTokens: () => (store('main.tokens.custom') || []) as Token[],
   getKnownTokens: (address?: Address): Token[] => (address && store('main.tokens.known', address)) || [],
   getCurrencyBalances: (address: Address) => {
@@ -21,10 +31,9 @@ export const BalancesStoreApi = (store: Store) => ({
     )
   },
   getTokenBalances: (address: Address) => {
-    return ((store('main.balances', address) || []) as Balance[]).filter(
-      (balance) => balance.address !== NATIVE_CURRENCY
-    )
+    const balances = (store('main.balances', address) || []) as Balance[]
+    return balances.filter((balance) => balance.address !== NATIVE_CURRENCY)
   },
-  getPylonEnabled: () => true
+  getPylonEnabled: () => false
   // store('main.pylonEnabled') as Boolean //TODO: need to add pylonEnabled to store zod def...
 })

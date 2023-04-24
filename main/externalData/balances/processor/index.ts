@@ -1,24 +1,8 @@
 import { BalancesStoreApi } from '..'
 import { TokenBalance } from '../scan'
-
-import { Account } from '../../surface'
-import { formatUnits } from 'ethers/lib/utils'
 import { toTokenId } from '../../../../resources/domain/balance'
-
-export type BalanceProcessor = ReturnType<typeof BalanceProcessor>
-
-const getBalances = (account: Account): TokenBalance[] => {
-  return Object.values(account.balances).map((b) => ({
-    address: b.contract.toLowerCase(),
-    chainId: b.chainId,
-    name: b.name || '',
-    symbol: b.symbol,
-    balance: b.amount,
-    decimals: b.decimals || 18,
-    displayBalance: formatUnits(b.amount, b.decimals),
-    logoUri: b.image || ''
-  }))
-}
+import store from '../../../store'
+import { Balance } from '../../../store/state'
 
 const getChangedBalances = (
   address: string,
@@ -66,35 +50,29 @@ const getTokenChanges = (
   return { unknownBalances, zeroBalances }
 }
 
-function BalanceProcessor(store: Store, api: ReturnType<typeof BalancesStoreApi>) {
-  function updateTokens(address: string, zeroBalances: Set<string>, unknownBalances: TokenBalance[]) {
-    if (zeroBalances.size) {
-      store.removeKnownTokens(address, zeroBalances)
-    }
+const api = BalancesStoreApi(store)
 
-    if (unknownBalances.length) {
-      store.addKnownTokens(address, unknownBalances)
-    }
+function updateTokens(address: string, zeroBalances: Set<string>, unknownBalances: TokenBalance[]) {
+  if (zeroBalances.size) {
+    store.removeKnownTokens(address, zeroBalances)
   }
 
-  function handleBalanceUpdate(address: string, changedBalances: TokenBalance[]) {
-    if (!changedBalances.length) return
-
-    store.setBalances(address, changedBalances)
-    const { zeroBalances, unknownBalances } = getTokenChanges(address, changedBalances, api)
-    updateTokens(address, zeroBalances, unknownBalances)
-
-    store.accountTokensUpdated(address)
+  if (unknownBalances.length) {
+    store.addKnownTokens(address, unknownBalances)
   }
-
-  function updateAccount(account: Account) {
-    const balances = getBalances(account)
-    const address = account.address.toLowerCase()
-    const changedBalances = getChangedBalances(address, balances, api)
-    handleBalanceUpdate(address, changedBalances)
-  }
-
-  return { handleBalanceUpdate, updateAccount }
 }
 
-export default BalanceProcessor
+function handleBalanceUpdate(address: string, balances: TokenBalance[]) {
+  const changedBalances = getChangedBalances(address, balances, api)
+  if (!changedBalances.length) return
+
+  store.setBalances(address, changedBalances)
+  const { zeroBalances, unknownBalances } = getTokenChanges(address, changedBalances, api)
+  updateTokens(address, zeroBalances, unknownBalances)
+
+  store.accountTokensUpdated(address)
+}
+
+export default {
+  handleBalanceUpdate
+}
