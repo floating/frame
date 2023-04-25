@@ -7,9 +7,7 @@ import iProcessor from '../inventory/processor'
 import { TokenBalance } from '../balances/scan'
 import { formatUnits } from 'ethers/lib/utils'
 
-type Subscription = Unsubscribable & {
-  items: Unsubscribable[]
-}
+type Subscription = Unsubscribable & { unsubscribables: Unsubscribable[]; collectionItems: CollectionItem[] }
 
 //TODO: do we need to export these from surface?...
 type ItemCollectionId = {
@@ -89,7 +87,7 @@ const toTokenBalance = (b: BalanceItem) => ({
   balance: b.amount,
   decimals: b.decimals || 18,
   displayBalance: formatUnits(b.amount, b.decimals),
-  logoUri: b.image || ''
+  logoURI: b.image || ''
 })
 
 const Pylon = createPylon('ws://localhost:9000')
@@ -149,14 +147,14 @@ const Surface = () => {
       }
     })
 
-    subscriptions[address] = Object.assign(sub, { items: [] })
+    subscriptions[address] = Object.assign(sub, { unsubscribables: [], collectionItems: [] })
   }
 
   const unsubscribe = async (address: string) => {
     log.verbose('Surface unsubscribing to account...', { address })
     const subscription = subscriptions[address]
     if (!subscription) return
-    subscription.items.forEach((sub) => sub.unsubscribe())
+    subscription.unsubscribables.forEach((u) => u.unsubscribe())
     subscription.unsubscribe()
 
     delete subscriptions[address]
@@ -213,9 +211,23 @@ const Surface = () => {
       }
     })
 
-    subscriptions[account].items.push(sub)
+    subscriptions[account].unsubscribables.push(sub)
+    subscriptions[account].collectionItems.push(...items)
   }
 
+  setInterval(() => {
+    log.verbose('Updating subscriptions to surface...')
+    const subscribers = Object.entries(subscriptions).map(([address, { collectionItems }]) => ({
+      collectionItems,
+      address
+    }))
+    Object.keys(subscriptions).forEach(unsubscribe)
+    subscribers.forEach(({ address, collectionItems }) => {
+      log.verbose('should be resubbing...', { collectionItems, address })
+      subscribe(address)
+      collectionItems.length && subscribeToItems(address, collectionItems)
+    })
+  }, 1000 * 60 * 1)
   return {
     stop,
     updateSubscribers,
