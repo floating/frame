@@ -81,6 +81,7 @@ class BalancesPreview extends React.Component {
   }
 
   render() {
+    const { populatedChains, allChainsUpdated, filter = '' } = this.props
     const { address, lastSignerType } = this.store('main.accounts', this.props.account)
     const storedBalances = this.store('main.balances', address) || []
     const rates = this.store('main.rates')
@@ -88,21 +89,29 @@ class BalancesPreview extends React.Component {
     const allBalances = this.getBalances(storedBalances, rates)
 
     // if filter only show balances that match filter
-    const filteredBalances = allBalances.filter((balance) => {
-      const { filter = '' } = this.props
+
+    const filteredBalances = allBalances.reduce((balances, balance) => {
       const chainName = this.store('main.networks.ethereum', balance.chainId, 'name')
-      return matchFilter(filter, [chainName, balance.name, balance.symbol])
-    })
+      const { expires } = populatedChains[balance.chainId] || {}
+      if (expires && Date.now() < expires && matchFilter(filter, [chainName, balance.name, balance.symbol])) {
+        balances.push(balance)
+      }
+      return balances
+    }, [])
 
     const totalValue = filteredBalances.reduce((a, b) => a.plus(b.totalValue), BigNumber(0))
     const totalDisplayValue = formatUsdRate(totalValue, 0)
-    const lastBalanceUpdate = this.store('main.accounts', address, 'balances.lastUpdated')
 
     const balances = filteredBalances.slice(0, 4)
 
     // scan if balances are more than a minute old
-    const scanning = !lastBalanceUpdate || new Date() - new Date(lastBalanceUpdate) > 1000 * 60
-    console.log({ scanning, balances, address })
+    console.log({
+      balances,
+      address,
+      populatedChains,
+      allChainsUpdated
+    })
+
     const hotSigner = ['ring', 'seed'].includes(lastSignerType)
 
     return (
@@ -111,23 +120,23 @@ class BalancesPreview extends React.Component {
           <span>{svg.tokens(13)}</span>
           <span>{'Balances'}</span>
         </div>
-        {balances.length && scanning === 0 ? (
+        {/* {balances.length && !allChainsUpdated ? (
           <div className='signerBalancesLoading'>
             <div className='loader' />
           </div>
-        ) : null}
+        ) : null} */}
         <Cluster>
           {balances.map(({ chainId, symbol, ...balance }, i) => {
             return (
               <ClusterRow key={chainId + symbol}>
                 <ClusterValue>
-                  <Balance chainId={chainId} symbol={symbol} balance={balance} i={i} scanning={scanning} />
+                  <Balance chainId={chainId} symbol={symbol} balance={balance} i={i} scanning={false} />
                 </ClusterValue>
               </ClusterRow>
             )
           })}
         </Cluster>
-        <div className='signerBalanceTotal' style={{ opacity: !scanning ? 1 : 0 }}>
+        <div className='signerBalanceTotal' style={{ opacity: 1 }}>
           {!this.props.expanded ? (
             <div className='signerBalanceButtons'>
               <div
@@ -164,7 +173,7 @@ class BalancesPreview extends React.Component {
             <div className='signerBalanceTotalLabel'>{'Total'}</div>
             <div className='signerBalanceTotalValue'>
               {svg.usd(11)}
-              {balances.length > 0 ? totalDisplayValue : '---.--'}
+              {balances.length && allChainsUpdated ? totalDisplayValue : '---.--'}
             </div>
           </div>
         </div>
@@ -172,7 +181,7 @@ class BalancesPreview extends React.Component {
           <div
             className='signerBalanceWarning'
             onClick={() => this.setState({ showHighHotMessage: !this.state.showHighHotMessage })}
-            style={scanning ? { opacity: 0 } : { opacity: 1 }}
+            style={!allChainsUpdated ? { opacity: 0 } : { opacity: 1 }}
           >
             <div className='signerBalanceWarningTitle'>{'high value account is using hot signer'}</div>
             {this.state.showHighHotMessage ? (
