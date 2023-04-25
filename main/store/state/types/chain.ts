@@ -9,7 +9,7 @@ import { NativeCurrencySchema } from './nativeCurrency'
 const layerValues = ['mainnet', 'rollup', 'sidechain', 'testnet'] as const
 const type = 'ethereum' as const
 
-const chainDefaults = {
+export const chainDefaults = {
   1: {
     id: 1,
     type,

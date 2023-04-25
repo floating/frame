@@ -32,7 +32,7 @@ it('parses a valid chain', () => {
   expect(chains['5']).toEqual(validChain)
 })
 
-it('sets all connections to disconnected to start', () => {
+it('sets the primary connection to disconnected to start', () => {
   const previouslyConnectedChain = {
     ...validChain,
     connection: {
@@ -45,6 +45,21 @@ it('sets all connections to disconnected to start', () => {
   const chains = EthereumChainsSchema.parse({ 5: previouslyConnectedChain })
 
   expect(chains['5'].connection.primary.connected).toBe(false)
+})
+
+it('sets the secondary connection to disconnected to start', () => {
+  const previouslyConnectedChain = {
+    ...validChain,
+    connection: {
+      secondary: {
+        ...validChain.connection.secondary,
+        connected: true
+      }
+    }
+  }
+  const chains = EthereumChainsSchema.parse({ 5: previouslyConnectedChain })
+
+  expect(chains['5'].connection.secondary.connected).toBe(false)
 })
 
 it('replaces a corrupt chain with a known id with the default value from the state', () => {
