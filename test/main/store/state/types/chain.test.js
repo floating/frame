@@ -1,35 +1,50 @@
 import { EthereumChainsSchema } from '../../../../../main/store/state/types/chain'
 
+const validChain = {
+  id: 5,
+  type: 'ethereum',
+  layer: 'testnet',
+  isTestnet: true,
+  on: false,
+  name: 'Görli',
+  explorer: 'https://goerli.etherscan.io',
+  connection: {
+    primary: {
+      on: true,
+      current: 'pylon',
+      status: 'loading',
+      connected: false,
+      custom: ''
+    },
+    secondary: {
+      on: false,
+      current: 'custom',
+      status: 'loading',
+      connected: false,
+      custom: ''
+    }
+  }
+}
+
 it('parses a valid chain', () => {
-  const chain = {
-    id: 5,
-    type: 'ethereum',
-    layer: 'testnet',
-    isTestnet: true,
-    on: false,
-    name: 'Görli',
-    explorer: 'https://goerli.etherscan.io',
+  const chains = EthereumChainsSchema.parse({ 5: validChain })
+
+  expect(chains['5']).toEqual(validChain)
+})
+
+it('sets all connections to disconnected to start', () => {
+  const previouslyConnectedChain = {
+    ...validChain,
     connection: {
       primary: {
-        on: true,
-        current: 'pylon',
-        status: 'loading',
-        connected: false,
-        custom: ''
-      },
-      secondary: {
-        on: false,
-        current: 'custom',
-        status: 'loading',
-        connected: false,
-        custom: ''
+        ...validChain.connection.primary,
+        connected: true
       }
     }
   }
+  const chains = EthereumChainsSchema.parse({ 5: previouslyConnectedChain })
 
-  const chains = EthereumChainsSchema.parse({ 5: chain })
-
-  expect(chains['5']).toEqual(chain)
+  expect(chains['5'].connection.primary.connected).toBe(false)
 })
 
 it('replaces a corrupt chain with a known id with the default value from the state', () => {
@@ -50,7 +65,7 @@ it('replaces a corrupt chain with a known id with the default value from the sta
     explorer: 'https://goerli.etherscan.io',
     connection: {
       primary: {
-        on: false,
+        on: true,
         current: 'custom',
         status: 'loading',
         connected: false,
@@ -91,7 +106,7 @@ it('adds mainnet if not present in the state', () => {
       on: true,
       connection: {
         primary: {
-          on: false,
+          on: true,
           current: 'custom',
           status: 'loading',
           connected: false,

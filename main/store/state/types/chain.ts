@@ -17,6 +17,7 @@ const chainDefaults = {
     name: 'Mainnet',
     isTestnet: false,
     explorer: 'https://etherscan.io',
+    on: true,
     connection: {
       primary: {
         on: true,
@@ -32,8 +33,7 @@ const chainDefaults = {
         connected: false,
         custom: ''
       }
-    },
-    on: true
+    }
   },
   5: {
     id: 5,
@@ -215,10 +215,8 @@ const chainDefaults = {
 function getDefaultChain(chainId: keyof typeof chainDefaults) {
   const defaultChain = chainDefaults[chainId]
 
-  // ensure all non-Mainnet chains that are replaced in state with a
-  // default value are turned off and not using any custom RPC presets
-  defaultChain.on = chainId === 1
-  defaultChain.connection.primary.on = false
+  // ensure all chains that are replaced in state with a
+  // default value are not using any custom RPC presets
   defaultChain.connection.primary.current = 'custom'
   defaultChain.connection.secondary.current = 'custom'
 
@@ -284,6 +282,30 @@ export const EthereumChainsSchema = z
       ...chains,
       1: chains['1'] || getDefaultChain(1)
     }
+  })
+  .transform((chains) => {
+    const disconnectedChains = Object.entries(chains).map(([id, chain]) => {
+      // all chains should start disconnected by default
+      return [
+        id,
+        {
+          ...chain,
+          connection: {
+            ...chain.connection,
+            primary: {
+              ...chain.connection.primary,
+              connected: false
+            },
+            secondary: {
+              ...chain.connection.secondary,
+              connected: false
+            }
+          }
+        }
+      ]
+    })
+
+    return Object.fromEntries(disconnectedChains)
   })
 
 export type ChainId = z.infer<typeof ChainIdSchema>
