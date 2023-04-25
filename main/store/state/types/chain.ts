@@ -212,6 +212,19 @@ const chainDefaults = {
   }
 }
 
+function getDefaultChain(chainId: keyof typeof chainDefaults) {
+  const defaultChain = chainDefaults[chainId]
+
+  // ensure all non-Mainnet chains that are replaced in state with a
+  // default value are turned off and not using any custom RPC presets
+  defaultChain.on = chainId === 1
+  defaultChain.connection.primary.on = false
+  defaultChain.connection.primary.current = 'custom'
+  defaultChain.connection.secondary.current = 'custom'
+
+  return defaultChain
+}
+
 export const ChainIdSchema = z.object({
   id: z.coerce.number(),
   type: z.literal('ethereum')
@@ -237,7 +250,7 @@ const ParsedChainSchema = z.union([ChainSchema, z.boolean()]).catch((ctx) => {
   const { id: chainId } = (ctx.input || {}) as any
 
   if (chainId in chainDefaults) {
-    return chainDefaults[chainId as keyof typeof chainDefaults]
+    return getDefaultChain(chainId as keyof typeof chainDefaults)
   }
 
   return false
@@ -267,11 +280,10 @@ export const EthereumChainsSchema = z
     ) as Record<string, Chain>
 
     // add mainnet if it's not already there
-    if (!('1' in chains)) {
-      chains['1'] = chainDefaults['1']
+    return {
+      ...chains,
+      1: chains['1'] || getDefaultChain(1)
     }
-
-    return chains
   })
 
 export type ChainId = z.infer<typeof ChainIdSchema>

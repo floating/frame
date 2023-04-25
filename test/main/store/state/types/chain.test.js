@@ -50,12 +50,10 @@ it('replaces a corrupt chain with a known id with the default value from the sta
     explorer: 'https://goerli.etherscan.io',
     connection: {
       primary: {
-        on: true,
-        current: 'pylon',
+        on: false,
+        current: 'custom',
         status: 'loading',
         connected: false,
-        type: '',
-        network: '',
         custom: ''
       },
       secondary: {
@@ -63,8 +61,6 @@ it('replaces a corrupt chain with a known id with the default value from the sta
         current: 'custom',
         status: 'loading',
         connected: false,
-        type: '',
-        network: '',
         custom: ''
       }
     }
@@ -92,10 +88,11 @@ it('adds mainnet if not present in the state', () => {
       name: 'Mainnet',
       isTestnet: false,
       explorer: 'https://etherscan.io',
+      on: true,
       connection: {
         primary: {
-          on: true,
-          current: 'pylon',
+          on: false,
+          current: 'custom',
           status: 'loading',
           connected: false,
           custom: ''
@@ -107,8 +104,7 @@ it('adds mainnet if not present in the state', () => {
           connected: false,
           custom: ''
         }
-      },
-      on: true
+      }
     }
   })
 })
