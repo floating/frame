@@ -53,7 +53,9 @@ const Networks = () => {
 
     const event = {
       account,
-      chains: chainIds
+      chains: Object.entries(networks[account])
+        .filter(([, value]) => value)
+        .map(([key]) => Number(key))
     }
 
     emitter.emit('updated', event)
