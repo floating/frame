@@ -32,6 +32,7 @@ class BalancesExpanded extends React.Component {
   }
 
   getBalances(rawBalances, rates) {
+    const { populatedChains } = this.props
     const networks = this.store('main.networks.ethereum')
     const networksMeta = this.store('main.networksMeta.ethereum')
 
@@ -56,7 +57,11 @@ class BalancesExpanded extends React.Component {
       .filter((balance) => {
         const filter = this.state.balanceFilter
         const chainName = this.store('main.networks.ethereum', balance.chainId, 'name')
-        return matchFilter(filter, [chainName, balance.name, balance.symbol])
+        return (
+          populatedChains[balance.chainId] &&
+          populatedChains[balance.chainId].expires > Date.now() &&
+          matchFilter(filter, [chainName, balance.name, balance.symbol])
+        )
       })
       .sort(byTotalValue)
 
@@ -96,6 +101,7 @@ class BalancesExpanded extends React.Component {
   }
 
   render() {
+    const { allChainsUpdated } = this.props
     const { address, lastSignerType } = this.store('main.accounts', this.props.account)
     const storedBalances = this.store('main.balances', address) || []
     const rates = this.store('main.rates')
@@ -103,37 +109,25 @@ class BalancesExpanded extends React.Component {
     const { balances: allBalances, totalDisplayValue, totalValue } = this.getBalances(storedBalances, rates)
     const balances = allBalances.slice(0, this.props.expanded ? allBalances.length : 4)
 
-    const lastBalanceUpdate = this.store('main.accounts', this.props.account, 'balances.lastUpdated')
-    const usingSurface = true //TODO: use the value in store...
-
-    // scan if balances are more than a minute old
-    const scanning = !lastBalanceUpdate || new Date() - new Date(lastBalanceUpdate) > 1000 * 60 * 5
-    // console.log({ scanning, balances, address })
-    console.log({ scanning, lastBalanceUpdate })
     const hotSigner = ['ring', 'seed'].includes(lastSignerType)
 
     return (
       <div className='accountViewScroll'>
         {this.renderAccountFilter()}
-        {scanning ? (
-          <div className='signerBalancesLoading'>
-            <div className='loader' />
-          </div>
-        ) : null}
         <ClusterBox>
           <Cluster>
             {balances.map(({ chainId, symbol, ...balance }, i) => {
               return (
                 <ClusterRow key={chainId + symbol + balance.address}>
                   <ClusterValue>
-                    <Balance chainId={chainId} symbol={symbol} balance={balance} i={i} scanning={scanning} />
+                    <Balance chainId={chainId} symbol={symbol} balance={balance} i={i} scanning={false} />
                   </ClusterValue>
                 </ClusterRow>
               )
             })}
           </Cluster>
         </ClusterBox>
-        <div className='signerBalanceTotal' style={{ opacity: !scanning ? 1 : 0 }}>
+        <div className='signerBalanceTotal' style={{ opacity: allChainsUpdated ? 1 : 0 }}>
           <div className='signerBalanceButtons'>
             <div
               className='signerBalanceButton signerBalanceAddToken'
@@ -148,7 +142,7 @@ class BalancesExpanded extends React.Component {
             <div className='signerBalanceTotalLabel'>{'Total'}</div>
             <div className='signerBalanceTotalValue'>
               {svg.usd(11)}
-              {balances.length > 0 ? totalDisplayValue : '---.--'}
+              {balances.length && allChainsUpdated ? totalDisplayValue : '---.--'}
             </div>
           </div>
         </div>
@@ -156,7 +150,7 @@ class BalancesExpanded extends React.Component {
           <div
             className='signerBalanceWarning'
             onClick={() => this.setState({ showHighHotMessage: !this.state.showHighHotMessage })}
-            style={scanning ? { opacity: 0 } : { opacity: 1 }}
+            style={!allChainsUpdated ? { opacity: 0 } : { opacity: 1 }}
           >
             <div className='signerBalanceWarningTitle'>{'high value account is using hot signer'}</div>
             {this.state.showHighHotMessage ? (

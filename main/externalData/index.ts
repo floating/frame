@@ -6,7 +6,6 @@ import Rates from './assets'
 import { BalancesStoreApi } from './balances'
 import { debounce } from '../../resources/utils'
 import BalanceScanner from './balances/scanner'
-import balanceProcessor from './balances/processor'
 import surface from './surface'
 
 import type { TokenBalance } from './balances/scan'
@@ -25,6 +24,7 @@ export interface DataScanner {
 }
 
 const externalData = function () {
+  // store.clearPopulatedChains()
   const storeApi = BalancesStoreApi(store)
   const scanner = BalanceScanner(store, storeApi)
   scanner.start()
@@ -129,6 +129,7 @@ const externalData = function () {
       }
     }, 800)()
 
+  //TODO: extract observers similar to with the provider observers...
   const observers: Record<string, Observer> = {
     activeAccount: store.observer(() => {
       const currentActive = storeApi.getActiveAddress()
@@ -139,9 +140,7 @@ const externalData = function () {
     accounts: store.observer(() => {
       if (!pylonActive) return
       const accounts = Object.keys(store('main.accounts'))
-      if (accounts.length) {
-        surface.updateSubscribers(accounts)
-      }
+      surface.updateSubscribers(accounts)
     }, 'externalData:accounts'),
     tokens: store.observer(() => {
       const customTokens = storeApi.getCustomTokens()

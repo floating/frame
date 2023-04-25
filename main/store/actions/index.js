@@ -134,6 +134,35 @@ module.exports = {
       return updated
     })
   },
+  addPopulatedChains: (u, address, chains, mode) => {
+    u('main.accounts', address, (account) => {
+      const populatedChains = account.balances.populatedChains || {}
+
+      chains.forEach((chain) => {
+        const lastUpdated = Date.now()
+        const expires = lastUpdated + (mode === 'scan' ? 1000 * 60 : 1000 * 60 * 5)
+        populatedChains[chain] = {
+          lastUpdated,
+          expires
+        }
+      })
+      const balances = { ...account.balances, populatedChains }
+      const updated = { ...account, balances }
+
+      log.verbose('addPopulatedChains', { address, chains, updated, populatedChains })
+      return updated
+    })
+  },
+  clearPopulatedChains: (u) => {
+    u('main.accounts', (accounts) => {
+      Object.values(accounts).forEach((account) => {
+        if (account.balances && account.balances.populatedChains) {
+          account.balances.populatedChains = {}
+        }
+      })
+      return accounts
+    })
+  },
   updateAccount: (u, updatedAccount) => {
     const { id, name } = updatedAccount
     u('main.accounts', id, (account = {}) => {

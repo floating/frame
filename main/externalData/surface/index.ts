@@ -137,7 +137,7 @@ const Surface = () => {
           [[] as number[], [] as TokenBalance[], {} as Inventory]
         )
 
-        bProcessor.handleBalanceUpdate(address, balances)
+        bProcessor.handleBalanceUpdate(address, balances, chainIds, 'surface')
         iProcessor.setInventory(address, inventory)
         networks.update(address, chainIds)
       },

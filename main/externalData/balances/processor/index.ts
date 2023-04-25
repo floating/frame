@@ -3,6 +3,7 @@ import { TokenBalance } from '../scan'
 import { toTokenId } from '../../../../resources/domain/balance'
 import store from '../../../store'
 import { Balance } from '../../../store/state'
+import log from 'electron-log'
 
 const getChangedBalances = (
   address: string,
@@ -62,15 +63,18 @@ function updateTokens(address: string, zeroBalances: Set<string>, unknownBalance
   }
 }
 
-function handleBalanceUpdate(address: string, balances: TokenBalance[]) {
+function handleBalanceUpdate(address: string, balances: TokenBalance[], chains: number[], mode: string) {
+  log.verbose('handling balance update...', { address, chains })
   const changedBalances = getChangedBalances(address, balances, api)
-  if (!changedBalances.length) return
+  if (changedBalances.length) {
+    store.setBalances(address, changedBalances)
+    const { zeroBalances, unknownBalances } = getTokenChanges(address, changedBalances, api)
+    updateTokens(address, zeroBalances, unknownBalances)
 
-  store.setBalances(address, changedBalances)
-  const { zeroBalances, unknownBalances } = getTokenChanges(address, changedBalances, api)
-  updateTokens(address, zeroBalances, unknownBalances)
+    store.accountTokensUpdated(address, chains)
+  }
 
-  store.accountTokensUpdated(address)
+  store.addPopulatedChains(address.toLowerCase(), chains, mode)
 }
 
 export default {

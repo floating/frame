@@ -202,7 +202,7 @@ function BalanceScanner(store: Store, api: ReturnType<typeof BalancesStoreApi>) 
 
   function handleTokenBalanceUpdate(balances: TokenBalance[], address: Address) {
     console.log('handling token balances update...', { balances, address })
-    processor.handleBalanceUpdate(address, balances)
+    processor.handleBalanceUpdate(address, balances, Array.from(enabledNetworks), 'scan')
   }
 
   function handleTokenBlacklistUpdate(tokensToRemove: Set<string>) {
