@@ -10,6 +10,7 @@ import { FrameSchema } from './frame'
 import { MuteSchema } from './mute'
 import { KnownOriginsSchema } from './origin'
 import { PermissionSchema } from './permission'
+import { PrivacySchema } from './privacy'
 import { ShortcutsSchema } from './shortcuts'
 import { SignerSchema } from './signer'
 
@@ -27,12 +28,7 @@ const MainPreferences = {
     .default(false)
     .describe("Lock an account when it's closed instead of when Frame restarts"),
   showLocalNameWithENS: z.boolean(),
-  menubarGasPrice: z.boolean().default(false).describe('Show gas price in menu bar'),
-  hardwareDerivation: z.string()
-}
-
-const FrameState = {
-  focusedFrame: z.string()
+  menubarGasPrice: z.boolean().default(false).describe('Show gas price in menu bar')
 }
 
 export const MainSchema = z.object({
@@ -54,13 +50,13 @@ export const MainSchema = z.object({
   balances: z.record(z.string().describe('Address'), z.array(BalanceSchema)),
   dapps: z.record(z.string(), DappSchema),
   mute: MuteSchema,
+  privacy: PrivacySchema,
   colorway: z.enum(['light', 'dark']),
   colorwayPrimary: ColorwayPrimarySchema,
   shortcuts: ShortcutsSchema,
   updater: UpdaterPreferencesSchema,
   frames: z.record(z.string(), FrameSchema),
   ...MainPreferences
-  //...FrameState
 })
 
 export type Main = z.infer<typeof MainSchema>

@@ -27,7 +27,7 @@ export type { Shortcut, ShortcutKey, ModifierKey } from './types/shortcuts'
 export type { ColorwayPalette } from './types/colors'
 
 const StateSchema = z.object({
-  main: MainSchema,
+  main: MainSchema.passthrough(), // TODO: remove passthrough once all pieces of state have been defined
   windows: z.any(),
   view: z.any(),
   selected: z.any(),
@@ -154,7 +154,6 @@ const mainState = {
   rates: {}, // main('rates', {}),
   inventory: {}, // main('rates', {}),
   signers: {},
-  savedSigners: {},
   updater: {
     dontRemind: main('updater.dontRemind', [])
   },
@@ -308,7 +307,6 @@ export default function () {
     const issues = result.error.issues
     log.warn(`Found ${issues.length} issues while parsing saved state`, issues)
 
-    //process.exit(1)
     return migratedState
   }
 
