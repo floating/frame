@@ -47,7 +47,7 @@ class Inventory extends React.Component {
           >
             <div key={k} className='inventoryCollection'>
               <div className='inventoryCollectionTop'>
-                <div className='inventoryCollectionName'>{inventory[k].meta.name}</div>
+                <div className='inventoryCollectionName'>{inventory[k].meta.name || k}</div>
                 <div className='inventoryCollectionCount'>{Object.keys(inventory[k].items).length}</div>
                 <div className='inventoryCollectionLine' />
               </div>
