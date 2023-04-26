@@ -134,13 +134,13 @@ module.exports = {
       return updated
     })
   },
-  addPopulatedChains: (u, address, chains, mode) => {
+  addPopulatedChains: (u, address, chains, expiryWindow) => {
     u('main.accounts', address, (account) => {
       const populatedChains = account.balances.populatedChains || {}
 
       chains.forEach((chain) => {
         const lastUpdated = Date.now()
-        const expires = lastUpdated + (mode === 'scan' ? 1000 * 60 : 1000 * 60 * 5)
+        const expires = lastUpdated + expiryWindow
         populatedChains[chain] = {
           lastUpdated,
           expires
