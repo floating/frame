@@ -4,7 +4,7 @@ import { Identity } from '../../accounts/types'
 export type ActionType = 'erc20:approve' | 'erc20:revoke' | 'erc20:transfer'
 
 type Erc20Spend = {
-  amount: HexAmount
+  amount: string // hex
   decimals: number
   name: string
   symbol: string

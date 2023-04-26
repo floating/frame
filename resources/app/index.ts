@@ -1,4 +1,4 @@
-import type { Shortcut, ShortcutKey, ModifierKey } from '../../main/store/state/types/shortcuts'
+import type { Shortcut, ShortcutKey, ModifierKey } from '../../main/store/state'
 
 type Platform = 'darwin' | 'win32' | 'linux'
 

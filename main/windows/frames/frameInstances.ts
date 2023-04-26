@@ -4,6 +4,8 @@ import path from 'path'
 import { createWindow } from '../window'
 import topRight from './topRight'
 
+import type { Frame } from '../../store/state'
+
 const isDev = process.env.NODE_ENV === 'development'
 
 export interface FrameInstance extends BrowserWindow {

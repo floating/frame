@@ -7,6 +7,7 @@ import migrations from '../migrate'
 
 import { MainSchema } from './types/main'
 import { chainDefaults } from './types/chain'
+import { chainMetaDefaults } from './types/chainMeta'
 
 export type { ChainId, Chain } from './types/chain'
 export type { Connection } from './types/connection'
@@ -15,16 +16,24 @@ export type { Permission } from './types/permission'
 export type { HardwareSignerType, HotSignerType, SignerType, Signer } from './types/signer'
 export type { Account, AccountMetadata } from './types/account'
 export type { Balance } from './types/balance'
+export type { InventoryAsset, InventoryCollection } from './types/inventory'
 export type { WithTokenId, Token } from './types/token'
 export type { Dapp } from './types/dapp'
 export type { NativeCurrency } from './types/nativeCurrency'
 export type { Gas, GasFees } from './types/gas'
 export type { Rate } from './types/rate'
+export type { Frame, ViewMetadata } from './types/frame'
+export type { Shortcut, ShortcutKey, ModifierKey } from './types/shortcuts'
 export type { ColorwayPalette } from './types/colors'
 
 const StateSchema = z.object({
   main: MainSchema,
-  windows: z.any()
+  windows: z.any(),
+  view: z.any(),
+  selected: z.any(),
+  panel: z.any(),
+  tray: z.any(),
+  platform: z.string()
 })
 
 export type Migration = {
@@ -149,187 +158,8 @@ const mainState = {
   updater: {
     dontRemind: main('updater.dontRemind', [])
   },
-  networks: main('networks', chainDefaults),
-  networksMeta: main('networksMeta', {
-    ethereum: {
-      1: {
-        blockHeight: 0,
-        gas: {
-          fees: {},
-          price: {
-            selected: 'standard',
-            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-          }
-        },
-        nativeCurrency: {
-          symbol: 'ETH',
-          usd: {
-            price: 0,
-            change24hr: 0
-          },
-          icon: 'https://assets.coingecko.com/coins/images/279/large/ethereum.png?1595348880',
-          name: 'Ether',
-          decimals: 18
-        },
-        icon: '',
-        primaryColor: 'accent1' // Mainnet
-      },
-      5: {
-        blockHeight: 0,
-        gas: {
-          fees: {},
-          price: {
-            selected: 'standard',
-            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-          }
-        },
-        nativeCurrency: {
-          symbol: 'görETH',
-          usd: {
-            price: 0,
-            change24hr: 0
-          },
-          icon: '',
-          name: 'Görli Ether',
-          decimals: 18
-        },
-        icon: '',
-        primaryColor: 'accent2' // Testnet
-      },
-      10: {
-        blockHeight: 0,
-        gas: {
-          fees: {},
-          price: {
-            selected: 'standard',
-            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-          }
-        },
-        nativeCurrency: {
-          usd: {
-            price: 0,
-            change24hr: 0
-          },
-          icon: '',
-          name: 'Ether',
-          symbol: 'ETH',
-          decimals: 18
-        },
-        icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/optimism.svg',
-        primaryColor: 'accent4' // Optimism
-      },
-      100: {
-        blockHeight: 0,
-        gas: {
-          fees: {},
-          price: {
-            selected: 'standard',
-            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-          }
-        },
-        nativeCurrency: {
-          symbol: 'xDAI',
-          usd: {
-            price: 0,
-            change24hr: 0
-          },
-          icon: '',
-          name: 'xDAI',
-          decimals: 18
-        },
-        icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/gnosis.svg',
-        primaryColor: 'accent5' // Gnosis
-      },
-      137: {
-        blockHeight: 0,
-        gas: {
-          fees: {},
-          price: {
-            selected: 'standard',
-            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-          }
-        },
-        nativeCurrency: {
-          symbol: 'MATIC',
-          usd: {
-            price: 0,
-            change24hr: 0
-          },
-          icon: '',
-          name: 'Matic',
-          decimals: 18
-        },
-        icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/polygon.svg',
-        primaryColor: 'accent6' // Polygon
-      },
-      42161: {
-        blockHeight: 0,
-        gas: {
-          fees: {},
-          price: {
-            selected: 'standard',
-            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-          }
-        },
-        nativeCurrency: {
-          usd: {
-            price: 0,
-            change24hr: 0
-          },
-          icon: '',
-          name: 'Ether',
-          symbol: 'ETH',
-          decimals: 18
-        },
-        icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/arbitrum.svg',
-        primaryColor: 'accent7' // Arbitrum
-      },
-      84531: {
-        blockHeight: 0,
-        gas: {
-          fees: {},
-          price: {
-            selected: 'standard',
-            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-          }
-        },
-        nativeCurrency: {
-          symbol: 'görETH',
-          usd: {
-            price: 0,
-            change24hr: 0
-          },
-          icon: '',
-          name: 'Görli Ether',
-          decimals: 18
-        },
-        icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/baseiconcolor.png',
-        primaryColor: 'accent2' // Testnet
-      },
-      11155111: {
-        blockHeight: 0,
-        gas: {
-          fees: {},
-          price: {
-            selected: 'standard',
-            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-          }
-        },
-        nativeCurrency: {
-          symbol: 'sepETH',
-          usd: {
-            price: 0,
-            change24hr: 0
-          },
-          icon: '',
-          name: 'Sepolia Ether',
-          decimals: 18
-        },
-        icon: '',
-        primaryColor: 'accent2' // Testnet
-      }
-    }
-  }),
+  networks: main('networks', { ethereum: chainDefaults }),
+  networksMeta: main('networksMeta', { ethereum: chainMetaDefaults }),
   dapps: main('dapps', {}),
   ipfs: {},
   frames: {},
@@ -408,8 +238,6 @@ const initial = {
       }
     }
   },
-  flow: {},
-  dapps: {},
   view: {
     current: '',
     list: [],
@@ -421,12 +249,10 @@ const initial = {
     addNetwork: false, // Phase view (needs to be merged with Add)
     clickGuard: false
   },
-  signers: {},
   tray: {
     open: false,
     initial: true
   },
-  balances: {},
   selected: {
     minimized: true,
     open: false,
@@ -451,18 +277,6 @@ const initial = {
         index: 0
       }
     }
-  },
-  frame: {
-    type: 'tray'
-  },
-  node: {
-    provider: false
-  },
-  provider: {
-    events: []
-  },
-  external: {
-    rates: {}
   },
   platform: process.platform,
   main: mainState
@@ -494,7 +308,7 @@ export default function () {
     const issues = result.error.issues
     log.warn(`Found ${issues.length} issues while parsing saved state`, issues)
 
-    process.exit(1)
+    //process.exit(1)
     return migratedState
   }
 

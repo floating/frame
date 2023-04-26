@@ -7,14 +7,11 @@ import { ChainMetadataSchema } from './chainMeta'
 import { ColorwayPrimarySchema } from './colors'
 import { DappSchema } from './dapp'
 import { FrameSchema } from './frame'
+import { MuteSchema } from './mute'
 import { KnownOriginsSchema } from './origin'
 import { PermissionSchema } from './permission'
-import { ShortcutSchema } from './shortcuts'
+import { ShortcutsSchema } from './shortcuts'
 import { SignerSchema } from './signer'
-
-const ShortcutsSchema = z.object({
-  summon: ShortcutSchema
-})
 
 const UpdaterPreferencesSchema = z.object({
   dontRemind: z.array(z.string())
@@ -38,19 +35,6 @@ const FrameState = {
   focusedFrame: z.string()
 }
 
-const notificationTypes = z.enum([
-  'alphaWarning',
-  'welcomeWarning',
-  'externalLinkWarning',
-  'explorerWarning',
-  'signerRelockChange',
-  'gasFeeWarning',
-  'betaDisclosure',
-  'onboardingWindow',
-  'signerCompatibilityWarning',
-  'migrateToPylon'
-])
-
 export const MainSchema = z.object({
   _version: z.coerce.number(),
   instanceId: z.string(), // TODO: uuid
@@ -69,7 +53,7 @@ export const MainSchema = z.object({
   signers: z.record(z.string(), SignerSchema),
   balances: z.record(z.string().describe('Address'), z.array(BalanceSchema)),
   dapps: z.record(z.string(), DappSchema),
-  mute: z.record(notificationTypes, z.boolean()),
+  mute: MuteSchema,
   colorway: z.enum(['light', 'dark']),
   colorwayPrimary: ColorwayPrimarySchema,
   shortcuts: ShortcutsSchema,

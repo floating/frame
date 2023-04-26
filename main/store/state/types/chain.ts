@@ -1,10 +1,7 @@
 import { z } from 'zod'
 import log from 'electron-log'
 
-import { ColorwayPaletteSchema } from './colors'
 import { ConnectionSchema } from './connection'
-import { GasSchema } from './gas'
-import { NativeCurrencySchema } from './nativeCurrency'
 
 const layerValues = ['mainnet', 'rollup', 'sidechain', 'testnet'] as const
 const type = 'ethereum' as const
