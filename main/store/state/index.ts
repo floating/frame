@@ -304,8 +304,9 @@ export default function () {
   const result = StateSchema.safeParse(migratedState)
 
   if (!result.success) {
-    const issues = result.error.issues
-    log.warn(`Found ${issues.length} issues while parsing saved state`, issues)
+    // TODO: report these to sentry
+    // const issues = result.error.issues
+    // log.warn(`Found ${issues.length} issues while parsing saved state`, issues)
 
     return migratedState
   }

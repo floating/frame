@@ -1,4 +1,4 @@
-jest.mock('electron-log', () => ({ info: console.log, error: jest.fn() }))
+jest.mock('electron-log', () => ({ info: console.log, warn: jest.fn(), error: jest.fn() }))
 jest.mock('electron', () => ({ app: { on: jest.fn(), getPath: jest.fn() } }))
 jest.mock('fs')
 

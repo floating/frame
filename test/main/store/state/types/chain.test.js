@@ -27,7 +27,7 @@ const validChain = {
 }
 
 it('parses a valid chain', () => {
-  const chains = EthereumChainsSchema.parse({ 5: validChain })
+  const { ethereum: chains } = EthereumChainsSchema.parse({ ethereum: { 5: validChain } })
 
   expect(chains['5']).toEqual(validChain)
 })
@@ -42,7 +42,8 @@ it('sets the primary connection to disconnected to start', () => {
       }
     }
   }
-  const chains = EthereumChainsSchema.parse({ 5: previouslyConnectedChain })
+
+  const { ethereum: chains } = EthereumChainsSchema.parse({ ethereum: { 5: previouslyConnectedChain } })
 
   expect(chains['5'].connection.primary.connected).toBe(false)
 })
@@ -57,7 +58,8 @@ it('sets the secondary connection to disconnected to start', () => {
       }
     }
   }
-  const chains = EthereumChainsSchema.parse({ 5: previouslyConnectedChain })
+
+  const { ethereum: chains } = EthereumChainsSchema.parse({ ethereum: { 5: previouslyConnectedChain } })
 
   expect(chains['5'].connection.secondary.connected).toBe(false)
 })
@@ -68,7 +70,7 @@ it('replaces a corrupt chain with a known id with the default value from the sta
     test: 'bogusvalue'
   }
 
-  const chains = EthereumChainsSchema.parse({ 5: chain })
+  const { ethereum: chains } = EthereumChainsSchema.parse({ ethereum: { 5: chain } })
 
   expect(chains['5']).toEqual({
     id: 5,
@@ -102,13 +104,13 @@ it('removes an unknown corrupt chain from the state', () => {
     test: 'bogusvalue'
   }
 
-  const chains = EthereumChainsSchema.parse({ 5: chain })
+  const { ethereum: chains } = EthereumChainsSchema.parse({ ethereum: { 5: chain } })
 
   expect(chains['5']).toBeUndefined()
 })
 
 it('adds mainnet if not present in the state', () => {
-  const chains = EthereumChainsSchema.parse({})
+  const { ethereum: chains } = EthereumChainsSchema.parse({ ethereum: {} })
 
   expect(chains).toEqual({
     1: {
