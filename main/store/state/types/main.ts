@@ -2,12 +2,15 @@ import { z } from 'zod'
 
 import { AccountMetadataSchema, AccountSchema } from './account'
 import { BalanceSchema } from './balance'
-import { ChainMetadataSchema, ChainSchema } from './chain'
+import { EthereumChainsSchema } from './chain'
+import { ChainMetadataSchema } from './chainMeta'
 import { ColorwayPrimarySchema } from './colors'
 import { DappSchema } from './dapp'
-import { OriginSchema } from './origin'
+import { FrameSchema } from './frame'
+import { KnownOriginsSchema } from './origin'
 import { PermissionSchema } from './permission'
 import { ShortcutSchema } from './shortcuts'
+import { SignerSchema } from './signer'
 
 const ShortcutsSchema = z.object({
   summon: ShortcutSchema
@@ -18,7 +21,7 @@ const UpdaterPreferencesSchema = z.object({
 })
 
 // these are individual keys on the main state object
-const PreferencesSchema = {
+const MainPreferences = {
   launch: z.boolean().default(false).describe('Launch Frame on system start'),
   reveal: z.boolean().default(false).describe('Show Frame when user glides mouse to edge of screen'),
   autohide: z.boolean().default(false).describe('Automatically hide Frame when it loses focus'),
@@ -29,6 +32,10 @@ const PreferencesSchema = {
   showLocalNameWithENS: z.boolean(),
   menubarGasPrice: z.boolean().default(false).describe('Show gas price in menu bar'),
   hardwareDerivation: z.string()
+}
+
+const FrameState = {
+  focusedFrame: z.string()
 }
 
 const notificationTypes = z.enum([
@@ -47,13 +54,11 @@ const notificationTypes = z.enum([
 export const MainSchema = z.object({
   _version: z.coerce.number(),
   instanceId: z.string(), // TODO: uuid
-  networks: z.object({
-    ethereum: z.record(z.coerce.number(), ChainSchema)
-  }),
+  networks: EthereumChainsSchema,
   networksMeta: z.object({
     ethereum: z.record(z.coerce.number(), ChainMetadataSchema)
   }),
-  origins: z.record(z.string().describe('Origin Id'), OriginSchema),
+  origins: KnownOriginsSchema,
   knownExtensions: z.record(z.string(), z.boolean()),
   permissions: z.record(
     z.string().describe('Address'),
@@ -61,6 +66,7 @@ export const MainSchema = z.object({
   ),
   accounts: z.record(z.string(), AccountSchema),
   accountsMeta: z.record(z.string(), AccountMetadataSchema),
+  signers: z.record(z.string(), SignerSchema),
   balances: z.record(z.string().describe('Address'), z.array(BalanceSchema)),
   dapps: z.record(z.string(), DappSchema),
   mute: z.record(notificationTypes, z.boolean()),
@@ -68,7 +74,9 @@ export const MainSchema = z.object({
   colorwayPrimary: ColorwayPrimarySchema,
   shortcuts: ShortcutsSchema,
   updater: UpdaterPreferencesSchema,
-  ...PreferencesSchema
+  frames: z.record(z.string(), FrameSchema),
+  ...MainPreferences
+  //...FrameState
 })
 
 export type Main = z.infer<typeof MainSchema>

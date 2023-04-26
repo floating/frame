@@ -26,12 +26,6 @@ interface Frame {
   views: Record<string, ViewMetadata>
 }
 
-type HotSignerType = 'ring' | 'seed'
-type HardwareSignerType = 'trezor' | 'ledger' | 'lattice'
-type SignerType = HotSignerType | HardwareSignerType
-
-type AccountStatus = 'ok'
-
 interface Signer {
   id: string
   name: string
@@ -40,20 +34,4 @@ interface Signer {
   addresses: Address[]
   status: string
   createdAt: number
-}
-
-interface Account {
-  id: string
-  name: string
-  lastSignerType: SignerType
-  active: boolean
-  address: Address
-  status: AccountStatus
-  signer: string
-  requests: Record<string, any>
-  ensName: string
-  created: string
-  balances: {
-    lastUpdated?: number
-  }
 }

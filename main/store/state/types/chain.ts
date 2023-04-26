@@ -254,15 +254,7 @@ const ParsedChainSchema = z.union([ChainSchema, z.boolean()]).catch((ctx) => {
   return false
 })
 
-export const ChainMetadataSchema = z.object({
-  blockHeight: z.number().optional(),
-  gas: GasSchema,
-  icon: z.string().optional(),
-  primaryColor: ColorwayPaletteSchema.keyof(),
-  nativeCurrency: NativeCurrencySchema
-})
-
-export const EthereumChainsSchema = z
+const ChainsSchema = z
   .record(z.coerce.number(), ParsedChainSchema)
   .transform((parsedChains) => {
     // remove any chains that failed to parse, which will now be set to "false"
@@ -308,6 +300,9 @@ export const EthereumChainsSchema = z
     return Object.fromEntries(disconnectedChains)
   })
 
+export const EthereumChainsSchema = z.object({
+  ethereum: ChainsSchema
+})
+
 export type ChainId = z.infer<typeof ChainIdSchema>
 export type Chain = z.infer<typeof ChainSchema>
-export type ChainMetadata = z.infer<typeof ChainMetadataSchema>

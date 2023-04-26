@@ -5,15 +5,14 @@ import log from 'electron-log'
 import persist from '../persist'
 import migrations from '../migrate'
 
-import { MainSchema, Main } from './types/main'
-
-import type { Origin } from './types/origin'
+import { MainSchema } from './types/main'
 import { chainDefaults } from './types/chain'
 
-export type { ChainId, Chain, ChainMetadata } from './types/chain'
+export type { ChainId, Chain } from './types/chain'
 export type { Connection } from './types/connection'
 export type { Origin } from './types/origin'
 export type { Permission } from './types/permission'
+export type { HardwareSignerType, HotSignerType, SignerType, Signer } from './types/signer'
 export type { Account, AccountMetadata } from './types/account'
 export type { Balance } from './types/balance'
 export type { WithTokenId, Token } from './types/token'
@@ -24,7 +23,8 @@ export type { Rate } from './types/rate'
 export type { ColorwayPalette } from './types/colors'
 
 const StateSchema = z.object({
-  main: MainSchema
+  main: MainSchema,
+  windows: z.any()
 })
 
 export type Migration = {
@@ -74,27 +74,7 @@ const main = (path: string, def: any) => {
   return found
 }
 
-// TODO: remove pieces of this as they're added to the main state definition
-type M = Main & {
-  shortcuts: any
-  lattice: any
-  latticeSettings: any
-  ledger: any
-  trezor: any
-  privacy: any
-  addresses: any
-  tokens: any
-  rates: any
-  inventory: any
-  signers: any
-  savedSigners: any
-  ipfs: any
-  frames: any
-  openDapps: any
-  dapp: any
-}
-
-const mainState: M = {
+const mainState = {
   _version: main('_version', 38),
   instanceId: main('instanceId', generateUuid()),
   colorway: main('colorway', 'dark'),
@@ -497,43 +477,11 @@ Object.keys(initial.main.accounts).forEach((id) => {
 
   // remote lastUpdated timestamp from balances
   // TODO: define account schema more accurately
-  // @ts-ignore
   initial.main.accounts[id].balances = { lastUpdated: undefined }
 })
 
-Object.values(initial.main.networks.ethereum).forEach((chain) => {
-  chain.connection.primary = { ...chain.connection.primary, connected: false }
-  chain.connection.secondary = { ...chain.connection.secondary, connected: false }
-})
-
-Object.values(initial.main.networksMeta).forEach((chains) => {
-  Object.values(chains).forEach((chainMeta) => {
-    // remove stale price data
-    chainMeta.nativeCurrency = { ...chainMeta.nativeCurrency, usd: { price: 0, change24hr: 0 } }
-  })
-})
-
-initial.main.origins = Object.entries(initial.main.origins).reduce((origins, [id, origin]) => {
-  if (id !== uuidv5('Unknown', uuidv5.DNS)) {
-    // don't persist unknown origin
-    origins[id] = {
-      ...origin,
-      session: {
-        ...origin.session,
-        endedAt: origin.session.lastUpdatedAt
-      }
-    }
-  }
-
-  return origins
-}, {} as Record<string, Origin>)
-
 initial.main.knownExtensions = Object.fromEntries(
   Object.entries(initial.main.knownExtensions).filter(([_id, allowed]) => allowed)
-)
-
-initial.main.dapps = Object.fromEntries(
-  Object.entries(initial.main.dapps).map(([id, dapp]) => [id, { ...dapp, openWhenReady: false }])
 )
 
 // ---
@@ -545,7 +493,10 @@ export default function () {
   if (!result.success) {
     const issues = result.error.issues
     log.warn(`Found ${issues.length} issues while parsing saved state`, issues)
+
+    process.exit(1)
+    return migratedState
   }
 
-  return migratedState
+  return result.data
 }

@@ -25,7 +25,7 @@ import { isTransactionRequest, isTypedMessageSignatureRequest } from '../../../r
 import Erc20Contract from '../../contracts/erc20'
 
 import type { PermitSignatureRequest, TypedMessage } from '../types'
-import type { Permission } from '../../store/state'
+import type { Account, Permission } from '../../store/state'
 
 const nebula = nebulaApi()
 

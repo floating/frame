@@ -28,11 +28,13 @@ import {
   PermitSignatureRequest
 } from './types'
 
-import type { Chain } from '../chains'
 import { ActionType } from '../transaction/actions'
 import { openBlockExplorer } from '../windows/window'
 import { ApprovalType } from '../../resources/constants'
 import { accountNS } from '../../resources/domain/account'
+
+import type { Chain } from '../chains'
+import type { Account, AccountMetadata, Gas } from '../store/state'
 
 function notify(title: string, body: string, action: (event: Electron.Event) => void) {
   const notification = new Notification({ title, body })
@@ -103,7 +105,7 @@ export class Accounts extends EventEmitter {
 
       const created = 'new:' + Date.now()
       const accountMetaId = uuidv5(address, accountNS)
-      const accountMeta = store('main.accountsMeta', accountMetaId) || { name }
+      const accountMeta = (store('main.accountsMeta', accountMetaId) || { name }) as AccountMetadata
       this.accounts[address] = new FrameAccount(
         { address, name: accountMeta.name, created, options, active: false },
         this
@@ -547,15 +549,21 @@ export class Accounts extends EventEmitter {
         try {
           const tx = req.data
           const chain = { type: 'ethereum', id: parseInt(tx.chainId, 16) }
-          const gas = store('main.networksMeta', chain.type, chain.id, 'gas')
+          const gas = store('main.networksMeta', chain.type, chain.id, 'gas') as Gas
 
           if (usesBaseFee(tx)) {
-            const { maxBaseFeePerGas, maxPriorityFeePerGas } = gas.price.fees
-            this.setPriorityFee(maxPriorityFeePerGas, id, false)
-            this.setBaseFee(maxBaseFeePerGas, id, false)
+            const { maxBaseFeePerGas, maxPriorityFeePerGas } = gas.price.fees || {}
+
+            if (maxPriorityFeePerGas && maxBaseFeePerGas) {
+              this.setPriorityFee(maxPriorityFeePerGas, id, false)
+              this.setBaseFee(maxBaseFeePerGas, id, false)
+            }
           } else {
             const gasPrice = gas.price.levels.fast
-            this.setGasPrice(gasPrice, id, false)
+
+            if (gasPrice) {
+              this.setGasPrice(gasPrice, id, false)
+            }
           }
         } catch (e) {
           log.error('Could not update gas fees for transaction', e)
