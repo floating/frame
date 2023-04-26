@@ -6,6 +6,11 @@ import { Balance, Token } from '../../../store/state'
 import log from 'electron-log'
 import surface from '../../surface'
 
+const toExpiryWindow = {
+  snapshot: 1000 * 60 * 5,
+  scan: 1000 * 60
+} as const
+
 const getChangedBalances = (
   address: string,
   tokenBalances: TokenBalance[],
@@ -76,8 +81,29 @@ function updateTokens(address: string, zeroBalances: Set<string>, unknownBalance
   }
 }
 
-function handleBalanceUpdate(address: string, balances: TokenBalance[], chains: number[], mode: string) {
+function handleBalanceUpdate(
+  address: string,
+  balances: TokenBalance[],
+  chains: number[],
+  mode: keyof typeof toExpiryWindow
+) {
   log.verbose('handling balance update...', { address, chains })
+  if (mode === 'snapshot') {
+    //Include 0 balance custom tokens when its a snapshot update as these will be missing
+    const customTokens = api.getCustomTokens()
+    const tokenBalanceSet = new Set(balances.map(toTokenId))
+
+    customTokens.forEach((token) => {
+      if (!tokenBalanceSet.has(toTokenId(token))) {
+        console.log('Missing custom token balance, adding to balances...', { token })
+        balances.push({
+          ...token,
+          balance: '0x00',
+          displayBalance: '0'
+        })
+      }
+    })
+  }
   const changedBalances = getChangedBalances(address, balances, api)
   if (changedBalances.length) {
     store.setBalances(address, changedBalances)
@@ -87,7 +113,7 @@ function handleBalanceUpdate(address: string, balances: TokenBalance[], chains: 
     store.accountTokensUpdated(address, chains)
   }
 
-  store.addPopulatedChains(address.toLowerCase(), chains, mode)
+  store.addPopulatedChains(address.toLowerCase(), chains, toExpiryWindow[mode])
 }
 
 function handleCustomTokenUpdate(customTokens: Token[]) {
