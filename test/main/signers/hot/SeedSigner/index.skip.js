@@ -41,8 +41,6 @@ describe('Seed signer', () => {
   let signer
 
   beforeAll(async () => {
-    log.transports.console.level = false
-
     clean()
 
     store = require('../../../../../main/store').default

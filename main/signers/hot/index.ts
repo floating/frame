@@ -21,13 +21,6 @@ export interface HotSignerData {
   addresses: Address[]
 }
 
-// TODO: remove this when updating tests
-const USER_DATA = app
-  ? app.getPath('userData')
-  : // @ts-ignore
-    path.resolve(path.dirname(require.main.filename), '../.userData')
-const SIGNERS_PATH = path.resolve(USER_DATA, 'signers')
-
 export default {
   newPhrase: (cb: Callback<string>) => {
     cb(null, generateMnemonic())
@@ -57,13 +50,16 @@ export default {
     if (zxcvbn(password).score < 3) return cb(new Error('Hot account password is too weak'))
 
     const signer = new RingSigner()
-    signer.addPrivateKey(privateKeyHex, password, (err) => {
-      if (err) {
-        signer.close()
-        return cb(err)
-      }
-      signers.add(signer)
-      cb(null, signer)
+
+    signer.once('ready', () => {
+      signer.addPrivateKey(privateKeyHex, password, (err) => {
+        if (err) {
+          signer.close()
+          return cb(err)
+        }
+        signers.add(signer)
+        cb(null, signer)
+      })
     })
   },
   createFromKeystore: (
@@ -79,26 +75,30 @@ export default {
     if (password.length < 12) return cb(new Error('Hot account password is too short'))
     if (zxcvbn(password).score < 3) return cb(new Error('Hot account password is too weak'))
     const signer = new RingSigner()
-    signer.addKeystore(keystore, keystorePassword, password, (err) => {
-      if (err) {
-        signer.close()
-        return cb(err)
-      }
-      signers.add(signer)
-      cb(null, signer)
+
+    signer.once('ready', () => {
+      signer.addKeystore(keystore, keystorePassword, password, (err) => {
+        if (err) {
+          signer.close()
+          return cb(err)
+        }
+        signers.add(signer)
+        cb(null, signer)
+      })
     })
   },
   scan: (signers: Signers) => {
     const storedSigners: Record<string, HotSignerData> = {}
+    const signersPath = path.resolve(app.getPath('userData'), 'signers')
 
     const scan = async () => {
       // Ensure signer directory exists
-      ensureDirSync(SIGNERS_PATH)
+      ensureDirSync(signersPath)
 
       // Find stored signers, read them from disk and add them to storedSigners
-      fs.readdirSync(SIGNERS_PATH).forEach((file) => {
+      fs.readdirSync(signersPath).forEach((file) => {
         try {
-          const signer = JSON.parse(fs.readFileSync(path.resolve(SIGNERS_PATH, file), 'utf8'))
+          const signer = JSON.parse(fs.readFileSync(path.resolve(signersPath, file), 'utf8'))
           storedSigners[signer.id] = signer
         } catch (e) {
           log.error(`Corrupt signer file: ${file}`)

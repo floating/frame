@@ -43,7 +43,6 @@ function processMessage(method: RPCMethod, params: any, cb: PseudoCallback<unkno
 
 export default function (worker: HotSignerMessageHandler, ipc: IPC) {
   const workerToken = crypto.randomBytes(32).toString('hex')
-
   const isTokenValid = (token: string) => crypto.timingSafeEqual(Buffer.from(token), Buffer.from(workerToken))
 
   const handleMessage = ({ id, method: rpcMethod, params: rpcParams, token }: RPCMessage) => {

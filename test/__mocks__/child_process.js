@@ -1,18 +1,26 @@
-const EventEmitter = require('events')
+import EventEmitter from 'events'
 
-const forkedChildProcess = new EventEmitter()
-forkedChildProcess.kill = jest.fn()
-forkedChildProcess.send = jest.fn()
+// in process message passing to simulate the ability of the parent
+// and child process to communicate via IPC
+const childProcessHandle = new EventEmitter()
+const forkedProcess = new EventEmitter()
 
-module.exports = {
-  _forkedChildProcess: forkedChildProcess,
-  fork: jest.fn((path, args, opts) => {
-    if (opts.signal) {
-      opts.signal.onabort = () => {
-        forkedChildProcess.kill('SIGABRT')
-      }
+childProcessHandle.send = jest.fn((msg) => forkedProcess.emit('message', msg))
+childProcessHandle.disconnect = jest.fn()
+childProcessHandle.kill = jest.fn()
+
+forkedProcess.send = (msg) => childProcessHandle.emit('message', msg)
+
+const fork = jest.fn((path, args, opts = {}) => {
+  if (opts.signal) {
+    opts.signal.onabort = () => {
+      childProcessHandle.kill('SIGABRT')
     }
+  }
 
-    return forkedChildProcess
-  })
-}
+  forkedProcess.emit('start')
+
+  return childProcessHandle
+})
+
+export { fork, childProcessHandle as _childProcessHandle, forkedProcess as _forkedChildProcess }
