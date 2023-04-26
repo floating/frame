@@ -1,5 +1,4 @@
-import React from 'react'
-import Restore from 'react-restore'
+import React, { useState } from 'react'
 import BigNumber from 'bignumber.js'
 
 import link from '../../../../../resources/link'
@@ -17,48 +16,25 @@ import { Cluster, ClusterRow, ClusterValue } from '../../../../../resources/Comp
 
 import Balance from '../Balance'
 
-class BalancesPreview extends React.Component {
-  constructor(...args) {
-    super(...args)
-    this.moduleRef = React.createRef()
-    if (!this.props.expanded) {
-      this.resizeObserver = new ResizeObserver(() => {
-        clearTimeout(this.resizeTimer)
-        this.resizeTimer = setTimeout(() => {
-          if (this.moduleRef && this.moduleRef.current) {
-            link.send('tray:action', 'updateAccountModule', this.props.moduleId, {
-              height: this.moduleRef.current.clientHeight
-            })
-          }
-        }, 100)
-      })
-    }
+const BalancesPreview = ({
+  populatedChains,
+  allChainsUpdated,
+  filter = '',
+  lastSignerType,
+  storedBalances,
+  rates,
+  ethereumNetworks,
+  moduleId,
+  networksMeta,
+  account
+}) => {
+  const [showHighHotMessage, setShowHighHotMessage] = useState(true)
 
-    this.state = {
-      openActive: false,
-      open: false,
-      selected: 0,
-      shadowTop: 0,
-      expand: false
-    }
-  }
-
-  componentDidMount() {
-    if (this.resizeObserver) this.resizeObserver.observe(this.moduleRef.current)
-  }
-
-  componentWillUnmount() {
-    if (this.resizeObserver) this.resizeObserver.disconnect()
-  }
-
-  getBalances(rawBalances, rates) {
-    const networks = this.store('main.networks.ethereum')
-    const networksMeta = this.store('main.networksMeta.ethereum')
-
+  const getBalances = (rawBalances, rates) => {
     return (
       rawBalances
         // only show balances from connected networks
-        .filter((rawBalance) => isNetworkConnected(networks[rawBalance.chainId]))
+        .filter((rawBalance) => isNetworkConnected(ethereumNetworks[rawBalance.chainId]))
         .map((rawBalance) => {
           const isNative = isNativeCurrency(rawBalance.address)
           const nativeCurrencyInfo = networksMeta[rawBalance.chainId].nativeCurrency || {}
@@ -66,136 +42,104 @@ class BalancesPreview extends React.Component {
           const rate = isNative ? nativeCurrencyInfo : rates[rawBalance.address || rawBalance.symbol] || {}
           const logoURI = (isNative && nativeCurrencyInfo.icon) || rawBalance.logoURI
           const name = isNative
-            ? nativeCurrencyInfo.name || networks[rawBalance.chainId].name
+            ? nativeCurrencyInfo.name || ethereumNetworks[rawBalance.chainId].name
             : rawBalance.name
           const decimals = isNative ? nativeCurrencyInfo.decimals || 18 : rawBalance.decimals
           const symbol = (isNative && nativeCurrencyInfo.symbol) || rawBalance.symbol
 
           return createBalance(
             { ...rawBalance, logoURI, name, decimals, symbol },
-            networks[rawBalance.chainId].isTestnet ? { price: 0 } : rate.usd
+            ethereumNetworks[rawBalance.chainId].isTestnet ? { price: 0 } : rate.usd
           )
         })
         .sort(byTotalValue)
     )
   }
 
-  render() {
-    const { populatedChains, allChainsUpdated, filter = '' } = this.props
-    const { address, lastSignerType } = this.store('main.accounts', this.props.account)
-    const storedBalances = this.store('main.balances', address) || []
-    const rates = this.store('main.rates')
+  const allBalances = getBalances(storedBalances, rates)
 
-    const allBalances = this.getBalances(storedBalances, rates)
+  const filteredBalances = allBalances.reduce((balances, balance) => {
+    const chainName = ethereumNetworks[balance.chainId].name
+    const { expires } = populatedChains[balance.chainId] || {}
+    if (expires && Date.now() < expires && matchFilter(filter, [chainName, balance.name, balance.symbol])) {
+      balances.push(balance)
+    }
+    return balances
+  }, [])
 
-    // if filter only show balances that match filter
+  const totalValue = filteredBalances.reduce((a, b) => a.plus(b.totalValue), BigNumber(0))
+  const totalDisplayValue = formatUsdRate(totalValue, 0)
 
-    const filteredBalances = allBalances.reduce((balances, balance) => {
-      const chainName = this.store('main.networks.ethereum', balance.chainId, 'name')
-      const { expires } = populatedChains[balance.chainId] || {}
-      if (expires && Date.now() < expires && matchFilter(filter, [chainName, balance.name, balance.symbol])) {
-        balances.push(balance)
-      }
-      return balances
-    }, [])
+  const balances = filteredBalances.slice(0, 4)
 
-    const totalValue = filteredBalances.reduce((a, b) => a.plus(b.totalValue), BigNumber(0))
-    const totalDisplayValue = formatUsdRate(totalValue, 0)
+  const hotSigner = ['ring', 'seed'].includes(lastSignerType)
 
-    const balances = filteredBalances.slice(0, 4)
-
-    // scan if balances are more than a minute old
-    console.log({
-      balances,
-      address,
-      populatedChains,
-      allChainsUpdated
-    })
-
-    const hotSigner = ['ring', 'seed'].includes(lastSignerType)
-
-    return (
-      <div ref={this.moduleRef} className='balancesBlock'>
-        <div className={'moduleHeader'}>
-          <span>{svg.tokens(13)}</span>
-          <span>{'Balances'}</span>
-        </div>
-        {/* {balances.length && !allChainsUpdated ? (
-          <div className='signerBalancesLoading'>
-            <div className='loader' />
-          </div>
-        ) : null} */}
-        <Cluster>
-          {balances.map(({ chainId, symbol, ...balance }, i) => {
-            return (
-              <ClusterRow key={chainId + symbol}>
-                <ClusterValue>
-                  <Balance chainId={chainId} symbol={symbol} balance={balance} i={i} scanning={false} />
-                </ClusterValue>
-              </ClusterRow>
-            )
-          })}
-        </Cluster>
-        <div className='signerBalanceTotal' style={{ opacity: 1 }}>
-          {!this.props.expanded ? (
-            <div className='signerBalanceButtons'>
-              <div
-                className='signerBalanceButton signerBalanceShowAll'
-                onClick={() => {
-                  const crumb = {
-                    view: 'expandedModule',
-                    data: {
-                      id: this.props.moduleId,
-                      account: this.props.account
-                    }
-                  }
-                  link.send('nav:forward', 'panel', crumb)
-                }}
-              >
-                {filteredBalances.length - balances.length > 0
-                  ? `+${filteredBalances.length - balances.length} More`
-                  : 'More'}
-              </div>
-            </div>
-          ) : (
-            <div className='signerBalanceButtons'>
-              <div
-                className='signerBalanceButton signerBalanceAddToken'
-                onMouseDown={() => {
-                  link.send('tray:action', 'navDash', { view: 'tokens', data: { notify: 'addToken' } })
-                }}
-              >
-                <span>Add Token</span>
-              </div>
-            </div>
-          )}
-          <div className='signerBalanceTotalText'>
-            <div className='signerBalanceTotalLabel'>{'Total'}</div>
-            <div className='signerBalanceTotalValue'>
-              {svg.usd(11)}
-              {balances.length && allChainsUpdated ? totalDisplayValue : '---.--'}
-            </div>
-          </div>
-        </div>
-        {totalValue.toNumber() > 10000 && hotSigner ? (
-          <div
-            className='signerBalanceWarning'
-            onClick={() => this.setState({ showHighHotMessage: !this.state.showHighHotMessage })}
-            style={!allChainsUpdated ? { opacity: 0 } : { opacity: 1 }}
-          >
-            <div className='signerBalanceWarningTitle'>{'high value account is using hot signer'}</div>
-            {this.state.showHighHotMessage ? (
-              <div className='signerBalanceWarningMessage'>
-                {
-                  'We recommend using one of our supported hardware signers to increase the security of your account'
-                }
-              </div>
-            ) : null}
-          </div>
-        ) : null}
+  return (
+    <div className='balancesBlock'>
+      <div className={'moduleHeader'}>
+        <span>{svg.tokens(13)}</span>
+        <span>{'Balances'}</span>
       </div>
-    )
-  }
+
+      <Cluster>
+        {balances.map(({ chainId, symbol, ...balance }, i) => {
+          return (
+            <ClusterRow key={chainId + symbol}>
+              <ClusterValue>
+                <Balance chainId={chainId} symbol={symbol} balance={balance} i={i} scanning={false} />
+              </ClusterValue>
+            </ClusterRow>
+          )
+        })}
+      </Cluster>
+      <div className='signerBalanceTotal' style={{ opacity: 1 }}>
+        <div className='signerBalanceButtons'>
+          <div
+            className='signerBalanceButton signerBalanceShowAll'
+            onClick={() => {
+              const crumb = {
+                view: 'expandedModule',
+                data: {
+                  id: moduleId,
+                  account: account
+                }
+              }
+              link.send('nav:forward', 'panel', crumb)
+            }}
+          >
+            {filteredBalances.length - balances.length > 0
+              ? `+${filteredBalances.length - balances.length} More`
+              : 'More'}
+          </div>
+        </div>
+
+        <div className='signerBalanceTotalText'>
+          <div className='signerBalanceTotalLabel'>{'Total'}</div>
+          <div className='signerBalanceTotalValue'>
+            {svg.usd(11)}
+            {balances.length && allChainsUpdated ? totalDisplayValue : '---.--'}
+          </div>
+        </div>
+      </div>
+      {totalValue.toNumber() > 10000 && hotSigner ? (
+        //TODO: extract to component...
+        <div
+          className='signerBalanceWarning'
+          onClick={() => setShowHighHotMessage(!showHighHotMessage)}
+          style={!allChainsUpdated ? { opacity: 0 } : { opacity: 1 }}
+        >
+          <div className='signerBalanceWarningTitle'>{'high value account is using hot signer'}</div>
+          {showHighHotMessage ? (
+            <div className='signerBalanceWarningMessage'>
+              {
+                'We recommend using one of our supported hardware signers to increase the security of your account'
+              }
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+    </div>
+  )
 }
 
-export default Restore.connect(BalancesPreview)
+export default BalancesPreview

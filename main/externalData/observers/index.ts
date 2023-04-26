@@ -73,14 +73,14 @@ function createActiveAccountObserver(handler: ActiveAddressChangedHandler) {
     }
   }
 }
-
+//TODO: do we need to sort the arrays?
 function createTokensObserver(handler: TokensChangedHandler) {
-  let customTokens = storeApi.getCustomTokens().sort()
-  let knownTokens = storeApi.getKnownTokens().sort()
+  let customTokens = storeApi.getCustomTokens()
+  let knownTokens = storeApi.getKnownTokens()
 
   return function () {
-    const currentCustomTokens = storeApi.getCustomTokens().sort()
-    const currentKnownTokens = storeApi.getKnownTokens().sort()
+    const currentCustomTokens = storeApi.getCustomTokens()
+    const currentKnownTokens = storeApi.getKnownTokens()
 
     if (!deepEqual(currentCustomTokens, customTokens)) {
       customTokens = currentCustomTokens

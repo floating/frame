@@ -2,8 +2,9 @@ import { BalancesStoreApi } from '..'
 import { TokenBalance } from '../scan'
 import { toTokenId } from '../../../../resources/domain/balance'
 import store from '../../../store'
-import { Balance } from '../../../store/state'
+import { Balance, Token } from '../../../store/state'
 import log from 'electron-log'
+import surface from '../../surface'
 
 const getChangedBalances = (
   address: string,
@@ -11,20 +12,31 @@ const getChangedBalances = (
   api: ReturnType<typeof BalancesStoreApi>
 ) => {
   const currentTokenBalances = api.getTokenBalances(address)
-  const customTokens = new Set(api.getCustomTokens().map(toTokenId))
+  const custom = api.getCustomTokens()
+  const customTokens = new Set(custom.map(toTokenId))
   const isCustomToken = (balance: Balance) => customTokens.has(toTokenId(balance))
 
-  const changedBalances = tokenBalances.filter((newBalance) => {
+  //TODO: in here should we check the token data inside the store and adopt the existing name?
+  const changedBalances = tokenBalances.reduce((balances, newBalance) => {
     const currentBalance = currentTokenBalances.find(
       (b) => b.address === newBalance.address && b.chainId === newBalance.chainId
     )
 
-    // do not add newly found tokens with a zero balance
     const isNewBalance = !currentBalance && parseInt(newBalance.balance) !== 0
     const isChangedBalance = !!currentBalance && currentBalance.balance !== newBalance.balance
 
-    return isNewBalance || isChangedBalance || isCustomToken(newBalance)
-  })
+    //Adopt custom token data if it is a custom token...
+    const isCustom = isCustomToken(newBalance)
+    if (isCustom)
+      newBalance = { ...newBalance, ...custom.find((t) => toTokenId(t) === toTokenId(newBalance)) }
+
+    if (isNewBalance || isChangedBalance || isCustom) {
+      balances.push(newBalance)
+    }
+    return balances
+  }, [] as TokenBalance[])
+
+  const changedSet = new Set(changedBalances.map(toTokenId))
 
   return changedBalances
 }
@@ -35,6 +47,7 @@ const getTokenChanges = (
   api: ReturnType<typeof BalancesStoreApi>
 ) => {
   const knownTokens = new Set(api.getKnownTokens(address).map(toTokenId))
+  const customTokens = new Set(api.getCustomTokens().map(toTokenId))
   const isKnown = (balance: TokenBalance) => knownTokens.has(toTokenId(balance))
 
   // add any non-zero balances to the list of known tokens
@@ -77,6 +90,30 @@ function handleBalanceUpdate(address: string, balances: TokenBalance[], chains: 
   store.addPopulatedChains(address.toLowerCase(), chains, mode)
 }
 
+function handleCustomTokenUpdate(customTokens: Token[]) {
+  log.verbose('inside handle custom token update')
+  const accounts = api.getAccounts()
+
+  accounts.forEach((address) => {
+    const balances = api.getTokenBalances(address)
+    const forProcessor = customTokens.filter((token) => surface.networks.has(address, token.chainId))
+    const newBalances = forProcessor.reduce((bals, item) => {
+      const tokenId = toTokenId(item)
+
+      const existing = balances.find((b) => toTokenId(b) === tokenId)
+      const { displayBalance, balance } = existing || { displayBalance: '0', balance: '0x00' }
+      return bals.concat({
+        ...item,
+        displayBalance,
+        balance
+      })
+    }, [] as TokenBalance[])
+    log.verbose('handleCustomTokenUpdate', { address, newBalances, forProcessor })
+    newBalances.length && store.setBalances(address, newBalances)
+  })
+}
+
 export default {
-  handleBalanceUpdate
+  handleBalanceUpdate,
+  handleCustomTokenUpdate
 }
