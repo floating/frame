@@ -237,6 +237,8 @@ const initial = {
       }
     }
   },
+  flow: {},
+  dapps: {},
   view: {
     current: '',
     list: [],
@@ -248,10 +250,12 @@ const initial = {
     addNetwork: false, // Phase view (needs to be merged with Add)
     clickGuard: false
   },
+  signers: {},
   tray: {
     open: false,
     initial: true
   },
+  balances: {},
   selected: {
     minimized: true,
     open: false,
@@ -277,6 +281,18 @@ const initial = {
       }
     }
   },
+  frame: {
+    type: 'tray'
+  },
+  node: {
+    provider: false
+  },
+  provider: {
+    events: []
+  },
+  external: {
+    rates: {}
+  },
   platform: process.platform,
   main: mainState
 }
@@ -290,11 +306,43 @@ Object.keys(initial.main.accounts).forEach((id) => {
 
   // remote lastUpdated timestamp from balances
   // TODO: define account schema more accurately
+  // @ts-ignore
   initial.main.accounts[id].balances = { lastUpdated: undefined }
 })
 
+Object.values(initial.main.networks.ethereum).forEach((chain) => {
+  chain.connection.primary = { ...chain.connection.primary, connected: false }
+  chain.connection.secondary = { ...chain.connection.secondary, connected: false }
+})
+
+Object.values(initial.main.networksMeta).forEach((chains) => {
+  Object.values(chains).forEach((chainMeta) => {
+    // remove stale price data
+    chainMeta.nativeCurrency = { ...chainMeta.nativeCurrency, usd: { price: 0, change24hr: 0 } }
+  })
+})
+
+initial.main.origins = Object.entries(initial.main.origins).reduce((origins, [id, origin]) => {
+  if (id !== uuidv5('Unknown', uuidv5.DNS)) {
+    // don't persist unknown origin
+    origins[id] = {
+      ...origin,
+      session: {
+        ...origin.session,
+        endedAt: origin.session.lastUpdatedAt
+      }
+    }
+  }
+
+  return origins
+}, {} as Record<string, Origin>)
+
 initial.main.knownExtensions = Object.fromEntries(
   Object.entries(initial.main.knownExtensions).filter(([_id, allowed]) => allowed)
+)
+
+initial.main.dapps = Object.fromEntries(
+  Object.entries(initial.main.dapps).map(([id, dapp]) => [id, { ...dapp, openWhenReady: false }])
 )
 
 // ---
