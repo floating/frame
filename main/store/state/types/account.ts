@@ -6,10 +6,12 @@ export const AccountMetadataSchema = z.object({
   lastUpdated: z.number().optional()
 })
 
+const LastSignerTypes = z.enum([...SignerTypes.options, 'Address'])
+
 export const AccountSchema = z.object({
   id: z.string(),
   name: z.string(),
-  lastSignerType: SignerTypes,
+  lastSignerType: LastSignerTypes,
   status: z.enum(['ok']),
   active: z.boolean().default(false),
   address: z.string(),

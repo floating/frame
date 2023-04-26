@@ -201,7 +201,6 @@ export default function (store: Store) {
   function handleUpdate(address: Address, updateFn: (address: Address) => void) {
     // because updates come from another process its possible to receive updates after an account
     // has been removed but before we stop the scan, so check to make sure the account exists
-    console.log({ address })
     if (store('main.accounts', address)) {
       updateFn(address)
     }

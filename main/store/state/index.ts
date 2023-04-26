@@ -1,13 +1,14 @@
 import { v4 as generateUuid, v5 as uuidv5 } from 'uuid'
 import { z } from 'zod'
-import log from 'electron-log'
 
 import persist from '../persist'
 import migrations from '../migrate'
 
 import { MainSchema } from './types/main'
-import { chainDefaults } from './types/chain'
-import { chainMetaDefaults } from './types/chainMeta'
+import { Chain, chainDefaults } from './types/chain'
+import { ChainMetadata, chainMetaDefaults } from './types/chainMeta'
+import type { Origin } from './types/origin'
+import type { Dapp } from './types/dapp'
 
 export type { ChainId, Chain } from './types/chain'
 export type { Connection } from './types/connection'
@@ -310,39 +311,45 @@ Object.keys(initial.main.accounts).forEach((id) => {
   initial.main.accounts[id].balances = { lastUpdated: undefined }
 })
 
-Object.values(initial.main.networks.ethereum).forEach((chain) => {
+Object.values(initial.main.networks.ethereum as Record<string, Chain>).forEach((chain) => {
   chain.connection.primary = { ...chain.connection.primary, connected: false }
   chain.connection.secondary = { ...chain.connection.secondary, connected: false }
 })
 
 Object.values(initial.main.networksMeta).forEach((chains) => {
-  Object.values(chains).forEach((chainMeta) => {
+  Object.values(chains as Record<string, ChainMetadata>).forEach((chainMeta) => {
     // remove stale price data
     chainMeta.nativeCurrency = { ...chainMeta.nativeCurrency, usd: { price: 0, change24hr: 0 } }
   })
 })
 
-initial.main.origins = Object.entries(initial.main.origins).reduce((origins, [id, origin]) => {
-  if (id !== uuidv5('Unknown', uuidv5.DNS)) {
-    // don't persist unknown origin
-    origins[id] = {
-      ...origin,
-      session: {
-        ...origin.session,
-        endedAt: origin.session.lastUpdatedAt
+initial.main.origins = Object.entries(initial.main.origins as Record<string, Origin>).reduce(
+  (origins, [id, origin]) => {
+    if (id !== uuidv5('Unknown', uuidv5.DNS)) {
+      // don't persist unknown origin
+      origins[id] = {
+        ...origin,
+        session: {
+          ...origin.session,
+          endedAt: origin.session.lastUpdatedAt
+        }
       }
     }
-  }
 
-  return origins
-}, {} as Record<string, Origin>)
+    return origins
+  },
+  {} as Record<string, Origin>
+)
 
 initial.main.knownExtensions = Object.fromEntries(
   Object.entries(initial.main.knownExtensions).filter(([_id, allowed]) => allowed)
 )
 
 initial.main.dapps = Object.fromEntries(
-  Object.entries(initial.main.dapps).map(([id, dapp]) => [id, { ...dapp, openWhenReady: false }])
+  Object.entries(initial.main.dapps as Record<string, Dapp>).map(([id, dapp]) => [
+    id,
+    { ...dapp, openWhenReady: false }
+  ])
 )
 
 // ---
@@ -354,10 +361,9 @@ export default function () {
   if (!result.success) {
     // TODO: report these to sentry
     // const issues = result.error.issues
-    // log.warn(`Found ${issues.length} issues while parsing saved state`, issues)
-
-    return migratedState
+    // console.warn(`Found ${issues.length} issues while parsing saved state`, issues)
   }
 
-  return result.data
+  // return result.data
+  return migratedState
 }
