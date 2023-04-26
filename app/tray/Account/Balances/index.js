@@ -26,6 +26,12 @@ class Balances extends React.Component {
     const storedBalances = this.store('main.balances', address) || []
     const rates = this.store('main.rates')
 
+    console.log({
+      address,
+      allChainsUpdated,
+      connectedChains
+    })
+
     const Component = this.props.expanded ? BalancesExpanded : BalancesPreview
 
     return (
