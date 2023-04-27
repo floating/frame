@@ -391,7 +391,7 @@ const initial = {
           type: 'ethereum',
           layer: 'sidechain',
           isTestnet: false,
-          name: 'Gnosis on RPCh',
+          name: 'Gnosis',
           explorer: 'https://blockscout.com/xdai/mainnet',
           gas: {
             price: {
