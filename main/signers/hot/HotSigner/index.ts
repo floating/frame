@@ -25,6 +25,7 @@ import type {
 } from './types'
 
 const WORKER_PATH = path.resolve(__dirname, 'worker/launch.js')
+const SIGNERS_PATH = path.resolve(app.getPath('userData'), 'signers')
 
 type RPCMessagePayload = {
   method: RPCMethod
@@ -36,7 +37,6 @@ export default class HotSigner extends Signer {
   private token = ''
 
   private readonly worker: ChildProcess
-  private readonly signersPath: string
 
   constructor(type: HotSignerType) {
     super()
@@ -44,7 +44,6 @@ export default class HotSigner extends Signer {
     this.type = type
     this.status = 'locked'
 
-    this.signersPath = path.resolve(app.getPath('userData'), 'signers')
     this.worker = fork(WORKER_PATH, [type])
 
     // TODO: add when worker is mocked in tests
@@ -61,17 +60,17 @@ export default class HotSigner extends Signer {
     const signer = { id, addresses, type, ...data }
 
     // Ensure signers directory exists
-    ensureDirSync(this.signersPath)
+    ensureDirSync(SIGNERS_PATH)
 
     // Write signer to disk
-    fs.writeFileSync(path.resolve(this.signersPath, `${id}.json`), JSON.stringify(signer), { mode: 0o600 })
+    fs.writeFileSync(path.resolve(SIGNERS_PATH, `${id}.json`), JSON.stringify(signer), { mode: 0o600 })
 
     // Log
     log.debug('Signer saved to disk')
   }
 
   delete() {
-    const signerPath = path.resolve(this.signersPath, `${this.id}.json`)
+    const signerPath = path.resolve(SIGNERS_PATH, `${this.id}.json`)
 
     // Overwrite file
     fs.writeFileSync(signerPath, '00000000000000000000000000000000000000000000000000000000000000000000', {

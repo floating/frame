@@ -1,8 +1,8 @@
 import path from 'path'
 import fs from 'fs'
+import zxcvbn from 'zxcvbn'
 import log from 'electron-log'
 import { generateMnemonic } from 'bip39'
-import zxcvbn from 'zxcvbn'
 import { ensureDirSync } from 'fs-extra'
 import { app } from 'electron'
 import { stripHexPrefix } from '@ethereumjs/util'
@@ -21,6 +21,8 @@ export interface HotSignerData {
   addresses: Address[]
 }
 
+const SIGNERS_PATH = path.resolve(app.getPath('userData'), 'signers')
+
 export default {
   newPhrase: (cb: Callback<string>) => {
     cb(null, generateMnemonic())
@@ -32,13 +34,16 @@ export default {
     if (zxcvbn(password).score < 3) return cb(new Error('Hot account password is too weak'))
 
     const signer = new SeedSigner()
-    signer.addPhrase(phrase, password, (err) => {
-      if (err) {
-        signer.close()
-        return cb(err)
-      }
-      signers.add(signer)
-      cb(null, signer)
+
+    signer.once('ready', () => {
+      signer.addPhrase(phrase, password, (err) => {
+        if (err) {
+          signer.close()
+          return cb(err)
+        }
+        signers.add(signer)
+        cb(null, signer)
+      })
     })
   },
   createFromPrivateKey: (signers: Signers, privateKey: string, password: string, cb: Callback<Signer>) => {
@@ -89,16 +94,15 @@ export default {
   },
   scan: (signers: Signers) => {
     const storedSigners: Record<string, HotSignerData> = {}
-    const signersPath = path.resolve(app.getPath('userData'), 'signers')
 
     const scan = async () => {
       // Ensure signer directory exists
-      ensureDirSync(signersPath)
+      ensureDirSync(SIGNERS_PATH)
 
       // Find stored signers, read them from disk and add them to storedSigners
-      fs.readdirSync(signersPath).forEach((file) => {
+      fs.readdirSync(SIGNERS_PATH).forEach((file) => {
         try {
-          const signer = JSON.parse(fs.readFileSync(path.resolve(signersPath, file), 'utf8'))
+          const signer = JSON.parse(fs.readFileSync(path.resolve(SIGNERS_PATH, file), 'utf8'))
           storedSigners[signer.id] = signer
         } catch (e) {
           log.error(`Corrupt signer file: ${file}`)

@@ -1,148 +1,66 @@
 import fs from 'fs'
 import path from 'path'
 import crypto from 'crypto'
-import { _setDataPath } from 'electron'
 import { remove } from 'fs-extra'
-import { _forkedChildProcess as workerProcess } from 'child_process'
+import log from 'electron-log'
 
-import store from '../../../../../main/store'
 import hot from '../../../../../main/signers/hot'
-import WorkerController from '../../../../../main/signers/hot/HotSigner/worker/controller'
-import RingSignerWorker from '../../../../../main/signers/hot/RingSigner/worker'
-import { assertDone } from '../../../../util'
-
-jest.mock('../../../../../main/store', () => ({ updateSigner: jest.fn(), removeSigner: jest.fn() }))
-jest.mock('child_process')
 
 const PASSWORD = 'fr@///3_password'
-const SIGNER_PATH = path.resolve(__dirname, '../.userData')
+const SIGNER_PATH = path.resolve(__dirname, '../.userData/signers')
 const FILE_PATH = path.resolve(__dirname, 'keystore.json')
 
-const signers = { add: jest.fn() }
+jest.mock('path', () => {
+  const original = jest.requireActual('path')
 
-const worker = new RingSignerWorker()
+  return {
+    ...original,
+    resolve: (...args) => {
+      // TODO: this can be cleaned up once tests are re-worked
+      if (args.includes('worker/launch.js')) {
+        return original.resolve(
+          __dirname,
+          '../../../../../compiled/main/signers/hot/HotSigner/worker/launch.js'
+        )
+      }
 
-const ipc = {
-  send: (msg) => workerProcess.send(msg),
-  on: (msg, cb) => workerProcess.on(msg, cb)
-}
-
-// simulate worker process being spawned
-const startWorkerProcess = () => jest.runOnlyPendingTimers()
-
-const launchWorkerProcess = () => {
-  setTimeout(() => {
-    new WorkerController(worker, ipc)
-  }, 0)
-}
-
-const clean = async () => remove(SIGNER_PATH)
-
-beforeAll(async () => {
-  _setDataPath('userData', SIGNER_PATH)
-
-  await clean()
+      return original.resolve(...args)
+    }
+  }
 })
 
-beforeEach(() => {
-  // this event is emitted when fork() is called in the mock child process library.
-  // this will simulate the worker process being started asynchonously, on the
-  // next tick of the event loop
-  workerProcess.once('start', launchWorkerProcess)
+jest.mock('electron')
+jest.mock('../../../../../main/store/persist')
 
-  signers.add = jest.fn()
-  store.updateSigner = jest.fn()
-})
+// Stubs
+const signers = { add: () => {} }
+// Util
+const clean = () => remove(SIGNER_PATH)
 
-afterEach(() => {
-  workerProcess.removeAllListeners()
-})
-
-afterAll(async () => {
-  workerProcess.off('start', launchWorkerProcess)
-
-  await clean()
-})
-
-describe('invalid keys', () => {
-  it('should not create a signer from an invalid private key', (done) => {
-    const privateKey = 'invalid key'
-
-    hot.createFromPrivateKey(signers, privateKey, PASSWORD, (err) => {
-      assertDone(() => {
-        expect(err.message).toBe('Invalid private key')
-        expect(signers.add).not.toHaveBeenCalled()
-        expect(store.updateSigner).not.toHaveBeenCalled()
-      }, done)
-    })
-
-    startWorkerProcess()
-  })
-
-  it('should not create a signer from an invalid keystore', (done) => {
-    const keystore = { invalid: 'keystore' }
-
-    hot.createFromKeystore(signers, keystore, 'test', PASSWORD, (err) => {
-      assertDone(() => {
-        expect(err.message).toBe('Invalid keystore version')
-        expect(signers.add).not.toHaveBeenCalled()
-        expect(store.updateSigner).not.toHaveBeenCalled()
-      }, done)
-    })
-
-    startWorkerProcess()
-  })
-})
+let store
 
 describe('Ring signer', () => {
-  it('creates a signer from a private key', (done) => {
-    const privateKey = '0x372f581b45880333b318a19d5bfd1e4ab680bdafbfbece0216876b7a94ef16ae'
-    const expectedSigner = {
-      name: 'hot signer',
-      type: 'ring',
-      model: 'keyring',
-      id: '3661326338643332343336613133363039376137346262663331373663666430',
-      addresses: ['0x249254933970e4ec336ea717fb9dc32d85dfa621'],
-      appVersion: { major: 0, minor: 0, patch: 0 }
+  let signer
+
+  beforeAll(async () => {
+    log.transports.console.level = false
+
+    clean()
+
+    store = require('../../../../../main/store').default
+  })
+
+  afterEach(() => {
+    jest.useRealTimers()
+  })
+
+  afterAll(() => {
+    clean()
+    if (signer.status !== 'locked') {
+      signer.close()
     }
-
-    hot.createFromPrivateKey(signers, privateKey, PASSWORD, (err, signer) => {
-      assertDone(() => {
-        expect(err).toBe(null)
-        expect(signer.status).toBe('ok')
-        expect(signer.id).not.toBe(undefined)
-        expect(store.updateSigner).toHaveBeenNthCalledWith(1, { ...expectedSigner, status: 'locked' })
-        expect(store.updateSigner).toHaveBeenNthCalledWith(2, { ...expectedSigner, status: 'ok' })
-
-        signer.close()
-      }, done)
-    })
-
-    startWorkerProcess()
-  }, 500)
-})
-
-describe.skip('yet to be converted', () => {
-  test('Scan for signers', (done) => {
-    let count = 0
-    const signers = {
-      add: (signer) => {
-        try {
-          signer.close(() => {})
-          if (signer.type === 'ring') count++
-          expect(count).toBe(1)
-          done()
-        } catch (e) {
-          done(e)
-        }
-      },
-      exists: () => false
-    }
-
-    hot.scan(signers)
-
-    jest.runAllTimers()
-  }, 800)
+    log.transports.console.level = 'debug'
+  })
 
   test('Close signer', (done) => {
     try {

@@ -5,11 +5,15 @@ import EventEmitter from 'events'
 const childProcessHandle = new EventEmitter()
 const forkedProcess = new EventEmitter()
 
-childProcessHandle.send = jest.fn((msg) => forkedProcess.emit('message', msg))
-childProcessHandle.disconnect = jest.fn()
-childProcessHandle.kill = jest.fn()
-
 forkedProcess.send = (msg) => childProcessHandle.emit('message', msg)
+forkedProcess.kill = () => {
+  forkedProcess.removeAllListeners()
+  childProcessHandle.emit('close')
+}
+
+childProcessHandle.send = jest.fn((msg) => forkedProcess.emit('message', msg))
+childProcessHandle.disconnect = () => forkedProcess.kill()
+childProcessHandle.kill = jest.fn()
 
 const fork = jest.fn((path, args, opts = {}) => {
   if (opts.signal) {

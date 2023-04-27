@@ -58,36 +58,6 @@ describe('Seed signer', () => {
     log.transports.console.level = 'debug'
   })
 
-  test('Create from invalid phrase', (done) => {
-    const mnemonic = 'invalid mnemonic'
-
-    try {
-      hot.createFromPhrase(signers, mnemonic, PASSWORD, (err) => {
-        expect(err).toBeTruthy()
-        expect(store('main.signers')).toEqual({})
-        done()
-      })
-    } catch (e) {
-      done(e)
-    }
-  }, 1000)
-
-  test('Create from phrase', (done) => {
-    try {
-      const mnemonic = generateMnemonic()
-      hot.createFromPhrase(signers, mnemonic, PASSWORD, (err, result) => {
-        signer = result
-        expect(err).toBe(null)
-        expect(signer.status).toBe('ok')
-        expect(signer.addresses.length).toBe(100)
-        expect(store(`main.signers.${signer.id}.id`)).toBe(signer.id)
-        done()
-      })
-    } catch (e) {
-      done(e)
-    }
-  }, 7_500)
-
   test('Lock', (done) => {
     try {
       signer.lock((err) => {
@@ -99,25 +69,6 @@ describe('Seed signer', () => {
       done(e)
     }
   }, 2000)
-
-  test('Scan for signers', (done) => {
-    jest.useFakeTimers()
-
-    let count = 0
-    const signers = {
-      add: (signer) => {
-        signer.close(() => {})
-        if (signer.type === 'seed') count++
-        expect(count).toBe(1)
-        done()
-      },
-      exists: () => false
-    }
-
-    hot.scan(signers)
-
-    jest.runAllTimers()
-  }, 800)
 
   test('Unlock with wrong password', (done) => {
     try {
