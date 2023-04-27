@@ -1,7 +1,7 @@
 import EventEmitter from 'events'
 
 export interface NetworksEvents {
-  updated: (event: { account: string; chains: number[] }) => void
+  updated: (event: { account: string }) => void
 }
 
 type TypedEventEmitter<T extends Record<keyof T, (...args: any[]) => void>> = {
@@ -41,7 +41,11 @@ const Networks = () => {
 
   const has = (account: string, chainId: number) => Boolean(networks[account]?.[chainId])
   const on = emitter.on.bind(emitter)
-  const get = (account: string) => Object.keys(networks[account] || {}).map(Number)
+  const get = (account: string) =>
+    Object.entries(networks[account] || {}).reduce((acc, [key, value]) => {
+      if (value) acc.push(Number(key))
+      return acc
+    }, [] as number[])
 
   const update = (account: string, chainIds: number[]) => {
     const currentNetworks = get(account)
@@ -51,14 +55,9 @@ const Networks = () => {
     toRemove.forEach((id) => (networks[account][id] = false))
     toAdd.forEach((id) => (networks[account][id] = true))
 
-    const event = {
-      account,
-      chains: Object.entries(networks[account])
-        .filter(([, value]) => value)
-        .map(([key]) => Number(key))
+    if ([...toAdd, ...toRemove].length) {
+      emitter.emit('updated', { account })
     }
-
-    emitter.emit('updated', event)
   }
 
   const close = () => {

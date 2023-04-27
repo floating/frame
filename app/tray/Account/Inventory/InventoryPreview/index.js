@@ -93,7 +93,7 @@ class Inventory extends React.Component {
     const displayCollections = this.displayCollections()
     const moreCollections = collections.length - displayCollections.length
     return (
-      <div ref={this.moduleRef} className='balancesBlock' style={{ marginTop: '420px' }}>
+      <div ref={this.moduleRef} className='balancesBlock' style={{}}>
         <div className='moduleHeader'>
           <span>{svg.inventory(12)}</span>
           <span>{'Inventory'}</span>

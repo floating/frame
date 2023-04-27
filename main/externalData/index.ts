@@ -9,10 +9,6 @@ import BalanceScanner from './balances/scanner'
 import processor from './balances/processor'
 import surface from './surface'
 
-import type { TokenBalance } from './balances/scan'
-
-const activeChains = new Set<number>()
-
 import type { Token } from '../store/state'
 import {
   createAccountsObserver,
@@ -22,7 +18,6 @@ import {
   createTrayObserver,
   createUsePylonObserver
 } from './observers'
-import { toTokenId } from '../../resources/domain/balance'
 
 export interface DataScanner {
   close: () => void
@@ -42,8 +37,9 @@ const externalData = function () {
     const usingSurface = surface.networks.get(activeAccount)
 
     const chainsToScan = chains.filter((chainId) => !usingPylon || !usingSurface.includes(chainId))
-    scanner.setNetworks(chainsToScan)
-    rates.updateSubscription(chains, activeAccount)
+    log.verbose('updateNetworks', { usingSurface, activeAccount, chainsToScan })
+    activeAccount && scanner.setNetworks(activeAccount, chainsToScan)
+    rates.updateSubscription(chains)
   }
 
   const updateAccount = (account: string) => {
@@ -61,9 +57,9 @@ const externalData = function () {
     surface.updateSubscribers(Object.keys(store('main.accounts')))
   }
 
-  surface.networks.on('updated', ({ account, chains }) => {
-    log.verbose('Surface networks updated...', { chains })
-    updateNetworks()
+  surface.networks.on('updated', ({ account }) => {
+    log.verbose('Surface networks updated...', { account })
+    if (account === storeApi.getActiveAddress()) updateNetworks()
   })
 
   let pauseScanningDelay: NodeJS.Timeout | undefined
@@ -89,10 +85,7 @@ const externalData = function () {
 
     pylonActive && processor.handleCustomTokenUpdate(tokens)
     activeAccount && scanner.addTokens(activeAccount, forScanner)
-    rates.updateSubscription(
-      storeApi.getConnectedNetworks().map((network) => network.id),
-      activeAccount
-    )
+    rates.updateSubscription(storeApi.getConnectedNetworks().map((network) => network.id))
   })
 
   //TODO: extract observers similar to with the provider observers...
@@ -114,8 +107,8 @@ const externalData = function () {
       handleTokensUpdate(address, tokens)
       log.verbose('CUSTOM TOKENS CHANGED...')
     },
-    knownTokensChanged(address, tokens) {
-      //TODO: When would this happen??
+    knownTokensChanged() {
+      rates.updateSubscription(storeApi.getConnectedNetworks().map((network) => network.id))
       log.verbose('KNOWN TOKENS CHANGED...')
     }
   })

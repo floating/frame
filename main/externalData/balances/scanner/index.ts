@@ -256,8 +256,11 @@ function BalanceScanner(store: Store, api: ReturnType<typeof BalancesStoreApi>) 
     chains.forEach((chainId) => enabledNetworks.delete(chainId))
   }
 
-  function setNetworks(chains: number[]) {
-    enabledNetworks = new Set(chains)
+  function setNetworks(address: string, chains: number[]) {
+    if (chains.some((chainId) => !enabledNetworks.has(chainId)) || chains.length !== enabledNetworks.size) {
+      enabledNetworks = new Set(chains)
+      runWhenReady(() => updateBalances(address, chains))
+    }
   }
 
   function getNetworks() {

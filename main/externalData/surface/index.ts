@@ -90,15 +90,19 @@ const toTokenBalance = (b: BalanceItem) => ({
   logoURI: b.image || ''
 })
 
-const Pylon = createPylon('ws://localhost:9000')
-
 const Surface = () => {
+  const Pylon = createPylon('ws://localhost:9000')
   const subscriptions: Record<string, Subscription> = {}
   const networks = Networks()
-
   const subscribe = async (addr: string) => {
     log.verbose('Surface subscribing to account...', { addr })
     const address = addr.toLowerCase()
+
+    const fallback = setTimeout(() => {
+      log.verbose('FAILED TO GET SNAPSHOT WITHIN 5 SECONDS OF SUBSCRIPTION: FALLING BACK TO SCAN')
+      networks.update(address, [])
+    }, 5_000)
+
     const sub = Pylon.accounts.subscribe(address, {
       onStarted() {
         log.verbose('subscribed to account')
@@ -107,7 +111,7 @@ const Surface = () => {
         log.verbose('got update for account', { data })
         if (!data.length || !data[0]) return
         const [{ address: addr, ...chains }] = data
-
+        clearTimeout(fallback)
         log.verbose('chains received...', { chains })
 
         const [chainIds, balances, inventory] = Object.entries(chains).reduce(
@@ -143,6 +147,7 @@ const Surface = () => {
         console.error({ err })
       },
       onStopped() {
+        log.verbose('inside stopped')
         delete subscriptions[address]
       }
     })
@@ -156,8 +161,8 @@ const Surface = () => {
     if (!subscription) return
     subscription.unsubscribables.forEach((u) => u.unsubscribe())
     subscription.unsubscribe()
-
     delete subscriptions[address]
+    networks.update(address, [])
   }
 
   const stop = () => {
