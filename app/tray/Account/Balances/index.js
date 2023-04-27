@@ -1,14 +1,74 @@
 import React from 'react'
 import Restore from 'react-restore'
+import BigNumber from 'bignumber.js'
 
 import BalancesPreview from './BalancesPreview'
 import BalancesExpanded from './BalancesExpanded'
 
+import { formatUsdRate } from '../../../../resources/domain/balance'
+
+import { isNetworkConnected } from '../../../../resources/utils/chains'
+import { matchFilter } from '../../../../resources/utils'
+
+import {
+  createBalance,
+  sortByTotalValue as byTotalValue,
+  isNativeCurrency
+} from '../../../../resources/domain/balance'
+
 class Balances extends React.Component {
-  render() {
+  getBalances(filter) {
+    const { address } = this.store('main.accounts', this.props.account)
+    const rawBalances = this.store('main.balances', address) || []
+    const rates = this.store('main.rates')
+
+    const ethereumNetworks = this.store('main.networks.ethereum')
+    const networksMeta = this.store('main.networksMeta.ethereum')
     const {
       balances: { populatedChains = {} }
     } = this.store('main.accounts', this.props.account)
+
+    const balances = rawBalances
+      // only show balances from connected networks
+      .filter((rawBalance) => {
+        const chainName = ethereumNetworks[rawBalance.chainId].name
+        return (
+          isNetworkConnected(ethereumNetworks[rawBalance.chainId]) &&
+          populatedChains[rawBalance.chainId] &&
+          populatedChains[rawBalance.chainId].expires > Date.now() &&
+          matchFilter(filter, [chainName, rawBalance.name, rawBalance.symbol])
+        )
+      })
+      .map((rawBalance) => {
+        const isNative = isNativeCurrency(rawBalance.address)
+        const nativeCurrencyInfo = networksMeta[rawBalance.chainId].nativeCurrency || {}
+
+        const rate = isNative ? nativeCurrencyInfo : rates[rawBalance.address || rawBalance.symbol] || {}
+        const logoURI = (isNative && nativeCurrencyInfo.icon) || rawBalance.logoURI
+        const name = isNative
+          ? nativeCurrencyInfo.name || ethereumNetworks[rawBalance.chainId].name
+          : rawBalance.name
+        const decimals = isNative ? nativeCurrencyInfo.decimals || 18 : rawBalance.decimals
+        const symbol = (isNative && nativeCurrencyInfo.symbol) || rawBalance.symbol
+
+        return createBalance(
+          { ...rawBalance, logoURI, name, decimals, symbol },
+          ethereumNetworks[rawBalance.chainId].isTestnet ? { price: 0 } : rate.usd
+        )
+      })
+      .sort(byTotalValue)
+
+    const totalValue = balances.reduce((a, b) => a.plus(b.totalValue), BigNumber(0))
+    const totalDisplayValue = formatUsdRate(totalValue, 0)
+
+    return { balances, totalValue, totalDisplayValue }
+  }
+
+  getAllChainsUpdated() {
+    const {
+      balances: { populatedChains = {} }
+    } = this.store('main.accounts', this.props.account)
+
     const connectedChains = Object.values(this.store('main.networks.ethereum') || {}).reduce((acc, n) => {
       if ((n.connection.primary || {}).connected || (n.connection.secondary || {}).connected) {
         acc.push(n.id)
@@ -16,34 +76,24 @@ class Balances extends React.Component {
       return acc
     }, [])
 
-    const allChainsUpdated = connectedChains.every(
+    return connectedChains.every(
       (chainId) => populatedChains[chainId] && populatedChains[chainId].expires > Date.now()
     )
+  }
 
-    const ethereumNetworks = this.store('main.networks.ethereum')
-    const networksMeta = this.store('main.networksMeta.ethereum')
-    const { address, lastSignerType } = this.store('main.accounts', this.props.account)
-    const storedBalances = this.store('main.balances', address) || []
-    const rates = this.store('main.rates')
+  isHotSigner() {
+    const { lastSignerType } = this.store('main.accounts', this.props.account)
+    return ['ring', 'seed'].includes(lastSignerType)
+  }
 
-    console.log({
-      address,
-      allChainsUpdated,
-      connectedChains
-    })
-
+  render() {
     const Component = this.props.expanded ? BalancesExpanded : BalancesPreview
-
     return (
       <Component
         {...this.props}
-        populatedChains={populatedChains}
-        allChainsUpdated={allChainsUpdated}
-        ethereumNetworks={ethereumNetworks}
-        networksMeta={networksMeta}
-        storedBalances={storedBalances}
-        rates={rates}
-        lastSignerType={lastSignerType}
+        allChainsUpdated={this.getAllChainsUpdated()}
+        getBalances={this.getBalances.bind(this)}
+        isHotSigner={this.isHotSigner()}
       />
     )
   }
