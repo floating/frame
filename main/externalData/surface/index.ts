@@ -221,18 +221,20 @@ const Surface = () => {
   }
 
   setInterval(() => {
-    log.verbose('Updating subscriptions to surface...')
     const subscribers = Object.entries(subscriptions).map(([address, { collectionItems }]) => ({
       collectionItems,
       address
     }))
+    if (!subscribers.length) return
+    log.verbose('Updating subscriptions to surface...')
+
     Object.keys(subscriptions).forEach(unsubscribe)
     subscribers.forEach(({ address, collectionItems }) => {
       log.verbose('should be resubbing...', { collectionItems, address })
       subscribe(address)
       collectionItems.length && subscribeToItems(address, collectionItems)
     })
-  }, 1000 * 60 * 1)
+  }, 1000 * 60 * 4)
   return {
     stop,
     updateSubscribers,

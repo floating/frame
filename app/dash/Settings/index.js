@@ -210,6 +210,28 @@ class Settings extends Component {
             </div>
           </div>
 
+          <div className='signerPermission localSetting' style={{ zIndex: 209 }}>
+            <div className='signerPermissionControls'>
+              <div className='signerPermissionSetting'>Pylon Accounts Service</div>
+              <div
+                className={
+                  this.store('main.usingPylon')
+                    ? 'signerPermissionToggle signerPermissionToggleOn'
+                    : 'signerPermissionToggle'
+                }
+                onClick={() => link.send('tray:action', 'setUsingPylon', !this.store('main.usingPylon'))}
+              >
+                <div className='signerPermissionToggleSwitch' />
+              </div>
+            </div>
+            <div className='signerPermissionDetails'>
+              <span>
+                Use Frame's Account Tracking Service, Eliminating Network Overhead and Ensuring Real-Time
+                Updates!
+              </span>
+            </div>
+          </div>
+
           <div className='signerPermission localSetting' style={{ zIndex: 207 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Show Account Name with ENS</div>

@@ -65,6 +65,7 @@ const externalData = function () {
   let pauseScanningDelay: NodeJS.Timeout | undefined
 
   const togglePylon = (currentMode: boolean) => {
+    log.verbose('toggling pylon')
     if (!currentMode) {
       surface.stop()
     } else {
