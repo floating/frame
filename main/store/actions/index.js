@@ -264,6 +264,9 @@ module.exports = {
   setErrorReporting: (u, enable) => {
     u('main.privacy.errorReporting', () => enable)
   },
+  setUsingPylon: (u, enable) => {
+    u('main.usingPylon', () => enable)
+  },
   setGasFees: (u, netType, netId, fees) => {
     u('main.networksMeta', netType, netId, 'gas.price.fees', () => fees)
   },
