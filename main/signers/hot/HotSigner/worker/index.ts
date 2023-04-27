@@ -88,7 +88,6 @@ export function encrypt(s: string, password: string) {
   const iv = crypto.randomBytes(16)
   const cipher = crypto.createCipheriv('aes-256-cbc', hashPassword(password, salt) as Buffer, iv)
   const encrypted = Buffer.concat([cipher.update(s), cipher.final()])
-
   return salt.toString('hex') + ':' + iv.toString('hex') + ':' + encrypted.toString('hex')
 }
 

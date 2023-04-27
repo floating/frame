@@ -1,5 +1,5 @@
-import hdKey from 'hdkey'
 import { validateMnemonic, mnemonicToSeed } from 'bip39'
+import hdKey from 'hdkey'
 import { utils } from 'ethers'
 
 import HotSigner from '../HotSigner'
