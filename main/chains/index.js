@@ -30,7 +30,6 @@ class FrameRpchProvider extends RPChEthereumProvider {
     this.status = 'loading'
     this.url = url
     setTimeout(() => this.create(), 0)
-    this.sdk.debug('rpch*')
   }
 
   onError(err) {
@@ -45,8 +44,7 @@ class FrameRpchProvider extends RPChEthereumProvider {
   }
 
   init() {
-    this.send({ method: 'net_version', params: [], id: this._nextId++, jsonrpc: '2.0' }, (err, res) => {
-      console.log({ res })
+    this.send({ method: 'net_version', params: [] }, (err, res) => {
       if (err) return this.onError(err)
       this.connected = true
       this.emit('connect')
@@ -79,19 +77,15 @@ class FrameRpchProvider extends RPChEthereumProvider {
   }
 
   send(payload, callback) {
-    if (!this.sdk.isReady) return this.error(payload, 'Not connected')
     if (this.closed) return this.error(payload, 'Not connected')
 
-    return this.sdk
-      .createRequest(this.url, JSON.stringify(payload))
-      .then((request) => {
-        return this.sdk.sendRequest(request).then((response) => {
-          if (callback) {
-            return callback(null, JSON.parse(response.body))
-          } else {
-            return JSON.parse(response.body)
-          }
-        })
+    return this.request({ method: payload.method, params: payload.params })
+      .then((response) => {
+        if (callback) {
+          return callback(null, { result: response })
+        } else {
+          return { result: response }
+        }
       })
       .catch((e) => {
         if (callback) {
@@ -103,16 +97,14 @@ class FrameRpchProvider extends RPChEthereumProvider {
   }
 
   async sendAsync(payload, callback) {
-    if (!this.sdk.isReady) return
     if (this.closed) return this.error(payload, 'Not connected')
 
-    const request = await this.sdk.createRequest(this.url, JSON.stringify(payload))
     try {
-      const response = await this.sdk.sendRequest(request)
+      const response = await this.request({ method: payload.method, params: payload.params })
       if (callback) {
-        return callback(null, JSON.parse(response.body))
+        return callback(null, { result: response })
       } else {
-        return JSON.parse(response.body)
+        return { result: response }
       }
     } catch (e) {
       if (callback) {
@@ -192,8 +184,8 @@ class ChainConnection extends EventEmitter {
         'https://primary.gnosis-chain.rpc.hoprtech.net',
         {
           timeout: 10000,
-          discoveryPlatformApiEndpoint: 'https://staging.discovery.rpch.tech',
-          client: 'blockwallet',
+          discoveryPlatformApiEndpoint: 'http://127.0.0.1:3020',
+          client: 'trial',
           crypto: RPChCrypto
         },
         (k, v) => set(k, v),
