@@ -184,8 +184,8 @@ class ChainConnection extends EventEmitter {
         'https://primary.gnosis-chain.rpc.hoprtech.net',
         {
           timeout: 10000,
-          discoveryPlatformApiEndpoint: 'http://127.0.0.1:3020',
-          client: 'trial',
+          discoveryPlatformApiEndpoint: 'https://staging.discovery.rpch.tech',
+          client: 'frame',
           crypto: RPChCrypto
         },
         (k, v) => set(k, v),
