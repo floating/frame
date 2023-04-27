@@ -13,6 +13,7 @@ import { assertDone } from '../../../util'
 
 jest.mock('../../../../main/store', () => ({ updateSigner: jest.fn(), removeSigner: jest.fn() }))
 jest.mock('child_process')
+jest.mock('crypto')
 
 const PASSWORD = 'fr@///3_password'
 const SIGNER_PATH = path.resolve(app.getPath('userData'), 'signers')
@@ -85,6 +86,18 @@ describe('Ring signers', () => {
           expect.objectContaining({ ...privateKeySigner, status: 'ok' })
         )
 
+        // ensure signer is written to disk
+        const persistedSigner = JSON.parse(fs.readFileSync(path.resolve(SIGNER_PATH, `${id}.json`), 'utf8'))
+        expect(persistedSigner).toEqual(
+          expect.objectContaining({
+            id,
+            type,
+            addresses,
+            encryptedKeys:
+              '01010101010101010101010101010101:01010101010101010101010101010101:636c77a8bbd3aa295be522781a1ef28b8f9bfb3cf80152b673f80a9960bed4fb48f335be978072886fed415ef13f3786449e88c8236444a547d16727664c59361c58c4b92c14a04cbe3ee7c80322aef6'
+          })
+        )
+
         signer.close()
       }, done)
     })
@@ -137,6 +150,18 @@ describe('Ring signers', () => {
         expect(store.updateSigner).toHaveBeenNthCalledWith(
           2,
           expect.objectContaining({ ...keystoreSigner, status: 'ok' })
+        )
+
+        // ensure signer is written to disk
+        const persistedSigner = JSON.parse(fs.readFileSync(path.resolve(SIGNER_PATH, `${id}.json`), 'utf8'))
+        expect(persistedSigner).toEqual(
+          expect.objectContaining({
+            id,
+            type,
+            addresses,
+            encryptedKeys:
+              '01010101010101010101010101010101:01010101010101010101010101010101:24c6b507ea0741763fd81920018dd7a6c65292b8f36957eab47abab0be581ee68890ecded0ad941c0a781f4153cfb0d241529d4075f00776967fbe8c5dfadbc548fbce7877cc5f93bd61d1c5df05ff68'
+          })
         )
 
         signer.close()
@@ -203,6 +228,18 @@ describe('Seed signers', () => {
         expect(store.updateSigner).toHaveBeenNthCalledWith(
           2,
           expect.objectContaining({ ...mnemonicSigner, status: 'ok' })
+        )
+
+        // ensure signer is written to disk
+        const persistedSigner = JSON.parse(fs.readFileSync(path.resolve(SIGNER_PATH, `${id}.json`), 'utf8'))
+        expect(persistedSigner).toEqual(
+          expect.objectContaining({
+            id,
+            type,
+            addresses: expect.any(Array),
+            encryptedSeed:
+              '01010101010101010101010101010101:01010101010101010101010101010101:4701a2d5e8aac93a0b727758797f4999687187e83286e417e0a7e3f715ea03ba5e60810cff2b8203103f23b1f4fbe1a0bb6d0f46ef8011e9acfbbd24c3dc0d4403d83772570a0850b521b252871e57c064216e28b350fb5ad2eba83b11494c89940846312cd9e4d825db3674536398d255811384ba3c5a39ec96a3ce1183085cb1fbd8289d7f2bf30c7ef1a37680dc44'
+          })
         )
       }, done)
     })
