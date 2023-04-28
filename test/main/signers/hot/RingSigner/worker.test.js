@@ -1,26 +1,19 @@
 import RingSignerWorker from '../../../../../main/signers/hot/RingSigner/worker'
 
+import { assertDone } from '../../../../util'
+
+jest.mock('crypto')
+
 let worker
 
 // mnemonic: test test test test test test test test test test test junk
 const key = '4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356'
 const password = 'afr@metest!'
 
-let errorOutput = console.error
-
-beforeAll(() => {
-  errorOutput = console.error
-  console.error = jest.fn()
-})
-
-afterAll(() => {
-  console.error = errorOutput
-})
-
-beforeEach((done) => {
+beforeAll((done) => {
   worker = new RingSignerWorker()
 
-  const unlockCb = (err, encryptedKeys) => {
+  const unlockCb = (_err, encryptedKeys) => {
     worker.unlock(done, { encryptedSecret: encryptedKeys, password })
   }
 
@@ -127,4 +120,22 @@ describe('#signTransaction', () => {
 
     worker.signTransaction(cb, { index: 0, rawTx: tx })
   }, 200)
+})
+
+describe('#addKey', () => {
+  const privateKey = '3a34930e00e54f8ac777ca94286a069c88dcf9d4e49503b38849f1a036bdcb03'
+  const password = 'somepassw0rd'
+
+  it('adds an additional private key', (done) => {
+    const cb = (err, keys) => {
+      assertDone(() => {
+        expect(err).toBeNull()
+        expect(keys).toBe(
+          '01010101010101010101010101010101:01010101010101010101010101010101:6efd31f2e9b59f0e3881ac7a9ccb35f1f43d614e90c5b05074b596d844e05e6fd8a0ed9482eaffc72b100a2dee983fde9132e6ec61985b6e4ed308cc63dbcf5e13408b94316afec95a6e8a036ef7811f'
+        )
+      }, done)
+    }
+
+    worker.addKey(cb, { key: privateKey, password })
+  })
 })
