@@ -107,6 +107,7 @@ export default class RingSigner extends HotSigner {
     } catch (e) {
       return cb(e as Error)
     }
+
     // Add private key
     this.addPrivateKey(wallet.getPrivateKey().toString('hex'), password, cb)
   }

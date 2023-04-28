@@ -24,16 +24,8 @@ import type {
   WorkerTokenMessage
 } from './types'
 
-// TODO: remove these when updating tests
-const windows = app ? require('../../../windows') : { broadcast: () => {} }
-// Mock user data dir during tests
-const USER_DATA = app
-  ? app.getPath('userData')
-  : // @ts-ignore
-    path.resolve(path.dirname(require.main.filename), '../.userData')
-
-const SIGNERS_PATH = path.resolve(USER_DATA, 'signers')
 const WORKER_PATH = path.resolve(__dirname, 'worker/launch.js')
+const SIGNERS_PATH = path.resolve(app.getPath('userData'), 'signers')
 
 type RPCMessagePayload = {
   method: RPCMethod
@@ -54,10 +46,9 @@ export default class HotSigner extends Signer {
 
     this.worker = fork(WORKER_PATH, [type])
 
-    // TODO: add when worker is mocked in tests
-    // this.worker.on('exit', (code) => {
-    //   log.error('Hot signer worker exited with code:', code)
-    // })
+    this.worker.on('exit', (code) => {
+      log.error('Hot signer worker exited with code:', code)
+    })
 
     this.getToken()
   }
@@ -229,7 +220,6 @@ export default class HotSigner extends Signer {
     const listener = (message: WorkerMessage) => {
       if (message.type === 'rpc') {
         const rpcMessage = message as WorkerRPCMessage
-
         if (rpcMessage.id === id) {
           const error = rpcMessage.error ? new Error(rpcMessage.error) : null
           cb(error, rpcMessage.result)

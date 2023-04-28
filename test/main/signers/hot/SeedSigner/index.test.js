@@ -1,227 +1,106 @@
-import path from 'path'
-import { remove } from 'fs-extra'
-import { generateMnemonic } from 'bip39'
-import log from 'electron-log'
+import { promisify } from 'util'
 
-import hot from '../../../../../main/signers/hot'
+import store from '../../../../../main/store'
+import SeedSigner from '../../../../../main/signers/hot/SeedSigner'
+import createMockWorker from '../mockWorker'
 
-const PASSWORD = 'fr@///3_password'
-const SIGNER_PATH = path.resolve(__dirname, '../.userData/signers')
+jest.mock('../../../../../main/store', () => ({}))
+jest.mock('child_process', () => ({ fork: () => mockWorker }))
+jest.mock('ethers', () => ({ utils: { computeAddress: () => '0xtest' } }))
+jest.mock('fs')
 
-jest.mock('electron')
-jest.mock('../../../../../main/store/persist')
+const token = 'foo'
+const mnemonic = 'truly wish balcony wall swing false radar announce shrug cactus mercy carpet'
 
-jest.mock('path', () => {
-  const original = jest.requireActual('path')
+let signer, mockWorker
 
-  return {
-    ...original,
-    resolve: (...args) => {
-      // TODO: this can be cleaned up once tests are re-worked
-      if (args.includes('worker/launch.js')) {
-        return original.resolve(
-          __dirname,
-          '../../../../../compiled/main/signers/hot/HotSigner/worker/launch.js'
-        )
-      }
+beforeEach((done) => {
+  mockWorker = createMockWorker()
 
-      return original.resolve(...args)
-    }
-  }
+  store.removeSigner = jest.fn()
+  store.updateSigner = jest.fn()
+  store.notify = jest.fn()
+
+  signer = new SeedSigner()
+  signer.once('ready', done)
+
+  mockWorker.emit('message', { type: 'token', token })
 })
 
-// Stubs
-const signers = { add: () => {} }
-// Util
-const clean = () => remove(SIGNER_PATH)
+it('unlocks the signer with the encrypted keys', async () => {
+  mockWorker.addResult(
+    'encryptSeed',
+    '7f575d51c5f4a1dce66368160a869768:554030e5813b7d9fb8f75e507639c24d:b37f66fd23190e36f10b4e5e621e8a0de80e2c65059c192164c10c7c3a1e52102ad0227a2f74c54b017b676316d0096d4e9ceb55f380da3704c560e7ae32bcdb917069cdb97ef416d3891b85169aca28'
+  )
 
-let store
+  const addPhrase = promisify(signer.addPhrase.bind(signer))
+  await addPhrase(mnemonic, 'somepassword198')
 
-describe('Seed signer', () => {
-  let signer
+  const lock = promisify(signer.lock.bind(signer))
+  await lock()
 
-  beforeAll(async () => {
-    log.transports.console.level = false
+  mockWorker.send.mockClear()
 
-    clean()
+  const unlock = promisify(signer.unlock.bind(signer))
+  await unlock('somepassword198')
 
-    store = require('../../../../../main/store').default
-  })
-
-  afterEach(() => {
-    jest.useRealTimers()
-  })
-
-  afterAll(() => {
-    clean()
-    if (signer.status !== 'locked') {
-      signer.close()
-    }
-    log.transports.console.level = 'debug'
-  })
-
-  test('Create from invalid phrase', (done) => {
-    const mnemonic = 'invalid mnemonic'
-
-    try {
-      hot.createFromPhrase(signers, mnemonic, PASSWORD, (err) => {
-        expect(err).toBeTruthy()
-        expect(store('main.signers')).toEqual({})
-        done()
-      })
-    } catch (e) {
-      done(e)
-    }
-  }, 1000)
-
-  test('Create from phrase', (done) => {
-    try {
-      const mnemonic = generateMnemonic()
-      hot.createFromPhrase(signers, mnemonic, PASSWORD, (err, result) => {
-        signer = result
-        expect(err).toBe(null)
-        expect(signer.status).toBe('ok')
-        expect(signer.addresses.length).toBe(100)
-        expect(store(`main.signers.${signer.id}.id`)).toBe(signer.id)
-        done()
-      })
-    } catch (e) {
-      done(e)
-    }
-  }, 7_500)
-
-  test('Lock', (done) => {
-    try {
-      signer.lock((err) => {
-        expect(err).toBe(null)
-        expect(signer.status).toBe('locked')
-        done()
-      })
-    } catch (e) {
-      done(e)
-    }
-  }, 2000)
-
-  test('Scan for signers', (done) => {
-    jest.useFakeTimers()
-
-    let count = 0
-    const signers = {
-      add: (signer) => {
-        signer.close(() => {})
-        if (signer.type === 'seed') count++
-        expect(count).toBe(1)
-        done()
-      },
-      exists: () => false
-    }
-
-    hot.scan(signers)
-
-    jest.runAllTimers()
-  }, 800)
-
-  test('Unlock with wrong password', (done) => {
-    try {
-      signer.unlock('Wrong password', (err) => {
-        expect(err).toBeTruthy()
-        expect(signer.status).toBe('locked')
-        done()
-      })
-    } catch (e) {
-      done(e)
-    }
-  }, 2000)
-
-  test('Unlock', (done) => {
-    try {
-      signer.unlock(PASSWORD, (err) => {
-        expect(err).toBe(null)
-        done()
-      })
-    } catch (e) {
-      done(e)
-    }
-  }, 500)
-
-  test('Sign message', (done) => {
-    try {
-      const message = '0x' + Buffer.from('test').toString('hex')
-
-      signer.signMessage(0, message, (err, result) => {
-        expect(err).toBe(null)
-        expect(result.length).toBe(132)
-        done()
-      })
-    } catch (e) {
-      done(e)
-    }
-  }, 500)
-
-  test('Sign transaction', (done) => {
-    const rawTx = {
-      nonce: '0x6',
-      gasPrice: '0x09184e72a000',
-      gasLimit: '0x30000',
-      to: '0xfa3caabc8eefec2b5e2895e5afbf79379e7268a7',
-      value: '0x0',
-      chainId: '0x1'
-    }
-
-    try {
-      signer.signTransaction(0, rawTx, (err, result) => {
-        expect(err).toBe(null)
-        expect(result.length).not.toBe(0)
-        expect(result.slice(0, 2)).toBe('0x')
-        done()
-      })
-    } catch (e) {
-      done(e)
-    }
-  }, 500)
-
-  test('Verify address', (done) => {
-    try {
-      signer.verifyAddress(0, signer.addresses[0], false, (err, result) => {
-        expect(err).toBe(null)
-        expect(result).toBe(true)
-        done()
-      })
-    } catch (e) {
-      done(e)
-    }
-  }, 500)
-
-  test('Verify wrong address', (done) => {
-    try {
-      signer.verifyAddress(0, '0xabcdef', false, (err, result) => {
-        expect(err.message).toBe('Unable to verify address')
-        expect(result).toBe(undefined)
-        done()
-      })
-    } catch (e) {
-      done(e)
-    }
-  }, 500)
-
-  test('Sign message when locked', (done) => {
-    try {
-      signer.signMessage(0, 'test', (err) => {
-        expect(err.message).toBe('Signer locked')
-        done()
-      })
-    } catch (e) {
-      done(e)
+  expect(mockWorker.send).toHaveBeenCalledWith({
+    id: expect.any(String),
+    token,
+    method: 'unlock',
+    params: {
+      encryptedSecret:
+        '7f575d51c5f4a1dce66368160a869768:554030e5813b7d9fb8f75e507639c24d:b37f66fd23190e36f10b4e5e621e8a0de80e2c65059c192164c10c7c3a1e52102ad0227a2f74c54b017b676316d0096d4e9ceb55f380da3704c560e7ae32bcdb917069cdb97ef416d3891b85169aca28',
+      password: 'somepassword198'
     }
   })
+})
 
-  test('Close signer', (done) => {
-    try {
-      signer.close()
-      expect(store(`main.signers.${signer.id}`)).toBe(undefined)
-      done()
-    } catch (e) {
-      done(e)
+it('adds a mnemonic phrase to a signer', async () => {
+  const expectedSigner = {
+    model: 'phrase',
+    type: 'seed',
+    id: '6462633939626236623534646635623134383134376435353235393764326139'
+    //addresses: ['0xf779148750d7c303034ba54754485e6b1d6aa1b4']
+  }
+
+  mockWorker.addResult(
+    'encryptSeed',
+    '7f575d51c5f4a1dce66368160a869768:554030e5813b7d9fb8f75e507639c24d:b37f66fd23190e36f10b4e5e621e8a0de80e2c65059c192164c10c7c3a1e52102ad0227a2f74c54b017b676316d0096d4e9ceb55f380da3704c560e7ae32bcdb917069cdb97ef416d3891b85169aca28'
+  )
+
+  const addPhrase = promisify(signer.addPhrase.bind(signer))
+  await addPhrase(mnemonic, 'somepassword198')
+
+  const lockedSigner = store.updateSigner.mock.calls[0][0]
+  const { id, type, model, status, addresses } = lockedSigner
+  expect({ id, type, model }).toStrictEqual(expectedSigner)
+  expect(status).toBe('locked')
+  expect(addresses).toHaveLength(100)
+
+  const unlockedSigner = store.updateSigner.mock.calls[1][0]
+  expect(unlockedSigner.status).toBe('ok')
+  expect(unlockedSigner.addresses).toHaveLength(100)
+
+  expect(mockWorker.send).toHaveBeenCalledWith({
+    id: expect.any(String),
+    token,
+    method: 'encryptSeed',
+    params: {
+      seed: 'a21e6860c54f72d9de7362b11e1d06f96c2da1c9a4c6d6943056cc0ca8cf288a0c77e9a3aa47000a995266c261d99c125478b304b66c60066f512c64a3e21228',
+      password: 'somepassword198'
     }
   })
+}, 200)
+
+it('does not add an invalid mnemonic phrase', async () => {
+  const addPhrase = promisify(signer.addPhrase.bind(signer))
+  await expect(addPhrase('invalid', 'somepassword198')).rejects.toThrow('Invalid mnemonic')
+})
+
+it('does not add a mnemonic phrase to a signer that already has a seed', async () => {
+  signer.encryptedSeed = 'test'
+
+  const addPhrase = promisify(signer.addPhrase.bind(signer))
+  await expect(addPhrase(mnemonic, 'somepassword198')).rejects.toThrow('This signer already has a seed')
 })

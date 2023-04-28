@@ -1,8 +1,8 @@
 import path from 'path'
 import fs from 'fs'
+import zxcvbn from 'zxcvbn'
 import log from 'electron-log'
 import { generateMnemonic } from 'bip39'
-import zxcvbn from 'zxcvbn'
 import { ensureDirSync } from 'fs-extra'
 import { app } from 'electron'
 import { stripHexPrefix } from '@ethereumjs/util'
@@ -21,12 +21,7 @@ export interface HotSignerData {
   addresses: Address[]
 }
 
-// TODO: remove this when updating tests
-const USER_DATA = app
-  ? app.getPath('userData')
-  : // @ts-ignore
-    path.resolve(path.dirname(require.main.filename), '../.userData')
-const SIGNERS_PATH = path.resolve(USER_DATA, 'signers')
+const SIGNERS_PATH = path.resolve(app.getPath('userData'), 'signers')
 
 export default {
   newPhrase: (cb: Callback<string>) => {
@@ -39,13 +34,16 @@ export default {
     if (zxcvbn(password).score < 3) return cb(new Error('Hot account password is too weak'))
 
     const signer = new SeedSigner()
-    signer.addPhrase(phrase, password, (err) => {
-      if (err) {
-        signer.close()
-        return cb(err)
-      }
-      signers.add(signer)
-      cb(null, signer)
+
+    signer.once('ready', () => {
+      signer.addPhrase(phrase, password, (err) => {
+        if (err) {
+          signer.close()
+          return cb(err)
+        }
+        signers.add(signer)
+        cb(null, signer)
+      })
     })
   },
   createFromPrivateKey: (signers: Signers, privateKey: string, password: string, cb: Callback<Signer>) => {
@@ -57,13 +55,16 @@ export default {
     if (zxcvbn(password).score < 3) return cb(new Error('Hot account password is too weak'))
 
     const signer = new RingSigner()
-    signer.addPrivateKey(privateKeyHex, password, (err) => {
-      if (err) {
-        signer.close()
-        return cb(err)
-      }
-      signers.add(signer)
-      cb(null, signer)
+
+    signer.once('ready', () => {
+      signer.addPrivateKey(privateKeyHex, password, (err) => {
+        if (err) {
+          signer.close()
+          return cb(err)
+        }
+        signers.add(signer)
+        cb(null, signer)
+      })
     })
   },
   createFromKeystore: (
@@ -79,13 +80,16 @@ export default {
     if (password.length < 12) return cb(new Error('Hot account password is too short'))
     if (zxcvbn(password).score < 3) return cb(new Error('Hot account password is too weak'))
     const signer = new RingSigner()
-    signer.addKeystore(keystore, keystorePassword, password, (err) => {
-      if (err) {
-        signer.close()
-        return cb(err)
-      }
-      signers.add(signer)
-      cb(null, signer)
+
+    signer.once('ready', () => {
+      signer.addKeystore(keystore, keystorePassword, password, (err) => {
+        if (err) {
+          signer.close()
+          return cb(err)
+        }
+        signers.add(signer)
+        cb(null, signer)
+      })
     })
   },
   scan: (signers: Signers) => {
