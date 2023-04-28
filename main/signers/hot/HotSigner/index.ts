@@ -46,10 +46,9 @@ export default class HotSigner extends Signer {
 
     this.worker = fork(WORKER_PATH, [type])
 
-    // TODO: add when worker is mocked in tests
-    // this.worker.on('exit', (code) => {
-    //   log.error('Hot signer worker exited with code:', code)
-    // })
+    this.worker.on('exit', (code) => {
+      log.error('Hot signer worker exited with code:', code)
+    })
 
     this.getToken()
   }
