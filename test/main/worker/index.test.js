@@ -1,17 +1,8 @@
-import log from 'electron-log'
-import { fork, _forkedChildProcess as childProcess } from 'child_process'
+import { fork, _childProcessHandle as childProcess } from 'child_process'
 
 import WorkerProcess from '../../../main/worker/process'
 
 jest.mock('child_process')
-
-beforeAll(() => {
-  log.transports.console.level = false
-})
-
-afterAll(() => {
-  log.transports.console.level = 'debug'
-})
 
 let worker
 
@@ -33,8 +24,6 @@ describe('initializing', () => {
   })
 
   it('kills the process after the provided timeout', () => {
-    jest.useFakeTimers()
-
     worker = new WorkerProcess({
       name: 'test-worker',
       timeout: 60000
@@ -43,8 +32,6 @@ describe('initializing', () => {
     jest.advanceTimersByTime(60000)
 
     expect(childProcess.kill).toHaveBeenCalledWith('SIGABRT')
-
-    jest.useRealTimers()
   })
 })
 

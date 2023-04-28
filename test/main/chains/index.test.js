@@ -1,11 +1,8 @@
 import EventEmitter from 'events'
 import { addHexPrefix, intToHex } from '@ethereumjs/util'
-import log from 'electron-log'
 
 import store from '../../../main/store'
 import { gweiToHex } from '../../util'
-
-log.transports.console.level = false
 
 class MockConnection extends EventEmitter {
   constructor(chainId) {
