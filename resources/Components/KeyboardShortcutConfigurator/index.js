@@ -1,8 +1,8 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import hotkeys from 'hotkeys-js'
 
 import link from '../../../resources/link'
-import { getShortcutFromKeyEvent, getDisplayShortcut, isShortcutKey } from '../../../resources/app'
+import { getShortcutFromKeyEvent, getDisplayShortcut, isShortcutKey, isNonUSLayout } from '../../keyboard'
 
 const KeyboardShortcutConfigurator = ({ actionText = '', platform, shortcut, shortcutName }) => {
   const { modifierKeys, shortcutKey } = getDisplayShortcut(platform, shortcut)
@@ -12,17 +12,18 @@ const KeyboardShortcutConfigurator = ({ actionText = '', platform, shortcut, sho
       hotkeys('*', { capture: true }, (event) => {
         event.preventDefault()
 
-        const allowedModifierKeys = ['Meta', 'Alt', 'Control', 'Command']
+        const allowedModifierKeys = ['Meta', 'Alt', 'AltGr', 'Control', 'Command']
         const isModifierKey = allowedModifierKeys.includes(event.key)
 
         // ignore modifier key solo keypresses and disabled keys
         if (!isModifierKey && isShortcutKey(event)) {
-          const newShortcut = getShortcutFromKeyEvent(event)
+          const newShortcut = getShortcutFromKeyEvent(event, hotkeys.getPressedKeyCodes())
           // enable the new shortcut
           link.send('tray:action', 'setShortcut', shortcutName, {
             ...newShortcut,
             configuring: false,
-            enabled: true
+            enabled: true,
+            nonUSLayout: isNonUSLayout()
           })
         }
 

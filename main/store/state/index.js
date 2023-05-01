@@ -194,7 +194,8 @@ const initial = {
         modifierKeys: ['Alt'],
         shortcutKey: 'Slash',
         enabled: true,
-        configuring: false
+        configuring: false,
+        nonUSLayout: false
       })
     },
     // showUSDValue: main('showUSDValue', true),

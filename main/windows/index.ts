@@ -16,7 +16,8 @@ import store from '../store'
 import FrameManager from './frames'
 import { createWindow } from './window'
 import { SystemTray, SystemTrayEventHandlers } from './systemTray'
-import { getAcceleratorFromShortcut } from '../../resources/app'
+import { registerShortcut } from '../keyboardShortcuts'
+import { Shortcut } from '../store/state/types/shortcuts'
 
 type Windows = { [key: string]: BrowserWindow }
 
@@ -39,7 +40,6 @@ let dash: Dash
 let onboard: Onboard
 let mouseTimeout: NodeJS.Timeout
 let glide = false
-let summonShortcutAccelerator = 'Alt+/'
 
 const app = {
   hide: () => {
@@ -554,35 +554,39 @@ const init = () => {
 
   store.observer(() => broadcast('permissions', JSON.stringify(store('permissions'))))
   store.observer(() => {
-    const summonShortcut = store('main.shortcuts.summon')
-    const accelerator = getAcceleratorFromShortcut(summonShortcut)
-    try {
-      globalShortcut.unregister(accelerator)
-      if (summonShortcutAccelerator) {
-        globalShortcut.unregister(summonShortcutAccelerator)
+    let summonShortcut: Shortcut = store('main.shortcuts.summon')
+    const summonHandler = (accelerator: string) => {
+      app.toggle()
+      if (store('windows.onboard.showing')) {
+        send('onboard', 'main:flex', 'shortcutActivated')
       }
-      if (summonShortcut.enabled && !summonShortcut.configuring) {
-        globalShortcut.register(accelerator, () => {
-          app.toggle()
-          if (store('windows.onboard.showing')) {
-            send('onboard', 'main:flex', 'shortcutActivated')
-          }
+      if (tray?.isReady()) {
+        systemTray.setContextMenu(tray.isVisible() ? 'hide' : 'show', {
+          displaySummonShortcut: summonShortcut.enabled,
+          accelerator
         })
-        summonShortcutAccelerator = accelerator
       }
-    } catch (e) {
-      const summonShortcutStr = [...summonShortcut.modifierKeys, summonShortcut.shortcutKey].join('+')
-      log.error(
-        new Error(`Could not set accelerator "${accelerator}" for summon shortcut: ${summonShortcutStr}`)
-      )
     }
 
-    if (tray?.isReady()) {
-      systemTray.setContextMenu(tray.isVisible() ? 'hide' : 'show', {
-        displaySummonShortcut: summonShortcut.enabled,
-        accelerator
-      })
+    // Windows Non-US key layout AltGr / Right Alt fix
+    if (
+      isWindows &&
+      (summonShortcut.modifierKeys.includes('AltGr') ||
+        (summonShortcut.modifierKeys.includes('Alt') && summonShortcut.nonUSLayout))
+    ) {
+      // remove AltGr and Alt from modifiers
+      const modifierKeys = summonShortcut.modifierKeys.filter((modifier) => !modifier.startsWith('Alt'))
+      // register Control + Alt + rest of shortcut - so that AltGr / Right Alt triggers summon in the same way as Left Alt
+      registerShortcut(
+        'summon',
+        { ...summonShortcut, modifierKeys: [...modifierKeys, 'Control', 'Alt'] },
+        summonHandler
+      )
+      // add Alt back to ensure that Left Alt is still registered
+      summonShortcut = { ...summonShortcut, modifierKeys: [...modifierKeys, 'Alt'] }
     }
+
+    registerShortcut('summon', summonShortcut, summonHandler)
   })
 }
 

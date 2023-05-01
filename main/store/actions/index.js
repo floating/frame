@@ -229,7 +229,8 @@ module.exports = {
       modifierKeys: shortcut.modifierKeys || existingShortcut.modifierKeys,
       shortcutKey: shortcut.shortcutKey || existingShortcut.shortcutKey,
       configuring: shortcut.configuring ?? existingShortcut.configuring,
-      enabled: shortcut.enabled ?? existingShortcut.enabled
+      enabled: shortcut.enabled ?? existingShortcut.enabled,
+      nonUSLayout: shortcut.nonUSLayout ?? existingShortcut.nonUSLayout
     }))
   },
   setAutohide: (u, v) => {

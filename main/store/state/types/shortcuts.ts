@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-const supportedModifierKey = z.enum(['Alt', 'Control', 'Meta', 'Super', 'CommandOrCtrl'])
+const supportedModifierKey = z.enum(['Alt', 'AltGr', 'Control', 'Meta', 'Super', 'CommandOrCtrl'])
 
 const supportedShortcutKey = z.enum([
   'Comma',
@@ -83,7 +83,8 @@ export const ShortcutSchema = z.object({
   modifierKeys: z.array(supportedModifierKey).default([]),
   shortcutKey: supportedShortcutKey,
   enabled: z.boolean().default(true),
-  configuring: z.boolean().default(false)
+  configuring: z.boolean().default(false),
+  nonUSLayout: z.boolean().default(false)
 })
 
 export type ModifierKey = z.infer<typeof supportedModifierKey>

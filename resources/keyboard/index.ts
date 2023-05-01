@@ -85,12 +85,14 @@ const shortcutKeyMap: Record<ShortcutKey, string> = {
   Numpad0: 'num0'
 }
 
-// TODO: use correct navigator and keyboard layout type here
-let keyboardLayout: any
+export type KeyboardLayout = {
+  get: (key: string) => string
+}
+
+let keyboardLayout: KeyboardLayout | undefined
 
 if (global?.navigator) {
-  // @ts-ignore
-  navigator.keyboard.getLayoutMap().then((layout: any) => {
+  navigator.keyboard.getLayoutMap().then((layout) => {
     keyboardLayout = layout
   })
 
@@ -136,8 +138,11 @@ export const getAcceleratorFromShortcut = ({ modifierKeys, shortcutKey }: Shortc
   return acceleratorBits.join('+')
 }
 
-export const getShortcutFromKeyEvent = (e: KeyboardEvent) => {
+export const getShortcutFromKeyEvent = (e: KeyboardEvent, pressedKeyCodes: number[]) => {
   const modifierKeys = []
+  if (!e.altKey && !e.ctrlKey && pressedKeyCodes.includes(17)) {
+    modifierKeys.push('AltGr')
+  }
   if (e.altKey) {
     modifierKeys.push('Alt')
   }
@@ -153,3 +158,5 @@ export const getShortcutFromKeyEvent = (e: KeyboardEvent) => {
     shortcutKey: e.code
   }
 }
+
+export const isNonUSLayout = () => keyboardLayout?.get('backSlash') === '\\'
