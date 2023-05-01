@@ -65,7 +65,7 @@ export default [
     files: [
       'app/**/*.js',
       'main/dapps/server/inject/*.js',
-      'resources/app/**/*.js',
+      'resources/keyboard/**/*.js',
       'resources/Components/**/*.js',
       'resources/Hooks/**/*.js',
       'resources/Native/**/*.js',
