@@ -91,7 +91,7 @@ const toTokenBalance = (b: BalanceItem) => ({
 })
 
 const Surface = () => {
-  const Pylon = createPylon('ws://localhost:9000')
+  const Pylon = createPylon('wss://api.pylon.link')
   const subscriptions: Record<string, Subscription> = {}
   const networks = Networks()
   const subscribe = async (addr: string) => {
