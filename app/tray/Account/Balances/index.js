@@ -31,12 +31,14 @@ class Balances extends React.Component {
     const balances = rawBalances
       // only show balances from connected networks
       .filter((rawBalance) => {
-        const chainName = ethereumNetworks[rawBalance.chainId].name
+        const chain = ethereumNetworks[rawBalance.chainId]
+
         return (
+          !!chain &&
           isNetworkConnected(ethereumNetworks[rawBalance.chainId]) &&
           populatedChains[rawBalance.chainId] &&
           populatedChains[rawBalance.chainId].expires > Date.now() &&
-          matchFilter(filter, [chainName, rawBalance.name, rawBalance.symbol])
+          matchFilter(filter, [chain.name, rawBalance.name, rawBalance.symbol])
         )
       })
       .map((rawBalance) => {
@@ -45,6 +47,7 @@ class Balances extends React.Component {
 
         const rate = isNative ? nativeCurrencyInfo : rates[rawBalance.address || rawBalance.symbol] || {}
         const logoURI = (isNative && nativeCurrencyInfo.icon) || rawBalance.logoURI
+
         const name = isNative
           ? nativeCurrencyInfo.name || ethereumNetworks[rawBalance.chainId].name
           : rawBalance.name
