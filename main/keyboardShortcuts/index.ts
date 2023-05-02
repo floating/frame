@@ -2,7 +2,7 @@ import { globalShortcut } from 'electron'
 import log from 'electron-log'
 
 import type { Shortcut } from '../store/state/types/shortcuts'
-import { shortcutKeyMap } from '../../resources/keyboard'
+import { shortcutKeyMap } from '../../resources/keyboard/mappings'
 
 const acceleratorMap = {
   summon: 'Alt+/'
