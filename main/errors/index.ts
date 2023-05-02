@@ -1,7 +1,9 @@
 import * as Sentry from '@sentry/electron'
-import type { Event } from '@sentry/electron'
 
 import store from '../store'
+
+import type { Event } from '@sentry/electron'
+import { getQueuedErrors } from './queue'
 
 const EVENT_RATE_LIMIT = 5
 
@@ -64,4 +66,10 @@ export function init() {
       }
     }
   })
+
+  const pendingErrors = getQueuedErrors()
+
+  while (pendingErrors.length > 0) {
+    Sentry.captureException(pendingErrors.pop())
+  }
 }
