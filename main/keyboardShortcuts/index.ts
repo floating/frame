@@ -35,13 +35,14 @@ export const registerShortcut = (
 ) => {
   const accelerator = getAcceleratorFromShortcut(shortcut)
   unregisterShortcut(name, shortcut)
+  const shortcutStr = [...shortcut.modifierKeys, shortcut.shortcutKey].join('+')
   try {
     if (shortcut.enabled && !shortcut.configuring) {
       globalShortcut.register(accelerator, () => shortcutHandler(accelerator))
+      log.info(`Accelerator "${accelerator}" registered for shortcut: ${shortcutStr}`)
       acceleratorMap[name as keyof typeof acceleratorMap] = accelerator
     }
   } catch (e) {
-    const shortcutStr = [...shortcut.modifierKeys, shortcut.shortcutKey].join('+')
     log.error(new Error(`Could not set accelerator "${accelerator}" for shortcut: ${shortcutStr}`))
   }
 }
