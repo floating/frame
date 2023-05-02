@@ -554,6 +554,7 @@ const init = () => {
 
   store.observer(() => broadcast('permissions', JSON.stringify(store('permissions'))))
   store.observer(() => {
+    const keyboardLayout = store('keyboardLayout')
     let summonShortcut: Shortcut = store('main.shortcuts.summon')
     const summonHandler = (accelerator: string) => {
       app.toggle()
@@ -572,7 +573,7 @@ const init = () => {
     if (
       !isMacOS &&
       (summonShortcut.modifierKeys.includes('AltGr') ||
-        (summonShortcut.modifierKeys.includes('Alt') && summonShortcut.nonUSLayout))
+        (summonShortcut.modifierKeys.includes('Alt') && !keyboardLayout.isUS))
     ) {
       // remove AltGr and Alt from modifiers
       const modifierKeys = summonShortcut.modifierKeys.filter((modifier) => !modifier.startsWith('Alt'))

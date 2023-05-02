@@ -1,11 +1,17 @@
 import { globalShortcut } from 'electron'
 import log from 'electron-log'
 
-import { getAcceleratorFromShortcut } from '../../resources/keyboard'
 import type { Shortcut } from '../store/state/types/shortcuts'
+import { shortcutKeyMap } from '../../resources/keyboard'
 
 const acceleratorMap = {
   summon: 'Alt+/'
+}
+
+const getAcceleratorFromShortcut = ({ modifierKeys, shortcutKey }: Shortcut) => {
+  const acceleratorBits = [...modifierKeys, shortcutKeyMap[shortcutKey] || shortcutKey]
+
+  return acceleratorBits.join('+')
 }
 
 export const registerShortcut = (

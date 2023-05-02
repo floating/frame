@@ -83,8 +83,7 @@ export const ShortcutSchema = z.object({
   modifierKeys: z.array(supportedModifierKey).default([]),
   shortcutKey: supportedShortcutKey,
   enabled: z.boolean().default(true),
-  configuring: z.boolean().default(false),
-  nonUSLayout: z.boolean().default(false)
+  configuring: z.boolean().default(false)
 })
 
 export type ModifierKey = z.infer<typeof supportedModifierKey>

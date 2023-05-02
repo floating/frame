@@ -163,6 +163,9 @@ const initial = {
     rates: {}
   },
   platform: process.platform,
+  keyboardLayout: {
+    isUS: true
+  },
   main: {
     _version: main('_version', 32),
     instanceId: main('instanceId', generateUuid()),
@@ -194,8 +197,7 @@ const initial = {
         modifierKeys: ['Alt'],
         shortcutKey: 'Slash',
         enabled: true,
-        configuring: false,
-        nonUSLayout: false
+        configuring: false
       })
     },
     // showUSDValue: main('showUSDValue', true),

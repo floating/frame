@@ -1,4 +1,5 @@
 import type { Shortcut, ShortcutKey, ModifierKey } from '../../main/store/state/types/shortcuts'
+import link from '../linkTS'
 
 type Platform = 'darwin' | 'win32' | 'linux'
 
@@ -8,7 +9,7 @@ const metaKeyMap: Record<Platform, string> = {
   linux: 'Meta'
 }
 
-const shortcutKeyMap: Record<ShortcutKey, string> = {
+export const shortcutKeyMap: Record<ShortcutKey, string> = {
   Comma: ',',
   Period: '.',
   Forwardslash: '/',
@@ -89,11 +90,16 @@ export type KeyboardLayout = {
   get: (key: string) => string
 }
 
+// https://www.w3.org/TR/uievents-code/#keyboard-101
+const isUSLayout = () => keyboardLayout?.get('Backslash') === '\\'
 let keyboardLayout: KeyboardLayout | undefined
 
 if (global?.navigator) {
   navigator.keyboard.getLayoutMap().then((layout) => {
     keyboardLayout = layout
+    link.send('tray:action', 'setKeyboardLayout', {
+      isUS: isUSLayout()
+    })
   })
 
   // TODO: keyboard layoutchange event listener when Electron supports it
@@ -136,12 +142,6 @@ export const getDisplayShortcut = (platform: Platform, shortcut: Shortcut) => {
   return { modifierKeys, shortcutKey }
 }
 
-export const getAcceleratorFromShortcut = ({ modifierKeys, shortcutKey }: Shortcut) => {
-  const acceleratorBits = [...modifierKeys, shortcutKeyMap[shortcutKey] || shortcutKey]
-
-  return acceleratorBits.join('+')
-}
-
 export const getShortcutFromKeyEvent = (e: KeyboardEvent, pressedKeyCodes: number[]) => {
   const modifierKeys = []
   if (!e.altKey && !e.ctrlKey && pressedKeyCodes.includes(17)) {
@@ -162,6 +162,3 @@ export const getShortcutFromKeyEvent = (e: KeyboardEvent, pressedKeyCodes: numbe
     shortcutKey: e.code
   }
 }
-
-// https://www.w3.org/TR/uievents-code/#keyboard-101
-export const isNonUSLayout = () => keyboardLayout?.get('Backslash') !== '\\'

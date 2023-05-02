@@ -143,7 +143,6 @@ describe('when configuring', () => {
       expect(link.send).toHaveBeenLastCalledWith('tray:action', 'setShortcut', 'Test', {
         enabled: true,
         configuring: false,
-        nonUSLayout: true,
         modifierKeys: ['Alt'],
         shortcutKey: 'KeyT'
       })
@@ -171,7 +170,6 @@ describe('when configuring', () => {
       expect(link.send).toHaveBeenLastCalledWith('tray:action', 'setShortcut', 'Test', {
         enabled: true,
         configuring: false,
-        nonUSLayout: true,
         modifierKeys: ['Alt'],
         shortcutKey: 'KeyT'
       })

@@ -229,8 +229,12 @@ module.exports = {
       modifierKeys: shortcut.modifierKeys || existingShortcut.modifierKeys,
       shortcutKey: shortcut.shortcutKey || existingShortcut.shortcutKey,
       configuring: shortcut.configuring ?? existingShortcut.configuring,
-      enabled: shortcut.enabled ?? existingShortcut.enabled,
-      nonUSLayout: shortcut.nonUSLayout ?? existingShortcut.nonUSLayout
+      enabled: shortcut.enabled ?? existingShortcut.enabled
+    }))
+  },
+  setKeyboardLayout: (u, layout) => {
+    u('keyboardLayout', (existingLayout = {}) => ({
+      isUS: layout.isUS ?? existingLayout.isUS
     }))
   },
   setAutohide: (u, v) => {

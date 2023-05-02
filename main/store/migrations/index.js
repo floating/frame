@@ -928,17 +928,6 @@ const migrations = {
     }
 
     return initial
-  },
-  37: (initial) => {
-    if (
-      initial?.main?.shortcuts?.summon &&
-      typeof initial.main.shortcuts.summon === 'object' &&
-      initial.main.shortcuts.summon.nonUSLayout === undefined
-    ) {
-      initial.main.shortcuts.summon.nonUSLayout = false
-    }
-
-    return initial
   }
 }
 

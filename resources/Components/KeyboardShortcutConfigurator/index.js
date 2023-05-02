@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import hotkeys from 'hotkeys-js'
 
 import link from '../../../resources/link'
-import { getShortcutFromKeyEvent, getDisplayShortcut, isShortcutKey, isNonUSLayout } from '../../keyboard'
+import { getShortcutFromKeyEvent, getDisplayShortcut, isShortcutKey } from '../../keyboard'
 
 const KeyboardShortcutConfigurator = ({ actionText = '', platform, shortcut, shortcutName }) => {
   const { modifierKeys, shortcutKey } = getDisplayShortcut(platform, shortcut)
@@ -22,8 +22,7 @@ const KeyboardShortcutConfigurator = ({ actionText = '', platform, shortcut, sho
           link.send('tray:action', 'setShortcut', shortcutName, {
             ...newShortcut,
             configuring: false,
-            enabled: true,
-            nonUSLayout: isNonUSLayout()
+            enabled: true
           })
         }
 
