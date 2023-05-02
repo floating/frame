@@ -590,8 +590,14 @@ const init = () => {
       (summonShortcut.modifierKeys.includes('AltGr') ||
         (summonShortcut.modifierKeys.includes('Alt') && !keyboardLayout.isUS))
     ) {
-      // register the NonUS shortcut if required
+      // register the NonUS shortcut
       registerShortcut('summonNonUS', summonShortcutNonUS, summonHandler)
+
+      // replace AltGr with Alt in the main shortcut
+      summonShortcut = {
+        ...summonShortcut,
+        modifierKeys: summonShortcut.modifierKeys.map((key) => (key === 'AltGr' ? 'Alt' : key))
+      }
     } else {
       // unregister any existing NonUS shortcut
       unregisterShortcut('summonNonUS', summonShortcutNonUS)
