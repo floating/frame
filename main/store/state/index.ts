@@ -1,29 +1,40 @@
 import { v4 as generateUuid, v5 as uuidv5 } from 'uuid'
 import { z } from 'zod'
-import log from 'electron-log'
 
 import persist from '../persist'
 import migrations from '../migrate'
 
-import { MainSchema, Main } from './types/main'
-
+import { MainSchema } from './types/main'
+import { Chain, chainDefaults } from './types/chain'
+import { ChainMetadata, chainMetaDefaults } from './types/chainMeta'
 import type { Origin } from './types/origin'
+import type { Dapp } from './types/dapp'
 
-export type { ChainId, Chain, ChainMetadata } from './types/chain'
+export type { ChainId, Chain } from './types/chain'
 export type { Connection } from './types/connection'
 export type { Origin } from './types/origin'
 export type { Permission } from './types/permission'
+export type { HardwareSignerType, HotSignerType, SignerType, Signer } from './types/signer'
 export type { Account, AccountMetadata } from './types/account'
 export type { Balance } from './types/balance'
+export type { InventoryAsset, InventoryCollection } from './types/inventory'
 export type { WithTokenId, Token } from './types/token'
 export type { Dapp } from './types/dapp'
 export type { NativeCurrency } from './types/nativeCurrency'
 export type { Gas, GasFees } from './types/gas'
 export type { Rate } from './types/rate'
+export type { Frame, ViewMetadata } from './types/frame'
+export type { Shortcut, ShortcutKey, ModifierKey } from './types/shortcuts'
 export type { ColorwayPalette } from './types/colors'
 
 const StateSchema = z.object({
-  main: MainSchema
+  main: MainSchema.passthrough(), // TODO: remove passthrough once all pieces of state have been defined
+  windows: z.any(),
+  view: z.any(),
+  selected: z.any(),
+  panel: z.any(),
+  tray: z.any(),
+  platform: z.string()
 })
 
 export type Migration = {
@@ -73,27 +84,7 @@ const main = (path: string, def: any) => {
   return found
 }
 
-// TODO: remove pieces of this as they're added to the main state definition
-type M = Main & {
-  shortcuts: any
-  lattice: any
-  latticeSettings: any
-  ledger: any
-  trezor: any
-  privacy: any
-  addresses: any
-  tokens: any
-  rates: any
-  inventory: any
-  signers: any
-  savedSigners: any
-  ipfs: any
-  frames: any
-  openDapps: any
-  dapp: any
-}
-
-const mainState: M = {
+const mainState = {
   _version: main('_version', 38),
   instanceId: main('instanceId', generateUuid()),
   colorway: main('colorway', 'dark'),
@@ -164,474 +155,11 @@ const mainState: M = {
   rates: {}, // main('rates', {}),
   inventory: {}, // main('rates', {}),
   signers: {},
-  savedSigners: {},
   updater: {
     dontRemind: main('updater.dontRemind', [])
   },
-  networks: main('networks', {
-    ethereum: {
-      1: {
-        id: 1,
-        type: 'ethereum',
-        layer: 'mainnet',
-        name: 'Mainnet',
-        isTestnet: false,
-        explorer: 'https://etherscan.io',
-        gas: {
-          price: {
-            selected: 'standard',
-            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-          }
-        },
-        connection: {
-          primary: {
-            on: true,
-            current: 'pylon',
-            status: 'loading',
-            connected: false,
-            type: '',
-            network: '',
-            custom: ''
-          },
-          secondary: {
-            on: false,
-            current: 'custom',
-            status: 'loading',
-            connected: false,
-            type: '',
-            network: '',
-            custom: ''
-          }
-        },
-        on: true
-      },
-      5: {
-        id: 5,
-        type: 'ethereum',
-        layer: 'testnet',
-        isTestnet: true,
-        name: 'Görli',
-        explorer: 'https://goerli.etherscan.io',
-        gas: {
-          price: {
-            selected: 'standard',
-            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-          }
-        },
-        connection: {
-          primary: {
-            on: true,
-            current: 'pylon',
-            status: 'loading',
-            connected: false,
-            type: '',
-            network: '',
-            custom: ''
-          },
-          secondary: {
-            on: false,
-            current: 'custom',
-            status: 'loading',
-            connected: false,
-            type: '',
-            network: '',
-            custom: ''
-          }
-        },
-        on: false
-      },
-      10: {
-        id: 10,
-        type: 'ethereum',
-        layer: 'rollup',
-        isTestnet: false,
-        name: 'Optimism',
-        explorer: 'https://optimistic.etherscan.io',
-        gas: {
-          price: {
-            selected: 'standard',
-            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-          }
-        },
-        connection: {
-          primary: {
-            on: true,
-            current: 'pylon',
-            status: 'loading',
-            connected: false,
-            type: '',
-            network: '',
-            custom: ''
-          },
-          secondary: {
-            on: false,
-            current: 'custom',
-            status: 'loading',
-            connected: false,
-            type: '',
-            network: '',
-            custom: ''
-          }
-        },
-        on: false
-      },
-      100: {
-        id: 100,
-        type: 'ethereum',
-        layer: 'sidechain',
-        isTestnet: false,
-        name: 'Gnosis',
-        explorer: 'https://blockscout.com/xdai/mainnet',
-        gas: {
-          price: {
-            selected: 'standard',
-            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-          }
-        },
-        connection: {
-          primary: {
-            on: false,
-            current: 'custom',
-            status: 'loading',
-            connected: false,
-            type: '',
-            network: '',
-            custom: 'https://rpc.gnosischain.com'
-          },
-          secondary: {
-            on: false,
-            current: 'custom',
-            status: 'loading',
-            connected: false,
-            type: '',
-            network: '',
-            custom: ''
-          }
-        },
-        on: false
-      },
-      137: {
-        id: 137,
-        type: 'ethereum',
-        layer: 'sidechain',
-        isTestnet: false,
-        name: 'Polygon',
-        explorer: 'https://polygonscan.com',
-        gas: {
-          price: {
-            selected: 'standard',
-            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-          }
-        },
-        connection: {
-          primary: {
-            on: true,
-            current: 'pylon',
-            status: 'loading',
-            connected: false,
-            type: '',
-            network: '',
-            custom: ''
-          },
-          secondary: {
-            on: false,
-            current: 'custom',
-            status: 'loading',
-            connected: false,
-            type: '',
-            network: '',
-            custom: ''
-          }
-        },
-        on: false
-      },
-      42161: {
-        id: 42161,
-        type: 'ethereum',
-        layer: 'rollup',
-        isTestnet: false,
-        name: 'Arbitrum',
-        explorer: 'https://arbiscan.io',
-        gas: {
-          price: {
-            selected: 'standard',
-            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-          }
-        },
-        connection: {
-          primary: {
-            on: true,
-            current: 'pylon',
-            status: 'loading',
-            connected: false,
-            type: '',
-            network: '',
-            custom: ''
-          },
-          secondary: {
-            on: false,
-            current: 'custom',
-            status: 'loading',
-            connected: false,
-            type: '',
-            network: '',
-            custom: ''
-          }
-        },
-        on: false
-      },
-      84531: {
-        id: 84531,
-        type: 'ethereum',
-        layer: 'testnet',
-        isTestnet: true,
-        name: 'Base Görli',
-        explorer: 'https://goerli-explorer.base.org',
-        gas: {
-          price: {
-            selected: 'standard',
-            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-          }
-        },
-        connection: {
-          primary: {
-            on: true,
-            current: 'custom',
-            status: 'loading',
-            connected: false,
-            type: '',
-            network: '',
-            custom: 'https://goerli.base.org'
-          },
-          secondary: {
-            on: false,
-            current: 'custom',
-            status: 'loading',
-            connected: false,
-            type: '',
-            network: '',
-            custom: ''
-          }
-        },
-        on: false
-      },
-      11155111: {
-        id: 11155111,
-        type: 'ethereum',
-        layer: 'testnet',
-        isTestnet: true,
-        name: 'Sepolia',
-        explorer: 'https://sepolia.etherscan.io',
-        gas: {
-          price: {
-            selected: 'standard',
-            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-          }
-        },
-        connection: {
-          primary: {
-            on: true,
-            current: 'pylon',
-            status: 'loading',
-            connected: false,
-            type: '',
-            network: '',
-            custom: ''
-          },
-          secondary: {
-            on: false,
-            current: 'custom',
-            status: 'loading',
-            connected: false,
-            type: '',
-            network: '',
-            custom: ''
-          }
-        },
-        on: false
-      }
-    }
-  }),
-  networksMeta: main('networksMeta', {
-    ethereum: {
-      1: {
-        blockHeight: 0,
-        gas: {
-          fees: {},
-          price: {
-            selected: 'standard',
-            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-          }
-        },
-        nativeCurrency: {
-          symbol: 'ETH',
-          usd: {
-            price: 0,
-            change24hr: 0
-          },
-          icon: 'https://assets.coingecko.com/coins/images/279/large/ethereum.png?1595348880',
-          name: 'Ether',
-          decimals: 18
-        },
-        icon: '',
-        primaryColor: 'accent1' // Mainnet
-      },
-      5: {
-        blockHeight: 0,
-        gas: {
-          fees: {},
-          price: {
-            selected: 'standard',
-            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-          }
-        },
-        nativeCurrency: {
-          symbol: 'görETH',
-          usd: {
-            price: 0,
-            change24hr: 0
-          },
-          icon: '',
-          name: 'Görli Ether',
-          decimals: 18
-        },
-        icon: '',
-        primaryColor: 'accent2' // Testnet
-      },
-      10: {
-        blockHeight: 0,
-        gas: {
-          fees: {},
-          price: {
-            selected: 'standard',
-            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-          }
-        },
-        nativeCurrency: {
-          usd: {
-            price: 0,
-            change24hr: 0
-          },
-          icon: '',
-          name: 'Ether',
-          symbol: 'ETH',
-          decimals: 18
-        },
-        icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/optimism.svg',
-        primaryColor: 'accent4' // Optimism
-      },
-      100: {
-        blockHeight: 0,
-        gas: {
-          fees: {},
-          price: {
-            selected: 'standard',
-            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-          }
-        },
-        nativeCurrency: {
-          symbol: 'xDAI',
-          usd: {
-            price: 0,
-            change24hr: 0
-          },
-          icon: '',
-          name: 'xDAI',
-          decimals: 18
-        },
-        icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/gnosis.svg',
-        primaryColor: 'accent5' // Gnosis
-      },
-      137: {
-        blockHeight: 0,
-        gas: {
-          fees: {},
-          price: {
-            selected: 'standard',
-            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-          }
-        },
-        nativeCurrency: {
-          symbol: 'MATIC',
-          usd: {
-            price: 0,
-            change24hr: 0
-          },
-          icon: '',
-          name: 'Matic',
-          decimals: 18
-        },
-        icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/polygon.svg',
-        primaryColor: 'accent6' // Polygon
-      },
-      42161: {
-        blockHeight: 0,
-        gas: {
-          fees: {},
-          price: {
-            selected: 'standard',
-            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-          }
-        },
-        nativeCurrency: {
-          usd: {
-            price: 0,
-            change24hr: 0
-          },
-          icon: '',
-          name: 'Ether',
-          symbol: 'ETH',
-          decimals: 18
-        },
-        icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/arbitrum.svg',
-        primaryColor: 'accent7' // Arbitrum
-      },
-      84531: {
-        blockHeight: 0,
-        gas: {
-          fees: {},
-          price: {
-            selected: 'standard',
-            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-          }
-        },
-        nativeCurrency: {
-          symbol: 'görETH',
-          usd: {
-            price: 0,
-            change24hr: 0
-          },
-          icon: '',
-          name: 'Görli Ether',
-          decimals: 18
-        },
-        icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/baseiconcolor.png',
-        primaryColor: 'accent2' // Testnet
-      },
-      11155111: {
-        blockHeight: 0,
-        gas: {
-          fees: {},
-          price: {
-            selected: 'standard',
-            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-          }
-        },
-        nativeCurrency: {
-          symbol: 'sepETH',
-          usd: {
-            price: 0,
-            change24hr: 0
-          },
-          icon: '',
-          name: 'Sepolia Ether',
-          decimals: 18
-        },
-        icon: '',
-        primaryColor: 'accent2' // Testnet
-      }
-    }
-  }),
+  networks: main('networks', { ethereum: chainDefaults }),
+  networksMeta: main('networksMeta', { ethereum: chainMetaDefaults }),
   dapps: main('dapps', {}),
   ipfs: {},
   frames: {},
@@ -783,39 +311,45 @@ Object.keys(initial.main.accounts).forEach((id) => {
   initial.main.accounts[id].balances = { lastUpdated: undefined }
 })
 
-Object.values(initial.main.networks.ethereum).forEach((chain) => {
+Object.values(initial.main.networks.ethereum as Record<string, Chain>).forEach((chain) => {
   chain.connection.primary = { ...chain.connection.primary, connected: false }
   chain.connection.secondary = { ...chain.connection.secondary, connected: false }
 })
 
 Object.values(initial.main.networksMeta).forEach((chains) => {
-  Object.values(chains).forEach((chainMeta) => {
+  Object.values(chains as Record<string, ChainMetadata>).forEach((chainMeta) => {
     // remove stale price data
     chainMeta.nativeCurrency = { ...chainMeta.nativeCurrency, usd: { price: 0, change24hr: 0 } }
   })
 })
 
-initial.main.origins = Object.entries(initial.main.origins).reduce((origins, [id, origin]) => {
-  if (id !== uuidv5('Unknown', uuidv5.DNS)) {
-    // don't persist unknown origin
-    origins[id] = {
-      ...origin,
-      session: {
-        ...origin.session,
-        endedAt: origin.session.lastUpdatedAt
+initial.main.origins = Object.entries(initial.main.origins as Record<string, Origin>).reduce(
+  (origins, [id, origin]) => {
+    if (id !== uuidv5('Unknown', uuidv5.DNS)) {
+      // don't persist unknown origin
+      origins[id] = {
+        ...origin,
+        session: {
+          ...origin.session,
+          endedAt: origin.session.lastUpdatedAt
+        }
       }
     }
-  }
 
-  return origins
-}, {} as Record<string, Origin>)
+    return origins
+  },
+  {} as Record<string, Origin>
+)
 
 initial.main.knownExtensions = Object.fromEntries(
   Object.entries(initial.main.knownExtensions).filter(([_id, allowed]) => allowed)
 )
 
 initial.main.dapps = Object.fromEntries(
-  Object.entries(initial.main.dapps).map(([id, dapp]) => [id, { ...dapp, openWhenReady: false }])
+  Object.entries(initial.main.dapps as Record<string, Dapp>).map(([id, dapp]) => [
+    id,
+    { ...dapp, openWhenReady: false }
+  ])
 )
 
 // ---
@@ -825,9 +359,11 @@ export default function () {
   const result = StateSchema.safeParse(migratedState)
 
   if (!result.success) {
-    const issues = result.error.issues
-    log.warn(`Found ${issues.length} issues while parsing saved state`, issues)
+    // TODO: report these to sentry
+    // const issues = result.error.issues
+    // console.warn(`Found ${issues.length} issues while parsing saved state`, issues)
   }
 
+  // return result.data
   return migratedState
 }

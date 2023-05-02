@@ -9,20 +9,18 @@ const GasLevelsSchema = z.object({
 })
 
 // TODO: validate these fields as hex amount values
-export const GasFeesSchema = z
-  .object({
-    nextBaseFee: z.string(),
-    maxBaseFeePerGas: z.string(),
-    maxPriorityFeePerGas: z.string(),
-    maxFeePerGas: z.string()
-  })
-  .partial()
+export const GasFeesSchema = z.object({
+  nextBaseFee: z.string(),
+  maxBaseFeePerGas: z.string(),
+  maxPriorityFeePerGas: z.string(),
+  maxFeePerGas: z.string()
+})
 
 export const GasSchema = z.object({
   price: z.object({
     selected: GasLevelsSchema.keyof(),
     levels: GasLevelsSchema,
-    fees: GasFeesSchema.optional()
+    fees: GasFeesSchema.nullish()
   })
 })
 

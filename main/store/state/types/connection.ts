@@ -13,10 +13,10 @@ const statusValues = [
 const presetValues = ['local', 'custom', 'pylon'] as const
 
 export const ConnectionSchema = z.object({
-  on: z.boolean(),
-  connected: z.boolean(),
-  current: z.enum(presetValues),
-  status: z.enum(statusValues),
+  on: z.boolean().default(false),
+  connected: z.boolean().default(false),
+  current: z.enum(presetValues).default('custom'),
+  status: z.enum(statusValues).default('off'),
   custom: z.string().default('')
 })
 
