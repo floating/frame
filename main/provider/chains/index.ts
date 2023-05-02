@@ -3,7 +3,8 @@ import deepEqual from 'deep-equal'
 import { Colorway, getColor } from '../../../resources/colors'
 import store from '../../store'
 
-import type { Chain, ChainMetadata, Origin } from '../../store/state'
+import type { Chain, Origin } from '../../store/state'
+import type { ChainMetadata } from '../../store/state/types/chainMeta'
 
 // typed access to state
 const storeApi = {

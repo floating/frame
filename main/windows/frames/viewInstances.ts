@@ -6,6 +6,8 @@ import store from '../../store'
 import server from '../../dapps/server'
 import { createViewInstance } from '../window'
 
+import type { ViewMetadata } from '../../store/state'
+
 interface Extract {
   session: string
   ens: string
