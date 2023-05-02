@@ -17,5 +17,5 @@ jobs:
       - run: git remote add upstream https://github.com/floating/frame.git
       - run: git fetch upstream canary
       - run: git checkout canary
-      - run: git reset --hard upstream/canary
-      - run: git push -f origin canary
+      - run: git merge upstream/canary
+      - run: git push origin canary
