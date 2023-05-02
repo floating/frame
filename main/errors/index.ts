@@ -1,9 +1,9 @@
 import * as Sentry from '@sentry/electron'
 
 import store from '../store'
+import { getQueuedErrors } from './queue'
 
 import type { Event } from '@sentry/electron'
-import { getQueuedErrors } from './queue'
 
 const EVENT_RATE_LIMIT = 5
 
