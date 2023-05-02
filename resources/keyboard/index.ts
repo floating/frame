@@ -1,5 +1,5 @@
 import type { Shortcut, ShortcutKey, ModifierKey } from '../../main/store/state/types/shortcuts'
-import link from '../linkTS'
+import link from '../link'
 import { Platform, metaKeyMap, shortcutKeyMap } from './mappings'
 
 export type KeyboardLayout = {
@@ -13,7 +13,7 @@ let keyboardLayout: KeyboardLayout | undefined
 if (global?.navigator) {
   navigator.keyboard.getLayoutMap().then((layout) => {
     keyboardLayout = layout
-    link.send('tray:action', 'setKeyboardLayout', {
+    ;(link as any).send('tray:action', 'setKeyboardLayout', {
       isUS: isUSLayout()
     })
   })
