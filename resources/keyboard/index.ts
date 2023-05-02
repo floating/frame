@@ -109,6 +109,10 @@ function getModifierKey(key: ModifierKey, platform: Platform) {
     return isMacOS ? 'Option' : 'Alt'
   }
 
+  if (key === 'AltGr') {
+    return 'Alt'
+  }
+
   if (key === 'Control' || key === 'CommandOrCtrl') {
     return isMacOS ? 'Control' : 'Ctrl'
   }
@@ -159,4 +163,5 @@ export const getShortcutFromKeyEvent = (e: KeyboardEvent, pressedKeyCodes: numbe
   }
 }
 
-export const isNonUSLayout = () => keyboardLayout?.get('backSlash') === '\\'
+// https://www.w3.org/TR/uievents-code/#keyboard-101
+export const isNonUSLayout = () => keyboardLayout?.get('Backslash') !== '\\'
