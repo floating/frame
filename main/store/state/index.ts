@@ -1,10 +1,10 @@
 import { v4 as generateUuid, v5 as uuidv5 } from 'uuid'
 import { z } from 'zod'
-import { queueError } from '../../errors/queue'
 import log from 'electron-log'
 
 import persist from '../persist'
 import migrations from '../migrate'
+import { queueError } from '../../errors/queue'
 
 import { MainSchema } from './types/main'
 import { Chain, chainDefaults } from './types/chain'
