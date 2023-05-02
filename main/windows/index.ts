@@ -570,7 +570,7 @@ const init = () => {
 
     // Windows Non-US key layout AltGr / Right Alt fix
     if (
-      isWindows &&
+      !isMacOS &&
       (summonShortcut.modifierKeys.includes('AltGr') ||
         (summonShortcut.modifierKeys.includes('Alt') && summonShortcut.nonUSLayout))
     ) {
@@ -579,7 +579,7 @@ const init = () => {
       // register Control + Alt + rest of shortcut - so that AltGr / Right Alt triggers summon in the same way as Left Alt
       registerShortcut(
         'summonNonUS',
-        { ...summonShortcut, modifierKeys: [...modifierKeys, 'Control', 'Alt'] },
+        { ...summonShortcut, modifierKeys: [...modifierKeys, 'AltRight'] },
         summonHandler
       )
       // add Alt back to ensure that Left Alt is still registered
