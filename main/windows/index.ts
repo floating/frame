@@ -578,7 +578,7 @@ const init = () => {
       const modifierKeys = summonShortcut.modifierKeys.filter((modifier) => !modifier.startsWith('Alt'))
       // register Control + Alt + rest of shortcut - so that AltGr / Right Alt triggers summon in the same way as Left Alt
       registerShortcut(
-        'summonNonUS', 
+        'summonNonUS',
         { ...summonShortcut, modifierKeys: [...modifierKeys, 'Control', 'Alt'] },
         summonHandler
       )
