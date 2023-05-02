@@ -16,7 +16,7 @@ import store from '../store'
 import FrameManager from './frames'
 import { createWindow } from './window'
 import { SystemTray, SystemTrayEventHandlers } from './systemTray'
-import { registerShortcut } from '../keyboardShortcuts'
+import { registerShortcut, unregisterShortcut } from '../keyboardShortcuts'
 import { Shortcut } from '../store/state/types/shortcuts'
 
 type Windows = { [key: string]: BrowserWindow }
@@ -570,24 +570,31 @@ const init = () => {
     }
 
     // Windows & Linux Non-US key layout AltGr / Right Alt fix
+    const createSummonShortcutNonUS = () => {
+      // remove AltGr and Alt from modifiers
+      const modifierKeys = summonShortcut.modifierKeys.filter((modifier) => !modifier.startsWith('Alt'))
+
+      // return new modifiers depending on OS + rest of shortcut - so that AltGr / Right Alt triggers summon in the same way as Left Alt
+      return {
+        ...summonShortcut,
+        modifierKeys: (isWindows
+          ? [...modifierKeys, 'Control', 'Alt']
+          : [...modifierKeys, 'AltRight']) as typeof summonShortcut.modifierKeys
+      }
+    }
+
+    const summonShortcutNonUS = createSummonShortcutNonUS()
+
     if (
       !isMacOS &&
       (summonShortcut.modifierKeys.includes('AltGr') ||
         (summonShortcut.modifierKeys.includes('Alt') && !keyboardLayout.isUS))
     ) {
-      // remove AltGr and Alt from modifiers
-      const modifierKeys = summonShortcut.modifierKeys.filter((modifier) => !modifier.startsWith('Alt'))
-      // register Control + Alt + rest of shortcut - so that AltGr / Right Alt triggers summon in the same way as Left Alt
-      registerShortcut(
-        'summonNonUS',
-        {
-          ...summonShortcut,
-          modifierKeys: isWindows ? [...modifierKeys, 'Control', 'Alt'] : [...modifierKeys, 'AltRight']
-        },
-        summonHandler
-      )
-      // add Alt back to ensure that Left Alt is still registered
-      summonShortcut = { ...summonShortcut, modifierKeys: [...modifierKeys, 'Alt'] }
+      // register the NonUS shortcut if required
+      registerShortcut('summonNonUS', summonShortcutNonUS, summonHandler)
+    } else {
+      // unregister any existing NonUS shortcut
+      unregisterShortcut('summonNonUS', summonShortcutNonUS)
     }
 
     registerShortcut('summon', summonShortcut, summonHandler)
