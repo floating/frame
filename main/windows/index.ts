@@ -573,7 +573,9 @@ const init = () => {
     const createSummonShortcutNonUS = () => {
       // remove AltGr and Alt from modifiers (Linux)
       // remove AltGr, Alt and Control from modifiers (Windows)
-      const modifierKeys = summonShortcut.modifierKeys.filter((modifier) => isWindows ? !modifier.startsWith('Alt') && modifier !== 'Control' : !modifier.startsWith('Alt'))
+      const modifierKeys = summonShortcut.modifierKeys.filter((modifier) =>
+        isWindows ? !modifier.startsWith('Alt') && modifier !== 'Control' : !modifier.startsWith('Alt')
+      )
 
       // return new modifiers depending on OS + rest of shortcut - so that AltGr / Right Alt triggers summon in the same way as Left Alt
       return {
