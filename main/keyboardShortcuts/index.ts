@@ -4,9 +4,7 @@ import log from 'electron-log'
 import type { Shortcut } from '../store/state/types/shortcuts'
 import { shortcutKeyMap } from '../../resources/keyboard/mappings'
 
-const acceleratorMap = {
-  summon: 'Alt+/'
-}
+const registeredAcceleratorMap: Record<string, string> = {}
 
 const getAcceleratorFromShortcut = ({ modifierKeys, shortcutKey }: Shortcut) => {
   const acceleratorBits = [...modifierKeys, shortcutKeyMap[shortcutKey] || shortcutKey]
@@ -17,8 +15,11 @@ const getAcceleratorFromShortcut = ({ modifierKeys, shortcutKey }: Shortcut) => 
 export const unregisterShortcut = (name: string, shortcut: Shortcut) => {
   const accelerator = getAcceleratorFromShortcut(shortcut)
   try {
-    const existingAccelerator = acceleratorMap[name as keyof typeof acceleratorMap]
+    // unregister the accelerator for the specified shortcut
     globalShortcut.unregister(accelerator)
+
+    // unregister any existing accelerator with the specified name
+    const existingAccelerator = registeredAcceleratorMap[name as keyof typeof registeredAcceleratorMap]
     if (existingAccelerator) {
       globalShortcut.unregister(existingAccelerator)
     }
@@ -34,13 +35,12 @@ export const registerShortcut = (
   shortcutHandler: (accelerator: string) => void
 ) => {
   const accelerator = getAcceleratorFromShortcut(shortcut)
-  unregisterShortcut(name, shortcut)
   const shortcutStr = [...shortcut.modifierKeys, shortcut.shortcutKey].join('+')
   try {
     if (shortcut.enabled && !shortcut.configuring) {
       globalShortcut.register(accelerator, () => shortcutHandler(accelerator))
       log.info(`Accelerator "${accelerator}" registered for shortcut: ${shortcutStr}`)
-      acceleratorMap[name as keyof typeof acceleratorMap] = accelerator
+      registeredAcceleratorMap[name as keyof typeof registeredAcceleratorMap] = accelerator
     }
   } catch (e) {
     log.error(new Error(`Could not set accelerator "${accelerator}" for shortcut: ${shortcutStr}`))
