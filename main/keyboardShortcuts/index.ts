@@ -89,7 +89,7 @@ export const registerShortcut = (
       register(shortcutNonUSName, shortcutNonUS, shortcutHandler)
 
       // replace AltGr with Alt in the main shortcut
-      shortcut.modifierKeys = shortcut.modifierKeys.map((key) => (key === 'AltGr' ? 'Alt' : key))
+      shortcut = { ...shortcut, modifierKeys: shortcut.modifierKeys.map((key) => (key === 'AltGr' ? 'Alt' : key)) }
     }
   }
 
