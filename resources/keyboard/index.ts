@@ -60,7 +60,7 @@ export const getDisplayShortcut = (platform: Platform, shortcut: Shortcut) => {
 
 export const getShortcutFromKeyEvent = (e: KeyboardEvent, pressedKeyCodes: number[]) => {
   const modifierKeys = []
-  if (!e.altKey && !e.ctrlKey && pressedKeyCodes.includes(17)) {
+  if (pressedKeyCodes.includes(17)) {
     modifierKeys.push('AltGr')
   }
   if (e.altKey) {
