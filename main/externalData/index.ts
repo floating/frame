@@ -61,17 +61,6 @@ const externalData = function () {
 
   let pauseScanningDelay: NodeJS.Timeout | undefined
 
-  const togglePylon = (currentMode: boolean) => {
-    log.verbose('toggling pylon')
-    if (!currentMode) {
-      surface.stop()
-    } else {
-      surface.updateSubscribers(Object.keys(store('main.accounts')))
-    }
-    // Switch all surface networks to use the scanner...
-    updateNetworks()
-  }
-
   //TODO: does this need to hit to t
   const handleTokensUpdate = debounce((activeAccount: string, tokens: Token[]) => {
     log.verbose('updating external data due to token update(s)', { activeAccount })
