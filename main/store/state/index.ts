@@ -123,7 +123,6 @@ const mainState = {
   },
   // showUSDValue: main('showUSDValue', true),
   launch: main('launch', false),
-  usingPylon: main('usingPylon', false),
   reveal: main('reveal', false),
   showLocalNameWithENS: main('showLocalNameWithENS', false),
   autohide: main('autohide', false),

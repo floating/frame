@@ -15,8 +15,7 @@ import {
   createActiveAccountObserver,
   createChainsObserver,
   createTokensObserver,
-  createTrayObserver,
-  createUsePylonObserver
+  createTrayObserver
 } from './observers'
 
 export interface DataScanner {
@@ -32,18 +31,20 @@ const externalData = function () {
   //TODO: move this into the observer creation fn..
   const updateNetworks = () => {
     const chains = storeApi.getConnectedNetworkIds()
-    const usingPylon = storeApi.getPylonEnabled()
     const activeAccount = storeApi.getActiveAddress()
     const usingSurface = surface.networks.get(activeAccount)
 
-    const chainsToScan = chains.filter((chainId) => !usingPylon || !usingSurface.includes(chainId))
+    const chainsToScan = chains.filter((chainId) => !usingSurface.includes(chainId))
     log.verbose('updateNetworks', { usingSurface, activeAccount, chainsToScan })
     activeAccount && scanner.setNetworks(activeAccount, chainsToScan)
     rates.updateSubscription(chains)
   }
 
   const updateAccount = (account: string) => {
-    account && scanner.setAddress(account)
+    if (account) {
+      scanner.setAddress(account)
+    }
+
     updateNetworks()
   }
 
@@ -51,11 +52,7 @@ const externalData = function () {
   const rates = Rates(pylon, store)
 
   rates.start()
-
-  if (storeApi.getPylonEnabled()) {
-    console.log('PYLON ENABLED... SETTING UP SUBSCRIPTIONS...')
-    surface.updateSubscribers(Object.keys(store('main.accounts')))
-  }
+  surface.updateSubscribers(Object.keys(store('main.accounts')))
 
   surface.networks.on('updated', ({ account }) => {
     log.verbose('Surface networks updated...', { account })
@@ -77,15 +74,15 @@ const externalData = function () {
 
   //TODO: does this need to hit to t
   const handleTokensUpdate = debounce((activeAccount: string, tokens: Token[]) => {
-    const pylonActive = storeApi.getPylonEnabled()
     log.verbose('updating external data due to token update(s)', { activeAccount })
 
-    const forScanner = tokens.filter(
-      (token) => !pylonActive || !surface.networks.has(activeAccount, token.chainId)
-    )
+    processor.handleCustomTokenUpdate(tokens)
 
-    pylonActive && processor.handleCustomTokenUpdate(tokens)
-    activeAccount && scanner.addTokens(activeAccount, forScanner)
+    if (activeAccount) {
+      const tokensToScan = tokens.filter((token) => !surface.networks.has(activeAccount, token.chainId))
+      scanner.addTokens(activeAccount, tokensToScan)
+    }
+
     rates.updateSubscription(storeApi.getConnectedNetworks().map((network) => network.id))
   })
 
@@ -111,12 +108,6 @@ const externalData = function () {
     knownTokensChanged() {
       rates.updateSubscription(storeApi.getConnectedNetworks().map((network) => network.id))
       log.verbose('KNOWN TOKENS CHANGED...')
-    }
-  })
-
-  const usePylonObserver = createUsePylonObserver({
-    pylonToggled(enabled) {
-      togglePylon(enabled)
     }
   })
 
@@ -152,7 +143,6 @@ const externalData = function () {
     activeAccountObserver,
     accountsObserver,
     tokensObserver,
-    usePylonObserver,
     chainsObserver,
     trayObserver
   ].map((obs) => store.observer(obs))

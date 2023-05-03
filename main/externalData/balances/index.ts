@@ -34,7 +34,6 @@ export const BalancesStoreApi = (store: Store) => ({
     const balances = (store('main.balances', address) || []) as Balance[]
     return balances.filter((balance) => balance.address !== NATIVE_CURRENCY)
   },
-  getPylonEnabled: () => store('main.usingPylon'),
   getTrayOpened: () => store('tray.open'),
   getAccounts: () => Object.keys(store('main.accounts') || {})
   // store('main.pylonEnabled') as Boolean //TODO: need to add pylonEnabled to store zod def...
