@@ -201,7 +201,6 @@ function BalanceScanner(store: Store, api: ReturnType<typeof BalancesStoreApi>) 
   }
 
   function handleTokenBalanceUpdate(balances: TokenBalance[], address: Address) {
-    console.log('handling token balances update...', { balances, address })
     processor.handleBalanceUpdate(address, balances, Array.from(enabledNetworks), 'scan')
   }
 
@@ -226,7 +225,6 @@ function BalanceScanner(store: Store, api: ReturnType<typeof BalancesStoreApi>) 
   }
 
   function setAddress(address: Address) {
-    log.verbose('setting address', { address })
     if (!workerController) {
       log.warn(`tried to set address to ${address} but balances controller is not running`)
       return
