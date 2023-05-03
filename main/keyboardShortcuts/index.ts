@@ -7,7 +7,7 @@ import { shortcutKeyMap } from '../../resources/keyboard/mappings'
 const registeredAcceleratorMap: Record<string, string> = {}
 
 const getAcceleratorFromShortcut = ({ modifierKeys, shortcutKey }: Shortcut) => {
-  const acceleratorBits = [...modifierKeys, shortcutKeyMap[shortcutKey] || shortcutKey]
+  const acceleratorBits = [...modifierKeys.slice().sort(), shortcutKeyMap[shortcutKey] || shortcutKey]
 
   return acceleratorBits.join('+')
 }
@@ -34,7 +34,6 @@ export const registerShortcut = (
   shortcut: Shortcut,
   shortcutHandler: (accelerator: string) => void
 ) => {
-  console.log('blah', shortcut)
   const accelerator = getAcceleratorFromShortcut(shortcut)
   const shortcutStr = [...shortcut.modifierKeys, shortcut.shortcutKey].join('+')
   try {
