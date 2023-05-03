@@ -20,7 +20,7 @@ export const unregisterShortcut = (name: string, shortcut: Shortcut) => {
 
     // unregister any existing accelerator with the specified name
     const existingAccelerator = registeredAcceleratorMap[name as keyof typeof registeredAcceleratorMap]
-    if (existingAccelerator) {
+    if (existingAccelerator && existingAccelerator !== accelerator) {
       globalShortcut.unregister(existingAccelerator)
     }
   } catch (e) {
@@ -34,6 +34,7 @@ export const registerShortcut = (
   shortcut: Shortcut,
   shortcutHandler: (accelerator: string) => void
 ) => {
+  console.log('blah', shortcut)
   const accelerator = getAcceleratorFromShortcut(shortcut)
   const shortcutStr = [...shortcut.modifierKeys, shortcut.shortcutKey].join('+')
   try {
