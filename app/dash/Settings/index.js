@@ -210,7 +210,7 @@ class Settings extends Component {
             </div>
           </div>
 
-          <div className='signerPermission localSetting' style={{ zIndex: 209 }}>
+          {/* <div className='signerPermission localSetting' style={{ zIndex: 209 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Pylon Accounts Service</div>
               <div
@@ -230,7 +230,7 @@ class Settings extends Component {
                 Updates!
               </span>
             </div>
-          </div>
+          </div> */}
 
           <div className='signerPermission localSetting' style={{ zIndex: 207 }}>
             <div className='signerPermissionControls'>

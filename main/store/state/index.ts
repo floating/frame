@@ -76,7 +76,6 @@ const main = (path: string, def: any) => {
 // TODO: remove pieces of this as they're added to the main state definition
 type M = Main & {
   shortcuts: any
-  usingPylon: boolean
   lattice: any
   latticeSettings: any
   ledger: any
@@ -131,7 +130,6 @@ const mainState: M = {
   },
   // showUSDValue: main('showUSDValue', true),
   launch: main('launch', false),
-  usingPylon: main('usingPylon', false),
   reveal: main('reveal', false),
   showLocalNameWithENS: main('showLocalNameWithENS', false),
   autohide: main('autohide', false),

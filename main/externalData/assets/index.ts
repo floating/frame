@@ -109,11 +109,12 @@ export default function rates(pylon: Pylon, store: Store) {
   }
 
   function setAssets(assetIds: AssetId[]) {
-    log.verbose(
+    log.debug(
       'subscribing to rates updates for native currencies on chains:',
       assetIds.filter((a) => a.type === AssetType.NativeCurrency).map((a) => a.chainId)
     )
-    log.verbose(
+
+    log.debug(
       'subscribing to rates updates for tokens:',
       assetIds.filter((a) => a.type === AssetType.Token).map((a) => a.address)
     )
