@@ -116,7 +116,12 @@ const Surface = () => {
 
         const [chainIds, balances, inventory] = Object.entries(chains).reduce(
           (acc, [chainId, chain]) => {
-            if (!chain || typeof chain === 'string' || !chain.balances || !chain.inventory) return acc
+            console.log({ chainId, chain: !!chain, balances: !!chain.balances, inventory: !!chain.inventory })
+            if (!chain || typeof chain === 'string' || !chain.balances || !chain.inventory) {
+              log.verbose(`Invalid chain data for ${chainId}`)
+              return acc
+            }
+
             acc[0].push(Number(chainId))
             acc[1].push(...Object.values(chain.balances).map(toTokenBalance))
 
@@ -139,6 +144,8 @@ const Surface = () => {
           [[] as number[], [] as TokenBalance[], {} as Inventory]
         )
 
+        console.log({ chainIds })
+
         bProcessor.handleBalanceUpdate(address, balances, chainIds, 'snapshot')
         iProcessor.setInventory(address, inventory)
         networks.update(address, chainIds)
@@ -151,6 +158,11 @@ const Surface = () => {
         delete subscriptions[address]
       }
     })
+
+    setTimeout(() => {
+      console.log(' ----> TRIGGERING UN SUB!')
+      sub.unsubscribe()
+    }, 10000)
 
     subscriptions[address] = Object.assign(sub, { unsubscribables: [], collectionItems: [] })
   }
@@ -225,6 +237,7 @@ const Surface = () => {
       collectionItems,
       address
     }))
+
     if (!subscribers.length) return
     log.verbose('Updating subscriptions to surface...')
 
@@ -232,9 +245,13 @@ const Surface = () => {
     subscribers.forEach(({ address, collectionItems }) => {
       log.verbose('should be resubbing...', { collectionItems, address })
       subscribe(address)
-      collectionItems.length && subscribeToItems(address, collectionItems)
+
+      if (collectionItems.length > 0) {
+        subscribeToItems(address, collectionItems)
+      }
     })
   }, 1000 * 60 * 4)
+
   return {
     stop,
     updateSubscribers,
