@@ -16,7 +16,7 @@ import store from '../store'
 import FrameManager from './frames'
 import { createWindow } from './window'
 import { SystemTray, SystemTrayEventHandlers } from './systemTray'
-import { registerShortcut, unregisterShortcut } from '../keyboardShortcuts'
+import { registerShortcut } from '../keyboardShortcuts'
 import { Shortcut } from '../store/state/types/shortcuts'
 
 type Windows = { [key: string]: BrowserWindow }
@@ -554,7 +554,6 @@ const init = () => {
 
   store.observer(() => broadcast('permissions', JSON.stringify(store('permissions'))))
   store.observer(() => {
-    const keyboardLayout = store('keyboardLayout')
     let summonShortcut: Shortcut = store('main.shortcuts.summon')
     const summonHandler = (accelerator: string) => {
       app.toggle()
@@ -569,46 +568,6 @@ const init = () => {
       }
     }
 
-    // Windows & Linux Non-US key layout AltGr / Right Alt fix
-    const createSummonShortcutNonUS = () => {
-      // remove AltGr and Alt from modifiers (Linux)
-      // remove AltGr, Alt and Control from modifiers (Windows)
-      const modifierKeys = summonShortcut.modifierKeys.filter((modifier) =>
-        isWindows ? !modifier.startsWith('Alt') && modifier !== 'Control' : !modifier.startsWith('Alt')
-      )
-
-      // return new modifiers depending on OS + rest of shortcut - so that AltGr / Right Alt triggers summon in the same way as Left Alt
-      return {
-        ...summonShortcut,
-        modifierKeys: (isWindows
-          ? [...modifierKeys, 'Control', 'Alt']
-          : [...modifierKeys, 'AltRight']) as typeof summonShortcut.modifierKeys
-      }
-    }
-
-    const summonShortcutNonUS = createSummonShortcutNonUS()
-
-    if (
-      !isMacOS &&
-      (summonShortcut.modifierKeys.includes('AltGr') ||
-        (summonShortcut.modifierKeys.includes('Alt') && !keyboardLayout.isUS))
-    ) {
-      // register the NonUS shortcut
-      unregisterShortcut('summonNonUS', summonShortcutNonUS)
-      registerShortcut('summonNonUS', summonShortcutNonUS, summonHandler)
-
-      // replace AltGr with Alt in the main shortcut
-      summonShortcut = {
-        ...summonShortcut,
-        modifierKeys: summonShortcut.modifierKeys.map((key) => (key === 'AltGr' ? 'Alt' : key))
-      }
-    } else {
-      // unregister any existing NonUS shortcut
-      unregisterShortcut('summonNonUS', summonShortcutNonUS)
-    }
-
-    // register the main summon shortcut
-    unregisterShortcut('summon', summonShortcut)
     registerShortcut('summon', summonShortcut, summonHandler)
   })
 }
