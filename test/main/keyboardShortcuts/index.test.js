@@ -40,7 +40,7 @@ describe('registerShortcut', () => {
   describe('on MacOS', () => {
     it('should unregister an existing shortcut', () => {
       withPlatform('darwin', () => {
-        registerShortcut('test', shortcut, () => {})
+        registerShortcut(shortcut, () => {})
 
         expect(globalShortcut.unregister).toHaveBeenCalledWith('Alt+/')
         expect(globalShortcut.unregister).toHaveBeenCalledTimes(1)
@@ -49,7 +49,7 @@ describe('registerShortcut', () => {
 
     it('should register the new shortcut', () => {
       withPlatform('darwin', () => {
-        registerShortcut('test', shortcut, () => {})
+        registerShortcut(shortcut, () => {})
 
         expect(globalShortcut.register).toHaveBeenCalledWith('Alt+/', expect.any(Function))
         expect(globalShortcut.register).toHaveBeenCalledTimes(1)
@@ -66,7 +66,7 @@ describe('registerShortcut', () => {
 
       it('should unregister the requested shortcut', () => {
         withPlatform('win32', () => {
-          registerShortcut('test', shortcut, () => {})
+          registerShortcut(shortcut, () => {})
 
           expect(globalShortcut.unregister).toHaveBeenCalledWith('Control+/')
           expect(globalShortcut.unregister).toHaveBeenCalledTimes(1)
@@ -75,7 +75,7 @@ describe('registerShortcut', () => {
 
       it('should register the requested shortcut', () => {
         withPlatform('win32', () => {
-          registerShortcut('test', shortcut, () => {})
+          registerShortcut(shortcut, () => {})
 
           expect(globalShortcut.register).toHaveBeenCalledWith('Control+/', expect.any(Function))
           expect(globalShortcut.register).toHaveBeenCalledTimes(1)
@@ -91,7 +91,7 @@ describe('registerShortcut', () => {
 
       it('should unregister the requested shortcut and an AltGr shortcut', () => {
         withPlatform('win32', () => {
-          registerShortcut('test', shortcut, () => {})
+          registerShortcut(shortcut, () => {})
 
           expect(globalShortcut.unregister).toHaveBeenCalledWith('Control+/')
           expect(globalShortcut.unregister).toHaveBeenCalledWith('Alt+Control+/')
@@ -101,7 +101,7 @@ describe('registerShortcut', () => {
 
       it('should register the requested shortcut', () => {
         withPlatform('win32', () => {
-          registerShortcut('test', shortcut, () => {})
+          registerShortcut(shortcut, () => {})
 
           expect(globalShortcut.register).toHaveBeenCalledWith('Control+/', expect.any(Function))
           expect(globalShortcut.register).toHaveBeenCalledTimes(1)
@@ -117,7 +117,7 @@ describe('registerShortcut', () => {
 
       it('should unregister the equivalent Alt-based shortcut and an AltGr shortcut', () => {
         withPlatform('win32', () => {
-          registerShortcut('test', shortcut, () => {})
+          registerShortcut(shortcut, () => {})
 
           expect(globalShortcut.unregister).toHaveBeenCalledWith('Alt+/')
           expect(globalShortcut.unregister).toHaveBeenCalledWith('Alt+Control+/')
@@ -127,7 +127,7 @@ describe('registerShortcut', () => {
 
       it('should register the equivalent Alt-based shortcut and an AltGr shortcut', () => {
         withPlatform('win32', () => {
-          registerShortcut('test', shortcut, () => {})
+          registerShortcut(shortcut, () => {})
 
           expect(globalShortcut.register).toHaveBeenCalledWith('Alt+/', expect.any(Function))
           expect(globalShortcut.register).toHaveBeenCalledWith('Alt+Control+/', expect.any(Function))
@@ -144,7 +144,7 @@ describe('registerShortcut', () => {
 
       it('should unregister the requested shortcut', () => {
         withPlatform('win32', () => {
-          registerShortcut('test', shortcut, () => {})
+          registerShortcut(shortcut, () => {})
 
           expect(globalShortcut.unregister).toHaveBeenCalledWith('Alt+/')
           expect(globalShortcut.unregister).toHaveBeenCalledTimes(1)
@@ -153,7 +153,7 @@ describe('registerShortcut', () => {
 
       it('should register the requested shortcut', () => {
         withPlatform('win32', () => {
-          registerShortcut('test', shortcut, () => {})
+          registerShortcut(shortcut, () => {})
 
           expect(globalShortcut.register).toHaveBeenCalledWith('Alt+/', expect.any(Function))
           expect(globalShortcut.register).toHaveBeenCalledTimes(1)
@@ -169,7 +169,7 @@ describe('registerShortcut', () => {
 
       it('should unregister the equivalent Alt-based shortcut and an AltGr shortcut', () => {
         withPlatform('win32', () => {
-          registerShortcut('test', shortcut, () => {})
+          registerShortcut(shortcut, () => {})
 
           expect(globalShortcut.unregister).toHaveBeenCalledWith('Alt+/')
           expect(globalShortcut.unregister).toHaveBeenCalledWith('Alt+Control+/')
@@ -179,7 +179,7 @@ describe('registerShortcut', () => {
 
       it('should register the equivalent Alt-based shortcut and an AltGr shortcut', () => {
         withPlatform('win32', () => {
-          registerShortcut('test', shortcut, () => {})
+          registerShortcut(shortcut, () => {})
 
           expect(globalShortcut.register).toHaveBeenCalledWith('Alt+/', expect.any(Function))
           expect(globalShortcut.register).toHaveBeenCalledWith('Alt+Control+/', expect.any(Function))
@@ -197,7 +197,7 @@ describe('registerShortcut', () => {
 
       it('should unregister the requested shortcut and an AltGr shortcut', () => {
         withPlatform('linux', () => {
-          registerShortcut('test', shortcut, () => {})
+          registerShortcut(shortcut, () => {})
 
           expect(globalShortcut.unregister).toHaveBeenCalledWith('Control+/')
           expect(globalShortcut.unregister).toHaveBeenCalledWith('AltRight+Control+/')
@@ -207,7 +207,7 @@ describe('registerShortcut', () => {
 
       it('should register the requested shortcut', () => {
         withPlatform('linux', () => {
-          registerShortcut('test', shortcut, () => {})
+          registerShortcut(shortcut, () => {})
 
           expect(globalShortcut.register).toHaveBeenCalledWith('Control+/', expect.any(Function))
           expect(globalShortcut.register).toHaveBeenCalledTimes(1)
@@ -223,7 +223,7 @@ describe('registerShortcut', () => {
 
       it('should unregister the equivalent Alt-based shortcut and an AltGr shortcut', () => {
         withPlatform('linux', () => {
-          registerShortcut('test', shortcut, () => {})
+          registerShortcut(shortcut, () => {})
 
           expect(globalShortcut.unregister).toHaveBeenCalledWith('Alt+/')
           expect(globalShortcut.unregister).toHaveBeenCalledWith('AltRight+/')
@@ -233,7 +233,7 @@ describe('registerShortcut', () => {
 
       it('should register the equivalent Alt-based shortcut and an AltGr shortcut', () => {
         withPlatform('linux', () => {
-          registerShortcut('test', shortcut, () => {})
+          registerShortcut(shortcut, () => {})
 
           expect(globalShortcut.register).toHaveBeenCalledWith('Alt+/', expect.any(Function))
           expect(globalShortcut.register).toHaveBeenCalledWith('AltRight+/', expect.any(Function))
@@ -250,7 +250,7 @@ describe('registerShortcut', () => {
 
       it('should unregister the requested shortcut', () => {
         withPlatform('linux', () => {
-          registerShortcut('test', shortcut, () => {})
+          registerShortcut(shortcut, () => {})
 
           expect(globalShortcut.unregister).toHaveBeenCalledWith('Alt+/')
           expect(globalShortcut.unregister).toHaveBeenCalledTimes(1)
@@ -259,7 +259,7 @@ describe('registerShortcut', () => {
 
       it('should register the requested shortcut', () => {
         withPlatform('linux', () => {
-          registerShortcut('test', shortcut, () => {})
+          registerShortcut(shortcut, () => {})
 
           expect(globalShortcut.register).toHaveBeenCalledWith('Alt+/', expect.any(Function))
           expect(globalShortcut.register).toHaveBeenCalledTimes(1)
@@ -275,7 +275,7 @@ describe('registerShortcut', () => {
 
       it('should unregister the equivalent Alt-based shortcut and an AltGr shortcut', () => {
         withPlatform('linux', () => {
-          registerShortcut('test', shortcut, () => {})
+          registerShortcut(shortcut, () => {})
 
           expect(globalShortcut.unregister).toHaveBeenCalledWith('Alt+/')
           expect(globalShortcut.unregister).toHaveBeenCalledWith('AltRight+/')
@@ -285,7 +285,7 @@ describe('registerShortcut', () => {
 
       it('should register the equivalent Alt-based shortcut and an AltGr shortcut', () => {
         withPlatform('linux', () => {
-          registerShortcut('test', shortcut, () => {})
+          registerShortcut(shortcut, () => {})
 
           expect(globalShortcut.register).toHaveBeenCalledWith('Alt+/', expect.any(Function))
           expect(globalShortcut.register).toHaveBeenCalledWith('AltRight+/', expect.any(Function))
