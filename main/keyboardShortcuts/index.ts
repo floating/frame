@@ -5,8 +5,6 @@ import store from '../store'
 import { shortcutKeyMap } from '../../resources/keyboard/mappings'
 import type { Shortcut } from '../store/state/types/shortcuts'
 
-const registeredAcceleratorMap: Record<string, string> = {}
-
 const getAcceleratorFromShortcut = ({ modifierKeys, shortcutKey }: Shortcut) => {
   const acceleratorBits = [...modifierKeys.slice().sort(), shortcutKeyMap[shortcutKey] || shortcutKey]
 
@@ -16,37 +14,23 @@ const getAcceleratorFromShortcut = ({ modifierKeys, shortcutKey }: Shortcut) => 
 const equivalentShortcuts = (shortcut1: Shortcut, shortcut2: Shortcut) =>
   shortcut1.modifierKeys === shortcut2.modifierKeys && shortcut1.shortcutKey === shortcut2.shortcutKey
 
-function unregister(name: string, shortcut: Shortcut) {
+function unregister(shortcut: Shortcut) {
   const accelerator = getAcceleratorFromShortcut(shortcut)
   try {
-    // unregister the accelerator for the specified shortcut
     globalShortcut.unregister(accelerator)
-    // const acceleratorKey = Object.keys(registeredAcceleratorMap).find((key) => registeredAcceleratorMap[key] === accelerator)
-    //delete registeredAcceleratorMap[acceleratorKey as keyof typeof registeredAcceleratorMap]
-    //console.log('unregistering', accelerator)
-
-    // unregister any existing accelerator with the specified name
-    const existingAccelerator = registeredAcceleratorMap[name as keyof typeof registeredAcceleratorMap]
-    if (existingAccelerator && existingAccelerator !== accelerator) {
-      console.log('unregistering', name, existingAccelerator)
-      console.log(registeredAcceleratorMap)
-      //globalShortcut.unregister(existingAccelerator)
-      //delete registeredAcceleratorMap[name]
-    }
   } catch (e) {
     const shortcutStr = [...shortcut.modifierKeys, shortcut.shortcutKey].join('+')
     log.error(new Error(`Could not unregister accelerator "${accelerator}" for shortcut: ${shortcutStr}`))
   }
 }
 
-function register(name: string, shortcut: Shortcut, shortcutHandler: (accelerator: string) => void) {
+function register(shortcut: Shortcut, shortcutHandler: (accelerator: string) => void) {
   const accelerator = getAcceleratorFromShortcut(shortcut)
   const shortcutStr = [...shortcut.modifierKeys, shortcut.shortcutKey].join('+')
   try {
     if (shortcut.enabled && !shortcut.configuring) {
       globalShortcut.register(accelerator, () => shortcutHandler(accelerator))
       log.info(`Accelerator "${accelerator}" registered for shortcut: ${shortcutStr}`)
-      registeredAcceleratorMap[name as keyof typeof registeredAcceleratorMap] = accelerator
     }
   } catch (e) {
     log.error(new Error(`Could not set accelerator "${accelerator}" for shortcut: ${shortcutStr}`))
@@ -54,7 +38,6 @@ function register(name: string, shortcut: Shortcut, shortcutHandler: (accelerato
 }
 
 export const registerShortcut = (
-  name: string,
   shortcut: Shortcut,
   shortcutHandler: (accelerator: string) => void
 ) => {
@@ -80,11 +63,10 @@ export const registerShortcut = (
   // Windows & Linux Non-US key layout AltGr / Right Alt fix
   if (!isMacOS) {
     const altGrShortcut = createAltGrShortcut()
-    const altGrShortcutName = `${name}-altGr`
 
     // unregister any existing AltGr shortcut - unless it matches the one we are about to register
     if (!keyboardLayout.isUS && !equivalentShortcuts(shortcut, altGrShortcut)) {
-      unregister(altGrShortcutName, altGrShortcut)
+      unregister(altGrShortcut)
     }
 
     if (
@@ -92,7 +74,7 @@ export const registerShortcut = (
       (shortcut.modifierKeys.includes('Alt') && !keyboardLayout.isUS)
     ) {
       // register the AltGr shortcut
-      register(altGrShortcutName, altGrShortcut, shortcutHandler)
+      register(altGrShortcut, shortcutHandler)
 
       // replace AltGr with Alt in the main shortcut
       shortcut = {
@@ -103,6 +85,6 @@ export const registerShortcut = (
   }
 
   // register the shortcut
-  unregister(name, shortcut)
-  register(name, shortcut, shortcutHandler)
+  unregister(shortcut)
+  register(shortcut, shortcutHandler)
 }

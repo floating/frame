@@ -568,7 +568,7 @@ const init = () => {
       }
     }
 
-    registerShortcut('summon', summonShortcut, summonHandler)
+    registerShortcut(summonShortcut, summonHandler)
   })
 }
 
