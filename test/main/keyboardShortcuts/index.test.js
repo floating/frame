@@ -89,7 +89,7 @@ describe('registerShortcut', () => {
         store.setKeyboardLayout({ isUS: false })
       })
 
-      it('should unregister the requested shortcut and a Non-US shortcut', () => {
+      it('should unregister the requested shortcut and an AltGr shortcut', () => {
         withPlatform('win32', () => {
           registerShortcut('test', shortcut, () => {})
 
@@ -115,7 +115,7 @@ describe('registerShortcut', () => {
         store.setKeyboardLayout({ isUS: false })
       })
 
-      it('should unregister the equivalent Alt-based shortcut and a Non-US shortcut', () => {
+      it('should unregister the equivalent Alt-based shortcut and an AltGr shortcut', () => {
         withPlatform('win32', () => {
           registerShortcut('test', shortcut, () => {})
 
@@ -125,7 +125,7 @@ describe('registerShortcut', () => {
         })
       })
 
-      it('should register the equivalent Alt-based shortcut and a Non-US shortcut', () => {
+      it('should register the equivalent Alt-based shortcut and an AltGr shortcut', () => {
         withPlatform('win32', () => {
           registerShortcut('test', shortcut, () => {})
 
@@ -167,7 +167,7 @@ describe('registerShortcut', () => {
         store.setKeyboardLayout({ isUS: false })
       })
 
-      it('should unregister the equivalent Alt-based shortcut and a Non-US shortcut', () => {
+      it('should unregister the equivalent Alt-based shortcut and an AltGr shortcut', () => {
         withPlatform('win32', () => {
           registerShortcut('test', shortcut, () => {})
 
@@ -177,7 +177,7 @@ describe('registerShortcut', () => {
         })
       })
 
-      it('should register the equivalent Alt-based shortcut and a Non-US shortcut', () => {
+      it('should register the equivalent Alt-based shortcut and an AltGr shortcut', () => {
         withPlatform('win32', () => {
           registerShortcut('test', shortcut, () => {})
 
@@ -195,7 +195,7 @@ describe('registerShortcut', () => {
         shortcut.modifierKeys = ['Control']
       })
 
-      it('should unregister the requested shortcut and a Non-US shortcut', () => {
+      it('should unregister the requested shortcut and an AltGr shortcut', () => {
         withPlatform('linux', () => {
           registerShortcut('test', shortcut, () => {})
 
@@ -221,7 +221,7 @@ describe('registerShortcut', () => {
         store.setKeyboardLayout({ isUS: false })
       })
 
-      it('should unregister the equivalent Alt-based shortcut and a Non-US shortcut', () => {
+      it('should unregister the equivalent Alt-based shortcut and an AltGr shortcut', () => {
         withPlatform('linux', () => {
           registerShortcut('test', shortcut, () => {})
 
@@ -231,7 +231,7 @@ describe('registerShortcut', () => {
         })
       })
 
-      it('should register the equivalent Alt-based shortcut and a Non-US shortcut', () => {
+      it('should register the equivalent Alt-based shortcut and an AltGr shortcut', () => {
         withPlatform('linux', () => {
           registerShortcut('test', shortcut, () => {})
 
@@ -273,7 +273,7 @@ describe('registerShortcut', () => {
         store.setKeyboardLayout({ isUS: false })
       })
 
-      it('should unregister the equivalent Alt-based shortcut and a Non-US shortcut', () => {
+      it('should unregister the equivalent Alt-based shortcut and an AltGr shortcut', () => {
         withPlatform('linux', () => {
           registerShortcut('test', shortcut, () => {})
 
@@ -283,7 +283,7 @@ describe('registerShortcut', () => {
         })
       })
 
-      it('should register the equivalent Alt-based shortcut and a Non-US shortcut', () => {
+      it('should register the equivalent Alt-based shortcut and an AltGr shortcut', () => {
         withPlatform('linux', () => {
           registerShortcut('test', shortcut, () => {})
 

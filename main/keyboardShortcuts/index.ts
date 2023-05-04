@@ -55,7 +55,7 @@ export const registerShortcut = (
   const isWindows = process.platform === 'win32'
   const isMacOS = process.platform === 'darwin'
   const keyboardLayout = store('keyboardLayout')
-  const createShortcutNonUS = () => {
+  const createAltGrShortcut = () => {
     // remove AltGr and Alt from modifiers (Linux)
     // remove AltGr, Alt and Control from modifiers (Windows)
     const modifierKeys = shortcut.modifierKeys.filter((modifier) =>
@@ -73,23 +73,26 @@ export const registerShortcut = (
 
   // Windows & Linux Non-US key layout AltGr / Right Alt fix
   if (!isMacOS) {
-    const shortcutNonUS = createShortcutNonUS()
-    const shortcutNonUSName = `${name}-nonUS`
+    const altGrShortcut = createAltGrShortcut()
+    const altGrShortcutName = `${name}-altGr`
 
-    // unregister any existing Non-US shortcut - unless it matches the one we are about to register
-    if (!keyboardLayout.isUS && !equivalentShortcuts(shortcut, shortcutNonUS)) {
-      unregister(shortcutNonUSName, shortcutNonUS)
+    // unregister any existing AltGr shortcut - unless it matches the one we are about to register
+    if (!keyboardLayout.isUS && !equivalentShortcuts(shortcut, altGrShortcut)) {
+      unregister(altGrShortcutName, altGrShortcut)
     }
 
     if (
       shortcut.modifierKeys.includes('AltGr') ||
       (shortcut.modifierKeys.includes('Alt') && !keyboardLayout.isUS)
     ) {
-      // register the Non-US shortcut
-      register(shortcutNonUSName, shortcutNonUS, shortcutHandler)
+      // register the AltGr shortcut
+      register(altGrShortcutName, altGrShortcut, shortcutHandler)
 
       // replace AltGr with Alt in the main shortcut
-      shortcut = { ...shortcut, modifierKeys: shortcut.modifierKeys.map((key) => (key === 'AltGr' ? 'Alt' : key)) }
+      shortcut = {
+        ...shortcut,
+        modifierKeys: shortcut.modifierKeys.map((key) => (key === 'AltGr' ? 'Alt' : key))
+      }
     }
   }
 
