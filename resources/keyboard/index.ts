@@ -66,9 +66,8 @@ export const getShortcutFromKeyEvent = (e: KeyboardEvent, pressedKeyCodes: numbe
   // AltGr detection - Windows registers this as Control + Alt
   // we can distinguish between AltGr and Control + Alt by checking the ctrlKey & altKey props
   if (
-    !e.ctrlKey &&
     !e.altKey &&
-    ((pressedKeyCodes.includes(17) && isWindows) || (pressedKeyCodes.includes(18) && isLinux))
+    ((!e.ctrlKey && pressedKeyCodes.includes(17) && isWindows) || (pressedKeyCodes.includes(18) && isLinux))
   ) {
     modifierKeys.push('AltGr')
   }
