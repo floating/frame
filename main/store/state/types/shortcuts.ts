@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-const supportedModifierKey = z.enum(['Alt', 'Control', 'Meta', 'Super', 'CommandOrCtrl'])
+const supportedModifierKey = z.enum(['Alt', 'AltGr', 'Control', 'Meta', 'Super', 'CommandOrCtrl'])
 
 const supportedShortcutKey = z.enum([
   'Comma',

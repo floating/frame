@@ -232,6 +232,11 @@ module.exports = {
       enabled: shortcut.enabled ?? existingShortcut.enabled
     }))
   },
+  setKeyboardLayout: (u, layout) => {
+    u('keyboardLayout', (existingLayout = {}) => ({
+      isUS: layout.isUS ?? existingLayout.isUS
+    }))
+  },
   setAutohide: (u, v) => {
     u('main.autohide', () => v)
   },

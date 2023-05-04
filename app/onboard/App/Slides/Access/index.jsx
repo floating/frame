@@ -4,7 +4,7 @@ import { Slide, SlideBody, SlideItem, Shortcut } from '../../styled'
 
 import link from '../../../../../resources/link'
 
-import { getDisplayShortcut } from '../../../../../resources/app'
+import { getDisplayShortcut } from '../../../../../resources/keyboard'
 
 const Access = ({ setTitle, setProceed, platform }) => {
   const { modifierKeys, shortcutKey } = getDisplayShortcut(platform, store('main.shortcuts.summon'))

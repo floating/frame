@@ -163,6 +163,9 @@ const initial = {
     rates: {}
   },
   platform: process.platform,
+  keyboardLayout: {
+    isUS: true
+  },
   main: {
     _version: main('_version', 32),
     instanceId: main('instanceId', generateUuid()),
