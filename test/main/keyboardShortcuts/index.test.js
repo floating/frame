@@ -200,7 +200,7 @@ describe('registerShortcut', () => {
           registerShortcut(shortcut, () => {})
 
           expect(globalShortcut.unregister).toHaveBeenCalledWith('Control+/')
-          expect(globalShortcut.unregister).toHaveBeenCalledWith('AltRight+Control+/')
+          expect(globalShortcut.unregister).toHaveBeenCalledWith('AltGr+Control+/')
           expect(globalShortcut.unregister).toHaveBeenCalledTimes(2)
         })
       })
@@ -226,7 +226,7 @@ describe('registerShortcut', () => {
           registerShortcut(shortcut, () => {})
 
           expect(globalShortcut.unregister).toHaveBeenCalledWith('Alt+/')
-          expect(globalShortcut.unregister).toHaveBeenCalledWith('AltRight+/')
+          expect(globalShortcut.unregister).toHaveBeenCalledWith('AltGr+/')
           expect(globalShortcut.unregister).toHaveBeenCalledTimes(2)
         })
       })
@@ -236,7 +236,7 @@ describe('registerShortcut', () => {
           registerShortcut(shortcut, () => {})
 
           expect(globalShortcut.register).toHaveBeenCalledWith('Alt+/', expect.any(Function))
-          expect(globalShortcut.register).toHaveBeenCalledWith('AltRight+/', expect.any(Function))
+          expect(globalShortcut.register).toHaveBeenCalledWith('AltGr+/', expect.any(Function))
           expect(globalShortcut.register).toHaveBeenCalledTimes(2)
         })
       })
@@ -278,7 +278,7 @@ describe('registerShortcut', () => {
           registerShortcut(shortcut, () => {})
 
           expect(globalShortcut.unregister).toHaveBeenCalledWith('Alt+/')
-          expect(globalShortcut.unregister).toHaveBeenCalledWith('AltRight+/')
+          expect(globalShortcut.unregister).toHaveBeenCalledWith('AltGr+/')
           expect(globalShortcut.unregister).toHaveBeenCalledTimes(2)
         })
       })
@@ -288,7 +288,7 @@ describe('registerShortcut', () => {
           registerShortcut(shortcut, () => {})
 
           expect(globalShortcut.register).toHaveBeenCalledWith('Alt+/', expect.any(Function))
-          expect(globalShortcut.register).toHaveBeenCalledWith('AltRight+/', expect.any(Function))
+          expect(globalShortcut.register).toHaveBeenCalledWith('AltGr+/', expect.any(Function))
           expect(globalShortcut.register).toHaveBeenCalledTimes(2)
         })
       })

@@ -56,7 +56,7 @@ export const registerShortcut = (shortcut: Shortcut, shortcutHandler: (accelerat
       ...shortcut,
       modifierKeys: (isWindows
         ? [...modifierKeys, 'Control', 'Alt']
-        : [...modifierKeys, 'AltRight']) as typeof shortcut.modifierKeys
+        : [...modifierKeys, 'AltGr']) as typeof shortcut.modifierKeys
     }
   }
 
