@@ -37,10 +37,7 @@ function register(shortcut: Shortcut, shortcutHandler: (accelerator: string) => 
   }
 }
 
-export const registerShortcut = (
-  shortcut: Shortcut,
-  shortcutHandler: (accelerator: string) => void
-) => {
+export const registerShortcut = (shortcut: Shortcut, shortcutHandler: (accelerator: string) => void) => {
   const isWindows = process.platform === 'win32'
   const isMacOS = process.platform === 'darwin'
   const keyboardLayout = store('keyboardLayout')
