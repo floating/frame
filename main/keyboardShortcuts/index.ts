@@ -16,7 +16,7 @@ const getAcceleratorFromShortcut = ({ modifierKeys, shortcutKey }: Shortcut) => 
 const equivalentShortcuts = (shortcut1: Shortcut, shortcut2: Shortcut) =>
   shortcut1.modifierKeys === shortcut2.modifierKeys && shortcut1.shortcutKey === shortcut2.shortcutKey
 
-export const unregister = (name: string, shortcut: Shortcut) => {
+function unregister(name: string, shortcut: Shortcut) {
   const accelerator = getAcceleratorFromShortcut(shortcut)
   try {
     // unregister the accelerator for the specified shortcut
@@ -33,7 +33,7 @@ export const unregister = (name: string, shortcut: Shortcut) => {
   }
 }
 
-const register = (name: string, shortcut: Shortcut, shortcutHandler: (accelerator: string) => void) => {
+function register(name: string, shortcut: Shortcut, shortcutHandler: (accelerator: string) => void) {
   const accelerator = getAcceleratorFromShortcut(shortcut)
   const shortcutStr = [...shortcut.modifierKeys, shortcut.shortcutKey].join('+')
   try {
