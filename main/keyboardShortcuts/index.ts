@@ -5,35 +5,38 @@ import store from '../store'
 import { shortcutKeyMap } from '../../resources/keyboard/mappings'
 import type { Shortcut } from '../store/state/types/shortcuts'
 
-const getAcceleratorFromShortcut = ({ modifierKeys, shortcutKey }: Shortcut) => {
-  const acceleratorBits = [...modifierKeys.slice().sort(), shortcutKeyMap[shortcutKey] || shortcutKey]
-
-  return acceleratorBits.join('+')
-}
+const stringifyShortcut = ({ modifierKeys, shortcutKey }: Shortcut) => ({
+  shortcutString: [...modifierKeys, shortcutKey].join('+'),
+  accelerator: [...modifierKeys.slice().sort(), shortcutKeyMap[shortcutKey] || shortcutKey].join('+')
+})
 
 const equivalentShortcuts = (shortcut1: Shortcut, shortcut2: Shortcut) =>
   shortcut1.modifierKeys === shortcut2.modifierKeys && shortcut1.shortcutKey === shortcut2.shortcutKey
 
 function unregister(shortcut: Shortcut) {
-  const accelerator = getAcceleratorFromShortcut(shortcut)
+  const { shortcutString, accelerator } = stringifyShortcut(shortcut)
+
+  log.verbose(`Unregistering accelerator "${accelerator}" for shortcut: ${shortcutString}`)
+
   try {
     globalShortcut.unregister(accelerator)
   } catch (e) {
-    const shortcutStr = [...shortcut.modifierKeys, shortcut.shortcutKey].join('+')
-    log.error(new Error(`Could not unregister accelerator "${accelerator}" for shortcut: ${shortcutStr}`))
+    log.error(`Failed to unregister accelerator "${accelerator}" for shortcut: ${shortcutString}`, e)
   }
 }
 
 function register(shortcut: Shortcut, shortcutHandler: (accelerator: string) => void) {
-  const accelerator = getAcceleratorFromShortcut(shortcut)
-  const shortcutStr = [...shortcut.modifierKeys, shortcut.shortcutKey].join('+')
+  const { shortcutString, accelerator } = stringifyShortcut(shortcut)
+
+  log.verbose(`Registering accelerator "${accelerator}" for shortcut: ${shortcutString}`)
+
   try {
     if (shortcut.enabled && !shortcut.configuring) {
       globalShortcut.register(accelerator, () => shortcutHandler(accelerator))
-      log.info(`Accelerator "${accelerator}" registered for shortcut: ${shortcutStr}`)
+      log.info(`Accelerator "${accelerator}" registered for shortcut: ${shortcutString}`)
     }
   } catch (e) {
-    log.error(new Error(`Could not set accelerator "${accelerator}" for shortcut: ${shortcutStr}`))
+    log.error(`Failed to register accelerator "${accelerator}" for shortcut: ${shortcutString}`, e)
   }
 }
 
