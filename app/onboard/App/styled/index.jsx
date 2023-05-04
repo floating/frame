@@ -97,6 +97,7 @@ export const Shortcut = styled.span`
   font-size: 14px;
   border: 2px solid var(--moon);
   margin: 6px;
+  white-space: nowrap;
 `
 
 export const Tag = styled.span`
