@@ -8,7 +8,7 @@ import { getDisplayShortcut } from '../../../../../resources/keyboard'
 
 const Access = ({ setTitle, setProceed, platform }) => {
   const { modifierKeys, shortcutKey } = getDisplayShortcut(platform, store('main.shortcuts.summon'))
-  const keyboardShortcut = `${modifierKeys} + ${shortcutKey}`
+  const keyboardShortcut = modifierKeys.concat(shortcutKey).join(' + ')
   const [shortcutActivated, setShortcutActivated] = useState(false)
   const [trayOpen, setTrayOpen] = useState(store('tray.open'))
 
