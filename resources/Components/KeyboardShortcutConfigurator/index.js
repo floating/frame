@@ -18,7 +18,6 @@ const KeyboardShortcutConfigurator = ({ actionText = '', platform, shortcut, sho
         // ignore modifier key solo keypresses and disabled keys
         if (!isModifierKey && isShortcutKey(event)) {
           const newShortcut = getShortcutFromKeyEvent(event, hotkeys.getPressedKeyCodes(), platform)
-          console.log(event, hotkeys.getPressedKeyCodes(), hotkeys.getPressedKeyString())
           // enable the new shortcut
           link.send('tray:action', 'setShortcut', shortcutName, {
             ...newShortcut,
