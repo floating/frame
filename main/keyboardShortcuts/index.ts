@@ -21,11 +21,17 @@ function unregister(name: string, shortcut: Shortcut) {
   try {
     // unregister the accelerator for the specified shortcut
     globalShortcut.unregister(accelerator)
+    // const acceleratorKey = Object.keys(registeredAcceleratorMap).find((key) => registeredAcceleratorMap[key] === accelerator)
+    //delete registeredAcceleratorMap[acceleratorKey as keyof typeof registeredAcceleratorMap]
+    //console.log('unregistering', accelerator)
 
     // unregister any existing accelerator with the specified name
     const existingAccelerator = registeredAcceleratorMap[name as keyof typeof registeredAcceleratorMap]
     if (existingAccelerator && existingAccelerator !== accelerator) {
-      // globalShortcut.unregister(existingAccelerator)
+      console.log('unregistering', name, existingAccelerator)
+      console.log(registeredAcceleratorMap)
+      //globalShortcut.unregister(existingAccelerator)
+      //delete registeredAcceleratorMap[name]
     }
   } catch (e) {
     const shortcutStr = [...shortcut.modifierKeys, shortcut.shortcutKey].join('+')
