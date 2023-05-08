@@ -28,9 +28,17 @@ describe('registerShortcut', () => {
   })
 
   it('should register the new shortcut', () => {
-    registerShortcut(shortcut, () => {})
+    globalShortcut.register.mockImplementationOnce((accelerator, handlerFn) => handlerFn(accelerator))
 
-    expect(globalShortcut.register).toHaveBeenCalledWith('Alt+/', expect.any(Function))
-    expect(globalShortcut.register).toHaveBeenCalledTimes(1)
+    return new Promise((resolve) => {
+      const handlerFn = (accelerator) => {
+        expect(accelerator).toBe('Alt+/')
+        resolve()
+      }
+      registerShortcut(shortcut, handlerFn)
+
+      expect(globalShortcut.register).toHaveBeenCalledWith('Alt+/', expect.any(Function))
+      expect(globalShortcut.register).toHaveBeenCalledTimes(1)
+    })
   })
 })
