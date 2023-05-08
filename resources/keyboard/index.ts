@@ -60,11 +60,11 @@ export const getDisplayShortcut = (platform: Platform, shortcut: Shortcut) => {
 
 export const getShortcutFromKeyEvent = (e: KeyboardEvent, pressedKeyCodes: number[], platform: Platform) => {
   const isWindows = platform === 'win32'
-  const altGrPressed = !e.altKey && isWindows && pressedKeyCodes.includes(17) && pressedKeyCodes.includes(18)
+  const altGrPressed = !e.altKey && pressedKeyCodes.includes(17) && pressedKeyCodes.includes(18)
   const modifierKeys = []
 
-  if (altGrPressed) {
-    modifierKeys.push('AltGr')
+  if (isWindows && altGrPressed) {
+    modifierKeys.push('Alt', 'Control')
   }
   if (e.altKey) {
     modifierKeys.push('Alt')
