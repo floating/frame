@@ -6,6 +6,19 @@ import { capitalize } from '../../../../resources/utils'
 
 let state
 
+async function withPlatform(platform, test) {
+  const originalPlatform = process.platform
+  Object.defineProperty(process, 'platform', {
+    value: platform
+  })
+
+  await test()
+
+  Object.defineProperty(process, 'platform', {
+    value: originalPlatform
+  })
+}
+
 beforeAll(() => {
   log.transports.console.level = false
 })
@@ -1472,6 +1485,92 @@ describe('migration 35', () => {
         configuring: false
       },
       custom: false
+    })
+  })
+})
+
+describe('migration 37', () => {
+  beforeEach(() => {
+    state.main._version = 36
+  })
+
+  describe('when altGr is a modifier', () => {
+    beforeEach(() => {
+      state.main.shortcuts = {
+        summon: { modifierKeys: ['AltGr'], shortcutKey: 'Slash', enabled: true, configuring: false }
+      }
+    })
+
+    it('should update the summon shortcut on Linux', () => {
+      withPlatform('linux', () => {
+        const updatedState = migrations.apply(state, 37)
+        const { shortcuts } = updatedState.main
+
+        expect(shortcuts).toStrictEqual({
+          summon: {
+            modifierKeys: ['Alt'],
+            shortcutKey: 'Slash',
+            enabled: true,
+            configuring: false
+          }
+        })
+      })
+    })
+
+    it('should update the summon shortcut on Windows', () => {
+      withPlatform('win32', () => {
+        const updatedState = migrations.apply(state, 37)
+        const { shortcuts } = updatedState.main
+
+        expect(shortcuts).toStrictEqual({
+          summon: {
+            modifierKeys: ['Alt', 'Control'],
+            shortcutKey: 'Slash',
+            enabled: true,
+            configuring: false
+          }
+        })
+      })
+    })
+  })
+
+  describe('when altGr is not a modifier', () => {
+    beforeEach(() => {
+      state.main.shortcuts = {
+        summon: { modifierKeys: ['Alt'], shortcutKey: 'Slash', enabled: true, configuring: false }
+      }
+    })
+
+    it('should not update the summon shortcut on Windows', () => {
+      withPlatform('win32', () => {
+        const updatedState = migrations.apply(state, 37)
+        const { shortcuts } = updatedState.main
+
+        expect(shortcuts).toStrictEqual({
+          summon: {
+            modifierKeys: ['Alt'],
+            shortcutKey: 'Slash',
+            enabled: true,
+            configuring: false
+          }
+        })
+      })
+    })
+
+    it('should not update the summon shortcut on Linux', () => {
+      withPlatform('linux', () => {
+        const updatedState = migrations.apply(state, 37)
+        const { shortcuts } = updatedState.main
+
+        expect(shortcuts).toStrictEqual({
+          summon: {
+            modifierKeys: ['Alt'],
+            shortcutKey: 'Slash',
+            enabled: true,
+            configuring: false
+          }
+        })
+      })
     })
   })
 })
