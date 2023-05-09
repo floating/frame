@@ -31,10 +31,6 @@ function getModifierKey(key: ModifierKey, platform: Platform) {
     return isMacOS ? 'Option' : 'Alt'
   }
 
-  if (key === 'AltGr') {
-    return 'Alt'
-  }
-
   if (key === 'Control' || key === 'CommandOrCtrl') {
     return isMacOS ? 'Control' : 'Ctrl'
   }

@@ -12,7 +12,7 @@ const KeyboardShortcutConfigurator = ({ actionText = '', platform, shortcut, sho
       hotkeys('*', { capture: true }, (event) => {
         event.preventDefault()
 
-        const allowedModifierKeys = ['Meta', 'Alt', 'AltGr', 'Control', 'Command']
+        const allowedModifierKeys = ['Meta', 'Alt', 'Control', 'Command']
         const isModifierKey = allowedModifierKeys.includes(event.key)
 
         // ignore modifier key solo keypresses and disabled keys
