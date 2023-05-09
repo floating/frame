@@ -931,7 +931,14 @@ const migrations = {
   },
   37: (initial) => {
     const isWindows = process.platform === 'win32'
-    const { shortcuts } = initial.main || {}
+    const { shortcuts } = initial.main || {
+      summon: {
+        modifierKeys: ['Alt'],
+        shortcutKey: 'Slash',
+        enabled: true,
+        configuring: false
+      }
+    }
     const altGrIndex = shortcuts.summon.modifierKeys.indexOf('AltGr')
     if (altGrIndex > -1) {
       const altGrReplacement = isWindows ? ['Alt', 'Control'] : ['Alt']
