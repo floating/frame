@@ -929,16 +929,21 @@ const migrations = {
 
     return initial
   },
-  37: (initial) => {
+  37: (initial = {}) => {
     const isWindows = process.platform === 'win32'
-    initial.main.shortcuts = initial.main.shortcuts || {
-      summon: {
-        modifierKeys: ['Alt'],
-        shortcutKey: 'Slash',
-        enabled: true,
-        configuring: false
-      }
+    const summonDefault = {
+      modifierKeys: ['Alt'],
+      shortcutKey: 'Slash',
+      enabled: true,
+      configuring: false
     }
+    initial.main = initial.main || {}
+    initial.main.shortcuts = initial.main.shortcuts || {
+      summon: summonDefault
+    }
+    initial.main.shortcuts.summon = initial.main.shortcuts.summon || summonDefault
+    initial.main.shortcuts.summon.modifierKeys =
+      initial.main.shortcuts.summon.modifierKeys || summonDefault.modifierKeys
     const shortcuts = initial.main.shortcuts
     const altGrIndex = shortcuts.summon.modifierKeys.indexOf('AltGr')
     if (altGrIndex > -1) {

@@ -1573,7 +1573,7 @@ describe('migration 37', () => {
   })
 
   it('should handle missing shortcuts.summon', () => {
-    delete state.main.shortcuts
+    delete state.main.shortcuts.summon
     const updatedState = migrations.apply(state, 37)
     const { shortcuts } = updatedState.main
 
@@ -1588,7 +1588,7 @@ describe('migration 37', () => {
   })
 
   it('should handle missing shortcuts.summon.modifierKeys', () => {
-    delete state.main.shortcuts.modifierKeys
+    delete state.main.shortcuts.summon.modifierKeys
     const updatedState = migrations.apply(state, 37)
     const { shortcuts } = updatedState.main
 
