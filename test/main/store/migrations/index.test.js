@@ -3,21 +3,9 @@ import log from 'electron-log'
 import migrations from '../../../../main/store/migrations'
 import { getDefaultAccountName } from '../../../../resources/domain/account'
 import { capitalize } from '../../../../resources/utils'
+import { withPlatform } from '../../../util'
 
 let state
-
-async function withPlatform(platform, test) {
-  const originalPlatform = process.platform
-  Object.defineProperty(process, 'platform', {
-    value: platform
-  })
-
-  await test()
-
-  Object.defineProperty(process, 'platform', {
-    value: originalPlatform
-  })
-}
 
 beforeAll(() => {
   log.transports.console.level = false
