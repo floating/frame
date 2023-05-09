@@ -928,6 +928,17 @@ const migrations = {
     }
 
     return initial
+  },
+  37: (initial) => {
+    const isWindows = process.platform === 'win32'
+    const { shortcuts } = initial.main || {}
+    const altGrIndex = shortcuts.summon.modifierKeys.indexOf('AltGr')
+    if (altGrIndex > -1) {
+      const altGrReplacement = isWindows ? ['Alt', 'Control'] : ['Alt']
+      initial.main.shortcuts.summon.modifierKeys.splice(altGrIndex, 1, ...altGrReplacement)
+    }
+
+    return initial
   }
 }
 

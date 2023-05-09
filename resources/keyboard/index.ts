@@ -31,10 +31,6 @@ function getModifierKey(key: ModifierKey, platform: Platform) {
     return isMacOS ? 'Option' : 'Alt'
   }
 
-  if (key === 'AltGr') {
-    return 'Alt'
-  }
-
   if (key === 'Control' || key === 'CommandOrCtrl') {
     return isMacOS ? 'Control' : 'Ctrl'
   }
@@ -60,13 +56,11 @@ export const getDisplayShortcut = (platform: Platform, shortcut: Shortcut) => {
 
 export const getShortcutFromKeyEvent = (e: KeyboardEvent, pressedKeyCodes: number[], platform: Platform) => {
   const isWindows = platform === 'win32'
-  const isLinux = platform === 'linux'
-  const altGrPressed = !e.altKey &&
-    ((pressedKeyCodes.includes(17) && pressedKeyCodes.includes(18) && isWindows) || (pressedKeyCodes.includes(18) && isLinux))
+  const altGrPressed = !e.altKey && pressedKeyCodes.includes(17) && pressedKeyCodes.includes(18)
   const modifierKeys = []
 
-  if (altGrPressed) {
-    modifierKeys.push('AltGr')
+  if (isWindows && altGrPressed) {
+    modifierKeys.push('Alt', 'Control')
   }
   if (e.altKey) {
     modifierKeys.push('Alt')
