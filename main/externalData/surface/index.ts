@@ -108,7 +108,7 @@ const Surface = () => {
         log.verbose('subscribed to account')
       },
       onData: (data) => {
-        log.verbose('got update for account', { data })
+        log.verbose(`Got update for account ${address}`, { data })
         if (!data.length || !data[0]) return
         const [{ address: addr, ...chains }] = data
         clearTimeout(fallback)
@@ -116,7 +116,6 @@ const Surface = () => {
 
         const [chainIds, balances, inventory] = Object.entries(chains).reduce(
           (acc, [chainId, chain]) => {
-            console.log({ chainId, chain: !!chain, balances: !!chain.balances, inventory: !!chain.inventory })
             if (!chain || typeof chain === 'string' || !chain.balances || !chain.inventory) {
               log.verbose(`Invalid chain data for ${chainId}`)
               return acc
@@ -154,15 +153,11 @@ const Surface = () => {
         console.error({ err })
       },
       onStopped() {
-        log.verbose('inside stopped')
+        log.verbose(`Subscription to ${address} stopped`)
+
         delete subscriptions[address]
       }
     })
-
-    setTimeout(() => {
-      console.log(' ----> TRIGGERING UN SUB!')
-      sub.unsubscribe()
-    }, 10000)
 
     subscriptions[address] = Object.assign(sub, { unsubscribables: [], collectionItems: [] })
   }
@@ -189,19 +184,12 @@ const Surface = () => {
 
   const updateSubscribers = (addresses: string[]) => {
     const removed = Object.keys(subscriptions).filter((address) => !addresses.includes(address))
-    const addedA = addresses.filter((address) => !subscriptions[address])
-    Object.keys(subscriptions).forEach((address) => {
-      if (!addresses.includes(address)) {
-        unsubscribe(address)
-      }
-    })
+    const added = addresses.filter((address) => !subscriptions[address])
 
-    addresses.forEach((address) => {
-      if (!subscriptions[address]) {
-        subscribe(address)
-      }
-    })
-    log.verbose('updating surface subscribers', { addresses, addedA, removed })
+    log.verbose('Updating surface subscribers', { addresses, added, removed })
+
+    removed.forEach(unsubscribe)
+    added.forEach(subscribe)
   }
 
   const subscribeToItems = (addr: string, items: CollectionItem[]) => {
