@@ -930,21 +930,23 @@ const migrations = {
     return initial
   },
   37: (initial) => {
-    const summonDefault = {
-      modifierKeys: ['Alt'],
-      shortcutKey: 'Slash',
-      enabled: true,
-      configuring: false
-    }
-    const altGrIndex = initial?.main?.shortcuts?.summon?.modifierKeys?.indexOf('AltGr')
-    if (altGrIndex !== undefined && altGrIndex > -1) {
-      const altGrReplacement = process.platform === 'win32' ? ['Alt', 'Control'] : ['Alt']
-      initial.main.shortcuts.summon.modifierKeys.splice(altGrIndex, 1, ...altGrReplacement)
-    } else if (altGrIndex === undefined) {
+    if (initial?.main && !initial.main.shortcuts?.summon?.modifierKeys) {
       initial.main.shortcuts = {
-        summon: summonDefault
+        summon: {
+          modifierKeys: ['Alt'],
+          shortcutKey: 'Slash',
+          enabled: true,
+          configuring: false
+        }
+      }
+    } else {
+      const altGrIndex = initial?.main?.shortcuts?.summon?.modifierKeys?.indexOf('AltGr')
+      if (altGrIndex !== undefined && altGrIndex > -1) {
+        const altGrReplacement = process.platform === 'win32' ? ['Alt', 'Control'] : ['Alt']
+        initial.main.shortcuts.summon.modifierKeys.splice(altGrIndex, 1, ...altGrReplacement)
       }
     }
+
     return initial
   }
 }
