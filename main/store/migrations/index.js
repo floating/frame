@@ -1,6 +1,9 @@
 import log from 'electron-log'
 import { v5 as uuidv5 } from 'uuid'
+import { z } from 'zod'
+
 import { accountNS, isDefaultAccountName } from '../../../resources/domain/account'
+import { isWindows } from '../../../resources/platform'
 
 const migrations = {
   4: (initial) => {
@@ -930,21 +933,43 @@ const migrations = {
     return initial
   },
   37: (initial) => {
-    if (initial?.main && !initial.main.shortcuts?.summon?.modifierKeys) {
+    const replaceAltGr = () => (isWindows() ? ['Alt', 'Control'] : ['Alt'])
+    const updateModifierKey = (key) => (key === 'AltGr' ? replaceAltGr(key) : key)
+
+    const defaultShortcuts = {
+      summon: {
+        modifierKeys: ['Alt'],
+        shortcutKey: 'Slash',
+        enabled: true,
+        configuring: false
+      }
+    }
+    const shortcutsSchema = z
+      .object({
+        summon: z.object({
+          modifierKeys: z.array(z.string()),
+          shortcutKey: z.string(),
+          enabled: z.boolean(),
+          configuring: z.boolean()
+        })
+      })
+      .catch(defaultShortcuts)
+
+    const result = shortcutsSchema.safeParse(initial.main.shortcuts)
+
+    if (result.success) {
+      const shortcuts = result.data
+      const modifierKeys = shortcuts.summon.modifierKeys.map(updateModifierKey).flat()
+
       initial.main.shortcuts = {
+        ...shortcuts,
         summon: {
-          modifierKeys: ['Alt'],
-          shortcutKey: 'Slash',
-          enabled: true,
-          configuring: false
+          ...shortcuts.summon,
+          modifierKeys
         }
       }
     } else {
-      const altGrIndex = initial?.main?.shortcuts?.summon?.modifierKeys?.indexOf('AltGr')
-      if (altGrIndex !== undefined && altGrIndex > -1) {
-        const altGrReplacement = process.platform === 'win32' ? ['Alt', 'Control'] : ['Alt']
-        initial.main.shortcuts.summon.modifierKeys.splice(altGrIndex, 1, ...altGrReplacement)
-      }
+      log.error('Migration 37: Could not migrate shortcuts', result.error)
     }
 
     return initial
