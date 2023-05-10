@@ -1,6 +1,8 @@
 import log from 'electron-log'
+import { z } from 'zod'
 import { v5 as uuidv5 } from 'uuid'
 import { accountNS, isDefaultAccountName } from '../../../resources/domain/account'
+import { isWindows } from '../../../resources/platform'
 
 const migrations = {
   4: (initial) => {
@@ -930,8 +932,10 @@ const migrations = {
     return initial
   },
   37: (initial) => {
-    const isWindows = process.platform === 'win32'
-    initial.main.shortcuts = initial.main.shortcuts || {
+    const replaceAltGr = () => (isWindows() ? ['Alt', 'Control'] : ['Alt'])
+    const updateModifierKey = (key) => (key === 'AltGr' ? replaceAltGr(key) : key)
+
+    const defaultShortcuts = {
       summon: {
         modifierKeys: ['Alt'],
         shortcutKey: 'Slash',
@@ -939,11 +943,33 @@ const migrations = {
         configuring: false
       }
     }
-    const shortcuts = initial.main.shortcuts
-    const altGrIndex = shortcuts.summon.modifierKeys.indexOf('AltGr')
-    if (altGrIndex > -1) {
-      const altGrReplacement = isWindows ? ['Alt', 'Control'] : ['Alt']
-      initial.main.shortcuts.summon.modifierKeys.splice(altGrIndex, 1, ...altGrReplacement)
+
+    const shortcutsSchema = z
+      .object({
+        summon: z.object({
+          modifierKeys: z.array(z.string()),
+          shortcutKey: z.string(),
+          enabled: z.boolean(),
+          configuring: z.boolean()
+        })
+      })
+      .catch(defaultShortcuts)
+
+    const result = shortcutsSchema.safeParse(initial.main.shortcuts)
+
+    if (result.success) {
+      const shortcuts = result.data
+      const modifierKeys = shortcuts.summon.modifierKeys.map(updateModifierKey).flat()
+
+      initial.main.shortcuts = {
+        ...shortcuts,
+        summon: {
+          ...shortcuts.summon,
+          modifierKeys
+        }
+      }
+    } else {
+      log.error('Migration 37: Could not migrate shortcuts', result.error)
     }
 
     return initial

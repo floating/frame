@@ -3,7 +3,9 @@ import log from 'electron-log'
 import migrations from '../../../../main/store/migrations'
 import { getDefaultAccountName } from '../../../../resources/domain/account'
 import { capitalize } from '../../../../resources/utils'
-import { withPlatform } from '../../../util'
+import { isWindows } from '../../../../resources/platform'
+
+jest.mock('../../../../resources/platform')
 
 let state
 
@@ -1493,67 +1495,67 @@ describe('migration 37', () => {
     })
 
     it('should update the summon shortcut on Linux', () => {
-      withPlatform('linux', () => {
-        const updatedState = migrations.apply(state, 37)
-        const { shortcuts } = updatedState.main
+      isWindows.mockReturnValue(false)
 
-        expect(shortcuts).toStrictEqual({
-          summon: {
-            modifierKeys: ['Alt'],
-            shortcutKey: 'Slash',
-            enabled: true,
-            configuring: false
-          }
-        })
+      const updatedState = migrations.apply(state, 37)
+      const { shortcuts } = updatedState.main
+
+      expect(shortcuts).toStrictEqual({
+        summon: {
+          modifierKeys: ['Alt'],
+          shortcutKey: 'Slash',
+          enabled: true,
+          configuring: false
+        }
       })
     })
 
     it('should update the summon shortcut on Windows', () => {
-      withPlatform('win32', () => {
-        const updatedState = migrations.apply(state, 37)
-        const { shortcuts } = updatedState.main
+      isWindows.mockReturnValue(true)
 
-        expect(shortcuts).toStrictEqual({
-          summon: {
-            modifierKeys: ['Alt', 'Control'],
-            shortcutKey: 'Slash',
-            enabled: true,
-            configuring: false
-          }
-        })
+      const updatedState = migrations.apply(state, 37)
+      const { shortcuts } = updatedState.main
+
+      expect(shortcuts).toStrictEqual({
+        summon: {
+          modifierKeys: ['Alt', 'Control'],
+          shortcutKey: 'Slash',
+          enabled: true,
+          configuring: false
+        }
       })
     })
   })
 
   it('should not update the summon shortcut on Windows', () => {
-    withPlatform('win32', () => {
-      const updatedState = migrations.apply(state, 37)
-      const { shortcuts } = updatedState.main
+    isWindows.mockReturnValue(true)
 
-      expect(shortcuts).toStrictEqual({
-        summon: {
-          modifierKeys: ['Alt'],
-          shortcutKey: 'Slash',
-          enabled: true,
-          configuring: false
-        }
-      })
+    const updatedState = migrations.apply(state, 37)
+    const { shortcuts } = updatedState.main
+
+    expect(shortcuts).toStrictEqual({
+      summon: {
+        modifierKeys: ['Alt'],
+        shortcutKey: 'Slash',
+        enabled: true,
+        configuring: false
+      }
     })
   })
 
   it('should not update the summon shortcut on Linux', () => {
-    withPlatform('linux', () => {
-      const updatedState = migrations.apply(state, 37)
-      const { shortcuts } = updatedState.main
+    isWindows.mockReturnValue(false)
 
-      expect(shortcuts).toStrictEqual({
-        summon: {
-          modifierKeys: ['Alt'],
-          shortcutKey: 'Slash',
-          enabled: true,
-          configuring: false
-        }
-      })
+    const updatedState = migrations.apply(state, 37)
+    const { shortcuts } = updatedState.main
+
+    expect(shortcuts).toStrictEqual({
+      summon: {
+        modifierKeys: ['Alt'],
+        shortcutKey: 'Slash',
+        enabled: true,
+        configuring: false
+      }
     })
   })
 
