@@ -944,6 +944,7 @@ const migrations = {
         configuring: false
       }
     }
+
     const shortcutsSchema = z
       .object({
         summon: z.object({
@@ -959,14 +960,15 @@ const migrations = {
 
     if (result.success) {
       const shortcuts = result.data
-      const modifierKeys = shortcuts.summon.modifierKeys.map(updateModifierKey).flat()
+
+      const updatedSummonShortcut = {
+        ...shortcuts.summon,
+        modifierKeys: shortcuts.summon.modifierKeys.map(updateModifierKey).flat()
+      }
 
       initial.main.shortcuts = {
         ...shortcuts,
-        summon: {
-          ...shortcuts.summon,
-          modifierKeys
-        }
+        summon: updatedSummonShortcut
       }
     } else {
       log.error('Migration 37: Could not migrate shortcuts', result.error)
