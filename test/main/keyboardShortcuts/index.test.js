@@ -1,26 +1,9 @@
 import { globalShortcut } from 'electron'
-import store from '../../../main/store'
 
 jest.mock('electron', () => ({
   app: { on: jest.fn(), getName: jest.fn(), getVersion: jest.fn(), getPath: jest.fn() },
   globalShortcut: { register: jest.fn(), unregister: jest.fn() }
 }))
-jest.mock('../../../main/store/state', () => () => ({ keyboardLayout: { isUS: true } }))
-jest.mock('../../../main/accounts', () => ({ updatePendingFees: jest.fn() }))
-jest.mock('../../../main/store/persist')
-
-async function withPlatform(platform, test) {
-  const originalPlatform = process.platform
-  Object.defineProperty(process, 'platform', {
-    value: platform
-  })
-
-  await test()
-
-  Object.defineProperty(process, 'platform', {
-    value: originalPlatform
-  })
-}
 
 let registerShortcut
 
@@ -37,261 +20,25 @@ describe('registerShortcut', () => {
     registerShortcut = keyboardShortcuts.registerShortcut
   })
 
-  describe('on MacOS', () => {
-    it('should unregister an existing shortcut', () => {
-      withPlatform('darwin', () => {
-        registerShortcut(shortcut, () => {})
+  it('should unregister an existing shortcut', () => {
+    registerShortcut(shortcut, () => {})
 
-        expect(globalShortcut.unregister).toHaveBeenCalledWith('Alt+/')
-        expect(globalShortcut.unregister).toHaveBeenCalledTimes(1)
-      })
-    })
-
-    it('should register the new shortcut', () => {
-      withPlatform('darwin', () => {
-        registerShortcut(shortcut, () => {})
-
-        expect(globalShortcut.register).toHaveBeenCalledWith('Alt+/', expect.any(Function))
-        expect(globalShortcut.register).toHaveBeenCalledTimes(1)
-      })
-    })
+    expect(globalShortcut.unregister).toHaveBeenCalledWith('Alt+/')
+    expect(globalShortcut.unregister).toHaveBeenCalledTimes(1)
   })
 
-  describe('on Windows', () => {
-    describe('when registering a shortcut without an Alt modifier and a US keyboard layout', () => {
-      beforeEach(() => {
-        shortcut.modifierKeys = ['Control']
-        store.setKeyboardLayout({ isUS: true })
-      })
+  it('should register the new shortcut', () => {
+    globalShortcut.register.mockImplementationOnce((accelerator, handlerFn) => handlerFn(accelerator))
 
-      it('should unregister the requested shortcut', () => {
-        withPlatform('win32', () => {
-          registerShortcut(shortcut, () => {})
+    return new Promise((resolve) => {
+      const handlerFn = (accelerator) => {
+        expect(accelerator).toBe('Alt+/')
+        resolve()
+      }
+      registerShortcut(shortcut, handlerFn)
 
-          expect(globalShortcut.unregister).toHaveBeenCalledWith('Control+/')
-          expect(globalShortcut.unregister).toHaveBeenCalledTimes(1)
-        })
-      })
-
-      it('should register the requested shortcut', () => {
-        withPlatform('win32', () => {
-          registerShortcut(shortcut, () => {})
-
-          expect(globalShortcut.register).toHaveBeenCalledWith('Control+/', expect.any(Function))
-          expect(globalShortcut.register).toHaveBeenCalledTimes(1)
-        })
-      })
-    })
-
-    describe('when registering a shortcut without an Alt modifier and a Non-US keyboard layout', () => {
-      beforeEach(() => {
-        shortcut.modifierKeys = ['Control']
-        store.setKeyboardLayout({ isUS: false })
-      })
-
-      it('should unregister the requested shortcut and an AltGr shortcut', () => {
-        withPlatform('win32', () => {
-          registerShortcut(shortcut, () => {})
-
-          expect(globalShortcut.unregister).toHaveBeenCalledWith('Control+/')
-          expect(globalShortcut.unregister).toHaveBeenCalledWith('Alt+Control+/')
-          expect(globalShortcut.unregister).toHaveBeenCalledTimes(2)
-        })
-      })
-
-      it('should register the requested shortcut', () => {
-        withPlatform('win32', () => {
-          registerShortcut(shortcut, () => {})
-
-          expect(globalShortcut.register).toHaveBeenCalledWith('Control+/', expect.any(Function))
-          expect(globalShortcut.register).toHaveBeenCalledTimes(1)
-        })
-      })
-    })
-
-    describe('when registering a shortcut with an AltGr modifier', () => {
-      beforeEach(() => {
-        shortcut.modifierKeys = ['AltGr']
-        store.setKeyboardLayout({ isUS: false })
-      })
-
-      it('should unregister the equivalent Alt-based shortcut and an AltGr shortcut', () => {
-        withPlatform('win32', () => {
-          registerShortcut(shortcut, () => {})
-
-          expect(globalShortcut.unregister).toHaveBeenCalledWith('Alt+/')
-          expect(globalShortcut.unregister).toHaveBeenCalledWith('Alt+Control+/')
-          expect(globalShortcut.unregister).toHaveBeenCalledTimes(2)
-        })
-      })
-
-      it('should register the equivalent Alt-based shortcut and an AltGr shortcut', () => {
-        withPlatform('win32', () => {
-          registerShortcut(shortcut, () => {})
-
-          expect(globalShortcut.register).toHaveBeenCalledWith('Alt+/', expect.any(Function))
-          expect(globalShortcut.register).toHaveBeenCalledWith('Alt+Control+/', expect.any(Function))
-          expect(globalShortcut.register).toHaveBeenCalledTimes(2)
-        })
-      })
-    })
-
-    describe('when registering a shortcut with an Alt modifier and a US keyboard layout', () => {
-      beforeEach(() => {
-        shortcut.modifierKeys = ['Alt']
-        store.setKeyboardLayout({ isUS: true })
-      })
-
-      it('should unregister the requested shortcut', () => {
-        withPlatform('win32', () => {
-          registerShortcut(shortcut, () => {})
-
-          expect(globalShortcut.unregister).toHaveBeenCalledWith('Alt+/')
-          expect(globalShortcut.unregister).toHaveBeenCalledTimes(1)
-        })
-      })
-
-      it('should register the requested shortcut', () => {
-        withPlatform('win32', () => {
-          registerShortcut(shortcut, () => {})
-
-          expect(globalShortcut.register).toHaveBeenCalledWith('Alt+/', expect.any(Function))
-          expect(globalShortcut.register).toHaveBeenCalledTimes(1)
-        })
-      })
-    })
-
-    describe('when registering a shortcut with an Alt modifier and a Non-US keyboard layout', () => {
-      beforeEach(() => {
-        shortcut.modifierKeys = ['Alt']
-        store.setKeyboardLayout({ isUS: false })
-      })
-
-      it('should unregister the equivalent Alt-based shortcut and an AltGr shortcut', () => {
-        withPlatform('win32', () => {
-          registerShortcut(shortcut, () => {})
-
-          expect(globalShortcut.unregister).toHaveBeenCalledWith('Alt+/')
-          expect(globalShortcut.unregister).toHaveBeenCalledWith('Alt+Control+/')
-          expect(globalShortcut.unregister).toHaveBeenCalledTimes(2)
-        })
-      })
-
-      it('should register the equivalent Alt-based shortcut and an AltGr shortcut', () => {
-        withPlatform('win32', () => {
-          registerShortcut(shortcut, () => {})
-
-          expect(globalShortcut.register).toHaveBeenCalledWith('Alt+/', expect.any(Function))
-          expect(globalShortcut.register).toHaveBeenCalledWith('Alt+Control+/', expect.any(Function))
-          expect(globalShortcut.register).toHaveBeenCalledTimes(2)
-        })
-      })
-    })
-  })
-
-  describe('on Linux', () => {
-    describe('when registering a shortcut without an Alt modifier', () => {
-      beforeEach(() => {
-        shortcut.modifierKeys = ['Control']
-      })
-
-      it('should unregister the requested shortcut and an AltGr shortcut', () => {
-        withPlatform('linux', () => {
-          registerShortcut(shortcut, () => {})
-
-          expect(globalShortcut.unregister).toHaveBeenCalledWith('Control+/')
-          expect(globalShortcut.unregister).toHaveBeenCalledWith('AltGr+Control+/')
-          expect(globalShortcut.unregister).toHaveBeenCalledTimes(2)
-        })
-      })
-
-      it('should register the requested shortcut', () => {
-        withPlatform('linux', () => {
-          registerShortcut(shortcut, () => {})
-
-          expect(globalShortcut.register).toHaveBeenCalledWith('Control+/', expect.any(Function))
-          expect(globalShortcut.register).toHaveBeenCalledTimes(1)
-        })
-      })
-    })
-
-    describe('when registering a shortcut with an AltGr modifier', () => {
-      beforeEach(() => {
-        shortcut.modifierKeys = ['AltGr']
-        store.setKeyboardLayout({ isUS: false })
-      })
-
-      it('should unregister the equivalent Alt-based shortcut and an AltGr shortcut', () => {
-        withPlatform('linux', () => {
-          registerShortcut(shortcut, () => {})
-
-          expect(globalShortcut.unregister).toHaveBeenCalledWith('Alt+/')
-          expect(globalShortcut.unregister).toHaveBeenCalledWith('AltGr+/')
-          expect(globalShortcut.unregister).toHaveBeenCalledTimes(2)
-        })
-      })
-
-      it('should register the equivalent Alt-based shortcut and an AltGr shortcut', () => {
-        withPlatform('linux', () => {
-          registerShortcut(shortcut, () => {})
-
-          expect(globalShortcut.register).toHaveBeenCalledWith('Alt+/', expect.any(Function))
-          expect(globalShortcut.register).toHaveBeenCalledWith('AltGr+/', expect.any(Function))
-          expect(globalShortcut.register).toHaveBeenCalledTimes(2)
-        })
-      })
-    })
-
-    describe('when registering a shortcut with an Alt modifier and a US keyboard layout', () => {
-      beforeEach(() => {
-        shortcut.modifierKeys = ['Alt']
-        store.setKeyboardLayout({ isUS: true })
-      })
-
-      it('should unregister the requested shortcut', () => {
-        withPlatform('linux', () => {
-          registerShortcut(shortcut, () => {})
-
-          expect(globalShortcut.unregister).toHaveBeenCalledWith('Alt+/')
-          expect(globalShortcut.unregister).toHaveBeenCalledTimes(1)
-        })
-      })
-
-      it('should register the requested shortcut', () => {
-        withPlatform('linux', () => {
-          registerShortcut(shortcut, () => {})
-
-          expect(globalShortcut.register).toHaveBeenCalledWith('Alt+/', expect.any(Function))
-          expect(globalShortcut.register).toHaveBeenCalledTimes(1)
-        })
-      })
-    })
-
-    describe('when registering a shortcut with an Alt modifier and a Non-US keyboard layout', () => {
-      beforeEach(() => {
-        shortcut.modifierKeys = ['Alt']
-        store.setKeyboardLayout({ isUS: false })
-      })
-
-      it('should unregister the equivalent Alt-based shortcut and an AltGr shortcut', () => {
-        withPlatform('linux', () => {
-          registerShortcut(shortcut, () => {})
-
-          expect(globalShortcut.unregister).toHaveBeenCalledWith('Alt+/')
-          expect(globalShortcut.unregister).toHaveBeenCalledWith('AltGr+/')
-          expect(globalShortcut.unregister).toHaveBeenCalledTimes(2)
-        })
-      })
-
-      it('should register the equivalent Alt-based shortcut and an AltGr shortcut', () => {
-        withPlatform('linux', () => {
-          registerShortcut(shortcut, () => {})
-
-          expect(globalShortcut.register).toHaveBeenCalledWith('Alt+/', expect.any(Function))
-          expect(globalShortcut.register).toHaveBeenCalledWith('AltGr+/', expect.any(Function))
-          expect(globalShortcut.register).toHaveBeenCalledTimes(2)
-        })
-      })
+      expect(globalShortcut.register).toHaveBeenCalledWith('Alt+/', expect.any(Function))
+      expect(globalShortcut.register).toHaveBeenCalledTimes(1)
     })
   })
 })

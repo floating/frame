@@ -1,6 +1,9 @@
 import log from 'electron-log'
 import { v5 as uuidv5 } from 'uuid'
+import { z } from 'zod'
+
 import { accountNS, isDefaultAccountName } from '../../../resources/domain/account'
+import { isWindows } from '../../../resources/platform'
 
 const migrations = {
   4: (initial) => {
@@ -925,6 +928,50 @@ const migrations = {
       initial.main.shortcuts.summon.enabled === undefined
     ) {
       initial.main.shortcuts.summon.enabled = true
+    }
+
+    return initial
+  },
+  37: (initial) => {
+    const replaceAltGr = () => (isWindows() ? ['Alt', 'Control'] : ['Alt'])
+    const updateModifierKey = (key) => (key === 'AltGr' ? replaceAltGr(key) : key)
+
+    const defaultShortcuts = {
+      summon: {
+        modifierKeys: ['Alt'],
+        shortcutKey: 'Slash',
+        enabled: true,
+        configuring: false
+      }
+    }
+
+    const shortcutsSchema = z
+      .object({
+        summon: z.object({
+          modifierKeys: z.array(z.string()),
+          shortcutKey: z.string(),
+          enabled: z.boolean(),
+          configuring: z.boolean()
+        })
+      })
+      .catch(defaultShortcuts)
+
+    const result = shortcutsSchema.safeParse(initial.main.shortcuts)
+
+    if (result.success) {
+      const shortcuts = result.data
+
+      const updatedSummonShortcut = {
+        ...shortcuts.summon,
+        modifierKeys: shortcuts.summon.modifierKeys.map(updateModifierKey).flat()
+      }
+
+      initial.main.shortcuts = {
+        ...shortcuts,
+        summon: updatedSummonShortcut
+      }
+    } else {
+      log.error('Migration 37: Could not migrate shortcuts', result.error)
     }
 
     return initial
