@@ -103,6 +103,17 @@ const Surface = () => {
       networks.update(address, [])
     }, 5_000)
 
+    const onStopped = () => {
+      // FIXME: does this update to start scanning once the subscription is stopped?
+      log.verbose(`Subscription to ${address} stopped`)
+      delete subscriptions[address]
+    }
+
+    const onError = (err: Error) => {
+      // FIXME: need to handle server errors
+      log.error(`Received error for subscription to ${address}`, err)
+    }
+
     const sub = Pylon.accounts.subscribe(address, {
       onStarted() {
         log.verbose('subscribed to account')
@@ -143,20 +154,12 @@ const Surface = () => {
           [[] as number[], [] as TokenBalance[], {} as Inventory]
         )
 
-        console.log({ chainIds })
-
         bProcessor.handleBalanceUpdate(address, balances, chainIds, 'snapshot')
         iProcessor.setInventory(address, inventory)
         networks.update(address, chainIds)
       },
-      onError: (err: unknown) => {
-        console.error({ err })
-      },
-      onStopped() {
-        log.verbose(`Subscription to ${address} stopped`)
-
-        delete subscriptions[address]
-      }
+      onError,
+      onStopped
     })
 
     subscriptions[address] = Object.assign(sub, { unsubscribables: [], collectionItems: [] })
