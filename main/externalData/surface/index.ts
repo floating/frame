@@ -119,16 +119,28 @@ const Surface = () => {
         log.verbose('subscribed to account')
       },
       onData: (data) => {
-        log.verbose(`Got update for account ${address}`, { data })
+        log.debug(`Got update from Pylon surface for account ${address}`, { data })
+
         if (!data.length || !data[0]) return
-        const [{ address: addr, ...chains }] = data
+        const [{ chainData: chains }] = data
+
         clearTimeout(fallback)
-        log.verbose('chains received...', { chains })
 
         const [chainIds, balances, inventory] = Object.entries(chains).reduce(
           (acc, [chainId, chain]) => {
-            if (!chain || typeof chain === 'string' || !chain.balances || !chain.inventory) {
-              log.verbose(`Invalid chain data for ${chainId}`)
+            // TODO: handle missing balances and inventory separately
+            if (!chain) {
+              log.verbose(`Missing chain data for chain ${chainId}`)
+              return acc
+            }
+
+            if (!chain.balances) {
+              log.verbose(`No balances data for chain ${chainId}`)
+              return acc
+            }
+
+            if (!chain.inventory) {
+              log.verbose(`No inventory data for chain ${chainId}`)
               return acc
             }
 
