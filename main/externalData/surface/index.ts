@@ -130,17 +130,17 @@ const Surface = () => {
           (acc, [chainId, chain]) => {
             // TODO: handle missing balances and inventory separately
             if (!chain) {
-              log.verbose(`Missing chain data for chain ${chainId}`)
+              log.verbose(`Missing chain data for chain ${chainId}`, { address })
               return acc
             }
 
             if (!chain.balances) {
-              log.verbose(`No balances data for chain ${chainId}`)
+              log.verbose(`No balances data for chain ${chainId}`, { address })
               return acc
             }
 
             if (!chain.inventory) {
-              log.verbose(`No inventory data for chain ${chainId}`)
+              log.verbose(`No inventory data for chain ${chainId}`, { address })
               return acc
             }
 
