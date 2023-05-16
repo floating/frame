@@ -104,13 +104,12 @@ const Surface = () => {
     }, 5_000)
 
     const onStopped = () => {
-      // FIXME: does this update to start scanning once the subscription is stopped?
       log.verbose(`Subscription to ${address} stopped`)
+      networks.update(address, [])
       delete subscriptions[address]
     }
 
     const onError = (err: Error) => {
-      // FIXME: need to handle server errors
       log.error(`Received error for subscription to ${address}`, err)
     }
 
