@@ -25,8 +25,12 @@ class Bridge extends React.Component {
               </div>
               <div className='badgeInput'>
                 <div className='badgeInputButton'>
-                  <div className='badgeInputInner' onMouseDown={() => link.send('tray:action', 'updateBadge', '')} style={{ color: 'var(--moon)' }}>
-                    Remind Me Later
+                  <div
+                    className='badgeInputInner'
+                    onMouseDown={() => link.send('tray:action', 'updateBadge', '')}
+                    style={{ color: 'var(--moon)' }}
+                  >
+                    Restart Later
                   </div>
                 </div>
               </div>
