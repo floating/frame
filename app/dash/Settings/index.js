@@ -12,7 +12,7 @@ const EditShortcut = styled.div`
   top: 1px;
   bottom: 0px;
   left: calc(100% + 10px);
-  background: var(--ghostC);
+  background: var(--ghostB);
   height: 20px;
   width: 60px;
   border-radius: 10px;

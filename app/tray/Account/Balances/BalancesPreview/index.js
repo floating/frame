@@ -3,34 +3,29 @@ import React from 'react'
 import link from '../../../../../resources/link'
 import svg from '../../../../../resources/svg'
 
-import { Cluster, ClusterRow, ClusterValue } from '../../../../../resources/Components/Cluster'
+import useAccountModule from '../../../../../resources/Hooks/useAccountModule'
+import useStore from '../../../../../resources/Hooks/useStore'
 
-import Balance from '../Balance'
 import HighValueWarning from '../Warning'
 
+import BalancesList from '../BalancesList'
+
 const BalancesPreview = ({ allChainsUpdated, moduleId, getBalances, account, filter, isHotSigner }) => {
-  const { balances: allBalances, totalValue, totalDisplayValue } = getBalances(filter)
+  const [moduleRef] = useAccountModule(moduleId)
+  const hiddenTokens = useStore('main.hiddenTokens') || []
+
+  const { balances: allBalances, totalValue, totalDisplayValue } = getBalances(filter, hiddenTokens)
 
   const balances = allBalances.slice(0, 4)
 
   return (
-    <div className='balancesBlock'>
+    <div ref={moduleRef} className='balancesBlock'>
       <div className={'moduleHeader'}>
         <span>{svg.tokens(13)}</span>
         <span>{'Balances'}</span>
       </div>
-      <Cluster>
-        {balances.map(({ chainId, symbol, ...balance }, i) => {
-          return (
-            <ClusterRow key={chainId + symbol}>
-              <ClusterValue>
-                <Balance chainId={chainId} symbol={symbol} balance={balance} i={i} scanning={false} />
-              </ClusterValue>
-            </ClusterRow>
-          )
-        })}
-      </Cluster>
-      <div className='signerBalanceTotal' style={{ opacity: 1 }}>
+      <BalancesList balances={balances} />
+      <div className='signerBalanceTotal'>
         <div className='signerBalanceButtons'>
           <div
             className='signerBalanceButton signerBalanceShowAll'
@@ -50,14 +45,17 @@ const BalancesPreview = ({ allChainsUpdated, moduleId, getBalances, account, fil
               : 'More'}
           </div>
         </div>
-
-        <div className='signerBalanceTotalText'>
-          <div className='signerBalanceTotalLabel'>{'Total'}</div>
-          <div className='signerBalanceTotalValue'>
-            {svg.usd(11)}
-            {balances.length && allChainsUpdated ? totalDisplayValue : '---.--'}
+        {balances.length && allChainsUpdated ? (
+          <div className='signerBalanceTotalText'>
+            <div className='signerBalanceTotalLabel'>{'Total'}</div>
+            <div className='signerBalanceTotalValue'>
+              {svg.usd(11)}
+              {totalDisplayValue}
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className='signerBalanceLoading'>{svg.sine()}</div>
+        )}
       </div>
       {totalValue.toNumber() > 10000 && isHotSigner && <HighValueWarning updated={allChainsUpdated} />}
     </div>

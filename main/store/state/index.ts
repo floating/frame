@@ -153,6 +153,7 @@ const mainState = {
   addresses: main('addresses', {}), // Should be removed after 0.5 release
   permissions: main('permissions', {}),
   balances: {},
+  hiddenTokens: main('hiddenTokens', []),
   tokens: main('tokens', { custom: [], known: {} }),
   rates: {}, // main('rates', {}),
   inventory: {}, // main('rates', {}),
