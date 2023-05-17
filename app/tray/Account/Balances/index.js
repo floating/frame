@@ -49,8 +49,7 @@ class Balances extends React.Component {
           (returnHidden ? isHidden : !isHidden) &&
           isNetworkConnected(ethereumNetworks[rawBalance.chainId]) &&
           populatedChains[rawBalance.chainId] &&
-          populatedChains[rawBalance.chainId].expires > Date.now() &&
-          matchFilter(filter, [chain.name, rawBalance.name, rawBalance.symbol])
+          populatedChains[rawBalance.chainId].expires > Date.now()
         )
       })
       .map((rawBalance) => {
@@ -70,6 +69,10 @@ class Balances extends React.Component {
           { ...rawBalance, logoURI, name, decimals, symbol },
           ethereumNetworks[rawBalance.chainId].isTestnet ? { price: 0 } : rate.usd
         )
+      })
+      .filter((rawBalance) => {
+        const chain = ethereumNetworks[rawBalance.chainId]
+        return matchFilter(filter, [chain.name, rawBalance.name, rawBalance.symbol])
       })
       .sort(byTotalValue)
 

@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import styled from 'styled-components'
 
 import link from '../../../../../resources/link'
 import svg from '../../../../../resources/svg'
@@ -8,6 +9,14 @@ import { Cluster, ClusterRow, ClusterValue } from '../../../../../resources/Comp
 import useStore from '../../../../../resources/Hooks/useStore'
 
 import Balance from '../Balance'
+
+const HiddenOverlay = styled.div`
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(0deg, transparent, var(--bad));
+  opacity: 0.03;
+  z-index: 10000;
+`
 
 const BalancesList = ({ balances }) => {
   const [open, setOpen] = useState(-1)
@@ -26,6 +35,7 @@ const BalancesList = ({ balances }) => {
                   setOpen(open === i ? -1 : i)
                 }}
               >
+                {hidden && <HiddenOverlay />}
                 <Balance chainId={chainId} symbol={symbol} balance={balance} i={i} scanning={false} />
               </ClusterValue>
             </ClusterRow>
