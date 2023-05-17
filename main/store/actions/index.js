@@ -969,7 +969,6 @@ module.exports = {
     })
   },
   tokenVisiblity(u, chain, address, hidden) {
-    console.log(' tokenVisiblity', { chain, address, hidden })
     const tokenId = `${chain}:${address}`
     u('main.hiddenTokens', (hiddenTokens) => {
       const index = hiddenTokens.indexOf(tokenId)
