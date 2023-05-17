@@ -107,86 +107,86 @@
   font-size 14px
   margin-bottom 16px
 
-  .signerBalanceButtons
-    display flex
-    justify-content left
-    align-items center
-    height 100%
+.signerBalanceButtons
+  display flex
+  justify-content left
+  align-items center
+  height 100%
 
-    .moduleItemButton
-      background var(--ghostA)
-      box-shadow 0px 4px 6px var(--ghostY)
-      border-bottom 2px solid var(--ghostZ)
-      cursor pointer
-      * 
-        pointer-events none
-
-    .moduleItemButton:hover
-      background var(--ghostB)
-      transform translateY(-1px)
-      border-bottom 2px solid var(--ghostZ)
-      box-shadow 0px 8px 30px -12px var(--ghostX)
-      
-    .moduleItemButton:active
-      background var(--ghostB)
-      transform translateY(0px)
-      box-shadow 0px 2px 4px var(--ghostX)
-
-  .signerBalanceButton
-    height 40px
-    margin-left 13px
+  .moduleItemButton
     background var(--ghostA)
+    box-shadow 0px 4px 6px var(--ghostY)
     border-bottom 2px solid var(--ghostZ)
-    box-shadow 0px 1px 4px var(--ghostX)
-    border-radius 20px
-    box-sizing border-box
     cursor pointer
-    z-index 4000
-    display flex
-    justify-content center
-    align-items center
-    font-size 11px
-    font-weight 400
-    letter-spacing 1px
-    text-transform uppercase
-    padding 1px 20px 0px 21px
-
-    *
+    * 
       pointer-events none
-      margin-left 2px
 
-  .signerBalanceButton:hover
+  .moduleItemButton:hover
     background var(--ghostB)
-    color var(--outerspace)
-    // color var(--good)
+    transform translateY(-1px)
+    border-bottom 2px solid var(--ghostZ)
+    box-shadow 0px 8px 30px -12px var(--ghostX)
+    
+  .moduleItemButton:active
+    background var(--ghostB)
+    transform translateY(0px)
+    box-shadow 0px 2px 4px var(--ghostX)
 
-  .signerBalanceTotalText
-    position absolute
-    left 16px
-    right 23px
-    bottom 0px
-    top 0px
+.signerBalanceButton
+  height 40px
+  margin-left 13px
+  background var(--ghostA)
+  border-bottom 2px solid var(--ghostZ)
+  box-shadow 0px 1px 4px var(--ghostX)
+  border-radius 20px
+  box-sizing border-box
+  cursor pointer
+  z-index 4000
+  display flex
+  justify-content center
+  align-items center
+  font-size 11px
+  font-weight 400
+  letter-spacing 1px
+  text-transform uppercase
+  padding 1px 20px 0px 21px
+
+  *
+    pointer-events none
+    margin-left 2px
+
+.signerBalanceButton:hover
+  background var(--ghostB)
+  color var(--outerspace)
+  // color var(--good)
+
+.signerBalanceTotalText
+  position absolute
+  left 16px
+  right 23px
+  bottom 0px
+  top 0px
+  display flex
+  justify-content flex-end
+  align-items center
+
+  .signerBalanceTotalLabel
+    margin-right 6px
+    margin-top 1px
+    text-transform uppercase
+    font-size 10px
+    letter-spacing 0.5px
+    font-weight 600
+    color var(--mint)
+
+  .signerBalanceTotalValue
+    font-size 16px
+    font-family 'FiraCode'
+    letter-spacing -1px
+    text-align center
     display flex
-    justify-content flex-end
     align-items center
-
-    .signerBalanceTotalLabel
-      margin-right 6px
-      margin-top 1px
-      text-transform uppercase
-      font-size 10px
-      letter-spacing 0.5px
-      font-weight 600
-      color var(--mint)
-
-    .signerBalanceTotalValue
-      font-size 16px
-      font-family 'FiraCode'
-      letter-spacing -1px
-      text-align center
-      display flex
-      align-items center
-      color var(--mint)
+    color var(--mint)
 
 .signerBalancesLoading
   position absolute
@@ -477,3 +477,7 @@
   svg
     color var(--mint)
   
+.signerBalanceFooter
+  display flex
+  justify-content center
+  align-items center

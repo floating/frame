@@ -8,10 +8,15 @@ import BalancesList from '../BalancesList'
 
 import useStore from '../../../../../resources/Hooks/useStore'
 
-const BalancesExpanded = ({ getBalances, allChainsUpdated, isHotSigner }) => {
+const BalancesExpanded = ({
+  getBalances,
+  allChainsUpdated,
+  isHotSigner,
+  expandedData,
+  moduleId,
+  account
+}) => {
   const [balanceFilter, setBalanceFilter] = useState('')
-
-  const [showHiddenTokens, setShowHiddenTokens] = useState(false)
 
   const hiddenTokens = useStore('main.hiddenTokens') || []
 
@@ -42,56 +47,63 @@ const BalancesExpanded = ({ getBalances, allChainsUpdated, isHotSigner }) => {
 
   const { balances: allBalances, totalValue, totalDisplayValue } = getBalances(balanceFilter, hiddenTokens)
 
-  const { balances: hiddenBalances } = getBalances(balanceFilter, hiddenTokens, true)
+  const { balances: hiddenBalances, totalDisplayValue: hiddenTotalDisplayValue } = getBalances(
+    balanceFilter,
+    hiddenTokens,
+    true
+  )
 
   return (
     <div className='accountViewScroll'>
       {renderAccountFilter()}
       <ClusterBox>
-        <BalancesList balances={allBalances} />
-      </ClusterBox>
-      <div className='signerBalanceTotal'>
-        <div className='signerBalanceButtons'>
-          <div
-            className='signerBalanceButton signerBalanceAddToken'
-            onMouseDown={() => {
-              link.send('tray:action', 'navDash', { view: 'tokens', data: { notify: 'addToken' } })
-            }}
-          >
-            <span>Add Token</span>
-          </div>
-        </div>
-        {allBalances.length && allChainsUpdated ? (
-          <div className='signerBalanceTotalText'>
-            <div className='signerBalanceTotalLabel'>{'Total'}</div>
-            <div className='signerBalanceTotalValue'>
-              {svg.usd(11)}
-              {totalDisplayValue}
+        <BalancesList balances={expandedData.hidden ? hiddenBalances : allBalances} />
+        <div className='signerBalanceTotal'>
+          {!expandedData.hidden && (
+            <div className='signerBalanceButtons'>
+              <div
+                className='signerBalanceButton signerBalanceShowAll'
+                onClick={() => {
+                  const crumb = {
+                    view: 'expandedModule',
+                    data: {
+                      id: moduleId,
+                      title: 'Hidden Balances',
+                      account: account,
+                      hidden: true
+                    }
+                  }
+                  link.send('nav:forward', 'panel', crumb)
+                }}
+              >
+                {`+${hiddenBalances.length} Hidden`}
+              </div>
             </div>
-          </div>
-        ) : (
-          <div className='signerBalanceLoading'>{svg.sine()}</div>
-        )}
+          )}
+          {hiddenBalances.length ? (
+            <div className='signerBalanceTotalText'>
+              <div className='signerBalanceTotalLabel'>{'Total'}</div>
+              <div className='signerBalanceTotalValue'>
+                {svg.usd(11)}
+                {expandedData.hidden ? hiddenTotalDisplayValue : totalDisplayValue}
+              </div>
+            </div>
+          ) : (
+            <div className='signerBalanceLoading'>{svg.sine()}</div>
+          )}
+        </div>
+      </ClusterBox>
+      <div className='signerBalanceFooter'>
+        <div
+          className='signerBalanceButton signerBalanceAddToken'
+          onMouseDown={() => {
+            link.send('tray:action', 'navDash', { view: 'tokens', data: { notify: 'addToken' } })
+          }}
+        >
+          <span>Add Token</span>
+        </div>
       </div>
       {totalValue.toNumber() > 10000 && isHotSigner && <HighValueWarning updated={allChainsUpdated} />}
-
-      <ClusterBox>
-        <Cluster>
-          <ClusterRow>
-            <ClusterValue onClick={() => setShowHiddenTokens(!showHiddenTokens)}>
-              <div className='showHiddenTokens'>
-                {svg.hide(18)}
-                <span>{showHiddenTokens ? 'hide  hidden balances' : 'show  hidden balances'}</span>
-              </div>
-            </ClusterValue>
-          </ClusterRow>
-        </Cluster>
-      </ClusterBox>
-      {showHiddenTokens && (
-        <ClusterBox>
-          <BalancesList balances={hiddenBalances} />
-        </ClusterBox>
-      )}
     </div>
   )
 }

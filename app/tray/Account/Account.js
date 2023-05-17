@@ -279,7 +279,8 @@ class _AccountBody extends React.Component {
             link.send('nav:back', 'panel')
           }}
           {...this.props}
-          accountViewTitle={crumb.data.id}
+          accountViewTitle={crumb.data.title || crumb.data.id}
+          key={crumb.data.title || crumb.data.id}
         >
           <div
             className='accountsModuleExpand cardShow'
