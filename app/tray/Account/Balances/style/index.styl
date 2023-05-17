@@ -9,6 +9,46 @@
   padding 10px 0px
   cursor pointer
 
+.signerBalanceDrawerItem
+  height 40px
+  display flex
+  justify-content center
+  align-items center
+  font-size 11px
+  text-transform uppercase
+  font-weight 600
+  color var(--mint)
+
+@keyframes wave
+  0%
+    transform translateX(0)
+  100%
+    transform translateX(74px)
+
+.signerBalanceLoading
+  position absolute
+  right 16px
+  bottom 12px
+  height 24px
+  width 90px
+  box-sizing border-box
+  display flex
+  overflow hidden
+  opacity 1
+  padding 1px 0px
+  border-radius 12px
+  background var(--ghostZ)
+  border 6px solid var(--ghostZ)
+  color var(--mint)
+  
+  svg
+    width 300%
+    position relative
+    left -100%
+    stroke-width 20px
+    animation wave 3.4s linear infinite
+    will-change transform
+
 .signerBalancesExpanded
   width 100%
 
@@ -65,7 +105,7 @@
   width 100%
   z-index 200000
   font-size 14px
-  margin-bottom 6px
+  margin-bottom 16px
 
   .signerBalanceButtons
     display flex
@@ -181,7 +221,6 @@
 .signerBalance
   position relative
   opacity 1
-  height 70px
   width 100%
   transition 0.1s ease-out all
   font-family 'MainFont'
@@ -193,57 +232,67 @@
     100%
       transform rotateZ(360deg) translateX(100%)
 
-  .signerBalanceLoading
-    position absolute
-    top 0
-    bottom 0
-    left 0
-    transform rotateZ(360deg) translateX(-100%)
-    will-change transform
-    width 400%
-    background linear-gradient(90deg, var(--ghostB0) 25%, var(--ghostB) 48%, var(--ghostB) 52%, var(--ghostB0) 75%)
-    animation sheenLoad 5s infinite linear
-    transition var(--standardFast)
+  // .signerBalanceLoading
+  //   position absolute
+  //   top 0
+  //   bottom 0
+  //   left 0
+  //   transform rotateZ(360deg) translateX(-100%)
+  //   will-change transform
+  //   width 400%
+  //   background linear-gradient(90deg, var(--ghostB0) 25%, var(--ghostB) 48%, var(--ghostB) 52%, var(--ghostB0) 75%)
+  //   animation sheenLoad 5s infinite linear
+  //   transition var(--standardFast)
 
   .signerBalanceInner
     position relative
-    height 100%
+    height 78px
     transition all linear 0.8s
 
-  .signerBalanceCurrency
+  .signerBalanceMain
     position absolute
-    left 62px
+    left 67px
     top 25px
-    right 135px
-    font-size 15px
+    right 18px
+    bottom 26px
+    font-size 16px
     display flex
-    align-items center
-    font-weight 400
+    font-weight 300
     white-space nowrap
+    align-items center
     z-index 2
     overflow hidden
+    font-family 'FiraCode'
+    .signerBalanceCurrencyLine
+      background var(--ghostY)
+      height 1px
+      margin 0px 12px 0px 12px
+      flex 1
 
   .signerBalanceChain
     position absolute
-    left 60px
-    top 8px
+    left 65px
+    top 10px
+    right 16px
     font-size 10px
     display flex
     align-items center
-    font-weight 500
+    font-weight 600
     white-space nowrap
     z-index 2
     text-transform uppercase
-    letter-spacing 2px
+    letter-spacing 1px
     height 12px
     padding 0px 0px 0px 2px
-    border-radius 8px
-   
+    color var(--mint)
+    span
+      margin-right 4px
+
   .signerBalancePrice
     position absolute
-    right 12px
-    bottom 8px
-    left 62px
+    right 20px
+    bottom 10px
+    left 68px
     font-size 12px
     font-weight 400
     color var(--mint)
@@ -292,8 +341,8 @@
 
   .signerBalanceIcon
     position absolute
-    left 12px
-    top 18px
+    left 15px
+    top 22px
     border-radius 16px
     overflow hidden
     z-index 1
@@ -325,24 +374,25 @@
 
   .signerBalanceValue
     position absolute
-    right 10px
-    top 22px
-    font-size 19px
+    right 16px
+    top 30px
+    font-size 18px
     text-align center
     display flex
     align-items center
     font-family 'FiraCode'
     font-weight 300
+    font-family 'VCR'
 
-    .displayValueSymbol
-      font-family 'MainFont'
-      font-weight 600
-      font-size 0.65em
-      line-height 13px
-      position relative
-      letter-spacing 0.5px
-      margin-top -0.12em
-      margin-right 0.36em
+    // .displayValueSymbol
+    //   font-family 'MainFont'
+    //   font-weight 600
+    //   font-size 0.65em
+    //   line-height 13px
+    //   position relative
+    //   letter-spacing 0.5px
+    //   margin-top -0.12em
+    //   margin-right 0.36em
 
   .signerBalanceEquivalent
     position absolute
@@ -408,3 +458,22 @@
   100%
     -webkit-transform rotate(360deg)
     transform rotate(360deg)
+
+
+.showHiddenTokens
+  padding 10px 0px 8px 0px
+  display flex
+  justify-content center
+  text-transform uppercase
+  font-size 12px
+  color var(--mint)
+  font-weight 400
+  svg
+    color var(--moon)
+  span
+    margin-left 8px
+
+.showHiddenTokens:hover
+  svg
+    color var(--mint)
+  

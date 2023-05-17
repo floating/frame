@@ -967,6 +967,21 @@ module.exports = {
       main.balanceFetchMode = newMode
       return main
     })
+  },
+  tokenVisiblity(u, chain, address, hidden) {
+    console.log(' tokenVisiblity', { chain, address, hidden })
+    const tokenId = `${chain}:${address}`
+    u('main.hiddenTokens', (hiddenTokens) => {
+      const index = hiddenTokens.indexOf(tokenId)
+      // If it should be showing but is in the hidden array, remove it
+      if (index !== -1 && !hidden) {
+        hiddenTokens.splice(index, 1)
+        // If it should be hidden but isn't in the hidden array, add it
+      } else if (index === -1 && hidden) {
+        hiddenTokens.push(tokenId)
+      }
+      return hiddenTokens
+    })
   }
   // toggleUSDValue: (u) => {
   //   u('main.showUSDValue', show => !show)
