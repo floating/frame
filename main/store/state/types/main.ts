@@ -55,6 +55,7 @@ export const MainSchema = z.object({
   }),
   origins: z.record(z.string().describe('Origin Id'), OriginSchema),
   knownExtensions: z.record(z.string(), z.boolean()),
+  hiddenTokens: z.array(z.string()),
   permissions: z.record(
     z.string().describe('Address'),
     z.record(z.string().describe('Origin Id'), PermissionSchema)

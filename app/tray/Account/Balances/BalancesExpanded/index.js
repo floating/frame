@@ -4,9 +4,21 @@ import svg from '../../../../../resources/svg'
 import Balance from '../Balance'
 import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../resources/Components/Cluster'
 import HighValueWarning from '../Warning'
+import BalancesList from '../BalancesList'
 
-const BalancesExpanded = ({ getBalances, allChainsUpdated, isHotSigner }) => {
+import useStore from '../../../../../resources/Hooks/useStore'
+
+const BalancesExpanded = ({
+  getBalances,
+  allChainsUpdated,
+  isHotSigner,
+  expandedData,
+  moduleId,
+  account
+}) => {
   const [balanceFilter, setBalanceFilter] = useState('')
+
+  const hiddenTokens = useStore('main.hiddenTokens') || []
 
   const renderAccountFilter = () => {
     return (
@@ -33,41 +45,62 @@ const BalancesExpanded = ({ getBalances, allChainsUpdated, isHotSigner }) => {
     )
   }
 
-  const { balances: allBalances, totalDisplayValue, totalValue } = getBalances(balanceFilter)
+  const { balances: allBalances, totalValue, totalDisplayValue } = getBalances(balanceFilter, hiddenTokens)
+
+  const { balances: hiddenBalances, totalDisplayValue: hiddenTotalDisplayValue } = getBalances(
+    balanceFilter,
+    hiddenTokens,
+    true
+  )
 
   return (
     <div className='accountViewScroll'>
       {renderAccountFilter()}
       <ClusterBox>
-        <Cluster>
-          {allBalances.map(({ chainId, symbol, ...balance }, i) => {
-            return (
-              <ClusterRow key={chainId + symbol + balance.address}>
-                <ClusterValue>
-                  <Balance chainId={chainId} symbol={symbol} balance={balance} i={i} scanning={false} />
-                </ClusterValue>
-              </ClusterRow>
-            )
-          })}
-        </Cluster>
-      </ClusterBox>
-      <div className='signerBalanceTotal' style={{ opacity: allChainsUpdated ? 1 : 0 }}>
-        <div className='signerBalanceButtons'>
-          <div
-            className='signerBalanceButton signerBalanceAddToken'
-            onMouseDown={() => {
-              link.send('tray:action', 'navDash', { view: 'tokens', data: { notify: 'addToken' } })
-            }}
-          >
-            <span>Add Token</span>
-          </div>
+        <BalancesList balances={expandedData.hidden ? hiddenBalances : allBalances} />
+        <div className='signerBalanceTotal'>
+          {!expandedData.hidden && (
+            <div className='signerBalanceButtons'>
+              <div
+                className='signerBalanceButton signerBalanceShowAll'
+                onClick={() => {
+                  const crumb = {
+                    view: 'expandedModule',
+                    data: {
+                      id: moduleId,
+                      title: 'Hidden Balances',
+                      account: account,
+                      hidden: true
+                    }
+                  }
+                  link.send('nav:forward', 'panel', crumb)
+                }}
+              >
+                {`+${hiddenBalances.length} Hidden`}
+              </div>
+            </div>
+          )}
+          {hiddenBalances.length ? (
+            <div className='signerBalanceTotalText'>
+              <div className='signerBalanceTotalLabel'>{'Total'}</div>
+              <div className='signerBalanceTotalValue'>
+                {svg.usd(11)}
+                {expandedData.hidden ? hiddenTotalDisplayValue : totalDisplayValue}
+              </div>
+            </div>
+          ) : (
+            <div className='signerBalanceLoading'>{svg.sine()}</div>
+          )}
         </div>
-        <div className='signerBalanceTotalText'>
-          <div className='signerBalanceTotalLabel'>{'Total'}</div>
-          <div className='signerBalanceTotalValue'>
-            {svg.usd(11)}
-            {allBalances.length && allChainsUpdated ? totalDisplayValue : '---.--'}
-          </div>
+      </ClusterBox>
+      <div className='signerBalanceFooter'>
+        <div
+          className='signerBalanceButton signerBalanceAddToken'
+          onMouseDown={() => {
+            link.send('tray:action', 'navDash', { view: 'tokens', data: { notify: 'addToken' } })
+          }}
+        >
+          <span>Add Token</span>
         </div>
       </div>
       {totalValue.toNumber() > 10000 && isHotSigner && <HighValueWarning updated={allChainsUpdated} />}
