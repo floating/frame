@@ -481,3 +481,30 @@
   display flex
   justify-content center
   align-items center
+
+  .signerBalanceFooterButton
+    height 40px
+    background var(--ghostA)
+    border-bottom 2px solid var(--ghostZ)
+    box-shadow 0px 1px 4px var(--ghostX)
+    border-radius 20px
+    box-sizing border-box
+    cursor pointer
+    z-index 4000
+    display flex
+    justify-content center
+    align-items center
+    font-size 11px
+    font-weight 400
+    letter-spacing 1px
+    text-transform uppercase
+    padding 1px 20px 0px 21px
+
+    *
+      pointer-events none
+      margin-left 2px
+
+  .signerBalanceFooterButton:hover
+    background var(--ghostB)
+    color var(--outerspace)
+    // color var(--good)
