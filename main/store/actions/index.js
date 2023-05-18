@@ -149,7 +149,8 @@ module.exports = {
       const balances = { ...account.balances, populatedChains }
       const updated = { ...account, balances }
 
-      log.verbose('addPopulatedChains', { address, chains, updated, populatedChains })
+      log.debug('addPopulatedChains', { address, chains, updated, populatedChains })
+
       return updated
     })
   },
@@ -285,10 +286,7 @@ module.exports = {
     u('main.networksMeta', netType, netId, 'nativeCurrency', (existing) => ({ ...existing, ...currency }))
   },
   removeNativeCurrencyRate: (u, netType, netId) => {
-    u('main.networksMeta', netType, netId, 'nativeCurrency', (nativeCurrency) => {
-      delete nativeCurrency['usd']
-      return nativeCurrency
-    })
+    u('main.networksMeta', netType, netId, 'nativeCurrency', ({ usd, ...currency }) => currency)
   },
   addNetwork: (u, net) => {
     try {

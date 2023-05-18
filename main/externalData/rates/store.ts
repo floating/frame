@@ -14,7 +14,7 @@ type RateUpdate = {
   }
 }
 
-const RATES_EXPIRY = 1000 * 60 * 5 // rates are valid for 5 minutes before being considered stale
+const RATES_EXPIRY = 1000 * 5 * 60 // rates are valid for 5 minutes before being considered stale
 const timeouts: Record<string, NodeJS.Timer> = {}
 
 const separateUpdates = (updates: RateUpdate[]) =>
@@ -46,7 +46,7 @@ const storeApi = {
   removeTokenRate: (address: Address) => store.removeRate(address),
   setNativeCurrencyRate: (chainId: number, rate: Rate) =>
     store.setNativeCurrencyData('ethereum', chainId, { usd: rate }),
-  removeNativeCurrencyRate: (chainId: number) => store.removeNativeCurrencyData('ethereum', chainId)
+  removeNativeCurrencyRate: (chainId: number) => store.removeNativeCurrencyRate('ethereum', chainId)
 }
 
 const handleNativeCurrencyUpdates = (updates: RateUpdate[]) => {

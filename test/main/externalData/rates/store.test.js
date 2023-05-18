@@ -6,7 +6,7 @@ import { handleUpdates } from '../../../../main/externalData/rates/store'
 jest.mock('../../../../main/store', () => ({
   setNativeCurrencyData: jest.fn(),
   setRates: jest.fn(),
-  removeNativeCurrencyData: jest.fn(),
+  removeNativeCurrencyRate: jest.fn(),
   removeRate: jest.fn()
 }))
 
@@ -87,7 +87,7 @@ it('expires a native currency rate after 5 minutes', () => {
   handleUpdates(updates)
   jest.advanceTimersByTime(1000 * 6 * 60)
 
-  expect(store.removeNativeCurrencyData).toHaveBeenCalledWith('ethereum', updates[0].id.chainId)
+  expect(store.removeNativeCurrencyRate).toHaveBeenCalledWith('ethereum', updates[0].id.chainId)
 })
 
 it('expires a token rate after 5 minutes', () => {
@@ -108,5 +108,5 @@ it('resets the expiry time when receiving a new rate', () => {
   handleUpdates([update])
   jest.advanceTimersByTime(1000 * 3 * 60)
 
-  expect(store.removeNativeCurrencyData).not.toHaveBeenCalled()
+  expect(store.removeNativeCurrencyRate).not.toHaveBeenCalled()
 })
