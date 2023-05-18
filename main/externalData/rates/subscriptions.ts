@@ -1,22 +1,20 @@
 import log from 'electron-log'
-
 import Pylon, { AssetType } from '@framelabs/pylon-client'
+
+import { handleUpdates } from './store'
+import store from '../../store'
+import { toTokenId } from '../../../resources/domain/balance'
 
 import type { AssetId } from '@framelabs/pylon-client/dist/assetId'
 import type { Token } from '../../store/state'
-import { toTokenId } from '../../../resources/domain/balance'
-import getRatesManager from './manager'
 
-export default function rates(pylon: Pylon, store: Store) {
-  const ratesManager = getRatesManager(store)
+const storeApi = {
+  getKnownTokens: (address?: Address) => ((address && store('main.tokens.known', address)) || []) as Token[],
+  getAddresses: () => Object.keys(store('main.accounts')),
+  getCustomTokens: () => (store('main.tokens.custom') || []) as Token[]
+}
 
-  const storeApi = {
-    getKnownTokens: (address?: Address) =>
-      ((address && store('main.tokens.known', address)) || []) as Token[],
-    getAddresses: () => Object.keys(store('main.accounts')),
-    getCustomTokens: () => (store('main.tokens.custom') || []) as Token[]
-  }
-
+export default function rates(pylon: Pylon) {
   function updateSubscription(chains: number[]) {
     const subscribedCurrencies = chains.map((chainId) => ({ type: AssetType.NativeCurrency, chainId }))
 
@@ -41,24 +39,24 @@ export default function rates(pylon: Pylon, store: Store) {
       }
     })
 
-    setAssets([...subscribedCurrencies, ...subscribedTokens])
+    subscribeToRates([...subscribedCurrencies, ...subscribedTokens])
   }
 
   function start() {
-    log.verbose('starting asset updates')
+    log.verbose('starting rates updates')
 
-    pylon.on('rates', ratesManager.handleUpdates)
+    pylon.on('rates', handleUpdates)
   }
 
   function stop() {
-    log.verbose('stopping asset updates')
+    log.verbose('stopping rates updates')
 
-    pylon.off('rates', ratesManager.handleUpdates)
+    pylon.off('rates', handleUpdates)
 
     pylon.rates([])
   }
 
-  function setAssets(assetIds: AssetId[]) {
+  function subscribeToRates(assetIds: AssetId[]) {
     log.debug(
       'subscribing to rates updates for native currencies on chains:',
       assetIds.filter((a) => a.type === AssetType.NativeCurrency).map((a) => a.chainId)
@@ -75,7 +73,7 @@ export default function rates(pylon: Pylon, store: Store) {
   return {
     start,
     stop,
-    setAssets,
+    subscribeToRates,
     updateSubscription
   }
 }

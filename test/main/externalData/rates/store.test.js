@@ -40,12 +40,12 @@ beforeEach(() => {
   ratesManager = getRatesManager(store)
 })
 
-test('handles no updates', () => {
+it('handles an empty set of updates', () => {
+  // this will throw if there are any issues
   ratesManager.handleUpdates([])
-  // Will throw if there are any issues...
 })
 
-test('handles only native currency updates', () => {
+it('handles only native currency updates', () => {
   const update = RateUpdate('0x000000', AssetType.NativeCurrency)
 
   ratesManager.handleUpdates([update])
@@ -57,7 +57,7 @@ test('handles only native currency updates', () => {
   )
 })
 
-test('handles only token updates', () => {
+it('handles only token updates', () => {
   const update = RateUpdate('0x000', AssetType.Token)
   ratesManager.handleUpdates([update])
   expect(store.setRates).toHaveBeenCalledWith({
@@ -65,7 +65,7 @@ test('handles only token updates', () => {
   })
 })
 
-test('handles both native currency and token updates', () => {
+it('handles both native currency and token updates', () => {
   const u1 = RateUpdate('0x000000', AssetType.NativeCurrency)
   const u2 = RateUpdate('0x000', AssetType.Token)
   const updates = [u1, u2]
@@ -80,7 +80,7 @@ test('handles both native currency and token updates', () => {
   })
 })
 
-test('sets timeout for native currency updates', () => {
+it('sets timeout for native currency updates', () => {
   const setTimeoutSpy = jest.spyOn(global, 'setTimeout')
   const update = RateUpdate('0x000000', AssetType.NativeCurrency)
   ratesManager.handleUpdates([update])
@@ -90,7 +90,7 @@ test('sets timeout for native currency updates', () => {
   setTimeoutSpy.mockRestore() // Clean up spy
 })
 
-test('sets timeout for token updates', () => {
+it('sets timeout for token updates', () => {
   const setTimeoutSpy = jest.spyOn(global, 'setTimeout')
   const update = RateUpdate('0x000', AssetType.Token)
   ratesManager.handleUpdates([update])
@@ -100,7 +100,7 @@ test('sets timeout for token updates', () => {
   setTimeoutSpy.mockRestore()
 })
 
-test('timeout removes native currency rate', () => {
+it('expires a native currency rate after a given period of time', () => {
   const updates = [RateUpdate('0x000000', AssetType.NativeCurrency)]
   ratesManager.handleUpdates(updates)
   jest.advanceTimersByTime(RATES_EXPIRY_TIMEOUT + 1)
@@ -109,7 +109,7 @@ test('timeout removes native currency rate', () => {
   expect(store.removeRate).not.toHaveBeenCalled()
 })
 
-test('timeout removes token rate', () => {
+it('expires a token rate after a given period of time', () => {
   const updates = [RateUpdate('0x000000', AssetType.Token)]
   ratesManager.handleUpdates(updates)
   jest.advanceTimersByTime(RATES_EXPIRY_TIMEOUT + 1)
@@ -118,7 +118,7 @@ test('timeout removes token rate', () => {
   expect(store.removeNativeCurrencyData).not.toHaveBeenCalled()
 })
 
-test('subsequent updates reset timeout', () => {
+it('resets the expiry time when receiving a new rate', () => {
   const update = RateUpdate('0x000000', AssetType.NativeCurrency)
   ratesManager.handleUpdates([update])
   jest.advanceTimersByTime(RATES_EXPIRY_TIMEOUT * 0.9)
@@ -128,7 +128,7 @@ test('subsequent updates reset timeout', () => {
   expect(store.removeNativeCurrencyData).not.toHaveBeenCalled()
 })
 
-test('ignores malformed native currency updates (missing an address)', () => {
+it('ignores malformed native currency updates (missing an address)', () => {
   const update = RateUpdate('0x0000', AssetType.NativeCurrency)
   delete update.id.address
 
@@ -136,7 +136,7 @@ test('ignores malformed native currency updates (missing an address)', () => {
   expect(store.setNativeCurrencyData).not.toHaveBeenCalled()
 })
 
-test('ignores malformed token updates (missing an address)', () => {
+it('ignores token updates with no address', () => {
   const update = RateUpdate('0x0000', AssetType.Token)
   delete update.id.address
 

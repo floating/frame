@@ -2,14 +2,13 @@ import log from 'electron-log'
 import Pylon from '@framelabs/pylon-client'
 
 import store from '../store'
-import Rates from './rates'
-import { BalancesStoreApi } from './balances'
-import { debounce } from '../../resources/utils'
+import RatesSubscriptions from './rates/subscriptions'
 import BalanceScanner from './balances/scanner'
 import processor from './balances/processor'
 import surface from './surface'
+import { BalancesStoreApi } from './balances'
+import { debounce } from '../../resources/utils'
 
-import type { Token } from '../store/state'
 import {
   createAccountsObserver,
   createActiveAccountObserver,
@@ -17,6 +16,8 @@ import {
   createTokensObserver,
   createTrayObserver
 } from './observers'
+
+import type { Token } from '../store/state'
 
 export interface DataScanner {
   close: () => void
@@ -49,7 +50,7 @@ const externalData = function () {
   }
 
   const pylon = new Pylon('wss://data.pylon.link')
-  const rates = Rates(pylon, store)
+  const rates = RatesSubscriptions(pylon)
 
   rates.start()
   surface.updateSubscribers(Object.keys(store('main.accounts')))
