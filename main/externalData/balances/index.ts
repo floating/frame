@@ -1,4 +1,3 @@
-import log from 'electron-log'
 import { NATIVE_CURRENCY } from '../../../resources/constants'
 
 import type { Chain, Balance, Token } from '../../store/state'
