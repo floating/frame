@@ -15,22 +15,23 @@ interface RateUpdate {
   }
 }
 
-interface GatheredUpdates {
-  native: RateUpdate[]
-  token: RateUpdate[]
-}
-
 type Rates = Record<string, UsdRate>
+
+type Identifier = `0x${string}` | `native:${number}`
+
+const toIdentifier = (update: RateUpdate) => {
+  const { chainId, address } = update.id
+  return (address?.toLowerCase() || `native:${chainId}`) as Identifier
+}
 
 const separateUpdates = (updates: RateUpdate[]) => {
   return updates.reduce(
     (acc, update) => {
-      if (!update.id.address) return acc
       return update.id.type === AssetType.NativeCurrency
         ? { ...acc, native: [...acc.native, update] }
         : { ...acc, token: [...acc.token, update] }
     },
-    { native: [], token: [] } as GatheredUpdates
+    { native: [] as RateUpdate[], token: [] as RateUpdate[] }
   )
 }
 
@@ -57,38 +58,19 @@ const storeApi = {
   removeNativeCurrencyRate: (chainId: number) => store.removeNativeCurrencyData('ethereum', chainId)
 }
 
-const timers: Record<Address, NodeJS.Timer> = {}
-
-const startTimeout = (update: RateUpdate) => {
-  const address = (update.id.address as Address).toLowerCase()
-  const { chainId, type } = update.id
-  if (timers[address]) {
-    clearTimeout(timers[address])
-  }
-  timers[address] = setTimeout(() => {
-    log.debug(`rate for token ${address} expired`)
-    removeRate(address, chainId, type)
-    delete timers[address]
-  }, RATES_EXPIRY_TIMEOUT)
-}
-
-const removeRate = (address: string, chainId: number, type: AssetType) => {
-  log.debug('removing rate', { address, chainId, type })
-  if (type === AssetType.NativeCurrency) {
-    storeApi.removeNativeCurrencyRate(chainId)
-  } else {
-    storeApi.removeTokenRate(address)
-  }
-}
+const timeouts: Record<Identifier, NodeJS.Timer> = {}
 
 const handleNativeUpdates = (updates: RateUpdate[]) => {
   log.debug(`got currency rate updates for chains: ${updates.map((u) => u.id.chainId)}`)
   updates.forEach((u) => {
+    const chainIdentifier = toIdentifier(u)
+    clearTimeout(timeouts[chainIdentifier])
     storeApi.setNativeCurrencyRate(u.id.chainId, {
       price: u.data.usd,
       change24hr: u.data.usd_24h_change
     })
-    startTimeout(u)
+    const expiry = setTimeout(() => storeApi.removeNativeCurrencyRate(u.id.chainId), RATES_EXPIRY_TIMEOUT)
+    timeouts[chainIdentifier] = expiry
   })
 }
 
@@ -96,7 +78,12 @@ const handleTokenUpdates = (updates: RateUpdate[]) => {
   log.debug(`got token rate updates for addresses: ${updates.map((u) => u.id.address)}`)
   const rates = gatherTokenRates(updates)
   storeApi.setTokenRates(rates)
-  updates.forEach(startTimeout)
+  updates.forEach((u) => {
+    const address = toIdentifier(u)
+    clearTimeout(timeouts[address])
+    const expiry = setTimeout(() => storeApi.removeTokenRate(address), RATES_EXPIRY_TIMEOUT)
+    timeouts[address] = expiry
+  })
 }
 
 const handleUpdates = (rates: RateUpdate[]) => {
