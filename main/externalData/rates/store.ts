@@ -2,12 +2,11 @@ import log from 'electron-log'
 import { AssetId, AssetType } from '@framelabs/pylon-client/dist/assetId'
 
 import store from '../../store'
-import { RATES_EXPIRY_TIMEOUT } from '../../../resources/constants'
 
 import type { UsdRate } from '../../provider/assets'
 import type { Rate } from '../../store/state'
 
-interface RateUpdate {
+type RateUpdate = {
   id: AssetId
   data: {
     usd: number
@@ -16,16 +15,13 @@ interface RateUpdate {
 }
 
 type Rates = Record<string, UsdRate>
-
 type Identifier = `0x${string}` | `native:${number}`
 
-const toIdentifier = (update: RateUpdate) => {
-  const { chainId, address } = update.id
-  return (address?.toLowerCase() || `native:${chainId}`) as Identifier
-}
+const RATES_EXPIRY = 1000 * 60 * 5 // rates are valid for 5 minutes
+const timeouts: Record<Identifier, NodeJS.Timer> = {}
 
-const separateUpdates = (updates: RateUpdate[]) => {
-  return updates.reduce(
+const separateUpdates = (updates: RateUpdate[]) =>
+  updates.reduce(
     (acc, update) => {
       return update.id.type === AssetType.NativeCurrency
         ? { ...acc, native: [...acc.native, update] }
@@ -33,10 +29,9 @@ const separateUpdates = (updates: RateUpdate[]) => {
     },
     { native: [] as RateUpdate[], token: [] as RateUpdate[] }
   )
-}
 
-const gatherTokenRates = (updates: RateUpdate[]) => {
-  const rates = updates.reduce((rates, update) => {
+const gatherTokenRates = (updates: RateUpdate[]) =>
+  updates.reduce((rates, update) => {
     const address = update.id.address as string
     rates[address] = {
       usd: {
@@ -47,9 +42,6 @@ const gatherTokenRates = (updates: RateUpdate[]) => {
     return rates
   }, {} as Rates)
 
-  return rates
-}
-
 const storeApi = {
   setTokenRates: (rates: Record<Address, UsdRate>) => store.setRates(rates),
   removeTokenRate: (address: Address) => store.removeRate(address),
@@ -58,39 +50,45 @@ const storeApi = {
   removeNativeCurrencyRate: (chainId: number) => store.removeNativeCurrencyData('ethereum', chainId)
 }
 
-const timeouts: Record<Identifier, NodeJS.Timer> = {}
-
-const handleNativeUpdates = (updates: RateUpdate[]) => {
+const handleNativeCurrencyUpdates = (updates: RateUpdate[]) => {
   log.debug(`got currency rate updates for chains: ${updates.map((u) => u.id.chainId)}`)
+
   updates.forEach((u) => {
-    const chainIdentifier = toIdentifier(u)
-    clearTimeout(timeouts[chainIdentifier])
+    const id = `native:${u.id.chainId}` as Identifier
+    const expiry = setTimeout(() => storeApi.removeNativeCurrencyRate(u.id.chainId), RATES_EXPIRY)
+
+    clearTimeout(timeouts[id])
+    timeouts[id] = expiry
+
     storeApi.setNativeCurrencyRate(u.id.chainId, {
       price: u.data.usd,
       change24hr: u.data.usd_24h_change
     })
-    const expiry = setTimeout(() => storeApi.removeNativeCurrencyRate(u.id.chainId), RATES_EXPIRY_TIMEOUT)
-    timeouts[chainIdentifier] = expiry
   })
 }
 
 const handleTokenUpdates = (updates: RateUpdate[]) => {
   log.debug(`got token rate updates for addresses: ${updates.map((u) => u.id.address)}`)
+
   const rates = gatherTokenRates(updates)
   storeApi.setTokenRates(rates)
+
   updates.forEach((u) => {
-    const address = toIdentifier(u)
+    const address = u.id.address as Identifier
+    const expiry = setTimeout(() => storeApi.removeTokenRate(address), RATES_EXPIRY)
+
     clearTimeout(timeouts[address])
-    const expiry = setTimeout(() => storeApi.removeTokenRate(address), RATES_EXPIRY_TIMEOUT)
     timeouts[address] = expiry
   })
 }
 
 const handleUpdates = (rates: RateUpdate[]) => {
   const { token, native } = separateUpdates(rates)
+
   if (native.length) {
-    handleNativeUpdates(native)
+    handleNativeCurrencyUpdates(native)
   }
+
   if (token.length) {
     handleTokenUpdates(token)
   }
