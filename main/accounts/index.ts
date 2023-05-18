@@ -11,7 +11,7 @@ import ExternalDataScanner, { DataScanner } from '../externalData'
 import Signer from '../signers/Signer'
 import { signerCompatibility as transactionCompatibility, maxFee, SignerCompatibility } from '../transaction'
 
-import { weiIntToEthInt, hexToInt } from '../../resources/utils'
+import { weiIntToEthInt, hexToInt, frameOriginId } from '../../resources/utils'
 import { accountPanelCrumb, signerPanelCrumb } from '../../resources/domain/nav'
 import { usesBaseFee, TransactionData, GasFeesSource } from '../../resources/domain/transaction'
 import { findUnavailableSigners, isSignerReady } from '../../resources/domain/signer'
@@ -42,8 +42,6 @@ function notify(title: string, body: string, action: (event: Electron.Event) => 
 
   setTimeout(() => notification.show(), 1000)
 }
-
-const frameOriginId = uuidv5('frame-internal', uuidv5.DNS)
 
 const storeApi = {
   getAccounts: function () {

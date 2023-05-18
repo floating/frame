@@ -1,7 +1,5 @@
 import { EventEmitter } from 'stream'
-import { v5 as uuid } from 'uuid'
-
-const internalOriginId = uuid('frame-internal', uuid.DNS)
+import { frameOriginId } from '../../resources/utils'
 
 class ProviderProxyConnection extends EventEmitter {
   constructor() {
@@ -11,10 +9,11 @@ class ProviderProxyConnection extends EventEmitter {
   }
 
   async send(payload: JSONRPCRequestPayload) {
+    const newPayload = { ...payload, _origin: frameOriginId }
     if (payload.method === 'eth_subscribe') {
-      this.emit('provider:subscribe', { ...payload, _origin: internalOriginId })
+      this.emit('provider:subscribe', newPayload)
     } else {
-      this.emit('provider:send', { ...payload, _origin: internalOriginId })
+      this.emit('provider:send', newPayload)
     }
   }
 
