@@ -53,16 +53,16 @@ const handleNativeCurrencyUpdates = (updates: RateUpdate[]) => {
   log.debug(`got currency rate updates for chains: ${updates.map((u) => u.id.chainId)}`)
 
   updates.forEach((u) => {
+    storeApi.setNativeCurrencyRate(u.id.chainId, {
+      price: u.data.usd,
+      change24hr: u.data.usd_24h_change
+    })
+
     const id = `native:${u.id.chainId}`
     const expiry = setTimeout(() => storeApi.removeNativeCurrencyRate(u.id.chainId), RATES_EXPIRY)
 
     clearTimeout(timeouts[id])
     timeouts[id] = expiry
-
-    storeApi.setNativeCurrencyRate(u.id.chainId, {
-      price: u.data.usd,
-      change24hr: u.data.usd_24h_change
-    })
   })
 }
 
