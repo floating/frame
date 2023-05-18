@@ -284,6 +284,12 @@ module.exports = {
   setNativeCurrencyData: (u, netType, netId, currency) => {
     u('main.networksMeta', netType, netId, 'nativeCurrency', (existing) => ({ ...existing, ...currency }))
   },
+  removeNativeCurrencyRate: (u, netType, netId) => {
+    u('main.networksMeta', netType, netId, 'nativeCurrency', (nativeCurrency) => {
+      delete nativeCurrency['usd']
+      return nativeCurrency
+    })
+  },
   addNetwork: (u, net) => {
     try {
       net.id = validateNetworkSettings(net)
@@ -583,6 +589,12 @@ module.exports = {
   },
   setRates: (u, rates) => {
     u('main.rates', (existingRates = {}) => ({ ...existingRates, ...rates }))
+  },
+  removeRate: (u, contractAddress) => {
+    u('main.rates', (rates = {}) => {
+      delete rates[contractAddress]
+      return rates
+    })
   },
   // Inventory
   setInventory: (u, address, inventory) => {

@@ -2,7 +2,7 @@ import log from 'electron-log'
 import Pylon from '@framelabs/pylon-client'
 
 import store from '../store'
-import Rates from './assets'
+import Rates from './rates'
 import { BalancesStoreApi } from './balances'
 import { debounce } from '../../resources/utils'
 import BalanceScanner from './balances/scanner'

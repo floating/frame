@@ -24,7 +24,9 @@ import {
   updateAccount as updateAccountAction,
   navClearReq as clearNavRequestAction,
   navClearSigner as clearNavSignerAction,
-  updateTypedDataRequest as updateTypedDataAction
+  updateTypedDataRequest as updateTypedDataAction,
+  removeNativeCurrencyRate as removeNativeCurrencyRateAction,
+  removeRate as removeRateAction
 } from '../../../../main/store/actions'
 import { toTokenId } from '../../../../resources/domain/balance'
 
@@ -1405,5 +1407,100 @@ describe('#updateTypedDataRequest', () => {
     })
 
     expect(requests[request].typedMessage.data.oldAttribute).toBeTruthy()
+  })
+})
+
+describe('#removeRate', () => {
+  let rates
+
+  const updaterFn = (node, update) => {
+    expect(node).toBe('main.rates')
+    rates = update(rates)
+  }
+  const removeRate = (address) => removeRateAction(updaterFn, address)
+
+  beforeEach(() => {
+    rates = {
+      '0x4a220e6096b25eadb88358cb44068a3248254675': {
+        usd: {
+          price: 127.37,
+          change24hr: -0.42878216754439036
+        }
+      },
+      '0x6b175474e89094c44da98b954eedeac495271d0f': {
+        usd: {
+          price: 1,
+          change24hr: 0.03304020502546278
+        }
+      }
+    }
+  })
+
+  it('should remove the rate corresponding to the address', () => {
+    removeRate('0x4a220e6096b25eadb88358cb44068a3248254675')
+    expect(rates['0x4a220e6096b25eadb88358cb44068a3248254675']).toBeUndefined()
+  })
+
+  it('should not remove any other rates', () => {
+    removeRate('0x4a220e6096b25eadb88358cb44068a3248254675')
+    expect(rates['0x6b175474e89094c44da98b954eedeac495271d0f']).toBeDefined()
+  })
+})
+
+describe('#removeNativeCurrencyRate', () => {
+  let networksMeta
+
+  const updaterFn = (node, netType, netId, _, update) => {
+    expect(node).toBe('main.networksMeta')
+    expect(netType).toBe('ethereum')
+    expect(netId).toBe(1)
+    networksMeta[netType][netId].nativeCurrency = update(networksMeta[netType][netId].nativeCurrency)
+  }
+  const removeNativeCurrencyRate = (netType, chainId) =>
+    removeNativeCurrencyRateAction(updaterFn, netType, chainId)
+
+  beforeEach(() => {
+    networksMeta = {
+      ethereum: {
+        1: {
+          nativeCurrency: {
+            symbol: 'ETH',
+            usd: {
+              price: 1657.52,
+              change24hr: 1.0143377406589682
+            },
+            decimals: 18
+          }
+        },
+        2: {
+          nativeCurrency: {
+            symbol: 'BOGUS',
+            usd: {
+              price: 1657.52,
+              change24hr: 1.0143377406589682
+            }
+          }
+        }
+      }
+    }
+  })
+
+  it('should remove the usd rate for a given network', () => {
+    removeNativeCurrencyRate('ethereum', 1)
+    expect(networksMeta.ethereum[1].nativeCurrency.usd).toBeUndefined()
+  })
+
+  it('should not remove any other metadata from this network', () => {
+    const {
+      nativeCurrency: { usd, ...nativeCurrency }
+    } = networksMeta.ethereum[1]
+
+    removeNativeCurrencyRate('ethereum', 1)
+    expect(networksMeta.ethereum[1].nativeCurrency).toStrictEqual(nativeCurrency)
+  })
+
+  it('should not remove the usd rate any other networks', () => {
+    removeNativeCurrencyRate('ethereum', 1)
+    expect(networksMeta.ethereum[2].nativeCurrency.usd).toBeDefined()
   })
 })
