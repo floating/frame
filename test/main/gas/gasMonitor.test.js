@@ -1,5 +1,5 @@
 import { intToHex } from '@ethereumjs/util'
-import GasMonitor from '../../../main/transaction/gasMonitor'
+import GasMonitor from '../../../main/gas/gasMonitor'
 
 let requestHandlers
 let testConnection = {

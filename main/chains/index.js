@@ -1,7 +1,6 @@
 // status = Network Mismatch, Not Connected, Connected, Standby, Syncing
 
 const EventEmitter = require('events')
-const { addHexPrefix } = require('@ethereumjs/util')
 const { Hardfork } = require('@ethereumjs/common')
 const provider = require('eth-provider')
 const log = require('electron-log')
@@ -9,17 +8,8 @@ const log = require('electron-log')
 const store = require('../store').default
 const { default: BlockMonitor } = require('./blocks')
 const { default: chainConfig } = require('./config')
-const { default: GasMonitor } = require('../transaction/gasMonitor')
-const { createGasCalculator } = require('./gas')
+const { getGas, eip1559Allowed } = require('../gas')
 const { NETWORK_PRESETS } = require('../../resources/constants')
-
-// These chain IDs are known to not support EIP-1559 and will be forced
-// not to use that mechanism
-// TODO: create a more general chain config that can use the block number
-// and ethereumjs/common to determine the state of various EIPs
-// Note that Arbitrum is in the list because it does not currently charge priority fees
-// https://support.arbitrum.io/hc/en-us/articles/4415963644955-How-the-fees-are-calculated-on-Arbitrum
-const legacyChains = [250, 4002, 42161]
 
 const resError = (error, payload, res) =>
   res({
@@ -37,9 +27,6 @@ class ChainConnection extends EventEmitter {
     // default chain config to istanbul hardfork until a block is received
     // to update it to london
     this.chainConfig = chainConfig(parseInt(this.chainId), 'istanbul')
-
-    // TODO: maybe this can be tied into chain config somehow
-    this.gasCalculator = createGasCalculator(this.chainId)
 
     this.primary = {
       status: 'off',
@@ -83,47 +70,32 @@ class ChainConnection extends EventEmitter {
 
   _createBlockMonitor(provider) {
     const monitor = new BlockMonitor(provider)
-    const allowEip1559 = !legacyChains.includes(parseInt(this.chainId))
 
     monitor.on('data', async (block) => {
       log.debug(`Updating to block ${parseInt(block.number)} for chain ${parseInt(this.chainId)}`)
 
-      let feeMarket = null
+      if ('baseFeePerGas' in block && eip1559Allowed(this.chainId)) {
+        this.chainConfig.setHardforkByBlockNumber(block.number)
 
-      const gasMonitor = new GasMonitor(provider)
-
-      if (allowEip1559 && 'baseFeePerGas' in block) {
-        try {
-          // only consider this an EIP-1559 block if fee market can be loaded
-          const feeHistory = await gasMonitor.getFeeHistory(10, [10])
-          feeMarket = this.gasCalculator.calculateGas(feeHistory)
-
-          this.chainConfig.setHardforkByBlockNumber(block.number)
-
-          if (!this.chainConfig.gteHardfork(Hardfork.London)) {
-            // if baseFeePerGas is present in the block header, the hardfork
-            // must be at least London
-            this.chainConfig.setHardfork(Hardfork.London)
-          }
-        } catch (e) {
-          feeMarket = null
-          // log.error(`could not load EIP-1559 fee market for chain ${this.chainId}`, e)
+        if (!this.chainConfig.gteHardfork(Hardfork.London)) {
+          // if baseFeePerGas is present in the block header, the hardfork
+          // must be at least London
+          this.chainConfig.setHardfork(Hardfork.London)
         }
       }
 
+      const { feeMarket, gasPrice } = await getGas(provider, this.chainId, block)
+
       try {
         if (feeMarket) {
-          const gasPrice = parseInt(feeMarket.maxBaseFeePerGas) + parseInt(feeMarket.maxPriorityFeePerGas)
-
-          store.setGasPrices(this.type, this.chainId, { fast: addHexPrefix(gasPrice.toString(16)) })
+          store.setGasPrices(this.type, this.chainId, gasPrice)
           store.setGasDefault(this.type, this.chainId, 'fast')
         } else {
-          const gas = await gasMonitor.getGasPrices()
           const customLevel = store('main.networksMeta', this.type, this.chainId, 'gas.price.levels.custom')
 
           store.setGasPrices(this.type, this.chainId, {
-            ...gas,
-            custom: customLevel || gas.fast
+            ...gasPrice,
+            custom: customLevel || gasPrice.fast
           })
         }
 
