@@ -1,9 +1,9 @@
-import { addHexPrefix } from '@ethereumjs/util'
+import { addHexPrefix, intToHex } from '@ethereumjs/util'
 import log from 'electron-log'
+import { BigNumber } from 'bignumber.js'
 
 import { Block, createGasCalculator } from './calculator'
 import { Provider } from '../provider'
-import { intToHex } from '@ethereumjs/util'
 import { frameOriginId } from '../../resources/utils'
 
 interface FeeHistoryResponse {
@@ -94,9 +94,8 @@ export async function getGas(provider: Provider, chainId: string, block: Block) 
 
   try {
     if (feeMarket) {
-      // TODO: bignum
-      const gasPriceInt = parseInt(feeMarket.maxBaseFeePerGas) + parseInt(feeMarket.maxPriorityFeePerGas)
-      gasPrice = { fast: addHexPrefix(gasPriceInt.toString(16)) }
+      const gasPriceBN = BigNumber(feeMarket.maxBaseFeePerGas).plus(BigNumber(feeMarket.maxPriorityFeePerGas))
+      gasPrice = { fast: addHexPrefix(gasPriceBN.toString(16)) }
     } else {
       gasPrice = await getGasPrices(provider)
     }
