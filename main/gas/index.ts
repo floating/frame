@@ -1,8 +1,8 @@
 import { addHexPrefix } from '@ethereumjs/util'
 import log from 'electron-log'
 
-import GasMonitor from './gasMonitor'
-import { Block, createGasCalculator } from '../chains/gas'
+import GasMonitor from './monitor'
+import { Block, createGasCalculator } from './calculator'
 import { Provider } from '../provider'
 
 // These chain IDs are known to not support EIP-1559 and will be forced

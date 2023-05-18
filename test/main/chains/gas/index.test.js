@@ -1,5 +1,5 @@
 import { intToHex } from '@ethereumjs/util'
-import { createGasCalculator } from '../../../../main/chains/gas'
+import { createGasCalculator } from '../../../../main/gas/calculator'
 import { gweiToHex } from '../../../util'
 
 describe('#createGasCalculator', () => {
