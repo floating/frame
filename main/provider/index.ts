@@ -17,7 +17,6 @@ import accounts, {
   AddChainRequest,
   AddTokenRequest
 } from '../accounts'
-
 import FrameAccount from '../accounts/Account'
 import Chains, { Chain } from '../chains'
 import reveal from '../reveal'
@@ -28,7 +27,6 @@ import { capitalize } from '../../resources/utils'
 import { ApprovalType } from '../../resources/constants'
 import { createObserver as AssetsObserver, loadAssets } from './assets'
 import { getVersionFromTypedData } from './typedData'
-
 import { Subscription, SubscriptionType, hasSubscriptionPermission } from './subscriptions'
 import {
   checkExistingNonceGas,
@@ -42,7 +40,6 @@ import {
   resError,
   decodeMessage
 } from './helpers'
-
 import {
   createChainsObserver as ChainsObserver,
   createOriginChainObserver as OriginChainObserver,
@@ -57,9 +54,8 @@ import {
   TypedMessage
 } from '../accounts/types'
 import * as sigParser from '../signatures'
-import { hasAddress } from '../../resources/domain/account'
 import { mapRequest } from '../requests'
-
+import { hasAddress } from '../../resources/domain/account'
 import type { Origin, Token } from '../store/state'
 
 interface RequiredApproval {

@@ -20,7 +20,7 @@ interface GasPrices {
   asap: string
 }
 
-async function getFeeHistory(
+export async function getFeeHistory(
   provider: Provider,
   numBlocks: number,
   rewardPercentiles: number[],
@@ -87,7 +87,6 @@ export async function getGas(provider: Provider, chainId: string, block: Block) 
       feeMarket = gasCalculator.calculateGas(feeHistory)
     } catch (e) {
       feeMarket = null
-      // log.error(`could not load EIP-1559 fee market for chain ${this.chainId}`, e)
     }
   }
 
