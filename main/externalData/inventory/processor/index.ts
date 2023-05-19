@@ -30,6 +30,7 @@ export const updateCollections = (account: string, inventory: Inventory) => {
 export const updateItems = (account: string, items: InventoryAsset[]) => {
   const inventory = storeApi.getInventory(account)
   for (const item of items) {
+    if (!item.name) return
     const collection = item.contract.toLowerCase()
     const tokenId = item.tokenId.toLowerCase()
 

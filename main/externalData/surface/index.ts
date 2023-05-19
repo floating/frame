@@ -90,6 +90,14 @@ const toTokenBalance = (b: BalanceItem) => ({
   logoURI: b.image || ''
 })
 
+const toInventoryAsset = (item: CollectionItem): InventoryAsset => ({
+  name: item.name,
+  tokenId: item.tokenId,
+  img: item.image,
+  contract: item.contract,
+  ...(item.link && { externalLink: item.link })
+})
+
 const Surface = () => {
   const Pylon = createPylon('wss://api.pylon.link')
   const subscriptions: Record<string, Subscription> = {}
@@ -222,13 +230,7 @@ const Surface = () => {
         log.debug('Received update for items', { account, items: data })
 
         if (!data.length) return
-        const assets = data.map((item) => ({
-          name: item.name,
-          tokenId: item.tokenId,
-          img: item.image,
-          contract: item.contract,
-          ...(item.link && { externalLink: item.link })
-        }))
+        const assets = data.map(toInventoryAsset)
         updateItems(account, assets)
       },
       onError: (err) => {

@@ -38,17 +38,17 @@ describe('updateCollections', () => {
     // Define an updated inventory with two collections
     const updatedInventory = {
       '0x1': Collection({
-        '1': {} as InventoryAsset,
-        '2': {} as InventoryAsset
+        '1': {},
+        '2': {}
       }),
       '0x2': Collection({
-        '3': {} as InventoryAsset
+        '3': {}
       })
     }
 
     mockExistingInventory = {
       '0x2': Collection({
-        '3': {} as InventoryAsset
+        '3': {}
       })
     }
 
@@ -63,8 +63,8 @@ describe('updateCollections', () => {
     // Define an updated inventory with two collections
     const updatedInventory = {
       '0x1': Collection({
-        '1': {} as InventoryAsset,
-        '2': {} as InventoryAsset
+        '1': {},
+        '2': {}
       })
     }
 
@@ -78,13 +78,13 @@ describe('updateCollections', () => {
     // Define an updated inventory with only one collection
     const updatedInventory = {
       '0x1': Collection({
-        '1': {} as InventoryAsset
+        '1': {}
       })
     }
 
     mockExistingInventory = {
       '0x2': Collection({
-        '3': {} as InventoryAsset
+        '3': {}
       })
     }
 
@@ -98,8 +98,8 @@ describe('updateCollections', () => {
     // Create a new inventory with two items in one collection
     const newInventory = {
       '0x1': Collection({
-        '1': {} as InventoryAsset,
-        '2': {} as InventoryAsset
+        '1': {},
+        '2': {}
       })
     }
 
@@ -108,7 +108,7 @@ describe('updateCollections', () => {
       '0x1': Collection({
         '1': {
           name: 'name'
-        } as InventoryAsset
+        }
       })
     }
 
@@ -131,15 +131,15 @@ describe('updateCollections', () => {
     // Create an existing inventory with two items in one collection
     mockExistingInventory = {
       '0x1': Collection({
-        '1': { name: 'name' } as InventoryAsset,
-        '2': { name: 'otherName' } as InventoryAsset
+        '1': { name: 'name' },
+        '2': { name: 'otherName' }
       })
     }
 
     // Create a new inventory with only one of the items from the existing inventory
     const newInventory = {
       '0x1': Collection({
-        '1': {} as InventoryAsset // Still owned item
+        '1': {} // Still owned item
         // Item '2' is not included, so it's no longer owned
       })
     }
@@ -176,8 +176,8 @@ describe('updateItems', () => {
 
     mockExistingInventory = {
       '0x1': Collection({
-        '1': { contract: '0x1', tokenId: '1', name: 'name' } as InventoryAsset,
-        '2': {} as InventoryAsset
+        '1': { contract: '0x1', tokenId: '1', name: 'name' },
+        '2': {}
       })
     }
 
@@ -198,11 +198,11 @@ describe('updateItems', () => {
         contract: '0x1',
         tokenId: '2',
         name: 'updatedName'
-      } as InventoryAsset
+      }
     ]
     mockExistingInventory = {
       '0x1': Collection({
-        '1': { name: 'oldName' } as InventoryAsset
+        '1': { name: 'oldName' }
       })
     }
 
@@ -219,12 +219,12 @@ describe('updateItems', () => {
         contract: '0x2',
         tokenId: '1',
         name: 'updatedName'
-      } as InventoryAsset
+      }
     ]
 
     mockExistingInventory = {
       '0x1': Collection({
-        '1': { name: 'oldName' } as InventoryAsset
+        '1': { name: 'oldName' }
       })
     }
 

@@ -1,9 +1,16 @@
 type HexAmount = string
 
-type InventoryAsset = {
-  name: string
-  [field: string]: any
-}
+type InventoryAsset =
+  | {
+      name?: undefined
+    }
+  | {
+      name: string
+      tokenId: string
+      img: string
+      contract: string
+      externalLink?: string
+    }
 
 type InventoryCollection = {
   meta: any
