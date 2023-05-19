@@ -440,18 +440,23 @@ class Chains extends EventEmitter {
     const suspendedConnections = []
 
     powerMonitor.on('suspend', (e) => {
+      const toggleConnectionOff = (chainId, node) => {
+        log.debug('Suspending connection', { chainId, node })
+
+        suspendedConnections.push(`${chainId}:${node}`)
+        store.toggleConnection('ethereum', chainId, node, false)
+      }
+
       const networks = store('main.networks.ethereum')
 
       Object.entries(networks).forEach(([chainId, chain]) => {
-        if (chain.connection.primary.on) {
-          suspendedConnections.push(`${chainId}:primary`)
-          store.toggleConnection('ethereum', chainId, 'primary', false)
-        }
+        const nodes = ['primary', 'secondary']
 
-        if (chain.connection.secondary.on) {
-          suspendedConnections.push(`${chainId}:secondary`)
-          store.toggleConnection('ethereum', chainId, 'secondary', false)
-        }
+        nodes.forEach((node) => {
+          if (chain.connection[node].on) {
+            toggleConnectionOff(chainId, node)
+          }
+        })
       })
 
       log.info('System suspending', { suspendedConnections })
