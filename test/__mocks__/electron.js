@@ -1,3 +1,5 @@
+import EventEmitter from 'events'
+
 const dataPaths = {
   userData: './test/.userData'
 }
@@ -10,4 +12,6 @@ const app = {
 
 const setDataPath = (key, path) => (dataPaths[key] = path)
 
-export { app, setDataPath as _setDataPath }
+const powerMonitor = new EventEmitter()
+
+export { app, setDataPath as _setDataPath, powerMonitor }
