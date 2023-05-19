@@ -1,5 +1,6 @@
 // status = Network Mismatch, Not Connected, Connected, Standby, Syncing
 
+const { powerMonitor } = require('electron')
 const EventEmitter = require('events')
 const { addHexPrefix } = require('@ethereumjs/util')
 const { Hardfork } = require('@ethereumjs/common')
@@ -435,6 +436,42 @@ class Chains extends EventEmitter {
   constructor() {
     super()
     this.connections = {}
+
+    const suspendedConnections = []
+
+    powerMonitor.on('suspend', (e) => {
+      const toggleConnectionOff = (chainId, node) => {
+        log.debug('Suspending connection', { chainId, node })
+
+        suspendedConnections.push(`${chainId}:${node}`)
+        store.toggleConnection('ethereum', chainId, node, false)
+      }
+
+      const networks = store('main.networks.ethereum')
+
+      Object.entries(networks).forEach(([chainId, chain]) => {
+        const nodes = ['primary', 'secondary']
+
+        nodes.forEach((node) => {
+          if (chain.connection[node].on) {
+            toggleConnectionOff(chainId, node)
+          }
+        })
+      })
+
+      log.info('System suspending', { suspendedConnections })
+    })
+
+    powerMonitor.on('resume', () => {
+      log.info('System resuming, toggling connections on', { suspendedConnections })
+
+      while (suspendedConnections.length > 0) {
+        const [chainId, node] = suspendedConnections.pop().split(':')
+
+        log.debug('Reconnecting', { chainId, node })
+        store.toggleConnection('ethereum', chainId, node, true)
+      }
+    })
 
     store.observer(() => {
       const networks = store('main.networks')
