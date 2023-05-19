@@ -2,18 +2,6 @@ import log from 'electron-log'
 
 import store from '../../../store'
 
-type InventoryAsset = {
-  name: string
-  [field: string]: any
-}
-
-type InventoryCollection = {
-  meta: any
-  items: Record<string, InventoryAsset>
-}
-
-type Inventory = Record<string, InventoryCollection>
-
 const storeApi = {
   getInventory(account: string) {
     return (store('main.inventory', account.toLowerCase()) || {}) as Inventory
