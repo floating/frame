@@ -3,7 +3,7 @@ import createPylon, { Unsubscribable } from '@framelabs/pylon-api-client'
 
 import Networks from './networks'
 import bProcessor from '../balances/processor'
-import iProcessor from '../inventory/processor'
+import { updateCollections, updateItems } from '../inventory/processor'
 import { TokenBalance } from '../balances/scan'
 import { formatUnits } from 'ethers/lib/utils'
 
@@ -170,7 +170,7 @@ const Surface = () => {
         )
 
         bProcessor.handleBalanceUpdate(address, balances, chainIds, 'snapshot')
-        iProcessor.setInventory(address, inventory)
+        updateCollections(address, inventory)
         networks.update(address, chainIds)
       },
       onError,
@@ -229,7 +229,7 @@ const Surface = () => {
           contract: item.contract,
           ...(item.link && { externalLink: item.link })
         }))
-        iProcessor.updateItems(account, assets)
+        updateItems(account, assets)
       },
       onError: (err) => {
         log.error('Error subscribing to items', { account, items, err })
