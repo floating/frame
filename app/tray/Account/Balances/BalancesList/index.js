@@ -29,14 +29,21 @@ const BalancesList = ({ balances }) => {
         const hidden = hiddenTokens.includes(tokenId)
         return (
           <>
-            <ClusterRow key={chainId + symbol}>
+            <ClusterRow key={chainId + address}>
               <ClusterValue
                 onClick={() => {
                   setOpen(open === i ? -1 : i)
                 }}
               >
                 {hidden && <HiddenOverlay />}
-                <Balance chainId={chainId} symbol={symbol} balance={balance} i={i} scanning={false} />
+                <Balance
+                  key={chainId + address}
+                  chainId={chainId}
+                  symbol={symbol}
+                  balance={balance}
+                  i={i}
+                  scanning={false}
+                />
               </ClusterValue>
             </ClusterRow>
             {i === open &&
