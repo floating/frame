@@ -26,7 +26,7 @@ const Details = ({ address, name }) => {
   return (
     <ClusterRow>
       <ClusterValue
-        pointerEvents={'auto'}
+        pointerEvents={true}
         onClick={() => {
           copyAddress()
         }}
