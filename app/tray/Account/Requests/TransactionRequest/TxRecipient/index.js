@@ -34,7 +34,7 @@ class TxRecipient extends React.Component {
         <Cluster>
           <ClusterRow>
             <ClusterValue
-              pointerEvents={true}
+              pointer={true}
               onClick={() => {
                 this.copyAddress(address)
               }}

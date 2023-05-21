@@ -254,7 +254,7 @@ class ChainSummaryComponent extends Component {
         </ClusterRow>
         {this.state.expanded && (
           <ClusterRow>
-            <ClusterValue pointerEvents={true}>
+            <ClusterValue pointer={true}>
               <div className='sliceGasBlock'>
                 {displayFeeMarket ? (
                   <GasFeesMarket gasPrice={gasPrice} fees={fees} color={this.props.color} />

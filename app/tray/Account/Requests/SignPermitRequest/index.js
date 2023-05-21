@@ -74,7 +74,7 @@ const PermitOverview = ({ req, chainData, originName }) => {
               {tokenData && (
                 <>
                   <ClusterRow>
-                    <ClusterValue pointerEvents={true} onClick={() => copySpender()}>
+                    <ClusterValue pointer={true} onClick={() => copySpender()}>
                       <div className='clusterAddress'>
                         <span className='clusterAddressRecipient'>
                           {spender.ens || (

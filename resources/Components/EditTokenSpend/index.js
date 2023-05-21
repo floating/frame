@@ -26,7 +26,7 @@ const Details = ({ address, name }) => {
   return (
     <ClusterRow>
       <ClusterValue
-        pointerEvents={true}
+        pointer={true}
         onClick={() => {
           copyAddress()
         }}
@@ -162,7 +162,7 @@ const EditTokenSpend = ({
             </ClusterValue>
           </ClusterRow>
           <ClusterRow>
-            <ClusterValue transparent={true} pointerEvents={'auto'}>
+            <ClusterValue transparent={true} pointer={true}>
               <div className='approveTokenSpendAmount'>
                 {isCustom && amount !== fromDecimal(custom) ? (
                   <div

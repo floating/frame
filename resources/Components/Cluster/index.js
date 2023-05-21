@@ -105,7 +105,7 @@ export const ClusterValue = styled.div`
   margin-top: 1px;
 
   ${(props) => {
-    return props.pointerEvents
+    return props.pointer
       ? css`
           * {
             pointer-events: auto;
@@ -120,7 +120,7 @@ export const ClusterValue = styled.div`
 
   ${(props) => {
     return (
-      (props.onClick || props.pointerEvents) &&
+      (props.onClick || props.pointer) &&
       css`
         cursor: pointer;
         margin-bottom: 0px;

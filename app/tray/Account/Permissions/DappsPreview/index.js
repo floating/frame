@@ -60,7 +60,7 @@ class DappsPermissionsPreview extends React.Component {
             permissionList.map((o) => {
               return (
                 <ClusterRow key={o}>
-                  <ClusterValue pointerEvents={true}>
+                  <ClusterValue pointer={true}>
                     <div className='signerPermission'>
                       <div className='signerPermissionControls'>
                         <div className='signerPermissionOrigin'>{permissions[o].origin}</div>
