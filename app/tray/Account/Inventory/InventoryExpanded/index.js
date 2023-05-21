@@ -3,6 +3,7 @@ import Restore from 'react-restore'
 import link from '../../../../../resources/link'
 
 import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../resources/Components/Cluster'
+import CollectionList from '../CollectionList'
 
 class Inventory extends React.Component {
   constructor(...args) {
@@ -69,7 +70,7 @@ class Inventory extends React.Component {
         <ClusterBox style={{ marginTop: '20px' }}>
           <Cluster>
             {collections.length ? (
-              this.renderInventoryList()
+              <CollectionList {...this.props} collections={this.displayCollections()} />
             ) : inventory ? (
               <ClusterRow>
                 <ClusterValue>

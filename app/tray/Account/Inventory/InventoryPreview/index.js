@@ -6,6 +6,8 @@ import { matchFilter } from '../../../../../resources/utils'
 
 import { Cluster, ClusterRow, ClusterValue } from '../../../../../resources/Components/Cluster'
 
+import CollectionList from '../CollectionList'
+
 class Inventory extends React.Component {
   constructor(...args) {
     super(...args)
@@ -52,42 +54,7 @@ class Inventory extends React.Component {
         return 0
       })
       .filter((c) => this.isFilterMatch(c))
-      .slice(0, 6)
-  }
-
-  renderInventoryList() {
-    const inventory = this.store('main.inventory', this.props.account)
-    const displayCollections = this.displayCollections()
-    return displayCollections.map((k) => {
-      const {
-        meta: { name, itemCount }
-      } = inventory[k]
-      return (
-        <ClusterRow key={k}>
-          <ClusterValue
-            onClick={() => {
-              const crumb = {
-                view: 'expandedModule',
-                data: {
-                  id: this.props.moduleId,
-                  account: this.props.account,
-                  currentCollection: k
-                }
-              }
-              link.send('nav:forward', 'panel', crumb)
-            }}
-          >
-            <div key={k} className='inventoryCollection'>
-              <div className='inventoryCollectionTop'>
-                <div className='inventoryCollectionName'>{name}</div>
-                <div className='inventoryCollectionCount'>{itemCount}</div>
-                <div className='inventoryCollectionLine' />
-              </div>
-            </div>
-          </ClusterValue>
-        </ClusterRow>
-      )
-    })
+      .slice(0, 5)
   }
 
   render() {
@@ -103,7 +70,7 @@ class Inventory extends React.Component {
         </div>
         <Cluster>
           {collections.length ? (
-            this.renderInventoryList()
+            <CollectionList {...this.props} collections={this.displayCollections()} />
           ) : inventory ? (
             <ClusterRow>
               <ClusterValue>

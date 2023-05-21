@@ -5,12 +5,9 @@
   position relative
   -webkit-app-region no-drag
   transition none
-  pointer-events auto
   transform translate3d(0, 0, 0)
   border 2px solid var(--outerspace)
   background var(--ghostB)
-  *
-    pointer-events none
 
   .ringIconInner
     position absolute
@@ -25,6 +22,9 @@
     background var(--outerspace)
     overflow hidden
     color var(--ghostB)
+
+    canvas
+      opacity 0
 
     img
       object-fit cover
@@ -60,3 +60,14 @@
   .ringIconInner
     background transparent
     border-radius 0px
+
+.ringIconNFT
+  background transparent
+  .ringIconInner
+    background var(--ghostB)
+    img
+      max-height 27px
+      min-height 27px
+      max-width 27px
+      min-width 27px
+      border-radius 15px
