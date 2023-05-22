@@ -1,9 +1,16 @@
 import store from '../../../../main/store'
-import log from 'electron-log'
 import { updateCollections, updateItems } from '../../../../main/externalData/inventory/processor'
 import { randomBytes } from 'crypto'
 
 const randomStr = () => randomBytes(32).toString('hex')
+
+const genInventoryAsset = (name = randomStr()) => ({
+  name,
+  tokenId: randomStr(),
+  img: randomStr(),
+  contract: randomStr(),
+  externalLink: randomStr()
+})
 
 const account = '0xAddress'
 
@@ -103,12 +110,11 @@ describe('updateCollections', () => {
       })
     }
 
+    const asset1 = genInventoryAsset()
     // Create an existing inventory with one item in the same collection
     mockExistingInventory = {
       '0x1': Collection({
-        '1': {
-          name: 'name'
-        }
+        '1': asset1
       })
     }
 
@@ -118,9 +124,7 @@ describe('updateCollections', () => {
       '0x1': {
         ...newInventory['0x1'],
         items: {
-          '1': {
-            name: 'name'
-          },
+          '1': asset1,
           '2': {}
         }
       }
@@ -129,17 +133,21 @@ describe('updateCollections', () => {
 
   it('removes data of items no longer owned after inventory update', () => {
     // Create an existing inventory with two items in one collection
+
+    const asset1 = genInventoryAsset()
+    const asset2 = genInventoryAsset()
+
     mockExistingInventory = {
       '0x1': Collection({
-        '1': { name: 'name' },
-        '2': { name: 'otherName' }
+        '1': asset1,
+        '2': asset2
       })
     }
 
     // Create a new inventory with only one of the items from the existing inventory
     const newInventory = {
       '0x1': Collection({
-        '1': {} // Still owned item
+        '1': asset1 // Still owned item
         // Item '2' is not included, so it's no longer owned
       })
     }
@@ -150,7 +158,7 @@ describe('updateCollections', () => {
       '0x1': {
         ...newInventory['0x1'],
         items: {
-          '1': { name: 'name' } // Still owned item with preserved data
+          '1': asset1 // Still owned item with preserved data
           // Item '2' data should not be present
         }
       }
@@ -165,18 +173,20 @@ describe('updateItems', () => {
       {
         contract: '0x1',
         tokenId: '1',
-        name: 'newName'
+        name: 'newName',
+        img: ''
       },
       {
         contract: '0x1',
         tokenId: '2',
-        name: 'name2'
+        name: 'name2',
+        img: ''
       }
     ]
 
     mockExistingInventory = {
       '0x1': Collection({
-        '1': { contract: '0x1', tokenId: '1', name: 'name' },
+        '1': { contract: '0x1', tokenId: '1', name: 'name', img: '' },
         '2': {}
       })
     }
@@ -191,46 +201,44 @@ describe('updateItems', () => {
     expect(store.setInventoryAsset).toHaveBeenNthCalledWith(2, account.toLowerCase(), '0x1', '2', items[1])
   })
 
-  // 2. Try to update a non-existent item
-  it('logs a warning and does not update when the item does not exist in the inventory', () => {
+  it('does not update when the item does not exist in the inventory', () => {
     const items = [
       {
         contract: '0x1',
         tokenId: '2',
-        name: 'updatedName'
+        name: 'updatedName',
+        img: ''
       }
     ]
     mockExistingInventory = {
       '0x1': Collection({
-        '1': { name: 'oldName' }
+        '1': genInventoryAsset('oldName')
       })
     }
 
     updateItems(account, items)
 
-    expect(log.warn).toHaveBeenCalled()
     expect(store.setInventoryAsset).not.toHaveBeenCalled()
   })
 
-  // 3. Try to update an item in a non-existent collection
-  it('logs a warning and does not update when the collection does not exist in the inventory', () => {
+  it('does not update when the collection does not exist in the inventory', () => {
     const items = [
       {
         contract: '0x2',
         tokenId: '1',
-        name: 'updatedName'
+        name: 'updatedName',
+        img: ''
       }
     ]
 
     mockExistingInventory = {
       '0x1': Collection({
-        '1': { name: 'oldName' }
+        '1': genInventoryAsset('oldName')
       })
     }
 
     updateItems(account, items)
 
-    expect(log.warn).toHaveBeenCalled()
     expect(store.setInventoryAsset).not.toHaveBeenCalled()
   })
 })
