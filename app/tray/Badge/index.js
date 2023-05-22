@@ -11,21 +11,26 @@ class Bridge extends React.Component {
         <div className='badgeWrap'>
           <div className='badge cardShow' style={{ transform: 'translateY(0px)', height: '196px' }}>
             <div className='badgeInner'>
-              <div className='badgeMessage'>Your update is ready, relaunch Frame to switch</div>
+              <div className='badgeMessage'>Your update is ready, restart Frame to switch?</div>
               <div className='badgeInput'>
                 <div className='badgeInputButton'>
                   <div
                     className='badgeInputInner'
-                    onMouseDown={() => link.send('tray:action', 'updateBadge', '')}
+                    onMouseDown={() => link.send('tray:updateRestart')}
+                    style={{ color: 'var(--good)' }}
                   >
-                    Ok
+                    Restart Now
                   </div>
                 </div>
               </div>
               <div className='badgeInput'>
                 <div className='badgeInputButton'>
-                  <div className='badgeInputInner' onMouseDown={() => link.send('tray:updateRestart')}>
-                    Relaunch Now
+                  <div
+                    className='badgeInputInner'
+                    onMouseDown={() => link.send('tray:action', 'updateBadge', '')}
+                    style={{ color: 'var(--moon)' }}
+                  >
+                    Restart Later
                   </div>
                 </div>
               </div>
