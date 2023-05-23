@@ -80,7 +80,7 @@ export const eip1559Allowed = (chainId: number) => !legacyChains.includes(chainI
 class DefaultGas {
   protected chainId: number
   protected provider: Provider
-  protected feeMarket: GasFees = null
+  protected feeMarket: GasFees | null = null
 
   constructor(chainId: number, provider: Provider) {
     this.chainId = chainId
