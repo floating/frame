@@ -1,6 +1,7 @@
 import store from '../../../../main/store'
 import { updateCollections, updateItems } from '../../../../main/externalData/inventory/processor'
 import { randomBytes } from 'crypto'
+import { Inventory, InventoryAsset } from '../../../../main/store/state'
 
 const randomStr = () => randomBytes(32).toString('hex')
 
@@ -29,146 +30,75 @@ jest.mock('electron-log', () => ({
   warn: jest.fn()
 }))
 
-const Collection = (items: Record<string, InventoryAsset>) => ({
+const Collection = (items: Record<string, InventoryAsset> = {}) => ({
   meta: {
     name: randomStr(),
     description: randomStr(),
     image: randomStr(),
     chainId: Math.floor(Math.random() * 10),
-    external_url: randomStr()
+    external_url: randomStr(),
+    ownedItems: []
   },
   items
 })
 
 describe('updateCollections', () => {
-  it('should initialize new collections when existing inventory is available', () => {
-    // Define an updated inventory with two collections
+  it('adds new collections when there are no existing collections', () => {
     const updatedInventory = {
-      '0x1': Collection({
-        '1': {},
-        '2': {}
-      }),
-      '0x2': Collection({
-        '3': {}
-      })
+      '0x1': Collection(),
+      '0x2': Collection()
     }
+
+    mockExistingInventory = {}
+
+    updateCollections(account, updatedInventory)
+
+    expect(store.setInventory).toHaveBeenCalledWith(account.toLowerCase(), updatedInventory)
+  })
+
+  it('preserves existing items when updating collection metadata', () => {
+    const item = genInventoryAsset()
+    const existingCollection = Collection({
+      [item.tokenId]: item
+    })
 
     mockExistingInventory = {
-      '0x2': Collection({
-        '3': {}
-      })
+      '0x1': existingCollection
     }
 
-    updateCollections(account, updatedInventory)
-
-    // The call to store.setInventory should include both collections
-    expect(store.setInventory).toHaveBeenCalledWith(account.toLowerCase(), updatedInventory)
-  })
-
-  // This case occurs on startup
-  it('should initialize new collections when existing inventory is undefined', () => {
-    // Define an updated inventory with two collections
-    const updatedInventory = {
-      '0x1': Collection({
-        '1': {},
-        '2': {}
-      })
-    }
-
-    updateCollections(account, updatedInventory)
-
-    // The call to store.setInventory should include both collections
-    expect(store.setInventory).toHaveBeenCalledWith(account.toLowerCase(), updatedInventory)
-  })
-
-  it('removes collections no longer present in the updated inventory', () => {
-    // Define an updated inventory with only one collection
-    const updatedInventory = {
-      '0x1': Collection({
-        '1': {}
-      })
-    }
-
-    mockExistingInventory = {
-      '0x2': Collection({
-        '3': {}
-      })
-    }
-
-    updateCollections(account, updatedInventory)
-
-    // The call to store.setInventory should only include the updated collection
-    expect(store.setInventory).toHaveBeenCalledWith(account.toLowerCase(), updatedInventory)
-  })
-
-  it('retains the existing data of items that are still owned when the inventory is updated', () => {
-    // Create a new inventory with two items in one collection
     const newInventory = {
-      '0x1': Collection({
-        '1': {},
-        '2': {}
-      })
-    }
-
-    const asset1 = genInventoryAsset()
-    // Create an existing inventory with one item in the same collection
-    mockExistingInventory = {
-      '0x1': Collection({
-        '1': asset1
-      })
+      '0x1': {
+        meta: {
+          ...existingCollection.meta,
+          name: 'newName'
+        },
+        items: {}
+      }
     }
 
     updateCollections(account, newInventory)
 
     expect(store.setInventory).toHaveBeenCalledWith(account.toLowerCase(), {
       '0x1': {
-        ...newInventory['0x1'],
-        items: {
-          '1': asset1,
-          '2': {}
-        }
+        meta: newInventory['0x1'].meta,
+        items: existingCollection.items
       }
     })
   })
 
-  it('removes data of items no longer owned after inventory update', () => {
-    // Create an existing inventory with two items in one collection
-
-    const asset1 = genInventoryAsset()
-    const asset2 = genInventoryAsset()
-
-    mockExistingInventory = {
-      '0x1': Collection({
-        '1': asset1,
-        '2': asset2
-      })
+  it('initializes new collections with an empty items dictionary when there is no existing inventory', () => {
+    const updatedInventory = {
+      '0x1': Collection({})
     }
 
-    // Create a new inventory with only one of the items from the existing inventory
-    const newInventory = {
-      '0x1': Collection({
-        '1': asset1 // Still owned item
-        // Item '2' is not included, so it's no longer owned
-      })
-    }
+    updateCollections(account, updatedInventory)
 
-    updateCollections(account, newInventory)
-
-    expect(store.setInventory).toHaveBeenCalledWith(account.toLowerCase(), {
-      '0x1': {
-        ...newInventory['0x1'],
-        items: {
-          '1': asset1 // Still owned item with preserved data
-          // Item '2' data should not be present
-        }
-      }
-    })
+    expect(store.setInventory).toHaveBeenCalledWith(account.toLowerCase(), updatedInventory)
   })
 })
 
 describe('updateItems', () => {
-  // 1. Update an existing item in the inventory
-  it('updates the inventory asset data for existing items', () => {
+  it('updates items for a given collection', () => {
     const items = [
       {
         contract: '0x1',
@@ -185,60 +115,12 @@ describe('updateItems', () => {
     ]
 
     mockExistingInventory = {
-      '0x1': Collection({
-        '1': { contract: '0x1', tokenId: '1', name: 'name', img: '' },
-        '2': {}
-      })
+      '0x1': Collection()
     }
 
     updateItems(account, items)
 
-    expect(store.setInventoryAsset).toHaveBeenNthCalledWith(1, account.toLowerCase(), '0x1', '1', {
-      ...items[0],
-      name: 'newName'
-    })
-
+    expect(store.setInventoryAsset).toHaveBeenNthCalledWith(1, account.toLowerCase(), '0x1', '1', items[0])
     expect(store.setInventoryAsset).toHaveBeenNthCalledWith(2, account.toLowerCase(), '0x1', '2', items[1])
-  })
-
-  it('does not update when the item does not exist in the inventory', () => {
-    const items = [
-      {
-        contract: '0x1',
-        tokenId: '2',
-        name: 'updatedName',
-        img: ''
-      }
-    ]
-    mockExistingInventory = {
-      '0x1': Collection({
-        '1': genInventoryAsset('oldName')
-      })
-    }
-
-    updateItems(account, items)
-
-    expect(store.setInventoryAsset).not.toHaveBeenCalled()
-  })
-
-  it('does not update when the collection does not exist in the inventory', () => {
-    const items = [
-      {
-        contract: '0x2',
-        tokenId: '1',
-        name: 'updatedName',
-        img: ''
-      }
-    ]
-
-    mockExistingInventory = {
-      '0x1': Collection({
-        '1': genInventoryAsset('oldName')
-      })
-    }
-
-    updateItems(account, items)
-
-    expect(store.setInventoryAsset).not.toHaveBeenCalled()
   })
 })

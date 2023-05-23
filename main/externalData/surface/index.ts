@@ -2,10 +2,11 @@ import log from 'electron-log'
 import createPylon, { Unsubscribable } from '@framelabs/pylon-api-client'
 
 import Networks from './networks'
-import bProcessor from '../balances/processor'
+import { handleBalanceUpdate } from '../balances/processor'
 import { updateCollections, updateItems } from '../inventory/processor'
 import { TokenBalance } from '../balances/scan'
 import { formatUnits } from 'ethers/lib/utils'
+import { Inventory, InventoryAsset, InventoryCollection } from '../../store/state'
 
 type Subscription = Unsubscribable & { unsubscribables: Unsubscribable[]; collectionItems: CollectionItem[] }
 
@@ -56,22 +57,14 @@ const toMeta = (collection: CollectionMetdata): InventoryCollection['meta'] => {
     description: collection.description,
     image: collection.image,
     chainId: collection.chainId,
-    external_url: ''
+    external_url: '',
+    ownedItems: collection.ownedItems
   }
-}
-
-const toItems = (collection: CollectionMetdata): InventoryCollection['items'] => {
-  return collection.ownedItems.reduce((items, item) => {
-    return {
-      ...items,
-      [item]: {}
-    }
-  }, {})
 }
 
 const toInventoryCollection = (collection: CollectionMetdata): InventoryCollection => {
   const meta = toMeta(collection)
-  const items = toItems(collection)
+  const items = {}
 
   return {
     meta,
@@ -177,7 +170,7 @@ const Surface = () => {
           [[] as number[], [] as TokenBalance[], {} as Inventory]
         )
 
-        bProcessor.handleBalanceUpdate(address, balances, chainIds, 'snapshot')
+        handleBalanceUpdate(address, balances, chainIds, 'snapshot')
         updateCollections(address, inventory)
         networks.update(address, chainIds)
       },

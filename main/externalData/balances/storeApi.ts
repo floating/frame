@@ -1,8 +1,9 @@
 import { NATIVE_CURRENCY } from '../../../resources/constants'
+import store from '../../store'
 
 import type { Chain, Balance, Token } from '../../store/state'
 
-export const BalancesStoreApi = (store: Store) => ({
+export const storeApi = {
   getActiveAddress: () => (store('selected.current') || '') as Address,
   getNetwork: (id: number) => (store('main.networks.ethereum', id) || {}) as Chain,
   getNativeCurrencySymbol: (id: number) =>
@@ -36,4 +37,4 @@ export const BalancesStoreApi = (store: Store) => ({
   getTrayOpened: () => store('tray.open'),
   getAccounts: () => Object.keys(store('main.accounts') || {})
   // store('main.pylonEnabled') as Boolean //TODO: need to add pylonEnabled to store zod def...
-})
+}

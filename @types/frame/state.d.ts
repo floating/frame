@@ -1,24 +1,5 @@
 type HexAmount = string
 
-type InventoryAsset =
-  | {
-      name?: undefined
-    }
-  | {
-      name: string
-      tokenId: string
-      img: string
-      contract: string
-      externalLink?: string
-    }
-
-type InventoryCollection = {
-  meta: any
-  items: Record<string, InventoryAsset>
-}
-
-type Inventory = Record<string, InventoryCollection>
-
 interface ViewMetadata {
   id: string
   ready: boolean

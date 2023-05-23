@@ -1,6 +1,7 @@
 import log from 'electron-log'
 
 import store from '../../../store'
+import { Inventory, InventoryAsset } from '../../../store/state'
 
 const storeApi = {
   getInventory(account: string) {
@@ -17,11 +18,10 @@ const storeApi = {
 export const updateCollections = (account: string, inventory: Inventory) => {
   const existingInventory = storeApi.getInventory(account)
 
-  for (const [contractAddress, { items }] of Object.entries(inventory)) {
-    for (const tokenId of Object.keys(items)) {
-      const tokenData = existingInventory[contractAddress]?.items[tokenId]
-      inventory[contractAddress].items[tokenId] = { ...tokenData }
-    }
+  for (const contractAddress of Object.keys(inventory)) {
+    const existingCollection = existingInventory[contractAddress]
+    const items = existingCollection?.items || {}
+    inventory[contractAddress].items = items
   }
 
   storeApi.setInventory(account, inventory)
@@ -36,11 +36,6 @@ export const updateItems = (account: string, items: InventoryAsset[]) => {
 
     if (!inventory[collection]) {
       log.warn('collection not found', { inventory })
-      return
-    }
-
-    if (!inventory[collection].items[tokenId]) {
-      log.warn('tokenId not found', { inventory })
       return
     }
 

@@ -21,6 +21,7 @@ export type { NativeCurrency } from './types/nativeCurrency'
 export type { Gas, GasFees } from './types/gas'
 export type { Rate } from './types/rate'
 export type { ColorwayPalette } from './types/colors'
+export type { InventoryAsset, InventoryCollection, Inventory } from './types/inventory'
 
 const StateSchema = z.object({
   main: MainSchema

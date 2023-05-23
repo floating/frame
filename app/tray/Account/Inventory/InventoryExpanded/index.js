@@ -30,6 +30,9 @@ class Inventory extends React.Component {
     const inventory = this.store('main.inventory', this.props.account)
     const displayCollections = this.displayCollections()
     return displayCollections.map((k) => {
+      const {
+        meta: { name, ownedItems }
+      } = inventory[k]
       return (
         <ClusterRow key={k}>
           <ClusterValue
@@ -47,8 +50,8 @@ class Inventory extends React.Component {
           >
             <div key={k} className='inventoryCollection'>
               <div className='inventoryCollectionTop'>
-                <div className='inventoryCollectionName'>{inventory[k].meta.name || k}</div>
-                <div className='inventoryCollectionCount'>{Object.keys(inventory[k].items).length}</div>
+                <div className='inventoryCollectionName'>{name || k}</div>
+                <div className='inventoryCollectionCount'>{ownedItems.length}</div>
                 <div className='inventoryCollectionLine' />
               </div>
             </div>

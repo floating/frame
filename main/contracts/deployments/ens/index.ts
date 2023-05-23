@@ -13,6 +13,7 @@ import type {
 
 import type { JsonFragment } from '@ethersproject/abi'
 import type { DecodableContract } from '../../../transaction/actions'
+import { InventoryCollection } from '../../../store/state'
 
 // TODO: fix typing on contract types
 type EnsContract = DecodableContract<unknown>
@@ -57,7 +58,7 @@ function getNameForTokenId(account: string, tokenId: string) {
   const ensInventory: InventoryCollection = store('main.inventory', account, 'ens') || {}
   const items = ensInventory.items || {}
 
-  const record = Object.values(items).find((ens) => ens.name && ens.tokenId === tokenId) || { name: '' }
+  const record = Object.values(items).find((ens) => ens.tokenId === tokenId) || { name: '' }
 
   return record.name
 }
