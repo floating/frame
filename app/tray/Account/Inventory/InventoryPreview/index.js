@@ -45,8 +45,8 @@ class Inventory extends React.Component {
     const collections = Object.keys(inventory || {})
     return collections
       .sort((a, b) => {
-        const assetsLengthA = inventory[a].meta.ownedItems.length
-        const assetsLengthB = inventory[b].meta.ownedItems.length
+        const assetsLengthA = inventory[a].meta.itemCount
+        const assetsLengthB = inventory[b].meta.itemCount
         if (assetsLengthA > assetsLengthB) return -1
         if (assetsLengthA < assetsLengthB) return 1
         return 0
@@ -60,7 +60,7 @@ class Inventory extends React.Component {
     const displayCollections = this.displayCollections()
     return displayCollections.map((k) => {
       const {
-        meta: { name, ownedItems }
+        meta: { name, itemCount }
       } = inventory[k]
       return (
         <ClusterRow key={k}>
@@ -80,7 +80,7 @@ class Inventory extends React.Component {
             <div key={k} className='inventoryCollection'>
               <div className='inventoryCollectionTop'>
                 <div className='inventoryCollectionName'>{name}</div>
-                <div className='inventoryCollectionCount'>{ownedItems.length}</div>
+                <div className='inventoryCollectionCount'>{itemCount}</div>
                 <div className='inventoryCollectionLine' />
               </div>
             </div>

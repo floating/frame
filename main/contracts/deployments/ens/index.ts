@@ -13,7 +13,7 @@ import type {
 
 import type { JsonFragment } from '@ethersproject/abi'
 import type { DecodableContract } from '../../../transaction/actions'
-import { InventoryCollection } from '../../../store/state'
+import type { InventoryCollection } from '../../../store/state'
 
 // TODO: fix typing on contract types
 type EnsContract = DecodableContract<unknown>

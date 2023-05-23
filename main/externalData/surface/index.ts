@@ -6,11 +6,11 @@ import { handleBalanceUpdate } from '../balances/processor'
 import { updateCollections, updateItems } from '../inventory/processor'
 import { TokenBalance } from '../balances/scan'
 import { formatUnits } from 'ethers/lib/utils'
-import { Inventory, InventoryAsset, InventoryCollection } from '../../store/state'
+
+import type { Inventory } from '../../store/state'
 
 type Subscription = Unsubscribable & { unsubscribables: Unsubscribable[]; collectionItems: CollectionItem[] }
 
-//TODO: do we need to export these from surface?...
 type ItemCollectionId = {
   contract: string
   chainId: number
@@ -45,32 +45,20 @@ interface CollectionItem {
   image: string
   description: string
 }
-interface CollectionItem {
-  contract: string
-  chainId: number
-  tokenId: string
-}
 
-const toMeta = (collection: CollectionMetdata): InventoryCollection['meta'] => {
-  return {
-    name: collection.name,
-    description: collection.description,
-    image: collection.image,
-    chainId: collection.chainId,
-    external_url: '',
-    ownedItems: collection.ownedItems
-  }
-}
+const toMeta = (collection: CollectionMetdata) => ({
+  name: collection.name,
+  description: collection.description,
+  image: collection.image,
+  chainId: collection.chainId,
+  external_url: '',
+  itemCount: collection.ownedItems.length
+})
 
-const toInventoryCollection = (collection: CollectionMetdata): InventoryCollection => {
-  const meta = toMeta(collection)
-  const items = {}
-
-  return {
-    meta,
-    items
-  }
-}
+const toInventoryCollection = (collection: CollectionMetdata) => ({
+  meta: toMeta(collection),
+  items: {}
+})
 
 const toTokenBalance = (b: BalanceItem) => ({
   address: b.contract.toLowerCase(),
@@ -83,7 +71,7 @@ const toTokenBalance = (b: BalanceItem) => ({
   logoURI: b.image || ''
 })
 
-const toInventoryAsset = (item: CollectionItem): InventoryAsset => ({
+const toInventoryAsset = (item: CollectionItem) => ({
   name: item.name,
   tokenId: item.tokenId,
   img: item.image,

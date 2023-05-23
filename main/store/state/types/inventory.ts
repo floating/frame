@@ -1,6 +1,5 @@
 import { z } from 'zod'
 
-// Schema for InventoryAsset
 const InventoryAssetSchema = z.object({
   name: z.string(),
   tokenId: z.string(),
@@ -9,7 +8,6 @@ const InventoryAssetSchema = z.object({
   externalLink: z.string().optional()
 })
 
-// Schema for InventoryCollection
 const InventoryCollectionSchema = z.object({
   meta: z.object({
     name: z.string(),
@@ -17,12 +15,11 @@ const InventoryCollectionSchema = z.object({
     image: z.string(),
     chainId: z.number(),
     external_url: z.string().optional(),
-    ownedItems: z.array(z.string())
+    itemCount: z.number().default(0)
   }),
   items: z.record(InventoryAssetSchema)
 })
 
-// Schema for Inventory
 const InventorySchema = z.record(InventoryCollectionSchema)
 
 export type InventoryAsset = z.infer<typeof InventoryAssetSchema>
