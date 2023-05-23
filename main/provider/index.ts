@@ -23,7 +23,7 @@ import Chains, { Chain } from '../chains'
 import reveal from '../reveal'
 import { getSignerType, Type as SignerType } from '../../resources/domain/signer'
 import { normalizeChainId, TransactionData } from '../../resources/domain/transaction'
-import { populate as populateTransaction, maxFee, classifyTransaction } from '../transaction'
+import { populate as populateTransaction, classifyTransaction } from '../transaction'
 import { capitalize } from '../../resources/utils'
 import { ApprovalType } from '../../resources/constants'
 import { createObserver as AssetsObserver, loadAssets } from './assets'
@@ -61,6 +61,7 @@ import { hasAddress } from '../../resources/domain/account'
 import { mapRequest } from '../requests'
 
 import type { Origin, Token } from '../store/state'
+import { getMaxTotalFee } from '../../resources/gas'
 
 interface RequiredApproval {
   type: ApprovalType
@@ -307,7 +308,7 @@ export class Provider extends EventEmitter {
     }
 
     const payload = req.payload
-    const maxTotalFee = maxFee(rawTx)
+    const maxTotalFee = getMaxTotalFee(rawTx)
 
     if (feeTotalOverMax(rawTx, maxTotalFee)) {
       const chainId = parseInt(rawTx.chainId)
