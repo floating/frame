@@ -1,11 +1,5 @@
 import { intToHex } from '@ethereumjs/util'
 
-import type { GasFees } from '../store/state'
-
-interface GasCalculator {
-  calculateGas: (blocks: Block[]) => GasFees
-}
-
 type RawGasFees = {
   nextBaseFee: number
   maxBaseFeePerGas: number
@@ -19,7 +13,7 @@ export type Block = {
   gasUsedRatio: number
 }
 
-function feesToHex(fees: RawGasFees) {
+export function feesToHex(fees: RawGasFees) {
   return {
     nextBaseFee: intToHex(fees.nextBaseFee),
     maxBaseFeePerGas: intToHex(fees.maxBaseFeePerGas),
@@ -69,7 +63,7 @@ function calculateReward(blocks: Block[]) {
   )
 }
 
-function estimateGasFees(blocks: Block[]) {
+export function estimateGasFees(blocks: Block[]) {
   // plan for max fee of 2 full blocks, each one increasing the fee by 12.5%
   const nextBlockFee = blocks[blocks.length - 1].baseFee // base fee for next block
   const calculatedFee = Math.ceil(nextBlockFee * 1.125 * 1.125)
@@ -86,40 +80,4 @@ function estimateGasFees(blocks: Block[]) {
   }
 
   return estimatedGasFees
-}
-
-function DefaultGasCalculator() {
-  return {
-    calculateGas: (blocks: Block[]) => {
-      const estimatedGasFees = estimateGasFees(blocks)
-
-      return feesToHex(estimatedGasFees)
-    }
-  }
-}
-
-function PolygonGasCalculator() {
-  return {
-    calculateGas: (blocks: Block[]) => {
-      const fees = estimateGasFees(blocks)
-
-      const maxPriorityFeePerGas = Math.max(fees.maxPriorityFeePerGas, 30e9)
-
-      return feesToHex({
-        ...fees,
-        maxPriorityFeePerGas,
-        maxFeePerGas: fees.maxBaseFeePerGas + maxPriorityFeePerGas
-      })
-    }
-  }
-}
-
-export function createGasCalculator(chainId: number): GasCalculator {
-  // TODO: maybe this can be tied into chain config somehow
-  if (chainId === 137 || chainId === 80001) {
-    // Polygon and Mumbai testnet
-    return PolygonGasCalculator()
-  }
-
-  return DefaultGasCalculator()
 }
