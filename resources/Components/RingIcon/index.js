@@ -1,5 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react'
-import DOMPurify from 'dompurify'
+import React from 'react'
 
 import svg from '../../svg'
 
