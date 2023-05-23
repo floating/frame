@@ -1,22 +1,19 @@
 import log from 'electron-log'
 import createPylon, { Unsubscribable } from '@framelabs/pylon-api-client'
+import { formatUnits } from 'ethers/lib/utils'
 
 import Networks from './networks'
 import bProcessor from '../balances/processor'
 import { updateCollections, updateItems } from '../inventory/processor'
-import { TokenBalance } from '../balances/scan'
-import { formatUnits } from 'ethers/lib/utils'
 
+import type { TokenBalance } from '../balances/scan'
 import type { Inventory } from '../../store/state'
 
 type Subscription = Unsubscribable & { unsubscribables: Unsubscribable[]; collectionItems: CollectionItem[] }
 
-type ItemCollectionId = {
+type ItemCollection = {
   contract: string
   chainId: number
-}
-
-type ItemCollection = ItemCollectionId & {
   name: string
   description: string
   image: string
