@@ -1,80 +1,18 @@
 import React, { useState } from 'react'
-import styled from 'styled-components'
+import styled, { keyframes, css } from 'styled-components'
 
 import link from '../../../../../resources/link'
-// import svg from '../../../../../resources/svg'
+import svg from '../../../../../resources/svg'
 // import { matchFilter } from '../../../../../resources/utils'
 
 import RingIcon from '../../../../../resources/Components/RingIcon'
 
 import useStore from '../../../../../resources/Hooks/useStore'
 import { ClusterRow, ClusterValue } from '../../../../../resources/Components/Cluster'
-// import { DisplayFiatPrice, DisplayValue } from '../../../../../resources/Components/DisplayValue'
 import RingIcon from '../../../../../resources/Components/RingIcon'
-
 import useStore from '../../../../../resources/Hooks/useStore'
 
-import React, { useRef, useEffect, useState } from 'react'
-import DOMPurify from 'dompurify'
-
-const DynamicImg = ({ src, alt, active }) => {
-  const canvasRef = useRef()
-  const [canvasUrl, setCanvasUrl] = useState('')
-  const [originalUrl, setOriginalUrl] = useState('')
-
-  const sanitizeURL = (url) => {
-    const sanitized = DOMPurify.sanitize(url)
-    setOriginalUrl(sanitized)
-    return sanitized
-  }
-
-  useEffect(() => {
-    if (!src) return
-    const img = new Image()
-    img.crossOrigin = 'anonymous'
-    img.src = sanitizeURL(src)
-
-    const clone = () => {
-      const canvas = canvasRef.current
-      if (!canvas) return
-      const ctx = canvas.getContext('2d')
-
-      const scaleFactor = window.devicePixelRatio || 1
-      const width = img.width * scaleFactor
-      const height = img.height * scaleFactor
-
-      canvas.width = width
-      canvas.height = height
-      ctx.scale(scaleFactor, scaleFactor)
-
-      ctx.drawImage(img, 0, 0, width / scaleFactor, height / scaleFactor)
-
-      canvas.toBlob((blob) => {
-        const url = URL.createObjectURL(blob)
-        console.log('blob url for img', url)
-        setCanvasUrl(url)
-      })
-    }
-
-    if (img.complete) {
-      setTimeout(() => {
-        clone()
-      }, 0)
-    } else {
-      img.onload = () => {
-        clone()
-      }
-    }
-  }, [src])
-
-  if (!canvasUrl) {
-    return <canvas ref={canvasRef} alt={alt} />
-  } else if (active) {
-    return <img src={originalUrl} alt={alt} />
-  } else {
-    return <img src={canvasUrl} alt={alt} />
-  }
-}
+import DynamicImg from '../../../../../resources/Components/DynamicImg'
 
 const CollectionInner = styled.div`
   position: relative;
@@ -84,7 +22,7 @@ const CollectionInner = styled.div`
 
 const CollectionIcon = styled.div`
   position: absolute;
-  top: 13px;
+  top: 14px;
   left: 14px;
 `
 
@@ -92,45 +30,85 @@ const CollectionMain = styled.div`
   position: absolute;
   display: flex;
   justify-content: space-between;
-  inset: 32px 20px 16px 66px;
+  align-items: center;
+  inset: 33px 20px 12px 66px;
 `
 
 const CollectionLine = styled.div`
   background: var(--ghostY);
   height: 1px;
-  margin: 11px 12px 0px 4px;
+  margin: 0px 12px 0px 6px;
   flex: 1;
   position: relative;
 `
 
-const CollectionDots = styled.div`
-  display: flex;
-  height: 100%;
+const wave = keyframes`
+  0% { 
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(1px, 2px);
+  }
+  100% { 
+    transform: translate(0, 0);
+  }
 `
 
 const CollectionDot = styled.div`
   display: flex;
-  height: 20px;
-  width: 20px;
-  min-height: 20px;
-  min-width: 20px;
-  margin-right: 8px;
-  border-radius: 8px;
-  background-image: ${(props) => `url(${props.bg})`};
-  background-size: cover;
-  background-color: var(--ghostB);
+  height: 16px;
+  width: 16px;
+  min-height: 16px;
+  min-width: 16px;
+  margin-right: 6px;
+  border-radius: 50%;
+  transition: var(--standard);
   overflow: hidden;
+  justify-content: center;
+  position: relative;
+  font-family: 'FiraCode';
+  font-size: 10px;
+  animation: ${(props) =>
+    props.active
+      ? css`
+          ${wave} 1.6s ease-in infinite
+        `
+      : 'none'};
+
+  z-index: 10;
   img {
     margin: -1px;
     object-fit: cover;
+    position: relative;
+    z-index: 10;
   }
+  canvas {
+    opacity: 0;
+  }
+`
+
+const MissingDot = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  inset: 8px;
+  border-radius: 50%;
+  background: var(--outerspace);
+  z-index: 1;
+`
+
+const CollectionDots = styled.div`
+  display: flex;
+  align-items: center;
+  height: 100%;
+  transition: var(--standardFast);
 `
 
 const CollectionCount = styled.div`
   display: flex;
   height: 20px;
   min-height: 20px;
-  margin-top: 1px;
   justify-content: center;
   align-items: center;
   font-size: 16px;
@@ -151,7 +129,7 @@ const Collection = ({ moduleId, account, collection, collectionId }) => {
       b = collection.items[b].tokenId
       return a < b ? -1 : b > a ? 1 : 0
     })
-    .slice(0, 5)
+    .slice(0, 8)
   return (
     <ClusterRow key={collectionId}>
       <ClusterValue
@@ -186,12 +164,13 @@ const Collection = ({ moduleId, account, collection, collectionId }) => {
               />
             </CollectionIcon>
             <CollectionMain>
-              <CollectionDots style={{ width: previewItems.length * 28 + 'px' }}>
-                {previewItems.map((id) => {
+              <CollectionDots style={{ width: previewItems.length * 22 + 4 + 'px' }}>
+                {previewItems.map((id, i) => {
                   const item = collection.items[id]
                   return (
-                    <CollectionDot>
+                    <CollectionDot style={{ animationDelay: i * 0.1 + 's' }} active={active}>
                       <DynamicImg src={item.img} alt={item.name} active={active} />
+                      <MissingDot />
                     </CollectionDot>
                   )
                 })}

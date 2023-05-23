@@ -89,9 +89,16 @@ const BalancesList = ({ balances }) => {
                     onClick={() => {
                       setOpen(-1)
                       if (address === '0x0000000000000000000000000000000000000000') {
-                        link.send('tray:openExplorer', { type: 'ethereum', id: chainId })
+                        link.send('tray:openExplorer', {
+                          type: 'token',
+                          chain: { type: 'ethereum', id: chainId }
+                        })
                       } else {
-                        link.send('tray:openExplorer', { type: 'ethereum', id: chainId }, null, address)
+                        link.send('tray:openExplorer', {
+                          type: 'token',
+                          chain: { type: 'ethereum', id: chainId },
+                          address
+                        })
                       }
                     }}
                   >

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import link from '../../../../../resources/link'
 import svg from '../../../../../resources/svg'
+import useStore from '../../../../../resources/Hooks/useStore'
 
 import {
   ClusterBox,
@@ -44,7 +45,7 @@ const PreviewDisplay = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 16px;
+  padding: 8px;
 `
 
 const PreviewOptions = styled.div`
@@ -60,7 +61,7 @@ const PreviewOptions = styled.div`
 `
 
 const Container = styled.div`
-  height: calc(100% - 348px);
+  height: calc(100% - 325px);
 `
 
 const toItems = (contract, collection) =>
@@ -72,7 +73,7 @@ const toItems = (contract, collection) =>
 
 const group = (items) => {
   return items.reduce((acc, id, index) => {
-    if (index % 5 === 0) acc.push([])
+    if (index % 4 === 0) acc.push([])
     acc[acc.length - 1].push(id)
     return acc
   }, [])
@@ -91,6 +92,8 @@ const InventoryCollection = ({ expandedData = {}, inventory, onAssetClick, accou
   const k = expandedData.currentCollection
   if (!k || !account || !inventory) return
 
+  const [confirmHide, setConfirmHide] = useState(false)
+
   useEffect(() => {
     if (k) {
       const collection = inventory[k]
@@ -100,7 +103,7 @@ const InventoryCollection = ({ expandedData = {}, inventory, onAssetClick, accou
   }, [])
 
   const renderClusterRow = (row, i) => {
-    while (row.length < 5) row.push(null) // Ensure the row has exactly 4 items
+    while (row.length < 4) row.push(null)
     return <ClusterRow key={`row-${i}}`}>{row.map(renderClusterValue)}</ClusterRow>
   }
 
@@ -113,12 +116,19 @@ const InventoryCollection = ({ expandedData = {}, inventory, onAssetClick, accou
         </ClusterValue>
       )
     }
-    const { tokenId, name, img, externalLink } = item
+    const { tokenId, name, img } = item
     return (
       <ClusterValue
         key={tokenId}
         grow={1}
-        onClick={() => externalLink && onAssetClick(externalLink)}
+        onClick={() => {
+          link.send('tray:openExplorer', {
+            type: 'token',
+            chain: { type: 'ethereum', id: inventory[k].meta.chainId },
+            address: k,
+            tokenId
+          })
+        }}
         onMouseEnter={() => {
           setHoverAsset({
             name,
@@ -145,6 +155,11 @@ const InventoryCollection = ({ expandedData = {}, inventory, onAssetClick, accou
     )
   }
 
+  const { meta } = inventory[k]
+  const collectionId = `${meta.chainId}:${k}`
+  const hiddenCollections = useStore('main.hiddenCollections') || []
+  const isHidden = hiddenCollections.includes(collectionId)
+
   return (
     <div className='inventoryDisplay'>
       <InventoryPreview>
@@ -159,14 +174,13 @@ const InventoryCollection = ({ expandedData = {}, inventory, onAssetClick, accou
                         <img
                           // src={`${pylonProxy}?type=nft&target=${encodeURIComponent(hoverAsset.img)}`}
                           src={hoverAsset.img}
-                          // loading='lazy'
                           alt={(hoverAsset.name || '').toUpperCase()}
                         />
                       </div>
                     </PreviewDisplay>
                   </ClusterValue>
                 </ClusterRow>
-                <ClusterRow height={'49px'}>
+                <ClusterRow height={'42px'}>
                   <ClusterValue>
                     <PreviewOptions key={hoverAsset.name}>{previewTitle(hoverAsset.name)}</PreviewOptions>
                   </ClusterValue>
@@ -182,9 +196,6 @@ const InventoryCollection = ({ expandedData = {}, inventory, onAssetClick, accou
                         style={
                           inventory[k].meta.image
                             ? {
-                                // backgroundImage: `url(${pylonProxy}?type=nft&target=${encodeURIComponent(
-                                //   inventory[k].meta.image
-                                // )})`
                                 backgroundImage: `url(${inventory[k].meta.image})`
                               }
                             : {}
@@ -193,19 +204,63 @@ const InventoryCollection = ({ expandedData = {}, inventory, onAssetClick, accou
                     </PreviewDisplay>
                   </ClusterValue>
                 </ClusterRow>
-                <ClusterRow height={'49px'}>
-                  <ClusterValue>
-                    <PreviewOptions key={inventory[k].meta.name}>
-                      {previewTitle(inventory[k].meta.name)}
-                    </PreviewOptions>
-                  </ClusterValue>
-                  <ClusterValue width={'49px'} onClick={() => {}}>
-                    <div className='signerBalanceDrawerItem'>{svg.telescope(16)}</div>
-                  </ClusterValue>
-                  <ClusterValue width={'49px'} onClick={() => {}}>
-                    <div className='signerBalanceDrawerItem'>{svg.show(16)}</div>
-                  </ClusterValue>
-                </ClusterRow>
+
+                {confirmHide ? (
+                  <ClusterRow height={'42px'}>
+                    <ClusterValue>
+                      <PreviewOptions key={inventory[k].meta.name}>
+                        {isHidden ? 'Unhide this collection?' : 'Hide this Collection?'}
+                      </PreviewOptions>
+                    </ClusterValue>
+                    <ClusterValue
+                      width={'42px'}
+                      onClick={() => {
+                        setConfirmHide(false)
+                      }}
+                    >
+                      <div className='signerBalanceDrawerItem'>{svg.x(16)}</div>
+                    </ClusterValue>
+                    <ClusterValue
+                      width={'42px'}
+                      onClick={() => {
+                        link.send('tray:action', 'collectionVisiblity', meta.chainId, k, !isHidden)
+                        setConfirmHide(false)
+                        if (!isHidden) link.send('nav:back', 'panel')
+                      }}
+                    >
+                      <div className='signerBalanceDrawerItem'>{svg.check(16)}</div>
+                    </ClusterValue>
+                  </ClusterRow>
+                ) : (
+                  <ClusterRow height={'42px'}>
+                    <ClusterValue>
+                      <PreviewOptions key={inventory[k].meta.name}>
+                        {previewTitle(inventory[k].meta.name)}
+                      </PreviewOptions>
+                    </ClusterValue>
+
+                    <ClusterValue
+                      width={'42px'}
+                      onClick={() => {
+                        link.send('tray:openExplorer', {
+                          type: 'token',
+                          chain: { type: 'ethereum', id: inventory[k].meta.chainId },
+                          address: k
+                        })
+                      }}
+                    >
+                      <div className='signerBalanceDrawerItem'>{svg.telescope(16)}</div>
+                    </ClusterValue>
+                    <ClusterValue
+                      width={'42px'}
+                      onClick={() => {
+                        setConfirmHide(true)
+                      }}
+                    >
+                      <div className='signerBalanceDrawerItem'>{isHidden ? svg.show(16) : svg.hide(16)}</div>
+                    </ClusterValue>
+                  </ClusterRow>
+                )}
               </>
             )}
           </Cluster>

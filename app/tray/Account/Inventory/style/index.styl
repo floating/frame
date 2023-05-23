@@ -213,8 +213,8 @@
 .inventoryCollectionItem
   box-sizing border-box
   cursor pointer
-  height: 70px;
-  width: 70px;
+  height: 84px;
+  width: 84px;
   padding 12px;
   display flex;
   justify-content center;
@@ -233,7 +233,6 @@
       pointer-events none
     }
 
-
     img
       object-fit cover
       width: 100%
@@ -245,16 +244,19 @@
       content attr(alt)
       position absolute
       inset 0px
-      color var(--ghostC)
-      background var(--outerspace)
+      color var(--outerspace)
+      background var(--ghostC)
       display flex
       justify-content center
       align-items center
       font-size 8px
-      font-weight 800
+      font-weight 400
       letter-spacing -0.5px
       padding 4px
       text-align center
+      border-radius 6px
+      word-break break-all
+      font-family 'VCR'
 
 .signerInventoryMain
   position absolute

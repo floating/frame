@@ -4,10 +4,8 @@
 
 .signerBalanceWarning
   position relative
-  border-top 1px solid var(--ghostA)
   font-weight 400
-  padding 10px 0px
-  cursor pointer
+  padding 4px 0px
 
 .signerBalanceDrawerItem
   height 40px
@@ -87,14 +85,11 @@
   text-transform uppercase
   pointer-events none
 
-.signerBalanceWarningTitle:hover
-  color var(--moonLight)
-
 .signerBalanceWarningMessage
   position relative
   width 100%
   text-align center
-  padding 20px
+  padding 8px 20px 12px 20px
   box-sizing border-box
   font-size 12px
   font-weight 300
@@ -131,6 +126,17 @@
     background var(--ghostB)
     transform translateY(0px)
     box-shadow 0px 2px 4px var(--ghostX)
+
+.moreButton
+  height 40px
+  font-size 11px
+  text-transform uppercase
+  display flex
+  justify-content center
+  align-items center
+  width 70px
+  max-width 70px
+  min-width 70px
 
 .signerBalanceButton
   height 40px
@@ -478,6 +484,7 @@
     color var(--mint)
   
 .signerBalanceFooter
+  margin-top 24px
   display flex
   justify-content center
   align-items center

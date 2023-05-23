@@ -239,7 +239,11 @@ class ChainSummaryComponent extends Component {
               explorer
                 ? () => {
                     if (address) {
-                      link.send('tray:openExplorer', currentChain, null, address)
+                      link.send('tray:openExplorer', {
+                        type: 'address',
+                        chain: currentChain,
+                        address
+                      })
                     } else {
                       link.rpc('openExplorer', currentChain, () => {})
                     }

@@ -998,6 +998,20 @@ module.exports = {
       }
       return hiddenTokens
     })
+  },
+  collectionVisiblity(u, chain, address, hidden) {
+    const collectionId = `${chain}:${address}`
+    u('main.hiddenCollections', (hiddenTokens) => {
+      const index = hiddenTokens.indexOf(collectionId)
+      // If it should be showing but is in the hidden array, remove it
+      if (index !== -1 && !hidden) {
+        hiddenTokens.splice(index, 1)
+        // If it should be hidden but isn't in the hidden array, add it
+      } else if (index === -1 && hidden) {
+        hiddenTokens.push(collectionId)
+      }
+      return hiddenTokens
+    })
   }
   // toggleUSDValue: (u) => {
   //   u('main.showUSDValue', show => !show)
