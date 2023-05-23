@@ -1,5 +1,6 @@
 import { intToHex } from '@ethereumjs/util'
 import { getFeeHistory, getGas } from '../../../main/gas/index'
+import { gweiToHex } from '../../../resources/utils'
 
 let requestHandlers
 let testConnection = {
@@ -65,6 +66,31 @@ describe('#getGas', () => {
         nextBaseFee: '0xb6'
       },
       gasPrice: { fast: '0xe7' }
+    })
+  })
+
+  describe('when the chain is Polygon', () => {
+    it('should enforce a minimum of 30 gwei for the priority fee', async () => {
+      const gas = await getGas(testConnection, '137', { baseFeePerGas: '0x108ca0736b' })
+
+      expect(gas.feeMarket.maxPriorityFeePerGas).toBe(gweiToHex(30))
+    })
+
+    it('should not change the priority fee if above 30 gwei', async () => {
+      requestHandlers.eth_feeHistory.mockImplementationOnce((params) => {
+        const numBlocks = parseInt(params[0] || '0x', 16)
+
+        return {
+          // base fees include the requested number of blocks plus the next block
+          baseFeePerGas: Array(numBlocks).fill('0x8').concat([nextBlockBaseFee]),
+          gasUsedRatio: fillEmptySlots(gasUsedRatios, numBlocks, 0).reverse(),
+          oldestBlock: '0x89502f',
+          reward: fillEmptySlots(blockRewards, numBlocks, ['0xa7a358200']).reverse()
+        }
+      })
+      const gas = await getGas(testConnection, '137', { baseFeePerGas: '0x108ca0736b' })
+
+      expect(gas.feeMarket.maxPriorityFeePerGas).toBe(gweiToHex(45))
     })
   })
 })
