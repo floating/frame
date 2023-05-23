@@ -9,7 +9,6 @@ import useStore from '../../../../../resources/Hooks/useStore'
 import HighValueWarning from '../Warning'
 
 import BalancesList from '../BalancesList'
-import { Cluster, ClusterRow, ClusterValue } from '../../../../../resources/Components/Cluster'
 
 const BalancesPreview = ({ allChainsUpdated, moduleId, getBalances, account, filter, isHotSigner }) => {
   const [moduleRef] = useAccountModule(moduleId)
