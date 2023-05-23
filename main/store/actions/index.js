@@ -598,8 +598,15 @@ module.exports = {
   setInventory: (u, address, inventory) => {
     u('main.inventory', address, () => inventory)
   },
-  setInventoryAsset: (u, address, collection, tokenId, asset) => {
-    u('main.inventory', address, collection, 'items', tokenId, () => asset)
+  setInventoryAssets: (u, address, collection, assets) => {
+    u('main.inventory', address, collection, 'items', (existingItems) => {
+      const insertedAssets = assets.reduce((acc, asset) => {
+        acc[asset.id] = asset
+        return acc
+      }, {})
+
+      return { ...existingItems, ...insertedAssets }
+    })
   },
   setBalance: (u, address, balance) => {
     u('main.balances', address, (balances = []) => {

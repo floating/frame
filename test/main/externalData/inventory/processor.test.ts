@@ -1,7 +1,9 @@
+import { randomBytes } from 'crypto'
+
 import store from '../../../../main/store'
 import { updateCollections, updateItems } from '../../../../main/externalData/inventory/processor'
-import { randomBytes } from 'crypto'
-import { Inventory, InventoryAsset } from '../../../../main/store/state'
+
+import type { Inventory, InventoryAsset } from '../../../../main/store/state'
 
 const randomStr = () => randomBytes(32).toString('hex')
 
@@ -21,14 +23,10 @@ jest.mock('../../../../main/store', () => {
   const store = jest.fn(() => mockExistingInventory) as unknown as Store
   store.setInventory = jest.fn()
   store.getInventory = jest.fn()
-  store.setInventoryAsset = jest.fn()
+  store.setInventoryAssets = jest.fn()
 
   return store
 })
-
-jest.mock('electron-log', () => ({
-  warn: jest.fn()
-}))
 
 const Collection = (items: Record<string, InventoryAsset> = {}) => ({
   meta: {
@@ -42,7 +40,11 @@ const Collection = (items: Record<string, InventoryAsset> = {}) => ({
   items
 })
 
-describe('updateCollections', () => {
+beforeEach(() => {
+  mockExistingInventory = {}
+})
+
+describe('#updateCollections', () => {
   it('adds new collections when there are no existing collections', () => {
     const updatedInventory = {
       '0x1': Collection(),
@@ -97,7 +99,7 @@ describe('updateCollections', () => {
   })
 })
 
-describe('updateItems', () => {
+describe('#updateItems', () => {
   it('updates items for a given collection', () => {
     const items = [
       {
@@ -120,7 +122,6 @@ describe('updateItems', () => {
 
     updateItems(account, items)
 
-    expect(store.setInventoryAsset).toHaveBeenNthCalledWith(1, account.toLowerCase(), '0x1', '1', items[0])
-    expect(store.setInventoryAsset).toHaveBeenNthCalledWith(2, account.toLowerCase(), '0x1', '2', items[1])
+    expect(store.setInventoryAssets).toHaveBeenCalledWith(account.toLowerCase(), '0x1', [items[0], items[1]])
   })
 })
