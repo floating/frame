@@ -1,9 +1,9 @@
 import log from 'electron-log'
-import { storeApi } from '../storeApi'
+import { BalancesStoreApi } from '..'
 import { NATIVE_CURRENCY } from '../../../../resources/constants'
 import { toTokenId } from '../../../../resources/domain/balance'
 import BalancesWorkerController from '../controller'
-import { handleBalanceUpdate } from '../processor'
+import processor from '../processor'
 import { CurrencyBalance, TokenBalance } from '../scan'
 import { Balance, Token, WithTokenId } from '../../../store/state'
 
@@ -15,7 +15,7 @@ const scanInterval = {
   inactive: 60 * 10
 }
 
-function BalanceScanner(store: Store) {
+function BalanceScanner(store: Store, api: ReturnType<typeof BalancesStoreApi>) {
   let scan: NodeJS.Timeout | null
   let workerController: BalancesWorkerController | null
   let onResume: (() => void) | null
@@ -67,7 +67,7 @@ function BalanceScanner(store: Store) {
 
   function restart() {
     start()
-    setAddress(storeApi.getActiveAddress())
+    setAddress(api.getActiveAddress())
   }
 
   function resume() {
@@ -80,7 +80,7 @@ function BalanceScanner(store: Store) {
     if (stopScan()) {
       log.debug('Pausing balances scan')
 
-      const address = storeApi.getActiveAddress()
+      const address = api.getActiveAddress()
 
       if (address) {
         // even when paused ensure data is updated every 10 minutes
@@ -157,8 +157,8 @@ function BalanceScanner(store: Store) {
   }
 
   function updateBalances(address: Address, chains: number[]) {
-    const customTokens = storeApi.getCustomTokens()
-    const knownTokens = storeApi
+    const customTokens = api.getCustomTokens()
+    const knownTokens = api
       .getKnownTokens(address)
       .filter(
         (token) => !customTokens.some((t) => t.address === token.address && t.chainId === token.chainId)
@@ -183,7 +183,7 @@ function BalanceScanner(store: Store) {
   }
 
   function handleChainBalanceUpdate(balances: CurrencyBalance[], address: Address) {
-    const currentChainBalances = storeApi.getCurrencyBalances(address)
+    const currentChainBalances = api.getCurrencyBalances(address)
 
     // only update balances that have changed
     balances
@@ -194,14 +194,14 @@ function BalanceScanner(store: Store) {
       .forEach((balance) => {
         store.setBalance(address, {
           ...balance,
-          symbol: storeApi.getNativeCurrencySymbol(balance.chainId),
+          symbol: api.getNativeCurrencySymbol(balance.chainId),
           address: NATIVE_CURRENCY
         })
       })
   }
 
   function handleTokenBalanceUpdate(balances: TokenBalance[], address: Address) {
-    handleBalanceUpdate(address, balances, Array.from(enabledNetworks), 'scan')
+    processor.handleBalanceUpdate(address, balances, Array.from(enabledNetworks), 'scan')
   }
 
   function handleTokenBlacklistUpdate(tokensToRemove: Set<string>) {

@@ -94,9 +94,9 @@ function createTokensObserver(handler: TokensChangedHandler) {
 }
 
 // function createUsePylonObserver(handler: UsePylonChangedHandler) {
-//   let usingPylon = balancesStoreApi.getPylonEnabled()
+//   let usingPylon = storeApi.getPylonEnabled()
 //   return function () {
-//     const currentUsingPylon = balancesStoreApi.getPylonEnabled()
+//     const currentUsingPylon = storeApi.getPylonEnabled()
 
 //     if (currentUsingPylon !== usingPylon) {
 //       usingPylon = currentUsingPylon
