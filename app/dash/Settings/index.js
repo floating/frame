@@ -1,11 +1,10 @@
-import { Component } from 'react'
 import Restore from 'react-restore'
+import styled from 'styled-components'
+import { Component } from 'react'
 
 import link from '../../../resources/link'
 import Dropdown from '../../../resources/Components/Dropdown'
 import KeyboardShortcutConfigurator from '../../../resources/Components/KeyboardShortcutConfigurator'
-
-import styled from 'styled-components'
 
 const EditShortcut = styled.div`
   position: absolute;
@@ -209,28 +208,6 @@ class Settings extends Component {
               <span>Help improve Frame by anonymously reporting errors</span>
             </div>
           </div>
-
-          {/* <div className='signerPermission localSetting' style={{ zIndex: 209 }}>
-            <div className='signerPermissionControls'>
-              <div className='signerPermissionSetting'>Pylon Accounts Service</div>
-              <div
-                className={
-                  this.store('main.usingPylon')
-                    ? 'signerPermissionToggle signerPermissionToggleOn'
-                    : 'signerPermissionToggle'
-                }
-                onClick={() => link.send('tray:action', 'setUsingPylon', !this.store('main.usingPylon'))}
-              >
-                <div className='signerPermissionToggleSwitch' />
-              </div>
-            </div>
-            <div className='signerPermissionDetails'>
-              <span>
-                Use Frame's Account Tracking Service, Eliminating Network Overhead and Ensuring Real-Time
-                Updates!
-              </span>
-            </div>
-          </div> */}
 
           <div className='signerPermission localSetting' style={{ zIndex: 207 }}>
             <div className='signerPermissionControls'>

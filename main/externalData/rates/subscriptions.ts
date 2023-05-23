@@ -43,13 +43,13 @@ export default function rates(pylon: Pylon) {
   }
 
   function start() {
-    log.verbose('starting rates updates')
+    log.verbose('Starting rates updates')
 
     pylon.on('rates', handleUpdates)
   }
 
   function stop() {
-    log.verbose('stopping rates updates')
+    log.verbose('Stopping rates updates')
 
     pylon.off('rates', handleUpdates)
 

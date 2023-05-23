@@ -12,11 +12,7 @@ type TypedEventEmitter<T extends Record<keyof T, (...args: any[]) => void>> = {
 }
 
 class NetworksEmitter implements TypedEventEmitter<NetworksEvents> {
-  private emitter: EventEmitter
-
-  constructor() {
-    this.emitter = new EventEmitter()
-  }
+  private readonly emitter = new EventEmitter()
 
   on<K extends keyof NetworksEvents>(event: K, listener: NetworksEvents[K]): void {
     this.emitter.on(event, listener)

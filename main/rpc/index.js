@@ -310,7 +310,6 @@ const rpc = {
     }
   },
   subscribeToItems(account, items, cb) {
-    log.verbose('Subscribing to items', { account, items })
     surface.subscribeToItems(account, items)
   }
 }

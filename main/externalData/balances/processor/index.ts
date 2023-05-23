@@ -1,10 +1,12 @@
-import { BalancesStoreApi } from '..'
-import { TokenBalance } from '../scan'
-import { toTokenId } from '../../../../resources/domain/balance'
-import store from '../../../store'
-import { Balance, Token } from '../../../store/state'
 import log from 'electron-log'
+
+import store from '../../../store'
 import surface from '../../surface'
+import { BalancesStoreApi } from '..'
+import { toTokenId } from '../../../../resources/domain/balance'
+
+import type { Balance, Token } from '../../../store/state'
+import type { TokenBalance } from '../scan'
 
 const toExpiryWindow = {
   snapshot: 1000 * 60 * 5,
@@ -40,8 +42,6 @@ const getChangedBalances = (
     }
     return balances
   }, [] as TokenBalance[])
-
-  const changedSet = new Set(changedBalances.map(toTokenId))
 
   return changedBalances
 }
@@ -87,7 +87,8 @@ function handleBalanceUpdate(
   chains: number[],
   mode: keyof typeof toExpiryWindow
 ) {
-  log.verbose('handling balance update...', { address, chains })
+  log.debug('Handling balance update', { address, chains })
+
   if (mode === 'snapshot') {
     //Include 0 balance custom tokens when its a snapshot update as these will be missing
     const customTokens = api.getCustomTokens()
@@ -95,7 +96,6 @@ function handleBalanceUpdate(
 
     customTokens.forEach((token) => {
       if (!tokenBalanceSet.has(toTokenId(token))) {
-        console.log('Missing custom token balance, adding to balances...', { token })
         balances.push({
           ...token,
           balance: '0x00',
@@ -104,6 +104,7 @@ function handleBalanceUpdate(
       }
     })
   }
+
   const changedBalances = getChangedBalances(address, balances, api)
   if (changedBalances.length) {
     store.setBalances(address, changedBalances)
@@ -117,7 +118,8 @@ function handleBalanceUpdate(
 }
 
 function handleCustomTokenUpdate(customTokens: Token[]) {
-  log.verbose('inside handle custom token update')
+  log.debug('Handling custom token update', { customTokens })
+
   const accounts = api.getAccounts()
 
   accounts.forEach((address) => {
@@ -134,8 +136,10 @@ function handleCustomTokenUpdate(customTokens: Token[]) {
         balance
       })
     }, [] as TokenBalance[])
-    log.verbose('handleCustomTokenUpdate', { address, newBalances, forProcessor })
-    newBalances.length && store.setBalances(address, newBalances)
+
+    if (newBalances.length) {
+      store.setBalances(address, newBalances)
+    }
   })
 }
 

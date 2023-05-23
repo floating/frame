@@ -94,17 +94,21 @@ const Surface = () => {
   const Pylon = createPylon('wss://api.pylon.link')
   const subscriptions: Record<string, Subscription> = {}
   const networks = Networks()
+
   const subscribe = async (addr: string) => {
-    log.verbose('Surface subscribing to account...', { addr })
     const address = addr.toLowerCase()
 
+    log.verbose('Subscribing to Pylon data', { address })
+
     const fallback = setTimeout(() => {
-      log.verbose('FAILED TO GET SNAPSHOT WITHIN 5 SECONDS OF SUBSCRIPTION: FALLING BACK TO SCAN')
+      log.warn('Failed to get data from Pylon, falling back to scan', { address })
+
       networks.update(address, [])
     }, 5_000)
 
     const onStopped = () => {
       log.verbose(`Subscription to ${address} stopped`)
+
       networks.update(address, [])
       delete subscriptions[address]
     }
@@ -115,7 +119,7 @@ const Surface = () => {
 
     const sub = Pylon.accounts.subscribe(address, {
       onStarted() {
-        log.verbose('subscribed to account')
+        log.debug('Subscribed to Pylon data', { address })
       },
       onData: (data) => {
         log.debug(`Got update from Pylon surface for account ${address}`, { data })
@@ -177,9 +181,11 @@ const Surface = () => {
   }
 
   const unsubscribe = async (address: string) => {
-    log.verbose('Surface unsubscribing to account...', { address })
+    log.verbose('Unsubscribing from Pylon data', { address })
+
     const subscription = subscriptions[address]
     if (!subscription) return
+
     subscription.unsubscribables.forEach((u) => u.unsubscribe())
     subscription.unsubscribe()
     delete subscriptions[address]
@@ -210,7 +216,7 @@ const Surface = () => {
     const account = addr.toLowerCase()
     const sub = Pylon.items.subscribe(items, {
       onStarted() {
-        log.verbose(`Created subscription to items`, { account, items })
+        log.debug(`Created subscription to items`, { account, items })
       },
       onData: (data) => {
         log.debug('Received update for items', { account, items: data })
@@ -241,11 +247,9 @@ const Surface = () => {
     }))
 
     if (!subscribers.length) return
-    log.verbose('Updating subscriptions to surface...')
 
     Object.keys(subscriptions).forEach(unsubscribe)
     subscribers.forEach(({ address, collectionItems }) => {
-      log.verbose('should be resubbing...', { collectionItems, address })
       subscribe(address)
 
       if (collectionItems.length > 0) {
