@@ -6,9 +6,9 @@ export function getMaxTotalFee(tx = { chainId: '' }) {
     return 2 * 1e18
   }
 
-  // for Fantom, the max fee should be 250 FTM
+  // for Fantom, the max fee should be 14000 FTM
   if ([250, 4002].includes(chainId)) {
-    return 250 * 1e18
+    return 14000 * 1e18
   }
 
   // for PulseChain, the max fee should be 100000000000 PLS

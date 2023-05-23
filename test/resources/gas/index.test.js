@@ -10,12 +10,12 @@ describe('#getMaxTotalFee', () => {
     expect(getMaxTotalFee(tx)).toBe(2e18)
   })
 
-  it('sets the max fee as 250 FTM on Fantom', () => {
+  it('sets the max fee as 14000 FTM on Fantom', () => {
     const tx = {
       chainId: addHexPrefix((250).toString(16))
     }
 
-    expect(getMaxTotalFee(tx)).toBe(250e18)
+    expect(getMaxTotalFee(tx)).toBe(14000e18)
   })
 
   it('sets the max fee as 100000000000 PLS on PulseChain', () => {

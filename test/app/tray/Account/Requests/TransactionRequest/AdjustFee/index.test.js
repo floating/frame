@@ -185,10 +185,15 @@ describe('base fee input', () => {
     const { getBaseFeeInput, clearBaseFee, enterBaseFee } = setupComponent(req)
 
     await clearBaseFee()
-    await enterBaseFee('5600')
+    await enterBaseFee('660000')
 
-    expect(getBaseFeeInput().value).toBe('5333.333333333')
-    expect(link.rpc).toHaveBeenCalledWith('setBaseFee', gweiToHex(5333.333333333), '1', expect.any(Function))
+    expect(getBaseFeeInput().value).toBe('463666.666666666')
+    expect(link.rpc).toHaveBeenCalledWith(
+      'setBaseFee',
+      gweiToHex(463666.666666666),
+      '1',
+      expect.any(Function)
+    )
   })
 
   it('recalculates the base fee when the total fee exceeds the maximum allowed (PLS)', async () => {
@@ -349,12 +354,12 @@ describe('priority fee input', () => {
     const { getPriorityFeeInput, clearPriorityFee, enterPriorityFee } = setupComponent(req)
 
     await clearPriorityFee()
-    await enterPriorityFee('5600')
+    await enterPriorityFee('5600000')
 
-    expect(getPriorityFeeInput().value).toBe('5333.333333333')
+    expect(getPriorityFeeInput().value).toBe('463666.666666666')
     expect(link.rpc).toHaveBeenCalledWith(
       'setPriorityFee',
-      gweiToHex(5333.333333333),
+      gweiToHex(463666.666666666),
       '1',
       expect.any(Function)
     )
@@ -487,10 +492,10 @@ describe('gas limit input', () => {
     const { getGasLimitInput, clearGasLimit, enterGasLimit } = setupComponent(req)
 
     await clearGasLimit()
-    await enterGasLimit('11364000')
+    await enterGasLimit('11364000000')
 
-    expect(getGasLimitInput().value).toBe('11363636')
-    expect(link.rpc).toHaveBeenCalledWith('setGasLimit', '0xad6534', '1', expect.any(Function))
+    expect(getGasLimitInput().value).toBe('636363636')
+    expect(link.rpc).toHaveBeenCalledWith('setGasLimit', '0x25ee2374', '1', expect.any(Function))
   })
 
   it('recalculates the gas limit when the total fee exceeds the maximum allowed (PLS)', async () => {
@@ -667,10 +672,15 @@ describe('legacy transactions', () => {
       const { getGasPriceInput, clearGasPrice, enterGasPrice } = setupComponent(req)
 
       await clearGasPrice()
-      await enterGasPrice('85')
+      await enterGasPrice('85000')
 
-      expect(getGasPriceInput().value).toBe('83.333333333')
-      expect(link.rpc).toHaveBeenCalledWith('setGasPrice', gweiToHex(83.333333333), '1', expect.any(Function))
+      expect(getGasPriceInput().value).toBe('4666.666666666')
+      expect(link.rpc).toHaveBeenCalledWith(
+        'setGasPrice',
+        gweiToHex(4666.666666666),
+        '1',
+        expect.any(Function)
+      )
     })
 
     it('recalculates the gas price when the total fee exceeds the maximum allowed (PLS)', async () => {
@@ -721,10 +731,10 @@ describe('legacy transactions', () => {
       const { getGasLimitInput, clearGasLimit, enterGasLimit } = setupComponent(req)
 
       await clearGasLimit()
-      await enterGasLimit('2874000')
+      await enterGasLimit('2874000000')
 
-      expect(getGasLimitInput().value).toBe('2873563')
-      expect(link.rpc).toHaveBeenCalledWith('setGasLimit', '0x2bd8db', '1', expect.any(Function))
+      expect(getGasLimitInput().value).toBe('160919540')
+      expect(link.rpc).toHaveBeenCalledWith('setGasLimit', '0x9976ff4', '1', expect.any(Function))
     })
 
     it('recalculates the gas limit when the total fee exceeds the maximum allowed (PLS)', async () => {
