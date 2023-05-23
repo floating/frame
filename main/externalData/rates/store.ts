@@ -50,7 +50,7 @@ const storeApi = {
 }
 
 const handleNativeCurrencyUpdates = (updates: RateUpdate[]) => {
-  log.debug(`got currency rate updates for chains: ${updates.map((u) => u.id.chainId)}`)
+  log.debug('Handling native currency rate updates', { chains: updates.map((u) => u.id.chainId) })
 
   updates.forEach((u) => {
     storeApi.setNativeCurrencyRate(u.id.chainId, {
@@ -67,7 +67,7 @@ const handleNativeCurrencyUpdates = (updates: RateUpdate[]) => {
 }
 
 const handleTokenUpdates = (updates: RateUpdate[]) => {
-  log.debug(`got token rate updates for addresses: ${updates.map((u) => u.id.address)}`)
+  log.debug('Handling token rate updates', { addresses: updates.map((u) => u.id.address) })
 
   const rates = gatherTokenRates(updates)
   storeApi.setTokenRates(rates)

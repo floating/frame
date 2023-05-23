@@ -1,14 +1,12 @@
 import deepEqual from 'deep-equal'
 
 import store from '../../store'
-import { Origin, Token } from '../../store/state'
-
+import { arraysEqual } from '../../../resources/utils'
 import { BalancesStoreApi } from '../balances'
 
-const storeApi = BalancesStoreApi(store)
+import type { Token } from '../../store/state'
 
-const arraysEqual = <T extends number | string>(a: T[], b: T[]) =>
-  b.every((v) => a.includes(v) && a.length === b.length)
+const storeApi = BalancesStoreApi(store)
 
 interface ActiveAddressChangedHandler {
   addressChanged: (address: Address) => void
@@ -23,20 +21,12 @@ interface TokensChangedHandler {
   knownTokensChanged: (address: Address, tokens: Token[]) => void
 }
 
-interface UsePylonChangedHandler {
-  pylonToggled: (enabled: boolean) => void
-}
-
 interface TrayChangedHandler {
   trayToggled: (open: boolean) => void
 }
 
 interface ChainIdsChangedHandler {
   chainsChanged: (chains: number[]) => void
-}
-
-interface NetworkChangedHandler {
-  networkChanged: (networkId: number, originId: string) => void
 }
 
 function createChainsObserver(handler: ChainIdsChangedHandler) {
@@ -73,6 +63,7 @@ function createActiveAccountObserver(handler: ActiveAddressChangedHandler) {
     }
   }
 }
+
 //TODO: do we need to sort the arrays?
 function createTokensObserver(handler: TokensChangedHandler) {
   let customTokens = storeApi.getCustomTokens()
@@ -118,6 +109,7 @@ function createTokensObserver(handler: TokensChangedHandler) {
 
 function createTrayObserver(handler: TrayChangedHandler) {
   let trayOpen = storeApi.getTrayOpened()
+
   return function () {
     const currentTrayOpen = storeApi.getTrayOpened()
 
@@ -132,6 +124,7 @@ function createTrayObserver(handler: TrayChangedHandler) {
 
 function createAccountsObserver(handler: AccountsChangedHandler) {
   let accounts = storeApi.getAccounts()
+
   return function () {
     const currentAccounts = storeApi.getAccounts()
 

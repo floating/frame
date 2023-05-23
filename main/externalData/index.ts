@@ -34,10 +34,14 @@ const externalData = function () {
     const chains = storeApi.getConnectedNetworkIds()
     const activeAccount = storeApi.getActiveAddress()
     const usingSurface = surface.networks.get(activeAccount)
-
     const chainsToScan = chains.filter((chainId) => !usingSurface.includes(chainId))
-    log.verbose('updateNetworks', { usingSurface, activeAccount, chainsToScan })
-    activeAccount && scanner.setNetworks(activeAccount, chainsToScan)
+
+    log.debug('updateNetworks', { usingSurface, activeAccount, chainsToScan })
+
+    if (activeAccount) {
+      scanner.setNetworks(activeAccount, chainsToScan)
+    }
+
     rates.updateSubscription(chains)
   }
 
@@ -56,15 +60,16 @@ const externalData = function () {
   surface.updateSubscribers(Object.keys(store('main.accounts')))
 
   surface.networks.on('updated', ({ account }) => {
-    log.verbose('Surface networks updated...', { account })
-    if (account === storeApi.getActiveAddress()) updateNetworks()
+    if (account === storeApi.getActiveAddress()) {
+      updateNetworks()
+    }
   })
 
   let pauseScanningDelay: NodeJS.Timeout | undefined
 
   //TODO: does this need to hit to t
   const handleTokensUpdate = debounce((activeAccount: string, tokens: Token[]) => {
-    log.verbose('updating external data due to token update(s)', { activeAccount })
+    log.debug('Updating external data due to token updates', { activeAccount })
 
     processor.handleCustomTokenUpdate(tokens)
 
@@ -93,17 +98,14 @@ const externalData = function () {
   const tokensObserver = createTokensObserver({
     customTokensChanged(address, tokens) {
       handleTokensUpdate(address, tokens)
-      log.verbose('CUSTOM TOKENS CHANGED...')
     },
     knownTokensChanged() {
       rates.updateSubscription(storeApi.getConnectedNetworks().map((network) => network.id))
-      log.verbose('KNOWN TOKENS CHANGED...')
     }
   })
 
   const chainsObserver = createChainsObserver({
     chainsChanged(chains) {
-      log.verbose('Networks have changed...', { chains })
       updateNetworks()
     }
   })
@@ -127,8 +129,8 @@ const externalData = function () {
       }
     }
   })
-  //TODO: do we need to remove these???
 
+  //TODO: do we need to remove these???
   const observers = [
     activeAccountObserver,
     accountsObserver,
@@ -140,6 +142,7 @@ const externalData = function () {
   const removeObservers = () => {
     observers.forEach((obs) => obs.remove())
   }
+
   return {
     close: () => {
       removeObservers()
