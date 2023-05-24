@@ -8,7 +8,7 @@ const log = require('electron-log')
 const store = require('../store').default
 const { default: BlockMonitor } = require('./blocks')
 const { default: chainConfig } = require('./config')
-const { getGas, eip1559Allowed } = require('../gas')
+const { init: initGas, eip1559Allowed } = require('../gas')
 const { NETWORK_PRESETS } = require('../../resources/constants')
 
 const resError = (error, payload, res) =>
@@ -84,7 +84,8 @@ class ChainConnection extends EventEmitter {
         }
       }
 
-      const { feeMarket, gasPrice } = await getGas(provider, this.chainId, block)
+      const gas = initGas(provider, this.chainId, block)
+      const { feeMarket, gasPrice } = await gas.getGas(block)
 
       try {
         if (feeMarket) {

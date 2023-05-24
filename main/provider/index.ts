@@ -56,6 +56,7 @@ import {
 import * as sigParser from '../signatures'
 import { mapRequest } from '../requests'
 import { hasAddress } from '../../resources/domain/account'
+import { init as initGas } from '../gas'
 import type { Origin, Token } from '../store/state'
 
 interface RequiredApproval {
@@ -399,43 +400,6 @@ export class Provider extends EventEmitter {
     return handlerId
   }
 
-  private async getGasEstimate(rawTx: TransactionData) {
-    const { from, to, value, data, nonce } = rawTx
-    const txParams = { from, to, value, data, nonce }
-
-    const payload: JSONRPCRequestPayload = {
-      method: 'eth_estimateGas',
-      params: [txParams],
-      jsonrpc: '2.0',
-      id: 1
-    }
-    const targetChain: Chain = {
-      type: 'ethereum',
-      id: parseInt(rawTx.chainId, 16)
-    }
-
-    return new Promise<string>((resolve, reject) => {
-      this.connection.send(
-        payload,
-        (response) => {
-          if (response.error) {
-            log.warn(`error estimating gas for tx to ${txParams.to}: ${response.error}`)
-            return reject(response.error)
-          }
-
-          const estimatedLimit = parseInt(response.result, 16)
-          const paddedLimit = Math.ceil(estimatedLimit * 1.5)
-
-          log.verbose(
-            `gas estimate for tx to ${txParams.to}: ${estimatedLimit}, using ${paddedLimit} as gas limit`
-          )
-          return resolve(addHexPrefix(paddedLimit.toString(16)))
-        },
-        targetChain
-      )
-    })
-  }
-
   getNonce(rawTx: TransactionData, res: RPCRequestCallback) {
     const targetChain: Chain = {
       type: 'ethereum',
@@ -464,12 +428,13 @@ export class Provider extends EventEmitter {
     try {
       const approvals: RequiredApproval[] = []
       const rawTx = getRawTx(newTx)
-      const gas = gasFees(rawTx)
+      const fees = gasFees(rawTx)
       const { chainConfig } = connection
+      const gas = initGas(connection, rawTx.chainId)
 
       const estimateGasLimit = async () => {
         try {
-          return await this.getGasEstimate(rawTx)
+          return await gas.getGasEstimate(rawTx)
         } catch (error) {
           approvals.push({
             type: ApprovalType.GasLimitApproval,
@@ -490,7 +455,7 @@ export class Provider extends EventEmitter {
       const tx = { ...rawTx, gasLimit, recipientType }
 
       try {
-        const populatedTransaction = populateTransaction(tx, chainConfig, gas)
+        const populatedTransaction = populateTransaction(tx, chainConfig, fees)
         const checkedTransaction = checkExistingNonceGas(populatedTransaction)
 
         log.verbose('Succesfully populated transaction', checkedTransaction)

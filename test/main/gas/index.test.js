@@ -1,5 +1,5 @@
 import { intToHex } from '@ethereumjs/util'
-import { getFeeHistory, getGas } from '../../../main/gas/index'
+import { init } from '../../../main/gas/index'
 import { gweiToHex } from '../../../resources/utils'
 
 let requestHandlers
@@ -38,27 +38,30 @@ beforeEach(() => {
 
 describe('#getGas', () => {
   it('should return prices for a legacy chain', async () => {
-    const gas = await getGas(testConnection, '250', { baseFeePerGas: '0x108ca0736b' })
+    const gas = init(testConnection, '250')
+    const gasPrices = await gas.getGas({ baseFeePerGas: '0x108ca0736b' })
 
-    expect(gas).toStrictEqual({
+    expect(gasPrices).toStrictEqual({
       feeMarket: null,
       gasPrice: { asap: gasPrice, fast: gasPrice, slow: gasPrice, standard: gasPrice }
     })
   })
 
   it('should return prices for a chain without a baseFeePerGas value', async () => {
-    const gas = await getGas(testConnection, '1', {})
+    const gas = init(testConnection, '1')
+    const gasPrices = await gas.getGas({})
 
-    expect(gas).toStrictEqual({
+    expect(gasPrices).toStrictEqual({
       feeMarket: null,
       gasPrice: { asap: gasPrice, fast: gasPrice, slow: gasPrice, standard: gasPrice }
     })
   })
 
   it('should return feemarket and a single price for a chain with a baseFeePerGas value', async () => {
-    const gas = await getGas(testConnection, '1', { baseFeePerGas: '0x108ca0736b' })
+    const gas = init(testConnection, '1')
+    const gasPrices = await gas.getGas({ baseFeePerGas: '0x108ca0736b' })
 
-    expect(gas).toStrictEqual({
+    expect(gasPrices).toStrictEqual({
       feeMarket: {
         maxBaseFeePerGas: '0xe7',
         maxFeePerGas: '0xe7',
@@ -71,9 +74,10 @@ describe('#getGas', () => {
 
   describe('when the chain is Polygon', () => {
     it('should enforce a minimum of 30 gwei for the priority fee', async () => {
-      const gas = await getGas(testConnection, '137', { baseFeePerGas: '0x108ca0736b' })
+      const gas = init(testConnection, '137')
+      const gasPrices = await gas.getGas({ baseFeePerGas: '0x108ca0736b' })
 
-      expect(gas.feeMarket.maxPriorityFeePerGas).toBe(gweiToHex(30))
+      expect(gasPrices.feeMarket.maxPriorityFeePerGas).toBe(gweiToHex(30))
     })
 
     it('should not change the priority fee if above 30 gwei', async () => {
@@ -88,31 +92,38 @@ describe('#getGas', () => {
           reward: fillEmptySlots(blockRewards, numBlocks, ['0xa7a358200']).reverse()
         }
       })
-      const gas = await getGas(testConnection, '137', { baseFeePerGas: '0x108ca0736b' })
+      const gas = init(testConnection, '137')
+      const gasPrices = await gas.getGas({ baseFeePerGas: '0x108ca0736b' })
 
-      expect(gas.feeMarket.maxPriorityFeePerGas).toBe(gweiToHex(45))
+      expect(gasPrices.feeMarket.maxPriorityFeePerGas).toBe(gweiToHex(45))
     })
   })
 })
 
 describe('#getFeeHistory', () => {
+  let gas
+
+  beforeEach(() => {
+    gas = init(testConnection, '1', { baseFeePerGas: '0x108ca0736b' })
+  })
+
   it('should request the correct percentiles with the eth_feeHistory RPC call', async () => {
-    await getFeeHistory(testConnection, 10, [10, 20, 30])
+    await gas.getFeeHistory(10, [10, 20, 30])
     expect(requestHandlers['eth_feeHistory']).toBeCalledWith([intToHex(10), 'latest', [10, 20, 30]])
   })
 
   it('should return the correct number of fee history items', async () => {
-    const feeHistory = await getFeeHistory(testConnection, 1, [10])
+    const feeHistory = await gas.getFeeHistory(1, [10])
     expect(feeHistory.length).toBe(2)
   })
 
   it('should return the correct baseFee for the next block', async () => {
-    const feeHistory = await getFeeHistory(testConnection, 1, [10])
+    const feeHistory = await gas.getFeeHistory(1, [10])
     expect(feeHistory[1].baseFee).toBe(182)
   })
 
   it('should return the correct fee data for historical blocks', async () => {
-    const feeHistory = await getFeeHistory(testConnection, 1, [10])
+    const feeHistory = await gas.getFeeHistory(1, [10])
     expect(feeHistory[0]).toStrictEqual({ baseFee: 8, gasUsedRatio: 0, rewards: [0] })
   })
 })
