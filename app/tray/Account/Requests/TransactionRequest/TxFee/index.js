@@ -43,13 +43,12 @@ const USDEstimateDisplay = ({ minFee, maxFee, nativeCurrency }) => {
   const { value: maxFeeValue, displayValue, approximationSymbol: maxFeeApproximation } = maxFee.fiat()
   const displayMaxFeeWarning = maxFeeValue > FEE_WARNING_THRESHOLD_USD
   const maxFeeIsUnknownValue = displayValue === '?'
-  const maxFeeIsZero = displayValue === '0.00'
 
   return (
     <div data-testid='usd-estimate-display' className='clusterTag'>
       <div className={`_txFeeValueDefault${displayMaxFeeWarning ? ' _txFeeValueDefaultWarn' : ''}`}>
         <span>{maxFeeIsUnknownValue ? '=' : '≈'}</span>
-        {maxFeeApproximation === '<' || maxFeeIsUnknownValue || maxFeeIsZero ? (
+        {maxFeeApproximation === '<' || maxFeeIsUnknownValue ? (
           <FeeDisplay fee={maxFee} />
         ) : (
           <FeeRange max={maxFee} min={minFee} />
