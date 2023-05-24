@@ -6,3 +6,4 @@ package-lock.json
 cache
 .vscode
 scratch*
+test/.userData
