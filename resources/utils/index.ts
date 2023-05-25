@@ -1,6 +1,7 @@
 import { randomInt } from 'crypto'
 import { addHexPrefix, intToHex, stripHexPrefix } from '@ethereumjs/util'
 import { getAddress as getChecksumAddress } from '@ethersproject/address'
+import BigNumber from 'bignumber.js'
 
 const weiToGwei = (wei: number) => wei / 1e9
 const weiToHex = (wei: number) => addHexPrefix(wei.toString(16))
@@ -83,8 +84,13 @@ function getAddress(address: Address) {
     return lowerCaseAddress
   }
 }
+
 function isNonZeroHex(hex: string) {
   return !!hex && !['0x', '0x0'].includes(hex)
+}
+
+function minimumHex(hexValue: string, min = 0) {
+  return addHexPrefix(BigNumber.maximum(hexValue, min).toString(16))
 }
 
 export {
@@ -107,5 +113,6 @@ export {
   getAddress,
   stripHexPrefix,
   matchFilter,
-  isNonZeroHex
+  isNonZeroHex,
+  minimumHex
 }

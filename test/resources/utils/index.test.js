@@ -1,4 +1,4 @@
-import { matchFilter, getAddress } from '../../../resources/utils'
+import { matchFilter, getAddress, minimumHex } from '../../../resources/utils'
 
 describe('#matchFilter', () => {
   it('matches if the entire filter matches a single property', () => {
@@ -76,5 +76,19 @@ describe('#getAddress', () => {
     expect(getAddress('0x81aa3e376ea6e4b238a213324220C1a515031D12')).toBe(
       '0x81aA3e376ea6e4b238a213324220c1A515031D12'
     )
+  })
+})
+
+describe('#minimumHex', () => {
+  it('returns zero by default for an input less than zero', () => {
+    expect(minimumHex('-0xa')).toBe('0x0')
+  })
+
+  it('returns the specified minimum for an input less than the minimum', () => {
+    expect(minimumHex('0x16', 100)).toBe('0x64')
+  })
+
+  it('returns the given value if its greater than the minimum', () => {
+    expect(minimumHex('0x16', 10)).toBe('0x16')
   })
 })
