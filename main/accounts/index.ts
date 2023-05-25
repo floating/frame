@@ -11,7 +11,7 @@ import ExternalDataScanner, { DataScanner } from '../externalData'
 import Signer from '../signers/Signer'
 import { signerCompatibility as transactionCompatibility, SignerCompatibility } from '../transaction'
 
-import { weiIntToEthInt, hexToInt } from '../../resources/utils'
+import { weiIntToEthInt, hexToInt, minimumHex } from '../../resources/utils'
 import { accountPanelCrumb, signerPanelCrumb } from '../../resources/domain/nav'
 import { usesBaseFee, TransactionData, GasFeesSource } from '../../resources/domain/transaction'
 import { findUnavailableSigners, isSignerReady } from '../../resources/domain/signer'
@@ -926,13 +926,6 @@ export class Accounts extends EventEmitter {
     return !fee || isNaN(parseInt(fee, 16)) || parseInt(fee, 16) < 0
   }
 
-  private limitedHexValue(hexValue: string, min: number, max?: number) {
-    const value = parseInt(hexValue, 16)
-    if (value < min) return intToHex(min)
-    if (max && value > max) return intToHex(max)
-    return hexValue
-  }
-
   private txFeeUpdate(inputValue: string, handlerId: string, userUpdate: boolean) {
     // Check value
     if (this.invalidValue(inputValue)) throw new Error('txFeeUpdate, invalid input value')
@@ -1008,7 +1001,7 @@ export class Accounts extends EventEmitter {
     )
 
     // New value
-    const newBaseFee = parseInt(this.limitedHexValue(baseFee, 0), 16)
+    const newBaseFee = parseInt(minimumHex(baseFee, 0), 16)
 
     // No change
     if (newBaseFee === currentBaseFee) return
@@ -1045,7 +1038,7 @@ export class Accounts extends EventEmitter {
     )
 
     // New values
-    const newMaxPriorityFeePerGas = parseInt(this.limitedHexValue(priorityFee, 0), 16)
+    const newMaxPriorityFeePerGas = parseInt(minimumHex(priorityFee, 0), 16)
 
     // No change
     if (newMaxPriorityFeePerGas === maxPriorityFeePerGas) return
@@ -1081,7 +1074,7 @@ export class Accounts extends EventEmitter {
     const { currentAccount, gasLimit, gasPrice, txType } = this.txFeeUpdate(price, handlerId, userUpdate)
 
     // New values
-    const newGasPrice = parseInt(this.limitedHexValue(price, 0), 16)
+    const newGasPrice = parseInt(minimumHex(price, 0), 16)
 
     // No change
     if (newGasPrice === gasPrice) return
@@ -1110,7 +1103,7 @@ export class Accounts extends EventEmitter {
     const { currentAccount, maxFeePerGas, gasPrice, txType } = this.txFeeUpdate(limit, handlerId, userUpdate)
 
     // New values
-    const newGasLimit = parseInt(this.limitedHexValue(limit, 0), 16)
+    const newGasLimit = parseInt(minimumHex(limit, 0), 16)
 
     const txRequest = this.getTransactionRequest(currentAccount, handlerId)
     const tx = txRequest.data

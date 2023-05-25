@@ -83,8 +83,13 @@ function getAddress(address: Address) {
     return lowerCaseAddress
   }
 }
+
 function isNonZeroHex(hex: string) {
   return !!hex && !['0x', '0x0'].includes(hex)
+}
+
+function minimumHex(hexValue: string, min = 0) {
+  return parseInt(hexValue, 16) < intToHex(min) ? '0x0' : hexValue
 }
 
 export {
@@ -107,5 +112,6 @@ export {
   getAddress,
   stripHexPrefix,
   matchFilter,
-  isNonZeroHex
+  isNonZeroHex,
+  minimumHex
 }

@@ -28,12 +28,6 @@ function bnToHex(bn) {
   return `0x${bn.toString(16)}`
 }
 
-function limitRange(bn, min = 0, max) {
-  if (max && bn.gt(max)) return BigNumber(max)
-  if (bn.lt(min)) return BigNumber(min)
-  return bn
-}
-
 function formatForInput(num, decimals, useWei = false) {
   if (!decimals) {
     return num.toString()
@@ -43,8 +37,6 @@ function formatForInput(num, decimals, useWei = false) {
 
 const totalFee = ({ gasPrice, baseFee, priorityFee, gasLimit }) =>
   gasPrice ? gasPrice.times(gasLimit) : baseFee.plus(priorityFee).times(gasLimit)
-
-const limitGasUnits = (bn) => limitRange(bn, 0)
 
 let submitTimeout = null
 
@@ -212,7 +204,7 @@ class TxFeeOverlay extends Component {
         rawBaseFee = maxTotalFee.div(gasLimit).decimalPlaces(0, BigNumber.ROUND_FLOOR).minus(priorityFee)
       }
 
-      return limitRange(rawBaseFee)
+      return BigNumber.maximum(0, rawBaseFee)
     }
 
     const displayPriorityFee = toDisplayFromWei(priorityFee)
@@ -223,7 +215,7 @@ class TxFeeOverlay extends Component {
         rawPriorityFee = maxTotalFee.div(gasLimit).decimalPlaces(0, BigNumber.ROUND_FLOOR).minus(baseFee)
       }
 
-      return limitRange(rawPriorityFee)
+      return BigNumber.maximum(0, rawPriorityFee)
     }
 
     const displayGasPrice = toDisplayFromWei(gasPrice)
@@ -234,7 +226,7 @@ class TxFeeOverlay extends Component {
         rawGasPrice = maxTotalFee.div(gasLimit).decimalPlaces(0, BigNumber.ROUND_FLOOR)
       }
 
-      return limitRange(rawGasPrice)
+      return BigNumber.maximum(0, rawGasPrice)
     }
 
     const displayGasLimit = gasLimit.toString()
@@ -247,7 +239,7 @@ class TxFeeOverlay extends Component {
         rawGasLimit = maxTotalFee.div(baseFee.plus(priorityFee)).decimalPlaces(0, BigNumber.ROUND_FLOOR)
       }
 
-      return limitGasUnits(rawGasLimit)
+      return BigNumber.maximum(0, rawGasLimit)
     }
 
     const receiveValueHandler = (value, name) => {
