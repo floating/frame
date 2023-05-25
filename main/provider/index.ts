@@ -23,7 +23,8 @@ import Chains, { Chain } from '../chains'
 import reveal from '../reveal'
 import { getSignerType, Type as SignerType } from '../../resources/domain/signer'
 import { normalizeChainId, TransactionData } from '../../resources/domain/transaction'
-import { populate as populateTransaction, maxFee, classifyTransaction } from '../transaction'
+import { populate as populateTransaction, classifyTransaction } from '../transaction'
+import { getMaxTotalFee } from '../../resources/gas'
 import { capitalize } from '../../resources/utils'
 import { ApprovalType } from '../../resources/constants'
 import { createObserver as AssetsObserver, loadAssets } from './assets'
@@ -307,7 +308,7 @@ export class Provider extends EventEmitter {
     }
 
     const payload = req.payload
-    const maxTotalFee = maxFee(rawTx)
+    const maxTotalFee = getMaxTotalFee(rawTx)
 
     if (feeTotalOverMax(rawTx, maxTotalFee)) {
       const chainId = parseInt(rawTx.chainId)

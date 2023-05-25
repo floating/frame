@@ -74,23 +74,6 @@ function londonToLegacy(txData: TransactionData): TransactionData {
   return txData
 }
 
-function maxFee(rawTx: TransactionData) {
-  const chainId = parseInt(rawTx.chainId)
-
-  // for ETH-based chains, the max fee should be 2 ETH
-  if ([1, 3, 4, 5, 6, 10, 42, 61, 62, 63, 69, 42161, 421611].includes(chainId)) {
-    return 2 * 1e18
-  }
-
-  // for Fantom, the max fee should be 250 FTM
-  if ([250, 4002].includes(chainId)) {
-    return 250 * 1e18
-  }
-
-  // for all other chains, default to 50 of the chain's currency
-  return 50 * 1e18
-}
-
 function calculateMaxFeePerGas(maxBaseFee: string, maxPriorityFee: string) {
   const maxFeePerGas = BigNumber(maxPriorityFee).plus(maxBaseFee).toString(16)
   return addHexPrefix(maxFeePerGas)
@@ -191,4 +174,4 @@ function classifyTransaction({
   return TxClassification.NATIVE_TRANSFER
 }
 
-export { maxFee, populate, sign, signerCompatibility, londonToLegacy, classifyTransaction }
+export { populate, sign, signerCompatibility, londonToLegacy, classifyTransaction }
