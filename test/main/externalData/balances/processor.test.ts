@@ -1,8 +1,10 @@
+import { jest } from '@jest/globals'
 import { randomBytes, randomInt } from 'crypto'
-import { handleBalanceUpdate } from '../../../../main/externalData/balances/processor'
+
 import store from '../../../../main/store'
+import { handleBalanceUpdate } from '../../../../main/externalData/balances/processor'
 import { storeApi } from '../../../../main/externalData/balances/storeApi'
-import { Token as IToken } from '../../../../main/store/state'
+
 const randomStr = () => randomBytes(32).toString('hex')
 
 jest.mock('../../../../main/externalData/surface', () => ({}))
@@ -14,11 +16,13 @@ jest.mock('../../../../main/store', () => ({
   addPopulatedChains: jest.fn()
 }))
 
+const { getTokenBalances, getCustomTokens } = jest.mocked(storeApi)
+
 jest.mock('../../../../main/externalData/balances/storeApi', () => ({
   storeApi: {
     getTokenBalances: jest.fn(() => []),
     getCustomTokens: jest.fn(() => []),
-    getKnownTokens: jest.fn(() => [])
+    getKnownTokens: () => []
   }
 }))
 
@@ -41,7 +45,7 @@ const Balance = (
   displayBalance: ''
 })
 
-const Token = (address: string, chainId: number, symbol = randomStr(), name = randomStr()): IToken => ({
+const Token = (address: string, chainId: number, symbol = randomStr(), name = randomStr()) => ({
   symbol,
   name,
   decimals: randomInt(18),
@@ -72,7 +76,7 @@ describe('snapshot updates', () => {
 
     const customTokens = [Token(bal1Addr, bal1Chain)]
 
-    ;(storeApi.getCustomTokens as jest.Mock).mockImplementationOnce(() => customTokens)
+    getCustomTokens.mockImplementationOnce(() => customTokens)
 
     handleBalanceUpdate(address, balances, [1], 'snapshot')
 
@@ -97,7 +101,7 @@ describe('snapshot updates', () => {
       displayBalance: '0'
     }
 
-    ;(storeApi.getCustomTokens as jest.Mock).mockImplementationOnce(() => [customToken])
+    getCustomTokens.mockImplementationOnce(() => [customToken])
 
     handleBalanceUpdate(address, balances, [1], 'snapshot')
 
@@ -107,7 +111,8 @@ describe('snapshot updates', () => {
   it('should not update balances which have not changed', () => {
     const address = randomStr()
     const balances = [Balance(), Balance()]
-    ;(storeApi.getTokenBalances as jest.Mock).mockImplementationOnce(() => balances)
+
+    getTokenBalances.mockImplementationOnce(() => balances)
 
     handleBalanceUpdate(address, balances, [], 'snapshot')
 
@@ -117,7 +122,8 @@ describe('snapshot updates', () => {
   it('should update the balances where the amount has changed', () => {
     const address = randomStr()
     const balances = [Balance(), Balance()]
-    ;(storeApi.getTokenBalances as jest.Mock).mockImplementationOnce(() => balances)
+
+    getTokenBalances.mockImplementationOnce(() => balances)
 
     const newBalance = {
       ...balances[0],
@@ -132,7 +138,7 @@ describe('snapshot updates', () => {
   it('should update the balances where the amount has changed and its a custom token', () => {
     const address = randomStr()
     const balances = [Balance(), Balance()]
-    ;(storeApi.getTokenBalances as jest.Mock).mockImplementationOnce(() => balances)
+    getTokenBalances.mockImplementationOnce(() => balances)
 
     const newBalance = {
       ...balances[0],
@@ -147,7 +153,8 @@ describe('snapshot updates', () => {
   it('should update the balances where the metadata have changed and its not a custom token', () => {
     const address = randomStr()
     const balances = [Balance(), Balance()]
-    ;(storeApi.getTokenBalances as jest.Mock).mockImplementationOnce(() => balances)
+
+    getTokenBalances.mockImplementationOnce(() => balances)
 
     const newBalance = {
       ...balances[0],
@@ -172,8 +179,8 @@ describe('snapshot updates', () => {
 
     const balances = [Balance(), customTokenBalance]
 
-    ;(storeApi.getCustomTokens as jest.Mock).mockImplementation(() => [customToken])
-    ;(storeApi.getTokenBalances as jest.Mock).mockImplementationOnce(() => balances)
+    getCustomTokens.mockImplementation(() => [customToken])
+    getTokenBalances.mockImplementationOnce(() => balances)
 
     const newBalance = {
       ...customTokenBalance,
