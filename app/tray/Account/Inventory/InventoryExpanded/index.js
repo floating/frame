@@ -8,9 +8,7 @@ import { matchFilter } from '../../../../../resources/utils'
 import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../resources/Components/Cluster'
 import CollectionList from '../CollectionList'
 
-const InventoryExpanded = (props) => {
-  const { expandedData, moduleId, account } = props
-
+const InventoryExpanded = ({ expandedData, moduleId, account }) => {
   const [collectionFilter, setCollectionFilter] = useState('')
   const hiddenCollections = useStore('main.hiddenCollections') || []
 
@@ -40,7 +38,7 @@ const InventoryExpanded = (props) => {
   }
 
   const isFilterMatch = (collection) => {
-    const c = useStore('main.inventory', props.account, collection)
+    const c = useStore('main.inventory', account, collection)
     if (!c || !c.meta) return false
     const collectionName = c.meta.name || ''
     const collectionItems = c.items || {}
@@ -53,11 +51,11 @@ const InventoryExpanded = (props) => {
   }
 
   const displayCollections = () => {
-    const inventory = useStore('main.inventory', props.account)
+    const inventory = useStore('main.inventory', account)
     const collections = Object.keys(inventory || {})
     return collections
       .filter((k) => {
-        const c = useStore('main.inventory', props.account, k)
+        const c = useStore('main.inventory', account, k)
         if (!c || !c.meta) return false
         const collectionId = `${c.meta.chainId}:${k}`
         const isHidden = hiddenCollections.includes(collectionId)
@@ -73,7 +71,7 @@ const InventoryExpanded = (props) => {
       .filter((c) => isFilterMatch(c))
   }
 
-  const inventory = useStore('main.inventory', props.account)
+  const inventory = useStore('main.inventory', account)
   const collections = Object.keys(inventory || {})
   return (
     <div className='accountViewScroll'>
@@ -81,7 +79,12 @@ const InventoryExpanded = (props) => {
       <ClusterBox>
         <Cluster>
           {collections.length ? (
-            <CollectionList {...props} collections={displayCollections()} />
+            <CollectionList
+              expandedData={expandedData}
+              moduleId={moduleId}
+              account={account}
+              collections={displayCollections()}
+            />
           ) : inventory ? (
             <ClusterRow>
               <ClusterValue>
@@ -91,7 +94,8 @@ const InventoryExpanded = (props) => {
           ) : (
             <ClusterRow>
               <ClusterValue>
-                <div className='inventoryNotFound'>Loading Items..</div>
+                {/* <div className='signerBalanceLoading'>{svg.sine()}</div> */}
+                <div className='inventoryNotFound'>Loading Items</div>
               </ClusterValue>
             </ClusterRow>
           )}

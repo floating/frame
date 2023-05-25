@@ -120,7 +120,7 @@ export const ClusterValue = styled.div`
 
   ${(props) => {
     return (
-      (props.onClick || props.allowPointer) &&
+      props.onClick &&
       css`
         cursor: pointer;
         margin-bottom: 0px;

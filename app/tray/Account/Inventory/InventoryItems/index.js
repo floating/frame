@@ -11,72 +11,14 @@ import {
   ClusterValue
 } from '../../../../../resources/Components/Cluster'
 
-import styled, { keyframes } from 'styled-components'
+import { PulsateCircle, InventoryPreview, PreviewDisplay, PreviewOptions, Container } from './styled'
 
-const pylonProxy = 'https://static.pylon.link'
-
-const pulsate = keyframes`
-  0% { transform: scale(1) }
-  100% { transform: scale(3) }
-`
-const PulsateCircle = styled.div`
-  display: inline-block;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background-color: var(--ghostZ);
-  animation: ${pulsate} 1.4s ease-in-out infinite alternate;
-  animation-delay: ${(props) => (props.index || 0) * 0.3 + 's'};
-  transform: translate3d(0, 0, 1px);
-`
-
-const InventoryPreview = styled.div`
-  position: absolute !important;
-  top: 42px;
-  left: 0px;
-  right: 0px;
-  bottom: 12px;
-`
-
-const PreviewDisplay = styled.div`
-  position: relative;
-  width: 100%;
-  height: 240px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 8px;
-`
-
-const PreviewOptions = styled.div`
-  position: relative;
-  width: 100%;
-  height: 31px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-family: 'VCR';
-  font-size: 14px;
-  text-transform: uppercase;
-`
-
-const Container = styled.div`
-  height: calc(100% - 325px);
-`
-
-const toItems = (contract, collection) =>
-  Object.keys(collection.items).map((tokenId) => ({
+const toItems = (contract, collection) => {
+  return Object.keys(collection.items).map((tokenId) => ({
     contract,
     chainId: collection.meta.chainId,
     tokenId
   }))
-
-const group = (items) => {
-  return items.reduce((acc, id, index) => {
-    if (index % 4 === 0) acc.push([])
-    acc[acc.length - 1].push(id)
-    return acc
-  }, [])
 }
 
 const previewTitle = (name = '') => {
@@ -91,8 +33,12 @@ const InventoryCollection = ({ expandedData = {}, inventory, onAssetClick, accou
   const [hoverAsset, setHoverAsset] = useState(false)
   const k = expandedData.currentCollection
   if (!k || !account || !inventory) return
-
   const [confirmHide, setConfirmHide] = useState(false)
+  const { meta } = inventory[k]
+
+  const collectionId = `${meta.chainId}:${k}`
+  const hiddenCollections = useStore('main.hiddenCollections') || []
+  const isHidden = hiddenCollections.includes(collectionId)
 
   useEffect(() => {
     if (k) {
@@ -101,11 +47,6 @@ const InventoryCollection = ({ expandedData = {}, inventory, onAssetClick, accou
       link.rpc('subscribeToItems', account, items, () => {})
     }
   }, [])
-
-  const renderClusterRow = (row, i) => {
-    while (row.length < 4) row.push(null)
-    return <ClusterRow key={`row-${i}}`}>{row.map(renderClusterValue)}</ClusterRow>
-  }
 
   const renderClusterValue = (id, i) => {
     const item = inventory[k].items[id]
@@ -155,10 +96,18 @@ const InventoryCollection = ({ expandedData = {}, inventory, onAssetClick, accou
     )
   }
 
-  const { meta } = inventory[k]
-  const collectionId = `${meta.chainId}:${k}`
-  const hiddenCollections = useStore('main.hiddenCollections') || []
-  const isHidden = hiddenCollections.includes(collectionId)
+  const group = (items) => {
+    return items
+      .reduce((acc, id, index) => {
+        if (index % 4 === 0) acc.push([])
+        acc[acc.length - 1].push(id)
+        return acc
+      }, [])
+      .map((row, i) => {
+        while (row.length < 4) row.push(null)
+        return <ClusterRow key={`row-${i}}`}>{row.map(renderClusterValue)}</ClusterRow>
+      })
+  }
 
   return (
     <div className='inventoryDisplay'>
@@ -170,13 +119,7 @@ const InventoryCollection = ({ expandedData = {}, inventory, onAssetClick, accou
                 <ClusterRow>
                   <ClusterValue>
                     <PreviewDisplay>
-                      <div className='inventoryPreviewMedia'>
-                        <img
-                          // src={`${pylonProxy}?type=nft&target=${encodeURIComponent(hoverAsset.img)}`}
-                          src={hoverAsset.img}
-                          alt={(hoverAsset.name || '').toUpperCase()}
-                        />
-                      </div>
+                      <img src={hoverAsset.img} alt={(hoverAsset.name || '').toUpperCase()} />
                     </PreviewDisplay>
                   </ClusterValue>
                 </ClusterRow>
@@ -204,7 +147,6 @@ const InventoryCollection = ({ expandedData = {}, inventory, onAssetClick, accou
                     </PreviewDisplay>
                   </ClusterValue>
                 </ClusterRow>
-
                 {confirmHide ? (
                   <ClusterRow height={'42px'}>
                     <ClusterValue>
@@ -276,7 +218,7 @@ const InventoryCollection = ({ expandedData = {}, inventory, onAssetClick, accou
                   b = inventory[k].items[b].tokenId
                   return a < b ? -1 : b > a ? 1 : 0
                 })
-              ).map(renderClusterRow)}
+              )}
             </ClusterScroll>
           </Container>
         </ClusterBox>

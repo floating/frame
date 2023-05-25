@@ -1,17 +1,12 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import styled, { keyframes, css } from 'styled-components'
 
 import link from '../../../../../resources/link'
-import svg from '../../../../../resources/svg'
-// import { matchFilter } from '../../../../../resources/utils'
-
 import RingIcon from '../../../../../resources/Components/RingIcon'
-
 import useStore from '../../../../../resources/Hooks/useStore'
 import { ClusterRow, ClusterValue } from '../../../../../resources/Components/Cluster'
 import RingIcon from '../../../../../resources/Components/RingIcon'
 import useStore from '../../../../../resources/Hooks/useStore'
-
 import DynamicImg from '../../../../../resources/Components/DynamicImg'
 
 const CollectionInner = styled.div`
@@ -31,7 +26,7 @@ const CollectionMain = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  inset: 33px 20px 12px 66px;
+  inset: 30px 20px 12px 66px;
 `
 
 const CollectionLine = styled.div`
@@ -61,20 +56,15 @@ const CollectionDot = styled.div`
   min-height: 16px;
   min-width: 16px;
   margin-right: 6px;
-  border-radius: 50%;
+  border-radius: 4px;
   transition: var(--standard);
   overflow: hidden;
   justify-content: center;
   position: relative;
   font-family: 'FiraCode';
   font-size: 10px;
-  animation: ${(props) =>
-    props.active
-      ? css`
-          ${wave} 1.6s ease-in infinite
-        `
-      : 'none'};
-
+  border: 1px solid var(--ghostB);
+  box-shadow: 0px 1px 2px var(--ghostY);
   z-index: 10;
   img {
     margin: -1px;
@@ -130,6 +120,16 @@ const Collection = ({ moduleId, account, collection, collectionId }) => {
       return a < b ? -1 : b > a ? 1 : 0
     })
     .slice(0, 8)
+
+  useEffect(() => {
+    const items = previewItems.map((tokenId) => ({
+      contract: collectionId,
+      chainId: collection.meta.chainId,
+      tokenId
+    }))
+    link.rpc('subscribeToItems', account, items, () => {})
+  }, [])
+
   return (
     <ClusterRow key={collectionId}>
       <ClusterValue
@@ -169,7 +169,7 @@ const Collection = ({ moduleId, account, collection, collectionId }) => {
                   const item = collection.items[id]
                   return (
                     <CollectionDot style={{ animationDelay: i * 0.1 + 's' }} active={active}>
-                      <DynamicImg src={item.img} alt={item.name} active={active} />
+                      <img src={item.img} alt={item.name} />
                       <MissingDot />
                     </CollectionDot>
                   )

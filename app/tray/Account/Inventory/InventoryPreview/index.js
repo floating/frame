@@ -3,11 +3,44 @@ import Restore from 'react-restore'
 import link from '../../../../../resources/link'
 import svg from '../../../../../resources/svg'
 import { matchFilter } from '../../../../../resources/utils'
+import styled, { keyframes } from 'styled-components'
 
 import { Cluster, ClusterRow, ClusterValue } from '../../../../../resources/Components/Cluster'
 
 import CollectionList from '../CollectionList'
 
+const LoadingWave = keyframes`
+  0% {
+    transform: translateX(0);
+  }
+  100%{
+    transform: translateX(74px);
+  }
+`
+const BalanceLoading = styled.div`
+  position: relative;
+  height: 24px;
+  width: 90px;
+  display: flex;
+  overflow: hidden;
+  opacity: 1;
+  padding: 1px 0px;
+  border-radius: 12px;
+  background: var(--ghostZ);
+  border: 6px solid var(--ghostZ);
+  color: var(--mint);
+  box-sizing: border-box;
+  margin: 0px 0px 6px 0px;
+
+  svg {
+    width: 300%;
+    position: relative;
+    left: -100%;
+    stroke-width: 20px;
+    animation: ${LoadingWave} 3.4s linear infinite;
+    will-change: transform;
+  }
+`
 class Inventory extends React.Component {
   constructor(...args) {
     super(...args)
@@ -88,7 +121,10 @@ class Inventory extends React.Component {
           ) : (
             <ClusterRow>
               <ClusterValue>
-                <div className='inventoryNotFound'>Loading Items..</div>
+                <div style={{ padding: '20px', display: 'flex', flexDirection: 'column' }}>
+                  <BalanceLoading>{svg.sine()}</BalanceLoading>
+                  <div className='inventoryNotFound'>Loading Items</div>
+                </div>
               </ClusterValue>
             </ClusterRow>
           )}
