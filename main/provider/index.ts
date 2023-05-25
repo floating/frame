@@ -430,7 +430,7 @@ export class Provider extends EventEmitter {
       const rawTx = getRawTx(newTx)
       const fees = gasFees(rawTx)
       const { chainConfig } = connection
-      const gas = initGas(connection, rawTx.chainId)
+      const gas = initGas(this, rawTx.chainId)
 
       const estimateGasLimit = async () => {
         try {

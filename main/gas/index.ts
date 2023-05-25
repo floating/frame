@@ -194,7 +194,6 @@ const gasChainMap = {
   80001: PolygonGas
 }
 
-// TODO: rationalise use of provider / provider.connection
 export function init(provider: Provider, chainIdStr: string) {
   const chainId = parseInt(chainIdStr)
   const ChainSpecificGas = gasChainMap[chainId as keyof typeof gasChainMap]
