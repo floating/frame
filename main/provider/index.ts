@@ -22,7 +22,7 @@ import Chains, { Chain } from '../chains'
 import reveal from '../reveal'
 import { getSignerType, Type as SignerType } from '../../resources/domain/signer'
 import { normalizeChainId, TransactionData } from '../../resources/domain/transaction'
-import { populate as populateTransaction, maxFee, classifyTransaction } from '../transaction'
+import { maxFee, classifyTransaction } from '../transaction'
 import { capitalize } from '../../resources/utils'
 import { ApprovalType } from '../../resources/constants'
 import { createObserver as AssetsObserver, loadAssets } from './assets'
@@ -32,7 +32,6 @@ import {
   checkExistingNonceGas,
   ecRecover,
   feeTotalOverMax,
-  gasFees,
   getPermissions,
   getRawTx,
   getSignedAddress,
@@ -428,7 +427,6 @@ export class Provider extends EventEmitter {
     try {
       const approvals: RequiredApproval[] = []
       const rawTx = getRawTx(newTx)
-      const fees = gasFees(rawTx)
       const { chainConfig } = connection
       const gas = initGas(this, rawTx.chainId)
 
@@ -455,7 +453,7 @@ export class Provider extends EventEmitter {
       const tx = { ...rawTx, gasLimit, recipientType }
 
       try {
-        const populatedTransaction = populateTransaction(tx, chainConfig, fees)
+        const populatedTransaction = gas.populateTransaction(tx, chainConfig)
         const checkedTransaction = checkExistingNonceGas(populatedTransaction)
 
         log.verbose('Succesfully populated transaction', checkedTransaction)

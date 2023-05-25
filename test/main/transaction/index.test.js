@@ -1,15 +1,12 @@
 import { addHexPrefix, stripHexPrefix } from '@ethereumjs/util'
-import { Common } from '@ethereumjs/common'
 
 import {
   maxFee,
   londonToLegacy,
   signerCompatibility,
-  populate,
   sign,
   classifyTransaction
 } from '../../../main/transaction'
-import { GasFeesSource } from '../../../resources/domain/transaction'
 import { TxClassification } from '../../../main/accounts/types'
 
 describe('#signerCompatibility', () => {
@@ -263,161 +260,6 @@ describe('#maxFee', () => {
     }
 
     expect(maxFee(tx)).toBe(5e19)
-  })
-})
-
-describe('#populate', () => {
-  let gas
-  let rawTx
-
-  beforeEach(() => {
-    gas = {
-      price: {
-        levels: {
-          fast: ''
-        }
-      }
-    }
-    rawTx = {
-      gasLimit: '0x61a8',
-      value: '0x6f05b59d3b20000',
-      to: '0x6635f83421bf059cd8111f180f0727128685bae4',
-      data: '0x0000000000000000000006635f83421bf059cd8111f180f0726635f83421bf059cd8111f180f072',
-      gasFeesSource: GasFeesSource.Dapp
-    }
-  })
-
-  describe('legacy transactions', () => {
-    const chainConfig = new Common({ chain: 'mainnet', hardfork: 'istanbul' })
-
-    it('sets the transaction type', () => {
-      const tx = populate(rawTx, chainConfig, gas)
-
-      expect(tx.type).toBe('0x0')
-    })
-
-    it('uses Frame-supplied gasPrice when the dapp did not specify a value', () => {
-      gas.price.levels.fast = addHexPrefix((7e9).toString(16))
-      const tx = populate(rawTx, chainConfig, gas)
-
-      expect(tx.gasPrice).toBe(gas.price.levels.fast)
-      expect(tx.gasFeesSource).toBe(GasFeesSource.Frame)
-    })
-
-    it('uses Frame-supplied gasPrice when the dapp specified an invalid value', () => {
-      gas.price.levels.fast = addHexPrefix((7e9).toString(16))
-      rawTx.gasPrice = ''
-      const tx = populate(rawTx, chainConfig, gas)
-
-      expect(tx.gasPrice).toBe(gas.price.levels.fast)
-      expect(tx.gasFeesSource).toBe(GasFeesSource.Frame)
-    })
-
-    it('uses dapp-supplied gasPrice when the dapp specified a valid value', () => {
-      gas.price.levels.fast = addHexPrefix((7e9).toString(16))
-      rawTx.gasPrice = (6e9).toString(16)
-      const tx = populate(rawTx, chainConfig, gas)
-
-      expect(tx.gasPrice).toBe(rawTx.gasPrice)
-      expect(tx.gasFeesSource).toBe(GasFeesSource.Dapp)
-    })
-  })
-
-  describe('eip-1559 transactions', () => {
-    const chainConfig = new Common({ chain: 'mainnet', hardfork: 'london' })
-
-    beforeEach(() => {
-      gas = {
-        price: {
-          fees: {
-            maxPriorityFeePerGas: '',
-            maxBaseFeePerGas: ''
-          }
-        }
-      }
-    })
-
-    it('sets the transaction type', () => {
-      const tx = populate(rawTx, chainConfig, gas)
-
-      expect(tx.type).toBe('0x2')
-    })
-
-    it('calculates maxFeePerGas when the dapp did not specify a value', () => {
-      gas.price.fees.maxBaseFeePerGas = addHexPrefix((7e9).toString(16))
-      gas.price.fees.maxPriorityFeePerGas = addHexPrefix((3e9).toString(16))
-      const tx = populate(rawTx, chainConfig, gas)
-
-      expect(tx.maxFeePerGas).toBe(addHexPrefix((7e9 + 3e9).toString(16)))
-      expect(tx.gasFeesSource).toBe(GasFeesSource.Frame)
-    })
-
-    it('calculates maxFeePerGas when the dapp specified an invalid value', () => {
-      gas.price.fees.maxBaseFeePerGas = addHexPrefix((7e9).toString(16))
-      gas.price.fees.maxPriorityFeePerGas = addHexPrefix((3e9).toString(16))
-      rawTx.maxFeePerGas = ''
-      const tx = populate(rawTx, chainConfig, gas)
-
-      expect(tx.maxFeePerGas).toBe(addHexPrefix((7e9 + 3e9).toString(16)))
-      expect(tx.gasFeesSource).toBe(GasFeesSource.Frame)
-    })
-
-    it('calculates maxFeePerGas using a dapp-supplied value of maxPriorityFeePerGas', () => {
-      gas.price.fees.maxBaseFeePerGas = addHexPrefix((7e9).toString(16))
-      gas.price.fees.maxPriorityFeePerGas = addHexPrefix((3e9).toString(16))
-      rawTx.maxPriorityFeePerGas = addHexPrefix((4e9).toString(16))
-      const tx = populate(rawTx, chainConfig, gas)
-
-      expect(tx.maxFeePerGas).toBe(addHexPrefix((7e9 + 4e9).toString(16)))
-      expect(tx.gasFeesSource).toBe(GasFeesSource.Dapp)
-    })
-
-    it('uses dapp-supplied maxFeePerGas when the dapp specified a valid value', () => {
-      gas.price.fees.maxBaseFeePerGas = addHexPrefix((7e9).toString(16))
-      gas.price.fees.maxPriorityFeePerGas = addHexPrefix((3e9).toString(16))
-      rawTx.maxFeePerGas = (6e9).toString(16)
-      const tx = populate(rawTx, chainConfig, gas)
-
-      expect(tx.maxFeePerGas).toBe(rawTx.maxFeePerGas)
-      expect(tx.gasFeesSource).toBe(GasFeesSource.Dapp)
-    })
-
-    it('uses Frame-supplied maxPriorityFeePerGas when the dapp did not specify a value', () => {
-      gas.price.fees.maxPriorityFeePerGas = addHexPrefix((3e9).toString(16))
-      const tx = populate(rawTx, chainConfig, gas)
-
-      expect(tx.maxPriorityFeePerGas).toBe(gas.price.fees.maxPriorityFeePerGas)
-      expect(tx.gasFeesSource).toBe(GasFeesSource.Frame)
-    })
-
-    it('uses Frame-supplied maxPriorityFeePerGas when the dapp specified an invalid value', () => {
-      gas.price.fees.maxPriorityFeePerGas = addHexPrefix((3e9).toString(16))
-      rawTx.maxFeePerGas = ''
-      const tx = populate(rawTx, chainConfig, gas)
-
-      expect(tx.maxPriorityFeePerGas).toBe(gas.price.fees.maxPriorityFeePerGas)
-      expect(tx.gasFeesSource).toBe(GasFeesSource.Frame)
-    })
-
-    it('uses dapp-supplied maxPriorityFeePerGas when the dapp specified a valid value', () => {
-      gas.price.fees.maxBaseFeePerGas = addHexPrefix((7e9).toString(16))
-      gas.price.fees.maxPriorityFeePerGas = addHexPrefix((3e9).toString(16))
-      rawTx.maxPriorityFeePerGas = (6e9).toString(16)
-      const tx = populate(rawTx, chainConfig, gas)
-
-      expect(tx.maxPriorityFeePerGas).toBe(rawTx.maxPriorityFeePerGas)
-      expect(tx.gasFeesSource).toBe(GasFeesSource.Dapp)
-    })
-  })
-
-  describe('eip-2930 transactions', () => {
-    const chainConfig = new Common({ chain: 'mainnet', hardfork: 'berlin' })
-
-    it('sets the transaction type', () => {
-      const tx = populate(rawTx, chainConfig, gas)
-
-      expect(tx.type).toBe('0x1')
-    })
   })
 })
 

@@ -1,6 +1,9 @@
-import { intToHex } from '@ethereumjs/util'
+import { addHexPrefix, intToHex } from '@ethereumjs/util'
+import store from '../../../main/store'
 import { init } from '../../../main/gas/index'
 import { gweiToHex } from '../../../resources/utils'
+import { Common } from '@ethereumjs/common'
+import { GasFeesSource } from '../../../resources/domain/transaction'
 
 let requestHandlers
 let testConnection = {
@@ -12,6 +15,8 @@ let testConnection = {
     return Promise.reject('unsupported method: ' + payload.method)
   })
 }
+
+jest.mock('../../../main/store/persist')
 
 const gasPrice = '0x3baa1028'
 const nextBlockBaseFee = '0xb6'
@@ -125,6 +130,167 @@ describe('#getFeeHistory', () => {
   it('should return the correct fee data for historical blocks', async () => {
     const feeHistory = await gas.getFeeHistory(1, [10])
     expect(feeHistory[0]).toStrictEqual({ baseFee: 8, gasUsedRatio: 0, rewards: [0] })
+  })
+})
+
+describe('#populateTransaction', () => {
+  let gas
+  let rawTx
+
+  beforeEach(() => {
+    gas = init(testConnection, '1')
+    rawTx = {
+      chainId: '0xa',
+      gasLimit: '0x61a8',
+      value: '0x6f05b59d3b20000',
+      to: '0x6635f83421bf059cd8111f180f0727128685bae4',
+      data: '0x0000000000000000000006635f83421bf059cd8111f180f0726635f83421bf059cd8111f180f072',
+      gasFeesSource: GasFeesSource.Dapp
+    }
+    store.setGasPrices('ethereum', rawTx.chainId, { fast: '' })
+  })
+
+  describe('legacy transactions', () => {
+    const chainConfig = new Common({ chain: 'mainnet', hardfork: 'istanbul' })
+
+    it('sets the transaction type', () => {
+      const tx = gas.populateTransaction(rawTx, chainConfig)
+
+      expect(tx.type).toBe('0x0')
+    })
+
+    it('uses Frame-supplied gasPrice when the dapp did not specify a value', () => {
+      const fastLevel = addHexPrefix((7e9).toString(16))
+      store.setGasPrices('ethereum', parseInt(rawTx.chainId), { fast: fastLevel })
+      const tx = gas.populateTransaction(rawTx, chainConfig)
+
+      expect(tx.gasPrice).toBe(fastLevel)
+      expect(tx.gasFeesSource).toBe(GasFeesSource.Frame)
+    })
+
+    it('uses Frame-supplied gasPrice when the dapp specified an invalid value', () => {
+      const fastLevel = addHexPrefix((7e9).toString(16))
+      store.setGasPrices('ethereum', parseInt(rawTx.chainId), { fast: fastLevel })
+      rawTx.gasPrice = ''
+      const tx = gas.populateTransaction(rawTx, chainConfig)
+
+      expect(tx.gasPrice).toBe(fastLevel)
+      expect(tx.gasFeesSource).toBe(GasFeesSource.Frame)
+    })
+
+    it('uses dapp-supplied gasPrice when the dapp specified a valid value', () => {
+      store.setGasPrices('ethereum', rawTx.chainId, { fast: addHexPrefix((7e9).toString(16)) })
+      rawTx.gasPrice = (6e9).toString(16)
+      const tx = gas.populateTransaction(rawTx, chainConfig)
+
+      expect(tx.gasPrice).toBe(rawTx.gasPrice)
+      expect(tx.gasFeesSource).toBe(GasFeesSource.Dapp)
+    })
+  })
+
+  describe('eip-1559 transactions', () => {
+    const chainConfig = new Common({ chain: 'mainnet', hardfork: 'london' })
+
+    beforeEach(() => {
+      store.setGasFees('ethereum', parseInt(rawTx.chainId), {
+        maxPriorityFeePerGas: '',
+        maxBaseFeePerGas: ''
+      })
+    })
+
+    it('sets the transaction type', () => {
+      const tx = gas.populateTransaction(rawTx, chainConfig)
+
+      expect(tx.type).toBe('0x2')
+    })
+
+    it('calculates maxFeePerGas when the dapp did not specify a value', () => {
+      store.setGasFees('ethereum', parseInt(rawTx.chainId), {
+        maxPriorityFeePerGas: addHexPrefix((3e9).toString(16)),
+        maxBaseFeePerGas: addHexPrefix((7e9).toString(16))
+      })
+      const tx = gas.populateTransaction(rawTx, chainConfig)
+
+      expect(tx.maxFeePerGas).toBe(addHexPrefix((7e9 + 3e9).toString(16)))
+      expect(tx.gasFeesSource).toBe(GasFeesSource.Frame)
+    })
+
+    it('calculates maxFeePerGas when the dapp specified an invalid value', () => {
+      store.setGasFees('ethereum', parseInt(rawTx.chainId), {
+        maxPriorityFeePerGas: addHexPrefix((3e9).toString(16)),
+        maxBaseFeePerGas: addHexPrefix((7e9).toString(16))
+      })
+      rawTx.maxFeePerGas = ''
+      const tx = gas.populateTransaction(rawTx, chainConfig)
+
+      expect(tx.maxFeePerGas).toBe(addHexPrefix((7e9 + 3e9).toString(16)))
+      expect(tx.gasFeesSource).toBe(GasFeesSource.Frame)
+    })
+
+    it('calculates maxFeePerGas using a dapp-supplied value of maxPriorityFeePerGas', () => {
+      store.setGasFees('ethereum', parseInt(rawTx.chainId), {
+        maxPriorityFeePerGas: addHexPrefix((3e9).toString(16)),
+        maxBaseFeePerGas: addHexPrefix((7e9).toString(16))
+      })
+      rawTx.maxPriorityFeePerGas = addHexPrefix((4e9).toString(16))
+      const tx = gas.populateTransaction(rawTx, chainConfig)
+
+      expect(tx.maxFeePerGas).toBe(addHexPrefix((7e9 + 4e9).toString(16)))
+      expect(tx.gasFeesSource).toBe(GasFeesSource.Dapp)
+    })
+
+    it('uses dapp-supplied maxFeePerGas when the dapp specified a valid value', () => {
+      store.setGasFees('ethereum', parseInt(rawTx.chainId), {
+        maxPriorityFeePerGas: addHexPrefix((3e9).toString(16)),
+        maxBaseFeePerGas: addHexPrefix((7e9).toString(16))
+      })
+      rawTx.maxFeePerGas = (6e9).toString(16)
+      const tx = gas.populateTransaction(rawTx, chainConfig)
+
+      expect(tx.maxFeePerGas).toBe(rawTx.maxFeePerGas)
+      expect(tx.gasFeesSource).toBe(GasFeesSource.Dapp)
+    })
+
+    it('uses Frame-supplied maxPriorityFeePerGas when the dapp did not specify a value', () => {
+      const maxPriorityFeePerGas = addHexPrefix((3e9).toString(16))
+      store.setGasFees('ethereum', parseInt(rawTx.chainId), { maxPriorityFeePerGas })
+      const tx = gas.populateTransaction(rawTx, chainConfig)
+
+      expect(tx.maxPriorityFeePerGas).toBe(maxPriorityFeePerGas)
+      expect(tx.gasFeesSource).toBe(GasFeesSource.Frame)
+    })
+
+    it('uses Frame-supplied maxPriorityFeePerGas when the dapp specified an invalid value', () => {
+      const maxPriorityFeePerGas = addHexPrefix((3e9).toString(16))
+      store.setGasFees('ethereum', parseInt(rawTx.chainId), { maxPriorityFeePerGas })
+      rawTx.maxFeePerGas = ''
+      const tx = gas.populateTransaction(rawTx, chainConfig)
+
+      expect(tx.maxPriorityFeePerGas).toBe(maxPriorityFeePerGas)
+      expect(tx.gasFeesSource).toBe(GasFeesSource.Frame)
+    })
+
+    it('uses dapp-supplied maxPriorityFeePerGas when the dapp specified a valid value', () => {
+      store.setGasFees('ethereum', parseInt(rawTx.chainId), {
+        maxBaseFeePerGas: addHexPrefix((7e9).toString(16)),
+        maxPriorityFeePerGas: addHexPrefix((3e9).toString(16))
+      })
+      rawTx.maxPriorityFeePerGas = (6e9).toString(16)
+      const tx = gas.populateTransaction(rawTx, chainConfig)
+
+      expect(tx.maxPriorityFeePerGas).toBe(rawTx.maxPriorityFeePerGas)
+      expect(tx.gasFeesSource).toBe(GasFeesSource.Dapp)
+    })
+  })
+
+  describe('eip-2930 transactions', () => {
+    const chainConfig = new Common({ chain: 'mainnet', hardfork: 'berlin' })
+
+    it('sets the transaction type', () => {
+      const tx = gas.populateTransaction(rawTx, chainConfig)
+
+      expect(tx.type).toBe('0x1')
+    })
   })
 })
 

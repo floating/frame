@@ -4,9 +4,11 @@ import { BigNumber } from 'bignumber.js'
 
 import { Block, estimateGasFees, feesToHex } from './calculator'
 import { Provider } from '../provider'
+import store from '../store'
 import { Chain, GasFees } from '../store/state'
 import { frameOriginId } from '../../resources/utils'
-import { TransactionData } from '../../resources/domain/transaction'
+import { GasFeesSource, TransactionData } from '../../resources/domain/transaction'
+import { Common } from '@ethereumjs/common'
 
 interface FeeHistoryResponse {
   baseFeePerGas: string[]
@@ -20,6 +22,11 @@ interface GasPrices {
   standard: string
   fast: string
   asap: string
+}
+
+function calculateMaxFeePerGas(maxBaseFee: string, maxPriorityFee: string) {
+  const maxFeePerGas = BigNumber(maxPriorityFee).plus(maxBaseFee).toString(16)
+  return addHexPrefix(maxFeePerGas)
 }
 
 async function getGasPrices(provider: Provider): Promise<GasPrices> {
@@ -120,6 +127,61 @@ class DefaultGas {
     }
 
     return gasPrice
+  }
+
+  populateTransaction(rawTx: TransactionData, chainConfig: Common): TransactionData {
+    const txData: TransactionData = { ...rawTx }
+    const gas = store('main.networksMeta', 'ethereum', parseInt(rawTx.chainId, 16), 'gas')
+
+    // non-EIP-1559 case
+    if (!chainConfig.isActivatedEIP(1559) || !gas.price.fees) {
+      txData.type = intToHex(chainConfig.isActivatedEIP(2930) ? 1 : 0)
+
+      const useFrameGasPrice = !rawTx.gasPrice || isNaN(parseInt(rawTx.gasPrice, 16))
+      if (useFrameGasPrice) {
+        // no valid dapp-supplied value for gasPrice so we use the Frame-supplied value
+        const gasPrice = BigNumber(gas.price.levels.fast as string).toString(16)
+        txData.gasPrice = addHexPrefix(gasPrice)
+        txData.gasFeesSource = GasFeesSource.Frame
+      }
+
+      return txData
+    }
+
+    // EIP-1559 case
+    txData.type = intToHex(2)
+
+    const useFrameMaxFeePerGas = !rawTx.maxFeePerGas || isNaN(parseInt(rawTx.maxFeePerGas, 16))
+    const useFrameMaxPriorityFeePerGas =
+      !rawTx.maxPriorityFeePerGas || isNaN(parseInt(rawTx.maxPriorityFeePerGas, 16))
+
+    if (!useFrameMaxFeePerGas && !useFrameMaxPriorityFeePerGas) {
+      // return tx unaltered when we are using no Frame-supplied values
+      return txData
+    }
+
+    if (useFrameMaxFeePerGas && useFrameMaxPriorityFeePerGas) {
+      // dapp did not supply a valid value for maxFeePerGas or maxPriorityFeePerGas so we change the source flag
+      txData.gasFeesSource = GasFeesSource.Frame
+    }
+
+    const maxPriorityFee =
+      useFrameMaxPriorityFeePerGas && gas.price.fees.maxPriorityFeePerGas
+        ? gas.price.fees.maxPriorityFeePerGas
+        : (rawTx.maxPriorityFeePerGas as string)
+
+    // if no valid dapp-supplied value for maxFeePerGas we calculate it
+    txData.maxFeePerGas =
+      useFrameMaxFeePerGas && gas.price.fees.maxBaseFeePerGas
+        ? calculateMaxFeePerGas(gas.price.fees.maxBaseFeePerGas, maxPriorityFee)
+        : txData.maxFeePerGas
+
+    // if no valid dapp-supplied value for maxPriorityFeePerGas we use the Frame-supplied value
+    txData.maxPriorityFeePerGas = useFrameMaxPriorityFeePerGas
+      ? addHexPrefix(BigNumber(maxPriorityFee).toString(16))
+      : txData.maxPriorityFeePerGas
+
+    return txData
   }
 
   async getGas(block: Block) {
