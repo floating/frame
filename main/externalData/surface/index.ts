@@ -1,21 +1,19 @@
 import log from 'electron-log'
 import createPylon, { Unsubscribable } from '@framelabs/pylon-api-client'
+import { formatUnits } from 'ethers/lib/utils'
 
 import Networks from './networks'
 import bProcessor from '../balances/processor'
-import iProcessor from '../inventory/processor'
-import { TokenBalance } from '../balances/scan'
-import { formatUnits } from 'ethers/lib/utils'
+import { updateCollections, updateItems } from '../inventory/processor'
+
+import type { TokenBalance } from '../balances/scan'
+import type { Inventory } from '../../store/state'
 
 type Subscription = Unsubscribable & { unsubscribables: Unsubscribable[]; collectionItems: CollectionItem[] }
 
-//TODO: do we need to export these from surface?...
-type ItemCollectionId = {
+type ItemCollection = {
   contract: string
   chainId: number
-}
-
-type ItemCollection = ItemCollectionId & {
   name: string
   description: string
   image: string
@@ -44,40 +42,20 @@ interface CollectionItem {
   image: string
   description: string
 }
-interface CollectionItem {
-  contract: string
-  chainId: number
-  tokenId: string
-}
 
-const toMeta = (collection: CollectionMetdata): InventoryCollection['meta'] => {
-  return {
-    name: collection.name,
-    description: collection.description,
-    image: collection.image,
-    chainId: collection.chainId,
-    external_url: ''
-  }
-}
+const toMeta = (collection: CollectionMetdata) => ({
+  name: collection.name,
+  description: collection.description,
+  image: collection.image,
+  chainId: collection.chainId,
+  external_url: '',
+  itemCount: collection.ownedItems.length
+})
 
-const toItems = (collection: CollectionMetdata): InventoryCollection['items'] => {
-  return collection.ownedItems.reduce((items, item) => {
-    return {
-      ...items,
-      [item]: {}
-    }
-  }, {})
-}
-
-const toInventoryCollection = (collection: CollectionMetdata): InventoryCollection => {
-  const meta = toMeta(collection)
-  const items = toItems(collection)
-
-  return {
-    meta,
-    items
-  }
-}
+const toInventoryCollection = (collection: CollectionMetdata) => ({
+  meta: toMeta(collection),
+  items: {}
+})
 
 const toTokenBalance = (b: BalanceItem) => ({
   address: b.contract.toLowerCase(),
@@ -88,6 +66,14 @@ const toTokenBalance = (b: BalanceItem) => ({
   decimals: b.decimals || 18,
   displayBalance: formatUnits(b.amount, b.decimals),
   logoURI: b.image || ''
+})
+
+const toInventoryAsset = (item: CollectionItem) => ({
+  name: item.name,
+  tokenId: item.tokenId,
+  img: item.image,
+  contract: item.contract,
+  ...(item.link && { externalLink: item.link })
 })
 
 const Surface = () => {
@@ -170,7 +156,7 @@ const Surface = () => {
         )
 
         bProcessor.handleBalanceUpdate(address, balances, chainIds, 'snapshot')
-        iProcessor.setInventory(address, inventory)
+        updateCollections(address, inventory)
         networks.update(address, chainIds)
       },
       onError,
@@ -222,14 +208,8 @@ const Surface = () => {
         log.debug('Received update for items', { account, items: data })
 
         if (!data.length) return
-        const assets = data.map((item) => ({
-          name: item.name,
-          tokenId: item.tokenId,
-          img: item.image,
-          contract: item.contract,
-          ...(item.link && { externalLink: item.link })
-        }))
-        iProcessor.updateItems(account, assets)
+        const assets = data.map(toInventoryAsset)
+        updateItems(account, assets)
       },
       onError: (err) => {
         log.error('Error subscribing to items', { account, items, err })

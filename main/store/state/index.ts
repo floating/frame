@@ -28,6 +28,7 @@ export type { Rate } from './types/rate'
 export type { Frame, ViewMetadata } from './types/frame'
 export type { Shortcut, ShortcutKey, ModifierKey } from './types/shortcuts'
 export type { ColorwayPalette } from './types/colors'
+export type { InventoryAsset, InventoryCollection, Inventory } from './types/inventory'
 
 const StateSchema = z.object({
   main: MainSchema.passthrough(), // TODO: remove passthrough once all pieces of state have been defined
