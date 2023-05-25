@@ -89,7 +89,7 @@ function isNonZeroHex(hex: string) {
 }
 
 function minimumHex(hexValue: string, min = 0) {
-  return parseInt(hexValue, 16) < intToHex(min) ? '0x0' : hexValue
+  return parseInt(hexValue, 16) < min ? intToHex(min) : hexValue
 }
 
 export {
