@@ -76,7 +76,22 @@ class TxFee extends React.Component {
     super(props, context)
   }
 
+  getOptimismFee = (l2Price, l2Limit, reqType) => {
+    const l1GasLimitMap = {
+      NATIVE_TRANSFER: 4300,
+      SEND_DATA: 5100,
+      CONTRACT_CALL: 6900
+    }
+
+    const l1Limit = l1GasLimitMap[reqType]
+    const ethPriceLevels = this.store('main.networksMeta.ethereum', 1, 'gas.price.levels')
+    const l1Price = hexToInt(ethPriceLevels.fast) || 0
+
+    return l1Price * l1Limit * 1.5 + l2Price * l2Limit
+  }
+
   render() {
+    console.log('TESTS')
     const req = this.props.req
     const chain = {
       type: 'ethereum',
@@ -84,23 +99,13 @@ class TxFee extends React.Component {
     }
     const { isTestnet } = this.store('main.networks', chain.type, chain.id)
     const { nativeCurrency } = this.store('main.networksMeta', chain.type, chain.id)
-    const getOptimismFee = (l2Price, l2Limit) => {
-      const l1GasLimitMap = {
-        NATIVE_TRANSFER: 4300,
-        SEND_DATA: 5100,
-        CONTRACT_CALL: 6900
-      }
-      const l1Limit = l1GasLimitMap[req.classification]
-      const ethPriceLevels = this.store('main.networksMeta.ethereum', 1, 'gas.price.levels')
-      const l1Price = hexToInt(ethPriceLevels.fast) || 0
-
-      return l1Price * l1Limit * 1.5 + l2Price * l2Limit
-    }
 
     const maxGas = BigNumber(req.data.gasLimit, 16)
     const maxFeePerGas = BigNumber(req.data[usesBaseFee(req.data) ? 'maxFeePerGas' : 'gasPrice'])
     const maxFeeSourceValue =
-      chain.id === 10 ? getOptimismFee(maxFeePerGas, maxGas) : maxFeePerGas.multipliedBy(maxGas)
+      chain.id === 10
+        ? this.getOptimismFee(maxFeePerGas, maxGas, req.classification)
+        : maxFeePerGas.multipliedBy(maxGas)
     const maxFee = displayValueData(maxFeeSourceValue, {
       currencyRate: nativeCurrency.usd,
       isTestnet
@@ -113,7 +118,9 @@ class TxFee extends React.Component {
     // accounts for the 50% padding in the gas estimate in the provider
     const minGas = maxGas.dividedBy(BigNumber(1.5))
     const minFeeSourceValue =
-      chain.id === 10 ? getOptimismFee(minFeePerGas, minGas) : minFeePerGas.multipliedBy(minGas)
+      chain.id === 10
+        ? this.getOptimismFee(minFeePerGas, minGas, req.classification)
+        : minFeePerGas.multipliedBy(minGas)
     const minFee = displayValueData(minFeeSourceValue, {
       currencyRate: nativeCurrency.usd,
       isTestnet
