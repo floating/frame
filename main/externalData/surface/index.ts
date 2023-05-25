@@ -2,7 +2,7 @@ import log from 'electron-log'
 import createPylon, { Unsubscribable } from '@framelabs/pylon-api-client'
 
 import Networks from './networks'
-import bProcessor from '../balances/processor'
+import { handleBalanceUpdate } from '../balances/processor'
 import iProcessor from '../inventory/processor'
 import { TokenBalance } from '../balances/scan'
 import { formatUnits } from 'ethers/lib/utils'
@@ -169,7 +169,7 @@ const Surface = () => {
           [[] as number[], [] as TokenBalance[], {} as Inventory]
         )
 
-        bProcessor.handleBalanceUpdate(address, balances, chainIds, 'snapshot')
+        handleBalanceUpdate(address, balances, chainIds, 'snapshot')
         iProcessor.setInventory(address, inventory)
         networks.update(address, chainIds)
       },

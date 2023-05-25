@@ -1,11 +1,12 @@
 import log from 'electron-log'
 
+import { isEqual } from 'lodash'
 import store from '../../../store'
 import surface from '../../surface'
-import { BalancesStoreApi } from '..'
+import { storeApi } from '../storeApi'
 import { toTokenId } from '../../../../resources/domain/balance'
 
-import type { Balance, Token } from '../../../store/state'
+import type { Token } from '../../../store/state'
 import type { TokenBalance } from '../scan'
 
 const toExpiryWindow = {
@@ -13,46 +14,34 @@ const toExpiryWindow = {
   scan: 1000 * 60
 } as const
 
-const getChangedBalances = (
-  address: string,
-  tokenBalances: TokenBalance[],
-  api: ReturnType<typeof BalancesStoreApi>
-) => {
-  const currentTokenBalances = api.getTokenBalances(address)
-  const custom = api.getCustomTokens()
-  const customTokens = new Set(custom.map(toTokenId))
-  const isCustomToken = (balance: Balance) => customTokens.has(toTokenId(balance))
+const getChangedBalances = (address: string, tokenBalances: TokenBalance[]): TokenBalance[] => {
+  const currentTokenBalances = storeApi.getTokenBalances(address)
+  const customTokens = new Set(storeApi.getCustomTokens().map(toTokenId))
 
-  //TODO: in here should we check the token data inside the store and adopt the existing name?
-  const changedBalances = tokenBalances.reduce((balances, newBalance) => {
+  return tokenBalances.reduce((balances, newBalance) => {
+    const { address: newAddress, chainId: newChainId, balance: newBalanceValue } = newBalance
+
     const currentBalance = currentTokenBalances.find(
-      (b) => b.address === newBalance.address && b.chainId === newBalance.chainId
+      ({ address, chainId }) => address === newAddress && chainId === newChainId
     )
 
-    const isNewBalance = !currentBalance && parseInt(newBalance.balance) !== 0
-    const isChangedBalance = !!currentBalance && currentBalance.balance !== newBalance.balance
+    const hasChanged =
+      !currentBalance ||
+      (customTokens.has(toTokenId(newBalance))
+        ? currentBalance.balance !== newBalanceValue
+        : !isEqual(currentBalance, newBalance))
 
-    //Adopt custom token data if it is a custom token...
-    const isCustom = isCustomToken(newBalance)
-    if (isCustom)
-      newBalance = { ...newBalance, ...custom.find((t) => toTokenId(t) === toTokenId(newBalance)) }
-
-    if (isNewBalance || isChangedBalance || isCustom) {
+    if (hasChanged) {
       balances.push(newBalance)
     }
+
     return balances
   }, [] as TokenBalance[])
-
-  return changedBalances
 }
 
-const getTokenChanges = (
-  address: string,
-  tokenBalances: TokenBalance[],
-  api: ReturnType<typeof BalancesStoreApi>
-) => {
-  const knownTokens = new Set(api.getKnownTokens(address).map(toTokenId))
-  const customTokens = new Set(api.getCustomTokens().map(toTokenId))
+const getTokenChanges = (address: string, tokenBalances: TokenBalance[]) => {
+  const knownTokens = new Set(storeApi.getKnownTokens(address).map(toTokenId))
+
   const isKnown = (balance: TokenBalance) => knownTokens.has(toTokenId(balance))
 
   // add any non-zero balances to the list of known tokens
@@ -69,7 +58,46 @@ const getTokenChanges = (
   return { unknownBalances, zeroBalances }
 }
 
-const api = BalancesStoreApi(store)
+const mergeCustomTokens = (balances: TokenBalance[]): TokenBalance[] => {
+  // Retrieve custom tokens from the store
+  const custom = storeApi.getCustomTokens()
+
+  // Convert custom tokens array to an object for easier manipulation
+  const customData = custom.reduce((data, token) => {
+    data[toTokenId(token)] = token
+    return data
+  }, {} as Record<string, Token>)
+
+  // Merge balances with the custom data
+  const mergedBalances = balances.map((balance) => {
+    const tokenId = toTokenId(balance)
+
+    if (tokenId in customData) {
+      const { name, symbol, decimals } = customData[tokenId]
+      balance = { ...balance, name, symbol, decimals }
+
+      // Remove the merged custom token
+      delete customData[tokenId]
+    }
+
+    return balance
+  })
+
+  // Check for any missing custom tokens
+  const missingCustomTokens = Object.values(customData)
+  if (missingCustomTokens.length) {
+    log.debug({ missingCustomTokens })
+  }
+
+  // Add missing balances with zero balance
+  const missingBalances = missingCustomTokens.map((token) => ({
+    ...token,
+    balance: '0x00',
+    displayBalance: '0'
+  }))
+
+  return [...mergedBalances, ...missingBalances]
+}
 
 function updateTokens(address: string, zeroBalances: Set<string>, unknownBalances: TokenBalance[]) {
   if (zeroBalances.size) {
@@ -81,7 +109,7 @@ function updateTokens(address: string, zeroBalances: Set<string>, unknownBalance
   }
 }
 
-function handleBalanceUpdate(
+export function handleBalanceUpdate(
   address: string,
   balances: TokenBalance[],
   chains: number[],
@@ -89,26 +117,13 @@ function handleBalanceUpdate(
 ) {
   log.debug('Handling balance update', { address, chains })
 
-  if (mode === 'snapshot') {
-    //Include 0 balance custom tokens when its a snapshot update as these will be missing
-    const customTokens = api.getCustomTokens()
-    const tokenBalanceSet = new Set(balances.map(toTokenId))
+  const withCustom = mergeCustomTokens(balances)
 
-    customTokens.forEach((token) => {
-      if (!tokenBalanceSet.has(toTokenId(token))) {
-        balances.push({
-          ...token,
-          balance: '0x00',
-          displayBalance: '0'
-        })
-      }
-    })
-  }
+  const changedBalances = getChangedBalances(address, withCustom)
 
-  const changedBalances = getChangedBalances(address, balances, api)
   if (changedBalances.length) {
     store.setBalances(address, changedBalances)
-    const { zeroBalances, unknownBalances } = getTokenChanges(address, changedBalances, api)
+    const { zeroBalances, unknownBalances } = getTokenChanges(address, changedBalances)
     updateTokens(address, zeroBalances, unknownBalances)
 
     store.accountTokensUpdated(address, chains)
@@ -117,13 +132,13 @@ function handleBalanceUpdate(
   store.addPopulatedChains(address.toLowerCase(), chains, toExpiryWindow[mode])
 }
 
-function handleCustomTokenUpdate(customTokens: Token[]) {
+export function handleCustomTokenUpdate(customTokens: Token[]) {
   log.debug('Handling custom token update', { customTokens })
 
-  const accounts = api.getAccounts()
+  const accounts = storeApi.getAccounts()
 
   accounts.forEach((address) => {
-    const balances = api.getTokenBalances(address)
+    const balances = storeApi.getTokenBalances(address)
     const forProcessor = customTokens.filter((token) => surface.networks.has(address, token.chainId))
     const newBalances = forProcessor.reduce((bals, item) => {
       const tokenId = toTokenId(item)
@@ -141,9 +156,4 @@ function handleCustomTokenUpdate(customTokens: Token[]) {
       store.setBalances(address, newBalances)
     }
   })
-}
-
-export default {
-  handleBalanceUpdate,
-  handleCustomTokenUpdate
 }

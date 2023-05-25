@@ -4,9 +4,9 @@ import Pylon from '@framelabs/pylon-client'
 import store from '../store'
 import RatesSubscriptions from './rates/subscriptions'
 import BalanceScanner from './balances/scanner'
-import processor from './balances/processor'
+import { handleCustomTokenUpdate } from './balances/processor'
 import surface from './surface'
-import { BalancesStoreApi } from './balances'
+import { storeApi } from './balances/storeApi'
 import { debounce } from '../../resources/utils'
 
 import {
@@ -25,8 +25,7 @@ export interface DataScanner {
 
 //TODO: cleanup state now that we are using new observer pattern...
 const externalData = function () {
-  const storeApi = BalancesStoreApi(store)
-  const scanner = BalanceScanner(store, storeApi)
+  const scanner = BalanceScanner()
   scanner.start()
 
   //TODO: move this into the observer creation fn..
@@ -71,7 +70,7 @@ const externalData = function () {
   const handleTokensUpdate = debounce((activeAccount: string, tokens: Token[]) => {
     log.debug('Updating external data due to token updates', { activeAccount })
 
-    processor.handleCustomTokenUpdate(tokens)
+    handleCustomTokenUpdate(tokens)
 
     if (activeAccount) {
       const tokensToScan = tokens.filter((token) => !surface.networks.has(activeAccount, token.chainId))
