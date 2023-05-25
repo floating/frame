@@ -19,7 +19,7 @@ import protectedMethods from '../api/protectedMethods'
 import { usesBaseFee, TransactionData, GasFeesSource } from '../../resources/domain/transaction'
 import { getAddress } from '../../resources/utils'
 
-import type { Chain, Permission } from '../store/state'
+import type { Chain } from '../store/state'
 
 const permission = (date: number, method: string) => ({ parentCapability: method, date })
 
@@ -31,56 +31,6 @@ export function decodeMessage(rawMessage: string) {
 
   // replace all multiple line returns with just one to prevent excess space in message
   return rawMessage.replaceAll(/[\n\r]+/g, '\n')
-}
-
-export function checkExistingNonceGas(tx: TransactionData) {
-  const { from, nonce } = tx
-
-  const reqs = store('main.accounts', (from || '').toLowerCase(), 'requests')
-
-  const requests = Object.keys(reqs || {}).map((key) => reqs[key])
-  const existing = requests.filter(
-    (r) => r.mode === 'monitor' && r.status !== 'error' && r.data.nonce === nonce
-  )
-
-  if (existing.length > 0) {
-    if (tx.maxPriorityFeePerGas && tx.maxFeePerGas) {
-      const existingFee = Math.max(...existing.map((r) => r.data.maxPriorityFeePerGas))
-      const existingMax = Math.max(...existing.map((r) => r.data.maxFeePerGas))
-      const feeInt = parseInt(tx.maxPriorityFeePerGas)
-      const maxInt = parseInt(tx.maxFeePerGas)
-      if (existingFee * 1.1 >= feeInt || existingMax * 1.1 >= maxInt) {
-        // Bump fees by 10%
-        const bumpedFee = Math.max(Math.ceil(existingFee * 1.1), feeInt)
-        const bumpedBase = Math.max(Math.ceil((existingMax - existingFee) * 1.1), Math.ceil(maxInt - feeInt))
-        tx.maxFeePerGas = '0x' + (bumpedBase + bumpedFee).toString(16)
-        tx.maxPriorityFeePerGas = '0x' + bumpedFee.toString(16)
-        tx.gasFeesSource = GasFeesSource.Frame
-        tx.feesUpdated = true
-      }
-    } else if (tx.gasPrice) {
-      const existingPrice = Math.max(...existing.map((r) => r.data.gasPrice))
-      const priceInt = parseInt(tx.gasPrice)
-      if (existingPrice >= priceInt) {
-        // Bump price by 10%
-        const bumpedPrice = Math.ceil(existingPrice * 1.1)
-        tx.gasPrice = '0x' + bumpedPrice.toString(16)
-        tx.gasFeesSource = GasFeesSource.Frame
-        tx.feesUpdated = true
-      }
-    }
-  }
-
-  return tx
-}
-
-export function feeTotalOverMax(rawTx: TransactionData, maxTotalFee: number) {
-  const maxFeePerGas = usesBaseFee(rawTx)
-    ? parseInt(rawTx.maxFeePerGas || '', 16)
-    : parseInt(rawTx.gasPrice || '', 16)
-  const gasLimit = parseInt(rawTx.gasLimit || '', 16)
-  const totalFee = maxFeePerGas * gasLimit
-  return totalFee > maxTotalFee
 }
 
 function parseValue(value = '') {
@@ -118,10 +68,6 @@ export function getRawTx(newTx: RPC.SendTransaction.TxParams): TransactionData {
   }
 
   return tx
-}
-
-export function gasFees(rawTx: TransactionData) {
-  return store('main.networksMeta', 'ethereum', parseInt(rawTx.chainId, 16), 'gas')
 }
 
 export function resError(errorData: string | EVMError, request: RPCId, res: RPCErrorCallback) {

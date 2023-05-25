@@ -29,9 +29,7 @@ import { createObserver as AssetsObserver, loadAssets } from './assets'
 import { getVersionFromTypedData } from './typedData'
 import { Subscription, SubscriptionType, hasSubscriptionPermission } from './subscriptions'
 import {
-  checkExistingNonceGas,
   ecRecover,
-  feeTotalOverMax,
   getPermissions,
   getRawTx,
   getSignedAddress,
@@ -55,7 +53,7 @@ import {
 import * as sigParser from '../signatures'
 import { mapRequest } from '../requests'
 import { hasAddress } from '../../resources/domain/account'
-import { init as initGas } from '../gas'
+import { checkExistingNonceGas, feeTotalOverMax, init as initGas } from '../gas'
 import type { Origin, Token } from '../store/state'
 
 interface RequiredApproval {
