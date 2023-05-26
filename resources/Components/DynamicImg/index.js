@@ -21,15 +21,6 @@ const DynamicImg = ({ src, alt, active }) => {
 
     img.onerror = logError
 
-    if (!canvasUrl) {
-      if (img.complete) {
-        clone()
-      } else {
-        img.onload = () => clone()
-      }
-    }
-    img.src = originalUrl
-
     const clone = () => {
       try {
         const canvas = canvasRef.current
