@@ -11,12 +11,26 @@ import type { Inventory } from '../../store/state'
 
 type Subscription = Unsubscribable & { unsubscribables: Unsubscribable[]; collectionItems: CollectionItem[] }
 
+type Image = {
+  source: string
+  cdn: {
+    original: {
+      main?: string
+      thumb?: string
+    }
+    frozen: {
+      main?: string
+      thumb?: string
+    }
+  }
+}
+
 type ItemCollection = {
   contract: string
   chainId: number
   name: string
   description: string
-  image: string
+  image: Image
 }
 
 type CollectionMetdata = ItemCollection & {
@@ -25,7 +39,7 @@ type CollectionMetdata = ItemCollection & {
 
 type BalanceItem = {
   contract: string
-  image: string
+  image: Image
   name: string
   symbol: string
   chainId: number
@@ -39,14 +53,14 @@ interface CollectionItem {
   contract: string
   tokenId: string
   name: string
-  image: string
+  image: Image
   description: string
 }
 
 const toMeta = (collection: CollectionMetdata) => ({
   name: collection.name,
   description: collection.description,
-  image: collection.image,
+  image: collection.image.cdn.frozen.thumb || collection.image.cdn.original.thumb || collection.image.source || '',
   chainId: collection.chainId,
   external_url: '',
   itemCount: collection.ownedItems.length
@@ -65,13 +79,13 @@ const toTokenBalance = (b: BalanceItem) => ({
   balance: b.amount,
   decimals: b.decimals || 18,
   displayBalance: formatUnits(b.amount, b.decimals),
-  logoURI: b.image || ''
+  logoURI: b.image.cdn.frozen.thumb || b.image.cdn.original.thumb || b.image.source || ''
 })
 
 const toInventoryAsset = (item: CollectionItem) => ({
   name: item.name,
   tokenId: item.tokenId,
-  img: item.image,
+  img: item.image.cdn.frozen.thumb || item.image.cdn.original.thumb || item.image.source || '',
   contract: item.contract,
   ...(item.link && { externalLink: item.link })
 })
