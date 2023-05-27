@@ -40,6 +40,7 @@ const BalancesList = ({ balances }) => {
                   key={chainId + address}
                   chainId={chainId}
                   symbol={symbol}
+                  address={address}
                   balance={balance}
                   i={i}
                   scanning={false}

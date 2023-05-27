@@ -904,7 +904,7 @@ export class Provider extends EventEmitter {
           address,
           symbol,
           decimals,
-          logoURI: tokenData.image || tokenData.logoURI || ''
+          image: tokenData.image || tokenData.logoURI || ''
         }
 
         const handlerId = this.addRequestHandler(res)

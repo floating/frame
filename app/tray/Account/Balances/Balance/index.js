@@ -1,19 +1,17 @@
-import React, { useState, useEffect, useContext } from 'react'
-import Restore from 'react-restore'
-
+import React from 'react'
 import { DisplayFiatPrice, DisplayValue } from '../../../../../resources/Components/DisplayValue'
 import RingIcon from '../../../../../resources/Components/RingIcon'
 
 import useStore from '../../../../../resources/Hooks/useStore'
 
 const Balance = (props) => {
-  const { symbol = '', balance, i, scanning, chainId } = props
+  const { symbol = '', balance, i, scanning, chainId, address } = props
 
   const chain = useStore('main.networks.ethereum', chainId)
   const chainColor = useStore('main.networksMeta.ethereum', chainId, 'primaryColor')
 
   const displaySymbol = symbol.substring(0, 10)
-  const { priceChange, decimals, balance: balanceValue, usdRate: currencyRate, logoURI } = balance
+  const { priceChange, decimals, balance: balanceValue, usdRate: currencyRate, image } = balance
   const change = parseFloat(priceChange)
   const direction = change < 0 ? -1 : change > 0 ? 1 : 0
   let priceChangeClass = 'signerBalanceCurrentPriceChange'
@@ -36,7 +34,11 @@ const Balance = (props) => {
 
   const { name: chainName = '', isTestnet = false } = chain
 
-  const ethMatch = logoURI?.includes('/coins/images/279/large/ethereum.png')
+  // TODO: remove image check when data is consistent
+  const imageURL = typeof image === 'string' ? image : image?.cdn?.original?.main || ''
+
+  const isNative = address === '0x0000000000000000000000000000000000000000'
+  const isEth = isNative && [1, 3, 4, 5, 10, 42, 42161, 11155111].includes(chainId)
 
   return (
     <div className={'signerBalance'} key={symbol} onMouseDown={() => this.setState({ selected: i })}>
@@ -44,7 +46,8 @@ const Balance = (props) => {
       <div className='signerBalanceInner' style={{ opacity: !scanning ? 1 : 0 }}>
         <div className='signerBalanceIcon'>
           <RingIcon
-            img={symbol.toUpperCase() !== 'ETH' && !isTestnet && !ethMatch && logoURI}
+            img={!isEth && !isTestnet && imageURL}
+            svgName={isEth && 'eth'}
             alt={symbol.toUpperCase()}
             color={chainColor ? `var(--${chainColor})` : ''}
           />

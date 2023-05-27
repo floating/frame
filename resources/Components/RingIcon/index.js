@@ -2,37 +2,25 @@ import React from 'react'
 
 import svg from '../../svg'
 
-import DynamicImg from '../DynamicImg'
-
-const Icon = ({ svgName, alt = '', svgSize = 16, img, small, nft, active }) => {
-  if (img) {
-    return (
-      <DynamicImg
-        src={img}
-        // src={`https://proxy.pylon.link?type=icon&target=${encodeURIComponent(img)}`}
-        alt={alt}
-        active={active}
-      />
-    )
+const Icon = ({ svgName, alt = '', svgSize = 16, img, small, nft, active, imgFrozen }) => {
+  if (imgFrozen && !active) {
+    return <img src={imgFrozen} alt={alt} />
+  } else if (img) {
+    return <img src={img} alt={alt} />
   }
 
   if (svgName) {
     const iconName = svgName.toLowerCase()
-    const ethChains = ['mainnet', 'görli', 'sepolia', 'ropsten', 'rinkeby', 'kovan']
-    if (ethChains.includes(iconName)) {
-      return svg.eth(small ? 13 : 18)
-    }
-
     const svgIcon = svg[iconName]
     return svgIcon ? svgIcon(svgSize) : null
   }
 
   if (nft) return <div style={{ position: 'relative', top: '-1px' }}>{svg.inventory(13)}</div>
 
-  return svg.eth(small ? 13 : 18)
+  return svg.missing(small ? 8 : 12)
 }
 
-const RingIcon = ({ color, svgName, svgSize, img, small, block, noRing, alt, nft, active }) => {
+const RingIcon = ({ color, svgName, svgSize, img, small, block, noRing, alt, nft, active, imgFrozen }) => {
   let ringIconClass = 'ringIcon'
   if (small) ringIconClass += ' ringIconSmall'
   if (block) ringIconClass += ' ringIconBlock'
@@ -50,6 +38,7 @@ const RingIcon = ({ color, svgName, svgSize, img, small, block, noRing, alt, nft
           svgName={svgName}
           svgSize={svgSize}
           img={img}
+          imgFrozen={imgFrozen}
           alt={alt}
           small={small}
           nft={nft}
