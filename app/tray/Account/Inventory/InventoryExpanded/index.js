@@ -41,10 +41,9 @@ const InventoryExpanded = ({ expandedData, moduleId, account }) => {
     const c = useStore('main.inventory', account, collection)
     if (!c || !c.meta) return false
     const collectionName = c.meta.name || ''
-    const collectionItems = c.items || {}
     const collectionChain = c.meta.chainId && useStore('main.networks.ethereum', c.meta.chainId)
-    const itemNames = Object.keys(collectionItems).map((item) => {
-      const { name } = collectionItems[item] || {}
+    const itemNames = c.items.map((item) => {
+      const { name } = c.items[item] || {}
       return name
     })
     return matchFilter(collectionFilter, [collectionName, collectionChain.name, ...itemNames])
@@ -62,8 +61,8 @@ const InventoryExpanded = ({ expandedData, moduleId, account }) => {
         return expandedData.hidden ? isHidden : !isHidden
       })
       .sort((a, b) => {
-        const assetsLengthA = Object.keys(inventory[a].items).length
-        const assetsLengthB = Object.keys(inventory[b].items).length
+        const assetsLengthA = inventory[a].meta.tokens.length
+        const assetsLengthB = inventory[b].meta.tokens.length
         if (assetsLengthA > assetsLengthB) return -1
         if (assetsLengthA < assetsLengthB) return 1
         return 0

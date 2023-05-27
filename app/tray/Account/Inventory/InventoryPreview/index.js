@@ -88,8 +88,8 @@ class Inventory extends React.Component {
         return !isHidden
       })
       .sort((a, b) => {
-        const assetsLengthA = inventory[a].meta.itemCount
-        const assetsLengthB = inventory[b].meta.itemCount
+        const assetsLengthA = inventory[a].meta.tokens.length
+        const assetsLengthB = inventory[b].meta.tokens.length
         if (assetsLengthA > assetsLengthB) return -1
         if (assetsLengthA < assetsLengthB) return 1
         return 0

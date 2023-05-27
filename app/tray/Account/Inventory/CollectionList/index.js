@@ -112,16 +112,18 @@ const Collection = ({ moduleId, account, collection, collectionId }) => {
 
   const [active, setActive] = useState(false)
 
-  const previewItems = Object.keys(collection.items || {})
-    .sort((a, b) => {
-      a = collection.items[a].tokenId
-      b = collection.items[b].tokenId
+  const previewItems = collection.items
+    .slice()
+    .sort((x, y) => {
+      const a = x.tokenId
+      const b = y.tokenId
       return a < b ? -1 : b > a ? 1 : 0
     })
     .slice(0, 8)
 
   useEffect(() => {
-    const items = previewItems.map((tokenId) => ({
+    const itemsForPreview = collection.meta.tokens.slice(0, 8)
+    const items = itemsForPreview.map((tokenId) => ({
       contract: collectionId,
       chainId: collection.meta.chainId,
       tokenId
@@ -165,7 +167,7 @@ const Collection = ({ moduleId, account, collection, collectionId }) => {
             <CollectionMain>
               <CollectionDots style={{ width: previewItems.length * 22 + 4 + 'px' }}>
                 {previewItems.map((id, i) => {
-                  const item = collection.items[id]
+                  const item = collection.items[id] || {}
                   return (
                     <CollectionDot style={{ animationDelay: i * 0.1 + 's' }} active={active}>
                       <img src={item.img} alt={item.name} />

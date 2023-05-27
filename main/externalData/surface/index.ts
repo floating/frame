@@ -63,12 +63,12 @@ const toMeta = (collection: CollectionMetdata) => ({
   image: collection.image,
   chainId: collection.chainId,
   external_url: '',
-  itemCount: collection.ownedItems.length
+  tokens: collection.ownedItems
 })
 
 const toInventoryCollection = (collection: CollectionMetdata) => ({
   meta: toMeta(collection),
-  items: {}
+  items: []
 })
 
 const toTokenBalance = (b: BalanceItem) => ({

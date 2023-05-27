@@ -14,7 +14,7 @@ import {
 import { PulsateCircle, InventoryPreview, PreviewDisplay, PreviewOptions, Container } from './styled'
 
 const toItems = (contract, collection) => {
-  return Object.keys(collection.items).map((tokenId) => ({
+  return collection.items.map((tokenId) => ({
     contract,
     chainId: collection.meta.chainId,
     tokenId

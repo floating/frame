@@ -56,7 +56,7 @@ function decode(abi: ReadonlyArray<Fragment | JsonFragment | string>, calldata: 
 
 function getNameForTokenId(account: string, tokenId: string) {
   const ensInventory: InventoryCollection = store('main.inventory', account, 'ens') || {}
-  const items = ensInventory.items || {}
+  const items = ensInventory.items || []
 
   const record = Object.values(items).find((ens) => ens.tokenId === tokenId) || { name: '' }
 
