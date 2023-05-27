@@ -91,7 +91,6 @@ class TxFee extends React.Component {
   }
 
   render() {
-    console.log('TESTS')
     const req = this.props.req
     const chain = {
       type: 'ethereum',
