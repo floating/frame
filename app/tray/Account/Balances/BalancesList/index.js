@@ -28,8 +28,8 @@ const BalancesList = ({ balances }) => {
         const tokenId = `${chainId}:${address}`
         const hidden = hiddenTokens.includes(tokenId)
         return (
-          <>
-            <ClusterRow key={chainId + address}>
+          <React.Fragment key={tokenId}>
+            <ClusterRow>
               <ClusterValue
                 onClick={() => {
                   setOpen(open === i ? -1 : i)
@@ -49,7 +49,7 @@ const BalancesList = ({ balances }) => {
             </ClusterRow>
             {i === open &&
               (confirming ? (
-                <ClusterRow key={chainId + symbol + 'drawerconfirm'}>
+                <ClusterRow>
                   <ClusterValue grow={3}>
                     <div className='signerBalanceDrawerItem' style={{ color: 'var(--moon)' }}>
                       {hidden ? 'unhide this balance?' : 'hide this balance?'}
@@ -75,7 +75,7 @@ const BalancesList = ({ balances }) => {
                   </ClusterValue>
                 </ClusterRow>
               ) : (
-                <ClusterRow key={chainId + symbol + 'drawer'}>
+                <ClusterRow>
                   <ClusterValue
                     grow={3}
                     onClick={() => {
@@ -115,7 +115,7 @@ const BalancesList = ({ balances }) => {
                   </ClusterValue>
                 </ClusterRow>
               ))}
-          </>
+          </React.Fragment>
         )
       })}
     </Cluster>

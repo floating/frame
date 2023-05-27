@@ -130,7 +130,7 @@ const Surface = () => {
 
         const chainIds: number[] = []
         const balances: TokenBalance[] = []
-        const inventory: any = {}
+        const inventory: Inventory = {}
 
         Object.entries(chains).forEach(([chainId, chain]) => {
           if (!chain || !chain.balances || !chain.inventory) {

@@ -192,7 +192,9 @@ const CollectionList = ({ moduleId, account, collections = [] }) => {
   const inventory = useStore('main.inventory', account)
   return collections.map((k) => {
     const collection = inventory[k]
-    return <Collection moduleId={moduleId} account={account} collection={collection} collectionId={k} />
+    return (
+      <Collection key={k} moduleId={moduleId} account={account} collection={collection} collectionId={k} />
+    )
   })
 }
 
