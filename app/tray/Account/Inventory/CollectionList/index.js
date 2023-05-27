@@ -7,7 +7,6 @@ import useStore from '../../../../../resources/Hooks/useStore'
 import { ClusterRow, ClusterValue } from '../../../../../resources/Components/Cluster'
 import RingIcon from '../../../../../resources/Components/RingIcon'
 import useStore from '../../../../../resources/Hooks/useStore'
-import DynamicImg from '../../../../../resources/Components/DynamicImg'
 
 const CollectionInner = styled.div`
   position: relative;
@@ -156,7 +155,7 @@ const Collection = ({ moduleId, account, collection, collectionId }) => {
           <CollectionInner>
             <CollectionIcon>
               <RingIcon
-                img={collection.meta.image}
+                img={collection.meta.image.cdn.frozen.thumb}
                 alt={collection.meta.name}
                 color={chainColor ? `var(--${chainColor})` : ''}
                 nft={true}
@@ -193,7 +192,9 @@ const CollectionList = ({ moduleId, account, collections = [] }) => {
   const inventory = useStore('main.inventory', account)
   return collections.map((k) => {
     const collection = inventory[k]
-    return <Collection moduleId={moduleId} account={account} collection={collection} collectionId={k} />
+    return (
+      <Collection key={k} moduleId={moduleId} account={account} collection={collection} collectionId={k} />
+    )
   })
 }
 

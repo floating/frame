@@ -100,8 +100,6 @@ class Inventory extends React.Component {
 
   render() {
     const inventory = this.store('main.inventory', this.props.account)
-
-    console.log('inventoy', inventory)
     const collections = Object.keys(inventory || {})
     const displayCollections = this.displayCollections()
     const moreCollections = collections.length - displayCollections.length

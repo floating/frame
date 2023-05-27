@@ -12,7 +12,19 @@ const InventoryCollectionSchema = z.object({
   meta: z.object({
     name: z.string(),
     description: z.string(),
-    image: z.string(),
+    image: z.object({
+      source: z.string(),
+      cdn: z.object({
+        original: z.object({
+          main: z.string().optional(),
+          thumb: z.string().optional()
+        }),
+        frozen: z.object({
+          main: z.string().optional(),
+          thumb: z.string().optional()
+        })
+      })
+    }),
     chainId: z.number(),
     external_url: z.string().optional(),
     itemCount: z.number().default(0)
