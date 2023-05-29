@@ -600,12 +600,12 @@ module.exports = {
   },
   setInventoryAssets: (u, address, collection, items) => {
     u('main.inventory', address, collection, 'items', (existingItems = []) => {
-      const itemsMap = new Map()
-      items.forEach((item) => itemsMap.set(item.tokenId, item))
-      existingItems // Add each existing item to the map only if it's not already there
-        .filter((item) => !itemsMap.has(item.tokenId))
-        .forEach((item) => itemsMap.set(item.tokenId, item))
-      return Array.from(itemsMap.values())
+      const mergedItems = items.reduce((collectionItems, item) => {
+        collectionItems[item.tokenId] = item
+        return collectionItems
+      }, Object.fromEntries(existingItems.map((item) => [item.tokenId, item])))
+
+      return Object.values(mergedItems)
     })
   },
   setBalance: (u, address, balance) => {

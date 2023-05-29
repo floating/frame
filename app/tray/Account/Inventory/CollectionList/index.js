@@ -198,12 +198,18 @@ const Collection = ({ moduleId, account, collection, collectionId }) => {
   )
 }
 
-const CollectionList = ({ moduleId, account, collections = [] }) => {
+const CollectionList = ({ moduleId, account, collections: collectionContracts = [] }) => {
   const inventory = useStore('main.inventory', account)
-  return collections.map((k) => {
-    const collection = inventory[k]
+  return collectionContracts.map((contractAddress) => {
+    const collection = inventory[contractAddress]
     return (
-      <Collection key={k} moduleId={moduleId} account={account} collection={collection} collectionId={k} />
+      <Collection
+        key={contractAddress}
+        moduleId={moduleId}
+        account={account}
+        collection={collection}
+        collectionId={contractAddress}
+      />
     )
   })
 }

@@ -37,13 +37,13 @@ const InventoryExpanded = ({ expandedData, moduleId, account }) => {
     )
   }
 
-  const isFilterMatch = (collection) => {
-    const c = useStore('main.inventory', account, collection)
-    if (!c || !c.meta) return false
-    const collectionName = c.meta.name || ''
-    const collectionChain = c.meta.chainId && useStore('main.networks.ethereum', c.meta.chainId)
-    const itemNames = c.items.map((item) => {
-      const { name } = c.items[item] || {}
+  const isFilterMatch = (collection = {}) => {
+    if (!collection.meta) return false
+    const collectionName = collection.meta.name || ''
+    const collectionChain =
+      collection.meta.chainId && useStore('main.networks.ethereum', collection.meta.chainId)
+    const itemNames = collection.items.map((item) => {
+      const { name } = collection.items[item] || {}
       return name
     })
     return matchFilter(collectionFilter, [collectionName, collectionChain.name, ...itemNames])
@@ -51,21 +51,18 @@ const InventoryExpanded = ({ expandedData, moduleId, account }) => {
 
   let hiddenCount = 0
 
-  const displayCollections = () => {
-    const inventory = useStore('main.inventory', account)
-    const collections = Object.keys(inventory || {})
+  const filterCollectionsToDisplay = (collections) => {
     return collections
-      .filter((k) => {
-        const c = useStore('main.inventory', account, k)
-        if (!c || !c.meta) return false
-        const collectionId = `${c.meta.chainId}:${k}`
+      .filter((collection = {}) => {
+        if (!collection.meta) return false
+        const collectionId = `${collection.meta.chainId}:${collection.contract}`
         const isHidden = hiddenCollections.includes(collectionId)
         if (isHidden) hiddenCount++
         return expandedData.hidden ? isHidden : !isHidden
       })
       .sort((a, b) => {
-        const assetsLengthA = inventory[a].meta.tokens.length
-        const assetsLengthB = inventory[b].meta.tokens.length
+        const assetsLengthA = a.meta.tokens.length
+        const assetsLengthB = b.meta.tokens.length
         if (assetsLengthA > assetsLengthB) return -1
         if (assetsLengthA < assetsLengthB) return 1
         return 0
@@ -74,7 +71,11 @@ const InventoryExpanded = ({ expandedData, moduleId, account }) => {
   }
 
   const inventory = useStore('main.inventory', account)
-  const collections = Object.keys(inventory || {})
+  const collections = Object.entries(inventory || {}).map(([contract, collection]) => ({
+    ...collection,
+    contract
+  }))
+
   return (
     <div className='accountViewScroll'>
       {renderAccountFilter()}
@@ -85,7 +86,7 @@ const InventoryExpanded = ({ expandedData, moduleId, account }) => {
               expandedData={expandedData}
               moduleId={moduleId}
               account={account}
-              collections={displayCollections()}
+              collections={filterCollectionsToDisplay(collections)}
             />
           ) : inventory ? (
             <ClusterRow>
