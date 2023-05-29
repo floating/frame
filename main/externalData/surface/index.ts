@@ -85,7 +85,8 @@ const toTokenBalance = (b: BalanceItem) => ({
 const toInventoryAsset = (item: CollectionItem) => ({
   name: item.name,
   tokenId: item.tokenId,
-  img: item.image.cdn.frozen.thumb || item.image.cdn.original.thumb || item.image.source || '',
+  image: item.image || {},
+  img: item.image.cdn.original.main || '',
   contract: item.contract,
   ...(item.link && { externalLink: item.link })
 })

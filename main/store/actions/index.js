@@ -598,8 +598,15 @@ module.exports = {
   setInventory: (u, address, inventory) => {
     u('main.inventory', address, () => inventory)
   },
-  setInventoryAssets: (u, address, collection, assets) => {
-    u('main.inventory', address, collection, 'items', (existingItems = []) => [...existingItems, ...assets])
+  setInventoryAssets: (u, address, collection, items) => {
+    u('main.inventory', address, collection, 'items', (existingItems = []) => {
+      const itemsMap = new Map()
+      items.forEach((item) => itemsMap.set(item.tokenId, item))
+      existingItems // Add each existing item to the map only if it's not already there
+        .filter((item) => !itemsMap.has(item.tokenId))
+        .forEach((item) => itemsMap.set(item.tokenId, item))
+      return Array.from(itemsMap.values())
+    })
   },
   setBalance: (u, address, balance) => {
     u('main.balances', address, (balances = []) => {

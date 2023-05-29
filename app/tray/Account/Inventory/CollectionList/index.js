@@ -63,6 +63,7 @@ const CollectionDot = styled.div`
   font-family: 'FiraCode';
   font-size: 10px;
   border: 1px solid var(--ghostB);
+  background: var(--ghostB);
   box-shadow: 0px 1px 2px var(--ghostY);
   z-index: 10;
   img {
@@ -71,20 +72,18 @@ const CollectionDot = styled.div`
     position: relative;
     z-index: 10;
   }
-  canvas {
-    opacity: 0;
+  img:before {
+    content: attr(alt);
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    overflow: hidden;
+    background: var(--ghostB);
+    color: var(--outerspace);
+    color: transparent;
   }
-`
-
-const MissingDot = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: absolute;
-  inset: 8px;
-  border-radius: 50%;
-  background: var(--outerspace);
-  z-index: 1;
 `
 
 const CollectionDots = styled.div`
@@ -122,8 +121,7 @@ const Collection = ({ moduleId, account, collection, collectionId }) => {
     .slice(0, 8)
 
   useEffect(() => {
-    const itemsForPreview = collection.meta.tokens.slice(0, 8)
-    const items = itemsForPreview.map((tokenId) => ({
+    const items = collection.meta.tokens.map((tokenId) => ({
       contract: collectionId,
       chainId: collection.meta.chainId,
       tokenId
@@ -165,19 +163,18 @@ const Collection = ({ moduleId, account, collection, collectionId }) => {
               />
             </CollectionIcon>
             <CollectionMain>
-              <CollectionDots style={{ width: previewItems.length * 22 + 4 + 'px' }}>
-                {previewItems.map((id, i) => {
-                  const item = collection.items[id] || {}
+              <CollectionDots style={{ width: previewItems.length * 24 + 'px' }}>
+                {previewItems.map((item, i) => {
+                  const img = item.image?.cdn?.frozen?.thumb || ''
                   return (
-                    <CollectionDot style={{ animationDelay: i * 0.1 + 's' }} active={active}>
-                      <img src={item.img} alt={item.name} />
-                      <MissingDot />
+                    <CollectionDot key={item.tokenId} active={active}>
+                      {<img src={img} alt={item.name} />}
                     </CollectionDot>
                   )
                 })}
               </CollectionDots>
               <CollectionLine />
-              <CollectionCount>{Object.keys(collection.items).length}</CollectionCount>
+              <CollectionCount>{Object.keys(collection.meta.tokens).length}</CollectionCount>
             </CollectionMain>
             <div className='signerBalanceChain'>
               <span style={{ color: chainColor ? `var(--${chainColor})` : '' }}>{chain.name}</span>

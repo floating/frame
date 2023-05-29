@@ -13,14 +13,6 @@ import {
 
 import { PulsateCircle, InventoryPreview, PreviewDisplay, PreviewOptions, Container } from './styled'
 
-const toItems = (contract, collection) => {
-  return collection.items.map((tokenId) => ({
-    contract,
-    chainId: collection.meta.chainId,
-    tokenId
-  }))
-}
-
 const previewTitle = (name = '') => {
   if (name.length > 29) {
     return name.slice(0, 27) + '..'
@@ -31,6 +23,7 @@ const previewTitle = (name = '') => {
 
 const InventoryCollection = ({ expandedData = {}, inventory, onAssetClick, account }) => {
   const [hoverAsset, setHoverAsset] = useState(false)
+  const { currentCollection } = expandedData
   const k = expandedData.currentCollection
   if (!k || !account || !inventory) return
   const [confirmHide, setConfirmHide] = useState(false)
@@ -42,14 +35,17 @@ const InventoryCollection = ({ expandedData = {}, inventory, onAssetClick, accou
 
   useEffect(() => {
     if (k) {
-      const collection = inventory[k]
-      const items = toItems(k, collection)
+      const collection = inventory[currentCollection]
+      const items = collection.meta.tokens.map((tokenId) => ({
+        contract: currentCollection,
+        chainId: collection.meta.chainId,
+        tokenId: tokenId
+      }))
       link.rpc('subscribeToItems', account, items, () => {})
     }
   }, [])
 
-  const renderClusterValue = (id, i) => {
-    const item = inventory[k].items[id]
+  const renderClusterValue = (item, i) => {
     if (!item) {
       return (
         <ClusterValue grow={1} transparent key={`empty-${Math.random()}`}>
@@ -57,7 +53,9 @@ const InventoryCollection = ({ expandedData = {}, inventory, onAssetClick, accou
         </ClusterValue>
       )
     }
-    const { tokenId, name, img } = item
+    const { tokenId, name, image } = item
+    const img = image?.cdn?.original?.main || ''
+
     return (
       <ClusterValue
         key={tokenId}
@@ -213,11 +211,26 @@ const InventoryCollection = ({ expandedData = {}, inventory, onAssetClick, accou
           >
             <ClusterScroll>
               {group(
-                Object.keys(inventory[k].items || {}).sort((a, b) => {
-                  a = inventory[k].items[a].tokenId
-                  b = inventory[k].items[b].tokenId
-                  return a < b ? -1 : b > a ? 1 : 0
-                })
+                (() => {
+                  let items = inventory[k].items || []
+                  let tokens = (inventory[k].meta.tokens || []).map((tokenId) => ({ tokenId }))
+
+                  let combinedItems = [...items]
+
+                  tokens.forEach((token) => {
+                    if (!items.find((item) => item.tokenId === token.tokenId)) {
+                      combinedItems.push(token)
+                    }
+                  })
+
+                  combinedItems.sort((a, b) => {
+                    a = a.tokenId
+                    b = b.tokenId
+                    return a < b ? -1 : b > a ? 1 : 0
+                  })
+
+                  return combinedItems
+                })()
               )}
             </ClusterScroll>
           </Container>

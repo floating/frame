@@ -33,11 +33,11 @@ export const PreviewDisplay = styled.div`
   padding: 8px;
 
   img {
-    width: 100%;
     height: 100%;
     object-fit: contain;
     border-radius: 26px;
     overflow: hidden;
+    background: var(--outerspace);
   }
 
   img:before {
