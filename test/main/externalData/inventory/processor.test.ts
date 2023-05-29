@@ -59,7 +59,7 @@ const Collection = (items: InventoryAsset[] = []) => ({
     },
     chainId: Math.floor(Math.random() * 10),
     external_url: randomStr(),
-    tokens: []
+    tokens: items.map((item) => item.tokenId)
   },
   items
 })
@@ -96,7 +96,7 @@ describe('#updateCollections', () => {
           ...existingCollection.meta,
           name: 'newName'
         },
-        items: [item]
+        items: existingCollection.items
       }
     }
 
