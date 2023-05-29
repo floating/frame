@@ -86,7 +86,6 @@ const toInventoryAsset = (item: CollectionItem) => ({
   name: item.name,
   tokenId: item.tokenId,
   image: item.image || {},
-  img: item.image.cdn.original.main || '',
   contract: item.contract,
   ...(item.link && { externalLink: item.link })
 })

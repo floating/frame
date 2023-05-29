@@ -54,7 +54,7 @@ const InventoryCollection = ({ expandedData = {}, inventory, onAssetClick, accou
       )
     }
     const { tokenId, name, image } = item
-    const img = image?.cdn?.original?.main || ''
+    const src = image?.cdn?.original?.main || image?.cdn?.frozen?.main || ''
 
     return (
       <ClusterValue
@@ -72,19 +72,14 @@ const InventoryCollection = ({ expandedData = {}, inventory, onAssetClick, accou
           setHoverAsset({
             name,
             tokenId,
-            img
+            src
           })
         }}
       >
         <div className='inventoryCollectionItem'>
-          {img ? (
+          {src ? (
             <div className='inventoryCollectionItemImage'>
-              <img
-                src={img}
-                // src={`${pylonProxy}?type=nft&target=${encodeURIComponent(img)}`}
-                loading='lazy'
-                alt={(name || '').toUpperCase()}
-              />
+              <img src={src} loading='lazy' alt={(name || '').toUpperCase()} />
             </div>
           ) : (
             <PulsateCircle index={i} />
@@ -112,12 +107,12 @@ const InventoryCollection = ({ expandedData = {}, inventory, onAssetClick, accou
       <InventoryPreview>
         <ClusterBox style={{ height: '100%' }}>
           <Cluster>
-            {hoverAsset && hoverAsset.img ? (
+            {hoverAsset && hoverAsset.src ? (
               <>
                 <ClusterRow>
                   <ClusterValue>
                     <PreviewDisplay>
-                      <img src={hoverAsset.img} alt={(hoverAsset.name || '').toUpperCase()} />
+                      <img src={hoverAsset.src} alt={(hoverAsset.name || '').toUpperCase()} />
                     </PreviewDisplay>
                   </ClusterValue>
                 </ClusterRow>
@@ -137,7 +132,11 @@ const InventoryCollection = ({ expandedData = {}, inventory, onAssetClick, accou
                         style={
                           inventory[k].meta.image
                             ? {
-                                backgroundImage: `url(${inventory[k].meta.image})`
+                                backgroundImage: `url(${
+                                  inventory[k].meta.image.cdn.original.main ||
+                                  inventory[k].meta.image.cdn.frozen.main ||
+                                  ''
+                                })`
                               }
                             : {}
                         }

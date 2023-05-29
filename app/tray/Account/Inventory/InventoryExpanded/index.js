@@ -49,6 +49,8 @@ const InventoryExpanded = ({ expandedData, moduleId, account }) => {
     return matchFilter(collectionFilter, [collectionName, collectionChain.name, ...itemNames])
   }
 
+  let hiddenCount = 0
+
   const displayCollections = () => {
     const inventory = useStore('main.inventory', account)
     const collections = Object.keys(inventory || {})
@@ -58,6 +60,7 @@ const InventoryExpanded = ({ expandedData, moduleId, account }) => {
         if (!c || !c.meta) return false
         const collectionId = `${c.meta.chainId}:${k}`
         const isHidden = hiddenCollections.includes(collectionId)
+        if (isHidden) hiddenCount++
         return expandedData.hidden ? isHidden : !isHidden
       })
       .sort((a, b) => {
@@ -99,7 +102,7 @@ const InventoryExpanded = ({ expandedData, moduleId, account }) => {
             </ClusterRow>
           )}
         </Cluster>
-        {!expandedData.hidden && (
+        {!expandedData.hidden ? (
           <div className='signerBalanceTotal'>
             <div className='signerBalanceButtons'>
               <div
@@ -117,14 +120,28 @@ const InventoryExpanded = ({ expandedData, moduleId, account }) => {
                   link.send('nav:forward', 'panel', crumb)
                 }}
               >
-                {`+${hiddenCollections.length} Hidden`}
+                {`+${hiddenCount} Hidden`}
               </div>
             </div>
           </div>
-        )}
+        ) : null}
       </ClusterBox>
     </div>
   )
 }
 
 export default InventoryExpanded
+
+// <div className='signerBalanceTotal'>
+//   <div className='signerBalanceButtons'>
+//     <div
+//       className='signerBalanceButton signerBalanceShowAll'
+//       onClick={() => {
+//         link.send('tray:action', 'collectionVisiblityReset')
+//         link.send('nav:back', 'panel')
+//       }}
+//     >
+//       {`Unhide All`}
+//     </div>
+//   </div>
+// </div>

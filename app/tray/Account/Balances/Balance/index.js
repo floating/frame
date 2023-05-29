@@ -34,8 +34,7 @@ const Balance = (props) => {
 
   const { name: chainName = '', isTestnet = false } = chain
 
-  // TODO: remove image check when data is consistent
-  const imageURL = typeof image === 'string' ? image : image?.cdn?.original?.main || ''
+  const imageURL = image?.cdn?.frozen?.thumb || image?.cdn?.original?.thumb || ''
 
   const isNative = address === '0x0000000000000000000000000000000000000000'
   const isEth = isNative && [1, 3, 4, 5, 10, 42, 42161, 11155111].includes(chainId)

@@ -3,9 +3,12 @@ import React from 'react'
 import svg from '../../svg'
 
 const Icon = ({ svgName, alt = '', svgSize = 16, img, small, nft, active, imgFrozen }) => {
+  console.log('active', active)
   if (imgFrozen && !active) {
+    console.log('showing frozen image', imgFrozen)
     return <img src={imgFrozen} alt={alt} />
   } else if (img) {
+    console.log('showing non-frozen image', img)
     return <img src={img} alt={alt} />
   }
 

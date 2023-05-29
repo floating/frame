@@ -104,6 +104,13 @@ const CollectionCount = styled.div`
   padding-left: 4px;
 `
 
+const displayName = (name = '') => {
+  if (name.length > 19) {
+    return name.slice(0, 25) + '...'
+  }
+  return name
+}
+
 const Collection = ({ moduleId, account, collection, collectionId }) => {
   const scanning = false
   const chain = useStore('main.networks.ethereum', collection.meta.chainId)
@@ -128,6 +135,9 @@ const Collection = ({ moduleId, account, collection, collectionId }) => {
     }))
     link.rpc('subscribeToItems', account, items, () => {})
   }, [])
+
+  const frozenSrc = collection?.meta?.image?.cdn?.frozen?.thumb || ''
+  const src = collection?.meta?.image?.cdn?.original?.thumb || ''
 
   return (
     <ClusterRow key={collectionId}>
@@ -155,7 +165,8 @@ const Collection = ({ moduleId, account, collection, collectionId }) => {
           <CollectionInner>
             <CollectionIcon>
               <RingIcon
-                img={collection.meta.image.cdn.frozen.thumb}
+                img={src}
+                imgFrozen={frozenSrc}
                 alt={collection.meta.name}
                 color={chainColor ? `var(--${chainColor})` : ''}
                 nft={true}
@@ -165,10 +176,10 @@ const Collection = ({ moduleId, account, collection, collectionId }) => {
             <CollectionMain>
               <CollectionDots style={{ width: previewItems.length * 24 + 'px' }}>
                 {previewItems.map((item, i) => {
-                  const img = item.image?.cdn?.frozen?.thumb || ''
+                  const src = item.image?.cdn?.frozen?.thumb || ''
                   return (
                     <CollectionDot key={item.tokenId} active={active}>
-                      {<img src={img} alt={item.name} />}
+                      {src ? <img src={src} alt={item.name} /> : null}
                     </CollectionDot>
                   )
                 })}
@@ -178,7 +189,7 @@ const Collection = ({ moduleId, account, collection, collectionId }) => {
             </CollectionMain>
             <div className='signerBalanceChain'>
               <span style={{ color: chainColor ? `var(--${chainColor})` : '' }}>{chain.name}</span>
-              <span>{collection.meta.name}</span>
+              <span>{displayName(collection.meta.name)}</span>
             </div>
           </CollectionInner>
         </div>

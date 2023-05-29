@@ -37,7 +37,6 @@ export const PreviewDisplay = styled.div`
     object-fit: contain;
     border-radius: 26px;
     overflow: hidden;
-    background: var(--outerspace);
   }
 
   img:before {

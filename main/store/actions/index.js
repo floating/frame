@@ -1012,6 +1012,11 @@ module.exports = {
       }
       return hiddenCollections
     })
+  },
+  collectionVisiblityReset(u) {
+    u('main.hiddenCollections', (hiddenCollections) => {
+      return []
+    })
   }
   // toggleUSDValue: (u) => {
   //   u('main.showUSDValue', show => !show)
