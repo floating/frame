@@ -77,7 +77,7 @@ const toInventoryAsset = (item: CollectionItem) => ({
 })
 
 const Surface = () => {
-  const Pylon = createPylon('wss://api.pylon.link')
+  const Pylon = createPylon('ws://localhost:9000')
   const subscriptions: Record<string, Subscription> = {}
   const networks = Networks()
 

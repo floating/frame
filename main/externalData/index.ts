@@ -81,12 +81,11 @@ const externalData = function () {
     rates.updateSubscription(storeApi.getConnectedNetworks().map((network) => network.id))
   })
 
-  //TODO: extract observers similar to with the provider observers...
-
   const activeAccountObserver = createActiveAccountObserver({
     addressChanged(address) {
       updateAccount(address)
-      surface.updateSubscribers([address])
+      const subscribers = address ? [address] : []
+      surface.updateSubscribers(subscribers)
     }
   })
 
