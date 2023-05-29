@@ -125,7 +125,7 @@ export function handleBalanceUpdate(
     const { zeroBalances, unknownBalances } = getTokenChanges(address, changedBalances)
     updateTokens(address, zeroBalances, unknownBalances)
 
-    storeApi.accountTokensUpdated(address)
+    storeApi.setAccountTokensUpdated(address)
   }
 
   storeApi.addPopulatedChains(address, chains, toExpiryWindow[mode])

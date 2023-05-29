@@ -1,17 +1,5 @@
 type HexAmount = string
 
-type InventoryAsset = {
-  name: string
-  [field: string]: any
-}
-
-type InventoryCollection = {
-  meta: any
-  items: Record<string, InventoryAsset>
-}
-
-type Inventory = Record<string, InventoryCollection>
-
 interface ViewMetadata {
   id: string
   ready: boolean

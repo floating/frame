@@ -2,7 +2,7 @@ import { NATIVE_CURRENCY } from '../../resources/constants'
 import { UsdRate } from '../provider/assets'
 import store from '../store'
 
-import type { Chain, Balance, Token, Rate, NativeCurrency } from '../store/state'
+import type { Chain, Balance, Token, Rate, NativeCurrency, Inventory, InventoryAsset } from '../store/state'
 import { TokenBalance } from './balances/scan'
 
 // Store API object
@@ -10,8 +10,11 @@ export const storeApi = {
   // Accounts
   getActiveAddress: () => (store('selected.current') || '') as Address,
   getAccounts: () => Object.keys(store('main.accounts') || {}) as Address[],
-  getAddresses: () => Object.keys(store('main.accounts')),
-  accountTokensUpdated: (address: Address) => store.accountTokensUpdated(address.toLowerCase()),
+  getAddresses: () => {
+    const addresses = Object.keys(store('main.accounts') || {})
+    return addresses as Address[]
+  },
+  setAccountTokensUpdated: (address: Address) => store.accountTokensUpdated(address.toLowerCase()),
 
   // Networks
   getNetwork: (id: number) => (store('main.networks.ethereum', id) || {}) as Chain,
@@ -68,16 +71,11 @@ export const storeApi = {
     store.removeBalances(address.toLowerCase(), tokens),
 
   // Methods related to inventory
-  getInventory: (address: Address) => store('main.inventory', address.toLowerCase()) as Inventory,
+  getInventory: (address: Address) => (store('main.inventory', address.toLowerCase()) || {}) as Inventory,
   setInventory: (address: Address, inventory: Inventory) =>
     store.setInventory(address.toLowerCase(), inventory),
-  setInventoryAsset: (
-    address: Address,
-    collectionAddress: Address,
-    tokenId: string,
-    asset: InventoryAsset
-  ) => {
-    store.setInventoryAsset(address.toLowerCase(), collectionAddress, tokenId, asset)
+  setInventoryAssets: (address: Address, collectionAddress: Address, assets: InventoryAsset[]) => {
+    store.setInventoryAssets(address.toLowerCase(), collectionAddress, assets)
   },
 
   // Rrates

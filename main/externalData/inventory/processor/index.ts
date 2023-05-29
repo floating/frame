@@ -2,29 +2,44 @@ import log from 'electron-log'
 
 import { storeApi } from '../../storeApi'
 
-const setInventory = (account: string, inventory: Inventory) => storeApi.setInventory(account, inventory)
+import type { Inventory, InventoryAsset } from '../../../store/state'
 
-const updateItems = (account: string, items: InventoryAsset[]) => {
-  const inventory = storeApi.getInventory(account)
-  items.forEach((item) => {
-    const collection = item.contract.toLowerCase()
-    const tokenId = item.tokenId.toLowerCase()
+export const updateCollections = (account: string, inventory: Inventory) => {
+  const existingInventory = storeApi.getInventory(account)
+  const collectionContractAddresses = Object.entries(inventory)
 
-    if (!inventory[collection]) {
-      log.warn('collection not found', { inventory })
-      return
+  // this only updates collection metadata
+  const updatedInventory = collectionContractAddresses.reduce((inv, [contractAddress, collection]) => {
+    const existingCollection = existingInventory[contractAddress]
+
+    inv[contractAddress] = {
+      ...collection,
+      items: existingCollection?.items || {}
     }
 
-    if (!inventory[collection].items[tokenId]) {
-      log.warn('tokenId not found', { inventory })
-      return
-    }
+    return inv
+  }, {} as Inventory)
 
-    storeApi.setInventoryAsset(account, collection, tokenId, item)
-  })
+  storeApi.setInventory(account, updatedInventory)
 }
 
-export default {
-  setInventory,
-  updateItems
+export const updateItems = (account: string, items: InventoryAsset[]) => {
+  const inventory = storeApi.getInventory(account)
+
+  const itemsByCollection = items.reduce((acc, item) => {
+    const collection = item.contract.toLowerCase()
+
+    if (!inventory[collection]) {
+      log.warn('Collection not found', { inventory, collection })
+      return acc
+    }
+
+    acc[collection] = [...(acc[collection] || []), item]
+
+    return acc
+  }, {} as Record<string, InventoryAsset[]>)
+
+  Object.entries(itemsByCollection).forEach(([collection, items]) =>
+    storeApi.setInventoryAssets(account, collection, items)
+  )
 }

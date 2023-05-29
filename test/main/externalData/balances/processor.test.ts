@@ -1,21 +1,12 @@
 import { jest } from '@jest/globals'
 import { randomBytes, randomInt } from 'crypto'
 
-import store from '../../../../main/store'
 import { handleBalanceUpdate } from '../../../../main/externalData/balances/processor'
 import { storeApi } from '../../../../main/externalData/storeApi'
 
 const randomStr = () => randomBytes(32).toString('hex')
 
 jest.mock('../../../../main/externalData/surface', () => ({}))
-jest.mock('../../../../main/store', () => ({
-  removeKnownTokens: jest.fn(),
-  addKnownTokens: jest.fn(),
-  setBalances: jest.fn(),
-  accountTokensUpdated: jest.fn(),
-  addPopulatedChains: jest.fn()
-}))
-
 const { getTokenBalances, getCustomTokens } = jest.mocked(storeApi)
 
 jest.mock('../../../../main/externalData/storeApi', () => ({
@@ -26,7 +17,8 @@ jest.mock('../../../../main/externalData/storeApi', () => ({
     addPopulatedChains: jest.fn(),
     setBalances: jest.fn(),
     addKnownTokens: jest.fn(),
-    accountTokensUpdated: jest.fn()
+    accountTokensUpdated: jest.fn(),
+    setAccountTokensUpdated: jest.fn()
   }
 }))
 
