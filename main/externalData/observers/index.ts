@@ -2,7 +2,7 @@ import deepEqual from 'deep-equal'
 
 import store from '../../store'
 import { arraysEqual } from '../../../resources/utils'
-import { storeApi } from '../balances/storeApi'
+import { storeApi } from '../storeApi'
 
 import type { Token } from '../../store/state'
 

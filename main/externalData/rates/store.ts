@@ -1,10 +1,8 @@
 import log from 'electron-log'
 import { AssetId, AssetType } from '@framelabs/pylon-client/dist/assetId'
 
-import store from '../../store'
-
 import type { UsdRate } from '../../provider/assets'
-import type { Rate } from '../../store/state'
+import { storeApi } from '../storeApi'
 
 type RateUpdate = {
   id: AssetId
@@ -40,14 +38,6 @@ const gatherTokenRates = (updates: RateUpdate[]) =>
 
     return rates
   }, {} as Record<string, UsdRate>)
-
-const storeApi = {
-  setTokenRates: (rates: Record<Address, UsdRate>) => store.setRates(rates),
-  removeTokenRate: (address: Address) => store.removeRate(address),
-  setNativeCurrencyRate: (chainId: number, rate: Rate) =>
-    store.setNativeCurrencyData('ethereum', chainId, { usd: rate }),
-  removeNativeCurrencyRate: (chainId: number) => store.removeNativeCurrencyRate('ethereum', chainId)
-}
 
 const handleNativeCurrencyUpdates = (updates: RateUpdate[]) => {
   log.debug('Handling native currency rate updates', { chains: updates.map((u) => u.id.chainId) })

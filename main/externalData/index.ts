@@ -6,7 +6,7 @@ import RatesSubscriptions from './rates/subscriptions'
 import BalanceScanner from './balances/scanner'
 import { handleCustomTokenUpdate } from './balances/processor'
 import surface from './surface'
-import { storeApi } from './balances/storeApi'
+import { storeApi } from './storeApi'
 import { debounce } from '../../resources/utils'
 
 import {
@@ -56,7 +56,9 @@ const externalData = function () {
   const rates = RatesSubscriptions(pylon)
 
   rates.start()
-  surface.updateSubscribers(Object.keys(store('main.accounts')))
+  const accounts = storeApi.getAccounts()
+
+  surface.updateSubscribers(accounts)
 
   surface.networks.on('updated', ({ account }) => {
     if (account === storeApi.getActiveAddress()) {

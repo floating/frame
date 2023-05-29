@@ -1,9 +1,8 @@
 import log from 'electron-log'
 
 import { isEqual } from 'lodash'
-import store from '../../../store'
 import surface from '../../surface'
-import { storeApi } from '../storeApi'
+import { storeApi } from '../../storeApi'
 import { toTokenId } from '../../../../resources/domain/balance'
 
 import type { Token } from '../../../store/state'
@@ -25,13 +24,13 @@ const getChangedBalances = (address: string, tokenBalances: TokenBalance[]): Tok
       ({ address, chainId }) => address === newAddress && chainId === newChainId
     )
 
-    const hasChanged =
-      !currentBalance ||
-      (customTokens.has(toTokenId(newBalance))
-        ? currentBalance.balance !== newBalanceValue
-        : !isEqual(currentBalance, newBalance))
+    const isCustomToken = customTokens.has(toTokenId(newBalance))
 
-    if (hasChanged) {
+    const hasChanged = isCustomToken
+      ? currentBalance?.balance !== newBalanceValue
+      : !isEqual(currentBalance, newBalance)
+
+    if (!currentBalance || hasChanged) {
       balances.push(newBalance)
     }
 
@@ -101,11 +100,11 @@ const mergeCustomTokens = (balances: TokenBalance[]): TokenBalance[] => {
 
 function updateTokens(address: string, zeroBalances: Set<string>, unknownBalances: TokenBalance[]) {
   if (zeroBalances.size) {
-    store.removeKnownTokens(address, zeroBalances)
+    storeApi.removeKnownTokens(address, zeroBalances)
   }
 
   if (unknownBalances.length) {
-    store.addKnownTokens(address, unknownBalances)
+    storeApi.addKnownTokens(address, unknownBalances)
   }
 }
 
@@ -122,14 +121,14 @@ export function handleBalanceUpdate(
   const changedBalances = getChangedBalances(address, withCustom)
 
   if (changedBalances.length) {
-    store.setBalances(address, changedBalances)
+    storeApi.setBalances(address, changedBalances)
     const { zeroBalances, unknownBalances } = getTokenChanges(address, changedBalances)
     updateTokens(address, zeroBalances, unknownBalances)
 
-    store.accountTokensUpdated(address, chains)
+    storeApi.accountTokensUpdated(address)
   }
 
-  store.addPopulatedChains(address.toLowerCase(), chains, toExpiryWindow[mode])
+  storeApi.addPopulatedChains(address, chains, toExpiryWindow[mode])
 }
 
 export function handleCustomTokenUpdate(customTokens: Token[]) {
@@ -153,7 +152,7 @@ export function handleCustomTokenUpdate(customTokens: Token[]) {
     }, [] as TokenBalance[])
 
     if (newBalances.length) {
-      store.setBalances(address, newBalances)
+      storeApi.setBalances(address, newBalances)
     }
   })
 }

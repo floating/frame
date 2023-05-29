@@ -3,7 +3,7 @@ import { randomBytes, randomInt } from 'crypto'
 
 import store from '../../../../main/store'
 import { handleBalanceUpdate } from '../../../../main/externalData/balances/processor'
-import { storeApi } from '../../../../main/externalData/balances/storeApi'
+import { storeApi } from '../../../../main/externalData/storeApi'
 
 const randomStr = () => randomBytes(32).toString('hex')
 
@@ -18,18 +18,17 @@ jest.mock('../../../../main/store', () => ({
 
 const { getTokenBalances, getCustomTokens } = jest.mocked(storeApi)
 
-jest.mock('../../../../main/externalData/balances/storeApi', () => ({
+jest.mock('../../../../main/externalData/storeApi', () => ({
   storeApi: {
     getTokenBalances: jest.fn(() => []),
     getCustomTokens: jest.fn(() => []),
-    getKnownTokens: () => []
+    getKnownTokens: () => [],
+    addPopulatedChains: jest.fn(),
+    setBalances: jest.fn(),
+    addKnownTokens: jest.fn(),
+    accountTokensUpdated: jest.fn()
   }
 }))
-
-// Reset all mocks before each test
-beforeEach(() => {
-  jest.clearAllMocks()
-})
 
 const Balance = (
   chainId = 1,
@@ -58,14 +57,14 @@ describe('snapshot updates', () => {
     const address = randomStr()
     const chains = [1, 2, 3]
     handleBalanceUpdate(address, [], chains, 'snapshot')
-    expect(store.addPopulatedChains).toHaveBeenCalledWith(address, chains, 1000 * 60 * 5)
+    expect(storeApi.addPopulatedChains).toHaveBeenCalledWith(address, chains, 1000 * 60 * 5)
   })
 
   it('should update the state with the new balances', () => {
     const address = randomStr()
     const balances = [Balance(), Balance()]
     handleBalanceUpdate(address, balances, [], 'snapshot')
-    expect(store.setBalances).toHaveBeenCalledWith(address, balances)
+    expect(storeApi.setBalances).toHaveBeenCalledWith(address, balances)
   })
 
   it('should use custom token data where available', () => {
@@ -80,7 +79,7 @@ describe('snapshot updates', () => {
 
     handleBalanceUpdate(address, balances, [1], 'snapshot')
 
-    expect(store.setBalances).toHaveBeenCalledWith(address, [
+    expect(storeApi.setBalances).toHaveBeenCalledWith(address, [
       {
         ...balances[0],
         ...customTokens[0]
@@ -105,7 +104,7 @@ describe('snapshot updates', () => {
 
     handleBalanceUpdate(address, balances, [1], 'snapshot')
 
-    expect(store.setBalances).toHaveBeenCalledWith(address, [...balances, customTokenBalance])
+    expect(storeApi.setBalances).toHaveBeenCalledWith(address, [...balances, customTokenBalance])
   })
 
   it('should not update balances which have not changed', () => {
@@ -116,7 +115,7 @@ describe('snapshot updates', () => {
 
     handleBalanceUpdate(address, balances, [], 'snapshot')
 
-    expect(store.setBalances).not.toHaveBeenCalled()
+    expect(storeApi.setBalances).not.toHaveBeenCalled()
   })
 
   it('should update the balances where the amount has changed', () => {
@@ -132,7 +131,7 @@ describe('snapshot updates', () => {
 
     handleBalanceUpdate(address, [newBalance], [], 'snapshot')
 
-    expect(store.setBalances).toHaveBeenCalledWith(address, [newBalance])
+    expect(storeApi.setBalances).toHaveBeenCalledWith(address, [newBalance])
   })
 
   it('should update the balances where the amount has changed and its a custom token', () => {
@@ -147,7 +146,7 @@ describe('snapshot updates', () => {
 
     handleBalanceUpdate(address, [newBalance], [], 'snapshot')
 
-    expect(store.setBalances).toHaveBeenCalledWith(address, [newBalance])
+    expect(storeApi.setBalances).toHaveBeenCalledWith(address, [newBalance])
   })
 
   it('should update the balances where the metadata have changed and its not a custom token', () => {
@@ -163,7 +162,7 @@ describe('snapshot updates', () => {
 
     handleBalanceUpdate(address, [newBalance], [], 'snapshot')
 
-    expect(store.setBalances).toHaveBeenCalledWith(address, [newBalance])
+    expect(storeApi.setBalances).toHaveBeenCalledWith(address, [newBalance])
   })
 
   it('should not update the balances where the metadata has changed but the token is custom', () => {
@@ -189,7 +188,7 @@ describe('snapshot updates', () => {
 
     handleBalanceUpdate(address, [newBalance], [], 'snapshot')
 
-    expect(store.setBalances).not.toHaveBeenCalled()
+    expect(storeApi.setBalances).not.toHaveBeenCalled()
   })
 })
 

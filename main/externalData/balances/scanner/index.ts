@@ -1,12 +1,11 @@
 import log from 'electron-log'
-import { storeApi } from '../storeApi'
+import { storeApi } from '../../storeApi'
 import { NATIVE_CURRENCY } from '../../../../resources/constants'
 import { toTokenId } from '../../../../resources/domain/balance'
 import BalancesWorkerController from '../controller'
 import { handleBalanceUpdate } from '../processor'
 import { CurrencyBalance, TokenBalance } from '../scan'
-import { Balance, Token, WithTokenId } from '../../../store/state'
-import store from '../../../store'
+import { Token, WithTokenId } from '../../../store/state'
 
 const RESTART_WAIT = 5 // seconds
 
@@ -178,27 +177,27 @@ function BalanceScanner() {
   function handleUpdate(address: Address, updateFn: (address: Address) => void) {
     // because updates come from another process its possible to receive updates after an account
     // has been removed but before we stop the scan, so check to make sure the account exists
-    if (store('main.accounts', address)) {
-      updateFn(address)
-    }
+    const accounts = storeApi.getAccounts()
+    if (accounts.includes(address)) updateFn(address)
   }
 
   function handleChainBalanceUpdate(balances: CurrencyBalance[], address: Address) {
     const currentChainBalances = storeApi.getCurrencyBalances(address)
 
-    // only update balances that have changed
-    balances
-      .filter(
-        (balance) =>
-          (currentChainBalances.find((b) => b.chainId === balance.chainId) || {}).balance !== balance.balance
-      )
-      .forEach((balance) => {
-        store.setBalance(address, {
+    // update balances that have changed
+    for (const balance of balances) {
+      const currentBalance = currentChainBalances.find((b) => b.chainId === balance.chainId)
+      if (currentBalance) {
+        const { symbol, decimals, name } = storeApi.getNativeCurrency(balance.chainId)
+        storeApi.setBalance(address, {
           ...balance,
-          symbol: storeApi.getNativeCurrencySymbol(balance.chainId),
+          symbol,
+          decimals,
+          name,
           address: NATIVE_CURRENCY
         })
-      })
+      }
+    }
   }
 
   function handleTokenBalanceUpdate(balances: TokenBalance[], address: Address) {
@@ -209,18 +208,18 @@ function BalanceScanner() {
     const includesBlacklistedTokens = (arr: WithTokenId[]) =>
       arr.some((val) => tokensToRemove.has(toTokenId(val)))
 
-    const balances: Record<string, Balance[]> = store('main.balances')
-    const knownTokens: Record<string, Token[]> = store('main.tokens.known')
+    const balances = storeApi.getAllBalances()
+    const knownTokens = storeApi.getAllKnownTokens()
 
     Object.entries(balances).forEach(([accountAddress, balances]) => {
       if (includesBlacklistedTokens(balances)) {
-        store.removeBalances(accountAddress, tokensToRemove)
+        storeApi.removeBalances(accountAddress, tokensToRemove)
       }
     })
 
     Object.entries(knownTokens).forEach(([accountAddress, tokens]) => {
       if (includesBlacklistedTokens(tokens)) {
-        store.removeKnownTokens(accountAddress, tokensToRemove)
+        storeApi.removeKnownTokens(accountAddress, tokensToRemove)
       }
     })
   }
@@ -260,10 +259,6 @@ function BalanceScanner() {
       enabledNetworks = new Set(chains)
       runWhenReady(() => updateBalances(address, chains))
     }
-  }
-
-  function getNetworks() {
-    return Array.from(enabledNetworks)
   }
 
   function addTokens(address: Address, tokens: Token[]) {

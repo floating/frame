@@ -1,13 +1,11 @@
 import log from 'electron-log'
 
-import store from '../../../store'
+import { storeApi } from '../../storeApi'
 
-const setInventory = (account: string, inventory: Inventory) => {
-  store.setInventory(account.toLowerCase(), inventory)
-}
+const setInventory = (account: string, inventory: Inventory) => storeApi.setInventory(account, inventory)
 
 const updateItems = (account: string, items: InventoryAsset[]) => {
-  const inventory = store('main.inventory', account.toLowerCase()) as Inventory
+  const inventory = storeApi.getInventory(account)
   items.forEach((item) => {
     const collection = item.contract.toLowerCase()
     const tokenId = item.tokenId.toLowerCase()
@@ -22,7 +20,7 @@ const updateItems = (account: string, items: InventoryAsset[]) => {
       return
     }
 
-    store.setInventoryAsset(account.toLowerCase(), collection, tokenId, item)
+    storeApi.setInventoryAsset(account, collection, tokenId, item)
   })
 }
 

@@ -2,17 +2,11 @@ import log from 'electron-log'
 import Pylon, { AssetType } from '@framelabs/pylon-client'
 
 import { handleUpdates } from './store'
-import store from '../../store'
 import { toTokenId } from '../../../resources/domain/balance'
 
 import type { AssetId } from '@framelabs/pylon-client/dist/assetId'
 import type { Token } from '../../store/state'
-
-const storeApi = {
-  getKnownTokens: (address?: Address) => ((address && store('main.tokens.known', address)) || []) as Token[],
-  getAddresses: () => Object.keys(store('main.accounts')),
-  getCustomTokens: () => (store('main.tokens.custom') || []) as Token[]
-}
+import { storeApi } from '../storeApi'
 
 export default function rates(pylon: Pylon) {
   function updateSubscription(chains: number[]) {
