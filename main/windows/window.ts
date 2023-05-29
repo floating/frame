@@ -122,15 +122,15 @@ export function openBlockExplorer(openExplorer: OpenExplorer) {
 
   if (explorer) {
     if (type === 'tx' && hash) {
-      explorerUrl = `/tx/${hash}`
+      explorerUrl = `${explorer}/tx/${hash}`
     } else if (type === 'token' && address) {
       if (tokenId) {
-        explorerUrl = `/nft/${address}/${tokenId}`
+        explorerUrl = `${explorer}/nft/${address}/${tokenId}`
       } else {
-        explorerUrl = `/token/${address}`
+        explorerUrl = `${explorer}/token/${address}`
       }
     } else if (type === 'address' && address) {
-      explorerUrl = `/address/${address}`
+      explorerUrl = `${explorer}/address/${address}`
     }
     shell.openExternal(explorerUrl)
   }
