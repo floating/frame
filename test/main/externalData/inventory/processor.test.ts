@@ -96,7 +96,7 @@ describe('#updateCollections', () => {
           ...existingCollection.meta,
           name: 'newName'
         },
-        items: []
+        items: [item]
       }
     }
 
